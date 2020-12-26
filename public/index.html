@@ -1,0 +1,71 @@
+<html>
+<head>
+    <!-- Without this '×' may not be rendered correctly //-->
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <style>
+    body {
+        background-color: black;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        font-size: 16px;
+    }
+    .mainGame {
+        position: relative;
+        margin-left: auto;
+        margin-right: auto;
+        padding-top: 2px;
+        width: 960px;
+        min-height: 540px;
+        background-color: black;
+        background-repeat: repeat;
+        top: 0px;
+        -moz-user-select: none;
+        -khtml-user-select: none;
+        -webkit-user-select: none;
+        -o-user-user-select: none;
+        cursor: default;
+    }
+    .loading {
+        font-size: 50px;
+        color: white;
+    }
+    /* https://stackoverflow.com/questions/7615009/disable-interpolation-when-scaling-a-canvas */
+    canvas {
+        image-rendering: optimizeSpeed;             /* Older versions of FF          */
+        image-rendering: -moz-crisp-edges;          /* FF 6.0+                       */
+        image-rendering: -webkit-optimize-contrast; /* Safari                        */
+        image-rendering: -o-crisp-edges;            /* OS X & Windows Opera (12.02+) */
+        image-rendering: pixelated;                 /* Awesome future-browsers       */
+        -ms-interpolation-mode: nearest-neighbor;
+    }
+    </style>
+    <link rel="stylesheet" type="text/css" href="styles.css" />
+    <title>Adventure Game</title>
+</head>
+<body class="pagebody">
+<div class="js-mainGame  mainGame">
+    <div class="js-loading loading" style="display: none">
+        Loading...
+    </div>
+    <script>
+        // Only show the loading text if it takes more than .2 seconds to load
+        setTimeout(function () {
+            if (document.querySelector('.js-gameContent').style.display === 'none') {
+                document.querySelector('.js-loading').style.display = '';
+            }
+        }, 200);
+    </script>
+    <div class="js-gameContent gameContent" style="display: none">
+        <div class="js-mouseContainer js-mainCanvasContainer mainCanvasContainer">
+            <canvas
+                class="js-mainCanvas mainCanvas"
+                width="256" height="224"
+                style="background-color: blue; transform-origin: 0 0; transform: scale(3);"
+            ></canvas>
+        </div>
+    </div>
+</div>
+</body>
+<script src="client.js"></script>
+</html>

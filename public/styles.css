@@ -1,0 +1,87 @@
+.gameContent {
+    position: relative;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    white-space: nowrap;
+    width: 768px;
+    height: 672px;
+}
+
+/* Context Menu */
+.contextMenu {
+    position: absolute;
+    background-color: #DDD;
+    width: 150px;
+    z-index: 10;
+    user-select: none;
+    /* Without some outline, it is hard to see what is happening when one menu is on top of another */
+    box-shadow: 2px 2px 10px black;
+    /* Make the menu scroll when there are too many elements to display comfortably. */
+    max-height: 400px;
+    overflow-y: auto;
+}
+.contextOption {
+    position: relative;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: sans-serif;
+    padding: 8px 8px;
+}
+.contextOption:hover, .contextOption.open {
+    background-color: #EEE;
+}
+
+.pp-container {
+    position: absolute;
+    right: 0px;
+    top: 0;
+    width: 400px;
+    padding: 4px;
+    background-color: #EEE;
+    font-size: 16px;
+    font-family: arial;
+}
+
+.pp-row {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 8px;
+    align-items: center;
+}
+
+.pp-property {
+    display: inline-block;
+    margin-right: 4px;
+}
+
+.pp-container select {
+    width: 120px;
+}
+.pp-container input[type="checkbox"] {
+    margin: 0;
+    margin-left: 4px;
+}
+.pp-container input[type="number"] {
+    margin: 0;
+    margin-left: 4px;
+    width: 4em;
+}
+.pp-tag-container {
+    border: 1px solid black;
+    padding: 4px;
+    background: white;
+}
+.pp-tag {
+    background-color: #AAA;
+    border-radius: 4px;
+    padding: 2px 4px;
+    cursor: pointer;
+    color: white;
+}
+.pp-tag:after-content {
+    content: 'x';
+    color: #AAA;
+}
+.pp-tag:hover:after-content {
+    color: red;
+}
