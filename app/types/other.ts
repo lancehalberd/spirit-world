@@ -39,9 +39,6 @@ export interface ShortRectangle {
     y: number,
     w: number,
     h: number,
-    // This is a bit of a hack but it is a simple way of allowing me to
-    // associate a depth value for an image.
-    d?: number,
 }
 export interface FrameDimensions {
     w: number,

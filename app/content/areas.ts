@@ -12,12 +12,14 @@ const worldMapPalette: TilePalette = {
     defaultTiles: [{x: 0, y: 16}, {x: 1, y: 16}, {x: 2, y: 16}, {x: 3, y: 16}],
     behaviors: {
         '16x8': {solid: true, canPickup: true, underTile: {x: 1, y: 8}},
-    }
-}
+        '5x8': {solid: true},
+        '7x8': {damage: 1},
+    },
+};
 
 export const palettes: {[key: string]: TilePalette} = {
     worldMap: worldMapPalette
-}
+};
 
 export function getDefaultArea(): AreaDefinition {
     return {

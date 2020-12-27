@@ -27,8 +27,8 @@ export function isPointInRectObject(x: number, y: number, rectangle: FullRectang
 }
 
 
-export function rectanglesOverlap(A: FullRectangle, B: FullRectangle) {
-    return !(A.bottom < B.top || A.top > B.bottom || A.right < B.left || A.left > B.right);
+export function rectanglesOverlap(A: ShortRectangle, B: ShortRectangle) {
+    return !(A.y + A.h < B.y || A.y > B.y + B.h || A.x + A.w < B.x || A.x > B.x + B.w);
 }
 
 export function collision(element1: HTMLElement, element2: HTMLElement): boolean {

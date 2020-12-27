@@ -9,7 +9,17 @@ const [mapTilesFrame] = createAnimation('gfx/tiles/overworld.png', {w: 384, h: 6
 const heroFrame: Frame = { image: mapTilesFrame.image, x: 48, y: 560, w: 16, h: 16};
 
 export function renderActor(context: CanvasRenderingContext2D, state: GameState, actor: Actor): void {
-    drawFrame(mainContext, heroFrame, { x: actor.x, y: actor.y, w: heroFrame.w, h: heroFrame.h });
+
+    mainContext.save();
+        if (actor.invulnerableFrames) {
+            mainContext.globalAlpha = 0.7 + 0.3 * Math.cos(2 * Math.PI * actor.invulnerableFrames * 3 / 50);
+        }
+        if (state.hero.action === 'roll' && state.hero.actionFrame) {
+            drawFrame(mainContext, heroFrame, { x: actor.x, y: actor.y - 2, w: heroFrame.w, h: heroFrame.h });
+        } else {
+            drawFrame(mainContext, heroFrame, { x: actor.x, y: actor.y, w: heroFrame.w, h: heroFrame.h });
+        }
+    mainContext.restore();
     if (actor.pickUpTile) {
         renderCarriedTile(context, state, actor);
     }

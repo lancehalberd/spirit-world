@@ -8,17 +8,16 @@ import { AreaLayer, Frame, Tile, TilePalette } from 'app/types';
 
 const [backgroundCanvas, backgroundContext] = createCanvasAndContext(512, 512);
 
-let lastTimeRendered;
 export function render() {
     const state = getState();
     if (!state?.gameHasBeenInitialized) {
         return;
     }
     // Only render if the state has actually progressed since the last render.
-    if (lastTimeRendered && lastTimeRendered >= state.time) {
+    if (state.lastTimeRendered >= state.time) {
         return;
     }
-    lastTimeRendered = state.time;
+    state.lastTimeRendered = state.time;
     const area = state.areaInstance;
 
     area.layers.map(layer => renderLayer(backgroundContext, layer));
@@ -30,10 +29,22 @@ export function render() {
             state.camera.x, state.camera.y, CANVAS_WIDTH, CANVAS_HEIGHT,
         );
         renderActor(mainContext, state, state.hero);
+        for (const object of state.areaInstance.objects) {
+            object?.render(mainContext, state);
+        }
     mainContext.restore();
     /*const index = Math.floor(state.hero.x / 32) % easternFrames.length;
     const frame = easternFrames[index];
     drawFrame(mainContext, frame, {...frame, x:0,y:0});*/
+    mainContext.fillStyle = 'red';
+    mainContext.strokeStyle = 'red';
+    for (let i = 0; i < state.hero.maxLife; i++) {
+        if (i < state.hero.life) {
+            mainContext.fillRect(5 + i * 15, 5, 10, 15);
+        } else {
+            mainContext.strokeRect(5 + i * 15, 5, 10, 15);
+        }
+    }
 }
 
 export function getTileFrame({w, h, source}: TilePalette, tile: Tile): Frame {

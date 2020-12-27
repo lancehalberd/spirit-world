@@ -10,5 +10,6 @@ export interface GameState {
     camera: { x: number, y: number },
     time: number,
     gameHasBeenInitialized: boolean,
+    lastTimeRendered: number,
     areaInstance?: AreaInstance,
 }

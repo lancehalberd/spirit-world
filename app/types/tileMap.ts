@@ -1,8 +1,9 @@
-import { Frame } from 'app/types';
+import { AnimationEffect, Frame, GameState, LootObject, ThrownObject } from 'app/types';
 
 export type Direction = 'up' | 'down' | 'left' | 'right';
 
 export interface TileBehaviors {
+    damage?: number,
     solid?: boolean,
     canPickup?: boolean,
     underTile?: {x: number, y: number}
@@ -83,12 +84,8 @@ export interface AreaInstance {
 export interface BaseObjectInstance {
     type: string,
     update?: (state) => void,
-    render?: (state: AreaInstance) => void,
+    render?: (context: CanvasRenderingContext2D, state: GameState) => void,
 }
 
-export interface ThrownObject extends BaseObjectInstance {
-    type: 'thrownObject',
-}
-
-export type ObjectInstance = ThrownObject;
+export type ObjectInstance = AnimationEffect | ThrownObject | LootObject;
 

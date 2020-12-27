@@ -50,9 +50,6 @@ function moveActorInDirection(state: GameState, actor: Actor, amount: number, di
     else if (direction === 'left') rightColumn = leftColumn;
     else if (direction === 'right') leftColumn = rightColumn;
 
-
-    // Flag indicating that the player was bounced back. Will only stay true
-    // if every tile hit is bouncy
     // const tiles = state.areaInstance.layers[0].grid.tiles;
     const behaviorGrid = state.areaInstance.behaviorGrid;
     for (let row = topRow; row <= bottomRow; row++) {
@@ -62,8 +59,8 @@ function moveActorInDirection(state: GameState, actor: Actor, amount: number, di
             if (!behaviors) {
                 continue;
             }
-            if (!behaviors) {
-                continue;
+            if (behaviors.solid && behaviors.damage > 0) {
+                damageActor(state, actor, behaviors.damage);
             }
             if (behaviors.solid) {
                 return false;
@@ -73,4 +70,35 @@ function moveActorInDirection(state: GameState, actor: Actor, amount: number, di
     actor.x = ax;
     actor.y = ay;
     return true;
+}
+export function checkForFloorDamage(state: GameState, actor: Actor) {
+    const palette = state.areaInstance.palette;
+    const tileSize = palette.w;
+
+    let leftColumn = Math.floor((actor.x + 4) / tileSize);
+    let rightColumn = Math.floor((actor.x + actor.w - 5) / tileSize);
+    let topRow = Math.floor((actor.y + 4) / tileSize);
+    let bottomRow = Math.floor((actor.y + actor.h - 5) / tileSize);
+
+    const behaviorGrid = state.areaInstance.behaviorGrid;
+    for (let row = topRow; row <= bottomRow; row++) {
+        for (let column = leftColumn; column <= rightColumn; column++) {
+            const behaviors = behaviorGrid?.[row]?.[column];
+            // This will happen when the player moves off the edge of the screen.
+            if (!behaviors) {
+                continue;
+            }
+            if (behaviors.damage > 0) {
+                damageActor(state, actor, behaviors.damage);
+            }
+        }
+    }
+}
+
+function damageActor(state: GameState, actor: Actor, damage: number) {
+    if (actor.action === 'roll' || actor.invulnerableFrames > 0) {
+        return;
+    }
+    actor.life -= damage;
+    actor.invulnerableFrames = 50;
 }
