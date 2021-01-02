@@ -1,34 +1,63 @@
+import { removeObjectFromArea } from 'app/content/areas';
 import { createCanvasAndContext } from 'app/dom';
+import { FRAME_LENGTH } from 'app/gameConstants';
+import { getState } from 'app/state';
 import { drawFrame } from 'app/utils/animations';
 import { rectanglesOverlap } from 'app/utils/index';
 
-import {Frame, GameState } from 'app/types';
+import { Frame, GameState, LootObjectDefinition, LootType, ObjectInstance, ShortRectangle } from 'app/types';
 
-
-interface Props {
-    frame?: Frame,
-    x?: number
-    y?: number,
+export class LootGetAnimation implements ObjectInstance {
+    definition = null;
+    loot: LootObject | ChestObject;
+    animationTime: number = 0;
+    x: number;
+    y: number;
+    z: number;
+    constructor(loot: LootObject | ChestObject) {
+        this.loot = loot;
+        const state = getState();
+        const frame = lootFrames[this.loot.definition.lootType] || lootFrames.unknown;
+        this.x = state.hero.x + state.hero.w / 2 - frame.w / 2;
+        this.y = state.hero.y - 4;
+        this.z = 8;
+    }
+    update(state: GameState) {
+        if (this.z < 20) {
+            this.z += 0.5;
+        }
+        this.animationTime += FRAME_LENGTH;
+        if (this.animationTime > 1000) {
+            removeObjectFromArea(state.areaInstance, this);
+        }
+    }
+    render(context, state: GameState) {
+        const frame = lootFrames[this.loot.definition.lootType] || lootFrames.unknown;
+        drawFrame(context, frame, { ...frame, x: this.x, y: this.y - this.z });
+    }
 }
 
-export class LootObject {
-    type = 'lootObject' as 'lootObject';
+export class LootObject implements ObjectInstance {
+    definition: LootObjectDefinition;
+    drawPriority: 'background' = 'background';
     frame: Frame;
     x: number;
     y: number;
     z: number;
-    constructor({frame, x = 0, y = 0 }: Props) {
-        this.frame = frame;
-        this.x = x;
-        this.y = y;
-    }
-    onObtainLoot(state: GameState) {
-        // Implement for each loot type.
+    constructor(definition: LootObjectDefinition) {
+        this.definition = definition;
+        this.frame = lootFrames[definition.lootType] || lootFrames.unknown;
+        this.x = definition.x;
+        this.y = definition.y;
     }
     update(state: GameState) {
         if (rectanglesOverlap(state.hero, {...this.frame, x: this.x, y: this.y})) {
-            this.onObtainLoot(state);
-            state.areaInstance.objects.splice(state.areaInstance.objects.indexOf(this), 1);
+            const onPickup = lootEffects[this.definition.lootType] || lootEffects.unknown;
+            onPickup(state, this);
+            state.hero.action = 'getItem';
+            state.hero.actionFrame = 0;
+            state.areaInstance.objects.splice(state.areaInstance.objects.indexOf(this), 1, new LootGetAnimation(this));
+            state.savedState.collectedItems[this.definition.id] = true;
         }
     }
     render(context, state: GameState) {
@@ -36,32 +65,110 @@ export class LootObject {
     }
 }
 
-const [peachCanvas, peachContext] = createCanvasAndContext(10, 10);
-peachContext.fillStyle = 'orange';
-peachContext.fillRect(0, 0, 10, 10);
-const peachFrame = {image: peachCanvas, x: 0, y: 0, w: peachCanvas.width, h: peachCanvas.height};
-const peachQuarterFrame = {image: peachCanvas, x: 0, y: 0, w: peachCanvas.width / 2, h: peachCanvas.height / 2};
+export const chestClosedFrame = createLootFrame('red', '[?]', 16);
+const chestOpenedFrame = createLootFrame('red', '[_]', 16);
 
-export class PeachOfImmortality extends LootObject {
-    constructor({x = 0, y = 0 }: Props) {
-        super({frame: peachFrame, x, y});
+export class ChestObject implements ObjectInstance {
+    definition: LootObjectDefinition;
+    drawPriority: 'background' = 'background';
+    behaviors = {
+        solid: true,
+    };
+    frame: Frame;
+    x: number;
+    y: number;
+    z: number;
+    constructor(definition: LootObjectDefinition) {
+        this.definition = definition;
+        this.x = definition.x;
+        this.y = definition.y;
     }
-    onObtainLoot(state: GameState) {
-        state.hero.maxLife++;
-        state.hero.life++;
+    getHitBox(state: GameState): ShortRectangle {
+        return { ...chestOpenedFrame, x: this.x, y: this.y };
+    }
+    onGrab(state: GameState) {
+        // You can only open a chest from the bottom.
+        if (state.hero.d === 'up' && !state.savedState.collectedItems[this.definition.id]) {
+            state.hero.action = 'getItem';
+            state.hero.actionFrame = 0;
+            const onPickup = lootEffects[this.definition.lootType] || lootEffects.unknown;
+            onPickup(state, this);
+            state.areaInstance.objects.splice(state.areaInstance.objects.indexOf(this) + 1, 0, new LootGetAnimation(this));
+            state.savedState.collectedItems[this.definition.id] = true;
+        }
+    }
+    update(state: GameState) {
+
+    }
+    render(context, state: GameState) {
+        if (state.savedState.collectedItems[this.definition.id]) {
+            drawFrame(context, chestOpenedFrame, { ...chestOpenedFrame, x: this.x, y: this.y });
+        } else {
+            drawFrame(context, chestClosedFrame, { ...chestClosedFrame, x: this.x, y: this.y });
+        }
     }
 }
 
-export class PeachOfImmortalityQuarter extends LootObject {
-    constructor({x = 0, y = 0 }: Props) {
-        super({frame: peachQuarterFrame, x, y});
-    }
-    onObtainLoot(state: GameState) {
+function createLootFrame(color: string, letter: string, size: number = 10): Frame {
+    const [toolCanvas, toolContext] = createCanvasAndContext(size, size);
+    toolContext.fillStyle = color;
+    toolContext.fillRect(0, 0, size, size);
+    toolContext.fillStyle = 'white';
+    toolContext.textBaseline = 'middle';
+    toolContext.textAlign = 'center';
+    toolContext.fillText(letter, size / 2, size / 2);
+    return {image: toolCanvas, x: 0, y: 0, w: toolCanvas.width, h: toolCanvas.height};
+}
+
+export const lootFrames: Partial<{[key in LootType]: Frame}> = {
+    weapon: createLootFrame('red', 'W'),
+    gloves: createLootFrame('blue', 'G'),
+    roll: createLootFrame('green', 'R'),
+    peachOfImmortality: createLootFrame('orange', 'P', 14),
+    peachOfImmortalityPiece: createLootFrame('orange', 'p', 7),
+    unknown: createLootFrame('black', '?'),
+}
+
+export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: ChestObject | LootObject) => void}> = {
+    unknown: (state: GameState, loot: ChestObject | LootObject) => {
+        if (['weapon', 'bow', 'staff', 'clone', 'invisibility'].includes(loot.definition.lootType)) {
+            state.hero.activeTools[loot.definition.lootType]++;
+        } else if ([
+            'gloves', 'roll', 'cloudSomersalt', 'charge', 'nimbusCloud', 'catEyes', 'spiritSight',
+            'trueSight', 'astralProjection', 'telekinesis', 'ironSkin', 'goldMail', 'phoenixCrown',
+            'waterBlessing', 'fireBlessing'
+        ].includes(loot.definition.lootType)) {
+            state.hero.passiveTools[loot.definition.lootType]++;
+        } else if (loot.definition.lootType === 'money') {
+            state.hero.money += (loot.definition.amount || 1);
+        } else if (loot.definition.lootType === 'arrows') {
+            state.hero.arrows += (loot.definition.amount || 1);
+        } else {
+            console.error('Unhandled loot type:', loot.definition.lootType);
+        }
+    },
+    peachOfImmortality: (state: GameState, loot: ChestObject | LootObject) => {
+        state.hero.maxLife++;
+        state.hero.life++;
+    },
+    peachOfImmortalityPiece: (state: GameState, loot: ChestObject | LootObject) => {
         state.hero.peachQuarters++;
         if (state.hero.peachQuarters >= 4) {
             state.hero.peachQuarters -= 4;
             state.hero.maxLife++;
             state.hero.life = state.hero.maxLife;
         }
-    }
+    },
+    roll: (state: GameState, loot: ChestObject | LootObject) => {
+        if (!state.hero.passiveTools.roll) {
+            state.hero.passiveTools.roll = 1;
+            if (state.hero.magicRegen === 0) {
+                state.hero.magicRegen = 4;
+            }
+        }
+    },
+    weapon: (state: GameState, loot: ChestObject | LootObject) => {
+        state.hero.activeTools.weapon++;
+        state.hero.chakrams++;
+    },
 }

@@ -1,9 +1,9 @@
 /* global navigator */
-import { exportAreaToClipboard } from 'app/development/exportArea';
+import { exportAreaGridToClipboard } from 'app/development/exportAreaGrid';
 import { toggleEditing } from 'app/development/tileEditor';
-import { runTileRipper } from 'app/development/tileRipper';
+//import { runTileRipper } from 'app/development/tileRipper';
 import { getState } from 'app/state';
-import { requireImage } from 'app/utils/images';
+//import { requireImage } from 'app/utils/images';
 
 export const KEY = {
     ESCAPE: 27,
@@ -17,18 +17,19 @@ export const KEY = {
     BACK_SPACE: 8,
     COMMAND: 91,
     CONTROL: 17,
+    C: 'C'.charCodeAt(0),
     E: 'E'.charCodeAt(0),
+    F: 'F'.charCodeAt(0),
+    G: 'G'.charCodeAt(0),
     I: 'I'.charCodeAt(0),
     J: 'J'.charCodeAt(0),
-    G: 'G'.charCodeAt(0),
     L: 'L'.charCodeAt(0),
     M: 'M'.charCodeAt(0),
-    S: 'S'.charCodeAt(0),
     R: 'R'.charCodeAt(0),
-    X: 'X'.charCodeAt(0),
-    C: 'C'.charCodeAt(0),
-    V: 'V'.charCodeAt(0),
+    S: 'S'.charCodeAt(0),
     T: 'T'.charCodeAt(0),
+    V: 'V'.charCodeAt(0),
+    X: 'X'.charCodeAt(0),
 };
 
 // Under this threshold, the analog buttons are considered "released" for the sake of
@@ -42,17 +43,17 @@ export const ANALOG_THRESHOLD = 0.3;
 // https://developer.mozilla.org/en-US/docs/Web/API/Gamepad_API/Using_the_Gamepad_API
 // Easy to find mappings at: http://html5gamepad.com/
 const GAME_PAD_MAPPINGS = {
-    [KEY.C]: 0, // A (bottom button)
-    [KEY.V]: 1, // B (right button)
-    [KEY.SPACE]: 2, // X (left button)
-    [KEY.X]: 3, // Y (top button)
+    [KEY.SPACE]: 0, // A (bottom button)
+    [KEY.SHIFT]: 1, // B (right button)
+    [KEY.V]: 2, // X (left button)
+    [KEY.F]: 3, // Y (top button)
     [KEY.ENTER]: 9, // START
     [KEY.UP]: 12,
     [KEY.DOWN]: 13,
     [KEY.LEFT]: 14,
     [KEY.RIGHT]: 15,
-    [KEY.R]: 4, // L Front Bumper
-    [KEY.SHIFT]: 5,  // R Front bumper
+    [KEY.X]: 4, // L Front Bumper
+    [KEY.C]: 5,  // R Front bumper
 };
 
 const LEFT_ANALOG_Y_AXIS = 1;
@@ -82,7 +83,7 @@ let lastButtonsPressed: {[key: string]: number} = {};
 export function isKeyDown(keyCode: number, releaseThreshold: number = 0): number {
     if (keysDown[keyCode]) {
         if (releaseThreshold) {
-            keysDown[keyCode] = 0;
+            return Date.now() - keysDown[keyCode] < releaseThreshold ? 1 : 0;
         }
         return 1;
     }
@@ -120,7 +121,7 @@ document.addEventListener('keyup', function(event) {
     const keyCode: number = event.which;
     keysDown[keyCode] = null;
 });
-const easternPalaceFrame = {image: requireImage('gfx/easternPalace/client.png'), x: 512, y: 0, w: 512, h: 512};
+// const easternPalaceFrame = {image: requireImage('gfx/easternPalace/client.png'), x: 512, y: 0, w: 512, h: 512};
 document.addEventListener('keydown', function(event: KeyboardEvent) {
     if (event.repeat) {
         return;
@@ -136,15 +137,15 @@ document.addEventListener('keydown', function(event: KeyboardEvent) {
     if (keyCode === KEY.R && commandIsDown) {
         return;
     }
-    keysDown[keyCode] = true;
+    keysDown[keyCode] = Date.now();
     if (keyCode === KEY.C && commandIsDown) {
-        exportAreaToClipboard(getState().areaInstance.definition);
+        exportAreaGridToClipboard(getState().areaGrid);
     }
     if (keyCode === KEY.E) {
         toggleEditing();
     }
-    if (keyCode === KEY.R) {
+    /*if (keyCode === KEY.R) {
         runTileRipper(easternPalaceFrame, 8);
-    }
+    }*/
 });
 }

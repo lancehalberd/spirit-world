@@ -52,6 +52,7 @@ export function displayPropertyPanel(properties: (EditorProperty<any> | Property
                 property.onChange(property.value);
             }
         }
+        input.blur();
     });
     propertyPanelElement.addEventListener('click', (event: InputEvent) => {
         const button = (event.target as HTMLElement).closest('button');

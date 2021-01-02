@@ -14,6 +14,7 @@ interface Props {
 }
 
 export class ThrownObject {
+    definition = null;
     type = 'thrownObject' as 'thrownObject';
     frame: Frame;
     x: number;

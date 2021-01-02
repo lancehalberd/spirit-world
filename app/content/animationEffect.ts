@@ -15,6 +15,7 @@ interface Props {
 }
 
 export class AnimationEffect {
+    definition = null;
     type = 'animationEffect' as 'animationEffect';
     animation: FrameAnimation;
     animationTime: number;

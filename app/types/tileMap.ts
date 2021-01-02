@@ -1,11 +1,20 @@
-import { AnimationEffect, Frame, GameState, LootObject, ThrownObject } from 'app/types';
+import {
+    Enemy, Frame, GameState, LootType,
+    ShortRectangle,
+} from 'app/types';
 
 export type Direction = 'up' | 'down' | 'left' | 'right';
 
 export interface TileBehaviors {
+    // Can be destroyed by weapon
+    cuttable?: number,
+    // Deals damage on contact
     damage?: number,
+    // Blocks movement
     solid?: boolean,
-    canPickup?: boolean,
+    // Can be picked up with glove
+    pickupWeight?: number,
+    // Tile to display if this tile is removed (picked up, cut, blown up).
     underTile?: {x: number, y: number}
 }
 
@@ -68,8 +77,12 @@ export interface AreaLayer extends TileGrid {
 
 export interface AreaDefinition {
     layers: AreaLayerDefinition[],
-    objects?: any[],
+    objects: ObjectDefinition[],
+    // Used to divide a larger super tile into smaller screens.
+    sections: ShortRectangle[],
 }
+
+export type AreaGrid = AreaDefinition[][];
 
 export interface AreaInstance {
     definition: AreaDefinition,
@@ -77,15 +90,46 @@ export interface AreaInstance {
     w: number,
     h: number,
     behaviorGrid: TileBehaviors[][],
+    enemies: Enemy[],
     layers: AreaLayer[],
     objects: ObjectInstance[],
+    canvas: HTMLCanvasElement,
+    context: CanvasRenderingContext2D,
+    // This is used during transitions to indicate that the top left corner
+    // of this area is offset from the camera origin by this many pixels.
+    cameraOffset: {x: number, y: number},
 }
 
-export interface BaseObjectInstance {
-    type: string,
-    update?: (state) => void,
+export interface ObjectInstance {
+    definition?: ObjectDefinition,
+    behaviors?: TileBehaviors,
+    drawPriority?: 'background' | 'foreground' | 'sprites',
+    x: number, y: number,
+    // This is called when a user grabs a solid tile
+    getHitBox?: (state: GameState) => ShortRectangle,
+    onGrab?: (state: GameState) => void,
+    update?: (state: GameState) => void,
     render?: (context: CanvasRenderingContext2D, state: GameState) => void,
 }
 
-export type ObjectInstance = AnimationEffect | ThrownObject | LootObject;
+export type ObjectStatus = 'normal' | 'gone' | 'hiddenSwitch' | 'hiddenEnemy';
+export interface BaseObjectDefinition {
+    id: string,
+    status: ObjectStatus,
+    x: number,
+    y: number,
+}
+
+export interface LootObjectDefinition extends BaseObjectDefinition {
+    type: 'chest' | 'loot',
+    lootType: LootType,
+    amount?: number,
+}
+
+export interface EnemyObjectDefinition extends BaseObjectDefinition {
+    type: 'enemy',
+    enemyType: 'snake',
+}
+
+export type ObjectDefinition = LootObjectDefinition | EnemyObjectDefinition;
 

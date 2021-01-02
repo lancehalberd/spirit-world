@@ -1,0 +1,291 @@
+import { getAreaFromGridCoords, getAreaSize, scrollToArea, setAreaSection } from 'app/content/areas';
+import { FRAME_LENGTH } from 'app/gameConstants';
+import { getActorTargets } from 'app/getActorTargets';
+import { KEY, isKeyDown } from 'app/keyCommands';
+import { checkForFloorDamage, moveActor } from 'app/moveActor';
+import { getTileFrame } from 'app/render';
+import { directionMap } from 'app/utils/field';
+import { rectanglesOverlap } from 'app/utils/index';
+import { getState, initializeState } from 'app/state';
+
+import { Actor, GameState, ObjectInstance, ThrownChakram, ThrownObject, Tile } from 'app/types';
+
+const rollSpeed = [5, 5, 5, 4, 4, 4, 4, 3, 3, 3, 2, 2];
+
+export function updateHero(state: GameState) {
+    const area = state.areaInstance;
+    let dx = 0, dy = 0;
+    if (state.hero.invulnerableFrames > 0) {
+        state.hero.invulnerableFrames--;
+    }
+    let movementSpeed = 2;
+
+    const { w, h, section } = getAreaSize(state);
+
+    // Automatically move the character into the bounds of the current section.
+    if (state.nextAreaInstance) {
+        movementSpeed = 0;
+        if (state.nextAreaInstance.cameraOffset.x) {
+            dx = 1 * state.nextAreaInstance.cameraOffset.x / Math.abs(state.nextAreaInstance.cameraOffset.x);
+        }
+        if (state.nextAreaInstance.cameraOffset.y) {
+            dy = 1 * state.nextAreaInstance.cameraOffset.y / Math.abs(state.nextAreaInstance.cameraOffset.y);
+        }
+    } else if (state.hero.x + state.hero.w > section.x + section.w + 1) {
+        movementSpeed = 0;
+        dx = -1;
+    } else if (state.hero.x < section.x - 1) {
+        movementSpeed = 0;
+        dx = 1;
+    } else if (state.hero.y + state.hero.h > section.y + section.h + 1) {
+        movementSpeed = 0;
+        dy = -1;
+    } else if (state.hero.y < section.y - 1) {
+        movementSpeed = 0;
+        dy = 1;
+    } else if (state.hero.action === 'getItem') {
+        movementSpeed = 0;
+        state.hero.actionFrame++;
+        if (state.hero.actionFrame >= 50) {
+            state.hero.action = null;
+        }
+    } else if (state.hero.action === 'grabbing') {
+        movementSpeed = 0;
+        if (!state.hero.pickUpTile && !isKeyDown(KEY.SHIFT)) {
+            state.hero.action = null;
+        }
+    } else if (state.hero.action === 'carrying') {
+        movementSpeed = 1.5;
+    } else if (state.hero.action === 'throwing' ) {
+        movementSpeed = 0;
+        state.hero.actionFrame++;
+        if (state.hero.actionFrame === 2) {
+            state.hero.action = null;
+        }
+    } else if (state.hero.action === 'knocked') {
+        movementSpeed = 0;
+        dx = state.hero.vx;
+        dy = state.hero.vy;
+        state.hero.z += state.hero.vz;
+        state.hero.vz -= 0.5;
+        if (state.hero.z <= 0) {
+            state.hero.action = null;
+            state.hero.vz = 0;
+        }
+    } else if (state.hero.action === 'attack') {
+        movementSpeed = 1;
+        state.hero.actionFrame++;
+        if (state.hero.actionFrame === 1) {
+            const m = Math.sqrt(state.hero.actionDx * state.hero.actionDx + state.hero.actionDy * state.hero.actionDy);
+            const chakram = new ThrownChakram({
+                x: state.hero.x + 3,
+                y: state.hero.y + 3,
+                vx: 4 * (m ? state.hero.actionDx / m : directionMap[state.hero.d][0]) + state.hero.actionDx,
+                vy: 4 * (m ? state.hero.actionDy / m : directionMap[state.hero.d][1]) + state.hero.actionDy,
+                returnSpeed: 4,
+            });
+            state.areaInstance.objects.push(chakram);
+        }
+        if (state.hero.actionFrame > 10) {
+            state.hero.action = null;
+        }
+    } else if (state.hero.action === 'roll') {
+        movementSpeed = 0;
+        dx = directionMap[state.hero.d][0] * rollSpeed[state.hero.actionFrame];
+        dy = directionMap[state.hero.d][1] * rollSpeed[state.hero.actionFrame];
+        state.hero.actionFrame++;
+        if (state.hero.actionFrame >= rollSpeed.length) {
+            state.hero.action = null;
+        }
+    }
+    if (movementSpeed) {
+        dy = isKeyDown(KEY.DOWN) - isKeyDown(KEY.UP);
+        dx = isKeyDown(KEY.RIGHT) - isKeyDown(KEY.LEFT);
+        if (dx || dy) {
+            const m = Math.sqrt(dx * dx + dy * dy);
+            dx = movementSpeed * dx / m;
+            dy = movementSpeed * dy / m;
+            if (dx < 0 && (state.hero.d === 'right' || Math.abs(dx) > Math.abs(dy))) {
+                state.hero.d = 'left';
+            } else if (dx > 0 && (state.hero.d === 'left' || Math.abs(dx) > Math.abs(dy))) {
+                state.hero.d = 'right';
+            } else if (dy < 0 && (state.hero.d === 'down' || Math.abs(dy) > Math.abs(dx))) {
+                state.hero.d = 'up';
+            } else if (dy > 0 && (state.hero.d === 'up' || Math.abs(dy) > Math.abs(dx))) {
+                state.hero.d = 'down';
+            }
+        }
+    }
+    if (dx || dy) {
+        moveActor(state, state.hero, dx, dy);
+    }
+    if (!state.hero.action && !state.hero.pickUpTile && state.hero.activeTools.weapon > 0 && state.hero.chakrams > 0 && isKeyDown(KEY.SPACE, 20)) {
+        state.hero.action = 'attack';
+        state.hero.actionDx = dx;
+        state.hero.actionDy = dy;
+        state.hero.actionFrame = 0;
+        state.hero.chakrams--;
+    }
+    if (!state.hero.action && !state.hero.pickUpTile && isKeyDown(KEY.SHIFT, 20)) {
+        const {objects, tiles} = getActorTargets(state, state.hero);
+        if ((dx || dy) && !tiles.some(({x, y}) => area.behaviorGrid?.[y]?.[x]?.solid) && !objects.some(o => o.behaviors?.solid)) {
+            if (state.hero.passiveTools.roll > 0 && state.hero.magic >= 5) {
+                state.hero.magic -= 5;
+                state.hero.action = 'roll';
+                state.hero.actionFrame = 0;
+            }
+        } else {
+            console.log({dx, dy, tiles, objects});
+            let closestTile: Tile = null, closestObject: ObjectInstance = null, closestDistance = 100;
+            for (const target of tiles) {
+                const behavior = area.behaviorGrid?.[target.y]?.[target.x];
+                if (behavior?.solid) {
+                    state.hero.action = 'grabbing';
+                }
+                if (state.hero.passiveTools.gloves >= behavior?.pickupWeight && behavior?.underTile) {
+                    // This is an unusual distance, but should do what we want still.
+                    const distance = (
+                        Math.abs(target.x * area.palette.w - state.hero.x) +
+                        Math.abs(target.y * area.palette.h - state.hero.y)
+                    );
+                    if (distance < closestDistance) {
+                        closestDistance = distance;
+                        closestTile = target;
+                    }
+                }
+            }
+            for (const object of objects) {
+                const behavior = object.behaviors;
+                if (behavior?.solid) {
+                    state.hero.action = 'grabbing';
+                }
+                if (object.onGrab) {
+                    const frame = object.getHitBox(state);
+                    // This is an unusual distance, but should do what we want still.
+                    const distance = (
+                        Math.abs(frame.x + frame.w / 2 - state.hero.x - state.hero.w / 2) +
+                        Math.abs(frame.y + frame.h / 2 - state.hero.y - state.hero.h / 2)
+                    );
+                    if (distance < closestDistance) {
+                        closestDistance = distance;
+                        closestObject = object;
+                        closestTile = null;
+                    }
+                }
+            }
+            if (closestTile) {
+                const layer = area.layers[0];
+                const tile = layer.tiles[closestTile.y]?.[closestTile.x];
+                const behavior = area.behaviorGrid?.[closestTile.y]?.[closestTile.x];
+                layer.tiles[closestTile.y][closestTile.x] = behavior?.underTile;
+                layer.tilesDrawn[closestTile.y][closestTile.x] = false;
+                const key = `${behavior?.underTile.x}x${behavior?.underTile.y}`;
+                area.behaviorGrid[closestTile.y][closestTile.x] = area.palette.behaviors[key];
+                state.hero.pickUpFrame = 0;
+                state.hero.pickUpTile = tile;
+            } else if (closestObject) {
+                if (closestObject.onGrab) {
+                    closestObject.onGrab(state);
+                }
+            }
+        }
+    }
+    if (state.hero.pickUpTile) {
+        state.hero.pickUpFrame++;
+        if (state.hero.pickUpFrame >= 5) {
+            state.hero.action = 'carrying';
+            if (isKeyDown(KEY.SHIFT, 20)) {
+                throwHeldObject(state);
+            }
+        }
+    }
+    checkForFloorDamage(state, state.hero);
+    checkForEnemyDamage(state, state.hero);
+    // Check for transition to other areas/area sections.
+    if (!state.nextAreaInstance) {
+        if (state.hero.x < 0 && dx < 0) {
+            state.areaGridCoords.x = (state.areaGridCoords.x + state.areaGrid[0].length - 1) % state.areaGrid[0].length;
+            scrollToArea(state, getAreaFromGridCoords(state.areaGrid, state.areaGridCoords), 'left');
+        } else if (state.hero.x + state.hero.w > w && dx > 0) {
+            state.areaGridCoords.x = (state.areaGridCoords.x + 1) % state.areaGrid[0].length;
+            scrollToArea(state, getAreaFromGridCoords(state.areaGrid, state.areaGridCoords), 'right');
+        } else if (state.hero.x < section.x && dx < 0) {
+            setAreaSection(state, 'left');
+        } else if (state.hero.x + state.hero.w > section.x + section.w && dx > 0) {
+            setAreaSection(state, 'right');
+        }
+        if (state.hero.y < 0 && dy < 0) {
+            state.areaGridCoords.y = (state.areaGridCoords.y + state.areaGrid.length - 1) % state.areaGrid.length;
+            scrollToArea(state, getAreaFromGridCoords(state.areaGrid, state.areaGridCoords), 'up');
+        } else if (state.hero.y + state.hero.h > h && dy > 0) {
+            state.areaGridCoords.y = (state.areaGridCoords.y + 1) % state.areaGrid.length;
+            scrollToArea(state, getAreaFromGridCoords(state.areaGrid, state.areaGridCoords), 'down');
+        } else if (state.hero.y < section.y && dy < 0) {
+            setAreaSection(state, 'up');
+        } else if (state.hero.y + state.hero.h > section.y + section.h && dy > 0) {
+            setAreaSection(state, 'down');
+        }
+    }
+    if (state.hero.life <= 0) {
+        initializeState();
+        getState().gameHasBeenInitialized = true;
+    }
+    state.hero.magic += state.hero.magicRegen * FRAME_LENGTH / 1000;
+    if (state.hero.magic > state.hero.maxMagic) {
+        state.hero.magic = state.hero.maxMagic;
+    }
+}
+
+export function checkForEnemyDamage(state: GameState, actor: Actor) {
+    if (actor.action === 'roll' || actor.action === 'getItem' || actor.invulnerableFrames > 0) {
+        return;
+    }
+    for (let enemy of state.areaInstance.enemies) {
+        if (enemy.touchDamage && rectanglesOverlap(actor, enemy)) {
+            //const dx = (actor.x + actor.w / 2) - (enemy.x + enemy.w / 2);
+            //const dy = (actor.y + actor.h / 2) - (enemy.y + enemy.h / 2);
+            damageActor(state, actor, enemy.touchDamage, {
+                vx: - 4 * directionMap[actor.d][0],
+                vy: - 4 * directionMap[actor.d][1],
+                vz: 2,
+            });
+        }
+    }
+}
+
+export function damageActor(state: GameState, actor: Actor, damage: number, knockback?: {vx: number, vy: number, vz: number}) {
+    if (actor.action === 'roll' || actor.action === 'getItem' || actor.invulnerableFrames > 0) {
+        return;
+    }
+    actor.life -= damage;
+    actor.invulnerableFrames = 50;
+    if (knockback) {
+        // Throw stone here.
+        throwHeldObject(state);
+        actor.action = 'knocked';
+        actor.vx = knockback.vx;
+        actor.vy = knockback.vy;
+        actor.vz = knockback.vz;
+    }
+}
+
+export function throwHeldObject(state: GameState){
+    if (!state.hero.pickUpTile) {
+        return;
+    }
+    state.hero.action = 'throwing';
+    state.hero.actionFrame = 0;
+    const throwSpeed = 6;
+    const thrownObject = new ThrownObject({
+        frame: getTileFrame(state.areaInstance.palette, state.hero.pickUpTile),
+        x: state.hero.x,
+        y: state.hero.y,
+        vx: directionMap[state.hero.d][0] * throwSpeed,
+        vy: directionMap[state.hero.d][1] * throwSpeed,
+        vz: 2,
+    });
+    state.areaInstance.objects.push(thrownObject);
+    state.hero.pickUpTile = null;
+}
+
+

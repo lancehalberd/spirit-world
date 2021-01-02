@@ -17,16 +17,6 @@ export function isPointInShortRect(x: number, y: number, {x: l = 0, y: t = 0, w 
     return !(y < t || y > t + h || x < l || x > l + w);
 }
 
-export function isPointInRectObject(x: number, y: number, rectangle: FullRectangle): boolean {
-    if (!rectangle || ifdefor(rectangle.top) === null || ifdefor(rectangle.left) === null
-         || ifdefor(rectangle.width) === null || ifdefor(rectangle.height) === null) {
-        return false;
-    }
-    return !(y < rectangle.top || y > (rectangle.top + rectangle.height)
-        || x < rectangle.left || x > (rectangle.left + rectangle.width));
-}
-
-
 export function rectanglesOverlap(A: ShortRectangle, B: ShortRectangle) {
     return !(A.y + A.h < B.y || A.y > B.y + B.h || A.x + A.w < B.x || A.x > B.x + B.w);
 }
