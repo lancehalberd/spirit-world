@@ -1,9 +1,9 @@
 /* global navigator */
 import { exportAreaGridToClipboard } from 'app/development/exportAreaGrid';
 import { toggleEditing } from 'app/development/tileEditor';
-//import { runTileRipper } from 'app/development/tileRipper';
+import { runTileRipper } from 'app/development/tileRipper';
 import { getState } from 'app/state';
-//import { requireImage } from 'app/utils/images';
+import { requireImage } from 'app/utils/images';
 
 export const KEY = {
     ESCAPE: 27,
@@ -121,7 +121,7 @@ document.addEventListener('keyup', function(event) {
     const keyCode: number = event.which;
     keysDown[keyCode] = null;
 });
-// const easternPalaceFrame = {image: requireImage('gfx/easternPalace/client.png'), x: 512, y: 0, w: 512, h: 512};
+const easternPalaceFrame = {image: requireImage('gfx/easternPalace/client.png'), x: 512, y: 0, w: 512, h: 512};
 document.addEventListener('keydown', function(event: KeyboardEvent) {
     if (event.repeat) {
         return;
@@ -144,8 +144,8 @@ document.addEventListener('keydown', function(event: KeyboardEvent) {
     if (keyCode === KEY.E) {
         toggleEditing();
     }
-    /*if (keyCode === KEY.R) {
+    if (keyCode === KEY.R && false) {
         runTileRipper(easternPalaceFrame, 8);
-    }*/
+    }
 });
 }

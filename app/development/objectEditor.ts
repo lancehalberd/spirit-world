@@ -1,16 +1,16 @@
 import _ from 'lodash';
 
+import { enemyDefinitions } from 'app/content/enemy';
+import { createObjectInstance } from 'app/content/objects';
 import { ChestObject, LootObject, chestClosedFrame, lootFrames } from 'app/content/lootObject';
 import { displayTileEditorPropertyPanel, EditingState } from 'app/development/tileEditor';
 import { getState } from 'app/state';
 import { isPointInShortRect } from 'app/utils/index';
 
 import {
-    EditorProperty, Frame, GameState, LootObjectDefinition,
-    LootType, ObjectDefinition, PropertyRow,
+    EnemyType, Frame, GameState, LootObjectDefinition,
+    LootType, ObjectDefinition, PanelRows,
 } from 'app/types';
-
-type PanelRows = (EditorProperty<any> | PropertyRow | string)[];
 
 let allLootTypes: LootType[];
 export function getLootTypes(): LootType[] {
@@ -41,6 +41,7 @@ export function getLootProperties(state: GameState, editingState: EditingState):
     return rows;
 }
 
+
 export function getSelectProperties(state: GameState, editingState: EditingState): PanelRows {
     const rows: PanelRows = [];
     if (editingState.selectedObject) {
@@ -54,7 +55,7 @@ export function getSelectProperties(state: GameState, editingState: EditingState
         });
     }
     if (editingState.selectedObject?.type === 'loot' || editingState.selectedObject?.type === 'chest') {
-        const lootObjectDefinition = editingState.selectedObject as LootObjectDefinition;
+        const lootObjectDefinition = editingState.selectedObject;
         rows.push({
             name: 'lootType',
             value: lootObjectDefinition.lootType,
@@ -67,6 +68,18 @@ export function getSelectProperties(state: GameState, editingState: EditingState
                 }
                 lootObjectDefinition.lootType = lootType;
                 updateObjectInstance(state, lootObjectDefinition);
+            },
+        });
+    }
+    if (editingState.selectedObject?.type === 'enemy') {
+        const enemyObjectDefinition = editingState.selectedObject;
+        rows.push({
+            name: 'enemy',
+            value: editingState.selectedObject.enemyType,
+            values: ['snake'],
+            onChange(enemyType: EnemyType) {
+                enemyObjectDefinition.enemyType = enemyType;
+                updateObjectInstance(state, enemyObjectDefinition);
             },
         });
     }
@@ -153,37 +166,36 @@ export function updateObjectId(state: GameState, object: ObjectDefinition, id: s
 
 
 export function getObjectFrame(object: ObjectDefinition): Frame {
-    let frame = lootFrames.unknown;
+    if (object.type === 'enemy') {
+        return enemyDefinitions[object.enemyType].animations.idle.down.frames[0]
+    }
     if (object.type === 'loot') {
-        frame = lootFrames[object.lootType] || lootFrames.unknown;
+        return lootFrames[object.lootType] || lootFrames.unknown;
     }
     if (object.type === 'chest') {
-        frame = chestClosedFrame;
+        return chestClosedFrame;
     }
-    return frame;
+    return lootFrames.unknown;
 }
 export function isPointInObject(x: number, y: number, object: ObjectDefinition): boolean {
     const camera = getState().camera;
-    const frame = getObjectFrame(object);
-    return isPointInShortRect(x + camera.x, y + camera.y, {...frame, x: object.x, y: object.y});
+    let frame =  {...getObjectFrame(object), x: object.x, y: object.y};
+    if (frame.content) {
+        frame.x += frame.content.x;
+        frame.y += frame.content.y;
+        frame.w = frame.content.w;
+        frame.h = frame.content.h;
+    }
+    return isPointInShortRect(x + camera.x, y + camera.y, frame);
 }
 
 export function updateObjectInstance(state: GameState, object: ObjectDefinition): void {
     const index = state.areaInstance.objects.findIndex(o => o.definition?.id === object.id);
+    const newObject = createObjectInstance(state, object);
     if (index < 0) {
-        if (object.type === 'loot' && !state.savedState.collectedItems[object.id]) {
-            state.areaInstance.objects.push(new LootObject(object));
-        }
-        if (object.type === 'chest' && !state.savedState.collectedItems[object.id]) {
-            state.areaInstance.objects.push(new ChestObject(object));
-        }
+        state.areaInstance.objects.push(newObject);
     } else {
-        if (object.type === 'loot') {
-            state.areaInstance.objects[index] = new LootObject(object);
-        }
-        if (object.type === 'chest') {
-            state.areaInstance.objects[index] = new ChestObject(object);
-        }
+        state.areaInstance.objects[index] = newObject;
     }
 }
 

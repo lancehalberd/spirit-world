@@ -1,26 +1,18 @@
 import _ from 'lodash';
 
+import { getAreaSize } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { moveActor } from 'app/moveActor';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { directionMap } from 'app/utils/field';
 
-import { Actor, ActorAnimations, Direction, EnemyObjectDefinition, Frame, FrameAnimation, GameState } from 'app/types';
+import { Actor, ActorAnimations, Direction, EnemyType, EnemyObjectDefinition, Frame, FrameAnimation, GameState, ObjectInstance } from 'app/types';
 
-
-interface Props {
-    animations?: ActorAnimations,
-    d?: Direction;
-    x?: number
-    y?: number,
-    life?: number,
-    touchDamage?: number,
-}
-
-export class Enemy implements Actor {
+export class Enemy implements Actor, ObjectInstance {
     type = 'enemy' as 'enemy';
+    drawPriority: 'sprites' = 'sprites';
     definition: EnemyObjectDefinition;
-    animations: ActorAnimations;
+    enemyDefinition: EnemyDefinition;
     currentAnimation: FrameAnimation;
     animationTime: number;
     d: Direction;
@@ -32,24 +24,23 @@ export class Enemy implements Actor {
     vz: number;
     w: number;
     h: number;
-    touchDamage: number;
     life: number;
     mode = 'choose';
     modeTime = 0;
     invulnerableFrames = 0;
-    constructor({animations, d = 'down', life = 1, touchDamage = 0.5, x = 0, y = 0 }: Props) {
-        this.animations = animations;
-        this.d = d;
-        this.currentAnimation = this.animations.idle[this.d];
+    constructor(definition: EnemyObjectDefinition) {
+        this.definition = definition;
+        this.enemyDefinition = enemyDefinitions[this.definition.enemyType] || enemyDefinitions.snake;
+        this.d = definition.d || 'down';
+        this.currentAnimation = this.enemyDefinition.animations.idle[this.d];
         this.animationTime = 0;
-        this.x = x;
-        this.y = y;
+        this.x = definition.x;
+        this.y = definition.y;
         this.z = 0;
         const frame = this.getFrame();
         this.w = frame?.content.w || frame.w;
         this.h = frame?.content.h || frame.h;
-        this.life = life;
-        this.touchDamage = touchDamage;
+        this.life = this.enemyDefinition.life;
     }
     getFrame(): Frame {
         return getFrame(this.currentAnimation, this.animationTime);
@@ -59,6 +50,13 @@ export class Enemy implements Actor {
         this.modeTime = 0;
     }
     update(state: GameState) {
+        const { section } = getAreaSize(state);
+        if (this.x < section.x || this.x > section.x + section.w || this.y < section.y || this.y > section.y + section.h) {
+            return;
+        }
+        if (this.enemyDefinition.update) {
+            this.enemyDefinition.update(state, this);
+        }
         this.modeTime += FRAME_LENGTH;
         this.animationTime += FRAME_LENGTH;
         if (this.invulnerableFrames > 0) {
@@ -77,9 +75,9 @@ export class Enemy implements Actor {
                 const w = (frame.content ? frame.content.w : frame.w);
                 context.translate(this.x + (frame?.content?.x || 0) + w / 2, 0);
                 context.scale(-1, 1);
-                drawFrame(context, frame, { ...frame, x: - w / 2, y: this.y });
+                drawFrame(context, frame, { ...frame, x: - w / 2, y: this.y - (frame?.content?.y || 0) });
             } else {
-                drawFrame(context, frame, { ...frame, x: this.x, y: this.y });
+                drawFrame(context, frame, { ...frame, x: this.x - (frame?.content?.x || 0), y: this.y - (frame?.content?.y || 0) });
             }
         context.restore();
     }
@@ -98,29 +96,41 @@ const snakeAnimations: ActorAnimations = {
     },
 };
 
-
-export class Snake extends Enemy {
-    constructor({d = 'down', x = 0, y = 0 }: Props) {
-        super({animations: snakeAnimations, d, x, y, life: 2, touchDamage: 1});
-    }
-    update(state: GameState) {
-        if (this.mode === 'choose' && this.modeTime > 200) {
-            this.setMode('walk');
-            this.d = _.sample(['up', 'down', 'left', 'right']);
-            this.currentAnimation = this.animations.idle[this.d];
-        }
-        if (this.mode === 'walk') {
-            if (this.modeTime >= 200) {
-                if (!moveActor(state, this, directionMap[this.d][0], directionMap[this.d][1])) {
-                    this.setMode('choose');
-                    this.modeTime = 200;
-                }
-            }
-            if (this.modeTime > 700 && Math.random() < (this.modeTime - 700) / 3000) {
-                this.setMode('choose');
-            }
-        }
-        super.update(state);
-    }
+interface EnemyDefinition {
+    animations: ActorAnimations,
+    life: number,
+    touchDamage: number,
+    update: (state: GameState, enemy: Enemy) => void,
 }
 
+export const enemyDefinitions: {[key in EnemyType]: EnemyDefinition} = {
+    snake: {animations: snakeAnimations, life: 2, touchDamage: 1, update: paceRandomly},
+}
+
+function paceRandomly(state: GameState, enemy: Enemy) {
+    if (enemy.mode === 'choose' && enemy.modeTime > 200) {
+        enemy.setMode('walk');
+        enemy.d = _.sample(['up', 'down', 'left', 'right']);
+        enemy.currentAnimation = enemy.enemyDefinition.animations.idle[enemy.d];
+    }
+    if (enemy.mode === 'walk') {
+        if (enemy.modeTime >= 200) {
+            const { section } = getAreaSize(state);
+            // Don't allow the enemy to move off the edge of the current section.
+            if (enemy.d === 'left' && enemy.x < section.x + 16
+                || enemy.d === 'right' && enemy.x + enemy.w > section.x + section.w - 16
+                || enemy.d === 'up' && enemy.y < section.y + 16
+                || enemy.d === 'down' && enemy.y + enemy.h > section.y + section.h - 16
+            ) {
+                enemy.setMode('choose');
+                enemy.modeTime = 200;
+            } else if (!moveActor(state, enemy, directionMap[enemy.d][0], directionMap[enemy.d][1])) {
+                enemy.setMode('choose');
+                enemy.modeTime = 200;
+            }
+        }
+        if (enemy.modeTime > 700 && Math.random() < (enemy.modeTime - 700) / 3000) {
+            enemy.setMode('choose');
+        }
+    }
+}

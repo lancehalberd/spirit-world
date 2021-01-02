@@ -1,4 +1,5 @@
-import { getAreaFromGridCoords, getAreaSize, scrollToArea, setAreaSection } from 'app/content/areas';
+import { destroyTile, getAreaFromGridCoords, getAreaSize, scrollToArea, setAreaSection } from 'app/content/areas';
+import { Enemy } from 'app/content/enemy';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { getActorTargets } from 'app/getActorTargets';
 import { KEY, isKeyDown } from 'app/keyCommands';
@@ -76,6 +77,7 @@ export function updateHero(state: GameState) {
         movementSpeed = 1;
         state.hero.actionFrame++;
         if (state.hero.actionFrame === 1) {
+            state.hero.chakrams--;
             const m = Math.sqrt(state.hero.actionDx * state.hero.actionDx + state.hero.actionDy * state.hero.actionDy);
             const chakram = new ThrownChakram({
                 x: state.hero.x + 3,
@@ -124,15 +126,21 @@ export function updateHero(state: GameState) {
         state.hero.actionDx = dx;
         state.hero.actionDy = dy;
         state.hero.actionFrame = 0;
-        state.hero.chakrams--;
     }
     if (!state.hero.action && !state.hero.pickUpTile && isKeyDown(KEY.SHIFT, 20)) {
         const {objects, tiles} = getActorTargets(state, state.hero);
         if ((dx || dy) && !tiles.some(({x, y}) => area.behaviorGrid?.[y]?.[x]?.solid) && !objects.some(o => o.behaviors?.solid)) {
-            if (state.hero.passiveTools.roll > 0 && state.hero.magic >= 5) {
-                state.hero.magic -= 5;
-                state.hero.action = 'roll';
-                state.hero.actionFrame = 0;
+            if (state.hero.passiveTools.roll > 0) {
+                if (state.hero.magic >= 5) {
+                    state.hero.magic -= 5;
+                    state.hero.action = 'roll';
+                    state.hero.actionFrame = 0;
+                } else {
+                    // Hack to freeze player for a moment
+                    state.hero.action = 'getItem';
+                    state.hero.actionFrame = 30;
+                    // We should play an insufficient mana sound here.
+                }
             }
         } else {
             console.log({dx, dy, tiles, objects});
@@ -176,20 +184,16 @@ export function updateHero(state: GameState) {
             if (closestTile) {
                 const layer = area.layers[0];
                 const tile = layer.tiles[closestTile.y]?.[closestTile.x];
-                const behavior = area.behaviorGrid?.[closestTile.y]?.[closestTile.x];
-                layer.tiles[closestTile.y][closestTile.x] = behavior?.underTile;
-                layer.tilesDrawn[closestTile.y][closestTile.x] = false;
-                const key = `${behavior?.underTile.x}x${behavior?.underTile.y}`;
-                area.behaviorGrid[closestTile.y][closestTile.x] = area.palette.behaviors[key];
                 state.hero.pickUpFrame = 0;
                 state.hero.pickUpTile = tile;
+                destroyTile(state, closestTile);
             } else if (closestObject) {
                 if (closestObject.onGrab) {
                     closestObject.onGrab(state);
                 }
             }
         }
-    }
+    } else if (isKeyDown(KEY.SHIFT))
     if (state.hero.pickUpTile) {
         state.hero.pickUpFrame++;
         if (state.hero.pickUpFrame >= 5) {
@@ -240,11 +244,14 @@ export function checkForEnemyDamage(state: GameState, actor: Actor) {
     if (actor.action === 'roll' || actor.action === 'getItem' || actor.invulnerableFrames > 0) {
         return;
     }
-    for (let enemy of state.areaInstance.enemies) {
-        if (enemy.touchDamage && rectanglesOverlap(actor, enemy)) {
+    for (const enemy of state.areaInstance.objects) {
+        if (!(enemy instanceof Enemy)) {
+            continue;
+        }
+        if (enemy.enemyDefinition.touchDamage && rectanglesOverlap(actor, enemy)) {
             //const dx = (actor.x + actor.w / 2) - (enemy.x + enemy.w / 2);
             //const dy = (actor.y + actor.h / 2) - (enemy.y + enemy.h / 2);
-            damageActor(state, actor, enemy.touchDamage, {
+            damageActor(state, actor, enemy.enemyDefinition.touchDamage, {
                 vx: - 4 * directionMap[actor.d][0],
                 vy: - 4 * directionMap[actor.d][1],
                 vz: 2,

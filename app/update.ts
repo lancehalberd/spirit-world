@@ -1,3 +1,4 @@
+import { Enemy } from 'app/content/enemy';
 import { editingState } from 'app/development/tileEditor';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { initializeGame } from 'app/initialize';
@@ -22,10 +23,7 @@ export function update() {
         updateHero(state);
         updateCamera(state);
         if (!editingState.isEditing) {
-            state.areaInstance.enemies = state.areaInstance.enemies.filter(e => e.life > 0);
-            for (const enemy of state.areaInstance.enemies) {
-                enemy?.update(state);
-            }
+            state.areaInstance.objects = state.areaInstance.objects.filter(e => !(e instanceof Enemy) || e.life > 0);
             for (const object of state.areaInstance.objects) {
                 object?.update(state);
             }

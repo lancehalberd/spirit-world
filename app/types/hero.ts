@@ -12,7 +12,7 @@ export type PassiveTool = 'gloves'
     | 'waterBlessing' | 'fireBlessing';
 export type Element = 'fire' | 'ice' | 'lightning';
 export type Collectible = 'peachOfImmortality' | 'peachOfImmortalityPiece';
-export type CommonLoot = 'money' | 'arrows';
+export type CommonLoot = 'money' | 'arrows' | 'peach';
 
 export type LootType = ActiveTool | Equipment | PassiveTool | Element | Collectible | CommonLoot | 'unknown';
 

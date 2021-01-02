@@ -1,5 +1,4 @@
 import { enterArea, getAreaFromGridCoords } from 'app/content/areas';
-import { Snake } from 'app/content/enemy';
 import { worldMap as testWorld } from 'app/content/peachCaveB1';
 
 import { GameState, Hero, SavedState } from 'app/types';
@@ -41,7 +40,7 @@ function getDefaultHeroState(): Hero {
             ironBoots: 0,
         },
         passiveTools: {
-            gloves: 1,
+            gloves: 0,
             roll: 0,
             cloudSomersalt: 0,
             charge: 0,
@@ -82,17 +81,6 @@ let state: GameState;
 export function initializeState() {
     state = getDefaultState();
     enterArea(state, getAreaFromGridCoords(state.areaGrid, state.areaGridCoords), state.hero.x, state.hero.y);
-
-    /*state.areaInstance.objects.push(new ProgressiveWeapon({x: 60, y: 20}));
-    state.areaInstance.objects.push(new ProgressiveGlove({x: 451, y: 227}));
-    state.areaInstance.objects.push(new ProgressiveGlove({x: 126, y: 92}));
-    state.areaInstance.objects.push(new PeachOfImmortality({x: 226, y: 384}));
-    state.areaInstance.objects.push(new PeachOfImmortalityQuarter({x: 150, y: 150}));
-    state.areaInstance.objects.push(new PeachOfImmortalityQuarter({x: 300, y: 150}));
-    state.areaInstance.objects.push(new PeachOfImmortalityQuarter({x: 150, y: 300}));
-    state.areaInstance.objects.push(new PeachOfImmortalityQuarter({x: 300, y: 300}));
-    state.areaInstance.objects.push(new DodgeRoll({x: 225, y: 225}));*/
-    state.areaInstance.enemies.push(new Snake({d: 'up', x: 125, y: 130}));
 }
 
 export function getState(): GameState {

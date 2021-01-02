@@ -1,4 +1,5 @@
-import { getAreaSize } from 'app/content/areas';
+import { destroyTile, getAreaSize } from 'app/content/areas';
+import { Enemy } from 'app/content/enemy';
 import { createCanvasAndContext } from 'app/dom';
 import { getTilesInRectangle } from 'app/getActorTargets';
 import { damageActor } from 'app/updateActor';
@@ -72,7 +73,10 @@ export class ThrownChakram {
                 state.hero.chakrams++;
             }
         }
-        for (const enemy of state.areaInstance.enemies) {
+        for (const enemy of state.areaInstance.objects) {
+            if (!(enemy instanceof Enemy)) {
+                continue;
+            }
             if (!this.hitTargets.has(enemy) && rectanglesOverlap(enemy, this)) {
                 damageActor(state, enemy, this.damage);
                 this.hitTargets.add(enemy);
@@ -81,13 +85,9 @@ export class ThrownChakram {
         }
         for (const target of getTilesInRectangle(state, this)) {
             const area = state.areaInstance;
-            const layer = area.layers[0];
             const behavior = area.behaviorGrid?.[target.y]?.[target.x];
             if (behavior?.cuttable <= state.hero.activeTools.weapon) {
-                layer.tiles[target.y][target.x] = behavior.underTile;
-                layer.tilesDrawn[target.y][target.x] = false;
-                const key = `${behavior.underTile.x}x${behavior.underTile.y}`;
-                area.behaviorGrid[target.y][target.x] = area.palette.behaviors[key];
+                destroyTile(state, target);
             } else if (behavior?.cuttable > state.hero.activeTools.weapon) {
                 this.outFrames = 0;
             }

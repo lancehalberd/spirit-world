@@ -2,6 +2,7 @@ import { AreaGrid } from 'app/types';
 
 export function exportAreaGridToClipboard(areaGrid: AreaGrid): void {
     navigator.clipboard.writeText(serializeAreaGrid(areaGrid));
+    console.log('Exported Area Grid');
 }
 
 export function serializeAreaGrid(areaGrid: AreaGrid) {

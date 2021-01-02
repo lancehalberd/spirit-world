@@ -142,4 +142,6 @@ export interface EditorSingleProperty<T> {
 export type EditorProperty<T> = EditorArrayProperty<T> | EditorSingleProperty<T> | EditorButtonProperty | EditorPaletteProperty;
 export type PropertyRow = (EditorProperty<any> | string)[];
 
+export type PanelRows = (EditorProperty<any> | PropertyRow | string)[];
+
 export type Coords = [number, number];

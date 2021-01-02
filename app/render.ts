@@ -79,11 +79,6 @@ export function renderAreaObjectsBeforeHero(context: CanvasRenderingContext2D, s
     }
     context.save();
         context.translate(-state.camera.x + area.cameraOffset.x, -state.camera.y + area.cameraOffset.y);
-        for (const enemy of area.enemies) {
-            if (enemy.y <= state.hero.y) {
-                enemy.render(context, state);
-            }
-        }
         for (const object of area.objects) {
             if (object.drawPriority === 'background' || (object.drawPriority === 'sprites' && object.y <= state.hero.y)) {
                 object?.render(context, state);
@@ -98,11 +93,6 @@ export function renderAreaObjectsAfterHero(context: CanvasRenderingContext2D, st
     }
     context.save();
         context.translate(-state.camera.x - area.cameraOffset.x, -state.camera.y - area.cameraOffset.y);
-        for (const enemy of area.enemies) {
-            if (enemy.y > state.hero.y) {
-                enemy.render(context, state);
-            }
-        }
         for (const object of area.objects) {
             if (!object.drawPriority ||
                 object.drawPriority === 'foreground' ||

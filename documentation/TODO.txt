@@ -1,18 +1,20 @@
 Test at http://localhost:81/alttp/public/
 
+
 Add object editing to editor:
-    - Add enemies to areas
-    - Add section settings for area
+    - Center new objects under the mouse.
+    - Show preview of objects while moving mouse over area
     - Think about when to refresh state of
         - defeated/updated enemies
         - updated tiles (probably every time we transition to another view area)
         - things like alttp colored switch state(on enter dungeon), flooded rooms state(might depend on specific state of dungeon), bombed blind's hideout (never resets), revealed chest or key (not sure), opened sealed door (depends on the mechanism),
 
 Add example prologue area:
+    - Add text boxes
+        - Space/shift/enter to advance/dismiss
+        - On start
+        - On pickup item
     - Floor switches to open exit from area that gives roll technique
-    - Weapon after dodge roll.
-    - Bushes/grass you can cut to farm up health
-    - Bushes also block progress without weapon.
     - NPC that gives weapon?
     - Dark areas + cat eyes powerup
     - Peach of Immortality at the end
@@ -23,9 +25,9 @@ Add objects that can be pushed or pulled.
 
 Add connected areas + dungeons
 
-Add animation when picking up a major item.
-
 Add animation for breaking stone hitting the ground.
+
+Animate hearts refilling
 
 
 Possible tool: Leather gloves protect you from thorn bushes.

@@ -1,9 +1,12 @@
 import _ from 'lodash';
 
 import { palettes, setAreaSection } from 'app/content/areas';
+import { getEnemyProperties, onMouseDownEnemy } from 'app/development/enemyEditor';
 import {
-    deleteObject, getObjectFrame,
-    getLootProperties, getSelectProperties,
+    deleteObject,
+    getLootProperties,
+    getObjectFrame,
+    getSelectProperties,
     onMouseDownLoot, onMouseDownSelect,
     onMouseMoveSelect,
 } from 'app/development/objectEditor';
@@ -16,7 +19,7 @@ import { drawFrame } from 'app/utils/animations';
 import { getMousePosition, isMouseDown } from 'app/utils/mouse';
 
 import {
-    EditorProperty, GameState,
+    EditorProperty, EnemyType, GameState,
     LootType, ObjectDefinition, PropertyRow, TileGrid,
 } from 'app/types';
 
@@ -25,7 +28,8 @@ export interface EditingState {
     isEditing: boolean,
     brush: TileGrid,
     selectedLayerIndex: number,
-    newLootType?: LootType,
+    newEnemyType: EnemyType,
+    newLootType: LootType,
     selectedObject?: ObjectDefinition,
     dragOffset: {x: number, y: number},
 }
@@ -35,6 +39,7 @@ export const editingState: EditingState = {
     isEditing: false,
     brush: null,
     selectedLayerIndex: 0,
+    newEnemyType: 'snake',
     newLootType: 'peachOfImmortalityPiece',
     selectedObject: null,
     dragOffset: {x: 0, y: 0},
@@ -99,7 +104,7 @@ export function displayTileEditorPropertyPanel() {
     rows.push({
         name: 'tool',
         value: editingState.tool,
-        values: ['select', 'brush', 'chest', 'loot'],
+        values: ['select', 'brush', 'chest', 'loot', 'enemy'],
         onChange(tool: 'select' | 'brush' | 'chest' | 'loot') {
             editingState.tool = tool;
             displayTileEditorPropertyPanel();
@@ -132,6 +137,9 @@ export function displayTileEditorPropertyPanel() {
             break;
         case 'select':
             rows = [...rows, ...getSelectProperties(state, editingState)];
+            break;
+        case 'enemy':
+            rows = [...rows, ...getEnemyProperties(state, editingState)];
             break;
         default:
             break;
@@ -168,6 +176,9 @@ mainCanvas.addEventListener('mousedown', function () {
         case 'chest':
         case 'loot':
             onMouseDownLoot(state, editingState, x, y);
+            break;
+        case 'enemy':
+            onMouseDownEnemy(state, editingState, x, y);
             break;
         case 'brush':
             drawBrush(x, y);
@@ -216,17 +227,22 @@ export function renderEditor(context: CanvasRenderingContext2D, state: GameState
         context.globalAlpha = 0.6;
         for (const object of state.areaInstance.definition.objects) {
             const frame = getObjectFrame(object);
-            drawFrame(context, frame, {...frame, x: object.x, y: object.y});
+            drawFrame(context, frame, {...frame, x: object.x - (frame.content?.x || 0), y: object.y - (frame.content?.y || 0)});
             // While editing, draw the loot inside the chest on top as well.
             if (object.type === 'chest') {
                 const frame = getObjectFrame({...object, type: 'loot'});
-                drawFrame(context, frame, {...frame, x: object.x, y: object.y});
+                drawFrame(context, frame, {...frame, x: object.x - (frame.content?.x || 0), y: object.y - (frame.content?.y || 0)});
             }
         }
         if (editingState.tool === 'select' && editingState.selectedObject) {
             const frame = getObjectFrame(editingState.selectedObject);
             context.fillStyle = 'white';
-            context.fillRect(editingState.selectedObject.x - 1, editingState.selectedObject.y - 1, frame.w + 2, frame.h + 2);
+            context.fillRect(
+                editingState.selectedObject.x + (frame.content?.x || 0) - 1,
+                editingState.selectedObject.y + (frame.content?.y || 0) - 1,
+                (frame.content?.w || frame.w) + 2,
+                (frame.content?.h || frame.h) + 2
+            );
         }
     context.restore();
 }

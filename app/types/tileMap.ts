@@ -1,5 +1,5 @@
 import {
-    Enemy, Frame, GameState, LootType,
+    Frame, GameState, LootType,
     ShortRectangle,
 } from 'app/types';
 
@@ -10,6 +10,8 @@ export interface TileBehaviors {
     cuttable?: number,
     // Deals damage on contact
     damage?: number,
+    lootChance?: number,
+    lootTypes?: LootType[],
     // Blocks movement
     solid?: boolean,
     // Can be picked up with glove
@@ -90,7 +92,6 @@ export interface AreaInstance {
     w: number,
     h: number,
     behaviorGrid: TileBehaviors[][],
-    enemies: Enemy[],
     layers: AreaLayer[],
     objects: ObjectInstance[],
     canvas: HTMLCanvasElement,
@@ -118,6 +119,7 @@ export interface BaseObjectDefinition {
     status: ObjectStatus,
     x: number,
     y: number,
+    d?: Direction,
 }
 
 export interface LootObjectDefinition extends BaseObjectDefinition {
@@ -126,9 +128,11 @@ export interface LootObjectDefinition extends BaseObjectDefinition {
     amount?: number,
 }
 
+export type EnemyType = 'snake';
+
 export interface EnemyObjectDefinition extends BaseObjectDefinition {
     type: 'enemy',
-    enemyType: 'snake',
+    enemyType: EnemyType,
 }
 
 export type ObjectDefinition = LootObjectDefinition | EnemyObjectDefinition;

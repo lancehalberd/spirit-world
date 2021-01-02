@@ -1,6 +1,7 @@
 import _ from 'lodash';
 
-import { ChestObject, LootObject } from 'app/content/lootObject';
+import { createObjectInstance } from 'app/content/objects';
+import { LootDropObject } from 'app/content/lootObject';
 import { createCanvasAndContext } from 'app/dom';
 import { createAnimation } from 'app/utils/animations';
 import { isPointInShortRect } from 'app/utils/index';
@@ -8,7 +9,7 @@ import { updateCamera } from 'app/updateCamera';
 
 import {
     AreaDefinition, AreaGrid, AreaInstance, AreaLayerDefinition,
-    Direction, GameState, ObjectInstance, ShortRectangle, TilePalette,
+    Direction, GameState, ObjectInstance, ShortRectangle, Tile, TilePalette,
 } from 'app/types';
 
 export const [mapTilesFrame] = createAnimation('gfx/tiles/overworld.png', {w: 384, h: 640}, {cols: 5}).frames;
@@ -19,21 +20,21 @@ const worldMapPalette: TilePalette = {
     // Array of tiles to randomly apply by default.
     defaultTiles: [{x: 0, y: 16}, {x: 1, y: 16}, {x: 2, y: 16}, {x: 3, y: 16}],
     behaviors: {
-        '16x8': {solid: true, pickupWeight: 1, underTile: {x: 1, y: 8}},
-        '16x9': {solid: true, pickupWeight: 1, underTile: {x: 1, y: 9}},
-        '16x10': {solid: true, pickupWeight: 1, underTile: {x: 1, y: 10}},
-        '17x8': {solid: true, pickupWeight: 2, underTile: {x: 1, y: 8}},
-        '17x9': {solid: true, pickupWeight: 2, underTile: {x: 1, y: 9}},
-        '17x10': {solid: true, pickupWeight: 2, underTile: {x: 1, y: 10}},
-        '18x8': {solid: true, pickupWeight: 3, underTile: {x: 1, y: 8}},
-        '18x9': {solid: true, pickupWeight: 3, underTile: {x: 1, y: 9}},
-        '18x10': {solid: true, pickupWeight: 3, underTile: {x: 1, y: 10}},
+        '16x8': {solid: true, pickupWeight: 1, underTile: {x: 1, y: 8}, lootChance: 0.2, lootTypes: ['peach']},
+        '16x9': {solid: true, pickupWeight: 1, underTile: {x: 1, y: 9}, lootChance: 0.2, lootTypes: ['peach']},
+        '16x10': {solid: true, pickupWeight: 1, underTile: {x: 1, y: 10}, lootChance: 0.2, lootTypes: ['peach']},
+        '17x8': {solid: true, pickupWeight: 2, underTile: {x: 1, y: 8}, lootChance: 0.2, lootTypes: ['peach']},
+        '17x9': {solid: true, pickupWeight: 2, underTile: {x: 1, y: 9}, lootChance: 0.2, lootTypes: ['peach']},
+        '17x10': {solid: true, pickupWeight: 2, underTile: {x: 1, y: 10}, lootChance: 0.2, lootTypes: ['peach']},
+        '18x8': {solid: true, pickupWeight: 3, underTile: {x: 1, y: 8}, lootChance: 0.2, lootTypes: ['peach']},
+        '18x9': {solid: true, pickupWeight: 3, underTile: {x: 1, y: 9}, lootChance: 0.2, lootTypes: ['peach']},
+        '18x10': {solid: true, pickupWeight: 3, underTile: {x: 1, y: 10}, lootChance: 0.2, lootTypes: ['peach']},
         '5x8': {solid: true},
         '5x9': {solid: true},
         '5x10': {solid: true},
-        '6x8': {solid: true, pickupWeight: 0, cuttable: 1, underTile: {x: 0, y: 16}},
-        '6x9': {solid: true, pickupWeight: 0, cuttable: 1, underTile: {x: 1, y: 23}},
-        '6x10': {solid: true, pickupWeight: 0, cuttable: 1, underTile: {x: 13, y: 13}},
+        '6x8': {solid: true, pickupWeight: 0, cuttable: 1, underTile: {x: 0, y: 16}, lootChance: 0.5, lootTypes: ['peach'] },
+        '6x9': {solid: true, pickupWeight: 0, cuttable: 1, underTile: {x: 1, y: 23}, lootChance: 0.5, lootTypes: ['peach']},
+        '6x10': {solid: true, pickupWeight: 0, cuttable: 1, underTile: {x: 13, y: 13}, lootChance: 0.5, lootTypes: ['peach']},
         '7x8': {damage: 1, cuttable: 1, underTile: {x: 0, y: 16}},
         '7x9': {damage: 1, cuttable: 1, underTile: {x: 1, y: 23}},
         '7x10': {damage: 1, cuttable: 1, underTile: {x: 13, y: 13}},
@@ -149,14 +150,6 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
         palette.w * definition.layers[0].grid.w,
         palette.h * definition.layers[0].grid.h,
     );
-    const objects: ObjectInstance[] = [];
-    for (const object of definition.objects) {
-        if (object.type === 'loot' && !state.savedState.collectedItems[object.id]) {
-            objects.push(new LootObject(object));
-        } else if (object.type === 'chest') {
-            objects.push(new ChestObject(object));
-        }
-    }
     return {
         definition: definition,
         palette,
@@ -170,8 +163,7 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
             tilesDrawn: [],
             palette: palettes[layer.grid.palette]
         })),
-        enemies: [],
-        objects,
+        objects: definition.objects.map(o => createObjectInstance(state, o)).filter(o => o),
         canvas,
         context,
         cameraOffset: {x: 0, y: 0},
@@ -198,3 +190,30 @@ export function removeObjectFromArea(area: AreaInstance, object: ObjectInstance)
         area.objects.splice(index, 1);
     }
 }
+
+export function destroyTile(state: GameState, target: Tile): void {
+    const area = state.areaInstance;
+    const layer = area.layers[0];
+    const behavior = area.behaviorGrid?.[target.y]?.[target.x];
+    layer.tiles[target.y][target.x] = behavior?.underTile;
+    layer.tilesDrawn[target.y][target.x] = false;
+    const key = `${behavior?.underTile.x}x${behavior?.underTile.y}`;
+    area.behaviorGrid[target.y][target.x] = area.palette.behaviors[key];
+    if (Math.random() < behavior.lootChance) {
+        const lootType = _.sample(behavior.lootTypes || []);
+        if (lootType) {
+            const drop = new LootDropObject({
+                id: 'drop',
+                type: 'loot',
+                lootType,
+                x: target.x * area.palette.w,
+                y: target.y * area.palette.h,
+                status: 'normal'
+            });
+            area.objects.push(drop);
+            drop.x += (area.palette.w - drop.frame.w) / 2;
+            drop.y += (area.palette.h - drop.frame.h) / 2;
+        }
+    }
+}
+

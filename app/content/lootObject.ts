@@ -2,7 +2,7 @@ import { removeObjectFromArea } from 'app/content/areas';
 import { createCanvasAndContext } from 'app/dom';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { getState } from 'app/state';
-import { drawFrame } from 'app/utils/animations';
+import { createAnimation, drawFrame } from 'app/utils/animations';
 import { rectanglesOverlap } from 'app/utils/index';
 
 import { Frame, GameState, LootObjectDefinition, LootType, ObjectInstance, ShortRectangle } from 'app/types';
@@ -18,8 +18,8 @@ export class LootGetAnimation implements ObjectInstance {
         this.loot = loot;
         const state = getState();
         const frame = lootFrames[this.loot.definition.lootType] || lootFrames.unknown;
-        this.x = state.hero.x + state.hero.w / 2 - frame.w / 2;
-        this.y = state.hero.y - 4;
+        this.x = (loot.definition.type === 'chest' ? loot.x + chestOpenedFrame.w / 2 : state.hero.x + state.hero.w / 2) - frame.w / 2;
+        this.y = (loot.definition.type === 'chest' ? loot.y + 8 : state.hero.y - 4);
         this.z = 8;
     }
     update(state: GameState) {
@@ -65,8 +65,21 @@ export class LootObject implements ObjectInstance {
     }
 }
 
-export const chestClosedFrame = createLootFrame('red', '[?]', 16);
-const chestOpenedFrame = createLootFrame('red', '[_]', 16);
+// Simple loot drop doesn't show the loot animation when collected.
+export class LootDropObject extends LootObject {
+    update(state: GameState) {
+        if (rectanglesOverlap(state.hero, {...this.frame, x: this.x, y: this.y})) {
+            const onPickup = lootEffects[this.definition.lootType] || lootEffects.unknown;
+            onPickup(state, this);
+            state.areaInstance.objects.splice(state.areaInstance.objects.indexOf(this), 1);
+            state.savedState.collectedItems[this.definition.id] = true;
+        }
+    }
+}
+
+const chestSheet = createAnimation('gfx/zeldaChest.png', {w: 32, h: 16}).frames[0];
+export const chestClosedFrame = {image: chestSheet.image, x: 0, y: 0, w: 16, h: 16};
+export const chestOpenedFrame = {image: chestSheet.image, x: 16, y: 0, w: 16, h: 16};
 
 export class ChestObject implements ObjectInstance {
     definition: LootObjectDefinition;
@@ -124,8 +137,9 @@ export const lootFrames: Partial<{[key in LootType]: Frame}> = {
     weapon: createLootFrame('red', 'W'),
     gloves: createLootFrame('blue', 'G'),
     roll: createLootFrame('green', 'R'),
-    peachOfImmortality: createLootFrame('orange', 'P', 14),
-    peachOfImmortalityPiece: createLootFrame('orange', 'p', 7),
+    peach: createLootFrame('orange', 'o', 6),
+    peachOfImmortality: createLootFrame('orange', 'P', 16),
+    peachOfImmortalityPiece: createLootFrame('orange', 'p', 8),
     unknown: createLootFrame('black', '?'),
 }
 
@@ -146,6 +160,9 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: Ch
         } else {
             console.error('Unhandled loot type:', loot.definition.lootType);
         }
+    },
+    peach: (state: GameState, loot: ChestObject | LootObject) => {
+        state.hero.life = Math.min(state.hero.life + 1, state.hero.maxLife);
     },
     peachOfImmortality: (state: GameState, loot: ChestObject | LootObject) => {
         state.hero.maxLife++;
