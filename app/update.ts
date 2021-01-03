@@ -1,6 +1,7 @@
 import { Enemy } from 'app/content/enemy';
 import { editingState } from 'app/development/tileEditor';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { updateKeysStillDown } from 'app/keyCommands';
 import { initializeGame } from 'app/initialize';
 import { getState } from 'app/state';
 import { updateHero } from 'app/updateActor';
@@ -28,6 +29,9 @@ export function update() {
                 object?.update(state);
             }
         }
+        // Do this after all key checks, since doing it before we cause the key
+        // to appear not pressed if there is a release threshold assigned.
+        updateKeysStillDown();
     } catch (e) {
         console.log(e.stack);
         debugger;

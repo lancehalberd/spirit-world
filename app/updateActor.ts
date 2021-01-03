@@ -1,6 +1,6 @@
 import { destroyTile, getAreaFromGridCoords, getAreaSize, scrollToArea, setAreaSection } from 'app/content/areas';
 import { Enemy } from 'app/content/enemy';
-import { FRAME_LENGTH } from 'app/gameConstants';
+import { KEY_THRESHOLD, FRAME_LENGTH } from 'app/gameConstants';
 import { getActorTargets } from 'app/getActorTargets';
 import { KEY, isKeyDown } from 'app/keyCommands';
 import { checkForFloorDamage, moveActor } from 'app/moveActor';
@@ -101,8 +101,11 @@ export function updateHero(state: GameState) {
         }
     }
     if (movementSpeed) {
+        const ANALOG_THRESHOLD = 0.2;
         dy = isKeyDown(KEY.DOWN) - isKeyDown(KEY.UP);
+        if (Math.abs(dy) < ANALOG_THRESHOLD) dy = 0;
         dx = isKeyDown(KEY.RIGHT) - isKeyDown(KEY.LEFT);
+        if (Math.abs(dx) < ANALOG_THRESHOLD) dx = 0;
         if (dx || dy) {
             const m = Math.sqrt(dx * dx + dy * dy);
             dx = movementSpeed * dx / m;
@@ -121,13 +124,15 @@ export function updateHero(state: GameState) {
     if (dx || dy) {
         moveActor(state, state.hero, dx, dy);
     }
-    if (!state.hero.action && !state.hero.pickUpTile && state.hero.activeTools.weapon > 0 && state.hero.chakrams > 0 && isKeyDown(KEY.SPACE, 20)) {
+    if (!state.hero.action && !state.hero.pickUpTile && state.hero.activeTools.weapon > 0 &&
+        state.hero.chakrams > 0 && isKeyDown(KEY.SPACE, KEY_THRESHOLD)
+    ) {
         state.hero.action = 'attack';
         state.hero.actionDx = dx;
         state.hero.actionDy = dy;
         state.hero.actionFrame = 0;
     }
-    if (!state.hero.action && !state.hero.pickUpTile && isKeyDown(KEY.SHIFT, 20)) {
+    if (!state.hero.action && !state.hero.pickUpTile && isKeyDown(KEY.SHIFT, KEY_THRESHOLD)) {
         const {objects, tiles} = getActorTargets(state, state.hero);
         if ((dx || dy) && !tiles.some(({x, y}) => area.behaviorGrid?.[y]?.[x]?.solid) && !objects.some(o => o.behaviors?.solid)) {
             if (state.hero.passiveTools.roll > 0) {
@@ -143,7 +148,7 @@ export function updateHero(state: GameState) {
                 }
             }
         } else {
-            console.log({dx, dy, tiles, objects});
+            //console.log({dx, dy, tiles, objects});
             let closestTile: Tile = null, closestObject: ObjectInstance = null, closestDistance = 100;
             for (const target of tiles) {
                 const behavior = area.behaviorGrid?.[target.y]?.[target.x];
@@ -193,12 +198,12 @@ export function updateHero(state: GameState) {
                 }
             }
         }
-    } else if (isKeyDown(KEY.SHIFT))
+    }
     if (state.hero.pickUpTile) {
         state.hero.pickUpFrame++;
         if (state.hero.pickUpFrame >= 5) {
             state.hero.action = 'carrying';
-            if (isKeyDown(KEY.SHIFT, 20)) {
+            if (isKeyDown(KEY.SHIFT, KEY_THRESHOLD)) {
                 throwHeldObject(state);
             }
         }

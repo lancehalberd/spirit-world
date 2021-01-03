@@ -102,12 +102,12 @@ export function isKeyDown(keyCode: number, releaseThreshold: number = 0): number
                 value = gamepad.axes[axisIndex[0]] * axisIndex[1];
             }
             if (value) {
-                const wasLastPressed = lastButtonsPressed[buttonIndex] || 0;
+                const wasLastPressed = lastButtonsPressed[keyCode] || 0;
                 const now = Date.now();
                 if (value > ANALOG_THRESHOLD) {
-                    lastButtonsPressed[buttonIndex] = now;
+                    lastButtonsPressed[keyCode] = now;
                 }
-                if (!releaseThreshold || (now - wasLastPressed >= releaseThreshold)) {
+                if (!releaseThreshold || (now - wasLastPressed) >= releaseThreshold) {
                     return value;
                 }
             }
@@ -115,6 +115,26 @@ export function isKeyDown(keyCode: number, releaseThreshold: number = 0): number
     }
     return 0;
 };
+export function updateKeysStillDown() {
+    const now = Date.now();
+    for (let keyCode in lastButtonsPressed) {
+        const buttonIndex = GAME_PAD_MAPPINGS[keyCode], axisIndex = GAME_PAD_AXIS_MAPPINGS[keyCode];
+        // There can be multiple game pads connected. For now, let's just check all of them for the button.
+        const gamepads = navigator.getGamepads();
+        for (const gamepad of gamepads) {
+            if (!gamepad) continue;
+            let value = 0;
+            if (typeof(buttonIndex) !== 'undefined' && buttonIsPressed(gamepad.buttons[buttonIndex])) {
+                value = 1;
+            } else if (typeof(axisIndex) !== 'undefined' && gamepad.axes[axisIndex[0]] * axisIndex[1] > 0) {
+                value = gamepad.axes[axisIndex[0]] * axisIndex[1];
+            }
+            if (value) {
+                lastButtonsPressed[keyCode] = now;
+            }
+        }
+    }
+}
 
 export function addKeyCommands() {
 document.addEventListener('keyup', function(event) {

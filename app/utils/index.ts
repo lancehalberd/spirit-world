@@ -147,15 +147,12 @@ export function readFromFile(): Promise<string> {
         input.type = 'file';
         input.click();
         input.onchange = function () {
-            console.log('on change');
-            console.log(input.files);
             if (!input.files[0]) {
                 return;
             }
             const reader = new FileReader();
             reader.readAsText(input.files[0], "UTF-8");
             reader.onload = function (event) {
-                console.log('Loaded file contents');
                 resolve('' + event.target.result);
             }
             reader.onerror = function (event) {

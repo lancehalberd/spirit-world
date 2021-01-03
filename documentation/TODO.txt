@@ -1,13 +1,15 @@
 Test at http://localhost:81/alttp/public/
 
+Fix Gamepad controls
 
-Add object editing to editor:
-    - Center new objects under the mouse.
-    - Show preview of objects while moving mouse over area
-    - Think about when to refresh state of
-        - defeated/updated enemies
-        - updated tiles (probably every time we transition to another view area)
-        - things like alttp colored switch state(on enter dungeon), flooded rooms state(might depend on specific state of dungeon), bombed blind's hideout (never resets), revealed chest or key (not sure), opened sealed door (depends on the mechanism),
+Center new objects under mouse while editing
+
+Show preview of new objects while editing
+
+Add inventory screen:
+    - Open with ENTER/START
+    - display peach pieces
+    - for now just display lines for each non-zero equipment (Lvl 1 gloves, Lvl 1 Chakram, Mist Roll)
 
 Add example prologue area:
     - Add text boxes
@@ -20,6 +22,8 @@ Add example prologue area:
     - Peach of Immortality at the end
 
 Make thrown objects deal damage to enemies
+
+Prevent enemies from dealing damage during invulnerability frames.
 
 Add objects that can be pushed or pulled.
 

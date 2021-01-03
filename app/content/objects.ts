@@ -10,7 +10,10 @@ import {
 export function createObjectInstance(state: GameState, object: ObjectDefinition): ObjectInstance {
     if (object.type === 'enemy') {
         return new Enemy(object);
-    } else if (object.type === 'loot' && !state.savedState.collectedItems[object.id]) {
+    } else if (object.type === 'loot') {
+        if (state.savedState.collectedItems[object.id]) {
+            return;
+        }
         return new LootObject(object);
     } else if (object.type === 'chest') {
         return new ChestObject(object);

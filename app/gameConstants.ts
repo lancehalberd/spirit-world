@@ -10,3 +10,5 @@ export const CANVAS_SCALE = 3;
 // Dimensions of the game in document pixels.
 export const DOM_WIDTH = CANVAS_WIDTH * CANVAS_SCALE;
 export const DOM_HEIGHT = CANVAS_HEIGHT * CANVAS_SCALE;
+
+export const KEY_THRESHOLD = 50;
