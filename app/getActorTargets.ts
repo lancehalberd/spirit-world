@@ -42,10 +42,10 @@ export function getActorTargets(state: GameState, actor: Actor): {tiles: Tile[],
         checkPoints.push({x: actor.x + actor.w - 1, y: actor.y + actor.h + 1});
     }
 
-    for (const object of state.areaInstance.objects.filter(o => o.getHitBox)) {
-        const hitBox = object.getHitBox(state);
+    for (const object of state.areaInstance.objects.filter(o => o.getHitbox)) {
+        const hitbox = object.getHitbox(state);
         for (const point of checkPoints) {
-            if (isPointInShortRect(point.x, point.y, hitBox)) {
+            if (isPointInShortRect(point.x, point.y, hitbox)) {
                 objects.push(object);
             }
         }

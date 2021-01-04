@@ -4,6 +4,7 @@ import { createCanvasAndContext } from 'app/dom';
 import { getTilesInRectangle } from 'app/getActorTargets';
 import { damageActor } from 'app/updateActor';
 import { drawFrame } from 'app/utils/animations';
+import { getDirection } from 'app/utils/field';
 import { isPointInShortRect, rectanglesOverlap } from 'app/utils/index';
 
 import { Frame, GameState } from 'app/types';
@@ -66,21 +67,31 @@ export class ThrownChakram {
             const dx = (state.hero.x + state.hero.w / 2) - (this.x + this.w / 2);
             const dy = (state.hero.y + state.hero.h / 2) - (this.y + this.h / 2);
             const m = Math.sqrt(dx * dx + dy * dy);
-            this.x += this.returnSpeed * dx / m;
-            this.y += this.returnSpeed * dy / m;
+            this.vx = this.returnSpeed * dx / m;
+            this.vy = this.returnSpeed * dy / m;
+            this.x += this.vx;
+            this.y += this.vy;
             if (isPointInShortRect(state.hero.x + state.hero.w / 2, state.hero.y + state.hero.h / 2, this)) {
                 state.areaInstance.objects.splice(state.areaInstance.objects.indexOf(this), 1);
                 state.hero.chakrams++;
             }
         }
-        for (const enemy of state.areaInstance.objects) {
-            if (!(enemy instanceof Enemy)) {
-                continue;
+        for (const object of state.areaInstance.objects) {
+            if (object instanceof Enemy) {
+                if (!this.hitTargets.has(object) && rectanglesOverlap(object, this)) {
+                    damageActor(state, object, this.damage);
+                    this.hitTargets.add(object);
+                    this.outFrames = 0;
+                }
             }
-            if (!this.hitTargets.has(enemy) && rectanglesOverlap(enemy, this)) {
-                damageActor(state, enemy, this.damage);
-                this.hitTargets.add(enemy);
-                this.outFrames = 0;
+            if (object.getHitbox && object.onHit) {
+                const hitbox = object.getHitbox(state);
+                if (rectanglesOverlap(hitbox, this)) {
+                    const direction = getDirection(hitbox.x - this.x + 8 * this.vx, hitbox.y - this.y + 8 * this.vy);
+                    object.onHit(state, direction);
+                    this.hitTargets.add(object);
+                    this.outFrames = 0;
+                }
             }
         }
         for (const target of getTilesInRectangle(state, this)) {

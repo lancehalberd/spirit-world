@@ -3,6 +3,7 @@ import _ from 'lodash';
 import { createObjectInstance } from 'app/content/objects';
 import { LootDropObject } from 'app/content/lootObject';
 import { createCanvasAndContext } from 'app/dom';
+import { CANVAS_HEIGHT, CANVAS_WIDTH } from 'app/gameConstants';
 import { createAnimation } from 'app/utils/animations';
 import { isPointInShortRect } from 'app/utils/index';
 import { updateCamera } from 'app/updateCamera';
@@ -12,7 +13,7 @@ import {
     Direction, GameState, ObjectInstance, ShortRectangle, Tile, TilePalette,
 } from 'app/types';
 
-export const [mapTilesFrame] = createAnimation('gfx/tiles/overworld.png', {w: 384, h: 640}, {cols: 5}).frames;
+export const [mapTilesFrame] = createAnimation('gfx/tiles/overworld.png', {w: 384, h: 640}).frames;
 const worldMapPalette: TilePalette = {
     w: 16, h: 16,
     // The source frame of the tiles.
@@ -114,6 +115,7 @@ export function setAreaSection(state: GameState, d: Direction): void {
             break;
         }
     }
+    refreshOffscreenObjects(state);
 }
 
 export function scrollToArea(state: GameState, area: AreaDefinition, direction: Direction): void {
@@ -180,6 +182,19 @@ export function getAreaSize(state: GameState): {w: number, h: number, section: S
             y: state.areaSection.y * state.areaInstance.palette.h,
             w: state.areaSection.w * state.areaInstance.palette.w,
             h: state.areaSection.h * state.areaInstance.palette.h,
+        }
+    }
+}
+
+export function refreshOffscreenObjects(state: GameState): void {
+    const l = state.camera.x + state.areaInstance.cameraOffset.x;
+    const t = state.camera.y + state.areaInstance.cameraOffset.y;
+    for (let i = 0; i < state.areaInstance.objects.length; i++) {
+        const object = state.areaInstance.objects[i];
+        if (object.definition && object.definition.type !== 'enemy') {
+            if (object.x < l || object.x > l + CANVAS_WIDTH || object.y < t || object.y > t + CANVAS_HEIGHT) {
+                state.areaInstance.objects[i] = createObjectInstance(state, object.definition);
+            }
         }
     }
 }

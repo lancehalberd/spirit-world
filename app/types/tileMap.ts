@@ -82,6 +82,7 @@ export interface AreaDefinition {
     objects: ObjectDefinition[],
     // Used to divide a larger super tile into smaller screens.
     sections: ShortRectangle[],
+    dark?: boolean,
 }
 
 export type AreaGrid = AreaDefinition[][];
@@ -107,8 +108,13 @@ export interface ObjectInstance {
     drawPriority?: 'background' | 'foreground' | 'sprites',
     x: number, y: number,
     // This is called when a user grabs a solid tile
-    getHitBox?: (state: GameState) => ShortRectangle,
+    getHitbox?: (state: GameState) => ShortRectangle,
+    // When the hero tries to pick up the object with the passive skill button.
     onGrab?: (state: GameState) => void,
+    // When the hero hits the object with a weapon or tool
+    onHit?: (state: GameState, direction: Direction) => void,
+    // When the hero walks into an object
+    onPush?: (state: GameState, direction: Direction) => void,
     update?: (state: GameState) => void,
     render?: (context: CanvasRenderingContext2D, state: GameState) => void,
 }
@@ -128,6 +134,10 @@ export interface LootObjectDefinition extends BaseObjectDefinition {
     amount?: number,
 }
 
+export interface SimpleObjectDefinition extends BaseObjectDefinition {
+    type: 'tippable',
+}
+
 export type EnemyType = 'snake';
 
 export interface EnemyObjectDefinition extends BaseObjectDefinition {
@@ -135,5 +145,5 @@ export interface EnemyObjectDefinition extends BaseObjectDefinition {
     enemyType: EnemyType,
 }
 
-export type ObjectDefinition = LootObjectDefinition | EnemyObjectDefinition;
+export type ObjectDefinition = SimpleObjectDefinition | LootObjectDefinition | EnemyObjectDefinition;
 

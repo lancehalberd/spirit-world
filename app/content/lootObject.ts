@@ -51,6 +51,9 @@ export class LootObject implements ObjectInstance {
         this.y = definition.y;
     }
     update(state: GameState) {
+        if (state.savedState.collectedItems[this.definition.id]) {
+            return;
+        }
         if (rectanglesOverlap(state.hero, {...this.frame, x: this.x, y: this.y})) {
             const onPickup = lootEffects[this.definition.lootType] || lootEffects.unknown;
             onPickup(state, this);
@@ -61,6 +64,9 @@ export class LootObject implements ObjectInstance {
         }
     }
     render(context, state: GameState) {
+        if (state.savedState.collectedItems[this.definition.id]) {
+            return;
+        }
         drawFrame(context, this.frame, { ...this.frame, x: this.x, y: this.y });
     }
 }
@@ -96,7 +102,7 @@ export class ChestObject implements ObjectInstance {
         this.x = definition.x;
         this.y = definition.y;
     }
-    getHitBox(state: GameState): ShortRectangle {
+    getHitbox(state: GameState): ShortRectangle {
         return { ...chestOpenedFrame, x: this.x, y: this.y };
     }
     onGrab(state: GameState) {
@@ -134,6 +140,8 @@ function createLootFrame(color: string, letter: string, size: number = 10): Fram
 }
 
 export const lootFrames: Partial<{[key in LootType]: Frame}> = {
+    catEyes: createLootFrame('red', 'E'),
+    trueSight: createLootFrame('red', 'T'),
     weapon: createLootFrame('red', 'W'),
     gloves: createLootFrame('blue', 'G'),
     roll: createLootFrame('green', 'R'),

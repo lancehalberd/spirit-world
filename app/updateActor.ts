@@ -122,7 +122,7 @@ export function updateHero(state: GameState) {
         }
     }
     if (dx || dy) {
-        moveActor(state, state.hero, dx, dy);
+        moveActor(state, state.hero, dx, dy, true);
     }
     if (!state.hero.action && !state.hero.pickUpTile && state.hero.activeTools.weapon > 0 &&
         state.hero.chakrams > 0 && isKeyDown(KEY.SPACE, KEY_THRESHOLD)
@@ -173,7 +173,7 @@ export function updateHero(state: GameState) {
                     state.hero.action = 'grabbing';
                 }
                 if (object.onGrab) {
-                    const frame = object.getHitBox(state);
+                    const frame = object.getHitbox(state);
                     // This is an unusual distance, but should do what we want still.
                     const distance = (
                         Math.abs(frame.x + frame.w / 2 - state.hero.x - state.hero.w / 2) +

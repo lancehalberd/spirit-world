@@ -1,9 +1,9 @@
 import { damageActor } from 'app/updateActor';
 import { isPointInShortRect } from 'app/utils/index';
 
-import { Actor, Direction, GameState } from 'app/types';
+import { Actor, Direction, GameState, ObjectInstance } from 'app/types';
 
-export function moveActor(state: GameState, actor: Actor, dx: number, dy: number) {
+export function moveActor(state: GameState, actor: Actor, dx: number, dy: number, push: boolean = false) {
     let sx = dx;
     if (sx < -1 || sx > 1) {
         sx /= Math.abs(sx);
@@ -17,7 +17,7 @@ export function moveActor(state: GameState, actor: Actor, dx: number, dy: number
     while (s < 100) {
         let movedX = false, movedY = false;
         if (sx) {
-            movedX = moveActorInDirection(state, actor, sx, (sx < 0) ? 'left' : 'right', !dy);
+            movedX = moveActorInDirection(state, actor, sx, (sx < 0) ? 'left' : 'right', !dy, push);
             if (movedX) {
                 mx += sx;
                 if (sx > -1 && sx < 1) {
@@ -31,7 +31,7 @@ export function moveActor(state: GameState, actor: Actor, dx: number, dy: number
             }
         }
         if (sy) {
-            movedY = moveActorInDirection(state, actor, sy, (sy < 0) ? 'up' : 'down', !dx);
+            movedY = moveActorInDirection(state, actor, sy, (sy < 0) ? 'up' : 'down', !dx, push);
             if (movedY) {
                 my += sy;
                 if (sy > -1 && sy < 1) {
@@ -53,7 +53,14 @@ export function moveActor(state: GameState, actor: Actor, dx: number, dy: number
     }
     return true;
 }
-function moveActorInDirection(state: GameState, actor: Actor, amount: number, direction: Direction, wiggle: boolean = false) {
+function moveActorInDirection(
+    state: GameState,
+    actor: Actor,
+    amount: number,
+    direction: Direction,
+    wiggle: boolean = false,
+    push: boolean = false,
+) {
     let ax = actor.x, ay = actor.y;
     if (direction === 'up' || direction === 'down') {
         ay += amount;
@@ -77,7 +84,7 @@ function moveActorInDirection(state: GameState, actor: Actor, amount: number, di
 
     // const tiles = state.areaInstance.layers[0].grid.tiles;
     const behaviorGrid = state.areaInstance.behaviorGrid;
-    let blocked = false;
+    let blockedByTile = false;
     const openCoords = [];
     for (let row = topRow; row <= bottomRow; row++) {
         for (let column = leftColumn; column <= rightColumn; column++) {
@@ -91,7 +98,7 @@ function moveActorInDirection(state: GameState, actor: Actor, amount: number, di
                 damageActor(state, actor, behaviors.damage);
             }
             if (behaviors.solid) {
-                blocked = true;
+                blockedByTile = true;
             } else {
                 openCoords.push({x: column, y: row});
             }
@@ -115,24 +122,51 @@ function moveActorInDirection(state: GameState, actor: Actor, amount: number, di
         checkPoints.push({x: ax + 1, y: ay + actor.h});
         checkPoints.push({x: ax + actor.w - 1, y: ay + actor.h});
     }
-    for (const solidObject of state.areaInstance.objects.filter(o => o.getHitBox && o.behaviors?.solid)) {
-        const hitBox = solidObject.getHitBox(state);
+    const pushedObjects: ObjectInstance[] = [];
+    let blockedByObject = false;
+    const blockedCoords = {};
+    for (const solidObject of state.areaInstance.objects.filter(o => o.getHitbox && o.behaviors?.solid)) {
+        const hitbox = solidObject.getHitbox(state);
         for (const point of checkPoints) {
-            if (isPointInShortRect(point.x, point.y, hitBox)) {
-                blocked = true;
-                // TODO: wiggling is based only on being blocked by tiles, so we disable it when
-                // blocked by a non-tile object.
-                wiggle = false;
-                break;
+            if (isPointInShortRect(point.x, point.y, hitbox)) {
+                blockedByObject = true;
+                const x = hitbox.x + hitbox.w / 2;
+                const y = hitbox.y + hitbox.h / 2;
+                blockedCoords[`${Math.floor(x / tileSize)}x${Math.floor(y / tileSize)}`] = solidObject;
+                if (push) {
+                    pushedObjects.push(solidObject);
+                }
             }
         }
     }
-    if (blocked) {
+    if (!blockedByTile && pushedObjects.length === 1) {
+        if (pushedObjects[0].onPush) {
+            pushedObjects[0].onPush(state, direction);
+        }
+    } else if (pushedObjects.length > 1) {
+        for (const object of pushedObjects) {
+            const hitbox = object.getHitbox(state);
+            if (Math.abs(ax - hitbox.x) < 4
+                || Math.abs(ax + actor.w - hitbox.x - hitbox.w) < 4
+                || Math.abs(ay - hitbox.y) < 4
+                || Math.abs(ay + actor.h - hitbox.y - hitbox.h) < 4
+            ) {
+                if (object.onPush) {
+                    object.onPush(state, direction);
+                }
+            }
+        }
+
+    }
+    if (blockedByTile || blockedByObject) {
         // If this is true, wiggle the character up to Npx to get around corners.
         // This makes it much smoother to try and get into pixel perfect gaps.
         if (wiggle) {
             const wiggleAmount = 7;
             for (const coords of openCoords) {
+                if (blockedCoords[`${coords.x}x${coords.y}`]) {
+                    continue;
+                }
                 if (direction === 'up' || direction === 'down') {
                     if (coords.x === leftColumn && coords.x === Math.floor((ax + actor.w - 1 - wiggleAmount) / tileSize)) {
                         return moveActorInDirection(state, actor, -0.5, 'left',  false);

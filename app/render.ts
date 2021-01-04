@@ -1,5 +1,5 @@
-import { renderEditor } from 'app/development/tileEditor';
-import { mainContext } from 'app/dom';
+import { editingState, renderEditor } from 'app/development/tileEditor';
+import { createCanvasAndContext, mainContext } from 'app/dom';
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from 'app/gameConstants';
 import { renderActor } from 'app/renderActor';
 import { renderMenu } from 'app/renderMenu';
@@ -7,6 +7,44 @@ import { getState } from 'app/state';
 import { drawFrame } from 'app/utils/animations';
 
 import { AreaInstance, AreaLayer, Frame, GameState, Tile, TilePalette } from 'app/types';
+
+const [darkCanvas, darkContext] = createCanvasAndContext(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
+let darkCanvasRadius: number;
+export function updateDarkCanvas(radius: number): void {
+    if (radius === darkCanvasRadius) {
+        return;
+    }
+    darkCanvasRadius = radius;
+    darkContext.fillStyle = 'black';
+    darkContext.clearRect(0, 0, darkCanvas.width, darkCanvas.height);
+    darkContext.beginPath();
+    darkContext.rect(0, 0, darkCanvas.width, darkCanvas.height);
+    darkContext.arc(darkCanvas.width / 2, darkCanvas.height / 2, radius / 4, 0, 2 * Math.PI, true);
+    darkContext.fill();
+    darkContext.save();
+        darkContext.globalAlpha = 0.8;
+        darkContext.beginPath();
+        darkContext.rect(0, 0, darkCanvas.width, darkCanvas.height);
+        darkContext.arc(darkCanvas.width / 2, darkCanvas.height / 2, 3 * radius / 16, 0, 2 * Math.PI, true);
+        darkContext.fill();
+        darkContext.globalAlpha = 0.6;
+        darkContext.beginPath();
+        darkContext.rect(0, 0, darkCanvas.width, darkCanvas.height);
+        darkContext.arc(darkCanvas.width / 2, darkCanvas.height / 2, radius / 8, 0, 2 * Math.PI, true);
+        darkContext.fill();
+    darkContext.restore();
+}
+
+function getDarkRadius(state: GameState): number {
+    if (state.hero.passiveTools.trueSight) {
+        return 320;
+    }
+    if (state.hero.passiveTools.catEyes) {
+        return 80;
+    }
+    return 20;
+}
+
 
 export function render() {
     const context = mainContext;
@@ -45,6 +83,21 @@ export function renderField(context: CanvasRenderingContext2D, state: GameState)
 
     // Render any editor specific graphics if appropriate.
     renderEditor(context, state);
+    if (state.areaInstance.definition.dark || state.nextAreaInstance?.definition.dark) {
+        context.save()
+            const radius = getDarkRadius(state);
+            updateDarkCanvas(radius);
+            if (editingState.isEditing) {
+                context.globalAlpha = 0.5;
+            }
+            context.drawImage(darkCanvas,
+                0, 0, darkCanvas.width, darkCanvas.height,
+                state.hero.x + state.hero.w / 2 - CANVAS_WIDTH - state.camera.x + state.areaInstance.cameraOffset.x,
+                state.hero.y + state.hero.h / 2 - CANVAS_HEIGHT - state.camera.y + state.areaInstance.cameraOffset.y,
+                CANVAS_WIDTH * 2, CANVAS_HEIGHT * 2
+            );
+        context.restore();
+    }
 
     // Draw the HUD onto the field.
     renderHUD(context, state);

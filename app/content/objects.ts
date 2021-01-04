@@ -2,6 +2,7 @@ import _ from 'lodash';
 
 import { Enemy } from 'app/content/enemy';
 import { ChestObject, LootObject } from 'app/content/lootObject';
+import { TippableObject } from 'app/content/tippableObject';
 
 import {
     GameState, ObjectDefinition, ObjectInstance,
@@ -11,12 +12,11 @@ export function createObjectInstance(state: GameState, object: ObjectDefinition)
     if (object.type === 'enemy') {
         return new Enemy(object);
     } else if (object.type === 'loot') {
-        if (state.savedState.collectedItems[object.id]) {
-            return;
-        }
         return new LootObject(object);
     } else if (object.type === 'chest') {
         return new ChestObject(object);
+    } else if (object.type === 'tippable') {
+        return new TippableObject(object);
     }
 
     console.error('Unhandled object type', object.type, object);

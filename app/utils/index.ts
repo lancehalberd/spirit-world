@@ -10,15 +10,15 @@ export function ifdefor<T>(value: T, defaultValue: T = null): T {
 }
 
 export function isPointInRect(x: number, y: number, l: number, t: number, w: number, h: number): boolean {
-    return !(y < t || y > (t + h) || x < l || x > (l + w));
+    return !(y <= t || y >= (t + h) || x <= l || x >= (l + w));
 }
 
 export function isPointInShortRect(x: number, y: number, {x: l = 0, y: t = 0, w = 0, h = 0}: ShortRectangle): boolean {
-    return !(y < t || y > t + h || x < l || x > l + w);
+    return !(y <= t || y >= t + h || x <= l || x >= l + w);
 }
 
 export function rectanglesOverlap(A: ShortRectangle, B: ShortRectangle) {
-    return !(A.y + A.h < B.y || A.y > B.y + B.h || A.x + A.w < B.x || A.x > B.x + B.w);
+    return !(A.y + A.h <= B.y || A.y >= B.y + B.h || A.x + A.w <= B.x || A.x >= B.x + B.w);
 }
 
 export function collision(element1: HTMLElement, element2: HTMLElement): boolean {

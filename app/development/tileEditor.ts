@@ -1,15 +1,18 @@
 import _ from 'lodash';
 
 import { palettes, setAreaSection } from 'app/content/areas';
+import { createObjectInstance } from 'app/content/objects';
 import { getEnemyProperties, onMouseDownEnemy, renderEnemyPreview } from 'app/development/enemyEditor';
 import {
     deleteObject,
     getLootProperties,
     getObjectFrame,
+    getObjectProperties,
     getSelectProperties,
-    onMouseDownLoot, onMouseDownSelect,
+    onMouseDownLoot, onMouseDownObject, onMouseDownSelect,
     onMouseMoveSelect,
     renderLootPreview,
+    renderObjectPreview,
 } from 'app/development/objectEditor';
 import { displayPropertyPanel, hidePropertyPanel, updateBrushCanvas } from 'app/development/propertyPanel';
 import { mainCanvas } from 'app/dom';
@@ -24,13 +27,16 @@ import {
     LootType, ObjectDefinition, PropertyRow, TileGrid,
 } from 'app/types';
 
+export type ObjectType = 'tippable';
+type EditorToolType = 'select' | 'brush' | 'chest' | 'loot' | 'enemy' | 'object';
 export interface EditingState {
-    tool: 'select' | 'brush' | 'chest' | 'loot' | 'enemy' | 'object',
+    tool: EditorToolType,
     isEditing: boolean,
     brush: TileGrid,
     selectedLayerIndex: number,
     newEnemyType: EnemyType,
     newLootType: LootType,
+    newObjectType: ObjectType,
     selectedObject?: ObjectDefinition,
     dragOffset: {x: number, y: number},
 }
@@ -42,6 +48,7 @@ export const editingState: EditingState = {
     selectedLayerIndex: 0,
     newEnemyType: 'snake',
     newLootType: 'peachOfImmortalityPiece',
+    newObjectType: 'tippable',
     selectedObject: null,
     dragOffset: {x: 0, y: 0},
 };
@@ -105,8 +112,8 @@ export function displayTileEditorPropertyPanel() {
     rows.push({
         name: 'tool',
         value: editingState.tool,
-        values: ['select', 'brush', 'chest', 'loot', 'enemy'],
-        onChange(tool: 'select' | 'brush' | 'chest' | 'loot') {
+        values: ['select', 'brush', 'chest', 'loot', 'enemy', 'object'],
+        onChange(tool: EditorToolType) {
             editingState.tool = tool;
             displayTileEditorPropertyPanel();
         },
@@ -119,6 +126,13 @@ export function displayTileEditorPropertyPanel() {
             state.areaInstance.definition.sections = sectionLayouts[sectionType];
             setAreaSection(state, state.hero.d);
             return 'Change Layout';
+        }
+    });
+    rows.push({
+        name: 'dark',
+        value: !!state.areaInstance.definition.dark,
+        onChange(dark: boolean) {
+            state.areaInstance.definition.dark = dark;
         }
     });
     switch (editingState.tool) {
@@ -136,6 +150,9 @@ export function displayTileEditorPropertyPanel() {
         case 'chest':
         case 'loot':
             rows = [...rows, ...getLootProperties(state, editingState)];
+            break;
+        case 'object':
+            rows = [...rows, ...getObjectProperties(state, editingState)];
             break;
         case 'select':
             rows = [...rows, ...getSelectProperties(state, editingState)];
@@ -178,6 +195,9 @@ mainCanvas.addEventListener('mousedown', function () {
         case 'chest':
         case 'loot':
             onMouseDownLoot(state, editingState, x, y);
+            break;
+        case 'object':
+            onMouseDownObject(state, editingState, x, y);
             break;
         case 'enemy':
             onMouseDownEnemy(state, editingState, x, y);
@@ -229,8 +249,9 @@ export function renderEditor(context: CanvasRenderingContext2D, state: GameState
         );
         context.globalAlpha = 0.6;
         for (const object of state.areaInstance.definition.objects) {
-            const frame = getObjectFrame(object);
-            drawFrame(context, frame, {...frame, x: object.x - (frame.content?.x || 0), y: object.y - (frame.content?.y || 0)});
+            const instance = createObjectInstance(state, object);
+            instance.render(context, state);
+            // drawFrame(context, frame, {...frame, x: object.x - (frame.content?.x || 0), y: object.y - (frame.content?.y || 0)});
             // While editing, draw the loot inside the chest on top as well.
             if (object.type === 'chest') {
                 const frame = getObjectFrame({...object, type: 'loot'});
@@ -252,6 +273,9 @@ export function renderEditor(context: CanvasRenderingContext2D, state: GameState
         }
         if (editingState.tool === 'loot' || editingState.tool === 'chest') {
             renderLootPreview(context, state, editingState, x, y);
+        }
+        if (editingState.tool === 'object') {
+            renderObjectPreview(context, state, editingState, x, y);
         }
     context.restore();
 }

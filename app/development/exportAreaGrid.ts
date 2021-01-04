@@ -80,6 +80,9 @@ export function serializeAreaGrid(areaGrid: AreaGrid) {
                 lines.push(`        {x: ${section.x}, y: ${section.y}, w: ${section.w}, h: ${section.h}},`);
             }
             lines.push('    ],');
+            if (area.dark) {
+                lines.push('    dark: true,');
+            }
             lines.push('};');
         }
     }

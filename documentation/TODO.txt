@@ -1,5 +1,21 @@
 Test at http://localhost:81/alttp/public/
 
+Add active tools
+    Bow
+
+Add puzzle blocks:
+    Ball that rolls until it hits a solid object (if it hits another ball, it stops and the other ball moves)
+    Tile that can be knocked over by pushing or hitting with a weapon, cannot be moved after falling
+
+Add ability to assign active tools to the X/Y buttons.
+    -Display a colored box around the items that correspond to the color of the button on the controller as well as a letter.
+    -Track most recent input to control keyboard vs controller type
+
+Add meditate ability
+    - stand still and hold the passive tool button to grow a ring of spirit sight around you
+    - release and press passive tool button to stop
+    - if astral projection is available, you can move around (need to press passive tool on body to return or press somethiing else to return instantly?)
+    - if telekinesis you can pick up real objects (possibly limited by telekinesis level)
 
 Add example prologue area:
     - Add text boxes

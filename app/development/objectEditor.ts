@@ -2,8 +2,9 @@ import _ from 'lodash';
 
 import { enemyDefinitions } from 'app/content/enemy';
 import { createObjectInstance } from 'app/content/objects';
-import { ChestObject, LootObject, chestClosedFrame, lootFrames } from 'app/content/lootObject';
-import { displayTileEditorPropertyPanel, EditingState } from 'app/development/tileEditor';
+import { chestClosedFrame, lootFrames } from 'app/content/lootObject';
+import { standingFrame } from 'app/content/tippableObject';
+import { displayTileEditorPropertyPanel, EditingState, ObjectType } from 'app/development/tileEditor';
 import { getState } from 'app/state';
 import { isPointInShortRect } from 'app/utils/index';
 
@@ -41,6 +42,20 @@ export function getLootProperties(state: GameState, editingState: EditingState):
     return rows;
 }
 
+const simpleObjectTypes = ['tippable'];
+
+export function getObjectProperties(state: GameState, editingState: EditingState): PanelRows {
+    const rows: PanelRows = [];
+    rows.push({
+        name: 'type',
+        value: editingState.newObjectType,
+        values: simpleObjectTypes,
+        onChange(objectType: ObjectType) {
+            editingState.newObjectType = objectType;
+        },
+    });
+    return rows;
+}
 
 export function getSelectProperties(state: GameState, editingState: EditingState): PanelRows {
     const rows: PanelRows = [];
@@ -67,6 +82,23 @@ export function getSelectProperties(state: GameState, editingState: EditingState
                     updateObjectId(state, lootObjectDefinition, lootObjectDefinition.id.replace(lootObjectDefinition.lootType, lootType));
                 }
                 lootObjectDefinition.lootType = lootType;
+                updateObjectInstance(state, lootObjectDefinition);
+            },
+        });
+    }
+    if (editingState.selectedObject?.type === 'tippable') {
+        const lootObjectDefinition = editingState.selectedObject;
+        rows.push({
+            name: 'type',
+            value: lootObjectDefinition.type,
+            values: simpleObjectTypes,
+            onChange(type: ObjectType) {
+
+                // Replace instances of the loot type in the id with the new loot type.
+                if (lootObjectDefinition.id.includes(lootObjectDefinition.type)) {
+                    updateObjectId(state, lootObjectDefinition, lootObjectDefinition.id.replace(lootObjectDefinition.type, type));
+                }
+                lootObjectDefinition.type = type;
                 updateObjectInstance(state, lootObjectDefinition);
             },
         });
@@ -100,7 +132,23 @@ export function onMouseDownLoot(state: GameState, editingState: EditingState, x:
     newObject.y -= (frame.content?.h || frame.h) / 2;
     fixObjectPosition(state, newObject);
     state.areaInstance.definition.objects.push(newObject);
-    state.areaInstance.objects.push(newObject.type === 'loot' ? new LootObject(newObject) : new ChestObject(newObject));
+    updateObjectInstance(state, newObject);
+}
+
+export function onMouseDownObject(state: GameState, editingState: EditingState, x: number, y: number): void {
+    const newObject: ObjectDefinition = {
+        id: uniqueId(state, editingState.newObjectType),
+        status: 'normal',
+        type: editingState.newObjectType,
+        x: Math.round(x + state.camera.x),
+        y: Math.round(y + state.camera.y),
+    };
+    const frame = getObjectFrame(newObject);
+    newObject.x -= (frame.content?.w || frame.w) / 2;
+    newObject.y -= (frame.content?.h || frame.h) / 2;
+    fixObjectPosition(state, newObject);
+    state.areaInstance.definition.objects.push(newObject);
+    updateObjectInstance(state, newObject);
 }
 
 export function onMouseDownSelect(state: GameState, editingState: EditingState, x: number, y: number): void {
@@ -133,7 +181,8 @@ export function onMouseDownSelect(state: GameState, editingState: EditingState, 
 }
 
 export function fixObjectPosition(state: GameState, object: ObjectDefinition): void {
-    if (object.type === 'chest') {
+    // These objects snap to the grid.
+    if (object.type === 'chest' || object.type === 'tippable') {
         object.x = Math.round(object.x / state.areaInstance.palette.w) * state.areaInstance.palette.w;
         object.y = Math.round(object.y / state.areaInstance.palette.h) * state.areaInstance.palette.h;
     }
@@ -177,6 +226,9 @@ export function getObjectFrame(object: ObjectDefinition): Frame {
     }
     if (object.type === 'chest') {
         return chestClosedFrame;
+    }
+    if (object.type === 'tippable') {
+        return standingFrame;
     }
     return lootFrames.unknown;
 }
@@ -232,9 +284,26 @@ export function renderLootPreview(
     definition.x -= (frame.content?.w || frame.w) / 2;
     definition.y -= (frame.content?.h || frame.h) / 2;
     fixObjectPosition(state, definition);
-    if (definition.type === 'chest') {
-        new ChestObject(definition).render(context, state);
-    } else {
-        new LootObject(definition).render(context, state);
-    }
+    createObjectInstance(state, definition).render(context, state);
+}
+
+export function renderObjectPreview(
+    context: CanvasRenderingContext2D,
+    state: GameState,
+    editingState: EditingState,
+    x: number,
+    y: number
+): void {
+    const definition: ObjectDefinition = {
+        id: uniqueId(state, editingState.newLootType),
+        status: 'normal',
+        type: editingState.newObjectType,
+        x: Math.round(x + state.camera.x),
+        y: Math.round(y + state.camera.y),
+    };
+    const frame = getObjectFrame(definition);
+    definition.x -= (frame.content?.w || frame.w) / 2;
+    definition.y -= (frame.content?.h || frame.h) / 2;
+    fixObjectPosition(state, definition);
+    createObjectInstance(state, definition).render(context, state);
 }
