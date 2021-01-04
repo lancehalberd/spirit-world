@@ -94,7 +94,10 @@ export function onMouseDownLoot(state: GameState, editingState: EditingState, x:
         lootType: editingState.newLootType,
         x: Math.round(x + state.camera.x),
         y: Math.round(y + state.camera.y),
-    }
+    };
+    const frame = getObjectFrame(newObject);
+    newObject.x -= (frame.content?.w || frame.w) / 2;
+    newObject.y -= (frame.content?.h || frame.h) / 2;
     fixObjectPosition(state, newObject);
     state.areaInstance.definition.objects.push(newObject);
     state.areaInstance.objects.push(newObject.type === 'loot' ? new LootObject(newObject) : new ChestObject(newObject));
@@ -210,3 +213,28 @@ export function deleteObject(state: GameState, object: ObjectDefinition): void {
     }
 }
 
+export function renderLootPreview(
+    context: CanvasRenderingContext2D,
+    state: GameState,
+    editingState: EditingState,
+    x: number,
+    y: number
+): void {
+    const definition: ObjectDefinition = {
+        id: uniqueId(state, editingState.newLootType),
+        status: 'normal',
+        type: editingState.tool === 'loot' ? 'loot' : 'chest',
+        lootType: editingState.newLootType,
+        x: Math.round(x + state.camera.x),
+        y: Math.round(y + state.camera.y),
+    };
+    const frame = getObjectFrame(definition);
+    definition.x -= (frame.content?.w || frame.w) / 2;
+    definition.y -= (frame.content?.h || frame.h) / 2;
+    fixObjectPosition(state, definition);
+    if (definition.type === 'chest') {
+        new ChestObject(definition).render(context, state);
+    } else {
+        new LootObject(definition).render(context, state);
+    }
+}

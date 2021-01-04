@@ -2,6 +2,7 @@ import { renderEditor } from 'app/development/tileEditor';
 import { mainContext } from 'app/dom';
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from 'app/gameConstants';
 import { renderActor } from 'app/renderActor';
+import { renderMenu } from 'app/renderMenu';
 import { getState } from 'app/state';
 import { drawFrame } from 'app/utils/animations';
 
@@ -18,6 +19,14 @@ export function render() {
         return;
     }
     state.lastTimeRendered = state.time;
+    if (!state.paused) {
+        renderField(context, state);
+    } else {
+        renderMenu(context, state);
+    }
+}
+
+export function renderField(context: CanvasRenderingContext2D, state: GameState): void {
     // Update any background tiles that have changed.
     state.areaInstance.layers.map(layer => renderLayer(state.areaInstance.context, layer));
     state.nextAreaInstance?.layers?.map(layer => renderLayer(state.nextAreaInstance.context, layer));

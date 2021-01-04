@@ -17,4 +17,5 @@ export interface GameState {
     nextAreaInstance?: AreaInstance,
     areaGrid: AreaGrid,
     areaGridCoords: {x: number, y: number},
+    paused: boolean,
 }

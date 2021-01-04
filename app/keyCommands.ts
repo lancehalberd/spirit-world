@@ -2,6 +2,7 @@
 import { exportAreaGridToClipboard } from 'app/development/exportAreaGrid';
 import { toggleEditing } from 'app/development/tileEditor';
 import { runTileRipper } from 'app/development/tileRipper';
+import { FRAME_LENGTH } from 'app/gameConstants';
 import { getState } from 'app/state';
 import { requireImage } from 'app/utils/images';
 
@@ -81,9 +82,10 @@ function buttonIsPressed(button) {
 const keysDown = {};
 let lastButtonsPressed: {[key: string]: number} = {};
 export function isKeyDown(keyCode: number, releaseThreshold: number = 0): number {
+    const now = Date.now();
     if (keysDown[keyCode]) {
         if (releaseThreshold) {
-            return Date.now() - keysDown[keyCode] < releaseThreshold ? 1 : 0;
+            return (now - keysDown[keyCode]) <= FRAME_LENGTH ? 1 : 0;
         }
         return 1;
     }
@@ -103,11 +105,10 @@ export function isKeyDown(keyCode: number, releaseThreshold: number = 0): number
             }
             if (value) {
                 const wasLastPressed = lastButtonsPressed[keyCode] || 0;
-                const now = Date.now();
                 if (value > ANALOG_THRESHOLD) {
                     lastButtonsPressed[keyCode] = now;
                 }
-                if (!releaseThreshold || (now - wasLastPressed) >= releaseThreshold) {
+                if (!releaseThreshold || (now - wasLastPressed) > 2 * FRAME_LENGTH) {
                     return value;
                 }
             }

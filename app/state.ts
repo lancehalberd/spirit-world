@@ -74,6 +74,7 @@ function getDefaultState(): GameState {
         lastTimeRendered: 0,
         areaGrid: testWorld,
         areaGridCoords: {x: 1, y: 1},
+        paused: false,
     };
 }
 

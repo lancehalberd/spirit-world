@@ -1,15 +1,5 @@
 Test at http://localhost:81/alttp/public/
 
-Fix Gamepad controls
-
-Center new objects under mouse while editing
-
-Show preview of new objects while editing
-
-Add inventory screen:
-    - Open with ENTER/START
-    - display peach pieces
-    - for now just display lines for each non-zero equipment (Lvl 1 gloves, Lvl 1 Chakram, Mist Roll)
 
 Add example prologue area:
     - Add text boxes
@@ -32,6 +22,14 @@ Add connected areas + dungeons
 Add animation for breaking stone hitting the ground.
 
 Animate hearts refilling
+
+
+Include some random dungeon design in the base game:
+    - Location of key under object might change (there should be some clue where it is or use spirit sight).
+    - Something like peg cave, but only a single peg needs to be pressed to open it (spirit sight reveals which?).
+    - Something like Easter Palace Foyer except the correct door isn't always the center door.
+
+Keep in mind significance of design elements for future racing/randomizer.
 
 
 Possible tool: Leather gloves protect you from thorn bushes.

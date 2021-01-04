@@ -11,4 +11,4 @@ export const CANVAS_SCALE = 3;
 export const DOM_WIDTH = CANVAS_WIDTH * CANVAS_SCALE;
 export const DOM_HEIGHT = CANVAS_HEIGHT * CANVAS_SCALE;
 
-export const KEY_THRESHOLD = 50;
+export const KEY_THRESHOLD = FRAME_LENGTH;

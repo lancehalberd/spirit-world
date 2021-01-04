@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 import { palettes, setAreaSection } from 'app/content/areas';
-import { getEnemyProperties, onMouseDownEnemy } from 'app/development/enemyEditor';
+import { getEnemyProperties, onMouseDownEnemy, renderEnemyPreview } from 'app/development/enemyEditor';
 import {
     deleteObject,
     getLootProperties,
@@ -9,6 +9,7 @@ import {
     getSelectProperties,
     onMouseDownLoot, onMouseDownSelect,
     onMouseMoveSelect,
+    renderLootPreview,
 } from 'app/development/objectEditor';
 import { displayPropertyPanel, hidePropertyPanel, updateBrushCanvas } from 'app/development/propertyPanel';
 import { mainCanvas } from 'app/dom';
@@ -112,11 +113,12 @@ export function displayTileEditorPropertyPanel() {
     });
     rows.push({
         name: 'sections',
-        value: 'Change Sections',
-        values: Object.keys(sectionLayouts),
+        value: 'Change Layout',
+        values: ['Change Layout', ...Object.keys(sectionLayouts)],
         onChange(sectionType: string) {
             state.areaInstance.definition.sections = sectionLayouts[sectionType];
             setAreaSection(state, state.hero.d);
+            return 'Change Layout';
         }
     });
     switch (editingState.tool) {
@@ -219,6 +221,7 @@ export function renderEditor(context: CanvasRenderingContext2D, state: GameState
     if (!editingState.isEditing) {
         return;
     }
+    const [x, y] = getMousePosition(mainCanvas, CANVAS_SCALE);
     context.save();
         context.translate(
             -state.camera.x + state.areaInstance.cameraOffset.x,
@@ -243,6 +246,12 @@ export function renderEditor(context: CanvasRenderingContext2D, state: GameState
                 (frame.content?.w || frame.w) + 2,
                 (frame.content?.h || frame.h) + 2
             );
+        }
+        if (editingState.tool === 'enemy') {
+            renderEnemyPreview(context, state, editingState, x, y);
+        }
+        if (editingState.tool === 'loot' || editingState.tool === 'chest') {
+            renderLootPreview(context, state, editingState, x, y);
         }
     context.restore();
 }
