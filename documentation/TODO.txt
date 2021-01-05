@@ -3,8 +3,6 @@ Test at http://localhost:81/alttp/public/
 Add active tools
     Bow
 
-Add import from file/clipboard functionality
-
 Add ability to assign active tools to the X/Y buttons.
     -Display a colored box around the items that correspond to the color of the button on the controller as well as a letter.
     -Track most recent input to control keyboard vs controller type
@@ -29,6 +27,9 @@ Add connected areas + dungeons
 Add animation for breaking stone hitting the ground.
 
 Animate hearts refilling
+
+Fix leaving an area section and immediately returning doesn't reset objects
+    - Fix tiles should also be reset when leaving an area section?
 
 Allow player to choose difficulty during the opening by completing tasks:
     - Solve more difficult puzzle to set puzzles to difficult

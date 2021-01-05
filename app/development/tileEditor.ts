@@ -1,8 +1,9 @@
 import _ from 'lodash';
 
-import { palettes, setAreaSection } from 'app/content/areas';
+import { enterAreaGrid, palettes, setAreaSection } from 'app/content/areas';
 import { createObjectInstance } from 'app/content/objects';
 import { getEnemyProperties, onMouseDownEnemy, renderEnemyPreview } from 'app/development/enemyEditor';
+import { exportAreaGridToClipboard, importAreaGrid, serializeAreaGrid } from 'app/development/exportAreaGrid';
 import {
     deleteObject,
     getLootProperties,
@@ -21,6 +22,7 @@ import { CANVAS_SCALE } from 'app/gameConstants';
 import { KEY } from 'app/keyCommands';
 import { getState } from 'app/state';
 import { drawFrame } from 'app/utils/animations';
+import { readFromFile, saveToFile } from 'app/utils/index';
 import { getMousePosition, isMouseDown } from 'app/utils/mouse';
 
 import {
@@ -109,15 +111,29 @@ export function displayTileEditorPropertyPanel() {
     const layer = area.layers[editingState.selectedLayerIndex];
     const palette = palettes[layer.grid.palette];
     let rows: (EditorProperty<any> | PropertyRow | string)[] = [];
-    rows.push({
-        name: 'tool',
-        value: editingState.tool,
-        values: ['select', 'brush', 'chest', 'loot', 'enemy', 'object'],
-        onChange(tool: EditorToolType) {
-            editingState.tool = tool;
-            displayTileEditorPropertyPanel();
+    rows.push('Area');
+    rows.push([{
+        name: 'Export to Clipboard',
+        onClick() {
+            exportAreaGridToClipboard(getState().areaGrid);
         },
-    });
+    }, {
+        name: 'Export to File',
+        onClick() {
+            saveToFile(serializeAreaGrid(getState().areaGrid), `map.ts`, 'text/javascript');
+        },
+    }]);
+    rows.push([{
+        name: 'Import from Clipboard',
+        onClick() {
+            navigator.clipboard.readText().then(contents => enterAreaGrid(getState(), importAreaGrid(contents), 0, 0, 32, 32));
+        },
+    }, {
+        name: 'Import from File',
+        onClick() {
+            readFromFile().then(contents => enterAreaGrid(getState(), importAreaGrid(contents), 0, 0, 32, 32));
+        },
+    }]);
     rows.push({
         name: 'sections',
         value: 'Change Layout',
@@ -134,6 +150,17 @@ export function displayTileEditorPropertyPanel() {
         onChange(dark: boolean) {
             state.areaInstance.definition.dark = dark;
         }
+    });
+    rows.push('-');
+    rows.push('Editing Tools');
+    rows.push({
+        name: 'tool',
+        value: editingState.tool,
+        values: ['select', 'brush', 'chest', 'loot', 'enemy', 'object'],
+        onChange(tool: EditorToolType) {
+            editingState.tool = tool;
+            displayTileEditorPropertyPanel();
+        },
     });
     switch (editingState.tool) {
         case 'brush':

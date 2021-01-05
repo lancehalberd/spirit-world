@@ -99,6 +99,17 @@ export function enterArea(state: GameState, area: AreaDefinition, x: number, y: 
     updateCamera(state, 512);
 }
 
+export function enterAreaGrid(state: GameState, areaGrid: AreaGrid): void {
+    if (!areaGrid) {
+        console.log('Invalid area', areaGrid);
+        return;
+    }
+    state.areaGrid = areaGrid;
+    const row = state.areaGridCoords.y % state.areaGrid.length;
+    const column = state.areaGridCoords.x % state.areaGrid[row].length;
+    enterArea(state, state.areaGrid[row][column], state.hero.x, state.hero.y);
+}
+
 export function setAreaSection(state: GameState, d: Direction): void {
     state.areaSection = state.areaInstance.definition.sections[0];
     let x = state.hero.x / state.areaInstance.palette.w;
