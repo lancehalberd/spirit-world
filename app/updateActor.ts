@@ -284,7 +284,7 @@ export function checkForEnemyDamage(state: GameState, actor: Actor) {
         return;
     }
     for (const enemy of state.areaInstance.objects) {
-        if (!(enemy instanceof Enemy)) {
+        if (!(enemy instanceof Enemy) || enemy.invulnerableFrames > 0) {
             continue;
         }
         if (enemy.enemyDefinition.touchDamage && rectanglesOverlap(actor, enemy)) {
@@ -300,10 +300,15 @@ export function checkForEnemyDamage(state: GameState, actor: Actor) {
 }
 
 export function damageActor(state: GameState, actor: Actor, damage: number, knockback?: {vx: number, vy: number, vz: number}) {
-    if (actor.action === 'roll' || actor.action === 'getItem' || actor.invulnerableFrames > 0) {
+    if (actor.action === 'roll' || actor.action === 'getItem') {
+        return;
+    }
+    // Hero is invulnerable during invulnerability frames, but other actors are not.
+    if (actor === state.hero && actor.invulnerableFrames > 0) {
         return;
     }
     actor.life -= damage;
+    // For enemies, this is actually the number of rames they cannot damage the hero for.
     actor.invulnerableFrames = 50;
     if (knockback) {
         // Throw stone here.

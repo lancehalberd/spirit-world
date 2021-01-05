@@ -1,12 +1,11 @@
 Test at http://localhost:81/alttp/public/
 
+Make thrown objects deal damage to enemies/hit objects
+
 Add active tools
     Bow
 
-Fix alignment of rolling balls on stopping.
-
 Add import from file/clipboard functionality
-
 
 Add ability to assign active tools to the X/Y buttons.
     -Display a colored box around the items that correspond to the color of the button on the controller as well as a letter.
@@ -26,12 +25,6 @@ Add example prologue area:
     - Floor switches to open exit from area that gives roll technique
     - NPC that gives weapon?
     - Peach of Immortality at the end
-
-Make thrown objects deal damage to enemies
-
-Prevent enemies from dealing damage during invulnerability frames, also allow them to take damage.
-
-Add objects that can be pushed or pulled.
 
 Add connected areas + dungeons
 
