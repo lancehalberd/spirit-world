@@ -110,11 +110,15 @@ export interface ObjectInstance {
     // This is called when a user grabs a solid tile
     getHitbox?: (state: GameState) => ShortRectangle,
     // When the hero tries to pick up the object with the passive skill button.
-    onGrab?: (state: GameState) => void,
+    // The direction is the direction the player is facing.
+    onGrab?: (state: GameState, direction: Direction) => void,
     // When the hero hits the object with a weapon or tool
     onHit?: (state: GameState, direction: Direction) => void,
+    // When the hero grabs an object and attempts to move.
+    onPull?: (state: GameState, direction: Direction) => void,
     // When the hero walks into an object
     onPush?: (state: GameState, direction: Direction) => void,
+    pullingHeroDirection?: Direction,
     update?: (state: GameState) => void,
     render?: (context: CanvasRenderingContext2D, state: GameState) => void,
 }
@@ -134,8 +138,10 @@ export interface LootObjectDefinition extends BaseObjectDefinition {
     amount?: number,
 }
 
+export type SimpleObjectType = 'pushPull' | 'rollingBall' | 'tippable';
+
 export interface SimpleObjectDefinition extends BaseObjectDefinition {
-    type: 'tippable',
+    type: SimpleObjectType,
 }
 
 export type EnemyType = 'snake';

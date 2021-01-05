@@ -3,14 +3,15 @@ import _ from 'lodash';
 import { enemyDefinitions } from 'app/content/enemy';
 import { createObjectInstance } from 'app/content/objects';
 import { chestClosedFrame, lootFrames } from 'app/content/lootObject';
+import { normalFrame } from 'app/content/rollingBallObject';
 import { standingFrame } from 'app/content/tippableObject';
-import { displayTileEditorPropertyPanel, EditingState, ObjectType } from 'app/development/tileEditor';
+import { displayTileEditorPropertyPanel, EditingState } from 'app/development/tileEditor';
 import { getState } from 'app/state';
 import { isPointInShortRect } from 'app/utils/index';
 
 import {
     EnemyType, Frame, GameState, LootObjectDefinition,
-    LootType, ObjectDefinition, PanelRows,
+    LootType, ObjectDefinition, SimpleObjectType, PanelRows,
 } from 'app/types';
 
 let allLootTypes: LootType[];
@@ -42,7 +43,7 @@ export function getLootProperties(state: GameState, editingState: EditingState):
     return rows;
 }
 
-const simpleObjectTypes = ['tippable'];
+export const simpleObjectTypes: SimpleObjectType[] = ['pushPull', 'rollingBall', 'tippable'];
 
 export function getObjectProperties(state: GameState, editingState: EditingState): PanelRows {
     const rows: PanelRows = [];
@@ -50,7 +51,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
         name: 'type',
         value: editingState.newObjectType,
         values: simpleObjectTypes,
-        onChange(objectType: ObjectType) {
+        onChange(objectType: SimpleObjectType) {
             editingState.newObjectType = objectType;
         },
     });
@@ -68,52 +69,55 @@ export function getSelectProperties(state: GameState, editingState: EditingState
                 return updateObjectId(state, selectedObject, newId);
             },
         });
-    }
-    if (editingState.selectedObject?.type === 'loot' || editingState.selectedObject?.type === 'chest') {
-        const lootObjectDefinition = editingState.selectedObject;
-        rows.push({
-            name: 'lootType',
-            value: lootObjectDefinition.lootType,
-            values: getLootTypes(),
-            onChange(lootType: LootType) {
-
-                // Replace instances of the loot type in the id with the new loot type.
-                if (lootObjectDefinition.id.includes(lootObjectDefinition.lootType)) {
-                    updateObjectId(state, lootObjectDefinition, lootObjectDefinition.id.replace(lootObjectDefinition.lootType, lootType));
-                }
-                lootObjectDefinition.lootType = lootType;
-                updateObjectInstance(state, lootObjectDefinition);
-            },
-        });
-    }
-    if (editingState.selectedObject?.type === 'tippable') {
-        const lootObjectDefinition = editingState.selectedObject;
-        rows.push({
-            name: 'type',
-            value: lootObjectDefinition.type,
-            values: simpleObjectTypes,
-            onChange(type: ObjectType) {
-
-                // Replace instances of the loot type in the id with the new loot type.
-                if (lootObjectDefinition.id.includes(lootObjectDefinition.type)) {
-                    updateObjectId(state, lootObjectDefinition, lootObjectDefinition.id.replace(lootObjectDefinition.type, type));
-                }
-                lootObjectDefinition.type = type;
-                updateObjectInstance(state, lootObjectDefinition);
-            },
-        });
-    }
-    if (editingState.selectedObject?.type === 'enemy') {
-        const enemyObjectDefinition = editingState.selectedObject;
-        rows.push({
-            name: 'enemy',
-            value: editingState.selectedObject.enemyType,
-            values: ['snake'],
-            onChange(enemyType: EnemyType) {
-                enemyObjectDefinition.enemyType = enemyType;
-                updateObjectInstance(state, enemyObjectDefinition);
-            },
-        });
+        switch (editingState.selectedObject.type) {
+            case 'loot':
+            case 'chest':
+                const lootObjectDefinition = editingState.selectedObject;
+                rows.push({
+                    name: 'lootType',
+                    value: lootObjectDefinition.lootType,
+                    values: getLootTypes(),
+                    onChange(lootType: LootType) {
+                        // Replace instances of the loot type in the id with the new loot type.
+                        if (lootObjectDefinition.id.includes(lootObjectDefinition.lootType)) {
+                            updateObjectId(state, lootObjectDefinition, lootObjectDefinition.id.replace(lootObjectDefinition.lootType, lootType));
+                        }
+                        lootObjectDefinition.lootType = lootType;
+                        updateObjectInstance(state, lootObjectDefinition);
+                    },
+                });
+                break;
+            case 'pushPull':
+            case 'rollingBall':
+            case 'tippable':
+                const objectDefinition = editingState.selectedObject;
+                rows.push({
+                    name: 'type',
+                    value: objectDefinition.type,
+                    values: simpleObjectTypes,
+                    onChange(type: SimpleObjectType) {
+                        // Replace instances of the loot type in the id with the new loot type.
+                        if (objectDefinition.id.includes(objectDefinition.type)) {
+                            updateObjectId(state, objectDefinition, objectDefinition.id.replace(objectDefinition.type, type));
+                        }
+                        objectDefinition.type = type;
+                        updateObjectInstance(state, objectDefinition);
+                    },
+                });
+                break;
+            case 'enemy':
+                const enemyObjectDefinition = editingState.selectedObject;
+                rows.push({
+                    name: 'enemy',
+                    value: editingState.selectedObject.enemyType,
+                    values: ['snake'],
+                    onChange(enemyType: EnemyType) {
+                        enemyObjectDefinition.enemyType = enemyType;
+                        updateObjectInstance(state, enemyObjectDefinition);
+                    },
+                });
+                break;
+        }
     }
     return rows;
 }
@@ -182,7 +186,11 @@ export function onMouseDownSelect(state: GameState, editingState: EditingState, 
 
 export function fixObjectPosition(state: GameState, object: ObjectDefinition): void {
     // These objects snap to the grid.
-    if (object.type === 'chest' || object.type === 'tippable') {
+    if (object.type === 'chest'
+        || object.type === 'pushPull'
+        || object.type === 'rollingBall'
+        || object.type === 'tippable'
+    ) {
         object.x = Math.round(object.x / state.areaInstance.palette.w) * state.areaInstance.palette.w;
         object.y = Math.round(object.y / state.areaInstance.palette.h) * state.areaInstance.palette.h;
     }
@@ -226,6 +234,9 @@ export function getObjectFrame(object: ObjectDefinition): Frame {
     }
     if (object.type === 'chest') {
         return chestClosedFrame;
+    }
+    if (object.type === 'pushPull' || object.type === 'rollingBall') {
+        return normalFrame;
     }
     if (object.type === 'tippable') {
         return standingFrame;

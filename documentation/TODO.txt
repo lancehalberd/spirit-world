@@ -3,9 +3,10 @@ Test at http://localhost:81/alttp/public/
 Add active tools
     Bow
 
-Add puzzle blocks:
-    Ball that rolls until it hits a solid object (if it hits another ball, it stops and the other ball moves)
-    Tile that can be knocked over by pushing or hitting with a weapon, cannot be moved after falling
+Fix alignment of rolling balls on stopping.
+
+Add import from file/clipboard functionality
+
 
 Add ability to assign active tools to the X/Y buttons.
     -Display a colored box around the items that correspond to the color of the button on the controller as well as a letter.
@@ -24,12 +25,11 @@ Add example prologue area:
         - On pickup item
     - Floor switches to open exit from area that gives roll technique
     - NPC that gives weapon?
-    - Dark areas + cat eyes powerup
     - Peach of Immortality at the end
 
 Make thrown objects deal damage to enemies
 
-Prevent enemies from dealing damage during invulnerability frames.
+Prevent enemies from dealing damage during invulnerability frames, also allow them to take damage.
 
 Add objects that can be pushed or pulled.
 
@@ -39,6 +39,11 @@ Add animation for breaking stone hitting the ground.
 
 Animate hearts refilling
 
+Allow player to choose difficulty during the opening by completing tasks:
+    - Solve more difficult puzzle to set puzzles to difficult
+    - Complete more difficult enemy encounters to set combat to difficult
+    ?? Complete opening without picking up a weapon to set to weaponless mode ??
+    - Maybe add an option to manually change the difficulty later just in case.
 
 Include some random dungeon design in the base game:
     - Location of key under object might change (there should be some clue where it is or use spirit sight).

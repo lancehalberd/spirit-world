@@ -1,4 +1,4 @@
-import { Direction, FrameAnimation, Tile } from 'app/types';
+import { Direction, FrameAnimation, ObjectInstance, Tile } from 'app/types';
 
 export type Action = 'attack' | 'roll' | 'knocked' | 'hurt' | 'dead' | 'grabbing' | 'carrying' | 'throwing' | 'getItem';
 export type ActiveTool = 'weapon' | 'bow' | 'staff' | 'clone' | 'invisibility';
@@ -44,6 +44,8 @@ export interface Actor {
     actionFrame?: number,
     pickUpFrame?: number,
     pickUpTile?: Tile,
+    grabTile?: Tile,
+    grabObject?: ObjectInstance,
     invulnerableFrames?: number,
     life: number,
 }

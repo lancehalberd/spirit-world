@@ -17,6 +17,10 @@ export function isPointInShortRect(x: number, y: number, {x: l = 0, y: t = 0, w 
     return !(y <= t || y >= t + h || x <= l || x >= l + w);
 }
 
+export function isPixelInShortRect(x: number, y: number, {x: l = 0, y: t = 0, w = 0, h = 0}: ShortRectangle): boolean {
+    return !(y < t || y >= t + h || x < l || x >= l + w);
+}
+
 export function rectanglesOverlap(A: ShortRectangle, B: ShortRectangle) {
     return !(A.y + A.h <= B.y || A.y >= B.y + B.h || A.x + A.w <= B.x || A.x >= B.x + B.w);
 }

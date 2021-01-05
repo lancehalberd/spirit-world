@@ -1,4 +1,6 @@
-import { Direction } from 'app/types';
+import { isPixelInShortRect } from 'app/utils/index';
+
+import { Direction, GameState, ObjectInstance, Tile } from 'app/types';
 
 export const directionMap = {
     up: [0, -1],
@@ -8,9 +10,48 @@ export const directionMap = {
 };
 
 export function getDirection(dx: number, dy: number): Direction {
-    console.log(dx, dy)
     if (Math.abs(dx) > Math.abs(dy)) {
         return dx < 0 ? 'left' : 'right';
     }
     return dy < 0 ? 'up' : 'down';
+}
+
+export function isPointOpen(state: GameState, {x, y}: {x: number, y: number}): boolean {
+    const tx = Math.floor(x / 16);
+    const ty = Math.floor(y / 16);
+    if (tx < state.areaSection.x || tx >= state.areaSection.x + state.areaSection.w
+        || ty < state.areaSection.y || ty >= state.areaSection.y + state.areaSection.h) {
+        return false;
+    }
+    const tileBehavior = state.areaInstance?.behaviorGrid[ty][tx];
+    if (tileBehavior?.solid) {
+        return false;
+    }
+    for (const object of state.areaInstance.objects) {
+        if (object.getHitbox && object.behaviors?.solid) {
+            if (isPixelInShortRect(x, y, object.getHitbox(state))) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+export function getSolidObstacles(state: GameState, {x, y}: Tile): {tiles: Tile[], objects: ObjectInstance[]} {
+    const tiles: Tile[] = [];
+    const objects: ObjectInstance[] = [];
+    const tx = Math.floor(x / 16);
+    const ty = Math.floor(y / 16);
+    const tileBehavior = state.areaInstance?.behaviorGrid[ty][tx];
+    if (tileBehavior?.solid) {
+        tiles.push({x: tx, y: ty});
+    }
+    for (const object of state.areaInstance.objects) {
+        if (object.getHitbox && object.behaviors?.solid) {
+            if (isPixelInShortRect(x, y, object.getHitbox(state))) {
+                objects.push(object);
+            }
+        }
+    }
+    return { tiles, objects };
 }

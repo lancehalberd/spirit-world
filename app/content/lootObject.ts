@@ -64,7 +64,7 @@ export class LootObject implements ObjectInstance {
         }
     }
     render(context, state: GameState) {
-        if (state.savedState.collectedItems[this.definition.id]) {
+        if (this.definition.id && state.savedState.collectedItems[this.definition.id]) {
             return;
         }
         drawFrame(context, this.frame, { ...this.frame, x: this.x, y: this.y });
@@ -78,7 +78,6 @@ export class LootDropObject extends LootObject {
             const onPickup = lootEffects[this.definition.lootType] || lootEffects.unknown;
             onPickup(state, this);
             state.areaInstance.objects.splice(state.areaInstance.objects.indexOf(this), 1);
-            state.savedState.collectedItems[this.definition.id] = true;
         }
     }
 }

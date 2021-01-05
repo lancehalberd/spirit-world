@@ -13,6 +13,7 @@ import {
     onMouseMoveSelect,
     renderLootPreview,
     renderObjectPreview,
+    simpleObjectTypes,
 } from 'app/development/objectEditor';
 import { displayPropertyPanel, hidePropertyPanel, updateBrushCanvas } from 'app/development/propertyPanel';
 import { mainCanvas } from 'app/dom';
@@ -24,10 +25,9 @@ import { getMousePosition, isMouseDown } from 'app/utils/mouse';
 
 import {
     EditorProperty, EnemyType, GameState,
-    LootType, ObjectDefinition, PropertyRow, TileGrid,
+    LootType, ObjectDefinition, PropertyRow, SimpleObjectType, TileGrid,
 } from 'app/types';
 
-export type ObjectType = 'tippable';
 type EditorToolType = 'select' | 'brush' | 'chest' | 'loot' | 'enemy' | 'object';
 export interface EditingState {
     tool: EditorToolType,
@@ -36,7 +36,7 @@ export interface EditingState {
     selectedLayerIndex: number,
     newEnemyType: EnemyType,
     newLootType: LootType,
-    newObjectType: ObjectType,
+    newObjectType: SimpleObjectType,
     selectedObject?: ObjectDefinition,
     dragOffset: {x: number, y: number},
 }
@@ -48,7 +48,7 @@ export const editingState: EditingState = {
     selectedLayerIndex: 0,
     newEnemyType: 'snake',
     newLootType: 'peachOfImmortalityPiece',
-    newObjectType: 'tippable',
+    newObjectType: simpleObjectTypes[0],
     selectedObject: null,
     dragOffset: {x: 0, y: 0},
 };

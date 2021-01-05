@@ -1,6 +1,5 @@
 import { createAnimation, drawFrame } from 'app/utils/animations';
-import { directionMap } from 'app/utils/field';
-import { isPointInShortRect } from 'app/utils/index';
+import { directionMap, isPointOpen } from 'app/utils/field';
 
 import { Direction, Frame, GameState, BaseObjectDefinition, ObjectInstance, ShortRectangle } from 'app/types';
 
@@ -18,7 +17,8 @@ export class TippableObject implements ObjectInstance {
     y: number;
     fallFrame = 0;
     fallDirection: Direction;
-    pushedFrames: number = 0;
+    pushCounter: number = 0;
+    pushedLastFrame: boolean = false;
     constructor(definition: BaseObjectDefinition) {
         this.definition = definition;
         this.x = definition.x;
@@ -34,8 +34,9 @@ export class TippableObject implements ObjectInstance {
     }
     onPush(state: GameState, direction: Direction): void {
         if (!this.fallDirection) {
-            this.pushedFrames += 2;
-            if (this.pushedFrames > 8) {
+            this.pushCounter++;
+            this.pushedLastFrame = true;
+            if (this.pushCounter >= 25) {
                 this.fallInDirection(state, direction);
             }
         }
@@ -43,20 +44,9 @@ export class TippableObject implements ObjectInstance {
     fallInDirection(state: GameState, direction: Direction): void {
         const x = this.x + 8 + 16 * directionMap[direction][0];
         const y = this.y + 8 + 16 * directionMap[direction][1];
-        const tx = Math.floor(x / 16);
-        const ty = Math.floor(y / 16);
-        const tileBehavior = state.areaInstance?.behaviorGrid[ty][tx];
-        if (tileBehavior?.solid) {
-            return;
+        if (isPointOpen(state, {x, y})) {
+            this.fallDirection = direction;
         }
-        for (const object of state.areaInstance.objects) {
-            if (object.getHitbox && object.behaviors?.solid) {
-                if (isPointInShortRect(x, y, object.getHitbox(state))) {
-                    return;
-                }
-            }
-        }
-        this.fallDirection = direction;
     }
     update(state: GameState) {
         if (this.fallDirection) {
@@ -66,8 +56,10 @@ export class TippableObject implements ObjectInstance {
                 this.y += directionMap[this.fallDirection][1];
             }
         }
-        if (this.pushedFrames > 0) {
-            this.pushedFrames--;
+        if (!this.pushedLastFrame) {
+            this.pushCounter = 0;
+        } else {
+            this.pushedLastFrame = false;
         }
     }
     render(context, state: GameState) {

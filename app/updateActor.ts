@@ -5,7 +5,7 @@ import { getActorTargets } from 'app/getActorTargets';
 import { KEY, isKeyDown } from 'app/keyCommands';
 import { checkForFloorDamage, moveActor } from 'app/moveActor';
 import { getTileFrame } from 'app/render';
-import { directionMap } from 'app/utils/field';
+import { directionMap, getDirection, isPointOpen } from 'app/utils/field';
 import { rectanglesOverlap } from 'app/utils/index';
 import { getState, initializeState } from 'app/state';
 
@@ -13,7 +13,7 @@ import { Actor, GameState, ObjectInstance, ThrownChakram, ThrownObject, Tile } f
 
 const rollSpeed = [5, 5, 5, 4, 4, 4, 4, 3, 3, 3, 2, 2];
 
-export function updateHero(state: GameState) {
+export function updateHero(this: void, state: GameState) {
     const area = state.areaInstance;
     let dx = 0, dy = 0;
     if (state.hero.invulnerableFrames > 0) {
@@ -52,8 +52,28 @@ export function updateHero(state: GameState) {
         }
     } else if (state.hero.action === 'grabbing') {
         movementSpeed = 0;
-        if (!state.hero.pickUpTile && !isKeyDown(KEY.SHIFT)) {
+        if (state.hero.grabObject?.pullingHeroDirection) {
+            dx = directionMap[state.hero.grabObject.pullingHeroDirection][0];
+            dy = directionMap[state.hero.grabObject.pullingHeroDirection][1];
+        } else if (!state.hero.pickUpTile && !isKeyDown(KEY.SHIFT)) {
             state.hero.action = null;
+            state.hero.grabTile = null;
+            state.hero.grabObject = null;
+        } else if (state.hero.grabObject?.onPull) {
+            const ANALOG_THRESHOLD = 0.2;
+            dy = isKeyDown(KEY.DOWN) - isKeyDown(KEY.UP);
+            if (Math.abs(dy) < ANALOG_THRESHOLD) dy = 0;
+            dx = isKeyDown(KEY.RIGHT) - isKeyDown(KEY.LEFT);
+            if (Math.abs(dx) < ANALOG_THRESHOLD) dx = 0;
+            if (dx || dy) {
+                const direction = getDirection(dx, dy);
+                const x = state.hero.x + 8 + 16 * directionMap[direction][0];
+                const y = state.hero.y + 8 + 16 * directionMap[direction][1];
+                if (direction === state.hero.d || isPointOpen(state, {x, y})) {
+                    state.hero.grabObject.onPull(state, direction);
+                }
+            }
+            dx = dy = 0;
         }
     } else if (state.hero.action === 'carrying') {
         movementSpeed = 1.5;
@@ -149,11 +169,12 @@ export function updateHero(state: GameState) {
             }
         } else {
             //console.log({dx, dy, tiles, objects});
-            let closestTile: Tile = null, closestObject: ObjectInstance = null, closestDistance = 100;
+            let closestLiftableTile: Tile = null, closestObject: ObjectInstance = null, closestDistance = 100;
             for (const target of tiles) {
                 const behavior = area.behaviorGrid?.[target.y]?.[target.x];
                 if (behavior?.solid) {
                     state.hero.action = 'grabbing';
+                    state.hero.grabTile = target;
                 }
                 if (state.hero.passiveTools.gloves >= behavior?.pickupWeight && behavior?.underTile) {
                     // This is an unusual distance, but should do what we want still.
@@ -163,7 +184,7 @@ export function updateHero(state: GameState) {
                     );
                     if (distance < closestDistance) {
                         closestDistance = distance;
-                        closestTile = target;
+                        closestLiftableTile = target;
                     }
                 }
             }
@@ -182,20 +203,22 @@ export function updateHero(state: GameState) {
                     if (distance < closestDistance) {
                         closestDistance = distance;
                         closestObject = object;
-                        closestTile = null;
+                        closestLiftableTile = null;
                     }
                 }
             }
-            if (closestTile) {
+            if (closestLiftableTile) {
                 const layer = area.layers[0];
-                const tile = layer.tiles[closestTile.y]?.[closestTile.x];
+                const tile = layer.tiles[closestLiftableTile.y]?.[closestLiftableTile.x];
                 state.hero.pickUpFrame = 0;
                 state.hero.pickUpTile = tile;
-                destroyTile(state, closestTile);
+                destroyTile(state, closestLiftableTile);
+                state.hero.grabTile = null;
             } else if (closestObject) {
                 if (closestObject.onGrab) {
-                    closestObject.onGrab(state);
+                    closestObject.onGrab(state, state.hero.d);
                 }
+                state.hero.grabObject = closestObject;
             }
         }
     }
