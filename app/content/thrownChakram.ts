@@ -9,10 +9,10 @@ import { isPointInShortRect, rectanglesOverlap } from 'app/utils/index';
 
 import { Frame, GameState } from 'app/types';
 
-
-const [chakramCanvas, chakramContext] = createCanvasAndContext(10, 10);
+const CHAKRAM_RADIUS = 6;
+const [chakramCanvas, chakramContext] = createCanvasAndContext(2 * CHAKRAM_RADIUS, 2 * CHAKRAM_RADIUS);
 chakramContext.fillStyle = 'orange';
-chakramContext.arc(5, 5, 5, 0, 2 * Math.PI);
+chakramContext.arc(CHAKRAM_RADIUS, CHAKRAM_RADIUS, CHAKRAM_RADIUS, 0, 2 * Math.PI);
 chakramContext.fill();
 const chakramFrame = {image: chakramCanvas, x: 0, y: 0, w: chakramCanvas.width, h: chakramCanvas.height};
 

@@ -1,7 +1,5 @@
 Test at http://localhost:81/alttp/public/
 
-Make thrown objects deal damage to enemies/hit objects
-
 Add active tools
     Bow
 

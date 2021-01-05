@@ -215,7 +215,7 @@ const a1x1: AreaDefinition = {
         },
     ],
     objects: [
-        {id: "1-1-weapon", status: "normal", type: "chest", lootType: "weapon", x: 80, y: 17},
+        {id: "1-1-weapon", status: "normal", type: "chest", lootType: "weapon", x: 80, y: 16},
         {id: "1-1-peachOfImmortality-0", status: "normal", type: "chest", lootType: "peachOfImmortality", x: 48, y: 272},
         {id: "1-1-roll-0", status: "normal", type: "chest", lootType: "roll", x: 208, y: 176},
         {id: "1-1-peachOfImmortalityPiece-4", status: "normal", type: "loot", lootType: "peachOfImmortalityPiece", x: 321, y: 356},

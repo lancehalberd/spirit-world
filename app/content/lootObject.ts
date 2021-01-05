@@ -64,7 +64,7 @@ export class LootObject implements ObjectInstance {
         }
     }
     render(context, state: GameState) {
-        if (this.definition.id && state.savedState.collectedItems[this.definition.id]) {
+        if (this.definition.id !== 'drop' && state.savedState.collectedItems[this.definition.id]) {
             return;
         }
         drawFrame(context, this.frame, { ...this.frame, x: this.x, y: this.y });

@@ -1,5 +1,5 @@
 import { damageActor } from 'app/updateActor';
-import { isPointInShortRect } from 'app/utils/index';
+import { isPixelInShortRect } from 'app/utils/index';
 
 import { Actor, Direction, GameState, ObjectInstance } from 'app/types';
 
@@ -128,7 +128,7 @@ function moveActorInDirection(
     for (const solidObject of state.areaInstance.objects.filter(o => o.getHitbox && o.behaviors?.solid)) {
         const hitbox = solidObject.getHitbox(state);
         for (const point of checkPoints) {
-            if (isPointInShortRect(point.x, point.y, hitbox)) {
+            if (isPixelInShortRect(point.x, point.y, hitbox)) {
                 blockedByObject = true;
                 const x = hitbox.x + hitbox.w / 2;
                 const y = hitbox.y + hitbox.h / 2;
