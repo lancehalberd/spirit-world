@@ -1,5 +1,6 @@
 import { destroyTile, getAreaFromGridCoords, getAreaSize, scrollToArea, setAreaSection } from 'app/content/areas';
 import { Enemy } from 'app/content/enemy';
+import { editingState } from 'app/development/tileEditor';
 import { KEY_THRESHOLD, FRAME_LENGTH } from 'app/gameConstants';
 import { getActorTargets } from 'app/getActorTargets';
 import { KEY, isKeyDown } from 'app/keyCommands';
@@ -24,7 +25,18 @@ export function updateHero(this: void, state: GameState) {
     const { w, h, section } = getAreaSize(state);
 
     // Automatically move the character into the bounds of the current section.
-    if (state.nextAreaInstance) {
+    if (editingState.isEditing) {
+        movementSpeed = 0;
+        state.hero.invulnerableFrames = 1;
+        const ANALOG_THRESHOLD = 0.2;
+        dy = isKeyDown(KEY.DOWN) - isKeyDown(KEY.UP);
+        if (Math.abs(dy) < ANALOG_THRESHOLD) dy = 0;
+        dx = isKeyDown(KEY.RIGHT) - isKeyDown(KEY.LEFT);
+        if (Math.abs(dx) < ANALOG_THRESHOLD) dx = 0;
+        state.hero.x += 4 * dx;
+        state.hero.y += 4 * dy;
+        if (dx || dy) state.hero.d = getDirection(dx, dy);
+    } else if (state.nextAreaInstance) {
         movementSpeed = 0;
         if (state.nextAreaInstance.cameraOffset.x) {
             dx = 1 * state.nextAreaInstance.cameraOffset.x / Math.abs(state.nextAreaInstance.cameraOffset.x);
@@ -61,9 +73,9 @@ export function updateHero(this: void, state: GameState) {
             state.hero.grabObject = null;
         } else if (state.hero.grabObject?.onPull) {
             const ANALOG_THRESHOLD = 0.2;
-            dy = isKeyDown(KEY.DOWN) - isKeyDown(KEY.UP);
+            let dy = isKeyDown(KEY.DOWN) - isKeyDown(KEY.UP);
             if (Math.abs(dy) < ANALOG_THRESHOLD) dy = 0;
-            dx = isKeyDown(KEY.RIGHT) - isKeyDown(KEY.LEFT);
+            let dx = isKeyDown(KEY.RIGHT) - isKeyDown(KEY.LEFT);
             if (Math.abs(dx) < ANALOG_THRESHOLD) dx = 0;
             if (dx || dy) {
                 const direction = getDirection(dx, dy);
@@ -73,7 +85,6 @@ export function updateHero(this: void, state: GameState) {
                     state.hero.grabObject.onPull(state, direction);
                 }
             }
-            dx = dy = 0;
         }
     } else if (state.hero.action === 'carrying') {
         movementSpeed = 1.5;

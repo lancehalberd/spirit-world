@@ -37,21 +37,28 @@ export function isPointOpen(state: GameState, {x, y}: {x: number, y: number}): b
     return true;
 }
 
-export function getSolidObstacles(state: GameState, {x, y}: Tile): {tiles: Tile[], objects: ObjectInstance[]} {
+export function getSolidObstacles(state: GameState, {x, y}: Tile): {open: boolean, tiles: Tile[], objects: ObjectInstance[]} {
     const tiles: Tile[] = [];
     const objects: ObjectInstance[] = [];
     const tx = Math.floor(x / 16);
     const ty = Math.floor(y / 16);
     const tileBehavior = state.areaInstance?.behaviorGrid[ty][tx];
+    let open = true;
+    if (tx < state.areaSection.x || tx >= state.areaSection.x + state.areaSection.w
+        || ty < state.areaSection.y || ty >= state.areaSection.y + state.areaSection.h) {
+        open = false;
+    }
     if (tileBehavior?.solid) {
         tiles.push({x: tx, y: ty});
+        open = false;
     }
     for (const object of state.areaInstance.objects) {
         if (object.getHitbox && object.behaviors?.solid) {
             if (isPixelInShortRect(x, y, object.getHitbox(state))) {
                 objects.push(object);
+                open = false;
             }
         }
     }
-    return { tiles, objects };
+    return { open, tiles, objects };
 }

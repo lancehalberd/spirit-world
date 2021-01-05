@@ -143,7 +143,7 @@ function moveActorInDirection(
         if (pushedObjects[0].onPush) {
             pushedObjects[0].onPush(state, direction);
         }
-    } else if (pushedObjects.length > 1) {
+    } else if (pushedObjects.length >= 1) {
         for (const object of pushedObjects) {
             const hitbox = object.getHitbox(state);
             if (Math.abs(ax - hitbox.x) < 4

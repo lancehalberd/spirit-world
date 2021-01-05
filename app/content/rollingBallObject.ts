@@ -51,10 +51,10 @@ export class RollingBallObject implements ObjectInstance {
         if (this.rollDirection) {
             const dx = 2 * directionMap[this.rollDirection][0];
             const dy = 2 * directionMap[this.rollDirection][1];
-            const x = this.x + dx + (this.rollDirection === 'right' ? 16 : 0);
-            const y = this.y + dy + (this.rollDirection === 'down' ? 16 : 0);
-            const { tiles, objects } = getSolidObstacles(state, {x, y});
-            if (!tiles.length && !objects.length) {
+            const x = this.x + dx + (this.rollDirection === 'right' ? 15 : 0);
+            const y = this.y + dy + (this.rollDirection === 'down' ? 15 : 0);
+            const { objects, open } = getSolidObstacles(state, {x, y});
+            if (open) {
                 this.x += dx;
                 this.y += dy;
             } else {
