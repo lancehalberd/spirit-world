@@ -6,7 +6,10 @@ import { moveActor } from 'app/moveActor';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { directionMap } from 'app/utils/field';
 
-import { Actor, ActorAnimations, Direction, EnemyType, EnemyObjectDefinition, Frame, FrameAnimation, GameState, ObjectInstance } from 'app/types';
+import {
+    Actor, ActorAnimations, Direction, EnemyType, EnemyObjectDefinition,
+    Frame, FrameAnimation, GameState, ObjectInstance,ObjectStatus,
+} from 'app/types';
 
 export class Enemy implements Actor, ObjectInstance {
     type = 'enemy' as 'enemy';
@@ -28,6 +31,7 @@ export class Enemy implements Actor, ObjectInstance {
     mode = 'choose';
     modeTime = 0;
     invulnerableFrames = 0;
+    status: ObjectStatus = 'normal';
     constructor(definition: EnemyObjectDefinition) {
         this.definition = definition;
         this.enemyDefinition = enemyDefinitions[this.definition.enemyType] || enemyDefinitions.snake;
@@ -45,13 +49,16 @@ export class Enemy implements Actor, ObjectInstance {
     getFrame(): Frame {
         return getFrame(this.currentAnimation, this.animationTime);
     }
+    isInCurrentSection(state: GameState): boolean {
+        const { section } = getAreaSize(state);
+        return !(this.x < section.x || this.x > section.x + section.w || this.y < section.y || this.y > section.y + section.h)
+    }
     setMode(mode: string) {
         this.mode = mode;
         this.modeTime = 0;
     }
     update(state: GameState) {
-        const { section } = getAreaSize(state);
-        if (this.x < section.x || this.x > section.x + section.w || this.y < section.y || this.y > section.y + section.h) {
+        if (!this.isInCurrentSection(state)) {
             return;
         }
         if (this.enemyDefinition.update) {

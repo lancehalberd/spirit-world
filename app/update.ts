@@ -3,7 +3,7 @@ import { editingState } from 'app/development/tileEditor';
 import { FRAME_LENGTH, KEY_THRESHOLD } from 'app/gameConstants';
 import { updateKeysStillDown } from 'app/keyCommands';
 import { initializeGame } from 'app/initialize';
-import { KEY, isKeyDown } from 'app/keyCommands';
+import { GAME_KEY, isKeyDown } from 'app/keyCommands';
 import { getState } from 'app/state';
 import { updateHero } from 'app/updateActor';
 import { updateCamera } from 'app/updateCamera';
@@ -24,8 +24,7 @@ export function update() {
     const state = getState();
     state.time += FRAME_LENGTH;
     try {
-        if (isKeyDown(KEY.ENTER, KEY_THRESHOLD)) {
-            console.log('hmm');
+        if (isKeyDown(GAME_KEY.MENU, KEY_THRESHOLD)) {
             state.paused = !state.paused;
         }
         if (!state.paused) {
@@ -44,7 +43,17 @@ function updateField(state: GameState) {
     updateHero(state);
     updateCamera(state);
     if (!editingState.isEditing) {
+        const originalLength = state.areaInstance.objects.length;
         state.areaInstance.objects = state.areaInstance.objects.filter(e => !(e instanceof Enemy) || e.life > 0);
+        if (originalLength > state.areaInstance.objects.length) {
+            if (!state.areaInstance.objects.some(e => (e instanceof Enemy) && e.isInCurrentSection(state))) {
+                for (const object of state.areaInstance.objects) {
+                    if (object.status === 'hiddenEnemy') {
+                        object.status = 'normal';
+                    }
+                }
+            }
+        }
         for (const object of state.areaInstance.objects) {
             object?.update(state);
         }

@@ -126,12 +126,12 @@ export function displayTileEditorPropertyPanel() {
     rows.push([{
         name: 'Import from Clipboard',
         onClick() {
-            navigator.clipboard.readText().then(contents => enterAreaGrid(getState(), importAreaGrid(contents), 0, 0, 32, 32));
+            navigator.clipboard.readText().then(contents => enterAreaGrid(getState(), importAreaGrid(contents)));
         },
     }, {
         name: 'Import from File',
         onClick() {
-            readFromFile().then(contents => enterAreaGrid(getState(), importAreaGrid(contents), 0, 0, 32, 32));
+            readFromFile().then(contents => enterAreaGrid(getState(), importAreaGrid(contents)));
         },
     }]);
     rows.push({
@@ -277,6 +277,7 @@ export function renderEditor(context: CanvasRenderingContext2D, state: GameState
         context.globalAlpha = 0.6;
         for (const object of state.areaInstance.definition.objects) {
             const instance = createObjectInstance(state, object);
+            instance.status = 'normal';
             instance.render(context, state);
             // drawFrame(context, frame, {...frame, x: object.x - (frame.content?.x || 0), y: object.y - (frame.content?.y || 0)});
             // While editing, draw the loot inside the chest on top as well.

@@ -24,12 +24,13 @@ function getDefaultHeroState(): Hero {
         magicRegen: 0,
         // inventory
         money: 0,
-        chakrams: 0,
+        chakrams: 1,
         arrows: 0,
         peachQuarters: 0,
         spiritTokens: 0,
+        toolCooldown: 0,
         activeTools: {
-            weapon: 0,
+            weapon: 1,
             bow: 0,
             staff: 0,
             clone: 0,

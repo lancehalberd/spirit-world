@@ -107,6 +107,7 @@ export interface ObjectInstance {
     behaviors?: TileBehaviors,
     drawPriority?: 'background' | 'foreground' | 'sprites',
     x: number, y: number,
+    status: ObjectStatus,
     // This is called when a user grabs a solid tile
     getHitbox?: (state: GameState) => ShortRectangle,
     // When the hero tries to pick up the object with the passive skill button.

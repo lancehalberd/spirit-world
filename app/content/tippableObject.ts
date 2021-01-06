@@ -1,7 +1,7 @@
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { directionMap, isPointOpen } from 'app/utils/field';
 
-import { Direction, Frame, GameState, BaseObjectDefinition, ObjectInstance, ShortRectangle } from 'app/types';
+import { Direction, Frame, GameState, BaseObjectDefinition, ObjectInstance, ObjectStatus, ShortRectangle } from 'app/types';
 
 const tilesFrame = createAnimation('gfx/tiles/overworld.png', {w: 384, h: 640}).frames[0];
 export const standingFrame: Frame = {image: tilesFrame.image, x: 16 * 20, y: 16 * 8, w: 16, h: 16};
@@ -19,6 +19,7 @@ export class TippableObject implements ObjectInstance {
     fallDirection: Direction;
     pushCounter: number = 0;
     pushedLastFrame: boolean = false;
+    status: ObjectStatus = 'normal';
     constructor(definition: BaseObjectDefinition) {
         this.definition = definition;
         this.x = definition.x;

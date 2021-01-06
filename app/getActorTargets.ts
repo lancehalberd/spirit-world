@@ -43,6 +43,9 @@ export function getActorTargets(state: GameState, actor: Actor): {tiles: Tile[],
     }
 
     for (const object of state.areaInstance.objects.filter(o => o.getHitbox)) {
+        if (object.status !== 'normal') {
+            continue;
+        }
         const hitbox = object.getHitbox(state);
         for (const point of checkPoints) {
             if (isPointInShortRect(point.x, point.y, hitbox)) {

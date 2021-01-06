@@ -5,7 +5,10 @@ import { getState } from 'app/state';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { rectanglesOverlap } from 'app/utils/index';
 
-import { Frame, GameState, LootObjectDefinition, LootType, ObjectInstance, ShortRectangle } from 'app/types';
+import {
+    ActiveTool, Frame, GameState, LootObjectDefinition,
+    LootType, ObjectInstance, ObjectStatus, ShortRectangle,
+} from 'app/types';
 
 export class LootGetAnimation implements ObjectInstance {
     definition = null;
@@ -14,6 +17,7 @@ export class LootGetAnimation implements ObjectInstance {
     x: number;
     y: number;
     z: number;
+    status: ObjectStatus = 'normal';
     constructor(loot: LootObject | ChestObject) {
         this.loot = loot;
         const state = getState();
@@ -44,13 +48,18 @@ export class LootObject implements ObjectInstance {
     x: number;
     y: number;
     z: number;
+    status: ObjectStatus;
     constructor(definition: LootObjectDefinition) {
         this.definition = definition;
         this.frame = lootFrames[definition.lootType] || lootFrames.unknown;
         this.x = definition.x;
         this.y = definition.y;
+        this.status = definition.status || 'normal';
     }
     update(state: GameState) {
+        if (this.status !== 'normal') {
+            return;
+        }
         if (state.savedState.collectedItems[this.definition.id]) {
             return;
         }
@@ -64,6 +73,9 @@ export class LootObject implements ObjectInstance {
         }
     }
     render(context, state: GameState) {
+        if (this.status !== 'normal') {
+            return;
+        }
         if (this.definition.id !== 'drop' && state.savedState.collectedItems[this.definition.id]) {
             return;
         }
@@ -96,10 +108,12 @@ export class ChestObject implements ObjectInstance {
     x: number;
     y: number;
     z: number;
+    status: ObjectStatus;
     constructor(definition: LootObjectDefinition) {
         this.definition = definition;
         this.x = definition.x;
         this.y = definition.y;
+        this.status = definition.status || 'normal';
     }
     getHitbox(state: GameState): ShortRectangle {
         return { ...chestOpenedFrame, x: this.x, y: this.y };
@@ -116,9 +130,14 @@ export class ChestObject implements ObjectInstance {
         }
     }
     update(state: GameState) {
-
+        if (this.status !== 'normal') {
+            return;
+        }
     }
     render(context, state: GameState) {
+        if (this.status !== 'normal') {
+            return;
+        }
         if (state.savedState.collectedItems[this.definition.id]) {
             drawFrame(context, chestOpenedFrame, { ...chestOpenedFrame, x: this.x, y: this.y });
         } else {
@@ -139,8 +158,9 @@ function createLootFrame(color: string, letter: string, size: number = 10): Fram
 }
 
 export const lootFrames: Partial<{[key in LootType]: Frame}> = {
-    catEyes: createLootFrame('red', 'E'),
-    trueSight: createLootFrame('red', 'T'),
+    bow: createLootFrame('red', 'B'),
+    catEyes: createLootFrame('blue', 'E'),
+    trueSight: createLootFrame('blue', 'T'),
     weapon: createLootFrame('red', 'W'),
     gloves: createLootFrame('blue', 'G'),
     roll: createLootFrame('green', 'R'),
@@ -152,7 +172,12 @@ export const lootFrames: Partial<{[key in LootType]: Frame}> = {
 
 export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: ChestObject | LootObject) => void}> = {
     unknown: (state: GameState, loot: ChestObject | LootObject) => {
-        if (['weapon', 'bow', 'staff', 'clone', 'invisibility'].includes(loot.definition.lootType)) {
+        if (['bow', 'staff', 'clone', 'invisibility'].includes(loot.definition.lootType)) {
+            if (!state.hero.leftTool) {
+                state.hero.leftTool = loot.definition.lootType as ActiveTool;
+            } else if (!state.hero.leftTool) {
+                state.hero.rightTool = loot.definition.lootType as ActiveTool;
+            }
             state.hero.activeTools[loot.definition.lootType]++;
         } else if ([
             'gloves', 'roll', 'cloudSomersalt', 'charge', 'nimbusCloud', 'catEyes', 'spiritSight',

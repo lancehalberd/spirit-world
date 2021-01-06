@@ -4,7 +4,7 @@ import { drawFrame } from 'app/utils/animations';
 import { getDirection } from 'app/utils/field';
 import { rectanglesOverlap } from 'app/utils/index';
 
-import {Frame, GameState } from 'app/types';
+import {Frame, GameState, ObjectInstance, ObjectStatus } from 'app/types';
 
 
 interface Props {
@@ -18,7 +18,7 @@ interface Props {
     damage?: number,
 }
 
-export class ThrownObject {
+export class ThrownObject implements ObjectInstance {
     definition = null;
     type = 'thrownObject' as 'thrownObject';
     frame: Frame;
@@ -30,6 +30,7 @@ export class ThrownObject {
     vz: number;
     damage;
     broken = false;
+    status: ObjectStatus = 'normal';
     constructor({frame, x = 0, y = 0, z = 17, vx = 0, vy = 0, vz = 0, damage = 1 }: Props) {
         this.frame = frame;
         this.x = x;
@@ -52,6 +53,9 @@ export class ThrownObject {
         this.vz -= 0.5;
         const hitbox = this.getHitbox(state);
         for (const object of state.areaInstance.objects) {
+            if (object.status !== 'normal') {
+                continue;
+            }
             if (object instanceof Enemy) {
                 if (rectanglesOverlap(object, hitbox)) {
                     damageActor(state, object, this.damage);

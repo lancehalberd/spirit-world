@@ -28,6 +28,9 @@ export function isPointOpen(state: GameState, {x, y}: {x: number, y: number}): b
         return false;
     }
     for (const object of state.areaInstance.objects) {
+        if (object.status !== 'normal') {
+            continue;
+        }
         if (object.getHitbox && object.behaviors?.solid) {
             if (isPixelInShortRect(x, y, object.getHitbox(state))) {
                 return false;

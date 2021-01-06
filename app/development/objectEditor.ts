@@ -11,7 +11,7 @@ import { isPointInShortRect } from 'app/utils/index';
 
 import {
     EnemyType, Frame, GameState, LootObjectDefinition,
-    LootType, ObjectDefinition, SimpleObjectType, PanelRows,
+    LootType, ObjectDefinition, ObjectStatus, SimpleObjectType, PanelRows,
 } from 'app/types';
 
 let allLootTypes: LootType[];
@@ -83,6 +83,15 @@ export function getSelectProperties(state: GameState, editingState: EditingState
                             updateObjectId(state, lootObjectDefinition, lootObjectDefinition.id.replace(lootObjectDefinition.lootType, lootType));
                         }
                         lootObjectDefinition.lootType = lootType;
+                        updateObjectInstance(state, lootObjectDefinition);
+                    },
+                });
+                rows.push({
+                    name: 'status',
+                    value: lootObjectDefinition.status || 'normal',
+                    values: ['normal', 'hiddenSwitch', 'hiddenEnemy'],
+                    onChange(status: ObjectStatus) {
+                        lootObjectDefinition.status = status;
                         updateObjectInstance(state, lootObjectDefinition);
                     },
                 });

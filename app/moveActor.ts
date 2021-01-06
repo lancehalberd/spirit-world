@@ -125,7 +125,7 @@ function moveActorInDirection(
     const pushedObjects: ObjectInstance[] = [];
     let blockedByObject = false;
     const blockedCoords = {};
-    for (const solidObject of state.areaInstance.objects.filter(o => o.getHitbox && o.behaviors?.solid)) {
+    for (const solidObject of state.areaInstance.objects.filter(o => o.getHitbox && o.status === 'normal' && o.behaviors?.solid)) {
         const hitbox = solidObject.getHitbox(state);
         for (const point of checkPoints) {
             if (isPixelInShortRect(point.x, point.y, hitbox)) {

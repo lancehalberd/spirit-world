@@ -2,6 +2,7 @@ import { editingState, renderEditor } from 'app/development/tileEditor';
 import { createCanvasAndContext, mainContext } from 'app/dom';
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from 'app/gameConstants';
 import { renderActor } from 'app/renderActor';
+import { renderHUD } from 'app/renderHUD';
 import { renderMenu } from 'app/renderMenu';
 import { getState } from 'app/state';
 import { drawFrame } from 'app/utils/animations';
@@ -111,24 +112,6 @@ export function renderField(context: CanvasRenderingContext2D, state: GameState)
 
     // Draw the HUD onto the field.
     renderHUD(context, state);
-}
-
-export function renderHUD(context: CanvasRenderingContext2D, state: GameState): void {
-    for (let i = 0; i < state.hero.maxLife; i++) {
-        context.fillStyle = 'white';
-        context.fillRect(5 + i * 8, 5, 1, 10);
-        context.fillRect(5 + i * 8, 5, 7, 1);
-        context.fillRect(5 + i * 8 + 6, 5, 1, 10);
-        context.fillRect(5 + i * 8, 5 + 9, 7, 1);
-        if (i < state.hero.life) {
-            context.fillStyle = 'red';
-            context.fillRect(5 + i * 8 + 1, 5 + 1, 5, 8);
-        }
-    }
-    context.fillStyle = 'black';
-    context.fillRect(5, 16, Math.floor(state.hero.maxMagic), 4);
-    context.fillStyle = 'blue';
-    context.fillRect(5, 16, Math.floor(state.hero.magic), 4);
 }
 
 export function renderAreaBackground(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance): void {

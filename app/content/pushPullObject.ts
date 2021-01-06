@@ -1,7 +1,7 @@
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { directionMap, isPointOpen } from 'app/utils/field';
 
-import { Direction, Frame, GameState, BaseObjectDefinition, ObjectInstance, ShortRectangle } from 'app/types';
+import { Direction, Frame, GameState, BaseObjectDefinition, ObjectInstance, ObjectStatus, ShortRectangle } from 'app/types';
 
 const tilesFrame = createAnimation('gfx/tiles/overworld.png', {w: 384, h: 640}).frames[0];
 export const normalFrame: Frame = {image: tilesFrame.image, x: 16 * 1, y: 16 * 35, w: 16, h: 16};
@@ -20,6 +20,7 @@ export class PushPullObject implements ObjectInstance {
     pushDirection: Direction;
     pushCounter: number = 0;
     pushedLastFrame: boolean = false;
+    status: ObjectStatus = 'normal';
     constructor(definition: BaseObjectDefinition) {
         this.definition = definition;
         this.x = definition.x;

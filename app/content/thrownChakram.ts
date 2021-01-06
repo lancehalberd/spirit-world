@@ -7,7 +7,7 @@ import { drawFrame } from 'app/utils/animations';
 import { getDirection } from 'app/utils/field';
 import { isPointInShortRect, rectanglesOverlap } from 'app/utils/index';
 
-import { Frame, GameState } from 'app/types';
+import { Frame, GameState, ObjectInstance, ObjectStatus } from 'app/types';
 
 const CHAKRAM_RADIUS = 6;
 const [chakramCanvas, chakramContext] = createCanvasAndContext(2 * CHAKRAM_RADIUS, 2 * CHAKRAM_RADIUS);
@@ -25,7 +25,7 @@ interface Props {
     returnSpeed?: number,
 }
 
-export class ThrownChakram {
+export class ThrownChakram implements ObjectInstance {
     definition = null;
     type = 'thrownChakram' as 'thrownChakram';
     frame: Frame;
@@ -40,6 +40,7 @@ export class ThrownChakram {
     vx: number;
     vy: number;
     hitTargets: Set<any>;
+    status: ObjectStatus = 'normal';
     constructor({x = 0, y = 0, vx = 0, vy = 0, damage = 1, returnSpeed = 4}: Props) {
         this.frame = chakramFrame;
         this.x = x;
@@ -59,8 +60,10 @@ export class ThrownChakram {
             this.x += this.vx;
             this.y += this.vy;
             this.outFrames--;
-            const { w, h } = getAreaSize(state);
-            if (this.x <= 0 || this.y <= 0 || this.x + this.w >= w || this.y + this.h >= h) {
+            const { section } = getAreaSize(state);
+            if (this.x <= section.x || this.y <= section.y
+                || this.x + this.w >= section.x + section.w || this.y + this.h >= section.y + section.h
+            ) {
                 this.outFrames = 0;
             }
         } else {
@@ -77,6 +80,9 @@ export class ThrownChakram {
             }
         }
         for (const object of state.areaInstance.objects) {
+            if (object.status !== 'normal') {
+                continue;
+            }
             if (object instanceof Enemy) {
                 if (!this.hitTargets.has(object) && rectanglesOverlap(object, this)) {
                     damageActor(state, object, this.damage);

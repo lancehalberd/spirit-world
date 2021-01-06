@@ -3,9 +3,10 @@ import { Enemy } from 'app/content/enemy';
 import { editingState } from 'app/development/tileEditor';
 import { KEY_THRESHOLD, FRAME_LENGTH } from 'app/gameConstants';
 import { getActorTargets } from 'app/getActorTargets';
-import { KEY, isKeyDown } from 'app/keyCommands';
+import { GAME_KEY, isKeyDown } from 'app/keyCommands';
 import { checkForFloorDamage, moveActor } from 'app/moveActor';
 import { getTileFrame } from 'app/render';
+import { useTool } from 'app/useTool';
 import { directionMap, getDirection, isPointOpen } from 'app/utils/field';
 import { rectanglesOverlap } from 'app/utils/index';
 import { getState, initializeState } from 'app/state';
@@ -29,9 +30,9 @@ export function updateHero(this: void, state: GameState) {
         movementSpeed = 0;
         state.hero.invulnerableFrames = 1;
         const ANALOG_THRESHOLD = 0.2;
-        dy = isKeyDown(KEY.DOWN) - isKeyDown(KEY.UP);
+        dy = isKeyDown(GAME_KEY.DOWN) - isKeyDown(GAME_KEY.UP);
         if (Math.abs(dy) < ANALOG_THRESHOLD) dy = 0;
-        dx = isKeyDown(KEY.RIGHT) - isKeyDown(KEY.LEFT);
+        dx = isKeyDown(GAME_KEY.RIGHT) - isKeyDown(GAME_KEY.LEFT);
         if (Math.abs(dx) < ANALOG_THRESHOLD) dx = 0;
         state.hero.x += 4 * dx;
         state.hero.y += 4 * dy;
@@ -67,15 +68,15 @@ export function updateHero(this: void, state: GameState) {
         if (state.hero.grabObject?.pullingHeroDirection) {
             dx = directionMap[state.hero.grabObject.pullingHeroDirection][0];
             dy = directionMap[state.hero.grabObject.pullingHeroDirection][1];
-        } else if (!state.hero.pickUpTile && !isKeyDown(KEY.SHIFT)) {
+        } else if (!state.hero.pickUpTile && !isKeyDown(GAME_KEY.PASSIVE_TOOL)) {
             state.hero.action = null;
             state.hero.grabTile = null;
             state.hero.grabObject = null;
         } else if (state.hero.grabObject?.onPull) {
             const ANALOG_THRESHOLD = 0.2;
-            let dy = isKeyDown(KEY.DOWN) - isKeyDown(KEY.UP);
+            let dy = isKeyDown(GAME_KEY.DOWN) - isKeyDown(GAME_KEY.UP);
             if (Math.abs(dy) < ANALOG_THRESHOLD) dy = 0;
-            let dx = isKeyDown(KEY.RIGHT) - isKeyDown(KEY.LEFT);
+            let dx = isKeyDown(GAME_KEY.RIGHT) - isKeyDown(GAME_KEY.LEFT);
             if (Math.abs(dx) < ANALOG_THRESHOLD) dx = 0;
             if (dx || dy) {
                 const direction = getDirection(dx, dy);
@@ -133,9 +134,9 @@ export function updateHero(this: void, state: GameState) {
     }
     if (movementSpeed) {
         const ANALOG_THRESHOLD = 0.2;
-        dy = isKeyDown(KEY.DOWN) - isKeyDown(KEY.UP);
+        dy = isKeyDown(GAME_KEY.DOWN) - isKeyDown(GAME_KEY.UP);
         if (Math.abs(dy) < ANALOG_THRESHOLD) dy = 0;
-        dx = isKeyDown(KEY.RIGHT) - isKeyDown(KEY.LEFT);
+        dx = isKeyDown(GAME_KEY.RIGHT) - isKeyDown(GAME_KEY.LEFT);
         if (Math.abs(dx) < ANALOG_THRESHOLD) dx = 0;
         if (dx || dy) {
             const m = Math.sqrt(dx * dx + dy * dy);
@@ -156,14 +157,26 @@ export function updateHero(this: void, state: GameState) {
         moveActor(state, state.hero, dx, dy, true);
     }
     if (!state.hero.action && !state.hero.pickUpTile && state.hero.activeTools.weapon > 0 &&
-        state.hero.chakrams > 0 && isKeyDown(KEY.SPACE, KEY_THRESHOLD)
+        state.hero.chakrams > 0 && isKeyDown(GAME_KEY.WEAPON, KEY_THRESHOLD)
     ) {
         state.hero.action = 'attack';
         state.hero.actionDx = dx;
         state.hero.actionDy = dy;
         state.hero.actionFrame = 0;
     }
-    if (!state.hero.action && !state.hero.pickUpTile && isKeyDown(KEY.SHIFT, KEY_THRESHOLD)) {
+
+    if (state.hero.toolCooldown > 0) {
+        state.hero.toolCooldown -= FRAME_LENGTH;
+    } else if (!state.hero.action && !state.hero.pickUpTile) {
+        if (state.hero.leftTool && isKeyDown(GAME_KEY.LEFT_TOOL, KEY_THRESHOLD)) {
+            state.hero.toolCooldown = 500;
+            useTool(state, state.hero.leftTool, dx, dy, state.hero.d);
+        } else if (state.hero.rightTool && isKeyDown(GAME_KEY.RIGHT_TOOL, KEY_THRESHOLD)) {
+            state.hero.toolCooldown = 500;
+            useTool(state, state.hero.rightTool, dx, dy, state.hero.d);
+        }
+    }
+    if (!state.hero.action && !state.hero.pickUpTile && isKeyDown(GAME_KEY.PASSIVE_TOOL, KEY_THRESHOLD)) {
         const {objects, tiles} = getActorTargets(state, state.hero);
         if ((dx || dy) && !tiles.some(({x, y}) => area.behaviorGrid?.[y]?.[x]?.solid) && !objects.some(o => o.behaviors?.solid)) {
             if (state.hero.passiveTools.roll > 0) {
@@ -237,7 +250,7 @@ export function updateHero(this: void, state: GameState) {
         state.hero.pickUpFrame++;
         if (state.hero.pickUpFrame >= 5) {
             state.hero.action = 'carrying';
-            if (isKeyDown(KEY.SHIFT, KEY_THRESHOLD)) {
+            if (isKeyDown(GAME_KEY.PASSIVE_TOOL, KEY_THRESHOLD)) {
                 throwHeldObject(state);
             }
         }

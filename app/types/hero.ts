@@ -48,6 +48,8 @@ export interface Actor {
     grabObject?: ObjectInstance,
     invulnerableFrames?: number,
     life: number,
+    leftTool?: ActiveTool,
+    rightTool?: ActiveTool,
 }
 
 export interface Hero extends Actor {
@@ -64,6 +66,7 @@ export interface Hero extends Actor {
     arrows: number,
     peachQuarters: number,
     spiritTokens: number,
+    toolCooldown: number,
     activeTools: {[key in ActiveTool]: number},
     equipment: {[key in Equipment]: number},
     passiveTools: {[key in PassiveTool]: number},

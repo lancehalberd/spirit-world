@@ -31,7 +31,22 @@ export const KEY = {
     T: 'T'.charCodeAt(0),
     V: 'V'.charCodeAt(0),
     X: 'X'.charCodeAt(0),
+    Z: 'Z'.charCodeAt(0),
 };
+
+export const GAME_KEY = {
+    MENU: KEY.ENTER,
+    LEFT_TOOL: KEY.C,
+    RIGHT_TOOL: KEY.V,
+    PASSIVE_TOOL: KEY.SHIFT,
+    WEAPON: KEY.SPACE,
+    PREVIOUS_ELEMENT: KEY.Z,
+    NEXT_ELEMENT: KEY.X,
+    UP: KEY.UP,
+    DOWN: KEY.DOWN,
+    LEFT: KEY.LEFT,
+    RIGHT: KEY.RIGHT,
+}
 
 // Under this threshold, the analog buttons are considered "released" for the sake of
 // actions that are only taken once per button push (like moving a menu cursor).
@@ -44,17 +59,17 @@ export const ANALOG_THRESHOLD = 0.3;
 // https://developer.mozilla.org/en-US/docs/Web/API/Gamepad_API/Using_the_Gamepad_API
 // Easy to find mappings at: http://html5gamepad.com/
 const GAME_PAD_MAPPINGS = {
-    [KEY.SPACE]: 0, // A (bottom button)
-    [KEY.SHIFT]: 1, // B (right button)
-    [KEY.V]: 2, // X (left button)
-    [KEY.F]: 3, // Y (top button)
-    [KEY.ENTER]: 9, // START
-    [KEY.UP]: 12,
-    [KEY.DOWN]: 13,
-    [KEY.LEFT]: 14,
-    [KEY.RIGHT]: 15,
-    [KEY.X]: 4, // L Front Bumper
-    [KEY.C]: 5,  // R Front bumper
+    [GAME_KEY.WEAPON]: 0, // A (bottom button)
+    [GAME_KEY.PASSIVE_TOOL]: 1, // B (right button)
+    [GAME_KEY.LEFT_TOOL]: 2, // X (left button)
+    [GAME_KEY.RIGHT_TOOL]: 3, // Y (top button)
+    [GAME_KEY.MENU]: 9, // START
+    [GAME_KEY.UP]: 12,
+    [GAME_KEY.DOWN]: 13,
+    [GAME_KEY.LEFT]: 14,
+    [GAME_KEY.RIGHT]: 15,
+    [GAME_KEY.PREVIOUS_ELEMENT]: 4, // L Front Bumper
+    [GAME_KEY.NEXT_ELEMENT]: 5,  // R Front bumper
 };
 
 const LEFT_ANALOG_Y_AXIS = 1;

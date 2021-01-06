@@ -1,7 +1,7 @@
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { drawFrame, getFrame } from 'app/utils/animations';
 
-import { FrameAnimation, GameState } from 'app/types';
+import { FrameAnimation, GameState, ObjectInstance, ObjectStatus } from 'app/types';
 
 
 interface Props {
@@ -14,7 +14,7 @@ interface Props {
     vz?: number,
 }
 
-export class AnimationEffect {
+export class AnimationEffect implements ObjectInstance {
     definition = null;
     type = 'animationEffect' as 'animationEffect';
     animation: FrameAnimation;
@@ -25,6 +25,7 @@ export class AnimationEffect {
     vx: number;
     vy: number;
     vz: number;
+    status: ObjectStatus = 'normal';
     constructor({animation, x = 0, y = 0, z = 17, vx = 0, vy = 0, vz = 0 }: Props) {
         this.animation = animation;
         this.animationTime = 0;
