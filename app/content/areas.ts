@@ -21,6 +21,7 @@ const worldMapPalette: TilePalette = {
     // Array of tiles to randomly apply by default.
     defaultTiles: [{x: 0, y: 16}, {x: 1, y: 16}, {x: 2, y: 16}, {x: 3, y: 16}],
     behaviors: {
+        '11x3': {pit: true},
         '16x8': {solid: true, pickupWeight: 1, underTile: {x: 1, y: 8}, lootChance: 0.2, lootTypes: ['peach']},
         '16x9': {solid: true, pickupWeight: 1, underTile: {x: 1, y: 9}, lootChance: 0.2, lootTypes: ['peach']},
         '16x10': {solid: true, pickupWeight: 1, underTile: {x: 1, y: 10}, lootChance: 0.2, lootTypes: ['peach']},
@@ -109,6 +110,8 @@ export function enterArea(state: GameState, area: AreaDefinition, x: number, y: 
     state.areaInstance = createAreaInstance(state, area);
     state.hero.x = x;
     state.hero.y = y;
+    state.hero.safeX = x;
+    state.hero.safeY = y;
     setAreaSection(state, state.hero.d);
     updateCamera(state, 512);
 }
@@ -144,6 +147,8 @@ export function setAreaSection(state: GameState, d: Direction): void {
     if (lastAreaSection !== state.areaSection) {
         removeAllClones(state);
         state.hero.activeStaff?.remove(state);
+        state.hero.safeX = state.hero.x;
+        state.hero.safeY = state.hero.y;
     }
     refreshOffscreenObjects(state);
 }
@@ -182,6 +187,8 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
         palette.w * definition.layers[0].grid.w,
         palette.h * definition.layers[0].grid.h,
     );
+    context.fillStyle = 'black';
+    context.fillRect(0, 0, canvas.width, canvas.height);
     return {
         definition: definition,
         palette,

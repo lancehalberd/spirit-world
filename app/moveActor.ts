@@ -97,7 +97,8 @@ function moveActorInDirection(
             if (behaviors.solid && behaviors.damage > 0) {
                 damageActor(state, actor, behaviors.damage);
             }
-            if (behaviors.solid) {
+            // The second condition is a hack to prevent enemies from walking over pits.
+            if (behaviors.solid || (behaviors.pit && !push)) {
                 blockedByTile = true;
             } else {
                 openCoords.push({x: column, y: row});
@@ -201,6 +202,7 @@ export function checkForFloorDamage(state: GameState, hero: Hero) {
     let bottomRow = Math.floor((hero.y + hero.h - 5) / tileSize);
 
     const behaviorGrid = state.areaInstance.behaviorGrid;
+    let fallingLeft = false, fallingRight = false, fallingUp = false, fallingDown = false;
     for (let row = topRow; row <= bottomRow; row++) {
         for (let column = leftColumn; column <= rightColumn; column++) {
             const behaviors = behaviorGrid?.[row]?.[column];
@@ -211,6 +213,34 @@ export function checkForFloorDamage(state: GameState, hero: Hero) {
             if (behaviors.damage > 0) {
                 damageActor(state, hero, behaviors.damage);
             }
+            if (behaviors.pit && hero.action !== 'roll') {
+                if (hero.x - column * 16 > 4) {
+                    fallingLeft = true;
+                    hero.x -= 0.1;
+                } else if (hero.x - column * 16 < -4) {
+                    fallingRight = true;
+                    hero.x += 0.1;
+                } else {
+                    fallingLeft = fallingRight = true;
+                }
+                if (hero.y - row * 16 > 4) {
+                    fallingUp = true;
+                    hero.y -= 0.1;
+                } else if (hero.y - row * 16 < -4) {
+                    fallingDown = true;
+                    hero.y += 0.1;
+                } else {
+                    fallingUp = fallingDown = true;
+                }
+            }
+        }
+    }
+    if (fallingUp && fallingDown && fallingLeft && fallingRight) {
+        const wasClone = !!state.hero.clones.length;
+        damageActor(state, hero, 1, null, true);
+        if (!wasClone) {
+            state.hero.x = state.hero.safeX;
+            state.hero.y = state.hero.safeY;
         }
     }
 }

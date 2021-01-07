@@ -93,7 +93,6 @@ export class Staff implements ObjectInstance {
                 state.areaInstance.behaviorGrid[row][column] = null;
             }
         }
-        console.log(direction, this.topRow, this.bottomRow, this.leftColumn, this.rightColumn);
         if (direction === 'left' || direction === 'right') {
             row = this.topRow;
             for (column = this.leftColumn; column <= this.rightColumn; column++) {

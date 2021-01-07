@@ -20,6 +20,8 @@ export class Clone implements Hero, ObjectInstance {
     x: number;
     y: number;
     z: number;
+    safeX: number;
+    safeY: number;
     vx: number;
     vy: number;
     vz: number;

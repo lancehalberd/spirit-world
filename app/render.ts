@@ -200,6 +200,8 @@ export function renderLayer(context: CanvasRenderingContext2D, layer: AreaLayer)
                 x: palette.source.x + tile.x * w,
                 y: palette.source.y + tile.y * h,
             };
+            // TODO: Remove this when we have real pit graphics.
+            context.fillRect(x * w, y * h, w, h);
             drawFrame(context, frame, {x: x * w, y: y * h, w, h});
         }
     }

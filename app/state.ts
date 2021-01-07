@@ -13,6 +13,7 @@ function getDefaultSavedState(): SavedState {
 function getDefaultHeroState(): Hero {
     return {
         x: 150, y: 445, z: 0,
+        safeX: 150, safeY: 445,
         vx: 0, vy: 0, vz: 0,
         w: 16, h: 16,
         d: 'down',

@@ -34,7 +34,10 @@ export function updateHero(this: void, state: GameState) {
     // Automatically move the character into the bounds of the current section.
     if (editingState.isEditing) {
         movementSpeed = 0;
+        // Hack to prevent player from being damaged or falling into pits while editing.
         hero.invulnerableFrames = 1;
+        hero.action = 'roll';
+        hero.actionFrame = rollSpeed.length - 1;
         [dx, dy] = getMovementDeltas();
         hero.x += 4 * dx;
         hero.y += 4 * dy;
@@ -352,13 +355,19 @@ export function destroyClone(state: GameState, clone: Hero): void {
     }
 }
 
-export function damageActor(state: GameState, actor: Actor, damage: number, knockback?: {vx: number, vy: number, vz: number}) {
-    if (actor.action === 'roll' || actor.action === 'getItem') {
+export function damageActor(
+    state: GameState,
+    actor: Actor,
+    damage: number,
+    knockback?: {vx: number, vy: number, vz: number},
+    overrideInvulnerability: boolean = false
+) {
+    if (!overrideInvulnerability && (actor.action === 'roll' || actor.action === 'getItem')) {
         return;
     }
     const hero = state.hero.activeClone || state.hero;
     // Hero is invulnerable during invulnerability frames, but other actors are not.
-    if (actor === hero && (actor.invulnerableFrames > 0 || state.hero.invisible)) {
+    if (!overrideInvulnerability && actor === hero && (actor.invulnerableFrames > 0 || state.hero.invisible)) {
         return;
     }
 

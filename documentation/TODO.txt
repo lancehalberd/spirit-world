@@ -59,6 +59,8 @@ Add example prologue area:
 
 Add connected areas + dungeons
 
+Support 64x64 super tiles for world map. Or maybe just 48x48.
+
 
 Additional Clone Tool Behavior:
     Can pick up + throw clone, clone can pick up and throw the hero.

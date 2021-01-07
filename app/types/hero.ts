@@ -81,5 +81,7 @@ export interface Hero extends Actor {
     activeStaff?: Staff,
     invisible: boolean,
     invisibilityCost: number,
+    safeX: number,
+    safeY: number,
 }
 

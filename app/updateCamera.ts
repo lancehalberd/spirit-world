@@ -34,6 +34,8 @@ export function updateCamera(state: GameState, speed = cameraSpeed): void {
             state.hero.y -= state.areaInstance.cameraOffset.y;
             state.camera.x -= state.areaInstance.cameraOffset.x;
             state.camera.y -= state.areaInstance.cameraOffset.y;
+            state.hero.safeX = state.hero.x;
+            state.hero.safeY = state.hero.y;
             state.areaInstance.cameraOffset = {x: 0, y: 0};
             state.nextAreaInstance = null;
             setAreaSection(state, state.hero.d);

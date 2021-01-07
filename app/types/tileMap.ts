@@ -12,6 +12,8 @@ export interface TileBehaviors {
     damage?: number,
     lootChance?: number,
     lootTypes?: LootType[],
+    // If a player falls in a pit they will take damage and respawn at their last stable location.
+    pit?: boolean,
     // Blocks movement
     solid?: boolean,
     // Can be picked up with glove
