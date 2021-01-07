@@ -102,10 +102,12 @@ export interface AreaInstance {
     cameraOffset: {x: number, y: number},
 }
 
+export type DrawPriority = 'background' | 'foreground' | 'sprites'
+
 export interface ObjectInstance {
     definition?: ObjectDefinition,
     behaviors?: TileBehaviors,
-    drawPriority?: 'background' | 'foreground' | 'sprites',
+    drawPriority?: DrawPriority,
     x: number, y: number,
     status: ObjectStatus,
     // This is called when a user grabs a solid tile
@@ -137,6 +139,8 @@ export interface LootObjectDefinition extends BaseObjectDefinition {
     type: 'chest' | 'loot',
     lootType: LootType,
     amount?: number,
+    // If this is 0/unset it means it is progressive.
+    level?: number,
 }
 
 export type SimpleObjectType = 'pushPull' | 'rollingBall' | 'tippable';

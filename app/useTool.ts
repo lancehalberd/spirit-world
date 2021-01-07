@@ -1,19 +1,91 @@
 import { Arrow } from 'app/content/arrow';
+import { Clone }  from 'app/content/clone';
+import { Staff } from 'app/content/staff';
 import { directionMap } from 'app/utils/field';
 
-import { ActiveTool, Direction, GameState, } from 'app/types'
+import { ActiveTool, GameState, Hero } from 'app/types'
 
-export function useTool(state: GameState, tool: ActiveTool, dx: number, dy: number, direction: Direction): void {
+export function useTool(
+    state: GameState,
+    hero: Hero,
+    tool: ActiveTool,
+    dx: number,
+    dy: number,
+): void {
     switch (tool) {
         case 'bow':
+            if (state.hero.magic < 5) {
+                return;
+            }
+            state.hero.magic -= 5;
             const arrow = new Arrow({
-                x: state.hero.x + 8 + 8 * directionMap[state.hero.d][0],
-                y: state.hero.y + 8 + 8 * directionMap[state.hero.d][1],
-                vx: 4 * directionMap[state.hero.d][0],
-                vy: 4 * directionMap[state.hero.d][1],
-                direction: state.hero.d
+                x: hero.x + 8 + 8 * directionMap[hero.d][0],
+                y: hero.y + 8 + 8 * directionMap[hero.d][1],
+                vx: 4 * directionMap[hero.d][0],
+                vy: 4 * directionMap[hero.d][1],
+                direction: hero.d
             });
             state.areaInstance.objects.push(arrow);
-            break;
+            return;
+        case 'invisibility':
+            if (state.hero.invisible) {
+                state.hero.invisible = false;
+                state.hero.toolCooldown = 0;
+                return;
+            }
+            if (state.hero.magic < state.hero.invisibilityCost) {
+                return;
+            }
+            state.hero.invisibilityCost += 4;
+            state.hero.invisible = true;
+            return;
+        case 'clone':
+            if (!state.hero.clones.length) {
+                if (state.hero.magic < 10) {
+                    return;
+                }
+                state.hero.magic -= 10;
+                for (let i = 0; i < state.hero.activeTools.clone; i++) {
+                    const clone = new Clone(state.hero);
+                    state.hero.activeClone = clone;
+                    state.hero.clones.push(clone);
+                    state.areaInstance.objects.push(clone);
+                }
+            } else {
+                const currentIndex = state.hero.clones.indexOf(state.hero.activeClone);
+                state.hero.activeClone = state.hero.clones[currentIndex + 1];
+            }
+            return;
+        case 'staff':
+            if (state.hero.activeStaff) {
+                state.hero.activeStaff.remove(state);
+                state.hero.toolCooldown = 0;
+                return;
+            }
+            if (state.hero.magic < 10) {
+                return;
+            }
+            const staffLevel = state.hero.activeTools.staff
+            const maxLength = staffLevel > 1 ? 64 : 4;
+            const staff = new Staff({
+                x: hero.x + 8 + 8 * directionMap[hero.d][0],
+                y: hero.y + 8 + 8 * directionMap[hero.d][1],
+                damage: 4 * staffLevel,
+                direction: hero.d,
+                element: hero.element,
+                maxLength,
+            }, state);
+            if (staff.invalid) {
+                return;
+            }
+            state.hero.activeStaff = staff;
+            state.areaInstance.objects.push(staff);
+            // A staff that takes up a single tile is also an invalid use, but we remove it after adding it.
+            if (staff.topRow === staff.bottomRow && staff.leftColumn === staff.rightColumn) {
+                staff.remove(state);
+            } else {
+                state.hero.magic -= 10;
+            }
+            return;
     }
 }

@@ -21,7 +21,7 @@ function getDefaultHeroState(): Hero {
         // base: 20, max: 100, roll: 5, charge: 10, double-charge: 50
         maxMagic: 20,
         // base 4, max 8-10
-        magicRegen: 0,
+        magicRegen: 4,
         // inventory
         money: 0,
         chakrams: 1,
@@ -43,7 +43,6 @@ function getDefaultHeroState(): Hero {
         passiveTools: {
             gloves: 0,
             roll: 0,
-            cloudSomersalt: 0,
             charge: 0,
             nimbusCloud: 0,
             catEyes: 0,
@@ -62,6 +61,11 @@ function getDefaultHeroState(): Hero {
             ice: 0,
             lightning: 0,
         },
+        clones: [],
+        activeClone: null,
+        status: 'normal',
+        invisible: false,
+        invisibilityCost: 0,
     };
 }
 

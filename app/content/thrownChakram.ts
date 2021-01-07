@@ -7,7 +7,7 @@ import { drawFrame } from 'app/utils/animations';
 import { getDirection } from 'app/utils/field';
 import { isPointInShortRect, rectanglesOverlap } from 'app/utils/index';
 
-import { Frame, GameState, ObjectInstance, ObjectStatus } from 'app/types';
+import { Frame, GameState, Hero, ObjectInstance, ObjectStatus } from 'app/types';
 
 const CHAKRAM_RADIUS = 6;
 const [chakramCanvas, chakramContext] = createCanvasAndContext(2 * CHAKRAM_RADIUS, 2 * CHAKRAM_RADIUS);
@@ -23,6 +23,7 @@ interface Props {
     vy?: number,
     damage?: number,
     returnSpeed?: number,
+    source: Hero,
 }
 
 export class ThrownChakram implements ObjectInstance {
@@ -41,7 +42,8 @@ export class ThrownChakram implements ObjectInstance {
     vy: number;
     hitTargets: Set<any>;
     status: ObjectStatus = 'normal';
-    constructor({x = 0, y = 0, vx = 0, vy = 0, damage = 1, returnSpeed = 4}: Props) {
+    source: Hero;
+    constructor({x = 0, y = 0, vx = 0, vy = 0, damage = 1, returnSpeed = 4, source}: Props) {
         this.frame = chakramFrame;
         this.x = x;
         this.y = y;
@@ -54,8 +56,17 @@ export class ThrownChakram implements ObjectInstance {
         this.h = this.frame.h
         this.outFrames = 10;
         this.hitTargets = new Set();
+        this.source = source;
+    }
+    remove(state: GameState) {
+        state.areaInstance.objects.splice(state.areaInstance.objects.indexOf(this), 1);
+        state.hero.chakrams++;
     }
     update(state: GameState) {
+        // Chakram returns to the hero if the clone it was thrown from no longer exists.
+        if (state.areaInstance.objects.indexOf(this.source) < 0) {
+            this.source = state.hero;
+        }
         if (this.outFrames > 0) {
             this.x += this.vx;
             this.y += this.vy;
@@ -67,16 +78,16 @@ export class ThrownChakram implements ObjectInstance {
                 this.outFrames = 0;
             }
         } else {
-            const dx = (state.hero.x + state.hero.w / 2) - (this.x + this.w / 2);
-            const dy = (state.hero.y + state.hero.h / 2) - (this.y + this.h / 2);
+            const dx = (this.source.x + this.source.w / 2) - (this.x + this.w / 2);
+            const dy = (this.source.y + this.source.h / 2) - (this.y + this.h / 2);
             const m = Math.sqrt(dx * dx + dy * dy);
             this.vx = this.returnSpeed * dx / m;
             this.vy = this.returnSpeed * dy / m;
             this.x += this.vx;
             this.y += this.vy;
-            if (isPointInShortRect(state.hero.x + state.hero.w / 2, state.hero.y + state.hero.h / 2, this)) {
-                state.areaInstance.objects.splice(state.areaInstance.objects.indexOf(this), 1);
-                state.hero.chakrams++;
+            if (isPointInShortRect(this.source.x + this.source.w / 2, this.source.y + this.source.h / 2, this)) {
+                this.remove(state);
+                return;
             }
         }
         for (const object of state.areaInstance.objects) {

@@ -1,7 +1,7 @@
 import { editingState, renderEditor } from 'app/development/tileEditor';
 import { createCanvasAndContext, mainContext } from 'app/dom';
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from 'app/gameConstants';
-import { renderActor } from 'app/renderActor';
+import { renderHero, renderShadow } from 'app/renderActor';
 import { renderHUD } from 'app/renderHUD';
 import { renderMenu } from 'app/renderMenu';
 import { getState } from 'app/state';
@@ -80,7 +80,7 @@ export function renderField(context: CanvasRenderingContext2D, state: GameState)
     renderAreaObjectsBeforeHero(context, state, state.nextAreaInstance);
     context.save();
         context.translate(-state.camera.x + state.areaInstance.cameraOffset.x, -state.camera.y + state.areaInstance.cameraOffset.y);
-        renderActor(context, state, state.hero);
+        renderHero(context, state, state.hero);
     context.restore();
     renderAreaObjectsAfterHero(context, state, state.areaInstance);
     renderAreaObjectsAfterHero(context, state, state.nextAreaInstance);
@@ -99,11 +99,12 @@ export function renderField(context: CanvasRenderingContext2D, state: GameState)
             if (editingState.isEditing) {
                 context.globalAlpha = 0.5;
             }
+            const hero = state.hero.activeClone || state.hero;
             context.drawImage(darkCanvas,
                 0, 0, darkCanvas.width, darkCanvas.height,
-                state.hero.x + state.hero.w / 2 - darkCanvas.width * 2 + 12 * directionMap[state.hero.d][0]
+                hero.x + hero.w / 2 - darkCanvas.width * 2 + 12 * directionMap[hero.d][0]
                 - state.camera.x + state.areaInstance.cameraOffset.x,
-                state.hero.y + state.hero.h / 2 - darkCanvas.height * 2 + 12 * directionMap[state.hero.d][1]
+                hero.y + hero.h / 2 - darkCanvas.height * 2 + 12 * directionMap[hero.d][1]
                  - state.camera.y + state.areaInstance.cameraOffset.y,
                 darkCanvas.width * 4, darkCanvas.height * 4
             );
@@ -134,6 +135,13 @@ export function renderAreaObjectsBeforeHero(context: CanvasRenderingContext2D, s
     }
     context.save();
         context.translate(-state.camera.x + area.cameraOffset.x, -state.camera.y + area.cameraOffset.y);
+        renderShadow(context, state, state.hero);
+        // Render shadows before anything else.
+        for (const object of area.objects) {
+            if (object.drawPriority === 'sprites') {
+                renderShadow(context, state, object);
+            }
+        }
         for (const object of area.objects) {
             if (object.drawPriority === 'background' || (object.drawPriority === 'sprites' && object.y <= state.hero.y)) {
                 object?.render(context, state);

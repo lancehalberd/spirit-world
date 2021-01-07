@@ -22,8 +22,9 @@ export class LootGetAnimation implements ObjectInstance {
         this.loot = loot;
         const state = getState();
         const frame = lootFrames[this.loot.definition.lootType] || lootFrames.unknown;
-        this.x = (loot.definition.type === 'chest' ? loot.x + chestOpenedFrame.w / 2 : state.hero.x + state.hero.w / 2) - frame.w / 2;
-        this.y = (loot.definition.type === 'chest' ? loot.y + 8 : state.hero.y - 4);
+        const hero = state.hero.activeClone || state.hero;
+        this.x = (loot.definition.type === 'chest' ? loot.x + chestOpenedFrame.w / 2 : hero.x + hero.w / 2) - frame.w / 2;
+        this.y = (loot.definition.type === 'chest' ? loot.y + 8 : hero.y - 4);
         this.z = 8;
     }
     update(state: GameState) {
@@ -63,11 +64,12 @@ export class LootObject implements ObjectInstance {
         if (state.savedState.collectedItems[this.definition.id]) {
             return;
         }
-        if (rectanglesOverlap(state.hero, {...this.frame, x: this.x, y: this.y})) {
+        const hero = state.hero.activeClone || state.hero;
+        if (rectanglesOverlap(hero, {...this.frame, x: this.x, y: this.y})) {
             const onPickup = lootEffects[this.definition.lootType] || lootEffects.unknown;
             onPickup(state, this);
-            state.hero.action = 'getItem';
-            state.hero.actionFrame = 0;
+            hero.action = 'getItem';
+            hero.actionFrame = 0;
             state.areaInstance.objects.splice(state.areaInstance.objects.indexOf(this), 1, new LootGetAnimation(this));
             state.savedState.collectedItems[this.definition.id] = true;
         }
@@ -86,7 +88,7 @@ export class LootObject implements ObjectInstance {
 // Simple loot drop doesn't show the loot animation when collected.
 export class LootDropObject extends LootObject {
     update(state: GameState) {
-        if (rectanglesOverlap(state.hero, {...this.frame, x: this.x, y: this.y})) {
+        if (rectanglesOverlap(state.hero.activeClone || state.hero, {...this.frame, x: this.x, y: this.y})) {
             const onPickup = lootEffects[this.definition.lootType] || lootEffects.unknown;
             onPickup(state, this);
             state.areaInstance.objects.splice(state.areaInstance.objects.indexOf(this), 1);
@@ -120,9 +122,10 @@ export class ChestObject implements ObjectInstance {
     }
     onGrab(state: GameState) {
         // You can only open a chest from the bottom.
-        if (state.hero.d === 'up' && !state.savedState.collectedItems[this.definition.id]) {
-            state.hero.action = 'getItem';
-            state.hero.actionFrame = 0;
+        const hero = state.hero.activeClone || state.hero;
+        if (hero.d === 'up' && !state.savedState.collectedItems[this.definition.id]) {
+            hero.action = 'getItem';
+            hero.actionFrame = 0;
             const onPickup = lootEffects[this.definition.lootType] || lootEffects.unknown;
             onPickup(state, this);
             state.areaInstance.objects.splice(state.areaInstance.objects.indexOf(this) + 1, 0, new LootGetAnimation(this));
@@ -160,14 +163,17 @@ function createLootFrame(color: string, letter: string, size: number = 10): Fram
 export const lootFrames: Partial<{[key in LootType]: Frame}> = {
     bow: createLootFrame('red', 'B'),
     catEyes: createLootFrame('blue', 'E'),
+    clone: createLootFrame('red', 'C'),
+    invisibility: createLootFrame('red', 'I'),
     trueSight: createLootFrame('blue', 'T'),
-    weapon: createLootFrame('red', 'W'),
     gloves: createLootFrame('blue', 'G'),
     roll: createLootFrame('green', 'R'),
+    staff: createLootFrame('red', 'S'),
     peach: createLootFrame('orange', 'o', 6),
     peachOfImmortality: createLootFrame('orange', 'P', 16),
     peachOfImmortalityPiece: createLootFrame('orange', 'p', 8),
     unknown: createLootFrame('black', '?'),
+    weapon: createLootFrame('red', 'W'),
 }
 
 export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: ChestObject | LootObject) => void}> = {
@@ -175,12 +181,12 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: Ch
         if (['bow', 'staff', 'clone', 'invisibility'].includes(loot.definition.lootType)) {
             if (!state.hero.leftTool) {
                 state.hero.leftTool = loot.definition.lootType as ActiveTool;
-            } else if (!state.hero.leftTool) {
+            } else if (!state.hero.rightTool) {
                 state.hero.rightTool = loot.definition.lootType as ActiveTool;
             }
             state.hero.activeTools[loot.definition.lootType]++;
         } else if ([
-            'gloves', 'roll', 'cloudSomersalt', 'charge', 'nimbusCloud', 'catEyes', 'spiritSight',
+            'gloves', 'roll', 'charge', 'nimbusCloud', 'catEyes', 'spiritSight',
             'trueSight', 'astralProjection', 'telekinesis', 'ironSkin', 'goldMail', 'phoenixCrown',
             'waterBlessing', 'fireBlessing'
         ].includes(loot.definition.lootType)) {
@@ -206,14 +212,6 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: Ch
             state.hero.peachQuarters -= 4;
             state.hero.maxLife++;
             state.hero.life = state.hero.maxLife;
-        }
-    },
-    roll: (state: GameState, loot: ChestObject | LootObject) => {
-        if (!state.hero.passiveTools.roll) {
-            state.hero.passiveTools.roll = 1;
-            if (state.hero.magicRegen === 0) {
-                state.hero.magicRegen = 4;
-            }
         }
     },
     weapon: (state: GameState, loot: ChestObject | LootObject) => {

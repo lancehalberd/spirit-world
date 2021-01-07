@@ -40,7 +40,8 @@ export function updateCamera(state: GameState, speed = cameraSpeed): void {
         }
         return;
     }
-    let targetX = Math.floor(state.hero.x - CANVAS_WIDTH / 2 + 16 / 2);
+    const hero = state.hero.activeClone || state.hero;
+    let targetX = Math.floor(hero.x - CANVAS_WIDTH / 2 + 16 / 2);
     // Constrain the camera to display only/center the current section.
     if (section.w >= CANVAS_WIDTH) {
         targetX = Math.max(section.x, Math.min(section.x + section.w - CANVAS_WIDTH, targetX));
@@ -48,7 +49,7 @@ export function updateCamera(state: GameState, speed = cameraSpeed): void {
         // This will center on the current section if it is smaller than the screen width.
         targetX = Math.round(section.x + section.w / 2 - CANVAS_WIDTH / 2);
     }
-    let targetY = Math.floor(state.hero.y - CANVAS_HEIGHT / 2 + 16 / 2);
+    let targetY = Math.floor(hero.y - CANVAS_HEIGHT / 2 + 16 / 2);
     if (section.h >= CANVAS_HEIGHT) {
         targetY = Math.max(section.y, Math.min(section.y + section.h - CANVAS_HEIGHT, targetY));
     } else {

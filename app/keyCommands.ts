@@ -152,6 +152,14 @@ export function updateKeysStillDown() {
     }
 }
 
+export function getMovementDeltas(): [number, number] {
+    let dy = isKeyDown(GAME_KEY.DOWN) - isKeyDown(GAME_KEY.UP);
+    if (Math.abs(dy) < ANALOG_THRESHOLD) dy = 0;
+    let dx = isKeyDown(GAME_KEY.RIGHT) - isKeyDown(GAME_KEY.LEFT);
+    if (Math.abs(dx) < ANALOG_THRESHOLD) dx = 0;
+    return [dx, dy];
+}
+
 export function addKeyCommands() {
 document.addEventListener('keyup', function(event) {
     const keyCode: number = event.which;

@@ -91,7 +91,21 @@ export function initializeAreaTiles(area: AreaDefinition): AreaDefinition {
     return area;
 }
 
+export function removeAllClones(state: GameState): void {
+    for (const clone of state.hero.clones) {
+        const index = state.areaInstance.objects.indexOf(clone);
+        if (index >= 0) {
+            state.areaInstance.objects.splice(index, 1);
+        }
+    }
+    state.hero.clones = []
+    state.hero.activeClone = null;
+}
+
 export function enterArea(state: GameState, area: AreaDefinition, x: number, y: number): void {
+    // Remove all clones on changing areas.
+    removeAllClones(state);
+    state.hero.activeStaff?.remove(state);
     state.areaInstance = createAreaInstance(state, area);
     state.hero.x = x;
     state.hero.y = y;
@@ -111,6 +125,7 @@ export function enterAreaGrid(state: GameState, areaGrid: AreaGrid): void {
 }
 
 export function setAreaSection(state: GameState, d: Direction): void {
+    const lastAreaSection = state.areaSection;
     state.areaSection = state.areaInstance.definition.sections[0];
     let x = state.hero.x / state.areaInstance.palette.w;
     let y = state.hero.y / state.areaInstance.palette.h;
@@ -125,6 +140,10 @@ export function setAreaSection(state: GameState, d: Direction): void {
             state.areaSection = section;
             break;
         }
+    }
+    if (lastAreaSection !== state.areaSection) {
+        removeAllClones(state);
+        state.hero.activeStaff?.remove(state);
     }
     refreshOffscreenObjects(state);
 }

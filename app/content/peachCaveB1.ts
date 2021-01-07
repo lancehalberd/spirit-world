@@ -234,6 +234,10 @@ const a1x1: AreaDefinition = {
         {id: "1-1-rollingBall-1", status: "normal", type: "rollingBall", x: 464, y: 128},
         {id: "1-1-rollingBall-2", status: "normal", type: "rollingBall", x: 432, y: 128},
         {id: "1-1-rollingBall-3-1", status: "normal", type: "rollingBall", x: 400, y: 128},
+        {id: "1-1-clone-0", status: "normal", type: "chest", lootType: "clone", x: 128, y: 416},
+        {id: "1-1-bow-0", status: "normal", type: "chest", lootType: "bow", x: 176, y: 416},
+        {id: "1-1-staff-0", status: "normal", type: "chest", lootType: "staff", x: 176, y: 448},
+        {id: "1-1-invisibility-0", status: "normal", type: "chest", lootType: "invisibility", x: 128, y: 448},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},

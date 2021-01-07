@@ -1,10 +1,13 @@
-import { Direction, FrameAnimation, ObjectInstance, Tile } from 'app/types';
+import { Clone } from 'app/content/clone';
+import { Staff } from 'app/content/staff';
+
+import { Direction, FrameAnimation, ObjectInstance, ObjectStatus, Tile } from 'app/types';
 
 export type Action = 'attack' | 'roll' | 'knocked' | 'hurt' | 'dead' | 'grabbing' | 'carrying' | 'throwing' | 'getItem';
 export type ActiveTool = 'weapon' | 'bow' | 'staff' | 'clone' | 'invisibility';
 export type Equipment = 'cloudBoots' | 'ironBoots';
 export type PassiveTool = 'gloves'
-    | 'roll' | 'cloudSomersalt'
+    | 'roll'
     | 'charge' | 'nimbusCloud'
     | 'catEyes' | 'spiritSight' | 'trueSight'
     | 'astralProjection' | 'telekinesis'
@@ -50,6 +53,8 @@ export interface Actor {
     life: number,
     leftTool?: ActiveTool,
     rightTool?: ActiveTool,
+    element?: Element,
+    status: ObjectStatus,
 }
 
 export interface Hero extends Actor {
@@ -71,5 +76,10 @@ export interface Hero extends Actor {
     equipment: {[key in Equipment]: number},
     passiveTools: {[key in PassiveTool]: number},
     elements: {[key in Element]: number},
+    clones: Clone[],
+    activeClone?: Clone,
+    activeStaff?: Staff,
+    invisible: boolean,
+    invisibilityCost: number,
 }
 

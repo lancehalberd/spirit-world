@@ -1,7 +1,7 @@
 import { damageActor } from 'app/updateActor';
 import { isPixelInShortRect } from 'app/utils/index';
 
-import { Actor, Direction, GameState, ObjectInstance } from 'app/types';
+import { Actor, Direction, GameState, Hero, ObjectInstance } from 'app/types';
 
 export function moveActor(state: GameState, actor: Actor, dx: number, dy: number, push: boolean = false) {
     let sx = dx;
@@ -191,14 +191,14 @@ function moveActorInDirection(
     actor.y = ay;
     return true;
 }
-export function checkForFloorDamage(state: GameState, actor: Actor) {
+export function checkForFloorDamage(state: GameState, hero: Hero) {
     const palette = state.areaInstance.palette;
     const tileSize = palette.w;
 
-    let leftColumn = Math.floor((actor.x + 4) / tileSize);
-    let rightColumn = Math.floor((actor.x + actor.w - 5) / tileSize);
-    let topRow = Math.floor((actor.y + 4) / tileSize);
-    let bottomRow = Math.floor((actor.y + actor.h - 5) / tileSize);
+    let leftColumn = Math.floor((hero.x + 4) / tileSize);
+    let rightColumn = Math.floor((hero.x + hero.w - 5) / tileSize);
+    let topRow = Math.floor((hero.y + 4) / tileSize);
+    let bottomRow = Math.floor((hero.y + hero.h - 5) / tileSize);
 
     const behaviorGrid = state.areaInstance.behaviorGrid;
     for (let row = topRow; row <= bottomRow; row++) {
@@ -209,7 +209,7 @@ export function checkForFloorDamage(state: GameState, actor: Actor) {
                 continue;
             }
             if (behaviors.damage > 0) {
-                damageActor(state, actor, behaviors.damage);
+                damageActor(state, hero, behaviors.damage);
             }
         }
     }

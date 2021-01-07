@@ -3,11 +3,19 @@ Test at http://localhost:81/alttp/public/
 Bugs:
     Sometimes get stuck when moving diagonally across the transition from an object flush with a tile wall. Possibly a wiggling issue?
 
-    Fix leaving an area section and immediately returning doesn't reset objects
+    Leaving an area section and immediately returning doesn't reset objects
         - Fix tiles should also be reset when leaving an area section?
 
 
+Add activatable crystal:
+    Hitting all crystals in a room will trigger hiddenSwitch objects (closedSwitch for doors).
+    Crystals can have a timer after which they will de-activate (closing closedSwitch doors, but not hiding hiddenSwitch objects)
 
+    Have a puzzle for the clone tool where a crystal deactivates after only 1s but cannot reach the door unless you stand at the door and have the clone hit the switch.
+
+    Similarly a puzzle where two switches must be hit within 1 second to make a chest appear. This could use the clone or an arrow.
+
+    A puzzle where 4 switches need to be hit in 200ms, you can blow up the clone in the middle to activate all at once.
 
 Add ability to assign active tools to the X/Y buttons.
     -Display a colored box around the items that correspond to the color of the button on the controller as well as a letter.
@@ -50,6 +58,26 @@ Add example prologue area:
     - Peach of Immortality at the end
 
 Add connected areas + dungeons
+
+
+Additional Clone Tool Behavior:
+    Can pick up + throw clone, clone can pick up and throw the hero.
+        -> Trying to move while held by the clone
+    Holding the clone tool down allows controlling all clones at once.
+    Holding the passive button (as if to meditate) will detonate the current clone for AOE elemental damage.
+    Charging the clone 1 level adds elements to the clones weapon/tools/explosion.
+    Charging the clone 1 level without elements makes it invulnerable for 4 seconds.
+
+Additionl Invisibility Tool Behavior:
+    Charge to deal elemental damage on contact while invisible.
+    Can move through activatable crystals and some other obstacles.
+        * charge invisibility then dodge roll through a line of crystals to activate them quickly.
+
+Additional Staff Behavior:
+    Eventually Lvl 2 staff can be used to create the Staff Tower.
+    - The sides of the staff should function as a wall rather than open ground.
+    Charging the staff does a very large spin attack that knocks enemies away.
+        Lvl 2 charge is a screen wide attack the applies damage+element to all enemies.
 
 Add animation for breaking stone hitting the ground.
 
