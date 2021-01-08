@@ -1,5 +1,5 @@
 import {
-    Frame, GameState, LootType,
+    Frame, GameState, LootType, MagicElement,
     ShortRectangle,
 } from 'app/types';
 
@@ -118,7 +118,7 @@ export interface ObjectInstance {
     // The direction is the direction the player is facing.
     onGrab?: (state: GameState, direction: Direction) => void,
     // When the hero hits the object with a weapon or tool
-    onHit?: (state: GameState, direction: Direction) => void,
+    onHit?: (state: GameState, direction: Direction, element?: MagicElement) => void,
     // When the hero grabs an object and attempts to move.
     onPull?: (state: GameState, direction: Direction) => void,
     // When the hero walks into an object
@@ -128,7 +128,7 @@ export interface ObjectInstance {
     render?: (context: CanvasRenderingContext2D, state: GameState) => void,
 }
 
-export type ObjectStatus = 'normal' | 'gone' | 'hiddenSwitch' | 'hiddenEnemy';
+export type ObjectStatus = 'normal' | 'gone' | 'hiddenSwitch' | 'hiddenEnemy' | 'active';
 export interface BaseObjectDefinition {
     id: string,
     status: ObjectStatus,
@@ -145,6 +145,13 @@ export interface LootObjectDefinition extends BaseObjectDefinition {
     level?: number,
 }
 
+export interface CrystalSwitchDefinition extends BaseObjectDefinition {
+    type: 'crystalSwitch',
+    element: MagicElement,
+    // If this is set, this crystal will de-activate after this many milliseconds.
+    timer?: number,
+}
+
 export type SimpleObjectType = 'pushPull' | 'rollingBall' | 'tippable';
 
 export interface SimpleObjectDefinition extends BaseObjectDefinition {
@@ -158,5 +165,7 @@ export interface EnemyObjectDefinition extends BaseObjectDefinition {
     enemyType: EnemyType,
 }
 
-export type ObjectDefinition = SimpleObjectDefinition | LootObjectDefinition | EnemyObjectDefinition;
+export type ObjectDefinition = SimpleObjectDefinition | CrystalSwitchDefinition | LootObjectDefinition | EnemyObjectDefinition;
+
+export type ObjectType = ObjectDefinition['type'];
 

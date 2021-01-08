@@ -2,6 +2,7 @@ import _ from 'lodash';
 
 import { Enemy } from 'app/content/enemy';
 import { ChestObject, LootObject } from 'app/content/lootObject';
+import { CrystalSwitch } from 'app/content/crystalSwitch';
 import { PushPullObject } from 'app/content/pushPullObject';
 import { RollingBallObject } from 'app/content/rollingBallObject';
 import { TippableObject } from 'app/content/tippableObject';
@@ -23,6 +24,8 @@ export function createObjectInstance(state: GameState, object: ObjectDefinition)
         return new RollingBallObject(object);
     } else if (object.type === 'pushPull') {
         return new PushPullObject(object);
+    } else if (object.type === 'crystalSwitch') {
+        return new CrystalSwitch(object);
     }
 
     console.error('Unhandled object type', object.type, object);

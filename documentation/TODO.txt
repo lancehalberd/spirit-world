@@ -6,21 +6,16 @@ Bugs:
     Leaving an area section and immediately returning doesn't reset objects
         - Fix tiles should also be reset when leaving an area section?
 
-
-Add activatable crystal:
-    Hitting all crystals in a room will trigger hiddenSwitch objects (closedSwitch for doors).
-    Crystals can have a timer after which they will de-activate (closing closedSwitch doors, but not hiding hiddenSwitch objects)
-
-    Have a puzzle for the clone tool where a crystal deactivates after only 1s but cannot reach the door unless you stand at the door and have the clone hit the switch.
-
-    Similarly a puzzle where two switches must be hit within 1 second to make a chest appear. This could use the clone or an arrow.
-
-    A puzzle where 4 switches need to be hit in 200ms, you can blow up the clone in the middle to activate all at once.
+Add doors:
+    - status closedEnemy: close on entering a room (in case the player came through that way) and open when all enemies defeated.
+    - status closedSwitch: open based on switches:
+        - for crystals, open as long as all crystals are activated
+        - for floor switches, toggle status when the floor switch toggles
+            - For floor switches that toggle when pressure is removed, this requres leaving the switch pressed by placing an object/clone/staff on top of it.
 
 Add ability to assign active tools to the X/Y buttons.
     -Display a colored box around the items that correspond to the color of the button on the controller as well as a letter.
     -Track most recent input to control keyboard vs controller type
-
 
 Add ability to charge weapon
     Spin chakram around quickly in a circle twice (can move after throwing)
@@ -37,9 +32,12 @@ Allow selecting an element using the L/R triggers
     Add elemental crystal objects that are faded red/blue/yellow and become vibrant when hit by element
     When all crystals in a room are activated, hiddenSwitch elements appear.
 
+Add ability to charge tools.
+
 Add ability to charge carried objects
     Hold the passive button when picking up an object to charge
-    Charge level is limited to
+    Charge level is limited both by level of gloves/bracers and charge level.
+    Should add selected element to thrown object
 
 
 Add meditate ability
@@ -76,10 +74,16 @@ Additionl Invisibility Tool Behavior:
         * charge invisibility then dodge roll through a line of crystals to activate them quickly.
 
 Additional Staff Behavior:
+    Should damage enemies + knock them away
     Eventually Lvl 2 staff can be used to create the Staff Tower.
     - The sides of the staff should function as a wall rather than open ground.
     Charging the staff does a very large spin attack that knocks enemies away.
         Lvl 2 charge is a screen wide attack the applies damage+element to all enemies.
+
+Some puzzle ideas:
+    - Have a puzzle for the clone tool where a crystal deactivates after only 1s but cannot reach the door unless you stand at the door and have the clone hit the switch.
+    - Similarly a puzzle where two switches must be hit within 1 second to make a chest appear. This could use the clone or an arrow.
+    - A puzzle where 4 switches need to be hit in 200ms, you can blow up the clone in the middle to activate all at once.
 
 Add animation for breaking stone hitting the ground.
 

@@ -2,19 +2,16 @@ import _ from 'lodash';
 
 import { enterAreaGrid, palettes, setAreaSection } from 'app/content/areas';
 import { createObjectInstance } from 'app/content/objects';
-import { getEnemyProperties, onMouseDownEnemy, renderEnemyPreview } from 'app/development/enemyEditor';
 import { exportAreaGridToClipboard, importAreaGrid, serializeAreaGrid } from 'app/development/exportAreaGrid';
 import {
     deleteObject,
-    getLootProperties,
     getObjectFrame,
     getObjectProperties,
     getSelectProperties,
-    onMouseDownLoot, onMouseDownObject, onMouseDownSelect,
+    onMouseDownObject, onMouseDownSelect,
     onMouseMoveSelect,
-    renderLootPreview,
     renderObjectPreview,
-    simpleObjectTypes,
+    combinedObjectTypes,
 } from 'app/development/objectEditor';
 import { displayPropertyPanel, hidePropertyPanel, updateBrushCanvas } from 'app/development/propertyPanel';
 import { mainCanvas } from 'app/dom';
@@ -26,20 +23,25 @@ import { readFromFile, saveToFile } from 'app/utils/index';
 import { getMousePosition, isMouseDown } from 'app/utils/mouse';
 
 import {
-    EditorProperty, EnemyType, GameState,
-    LootType, ObjectDefinition, PropertyRow, SimpleObjectType, TileGrid,
+    EditorProperty,  EnemyType, GameState,
+    LootType, MagicElement,
+    ObjectDefinition, ObjectStatus, ObjectType,
+    PropertyRow, TileGrid,
 } from 'app/types';
 
-type EditorToolType = 'select' | 'brush' | 'chest' | 'loot' | 'enemy' | 'object';
+type EditorToolType = 'select' | 'brush' | 'object';
 export interface EditingState {
     tool: EditorToolType,
     isEditing: boolean,
     brush: TileGrid,
     selectedLayerIndex: number,
-    newEnemyType: EnemyType,
-    newLootType: LootType,
-    newObjectType: SimpleObjectType,
+    element?: MagicElement,
+    enemyType: EnemyType,
+    lootType: LootType,
+    objectStatus: ObjectStatus,
+    objectType: ObjectType,
     selectedObject?: ObjectDefinition,
+    timer: number,
     dragOffset: {x: number, y: number},
 }
 
@@ -48,10 +50,13 @@ export const editingState: EditingState = {
     isEditing: false,
     brush: null,
     selectedLayerIndex: 0,
-    newEnemyType: 'snake',
-    newLootType: 'peachOfImmortalityPiece',
-    newObjectType: simpleObjectTypes[0],
+    element: null,
+    enemyType: 'snake',
+    lootType: 'peachOfImmortalityPiece',
+    objectStatus: 'normal',
+    objectType: combinedObjectTypes[0],
     selectedObject: null,
+    timer: 0,
     dragOffset: {x: 0, y: 0},
 };
 window['editingState'] = editingState;
@@ -156,7 +161,7 @@ export function displayTileEditorPropertyPanel() {
     rows.push({
         name: 'tool',
         value: editingState.tool,
-        values: ['select', 'brush', 'chest', 'loot', 'enemy', 'object'],
+        values: ['select', 'brush', 'object'],
         onChange(tool: EditorToolType) {
             editingState.tool = tool;
             displayTileEditorPropertyPanel();
@@ -174,18 +179,11 @@ export function displayTileEditorPropertyPanel() {
                 }
             });
             break;
-        case 'chest':
-        case 'loot':
-            rows = [...rows, ...getLootProperties(state, editingState)];
-            break;
         case 'object':
             rows = [...rows, ...getObjectProperties(state, editingState)];
             break;
         case 'select':
             rows = [...rows, ...getSelectProperties(state, editingState)];
-            break;
-        case 'enemy':
-            rows = [...rows, ...getEnemyProperties(state, editingState)];
             break;
         default:
             break;
@@ -219,15 +217,8 @@ mainCanvas.addEventListener('mousedown', function () {
         case 'select':
             onMouseDownSelect(state, editingState, x, y);
             break;
-        case 'chest':
-        case 'loot':
-            onMouseDownLoot(state, editingState, x, y);
-            break;
         case 'object':
             onMouseDownObject(state, editingState, x, y);
-            break;
-        case 'enemy':
-            onMouseDownEnemy(state, editingState, x, y);
             break;
         case 'brush':
             drawBrush(x, y);
@@ -295,12 +286,6 @@ export function renderEditor(context: CanvasRenderingContext2D, state: GameState
                 (frame.content?.w || frame.w) + 2,
                 (frame.content?.h || frame.h) + 2
             );
-        }
-        if (editingState.tool === 'enemy') {
-            renderEnemyPreview(context, state, editingState, x, y);
-        }
-        if (editingState.tool === 'loot' || editingState.tool === 'chest') {
-            renderLootPreview(context, state, editingState, x, y);
         }
         if (editingState.tool === 'object') {
             renderObjectPreview(context, state, editingState, x, y);

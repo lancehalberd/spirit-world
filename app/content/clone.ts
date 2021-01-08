@@ -6,7 +6,7 @@ import { renderHero } from 'app/renderActor';
 
 import {
     Action, ActiveTool,
-    Direction, DrawPriority, Element, Equipment, Frame,
+    Direction, DrawPriority, MagicElement, Equipment, Frame,
     GameState, Hero, ObjectInstance, ObjectStatus, PassiveTool,
     Tile
 } from 'app/types';
@@ -15,7 +15,7 @@ export class Clone implements Hero, ObjectInstance {
     definition = null;
     drawPriority: DrawPriority = 'sprites';
     frame: Frame;
-    element: Element;
+    element: MagicElement;
     life: number;
     x: number;
     y: number;
@@ -41,7 +41,7 @@ export class Clone implements Hero, ObjectInstance {
     activeTools: {[key in ActiveTool]: number};
     equipment: {[key in Equipment]: number};
     passiveTools: {[key in PassiveTool]: number};
-    elements: {[key in Element]: number};
+    elements: {[key in MagicElement]: number};
     activeClone: Clone;
     clones: Clone[]
     stuckFrames: number = 0;

@@ -2,7 +2,7 @@ import { removeObjectFromArea } from 'app/content/areas';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { isPointOpen } from 'app/utils/field';
 
-import { Direction, Element, Frame, GameState, ObjectInstance, ObjectStatus, TileBehaviors } from 'app/types';
+import { Direction, MagicElement, Frame, GameState, ObjectInstance, ObjectStatus, TileBehaviors } from 'app/types';
 
 const tilesFrame = createAnimation('gfx/tiles/overworld.png', {w: 384, h: 640}).frames[0];
 export const normalFrame: Frame = {image: tilesFrame.image, x: 16 * 0, y: 16 * 35, w: 16, h: 16};
@@ -19,7 +19,7 @@ interface Props {
     y?: number,
     damage?: number,
     direction: Direction,
-    element: Element,
+    element: MagicElement,
     maxLength: number,
 }
 
@@ -35,7 +35,7 @@ export class Staff implements ObjectInstance {
     damage;
     status: ObjectStatus = 'normal';
     direction: Direction;
-    element: Element;
+    element: MagicElement;
     storedBehaviors: TileBehaviors[][];
     constructor({ x = 0, y = 0, damage = 1, direction, element, maxLength = 4 }: Props, state: GameState) {
         this.x = x;

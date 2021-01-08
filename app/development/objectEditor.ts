@@ -7,11 +7,11 @@ import { normalFrame } from 'app/content/rollingBallObject';
 import { standingFrame } from 'app/content/tippableObject';
 import { displayTileEditorPropertyPanel, EditingState } from 'app/development/tileEditor';
 import { getState } from 'app/state';
-import { isPointInShortRect } from 'app/utils/index';
+import { ifdefor, isPointInShortRect } from 'app/utils/index';
 
 import {
-    EnemyType, Frame, GameState, LootObjectDefinition,
-    LootType, ObjectDefinition, ObjectStatus, SimpleObjectType, PanelRows,
+    EnemyType, Frame, GameState,
+    LootType, MagicElement, ObjectDefinition, ObjectStatus, ObjectType, PanelRows,
 } from 'app/types';
 
 let allLootTypes: LootType[];
@@ -30,36 +30,171 @@ export function getLootTypes(): LootType[] {
     return allLootTypes;
 }
 
-export function getLootProperties(state: GameState, editingState: EditingState): PanelRows {
-    const rows: PanelRows = [];
-    rows.push({
-        name: 'loot',
-        value: editingState.newLootType,
-        values: getLootTypes(),
-        onChange(lootType: LootType) {
-            editingState.newLootType = lootType;
-        },
-    });
-    return rows;
+export const combinedObjectTypes: ObjectType[] = ['loot', 'chest', 'enemy', 'crystalSwitch', 'pushPull', 'rollingBall', 'tippable'];
+
+function createObjectDefinition(
+    state: GameState,
+    editingState: EditingState,
+    definition: Partial<ObjectDefinition>
+): ObjectDefinition {
+    const x = definition.x || 0;
+    const y = definition.y || 0;
+    switch (definition.type) {
+        case 'crystalSwitch':
+            return {
+                type: definition.type,
+                id: definition.id || uniqueId(state, 'crystalSwitch'),
+                element: definition.element || editingState.element,
+                status: definition.status || editingState.objectStatus,
+                // Need to use ifdefor here since 0 is a valid value for timer.
+                timer: ifdefor(definition.timer, editingState.timer),
+                x,
+                y,
+            };
+        case 'enemy':
+            const enemyType = definition.enemyType || editingState.enemyType;
+            return {
+                type: definition.type,
+                id: definition.id || uniqueId(state, enemyType),
+                enemyType,
+                status: 'normal',
+                x,
+                y,
+            };
+        case 'loot':
+        case 'chest':
+            const lootType = definition.lootType || editingState.lootType;
+            return {
+                type: definition.type,
+                id: definition.id || uniqueId(state, lootType),
+                lootType,
+                status: definition.status || editingState.objectStatus,
+                x,
+                y,
+            };
+        case 'pushPull':
+        case 'rollingBall':
+        case 'tippable':
+            return {
+                type: definition.type,
+                id: definition.id || uniqueId(state, definition.type),
+                status: definition.status || editingState.objectStatus,
+                x,
+                y,
+            };
+        default:
+            throw new Error('Unhandled object type, ' + definition['type']);
+    }
+    return null;
 }
 
-export const simpleObjectTypes: SimpleObjectType[] = ['pushPull', 'rollingBall', 'tippable'];
-
 export function getObjectProperties(state: GameState, editingState: EditingState): PanelRows {
+    return getObjectTypeProperties(state, editingState, {type: editingState.objectType} as ObjectDefinition);
+}
+
+export function getObjectTypeProperties(state: GameState, editingState: EditingState, object: ObjectDefinition): PanelRows {
     const rows: PanelRows = [];
     rows.push({
         name: 'type',
-        value: editingState.newObjectType,
-        values: simpleObjectTypes,
-        onChange(objectType: SimpleObjectType) {
-            editingState.newObjectType = objectType;
+        value: object.type || editingState.objectType,
+        values: combinedObjectTypes,
+        onChange(objectType: ObjectType) {
+            if (object.id) {
+                // Replace instances of the loot type in the id with the new loot type.
+                if (object.id.includes(object.type)) {
+                    updateObjectId(state, object, object.id.replace(object.type, objectType));
+                }
+                object.type = objectType;
+                updateObjectInstance(state, object);
+            } else {
+                editingState.objectType = objectType;
+            }
+            displayTileEditorPropertyPanel();
         },
     });
+    switch (object.type) {
+        case 'loot':
+        case 'chest':
+            rows.push({
+                name: 'lootType',
+                value: object.lootType || editingState.lootType,
+                values: getLootTypes(),
+                onChange(lootType: LootType) {
+                    if (object.id) {
+                        // Replace instances of the loot type in the id with the new loot type.
+                        if (object.id.includes(object.lootType)) {
+                            updateObjectId(state, object, object.id.replace(object.lootType, lootType));
+                        }
+                        object.lootType = lootType;
+                        updateObjectInstance(state, object);
+                    } else {
+                        editingState.lootType = lootType;
+                    }
+                },
+            });
+            rows.push({
+                name: 'status',
+                value: object.status || editingState.objectStatus,
+                values: ['normal', 'hiddenSwitch', 'hiddenEnemy'],
+                onChange(status: ObjectStatus) {
+                    if (object.id) {
+                        object.status = status;
+                        updateObjectInstance(state, object);
+                    } else {
+                        editingState.objectStatus = status;
+                    }
+                },
+            });
+            break;
+        case 'crystalSwitch':
+            rows.push({
+                name: 'element',
+                value: object.element || editingState.element || 'none',
+                values: ['none', 'fire', 'ice', 'lightning'],
+                onChange(value: MagicElement | 'none') {
+                    const element = value === 'none' ? null : value;
+                    if (object.id) {
+                        object.element = element;
+                        updateObjectInstance(state, object);
+                    } else {
+                        editingState.element = element;
+                    }
+                },
+            });
+            rows.push({
+                name: 'timer',
+                value: object.timer || editingState.timer,
+                onChange(timer: number) {
+                    if (object.id) {
+                        object.timer = timer;
+                        updateObjectInstance(state, object);
+                    } else {
+                        editingState.timer = timer;
+                    }
+                },
+            });
+            break;
+        case 'enemy':
+            rows.push({
+                name: 'enemy',
+                value: object.enemyType || editingState.enemyType,
+                values: ['snake'],
+                onChange(enemyType: EnemyType) {
+                    if (object.id) {
+                        object.enemyType = enemyType;
+                        updateObjectInstance(state, object);
+                    } else {
+                        editingState.enemyType = enemyType;
+                    }
+                },
+            });
+            break;
+    }
     return rows;
 }
 
 export function getSelectProperties(state: GameState, editingState: EditingState): PanelRows {
-    const rows: PanelRows = [];
+    let rows: PanelRows = [];
     if (editingState.selectedObject) {
         const selectedObject = editingState.selectedObject;
         rows.push({
@@ -69,93 +204,22 @@ export function getSelectProperties(state: GameState, editingState: EditingState
                 return updateObjectId(state, selectedObject, newId);
             },
         });
-        switch (editingState.selectedObject.type) {
-            case 'loot':
-            case 'chest':
-                const lootObjectDefinition = editingState.selectedObject;
-                rows.push({
-                    name: 'lootType',
-                    value: lootObjectDefinition.lootType,
-                    values: getLootTypes(),
-                    onChange(lootType: LootType) {
-                        // Replace instances of the loot type in the id with the new loot type.
-                        if (lootObjectDefinition.id.includes(lootObjectDefinition.lootType)) {
-                            updateObjectId(state, lootObjectDefinition, lootObjectDefinition.id.replace(lootObjectDefinition.lootType, lootType));
-                        }
-                        lootObjectDefinition.lootType = lootType;
-                        updateObjectInstance(state, lootObjectDefinition);
-                    },
-                });
-                rows.push({
-                    name: 'status',
-                    value: lootObjectDefinition.status || 'normal',
-                    values: ['normal', 'hiddenSwitch', 'hiddenEnemy'],
-                    onChange(status: ObjectStatus) {
-                        lootObjectDefinition.status = status;
-                        updateObjectInstance(state, lootObjectDefinition);
-                    },
-                });
-                break;
-            case 'pushPull':
-            case 'rollingBall':
-            case 'tippable':
-                const objectDefinition = editingState.selectedObject;
-                rows.push({
-                    name: 'type',
-                    value: objectDefinition.type,
-                    values: simpleObjectTypes,
-                    onChange(type: SimpleObjectType) {
-                        // Replace instances of the loot type in the id with the new loot type.
-                        if (objectDefinition.id.includes(objectDefinition.type)) {
-                            updateObjectId(state, objectDefinition, objectDefinition.id.replace(objectDefinition.type, type));
-                        }
-                        objectDefinition.type = type;
-                        updateObjectInstance(state, objectDefinition);
-                    },
-                });
-                break;
-            case 'enemy':
-                const enemyObjectDefinition = editingState.selectedObject;
-                rows.push({
-                    name: 'enemy',
-                    value: editingState.selectedObject.enemyType,
-                    values: ['snake'],
-                    onChange(enemyType: EnemyType) {
-                        enemyObjectDefinition.enemyType = enemyType;
-                        updateObjectInstance(state, enemyObjectDefinition);
-                    },
-                });
-                break;
-        }
+        rows = [...rows, ...getObjectTypeProperties(state, editingState, editingState.selectedObject)];
     }
     return rows;
 }
 
-export function onMouseDownLoot(state: GameState, editingState: EditingState, x: number, y: number): void {
-    const newObject: LootObjectDefinition = {
-        id: uniqueId(state, editingState.newLootType),
-        status: 'normal',
-        type: editingState.tool === 'loot' ? 'loot' : 'chest',
-        lootType: editingState.newLootType,
-        x: Math.round(x + state.camera.x),
-        y: Math.round(y + state.camera.y),
-    };
-    const frame = getObjectFrame(newObject);
-    newObject.x -= (frame.content?.w || frame.w) / 2;
-    newObject.y -= (frame.content?.h || frame.h) / 2;
-    fixObjectPosition(state, newObject);
-    state.areaInstance.definition.objects.push(newObject);
-    updateObjectInstance(state, newObject);
-}
-
 export function onMouseDownObject(state: GameState, editingState: EditingState, x: number, y: number): void {
-    const newObject: ObjectDefinition = {
-        id: uniqueId(state, editingState.newObjectType),
-        status: 'normal',
-        type: editingState.newObjectType,
-        x: Math.round(x + state.camera.x),
-        y: Math.round(y + state.camera.y),
-    };
+    const newObject: ObjectDefinition = createObjectDefinition(
+        state,
+        editingState,
+        {
+            type: editingState.objectType,
+            x: Math.round(x + state.camera.x),
+            y: Math.round(y + state.camera.y),
+        }
+    );
+
     const frame = getObjectFrame(newObject);
     newObject.x -= (frame.content?.w || frame.w) / 2;
     newObject.y -= (frame.content?.h || frame.h) / 2;
@@ -196,6 +260,7 @@ export function onMouseDownSelect(state: GameState, editingState: EditingState, 
 export function fixObjectPosition(state: GameState, object: ObjectDefinition): void {
     // These objects snap to the grid.
     if (object.type === 'chest'
+        || object.type === 'crystalSwitch'
         || object.type === 'pushPull'
         || object.type === 'rollingBall'
         || object.type === 'tippable'
@@ -244,7 +309,7 @@ export function getObjectFrame(object: ObjectDefinition): Frame {
     if (object.type === 'chest') {
         return chestClosedFrame;
     }
-    if (object.type === 'pushPull' || object.type === 'rollingBall') {
+    if (object.type === 'crystalSwitch' || object.type === 'pushPull' || object.type === 'rollingBall') {
         return normalFrame;
     }
     if (object.type === 'tippable') {
@@ -285,28 +350,6 @@ export function deleteObject(state: GameState, object: ObjectDefinition): void {
     }
 }
 
-export function renderLootPreview(
-    context: CanvasRenderingContext2D,
-    state: GameState,
-    editingState: EditingState,
-    x: number,
-    y: number
-): void {
-    const definition: ObjectDefinition = {
-        id: uniqueId(state, editingState.newLootType),
-        status: 'normal',
-        type: editingState.tool === 'loot' ? 'loot' : 'chest',
-        lootType: editingState.newLootType,
-        x: Math.round(x + state.camera.x),
-        y: Math.round(y + state.camera.y),
-    };
-    const frame = getObjectFrame(definition);
-    definition.x -= (frame.content?.w || frame.w) / 2;
-    definition.y -= (frame.content?.h || frame.h) / 2;
-    fixObjectPosition(state, definition);
-    createObjectInstance(state, definition).render(context, state);
-}
-
 export function renderObjectPreview(
     context: CanvasRenderingContext2D,
     state: GameState,
@@ -314,13 +357,13 @@ export function renderObjectPreview(
     x: number,
     y: number
 ): void {
-    const definition: ObjectDefinition = {
-        id: uniqueId(state, editingState.newLootType),
+    const definition: ObjectDefinition = createObjectDefinition(state, editingState, {
+        id: uniqueId(state, editingState.objectType),
         status: 'normal',
-        type: editingState.newObjectType,
+        type: editingState.objectType,
         x: Math.round(x + state.camera.x),
         y: Math.round(y + state.camera.y),
-    };
+    });
     const frame = getObjectFrame(definition);
     definition.x -= (frame.content?.w || frame.w) / 2;
     definition.y -= (frame.content?.h || frame.h) / 2;

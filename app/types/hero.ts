@@ -13,11 +13,11 @@ export type PassiveTool = 'gloves'
     | 'astralProjection' | 'telekinesis'
     | 'ironSkin' | 'goldMail' | 'phoenixCrown'
     | 'waterBlessing' | 'fireBlessing';
-export type Element = 'fire' | 'ice' | 'lightning';
+export type MagicElement = 'fire' | 'ice' | 'lightning';
 export type Collectible = 'peachOfImmortality' | 'peachOfImmortalityPiece';
 export type CommonLoot = 'money' | 'arrows' | 'peach';
 
-export type LootType = ActiveTool | Equipment | PassiveTool | Element | Collectible | CommonLoot | 'unknown';
+export type LootType = ActiveTool | Equipment | PassiveTool | MagicElement | Collectible | CommonLoot | 'unknown';
 
 
 type AnimationSet = {
@@ -53,7 +53,7 @@ export interface Actor {
     life: number,
     leftTool?: ActiveTool,
     rightTool?: ActiveTool,
-    element?: Element,
+    element?: MagicElement,
     status: ObjectStatus,
 }
 
@@ -75,7 +75,7 @@ export interface Hero extends Actor {
     activeTools: {[key in ActiveTool]: number},
     equipment: {[key in Equipment]: number},
     passiveTools: {[key in PassiveTool]: number},
-    elements: {[key in Element]: number},
+    elements: {[key in MagicElement]: number},
     clones: Clone[],
     activeClone?: Clone,
     activeStaff?: Staff,
