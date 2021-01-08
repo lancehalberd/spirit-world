@@ -49,12 +49,12 @@ export function update() {
                     state.menuIndex = (state.menuIndex + selectableTools.length - 1) % selectableTools.length;
                 } else if (isKeyDown(GAME_KEY.RIGHT, KEY_THRESHOLD)) {
                     state.menuIndex = (state.menuIndex + 1) % selectableTools.length;
-                } else if (isKeyDown(GAME_KEY.LEFT_TOOL)) {
+                } else if (isKeyDown(GAME_KEY.LEFT_TOOL, KEY_THRESHOLD)) {
                     if (state.hero.rightTool === selectedTool) {
                         state.hero.rightTool = state.hero.leftTool;
                     }
                     state.hero.leftTool = selectedTool;
-                } else if (isKeyDown(GAME_KEY.RIGHT_TOOL)) {
+                } else if (isKeyDown(GAME_KEY.RIGHT_TOOL, KEY_THRESHOLD)) {
                     if (state.hero.leftTool === selectedTool) {
                         state.hero.leftTool = state.hero.rightTool;
                     }

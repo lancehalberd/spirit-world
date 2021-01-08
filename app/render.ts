@@ -61,9 +61,8 @@ export function render() {
         return;
     }
     state.lastTimeRendered = state.time;
-    if (!state.paused) {
-        renderField(context, state);
-    } else {
+    renderField(context, state);
+    if (state.paused) {
         renderMenu(context, state);
     }
     // Draw the HUD onto the field.

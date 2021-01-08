@@ -61,7 +61,7 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
 
     if (selectableItemFrames.length) {
         state.menuIndex = state.menuIndex % selectableItemFrames.length;
-        const frame = pad(selectableItemFrames[state.menuIndex], 1.5);
+        const frame = pad(selectableItemFrames[state.menuIndex], 3.5);
         context.strokeStyle = 'white';
         context.beginPath();
         context.rect(frame.x, frame.y, frame.w, frame.h);

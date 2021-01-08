@@ -8,10 +8,7 @@ Bugs:
     Leaving an area section and immediately returning doesn't reset objects
         - Fix tiles should also be reset when leaving an area section?
 
-Improve Tool Selection:
-    -Track most recent input to control keyboard vs controller type
-    - Color around the selection + HUD indicator should match the color of the controller button (blue + yellow for X-Box)
-    - Display a letter attached to the selection based on the button/keyboard key.
+    Fix player isn't tracking smoothly when dragging push pull objects.
 
 Add doors:
     - status closedEnemy: close on entering a room (in case the player came through that way) and open when all enemies defeated.
@@ -62,6 +59,10 @@ Add connected areas + dungeons
 
 Support 64x64 super tiles for world map. Or maybe just 48x48.
 
+Improve Tool Selection:
+    -Track most recent input to control keyboard vs controller type
+    - Color around the selection + HUD indicator should match the color of the controller button (blue + yellow for X-Box)
+    - Display a letter attached to the selection based on the button/keyboard key.
 
 Additional Clone Tool Behavior:
     Can pick up + throw clone, clone can pick up and throw the hero.
