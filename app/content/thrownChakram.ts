@@ -60,7 +60,6 @@ export class ThrownChakram implements ObjectInstance {
     }
     remove(state: GameState) {
         state.areaInstance.objects.splice(state.areaInstance.objects.indexOf(this), 1);
-        state.hero.chakrams++;
     }
     update(state: GameState) {
         // Chakram returns to the hero if the clone it was thrown from no longer exists.
@@ -91,7 +90,7 @@ export class ThrownChakram implements ObjectInstance {
             }
         }
         for (const object of state.areaInstance.objects) {
-            if (object.status !== 'normal') {
+            if (object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
                 continue;
             }
             if (object instanceof Enemy) {

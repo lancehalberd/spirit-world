@@ -42,6 +42,9 @@ export interface EditingState {
     objectStatus: ObjectStatus,
     objectType: ObjectType,
     selectedObject?: ObjectDefinition,
+    showAreaProperties: boolean,
+    showFieldProperties: boolean,
+    showInventoryProperties: boolean,
     timer: number,
     dragOffset: {x: number, y: number},
 }
@@ -57,6 +60,9 @@ export const editingState: EditingState = {
     objectStatus: 'normal',
     objectType: combinedObjectTypes[0],
     selectedObject: null,
+    showAreaProperties: false,
+    showFieldProperties: true,
+    showInventoryProperties: false,
     timer: 0,
     dragOffset: {x: 0, y: 0},
 };
@@ -117,77 +123,163 @@ export function displayTileEditorPropertyPanel() {
     const layer = area.layers[editingState.selectedLayerIndex];
     const palette = palettes[layer.grid.palette];
     let rows: (EditorProperty<any> | PropertyRow | string)[] = [];
-    rows.push('Area');
-    rows.push([{
-        name: 'Export to Clipboard',
-        onClick() {
-            exportAreaGridToClipboard(getState().areaGrid);
-        },
-    }, {
-        name: 'Export to File',
-        onClick() {
-            saveToFile(serializeAreaGrid(getState().areaGrid), `map.ts`, 'text/javascript');
-        },
-    }]);
-    rows.push([{
-        name: 'Import from Clipboard',
-        onClick() {
-            navigator.clipboard.readText().then(contents => enterAreaGrid(getState(), importAreaGrid(contents)));
-        },
-    }, {
-        name: 'Import from File',
-        onClick() {
-            readFromFile().then(contents => enterAreaGrid(getState(), importAreaGrid(contents)));
-        },
-    }]);
     rows.push({
-        name: 'sections',
-        value: 'Change Layout',
-        values: ['Change Layout', ...Object.keys(sectionLayouts)],
-        onChange(sectionType: string) {
-            state.areaInstance.definition.sections = sectionLayouts[sectionType];
-            setAreaSection(state, state.hero.d);
-            return 'Change Layout';
-        }
-    });
-    rows.push({
-        name: 'dark',
-        value: !!state.areaInstance.definition.dark,
-        onChange(dark: boolean) {
-            state.areaInstance.definition.dark = dark;
-        }
-    });
-    rows.push('-');
-    rows.push('Editing Tools');
-    rows.push({
-        name: 'tool',
-        value: editingState.tool,
-        values: ['select', 'brush', 'object'],
-        onChange(tool: EditorToolType) {
-            editingState.tool = tool;
+        name: editingState.showAreaProperties ? 'Area -' : 'Area +',
+        onClick() {
+            editingState.showAreaProperties = !editingState.showAreaProperties;
             displayTileEditorPropertyPanel();
         },
     });
-    switch (editingState.tool) {
-        case 'brush':
-            rows.push({
-                name: 'brush',
-                value: editingState.brush,
-                palette,
-                onChange(tiles: TileGrid) {
-                    editingState.brush = tiles;
-                    updateBrushCanvas(editingState.brush);
-                }
+    if (editingState.showAreaProperties) {
+        rows.push([{
+            name: 'Export to Clipboard',
+            onClick() {
+                exportAreaGridToClipboard(getState().areaGrid);
+            },
+        }, {
+            name: 'Export to File',
+            onClick() {
+                saveToFile(serializeAreaGrid(getState().areaGrid), `map.ts`, 'text/javascript');
+            },
+        }]);
+        rows.push([{
+            name: 'Import from Clipboard',
+            onClick() {
+                navigator.clipboard.readText().then(contents => enterAreaGrid(getState(), importAreaGrid(contents)));
+            },
+        }, {
+            name: 'Import from File',
+            onClick() {
+                readFromFile().then(contents => enterAreaGrid(getState(), importAreaGrid(contents)));
+            },
+        }]);
+        rows.push({
+            name: 'sections',
+            value: 'Change Layout',
+            values: ['Change Layout', ...Object.keys(sectionLayouts)],
+            onChange(sectionType: string) {
+                state.areaInstance.definition.sections = sectionLayouts[sectionType];
+                setAreaSection(state, state.hero.d);
+                return 'Change Layout';
+            }
+        });
+        rows.push({
+            name: 'dark',
+            value: !!state.areaInstance.definition.dark,
+            onChange(dark: boolean) {
+                state.areaInstance.definition.dark = dark;
+            }
+        });
+    }
+    rows.push(' ');
+    rows.push(' ');
+    rows.push(' ');
+    rows.push({
+        name: editingState.showFieldProperties ? 'Field -' : 'Field +',
+        onClick() {
+            editingState.showFieldProperties = !editingState.showFieldProperties;
+            displayTileEditorPropertyPanel();
+        },
+    });
+    if (editingState.showFieldProperties) {
+        rows.push({
+            name: 'tool',
+            value: editingState.tool,
+            values: ['select', 'brush', 'object'],
+            onChange(tool: EditorToolType) {
+                editingState.tool = tool;
+                displayTileEditorPropertyPanel();
+            },
+        });
+        switch (editingState.tool) {
+            case 'brush':
+                rows.push({
+                    name: 'brush',
+                    value: editingState.brush,
+                    palette,
+                    onChange(tiles: TileGrid) {
+                        editingState.brush = tiles;
+                        updateBrushCanvas(editingState.brush);
+                    }
+                });
+                break;
+            case 'object':
+                rows = [...rows, ...getObjectProperties(state, editingState)];
+                break;
+            case 'select':
+                rows = [...rows, ...getSelectProperties(state, editingState)];
+                break;
+            default:
+                break;
+        }
+    }
+    rows.push(' ');
+    rows.push(' ');
+    rows.push(' ');
+    rows.push({
+        name: editingState.showInventoryProperties ? 'Inventory -' : 'Inventory +',
+        onClick() {
+            editingState.showInventoryProperties = !editingState.showInventoryProperties;
+            displayTileEditorPropertyPanel();
+        },
+    });
+    if (editingState.showInventoryProperties) {
+        rows.push([{
+            name: 'life',
+            value: state.hero.life || 1,
+            onChange(value: number) {
+                state.hero.life = value >= 1 ? value : 1;
+                return state.hero.life;
+            },
+        }, {
+            name: '/',
+            value: state.hero.maxLife || 1,
+            onChange(value: number) {
+                state.hero.maxLife = value >= 1 ? value : 1;
+                return state.hero.maxLife;
+            },
+        }]);
+        rows.push([{
+            name: 'magic',
+            value: state.hero.maxMagic || 1,
+            onChange(value: number) {
+                state.hero.maxMagic = value >= 1 ? value : 1;
+                return state.hero.maxMagic;
+            },
+        }, {
+            name: 'regen',
+            value: state.hero.magicRegen || 1,
+            onChange(value: number) {
+                state.hero.magicRegen = value >= 1 ? value : 1;
+                return state.hero.magicRegen;
+            },
+        }]);
+        let row: PropertyRow = [];
+        function addTool(array, key) {
+            row.push({
+                name: key,
+                value: array[key] || 0,
+                onChange(value: number) {
+                    array[key] = value;
+                },
             });
-            break;
-        case 'object':
-            rows = [...rows, ...getObjectProperties(state, editingState)];
-            break;
-        case 'select':
-            rows = [...rows, ...getSelectProperties(state, editingState)];
-            break;
-        default:
-            break;
+            if (row.length === 2) {
+                rows.push(row);
+                row = [];
+            }
+        }
+        for (let tool in state.hero.activeTools) {
+            addTool(state.hero.activeTools, tool);
+        }
+        for (let tool in state.hero.passiveTools) {
+            addTool(state.hero.passiveTools, tool);
+        }
+        for (let tool in state.hero.elements) {
+            addTool(state.hero.elements, tool);
+        }
+        for (let tool in state.hero.equipment) {
+            addTool(state.hero.equipment, tool);
+        }
     }
     displayPropertyPanel(rows);
 }
@@ -261,7 +353,7 @@ export function renderEditor(context: CanvasRenderingContext2D, state: GameState
         return;
     }
     // Unselect objects that are no longer in the current area.
-    if (!state.areaInstance.objects.find(o => o.definition === editingState.selectedObject)) {
+    if (editingState.selectedObject && !state.areaInstance.objects.find(o => o.definition === editingState.selectedObject)) {
         editingState.selectedObject = null;
         displayTileEditorPropertyPanel();
     }

@@ -53,7 +53,7 @@ export class ThrownObject implements ObjectInstance {
         this.vz -= 0.5;
         const hitbox = this.getHitbox(state);
         for (const object of state.areaInstance.objects) {
-            if (object.status !== 'normal') {
+            if (object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
                 continue;
             }
             if (object instanceof Enemy) {

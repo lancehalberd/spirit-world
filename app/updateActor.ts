@@ -110,7 +110,6 @@ export function updateHero(this: void, state: GameState) {
         movementSpeed = 1;
         hero.actionFrame++;
         if (hero.actionFrame === 1) {
-            state.hero.chakrams--;
             const m = Math.sqrt(hero.actionDx * hero.actionDx + hero.actionDy * hero.actionDy);
             const chakram = new ThrownChakram({
                 x: hero.x + 3,
@@ -122,7 +121,7 @@ export function updateHero(this: void, state: GameState) {
             });
             state.areaInstance.objects.push(chakram);
         }
-        if (hero.actionFrame > 10) {
+        if (hero.actionFrame > 2) {
             hero.action = null;
         }
     } else if (hero.action === 'roll') {
@@ -155,12 +154,15 @@ export function updateHero(this: void, state: GameState) {
         moveActor(state, hero, dx, dy, true);
     }
     if (!hero.action && !hero.pickUpTile && hero.activeTools.weapon > 0 &&
-        state.hero.chakrams > 0 && isKeyDown(GAME_KEY.WEAPON, KEY_THRESHOLD)
+        isKeyDown(GAME_KEY.WEAPON, KEY_THRESHOLD)
     ) {
-        hero.action = 'attack';
-        hero.actionDx = dx;
-        hero.actionDy = dy;
-        hero.actionFrame = 0;
+        const thrownChakrams = state.areaInstance.objects.filter(o => o instanceof ThrownChakram);
+        if (state.hero.activeTools.weapon - thrownChakrams.length > 0) {
+            hero.action = 'attack';
+            hero.actionDx = dx;
+            hero.actionDy = dy;
+            hero.actionFrame = 0;
+        }
     }
 
     if (hero.toolCooldown > 0) {

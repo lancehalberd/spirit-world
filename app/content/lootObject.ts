@@ -58,7 +58,7 @@ export class LootObject implements ObjectInstance {
         this.status = definition.status || 'normal';
     }
     update(state: GameState) {
-        if (this.status !== 'normal') {
+        if (this.status === 'hiddenEnemy' || this.status === 'hiddenSwitch') {
             return;
         }
         if (state.savedState.collectedItems[this.definition.id]) {
@@ -75,7 +75,7 @@ export class LootObject implements ObjectInstance {
         }
     }
     render(context, state: GameState) {
-        if (this.status !== 'normal') {
+        if (this.status === 'hiddenEnemy' || this.status === 'hiddenSwitch') {
             return;
         }
         if (this.definition.id !== 'drop' && state.savedState.collectedItems[this.definition.id]) {
@@ -133,12 +133,12 @@ export class ChestObject implements ObjectInstance {
         }
     }
     update(state: GameState) {
-        if (this.status !== 'normal') {
+        if (this.status === 'hiddenEnemy' || this.status === 'hiddenSwitch') {
             return;
         }
     }
     render(context, state: GameState) {
-        if (this.status !== 'normal') {
+        if (this.status === 'hiddenEnemy' || this.status === 'hiddenSwitch') {
             return;
         }
         if (state.savedState.collectedItems[this.definition.id]) {
@@ -213,9 +213,5 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: Ch
             state.hero.maxLife++;
             state.hero.life = state.hero.maxLife;
         }
-    },
-    weapon: (state: GameState, loot: ChestObject | LootObject) => {
-        state.hero.activeTools.weapon++;
-        state.hero.chakrams++;
     },
 }

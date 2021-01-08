@@ -25,7 +25,6 @@ function getDefaultHeroState(): Hero {
         magicRegen: 4,
         // inventory
         money: 0,
-        chakrams: 0,
         arrows: 0,
         peachQuarters: 0,
         spiritTokens: 0,

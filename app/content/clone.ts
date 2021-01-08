@@ -28,7 +28,6 @@ export class Clone implements Hero, ObjectInstance {
     w: number;
     h: number;
     d: Direction;
-    chakrams: number;
     arrows: number;
     peachQuarters: number;
     magic: number;

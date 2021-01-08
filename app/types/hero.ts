@@ -67,7 +67,6 @@ export interface Hero extends Actor {
     magicRegen: number,
     // inventory
     money: number,
-    chakrams: number,
     arrows: number,
     peachQuarters: number,
     spiritTokens: number,

@@ -28,7 +28,7 @@ export function isPointOpen(state: GameState, {x, y}: {x: number, y: number}): b
         return false;
     }
     for (const object of state.areaInstance.objects) {
-        if (object.status !== 'normal') {
+        if (object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
             continue;
         }
         if (object.getHitbox && object.behaviors?.solid) {
