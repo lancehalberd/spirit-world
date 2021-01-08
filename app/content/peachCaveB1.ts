@@ -344,7 +344,7 @@ const a1x2: AreaDefinition = {
         {id: "2-1-snake-2", status: "normal", type: "enemy", enemyType: "snake", x: 190, y: 191},
         {id: "2-1-snake-3", status: "normal", type: "enemy", enemyType: "snake", x: 190, y: 47},
         {type: "chest", id: "2-1-staff-0", lootType: "staff", status: "hiddenSwitch", x: 96, y: 416},
-        {type: "crystalSwitch", id: "2-1-crystalSwitch-0", element: null, status: "normal", timer: 0, x: 16, y: 272},
+        {type: "crystalSwitch", id: "2-1-crystalSwitch-0", element: null, status: "normal", timer: 1000, x: 16, y: 272},
         {type: "crystalSwitch", id: "2-1-crystalSwitch-1", element: null, status: "normal", timer: 1000, x: 224, y: 272},
         {type: "chest", id: "2-1-clone-0", lootType: "clone", status: "normal", x: 144, y: 416},
     ],

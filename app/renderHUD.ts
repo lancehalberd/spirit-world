@@ -19,7 +19,7 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
     }
     context.fillStyle = 'black';
     context.fillRect(5, 16, Math.floor(state.hero.maxMagic), 4);
-    context.fillStyle = 'blue';
+    context.fillStyle = 'lightblue';
     context.fillRect(5, 16, Math.floor(state.hero.magic), 4);
 
     if (state.hero.leftTool) {

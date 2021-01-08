@@ -3,6 +3,8 @@ Test at http://localhost:81/alttp/public/
 Bugs:
     Sometimes get stuck when moving diagonally across the transition from an object flush with a tile wall. Possibly a wiggling issue?
 
+    Why aren't snakes at the bottom of bow room rendered until the transion finishes?
+
     Leaving an area section and immediately returning doesn't reset objects
         - Fix tiles should also be reset when leaving an area section?
 
