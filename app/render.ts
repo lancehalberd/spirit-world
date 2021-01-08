@@ -153,7 +153,7 @@ export function renderAreaObjectsAfterHero(context: CanvasRenderingContext2D, st
         return;
     }
     context.save();
-        context.translate(-state.camera.x - area.cameraOffset.x, -state.camera.y - area.cameraOffset.y);
+        context.translate(-state.camera.x + area.cameraOffset.x, -state.camera.y + area.cameraOffset.y);
         for (const object of area.objects) {
             if (!object.drawPriority ||
                 object.drawPriority === 'foreground' ||
