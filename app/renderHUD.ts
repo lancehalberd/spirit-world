@@ -1,6 +1,7 @@
 import { lootFrames } from 'app/content/lootObject';
-import { CANVAS_WIDTH } from 'app/gameConstants';
+import { CANVAS_WIDTH, LEFT_TOOL_COLOR, RIGHT_TOOL_COLOR } from 'app/gameConstants';
 import { drawFrame } from 'app/utils/animations';
+import { fillRect, pad } from 'app/utils/index';
 
 import { GameState } from 'app/types';
 
@@ -23,10 +24,14 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
 
     if (state.hero.leftTool) {
         const frame = lootFrames[state.hero.leftTool] || lootFrames.unknown;
-        drawFrame(context, frame, {...frame, x: CANVAS_WIDTH - 40, y: 4})
+        const target = {...frame, x: CANVAS_WIDTH - 40, y: 4};
+        fillRect(context, pad(target, 2), LEFT_TOOL_COLOR);
+        drawFrame(context, frame, target)
     }
     if (state.hero.rightTool) {
         const frame = lootFrames[state.hero.rightTool] || lootFrames.unknown;
-        drawFrame(context, frame, {...frame, x: CANVAS_WIDTH - 20, y: 4});
+        const target = {...frame, x: CANVAS_WIDTH - 20, y: 4};
+        fillRect(context, pad(target, 2), RIGHT_TOOL_COLOR);
+        drawFrame(context, frame, target);
     }
 }

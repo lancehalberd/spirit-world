@@ -9,7 +9,7 @@ import { updateHero } from 'app/updateActor';
 import { updateCamera } from 'app/updateCamera';
 import { areAllImagesLoaded } from 'app/utils/images';
 
-import { GameState } from 'app/types';
+import { GameState, ActiveTool } from 'app/types';
 
 let isGameInitialized = false;
 export function update() {
@@ -29,6 +29,36 @@ export function update() {
         }
         if (!state.paused) {
             updateField(state);
+        } else {
+            const selectableTools: ActiveTool[] = [];
+            if (state.hero.activeTools.bow) {
+                selectableTools.push('bow');
+            }
+            if (state.hero.activeTools.staff) {
+                selectableTools.push('staff');
+            }
+            if (state.hero.activeTools.invisibility) {
+                selectableTools.push('invisibility');
+            }
+            if (state.hero.activeTools.clone) {
+                selectableTools.push('clone');
+            }
+            const selectedTool = selectableTools[state.menuIndex];
+            if (isKeyDown(GAME_KEY.LEFT, KEY_THRESHOLD)) {
+                state.menuIndex = (state.menuIndex + selectableTools.length - 1) % selectableTools.length;
+            } else if (isKeyDown(GAME_KEY.RIGHT, KEY_THRESHOLD)) {
+                state.menuIndex = (state.menuIndex + 1) % selectableTools.length;
+            } else if (isKeyDown(GAME_KEY.LEFT_TOOL)) {
+                if (state.hero.rightTool === selectedTool) {
+                    state.hero.rightTool = state.hero.leftTool;
+                }
+                state.hero.leftTool = selectedTool;
+            } else if (isKeyDown(GAME_KEY.RIGHT_TOOL)) {
+                if (state.hero.leftTool === selectedTool) {
+                    state.hero.leftTool = state.hero.rightTool;
+                }
+                state.hero.rightTool = selectedTool;
+            }
         }
         // Do this after all key checks, since doing it before we cause the key
         // to appear not pressed if there is a release threshold assigned.

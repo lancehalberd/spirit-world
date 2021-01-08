@@ -6,16 +6,17 @@ Bugs:
     Leaving an area section and immediately returning doesn't reset objects
         - Fix tiles should also be reset when leaving an area section?
 
+Improve Tool Selection:
+    -Track most recent input to control keyboard vs controller type
+    - Color around the selection + HUD indicator should match the color of the controller button (blue + yellow for X-Box)
+    - Display a letter attached to the selection based on the button/keyboard key.
+
 Add doors:
     - status closedEnemy: close on entering a room (in case the player came through that way) and open when all enemies defeated.
     - status closedSwitch: open based on switches:
         - for crystals, open as long as all crystals are activated
         - for floor switches, toggle status when the floor switch toggles
             - For floor switches that toggle when pressure is removed, this requres leaving the switch pressed by placing an object/clone/staff on top of it.
-
-Add ability to assign active tools to the X/Y buttons.
-    -Display a colored box around the items that correspond to the color of the button on the controller as well as a letter.
-    -Track most recent input to control keyboard vs controller type
 
 Add ability to charge weapon
     Spin chakram around quickly in a circle twice (can move after throwing)

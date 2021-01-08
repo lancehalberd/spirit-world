@@ -25,13 +25,13 @@ function getDefaultHeroState(): Hero {
         magicRegen: 4,
         // inventory
         money: 0,
-        chakrams: 1,
+        chakrams: 0,
         arrows: 0,
         peachQuarters: 0,
         spiritTokens: 0,
         toolCooldown: 0,
         activeTools: {
-            weapon: 1,
+            weapon: 0,
             bow: 0,
             staff: 0,
             clone: 0,
@@ -81,6 +81,7 @@ function getDefaultState(): GameState {
         areaGrid: testWorld,
         areaGridCoords: {x: 1, y: 1},
         paused: false,
+        menuIndex: 0,
     };
 }
 

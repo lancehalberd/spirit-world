@@ -66,6 +66,8 @@ export function render() {
     } else {
         renderMenu(context, state);
     }
+    // Draw the HUD onto the field.
+    renderHUD(context, state);
 }
 
 export function renderField(context: CanvasRenderingContext2D, state: GameState): void {
@@ -110,9 +112,6 @@ export function renderField(context: CanvasRenderingContext2D, state: GameState)
             );
         context.restore();
     }
-
-    // Draw the HUD onto the field.
-    renderHUD(context, state);
 }
 
 export function renderAreaBackground(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance): void {

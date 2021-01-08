@@ -18,4 +18,5 @@ export interface GameState {
     areaGrid: AreaGrid,
     areaGridCoords: {x: number, y: number},
     paused: boolean,
+    menuIndex: number,
 }

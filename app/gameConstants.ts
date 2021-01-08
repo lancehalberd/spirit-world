@@ -12,3 +12,6 @@ export const DOM_WIDTH = CANVAS_WIDTH * CANVAS_SCALE;
 export const DOM_HEIGHT = CANVAS_HEIGHT * CANVAS_SCALE;
 
 export const KEY_THRESHOLD = FRAME_LENGTH;
+
+export const LEFT_TOOL_COLOR = 'blue';
+export const RIGHT_TOOL_COLOR = 'yellow';
