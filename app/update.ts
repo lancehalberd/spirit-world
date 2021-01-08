@@ -43,21 +43,23 @@ export function update() {
             if (state.hero.activeTools.clone) {
                 selectableTools.push('clone');
             }
-            const selectedTool = selectableTools[state.menuIndex];
-            if (isKeyDown(GAME_KEY.LEFT, KEY_THRESHOLD)) {
-                state.menuIndex = (state.menuIndex + selectableTools.length - 1) % selectableTools.length;
-            } else if (isKeyDown(GAME_KEY.RIGHT, KEY_THRESHOLD)) {
-                state.menuIndex = (state.menuIndex + 1) % selectableTools.length;
-            } else if (isKeyDown(GAME_KEY.LEFT_TOOL)) {
-                if (state.hero.rightTool === selectedTool) {
-                    state.hero.rightTool = state.hero.leftTool;
+            if(selectableTools.length) {
+                const selectedTool = selectableTools[state.menuIndex];
+                if (isKeyDown(GAME_KEY.LEFT, KEY_THRESHOLD)) {
+                    state.menuIndex = (state.menuIndex + selectableTools.length - 1) % selectableTools.length;
+                } else if (isKeyDown(GAME_KEY.RIGHT, KEY_THRESHOLD)) {
+                    state.menuIndex = (state.menuIndex + 1) % selectableTools.length;
+                } else if (isKeyDown(GAME_KEY.LEFT_TOOL)) {
+                    if (state.hero.rightTool === selectedTool) {
+                        state.hero.rightTool = state.hero.leftTool;
+                    }
+                    state.hero.leftTool = selectedTool;
+                } else if (isKeyDown(GAME_KEY.RIGHT_TOOL)) {
+                    if (state.hero.leftTool === selectedTool) {
+                        state.hero.leftTool = state.hero.rightTool;
+                    }
+                    state.hero.rightTool = selectedTool;
                 }
-                state.hero.leftTool = selectedTool;
-            } else if (isKeyDown(GAME_KEY.RIGHT_TOOL)) {
-                if (state.hero.leftTool === selectedTool) {
-                    state.hero.leftTool = state.hero.rightTool;
-                }
-                state.hero.rightTool = selectedTool;
             }
         }
         // Do this after all key checks, since doing it before we cause the key

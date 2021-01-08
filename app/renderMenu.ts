@@ -52,13 +52,21 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
     if (state.hero.activeTools.clone) {
         renderSelectableTool('clone');
     }
-    state.menuIndex = state.menuIndex % selectableItemFrames.length;
+    x += 60;
 
-    const frame = pad(selectableItemFrames[state.menuIndex], 1.5);
-    context.strokeStyle = 'white';
-    context.beginPath();
-    context.rect(frame.x, frame.y, frame.w, frame.h);
-    context.stroke();
+    if (state.hero.activeTools.weapon) {
+        const frame = lootFrames.weapon || lootFrames.unknown;
+        drawFrame(context, frame, {...frame, x: (x + 8 - frame.w / 2), y: (y + 8 - frame.h / 2)});
+    }
+
+    if (selectableItemFrames.length) {
+        state.menuIndex = state.menuIndex % selectableItemFrames.length;
+        const frame = pad(selectableItemFrames[state.menuIndex], 1.5);
+        context.strokeStyle = 'white';
+        context.beginPath();
+        context.rect(frame.x, frame.y, frame.w, frame.h);
+        context.stroke();
+    }
 
     x = r.x, y += 30;
     context.textBaseline = 'middle';
