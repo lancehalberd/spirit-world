@@ -69,6 +69,10 @@ export function render() {
     renderHUD(context, state);
 }
 
+export function translateContextForAreaAndCamera(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance): void {
+    context.translate(-state.camera.x + area.cameraOffset.x, -state.camera.y + area.cameraOffset.y);
+}
+
 export function renderField(context: CanvasRenderingContext2D, state: GameState): void {
     // Update any background tiles that have changed.
     state.areaInstance.layers.map(layer => renderLayer(state.areaInstance.context, layer));
@@ -80,7 +84,7 @@ export function renderField(context: CanvasRenderingContext2D, state: GameState)
     renderAreaObjectsBeforeHero(context, state, state.areaInstance);
     renderAreaObjectsBeforeHero(context, state, state.nextAreaInstance);
     context.save();
-        context.translate(-state.camera.x + state.areaInstance.cameraOffset.x, -state.camera.y + state.areaInstance.cameraOffset.y);
+        translateContextForAreaAndCamera(context, state, state.areaInstance);
         renderHero(context, state, state.hero);
     context.restore();
     renderAreaObjectsAfterHero(context, state, state.areaInstance);
@@ -118,7 +122,7 @@ export function renderAreaBackground(context: CanvasRenderingContext2D, state: G
         return;
     }
     context.save();
-        context.translate(-state.camera.x + area.cameraOffset.x, -state.camera.y + area.cameraOffset.y);
+        translateContextForAreaAndCamera(context, state, area);
         context.drawImage(
             area.canvas,
             state.camera.x - area.cameraOffset.x, state.camera.y - area.cameraOffset.y, CANVAS_WIDTH, CANVAS_HEIGHT,
@@ -132,7 +136,7 @@ export function renderAreaObjectsBeforeHero(context: CanvasRenderingContext2D, s
         return;
     }
     context.save();
-        context.translate(-state.camera.x + area.cameraOffset.x, -state.camera.y + area.cameraOffset.y);
+        translateContextForAreaAndCamera(context, state, area);
         renderShadow(context, state, state.hero);
         // Render shadows before anything else.
         for (const object of area.objects) {
@@ -153,7 +157,7 @@ export function renderAreaObjectsAfterHero(context: CanvasRenderingContext2D, st
         return;
     }
     context.save();
-        context.translate(-state.camera.x + area.cameraOffset.x, -state.camera.y + area.cameraOffset.y);
+        translateContextForAreaAndCamera(context, state, area);
         for (const object of area.objects) {
             if (!object.drawPriority ||
                 object.drawPriority === 'foreground' ||

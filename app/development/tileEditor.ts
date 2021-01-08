@@ -17,13 +17,14 @@ import { displayPropertyPanel, hidePropertyPanel, updateBrushCanvas } from 'app/
 import { mainCanvas } from 'app/dom';
 import { CANVAS_SCALE } from 'app/gameConstants';
 import { KEY } from 'app/keyCommands';
+import { translateContextForAreaAndCamera } from 'app/render';
 import { getState } from 'app/state';
 import { drawFrame } from 'app/utils/animations';
 import { readFromFile, saveToFile } from 'app/utils/index';
 import { getMousePosition, isMouseDown } from 'app/utils/mouse';
 
 import {
-    EditorProperty,  EnemyType, GameState,
+    AreaInstance, EditorProperty,  EnemyType, GameState,
     LootType, MagicElement,
     ObjectDefinition, ObjectStatus, ObjectType,
     PropertyRow, TileGrid,
@@ -259,14 +260,24 @@ export function renderEditor(context: CanvasRenderingContext2D, state: GameState
     if (!editingState.isEditing) {
         return;
     }
+    // Unselect objects that are no longer in the current area.
+    if (!state.areaInstance.objects.find(o => o.definition === editingState.selectedObject)) {
+        editingState.selectedObject = null;
+        displayTileEditorPropertyPanel();
+    }
+    renderEditorArea(context, state, state.areaInstance);
+    if (state.nextAreaInstance) {
+        renderEditorArea(context, state, state.nextAreaInstance);
+    }
+}
+
+
+function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance): void {
     const [x, y] = getMousePosition(mainCanvas, CANVAS_SCALE);
     context.save();
-        context.translate(
-            -state.camera.x + state.areaInstance.cameraOffset.x,
-            -state.camera.y + state.areaInstance.cameraOffset.y
-        );
+        translateContextForAreaAndCamera(context, state, area);
         context.globalAlpha = 0.6;
-        for (const object of state.areaInstance.definition.objects) {
+        for (const object of area.definition.objects) {
             const instance = createObjectInstance(state, object);
             instance.status = 'normal';
             instance.render(context, state);
@@ -277,7 +288,8 @@ export function renderEditor(context: CanvasRenderingContext2D, state: GameState
                 drawFrame(context, frame, {...frame, x: object.x - (frame.content?.x || 0), y: object.y - (frame.content?.y || 0)});
             }
         }
-        if (editingState.tool === 'select' && editingState.selectedObject) {
+        // These two are only drawn for the current area.
+        if (area === state.areaInstance && editingState.tool === 'select' && editingState.selectedObject) {
             const frame = getObjectFrame(editingState.selectedObject);
             context.fillStyle = 'white';
             context.fillRect(
@@ -287,7 +299,7 @@ export function renderEditor(context: CanvasRenderingContext2D, state: GameState
                 (frame.content?.h || frame.h) + 2
             );
         }
-        if (editingState.tool === 'object') {
+        if (area === state.areaInstance && editingState.tool === 'object') {
             renderObjectPreview(context, state, editingState, x, y);
         }
     context.restore();
