@@ -4,7 +4,7 @@ import { Staff } from 'app/content/staff';
 import { Direction, FrameAnimation, ObjectInstance, ObjectStatus, Tile } from 'app/types';
 
 export type Action = 'attack' | 'roll' | 'knocked' | 'hurt' | 'dead' | 'grabbing' | 'carrying' | 'throwing' | 'getItem';
-export type ActiveTool = 'weapon' | 'bow' | 'staff' | 'clone' | 'invisibility';
+export type ActiveTool = 'bow' | 'staff' | 'clone' | 'invisibility';
 export type Equipment = 'cloudBoots' | 'ironBoots';
 export type PassiveTool = 'gloves'
     | 'roll'
@@ -17,7 +17,7 @@ export type MagicElement = 'fire' | 'ice' | 'lightning';
 export type Collectible = 'peachOfImmortality' | 'peachOfImmortalityPiece';
 export type CommonLoot = 'money' | 'arrows' | 'peach';
 
-export type LootType = ActiveTool | Equipment | PassiveTool | MagicElement | Collectible | CommonLoot | 'unknown';
+export type LootType = 'weapon' | ActiveTool | Equipment | PassiveTool | MagicElement | Collectible | CommonLoot | 'unknown';
 
 
 type AnimationSet = {
@@ -51,10 +51,6 @@ export interface Actor {
     grabObject?: ObjectInstance,
     invulnerableFrames?: number,
     life: number,
-    leftTool?: ActiveTool,
-    rightTool?: ActiveTool,
-    element?: MagicElement,
-    status: ObjectStatus,
 }
 
 export interface Hero extends Actor {
@@ -82,5 +78,10 @@ export interface Hero extends Actor {
     invisibilityCost: number,
     safeX: number,
     safeY: number,
+    weapon: number,
+    leftTool?: ActiveTool,
+    rightTool?: ActiveTool,
+    element?: MagicElement,
+    status: ObjectStatus,
 }
 

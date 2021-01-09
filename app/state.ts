@@ -29,8 +29,8 @@ function getDefaultHeroState(): Hero {
         peachQuarters: 0,
         spiritTokens: 0,
         toolCooldown: 0,
+        weapon: 0,
         activeTools: {
-            weapon: 0,
             bow: 0,
             staff: 0,
             clone: 0,

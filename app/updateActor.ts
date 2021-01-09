@@ -153,11 +153,11 @@ export function updateHero(this: void, state: GameState) {
     if (dx || dy) {
         moveActor(state, hero, dx, dy, true);
     }
-    if (!hero.action && !hero.pickUpTile && hero.activeTools.weapon > 0 &&
+    if (!hero.action && !hero.pickUpTile && hero.weapon > 0 &&
         isKeyDown(GAME_KEY.WEAPON, KEY_THRESHOLD)
     ) {
         const thrownChakrams = state.areaInstance.objects.filter(o => o instanceof ThrownChakram);
-        if (state.hero.activeTools.weapon - thrownChakrams.length > 0) {
+        if (state.hero.weapon - thrownChakrams.length > 0) {
             hero.action = 'attack';
             hero.actionDx = dx;
             hero.actionDy = dy;

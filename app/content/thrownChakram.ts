@@ -113,9 +113,9 @@ export class ThrownChakram implements ObjectInstance {
         for (const target of getTilesInRectangle(state, this)) {
             const area = state.areaInstance;
             const behavior = area.behaviorGrid?.[target.y]?.[target.x];
-            if (behavior?.cuttable <= state.hero.activeTools.weapon) {
+            if (behavior?.cuttable <= state.hero.weapon) {
                 destroyTile(state, target);
-            } else if (behavior?.cuttable > state.hero.activeTools.weapon) {
+            } else if (behavior?.cuttable > state.hero.weapon) {
                 this.outFrames = 0;
             }
         }

@@ -15,9 +15,6 @@ Add doors:
         - for floor switches, toggle status when the floor switch toggles
             - For floor switches that toggle when pressure is removed, this requres leaving the switch pressed by placing an object/clone/staff on top of it.
 
-Add inventory editor
-    - Just a bunch of number inputs that let you set the level of tools.
-
 Add ability to charge weapon
     Spin chakram around quickly in a circle twice (can move after throwing)
     Costs 10 mana

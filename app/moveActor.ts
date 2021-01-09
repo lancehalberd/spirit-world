@@ -1,7 +1,9 @@
-import { damageActor } from 'app/updateActor';
-import { isPixelInShortRect } from 'app/utils/index';
+import _ from 'lodash';
 
-import { Actor, Direction, GameState, Hero, ObjectInstance } from 'app/types';
+import { damageActor } from 'app/updateActor';
+import { getSolidObstaclesOrPits, isPointOpen } from 'app/utils/field';
+
+import { Actor, Direction, GameState, Hero } from 'app/types';
 
 export function moveActor(state: GameState, actor: Actor, dx: number, dy: number, push: boolean = false) {
     let sx = dx;
@@ -67,31 +69,41 @@ function moveActorInDirection(
     } else {
         ax += amount;
     }
-    const palette = state.areaInstance.palette;
-    const tileSize = palette.w;
 
-    let leftColumn = Math.floor(ax / tileSize);
-    let rightColumn = Math.floor((ax + actor.w - 1) / tileSize);
-    let topRow = Math.floor(ay / tileSize);
-    let bottomRow = Math.floor((ay + actor.h - 1) / tileSize);
-
-
+    let checkPoints: {x: number, y: number}[];
     // When moving vertically, we only care about the row we are moving into.
-    if (direction === 'up') bottomRow = topRow;
-    else if (direction === 'down') topRow = bottomRow;
-    else if (direction === 'left') rightColumn = leftColumn;
-    else if (direction === 'right') leftColumn = rightColumn;
+    if (direction === 'up') {
+        checkPoints = [{x: ax, y: ay}, {x: ax + 7, y: ay}];
+        if (actor.w > 8) {
+            checkPoints = [...checkPoints, {x: ax + 8, y: ay}, {x: ax + 15, y: ay}];
+        }
+    } else if (direction === 'down') {
+        checkPoints = [{x: ax, y: ay + actor.h - 1}, {x: ax + 7, y: ay + actor.h - 1}];
+        if (actor.w > 8) {
+            checkPoints = [...checkPoints, {x: ax + 8, y: ay + actor.h - 1}, {x: ax + 15, y: ay + actor.h - 1}];
+        }
+    } else if (direction === 'left') {
+        checkPoints = [{x: ax, y: ay}, {x: ax, y: ay + 7}];
+        if (actor.h > 8) {
+            checkPoints = [...checkPoints, {x: ax, y: ay + 8}, {x: ax, y: ay + 15}];
+        }
+    } else if (direction === 'right') {
+        checkPoints = [{x: ax + actor.w - 1, y: ay}, {x: ax + actor.w - 1, y: ay + 7}];
+        if (actor.h > 8) {
+            checkPoints = [...checkPoints, {x: ax + actor.w - 1, y: ay + 8}, {x: ax + actor.w - 1, y: ay + 15}];
+        }
+    }
 
     // const tiles = state.areaInstance.layers[0].grid.tiles;
     const behaviorGrid = state.areaInstance.behaviorGrid;
     let blockedByTile = false;
-    const openCoords = [];
-    for (let row = topRow; row <= bottomRow; row++) {
-        for (let column = leftColumn; column <= rightColumn; column++) {
-            const behaviors = behaviorGrid?.[row]?.[column];
-            // This will happen when the player moves off the edge of the screen.
+    let blockedByObject = false;
+    let pushedObjects = [];
+    for (const point of checkPoints) {
+        const {tiles, objects} = getSolidObstaclesOrPits(state, point);
+        for (const tile of tiles) {
+            const behaviors = behaviorGrid?.[tile.y]?.[tile.x];
             if (!behaviors) {
-                openCoords.push({x: column, y: row});
                 continue;
             }
             if (behaviors.solid && behaviors.damage > 0) {
@@ -100,46 +112,17 @@ function moveActorInDirection(
             // The second condition is a hack to prevent enemies from walking over pits.
             if (behaviors.solid || (behaviors.pit && !push)) {
                 blockedByTile = true;
-            } else {
-                openCoords.push({x: column, y: row});
+            }
+        }
+        for (const object of objects) {
+            blockedByObject = true;
+            if (push) {
+                pushedObjects.push(object);
             }
         }
     }
+    pushedObjects = _.uniq(pushedObjects);
 
-    const checkPoints: {x: number, y: number}[] = [];
-    if (direction === 'left') {
-        checkPoints.push({x: ax, y: ay + 1});
-        checkPoints.push({x: ax, y: ay + actor.h - 1});
-    }
-    if (direction === 'right') {
-        checkPoints.push({x: ax + actor.w - 1, y: ay + 1});
-        checkPoints.push({x: ax + actor.w - 1, y: ay + actor.h - 1});
-    }
-    if (direction === 'up') {
-        checkPoints.push({x: ax + 1, y: ay});
-        checkPoints.push({x: ax + actor.w - 1, y: ay});
-    }
-    if (direction === 'down') {
-        checkPoints.push({x: ax + 1, y: ay + actor.h});
-        checkPoints.push({x: ax + actor.w - 1, y: ay + actor.h});
-    }
-    const pushedObjects: ObjectInstance[] = [];
-    let blockedByObject = false;
-    const blockedCoords = {};
-    for (const solidObject of state.areaInstance.objects.filter(o => o.getHitbox && o.status === 'normal' && o.behaviors?.solid)) {
-        const hitbox = solidObject.getHitbox(state);
-        for (const point of checkPoints) {
-            if (isPixelInShortRect(point.x, point.y, hitbox)) {
-                blockedByObject = true;
-                const x = hitbox.x + hitbox.w / 2;
-                const y = hitbox.y + hitbox.h / 2;
-                blockedCoords[`${Math.floor(x / tileSize)}x${Math.floor(y / tileSize)}`] = solidObject;
-                if (push) {
-                    pushedObjects.push(solidObject);
-                }
-            }
-        }
-    }
     if (!blockedByTile && pushedObjects.length === 1) {
         if (pushedObjects[0].onPush) {
             pushedObjects[0].onPush(state, direction);
@@ -147,43 +130,106 @@ function moveActorInDirection(
     } else if (pushedObjects.length >= 1) {
         for (const object of pushedObjects) {
             const hitbox = object.getHitbox(state);
-            if (Math.abs(ax - hitbox.x) < 4
-                || Math.abs(ax + actor.w - hitbox.x - hitbox.w) < 4
-                || Math.abs(ay - hitbox.y) < 4
-                || Math.abs(ay + actor.h - hitbox.y - hitbox.h) < 4
+            if (Math.abs(ax - hitbox.x) < 8
+                || Math.abs(ax + actor.w - hitbox.x - hitbox.w) < 8
+                || Math.abs(ay - hitbox.y) < 8
+                || Math.abs(ay + actor.h - hitbox.y - hitbox.h) < 8
             ) {
                 if (object.onPush) {
                     object.onPush(state, direction);
                 }
             }
         }
-
     }
     if (blockedByTile || blockedByObject) {
         // If this is true, wiggle the character up to Npx to get around corners.
         // This makes it much smoother to try and get into pixel perfect gaps.
-        if (wiggle) {
-            const wiggleAmount = 7;
-            for (const coords of openCoords) {
-                if (blockedCoords[`${coords.x}x${coords.y}`]) {
-                    continue;
-                }
-                if (direction === 'up' || direction === 'down') {
-                    if (coords.x === leftColumn && coords.x === Math.floor((ax + actor.w - 1 - wiggleAmount) / tileSize)) {
-                        return moveActorInDirection(state, actor, -0.5, 'left',  false);
-                    }
-                    if (coords.x === rightColumn && coords.x === Math.floor((ax + wiggleAmount) / tileSize)) {
-                        return moveActorInDirection(state, actor, 0.5, 'right',  false);
+        if (!wiggle) {
+            return false;
+        }
+        function wiggleLeft(y: number) {
+            for (let l = ax - 1; l >= ax - 8; l--) {
+                let open = true;
+                for (let x = l; x < l + actor.w; x += 8) {
+                    if (!isPointOpen(state, {x, y})) {
+                        open = false;
+                        break;
                     }
                 }
-                if (direction === 'left' || direction === 'right') {
-                    if (coords.y === topRow && coords.y === Math.floor((ay + actor.h - 1 - wiggleAmount) / tileSize)) {
-                        return moveActorInDirection(state, actor, -0.5, 'up',  false);
-                    }
-                    if (coords.y === bottomRow && coords.y === Math.floor((ay + wiggleAmount) / tileSize)) {
-                        return moveActorInDirection(state, actor, 0.5, 'down',  false);
+                if (open) {
+                    return moveActorInDirection(state, actor, -0.5, 'left',  false);
+                }
+            }
+        }
+        function wiggleRight(y: number) {
+            for (let l = ax + 1; l <= ax + 8; l++) {
+                let open = true;
+                for (let x = l; x < l + actor.w; x += 8) {
+                    if (!isPointOpen(state, {x, y})) {
+                        open = false;
+                        break;
                     }
                 }
+                if (open) {
+                    return moveActorInDirection(state, actor, 0.5, 'right',  false);
+                }
+            }
+        }
+        function wiggleUp(x: number) {
+            for (let t = ay - 1; t >= ay - 8; t--) {
+                let open = true;
+                for (let y = t; y < t + actor.h; y += 8) {
+                    if (!isPointOpen(state, {x, y})) {
+                        open = false;
+                        break;
+                    }
+                }
+                if (open) {
+                    return moveActorInDirection(state, actor, -0.5, 'up',  false);
+                }
+            }
+        }
+        function wiggleDown(x: number) {
+            for (let t = ay + 1; t <= ay + 8; t++) {
+                let open = true;
+                for (let y = t; y < t + actor.h; y += 8) {
+                    if (!isPointOpen(state, {x, y})) {
+                        open = false;
+                        break;
+                    }
+                }
+                if (open) {
+                    return moveActorInDirection(state, actor, 0.5, 'down',  false);
+                }
+            }
+        }
+        if (direction === 'up') {
+            if (wiggleLeft(ay)) {
+                return true;
+            }
+            if (wiggleRight(ay)) {
+                return true;
+            }
+        } else if (direction === 'down') {
+            if (wiggleLeft(ay + actor.h - 1)) {
+                return true;
+            }
+            if (wiggleRight(ay + actor.h - 1)) {
+                return true;
+            }
+        } else if (direction === 'left') {
+            if (wiggleUp(ax)) {
+                return true;
+            }
+            if (wiggleDown(ax)) {
+                return true;
+            }
+        } else if (direction === 'right') {
+            if (wiggleUp(ax + actor.w - 1)) {
+                return true;
+            }
+            if (wiggleDown(ax + actor.w - 1)) {
+                return true;
             }
         }
         return false;

@@ -23,7 +23,7 @@ export function isPointOpen(state: GameState, {x, y}: {x: number, y: number}): b
         || ty < state.areaSection.y || ty >= state.areaSection.y + state.areaSection.h) {
         return false;
     }
-    const tileBehavior = state.areaInstance?.behaviorGrid[ty][tx];
+    const tileBehavior = state.areaInstance?.behaviorGrid[ty]?.[tx];
     if (tileBehavior?.solid) {
         return false;
     }
@@ -45,7 +45,7 @@ export function getSolidObstacles(state: GameState, {x, y}: Tile): {open: boolea
     const objects: ObjectInstance[] = [];
     const tx = Math.floor(x / 16);
     const ty = Math.floor(y / 16);
-    const tileBehavior = state.areaInstance?.behaviorGrid[ty][tx];
+    const tileBehavior = state.areaInstance?.behaviorGrid[ty]?.[tx];
     let open = true;
     if (tx < state.areaSection.x || tx >= state.areaSection.x + state.areaSection.w
         || ty < state.areaSection.y || ty >= state.areaSection.y + state.areaSection.h) {
@@ -54,6 +54,32 @@ export function getSolidObstacles(state: GameState, {x, y}: Tile): {open: boolea
     if (tileBehavior?.solid) {
         tiles.push({x: tx, y: ty});
         open = false;
+    }
+    for (const object of state.areaInstance.objects) {
+        if (object.getHitbox && object.behaviors?.solid) {
+            if (isPixelInShortRect(x, y, object.getHitbox(state))) {
+                objects.push(object);
+                open = false;
+            }
+        }
+    }
+    return { open, tiles, objects };
+}
+
+
+export function getSolidObstaclesOrPits(state: GameState, {x, y}: Tile): {open: boolean, tiles: Tile[], objects: ObjectInstance[]} {
+    const tiles: Tile[] = [];
+    const objects: ObjectInstance[] = [];
+    const tx = Math.floor(x / 16);
+    const ty = Math.floor(y / 16);
+    const tileBehavior = state.areaInstance?.behaviorGrid[ty]?.[tx];
+    let open = true;
+    if (tx < state.areaSection.x || tx >= state.areaSection.x + state.areaSection.w
+        || ty < state.areaSection.y || ty >= state.areaSection.y + state.areaSection.h) {
+        open = false;
+    }
+    if (tileBehavior?.solid || tileBehavior?.pit) {
+        tiles.push({x: tx, y: ty});
     }
     for (const object of state.areaInstance.objects) {
         if (object.getHitbox && object.behaviors?.solid) {

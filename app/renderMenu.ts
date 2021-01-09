@@ -54,7 +54,7 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
     }
     x += 60;
 
-    if (state.hero.activeTools.weapon) {
+    if (state.hero.weapon) {
         const frame = lootFrames.weapon || lootFrames.unknown;
         drawFrame(context, frame, {...frame, x: (x + 8 - frame.w / 2), y: (y + 8 - frame.h / 2)});
     }

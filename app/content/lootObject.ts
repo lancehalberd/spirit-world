@@ -178,7 +178,9 @@ export const lootFrames: Partial<{[key in LootType]: Frame}> = {
 
 export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: ChestObject | LootObject) => void}> = {
     unknown: (state: GameState, loot: ChestObject | LootObject) => {
-        if (['bow', 'staff', 'clone', 'invisibility'].includes(loot.definition.lootType)) {
+        if (loot.definition.lootType === 'weapon') {
+            state.hero.weapon++;
+        } else if (['bow', 'staff', 'clone', 'invisibility'].includes(loot.definition.lootType)) {
             if (!state.hero.leftTool) {
                 state.hero.leftTool = loot.definition.lootType as ActiveTool;
             } else if (!state.hero.rightTool) {
