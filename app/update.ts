@@ -83,6 +83,13 @@ function updateField(state: GameState) {
                     if (object.status === 'hiddenEnemy') {
                         object.status = 'normal';
                     }
+                    if (object.status === 'closedEnemy') {
+                        if (object.changeStatus) {
+                            object.changeStatus(state, 'normal');
+                        } else {
+                            object.status = 'normal';
+                        }
+                    }
                 }
             }
         }

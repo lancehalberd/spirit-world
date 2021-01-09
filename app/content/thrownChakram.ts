@@ -1,4 +1,4 @@
-import { destroyTile, getAreaSize } from 'app/content/areas';
+import { destroyTile, getAreaSize, removeObjectFromArea } from 'app/content/areas';
 import { Enemy } from 'app/content/enemy';
 import { createCanvasAndContext } from 'app/dom';
 import { getTilesInRectangle } from 'app/getActorTargets';
@@ -58,9 +58,6 @@ export class ThrownChakram implements ObjectInstance {
         this.hitTargets = new Set();
         this.source = source;
     }
-    remove(state: GameState) {
-        state.areaInstance.objects.splice(state.areaInstance.objects.indexOf(this), 1);
-    }
     update(state: GameState) {
         // Chakram returns to the hero if the clone it was thrown from no longer exists.
         if (state.areaInstance.objects.indexOf(this.source) < 0) {
@@ -85,7 +82,7 @@ export class ThrownChakram implements ObjectInstance {
             this.x += this.vx;
             this.y += this.vy;
             if (isPointInShortRect(this.source.x + this.source.w / 2, this.source.y + this.source.h / 2, this)) {
-                this.remove(state);
+                removeObjectFromArea(state, state.areaInstance, this);
                 return;
             }
         }

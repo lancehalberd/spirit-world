@@ -1,8 +1,7 @@
-import { removeObjectFromArea } from 'app/content/areas';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { isPointOpen } from 'app/utils/field';
 
-import { Direction, MagicElement, Frame, GameState, ObjectInstance, ObjectStatus, TileBehaviors } from 'app/types';
+import { AreaInstance, Direction, MagicElement, Frame, GameState, ObjectInstance, ObjectStatus, TileBehaviors } from 'app/types';
 
 const tilesFrame = createAnimation('gfx/tiles/overworld.png', {w: 384, h: 640}).frames[0];
 export const normalFrame: Frame = {image: tilesFrame.image, x: 16 * 0, y: 16 * 35, w: 16, h: 16};
@@ -37,7 +36,7 @@ export class Staff implements ObjectInstance {
     direction: Direction;
     element: MagicElement;
     storedBehaviors: TileBehaviors[][];
-    constructor({ x = 0, y = 0, damage = 1, direction, element, maxLength = 4 }: Props, state: GameState) {
+    constructor(state: GameState, { x = 0, y = 0, damage = 1, direction, element, maxLength = 4 }: Props) {
         this.x = x;
         this.y = y;
         this.direction = direction;
@@ -120,14 +119,17 @@ export class Staff implements ObjectInstance {
     }
     update(state: GameState) {
     }
-    remove(state: GameState) {
-        removeObjectFromArea(state.areaInstance, this);
+    remove(state: GameState, area: AreaInstance) {
+        const index = area.objects.indexOf(this);
+        if (index >= 0){
+            area.objects.splice(index, 1);
+        }
         // Restore the original tiles under the staff.
         for (let row = this.topRow; row <= this.bottomRow; row++) {
             for (let column = this.leftColumn; column <= this.rightColumn; column++) {
                 // Indicate that the tiles need to be redrawn now that the staff is gone.
-                state.areaInstance.layers[0].tilesDrawn[row][column] = false;
-                state.areaInstance.behaviorGrid[row][column] = this.storedBehaviors[row][column];
+                area.layers[0].tilesDrawn[row][column] = false;
+                area.behaviorGrid[row][column] = this.storedBehaviors[row][column];
             }
         }
         state.hero.activeStaff = null;

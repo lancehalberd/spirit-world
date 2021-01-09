@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 import { damageActor } from 'app/updateActor';
-import { getSolidObstaclesOrPits, isPointOpen } from 'app/utils/field';
+import { getTileBehaviorsAndObstacles, isPointOpen } from 'app/utils/field';
 
 import { Actor, Direction, GameState, Hero } from 'app/types';
 
@@ -95,24 +95,17 @@ function moveActorInDirection(
     }
 
     // const tiles = state.areaInstance.layers[0].grid.tiles;
-    const behaviorGrid = state.areaInstance.behaviorGrid;
     let blockedByTile = false;
     let blockedByObject = false;
     let pushedObjects = [];
     for (const point of checkPoints) {
-        const {tiles, objects} = getSolidObstaclesOrPits(state, point);
-        for (const tile of tiles) {
-            const behaviors = behaviorGrid?.[tile.y]?.[tile.x];
-            if (!behaviors) {
-                continue;
-            }
-            if (behaviors.solid && behaviors.damage > 0) {
-                damageActor(state, actor, behaviors.damage);
-            }
-            // The second condition is a hack to prevent enemies from walking over pits.
-            if (behaviors.solid || (behaviors.pit && !push)) {
-                blockedByTile = true;
-            }
+        const { tileBehavior, objects} = getTileBehaviorsAndObstacles(state, point);
+        if (tileBehavior?.solid && tileBehavior?.damage > 0) {
+            damageActor(state, actor, tileBehavior.damage);
+        }
+        // The second condition is a hack to prevent enemies from walking over pits.
+        if (tileBehavior?.solid || (tileBehavior?.pit && !push)) {
+            blockedByTile = true;
         }
         for (const object of objects) {
             blockedByObject = true;

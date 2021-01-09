@@ -37,11 +37,17 @@ export class CrystalSwitch implements ObjectInstance {
         this.status = 'active';
         this.timeLeft = this.definition.timer || 0;
         // If all crystals in this super tile are active, reveal hiddenSwitch objects.
-        // TODO: open closedSwitch doors.
         if (!state.areaInstance.objects.some(o => o.definition?.type === 'crystalSwitch' && o.status !== 'active')) {
             for (const object of state.areaInstance.objects) {
                 if (object.status === 'hiddenSwitch') {
                     object.status = 'normal';
+                }
+                if (object.status === 'closedSwitch') {
+                    if (object.changeStatus) {
+                        object.changeStatus(state, 'normal');
+                    } else {
+                        object.status = 'normal';
+                    }
                 }
             }
         }
@@ -51,6 +57,17 @@ export class CrystalSwitch implements ObjectInstance {
             this.timeLeft -= FRAME_LENGTH;
             if (this.timeLeft <= 0) {
                 this.status = 'normal';
+                console.log('deactivating switch');
+                for (const object of state.areaInstance.objects) {
+                    if (object.definition.status === 'closedSwitch') {
+                        if (object.changeStatus) {
+                            console.log('change status to closedSwitch');
+                            object.changeStatus(state, 'closedSwitch');
+                        } else {
+                            object.status = 'closedSwitch';
+                        }
+                    }
+                }
             }
         }
     }

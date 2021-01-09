@@ -1,16 +1,15 @@
 import _ from 'lodash';
 
+import { addObjectToArea, removeObjectFromArea } from 'app/content/areas';
 import { enemyDefinitions } from 'app/content/enemy';
 import { createObjectInstance } from 'app/content/objects';
-import { chestClosedFrame, lootFrames } from 'app/content/lootObject';
-import { normalFrame } from 'app/content/rollingBallObject';
-import { standingFrame } from 'app/content/tippableObject';
+import { lootFrames } from 'app/content/lootObject';
 import { displayTileEditorPropertyPanel, EditingState } from 'app/development/tileEditor';
 import { getState } from 'app/state';
 import { ifdefor, isPointInShortRect } from 'app/utils/index';
 
 import {
-    EnemyType, Frame, GameState,
+    FrameDimensions, Direction, EnemyType, GameState,
     LootType, MagicElement, ObjectDefinition, ObjectStatus, ObjectType, PanelRows,
 } from 'app/types';
 
@@ -30,7 +29,7 @@ export function getLootTypes(): LootType[] {
     return allLootTypes;
 }
 
-export const combinedObjectTypes: ObjectType[] = ['loot', 'chest', 'enemy', 'crystalSwitch', 'pushPull', 'rollingBall', 'tippable'];
+export const combinedObjectTypes: ObjectType[] = ['loot', 'chest', 'door', 'enemy', 'crystalSwitch', 'pushPull', 'rollingBall', 'tippable'];
 
 function createObjectDefinition(
     state: GameState,
@@ -48,6 +47,15 @@ function createObjectDefinition(
                 status: definition.status || editingState.objectStatus,
                 // Need to use ifdefor here since 0 is a valid value for timer.
                 timer: ifdefor(definition.timer, editingState.timer),
+                x,
+                y,
+            };
+        case 'door':
+            return {
+                type: definition.type,
+                id: definition.id || uniqueId(state, 'door'),
+                status: definition.status || editingState.objectStatus,
+                d: definition.d || editingState.direction,
                 x,
                 y,
             };
@@ -113,6 +121,34 @@ export function getObjectTypeProperties(state: GameState, editingState: EditingS
         },
     });
     switch (object.type) {
+        case 'door':
+            rows.push({
+                name: 'direction',
+                value: object.d || editingState.direction,
+                values: ['up', 'down', 'left', 'right'],
+                onChange(direction: Direction) {
+                    if (object.id) {
+                        object.d = direction;
+                        updateObjectInstance(state, object);
+                    } else {
+                        editingState.direction = direction;
+                    }
+                },
+            });
+            rows.push({
+                name: 'status',
+                value: object.status || editingState.objectStatus,
+                values: ['normal', 'closed', 'closedEnemy', 'closedSwitch'],
+                onChange(status: ObjectStatus) {
+                    if (object.id) {
+                        object.status = status;
+                        updateObjectInstance(state, object);
+                    } else {
+                        editingState.objectStatus = status;
+                    }
+                },
+            });
+            break;
         case 'loot':
         case 'chest':
             rows.push({
@@ -135,7 +171,7 @@ export function getObjectTypeProperties(state: GameState, editingState: EditingS
             rows.push({
                 name: 'status',
                 value: object.status || editingState.objectStatus,
-                values: ['normal', 'hiddenSwitch', 'hiddenEnemy'],
+                values: ['normal', 'hiddenEnemy', 'hiddenSwitch'],
                 onChange(status: ObjectStatus) {
                     if (object.id) {
                         object.status = status;
@@ -261,6 +297,7 @@ export function fixObjectPosition(state: GameState, object: ObjectDefinition): v
     // These objects snap to the grid.
     if (object.type === 'chest'
         || object.type === 'crystalSwitch'
+        || object.type === 'door'
         || object.type === 'pushPull'
         || object.type === 'rollingBall'
         || object.type === 'tippable'
@@ -298,8 +335,11 @@ export function updateObjectId(state: GameState, object: ObjectDefinition, id: s
     return updateObjectId(state, object, `${id}-1`);
 }
 
-
-export function getObjectFrame(object: ObjectDefinition): Frame {
+const simpleGeometry: FrameDimensions = {w: 16, h: 16};
+export function getObjectFrame(object: ObjectDefinition): FrameDimensions {
+    if (object.type === 'door') {
+        return { w: 32, h: 32 };
+    }
     if (object.type === 'enemy') {
         return enemyDefinitions[object.enemyType].animations.idle.down.frames[0]
     }
@@ -307,16 +347,17 @@ export function getObjectFrame(object: ObjectDefinition): Frame {
         return lootFrames[object.lootType] || lootFrames.unknown;
     }
     if (object.type === 'chest') {
-        return chestClosedFrame;
+        return simpleGeometry;
     }
     if (object.type === 'crystalSwitch' || object.type === 'pushPull' || object.type === 'rollingBall') {
-        return normalFrame;
+        return simpleGeometry;
     }
     if (object.type === 'tippable') {
-        return standingFrame;
+        return simpleGeometry;
     }
     return lootFrames.unknown;
 }
+
 export function isPointInObject(x: number, y: number, object: ObjectDefinition): boolean {
     const camera = getState().camera;
     let frame =  {...getObjectFrame(object), x: object.x, y: object.y};
@@ -333,9 +374,10 @@ export function updateObjectInstance(state: GameState, object: ObjectDefinition)
     const index = state.areaInstance.objects.findIndex(o => o.definition?.id === object.id);
     const newObject = createObjectInstance(state, object);
     if (index < 0) {
-        state.areaInstance.objects.push(newObject);
+        addObjectToArea(state, state.areaInstance, newObject);
     } else {
-        state.areaInstance.objects[index] = newObject;
+        removeObjectFromArea(state, state.areaInstance, state.areaInstance.objects[index]);
+        addObjectToArea(state, state.areaInstance, newObject);
     }
 }
 
@@ -344,9 +386,10 @@ export function deleteObject(state: GameState, object: ObjectDefinition): void {
     if (index >= 0) {
         state.areaInstance.definition.objects.splice(index, 1);
     }
+    // Remove the associated ObjectInstance if one exists.
     index = state.areaInstance.objects.findIndex(o => o.definition?.id === object.id);
     if (index >= 0) {
-        state.areaInstance.objects.splice(index, 1);
+        removeObjectFromArea(state, state.areaInstance, state.areaInstance.objects[index]);
     }
 }
 
@@ -359,6 +402,7 @@ export function renderObjectPreview(
 ): void {
     const definition: ObjectDefinition = createObjectDefinition(state, editingState, {
         id: uniqueId(state, editingState.objectType),
+        // This is set to 'normal' so we can see the preview during edit even if it would otherwise be hidden.
         status: 'normal',
         type: editingState.objectType,
         x: Math.round(x + state.camera.x),

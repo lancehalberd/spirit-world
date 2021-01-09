@@ -48,6 +48,7 @@ export class Clone implements Hero, ObjectInstance {
     status: ObjectStatus = 'normal';
     animationTime: number = 0;
     action: Action;
+    actionTarget: any;
     actionDx: number;
     actionDy: number;
     actionFrame: number;
@@ -67,10 +68,5 @@ export class Clone implements Hero, ObjectInstance {
     }
     update(state: GameState) {
     }
-    remove(state: GameState): void {
-        state.areaInstance.objects.splice(state.areaInstance.objects.indexOf(this), 1);
-    }
-    render(context, state: GameState) {
-        renderHero(context, state, this);
-    }
+    render = renderHero;
 }

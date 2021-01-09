@@ -20,7 +20,8 @@ export const heroAnimations: ActorAnimations = {
 
 const shadowFrame: Frame = createAnimation('gfx/shadow.png', { w: 16, h: 16 }).frames[0];
 
-export function renderHero(context: CanvasRenderingContext2D, state: GameState, hero: Hero): void {
+export function renderHero(this: Hero, context: CanvasRenderingContext2D, state: GameState): void {
+    const hero = this;
     if (state.hero.invisible) {
         return;
     }

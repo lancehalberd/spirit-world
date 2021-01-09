@@ -8,6 +8,7 @@ export const standingFrame: Frame = {image: tilesFrame.image, x: 16 * 20, y: 16 
 const fallenFrame: Frame = {image: tilesFrame.image, x: 16 * 21, y: 16 * 8, w: 16, h: 16};
 
 export class TippableObject implements ObjectInstance {
+    alwaysReset = true;
     behaviors = {
         solid: true,
     };

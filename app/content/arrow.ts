@@ -1,4 +1,4 @@
-import { getAreaSize } from 'app/content/areas';
+import { getAreaSize, removeObjectFromArea } from 'app/content/areas';
 import { Enemy } from 'app/content/enemy';
 import { createCanvasAndContext } from 'app/dom';
 import { damageActor } from 'app/updateActor';
@@ -64,7 +64,7 @@ export class Arrow implements ObjectInstance {
     update(state: GameState) {
         if (this.stuckFrames > 0) {
             if (this.stuckFrames++ > 15) {
-                this.remove(state);
+                removeObjectFromArea(state, state.areaInstance, this);
             }
             return;
         }
@@ -74,7 +74,7 @@ export class Arrow implements ObjectInstance {
         if (this.x + this.w <= section.x || this.y + this.h <= section.y
             || this.x >= section.x + section.w || this.y  >= section.y + section.h
         ) {
-            this.remove(state);
+            removeObjectFromArea(state, state.areaInstance, this);
             return;
         }
         for (const object of state.areaInstance.objects) {
@@ -98,9 +98,6 @@ export class Arrow implements ObjectInstance {
                 }
             }
         }
-    }
-    remove(state: GameState): void {
-        state.areaInstance.objects.splice(state.areaInstance.objects.indexOf(this), 1);
     }
     render(context, state: GameState) {
         //context.fillStyle = 'blue';

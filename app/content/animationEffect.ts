@@ -1,3 +1,4 @@
+import { removeObjectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { drawFrame, getFrame } from 'app/utils/animations';
 
@@ -43,7 +44,7 @@ export class AnimationEffect implements ObjectInstance {
         this.animationTime += FRAME_LENGTH;
         this.vz -= 0.5;
         if (this.z <= 0) {
-            state.areaInstance.objects.splice(state.areaInstance.objects.indexOf(this), 1);
+            removeObjectFromArea(state, state.areaInstance, this);
         }
     }
     render(context, state: GameState) {

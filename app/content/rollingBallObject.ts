@@ -1,5 +1,5 @@
 import { createAnimation, drawFrame } from 'app/utils/animations';
-import { directionMap, getSolidObstacles, isPointOpen } from 'app/utils/field';
+import { directionMap, getTileBehaviorsAndObstacles, isPointOpen } from 'app/utils/field';
 
 import { Direction, Frame, GameState, BaseObjectDefinition, ObjectInstance, ObjectStatus, ShortRectangle } from 'app/types';
 
@@ -8,6 +8,7 @@ export const normalFrame: Frame = {image: tilesFrame.image, x: 16 * 0, y: 16 * 3
 const rollingFrame: Frame = {image: tilesFrame.image, x: 16 * 3, y: 16 * 35, w: 16, h: 16};
 
 export class RollingBallObject implements ObjectInstance {
+    alwaysReset = true;
     behaviors = {
         solid: true,
     };
@@ -54,8 +55,8 @@ export class RollingBallObject implements ObjectInstance {
             const dy = 2 * directionMap[this.rollDirection][1];
             const x = this.x + dx + (this.rollDirection === 'right' ? 15 : 0);
             const y = this.y + dy + (this.rollDirection === 'down' ? 15 : 0);
-            const { objects, open } = getSolidObstacles(state, {x, y});
-            if (open) {
+            const { objects, tileBehavior } = getTileBehaviorsAndObstacles(state, {x, y});
+            if (!tileBehavior.solid && !tileBehavior.pit && !tileBehavior.outOfBounds) {
                 this.x += dx;
                 this.y += dy;
             } else {

@@ -1,5 +1,5 @@
 import {
-    destroyTile, getAreaFromGridCoords, getAreaSize,
+    addObjectToArea, destroyTile, getAreaFromGridCoords, getAreaSize,
     removeAllClones, removeObjectFromArea, scrollToArea, setAreaSection
 } from 'app/content/areas';
 import { Enemy } from 'app/content/enemy';
@@ -52,16 +52,23 @@ export function updateHero(this: void, state: GameState) {
         }
     } else if (hero.x + hero.w > section.x + section.w + 1) {
         movementSpeed = 0;
-        dx = -1;
+        hero.x -= 0.5;
+        //dx = -1;
     } else if (hero.x < section.x - 1) {
         movementSpeed = 0;
-        dx = 1;
+        hero.x += 0.5;
+        //dx = 1;
     } else if (hero.y + hero.h > section.y + section.h + 1) {
         movementSpeed = 0;
-        dy = -1;
+        hero.y -= 0.5;
+        //dy = -1;
     } else if (hero.y < section.y - 1) {
         movementSpeed = 0;
-        dy = 1;
+        hero.y += 0.5;
+        //dy = 1;
+    } else if (hero.action === 'beingMoved') {
+        movementSpeed = 0;
+        // The object moving the hero will take care of their movement until it is completed.
     } else if (hero.action === 'getItem') {
         movementSpeed = 0;
         hero.actionFrame++;
@@ -119,10 +126,12 @@ export function updateHero(this: void, state: GameState) {
                 returnSpeed: 4,
                 source: hero,
             });
-            state.areaInstance.objects.push(chakram);
+            addObjectToArea(state, state.areaInstance, chakram);
         }
         if (hero.actionFrame > 2) {
             hero.action = null;
+            hero.actionDx = 0;
+            hero.actionDy = 0;
         }
     } else if (hero.action === 'roll') {
         movementSpeed = 0;
@@ -255,30 +264,38 @@ export function updateHero(this: void, state: GameState) {
             }
         }
     }
-    checkForFloorDamage(state, hero);
-    checkForEnemyDamage(state, hero);
+    // Mostly don't check for pits/damage when the player cannot control themselves.
+    if (hero.action !== 'beingMoved' && hero.action !== 'knocked'
+        && hero.action !== 'dead'  && hero.action !== 'getItem'
+    ) {
+        checkForFloorDamage(state, hero);
+        checkForEnemyDamage(state, hero);
+    }
     // Check for transition to other areas/area sections.
     if (!state.nextAreaInstance) {
-        if (hero.x < 0 && dx < 0) {
+        // We only move to the next area if the player is moving in the direction of that area.
+        // dx/dy handles most cases, but in some cases like moving through doorways we also need to check
+        // hero.actionDx
+        if (hero.x < 0 && (dx < 0 || hero.actionDx < 0)) {
             state.areaGridCoords.x = (state.areaGridCoords.x + state.areaGrid[0].length - 1) % state.areaGrid[0].length;
             scrollToArea(state, getAreaFromGridCoords(state.areaGrid, state.areaGridCoords), 'left');
-        } else if (hero.x + hero.w > w && dx > 0) {
+        } else if (hero.x + hero.w > w && (dx > 0 || hero.actionDx > 0)) {
             state.areaGridCoords.x = (state.areaGridCoords.x + 1) % state.areaGrid[0].length;
             scrollToArea(state, getAreaFromGridCoords(state.areaGrid, state.areaGridCoords), 'right');
-        } else if (hero.x < section.x && dx < 0) {
+        } else if (hero.x < section.x && (dx < 0 || hero.actionDx < 0)) {
             setAreaSection(state, 'left');
-        } else if (hero.x + hero.w > section.x + section.w && dx > 0) {
+        } else if (hero.x + hero.w > section.x + section.w && (dx > 0 || hero.actionDx > 0)) {
             setAreaSection(state, 'right');
         }
-        if (hero.y < 0 && dy < 0) {
+        if (hero.y < 0 && (dy < 0 || hero.actionDy < 0)) {
             state.areaGridCoords.y = (state.areaGridCoords.y + state.areaGrid.length - 1) % state.areaGrid.length;
             scrollToArea(state, getAreaFromGridCoords(state.areaGrid, state.areaGridCoords), 'up');
-        } else if (hero.y + hero.h > h && dy > 0) {
+        } else if (hero.y + hero.h > h && (dy > 0 || hero.actionDy > 0)) {
             state.areaGridCoords.y = (state.areaGridCoords.y + 1) % state.areaGrid.length;
             scrollToArea(state, getAreaFromGridCoords(state.areaGrid, state.areaGridCoords), 'down');
-        } else if (hero.y < section.y && dy < 0) {
+        } else if (hero.y < section.y && (dy < 0 || hero.actionDy < 0)) {
             setAreaSection(state, 'up');
-        } else if (hero.y + hero.h > section.y + section.h && dy > 0) {
+        } else if (hero.y + hero.h > section.y + section.h && (dy > 0 || hero.actionDy > 0)) {
             setAreaSection(state, 'down');
         }
     }
@@ -342,14 +359,14 @@ export function destroyClone(state: GameState, clone: Hero): void {
         const lastClone = state.hero.clones.pop();
         state.hero.x = lastClone.x;
         state.hero.y = lastClone.y;
-        removeObjectFromArea(state.areaInstance, lastClone);
+        removeObjectFromArea(state, state.areaInstance, lastClone);
     } else {
         // If a non-hero clone is destroyed we just remove it from the array of clones.
         const index = state.hero.clones.indexOf(clone as any);
         if (index >= 0) {
             state.hero.clones.splice(index, 1);
         }
-        removeObjectFromArea(state.areaInstance, clone);
+        removeObjectFromArea(state, state.areaInstance, clone);
     }
     // If the active clone is destroyed, we return control to the main hero.
     if (state.hero.activeClone === clone) {
@@ -410,7 +427,7 @@ export function throwHeldObject(hero: Hero, state: GameState){
         vy: directionMap[hero.d][1] * throwSpeed,
         vz: 2,
     });
-    state.areaInstance.objects.push(thrownObject);
+    addObjectToArea(state, state.areaInstance, thrownObject);
     hero.pickUpTile = null;
 }
 

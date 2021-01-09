@@ -1,3 +1,4 @@
+import { addObjectToArea } from 'app/content/areas';
 import { Arrow } from 'app/content/arrow';
 import { Clone }  from 'app/content/clone';
 import { Staff } from 'app/content/staff';
@@ -25,7 +26,7 @@ export function useTool(
                 vy: 4 * directionMap[hero.d][1],
                 direction: hero.d
             });
-            state.areaInstance.objects.push(arrow);
+            addObjectToArea(state, state.areaInstance, arrow);
             return;
         case 'invisibility':
             if (state.hero.invisible) {
@@ -49,7 +50,7 @@ export function useTool(
                     const clone = new Clone(state.hero);
                     state.hero.activeClone = clone;
                     state.hero.clones.push(clone);
-                    state.areaInstance.objects.push(clone);
+                    addObjectToArea(state, state.areaInstance, clone);
                 }
             } else {
                 const currentIndex = state.hero.clones.indexOf(state.hero.activeClone);
@@ -58,7 +59,7 @@ export function useTool(
             return;
         case 'staff':
             if (state.hero.activeStaff) {
-                state.hero.activeStaff.remove(state);
+                state.hero.activeStaff.remove(state, state.areaInstance);
                 state.hero.toolCooldown = 0;
                 return;
             }
@@ -67,22 +68,22 @@ export function useTool(
             }
             const staffLevel = state.hero.activeTools.staff
             const maxLength = staffLevel > 1 ? 64 : 4;
-            const staff = new Staff({
+            const staff = new Staff(state, {
                 x: hero.x + 8 + 8 * directionMap[hero.d][0],
                 y: hero.y + 8 + 8 * directionMap[hero.d][1],
                 damage: 4 * staffLevel,
                 direction: hero.d,
                 element: hero.element,
                 maxLength,
-            }, state);
+            });
             if (staff.invalid) {
                 return;
             }
             state.hero.activeStaff = staff;
-            state.areaInstance.objects.push(staff);
+            addObjectToArea(state, state.areaInstance, staff);
             // A staff that takes up a single tile is also an invalid use, but we remove it after adding it.
             if (staff.topRow === staff.bottomRow && staff.leftColumn === staff.rightColumn) {
-                staff.remove(state);
+                staff.remove(state, state.areaInstance);
             } else {
                 state.hero.magic -= 10;
             }

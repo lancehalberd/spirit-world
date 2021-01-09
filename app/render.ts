@@ -1,7 +1,7 @@
 import { editingState, renderEditor } from 'app/development/tileEditor';
 import { createCanvasAndContext, mainContext } from 'app/dom';
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from 'app/gameConstants';
-import { renderHero, renderShadow } from 'app/renderActor';
+import { renderShadow } from 'app/renderActor';
 import { renderHUD } from 'app/renderHUD';
 import { renderMenu } from 'app/renderMenu';
 import { getState } from 'app/state';
@@ -85,7 +85,7 @@ export function renderField(context: CanvasRenderingContext2D, state: GameState)
     renderAreaObjectsBeforeHero(context, state, state.nextAreaInstance);
     context.save();
         translateContextForAreaAndCamera(context, state, state.areaInstance);
-        renderHero(context, state, state.hero);
+        state.hero.render(context, state);
     context.restore();
     renderAreaObjectsAfterHero(context, state, state.areaInstance);
     renderAreaObjectsAfterHero(context, state, state.nextAreaInstance);

@@ -1,3 +1,4 @@
+import { removeObjectFromArea } from 'app/content/areas';
 import { Enemy } from 'app/content/enemy';
 import { damageActor } from 'app/updateActor';
 import { drawFrame } from 'app/utils/animations';
@@ -78,7 +79,7 @@ export class ThrownObject implements ObjectInstance {
     breakOnImpact(state) {
         if (!this.broken) {
             this.broken = true;
-            state.areaInstance.objects.splice(state.areaInstance.objects.indexOf(this), 1);
+            removeObjectFromArea(state, state.areaInstance, this);
         }
     }
     render(context, state: GameState) {

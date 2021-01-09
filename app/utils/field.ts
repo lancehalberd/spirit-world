@@ -1,6 +1,6 @@
 import { isPixelInShortRect } from 'app/utils/index';
 
-import { Direction, GameState, ObjectInstance, Tile } from 'app/types';
+import { Direction, GameState, ObjectInstance, Tile, TileBehaviors } from 'app/types';
 
 export const directionMap = {
     up: [0, -1],
@@ -27,6 +27,17 @@ export function isPointOpen(state: GameState, {x, y}: {x: number, y: number}): b
     if (tileBehavior?.solid) {
         return false;
     }
+    // If the behavior has a bitmap for solid pixels, read the exact pixel to see if it is blocked.
+    if (tileBehavior?.solidMap) {
+        const sy = (y | 0) % 16;
+        const sx = (x | 0) % 16;
+        // console.log(tileBehavior.solidMap, y, x, sy, sx, tileBehavior.solidMap[sy] >> (15 - sx));
+        if (tileBehavior.solidMap[sy] >> (15 - sx) & 1) {
+            return false;
+        }
+    } else if (tileBehavior?.solid) {
+        return false;
+    }
     for (const object of state.areaInstance.objects) {
         if (object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
             continue;
@@ -40,54 +51,31 @@ export function isPointOpen(state: GameState, {x, y}: {x: number, y: number}): b
     return true;
 }
 
-export function getSolidObstacles(state: GameState, {x, y}: Tile): {open: boolean, tiles: Tile[], objects: ObjectInstance[]} {
-    const tiles: Tile[] = [];
+export function getTileBehaviorsAndObstacles(state: GameState, {x, y}: Tile): {tileBehavior: TileBehaviors, objects: ObjectInstance[]} {
     const objects: ObjectInstance[] = [];
     const tx = Math.floor(x / 16);
     const ty = Math.floor(y / 16);
-    const tileBehavior = state.areaInstance?.behaviorGrid[ty]?.[tx];
-    let open = true;
+    const tileBehavior = {...(state.areaInstance?.behaviorGrid[ty]?.[tx] || {})};
+
     if (tx < state.areaSection.x || tx >= state.areaSection.x + state.areaSection.w
         || ty < state.areaSection.y || ty >= state.areaSection.y + state.areaSection.h) {
-        open = false;
+        tileBehavior.outOfBounds = true;
     }
-    if (tileBehavior?.solid) {
-        tiles.push({x: tx, y: ty});
-        open = false;
+    // If the behavior has a bitmap for solid pixels, read the exact pixel to see if it is blocked.
+    if (tileBehavior.solidMap) {
+        const sy = (y | 0) % 16;
+        const sx = (x | 0) % 16;
+        // console.log(tileBehavior.solidMap, y, x, sy, sx, tileBehavior.solidMap[sy] >> (15 - sx));
+        tileBehavior.solid = !!(tileBehavior.solidMap[sy] >> (15 - sx) & 1);
     }
     for (const object of state.areaInstance.objects) {
         if (object.getHitbox && object.behaviors?.solid) {
             if (isPixelInShortRect(x, y, object.getHitbox(state))) {
                 objects.push(object);
-                open = false;
+                tileBehavior.solid = true;
             }
         }
     }
-    return { open, tiles, objects };
+    return { tileBehavior, objects };
 }
 
-
-export function getSolidObstaclesOrPits(state: GameState, {x, y}: Tile): {open: boolean, tiles: Tile[], objects: ObjectInstance[]} {
-    const tiles: Tile[] = [];
-    const objects: ObjectInstance[] = [];
-    const tx = Math.floor(x / 16);
-    const ty = Math.floor(y / 16);
-    const tileBehavior = state.areaInstance?.behaviorGrid[ty]?.[tx];
-    let open = true;
-    if (tx < state.areaSection.x || tx >= state.areaSection.x + state.areaSection.w
-        || ty < state.areaSection.y || ty >= state.areaSection.y + state.areaSection.h) {
-        open = false;
-    }
-    if (tileBehavior?.solid || tileBehavior?.pit) {
-        tiles.push({x: tx, y: ty});
-    }
-    for (const object of state.areaInstance.objects) {
-        if (object.getHitbox && object.behaviors?.solid) {
-            if (isPixelInShortRect(x, y, object.getHitbox(state))) {
-                objects.push(object);
-                open = false;
-            }
-        }
-    }
-    return { open, tiles, objects };
-}

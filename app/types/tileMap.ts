@@ -12,10 +12,13 @@ export interface TileBehaviors {
     damage?: number,
     lootChance?: number,
     lootTypes?: LootType[],
+    // Indicates this tile is outside of the current area section.
+    outOfBounds?: boolean,
     // If a player falls in a pit they will take damage and respawn at their last stable location.
     pit?: boolean,
     // Blocks movement
     solid?: boolean,
+    solidMap?: Uint16Array,
     // Can be picked up with glove
     pickupWeight?: number,
     // Tile to display if this tile is removed (picked up, cut, blown up).
@@ -110,8 +113,10 @@ export interface ObjectInstance {
     definition?: ObjectDefinition,
     behaviors?: TileBehaviors,
     drawPriority?: DrawPriority,
+    alwaysReset?: boolean,
     x: number, y: number,
     status: ObjectStatus,
+    changeStatus?: (state: GameState, status: ObjectStatus) => void,
     // This is called when a user grabs a solid tile
     getHitbox?: (state: GameState) => ShortRectangle,
     // When the hero tries to pick up the object with the passive skill button.
@@ -125,10 +130,14 @@ export interface ObjectInstance {
     onPush?: (state: GameState, direction: Direction) => void,
     pullingHeroDirection?: Direction,
     update?: (state: GameState) => void,
-    render?: (context: CanvasRenderingContext2D, state: GameState) => void,
+    add?: (state: GameState, area: AreaInstance) => void,
+    remove?: (state: GameState, area: AreaInstance) => void,
+    render: (context: CanvasRenderingContext2D, state: GameState) => void,
 }
 
-export type ObjectStatus = 'normal' | 'gone' | 'hiddenSwitch' | 'hiddenEnemy' | 'active';
+export type ObjectStatus = 'active' | 'closed' | 'closedEnemy' | 'closedSwitch'
+    | 'gone' | 'hiddenSwitch' | 'hiddenEnemy' | 'normal';
+
 export interface BaseObjectDefinition {
     id: string,
     status: ObjectStatus,
@@ -152,7 +161,7 @@ export interface CrystalSwitchDefinition extends BaseObjectDefinition {
     timer?: number,
 }
 
-export type SimpleObjectType = 'pushPull' | 'rollingBall' | 'tippable';
+export type SimpleObjectType = 'door' | 'pushPull' | 'rollingBall' | 'tippable';
 
 export interface SimpleObjectDefinition extends BaseObjectDefinition {
     type: SimpleObjectType,

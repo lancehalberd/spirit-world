@@ -21,6 +21,10 @@ export function isPixelInShortRect(x: number, y: number, {x: l = 0, y: t = 0, w 
     return !(y < t || y >= t + h || x < l || x >= l + w);
 }
 
+export function isBoxInBox(A: ShortRectangle, B: ShortRectangle) {
+    return !(A.y + A.h - 1 < B.y || A.y > B.y + B.h - 1 || A.x + A.w - 1 < B.x || A.x > B.x + B.w - 1);
+}
+
 export function rectanglesOverlap(A: ShortRectangle, B: ShortRectangle) {
     return !(A.y + A.h <= B.y || A.y >= B.y + B.h || A.x + A.w <= B.x || A.x >= B.x + B.w);
 }

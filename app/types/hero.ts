@@ -1,9 +1,10 @@
 import { Clone } from 'app/content/clone';
 import { Staff } from 'app/content/staff';
 
-import { Direction, FrameAnimation, ObjectInstance, ObjectStatus, Tile } from 'app/types';
+import { Direction, FrameAnimation, GameState, ObjectInstance, ObjectStatus, Tile } from 'app/types';
 
-export type Action = 'attack' | 'roll' | 'knocked' | 'hurt' | 'dead' | 'grabbing' | 'carrying' | 'throwing' | 'getItem';
+export type Action =
+    'attack' | 'roll' | 'knocked' | 'hurt' | 'dead' | 'grabbing' | 'carrying' | 'throwing' | 'getItem' | 'beingMoved';
 export type ActiveTool = 'bow' | 'staff' | 'clone' | 'invisibility';
 export type Equipment = 'cloudBoots' | 'ironBoots';
 export type PassiveTool = 'gloves'
@@ -45,12 +46,14 @@ export interface Actor {
     actionDx?: number,
     actionDy?: number,
     actionFrame?: number,
+    actionTarget?: any,
     pickUpFrame?: number,
     pickUpTile?: Tile,
     grabTile?: Tile,
     grabObject?: ObjectInstance,
     invulnerableFrames?: number,
     life: number,
+    render: (context: CanvasRenderingContext2D, state: GameState) => void,
 }
 
 export interface Hero extends Actor {

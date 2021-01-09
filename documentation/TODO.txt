@@ -1,17 +1,22 @@
 Test at http://localhost:81/alttp/public/
 
 Bugs:
-    Sometimes get stuck when moving diagonally across the transition from an object flush with a tile wall. Possibly a wiggling issue?
+    Fix tiles should also be reset when leaving an area section.
 
-    Leaving an area section and immediately returning doesn't reset objects
-        - Fix tiles should also be reset when leaving an area section?
+Update collision detection and wiggle logic:
+    - Create an array that is the width of the character(relative to movement direction) + 16
+    - Assuming entry 8 = [ax, ay] and length - 9 = [ax + width - 1, ay] (for moving up or down) check pairs of 0 and 3 pixels every 4 pixels, so for w = 16, check 8+11,12+15,16+19,20+23. If any are blocked, movement is blocked, remember the blocked pixel index.
+    - If movement is blocked if blocked index <= length / 2 then scan right starting at blocked index + 1. If w open pixels are found, wiggle right. If a blocked pixel is found at index >= length - w, then abort, wiggling is not possible.
+    - If blocked index > length / 2, repeat the above except scanning left to check for left wiggle.
 
-Add doors:
-    - status closedEnemy: close on entering a room (in case the player came through that way) and open when all enemies defeated.
-    - status closedSwitch: open based on switches:
-        - for crystals, open as long as all crystals are activated
-        - for floor switches, toggle status when the floor switch toggles
-            - For floor switches that toggle when pressure is removed, this requres leaving the switch pressed by placing an object/clone/staff on top of it.
+Add Small Loot to editor that creates LootDrop
+    - locked to tile grid
+    - if on destructable tile (cuttable, pickup), not rendered/updated until the tile is destroyed.
+    - keep a hash of picked up objects in dungeons so these only replenish on leaving the dungeon.
+
+Door floor switch behavior:
+    - for floor switches, toggle status when the floor switch toggles
+        - For floor switches that toggle when pressure is removed, this requres leaving the switch pressed by placing an object/clone/staff on top of it.
 
 Add ability to charge weapon
     Spin chakram around quickly in a circle twice (can move after throwing)

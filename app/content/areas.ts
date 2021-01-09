@@ -13,6 +13,29 @@ import {
     Direction, GameState, ObjectInstance, ShortRectangle, Tile, TilePalette,
 } from 'app/types';
 
+
+export const BITMAP_TOP_RIGHT: Uint16Array = new Uint16Array([
+    0xFFFF, 0x7FFF, 0x3FFF, 0x1FFF, 0x0FFF, 0x07FF, 0x03FF, 0x01FF,
+    0x00FF, 0x007F, 0x003F, 0x001F, 0x000F, 0x0007, 0x0003, 0x0001,
+]);
+
+export const BITMAP_TOP: Uint16Array = new Uint16Array([
+    0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
+    0, 0, 0, 0, 0, 0, 0, 0,
+]);
+export const BITMAP_BOTTOM: Uint16Array = new Uint16Array([
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
+]);
+export const BITMAP_LEFT: Uint16Array = new Uint16Array([
+    0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00,
+    0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00,
+]);
+export const BITMAP_RIGHT: Uint16Array = new Uint16Array([
+    0x00FF, 0x00FF, 0x00FF, 0x00FF, 0x00FF, 0x00FF, 0x00FF, 0x00FF,
+    0x00FF, 0x00FF, 0x00FF, 0x00FF, 0x00FF, 0x00FF, 0x00FF, 0x00FF,
+]);
+
 export const [mapTilesFrame] = createAnimation('gfx/tiles/overworld.png', {w: 384, h: 640}).frames;
 const worldMapPalette: TilePalette = {
     w: 16, h: 16,
@@ -21,6 +44,11 @@ const worldMapPalette: TilePalette = {
     // Array of tiles to randomly apply by default.
     defaultTiles: [{x: 0, y: 16}, {x: 1, y: 16}, {x: 2, y: 16}, {x: 3, y: 16}],
     behaviors: {
+        '0x7': {solidMap: BITMAP_TOP_RIGHT},
+        '1x1': {solidMap: BITMAP_TOP},
+        '1x4': {solidMap: BITMAP_BOTTOM},
+        '5x6': {solidMap: BITMAP_LEFT},
+        '3x7': {solidMap: BITMAP_RIGHT},
         '11x3': {pit: true},
         '16x8': {solid: true, pickupWeight: 1, underTile: {x: 1, y: 8}, lootChance: 0.2, lootTypes: ['peach']},
         '16x9': {solid: true, pickupWeight: 1, underTile: {x: 1, y: 9}, lootChance: 0.2, lootTypes: ['peach']},
@@ -94,10 +122,7 @@ export function initializeAreaTiles(area: AreaDefinition): AreaDefinition {
 
 export function removeAllClones(state: GameState): void {
     for (const clone of state.hero.clones) {
-        const index = state.areaInstance.objects.indexOf(clone);
-        if (index >= 0) {
-            state.areaInstance.objects.splice(index, 1);
-        }
+        removeObjectFromArea(state, state.areaInstance, clone);
     }
     state.hero.clones = []
     state.hero.activeClone = null;
@@ -106,7 +131,7 @@ export function removeAllClones(state: GameState): void {
 export function enterArea(state: GameState, area: AreaDefinition, x: number, y: number): void {
     // Remove all clones on changing areas.
     removeAllClones(state);
-    state.hero.activeStaff?.remove(state);
+    state.hero.activeStaff?.remove(state, state.areaInstance);
     state.areaInstance = createAreaInstance(state, area);
     state.hero.x = x;
     state.hero.y = y;
@@ -146,7 +171,7 @@ export function setAreaSection(state: GameState, d: Direction): void {
     }
     if (lastAreaSection !== state.areaSection) {
         removeAllClones(state);
-        state.hero.activeStaff?.remove(state);
+        state.hero.activeStaff?.remove(state, state.areaInstance);
         state.hero.safeX = state.hero.x;
         state.hero.safeY = state.hero.y;
     }
@@ -189,7 +214,7 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
     );
     context.fillStyle = 'black';
     context.fillRect(0, 0, canvas.width, canvas.height);
-    return {
+    const instance: AreaInstance = {
         definition: definition,
         palette,
         w: definition.layers[0].grid.w,
@@ -202,11 +227,13 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
             tilesDrawn: [],
             palette: palettes[layer.grid.palette]
         })),
-        objects: definition.objects.map(o => createObjectInstance(state, o)).filter(o => o),
+        objects: [],
         canvas,
         context,
         cameraOffset: {x: 0, y: 0},
     };
+    definition.objects.map(o => addObjectToArea(state, instance, createObjectInstance(state, o)));
+    return instance;
 }
 
 export function getAreaSize(state: GameState): {w: number, h: number, section: ShortRectangle} {
@@ -230,16 +257,28 @@ export function refreshOffscreenObjects(state: GameState): void {
         const object = state.areaInstance.objects[i];
         if (object.definition && object.definition.type !== 'enemy') {
             if (object.x < l || object.x > l + CANVAS_WIDTH || object.y < t || object.y > t + CANVAS_HEIGHT) {
-                state.areaInstance.objects[i] = createObjectInstance(state, object.definition);
+                if (state.areaInstance.objects[i].alwaysReset) {
+                    state.areaInstance.objects[i] = createObjectInstance(state, object.definition);
+                }
             }
         }
     }
 }
-
-export function removeObjectFromArea(area: AreaInstance, object: ObjectInstance): void {
-    const index = area.objects.indexOf(object);
-    if (index >= 0) {
-        area.objects.splice(index, 1);
+export function addObjectToArea(state: GameState, area: AreaInstance, object: ObjectInstance): void {
+    if (object.add) {
+        object.add(state, area);
+    } else {
+        area.objects.push(object);
+    }
+}
+export function removeObjectFromArea(state: GameState, area: AreaInstance, object: ObjectInstance): void {
+    if (object.remove) {
+        object.remove(state, area);
+    } else {
+        const index = area.objects.indexOf(object);
+        if (index >= 0) {
+            area.objects.splice(index, 1);
+        }
     }
 }
 
@@ -262,7 +301,7 @@ export function destroyTile(state: GameState, target: Tile): void {
                 y: target.y * area.palette.h,
                 status: 'normal'
             });
-            area.objects.push(drop);
+            addObjectToArea(state, area, drop);
             drop.x += (area.palette.w - drop.frame.w) / 2;
             drop.y += (area.palette.h - drop.frame.h) / 2;
         }

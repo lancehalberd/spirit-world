@@ -1,5 +1,6 @@
 import { enterArea, getAreaFromGridCoords } from 'app/content/areas';
 import { worldMap as testWorld } from 'app/content/peachCaveB1';
+import { renderHero } from 'app/renderActor';
 
 import { GameState, Hero, SavedState } from 'app/types';
 
@@ -66,6 +67,7 @@ function getDefaultHeroState(): Hero {
         status: 'normal',
         invisible: false,
         invisibilityCost: 0,
+        render: renderHero,
     };
 }
 

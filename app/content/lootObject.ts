@@ -33,7 +33,7 @@ export class LootGetAnimation implements ObjectInstance {
         }
         this.animationTime += FRAME_LENGTH;
         if (this.animationTime > 1000) {
-            removeObjectFromArea(state.areaInstance, this);
+            removeObjectFromArea(state, state.areaInstance, this);
         }
     }
     render(context, state: GameState) {
@@ -91,7 +91,7 @@ export class LootDropObject extends LootObject {
         if (rectanglesOverlap(state.hero.activeClone || state.hero, {...this.frame, x: this.x, y: this.y})) {
             const onPickup = lootEffects[this.definition.lootType] || lootEffects.unknown;
             onPickup(state, this);
-            state.areaInstance.objects.splice(state.areaInstance.objects.indexOf(this), 1);
+            removeObjectFromArea(state, state.areaInstance, this);
         }
     }
 }

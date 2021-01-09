@@ -1,6 +1,7 @@
 import _ from 'lodash';
 
 import { enterAreaGrid, palettes, setAreaSection } from 'app/content/areas';
+import { lootFrames } from 'app/content/lootObject';
 import { createObjectInstance } from 'app/content/objects';
 import { exportAreaGridToClipboard, importAreaGrid, serializeAreaGrid } from 'app/development/exportAreaGrid';
 import {
@@ -24,7 +25,7 @@ import { readFromFile, saveToFile } from 'app/utils/index';
 import { getMousePosition, isMouseDown } from 'app/utils/mouse';
 
 import {
-    AreaInstance, EditorProperty,  EnemyType, GameState,
+    AreaInstance, Direction, EditorProperty,  EnemyType, GameState,
     LootType, MagicElement,
     ObjectDefinition, ObjectStatus, ObjectType,
     PropertyRow, TileGrid,
@@ -35,6 +36,7 @@ export interface EditingState {
     tool: EditorToolType,
     isEditing: boolean,
     brush: TileGrid,
+    direction: Direction,
     selectedLayerIndex: number,
     element?: MagicElement,
     enemyType: EnemyType,
@@ -53,6 +55,7 @@ export const editingState: EditingState = {
     tool: 'select',
     isEditing: false,
     brush: null,
+    direction: 'up',
     selectedLayerIndex: 0,
     element: null,
     enemyType: 'snake',
@@ -376,7 +379,7 @@ function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, a
             // drawFrame(context, frame, {...frame, x: object.x - (frame.content?.x || 0), y: object.y - (frame.content?.y || 0)});
             // While editing, draw the loot inside the chest on top as well.
             if (object.type === 'chest') {
-                const frame = getObjectFrame({...object, type: 'loot'});
+                const frame = lootFrames[object.lootType] || lootFrames.unknown;
                 drawFrame(context, frame, {...frame, x: object.x - (frame.content?.x || 0), y: object.y - (frame.content?.y || 0)});
             }
         }
