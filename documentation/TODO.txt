@@ -6,8 +6,6 @@ Bugs:
     Leaving an area section and immediately returning doesn't reset objects
         - Fix tiles should also be reset when leaving an area section?
 
-    Fix player isn't tracking smoothly when dragging push pull objects.
-
 Add doors:
     - status closedEnemy: close on entering a room (in case the player came through that way) and open when all enemies defeated.
     - status closedSwitch: open based on switches:

@@ -78,7 +78,7 @@ export function updateHero(this: void, state: GameState) {
             hero.grabTile = null;
             hero.grabObject = null;
         } else if (hero.grabObject?.onPull) {
-            [dx, dy] = getMovementDeltas();
+            const [dx, dy] = getMovementDeltas();
             if (dx || dy) {
                 const direction = getDirection(dx, dy);
                 const x = hero.x + 8 + 16 * directionMap[direction][0];
