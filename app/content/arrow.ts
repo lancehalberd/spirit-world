@@ -43,8 +43,8 @@ export class Arrow implements ObjectInstance {
     status: ObjectStatus = 'normal';
     constructor({x = 0, y = 0, vx = 0, vy = 0, direction, damage = 1}: Props) {
         this.frame = arrowFrame;
-        this.x = x;
-        this.y = y;
+        this.x = x | 0;
+        this.y = y | 0;
         this.vx = vx;
         this.vy = vy;
         this.direction = direction;
