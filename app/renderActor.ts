@@ -4,7 +4,7 @@ import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 
 import { Actor, ActorAnimations, Frame, FrameAnimation, FrameDimensions, GameState, Hero, ObjectInstance } from 'app/types';
 
-const heroGeometry: FrameDimensions = {w: 18, h: 26, content: {x: 1, y: 10, w: 16, h: 16}};
+const heroGeometry: FrameDimensions = {w: 18, h: 26, content: {x: 1, y: 15, w: 16, h: 16}};
 const upAnimation: FrameAnimation = createAnimation('gfx/facing.png', heroGeometry, { cols: 1, x: 2});
 const downAnimation: FrameAnimation = createAnimation('gfx/facing.png', heroGeometry, { cols: 1, x: 0});
 const leftAnimation: FrameAnimation = createAnimation('gfx/facing.png', heroGeometry, { cols: 1, x: 3});
@@ -59,5 +59,5 @@ export function renderCarriedTile(context: CanvasRenderingContext2D, state: Game
 }
 
 export function renderShadow(context: CanvasRenderingContext2D, state: GameState, object: ObjectInstance): void {
-    drawFrame(mainContext, shadowFrame, { ...shadowFrame, x: object.x, y: object.y });
+    drawFrame(mainContext, shadowFrame, { ...shadowFrame, x: object.x, y: object.y - 3 });
 }
