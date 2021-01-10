@@ -58,6 +58,11 @@ export function renderCarriedTile(context: CanvasRenderingContext2D, state: Game
         { x: actor.x + offset.x, y: actor.y+ offset.y, w: palette.w, h: palette.h });
 }
 
+
+export function renderHeroShadow(context: CanvasRenderingContext2D, state: GameState, hero: Hero): void {
+    drawFrame(mainContext, shadowFrame, { ...shadowFrame, x: hero.x, y: hero.y - 3 });
+}
+
 export function renderShadow(context: CanvasRenderingContext2D, state: GameState, object: ObjectInstance): void {
     drawFrame(mainContext, shadowFrame, { ...shadowFrame, x: object.x, y: object.y - 3 });
 }

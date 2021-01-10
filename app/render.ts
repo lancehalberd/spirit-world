@@ -1,7 +1,8 @@
+import { Clone } from 'app/content/clone';
 import { editingState, renderEditor } from 'app/development/tileEditor';
 import { createCanvasAndContext, mainContext } from 'app/dom';
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from 'app/gameConstants';
-import { renderShadow } from 'app/renderActor';
+import { renderHeroShadow, renderShadow } from 'app/renderActor';
 import { renderHUD } from 'app/renderHUD';
 import { renderMenu } from 'app/renderMenu';
 import { getState } from 'app/state';
@@ -137,11 +138,15 @@ export function renderAreaObjectsBeforeHero(context: CanvasRenderingContext2D, s
     }
     context.save();
         translateContextForAreaAndCamera(context, state, area);
-        renderShadow(context, state, state.hero);
+        renderHeroShadow(context, state, state.hero);
         // Render shadows before anything else.
         for (const object of area.objects) {
             if (object.drawPriority === 'sprites') {
-                renderShadow(context, state, object);
+                if (object instanceof Clone) {
+                    renderHeroShadow(context, state, object);
+                } else {
+                    renderShadow(context, state, object);
+                }
             }
         }
         for (const object of area.objects) {

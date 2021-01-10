@@ -90,7 +90,7 @@ export class Enemy implements Actor, ObjectInstance {
     }
 }
 
-const snakeGeometry = { w: 18, h: 18, content: { x: 1, y: 1, w: 16, h: 16} };
+const snakeGeometry = { w: 18, h: 18, content: { x: 1, y: 6, w: 16, h: 16} };
 const leftSnakeAnimation: FrameAnimation = createAnimation('gfx/enemies/snek.png', snakeGeometry, { x: 0});
 const downSnakeAnimation: FrameAnimation = createAnimation('gfx/enemies/snek.png', snakeGeometry, { x: 1});
 const upSnakeAnimation: FrameAnimation = createAnimation('gfx/enemies/snek.png', snakeGeometry, { x: 2});
