@@ -69,6 +69,9 @@ export function getTileBehaviorsAndObstacles(state: GameState, {x, y}: Tile): {t
         tileBehavior.solid = !!(tileBehavior.solidMap[sy] >> (15 - sx) & 1);
     }
     for (const object of state.areaInstance.objects) {
+        if (object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
+            continue;
+        }
         if (object.getHitbox && object.behaviors?.solid) {
             if (isPixelInShortRect(x, y, object.getHitbox(state))) {
                 objects.push(object);

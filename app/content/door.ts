@@ -1,4 +1,5 @@
-import { BITMAP_BOTTOM, BITMAP_LEFT, BITMAP_RIGHT, BITMAP_TOP } from 'app/content/areas';
+import { resetTileBehavior } from 'app/content/areas';
+import { BITMAP_BOTTOM, BITMAP_LEFT, BITMAP_RIGHT, BITMAP_TOP } from 'app/content/palettes';
 import { isBoxInBox } from 'app/utils/index';
 
 import {
@@ -62,20 +63,12 @@ export class Door implements ObjectInstance {
     }
     // This is probably only needed by the editor since doors are not removed during gameplay.
     remove(state: GameState, area: AreaInstance) {
-        const grid = area.definition.layers[0].grid;
-        const palette = area.palette;
         const y = Math.floor(this.y / 16);
         const x = Math.floor(this.x / 16);
-        function resetBehavior(x: number, y: number): void {
-            const tile = grid.tiles[y]?.[x];
-            if (tile) {
-                area.behaviorGrid[y][x] = palette.behaviors[`${tile.x}x${tile.y}`];
-            }
-        }
-        resetBehavior(x, y);
-        resetBehavior(x + 1, y);
-        resetBehavior(x, y + 1);
-        resetBehavior(x + 1, y + 1);
+        resetTileBehavior(area, {x, y});
+        resetTileBehavior(area, {x: x + 1, y});
+        resetTileBehavior(area, {x, y: y + 1});
+        resetTileBehavior(area, {x: x + 1, y: y + 1});
         const index = area.objects.indexOf(this);
         if (index >= 0) {
             area.objects.splice(index, 1);
@@ -102,6 +95,8 @@ export class Door implements ObjectInstance {
             hero.actionTarget = null;
             hero.actionDx = 0;
             hero.actionDy = 0;
+            hero.safeX = hero.x;
+            hero.safeY = hero.y;
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {

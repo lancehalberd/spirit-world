@@ -8,12 +8,12 @@ import {
 } from 'app/types';
 
 let propertyPanelElement = null;
-let propertiesByName: {[key: string]: EditorProperty<any>} = {};
+let propertiesById: {[key: string]: EditorProperty<any>} = {};
 
 
 export function displayPropertyPanel(properties: (EditorProperty<any> | PropertyRow | string)[]): void {
     hidePropertyPanel();
-    propertiesByName = {};
+    propertiesById = {};
     propertyPanelElement = tagElement('div', 'pp-container');
     for (const property of properties) {
         if (Array.isArray(property)) {
@@ -25,7 +25,7 @@ export function displayPropertyPanel(properties: (EditorProperty<any> | Property
     propertyPanelElement.addEventListener('change', (event: InputEvent) => {
         const input = (event.target as HTMLElement).closest('input')
             || (event.target as HTMLElement).closest('select');
-        const property = input && propertiesByName[input.name];
+        const property = input && propertiesById[input.name];
         if (property) {
             if (isStringProperty(property) && property.onChange) {
                 // If there is a validation error, onChange will return
@@ -57,7 +57,7 @@ export function displayPropertyPanel(properties: (EditorProperty<any> | Property
     propertyPanelElement.addEventListener('click', (event: InputEvent) => {
         const button = (event.target as HTMLElement).closest('button');
         if (button) {
-            const property = propertiesByName[button.name];
+            const property = propertiesById[button.name];
             if (isButtonProperty(property)) {
                 property.onClick();
             }
@@ -65,7 +65,7 @@ export function displayPropertyPanel(properties: (EditorProperty<any> | Property
         const tag = (event.target as HTMLElement).closest('.pp-tag');
         if (tag) {
             const container = tag.closest('.pp-tag-container') as HTMLElement;
-            const property = container && propertiesByName[container.getAttribute('name')];
+            const property = container && propertiesById[container.getAttribute('name')];
             if (isStringArrayProperty(property)) {
                 const value = tag.textContent;
                 const index = property.value.indexOf(value);
@@ -169,7 +169,7 @@ function renderProperty(property: EditorProperty<any> | string): string | HTMLEl
         return `<span class="pp-property">${property}</span>`;
     }
     if (isPaletteProperty(property)) {
-        propertiesByName[property.name] = property;
+        propertiesById[property.id || property.name] = property;
         const span = tagElement('span', 'pp-property');
         const image = property.palette.source.image;
 
@@ -200,46 +200,46 @@ function renderProperty(property: EditorProperty<any> | string): string | HTMLEl
         span.append(brushCanvas);
         return span;
     } else if (isButtonProperty(property)) {
-        propertiesByName[property.name] = property;
-        return `<span class="pp-property"><button name="${property.name}">${property.name}</button></span>`;
+        propertiesById[property.id || property.name] = property;
+        return `<span class="pp-property"><button name="${property.id || property.name}">${property.name}</button></span>`;
     } else if (property.onChange) {
-        propertiesByName[property.name] = property;
+        propertiesById[property.id || property.name] = property;
         if (isStringProperty(property)) {
             if (property.values) {
-                return `<span class="pp-property">${property.name} <select name="${property.name}">`
+                return `<span class="pp-property">${property.name} <select name="${property.id || property.name}">`
                     + property.values.map(val => `
                         <option ${val === property.value ? 'selected' : ''}>
                             ${val}
                         </option>`)
                     + '</select></span>';
             }
-            return `<span class="pp-property">${property.name} <input value="${property.value}" name="${property.name}" /></span>`;
+            return `<span class="pp-property">${property.name} <input value="${property.value}" name="${property.id || property.name}" /></span>`;
         } else if (isNumberProperty(property)) {
             if (property.values) {
-                return `<span class="pp-property">${property.name} <select name="${property.name}">`
+                return `<span class="pp-property">${property.name} <select name="${property.id || property.name}">`
                     + property.values.map(val => `
                         <option ${val === property.value ? 'selected' : ''}>
                             ${val}
                         </option>`)
                     + '</select></span>';
             }
-            return `<span class="pp-property">${property.name} <input type="number" value="${property.value}" name="${property.name}" /></span>`;
+            return `<span class="pp-property">${property.name} <input type="number" value="${property.value}" name="${property.id || property.name}" /></span>`;
         } else if (isBooleanProperty(property)) {
             return `<span class="pp-property">
                         ${property.name}
-                        <input type="checkbox" ${property.value ? 'checked' : ''} name="${property.name}" />
+                        <input type="checkbox" ${property.value ? 'checked' : ''} name="${property.id || property.name}" />
                     </span>`;
         } else if (isStringArrayProperty(property)) {
             const options = property.values.filter(v => !property.value.includes(v));
             const selectedContainer = property.value.length ? `
-                <div class="pp-tag-container" name="${property.name}">
+                <div class="pp-tag-container" name="${property.id || property.name}">
                     ${property.value.map(v => `<span class="pp-tag">${v}</span>`).join('')}
                 </div>
                 ` : '';
 
             return `<span class="pp-property">
                         <div>
-                            ${property.name} <select name="${property.name}" ${!options.length ? 'disabled' : ''}>
+                            ${property.name} <select name="${property.id || property.name}" ${!options.length ? 'disabled' : ''}>
                                 <option disabled selected value> -- Add -- </option>
                                 ${options.map(val => `<option>${val}</option>`)}
                             </select>

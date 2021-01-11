@@ -7,7 +7,7 @@ import { renderHero } from 'app/renderActor';
 import {
     Action, ActiveTool,
     Direction, DrawPriority, MagicElement, Equipment, Frame,
-    GameState, Hero, ObjectInstance, ObjectStatus, PassiveTool,
+    GameState, Hero, LayerTile, ObjectInstance, ObjectStatus, PassiveTool,
     Tile
 } from 'app/types';
 
@@ -53,7 +53,7 @@ export class Clone implements Hero, ObjectInstance {
     actionDy: number;
     actionFrame: number;
     pickUpFrame: number;
-    pickUpTile: Tile;
+    pickUpTile: LayerTile;
     grabTile: Tile;
     grabObject: ObjectInstance;
     invulnerableFrames: number;

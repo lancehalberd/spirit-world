@@ -1,6 +1,10 @@
 import _ from 'lodash';
 
-import { enterAreaGrid, palettes, setAreaSection } from 'app/content/areas';
+import {
+    applyLayerToBehaviorGrid, enterAreaGrid,
+    initializeAreaLayerTiles, resetTileBehavior, setAreaSection,
+} from 'app/content/areas';
+import { palettes } from 'app/content/palettes';
 import { lootFrames } from 'app/content/lootObject';
 import { createObjectInstance } from 'app/content/objects';
 import { exportAreaGridToClipboard, importAreaGrid, serializeAreaGrid } from 'app/development/exportAreaGrid';
@@ -25,13 +29,13 @@ import { readFromFile, saveToFile } from 'app/utils/index';
 import { getMousePosition, isMouseDown } from 'app/utils/mouse';
 
 import {
-    AreaInstance, Direction, EditorProperty,  EnemyType, GameState,
+    AreaInstance, AreaLayerDefinition, Direction, EditorProperty,  EnemyType, GameState,
     LootType, MagicElement,
     ObjectDefinition, ObjectStatus, ObjectType,
     PropertyRow, TileGrid,
 } from 'app/types';
 
-type EditorToolType = 'select' | 'brush' | 'object';
+type EditorToolType = 'select' | 'brush' | 'replace' | 'object';
 export interface EditingState {
     tool: EditorToolType,
     isEditing: boolean,
@@ -43,6 +47,7 @@ export interface EditingState {
     lootType: LootType,
     objectStatus: ObjectStatus,
     objectType: ObjectType,
+    replacePercentage: number,
     selectedObject?: ObjectDefinition,
     showAreaProperties: boolean,
     showFieldProperties: boolean,
@@ -62,6 +67,7 @@ export const editingState: EditingState = {
     lootType: 'peachOfImmortalityPiece',
     objectStatus: 'normal',
     objectType: combinedObjectTypes[0],
+    replacePercentage: 100,
     selectedObject: null,
     showAreaProperties: false,
     showFieldProperties: true,
@@ -71,15 +77,16 @@ export const editingState: EditingState = {
 };
 window['editingState'] = editingState;
 export function toggleEditing() {
+    const state = getState();
     editingState.isEditing = !editingState.isEditing;
     if (editingState.isEditing) {
-        startEditing();
+        startEditing(state);
     } else {
-        stopEditing();
+        stopEditing(state);
     }
 }
-export function startEditing() {
-    const area = getState().areaInstance.definition;
+export function startEditing(state: GameState) {
+    const area = state.areaInstance.definition;
     const layer = area.layers[editingState.selectedLayerIndex];
     const palette = palettes[layer.grid.palette];
     if (!editingState.brush) {
@@ -94,10 +101,14 @@ export function startEditing() {
         }
     }
     displayTileEditorPropertyPanel();
+    state.areaInstance.tilesDrawn = [];
+    state.areaInstance.checkToRedrawTiles = true;
 }
 
-export function stopEditing() {
+export function stopEditing(state: GameState) {
     hidePropertyPanel();
+    state.areaInstance.tilesDrawn = [];
+    state.areaInstance.checkToRedrawTiles = true;
 }
 
 const fullSection = {x: 0, y: 0, w: 32, h: 32};
@@ -122,9 +133,10 @@ const sectionLayouts = {
 }
 export function displayTileEditorPropertyPanel() {
     const state = getState();
-    const area = state.areaInstance.definition;
-    const layer = area.layers[editingState.selectedLayerIndex];
-    const palette = palettes[layer.grid.palette];
+    if (editingState.selectedLayerIndex >= state.areaInstance.layers.length) {
+        editingState.selectedLayerIndex = 0;
+    }
+    const selectedPaletteKey = state.areaInstance.layers[editingState.selectedLayerIndex].definition.grid.palette;
     let rows: (EditorProperty<any> | PropertyRow | string)[] = [];
     rows.push({
         name: editingState.showAreaProperties ? 'Area -' : 'Area +',
@@ -178,34 +190,161 @@ export function displayTileEditorPropertyPanel() {
     rows.push(' ');
     rows.push(' ');
     rows.push({
-        name: editingState.showFieldProperties ? 'Field -' : 'Field +',
+        name: editingState.showFieldProperties ? 'Layers -' : 'Layers +',
         onClick() {
             editingState.showFieldProperties = !editingState.showFieldProperties;
             displayTileEditorPropertyPanel();
         },
     });
     if (editingState.showFieldProperties) {
+        for (let i = 0; i < state.areaInstance.layers.length; i++) {
+            const layer = state.areaInstance.layers[i];
+            const row: PropertyRow = [
+            {
+                name: '',
+                id: `layer-${i}-key`,
+                value: layer.key,
+                onChange(key: string) {
+                    layer.key = key
+                    layer.definition.key = key;
+                    // editingState.selectedLayerIndex = i;
+                    displayTileEditorPropertyPanel();
+                },
+            }];
+            if (i > 0) {
+                row.push({
+                    name: '^',
+                    id: `layer-${i}-up`,
+                    onClick() {
+                        state.areaInstance.layers[i] = state.areaInstance.layers[i - 1];
+                        state.areaInstance.definition.layers[i] = state.areaInstance.definition.layers[i - 1];
+                        state.areaInstance.layers[i - 1] = layer;
+                        state.areaInstance.definition.layers[i - 1] = layer.definition;
+                        state.areaInstance.tilesDrawn = [];
+                        state.areaInstance.checkToRedrawTiles = true;
+                        if (editingState.selectedLayerIndex === i - 1) {
+                            editingState.selectedLayerIndex = i;
+                        } else if (editingState.selectedLayerIndex === i) {
+                            editingState.selectedLayerIndex = i - 1;
+                        }
+                        displayTileEditorPropertyPanel();
+                    },
+                });
+            }
+            if (i < state.areaInstance.layers.length - 1) {
+                row.push({
+                    name: 'v',
+                    id: `layer-${i}-down`,
+                    onClick() {
+                        state.areaInstance.layers[i] = state.areaInstance.layers[i + 1];
+                        state.areaInstance.definition.layers[i] = state.areaInstance.definition.layers[i + 1];
+                        state.areaInstance.layers[i + 1] = layer;
+                        state.areaInstance.definition.layers[i + 1] = layer.definition;
+                        state.areaInstance.tilesDrawn = [];
+                        state.areaInstance.checkToRedrawTiles = true;
+                        if (editingState.selectedLayerIndex === i + 1) {
+                            editingState.selectedLayerIndex = i;
+                        } else if (editingState.selectedLayerIndex === i) {
+                            editingState.selectedLayerIndex = i + 1;
+                        }
+                        displayTileEditorPropertyPanel();
+                    },
+                });
+            }
+            if (editingState.selectedLayerIndex !== i) {
+                row.unshift({
+                    name: '>',
+                    id: `layer-${i}-select`,
+                    onClick() {
+                        editingState.selectedLayerIndex = i;
+                        state.areaInstance.tilesDrawn = [];
+                        state.areaInstance.checkToRedrawTiles = true;
+                        displayTileEditorPropertyPanel();
+                    }
+                })
+            } else {
+                row.unshift('**');
+            }
+            rows.push(row);
+        }
+        rows.push({
+            name: 'Add Layer',
+            onClick() {
+                const key = 'layer-' + state.areaInstance.definition.layers.length;
+                const layerDefinition: AreaLayerDefinition = {
+                    key,
+                    grid: {
+                        // The dimensions of the grid.
+                        w: state.areaInstance.w,
+                        h: state.areaInstance.h,
+                        // The palette to use for this grid (controls the size of tiles)
+                        palette: selectedPaletteKey,
+                        // The matrix of tiles
+                        tiles: [],
+                    },
+                };
+                initializeAreaLayerTiles(layerDefinition);
+                state.areaInstance.definition.layers.push(layerDefinition);
+                state.areaInstance.layers.push({
+                    definition: layerDefinition,
+                    ...layerDefinition,
+                    ...layerDefinition.grid,
+                    tiles: _.cloneDeep(layerDefinition.grid.tiles),
+                    palette: palettes[layerDefinition.grid.palette]
+                });
+                applyLayerToBehaviorGrid(state.areaInstance.behaviorGrid, layerDefinition);
+                editingState.selectedLayerIndex = _.findIndex(state.areaInstance.layers, { key });
+                state.areaInstance.tilesDrawn = [];
+                state.areaInstance.checkToRedrawTiles = true;
+                displayTileEditorPropertyPanel();
+            }
+        });
         rows.push({
             name: 'tool',
             value: editingState.tool,
-            values: ['select', 'brush', 'object'],
+            values: ['select', 'brush', 'replace', 'object'],
             onChange(tool: EditorToolType) {
                 editingState.tool = tool;
                 displayTileEditorPropertyPanel();
             },
         });
+        rows.push({
+            name: 'palette',
+            value: selectedPaletteKey,
+            values: Object.keys(palettes),
+            onChange(key: string) {
+                state.areaInstance.definition.layers[editingState.selectedLayerIndex].grid.palette = key;
+                state.areaInstance.layers[editingState.selectedLayerIndex].palette = palettes[key];
+                state.areaInstance.tilesDrawn = [];
+                state.areaInstance.checkToRedrawTiles = true;
+                displayTileEditorPropertyPanel();
+            },
+        });
+        rows.push({
+            name: 'brush',
+            value: editingState.brush,
+            palette: palettes[selectedPaletteKey],
+            onChange(tiles: TileGrid) {
+                editingState.brush = tiles;
+                updateBrushCanvas(editingState.brush);
+                if (editingState.tool !== 'brush' && editingState.tool !== 'replace') {
+                    editingState.tool = 'brush';
+                    displayTileEditorPropertyPanel();
+                }
+            }
+        });
         switch (editingState.tool) {
             case 'brush':
+                break;
+            case 'replace':
                 rows.push({
-                    name: 'brush',
-                    value: editingState.brush,
-                    palette,
-                    onChange(tiles: TileGrid) {
-                        editingState.brush = tiles;
-                        updateBrushCanvas(editingState.brush);
+                    name: 'percent',
+                    value: editingState.replacePercentage,
+                    onChange(percent: number) {
+                        editingState.replacePercentage = Math.max(0, Math.min(100, percent));
+                        return editingState.replacePercentage;
                     }
                 });
-                break;
             case 'object':
                 rows = [...rows, ...getObjectProperties(state, editingState)];
                 break;
@@ -319,6 +458,9 @@ mainCanvas.addEventListener('mousedown', function () {
         case 'brush':
             drawBrush(x, y);
             break;
+        case 'replace':
+            replaceTiles(x, y);
+            break;
     }
 });
 
@@ -345,8 +487,30 @@ function drawBrush(x: number, y: number): void {
             const tile = editingState.brush.tiles[y][x]
             tileRow[column] = tile;
             layer.tiles[row][column] = tile;
-            layer.tilesDrawn[row][column] = false;
-            area.behaviorGrid[row][column] = palette.behaviors[`${tile.x}x${tile.y}`];
+            state.areaInstance.tilesDrawn[row][column] = false;
+            state.areaInstance.checkToRedrawTiles = true;
+            resetTileBehavior(area, {x: column, y: row});
+        }
+    }
+}
+function replaceTiles(x: number, y: number): void {
+    const state = getState();
+    const layer = state.areaInstance.layers[editingState.selectedLayerIndex];
+    const { w, h } = layer.palette;
+    const tile = layer.tiles[((state.camera.y + y) / h) | 0]?.[((state.camera.x + x) / w) | 0];
+    const replacement = editingState.brush.tiles[0][0];
+    if (!tile) {
+        return;
+    }
+    for (let y = 0; y < layer.tiles.length; y++) {
+        for (let x = 0; x < layer.tiles[y].length; x++) {
+            const t = layer.tiles[y][x];
+            if (t.x === tile.x && t.y === tile.y && Math.random() <= editingState.replacePercentage / 100) {
+                layer.definition.grid.tiles[y][x] = replacement;
+                layer.tiles[y][x] = replacement;
+                state.areaInstance.tilesDrawn[y][x] = false;
+                state.areaInstance.checkToRedrawTiles = true;
+            }
         }
     }
 }

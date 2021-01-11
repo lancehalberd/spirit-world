@@ -1,4 +1,5 @@
 import { getAreaSize, setAreaSection } from 'app/content/areas';
+import { displayTileEditorPropertyPanel, editingState } from 'app/development/tileEditor';
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
 
 import { GameState } from 'app/types';
@@ -39,6 +40,11 @@ export function updateCamera(state: GameState, speed = cameraSpeed): void {
             state.areaInstance.cameraOffset = {x: 0, y: 0};
             state.nextAreaInstance = null;
             setAreaSection(state, state.hero.d);
+            if (editingState.isEditing) {
+                displayTileEditorPropertyPanel();
+                state.areaInstance.tilesDrawn = [];
+                state.areaInstance.checkToRedrawTiles = true;
+            }
         }
         return;
     }

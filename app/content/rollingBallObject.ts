@@ -1,11 +1,10 @@
-import { createAnimation, drawFrame } from 'app/utils/animations';
+import { FRAME_LENGTH } from 'app/gameConstants';
+import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { directionMap, getTileBehaviorsAndObstacles, isPointOpen } from 'app/utils/field';
 
-import { Direction, Frame, GameState, BaseObjectDefinition, ObjectInstance, ObjectStatus, ShortRectangle } from 'app/types';
+import { Direction, GameState, BaseObjectDefinition, ObjectInstance, ObjectStatus, ShortRectangle } from 'app/types';
 
-const tilesFrame = createAnimation('gfx/tiles/overworld.png', {w: 384, h: 640}).frames[0];
-export const normalFrame: Frame = {image: tilesFrame.image, x: 16 * 0, y: 16 * 35, w: 16, h: 16};
-const rollingFrame: Frame = {image: tilesFrame.image, x: 16 * 3, y: 16 * 35, w: 16, h: 16};
+const rollingAnimation = createAnimation('gfx/tiles/rollingboulder.png', {w: 16, h: 16}, {cols:4});
 
 export class RollingBallObject implements ObjectInstance {
     alwaysReset = true;
@@ -20,13 +19,15 @@ export class RollingBallObject implements ObjectInstance {
     pushCounter: number = 0;
     pushedThisFrame: boolean = false;
     status: ObjectStatus = 'normal';
+    animationTime = 0;
     constructor(definition: BaseObjectDefinition) {
         this.definition = definition;
         this.x = definition.x;
         this.y = definition.y;
+
     }
     getHitbox(state: GameState): ShortRectangle {
-        return { ...normalFrame, x: this.x, y: this.y };
+        return { x: this.x, y: this.y, w: 16, h: 16 };
     }
     onHit(state: GameState, direction: Direction): void {
         if (!this.rollDirection) {
@@ -51,6 +52,7 @@ export class RollingBallObject implements ObjectInstance {
     }
     update(state: GameState) {
         if (this.rollDirection) {
+            this.animationTime += FRAME_LENGTH;
             const dx = 2 * directionMap[this.rollDirection][0];
             const dy = 2 * directionMap[this.rollDirection][1];
             const x = this.x + dx + (this.rollDirection === 'right' ? 15 : 0);
@@ -78,10 +80,7 @@ export class RollingBallObject implements ObjectInstance {
         }
     }
     render(context, state: GameState) {
-        if (this.rollDirection) {
-            drawFrame(context, rollingFrame, { ...rollingFrame, x: this.x, y: this.y });
-        } else {
-            drawFrame(context, normalFrame, { ...normalFrame, x: this.x, y: this.y });
-        }
+        const frame = getFrame(rollingAnimation, this.animationTime);
+        drawFrame(context, frame, { ...frame, x: this.x, y: this.y });
     }
 }

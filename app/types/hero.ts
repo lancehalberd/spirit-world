@@ -1,7 +1,7 @@
 import { Clone } from 'app/content/clone';
 import { Staff } from 'app/content/staff';
 
-import { Direction, FrameAnimation, GameState, ObjectInstance, ObjectStatus, Tile } from 'app/types';
+import { Direction, FrameAnimation, GameState, LayerTile, ObjectInstance, ObjectStatus, Tile } from 'app/types';
 
 export type Action =
     'attack' | 'roll' | 'knocked' | 'hurt' | 'dead' | 'grabbing' | 'carrying' | 'throwing' | 'getItem' | 'beingMoved';
@@ -48,7 +48,7 @@ export interface Actor {
     actionFrame?: number,
     actionTarget?: any,
     pickUpFrame?: number,
-    pickUpTile?: Tile,
+    pickUpTile?: LayerTile,
     grabTile?: Tile,
     grabObject?: ObjectInstance,
     invulnerableFrames?: number,

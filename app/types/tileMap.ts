@@ -44,6 +44,12 @@ export interface Tile {
     y: number,
 }
 
+export interface LayerTile {
+    layerKey: string,
+    x: number,
+    y: number,
+}
+
 export interface TileGrid {
     // The dimensions of the grid.
     w: number,
@@ -76,10 +82,10 @@ export interface AreaLayerDefinition {
 export interface AreaLayer extends TileGrid {
     // Unique identifier for this layer.
     key: string,
+    definition: AreaLayerDefinition,
     // Coordinates for the layer origin, if not (0, 0).
     x?: number,
     y?: number,
-    tilesDrawn: boolean[][],
 }
 
 export interface AreaDefinition {
@@ -98,6 +104,8 @@ export interface AreaInstance {
     w: number,
     h: number,
     behaviorGrid: TileBehaviors[][],
+    checkToRedrawTiles: boolean,
+    tilesDrawn: boolean[][],
     layers: AreaLayer[],
     objects: ObjectInstance[],
     canvas: HTMLCanvasElement,

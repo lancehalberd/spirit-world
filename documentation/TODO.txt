@@ -2,6 +2,11 @@ Test at http://localhost:81/alttp/public/
 
 Bugs:
     Fix tiles should also be reset when leaving an area section.
+    Pushing on a solid object sitting on thorny ground shouldn't hurt you:
+        -return tileBehaviors and objectBehaviors separately, only damage if tile is solid+damaging.
+
+
+Add Particles to tile behaviors as array of frames. Use one of each frame when tile is destroyed. Include multiple copies of the frame in the particles array if we want duplicates of any frames.
 
 Update collision detection and wiggle logic:
     - Create an array that is the width of the character(relative to movement direction) + 16

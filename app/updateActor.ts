@@ -209,7 +209,7 @@ export function updateHero(this: void, state: GameState) {
                     hero.action = 'grabbing';
                     hero.grabTile = target;
                 }
-                if (hero.passiveTools.gloves >= behavior?.pickupWeight && behavior?.underTile) {
+                if (hero.passiveTools.gloves >= behavior?.pickupWeight) {
                     // This is an unusual distance, but should do what we want still.
                     const distance = (
                         Math.abs(target.x * area.palette.w - hero.x) +
@@ -241,11 +241,19 @@ export function updateHero(this: void, state: GameState) {
                 }
             }
             if (closestLiftableTile) {
-                const layer = area.layers[0];
-                const tile = layer.tiles[closestLiftableTile.y]?.[closestLiftableTile.x];
                 hero.pickUpFrame = 0;
-                hero.pickUpTile = tile;
-                destroyTile(state, closestLiftableTile);
+                for (const layer of state.areaInstance.layers) {
+                    const palette = layer.palette;
+                    const tile = {
+                        ...layer.definition.grid.tiles[closestLiftableTile.y][closestLiftableTile.x],
+                        layerKey: layer.key,
+                    };
+                    const behavior = palette.behaviors[`${tile.x}x${tile.y}`];
+                    if (behavior?.pickupWeight <= state.hero.passiveTools.gloves) {
+                        hero.pickUpTile = tile;
+                        destroyTile(state, {...closestLiftableTile, layerKey: layer.key});
+                    }
+                }
                 hero.grabTile = null;
             } else if (closestObject) {
                 if (closestObject.onGrab) {
@@ -420,7 +428,7 @@ export function throwHeldObject(hero: Hero, state: GameState){
     hero.actionFrame = 0;
     const throwSpeed = 6;
     const thrownObject = new ThrownObject({
-        frame: getTileFrame(state.areaInstance.palette, hero.pickUpTile),
+        frame: getTileFrame(state.areaInstance, hero.pickUpTile),
         x: hero.x,
         y: hero.y,
         vx: directionMap[hero.d][0] * throwSpeed,

@@ -128,10 +128,11 @@ export class Staff implements ObjectInstance {
         for (let row = this.topRow; row <= this.bottomRow; row++) {
             for (let column = this.leftColumn; column <= this.rightColumn; column++) {
                 // Indicate that the tiles need to be redrawn now that the staff is gone.
-                area.layers[0].tilesDrawn[row][column] = false;
+                area.tilesDrawn[row][column] = false;
                 area.behaviorGrid[row][column] = this.storedBehaviors[row][column];
             }
         }
+        area.checkToRedrawTiles = true;
         state.hero.activeStaff = null;
     }
     render(context, state: GameState) {

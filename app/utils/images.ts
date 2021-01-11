@@ -19,19 +19,22 @@ export function requireImage(imageFile) {
     return loadImage(imageFile, () => numberOfImagesLeftToLoad--);
 }
 
+let allImagesAreLoaded = false;
 export function areAllImagesLoaded() {
-    return startedLoading && numberOfImagesLeftToLoad <= 0;
+    return allImagesAreLoaded;
 }
+const allImagesLoadedPromise = new Promise(resolve => {
+    const intervalId = setInterval(() => {
+        if (startedLoading && numberOfImagesLeftToLoad <= 0) {
+            clearInterval(intervalId);
+            resolve();
+        }
+    }, 50);
+});
 export async function allImagesLoaded() {
-    return new Promise(resolve => {
-        const intervalId = setInterval(() => {
-            if (areAllImagesLoaded()) {
-                clearInterval(intervalId);
-                resolve();
-            }
-        }, 50);
-    });
+    return allImagesLoadedPromise
 }
+allImagesLoaded().then(() => allImagesAreLoaded = true);
 
 const initialImagesToLoad = [];
 for (const initialImageToLoad of initialImagesToLoad) {

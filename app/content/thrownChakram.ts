@@ -111,8 +111,16 @@ export class ThrownChakram implements ObjectInstance {
             const area = state.areaInstance;
             const behavior = area.behaviorGrid?.[target.y]?.[target.x];
             if (behavior?.cuttable <= state.hero.weapon) {
-                destroyTile(state, target);
-            } else if (behavior?.cuttable > state.hero.weapon) {
+                // We need to find the specific cuttable layers that can be destroyed.
+                for (const layer of state.areaInstance.layers) {
+                    const palette = layer.palette;
+                    const tile = layer.definition.grid.tiles[target.y][target.x];
+                    const behavior = palette.behaviors[`${tile.x}x${tile.y}`];
+                    if (behavior?.cuttable <= state.hero.weapon) {
+                        destroyTile(state, {...target, layerKey: layer.key});
+                    }
+                }
+            } else if (behavior?.solid) {
                 this.outFrames = 0;
             }
         }

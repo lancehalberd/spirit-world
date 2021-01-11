@@ -1,91 +1,43 @@
 import _ from 'lodash';
 
 import { createObjectInstance } from 'app/content/objects';
+import { palettes } from 'app/content/palettes';
 import { LootDropObject } from 'app/content/lootObject';
 import { createCanvasAndContext } from 'app/dom';
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from 'app/gameConstants';
-import { createAnimation } from 'app/utils/animations';
 import { isPointInShortRect } from 'app/utils/index';
 import { updateCamera } from 'app/updateCamera';
 
 import {
     AreaDefinition, AreaGrid, AreaInstance, AreaLayerDefinition,
-    Direction, GameState, ObjectInstance, ShortRectangle, Tile, TilePalette,
+    Direction, GameState, LayerTile, ObjectInstance, ShortRectangle, Tile, TileBehaviors,
 } from 'app/types';
 
 
-export const BITMAP_TOP_RIGHT: Uint16Array = new Uint16Array([
-    0xFFFF, 0x7FFF, 0x3FFF, 0x1FFF, 0x0FFF, 0x07FF, 0x03FF, 0x01FF,
-    0x00FF, 0x007F, 0x003F, 0x001F, 0x000F, 0x0007, 0x0003, 0x0001,
-]);
-
-export const BITMAP_TOP: Uint16Array = new Uint16Array([
-    0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
-    0, 0, 0, 0, 0, 0, 0, 0,
-]);
-export const BITMAP_BOTTOM: Uint16Array = new Uint16Array([
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
-]);
-export const BITMAP_LEFT: Uint16Array = new Uint16Array([
-    0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00,
-    0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00, 0xFF00,
-]);
-export const BITMAP_RIGHT: Uint16Array = new Uint16Array([
-    0x00FF, 0x00FF, 0x00FF, 0x00FF, 0x00FF, 0x00FF, 0x00FF, 0x00FF,
-    0x00FF, 0x00FF, 0x00FF, 0x00FF, 0x00FF, 0x00FF, 0x00FF, 0x00FF,
-]);
-
-export const [mapTilesFrame] = createAnimation('gfx/tiles/overworld.png', {w: 384, h: 640}).frames;
-const worldMapPalette: TilePalette = {
-    w: 16, h: 16,
-    // The source frame of the tiles.
-    source: mapTilesFrame,
-    // Array of tiles to randomly apply by default.
-    defaultTiles: [{x: 0, y: 16}, {x: 1, y: 16}, {x: 2, y: 16}, {x: 3, y: 16}],
-    behaviors: {
-        '0x7': {solidMap: BITMAP_TOP_RIGHT},
-        '1x1': {solidMap: BITMAP_TOP},
-        '1x4': {solidMap: BITMAP_BOTTOM},
-        '5x6': {solidMap: BITMAP_LEFT},
-        '3x7': {solidMap: BITMAP_RIGHT},
-        '11x3': {pit: true},
-        '16x8': {solid: true, pickupWeight: 1, underTile: {x: 1, y: 8}, lootChance: 0.2, lootTypes: ['peach']},
-        '16x9': {solid: true, pickupWeight: 1, underTile: {x: 1, y: 9}, lootChance: 0.2, lootTypes: ['peach']},
-        '16x10': {solid: true, pickupWeight: 1, underTile: {x: 1, y: 10}, lootChance: 0.2, lootTypes: ['peach']},
-        '17x8': {solid: true, pickupWeight: 2, underTile: {x: 1, y: 8}, lootChance: 0.2, lootTypes: ['peach']},
-        '17x9': {solid: true, pickupWeight: 2, underTile: {x: 1, y: 9}, lootChance: 0.2, lootTypes: ['peach']},
-        '17x10': {solid: true, pickupWeight: 2, underTile: {x: 1, y: 10}, lootChance: 0.2, lootTypes: ['peach']},
-        '18x8': {solid: true, pickupWeight: 3, underTile: {x: 1, y: 8}, lootChance: 0.2, lootTypes: ['peach']},
-        '18x9': {solid: true, pickupWeight: 3, underTile: {x: 1, y: 9}, lootChance: 0.2, lootTypes: ['peach']},
-        '18x10': {solid: true, pickupWeight: 3, underTile: {x: 1, y: 10}, lootChance: 0.2, lootTypes: ['peach']},
-        '5x8': {solid: true},
-        '5x9': {solid: true},
-        '5x10': {solid: true},
-        '6x8': {solid: true, pickupWeight: 0, cuttable: 1, underTile: {x: 0, y: 16}, lootChance: 0.5, lootTypes: ['peach'] },
-        '6x9': {solid: true, pickupWeight: 0, cuttable: 1, underTile: {x: 1, y: 23}, lootChance: 0.5, lootTypes: ['peach']},
-        '6x10': {solid: true, pickupWeight: 0, cuttable: 1, underTile: {x: 13, y: 13}, lootChance: 0.5, lootTypes: ['peach']},
-        '7x8': {damage: 1, cuttable: 1, underTile: {x: 0, y: 16}},
-        '7x9': {damage: 1, cuttable: 1, underTile: {x: 1, y: 23}},
-        '7x10': {damage: 1, cuttable: 1, underTile: {x: 13, y: 13}},
-    },
-};
-
-export const palettes: {[key: string]: TilePalette} = {
-    worldMap: worldMapPalette
-};
 
 export function getDefaultArea(): AreaDefinition {
     return {
         layers: [
             {
-                key: 'background',
+                key: 'floor',
                 grid: {
                     // The dimensions of the grid.
                     w: 32,
                     h: 32,
                     // The palette to use for this grid (controls the size of tiles)
-                    palette: 'worldMap',
+                    palette: 'floor',
+                    // The matrix of tiles
+                    tiles: [],
+                },
+            },
+            {
+                key: 'field',
+                grid: {
+                    // The dimensions of the grid.
+                    w: 32,
+                    h: 32,
+                    // The palette to use for this grid (controls the size of tiles)
+                    palette: 'field',
                     // The matrix of tiles
                     tiles: [],
                 },
@@ -121,6 +73,12 @@ export function initializeAreaTiles(area: AreaDefinition): AreaDefinition {
 }
 
 export function removeAllClones(state: GameState): void {
+    if (state.hero.activeClone) {
+        console.log(state.hero.x, state.hero.y);
+        state.hero.x = state.hero.activeClone.x;
+        state.hero.y = state.hero.activeClone.y;
+        console.log(state.hero.x, state.hero.y);
+    }
     for (const clone of state.hero.clones) {
         removeObjectFromArea(state, state.areaInstance, clone);
     }
@@ -179,6 +137,7 @@ export function setAreaSection(state: GameState, d: Direction): void {
 }
 
 export function scrollToArea(state: GameState, area: AreaDefinition, direction: Direction): void {
+    removeAllClones(state);
     state.nextAreaInstance = createAreaInstance(state, area);
     if (direction === 'up') {
         state.nextAreaInstance.cameraOffset.y = -state.nextAreaInstance.canvas.height;
@@ -194,10 +153,9 @@ export function scrollToArea(state: GameState, area: AreaDefinition, direction: 
     }
 }
 
-export function createAreaInstance(state: GameState, definition: AreaDefinition): AreaInstance {
-    const grid = definition.layers[0].grid;
+export function applyLayerToBehaviorGrid(behaviorGrid: TileBehaviors[][], layer: AreaLayerDefinition): void {
+    const grid = layer.grid;
     const palette = palettes[grid.palette];
-    const behaviorGrid = [];
     for (let y = 0; y < grid.tiles.length; y++) {
         behaviorGrid[y] = [];
         for (let x = 0; x < grid.tiles.length; x++) {
@@ -205,26 +163,61 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
             if (!tile) {
                 continue;
             }
-            behaviorGrid[y][x] = palette.behaviors[`${tile.x}x${tile.y}`];
+            const behaviors = palette.behaviors[`${tile.x}x${tile.y}`];
+            // The behavior grid combines behaviors of all layers, with higher layers
+            // overriding the behavior of lower layers.
+            if (behaviors) {
+                behaviorGrid[y][x] = {...(behaviorGrid[y][x] || {}), ...behaviors};
+            }
+
         }
     }
+}
+
+// This resets the tile behavior for a specific tile to whatever the combined behavior of the layers are.
+// This is useful when an object in a tile was overriding the tile behavior beneath it and we need to
+// reconstruct the original behavior after the object is removed.
+export function resetTileBehavior(area: AreaInstance, {x, y}: Tile): void {
+    delete area.behaviorGrid?.[y]?.[x];
+    for (const layer of area.layers) {
+        const palette = layer.palette;
+        const tile = layer.tiles[y][x];
+        if (!tile) {
+            continue;
+        }
+        const behaviors = palette.behaviors[`${tile.x}x${tile.y}`];
+        // The behavior grid combines behaviors of all layers, with higher layers
+        // overriding the behavior of lower layers.
+        if (behaviors) {
+            area.behaviorGrid[y][x] = {...(area.behaviorGrid[y][x] || {}), ...behaviors};
+        }
+    }
+}
+
+export function createAreaInstance(state: GameState, definition: AreaDefinition): AreaInstance {
+    const behaviorGrid: TileBehaviors[][] = [];
+    for (const layer of definition.layers) {
+        applyLayerToBehaviorGrid(behaviorGrid, layer);
+    }
+    // Currently all layers should use matching grids, so just grab the first.
+    const palette = palettes[definition.layers[0].grid.palette];
     const [canvas, context] = createCanvasAndContext(
         palette.w * definition.layers[0].grid.w,
         palette.h * definition.layers[0].grid.h,
     );
-    context.fillStyle = 'black';
-    context.fillRect(0, 0, canvas.width, canvas.height);
     const instance: AreaInstance = {
         definition: definition,
         palette,
         w: definition.layers[0].grid.w,
         h: definition.layers[0].grid.h,
         behaviorGrid,
+        tilesDrawn: [],
+        checkToRedrawTiles: true,
         layers: definition.layers.map(layer => ({
+            definition: layer,
             ...layer,
             ...layer.grid,
             tiles: _.cloneDeep(layer.grid.tiles),
-            tilesDrawn: [],
             palette: palettes[layer.grid.palette]
         })),
         objects: [],
@@ -282,15 +275,21 @@ export function removeObjectFromArea(state: GameState, area: AreaInstance, objec
     }
 }
 
-export function destroyTile(state: GameState, target: Tile): void {
+export function destroyTile(state: GameState, target: LayerTile): void {
     const area = state.areaInstance;
-    const layer = area.layers[0];
+    const layer = _.find(area.layers, { key: target.layerKey });
+    if (!layer) {
+        console.error(`Missing target layer: ${target.layerKey}`);
+        return;
+    }
     const behavior = area.behaviorGrid?.[target.y]?.[target.x];
-    layer.tiles[target.y][target.x] = behavior?.underTile;
-    layer.tilesDrawn[target.y][target.x] = false;
-    const key = `${behavior?.underTile.x}x${behavior?.underTile.y}`;
-    area.behaviorGrid[target.y][target.x] = area.palette.behaviors[key];
-    if (Math.random() < behavior.lootChance) {
+    area.tilesDrawn[target.y][target.x] = false;
+    area.checkToRedrawTiles = true;
+    const underTile = behavior?.underTile || {x: 0, y: 0};
+    const key = `${underTile.x}x${underTile.y}`;
+    layer.tiles[target.y][target.x] = underTile;
+    area.behaviorGrid[target.y][target.x] = layer.palette.behaviors[key];
+    if (Math.random() < behavior?.lootChance) {
         const lootType = _.sample(behavior.lootTypes || []);
         if (lootType) {
             const drop = new LootDropObject({

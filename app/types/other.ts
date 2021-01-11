@@ -108,6 +108,7 @@ export interface MenuOption {
 
 export interface EditorArrayProperty<T> {
     name: string,
+    id?: string,
     // A button property will have no value.
     value?: T[],
     // If the property is an enum, you can set the list of all values.
@@ -119,6 +120,7 @@ export interface EditorArrayProperty<T> {
 // This is used to allow a user to select a tile/group of tiles from a tile palette.
 export interface EditorPaletteProperty {
     name: string,
+    id?: string,
     // The selection is a complete tile grid, but will often be used to represent a single tile.
     value?: TileGrid,
     palette: TilePalette,
@@ -127,11 +129,13 @@ export interface EditorPaletteProperty {
 
 export interface EditorButtonProperty {
     name: string,
+    id?: string,
     onClick: () => void,
 }
 
 export interface EditorSingleProperty<T> {
     name: string,
+    id?: string,
     // A button property will have no value.
     value?: T,
     // If the property is an enum, you can set the list of all values.

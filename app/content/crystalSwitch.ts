@@ -57,11 +57,9 @@ export class CrystalSwitch implements ObjectInstance {
             this.timeLeft -= FRAME_LENGTH;
             if (this.timeLeft <= 0) {
                 this.status = 'normal';
-                console.log('deactivating switch');
                 for (const object of state.areaInstance.objects) {
-                    if (object.definition.status === 'closedSwitch') {
+                    if (object.definition?.status === 'closedSwitch') {
                         if (object.changeStatus) {
-                            console.log('change status to closedSwitch');
                             object.changeStatus(state, 'closedSwitch');
                         } else {
                             object.status = 'closedSwitch';

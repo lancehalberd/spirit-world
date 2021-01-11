@@ -94,7 +94,6 @@ function moveActorInDirection(
         }
     }
 
-    // const tiles = state.areaInstance.layers[0].grid.tiles;
     let blockedByTile = false;
     let blockedByObject = false;
     let pushedObjects = [];
