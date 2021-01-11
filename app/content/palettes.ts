@@ -77,7 +77,7 @@ function combinePalettes(palettes: TilePalette[]): TilePalette {
     const w = 16, h = Math.ceil(totalTiles / 16);
     // Don't draw the combined palettes until all images have loaded.
     const [canvas] = createCanvasAndContext(w * 16, h * 16);
-    document.body.append(canvas);
+    // document.body.append(canvas);
     const targetPalette: TilePalette = {
         w: 16, h: 16,
         source: {image: canvas, x: 0, y: 0, w: canvas.width, h: canvas.height},

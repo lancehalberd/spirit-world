@@ -120,7 +120,7 @@ export class ThrownChakram implements ObjectInstance {
                         destroyTile(state, {...target, layerKey: layer.key});
                     }
                 }
-            } else if (behavior?.solid) {
+            } else if (behavior?.cuttable > state.hero.weapon) {
                 this.outFrames = 0;
             }
         }
