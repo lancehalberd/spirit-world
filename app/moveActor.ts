@@ -277,8 +277,8 @@ export function checkForFloorDamage(state: GameState, hero: Hero) {
         const wasClone = !!state.hero.clones.length;
         damageActor(state, hero, 1, null, true);
         if (!wasClone) {
-            state.hero.x = state.hero.safeX;
-            state.hero.y = state.hero.safeY;
+            state.hero.action = 'falling';
+            state.hero.actionFrame = 0;
         }
     }
 }

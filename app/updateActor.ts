@@ -66,6 +66,15 @@ export function updateHero(this: void, state: GameState) {
         movementSpeed = 0;
         hero.y += 0.5;
         //dy = 1;
+    } else if (hero.action === 'falling') {
+        movementSpeed = 0;
+        hero.actionFrame++;
+        if (hero.actionFrame >= 5) {
+            hero.d = hero.safeD;
+            hero.x = hero.safeX;
+            hero.y = hero.safeY;
+            hero.action = null;
+        }
     } else if (hero.action === 'beingMoved') {
         movementSpeed = 0;
         // The object moving the hero will take care of their movement until it is completed.
@@ -273,7 +282,7 @@ export function updateHero(this: void, state: GameState) {
         }
     }
     // Mostly don't check for pits/damage when the player cannot control themselves.
-    if (hero.action !== 'beingMoved' && hero.action !== 'knocked'
+    if (hero.action !== 'beingMoved' && hero.action !== 'falling' && hero.action !== 'knocked'
         && hero.action !== 'dead'  && hero.action !== 'getItem'
     ) {
         checkForFloorDamage(state, hero);

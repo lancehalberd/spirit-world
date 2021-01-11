@@ -5,6 +5,8 @@ Bugs:
     Pushing on a solid object sitting on thorny ground shouldn't hurt you:
         -return tileBehaviors and objectBehaviors separately, only damage if tile is solid+damaging.
 
+Organize editor options a bit better:
+    probably hide the palette itself when brush is not selected or move palette below the object options.
 
 Add Particles to tile behaviors as array of frames. Use one of each frame when tile is destroyed. Include multiple copies of the frame in the particles array if we want duplicates of any frames.
 

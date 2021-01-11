@@ -95,6 +95,7 @@ export class Door implements ObjectInstance {
             hero.actionTarget = null;
             hero.actionDx = 0;
             hero.actionDy = 0;
+            hero.safeD = hero.d;
             hero.safeX = hero.x;
             hero.safeY = hero.y;
         }

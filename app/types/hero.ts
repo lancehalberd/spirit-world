@@ -4,7 +4,8 @@ import { Staff } from 'app/content/staff';
 import { Direction, FrameAnimation, GameState, LayerTile, ObjectInstance, ObjectStatus, Tile } from 'app/types';
 
 export type Action =
-    'attack' | 'roll' | 'knocked' | 'hurt' | 'dead' | 'grabbing' | 'carrying' | 'throwing' | 'getItem' | 'beingMoved';
+    'attack' | 'roll' | 'knocked' | 'hurt' | 'dead' | 'grabbing' | 'carrying' | 'throwing' | 'getItem' | 'beingMoved' |
+    'falling';
 export type ActiveTool = 'bow' | 'staff' | 'clone' | 'invisibility';
 export type Equipment = 'cloudBoots' | 'ironBoots';
 export type PassiveTool = 'gloves'
@@ -79,6 +80,7 @@ export interface Hero extends Actor {
     activeStaff?: Staff,
     invisible: boolean,
     invisibilityCost: number,
+    safeD: Direction,
     safeX: number,
     safeY: number,
     weapon: number,

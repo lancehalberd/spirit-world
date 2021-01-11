@@ -93,6 +93,7 @@ export function enterArea(state: GameState, area: AreaDefinition, x: number, y: 
     state.areaInstance = createAreaInstance(state, area);
     state.hero.x = x;
     state.hero.y = y;
+    state.hero.safeD = state.hero.d;
     state.hero.safeX = x;
     state.hero.safeY = y;
     setAreaSection(state, state.hero.d);
@@ -130,6 +131,7 @@ export function setAreaSection(state: GameState, d: Direction): void {
     if (lastAreaSection !== state.areaSection) {
         removeAllClones(state);
         state.hero.activeStaff?.remove(state, state.areaInstance);
+        state.hero.safeD = state.hero.d;
         state.hero.safeX = state.hero.x;
         state.hero.safeY = state.hero.y;
     }
