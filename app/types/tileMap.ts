@@ -12,6 +12,9 @@ export interface TileBehaviors {
     damage?: number,
     lootChance?: number,
     lootTypes?: LootType[],
+    // If this is true projectiles can pass over this tile even if it is solid.
+    // Also, the bow won't cut low tiles like thorns.
+    low?: boolean,
     // Indicates this tile is outside of the current area section.
     outOfBounds?: boolean,
     // If a player falls in a pit they will take damage and respawn at their last stable location.

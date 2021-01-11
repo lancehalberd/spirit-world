@@ -29,46 +29,14 @@ export const BITMAP_RIGHT: Uint16Array = new Uint16Array([
 ]);
 
 const bushBehavior: TileBehaviors = {solid: true, pickupWeight: 0, cuttable: 1, lootChance: 0.5, lootTypes: ['peach'] };
-const lightStoneBehavior: TileBehaviors = {solid: true, pickupWeight: 1, lootChance: 0.2, lootTypes: ['peach']};
-const heavyStoneBehavior: TileBehaviors = {solid: true, pickupWeight: 1, lootChance: 0.2, lootTypes: ['peach']};
-const solidBehavior: TileBehaviors = { solid: true };
+const lightStoneBehavior: TileBehaviors = { low: true, solid: true, pickupWeight: 1, lootChance: 0.2, lootTypes: ['peach']};
+const heavyStoneBehavior: TileBehaviors = { low: true, solid: true, pickupWeight: 1, lootChance: 0.2, lootTypes: ['peach']};
+// const wallBehavior: TileBehaviors = { solid: true };
+const lowWallBehavior: TileBehaviors = { low: true, solid: true };
 const pitBehavior: TileBehaviors = { pit: true };
-const thornBehavior: TileBehaviors = { damage: 1, cuttable: 1 };
+const thornBehavior: TileBehaviors = { low: true, damage: 1, cuttable: 1 };
 
 export const [mapTilesFrame] = createAnimation('gfx/tiles/overworld.png', {w: 384, h: 640}).frames;
-/*const worldMapPalette: TilePalette = {
-    w: 16, h: 16,
-    // The source frame of the tiles.
-    source: mapTilesFrame,
-    // Array of tiles to randomly apply by default.
-    defaultTiles: [{x: 0, y: 16}, {x: 1, y: 16}, {x: 2, y: 16}, {x: 3, y: 16}],
-    behaviors: {
-        '0x7': {solidMap: BITMAP_TOP_RIGHT},
-        '1x1': {solidMap: BITMAP_TOP},
-        '1x4': {solidMap: BITMAP_BOTTOM},
-        '5x6': {solidMap: BITMAP_LEFT},
-        '3x7': {solidMap: BITMAP_RIGHT},
-        '11x3': pitBehavior,
-        '16x8': {...lightStoneBehavior, underTile: {x: 1, y: 8}},
-        '16x9': {...lightStoneBehavior, underTile: {x: 1, y: 9}},
-        '16x10': {...lightStoneBehavior, underTile: {x: 1, y: 10}},
-        '17x8': {...heavyStoneBehavior, underTile: {x: 1, y: 8}},
-        '17x9': {...heavyStoneBehavior, underTile: {x: 1, y: 9}},
-        '17x10': {...heavyStoneBehavior, underTile: {x: 1, y: 10}},
-        '18x8': {...heavyStoneBehavior, underTile: {x: 1, y: 8}},
-        '18x9': {...heavyStoneBehavior, underTile: {x: 1, y: 9}},
-        '18x10': {...heavyStoneBehavior, underTile: {x: 1, y: 10}},
-        '5x8': solidBehavior,
-        '5x9': solidBehavior,
-        '5x10': solidBehavior,
-        '6x8': {...bushBehavior, underTile: {x: 0, y: 16}},
-        '6x9': {...bushBehavior, underTile: {x: 1, y: 23}},
-        '6x10': {...bushBehavior, underTile: {x: 13, y: 13}},
-        '7x8': {...thornBehavior, underTile: {x: 0, y: 16}},
-        '7x9': {...thornBehavior, underTile: {x: 1, y: 23}},
-        '7x10': {...thornBehavior, underTile: {x: 13, y: 13}},
-    },
-};*/
 
 function combinePalettes(palettes: TilePalette[]): TilePalette {
     const size = 16;
@@ -137,7 +105,7 @@ const fieldPalette = {...combinePalettes([
         singleTilePalette('gfx/tiles/rocks.png', lightStoneBehavior, 16),
         singleTilePalette('gfx/tiles/rocks.png', heavyStoneBehavior, 80),
         singleTilePalette('gfx/tiles/rocks.png', heavyStoneBehavior, 96),
-        singleTilePalette('gfx/tiles/rocks.png', solidBehavior, 160),
+        singleTilePalette('gfx/tiles/rocks.png', lowWallBehavior, 160),
         {
             w: 16, h: 16,
             source: {image: requireImage('gfx/tiles/grass.png'), x: 0, y: 0, w: 11 * 16, h: 16},

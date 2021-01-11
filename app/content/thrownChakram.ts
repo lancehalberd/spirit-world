@@ -75,7 +75,7 @@ export class ThrownChakram implements ObjectInstance {
             }
         } else {
             const dx = (this.source.x + this.source.w / 2) - (this.x + this.w / 2);
-            const dy = (this.source.y + this.source.h / 2) - (this.y + this.h / 2);
+            const dy = (this.source.y - 2 + this.source.h / 2) - (this.y + this.h / 2);
             const m = Math.sqrt(dx * dx + dy * dy);
             this.vx = this.returnSpeed * dx / m;
             this.vy = this.returnSpeed * dy / m;
@@ -97,13 +97,16 @@ export class ThrownChakram implements ObjectInstance {
                     this.outFrames = 0;
                 }
             }
-            if (object.getHitbox && object.onHit) {
-                const hitbox = object.getHitbox(state);
-                if (rectanglesOverlap(hitbox, this)) {
-                    const direction = getDirection(hitbox.x - this.x + 8 * this.vx, hitbox.y - this.y + 8 * this.vy);
-                    object.onHit(state, direction);
-                    this.hitTargets.add(object);
-                    this.outFrames = 0;
+            // Only hit objects on the way out to prevent accidentally dragging objects towards the player.
+            if (this.outFrames > 0) {
+                if (object.getHitbox && object.onHit) {
+                    const hitbox = object.getHitbox(state);
+                    if (rectanglesOverlap(hitbox, this)) {
+                        const direction = getDirection(hitbox.x - this.x + 8 * this.vx, hitbox.y - this.y + 8 * this.vy);
+                        object.onHit(state, direction);
+                        this.hitTargets.add(object);
+                        this.outFrames = 0;
+                    }
                 }
             }
         }
@@ -120,7 +123,7 @@ export class ThrownChakram implements ObjectInstance {
                         destroyTile(state, {...target, layerKey: layer.key});
                     }
                 }
-            } else if (behavior?.cuttable > state.hero.weapon) {
+            } else if (behavior?.cuttable > state.hero.weapon || (behavior?.solid && !behavior?.low)) {
                 this.outFrames = 0;
             }
         }

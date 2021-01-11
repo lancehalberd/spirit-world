@@ -1,6 +1,7 @@
-import { getAreaSize, removeObjectFromArea } from 'app/content/areas';
+import { destroyTile, getAreaSize, removeObjectFromArea } from 'app/content/areas';
 import { Enemy } from 'app/content/enemy';
 import { createCanvasAndContext } from 'app/dom';
+import { getTilesInRectangle } from 'app/getActorTargets';
 import { damageActor } from 'app/updateActor';
 import { drawFrame } from 'app/utils/animations';
 import { getDirection } from 'app/utils/field';
@@ -96,6 +97,24 @@ export class Arrow implements ObjectInstance {
                     this.stuckFrames = 1;
                     return;
                 }
+            }
+        }
+        for (const target of getTilesInRectangle(state, this)) {
+            const area = state.areaInstance;
+            const behavior = area.behaviorGrid?.[target.y]?.[target.x];
+            const bowLevel = state.hero.activeTools.bow;
+            if (behavior?.cuttable <= bowLevel && !behavior?.low) {
+                // We need to find the specific cuttable layers that can be destroyed.
+                for (const layer of state.areaInstance.layers) {
+                    const palette = layer.palette;
+                    const tile = layer.definition.grid.tiles[target.y][target.x];
+                    const behavior = palette.behaviors[`${tile.x}x${tile.y}`];
+                    if (behavior?.cuttable <= bowLevel) {
+                        destroyTile(state, {...target, layerKey: layer.key});
+                    }
+                }
+            } else if ((behavior?.cuttable > bowLevel || behavior?.solid) && !behavior?.low) {
+                this.stuckFrames = 1;
             }
         }
     }

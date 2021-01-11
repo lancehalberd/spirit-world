@@ -94,13 +94,31 @@ export function updateHero(this: void, state: GameState) {
             hero.grabTile = null;
             hero.grabObject = null;
         } else if (hero.grabObject?.onPull) {
-            const [dx, dy] = getMovementDeltas();
-            if (dx || dy) {
-                const direction = getDirection(dx, dy);
-                const x = hero.x + 8 + 16 * directionMap[direction][0];
-                const y = hero.y + 8 + 16 * directionMap[direction][1];
-                if (direction === hero.d || isPointOpen(state, {x, y})) {
+            const [pulldx, pulldy] = getMovementDeltas();
+            if (pulldx || pulldy) {
+                const direction = getDirection(pulldx, pulldy);
+                const points = [0, 5, 10, 15];
+                if ((direction === hero.d && (hero.x === hero.grabObject.x || hero.y === hero.grabObject.y))
+                    || points.every(x => points.every(y => isPointOpen(state,
+                        {x: hero.x + x + 16 * directionMap[direction][0], y: hero.y + y + 16 * directionMap[direction][1] }
+                    )))
+                ) {
                     hero.grabObject.onPull(state, direction);
+                } else {
+                    const wiggleDistance = 14;
+                    // If the player is not positioned correctly to pull the object, instead of pulling,
+                    // attempt to wiggle them in better alignment with the object.
+                    if (hero.x > hero.grabObject.x - wiggleDistance && hero.x < hero.grabObject.x) {
+                        dx = Math.min(1, hero.grabObject.x - hero.x);
+                    } else if (hero.x < hero.grabObject.x + wiggleDistance && hero.x > hero.grabObject.x) {
+                        dx = Math.max(-1, hero.grabObject.x - hero.x);
+                    }
+                    console.log(hero.y, hero.grabObject.y);
+                    if (hero.y > hero.grabObject.y - wiggleDistance && hero.y < hero.grabObject.y) {
+                        dy = Math.min(1, hero.grabObject.y - hero.y);
+                    } else if (hero.y < hero.grabObject.y + wiggleDistance && hero.y > hero.grabObject.y) {
+                        dy = Math.max(-1, hero.grabObject.y - hero.y);
+                    }
                 }
             }
         }
@@ -129,7 +147,7 @@ export function updateHero(this: void, state: GameState) {
             const m = Math.sqrt(hero.actionDx * hero.actionDx + hero.actionDy * hero.actionDy);
             const chakram = new ThrownChakram({
                 x: hero.x + 3,
-                y: hero.y + 3,
+                y: hero.y - 2,
                 vx: 4 * (m ? hero.actionDx / m : directionMap[hero.d][0]) + hero.actionDx,
                 vy: 4 * (m ? hero.actionDy / m : directionMap[hero.d][1]) + hero.actionDy,
                 returnSpeed: 4,
