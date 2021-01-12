@@ -4,6 +4,7 @@ import { Enemy } from 'app/content/enemy';
 import { ChestObject, LootObject } from 'app/content/lootObject';
 import { CrystalSwitch } from 'app/content/crystalSwitch';
 import { Door } from 'app/content/door';
+import { FloorSwitch } from 'app/content/floorSwitch';
 import { PushPullObject } from 'app/content/pushPullObject';
 import { RollingBallObject } from 'app/content/rollingBallObject';
 import { TippableObject } from 'app/content/tippableObject';
@@ -21,6 +22,8 @@ export function createObjectInstance(state: GameState, object: ObjectDefinition)
         return new ChestObject(object);
     } else if (object.type === 'door') {
         return new Door(state, object);
+    } else if (object.type === 'floorSwitch') {
+        return new FloorSwitch(object);
     } else if (object.type === 'tippable') {
         return new TippableObject(object);
     } else if (object.type === 'rollingBall') {

@@ -19,7 +19,8 @@ export function moveActor(state: GameState, actor: Actor, dx: number, dy: number
     while (s < 100) {
         let movedX = false, movedY = false;
         if (sx) {
-            movedX = moveActorInDirection(state, actor, sx, (sx < 0) ? 'left' : 'right', !dy, push);
+            // You can't push when moving diagonally.
+            movedX = moveActorInDirection(state, actor, sx, (sx < 0) ? 'left' : 'right', !dy, push && !dy);
             if (movedX) {
                 mx += sx;
                 if (sx > -1 && sx < 1) {
@@ -33,7 +34,8 @@ export function moveActor(state: GameState, actor: Actor, dx: number, dy: number
             }
         }
         if (sy) {
-            movedY = moveActorInDirection(state, actor, sy, (sy < 0) ? 'up' : 'down', !dx, push);
+            // You can't push when moving diagonally.
+            movedY = moveActorInDirection(state, actor, sy, (sy < 0) ? 'up' : 'down', !dx, push && !dx);
             if (movedY) {
                 my += sy;
                 if (sy > -1 && sy < 1) {

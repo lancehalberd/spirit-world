@@ -29,7 +29,7 @@ export function getLootTypes(): LootType[] {
     return allLootTypes;
 }
 
-export const combinedObjectTypes: ObjectType[] = ['loot', 'chest', 'door', 'enemy', 'crystalSwitch', 'pushPull', 'rollingBall', 'tippable'];
+export const combinedObjectTypes: ObjectType[] = ['loot', 'chest', 'door', 'enemy', 'crystalSwitch', 'floorSwitch', 'pushPull', 'rollingBall', 'tippable'];
 
 function createObjectDefinition(
     state: GameState,
@@ -66,6 +66,16 @@ function createObjectDefinition(
                 id: definition.id || uniqueId(state, enemyType),
                 enemyType,
                 status: 'normal',
+                x,
+                y,
+            };
+        case 'floorSwitch':
+            return {
+                type: definition.type,
+                id: definition.id || uniqueId(state, 'floorSwitch'),
+                status: definition.status || editingState.objectStatus,
+                // Need to use ifdefor here since 0 is a valid value for timer.
+                toggleOnRelease: ifdefor(definition.toggleOnRelease, editingState.toggleOnRelease),
                 x,
                 y,
             };
@@ -210,6 +220,21 @@ export function getObjectTypeProperties(state: GameState, editingState: EditingS
                 },
             });
             break;
+        case 'floorSwitch':
+            rows.push({
+                name: 'toggleOnRelease',
+                value: object.toggleOnRelease || editingState.toggleOnRelease || false,
+                values: ['none', 'fire', 'ice', 'lightning'],
+                onChange(toggleOnRelease: boolean) {
+                    if (object.id) {
+                        object.toggleOnRelease = toggleOnRelease;
+                        updateObjectInstance(state, object);
+                    } else {
+                        editingState.toggleOnRelease = toggleOnRelease;
+                    }
+                },
+            });
+            break;
         case 'enemy':
             rows.push({
                 name: 'enemy',
@@ -298,6 +323,7 @@ export function fixObjectPosition(state: GameState, object: ObjectDefinition): v
     if (object.type === 'chest'
         || object.type === 'crystalSwitch'
         || object.type === 'door'
+        || object.type === 'floorSwitch'
         || object.type === 'pushPull'
         || object.type === 'rollingBall'
         || object.type === 'tippable'

@@ -157,6 +157,11 @@ export interface BaseObjectDefinition {
     d?: Direction,
 }
 
+export interface FloorSwitchDefinition extends BaseObjectDefinition {
+    type: 'floorSwitch',
+    toggleOnRelease?: boolean,
+}
+
 export interface LootObjectDefinition extends BaseObjectDefinition {
     type: 'chest' | 'loot',
     lootType: LootType,
@@ -185,7 +190,11 @@ export interface EnemyObjectDefinition extends BaseObjectDefinition {
     enemyType: EnemyType,
 }
 
-export type ObjectDefinition = SimpleObjectDefinition | CrystalSwitchDefinition | LootObjectDefinition | EnemyObjectDefinition;
+export type ObjectDefinition = SimpleObjectDefinition
+    | CrystalSwitchDefinition
+    | FloorSwitchDefinition
+    | LootObjectDefinition
+    | EnemyObjectDefinition;
 
 export type ObjectType = ObjectDefinition['type'];
 

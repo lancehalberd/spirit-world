@@ -53,6 +53,7 @@ export interface EditingState {
     showFieldProperties: boolean,
     showInventoryProperties: boolean,
     timer: number,
+    toggleOnRelease: boolean,
     dragOffset: {x: number, y: number},
 }
 
@@ -73,6 +74,7 @@ export const editingState: EditingState = {
     showFieldProperties: true,
     showInventoryProperties: false,
     timer: 0,
+    toggleOnRelease: false,
     dragOffset: {x: 0, y: 0},
 };
 window['editingState'] = editingState;
@@ -308,31 +310,33 @@ export function displayTileEditorPropertyPanel() {
                 displayTileEditorPropertyPanel();
             },
         });
-        rows.push({
-            name: 'palette',
-            value: selectedPaletteKey,
-            values: Object.keys(palettes),
-            onChange(key: string) {
-                state.areaInstance.definition.layers[editingState.selectedLayerIndex].grid.palette = key;
-                state.areaInstance.layers[editingState.selectedLayerIndex].palette = palettes[key];
-                state.areaInstance.tilesDrawn = [];
-                state.areaInstance.checkToRedrawTiles = true;
-                displayTileEditorPropertyPanel();
-            },
-        });
-        rows.push({
-            name: 'brush',
-            value: editingState.brush,
-            palette: palettes[selectedPaletteKey],
-            onChange(tiles: TileGrid) {
-                editingState.brush = tiles;
-                updateBrushCanvas(editingState.brush);
-                if (editingState.tool !== 'brush' && editingState.tool !== 'replace') {
-                    editingState.tool = 'brush';
+        if (editingState.tool !== 'object') {
+            rows.push({
+                name: 'palette',
+                value: selectedPaletteKey,
+                values: Object.keys(palettes),
+                onChange(key: string) {
+                    state.areaInstance.definition.layers[editingState.selectedLayerIndex].grid.palette = key;
+                    state.areaInstance.layers[editingState.selectedLayerIndex].palette = palettes[key];
+                    state.areaInstance.tilesDrawn = [];
+                    state.areaInstance.checkToRedrawTiles = true;
                     displayTileEditorPropertyPanel();
+                },
+            });
+            rows.push({
+                name: 'brush',
+                value: editingState.brush,
+                palette: palettes[selectedPaletteKey],
+                onChange(tiles: TileGrid) {
+                    editingState.brush = tiles;
+                    updateBrushCanvas(editingState.brush);
+                    if (editingState.tool !== 'brush' && editingState.tool !== 'replace') {
+                        editingState.tool = 'brush';
+                        displayTileEditorPropertyPanel();
+                    }
                 }
-            }
-        });
+            });
+        }
         switch (editingState.tool) {
             case 'brush':
                 break;
@@ -345,6 +349,7 @@ export function displayTileEditorPropertyPanel() {
                         return editingState.replacePercentage;
                     }
                 });
+                break;
             case 'object':
                 rows = [...rows, ...getObjectProperties(state, editingState)];
                 break;

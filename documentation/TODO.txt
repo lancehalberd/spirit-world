@@ -4,9 +4,18 @@ Bugs:
     Fix tiles should also be reset when leaving an area section.
     Pushing on a solid object sitting on thorny ground shouldn't hurt you:
         -return tileBehaviors and objectBehaviors separately, only damage if tile is solid+damaging.
+    Fix menu selection breaks sometimes
+        No luck reproducing, maybe the analog stick was doing something weird?
 
-Organize editor options a bit better:
-    probably hide the palette itself when brush is not selected or move palette below the object options.
+
+Add ability to charge weapon
+    Spin chakram around quickly in a circle twice (can move after throwing)
+    Costs 10 mana
+
+    Charge level 2 requires level 2 charge ability + level 2 weapon
+    Costs 50 mana
+    Similar to level 1 but 2 chakrams spin around you at different radiuses for 4 seconds.
+
 
 Add Particles to tile behaviors as array of frames. Use one of each frame when tile is destroyed. Include multiple copies of the frame in the particles array if we want duplicates of any frames.
 
@@ -20,18 +29,6 @@ Add Small Loot to editor that creates LootDrop
     - locked to tile grid
     - if on destructable tile (cuttable, pickup), not rendered/updated until the tile is destroyed.
     - keep a hash of picked up objects in dungeons so these only replenish on leaving the dungeon.
-
-Door floor switch behavior:
-    - for floor switches, toggle status when the floor switch toggles
-        - For floor switches that toggle when pressure is removed, this requres leaving the switch pressed by placing an object/clone/staff on top of it.
-
-Add ability to charge weapon
-    Spin chakram around quickly in a circle twice (can move after throwing)
-    Costs 10 mana
-
-    Charge level 2 requires level 2 charge ability + level 2 weapon
-    Costs 50 mana
-    Similar to level 1 but 2 chakrams spin around you at different radiuses for 4 seconds.
 
 Allow selecting an element using the L/R triggers
     No element is an option and the default

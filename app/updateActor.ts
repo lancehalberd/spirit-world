@@ -98,6 +98,8 @@ export function updateHero(this: void, state: GameState) {
             if (pulldx || pulldy) {
                 const direction = getDirection(pulldx, pulldy);
                 const points = [0, 5, 10, 15];
+                // There is special logic for pushing in the direction the hero is facing since we expect that
+                // direction to be blocked by the object they are grabbing.
                 if ((direction === hero.d && (hero.x === hero.grabObject.x || hero.y === hero.grabObject.y))
                     || points.every(x => points.every(y => isPointOpen(state,
                         {x: hero.x + x + 16 * directionMap[direction][0], y: hero.y + y + 16 * directionMap[direction][1] }
