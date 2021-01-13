@@ -71,6 +71,7 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
     x = r.x, y += 30;
     context.textBaseline = 'middle';
     context.textAlign = 'center';
+    context.font = '12px Arial';
     function renderLoot(lootType: LootType, level: number): void {
         const frame = lootFrames[lootType] || lootFrames.unknown;
         drawFrame(context, frame, {...frame, x: (x + 8 - frame.w / 2), y: (y + 8 - frame.h / 2)});
