@@ -7,6 +7,8 @@ Bugs:
     Fix menu selection breaks sometimes
         No luck reproducing, maybe the analog stick was doing something weird?
 
+Add Keys to area grids and include areagrid key in area grid coords on state and spawn location.
+
 
 Add ability to charge weapon
     Spin chakram around quickly in a circle twice (can move after throwing)
@@ -55,6 +57,8 @@ Add example prologue area:
     - Add text boxes
         - Space/shift/enter to advance/dismiss
         - On start
+        - "You're no ordinary monkey, what brings you here?"
+            "I heard there was a golden peach hidden in this cave that could make you immortal."
         - On pickup item
     - Floor switches to open exit from area that gives roll technique
     - NPC that gives weapon?

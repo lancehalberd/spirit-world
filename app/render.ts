@@ -5,6 +5,7 @@ import { editingState, renderEditor } from 'app/development/tileEditor';
 import { createCanvasAndContext, mainContext } from 'app/dom';
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from 'app/gameConstants';
 import { renderHeroShadow, renderShadow } from 'app/renderActor';
+import { renderDefeatedMenu } from 'app/renderDefeatedMenu';
 import { renderHUD } from 'app/renderHUD';
 import { renderMenu } from 'app/renderMenu';
 import { getState } from 'app/state';
@@ -65,7 +66,9 @@ export function render() {
     }
     state.lastTimeRendered = state.time;
     renderField(context, state);
-    if (state.paused) {
+    if (state.defeated) {
+        renderDefeatedMenu(context, state);
+    } else if (state.paused) {
         renderMenu(context, state);
     }
     // Draw the HUD onto the field.

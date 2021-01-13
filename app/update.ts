@@ -4,7 +4,7 @@ import { FRAME_LENGTH, KEY_THRESHOLD } from 'app/gameConstants';
 import { updateKeysStillDown } from 'app/keyCommands';
 import { initializeGame } from 'app/initialize';
 import { GAME_KEY, isKeyDown } from 'app/keyCommands';
-import { getState } from 'app/state';
+import { getState, initializeState, returnToSpawnLocation } from 'app/state';
 import { updateHero } from 'app/updateActor';
 import { updateCamera } from 'app/updateCamera';
 import { areAllImagesLoaded } from 'app/utils/images';
@@ -24,42 +24,16 @@ export function update() {
     const state = getState();
     state.time += FRAME_LENGTH;
     try {
-        if (isKeyDown(GAME_KEY.MENU, KEY_THRESHOLD)) {
-            state.paused = !state.paused;
-        }
-        if (!state.paused) {
-            updateField(state);
+        if (state.defeated) {
+            updateDefeated(state);
         } else {
-            const selectableTools: ActiveTool[] = [];
-            if (state.hero.activeTools.bow) {
-                selectableTools.push('bow');
+            if (isKeyDown(GAME_KEY.MENU, KEY_THRESHOLD)) {
+                state.paused = !state.paused;
             }
-            if (state.hero.activeTools.staff) {
-                selectableTools.push('staff');
-            }
-            if (state.hero.activeTools.invisibility) {
-                selectableTools.push('invisibility');
-            }
-            if (state.hero.activeTools.clone) {
-                selectableTools.push('clone');
-            }
-            if(selectableTools.length) {
-                const selectedTool = selectableTools[state.menuIndex];
-                if (isKeyDown(GAME_KEY.LEFT, KEY_THRESHOLD)) {
-                    state.menuIndex = (state.menuIndex + selectableTools.length - 1) % selectableTools.length;
-                } else if (isKeyDown(GAME_KEY.RIGHT, KEY_THRESHOLD)) {
-                    state.menuIndex = (state.menuIndex + 1) % selectableTools.length;
-                } else if (isKeyDown(GAME_KEY.LEFT_TOOL, KEY_THRESHOLD)) {
-                    if (state.hero.rightTool === selectedTool) {
-                        state.hero.rightTool = state.hero.leftTool;
-                    }
-                    state.hero.leftTool = selectedTool;
-                } else if (isKeyDown(GAME_KEY.RIGHT_TOOL, KEY_THRESHOLD)) {
-                    if (state.hero.leftTool === selectedTool) {
-                        state.hero.leftTool = state.hero.rightTool;
-                    }
-                    state.hero.rightTool = selectedTool;
-                }
+            if (!state.paused) {
+                updateField(state);
+            } else {
+                updateMenu(state);
             }
         }
         // Do this after all key checks, since doing it before we cause the key
@@ -68,6 +42,55 @@ export function update() {
     } catch (e) {
         console.log(e.stack);
         debugger;
+    }
+}
+
+function updateMenu(state: GameState) {
+    const selectableTools: ActiveTool[] = [];
+    if (state.hero.activeTools.bow) {
+        selectableTools.push('bow');
+    }
+    if (state.hero.activeTools.staff) {
+        selectableTools.push('staff');
+    }
+    if (state.hero.activeTools.invisibility) {
+        selectableTools.push('invisibility');
+    }
+    if (state.hero.activeTools.clone) {
+        selectableTools.push('clone');
+    }
+    if(selectableTools.length) {
+        const selectedTool = selectableTools[state.menuIndex];
+        if (isKeyDown(GAME_KEY.LEFT, KEY_THRESHOLD)) {
+            state.menuIndex = (state.menuIndex + selectableTools.length - 1) % selectableTools.length;
+        } else if (isKeyDown(GAME_KEY.RIGHT, KEY_THRESHOLD)) {
+            state.menuIndex = (state.menuIndex + 1) % selectableTools.length;
+        } else if (isKeyDown(GAME_KEY.LEFT_TOOL, KEY_THRESHOLD)) {
+            if (state.hero.rightTool === selectedTool) {
+                state.hero.rightTool = state.hero.leftTool;
+            }
+            state.hero.leftTool = selectedTool;
+        } else if (isKeyDown(GAME_KEY.RIGHT_TOOL, KEY_THRESHOLD)) {
+            if (state.hero.leftTool === selectedTool) {
+                state.hero.leftTool = state.hero.rightTool;
+            }
+            state.hero.rightTool = selectedTool;
+        }
+    }
+}
+
+function updateDefeated(state: GameState) {
+    if (isKeyDown(GAME_KEY.UP, KEY_THRESHOLD) || isKeyDown(GAME_KEY.DOWN, KEY_THRESHOLD)) {
+        state.defeatedIndex = (state.defeatedIndex + 1) % 2;
+    } else if (isKeyDown(GAME_KEY.WEAPON, KEY_THRESHOLD) || isKeyDown(GAME_KEY.PASSIVE_TOOL, KEY_THRESHOLD)
+         || isKeyDown(GAME_KEY.MENU, KEY_THRESHOLD)
+    ) {
+        if (state.defeatedIndex === 0) {
+            returnToSpawnLocation(state);
+        } else if (state.defeatedIndex === 1) {
+            initializeState();
+            getState().gameHasBeenInitialized = true;
+        }
     }
 }
 

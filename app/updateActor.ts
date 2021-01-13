@@ -12,7 +12,6 @@ import { getTileFrame } from 'app/render';
 import { useTool } from 'app/useTool';
 import { directionMap, getDirection, isPointOpen } from 'app/utils/field';
 import { rectanglesOverlap } from 'app/utils/index';
-import { getState, initializeState } from 'app/state';
 
 import { Actor, GameState, Hero, ObjectInstance, ThrownChakram, ThrownObject, Tile } from 'app/types';
 
@@ -337,8 +336,8 @@ export function updateHero(this: void, state: GameState) {
         }
     }
     if (hero.life <= 0) {
-        initializeState();
-        getState().gameHasBeenInitialized = true;
+        state.defeated = true;
+        state.defeatedIndex = 0;
     }
     state.hero.magic += state.hero.magicRegen * FRAME_LENGTH / 1000;
     // Clones drain 2 magic per second.

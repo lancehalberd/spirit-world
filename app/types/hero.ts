@@ -17,7 +17,7 @@ export type PassiveTool = 'gloves'
     | 'waterBlessing' | 'fireBlessing';
 export type MagicElement = 'fire' | 'ice' | 'lightning';
 export type Collectible = 'peachOfImmortality' | 'peachOfImmortalityPiece';
-export type CommonLoot = 'money' | 'arrows' | 'peach';
+export type CommonLoot = 'money' | 'peach';
 
 export type LootType = 'weapon' | ActiveTool | Equipment | PassiveTool | MagicElement | Collectible | CommonLoot | 'unknown';
 
@@ -57,6 +57,14 @@ export interface Actor {
     render: (context: CanvasRenderingContext2D, state: GameState) => void,
 }
 
+// TODO: indicate which area grid to spawn in once area grids have ids.
+export interface SpawnLocation {
+    x: number,
+    y: number,
+    d: Direction,
+    areaGridCoords: {x: number, y: number},
+}
+
 export interface Hero extends Actor {
     // stats
     maxLife: number,
@@ -88,5 +96,6 @@ export interface Hero extends Actor {
     rightTool?: ActiveTool,
     element?: MagicElement,
     status: ObjectStatus,
+    spawnLocation: SpawnLocation,
 }
 

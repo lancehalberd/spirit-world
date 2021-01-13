@@ -20,6 +20,7 @@ export function getLootTypes(): LootType[] {
         allLootTypes = [
             'peachOfImmortality',
             'peachOfImmortalityPiece',
+            'weapon',
             ...(Object.keys(state.hero.activeTools) as LootType[]),
             ...(Object.keys(state.hero.passiveTools) as LootType[]),
             ...(Object.keys(state.hero.equipment) as LootType[]),
@@ -87,6 +88,8 @@ function createObjectDefinition(
                 id: definition.id || uniqueId(state, lootType),
                 lootType,
                 status: definition.status || editingState.objectStatus,
+                level: definition.level || editingState.level,
+                amount: definition.amount || editingState.amount,
                 x,
                 y,
             };
@@ -160,10 +163,11 @@ export function getObjectTypeProperties(state: GameState, editingState: EditingS
             });
             break;
         case 'loot':
-        case 'chest':
+        case 'chest': {
+            const lootType = object.lootType || editingState.lootType;
             rows.push({
                 name: 'lootType',
-                value: object.lootType || editingState.lootType,
+                value: lootType,
                 values: getLootTypes(),
                 onChange(lootType: LootType) {
                     if (object.id) {
@@ -176,6 +180,7 @@ export function getObjectTypeProperties(state: GameState, editingState: EditingS
                     } else {
                         editingState.lootType = lootType;
                     }
+                    displayTileEditorPropertyPanel();
                 },
             });
             rows.push({
@@ -191,7 +196,42 @@ export function getObjectTypeProperties(state: GameState, editingState: EditingS
                     }
                 },
             });
+            if (lootType === 'money') {
+                rows.push({
+                    name: 'amount',
+                    value: '' + object.amount || editingState.amount,
+                    values: ['1', '20', '50', '100', '300'],
+                    onChange(amountString: string) {
+                        const amount = parseInt(amountString, 10);
+                        if (object.id) {
+                            object.amount = amount;
+                            updateObjectInstance(state, object);
+                        } else {
+                            editingState.amount = amount;
+                        }
+                    },
+                });
+            } else if (lootType === 'peachOfImmortality' || lootType === 'peachOfImmortalityPiece') {
+            } else if (lootType === 'fire' || lootType === 'ice' || lootType === 'lightning') {
+            } else {
+                const level = object.level || editingState.level;
+                rows.push({
+                    name: 'level',
+                    value: level ? `${level}` : 'progressive',
+                    values: ['progressive', '1', '2'],
+                    onChange(levelString: string) {
+                        const level = levelString === 'progressive' ? 0 : parseInt(levelString, 10);
+                        if (object.id) {
+                            object.level = level;
+                            updateObjectInstance(state, object);
+                        } else {
+                            editingState.level = level;
+                        }
+                    },
+                });
+            }
             break;
+        }
         case 'crystalSwitch':
             rows.push({
                 name: 'element',

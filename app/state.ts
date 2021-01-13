@@ -68,11 +68,46 @@ function getDefaultHeroState(): Hero {
         invisible: false,
         invisibilityCost: 0,
         render: renderHero,
+        spawnLocation: {
+            x: 150,
+            y: 445,
+            d: 'down',
+            areaGridCoords: {x: 1, y: 1},
+        }
     };
 }
 
+export function updateHeroMagicStats(state: GameState) {
+    state.hero.maxMagic = 20;
+    state.hero.magicRegen = 4;
+    if (state.hero.passiveTools.charge >= 1) {
+        state.hero.maxMagic += 10;
+        state.hero.magicRegen += 1;
+    }
+    if (state.hero.passiveTools.charge >= 2) {
+        state.hero.maxMagic += 20;
+        state.hero.magicRegen += 2;
+    }
+    if (state.hero.elements.fire) {
+        state.hero.maxMagic += 10;
+        state.hero.magicRegen += 1;
+    }
+    if (state.hero.elements.ice) {
+        state.hero.maxMagic += 10;
+        state.hero.magicRegen += 1;
+    }
+    if (state.hero.elements.lightning) {
+        state.hero.maxMagic += 10;
+        state.hero.magicRegen += 1;
+    }
+    if (state.hero.passiveTools.phoenixCrown) {
+        state.hero.maxMagic += 20;
+        state.hero.magicRegen += 5;
+    }
+}
+
 function getDefaultState(): GameState {
-    return {
+    const state = {
         savedState: getDefaultSavedState(),
         hero: getDefaultHeroState(),
         camera: { x: 0, y: 0 },
@@ -83,13 +118,40 @@ function getDefaultState(): GameState {
         areaGridCoords: {x: 1, y: 1},
         paused: false,
         menuIndex: 0,
+        defeated: false,
+        defeatedIndex: 0,
     };
+    updateHeroMagicStats(state);
+    return state;
 }
 
 let state: GameState;
 export function initializeState() {
     state = getDefaultState();
-    enterArea(state, getAreaFromGridCoords(state.areaGrid, state.areaGridCoords), state.hero.x, state.hero.y);
+    returnToSpawnLocation(state);
+}
+
+export function returnToSpawnLocation(state: GameState) {
+    state.hero.d = state.hero.spawnLocation.d;
+    state.hero.life = state.hero.maxLife;
+    state.hero.magic = state.hero.maxMagic;
+    state.defeated = false;
+    // Clear out any state/flags that shouldn't be kept on the hero.
+    state.hero.pickUpTile = null;
+    state.hero.grabObject = null;
+    state.hero.grabTile = null;
+    state.hero.action = null;
+    state.hero.invulnerableFrames = 0;
+    state.hero.invisible = false;
+    state.hero.activeStaff = null;
+    state.hero.activeClone = null;
+    state.hero.vx = 0;
+    state.hero.vy = 0;
+    state.hero.vz = 0;
+    enterArea(state,
+        getAreaFromGridCoords(state.areaGrid, state.hero.spawnLocation.areaGridCoords),
+        state.hero.spawnLocation.x, state.hero.spawnLocation.y
+    );
 }
 
 export function getState(): GameState {

@@ -23,7 +23,7 @@ import { mainCanvas } from 'app/dom';
 import { CANVAS_SCALE } from 'app/gameConstants';
 import { KEY } from 'app/keyCommands';
 import { translateContextForAreaAndCamera } from 'app/render';
-import { getState } from 'app/state';
+import { getState, updateHeroMagicStats } from 'app/state';
 import { drawFrame } from 'app/utils/animations';
 import { readFromFile, saveToFile } from 'app/utils/index';
 import { getMousePosition, isMouseDown } from 'app/utils/mouse';
@@ -37,6 +37,7 @@ import {
 
 type EditorToolType = 'select' | 'brush' | 'replace' | 'object';
 export interface EditingState {
+    amount: number,
     tool: EditorToolType,
     isEditing: boolean,
     brush: TileGrid,
@@ -44,6 +45,7 @@ export interface EditingState {
     selectedLayerIndex: number,
     element?: MagicElement,
     enemyType: EnemyType,
+    level: number,
     lootType: LootType,
     objectStatus: ObjectStatus,
     objectType: ObjectType,
@@ -58,6 +60,7 @@ export interface EditingState {
 }
 
 export const editingState: EditingState = {
+    amount: 1,
     tool: 'select',
     isEditing: false,
     brush: null,
@@ -65,6 +68,7 @@ export const editingState: EditingState = {
     selectedLayerIndex: 0,
     element: null,
     enemyType: 'snake',
+    level: 0,
     lootType: 'peachOfImmortalityPiece',
     objectStatus: 'normal',
     objectType: combinedObjectTypes[0],
@@ -402,12 +406,13 @@ export function displayTileEditorPropertyPanel() {
             },
         }]);
         let row: PropertyRow = [];
-        function addTool(array, key) {
+        function addTool(object, key) {
             row.push({
                 name: key,
-                value: array[key] || 0,
+                value: object[key] || 0,
                 onChange(value: number) {
-                    array[key] = value;
+                    object[key] = value;
+                    updateHeroMagicStats(state);
                 },
             });
             if (row.length === 2) {
@@ -415,6 +420,9 @@ export function displayTileEditorPropertyPanel() {
                 row = [];
             }
         }
+        addTool(state.hero, 'weapon');
+        rows.push(row);
+        row = [];
         for (let tool in state.hero.activeTools) {
             addTool(state.hero.activeTools, tool);
         }
@@ -515,6 +523,7 @@ function replaceTiles(x: number, y: number): void {
                 layer.tiles[y][x] = replacement;
                 state.areaInstance.tilesDrawn[y][x] = false;
                 state.areaInstance.checkToRedrawTiles = true;
+                resetTileBehavior(state.areaInstance, {x, y});
             }
         }
     }

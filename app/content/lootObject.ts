@@ -1,7 +1,7 @@
 import { removeObjectFromArea } from 'app/content/areas';
 import { createCanvasAndContext } from 'app/dom';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { getState } from 'app/state';
+import { getState, updateHeroMagicStats } from 'app/state';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { rectanglesOverlap } from 'app/utils/index';
 
@@ -176,30 +176,46 @@ export const lootFrames: Partial<{[key in LootType]: Frame}> = {
     weapon: createLootFrame('red', 'W'),
 }
 
+export function applyUpgrade(currentLevel: number, loot: LootObjectDefinition): number {
+    // Non-progressive upgrades specify the exact level of the item. Lower level items will be ignored
+    // if the player already possesses a better version.
+    if (loot.level) {
+        return Math.max(currentLevel, loot.level);
+    }
+    return currentLevel + 1;
+}
+
 export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: ChestObject | LootObject) => void}> = {
     unknown: (state: GameState, loot: ChestObject | LootObject) => {
         if (loot.definition.lootType === 'weapon') {
-            state.hero.weapon++;
+            state.hero.weapon = applyUpgrade(state.hero.weapon, loot.definition);
         } else if (['bow', 'staff', 'clone', 'invisibility'].includes(loot.definition.lootType)) {
             if (!state.hero.leftTool) {
                 state.hero.leftTool = loot.definition.lootType as ActiveTool;
             } else if (!state.hero.rightTool) {
                 state.hero.rightTool = loot.definition.lootType as ActiveTool;
             }
-            state.hero.activeTools[loot.definition.lootType]++;
+            state.hero.activeTools[loot.definition.lootType] = applyUpgrade(state.hero.activeTools[loot.definition.lootType], loot.definition);
         } else if ([
             'gloves', 'roll', 'charge', 'nimbusCloud', 'catEyes', 'spiritSight',
             'trueSight', 'astralProjection', 'telekinesis', 'ironSkin', 'goldMail', 'phoenixCrown',
             'waterBlessing', 'fireBlessing'
         ].includes(loot.definition.lootType)) {
-            state.hero.passiveTools[loot.definition.lootType]++;
+            state.hero.passiveTools[loot.definition.lootType] = applyUpgrade(state.hero.passiveTools[loot.definition.lootType], loot.definition);
+        } else if ([
+            'fire', 'lightning', 'ice'
+        ].includes(loot.definition.lootType)) {
+            state.hero.elements[loot.definition.lootType] = applyUpgrade(state.hero.elements[loot.definition.lootType], loot.definition);
+        }  else if ([
+            'cloudBoots', 'ironBoots'
+        ].includes(loot.definition.lootType)) {
+            state.hero.equipment[loot.definition.lootType] = applyUpgrade(state.hero.equipment[loot.definition.lootType], loot.definition);
         } else if (loot.definition.lootType === 'money') {
             state.hero.money += (loot.definition.amount || 1);
-        } else if (loot.definition.lootType === 'arrows') {
-            state.hero.arrows += (loot.definition.amount || 1);
         } else {
             console.error('Unhandled loot type:', loot.definition.lootType);
         }
+        updateHeroMagicStats(state);
     },
     peach: (state: GameState, loot: ChestObject | LootObject) => {
         state.hero.life = Math.min(state.hero.life + 1, state.hero.maxLife);
