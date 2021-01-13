@@ -1,3 +1,4 @@
+import { addParticleAnimations } from 'app/content/animationEffect';
 import { destroyTile, getAreaSize, removeObjectFromArea } from 'app/content/areas';
 import { Enemy } from 'app/content/enemy';
 import { createCanvasAndContext } from 'app/dom';
@@ -121,6 +122,7 @@ export class ThrownChakram implements ObjectInstance {
                     const behavior = palette.behaviors[`${tile.x}x${tile.y}`];
                     if (behavior?.cuttable <= state.hero.weapon) {
                         destroyTile(state, {...target, layerKey: layer.key});
+                        addParticleAnimations(state, target.x * 16, target.y * 16, 2, behavior.particles);
                     }
                 }
             } else if (behavior?.cuttable > state.hero.weapon || (behavior?.solid && !behavior?.low)) {

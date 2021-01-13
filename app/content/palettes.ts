@@ -4,7 +4,7 @@ import { createCanvasAndContext } from 'app/dom';
 import { createAnimation } from 'app/utils/animations';
 import { allImagesLoaded, requireImage } from 'app/utils/images';
 
-import { TileBehaviors, TilePalette } from 'app/types';
+import { Frame, TileBehaviors, TilePalette } from 'app/types';
 
 export const BITMAP_TOP_RIGHT: Uint16Array = new Uint16Array([
     0xFFFF, 0x7FFF, 0x3FFF, 0x1FFF, 0x0FFF, 0x07FF, 0x03FF, 0x01FF,
@@ -28,13 +28,29 @@ export const BITMAP_RIGHT: Uint16Array = new Uint16Array([
     0x00FF, 0x00FF, 0x00FF, 0x00FF, 0x00FF, 0x00FF, 0x00FF, 0x00FF,
 ]);
 
-const bushBehavior: TileBehaviors = {solid: true, pickupWeight: 0, cuttable: 1, lootChance: 0.5, lootTypes: ['peach'] };
-const lightStoneBehavior: TileBehaviors = { low: true, solid: true, pickupWeight: 1, lootChance: 0.2, lootTypes: ['peach']};
-const heavyStoneBehavior: TileBehaviors = { low: true, solid: true, pickupWeight: 1, lootChance: 0.2, lootTypes: ['peach']};
+const bushParticles: Frame[] = createAnimation('gfx/tiles/bushes.png', {w: 16, h: 16}, {x: 2, cols: 3}).frames;
+const lightStoneParticles: Frame[] = createAnimation('gfx/tiles/rocks.png', {w: 16, h: 16}, {x: 2, cols: 3}).frames;
+const heavyStoneParticles: Frame[] = createAnimation('gfx/tiles/rocks.png', {w: 16, h: 16}, {x: 7, cols: 3}).frames;
+const thornParticles: Frame[] = createAnimation('gfx/tiles/thornstiles.png', {w: 16, h: 16}, {x: 1, cols: 3}).frames;
+const bushBehavior: TileBehaviors = {
+    solid: true, pickupWeight: 0, cuttable: 1, lootChance: 0.5, lootTypes: ['peach'],
+    particles: bushParticles,
+};
+const lightStoneBehavior: TileBehaviors = {
+    low: true, solid: true, pickupWeight: 1, lootChance: 0.2, lootTypes: ['peach'],
+    particles: lightStoneParticles,
+};
+const heavyStoneBehavior: TileBehaviors = {
+    low: true, solid: true, pickupWeight: 1, lootChance: 0.2, lootTypes: ['peach'],
+    particles: heavyStoneParticles,
+};
 // const wallBehavior: TileBehaviors = { solid: true };
 const lowWallBehavior: TileBehaviors = { low: true, solid: true };
 const pitBehavior: TileBehaviors = { pit: true };
-const thornBehavior: TileBehaviors = { low: true, damage: 1, cuttable: 1 };
+const thornBehavior: TileBehaviors = {
+    low: true, damage: 1, cuttable: 1,
+    particles: thornParticles,
+};
 
 export const [mapTilesFrame] = createAnimation('gfx/tiles/overworld.png', {w: 384, h: 640}).frames;
 

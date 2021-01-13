@@ -1,8 +1,8 @@
 import { removeObjectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { drawFrame, getFrame } from 'app/utils/animations';
+import { drawFrame, frameAnimation, getFrame } from 'app/utils/animations';
 
-import { FrameAnimation, GameState, ObjectInstance, ObjectStatus } from 'app/types';
+import { Frame, FrameAnimation, GameState, ObjectInstance, ObjectStatus } from 'app/types';
 
 
 interface Props {
@@ -13,11 +13,11 @@ interface Props {
     vx?: number,
     vy?: number,
     vz?: number,
+    az?: number,
 }
 
 export class AnimationEffect implements ObjectInstance {
     definition = null;
-    type = 'animationEffect' as 'animationEffect';
     animation: FrameAnimation;
     animationTime: number;
     x: number;
@@ -26,8 +26,9 @@ export class AnimationEffect implements ObjectInstance {
     vx: number;
     vy: number;
     vz: number;
+    az: number;
     status: ObjectStatus = 'normal';
-    constructor({animation, x = 0, y = 0, z = 17, vx = 0, vy = 0, vz = 0 }: Props) {
+    constructor({animation, x = 0, y = 0, z = 17, vx = 0, vy = 0, vz = 0, az = -0.5 }: Props) {
         this.animation = animation;
         this.animationTime = 0;
         this.x = x;
@@ -36,13 +37,14 @@ export class AnimationEffect implements ObjectInstance {
         this.vx = vx;
         this.vy = vy;
         this.vz = vz;
+        this.az = az;
     }
     update(state: GameState) {
         this.x += this.vx;
         this.y += this.vy;
         this.z += this.vz;
         this.animationTime += FRAME_LENGTH;
-        this.vz -= 0.5;
+        this.vz += this.az;
         if (this.z <= 0) {
             removeObjectFromArea(state, state.areaInstance, this);
         }
@@ -50,5 +52,21 @@ export class AnimationEffect implements ObjectInstance {
     render(context, state: GameState) {
         const frame = getFrame(this.animation, this.animationTime);
         drawFrame(context, frame, { ...frame, x: this.x, y: this.y - this.z });
+    }
+}
+
+export function addParticleAnimations(state: GameState, x: number, y: number, z: number, particles: Frame[]): void {
+    if (!particles) {
+        return;
+    }
+    let theta = Math.random() * 2 * Math.PI;
+    for (const frame of particles) {
+        const vx = Math.cos(theta);
+        const vy = Math.sin(theta);
+        state.areaInstance.objects.push(new AnimationEffect({
+            animation: frameAnimation(frame),
+            x: x + vx, y: y + vy, z,
+            vx, vy, vz: 1.5, az: -0.2}));
+        theta += Math.PI * 2 / (particles.length);
     }
 }

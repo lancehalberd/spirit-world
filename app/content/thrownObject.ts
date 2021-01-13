@@ -1,3 +1,4 @@
+import { addParticleAnimations } from 'app/content/animationEffect';
 import { removeObjectFromArea } from 'app/content/areas';
 import { Enemy } from 'app/content/enemy';
 import { damageActor } from 'app/updateActor';
@@ -10,6 +11,7 @@ import {Frame, GameState, ObjectInstance, ObjectStatus } from 'app/types';
 
 interface Props {
     frame: Frame,
+    particles?: Frame[],
     x?: number
     y?: number,
     z?: number,
@@ -23,6 +25,7 @@ export class ThrownObject implements ObjectInstance {
     definition = null;
     type = 'thrownObject' as 'thrownObject';
     frame: Frame;
+    particles: Frame[];
     x: number;
     y: number;
     z: number;
@@ -32,8 +35,9 @@ export class ThrownObject implements ObjectInstance {
     damage;
     broken = false;
     status: ObjectStatus = 'normal';
-    constructor({frame, x = 0, y = 0, z = 17, vx = 0, vy = 0, vz = 0, damage = 1 }: Props) {
+    constructor({frame, particles = [], x = 0, y = 0, z = 17, vx = 0, vy = 0, vz = 0, damage = 1 }: Props) {
         this.frame = frame;
+        this.particles = particles;
         this.x = x;
         this.y = y;
         this.z = z;
@@ -80,6 +84,7 @@ export class ThrownObject implements ObjectInstance {
         if (!this.broken) {
             this.broken = true;
             removeObjectFromArea(state, state.areaInstance, this);
+            addParticleAnimations(state, this.x, this.y, this.z, this.particles);
         }
     }
     render(context, state: GameState) {

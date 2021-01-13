@@ -17,6 +17,8 @@ export interface TileBehaviors {
     low?: boolean,
     // Indicates this tile is outside of the current area section.
     outOfBounds?: boolean,
+    // Array of frames to use for particles when this tile/object is destroyed.
+    particles?: Frame[],
     // If a player falls in a pit they will take damage and respawn at their last stable location.
     pit?: boolean,
     // Blocks movement

@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 import {
     addObjectToArea, destroyTile, getAreaFromGridCoords, getAreaSize,
     removeAllClones, removeObjectFromArea, scrollToArea, setAreaSection
@@ -455,8 +457,13 @@ export function throwHeldObject(hero: Hero, state: GameState){
     hero.action = 'throwing';
     hero.actionFrame = 0;
     const throwSpeed = 6;
+    const tile = hero.pickUpTile;
+    const layer = _.find(state.areaInstance.layers, { key: tile.layerKey});
+    const palette = layer.palette;
+    const behaviors = palette.behaviors[`${tile.x}x${tile.y}`];
     const thrownObject = new ThrownObject({
         frame: getTileFrame(state.areaInstance, hero.pickUpTile),
+        particles: behaviors?.particles,
         x: hero.x,
         y: hero.y,
         vx: directionMap[hero.d][0] * throwSpeed,
