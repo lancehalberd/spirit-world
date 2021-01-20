@@ -63,7 +63,7 @@ etc/
 # Don't include built js file.
 public/client.js
 # Don't include old graphics.
-public/gfx2/old
+public/gfx/old
 # Don't include rsync command.
 rsync.txt
 
