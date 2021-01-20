@@ -9,7 +9,7 @@ import { updateHero } from 'app/updateActor';
 import { updateCamera } from 'app/updateCamera';
 import { areAllImagesLoaded } from 'app/utils/images';
 
-import { GameState, ActiveTool } from 'app/types';
+import { ActiveTool, GameState, MagicElement } from 'app/types';
 
 let isGameInitialized = false;
 export function update() {
@@ -94,10 +94,26 @@ function updateDefeated(state: GameState) {
     }
 }
 
+function switchElement(state: GameState, delta: number): void {
+    const allElements: MagicElement[] = [null];
+    for (const element of ['fire', 'ice', 'lightning'] as MagicElement[]) {
+        if (state.hero.elements[element]) {
+            allElements.push(element);
+        }
+    }
+    const index = allElements.indexOf(state.hero.element);
+    state.hero.element = allElements[(index + delta + allElements.length) % allElements.length];
+}
+
 function updateField(state: GameState) {
     updateHero(state);
     updateCamera(state);
     if (!editingState.isEditing) {
+        if (isKeyDown(GAME_KEY.PREVIOUS_ELEMENT, KEY_THRESHOLD)) {
+            switchElement(state, -1);
+        } else if (isKeyDown(GAME_KEY.NEXT_ELEMENT, KEY_THRESHOLD)) {
+            switchElement(state, 1);
+        }
         const originalLength = state.areaInstance.objects.length;
         state.areaInstance.objects = state.areaInstance.objects.filter(e => !(e instanceof Enemy) || e.life > 0);
         if (originalLength > state.areaInstance.objects.length) {

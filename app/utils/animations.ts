@@ -58,6 +58,7 @@ export function createAnimation(
 };
 
 export function getFrame(animation: FrameAnimation, animationTime: number): Frame {
+    animationTime = Math.max(animationTime, 0);
     let frameIndex = Math.floor(animationTime / (FRAME_LENGTH * (animation.frameDuration || 1)));
     if (animation.loop === false) { // You can set this to prevent an animation from looping.
         frameIndex = Math.min(frameIndex, animation.frames.length - 1);

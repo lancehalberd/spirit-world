@@ -1,11 +1,17 @@
-import { createAnimation, drawFrame } from 'app/utils/animations';
+import { addParticleAnimations } from 'app/content/animationEffect';
+import { FRAME_LENGTH } from 'app/gameConstants';
+import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { directionMap, isPointOpen } from 'app/utils/field';
 
-import { Direction, Frame, GameState, BaseObjectDefinition, ObjectInstance, ObjectStatus, ShortRectangle } from 'app/types';
+import { Direction, Frame, FrameAnimation, GameState, BaseObjectDefinition, ObjectInstance, ObjectStatus, ShortRectangle } from 'app/types';
 
-const tilesFrame = createAnimation('gfx/tiles/overworld.png', {w: 384, h: 640}).frames[0];
-export const standingFrame: Frame = {image: tilesFrame.image, x: 16 * 20, y: 16 * 8, w: 16, h: 16};
-const fallenFrame: Frame = {image: tilesFrame.image, x: 16 * 21, y: 16 * 8, w: 16, h: 16};
+
+//const crackedPotFrame: Frame = createAnimation('gfx/tiles/tippablepot.png', {w: 16, h: 18}).frames[0];
+const particleFrames: Frame[] = createAnimation('gfx/tiles/tippablepot.png', {w: 16, h: 18}, {x: 4, cols: 5}).frames;
+//const remainsFrame: Frame = createAnimation('gfx/tiles/tippablepot.png', {w: 16, h: 18}, {x: 3}).frames[0];
+const fallingAnimation: FrameAnimation = createAnimation('gfx/tiles/tippablepot.png', {w: 16, h: 18},
+    {cols: 4, duration: 4}, {loop: false}
+);
 
 export class TippableObject implements ObjectInstance {
     alwaysReset = true;
@@ -21,13 +27,15 @@ export class TippableObject implements ObjectInstance {
     pushCounter: number = 0;
     pushedLastFrame: boolean = false;
     status: ObjectStatus = 'normal';
+    animationTime = 0;
+    shattered = false;
     constructor(definition: BaseObjectDefinition) {
         this.definition = definition;
         this.x = definition.x;
         this.y = definition.y;
     }
     getHitbox(state: GameState): ShortRectangle {
-        return { ...standingFrame, x: this.x, y: this.y };
+        return { x: this.x, y: this.y, w: 16, h: 16 };
     }
     onHit(state: GameState, direction: Direction): void {
         if (!this.fallDirection) {
@@ -48,14 +56,20 @@ export class TippableObject implements ObjectInstance {
         const y = this.y + 8 + 16 * directionMap[direction][1];
         if (isPointOpen(state, {x, y})) {
             this.fallDirection = direction;
+            this.animationTime = -80;
         }
     }
     update(state: GameState) {
         if (this.fallDirection) {
+            this.animationTime += FRAME_LENGTH;
             if (this.fallFrame < 16) {
                 this.fallFrame++;
                 this.x += directionMap[this.fallDirection][0];
                 this.y += directionMap[this.fallDirection][1];
+            }
+            if (!this.shattered && this.animationTime >= (fallingAnimation.frames.length - 1) * FRAME_LENGTH * fallingAnimation.frameDuration) {
+                this.shattered = true;
+                addParticleAnimations(state, this.x, this.y, 2, particleFrames);
             }
         }
         if (!this.pushedLastFrame) {
@@ -65,10 +79,7 @@ export class TippableObject implements ObjectInstance {
         }
     }
     render(context, state: GameState) {
-        if (this.fallFrame < 8) {
-            drawFrame(context, standingFrame, { ...standingFrame, x: this.x, y: this.y });
-        } else {
-            drawFrame(context, fallenFrame, { ...fallenFrame, x: this.x, y: this.y });
-        }
+        const frame = getFrame(fallingAnimation, this.animationTime);
+        drawFrame(context, frame, { ...frame, x: this.x, y: this.y - 2 });
     }
 }

@@ -1,4 +1,4 @@
-import { AreaGrid, AreaInstance, Hero, ShortRectangle } from 'app/types';
+import { AreaGrid, AreaInstance, Hero, ShortRectangle, Zone } from 'app/types';
 
 export type SavedState = {
     coins: number,
@@ -15,6 +15,7 @@ export interface GameState {
     areaInstance?: AreaInstance,
     areaSection?: ShortRectangle,
     nextAreaInstance?: AreaInstance,
+    zone: Zone,
     areaGrid: AreaGrid,
     areaGridCoords: {x: number, y: number},
     paused: boolean,

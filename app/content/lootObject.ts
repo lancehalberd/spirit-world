@@ -149,7 +149,7 @@ export class ChestObject implements ObjectInstance {
     }
 }
 
-function createLootFrame(color: string, letter: string, size: number = 10): Frame {
+function createLootFrame(color: string, letter: string, size: number = 16): Frame {
     const [toolCanvas, toolContext] = createCanvasAndContext(size, size);
     toolContext.fillStyle = color;
     toolContext.fillRect(0, 0, size, size);

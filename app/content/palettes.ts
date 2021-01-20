@@ -28,12 +28,13 @@ export const BITMAP_RIGHT: Uint16Array = new Uint16Array([
     0x00FF, 0x00FF, 0x00FF, 0x00FF, 0x00FF, 0x00FF, 0x00FF, 0x00FF,
 ]);
 
-const bushParticles: Frame[] = createAnimation('gfx/tiles/bushes.png', {w: 16, h: 16}, {x: 2, cols: 3}).frames;
+const bushParticles: Frame[] = createAnimation('gfx/tiles/bush.png', {w: 16, h: 16}, {x: 2, cols: 3}).frames;
 const lightStoneParticles: Frame[] = createAnimation('gfx/tiles/rocks.png', {w: 16, h: 16}, {x: 2, cols: 3}).frames;
 const heavyStoneParticles: Frame[] = createAnimation('gfx/tiles/rocks.png', {w: 16, h: 16}, {x: 7, cols: 3}).frames;
-const thornParticles: Frame[] = createAnimation('gfx/tiles/thornstiles.png', {w: 16, h: 16}, {x: 1, cols: 3}).frames;
+const thornParticles: Frame[] = createAnimation('gfx/tiles/thorns.png', {w: 16, h: 16}, {x: 2, cols: 5}).frames;
 const bushBehavior: TileBehaviors = {
     solid: true, pickupWeight: 0, cuttable: 1, lootChance: 0.5, lootTypes: ['peach'],
+    underTile: {x: 5, y: 1},
     particles: bushParticles,
 };
 const lightStoneBehavior: TileBehaviors = {
@@ -49,6 +50,7 @@ const lowWallBehavior: TileBehaviors = { low: true, solid: true };
 const pitBehavior: TileBehaviors = { pit: true };
 const thornBehavior: TileBehaviors = {
     low: true, damage: 1, cuttable: 1,
+    underTile: {x: 6, y: 1},
     particles: thornParticles,
 };
 
@@ -112,11 +114,11 @@ function singleTilePalette(source: string, behaviors: TileBehaviors, x = 0, y = 
 
 const fieldPalette = {...combinePalettes([
         // This is the empty tile.
-        singleTilePalette('gfx/tiles/bushes.png', null, -16),
-        singleTilePalette('gfx/tiles/bushes.png', bushBehavior, 16),
+        singleTilePalette('gfx/tiles/bush.png', null, -16),
+        singleTilePalette('gfx/tiles/bush.png', bushBehavior, 0),
         singleTilePalette('gfx/tiles/cactussheet.png', {...bushBehavior, damage: 1}),
         singleTilePalette('gfx/tiles/pit.png', pitBehavior),
-        singleTilePalette('gfx/tiles/thornstiles.png', thornBehavior),
+        singleTilePalette('gfx/tiles/thorns.png', thornBehavior),
         singleTilePalette('gfx/tiles/rocks.png', lightStoneBehavior),
         singleTilePalette('gfx/tiles/rocks.png', lightStoneBehavior, 16),
         singleTilePalette('gfx/tiles/rocks.png', heavyStoneBehavior, 80),
@@ -126,7 +128,9 @@ const fieldPalette = {...combinePalettes([
             w: 16, h: 16,
             source: {image: requireImage('gfx/tiles/grass.png'), x: 0, y: 0, w: 11 * 16, h: 16},
             defaultTiles: [],
-        }
+        },
+        singleTilePalette('gfx/tiles/bush.png', null, 16),
+        singleTilePalette('gfx/tiles/thorns.png', null, 16),
     ]),
     defaultTiles: [
         {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0},

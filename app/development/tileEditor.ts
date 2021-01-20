@@ -7,7 +7,7 @@ import {
 import { palettes } from 'app/content/palettes';
 import { lootFrames } from 'app/content/lootObject';
 import { createObjectInstance } from 'app/content/objects';
-import { exportAreaGridToClipboard, importAreaGrid, serializeAreaGrid } from 'app/development/exportAreaGrid';
+import { exportZoneToClipboard, importAreaGrid, serializeZone } from 'app/development/exportZone';
 import {
     deleteObject,
     getObjectFrame,
@@ -155,12 +155,12 @@ export function displayTileEditorPropertyPanel() {
         rows.push([{
             name: 'Export to Clipboard',
             onClick() {
-                exportAreaGridToClipboard(getState().areaGrid);
+                exportZoneToClipboard(getState().zone);
             },
         }, {
             name: 'Export to File',
             onClick() {
-                saveToFile(serializeAreaGrid(getState().areaGrid), `map.ts`, 'text/javascript');
+                saveToFile(serializeZone(getState().zone), `map.ts`, 'text/javascript');
             },
         }]);
         rows.push([{

@@ -6,8 +6,7 @@ import {
     ObjectStatus, SimpleObjectDefinition, ShortRectangle,
 } from 'app/types';
 
-const tilesFrame = createAnimation('gfx/tiles/overworld.png', {w: 384, h: 640}).frames[0];
-export const normalFrame: Frame = {image: tilesFrame.image, x: 16 * 1, y: 16 * 35, w: 16, h: 16};
+const potFrame: Frame = createAnimation('gfx/tiles/movablepot.png', {w: 16, h: 18}).frames[0];
 
 export class PushPullObject implements ObjectInstance {
     alwaysReset = true;
@@ -31,7 +30,7 @@ export class PushPullObject implements ObjectInstance {
         this.y = definition.y;
     }
     getHitbox(state: GameState): ShortRectangle {
-        return { ...normalFrame, x: this.x, y: this.y };
+        return { x: this.x, y: this.y, w: 16, h: 16 };
     }
     onGrab(state: GameState, direction: Direction): void {
         this.grabDirection = direction;
@@ -83,6 +82,6 @@ export class PushPullObject implements ObjectInstance {
         }
     }
     render(context, state: GameState) {
-        drawFrame(context, normalFrame, { ...normalFrame, x: this.x, y: this.y });
+        drawFrame(context, potFrame, { ...potFrame, x: this.x, y: this.y - 2});
     }
 }

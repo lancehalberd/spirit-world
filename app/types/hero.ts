@@ -5,7 +5,7 @@ import { Direction, FrameAnimation, GameState, LayerTile, ObjectInstance, Object
 
 export type Action =
     'attack' | 'roll' | 'knocked' | 'hurt' | 'dead' | 'grabbing' | 'carrying' | 'throwing' | 'getItem' | 'beingMoved' |
-    'falling';
+    'falling' | 'meditating';
 export type ActiveTool = 'bow' | 'staff' | 'clone' | 'invisibility';
 export type Equipment = 'cloudBoots' | 'ironBoots';
 export type PassiveTool = 'gloves'
@@ -95,6 +95,7 @@ export interface Hero extends Actor {
     leftTool?: ActiveTool,
     rightTool?: ActiveTool,
     element?: MagicElement,
+    spiritRadius: number,
     status: ObjectStatus,
     spawnLocation: SpawnLocation,
 }

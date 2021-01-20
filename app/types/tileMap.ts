@@ -101,6 +101,16 @@ export interface AreaDefinition {
     dark?: boolean,
 }
 
+export interface Zone {
+    key: string,
+    floors: Floor[],
+}
+
+export interface Floor {
+    origin?: {x: number, y: number},
+    grid: AreaGrid,
+}
+
 export type AreaGrid = AreaDefinition[][];
 
 export interface AreaInstance {

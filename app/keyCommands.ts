@@ -1,10 +1,9 @@
 /* global navigator */
-import { exportAreaGridToClipboard } from 'app/development/exportAreaGrid';
+import { exportZoneToClipboard } from 'app/development/exportZone';
 import { toggleEditing } from 'app/development/tileEditor';
 import { runTileRipper } from 'app/development/tileRipper';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { getState } from 'app/state';
-import { requireImage } from 'app/utils/images';
 
 export const KEY = {
     ESCAPE: 27,
@@ -165,7 +164,6 @@ document.addEventListener('keyup', function(event) {
     const keyCode: number = event.which;
     keysDown[keyCode] = null;
 });
-const easternPalaceFrame = {image: requireImage('gfx/easternPalace/client.png'), x: 512, y: 0, w: 512, h: 512};
 document.addEventListener('keydown', function(event: KeyboardEvent) {
     if (event.repeat) {
         return;
@@ -183,13 +181,14 @@ document.addEventListener('keydown', function(event: KeyboardEvent) {
     }
     keysDown[keyCode] = Date.now();
     if (keyCode === KEY.C && commandIsDown) {
-        exportAreaGridToClipboard(getState().areaGrid);
+        exportZoneToClipboard(getState().zone);
     }
     if (keyCode === KEY.E) {
         toggleEditing();
     }
     if (keyCode === KEY.R && false) {
-        runTileRipper(easternPalaceFrame, 8);
+        // This needs a Frame to run correctly.
+        runTileRipper(null, 8);
     }
 });
 }

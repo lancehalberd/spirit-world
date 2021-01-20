@@ -6,9 +6,15 @@ Bugs:
         -return tileBehaviors and objectBehaviors separately, only damage if tile is solid+damaging.
     Fix menu selection breaks sometimes
         No luck reproducing, maybe the analog stick was doing something weird?
+    Fix bug if clone is left on far right tile, you continue and then return, causes you to move to wrogns creen.
 
-Add Keys to area grids and include areagrid key in area grid coords on state and spawn location.
 
+
+
+
+Add zone key+floor to spawn location.
+
+Add Reset button for area to recreate the current area instance (in order to respawn mobs, return puzzles elements to starting locations, etc).
 
 Add ability to charge weapon
     Spin chakram around quickly in a circle twice (can move after throwing)
@@ -18,24 +24,18 @@ Add ability to charge weapon
     Costs 50 mana
     Similar to level 1 but 2 chakrams spin around you at different radiuses for 4 seconds.
 
-
-Update collision detection and wiggle logic:
-    - Create an array that is the width of the character(relative to movement direction) + 16
-    - Assuming entry 8 = [ax, ay] and length - 9 = [ax + width - 1, ay] (for moving up or down) check pairs of 0 and 3 pixels every 4 pixels, so for w = 16, check 8+11,12+15,16+19,20+23. If any are blocked, movement is blocked, remember the blocked pixel index.
-    - If movement is blocked if blocked index <= length / 2 then scan right starting at blocked index + 1. If w open pixels are found, wiggle right. If a blocked pixel is found at index >= length - w, then abort, wiggling is not possible.
-    - If blocked index > length / 2, repeat the above except scanning left to check for left wiggle.
+Apply element to charge abilities.
+    Costs an additional 10 mana for the element
+    Add elemental crystal objects that are faded red/blue/yellow and become vibrant when hit by element
 
 Add Small Loot to editor that creates LootDrop
     - locked to tile grid
     - if on destructable tile (cuttable, pickup), not rendered/updated until the tile is destroyed.
+        - This should actually be done for any loot, this will make it easy to hide keys under objects.
+        - We can support progress items under tiles, but probably shouldn't actually use this in practice in order to avoid players searching under every tile. On the other hand, if we clearly telegraph when this happens, maybe we can void this problem and encourage players to use smart ways to check for things (like spirit sight to search under many objects for a key).
     - keep a hash of picked up objects in dungeons so these only replenish on leaving the dungeon.
+    - Add an editor option to clear the history of picked up small loots.
 
-Allow selecting an element using the L/R triggers
-    No element is an option and the default
-    Apply element to charge abilities.
-    Costs an additional 10 mana for the element
-    Add elemental crystal objects that are faded red/blue/yellow and become vibrant when hit by element
-    When all crystals in a room are activated, hiddenSwitch elements appear.
 
 Add ability to charge tools.
 
@@ -45,11 +45,10 @@ Add ability to charge carried objects
     Should add selected element to thrown object
 
 
-Add meditate ability
-    - stand still and hold the passive tool button to grow a ring of spirit sight around you
-    - release and press passive tool button to stop
-    - if astral projection is available, you can move around (need to press passive tool on body to return or press somethiing else to return instantly?)
-    - if telekinesis you can pick up real objects (possibly limited by telekinesis level)
+Add astral projection + telekinesis abilities
+    - if astral projection is available, you can move around (need to press passive tool on body to return or press something else to return instantly?)
+    -
+    - if telekinesis you can pick up real objects if they have stable spirit elements (possibly limited by telekinesis level)
 
 Add example prologue area:
     - Add text boxes
@@ -64,10 +63,10 @@ Add example prologue area:
 
 Add connected areas + dungeons
 
-Support 64x64 super tiles for world map. Or maybe just 48x48.
+Support 64x64 super tiles for world map. Or maybe just 48x48. Probably add this after Spirit World mechanics to make sure they perform okay together.
 
 Improve Tool Selection:
-    -Track most recent input to control keyboard vs controller type
+    - Track most recent input to control keyboard vs controller type
     - Color around the selection + HUD indicator should match the color of the controller button (blue + yellow for X-Box)
     - Display a letter attached to the selection based on the button/keyboard key.
 
@@ -91,29 +90,37 @@ Additional Staff Behavior:
     Charging the staff does a very large spin attack that knocks enemies away.
         Lvl 2 charge is a screen wide attack the applies damage+element to all enemies.
 
+
+
+Update collision detection and wiggle logic:
+    - Create an array that is the width of the character(relative to movement direction) + 16
+    - Assuming entry 8 = [ax, ay] and length - 9 = [ax + width - 1, ay] (for moving up or down) check pairs of 0 and 3 pixels every 4 pixels, so for w = 16, check 8+11,12+15,16+19,20+23. If any are blocked, movement is blocked, remember the blocked pixel index.
+    - If movement is blocked if blocked index <= length / 2 then scan right starting at blocked index + 1. If w open pixels are found, wiggle right. If a blocked pixel is found at index >= length - w, then abort, wiggling is not possible.
+    - If blocked index > length / 2, repeat the above except scanning left to check for left wiggle.
+
 Some puzzle ideas:
     - Have a puzzle for the clone tool where a crystal deactivates after only 1s but cannot reach the door unless you stand at the door and have the clone hit the switch.
     - Similarly a puzzle where two switches must be hit within 1 second to make a chest appear. This could use the clone or an arrow.
     - A puzzle where 4 switches need to be hit in 200ms, you can blow up the clone in the middle to activate all at once.
-
-Add animation for breaking stone hitting the ground.
 
 Track the object an arrow is stuck in and move it with that target until it disappears
     - Use a different 'stuck' frame for the arrow missing the head.
 
 Animate hearts refilling
 
+Add spirit element that replaces the default 'none' element when the upgrade is found. In vanilla this would require getting all other elements first.
 
-Allow player to choose difficulty during the opening by completing tasks:
-    - Solve more difficult puzzle to set puzzles to difficult
-    - Complete more difficult enemy encounters to set combat to difficult
-    ?? Complete opening without picking up a weapon to set to weaponless mode ??
-    - Maybe add an option to manually change the difficulty later just in case.
+
+Add offering shrines in dungeons that allow players to adjust the difficulty by paying 50 money:
+    - Take 1/2 damage
+    - 1/2 boss life
+    - easier traps (disable conveyer belts, remove spikes)
+    - easier puzzles (required chests are made distinct from optional chests, positions of required items are moved to more easily accessible locations)
 
 Include some random dungeon design in the base game:
     - Location of key under object might change (there should be some clue where it is or use spirit sight).
     - Something like peg cave, but only a single peg needs to be pressed to open it (spirit sight reveals which?).
-    - Something like Easter Palace Foyer except the correct door isn't always the center door.
+    - Something like Eastern Palace Foyer except the correct door isn't always the center door.
 
 Keep in mind significance of design elements for future racing/randomizer.
 

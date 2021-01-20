@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { Clone } from 'app/content/clone';
 import { editingState, renderEditor } from 'app/development/tileEditor';
 import { createCanvasAndContext, mainContext } from 'app/dom';
-import { CANVAS_HEIGHT, CANVAS_WIDTH } from 'app/gameConstants';
+import { CANVAS_HEIGHT, CANVAS_WIDTH, MAX_SPIRIT_RADIUS } from 'app/gameConstants';
 import { renderHeroShadow, renderShadow } from 'app/renderActor';
 import { renderDefeatedMenu } from 'app/renderDefeatedMenu';
 import { renderHUD } from 'app/renderHUD';
@@ -41,6 +41,56 @@ export function updateDarkCanvas(radius: number): void {
         darkContext.arc(darkCanvas.width / 2, darkCanvas.height / 2, radius / 8, 0, 2 * Math.PI, true);
         darkContext.fill();
     darkContext.restore();
+}
+// This is the max size of the s
+const [spiritCanvas, spiritContext] = createCanvasAndContext(MAX_SPIRIT_RADIUS * 2, MAX_SPIRIT_RADIUS * 2);
+document.body.append(spiritCanvas);
+spiritCanvas.style.position = 'absolute';
+spiritCanvas.style.top = '0';
+let spiritCanvasRadius: number;
+export function updateSpiritCanvas(state: GameState, radius: number): void {
+    if (radius === spiritCanvasRadius) {
+        return;
+    }
+    spiritCanvasRadius = radius;
+    const spiritAlpha = 0.2 + 0.8 * radius / MAX_SPIRIT_RADIUS;
+    const x = spiritCanvas.width / 2;
+    const y = spiritCanvas.height / 2
+    spiritContext.save();
+        const area = state.areaInstance;
+        const gradient = spiritContext.createRadialGradient(x, y, 0, x, y, radius);
+        gradient.addColorStop(0.9, 'rgba(0, 0, 0, 1)');
+        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        spiritContext.fillStyle = 'white';
+        spiritContext.globalAlpha = spiritAlpha;
+        spiritContext.clearRect(0, 0, spiritCanvas.width, spiritCanvas.height);
+        spiritContext.fillStyle = gradient;
+        spiritContext.beginPath();
+        spiritContext.arc(x, y, radius, 0, 2 * Math.PI);
+        spiritContext.fill();
+        /*spiritContext.beginPath();
+        spiritContext.arc(x, y, 3 * radius / 4, 0, 2 * Math.PI);
+        spiritContext.fill();
+        spiritContext.globalAlpha = 0.6 * spiritAlpha;
+        spiritContext.beginPath();
+        spiritContext.arc(x, y, 7 * radius / 8, 0, 2 * Math.PI);
+        spiritContext.fill();
+        spiritContext.globalAlpha = 0.6 * spiritAlpha;
+        spiritContext.beginPath();
+        spiritContext.arc(x, y, radius, 0, 2 * Math.PI);
+        spiritContext.fill();*/
+        /*spiritContext.translate(
+            -state.camera.x + area.cameraOffset.x + spiritCanvas.width / 2,
+            -state.camera.y + area.cameraOffset.y - CANVAS_HEIGHT + spiritCanvas.height / 2
+        );*/
+        spiritContext.globalAlpha = 1;
+        spiritContext.globalCompositeOperation = 'source-in';
+        spiritContext.drawImage(
+            area.canvas,
+            0, 0, spiritCanvas.width, spiritCanvas.height,
+            0, 0, spiritCanvas.width, spiritCanvas.height,
+        );
+    spiritContext.restore();
 }
 
 function getDarkRadius(state: GameState): number {
@@ -129,14 +179,36 @@ export function renderField(context: CanvasRenderingContext2D, state: GameState)
         state.nextAreaInstance.checkToRedrawTiles = false;
     }
 
+    const hero = state.hero.activeClone || state.hero;
+
     // Draw the field, enemies, objects and hero.
     renderAreaBackground(context, state, state.areaInstance);
     renderAreaBackground(context, state, state.nextAreaInstance);
+    if (state.hero.spiritRadius > 0) {
+        updateSpiritCanvas(state, state.hero.spiritRadius);
+        context.drawImage(spiritCanvas,
+            0, 0, spiritCanvas.width, spiritCanvas.height,
+            hero.x + hero.w / 2 - spiritCanvas.width / 2
+            - state.camera.x + state.areaInstance.cameraOffset.x,
+            hero.y - spiritCanvas.height / 2
+             - state.camera.y + state.areaInstance.cameraOffset.y,
+            spiritCanvas.width, spiritCanvas.height
+        );
+    }
     renderAreaObjectsBeforeHero(context, state, state.areaInstance);
     renderAreaObjectsBeforeHero(context, state, state.nextAreaInstance);
     context.save();
         translateContextForAreaAndCamera(context, state, state.areaInstance);
         state.hero.render(context, state);
+        /*if (state.hero.spiritRadius > 0) {
+            context.save()
+                context.beginPath();
+                context.globalAlpha = 0.7;
+                context.fillStyle = 'red';
+                context.arc(state.hero.x + 8, state.hero.y, state.hero.spiritRadius, 0, 2 * Math.PI);
+                context.fill();
+            context.restore();
+        }*/
     context.restore();
     renderAreaObjectsAfterHero(context, state, state.areaInstance);
     renderAreaObjectsAfterHero(context, state, state.nextAreaInstance);
@@ -155,7 +227,6 @@ export function renderField(context: CanvasRenderingContext2D, state: GameState)
             if (editingState.isEditing) {
                 context.globalAlpha = 0.5;
             }
-            const hero = state.hero.activeClone || state.hero;
             context.drawImage(darkCanvas,
                 0, 0, darkCanvas.width, darkCanvas.height,
                 hero.x + hero.w / 2 - darkCanvas.width * 2 + 12 * directionMap[hero.d][0]

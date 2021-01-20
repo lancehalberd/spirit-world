@@ -1,5 +1,5 @@
 import { enterArea, getAreaFromGridCoords } from 'app/content/areas';
-import { worldMap as testWorld } from 'app/content/peachCaveB1';
+import { zones } from 'app/content/zones';
 import { renderHero } from 'app/renderActor';
 
 import { GameState, Hero, SavedState } from 'app/types';
@@ -57,6 +57,7 @@ function getDefaultHeroState(): Hero {
             waterBlessing: 0,
             fireBlessing: 0,
         },
+        element: null,
         elements: {
             fire: 0,
             ice: 0,
@@ -68,6 +69,7 @@ function getDefaultHeroState(): Hero {
         invisible: false,
         invisibilityCost: 0,
         render: renderHero,
+        spiritRadius: 0,
         spawnLocation: {
             x: 150,
             y: 445,
@@ -114,7 +116,8 @@ function getDefaultState(): GameState {
         time: 0,
         gameHasBeenInitialized: false,
         lastTimeRendered: 0,
-        areaGrid: testWorld,
+        zone: zones.peachCave,
+        areaGrid: zones.peachCave.floors[0].grid,
         areaGridCoords: {x: 1, y: 1},
         paused: false,
         menuIndex: 0,

@@ -15,3 +15,5 @@ export const KEY_THRESHOLD = FRAME_LENGTH;
 
 export const LEFT_TOOL_COLOR = 'blue';
 export const RIGHT_TOOL_COLOR = 'yellow';
+
+export const MAX_SPIRIT_RADIUS = 80;

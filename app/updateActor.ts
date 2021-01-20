@@ -6,7 +6,7 @@ import {
 } from 'app/content/areas';
 import { Enemy } from 'app/content/enemy';
 import { editingState } from 'app/development/tileEditor';
-import { KEY_THRESHOLD, FRAME_LENGTH } from 'app/gameConstants';
+import { KEY_THRESHOLD, FRAME_LENGTH, MAX_SPIRIT_RADIUS } from 'app/gameConstants';
 import { getActorTargets } from 'app/getActorTargets';
 import { GAME_KEY, getMovementDeltas, isKeyDown } from 'app/keyCommands';
 import { checkForFloorDamage, moveActor } from 'app/moveActor';
@@ -133,6 +133,17 @@ export function updateHero(this: void, state: GameState) {
         if (hero.actionFrame === 2) {
             hero.action = null;
         }
+    } else if (hero.action === 'meditating') {
+        movementSpeed = 0;
+        if (isKeyDown(GAME_KEY.PASSIVE_TOOL)) {
+            const maxRadius = MAX_SPIRIT_RADIUS;
+            hero.spiritRadius = Math.min(hero.spiritRadius + 4, maxRadius);
+        } else {
+            hero.spiritRadius = Math.max(hero.spiritRadius - 8, 0);
+            if (hero.spiritRadius === 0) {
+                hero.action = null;
+            }
+        }
     } else if (hero.action === 'knocked') {
         movementSpeed = 0;
         dx = hero.vx;
@@ -150,7 +161,7 @@ export function updateHero(this: void, state: GameState) {
             const m = Math.sqrt(hero.actionDx * hero.actionDx + hero.actionDy * hero.actionDy);
             const chakram = new ThrownChakram({
                 x: hero.x + 3,
-                y: hero.y - 2,
+                y: hero.y,
                 vx: 4 * (m ? hero.actionDx / m : directionMap[hero.d][0]) + hero.actionDx,
                 vy: 4 * (m ? hero.actionDy / m : directionMap[hero.d][1]) + hero.actionDy,
                 returnSpeed: 4,
@@ -217,20 +228,7 @@ export function updateHero(this: void, state: GameState) {
     }
     if (!hero.action && !hero.pickUpTile && isKeyDown(GAME_KEY.PASSIVE_TOOL, KEY_THRESHOLD)) {
         const {objects, tiles} = getActorTargets(state, hero);
-        if ((dx || dy) && !tiles.some(({x, y}) => area.behaviorGrid?.[y]?.[x]?.solid) && !objects.some(o => o.behaviors?.solid)) {
-            if (hero.passiveTools.roll > 0) {
-                if (state.hero.magic >= 5) {
-                    state.hero.magic -= 5;
-                    hero.action = 'roll';
-                    hero.actionFrame = 0;
-                } else {
-                    // Hack to freeze player for a moment
-                    hero.action = 'getItem';
-                    hero.actionFrame = 30;
-                    // We should play an insufficient mana sound here.
-                }
-            }
-        } else {
+        if (tiles.some(({x, y}) => area.behaviorGrid?.[y]?.[x]?.solid) || objects.some(o => o.behaviors?.solid)) {
             //console.log({dx, dy, tiles, objects});
             let closestLiftableTile: Tile = null, closestObject: ObjectInstance = null, closestDistance = 100;
             for (const target of tiles) {
@@ -290,6 +288,25 @@ export function updateHero(this: void, state: GameState) {
                     closestObject.onGrab(state, hero.d);
                 }
                 hero.grabObject = closestObject;
+            }
+        } else if (dx || dy) {
+            if (hero.passiveTools.roll > 0) {
+                if (state.hero.magic >= 5) {
+                    state.hero.magic -= 5;
+                    hero.action = 'roll';
+                    hero.actionFrame = 0;
+                } else {
+                    // Hack to freeze player for a moment
+                    hero.action = 'getItem';
+                    hero.actionFrame = 30;
+                    // We should play an insufficient mana sound here.
+                }
+            }
+        } else {
+            if (hero.passiveTools.spiritSight > 0) {
+                hero.action = 'meditating';
+                hero.actionFrame = 0;
+                hero.spiritRadius = 0;
             }
         }
     }
@@ -429,11 +446,15 @@ export function damageActor(
     }
 
     // If any clones are in use, any damage one takes destroys it until only one clone remains.
-    if (state.hero.clones.length && (actor === state.hero || state.hero.clones.indexOf(actor as any) >= 0)) {
+    if (actor === state.hero || state.hero.clones.indexOf(actor as any) >= 0) {
         // Damage applies to the hero, not the clone.
         state.hero.life -= damage;
         state.hero.invulnerableFrames = 50;
-        destroyClone(state, actor as any);
+        // Taking damage resets radius for spirit sight meditation.
+        state.hero.spiritRadius = 0;
+        if (state.hero.clones.length) {
+            destroyClone(state, actor as any);
+        }
     } else {
         actor.life -= damage;
         // For enemies, this is actually the number of rames they cannot damage the hero for.

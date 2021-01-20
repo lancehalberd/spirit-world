@@ -63,6 +63,7 @@ export class Clone implements Hero, ObjectInstance {
     invisibilityCost: number;
     invisible: boolean;
     spawnLocation: SpawnLocation;
+    spiritRadius: number;
     constructor(hero: Hero) {
         for (let k in hero) {
             this[k] = hero[k];

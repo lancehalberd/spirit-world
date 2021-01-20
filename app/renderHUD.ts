@@ -1,37 +1,55 @@
 import { lootFrames } from 'app/content/lootObject';
 import { CANVAS_WIDTH, LEFT_TOOL_COLOR, RIGHT_TOOL_COLOR } from 'app/gameConstants';
-import { drawFrame } from 'app/utils/animations';
+import { createAnimation, drawFrame } from 'app/utils/animations';
 import { fillRect, pad } from 'app/utils/index';
 
 import { GameState } from 'app/types';
 
+const [emptyHeart, fullHeart, threeQuarters, halfHeart, quarterHeart] =
+    createAnimation('gfx/hud/hearts.png', {w: 12, h: 12}, {cols: 5}).frames;
+
 export function renderHUD(context: CanvasRenderingContext2D, state: GameState): void {
     for (let i = 0; i < state.hero.maxLife; i++) {
-        context.fillStyle = 'white';
-        context.fillRect(5 + i * 8, 5, 1, 10);
-        context.fillRect(5 + i * 8, 5, 7, 1);
-        context.fillRect(5 + i * 8 + 6, 5, 1, 10);
-        context.fillRect(5 + i * 8, 5 + 9, 7, 1);
-        if (i < state.hero.life) {
-            context.fillStyle = 'red';
-            context.fillRect(5 + i * 8 + 1, 5 + 1, 5, 8);
+        drawFrame(context, emptyHeart, {...emptyHeart, x: 5 + i * 13, y: 5});
+        let frame = fullHeart;
+        if (i >= state.hero.life) {
+            frame = emptyHeart;
+        } else if (i >= state.hero.life - 0.25) {
+            frame = quarterHeart;
+        } else if (i >= state.hero.life - 0.5) {
+            frame = halfHeart;
+        } else if (i >= state.hero.life - 0.75) {
+            frame = threeQuarters;
         }
+        drawFrame(context, frame, {...frame, x: 5 + i * 13, y: 5});
     }
     context.fillStyle = 'black';
-    context.fillRect(5, 16, Math.floor(state.hero.maxMagic), 4);
-    context.fillStyle = 'lightblue';
-    context.fillRect(5, 16, Math.floor(state.hero.magic), 4);
-
-    if (state.hero.leftTool) {
-        const frame = lootFrames[state.hero.leftTool] || lootFrames.unknown;
-        const target = {...frame, x: CANVAS_WIDTH - 40, y: 4};
-        fillRect(context, pad(target, 2), LEFT_TOOL_COLOR);
-        drawFrame(context, frame, target)
+    context.fillRect(5, 18, Math.floor(state.hero.maxMagic), 4);
+    let manaColor = '#AAA';
+    if (state.hero.element === 'fire') {
+        manaColor = '#F00';
+    } else if (state.hero.element === 'ice') {
+        manaColor = '#AAF';
+    } else if (state.hero.element === 'lightning') {
+        manaColor = '#FF8';
     }
+    context.fillStyle = manaColor;
+    context.fillRect(5, 18, Math.floor(state.hero.magic), 4);
+
+    let frame = lootFrames[state.hero.leftTool] || lootFrames.unknown;
+    let target = {...frame, x: CANVAS_WIDTH - 44, y: 4};
+    fillRect(context, pad(target, 2), LEFT_TOOL_COLOR);
+    if (state.hero.leftTool) {
+        drawFrame(context, frame, target)
+    } else {
+        fillRect(context, target, 'black');
+    }
+    frame = lootFrames[state.hero.rightTool] || lootFrames.unknown;
+    target = {...frame, x: CANVAS_WIDTH - 20, y: 4};
+    fillRect(context, pad(target, 2), RIGHT_TOOL_COLOR);
     if (state.hero.rightTool) {
-        const frame = lootFrames[state.hero.rightTool] || lootFrames.unknown;
-        const target = {...frame, x: CANVAS_WIDTH - 20, y: 4};
-        fillRect(context, pad(target, 2), RIGHT_TOOL_COLOR);
         drawFrame(context, frame, target);
+    } else {
+        fillRect(context, target, 'black');
     }
 }
