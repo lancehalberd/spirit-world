@@ -1,6 +1,7 @@
 import _ from 'lodash';
 
 import { Clone } from 'app/content/clone';
+import { Enemy } from 'app/content/enemy';
 import { editingState, renderEditor } from 'app/development/tileEditor';
 import { createCanvasAndContext, mainContext } from 'app/dom';
 import { CANVAS_HEIGHT, CANVAS_WIDTH, MAX_SPIRIT_RADIUS } from 'app/gameConstants';
@@ -265,15 +266,24 @@ export function renderAreaObjectsBeforeHero(context: CanvasRenderingContext2D, s
             if (object.drawPriority === 'sprites') {
                 if (object instanceof Clone) {
                     renderHeroShadow(context, state, object);
-                } else {
+                } else if (object instanceof Enemy) {
                     renderShadow(context, state, object);
                 }
             }
         }
+        const objectsToRender = [];
         for (const object of area.objects) {
-            if (object.drawPriority === 'background' || (object.drawPriority === 'sprites' && object.y <= state.hero.y)) {
+            if (object.drawPriority === 'background') {
                 object?.render(context, state);
+            } else if (object.drawPriority === 'sprites' && object.y <= state.hero.y) {
+                if (object.render) {
+                    objectsToRender.push(object);
+                }
             }
+        }
+        objectsToRender.sort((A, B) => A.y - B.y);
+        for (const object of objectsToRender) {
+            object.render(context, state);
         }
     context.restore();
 }
@@ -284,13 +294,19 @@ export function renderAreaObjectsAfterHero(context: CanvasRenderingContext2D, st
     }
     context.save();
         translateContextForAreaAndCamera(context, state, area);
+        const objectsToRender = [];
         for (const object of area.objects) {
-            if (!object.drawPriority ||
-                object.drawPriority === 'foreground' ||
-                (object.drawPriority === 'sprites' && object.y > state.hero.y)
-            ) {
+            if (!object.drawPriority || object.drawPriority === 'foreground') {
                 object?.render(context, state);
+            } else if (object.drawPriority === 'sprites' && object.y > state.hero.y) {
+                if (object.render) {
+                    objectsToRender.push(object);
+                }
             }
+        }
+        objectsToRender.sort((A, B) => A.y - B.y);
+        for (const object of objectsToRender) {
+            object.render(context, state);
         }
     context.restore();
 }

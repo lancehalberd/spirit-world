@@ -1,13 +1,12 @@
 import _ from 'lodash';
 
 import {
-    applyLayerToBehaviorGrid, enterAreaGrid,
-    initializeAreaLayerTiles, resetTileBehavior, setAreaSection,
+    applyLayerToBehaviorGrid,
+    initializeAreaLayerTiles, resetTileBehavior,
 } from 'app/content/areas';
 import { palettes } from 'app/content/palettes';
 import { lootFrames } from 'app/content/lootObject';
 import { createObjectInstance } from 'app/content/objects';
-import { exportZoneToClipboard, importAreaGrid, serializeZone } from 'app/development/exportZone';
 import {
     deleteObject,
     getObjectFrame,
@@ -19,13 +18,13 @@ import {
     combinedObjectTypes,
 } from 'app/development/objectEditor';
 import { displayPropertyPanel, hidePropertyPanel, updateBrushCanvas } from 'app/development/propertyPanel';
+import { getZoneProperties } from 'app/development/zoneEditor';
 import { mainCanvas } from 'app/dom';
 import { CANVAS_SCALE } from 'app/gameConstants';
 import { KEY } from 'app/keyCommands';
 import { translateContextForAreaAndCamera } from 'app/render';
 import { getState, updateHeroMagicStats } from 'app/state';
 import { drawFrame } from 'app/utils/animations';
-import { readFromFile, saveToFile } from 'app/utils/index';
 import { getMousePosition, isMouseDown } from 'app/utils/mouse';
 
 import {
@@ -51,7 +50,7 @@ export interface EditingState {
     objectType: ObjectType,
     replacePercentage: number,
     selectedObject?: ObjectDefinition,
-    showAreaProperties: boolean,
+    showZoneProperties: boolean,
     showFieldProperties: boolean,
     showInventoryProperties: boolean,
     timer: number,
@@ -74,7 +73,7 @@ export const editingState: EditingState = {
     objectType: combinedObjectTypes[0],
     replacePercentage: 100,
     selectedObject: null,
-    showAreaProperties: false,
+    showZoneProperties: false,
     showFieldProperties: true,
     showInventoryProperties: false,
     timer: 0,
@@ -117,26 +116,6 @@ export function stopEditing(state: GameState) {
     state.areaInstance.checkToRedrawTiles = true;
 }
 
-const fullSection = {x: 0, y: 0, w: 32, h: 32};
-const leftColumn = {x: 0, y: 0, w: 16, h: 32};
-const rightColumn = {x: 16, y: 0, w: 16, h: 32};
-const topRow = {x: 0, y: 0, w: 32, h: 16};
-const bottomRow = {x: 0, y: 16, w: 32, h: 16};
-const tlSection = {x: 0, y: 0, w: 16, h: 16};
-const trSection = {x: 16, y: 0, w: 16, h: 16};
-const blSection = {x: 0, y: 16, w: 16, h: 16};
-const brSection = {x: 16, y: 16, w: 16, h: 16};
-
-const sectionLayouts = {
-    single: [fullSection],
-    fourSquare: [tlSection, trSection, blSection, brSection],
-    columns: [leftColumn, rightColumn],
-    rows: [topRow, bottomRow],
-    leftColumn: [leftColumn, trSection, brSection],
-    rightColumn: [tlSection, blSection, rightColumn],
-    topRow: [topRow, blSection, brSection],
-    bottomRow: [tlSection, trSection, bottomRow],
-}
 export function displayTileEditorPropertyPanel() {
     const state = getState();
     if (editingState.selectedLayerIndex >= state.areaInstance.layers.length) {
@@ -144,54 +123,7 @@ export function displayTileEditorPropertyPanel() {
     }
     const selectedPaletteKey = state.areaInstance.layers[editingState.selectedLayerIndex].definition.grid.palette;
     let rows: (EditorProperty<any> | PropertyRow | string)[] = [];
-    rows.push({
-        name: editingState.showAreaProperties ? 'Area -' : 'Area +',
-        onClick() {
-            editingState.showAreaProperties = !editingState.showAreaProperties;
-            displayTileEditorPropertyPanel();
-        },
-    });
-    if (editingState.showAreaProperties) {
-        rows.push([{
-            name: 'Export to Clipboard',
-            onClick() {
-                exportZoneToClipboard(getState().zone);
-            },
-        }, {
-            name: 'Export to File',
-            onClick() {
-                saveToFile(serializeZone(getState().zone), `map.ts`, 'text/javascript');
-            },
-        }]);
-        rows.push([{
-            name: 'Import from Clipboard',
-            onClick() {
-                navigator.clipboard.readText().then(contents => enterAreaGrid(getState(), importAreaGrid(contents)));
-            },
-        }, {
-            name: 'Import from File',
-            onClick() {
-                readFromFile().then(contents => enterAreaGrid(getState(), importAreaGrid(contents)));
-            },
-        }]);
-        rows.push({
-            name: 'sections',
-            value: 'Change Layout',
-            values: ['Change Layout', ...Object.keys(sectionLayouts)],
-            onChange(sectionType: string) {
-                state.areaInstance.definition.sections = sectionLayouts[sectionType];
-                setAreaSection(state, state.hero.d);
-                return 'Change Layout';
-            }
-        });
-        rows.push({
-            name: 'dark',
-            value: !!state.areaInstance.definition.dark,
-            onChange(dark: boolean) {
-                state.areaInstance.definition.dark = dark;
-            }
-        });
-    }
+    rows = [...rows, ...getZoneProperties(state, editingState)];
     rows.push(' ');
     rows.push(' ');
     rows.push(' ');

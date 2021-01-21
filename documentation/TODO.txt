@@ -10,9 +10,9 @@ Bugs:
 
 
 
+Add minimap to editor that shows all areas+section breakdown for the current floor.
+    Add option to increase/decrease the rows/columns of the current floor.
 
-
-Add zone key+floor to spawn location.
 
 Add Reset button for area to recreate the current area instance (in order to respawn mobs, return puzzles elements to starting locations, etc).
 

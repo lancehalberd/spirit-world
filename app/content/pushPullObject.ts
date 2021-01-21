@@ -13,7 +13,7 @@ export class PushPullObject implements ObjectInstance {
     behaviors = {
         solid: true,
     };
-    drawPriority: 'background' = 'background';
+    drawPriority: 'sprites' = 'sprites';
     definition: SimpleObjectDefinition = null;
     x: number;
     y: number;

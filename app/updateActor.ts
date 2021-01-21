@@ -116,7 +116,6 @@ export function updateHero(this: void, state: GameState) {
                     } else if (hero.x < hero.grabObject.x + wiggleDistance && hero.x > hero.grabObject.x) {
                         dx = Math.max(-1, hero.grabObject.x - hero.x);
                     }
-                    console.log(hero.y, hero.grabObject.y);
                     if (hero.y > hero.grabObject.y - wiggleDistance && hero.y < hero.grabObject.y) {
                         dy = Math.min(1, hero.grabObject.y - hero.y);
                     } else if (hero.y < hero.grabObject.y + wiggleDistance && hero.y > hero.grabObject.y) {

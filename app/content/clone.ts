@@ -8,7 +8,7 @@ import {
     Action, ActiveTool,
     Direction, DrawPriority, MagicElement, Equipment, Frame,
     GameState, Hero, LayerTile, ObjectInstance, ObjectStatus, PassiveTool,
-    ShortRectangle, SpawnLocation, Tile
+    ShortRectangle, Tile, ZoneLocation
 } from 'app/types';
 
 export class Clone implements Hero, ObjectInstance {
@@ -62,7 +62,7 @@ export class Clone implements Hero, ObjectInstance {
     rightTool: ActiveTool;
     invisibilityCost: number;
     invisible: boolean;
-    spawnLocation: SpawnLocation;
+    spawnLocation: ZoneLocation;
     spiritRadius: number;
     constructor(hero: Hero) {
         for (let k in hero) {

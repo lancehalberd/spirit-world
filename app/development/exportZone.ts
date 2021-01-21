@@ -1,3 +1,5 @@
+import { zones } from 'app/content/zones';
+
 import { AreaGrid, Zone } from 'app/types';
 
 export function exportZoneToClipboard(zone: Zone): void {
@@ -103,7 +105,7 @@ export function serializeZone(zone: Zone) {
         lines.push('        {');
         lines.push('            grid: [');
         for (let row = 0; row < areaGrid.length; row++) {
-            let rowLine = '            [';
+            let rowLine = '                [';
             for (let column = 0; column < areaGrid[row].length; column++) {
                 rowLine += `f${floorIndex}_${row}x${column},`;
             }
@@ -122,7 +124,7 @@ window['serializeZone'] = serializeZone;
 
 
 // Importing a zone will override the zones hash entry for the zone.
-export function importZone(fileContents: string): void {
+export function importZone(fileContents: string): string {
     if (!window.confirm('Replace current area?')) {
         return;
     }
@@ -133,8 +135,14 @@ export function importZone(fileContents: string): void {
     fileContents = fileContents.replace(/\bexport /g, '');
     // Remove all type definitions.
     fileContents = fileContents.replace(/: [A-Z][a-zA-Z]+/g, '');
+
+    const zoneKey = fileContents.match(/zones\.(\w+) = /)[1];
     // console.log(fileContents);
+    fileContents = fileContents.replace(/zones\./, 'localZones.');
+    const localZones = {};
     eval(fileContents);
+    zones[zoneKey] = localZones[zoneKey];
+    return zoneKey;
 }
 
 let worldMap: AreaGrid;

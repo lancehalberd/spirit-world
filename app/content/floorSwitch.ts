@@ -1,9 +1,12 @@
+import { createAnimation, drawFrame } from 'app/utils/animations';
 import { rectanglesOverlap } from 'app/utils/index';
 
 import {
     FloorSwitchDefinition, GameState,
     ObjectInstance, ObjectStatus, ShortRectangle,
 } from 'app/types';
+
+const [upFrame, downFrame] = createAnimation('gfx/tiles/toggletiles.png', {w: 16, h: 16}, {cols: 2}).frames;
 
 export class FloorSwitch implements ObjectInstance {
     drawPriority: 'background' = 'background';
@@ -48,7 +51,7 @@ export class FloorSwitch implements ObjectInstance {
             if (object.status === 'hiddenSwitch') {
                 object.status = 'normal';
             }
-            if (object.definition.status === 'closedSwitch') {
+            if (object.definition?.status === 'closedSwitch') {
                 const newStatus = object.status === 'normal' ? 'closedSwitch' : 'normal';
                 if (object.changeStatus) {
                     object.changeStatus(state, newStatus);
@@ -68,15 +71,9 @@ export class FloorSwitch implements ObjectInstance {
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
         if (this.status === 'active') {
-            context.fillStyle = 'rgba(0, 0, 0, 0.5)';
-            context.beginPath();
-            context.arc(this.x + 8, this.y + 8, 5, 0, 2 * Math.PI);
-            context.fill();
+            drawFrame(context, downFrame, {...downFrame, x: this.x, y: this.y});
         } else {
-            context.fillStyle = 'rgba(255, 255, 255, 0.5)';
-            context.beginPath();
-            context.arc(this.x + 8, this.y + 8, 6, 0, 2 * Math.PI);
-            context.fill();
+            drawFrame(context, upFrame, {...upFrame, x: this.x, y: this.y});
         }
     }
 }

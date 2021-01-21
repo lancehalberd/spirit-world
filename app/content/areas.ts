@@ -74,10 +74,8 @@ export function initializeAreaTiles(area: AreaDefinition): AreaDefinition {
 
 export function removeAllClones(state: GameState): void {
     if (state.hero.activeClone) {
-        console.log(state.hero.x, state.hero.y);
         state.hero.x = state.hero.activeClone.x;
         state.hero.y = state.hero.activeClone.y;
-        console.log(state.hero.x, state.hero.y);
     }
     for (const clone of state.hero.clones) {
         removeObjectFromArea(state, state.areaInstance, clone);
@@ -106,9 +104,10 @@ export function enterAreaGrid(state: GameState, areaGrid: AreaGrid): void {
         return;
     }
     state.areaGrid = areaGrid;
-    const row = state.areaGridCoords.y % state.areaGrid.length;
-    const column = state.areaGridCoords.x % state.areaGrid[row].length;
-    enterArea(state, state.areaGrid[row][column], state.hero.x, state.hero.y);
+    state.areaGridCoords.y = state.areaGridCoords.y % state.areaGrid.length;
+    state.areaGridCoords.x = state.areaGridCoords.x % state.areaGrid[state.areaGridCoords.y].length;
+    const area = getAreaFromGridCoords(state.areaGrid, {x: state.areaGridCoords.x, y: state.areaGridCoords.y });
+    enterArea(state, area, state.hero.x, state.hero.y);
 }
 
 export function setAreaSection(state: GameState, d: Direction): void {

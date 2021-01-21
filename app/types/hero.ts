@@ -58,11 +58,13 @@ export interface Actor {
 }
 
 // TODO: indicate which area grid to spawn in once area grids have ids.
-export interface SpawnLocation {
+export interface ZoneLocation {
+    zoneKey: string,
+    floor: number,
+    areaGridCoords: {x: number, y: number},
     x: number,
     y: number,
     d: Direction,
-    areaGridCoords: {x: number, y: number},
 }
 
 export interface Hero extends Actor {
@@ -97,6 +99,6 @@ export interface Hero extends Actor {
     element?: MagicElement,
     spiritRadius: number,
     status: ObjectStatus,
-    spawnLocation: SpawnLocation,
+    spawnLocation: ZoneLocation,
 }
 

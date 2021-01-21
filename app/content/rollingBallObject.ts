@@ -11,7 +11,7 @@ export class RollingBallObject implements ObjectInstance {
     behaviors = {
         solid: true,
     };
-    drawPriority: 'background' = 'background';
+    drawPriority: 'sprites' = 'sprites';
     definition = null;
     x: number;
     y: number;

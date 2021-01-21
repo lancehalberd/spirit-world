@@ -71,6 +71,8 @@ function getDefaultHeroState(): Hero {
         render: renderHero,
         spiritRadius: 0,
         spawnLocation: {
+            zoneKey: 'peachCave',
+            floor: 0,
             x: 150,
             y: 445,
             d: 'down',
@@ -135,7 +137,6 @@ export function initializeState() {
 }
 
 export function returnToSpawnLocation(state: GameState) {
-    state.hero.d = state.hero.spawnLocation.d;
     state.hero.life = state.hero.maxLife;
     state.hero.magic = state.hero.maxMagic;
     state.defeated = false;
@@ -151,6 +152,9 @@ export function returnToSpawnLocation(state: GameState) {
     state.hero.vx = 0;
     state.hero.vy = 0;
     state.hero.vz = 0;
+    state.zone = zones[state.hero.spawnLocation.zoneKey];
+    state.areaGrid = state.zone.floors[state.hero.spawnLocation.floor].grid;
+    state.hero.d = state.hero.spawnLocation.d;
     enterArea(state,
         getAreaFromGridCoords(state.areaGrid, state.hero.spawnLocation.areaGridCoords),
         state.hero.spawnLocation.x, state.hero.spawnLocation.y
