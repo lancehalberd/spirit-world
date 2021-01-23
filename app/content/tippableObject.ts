@@ -3,14 +3,17 @@ import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { directionMap, isPointOpen } from 'app/utils/field';
 
-import { Direction, Frame, FrameAnimation, GameState, BaseObjectDefinition, ObjectInstance, ObjectStatus, ShortRectangle } from 'app/types';
+import {
+    Direction, DrawPriority, Frame, FrameAnimation, GameState,
+    BaseObjectDefinition, ObjectInstance, ObjectStatus, ShortRectangle,
+} from 'app/types';
 
 
 //const crackedPotFrame: Frame = createAnimation('gfx/tiles/tippablepot.png', {w: 16, h: 18}).frames[0];
-const particleFrames: Frame[] = createAnimation('gfx/tiles/tippablepot.png', {w: 16, h: 18}, {x: 4, cols: 5}).frames;
+const particleFrames: Frame[] = createAnimation('gfx/tiles/tippablepot.png', {w: 16, h: 18}, {x: 6, cols: 5}).frames;
 //const remainsFrame: Frame = createAnimation('gfx/tiles/tippablepot.png', {w: 16, h: 18}, {x: 3}).frames[0];
 const fallingAnimation: FrameAnimation = createAnimation('gfx/tiles/tippablepot.png', {w: 16, h: 18},
-    {cols: 4, duration: 4}, {loop: false}
+    {cols: 6, duration: 4}, {loop: false}
 );
 
 export class TippableObject implements ObjectInstance {
@@ -18,7 +21,7 @@ export class TippableObject implements ObjectInstance {
     behaviors = {
         solid: true,
     };
-    drawPriority: 'sprites' = 'sprites';
+    drawPriority: DrawPriority = 'sprites';
     definition = null;
     x: number;
     y: number;
@@ -69,6 +72,7 @@ export class TippableObject implements ObjectInstance {
             }
             if (!this.shattered && this.animationTime >= (fallingAnimation.frames.length - 1) * FRAME_LENGTH * fallingAnimation.frameDuration) {
                 this.shattered = true;
+                this.drawPriority = 'background';
                 addParticleAnimations(state, this.x, this.y, 2, particleFrames);
             }
         }

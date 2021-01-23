@@ -10,10 +10,10 @@ Bugs:
 Graphics:
     Add sparkles to peach loot + hud.
     Add circular depression object+graphics (to roll ball into)
-    Add crystal switch graphics.
 
+Add Zone doors
 
-Add connected areas + dungeons
+Add staircases
 
 Add ability to charge weapon
     Spin chakram around quickly in a circle twice (can move after throwing)

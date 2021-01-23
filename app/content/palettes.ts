@@ -54,8 +54,6 @@ const thornBehavior: TileBehaviors = {
     particles: thornParticles,
 };
 
-export const [mapTilesFrame] = createAnimation('gfx/tiles/overworld.png', {w: 384, h: 640}).frames;
-
 function combinePalettes(palettes: TilePalette[]): TilePalette {
     const size = 16;
     let totalTiles: number = palettes.reduce(
