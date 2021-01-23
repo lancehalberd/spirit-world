@@ -276,11 +276,10 @@ export function checkForFloorDamage(state: GameState, hero: Hero) {
         }
     }
     if (fallingUp && fallingDown && fallingLeft && fallingRight) {
-        const wasClone = !!state.hero.clones.length;
-        damageActor(state, hero, 1, null, true);
-        if (!wasClone) {
-            state.hero.action = 'falling';
-            state.hero.actionFrame = 0;
-        }
+        // const wasClone = !!state.hero.clones.length;
+
+
+        hero.action = 'falling';
+        hero.actionFrame = 0;
     }
 }

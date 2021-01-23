@@ -3,6 +3,7 @@ import _ from 'lodash';
 import { createObjectInstance } from 'app/content/objects';
 import { palettes } from 'app/content/palettes';
 import { LootDropObject } from 'app/content/lootObject';
+import { zones } from 'app/content/zones';
 import { createCanvasAndContext } from 'app/dom';
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from 'app/gameConstants';
 import { isPointInShortRect } from 'app/utils/index';
@@ -11,6 +12,7 @@ import { updateCamera } from 'app/updateCamera';
 import {
     AreaDefinition, AreaGrid, AreaInstance, AreaLayerDefinition,
     Direction, GameState, LayerTile, ObjectInstance, ShortRectangle, Tile, TileBehaviors,
+    ZoneLocation,
 } from 'app/types';
 
 
@@ -108,6 +110,46 @@ export function enterAreaGrid(state: GameState, areaGrid: AreaGrid): void {
     state.areaGridCoords.x = state.areaGridCoords.x % state.areaGrid[state.areaGridCoords.y].length;
     const area = getAreaFromGridCoords(state.areaGrid, {x: state.areaGridCoords.x, y: state.areaGridCoords.y });
     enterArea(state, area, state.hero.x, state.hero.y);
+}
+
+export function enterLocation(state: GameState, location: ZoneLocation): void {
+    state.zone = zones[location.zoneKey];
+    state.floor = location.floor;
+    state.areaGridCoords.y = location.areaGridCoords.y;
+    state.areaGridCoords.x = location.areaGridCoords.x;
+    state.hero.x = location.x;
+    state.hero.y = location.y;
+    enterAreaGrid(state, state.zone.floors[state.floor].grid);
+}
+
+export function enterZoneByTarget(state: GameState, zoneKey: string, targetObjectId: string): boolean {
+    const zone = zones[zoneKey];
+    if (!zone) {
+        console.error(`Missing zone: ${zoneKey}`);
+        return false;
+    }
+    for (let floor = 0; floor < zone.floors.length; floor++) {
+        const areaGrid = zone.floors[floor].grid;
+        for (let y = 0; y < areaGrid.length; y++) {
+            for (let x = 0; x < areaGrid[y].length; x++) {
+                for (const object of (areaGrid[y][x]?.objects || [])) {
+                    if (object.id === targetObjectId) {
+                        enterLocation(state, {
+                            zoneKey,
+                            floor,
+                            areaGridCoords: {x, y},
+                            x: object.x,
+                            y: object.y,
+                            d: state.hero.d,
+                        });
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    console.error('Could not find', targetObjectId, 'in', zoneKey);
+    return false;
 }
 
 export function setAreaSection(state: GameState, d: Direction): void {

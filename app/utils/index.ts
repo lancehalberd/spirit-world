@@ -21,8 +21,15 @@ export function isPixelInShortRect(x: number, y: number, {x: l = 0, y: t = 0, w 
     return !(y < t || y >= t + h || x < l || x >= l + w);
 }
 
-export function isBoxInBox(A: ShortRectangle, B: ShortRectangle) {
+// This is similar to rectanglesOverlap, except that the rectangles here represent pixel grids
+// and only overlap if they share an actual pixel.
+export function boxesIntersect(A: ShortRectangle, B: ShortRectangle) {
     return !(A.y + A.h - 1 < B.y || A.y > B.y + B.h - 1 || A.x + A.w - 1 < B.x || A.x > B.x + B.w - 1);
+}
+
+export function isObjectInsideTarget(object: ShortRectangle, target: ShortRectangle): boolean {
+    return object.x >= target.x && object.y >= target.y
+        && object.x + object.w <= target.x + target.w && object.y + object.h <= target.y + target.h;
 }
 
 export function rectanglesOverlap(A: ShortRectangle, B: ShortRectangle) {

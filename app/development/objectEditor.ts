@@ -4,6 +4,7 @@ import { addObjectToArea, removeObjectFromArea } from 'app/content/areas';
 import { enemyDefinitions } from 'app/content/enemy';
 import { createObjectInstance } from 'app/content/objects';
 import { lootFrames } from 'app/content/lootObject';
+import { zones } from 'app/content/zones';
 import { displayTileEditorPropertyPanel, EditingState } from 'app/development/tileEditor';
 import { getState } from 'app/state';
 import { ifdefor, isPointInShortRect } from 'app/utils/index';
@@ -11,6 +12,7 @@ import { ifdefor, isPointInShortRect } from 'app/utils/index';
 import {
     FrameDimensions, Direction, EnemyType, GameState,
     LootType, MagicElement, ObjectDefinition, ObjectStatus, ObjectType, PanelRows,
+    Zone,
 } from 'app/types';
 
 let allLootTypes: LootType[];
@@ -30,7 +32,12 @@ export function getLootTypes(): LootType[] {
     return allLootTypes;
 }
 
-export const combinedObjectTypes: ObjectType[] = ['loot', 'chest', 'door', 'enemy', 'crystalSwitch', 'floorSwitch', 'pushPull', 'rollingBall', 'tippable'];
+export const combinedObjectTypes: ObjectType[] = [
+    'loot', 'chest',
+    'door', 'pitEntrance', 'marker',
+    'enemy',
+    'crystalSwitch', 'floorSwitch',
+    'pushPull', 'rollingBall', 'tippable'];
 
 function createObjectDefinition(
     state: GameState,
@@ -75,8 +82,18 @@ function createObjectDefinition(
                 type: definition.type,
                 id: definition.id || uniqueId(state, 'floorSwitch'),
                 status: definition.status || editingState.objectStatus,
-                // Need to use ifdefor here since 0 is a valid value for timer.
+                // Need to use ifdefor here since false is a valid value for toggleOnRelease.
                 toggleOnRelease: ifdefor(definition.toggleOnRelease, editingState.toggleOnRelease),
+                x,
+                y,
+            };
+        case 'pitEntrance':
+            return {
+                type: definition.type,
+                id: definition.id || uniqueId(state, 'pitEntrance'),
+                status: definition.status || editingState.objectStatus,
+                targetZone: definition.targetZone || editingState.entranceTargetZone,
+                targetObjectId: definition.targetObjectId || editingState.entranceTargetObjectId,
                 x,
                 y,
             };
@@ -93,6 +110,7 @@ function createObjectDefinition(
                 x,
                 y,
             };
+        case 'marker':
         case 'pushPull':
         case 'rollingBall':
         case 'tippable':
@@ -111,6 +129,21 @@ function createObjectDefinition(
 
 export function getObjectProperties(state: GameState, editingState: EditingState): PanelRows {
     return getObjectTypeProperties(state, editingState, {type: editingState.objectType} as ObjectDefinition);
+}
+
+function getTargetObjectIds(zone: Zone): string[] {
+    const combinedObjectIds: string[][] = [];
+    for (const floor of zone.floors) {
+        for (const row of floor.grid) {
+            for (const area of row) {
+                if (!area) {
+                    continue;
+                }
+                combinedObjectIds.push(area.objects.filter(object => object.type === 'marker').map(object => object.id));
+            }
+        }
+    }
+    return _.flatten(combinedObjectIds);
 }
 
 export function getObjectTypeProperties(state: GameState, editingState: EditingState, object: ObjectDefinition): PanelRows {
@@ -161,6 +194,54 @@ export function getObjectTypeProperties(state: GameState, editingState: EditingS
                     }
                 },
             });
+            break;
+        case 'pitEntrance':
+            const zoneKeys = Object.keys(zones);
+            if (!editingState.entranceTargetZone) {
+                editingState.entranceTargetZone = zoneKeys[0];
+            }
+            const zoneKey = object.targetZone || editingState.entranceTargetZone;
+            rows.push({
+                name: 'target zone',
+                value: zoneKey,
+                values: zoneKeys,
+                onChange(targetZone: string) {
+                    if (object.id) {
+                        object.targetZone = targetZone;
+                        updateObjectInstance(state, object);
+                    } else {
+                        editingState.entranceTargetZone = targetZone;
+                    }
+                    // We need to refresh the panel to get the new marker ids for the selected zone.
+                    displayTileEditorPropertyPanel();
+                },
+            });
+            const zone = zones[zoneKey];
+            const objectIds = zone ? getTargetObjectIds(zone) : [];
+            if (objectIds.length) {
+                if (!editingState.entranceTargetObjectId || objectIds.indexOf(editingState.entranceTargetObjectId) < 0) {
+                    editingState.entranceTargetObjectId = objectIds[0];
+                }
+                if (object.id && objectIds.indexOf(object.targetObjectId) < 0) {
+                    object.targetObjectId = objectIds[0];
+                }
+                rows.push({
+                    name: 'target marker',
+                    value: object.targetObjectId || editingState.entranceTargetObjectId,
+                    values: objectIds,
+                    onChange(targetObjectId: string) {
+                        if (object.id) {
+                            object.targetObjectId = targetObjectId;
+                            updateObjectInstance(state, object);
+                        } else {
+                            editingState.entranceTargetObjectId = targetObjectId;
+                        }
+                    },
+                });
+            } else {
+                rows.push('No valid markers');
+            }
+
             break;
         case 'loot':
         case 'chest': {
@@ -359,15 +440,8 @@ export function onMouseDownSelect(state: GameState, editingState: EditingState, 
 }
 
 export function fixObjectPosition(state: GameState, object: ObjectDefinition): void {
-    // These objects snap to the grid.
-    if (object.type === 'chest'
-        || object.type === 'crystalSwitch'
-        || object.type === 'door'
-        || object.type === 'floorSwitch'
-        || object.type === 'pushPull'
-        || object.type === 'rollingBall'
-        || object.type === 'tippable'
-    ) {
+    // Currently all objects snap to the grid except loot outside of chests.
+    if (object.type !== 'loot') {
         object.x = Math.round(object.x / state.areaInstance.palette.w) * state.areaInstance.palette.w;
         object.y = Math.round(object.y / state.areaInstance.palette.h) * state.areaInstance.palette.h;
     }
@@ -385,7 +459,7 @@ export function onMouseMoveSelect(state: GameState, editingState: EditingState, 
 
 export function uniqueId(state: GameState, prefix: string) {
     let i = 0;
-    prefix = `${state.areaGridCoords.x}-${state.areaGridCoords.y}-${prefix}`;
+    prefix = `${state.zone.key}:${state.floor}:${state.areaGridCoords.x}x${state.areaGridCoords.y}-${prefix}`;
     while (state.areaInstance.definition.objects.some(o => o.id === `${prefix}-${i}`)) {
         i++;
     }
@@ -420,6 +494,11 @@ export function getObjectFrame(object: ObjectDefinition): FrameDimensions {
     }
     if (object.type === 'tippable') {
         return simpleGeometry;
+    }
+    const state = getState();
+    const instance = createObjectInstance(state, object);
+    if (instance.getHitbox) {
+        return instance.getHitbox(state);
     }
     return lootFrames.unknown;
 }

@@ -97,7 +97,7 @@ export function serializeZone(zone: Zone) {
         }
     }
 
-    lines.push('zones.peachCave = {');
+    lines.push(`zones.${zone.key} = {`);
     lines.push(`    key: '${zone.key}',`);
     lines.push(`    floors: [`);
     for (let floorIndex = 0; floorIndex < zone.floors.length; floorIndex++) {

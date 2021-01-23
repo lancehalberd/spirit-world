@@ -42,11 +42,11 @@ export function useTool(
             return;
         case 'clone':
             if (!state.hero.clones.length) {
-                if (state.hero.magic < 10) {
+                if (state.hero.magic < 10 || state.hero.life < 2) {
                     return;
                 }
                 state.hero.magic -= 10;
-                for (let i = 0; i < state.hero.activeTools.clone; i++) {
+                for (let i = 0; i < state.hero.activeTools.clone && i < state.hero.life - 1; i++) {
                     const clone = new Clone(state.hero);
                     state.hero.activeClone = clone;
                     state.hero.clones.push(clone);

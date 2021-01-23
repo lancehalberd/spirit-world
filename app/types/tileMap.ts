@@ -189,7 +189,13 @@ export interface CrystalSwitchDefinition extends BaseObjectDefinition {
     timer?: number,
 }
 
-export type SimpleObjectType = 'door' | 'pushPull' | 'rollingBall' | 'tippable';
+export interface EntranceDefinition extends BaseObjectDefinition {
+    type: 'pitEntrance',
+    targetZone: string,
+    targetObjectId: string,
+}
+
+export type SimpleObjectType = 'door' | 'marker' | 'pushPull' | 'rollingBall' | 'tippable';
 
 export interface SimpleObjectDefinition extends BaseObjectDefinition {
     type: SimpleObjectType,
@@ -204,9 +210,11 @@ export interface EnemyObjectDefinition extends BaseObjectDefinition {
 
 export type ObjectDefinition = SimpleObjectDefinition
     | CrystalSwitchDefinition
+    | EntranceDefinition
+    | EnemyObjectDefinition
     | FloorSwitchDefinition
     | LootObjectDefinition
-    | EnemyObjectDefinition;
+    ;
 
 export type ObjectType = ObjectDefinition['type'];
 

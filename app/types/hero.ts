@@ -5,7 +5,7 @@ import { Direction, FrameAnimation, GameState, LayerTile, ObjectInstance, Object
 
 export type Action =
     'attack' | 'roll' | 'knocked' | 'hurt' | 'dead' | 'grabbing' | 'carrying' | 'throwing' | 'getItem' | 'beingMoved' |
-    'falling' | 'meditating';
+    'falling' | 'fallen' | 'meditating';
 export type ActiveTool = 'bow' | 'staff' | 'clone' | 'invisibility';
 export type Equipment = 'cloudBoots' | 'ironBoots';
 export type PassiveTool = 'gloves'

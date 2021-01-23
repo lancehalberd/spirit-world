@@ -111,7 +111,7 @@ export function updateHeroMagicStats(state: GameState) {
 }
 
 function getDefaultState(): GameState {
-    const state = {
+    const state: GameState = {
         savedState: getDefaultSavedState(),
         hero: getDefaultHeroState(),
         camera: { x: 0, y: 0 },
@@ -121,6 +121,7 @@ function getDefaultState(): GameState {
         zone: zones.peachCave,
         areaGrid: zones.peachCave.floors[0].grid,
         areaGridCoords: {x: 1, y: 1},
+        floor: 0,
         paused: false,
         menuIndex: 0,
         defeated: false,
@@ -153,7 +154,8 @@ export function returnToSpawnLocation(state: GameState) {
     state.hero.vy = 0;
     state.hero.vz = 0;
     state.zone = zones[state.hero.spawnLocation.zoneKey];
-    state.areaGrid = state.zone.floors[state.hero.spawnLocation.floor].grid;
+    state.floor = state.hero.spawnLocation.floor;
+    state.areaGrid = state.zone.floors[state.floor].grid;
     state.areaGridCoords.x = state.hero.spawnLocation.areaGridCoords.x;
     state.areaGridCoords.y = state.hero.spawnLocation.areaGridCoords.y;
     state.hero.d = state.hero.spawnLocation.d;

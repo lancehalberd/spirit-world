@@ -95,7 +95,8 @@ export function getZoneProperties(state: GameState, editingState: EditingState):
                 const zoneKey = importZone(contents);
                 const state = getState();
                 state.zone = zones[zoneKey];
-                enterAreaGrid(getState(), state.zone.floors[0].grid);
+                state.floor = 0;
+                enterAreaGrid(getState(), state.zone.floors[state.floor].grid);
             });
         },
     }, {
@@ -105,7 +106,8 @@ export function getZoneProperties(state: GameState, editingState: EditingState):
                 const zoneKey = importZone(contents);
                 const state = getState();
                 state.zone = zones[zoneKey];
-                enterAreaGrid(getState(), state.zone.floors[0].grid);
+                state.floor = 0;
+                enterAreaGrid(getState(), state.zone.floors[state.floor].grid);
             });
         },
     }]);
@@ -117,7 +119,8 @@ export function getZoneProperties(state: GameState, editingState: EditingState):
         onChange(zoneKey: string) {
             if (state.zone.key !== zoneKey) {
                 state.zone = zones[zoneKey];
-                state.areaGrid = state.zone.floors[0].grid;
+                state.floor = 0;
+                state.areaGrid = state.zone.floors[state.floor].grid;
                 enterAreaGrid(state, state.areaGrid);
                 displayTileEditorPropertyPanel();
             }
@@ -140,7 +143,8 @@ export function getZoneProperties(state: GameState, editingState: EditingState):
             };
             zones[newZoneKey] = zone;
             state.zone = zone;
-            state.areaGrid = zone.floors[0].grid;
+            state.floor = 0;
+            state.areaGrid = zone.floors[state.floor].grid;
             enterAreaGrid(state, state.areaGrid);
             displayTileEditorPropertyPanel();
         },
@@ -154,6 +158,7 @@ export function getZoneProperties(state: GameState, editingState: EditingState):
         onChange(floorString: string) {
             const floorNumber = parseInt(floorString, 10);
             const newGrid = state.zone.floors[floorNumber - 1].grid;
+            state.floor = floorNumber;
             if (newGrid !== state.areaGrid) {
                 enterAreaGrid(state, newGrid);
                 displayTileEditorPropertyPanel();
@@ -173,7 +178,8 @@ export function getZoneProperties(state: GameState, editingState: EditingState):
                 }
             }
             state.zone.floors.push(floor);
-            enterAreaGrid(state, floor.grid);
+            state.floor = state.zone.floors.length - 1;
+            enterAreaGrid(state, state.zone.floors[state.floor].grid);
             displayTileEditorPropertyPanel();
         },
     }]);

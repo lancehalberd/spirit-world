@@ -9,6 +9,11 @@ Bugs:
 
 Graphics:
     Add sparkles to peach loot + hud.
+    Add circular depression object+graphics (to roll ball into)
+    Add crystal switch graphics.
+
+
+Add connected areas + dungeons
 
 Add ability to charge weapon
     Spin chakram around quickly in a circle twice (can move after throwing)
@@ -54,8 +59,6 @@ Add example prologue area:
     - Floor switches to open exit from area that gives roll technique
     - NPC that gives weapon?
     - Peach of Immortality at the end
-
-Add connected areas + dungeons
 
 Support 64x64 super tiles for world map. Or maybe just 48x48. Probably add this after Spirit World mechanics to make sure they perform okay together.
 

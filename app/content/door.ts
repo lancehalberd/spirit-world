@@ -1,6 +1,6 @@
 import { resetTileBehavior } from 'app/content/areas';
 import { BITMAP_BOTTOM, BITMAP_LEFT, BITMAP_RIGHT, BITMAP_TOP } from 'app/content/palettes';
-import { isBoxInBox } from 'app/utils/index';
+import { boxesIntersect } from 'app/utils/index';
 
 import {
     AreaInstance, DrawPriority, GameState, ObjectInstance,
@@ -76,7 +76,7 @@ export class Door implements ObjectInstance {
     }
     update(state: GameState) {
         const hero = state.hero.activeClone || state.hero;
-        if (isBoxInBox(hero, { x: this.x, y: this.y, w: 32, h: 32})) {
+        if (boxesIntersect(hero, { x: this.x, y: this.y, w: 32, h: 32})) {
             if (hero.action !== 'beingMoved') {
                 hero.action = 'beingMoved';
                 hero.actionTarget = this;

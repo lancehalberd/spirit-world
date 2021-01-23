@@ -24,7 +24,7 @@ const shadowFrame: Frame = createAnimation('gfx/shadow.png', { w: 16, h: 16 }).f
 
 export function renderHero(this: Hero, context: CanvasRenderingContext2D, state: GameState): void {
     const hero = this;
-    if (state.hero.invisible) {
+    if (state.hero.invisible || hero.action === 'fallen') {
         return;
     }
     const frame = getFrame(heroAnimations.idle[hero.d], 0);
@@ -37,6 +37,14 @@ export function renderHero(this: Hero, context: CanvasRenderingContext2D, state:
         }
         if (hero.action === 'roll' && hero.actionFrame) {
             drawFrame(mainContext, frame, { x: hero.x - frame.content.x, y: hero.y - frame.content.y - 2 - hero.z, w: frame.w, h: frame.h });
+        } else if (hero.action === 'falling') {
+            const fallingFrame = {...frame, h: frame.h - hero.actionFrame * 2};
+            drawFrame(mainContext, fallingFrame, {
+                x: hero.x - frame.content.x,
+                y: hero.y - frame.content.y - hero.z + hero.actionFrame * 2,
+                w: fallingFrame.w,
+                h: fallingFrame.h,
+            });
         } else {
             drawFrame(mainContext, frame, { x: hero.x - frame.content.x, y: hero.y - frame.content.y - hero.z, w: frame.w, h: frame.h });
         }
@@ -62,6 +70,9 @@ export function renderCarriedTile(context: CanvasRenderingContext2D, state: Game
 
 
 export function renderHeroShadow(context: CanvasRenderingContext2D, state: GameState, hero: Hero): void {
+    if (hero.action === 'fallen' || hero.action === 'falling') {
+        return;
+    }
     drawFrame(mainContext, shadowFrame, { ...shadowFrame, x: hero.x, y: hero.y - 3 });
 }
 

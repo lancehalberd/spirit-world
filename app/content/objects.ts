@@ -8,6 +8,8 @@ import { FloorSwitch } from 'app/content/floorSwitch';
 import { PushPullObject } from 'app/content/pushPullObject';
 import { RollingBallObject } from 'app/content/rollingBallObject';
 import { TippableObject } from 'app/content/tippableObject';
+import { Marker } from 'app/content/objects/marker';
+import { PitEntrance } from 'app/content/objects/pitEntrance';
 
 import {
     GameState, ObjectDefinition, ObjectInstance,
@@ -32,6 +34,10 @@ export function createObjectInstance(state: GameState, object: ObjectDefinition)
         return new PushPullObject(object);
     } else if (object.type === 'crystalSwitch') {
         return new CrystalSwitch(object);
+    } else if (object.type === 'pitEntrance') {
+        return new PitEntrance(object);
+    } else if (object.type === 'marker') {
+        return new Marker(object);
     }
 
     console.error('Unhandled object type', object.type, object);

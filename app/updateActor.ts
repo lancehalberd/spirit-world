@@ -70,10 +70,18 @@ export function updateHero(this: void, state: GameState) {
     } else if (hero.action === 'falling') {
         movementSpeed = 0;
         hero.actionFrame++;
-        if (hero.actionFrame >= 5) {
+        if (hero.actionFrame >= 13) {
+            hero.action = 'fallen';
+            hero.actionFrame = 0;
+        }
+    } else if (hero.action === 'fallen') {
+        movementSpeed = 0;
+        hero.actionFrame++;
+        if (hero.actionFrame >= 8) {
             hero.d = hero.safeD;
             hero.x = hero.safeX;
             hero.y = hero.safeY;
+            damageActor(state, hero, 1, null, true);
             hero.action = null;
         }
     } else if (hero.action === 'beingMoved') {
@@ -148,8 +156,9 @@ export function updateHero(this: void, state: GameState) {
         dx = hero.vx;
         dy = hero.vy;
         hero.z += hero.vz;
-        hero.vz -= 0.5;
+        hero.vz = Math.max(-8, hero.vz - 0.5);
         if (hero.z <= 0) {
+            hero.z = 0;
             hero.action = null;
             hero.vz = 0;
         }
@@ -319,7 +328,7 @@ export function updateHero(this: void, state: GameState) {
         }
     }
     // Mostly don't check for pits/damage when the player cannot control themselves.
-    if (hero.action !== 'beingMoved' && hero.action !== 'falling' && hero.action !== 'knocked'
+    if (hero.action !== 'beingMoved' && hero.action !== 'falling' && hero.action !== 'fallen' && hero.action !== 'knocked'
         && hero.action !== 'dead'  && hero.action !== 'getItem'
     ) {
         checkForFloorDamage(state, hero);
