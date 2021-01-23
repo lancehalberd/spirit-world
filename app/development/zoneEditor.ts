@@ -1,10 +1,12 @@
 import _ from 'lodash';
 import {
-    enterAreaGrid, setAreaSection,
+    enterArea, enterAreaGrid, setAreaSection,
 } from 'app/content/areas';
 import { zones } from 'app/content/zones';
 import { exportZoneToClipboard, importZone, serializeZone } from 'app/development/exportZone';
 import { displayTileEditorPropertyPanel, EditingState } from 'app/development/tileEditor';
+import { createCanvasAndContext } from 'app/dom';
+import { CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
 import { getState } from 'app/state';
 import { readFromFile, saveToFile } from 'app/utils/index';
 
@@ -30,6 +32,36 @@ const sectionLayouts = {
     rightColumn: [tlSection, blSection, rightColumn],
     topRow: [topRow, blSection, brSection],
     bottomRow: [tlSection, trSection, bottomRow],
+}
+
+const [mapCanvas, mapContext] = createCanvasAndContext(128, 128);
+
+export function renderZoneEditor(context: CanvasRenderingContext2D, state: GameState, editingState: EditingState): void {
+    const width = state.areaGrid[0].length * 32;
+    const height = state.areaGrid.length * 32;
+    if (mapCanvas.width !== width || mapCanvas.height !== height) {
+        mapCanvas.width = width;
+        mapCanvas.height = height;
+    }
+    mapContext.clearRect(0, 0, width, height);
+
+    mapContext.fillStyle = 'rgba(50, 50, 50, 0.5)';
+    for (let row = 0; row < state.areaGrid.length; row++) {
+        for (let column = 0; column < state.areaGrid[row].length; column++) {
+            for( const section of (state.areaGrid[row][column]?.sections || [fullSection])) {
+                mapContext.fillRect(column * 32 + section.x, row * 32 + section.y, section.w, 1);
+                mapContext.fillRect(column * 32 + section.x, row * 32 + section.y + section.h - 1, section.w, 1);
+                mapContext.fillRect(column * 32 + section.x, row * 32 + section.y + 1, 1, section.h - 2);
+                mapContext.fillRect(column * 32 + section.x + section.w - 1, row * 32 + section.y + 1, 1, section.h - 2);
+            }
+        }
+    }
+
+    mapContext.fillStyle = 'rgba(255, 255, 255, 0.8)';
+    const area = state.nextAreaInstance || state.areaInstance;
+    let cameraX = Math.floor(state.areaGridCoords.x * 32 + state.camera.x / 16 - area.cameraOffset.x / 16);
+    let cameraY = Math.floor(state.areaGridCoords.y * 32 + state.camera.y / 16 - area.cameraOffset.y / 16);
+    mapContext.fillRect(cameraX, cameraY, CANVAS_WIDTH / 16, CANVAS_HEIGHT / 16);
 }
 
 export function getZoneProperties(state: GameState, editingState: EditingState): PanelRows {
@@ -146,6 +178,50 @@ export function getZoneProperties(state: GameState, editingState: EditingState):
         },
     }]);
 
+    rows.push(mapCanvas);
+
+    rows.push(['Size', {
+        name: '',
+        id: `floor-columns`,
+        value: state.areaGrid[0].length,
+        onChange(columns: number) {
+            if (columns < 1) {
+                return state.areaGrid[0].length;
+            }
+            if (columns !== state.areaGrid[0].length) {
+                for (let i = 0; i < state.areaGrid.length; i++) {
+                    while (state.areaGrid[i].length < columns) {
+                        state.areaGrid[i].push(null);
+                    }
+                    while (state.areaGrid[i].length > columns) {
+                        state.areaGrid[i].pop();
+                    }
+                }
+                enterAreaGrid(state, state.areaGrid);
+                displayTileEditorPropertyPanel();
+            }
+        }
+    }, 'x', {
+        name: '',
+        id: `floor-rows`,
+        value: state.areaGrid.length,
+        onChange(rows: number) {
+            if (rows < 1) {
+                return state.areaGrid.length;
+            }
+            if (rows !== state.areaGrid.length) {
+                while (state.areaGrid.length < rows) {
+                    state.areaGrid.push([...new Array(state.areaGrid[0].length)].map(() => null));
+                }
+                while (state.areaGrid.length > rows) {
+                    state.areaGrid.pop();
+                }
+                enterAreaGrid(state, state.areaGrid);
+                displayTileEditorPropertyPanel();
+            }
+        }
+    }]);
+
 
     rows.push({
         name: 'sections',
@@ -162,6 +238,13 @@ export function getZoneProperties(state: GameState, editingState: EditingState):
         value: !!state.areaInstance.definition.dark,
         onChange(dark: boolean) {
             state.areaInstance.definition.dark = dark;
+        }
+    });
+    rows.push({
+        name: 'Refresh Area',
+        onClick() {
+            // Calling this will instantiate the area again and place the player back in their current location.
+            enterArea(state, state.areaInstance.definition, state.hero.x, state.hero.y);
         }
     });
     return rows;

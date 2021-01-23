@@ -6,15 +6,9 @@ Bugs:
         -return tileBehaviors and objectBehaviors separately, only damage if tile is solid+damaging.
     Fix menu selection breaks sometimes
         No luck reproducing, maybe the analog stick was doing something weird?
-    Fix bug if clone is left on far right tile, you continue and then return, causes you to move to wrogns creen.
 
-
-
-Add minimap to editor that shows all areas+section breakdown for the current floor.
-    Add option to increase/decrease the rows/columns of the current floor.
-
-
-Add Reset button for area to recreate the current area instance (in order to respawn mobs, return puzzles elements to starting locations, etc).
+Graphics:
+    Add sparkles to peach loot + hud.
 
 Add ability to charge weapon
     Spin chakram around quickly in a circle twice (can move after throwing)

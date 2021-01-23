@@ -6,11 +6,11 @@ import { fillRect, pad } from 'app/utils/index';
 import { GameState } from 'app/types';
 
 const [emptyHeart, fullHeart, threeQuarters, halfHeart, quarterHeart] =
-    createAnimation('gfx/hud/hearts.png', {w: 12, h: 12}, {cols: 5}).frames;
+    createAnimation('gfx/hud/hearts.png', {w: 10, h: 10}, {cols: 5}).frames;
 
 export function renderHUD(context: CanvasRenderingContext2D, state: GameState): void {
     for (let i = 0; i < state.hero.maxLife; i++) {
-        drawFrame(context, emptyHeart, {...emptyHeart, x: 5 + i * 13, y: 5});
+        drawFrame(context, emptyHeart, {...emptyHeart, x: 5 + i * 11, y: 5});
         let frame = fullHeart;
         if (i >= state.hero.life) {
             frame = emptyHeart;
@@ -21,10 +21,10 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
         } else if (i >= state.hero.life - 0.75) {
             frame = threeQuarters;
         }
-        drawFrame(context, frame, {...frame, x: 5 + i * 13, y: 5});
+        drawFrame(context, frame, {...frame, x: 5 + i * 11, y: 5});
     }
     context.fillStyle = 'black';
-    context.fillRect(5, 18, Math.floor(state.hero.maxMagic), 4);
+    context.fillRect(5, 16, Math.floor(state.hero.maxMagic), 4);
     let manaColor = '#AAA';
     if (state.hero.element === 'fire') {
         manaColor = '#F00';
@@ -34,7 +34,7 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
         manaColor = '#FF8';
     }
     context.fillStyle = manaColor;
-    context.fillRect(5, 18, Math.floor(state.hero.magic), 4);
+    context.fillRect(5, 16, Math.floor(state.hero.magic), 4);
 
     let frame = lootFrames[state.hero.leftTool] || lootFrames.unknown;
     let target = {...frame, x: CANVAS_WIDTH - 44, y: 4};

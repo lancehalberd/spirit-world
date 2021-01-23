@@ -3,6 +3,7 @@ import { createCanvasAndContext } from 'app/dom';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { getState, updateHeroMagicStats } from 'app/state';
 import { createAnimation, drawFrame } from 'app/utils/animations';
+import { requireImage } from 'app/utils/images';
 import { rectanglesOverlap } from 'app/utils/index';
 
 import {
@@ -96,13 +97,19 @@ export class LootDropObject extends LootObject {
     }
 }
 
-const chestSheet = createAnimation('gfx/zeldaChest.png', {w: 32, h: 16}).frames[0];
-export const chestClosedFrame = {image: chestSheet.image, x: 0, y: 0, w: 16, h: 16};
-export const chestOpenedFrame = {image: chestSheet.image, x: 16, y: 0, w: 16, h: 16};
+
+const [/*smallPeach*/, fullPeachFrame, /*threeQuartersPeach*/, /*halfPeach*/, /*quarterPeach*/, peachPieceFrame] =
+    createAnimation('gfx/hud/peaches.png', {w: 18, h: 18}, {cols: 3, rows: 2}).frames;
+
+const smallPeachFrame = {image: requireImage('gfx/hud/peaches.png'), x: 4, y: 3, w: 12, h: 12 };
+
+const [chestClosedFrame, chestOpenedFrame] = createAnimation('gfx/tiles/chest.png',
+    {w: 18, h: 20, content: {x: 1, y: 4, w: 16, h: 16}}, {cols: 2}
+).frames;
 
 export class ChestObject implements ObjectInstance {
     definition: LootObjectDefinition;
-    drawPriority: 'background' = 'background';
+    drawPriority: 'sprites' = 'sprites';
     behaviors = {
         solid: true,
     };
@@ -118,7 +125,7 @@ export class ChestObject implements ObjectInstance {
         this.status = definition.status || 'normal';
     }
     getHitbox(state: GameState): ShortRectangle {
-        return { ...chestOpenedFrame, x: this.x, y: this.y };
+        return { x: this.x, y: this.y, w: 16, h: 16 };
     }
     onGrab(state: GameState) {
         // You can only open a chest from the bottom.
@@ -142,9 +149,13 @@ export class ChestObject implements ObjectInstance {
             return;
         }
         if (state.savedState.collectedItems[this.definition.id]) {
-            drawFrame(context, chestOpenedFrame, { ...chestOpenedFrame, x: this.x, y: this.y });
+            drawFrame(context, chestOpenedFrame, {
+                ...chestOpenedFrame, x: this.x - chestOpenedFrame.content.x, y: this.y - chestOpenedFrame.content.y
+            });
         } else {
-            drawFrame(context, chestClosedFrame, { ...chestClosedFrame, x: this.x, y: this.y });
+            drawFrame(context, chestClosedFrame, {
+                ...chestClosedFrame, x: this.x - chestClosedFrame.content.x, y: this.y - chestClosedFrame.content.y
+            });
         }
     }
 }
@@ -169,9 +180,9 @@ export const lootFrames: Partial<{[key in LootType]: Frame}> = {
     gloves: createLootFrame('blue', 'G'),
     roll: createLootFrame('green', 'R'),
     staff: createLootFrame('red', 'S'),
-    peach: createLootFrame('orange', 'o', 6),
-    peachOfImmortality: createLootFrame('orange', 'P', 16),
-    peachOfImmortalityPiece: createLootFrame('orange', 'p', 8),
+    peach: smallPeachFrame,
+    peachOfImmortality: fullPeachFrame,
+    peachOfImmortalityPiece: peachPieceFrame,
     unknown: createLootFrame('black', '?'),
     weapon: createLootFrame('red', 'W'),
 }

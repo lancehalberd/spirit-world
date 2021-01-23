@@ -13,7 +13,7 @@ export function queryAll(className): NodeListOf<HTMLElement> {
 
 export const mainCanvas:HTMLCanvasElement = query('.js-mainCanvas') as HTMLCanvasElement;
 window['mainCanvas'] = mainCanvas;
-mainCanvas.width = mainCanvas.height = 512;
+// mainCanvas.width = mainCanvas.height = 512;
 export const mainContext = mainCanvas.getContext('2d');
 mainContext.imageSmoothingEnabled = false;
 window['mainContext'] = mainContext;

@@ -18,7 +18,7 @@ import {
     combinedObjectTypes,
 } from 'app/development/objectEditor';
 import { displayPropertyPanel, hidePropertyPanel, updateBrushCanvas } from 'app/development/propertyPanel';
-import { getZoneProperties } from 'app/development/zoneEditor';
+import { getZoneProperties, renderZoneEditor } from 'app/development/zoneEditor';
 import { mainCanvas } from 'app/dom';
 import { CANVAS_SCALE } from 'app/gameConstants';
 import { KEY } from 'app/keyCommands';
@@ -28,10 +28,10 @@ import { drawFrame } from 'app/utils/animations';
 import { getMousePosition, isMouseDown } from 'app/utils/mouse';
 
 import {
-    AreaInstance, AreaLayerDefinition, Direction, EditorProperty,  EnemyType, GameState,
+    AreaInstance, AreaLayerDefinition, Direction,  EnemyType, GameState,
     LootType, MagicElement,
     ObjectDefinition, ObjectStatus, ObjectType,
-    PropertyRow, TileGrid,
+    PanelRows, PropertyRow, TileGrid,
 } from 'app/types';
 
 type EditorToolType = 'select' | 'brush' | 'replace' | 'object';
@@ -122,7 +122,7 @@ export function displayTileEditorPropertyPanel() {
         editingState.selectedLayerIndex = 0;
     }
     const selectedPaletteKey = state.areaInstance.layers[editingState.selectedLayerIndex].definition.grid.palette;
-    let rows: (EditorProperty<any> | PropertyRow | string)[] = [];
+    let rows: PanelRows = [];
     rows = [...rows, ...getZoneProperties(state, editingState)];
     rows.push(' ');
     rows.push(' ');
@@ -473,6 +473,9 @@ export function renderEditor(context: CanvasRenderingContext2D, state: GameState
     renderEditorArea(context, state, state.areaInstance);
     if (state.nextAreaInstance) {
         renderEditorArea(context, state, state.nextAreaInstance);
+    }
+    if (editingState.showZoneProperties) {
+        renderZoneEditor(context, state, editingState);
     }
 }
 

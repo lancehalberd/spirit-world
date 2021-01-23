@@ -144,8 +144,8 @@ export interface EditorSingleProperty<T> {
     onChange?: (newValue: T) => (T | void),
 }
 export type EditorProperty<T> = EditorArrayProperty<T> | EditorSingleProperty<T> | EditorButtonProperty | EditorPaletteProperty;
-export type PropertyRow = (EditorProperty<any> | string)[];
+export type PropertyRow = (EditorProperty<any> | HTMLElement | string)[];
 
-export type PanelRows = (EditorProperty<any> | PropertyRow | string)[];
+export type PanelRows = (EditorProperty<any> | PropertyRow | HTMLElement | string)[];
 
 export type Coords = [number, number];

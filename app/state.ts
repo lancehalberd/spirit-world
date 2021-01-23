@@ -154,6 +154,8 @@ export function returnToSpawnLocation(state: GameState) {
     state.hero.vz = 0;
     state.zone = zones[state.hero.spawnLocation.zoneKey];
     state.areaGrid = state.zone.floors[state.hero.spawnLocation.floor].grid;
+    state.areaGridCoords.x = state.hero.spawnLocation.areaGridCoords.x;
+    state.areaGridCoords.y = state.hero.spawnLocation.areaGridCoords.y;
     state.hero.d = state.hero.spawnLocation.d;
     enterArea(state,
         getAreaFromGridCoords(state.areaGrid, state.hero.spawnLocation.areaGridCoords),

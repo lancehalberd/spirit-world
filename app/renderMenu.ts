@@ -1,19 +1,23 @@
 import { lootFrames } from 'app/content/lootObject';
 import { LEFT_TOOL_COLOR, RIGHT_TOOL_COLOR, CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
-import { drawFrame } from 'app/utils/animations';
+import { createAnimation, drawFrame } from 'app/utils/animations';
 import { fillRect, pad } from 'app/utils/index';
 
 import { ActiveTool, GameState, LootType } from 'app/types';
 
 const MARGIN = 20;
 
+
+const [, fullPeach, threeQuartersPeach, halfPeach, quarterPeach] =
+    createAnimation('gfx/hud/peaches.png', {w: 18, h: 18}, {cols: 3, rows: 2}).frames;
+
 export function renderMenu(context: CanvasRenderingContext2D, state: GameState): void {
 
     let r = {
         x: MARGIN,
-        y: MARGIN,
+        y: MARGIN * 1.5,
         w: CANVAS_WIDTH - 2 * MARGIN,
-        h: CANVAS_HEIGHT - 2 * MARGIN,
+        h: CANVAS_HEIGHT - 2.5 * MARGIN,
     };
 
     fillRect(context, r, 'white');
@@ -91,14 +95,17 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
             }
         }
     }
-    const peachFrame = lootFrames.peachOfImmortalityPiece;
-    const peachRect = { x: r.x + 4, y: r.y + r.h - 4 - peachFrame.h * 2, w: peachFrame.w, h: peachFrame.h};
-    for (let i = 0; i < 4; i++) {
-        fillRect(context, peachRect, i < state.hero.peachQuarters ? 'orange' : 'grey');
-        peachRect.x += peachFrame.w;
-        if (i === 1) {
-            peachRect.x = r.x + 4;
-            peachRect.y += peachFrame.h;
-        }
+    let peachFrame = fullPeach;
+    const peachRect = { x: r.x + 4, y: r.y + r.h - 4 - peachFrame.h, w: peachFrame.w, h: peachFrame.h};
+    context.save();
+        context.globalAlpha = 0.3;
+        drawFrame(context, peachFrame, peachRect);
+    context.restore();
+    if (state.hero.peachQuarters === 3) {
+        drawFrame(context, threeQuartersPeach, peachRect);
+    } else if (state.hero.peachQuarters === 2) {
+        drawFrame(context, halfPeach, peachRect);
+    } else if (state.hero.peachQuarters === 1) {
+        drawFrame(context, quarterPeach, peachRect);
     }
 }

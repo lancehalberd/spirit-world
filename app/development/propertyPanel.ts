@@ -4,14 +4,14 @@ import { getMousePosition, isMouseDown } from 'app/utils/mouse';
 
 import {
     EditorArrayProperty, EditorButtonProperty, EditorPaletteProperty, EditorProperty, EditorSingleProperty,
-    PropertyRow, TileGrid,
+    PanelRows, PropertyRow, TileGrid,
 } from 'app/types';
 
 let propertyPanelElement = null;
 let propertiesById: {[key: string]: EditorProperty<any>} = {};
 
 
-export function displayPropertyPanel(properties: (EditorProperty<any> | PropertyRow | string)[]): void {
+export function displayPropertyPanel(properties: PanelRows): void {
     hidePropertyPanel();
     propertiesById = {};
     propertyPanelElement = tagElement('div', 'pp-container');
@@ -126,7 +126,6 @@ function isPaletteProperty(property: EditorProperty<any>): property is EditorPal
 const brushCanvas = createCanvas(100, 100);
 brushCanvas.style.border = '1px solid black';
 const brushContext = brushCanvas.getContext('2d');
-brushContext
 export function updateBrushCanvas(selectedTiles: TileGrid): void {
     const brushWidth = selectedTiles.w * selectedTiles.palette.w;
     const brushHeight = selectedTiles.h * selectedTiles.palette.h;
@@ -164,9 +163,14 @@ export function updateBrushCanvas(selectedTiles: TileGrid): void {
 }
 
 // TODO: only return HTMLElements from this function
-function renderProperty(property: EditorProperty<any> | string): string | HTMLElement {
+function renderProperty(property: EditorProperty<any> | HTMLElement | string): string | HTMLElement {
     if (typeof(property) === 'string') {
         return `<span class="pp-property">${property}</span>`;
+    }
+    if (property instanceof HTMLElement) {
+        const span = tagElement('span', 'pp-property');
+        span.append(property);
+        return span;
     }
     if (isPaletteProperty(property)) {
         propertiesById[property.id || property.name] = property;
