@@ -118,11 +118,15 @@ export class ChestObject implements ObjectInstance {
     y: number;
     z: number;
     status: ObjectStatus;
-    constructor(definition: LootObjectDefinition) {
+    constructor(state: GameState, definition: LootObjectDefinition) {
         this.definition = definition;
         this.x = definition.x;
         this.y = definition.y;
         this.status = definition.status || 'normal';
+        // Chests that have been opened are always revealed.
+        if (state.savedState.collectedItems[this.definition.id]) {
+            this.status = 'normal';
+        }
     }
     getHitbox(state: GameState): ShortRectangle {
         return { x: this.x, y: this.y, w: 16, h: 16 };

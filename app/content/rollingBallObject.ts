@@ -1,8 +1,9 @@
+import { removeObjectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { directionMap, getTileBehaviorsAndObstacles, isPointOpen } from 'app/utils/field';
 
-import { Direction, GameState, BaseObjectDefinition, ObjectInstance, ObjectStatus, ShortRectangle } from 'app/types';
+import { BallGoal, Direction, GameState, BaseObjectDefinition, ObjectInstance, ObjectStatus, ShortRectangle } from 'app/types';
 
 const rollingAnimation = createAnimation('gfx/tiles/rollingboulder.png', {w: 16, h: 16}, {cols:4});
 
@@ -57,6 +58,18 @@ export class RollingBallObject implements ObjectInstance {
             const dy = 2 * directionMap[this.rollDirection][1];
             const x = this.x + dx + (this.rollDirection === 'right' ? 15 : 0);
             const y = this.y + dy + (this.rollDirection === 'down' ? 15 : 0);
+            for (const object of state.areaInstance.objects) {
+                if (object.definition?.type !== 'ballGoal') {
+                    continue;
+                }
+                if (Math.abs(this.x - object.x) <= 2 && Math.abs(this.y - object.y) <= 2) {
+                    (object as BallGoal).activate(state);
+                    // The activated BallGoal will render the ball in the depression, so we remove
+                    // the original ball from the area.
+                    removeObjectFromArea(state, state.areaInstance, this);
+                    return;
+                }
+            }
             const { objects, tileBehavior } = getTileBehaviorsAndObstacles(state, {x, y});
             if (!tileBehavior.solid && !tileBehavior.pit && !tileBehavior.outOfBounds) {
                 this.x += dx;

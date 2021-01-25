@@ -1,3 +1,4 @@
+import { changeObjectStatus, findObjectInstanceById } from 'app/content/objects';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { rectanglesOverlap } from 'app/utils/index';
 
@@ -47,18 +48,23 @@ export class FloorSwitch implements ObjectInstance {
         if (this.status === 'normal' && !this.definition.toggleOnRelease) {
             return;
         }
+        if (this.definition.targetObjectId) {
+            const target = findObjectInstanceById(state.areaInstance, this.definition.targetObjectId);
+            if (!target) {
+                return;
+            }
+            this.toggleTargetStatus(state, target);
+            return;
+        }
         for (const object of state.areaInstance.objects) {
-            if (object.status === 'hiddenSwitch') {
-                object.status = 'normal';
-            }
-            if (object.definition?.status === 'closedSwitch') {
-                const newStatus = object.status === 'normal' ? 'closedSwitch' : 'normal';
-                if (object.changeStatus) {
-                    object.changeStatus(state, newStatus);
-                } else {
-                    object.status = newStatus;
-                }
-            }
+            this.toggleTargetStatus(state, object);
+        }
+    }
+    toggleTargetStatus(state: GameState, target: ObjectInstance): void {
+        if (target.status === 'hiddenSwitch' || target.status === 'closedSwitch') {
+            changeObjectStatus(state, target, 'normal');
+        } else if (target.definition.status === 'closedSwitch') {
+            changeObjectStatus(state, target, 'closedSwitch');
         }
     }
 

@@ -4,8 +4,9 @@ import { Staff } from 'app/content/staff';
 import { Direction, FrameAnimation, GameState, LayerTile, ObjectInstance, ObjectStatus, Tile } from 'app/types';
 
 export type Action =
-    'attack' | 'roll' | 'knocked' | 'hurt' | 'dead' | 'grabbing' | 'carrying' | 'throwing' | 'getItem' | 'beingMoved' |
-    'falling' | 'fallen' | 'meditating';
+    'attack' | 'roll' | 'knocked' | 'hurt' | 'dead' | 'grabbing' | 'carrying' | 'throwing' | 'getItem'
+    | 'beingMoved' | 'entering' | 'exiting'
+    | 'falling' | 'fallen' | 'meditating';
 export type ActiveTool = 'bow' | 'staff' | 'clone' | 'invisibility';
 export type Equipment = 'cloudBoots' | 'ironBoots';
 export type PassiveTool = 'gloves'

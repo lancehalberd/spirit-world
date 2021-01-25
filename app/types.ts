@@ -8,3 +8,4 @@ export { Enemy } from 'app/content/enemy';
 export { ChestObject, LootObject } from 'app/content/lootObject';
 export { ThrownChakram } from 'app/content/thrownChakram';
 export { ThrownObject } from 'app/content/thrownObject';
+export { BallGoal } from 'app/content/objects/ballGoal';

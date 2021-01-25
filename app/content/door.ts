@@ -1,21 +1,26 @@
-import { resetTileBehavior } from 'app/content/areas';
+import _ from 'lodash';
+
+import { enterZoneByTarget, resetTileBehavior } from 'app/content/areas';
+import { findObjectInstanceById } from 'app/content/objects';
 import { BITMAP_BOTTOM, BITMAP_LEFT, BITMAP_RIGHT, BITMAP_TOP } from 'app/content/palettes';
+import { directionMap, getDirection } from 'app/utils/field';
 import { boxesIntersect } from 'app/utils/index';
 
 import {
     AreaInstance, DrawPriority, GameState, ObjectInstance,
-    ObjectStatus, SimpleObjectDefinition,
+    ObjectStatus, EntranceDefinition, ShortRectangle
 } from 'app/types';
 
 
 export class Door implements ObjectInstance {
+    alwaysReset = true;
     area: AreaInstance;
     drawPriority: DrawPriority = 'background';
-    definition: SimpleObjectDefinition = null;
+    definition: EntranceDefinition = null;
     x: number;
     y: number;
     status: ObjectStatus = 'normal';
-    constructor(state: GameState, definition: SimpleObjectDefinition) {
+    constructor(state: GameState, definition: EntranceDefinition) {
         this.definition = definition;
         this.x = definition.x;
         this.y = definition.y;
@@ -61,6 +66,9 @@ export class Door implements ObjectInstance {
         area.objects.push(this);
         this.changeStatus(state, this.status);
     }
+    getHitbox(state: GameState): ShortRectangle {
+        return { x: this.x, y: this.y, w: 32, h: 32};
+    }
     // This is probably only needed by the editor since doors are not removed during gameplay.
     remove(state: GameState, area: AreaInstance) {
         const y = Math.floor(this.y / 16);
@@ -76,9 +84,19 @@ export class Door implements ObjectInstance {
     }
     update(state: GameState) {
         const hero = state.hero.activeClone || state.hero;
-        if (boxesIntersect(hero, { x: this.x, y: this.y, w: 32, h: 32})) {
-            if (hero.action !== 'beingMoved') {
-                hero.action = 'beingMoved';
+        if (boxesIntersect(hero, this.getHitbox(state))) {
+            let shouldEnterDoor = (hero.action !== 'entering' && hero.action !== 'exiting');
+            if (!shouldEnterDoor && hero.actionTarget !== this) {
+                const direction = getDirection(-hero.actionDx, -hero.actionDy);
+                // If the hero is moving in the direction opposite this door, then we should take over the movement,
+                // as this happens when the hero is passed from an entrance to an exit.
+                if (direction === this.definition.d) {
+                    shouldEnterDoor = true;
+                }
+            }
+            if (shouldEnterDoor) {
+                hero.action = 'entering';
+                hero.actionFrame = 0;
                 hero.actionTarget = this;
                 hero.actionDx = 0;
                 hero.actionDy = 0;
@@ -88,8 +106,32 @@ export class Door implements ObjectInstance {
                     hero.actionDx = (hero.x + hero.w / 2 < this.x + 16) ? 1 : -1;
                 }
             }
-            hero.x += 2 * hero.actionDx;
-            hero.y += 2 * hero.actionDy;
+            // Reduce speed to the regular screen transition speed if the player transitions screens while
+            // moving through the door.
+            const speed = state.nextAreaInstance ? 0.75 : 2;
+            hero.x += speed * hero.actionDx;
+            hero.y += speed * hero.actionDy;
+            // If we are entering a door with a target zone, make sure we transition to the new zone before
+            // we hit the edge of the screen and trigger the scrolling transition.
+            if (hero.action === 'entering' && this.definition.targetZone && this.definition.targetObjectId) {
+                if (hero.actionFrame > 8) {
+                    if (hero.action === 'entering' && enterZoneByTarget(state, this.definition.targetZone, this.definition.targetObjectId)) {
+                        hero.action = 'exiting';
+                        const target = findObjectInstanceById(state.areaInstance, this.definition.targetObjectId) as Door;
+                        if (!target){
+                            console.error(state.areaInstance.objects);
+                            console.error(this.definition.targetObjectId);
+                            debugger;
+                        }
+                        hero.actionTarget = target;
+                        // Make sure the hero is coming *out* of the target door.
+                        hero.actionDx = -directionMap[target.definition.d][0];
+                        hero.actionDy = -directionMap[target.definition.d][1];
+                        // This will be the opposite direction of the door they are coming out of.
+                        hero.d = getDirection(hero.actionDx, hero.actionDy);
+                    }
+                }
+            }
         } else if (hero.actionTarget === this) {
             hero.action = null;
             hero.actionTarget = null;

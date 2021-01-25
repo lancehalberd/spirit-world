@@ -133,7 +133,7 @@ function updateField(state: GameState) {
             }
         }
         for (const object of state.areaInstance.objects) {
-            object?.update(state);
+            object.update?.(state);
         }
     }
 }

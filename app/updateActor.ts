@@ -2,7 +2,7 @@ import _ from 'lodash';
 
 import {
     addObjectToArea, destroyTile, getAreaFromGridCoords, getAreaSize,
-    removeAllClones, removeObjectFromArea, scrollToArea, setAreaSection
+    removeAllClones, removeObjectFromArea, scrollToArea, setNextAreaSection
 } from 'app/content/areas';
 import { Enemy } from 'app/content/enemy';
 import { editingState } from 'app/development/tileEditor';
@@ -45,10 +45,12 @@ export function updateHero(this: void, state: GameState) {
         if (dx || dy) hero.d = getDirection(dx, dy);
     } else if (state.nextAreaInstance) {
         movementSpeed = 0;
-        if (state.nextAreaInstance.cameraOffset.x) {
-            dx = 1 * state.nextAreaInstance.cameraOffset.x / Math.abs(state.nextAreaInstance.cameraOffset.x);
+        if (state.nextAreaInstance.cameraOffset.x && state.hero.action !== 'entering') {
+            // We need to make sure this is low enough that the character doesn't get entirely into the second column,
+            // otherwise horizontal doors won't work as expected.
+            dx = 0.75 * state.nextAreaInstance.cameraOffset.x / Math.abs(state.nextAreaInstance.cameraOffset.x);
         }
-        if (state.nextAreaInstance.cameraOffset.y) {
+        if (state.nextAreaInstance.cameraOffset.y && state.hero.action !== 'entering') {
             dy = 1 * state.nextAreaInstance.cameraOffset.y / Math.abs(state.nextAreaInstance.cameraOffset.y);
         }
     } else if (hero.x + hero.w > section.x + section.w + 1) {
@@ -84,8 +86,9 @@ export function updateHero(this: void, state: GameState) {
             damageActor(state, hero, 1, null, true);
             hero.action = null;
         }
-    } else if (hero.action === 'beingMoved') {
+    } else if (hero.action === 'beingMoved' || hero.action === 'entering' || hero.action === 'exiting') {
         movementSpeed = 0;
+        hero.actionFrame++;
         // The object moving the hero will take care of their movement until it is completed.
     } else if (hero.action === 'getItem') {
         movementSpeed = 0;
@@ -346,9 +349,9 @@ export function updateHero(this: void, state: GameState) {
             state.areaGridCoords.x = (state.areaGridCoords.x + 1) % state.areaGrid[0].length;
             scrollToArea(state, getAreaFromGridCoords(state.areaGrid, state.areaGridCoords), 'right');
         } else if (hero.x < section.x && (dx < 0 || hero.actionDx < 0)) {
-            setAreaSection(state, 'left');
+            setNextAreaSection(state, 'left');
         } else if (hero.x + hero.w > section.x + section.w && (dx > 0 || hero.actionDx > 0)) {
-            setAreaSection(state, 'right');
+            setNextAreaSection(state, 'right');
         }
         if (hero.y < 0 && (dy < 0 || hero.actionDy < 0)) {
             state.areaGridCoords.y = (state.areaGridCoords.y + state.areaGrid.length - 1) % state.areaGrid.length;
@@ -357,9 +360,9 @@ export function updateHero(this: void, state: GameState) {
             state.areaGridCoords.y = (state.areaGridCoords.y + 1) % state.areaGrid.length;
             scrollToArea(state, getAreaFromGridCoords(state.areaGrid, state.areaGridCoords), 'down');
         } else if (hero.y < section.y && (dy < 0 || hero.actionDy < 0)) {
-            setAreaSection(state, 'up');
+            setNextAreaSection(state, 'up');
         } else if (hero.y + hero.h > section.y + section.h && (dy > 0 || hero.actionDy > 0)) {
-            setAreaSection(state, 'down');
+            setNextAreaSection(state, 'down');
         }
     }
     if (hero.life <= 0) {

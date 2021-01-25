@@ -33,9 +33,6 @@ export class PitEntrance implements ObjectInstance {
                     hero.z = CANVAS_HEIGHT;
                     hero.vx = hero.vy = 0;
                     hero.vz = -1;
-                    hero.safeD = hero.d;
-                    hero.safeX = hero.x;
-                    hero.safeY = hero.y;
                 }
             } else if (hero.action !== 'falling') {
                 hero.action = 'falling';

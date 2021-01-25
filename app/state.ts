@@ -71,12 +71,18 @@ function getDefaultHeroState(): Hero {
         render: renderHero,
         spiritRadius: 0,
         spawnLocation: {
-            zoneKey: 'peachCave',
+            zoneKey: 'demo_entrance',
+            floor: 0,
+            x: 150,
+            y: 100,
+            d: 'up',
+            areaGridCoords: {x: 0, y: 0},
+            /*zoneKey: 'peachCave',
             floor: 0,
             x: 150,
             y: 445,
             d: 'down',
-            areaGridCoords: {x: 1, y: 1},
+            areaGridCoords: {x: 1, y: 1},*/
         }
     };
 }

@@ -15,6 +15,7 @@ export interface GameState {
     areaInstance?: AreaInstance,
     areaSection?: ShortRectangle,
     nextAreaInstance?: AreaInstance,
+    nextAreaSection?: ShortRectangle,
     zone: Zone,
     areaGrid: AreaGrid,
     areaGridCoords: {x: number, y: number},

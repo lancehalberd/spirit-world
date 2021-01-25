@@ -1,11 +1,10 @@
 import _ from 'lodash';
 
-import { createObjectInstance } from 'app/content/objects';
+import { createObjectInstance, findObjectInstanceById } from 'app/content/objects';
 import { palettes } from 'app/content/palettes';
 import { LootDropObject } from 'app/content/lootObject';
 import { zones } from 'app/content/zones';
 import { createCanvasAndContext } from 'app/dom';
-import { CANVAS_HEIGHT, CANVAS_WIDTH } from 'app/gameConstants';
 import { isPointInShortRect } from 'app/utils/index';
 import { updateCamera } from 'app/updateCamera';
 
@@ -96,7 +95,7 @@ export function enterArea(state: GameState, area: AreaDefinition, x: number, y: 
     state.hero.safeD = state.hero.d;
     state.hero.safeX = x;
     state.hero.safeY = y;
-    setAreaSection(state, state.hero.d);
+    setAreaSection(state, state.hero.d, true);
     updateCamera(state, 512);
 }
 
@@ -142,6 +141,12 @@ export function enterZoneByTarget(state: GameState, zoneKey: string, targetObjec
                             y: object.y,
                             d: state.hero.d,
                         });
+                        const target = findObjectInstanceById(state.areaInstance, targetObjectId);
+                        if (target.getHitbox) {
+                            const hitbox = target.getHitbox(state);
+                            state.hero.x = hitbox.x + hitbox.w / 2 - state.hero.w / 2;
+                            state.hero.y = hitbox.y + hitbox.h / 2 - state.hero.h / 2;
+                        }
                         return true;
                     }
                 }
@@ -152,7 +157,39 @@ export function enterZoneByTarget(state: GameState, zoneKey: string, targetObjec
     return false;
 }
 
-export function setAreaSection(state: GameState, d: Direction): void {
+export function setNextAreaSection(state: GameState, d: Direction): void {
+    state.nextAreaSection = state.areaInstance.definition.sections[0];
+    let x = state.hero.x / state.areaInstance.palette.w;
+    let y = state.hero.y / state.areaInstance.palette.h;
+    if (d === 'right') {
+        x += state.hero.w / state.areaInstance.palette.w;
+    }
+    if (d === 'down') {
+        y += state.hero.h / state.areaInstance.palette.h;
+    }
+    for (const section of state.areaInstance.definition.sections) {
+        if (isPointInShortRect(x, y, section)) {
+            state.nextAreaSection = section;
+            break;
+        }
+    }
+}
+
+export function switchToNextAreaSection(state: GameState): void {
+    if (!state.nextAreaSection || state.areaSection === state.nextAreaSection) {
+        state.nextAreaSection = null;
+        return;
+    }
+    refreshSection(state, state.areaInstance, state.areaSection);
+    state.areaSection = state.nextAreaSection;
+    removeAllClones(state);
+    state.hero.activeStaff?.remove(state, state.areaInstance);
+    state.hero.safeD = state.hero.d;
+    state.hero.safeX = state.hero.x;
+    state.hero.safeY = state.hero.y;
+}
+
+export function setAreaSection(state: GameState, d: Direction, newArea: boolean = false): void {
     const lastAreaSection = state.areaSection;
     state.areaSection = state.areaInstance.definition.sections[0];
     let x = state.hero.x / state.areaInstance.palette.w;
@@ -169,14 +206,13 @@ export function setAreaSection(state: GameState, d: Direction): void {
             break;
         }
     }
-    if (lastAreaSection !== state.areaSection) {
+    if (newArea || lastAreaSection !== state.areaSection) {
         removeAllClones(state);
         state.hero.activeStaff?.remove(state, state.areaInstance);
         state.hero.safeD = state.hero.d;
         state.hero.safeX = state.hero.x;
         state.hero.safeY = state.hero.y;
     }
-    refreshOffscreenObjects(state);
 }
 
 export function scrollToArea(state: GameState, area: AreaDefinition, direction: Direction): void {
@@ -274,28 +310,54 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
 
 export function getAreaSize(state: GameState): {w: number, h: number, section: ShortRectangle} {
     const area = state.areaInstance;
+    const areaSection = state.nextAreaSection || state.areaSection;
     return {
         w: area.palette.w * area.w,
         h: area.palette.h * area.h,
         section: {
-            x: state.areaSection.x * state.areaInstance.palette.w,
-            y: state.areaSection.y * state.areaInstance.palette.h,
-            w: state.areaSection.w * state.areaInstance.palette.w,
-            h: state.areaSection.h * state.areaInstance.palette.h,
-        }
+            x: areaSection.x * state.areaInstance.palette.w,
+            y: areaSection.y * state.areaInstance.palette.h,
+            w: areaSection.w * state.areaInstance.palette.w,
+            h: areaSection.h * state.areaInstance.palette.h,
+        },
     }
 }
 
-export function refreshOffscreenObjects(state: GameState): void {
-    const l = state.camera.x + state.areaInstance.cameraOffset.x;
-    const t = state.camera.y + state.areaInstance.cameraOffset.y;
-    for (let i = 0; i < state.areaInstance.objects.length; i++) {
-        const object = state.areaInstance.objects[i];
-        if (object.definition && object.definition.type !== 'enemy') {
-            if (object.x < l || object.x > l + CANVAS_WIDTH || object.y < t || object.y > t + CANVAS_HEIGHT) {
-                if (state.areaInstance.objects[i].alwaysReset) {
-                    state.areaInstance.objects[i] = createObjectInstance(state, object.definition);
-                }
+export function refreshSection(state: GameState, area: AreaInstance, section: ShortRectangle): void {
+    // First reset tiles that need to be reset.
+    // This is done before objects since some objects will update the tiles under them.
+    for (let y = 0; y < section.h; y++) {
+        const row = section.y + y;
+        for (let x = 0; x < section.w; x++) {
+            const column = section.x + x;
+            for (let l = 0; l < area.definition.layers.length; l++) {
+                area.layers[l].tiles[row][column]
+                    = area.definition.layers[l].grid.tiles[row][column];
+            }
+            resetTileBehavior(area, {x: column, y: row});
+            area.tilesDrawn[row][column] = false;
+        }
+    }
+    area.checkToRedrawTiles = true;
+    const l = section.x * 16;
+    const t = section.y * 16;
+    // Reset objects in the section that should be reset.
+    for (let i = 0; i < state.areaInstance.definition.objects.length; i++) {
+        const definition = state.areaInstance.definition.objects[i];
+        // Ignore objects defined outside of this section.
+        if (definition.x >= l + section.w * 16 || definition.x < l || definition.y >= t + section.h * 16 || definition.y < t) {
+            continue;
+        }
+        let object = findObjectInstanceById(state.areaInstance, definition.id, true);
+        if (object) {
+            if (object.alwaysReset) {
+                removeObjectFromArea(state, state.areaInstance, object);
+                addObjectToArea(state, state.areaInstance, createObjectInstance(state, definition));
+            }
+        } else {
+            object = createObjectInstance(state, definition);
+            if (object.alwaysReset) {
+                addObjectToArea(state, state.areaInstance, object);
             }
         }
     }

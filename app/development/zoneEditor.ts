@@ -235,6 +235,7 @@ export function getZoneProperties(state: GameState, editingState: EditingState):
         values: ['Change Layout', ...Object.keys(sectionLayouts)],
         onChange(sectionType: string) {
             state.areaInstance.definition.sections = sectionLayouts[sectionType];
+            state.areaSection = null;
             setAreaSection(state, state.hero.d);
             return 'Change Layout';
         }

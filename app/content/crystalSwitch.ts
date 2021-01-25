@@ -1,3 +1,8 @@
+import {
+    changeObjectStatus,
+    checkIfAllSwitchesAreActivated,
+    findObjectInstanceById,
+} from 'app/content/objects';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 
@@ -40,21 +45,7 @@ export class CrystalSwitch implements ObjectInstance {
         this.status = 'active';
         this.animationTime = 0;
         this.timeLeft = this.definition.timer || 0;
-        // If all crystals in this super tile are active, reveal hiddenSwitch objects.
-        if (!state.areaInstance.objects.some(o => o.definition?.type === 'crystalSwitch' && o.status !== 'active')) {
-            for (const object of state.areaInstance.objects) {
-                if (object.status === 'hiddenSwitch') {
-                    object.status = 'normal';
-                }
-                if (object.status === 'closedSwitch') {
-                    if (object.changeStatus) {
-                        object.changeStatus(state, 'normal');
-                    } else {
-                        object.status = 'normal';
-                    }
-                }
-            }
-        }
+        checkIfAllSwitchesAreActivated(state, this);
     }
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;
@@ -62,13 +53,16 @@ export class CrystalSwitch implements ObjectInstance {
             this.timeLeft -= FRAME_LENGTH;
             if (this.timeLeft <= 0) {
                 this.status = 'normal';
+                if (this.definition.targetObjectId) {
+                    const target = findObjectInstanceById(state.areaInstance, this.definition.targetObjectId);
+                    if (target && target.definition.status === 'closedSwitch') {
+                        changeObjectStatus(state, target, 'closedSwitch');
+                    }
+                    return;
+                }
                 for (const object of state.areaInstance.objects) {
                     if (object.definition?.status === 'closedSwitch') {
-                        if (object.changeStatus) {
-                            object.changeStatus(state, 'closedSwitch');
-                        } else {
-                            object.status = 'closedSwitch';
-                        }
+                        changeObjectStatus(state, object, 'closedSwitch');
                     }
                 }
             }

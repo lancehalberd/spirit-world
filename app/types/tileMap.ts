@@ -169,9 +169,15 @@ export interface BaseObjectDefinition {
     d?: Direction,
 }
 
+export interface BallGoalDefinition extends BaseObjectDefinition {
+    type: 'ballGoal',
+    targetObjectId?: string,
+}
+
 export interface FloorSwitchDefinition extends BaseObjectDefinition {
     type: 'floorSwitch',
     toggleOnRelease?: boolean,
+    targetObjectId?: string,
 }
 
 export interface LootObjectDefinition extends BaseObjectDefinition {
@@ -187,15 +193,16 @@ export interface CrystalSwitchDefinition extends BaseObjectDefinition {
     element: MagicElement,
     // If this is set, this crystal will de-activate after this many milliseconds.
     timer?: number,
+    targetObjectId?: string,
 }
 
 export interface EntranceDefinition extends BaseObjectDefinition {
-    type: 'pitEntrance',
-    targetZone: string,
-    targetObjectId: string,
+    type: 'pitEntrance' | 'door' | 'stairs',
+    targetZone?: string,
+    targetObjectId?: string,
 }
 
-export type SimpleObjectType = 'door' | 'marker' | 'pushPull' | 'rollingBall' | 'tippable';
+export type SimpleObjectType = 'marker' | 'pushPull' | 'rollingBall' | 'tippable';
 
 export interface SimpleObjectDefinition extends BaseObjectDefinition {
     type: SimpleObjectType,
@@ -209,6 +216,7 @@ export interface EnemyObjectDefinition extends BaseObjectDefinition {
 }
 
 export type ObjectDefinition = SimpleObjectDefinition
+    | BallGoalDefinition
     | CrystalSwitchDefinition
     | EntranceDefinition
     | EnemyObjectDefinition

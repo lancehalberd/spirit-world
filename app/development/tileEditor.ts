@@ -31,7 +31,7 @@ import {
     AreaInstance, AreaLayerDefinition, Direction,  EnemyType, GameState,
     LootType, MagicElement,
     ObjectDefinition, ObjectStatus, ObjectType,
-    PanelRows, PropertyRow, TileGrid,
+    PanelRows, PropertyRow, ShortRectangle, TileGrid,
 } from 'app/types';
 
 type EditorToolType = 'select' | 'brush' | 'replace' | 'object';
@@ -44,8 +44,8 @@ export interface EditingState {
     selectedLayerIndex: number,
     element?: MagicElement,
     enemyType: EnemyType,
-    entranceTargetZone: string,
-    entranceTargetObjectId: string,
+    entranceTargetZone?: string,
+    entranceTargetObjectId?: string,
     level: number,
     lootType: LootType,
     objectStatus: ObjectStatus,
@@ -55,6 +55,7 @@ export interface EditingState {
     showZoneProperties: boolean,
     showFieldProperties: boolean,
     showInventoryProperties: boolean,
+    switchTargetObjectId?: string,
     timer: number,
     toggleOnRelease: boolean,
     dragOffset: {x: number, y: number},
@@ -80,6 +81,7 @@ export const editingState: EditingState = {
     showZoneProperties: false,
     showFieldProperties: true,
     showInventoryProperties: false,
+    switchTargetObjectId: null,
     timer: 0,
     toggleOnRelease: false,
     dragOffset: {x: 0, y: 0},
@@ -502,14 +504,21 @@ function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, a
         }
         // These two are only drawn for the current area.
         if (area === state.areaInstance && editingState.tool === 'select' && editingState.selectedObject) {
-            const frame = getObjectFrame(editingState.selectedObject);
+            const instance = createObjectInstance(state, editingState.selectedObject);
+            let target: ShortRectangle;
+            if (instance.getHitbox) {
+                target = instance.getHitbox(state);
+            } else {
+                const frame = getObjectFrame(editingState.selectedObject);
+                target = {
+                    x: editingState.selectedObject.x + (frame.content?.x || 0) - 1,
+                    y: editingState.selectedObject.y + (frame.content?.y || 0) - 1,
+                    w: (frame.content?.w || frame.w) + 2,
+                    h: (frame.content?.h || frame.h) + 2,
+                };
+            }
             context.fillStyle = 'white';
-            context.fillRect(
-                editingState.selectedObject.x + (frame.content?.x || 0) - 1,
-                editingState.selectedObject.y + (frame.content?.y || 0) - 1,
-                (frame.content?.w || frame.w) + 2,
-                (frame.content?.h || frame.h) + 2
-            );
+            context.fillRect(target.x, target.y, target.w, target.h);
         }
         if (area === state.areaInstance && editingState.tool === 'object') {
             renderObjectPreview(context, state, editingState, x, y);

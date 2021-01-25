@@ -122,8 +122,11 @@ export function render() {
     } else if (state.paused) {
         renderMenu(context, state);
     }
-    // Draw the HUD onto the field.
-    renderHUD(context, state);
+    // Don't draw the HUD while editing since it obscures some tiles.
+    if (!editingState.isEditing) {
+        // Draw the HUD onto the field.
+        renderHUD(context, state);
+    }
 }
 
 export function translateContextForAreaAndCamera(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance): void {
@@ -251,6 +254,11 @@ export function renderAreaBackground(context: CanvasRenderingContext2D, state: G
             state.camera.x - area.cameraOffset.x, state.camera.y - area.cameraOffset.y, CANVAS_WIDTH, CANVAS_HEIGHT,
             state.camera.x - area.cameraOffset.x, state.camera.y - area.cameraOffset.y, CANVAS_WIDTH, CANVAS_HEIGHT,
         );
+        for (const object of area.objects) {
+            if (object.drawPriority === 'background') {
+                object?.render(context, state);
+            }
+        }
     context.restore();
 }
 
@@ -260,7 +268,9 @@ export function renderAreaObjectsBeforeHero(context: CanvasRenderingContext2D, s
     }
     context.save();
         translateContextForAreaAndCamera(context, state, area);
-        renderHeroShadow(context, state, state.hero);
+        if (area === state.areaInstance) {
+            renderHeroShadow(context, state, state.hero);
+        }
         // Render shadows before anything else.
         for (const object of area.objects) {
             if (object.drawPriority === 'sprites') {
@@ -273,9 +283,7 @@ export function renderAreaObjectsBeforeHero(context: CanvasRenderingContext2D, s
         }
         const objectsToRender = [];
         for (const object of area.objects) {
-            if (object.drawPriority === 'background') {
-                object?.render(context, state);
-            } else if (object.drawPriority === 'sprites' && object.y <= state.hero.y) {
+            if (object.drawPriority === 'sprites' && object.y <= state.hero.y) {
                 if (object.render) {
                     objectsToRender.push(object);
                 }

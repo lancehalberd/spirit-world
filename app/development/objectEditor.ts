@@ -10,6 +10,7 @@ import { getState } from 'app/state';
 import { ifdefor, isPointInShortRect } from 'app/utils/index';
 
 import {
+    BallGoalDefinition, CrystalSwitchDefinition, FloorSwitchDefinition,
     FrameDimensions, Direction, EnemyType, GameState,
     LootType, MagicElement, ObjectDefinition, ObjectStatus, ObjectType, PanelRows,
     Zone,
@@ -36,7 +37,7 @@ export const combinedObjectTypes: ObjectType[] = [
     'loot', 'chest',
     'door', 'pitEntrance', 'marker',
     'enemy',
-    'crystalSwitch', 'floorSwitch',
+    'ballGoal', 'crystalSwitch', 'floorSwitch',
     'pushPull', 'rollingBall', 'tippable'];
 
 function createObjectDefinition(
@@ -47,22 +48,35 @@ function createObjectDefinition(
     const x = definition.x || 0;
     const y = definition.y || 0;
     switch (definition.type) {
+        case 'ballGoal':
+            return {
+                type: definition.type,
+                id: definition.id || uniqueId(state, 'crystalSwitch'),
+                status: 'normal',
+                targetObjectId: definition.targetObjectId || editingState.switchTargetObjectId,
+                x,
+                y,
+            };
         case 'crystalSwitch':
             return {
                 type: definition.type,
                 id: definition.id || uniqueId(state, 'crystalSwitch'),
                 element: definition.element || editingState.element,
-                status: definition.status || editingState.objectStatus,
+                status: 'normal',
+                targetObjectId: definition.targetObjectId || editingState.switchTargetObjectId,
                 // Need to use ifdefor here since 0 is a valid value for timer.
                 timer: ifdefor(definition.timer, editingState.timer),
                 x,
                 y,
             };
         case 'door':
+        case 'stairs':
             return {
                 type: definition.type,
-                id: definition.id || uniqueId(state, 'door'),
+                id: definition.id || uniqueId(state, definition.type),
                 status: definition.status || editingState.objectStatus,
+                targetZone: definition.targetZone || editingState.entranceTargetZone,
+                targetObjectId: definition.targetObjectId || editingState.entranceTargetObjectId,
                 d: definition.d || editingState.direction,
                 x,
                 y,
@@ -81,8 +95,9 @@ function createObjectDefinition(
             return {
                 type: definition.type,
                 id: definition.id || uniqueId(state, 'floorSwitch'),
-                status: definition.status || editingState.objectStatus,
+                status: 'normal',
                 // Need to use ifdefor here since false is a valid value for toggleOnRelease.
+                targetObjectId: definition.targetObjectId || editingState.switchTargetObjectId,
                 toggleOnRelease: ifdefor(definition.toggleOnRelease, editingState.toggleOnRelease),
                 x,
                 y,
@@ -91,7 +106,7 @@ function createObjectDefinition(
             return {
                 type: definition.type,
                 id: definition.id || uniqueId(state, 'pitEntrance'),
-                status: definition.status || editingState.objectStatus,
+                status: 'normal',
                 targetZone: definition.targetZone || editingState.entranceTargetZone,
                 targetObjectId: definition.targetObjectId || editingState.entranceTargetObjectId,
                 x,
@@ -117,7 +132,7 @@ function createObjectDefinition(
             return {
                 type: definition.type,
                 id: definition.id || uniqueId(state, definition.type),
-                status: definition.status || editingState.objectStatus,
+                status: 'normal',
                 x,
                 y,
             };
@@ -131,7 +146,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
     return getObjectTypeProperties(state, editingState, {type: editingState.objectType} as ObjectDefinition);
 }
 
-function getTargetObjectIds(zone: Zone): string[] {
+function getTargetObjectIdsByTypes(zone: Zone, types: ObjectType[]): string[] {
     const combinedObjectIds: string[][] = [];
     for (const floor of zone.floors) {
         for (const row of floor.grid) {
@@ -139,15 +154,40 @@ function getTargetObjectIds(zone: Zone): string[] {
                 if (!area) {
                     continue;
                 }
-                combinedObjectIds.push(area.objects.filter(object => object.type === 'marker').map(object => object.id));
+                combinedObjectIds.push(area.objects.filter(object => types.includes(object.type)).map(object => object.id));
             }
         }
     }
     return _.flatten(combinedObjectIds);
 }
 
-export function getObjectTypeProperties(state: GameState, editingState: EditingState, object: ObjectDefinition): PanelRows {
+export function getSwitchTargetProperties(state: GameState, editingState: EditingState, object: BallGoalDefinition | CrystalSwitchDefinition | FloorSwitchDefinition ): PanelRows {
     const rows: PanelRows = [];
+    const objectIds = ['all', ...getTargetObjectIdsByTypes(state.zone, ['door', 'chest', 'loot'])];
+    if (!editingState.entranceTargetObjectId || objectIds.indexOf(editingState.entranceTargetObjectId) < 0) {
+        editingState.switchTargetObjectId = null;
+    }
+    if (object.id && objectIds.indexOf(object.targetObjectId) < 0) {
+        object.targetObjectId = null;
+    }
+    rows.push({
+        name: 'target object',
+        value: object.targetObjectId || editingState.entranceTargetObjectId || 'all',
+        values: objectIds,
+        onChange(targetObjectId: string) {
+            if (object.id) {
+                object.targetObjectId = targetObjectId;
+                updateObjectInstance(state, object);
+            } else {
+                editingState.switchTargetObjectId = targetObjectId;
+            }
+        },
+    });
+    return rows;
+}
+
+export function getObjectTypeProperties(state: GameState, editingState: EditingState, object: ObjectDefinition): PanelRows {
+    let rows: PanelRows = [];
     rows.push({
         name: 'type',
         value: object.type || editingState.objectType,
@@ -159,7 +199,7 @@ export function getObjectTypeProperties(state: GameState, editingState: EditingS
                     updateObjectId(state, object, object.id.replace(object.type, objectType));
                 }
                 object.type = objectType;
-                updateObjectInstance(state, object);
+                updateObjectInstance(state, createObjectDefinition(state, editingState, object));
             } else {
                 editingState.objectType = objectType;
             }
@@ -194,18 +234,17 @@ export function getObjectTypeProperties(state: GameState, editingState: EditingS
                     }
                 },
             });
-            break;
         case 'pitEntrance':
             const zoneKeys = Object.keys(zones);
-            if (!editingState.entranceTargetZone) {
-                editingState.entranceTargetZone = zoneKeys[0];
-            }
-            const zoneKey = object.targetZone || editingState.entranceTargetZone;
+            const zoneKey = ifdefor(object.targetZone, editingState.entranceTargetZone) || 'none';
             rows.push({
                 name: 'target zone',
                 value: zoneKey,
-                values: zoneKeys,
+                values: ['none', ...zoneKeys],
                 onChange(targetZone: string) {
+                    if (targetZone === 'none') {
+                        targetZone = null;
+                    }
                     if (object.id) {
                         object.targetZone = targetZone;
                         updateObjectInstance(state, object);
@@ -217,7 +256,10 @@ export function getObjectTypeProperties(state: GameState, editingState: EditingS
                 },
             });
             const zone = zones[zoneKey];
-            const objectIds = zone ? getTargetObjectIds(zone) : [];
+            // Pit entrances target markers, but other entrances target the same kind of entrnace,
+            // for example stairs => stairs, doors => doors.
+            const targetType: ObjectType = object.type === 'pitEntrance' ? 'marker' : object.type;
+            const objectIds = zone ? getTargetObjectIdsByTypes(zone, [targetType]) : [];
             if (objectIds.length) {
                 if (!editingState.entranceTargetObjectId || objectIds.indexOf(editingState.entranceTargetObjectId) < 0) {
                     editingState.entranceTargetObjectId = objectIds[0];
@@ -239,9 +281,8 @@ export function getObjectTypeProperties(state: GameState, editingState: EditingS
                     },
                 });
             } else {
-                rows.push('No valid markers');
+                rows.push(`No objects of type ${targetType}`);
             }
-
             break;
         case 'loot':
         case 'chest': {
@@ -313,6 +354,9 @@ export function getObjectTypeProperties(state: GameState, editingState: EditingS
             }
             break;
         }
+        case 'ballGoal':
+            rows = [...rows, ...getSwitchTargetProperties(state, editingState, object)];
+            break;
         case 'crystalSwitch':
             rows.push({
                 name: 'element',
@@ -340,6 +384,7 @@ export function getObjectTypeProperties(state: GameState, editingState: EditingS
                     }
                 },
             });
+            rows = [...rows, ...getSwitchTargetProperties(state, editingState, object)];
             break;
         case 'floorSwitch':
             rows.push({
@@ -355,6 +400,7 @@ export function getObjectTypeProperties(state: GameState, editingState: EditingS
                     }
                 },
             });
+            rows = [...rows, ...getSwitchTargetProperties(state, editingState, object)];
             break;
         case 'enemy':
             rows.push({
