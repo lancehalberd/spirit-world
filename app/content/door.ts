@@ -84,7 +84,7 @@ export class Door implements ObjectInstance {
     }
     update(state: GameState) {
         const hero = state.hero.activeClone || state.hero;
-        if (boxesIntersect(hero, this.getHitbox(state))) {
+        if ((!hero.actionTarget || hero.actionTarget === this) && boxesIntersect(hero, this.getHitbox(state))) {
             let shouldEnterDoor = (hero.action !== 'entering' && hero.action !== 'exiting');
             if (!shouldEnterDoor && hero.actionTarget !== this) {
                 const direction = getDirection(-hero.actionDx, -hero.actionDy);
@@ -94,7 +94,7 @@ export class Door implements ObjectInstance {
                     shouldEnterDoor = true;
                 }
             }
-            if (shouldEnterDoor) {
+            if (shouldEnterDoor && hero.actionTarget !== this) {
                 hero.action = 'entering';
                 hero.actionFrame = 0;
                 hero.actionTarget = this;
@@ -105,6 +105,9 @@ export class Door implements ObjectInstance {
                 } else {
                     hero.actionDx = (hero.x + hero.w / 2 < this.x + 16) ? 1 : -1;
                 }
+            }
+            if (hero.actionTarget !== this) {
+                return;
             }
             // Reduce speed to the regular screen transition speed if the player transitions screens while
             // moving through the door.

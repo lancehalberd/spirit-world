@@ -4,10 +4,92 @@ import { renderHero } from 'app/renderActor';
 
 import { GameState, Hero, SavedState } from 'app/types';
 
-function getDefaultSavedState(): SavedState {
+
+export function loadSavedData(): boolean {
+    // return false;
+    if (window.location.search.substr(1) === 'reset' && confirm('Clear your saved data?')) {
+        return false;
+    }
+    const importedSaveData = window.localStorage.getItem('savedGames');
+    if (importedSaveData) {
+        state.savedGames = JSON.parse(importedSaveData);
+        return true;
+    }
+    return false;
+}
+
+export function saveGame(): void {
+    state.savedState.hero = state.hero;
+    state.savedGames[state.savedGameIndex] = state.savedState;
+    // console.log(exportState(getState()));
+    window.localStorage.setItem('savedGames', JSON.stringify(state.savedGames));
+}
+export function eraseAllSaves(): void {
+    window.localStorage.clear()
+}
+
+export function setSaveFileToState(savedGameIndex: number, gameMode: number = 0): void {
+    state.savedGameIndex = savedGameIndex;
+    let savedGame = state.savedGames[state.savedGameIndex];
+    if (!savedGame) {
+        savedGame = getDefaultSavedState();
+        savedGame.hero.spawnLocation = gameMode === 0 ? {
+            zoneKey: 'peachCave',
+            floor: 0,
+            x: 150,
+            y: 445,
+            d: 'down',
+            areaGridCoords: {x: 1, y: 1},
+        } : {
+            zoneKey: 'demo_entrance',
+            floor: 0,
+            x: 150,
+            y: 100,
+            d: 'up',
+            areaGridCoords: {x: 0, y: 0},
+        };
+    }
+    state.savedState = savedGame;
+    state.hero = savedGame.hero;
+    state.hero.render = renderHero;
+    updateHeroMagicStats(state);
+    returnToSpawnLocation(state);
+}
+
+export function selectSaveFile(savedGameIndex: number): void {
+    state.savedGameIndex = savedGameIndex;
+    const savedGame = state.savedGames[state.savedGameIndex];
+    if (!savedGame) {
+        state.scene = 'chooseGameMode';
+        state.menuIndex = 0;
+        // Adjust the current state so we can show the correct background preview.
+        state.hero = getDefaultSavedState().hero;
+        state.hero.spawnLocation = {
+            zoneKey: 'peachCave',
+            floor: 0,
+            x: 150,
+            y: 445,
+            d: 'down',
+            areaGridCoords: {x: 1, y: 1},
+        };
+        state.hero.render = renderHero;
+        updateHeroMagicStats(state);
+        returnToSpawnLocation(state);
+        return;
+    }
+    state.savedState = savedGame;
+    state.hero = savedGame.hero;
+    state.hero.render = renderHero;
+    updateHeroMagicStats(state);
+    returnToSpawnLocation(state);
+    state.scene = 'game';
+}
+
+export function getDefaultSavedState(): SavedState {
     return {
         coins: 0,
         collectedItems: {},
+        hero: getDefaultHeroState(),
     };
 }
 
@@ -18,6 +100,7 @@ function getDefaultHeroState(): Hero {
         vx: 0, vy: 0, vz: 0,
         w: 16, h: 16,
         d: 'down',
+        animationTime: 0,
         life: 4, maxLife: 4,
         magic: 0,
         // base: 20, max: 100, roll: 5, charge: 10, double-charge: 50
@@ -119,7 +202,9 @@ export function updateHeroMagicStats(state: GameState) {
 function getDefaultState(): GameState {
     const state: GameState = {
         savedState: getDefaultSavedState(),
-        hero: getDefaultHeroState(),
+        savedGames: [null, null, null],
+        savedGameIndex: 0,
+        hero: null,
         camera: { x: 0, y: 0 },
         time: 0,
         gameHasBeenInitialized: false,
@@ -131,16 +216,17 @@ function getDefaultState(): GameState {
         paused: false,
         menuIndex: 0,
         defeated: false,
-        defeatedIndex: 0,
+        scene: 'title',
     };
-    updateHeroMagicStats(state);
     return state;
 }
 
 let state: GameState;
 export function initializeState() {
     state = getDefaultState();
-    returnToSpawnLocation(state);
+    loadSavedData();
+    setSaveFileToState(0);
+    state.scene = 'title';
 }
 
 export function returnToSpawnLocation(state: GameState) {

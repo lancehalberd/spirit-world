@@ -7,10 +7,17 @@ import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { Actor, ActorAnimations, Frame, FrameAnimation, FrameDimensions, GameState, Hero, ObjectInstance } from 'app/types';
 
 const heroGeometry: FrameDimensions = {w: 18, h: 26, content: {x: 1, y: 15, w: 16, h: 16}};
-const upAnimation: FrameAnimation = createAnimation('gfx/facing.png', heroGeometry, { cols: 1, x: 2});
-const downAnimation: FrameAnimation = createAnimation('gfx/facing.png', heroGeometry, { cols: 1, x: 0});
-const leftAnimation: FrameAnimation = createAnimation('gfx/facing.png', heroGeometry, { cols: 1, x: 3});
-const rightAnimation: FrameAnimation = createAnimation('gfx/facing.png', heroGeometry, { cols: 1, x: 1});
+const upAnimation: FrameAnimation = createAnimation('gfx/facing.png', heroGeometry, { x: 2});
+const downAnimation: FrameAnimation = createAnimation('gfx/facing.png', heroGeometry, { x: 0});
+const leftAnimation: FrameAnimation = createAnimation('gfx/facing.png', heroGeometry, { x: 3});
+const rightAnimation: FrameAnimation = createAnimation('gfx/facing.png', heroGeometry, { x: 1});
+
+const walkingGeometry: FrameDimensions = {w: 20, h: 28, content: {x: 2, y: 16, w: 16, h: 16}};
+const walkUpAnimation: FrameAnimation = createAnimation('gfx/mcwalking.png', walkingGeometry, { cols: 8, y: 2, duration: 4});
+const walkDownAnimation: FrameAnimation = createAnimation('gfx/mcwalking.png', walkingGeometry, { cols: 8, y: 0, duration: 4});
+const walkLeftAnimation: FrameAnimation = createAnimation('gfx/mcwalking.png', walkingGeometry, { cols: 8, y: 3, duration: 4});
+const walkRightAnimation: FrameAnimation = createAnimation('gfx/mcwalking.png', walkingGeometry, { cols: 8, y: 1, duration: 4});
+
 export const heroAnimations: ActorAnimations = {
     idle: {
         up: upAnimation,
@@ -18,7 +25,14 @@ export const heroAnimations: ActorAnimations = {
         left: leftAnimation,
         right: rightAnimation,
     },
+    move: {
+        up: walkUpAnimation,
+        down: walkDownAnimation,
+        left: walkLeftAnimation,
+        right: walkRightAnimation,
+    },
 };
+
 
 const shadowFrame: Frame = createAnimation('gfx/shadow.png', { w: 16, h: 16 }).frames[0];
 
@@ -27,7 +41,12 @@ export function renderHero(this: Hero, context: CanvasRenderingContext2D, state:
     if (state.hero.invisible || hero.action === 'fallen') {
         return;
     }
-    const frame = getFrame(heroAnimations.idle[hero.d], 0);
+    const animations = (
+            hero.action === 'walking' || hero.action === 'pushing' || hero.action === 'roll'
+        )
+        ? heroAnimations.move
+        : heroAnimations.idle;
+    const frame = getFrame(animations[hero.d], hero.animationTime);
     const activeClone = state.hero.activeClone || state.hero;
     mainContext.save();
         if (hero !== activeClone) {

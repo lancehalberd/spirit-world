@@ -116,6 +116,11 @@ function moveActorInDirection(
         }
     }
     pushedObjects = _.uniq(pushedObjects);
+    if ((blockedByTile || pushedObjects.length) && (!actor.action || actor.action === 'walking')) {
+        actor.action = 'pushing';
+    } else if ((!blockedByTile && !pushedObjects.length) && actor.action === 'pushing') {
+        actor.action = null;
+    }
 
     if (!blockedByTile && pushedObjects.length === 1) {
         if (pushedObjects[0].onPush) {

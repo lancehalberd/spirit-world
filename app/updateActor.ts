@@ -135,7 +135,7 @@ export function updateHero(this: void, state: GameState) {
                 }
             }
         }
-    } else if (hero.action === 'carrying') {
+    } else if (hero.pickUpTile) {
         movementSpeed = 1.5;
     } else if (hero.action === 'throwing' ) {
         movementSpeed = 0;
@@ -193,6 +193,10 @@ export function updateHero(this: void, state: GameState) {
         if (hero.actionFrame >= rollSpeed.length) {
             hero.action = null;
         }
+        hero.animationTime += FRAME_LENGTH;
+    }
+    if (hero.action === 'pushing') {
+        hero.animationTime -= 3 * FRAME_LENGTH / 4;
     }
     if (movementSpeed) {
         [dx, dy] = getMovementDeltas();
@@ -213,8 +217,21 @@ export function updateHero(this: void, state: GameState) {
     }
     if (dx || dy) {
         moveActor(state, hero, dx, dy, true);
+        if (!hero.action) {
+            hero.action = 'walking';
+            hero.animationTime = 0;
+        } else {
+            hero.animationTime += FRAME_LENGTH;
+        }
+    } else {
+        if (hero.action === 'walking' || hero.action === 'pushing') {
+            hero.action = null;
+            hero.animationTime = 0;
+        } else {
+            hero.animationTime += FRAME_LENGTH;
+        }
     }
-    if (!hero.action && !hero.pickUpTile && hero.weapon > 0 &&
+    if ((!hero.action || hero.action === 'walking' || hero.action === 'pushing') && !hero.pickUpTile && hero.weapon > 0 &&
         isKeyDown(GAME_KEY.WEAPON, KEY_THRESHOLD)
     ) {
         const thrownChakrams = state.areaInstance.objects.filter(o => o instanceof ThrownChakram);
@@ -228,7 +245,7 @@ export function updateHero(this: void, state: GameState) {
 
     if (hero.toolCooldown > 0) {
         hero.toolCooldown -= FRAME_LENGTH;
-    } else if (!hero.action && !hero.pickUpTile) {
+    } else if ((!hero.action || hero.action === 'walking' || hero.action === 'pushing') && !hero.pickUpTile) {
         if (state.hero.leftTool && isKeyDown(GAME_KEY.LEFT_TOOL, KEY_THRESHOLD)) {
             hero.toolCooldown = 500;
             useTool(state, hero, state.hero.leftTool, dx, dy);
@@ -237,7 +254,9 @@ export function updateHero(this: void, state: GameState) {
             useTool(state, hero, state.hero.rightTool, dx, dy);
         }
     }
-    if (!hero.action && !hero.pickUpTile && isKeyDown(GAME_KEY.PASSIVE_TOOL, KEY_THRESHOLD)) {
+    if (
+        (!hero.action || hero.action === 'walking' || hero.action === 'pushing') &&
+        !hero.pickUpTile && isKeyDown(GAME_KEY.PASSIVE_TOOL, KEY_THRESHOLD)) {
         const {objects, tiles} = getActorTargets(state, hero);
         if (tiles.some(({x, y}) => area.behaviorGrid?.[y]?.[x]?.solid) || objects.some(o => o.behaviors?.solid)) {
             //console.log({dx, dy, tiles, objects});
@@ -324,7 +343,9 @@ export function updateHero(this: void, state: GameState) {
     if (hero.pickUpTile) {
         hero.pickUpFrame++;
         if (hero.pickUpFrame >= 5) {
-            hero.action = 'carrying';
+            if (hero.action === 'grabbing') {
+                hero.action = null;
+            }
             if (isKeyDown(GAME_KEY.PASSIVE_TOOL, KEY_THRESHOLD)) {
                 throwHeldObject(hero, state);
             }
@@ -367,7 +388,7 @@ export function updateHero(this: void, state: GameState) {
     }
     if (hero.life <= 0) {
         state.defeated = true;
-        state.defeatedIndex = 0;
+        state.menuIndex = 0;
     }
     state.hero.magic += state.hero.magicRegen * FRAME_LENGTH / 1000;
     // Clones drain 2 magic per second.

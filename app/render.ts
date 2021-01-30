@@ -9,6 +9,7 @@ import { renderHeroShadow, renderShadow } from 'app/renderActor';
 import { renderDefeatedMenu } from 'app/renderDefeatedMenu';
 import { renderHUD } from 'app/renderHUD';
 import { renderMenu } from 'app/renderMenu';
+import { renderTitle } from 'app/renderTitle';
 import { getState } from 'app/state';
 import { drawFrame } from 'app/utils/animations';
 import { directionMap } from 'app/utils/field';
@@ -109,6 +110,10 @@ export function render() {
     const context = mainContext;
     const state = getState();
     if (!state?.gameHasBeenInitialized) {
+        return;
+    }
+    if (state.scene === 'title' || state.scene === 'chooseGameMode') {
+        renderTitle(context, state);
         return;
     }
     // Only render if the state has actually progressed since the last render.

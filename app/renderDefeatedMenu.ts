@@ -30,10 +30,10 @@ export function renderDefeatedMenu(context: CanvasRenderingContext2D, state: Gam
     context.fillText('CONTINUE', x, y + 2);
 
     y = r.y + r.h * 3 / 4
-    if (state.defeatedIndex === 1) {
+    if (state.menuIndex === 1) {
         selectedY = y;
     }
-    context.fillText('NEW GAME', x, y + 2);
+    context.fillText('QUIT', x, y + 2);
 
     // Draw an arrow next to the selected option.
     context.beginPath();

@@ -13,17 +13,14 @@ Graphics:
 
 
 Add title screen:
-    - Present 3 rows for 3 save states:
-        New Game (Warn that this will erase saved data, just use a confirm prompt for now)
-            Quick Demo
-                - Small area.
-                - Start with 6 hearts + weapon
-                - Has a hub with a chest outside an entrance containing a tool. Entrance takes you to a series of puzzles that ultimately rewards you with 4 peach pieces and drops you off in the basement with the charge tool and upgrades locked behind each tool.
-            Full Game
     - "Delete Save" option at the bottom
         - Select file
             - "Delete your progress?" + display file details (LEFT/RIGHT)"Yes"/"No", select "No" by default.
     - Change defeat screen to be 'Continue' + 'Quit', quit takes you back to title.
+
+Quick Demo
+    - Start with 6 hearts + weapon
+    - Has a hub with a chest outside an entrance containing a tool. Entrance takes you to a series of puzzles that ultimately rewards you with 4 peach pieces and drops you off in the basement with the charge tool and upgrades locked behind each tool.
 
 Prologue Dungeon: Peach Cave
     - Peach cave entrance is near the river in between the waterfall and the crater lake.

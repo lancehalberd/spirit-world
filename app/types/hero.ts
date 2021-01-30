@@ -4,7 +4,7 @@ import { Staff } from 'app/content/staff';
 import { Direction, FrameAnimation, GameState, LayerTile, ObjectInstance, ObjectStatus, Tile } from 'app/types';
 
 export type Action =
-    'attack' | 'roll' | 'knocked' | 'hurt' | 'dead' | 'grabbing' | 'carrying' | 'throwing' | 'getItem'
+    'attack' | 'roll' | 'knocked' | 'hurt' | 'dead' | 'walking' | 'pushing' | 'grabbing' | 'carrying' | 'throwing' | 'getItem'
     | 'beingMoved' | 'entering' | 'exiting'
     | 'falling' | 'fallen' | 'meditating';
 export type ActiveTool = 'bow' | 'staff' | 'clone' | 'invisibility';
@@ -49,6 +49,7 @@ export interface Actor {
     actionDy?: number,
     actionFrame?: number,
     actionTarget?: any,
+    animationTime: number,
     pickUpFrame?: number,
     pickUpTile?: LayerTile,
     grabTile?: Tile,

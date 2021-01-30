@@ -1,7 +1,7 @@
 import { removeObjectFromArea } from 'app/content/areas';
 import { createCanvasAndContext } from 'app/dom';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { getState, updateHeroMagicStats } from 'app/state';
+import { getState, saveGame, updateHeroMagicStats } from 'app/state';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { requireImage } from 'app/utils/images';
 import { rectanglesOverlap } from 'app/utils/index';
@@ -73,6 +73,7 @@ export class LootObject implements ObjectInstance {
             hero.actionFrame = 0;
             state.areaInstance.objects.splice(state.areaInstance.objects.indexOf(this), 1, new LootGetAnimation(this));
             state.savedState.collectedItems[this.definition.id] = true;
+            saveGame();
         }
     }
     render(context, state: GameState) {
@@ -141,6 +142,7 @@ export class ChestObject implements ObjectInstance {
             onPickup(state, this);
             state.areaInstance.objects.splice(state.areaInstance.objects.indexOf(this) + 1, 0, new LootGetAnimation(this));
             state.savedState.collectedItems[this.definition.id] = true;
+            saveGame();
         }
     }
     update(state: GameState) {

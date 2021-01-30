@@ -4,9 +4,17 @@ import { FRAME_LENGTH, KEY_THRESHOLD } from 'app/gameConstants';
 import { updateKeysStillDown } from 'app/keyCommands';
 import { initializeGame } from 'app/initialize';
 import { GAME_KEY, isKeyDown } from 'app/keyCommands';
-import { getState, initializeState, returnToSpawnLocation } from 'app/state';
+import {
+    getDefaultSavedState,
+    getState,
+    returnToSpawnLocation,
+    selectSaveFile,
+    setSaveFileToState,
+    updateHeroMagicStats,
+} from 'app/state';
 import { updateHero } from 'app/updateActor';
 import { updateCamera } from 'app/updateCamera';
+import { areFontsLoaded } from 'app/utils/drawText';
 import { areAllImagesLoaded } from 'app/utils/images';
 
 import { ActiveTool, GameState, MagicElement } from 'app/types';
@@ -15,7 +23,7 @@ let isGameInitialized = false;
 export function update() {
     // Don't run the main loop until everything necessary is initialized.
     if (!isGameInitialized) {
-        if (areAllImagesLoaded())  {
+        if (areFontsLoaded() && areAllImagesLoaded())  {
             initializeGame();
             isGameInitialized = true;
         }
@@ -24,11 +32,14 @@ export function update() {
     const state = getState();
     state.time += FRAME_LENGTH;
     try {
-        if (state.defeated) {
+        if (state.scene === 'title' || state.scene === 'chooseGameMode') {
+            updateTitle(state);
+        } else if (state.defeated) {
             updateDefeated(state);
         } else {
             if (isKeyDown(GAME_KEY.MENU, KEY_THRESHOLD)) {
                 state.paused = !state.paused;
+                state.menuIndex = 0;
             }
             if (!state.paused) {
                 updateField(state);
@@ -42,6 +53,84 @@ export function update() {
     } catch (e) {
         console.log(e.stack);
         debugger;
+    }
+}
+
+export function getTitleOptions(state: GameState): string[] {
+    if (state.scene === 'chooseGameMode') {
+        return ['Full Game', 'Quick Demo', 'Cancel'];
+    }
+    return state.savedGames.map(savedGame => {
+        if (!savedGame) {
+            return 'New Game';
+        }
+        return savedGame.hero.spawnLocation.zoneKey;// + ' ' + 'V'.repeat(savedGame.hero.maxLife) + ' life';
+    });
+}
+
+export function isConfirmKeyPressed(): boolean {
+    return !!(isKeyDown(GAME_KEY.WEAPON, KEY_THRESHOLD)
+        || isKeyDown(GAME_KEY.PASSIVE_TOOL, KEY_THRESHOLD)
+        || isKeyDown(GAME_KEY.MENU, KEY_THRESHOLD));
+}
+
+function updateTitle(state: GameState) {
+    const options = getTitleOptions(state);
+    let changedOption = false;
+    if (isKeyDown(GAME_KEY.UP, KEY_THRESHOLD)) {
+        state.menuIndex = (state.menuIndex - 1 + options.length) % options.length;
+        changedOption = true;
+    } else if (isKeyDown(GAME_KEY.DOWN, KEY_THRESHOLD)) {
+        state.menuIndex = (state.menuIndex + 1) % options.length;
+        changedOption = true;
+    }
+    if (changedOption) {
+        if (state.scene === 'title') {
+            setSaveFileToState(state.menuIndex, 0);
+        } else if (state.scene === 'chooseGameMode') {
+            setSaveFileToState(state.savedGameIndex, state.menuIndex);
+        }
+    }
+    if (isConfirmKeyPressed()) {
+        switch (state.scene) {
+            case 'chooseGameMode':
+                state.savedState = getDefaultSavedState();
+                state.hero = state.savedState.hero;
+                if (state.menuIndex === 0) {
+                    // Full Game
+                    state.hero.spawnLocation = {
+                        zoneKey: 'peachCave',
+                        floor: 0,
+                        x: 150,
+                        y: 445,
+                        d: 'down',
+                        areaGridCoords: {x: 1, y: 1},
+                    };
+                    state.scene = 'game';
+                    updateHeroMagicStats(state);
+                    returnToSpawnLocation(state);
+                } else if (state.menuIndex === 1) {
+                    // Demo
+                    state.hero.spawnLocation = {
+                        zoneKey: 'demo_entrance',
+                        floor: 0,
+                        x: 150,
+                        y: 100,
+                        d: 'up',
+                        areaGridCoords: {x: 0, y: 0},
+                    };
+                    state.scene = 'game';
+                    updateHeroMagicStats(state);
+                    returnToSpawnLocation(state);
+                } else {
+                    state.scene = 'title';
+                    state.menuIndex = state.savedGameIndex;
+                }
+                break;
+            case 'title':
+                selectSaveFile(state.menuIndex);
+                break;
+        }
     }
 }
 
@@ -81,15 +170,14 @@ function updateMenu(state: GameState) {
 
 function updateDefeated(state: GameState) {
     if (isKeyDown(GAME_KEY.UP, KEY_THRESHOLD) || isKeyDown(GAME_KEY.DOWN, KEY_THRESHOLD)) {
-        state.defeatedIndex = (state.defeatedIndex + 1) % 2;
-    } else if (isKeyDown(GAME_KEY.WEAPON, KEY_THRESHOLD) || isKeyDown(GAME_KEY.PASSIVE_TOOL, KEY_THRESHOLD)
-         || isKeyDown(GAME_KEY.MENU, KEY_THRESHOLD)
-    ) {
-        if (state.defeatedIndex === 0) {
+        state.menuIndex = (state.menuIndex + 1) % 2;
+    } else if (isConfirmKeyPressed()) {
+        if (state.menuIndex === 0) {
             returnToSpawnLocation(state);
-        } else if (state.defeatedIndex === 1) {
-            initializeState();
-            getState().gameHasBeenInitialized = true;
+        } else if (state.menuIndex === 1) {
+            state.scene = 'title';
+            state.menuIndex = state.savedGameIndex;
+            setSaveFileToState(state.menuIndex);
         }
     }
 }
