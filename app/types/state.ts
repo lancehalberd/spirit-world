@@ -1,4 +1,4 @@
-import { AreaGrid, AreaInstance, Hero, ShortRectangle, Zone } from 'app/types';
+import { AreaGrid, AreaInstance, Hero, ShortRectangle, Zone, ZoneLocation } from 'app/types';
 
 export type SavedState = {
     coins: number,
@@ -6,7 +6,9 @@ export type SavedState = {
     hero: Hero,
 }
 
-export type Scene = 'title' | 'chooseGameMode' | 'game' | 'credits' | 'options';
+export type Scene = 'title'
+    | 'chooseGameMode' | 'deleteSavedGame' | 'deleteSavedGameConfirmation'
+    | 'game' | 'credits' | 'options';
 
 export interface GameState {
     savedState: SavedState,
@@ -17,14 +19,14 @@ export interface GameState {
     time: number,
     gameHasBeenInitialized: boolean,
     lastTimeRendered: number,
+    alternateAreaInstance?: AreaInstance,
     areaInstance?: AreaInstance,
     areaSection?: ShortRectangle,
     nextAreaInstance?: AreaInstance,
     nextAreaSection?: ShortRectangle,
     zone: Zone,
     areaGrid: AreaGrid,
-    areaGridCoords: {x: number, y: number},
-    floor: number,
+    location: ZoneLocation,
     paused: boolean,
     menuIndex: number,
     defeated: boolean,

@@ -505,7 +505,8 @@ export function onMouseMoveSelect(state: GameState, editingState: EditingState, 
 
 export function uniqueId(state: GameState, prefix: string) {
     let i = 0;
-    prefix = `${state.zone.key}:${state.floor}:${state.areaGridCoords.x}x${state.areaGridCoords.y}-${prefix}`;
+    const { zoneKey, floor, areaGridCoords: {x, y}, isSpiritWorld} = state.location;
+    prefix = `${zoneKey}:${isSpiritWorld ? 's' : ''}${floor}:${x}x${y}-${prefix}`;
     while (state.areaInstance.definition.objects.some(o => o.id === `${prefix}-${i}`)) {
         i++;
     }

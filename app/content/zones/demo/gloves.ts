@@ -139,6 +139,9 @@ zones.demo_gloves = {
             grid: [
                 [f0_0x0,],
             ],
+            spiritGrid: [
+                [null,],
+            ],
         },
     ],
 };

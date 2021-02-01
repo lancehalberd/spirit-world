@@ -9,7 +9,7 @@ import { isPointInShortRect } from 'app/utils/index';
 import { updateCamera } from 'app/updateCamera';
 
 import {
-    AreaDefinition, AreaGrid, AreaInstance, AreaLayerDefinition,
+    AreaDefinition, AreaInstance, AreaLayerDefinition,
     Direction, GameState, LayerTile, ObjectInstance, ShortRectangle, Tile, TileBehaviors,
     ZoneLocation,
 } from 'app/types';
@@ -18,6 +18,7 @@ import {
 
 export function getDefaultArea(): AreaDefinition {
     return {
+        default: true,
         layers: [
             {
                 key: 'floor',
@@ -49,10 +50,51 @@ export function getDefaultArea(): AreaDefinition {
     };
 }
 
+export function getDefaultSpiritArea(location: ZoneLocation): AreaDefinition {
+    const parentDefinition = getAreaFromLocation({...location, isSpiritWorld: false});
+    return {
+        default: true,
+        parentDefinition,
+        layers: [
+            {
+                key: 'floor',
+                grid: {
+                    // The dimensions of the grid.
+                    w: 32,
+                    h: 32,
+                    // The palette to use for this grid (controls the size of tiles)
+                    palette: 'spiritFloor',
+                    // The matrix of tiles
+                    tiles: [],
+                },
+            },
+            {
+                key: 'field',
+                grid: {
+                    // The dimensions of the grid.
+                    w: 32,
+                    h: 32,
+                    // The palette to use for this grid (controls the size of tiles)
+                    palette: 'spiritField',
+                    // The matrix of tiles
+                    tiles: [],
+                },
+            },
+        ],
+        objects: [],
+        // Spirit world sections should match their parent definition, otherwise the
+        // camera will not be aligned correctly when switching back and forth.
+        sections: parentDefinition.sections,
+    };
+}
 
-export function getAreaFromGridCoords(grid: AreaGrid, {x, y}: {x: number, y: number}): AreaDefinition {
+export function getAreaFromLocation(location: ZoneLocation): AreaDefinition {
+    const floor = zones[location.zoneKey].floors[location.floor];
+    const grid = location.isSpiritWorld ? floor.spiritGrid : floor.grid;
+    const {x, y} = location.areaGridCoords;
     if (!grid[y][x]) {
-        grid[y][x] = initializeAreaTiles(getDefaultArea());
+        grid[y][x] =
+            initializeAreaTiles(location.isSpiritWorld ? getDefaultSpiritArea(location) : getDefaultArea());
     }
     return grid[y][x];
 }
@@ -85,40 +127,35 @@ export function removeAllClones(state: GameState): void {
     state.hero.activeClone = null;
 }
 
-export function enterArea(state: GameState, area: AreaDefinition, x: number, y: number): void {
+export function enterLocation(state: GameState, location: ZoneLocation): void {
+    state.location = {...location};
+    state.zone = zones[location.zoneKey];
+    state.hero.x = location.x;
+    state.hero.y = location.y;
+
+    const floor = state.zone.floors[location.floor];
+    if (!floor) {
+        console.log('Invalid floor', state.location);
+        return;
+    }
+    state.areaGrid = location.isSpiritWorld ? floor.spiritGrid : floor.grid;
+    state.location.areaGridCoords.y = state.location.areaGridCoords.y % state.areaGrid.length;
+    state.location.areaGridCoords.x = state.location.areaGridCoords.x % state.areaGrid[state.location.areaGridCoords.y].length;
+    const area = getAreaFromLocation(state.location);
+    const alternateArea = getAreaFromLocation({...state.location, isSpiritWorld: !state.location.isSpiritWorld});
+
     // Remove all clones on changing areas.
     removeAllClones(state);
     state.hero.activeStaff?.remove(state, state.areaInstance);
     state.areaInstance = createAreaInstance(state, area);
-    state.hero.x = x;
-    state.hero.y = y;
-    state.hero.safeD = state.hero.d;
-    state.hero.safeX = x;
-    state.hero.safeY = y;
-    setAreaSection(state, state.hero.d, true);
-    updateCamera(state, 512);
-}
-
-export function enterAreaGrid(state: GameState, areaGrid: AreaGrid): void {
-    if (!areaGrid) {
-        console.log('Invalid area', areaGrid);
-        return;
-    }
-    state.areaGrid = areaGrid;
-    state.areaGridCoords.y = state.areaGridCoords.y % state.areaGrid.length;
-    state.areaGridCoords.x = state.areaGridCoords.x % state.areaGrid[state.areaGridCoords.y].length;
-    const area = getAreaFromGridCoords(state.areaGrid, {x: state.areaGridCoords.x, y: state.areaGridCoords.y });
-    enterArea(state, area, state.hero.x, state.hero.y);
-}
-
-export function enterLocation(state: GameState, location: ZoneLocation): void {
-    state.zone = zones[location.zoneKey];
-    state.floor = location.floor;
-    state.areaGridCoords.y = location.areaGridCoords.y;
-    state.areaGridCoords.x = location.areaGridCoords.x;
+    state.alternateAreaInstance = createAreaInstance(state, alternateArea);
     state.hero.x = location.x;
     state.hero.y = location.y;
-    enterAreaGrid(state, state.zone.floors[state.floor].grid);
+    state.hero.safeD = state.hero.d;
+    state.hero.safeX = location.x;
+    state.hero.safeY = location.y;
+    setAreaSection(state, state.hero.d, true);
+    updateCamera(state, 512);
 }
 
 export function enterZoneByTarget(state: GameState, zoneKey: string, targetObjectId: string): boolean {
@@ -127,8 +164,9 @@ export function enterZoneByTarget(state: GameState, zoneKey: string, targetObjec
         console.error(`Missing zone: ${zoneKey}`);
         return false;
     }
+    const inSpiritWorld = state.areaInstance.definition.isSpiritWorld;
     for (let floor = 0; floor < zone.floors.length; floor++) {
-        const areaGrid = zone.floors[floor].grid;
+        const areaGrid = inSpiritWorld ? zone.floors[floor].spiritGrid : zone.floors[floor].grid;
         for (let y = 0; y < areaGrid.length; y++) {
             for (let x = 0; x < areaGrid[y].length; x++) {
                 for (const object of (areaGrid[y][x]?.objects || [])) {
@@ -140,6 +178,7 @@ export function enterZoneByTarget(state: GameState, zoneKey: string, targetObjec
                             x: object.x,
                             y: object.y,
                             d: state.hero.d,
+                            isSpiritWorld: inSpiritWorld,
                         });
                         const target = findObjectInstanceById(state.areaInstance, targetObjectId);
                         if (target.getHitbox) {

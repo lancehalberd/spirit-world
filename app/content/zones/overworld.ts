@@ -861,6 +861,11 @@ zones.overworld = {
                 [f0_1x0,f0_1x1,f0_1x2,],
                 [f0_2x0,f0_2x1,f0_2x2,],
             ],
+            spiritGrid: [
+                [null, null, null],
+                [null, null, null],
+                [null, null, null],
+            ],
         },
     ],
 };

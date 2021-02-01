@@ -54,6 +54,23 @@ const thornBehavior: TileBehaviors = {
     particles: thornParticles,
 };
 
+const spiritBushParticles: Frame[] = createAnimation('gfx/tiles/bushspirit.png', {w: 16, h: 16}, {x: 2, cols: 3}).frames;
+const spiritLightStoneParticles: Frame[] = createAnimation('gfx/tiles/rocksspirit.png', {w: 16, h: 16}, {x: 2, cols: 3}).frames;
+const spiritHeavyStoneParticles: Frame[] = createAnimation('gfx/tiles/rocksspirit.png', {w: 16, h: 16}, {x: 7, cols: 3}).frames;
+const spiritThornParticles: Frame[] = createAnimation('gfx/tiles/thornsspirit.png', {w: 16, h: 16}, {x: 2, cols: 5}).frames;
+const spiritBushBehavior: TileBehaviors = {
+    ...bushBehavior, particles: spiritBushParticles,
+};
+const spiritLightStoneBehavior: TileBehaviors = {
+    ...lightStoneBehavior, particles: spiritLightStoneParticles,
+};
+const spiritHeavyStoneBehavior: TileBehaviors = {
+    ...heavyStoneBehavior, particles: spiritHeavyStoneParticles,
+};
+const spiritThornBehavior: TileBehaviors = {
+    ...thornBehavior, particles: spiritThornParticles,
+};
+
 function combinePalettes(palettes: TilePalette[]): TilePalette {
     const size = 16;
     let totalTiles: number = palettes.reduce(
@@ -153,8 +170,55 @@ const fieldPalette = {...combinePalettes([
     ]
 };
 const floorPalette = {...fieldPalette, defaultTiles: [{x: 10, y: 0}]}
+const spiritFieldPalette = {...combinePalettes([
+        // This is the empty tile.
+        singleTilePalette('gfx/tiles/bushspirit.png', null, -16),
+        singleTilePalette('gfx/tiles/bushspirit.png', spiritBushBehavior, 0),
+        // No spirit version of this tile
+        singleTilePalette('gfx/tiles/cactussheet.png', {...spiritBushBehavior, damage: 1}),
+        // No spirit version of this tile
+        singleTilePalette('gfx/tiles/pit.png', pitBehavior),
+        singleTilePalette('gfx/tiles/thornsspirit.png', spiritThornBehavior),
+        singleTilePalette('gfx/tiles/rocksspirit.png', spiritLightStoneBehavior),
+        singleTilePalette('gfx/tiles/rocksspirit.png', spiritLightStoneBehavior, 16),
+        singleTilePalette('gfx/tiles/rocksspirit.png', spiritHeavyStoneBehavior, 80),
+        singleTilePalette('gfx/tiles/rocksspirit.png', spiritHeavyStoneBehavior, 96),
+        singleTilePalette('gfx/tiles/rocksspirit.png', lowWallBehavior, 160),
+        {
+            w: 16, h: 16,
+            source: {image: requireImage('gfx/tiles/grassspirit.png'), x: 0, y: 0, w: 11 * 16, h: 16},
+            defaultTiles: [],
+        },
+        singleTilePalette('gfx/tiles/bushspirit.png', null, 16),
+        singleTilePalette('gfx/tiles/thornsspirit.png', null, 16),
+    ]),
+    defaultTiles: [
+        {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0},
+        {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0},
+        {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0},
+        {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0},
+        {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0},
+        {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0},
+        {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0},
+        {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0},
+        {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0},
+        {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0},
+        {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0},
+        {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0},
+        {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0},
+        {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0},
+        {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0},
+        {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0},
+
+        {x: 11, y: 0}, {x: 12, y: 0}, {x: 13, y: 0},{x: 14, y: 0}, {x: 15, y: 0},
+        {x: 0, y: 1}, {x: 1, y: 1}, {x: 2, y: 1}, {x: 3, y: 1}, {x: 4, y: 1},
+    ]
+};
+const spiritFloorPalette = {...spiritFieldPalette, defaultTiles: [{x: 10, y: 0}]}
 
 export const palettes: {[key: string]: TilePalette} = {
     field: fieldPalette,
-    floor: floorPalette
+    floor: floorPalette,
+    spiritField: spiritFieldPalette,
+    spiritFloor: spiritFloorPalette,
 };

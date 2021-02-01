@@ -1,7 +1,10 @@
 import { Clone } from 'app/content/clone';
 import { Staff } from 'app/content/staff';
 
-import { Direction, FrameAnimation, GameState, LayerTile, ObjectInstance, ObjectStatus, Tile } from 'app/types';
+import {
+    Direction, FrameAnimation, GameState, LayerTile,
+    ObjectInstance, ObjectStatus, Tile, ZoneLocation,
+} from 'app/types';
 
 export type Action =
     'attack' | 'roll' | 'knocked' | 'hurt' | 'dead' | 'walking' | 'pushing' | 'grabbing' | 'carrying' | 'throwing' | 'getItem'
@@ -57,16 +60,6 @@ export interface Actor {
     invulnerableFrames?: number,
     life: number,
     render: (context: CanvasRenderingContext2D, state: GameState) => void,
-}
-
-// TODO: indicate which area grid to spawn in once area grids have ids.
-export interface ZoneLocation {
-    zoneKey: string,
-    floor: number,
-    areaGridCoords: {x: number, y: number},
-    x: number,
-    y: number,
-    d: Direction,
 }
 
 export interface Hero extends Actor {

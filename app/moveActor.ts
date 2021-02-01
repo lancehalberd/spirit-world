@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import { damageActor } from 'app/updateActor';
+import { damageActor, throwHeldObject } from 'app/updateActor';
 import { getTileBehaviorsAndObstacles, isPointOpen } from 'app/utils/field';
 
 import { Actor, Direction, GameState, Hero } from 'app/types';
@@ -283,7 +283,7 @@ export function checkForFloorDamage(state: GameState, hero: Hero) {
     if (fallingUp && fallingDown && fallingLeft && fallingRight) {
         // const wasClone = !!state.hero.clones.length;
 
-
+        throwHeldObject(state, hero);
         hero.action = 'falling';
         hero.actionFrame = 0;
     }

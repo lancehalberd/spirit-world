@@ -99,12 +99,16 @@ const f0_0x0: AreaDefinition = {
         {x: 0, y: 0, w: 32, h: 32},
     ],
 };
+const sf0_0x0: AreaDefinition = null;
 zones.demo_entrance = {
     key: 'demo_entrance',
     floors: [
         {
             grid: [
                 [f0_0x0,],
+            ],
+            spiritGrid: [
+                [sf0_0x0,],
             ],
         },
     ],

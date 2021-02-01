@@ -112,7 +112,9 @@ export function render() {
     if (!state?.gameHasBeenInitialized) {
         return;
     }
-    if (state.scene === 'title' || state.scene === 'chooseGameMode') {
+    if (state.scene === 'title' || state.scene === 'chooseGameMode' ||
+            state.scene === 'deleteSavedGame' || state.scene === 'deleteSavedGameConfirmation'
+    ) {
         renderTitle(context, state);
         return;
     }

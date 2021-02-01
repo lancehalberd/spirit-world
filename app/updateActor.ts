@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 import {
-    addObjectToArea, destroyTile, getAreaFromGridCoords, getAreaSize,
+    addObjectToArea, destroyTile, getAreaFromLocation, getAreaSize,
     removeAllClones, removeObjectFromArea, scrollToArea, setNextAreaSection
 } from 'app/content/areas';
 import { Enemy } from 'app/content/enemy';
@@ -347,7 +347,7 @@ export function updateHero(this: void, state: GameState) {
                 hero.action = null;
             }
             if (isKeyDown(GAME_KEY.PASSIVE_TOOL, KEY_THRESHOLD)) {
-                throwHeldObject(hero, state);
+                throwHeldObject(state, hero);
             }
         }
     }
@@ -364,22 +364,22 @@ export function updateHero(this: void, state: GameState) {
         // dx/dy handles most cases, but in some cases like moving through doorways we also need to check
         // hero.actionDx
         if (hero.x < 0 && (dx < 0 || hero.actionDx < 0)) {
-            state.areaGridCoords.x = (state.areaGridCoords.x + state.areaGrid[0].length - 1) % state.areaGrid[0].length;
-            scrollToArea(state, getAreaFromGridCoords(state.areaGrid, state.areaGridCoords), 'left');
+            state.location.areaGridCoords.x = (state.location.areaGridCoords.x + state.areaGrid[0].length - 1) % state.areaGrid[0].length;
+            scrollToArea(state, getAreaFromLocation(state.location), 'left');
         } else if (hero.x + hero.w > w && (dx > 0 || hero.actionDx > 0)) {
-            state.areaGridCoords.x = (state.areaGridCoords.x + 1) % state.areaGrid[0].length;
-            scrollToArea(state, getAreaFromGridCoords(state.areaGrid, state.areaGridCoords), 'right');
+            state.location.areaGridCoords.x = (state.location.areaGridCoords.x + 1) % state.areaGrid[0].length;
+            scrollToArea(state, getAreaFromLocation(state.location), 'right');
         } else if (hero.x < section.x && (dx < 0 || hero.actionDx < 0)) {
             setNextAreaSection(state, 'left');
         } else if (hero.x + hero.w > section.x + section.w && (dx > 0 || hero.actionDx > 0)) {
             setNextAreaSection(state, 'right');
         }
         if (hero.y < 0 && (dy < 0 || hero.actionDy < 0)) {
-            state.areaGridCoords.y = (state.areaGridCoords.y + state.areaGrid.length - 1) % state.areaGrid.length;
-            scrollToArea(state, getAreaFromGridCoords(state.areaGrid, state.areaGridCoords), 'up');
+            state.location.areaGridCoords.y = (state.location.areaGridCoords.y + state.areaGrid.length - 1) % state.areaGrid.length;
+            scrollToArea(state, getAreaFromLocation(state.location), 'up');
         } else if (hero.y + hero.h > h && (dy > 0 || hero.actionDy > 0)) {
-            state.areaGridCoords.y = (state.areaGridCoords.y + 1) % state.areaGrid.length;
-            scrollToArea(state, getAreaFromGridCoords(state.areaGrid, state.areaGridCoords), 'down');
+            state.location.areaGridCoords.y = (state.location.areaGridCoords.y + 1) % state.areaGrid.length;
+            scrollToArea(state, getAreaFromLocation(state.location), 'down');
         } else if (hero.y < section.y && (dy < 0 || hero.actionDy < 0)) {
             setNextAreaSection(state, 'up');
         } else if (hero.y + hero.h > section.y + section.h && (dy > 0 || hero.actionDy > 0)) {
@@ -495,7 +495,7 @@ export function damageActor(
 
     if (knockback) {
         // Throw stone here.
-        throwHeldObject(hero, state);
+        throwHeldObject(state, hero);
         actor.action = 'knocked';
         actor.vx = knockback.vx;
         actor.vy = knockback.vy;
@@ -503,7 +503,7 @@ export function damageActor(
     }
 }
 
-export function throwHeldObject(hero: Hero, state: GameState){
+export function throwHeldObject(state: GameState, hero: Hero){
     if (!hero.pickUpTile) {
         return;
     }

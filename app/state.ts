@@ -1,12 +1,12 @@
-import { enterArea, getAreaFromGridCoords } from 'app/content/areas';
+import { enterLocation } from 'app/content/areas';
 import { zones } from 'app/content/zones';
 import { renderHero } from 'app/renderActor';
 
-import { GameState, Hero, SavedState } from 'app/types';
+import { GameState, Hero, SavedState, ZoneLocation } from 'app/types';
 
 
 export function loadSavedData(): boolean {
-    // return false;
+    //return false;
     if (window.location.search.substr(1) === 'reset' && confirm('Clear your saved data?')) {
         return false;
     }
@@ -19,7 +19,12 @@ export function loadSavedData(): boolean {
 }
 
 export function saveGame(): void {
-    state.savedState.hero = state.hero;
+    const hero = {...state.hero};
+    // sanitize hero object before saving it.
+    delete hero.activeClone;
+    delete hero.render;
+    hero.clones = [];
+    state.savedState.hero = hero;
     state.savedGames[state.savedGameIndex] = state.savedState;
     // console.log(exportState(getState()));
     window.localStorage.setItem('savedGames', JSON.stringify(state.savedGames));
@@ -28,26 +33,31 @@ export function eraseAllSaves(): void {
     window.localStorage.clear()
 }
 
+export const SPAWN_LOCATION_FULL: ZoneLocation = {
+    zoneKey: 'peachCave',
+    floor: 0,
+    x: 150,
+    y: 445,
+    d: 'down',
+    areaGridCoords: {x: 1, y: 1},
+    isSpiritWorld: false,
+};
+export const SPAWN_LOCATION_DEMO: ZoneLocation = {
+    zoneKey: 'demo_entrance',
+    floor: 0,
+    x: 150,
+    y: 100,
+    d: 'up',
+    areaGridCoords: {x: 0, y: 0},
+    isSpiritWorld: false,
+};
+
 export function setSaveFileToState(savedGameIndex: number, gameMode: number = 0): void {
     state.savedGameIndex = savedGameIndex;
     let savedGame = state.savedGames[state.savedGameIndex];
     if (!savedGame) {
         savedGame = getDefaultSavedState();
-        savedGame.hero.spawnLocation = gameMode === 0 ? {
-            zoneKey: 'peachCave',
-            floor: 0,
-            x: 150,
-            y: 445,
-            d: 'down',
-            areaGridCoords: {x: 1, y: 1},
-        } : {
-            zoneKey: 'demo_entrance',
-            floor: 0,
-            x: 150,
-            y: 100,
-            d: 'up',
-            areaGridCoords: {x: 0, y: 0},
-        };
+        savedGame.hero.spawnLocation = gameMode === 0 ? SPAWN_LOCATION_FULL : SPAWN_LOCATION_DEMO;
     }
     state.savedState = savedGame;
     state.hero = savedGame.hero;
@@ -64,14 +74,7 @@ export function selectSaveFile(savedGameIndex: number): void {
         state.menuIndex = 0;
         // Adjust the current state so we can show the correct background preview.
         state.hero = getDefaultSavedState().hero;
-        state.hero.spawnLocation = {
-            zoneKey: 'peachCave',
-            floor: 0,
-            x: 150,
-            y: 445,
-            d: 'down',
-            areaGridCoords: {x: 1, y: 1},
-        };
+        state.hero.spawnLocation = SPAWN_LOCATION_FULL;
         state.hero.render = renderHero;
         updateHeroMagicStats(state);
         returnToSpawnLocation(state);
@@ -153,20 +156,7 @@ function getDefaultHeroState(): Hero {
         invisibilityCost: 0,
         render: renderHero,
         spiritRadius: 0,
-        spawnLocation: {
-            zoneKey: 'demo_entrance',
-            floor: 0,
-            x: 150,
-            y: 100,
-            d: 'up',
-            areaGridCoords: {x: 0, y: 0},
-            /*zoneKey: 'peachCave',
-            floor: 0,
-            x: 150,
-            y: 445,
-            d: 'down',
-            areaGridCoords: {x: 1, y: 1},*/
-        }
+        spawnLocation: SPAWN_LOCATION_FULL,
     };
 }
 
@@ -209,10 +199,9 @@ function getDefaultState(): GameState {
         time: 0,
         gameHasBeenInitialized: false,
         lastTimeRendered: 0,
+        location: SPAWN_LOCATION_FULL,
         zone: zones.peachCave,
         areaGrid: zones.peachCave.floors[0].grid,
-        areaGridCoords: {x: 1, y: 1},
-        floor: 0,
         paused: false,
         menuIndex: 0,
         defeated: false,
@@ -245,16 +234,11 @@ export function returnToSpawnLocation(state: GameState) {
     state.hero.vx = 0;
     state.hero.vy = 0;
     state.hero.vz = 0;
-    state.zone = zones[state.hero.spawnLocation.zoneKey];
-    state.floor = state.hero.spawnLocation.floor;
-    state.areaGrid = state.zone.floors[state.floor].grid;
-    state.areaGridCoords.x = state.hero.spawnLocation.areaGridCoords.x;
-    state.areaGridCoords.y = state.hero.spawnLocation.areaGridCoords.y;
+    state.location = {...state.hero.spawnLocation};
+    state.zone = zones[state.location.zoneKey];
+    state.areaGrid = state.zone.floors[state.location.floor].grid;
     state.hero.d = state.hero.spawnLocation.d;
-    enterArea(state,
-        getAreaFromGridCoords(state.areaGrid, state.hero.spawnLocation.areaGridCoords),
-        state.hero.spawnLocation.x, state.hero.spawnLocation.y
-    );
+    enterLocation(state, state.hero.spawnLocation);
 }
 
 export function getState(): GameState {

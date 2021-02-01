@@ -11,6 +11,8 @@ import {
     selectSaveFile,
     setSaveFileToState,
     updateHeroMagicStats,
+    SPAWN_LOCATION_DEMO,
+    SPAWN_LOCATION_FULL,
 } from 'app/state';
 import { updateHero } from 'app/updateActor';
 import { updateCamera } from 'app/updateCamera';
@@ -32,7 +34,9 @@ export function update() {
     const state = getState();
     state.time += FRAME_LENGTH;
     try {
-        if (state.scene === 'title' || state.scene === 'chooseGameMode') {
+        if (state.scene === 'title' || state.scene === 'chooseGameMode' ||
+            state.scene === 'deleteSavedGame' || state.scene === 'deleteSavedGameConfirmation'
+        ) {
             updateTitle(state);
         } else if (state.defeated) {
             updateDefeated(state);
@@ -60,12 +64,19 @@ export function getTitleOptions(state: GameState): string[] {
     if (state.scene === 'chooseGameMode') {
         return ['Full Game', 'Quick Demo', 'Cancel'];
     }
-    return state.savedGames.map(savedGame => {
+    if (state.scene === 'deleteSavedGameConfirmation') {
+        return ['CANCEL', 'DELETE'];
+    }
+    const gameFiles = state.savedGames.map(savedGame => {
         if (!savedGame) {
             return 'New Game';
         }
         return savedGame.hero.spawnLocation.zoneKey;// + ' ' + 'V'.repeat(savedGame.hero.maxLife) + ' life';
     });
+    if (state.scene === 'deleteSavedGame') {
+        return [...gameFiles, 'CANCEL'];
+    }
+    return [...gameFiles, 'DELETE'];
 }
 
 export function isConfirmKeyPressed(): boolean {
@@ -85,7 +96,7 @@ function updateTitle(state: GameState) {
         changedOption = true;
     }
     if (changedOption) {
-        if (state.scene === 'title') {
+        if (state.scene === 'title' || state.scene === 'deleteSavedGame') {
             setSaveFileToState(state.menuIndex, 0);
         } else if (state.scene === 'chooseGameMode') {
             setSaveFileToState(state.savedGameIndex, state.menuIndex);
@@ -93,42 +104,52 @@ function updateTitle(state: GameState) {
     }
     if (isConfirmKeyPressed()) {
         switch (state.scene) {
+            case 'deleteSavedGameConfirmation':
+                if (state.menuIndex === 1) {
+                    state.savedGames[state.savedGameIndex] = null;
+                }
+                state.scene = 'title';
+                state.menuIndex = state.savedGameIndex;
+                setSaveFileToState(state.savedGameIndex, 0);
+                break;
+            case 'deleteSavedGame':
+                if (state.menuIndex >= state.savedGames.length) {
+                    state.scene = 'title';
+                    state.menuIndex = 0;
+                } else {
+                    state.savedGameIndex = state.menuIndex;
+                    state.scene = 'deleteSavedGameConfirmation';
+                    state.menuIndex = 0;
+                }
+                break;
             case 'chooseGameMode':
                 state.savedState = getDefaultSavedState();
                 state.hero = state.savedState.hero;
                 if (state.menuIndex === 0) {
                     // Full Game
-                    state.hero.spawnLocation = {
-                        zoneKey: 'peachCave',
-                        floor: 0,
-                        x: 150,
-                        y: 445,
-                        d: 'down',
-                        areaGridCoords: {x: 1, y: 1},
-                    };
+                    state.hero.spawnLocation = SPAWN_LOCATION_FULL;
                     state.scene = 'game';
                     updateHeroMagicStats(state);
                     returnToSpawnLocation(state);
                 } else if (state.menuIndex === 1) {
                     // Demo
-                    state.hero.spawnLocation = {
-                        zoneKey: 'demo_entrance',
-                        floor: 0,
-                        x: 150,
-                        y: 100,
-                        d: 'up',
-                        areaGridCoords: {x: 0, y: 0},
-                    };
+                    state.hero.spawnLocation = SPAWN_LOCATION_DEMO;
                     state.scene = 'game';
                     updateHeroMagicStats(state);
                     returnToSpawnLocation(state);
                 } else {
                     state.scene = 'title';
                     state.menuIndex = state.savedGameIndex;
+                    setSaveFileToState(state.savedGameIndex, 0);
                 }
                 break;
             case 'title':
-                selectSaveFile(state.menuIndex);
+                if (state.menuIndex >= state.savedGames.length) {
+                    state.scene = 'deleteSavedGame';
+                    state.menuIndex = 0;
+                } else {
+                    selectSaveFile(state.menuIndex);
+                }
                 break;
         }
     }

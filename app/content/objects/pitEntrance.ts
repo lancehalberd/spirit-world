@@ -1,5 +1,6 @@
 import { enterZoneByTarget } from 'app/content/areas';
 import { CANVAS_HEIGHT } from 'app/gameConstants';
+import { throwHeldObject } from 'app/updateActor';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { isObjectInsideTarget } from 'app/utils/index';
 
@@ -38,6 +39,7 @@ export class PitEntrance implements ObjectInstance {
                     hero.safeY = hero.y;
                 }
             } else if (hero.action !== 'falling') {
+                throwHeldObject(state, hero);
                 hero.action = 'falling';
                 hero.actionFrame = 0;
             }

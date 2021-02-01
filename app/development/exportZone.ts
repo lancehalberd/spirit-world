@@ -11,29 +11,31 @@ export function serializeZone(zone: Zone) {
     const tileMap = {};
     let tileIndex = 0;
     for (const floor of zone.floors) {
-        const areaGrid = floor.grid;
-        for (const gridRow of areaGrid) {
-            for (const area of gridRow) {
-                if (!area) {
-                    continue;
-                }
-                area['rowsByKey'] = {};
-                area.layers.map(layer => {
-                    const rows = [];
-                    for (let r = 0; r < layer.grid.tiles.length; r++) {
-                        rows[r] = [];
-                        for (let c = 0; c < layer.grid.tiles[r].length; c++) {
-                            const {x, y} = layer.grid.tiles[r][c];
-                            if (!tileMap[`${x}x${y}`]) {
-                                tileMap[`${x}x${y}`] = {
-                                    x, y, i: tileIndex++,
-                                };
-                            }
-                            rows[r][c] = 't' + tileMap[`${x}x${y}`].i;
-                        }
+        for (const areaGrid of [floor.grid, floor.spiritGrid]) {
+            const key = (areaGrid === floor.grid) ? 'f' : 'sf';
+            for (const gridRow of areaGrid) {
+                for (const area of gridRow) {
+                    if (!area) {
+                        continue;
                     }
-                    area['rowsByKey'][layer.key] = rows;
-                });
+                    area[key] = {};
+                    area.layers.map(layer => {
+                        const rows = [];
+                        for (let r = 0; r < layer.grid.tiles.length; r++) {
+                            rows[r] = [];
+                            for (let c = 0; c < layer.grid.tiles[r].length; c++) {
+                                const {x, y} = layer.grid.tiles[r][c];
+                                if (!tileMap[`${x}x${y}`]) {
+                                    tileMap[`${x}x${y}`] = {
+                                        x, y, i: tileIndex++,
+                                    };
+                                }
+                                rows[r][c] = 't' + tileMap[`${x}x${y}`].i;
+                            }
+                        }
+                        area[key][layer.key] = rows;
+                    });
+                }
             }
         }
     }
@@ -49,50 +51,57 @@ export function serializeZone(zone: Zone) {
     }
     lines.push(`const ${tileAssignments.join(', ')};`);
     for (let floorIndex = 0; floorIndex < zone.floors.length; floorIndex++) {
-        const areaGrid = zone.floors[floorIndex].grid;
-        for (let row = 0; row < areaGrid.length; row++) {
-            for (let column = 0; column < areaGrid[row].length; column++) {
-                const area = areaGrid[row][column];
-                if (!area) {
-                    lines.push(`const f${floorIndex}_${row}x${column}: AreaDefinition = null;`);
-                    continue;
-                }
-                lines.push(`const f${floorIndex}_${row}x${column}: AreaDefinition = {`);
-                lines.push('    layers: [');
-                area.layers.map(layer => {
-                    lines.push('        {');
-                    lines.push(`            key: '${layer.key}',`);
-                    if (layer.x) lines.push(`            x: ${layer.x},`);
-                    if (layer.y) lines.push(`            y: ${layer.y},`);
-                    if (layer.grid) {
-                        lines.push('            grid: {');
-                        lines.push(`                w: ${layer.grid.w},`);
-                        lines.push(`                h: ${layer.grid.h},`);
-                        lines.push(`                palette: '${layer.grid.palette}',`);
-                        lines.push('                tiles: [');
-                        for (const row of area['rowsByKey'][layer.key]) {
-                            lines.push(`                    [${row.join(',')}],`);
-                        }
-                        lines.push('                ],');
-                        lines.push('            },');
+        const floor = zone.floors[floorIndex];
+        for (const areaGrid of [floor.grid, floor.spiritGrid]) {
+            const key = (areaGrid === floor.grid) ? 'f' : 'sf';
+            for (let row = 0; row < areaGrid.length; row++) {
+                for (let column = 0; column < areaGrid[row].length; column++) {
+                    const area = areaGrid[row][column];
+                    if (!area) {
+                        lines.push(`const ${key}${floorIndex}_${row}x${column}: AreaDefinition = null;`);
+                        continue;
                     }
-                    lines.push('        },');
-                });
-                lines.push('    ],');
-                lines.push('    objects: [');
-                for (const object of area.objects) {
-                    lines.push(`        {${Object.keys(object).map(k => `${k}: ${JSON.stringify(object[k])}` ).join(', ')}},`);
+                    lines.push(`const ${key}${floorIndex}_${row}x${column}: AreaDefinition = {`);
+                    if (key === 'sf') {
+                        lines.push(`    isSpiritWorld: true,`);
+                        lines.push(`    parentDefinition: f${floorIndex}_${row}x${column},`);
+                    }
+                    lines.push('    layers: [');
+                    area.layers.map(layer => {
+                        lines.push('        {');
+                        lines.push(`            key: '${layer.key}',`);
+                        if (layer.x) lines.push(`            x: ${layer.x},`);
+                        if (layer.y) lines.push(`            y: ${layer.y},`);
+                        if (layer.grid) {
+                            lines.push('            grid: {');
+                            lines.push(`                w: ${layer.grid.w},`);
+                            lines.push(`                h: ${layer.grid.h},`);
+                            lines.push(`                palette: '${layer.grid.palette}',`);
+                            lines.push('                tiles: [');
+                            for (const row of area[key][layer.key]) {
+                                lines.push(`                    [${row.join(',')}],`);
+                            }
+                            lines.push('                ],');
+                            lines.push('            },');
+                        }
+                        lines.push('        },');
+                    });
+                    lines.push('    ],');
+                    lines.push('    objects: [');
+                    for (const object of area.objects) {
+                        lines.push(`        {${Object.keys(object).map(k => `${k}: ${JSON.stringify(object[k])}` ).join(', ')}},`);
+                    }
+                    lines.push('    ],');
+                    lines.push('    sections: [');
+                    for (const section of area.sections) {
+                        lines.push(`        {x: ${section.x}, y: ${section.y}, w: ${section.w}, h: ${section.h}},`);
+                    }
+                    lines.push('    ],');
+                    if (area.dark) {
+                        lines.push('    dark: true,');
+                    }
+                    lines.push('};');
                 }
-                lines.push('    ],');
-                lines.push('    sections: [');
-                for (const section of area.sections) {
-                    lines.push(`        {x: ${section.x}, y: ${section.y}, w: ${section.w}, h: ${section.h}},`);
-                }
-                lines.push('    ],');
-                if (area.dark) {
-                    lines.push('    dark: true,');
-                }
-                lines.push('};');
             }
         }
     }
@@ -101,13 +110,25 @@ export function serializeZone(zone: Zone) {
     lines.push(`    key: '${zone.key}',`);
     lines.push(`    floors: [`);
     for (let floorIndex = 0; floorIndex < zone.floors.length; floorIndex++) {
-        const areaGrid = zone.floors[floorIndex].grid;
+        let areaGrid = zone.floors[floorIndex].grid;
+        let key = 'f';
         lines.push('        {');
         lines.push('            grid: [');
         for (let row = 0; row < areaGrid.length; row++) {
             let rowLine = '                [';
             for (let column = 0; column < areaGrid[row].length; column++) {
-                rowLine += `f${floorIndex}_${row}x${column},`;
+                rowLine += `${key}${floorIndex}_${row}x${column},`;
+            }
+            lines.push(rowLine + '],');
+        }
+        lines.push('            ],');
+        lines.push('            spiritGrid: [');
+        areaGrid = zone.floors[floorIndex].spiritGrid;
+        key = 'sf';
+        for (let row = 0; row < areaGrid.length; row++) {
+            let rowLine = '                [';
+            for (let column = 0; column < areaGrid[row].length; column++) {
+                rowLine += `${key}${floorIndex}_${row}x${column},`;
             }
             lines.push(rowLine + '],');
         }

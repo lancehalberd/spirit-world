@@ -75,6 +75,17 @@ interface TileGridDefinition {
     tiles: Tile[][],
 }
 
+export interface ZoneLocation {
+    zoneKey: string,
+    floor: number,
+    areaGridCoords: {x: number, y: number},
+    isSpiritWorld: boolean,
+    x: number,
+    y: number,
+    d: Direction,
+}
+
+
 export interface AreaLayerDefinition {
     // Unique identifier for this layer.
     key: string,
@@ -94,11 +105,17 @@ export interface AreaLayer extends TileGrid {
 }
 
 export interface AreaDefinition {
+    default?: boolean,
     layers: AreaLayerDefinition[],
     objects: ObjectDefinition[],
     // Used to divide a larger super tile into smaller screens.
     sections: ShortRectangle[],
     dark?: boolean,
+    // Spirit world areas with real counterparts have this reference set
+    // to make it more convenient to translate real tiles/objects to the spirit world.
+    parentDefinition?: AreaDefinition,
+    // Set to true if this is a spirit world area.
+    isSpiritWorld?: boolean,
 }
 
 export interface Zone {
@@ -108,7 +125,8 @@ export interface Zone {
 
 export interface Floor {
     origin?: {x: number, y: number},
-    grid: AreaGrid,
+    grid?: AreaGrid,
+    spiritGrid: AreaGrid,
 }
 
 export type AreaGrid = AreaDefinition[][];
