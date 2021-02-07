@@ -149,6 +149,8 @@ export function enterLocation(state: GameState, location: ZoneLocation): void {
     state.hero.activeStaff?.remove(state, state.areaInstance);
     state.areaInstance = createAreaInstance(state, area);
     state.alternateAreaInstance = createAreaInstance(state, alternateArea);
+    linkObjects(state);
+    state.hero.area = state.areaInstance;
     state.hero.x = location.x;
     state.hero.y = location.y;
     state.hero.safeD = state.hero.d;
@@ -156,6 +158,22 @@ export function enterLocation(state: GameState, location: ZoneLocation): void {
     state.hero.safeY = location.y;
     setAreaSection(state, state.hero.d, true);
     updateCamera(state, 512);
+}
+
+function linkObjects(state: GameState): void {
+    for (const object of state.areaInstance.objects) {
+        linkObject(object, state.alternateAreaInstance);
+    }
+}
+export function linkObject(object: ObjectInstance, alternateAreaInstance: AreaInstance): void {
+    if (!object.definition.linked) {
+        return;
+    }
+    const linkedObject = alternateAreaInstance.objects.find(o => o.x === object.x && o.y === object.y);
+    if (linkedObject) {
+        linkedObject.linkedObject = object;
+        object.linkedObject = linkedObject;
+    }
 }
 
 export function enterZoneByTarget(state: GameState, zoneKey: string, targetObjectId: string): boolean {
@@ -271,13 +289,16 @@ export function scrollToArea(state: GameState, area: AreaDefinition, direction: 
     }
 }
 
-export function applyLayerToBehaviorGrid(behaviorGrid: TileBehaviors[][], layer: AreaLayerDefinition): void {
+export function applyLayerToBehaviorGrid(behaviorGrid: TileBehaviors[][], layer: AreaLayerDefinition, parentLayer: AreaLayerDefinition): void {
     const grid = layer.grid;
     const palette = palettes[grid.palette];
     for (let y = 0; y < grid.tiles.length; y++) {
         behaviorGrid[y] = [];
         for (let x = 0; x < grid.tiles.length; x++) {
-            const tile = grid.tiles[y][x];
+            let tile = grid.tiles[y][x];
+            if (!tile && parentLayer) {
+                tile = parentLayer.grid.tiles[y][x];
+            }
             if (!tile) {
                 continue;
             }
@@ -314,8 +335,8 @@ export function resetTileBehavior(area: AreaInstance, {x, y}: Tile): void {
 
 export function createAreaInstance(state: GameState, definition: AreaDefinition): AreaInstance {
     const behaviorGrid: TileBehaviors[][] = [];
-    for (const layer of definition.layers) {
-        applyLayerToBehaviorGrid(behaviorGrid, layer);
+    for (let i = 0; i < definition.layers.length; i++) {
+        applyLayerToBehaviorGrid(behaviorGrid, definition.layers[i], definition.parentDefinition?.layers[i]);
     }
     // Currently all layers should use matching grids, so just grab the first.
     const palette = palettes[definition.layers[0].grid.palette];
@@ -343,6 +364,18 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
         context,
         cameraOffset: {x: 0, y: 0},
     };
+    if (definition.parentDefinition) {
+        for (let l = 0; l < instance.layers.length; l++) {
+            for (let y = 0; y < instance.layers[l].tiles.length; y++) {
+                for (let x = 0; x < instance.layers[l].tiles[y].length; x++) {
+                    if (!instance.layers[l].tiles[y][x]) {
+                        instance.layers[l].tiles[y][x] = definition.parentDefinition.layers[l].grid.tiles[y][x];
+                    }
+                }
+
+            }
+        }
+    }
     definition.objects.map(o => addObjectToArea(state, instance, createObjectInstance(state, o)));
     return instance;
 }
@@ -371,7 +404,8 @@ export function refreshSection(state: GameState, area: AreaInstance, section: Sh
             const column = section.x + x;
             for (let l = 0; l < area.definition.layers.length; l++) {
                 area.layers[l].tiles[row][column]
-                    = area.definition.layers[l].grid.tiles[row][column];
+                    = area.definition.layers[l].grid.tiles[row][column]
+                        || area.definition.parentDefinition?.layers[l].grid.tiles[row][column];
             }
             resetTileBehavior(area, {x: column, y: row});
             area.tilesDrawn[row][column] = false;
@@ -402,6 +436,7 @@ export function refreshSection(state: GameState, area: AreaInstance, section: Sh
     }
 }
 export function addObjectToArea(state: GameState, area: AreaInstance, object: ObjectInstance): void {
+    object.area = area;
     if (object.add) {
         object.add(state, area);
     } else {

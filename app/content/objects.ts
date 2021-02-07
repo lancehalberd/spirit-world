@@ -56,10 +56,10 @@ export function findObjectInstanceById(areaInstance: AreaInstance, id: string, a
     return object;
 }
 
-export function checkIfAllSwitchesAreActivated(state: GameState, switchInstance: BallGoal | CrystalSwitch): void {
+export function checkIfAllSwitchesAreActivated(state: GameState, switchInstance: BallGoal | CrystalSwitch | FloorSwitch): void {
     // Do nothing if there still exists a switch with the same target that is not active.
     if (state.areaInstance.objects.some(o =>
-        (o.definition?.type === 'ballGoal' || o.definition?.type === 'crystalSwitch') &&
+        (o.definition?.type === 'ballGoal' || o.definition?.type === 'crystalSwitch' || o.definition?.type === 'floorSwitch') &&
         o.definition?.targetObjectId === switchInstance.definition.targetObjectId &&
         o.status !== 'active'
     )) {
@@ -74,6 +74,21 @@ export function checkIfAllSwitchesAreActivated(state: GameState, switchInstance:
     }
     for (const object of state.areaInstance.objects) {
         activateTarget(state, object);
+    }
+}
+
+export function deactivateTargets(state: GameState, targetObjectId: string = null): void {
+    if (targetObjectId) {
+        const target = findObjectInstanceById(state.areaInstance, targetObjectId);
+        if (target && target.definition.status === 'closedSwitch') {
+            changeObjectStatus(state, target, 'closedSwitch');
+        }
+        return;
+    }
+    for (const object of state.areaInstance.objects) {
+        if (object.definition?.status === 'closedSwitch') {
+            changeObjectStatus(state, object, 'closedSwitch');
+        }
     }
 }
 

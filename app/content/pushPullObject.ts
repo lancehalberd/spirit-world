@@ -2,13 +2,14 @@ import { createAnimation, drawFrame } from 'app/utils/animations';
 import { directionMap, isPointOpen } from 'app/utils/field';
 
 import {
-    Direction, Frame, GameState, ObjectInstance,
+    AreaInstance, Direction, Frame, GameState, ObjectInstance,
     ObjectStatus, SimpleObjectDefinition, ShortRectangle,
 } from 'app/types';
 
 const potFrame: Frame = createAnimation('gfx/tiles/movablepot.png', {w: 16, h: 18}).frames[0];
 
 export class PushPullObject implements ObjectInstance {
+    area: AreaInstance;
     alwaysReset = true;
     behaviors = {
         solid: true,
@@ -18,6 +19,7 @@ export class PushPullObject implements ObjectInstance {
     x: number;
     y: number;
     grabDirection: Direction;
+    linkedObject: PushPullObject;
     pullingHeroDirection: Direction;
     pushFrame = 0;
     pushDirection: Direction;
@@ -58,10 +60,15 @@ export class PushPullObject implements ObjectInstance {
         }
         const x = this.x + 8 + 16 * directionMap[direction][0];
         const y = this.y + 8 + 16 * directionMap[direction][1];
-        if (isPointOpen(state, {x, y})) {
+        if (isPointOpen(state, this.area, {x, y}) && (!this.linkedObject || isPointOpen(state, this.linkedObject.area, {x, y}))) {
             this.pushDirection = direction;
             this.pullingHeroDirection = direction;
             this.pushFrame = 0;
+            if (this.linkedObject) {
+                this.linkedObject.pushDirection = direction;
+                this.linkedObject.pullingHeroDirection = direction;
+                this.linkedObject.pushFrame = 0;
+            }
         }
     }
     update(state: GameState) {

@@ -17,6 +17,7 @@ export class BallGoal implements ObjectInstance {
     definition: BallGoalDefinition = null;
     x: number;
     y: number;
+    linkedObject: BallGoal;
     status: ObjectStatus = 'normal';
     constructor(definition: BallGoalDefinition) {
         this.definition = definition;

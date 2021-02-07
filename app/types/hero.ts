@@ -2,7 +2,7 @@ import { Clone } from 'app/content/clone';
 import { Staff } from 'app/content/staff';
 
 import {
-    Direction, FrameAnimation, GameState, LayerTile,
+    AreaInstance, Direction, FrameAnimation, GameState, LayerTile,
     ObjectInstance, ObjectStatus, Tile, ZoneLocation,
 } from 'app/types';
 
@@ -38,6 +38,7 @@ export interface ActorAnimations {
 }
 
 export interface Actor {
+    area: AreaInstance,
     x: number,
     y: number,
     z: number,

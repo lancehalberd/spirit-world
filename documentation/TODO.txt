@@ -7,16 +7,14 @@ Bugs:
         No luck reproducing, maybe the analog stick was doing something weird?
     Doors don't appear open when moving into them from a different section
         I think this is because the door doesn't update until it is in the current areaInstance
+    Objects+enemies shouldn't be able to float on top of pits.
 
 Graphics:
     Add sparkles to peach loot + hud.
 
-
-Add title screen:
-    - "Delete Save" option at the bottom
-        - Select file
-            - "Delete your progress?" + display file details (LEFT/RIGHT)"Yes"/"No", select "No" by default.
-    - Change defeat screen to be 'Continue' + 'Quit', quit takes you back to title.
+Spirit Sight Puzzles:
+    - spirit world floor switches +  push/pull objects bound to spirit world to open door/reveal chest.
+    - rolling ball bound to spirit world with barriers only in spirit world. Include a real world only push pull block to position the rolling ball correctly.
 
 Quick Demo
     - Start with 6 hearts + weapon

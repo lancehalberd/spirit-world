@@ -3,11 +3,13 @@ import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { directionMap, getTileBehaviorsAndObstacles, isPointOpen } from 'app/utils/field';
 
-import { BallGoal, Direction, GameState, BaseObjectDefinition, ObjectInstance, ObjectStatus, ShortRectangle } from 'app/types';
+import { AreaInstance, BallGoal, Direction, GameState, BaseObjectDefinition, ObjectInstance, ObjectStatus, ShortRectangle } from 'app/types';
 
 const rollingAnimation = createAnimation('gfx/tiles/rollingboulder.png', {w: 16, h: 16}, {cols:4});
+const rollingAnimationSpirit = createAnimation('gfx/tiles/rollingboulderspirit.png', {w: 16, h: 16}, {cols:4});
 
 export class RollingBallObject implements ObjectInstance {
+    area: AreaInstance;
     alwaysReset = true;
     behaviors = {
         solid: true,
@@ -16,16 +18,17 @@ export class RollingBallObject implements ObjectInstance {
     definition = null;
     x: number;
     y: number;
+    linkedObject: RollingBallObject;
     rollDirection: Direction;
     pushCounter: number = 0;
     pushedThisFrame: boolean = false;
     status: ObjectStatus = 'normal';
     animationTime = 0;
+    stuck: boolean = false;
     constructor(definition: BaseObjectDefinition) {
         this.definition = definition;
         this.x = definition.x;
         this.y = definition.y;
-
     }
     getHitbox(state: GameState): ShortRectangle {
         return { x: this.x, y: this.y, w: 16, h: 16 };
@@ -45,10 +48,16 @@ export class RollingBallObject implements ObjectInstance {
         }
     }
     rollInDirection(state: GameState, direction: Direction): void {
+        if (this.stuck) {
+            return;
+        }
         const x = this.x + 8 + 16 * directionMap[direction][0];
         const y = this.y + 8 + 16 * directionMap[direction][1];
-        if (isPointOpen(state, {x, y})) {
+        if (isPointOpen(state, this.area, {x, y}) && (!this.linkedObject || isPointOpen(state, this.linkedObject.area, {x, y}))) {
             this.rollDirection = direction;
+            if (this.linkedObject) {
+                this.linkedObject.rollDirection = direction;
+            }
         }
     }
     update(state: GameState) {
@@ -67,10 +76,21 @@ export class RollingBallObject implements ObjectInstance {
                     // The activated BallGoal will render the ball in the depression, so we remove
                     // the original ball from the area.
                     removeObjectFromArea(state, state.areaInstance, this);
+                    if (this.linkedObject) {
+                        const linkedGoal = (object as BallGoal).linkedObject;
+                        if (linkedGoal) {
+                            linkedGoal.activate(state);
+                            removeObjectFromArea(state, state.areaInstance, this);
+                        } else {
+                            // If there is no alternate goal, the alternate ball is just stuck in place.
+                            this.linkedObject.rollDirection = null;
+                            this.linkedObject.stuck = true;
+                        }
+                    }
                     return;
                 }
             }
-            const { objects, tileBehavior } = getTileBehaviorsAndObstacles(state, {x, y});
+            const { objects, tileBehavior } = getTileBehaviorsAndObstacles(state, this.area, {x, y});
             if (!tileBehavior.solid && !tileBehavior.pit && !tileBehavior.outOfBounds) {
                 this.x += dx;
                 this.y += dy;
@@ -91,9 +111,14 @@ export class RollingBallObject implements ObjectInstance {
         } else {
             this.pushedThisFrame = false;
         }
+        if (this.linkedObject && this.linkedObject.rollDirection === null) {
+            this.rollDirection = null;
+            this.x = this.linkedObject.x;
+            this.y = this.linkedObject.y;
+        }
     }
     render(context, state: GameState) {
-        const frame = getFrame(rollingAnimation, this.animationTime);
+        const frame = getFrame(this.definition.spirit ? rollingAnimationSpirit : rollingAnimation, this.animationTime);
         drawFrame(context, frame, { ...frame, x: this.x, y: this.y });
     }
 }

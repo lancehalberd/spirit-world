@@ -5,13 +5,14 @@ import { renderHero } from 'app/renderActor';
 //import { getFrame } from 'app/utils/animations';
 
 import {
-    Action, ActiveTool,
+    Action, ActiveTool, AreaInstance,
     Direction, DrawPriority, MagicElement, Equipment, Frame,
     GameState, Hero, LayerTile, ObjectInstance, ObjectStatus, PassiveTool,
     ShortRectangle, Tile, ZoneLocation
 } from 'app/types';
 
 export class Clone implements Hero, ObjectInstance {
+    area: AreaInstance;
     definition = null;
     drawPriority: DrawPriority = 'sprites';
     frame: Frame;

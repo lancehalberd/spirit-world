@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import { addObjectToArea, removeObjectFromArea } from 'app/content/areas';
+import { addObjectToArea, linkObject, removeObjectFromArea } from 'app/content/areas';
 import { enemyDefinitions } from 'app/content/enemy';
 import { createObjectInstance } from 'app/content/objects';
 import { lootFrames } from 'app/content/lootObject';
@@ -10,10 +10,10 @@ import { getState } from 'app/state';
 import { ifdefor, isPointInShortRect } from 'app/utils/index';
 
 import {
-    BallGoalDefinition, CrystalSwitchDefinition, FloorSwitchDefinition,
+    AreaInstance, BallGoalDefinition, CrystalSwitchDefinition, FloorSwitchDefinition,
     FrameDimensions, Direction, EnemyType, GameState,
     LootType, MagicElement, ObjectDefinition, ObjectStatus, ObjectType, PanelRows,
-    Zone,
+    Zone, ZoneLocation,
 } from 'app/types';
 
 let allLootTypes: LootType[];
@@ -47,94 +47,83 @@ function createObjectDefinition(
 ): ObjectDefinition {
     const x = definition.x || 0;
     const y = definition.y || 0;
+    const commonProps = {
+        id: definition.id || uniqueId(state, definition.type),
+        linked: definition.linked || editingState.linked,
+        spirit: definition.spirit || editingState.spirit,
+        status: 'normal' as ObjectStatus,
+        x,
+        y,
+    };
     switch (definition.type) {
         case 'ballGoal':
             return {
+                ...commonProps,
                 type: definition.type,
-                id: definition.id || uniqueId(state, 'crystalSwitch'),
-                status: 'normal',
                 targetObjectId: definition.targetObjectId || editingState.switchTargetObjectId,
-                x,
-                y,
             };
         case 'crystalSwitch':
             return {
+                ...commonProps,
                 type: definition.type,
-                id: definition.id || uniqueId(state, 'crystalSwitch'),
                 element: definition.element || editingState.element,
-                status: 'normal',
                 targetObjectId: definition.targetObjectId || editingState.switchTargetObjectId,
                 // Need to use ifdefor here since 0 is a valid value for timer.
                 timer: ifdefor(definition.timer, editingState.timer),
-                x,
-                y,
             };
         case 'door':
         case 'stairs':
             return {
+                ...commonProps,
                 type: definition.type,
-                id: definition.id || uniqueId(state, definition.type),
                 status: definition.status || editingState.objectStatus,
                 targetZone: definition.targetZone || editingState.entranceTargetZone,
                 targetObjectId: definition.targetObjectId || editingState.entranceTargetObjectId,
                 d: definition.d || editingState.direction,
-                x,
-                y,
             };
         case 'enemy':
             const enemyType = definition.enemyType || editingState.enemyType;
             return {
+                ...commonProps,
                 type: definition.type,
                 id: definition.id || uniqueId(state, enemyType),
                 enemyType,
-                status: 'normal',
-                x,
-                y,
             };
         case 'floorSwitch':
             return {
+                ...commonProps,
                 type: definition.type,
-                id: definition.id || uniqueId(state, 'floorSwitch'),
-                status: 'normal',
                 // Need to use ifdefor here since false is a valid value for toggleOnRelease.
                 targetObjectId: definition.targetObjectId || editingState.switchTargetObjectId,
                 toggleOnRelease: ifdefor(definition.toggleOnRelease, editingState.toggleOnRelease),
-                x,
-                y,
             };
         case 'pitEntrance':
             return {
+                ...commonProps,
                 type: definition.type,
-                id: definition.id || uniqueId(state, 'pitEntrance'),
-                status: 'normal',
                 targetZone: definition.targetZone || editingState.entranceTargetZone,
                 targetObjectId: definition.targetObjectId || editingState.entranceTargetObjectId,
-                x,
-                y,
+
             };
         case 'loot':
         case 'chest':
             const lootType = definition.lootType || editingState.lootType;
             return {
+                ...commonProps,
                 type: definition.type,
                 id: definition.id || uniqueId(state, lootType),
                 lootType,
                 status: definition.status || editingState.objectStatus,
                 level: definition.level || editingState.level,
                 amount: definition.amount || editingState.amount,
-                x,
-                y,
             };
         case 'marker':
         case 'pushPull':
         case 'rollingBall':
         case 'tippable':
             return {
+                ...commonProps,
                 type: definition.type,
-                id: definition.id || uniqueId(state, definition.type),
-                status: 'normal',
-                x,
-                y,
             };
         default:
             throw new Error('Unhandled object type, ' + definition['type']);
@@ -206,6 +195,29 @@ export function getObjectTypeProperties(state: GameState, editingState: EditingS
             displayTileEditorPropertyPanel();
         },
     });
+    rows.push([{
+        name: 'spirit',
+        value: object.spirit || editingState.spirit,
+        onChange(spirit: boolean) {
+            if (object.id) {
+                object.spirit = spirit;
+                updateObjectInstance(state, object);
+            } else {
+                editingState.spirit = spirit;
+            }
+        },
+    }, {
+        name: 'linked',
+        value: object.linked || editingState.linked,
+        onChange(linked: boolean) {
+            if (object.id) {
+                object.linked = linked;
+                updateObjectInstance(state, object);
+            } else {
+                editingState.linked = linked;
+            }
+        },
+    }]);
     switch (object.type) {
         case 'door':
             rows.push({
@@ -452,7 +464,6 @@ export function onMouseDownObject(state: GameState, editingState: EditingState, 
     newObject.x -= (frame.content?.w || frame.w) / 2;
     newObject.y -= (frame.content?.h || frame.h) / 2;
     fixObjectPosition(state, newObject);
-    state.areaInstance.definition.objects.push(newObject);
     updateObjectInstance(state, newObject);
 }
 
@@ -503,11 +514,16 @@ export function onMouseMoveSelect(state: GameState, editingState: EditingState, 
     }
 }
 
-export function uniqueId(state: GameState, prefix: string) {
+export function uniqueId(state: GameState, prefix: string, location: ZoneLocation = null) {
+    if (!location) {
+        location = state.location;
+    }
     let i = 0;
-    const { zoneKey, floor, areaGridCoords: {x, y}, isSpiritWorld} = state.location;
+    const { zoneKey, floor, areaGridCoords: {x, y}, isSpiritWorld} = location;
     prefix = `${zoneKey}:${isSpiritWorld ? 's' : ''}${floor}:${x}x${y}-${prefix}`;
-    while (state.areaInstance.definition.objects.some(o => o.id === `${prefix}-${i}`)) {
+    const area = (location.isSpiritWorld === state.location.isSpiritWorld)
+        ? state.areaInstance : state.alternateAreaInstance;
+    while (area.definition.objects.some(o => o.id === `${prefix}-${i}`)) {
         i++;
     }
     return `${prefix}-${i}`;
@@ -562,14 +578,50 @@ export function isPointInObject(x: number, y: number, object: ObjectDefinition):
     return isPointInShortRect(x + camera.x, y + camera.y, frame);
 }
 
-export function updateObjectInstance(state: GameState, object: ObjectDefinition): void {
-    const index = state.areaInstance.objects.findIndex(o => o.definition?.id === object.id);
+function checkToAddLinkedObject(state: GameState, definition: ObjectDefinition): void {
+    const linkedInstance = state.alternateAreaInstance.objects.find(({definition}) =>
+        definition.x === definition.x && definition.y === definition.y
+    );
+    if (linkedInstance) {
+        console.log('Updating linked instance');
+        updateObjectInstance(state, {...linkedInstance.definition, linked: definition.linked}, state.alternateAreaInstance);
+    }
+    if (!definition.linked) {
+        return;
+    }
+    const alternateLocation = {...state.location, isSpiritWorld: !state.location.isSpiritWorld};
+    const alternateObject = {
+        ...definition,
+        id: uniqueId(state, definition.type, alternateLocation),
+        linked: true, spirit: !definition.spirit
+    };
+    console.log('Adding alternate object')
+    updateObjectInstance(state, alternateObject, state.alternateAreaInstance);
+    // Make sure to update the object links when we replace object instances.
+    const instance = state.areaInstance.objects.find(o => o.definition.id === definition.id);
+    linkObject(instance, state.alternateAreaInstance);
+}
+
+export function updateObjectInstance(state: GameState, object: ObjectDefinition, area: AreaInstance = null): void {
+    if (!area) {
+        area = state.areaInstance;
+    }
+    const definitionIndex = area.definition.objects.findIndex(d => d.id === object.id);
+    if (definitionIndex >= 0) {
+        area.definition.objects[definitionIndex] = object;
+    } else {
+        area.definition.objects.push(object);
+    }
+    const index = area.objects.findIndex(o => o.definition?.id === object.id);
     const newObject = createObjectInstance(state, object);
     if (index < 0) {
-        addObjectToArea(state, state.areaInstance, newObject);
+        addObjectToArea(state, area, newObject);
     } else {
-        removeObjectFromArea(state, state.areaInstance, state.areaInstance.objects[index]);
-        addObjectToArea(state, state.areaInstance, newObject);
+        removeObjectFromArea(state, area, area.objects[index]);
+        addObjectToArea(state, area, newObject);
+    }
+    if (area === state.areaInstance && state.alternateAreaInstance) {
+        checkToAddLinkedObject(state, object);
     }
 }
 

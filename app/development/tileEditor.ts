@@ -47,6 +47,7 @@ export interface EditingState {
     entranceTargetZone?: string,
     entranceTargetObjectId?: string,
     level: number,
+    linked: boolean,
     lootType: LootType,
     objectStatus: ObjectStatus,
     objectType: ObjectType,
@@ -55,6 +56,7 @@ export interface EditingState {
     showZoneProperties: boolean,
     showFieldProperties: boolean,
     showInventoryProperties: boolean,
+    spirit: boolean,
     switchTargetObjectId?: string,
     timer: number,
     toggleOnRelease: boolean,
@@ -73,6 +75,7 @@ export const editingState: EditingState = {
     entranceTargetZone: null,
     entranceTargetObjectId: null,
     level: 0,
+    linked: false,
     lootType: 'peachOfImmortalityPiece',
     objectStatus: 'normal',
     objectType: combinedObjectTypes[0],
@@ -81,6 +84,7 @@ export const editingState: EditingState = {
     showZoneProperties: false,
     showFieldProperties: true,
     showInventoryProperties: false,
+    spirit: false,
     switchTargetObjectId: null,
     timer: 0,
     toggleOnRelease: false,
@@ -214,32 +218,56 @@ export function displayTileEditorPropertyPanel() {
         rows.push({
             name: 'Add Layer',
             onClick() {
-                const key = 'layer-' + state.areaInstance.definition.layers.length;
+                const definition = state.areaInstance.definition;
+                const alternateDefinition = state.alternateAreaInstance.definition;
+                const key = 'layer-' + definition.layers.length;
+                const topLayerDefinition = definition.layers[definition.layers.length - 1];
+                const alternateTopLayerDefinition = alternateDefinition.layers[alternateDefinition.layers.length - 1];
                 const layerDefinition: AreaLayerDefinition = {
+                    ...topLayerDefinition,
                     key,
                     grid: {
-                        // The dimensions of the grid.
-                        w: state.areaInstance.w,
-                        h: state.areaInstance.h,
-                        // The palette to use for this grid (controls the size of tiles)
-                        palette: selectedPaletteKey,
+                        ...topLayerDefinition.grid,
+                        // The matrix of tiles
+                        tiles: [],
+                    },
+                };
+                const alternateLayerDefinition: AreaLayerDefinition = {
+                    ...alternateTopLayerDefinition,
+                    key,
+                    grid: {
+                        ...alternateTopLayerDefinition.grid,
                         // The matrix of tiles
                         tiles: [],
                     },
                 };
                 initializeAreaLayerTiles(layerDefinition);
-                state.areaInstance.definition.layers.push(layerDefinition);
+                initializeAreaLayerTiles(alternateLayerDefinition);
+                definition.layers.push(layerDefinition);
+                alternateDefinition.layers.push(layerDefinition);
                 state.areaInstance.layers.push({
                     definition: layerDefinition,
                     ...layerDefinition,
                     ...layerDefinition.grid,
                     tiles: _.cloneDeep(layerDefinition.grid.tiles),
-                    palette: palettes[layerDefinition.grid.palette]
+                    palette: palettes[layerDefinition.grid.palette],
                 });
-                applyLayerToBehaviorGrid(state.areaInstance.behaviorGrid, layerDefinition);
+                state.alternateAreaInstance.layers.push({
+                    definition: alternateLayerDefinition,
+                    ...alternateLayerDefinition,
+                    ...alternateLayerDefinition.grid,
+                    tiles: _.cloneDeep(alternateLayerDefinition.grid.tiles),
+                    palette: palettes[alternateLayerDefinition.grid.palette],
+                });
+                applyLayerToBehaviorGrid(state.areaInstance.behaviorGrid, layerDefinition,
+                    state.areaInstance.definition.isSpiritWorld ? null : alternateLayerDefinition);
+                applyLayerToBehaviorGrid(state.alternateAreaInstance.behaviorGrid, alternateLayerDefinition,
+                    state.areaInstance.definition.isSpiritWorld ? layerDefinition : null);
                 editingState.selectedLayerIndex = _.findIndex(state.areaInstance.layers, { key });
                 state.areaInstance.tilesDrawn = [];
+                state.alternateAreaInstance.tilesDrawn = [];
                 state.areaInstance.checkToRedrawTiles = true;
+                state.alternateAreaInstance.checkToRedrawTiles = true;
                 displayTileEditorPropertyPanel();
             }
         });

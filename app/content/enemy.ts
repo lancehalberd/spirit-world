@@ -7,12 +7,13 @@ import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { directionMap } from 'app/utils/field';
 
 import {
-    Actor, ActorAnimations, Direction, EnemyType, EnemyObjectDefinition,
+    Actor, ActorAnimations, AreaInstance, Direction, EnemyType, EnemyObjectDefinition,
     Frame, FrameAnimation, GameState, ObjectInstance,ObjectStatus,
 } from 'app/types';
 
 export class Enemy implements Actor, ObjectInstance {
     type = 'enemy' as 'enemy';
+    area: AreaInstance;
     drawPriority: 'sprites' = 'sprites';
     definition: EnemyObjectDefinition;
     enemyDefinition: EnemyDefinition;

@@ -225,6 +225,7 @@ function updateField(state: GameState) {
         }
         const originalLength = state.areaInstance.objects.length;
         state.areaInstance.objects = state.areaInstance.objects.filter(e => !(e instanceof Enemy) || e.life > 0);
+        // If an enemy was defeated, check if all enemies are defeated to see if any doors open or treasures appear.
         if (originalLength > state.areaInstance.objects.length) {
             if (!state.areaInstance.objects.some(e => (e instanceof Enemy) && e.isInCurrentSection(state))) {
                 for (const object of state.areaInstance.objects) {
@@ -240,6 +241,9 @@ function updateField(state: GameState) {
                     }
                 }
             }
+        }
+        for (const object of state.alternateAreaInstance?.objects || []) {
+            object.update?.(state);
         }
         for (const object of state.areaInstance.objects) {
             object.update?.(state);

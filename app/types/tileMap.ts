@@ -151,7 +151,9 @@ export interface AreaInstance {
 export type DrawPriority = 'background' | 'foreground' | 'sprites'
 
 export interface ObjectInstance {
+    area?: AreaInstance,
     definition?: ObjectDefinition,
+    linkedObject?: ObjectInstance,
     behaviors?: TileBehaviors,
     drawPriority?: DrawPriority,
     alwaysReset?: boolean,
@@ -181,6 +183,10 @@ export type ObjectStatus = 'active' | 'closed' | 'closedEnemy' | 'closedSwitch'
 
 export interface BaseObjectDefinition {
     id: string,
+    // Whether this is linked to an object in the physical/spirit world.
+    linked?: boolean,
+    // Whether this is a spirit object.
+    spirit?: boolean,
     status: ObjectStatus,
     x: number,
     y: number,

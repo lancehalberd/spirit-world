@@ -245,7 +245,12 @@ export function getZoneProperties(state: GameState, editingState: EditingState):
         onChange(isSpiritWorld: boolean) {
             if (state.location.isSpiritWorld != isSpiritWorld) {
                 state.location.isSpiritWorld = isSpiritWorld;
-                enterLocation(state, state.location);
+                editingState.spirit = isSpiritWorld;
+                const tempInstance = state.areaInstance;
+                state.areaInstance = state.alternateAreaInstance;
+                state.alternateAreaInstance = tempInstance;
+                state.hero.area = state.areaInstance;
+                //enterLocation(state, state.location);
                 displayTileEditorPropertyPanel();
             }
         }

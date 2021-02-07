@@ -5,7 +5,7 @@ import { Enemy } from 'app/content/enemy';
 import { editingState, renderEditor } from 'app/development/tileEditor';
 import { createCanvasAndContext, mainContext } from 'app/dom';
 import { CANVAS_HEIGHT, CANVAS_WIDTH, MAX_SPIRIT_RADIUS } from 'app/gameConstants';
-import { renderHeroShadow, renderShadow } from 'app/renderActor';
+import { renderHeroEyes, renderHeroShadow, renderShadow } from 'app/renderActor';
 import { renderDefeatedMenu } from 'app/renderDefeatedMenu';
 import { renderHUD } from 'app/renderHUD';
 import { renderMenu } from 'app/renderMenu';
@@ -14,7 +14,7 @@ import { getState } from 'app/state';
 import { drawFrame } from 'app/utils/animations';
 import { directionMap } from 'app/utils/field';
 
-import { AreaInstance, AreaLayer, Frame, GameState, LayerTile } from 'app/types';
+import { AreaInstance, AreaLayer, AreaLayerDefinition, Frame, GameState, LayerTile } from 'app/types';
 
 const [darkCanvas, darkContext] = createCanvasAndContext(CANVAS_WIDTH / 2 + 4, CANVAS_HEIGHT / 2 + 4);
 let darkCanvasRadius: number;
@@ -46,26 +46,26 @@ export function updateDarkCanvas(radius: number): void {
 }
 // This is the max size of the s
 const [spiritCanvas, spiritContext] = createCanvasAndContext(MAX_SPIRIT_RADIUS * 2, MAX_SPIRIT_RADIUS * 2);
-document.body.append(spiritCanvas);
+/*document.body.append(spiritCanvas);
 spiritCanvas.style.position = 'absolute';
-spiritCanvas.style.top = '0';
-let spiritCanvasRadius: number;
+spiritCanvas.style.top = '0';*/
+//let spiritCanvasRadius: number;
 export function updateSpiritCanvas(state: GameState, radius: number): void {
-    if (radius === spiritCanvasRadius) {
-        return;
-    }
-    spiritCanvasRadius = radius;
+    //if (radius === spiritCanvasRadius) {
+    //    return;
+    //}
+    //spiritCanvasRadius = radius;
     const spiritAlpha = 0.2 + 0.8 * radius / MAX_SPIRIT_RADIUS;
     const x = spiritCanvas.width / 2;
     const y = spiritCanvas.height / 2
     spiritContext.save();
-        const area = state.areaInstance;
+        const area = state.alternateAreaInstance;
+        spiritContext.clearRect(0, 0, spiritCanvas.width, spiritCanvas.height);
         const gradient = spiritContext.createRadialGradient(x, y, 0, x, y, radius);
-        gradient.addColorStop(0.9, 'rgba(0, 0, 0, 1)');
+        gradient.addColorStop(0.7, 'rgba(0, 0, 0, 1)');
         gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
         spiritContext.fillStyle = 'white';
         spiritContext.globalAlpha = spiritAlpha;
-        spiritContext.clearRect(0, 0, spiritCanvas.width, spiritCanvas.height);
         spiritContext.fillStyle = gradient;
         spiritContext.beginPath();
         spiritContext.arc(x, y, radius, 0, 2 * Math.PI);
@@ -81,17 +81,28 @@ export function updateSpiritCanvas(state: GameState, radius: number): void {
         spiritContext.beginPath();
         spiritContext.arc(x, y, radius, 0, 2 * Math.PI);
         spiritContext.fill();*/
-        /*spiritContext.translate(
-            -state.camera.x + area.cameraOffset.x + spiritCanvas.width / 2,
-            -state.camera.y + area.cameraOffset.y - CANVAS_HEIGHT + spiritCanvas.height / 2
-        );*/
+        const xOffset = state.hero.x + state.hero.w / 2 - spiritCanvas.width / 2;
+        const yOffset = state.hero.y - spiritCanvas.height / 2;
+        spiritContext.translate(
+            -(state.hero.x + state.hero.w / 2 - state.camera.x - spiritCanvas.width / 2),
+            -(state.hero.y - state.camera.y - spiritCanvas.height / 2)
+        );
         spiritContext.globalAlpha = 1;
-        spiritContext.globalCompositeOperation = 'source-in';
+        spiritContext.globalCompositeOperation = 'source-atop';
         spiritContext.drawImage(
             area.canvas,
-            0, 0, spiritCanvas.width, spiritCanvas.height,
-            0, 0, spiritCanvas.width, spiritCanvas.height,
+            xOffset, yOffset, spiritCanvas.width, spiritCanvas.height,
+            (state.hero.x + state.hero.w / 2 - state.camera.x - spiritCanvas.width / 2),
+            (state.hero.y - state.camera.y - spiritCanvas.height / 2),
+            spiritCanvas.width, spiritCanvas.height,
         );
+        renderAreaObjectsBeforeHero(spiritContext, state, state.alternateAreaInstance);
+        spiritContext.save();
+            translateContextForAreaAndCamera(spiritContext, state, state.areaInstance);
+            renderHeroEyes(spiritContext, state, state.hero.activeClone || state.hero);
+        spiritContext.restore();
+
+        renderAreaObjectsAfterHero(spiritContext, state, state.alternateAreaInstance);
     spiritContext.restore();
 }
 
@@ -140,54 +151,42 @@ export function translateContextForAreaAndCamera(context: CanvasRenderingContext
     context.translate(-state.camera.x + area.cameraOffset.x, -state.camera.y + area.cameraOffset.y);
 }
 
+function checkToRedrawTiles(area: AreaInstance) {
+    if (editingState.isEditing) {
+        const {w, h} = area.palette;
+        for (let y = 0; y < area.h; y++) {
+            for (let x = 0; x < area.w; x++) {
+                if (!area.tilesDrawn?.[y]?.[x]) {
+                    area.context.clearRect(x * w, y * h, w, h);
+                }
+            }
+        }
+    }
+    area.layers.map((layer, index) => renderLayer(area, layer, area.definition.parentDefinition?.layers[index]));
+    for (let y = 0; y < area.h; y++) {
+        if (!area.tilesDrawn[y]) {
+            area.tilesDrawn[y] = [];
+        }
+        for (let x = 0; x < area.w; x++) {
+            area.tilesDrawn[y][x] = true;
+        }
+    }
+    area.checkToRedrawTiles = false;
+}
+
 export function renderField(context: CanvasRenderingContext2D, state: GameState): void {
     if (editingState.isEditing) {
         context.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     }
     // Update any background tiles that have changed.
     if (state.areaInstance.checkToRedrawTiles) {
-        if (editingState.isEditing) {
-            const {w, h} = state.areaInstance.palette;
-            for (let y = 0; y < state.areaInstance.h; y++) {
-                for (let x = 0; x < state.areaInstance.w; x++) {
-                    if (!state.areaInstance.tilesDrawn?.[y]?.[x]) {
-                        state.areaInstance.context.clearRect(x * w, y * h, w, h);
-                    }
-                }
-            }
-        }
-        state.areaInstance.layers.map(layer => renderLayer(state.areaInstance, layer));
-        for (let y = 0; y < state.areaInstance.h; y++) {
-            if (!state.areaInstance.tilesDrawn[y]) {
-                state.areaInstance.tilesDrawn[y] = [];
-            }
-            for (let x = 0; x < state.areaInstance.w; x++) {
-                state.areaInstance.tilesDrawn[y][x] = true;
-            }
-        }
-        state.areaInstance.checkToRedrawTiles = false;
+        checkToRedrawTiles(state.areaInstance);
+    }
+    if (state.hero.spiritRadius > 0 && state.alternateAreaInstance.checkToRedrawTiles) {
+        checkToRedrawTiles(state.alternateAreaInstance);
     }
     if (state.nextAreaInstance?.checkToRedrawTiles) {
-        if (editingState.isEditing) {
-            const {w, h} = state.nextAreaInstance.palette;
-            for (let y = 0; y < state.nextAreaInstance.h; y++) {
-                for (let x = 0; x < state.nextAreaInstance.w; x++) {
-                    if (!state.nextAreaInstance.tilesDrawn?.[y]?.[x]) {
-                        state.nextAreaInstance.context.clearRect(x * w, y * h, w, h);
-                    }
-                }
-            }
-        }
-        state.nextAreaInstance?.layers?.map(layer => renderLayer(state.nextAreaInstance, layer));
-        for (let y = 0; y < state.nextAreaInstance.h; y++) {
-            if (!state.nextAreaInstance.tilesDrawn[y]) {
-                state.nextAreaInstance.tilesDrawn[y] = [];
-            }
-            for (let x = 0; x < state.nextAreaInstance.w; x++) {
-                state.nextAreaInstance.tilesDrawn[y][x] = true;
-            }
-        }
-        state.nextAreaInstance.checkToRedrawTiles = false;
+        checkToRedrawTiles(state.nextAreaInstance);
     }
 
     const hero = state.hero.activeClone || state.hero;
@@ -195,6 +194,14 @@ export function renderField(context: CanvasRenderingContext2D, state: GameState)
     // Draw the field, enemies, objects and hero.
     renderAreaBackground(context, state, state.areaInstance);
     renderAreaBackground(context, state, state.nextAreaInstance);
+    renderAreaObjectsBeforeHero(context, state, state.areaInstance);
+    renderAreaObjectsBeforeHero(context, state, state.nextAreaInstance);
+    context.save();
+        translateContextForAreaAndCamera(context, state, state.areaInstance);
+        state.hero.render(context, state);
+    context.restore();
+    renderAreaObjectsAfterHero(context, state, state.areaInstance);
+    renderAreaObjectsAfterHero(context, state, state.nextAreaInstance);
     if (state.hero.spiritRadius > 0) {
         updateSpiritCanvas(state, state.hero.spiritRadius);
         context.drawImage(spiritCanvas,
@@ -206,23 +213,6 @@ export function renderField(context: CanvasRenderingContext2D, state: GameState)
             spiritCanvas.width, spiritCanvas.height
         );
     }
-    renderAreaObjectsBeforeHero(context, state, state.areaInstance);
-    renderAreaObjectsBeforeHero(context, state, state.nextAreaInstance);
-    context.save();
-        translateContextForAreaAndCamera(context, state, state.areaInstance);
-        state.hero.render(context, state);
-        /*if (state.hero.spiritRadius > 0) {
-            context.save()
-                context.beginPath();
-                context.globalAlpha = 0.7;
-                context.fillStyle = 'red';
-                context.arc(state.hero.x + 8, state.hero.y, state.hero.spiritRadius, 0, 2 * Math.PI);
-                context.fill();
-            context.restore();
-        }*/
-    context.restore();
-    renderAreaObjectsAfterHero(context, state, state.areaInstance);
-    renderAreaObjectsAfterHero(context, state, state.nextAreaInstance);
 
     // Render any editor specific graphics if appropriate.
     renderEditor(context, state);
@@ -338,7 +328,7 @@ export function getTileFrame(area: AreaInstance, tile: LayerTile): Frame {
     };
 }
 
-export function renderLayer(area: AreaInstance, layer: AreaLayer): void {
+export function renderLayer(area: AreaInstance, layer: AreaLayer, parentLayer: AreaLayerDefinition): void {
     const context = area.context;
     const palette = layer.palette;
     const { w, h } = palette;
@@ -360,7 +350,13 @@ export function renderLayer(area: AreaInstance, layer: AreaLayer): void {
             if (area.tilesDrawn[y][x]) {
                 continue;
             }
-            const tile = layer.tiles[y][x];
+            let tile = layer.tiles[y][x];
+            if (!tile) {
+                debugger;
+            }
+            /*if (!tile && parentLayer) {
+                tile = parentLayer.grid.tiles[y][x];
+            }*/
             const frame: Frame = {
                 ...baseFrame,
                 x: palette.source.x + tile.x * w,

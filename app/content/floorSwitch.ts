@@ -1,4 +1,9 @@
-import { changeObjectStatus, findObjectInstanceById } from 'app/content/objects';
+import {
+    changeObjectStatus,
+    checkIfAllSwitchesAreActivated,
+    deactivateTargets,
+    findObjectInstanceById,
+} from 'app/content/objects';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { rectanglesOverlap } from 'app/utils/index';
 
@@ -44,20 +49,25 @@ export class FloorSwitch implements ObjectInstance {
         } else {
             this.status = 'active';
         }
+        if (this.definition.toggleOnRelease && this.definition.targetObjectId) {
+            if (this.status === 'active') {
+                checkIfAllSwitchesAreActivated(state, this);
+            } else {
+                deactivateTargets(state, this.definition.targetObjectId);
+            }
+            return;
+        }
         // Don't apply the toggle effect on release unless toggleOnRelease is true.
         if (this.status === 'normal' && !this.definition.toggleOnRelease) {
             return;
         }
         if (this.definition.targetObjectId) {
-            const target = findObjectInstanceById(state.areaInstance, this.definition.targetObjectId);
-            if (!target) {
-                return;
-            }
-            this.toggleTargetStatus(state, target);
-            return;
-        }
-        for (const object of state.areaInstance.objects) {
+            const object = findObjectInstanceById(state.areaInstance, this.definition.targetObjectId);
             this.toggleTargetStatus(state, object);
+        } else {
+            for (const object of state.areaInstance.objects) {
+                this.toggleTargetStatus(state, object);
+            }
         }
     }
     toggleTargetStatus(state: GameState, target: ObjectInstance): void {

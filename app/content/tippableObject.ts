@@ -4,7 +4,7 @@ import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { directionMap, isPointOpen } from 'app/utils/field';
 
 import {
-    Direction, DrawPriority, Frame, FrameAnimation, GameState,
+    AreaInstance, Direction, DrawPriority, Frame, FrameAnimation, GameState,
     BaseObjectDefinition, ObjectInstance, ObjectStatus, ShortRectangle,
 } from 'app/types';
 
@@ -17,6 +17,7 @@ const fallingAnimation: FrameAnimation = createAnimation('gfx/tiles/tippablepot.
 );
 
 export class TippableObject implements ObjectInstance {
+    area: AreaInstance;
     alwaysReset = true;
     behaviors = {
         solid: true,
@@ -27,6 +28,8 @@ export class TippableObject implements ObjectInstance {
     y: number;
     fallFrame = 0;
     fallDirection: Direction;
+    grabDirection: Direction;
+    pullingHeroDirection: Direction;
     pushCounter: number = 0;
     pushedLastFrame: boolean = false;
     status: ObjectStatus = 'normal';
@@ -40,8 +43,16 @@ export class TippableObject implements ObjectInstance {
     getHitbox(state: GameState): ShortRectangle {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
+    onGrab(state: GameState, direction: Direction): void {
+        this.grabDirection = direction;
+    }
     onHit(state: GameState, direction: Direction): void {
         if (!this.fallDirection) {
+            this.fallInDirection(state, direction);
+        }
+    }
+    onPull(state: GameState, direction: Direction): void {
+        if (!this.fallDirection && this.grabDirection === direction) {
             this.fallInDirection(state, direction);
         }
     }
@@ -57,9 +68,10 @@ export class TippableObject implements ObjectInstance {
     fallInDirection(state: GameState, direction: Direction): void {
         const x = this.x + 8 + 16 * directionMap[direction][0];
         const y = this.y + 8 + 16 * directionMap[direction][1];
-        if (isPointOpen(state, {x, y})) {
+        if (isPointOpen(state, this.area, {x, y})) {
             this.fallDirection = direction;
             this.animationTime = -80;
+            this.pullingHeroDirection = direction;
         }
     }
     update(state: GameState) {
@@ -72,6 +84,12 @@ export class TippableObject implements ObjectInstance {
             }
             if (!this.shattered && this.animationTime >= (fallingAnimation.frames.length - 1) * FRAME_LENGTH * fallingAnimation.frameDuration) {
                 this.shattered = true;
+                this.pullingHeroDirection = null;
+                const hero = state.hero.activeClone || state.hero;
+                if (hero.grabObject === this) {
+                    hero.grabObject = null;
+                    hero.action = null;
+                }
                 this.drawPriority = 'background';
                 addParticleAnimations(state, this.x, this.y, 2, particleFrames);
             }

@@ -102,6 +102,8 @@ export class LootDropObject extends LootObject {
 const [/*smallPeach*/, fullPeachFrame, /*threeQuartersPeach*/, /*halfPeach*/, /*quarterPeach*/, peachPieceFrame] =
     createAnimation('gfx/hud/peaches.png', {w: 18, h: 18}, {cols: 3, rows: 2}).frames;
 
+const [weaponFrame] = createAnimation('gfx/chakram1.png', {w: 16, h: 16}, {x: 9}).frames;
+
 const smallPeachFrame = {image: requireImage('gfx/hud/peaches.png'), x: 4, y: 3, w: 12, h: 12 };
 
 const [chestClosedFrame, chestOpenedFrame] = createAnimation('gfx/tiles/chest.png',
@@ -190,7 +192,7 @@ export const lootFrames: Partial<{[key in LootType]: Frame}> = {
     peachOfImmortality: fullPeachFrame,
     peachOfImmortalityPiece: peachPieceFrame,
     unknown: createLootFrame('black', '?'),
-    weapon: createLootFrame('red', 'W'),
+    weapon: weaponFrame,
 }
 
 export function applyUpgrade(currentLevel: number, loot: LootObjectDefinition): number {

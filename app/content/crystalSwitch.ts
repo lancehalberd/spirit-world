@@ -1,7 +1,6 @@
 import {
-    changeObjectStatus,
     checkIfAllSwitchesAreActivated,
-    findObjectInstanceById,
+    deactivateTargets,
 } from 'app/content/objects';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
@@ -53,18 +52,7 @@ export class CrystalSwitch implements ObjectInstance {
             this.timeLeft -= FRAME_LENGTH;
             if (this.timeLeft <= 0) {
                 this.status = 'normal';
-                if (this.definition.targetObjectId) {
-                    const target = findObjectInstanceById(state.areaInstance, this.definition.targetObjectId);
-                    if (target && target.definition.status === 'closedSwitch') {
-                        changeObjectStatus(state, target, 'closedSwitch');
-                    }
-                    return;
-                }
-                for (const object of state.areaInstance.objects) {
-                    if (object.definition?.status === 'closedSwitch') {
-                        changeObjectStatus(state, object, 'closedSwitch');
-                    }
-                }
+                deactivateTargets(state, this.definition.targetObjectId);
             }
         }
     }

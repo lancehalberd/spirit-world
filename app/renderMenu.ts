@@ -23,7 +23,7 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
     fillRect(context, r, 'white');
     fillRect(context, pad(r, -2), 'black');
 
-    r = pad(r, -4);
+    r = pad(r, -10);
 
 
     let x = r.x, y = r.y;

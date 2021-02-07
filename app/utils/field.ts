@@ -1,6 +1,6 @@
 import { isPixelInShortRect } from 'app/utils/index';
 
-import { Direction, GameState, ObjectInstance, Tile, TileBehaviors } from 'app/types';
+import { AreaInstance, Direction, GameState, ObjectInstance, Tile, TileBehaviors } from 'app/types';
 
 export const directionMap = {
     up: [0, -1],
@@ -16,14 +16,14 @@ export function getDirection(dx: number, dy: number): Direction {
     return dy < 0 ? 'up' : 'down';
 }
 
-export function isPointOpen(state: GameState, {x, y}: {x: number, y: number}): boolean {
+export function isPointOpen(state: GameState, area: AreaInstance, {x, y}: {x: number, y: number}, ): boolean {
     const tx = Math.floor(x / 16);
     const ty = Math.floor(y / 16);
     if (tx < state.areaSection.x || tx >= state.areaSection.x + state.areaSection.w
         || ty < state.areaSection.y || ty >= state.areaSection.y + state.areaSection.h) {
         return false;
     }
-    const tileBehavior = state.areaInstance?.behaviorGrid[ty]?.[tx];
+    const tileBehavior = area?.behaviorGrid[ty]?.[tx];
     if (tileBehavior?.solid) {
         return false;
     }
@@ -38,7 +38,7 @@ export function isPointOpen(state: GameState, {x, y}: {x: number, y: number}): b
     } else if (tileBehavior?.solid) {
         return false;
     }
-    for (const object of state.areaInstance.objects) {
+    for (const object of area.objects) {
         if (object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
             continue;
         }
@@ -51,11 +51,11 @@ export function isPointOpen(state: GameState, {x, y}: {x: number, y: number}): b
     return true;
 }
 
-export function getTileBehaviorsAndObstacles(state: GameState, {x, y}: Tile): {tileBehavior: TileBehaviors, objects: ObjectInstance[]} {
+export function getTileBehaviorsAndObstacles(state: GameState, area: AreaInstance, {x, y}: Tile): {tileBehavior: TileBehaviors, objects: ObjectInstance[]} {
     const objects: ObjectInstance[] = [];
     const tx = Math.floor(x / 16);
     const ty = Math.floor(y / 16);
-    const tileBehavior = {...(state.areaInstance?.behaviorGrid[ty]?.[tx] || {})};
+    const tileBehavior = {...(area?.behaviorGrid[ty]?.[tx] || {})};
 
     if (tx < state.areaSection.x || tx >= state.areaSection.x + state.areaSection.w
         || ty < state.areaSection.y || ty >= state.areaSection.y + state.areaSection.h) {
@@ -68,7 +68,7 @@ export function getTileBehaviorsAndObstacles(state: GameState, {x, y}: Tile): {t
         // console.log(tileBehavior.solidMap, y, x, sy, sx, tileBehavior.solidMap[sy] >> (15 - sx));
         tileBehavior.solid = !!(tileBehavior.solidMap[sy] >> (15 - sx) & 1);
     }
-    for (const object of state.areaInstance.objects) {
+    for (const object of area.objects) {
         if (object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
             continue;
         }

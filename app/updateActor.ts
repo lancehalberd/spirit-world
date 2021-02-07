@@ -113,7 +113,7 @@ export function updateHero(this: void, state: GameState) {
                 // There is special logic for pushing in the direction the hero is facing since we expect that
                 // direction to be blocked by the object they are grabbing.
                 if ((direction === hero.d && (hero.x === hero.grabObject.x || hero.y === hero.grabObject.y))
-                    || points.every(x => points.every(y => isPointOpen(state,
+                    || points.every(x => points.every(y => isPointOpen(state, hero.area,
                         {x: hero.x + x + 16 * directionMap[direction][0], y: hero.y + y + 16 * directionMap[direction][1] }
                     )))
                 ) {
@@ -168,19 +168,21 @@ export function updateHero(this: void, state: GameState) {
     } else if (hero.action === 'attack') {
         movementSpeed = 1;
         hero.actionFrame++;
-        if (hero.actionFrame === 1) {
-            const m = Math.sqrt(hero.actionDx * hero.actionDx + hero.actionDy * hero.actionDy);
+        if (hero.actionFrame === 6) {
+            // const m = Math.sqrt(hero.actionDx * hero.actionDx + hero.actionDy * hero.actionDy);
             const chakram = new ThrownChakram({
                 x: hero.x + 3,
                 y: hero.y,
-                vx: 4 * (m ? hero.actionDx / m : directionMap[hero.d][0]) + hero.actionDx,
-                vy: 4 * (m ? hero.actionDy / m : directionMap[hero.d][1]) + hero.actionDy,
+                //vx: 4 * (m ? hero.actionDx / m : directionMap[hero.d][0]) + hero.actionDx,
+                //vy: 4 * (m ? hero.actionDy / m : directionMap[hero.d][1]) + hero.actionDy,
+                vx: 5 * directionMap[hero.d][0],
+                vy: 5 * directionMap[hero.d][1],
                 returnSpeed: 4,
                 source: hero,
             });
             addObjectToArea(state, state.areaInstance, chakram);
         }
-        if (hero.actionFrame > 2) {
+        if (hero.actionFrame > 12) {
             hero.action = null;
             hero.actionDx = 0;
             hero.actionDy = 0;
@@ -204,14 +206,16 @@ export function updateHero(this: void, state: GameState) {
             const m = Math.sqrt(dx * dx + dy * dy);
             dx = movementSpeed * dx / m;
             dy = movementSpeed * dy / m;
-            if (dx < 0 && (hero.d === 'right' || Math.abs(dx) > Math.abs(dy))) {
-                hero.d = 'left';
-            } else if (dx > 0 && (hero.d === 'left' || Math.abs(dx) > Math.abs(dy))) {
-                hero.d = 'right';
-            } else if (dy < 0 && (hero.d === 'down' || Math.abs(dy) > Math.abs(dx))) {
-                hero.d = 'up';
-            } else if (dy > 0 && (hero.d === 'up' || Math.abs(dy) > Math.abs(dx))) {
-                hero.d = 'down';
+            if (hero.action !== 'attack') {
+                if (dx < 0 && (hero.d === 'right' || Math.abs(dx) > Math.abs(dy))) {
+                    hero.d = 'left';
+                } else if (dx > 0 && (hero.d === 'left' || Math.abs(dx) > Math.abs(dy))) {
+                    hero.d = 'right';
+                } else if (dy < 0 && (hero.d === 'down' || Math.abs(dy) > Math.abs(dx))) {
+                    hero.d = 'up';
+                } else if (dy > 0 && (hero.d === 'up' || Math.abs(dy) > Math.abs(dx))) {
+                    hero.d = 'down';
+                }
             }
         }
     }
@@ -237,6 +241,7 @@ export function updateHero(this: void, state: GameState) {
         const thrownChakrams = state.areaInstance.objects.filter(o => o instanceof ThrownChakram);
         if (state.hero.weapon - thrownChakrams.length > 0) {
             hero.action = 'attack';
+            hero.animationTime = 0;
             hero.actionDx = dx;
             hero.actionDy = dy;
             hero.actionFrame = 0;
@@ -303,7 +308,7 @@ export function updateHero(this: void, state: GameState) {
                 for (const layer of state.areaInstance.layers) {
                     const palette = layer.palette;
                     const tile = {
-                        ...layer.definition.grid.tiles[closestLiftableTile.y][closestLiftableTile.x],
+                        ...layer.tiles[closestLiftableTile.y][closestLiftableTile.x],
                         layerKey: layer.key,
                     };
                     const behavior = palette.behaviors[`${tile.x}x${tile.y}`];
@@ -335,6 +340,7 @@ export function updateHero(this: void, state: GameState) {
         } else {
             if (hero.passiveTools.spiritSight > 0) {
                 hero.action = 'meditating';
+                hero.d = 'down';
                 hero.actionFrame = 0;
                 hero.spiritRadius = 0;
             }
@@ -414,6 +420,8 @@ export function updateHero(this: void, state: GameState) {
     if (state.hero.magic > state.hero.maxMagic) {
         state.hero.magic = state.hero.maxMagic;
     }
+    state.location.x = state.hero.x;
+    state.location.y = state.hero.y;
 }
 
 export function checkForEnemyDamage(state: GameState, hero: Hero) {

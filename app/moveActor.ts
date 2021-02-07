@@ -100,7 +100,7 @@ function moveActorInDirection(
     let blockedByObject = false;
     let pushedObjects = [];
     for (const point of checkPoints) {
-        const { tileBehavior, objects} = getTileBehaviorsAndObstacles(state, point);
+        const { tileBehavior, objects} = getTileBehaviorsAndObstacles(state, actor.area, point);
         if (tileBehavior?.solid && tileBehavior?.damage > 0) {
             damageActor(state, actor, tileBehavior.damage);
         }
@@ -150,7 +150,7 @@ function moveActorInDirection(
             for (let l = ax - 1; l >= ax - 8; l--) {
                 let open = true;
                 for (let x = l; x < l + actor.w; x += 8) {
-                    if (!isPointOpen(state, {x, y})) {
+                    if (!isPointOpen(state, actor.area, {x, y})) {
                         open = false;
                         break;
                     }
@@ -164,7 +164,7 @@ function moveActorInDirection(
             for (let l = ax + 1; l <= ax + 8; l++) {
                 let open = true;
                 for (let x = l; x < l + actor.w; x += 8) {
-                    if (!isPointOpen(state, {x, y})) {
+                    if (!isPointOpen(state, actor.area, {x, y})) {
                         open = false;
                         break;
                     }
@@ -178,7 +178,7 @@ function moveActorInDirection(
             for (let t = ay - 1; t >= ay - 8; t--) {
                 let open = true;
                 for (let y = t; y < t + actor.h; y += 8) {
-                    if (!isPointOpen(state, {x, y})) {
+                    if (!isPointOpen(state, actor.area, {x, y})) {
                         open = false;
                         break;
                     }
@@ -192,7 +192,7 @@ function moveActorInDirection(
             for (let t = ay + 1; t <= ay + 8; t++) {
                 let open = true;
                 for (let y = t; y < t + actor.h; y += 8) {
-                    if (!isPointOpen(state, {x, y})) {
+                    if (!isPointOpen(state, actor.area, {x, y})) {
                         open = false;
                         break;
                     }
@@ -238,7 +238,7 @@ function moveActorInDirection(
     return true;
 }
 export function checkForFloorDamage(state: GameState, hero: Hero) {
-    const palette = state.areaInstance.palette;
+    const palette = hero.area.palette;
     const tileSize = palette.w;
 
     let leftColumn = Math.floor((hero.x + 4) / tileSize);
@@ -246,7 +246,7 @@ export function checkForFloorDamage(state: GameState, hero: Hero) {
     let topRow = Math.floor((hero.y + 4) / tileSize);
     let bottomRow = Math.floor((hero.y + hero.h - 5) / tileSize);
 
-    const behaviorGrid = state.areaInstance.behaviorGrid;
+    const behaviorGrid = hero.area.behaviorGrid;
     let fallingLeft = false, fallingRight = false, fallingUp = false, fallingDown = false;
     for (let row = topRow; row <= bottomRow; row++) {
         for (let column = leftColumn; column <= rightColumn; column++) {

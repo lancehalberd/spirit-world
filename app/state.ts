@@ -98,6 +98,7 @@ export function getDefaultSavedState(): SavedState {
 
 function getDefaultHeroState(): Hero {
     return {
+        area: null,
         x: 150, y: 445, z: 0,
         safeD: 'down', safeX: 150, safeY: 445,
         vx: 0, vy: 0, vz: 0,

@@ -1,21 +1,17 @@
 import { addParticleAnimations } from 'app/content/animationEffect';
 import { destroyTile, getAreaSize, removeObjectFromArea } from 'app/content/areas';
 import { Enemy } from 'app/content/enemy';
-import { createCanvasAndContext } from 'app/dom';
+import { FRAME_LENGTH } from 'app/gameConstants';
 import { getTilesInRectangle } from 'app/getActorTargets';
 import { damageActor } from 'app/updateActor';
-import { drawFrame } from 'app/utils/animations';
+import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { getDirection } from 'app/utils/field';
 import { isPointInShortRect, rectanglesOverlap } from 'app/utils/index';
 
-import { Frame, GameState, Hero, ObjectInstance, ObjectStatus } from 'app/types';
+import { DrawPriority, Frame, GameState, Hero, ObjectInstance, ObjectStatus } from 'app/types';
 
-const CHAKRAM_RADIUS = 6;
-const [chakramCanvas, chakramContext] = createCanvasAndContext(2 * CHAKRAM_RADIUS, 2 * CHAKRAM_RADIUS);
-chakramContext.fillStyle = 'orange';
-chakramContext.arc(CHAKRAM_RADIUS, CHAKRAM_RADIUS, CHAKRAM_RADIUS, 0, 2 * Math.PI);
-chakramContext.fill();
-const chakramFrame = {image: chakramCanvas, x: 0, y: 0, w: chakramCanvas.width, h: chakramCanvas.height};
+const chakramGeometry = {w: 16, h: 16, content: {x: 2, y: 2, w: 12, h: 12}};
+const chakramAnimation = createAnimation('gfx/chakram1.png', chakramGeometry, {cols: 4, x: 0, duration: 2}, {loopFrame: 1});
 
 interface Props {
     x?: number
@@ -29,6 +25,7 @@ interface Props {
 
 export class ThrownChakram implements ObjectInstance {
     definition = null;
+    drawPriority: DrawPriority = 'sprites';
     type = 'thrownChakram' as 'thrownChakram';
     frame: Frame;
     outFrames: number;
@@ -44,8 +41,8 @@ export class ThrownChakram implements ObjectInstance {
     hitTargets: Set<any>;
     status: ObjectStatus = 'normal';
     source: Hero;
+    animationTime = 0;
     constructor({x = 0, y = 0, vx = 0, vy = 0, damage = 1, returnSpeed = 4, source}: Props) {
-        this.frame = chakramFrame;
         this.x = x;
         this.y = y;
         this.vx = vx;
@@ -53,9 +50,9 @@ export class ThrownChakram implements ObjectInstance {
         this.damage = damage;
         this.speed = Math.sqrt(vx * vx + vy * vy);
         this.returnSpeed = returnSpeed;
-        this.w = this.frame.w;
-        this.h = this.frame.h
-        this.outFrames = 10;
+        this.w = chakramGeometry.content.w;
+        this.h = chakramGeometry.content.h;
+        this.outFrames = 12;
         this.hitTargets = new Set();
         this.source = source;
     }
@@ -64,6 +61,7 @@ export class ThrownChakram implements ObjectInstance {
         if (state.areaInstance.objects.indexOf(this.source) < 0) {
             this.source = state.hero;
         }
+        this.animationTime += FRAME_LENGTH;
         if (this.outFrames > 0) {
             this.x += this.vx;
             this.y += this.vy;
@@ -118,7 +116,7 @@ export class ThrownChakram implements ObjectInstance {
                 // We need to find the specific cuttable layers that can be destroyed.
                 for (const layer of state.areaInstance.layers) {
                     const palette = layer.palette;
-                    const tile = layer.definition.grid.tiles[target.y][target.x];
+                    const tile = layer.tiles[target.y][target.x];
                     const behavior = palette.behaviors[`${tile.x}x${tile.y}`];
                     if (behavior?.cuttable <= state.hero.weapon) {
                         destroyTile(state, {...target, layerKey: layer.key});
@@ -131,6 +129,7 @@ export class ThrownChakram implements ObjectInstance {
         }
     }
     render(context, state: GameState) {
-        drawFrame(context, this.frame, { ...this.frame, x: this.x, y: this.y });
+        const frame = getFrame(chakramAnimation, this.animationTime);
+        drawFrame(context, frame, { ...frame, x: this.x - frame.content.x, y: this.y - frame.content.y });
     }
 }
