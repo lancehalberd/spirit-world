@@ -17,7 +17,12 @@ import { rectanglesOverlap } from 'app/utils/index';
 
 import { Actor, GameState, Hero, ObjectInstance, ThrownChakram, ThrownObject, Tile } from 'app/types';
 
-const rollSpeed = [5, 5, 5, 4, 4, 4, 4, 3, 3, 3, 2, 2];
+const rollSpeed = [
+    5, 5, 5, 5,
+    4, 4, 4, 4,
+    3, 3, 3, 3,
+    2, 2, 2, 2,
+];
 
 export function updateHero(this: void, state: GameState) {
     const area = state.areaInstance;
@@ -194,8 +199,8 @@ export function updateHero(this: void, state: GameState) {
         hero.actionFrame++;
         if (hero.actionFrame >= rollSpeed.length) {
             hero.action = null;
+            hero.animationTime = 0;
         }
-        hero.animationTime += FRAME_LENGTH;
     }
     if (hero.action === 'pushing') {
         hero.animationTime -= 3 * FRAME_LENGTH / 4;
@@ -330,6 +335,7 @@ export function updateHero(this: void, state: GameState) {
                     state.hero.magic -= 5;
                     hero.action = 'roll';
                     hero.actionFrame = 0;
+                    hero.animationTime = 0;
                 } else {
                     // Hack to freeze player for a moment
                     hero.action = 'getItem';

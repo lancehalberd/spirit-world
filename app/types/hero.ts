@@ -35,6 +35,7 @@ export interface ActorAnimations {
     attack?: AnimationSet,
     hurt?: AnimationSet,
     death?: AnimationSet,
+    roll?: AnimationSet,
 }
 
 export interface Actor {

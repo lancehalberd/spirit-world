@@ -23,6 +23,12 @@ const attackDownAnimation: FrameAnimation = createAnimation('gfx/mcchakramthrow.
 const attackLeftAnimation: FrameAnimation = createAnimation('gfx/mcchakramthrow.png', attackingGeometry, { cols: 4, x: 1, y: 3, duration: 3}, {loop: false});
 const attackRightAnimation: FrameAnimation = createAnimation('gfx/mcchakramthrow.png', attackingGeometry, { cols: 4, x: 1, y: 1, duration: 3}, {loop: false});
 
+const rollGeometry: FrameDimensions = {w: 20, h: 28, content: {x: 2, y: 16, w: 16, h: 16}};
+const rollUpAnimation: FrameAnimation = createAnimation('gfx/mcroll.png', rollGeometry, { cols: 4, x: 1, y: 2, duration: 4}, {loop: false});
+const rollDownAnimation: FrameAnimation = createAnimation('gfx/mcroll.png', rollGeometry, { cols: 4, x: 1, y: 0, duration: 4}, {loop: false});
+const rollLeftAnimation: FrameAnimation = createAnimation('gfx/mcroll.png', rollGeometry, { cols: 4, x: 1, y: 3, duration: 4}, {loop: false});
+const rollRightAnimation: FrameAnimation = createAnimation('gfx/mcroll.png', rollGeometry, { cols: 4, x: 1, y: 1, duration: 4}, {loop: false});
+
 
 
 export const heroAnimations: ActorAnimations = {
@@ -44,6 +50,12 @@ export const heroAnimations: ActorAnimations = {
         left: attackLeftAnimation,
         right: attackRightAnimation,
     },
+    roll: {
+        up: rollUpAnimation,
+        down: rollDownAnimation,
+        left: rollLeftAnimation,
+        right: rollRightAnimation,
+    }
 };
 
 
@@ -56,8 +68,10 @@ function getHeroFrame(state: GameState, hero: Hero): Frame {
             return getFrame(heroAnimations.idle.down, hero.animationTime);
         case 'walking':
         case 'pushing':
-        case 'roll':
             animations = heroAnimations.move;
+            break;
+        case 'roll':
+            animations = heroAnimations.roll;
             break;
         case 'attack':
             animations = heroAnimations.attack;
@@ -81,9 +95,7 @@ export function renderHero(this: Hero, context: CanvasRenderingContext2D, state:
         } else if (hero.invulnerableFrames) {
             context.globalAlpha = 0.7 + 0.3 * Math.cos(2 * Math.PI * hero.invulnerableFrames * 3 / 50);
         }
-        if (hero.action === 'roll' && hero.actionFrame) {
-            drawFrame(context, frame, { x: hero.x - frame.content.x, y: hero.y - frame.content.y - 2 - hero.z, w: frame.w, h: frame.h });
-        } else if (hero.action === 'falling') {
+        if (hero.action === 'falling') {
             const fallingFrame = {...frame, h: frame.h - hero.actionFrame * 2};
             drawFrame(context, fallingFrame, {
                 x: hero.x - frame.content.x,

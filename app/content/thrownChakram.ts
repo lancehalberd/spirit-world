@@ -11,7 +11,7 @@ import { isPointInShortRect, rectanglesOverlap } from 'app/utils/index';
 import { DrawPriority, Frame, GameState, Hero, ObjectInstance, ObjectStatus } from 'app/types';
 
 const chakramGeometry = {w: 16, h: 16, content: {x: 2, y: 2, w: 12, h: 12}};
-const chakramAnimation = createAnimation('gfx/chakram1.png', chakramGeometry, {cols: 4, x: 0, duration: 2}, {loopFrame: 1});
+const chakramAnimation = createAnimation('gfx/chakram1.png', chakramGeometry, {cols: 9, x: 0, duration: 2}, {loopFrame: 1});
 
 interface Props {
     x?: number
