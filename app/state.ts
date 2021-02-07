@@ -23,6 +23,7 @@ export function saveGame(): void {
     // sanitize hero object before saving it.
     delete hero.activeClone;
     delete hero.render;
+    delete hero.area;
     hero.clones = [];
     state.savedState.hero = hero;
     state.savedGames[state.savedGameIndex] = state.savedState;
