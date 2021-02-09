@@ -36,14 +36,17 @@ const bushBehavior: TileBehaviors = {
     solid: true, pickupWeight: 0, cuttable: 1, lootChance: 0.5, lootTypes: ['peach'],
     underTile: {x: 5, y: 1},
     particles: bushParticles,
+    linked: true,
 };
 const lightStoneBehavior: TileBehaviors = {
     low: true, solid: true, pickupWeight: 1, lootChance: 0.2, lootTypes: ['peach'],
     particles: lightStoneParticles,
+    linked: true,
 };
 const heavyStoneBehavior: TileBehaviors = {
     low: true, solid: true, pickupWeight: 1, lootChance: 0.2, lootTypes: ['peach'],
     particles: heavyStoneParticles,
+    linked: true,
 };
 // const wallBehavior: TileBehaviors = { solid: true };
 const lowWallBehavior: TileBehaviors = { low: true, solid: true };

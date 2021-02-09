@@ -1,5 +1,5 @@
 import {
-    createAreaInstance, getAreaFromLocation, getAreaSize,
+    createAreaInstance, getAreaFromLocation, getAreaSize, linkObjects,
     setAreaSection, switchToNextAreaSection,
 } from 'app/content/areas';
 import { displayTileEditorPropertyPanel, editingState } from 'app/development/tileEditor';
@@ -45,6 +45,9 @@ export function updateCamera(state: GameState, speed = cameraSpeed): void {
             state.nextAreaInstance = null;
             const alternateArea = getAreaFromLocation({...state.location, isSpiritWorld: !state.location.isSpiritWorld});
             state.alternateAreaInstance = createAreaInstance(state, alternateArea);
+            state.areaInstance.alternateArea = state.alternateAreaInstance;
+            state.alternateAreaInstance.alternateArea = state.areaInstance;
+            linkObjects(state);
             setAreaSection(state, state.hero.d);
             state.hero.area = state.areaInstance;
             if (editingState.isEditing) {

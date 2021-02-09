@@ -10,7 +10,7 @@ import { getState } from 'app/state';
 import { ifdefor, isPointInShortRect } from 'app/utils/index';
 
 import {
-    AreaInstance, BallGoalDefinition, CrystalSwitchDefinition, FloorSwitchDefinition,
+    AreaDefinition, AreaInstance, BallGoalDefinition, CrystalSwitchDefinition, FloorSwitchDefinition,
     FrameDimensions, Direction, EnemyType, GameState,
     LootType, MagicElement, ObjectDefinition, ObjectStatus, ObjectType, PanelRows,
     Zone, ZoneLocation,
@@ -49,8 +49,8 @@ function createObjectDefinition(
     const y = definition.y || 0;
     const commonProps = {
         id: definition.id || uniqueId(state, definition.type),
-        linked: definition.linked || editingState.linked,
-        spirit: definition.spirit || editingState.spirit,
+        linked: ifdefor(definition.linked, editingState.linked),
+        spirit: ifdefor(definition.spirit, editingState.spirit),
         status: 'normal' as ObjectStatus,
         x,
         y,
@@ -101,7 +101,7 @@ function createObjectDefinition(
             return {
                 ...commonProps,
                 type: definition.type,
-                targetZone: definition.targetZone || editingState.entranceTargetZone,
+                targetZone: ifdefor(definition.targetZone, editingState.entranceTargetZone) || 'none',
                 targetObjectId: definition.targetObjectId || editingState.entranceTargetObjectId,
 
             };
@@ -140,19 +140,28 @@ function getTargetObjectIdsByTypes(zone: Zone, types: ObjectType[]): string[] {
     for (const floor of zone.floors) {
         for (const row of floor.grid) {
             for (const area of row) {
-                if (!area) {
-                    continue;
-                }
-                combinedObjectIds.push(area.objects.filter(object => types.includes(object.type)).map(object => object.id));
+                combinedObjectIds.push(getTargetObjectIdsByTypesAndArea(area, types));
+            }
+        }
+        for (const row of floor.spiritGrid) {
+            for (const area of row) {
+                combinedObjectIds.push(getTargetObjectIdsByTypesAndArea(area, types));
             }
         }
     }
     return _.flatten(combinedObjectIds);
 }
 
+function getTargetObjectIdsByTypesAndArea(area: AreaDefinition, types: ObjectType[]): string[] {
+    if (!area) {
+        return [];
+    }
+    return area.objects.filter(object => types.includes(object.type)).map(object => object.id);
+}
+
 export function getSwitchTargetProperties(state: GameState, editingState: EditingState, object: BallGoalDefinition | CrystalSwitchDefinition | FloorSwitchDefinition ): PanelRows {
     const rows: PanelRows = [];
-    const objectIds = ['all', ...getTargetObjectIdsByTypes(state.zone, ['door', 'chest', 'loot'])];
+    const objectIds = ['all', ...getTargetObjectIdsByTypesAndArea(state.areaInstance.definition, ['door', 'chest', 'loot'])];
     if (!editingState.entranceTargetObjectId || objectIds.indexOf(editingState.entranceTargetObjectId) < 0) {
         editingState.switchTargetObjectId = null;
     }
@@ -197,7 +206,7 @@ export function getObjectTypeProperties(state: GameState, editingState: EditingS
     });
     rows.push([{
         name: 'spirit',
-        value: object.spirit || editingState.spirit,
+        value: ifdefor(object.spirit, editingState.spirit),
         onChange(spirit: boolean) {
             if (object.id) {
                 object.spirit = spirit;
@@ -208,7 +217,7 @@ export function getObjectTypeProperties(state: GameState, editingState: EditingS
         },
     }, {
         name: 'linked',
-        value: object.linked || editingState.linked,
+        value: ifdefor(object.linked, editingState.linked),
         onChange(linked: boolean) {
             if (object.id) {
                 object.linked = linked;
@@ -506,12 +515,27 @@ export function fixObjectPosition(state: GameState, object: ObjectDefinition): v
 
 export function onMouseMoveSelect(state: GameState, editingState: EditingState, x: number, y: number): void {
     if (editingState.selectedObject) {
+        const linkedDefinition = getLinkedDefinition(state.alternateAreaInstance.definition, editingState.selectedObject);
+        const oldX = editingState.selectedObject.x, oldY = editingState.selectedObject.y;
         editingState.selectedObject.x = Math.round(x + editingState.dragOffset.x);
         editingState.selectedObject.y = Math.round(y + editingState.dragOffset.y);
         fixObjectPosition(state, editingState.selectedObject);
-        updateObjectInstance(getState(), editingState.selectedObject);
+        if (oldX !== editingState.selectedObject.x || oldY !== editingState.selectedObject.y) {
+            if (linkedDefinition) {
+                console.log("Updating linked definition");
+                linkedDefinition.x = editingState.selectedObject.x;
+                linkedDefinition.y = editingState.selectedObject.y;
+                console.log(linkedDefinition);
+                updateObjectInstance(state, linkedDefinition, state.alternateAreaInstance);
+            }
+            updateObjectInstance(state, editingState.selectedObject);
+        }
         return;
     }
+}
+
+function getLinkedDefinition(alternateArea: AreaDefinition, object: ObjectDefinition): ObjectDefinition {
+    return alternateArea.objects.find(o => o.x === object.x && o.y === object.y && o.type === object.type);
 }
 
 export function uniqueId(state: GameState, prefix: string, location: ZoneLocation = null) {
@@ -579,12 +603,12 @@ export function isPointInObject(x: number, y: number, object: ObjectDefinition):
 }
 
 function checkToAddLinkedObject(state: GameState, definition: ObjectDefinition): void {
-    const linkedInstance = state.alternateAreaInstance.objects.find(({definition}) =>
-        definition.x === definition.x && definition.y === definition.y
+    const linkedInstance = state.alternateAreaInstance.objects.find(other =>
+        definition.x === other.definition.x && definition.y === other.definition.y
     );
     if (linkedInstance) {
-        console.log('Updating linked instance');
         updateObjectInstance(state, {...linkedInstance.definition, linked: definition.linked}, state.alternateAreaInstance);
+        return;
     }
     if (!definition.linked) {
         return;
@@ -595,11 +619,10 @@ function checkToAddLinkedObject(state: GameState, definition: ObjectDefinition):
         id: uniqueId(state, definition.type, alternateLocation),
         linked: true, spirit: !definition.spirit
     };
-    console.log('Adding alternate object')
     updateObjectInstance(state, alternateObject, state.alternateAreaInstance);
     // Make sure to update the object links when we replace object instances.
     const instance = state.areaInstance.objects.find(o => o.definition.id === definition.id);
-    linkObject(instance, state.alternateAreaInstance);
+    linkObject(instance);
 }
 
 export function updateObjectInstance(state: GameState, object: ObjectDefinition, area: AreaInstance = null): void {
@@ -617,12 +640,13 @@ export function updateObjectInstance(state: GameState, object: ObjectDefinition,
     if (index < 0) {
         addObjectToArea(state, area, newObject);
     } else {
-        removeObjectFromArea(state, area, area.objects[index]);
+        removeObjectFromArea(state, area.objects[index]);
         addObjectToArea(state, area, newObject);
     }
     if (area === state.areaInstance && state.alternateAreaInstance) {
         checkToAddLinkedObject(state, object);
     }
+    linkObject(newObject);
 }
 
 export function deleteObject(state: GameState, object: ObjectDefinition): void {
@@ -633,7 +657,7 @@ export function deleteObject(state: GameState, object: ObjectDefinition): void {
     // Remove the associated ObjectInstance if one exists.
     index = state.areaInstance.objects.findIndex(o => o.definition?.id === object.id);
     if (index >= 0) {
-        removeObjectFromArea(state, state.areaInstance, state.areaInstance.objects[index]);
+        removeObjectFromArea(state, state.areaInstance.objects[index]);
     }
 }
 

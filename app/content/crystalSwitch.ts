@@ -6,7 +6,7 @@ import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 
 import {
-    CrystalSwitchDefinition, Direction, DrawPriority, GameState,
+    AreaInstance, CrystalSwitchDefinition, Direction, DrawPriority, GameState,
     MagicElement, ObjectInstance, ObjectStatus, ShortRectangle,
 } from 'app/types';
 
@@ -17,11 +17,13 @@ const redGlowAnimation = createAnimation('gfx/tiles/activatablecrystal.png', cry
 const blueGlowAnimation = createAnimation('gfx/tiles/activatablecrystal.png', crystalGeometry, {x: 8, cols: 3, frameMap: [0, 1, 2, 1]});
 
 export class CrystalSwitch implements ObjectInstance {
+    area: AreaInstance;
     behaviors = {
         solid: true,
     };
     drawPriority: DrawPriority = 'sprites';
     definition: CrystalSwitchDefinition = null;
+    linkedObject: CrystalSwitch;
     x: number;
     y: number;
     status: ObjectStatus = 'normal';
@@ -44,7 +46,13 @@ export class CrystalSwitch implements ObjectInstance {
         this.status = 'active';
         this.animationTime = 0;
         this.timeLeft = this.definition.timer || 0;
-        checkIfAllSwitchesAreActivated(state, this);
+        checkIfAllSwitchesAreActivated(state, this.area, this);
+        if (this.linkedObject) {
+            this.linkedObject.status = 'active';
+            this.linkedObject.animationTime = 0;
+            this.linkedObject.timeLeft = this.definition.timer || 0;
+            checkIfAllSwitchesAreActivated(state, this.linkedObject.area, this.linkedObject);
+        }
     }
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;
@@ -52,7 +60,7 @@ export class CrystalSwitch implements ObjectInstance {
             this.timeLeft -= FRAME_LENGTH;
             if (this.timeLeft <= 0) {
                 this.status = 'normal';
-                deactivateTargets(state, this.definition.targetObjectId);
+                deactivateTargets(state, this.area, this.definition.targetObjectId);
             }
         }
     }

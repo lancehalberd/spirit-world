@@ -59,7 +59,7 @@ export function useTool(
             return;
         case 'staff':
             if (state.hero.activeStaff) {
-                state.hero.activeStaff.remove(state, state.areaInstance);
+                state.hero.activeStaff.remove(state);
                 state.hero.toolCooldown = 0;
                 return;
             }
@@ -83,7 +83,7 @@ export function useTool(
             addObjectToArea(state, state.areaInstance, staff);
             // A staff that takes up a single tile is also an invalid use, but we remove it after adding it.
             if (staff.topRow === staff.bottomRow && staff.leftColumn === staff.rightColumn) {
-                staff.remove(state, state.areaInstance);
+                staff.remove(state);
             } else {
                 state.hero.magic -= 10;
             }

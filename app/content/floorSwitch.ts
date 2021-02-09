@@ -8,14 +8,15 @@ import { createAnimation, drawFrame } from 'app/utils/animations';
 import { rectanglesOverlap } from 'app/utils/index';
 
 import {
-    FloorSwitchDefinition, GameState,
+    AreaInstance, DrawPriority, FloorSwitchDefinition, GameState,
     ObjectInstance, ObjectStatus, ShortRectangle,
 } from 'app/types';
 
 const [upFrame, downFrame] = createAnimation('gfx/tiles/toggletiles.png', {w: 16, h: 16}, {cols: 2}).frames;
 
 export class FloorSwitch implements ObjectInstance {
-    drawPriority: 'background' = 'background';
+    area: AreaInstance;
+    drawPriority: DrawPriority = 'background';
     definition: FloorSwitchDefinition = null;
     x: number;
     y: number;
@@ -30,10 +31,10 @@ export class FloorSwitch implements ObjectInstance {
     }
     isDepressed(state: GameState): boolean {
         const hitbox = this.getHitbox(state);
-        if (rectanglesOverlap(state.hero, hitbox)) {
+        if (state.hero.area === this.area && rectanglesOverlap(state.hero, hitbox)) {
             return true;
         }
-        for (const object of state.areaInstance.objects) {
+        for (const object of this.area.objects) {
             if (object === this || !object.getHitbox) {
                 continue;
             }
@@ -51,9 +52,9 @@ export class FloorSwitch implements ObjectInstance {
         }
         if (this.definition.toggleOnRelease && this.definition.targetObjectId) {
             if (this.status === 'active') {
-                checkIfAllSwitchesAreActivated(state, this);
+                checkIfAllSwitchesAreActivated(state, this.area, this);
             } else {
-                deactivateTargets(state, this.definition.targetObjectId);
+                deactivateTargets(state, this.area, this.definition.targetObjectId);
             }
             return;
         }
@@ -62,10 +63,10 @@ export class FloorSwitch implements ObjectInstance {
             return;
         }
         if (this.definition.targetObjectId) {
-            const object = findObjectInstanceById(state.areaInstance, this.definition.targetObjectId);
+            const object = findObjectInstanceById(this.area, this.definition.targetObjectId);
             this.toggleTargetStatus(state, object);
         } else {
-            for (const object of state.areaInstance.objects) {
+            for (const object of this.area.objects) {
                 this.toggleTargetStatus(state, object);
             }
         }

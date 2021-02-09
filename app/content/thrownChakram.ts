@@ -8,7 +8,7 @@ import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { getDirection } from 'app/utils/field';
 import { isPointInShortRect, rectanglesOverlap } from 'app/utils/index';
 
-import { DrawPriority, Frame, GameState, Hero, ObjectInstance, ObjectStatus } from 'app/types';
+import { AreaInstance, DrawPriority, Frame, GameState, Hero, ObjectInstance, ObjectStatus } from 'app/types';
 
 const chakramGeometry = {w: 16, h: 16, content: {x: 2, y: 2, w: 12, h: 12}};
 const chakramAnimation = createAnimation('gfx/chakram1.png', chakramGeometry, {cols: 9, x: 0, duration: 2}, {loopFrame: 1});
@@ -24,6 +24,7 @@ interface Props {
 }
 
 export class ThrownChakram implements ObjectInstance {
+    area: AreaInstance;
     definition = null;
     drawPriority: DrawPriority = 'sprites';
     type = 'thrownChakram' as 'thrownChakram';
@@ -58,7 +59,7 @@ export class ThrownChakram implements ObjectInstance {
     }
     update(state: GameState) {
         // Chakram returns to the hero if the clone it was thrown from no longer exists.
-        if (state.areaInstance.objects.indexOf(this.source) < 0) {
+        if (this.area.objects.indexOf(this.source) < 0) {
             this.source = state.hero;
         }
         this.animationTime += FRAME_LENGTH;
@@ -81,11 +82,11 @@ export class ThrownChakram implements ObjectInstance {
             this.x += this.vx;
             this.y += this.vy;
             if (isPointInShortRect(this.source.x + this.source.w / 2, this.source.y + this.source.h / 2, this)) {
-                removeObjectFromArea(state, state.areaInstance, this);
+                removeObjectFromArea(state, this);
                 return;
             }
         }
-        for (const object of state.areaInstance.objects) {
+        for (const object of this.area.objects) {
             if (object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
                 continue;
             }
@@ -110,17 +111,16 @@ export class ThrownChakram implements ObjectInstance {
             }
         }
         for (const target of getTilesInRectangle(state, this)) {
-            const area = state.areaInstance;
-            const behavior = area.behaviorGrid?.[target.y]?.[target.x];
+            const behavior = this.area.behaviorGrid?.[target.y]?.[target.x];
             if (behavior?.cuttable <= state.hero.weapon) {
                 // We need to find the specific cuttable layers that can be destroyed.
-                for (const layer of state.areaInstance.layers) {
+                for (const layer of this.area.layers) {
                     const palette = layer.palette;
                     const tile = layer.tiles[target.y][target.x];
                     const behavior = palette.behaviors[`${tile.x}x${tile.y}`];
                     if (behavior?.cuttable <= state.hero.weapon) {
-                        destroyTile(state, {...target, layerKey: layer.key});
-                        addParticleAnimations(state, target.x * 16, target.y * 16, 2, behavior.particles);
+                        destroyTile(state, this.area, {...target, layerKey: layer.key});
+                        addParticleAnimations(state, this.area, target.x * 16, target.y * 16, 2, behavior.particles);
                     }
                 }
             } else if (behavior?.cuttable > state.hero.weapon || (behavior?.solid && !behavior?.low)) {

@@ -24,7 +24,13 @@ export function serializeZone(zone: Zone) {
                         for (let r = 0; r < layer.grid.tiles.length; r++) {
                             rows[r] = [];
                             for (let c = 0; c < layer.grid.tiles[r].length; c++) {
-                                const {x, y} = layer.grid.tiles[r][c];
+                                const tile = layer.grid.tiles[r][c];
+                                // Spirit world tiles will be null when they should inherit from the physical world.
+                                if (!tile) {
+                                    rows[r][c] = 'e';
+                                    continue;
+                                }
+                                const {x, y} = tile;
                                 if (!tileMap[`${x}x${y}`]) {
                                     tileMap[`${x}x${y}`] = {
                                         x, y, i: tileIndex++,
@@ -44,7 +50,7 @@ export function serializeZone(zone: Zone) {
     lines.push("");
     lines.push("import { AreaDefinition } from 'app/types';");
     lines.push("");
-    const tileAssignments = [];
+    const tileAssignments = ['e = null'];
     for (let key in tileMap) {
         const data = tileMap[key];
         tileAssignments.push(`t${data.i} = {x: ${data.x}, y: ${data.y}}`);

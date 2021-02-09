@@ -56,9 +56,9 @@ export function findObjectInstanceById(areaInstance: AreaInstance, id: string, a
     return object;
 }
 
-export function checkIfAllSwitchesAreActivated(state: GameState, switchInstance: BallGoal | CrystalSwitch | FloorSwitch): void {
+export function checkIfAllSwitchesAreActivated(state: GameState, area: AreaInstance, switchInstance: BallGoal | CrystalSwitch | FloorSwitch): void {
     // Do nothing if there still exists a switch with the same target that is not active.
-    if (state.areaInstance.objects.some(o =>
+    if (area.objects.some(o =>
         (o.definition?.type === 'ballGoal' || o.definition?.type === 'crystalSwitch' || o.definition?.type === 'floorSwitch') &&
         o.definition?.targetObjectId === switchInstance.definition.targetObjectId &&
         o.status !== 'active'
@@ -66,7 +66,7 @@ export function checkIfAllSwitchesAreActivated(state: GameState, switchInstance:
         return;
     }
     if (switchInstance.definition.targetObjectId) {
-        const target = findObjectInstanceById(state.areaInstance, switchInstance.definition.targetObjectId);
+        const target = findObjectInstanceById(area, switchInstance.definition.targetObjectId);
         if (target) {
             activateTarget(state, target);
         }
@@ -77,9 +77,9 @@ export function checkIfAllSwitchesAreActivated(state: GameState, switchInstance:
     }
 }
 
-export function deactivateTargets(state: GameState, targetObjectId: string = null): void {
+export function deactivateTargets(state: GameState, area: AreaInstance, targetObjectId: string = null): void {
     if (targetObjectId) {
-        const target = findObjectInstanceById(state.areaInstance, targetObjectId);
+        const target = findObjectInstanceById(area, targetObjectId);
         if (target && target.definition.status === 'closedSwitch') {
             changeObjectStatus(state, target, 'closedSwitch');
         }
@@ -94,14 +94,10 @@ export function deactivateTargets(state: GameState, targetObjectId: string = nul
 
 export function activateTarget(state: GameState, target: ObjectInstance): void {
     if (target.status === 'hiddenSwitch') {
-        target.status = 'normal';
+        changeObjectStatus(state, target, 'normal');
     }
     if (target.status === 'closedSwitch') {
-        if (target.changeStatus) {
-            target.changeStatus(state, 'normal');
-        } else {
-            target.status = 'normal';
-        }
+        changeObjectStatus(state, target, 'normal');
     }
 }
 
@@ -109,6 +105,9 @@ export function changeObjectStatus(state: GameState, object: ObjectInstance, new
     if (object.changeStatus) {
         object.changeStatus(state, newStatus);
     } else {
-        object.status = newStatus
+        object.status = newStatus;
+        if (object.linkedObject) {
+            object.linkedObject.status = newStatus;
+        }
     }
 }

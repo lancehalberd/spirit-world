@@ -8,6 +8,7 @@ export * from 'app/content/zones/peachCave';
 export * from 'app/content/zones/overworld';
 export * from 'app/content/zones/demo/entrance';
 export * from 'app/content/zones/demo/gloves';
+export * from 'app/content/zones/demo/sight';
 
 export function getZone(zoneKey: string): Zone {
     return zones[zoneKey];

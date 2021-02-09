@@ -121,7 +121,7 @@ export function removeAllClones(state: GameState): void {
         state.hero.y = state.hero.activeClone.y;
     }
     for (const clone of state.hero.clones) {
-        removeObjectFromArea(state, state.areaInstance, clone);
+        removeObjectFromArea(state, clone);
     }
     state.hero.clones = []
     state.hero.activeClone = null;
@@ -146,9 +146,11 @@ export function enterLocation(state: GameState, location: ZoneLocation): void {
 
     // Remove all clones on changing areas.
     removeAllClones(state);
-    state.hero.activeStaff?.remove(state, state.areaInstance);
+    state.hero.activeStaff?.remove(state);
     state.areaInstance = createAreaInstance(state, area);
     state.alternateAreaInstance = createAreaInstance(state, alternateArea);
+    state.areaInstance.alternateArea = state.alternateAreaInstance;
+    state.alternateAreaInstance.alternateArea = state.areaInstance;
     linkObjects(state);
     state.hero.area = state.areaInstance;
     state.hero.x = location.x;
@@ -160,16 +162,16 @@ export function enterLocation(state: GameState, location: ZoneLocation): void {
     updateCamera(state, 512);
 }
 
-function linkObjects(state: GameState): void {
+export function linkObjects(state: GameState): void {
     for (const object of state.areaInstance.objects) {
-        linkObject(object, state.alternateAreaInstance);
+        linkObject(object);
     }
 }
-export function linkObject(object: ObjectInstance, alternateAreaInstance: AreaInstance): void {
+export function linkObject(object: ObjectInstance): void {
     if (!object.definition.linked) {
         return;
     }
-    const linkedObject = alternateAreaInstance.objects.find(o => o.x === object.x && o.y === object.y);
+    const linkedObject = object.area.alternateArea.objects.find(o => o.x === object.x && o.y === object.y);
     if (linkedObject) {
         linkedObject.linkedObject = object;
         object.linkedObject = linkedObject;
@@ -240,7 +242,7 @@ export function switchToNextAreaSection(state: GameState): void {
     refreshSection(state, state.areaInstance, state.areaSection);
     state.areaSection = state.nextAreaSection;
     removeAllClones(state);
-    state.hero.activeStaff?.remove(state, state.areaInstance);
+    state.hero.activeStaff?.remove(state);
     state.hero.safeD = state.hero.d;
     state.hero.safeX = state.hero.x;
     state.hero.safeY = state.hero.y;
@@ -265,7 +267,7 @@ export function setAreaSection(state: GameState, d: Direction, newArea: boolean 
     }
     if (newArea || lastAreaSection !== state.areaSection) {
         removeAllClones(state);
-        state.hero.activeStaff?.remove(state, state.areaInstance);
+        state.hero.activeStaff?.remove(state);
         state.hero.safeD = state.hero.d;
         state.hero.safeX = state.hero.x;
         state.hero.safeY = state.hero.y;
@@ -320,7 +322,7 @@ export function resetTileBehavior(area: AreaInstance, {x, y}: Tile): void {
     delete area.behaviorGrid?.[y]?.[x];
     for (const layer of area.layers) {
         const palette = layer.palette;
-        const tile = layer.tiles[y][x];
+        const tile = layer.tiles[y]?.[x];
         if (!tile) {
             continue;
         }
@@ -345,6 +347,7 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
         palette.h * definition.layers[0].grid.h,
     );
     const instance: AreaInstance = {
+        alternateArea: null,
         definition: definition,
         palette,
         w: definition.layers[0].grid.w,
@@ -424,7 +427,7 @@ export function refreshSection(state: GameState, area: AreaInstance, section: Sh
         let object = findObjectInstanceById(state.areaInstance, definition.id, true);
         if (object) {
             if (object.alwaysReset) {
-                removeObjectFromArea(state, state.areaInstance, object);
+                removeObjectFromArea(state, object);
                 addObjectToArea(state, state.areaInstance, createObjectInstance(state, definition));
             }
         } else {
@@ -443,26 +446,27 @@ export function addObjectToArea(state: GameState, area: AreaInstance, object: Ob
         area.objects.push(object);
     }
 }
-export function removeObjectFromArea(state: GameState, area: AreaInstance, object: ObjectInstance): void {
+export function removeObjectFromArea(state: GameState, object: ObjectInstance): void {
     if (object.remove) {
-        object.remove(state, area);
+        object.remove(state);
     } else {
-        const index = area.objects.indexOf(object);
+        const index = object.area.objects.indexOf(object);
         if (index >= 0) {
-            area.objects.splice(index, 1);
+            object.area.objects.splice(index, 1);
         }
     }
 }
 
-export function destroyTile(state: GameState, target: LayerTile): void {
-    const area = state.areaInstance;
+export function destroyTile(state: GameState, area: AreaInstance, target: LayerTile): void {
     const layer = _.find(area.layers, { key: target.layerKey });
     if (!layer) {
         console.error(`Missing target layer: ${target.layerKey}`);
         return;
     }
     const behavior = area.behaviorGrid?.[target.y]?.[target.x];
-    area.tilesDrawn[target.y][target.x] = false;
+    if (area.tilesDrawn[target.y]?.[target.x]) {
+        area.tilesDrawn[target.y][target.x] = false;
+    }
     area.checkToRedrawTiles = true;
     const underTile = behavior?.underTile || {x: 0, y: 0};
     const key = `${underTile.x}x${underTile.y}`;

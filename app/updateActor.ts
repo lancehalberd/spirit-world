@@ -319,7 +319,20 @@ export function updateHero(this: void, state: GameState) {
                     const behavior = palette.behaviors[`${tile.x}x${tile.y}`];
                     if (behavior?.pickupWeight <= state.hero.passiveTools.gloves) {
                         hero.pickUpTile = tile;
-                        destroyTile(state, {...closestLiftableTile, layerKey: layer.key});
+                        destroyTile(state, state.areaInstance, {...closestLiftableTile, layerKey: layer.key});
+                        if (behavior.linked) {
+                            const alternateLayer = _.find(state.alternateAreaInstance.layers, {key: layer.key});
+                            if(alternateLayer) {
+                                const alternateTile = {
+                                    ...alternateLayer.tiles[closestLiftableTile.y][closestLiftableTile.x],
+                                    layerKey: alternateLayer.key,
+                                };
+                                if (alternateTile.x === tile.x && alternateTile.y === tile.y) {
+                                    hero.pickUpTile.linked = true;
+                                    destroyTile(state, state.alternateAreaInstance, {...closestLiftableTile, layerKey: layer.key});
+                                }
+                            }
+                        }
                     }
                 }
                 hero.grabTile = null;
@@ -460,14 +473,14 @@ export function destroyClone(state: GameState, clone: Hero): void {
         const lastClone = state.hero.clones.pop();
         state.hero.x = lastClone.x;
         state.hero.y = lastClone.y;
-        removeObjectFromArea(state, state.areaInstance, lastClone);
+        removeObjectFromArea(state, lastClone);
     } else {
         // If a non-hero clone is destroyed we just remove it from the array of clones.
         const index = state.hero.clones.indexOf(clone as any);
         if (index >= 0) {
             state.hero.clones.splice(index, 1);
         }
-        removeObjectFromArea(state, state.areaInstance, clone);
+        removeObjectFromArea(state, clone);
     }
     // If the active clone is destroyed, we return control to the main hero.
     if (state.hero.activeClone === clone) {
@@ -538,6 +551,23 @@ export function throwHeldObject(state: GameState, hero: Hero){
         vz: 2,
     });
     addObjectToArea(state, state.areaInstance, thrownObject);
+    if (tile.linked) {
+        const layer = _.find(state.alternateAreaInstance.layers, { key: tile.layerKey});
+        const palette = layer.palette;
+        const behaviors = palette.behaviors[`${tile.x}x${tile.y}`];
+        const alternateThrownObject = new ThrownObject({
+            frame: getTileFrame(state.alternateAreaInstance, hero.pickUpTile),
+            particles: behaviors?.particles,
+            x: hero.x,
+            y: hero.y,
+            vx: directionMap[hero.d][0] * throwSpeed,
+            vy: directionMap[hero.d][1] * throwSpeed,
+            vz: 2,
+        });
+        alternateThrownObject.linkedObject = thrownObject;
+        thrownObject.linkedObject = alternateThrownObject;
+        addObjectToArea(state, state.alternateAreaInstance, alternateThrownObject);
+    }
     hero.pickUpTile = null;
 }
 

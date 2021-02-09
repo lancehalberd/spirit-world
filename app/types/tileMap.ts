@@ -10,6 +10,8 @@ export interface TileBehaviors {
     cuttable?: number,
     // Deals damage on contact
     damage?: number,
+    // If this is true then this tile will link to a matching tile in the alternate world.
+    linked?: boolean,
     lootChance?: number,
     lootTypes?: LootType[],
     // If this is true projectiles can pass over this tile even if it is solid.
@@ -51,6 +53,7 @@ export interface Tile {
 
 export interface LayerTile {
     layerKey: string,
+    linked?: boolean,
     x: number,
     y: number,
 }
@@ -132,6 +135,7 @@ export interface Floor {
 export type AreaGrid = AreaDefinition[][];
 
 export interface AreaInstance {
+    alternateArea: AreaInstance,
     definition: AreaDefinition,
     palette: TilePalette,
     w: number,
@@ -174,7 +178,7 @@ export interface ObjectInstance {
     pullingHeroDirection?: Direction,
     update?: (state: GameState) => void,
     add?: (state: GameState, area: AreaInstance) => void,
-    remove?: (state: GameState, area: AreaInstance) => void,
+    remove?: (state: GameState) => void,
     render: (context: CanvasRenderingContext2D, state: GameState) => void,
 }
 

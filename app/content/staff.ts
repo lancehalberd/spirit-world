@@ -38,6 +38,8 @@ export class Staff implements ObjectInstance {
     element: MagicElement;
     storedBehaviors: TileBehaviors[][];
     constructor(state: GameState, { x = 0, y = 0, damage = 1, direction, element, maxLength = 4 }: Props) {
+        // Note this assumes the staff is always added to the area the hero is in.
+        this.area = state.areaInstance;
         this.x = x;
         this.y = y;
         this.direction = direction;
@@ -120,20 +122,20 @@ export class Staff implements ObjectInstance {
     }
     update(state: GameState) {
     }
-    remove(state: GameState, area: AreaInstance) {
-        const index = area.objects.indexOf(this);
+    remove(state: GameState) {
+        const index = this.area.objects.indexOf(this);
         if (index >= 0){
-            area.objects.splice(index, 1);
+            this.area.objects.splice(index, 1);
         }
         // Restore the original tiles under the staff.
         for (let row = this.topRow; row <= this.bottomRow; row++) {
             for (let column = this.leftColumn; column <= this.rightColumn; column++) {
                 // Indicate that the tiles need to be redrawn now that the staff is gone.
-                area.tilesDrawn[row][column] = false;
-                area.behaviorGrid[row][column] = this.storedBehaviors[row][column];
+                this.area.tilesDrawn[row][column] = false;
+                this.area.behaviorGrid[row][column] = this.storedBehaviors[row][column];
             }
         }
-        area.checkToRedrawTiles = true;
+        this.area.checkToRedrawTiles = true;
         state.hero.activeStaff = null;
     }
     render(context, state: GameState) {

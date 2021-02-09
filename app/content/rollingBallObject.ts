@@ -75,12 +75,12 @@ export class RollingBallObject implements ObjectInstance {
                     (object as BallGoal).activate(state);
                     // The activated BallGoal will render the ball in the depression, so we remove
                     // the original ball from the area.
-                    removeObjectFromArea(state, state.areaInstance, this);
+                    removeObjectFromArea(state, this);
                     if (this.linkedObject) {
                         const linkedGoal = (object as BallGoal).linkedObject;
                         if (linkedGoal) {
                             linkedGoal.activate(state);
-                            removeObjectFromArea(state, state.areaInstance, this);
+                            removeObjectFromArea(state, this);
                         } else {
                             // If there is no alternate goal, the alternate ball is just stuck in place.
                             this.linkedObject.rollDirection = null;

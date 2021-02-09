@@ -13,6 +13,7 @@ import {
 
 
 export class Door implements ObjectInstance {
+    linkedObject: Door;
     alwaysReset = true;
     area: AreaInstance;
     drawPriority: DrawPriority = 'background';
@@ -28,6 +29,9 @@ export class Door implements ObjectInstance {
     }
     changeStatus(state: GameState, status: ObjectStatus): void {
         this.status = status;
+        if (this.linkedObject && this.linkedObject.status !== status) {
+            this.linkedObject.changeStatus(state, status);
+        }
         const y = Math.floor(this.y / 16);
         const x = Math.floor(this.x / 16);
         if (this.status === 'normal') {
@@ -70,20 +74,24 @@ export class Door implements ObjectInstance {
         return { x: this.x, y: this.y, w: 32, h: 32};
     }
     // This is probably only needed by the editor since doors are not removed during gameplay.
-    remove(state: GameState, area: AreaInstance) {
+    remove(state: GameState) {
         const y = Math.floor(this.y / 16);
         const x = Math.floor(this.x / 16);
-        resetTileBehavior(area, {x, y});
-        resetTileBehavior(area, {x: x + 1, y});
-        resetTileBehavior(area, {x, y: y + 1});
-        resetTileBehavior(area, {x: x + 1, y: y + 1});
-        const index = area.objects.indexOf(this);
+        resetTileBehavior(this.area, {x, y});
+        resetTileBehavior(this.area, {x: x + 1, y});
+        resetTileBehavior(this.area, {x, y: y + 1});
+        resetTileBehavior(this.area, {x: x + 1, y: y + 1});
+        const index = this.area.objects.indexOf(this);
         if (index >= 0) {
-            area.objects.splice(index, 1);
+            this.area.objects.splice(index, 1);
         }
     }
     update(state: GameState) {
         const hero = state.hero.activeClone || state.hero;
+        // Nothing to update if the hero isn't in the same world as this door.
+        if (hero.area !== this.area) {
+            return;
+        }
         if ((!hero.actionTarget || hero.actionTarget === this) && boxesIntersect(hero, this.getHitbox(state))) {
             let shouldEnterDoor = (hero.action !== 'entering' && hero.action !== 'exiting');
             if (!shouldEnterDoor && hero.actionTarget !== this) {

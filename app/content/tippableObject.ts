@@ -29,6 +29,7 @@ export class TippableObject implements ObjectInstance {
     fallFrame = 0;
     fallDirection: Direction;
     grabDirection: Direction;
+    linkedObject: TippableObject;
     pullingHeroDirection: Direction;
     pushCounter: number = 0;
     pushedLastFrame: boolean = false;
@@ -68,10 +69,15 @@ export class TippableObject implements ObjectInstance {
     fallInDirection(state: GameState, direction: Direction): void {
         const x = this.x + 8 + 16 * directionMap[direction][0];
         const y = this.y + 8 + 16 * directionMap[direction][1];
-        if (isPointOpen(state, this.area, {x, y})) {
+        if (isPointOpen(state, this.area, {x, y}) && (!this.linkedObject || isPointOpen(state, this.linkedObject.area, {x, y}))) {
             this.fallDirection = direction;
             this.animationTime = -80;
             this.pullingHeroDirection = direction;
+            if (this.linkedObject) {
+                this.linkedObject.fallDirection = direction;
+                this.linkedObject.animationTime = -80;
+                this.linkedObject.pullingHeroDirection = direction;
+            }
         }
     }
     update(state: GameState) {
@@ -90,8 +96,9 @@ export class TippableObject implements ObjectInstance {
                     hero.grabObject = null;
                     hero.action = null;
                 }
-                this.drawPriority = 'background';
-                addParticleAnimations(state, this.x, this.y, 2, particleFrames);
+                // Not sure why I had this, with this, the pot is hidden behind floor switches sometimes.
+                // this.drawPriority = 'background';
+                addParticleAnimations(state, this.area, this.x, this.y, 2, particleFrames);
             }
         }
         if (!this.pushedLastFrame) {

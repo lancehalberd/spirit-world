@@ -81,28 +81,20 @@ export function updateSpiritCanvas(state: GameState, radius: number): void {
         spiritContext.beginPath();
         spiritContext.arc(x, y, radius, 0, 2 * Math.PI);
         spiritContext.fill();*/
-        const xOffset = state.hero.x + state.hero.w / 2 - spiritCanvas.width / 2;
-        const yOffset = state.hero.y - spiritCanvas.height / 2;
         spiritContext.translate(
             -(state.hero.x + state.hero.w / 2 - state.camera.x - spiritCanvas.width / 2),
             -(state.hero.y - state.camera.y - spiritCanvas.height / 2)
         );
         spiritContext.globalAlpha = 1;
         spiritContext.globalCompositeOperation = 'source-atop';
-        spiritContext.drawImage(
-            area.canvas,
-            xOffset, yOffset, spiritCanvas.width, spiritCanvas.height,
-            (state.hero.x + state.hero.w / 2 - state.camera.x - spiritCanvas.width / 2),
-            (state.hero.y - state.camera.y - spiritCanvas.height / 2),
-            spiritCanvas.width, spiritCanvas.height,
-        );
-        renderAreaObjectsBeforeHero(spiritContext, state, state.alternateAreaInstance);
+        renderAreaBackground(spiritContext, state, area);
+        renderAreaObjectsBeforeHero(spiritContext, state, area);
         spiritContext.save();
-            translateContextForAreaAndCamera(spiritContext, state, state.areaInstance);
+            translateContextForAreaAndCamera(spiritContext, state, area);
             renderHeroEyes(spiritContext, state, state.hero.activeClone || state.hero);
         spiritContext.restore();
 
-        renderAreaObjectsAfterHero(spiritContext, state, state.alternateAreaInstance);
+        renderAreaObjectsAfterHero(spiritContext, state, area);
     spiritContext.restore();
 }
 

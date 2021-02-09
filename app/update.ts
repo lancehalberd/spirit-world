@@ -1,4 +1,6 @@
+import { getAreaSize } from 'app/content/areas';
 import { Enemy } from 'app/content/enemy';
+import { changeObjectStatus } from 'app/content/objects';
 import { editingState } from 'app/development/tileEditor';
 import { FRAME_LENGTH, KEY_THRESHOLD } from 'app/gameConstants';
 import { updateKeysStillDown } from 'app/keyCommands';
@@ -19,7 +21,7 @@ import { updateCamera } from 'app/updateCamera';
 import { areFontsLoaded } from 'app/utils/drawText';
 import { areAllImagesLoaded } from 'app/utils/images';
 
-import { ActiveTool, GameState, MagicElement } from 'app/types';
+import { ActiveTool, AreaInstance, GameState, MagicElement } from 'app/types';
 
 let isGameInitialized = false;
 export function update() {
@@ -223,25 +225,8 @@ function updateField(state: GameState) {
         } else if (isKeyDown(GAME_KEY.NEXT_ELEMENT, KEY_THRESHOLD)) {
             switchElement(state, 1);
         }
-        const originalLength = state.areaInstance.objects.length;
-        state.areaInstance.objects = state.areaInstance.objects.filter(e => !(e instanceof Enemy) || e.life > 0);
-        // If an enemy was defeated, check if all enemies are defeated to see if any doors open or treasures appear.
-        if (originalLength > state.areaInstance.objects.length) {
-            if (!state.areaInstance.objects.some(e => (e instanceof Enemy) && e.isInCurrentSection(state))) {
-                for (const object of state.areaInstance.objects) {
-                    if (object.status === 'hiddenEnemy') {
-                        object.status = 'normal';
-                    }
-                    if (object.status === 'closedEnemy') {
-                        if (object.changeStatus) {
-                            object.changeStatus(state, 'normal');
-                        } else {
-                            object.status = 'normal';
-                        }
-                    }
-                }
-            }
-        }
+        removeDefeatedEnemies(state, state.alternateAreaInstance);
+        removeDefeatedEnemies(state, state.areaInstance);
         for (const object of state.alternateAreaInstance?.objects || []) {
             object.update?.(state);
         }
@@ -250,3 +235,33 @@ function updateField(state: GameState) {
         }
     }
 }
+function removeDefeatedEnemies(state: GameState, area: AreaInstance): void {
+    const originalLength = area.objects.length;
+    area.objects = area.objects.filter(e => !(e instanceof Enemy) || e.life > 0);
+    // If an enemy was defeated, check if all enemies are defeated to see if any doors open or treasures appear.
+    if (originalLength > area.objects.length) {
+        if (!area.objects.some(e => (e instanceof Enemy) && e.isInCurrentSection(state))) {
+            const { section } = getAreaSize(state);
+            for (const object of area.objects) {
+                if (!object.getHitbox) {
+                    continue;
+                }
+                const hitbox = object.getHitbox(state);
+                if (hitbox.x < section.x ||
+                    hitbox.x >= section.x + section.w ||
+                    hitbox.y < section.y ||
+                    hitbox.y >= section.y + section.h
+                ) {
+                    continue;
+                }
+                if (object.status === 'hiddenEnemy') {
+                    changeObjectStatus(state, object, 'normal');
+                }
+                if (object.status === 'closedEnemy') {
+                    changeObjectStatus(state, object, 'normal');
+                }
+            }
+        }
+    }
+}
+

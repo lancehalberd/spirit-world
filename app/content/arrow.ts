@@ -65,7 +65,7 @@ export class Arrow implements ObjectInstance {
     update(state: GameState) {
         if (this.stuckFrames > 0) {
             if (this.stuckFrames++ > 15) {
-                removeObjectFromArea(state, state.areaInstance, this);
+                removeObjectFromArea(state, this);
             }
             return;
         }
@@ -75,7 +75,7 @@ export class Arrow implements ObjectInstance {
         if (this.x + this.w <= section.x || this.y + this.h <= section.y
             || this.x >= section.x + section.w || this.y  >= section.y + section.h
         ) {
-            removeObjectFromArea(state, state.areaInstance, this);
+            removeObjectFromArea(state, this);
             return;
         }
         for (const object of state.areaInstance.objects) {
@@ -110,7 +110,7 @@ export class Arrow implements ObjectInstance {
                     const tile = layer.tiles[target.y][target.x];
                     const behavior = palette.behaviors[`${tile.x}x${tile.y}`];
                     if (behavior?.cuttable <= bowLevel) {
-                        destroyTile(state, {...target, layerKey: layer.key});
+                        destroyTile(state, state.areaInstance, {...target, layerKey: layer.key});
                     }
                 }
             } else if ((behavior?.cuttable > bowLevel || behavior?.solid) && !behavior?.low) {

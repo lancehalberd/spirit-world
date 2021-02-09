@@ -8,13 +8,14 @@ Bugs:
     Doors don't appear open when moving into them from a different section
         I think this is because the door doesn't update until it is in the current areaInstance
     Objects+enemies shouldn't be able to float on top of pits.
+    nextAreaInstance is not rendered in Safari
 
 Graphics:
     Add sparkles to peach loot + hud.
 
-Spirit Sight Puzzles:
-    - spirit world floor switches +  push/pull objects bound to spirit world to open door/reveal chest.
-    - rolling ball bound to spirit world with barriers only in spirit world. Include a real world only push pull block to position the rolling ball correctly.
+Outanding Questions:
+    - People will think the game is buggy if this is the default behavior for rocks/bushes since they will sometimes hit spirit enemies they cannot see... Maybe don't have many spirit enemies spawn early in the game, or only have them spawn places where the player is unlikely to throw objects (perhaps places with no objects to throw, or only lvl 2 glove object?)
+    - Do we want to implement one way links like physical effects spirit but not the other? It would make sense, but seems like a lot of work, so let's not do this for now unless we see some obvious wins. It is also a bit more complicated for the player to understand, especially if we have doubly linked, linked each way, and unlinked pairs.
 
 Quick Demo
     - Start with 6 hearts + weapon
@@ -76,7 +77,6 @@ Add ability to charge carried objects
 
 Add astral projection + telekinesis abilities
     - if astral projection is available, you can move around (need to press passive tool on body to return or press something else to return instantly?)
-    -
     - if telekinesis you can pick up real objects if they have stable spirit elements (possibly limited by telekinesis level)
 
 
@@ -123,7 +123,6 @@ Update collision detection and wiggle logic:
 
 Some puzzle ideas:
     - Have a puzzle for the clone tool where a crystal deactivates after only 1s but cannot reach the door unless you stand at the door and have the clone hit the switch.
-    - Similarly a puzzle where two switches must be hit within 1 second to make a chest appear. This could use the clone or an arrow.
     - A puzzle where 4 switches need to be hit in 200ms, you can blow up the clone in the middle to activate all at once.
     - If we place a block on top of a switch that toggles on release, we can make a door that requires you to push the block off of the switch.
 

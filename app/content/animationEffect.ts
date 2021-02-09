@@ -1,8 +1,8 @@
-import { removeObjectFromArea } from 'app/content/areas';
+import { addObjectToArea, removeObjectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { drawFrame, frameAnimation, getFrame } from 'app/utils/animations';
 
-import { Frame, FrameAnimation, GameState, ObjectInstance, ObjectStatus } from 'app/types';
+import { AreaInstance, Frame, FrameAnimation, GameState, ObjectInstance, ObjectStatus } from 'app/types';
 
 
 interface Props {
@@ -17,6 +17,7 @@ interface Props {
 }
 
 export class AnimationEffect implements ObjectInstance {
+    area: AreaInstance;
     definition = null;
     animation: FrameAnimation;
     animationTime: number;
@@ -46,7 +47,7 @@ export class AnimationEffect implements ObjectInstance {
         this.animationTime += FRAME_LENGTH;
         this.vz += this.az;
         if (this.z <= 0) {
-            removeObjectFromArea(state, state.areaInstance, this);
+            removeObjectFromArea(state, this);
         }
     }
     render(context, state: GameState) {
@@ -55,7 +56,7 @@ export class AnimationEffect implements ObjectInstance {
     }
 }
 
-export function addParticleAnimations(state: GameState, x: number, y: number, z: number, particles: Frame[]): void {
+export function addParticleAnimations(state: GameState, area: AreaInstance, x: number, y: number, z: number, particles: Frame[]): void {
     if (!particles) {
         return;
     }
@@ -63,10 +64,13 @@ export function addParticleAnimations(state: GameState, x: number, y: number, z:
     for (const frame of particles) {
         const vx = Math.cos(theta);
         const vy = Math.sin(theta);
-        state.areaInstance.objects.push(new AnimationEffect({
-            animation: frameAnimation(frame),
-            x: x + vx, y: y + vy, z,
-            vx, vy, vz: 1.5, az: -0.2}));
+        addObjectToArea(state, area,
+            new AnimationEffect({
+                animation: frameAnimation(frame),
+                x: x + vx, y: y + vy, z,
+                vx, vy, vz: 1.5, az: -0.2
+            })
+        );
         theta += Math.PI * 2 / (particles.length);
     }
 }

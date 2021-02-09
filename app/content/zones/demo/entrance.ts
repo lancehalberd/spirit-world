@@ -2,7 +2,7 @@ import { zones } from 'app/content/zones/zoneHash';
 
 import { AreaDefinition } from 'app/types';
 
-const t0 = {x: 10, y: 0}, t1 = {x: 9, y: 0}, t2 = {x: 0, y: 0}, t3 = {x: 13, y: 0}, t4 = {x: 12, y: 0}, t5 = {x: 3, y: 1}, t6 = {x: 1, y: 1}, t7 = {x: 2, y: 1}, t8 = {x: 5, y: 0}, t9 = {x: 6, y: 0}, t10 = {x: 11, y: 0}, t11 = {x: 4, y: 1}, t12 = {x: 0, y: 1}, t13 = {x: 15, y: 0}, t14 = {x: 14, y: 0};
+const e = null, t0 = {x: 10, y: 0}, t1 = {x: 9, y: 0}, t2 = {x: 0, y: 0}, t3 = {x: 13, y: 0}, t4 = {x: 12, y: 0}, t5 = {x: 3, y: 1}, t6 = {x: 1, y: 1}, t7 = {x: 2, y: 1}, t8 = {x: 5, y: 0}, t9 = {x: 6, y: 0}, t10 = {x: 11, y: 0}, t11 = {x: 4, y: 1}, t12 = {x: 0, y: 1}, t13 = {x: 15, y: 0}, t14 = {x: 14, y: 0};
 const f0_0x0: AreaDefinition = {
     layers: [
         {
@@ -54,8 +54,8 @@ const f0_0x0: AreaDefinition = {
                 h: 32,
                 palette: 'field',
                 tiles: [
-                    [t1,t1,t2,t2,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1],
-                    [t1,t1,t2,t2,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1],
+                    [t1,t1,t2,t2,t1,t1,t1,t1,t1,t1,t1,t1,t1,t2,t2,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1],
+                    [t1,t1,t2,t2,t1,t1,t1,t1,t1,t1,t1,t1,t1,t2,t2,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1],
                     [t1,t1,t2,t2,t1,t2,t2,t2,t2,t2,t2,t2,t2,t2,t3,t4,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t1,t1],
                     [t1,t1,t2,t2,t1,t2,t5,t2,t2,t2,t2,t2,t2,t2,t2,t2,t6,t7,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t1,t1],
                     [t1,t1,t8,t9,t1,t3,t2,t10,t3,t2,t2,t6,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t11,t2,t2,t2,t2,t1,t1],
@@ -91,15 +91,118 @@ const f0_0x0: AreaDefinition = {
         },
     ],
     objects: [
-        {type: "door", id: "demo_entrance:0:0x0-glovesDoor", status: "normal", targetZone: "demo_gloves", targetObjectId: "gloves:0:0x0-entrance", d: "up", x: 32, y: 0},
-        {type: "chest", id: "demo_entrance:0:0x0-gloves-0", lootType: "gloves", status: "normal", level: 0, amount: 1, x: 64, y: 80},
-        {type: "marker", id: "demo_entrance:0:0x0-glovesMarker", status: "normal", x: 96, y: 48},
+        {type: "door", id: "demo_entrance:0:0x0-glovesDoor", status: "normal", targetZone: "demo_gloves", targetObjectId: "gloves:0:0x0-entrance", d: "up", x: 32, y: 0, linked: true},
+        {type: "chest", id: "demo_entrance:0:0x0-gloves-0", lootType: "gloves", status: "normal", level: 0, amount: 1, x: 64, y: 80, linked: false},
+        {type: "marker", id: "demo_entrance:0:0x0-glovesMarker", status: "normal", x: 96, y: 48, linked: false},
+        {id: "demo_entrance:0:0x0-spiritSight-0", linked: false, spirit: false, status: "closedSwitch", x: 192, y: 32, type: "chest", lootType: "spiritSight", level: 0, amount: 1},
+        {id: "demo_entrance:0:0x0-pushPull-0", linked: true, spirit: false, status: "normal", x: 176, y: 80, type: "pushPull"},
+        {id: "demo_entrance:0:0x0-eye-door", linked: true, spirit: false, status: "closedSwitch", x: 208, y: 0, type: "door", targetZone: "demo_sight", targetObjectId: "demo_sight:0:0x0-door-0", d: "up"},
+        {id: "demo_entrance:0:0x0-pushPull-1", linked: true, spirit: false, status: "normal", x: 256, y: 80, type: "pushPull"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
     ],
 };
-const sf0_0x0: AreaDefinition = null;
+const sf0_0x0: AreaDefinition = {
+    isSpiritWorld: true,
+    parentDefinition: f0_0x0,
+    layers: [
+        {
+            key: 'floor',
+            grid: {
+                w: 32,
+                h: 32,
+                palette: 'spiritFloor',
+                tiles: [
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                ],
+            },
+        },
+        {
+            key: 'field',
+            grid: {
+                w: 32,
+                h: 32,
+                palette: 'spiritField',
+                tiles: [
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,t1,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,t1,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
+                ],
+            },
+        },
+    ],
+    objects: [
+        {id: "demo_entrance:s0:0x0-pushPull-0", linked: true, spirit: true, status: "normal", x: 176, y: 80, type: "pushPull"},
+        {id: "demo_entrance:s0:0x0-floorSwitch-0", linked: true, spirit: true, status: "normal", x: 160, y: 80, type: "floorSwitch", targetObjectId: "demo_entrance:s-eye-door", toggleOnRelease: true},
+        {id: "demo_entrance:s0:0x0-floorSwitch-1", linked: true, spirit: true, status: "normal", x: 256, y: 96, type: "floorSwitch", targetObjectId: "demo_entrance:s-eye-door", toggleOnRelease: true},
+        {id: "demo_entrance:s0:0x0-pushPull-1", linked: true, spirit: true, status: "normal", x: 256, y: 80, type: "pushPull"},
+        {id: "demo_entrance:s-eye-door", linked: true, spirit: true, status: "closedSwitch", x: 208, y: 0, type: "door", targetZone: "demo_sight", targetObjectId: "demo_sight:s0:0x0-door-0", d: "up"},
+    ],
+    sections: [
+        {x: 0, y: 0, w: 32, h: 32},
+    ],
+};
 zones.demo_entrance = {
     key: 'demo_entrance',
     floors: [

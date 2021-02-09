@@ -2,13 +2,14 @@ import { checkIfAllSwitchesAreActivated } from 'app/content/objects';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 
 import {
-    BallGoalDefinition, DrawPriority, GameState,
+    AreaInstance, BallGoalDefinition, DrawPriority, GameState,
     ObjectInstance, ObjectStatus, ShortRectangle,
 } from 'app/types';
 
 const [emptyFrame, filledFrame] = createAnimation('gfx/tiles/circulardepression.png', {w: 16, h: 16}, {cols: 2}).frames;
 
 export class BallGoal implements ObjectInstance {
+    area: AreaInstance;
     alwaysReset = true;
     behaviors = {
         solid: false,
@@ -31,7 +32,7 @@ export class BallGoal implements ObjectInstance {
         this.status = 'active';
         // Once a ball activates the goal, it fills the goal and it becomes solid.
         this.behaviors = { solid: true };
-        checkIfAllSwitchesAreActivated(state, this);
+        checkIfAllSwitchesAreActivated(state, this.area, this);
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
         const target = { ...emptyFrame, x: this.x, y: this.y };

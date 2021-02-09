@@ -6,7 +6,7 @@ import { drawFrame } from 'app/utils/animations';
 import { getDirection } from 'app/utils/field';
 import { rectanglesOverlap } from 'app/utils/index';
 
-import {Frame, GameState, ObjectInstance, ObjectStatus } from 'app/types';
+import { AreaInstance, Frame, GameState, ObjectInstance, ObjectStatus } from 'app/types';
 
 
 interface Props {
@@ -22,7 +22,9 @@ interface Props {
 }
 
 export class ThrownObject implements ObjectInstance {
+    area: AreaInstance;
     definition = null;
+    linkedObject: ThrownObject;
     type = 'thrownObject' as 'thrownObject';
     frame: Frame;
     particles: Frame[];
@@ -57,7 +59,7 @@ export class ThrownObject implements ObjectInstance {
         this.z += this.vz;
         this.vz -= 0.5;
         const hitbox = this.getHitbox(state);
-        for (const object of state.areaInstance.objects) {
+        for (const object of this.area.objects) {
             if (object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
                 continue;
             }
@@ -83,8 +85,11 @@ export class ThrownObject implements ObjectInstance {
     breakOnImpact(state) {
         if (!this.broken) {
             this.broken = true;
-            removeObjectFromArea(state, state.areaInstance, this);
-            addParticleAnimations(state, this.x, this.y, this.z, this.particles);
+            removeObjectFromArea(state, this);
+            addParticleAnimations(state, this.area, this.x, this.y, this.z, this.particles);
+            if (this.linkedObject && !this.linkedObject.broken) {
+                this.linkedObject.breakOnImpact(state);
+            }
         }
     }
     render(context, state: GameState) {

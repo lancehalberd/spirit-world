@@ -22,13 +22,27 @@ export function saveGame(): void {
     const hero = {...state.hero};
     // sanitize hero object before saving it.
     delete hero.activeClone;
+    delete hero.activeStaff;
     delete hero.render;
     delete hero.area;
+    delete hero.grabObject;
+    delete hero.grabTile;
+    delete hero.pickUpTile;
     hero.clones = [];
     state.savedState.hero = hero;
     state.savedGames[state.savedGameIndex] = state.savedState;
+    // These can get set on other files when previewing the saved game.
+    for (const savedGame of state.savedGames) {
+        delete savedGame.hero.area;
+    }
     // console.log(exportState(getState()));
-    window.localStorage.setItem('savedGames', JSON.stringify(state.savedGames));
+    try {
+        window.localStorage.setItem('savedGames', JSON.stringify(state.savedGames));
+    } catch (e) {
+        console.error(e);
+        debugger;
+    }
+
 }
 export function eraseAllSaves(): void {
     window.localStorage.clear()

@@ -69,6 +69,7 @@ export class Clone implements Hero, ObjectInstance {
         for (let k in hero) {
             this[k] = hero[k];
         }
+        this.invulnerableFrames = 0;
     }
     getHitbox(state: GameState): ShortRectangle {
         return { x: this.x, y: this.y, w: 16, h: 16 };

@@ -1,4 +1,4 @@
-import { removeObjectFromArea } from 'app/content/areas';
+import { addObjectToArea, removeObjectFromArea } from 'app/content/areas';
 import { createCanvasAndContext } from 'app/dom';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { getState, saveGame, updateHeroMagicStats } from 'app/state';
@@ -7,7 +7,7 @@ import { requireImage } from 'app/utils/images';
 import { rectanglesOverlap } from 'app/utils/index';
 
 import {
-    ActiveTool, Frame, GameState, LootObjectDefinition,
+    ActiveTool, AreaInstance, Frame, GameState, LootObjectDefinition,
     LootType, ObjectInstance, ObjectStatus, ShortRectangle,
 } from 'app/types';
 
@@ -34,7 +34,7 @@ export class LootGetAnimation implements ObjectInstance {
         }
         this.animationTime += FRAME_LENGTH;
         if (this.animationTime > 1000) {
-            removeObjectFromArea(state, state.areaInstance, this);
+            removeObjectFromArea(state, this);
         }
     }
     render(context, state: GameState) {
@@ -44,6 +44,7 @@ export class LootGetAnimation implements ObjectInstance {
 }
 
 export class LootObject implements ObjectInstance {
+    area: AreaInstance;
     definition: LootObjectDefinition;
     drawPriority: 'background' = 'background';
     frame: Frame;
@@ -71,7 +72,8 @@ export class LootObject implements ObjectInstance {
             onPickup(state, this);
             hero.action = 'getItem';
             hero.actionFrame = 0;
-            state.areaInstance.objects.splice(state.areaInstance.objects.indexOf(this), 1, new LootGetAnimation(this));
+            removeObjectFromArea(state, this);
+            addObjectToArea(state, this.area, new LootGetAnimation(this))
             state.savedState.collectedItems[this.definition.id] = true;
             saveGame();
         }
@@ -93,7 +95,7 @@ export class LootDropObject extends LootObject {
         if (rectanglesOverlap(state.hero.activeClone || state.hero, {...this.frame, x: this.x, y: this.y})) {
             const onPickup = lootEffects[this.definition.lootType] || lootEffects.unknown;
             onPickup(state, this);
-            removeObjectFromArea(state, state.areaInstance, this);
+            removeObjectFromArea(state, this);
         }
     }
 }
@@ -111,12 +113,14 @@ const [chestClosedFrame, chestOpenedFrame] = createAnimation('gfx/tiles/chest.pn
 ).frames;
 
 export class ChestObject implements ObjectInstance {
+    area: AreaInstance;
     definition: LootObjectDefinition;
     drawPriority: 'sprites' = 'sprites';
     behaviors = {
         solid: true,
     };
     frame: Frame;
+    linkedObject: ChestObject;
     x: number;
     y: number;
     z: number;
@@ -142,8 +146,11 @@ export class ChestObject implements ObjectInstance {
             hero.actionFrame = 0;
             const onPickup = lootEffects[this.definition.lootType] || lootEffects.unknown;
             onPickup(state, this);
-            state.areaInstance.objects.splice(state.areaInstance.objects.indexOf(this) + 1, 0, new LootGetAnimation(this));
+            addObjectToArea(state, this.area, new LootGetAnimation(this));
             state.savedState.collectedItems[this.definition.id] = true;
+            if (this.linkedObject) {
+                state.savedState.collectedItems[this.linkedObject.definition.id] = true;
+            }
             saveGame();
         }
     }
