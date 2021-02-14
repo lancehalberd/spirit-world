@@ -1,5 +1,5 @@
 import {
-    createAreaInstance, getAreaFromLocation, getAreaSize, linkObjects,
+    checkIfAllEnemiesAreDefeated, createAreaInstance, getAreaFromLocation, getAreaSize, linkObjects,
     setAreaSection, switchToNextAreaSection,
 } from 'app/content/areas';
 import { displayTileEditorPropertyPanel, editingState } from 'app/development/tileEditor';
@@ -55,6 +55,8 @@ export function updateCamera(state: GameState, speed = cameraSpeed): void {
                 state.areaInstance.tilesDrawn = [];
                 state.areaInstance.checkToRedrawTiles = true;
             }
+            checkIfAllEnemiesAreDefeated(state, state.areaInstance);
+            checkIfAllEnemiesAreDefeated(state, state.alternateAreaInstance);
         }
         return;
     }

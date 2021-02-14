@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import { createObjectInstance, findObjectInstanceById } from 'app/content/objects';
+import { changeObjectStatus, createObjectInstance, findObjectInstanceById } from 'app/content/objects';
 import { palettes } from 'app/content/palettes';
 import { LootDropObject } from 'app/content/lootObject';
 import { zones } from 'app/content/zones';
@@ -10,7 +10,7 @@ import { updateCamera } from 'app/updateCamera';
 
 import {
     AreaDefinition, AreaInstance, AreaLayerDefinition,
-    Direction, GameState, LayerTile, ObjectInstance, ShortRectangle, Tile, TileBehaviors,
+    Direction, Enemy, GameState, LayerTile, ObjectInstance, ShortRectangle, Tile, TileBehaviors,
     ZoneLocation,
 } from 'app/types';
 
@@ -240,12 +240,16 @@ export function switchToNextAreaSection(state: GameState): void {
         return;
     }
     refreshSection(state, state.areaInstance, state.areaSection);
+    refreshSection(state, state.alternateAreaInstance, state.areaSection);
+    linkObjects(state);
     state.areaSection = state.nextAreaSection;
     removeAllClones(state);
     state.hero.activeStaff?.remove(state);
     state.hero.safeD = state.hero.d;
     state.hero.safeX = state.hero.x;
     state.hero.safeY = state.hero.y;
+    checkIfAllEnemiesAreDefeated(state, state.areaInstance);
+    checkIfAllEnemiesAreDefeated(state, state.alternateAreaInstance);
 }
 
 export function setAreaSection(state: GameState, d: Direction, newArea: boolean = false): void {
@@ -411,29 +415,31 @@ export function refreshSection(state: GameState, area: AreaInstance, section: Sh
                         || area.definition.parentDefinition?.layers[l].grid.tiles[row][column];
             }
             resetTileBehavior(area, {x: column, y: row});
-            area.tilesDrawn[row][column] = false;
+            if (area.tilesDrawn[row]?.[column]) {
+                area.tilesDrawn[row][column] = false;
+            }
         }
     }
     area.checkToRedrawTiles = true;
     const l = section.x * 16;
     const t = section.y * 16;
     // Reset objects in the section that should be reset.
-    for (let i = 0; i < state.areaInstance.definition.objects.length; i++) {
-        const definition = state.areaInstance.definition.objects[i];
+    for (let i = 0; i < area.definition.objects.length; i++) {
+        const definition = area.definition.objects[i];
         // Ignore objects defined outside of this section.
         if (definition.x >= l + section.w * 16 || definition.x < l || definition.y >= t + section.h * 16 || definition.y < t) {
             continue;
         }
-        let object = findObjectInstanceById(state.areaInstance, definition.id, true);
+        let object = findObjectInstanceById(area, definition.id, true);
         if (object) {
             if (object.alwaysReset) {
                 removeObjectFromArea(state, object);
-                addObjectToArea(state, state.areaInstance, createObjectInstance(state, definition));
+                addObjectToArea(state, area, createObjectInstance(state, definition));
             }
         } else {
             object = createObjectInstance(state, definition);
             if (object.alwaysReset) {
-                addObjectToArea(state, state.areaInstance, object);
+                addObjectToArea(state, area, object);
             }
         }
     }
@@ -490,3 +496,28 @@ export function destroyTile(state: GameState, area: AreaInstance, target: LayerT
     }
 }
 
+export function checkIfAllEnemiesAreDefeated(state: GameState, area: AreaInstance): void {
+    if (area.objects.some(e => (e instanceof Enemy) && e.isInCurrentSection(state))) {
+        return;
+    }
+    const { section } = getAreaSize(state);
+    for (const object of area.objects) {
+        if (!object.getHitbox) {
+            continue;
+        }
+        const hitbox = object.getHitbox(state);
+        if (hitbox.x < section.x ||
+            hitbox.x >= section.x + section.w ||
+            hitbox.y < section.y ||
+            hitbox.y >= section.y + section.h
+        ) {
+            continue;
+        }
+        if (object.status === 'hiddenEnemy') {
+            changeObjectStatus(state, object, 'normal');
+        }
+        if (object.status === 'closedEnemy') {
+            changeObjectStatus(state, object, 'normal');
+        }
+    }
+}

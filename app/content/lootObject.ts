@@ -198,6 +198,7 @@ export const lootFrames: Partial<{[key in LootType]: Frame}> = {
     peach: smallPeachFrame,
     peachOfImmortality: fullPeachFrame,
     peachOfImmortalityPiece: peachPieceFrame,
+    spiritSight: createLootFrame('blue', 'SE'),
     unknown: createLootFrame('black', '?'),
     weapon: weaponFrame,
 }

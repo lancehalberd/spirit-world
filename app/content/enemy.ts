@@ -81,7 +81,7 @@ export class Enemy implements Actor, ObjectInstance {
                 // Flip the frame when facing right. We may need an additional flag for this behavior
                 // if we don't do it for all enemies on the right frames.
                 const w = (frame.content ? frame.content.w : frame.w);
-                context.translate(this.x + (frame?.content?.x || 0) + w / 2, 0);
+                context.translate((this.x | 0) + (frame?.content?.x || 0) + w / 2, 0);
                 context.scale(-1, 1);
                 drawFrame(context, frame, { ...frame, x: - w / 2, y: this.y - (frame?.content?.y || 0) });
             } else {

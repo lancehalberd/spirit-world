@@ -27,6 +27,7 @@ export class TippableObject implements ObjectInstance {
     x: number;
     y: number;
     fallFrame = 0;
+    fallingInPlace: boolean = false;
     fallDirection: Direction;
     grabDirection: Direction;
     linkedObject: TippableObject;
@@ -53,12 +54,19 @@ export class TippableObject implements ObjectInstance {
         }
     }
     onPull(state: GameState, direction: Direction): void {
-        if (!this.fallDirection && this.grabDirection === direction) {
+        if (!this.fallDirection && !this.fallingInPlace && this.grabDirection === direction) {
             this.fallInDirection(state, direction);
+        } else if (!this.fallDirection && !this.fallingInPlace) {
+            this.fallingInPlace = true;
+            this.animationTime = -80;
+            if (this.linkedObject) {
+                this.linkedObject.fallingInPlace = true;
+                this.linkedObject.animationTime = -80;
+            }
         }
     }
     onPush(state: GameState, direction: Direction): void {
-        if (!this.fallDirection) {
+        if (!this.fallDirection && !this.fallingInPlace) {
             this.pushCounter++;
             this.pushedLastFrame = true;
             if (this.pushCounter >= 25) {
@@ -67,6 +75,9 @@ export class TippableObject implements ObjectInstance {
         }
     }
     fallInDirection(state: GameState, direction: Direction): void {
+        if (this.fallDirection || this.fallingInPlace) {
+            return;
+        }
         const x = this.x + 8 + 16 * directionMap[direction][0];
         const y = this.y + 8 + 16 * directionMap[direction][1];
         if (isPointOpen(state, this.area, {x, y}) && (!this.linkedObject || isPointOpen(state, this.linkedObject.area, {x, y}))) {
@@ -81,25 +92,34 @@ export class TippableObject implements ObjectInstance {
         }
     }
     update(state: GameState) {
-        if (this.fallDirection) {
+        if (this.fallingInPlace) {
+            this.animationTime += FRAME_LENGTH;
+            if (this.animationTime === 200) {
+                const hero = state.hero.activeClone || state.hero;
+                if (hero.grabObject === this) {
+                    hero.grabObject = null;
+                    hero.action = null;
+                }
+            }
+        } if (this.fallDirection) {
             this.animationTime += FRAME_LENGTH;
             if (this.fallFrame < 16) {
                 this.fallFrame++;
                 this.x += directionMap[this.fallDirection][0];
                 this.y += directionMap[this.fallDirection][1];
             }
-            if (!this.shattered && this.animationTime >= (fallingAnimation.frames.length - 1) * FRAME_LENGTH * fallingAnimation.frameDuration) {
-                this.shattered = true;
-                this.pullingHeroDirection = null;
-                const hero = state.hero.activeClone || state.hero;
-                if (hero.grabObject === this) {
-                    hero.grabObject = null;
-                    hero.action = null;
-                }
-                // Not sure why I had this, with this, the pot is hidden behind floor switches sometimes.
-                // this.drawPriority = 'background';
-                addParticleAnimations(state, this.area, this.x, this.y, 2, particleFrames);
+        }
+        if (!this.shattered && this.animationTime >= (fallingAnimation.frames.length - 1) * FRAME_LENGTH * fallingAnimation.frameDuration) {
+            this.shattered = true;
+            this.pullingHeroDirection = null;
+            const hero = state.hero.activeClone || state.hero;
+            if (hero.grabObject === this) {
+                hero.grabObject = null;
+                hero.action = null;
             }
+            // Not sure why I had this, with this, the pot is hidden behind floor switches sometimes.
+            // this.drawPriority = 'background';
+            addParticleAnimations(state, this.area, this.x, this.y, 2, particleFrames);
         }
         if (!this.pushedLastFrame) {
             this.pushCounter = 0;

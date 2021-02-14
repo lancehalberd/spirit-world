@@ -33,7 +33,9 @@ export function saveGame(): void {
     state.savedGames[state.savedGameIndex] = state.savedState;
     // These can get set on other files when previewing the saved game.
     for (const savedGame of state.savedGames) {
-        delete savedGame.hero.area;
+        if (savedGame?.hero) {
+            delete savedGame.hero.area;
+        }
     }
     // console.log(exportState(getState()));
     try {

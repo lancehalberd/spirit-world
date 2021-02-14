@@ -30,11 +30,14 @@ type AnimationSet = {
     [key in Direction]: FrameAnimation
 }
 export interface ActorAnimations {
+    attack?: AnimationSet,
+    death?: AnimationSet,
+    grab?: AnimationSet,
+    hurt?: AnimationSet,
     idle: AnimationSet,
     move?: AnimationSet,
-    attack?: AnimationSet,
-    hurt?: AnimationSet,
-    death?: AnimationSet,
+    pull?: AnimationSet,
+    push?: AnimationSet,
     roll?: AnimationSet,
 }
 
