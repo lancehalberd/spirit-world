@@ -116,9 +116,17 @@ export function initializeAreaTiles(area: AreaDefinition): AreaDefinition {
 }
 
 export function removeAllClones(state: GameState): void {
+    // Modify the hero to match the state of the active clone before it is removed.
     if (state.hero.activeClone) {
         state.hero.x = state.hero.activeClone.x;
         state.hero.y = state.hero.activeClone.y;
+        state.hero.d = state.hero.activeClone.d;
+        state.hero.animationTime = state.hero.activeClone.animationTime;
+        state.hero.action = state.hero.activeClone.action;
+        state.hero.actionFrame = state.hero.activeClone.actionFrame;
+        state.hero.actionDx = state.hero.activeClone.actionDx;
+        state.hero.actionDy = state.hero.activeClone.actionDy;
+        state.hero.actionTarget = state.hero.activeClone.actionTarget;
     }
     for (const clone of state.hero.clones) {
         removeObjectFromArea(state, clone);
@@ -168,7 +176,7 @@ export function linkObjects(state: GameState): void {
     }
 }
 export function linkObject(object: ObjectInstance): void {
-    if (!object.definition.linked) {
+    if (!object.definition?.linked) {
         return;
     }
     const linkedObject = object.area.alternateArea.objects.find(o => o.x === object.x && o.y === object.y);
@@ -217,14 +225,16 @@ export function enterZoneByTarget(state: GameState, zoneKey: string, targetObjec
 }
 
 export function setNextAreaSection(state: GameState, d: Direction): void {
+    removeAllClones(state);
     state.nextAreaSection = state.areaInstance.definition.sections[0];
-    let x = state.hero.x / state.areaInstance.palette.w;
-    let y = state.hero.y / state.areaInstance.palette.h;
+    const hero = state.hero;
+    let x = hero.x / state.areaInstance.palette.w;
+    let y = hero.y / state.areaInstance.palette.h;
     if (d === 'right') {
-        x += state.hero.w / state.areaInstance.palette.w;
+        x += hero.w / state.areaInstance.palette.w;
     }
     if (d === 'down') {
-        y += state.hero.h / state.areaInstance.palette.h;
+        y += hero.h / state.areaInstance.palette.h;
     }
     for (const section of state.areaInstance.definition.sections) {
         if (isPointInShortRect(x, y, section)) {

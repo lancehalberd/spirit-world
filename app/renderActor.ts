@@ -138,6 +138,8 @@ function getHeroFrame(state: GameState, hero: Hero): Frame {
         case 'pushing':
             animations = heroAnimations.push;
             break;
+        case 'entering':
+        case 'exiting':
         case 'walking':
             animations = heroAnimations.move;
             break;

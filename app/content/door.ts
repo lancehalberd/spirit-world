@@ -87,7 +87,7 @@ export class Door implements ObjectInstance {
         }
     }
     update(state: GameState) {
-        const hero = state.hero.activeClone || state.hero;
+        let hero = state.hero.activeClone || state.hero;
         // Nothing to update if the hero isn't in the same world as this door.
         if (hero.area !== this.area) {
             return;
@@ -127,6 +127,9 @@ export class Door implements ObjectInstance {
             if (hero.action === 'entering' && this.definition.targetZone && this.definition.targetObjectId) {
                 if (hero.actionFrame > 8) {
                     if (hero.action === 'entering' && enterZoneByTarget(state, this.definition.targetZone, this.definition.targetObjectId)) {
+                        // We need to reassign hero after calling `enterZoneByTarget` because the active hero may change
+                        // from one clone to another when changing zones.
+                        hero = state.hero.activeClone || state.hero;
                         hero.action = 'exiting';
                         const target = findObjectInstanceById(state.areaInstance, this.definition.targetObjectId) as Door;
                         if (!target){
