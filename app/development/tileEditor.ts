@@ -31,10 +31,10 @@ import {
     AreaInstance, AreaLayerDefinition, Direction,  EnemyType, GameState,
     LootType, MagicElement,
     ObjectDefinition, ObjectStatus, ObjectType,
-    PanelRows, PropertyRow, ShortRectangle, TileGrid,
+    PanelRows, PropertyRow, ShortRectangle, Tile, TileGrid,
 } from 'app/types';
 
-type EditorToolType = 'select' | 'brush' | 'replace' | 'object';
+type EditorToolType = 'brush' | 'delete' | 'object' | 'replace' | 'select';
 export interface EditingState {
     amount: number,
     tool: EditorToolType,
@@ -69,7 +69,8 @@ export const editingState: EditingState = {
     isEditing: false,
     brush: null,
     direction: 'up',
-    selectedLayerIndex: 0,
+    // Default editing the field, not the floor.
+    selectedLayerIndex: 1,
     element: null,
     enemyType: 'snake',
     entranceTargetZone: null,
@@ -274,7 +275,7 @@ export function displayTileEditorPropertyPanel() {
         rows.push({
             name: 'tool',
             value: editingState.tool,
-            values: ['select', 'brush', 'replace', 'object'],
+            values: ['select', 'brush', 'delete', 'replace', 'object'],
             onChange(tool: EditorToolType) {
                 editingState.tool = tool;
                 displayTileEditorPropertyPanel();
@@ -419,6 +420,9 @@ mainCanvas.addEventListener('mousemove', function () {
         case 'brush':
             drawBrush(x, y);
             break;
+        case 'delete':
+            deleteTile(x, y);
+            break;
     }
 });
 mainCanvas.addEventListener('mousedown', function () {
@@ -437,11 +441,44 @@ mainCanvas.addEventListener('mousedown', function () {
         case 'brush':
             drawBrush(x, y);
             break;
+        case 'delete':
+            deleteTile(x, y);
+            break;
         case 'replace':
             replaceTiles(x, y);
             break;
     }
 });
+
+function deleteTile(x: number, y: number): void {
+    const state = getState();
+    const palette = editingState.brush.palette;
+    y = Math.floor((state.camera.y + y) / palette.h);
+    x = Math.floor((state.camera.x + x) / palette.w);
+    const area = state.areaInstance;
+    const definition = area.definition;
+    const layer = area.layers[editingState.selectedLayerIndex];
+    const layerDefinition = definition.layers[editingState.selectedLayerIndex];
+    const tiles = layerDefinition.grid.tiles;
+    if (x < 0 || x > tiles[0].length - 1 || y < 0 || y > tiles.length - 1) {
+        return;
+    }
+    if (!definition.isSpiritWorld) {
+        // In the physical world we just replace tiles with the empty tile.
+        tiles[y][x] = {x: 0, y: 0};
+        layer.tiles[y][x] = {x: 0, y: 0};
+        applyTileChangeToSpiritWorld(area.alternateArea, editingState.selectedLayerIndex, x, y, {x: 0, y: 0});
+    } else {
+        // Clear the tile definition in the spirit world.
+        tiles[y][x] = null;
+        // And set the instance to use the tile from the parent definition.
+        layer.tiles[y][x] =
+            definition.parentDefinition.layers[editingState.selectedLayerIndex].grid.tiles[y][x];
+    }
+    area.tilesDrawn[y][x] = false;
+    area.checkToRedrawTiles = true;
+    resetTileBehavior(area, {x, y});
+}
 
 function drawBrush(x: number, y: number): void {
     const state = getState();
@@ -466,6 +503,7 @@ function drawBrush(x: number, y: number): void {
             const tile = editingState.brush.tiles[y][x]
             tileRow[column] = tile;
             layer.tiles[row][column] = tile;
+            applyTileChangeToSpiritWorld(area.alternateArea, editingState.selectedLayerIndex, column, row, tile);
             state.areaInstance.tilesDrawn[row][column] = false;
             state.areaInstance.checkToRedrawTiles = true;
             resetTileBehavior(area, {x: column, y: row});
@@ -490,9 +528,25 @@ function replaceTiles(x: number, y: number): void {
                 state.areaInstance.tilesDrawn[y][x] = false;
                 state.areaInstance.checkToRedrawTiles = true;
                 resetTileBehavior(state.areaInstance, {x, y});
+                applyTileChangeToSpiritWorld(state.alternateAreaInstance, editingState.selectedLayerIndex, x, y, replacement);
             }
         }
     }
+}
+// Apply a tile change to the spirit world if it doesn't have its own tile definition (the tile is null).
+function applyTileChangeToSpiritWorld(area: AreaInstance, layerIndex: number, x: number, y: number, tile: Tile): void {
+    if (!area.definition.isSpiritWorld || !area.definition.layers[layerIndex]) {
+        return;
+    }
+    if (area.definition.layers[layerIndex].grid.tiles[y][x]) {
+        return;
+    }
+    area.layers[layerIndex].tiles[y][x] = tile;
+    if (area.tilesDrawn[y]?.[x]) {
+        area.tilesDrawn[y][x] = false;
+    }
+    area.checkToRedrawTiles = true;
+    resetTileBehavior(area, {x, y});
 }
 
 export function renderEditor(context: CanvasRenderingContext2D, state: GameState): void {
