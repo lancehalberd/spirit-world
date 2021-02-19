@@ -1,9 +1,10 @@
 import _ from 'lodash';
 
-import { getMovementDeltas } from 'app/keyCommands';
+import { EXPLOSION_RADIUS, EXPLOSION_TIME } from 'app/gameConstants';
+import { getCloneMovementDeltas } from 'app/keyCommands';
 import { getTileFrame } from 'app/render';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
-import { directionMap, getDirection } from 'app/utils/field';
+import { carryMap, directionMap, getDirection } from 'app/utils/field';
 
 import { Actor, ActorAnimations, Frame, FrameAnimation, FrameDimensions, GameState, Hero, ObjectInstance } from 'app/types';
 
@@ -41,18 +42,15 @@ const grabDownAnimation: FrameAnimation = createAnimation('gfx/mcpushpull.png', 
 const grabLeftAnimation: FrameAnimation = createAnimation('gfx/mcpushpull.png', pushGeometry, { cols: 1, x: 1, y: 3, duration: 8});
 const grabRightAnimation: FrameAnimation = createAnimation('gfx/mcpushpull.png', pushGeometry, { cols: 1, x: 1, y: 1, duration: 8});
 
+const pullUpAnimation: FrameAnimation = createAnimation('gfx/mcpushpull.png', pushGeometry, { cols: 3, x: 2, y: 2, duration: 8, frameMap:[0, 1, 0, 2]});
+const pullDownAnimation: FrameAnimation = createAnimation('gfx/mcpushpull.png', pushGeometry, { cols: 3, x: 2, y: 0, duration: 8, frameMap:[0, 1, 0, 2]});
+const pullLeftAnimation: FrameAnimation = createAnimation('gfx/mcpushpull.png', pushGeometry, { cols: 3, x: 2, y: 3, duration: 8, frameMap:[0, 1, 0, 2]});
+const pullRightAnimation: FrameAnimation = createAnimation('gfx/mcpushpull.png', pushGeometry, { cols: 3, x: 2, y: 1, duration: 8, frameMap:[0, 1, 0, 2]});
 
-const pullUpAnimation: FrameAnimation = createAnimation('gfx/mcpushpull.png', pushGeometry, { cols: 3, x: 2, y: 2, duration: 8});
-const pullDownAnimation: FrameAnimation = createAnimation('gfx/mcpushpull.png', pushGeometry, { cols: 3, x: 2, y: 0, duration: 8});
-const pullLeftAnimation: FrameAnimation = createAnimation('gfx/mcpushpull.png', pushGeometry, { cols: 3, x: 2, y: 3, duration: 8});
-const pullRightAnimation: FrameAnimation = createAnimation('gfx/mcpushpull.png', pushGeometry, { cols: 3, x: 2, y: 1, duration: 8});
-
-const pushUpAnimation: FrameAnimation = createAnimation('gfx/mcpushpull.png', pushGeometry, { cols: 3, x: 5, y: 2, duration: 8});
-const pushDownAnimation: FrameAnimation = createAnimation('gfx/mcpushpull.png', pushGeometry, { cols: 3, x: 5, y: 0, duration: 8});
-const pushLeftAnimation: FrameAnimation = createAnimation('gfx/mcpushpull.png', pushGeometry, { cols: 3, x: 5, y: 3, duration: 8});
-const pushRightAnimation: FrameAnimation = createAnimation('gfx/mcpushpull.png', pushGeometry, { cols: 3, x: 5, y: 1, duration: 8});
-
-
+const pushUpAnimation: FrameAnimation = createAnimation('gfx/mcpushpull.png', pushGeometry, { cols: 3, x: 5, y: 2, duration: 8, frameMap:[0, 1, 0, 2]});
+const pushDownAnimation: FrameAnimation = createAnimation('gfx/mcpushpull.png', pushGeometry, { cols: 3, x: 5, y: 0, duration: 8, frameMap:[0, 1, 0, 2]});
+const pushLeftAnimation: FrameAnimation = createAnimation('gfx/mcpushpull.png', pushGeometry, { cols: 3, x: 5, y: 3, duration: 8, frameMap:[0, 1, 0, 2]});
+const pushRightAnimation: FrameAnimation = createAnimation('gfx/mcpushpull.png', pushGeometry, { cols: 3, x: 5, y: 1, duration: 8, frameMap:[0, 1, 0, 2]});
 
 
 export const heroAnimations: ActorAnimations = {
@@ -111,7 +109,7 @@ function getHeroFrame(state: GameState, hero: Hero): Frame {
         case 'grabbing':
             const [dx, dy] = directionMap[hero.d];
             const oppositeDirection = getDirection(-dx, -dy);
-            const [kdx, kdy] = getMovementDeltas();
+            const [kdx, kdy] = getCloneMovementDeltas(state, hero);
             if (hero.grabObject?.pullingHeroDirection === oppositeDirection) {
                 lastPullAnimation = heroAnimations.pull;
                 return getFrame(lastPullAnimation[hero.d], hero.animationTime);
@@ -143,6 +141,8 @@ function getHeroFrame(state: GameState, hero: Hero): Frame {
         case 'walking':
             animations = heroAnimations.move;
             break;
+        case 'beingCarried':
+        case 'knocked':
         case 'roll':
             animations = heroAnimations.roll;
             break;
@@ -164,7 +164,7 @@ export function renderHero(this: Hero, context: CanvasRenderingContext2D, state:
     const activeClone = state.hero.activeClone || state.hero;
     context.save();
         if (hero !== activeClone) {
-            // context.globalAlpha = 0.6;
+            context.globalAlpha = 0.8;
         } else if (hero.invulnerableFrames) {
             context.globalAlpha = 0.7 + 0.3 * Math.cos(2 * Math.PI * hero.invulnerableFrames * 3 / 50);
         }
@@ -183,6 +183,7 @@ export function renderHero(this: Hero, context: CanvasRenderingContext2D, state:
     if (hero.pickUpTile) {
         renderCarriedTile(context, state, hero);
     }
+    renderExplosionRing(context, state, hero);
 }
 export function renderHeroEyes(context: CanvasRenderingContext2D, state: GameState, hero: Hero) {
     const frame = getHeroFrame(state, hero);
@@ -210,13 +211,6 @@ export function renderHeroEyes(context: CanvasRenderingContext2D, state: GameSta
     });
 }
 
-// 15, 4, 4,
-const carryMap = {
-    'right': [{x: 12, y: -9}, {x: 12, y: -9}, {x: 12, y: -9}, {x: 12, y: -9}, {x: 9, y: -13}, {x: 7, y: -16}, {x: 0, y: -17}],
-    'left': [{x: -12, y: -9}, {x: -12, y: -9}, {x: -12, y: -9}, {x: -12, y: -9}, {x: -9, y: -13}, {x: -7, y: -16}, {x: 0, y: -17}],
-    'down': [{x: 0, y: 3}, {x: 0, y: 3}, {x: 0, y: 3}, {x: 0, y: 3}, {x: 0, y: -4}, {x: 0, y: -9}, {x: 0, y: -17}],
-    'up': [{x: 0, y: -15}, {x: 0, y: -15}, {x: 0, y: -15}, {x: 0, y: -15}, {x: 0, y: -16}, {x: 0, y: -17}, {x: 0, y: -17}],
-};
 export function renderCarriedTile(context: CanvasRenderingContext2D, state: GameState, actor: Actor): void {
     const offset = carryMap[actor.d][Math.min(actor.pickUpFrame, carryMap[actor.d].length - 1)];
     const frame = getTileFrame(state.areaInstance, actor.pickUpTile);
@@ -230,6 +224,25 @@ export function renderHeroShadow(context: CanvasRenderingContext2D, state: GameS
         return;
     }
     drawFrame(context, shadowFrame, { ...shadowFrame, x: hero.x, y: hero.y - 3 - Y_OFF });
+}
+export function renderExplosionRing(context: CanvasRenderingContext2D, state: GameState, hero: Hero): void {
+    if (!(hero.explosionTime > 0)) {
+        return;
+    }
+    const maxR = EXPLOSION_RADIUS;
+    const r = maxR * hero.explosionTime / EXPLOSION_TIME;
+    context.beginPath();
+    // Alternate value: hero.y + hero.h / 2 - 3 - Y_OFF (based on shadow position)
+    context.arc(hero.x + hero.w / 2, hero.y + hero.h / 2, maxR, 0, 2 * Math.PI);
+    context.strokeStyle = 'red';
+    context.stroke();
+    context.save();
+        context.globalAlpha = hero.explosionTime / EXPLOSION_TIME;
+        context.beginPath();
+        context.arc(hero.x + hero.w / 2, hero.y + hero.h / 2, r, 0, 2 * Math.PI);
+        context.fillStyle = 'red';
+        context.fill();
+    context.restore();
 }
 
 export function renderShadow(context: CanvasRenderingContext2D, state: GameState, object: ObjectInstance): void {

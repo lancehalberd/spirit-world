@@ -2,20 +2,28 @@ import _ from 'lodash';
 
 import {
     addObjectToArea, destroyTile, getAreaFromLocation, getAreaSize,
-    removeAllClones, removeObjectFromArea, scrollToArea, setNextAreaSection
+    removeAllClones, removeObjectFromArea, scrollToArea, setNextAreaSection,
+    swapHeroStates,
 } from 'app/content/areas';
+import { CloneExplosionEffect } from 'app/content/effects/CloneExplosionEffect';
 import { Enemy } from 'app/content/enemy';
 import { editingState } from 'app/development/tileEditor';
-import { KEY_THRESHOLD, FRAME_LENGTH, MAX_SPIRIT_RADIUS } from 'app/gameConstants';
+import { EXPLOSION_TIME, FRAME_LENGTH, MAX_SPIRIT_RADIUS } from 'app/gameConstants';
 import { getActorTargets } from 'app/getActorTargets';
-import { GAME_KEY, getMovementDeltas, isKeyDown } from 'app/keyCommands';
+import {
+    GAME_KEY,
+    getCloneMovementDeltas,
+    isGameKeyDown,
+    wasGameKeyPressed,
+    wasGameKeyPressedAndReleased,
+} from 'app/keyCommands';
 import { checkForFloorDamage, moveActor } from 'app/moveActor';
 import { getTileFrame } from 'app/render';
 import { useTool } from 'app/useTool';
 import { directionMap, getDirection, isPointOpen } from 'app/utils/field';
 import { rectanglesOverlap } from 'app/utils/index';
 
-import { Actor, GameState, Hero, ObjectInstance, ThrownChakram, ThrownObject, Tile } from 'app/types';
+import { Actor, Clone, GameState, Hero, ObjectInstance, ThrownChakram, ThrownObject, Tile } from 'app/types';
 
 const rollSpeed = [
     5, 5, 5, 5,
@@ -24,27 +32,46 @@ const rollSpeed = [
     2, 2, 2, 2,
 ];
 
-export function updateHero(this: void, state: GameState) {
-    const area = state.areaInstance;
-    let dx = 0, dy = 0;
+export function updateAllHeroes(this: void, state: GameState) {
     if (state.hero.invulnerableFrames > 0) {
         state.hero.invulnerableFrames--;
     }
+    // Switching clones is done outside of updateHero, otherwise the switch gets processed by each clone.
+    if (state.hero.clones.length && !state.hero.pickUpObject && (
+            (state.hero.leftTool === 'clone' && wasGameKeyPressedAndReleased(state, GAME_KEY.LEFT_TOOL))
+            || (state.hero.rightTool === 'clone' && wasGameKeyPressedAndReleased(state, GAME_KEY.RIGHT_TOOL))
+    )) {
+        //const currentIndex = state.hero.clones.indexOf(state.hero.activeClone);
+        //state.hero.activeClone = state.hero.clones[currentIndex + 1];
+        swapHeroStates(state.hero, state.hero.clones[0]);
+        state.hero.clones.push(state.hero.clones.shift());
+    }
+    for (const clone of state.hero.clones) {
+        updateHero(state, clone);
+    }
+    updateHero(state, state.hero);
+}
+
+export function updateHero(this: void, state: GameState, hero: Hero) {
+    const area = state.areaInstance;
+    let dx = 0, dy = 0;
     let movementSpeed = 2;
 
     const { w, h, section } = getAreaSize(state);
 
-    const hero: Hero = state.hero.activeClone || state.hero;
-
+    const isCloneToolDown = (state.hero.leftTool === 'clone' && isGameKeyDown(state, GAME_KEY.LEFT_TOOL))
+        || (state.hero.rightTool === 'clone' && isGameKeyDown(state, GAME_KEY.RIGHT_TOOL));
+    const primaryClone = state.hero.activeClone || state.hero;
+    const isControlled = isCloneToolDown || hero === primaryClone;
 
     // Automatically move the character into the bounds of the current section.
-    if (editingState.isEditing) {
+    if (editingState.isEditing && isControlled) {
         movementSpeed = 0;
         // Hack to prevent player from being damaged or falling into pits while editing.
         hero.invulnerableFrames = 1;
         hero.action = 'roll';
         hero.actionFrame = rollSpeed.length - 1;
-        [dx, dy] = getMovementDeltas();
+        [dx, dy] = getCloneMovementDeltas(state, hero);
         hero.x += 4 * dx;
         hero.y += 4 * dy;
         if (dx || dy) hero.d = getDirection(dx, dy);
@@ -91,10 +118,14 @@ export function updateHero(this: void, state: GameState) {
             damageActor(state, hero, 1, null, true);
             hero.action = null;
         }
-    } else if (hero.action === 'beingMoved' || hero.action === 'entering' || hero.action === 'exiting') {
+    } else if (hero.action === 'beingCarried') {
+        // The clone will update itself to match its carrier.
+        hero.animationTime = 0;
+        movementSpeed = 0;
+    } else if (hero.action === 'entering' || hero.action === 'exiting') {
+        // The door will move the player until the action is complete.
         movementSpeed = 0;
         hero.actionFrame++;
-        // The object moving the hero will take care of their movement until it is completed.
     } else if (hero.action === 'getItem') {
         movementSpeed = 0;
         hero.actionFrame++;
@@ -106,12 +137,12 @@ export function updateHero(this: void, state: GameState) {
         if (hero.grabObject?.pullingHeroDirection) {
             dx = directionMap[hero.grabObject.pullingHeroDirection][0];
             dy = directionMap[hero.grabObject.pullingHeroDirection][1];
-        } else if (!hero.pickUpTile && (!isKeyDown(GAME_KEY.PASSIVE_TOOL))) {
+        } else if (!hero.pickUpTile && !hero.pickUpObject && (!isGameKeyDown(state, GAME_KEY.PASSIVE_TOOL))) {
             hero.action = null;
             hero.grabTile = null;
             hero.grabObject = null;
-        } else if (hero.grabObject?.onPull) {
-            const [pulldx, pulldy] = getMovementDeltas();
+        } else if (isControlled && hero.grabObject?.onPull) {
+            const [pulldx, pulldy] = getCloneMovementDeltas(state, hero);
             if (pulldx || pulldy) {
                 const direction = getDirection(pulldx, pulldy);
                 const points = [0, 5, 10, 15];
@@ -122,7 +153,7 @@ export function updateHero(this: void, state: GameState) {
                         {x: hero.x + x + 16 * directionMap[direction][0], y: hero.y + y + 16 * directionMap[direction][1] }
                     )))
                 ) {
-                    hero.grabObject.onPull(state, direction);
+                    hero.grabObject.onPull(state, direction, hero);
                 } else {
                     const wiggleDistance = 14;
                     // If the player is not positioned correctly to pull the object, instead of pulling,
@@ -140,7 +171,7 @@ export function updateHero(this: void, state: GameState) {
                 }
             }
         }
-    } else if (hero.pickUpTile) {
+    } else if (hero.pickUpTile || hero.pickUpObject) {
         movementSpeed = 1.5;
     } else if (hero.action === 'throwing' ) {
         movementSpeed = 0;
@@ -150,10 +181,32 @@ export function updateHero(this: void, state: GameState) {
         }
     } else if (hero.action === 'meditating') {
         movementSpeed = 0;
-        if (isKeyDown(GAME_KEY.PASSIVE_TOOL)) {
-            const maxRadius = MAX_SPIRIT_RADIUS;
-            hero.spiritRadius = Math.min(hero.spiritRadius + 4, maxRadius);
+        if (isControlled && isGameKeyDown(state, GAME_KEY.PASSIVE_TOOL)) {
+            if (state.hero.clones.length) {
+                // Meditating as a clone will either blow up the current clone, or all clones
+                // except the current if the clone tool is being pressed.
+                if (!isCloneToolDown || hero !== primaryClone) {
+                    hero.explosionTime += FRAME_LENGTH;
+                    if (hero.explosionTime >= EXPLOSION_TIME) {
+                        hero.action = null;
+                        hero.explosionTime = 0;
+                        addObjectToArea(state, hero.area, new CloneExplosionEffect({
+                            x: hero.x + hero.w / 2,
+                            y: hero.y + hero.h / 2,
+                        }));
+                        destroyClone(state, hero);
+                        return;
+                    }
+                } else {
+                    // You cannot meditate while you have clones spawned.
+                    hero.action = null;
+                }
+            } else {
+                const maxRadius = MAX_SPIRIT_RADIUS;
+                hero.spiritRadius = Math.min(hero.spiritRadius + 4, maxRadius);
+            }
         } else {
+            hero.explosionTime = 0;
             hero.spiritRadius = Math.max(hero.spiritRadius - 8, 0);
             if (hero.spiritRadius === 0) {
                 hero.action = null;
@@ -205,8 +258,8 @@ export function updateHero(this: void, state: GameState) {
     if (hero.action === 'pushing') {
         hero.animationTime -= 3 * FRAME_LENGTH / 4;
     }
-    if (movementSpeed) {
-        [dx, dy] = getMovementDeltas();
+    if (isControlled && movementSpeed) {
+        [dx, dy] = getCloneMovementDeltas(state, hero);
         if (dx || dy) {
             const m = Math.sqrt(dx * dx + dy * dy);
             dx = movementSpeed * dx / m;
@@ -240,8 +293,9 @@ export function updateHero(this: void, state: GameState) {
             hero.animationTime += FRAME_LENGTH;
         }
     }
-    if ((!hero.action || hero.action === 'walking' || hero.action === 'pushing') && !hero.pickUpTile && hero.weapon > 0 &&
-        isKeyDown(GAME_KEY.WEAPON, KEY_THRESHOLD)
+    if (isControlled && (!hero.action || hero.action === 'walking' || hero.action === 'pushing')
+        && !hero.pickUpTile && !hero.pickUpObject &&  hero.weapon > 0
+        && wasGameKeyPressed(state, GAME_KEY.WEAPON)
     ) {
         const thrownChakrams = state.areaInstance.objects.filter(o => o instanceof ThrownChakram);
         if (state.hero.weapon - thrownChakrams.length > 0) {
@@ -255,18 +309,20 @@ export function updateHero(this: void, state: GameState) {
 
     if (hero.toolCooldown > 0) {
         hero.toolCooldown -= FRAME_LENGTH;
-    } else if ((!hero.action || hero.action === 'walking' || hero.action === 'pushing') && !hero.pickUpTile) {
-        if (state.hero.leftTool && isKeyDown(GAME_KEY.LEFT_TOOL, KEY_THRESHOLD)) {
+    } else if ((!hero.action || hero.action === 'walking' || hero.action === 'pushing')
+        && !hero.pickUpTile && !hero.pickUpObject
+    ) {
+        if (isControlled && state.hero.leftTool && wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL)) {
             hero.toolCooldown = 500;
             useTool(state, hero, state.hero.leftTool, dx, dy);
-        } else if (state.hero.rightTool && isKeyDown(GAME_KEY.RIGHT_TOOL, KEY_THRESHOLD)) {
+        } else if (isControlled && state.hero.rightTool && wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL)) {
             hero.toolCooldown = 500;
             useTool(state, hero, state.hero.rightTool, dx, dy);
         }
     }
-    if (
+    if (isControlled &&
         (!hero.action || hero.action === 'walking' || hero.action === 'pushing') &&
-        !hero.pickUpTile && isKeyDown(GAME_KEY.PASSIVE_TOOL, KEY_THRESHOLD)) {
+        !hero.pickUpTile && !hero.pickUpObject && wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL)) {
         const {objects, tiles} = getActorTargets(state, hero);
         if (tiles.some(({x, y}) => area.behaviorGrid?.[y]?.[x]?.solid) || objects.some(o => o.behaviors?.solid)) {
             //console.log({dx, dy, tiles, objects});
@@ -290,6 +346,9 @@ export function updateHero(this: void, state: GameState) {
                 }
             }
             for (const object of objects) {
+                if (object === hero) {
+                    continue;
+                }
                 const behavior = object.behaviors;
                 if (behavior?.solid) {
                     hero.action = 'grabbing';
@@ -308,8 +367,8 @@ export function updateHero(this: void, state: GameState) {
                     }
                 }
             }
+            hero.pickUpFrame = 0;
             if (closestLiftableTile) {
-                hero.pickUpFrame = 0;
                 for (const layer of state.areaInstance.layers) {
                     const palette = layer.palette;
                     const tile = {
@@ -338,9 +397,11 @@ export function updateHero(this: void, state: GameState) {
                 hero.grabTile = null;
             } else if (closestObject) {
                 if (closestObject.onGrab) {
-                    closestObject.onGrab(state, hero.d);
+                    closestObject.onGrab(state, hero.d, hero);
                 }
                 hero.grabObject = closestObject;
+            } else if (hero !== state.hero) {
+
             }
         } else if (dx || dy) {
             if (hero.passiveTools.roll > 0) {
@@ -365,19 +426,19 @@ export function updateHero(this: void, state: GameState) {
             }
         }
     }
-    if (hero.pickUpTile) {
+    if (hero.pickUpTile || hero.pickUpObject) {
         hero.pickUpFrame++;
         if (hero.pickUpFrame >= 5) {
             if (hero.action === 'grabbing') {
                 hero.action = null;
             }
-            if (isKeyDown(GAME_KEY.PASSIVE_TOOL, KEY_THRESHOLD)) {
+            if (isControlled && wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL)) {
                 throwHeldObject(state, hero);
             }
         }
     }
     // Mostly don't check for pits/damage when the player cannot control themselves.
-    if (hero.action !== 'beingMoved' && hero.action !== 'falling' && hero.action !== 'fallen' && hero.action !== 'knocked'
+    if (hero.action !== 'beingCarried' && hero.action !== 'falling' && hero.action !== 'fallen' && hero.action !== 'knocked'
         && hero.action !== 'dead'  && hero.action !== 'getItem'
     ) {
         checkForFloorDamage(state, hero);
@@ -521,22 +582,36 @@ export function damageActor(
     }
 
     if (knockback) {
-        // Throw stone here.
         throwHeldObject(state, hero);
         actor.action = 'knocked';
+        actor.animationTime = 0;
         actor.vx = knockback.vx;
         actor.vy = knockback.vy;
         actor.vz = knockback.vz;
     }
 }
 
+const throwSpeed = 6;
 export function throwHeldObject(state: GameState, hero: Hero){
+    if (hero.pickUpObject) {
+        // This assumes only clones can be picked up and thrown. We will have to update this if
+        // we add other objects to this category.
+        const clone = hero.pickUpObject as Clone;
+        clone.d = hero.d;
+        clone.vx = directionMap[hero.d][0] * throwSpeed;
+        clone.vy = directionMap[hero.d][1] * throwSpeed;
+        clone.vz = 2;
+        clone.action = 'knocked';
+        clone.animationTime = 0;
+        clone.carrier = null;
+        hero.pickUpObject = null;
+        return;
+    }
     if (!hero.pickUpTile) {
         return;
     }
     hero.action = 'throwing';
     hero.actionFrame = 0;
-    const throwSpeed = 6;
     const tile = hero.pickUpTile;
     const layer = _.find(state.areaInstance.layers, { key: tile.layerKey});
     const palette = layer.palette;

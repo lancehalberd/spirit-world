@@ -1,5 +1,5 @@
 import {
-    Frame, GameState, LootType, MagicElement,
+    Frame, GameState, Hero, LootType, MagicElement,
     ShortRectangle,
 } from 'app/types';
 
@@ -10,6 +10,8 @@ export interface TileBehaviors {
     cuttable?: number,
     // Deals damage on contact
     damage?: number,
+    // Can be destroyed by an explosion.
+    destructible?: boolean,
     // If this is true then this tile will link to a matching tile in the alternate world.
     linked?: boolean,
     lootChance?: number,
@@ -166,13 +168,14 @@ export interface ObjectInstance {
     changeStatus?: (state: GameState, status: ObjectStatus) => void,
     // This is called when a user grabs a solid tile
     getHitbox?: (state: GameState) => ShortRectangle,
+    onDestroy?: (state: GameState, dx: number, dy: number) => void,
     // When the hero tries to pick up the object with the passive skill button.
     // The direction is the direction the player is facing.
-    onGrab?: (state: GameState, direction: Direction) => void,
+    onGrab?: (state: GameState, direction: Direction, hero: Hero) => void,
     // When the hero hits the object with a weapon or tool
     onHit?: (state: GameState, direction: Direction, element?: MagicElement) => void,
     // When the hero grabs an object and attempts to move.
-    onPull?: (state: GameState, direction: Direction) => void,
+    onPull?: (state: GameState, direction: Direction, hero: Hero) => void,
     // When the hero walks into an object
     onPush?: (state: GameState, direction: Direction) => void,
     pullingHeroDirection?: Direction,

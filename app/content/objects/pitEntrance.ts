@@ -31,6 +31,7 @@ export class PitEntrance implements ObjectInstance {
             if (hero.action === 'fallen') {
                 if (enterZoneByTarget(state, this.definition.targetZone, this.definition.targetObjectId)) {
                     hero.action = 'knocked';
+                    hero.animationTime = 0;
                     hero.z = CANVAS_HEIGHT;
                     hero.vx = hero.vy = 0;
                     hero.vz = -1;

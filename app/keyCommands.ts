@@ -2,8 +2,9 @@
 import { exportZoneToClipboard } from 'app/development/exportZone';
 import { toggleEditing } from 'app/development/tileEditor';
 import { runTileRipper } from 'app/development/tileRipper';
-import { FRAME_LENGTH } from 'app/gameConstants';
 import { getState } from 'app/state';
+
+import { GameState, Hero } from 'app/types'
 
 export const KEY = {
     ESCAPE: 27,
@@ -94,13 +95,8 @@ function buttonIsPressed(button) {
 }
 
 const keysDown = {};
-let lastButtonsPressed: {[key: string]: number} = {};
-export function isKeyDown(keyCode: number, releaseThreshold: number = 0): number {
-    const now = Date.now();
+export function isKeyDown(keyCode: number): number {
     if (keysDown[keyCode]) {
-        if (releaseThreshold) {
-            return (now - keysDown[keyCode]) <= FRAME_LENGTH ? 1 : 0;
-        }
         return 1;
     }
     // If a mapping exists for the current key code to a gamepad button,
@@ -118,77 +114,115 @@ export function isKeyDown(keyCode: number, releaseThreshold: number = 0): number
                 value = gamepad.axes[axisIndex[0]] * axisIndex[1];
             }
             if (value) {
-                const wasLastPressed = lastButtonsPressed[keyCode] || 0;
-                if (value > ANALOG_THRESHOLD) {
-                    lastButtonsPressed[keyCode] = now;
-                }
-                if (!releaseThreshold || (now - wasLastPressed) > 2 * FRAME_LENGTH) {
-                    return value;
-                }
+                return value;
             }
         }
     }
     return 0;
 };
-export function updateKeysStillDown() {
-    const now = Date.now();
-    for (let keyCode in lastButtonsPressed) {
-        const buttonIndex = GAME_PAD_MAPPINGS[keyCode], axisIndex = GAME_PAD_AXIS_MAPPINGS[keyCode];
-        // There can be multiple game pads connected. For now, let's just check all of them for the button.
-        const gamepads = navigator.getGamepads();
-        for (const gamepad of gamepads) {
-            if (!gamepad) continue;
-            let value = 0;
-            if (typeof(buttonIndex) !== 'undefined' && buttonIsPressed(gamepad.buttons[buttonIndex])) {
-                value = 1;
-            } else if (typeof(axisIndex) !== 'undefined' && gamepad.axes[axisIndex[0]] * axisIndex[1] > 0) {
-                value = gamepad.axes[axisIndex[0]] * axisIndex[1];
-            }
-            if (value) {
-                lastButtonsPressed[keyCode] = now;
-            }
+
+export function addKeyCommands() {
+    document.addEventListener('keyup', function(event) {
+        const keyCode: number = event.which;
+        keysDown[keyCode] = null;
+    });
+    document.addEventListener('keydown', function(event: KeyboardEvent) {
+        if (event.repeat) {
+            return;
         }
-    }
+        // Don't process keys if an input is targeted, otherwise we prevent typing in
+        // the input.
+        if ((event.target as HTMLElement).closest('input')) {
+            return;
+        }
+        const commandIsDown = (keysDown[KEY.CONTROL] || keysDown[KEY.COMMAND]);
+        const keyCode: number = event.which;
+        // Don't override the refresh page command.
+        if (keyCode === KEY.R && commandIsDown) {
+            return;
+        }
+        keysDown[keyCode] = 1;
+        if (keyCode === KEY.C && commandIsDown) {
+            exportZoneToClipboard(getState().zone);
+        }
+        if (keyCode === KEY.E) {
+            toggleEditing();
+        }
+        if (keyCode === KEY.R && false) {
+            // This needs a Frame to run correctly.
+            runTileRipper(null, 8);
+        }
+    });
 }
 
-export function getMovementDeltas(): [number, number] {
-    let dy = isKeyDown(GAME_KEY.DOWN) - isKeyDown(GAME_KEY.UP);
+export function updateKeyboardState(state: GameState) {
+    const previousGameKeysDown = state.keyboard.gameKeysDown;
+    // This set is persisted until a new set of keys is pressed.
+    let mostRecentKeysPressed: Set<number> = state.keyboard.mostRecentKeysPressed;
+    const gameKeyValues: number[] = [];
+    const gameKeysDown: Set<number> = new Set();
+    const gameKeysPressed: Set<number> = new Set();
+    const gameKeysReleased: Set<number> = new Set();
+    for (let keyCode of Object.values(GAME_KEY)) {
+        gameKeyValues[keyCode] = isKeyDown(keyCode);
+        if (gameKeyValues[keyCode] >= ANALOG_THRESHOLD) {
+            gameKeysDown.add(keyCode);
+        }
+    }
+    for (const oldKeyDown of [...previousGameKeysDown]) {
+        if (!gameKeysDown.has(oldKeyDown)) {
+            gameKeysReleased.add(oldKeyDown);
+        }
+    }
+    for (const newKeyDown of [...gameKeysDown]) {
+        if (!previousGameKeysDown.has(newKeyDown)) {
+            gameKeysPressed.add(newKeyDown);
+        }
+    }
+    if (gameKeysPressed.size > 0) {
+        mostRecentKeysPressed = gameKeysPressed;
+    }
+    state.keyboard = { gameKeyValues, gameKeysDown, gameKeysPressed, gameKeysReleased, mostRecentKeysPressed };
+}
+
+export function wasGameKeyPressed(state: GameState, keyCode: number): boolean {
+    return state.keyboard.gameKeysPressed.has(keyCode);
+}
+
+// Only returns true if a key was pressed and released without any other keys having been pressed in between.
+// Specifically this is used to determined whether to switch clones, which should only happen if the user presses
+// the clone tool button without pressing any other buttons before releasing it. Note that it is okay if they
+// continue holding buttons that were already down when pressing the clone button.
+export function wasGameKeyPressedAndReleased(state: GameState, keyCode: number): boolean {
+    return state.keyboard.mostRecentKeysPressed.has(keyCode) && state.keyboard.gameKeysReleased.has(keyCode);
+}
+
+export function isGameKeyDown(state: GameState, keyCode: number): boolean {
+    return state.keyboard.gameKeysDown.has(keyCode);
+}
+
+export function getMovementDeltas(state: GameState): [number, number] {
+    const { gameKeyValues } = state.keyboard;
+    let dy = gameKeyValues[GAME_KEY.DOWN] - gameKeyValues[GAME_KEY.UP];
     if (Math.abs(dy) < ANALOG_THRESHOLD) dy = 0;
-    let dx = isKeyDown(GAME_KEY.RIGHT) - isKeyDown(GAME_KEY.LEFT);
+    let dx = gameKeyValues[GAME_KEY.RIGHT] - gameKeyValues[GAME_KEY.LEFT];
     if (Math.abs(dx) < ANALOG_THRESHOLD) dx = 0;
     return [dx, dy];
 }
 
-export function addKeyCommands() {
-document.addEventListener('keyup', function(event) {
-    const keyCode: number = event.which;
-    keysDown[keyCode] = null;
-});
-document.addEventListener('keydown', function(event: KeyboardEvent) {
-    if (event.repeat) {
-        return;
+export function getCloneMovementDeltas(state: GameState, hero: Hero): [number, number] {
+    const [dx, dy] = getMovementDeltas(state);
+    const activeClone = state.hero.activeClone || state.hero;
+    if (activeClone.d === hero.d) {
+        return [dx, dy];
     }
-    // Don't process keys if an input is targeted, otherwise we prevent typing in
-    // the input.
-    if ((event.target as HTMLElement).closest('input')) {
-        return;
+    if ((activeClone.d === 'left' && hero.d === 'up') || (activeClone.d === 'up' && hero.d === 'right') ||
+        (activeClone.d === 'right' && hero.d === 'down') || (activeClone.d === 'down' && hero.d === 'left')) {
+        return [-dy, dx];
     }
-    const commandIsDown = (keysDown[KEY.CONTROL] || keysDown[KEY.COMMAND]);
-    const keyCode: number = event.which;
-    // Don't override the refresh page command.
-    if (keyCode === KEY.R && commandIsDown) {
-        return;
+    if ((activeClone.d === 'left' && hero.d === 'down') || (activeClone.d === 'up' && hero.d === 'left') ||
+        (activeClone.d === 'right' && hero.d === 'up') || (activeClone.d === 'down' && hero.d === 'right')) {
+        return [dy, -dx];
     }
-    keysDown[keyCode] = Date.now();
-    if (keyCode === KEY.C && commandIsDown) {
-        exportZoneToClipboard(getState().zone);
-    }
-    if (keyCode === KEY.E) {
-        toggleEditing();
-    }
-    if (keyCode === KEY.R && false) {
-        // This needs a Frame to run correctly.
-        runTileRipper(null, 8);
-    }
-});
+    return [-dx, -dy];
 }

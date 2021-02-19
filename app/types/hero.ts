@@ -8,7 +8,7 @@ import {
 
 export type Action =
     'attack' | 'roll' | 'knocked' | 'hurt' | 'dead' | 'walking' | 'pushing' | 'grabbing' | 'carrying' | 'throwing' | 'getItem'
-    | 'beingMoved' | 'entering' | 'exiting'
+    | 'beingCarried' | 'entering' | 'exiting'
     | 'falling' | 'fallen' | 'meditating';
 export type ActiveTool = 'bow' | 'staff' | 'clone' | 'invisibility';
 export type Equipment = 'cloudBoots' | 'ironBoots';
@@ -58,7 +58,11 @@ export interface Actor {
     actionFrame?: number,
     actionTarget?: any,
     animationTime: number,
+    // If this is set, the actor is being carried by a hero/clone.
+    carrier?: Hero,
+    explosionTime?: number,
     pickUpFrame?: number,
+    pickUpObject?: ObjectInstance;
     pickUpTile?: LayerTile,
     grabTile?: Tile,
     grabObject?: ObjectInstance,

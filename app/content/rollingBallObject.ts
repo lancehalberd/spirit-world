@@ -90,7 +90,7 @@ export class RollingBallObject implements ObjectInstance {
                     return;
                 }
             }
-            const { objects, tileBehavior } = getTileBehaviorsAndObstacles(state, this.area, {x, y});
+            const { objects, tileBehavior } = getTileBehaviorsAndObstacles(state, this.area, {x, y}, new Set([this]));
             if (!tileBehavior.solid && !tileBehavior.pit && !tileBehavior.outOfBounds) {
                 this.x += dx;
                 this.y += dy;

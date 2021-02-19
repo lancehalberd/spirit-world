@@ -22,6 +22,13 @@ Graphics:
 
 Todo:
 
+Apply element to charge abilities.
+    Costs an additional 10 mana for the element
+
+Additional Clone Tool Behavior:
+    Charging the clone 1 level adds elements to the clones weapon/tools/explosion.
+    Charging the clone 1 level without elements makes it invulnerable for 4 seconds.
+
 Quick Demo
     - Start with 6 hearts + weapon
     - Has a hub with a chest outside an entrance containing a tool. Entrance takes you to a series of puzzles that ultimately rewards you with 4 peach pieces and drops you off in the basement with the charge tool and upgrades locked behind each tool.
@@ -59,9 +66,6 @@ Add ability to charge weapon
     Costs 50 mana
     Similar to level 1 but 2 chakrams spin around you at different radiuses for 4 seconds.
 
-Apply element to charge abilities.
-    Costs an additional 10 mana for the element
-    Add elemental crystal objects that are faded red/blue/yellow and become vibrant when hit by element
 
 Add Small Loot to editor that creates LootDrop
     - locked to tile grid
@@ -98,14 +102,6 @@ Improve Tool Selection:
     - Color around the selection + HUD indicator should match the color of the controller button (blue + yellow for X-Box)
     - Display a letter attached to the selection based on the button/keyboard key.
 
-Additional Clone Tool Behavior:
-    Can pick up + throw clone, clone can pick up and throw the hero.
-        -> Trying to move while held by the clone
-    Holding the clone tool down allows controlling all clones at once.
-    Holding the passive button (as if to meditate) will detonate the current clone for AOE elemental damage.
-    Charging the clone 1 level adds elements to the clones weapon/tools/explosion.
-    Charging the clone 1 level without elements makes it invulnerable for 4 seconds.
-
 Additionl Invisibility Tool Behavior:
     Charge to deal elemental damage on contact while invisible.
     Can move through activatable crystals and some other obstacles.
@@ -127,7 +123,6 @@ Update collision detection and wiggle logic:
     - If blocked index > length / 2, repeat the above except scanning left to check for left wiggle.
 
 Some puzzle ideas:
-    - Have a puzzle for the clone tool where a crystal deactivates after only 1s but cannot reach the door unless you stand at the door and have the clone hit the switch.
     - A puzzle where 4 switches need to be hit in 200ms, you can blow up the clone in the middle to activate all at once.
     - If we place a block on top of a switch that toggles on release, we can make a door that requires you to push the block off of the switch.
 

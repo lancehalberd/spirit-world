@@ -2,7 +2,7 @@ import { createAnimation, drawFrame } from 'app/utils/animations';
 import { directionMap, isPointOpen } from 'app/utils/field';
 
 import {
-    AreaInstance, Direction, Frame, GameState, ObjectInstance,
+    AreaInstance, Direction, Frame, GameState, Hero, ObjectInstance,
     ObjectStatus, SimpleObjectDefinition, ShortRectangle,
 } from 'app/types';
 
@@ -51,16 +51,19 @@ export class PushPullObject implements ObjectInstance {
             }
         }
     }
-    onPull(state: GameState, direction: Direction): void {
+    onPull(state: GameState, direction: Direction, hero: Hero): void {
         this.pushInDirection(state, direction);
     }
-    pushInDirection(state: GameState, direction: Direction): void {
+    pushInDirection(state: GameState, direction: Direction, hero: Hero = null): void {
         if (this.pushDirection) {
             return;
         }
         const x = this.x + 8 + 16 * directionMap[direction][0];
         const y = this.y + 8 + 16 * directionMap[direction][1];
-        if (isPointOpen(state, this.area, {x, y}) && (!this.linkedObject || isPointOpen(state, this.linkedObject.area, {x, y}))) {
+        const excludedObjects = new Set([hero]);
+        if (isPointOpen(state, this.area, {x, y}, excludedObjects)
+            && (!this.linkedObject || isPointOpen(state, this.linkedObject.area, {x, y}, excludedObjects))
+        ) {
             this.pushDirection = direction;
             this.pullingHeroDirection = direction;
             this.pushFrame = 0;

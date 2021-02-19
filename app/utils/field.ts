@@ -9,6 +9,31 @@ export const directionMap = {
     right: [1, 0],
 };
 
+export const directionToLeftRotationsFromRight = {
+    right: 0,
+    up: 1,
+    left: 2,
+    down: 3,
+}
+export const leftRotationsFromRightToDirection = Object.keys(directionToLeftRotationsFromRight) as Direction[];
+
+export function rotateDirection(d: Direction, leftRotations: number): Direction {
+    // Calculates a new rotation in the range of 0-3.
+    const newRotation = ((directionToLeftRotationsFromRight[d] + leftRotations) % 4 + 4) % 4;
+    return leftRotationsFromRightToDirection[newRotation];
+}
+
+
+// 15, 4, 4,
+// This is a map of offsets used to animate an object being picked up by the player, and is designed for use with a
+// 16x16 tile.
+export const carryMap = {
+    'right': [{x: 12, y: -9}, {x: 12, y: -9}, {x: 12, y: -9}, {x: 12, y: -9}, {x: 9, y: -13}, {x: 7, y: -16}, {x: 0, y: -17}],
+    'left': [{x: -12, y: -9}, {x: -12, y: -9}, {x: -12, y: -9}, {x: -12, y: -9}, {x: -9, y: -13}, {x: -7, y: -16}, {x: 0, y: -17}],
+    'down': [{x: 0, y: 3}, {x: 0, y: 3}, {x: 0, y: 3}, {x: 0, y: 3}, {x: 0, y: -4}, {x: 0, y: -9}, {x: 0, y: -17}],
+    'up': [{x: 0, y: -15}, {x: 0, y: -15}, {x: 0, y: -15}, {x: 0, y: -15}, {x: 0, y: -16}, {x: 0, y: -17}, {x: 0, y: -17}],
+};
+
 export function getDirection(dx: number, dy: number): Direction {
     if (Math.abs(dx) > Math.abs(dy)) {
         return dx < 0 ? 'left' : 'right';
@@ -16,7 +41,12 @@ export function getDirection(dx: number, dy: number): Direction {
     return dy < 0 ? 'up' : 'down';
 }
 
-export function isPointOpen(state: GameState, area: AreaInstance, {x, y}: {x: number, y: number}, ): boolean {
+export function isPointOpen(
+    state: GameState,
+    area: AreaInstance,
+    {x, y}: {x: number, y: number},
+    excludeObjects: Set<any> = null
+): boolean {
     const tx = Math.floor(x / 16);
     const ty = Math.floor(y / 16);
     if (tx < state.areaSection.x || tx >= state.areaSection.x + state.areaSection.w
@@ -42,6 +72,9 @@ export function isPointOpen(state: GameState, area: AreaInstance, {x, y}: {x: nu
         if (object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
             continue;
         }
+        if (excludeObjects?.has(object)) {
+            continue;
+        }
         if (object.getHitbox && object.behaviors?.solid) {
             if (isPixelInShortRect(x, y, object.getHitbox(state))) {
                 return false;
@@ -51,7 +84,12 @@ export function isPointOpen(state: GameState, area: AreaInstance, {x, y}: {x: nu
     return true;
 }
 
-export function getTileBehaviorsAndObstacles(state: GameState, area: AreaInstance, {x, y}: Tile): {tileBehavior: TileBehaviors, objects: ObjectInstance[]} {
+export function getTileBehaviorsAndObstacles(
+    state: GameState,
+    area: AreaInstance,
+    {x, y}: Tile,
+    excludeObjects: Set<any> = null
+): {tileBehavior: TileBehaviors, objects: ObjectInstance[]} {
     const objects: ObjectInstance[] = [];
     const tx = Math.floor(x / 16);
     const ty = Math.floor(y / 16);
@@ -70,6 +108,9 @@ export function getTileBehaviorsAndObstacles(state: GameState, area: AreaInstanc
     }
     for (const object of area.objects) {
         if (object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
+            continue;
+        }
+        if (excludeObjects?.has(object)) {
             continue;
         }
         if (object.getHitbox && object.behaviors?.solid) {

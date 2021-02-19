@@ -48,13 +48,10 @@ export function useTool(
                 state.hero.magic -= 10;
                 for (let i = 0; i < state.hero.activeTools.clone && i < state.hero.life - 1; i++) {
                     const clone = new Clone(state.hero);
-                    state.hero.activeClone = clone;
+                    //state.hero.activeClone = clone;
                     state.hero.clones.push(clone);
                     addObjectToArea(state, state.areaInstance, clone);
                 }
-            } else {
-                const currentIndex = state.hero.clones.indexOf(state.hero.activeClone);
-                state.hero.activeClone = state.hero.clones[currentIndex + 1];
             }
             return;
         case 'staff':

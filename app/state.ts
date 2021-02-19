@@ -27,6 +27,7 @@ export function saveGame(): void {
     delete hero.area;
     delete hero.grabObject;
     delete hero.grabTile;
+    delete hero.pickUpObject;
     delete hero.pickUpTile;
     hero.clones = [];
     state.savedState.hero = hero;
@@ -224,6 +225,13 @@ function getDefaultState(): GameState {
         menuIndex: 0,
         defeated: false,
         scene: 'title',
+        keyboard: {
+            gameKeyValues: [],
+            gameKeysDown: new Set(),
+            gameKeysPressed: new Set(),
+            gameKeysReleased: new Set(),
+            mostRecentKeysPressed: new Set(),
+        },
     };
     return state;
 }
@@ -242,6 +250,7 @@ export function returnToSpawnLocation(state: GameState) {
     state.defeated = false;
     // Clear out any state/flags that shouldn't be kept on the hero.
     state.hero.pickUpTile = null;
+    state.hero.pickUpObject = null;
     state.hero.grabObject = null;
     state.hero.grabTile = null;
     state.hero.action = null;

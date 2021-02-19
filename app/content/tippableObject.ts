@@ -1,4 +1,5 @@
 import { addParticleAnimations } from 'app/content/animationEffect';
+import { removeObjectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { directionMap, isPointOpen } from 'app/utils/field';
@@ -20,6 +21,7 @@ export class TippableObject implements ObjectInstance {
     area: AreaInstance;
     alwaysReset = true;
     behaviors = {
+        destructible: true,
         solid: true,
     };
     drawPriority: DrawPriority = 'sprites';
@@ -90,6 +92,10 @@ export class TippableObject implements ObjectInstance {
                 this.linkedObject.pullingHeroDirection = direction;
             }
         }
+    }
+    onDestroy(state: GameState, dx: number, dy: number) {
+        addParticleAnimations(state, this.area, this.x, this.y, 2, particleFrames);
+        removeObjectFromArea(state, this);
     }
     update(state: GameState) {
         if (this.fallingInPlace) {

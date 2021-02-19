@@ -1,18 +1,19 @@
-//import { getAreaSize } from 'app/content/areas';
-//import { GAME_KEY, getMovementDeltas, isKeyDown } from 'app/keyCommands';
 import { renderHero } from 'app/renderActor';
-//import { moveActor } from 'app/moveActor';
-//import { getFrame } from 'app/utils/animations';
+
+import { carryMap, directionMap, directionToLeftRotationsFromRight, rotateDirection } from 'app/utils/field';
 
 import {
     Action, ActiveTool, AreaInstance,
     Direction, DrawPriority, MagicElement, Equipment, Frame,
     GameState, Hero, LayerTile, ObjectInstance, ObjectStatus, PassiveTool,
-    ShortRectangle, Tile, ZoneLocation
+    ShortRectangle, Tile, TileBehaviors, ZoneLocation
 } from 'app/types';
 
 export class Clone implements Hero, ObjectInstance {
     area: AreaInstance;
+    behaviors: TileBehaviors = {
+        solid: true,
+    };
     definition = null;
     drawPriority: DrawPriority = 'sprites';
     frame: Frame;
@@ -54,8 +55,10 @@ export class Clone implements Hero, ObjectInstance {
     actionDx: number;
     actionDy: number;
     actionFrame: number;
+    carrier: Hero;
     pickUpFrame: number;
     pickUpTile: LayerTile;
+    pickUpObject: ObjectInstance;
     grabTile: Tile;
     grabObject: ObjectInstance;
     invulnerableFrames: number;
@@ -65,6 +68,7 @@ export class Clone implements Hero, ObjectInstance {
     invisible: boolean;
     spawnLocation: ZoneLocation;
     spiritRadius: number;
+    carryRotationOffset: number;
     constructor(hero: Hero) {
         for (let k in hero) {
             this[k] = hero[k];
@@ -74,7 +78,36 @@ export class Clone implements Hero, ObjectInstance {
     getHitbox(state: GameState): ShortRectangle {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
+
+    onGrab(state: GameState, direction: Direction, hero: Hero) {
+        this.action = 'beingCarried';
+        this.carrier = hero;
+        // Track the clone rotation relative to the hero picking it up so we can rotate it correctly if the hero
+        // changes directions.
+        this.carryRotationOffset = directionToLeftRotationsFromRight[this.d] - directionToLeftRotationsFromRight[hero.d];
+        hero.pickUpObject = this;
+    }
     update(state: GameState) {
+        if (this.carrier) {
+            if (this.carrier.area === this.area) {
+                this.updateCoords(state);
+            } else {
+                this.carrier = null;
+                this.action = 'knocked';
+                this.animationTime = 0;
+            }
+        }
+    }
+    updateCoords(state: GameState) {
+        const offset = carryMap[this.carrier.d][Math.min(this.carrier.pickUpFrame, carryMap[this.carrier.d].length - 1)];
+        if (!this.carrier || !offset) {
+            debugger;
+        }
+        const [dx, dy] = directionMap[this.carrier.d];
+        this.x = this.carrier.x + offset.x + dx;
+        this.y = this.carrier.y + dy;
+        this.z = -offset.y;
+        this.d = rotateDirection(this.carrier.d, this.carryRotationOffset);
     }
     render = renderHero;
 }

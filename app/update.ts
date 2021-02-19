@@ -1,10 +1,10 @@
 import { checkIfAllEnemiesAreDefeated } from 'app/content/areas';
 import { Enemy } from 'app/content/enemy';
 import { editingState } from 'app/development/tileEditor';
-import { FRAME_LENGTH, KEY_THRESHOLD } from 'app/gameConstants';
-import { updateKeysStillDown } from 'app/keyCommands';
+import { FRAME_LENGTH } from 'app/gameConstants';
+import { updateKeyboardState } from 'app/keyCommands';
 import { initializeGame } from 'app/initialize';
-import { GAME_KEY, isKeyDown } from 'app/keyCommands';
+import { GAME_KEY, wasGameKeyPressed } from 'app/keyCommands';
 import {
     getDefaultSavedState,
     getState,
@@ -15,7 +15,7 @@ import {
     SPAWN_LOCATION_DEMO,
     SPAWN_LOCATION_FULL,
 } from 'app/state';
-import { updateHero } from 'app/updateActor';
+import { updateAllHeroes } from 'app/updateActor';
 import { updateCamera } from 'app/updateCamera';
 import { areFontsLoaded } from 'app/utils/drawText';
 import { areAllImagesLoaded } from 'app/utils/images';
@@ -34,6 +34,7 @@ export function update() {
     }
     const state = getState();
     state.time += FRAME_LENGTH;
+    updateKeyboardState(state);
     try {
         if (state.scene === 'title' || state.scene === 'chooseGameMode' ||
             state.scene === 'deleteSavedGame' || state.scene === 'deleteSavedGameConfirmation'
@@ -42,7 +43,7 @@ export function update() {
         } else if (state.defeated) {
             updateDefeated(state);
         } else {
-            if (isKeyDown(GAME_KEY.MENU, KEY_THRESHOLD)) {
+            if (wasGameKeyPressed(state, GAME_KEY.MENU)) {
                 state.paused = !state.paused;
                 state.menuIndex = 0;
             }
@@ -52,9 +53,6 @@ export function update() {
                 updateMenu(state);
             }
         }
-        // Do this after all key checks, since doing it before we cause the key
-        // to appear not pressed if there is a release threshold assigned.
-        updateKeysStillDown();
     } catch (e) {
         console.log(e.stack);
         debugger;
@@ -80,19 +78,19 @@ export function getTitleOptions(state: GameState): string[] {
     return [...gameFiles, 'DELETE'];
 }
 
-export function isConfirmKeyPressed(): boolean {
-    return !!(isKeyDown(GAME_KEY.WEAPON, KEY_THRESHOLD)
-        || isKeyDown(GAME_KEY.PASSIVE_TOOL, KEY_THRESHOLD)
-        || isKeyDown(GAME_KEY.MENU, KEY_THRESHOLD));
+export function isConfirmKeyPressed(state: GameState): boolean {
+    return !!(wasGameKeyPressed(state, GAME_KEY.WEAPON)
+        || wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL)
+        || wasGameKeyPressed(state, GAME_KEY.MENU));
 }
 
 function updateTitle(state: GameState) {
     const options = getTitleOptions(state);
     let changedOption = false;
-    if (isKeyDown(GAME_KEY.UP, KEY_THRESHOLD)) {
+    if (wasGameKeyPressed(state, GAME_KEY.UP)) {
         state.menuIndex = (state.menuIndex - 1 + options.length) % options.length;
         changedOption = true;
-    } else if (isKeyDown(GAME_KEY.DOWN, KEY_THRESHOLD)) {
+    } else if (wasGameKeyPressed(state, GAME_KEY.DOWN)) {
         state.menuIndex = (state.menuIndex + 1) % options.length;
         changedOption = true;
     }
@@ -103,7 +101,7 @@ function updateTitle(state: GameState) {
             setSaveFileToState(state.savedGameIndex, state.menuIndex);
         }
     }
-    if (isConfirmKeyPressed()) {
+    if (isConfirmKeyPressed(state)) {
         switch (state.scene) {
             case 'deleteSavedGameConfirmation':
                 if (state.menuIndex === 1) {
@@ -172,16 +170,16 @@ function updateMenu(state: GameState) {
     }
     if(selectableTools.length) {
         const selectedTool = selectableTools[state.menuIndex];
-        if (isKeyDown(GAME_KEY.LEFT, KEY_THRESHOLD)) {
+        if (wasGameKeyPressed(state, GAME_KEY.LEFT)) {
             state.menuIndex = (state.menuIndex + selectableTools.length - 1) % selectableTools.length;
-        } else if (isKeyDown(GAME_KEY.RIGHT, KEY_THRESHOLD)) {
+        } else if (wasGameKeyPressed(state, GAME_KEY.RIGHT)) {
             state.menuIndex = (state.menuIndex + 1) % selectableTools.length;
-        } else if (isKeyDown(GAME_KEY.LEFT_TOOL, KEY_THRESHOLD)) {
+        } else if (wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL)) {
             if (state.hero.rightTool === selectedTool) {
                 state.hero.rightTool = state.hero.leftTool;
             }
             state.hero.leftTool = selectedTool;
-        } else if (isKeyDown(GAME_KEY.RIGHT_TOOL, KEY_THRESHOLD)) {
+        } else if (wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL)) {
             if (state.hero.leftTool === selectedTool) {
                 state.hero.leftTool = state.hero.rightTool;
             }
@@ -191,9 +189,9 @@ function updateMenu(state: GameState) {
 }
 
 function updateDefeated(state: GameState) {
-    if (isKeyDown(GAME_KEY.UP, KEY_THRESHOLD) || isKeyDown(GAME_KEY.DOWN, KEY_THRESHOLD)) {
+    if (wasGameKeyPressed(state, GAME_KEY.UP) || wasGameKeyPressed(state, GAME_KEY.DOWN)) {
         state.menuIndex = (state.menuIndex + 1) % 2;
-    } else if (isConfirmKeyPressed()) {
+    } else if (isConfirmKeyPressed(state)) {
         if (state.menuIndex === 0) {
             returnToSpawnLocation(state);
         } else if (state.menuIndex === 1) {
@@ -216,12 +214,12 @@ function switchElement(state: GameState, delta: number): void {
 }
 
 function updateField(state: GameState) {
-    updateHero(state);
+    updateAllHeroes(state);
     updateCamera(state);
     if (!editingState.isEditing) {
-        if (isKeyDown(GAME_KEY.PREVIOUS_ELEMENT, KEY_THRESHOLD)) {
+        if (wasGameKeyPressed(state, GAME_KEY.PREVIOUS_ELEMENT)) {
             switchElement(state, -1);
-        } else if (isKeyDown(GAME_KEY.NEXT_ELEMENT, KEY_THRESHOLD)) {
+        } else if (wasGameKeyPressed(state, GAME_KEY.NEXT_ELEMENT)) {
             switchElement(state, 1);
         }
         removeDefeatedEnemies(state, state.alternateAreaInstance);

@@ -10,7 +10,7 @@ import { updateCamera } from 'app/updateCamera';
 
 import {
     AreaDefinition, AreaInstance, AreaLayerDefinition,
-    Direction, Enemy, GameState, LayerTile, ObjectInstance, ShortRectangle, Tile, TileBehaviors,
+    Direction, Enemy, GameState, Hero, LayerTile, ObjectInstance, ShortRectangle, Tile, TileBehaviors,
     ZoneLocation,
 } from 'app/types';
 
@@ -115,10 +115,23 @@ export function initializeAreaTiles(area: AreaDefinition): AreaDefinition {
     return area;
 }
 
+export function swapHeroStates(heroA: Hero, heroB: Hero) {
+    const allKeys = [...new Set([...Object.keys(heroA), ...Object.keys(heroB)])];
+    for (const key of allKeys) {
+        if (key === 'behaviors') {
+            continue;
+        }
+        const temp = heroA[key];
+        heroA[key] = heroB[key];
+        heroB[key] = temp;
+    }
+}
+
 export function removeAllClones(state: GameState): void {
     // Modify the hero to match the state of the active clone before it is removed.
     if (state.hero.activeClone) {
-        state.hero.x = state.hero.activeClone.x;
+        swapHeroStates(state.hero, state.hero.activeClone);
+        /*state.hero.x = state.hero.activeClone.x;
         state.hero.y = state.hero.activeClone.y;
         state.hero.d = state.hero.activeClone.d;
         state.hero.animationTime = state.hero.activeClone.animationTime;
@@ -126,7 +139,7 @@ export function removeAllClones(state: GameState): void {
         state.hero.actionFrame = state.hero.activeClone.actionFrame;
         state.hero.actionDx = state.hero.activeClone.actionDx;
         state.hero.actionDy = state.hero.activeClone.actionDy;
-        state.hero.actionTarget = state.hero.activeClone.actionTarget;
+        state.hero.actionTarget = state.hero.activeClone.actionTarget;*/
     }
     for (const clone of state.hero.clones) {
         removeObjectFromArea(state, clone);

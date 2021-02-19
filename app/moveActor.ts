@@ -95,12 +95,16 @@ function moveActorInDirection(
             checkPoints = [...checkPoints, {x: ax + actor.w - 1, y: ay + 8}, {x: ax + actor.w - 1, y: ay + 15}];
         }
     }
+    const excludedObjects = new Set<any>([actor]);
+    if (actor.pickUpObject) {
+        excludedObjects.add(actor.pickUpObject);
+    }
 
     let blockedByTile = false;
     let blockedByObject = false;
     let pushedObjects = [];
     for (const point of checkPoints) {
-        const { tileBehavior, objects} = getTileBehaviorsAndObstacles(state, actor.area, point);
+        const { tileBehavior, objects} = getTileBehaviorsAndObstacles(state, actor.area, point, excludedObjects);
         if (tileBehavior?.solid && tileBehavior?.damage > 0) {
             damageActor(state, actor, tileBehavior.damage);
         }
@@ -150,7 +154,7 @@ function moveActorInDirection(
             for (let l = ax - 1; l >= ax - 8; l--) {
                 let open = true;
                 for (let x = l; x < l + actor.w; x += 8) {
-                    if (!isPointOpen(state, actor.area, {x, y})) {
+                    if (!isPointOpen(state, actor.area, {x, y}, excludedObjects)) {
                         open = false;
                         break;
                     }
@@ -164,7 +168,7 @@ function moveActorInDirection(
             for (let l = ax + 1; l <= ax + 8; l++) {
                 let open = true;
                 for (let x = l; x < l + actor.w; x += 8) {
-                    if (!isPointOpen(state, actor.area, {x, y})) {
+                    if (!isPointOpen(state, actor.area, {x, y}, excludedObjects)) {
                         open = false;
                         break;
                     }
@@ -178,7 +182,7 @@ function moveActorInDirection(
             for (let t = ay - 1; t >= ay - 8; t--) {
                 let open = true;
                 for (let y = t; y < t + actor.h; y += 8) {
-                    if (!isPointOpen(state, actor.area, {x, y})) {
+                    if (!isPointOpen(state, actor.area, {x, y}, excludedObjects)) {
                         open = false;
                         break;
                     }
@@ -192,7 +196,7 @@ function moveActorInDirection(
             for (let t = ay + 1; t <= ay + 8; t++) {
                 let open = true;
                 for (let y = t; y < t + actor.h; y += 8) {
-                    if (!isPointOpen(state, actor.area, {x, y})) {
+                    if (!isPointOpen(state, actor.area, {x, y}, excludedObjects)) {
                         open = false;
                         break;
                     }
