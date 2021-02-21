@@ -16,6 +16,12 @@ const downAnimation: FrameAnimation = createAnimation('gfx/facing.png', heroGeom
 const leftAnimation: FrameAnimation = createAnimation('gfx/facing.png', heroGeometry, { x: 3});
 const rightAnimation: FrameAnimation = createAnimation('gfx/facing.png', heroGeometry, { x: 1});
 
+const hurtGeometry: FrameDimensions = {w: 20, h: 28, content: {x: 2, y: 16 + Y_OFF, w: 16, h: 16}};
+const hurtUpAnimation: FrameAnimation = createAnimation('gfx/mchurt.png', hurtGeometry, { x: 2});
+const hurtDownAnimation: FrameAnimation = createAnimation('gfx/mchurt.png', hurtGeometry, { x: 0});
+const hurtLeftAnimation: FrameAnimation = createAnimation('gfx/mchurt.png', hurtGeometry, { x: 3});
+const hurtRightAnimation: FrameAnimation = createAnimation('gfx/mchurt.png', hurtGeometry, { x: 1});
+
 const walkingGeometry: FrameDimensions = {w: 20, h: 28, content: {x: 2, y: 16 + Y_OFF, w: 16, h: 16}};
 const walkUpAnimation: FrameAnimation = createAnimation('gfx/mcwalking.png', walkingGeometry, { cols: 8, y: 2, duration: 4});
 const walkDownAnimation: FrameAnimation = createAnimation('gfx/mcwalking.png', walkingGeometry, { cols: 8, y: 0, duration: 4});
@@ -36,24 +42,48 @@ const rollRightAnimation: FrameAnimation = createAnimation('gfx/mcroll.png', rol
 
 
 const pushGeometry: FrameDimensions = {w: 20, h: 28, content: {x: 2, y: 16 + Y_OFF, w: 16, h: 16}};
-
 const grabUpAnimation: FrameAnimation = createAnimation('gfx/mcpushpull.png', pushGeometry, { cols: 1, x: 1, y: 2, duration: 8});
 const grabDownAnimation: FrameAnimation = createAnimation('gfx/mcpushpull.png', pushGeometry, { cols: 1, x: 1, y: 0, duration: 8});
 const grabLeftAnimation: FrameAnimation = createAnimation('gfx/mcpushpull.png', pushGeometry, { cols: 1, x: 1, y: 3, duration: 8});
 const grabRightAnimation: FrameAnimation = createAnimation('gfx/mcpushpull.png', pushGeometry, { cols: 1, x: 1, y: 1, duration: 8});
-
 const pullUpAnimation: FrameAnimation = createAnimation('gfx/mcpushpull.png', pushGeometry, { cols: 3, x: 2, y: 2, duration: 8, frameMap:[0, 1, 0, 2]});
 const pullDownAnimation: FrameAnimation = createAnimation('gfx/mcpushpull.png', pushGeometry, { cols: 3, x: 2, y: 0, duration: 8, frameMap:[0, 1, 0, 2]});
 const pullLeftAnimation: FrameAnimation = createAnimation('gfx/mcpushpull.png', pushGeometry, { cols: 3, x: 2, y: 3, duration: 8, frameMap:[0, 1, 0, 2]});
 const pullRightAnimation: FrameAnimation = createAnimation('gfx/mcpushpull.png', pushGeometry, { cols: 3, x: 2, y: 1, duration: 8, frameMap:[0, 1, 0, 2]});
-
 const pushUpAnimation: FrameAnimation = createAnimation('gfx/mcpushpull.png', pushGeometry, { cols: 3, x: 5, y: 2, duration: 8, frameMap:[0, 1, 0, 2]});
 const pushDownAnimation: FrameAnimation = createAnimation('gfx/mcpushpull.png', pushGeometry, { cols: 3, x: 5, y: 0, duration: 8, frameMap:[0, 1, 0, 2]});
 const pushLeftAnimation: FrameAnimation = createAnimation('gfx/mcpushpull.png', pushGeometry, { cols: 3, x: 5, y: 3, duration: 8, frameMap:[0, 1, 0, 2]});
 const pushRightAnimation: FrameAnimation = createAnimation('gfx/mcpushpull.png', pushGeometry, { cols: 3, x: 5, y: 1, duration: 8, frameMap:[0, 1, 0, 2]});
 
 
+const fallGeometry: FrameDimensions = {w: 20, h: 28, content: {x: 2, y: 16 + Y_OFF, w: 16, h: 16}};
+export const fallAnimation: FrameAnimation = createAnimation('gfx/mcfall.png', fallGeometry, { cols: 13, duration: 4}, { loop: false });
+
 export const heroAnimations: ActorAnimations = {
+    attack: {
+        up: attackUpAnimation,
+        down: attackDownAnimation,
+        left: attackLeftAnimation,
+        right: attackRightAnimation,
+    },
+    falling: {
+        up: fallAnimation,
+        down: fallAnimation,
+        left: fallAnimation,
+        right: fallAnimation,
+    },
+    grab: {
+        up: grabUpAnimation,
+        down: grabDownAnimation,
+        left: grabLeftAnimation,
+        right: grabRightAnimation,
+    },
+    hurt: {
+        up: hurtUpAnimation,
+        down: hurtDownAnimation,
+        left: hurtLeftAnimation,
+        right: hurtRightAnimation,
+    },
     idle: {
         up: upAnimation,
         down: downAnimation,
@@ -66,24 +96,6 @@ export const heroAnimations: ActorAnimations = {
         left: walkLeftAnimation,
         right: walkRightAnimation,
     },
-    attack: {
-        up: attackUpAnimation,
-        down: attackDownAnimation,
-        left: attackLeftAnimation,
-        right: attackRightAnimation,
-    },
-    roll: {
-        up: rollUpAnimation,
-        down: rollDownAnimation,
-        left: rollLeftAnimation,
-        right: rollRightAnimation,
-    },
-    grab: {
-        up: grabUpAnimation,
-        down: grabDownAnimation,
-        left: grabLeftAnimation,
-        right: grabRightAnimation,
-    },
     pull: {
         up: pullUpAnimation,
         down: pullDownAnimation,
@@ -95,7 +107,13 @@ export const heroAnimations: ActorAnimations = {
         down: pushDownAnimation,
         left: pushLeftAnimation,
         right: pushRightAnimation,
-    }
+    },
+    roll: {
+        up: rollUpAnimation,
+        down: rollDownAnimation,
+        left: rollLeftAnimation,
+        right: rollRightAnimation,
+    },
 };
 
 
@@ -105,6 +123,9 @@ let lastPullAnimation = null;
 function getHeroFrame(state: GameState, hero: Hero): Frame {
     let animations: ActorAnimations['idle'];
     switch (hero.action) {
+        case 'falling':
+            animations = heroAnimations.falling;
+            break;
         // Grabbing currently covers animations for pulling/pushing objects that are grabbed.
         case 'grabbing':
             const [dx, dy] = directionMap[hero.d];
@@ -141,8 +162,11 @@ function getHeroFrame(state: GameState, hero: Hero): Frame {
         case 'walking':
             animations = heroAnimations.move;
             break;
-        case 'beingCarried':
         case 'knocked':
+            animations = heroAnimations.hurt;
+            break;
+        case 'beingCarried':
+        case 'thrown':
         case 'roll':
             animations = heroAnimations.roll;
             break;
@@ -168,17 +192,7 @@ export function renderHero(this: Hero, context: CanvasRenderingContext2D, state:
         } else if (hero.invulnerableFrames) {
             context.globalAlpha = 0.7 + 0.3 * Math.cos(2 * Math.PI * hero.invulnerableFrames * 3 / 50);
         }
-        if (hero.action === 'falling') {
-            const fallingFrame = {...frame, h: frame.h - hero.actionFrame * 2};
-            drawFrame(context, fallingFrame, {
-                x: hero.x - frame.content.x,
-                y: hero.y - frame.content.y - hero.z + hero.actionFrame * 2,
-                w: fallingFrame.w,
-                h: fallingFrame.h,
-            });
-        } else {
-            drawFrame(context, frame, { x: hero.x - frame.content.x, y: hero.y - frame.content.y - hero.z, w: frame.w, h: frame.h });
-        }
+        drawFrame(context, frame, { x: hero.x - frame.content.x, y: hero.y - frame.content.y - hero.z, w: frame.w, h: frame.h });
     context.restore();
     if (hero.pickUpTile) {
         renderCarriedTile(context, state, hero);

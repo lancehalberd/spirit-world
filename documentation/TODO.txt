@@ -1,6 +1,9 @@
 Test at http://localhost:81/alttp/public/
 
 High Priority Bugs:
+    Objects+enemies shouldn't be able to float on top of pits.
+        - Make objects fall in pits.
+        - Pit entrance should pull you in like other pits
 
 
 Low Priority Bugs:
@@ -10,7 +13,6 @@ Low Priority Bugs:
         No luck reproducing, maybe the analog stick was doing something weird?
     Doors don't appear open when moving into them from a different section
         I think this is because the door doesn't update until it is in the current areaInstance
-    Objects+enemies shouldn't be able to float on top of pits.
     nextAreaInstance is not rendered in Safari
 
 Outanding Questions:
@@ -21,6 +23,10 @@ Graphics:
     Add sparkles to peach loot + hud.
 
 Todo:
+
+Add signs to demo:
+    Use closed chest graphic for now (so users will try to interact with them)
+    Use escape sequences like {B_WEAPON} {B_UP} {B_LEFT_TOOL} {B_RIGHT_TOOL} for special characters {I_WEAPON} {I_BOW}
 
 Apply element to charge abilities.
     Costs an additional 10 mana for the element

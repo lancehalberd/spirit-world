@@ -285,10 +285,8 @@ export function checkForFloorDamage(state: GameState, hero: Hero) {
         }
     }
     if (fallingUp && fallingDown && fallingLeft && fallingRight) {
-        // const wasClone = !!state.hero.clones.length;
-
         throwHeldObject(state, hero);
         hero.action = 'falling';
-        hero.actionFrame = 0;
+        hero.animationTime = 0;
     }
 }

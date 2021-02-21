@@ -7,7 +7,8 @@ import {
 } from 'app/types';
 
 export type Action =
-    'attack' | 'roll' | 'knocked' | 'hurt' | 'dead' | 'walking' | 'pushing' | 'grabbing' | 'carrying' | 'throwing' | 'getItem'
+    'attack' | 'roll' | 'knocked' | 'hurt' | 'dead' | 'walking'
+    | 'pushing' | 'grabbing' | 'carrying' | 'throwing' | 'thrown' | 'getItem'
     | 'beingCarried' | 'entering' | 'exiting'
     | 'falling' | 'fallen' | 'meditating';
 export type ActiveTool = 'bow' | 'staff' | 'clone' | 'invisibility';
@@ -32,6 +33,7 @@ type AnimationSet = {
 export interface ActorAnimations {
     attack?: AnimationSet,
     death?: AnimationSet,
+    falling?: AnimationSet,
     grab?: AnimationSet,
     hurt?: AnimationSet,
     idle: AnimationSet,

@@ -19,6 +19,7 @@ import {
 } from 'app/keyCommands';
 import { checkForFloorDamage, moveActor } from 'app/moveActor';
 import { getTileFrame } from 'app/render';
+import { fallAnimation } from 'app/renderActor';
 import { useTool } from 'app/useTool';
 import { directionMap, getDirection, isPointOpen } from 'app/utils/field';
 import { rectanglesOverlap } from 'app/utils/index';
@@ -103,10 +104,8 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         //dy = 1;
     } else if (hero.action === 'falling') {
         movementSpeed = 0;
-        hero.actionFrame++;
-        if (hero.actionFrame >= 13) {
+        if (hero.animationTime >= fallAnimation.duration) {
             hero.action = 'fallen';
-            hero.actionFrame = 0;
         }
     } else if (hero.action === 'fallen') {
         movementSpeed = 0;
@@ -212,7 +211,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
                 hero.action = null;
             }
         }
-    } else if (hero.action === 'knocked') {
+    } else if (hero.action === 'knocked' || hero.action === 'thrown') {
         movementSpeed = 0;
         dx = hero.vx;
         dy = hero.vy;
@@ -418,7 +417,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
                 }
             }
         } else {
-            if (hero.passiveTools.spiritSight > 0) {
+            if (state.hero.clones.length || hero.passiveTools.spiritSight > 0) {
                 hero.action = 'meditating';
                 hero.d = 'down';
                 hero.actionFrame = 0;
@@ -601,7 +600,7 @@ export function throwHeldObject(state: GameState, hero: Hero){
         clone.vx = directionMap[hero.d][0] * throwSpeed;
         clone.vy = directionMap[hero.d][1] * throwSpeed;
         clone.vz = 2;
-        clone.action = 'knocked';
+        clone.action = 'thrown';
         clone.animationTime = 0;
         clone.carrier = null;
         hero.pickUpObject = null;

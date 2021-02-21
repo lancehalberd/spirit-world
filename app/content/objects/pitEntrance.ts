@@ -2,7 +2,7 @@ import { enterZoneByTarget } from 'app/content/areas';
 import { CANVAS_HEIGHT } from 'app/gameConstants';
 import { throwHeldObject } from 'app/updateActor';
 import { createAnimation, drawFrame } from 'app/utils/animations';
-import { isObjectInsideTarget } from 'app/utils/index';
+import { isObjectInsideTarget, pad } from 'app/utils/index';
 
 import {
     DrawPriority, GameState, ObjectInstance,
@@ -27,7 +27,7 @@ export class PitEntrance implements ObjectInstance {
     }
     update(state: GameState) {
         const hero = state.hero.activeClone || state.hero;
-        if (isObjectInsideTarget(hero, this.getHitbox(state))) {
+        if (isObjectInsideTarget(hero, pad(this.getHitbox(state), 2))) {
             if (hero.action === 'fallen') {
                 if (enterZoneByTarget(state, this.definition.targetZone, this.definition.targetObjectId)) {
                     hero.action = 'knocked';
@@ -42,7 +42,7 @@ export class PitEntrance implements ObjectInstance {
             } else if (hero.action !== 'falling') {
                 throwHeldObject(state, hero);
                 hero.action = 'falling';
-                hero.actionFrame = 0;
+                hero.animationTime = 0;
             }
         }
     }
