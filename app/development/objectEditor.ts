@@ -34,11 +34,12 @@ export function getLootTypes(): LootType[] {
 }
 
 export const combinedObjectTypes: ObjectType[] = [
-    'loot', 'chest',
+    'loot', 'chest', 'sign',
     'door', 'pitEntrance', 'marker',
     'enemy',
     'ballGoal', 'crystalSwitch', 'floorSwitch',
-    'pushPull', 'rollingBall', 'tippable'];
+    'pushPull', 'rollingBall', 'tippable',
+];
 
 function createObjectDefinition(
     state: GameState,
@@ -124,6 +125,12 @@ function createObjectDefinition(
             return {
                 ...commonProps,
                 type: definition.type,
+            };
+        case 'sign':
+            return {
+                ...commonProps,
+                type: definition.type,
+                message: definition.message || editingState.message,
             };
         default:
             throw new Error('Unhandled object type, ' + definition['type']);
@@ -434,6 +441,21 @@ export function getObjectTypeProperties(state: GameState, editingState: EditingS
                         updateObjectInstance(state, object);
                     } else {
                         editingState.enemyType = enemyType;
+                    }
+                },
+            });
+            break;
+        case 'sign':
+            rows.push({
+                name: 'message',
+                multiline: true,
+                value: object.id ? object.message : editingState.message,
+                onChange(message: string) {
+                    if (object.id) {
+                        object.message = message;
+                        updateObjectInstance(state, object);
+                    } else {
+                        editingState.message = message;
                     }
                 },
             });

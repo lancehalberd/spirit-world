@@ -9,6 +9,7 @@ import { renderHeroEyes, renderHeroShadow, renderShadow } from 'app/renderActor'
 import { renderDefeatedMenu } from 'app/renderDefeatedMenu';
 import { renderHUD } from 'app/renderHUD';
 import { renderMenu } from 'app/renderMenu';
+import { renderMessage } from 'app/render/renderMessage';
 import { renderTitle } from 'app/renderTitle';
 import { getState } from 'app/state';
 import { drawFrame } from 'app/utils/animations';
@@ -113,6 +114,10 @@ export function render() {
     const context = mainContext;
     const state = getState();
     if (!state?.gameHasBeenInitialized) {
+        return;
+    }
+    if (state.messageState?.pages) {
+        renderMessage(context, state);
         return;
     }
     if (state.scene === 'title' || state.scene === 'chooseGameMode' ||

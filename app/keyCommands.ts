@@ -132,7 +132,9 @@ export function addKeyCommands() {
         }
         // Don't process keys if an input is targeted, otherwise we prevent typing in
         // the input.
-        if ((event.target as HTMLElement).closest('input')) {
+        if ((event.target as HTMLElement).closest('input') ||
+            (event.target as HTMLElement).closest('textarea')
+        ) {
             return;
         }
         const commandIsDown = (keysDown[KEY.CONTROL] || keysDown[KEY.COMMAND]);

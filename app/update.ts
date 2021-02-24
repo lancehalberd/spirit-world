@@ -36,7 +36,9 @@ export function update() {
     state.time += FRAME_LENGTH;
     updateKeyboardState(state);
     try {
-        if (state.scene === 'title' || state.scene === 'chooseGameMode' ||
+        if (state.messageState?.pages) {
+            updateMessage(state);
+        } else if (state.scene === 'title' || state.scene === 'chooseGameMode' ||
             state.scene === 'deleteSavedGame' || state.scene === 'deleteSavedGameConfirmation'
         ) {
             updateTitle(state);
@@ -150,6 +152,15 @@ function updateTitle(state: GameState) {
                     selectSaveFile(state.menuIndex);
                 }
                 break;
+        }
+    }
+}
+
+function updateMessage(state: GameState) {
+    if (isConfirmKeyPressed(state)) {
+        state.messageState.pageIndex++;
+        if (state.messageState.pageIndex >= state.messageState.pages.length) {
+            state.messageState.pages = null;
         }
     }
 }

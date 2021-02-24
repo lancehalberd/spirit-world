@@ -12,6 +12,7 @@ import { TippableObject } from 'app/content/tippableObject';
 import { BallGoal } from 'app/content/objects/ballGoal';
 import { Marker } from 'app/content/objects/marker';
 import { PitEntrance } from 'app/content/objects/pitEntrance';
+import { Sign } from 'app/content/objects/sign';
 
 import {
     AreaInstance, GameState, ObjectDefinition, ObjectInstance, ObjectStatus,
@@ -42,6 +43,8 @@ export function createObjectInstance(state: GameState, object: ObjectDefinition)
         return new PitEntrance(object);
     } else if (object.type === 'marker') {
         return new Marker(object);
+    }  else if (object.type === 'sign') {
+        return new Sign(object);
     }
 
     console.error('Unhandled object type', object.type, object);

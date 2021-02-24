@@ -40,4 +40,8 @@ export interface GameState {
         mostRecentKeysPressed: Set<number>,
         gameKeysReleased: Set<number>,
     },
+    messageState?: {
+        pageIndex: number,
+        pages: string[],
+    },
 }

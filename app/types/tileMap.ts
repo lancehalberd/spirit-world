@@ -233,6 +233,11 @@ export interface EntranceDefinition extends BaseObjectDefinition {
     targetObjectId?: string,
 }
 
+export interface SignDefinition extends BaseObjectDefinition {
+    type: 'sign',
+    message: string,
+}
+
 export type SimpleObjectType = 'marker' | 'pushPull' | 'rollingBall' | 'tippable';
 
 export interface SimpleObjectDefinition extends BaseObjectDefinition {
@@ -253,6 +258,7 @@ export type ObjectDefinition = SimpleObjectDefinition
     | EnemyObjectDefinition
     | FloorSwitchDefinition
     | LootObjectDefinition
+    | SignDefinition
     ;
 
 export type ObjectType = ObjectDefinition['type'];

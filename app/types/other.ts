@@ -136,6 +136,7 @@ export interface EditorButtonProperty {
 export interface EditorSingleProperty<T> {
     name: string,
     id?: string,
+    multiline?: boolean,
     // A button property will have no value.
     value?: T,
     // If the property is an enum, you can set the list of all values.

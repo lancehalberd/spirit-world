@@ -24,6 +24,7 @@ export function displayPropertyPanel(properties: PanelRows): void {
     }
     propertyPanelElement.addEventListener('change', (event: InputEvent) => {
         const input = (event.target as HTMLElement).closest('input')
+            || (event.target as HTMLElement).closest('textarea')
             || (event.target as HTMLElement).closest('select');
         const property = input && propertiesById[input.name];
         if (property) {
@@ -216,6 +217,9 @@ function renderProperty(property: EditorProperty<any> | HTMLElement | string): s
                             ${val}
                         </option>`)
                     + '</select></span>';
+            }
+            if (property.multiline) {
+                return `<span class="pp-property">${property.name} <textarea rows="5" cols="30" name="${property.id || property.name}">${property.value}</textarea></span>`;
             }
             return `<span class="pp-property">${property.name} <input value="${property.value}" name="${property.id || property.name}" /></span>`;
         } else if (isNumberProperty(property)) {
