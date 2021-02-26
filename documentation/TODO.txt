@@ -9,8 +9,6 @@ High Priority Bugs:
 Low Priority Bugs:
     Pushing on a solid object sitting on thorny ground shouldn't hurt you:
         -return tileBehaviors and objectBehaviors separately, only damage if tile is solid+damaging.
-    Fix menu selection breaks sometimes
-        No luck reproducing, maybe the analog stick was doing something weird?
     Doors don't appear open when moving into them from a different section
         I think this is because the door doesn't update until it is in the current areaInstance
     nextAreaInstance is not rendered in Safari
@@ -25,7 +23,7 @@ Graphics:
 Todo:
 
 Add signs to demo:
-    Use closed chest graphic for now (so users will try to interact with them)
+    Fix wrapping+page generation
     Use escape sequences like {B_WEAPON} {B_UP} {B_LEFT_TOOL} {B_RIGHT_TOOL} for special characters {I_WEAPON} {I_BOW}
 
 Apply element to charge abilities.

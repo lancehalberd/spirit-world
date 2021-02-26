@@ -54,8 +54,8 @@ const f0_0x0: AreaDefinition = {
                 h: 32,
                 palette: 'field',
                 tiles: [
-                    [t1,t1,t2,t2,t1,t1,t1,t1,t1,t1,t1,t1,t1,t2,t2,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1],
-                    [t1,t1,t2,t2,t1,t1,t1,t1,t1,t1,t1,t1,t1,t2,t2,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1],
+                    [t1,t1,t2,t2,t1,t1,t1,t1,t1,t1,t1,t1,t1,t2,t2,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t2,t2,t1,t1,t1,t1],
+                    [t1,t1,t2,t2,t1,t1,t1,t1,t1,t1,t1,t1,t1,t2,t2,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t2,t2,t1,t1,t1,t1],
                     [t1,t1,t2,t2,t1,t2,t2,t2,t2,t2,t2,t2,t2,t2,t3,t4,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t1,t1],
                     [t1,t1,t2,t2,t1,t2,t5,t2,t2,t2,t2,t2,t2,t2,t2,t2,t6,t7,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t1,t1],
                     [t1,t1,t8,t9,t1,t3,t2,t10,t3,t2,t2,t6,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t11,t2,t2,t2,t2,t1,t1],
@@ -102,6 +102,8 @@ const f0_0x0: AreaDefinition = {
         {id: "demo_entrance:0:0x0-floorSwitch-0", linked: false, spirit: false, status: "normal", x: 48, y: 192, type: "floorSwitch", targetObjectId: "demo_entrance:cloneDoor", toggleOnRelease: true},
         {id: "demo_entrance:cloneDoor", linked: false, spirit: false, status: "closedSwitch", x: 0, y: 224, type: "door", targetZone: "demo_clone", targetObjectId: "clone:0:0x0-entrance", d: "left"},
         {id: "demo_entrance:0:0x0-sign-0", linked: false, spirit: false, status: "normal", x: 144, y: 64, type: "sign", message: "This is my very first sign in spirit quest, the game, the movie, the motion picture."},
+        {id: "demo_entrance:bowDoor", linked: false, spirit: false, status: "normal", x: 416, y: 0, type: "door", targetZone: "demo_bow", targetObjectId: "bow-entrance", d: "up"},
+        {id: "demo_entrance:0:0x0-bow-0", linked: false, spirit: false, status: "normal", x: 384, y: 64, type: "chest", lootType: "bow", level: 0, amount: 1},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},

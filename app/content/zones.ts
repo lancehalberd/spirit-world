@@ -6,6 +6,7 @@ export * from 'app/content/zones/zoneHash';
 // Every zone needs to be imported here in order to be added to the zones hash.
 export * from 'app/content/zones/peachCave';
 export * from 'app/content/zones/overworld';
+export * from 'app/content/zones/demo/bow';
 export * from 'app/content/zones/demo/clone';
 export * from 'app/content/zones/demo/entrance';
 export * from 'app/content/zones/demo/gloves';

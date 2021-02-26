@@ -91,7 +91,7 @@ const f0_0x0: AreaDefinition = {
         },
     ],
     objects: [
-        {id: "demo_sight:0:0x0-door-0", linked: true, spirit: false, status: "normal", x: 112, y: 480, type: "door", targetZone: "demo_entrance", targetObjectId: "demo_entrance:0:0x0-eye-door", d: "down"},
+        {id: "demo_sight:0:0x0-door-0", linked: true, spirit: false, status: "normal", x: 112, y: 480, type: "door", targetZone: "demo_entrance", targetObjectId: "demo_entrance:eyeDoor", d: "down"},
         {id: "demo_sight:0:0x0-door-1", linked: false, spirit: false, status: "normal", x: 112, y: 224, type: "door", targetZone: null, targetObjectId: null, d: "down"},
         {id: "demo_sight:0:0x0-door-2", linked: false, spirit: false, status: "closedEnemy", x: 368, y: 224, type: "door", targetZone: null, targetObjectId: null, d: "down"},
         {id: "demo_sight:0:0x0-door-3", linked: false, spirit: false, status: "normal", x: 368, y: 256, type: "door", targetZone: null, targetObjectId: null, d: "up"},
