@@ -19,6 +19,7 @@ const blueGlowFrames = createAnimation('gfx/tiles/activatablecrystal.png', cryst
 export class CrystalSwitch implements ObjectInstance {
     area: AreaInstance;
     behaviors = {
+        low: true,
         solid: true,
     };
     drawPriority: DrawPriority = 'sprites';

@@ -1,7 +1,8 @@
 /* global navigator */
+import { enterLocation } from 'app/content/areas';
 import { exportZoneToClipboard } from 'app/development/exportZone';
 import { toggleEditing } from 'app/development/tileEditor';
-import { runTileRipper } from 'app/development/tileRipper';
+//import { runTileRipper } from 'app/development/tileRipper';
 import { getState } from 'app/state';
 
 import { GameState, Hero } from 'app/types'
@@ -150,9 +151,12 @@ export function addKeyCommands() {
         if (keyCode === KEY.E) {
             toggleEditing();
         }
-        if (keyCode === KEY.R && false) {
-            // This needs a Frame to run correctly.
-            runTileRipper(null, 8);
+        if (keyCode === KEY.R) {
+            const state = getState();
+            state.location.x = state.hero.x;
+            state.location.y = state.hero.y;
+            // Calling this will instantiate the area again and place the player back in their current location.
+            enterLocation(state, state.location);
         }
     });
 }

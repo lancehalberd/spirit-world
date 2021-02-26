@@ -39,6 +39,7 @@ export class Arrow implements ObjectInstance {
     h: number;
     vx: number;
     vy: number;
+    hitTargets: Set<any>;
     direction: Direction;
     stuckFrames: number = 0;
     status: ObjectStatus = 'normal';
@@ -55,6 +56,7 @@ export class Arrow implements ObjectInstance {
         this.h = hitbox.h;
         this.x -= this.w / 2 ;
         this.y -= this.h / 2;
+        this.hitTargets = new Set();
     }
     getRotatedHitbox(): ShortRectangle {
         if (this.direction === 'up' || this.direction === 'down') {
@@ -83,7 +85,8 @@ export class Arrow implements ObjectInstance {
                 continue;
             }
             if (object instanceof Enemy) {
-                if (rectanglesOverlap(object, this)) {
+                if (!this.hitTargets.has(object) && rectanglesOverlap(object, this)) {
+                    this.hitTargets.add(object);
                     damageActor(state, object, this.damage);
                     this.stuckFrames = 1;
                     return;
@@ -91,11 +94,14 @@ export class Arrow implements ObjectInstance {
             }
             if (object.getHitbox && object.behaviors?.solid) {
                 const hitbox = object.getHitbox(state);
-                if (rectanglesOverlap(hitbox, this)) {
+                if (!this.hitTargets.has(object) && rectanglesOverlap(hitbox, this)) {
+                    this.hitTargets.add(object);
                     const direction = getDirection(hitbox.x - this.x + 8 * this.vx, hitbox.y - this.y + 8 * this.vy);
                     object.onHit?.(state, direction);
-                    this.stuckFrames = 1;
-                    return;
+                    if (!object.behaviors?.low){
+                        this.stuckFrames = 1;
+                        return;
+                    }
                 }
             }
         }
