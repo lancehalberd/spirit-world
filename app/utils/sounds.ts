@@ -1,12 +1,13 @@
 import {Howl/*, Howler*/} from 'howler';
 
+import { ifdefor } from 'app/utils/index';
 
 /* globals setTimeout, Set, Map */
 const sounds = new Map();
 window['sounds'] = sounds;
 
 export function requireSound(key, callback = null) {
-    let source, offset, volume, duration, limit, repeatFrom, nextTrack, type = 'default';
+    let source, loop, offset, volume, duration, limit, repeatFrom, nextTrack, type = 'default';
     if (typeof key === 'string') {
         [source, offset, volume] = key.split('+');
         key = source;
@@ -14,6 +15,7 @@ export function requireSound(key, callback = null) {
         offset = key.offset;
         volume = key.volume;
         limit = key.limit;
+        loop = key.loop;
         source = key.source;
         repeatFrom = key.repeatFrom;
         nextTrack = key.nextTrack;
@@ -73,7 +75,7 @@ export function requireSound(key, callback = null) {
     } else {
         const howlerProperties: any = {
             src: [source],
-            loop: false,
+            loop: ifdefor(loop, false),
             volume: (volume || 1) / 50,
             onplay: function () {
                 if (newSound.activeInstances === 0) {
@@ -81,6 +83,13 @@ export function requireSound(key, callback = null) {
                 }
                 newSound.activeInstances++;
                 //console.log('playing sound', newSound.activeInstances);
+            },
+            onstop: function () {
+                newSound.activeInstances--;
+                //console.log('stopped sound', newSound.activeInstances);
+                if (newSound.activeInstances === 0) {
+                    playingSounds.delete(newSound);
+                }
             },
             onend: function () {
                 newSound.activeInstances--;
@@ -145,7 +154,17 @@ export function playSound(key, muted = false) {
         console.log(e);
         debugger;
     }
+    return sound;
 }
+export function stopSound(sound) {
+    if (sound.howl) {
+        sound.howl.stop();
+    } else {
+        // no logic for stopping non howl sounds.
+    }
+}
+window['stopSound'] = stopSound;
+
 
 let playingTracks = [], trackIsPlaying = false;
 window['playingTracks'] = playingTracks;
@@ -226,6 +245,17 @@ export function isPlayingTrack() {
     return trackIsPlaying;
 }
 
+const preloadSounds = () => {
+    [
+        {key: 'switch', source: 'sfx/switch.wav', volume: 10, limit: 2},
+        {key: 'rollingBall', source: 'sfx/rollingBall.wav',
+            offset: '0:1400', loop: true, volume: 10, limit: 2
+        },
+        {key: 'rollingBallHit', source: 'sfx/rollingBallHit.wav', volume: 10, limit: 2},
+        {key: 'rollingBallSocket', source: 'sfx/rollingBallSocket.wav', volume: 10, limit: 2},
+    ].forEach(sound => requireSound(sound));
+};
+preloadSounds();
 /*export function muteSounds() {
     for (const sound of playingSounds) sound.howl.mute(true);
 }

@@ -100,7 +100,7 @@ const f0_0x0: AreaDefinition = {
         {type: "door", id: "bow:0:0x0-door-6", status: "normal", targetZone: null, targetObjectId: null, d: "down", x: 112, y: 224},
         {id: "demo_bow:0:0x0-pitEntrance-0", linked: false, spirit: false, status: "normal", x: 448, y: 448, type: "pitEntrance", targetZone: "demo_entrance", targetObjectId: "demo_entrance:0:0x0-glovesMarker"},
         {id: "demo_bow:0:0x0-crystalSwitch-0", linked: false, spirit: false, status: "normal", x: 208, y: 304, type: "crystalSwitch", element: null, targetObjectId: "bow:0:0x0-door-1", timer: 2000},
-        {id: "demo_bow:0:0x0-crystalSwitch-1", linked: false, spirit: false, status: "normal", x: 32, y: 304, type: "crystalSwitch", element: null, targetObjectId: "bow:0:0x0-door-1", timer: 400},
+        {id: "demo_bow:0:0x0-crystalSwitch-1", linked: false, spirit: false, status: "normal", x: 32, y: 304, type: "crystalSwitch", element: null, targetObjectId: "bow:0:0x0-door-1", timer: 1000},
         {id: "demo_bow:0:0x0-floorSwitch-0", linked: false, spirit: false, status: "normal", x: 208, y: 448, type: "floorSwitch", targetObjectId: "demo_bow:0:0x0-peachOfImmortalityPiece-0", toggleOnRelease: true},
         {id: "demo_bow:0:0x0-floorSwitch-2", linked: false, spirit: false, status: "normal", x: 160, y: 336, type: "floorSwitch", targetObjectId: "demo_bow:0:0x0-peachOfImmortalityPiece-0", toggleOnRelease: true},
         {id: "demo_bow:0:0x0-peachOfImmortalityPiece-0", linked: false, spirit: false, status: "hiddenSwitch", x: 176, y: 288, type: "chest", lootType: "peachOfImmortalityPiece", level: 0, amount: 1},

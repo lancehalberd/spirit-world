@@ -2,6 +2,7 @@ import { removeObjectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { directionMap, getTileBehaviorsAndObstacles, isPointOpen } from 'app/utils/field';
+import { playSound, stopSound } from 'app/utils/sounds';
 
 import { AreaInstance, BallGoal, Direction, GameState, BaseObjectDefinition, ObjectInstance, ObjectStatus, ShortRectangle } from 'app/types';
 
@@ -25,10 +26,14 @@ export class RollingBallObject implements ObjectInstance {
     status: ObjectStatus = 'normal';
     animationTime = 0;
     stuck: boolean = false;
+    soundReference;
     constructor(definition: BaseObjectDefinition) {
         this.definition = definition;
         this.x = definition.x;
         this.y = definition.y;
+    }
+    cleanup() {
+        this.stopRollingSound();
     }
     getHitbox(state: GameState): ShortRectangle {
         return { x: this.x, y: this.y, w: 16, h: 16 };
@@ -55,9 +60,16 @@ export class RollingBallObject implements ObjectInstance {
         const y = this.y + 8 + 16 * directionMap[direction][1];
         if (isPointOpen(state, this.area, {x, y}) && (!this.linkedObject || isPointOpen(state, this.linkedObject.area, {x, y}))) {
             this.rollDirection = direction;
+            this.soundReference = playSound('rollingBall');
             if (this.linkedObject) {
                 this.linkedObject.rollDirection = direction;
             }
+        }
+    }
+    stopRollingSound() {
+        if (this.soundReference) {
+            stopSound(this.soundReference);
+            this.soundReference = null;
         }
     }
     update(state: GameState) {
@@ -72,11 +84,14 @@ export class RollingBallObject implements ObjectInstance {
                     continue;
                 }
                 if (Math.abs(this.x - object.x) <= 2 && Math.abs(this.y - object.y) <= 2) {
+                    this.stopRollingSound();
+                    playSound('rollingBallSocket');
                     (object as BallGoal).activate(state);
                     // The activated BallGoal will render the ball in the depression, so we remove
                     // the original ball from the area.
                     removeObjectFromArea(state, this);
                     if (this.linkedObject) {
+                        this.linkedObject.stopRollingSound();
                         const linkedGoal = (object as BallGoal).linkedObject;
                         if (linkedGoal) {
                             linkedGoal.activate(state);
@@ -102,6 +117,9 @@ export class RollingBallObject implements ObjectInstance {
                         }
                     }
                 }
+                this.stopRollingSound();
+                this.linkedObject?.stopRollingSound();
+                playSound('rollingBallHit');
                 this.rollDirection = null;
             }
         }

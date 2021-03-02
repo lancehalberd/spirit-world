@@ -7,7 +7,7 @@ import { fillRect, pad } from 'app/utils/index';
 
 import { GameState } from 'app/types';
 
-const WIDTH = CANVAS_WIDTH / 2;
+const WIDTH = 144;
 const ROW_HEIGHT = 20;
 
 
@@ -38,13 +38,13 @@ export function renderTitle(context: CanvasRenderingContext2D, state: GameState)
     const smallTextOptions = {
         textBaseline: 'middle',
         textAlign: 'left',
-        size: 8,
+        size: 16,
         fillStyle: 'white',
     };
     context.fillStyle = 'white';
     let x = r.x + 20, y = r.y + ROW_HEIGHT / 2;
     for (let i = 0; i < options.length; i++) {
-        let text = options[i].slice(0, 15).toUpperCase();
+        let text = options[i].slice(0, 13).toUpperCase();
         drawText(context, text, x, y, smallTextOptions);
         if (state.menuIndex === i) {
             // Draw an arrow next to the selected option.

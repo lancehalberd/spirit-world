@@ -17,7 +17,6 @@ import {
 } from 'app/state';
 import { updateAllHeroes } from 'app/updateActor';
 import { updateCamera } from 'app/updateCamera';
-import { areFontsLoaded } from 'app/utils/drawText';
 import { areAllImagesLoaded } from 'app/utils/images';
 
 import { ActiveTool, AreaInstance, GameState, MagicElement } from 'app/types';
@@ -26,7 +25,7 @@ let isGameInitialized = false;
 export function update() {
     // Don't run the main loop until everything necessary is initialized.
     if (!isGameInitialized) {
-        if (areFontsLoaded() && areAllImagesLoaded())  {
+        if (areAllImagesLoaded())  {
             initializeGame();
             isGameInitialized = true;
         }

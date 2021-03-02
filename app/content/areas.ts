@@ -479,6 +479,9 @@ export function removeObjectFromArea(state: GameState, object: ObjectInstance): 
     if (object.remove) {
         object.remove(state);
     } else {
+        if (object.cleanup) {
+            object.cleanup(state);
+        }
         const index = object.area.objects.indexOf(object);
         if (index >= 0) {
             object.area.objects.splice(index, 1);

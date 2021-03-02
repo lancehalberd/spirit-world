@@ -1,15 +1,27 @@
+import { parseMessage } from 'app/render/renderMessage';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 
 import {
-    AreaInstance, GameState, Direction, SignDefinition,
+    AreaInstance, GameState, Direction, Hero, SignDefinition,
     ObjectInstance, ObjectStatus, ShortRectangle,
 } from 'app/types';
 
-const messageBreak = '{|}';
+const signGeometry = {w: 16, h: 19, content: {x: 0, y: 3, w: 16, h: 16}};
+const [shortSign] = createAnimation('gfx/tiles/signshort.png', signGeometry).frames;
+const [shortSignSpirit] = createAnimation('gfx/tiles/shortsignspirit.png', signGeometry).frames;
+const [tallSign] = createAnimation('gfx/tiles/signtall.png', signGeometry).frames;
+const [tallSignSpirit] = createAnimation('gfx/tiles/signtallspirit.png', signGeometry).frames;
 
-const [chestClosedFrame] = createAnimation('gfx/tiles/chest.png',
-    {w: 18, h: 20, content: {x: 1, y: 4, w: 16, h: 16}}, {cols: 2}
-).frames;
+export const signStyles = {
+    short: {
+        normal: shortSign,
+        spirit: shortSignSpirit,
+    },
+    tall: {
+        normal: tallSign,
+        spirit: tallSignSpirit,
+    },
+};
 
 export class Sign implements ObjectInstance {
     area: AreaInstance;
@@ -30,14 +42,16 @@ export class Sign implements ObjectInstance {
     getHitbox(state: GameState): ShortRectangle {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
-    onGrab(state: GameState, direction: Direction) {
+    onGrab(state: GameState, direction: Direction, hero: Hero) {
         if (direction !== 'up') {
             return;
         }
         state.messageState = {
             pageIndex: 0,
-            pages: this.definition.message.split(messageBreak),
+            pages: parseMessage(state, this.definition.message),
         };
+        // Remove the grab action since the hero is reading the sign, not grabbing it.
+        hero.action = null;
     }
     update(state: GameState) {
         if (this.status === 'hiddenEnemy' || this.status === 'hiddenSwitch') {
@@ -45,8 +59,8 @@ export class Sign implements ObjectInstance {
         }
     }
     render(context, state: GameState) {
-        drawFrame(context, chestClosedFrame, {
-            ...chestClosedFrame, x: this.x - chestClosedFrame.content.x, y: this.y - chestClosedFrame.content.y
-        });
+        const style = this.definition.style || 'short';
+        const frame = this.definition.spirit ? signStyles[style].spirit : signStyles[style].normal;
+        drawFrame(context, frame, { ...frame, x: this.x - frame.content.x, y: this.y - frame.content.y });
     }
 }

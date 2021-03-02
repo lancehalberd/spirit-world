@@ -1,4 +1,4 @@
-import { AreaGrid, AreaInstance, Hero, ShortRectangle, Zone, ZoneLocation } from 'app/types';
+import { AreaGrid, AreaInstance, Frame, Hero, ShortRectangle, Zone, ZoneLocation } from 'app/types';
 
 export type SavedState = {
     coins: number,
@@ -42,6 +42,8 @@ export interface GameState {
     },
     messageState?: {
         pageIndex: number,
-        pages: string[],
+        pages: Frame[][][],
     },
+    isUsingKeyboard?: boolean,
+    isUsingXbox?: boolean,
 }

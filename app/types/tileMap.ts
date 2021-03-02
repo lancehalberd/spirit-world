@@ -166,6 +166,7 @@ export interface ObjectInstance {
     x: number, y: number,
     status: ObjectStatus,
     changeStatus?: (state: GameState, status: ObjectStatus) => void,
+    cleanup?: (state: GameState) => void,
     // This is called when a user grabs a solid tile
     getHitbox?: (state: GameState) => ShortRectangle,
     onDestroy?: (state: GameState, dx: number, dy: number) => void,
@@ -194,6 +195,8 @@ export interface BaseObjectDefinition {
     linked?: boolean,
     // Whether this is a spirit object.
     spirit?: boolean,
+    // Stores optional style type for some objects, e.g., 'short' vs 'tall' signs.
+    style?: string,
     status: ObjectStatus,
     x: number,
     y: number,

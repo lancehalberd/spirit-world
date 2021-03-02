@@ -3,6 +3,7 @@ import _ from 'lodash';
 import { addObjectToArea, linkObject, removeObjectFromArea } from 'app/content/areas';
 import { enemyDefinitions } from 'app/content/enemy';
 import { createObjectInstance } from 'app/content/objects';
+import { signStyles } from 'app/content/objects/sign';
 import { lootFrames } from 'app/content/lootObject';
 import { zones } from 'app/content/zones';
 import { displayTileEditorPropertyPanel, EditingState } from 'app/development/tileEditor';
@@ -129,6 +130,7 @@ function createObjectDefinition(
         case 'sign':
             return {
                 ...commonProps,
+                style: definition.style || editingState.style || Object.keys(signStyles)[0],
                 type: definition.type,
                 message: definition.message || editingState.message,
             };
@@ -446,6 +448,19 @@ export function getObjectTypeProperties(state: GameState, editingState: EditingS
             });
             break;
         case 'sign':
+            rows.push({
+                name: 'style',
+                value: object.style || editingState.style || Object.keys(signStyles)[0],
+                values: Object.keys(signStyles),
+                onChange(style: string) {
+                    if (object.id) {
+                        object.style = style;
+                        updateObjectInstance(state, object);
+                    } else {
+                        editingState.style = style;
+                    }
+                },
+            });
             rows.push({
                 name: 'message',
                 multiline: true,

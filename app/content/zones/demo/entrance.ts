@@ -101,9 +101,12 @@ const f0_0x0: AreaDefinition = {
         {id: "demo_entrance:cloneChest", linked: false, spirit: false, status: "normal", x: 80, y: 208, type: "chest", lootType: "clone", level: 1, amount: 1},
         {id: "demo_entrance:0:0x0-floorSwitch-0", linked: false, spirit: false, status: "normal", x: 48, y: 192, type: "floorSwitch", targetObjectId: "demo_entrance:cloneDoor", toggleOnRelease: true},
         {id: "demo_entrance:cloneDoor", linked: false, spirit: false, status: "closedSwitch", x: 0, y: 224, type: "door", targetZone: "demo_clone", targetObjectId: "clone:0:0x0-entrance", d: "left"},
-        {id: "demo_entrance:0:0x0-sign-0", linked: false, spirit: false, status: "normal", x: 144, y: 64, type: "sign", message: "This is my very first sign in spirit quest, the game, the movie, the motion picture."},
         {id: "demo_entrance:bowDoor", linked: false, spirit: false, status: "normal", x: 416, y: 0, type: "door", targetZone: "demo_bow", targetObjectId: "bow-entrance", d: "up"},
         {id: "demo_entrance:0:0x0-bow-0", linked: false, spirit: false, status: "normal", x: 384, y: 64, type: "chest", lootType: "bow", level: 0, amount: 1},
+        {id: "demo_entrance:0:0x0-sign-1", linked: false, spirit: false, status: "normal", x: 128, y: 80, type: "sign", message: "Press {B_MENU} to open you inventory and equip tools to {B_TOOL}. Press {B_TOOL} in the field to use your tools.", style: "short"},
+        {id: "demo_entrance:0:0x0-sign-0", linked: false, spirit: false, status: "normal", x: 176, y: 32, type: "sign", message: "With the Spirit Eyes, hold {B_PASSIVE} to meditate and look into the Spirit World."},
+        {id: "demo_entrance:0:0x0-sign-3", linked: false, spirit: false, status: "normal", x: 80, y: 80, type: "sign", message: "The Gloves allow you to pick up heavy stones. Face a stone and press {B_PASSIVE} to lift and carry it. Press {B_PASSIVE} again to throw.", style: "tall"},
+        {id: "demo_entrance:0:0x0-sign-2", linked: false, spirit: false, status: "normal", x: 96, y: 208, type: "sign", message: "The Clone technique allows you to create a clone of yourself. Press {B_TOOL} to create a clone, then {B_TOOL} to switch between clones. You can hold {B_TOOL} to control all your clones at once.", style: "tall"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},

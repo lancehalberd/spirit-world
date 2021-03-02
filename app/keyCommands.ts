@@ -96,8 +96,10 @@ function buttonIsPressed(button) {
 }
 
 const keysDown = {};
+let lastInput: 'keyboard' | 'gamepad' = null;
 export function isKeyDown(keyCode: number): number {
     if (keysDown[keyCode]) {
+        lastInput = 'keyboard';
         return 1;
     }
     // If a mapping exists for the current key code to a gamepad button,
@@ -115,6 +117,7 @@ export function isKeyDown(keyCode: number): number {
                 value = gamepad.axes[axisIndex[0]] * axisIndex[1];
             }
             if (value) {
+                lastInput = 'gamepad';
                 return value;
             }
         }
@@ -189,6 +192,13 @@ export function updateKeyboardState(state: GameState) {
         mostRecentKeysPressed = gameKeysPressed;
     }
     state.keyboard = { gameKeyValues, gameKeysDown, gameKeysPressed, gameKeysReleased, mostRecentKeysPressed };
+    if (lastInput === 'gamepad') {
+        state.isUsingKeyboard = false;
+        state.isUsingXbox = true;
+    } else if (lastInput === 'keyboard') {
+        state.isUsingKeyboard = true;
+        state.isUsingXbox = false;
+    }
 }
 
 export function wasGameKeyPressed(state: GameState, keyCode: number): boolean {
