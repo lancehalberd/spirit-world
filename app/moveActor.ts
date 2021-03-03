@@ -150,10 +150,11 @@ function moveActorInDirection(
         if (!wiggle) {
             return false;
         }
+        const maxWiggle = 8;
         function wiggleLeft(y: number) {
-            for (let l = ax - 1; l >= ax - 8; l--) {
+            for (let l = ax - 1; l >= ax - maxWiggle; l--) {
                 let open = true;
-                for (let x = l; x < l + actor.w; x += 8) {
+                for (const x of [l, l + Math.floor(actor.w / 2), l + actor.w - 1]) {
                     if (!isPointOpen(state, actor.area, {x, y}, excludedObjects)) {
                         open = false;
                         break;
@@ -165,9 +166,9 @@ function moveActorInDirection(
             }
         }
         function wiggleRight(y: number) {
-            for (let l = ax + 1; l <= ax + 8; l++) {
+            for (let l = ax + 1; l <= ax + maxWiggle; l++) {
                 let open = true;
-                for (let x = l; x < l + actor.w; x += 8) {
+                for (const x of [l, l + Math.floor(actor.w / 2), l + actor.w - 1]) {
                     if (!isPointOpen(state, actor.area, {x, y}, excludedObjects)) {
                         open = false;
                         break;
@@ -179,9 +180,9 @@ function moveActorInDirection(
             }
         }
         function wiggleUp(x: number) {
-            for (let t = ay - 1; t >= ay - 8; t--) {
+            for (let t = ay - 1; t >= ay - maxWiggle; t--) {
                 let open = true;
-                for (let y = t; y < t + actor.h; y += 8) {
+                for (const y of [t, t + Math.floor(actor.h / 2), t + actor.h - 1]) {
                     if (!isPointOpen(state, actor.area, {x, y}, excludedObjects)) {
                         open = false;
                         break;
@@ -193,9 +194,9 @@ function moveActorInDirection(
             }
         }
         function wiggleDown(x: number) {
-            for (let t = ay + 1; t <= ay + 8; t++) {
+            for (let t = ay + 1; t <= ay + maxWiggle; t++) {
                 let open = true;
-                for (let y = t; y < t + actor.h; y += 8) {
+                for (const y of [t, t + Math.floor(actor.h / 2), t + actor.h - 1]) {
                     if (!isPointOpen(state, actor.area, {x, y}, excludedObjects)) {
                         open = false;
                         break;
