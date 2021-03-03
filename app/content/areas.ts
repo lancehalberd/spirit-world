@@ -92,6 +92,9 @@ export function getAreaFromLocation(location: ZoneLocation): AreaDefinition {
     const floor = zones[location.zoneKey].floors[location.floor];
     const grid = location.isSpiritWorld ? floor.spiritGrid : floor.grid;
     const {x, y} = location.areaGridCoords;
+    if (!grid[y]) {
+        grid[y] = [];
+    }
     if (!grid[y][x]) {
         grid[y][x] =
             initializeAreaTiles(location.isSpiritWorld ? getDefaultSpiritArea(location) : getDefaultArea());

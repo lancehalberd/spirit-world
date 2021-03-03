@@ -10,7 +10,7 @@ export type Action =
     'attack' | 'roll' | 'knocked' | 'hurt' | 'dead' | 'walking'
     | 'pushing' | 'grabbing' | 'carrying' | 'throwing' | 'thrown' | 'getItem'
     | 'beingCarried' | 'entering' | 'exiting'
-    | 'falling' | 'fallen' | 'meditating';
+    | 'falling' | 'fallen' | 'meditating' | 'swimming';
 export type ActiveTool = 'bow' | 'staff' | 'clone' | 'invisibility';
 export type Equipment = 'cloudBoots' | 'ironBoots';
 export type PassiveTool = 'gloves'

@@ -17,7 +17,7 @@ import {
     wasGameKeyPressed,
     wasGameKeyPressedAndReleased,
 } from 'app/keyCommands';
-import { checkForFloorDamage, moveActor } from 'app/moveActor';
+import { checkForFloorEffects, moveActor } from 'app/moveActor';
 import { getTileFrame } from 'app/render';
 import { fallAnimation } from 'app/renderActor';
 import { useTool } from 'app/useTool';
@@ -102,6 +102,8 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         movementSpeed = 0;
         hero.y += 0.5;
         //dy = 1;
+    } else if (hero.action === 'swimming') {
+        movementSpeed = 1.5;
     } else if (hero.action === 'falling') {
         movementSpeed = 0;
         if (hero.animationTime >= fallAnimation.duration) {
@@ -440,7 +442,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
     if (hero.action !== 'beingCarried' && hero.action !== 'falling' && hero.action !== 'fallen' && hero.action !== 'knocked'
         && hero.action !== 'dead'  && hero.action !== 'getItem'
     ) {
-        checkForFloorDamage(state, hero);
+        checkForFloorEffects(state, hero);
         checkForEnemyDamage(state, hero);
     }
     // Check for transition to other areas/area sections.

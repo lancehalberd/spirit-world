@@ -153,7 +153,7 @@ export function getZoneProperties(state: GameState, editingState: EditingState):
         value: '' + (floor + 1),
         values: ([...new Array(state.zone.floors.length)].map((v, i) => '' + (i + 1))),
         onChange(floorString: string) {
-            const floorNumber = parseInt(floorString, 10);
+            const floorNumber = parseInt(floorString, 10) - 1;
             if (state.location.floor !== floorNumber) {
                 state.location.floor = floorNumber;
                 enterLocation(state, state.location);

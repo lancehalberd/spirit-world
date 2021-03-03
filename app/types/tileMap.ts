@@ -12,6 +12,8 @@ export interface TileBehaviors {
     damage?: number,
     // Can be destroyed by an explosion.
     destructible?: boolean,
+    // This tile can be jumped over in this direction but is otherwise impassable.
+    jumpDirection?: Direction,
     // If this is true then this tile will link to a matching tile in the alternate world.
     linked?: boolean,
     lootChance?: number,
@@ -31,7 +33,8 @@ export interface TileBehaviors {
     // Can be picked up with glove
     pickupWeight?: number,
     // Tile to display if this tile is removed (picked up, cut, blown up).
-    underTile?: {x: number, y: number}
+    underTile?: {x: number, y: number},
+    water?: boolean,
 }
 
 export interface TilePalette {

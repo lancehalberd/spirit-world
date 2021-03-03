@@ -4,6 +4,7 @@ import { Zone } from 'app/types';
 
 export * from 'app/content/zones/zoneHash';
 // Every zone needs to be imported here in order to be added to the zones hash.
+export * from 'app/content/zones/newPeachCave';
 export * from 'app/content/zones/peachCave';
 export * from 'app/content/zones/overworld';
 export * from 'app/content/zones/demo/bow';

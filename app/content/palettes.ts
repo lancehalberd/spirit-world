@@ -56,6 +56,12 @@ const thornBehavior: TileBehaviors = {
     underTile: {x: 6, y: 1},
     particles: thornParticles,
 };
+const deepWaterBehavior: TileBehaviors = {
+    water: true,
+}
+const southCliffBehavior: TileBehaviors = {
+    jumpDirection: 'down',
+}
 
 const spiritBushParticles: Frame[] = createAnimation('gfx/tiles/bushspirit.png', {w: 16, h: 16}, {x: 2, cols: 3}).frames;
 const spiritLightStoneParticles: Frame[] = createAnimation('gfx/tiles/rocksspirit.png', {w: 16, h: 16}, {x: 2, cols: 3}).frames;
@@ -121,13 +127,32 @@ function drawCombinedPalettes(targetPalette: TilePalette, canvas: HTMLCanvasElem
     }
 }
 
-function singleTilePalette(source: string, behaviors: TileBehaviors, x = 0, y = 0, w = 16, h = 16): TilePalette {
+function singleTilePalette(source: string, behaviors: TileBehaviors = null, x = 0, y = 0, w = 16, h = 16): TilePalette {
     return {
         w, h,
         source: {image: requireImage(source), x, y, w, h},
         behaviors: behaviors ? {'0x0': behaviors} : {},
         defaultTiles: []
     };
+}
+function canvasPalette(draw: (context: CanvasRenderingContext2D) => void, behaviors: TileBehaviors = null): TilePalette {
+    const [canvas, context] = createCanvasAndContext(16, 16);
+    draw(context);
+    /*canvas.style.position = 'absolute';
+    canvas.style.top = '0';
+    document.body.append(canvas);*/
+    return {
+        w: 16, h: 16,
+        source: {image: canvas, x: 0, y: 0, w: 16, h: 16},
+        behaviors: behaviors ? {'0x0': behaviors} : {},
+        defaultTiles: []
+    };
+}
+function solidColorTile(color: string, behaviors: TileBehaviors = null): TilePalette {
+    return canvasPalette(context => {
+        context.fillStyle = color;
+        context.fillRect(0, 0, 16, 16);
+    }, behaviors);
 }
 
 const fieldPalette = {...combinePalettes([
@@ -149,6 +174,9 @@ const fieldPalette = {...combinePalettes([
         },
         singleTilePalette('gfx/tiles/bush.png', null, 16),
         singleTilePalette('gfx/tiles/thorns.png', null, 16),
+        solidColorTile('#0000FF', deepWaterBehavior), // deep water
+        solidColorTile('#A0A0FF'), // shallow water
+        solidColorTile('#A08000', southCliffBehavior), // southCliff
     ]),
     defaultTiles: [
         {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0},
@@ -194,6 +222,9 @@ const spiritFieldPalette = {...combinePalettes([
         },
         singleTilePalette('gfx/tiles/bushspirit.png', null, 16),
         singleTilePalette('gfx/tiles/thornsspirit.png', null, 16),
+        solidColorTile('#8080FF', deepWaterBehavior), // deep water
+        solidColorTile('#D0D0FF'), // shallow water
+        solidColorTile('#806040', southCliffBehavior), // southCliff
     ]),
     defaultTiles: [null]
 };

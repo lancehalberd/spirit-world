@@ -241,7 +241,7 @@ function moveActorInDirection(
     actor.y = ay;
     return true;
 }
-export function checkForFloorDamage(state: GameState, hero: Hero) {
+export function checkForFloorEffects(state: GameState, hero: Hero) {
     const palette = hero.area.palette;
     const tileSize = palette.w;
 
@@ -252,15 +252,20 @@ export function checkForFloorDamage(state: GameState, hero: Hero) {
 
     const behaviorGrid = hero.area.behaviorGrid;
     let fallingLeft = false, fallingRight = false, fallingUp = false, fallingDown = false;
+    let startSwimming = true;
     for (let row = topRow; row <= bottomRow; row++) {
         for (let column = leftColumn; column <= rightColumn; column++) {
             const behaviors = behaviorGrid?.[row]?.[column];
             // This will happen when the player moves off the edge of the screen.
             if (!behaviors) {
+                startSwimming = false;
                 continue;
             }
             if (behaviors.damage > 0) {
                 damageActor(state, hero, behaviors.damage);
+            }
+            if (!behaviors.water) {
+                startSwimming = false;
             }
             if (behaviors.pit && hero.action !== 'roll') {
                 if (hero.x - column * 16 > 4) {
@@ -283,6 +288,11 @@ export function checkForFloorDamage(state: GameState, hero: Hero) {
                 }
             }
         }
+    }
+    if (startSwimming && hero.action !== 'roll') {
+        hero.action = 'swimming';
+    } else if (!startSwimming && hero.action === 'swimming') {
+        hero.action = null;
     }
     if (fallingUp && fallingDown && fallingLeft && fallingRight) {
         throwHeldObject(state, hero);
