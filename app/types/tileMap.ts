@@ -90,6 +90,8 @@ export interface ZoneLocation {
     isSpiritWorld: boolean,
     x: number,
     y: number,
+    // This can be set to have the player falling when they spawn.
+    z?: number,
     d: Direction,
 }
 

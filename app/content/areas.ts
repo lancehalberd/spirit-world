@@ -179,6 +179,10 @@ export function enterLocation(state: GameState, location: ZoneLocation): void {
     state.hero.area = state.areaInstance;
     state.hero.x = location.x;
     state.hero.y = location.y;
+    if (location.z) {
+        state.hero.z = location.z;
+        state.hero.action = 'knocked';
+    }
     state.hero.safeD = state.hero.d;
     state.hero.safeX = location.x;
     state.hero.safeY = location.y;
@@ -325,7 +329,9 @@ export function applyLayerToBehaviorGrid(behaviorGrid: TileBehaviors[][], layer:
     const grid = layer.grid;
     const palette = palettes[grid.palette];
     for (let y = 0; y < grid.tiles.length; y++) {
-        behaviorGrid[y] = [];
+        if (!behaviorGrid[y]) {
+            behaviorGrid[y] = [];
+        }
         for (let x = 0; x < grid.tiles.length; x++) {
             let tile = grid.tiles[y][x];
             if (!tile && parentLayer) {

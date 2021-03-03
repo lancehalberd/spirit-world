@@ -10,15 +10,19 @@ export function exportZoneToClipboard(zone: Zone): void {
 export function serializeZone(zone: Zone) {
     const tileMap = {};
     let tileIndex = 0;
+    const emptySpiritAreas = [];
+    let usedEmptyTile = false;
     for (const floor of zone.floors) {
         for (const areaGrid of [floor.grid, floor.spiritGrid]) {
             const key = (areaGrid === floor.grid) ? 'f' : 'sf';
             for (const gridRow of areaGrid) {
                 for (const area of gridRow) {
+                    let isEmpty = true;
                     if (!area) {
                         continue;
                     }
                     area[key] = {};
+                    let usedEmptyTileInternally = false;
                     area.layers.map(layer => {
                         const rows = [];
                         for (let r = 0; r < layer.grid.tiles.length; r++) {
@@ -28,8 +32,10 @@ export function serializeZone(zone: Zone) {
                                 // Spirit world tiles will be null when they should inherit from the physical world.
                                 if (!tile) {
                                     rows[r][c] = 'e';
+                                    usedEmptyTileInternally = true;
                                     continue;
                                 }
+                                isEmpty = false;
                                 const {x, y} = tile;
                                 if (!tileMap[`${x}x${y}`]) {
                                     tileMap[`${x}x${y}`] = {
@@ -41,6 +47,11 @@ export function serializeZone(zone: Zone) {
                         }
                         area[key][layer.key] = rows;
                     });
+                    if (isEmpty) {
+                        emptySpiritAreas.push(area);
+                    } else if (usedEmptyTileInternally) {
+                        usedEmptyTile = true;
+                    }
                 }
             }
         }
@@ -50,7 +61,11 @@ export function serializeZone(zone: Zone) {
     lines.push("");
     lines.push("import { AreaDefinition } from 'app/types';");
     lines.push("");
-    const tileAssignments = ['e = null'];
+    const tileAssignments = [];
+    // Only add the empty tile if it was used.
+    if (usedEmptyTile) {
+        tileAssignments.push('e = null');
+    }
     for (let key in tileMap) {
         const data = tileMap[key];
         tileAssignments.push(`t${data.i} = {x: ${data.x}, y: ${data.y}}`);
@@ -63,7 +78,7 @@ export function serializeZone(zone: Zone) {
             for (let row = 0; row < areaGrid.length; row++) {
                 for (let column = 0; column < areaGrid[row].length; column++) {
                     const area = areaGrid[row][column];
-                    if (!area) {
+                    if (!area || emptySpiritAreas.includes(area)) {
                         lines.push(`const ${key}${floorIndex}_${row}x${column}: AreaDefinition = null;`);
                         continue;
                     }

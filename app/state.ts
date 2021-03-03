@@ -1,5 +1,6 @@
 import { enterLocation } from 'app/content/areas';
 import { zones } from 'app/content/zones';
+import { CANVAS_HEIGHT } from 'app/gameConstants';
 import { renderHero } from 'app/renderActor';
 
 import { GameState, Hero, SavedState, ZoneLocation } from 'app/types';
@@ -52,12 +53,13 @@ export function eraseAllSaves(): void {
 }
 
 export const SPAWN_LOCATION_FULL: ZoneLocation = {
-    zoneKey: 'peachCave',
+    zoneKey: 'newPeachCave',
     floor: 0,
-    x: 150,
-    y: 445,
-    d: 'down',
-    areaGridCoords: {x: 1, y: 1},
+    x: 112,
+    y: 176,
+    z: CANVAS_HEIGHT,
+    d: 'up',
+    areaGridCoords: {x: 0, y: 1},
     isSpiritWorld: false,
 };
 export const SPAWN_LOCATION_DEMO: ZoneLocation = {
