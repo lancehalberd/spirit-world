@@ -31,11 +31,23 @@ const [
     /*ps_rightStick*/, ps_leftStick,
     ps_x, ps_circle, ps_square, ps_triangle,
     ps_r1, ps_l1, /*ps_r2*/, /*ps_l2*/,
-    keyboard_enter, keyboard_w, keyboard_d, keyboard_s,
-    keyboard_left, keyboard_right, keyboard_up,
+    keyboard_enter,
+    /*keyboard_w*/, /*keyboard_d*/, /*keyboard_s*/, /*keyboard_a*/,
+    keyboard_wasd,
+    /*keyboard_left*/, /*keyboard_right*/, /*keyboard_up*/,
     keyboard_c, keyboard_v, keyboard_z, keyboard_x,
     keyboard_space, keyboard_shift,
-] = createAnimation('gfx/hud/controllerbuttons.png', {w: 24, h: 16}, {cols: 38}).frames;
+] = createAnimation('gfx/hud/controllerbuttonswhite.png', {w: 26, h: 18, content: {x: 0, y: 1, w: 26, h: 16}}, {cols: 40}).frames;
+
+const smallKeys = [
+    xbox_y, xbox_b, xbox_a, xbox_x, xbox_start,
+    ps_x, ps_circle, ps_square, ps_triangle, ps_start,
+    keyboard_c, keyboard_v, keyboard_z, keyboard_x,
+]
+for (const smallKey of smallKeys) {
+    smallKey.x += 5;
+    smallKey.w -= 9;
+}
 
 export const xboxMap = {
     [GAME_KEY.UP]: [xbox_dpad, xbox_leftStick],
@@ -66,10 +78,10 @@ export const psMap = {
 };
 
 export const keyboardMap = {
-    [GAME_KEY.UP]: [keyboard_up, keyboard_w],
-    [GAME_KEY.DOWN]: [keyboard_s],
-    [GAME_KEY.LEFT]: [keyboard_left],
-    [GAME_KEY.RIGHT]: [keyboard_right, keyboard_d],
+    [GAME_KEY.UP]: [keyboard_wasd],
+    [GAME_KEY.DOWN]: [keyboard_wasd],
+    [GAME_KEY.LEFT]: [keyboard_wasd],
+    [GAME_KEY.RIGHT]: [keyboard_wasd],
     [GAME_KEY.MENU]: [keyboard_enter],
     [GAME_KEY.WEAPON]: [keyboard_space],
     [GAME_KEY.PASSIVE_TOOL]: [keyboard_shift],

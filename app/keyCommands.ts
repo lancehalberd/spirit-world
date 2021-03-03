@@ -2,7 +2,6 @@
 import { enterLocation } from 'app/content/areas';
 import { exportZoneToClipboard } from 'app/development/exportZone';
 import { toggleEditing } from 'app/development/tileEditor';
-//import { runTileRipper } from 'app/development/tileRipper';
 import { getState } from 'app/state';
 
 import { GameState, Hero } from 'app/types'
@@ -19,7 +18,9 @@ export const KEY = {
     BACK_SPACE: 8,
     COMMAND: 91,
     CONTROL: 17,
+    A: 'A'.charCodeAt(0),
     C: 'C'.charCodeAt(0),
+    D: 'D'.charCodeAt(0),
     E: 'E'.charCodeAt(0),
     F: 'F'.charCodeAt(0),
     G: 'G'.charCodeAt(0),
@@ -31,22 +32,37 @@ export const KEY = {
     S: 'S'.charCodeAt(0),
     T: 'T'.charCodeAt(0),
     V: 'V'.charCodeAt(0),
+    W: 'W'.charCodeAt(0),
     X: 'X'.charCodeAt(0),
     Z: 'Z'.charCodeAt(0),
 };
 
 export const GAME_KEY = {
-    MENU: KEY.ENTER,
-    LEFT_TOOL: KEY.C,
-    RIGHT_TOOL: KEY.V,
-    PASSIVE_TOOL: KEY.SHIFT,
-    WEAPON: KEY.SPACE,
-    PREVIOUS_ELEMENT: KEY.Z,
-    NEXT_ELEMENT: KEY.X,
-    UP: KEY.UP,
-    DOWN: KEY.DOWN,
-    LEFT: KEY.LEFT,
-    RIGHT: KEY.RIGHT,
+    MENU: 0,
+    LEFT_TOOL: 1,
+    RIGHT_TOOL: 2,
+    PASSIVE_TOOL: 3,
+    WEAPON: 4,
+    PREVIOUS_ELEMENT: 5,
+    NEXT_ELEMENT: 6,
+    UP: 7,
+    DOWN: 8,
+    LEFT: 9,
+    RIGHT: 10,
+};
+
+const KEYBOARD_MAPPINGS = {
+    [GAME_KEY.WEAPON]: [KEY.SPACE], // A (bottom button)
+    [GAME_KEY.PASSIVE_TOOL]: [KEY.SHIFT], // B (right button)
+    [GAME_KEY.LEFT_TOOL]: [KEY.C], // X (left button)
+    [GAME_KEY.RIGHT_TOOL]: [KEY.V], // Y (top button)
+    [GAME_KEY.MENU]: [KEY.ENTER], // START
+    [GAME_KEY.UP]: [KEY.UP, KEY.W],
+    [GAME_KEY.DOWN]: [KEY.DOWN, KEY.S],
+    [GAME_KEY.LEFT]: [KEY.LEFT, KEY.A],
+    [GAME_KEY.RIGHT]: [KEY.RIGHT, KEY.D],
+    [GAME_KEY.PREVIOUS_ELEMENT]: [KEY.Z], // L Front Bumper
+    [GAME_KEY.NEXT_ELEMENT]: [KEY.X],  // R Front bumper
 }
 
 // Under this threshold, the analog buttons are considered "released" for the sake of
@@ -97,14 +113,17 @@ function buttonIsPressed(button) {
 
 const keysDown = {};
 let lastInput: 'keyboard' | 'gamepad' = null;
-export function isKeyDown(keyCode: number): number {
+function isKeyboardKeyDown(keyCode: number) {
     if (keysDown[keyCode]) {
         lastInput = 'keyboard';
         return 1;
     }
+    return 0;
+}
+function isGamepadGamekeyPressed(gameKey: number) {
     // If a mapping exists for the current key code to a gamepad button,
     // check if that gamepad button is pressed.
-    const buttonIndex = GAME_PAD_MAPPINGS[keyCode], axisIndex = GAME_PAD_AXIS_MAPPINGS[keyCode];
+    const buttonIndex = GAME_PAD_MAPPINGS[gameKey], axisIndex = GAME_PAD_AXIS_MAPPINGS[gameKey];
     if (typeof(buttonIndex) !== 'undefined' || typeof(axisIndex) !== 'undefined') {
         // There can be multiple game pads connected. For now, let's just check all of them for the button.
         const gamepads = navigator.getGamepads();
@@ -123,7 +142,7 @@ export function isKeyDown(keyCode: number): number {
         }
     }
     return 0;
-};
+}
 
 export function addKeyCommands() {
     document.addEventListener('keyup', function(event) {
@@ -172,10 +191,19 @@ export function updateKeyboardState(state: GameState) {
     const gameKeysDown: Set<number> = new Set();
     const gameKeysPressed: Set<number> = new Set();
     const gameKeysReleased: Set<number> = new Set();
-    for (let keyCode of Object.values(GAME_KEY)) {
-        gameKeyValues[keyCode] = isKeyDown(keyCode);
-        if (gameKeyValues[keyCode] >= ANALOG_THRESHOLD) {
-            gameKeysDown.add(keyCode);
+    for (let gameKey of Object.values(GAME_KEY)) {
+        gameKeyValues[gameKey] = 0;
+        for (const keyboardCode of KEYBOARD_MAPPINGS[gameKey]) {
+            gameKeyValues[gameKey] = isKeyboardKeyDown(keyboardCode);
+            if (gameKeyValues[gameKey]) {
+                break;
+            }
+        }
+        if (!gameKeyValues[gameKey]) {
+            gameKeyValues[gameKey] = isGamepadGamekeyPressed(gameKey);
+        }
+        if (gameKeyValues[gameKey] >= ANALOG_THRESHOLD) {
+            gameKeysDown.add(gameKey);
         }
     }
     for (const oldKeyDown of [...previousGameKeysDown]) {

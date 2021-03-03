@@ -103,7 +103,12 @@ export function parseMessage(state: GameState, message: string): Frame[][][] {
                     }
                     // Add the space if this is the fist escapedToken and there was no string token before it.
                     const shouldAddSpace = i === 0 && !stringToken;
-                    let tokenWidth = tokenFrames.reduce((sum, {w}) => sum + w, 0);
+                    let tokenWidth;
+                    try {
+                        tokenWidth = tokenFrames.reduce((sum, {w}) => sum + w, 0);
+                    } catch (e) {
+                        debugger;
+                    }
                     if (shouldAddSpace) {
                         tokenWidth += characterWidth;
                     }
@@ -162,7 +167,9 @@ export function renderMessage(context: CanvasRenderingContext2D, state: GameStat
                 x += characterWidth;
                 continue;
             }
-            drawFrame(context, frame, {x, y, w: frame.w, h: frame.h});
+            drawFrame(context, frame, {
+                x: x - (frame.content?.x || 0),
+                y: y - (frame.content?.y || 0), w: frame.w, h: frame.h});
             x += frame.w;
         }
         y += 18;
