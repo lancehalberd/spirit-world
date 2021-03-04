@@ -1,10 +1,10 @@
 import { checkIfAllEnemiesAreDefeated } from 'app/content/areas';
 import { Enemy } from 'app/content/enemy';
 import { editingState } from 'app/development/tileEditor';
-import { FRAME_LENGTH } from 'app/gameConstants';
+import { FRAME_LENGTH, GAME_KEY } from 'app/gameConstants';
 import { updateKeyboardState } from 'app/keyCommands';
 import { initializeGame } from 'app/initialize';
-import { GAME_KEY, wasGameKeyPressed } from 'app/keyCommands';
+import { wasGameKeyPressed } from 'app/keyCommands';
 import {
     getDefaultSavedState,
     getState,

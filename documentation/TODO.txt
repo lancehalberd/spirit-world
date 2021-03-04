@@ -22,9 +22,9 @@ Graphics:
 
 Todo:
 
-Add signs to demo:
-    Fix wrapping+page generation
-    Use escape sequences like {B_WEAPON} {B_UP} {B_LEFT_TOOL} {B_RIGHT_TOOL} for special characters {I_WEAPON} {I_BOW}
+Current tasks:
+    - Add cliffs that you can jump down
+
 
 Apply element to charge abilities.
     Costs an additional 10 mana for the element
@@ -35,26 +35,16 @@ Additional Clone Tool Behavior:
 
 Quick Demo
     - Start with 6 hearts + weapon
-    - Has a hub with a chest outside an entrance containing a tool. Entrance takes you to a series of puzzles that ultimately rewards you with 4 peach pieces and drops you off in the basement with the charge tool and upgrades locked behind each tool.
+    - Invisibility tool section
+    - Staff tool section
+    - Charge tool to unlock lvl 2 tools
+    - Combined tool puzzles
 
 Prologue Dungeon: Peach Cave
     - Peach cave entrance is near the river in between the waterfall and the crater lake.
     - Entrance is dark, MC falls into pit 2 stories deep and lands in a pool and has to swim to shallow ground.
     - Area is dark but lit up by glowing mushrooms in some places.
-    - Peach of Immortality is found early and gives initial mana bar. Needs to be found before the cat eyes+weapon.
-    - Add warning text on entering dark areas without cat eyes.
-        "It's too dark to see anything in here, I should turn back."
-        After:
-        "Now I can see where I'm going in here."
-    - Add text boxes
-        - Space/shift/enter to advance/dismiss
-        - On start
-        - "You're no ordinary monkey, what brings you here?"
-            "I heard there was a golden peach hidden in this cave that could make you immortal."
-        - On pickup item
-    - NPC that gives weapon?
-    - Exit via a pit that falls into a pool that lets out into the lake. Just use a cave entrance/exit for now,eventually I think it would be better if you swim out. Hoping the forced swimming makes it obvious you don't need an item to swim.
-    - Removed dodge roll, it is a little tricky to work with and don't want it to be one of the first things a player has to learn to use.
+
 
 Dungeon 1: Vanara Temple
     - Find dodge roll technique, required to complete.

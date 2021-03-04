@@ -1,4 +1,4 @@
-import { GAME_KEY } from 'app/keyCommands';
+import { GAME_KEY } from 'app/gameConstants';
 import { createAnimation } from 'app/utils/animations';
 import { requireImage } from 'app/utils/images';
 

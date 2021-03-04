@@ -8,10 +8,9 @@ import {
 import { CloneExplosionEffect } from 'app/content/effects/CloneExplosionEffect';
 import { Enemy } from 'app/content/enemy';
 import { editingState } from 'app/development/tileEditor';
-import { EXPLOSION_TIME, FRAME_LENGTH, MAX_SPIRIT_RADIUS } from 'app/gameConstants';
+import { EXPLOSION_TIME, FRAME_LENGTH, GAME_KEY, MAX_SPIRIT_RADIUS } from 'app/gameConstants';
 import { getActorTargets } from 'app/getActorTargets';
 import {
-    GAME_KEY,
     getCloneMovementDeltas,
     isGameKeyDown,
     wasGameKeyPressed,

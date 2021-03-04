@@ -1,4 +1,4 @@
-import { parseMessage } from 'app/render/renderMessage';
+import { showMessage } from 'app/render/renderMessage';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 
 import {
@@ -46,10 +46,7 @@ export class Sign implements ObjectInstance {
         if (direction !== 'up') {
             return;
         }
-        state.messageState = {
-            pageIndex: 0,
-            pages: parseMessage(state, this.definition.message),
-        };
+        showMessage(state, this.definition.message);
         // Remove the grab action since the hero is reading the sign, not grabbing it.
         hero.action = null;
     }

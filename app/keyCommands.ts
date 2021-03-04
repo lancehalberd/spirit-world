@@ -2,6 +2,7 @@
 import { enterLocation } from 'app/content/areas';
 import { exportZoneToClipboard } from 'app/development/exportZone';
 import { toggleEditing } from 'app/development/tileEditor';
+import { GAME_KEY } from 'app/gameConstants';
 import { getState } from 'app/state';
 
 import { GameState, Hero } from 'app/types'
@@ -35,20 +36,6 @@ export const KEY = {
     W: 'W'.charCodeAt(0),
     X: 'X'.charCodeAt(0),
     Z: 'Z'.charCodeAt(0),
-};
-
-export const GAME_KEY = {
-    MENU: 0,
-    LEFT_TOOL: 1,
-    RIGHT_TOOL: 2,
-    PASSIVE_TOOL: 3,
-    WEAPON: 4,
-    PREVIOUS_ELEMENT: 5,
-    NEXT_ELEMENT: 6,
-    UP: 7,
-    DOWN: 8,
-    LEFT: 9,
-    RIGHT: 10,
 };
 
 const KEYBOARD_MAPPINGS = {

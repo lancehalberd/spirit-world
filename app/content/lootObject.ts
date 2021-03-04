@@ -1,6 +1,7 @@
 import { addObjectToArea, removeObjectFromArea } from 'app/content/areas';
 import { createCanvasAndContext } from 'app/dom';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { showMessage } from 'app/render/renderMessage';
 import { getState, saveGame, updateHeroMagicStats } from 'app/state';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { requireImage } from 'app/utils/images';
@@ -33,13 +34,83 @@ export class LootGetAnimation implements ObjectInstance {
             this.z += 0.5;
         }
         this.animationTime += FRAME_LENGTH;
-        if (this.animationTime > 1000) {
+        if (this.animationTime === 1000) {
+            showLootMessage(state, this.loot.definition.lootType, this.loot.definition.level);
+        } else if (this.animationTime > 1000) {
             removeObjectFromArea(state, this);
         }
     }
     render(context, state: GameState) {
         const frame = lootFrames[this.loot.definition.lootType] || lootFrames.unknown;
         drawFrame(context, frame, { ...frame, x: this.x, y: this.y - this.z });
+    }
+}
+
+const equipToolMessage = '{|}Press {B_MENU} to open your menu.'
+    + '{|}Select a tool and press {B_TOOL} to assign it.';
+
+function showLootMessage(state: GameState, lootType: LootType, level?: number): void {
+    switch (lootType) {
+        case 'weapon':
+            if (state.hero.weapon === 1) {
+                return showMessage(state, 'You found the Chakram! {|} Press {B_WEAPON} to throw the Chakram.'
+                    + '{|}Use it to defeat enemies or destroy some obstacles.');
+            }
+            return;
+        case 'bow':
+            if (state.hero.activeTools.bow === 1) {
+                return showMessage(state, 'You found the Bow!' + equipToolMessage
+                    + '{|}Press {B_TOOL} to shoot a magic arrow.'
+                    + '{|}Use the bow to hit distant enemies and objects.');
+            }
+            return;
+        case 'clone':
+            if (state.hero.activeTools.clone === 1) {
+                return showMessage(state, 'You learned the Clone Techique!' + equipToolMessage
+                    + '{|}Press {B_TOOL} to create a clone or switch between clones.'
+                    + '{|}Hold {B_TOOL} to control all clones at once!'
+                    + '{|}Hold {B_PASSIVE} to make a clone explode!');
+            }
+            return;
+        case 'invisibility':
+            if (state.hero.activeTools.invisibility === 1) {
+                return showMessage(state, 'You learned the Invisibility Technique!' + equipToolMessage
+                    + '{|}Press {B_TOOL} to become invisible and immune to most damage.'
+                    + '{|}This rapidly drains your Spirit Energy!'
+                    + '{|}Press {B_TOOL} again to become visible again and recover.');
+            }
+            return;
+        case 'staff':
+            if (state.hero.activeTools.staff === 1) {
+                return showMessage(state, 'You have obtained the Tree Staff!' + equipToolMessage
+                    + '{|}Press {B_TOOL} to summon the staff and slam it to the ground.'
+                    + '{|}You can use the staff as a weapon and a bridge!'
+                    + '{|}Press {B_TOOL} again to summon the staff back to you.');
+            }
+            return;
+        case 'gloves':
+            return showMessage(state, 'You found magical bracers! {|} Now you can lift heavier objects.'
+                + '{|}Face an object and use {B_PASSIVE} to try to lift it.');
+        case 'roll':
+            return showMessage(state, 'You learned the Mist Roll Technique!'
+                + '{|}Press {B_PASSIVE} while moving to do a quick roll.'
+                + '{|}You can avoid most damage while rolling and cross small gaps.'
+            );
+        case 'catEyes':
+            return showMessage(state, 'You have been blessed with Cat Eyes!'
+                + '{|}You can see much better in the dark now!'
+            );
+        case 'spiritSight':
+            return showMessage(state, 'You have been blessed with Spirit Sight!'
+                + '{|}Hold {B_PASSIVE} to gaze into the Spirit World.'
+                + '{|}If an object is in both the Material World and Spirit World,'
+                + '{|}see what happens if you change it in the Material World!');
+        case 'fire':
+        case 'ice':
+        case 'lightning':
+            return showMessage(state, 'You found a new element!'
+                + '{|}Press {B_PREV_ELEMENT}/{B_NEXT_ELEMENT} to switch elements.'
+                + '{|}Changing your element has no effect for now.');
     }
 }
 

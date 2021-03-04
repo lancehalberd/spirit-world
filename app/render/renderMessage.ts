@@ -1,6 +1,5 @@
 import _ from 'lodash';
-import { CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
-import { GAME_KEY } from 'app/keyCommands';
+import { CANVAS_WIDTH, CANVAS_HEIGHT, GAME_KEY } from 'app/gameConstants';
 import { renderField } from 'app/render';
 import { renderHUD } from 'app/renderHUD';
 import { drawFrame } from 'app/utils/animations';
@@ -53,6 +52,13 @@ function getEscapedFrames(state: GameState, escapedToken: string): Frame[] {
     console.log('Unhandled escape sequence', escapedToken);
     debugger;
     return [];
+}
+
+export function showMessage(state: GameState, message: string): void {
+    state.messageState = {
+        pageIndex: 0,
+        pages: parseMessage(state, message),
+    };
 }
 
 const messageBreak = '{|}';
@@ -133,12 +139,15 @@ export function parseMessage(state: GameState, message: string): Frame[][][] {
                 }
             }
         }
-    }
-    if (row) {
-        currentPage.push(row);
-    }
-    if (currentPage.length) {
-        pages.push(currentPage);
+        if (row.length) {
+            currentPage.push(row);
+        }
+        if (currentPage.length) {
+            pages.push(currentPage);
+        }
+        currentPage = [];
+        row = [];
+        rowWidth = 0;
     }
     return pages;
 }

@@ -20,3 +20,17 @@ export const MAX_SPIRIT_RADIUS = 80;
 
 export const EXPLOSION_RADIUS = 24;
 export const EXPLOSION_TIME = 1000;
+
+export const GAME_KEY = {
+    MENU: 0,
+    LEFT_TOOL: 1,
+    RIGHT_TOOL: 2,
+    PASSIVE_TOOL: 3,
+    WEAPON: 4,
+    PREVIOUS_ELEMENT: 5,
+    NEXT_ELEMENT: 6,
+    UP: 7,
+    DOWN: 8,
+    LEFT: 9,
+    RIGHT: 10,
+};

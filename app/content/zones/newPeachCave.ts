@@ -55,9 +55,9 @@ const f0_0x0: AreaDefinition = {
                 palette: 'field',
                 tiles: [
                     [t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t1,t1],
-                    [t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t3,t3,t2,t2,t2,t2,t2,t3,t3,t3,t3,t3,t1,t1],
-                    [t1,t1,t2,t2,t2,t4,t2,t2,t2,t2,t2,t2,t4,t1,t1,t1,t1,t1,t3,t3,t3,t2,t2,t2,t3,t3,t3,t3,t3,t3,t1,t1],
-                    [t1,t1,t2,t2,t2,t5,t2,t2,t2,t2,t2,t6,t7,t2,t1,t1,t2,t2,t2,t2,t3,t3,t3,t3,t3,t3,t8,t8,t8,t8,t1,t1],
+                    [t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t3,t3,t2,t2,t2,t2,t2,t2,t3,t3,t3,t3,t1,t1],
+                    [t1,t1,t2,t2,t2,t4,t2,t2,t2,t2,t2,t2,t4,t1,t1,t1,t1,t1,t3,t3,t3,t2,t2,t2,t2,t3,t3,t3,t3,t3,t1,t1],
+                    [t1,t1,t2,t2,t2,t5,t2,t2,t2,t2,t2,t6,t7,t2,t1,t1,t2,t2,t2,t2,t3,t3,t2,t2,t3,t3,t8,t8,t8,t8,t1,t1],
                     [t1,t1,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t1,t1,t2,t2,t2,t2,t2,t3,t3,t3,t3,t2,t2,t2,t2,t2,t1,t1],
                     [t1,t1,t9,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t1,t1,t1,t1,t2,t2,t2,t2,t3,t3,t2,t2,t2,t2,t2,t2,t1,t1],
                     [t1,t1,t2,t2,t10,t2,t2,t2,t2,t2,t2,t2,t2,t2,t1,t1,t1,t1,t3,t3,t3,t2,t2,t2,t2,t3,t3,t3,t3,t11,t1,t1],
