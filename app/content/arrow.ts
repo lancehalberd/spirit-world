@@ -55,13 +55,15 @@ export class Arrow implements ObjectInstance {
         this.w = hitbox.w;
         this.h = hitbox.h;
         this.x -= this.w / 2 ;
-        this.y -= this.h / 2;
+        this.y -= this.h / 2 ;
         this.hitTargets = new Set();
     }
     getRotatedHitbox(): ShortRectangle {
         if (this.direction === 'up' || this.direction === 'down') {
             return {...this.frame, x: this.x, y: this.y };
         }
+        //adjusts y alignment of arrow fired horizontally to appear more central to the character
+        this.y += 6;
         return { x: this.x, y: this.y, w: this.frame.h, h: this.frame.w };
     }
     update(state: GameState) {
