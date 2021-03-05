@@ -1,5 +1,6 @@
 import _ from 'lodash';
 
+import { FRAME_LENGTH } from 'app/gameConstants';
 import { damageActor, throwHeldObject } from 'app/updateActor';
 import { getTileBehaviorsAndObstacles, isPointOpen } from 'app/utils/field';
 
@@ -100,7 +101,7 @@ function moveActorInDirection(
         excludedObjects.add(actor.pickUpObject);
     }
 
-    let blockedByTile = false;
+    let blockedByTile = false, canJumpDown = true;
     let blockedByObject = false;
     let pushedObjects = [];
     for (const point of checkPoints) {
@@ -108,9 +109,15 @@ function moveActorInDirection(
         if (tileBehavior?.solid && tileBehavior?.damage > 0) {
             damageActor(state, actor, tileBehavior.damage);
         }
+        // Climbable overrides solid tile behavior. This allows use to place tiles marked climbable on top
+        // of solid tiles to make them passable.
+        const isTilePassable = (!tileBehavior?.solid || tileBehavior.climbable);
         // The second condition is a hack to prevent enemies from walking over pits.
-        if (tileBehavior?.solid || (tileBehavior?.pit && !push)) {
+        if (!isTilePassable || (tileBehavior?.pit && !push)) {
             blockedByTile = true;
+        }
+        if (!isTilePassable && tileBehavior?.jumpDirection !== direction) {
+            canJumpDown = false;
         }
         for (const object of objects) {
             blockedByObject = true;
@@ -120,10 +127,28 @@ function moveActorInDirection(
         }
     }
     pushedObjects = _.uniq(pushedObjects);
-    if ((blockedByTile || pushedObjects.length) && (!actor.action || actor.action === 'walking')) {
-        actor.action = 'pushing';
+    if ((blockedByTile || pushedObjects.length) && (!actor.action || actor.action === 'walking' || actor.action === 'pushing')) {
+        if (!canJumpDown && actor.action !== 'pushing') {
+            actor.action = 'pushing';
+            actor.animationTime = 0;
+        }
+        if (canJumpDown) {
+            actor.jumpingTime = (actor.jumpingTime || 0) + FRAME_LENGTH;
+            if (actor.jumpingTime >= 500) {
+                actor.action = 'jumpingDown';
+                actor.animationTime = 0;
+                actor.vx = ax - actor.x;
+                // Make the actor "jump up" a bit at the start.
+                actor.vy = ay - actor.y - 2;
+            }
+        } else {
+            actor.jumpingTime = 0;
+        }
     } else if ((!blockedByTile && !pushedObjects.length) && actor.action === 'pushing') {
         actor.action = null;
+        actor.jumpingTime = 0;
+    } else {
+        actor.jumpingTime = 0;
     }
 
     if (!blockedByTile && pushedObjects.length === 1) {
@@ -254,6 +279,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
     const behaviorGrid = hero.area.behaviorGrid;
     let fallingLeft = false, fallingRight = false, fallingUp = false, fallingDown = false;
     let startSwimming = true;
+    let startClimbing = false;
     for (let row = topRow; row <= bottomRow; row++) {
         for (let column = leftColumn; column <= rightColumn; column++) {
             const behaviors = behaviorGrid?.[row]?.[column];
@@ -261,6 +287,9 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
             if (!behaviors) {
                 startSwimming = false;
                 continue;
+            }
+            if (behaviors.climbable) {
+                startClimbing = true;
             }
             if (behaviors.damage > 0) {
                 damageActor(state, hero, behaviors.damage);
@@ -293,6 +322,11 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
     if (startSwimming && hero.action !== 'roll') {
         hero.action = 'swimming';
     } else if (!startSwimming && hero.action === 'swimming') {
+        hero.action = null;
+    }
+    if (startClimbing) {
+        hero.action = 'climbing';
+    } else if (!startClimbing && hero.action === 'climbing') {
         hero.action = null;
     }
     if (fallingUp && fallingDown && fallingLeft && fallingRight) {

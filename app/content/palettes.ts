@@ -61,6 +61,13 @@ const deepWaterBehavior: TileBehaviors = {
 }
 const southCliffBehavior: TileBehaviors = {
     jumpDirection: 'down',
+    solid: true,
+    low: true,
+}
+const climbableWall: TileBehaviors = {
+    climbable: true,
+    solid: true,
+    low: true,
 }
 
 const spiritBushParticles: Frame[] = createAnimation('gfx/tiles/bushspirit.png', {w: 16, h: 16}, {x: 2, cols: 3}).frames;
@@ -154,6 +161,21 @@ function solidColorTile(color: string, behaviors: TileBehaviors = null): TilePal
         context.fillRect(0, 0, 16, 16);
     }, behaviors);
 }
+function gradientColorTile(colors: string[], x0, y0, x1, y1, behaviors: TileBehaviors = null): TilePalette {
+    return canvasPalette(context => {
+        const gradient = context.createLinearGradient(x0, y0, x1, y1);
+        for (let i = 0; i < colors.length; i++) {
+            gradient.addColorStop(i * 1 / (colors.length - 1), colors[i])
+        }
+        context.fillStyle = gradient;
+        context.fillRect(0, 0, 16, 16);
+    }, behaviors);
+}
+
+const vineTile = canvasPalette(context => {
+        context.fillStyle = 'green';
+        context.fillRect(6, 0, 4, 16);
+}, climbableWall);
 
 const fieldPalette = {...combinePalettes([
         // This is the empty tile.
@@ -176,7 +198,9 @@ const fieldPalette = {...combinePalettes([
         singleTilePalette('gfx/tiles/thorns.png', null, 16),
         solidColorTile('#0000FF', deepWaterBehavior), // deep water
         solidColorTile('#A0A0FF'), // shallow water
-        solidColorTile('#A08000', southCliffBehavior), // southCliff
+        gradientColorTile(['#A08000', '#806000'], 0, 0, 0, 16, southCliffBehavior), // southCliffTop
+        solidColorTile('#806000', lowWallBehavior), // cliffBottom
+        vineTile,
     ]),
     defaultTiles: [
         {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0},
@@ -224,7 +248,9 @@ const spiritFieldPalette = {...combinePalettes([
         singleTilePalette('gfx/tiles/thornsspirit.png', null, 16),
         solidColorTile('#8080FF', deepWaterBehavior), // deep water
         solidColorTile('#D0D0FF'), // shallow water
-        solidColorTile('#806040', southCliffBehavior), // southCliff
+        gradientColorTile(['#A08000', '#806000'], 0, 0, 0, 16, southCliffBehavior), // southCliffTop
+        solidColorTile('#806000', lowWallBehavior), // cliffBottom
+        vineTile,
     ]),
     defaultTiles: [null]
 };

@@ -54,18 +54,15 @@ export function isPointOpen(
         return false;
     }
     const tileBehavior = area?.behaviorGrid[ty]?.[tx];
-    if (tileBehavior?.solid) {
-        return false;
-    }
     // If the behavior has a bitmap for solid pixels, read the exact pixel to see if it is blocked.
-    if (tileBehavior?.solidMap) {
+    if (tileBehavior?.solidMap && !tileBehavior?.climbable) {
         const sy = (y | 0) % 16;
         const sx = (x | 0) % 16;
         // console.log(tileBehavior.solidMap, y, x, sy, sx, tileBehavior.solidMap[sy] >> (15 - sx));
         if (tileBehavior.solidMap[sy] >> (15 - sx) & 1) {
             return false;
         }
-    } else if (tileBehavior?.solid) {
+    } else if (tileBehavior?.solid && !tileBehavior?.climbable) {
         return false;
     }
     for (const object of area.objects) {

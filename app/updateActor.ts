@@ -103,7 +103,9 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         //dy = 1;
     } else if (hero.action === 'swimming') {
         movementSpeed = 1.5;
-    } else if (hero.action === 'falling') {
+    } else if (hero.action === 'climbing') {
+        movementSpeed = 1;
+    }  else if (hero.action === 'falling') {
         movementSpeed = 0;
         if (hero.animationTime >= fallAnimation.duration) {
             hero.action = 'fallen';
@@ -117,6 +119,19 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             hero.y = hero.safeY;
             damageActor(state, hero, 1, null, true);
             hero.action = null;
+        }
+    } else if (hero.action === 'jumpingDown') {
+        movementSpeed = 0;
+        // After the hero has jumped a bit, we stop the jump when they hit a position they can successfully move to.
+        if (hero.vy > 4 && moveActor(state, hero, hero.vx, hero.vy, false)) {
+            hero.action = null;
+            hero.animationTime = 0;
+        } else {
+            // This is necessary to ignore any changes to actions that calling `moveActor` might trigger.
+            hero.action = 'jumpingDown';
+            hero.x += hero.vx;
+            hero.y += hero.vy;
+            hero.vy = Math.min(8, hero.vy + 0.5);
         }
     } else if (hero.action === 'beingCarried') {
         // The clone will update itself to match its carrier.

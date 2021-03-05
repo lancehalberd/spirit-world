@@ -10,7 +10,14 @@ export type Action =
     'attack' | 'roll' | 'knocked' | 'hurt' | 'dead' | 'walking'
     | 'pushing' | 'grabbing' | 'carrying' | 'throwing' | 'thrown' | 'getItem'
     | 'beingCarried' | 'entering' | 'exiting'
-    | 'falling' | 'fallen' | 'meditating' | 'swimming';
+    | 'falling' | 'fallen' | 'meditating'
+    // Used when the player is in water. Player cannot use abilities.
+    |'swimming'
+    // Used for climbing vines on walls or ladders. The player moves more slowly and cannot use abilities while climbing.
+    | 'climbing'
+    // Used when jumping off of ledges. This causes the character to move in a specific fall trajectory
+    // based on the direction they jump down until they "land" on a walkable tile.
+    | 'jumpingDown';
 export type ActiveTool = 'bow' | 'staff' | 'clone' | 'invisibility';
 export type Equipment = 'cloudBoots' | 'ironBoots';
 export type PassiveTool = 'gloves'
@@ -60,6 +67,7 @@ export interface Actor {
     actionFrame?: number,
     actionTarget?: any,
     animationTime: number,
+    jumpingTime?: number,
     // If this is set, the actor is being carried by a hero/clone.
     carrier?: Hero,
     explosionTime?: number,

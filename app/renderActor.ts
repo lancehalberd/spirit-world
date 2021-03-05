@@ -168,8 +168,12 @@ function getHeroFrame(state: GameState, hero: Hero): Frame {
             break;
         case 'beingCarried':
         case 'thrown':
+        case 'jumpingDown':
         case 'roll':
             animations = heroAnimations.roll;
+            break;
+        case 'climbing':
+            return getFrame(heroAnimations.push.up, hero.animationTime);
             break;
         case 'attack':
             animations = heroAnimations.attack;

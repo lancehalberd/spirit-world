@@ -23,7 +23,20 @@ Graphics:
 Todo:
 
 Current tasks:
-    - Add cliffs that you can jump down
+    - Add growing vines:
+        - Watercup plants that can be tipped+poured onto sprouts.
+        - Sprouts that grow into vines when watered.
+    - Add enemies:
+        - Eggs that hatch into enemies if not destroyed first
+        - Ground enemies:
+            Tiny beatles the move sporadically
+            Vanilla beatles that move average speed and will move towards the player when nearby
+            Charging beatles that will give a tell and then charge very quickly at the player only stopping when they can no longer move forward
+        - Vine enemies that can be knocked to the ground
+        - Flying enemies
+    - Add boss:
+        - Spawns eggs
+        - Drains light and regains a bit of health for every 25% lost
 
 
 Apply element to charge abilities.

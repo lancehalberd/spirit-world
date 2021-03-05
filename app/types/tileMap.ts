@@ -6,6 +6,8 @@ import {
 export type Direction = 'up' | 'down' | 'left' | 'right';
 
 export interface TileBehaviors {
+    // Sets players action to 'climbing' while on the tile.
+    climbable?: boolean,
     // Can be destroyed by weapon
     cuttable?: number,
     // Deals damage on contact
