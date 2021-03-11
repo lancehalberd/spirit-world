@@ -4,9 +4,15 @@ import { FRAME_LENGTH } from 'app/gameConstants';
 import { damageActor, throwHeldObject } from 'app/updateActor';
 import { getTileBehaviorsAndObstacles, isPointOpen } from 'app/utils/field';
 
-import { Actor, Direction, GameState, Hero } from 'app/types';
+import { Actor, Direction, GameState, Hero, MovementProperties } from 'app/types';
 
-export function moveActor(state: GameState, actor: Actor, dx: number, dy: number, push: boolean = false, careful: boolean = false) {
+export function moveActor(state: GameState, actor: Actor, dx: number, dy: number, {
+    canPush = false,
+    canFall = false,
+    canSwim = false,
+    canClimb = false,
+    canWiggle = true,
+}: MovementProperties) {
     let sx = dx;
     if (sx < -1 || sx > 1) {
         sx /= Math.abs(sx);
@@ -21,7 +27,13 @@ export function moveActor(state: GameState, actor: Actor, dx: number, dy: number
         let movedX = false, movedY = false;
         if (sx) {
             // You can't push when moving diagonally.
-            movedX = moveActorInDirection(state, actor, sx, (sx < 0) ? 'left' : 'right', !dy, push && !dy, careful);
+            movedX = moveActorInDirection(state, actor, sx, (sx < 0) ? 'left' : 'right', {
+                canPush: canPush && !dy,
+                canWiggle: canWiggle && !dy,
+                canSwim,
+                canFall,
+                canClimb,
+            });
             if (movedX) {
                 mx += sx;
                 if (sx > -1 && sx < 1) {
@@ -36,7 +48,13 @@ export function moveActor(state: GameState, actor: Actor, dx: number, dy: number
         }
         if (sy) {
             // You can't push when moving diagonally.
-            movedY = moveActorInDirection(state, actor, sy, (sy < 0) ? 'up' : 'down', !dx, push && !dx, careful);
+            movedY = moveActorInDirection(state, actor, sy, (sy < 0) ? 'up' : 'down', {
+                canPush: canPush && !dx,
+                canWiggle: canWiggle && !dx,
+                canSwim,
+                canFall,
+                canClimb,
+            });
             if (movedY) {
                 my += sy;
                 if (sy > -1 && sy < 1) {
@@ -63,10 +81,15 @@ function moveActorInDirection(
     actor: Actor,
     amount: number,
     direction: Direction,
-    wiggle: boolean = false,
-    push: boolean = false,
-    careful: boolean = false,
+    movementProperties: MovementProperties
 ) {
+    const {
+        canPush = false,
+        canFall = false,
+        canSwim = false,
+        canClimb = false,
+        canWiggle = true,
+    } = movementProperties;
     let ax = actor.x, ay = actor.y;
     if (direction === 'up' || direction === 'down') {
         ay += amount;
@@ -118,7 +141,13 @@ function moveActorInDirection(
         // of solid tiles to make them passable.
         const isTilePassable = (!tileBehavior?.solid || tileBehavior.climbable);
         // The second condition is a hack to prevent enemies from walking over pits.
-        if (!isTilePassable || (tileBehavior?.pit && careful)) {
+        if (!isTilePassable || (tileBehavior?.pit && !canFall)) {
+            blockedByTile = true;
+        }
+        if (tileBehavior?.water && !canSwim) {
+            blockedByTile = true;
+        }
+        if (tileBehavior?.climbable && !canClimb) {
             blockedByTile = true;
         }
         if (!isTilePassable && tileBehavior?.jumpDirection !== direction) {
@@ -126,13 +155,13 @@ function moveActorInDirection(
         }
         for (const object of objects) {
             blockedByObject = true;
-            if (push) {
+            if (canPush) {
                 pushedObjects.push(object);
             }
         }
     }
     pushedObjects = _.uniq(pushedObjects);
-    if (push && (blockedByTile || pushedObjects.length) && (!actor.action || actor.action === 'walking' || actor.action === 'pushing')) {
+    if (canPush && (blockedByTile || pushedObjects.length) && (!actor.action || actor.action === 'walking' || actor.action === 'pushing')) {
         if (!canJumpDown && actor.action !== 'pushing') {
             actor.action = 'pushing';
             actor.animationTime = 0;
@@ -177,7 +206,7 @@ function moveActorInDirection(
     if (blockedByTile || blockedByObject) {
         // If this is true, wiggle the character up to Npx to get around corners.
         // This makes it much smoother to try and get into pixel perfect gaps.
-        if (!wiggle) {
+        if (!canWiggle) {
             return false;
         }
         const maxWiggle = 8;
@@ -191,7 +220,10 @@ function moveActorInDirection(
                     }
                 }
                 if (open) {
-                    return moveActorInDirection(state, actor, -0.5, 'left',  false);
+                    return moveActorInDirection(state, actor, -0.5, 'left', {
+                        ...movementProperties,
+                        canWiggle: false,
+                    });
                 }
             }
         }
@@ -205,7 +237,10 @@ function moveActorInDirection(
                     }
                 }
                 if (open) {
-                    return moveActorInDirection(state, actor, 0.5, 'right',  false);
+                    return moveActorInDirection(state, actor, 0.5, 'right', {
+                        ...movementProperties,
+                        canWiggle: false,
+                    });
                 }
             }
         }
@@ -219,7 +254,10 @@ function moveActorInDirection(
                     }
                 }
                 if (open) {
-                    return moveActorInDirection(state, actor, -0.5, 'up',  false);
+                    return moveActorInDirection(state, actor, -0.5, 'up', {
+                        ...movementProperties,
+                        canWiggle: false,
+                    });
                 }
             }
         }
@@ -233,7 +271,10 @@ function moveActorInDirection(
                     }
                 }
                 if (open) {
-                    return moveActorInDirection(state, actor, 0.5, 'down',  false);
+                    return moveActorInDirection(state, actor, 0.5, 'down', {
+                        ...movementProperties,
+                        canWiggle: false,
+                    });
                 }
             }
         }

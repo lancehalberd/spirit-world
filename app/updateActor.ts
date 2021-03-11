@@ -129,7 +129,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
     } else if (hero.action === 'jumpingDown') {
         movementSpeed = 0;
         // After the hero has jumped a bit, we stop the jump when they hit a position they can successfully move to.
-        if (hero.vy > 4 && moveActor(state, hero, hero.vx, hero.vy, false)) {
+        if (hero.vy > 4 && moveActor(state, hero, hero.vx, hero.vy, {canFall: true})) {
             hero.action = null;
             hero.animationTime = 0;
         } else {
@@ -299,7 +299,13 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         }
     }
     if (dx || dy) {
-        moveActor(state, hero, dx, dy, true);
+        const encumbered = hero.pickUpObject || hero.pickUpTile;
+        moveActor(state, hero, dx, dy, {
+            canPush: !encumbered,
+            canClimb: !encumbered,
+            canFall: true,
+            canSwim: !encumbered,
+        });
         if (!hero.action) {
             hero.action = 'walking';
             hero.animationTime = 0;

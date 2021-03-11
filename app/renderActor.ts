@@ -6,7 +6,7 @@ import { getTileFrame } from 'app/render';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { carryMap, directionMap, getDirection } from 'app/utils/field';
 
-import { Actor, ActorAnimations, Frame, FrameAnimation, FrameDimensions, GameState, Hero, ObjectInstance } from 'app/types';
+import { Actor, ActorAnimations, Enemy, Frame, FrameAnimation, FrameDimensions, GameState, Hero } from 'app/types';
 
 const Y_OFF = -4;
 
@@ -268,6 +268,10 @@ export function renderExplosionRing(context: CanvasRenderingContext2D, state: Ga
     context.restore();
 }
 
-export function renderShadow(context: CanvasRenderingContext2D, state: GameState, object: ObjectInstance): void {
-    drawFrame(context, shadowFrame, { ...shadowFrame, x: object.x, y: object.y - 3 });
+export function renderEnemyShadow(context: CanvasRenderingContext2D, state: GameState, object: Enemy): void {
+    drawFrame(context, shadowFrame, { ...shadowFrame,
+        x: object.x, y: object.y - 3 * object.scale,
+        w: shadowFrame.w * object.scale,
+        h: shadowFrame.h * object.scale,
+    });
 }

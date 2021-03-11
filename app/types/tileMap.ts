@@ -197,6 +197,15 @@ export interface ObjectInstance {
 export type ObjectStatus = 'active' | 'closed' | 'closedEnemy' | 'closedSwitch'
     | 'gone' | 'hiddenSwitch' | 'hiddenEnemy' | 'normal';
 
+export interface MovementProperties {
+    canPush?: boolean,
+    canFall?: boolean,
+    canSwim?: boolean,
+    canClimb?: boolean,
+    // Whether the mover should wiggle to fit into tight spaces.
+    canWiggle?: boolean,
+}
+
 export interface BaseObjectDefinition {
     id: string,
     // Whether this is linked to an object in the physical/spirit world.

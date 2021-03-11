@@ -5,7 +5,7 @@ import { Enemy } from 'app/content/enemy';
 import { editingState, renderEditor } from 'app/development/tileEditor';
 import { createCanvasAndContext, mainContext } from 'app/dom';
 import { CANVAS_HEIGHT, CANVAS_WIDTH, MAX_SPIRIT_RADIUS } from 'app/gameConstants';
-import { renderHeroEyes, renderHeroShadow, renderShadow } from 'app/renderActor';
+import { renderHeroEyes, renderHeroShadow, renderEnemyShadow } from 'app/renderActor';
 import { renderDefeatedMenu } from 'app/renderDefeatedMenu';
 import { renderHUD } from 'app/renderHUD';
 import { renderMenu } from 'app/renderMenu';
@@ -270,9 +270,10 @@ export function renderAreaObjectsBeforeHero(context: CanvasRenderingContext2D, s
             if (object.drawPriority === 'sprites') {
                 if (object instanceof Clone) {
                     renderHeroShadow(context, state, object);
-                } else if (object instanceof Enemy &&  object.hasShadow) {
-                    renderShadow(context, state, object);
                 }
+            }
+            if (object instanceof Enemy && object.hasShadow) {
+                renderEnemyShadow(context, state, object);
             }
         }
         const objectsToRender = [];

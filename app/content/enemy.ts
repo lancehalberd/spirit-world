@@ -10,14 +10,16 @@ import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { directionMap } from 'app/utils/field';
 
 import {
-    Actor, ActorAnimations, AreaInstance, BossObjectDefinition, BossType, Direction, EnemyType, EnemyObjectDefinition,
-    Frame, FrameAnimation, FrameDimensions, GameState, Hero, ObjectInstance, ObjectStatus, ShortRectangle,
+    Actor, ActorAnimations, AreaInstance, BossObjectDefinition, BossType, Direction, DrawPriority,
+    EnemyType, EnemyObjectDefinition,
+    Frame, FrameAnimation, FrameDimensions, GameState, Hero, MovementProperties,
+    ObjectInstance, ObjectStatus, ShortRectangle,
 } from 'app/types';
 
 export class Enemy implements Actor, ObjectInstance {
     type = 'enemy' as 'enemy';
     area: AreaInstance;
-    drawPriority: 'sprites' = 'sprites';
+    drawPriority: DrawPriority = 'sprites';
     definition: EnemyObjectDefinition | BossObjectDefinition;
     enemyDefinition: EnemyDefinition;
     currentAnimation: FrameAnimation;
@@ -67,6 +69,7 @@ export class Enemy implements Actor, ObjectInstance {
         if (definition.type === 'boss' && state.savedState.objectFlags[this.definition.id]) {
             this.status = 'gone';
         }
+        this.drawPriority = this.flying ? 'foreground' : 'sprites';
     }
     getFrame(): Frame {
         return getFrame(this.currentAnimation, this.animationTime);
@@ -394,10 +397,10 @@ function moveTo(state: GameState, enemy: Enemy, tx: number, ty: number): number 
     const dx = tx - (hitbox.x + hitbox.w / 2), dy = ty - (hitbox.y + hitbox.h / 2);
     const mag = Math.sqrt(dx * dx + dy * dy);
     if (mag > enemy.speed) {
-        moveEnemy(state, enemy, enemy.speed * dx / mag, enemy.speed * dy / mag);
+        moveEnemy(state, enemy, enemy.speed * dx / mag, enemy.speed * dy / mag, {});
         return mag - enemy.speed;
     }
-    moveEnemy(state, enemy, dx, dy);
+    moveEnemy(state, enemy, dx, dy, {});
     return 0;
 }
 
@@ -439,7 +442,7 @@ function scurryRandomly(state: GameState, enemy: Enemy) {
     const ax = tvx - enemy.vx;
     const ay = tvy - enemy.vy;
     accelerateInDirection(state, enemy, {x: ax, y: ay});
-    moveEnemy(state, enemy, enemy.vx, enemy.vy);
+    moveEnemy(state, enemy, enemy.vx, enemy.vy, {});
 }
 
 function accelerateInDirection(state: GameState, enemy: Enemy, a: {x: number, y: number}): void {
@@ -459,7 +462,7 @@ function scurryAndChase(state: GameState, enemy: Enemy) {
     const chaseVector = getVectorToNearByHero(state, enemy, enemy.aggroRadius);
     if (chaseVector) {
         accelerateInDirection(state, enemy, chaseVector);
-        moveEnemy(state, enemy, enemy.vx, enemy.vy);
+        moveEnemy(state, enemy, enemy.vx, enemy.vy, {});
     } else {
         scurryRandomly(state, enemy);
     }
@@ -470,7 +473,7 @@ function paceAndCharge(state: GameState, enemy: Enemy) {
         enemy.animationTime = 0;
         enemy.z += enemy.vz;
         enemy.vz -= 0.5;
-        moveEnemy(state, enemy, enemy.vx, enemy.vy, false);
+        moveEnemy(state, enemy, enemy.vx, enemy.vy, {canFall: true});
         if (enemy.z < 0) {
             enemy.z = 0;
             enemy.setMode('stunned');
@@ -495,7 +498,7 @@ function paceAndCharge(state: GameState, enemy: Enemy) {
             enemy.animationTime = 0;
             return;
         }
-        if (!moveEnemy(state, enemy, 3 * enemy.speed * directionMap[enemy.d][0], 3 * enemy.speed * directionMap[enemy.d][1], false)) {
+        if (!moveEnemy(state, enemy, 3 * enemy.speed * directionMap[enemy.d][0], 3 * enemy.speed * directionMap[enemy.d][1], {canFall: true})) {
             enemy.setMode('knocked');
             enemy.vx = -enemy.speed * directionMap[enemy.d][0];
             enemy.vy = -enemy.speed * directionMap[enemy.d][1];
@@ -574,7 +577,7 @@ function paceRandomly(state: GameState, enemy: Enemy) {
     }
     if (enemy.mode === 'walk') {
         if (enemy.modeTime >= 200) {
-            if (!moveEnemy(state, enemy, enemy.speed * directionMap[enemy.d][0], enemy.speed * directionMap[enemy.d][1])) {
+            if (!moveEnemy(state, enemy, enemy.speed * directionMap[enemy.d][0], enemy.speed * directionMap[enemy.d][1], {})) {
                 enemy.setMode('choose');
                 enemy.modeTime = 200;
             }
@@ -585,7 +588,7 @@ function paceRandomly(state: GameState, enemy: Enemy) {
     }
 }
 
-function moveEnemy(state, enemy, dx, dy, careful: boolean = true): boolean {
+function moveEnemy(state, enemy, dx, dy, movementProperties: MovementProperties): boolean {
     const { section } = getAreaSize(state);
     // Don't allow the enemy to move towards the outer edges of the screen.
     if ((dx < 0 && enemy.x + dx < section.x + 16)
@@ -600,7 +603,7 @@ function moveEnemy(state, enemy, dx, dy, careful: boolean = true): boolean {
         enemy.y += dy;
         return true;
     }
-    return moveActor(state, enemy, dx, dy, false, careful);
+    return moveActor(state, enemy, dx, dy, movementProperties);
 }
 
 
