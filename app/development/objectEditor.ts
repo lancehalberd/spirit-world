@@ -11,7 +11,7 @@ import { getState } from 'app/state';
 import { ifdefor, isPointInShortRect } from 'app/utils/index';
 
 import {
-    AreaDefinition, AreaInstance, BallGoalDefinition, CrystalSwitchDefinition, FloorSwitchDefinition,
+    AreaDefinition, AreaInstance, BallGoalDefinition, BossType, CrystalSwitchDefinition, FloorSwitchDefinition,
     FrameDimensions, Direction, EnemyType, GameState,
     LootType, MagicElement, ObjectDefinition, ObjectStatus, ObjectType, PanelRows,
     Zone, ZoneLocation,
@@ -37,9 +37,8 @@ export function getLootTypes(): LootType[] {
 export const combinedObjectTypes: ObjectType[] = [
     'loot', 'chest', 'sign',
     'door', 'pitEntrance', 'marker',
-    'enemy',
     'ballGoal', 'crystalSwitch', 'floorSwitch',
-    'pushPull', 'rollingBall', 'tippable',
+    'pushPull', 'rollingBall', 'tippable', 'waterPot',
 ];
 
 function createObjectDefinition(
@@ -83,7 +82,18 @@ function createObjectDefinition(
                 targetObjectId: definition.targetObjectId || editingState.entranceTargetObjectId,
                 d: definition.d || editingState.direction,
             };
-        case 'enemy':
+        case 'boss': {
+            const bossType = definition.enemyType || editingState.bossType;
+            const lootType = definition.lootType || editingState.lootType;
+            return {
+                ...commonProps,
+                type: definition.type,
+                id: definition.id || uniqueId(state, bossType),
+                enemyType: bossType,
+                lootType,
+            };
+        }
+        case 'enemy': {
             const enemyType = definition.enemyType || editingState.enemyType;
             return {
                 ...commonProps,
@@ -91,6 +101,7 @@ function createObjectDefinition(
                 id: definition.id || uniqueId(state, enemyType),
                 enemyType,
             };
+        }
         case 'floorSwitch':
             return {
                 ...commonProps,
@@ -108,7 +119,7 @@ function createObjectDefinition(
 
             };
         case 'loot':
-        case 'chest':
+        case 'chest': {
             const lootType = definition.lootType || editingState.lootType;
             return {
                 ...commonProps,
@@ -116,13 +127,15 @@ function createObjectDefinition(
                 id: definition.id || uniqueId(state, lootType),
                 lootType,
                 status: definition.status || editingState.objectStatus,
-                level: definition.level || editingState.level,
-                amount: definition.amount || editingState.amount,
+                lootLevel: definition.lootLevel || editingState.level,
+                lootAmount: definition.lootAmount || editingState.amount,
             };
+        }
         case 'marker':
         case 'pushPull':
         case 'rollingBall':
         case 'tippable':
+        case 'waterPot':
             return {
                 ...commonProps,
                 type: definition.type,
@@ -195,24 +208,26 @@ export function getSwitchTargetProperties(state: GameState, editingState: Editin
 
 export function getObjectTypeProperties(state: GameState, editingState: EditingState, object: ObjectDefinition): PanelRows {
     let rows: PanelRows = [];
-    rows.push({
-        name: 'type',
-        value: object.type || editingState.objectType,
-        values: combinedObjectTypes,
-        onChange(objectType: ObjectType) {
-            if (object.id) {
-                // Replace instances of the loot type in the id with the new loot type.
-                if (object.id.includes(object.type)) {
-                    updateObjectId(state, object, object.id.replace(object.type, objectType));
+    if (object.type !== 'enemy' && object.type !== 'boss') {
+        rows.push({
+            name: 'type',
+            value: object.type || editingState.objectType,
+            values: combinedObjectTypes,
+            onChange(objectType: ObjectType) {
+                if (object.id) {
+                    // Replace instances of the loot type in the id with the new loot type.
+                    if (object.id.includes(object.type)) {
+                        updateObjectId(state, object, object.id.replace(object.type, objectType));
+                    }
+                    object.type = objectType as any;
+                    updateObjectInstance(state, createObjectDefinition(state, editingState, object));
+                } else {
+                    editingState.objectType = objectType;
                 }
-                object.type = objectType;
-                updateObjectInstance(state, createObjectDefinition(state, editingState, object));
-            } else {
-                editingState.objectType = objectType;
-            }
-            displayTileEditorPropertyPanel();
-        },
-    });
+                displayTileEditorPropertyPanel();
+            },
+        });
+    }
     rows.push([{
         name: 'spirit',
         value: ifdefor(object.spirit, editingState.spirit),
@@ -316,25 +331,7 @@ export function getObjectTypeProperties(state: GameState, editingState: EditingS
             break;
         case 'loot':
         case 'chest': {
-            const lootType = object.lootType || editingState.lootType;
-            rows.push({
-                name: 'lootType',
-                value: lootType,
-                values: getLootTypes(),
-                onChange(lootType: LootType) {
-                    if (object.id) {
-                        // Replace instances of the loot type in the id with the new loot type.
-                        if (object.id.includes(object.lootType)) {
-                            updateObjectId(state, object, object.id.replace(object.lootType, lootType));
-                        }
-                        object.lootType = lootType;
-                        updateObjectInstance(state, object);
-                    } else {
-                        editingState.lootType = lootType;
-                    }
-                    displayTileEditorPropertyPanel();
-                },
-            });
+            rows = [...rows, ...getLootFields(state, editingState, object)];
             rows.push({
                 name: 'status',
                 value: object.status || editingState.objectStatus,
@@ -348,40 +345,6 @@ export function getObjectTypeProperties(state: GameState, editingState: EditingS
                     }
                 },
             });
-            if (lootType === 'money') {
-                rows.push({
-                    name: 'amount',
-                    value: '' + object.amount || editingState.amount,
-                    values: ['1', '20', '50', '100', '300'],
-                    onChange(amountString: string) {
-                        const amount = parseInt(amountString, 10);
-                        if (object.id) {
-                            object.amount = amount;
-                            updateObjectInstance(state, object);
-                        } else {
-                            editingState.amount = amount;
-                        }
-                    },
-                });
-            } else if (lootType === 'peachOfImmortality' || lootType === 'peachOfImmortalityPiece') {
-            } else if (lootType === 'fire' || lootType === 'ice' || lootType === 'lightning') {
-            } else {
-                const level = object.level || editingState.level;
-                rows.push({
-                    name: 'level',
-                    value: level ? `${level}` : 'progressive',
-                    values: ['progressive', '1', '2'],
-                    onChange(levelString: string) {
-                        const level = levelString === 'progressive' ? 0 : parseInt(levelString, 10);
-                        if (object.id) {
-                            object.level = level;
-                            updateObjectInstance(state, object);
-                        } else {
-                            editingState.level = level;
-                        }
-                    },
-                });
-            }
             break;
         }
         case 'ballGoal':
@@ -434,9 +397,9 @@ export function getObjectTypeProperties(state: GameState, editingState: EditingS
             break;
         case 'enemy':
             rows.push({
-                name: 'enemy',
+                name: 'type',
                 value: object.enemyType || editingState.enemyType,
-                values: ['snake'],
+                values: ['beetle', 'beetleHorned', 'beetleMini', 'beetleWinged', 'snake'],
                 onChange(enemyType: EnemyType) {
                     if (object.id) {
                         object.enemyType = enemyType;
@@ -446,6 +409,22 @@ export function getObjectTypeProperties(state: GameState, editingState: EditingS
                     }
                 },
             });
+            break;
+        case 'boss':
+            rows.push({
+                name: 'type',
+                value: object.enemyType || editingState.enemyType,
+                values: ['beetleBoss'],
+                onChange(bossType: BossType) {
+                    if (object.id) {
+                        object.enemyType = bossType;
+                        updateObjectInstance(state, object);
+                    } else {
+                        editingState.bossType = bossType;
+                    }
+                },
+            });
+            rows = [...rows, ...getLootFields(state, editingState, object)];
             break;
         case 'sign':
             rows.push({
@@ -479,6 +458,67 @@ export function getObjectTypeProperties(state: GameState, editingState: EditingS
     return rows;
 }
 
+function getLootFields(state: GameState, editingState: EditingState, object: ObjectDefinition) {
+    if (object.type !== 'loot' && object.type !== 'chest' && object.type !== 'boss') {
+        return [];
+    }
+    let rows = [];
+    const lootType = object.lootType || editingState.lootType;
+    rows.push({
+        name: 'lootType',
+        value: lootType,
+        values: getLootTypes(),
+        onChange(lootType: LootType) {
+            if (object.id) {
+                // Replace instances of the loot type in the id with the new loot type.
+                if (object.id.includes(object.lootType)) {
+                    updateObjectId(state, object, object.id.replace(object.lootType, lootType));
+                }
+                object.lootType = lootType;
+                updateObjectInstance(state, object);
+            } else {
+                editingState.lootType = lootType;
+            }
+            displayTileEditorPropertyPanel();
+        },
+    });
+    if (lootType === 'money') {
+        rows.push({
+            name: 'amount',
+            value: '' + object.lootAmount || editingState.amount,
+            values: ['1', '20', '50', '100', '300'],
+            onChange(amountString: string) {
+                const amount = parseInt(amountString, 10);
+                if (object.id) {
+                    object.lootAmount = amount;
+                    updateObjectInstance(state, object);
+                } else {
+                    editingState.amount = amount;
+                }
+            },
+        });
+    } else if (lootType === 'peachOfImmortality' || lootType === 'peachOfImmortalityPiece') {
+    } else if (lootType === 'fire' || lootType === 'ice' || lootType === 'lightning') {
+    } else {
+        const level = object.lootLevel || editingState.level;
+        rows.push({
+            name: 'level',
+            value: level ? `${level}` : 'progressive',
+            values: ['progressive', '1', '2'],
+            onChange(levelString: string) {
+                const level = levelString === 'progressive' ? 0 : parseInt(levelString, 10);
+                if (object.id) {
+                    object.lootLevel = level;
+                    updateObjectInstance(state, object);
+                } else {
+                    editingState.level = level;
+                }
+            },
+        });
+    }
+    return rows;
+}
+
 export function getSelectProperties(state: GameState, editingState: EditingState): PanelRows {
     let rows: PanelRows = [];
     if (editingState.selectedObject) {
@@ -500,7 +540,7 @@ export function onMouseDownObject(state: GameState, editingState: EditingState, 
         state,
         editingState,
         {
-            type: editingState.objectType,
+            type: editingState.tool === 'object' ? editingState.objectType : editingState.tool as 'enemy' | 'boss',
             x: Math.round(x + state.camera.x),
             y: Math.round(y + state.camera.y),
         }
@@ -616,9 +656,6 @@ export function getObjectFrame(object: ObjectDefinition): FrameDimensions {
     if (object.type === 'crystalSwitch' || object.type === 'pushPull' || object.type === 'rollingBall') {
         return simpleGeometry;
     }
-    if (object.type === 'tippable') {
-        return simpleGeometry;
-    }
     const state = getState();
     const instance = createObjectInstance(state, object);
     if (instance.getHitbox) {
@@ -709,7 +746,7 @@ export function renderObjectPreview(
         id: uniqueId(state, editingState.objectType),
         // This is set to 'normal' so we can see the preview during edit even if it would otherwise be hidden.
         status: 'normal',
-        type: editingState.objectType,
+        type: editingState.tool === 'object' ? editingState.objectType : editingState.tool as 'boss' | 'enemy',
         x: Math.round(x + state.camera.x),
         y: Math.round(y + state.camera.y),
     });

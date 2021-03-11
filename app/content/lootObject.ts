@@ -8,25 +8,25 @@ import { requireImage } from 'app/utils/images';
 import { rectanglesOverlap } from 'app/utils/index';
 
 import {
-    ActiveTool, AreaInstance, Frame, GameState, LootObjectDefinition,
+    ActiveTool, AreaInstance, BossObjectDefinition, Frame, GameState, LootObjectDefinition,
     LootType, ObjectInstance, ObjectStatus, ShortRectangle,
 } from 'app/types';
 
 export class LootGetAnimation implements ObjectInstance {
     definition = null;
-    loot: LootObject | ChestObject;
+    loot: LootObjectDefinition | BossObjectDefinition;
     animationTime: number = 0;
     x: number;
     y: number;
     z: number;
     status: ObjectStatus = 'normal';
-    constructor(loot: LootObject | ChestObject) {
+    constructor(loot: LootObjectDefinition | BossObjectDefinition) {
         this.loot = loot;
         const state = getState();
-        const frame = lootFrames[this.loot.definition.lootType] || lootFrames.unknown;
+        const frame = lootFrames[this.loot.lootType] || lootFrames.unknown;
         const hero = state.hero.activeClone || state.hero;
-        this.x = (loot.definition.type === 'chest' ? loot.x + chestOpenedFrame.w / 2 : hero.x + hero.w / 2) - frame.w / 2;
-        this.y = (loot.definition.type === 'chest' ? loot.y + 8 : hero.y - 4);
+        this.x = (loot.type === 'chest' ? loot.x + chestOpenedFrame.w / 2 : hero.x + hero.w / 2) - frame.w / 2;
+        this.y = (loot.type === 'chest' ? loot.y + 8 : hero.y - 4);
         this.z = 8;
     }
     update(state: GameState) {
@@ -35,13 +35,13 @@ export class LootGetAnimation implements ObjectInstance {
         }
         this.animationTime += FRAME_LENGTH;
         if (this.animationTime === 1000) {
-            showLootMessage(state, this.loot.definition.lootType, this.loot.definition.level);
+            showLootMessage(state, this.loot.lootType, this.loot.lootLevel);
         } else if (this.animationTime > 1000) {
             removeObjectFromArea(state, this);
         }
     }
     render(context, state: GameState) {
-        const frame = lootFrames[this.loot.definition.lootType] || lootFrames.unknown;
+        const frame = lootFrames[this.loot.lootType] || lootFrames.unknown;
         drawFrame(context, frame, { ...frame, x: this.x, y: this.y - this.z });
     }
 }
@@ -139,14 +139,9 @@ export class LootObject implements ObjectInstance {
         }
         const hero = state.hero.activeClone || state.hero;
         if (rectanglesOverlap(hero, {...this.frame, x: this.x, y: this.y})) {
-            const onPickup = lootEffects[this.definition.lootType] || lootEffects.unknown;
-            onPickup(state, this);
-            hero.action = 'getItem';
-            hero.actionFrame = 0;
             removeObjectFromArea(state, this);
-            addObjectToArea(state, this.area, new LootGetAnimation(this))
             state.savedState.collectedItems[this.definition.id] = true;
-            saveGame();
+            getLoot(state, this.definition);
         }
     }
     render(context, state: GameState) {
@@ -160,12 +155,22 @@ export class LootObject implements ObjectInstance {
     }
 }
 
+export function getLoot(this: void, state: GameState, definition: LootObjectDefinition | BossObjectDefinition): void {
+    const onPickup = lootEffects[definition.lootType] || lootEffects.unknown;
+    onPickup(state, definition);
+    const hero = state.hero.activeClone || state.hero;
+    hero.action = 'getItem';
+    hero.actionFrame = 0;
+    addObjectToArea(state, hero.area, new LootGetAnimation(definition));
+    saveGame();
+}
+
 // Simple loot drop doesn't show the loot animation when collected.
 export class LootDropObject extends LootObject {
     update(state: GameState) {
         if (rectanglesOverlap(state.hero.activeClone || state.hero, {...this.frame, x: this.x, y: this.y})) {
             const onPickup = lootEffects[this.definition.lootType] || lootEffects.unknown;
-            onPickup(state, this);
+            onPickup(state, this.definition);
             removeObjectFromArea(state, this);
         }
     }
@@ -213,16 +218,11 @@ export class ChestObject implements ObjectInstance {
         // You can only open a chest from the bottom.
         const hero = state.hero.activeClone || state.hero;
         if (hero.d === 'up' && !state.savedState.collectedItems[this.definition.id]) {
-            hero.action = 'getItem';
-            hero.actionFrame = 0;
-            const onPickup = lootEffects[this.definition.lootType] || lootEffects.unknown;
-            onPickup(state, this);
-            addObjectToArea(state, this.area, new LootGetAnimation(this));
             state.savedState.collectedItems[this.definition.id] = true;
             if (this.linkedObject) {
                 state.savedState.collectedItems[this.linkedObject.definition.id] = true;
             }
-            saveGame();
+            getLoot(state, this.definition);
         }
     }
     update(state: GameState) {
@@ -274,55 +274,55 @@ export const lootFrames: Partial<{[key in LootType]: Frame}> = {
     weapon: weaponFrame,
 }
 
-export function applyUpgrade(currentLevel: number, loot: LootObjectDefinition): number {
+export function applyUpgrade(currentLevel: number, loot: LootObjectDefinition | BossObjectDefinition): number {
     // Non-progressive upgrades specify the exact level of the item. Lower level items will be ignored
     // if the player already possesses a better version.
-    if (loot.level) {
-        return Math.max(currentLevel, loot.level);
+    if (loot.lootLevel) {
+        return Math.max(currentLevel, loot.lootLevel);
     }
     return currentLevel + 1;
 }
 
-export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: ChestObject | LootObject) => void}> = {
-    unknown: (state: GameState, loot: ChestObject | LootObject) => {
-        if (loot.definition.lootType === 'weapon') {
-            state.hero.weapon = applyUpgrade(state.hero.weapon, loot.definition);
-        } else if (['bow', 'staff', 'clone', 'invisibility'].includes(loot.definition.lootType)) {
+export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition) => void}> = {
+    unknown: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition) => {
+        if (loot.lootType === 'weapon') {
+            state.hero.weapon = applyUpgrade(state.hero.weapon, loot);
+        } else if (['bow', 'staff', 'clone', 'invisibility'].includes(loot.lootType)) {
             if (!state.hero.leftTool) {
-                state.hero.leftTool = loot.definition.lootType as ActiveTool;
+                state.hero.leftTool = loot.lootType as ActiveTool;
             } else if (!state.hero.rightTool) {
-                state.hero.rightTool = loot.definition.lootType as ActiveTool;
+                state.hero.rightTool = loot.lootType as ActiveTool;
             }
-            state.hero.activeTools[loot.definition.lootType] = applyUpgrade(state.hero.activeTools[loot.definition.lootType], loot.definition);
+            state.hero.activeTools[loot.lootType] = applyUpgrade(state.hero.activeTools[loot.lootType], loot);
         } else if ([
             'gloves', 'roll', 'charge', 'nimbusCloud', 'catEyes', 'spiritSight',
             'trueSight', 'astralProjection', 'telekinesis', 'ironSkin', 'goldMail', 'phoenixCrown',
             'waterBlessing', 'fireBlessing'
-        ].includes(loot.definition.lootType)) {
-            state.hero.passiveTools[loot.definition.lootType] = applyUpgrade(state.hero.passiveTools[loot.definition.lootType], loot.definition);
+        ].includes(loot.lootType)) {
+            state.hero.passiveTools[loot.lootType] = applyUpgrade(state.hero.passiveTools[loot.lootType], loot);
         } else if ([
             'fire', 'lightning', 'ice'
-        ].includes(loot.definition.lootType)) {
-            state.hero.elements[loot.definition.lootType] = applyUpgrade(state.hero.elements[loot.definition.lootType], loot.definition);
+        ].includes(loot.lootType)) {
+            state.hero.elements[loot.lootType] = applyUpgrade(state.hero.elements[loot.lootType], loot);
         }  else if ([
             'cloudBoots', 'ironBoots'
-        ].includes(loot.definition.lootType)) {
-            state.hero.equipment[loot.definition.lootType] = applyUpgrade(state.hero.equipment[loot.definition.lootType], loot.definition);
-        } else if (loot.definition.lootType === 'money') {
-            state.hero.money += (loot.definition.amount || 1);
+        ].includes(loot.lootType)) {
+            state.hero.equipment[loot.lootType] = applyUpgrade(state.hero.equipment[loot.lootType], loot);
+        } else if (loot.lootType === 'money') {
+            state.hero.money += (loot.lootAmount || 1);
         } else {
-            console.error('Unhandled loot type:', loot.definition.lootType);
+            console.error('Unhandled loot type:', loot.lootType);
         }
         updateHeroMagicStats(state);
     },
-    peach: (state: GameState, loot: ChestObject | LootObject) => {
+    peach: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition) => {
         state.hero.life = Math.min(state.hero.life + 1, state.hero.maxLife);
     },
-    peachOfImmortality: (state: GameState, loot: ChestObject | LootObject) => {
+    peachOfImmortality: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition) => {
         state.hero.maxLife++;
         state.hero.life++;
     },
-    peachOfImmortalityPiece: (state: GameState, loot: ChestObject | LootObject) => {
+    peachOfImmortalityPiece: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition) => {
         state.hero.peachQuarters++;
         if (state.hero.peachQuarters >= 4) {
             state.hero.peachQuarters -= 4;

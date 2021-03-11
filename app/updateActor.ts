@@ -109,6 +109,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         movementSpeed = 0;
         if (hero.animationTime >= fallAnimation.duration) {
             hero.action = 'fallen';
+            hero.actionFrame = 0;
         }
     } else if (hero.action === 'fallen') {
         movementSpeed = 0;
@@ -118,7 +119,12 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             hero.x = hero.safeX;
             hero.y = hero.safeY;
             damageActor(state, hero, 1, null, true);
-            hero.action = null;
+            // For now leave the hero in the 'fallen' state if they died, otherwise they reappear
+            // just fine when the continue/quit option shows up.
+            // Once the death animation is added we can probably remove this check if we want.
+            if (hero.life > 0) {
+                hero.action = null;
+            }
         }
     } else if (hero.action === 'jumpingDown') {
         movementSpeed = 0;
@@ -465,10 +471,16 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         // dx/dy handles most cases, but in some cases like moving through doorways we also need to check
         // hero.actionDx
         if (hero.x < 0 && (dx < 0 || hero.actionDx < 0)) {
-            state.location.areaGridCoords.x = (state.location.areaGridCoords.x + state.areaGrid[0].length - 1) % state.areaGrid[0].length;
+            state.location.areaGridCoords = {
+                x: (state.location.areaGridCoords.x + state.areaGrid[0].length - 1) % state.areaGrid[0].length,
+                y: state.location.areaGridCoords.y,
+            };
             scrollToArea(state, getAreaFromLocation(state.location), 'left');
         } else if (hero.x + hero.w > w && (dx > 0 || hero.actionDx > 0)) {
-            state.location.areaGridCoords.x = (state.location.areaGridCoords.x + 1) % state.areaGrid[0].length;
+            state.location.areaGridCoords = {
+                x: (state.location.areaGridCoords.x + 1) % state.areaGrid[0].length,
+                y: state.location.areaGridCoords.y,
+            };
             scrollToArea(state, getAreaFromLocation(state.location), 'right');
         } else if (hero.x < section.x && (dx < 0 || hero.actionDx < 0)) {
             setNextAreaSection(state, 'left');
@@ -476,10 +488,16 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             setNextAreaSection(state, 'right');
         }
         if (hero.y < 0 && (dy < 0 || hero.actionDy < 0)) {
-            state.location.areaGridCoords.y = (state.location.areaGridCoords.y + state.areaGrid.length - 1) % state.areaGrid.length;
+            state.location.areaGridCoords = {
+                x: state.location.areaGridCoords.x,
+                y: (state.location.areaGridCoords.y + state.areaGrid.length - 1) % state.areaGrid.length,
+            };
             scrollToArea(state, getAreaFromLocation(state.location), 'up');
         } else if (hero.y + hero.h > h && (dy > 0 || hero.actionDy > 0)) {
-            state.location.areaGridCoords.y = (state.location.areaGridCoords.y + 1) % state.areaGrid.length;
+            state.location.areaGridCoords = {
+                x: state.location.areaGridCoords.x,
+                y: (state.location.areaGridCoords.y + 1) % state.areaGrid.length,
+            };
             scrollToArea(state, getAreaFromLocation(state.location), 'down');
         } else if (hero.y < section.y && (dy < 0 || hero.actionDy < 0)) {
             setNextAreaSection(state, 'up');
@@ -527,7 +545,7 @@ export function checkForEnemyDamage(state: GameState, hero: Hero) {
         if (!(enemy instanceof Enemy) || enemy.invulnerableFrames > 0) {
             continue;
         }
-        if (enemy.enemyDefinition.touchDamage && rectanglesOverlap(hero, enemy)) {
+        if (enemy.enemyDefinition.touchDamage && rectanglesOverlap(hero, enemy.getHitbox(state))) {
             //const dx = (hero.x + hero.w / 2) - (enemy.x + enemy.w / 2);
             //const dy = (hero.y + hero.h / 2) - (enemy.y + enemy.h / 2);
             damageActor(state, hero, enemy.enemyDefinition.touchDamage, {
@@ -571,6 +589,9 @@ export function damageActor(
     knockback?: {vx: number, vy: number, vz: number},
     overrideInvulnerability: boolean = false
 ) {
+    if (actor.life <= 0) {
+        return;
+    }
     if (!overrideInvulnerability && (actor.action === 'roll' || actor.action === 'getItem')) {
         return;
     }
@@ -594,6 +615,9 @@ export function damageActor(
         actor.life -= damage;
         // For enemies, this is actually the number of rames they cannot damage the hero for.
         actor.invulnerableFrames = 50;
+        if (actor.life <= 0 && actor instanceof Enemy) {
+            actor.showDeathAnimation(state);
+        }
     }
 
     if (knockback) {

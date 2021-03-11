@@ -1,65 +1,120 @@
 import _ from 'lodash';
 
-import { getAreaSize } from 'app/content/areas';
+import { AnimationEffect } from 'app/content/animationEffect';
+import { getLoot } from 'app/content/lootObject';
+import { addObjectToArea, getAreaSize, removeObjectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { moveActor } from 'app/moveActor';
+import { saveGame } from 'app/state';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { directionMap } from 'app/utils/field';
 
 import {
-    Actor, ActorAnimations, AreaInstance, Direction, EnemyType, EnemyObjectDefinition,
-    Frame, FrameAnimation, GameState, ObjectInstance,ObjectStatus,
+    Actor, ActorAnimations, AreaInstance, BossObjectDefinition, BossType, Direction, EnemyType, EnemyObjectDefinition,
+    Frame, FrameAnimation, FrameDimensions, GameState, Hero, ObjectInstance, ObjectStatus, ShortRectangle,
 } from 'app/types';
 
 export class Enemy implements Actor, ObjectInstance {
     type = 'enemy' as 'enemy';
     area: AreaInstance;
     drawPriority: 'sprites' = 'sprites';
-    definition: EnemyObjectDefinition;
+    definition: EnemyObjectDefinition | BossObjectDefinition;
     enemyDefinition: EnemyDefinition;
     currentAnimation: FrameAnimation;
+    hasShadow: boolean = true;
     animationTime: number;
+    alwaysUpdate: boolean = false;
     d: Direction;
     x: number;
     y: number;
-    z: number;
-    vx: number;
-    vy: number;
-    vz: number;
+    z: number = 0;
+    vx: number = 0;
+    vy: number = 0;
+    vz: number = 0;
     w: number;
     h: number;
+    flying: boolean;
     life: number;
+    speed: number;
+    acceleration: number;
+    aggroRadius: number;
     mode = 'choose';
     modeTime = 0;
+    params: any;
     invulnerableFrames = 0;
     status: ObjectStatus = 'normal';
-    constructor(definition: EnemyObjectDefinition) {
+    scale: number = 1;
+    constructor(state: GameState, definition: EnemyObjectDefinition | BossObjectDefinition) {
         this.definition = definition;
         this.enemyDefinition = enemyDefinitions[this.definition.enemyType] || enemyDefinitions.snake;
         this.d = definition.d || 'down';
+        this.hasShadow = this.enemyDefinition.hasShadow ?? true;
         this.currentAnimation = this.enemyDefinition.animations.idle[this.d];
         this.animationTime = 0;
         this.x = definition.x;
         this.y = definition.y;
-        this.z = 0;
         const frame = this.getFrame();
-        this.w = frame?.content.w || frame.w;
-        this.h = frame?.content.h || frame.h;
-        this.life = this.enemyDefinition.life;
+        this.w = frame.content?.w ?? frame.w;
+        this.h = frame.content?.h ?? frame.h;
+        this.life = this.enemyDefinition.life ?? 1;
+        this.speed = this.enemyDefinition.speed ?? 1;
+        this.acceleration = this.enemyDefinition.acceleration ?? .1;
+        this.aggroRadius = this.enemyDefinition.aggroRadius ?? 80;
+        this.flying = this.enemyDefinition.flying;
+        this.z = this.flying ? 12 : 0;
+        this.scale = this.enemyDefinition.scale ?? 1;
+        this.params = {};
+        if (definition.type === 'boss' && state.savedState.objectFlags[this.definition.id]) {
+            this.status = 'gone';
+        }
     }
     getFrame(): Frame {
         return getFrame(this.currentAnimation, this.animationTime);
+    }
+    getHitbox(state: GameState): ShortRectangle {
+        const frame = this.getFrame();
+        return {
+            x: this.x,
+            y: this.y - this.z,
+            w: (frame.content?.w ?? frame.w) * this.scale,
+            h: (frame.content?.h ?? frame.h) * this.scale,
+        };
     }
     isInCurrentSection(state: GameState): boolean {
         const { section } = getAreaSize(state);
         return !(this.x < section.x || this.x > section.x + section.w || this.y < section.y || this.y > section.y + section.h)
     }
+    setAnimation(type: string, d: Direction, time: number = 0) {
+        const animationSet = this.enemyDefinition.animations[type] || this.enemyDefinition.animations.idle;
+        this.currentAnimation = animationSet[d];
+        this.animationTime = time;
+    }
     setMode(mode: string) {
         this.mode = mode;
         this.modeTime = 0;
     }
+    showDeathAnimation(state: GameState) {
+        const hitbox = this.getHitbox(state);
+        const deathAnimation = new AnimationEffect({
+            animation: enemyDeathAnimation,
+            x: hitbox.x + hitbox.w / 2 - enemyDeathAnimation.frames[0].w / 2 * this.scale,
+            y: hitbox.y + hitbox.h / 2 - enemyDeathAnimation.frames[0].h / 2 * this.scale,
+            scale: this.scale,
+        });
+        addObjectToArea(state, this.area, deathAnimation);
+        if (this.definition.type === 'boss' && !state.savedState.objectFlags[this.definition.id]) {
+            state.savedState.objectFlags[this.definition.id] = true;
+            if (this.definition.lootType) {
+                getLoot(state, this.definition);
+            }
+            saveGame();
+        }
+    }
     update(state: GameState) {
-        if (!this.isInCurrentSection(state)) {
+        if (this.status === 'gone') {
+            return;
+        }
+        if (!this.alwaysUpdate && !this.isInCurrentSection(state)) {
             return;
         }
         if (this.enemyDefinition.update) {
@@ -70,23 +125,42 @@ export class Enemy implements Actor, ObjectInstance {
         if (this.invulnerableFrames > 0) {
             this.invulnerableFrames--;
         }
+        // Checks if the enemy fell into a pit, for example
+        checkForFloorEffects(state, this);
     }
-    render(context, state: GameState) {
+    render(context: CanvasRenderingContext2D, state: GameState) {
+        if (this.status === 'gone') {
+            return;
+        }
         const frame = this.getFrame();
         context.save();
             if (this.invulnerableFrames) {
                 context.globalAlpha = 0.7 + 0.3 * Math.cos(2 * Math.PI * this.invulnerableFrames * 3 / 50);
             }
-            if (this.d === 'right') {
+            if (this.d === 'right' && this.enemyDefinition.flipRight) {
                 // Flip the frame when facing right. We may need an additional flag for this behavior
                 // if we don't do it for all enemies on the right frames.
-                const w = (frame.content ? frame.content.w : frame.w);
+                const w = frame.content?.w ?? frame.w;
                 context.translate((this.x | 0) + (frame?.content?.x || 0) + w / 2, 0);
                 context.scale(-1, 1);
-                drawFrame(context, frame, { ...frame, x: - w / 2, y: this.y - (frame?.content?.y || 0) });
+                drawFrame(context, frame, { ...frame,
+                    x: - w / 2 - (frame?.content?.x || 0) * this.scale,
+                    y: this.y - (frame?.content?.y || 0) * this.scale - this.z,
+                    w: frame.w * this.scale,
+                    h: frame.h * this.scale,
+                });
             } else {
-                drawFrame(context, frame, { ...frame, x: this.x - (frame?.content?.x || 0), y: this.y - (frame?.content?.y || 0) });
+                drawFrame(context, frame, { ...frame,
+                    x: this.x - (frame?.content?.x || 0) * this.scale,
+                    y: this.y - (frame?.content?.y || 0) * this.scale - this.z,
+                    w: frame.w * this.scale,
+                    h: frame.h * this.scale,
+                });
             }
+            /*const hitbox = this.getHitbox(state);
+            context.globalAlpha = 0.5;
+            context.fillStyle = 'red';
+            context.fillRect(hitbox.x, hitbox.y, hitbox.w, hitbox.h);*/
         context.restore();
     }
 }
@@ -103,18 +177,395 @@ const snakeAnimations: ActorAnimations = {
         right: leftSnakeAnimation,
     },
 };
+const beetleGeometry = { w: 18, h: 17, content: { x: 1, y: 4, w: 16, h: 16} };
+const beetleDownAnimation: FrameAnimation = createAnimation('gfx/enemies/genericbeetle.png', beetleGeometry, { y: 0, cols: 4});
+const beetleRightAnimation: FrameAnimation = createAnimation('gfx/enemies/genericbeetle.png', beetleGeometry, { y: 1, cols: 4});
+const beetleUpAnimation: FrameAnimation = createAnimation('gfx/enemies/genericbeetle.png', beetleGeometry, { y: 2, cols: 4});
+const beetleLeftAnimation: FrameAnimation = createAnimation('gfx/enemies/genericbeetle.png', beetleGeometry, { y: 4, cols: 4});
+const beetleClimbAnimation: FrameAnimation = createAnimation('gfx/enemies/genericbeetle.png', beetleGeometry, { y: 3, cols: 4});
+
+const beetleAnimations: ActorAnimations = {
+    climbing: {
+        up: beetleClimbAnimation,
+        down: beetleClimbAnimation,
+        left: beetleClimbAnimation,
+        right: beetleClimbAnimation,
+    },
+    idle: {
+        up: beetleUpAnimation,
+        down: beetleDownAnimation,
+        left: beetleLeftAnimation,
+        right: beetleRightAnimation,
+    },
+};
+
+const beetleMiniGeometry = { w: 10, h: 10 };
+const beetleMiniDownAnimation: FrameAnimation = createAnimation('gfx/enemies/smallbeetle.png', beetleMiniGeometry, { x: 0, cols: 2});
+const beetleMiniRightAnimation: FrameAnimation = createAnimation('gfx/enemies/smallbeetle.png', beetleMiniGeometry, { x: 2, cols: 2});
+const beetleMiniUpAnimation: FrameAnimation = createAnimation('gfx/enemies/smallbeetle.png', beetleMiniGeometry, { x: 4, cols: 2});
+const beetleMiniLeftAnimation: FrameAnimation = createAnimation('gfx/enemies/smallbeetle.png', beetleMiniGeometry, { x: 7, cols: 2});
+const beetleMiniAnimations: ActorAnimations = {
+    idle: {
+        up: beetleMiniUpAnimation,
+        down: beetleMiniDownAnimation,
+        left: beetleMiniLeftAnimation,
+        right: beetleMiniRightAnimation,
+    },
+};
+
+const beetleHornedGeometry = { w: 22, h: 18, content: { x: 3, y: 4, w: 16, h: 16} };
+const beetleHornedDownAnimation: FrameAnimation = createAnimation('gfx/enemies/hornedbeetle.png', beetleHornedGeometry, { y: 0, cols: 4});
+const beetleHornedRightAnimation: FrameAnimation = createAnimation('gfx/enemies/hornedbeetle.png', beetleHornedGeometry, { y: 2, cols: 4});
+const beetleHornedUpAnimation: FrameAnimation = createAnimation('gfx/enemies/hornedbeetle.png', beetleHornedGeometry, { y: 4, cols: 4});
+const beetleHornedLeftAnimation: FrameAnimation = createAnimation('gfx/enemies/hornedbeetle.png', beetleHornedGeometry, { y: 6, cols: 4});
+const beetleHornedChargeDownAnimation: FrameAnimation = createAnimation('gfx/enemies/hornedbeetle.png', beetleHornedGeometry, { y: 1, cols: 4});
+const beetleHornedChargeRightAnimation: FrameAnimation = createAnimation('gfx/enemies/hornedbeetle.png', beetleHornedGeometry, { y: 3, cols: 4});
+const beetleHornedChargeUpAnimation: FrameAnimation = createAnimation('gfx/enemies/hornedbeetle.png', beetleHornedGeometry, { y: 5, cols: 4});
+const beetleHornedChargeLeftAnimation: FrameAnimation = createAnimation('gfx/enemies/hornedbeetle.png', beetleHornedGeometry, { y: 7, cols: 4});
+
+const beetleHornedAnimations: ActorAnimations = {
+    idle: {
+        up: beetleHornedUpAnimation,
+        down: beetleHornedDownAnimation,
+        left: beetleHornedLeftAnimation,
+        right: beetleHornedRightAnimation,
+    },
+    attack: {
+        up: beetleHornedChargeUpAnimation,
+        down: beetleHornedChargeDownAnimation,
+        left: beetleHornedChargeLeftAnimation,
+        right: beetleHornedChargeRightAnimation,
+    }
+};
+
+const beetleWingedGeometry = { w: 22, h: 18, content: { x: 3, y: 4, w: 16, h: 16} };
+const beetleWingedAnimation: FrameAnimation = createAnimation('gfx/enemies/flyingbeetle.png', beetleWingedGeometry, { cols: 4});
+const beetleWingedAnimations: ActorAnimations = {
+    idle: {
+        up: beetleWingedAnimation,
+        down: beetleWingedAnimation,
+        left: beetleWingedAnimation,
+        right: beetleWingedAnimation,
+    },
+};
 
 interface EnemyDefinition {
     animations: ActorAnimations,
-    life: number,
+    aggroRadius?: number,
+    flipRight?: boolean,
+    flying?: boolean,
+    hasShadow?: boolean,
+    life?: number,
+    speed?: number,
+    acceleration?: number,
+    scale?: number,
     touchDamage: number,
     update: (state: GameState, enemy: Enemy) => void,
 }
 
-export const enemyDefinitions: {[key in EnemyType]: EnemyDefinition} = {
-    snake: {animations: snakeAnimations, life: 2, touchDamage: 1, update: paceRandomly},
+export const enemyDefinitions: {[key in EnemyType | BossType]: EnemyDefinition} = {
+    snake: {animations: snakeAnimations, life: 2, touchDamage: 1, update: paceRandomly, flipRight: true},
+    beetle: {animations: beetleAnimations, acceleration: 0.05, life: 2, touchDamage: 1, update: scurryAndChase},
+    beetleBoss: {
+        animations: beetleWingedAnimations, flying: true, scale: 4,
+        acceleration: 0.5, speed: 2,
+        life: 20, touchDamage: 1, update: updateBeetleBoss
+    },
+    beetleBossWingedMinionDefinition: {
+        animations: beetleWingedAnimations,
+        flying: true, acceleration: 0.5, speed: 3,
+        life: 1, touchDamage: 1, update: flyBy,
+    },
+    beetleHorned: {animations: beetleHornedAnimations, life: 3, touchDamage: 1, update: paceAndCharge},
+    beetleMini: {
+        animations: beetleMiniAnimations,
+        acceleration: 0.01,
+        speed: 0.8,
+        hasShadow: false, life: 1, touchDamage: 1, update: scurryRandomly
+    },
+    beetleWinged: {
+        animations: beetleWingedAnimations,
+        flying: true, acceleration: 0.1, aggroRadius: 112,
+        life: 1, touchDamage: 1, update: scurryAndChase,
+    },
+};
+
+function updateBeetleBoss(state: GameState, enemy: Enemy): void {
+    const hitbox = enemy.getHitbox(state);
+    const { section } = getAreaSize(state);
+    enemy.alwaysUpdate = true;
+    if (enemy.life <= 8) {
+        enemy.speed = enemyDefinitions.beetleBoss.speed + 1;
+    }
+    if (enemy.mode === 'choose' && enemy.modeTime > 500) {
+        enemy.vx = enemy.vy = 0;
+        if (enemy.life > 8) {
+            if (Math.random() < 0.3) {
+                enemy.setMode('circle');
+            } else if (Math.random() < 0.5) {
+                const vector = getVectorToNearByHero(state, enemy, 32 * 32);
+                if (vector) {
+                    enemy.setMode('rush');
+                    enemy.vx = vector.x;
+                    enemy.vy = vector.y;
+                }
+            } else {
+                enemy.setMode('summon');
+                enemy.params.summonTheta = Math.random() * 2 * Math.PI;
+            }
+        } else {
+            if (Math.random() < 0.25) {
+                enemy.setMode('circle');
+            } else if (Math.random() < 0.25) {
+                const vector = getVectorToNearByHero(state, enemy, 32 * 32);
+                if (vector) {
+                    enemy.setMode('rush');
+                    enemy.vx = vector.x;
+                    enemy.vy = vector.y;
+                }
+            } else {
+                enemy.setMode('summon');
+                enemy.params.summonTheta = Math.random() * 2 * Math.PI;
+            }
+        }
+    } else if (enemy.mode === 'circle') {
+        // In theory the enemy circles the center of the area moving clockwise.
+        accelerateInDirection(state, enemy, {
+            x: section.y + section.h / 2 - (hitbox.y + hitbox.h / 2),
+            y: (hitbox.x + hitbox.w / 2) - (section.x + section.w / 2),
+        });
+        enemy.x += enemy.vx;
+        enemy.y += enemy.vy;
+        if (enemy.modeTime > 3000) {
+            enemy.setMode('return');
+        }
+    } else if (enemy.mode === 'return') {
+        if (moveTo(state, enemy, section.x + section.w / 2, section.y + 16 + hitbox.h / 2) === 0) {
+            enemy.setMode('choose');
+        }
+    } else if (enemy.mode === 'summon') {
+        if (enemy.modeTime === 500 || enemy.modeTime === 1000 || enemy.modeTime === 1500) {
+            const theta = enemy.params.summonTheta + 2 * Math.PI * enemy.modeTime / 500 / 3;
+            const minion = new Enemy(state, {
+                type: 'enemy',
+                id: '' + Math.random(),
+                status: 'normal',
+                enemyType: 'beetleBossWingedMinionDefinition',
+                x: section.x + section.w / 2 + (section.w / 2 + 32) * Math.cos(theta),
+                y: section.y + section.h / 2 + (section.h / 2 + 32) * Math.sin(theta),
+            });
+            const vector = getVectorToNearByHero(state, minion, 1000);
+            if (vector) {
+                minion.vx = minion.speed * vector.x;
+                minion.vy = minion.speed * vector.y;
+                minion.alwaysUpdate = true;
+                addObjectToArea(state, enemy.area, minion);
+            } else {
+                console.log('could not find nearby hero to target');
+            }
+        }
+        if (enemy.modeTime > 3000) {
+            enemy.setMode('choose');
+        }
+    } else if (enemy.mode === 'rush') {
+        // Just accelerate in the direction the boss chose when it entered this mode.
+        accelerateInDirection(state, enemy, {x: enemy.vx, y: enemy.vy});
+        enemy.x += enemy.vx;
+        enemy.y += enemy.vy;
+        if (enemy.modeTime > 1500) {
+            if (enemy.life > 8 || Math.random() < 0.5) {
+                enemy.setMode('return');
+            } else {
+                const vector = getVectorToNearByHero(state, enemy, 32 * 32);
+                if (vector) {
+                    enemy.setMode('rush');
+                    enemy.vx = vector.x;
+                    enemy.vy = vector.y;
+                } else {
+                    enemy.setMode('return');
+                }
+            }
+        }
+    }
 }
 
+function moveTo(state: GameState, enemy: Enemy, tx: number, ty: number): number {
+    const hitbox = enemy.getHitbox(state);
+    const dx = tx - (hitbox.x + hitbox.w / 2), dy = ty - (hitbox.y + hitbox.h / 2);
+    const mag = Math.sqrt(dx * dx + dy * dy);
+    if (mag > enemy.speed) {
+        moveEnemy(state, enemy, enemy.speed * dx / mag, enemy.speed * dy / mag);
+        return mag - enemy.speed;
+    }
+    moveEnemy(state, enemy, dx, dy);
+    return 0;
+}
+
+//
+function flyBy(state: GameState, enemy: Enemy): void {
+    enemy.x += enemy.vx;
+    enemy.y += enemy.vy;
+    const { section } = getAreaSize(state);
+    // Remove the enemy once it has moved off the screen entirely.
+    if ((enemy.vx < 0 && enemy.x + enemy.w < section.x - 16)
+        || (enemy.vx > 0 && enemy.x > section.x + section.w + 16)
+        || (enemy.vy < 0 && enemy.y + enemy.h < section.y - 16)
+        || (enemy.vy > 0 && enemy.y > section.y + section.h + 16)
+    ) {
+        removeObjectFromArea(state, enemy);
+    }
+}
+
+// The enemy choose a vector and accelerates in that direction for a bit.
+// The enemy slides a bit since it doesn't immediately move in the desired direction.
+const maxScurryTime = 4000;
+const minScurryTime = 1000;
+function scurryRandomly(state: GameState, enemy: Enemy) {
+    if (enemy.mode === 'choose' && enemy.modeTime > 200) {
+        enemy.params.theta = 2 * Math.PI * Math.random();
+        enemy.setMode('scurry');
+        enemy.currentAnimation = enemy.enemyDefinition.animations.idle[enemy.d];
+    }
+    let tvx = 0, tvy = 0;
+    if (enemy.mode === 'scurry') {
+        tvx = enemy.speed * Math.cos(enemy.params.theta);
+        tvy = enemy.speed * Math.sin(enemy.params.theta);
+        if (enemy.modeTime > minScurryTime &&
+            Math.random() < (enemy.modeTime - minScurryTime) / (maxScurryTime - minScurryTime)
+        ) {
+            enemy.setMode('choose');
+        }
+    }
+    const ax = tvx - enemy.vx;
+    const ay = tvy - enemy.vy;
+    accelerateInDirection(state, enemy, {x: ax, y: ay});
+    moveEnemy(state, enemy, enemy.vx, enemy.vy);
+}
+
+function accelerateInDirection(state: GameState, enemy: Enemy, a: {x: number, y: number}): void {
+    let mag = Math.sqrt(a.x * a.x + a.y * a.y);
+    if (mag) {
+        enemy.vx = enemy.vx + enemy.acceleration * a.x / mag;
+        enemy.vy = enemy.vy + enemy.acceleration * a.y / mag;
+        mag = Math.sqrt(enemy.vx * enemy.vx + enemy.vy * enemy.vy);
+        if (mag > enemy.speed) {
+            enemy.vx = enemy.speed * enemy.vx / mag;
+            enemy.vy = enemy.speed * enemy.vy / mag;
+        }
+    }
+}
+
+function scurryAndChase(state: GameState, enemy: Enemy) {
+    const chaseVector = getVectorToNearByHero(state, enemy, enemy.aggroRadius);
+    if (chaseVector) {
+        accelerateInDirection(state, enemy, chaseVector);
+        moveEnemy(state, enemy, enemy.vx, enemy.vy);
+    } else {
+        scurryRandomly(state, enemy);
+    }
+}
+
+function paceAndCharge(state: GameState, enemy: Enemy) {
+    if (enemy.mode === 'knocked') {
+        enemy.animationTime = 0;
+        enemy.z += enemy.vz;
+        enemy.vz -= 0.5;
+        moveEnemy(state, enemy, enemy.vx, enemy.vy, false);
+        if (enemy.z < 0) {
+            enemy.z = 0;
+            enemy.setMode('stunned');
+        }
+    } else if (enemy.mode === 'stunned') {
+        enemy.animationTime = 0;
+        if (enemy.modeTime > 500) {
+            enemy.setMode('choose');
+            enemy.setAnimation('idle', enemy.d);
+        }
+    } else if (enemy.mode !== 'charge') {
+        const {d, hero} = getLineOfSightTargetAndDirection(state, enemy);
+        if (hero) {
+            enemy.d = d;
+            enemy.setMode('charge');
+            enemy.setAnimation('attack', enemy.d);
+        } else {
+            paceRandomly(state, enemy);
+        }
+    } else if (enemy.mode === 'charge') {
+        if (enemy.modeTime < 400) {
+            enemy.animationTime = 0;
+            return;
+        }
+        if (!moveEnemy(state, enemy, 3 * enemy.speed * directionMap[enemy.d][0], 3 * enemy.speed * directionMap[enemy.d][1], false)) {
+            enemy.setMode('knocked');
+            enemy.vx = -enemy.speed * directionMap[enemy.d][0];
+            enemy.vy = -enemy.speed * directionMap[enemy.d][1];
+            enemy.vz = 4;
+        }
+    }
+}
+
+function getVectorToNearByHero(state: GameState, enemy: Enemy, radius: number): {x: number, y: number} {
+    const hitbox = enemy.getHitbox(state);
+    for (const hero of [state.hero, ...state.hero.clones]) {
+        const dx = (hero.x + hero.w / 2) - (hitbox.x + hitbox.w / 2);
+        const dy = (hero.y + hero.h / 2) - (hitbox.y + hitbox.h / 2);
+        const mag = Math.sqrt(dx * dx + dy * dy);
+        if (mag <= radius) {
+            return {x: dx / mag, y: dy / mag};
+        }
+    }
+    return null;
+}
+
+function getLineOfSightTargetAndDirection(state: GameState, enemy: Enemy): {d: Direction, hero: Hero} {
+    const hitbox = enemy.getHitbox(state);
+    for (const hero of [state.hero, ...state.hero.clones]) {
+        if (hitbox.x < hero.x + hero.w && hitbox.x + hitbox.w > hero.x) {
+            const x = Math.floor(hitbox.x / 16);
+            const y1 = Math.floor(hero.y / 16), y2 = Math.floor(hitbox.y / 16);
+            const minY = Math.min(y1, y2);
+            const maxY = Math.max(y1, y2);
+            let blocked = false;
+            for (let y = minY; y <= maxY; y++) {
+                const tileBehavior = {...(enemy.area?.behaviorGrid[y]?.[x] || {})};
+                if (tileBehavior.solid || tileBehavior.pit || tileBehavior.water) {
+                    blocked = true;
+                    break;
+                }
+            }
+            if (!blocked) {
+                return {
+                    d: hero.y < hitbox.y ? 'up' : 'down',
+                    hero,
+                };
+            }
+        }
+        if (hitbox.y < hero.y + hero.h && hitbox.y + hitbox.h > hero.y) {
+            const y = Math.floor(hitbox.y / 16);
+            const x1 = Math.floor(hero.x / 16), x2 = Math.floor(hitbox.x / 16);
+            const minX = Math.min(x1, x2);
+            const maxX = Math.max(x1, x2);
+            let blocked = false;
+            for (let x = minX; x <= maxX; x++) {
+                const tileBehavior = {...(enemy.area?.behaviorGrid[y]?.[x] || {})};
+                if (tileBehavior.solid || tileBehavior.pit || tileBehavior.water) {
+                    blocked = true;
+                    break;
+                }
+            }
+            if (!blocked) {
+                return {
+                    d: hero.x < hitbox.x ? 'left' : 'right',
+                    hero,
+                };
+            }
+        }
+    }
+    return {d: null, hero: null};
+}
+
+// The enemy pauses to choose a random direction, then moves in that direction for a bit and repeats.
+// If the enemy encounters an obstacle, it will change directions more quickly.
 function paceRandomly(state: GameState, enemy: Enemy) {
     if (enemy.mode === 'choose' && enemy.modeTime > 200) {
         enemy.setMode('walk');
@@ -123,22 +574,77 @@ function paceRandomly(state: GameState, enemy: Enemy) {
     }
     if (enemy.mode === 'walk') {
         if (enemy.modeTime >= 200) {
-            const { section } = getAreaSize(state);
-            // Don't allow the enemy to move off the edge of the current section.
-            if (enemy.d === 'left' && enemy.x < section.x + 16
-                || enemy.d === 'right' && enemy.x + enemy.w > section.x + section.w - 16
-                || enemy.d === 'up' && enemy.y < section.y + 16
-                || enemy.d === 'down' && enemy.y + enemy.h > section.y + section.h - 16
-            ) {
-                enemy.setMode('choose');
-                enemy.modeTime = 200;
-            } else if (!moveActor(state, enemy, directionMap[enemy.d][0], directionMap[enemy.d][1])) {
+            if (!moveEnemy(state, enemy, enemy.speed * directionMap[enemy.d][0], enemy.speed * directionMap[enemy.d][1])) {
                 enemy.setMode('choose');
                 enemy.modeTime = 200;
             }
         }
         if (enemy.modeTime > 700 && Math.random() < (enemy.modeTime - 700) / 3000) {
             enemy.setMode('choose');
+        }
+    }
+}
+
+function moveEnemy(state, enemy, dx, dy, careful: boolean = true): boolean {
+    const { section } = getAreaSize(state);
+    // Don't allow the enemy to move towards the outer edges of the screen.
+    if ((dx < 0 && enemy.x + dx < section.x + 16)
+        || (dx > 0 && enemy.x + dx + enemy.w > section.x + section.w - 16)
+        || (dy < 0 && enemy.y < section.y + 16)
+        || (dy > 0 && enemy.y + enemy.h > section.y + section.h - 16)
+    ) {
+        return false;
+    }
+    if (enemy.flying) {
+        enemy.x += dx;
+        enemy.y += dy;
+        return true;
+    }
+    return moveActor(state, enemy, dx, dy, false, careful);
+}
+
+
+const fallGeometry: FrameDimensions = {w: 24, h: 24};
+export const enemyFallAnimation: FrameAnimation = createAnimation('gfx/effects/enemyfall.png', fallGeometry, { cols: 10, duration: 4}, { loop: false });
+
+const enemyDeathGeometry: FrameDimensions = {w: 20, h: 20};
+export const enemyDeathAnimation: FrameAnimation = createAnimation('gfx/effects/enemydeath.png', enemyDeathGeometry, { cols: 9, duration: 4}, { loop: false });
+
+
+export function checkForFloorEffects(state: GameState, enemy: Enemy) {
+    const palette = enemy.area.palette;
+    const behaviorGrid = enemy.area.behaviorGrid;
+    const tileSize = palette.w;
+
+    const hitbox = enemy.getHitbox(state);
+    let leftColumn = Math.floor((hitbox.x + 6) / tileSize);
+    let rightColumn = Math.floor((hitbox.x + hitbox.w - 7) / tileSize);
+    let topRow = Math.floor((hitbox.y + 6) / tileSize);
+    let bottomRow = Math.floor((hitbox.y + hitbox.h - 7) / tileSize);
+
+    for (let row = topRow; row <= bottomRow; row++) {
+        for (let column = leftColumn; column <= rightColumn; column++) {
+            const behaviors = behaviorGrid?.[row]?.[column];
+            // This will happen when the player moves off the edge of the screen.
+            if (!behaviors) {
+                //startSwimming = false;
+                continue;
+            }
+            /*if (behaviors.climbable) {
+                startClimbing = true;
+            }
+            if (!behaviors.water) {
+                startSwimming = false;
+            }*/
+            if (behaviors.pit && enemy.z <= 0 && !enemy.flying) {
+                const pitAnimation = new AnimationEffect({
+                    animation: enemyFallAnimation,
+                    x: column * 16 - 4, y: row * 16 - 4,
+                });
+                addObjectToArea(state, enemy.area, pitAnimation);
+                removeObjectFromArea(state, enemy);
+                return;
+            }
         }
     }
 }

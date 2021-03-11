@@ -14,6 +14,7 @@ interface Props {
     vy?: number,
     vz?: number,
     az?: number,
+    scale?: number,
 }
 
 export class AnimationEffect implements ObjectInstance {
@@ -28,8 +29,9 @@ export class AnimationEffect implements ObjectInstance {
     vy: number;
     vz: number;
     az: number;
+    scale: number;
     status: ObjectStatus = 'normal';
-    constructor({animation, x = 0, y = 0, z = 17, vx = 0, vy = 0, vz = 0, az = -0.5 }: Props) {
+    constructor({animation, x = 0, y = 0, z = 0, vx = 0, vy = 0, vz = 0, az = 0, scale = 1}: Props) {
         this.animation = animation;
         this.animationTime = 0;
         this.x = x;
@@ -39,6 +41,7 @@ export class AnimationEffect implements ObjectInstance {
         this.vy = vy;
         this.vz = vz;
         this.az = az;
+        this.scale = scale;
     }
     update(state: GameState) {
         this.x += this.vx;
@@ -46,13 +49,17 @@ export class AnimationEffect implements ObjectInstance {
         this.z += this.vz;
         this.animationTime += FRAME_LENGTH;
         this.vz += this.az;
-        if (this.z <= 0) {
+        if (this.z < 0 || (!this.animation.loop && this.animationTime >= this.animation.duration)) {
             removeObjectFromArea(state, this);
         }
     }
     render(context, state: GameState) {
         const frame = getFrame(this.animation, this.animationTime);
-        drawFrame(context, frame, { ...frame, x: this.x, y: this.y - this.z });
+        drawFrame(context, frame, { ...frame,
+            x: this.x, y: this.y - this.z,
+            w: frame.w * this.scale,
+            h: frame.h * this.scale,
+        });
     }
 }
 
@@ -68,7 +75,7 @@ export function addParticleAnimations(state: GameState, area: AreaInstance, x: n
             new AnimationEffect({
                 animation: frameAnimation(frame),
                 x: x + vx, y: y + vy, z,
-                vx, vy, vz: 1.5, az: -0.2
+                vx, vy, vz: 1.5, az: -0.2,
             })
         );
         theta += Math.PI * 2 / (particles.length);

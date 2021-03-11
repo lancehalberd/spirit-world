@@ -79,16 +79,23 @@ export function setSaveFileToState(savedGameIndex: number, gameMode: number = 0)
         savedGame = getDefaultSavedState();
         savedGame.hero.spawnLocation = gameMode === 0 ? SPAWN_LOCATION_FULL : SPAWN_LOCATION_DEMO;
     }
-    state.savedState = savedGame;
-    state.hero = savedGame.hero;
-    state.hero.render = renderHero;
+    const defaultSavedState = getDefaultSavedState();
+    state.savedState = {
+        ...defaultSavedState,
+        ...savedGame,
+        hero: {
+            ...defaultSavedState.hero,
+            ...savedGame.hero,
+            render: renderHero,
+        },
+    };
+    state.hero = state.savedState.hero;
     updateHeroMagicStats(state);
     returnToSpawnLocation(state);
 }
 
 export function selectSaveFile(savedGameIndex: number): void {
-    state.savedGameIndex = savedGameIndex;
-    const savedGame = state.savedGames[state.savedGameIndex];
+    let savedGame = state.savedGames[state.savedGameIndex];
     if (!savedGame) {
         state.scene = 'chooseGameMode';
         state.menuIndex = 0;
@@ -100,11 +107,7 @@ export function selectSaveFile(savedGameIndex: number): void {
         returnToSpawnLocation(state);
         return;
     }
-    state.savedState = savedGame;
-    state.hero = savedGame.hero;
-    state.hero.render = renderHero;
-    updateHeroMagicStats(state);
-    returnToSpawnLocation(state);
+    setSaveFileToState(savedGameIndex);
     state.scene = 'game';
 }
 
@@ -112,6 +115,7 @@ export function getDefaultSavedState(): SavedState {
     return {
         coins: 0,
         collectedItems: {},
+        objectFlags: {},
         hero: getDefaultHeroState(),
     };
 }
@@ -124,6 +128,7 @@ function getDefaultHeroState(): Hero {
         vx: 0, vy: 0, vz: 0,
         w: 16, h: 16,
         d: 'down',
+        actionFrame: 0,
         animationTime: 0,
         life: 4, maxLife: 4,
         magic: 0,
@@ -263,9 +268,13 @@ export function returnToSpawnLocation(state: GameState) {
     state.hero.vx = 0;
     state.hero.vy = 0;
     state.hero.vz = 0;
-    state.location = {...state.hero.spawnLocation};
+    /*state.location = {
+        ...state.hero.spawnLocation,
+        areaGridCoords: {...state.hero.spawnLocation.areaGridCoords},
+        z: 0,
+    };
     state.zone = zones[state.location.zoneKey];
-    state.areaGrid = state.zone.floors[state.location.floor].grid;
+    state.areaGrid = state.zone.floors[state.location.floor].grid;*/
     state.hero.d = state.hero.spawnLocation.d;
     enterLocation(state, state.hero.spawnLocation);
 }

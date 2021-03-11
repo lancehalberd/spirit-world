@@ -36,6 +36,7 @@ export interface TileBehaviors {
     pickupWeight?: number,
     // Tile to display if this tile is removed (picked up, cut, blown up).
     underTile?: {x: number, y: number},
+    growTiles?: Tile[],
     water?: boolean,
 }
 
@@ -170,7 +171,7 @@ export interface ObjectInstance {
     behaviors?: TileBehaviors,
     drawPriority?: DrawPriority,
     alwaysReset?: boolean,
-    x: number, y: number,
+    x: number, y: number, z?: number,
     status: ObjectStatus,
     changeStatus?: (state: GameState, status: ObjectStatus) => void,
     cleanup?: (state: GameState) => void,
@@ -224,9 +225,9 @@ export interface FloorSwitchDefinition extends BaseObjectDefinition {
 export interface LootObjectDefinition extends BaseObjectDefinition {
     type: 'chest' | 'loot',
     lootType: LootType,
-    amount?: number,
+    lootAmount?: number,
     // If this is 0/unset it means it is progressive.
-    level?: number,
+    lootLevel?: number,
 }
 
 export interface CrystalSwitchDefinition extends BaseObjectDefinition {
@@ -248,21 +249,37 @@ export interface SignDefinition extends BaseObjectDefinition {
     message: string,
 }
 
-export type SimpleObjectType = 'marker' | 'pushPull' | 'rollingBall' | 'tippable';
+export type SimpleObjectType = 'marker' | 'pushPull' | 'rollingBall' | 'tippable' | 'waterPot';
 
 export interface SimpleObjectDefinition extends BaseObjectDefinition {
     type: SimpleObjectType,
 }
 
-export type EnemyType = 'snake';
+export type EnemyType =
+    'beetle' | 'beetleHorned' | 'beetleMini' | 'beetleWinged'
+    | 'beetleBossWingedMinionDefinition'
+    | 'snake';
+
+export type BossType =
+    'beetleBoss'
 
 export interface EnemyObjectDefinition extends BaseObjectDefinition {
     type: 'enemy',
     enemyType: EnemyType,
 }
 
+export interface BossObjectDefinition extends BaseObjectDefinition {
+    type: 'boss',
+    enemyType: BossType,
+    lootType: LootType,
+    lootAmount?: number,
+    // If this is 0/unset it means it is progressive.
+    lootLevel?: number,
+}
+
 export type ObjectDefinition = SimpleObjectDefinition
     | BallGoalDefinition
+    | BossObjectDefinition
     | CrystalSwitchDefinition
     | EntranceDefinition
     | EnemyObjectDefinition

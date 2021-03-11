@@ -176,6 +176,10 @@ const vineTile = canvasPalette(context => {
         context.fillStyle = 'green';
         context.fillRect(6, 0, 4, 16);
 }, climbableWall);
+const vineTileBase = canvasPalette(context => {
+        context.fillStyle = 'green';
+        context.fillRect(6, 0, 4, 6);
+}, { growTiles: [{x: 11, y: 1}]});
 
 const fieldPalette = {...combinePalettes([
         // This is the empty tile.
@@ -201,6 +205,7 @@ const fieldPalette = {...combinePalettes([
         gradientColorTile(['#A08000', '#806000'], 0, 0, 0, 16, southCliffBehavior), // southCliffTop
         solidColorTile('#806000', lowWallBehavior), // cliffBottom
         vineTile,
+        vineTileBase,
     ]),
     defaultTiles: [
         {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0},
@@ -251,6 +256,7 @@ const spiritFieldPalette = {...combinePalettes([
         gradientColorTile(['#A08000', '#806000'], 0, 0, 0, 16, southCliffBehavior), // southCliffTop
         solidColorTile('#806000', lowWallBehavior), // cliffBottom
         vineTile,
+        vineTileBase,
     ]),
     defaultTiles: [null]
 };

@@ -6,7 +6,7 @@ import { getTileBehaviorsAndObstacles, isPointOpen } from 'app/utils/field';
 
 import { Actor, Direction, GameState, Hero } from 'app/types';
 
-export function moveActor(state: GameState, actor: Actor, dx: number, dy: number, push: boolean = false) {
+export function moveActor(state: GameState, actor: Actor, dx: number, dy: number, push: boolean = false, careful: boolean = false) {
     let sx = dx;
     if (sx < -1 || sx > 1) {
         sx /= Math.abs(sx);
@@ -21,7 +21,7 @@ export function moveActor(state: GameState, actor: Actor, dx: number, dy: number
         let movedX = false, movedY = false;
         if (sx) {
             // You can't push when moving diagonally.
-            movedX = moveActorInDirection(state, actor, sx, (sx < 0) ? 'left' : 'right', !dy, push && !dy);
+            movedX = moveActorInDirection(state, actor, sx, (sx < 0) ? 'left' : 'right', !dy, push && !dy, careful);
             if (movedX) {
                 mx += sx;
                 if (sx > -1 && sx < 1) {
@@ -36,7 +36,7 @@ export function moveActor(state: GameState, actor: Actor, dx: number, dy: number
         }
         if (sy) {
             // You can't push when moving diagonally.
-            movedY = moveActorInDirection(state, actor, sy, (sy < 0) ? 'up' : 'down', !dx, push && !dx);
+            movedY = moveActorInDirection(state, actor, sy, (sy < 0) ? 'up' : 'down', !dx, push && !dx, careful);
             if (movedY) {
                 my += sy;
                 if (sy > -1 && sy < 1) {
@@ -65,6 +65,7 @@ function moveActorInDirection(
     direction: Direction,
     wiggle: boolean = false,
     push: boolean = false,
+    careful: boolean = false,
 ) {
     let ax = actor.x, ay = actor.y;
     if (direction === 'up' || direction === 'down') {
@@ -107,13 +108,17 @@ function moveActorInDirection(
     for (const point of checkPoints) {
         const { tileBehavior, objects} = getTileBehaviorsAndObstacles(state, actor.area, point, excludedObjects);
         if (tileBehavior?.solid && tileBehavior?.damage > 0) {
-            damageActor(state, actor, tileBehavior.damage);
+            damageActor(state, actor, tileBehavior.damage, {
+                vx: - 4 * (ax - actor.x),
+                vy: - 4 * (ay - actor.y),
+                vz: 2,
+            });
         }
         // Climbable overrides solid tile behavior. This allows use to place tiles marked climbable on top
         // of solid tiles to make them passable.
         const isTilePassable = (!tileBehavior?.solid || tileBehavior.climbable);
         // The second condition is a hack to prevent enemies from walking over pits.
-        if (!isTilePassable || (tileBehavior?.pit && !push)) {
+        if (!isTilePassable || (tileBehavior?.pit && careful)) {
             blockedByTile = true;
         }
         if (!isTilePassable && tileBehavior?.jumpDirection !== direction) {
@@ -127,7 +132,7 @@ function moveActorInDirection(
         }
     }
     pushedObjects = _.uniq(pushedObjects);
-    if ((blockedByTile || pushedObjects.length) && (!actor.action || actor.action === 'walking' || actor.action === 'pushing')) {
+    if (push && (blockedByTile || pushedObjects.length) && (!actor.action || actor.action === 'walking' || actor.action === 'pushing')) {
         if (!canJumpDown && actor.action !== 'pushing') {
             actor.action = 'pushing';
             actor.animationTime = 0;
@@ -277,7 +282,9 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
     let bottomRow = Math.floor((hero.y + hero.h - 5) / tileSize);
 
     const behaviorGrid = hero.area.behaviorGrid;
-    let fallingLeft = false, fallingRight = false, fallingUp = false, fallingDown = false;
+    // We don't want a player to be able to walk in between pits without falling, so the character is forced to fall
+    // any time all four corners are over pits.
+    let fallingTopLeft = false, fallingTopRight = false, fallingBottomLeft = false, fallingBottomRight = false;
     let startSwimming = true;
     let startClimbing = false;
     for (let row = topRow; row <= bottomRow; row++) {
@@ -297,24 +304,31 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
             if (!behaviors.water) {
                 startSwimming = false;
             }
-            if (behaviors.pit && hero.action !== 'roll') {
-                if (hero.x - column * 16 > 4) {
-                    fallingLeft = true;
-                    hero.x -= 0.1;
-                } else if (hero.x - column * 16 < -4) {
-                    fallingRight = true;
-                    hero.x += 0.1;
-                } else {
-                    fallingLeft = fallingRight = true;
-                }
+            if (behaviors.pit && hero.action !== 'roll' && hero.z <= 0) {
                 if (hero.y - row * 16 > 4) {
-                    fallingUp = true;
-                    hero.y -= 0.1;
+                    if (hero.x - column * 16 > 4) {
+                        fallingTopLeft = true;
+                    } else if (hero.x - column * 16 < -4) {
+                        fallingTopRight = true;
+                    } else {
+                        fallingTopLeft = fallingTopRight = true;
+                    }
                 } else if (hero.y - row * 16 < -4) {
-                    fallingDown = true;
-                    hero.y += 0.1;
+                    if (hero.x - column * 16 > 4) {
+                        fallingBottomLeft = true;
+                    } else if (hero.x - column * 16 < -4) {
+                        fallingBottomRight = true;
+                    } else {
+                        fallingBottomLeft = fallingBottomRight = true;
+                    }
                 } else {
-                    fallingUp = fallingDown = true;
+                    if (hero.x - column * 16 > 4) {
+                        fallingTopLeft = fallingBottomLeft = true;
+                    } else if (hero.x - column * 16 < -4) {
+                        fallingTopRight = fallingBottomRight = true;
+                    } else {
+                        fallingTopLeft = fallingTopRight = fallingBottomLeft = fallingBottomRight = true;
+                    }
                 }
             }
         }
@@ -329,9 +343,24 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
     } else if (!startClimbing && hero.action === 'climbing') {
         hero.action = null;
     }
-    if (fallingUp && fallingDown && fallingLeft && fallingRight) {
+    if (fallingTopLeft && fallingTopRight && fallingBottomLeft && fallingBottomRight) {
         throwHeldObject(state, hero);
         hero.action = 'falling';
+        hero.x = Math.round(hero.x / tileSize) * tileSize;
+        hero.y = Math.round(hero.y / tileSize) * tileSize;
         hero.animationTime = 0;
+    } else {
+        if (fallingTopLeft && fallingTopRight) {
+            hero.y -= 0.1;
+        }
+        if (fallingTopLeft && fallingBottomLeft) {
+            hero.x -= 0.1;
+        }
+        if (fallingBottomRight && fallingBottomLeft) {
+            hero.y += 0.1;
+        }
+        if (fallingBottomRight && fallingTopRight) {
+            hero.x += 0.1;
+        }
     }
 }

@@ -13,6 +13,7 @@ import { BallGoal } from 'app/content/objects/ballGoal';
 import { Marker } from 'app/content/objects/marker';
 import { PitEntrance } from 'app/content/objects/pitEntrance';
 import { Sign } from 'app/content/objects/sign';
+import { WaterPot } from 'app/content/objects/waterPot';
 
 import {
     AreaInstance, GameState, ObjectDefinition, ObjectInstance, ObjectStatus,
@@ -21,8 +22,8 @@ import {
 export function createObjectInstance(state: GameState, object: ObjectDefinition): ObjectInstance {
     if (object.type === 'ballGoal') {
         return new BallGoal(object);
-    } else if (object.type === 'enemy') {
-        return new Enemy(object);
+    } else if (object.type === 'enemy' || object.type === 'boss') {
+        return new Enemy(state, object);
     } else if (object.type === 'loot') {
         return new LootObject(object);
     } else if (object.type === 'chest') {
@@ -43,8 +44,10 @@ export function createObjectInstance(state: GameState, object: ObjectDefinition)
         return new PitEntrance(object);
     } else if (object.type === 'marker') {
         return new Marker(object);
-    }  else if (object.type === 'sign') {
+    } else if (object.type === 'sign') {
         return new Sign(object);
+    } else if (object.type === 'waterPot') {
+        return new WaterPot(state, object);
     }
 
     console.error('Unhandled object type', object.type, object);

@@ -152,7 +152,11 @@ export function removeAllClones(state: GameState): void {
 }
 
 export function enterLocation(state: GameState, location: ZoneLocation): void {
-    state.location = {...location};
+    state.location = {
+        ...location,
+        areaGridCoords: {...location.areaGridCoords},
+        z: 0,
+    };
     state.zone = zones[location.zoneKey];
     state.hero.x = location.x;
     state.hero.y = location.y;
@@ -163,8 +167,10 @@ export function enterLocation(state: GameState, location: ZoneLocation): void {
         return;
     }
     state.areaGrid = location.isSpiritWorld ? floor.spiritGrid : floor.grid;
-    state.location.areaGridCoords.y = state.location.areaGridCoords.y % state.areaGrid.length;
-    state.location.areaGridCoords.x = state.location.areaGridCoords.x % state.areaGrid[state.location.areaGridCoords.y].length;
+    state.location.areaGridCoords = {
+        y: state.location.areaGridCoords.y % state.areaGrid.length,
+        x: state.location.areaGridCoords.x % state.areaGrid[state.location.areaGridCoords.y].length,
+    };
     const area = getAreaFromLocation(state.location);
     const alternateArea = getAreaFromLocation({...state.location, isSpiritWorld: !state.location.isSpiritWorld});
 
@@ -510,9 +516,9 @@ export function destroyTile(state: GameState, area: AreaInstance, target: LayerT
     }
     area.checkToRedrawTiles = true;
     const underTile = behavior?.underTile || {x: 0, y: 0};
-    const key = `${underTile.x}x${underTile.y}`;
     layer.tiles[target.y][target.x] = underTile;
-    area.behaviorGrid[target.y][target.x] = layer.palette.behaviors[key];
+
+    resetTileBehavior(area, target);
     if (Math.random() < behavior?.lootChance) {
         const lootType = _.sample(behavior.lootTypes || []);
         if (lootType) {

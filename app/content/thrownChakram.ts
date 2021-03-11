@@ -91,7 +91,7 @@ export class ThrownChakram implements ObjectInstance {
                 continue;
             }
             if (object instanceof Enemy) {
-                if (!this.hitTargets.has(object) && rectanglesOverlap(object, this)) {
+                if (!this.hitTargets.has(object) && rectanglesOverlap(object.getHitbox(state), this)) {
                     damageActor(state, object, this.damage);
                     this.hitTargets.add(object);
                     this.outFrames = 0;

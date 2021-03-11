@@ -34,11 +34,12 @@ export type CommonLoot = 'money' | 'peach';
 export type LootType = 'weapon' | ActiveTool | Equipment | PassiveTool | MagicElement | Collectible | CommonLoot | 'unknown';
 
 
-type AnimationSet = {
+export type AnimationSet = {
     [key in Direction]: FrameAnimation
 }
 export interface ActorAnimations {
     attack?: AnimationSet,
+    climbing?: AnimationSet,
     death?: AnimationSet,
     falling?: AnimationSet,
     grab?: AnimationSet,

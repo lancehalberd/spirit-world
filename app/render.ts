@@ -270,7 +270,7 @@ export function renderAreaObjectsBeforeHero(context: CanvasRenderingContext2D, s
             if (object.drawPriority === 'sprites') {
                 if (object instanceof Clone) {
                     renderHeroShadow(context, state, object);
-                } else if (object instanceof Enemy) {
+                } else if (object instanceof Enemy &&  object.hasShadow) {
                     renderShadow(context, state, object);
                 }
             }

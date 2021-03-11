@@ -11,6 +11,7 @@ import {
     deleteObject,
     getObjectFrame,
     getObjectProperties,
+    getObjectTypeProperties,
     getSelectProperties,
     onMouseDownObject, onMouseDownSelect,
     onMouseMoveSelect,
@@ -28,13 +29,13 @@ import { drawFrame } from 'app/utils/animations';
 import { getMousePosition, isMouseDown } from 'app/utils/mouse';
 
 import {
-    AreaInstance, AreaLayerDefinition, Direction,  EnemyType, GameState,
+    AreaInstance, AreaLayerDefinition, BossType, Direction,  EnemyType, GameState,
     LootType, MagicElement,
     ObjectDefinition, ObjectStatus, ObjectType,
     PanelRows, PropertyRow, ShortRectangle, Tile, TileGrid,
 } from 'app/types';
 
-type EditorToolType = 'brush' | 'delete' | 'object' | 'replace' | 'select';
+type EditorToolType = 'brush' | 'delete' | 'object' | 'enemy' | 'boss' | 'replace' | 'select';
 export interface EditingState {
     amount: number,
     tool: EditorToolType,
@@ -43,6 +44,7 @@ export interface EditingState {
     direction: Direction,
     selectedLayerIndex: number,
     element?: MagicElement,
+    bossType: BossType,
     enemyType: EnemyType,
     entranceTargetZone?: string,
     entranceTargetObjectId?: string,
@@ -74,6 +76,7 @@ export const editingState: EditingState = {
     // Default editing the field, not the floor.
     selectedLayerIndex: 1,
     element: null,
+    bossType: 'beetleBoss',
     enemyType: 'snake',
     entranceTargetZone: null,
     entranceTargetObjectId: null,
@@ -279,13 +282,13 @@ export function displayTileEditorPropertyPanel() {
         rows.push({
             name: 'tool',
             value: editingState.tool,
-            values: ['select', 'brush', 'delete', 'replace', 'object'],
+            values: ['select', 'brush', 'delete', 'replace', 'object', 'enemy', 'boss'],
             onChange(tool: EditorToolType) {
                 editingState.tool = tool;
                 displayTileEditorPropertyPanel();
             },
         });
-        if (editingState.tool !== 'object') {
+        if (editingState.tool !== 'object' && editingState.tool !== 'enemy' && editingState.tool !== 'boss') {
             rows.push({
                 name: 'palette',
                 value: selectedPaletteKey,
@@ -324,6 +327,12 @@ export function displayTileEditorPropertyPanel() {
                         return editingState.replacePercentage;
                     }
                 });
+                break;
+            case 'enemy':
+                rows = [...rows, ...getObjectTypeProperties(state, editingState, {type: 'enemy'} as ObjectDefinition)];
+                break;
+            case 'boss':
+                rows = [...rows, ...getObjectTypeProperties(state, editingState, {type: 'boss'} as ObjectDefinition)];
                 break;
             case 'object':
                 rows = [...rows, ...getObjectProperties(state, editingState)];
@@ -439,6 +448,8 @@ mainCanvas.addEventListener('mousedown', function () {
         case 'select':
             onMouseDownSelect(state, editingState, x, y);
             break;
+        case 'boss':
+        case 'enemy':
         case 'object':
             onMouseDownObject(state, editingState, x, y);
             break;
@@ -558,7 +569,7 @@ export function renderEditor(context: CanvasRenderingContext2D, state: GameState
         return;
     }
     // Unselect objects that are no longer in the current area.
-    if (editingState.selectedObject && !state.areaInstance.objects.find(o => o.definition === editingState.selectedObject)) {
+    if (editingState.selectedObject && !state.areaInstance.definition.objects.find(o => o === editingState.selectedObject)) {
         editingState.selectedObject = null;
         displayTileEditorPropertyPanel();
     }
@@ -582,8 +593,8 @@ function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, a
             instance.status = 'normal';
             instance.render(context, state);
             // drawFrame(context, frame, {...frame, x: object.x - (frame.content?.x || 0), y: object.y - (frame.content?.y || 0)});
-            // While editing, draw the loot inside the chest on top as well.
-            if (object.type === 'chest') {
+            // While editing, draw the loot inside the chest/boss on top as well.
+            if (object.type === 'chest' || object.type === 'boss') {
                 const frame = lootFrames[object.lootType] || lootFrames.unknown;
                 drawFrame(context, frame, {...frame, x: object.x - (frame.content?.x || 0), y: object.y - (frame.content?.y || 0)});
             }
@@ -606,7 +617,7 @@ function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, a
             context.fillStyle = 'white';
             context.fillRect(target.x, target.y, target.w, target.h);
         }
-        if (area === state.areaInstance && editingState.tool === 'object') {
+        if (area === state.areaInstance && ['object', 'enemy', 'boss'].includes(editingState.tool)) {
             renderObjectPreview(context, state, editingState, x, y);
         }
     context.restore();

@@ -245,7 +245,7 @@ function updateField(state: GameState) {
 
 function removeDefeatedEnemies(state: GameState, area: AreaInstance): void {
     const originalLength = area.objects.length;
-    area.objects = area.objects.filter(e => !(e instanceof Enemy) || e.life > 0);
+    area.objects = area.objects.filter(e => !(e instanceof Enemy) || (e.life > 0 && e.status !== 'gone'));
     // If an enemy was defeated, check if all enemies are defeated to see if any doors open or treasures appear.
     if (originalLength > area.objects.length) {
         checkIfAllEnemiesAreDefeated(state, area);

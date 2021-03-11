@@ -86,7 +86,7 @@ export function getTileBehaviorsAndObstacles(
     area: AreaInstance,
     {x, y}: Tile,
     excludeObjects: Set<any> = null
-): {tileBehavior: TileBehaviors, objects: ObjectInstance[]} {
+): {tileBehavior: TileBehaviors, tx: number, ty: number, objects: ObjectInstance[]} {
     const objects: ObjectInstance[] = [];
     const tx = Math.floor(x / 16);
     const ty = Math.floor(y / 16);
@@ -117,6 +117,6 @@ export function getTileBehaviorsAndObstacles(
             }
         }
     }
-    return { tileBehavior, objects };
+    return { tileBehavior, tx, ty, objects };
 }
 
