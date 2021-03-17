@@ -34,6 +34,12 @@ export type CommonLoot = 'money' | 'peach';
 export type LootType = 'weapon' | ActiveTool | Equipment | PassiveTool | MagicElement | Collectible | CommonLoot | 'unknown';
 
 
+export interface LootTable {
+    totalWeight: number,
+    thresholds:  number[],
+    loot: {type: LootType, amount?: number}[],
+}
+
 export type AnimationSet = {
     [key in Direction]: FrameAnimation
 }

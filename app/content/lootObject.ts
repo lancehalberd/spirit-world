@@ -9,8 +9,34 @@ import { rectanglesOverlap } from 'app/utils/index';
 
 import {
     ActiveTool, AreaInstance, BossObjectDefinition, Frame, GameState, LootObjectDefinition,
-    LootType, ObjectInstance, ObjectStatus, ShortRectangle,
+    LootTable, LootType, ObjectInstance, ObjectStatus, ShortRectangle,
 } from 'app/types';
+
+
+function rollItem(table: LootTable) {
+    const roll = Math.random() * table.totalWeight;
+    let i = 0;
+    while (roll > table.thresholds[i]) i++;
+    return table.loot[i];
+}
+
+export function dropItemFromTable(state: GameState, area: AreaInstance, lootTable: LootTable, x: number, y: number) {
+    const item = rollItem(lootTable);
+    if (item) {
+        const drop = new LootDropObject({
+            id: 'drop',
+            type: 'loot',
+            lootType: item.type,
+            lootAmount: item.amount || 1,
+            x,
+            y,
+            status: 'normal'
+        });
+        addObjectToArea(state, state.areaInstance, drop);
+        drop.x -= drop.frame.w / 2;
+        drop.y -= drop.frame.h / 2;
+    }
+}
 
 export class LootGetAnimation implements ObjectInstance {
     definition = null;
@@ -23,7 +49,7 @@ export class LootGetAnimation implements ObjectInstance {
     constructor(loot: LootObjectDefinition | BossObjectDefinition) {
         this.loot = loot;
         const state = getState();
-        const frame = lootFrames[this.loot.lootType] || lootFrames.unknown;
+        const frame = getLootFrame(loot);
         const hero = state.hero.activeClone || state.hero;
         this.x = (loot.type === 'chest' ? loot.x + chestOpenedFrame.w / 2 : hero.x + hero.w / 2) - frame.w / 2;
         this.y = (loot.type === 'chest' ? loot.y + 8 : hero.y - 4);
@@ -35,13 +61,13 @@ export class LootGetAnimation implements ObjectInstance {
         }
         this.animationTime += FRAME_LENGTH;
         if (this.animationTime === 1000) {
-            showLootMessage(state, this.loot.lootType, this.loot.lootLevel);
+            showLootMessage(state, this.loot.lootType, this.loot.lootLevel, this.loot.lootAmount);
         } else if (this.animationTime > 1000) {
             removeObjectFromArea(state, this);
         }
     }
     render(context, state: GameState) {
-        const frame = lootFrames[this.loot.lootType] || lootFrames.unknown;
+        const frame = getLootFrame(this.loot);
         drawFrame(context, frame, { ...frame, x: this.x, y: this.y - this.z });
     }
 }
@@ -49,7 +75,7 @@ export class LootGetAnimation implements ObjectInstance {
 const equipToolMessage = '{|}Press {B_MENU} to open your menu.'
     + '{|}Select a tool and press {B_TOOL} to assign it.';
 
-function showLootMessage(state: GameState, lootType: LootType, level?: number): void {
+function showLootMessage(state: GameState, lootType: LootType, lootLevel?: number, lootAmount?: number): void {
     switch (lootType) {
         case 'weapon':
             if (state.hero.weapon === 1) {
@@ -111,6 +137,8 @@ function showLootMessage(state: GameState, lootType: LootType, level?: number): 
             return showMessage(state, 'You found a new element!'
                 + '{|}Press {B_PREV_ELEMENT}/{B_NEXT_ELEMENT} to switch elements.'
                 + '{|}Changing your element has no effect for now.');
+        case 'money':
+            return showMessage(state, `You found ${lootAmount || 1} coins!`);
     }
 }
 
@@ -125,7 +153,7 @@ export class LootObject implements ObjectInstance {
     status: ObjectStatus;
     constructor(definition: LootObjectDefinition) {
         this.definition = definition;
-        this.frame = lootFrames[definition.lootType] || lootFrames.unknown;
+        this.frame = getLootFrame(definition);
         this.x = definition.x;
         this.y = definition.y;
         this.status = definition.status || 'normal';
@@ -257,7 +285,7 @@ function createLootFrame(color: string, letter: string, size: number = 16): Fram
     return {image: toolCanvas, x: 0, y: 0, w: toolCanvas.width, h: toolCanvas.height};
 }
 
-export const lootFrames: Partial<{[key in LootType]: Frame}> = {
+const lootFrames: Partial<{[key in LootType]: Frame}> = {
     bow: createLootFrame('red', 'B'),
     catEyes: createLootFrame('blue', 'E'),
     clone: createLootFrame('red', 'C'),
@@ -272,6 +300,27 @@ export const lootFrames: Partial<{[key in LootType]: Frame}> = {
     spiritSight: createLootFrame('blue', 'SE'),
     unknown: createLootFrame('black', '?'),
     weapon: weaponFrame,
+};
+
+
+const [smallCoin, , , bigCoin, , , , otherCoin, mediumCoin] =
+    createAnimation('gfx/hud/coins.png', {w: 16, h: 16}, {cols: 9}).frames;
+export function getLootFrame({lootType, lootLevel, lootAmount}:
+    {lootType: LootType, lootLevel?: number, lootAmount?: number}
+): Frame {
+    if (lootType === 'money') {
+        if (!lootAmount || lootAmount === 1) {
+            return smallCoin;
+        }
+        if (lootAmount === 5) {
+            return mediumCoin;
+        }
+        if (lootAmount === 20) {
+            return bigCoin;
+        }
+        return otherCoin;
+    }
+    return lootFrames[lootType] || lootFrames.unknown;
 }
 
 export function applyUpgrade(currentLevel: number, loot: LootObjectDefinition | BossObjectDefinition): number {

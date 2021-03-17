@@ -4,7 +4,7 @@ import { addObjectToArea, linkObject, removeObjectFromArea } from 'app/content/a
 import { createObjectInstance } from 'app/content/objects';
 import { doorStyles } from 'app/content/door';
 import { signStyles } from 'app/content/objects/sign';
-import { lootFrames } from 'app/content/lootObject';
+import { getLootFrame } from 'app/content/lootObject';
 import { zones } from 'app/content/zones';
 import { displayTileEditorPropertyPanel, EditingState } from 'app/development/tileEditor';
 import { getState } from 'app/state';
@@ -24,6 +24,7 @@ export function getLootTypes(): LootType[] {
         allLootTypes = [
             'peachOfImmortality',
             'peachOfImmortalityPiece',
+            'money',
             'weapon',
             ...(Object.keys(state.hero.activeTools) as LootType[]),
             ...(Object.keys(state.hero.passiveTools) as LootType[]),
@@ -664,14 +665,14 @@ export function updateObjectId(state: GameState, object: ObjectDefinition, id: s
 
 export function getObjectFrame(object: ObjectDefinition): FrameDimensions {
     if (object.type === 'loot') {
-        return lootFrames[object.lootType] || lootFrames.unknown;
+        return getLootFrame(object);
     }
     const state = getState();
     const instance = createObjectInstance(state, object);
     if (instance.getHitbox) {
         return instance.getHitbox(state);
     }
-    return lootFrames.unknown;
+    return getLootFrame({lootType: 'unknown'});
 }
 
 export function isPointInObject(x: number, y: number, object: ObjectDefinition): boolean {

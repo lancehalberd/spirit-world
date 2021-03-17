@@ -1,4 +1,4 @@
-import { lootFrames } from 'app/content/lootObject';
+import { getLootFrame } from 'app/content/lootObject';
 import { LEFT_TOOL_COLOR, RIGHT_TOOL_COLOR, CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { fillRect, pad } from 'app/utils/index';
@@ -30,7 +30,7 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
 
     const selectableItemFrames = [];
     function renderSelectableTool(tool: ActiveTool): void {
-        const frame = lootFrames[tool] || lootFrames.unknown;
+        const frame = getLootFrame({ lootType: tool, lootLevel: state.hero.activeTools[tool] });
         const target = {...frame, x: (x + 8 - frame.w / 2), y: (y + 8 - frame.h / 2)};
         if (state.hero.leftTool === tool) {
             fillRect(context, pad(target, 2), LEFT_TOOL_COLOR);
@@ -59,7 +59,7 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
     x += 60;
 
     if (state.hero.weapon) {
-        const frame = lootFrames.weapon || lootFrames.unknown;
+        const frame = getLootFrame({ lootType: 'weapon', lootLevel: state.hero.weapon });
         drawFrame(context, frame, {...frame, x: (x + 8 - frame.w / 2), y: (y + 8 - frame.h / 2)});
     }
 
@@ -76,11 +76,11 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
     context.textBaseline = 'middle';
     context.textAlign = 'center';
     context.font = '12px Arial';
-    function renderLoot(lootType: LootType, level: number): void {
-        const frame = lootFrames[lootType] || lootFrames.unknown;
+    function renderLoot(lootType: LootType, lootLevel: number): void {
+        const frame = getLootFrame({ lootType, lootLevel });
         drawFrame(context, frame, {...frame, x: (x + 8 - frame.w / 2), y: (y + 8 - frame.h / 2)});
         context.fillStyle = 'white';
-        context.fillText(`${level}`, x + 20, y + 8);
+        context.fillText(`${lootLevel}`, x + 20, y + 8);
         x += 28;
         if (x + 24 >= r.x + r.w) {
             y += 20;

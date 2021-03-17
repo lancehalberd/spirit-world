@@ -1,5 +1,5 @@
 import {
-    Frame, GameState, Hero, LootType, MagicElement,
+    Frame, GameState, Hero, LootTable, LootType, MagicElement,
     ShortRectangle,
 } from 'app/types';
 
@@ -18,8 +18,7 @@ export interface TileBehaviors {
     jumpDirection?: Direction,
     // If this is true then this tile will link to a matching tile in the alternate world.
     linked?: boolean,
-    lootChance?: number,
-    lootTypes?: LootType[],
+    lootTable?: LootTable,
     // If this is true projectiles can pass over this tile even if it is solid.
     // Also, the bow won't cut low tiles like thorns.
     low?: boolean,

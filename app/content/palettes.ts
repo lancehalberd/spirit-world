@@ -1,5 +1,6 @@
 import _ from 'lodash';
 
+import { simpleLootTable, lifeLootTable, moneyLootTable } from 'app/content/lootTables';
 import { createCanvasAndContext } from 'app/dom';
 import { createAnimation } from 'app/utils/animations';
 import { allImagesLoaded, requireImage } from 'app/utils/images';
@@ -33,18 +34,18 @@ const lightStoneParticles: Frame[] = createAnimation('gfx/tiles/rocks.png', {w: 
 const heavyStoneParticles: Frame[] = createAnimation('gfx/tiles/rocks.png', {w: 16, h: 16}, {x: 7, cols: 3}).frames;
 const thornParticles: Frame[] = createAnimation('gfx/tiles/thorns.png', {w: 16, h: 16}, {x: 2, cols: 5}).frames;
 const bushBehavior: TileBehaviors = {
-    solid: true, pickupWeight: 0, cuttable: 1, lootChance: 0.5, lootTypes: ['peach'],
+    solid: true, pickupWeight: 0, cuttable: 1, lootTable: lifeLootTable,
     underTile: {x: 5, y: 1},
     particles: bushParticles,
     linked: true,
 };
 const lightStoneBehavior: TileBehaviors = {
-    low: true, solid: true, pickupWeight: 1, lootChance: 0.2, lootTypes: ['peach'],
+    low: true, solid: true, pickupWeight: 1, lootTable: simpleLootTable,
     particles: lightStoneParticles,
     linked: true,
 };
 const heavyStoneBehavior: TileBehaviors = {
-    low: true, solid: true, pickupWeight: 1, lootChance: 0.2, lootTypes: ['peach'],
+    low: true, solid: true, pickupWeight: 1, lootTable: moneyLootTable,
     particles: heavyStoneParticles,
     linked: true,
 };

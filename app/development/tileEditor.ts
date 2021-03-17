@@ -5,7 +5,7 @@ import {
     initializeAreaLayerTiles, resetTileBehavior,
 } from 'app/content/areas';
 import { palettes } from 'app/content/palettes';
-import { lootFrames } from 'app/content/lootObject';
+import { getLootFrame } from 'app/content/lootObject';
 import { createObjectInstance } from 'app/content/objects';
 import {
     deleteObject,
@@ -595,7 +595,7 @@ function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, a
             // drawFrame(context, frame, {...frame, x: object.x - (frame.content?.x || 0), y: object.y - (frame.content?.y || 0)});
             // While editing, draw the loot inside the chest/boss on top as well.
             if (object.type === 'chest' || object.type === 'boss') {
-                const frame = lootFrames[object.lootType] || lootFrames.unknown;
+                const frame = getLootFrame(object);
                 drawFrame(context, frame, {...frame, x: object.x - (frame.content?.x || 0), y: object.y - (frame.content?.y || 0)});
             }
         }

@@ -2,7 +2,7 @@ import _ from 'lodash';
 
 import { changeObjectStatus, createObjectInstance, findObjectInstanceById } from 'app/content/objects';
 import { palettes } from 'app/content/palettes';
-import { LootDropObject } from 'app/content/lootObject';
+import { dropItemFromTable } from 'app/content/lootObject';
 import { zones } from 'app/content/zones';
 import { createCanvasAndContext } from 'app/dom';
 import { isPointInShortRect } from 'app/utils/index';
@@ -10,7 +10,8 @@ import { updateCamera } from 'app/updateCamera';
 
 import {
     AreaDefinition, AreaInstance, AreaLayerDefinition,
-    Direction, Enemy, GameState, Hero, LayerTile, ObjectInstance, ShortRectangle, Tile, TileBehaviors,
+    Direction, Enemy, GameState, Hero, LayerTile,
+    ObjectInstance, ShortRectangle, Tile, TileBehaviors,
     ZoneLocation,
 } from 'app/types';
 
@@ -543,23 +544,14 @@ export function destroyTile(state: GameState, area: AreaInstance, target: LayerT
     layer.tiles[target.y][target.x] = underTile;
 
     resetTileBehavior(area, target);
-    if (Math.random() < behavior?.lootChance) {
-        const lootType = _.sample(behavior.lootTypes || []);
-        if (lootType) {
-            const drop = new LootDropObject({
-                id: 'drop',
-                type: 'loot',
-                lootType,
-                x: target.x * area.palette.w,
-                y: target.y * area.palette.h,
-                status: 'normal'
-            });
-            addObjectToArea(state, area, drop);
-            drop.x += (area.palette.w - drop.frame.w) / 2;
-            drop.y += (area.palette.h - drop.frame.h) / 2;
-        }
+    if (behavior?.lootTable) {
+        dropItemFromTable(state, area, behavior.lootTable,
+            (target.x + 0.5) * area.palette.w,
+            (target.y + 0.5) * area.palette.h
+        );
     }
 }
+
 
 export function checkIfAllEnemiesAreDefeated(state: GameState, area: AreaInstance): void {
     if (area.objects.some(e => (e instanceof Enemy) && e.isInCurrentSection(state))) {

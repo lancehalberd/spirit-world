@@ -1,7 +1,8 @@
 import _ from 'lodash';
 
 import { AnimationEffect } from 'app/content/animationEffect';
-import { getLoot } from 'app/content/lootObject';
+import { dropItemFromTable, getLoot } from 'app/content/lootObject';
+import { simpleLootTable, lifeLootTable, moneyLootTable } from 'app/content/lootTables';
 import { addObjectToArea, getAreaSize, removeObjectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { moveActor } from 'app/moveActor';
@@ -12,7 +13,7 @@ import { directionMap } from 'app/utils/field';
 import {
     Actor, ActorAnimations, AreaInstance, BossObjectDefinition, BossType, Direction, DrawPriority,
     EnemyType, EnemyObjectDefinition,
-    Frame, FrameAnimation, FrameDimensions, GameState, Hero, MovementProperties,
+    Frame, FrameAnimation, FrameDimensions, GameState, Hero, LootTable, MovementProperties,
     ObjectInstance, ObjectStatus, ShortRectangle,
 } from 'app/types';
 
@@ -104,6 +105,12 @@ export class Enemy implements Actor, ObjectInstance {
             y: hitbox.y + hitbox.h / 2 - enemyDeathAnimation.frames[0].h / 2 * this.scale,
             scale: this.scale,
         });
+        if (this.enemyDefinition.lootTable) {
+            dropItemFromTable(state, this.area, this.enemyDefinition.lootTable,
+                hitbox.x + hitbox.w / 2,
+                hitbox.y + hitbox.h / 2
+            );
+        }
         addObjectToArea(state, this.area, deathAnimation);
         if (this.definition.type === 'boss' && !state.savedState.objectFlags[this.definition.id]) {
             state.savedState.objectFlags[this.definition.id] = true;
@@ -259,6 +266,7 @@ interface EnemyDefinition {
     flying?: boolean,
     hasShadow?: boolean,
     life?: number,
+    lootTable: LootTable,
     speed?: number,
     acceleration?: number,
     scale?: number,
@@ -267,29 +275,42 @@ interface EnemyDefinition {
 }
 
 export const enemyDefinitions: {[key in EnemyType | BossType]: EnemyDefinition} = {
-    snake: {animations: snakeAnimations, life: 2, touchDamage: 1, update: paceRandomly, flipRight: true},
-    beetle: {animations: beetleAnimations, acceleration: 0.05, life: 2, touchDamage: 1, update: scurryAndChase},
+    snake: {
+        animations: snakeAnimations, life: 2, touchDamage: 1, update: paceRandomly, flipRight: true,
+        lootTable: simpleLootTable,
+    },
+    beetle: {
+        animations: beetleAnimations, acceleration: 0.05, life: 2, touchDamage: 1, update: scurryAndChase,
+        lootTable: simpleLootTable,
+    },
     beetleBoss: {
         animations: beetleWingedAnimations, flying: true, scale: 4,
         acceleration: 0.5, speed: 2,
-        life: 20, touchDamage: 1, update: updateBeetleBoss
+        life: 20, touchDamage: 1, update: updateBeetleBoss,
+        lootTable: null,
     },
     beetleBossWingedMinionDefinition: {
         animations: beetleWingedAnimations,
         flying: true, acceleration: 0.5, speed: 3,
         life: 1, touchDamage: 1, update: flyBy,
+        lootTable: lifeLootTable,
     },
-    beetleHorned: {animations: beetleHornedAnimations, life: 3, touchDamage: 1, update: paceAndCharge},
+    beetleHorned: {
+        animations: beetleHornedAnimations, life: 3, touchDamage: 1, update: paceAndCharge,
+        lootTable: moneyLootTable,
+    },
     beetleMini: {
         animations: beetleMiniAnimations,
         acceleration: 0.01,
         speed: 0.8,
-        hasShadow: false, life: 1, touchDamage: 1, update: scurryRandomly
+        hasShadow: false, life: 1, touchDamage: 1, update: scurryRandomly,
+        lootTable: lifeLootTable,
     },
     beetleWinged: {
         animations: beetleWingedAnimations,
         flying: true, acceleration: 0.1, aggroRadius: 112,
         life: 1, touchDamage: 1, update: scurryAndChase,
+        lootTable: simpleLootTable,
     },
 };
 
