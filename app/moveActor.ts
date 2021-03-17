@@ -374,7 +374,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
             }
         }
     }
-    if (startSwimming && hero.action !== 'roll') {
+    if (startSwimming && hero.action !== 'roll' && hero.action !== 'entering' && hero.action !== 'exiting') {
         hero.action = 'swimming';
     } else if (!startSwimming && hero.action === 'swimming') {
         hero.action = null;

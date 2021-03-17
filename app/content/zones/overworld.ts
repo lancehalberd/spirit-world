@@ -2,7 +2,7 @@ import { zones } from 'app/content/zones/zoneHash';
 
 import { AreaDefinition } from 'app/types';
 
-const t0 = {x: 10, y: 0}, t1 = {x: 9, y: 0}, t2 = {x: 0, y: 0}, t3 = {x: 14, y: 0}, t4 = {x: 4, y: 1}, t5 = {x: 2, y: 1}, t6 = {x: 11, y: 0}, t7 = {x: 1, y: 1}, t8 = {x: 15, y: 0}, t9 = {x: 3, y: 1}, t10 = {x: 0, y: 1}, t11 = {x: 13, y: 0}, t12 = {x: 12, y: 0};
+const t0 = {x: 10, y: 0}, t1 = {x: 9, y: 0}, t2 = {x: 0, y: 0}, t3 = {x: 14, y: 0}, t4 = {x: 4, y: 1}, t5 = {x: 2, y: 1}, t6 = {x: 11, y: 0}, t7 = {x: 1, y: 1}, t8 = {x: 15, y: 0}, t9 = {x: 3, y: 1}, t10 = {x: 0, y: 1}, t11 = {x: 13, y: 0}, t12 = {x: 12, y: 0}, t13 = {x: 7, y: 1}, t14 = {x: 8, y: 1};
 const f0_0x0: AreaDefinition = {
     layers: [
         {
@@ -392,32 +392,32 @@ const f0_1x1: AreaDefinition = {
                 h: 32,
                 palette: 'floor',
                 tiles: [
-                    [t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0],
-                    [t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0],
-                    [t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0],
-                    [t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0],
-                    [t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0],
-                    [t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0],
-                    [t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0],
-                    [t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0],
-                    [t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0],
-                    [t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0],
-                    [t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0],
-                    [t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0],
-                    [t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0],
-                    [t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0],
-                    [t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0],
-                    [t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0],
-                    [t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0],
-                    [t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0],
-                    [t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0],
-                    [t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0],
-                    [t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0],
-                    [t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0],
-                    [t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0],
-                    [t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0],
-                    [t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0],
-                    [t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0],
+                    [t0,t13,t13,t14,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0],
+                    [t13,t13,t13,t14,t14,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0],
+                    [t13,t13,t13,t13,t14,t14,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0],
+                    [t13,t13,t13,t13,t13,t14,t14,t14,t14,t14,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0],
+                    [t14,t13,t13,t13,t13,t13,t13,t13,t13,t14,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0],
+                    [t14,t14,t14,t14,t13,t13,t13,t13,t13,t14,t14,t0,t0,t0,t0,t0,t13,t13,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0],
+                    [t0,t0,t14,t14,t14,t13,t13,t13,t13,t13,t14,t0,t0,t0,t14,t14,t13,t13,t14,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0],
+                    [t0,t0,t0,t14,t14,t13,t13,t13,t13,t13,t14,t14,t14,t14,t14,t13,t13,t13,t14,t14,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0],
+                    [t0,t0,t0,t0,t14,t13,t13,t13,t13,t13,t14,t13,t13,t13,t13,t13,t13,t13,t13,t14,t14,t14,t14,t0,t0,t0,t0,t0,t0,t0,t0,t0],
+                    [t0,t0,t0,t0,t14,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t14,t14,t0,t0,t0,t0,t0,t0,t0,t0],
+                    [t0,t0,t0,t0,t14,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t14,t14,t14,t0,t0,t0,t0,t0,t0],
+                    [t0,t0,t0,t0,t14,t14,t14,t14,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t14,t0,t0,t0,t0,t0,t0],
+                    [t0,t0,t0,t0,t0,t0,t14,t14,t14,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t14,t14,t0,t0,t0,t0,t0],
+                    [t0,t0,t0,t0,t0,t0,t0,t14,t14,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t14,t0,t0,t0,t0,t0],
+                    [t0,t0,t0,t0,t0,t0,t0,t14,t14,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t14,t0,t0,t0,t0,t0],
+                    [t0,t0,t0,t0,t0,t0,t0,t14,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t14,t14,t0,t0,t0,t0],
+                    [t0,t0,t0,t0,t0,t0,t0,t14,t14,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t14,t0,t0,t0,t0],
+                    [t0,t0,t0,t0,t0,t0,t0,t0,t14,t14,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t14,t0,t0,t0,t0],
+                    [t0,t0,t0,t0,t0,t0,t0,t0,t0,t14,t14,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t14,t0,t0,t0,t0],
+                    [t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t14,t14,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t14,t0,t0,t0,t0],
+                    [t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t14,t14,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t14,t14,t0,t0,t0,t0],
+                    [t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t14,t14,t14,t14,t13,t13,t13,t13,t13,t13,t13,t13,t13,t13,t14,t0,t0,t0,t0,t0],
+                    [t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t14,t14,t13,t13,t13,t13,t13,t13,t13,t13,t14,t14,t14,t14,t0,t0,t0,t0,t0],
+                    [t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t14,t14,t14,t13,t13,t13,t14,t14,t14,t14,t0,t0,t0,t0,t0,t0,t0,t0],
+                    [t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t14,t14,t13,t13,t14,t14,t14,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0],
+                    [t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t14,t14,t14,t14,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0],
                     [t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0],
                     [t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0],
                     [t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0,t0],
@@ -437,24 +437,24 @@ const f0_1x1: AreaDefinition = {
                     [t1,t2,t2,t2,t2,t2,t2,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t1,t2,t2,t2,t1,t1],
                     [t2,t7,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2],
                     [t2,t2,t7,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t5,t2],
-                    [t2,t2,t2,t2,t2,t2,t6,t3,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t9,t2,t2,t2,t2,t2,t2,t2],
-                    [t2,t2,t2,t2,t2,t2,t2,t2,t5,t2,t2,t2,t2,t2,t9,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t6,t2],
-                    [t2,t2,t2,t2,t2,t4,t2,t2,t2,t2,t2,t12,t8,t2,t2,t12,t2,t11,t2,t2,t7,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2],
-                    [t2,t2,t2,t3,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t6,t2,t2,t2,t2,t2,t11,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2],
-                    [t2,t2,t2,t2,t2,t2,t2,t4,t3,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t9,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t1],
+                    [t2,t2,t2,t2,t2,t2,t6,t3,t2,t2,t2,t2,t2,t2,t2,t1,t1,t1,t1,t2,t2,t2,t2,t2,t9,t2,t2,t2,t2,t2,t2,t2],
+                    [t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t1,t1,t1,t1,t1,t1,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t6,t2],
+                    [t2,t2,t2,t2,t2,t4,t2,t2,t2,t2,t2,t12,t8,t2,t1,t1,t2,t2,t1,t1,t7,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2],
+                    [t2,t2,t2,t3,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t1,t1,t2,t2,t1,t1,t2,t11,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2],
+                    [t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t9,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t1],
                     [t1,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t7,t2,t2,t2,t11,t2,t2,t2,t2,t2,t2,t2,t2,t1],
-                    [t1,t2,t2,t2,t6,t2,t2,t2,t2,t11,t2,t2,t2,t10,t9,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t1],
-                    [t1,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t4,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t1],
-                    [t1,t1,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t1],
-                    [t1,t1,t2,t2,t2,t2,t2,t2,t2,t2,t9,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t11,t2,t2,t4,t2,t1],
-                    [t1,t4,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t1],
-                    [t1,t2,t2,t8,t10,t2,t2,t2,t2,t2,t2,t6,t2,t2,t2,t4,t6,t2,t2,t2,t2,t2,t2,t2,t10,t2,t2,t2,t2,t2,t2,t1],
+                    [t1,t2,t2,t2,t6,t2,t2,t2,t2,t11,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t1],
                     [t1,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t1],
-                    [t1,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t9,t2,t2,t2,t6,t2,t2,t2,t2,t2,t10,t2,t2,t2,t2,t2,t2,t2,t1],
-                    [t1,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t12,t2,t8,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t12,t1],
-                    [t1,t2,t7,t2,t2,t12,t2,t2,t2,t2,t6,t2,t2,t2,t2,t2,t5,t2,t2,t9,t2,t2,t2,t2,t2,t2,t2,t3,t6,t2,t2,t1],
-                    [t1,t2,t2,t2,t8,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t5,t2,t2,t2,t2,t2,t6,t2,t1],
-                    [t1,t2,t2,t4,t2,t7,t2,t2,t2,t2,t2,t2,t2,t9,t2,t2,t2,t2,t2,t5,t2,t2,t2,t2,t9,t2,t2,t2,t2,t2,t2,t1],
+                    [t1,t1,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t1],
+                    [t1,t1,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t11,t2,t2,t4,t2,t1],
+                    [t1,t4,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t1],
+                    [t1,t2,t2,t8,t10,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t10,t2,t2,t2,t2,t2,t2,t1],
+                    [t1,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t1],
+                    [t1,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t10,t2,t2,t2,t2,t2,t2,t2,t1],
+                    [t1,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t12,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t12,t1],
+                    [t1,t2,t7,t2,t2,t12,t2,t2,t2,t2,t6,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t3,t6,t2,t2,t1],
+                    [t1,t2,t2,t2,t8,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t6,t2,t1],
+                    [t1,t2,t2,t4,t2,t7,t2,t2,t2,t2,t2,t2,t2,t9,t2,t2,t2,t2,t2,t5,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t1],
                     [t1,t5,t2,t2,t2,t2,t2,t2,t4,t2,t2,t7,t2,t7,t2,t2,t6,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t1],
                     [t1,t2,t2,t2,t2,t2,t2,t2,t2,t6,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t1],
                     [t1,t2,t9,t10,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t8,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t2,t4],
@@ -471,6 +471,7 @@ const f0_1x1: AreaDefinition = {
         },
     ],
     objects: [
+        {id: "peachCaveWaterEntrance", linked: false, spirit: false, status: "normal", x: 256, y: 80, type: "door", style: "normal", targetZone: "newPeachCave", targetObjectId: "newPeachCave:waterEntrance", d: "up"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -852,6 +853,15 @@ const f0_2x2: AreaDefinition = {
         {x: 0, y: 0, w: 32, h: 32},
     ],
 };
+const sf0_0x0: AreaDefinition = null;
+const sf0_0x1: AreaDefinition = null;
+const sf0_0x2: AreaDefinition = null;
+const sf0_1x0: AreaDefinition = null;
+const sf0_1x1: AreaDefinition = null;
+const sf0_1x2: AreaDefinition = null;
+const sf0_2x0: AreaDefinition = null;
+const sf0_2x1: AreaDefinition = null;
+const sf0_2x2: AreaDefinition = null;
 zones.overworld = {
     key: 'overworld',
     floors: [
@@ -862,9 +872,9 @@ zones.overworld = {
                 [f0_2x0,f0_2x1,f0_2x2,],
             ],
             spiritGrid: [
-                [null, null, null],
-                [null, null, null],
-                [null, null, null],
+                [sf0_0x0,sf0_0x1,sf0_0x2,],
+                [sf0_1x0,sf0_1x1,sf0_1x2,],
+                [sf0_2x0,sf0_2x1,sf0_2x2,],
             ],
         },
     ],

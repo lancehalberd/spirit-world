@@ -151,7 +151,23 @@ export function removeAllClones(state: GameState): void {
     state.hero.activeClone = null;
 }
 
-export function enterLocation(state: GameState, location: ZoneLocation): void {
+export function enterLocation(
+    state: GameState,
+    location: ZoneLocation,
+    instant: boolean = true,
+    callback: () => void = null
+): void {
+    if (!instant) {
+        if (state.location?.zoneKey !== location.zoneKey || state.location?.floor !== location.floor) {
+            state.transitionState = {
+                callback,
+                nextLocation: location,
+                time: 0,
+                type: state.location?.zoneKey !== location.zoneKey ? 'circle' : 'fade',
+            };
+            return;
+        }
+    }
     state.location = {
         ...location,
         areaGridCoords: {...location.areaGridCoords},
@@ -212,7 +228,13 @@ export function linkObject(object: ObjectInstance): void {
     }
 }
 
-export function enterZoneByTarget(state: GameState, zoneKey: string, targetObjectId: string): boolean {
+export function enterZoneByTarget(
+    state: GameState,
+    zoneKey: string,
+    targetObjectId: string,
+    instant: boolean = true,
+    callback: () => void = null
+): boolean {
     const zone = zones[zoneKey];
     if (!zone) {
         console.error(`Missing zone: ${zoneKey}`);
@@ -233,13 +255,15 @@ export function enterZoneByTarget(state: GameState, zoneKey: string, targetObjec
                             y: object.y,
                             d: state.hero.d,
                             isSpiritWorld: inSpiritWorld,
+                        }, instant, () => {
+                            const target = findObjectInstanceById(state.areaInstance, targetObjectId);
+                            if (target?.getHitbox) {
+                                const hitbox = target.getHitbox(state);
+                                state.hero.x = hitbox.x + hitbox.w / 2 - state.hero.w / 2;
+                                state.hero.y = hitbox.y + hitbox.h / 2 - state.hero.h / 2;
+                            }
+                            callback?.();
                         });
-                        const target = findObjectInstanceById(state.areaInstance, targetObjectId);
-                        if (target.getHitbox) {
-                            const hitbox = target.getHitbox(state);
-                            state.hero.x = hitbox.x + hitbox.w / 2 - state.hero.w / 2;
-                            state.hero.y = hitbox.y + hitbox.h / 2 - state.hero.h / 2;
-                        }
                         return true;
                     }
                 }

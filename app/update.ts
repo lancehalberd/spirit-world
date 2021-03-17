@@ -1,7 +1,11 @@
-import { checkIfAllEnemiesAreDefeated } from 'app/content/areas';
+import { checkIfAllEnemiesAreDefeated, enterLocation } from 'app/content/areas';
 import { Enemy } from 'app/content/enemy';
 import { editingState } from 'app/development/tileEditor';
-import { FRAME_LENGTH, GAME_KEY } from 'app/gameConstants';
+import {
+    FRAME_LENGTH, GAME_KEY,
+    FADE_IN_DURATION, FADE_OUT_DURATION,
+    CIRCLE_WIPE_IN_DURATION, CIRCLE_WIPE_OUT_DURATION,
+} from 'app/gameConstants';
 import { updateKeyboardState } from 'app/keyCommands';
 import { initializeGame } from 'app/initialize';
 import { wasGameKeyPressed } from 'app/keyCommands';
@@ -35,7 +39,9 @@ export function update() {
     state.time += FRAME_LENGTH;
     updateKeyboardState(state);
     try {
-        if (state.messageState?.pages) {
+        if (state.transitionState) {
+            updateTransition(state);
+        } else if (state.messageState?.pages) {
             updateMessage(state);
         } else if (state.scene === 'title' || state.scene === 'chooseGameMode' ||
             state.scene === 'deleteSavedGame' || state.scene === 'deleteSavedGameConfirmation'
@@ -239,6 +245,27 @@ function updateField(state: GameState) {
         }
         for (const object of state.areaInstance.objects) {
             object.update?.(state);
+        }
+    }
+}
+
+function updateTransition(state: GameState) {
+    state.transitionState.time += FRAME_LENGTH;
+    if (state.transitionState.type === 'fade') {
+        if (state.transitionState.time === FADE_OUT_DURATION) {
+            enterLocation(state, state.transitionState.nextLocation, true);
+            state.transitionState.callback?.();
+            updateCamera(state);
+        } else if (state.transitionState.time > FADE_OUT_DURATION + FADE_IN_DURATION) {
+            state.transitionState = null;
+        }
+    } else {
+        if (state.transitionState.time === CIRCLE_WIPE_OUT_DURATION) {
+            enterLocation(state, state.transitionState.nextLocation, true);
+            state.transitionState.callback?.();
+            updateCamera(state);
+        } else if (state.transitionState.time > CIRCLE_WIPE_OUT_DURATION + CIRCLE_WIPE_IN_DURATION) {
+            state.transitionState = null;
         }
     }
 }

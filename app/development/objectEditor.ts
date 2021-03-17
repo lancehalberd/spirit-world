@@ -1,8 +1,8 @@
 import _ from 'lodash';
 
 import { addObjectToArea, linkObject, removeObjectFromArea } from 'app/content/areas';
-import { enemyDefinitions } from 'app/content/enemy';
 import { createObjectInstance } from 'app/content/objects';
+import { doorStyles } from 'app/content/door';
 import { signStyles } from 'app/content/objects/sign';
 import { lootFrames } from 'app/content/lootObject';
 import { zones } from 'app/content/zones';
@@ -78,6 +78,7 @@ function createObjectDefinition(
                 ...commonProps,
                 type: definition.type,
                 status: definition.status || editingState.objectStatus,
+                style: definition.style || editingState.style || Object.keys(doorStyles)[0],
                 targetZone: definition.targetZone || editingState.entranceTargetZone,
                 targetObjectId: definition.targetObjectId || editingState.entranceTargetObjectId,
                 d: definition.d || editingState.direction,
@@ -428,19 +429,6 @@ export function getObjectTypeProperties(state: GameState, editingState: EditingS
             break;
         case 'sign':
             rows.push({
-                name: 'style',
-                value: object.style || editingState.style || Object.keys(signStyles)[0],
-                values: Object.keys(signStyles),
-                onChange(style: string) {
-                    if (object.id) {
-                        object.style = style;
-                        updateObjectInstance(state, object);
-                    } else {
-                        editingState.style = style;
-                    }
-                },
-            });
-            rows.push({
                 name: 'message',
                 multiline: true,
                 value: object.id ? object.message : editingState.message,
@@ -455,6 +443,41 @@ export function getObjectTypeProperties(state: GameState, editingState: EditingS
             });
             break;
     }
+    rows = [...rows, ...getStyleFields(state, editingState, object)];
+    return rows;
+}
+
+function getStyleFields(state: GameState, editingState: EditingState, object: ObjectDefinition) {
+    let rows = [];
+    let styles = null;
+    if (object.type === 'sign') {
+        styles = signStyles;
+    } else if (object.type === 'door') {
+        styles = doorStyles;
+    }
+    if (!styles) {
+        return [];
+    }
+
+    if (!styles[editingState.style]) {
+        editingState.style = Object.keys(styles)[0];
+    }
+    if (!styles[object.style]) {
+        object.style = Object.keys(styles)[0];
+    }
+    rows.push({
+        name: 'style',
+        value: object.style || editingState.style || Object.keys(styles)[0],
+        values: Object.keys(styles),
+        onChange(style: string) {
+            if (object.id) {
+                object.style = style;
+                updateObjectInstance(state, object);
+            } else {
+                editingState.style = style;
+            }
+        },
+    });
     return rows;
 }
 
@@ -639,22 +662,9 @@ export function updateObjectId(state: GameState, object: ObjectDefinition, id: s
     return updateObjectId(state, object, `${id}-1`);
 }
 
-const simpleGeometry: FrameDimensions = {w: 16, h: 16};
 export function getObjectFrame(object: ObjectDefinition): FrameDimensions {
-    if (object.type === 'door') {
-        return { w: 32, h: 32 };
-    }
-    if (object.type === 'enemy') {
-        return enemyDefinitions[object.enemyType].animations.idle.down.frames[0]
-    }
     if (object.type === 'loot') {
         return lootFrames[object.lootType] || lootFrames.unknown;
-    }
-    if (object.type === 'chest') {
-        return simpleGeometry;
-    }
-    if (object.type === 'crystalSwitch' || object.type === 'pushPull' || object.type === 'rollingBall') {
-        return simpleGeometry;
     }
     const state = getState();
     const instance = createObjectInstance(state, object);

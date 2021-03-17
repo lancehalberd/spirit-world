@@ -29,13 +29,8 @@ Todo:
 
 
 Current tasks:
-    - Add enemies:
-        - Eggs that hatch into enemies if not destroyed first
-        - Vine enemies that can be knocked to the ground
-    - Sticky Web Ground
     - Enemies drop money:
         1/20 = 20, 1/10 = 5, 40% = 1, 1/4 = life, 1 / 5 = nothing
-    - Make cliffs omni directional (but you can't jump from 'climbing')
     - 50 money chest
     - Difficulty shrine:
         - 50 money per point
@@ -45,6 +40,13 @@ Current tasks:
         - Or second chance is only for boss, and have a single refill tank that you can charge like in metroid?
         - Remove boss webs
         - Reduce boss health
+
+Peach Cave Improvemnts:
+    - Add enemies:
+        - Eggs that hatch into enemies if not destroyed first
+        - Vine enemies that can be knocked to the ground
+    - Sticky Web Ground
+    - Make cliffs omni directional (but you can't jump from 'climbing')
     - Add boss:
         - Spawns eggs
         - Drains light and regains a bit of health for every 25% lost
@@ -84,6 +86,9 @@ Add ability to charge weapon
     Costs 50 mana
     Similar to level 1 but 2 chakrams spin around you at different radiuses for 4 seconds.
 
+Multi-area Boss ideas:
+    - Plant-like boss that is growing in several chambers that you have to move between to defeat.
+    - Boss that escapes and must be chased to different chambers.
 
 Add Small Loot to editor that creates LootDrop
     - locked to tile grid

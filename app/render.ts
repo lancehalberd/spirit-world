@@ -4,7 +4,11 @@ import { Clone } from 'app/content/clone';
 import { Enemy } from 'app/content/enemy';
 import { editingState, renderEditor } from 'app/development/tileEditor';
 import { createCanvasAndContext, mainContext } from 'app/dom';
-import { CANVAS_HEIGHT, CANVAS_WIDTH, MAX_SPIRIT_RADIUS } from 'app/gameConstants';
+import {
+    CANVAS_HEIGHT, CANVAS_WIDTH, MAX_SPIRIT_RADIUS,
+    FADE_IN_DURATION, FADE_OUT_DURATION,
+    CIRCLE_WIPE_IN_DURATION, CIRCLE_WIPE_OUT_DURATION,
+} from 'app/gameConstants';
 import { renderHeroEyes, renderHeroShadow, renderEnemyShadow } from 'app/renderActor';
 import { renderDefeatedMenu } from 'app/renderDefeatedMenu';
 import { renderHUD } from 'app/renderHUD';
@@ -116,6 +120,12 @@ export function render() {
     if (!state?.gameHasBeenInitialized) {
         return;
     }
+    if (state.transitionState) {
+        renderField(context, state);
+        renderHUD(context, state);
+        renderTransition(context, state);
+        return;
+    }
     if (state.messageState?.pages) {
         renderMessage(context, state);
         return;
@@ -141,6 +151,50 @@ export function render() {
     if (!editingState.isEditing) {
         // Draw the HUD onto the field.
         renderHUD(context, state);
+    }
+}
+
+function renderTransition(context: CanvasRenderingContext2D, state: GameState) {
+    if (state.transitionState.type === 'fade') {
+        if (state.transitionState.time <= FADE_OUT_DURATION) {
+            context.save();
+                const p = Math.min(1, 1.5 * state.transitionState.time / FADE_OUT_DURATION);
+                context.globalAlpha = p;
+                context.fillStyle = '#000';
+                context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+            context.restore();
+        } else {
+            context.save();
+                const alpha = 1.5 - 1.5 * (state.transitionState.time - FADE_OUT_DURATION) / FADE_IN_DURATION;
+                context.globalAlpha = Math.max(0, Math.min(1, alpha));
+                context.fillStyle = '#000';
+                context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+            context.restore();
+        }
+    } else {
+        const x = state.hero.x + state.hero.w / 2 - state.camera.x;
+        const y = state.hero.y + 2 - state.camera.y;
+        if (state.transitionState.time <= CIRCLE_WIPE_OUT_DURATION) {
+            context.save();
+                const p = 1 - 1.5 * state.transitionState.time / CIRCLE_WIPE_OUT_DURATION;
+                const radius = Math.max(CANVAS_WIDTH, CANVAS_HEIGHT) * Math.max(0, Math.min(1, p));
+                context.fillStyle = '#000';
+                context.beginPath();
+                context.rect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+                context.arc(x, y, radius, 0, 2 * Math.PI, true);
+                context.fill();
+            context.restore();
+        } else {
+            context.save();
+                const p = 1.5 * (state.transitionState.time - CIRCLE_WIPE_OUT_DURATION) / CIRCLE_WIPE_IN_DURATION - 0.5;
+                const radius = Math.max(CANVAS_WIDTH, CANVAS_HEIGHT) * Math.max(0, Math.min(1, p));
+                context.fillStyle = '#000';
+                context.beginPath();
+                context.rect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+                context.arc(x, y, radius, 0, 2 * Math.PI, true);
+                context.fill();
+            context.restore();
+        }
     }
 }
 

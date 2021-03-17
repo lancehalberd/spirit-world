@@ -28,6 +28,13 @@ export interface GameState {
     zone: Zone,
     areaGrid: AreaGrid,
     location: ZoneLocation,
+    transitionState?: {
+        // The location to switch to after the current screen wipe transition.
+        nextLocation: ZoneLocation,
+        time: number,
+        callback: () => void,
+        type: 'circle' | 'fade',
+    },
     paused: boolean,
     menuIndex: number,
     defeated: boolean,

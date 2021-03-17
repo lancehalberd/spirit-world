@@ -472,7 +472,12 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         checkForEnemyDamage(state, hero);
     }
     // Check for transition to other areas/area sections.
-    if (!state.nextAreaInstance) {
+    const isMovingThroughZoneDoor = hero.actionTarget?.definition?.type === 'door'
+        && hero.actionTarget.definition.targetZone
+        && hero.actionTarget.definition.targetObjectId
+    // Do not trigger the scrolling transition when traveling through a zone door.
+    // Zone doors will eventually use a screen wipe transition.
+    if (!state.nextAreaInstance && !isMovingThroughZoneDoor) {
         // We only move to the next area if the player is moving in the direction of that area.
         // dx/dy handles most cases, but in some cases like moving through doorways we also need to check
         // hero.actionDx

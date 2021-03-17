@@ -4,13 +4,34 @@ import { enterZoneByTarget, resetTileBehavior } from 'app/content/areas';
 import { findObjectInstanceById } from 'app/content/objects';
 import { BITMAP_BOTTOM, BITMAP_LEFT, BITMAP_RIGHT, BITMAP_TOP } from 'app/content/palettes';
 import { directionMap, getDirection } from 'app/utils/field';
-import { boxesIntersect } from 'app/utils/index';
+import { boxesIntersect, isPointInShortRect } from 'app/utils/index';
 
 import {
     AreaInstance, DrawPriority, GameState, ObjectInstance,
-    ObjectStatus, EntranceDefinition, ShortRectangle
+    ObjectStatus, EntranceDefinition, ShortRectangle, TileBehaviors
 } from 'app/types';
 
+
+export const doorStyles = {
+    normal: {
+        w: 32,
+        h: 32,
+    },
+    wideEntrance: {
+        w: 64,
+        h: 16,
+    },
+};
+
+function applyBehaviorToTile(area: AreaInstance, x: number, y: number, behavior: TileBehaviors): void {
+    if (!area.behaviorGrid[y]) {
+        area.behaviorGrid[y] = [];
+    }
+    if (!area.behaviorGrid[y][x]) {
+        area.behaviorGrid[y][x] = {};
+    }
+    area.behaviorGrid[y][x] = {...area.behaviorGrid[y][x], ...behavior};
+}
 
 export class Door implements ObjectInstance {
     linkedObject: Door;
@@ -21,11 +42,13 @@ export class Door implements ObjectInstance {
     x: number;
     y: number;
     status: ObjectStatus = 'normal';
+    style: string = 'normal';
     constructor(state: GameState, definition: EntranceDefinition) {
         this.definition = definition;
         this.x = definition.x;
         this.y = definition.y;
         this.status = definition.status || 'normal';
+        this.style = definition.style || 'normal';
     }
     changeStatus(state: GameState, status: ObjectStatus): void {
         this.status = status;
@@ -34,34 +57,38 @@ export class Door implements ObjectInstance {
         }
         const y = Math.floor(this.y / 16);
         const x = Math.floor(this.x / 16);
-        if (this.status === 'normal') {
-            if (this.definition.d === 'left' || this.definition.d === 'right') {
-                if (this.area.behaviorGrid[y]) {
-                    this.area.behaviorGrid[y][x] = { solidMap: BITMAP_TOP };
-                    this.area.behaviorGrid[y][x + 1] = { solidMap: BITMAP_TOP };
-                }
-                if (this.area.behaviorGrid[y + 1]) {
-                    this.area.behaviorGrid[y + 1][x] = { solidMap: BITMAP_BOTTOM };
-                    this.area.behaviorGrid[y + 1][x + 1] = { solidMap: BITMAP_BOTTOM };
+        if (this.style === 'wideEntrance') {
+            const behaviors = this.status === 'normal' ? { solid: false } : { solid: true};
+            if (this.definition.d === 'up' || this.definition.d === 'down') {
+                applyBehaviorToTile(this.area, x, y, behaviors);
+                applyBehaviorToTile(this.area, x + 1, y, behaviors);
+                applyBehaviorToTile(this.area, x + 2, y, behaviors);
+                applyBehaviorToTile(this.area, x + 3, y, behaviors);
+            } else {
+                applyBehaviorToTile(this.area, x, y, behaviors);
+                applyBehaviorToTile(this.area, x, y + 1, behaviors);
+                applyBehaviorToTile(this.area, x, y + 2, behaviors);
+                applyBehaviorToTile(this.area, x, y + 3, behaviors);
+            }
+        } else if (this.style === 'normal') {
+            if (this.status === 'normal') {
+                if (this.definition.d === 'left' || this.definition.d === 'right') {
+                    applyBehaviorToTile(this.area, x, y, { solidMap: BITMAP_TOP });
+                    applyBehaviorToTile(this.area, x + 1, y, { solidMap: BITMAP_TOP });
+                    applyBehaviorToTile(this.area, x, y + 1, { solidMap: BITMAP_BOTTOM });
+                    applyBehaviorToTile(this.area, x + 1, y + 1, { solidMap: BITMAP_BOTTOM });
+                } else {
+                    applyBehaviorToTile(this.area, x, y, { solidMap: BITMAP_LEFT });
+                    applyBehaviorToTile(this.area, x + 1, y, { solidMap: BITMAP_RIGHT });
+                    applyBehaviorToTile(this.area, x, y + 1, { solidMap: BITMAP_LEFT });
+                    applyBehaviorToTile(this.area, x + 1, y + 1, { solidMap: BITMAP_RIGHT });
                 }
             } else {
-                if (this.area.behaviorGrid[y]) {
-                    this.area.behaviorGrid[y][x] = { solidMap: BITMAP_LEFT };
-                    this.area.behaviorGrid[y][x + 1] = { solidMap: BITMAP_RIGHT };
-                }
-                if (this.area.behaviorGrid[y + 1]) {
-                    this.area.behaviorGrid[y + 1][x] = { solidMap: BITMAP_LEFT };
-                    this.area.behaviorGrid[y + 1][x + 1] = { solidMap: BITMAP_RIGHT };
-                }
-            }
-        } else {
-            if (this.area.behaviorGrid[y]) {
-                this.area.behaviorGrid[y][x] = { solid: true };
-                this.area.behaviorGrid[y][x + 1] = { solid: true };
-            }
-            if (this.area.behaviorGrid[y + 1]) {
-                this.area.behaviorGrid[y + 1][x] = { solid: true };
-                this.area.behaviorGrid[y + 1][x + 1] = { solid: true };
+                const behaviors = { solid: true};
+                applyBehaviorToTile(this.area, x, y, behaviors);
+                applyBehaviorToTile(this.area, x + 1, y, behaviors);
+                applyBehaviorToTile(this.area, x, y + 1, behaviors);
+                applyBehaviorToTile(this.area, x + 1, y + 1, behaviors);
             }
         }
     }
@@ -71,16 +98,33 @@ export class Door implements ObjectInstance {
         this.changeStatus(state, this.status);
     }
     getHitbox(state: GameState): ShortRectangle {
-        return { x: this.x, y: this.y, w: 32, h: 32};
+        if (this.definition.d === 'up' || this.definition.d === 'down') {
+            return { x: this.x, y: this.y, w: doorStyles[this.style].w, h: doorStyles[this.style].h};
+        }
+        return { x: this.x, y: this.y, w: doorStyles[this.style].h, h: doorStyles[this.style].w};
     }
     // This is probably only needed by the editor since doors are not removed during gameplay.
     remove(state: GameState) {
         const y = Math.floor(this.y / 16);
         const x = Math.floor(this.x / 16);
-        resetTileBehavior(this.area, {x, y});
-        resetTileBehavior(this.area, {x: x + 1, y});
-        resetTileBehavior(this.area, {x, y: y + 1});
-        resetTileBehavior(this.area, {x: x + 1, y: y + 1});
+        if (this.style === 'wideEntrance') {
+            if (this.definition.d === 'up' || this.definition.d === 'down') {
+                resetTileBehavior(this.area, {x, y});
+                resetTileBehavior(this.area, {x: x + 1, y});
+                resetTileBehavior(this.area, {x: x + 2, y});
+                resetTileBehavior(this.area, {x: x + 3, y});
+            } else {
+                resetTileBehavior(this.area, {x, y});
+                resetTileBehavior(this.area, {x, y: y + 1});
+                resetTileBehavior(this.area, {x, y: y + 2});
+                resetTileBehavior(this.area, {x, y: y + 3});
+            }
+        } else if (this.style === 'normal') {
+            resetTileBehavior(this.area, {x, y});
+            resetTileBehavior(this.area, {x: x + 1, y});
+            resetTileBehavior(this.area, {x, y: y + 1});
+            resetTileBehavior(this.area, {x: x + 1, y: y + 1});
+        }
         const index = this.area.objects.indexOf(this);
         if (index >= 0) {
             this.area.objects.splice(index, 1);
@@ -92,7 +136,8 @@ export class Door implements ObjectInstance {
         if (hero.area !== this.area) {
             return;
         }
-        if ((!hero.actionTarget || hero.actionTarget === this) && boxesIntersect(hero, this.getHitbox(state))) {
+        const heroIsTouchingDoor = boxesIntersect(hero, this.getHitbox(state));
+        if ((!hero.actionTarget || hero.actionTarget === this) && heroIsTouchingDoor) {
             let shouldEnterDoor = (hero.action !== 'entering' && hero.action !== 'exiting');
             if (!shouldEnterDoor && hero.actionTarget !== this) {
                 const direction = getDirection(-hero.actionDx, -hero.actionDy);
@@ -122,52 +167,67 @@ export class Door implements ObjectInstance {
             const speed = state.nextAreaInstance ? 0.75 : 2;
             hero.x += speed * hero.actionDx;
             hero.y += speed * hero.actionDy;
-            // If we are entering a door with a target zone, make sure we transition to the new zone before
-            // we hit the edge of the screen and trigger the scrolling transition.
-            if (hero.action === 'entering' && this.definition.targetZone && this.definition.targetObjectId) {
-                if (hero.actionFrame > 8) {
-                    if (hero.action === 'entering' && enterZoneByTarget(state, this.definition.targetZone, this.definition.targetObjectId)) {
-                        // We need to reassign hero after calling `enterZoneByTarget` because the active hero may change
-                        // from one clone to another when changing zones.
-                        hero = state.hero.activeClone || state.hero;
-                        hero.action = 'exiting';
-                        const target = findObjectInstanceById(state.areaInstance, this.definition.targetObjectId) as Door;
-                        if (!target){
-                            console.error(state.areaInstance.objects);
-                            console.error(this.definition.targetObjectId);
-                            debugger;
-                        }
-                        hero.actionTarget = target;
-                        // Make sure the hero is coming *out* of the target door.
-                        hero.actionDx = -directionMap[target.definition.d][0];
-                        hero.actionDy = -directionMap[target.definition.d][1];
-                        // This will be the opposite direction of the door they are coming out of.
-                        hero.d = getDirection(hero.actionDx, hero.actionDy);
-                    }
-                }
-            }
-        } else if (hero.actionTarget === this) {
-            hero.action = null;
-            hero.actionTarget = null;
-            hero.actionDx = 0;
-            hero.actionDy = 0;
-            hero.safeD = hero.d;
-            hero.safeX = hero.x;
-            hero.safeY = hero.y;
         }
+        if (hero.actionTarget === this) {
+            const x = hero.x + hero.w / 2 + hero.actionDx * hero.w / 2;
+            const y = hero.y + hero.h / 2 + hero.actionDy * hero.h / 2;
+            const changedZones = !isPointInShortRect(x, y, this.getHitbox(state)) && this.travelToZone(state);
+            if (!changedZones && !heroIsTouchingDoor) {
+                hero.action = null;
+                hero.actionTarget = null;
+                hero.actionDx = 0;
+                hero.actionDy = 0;
+                hero.safeD = hero.d;
+                hero.safeX = hero.x;
+                hero.safeY = hero.y;
+            }
+        }
+    }
+    travelToZone(state: GameState) {
+        let hero = state.hero.activeClone || state.hero;
+        if (hero.action !== 'entering' || !this.definition.targetZone || !this.definition.targetObjectId) {
+            return false;
+        }
+        return enterZoneByTarget(state, this.definition.targetZone, this.definition.targetObjectId, false, () => {
+            // We need to reassign hero after calling `enterZoneByTarget` because the active hero may change
+            // from one clone to another when changing zones.
+            hero = state.hero.activeClone || state.hero;
+            hero.action = 'exiting';
+            const target = findObjectInstanceById(state.areaInstance, this.definition.targetObjectId) as Door;
+            if (!target){
+                console.error(state.areaInstance.objects);
+                console.error(this.definition.targetObjectId);
+                debugger;
+            }
+            hero.actionTarget = target;
+            // Make sure the hero is coming *out* of the target door.
+            hero.actionDx = -directionMap[target.definition.d][0];
+            hero.actionDy = -directionMap[target.definition.d][1];
+            // This will be the opposite direction of the door they are coming out of.
+            hero.d = getDirection(hero.actionDx, hero.actionDy);
+        });
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
         context.fillStyle = '#888';
-        if (this.status === 'normal' || state.hero.actionTarget === this) {
-            if (this.definition.d === 'left' || this.definition.d === 'right') {
-                context.fillRect(this.x, this.y, 32, 8);
-                context.fillRect(this.x, this.y + 24, 32, 8);
+        if (this.style === 'wideEntrance') {
+            if (this.status !== 'normal' && state.hero.actionTarget !== this) {
+                const hitbox = this.getHitbox(state);
+                context.fillRect(hitbox.x, hitbox.y, hitbox.w, hitbox.h);
             } else {
-                context.fillRect(this.x, this.y, 8, 32);
-                context.fillRect(this.x + 24, this.y, 8, 32);
+                // Display nothing when this entrance is open.
             }
-        } else {
-            context.fillRect(this.x, this.y, 32, 32);
+        } else if (this.style === 'normal') {
+            if (this.status === 'normal' || state.hero.actionTarget === this) {
+                if (this.definition.d === 'left' || this.definition.d === 'right') {
+                    context.fillRect(this.x, this.y, 32, 8);
+                    context.fillRect(this.x, this.y + 24, 32, 8);
+                } else {
+                    context.fillRect(this.x, this.y, 8, 32);
+                    context.fillRect(this.x + 24, this.y, 8, 32);
+                }
+            } else {
+                context.fillRect(this.x, this.y, 32, 32);
+            }
         }
     }
 }
