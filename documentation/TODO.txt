@@ -29,9 +29,6 @@ Todo:
 
 
 Current tasks:
-    - Enemies drop money:
-        1/20 = 20, 1/10 = 5, 40% = 1, 1/4 = life, 1 / 5 = nothing
-    - 50 money chest
     - Difficulty shrine:
         - 50 money per point
         - move points around for free
