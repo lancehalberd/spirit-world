@@ -498,13 +498,14 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         } else if (hero.x + hero.w > section.x + section.w && (dx > 0 || hero.actionDx > 0)) {
             setNextAreaSection(state, 'right');
         }
+        const isHeroMovingDown = (dy > 0 || hero.actionDy > 0 || (hero.action === 'jumpingDown' && hero.vy > 0));
         if (hero.y < 0 && (dy < 0 || hero.actionDy < 0)) {
             state.location.areaGridCoords = {
                 x: state.location.areaGridCoords.x,
                 y: (state.location.areaGridCoords.y + state.areaGrid.length - 1) % state.areaGrid.length,
             };
             scrollToArea(state, getAreaFromLocation(state.location), 'up');
-        } else if (hero.y + hero.h > h && (dy > 0 || hero.actionDy > 0)) {
+        } else if (hero.y + hero.h > h && isHeroMovingDown) {
             state.location.areaGridCoords = {
                 x: state.location.areaGridCoords.x,
                 y: (state.location.areaGridCoords.y + 1) % state.areaGrid.length,
@@ -512,7 +513,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             scrollToArea(state, getAreaFromLocation(state.location), 'down');
         } else if (hero.y < section.y && (dy < 0 || hero.actionDy < 0)) {
             setNextAreaSection(state, 'up');
-        } else if (hero.y + hero.h > section.y + section.h && (dy > 0 || hero.actionDy > 0)) {
+        } else if (hero.y + hero.h > section.y + section.h && isHeroMovingDown) {
             setNextAreaSection(state, 'down');
         }
     }
