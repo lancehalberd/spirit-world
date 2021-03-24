@@ -188,13 +188,15 @@ export function getLoot(this: void, state: GameState, definition: LootObjectDefi
     onPickup(state, definition);
     const hero = state.hero.activeClone || state.hero;
     hero.action = 'getItem';
-    hero.actionFrame = 0;
-    addObjectToArea(state, hero.area, new LootGetAnimation(definition));
+    const lootAnimation = new LootGetAnimation(definition);
+    addObjectToArea(state, hero.area, lootAnimation);
+    hero.area.priorityObjects.push([lootAnimation]);
     saveGame();
 }
 
 // Simple loot drop doesn't show the loot animation when collected.
 export class LootDropObject extends LootObject {
+    alwaysReset = true;
     update(state: GameState) {
         if (rectanglesOverlap(state.hero.activeClone || state.hero, {...this.frame, x: this.x, y: this.y})) {
             const onPickup = lootEffects[this.definition.lootType] || lootEffects.unknown;

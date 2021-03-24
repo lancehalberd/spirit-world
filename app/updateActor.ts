@@ -151,7 +151,9 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
     } else if (hero.action === 'getItem') {
         movementSpeed = 0;
         hero.actionFrame++;
-        if (hero.actionFrame >= 50) {
+        // The hero doesn't update while the loot item is displayed, so we don't
+        // need to show this for many frames after the hero starts updating again.
+        if (hero.actionFrame >= 5) {
             hero.action = null;
         }
     } else if (hero.action === 'grabbing') {

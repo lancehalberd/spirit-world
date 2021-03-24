@@ -74,8 +74,7 @@ export class Enemy implements Actor, ObjectInstance {
         if (definition.type === 'boss' && state.savedState.objectFlags[this.definition.id]) {
             this.status = 'gone';
         }
-        // Make sure bosses return to their spawn points when leaving their areas.
-        this.alwaysReset = definition.type === 'boss';
+        this.alwaysReset = this.enemyDefinition.alwaysReset;
         this.drawPriority = this.flying ? 'foreground' : 'sprites';
     }
     getFrame(): Frame {
@@ -141,6 +140,12 @@ export class Enemy implements Actor, ObjectInstance {
             }
             saveGame();
         }
+    }
+    shouldReset(state: GameState) {
+        return true;
+    }
+    shouldRespawn(state: GameState) {
+        return this.alwaysReset;
     }
     update(state: GameState) {
         if (this.status === 'gone') {
@@ -282,6 +287,7 @@ const beetleWingedAnimations: ActorAnimations = {
 };
 
 interface EnemyDefinition {
+    alwaysReset?: boolean,
     animations: ActorAnimations,
     aggroRadius?: number,
     flipRight?: boolean,
@@ -306,12 +312,16 @@ export const enemyDefinitions: {[key in EnemyType | BossType]: EnemyDefinition} 
         lootTable: simpleLootTable,
     },
     beetleBoss: {
+        // Reset the boss to its starting position if you leave the arena.
+        alwaysReset: true,
         animations: beetleWingedAnimations, flying: true, scale: 4,
         acceleration: 0.5, speed: 2,
         life: 16, touchDamage: 1, update: updateBeetleBoss,
         lootTable: null,
     },
     beetleBossWingedMinionDefinition: {
+        // Despawn these if you leave the boss arena.
+        alwaysReset: true,
         animations: beetleWingedAnimations,
         flying: true, acceleration: 0.5, speed: 3,
         life: 1, touchDamage: 1, update: flyBy,

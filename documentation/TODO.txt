@@ -1,12 +1,11 @@
 Test at http://localhost:81/alttp/public/
 
 High Priority Bugs:
-    Items appear on top of bushes when leaving + coming back to section
-        - Just despawn items off screen.
+    Objects shouldn't make sounds from other sections.
+        - For example switches depressing currently make a sound when leaving an area on resetting the area.
     Objects shouldn't be able to float on top of pits.
         - Make objects fall in pits.
         - Pit entrance should pull you in like other pits
-
 
 Low Priority Bugs:
     Pushing on a solid object sitting on thorny ground shouldn't hurt you:
@@ -29,8 +28,9 @@ Todo:
 
 
 Current tasks:
+    - Combine loot/object flags into single object.
+    - Add progress tab to editor to reset flags for bosses/chests.
     - Fix door doesn't open after boss.
-    - Freeze enemies while picking up an item.
     - Difficulty shrine:
         - 50 money per point
         - move points around for free
@@ -39,6 +39,10 @@ Current tasks:
         - Or second chance is only for boss, and have a single refill tank that you can charge like in metroid?
         - Remove boss webs
         - Reduce boss health
+
+Idea:
+    Objects you can bounce off of when jumping
+        - Just make them solid and knock the player back a bit if the player's y velocity is >= some value?
 
 Peach Cave Improvemnts:
     - Add enemies:

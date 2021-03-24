@@ -36,6 +36,7 @@ function applyBehaviorToTile(area: AreaInstance, x: number, y: number, behavior:
 export class Door implements ObjectInstance {
     linkedObject: Door;
     alwaysReset = true;
+    updateDuringTransition = true;
     area: AreaInstance;
     drawPriority: DrawPriority = 'background';
     definition: EntranceDefinition = null;

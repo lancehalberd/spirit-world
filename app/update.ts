@@ -230,24 +230,48 @@ function switchElement(state: GameState, delta: number): void {
 }
 
 function updateField(state: GameState) {
+    if (editingState.isEditing) {
+        updateAllHeroes(state);
+        updateCamera(state);
+        return;
+    }
+    // If any priority objects are defined for the area, only process them
+    // until there are none remaining in the queue.
+    if (state.areaInstance.priorityObjects.length) {
+        const priorityObjects = state.areaInstance.priorityObjects.pop();
+        for (let i = 0; i < priorityObjects.length; i++) {
+            if (state.areaInstance.objects.indexOf(priorityObjects[i]) < 0) {
+                priorityObjects.splice(i--, 1);
+                continue;
+            }
+            priorityObjects[i].update?.(state);
+        }
+        if (priorityObjects.length) {
+            state.areaInstance.priorityObjects.push(priorityObjects);
+        }
+        return;
+    }
     updateAllHeroes(state);
     updateCamera(state);
-    if (!editingState.isEditing) {
-        if (wasGameKeyPressed(state, GAME_KEY.PREVIOUS_ELEMENT)) {
-            switchElement(state, -1);
-        } else if (wasGameKeyPressed(state, GAME_KEY.NEXT_ELEMENT)) {
-            switchElement(state, 1);
+    if (wasGameKeyPressed(state, GAME_KEY.PREVIOUS_ELEMENT)) {
+        switchElement(state, -1);
+    } else if (wasGameKeyPressed(state, GAME_KEY.NEXT_ELEMENT)) {
+        switchElement(state, 1);
+    }
+    removeDefeatedEnemies(state, state.alternateAreaInstance);
+    removeDefeatedEnemies(state, state.areaInstance);
+    const isScreenTransitioning = state.nextAreaInstance || state.nextAreaSection;
+    for (const object of state.alternateAreaInstance?.objects || []) {
+        if (isScreenTransitioning && !object.updateDuringTransition) {
+            continue;
         }
-        removeDefeatedEnemies(state, state.alternateAreaInstance);
-        removeDefeatedEnemies(state, state.areaInstance);
-        if (!state.nextAreaInstance) {
-            for (const object of state.alternateAreaInstance?.objects || []) {
-                object.update?.(state);
-            }
-            for (const object of state.areaInstance.objects) {
-                object.update?.(state);
-            }
+        object.update?.(state);
+    }
+    for (const object of state.areaInstance.objects) {
+        if (isScreenTransitioning && !object.updateDuringTransition) {
+            continue;
         }
+        object.update?.(state);
     }
 }
 

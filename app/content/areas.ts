@@ -431,6 +431,7 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
             palette: palettes[layer.grid.palette]
         })),
         objects: [],
+        priorityObjects: [],
         canvas,
         context,
         cameraOffset: {x: 0, y: 0},
@@ -486,6 +487,25 @@ export function refreshSection(state: GameState, area: AreaInstance, section: Sh
     area.checkToRedrawTiles = true;
     const l = section.x * 16;
     const t = section.y * 16;
+    // Remove any objects from that area that should be reset.
+    // This will permanently remove any objects that reset and don't have definitions, like loot drops.
+    for (const object of [...area.objects]) {
+        // We only want to use definitions from the area itself, not transient objects like minions.
+        const definition = area.definition.objects[area.definition.objects.indexOf(object.definition)];
+        // Only update objects defined in this section
+        if (definition?.x >= l + section.w * 16 || definition?.x < l || definition?.y >= t + section.h * 16 || definition?.y < t) {
+            continue;
+        }
+        if (object.alwaysReset || object.shouldReset && object.shouldReset(state)) {
+            removeObjectFromArea(state, object);
+            // Transient effects or minions summoned by a boss should just be despawned when reset.
+            if (definition) {
+                const object = createObjectInstance(state, definition);
+                addObjectToArea(state, area, object);
+            } else {
+            }
+        }
+    }
     // Reset objects in the section that should be reset.
     for (let i = 0; i < area.definition.objects.length; i++) {
         const definition = area.definition.objects[i];
@@ -494,14 +514,9 @@ export function refreshSection(state: GameState, area: AreaInstance, section: Sh
             continue;
         }
         let object = findObjectInstanceById(area, definition.id, true);
-        if (object) {
-            if (object.alwaysReset) {
-                removeObjectFromArea(state, object);
-                addObjectToArea(state, area, createObjectInstance(state, definition));
-            }
-        } else {
+        if (!object) {
             object = createObjectInstance(state, definition);
-            if (object.alwaysReset) {
+            if (object.alwaysReset || object.shouldRespawn && object.shouldRespawn(state)) {
                 addObjectToArea(state, area, object);
             }
         }

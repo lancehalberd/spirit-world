@@ -482,14 +482,13 @@ function deleteTile(x: number, y: number): void {
     }
     if (!definition.isSpiritWorld) {
         // In the physical world we just replace tiles with the empty tile.
-        tiles[y][x] = {x: 0, y: 0};
-        layer.tiles[y][x] = {x: 0, y: 0};
+        layer.originalTiles[y][x] = layer.tiles[y][x] = tiles[y][x] = {x: 0, y: 0};
         applyTileChangeToSpiritWorld(area.alternateArea, editingState.selectedLayerIndex, x, y, {x: 0, y: 0});
     } else {
         // Clear the tile definition in the spirit world.
         tiles[y][x] = null;
         // And set the instance to use the tile from the parent definition.
-        layer.tiles[y][x] =
+        layer.originalTiles[y][x] = layer.tiles[y][x] =
             definition.parentDefinition.layers[editingState.selectedLayerIndex].grid.tiles[y][x];
     }
     area.tilesDrawn[y][x] = false;
@@ -520,6 +519,7 @@ function drawBrush(x: number, y: number): void {
             const tile = editingState.brush.tiles[y][x]
             tileRow[column] = tile;
             layer.tiles[row][column] = tile;
+            layer.originalTiles[row][column] = tile;
             applyTileChangeToSpiritWorld(area.alternateArea, editingState.selectedLayerIndex, column, row, tile);
             state.areaInstance.tilesDrawn[row][column] = false;
             state.areaInstance.checkToRedrawTiles = true;
@@ -542,6 +542,7 @@ function replaceTiles(x: number, y: number): void {
             if (t.x === tile.x && t.y === tile.y && Math.random() <= editingState.replacePercentage / 100) {
                 layer.definition.grid.tiles[y][x] = replacement;
                 layer.tiles[y][x] = replacement;
+                layer.originalTiles[y][x] = replacement;
                 state.areaInstance.tilesDrawn[y][x] = false;
                 state.areaInstance.checkToRedrawTiles = true;
                 resetTileBehavior(state.areaInstance, {x, y});
