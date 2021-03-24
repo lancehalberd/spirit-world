@@ -49,7 +49,8 @@ export interface TilePalette {
     defaultTiles?: Tile[],
     behaviors?: {
         [key: string]: TileBehaviors,
-    }
+    },
+    stamps?: Tile[][][],
 }
 
 export interface Tile {
@@ -206,6 +207,7 @@ export interface ObjectInstance {
     add?: (state: GameState, area: AreaInstance) => void,
     remove?: (state: GameState) => void,
     render: (context: CanvasRenderingContext2D, state: GameState) => void,
+    renderForeground?: (context: CanvasRenderingContext2D, state: GameState) => void,
 }
 
 export type ObjectStatus = 'active' | 'closed' | 'closedEnemy' | 'closedSwitch'

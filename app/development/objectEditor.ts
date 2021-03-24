@@ -608,7 +608,10 @@ export function onMouseDownSelect(state: GameState, editingState: EditingState, 
 
 export function fixObjectPosition(state: GameState, object: ObjectDefinition): void {
     // Currently all objects snap to the grid except loot outside of chests.
-    if (object.type !== 'loot') {
+    /*if (object.type === 'door' && object.style === 'rectangle') {
+        object.x = Math.round(object.x / 8) * 8;
+        object.y = Math.round(object.y / 8) * 8;
+    } else */if (object.type !== 'loot') {
         object.x = Math.round(object.x / state.areaInstance.palette.w) * state.areaInstance.palette.w;
         object.y = Math.round(object.y / state.areaInstance.palette.h) * state.areaInstance.palette.h;
     }

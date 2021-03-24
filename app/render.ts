@@ -304,7 +304,7 @@ export function renderAreaBackground(context: CanvasRenderingContext2D, state: G
         );
         for (const object of area.objects) {
             if (object.drawPriority === 'background') {
-                object?.render(context, state);
+                object.render?.(context, state);
             }
         }
     context.restore();
@@ -353,8 +353,10 @@ export function renderAreaObjectsAfterHero(context: CanvasRenderingContext2D, st
         translateContextForAreaAndCamera(context, state, area);
         const objectsToRender = [];
         for (const object of area.objects) {
-            if (!object.drawPriority || object.drawPriority === 'foreground') {
-                object?.render(context, state);
+            if (object.renderForeground) {
+                object.renderForeground(context, state);
+            } else if (!object.drawPriority || object.drawPriority === 'foreground') {
+                object.render?.(context, state);
             } else if (object.drawPriority === 'sprites' && object.y > state.hero.y) {
                 if (object.render) {
                     objectsToRender.push(object);

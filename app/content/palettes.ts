@@ -5,7 +5,7 @@ import { createCanvasAndContext } from 'app/dom';
 import { createAnimation } from 'app/utils/animations';
 import { allImagesLoaded, requireImage } from 'app/utils/images';
 
-import { Frame, TileBehaviors, TilePalette } from 'app/types';
+import { Frame, Tile, TileBehaviors, TilePalette } from 'app/types';
 
 export const BITMAP_TOP_RIGHT: Uint16Array = new Uint16Array([
     0xFFFF, 0x7FFF, 0x3FFF, 0x1FFF, 0x0FFF, 0x07FF, 0x03FF, 0x01FF,
@@ -29,6 +29,24 @@ export const BITMAP_RIGHT: Uint16Array = new Uint16Array([
     0x00FF, 0x00FF, 0x00FF, 0x00FF, 0x00FF, 0x00FF, 0x00FF, 0x00FF,
 ]);
 
+
+export const BITMAP_TOP_12: Uint16Array = new Uint16Array([
+    0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
+    0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0, 0, 0, 0,
+]);
+export const BITMAP_BOTTOM_12: Uint16Array = new Uint16Array([
+    0, 0, 0, 0, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
+    0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
+]);
+export const BITMAP_LEFT_12: Uint16Array = new Uint16Array([
+    0xFFF0, 0xFFF0, 0xFFF0, 0xFFF0, 0xFFF0, 0xFFF0, 0xFFF0, 0xFFF0,
+    0xFFF0, 0xFFF0, 0xFFF0, 0xFFF0, 0xFFF0, 0xFFF0, 0xFFF0, 0xFFF0,
+]);
+export const BITMAP_RIGHT_12: Uint16Array = new Uint16Array([
+    0x0FFF, 0x0FFF, 0x0FFF, 0x0FFF, 0x0FFF, 0x0FFF, 0x0FFF, 0x0FFF,
+    0x0FFF, 0x0FFF, 0x0FFF, 0x0FFF, 0x0FFF, 0x0FFF, 0x0FFF, 0x0FFF,
+]);
+
 const bushParticles: Frame[] = createAnimation('gfx/tiles/bush.png', {w: 16, h: 16}, {x: 2, cols: 3}).frames;
 const lightStoneParticles: Frame[] = createAnimation('gfx/tiles/rocks.png', {w: 16, h: 16}, {x: 2, cols: 3}).frames;
 const heavyStoneParticles: Frame[] = createAnimation('gfx/tiles/rocks.png', {w: 16, h: 16}, {x: 7, cols: 3}).frames;
@@ -49,7 +67,7 @@ const heavyStoneBehavior: TileBehaviors = {
     particles: heavyStoneParticles,
     linked: true,
 };
-// const wallBehavior: TileBehaviors = { solid: true };
+const wallBehavior: TileBehaviors = { solid: true };
 const lowWallBehavior: TileBehaviors = { low: true, solid: true };
 const pitBehavior: TileBehaviors = { pit: true };
 const thornBehavior: TileBehaviors = {
@@ -88,7 +106,11 @@ const spiritThornBehavior: TileBehaviors = {
     ...thornBehavior, particles: spiritThornParticles,
 };
 
-function combinePalettes(palettes: TilePalette[]): TilePalette {
+interface TilePaletteStamp extends TilePalette {
+    isStamp?: boolean
+}
+
+function combinePalettes(palettes: TilePaletteStamp[]): TilePalette {
     const size = 16;
     let totalTiles: number = palettes.reduce(
         (sum, palette) => sum + (palette.source.w / size) * (palette.source.h / size), 0);
@@ -110,12 +132,14 @@ function combinePalettes(palettes: TilePalette[]): TilePalette {
     return targetPalette;
 }
 
-function drawCombinedPalettes(targetPalette: TilePalette, canvas: HTMLCanvasElement, palettes: TilePalette[]): void {
+function drawCombinedPalettes(targetPalette: TilePalette, canvas: HTMLCanvasElement, palettes: TilePaletteStamp[]): void {
     const {w, h} = palettes[0];
     const context = canvas.getContext('2d');
     let x = 0, y = 0;
     for (const palette of palettes) {
+        const stamp: Tile[][] = [];
         for (let py = 0; py < palette.source.h / h; py ++) {
+            stamp[py] = [];
             for (let px = 0; px < palette.source.w / w; px ++) {
                 context.drawImage(palette.source.image,
                     palette.source.x + px * w, palette.source.y + py * h, w, h,
@@ -125,12 +149,16 @@ function drawCombinedPalettes(targetPalette: TilePalette, canvas: HTMLCanvasElem
                 if (behaviors) {
                     targetPalette.behaviors[`${x}x${y}`] = behaviors;
                 }
+                stamp[py][x] = {x, y};
                 x++;
                 if (x >= canvas.width / w) {
                     x = 0;
                     y ++;
                 }
             }
+        }
+        if (palette.isStamp) {
+            targetPalette.stamps.push(stamp);
         }
     }
 }
@@ -141,6 +169,16 @@ function singleTilePalette(source: string, behaviors: TileBehaviors = null, x = 
         source: {image: requireImage(source), x, y, w, h},
         behaviors: behaviors ? {'0x0': behaviors} : {},
         defaultTiles: []
+    };
+}
+
+function stampTilePallete(frame: Frame, behaviors: {[key: string]: TileBehaviors} = {}): TilePaletteStamp {
+    return {
+        w: 16, h: 16,
+        source: frame,
+        behaviors,
+        defaultTiles: [],
+        isStamp: true,
     };
 }
 function canvasPalette(draw: (context: CanvasRenderingContext2D) => void, behaviors: TileBehaviors = null): TilePalette {
@@ -182,6 +220,11 @@ const vineTileBase = canvasPalette(context => {
         context.fillRect(6, 0, 4, 6);
 }, { growTiles: [{x: 11, y: 1}]});
 
+const rockWallFrame: Frame = {
+    image: requireImage('gfx/tiles/rockwalltiles.png'),
+    x: 0, y: 0, w: 48, h: 32,
+}
+
 const fieldPalette = {...combinePalettes([
         // This is the empty tile.
         singleTilePalette('gfx/tiles/bush.png', null, -16),
@@ -207,6 +250,10 @@ const fieldPalette = {...combinePalettes([
         solidColorTile('#806000', lowWallBehavior), // cliffBottom
         vineTile,
         vineTileBase,
+        stampTilePallete(rockWallFrame, {
+            '0x0': wallBehavior, '1x0': wallBehavior, '2x0': wallBehavior,
+            '0x1': wallBehavior, '1x1': wallBehavior, '2x1': wallBehavior,
+        }),
     ]),
     defaultTiles: [
         {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0},
@@ -258,6 +305,10 @@ const spiritFieldPalette = {...combinePalettes([
         solidColorTile('#806000', lowWallBehavior), // cliffBottom
         vineTile,
         vineTileBase,
+        stampTilePallete(rockWallFrame, {
+            '0x0': wallBehavior, '1x0': wallBehavior, '2x0': wallBehavior,
+            '0x1': wallBehavior, '1x1': wallBehavior, '2x1': wallBehavior,
+        }),
     ]),
     defaultTiles: [null]
 };

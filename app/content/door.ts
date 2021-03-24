@@ -2,7 +2,11 @@ import _ from 'lodash';
 
 import { enterZoneByTarget, resetTileBehavior } from 'app/content/areas';
 import { findObjectInstanceById } from 'app/content/objects';
-import { BITMAP_BOTTOM, BITMAP_LEFT, BITMAP_RIGHT, BITMAP_TOP } from 'app/content/palettes';
+import {
+    BITMAP_BOTTOM, BITMAP_LEFT, BITMAP_RIGHT, BITMAP_TOP,
+    BITMAP_BOTTOM_12, BITMAP_LEFT_12, BITMAP_RIGHT_12, BITMAP_TOP_12,
+} from 'app/content/palettes';
+import { createAnimation, drawFrame } from 'app/utils/animations';
 import { directionMap, getDirection } from 'app/utils/field';
 import { boxesIntersect, isPointInShortRect } from 'app/utils/index';
 
@@ -13,8 +17,12 @@ import {
 
 
 export const doorStyles = {
-    normal: {
+    square: {
         w: 32,
+        h: 32,
+    },
+    rectangle: {
+        w: 48,
         h: 32,
     },
     wideEntrance: {
@@ -22,6 +30,13 @@ export const doorStyles = {
         h: 16,
     },
 };
+type DoorStyle = keyof typeof doorStyles;
+
+const [
+    /*wall*/, /*crackedWall*/, /*cave*/, doorFrame,
+    openDoor, closedDoor, /*lockedDoorSteel*/, /*lockedDoorWood*/,
+    /*closedDoorMagic*/, /*lockedDoorBig*/,
+] = createAnimation('gfx/tiles/rockwalltiles.png', {w: 48, h: 32}, {cols: 10}).frames;
 
 function applyBehaviorToTile(area: AreaInstance, x: number, y: number, behavior: TileBehaviors): void {
     if (!area.behaviorGrid[y]) {
@@ -43,13 +58,16 @@ export class Door implements ObjectInstance {
     x: number;
     y: number;
     status: ObjectStatus = 'normal';
-    style: string = 'normal';
+    style: DoorStyle = 'square';
     constructor(state: GameState, definition: EntranceDefinition) {
         this.definition = definition;
         this.x = definition.x;
         this.y = definition.y;
         this.status = definition.status || 'normal';
-        this.style = definition.style || 'normal';
+        this.style = definition.style as DoorStyle;
+        if (!doorStyles[this.style]) {
+            this.style = 'square';
+        }
     }
     changeStatus(state: GameState, status: ObjectStatus): void {
         this.status = status;
@@ -71,7 +89,7 @@ export class Door implements ObjectInstance {
                 applyBehaviorToTile(this.area, x, y + 2, behaviors);
                 applyBehaviorToTile(this.area, x, y + 3, behaviors);
             }
-        } else if (this.style === 'normal') {
+        } else if (this.style === 'square') {
             if (this.status === 'normal') {
                 if (this.definition.d === 'left' || this.definition.d === 'right') {
                     applyBehaviorToTile(this.area, x, y, { solidMap: BITMAP_TOP });
@@ -90,6 +108,37 @@ export class Door implements ObjectInstance {
                 applyBehaviorToTile(this.area, x + 1, y, behaviors);
                 applyBehaviorToTile(this.area, x, y + 1, behaviors);
                 applyBehaviorToTile(this.area, x + 1, y + 1, behaviors);
+            }
+        } else if (this.style === 'rectangle') {
+            if (this.status === 'normal') {
+                if (this.definition.d === 'left' || this.definition.d === 'right') {
+                    applyBehaviorToTile(this.area, x, y, { solidMap: BITMAP_TOP_12 });
+                    applyBehaviorToTile(this.area, x + 1, y, { solidMap: BITMAP_TOP_12 });
+                    applyBehaviorToTile(this.area, x, y + 1, { solid: false });
+                    applyBehaviorToTile(this.area, x + 1, y + 1, { solid: false });
+                    applyBehaviorToTile(this.area, x, y + 2, { solidMap: BITMAP_BOTTOM_12 });
+                    applyBehaviorToTile(this.area, x + 1, y + 2, { solidMap: BITMAP_BOTTOM_12 });
+                } else {
+                    applyBehaviorToTile(this.area, x, y, { solidMap: BITMAP_LEFT_12 });
+                    applyBehaviorToTile(this.area, x + 1, y, { solid: false });
+                    applyBehaviorToTile(this.area, x + 2, y, { solidMap: BITMAP_RIGHT_12 });
+                    applyBehaviorToTile(this.area, x, y + 1, { solidMap: BITMAP_LEFT_12 });
+                    applyBehaviorToTile(this.area, x + 1, y + 1, { solid: false });
+                    applyBehaviorToTile(this.area, x + 2, y + 1, { solidMap: BITMAP_RIGHT_12 });
+                }
+            } else {
+                const behaviors = { solid: true};
+                applyBehaviorToTile(this.area, x, y, behaviors);
+                applyBehaviorToTile(this.area, x + 1, y, behaviors);
+                applyBehaviorToTile(this.area, x, y + 1, behaviors);
+                applyBehaviorToTile(this.area, x + 1, y + 1, behaviors);
+                if (this.definition.d === 'left' || this.definition.d === 'right') {
+                    applyBehaviorToTile(this.area, x, y + 2, behaviors);
+                    applyBehaviorToTile(this.area, x + 1, y + 2, behaviors);
+                } else {
+                    applyBehaviorToTile(this.area, x + 2, y, behaviors);
+                    applyBehaviorToTile(this.area, x + 2, y + 1, behaviors);
+                }
             }
         }
     }
@@ -120,7 +169,7 @@ export class Door implements ObjectInstance {
                 resetTileBehavior(this.area, {x, y: y + 2});
                 resetTileBehavior(this.area, {x, y: y + 3});
             }
-        } else if (this.style === 'normal') {
+        } else if (this.style === 'square') {
             resetTileBehavior(this.area, {x, y});
             resetTileBehavior(this.area, {x: x + 1, y});
             resetTileBehavior(this.area, {x, y: y + 1});
@@ -217,7 +266,7 @@ export class Door implements ObjectInstance {
             } else {
                 // Display nothing when this entrance is open.
             }
-        } else if (this.style === 'normal') {
+        } else if (this.style === 'square') {
             if (this.status === 'normal' || state.hero.actionTarget === this) {
                 if (this.definition.d === 'left' || this.definition.d === 'right') {
                     context.fillRect(this.x, this.y, 32, 8);
@@ -229,6 +278,43 @@ export class Door implements ObjectInstance {
             } else {
                 context.fillRect(this.x, this.y, 32, 32);
             }
+        } else if (this.style === 'rectangle') {
+            let rotation = 0;
+            if (this.definition.d === 'left') {
+                rotation = -Math.PI / 2;
+            } else if (this.definition.d  === 'down') {
+                rotation = Math.PI;
+            } else if (this.definition.d  === 'right') {
+                rotation = Math.PI / 2;
+            }
+            let frame = doorFrame;
+            context.save();
+                const hitbox = this.getHitbox(state);
+                context.translate(hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2);
+                context.rotate(rotation);
+                drawFrame(context, frame, { ...frame, x: -frame.w / 2, y: -frame.h / 2 });
+                frame = this.status === 'normal' ? openDoor : closedDoor;
+                drawFrame(context, frame, { ...frame, x: -frame.w / 2, y: -frame.h / 2 });
+            context.restore();
+        }
+    }
+    renderForeground(context: CanvasRenderingContext2D, state: GameState) {
+        if (this.style === 'rectangle') {
+            let rotation = 0;
+            if (this.definition.d === 'left') {
+                rotation = -Math.PI / 2;
+            } else if (this.definition.d  === 'down') {
+                rotation = Math.PI;
+            } else if (this.definition.d  === 'right') {
+                rotation = Math.PI / 2;
+            }
+            let frame = {...doorFrame, h: doorFrame.h / 2};
+            context.save();
+                const hitbox = this.getHitbox(state);
+                context.translate(hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2);
+                context.rotate(rotation);
+                drawFrame(context, frame, { ...frame, x: -doorFrame.w / 2, y: -doorFrame.h / 2 });
+            context.restore();
         }
     }
 }
