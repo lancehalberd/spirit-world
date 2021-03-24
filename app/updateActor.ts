@@ -22,6 +22,7 @@ import { fallAnimation } from 'app/renderActor';
 import { useTool } from 'app/useTool';
 import { directionMap, getDirection, isPointOpen } from 'app/utils/field';
 import { rectanglesOverlap } from 'app/utils/index';
+import { playSound } from 'app/utils/sounds';
 
 import { Actor, Clone, GameState, Hero, ObjectInstance, ThrownChakram, ThrownObject, Tile } from 'app/types';
 
@@ -211,6 +212,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
                     if (hero.explosionTime >= EXPLOSION_TIME) {
                         hero.action = null;
                         hero.explosionTime = 0;
+                        playSound('cloneExplosion');
                         addObjectToArea(state, hero.area, new CloneExplosionEffect({
                             x: hero.x + hero.w / 2,
                             y: hero.y + hero.h / 2,
@@ -613,8 +615,10 @@ export function damageActor(
         return;
     }
 
-    // If any clones are in use, any damage one takes destroys it until only one clone remains.
-    if (actor === state.hero || state.hero.clones.indexOf(actor as any) >= 0) {
+    if (actor.takeDamage) {
+        actor.takeDamage(state, damage);
+    } else if (actor === state.hero || state.hero.clones.indexOf(actor as any) >= 0) {
+        // If any clones are in use, any damage one takes destroys it until only one clone remains.
         // Damage applies to the hero, not the clone.
         state.hero.life -= damage;
         state.hero.invulnerableFrames = 50;
@@ -622,13 +626,6 @@ export function damageActor(
         state.hero.spiritRadius = 0;
         if (state.hero.clones.length) {
             destroyClone(state, actor as any);
-        }
-    } else {
-        actor.life -= damage;
-        // For enemies, this is actually the number of rames they cannot damage the hero for.
-        actor.invulnerableFrames = 50;
-        if (actor.life <= 0 && actor instanceof Enemy) {
-            actor.showDeathAnimation(state);
         }
     }
 

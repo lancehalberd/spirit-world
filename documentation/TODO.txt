@@ -29,6 +29,8 @@ Todo:
 
 
 Current tasks:
+    - Fix door doesn't open after boss.
+    - Freeze enemies while picking up an item.
     - Difficulty shrine:
         - 50 money per point
         - move points around for free

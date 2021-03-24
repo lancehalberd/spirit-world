@@ -86,6 +86,7 @@ export interface Actor {
     invulnerableFrames?: number,
     life: number,
     render: (context: CanvasRenderingContext2D, state: GameState) => void,
+    takeDamage?: (state: GameState, damage: number) => void,
 }
 
 export interface Hero extends Actor {

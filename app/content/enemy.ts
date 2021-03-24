@@ -9,6 +9,7 @@ import { moveActor } from 'app/moveActor';
 import { saveGame } from 'app/state';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { directionMap } from 'app/utils/field';
+import { playSound } from 'app/utils/sounds';
 
 import {
     Actor, ActorAnimations, AreaInstance, BossObjectDefinition, BossType, Direction, DrawPriority,
@@ -97,6 +98,16 @@ export class Enemy implements Actor, ObjectInstance {
         this.mode = mode;
         this.modeTime = 0;
     }
+    takeDamage(state: GameState, damage: number) {
+        this.life -= damage;
+        // This is actually the number of frames the enemy cannot damage the hero for.
+        this.invulnerableFrames = 50;
+        if (this.life <= 0) {
+            this.showDeathAnimation(state);
+        } else {
+            playSound('enemyHit');
+        }
+    }
     showDeathAnimation(state: GameState) {
         const hitbox = this.getHitbox(state);
         const deathAnimation = new AnimationEffect({
@@ -105,6 +116,7 @@ export class Enemy implements Actor, ObjectInstance {
             y: hitbox.y + hitbox.h / 2 - enemyDeathAnimation.frames[0].h / 2 * this.scale,
             scale: this.scale,
         });
+        playSound('enemyDeath');
         if (this.enemyDefinition.lootTable) {
             dropItemFromTable(state, this.area, this.enemyDefinition.lootTable,
                 hitbox.x + hitbox.w / 2,

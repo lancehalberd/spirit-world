@@ -253,6 +253,13 @@ const preloadSounds = () => {
         },
         {key: 'rollingBallHit', source: 'sfx/rollingBallHit.wav', volume: 10, limit: 2},
         {key: 'rollingBallSocket', source: 'sfx/rollingBallSocket.wav', volume: 10, limit: 2},
+        {key: 'cloneExplosion', source: 'sfx/cloneExplosion.wav', volume: 10, limit: 2},
+        //{key: 'enemyHit', source: 'sfx/cloneExplosion.wav',
+        //     offset: '200:300', volume: 10, limit: 2},
+        {key: 'enemyHit', source: 'sfx/enemyDeath.wav',
+             offset: '300:200', volume: 10, limit: 2},
+        {key: 'enemyDeath', source: 'sfx/enemyDeath.wav',
+             offset: '170:300', volume: 10, limit: 2},
     ].forEach(sound => requireSound(sound));
 };
 preloadSounds();
