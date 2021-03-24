@@ -463,6 +463,7 @@ function getProgressProperties(state: GameState, editingState: EditingState) {
                         state.location.y = state.hero.y;
                         // Calling this will instantiate the area again and place the player back in their current location.
                         enterLocation(state, state.location);
+                        displayTileEditorPropertyPanel();
                         return;
                     }
                 }

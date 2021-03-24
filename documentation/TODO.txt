@@ -1,8 +1,6 @@
 Test at http://localhost:81/alttp/public/
 
 High Priority Bugs:
-    Objects shouldn't make sounds from other sections.
-        - For example switches depressing currently make a sound when leaving an area on resetting the area.
     Player leaves swimming animation during transitions:
         Both when moving through doors and scrolling between super tiles
         This doesn't happen during transitions inside super tiles.

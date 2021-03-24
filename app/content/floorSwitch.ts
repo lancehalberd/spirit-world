@@ -16,6 +16,7 @@ import {
 const [upFrame, downFrame] = createAnimation('gfx/tiles/toggletiles.png', {w: 16, h: 16}, {cols: 2}).frames;
 
 export class FloorSwitch implements ObjectInstance {
+    alwaysReset = true;
     area: AreaInstance;
     drawPriority: DrawPriority = 'background';
     definition: FloorSwitchDefinition = null;
