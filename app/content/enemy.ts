@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { AnimationEffect } from 'app/content/animationEffect';
 import { dropItemFromTable, getLoot } from 'app/content/lootObject';
 import { simpleLootTable, lifeLootTable, moneyLootTable } from 'app/content/lootTables';
-import { addObjectToArea, getAreaSize, removeObjectFromArea } from 'app/content/areas';
+import { addObjectToArea, getAreaSize } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { moveActor } from 'app/moveActor';
 import { saveGame } from 'app/state';
@@ -472,7 +472,9 @@ function flyBy(state: GameState, enemy: Enemy): void {
         || (enemy.vy < 0 && enemy.y + enemy.h < section.y - 16)
         || (enemy.vy > 0 && enemy.y > section.y + section.h + 16)
     ) {
-        removeObjectFromArea(state, enemy);
+        // The main control loop will remove enemies with this status and then
+        // check if anything should trigger if all enemies are defeated.
+        enemy.status = 'gone';
     }
 }
 
@@ -702,7 +704,7 @@ export function checkForFloorEffects(state: GameState, enemy: Enemy) {
                     x: column * 16 - 4, y: row * 16 - 4,
                 });
                 addObjectToArea(state, enemy.area, pitAnimation);
-                removeObjectFromArea(state, enemy);
+                enemy.status = 'gone';
                 return;
             }
         }
