@@ -240,11 +240,13 @@ function updateField(state: GameState) {
         }
         removeDefeatedEnemies(state, state.alternateAreaInstance);
         removeDefeatedEnemies(state, state.areaInstance);
-        for (const object of state.alternateAreaInstance?.objects || []) {
-            object.update?.(state);
-        }
-        for (const object of state.areaInstance.objects) {
-            object.update?.(state);
+        if (!state.nextAreaInstance) {
+            for (const object of state.alternateAreaInstance?.objects || []) {
+                object.update?.(state);
+            }
+            for (const object of state.areaInstance.objects) {
+                object.update?.(state);
+            }
         }
     }
 }

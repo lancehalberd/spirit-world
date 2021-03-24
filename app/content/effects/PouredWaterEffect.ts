@@ -30,6 +30,7 @@ export function growVine(this: void, area: AreaInstance, tx: number, ty: number)
                 }
                 const growTile = behavior.growTiles[i % behavior.growTiles.length];
                 layer.tiles[y][tx] = growTile;
+                layer.originalTiles[y][tx] = growTile;
                 if (area.tilesDrawn[y]?.[tx]) {
                     area.tilesDrawn[y][tx] = false;
                 }

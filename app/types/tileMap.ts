@@ -75,7 +75,14 @@ export interface TileGrid {
     tiles: Tile[][],
 }
 
-interface TileGridDefinition {
+export interface AreaTileGrid extends TileGrid {
+    // The matrix of tiles as they should be on resetting the area (respawning bushes etc)
+    // This is different than the definition because certain effects change the reset behavior
+    // but should not actually change the definition of the area.
+    originalTiles: Tile[][],
+}
+
+interface AreaTileGridDefinition {
     // The dimensions of the grid.
     w: number,
     h: number,
@@ -101,13 +108,13 @@ export interface ZoneLocation {
 export interface AreaLayerDefinition {
     // Unique identifier for this layer.
     key: string,
-    grid?: TileGridDefinition,
+    grid?: AreaTileGridDefinition,
     // Coordinates for the layer origin, if not (0, 0).
     x?: number,
     y?: number,
 }
 
-export interface AreaLayer extends TileGrid {
+export interface AreaLayer extends AreaTileGrid {
     // Unique identifier for this layer.
     key: string,
     definition: AreaLayerDefinition,

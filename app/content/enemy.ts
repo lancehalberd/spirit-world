@@ -27,8 +27,11 @@ export class Enemy implements Actor, ObjectInstance {
     currentAnimation: FrameAnimation;
     hasShadow: boolean = true;
     animationTime: number;
+    alwaysReset: boolean = false;
     alwaysUpdate: boolean = false;
     d: Direction;
+    spawnX: number;
+    spawnY: number;
     x: number;
     y: number;
     z: number = 0;
@@ -55,8 +58,8 @@ export class Enemy implements Actor, ObjectInstance {
         this.hasShadow = this.enemyDefinition.hasShadow ?? true;
         this.currentAnimation = this.enemyDefinition.animations.idle[this.d];
         this.animationTime = 0;
-        this.x = definition.x;
-        this.y = definition.y;
+        this.spawnX = this.x = definition.x;
+        this.spawnY = this.y = definition.y;
         const frame = this.getFrame();
         this.w = frame.content?.w ?? frame.w;
         this.h = frame.content?.h ?? frame.h;
@@ -71,6 +74,8 @@ export class Enemy implements Actor, ObjectInstance {
         if (definition.type === 'boss' && state.savedState.objectFlags[this.definition.id]) {
             this.status = 'gone';
         }
+        // Make sure bosses return to their spawn points when leaving their areas.
+        this.alwaysReset = definition.type === 'boss';
         this.drawPriority = this.flying ? 'foreground' : 'sprites';
     }
     getFrame(): Frame {
@@ -88,6 +93,11 @@ export class Enemy implements Actor, ObjectInstance {
     isInCurrentSection(state: GameState): boolean {
         const { section } = getAreaSize(state);
         return !(this.x < section.x || this.x > section.x + section.w || this.y < section.y || this.y > section.y + section.h)
+    }
+    isFromCurrentSection(state: GameState): boolean {
+        const { section } = getAreaSize(state);
+        return !(this.spawnX < section.x || this.spawnX > section.x + section.w ||
+                this.spawnY < section.y || this.spawnY > section.y + section.h)
     }
     setAnimation(type: string, d: Direction, time: number = 0) {
         const animationSet = this.enemyDefinition.animations[type] || this.enemyDefinition.animations.idle;
@@ -136,7 +146,7 @@ export class Enemy implements Actor, ObjectInstance {
         if (this.status === 'gone') {
             return;
         }
-        if (!this.alwaysUpdate && !this.isInCurrentSection(state)) {
+        if (!this.alwaysUpdate && !this.isFromCurrentSection(state)) {
             return;
         }
         if (this.enemyDefinition.update) {
@@ -298,7 +308,7 @@ export const enemyDefinitions: {[key in EnemyType | BossType]: EnemyDefinition} 
     beetleBoss: {
         animations: beetleWingedAnimations, flying: true, scale: 4,
         acceleration: 0.5, speed: 2,
-        life: 20, touchDamage: 1, update: updateBeetleBoss,
+        life: 16, touchDamage: 1, update: updateBeetleBoss,
         lootTable: null,
     },
     beetleBossWingedMinionDefinition: {
@@ -339,7 +349,7 @@ function updateBeetleBoss(state: GameState, enemy: Enemy): void {
             if (Math.random() < 0.3) {
                 enemy.setMode('circle');
             } else if (Math.random() < 0.5) {
-                const vector = getVectorToNearByHero(state, enemy, 32 * 32);
+                const vector = getVectorToNearbyHero(state, enemy, 32 * 32);
                 if (vector) {
                     enemy.setMode('rush');
                     enemy.vx = vector.x;
@@ -353,7 +363,7 @@ function updateBeetleBoss(state: GameState, enemy: Enemy): void {
             if (Math.random() < 0.25) {
                 enemy.setMode('circle');
             } else if (Math.random() < 0.25) {
-                const vector = getVectorToNearByHero(state, enemy, 32 * 32);
+                const vector = getVectorToNearbyHero(state, enemy, 32 * 32);
                 if (vector) {
                     enemy.setMode('rush');
                     enemy.vx = vector.x;
@@ -372,7 +382,7 @@ function updateBeetleBoss(state: GameState, enemy: Enemy): void {
         });
         enemy.x += enemy.vx;
         enemy.y += enemy.vy;
-        if (enemy.modeTime > 3000) {
+        if (enemy.modeTime > 10000 / enemy.speed) {
             enemy.setMode('return');
         }
     } else if (enemy.mode === 'return') {
@@ -390,10 +400,12 @@ function updateBeetleBoss(state: GameState, enemy: Enemy): void {
                 x: section.x + section.w / 2 + (section.w / 2 + 32) * Math.cos(theta),
                 y: section.y + section.h / 2 + (section.h / 2 + 32) * Math.sin(theta),
             });
-            const vector = getVectorToNearByHero(state, minion, 1000);
+            const vector = getVectorToNearbyHero(state, minion, 1000);
             if (vector) {
                 minion.vx = minion.speed * vector.x;
                 minion.vy = minion.speed * vector.y;
+                // Since the minion is spawnd from off screen, we need to set this flag to
+                // allow it to update. (monsters spawned offscreen do not update by default)
                 minion.alwaysUpdate = true;
                 addObjectToArea(state, enemy.area, minion);
             } else {
@@ -406,13 +418,15 @@ function updateBeetleBoss(state: GameState, enemy: Enemy): void {
     } else if (enemy.mode === 'rush') {
         // Just accelerate in the direction the boss chose when it entered this mode.
         accelerateInDirection(state, enemy, {x: enemy.vx, y: enemy.vy});
-        enemy.x += enemy.vx;
-        enemy.y += enemy.vy;
-        if (enemy.modeTime > 1500) {
+        if (enemy.modeTime <= 1000) {
+            enemy.x += enemy.vx;
+            enemy.y += enemy.vy;
+        }
+        if (enemy.modeTime >= 1500) {
             if (enemy.life > 8 || Math.random() < 0.5) {
                 enemy.setMode('return');
             } else {
-                const vector = getVectorToNearByHero(state, enemy, 32 * 32);
+                const vector = getVectorToNearbyHero(state, enemy, 32 * 32);
                 if (vector) {
                     enemy.setMode('rush');
                     enemy.vx = vector.x;
@@ -492,7 +506,7 @@ function accelerateInDirection(state: GameState, enemy: Enemy, a: {x: number, y:
 }
 
 function scurryAndChase(state: GameState, enemy: Enemy) {
-    const chaseVector = getVectorToNearByHero(state, enemy, enemy.aggroRadius);
+    const chaseVector = getVectorToNearbyHero(state, enemy, enemy.aggroRadius);
     if (chaseVector) {
         accelerateInDirection(state, enemy, chaseVector);
         moveEnemy(state, enemy, enemy.vx, enemy.vy, {});
@@ -540,7 +554,7 @@ function paceAndCharge(state: GameState, enemy: Enemy) {
     }
 }
 
-function getVectorToNearByHero(state: GameState, enemy: Enemy, radius: number): {x: number, y: number} {
+function getVectorToNearbyHero(state: GameState, enemy: Enemy, radius: number): {x: number, y: number} {
     const hitbox = enemy.getHitbox(state);
     for (const hero of [state.hero, ...state.hero.clones]) {
         const dx = (hero.x + hero.w / 2) - (hitbox.x + hitbox.w / 2);

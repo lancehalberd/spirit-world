@@ -258,6 +258,7 @@ export function displayTileEditorPropertyPanel() {
                     ...layerDefinition,
                     ...layerDefinition.grid,
                     tiles: _.cloneDeep(layerDefinition.grid.tiles),
+                    originalTiles: _.cloneDeep(layerDefinition.grid.tiles),
                     palette: palettes[layerDefinition.grid.palette],
                 });
                 state.alternateAreaInstance.layers.push({
@@ -265,6 +266,7 @@ export function displayTileEditorPropertyPanel() {
                     ...alternateLayerDefinition,
                     ...alternateLayerDefinition.grid,
                     tiles: _.cloneDeep(alternateLayerDefinition.grid.tiles),
+                    originalTiles: _.cloneDeep(alternateLayerDefinition.grid.tiles),
                     palette: palettes[alternateLayerDefinition.grid.palette],
                 });
                 applyLayerToBehaviorGrid(state.areaInstance.behaviorGrid, layerDefinition,

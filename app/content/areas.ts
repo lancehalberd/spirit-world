@@ -427,6 +427,7 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
             ...layer,
             ...layer.grid,
             tiles: _.cloneDeep(layer.grid.tiles),
+            originalTiles: _.cloneDeep(layer.grid.tiles),
             palette: palettes[layer.grid.palette]
         })),
         objects: [],
@@ -440,6 +441,7 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
                 for (let x = 0; x < instance.layers[l].tiles[y].length; x++) {
                     if (!instance.layers[l].tiles[y][x]) {
                         instance.layers[l].tiles[y][x] = definition.parentDefinition.layers[l].grid.tiles[y][x];
+                        instance.layers[l].originalTiles[y][x] = definition.parentDefinition.layers[l].grid.tiles[y][x];
                     }
                 }
 
@@ -473,9 +475,7 @@ export function refreshSection(state: GameState, area: AreaInstance, section: Sh
         for (let x = 0; x < section.w; x++) {
             const column = section.x + x;
             for (let l = 0; l < area.definition.layers.length; l++) {
-                area.layers[l].tiles[row][column]
-                    = area.definition.layers[l].grid.tiles[row][column]
-                        || area.definition.parentDefinition?.layers[l].grid.tiles[row][column];
+                area.layers[l].tiles[row][column] = area.layers[l].originalTiles[row][column];
             }
             resetTileBehavior(area, {x: column, y: row});
             if (area.tilesDrawn[row]?.[column]) {
