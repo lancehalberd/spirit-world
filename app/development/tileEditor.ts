@@ -3,6 +3,7 @@ import _ from 'lodash';
 import {
     applyLayerToBehaviorGrid,
     initializeAreaLayerTiles, resetTileBehavior,
+    enterLocation,
 } from 'app/content/areas';
 import { palettes } from 'app/content/palettes';
 import { getLootFrame } from 'app/content/lootObject';
@@ -59,6 +60,7 @@ export interface EditingState {
     showZoneProperties: boolean,
     showFieldProperties: boolean,
     showInventoryProperties: boolean,
+    showProgressProperties: boolean,
     spirit: boolean,
     style?: string,
     switchTargetObjectId?: string,
@@ -91,6 +93,7 @@ export const editingState: EditingState = {
     showZoneProperties: false,
     showFieldProperties: true,
     showInventoryProperties: false,
+    showProgressProperties: false,
     spirit: false,
     style: null,
     switchTargetObjectId: null,
@@ -139,12 +142,25 @@ export function displayTileEditorPropertyPanel() {
     if (editingState.selectedLayerIndex >= state.areaInstance.layers.length) {
         editingState.selectedLayerIndex = 0;
     }
-    const selectedPaletteKey = state.areaInstance.layers[editingState.selectedLayerIndex].definition.grid.palette;
     let rows: PanelRows = [];
     rows = [...rows, ...getZoneProperties(state, editingState)];
     rows.push(' ');
     rows.push(' ');
     rows.push(' ');
+    rows = [...rows, ...getFieldProperties(state, editingState)];
+    rows.push(' ');
+    rows.push(' ');
+    rows.push(' ');
+    rows = [...rows, ...getInventoryProperties(state, editingState)];
+    rows.push(' ');
+    rows.push(' ');
+    rows.push(' ');
+    rows = [...rows, ...getProgressProperties(state, editingState)];
+    displayPropertyPanel(rows);
+}
+
+function getFieldProperties(state: GameState, editingState: EditingState) {
+    let rows: PanelRows = [];
     rows.push({
         name: editingState.showFieldProperties ? 'Layers -' : 'Layers +',
         onClick() {
@@ -152,6 +168,7 @@ export function displayTileEditorPropertyPanel() {
             displayTileEditorPropertyPanel();
         },
     });
+    const selectedPaletteKey = state.areaInstance.layers[editingState.selectedLayerIndex].definition.grid.palette;
     if (editingState.showFieldProperties) {
         for (let i = 0; i < state.areaInstance.layers.length; i++) {
             const layer = state.areaInstance.layers[i];
@@ -346,9 +363,11 @@ export function displayTileEditorPropertyPanel() {
                 break;
         }
     }
-    rows.push(' ');
-    rows.push(' ');
-    rows.push(' ');
+    return rows;
+}
+
+function getInventoryProperties(state: GameState, editingState: EditingState) {
+    let rows: PanelRows = [];
     rows.push({
         name: editingState.showInventoryProperties ? 'Inventory -' : 'Inventory +',
         onClick() {
@@ -418,9 +437,40 @@ export function displayTileEditorPropertyPanel() {
             addTool(state.hero.equipment, tool);
         }
     }
-    displayPropertyPanel(rows);
+    return rows;
 }
 
+function getProgressProperties(state: GameState, editingState: EditingState) {
+    let rows: PanelRows = [];
+    rows.push({
+        name: editingState.showProgressProperties ? 'Progress -' : 'Progress +',
+        onClick() {
+            editingState.showProgressProperties = !editingState.showProgressProperties;
+            displayTileEditorPropertyPanel();
+        },
+    });
+    if (editingState.showProgressProperties) {
+        const setFlags = Object.keys(state.savedState.objectFlags);
+        rows.push({
+            name: 'flags',
+            value: setFlags,
+            values: setFlags,
+            onChange(value: string[]) {
+                for (const key of Object.keys(state.savedState.objectFlags)) {
+                    if (value.indexOf(key) < 0) {
+                        delete state.savedState.objectFlags[key];
+                        state.location.x = state.hero.x;
+                        state.location.y = state.hero.y;
+                        // Calling this will instantiate the area again and place the player back in their current location.
+                        enterLocation(state, state.location);
+                        return;
+                    }
+                }
+            }
+        });
+    }
+    return rows;
+}
 
 mainCanvas.addEventListener('mousemove', function () {
     if (!editingState.isEditing || !isMouseDown()) {

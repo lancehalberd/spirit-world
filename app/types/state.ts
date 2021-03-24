@@ -2,7 +2,6 @@ import { AreaGrid, AreaInstance, Frame, Hero, ShortRectangle, Zone, ZoneLocation
 
 export type SavedState = {
     coins: number,
-    collectedItems: {[key: string]: boolean},
     objectFlags: {[key: string]: boolean},
     hero: Hero,
 }

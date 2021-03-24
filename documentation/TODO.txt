@@ -3,6 +3,10 @@ Test at http://localhost:81/alttp/public/
 High Priority Bugs:
     Objects shouldn't make sounds from other sections.
         - For example switches depressing currently make a sound when leaving an area on resetting the area.
+    Player leaves swimming animation during transitions:
+        Both when moving through doors and scrolling between super tiles
+        This doesn't happen during transitions inside super tiles.
+        - Could solve by setting swimming as a flag instead of an action, which might otherwise be useful.
     Objects shouldn't be able to float on top of pits.
         - Make objects fall in pits.
         - Pit entrance should pull you in like other pits
@@ -28,8 +32,6 @@ Todo:
 
 
 Current tasks:
-    - Combine loot/object flags into single object.
-    - Add progress tab to editor to reset flags for bosses/chests.
     - Fix door doesn't open after boss.
     - Difficulty shrine:
         - 50 money per point

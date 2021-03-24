@@ -162,13 +162,13 @@ export class LootObject implements ObjectInstance {
         if (this.status === 'hiddenEnemy' || this.status === 'hiddenSwitch') {
             return;
         }
-        if (state.savedState.collectedItems[this.definition.id]) {
+        if (state.savedState.objectFlags[this.definition.id]) {
             return;
         }
         const hero = state.hero.activeClone || state.hero;
         if (rectanglesOverlap(hero, {...this.frame, x: this.x, y: this.y})) {
             removeObjectFromArea(state, this);
-            state.savedState.collectedItems[this.definition.id] = true;
+            state.savedState.objectFlags[this.definition.id] = true;
             getLoot(state, this.definition);
         }
     }
@@ -176,7 +176,7 @@ export class LootObject implements ObjectInstance {
         if (this.status === 'hiddenEnemy' || this.status === 'hiddenSwitch') {
             return;
         }
-        if (this.definition.id !== 'drop' && state.savedState.collectedItems[this.definition.id]) {
+        if (this.definition.id !== 'drop' && state.savedState.objectFlags[this.definition.id]) {
             return;
         }
         drawFrame(context, this.frame, { ...this.frame, x: this.x, y: this.y });
@@ -237,7 +237,7 @@ export class ChestObject implements ObjectInstance {
         this.y = definition.y;
         this.status = definition.status || 'normal';
         // Chests that have been opened are always revealed.
-        if (state.savedState.collectedItems[this.definition.id]) {
+        if (state.savedState.objectFlags[this.definition.id]) {
             this.status = 'normal';
         }
     }
@@ -247,10 +247,10 @@ export class ChestObject implements ObjectInstance {
     onGrab(state: GameState) {
         // You can only open a chest from the bottom.
         const hero = state.hero.activeClone || state.hero;
-        if (hero.d === 'up' && !state.savedState.collectedItems[this.definition.id]) {
-            state.savedState.collectedItems[this.definition.id] = true;
+        if (hero.d === 'up' && !state.savedState.objectFlags[this.definition.id]) {
+            state.savedState.objectFlags[this.definition.id] = true;
             if (this.linkedObject) {
-                state.savedState.collectedItems[this.linkedObject.definition.id] = true;
+                state.savedState.objectFlags[this.linkedObject.definition.id] = true;
             }
             getLoot(state, this.definition);
         }
@@ -264,7 +264,7 @@ export class ChestObject implements ObjectInstance {
         if (this.status === 'hiddenEnemy' || this.status === 'hiddenSwitch') {
             return;
         }
-        if (state.savedState.collectedItems[this.definition.id]) {
+        if (state.savedState.objectFlags[this.definition.id]) {
             drawFrame(context, chestOpenedFrame, {
                 ...chestOpenedFrame, x: this.x - chestOpenedFrame.content.x, y: this.y - chestOpenedFrame.content.y
             });

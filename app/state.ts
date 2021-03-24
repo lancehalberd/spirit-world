@@ -114,7 +114,6 @@ export function selectSaveFile(savedGameIndex: number): void {
 export function getDefaultSavedState(): SavedState {
     return {
         coins: 0,
-        collectedItems: {},
         objectFlags: {},
         hero: getDefaultHeroState(),
     };
