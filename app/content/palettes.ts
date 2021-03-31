@@ -145,7 +145,7 @@ function drawCombinedPalettes(targetPalette: TilePalette, canvas: HTMLCanvasElem
                     palette.source.x + px * w, palette.source.y + py * h, w, h,
                     x * w, y * h, w, h
                 );
-                const behaviors = palette.behaviors?.[`${px}x${py}`];
+                const behaviors = palette.behaviors?.[`${px}x${py}`] || palette.behaviors?.all;
                 if (behaviors) {
                     targetPalette.behaviors[`${x}x${y}`] = behaviors;
                 }
@@ -158,6 +158,7 @@ function drawCombinedPalettes(targetPalette: TilePalette, canvas: HTMLCanvasElem
             }
         }
         if (palette.isStamp) {
+            targetPalette.stamps = targetPalette.stamps || [];
             targetPalette.stamps.push(stamp);
         }
     }
@@ -225,6 +226,27 @@ const rockWallFrame: Frame = {
     x: 0, y: 0, w: 48, h: 32,
 }
 
+
+const caveFloorPalette: TilePalette = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/cavefloor.png'), x: 0, y: 0, w: 336, h: 16},
+    behaviors: {},
+    defaultTiles: [{x: 0, y: 0}]
+};
+
+const caveCornersPalette: TilePalette = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/cavewalls.png'), x: 32, y: 0, w: 8 * 32, h: 32},
+    behaviors: {'all': {solid: true}},
+    defaultTiles: [{x: 0, y: 0}]
+};
+const caveWallsPalette: TilePalette = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/cavewalls.png'), x: 0, y: 32, w: 32, h: 4 * 32},
+    behaviors: {'all': {solid: true}},
+    defaultTiles: [{x: 0, y: 0}]
+};
+
 const fieldPalette = {...combinePalettes([
         // This is the empty tile.
         singleTilePalette('gfx/tiles/bush.png', null, -16),
@@ -254,6 +276,10 @@ const fieldPalette = {...combinePalettes([
             '0x0': wallBehavior, '1x0': wallBehavior, '2x0': wallBehavior,
             '0x1': wallBehavior, '1x1': wallBehavior, '2x1': wallBehavior,
         }),
+        caveFloorPalette,
+        singleTilePalette('gfx/tiles/cavewalls.png', { solid: true }), // 'Abyss' between walls
+        caveWallsPalette,
+        caveCornersPalette,
     ]),
     defaultTiles: [
         {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0},
@@ -309,6 +335,10 @@ const spiritFieldPalette = {...combinePalettes([
             '0x0': wallBehavior, '1x0': wallBehavior, '2x0': wallBehavior,
             '0x1': wallBehavior, '1x1': wallBehavior, '2x1': wallBehavior,
         }),
+        caveFloorPalette,
+        singleTilePalette('gfx/tiles/cavewalls.png', { solid: true }), // 'Abyss' between walls
+        caveWallsPalette,
+        caveCornersPalette,
     ]),
     defaultTiles: [null]
 };

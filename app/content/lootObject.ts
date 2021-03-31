@@ -6,6 +6,7 @@ import { getState, saveGame, updateHeroMagicStats } from 'app/state';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { requireImage } from 'app/utils/images';
 import { rectanglesOverlap } from 'app/utils/index';
+import { playSound } from 'app/utils/sounds';
 
 import {
     ActiveTool, AreaInstance, BossObjectDefinition, Frame, GameState, LootObjectDefinition,
@@ -201,6 +202,9 @@ export class LootDropObject extends LootObject {
         if (rectanglesOverlap(state.hero.activeClone || state.hero, {...this.frame, x: this.x, y: this.y})) {
             const onPickup = lootEffects[this.definition.lootType] || lootEffects.unknown;
             onPickup(state, this.definition);
+            if (this.definition.lootType === 'money') {
+                playSound('getMoney');
+            }
             removeObjectFromArea(state, this);
         }
     }

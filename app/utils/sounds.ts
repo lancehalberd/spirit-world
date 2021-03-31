@@ -260,6 +260,7 @@ const preloadSounds = () => {
              offset: '300:200', volume: 10, limit: 2},
         {key: 'enemyDeath', source: 'sfx/enemyDeath.wav',
              offset: '170:300', volume: 10, limit: 2},
+        {key: 'getMoney', source: 'sfx/enemyDeath.wav', volume: 10, limit: 2},
     ].forEach(sound => requireSound(sound));
 };
 preloadSounds();

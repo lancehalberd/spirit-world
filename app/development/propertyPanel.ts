@@ -127,6 +127,7 @@ function isPaletteProperty(property: EditorProperty<any>): property is EditorPal
 const brushCanvas = createCanvas(100, 100);
 brushCanvas.style.border = '1px solid black';
 const brushContext = brushCanvas.getContext('2d');
+brushContext.imageSmoothingEnabled = false;
 export function updateBrushCanvas(selectedTiles: TileGrid): void {
     const brushWidth = selectedTiles.w * selectedTiles.palette.w;
     const brushHeight = selectedTiles.h * selectedTiles.palette.h;

@@ -123,7 +123,9 @@ export class ThrownChakram implements ObjectInstance {
                         addParticleAnimations(state, this.area, target.x * 16, target.y * 16, 2, behavior.particles);
                     }
                 }
-            } else if (behavior?.cuttable > state.hero.weapon || (behavior?.solid && !behavior?.low)) {
+            } else if (behavior?.cuttable > state.hero.weapon ||
+                ((behavior?.solid || behavior?.solidMap) && !behavior?.low)
+            ) {
                 this.outFrames = 0;
             }
         }

@@ -23,14 +23,15 @@ import { displayPropertyPanel, hidePropertyPanel, updateBrushCanvas } from 'app/
 import { getZoneProperties, renderZoneEditor } from 'app/development/zoneEditor';
 import { mainCanvas } from 'app/dom';
 import { CANVAS_SCALE } from 'app/gameConstants';
-import { KEY } from 'app/keyCommands';
+import { KEY, isKeyboardKeyDown } from 'app/keyCommands';
 import { translateContextForAreaAndCamera } from 'app/render';
 import { getState, updateHeroMagicStats } from 'app/state';
 import { drawFrame } from 'app/utils/animations';
 import { getMousePosition, isMouseDown } from 'app/utils/mouse';
 
 import {
-    AreaInstance, AreaLayerDefinition, BossType, Direction,  EnemyType, GameState,
+    AreaInstance, AreaLayerDefinition, BossType, Direction,  EnemyType, Frame,
+    GameState,
     LootType, MagicElement,
     ObjectDefinition, ObjectStatus, ObjectType,
     PanelRows, PropertyRow, ShortRectangle, Tile, TileGrid,
@@ -484,7 +485,11 @@ mainCanvas.addEventListener('mousemove', function () {
             onMouseMoveSelect(state, editingState, x, y);
             break;
         case 'brush':
-            drawBrush(x, y);
+            if (isKeyboardKeyDown(KEY.SHIFT)) {
+                updateBrushSelection(x, y);
+            } else {
+                drawBrush(x, y);
+            }
             break;
         case 'delete':
             deleteTile(x, y);
@@ -507,7 +512,12 @@ mainCanvas.addEventListener('mousedown', function () {
             onMouseDownObject(state, editingState, x, y);
             break;
         case 'brush':
-            drawBrush(x, y);
+            if (isKeyboardKeyDown(KEY.SHIFT)) {
+                editingState.dragOffset = {x, y};
+                updateBrushSelection(x, y);
+            } else {
+                drawBrush(x, y);
+            }
             break;
         case 'delete':
             deleteTile(x, y);
@@ -547,6 +557,35 @@ function deleteTile(x: number, y: number): void {
     resetTileBehavior(area, {x, y});
 }
 
+function getSelectionBounds(state: GameState, x1: number, y1: number, x2: number, y2: number): {L: number, R: number, T: number, B: number} {
+    const layerDefinition = state.areaInstance.definition.layers[editingState.selectedLayerIndex];
+    const palette = palettes[layerDefinition.grid.palette];
+    const tx1 = Math.floor((state.camera.x + x1) / palette.w);
+    const ty1 = Math.floor((state.camera.y + y1) / palette.h);
+    const tx2 = Math.floor((state.camera.x + x2) / palette.w);
+    const ty2 = Math.floor((state.camera.y + y2) / palette.h);
+    const L = Math.max(0, Math.min(tx1, tx2));
+    const R = Math.min(layerDefinition.grid.w - 1, Math.max(tx1, tx2));
+    const T = Math.max(0, Math.min(ty1, ty2));
+    const B = Math.min(layerDefinition.grid.h - 1, Math.max(ty1, ty2));
+    return {L, R, T, B};
+}
+
+function updateBrushSelection(x: number, y: number): void {
+    const state = getState();
+    const layerDefinition = state.areaInstance.definition.layers[editingState.selectedLayerIndex];
+    const {L, R, T, B} = getSelectionBounds(state, editingState.dragOffset.x, editingState.dragOffset.y, x, y);
+    editingState.brush.w = R - L + 1;
+    editingState.brush.h = B - T + 1;
+    editingState.brush.tiles = [];
+    for (let y = 0; y < editingState.brush.h; y++) {
+        editingState.brush.tiles[y] = [];
+        for (let x = 0; x < editingState.brush.w; x++) {
+            editingState.brush.tiles[y][x] = layerDefinition.grid.tiles[T + y][L + x];
+        }
+    }
+    updateBrushCanvas(editingState.brush);
+}
 function drawBrush(x: number, y: number): void {
     const state = getState();
     const palette = editingState.brush.palette;
@@ -653,26 +692,60 @@ function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, a
                 drawFrame(context, frame, {...frame, x: object.x - (frame.content?.x || 0), y: object.y - (frame.content?.y || 0)});
             }
         }
-        // These two are only drawn for the current area.
-        if (area === state.areaInstance && editingState.tool === 'select' && editingState.selectedObject) {
-            const instance = createObjectInstance(state, editingState.selectedObject);
-            let target: ShortRectangle;
-            if (instance.getHitbox) {
-                target = instance.getHitbox(state);
-            } else {
-                const frame = getObjectFrame(editingState.selectedObject);
-                target = {
-                    x: editingState.selectedObject.x + (frame.content?.x || 0) - 1,
-                    y: editingState.selectedObject.y + (frame.content?.y || 0) - 1,
-                    w: (frame.content?.w || frame.w) + 2,
-                    h: (frame.content?.h || frame.h) + 2,
-                };
+        // Tool previews are only drawn for the current area.
+        if (area === state.areaInstance) {
+            if (editingState.tool === 'brush') {
+                const palette = editingState.brush.palette;
+                const {w, h} = palette;
+                if (isKeyboardKeyDown(KEY.SHIFT)) {
+                    let x1 = x, y1 = y;
+                    if (isMouseDown()) {
+                        x1 = editingState.dragOffset.x;
+                        y1 = editingState.dragOffset.y;
+                    }
+                    const {L, R, T, B} = getSelectionBounds(state, x1, y1, x, y);
+                    context.lineWidth = 2;
+                    context.strokeStyle = 'white';
+                    context.strokeRect(L * w, T * h, (R - L + 1) * w, (B - T + 1) * h);
+                } else {
+                    const sy = Math.floor((state.camera.y + y) / h);
+                    const sx = Math.floor((state.camera.x + x) / w);
+                    for (let y = 0; y < editingState.brush.h; y++) {
+                        const ty = sy + y;
+                        for (let x = 0; x < editingState.brush.w; x++) {
+                            const tx = sx + x;
+                            const tile = editingState.brush.tiles[y][x];
+                            const frame: Frame = {
+                                image: palette.source.image,
+                                x: palette.source.x + tile.x * w,
+                                y: palette.source.y + tile.y * h,
+                                w, h
+                            };
+                            drawFrame(context, frame, {x: tx * w, y: ty * h, w, h});
+                        }
+                    }
+                }
             }
-            context.fillStyle = 'white';
-            context.fillRect(target.x, target.y, target.w, target.h);
-        }
-        if (area === state.areaInstance && ['object', 'enemy', 'boss'].includes(editingState.tool)) {
-            renderObjectPreview(context, state, editingState, x, y);
+            if (editingState.tool === 'select' && editingState.selectedObject) {
+                const instance = createObjectInstance(state, editingState.selectedObject);
+                let target: ShortRectangle;
+                if (instance.getHitbox) {
+                    target = instance.getHitbox(state);
+                } else {
+                    const frame = getObjectFrame(editingState.selectedObject);
+                    target = {
+                        x: editingState.selectedObject.x + (frame.content?.x || 0) - 1,
+                        y: editingState.selectedObject.y + (frame.content?.y || 0) - 1,
+                        w: (frame.content?.w || frame.w) + 2,
+                        h: (frame.content?.h || frame.h) + 2,
+                    };
+                }
+                context.fillStyle = 'white';
+                context.fillRect(target.x, target.y, target.w, target.h);
+            }
+            if (['object', 'enemy', 'boss'].includes(editingState.tool)) {
+                renderObjectPreview(context, state, editingState, x, y);
+            }
         }
     context.restore();
 }

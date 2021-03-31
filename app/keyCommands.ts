@@ -100,7 +100,7 @@ function buttonIsPressed(button) {
 
 const keysDown = {};
 let lastInput: 'keyboard' | 'gamepad' = null;
-function isKeyboardKeyDown(keyCode: number) {
+export function isKeyboardKeyDown(keyCode: number) {
     if (keysDown[keyCode]) {
         lastInput = 'keyboard';
         return 1;
