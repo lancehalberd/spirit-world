@@ -271,7 +271,7 @@ export function getObjectTypeProperties(state: GameState, editingState: EditingS
             rows.push({
                 name: 'status',
                 value: object.status || editingState.objectStatus,
-                values: ['normal', 'closed', 'closedEnemy', 'closedSwitch'],
+                values: ['normal', 'closed', 'closedEnemy', 'closedSwitch', 'locked', 'bigKeyLocked', 'cracked', 'blownOpen'],
                 onChange(status: ObjectStatus) {
                     if (object.id) {
                         object.status = status;

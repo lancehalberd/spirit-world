@@ -16,29 +16,39 @@ import {
 
 
 const [
-    /*crackedWall*/, /*caveFrame*/, /* caveCeiling */, /* cave */,
-    southCaveDoorFrame, southCaveDoorCeiling, southCaveDoorClosed, /*lockedDoorWood*/, /*lockedDoorSteel*/, /*lockedDoorBig*/,
+    southCrackedWall, southCaveFrame, southCaveCeiling, southCave,
+    southCaveDoorFrame, southCaveDoorCeiling, southCaveDoorClosed,
+    /*southLockedDoorWood*/, southLockedDoorSteel, southLockedDoorBig,
 ] = createAnimation('gfx/tiles/cavewalls.png', {w: 32, h: 32}, {x: 1, y: 1, cols: 10}).frames;
 
 const [
-    /*crackedWall*/, /*caveFrame*/, /* caveCeiling */, /* cave */,
-    eastCaveDoorFrame, eastCaveDoorCeiling, eastCaveDoorClosed, /*lockedDoorWood*/, /*lockedDoorSteel*/, /*lockedDoorBig*/,
+    eastCrackedWall, eastCaveFrame, eastCaveCeiling, eastCave,
+    eastCaveDoorFrame, eastCaveDoorCeiling, eastCaveDoorClosed,
+    /*eastLockedDoorWood*/, eastLockedDoorSteel, eastLockedDoorBig,
 ] = createAnimation('gfx/tiles/cavewalls.png', {w: 32, h: 32}, {x: 1, y: 2, cols: 10}).frames;
 
 const [
-    /*crackedWall*/, /*caveFrame*/, /* caveCeiling */, /* cave */,
-    northCaveDoorFrame, northCaveDoorCeiling, northCaveDoorClosed, /*lockedDoorWood*/, /*lockedDoorSteel*/, /*lockedDoorBig*/,
+    northCrackedWall, northCaveFrame, northCaveCeiling, northCave,
+    northCaveDoorFrame, northCaveDoorCeiling, northCaveDoorClosed,
+    /*northLockedDoorWood*/, northLockedDoorSteel, northLockedDoorBig,
 ] = createAnimation('gfx/tiles/cavewalls.png', {w: 32, h: 32}, {x: 1, y: 3, cols: 10}).frames;
 
 const [
-    /*crackedWall*/, /*caveFrame*/, /* caveCeiling */, /* cave */,
-    westCaveDoorFrame, westCaveDoorCeiling, westCaveDoorClosed, /*lockedDoorWood*/, /*lockedDoorSteel*/, /*lockedDoorBig*/,
+    westCrackedWall, westCaveFrame, westCaveCeiling, westCave,
+    westCaveDoorFrame, westCaveDoorCeiling, westCaveDoorClosed,
+    /*westLockedDoorWood*/, westLockedDoorSteel, westLockedDoorBig,
 ] = createAnimation('gfx/tiles/cavewalls.png', {w: 32, h: 32}, {x: 1, y: 4, cols: 10}).frames;
 
 interface DoorStyleFrames {
     doorFrame: Frame,
     doorCeiling: Frame,
     doorClosed: Frame,
+    cracked: Frame,
+    caveFrame: Frame,
+    caveCeiling: Frame,
+    cave: Frame,
+    locked: Frame,
+    bigKeyLocked: Frame,
 }
 interface DoorStyleDefinition {
     w: number,
@@ -53,10 +63,42 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
     cave: {
         w: 32,
         h: 32,
-        down: { doorFrame: southCaveDoorFrame, doorCeiling: southCaveDoorCeiling, doorClosed: southCaveDoorClosed },
-        right: { doorFrame: eastCaveDoorFrame, doorCeiling: eastCaveDoorCeiling, doorClosed: eastCaveDoorClosed },
-        up: { doorFrame: northCaveDoorFrame, doorCeiling: northCaveDoorCeiling, doorClosed: northCaveDoorClosed },
-        left: { doorFrame: westCaveDoorFrame, doorCeiling: westCaveDoorCeiling, doorClosed: westCaveDoorClosed },
+        down: {
+            doorFrame: southCaveDoorFrame, doorCeiling: southCaveDoorCeiling, doorClosed: southCaveDoorClosed,
+            cracked: southCrackedWall,
+            caveFrame: southCaveFrame,
+            caveCeiling: southCaveCeiling,
+            cave: southCave,
+            locked: southLockedDoorSteel,
+            bigKeyLocked: southLockedDoorBig,
+        },
+        right: {
+            doorFrame: eastCaveDoorFrame, doorCeiling: eastCaveDoorCeiling, doorClosed: eastCaveDoorClosed,
+            cracked: eastCrackedWall,
+            caveFrame: eastCaveFrame,
+            caveCeiling: eastCaveCeiling,
+            cave: eastCave,
+            locked: eastLockedDoorSteel,
+            bigKeyLocked: eastLockedDoorBig,
+        },
+        up: {
+            doorFrame: northCaveDoorFrame, doorCeiling: northCaveDoorCeiling, doorClosed: northCaveDoorClosed,
+            cracked: northCrackedWall,
+            caveFrame: northCaveFrame,
+            caveCeiling: northCaveCeiling,
+            cave: northCave,
+            locked: northLockedDoorSteel,
+            bigKeyLocked: northLockedDoorBig,
+        },
+        left: {
+            doorFrame: westCaveDoorFrame, doorCeiling: westCaveDoorCeiling, doorClosed: westCaveDoorClosed,
+            cracked: westCrackedWall,
+            caveFrame: westCaveFrame,
+            caveCeiling: westCaveCeiling,
+            cave: westCave,
+            locked: westLockedDoorSteel,
+            bigKeyLocked: westLockedDoorBig,
+        },
     },
     square: {
         w: 32,
@@ -96,10 +138,21 @@ export class Door implements ObjectInstance {
         this.x = definition.x;
         this.y = definition.y;
         this.status = definition.status || 'normal';
+        // If the player already opened this door, set it to the appropriate open status.
+        if (state.savedState.objectFlags[this.definition.id]) {
+            if (this.status === 'cracked') {
+                this.status = 'blownOpen';
+            } else if (this.status === 'locked' || this.status === 'bigKeyLocked') {
+                this.status = 'normal';
+            }
+        }
         this.style = definition.style as DoorStyle;
         if (!doorStyles[this.style]) {
             this.style = 'cave';
         }
+    }
+    isOpen(): boolean {
+        return this.status === 'normal' || this.status === 'blownOpen';
     }
     changeStatus(state: GameState, status: ObjectStatus): void {
         this.status = status;
@@ -110,7 +163,7 @@ export class Door implements ObjectInstance {
         const x = Math.floor(this.x / 16);
         const doorStyle = doorStyles[this.style];
         if (doorStyle.w === 64) {
-            const behaviors = this.status === 'normal' ? { solid: false } : { solid: true, low: false};
+            const behaviors = this.isOpen() ? { solid: false } : { solid: true, low: false};
             if (this.definition.d === 'up' || this.definition.d === 'down') {
                 applyBehaviorToTile(this.area, x, y, behaviors);
                 applyBehaviorToTile(this.area, x + 1, y, behaviors);
@@ -123,7 +176,7 @@ export class Door implements ObjectInstance {
                 applyBehaviorToTile(this.area, x, y + 3, behaviors);
             }
         } else if (doorStyle.w === 32) {
-            if (this.status === 'normal') {
+            if (this.isOpen()) {
                 if (this.definition.d === 'left' || this.definition.d === 'right') {
                     applyBehaviorToTile(this.area, x, y, { solidMap: BITMAP_TOP, low: false });
                     applyBehaviorToTile(this.area, x + 1, y, { solidMap: BITMAP_TOP, low: false });
@@ -264,21 +317,45 @@ export class Door implements ObjectInstance {
         const doorStyle = doorStyles[this.style];
         context.fillStyle = '#888';
         if (doorStyle[this.definition.d]) {
-            let frame: Frame = doorStyle[this.definition.d].doorFrame;
-            drawFrame(context, frame, { ...frame, x: this.x, y: this.y });
-            if (this.status !== 'normal' && state.hero.actionTarget !== this) {
-                frame = doorStyle[this.definition.d].doorClosed;
+            let frame: Frame;
+            if (this.status !== 'cracked') {
+                if (this.status === 'blownOpen') {
+                    frame = doorStyle[this.definition.d].caveFrame;
+                } else {
+                    frame = doorStyle[this.definition.d].doorFrame;
+                }
                 drawFrame(context, frame, { ...frame, x: this.x, y: this.y });
             }
+            if (this.status === 'normal' || state.hero.actionTarget === this) {
+                return;
+            }
+            switch (this.status) {
+                case 'cracked':
+                    frame = doorStyle[this.definition.d].cracked;
+                    break;
+                case 'blownOpen':
+                    frame = doorStyle[this.definition.d].cave;
+                    break;
+                case 'locked':
+                    frame = doorStyle[this.definition.d].locked;
+                    break;
+                case 'bigKeyLocked':
+                    frame = doorStyle[this.definition.d].bigKeyLocked;
+                    break;
+                default:
+                    frame = doorStyle[this.definition.d].doorClosed;
+                    break;
+            }
+            drawFrame(context, frame, { ...frame, x: this.x, y: this.y });
         } else if (doorStyle.w === 64) {
-            if (this.status !== 'normal' && state.hero.actionTarget !== this) {
+            if (!this.isOpen() && state.hero.actionTarget !== this) {
                 const hitbox = this.getHitbox(state);
                 context.fillRect(hitbox.x, hitbox.y, hitbox.w, hitbox.h);
             } else {
                 // Display nothing when this entrance is open.
             }
         } else if (doorStyle.w === 32) {
-            if (this.status === 'normal' || state.hero.actionTarget === this) {
+            if (!this.isOpen() || state.hero.actionTarget === this) {
                 if (this.definition.d === 'left' || this.definition.d === 'right') {
                     context.fillRect(this.x, this.y, 32, 8);
                     context.fillRect(this.x, this.y + 24, 32, 8);
@@ -293,8 +370,13 @@ export class Door implements ObjectInstance {
     }
     renderForeground(context: CanvasRenderingContext2D, state: GameState) {
         const doorStyle = doorStyles[this.style];
-        if (doorStyle[this.definition.d]) {
-            const frame = doorStyle[this.definition.d].doorCeiling;
+        if (doorStyle[this.definition.d] && this.status !== 'cracked') {
+            let frame: Frame;
+            if (this.status === 'blownOpen') {
+                frame = doorStyle[this.definition.d].caveCeiling;
+            } else {
+                frame = doorStyle[this.definition.d].doorCeiling;
+            }
             drawFrame(context, frame, { ...frame, x: this.x, y: this.y });
         }
     }
