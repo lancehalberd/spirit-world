@@ -28,6 +28,8 @@ function getEscapedFrames(state: GameState, escapedToken: string): Frame[] {
         return _.flatten(controllerMaps.map(controllerMap => controllerMap[key]));
     }
     switch (escapedToken.toUpperCase()) {
+        case 'B_DPAD':
+            return getGameKeyFrames(GAME_KEY.UP);
         case 'B_UP':
             return getGameKeyFrames(GAME_KEY.UP);
         case 'B_DOWN':
@@ -69,7 +71,7 @@ export function parseMessage(state: GameState, message: string): Frame[][][] {
     let row: Frame[] = [];
     let rowWidth = 0;
     for (const chunk of chunks) {
-        const spacedChunks = chunk.split(' ');
+        const spacedChunks = chunk.split(/[ \n]+/);
         for (const spacedChunk of spacedChunks) {
             // This will split the spaced chunk into a sequence of elements like:
             // ['string', 'escapedToken', 'string', ...].

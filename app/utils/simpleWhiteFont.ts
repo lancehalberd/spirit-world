@@ -34,10 +34,11 @@ const [
     keyboard_enter,
     /*keyboard_w*/, /*keyboard_d*/, /*keyboard_s*/, /*keyboard_a*/,
     keyboard_wasd,
-    /*keyboard_left*/, /*keyboard_right*/, /*keyboard_up*/,
+    /*keyboard_left*/, /*keyboard_right*/, /*keyboard_up*/,  /*keyboard_down*/,
+    keyboard_uldr,
     keyboard_c, keyboard_v, keyboard_z, keyboard_x,
     keyboard_space, keyboard_shift,
-] = createAnimation('gfx/hud/controllerbuttonswhite.png', {w: 26, h: 18, content: {x: 0, y: 1, w: 26, h: 16}}, {cols: 40}).frames;
+] = createAnimation('gfx/hud/controllerbuttonswhite.png', {w: 26, h: 18, content: {x: 0, y: 1, w: 26, h: 16}}, {cols: 42}).frames;
 
 const smallKeys = [
     xbox_y, xbox_b, xbox_a, xbox_x, xbox_start,
@@ -50,10 +51,10 @@ for (const smallKey of smallKeys) {
 }
 
 export const xboxMap = {
-    [GAME_KEY.UP]: [xbox_dpad, xbox_leftStick],
-    [GAME_KEY.DOWN]: [xbox_dpad, xbox_leftStick],
-    [GAME_KEY.LEFT]: [xbox_dpad, xbox_leftStick],
-    [GAME_KEY.RIGHT]: [xbox_dpad, xbox_leftStick],
+    [GAME_KEY.UP]: [xbox_dpad, characterMap['/'], xbox_leftStick],
+    [GAME_KEY.DOWN]: [xbox_dpad, characterMap['/'], xbox_leftStick],
+    [GAME_KEY.LEFT]: [xbox_dpad, characterMap['/'], xbox_leftStick],
+    [GAME_KEY.RIGHT]: [xbox_dpad, characterMap['/'], xbox_leftStick],
     [GAME_KEY.MENU]: [xbox_start],
     [GAME_KEY.WEAPON]: [xbox_a],
     [GAME_KEY.PASSIVE_TOOL]: [xbox_b],
@@ -64,10 +65,10 @@ export const xboxMap = {
 };
 
 export const psMap = {
-    [GAME_KEY.UP]: [ps_dpad, ps_leftStick],
-    [GAME_KEY.DOWN]: [ps_dpad, ps_leftStick],
-    [GAME_KEY.LEFT]: [ps_dpad, ps_leftStick],
-    [GAME_KEY.RIGHT]: [ps_dpad, ps_leftStick],
+    [GAME_KEY.UP]: [ps_dpad, characterMap['/'], ps_leftStick],
+    [GAME_KEY.DOWN]: [ps_dpad, characterMap['/'], ps_leftStick],
+    [GAME_KEY.LEFT]: [ps_dpad, characterMap['/'], ps_leftStick],
+    [GAME_KEY.RIGHT]: [ps_dpad, characterMap['/'], ps_leftStick],
     [GAME_KEY.MENU]: [ps_start],
     [GAME_KEY.WEAPON]: [ps_x],
     [GAME_KEY.PASSIVE_TOOL]: [ps_circle],
@@ -78,10 +79,10 @@ export const psMap = {
 };
 
 export const keyboardMap = {
-    [GAME_KEY.UP]: [keyboard_wasd],
-    [GAME_KEY.DOWN]: [keyboard_wasd],
-    [GAME_KEY.LEFT]: [keyboard_wasd],
-    [GAME_KEY.RIGHT]: [keyboard_wasd],
+    [GAME_KEY.UP]: [keyboard_wasd, characterMap['/'], keyboard_uldr],
+    [GAME_KEY.DOWN]: [keyboard_wasd, characterMap['/'], keyboard_uldr],
+    [GAME_KEY.LEFT]: [keyboard_wasd, characterMap['/'], keyboard_uldr],
+    [GAME_KEY.RIGHT]: [keyboard_wasd, characterMap['/'], keyboard_uldr],
     [GAME_KEY.MENU]: [keyboard_enter],
     [GAME_KEY.WEAPON]: [keyboard_space],
     [GAME_KEY.PASSIVE_TOOL]: [keyboard_shift],

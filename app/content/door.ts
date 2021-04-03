@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { enterZoneByTarget, resetTileBehavior } from 'app/content/areas';
 import { findObjectInstanceById } from 'app/content/objects';
 import {
-    BITMAP_BOTTOM, BITMAP_LEFT, BITMAP_RIGHT, BITMAP_TOP,
+    BITMAP_LEFT, BITMAP_RIGHT,
 } from 'app/content/palettes';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { directionMap, getDirection } from 'app/utils/field';
@@ -14,6 +14,15 @@ import {
     ObjectStatus, EntranceDefinition, ShortRectangle, TileBehaviors
 } from 'app/types';
 
+
+const BITMAP_SIDE_DOOR_TOP: Uint16Array = new Uint16Array([
+    0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
+    0xFFFF, 0xFFFF, 0xFFFF, 0, 0, 0, 0, 0,
+]);
+const BITMAP_SIDE_DOOR_BOTTOM: Uint16Array = new Uint16Array([
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
+]);
 
 const [
     southCrackedWall, southCaveFrame, southCaveCeiling, southCave,
@@ -178,10 +187,10 @@ export class Door implements ObjectInstance {
         } else if (doorStyle.w === 32) {
             if (this.isOpen()) {
                 if (this.definition.d === 'left' || this.definition.d === 'right') {
-                    applyBehaviorToTile(this.area, x, y, { solidMap: BITMAP_TOP, low: false });
-                    applyBehaviorToTile(this.area, x + 1, y, { solidMap: BITMAP_TOP, low: false });
-                    applyBehaviorToTile(this.area, x, y + 1, { solidMap: BITMAP_BOTTOM, low: false});
-                    applyBehaviorToTile(this.area, x + 1, y + 1, { solidMap: BITMAP_BOTTOM, low: false });
+                    applyBehaviorToTile(this.area, x, y, { solidMap: BITMAP_SIDE_DOOR_TOP, low: false });
+                    applyBehaviorToTile(this.area, x + 1, y, { solidMap: BITMAP_SIDE_DOOR_TOP, low: false });
+                    applyBehaviorToTile(this.area, x, y + 1, { solidMap: BITMAP_SIDE_DOOR_BOTTOM, low: false});
+                    applyBehaviorToTile(this.area, x + 1, y + 1, { solidMap: BITMAP_SIDE_DOOR_BOTTOM, low: false });
                 } else {
                     applyBehaviorToTile(this.area, x, y, { solidMap: BITMAP_LEFT, low: false });
                     applyBehaviorToTile(this.area, x + 1, y, { solidMap: BITMAP_RIGHT, low: false });
@@ -304,6 +313,13 @@ export class Door implements ObjectInstance {
                 console.error(state.areaInstance.objects);
                 console.error(this.definition.targetObjectId);
                 debugger;
+            }
+            // When passing horizontally through narrow doors, we need to start 3px lower than usual.
+            if (target.definition.type === 'door') {
+                const style = doorStyles[target.style];
+                if (style.h === 32 && target.definition.d === 'left' || target.definition.d === 'right') {
+                    hero.y += 3;
+                }
             }
             hero.actionTarget = target;
             // Make sure the hero is coming *out* of the target door.

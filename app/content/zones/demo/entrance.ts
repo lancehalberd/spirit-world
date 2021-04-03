@@ -107,6 +107,7 @@ const f0_0x0: AreaDefinition = {
         {id: "demo_entrance:0:0x0-sign-0", linked: false, spirit: false, status: "normal", x: 176, y: 32, type: "sign", message: "With the Spirit Eyes, hold {B_PASSIVE} to meditate and look into the Spirit World."},
         {id: "demo_entrance:0:0x0-sign-3", linked: false, spirit: false, status: "normal", x: 80, y: 80, type: "sign", message: "The Gloves allow you to pick up heavy stones. Face a stone and press {B_PASSIVE} to lift and carry it. Press {B_PASSIVE} again to throw.", style: "tall"},
         {id: "demo_entrance:0:0x0-sign-2", linked: false, spirit: false, status: "normal", x: 96, y: 208, type: "sign", message: "The Clone technique allows you to create a clone of yourself. Press {B_TOOL} to create a clone, then {B_TOOL} to switch between clones. You can hold {B_TOOL} to control all your clones at once.", style: "tall"},
+        {id: "demo_entrance:0:0x0-sign-4", linked: false, spirit: false, status: "normal", x: 208, y: 128, style: "short", type: "sign", message: "Face a pot and hold {B_PASSIVE} to grab it. \n{|}\nGrab a pot and use {B_DPAD} to push or pull it."},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
