@@ -9,13 +9,13 @@ import {
 import { updateKeyboardState } from 'app/keyCommands';
 import { initializeGame } from 'app/initialize';
 import { wasGameKeyPressed } from 'app/keyCommands';
+import { updateHeroMagicStats } from 'app/render/spiritBar';
 import {
     getDefaultSavedState,
     getState,
     returnToSpawnLocation,
     selectSaveFile,
     setSaveFileToState,
-    updateHeroMagicStats,
     SPAWN_LOCATION_DEMO,
     SPAWN_LOCATION_FULL,
 } from 'app/state';

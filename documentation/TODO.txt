@@ -23,10 +23,6 @@ Outstanding Questions:
 Graphics:
     Add Item Get Frame gfx/wukongimportantitem.png 20x28
     // Let's draw this to its own canvas and only update when magic changes px value.
-    Add mana bar graphics gfx/hud/magicbar.png [
-        topCap, bottomCap, topBar (top 5px), bottomBar (bottom 5px), barBack,
-        manaBottom, manaFill, manaLine, manaTop (used when full)
-    ]
     Add fall animation for objects that fall into pits (this isn't implemented yet)
     Add sparkles to peach loot + hud.
     Add damage effects for hitting enemies?

@@ -1,6 +1,7 @@
 import { enterLocation } from 'app/content/areas';
 import { zones } from 'app/content/zones';
 import { CANVAS_HEIGHT } from 'app/gameConstants';
+import { updateHeroMagicStats } from 'app/render/spiritBar';
 import { renderHero } from 'app/renderActor';
 
 import { GameState, Hero, SavedState, ZoneLocation } from 'app/types';
@@ -183,35 +184,6 @@ function getDefaultHeroState(): Hero {
         spiritRadius: 0,
         spawnLocation: SPAWN_LOCATION_FULL,
     };
-}
-
-export function updateHeroMagicStats(state: GameState) {
-    state.hero.maxMagic = 20;
-    state.hero.magicRegen = 4;
-    if (state.hero.passiveTools.charge >= 1) {
-        state.hero.maxMagic += 10;
-        state.hero.magicRegen += 1;
-    }
-    if (state.hero.passiveTools.charge >= 2) {
-        state.hero.maxMagic += 20;
-        state.hero.magicRegen += 2;
-    }
-    if (state.hero.elements.fire) {
-        state.hero.maxMagic += 10;
-        state.hero.magicRegen += 1;
-    }
-    if (state.hero.elements.ice) {
-        state.hero.maxMagic += 10;
-        state.hero.magicRegen += 1;
-    }
-    if (state.hero.elements.lightning) {
-        state.hero.maxMagic += 10;
-        state.hero.magicRegen += 1;
-    }
-    if (state.hero.passiveTools.phoenixCrown) {
-        state.hero.maxMagic += 20;
-        state.hero.magicRegen += 5;
-    }
 }
 
 function getDefaultState(): GameState {

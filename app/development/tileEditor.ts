@@ -25,7 +25,8 @@ import { mainCanvas } from 'app/dom';
 import { CANVAS_SCALE } from 'app/gameConstants';
 import { KEY, isKeyboardKeyDown } from 'app/keyCommands';
 import { translateContextForAreaAndCamera } from 'app/render';
-import { getState, updateHeroMagicStats } from 'app/state';
+import { updateHeroMagicStats } from 'app/render/spiritBar';
+import { getState } from 'app/state';
 import { drawFrame } from 'app/utils/animations';
 import { getMousePosition, isMouseDown } from 'app/utils/mouse';
 
