@@ -131,6 +131,7 @@ function getDefaultHeroState(): Hero {
         actionFrame: 0,
         animationTime: 0,
         life: 4, maxLife: 4,
+        lightRadius: 20,
         magic: 0,
         // base: 20, max: 100, roll: 5, charge: 10, double-charge: 50
         maxMagic: 20,

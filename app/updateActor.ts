@@ -526,6 +526,10 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         state.menuIndex = 0;
     }
     state.hero.magic += state.hero.magicRegen * FRAME_LENGTH / 1000;
+    // Spirit regenerates twice as quickly when idle.
+    if (!state.hero.action) {
+        state.hero.magic += state.hero.magicRegen * FRAME_LENGTH / 1000;
+    }
     // Clones drain 2 magic per second.
     state.hero.magic -= 2 * state.hero.clones.length * FRAME_LENGTH / 1000;
     if (state.hero.invisible) {
@@ -536,6 +540,27 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         // Invisibility cost returns to 0 while it is off.
         state.hero.invisibilityCost -= 4 * FRAME_LENGTH / 1000;
         state.hero.invisibilityCost = Math.max(0, state.hero.invisibilityCost);
+    }
+    // At base mana regen, using cat eyes reduces your mana very slowly unless you are stationary.
+    let targetLightRadius = 20, minLightRadius = 20;
+    if (state.areaInstance.definition.dark) {
+        if (state.hero.passiveTools.trueSight > 0) {
+            state.hero.magic -= 10 * FRAME_LENGTH / 1000;
+            targetLightRadius = 320;
+            minLightRadius += 20;
+        } else if (state.hero.passiveTools.catEyes > 0) {
+            state.hero.magic -= 5 * FRAME_LENGTH / 1000;
+            targetLightRadius = 80;
+            minLightRadius += 10;
+        }
+        // Light radius starts dropping when spirit energy < 50% full.
+        targetLightRadius = Math.max(minLightRadius,
+            Math.floor(targetLightRadius * Math.min(1, 2 * state.hero.magic / state.hero.maxMagic)));
+    }
+    if (state.hero.lightRadius > targetLightRadius) {
+        state.hero.lightRadius = Math.max(targetLightRadius, state.hero.lightRadius - 2);
+    } else if (state.hero.lightRadius < targetLightRadius) {
+        state.hero.lightRadius = Math.min(targetLightRadius, state.hero.lightRadius + 2);
     }
     if (state.hero.magic < 0) {
         state.hero.magic = 0;

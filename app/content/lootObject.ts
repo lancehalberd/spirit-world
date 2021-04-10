@@ -127,6 +127,7 @@ function showLootMessage(state: GameState, lootType: LootType, lootLevel?: numbe
         case 'catEyes':
             return showMessage(state, 'You have been blessed with Cat Eyes!'
                 + '{|}You can see much better in the dark now!'
+                + '{|}Using cat eyes consumes spirit energy, stand still to recover.'
             );
         case 'spiritSight':
             return showMessage(state, 'You have been blessed with Spirit Sight!'

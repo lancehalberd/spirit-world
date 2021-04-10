@@ -103,17 +103,6 @@ export function updateSpiritCanvas(state: GameState, radius: number): void {
     spiritContext.restore();
 }
 
-function getDarkRadius(state: GameState): number {
-    if (state.hero.passiveTools.trueSight) {
-        return 320;
-    }
-    if (state.hero.passiveTools.catEyes) {
-        return 80;
-    }
-    return 20;
-}
-
-
 export function render() {
     const context = mainContext;
     const state = getState();
@@ -274,8 +263,7 @@ export function renderField(context: CanvasRenderingContext2D, state: GameState)
     }
     if (darkPercent > 0) {
         context.save()
-            const radius = getDarkRadius(state);
-            updateDarkCanvas(radius);
+            updateDarkCanvas(state.hero.lightRadius);
             if (editingState.isEditing) {
                 context.globalAlpha = 0.5;
             }

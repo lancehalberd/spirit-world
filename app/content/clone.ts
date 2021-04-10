@@ -66,6 +66,7 @@ export class Clone implements Hero, ObjectInstance {
     rightTool: ActiveTool;
     invisibilityCost: number;
     invisible: boolean;
+    lightRadius: number;
     spawnLocation: ZoneLocation;
     spiritRadius: number;
     carryRotationOffset: number;

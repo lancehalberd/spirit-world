@@ -97,6 +97,7 @@ export interface Hero extends Actor {
     maxMagic: number,
     // base 4, max 8-10
     magicRegen: number,
+    lightRadius: number,
     // inventory
     money: number,
     arrows: number,

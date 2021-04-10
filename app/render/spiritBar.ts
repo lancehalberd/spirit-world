@@ -62,7 +62,7 @@ export function renderSpiritBar(context: CanvasRenderingContext2D, state: GameSt
         // Draw the top of the spirit bar at 100%, otherwise draw the indicator line at the top of the fill.
         if (fillHeight >= state.hero.maxMagic) {
             drawFrame(context, spiritTop, {...spiritTop, x, y: y + topCap.h - 1});
-        } else {
+        } else if (fillHeight > 1) {
             drawFrame(context, spiritLine, {...spiritLine, x, y: y + topCap.h + barHeight - fillHeight});
         }
     }
