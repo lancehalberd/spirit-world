@@ -20,7 +20,7 @@ function createLootTable(totalWeight: number, entries: {type: LootType, amount?:
 }
 
 export const simpleLootTable = createLootTable(200, [
-    {type: 'money', amount: 20, weight: 2},
+    {type: 'money', amount: 10, weight: 2},
     {type: 'money', amount: 5, weight: 10},
     {type: 'money', amount: 1, weight: 50},
     {type: 'peach', weight: 25},
@@ -34,6 +34,7 @@ export const lifeLootTable = createLootTable(200, [
 
 export const moneyLootTable = createLootTable(100, [
     {type: 'money', amount: 20, weight: 5},
+    {type: 'money', amount: 10, weight: 10},
     {type: 'money', amount: 5, weight: 20},
     {type: 'money', amount: 1, weight: 50},
 ]);

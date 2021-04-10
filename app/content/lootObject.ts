@@ -146,7 +146,7 @@ function showLootMessage(state: GameState, lootType: LootType, lootLevel?: numbe
 export class LootObject implements ObjectInstance {
     area: AreaInstance;
     definition: LootObjectDefinition;
-    drawPriority: 'background' = 'background';
+    drawPriority: 'sprites' = 'sprites';
     frame: Frame;
     x: number;
     y: number;
@@ -181,6 +181,13 @@ export class LootObject implements ObjectInstance {
             return;
         }
         drawFrame(context, this.frame, { ...this.frame, x: this.x, y: this.y });
+    }
+    renderShadow(context, state: GameState) {
+        const frame = getLootShadowFrame(this.definition);
+        drawFrame(context, frame, { ...frame,
+            x: this.x - (frame.w - this.frame.w) / 2,
+            y: this.y - (frame.h - this.frame.h),
+        });
     }
 }
 
@@ -309,24 +316,47 @@ const lootFrames: Partial<{[key in LootType]: Frame}> = {
 };
 
 
-const [smallCoin, , , bigCoin, , , , otherCoin, mediumCoin] =
-    createAnimation('gfx/hud/coins.png', {w: 16, h: 16}, {cols: 9}).frames;
+const [
+    smallShadow, bigShadow,
+    /*smallLightHalf*/, /*smallDarkHalf*/,
+    lightOrb, darkOrb,
+    /* smallWhole*/,
+    lightHalf, darkHalf, wholeCoin
+] =
+    createAnimation('gfx/hud/money.png', {w: 16, h: 16}, {cols: 10}).frames;
 export function getLootFrame({lootType, lootLevel, lootAmount}:
     {lootType: LootType, lootLevel?: number, lootAmount?: number}
 ): Frame {
     if (lootType === 'money') {
         if (!lootAmount || lootAmount === 1) {
-            return smallCoin;
+            return lightOrb;
         }
         if (lootAmount === 5) {
-            return mediumCoin;
+            return darkOrb;
+        }
+        if (lootAmount === 10) {
+            return lightHalf;
         }
         if (lootAmount === 20) {
-            return bigCoin;
+            return darkHalf;
         }
-        return otherCoin;
+        return wholeCoin;
     }
     return lootFrames[lootType] || lootFrames.unknown;
+}
+function getLootShadowFrame({lootType, lootLevel, lootAmount}:
+    {lootType: LootType, lootLevel?: number, lootAmount?: number}
+): Frame {
+    if (lootType === 'money') {
+        if (!lootAmount || lootAmount <= 5) {
+            return smallShadow;
+        }
+        return bigShadow;
+    }
+    if (lootType === 'peach') {
+        return smallShadow;
+    }
+    return bigShadow;
 }
 
 export function applyUpgrade(currentLevel: number, loot: LootObjectDefinition | BossObjectDefinition): number {

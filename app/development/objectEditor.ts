@@ -510,7 +510,7 @@ function getLootFields(state: GameState, editingState: EditingState, object: Obj
         rows.push({
             name: 'amount',
             value: '' + object.lootAmount || editingState.amount,
-            values: ['1', '20', '50', '100', '300'],
+            values: ['1', '5', '10', '20', '50', '100', '300'],
             onChange(amountString: string) {
                 const amount = parseInt(amountString, 10);
                 if (object.id) {

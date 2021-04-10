@@ -10,7 +10,7 @@ const [emptyHeart, fullHeart, threeQuarters, halfHeart, quarterHeart] =
     createAnimation('gfx/hud/hearts.png', {w: 10, h: 10}, {cols: 5}).frames;
 
 const [coin] =
-    createAnimation('gfx/hud/coins.png', {w: 16, h: 16}, {x: 8}).frames;
+    createAnimation('gfx/hud/money.png', {w: 16, h: 16}, {x: 9}).frames;
 
 export function renderHUD(context: CanvasRenderingContext2D, state: GameState): void {
     for (let i = 0; i < state.hero.maxLife; i++) {
@@ -57,7 +57,7 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
         fillRect(context, target, 'black');
     }
 
-    drawFrame(context, coin, {...coin, x: CANVAS_WIDTH - 110, y: 5});
+    drawFrame(context, coin, {...coin, x: CANVAS_WIDTH - 110, y: 4});
     let moneyText = `${state.hero.money}`;
     while (moneyText.length < 4) moneyText = '0' + moneyText;
     drawText(context, moneyText, CANVAS_WIDTH - 90, 14, {

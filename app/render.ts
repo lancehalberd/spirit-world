@@ -321,12 +321,11 @@ export function renderAreaObjectsBeforeHero(context: CanvasRenderingContext2D, s
         }
         // Render shadows before anything else.
         for (const object of area.objects) {
-            if (object.drawPriority === 'sprites') {
-                if (object instanceof Clone) {
-                    renderHeroShadow(context, state, object);
-                }
-            }
-            if (object instanceof Enemy && object.hasShadow) {
+            if (object.renderShadow) {
+                object.renderShadow(context, state);
+            } else if (object instanceof Clone) {
+                renderHeroShadow(context, state, object);
+            } else if (object instanceof Enemy && object.hasShadow) {
                 renderEnemyShadow(context, state, object);
             }
         }

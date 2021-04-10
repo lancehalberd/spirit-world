@@ -186,7 +186,7 @@ export function enterLocation(
     state.areaGrid = location.isSpiritWorld ? floor.spiritGrid : floor.grid;
     state.location.areaGridCoords = {
         y: state.location.areaGridCoords.y % state.areaGrid.length,
-        x: state.location.areaGridCoords.x % state.areaGrid[state.location.areaGridCoords.y].length,
+        x: state.location.areaGridCoords.x % state.areaGrid[state.location.areaGridCoords.y % state.areaGrid.length].length,
     };
     const area = getAreaFromLocation(state.location);
     const alternateArea = getAreaFromLocation({...state.location, isSpiritWorld: !state.location.isSpiritWorld});

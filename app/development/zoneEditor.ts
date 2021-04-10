@@ -127,7 +127,7 @@ export function getZoneProperties(state: GameState, editingState: EditingState):
         id: `add-new-zone`,
         onClick() {
             const newZoneKey = window.prompt('Enter the new zone key');
-            if (zones[newZoneKey]) {
+            if (!newZoneKey || zones[newZoneKey]) {
                 return;
             }
             const zone: Zone = {

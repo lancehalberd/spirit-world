@@ -207,6 +207,7 @@ export interface ObjectInstance {
     add?: (state: GameState, area: AreaInstance) => void,
     remove?: (state: GameState) => void,
     render: (context: CanvasRenderingContext2D, state: GameState) => void,
+    renderShadow?: (context: CanvasRenderingContext2D, state: GameState) => void,
     renderForeground?: (context: CanvasRenderingContext2D, state: GameState) => void,
 }
 
