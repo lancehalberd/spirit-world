@@ -66,7 +66,7 @@ export class ThrownObject implements ObjectInstance {
                 continue;
             }
             if (object instanceof Enemy) {
-                if (rectanglesOverlap(object, hitbox)) {
+                if (rectanglesOverlap(object.getHitbox(state), hitbox)) {
                     damageActor(state, object, this.damage);
                     this.breakOnImpact(state);
                 }
