@@ -119,7 +119,7 @@ export function serializeZone(zone: Zone) {
                     }
                     lines.push('    ],');
                     if (area.dark) {
-                        lines.push('    dark: true,');
+                        lines.push(`    dark: ${area.dark},`);
                     }
                     lines.push('};');
                 }

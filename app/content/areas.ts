@@ -375,7 +375,9 @@ export function applyLayerToBehaviorGrid(behaviorGrid: TileBehaviors[][], layer:
             // The behavior grid combines behaviors of all layers, with higher layers
             // overriding the behavior of lower layers.
             if (behaviors) {
-                behaviorGrid[y][x] = {...(behaviorGrid[y][x] || {}), ...behaviors};
+                const lightRadius = Math.max(behaviorGrid[y][x]?.lightRadius || 0, behaviors.lightRadius || 0);
+                const brightness = Math.max(behaviorGrid[y][x]?.brightness || 0, behaviors.brightness || 0);
+                behaviorGrid[y][x] = {...(behaviorGrid[y][x] || {}), ...behaviors, lightRadius, brightness};
             }
 
         }

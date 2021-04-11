@@ -201,7 +201,7 @@ const f0_0x1: AreaDefinition = {
         {x: 16, y: 0, w: 16, h: 16},
         {x: 16, y: 16, w: 16, h: 16},
     ],
-    dark: true,
+    dark: 100,
 };
 const f0_0x2: AreaDefinition = {
     layers: [

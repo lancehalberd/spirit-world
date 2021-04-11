@@ -211,6 +211,7 @@ function getDefaultState(): GameState {
             gameKeysReleased: new Set(),
             mostRecentKeysPressed: new Set(),
         },
+        fadeLevel: 0,
     };
     return state;
 }
@@ -249,6 +250,7 @@ export function returnToSpawnLocation(state: GameState) {
     state.areaGrid = state.zone.floors[state.location.floor].grid;*/
     state.hero.d = state.hero.spawnLocation.d;
     enterLocation(state, state.hero.spawnLocation);
+    state.fadeLevel = state.areaInstance.definition.dark / 100;
 }
 
 export function getState(): GameState {

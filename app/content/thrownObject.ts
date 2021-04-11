@@ -6,7 +6,7 @@ import { drawFrame } from 'app/utils/animations';
 import { getDirection } from 'app/utils/field';
 import { rectanglesOverlap } from 'app/utils/index';
 
-import { AreaInstance, Frame, GameState, ObjectInstance, ObjectStatus } from 'app/types';
+import { AreaInstance, Frame, GameState, ObjectInstance, ObjectStatus, TileBehaviors } from 'app/types';
 
 
 interface Props {
@@ -23,6 +23,7 @@ interface Props {
 
 export class ThrownObject implements ObjectInstance {
     area: AreaInstance;
+    behaviors: TileBehaviors;
     definition = null;
     linkedObject: ThrownObject;
     type = 'thrownObject' as 'thrownObject';
@@ -47,6 +48,7 @@ export class ThrownObject implements ObjectInstance {
         this.vy = vy;
         this.vz = vz;
         this.damage = damage;
+        this.behaviors = {};
     }
     getHitbox(state: GameState) {
         // Technically it is unrealistic to use the z-component in the hitbox, but practically
@@ -86,7 +88,7 @@ export class ThrownObject implements ObjectInstance {
         if (!this.broken) {
             this.broken = true;
             removeObjectFromArea(state, this);
-            addParticleAnimations(state, this.area, this.x, this.y, this.z, this.particles);
+            addParticleAnimations(state, this.area, this.x, this.y, this.z, this.particles, this.behaviors);
             if (this.linkedObject && !this.linkedObject.broken) {
                 this.linkedObject.breakOnImpact(state);
             }

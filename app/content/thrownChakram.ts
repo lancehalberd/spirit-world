@@ -120,7 +120,7 @@ export class ThrownChakram implements ObjectInstance {
                     const behavior = palette.behaviors[`${tile.x}x${tile.y}`];
                     if (behavior?.cuttable <= state.hero.weapon) {
                         destroyTile(state, this.area, {...target, layerKey: layer.key});
-                        addParticleAnimations(state, this.area, target.x * 16, target.y * 16, 2, behavior.particles);
+                        addParticleAnimations(state, this.area, target.x * 16, target.y * 16, 2, behavior.particles, behavior);
                     }
                 }
             } else if (behavior?.cuttable > state.hero.weapon ||

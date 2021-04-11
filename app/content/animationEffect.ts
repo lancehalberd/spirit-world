@@ -2,7 +2,7 @@ import { addObjectToArea, removeObjectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { drawFrame, frameAnimation, getFrame } from 'app/utils/animations';
 
-import { AreaInstance, Frame, FrameAnimation, GameState, ObjectInstance, ObjectStatus } from 'app/types';
+import { AreaInstance, Frame, FrameAnimation, GameState, ObjectInstance, ObjectStatus, TileBehaviors } from 'app/types';
 
 
 interface Props {
@@ -22,6 +22,7 @@ export class AnimationEffect implements ObjectInstance {
     definition = null;
     animation: FrameAnimation;
     animationTime: number;
+    behaviors: TileBehaviors;
     x: number;
     y: number;
     z: number;
@@ -42,6 +43,11 @@ export class AnimationEffect implements ObjectInstance {
         this.vz = vz;
         this.az = az;
         this.scale = scale;
+        this.behaviors = {};
+    }
+    getHitbox(state: GameState) {
+        const frame = getFrame(this.animation, this.animationTime);
+        return {x: this.x, y: this.y - this.z, w: frame.w, h: frame.h};
     }
     update(state: GameState) {
         this.x += this.vx;
@@ -49,7 +55,10 @@ export class AnimationEffect implements ObjectInstance {
         this.z += this.vz;
         this.animationTime += FRAME_LENGTH;
         this.vz += this.az;
-        if (this.z < 0 || (!this.animation.loop && this.animationTime >= this.animation.duration)) {
+        if (this.behaviors.brightness > 0) {
+            this.behaviors.brightness *= 0.9;
+        }
+        if (this.z < 0 || (this.animation.loop === false && this.animationTime >= this.animation.duration)) {
             removeObjectFromArea(state, this);
         }
     }
@@ -63,7 +72,8 @@ export class AnimationEffect implements ObjectInstance {
     }
 }
 
-export function addParticleAnimations(state: GameState, area: AreaInstance, x: number, y: number, z: number, particles: Frame[]): void {
+export function addParticleAnimations(
+    state: GameState, area: AreaInstance, x: number, y: number, z: number, particles: Frame[], behaviors?: TileBehaviors): void {
     if (!particles) {
         return;
     }
@@ -71,13 +81,16 @@ export function addParticleAnimations(state: GameState, area: AreaInstance, x: n
     for (const frame of particles) {
         const vx = Math.cos(theta);
         const vy = Math.sin(theta);
-        addObjectToArea(state, area,
-            new AnimationEffect({
-                animation: frameAnimation(frame),
-                x: x + vx, y: y + vy, z,
-                vx, vy, vz: 1.5, az: -0.2,
-            })
-        );
+        const particle = new AnimationEffect({
+            animation: frameAnimation(frame),
+            x: x + vx, y: y + vy, z,
+            vx, vy, vz: 1.5, az: -0.2,
+        });
+        if (behaviors?.brightness) {
+            particle.behaviors.brightness = behaviors.brightness;
+            particle.behaviors.lightRadius = (behaviors.lightRadius || 32) / 2;
+        }
+        addObjectToArea(state, area, particle);
         theta += Math.PI * 2 / (particles.length);
     }
 }

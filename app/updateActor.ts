@@ -248,6 +248,10 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             hero.action = null;
             hero.vz = 0;
         }
+    } else if (hero.z > 0) {
+        hero.action = 'knocked';
+        dx = 0;
+        dy = 0;
     } else if (hero.action === 'attack') {
         movementSpeed = 1;
         hero.actionFrame++;
@@ -541,26 +545,30 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         state.hero.invisibilityCost -= 4 * FRAME_LENGTH / 1000;
         state.hero.invisibilityCost = Math.max(0, state.hero.invisibilityCost);
     }
-    // At base mana regen, using cat eyes reduces your mana very slowly unless you are stationary.
-    let targetLightRadius = 20, minLightRadius = 20;
-    if (state.areaInstance.definition.dark) {
-        if (state.hero.passiveTools.trueSight > 0) {
-            state.hero.magic -= 10 * FRAME_LENGTH / 1000;
-            targetLightRadius = 320;
-            minLightRadius += 20;
-        } else if (state.hero.passiveTools.catEyes > 0) {
-            state.hero.magic -= 5 * FRAME_LENGTH / 1000;
-            targetLightRadius = 80;
-            minLightRadius += 10;
+    if (hero.action !== 'knocked' && hero.action !== 'thrown') {
+        // At base mana regen, using cat eyes reduces your mana very slowly unless you are stationary.
+        let targetLightRadius = 20, minLightRadius = 20;
+        if (state.areaInstance.definition.dark) {
+            const coefficient = 100 / state.areaInstance.definition.dark;
+            minLightRadius *= coefficient;
+            if (state.hero.passiveTools.trueSight > 0) {
+                state.hero.magic -= 10 * FRAME_LENGTH / 1000 / coefficient;
+                targetLightRadius = 320 * coefficient;
+                minLightRadius += 20 * coefficient;
+            } else if (state.hero.passiveTools.catEyes > 0) {
+                state.hero.magic -= 5 * FRAME_LENGTH / 1000 / coefficient;
+                targetLightRadius = 80 * coefficient;
+                minLightRadius += 10 * coefficient;
+            }
+            // Light radius starts dropping when spirit energy < 50% full.
+            targetLightRadius = Math.max(minLightRadius,
+                Math.floor(targetLightRadius * Math.min(1, 2 * state.hero.magic / state.hero.maxMagic)));
         }
-        // Light radius starts dropping when spirit energy < 50% full.
-        targetLightRadius = Math.max(minLightRadius,
-            Math.floor(targetLightRadius * Math.min(1, 2 * state.hero.magic / state.hero.maxMagic)));
-    }
-    if (state.hero.lightRadius > targetLightRadius) {
-        state.hero.lightRadius = Math.max(targetLightRadius, state.hero.lightRadius - 2);
-    } else if (state.hero.lightRadius < targetLightRadius) {
-        state.hero.lightRadius = Math.min(targetLightRadius, state.hero.lightRadius + 2);
+        if (state.hero.lightRadius > targetLightRadius) {
+            state.hero.lightRadius = Math.max(targetLightRadius, state.hero.lightRadius - 2);
+        } else if (state.hero.lightRadius < targetLightRadius) {
+            state.hero.lightRadius = Math.min(targetLightRadius, state.hero.lightRadius + 2);
+        }
     }
     if (state.hero.magic < 0) {
         state.hero.magic = 0;
@@ -700,6 +708,8 @@ export function throwHeldObject(state: GameState, hero: Hero){
         vy: directionMap[hero.d][1] * throwSpeed,
         vz: 2,
     });
+    thrownObject.behaviors.brightness = behaviors?.brightness;
+    thrownObject.behaviors.lightRadius = behaviors?.lightRadius;
     addObjectToArea(state, state.areaInstance, thrownObject);
     if (tile.linked) {
         const layer = _.find(state.alternateAreaInstance.layers, { key: tile.layerKey});
@@ -715,6 +725,8 @@ export function throwHeldObject(state: GameState, hero: Hero){
             vz: 2,
         });
         alternateThrownObject.linkedObject = thrownObject;
+        alternateThrownObject.behaviors.brightness = behaviors?.brightness;
+        alternateThrownObject.behaviors.lightRadius = behaviors?.lightRadius;
         thrownObject.linkedObject = alternateThrownObject;
         addObjectToArea(state, state.alternateAreaInstance, alternateThrownObject);
     }

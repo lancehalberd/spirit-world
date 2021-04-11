@@ -9,6 +9,7 @@ import {
     FADE_IN_DURATION, FADE_OUT_DURATION,
     CIRCLE_WIPE_IN_DURATION, CIRCLE_WIPE_OUT_DURATION,
 } from 'app/gameConstants';
+import { renderAreaLighting, updateLightingCanvas } from 'app/render/areaLighting';
 import { renderHeroEyes, renderHeroShadow, renderEnemyShadow } from 'app/renderActor';
 import { renderDefeatedMenu } from 'app/renderDefeatedMenu';
 import { renderHUD } from 'app/renderHUD';
@@ -17,38 +18,9 @@ import { renderMessage } from 'app/render/renderMessage';
 import { renderTitle } from 'app/renderTitle';
 import { getState } from 'app/state';
 import { drawFrame } from 'app/utils/animations';
-import { directionMap } from 'app/utils/field';
 
 import { AreaInstance, AreaLayer, AreaLayerDefinition, Frame, GameState, LayerTile } from 'app/types';
 
-const [darkCanvas, darkContext] = createCanvasAndContext(CANVAS_WIDTH / 2 + 4, CANVAS_HEIGHT / 2 + 4);
-let darkCanvasRadius: number;
-let darkPercent: number = 0;
-export function updateDarkCanvas(radius: number): void {
-    if (radius === darkCanvasRadius && darkPercent >= 1) {
-        return;
-    }
-    darkCanvasRadius = radius;
-    darkContext.save();
-        darkContext.fillStyle = 'black';
-        darkContext.globalAlpha = darkPercent;
-        darkContext.clearRect(0, 0, darkCanvas.width, darkCanvas.height);
-        darkContext.beginPath();
-        darkContext.rect(0, 0, darkCanvas.width, darkCanvas.height);
-        darkContext.arc(darkCanvas.width / 2, darkCanvas.height / 2, radius / 4, 0, 2 * Math.PI, true);
-        darkContext.fill();
-        darkContext.globalAlpha = 0.8 * darkPercent;
-        darkContext.beginPath();
-        darkContext.rect(0, 0, darkCanvas.width, darkCanvas.height);
-        darkContext.arc(darkCanvas.width / 2, darkCanvas.height / 2, 3 * radius / 16, 0, 2 * Math.PI, true);
-        darkContext.fill();
-        darkContext.globalAlpha = 0.6 * darkPercent;
-        darkContext.beginPath();
-        darkContext.rect(0, 0, darkCanvas.width, darkCanvas.height);
-        darkContext.arc(darkCanvas.width / 2, darkCanvas.height / 2, radius / 8, 0, 2 * Math.PI, true);
-        darkContext.fill();
-    darkContext.restore();
-}
 // This is the max size of the s
 const [spiritCanvas, spiritContext] = createCanvasAndContext(MAX_SPIRIT_RADIUS * 2, MAX_SPIRIT_RADIUS * 2);
 /*document.body.append(spiritCanvas);
@@ -221,12 +193,15 @@ export function renderField(context: CanvasRenderingContext2D, state: GameState)
     // Update any background tiles that have changed.
     if (state.areaInstance.checkToRedrawTiles) {
         checkToRedrawTiles(state.areaInstance);
+        updateLightingCanvas(state.areaInstance);
     }
     if (state.hero.spiritRadius > 0 && state.alternateAreaInstance.checkToRedrawTiles) {
         checkToRedrawTiles(state.alternateAreaInstance);
+        updateLightingCanvas(state.alternateAreaInstance);
     }
     if (state.nextAreaInstance?.checkToRedrawTiles) {
         checkToRedrawTiles(state.nextAreaInstance);
+        updateLightingCanvas(state.nextAreaInstance);
     }
 
     const hero = state.hero.activeClone || state.hero;
@@ -256,27 +231,7 @@ export function renderField(context: CanvasRenderingContext2D, state: GameState)
 
     // Render any editor specific graphics if appropriate.
     renderEditor(context, state);
-    if (darkPercent < 1 && (state.areaInstance.definition.dark || state.nextAreaInstance?.definition.dark)) {
-        darkPercent = Math.min(darkPercent + 0.05, 1);
-    } else if (darkPercent > 0){
-        darkPercent = Math.max(darkPercent - 0.05, 0);
-    }
-    if (darkPercent > 0) {
-        context.save()
-            updateDarkCanvas(state.hero.lightRadius);
-            if (editingState.isEditing) {
-                context.globalAlpha = 0.5;
-            }
-            context.drawImage(darkCanvas,
-                0, 0, darkCanvas.width, darkCanvas.height,
-                hero.x + hero.w / 2 - darkCanvas.width * 2 + 12 * directionMap[hero.d][0]
-                - state.camera.x + state.areaInstance.cameraOffset.x,
-                hero.y + hero.h / 2 - darkCanvas.height * 2 + 12 * directionMap[hero.d][1]
-                 - state.camera.y + state.areaInstance.cameraOffset.y,
-                darkCanvas.width * 4, darkCanvas.height * 4
-            );
-        context.restore();
-    }
+    renderAreaLighting(context, state);
 }
 
 export function renderAreaBackground(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance): void {

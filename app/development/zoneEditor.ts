@@ -256,10 +256,15 @@ export function getZoneProperties(state: GameState, editingState: EditingState):
         }
     });
     rows.push({
-        name: 'dark',
-        value: !!state.areaInstance.definition.dark,
-        onChange(dark: boolean) {
-            state.areaInstance.definition.dark = dark;
+        name: 'darkness',
+        value: state.areaInstance.definition.dark || 0,
+        values: [0, 25, 50, 75, 100],
+        onChange(dark: number) {
+            if (!dark) {
+                delete state.areaInstance.definition.dark;
+            } else {
+                state.areaInstance.definition.dark = dark;
+            }
         }
     });
     rows.push({

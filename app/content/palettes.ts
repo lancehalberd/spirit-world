@@ -106,6 +106,7 @@ const spiritThornBehavior: TileBehaviors = {
     ...thornBehavior, particles: spiritThornParticles,
 };
 
+
 interface TilePaletteStamp extends TilePalette {
     isStamp?: boolean
 }
@@ -247,6 +248,36 @@ const caveWallsPalette: TilePalette = {
     defaultTiles: [{x: 0, y: 0}]
 };
 
+
+const spiritPlantParticles = createAnimation('gfx/tiles/spiritplants.png', {w: 16, h: 16}, {x: 5, cols: 4}).frames;
+
+const spiritPlantBehavior = {
+    solid: true, pickupWeight: 0, cuttable: 1, lootTable: lifeLootTable,
+    underTile: {x: 5, y: 1},
+    particles: spiritPlantParticles,
+    brightness: 0.6,
+    lightRadius: 48,
+};
+const spiritPlantsPalette: TilePalette = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/spiritplants.png'), x: 0, y: 0, w: 5 * 16, h: 16},
+    behaviors: {
+        '0x0': spiritPlantBehavior,
+        '1x0': spiritPlantBehavior,
+        '2x0': {brightness: 0.4, lightRadius: 24},
+        '3x0': {brightness: 0.4, lightRadius: 24},
+    },
+    defaultTiles: [{x: 0, y: 0}]
+};
+const brightGrass: TilePalette = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/grass.png'), x: 0, y: 0, w: 11 * 16, h: 16},
+    defaultTiles: [],
+    behaviors: {
+        '0x0': {brightness: 1, lightRadius: 16},
+    },
+};
+
 const fieldPalette = {...combinePalettes([
         // This is the empty tile.
         singleTilePalette('gfx/tiles/bush.png', null, -16),
@@ -280,6 +311,8 @@ const fieldPalette = {...combinePalettes([
         singleTilePalette('gfx/tiles/cavewalls.png', { solid: true }), // 'Abyss' between walls
         caveWallsPalette,
         caveCornersPalette,
+        spiritPlantsPalette,
+        brightGrass,
     ]),
     defaultTiles: [
         {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0},
@@ -339,6 +372,8 @@ const spiritFieldPalette = {...combinePalettes([
         singleTilePalette('gfx/tiles/cavewalls.png', { solid: true }), // 'Abyss' between walls
         caveWallsPalette,
         caveCornersPalette,
+        spiritPlantsPalette,
+        brightGrass,
     ]),
     defaultTiles: [null]
 };

@@ -6,6 +6,10 @@ import {
 export type Direction = 'up' | 'down' | 'left' | 'right';
 
 export interface TileBehaviors {
+    // 0-1
+    brightness?: number,
+    // In pixels
+    lightRadius?: number,
     // Sets players action to 'climbing' while on the tile.
     climbable?: boolean,
     // Can be destroyed by weapon
@@ -130,7 +134,8 @@ export interface AreaDefinition {
     objects: ObjectDefinition[],
     // Used to divide a larger super tile into smaller screens.
     sections: ShortRectangle[],
-    dark?: boolean,
+    // 0/undefined = fully lit, 100 = pitch black.
+    dark?: number,
     // Spirit world areas with real counterparts have this reference set
     // to make it more convenient to translate real tiles/objects to the spirit world.
     parentDefinition?: AreaDefinition,
@@ -163,8 +168,13 @@ export interface AreaInstance {
     layers: AreaLayer[],
     objects: ObjectInstance[],
     priorityObjects: ObjectInstance[][],
+    // These cached the tile backgrounds and are only updated when specific tile are marked to be redrawn.
     canvas: HTMLCanvasElement,
     context: CanvasRenderingContext2D,
+    // These cache the tile based lighting and are only created when lighting effects are in play.
+    // These are recalculated when from scratch when tiles with lighting behavior are changed.
+    lightingCanvas?: HTMLCanvasElement,
+    lightingContext?: CanvasRenderingContext2D,
     // This is used during transitions to indicate that the top left corner
     // of this area is offset from the camera origin by this many pixels.
     cameraOffset: {x: number, y: number},

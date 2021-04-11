@@ -53,4 +53,5 @@ export interface GameState {
     },
     isUsingKeyboard?: boolean,
     isUsingXbox?: boolean,
+    fadeLevel: number,
 }
