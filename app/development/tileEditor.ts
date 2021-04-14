@@ -106,6 +106,9 @@ export const editingState: EditingState = {
 window['editingState'] = editingState;
 export function toggleEditing() {
     const state = getState();
+    state.scene = 'game';
+    state.hero.z = 0;
+    state.hero.actionTarget = null;
     editingState.isEditing = !editingState.isEditing;
     if (editingState.isEditing) {
         startEditing(state);
@@ -599,13 +602,13 @@ function drawBrush(x: number, y: number): void {
     for (let y = 0; y < editingState.brush.h; y++) {
         const row = sy + y;
         if (row < 0 || row >= layerDefinition.grid.tiles.length) {
-            return;
+            continue;
         }
         const tileRow = layerDefinition.grid.tiles[row];
         for (let x = 0; x < editingState.brush.w; x++) {
             const column = sx + x;
             if (column < 0 || column >= tileRow.length) {
-                return;
+                continue;
             }
             const tile = editingState.brush.tiles[y][x]
             tileRow[column] = tile;
@@ -676,6 +679,22 @@ export function renderEditor(context: CanvasRenderingContext2D, state: GameState
     }
 }
 
+export function selectSection() {
+    const state = getState();
+    const layerDefinition = state.areaInstance.definition.layers[editingState.selectedLayerIndex];
+    editingState.brush.tiles = [];
+    const L = state.areaSection.x;
+    const T = state.areaSection.y;
+    editingState.brush.w = state.areaSection.w;
+    editingState.brush.h = state.areaSection.h;
+    for (let y = 0; y < editingState.brush.h; y++) {
+        editingState.brush.tiles[y] = [];
+        for (let x = 0; x < editingState.brush.w; x++) {
+            editingState.brush.tiles[y][x] = layerDefinition.grid.tiles[T + y][L + x];
+        }
+    }
+    updateBrushCanvas(editingState.brush);
+}
 
 function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance): void {
     const [x, y] = getMousePosition(mainCanvas, CANVAS_SCALE);

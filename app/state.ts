@@ -91,6 +91,7 @@ export function setSaveFileToState(savedGameIndex: number, gameMode: number = 0)
         },
     };
     state.hero = state.savedState.hero;
+    setSpawnLocation(state);
     updateHeroMagicStats(state);
     returnToSpawnLocation(state);
 }
@@ -104,6 +105,7 @@ export function selectSaveFile(savedGameIndex: number): void {
         state.hero = getDefaultSavedState().hero;
         state.hero.spawnLocation = SPAWN_LOCATION_FULL;
         state.hero.render = renderHero;
+        setSpawnLocation(state);
         updateHeroMagicStats(state);
         returnToSpawnLocation(state);
         return;
@@ -250,11 +252,29 @@ export function returnToSpawnLocation(state: GameState) {
     state.areaGrid = state.zone.floors[state.location.floor].grid;*/
     state.hero.d = state.hero.spawnLocation.d;
     enterLocation(state, state.hero.spawnLocation);
-    state.fadeLevel = state.areaInstance.definition.dark / 100;
+    state.fadeLevel = (state.areaInstance.definition.dark || 0) / 100;
 }
 
 export function getState(): GameState {
     return state;
 }
 window['getState'] = getState;
+
+
+const SPAWN_LOCATION_PEACH_CAVE_EXIT: ZoneLocation = {
+    zoneKey: 'overworld',
+    floor: 0,
+    x: 262,
+    y: 122,
+    z: 0,
+    d: 'down',
+    areaGridCoords: {x: 1, y: 1},
+    isSpiritWorld: false,
+};
+
+function setSpawnLocation(state: GameState): void {
+    if (state.savedState.objectFlags['newPeachCave:boss']) {
+        state.hero.spawnLocation = SPAWN_LOCATION_PEACH_CAVE_EXIT;
+    }
+}
 

@@ -1,7 +1,7 @@
 /* global navigator */
 import { enterLocation } from 'app/content/areas';
 import { exportZoneToClipboard } from 'app/development/exportZone';
-import { toggleEditing } from 'app/development/tileEditor';
+import { selectSection, toggleEditing } from 'app/development/tileEditor';
 import { GAME_KEY } from 'app/gameConstants';
 import { getState } from 'app/state';
 
@@ -156,6 +156,11 @@ export function addKeyCommands() {
         keysDown[keyCode] = 1;
         if (keyCode === KEY.C && commandIsDown) {
             exportZoneToClipboard(getState().zone);
+            event.preventDefault();
+        }
+        if (event.which === KEY.A && commandIsDown) {
+            selectSection();
+            event.preventDefault();
         }
         if (keyCode === KEY.E) {
             toggleEditing();

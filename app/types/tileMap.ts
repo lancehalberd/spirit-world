@@ -171,6 +171,9 @@ export interface AreaInstance {
     // These cached the tile backgrounds and are only updated when specific tile are marked to be redrawn.
     canvas: HTMLCanvasElement,
     context: CanvasRenderingContext2D,
+    // Foreground is only created as needed.
+    foregroundCanvas?: HTMLCanvasElement,
+    foregroundContext?: CanvasRenderingContext2D,
     // These cache the tile based lighting and are only created when lighting effects are in play.
     // These are recalculated when from scratch when tiles with lighting behavior are changed.
     lightingCanvas?: HTMLCanvasElement,

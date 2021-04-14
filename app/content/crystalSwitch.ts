@@ -21,6 +21,8 @@ export class CrystalSwitch implements ObjectInstance {
     behaviors = {
         low: true,
         solid: true,
+        brightness: 0.5,
+        lightRadius: 16,
     };
     drawPriority: DrawPriority = 'sprites';
     definition: CrystalSwitchDefinition = null;
@@ -47,6 +49,8 @@ export class CrystalSwitch implements ObjectInstance {
         this.status = 'active';
         this.animationTime = 0;
         this.timeLeft = this.definition.timer || 0;
+        this.behaviors.brightness = 1;
+        this.behaviors.lightRadius = 32;
         checkIfAllSwitchesAreActivated(state, this.area, this);
         if (this.linkedObject) {
             this.linkedObject.status = 'active';
@@ -61,6 +65,8 @@ export class CrystalSwitch implements ObjectInstance {
             this.timeLeft -= FRAME_LENGTH;
             if (this.timeLeft <= 0) {
                 this.status = 'normal';
+                this.behaviors.brightness = 0.5;
+                this.behaviors.lightRadius = 16;
                 deactivateTargets(state, this.area, this.definition.targetObjectId);
             }
         }

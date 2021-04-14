@@ -7,7 +7,7 @@ import {
 } from 'app/content/palettes';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { directionMap, getDirection } from 'app/utils/field';
-import { boxesIntersect, isPointInShortRect } from 'app/utils/index';
+import { boxesIntersect, isObjectInsideTarget, isPointInShortRect } from 'app/utils/index';
 
 import {
     AreaInstance, DrawPriority, Frame, GameState, ObjectInstance,
@@ -286,7 +286,8 @@ export class Door implements ObjectInstance {
         if (hero.actionTarget === this) {
             const x = hero.x + hero.w / 2 + hero.actionDx * hero.w / 2;
             const y = hero.y + hero.h / 2 + hero.actionDy * hero.h / 2;
-            const changedZones = !isPointInShortRect(x, y, this.getHitbox(state)) && this.travelToZone(state);
+            const hitbox = this.getHitbox(state);
+            const changedZones = (!isPointInShortRect(x, y, hitbox) || isObjectInsideTarget(hero, hitbox)) && this.travelToZone(state);
             if (!changedZones && !heroIsTouchingDoor) {
                 hero.action = null;
                 hero.actionTarget = null;

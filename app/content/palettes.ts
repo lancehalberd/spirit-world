@@ -278,6 +278,17 @@ const brightGrass: TilePalette = {
     },
 };
 
+const treeLeaves = canvasPalette((context: CanvasRenderingContext2D) => {
+    context.fillStyle = 'green';
+    context.fillRect(0, 8, 16, 8);
+    context.globalAlpha = 0.6;
+    context.arc(8, 8, 8, 0, 2 * Math.PI);
+    context.fill();
+    context.beginPath();
+    context.arc(8, 8, 12, 0, 2 * Math.PI);
+    context.fill();
+});
+
 const fieldPalette = {...combinePalettes([
         // This is the empty tile.
         singleTilePalette('gfx/tiles/bush.png', null, -16),
@@ -313,6 +324,7 @@ const fieldPalette = {...combinePalettes([
         caveCornersPalette,
         spiritPlantsPalette,
         brightGrass,
+        treeLeaves,
     ]),
     defaultTiles: [
         {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0},
@@ -374,6 +386,7 @@ const spiritFieldPalette = {...combinePalettes([
         caveCornersPalette,
         spiritPlantsPalette,
         brightGrass,
+        treeLeaves,
     ]),
     defaultTiles: [null]
 };

@@ -170,11 +170,14 @@ function checkToRedrawTiles(area: AreaInstance) {
             for (let x = 0; x < area.w; x++) {
                 if (!area.tilesDrawn?.[y]?.[x]) {
                     area.context.clearRect(x * w, y * h, w, h);
+                    if (area.foregroundContext) {
+                        area.foregroundContext.clearRect(x * w, y * h, w, h);
+                    }
                 }
             }
         }
     }
-    area.layers.map((layer, index) => renderLayer(area, layer, area.definition.parentDefinition?.layers[index]));
+    area.layers.map((layer, index) => renderLayer(area, layer, area.definition.parentDefinition?.layers[index], index >= 2));
     for (let y = 0; y < area.h; y++) {
         if (!area.tilesDrawn[y]) {
             area.tilesDrawn[y] = [];
@@ -228,6 +231,8 @@ export function renderField(context: CanvasRenderingContext2D, state: GameState)
             spiritCanvas.width, spiritCanvas.height
         );
     }
+    renderAreaForeground(context, state, state.areaInstance);
+    renderAreaForeground(context, state, state.nextAreaInstance);
 
     // Render any editor specific graphics if appropriate.
     renderEditor(context, state);
@@ -250,6 +255,20 @@ export function renderAreaBackground(context: CanvasRenderingContext2D, state: G
                 object.render?.(context, state);
             }
         }
+    context.restore();
+}
+
+export function renderAreaForeground(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance): void {
+    if (!area?.foregroundCanvas) {
+        return;
+    }
+    context.save();
+        translateContextForAreaAndCamera(context, state, area);
+        context.drawImage(
+            area.foregroundCanvas,
+            state.camera.x - area.cameraOffset.x, state.camera.y - area.cameraOffset.y, CANVAS_WIDTH, CANVAS_HEIGHT,
+            state.camera.x - area.cameraOffset.x, state.camera.y - area.cameraOffset.y, CANVAS_WIDTH, CANVAS_HEIGHT,
+        );
     context.restore();
 }
 
@@ -324,9 +343,16 @@ export function getTileFrame(area: AreaInstance, tile: LayerTile): Frame {
     };
 }
 
-export function renderLayer(area: AreaInstance, layer: AreaLayer, parentLayer: AreaLayerDefinition): void {
-    const context = area.context;
+export function renderLayer(area: AreaInstance, layer: AreaLayer, parentLayer: AreaLayerDefinition, isForeground: boolean): void {
     const palette = layer.palette;
+    // Create foreground canvas only as needed.
+    if (isForeground && !area.foregroundContext) {
+        [area.foregroundCanvas, area.foregroundContext] = createCanvasAndContext(
+            palette.w * layer.definition.grid.w,
+            palette.h * layer.definition.grid.h,
+        );
+    }
+    const context = isForeground ? area.foregroundContext : area.context;
     const { w, h } = palette;
     const baseFrame = {
         image: palette.source.image,

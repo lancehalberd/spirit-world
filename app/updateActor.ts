@@ -570,6 +570,9 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             state.hero.lightRadius = Math.min(targetLightRadius, state.hero.lightRadius + 2);
         }
     }
+    if (editingState.isEditing) {
+        state.hero.magic = state.hero.maxMagic;
+    }
     if (state.hero.magic < 0) {
         state.hero.magic = 0;
         state.hero.invisible = false;

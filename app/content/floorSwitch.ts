@@ -78,7 +78,7 @@ export class FloorSwitch implements ObjectInstance {
     toggleTargetStatus(state: GameState, target: ObjectInstance): void {
         if (target.status === 'hiddenSwitch' || target.status === 'closedSwitch') {
             changeObjectStatus(state, target, 'normal');
-        } else if (target.definition.status === 'closedSwitch') {
+        } else if (target.definition?.status === 'closedSwitch') {
             changeObjectStatus(state, target, 'closedSwitch');
         }
     }

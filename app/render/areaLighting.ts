@@ -116,36 +116,6 @@ export function renderAreaLighting(context: CanvasRenderingContext2D, state: Gam
             },
             1, state.hero.lightRadius
         );
-        /*lightingContext.save();
-            const r = state.hero.lightRadius / lightingGranularity;
-            const x = hero.x + hero.w / 2 + 12 * directionMap[hero.d][0]
-                - state.camera.x + state.areaInstance.cameraOffset.x;
-            const y = hero.y + hero.h / 2 + 12 * directionMap[hero.d][1]
-                - state.camera.y + state.areaInstance.cameraOffset.y
-            lightingContext.translate(
-                Math.floor(x / lightingGranularity),
-                Math.floor(y / lightingGranularity)
-            );
-            lightingContext.scale(r / 32, r / 32);
-            lightingContext.beginPath();
-            lightingContext.arc(0, 0, 32, 0, 2 * Math.PI);
-            lightingContext.fill();*/
-            // 1/2 of the radius is fully lit.
-            /*lightingContext.globalAlpha = 1;
-            lightingContext.beginPath();
-            lightingContext.arc(0, 0, r / 2, 0, 2 * Math.PI);
-            lightingContext.fill();
-            // 1/4th of the radius is well lit.
-            lightingContext.globalAlpha = 0.4;
-            lightingContext.beginPath();
-            lightingContext.arc(0, 0, 3 * r / 4, 0, 2 * Math.PI);
-            lightingContext.fill();
-            // 1/4th fo the radius is poorly lit.
-            lightingContext.globalAlpha = 0.2;
-            lightingContext.beginPath();
-            lightingContext.arc(0, 0, r, 0, 2 * Math.PI);
-            lightingContext.fill();
-        lightingContext.restore();*/
         if (hero.pickUpTile) {
             const tile = hero.pickUpTile;
             const layer = _.find(state.areaInstance.layers, { key: tile.layerKey});
@@ -160,20 +130,6 @@ export function renderAreaLighting(context: CanvasRenderingContext2D, state: Gam
                     },
                     behaviors.brightness, behaviors.lightRadius
                 );
-                /*
-                const r = (behaviors.lightRadius || 32) / lightingGranularity;
-                lightingContext.save();
-                // This assumes the tile is 16x16.
-                lightingContext.translate(
-                    (hero.x + offset.x + 8) / lightingGranularity,
-                    (hero.y + offset.y + 8) / lightingGranularity
-                );
-                lightingContext.scale(r / 32, r / 32);
-                lightingContext.globalAlpha = behaviors.brightness;
-                lightingContext.beginPath();
-                lightingContext.arc(0, 0, 32, 0, 2 * Math.PI);
-                lightingContext.fill();
-                lightingContext.restore();*/
             }
         }
         lightingContext.save();
@@ -182,32 +138,18 @@ export function renderAreaLighting(context: CanvasRenderingContext2D, state: Gam
                 Math.floor((state.areaInstance.cameraOffset.y - state.camera.y) / lightingGranularity)
             )
             for (const object of state.areaInstance.objects) {
+                if (object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
+                    continue;
+                }
                 if (object.getHitbox && object.behaviors?.brightness) {
-                    // Hard lighting
-                    /*const r = object.behaviors.lightRadius || 32;
-                    lightingContext.globalAlpha = object.behaviors.brightness;
-                    lightingContext.beginPath();
                     const hitbox = object.getHitbox(state);
-                    lightingContext.arc(
-                        (hitbox.x + hitbox.w / 2) / lightingGranularity, (hitbox.y + hitbox.h / 2) / lightingGranularity,
-                        r / lightingGranularity, 0, 2 * Math.PI, true
+                    drawLightGradient(lightingContext,
+                        {
+                            x: hitbox.x + hitbox.w / 2,
+                            y: hitbox.y + hitbox.h / 2,
+                        },
+                        object.behaviors.brightness, object.behaviors.lightRadius
                     );
-                    lightingContext.fill();*/
-
-                    // Gradient lighting
-                    const r = (object.behaviors.lightRadius || 32) / lightingGranularity;
-                    const hitbox = object.getHitbox(state);
-                    lightingContext.save();
-                    lightingContext.translate(
-                        (hitbox.x + hitbox.w / 2) / lightingGranularity,
-                        (hitbox.y + hitbox.h / 2) / lightingGranularity
-                    );
-                    lightingContext.scale(r / 32, r / 32);
-                    lightingContext.globalAlpha = object.behaviors.brightness;
-                    lightingContext.beginPath();
-                    lightingContext.arc(0, 0, 32, 0, 2 * Math.PI);
-                    lightingContext.fill();
-                    lightingContext.restore();
                 }
                 if (object instanceof Clone) {
                     if (object.pickUpTile) {
@@ -236,32 +178,18 @@ export function renderAreaLighting(context: CanvasRenderingContext2D, state: Gam
                 Math.floor((state.nextAreaInstance.cameraOffset.y - state.camera.y) / lightingGranularity)
             )
             for (const object of state.nextAreaInstance.objects || []) {
+                if (object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
+                    continue;
+                }
                 if (object.getHitbox && object.behaviors?.brightness) {
-                    // Hard lighting
-                    /*const r = object.behaviors.lightRadius || 32;
-                    lightingContext.globalAlpha = object.behaviors.brightness;
-                    lightingContext.beginPath();
                     const hitbox = object.getHitbox(state);
-                    lightingContext.arc(
-                        (hitbox.x + hitbox.w / 2) / lightingGranularity, (hitbox.y + hitbox.h / 2) / lightingGranularity,
-                        r / lightingGranularity, 0, 2 * Math.PI, true
+                    drawLightGradient(lightingContext,
+                        {
+                            x: hitbox.x + hitbox.w / 2,
+                            y: hitbox.y + hitbox.h / 2,
+                        },
+                        object.behaviors.brightness, object.behaviors.lightRadius
                     );
-                    lightingContext.fill();*/
-
-                    // Gradient lighting.
-                    const r = (object.behaviors.lightRadius || 32) / lightingGranularity;
-                    const hitbox = object.getHitbox(state);
-                    lightingContext.save();
-                    lightingContext.translate(
-                        (hitbox.x + hitbox.w / 2) / lightingGranularity,
-                        (hitbox.y + hitbox.h / 2) / lightingGranularity
-                    );
-                    lightingContext.scale(r / 32, r / 32);
-                    lightingContext.globalAlpha = object.behaviors.brightness;
-                    lightingContext.beginPath();
-                    lightingContext.arc(0, 0, 32, 0, 2 * Math.PI);
-                    lightingContext.fill();
-                    lightingContext.restore();
                 }
             }
             lightingContext.restore();

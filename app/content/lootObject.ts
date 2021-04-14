@@ -185,6 +185,12 @@ export class LootObject implements ObjectInstance {
         drawFrame(context, this.frame, { ...this.frame, x: this.x, y: this.y });
     }
     renderShadow(context, state: GameState) {
+        if (this.status === 'hiddenEnemy' || this.status === 'hiddenSwitch') {
+            return;
+        }
+        if (this.definition.id !== 'drop' && state.savedState.objectFlags[this.definition.id]) {
+            return;
+        }
         const frame = getLootShadowFrame(this.definition);
         drawFrame(context, frame, { ...frame,
             x: this.x - (frame.w - this.frame.w) / 2,
@@ -237,6 +243,8 @@ export class ChestObject implements ObjectInstance {
     drawPriority: 'sprites' = 'sprites';
     behaviors = {
         solid: true,
+        brightness: 0.5,
+        lightRadius: 12,
     };
     frame: Frame;
     linkedObject: ChestObject;
