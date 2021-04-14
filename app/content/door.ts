@@ -318,7 +318,7 @@ export class Door implements ObjectInstance {
             // When passing horizontally through narrow doors, we need to start 3px lower than usual.
             if (target.definition.type === 'door') {
                 const style = doorStyles[target.style];
-                if (style.h === 32 && target.definition.d === 'left' || target.definition.d === 'right') {
+                if (style.h === 32 && target.definition.d !== 'down') {
                     hero.y += 3;
                 }
             }
