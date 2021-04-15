@@ -1,6 +1,7 @@
 import _ from 'lodash';
 
 import { AnimationEffect } from 'app/content/animationEffect';
+import { EnemyArrow } from 'app/content/arrow';
 import { dropItemFromTable, getLoot } from 'app/content/lootObject';
 import { simpleLootTable, lifeLootTable, moneyLootTable } from 'app/content/lootTables';
 import { addObjectToArea, getAreaSize } from 'app/content/areas';
@@ -8,7 +9,7 @@ import { FRAME_LENGTH } from 'app/gameConstants';
 import { moveActor } from 'app/moveActor';
 import { saveGame } from 'app/state';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
-import { directionMap } from 'app/utils/field';
+import { directionMap, getDirection } from 'app/utils/field';
 import { playSound } from 'app/utils/sounds';
 
 import {
@@ -303,6 +304,10 @@ interface EnemyDefinition {
 }
 
 export const enemyDefinitions: {[key in EnemyType | BossType]: EnemyDefinition} = {
+    arrowTurret: {
+        animations: beetleAnimations, life: 4, touchDamage: 1, update: spinAndShoot, flipRight: true,
+        lootTable: simpleLootTable,
+    },
     snake: {
         animations: snakeAnimations, life: 2, touchDamage: 1, update: paceRandomly, flipRight: true,
         lootTable: simpleLootTable,
@@ -344,7 +349,43 @@ export const enemyDefinitions: {[key in EnemyType | BossType]: EnemyDefinition} 
         life: 1, touchDamage: 1, update: scurryAndChase,
         lootTable: simpleLootTable,
     },
+    wallLaser: {
+        animations: beetleAnimations, life: 2, touchDamage: 1, update: paceRandomly, flipRight: true,
+        lootTable: simpleLootTable,
+    },
 };
+
+function spinAndShoot(state: GameState, enemy: Enemy): void {
+    if (typeof enemy.params.currentTheta === 'undefined') {
+        enemy.params.lastTheta = enemy.params.currentTheta = Math.floor(Math.random() * 2) * Math.PI / 4;
+    }
+    if (enemy.mode === 'shoot') {
+        if (enemy.modeTime === 100) {
+            for (let i = 0; i < 4; i++) {
+                const hitbox = enemy.getHitbox(state);
+                const dx = Math.cos(enemy.params.currentTheta + i * Math.PI / 2);
+                const dy = Math.sin(enemy.params.currentTheta + i * Math.PI / 2);
+                const arrow = new EnemyArrow({
+                    x: hitbox.x + hitbox.w / 2 + hitbox.w / 2 * dx,
+                    y: hitbox.y + hitbox.h / 2 + hitbox.h / 2 * dy,
+                    vx: 4 * dx,
+                    vy: 4 * dy,
+                    direction: getDirection(dx, dy),
+                });
+                addObjectToArea(state, state.areaInstance, arrow);
+            }
+        }
+        if (enemy.modeTime >= 500) {
+            enemy.setMode('spin');
+        }
+    } else {
+        enemy.params.currentTheta = enemy.params.lastTheta + Math.PI / 4 * enemy.modeTime / 1000;
+        if (enemy.modeTime >= 500) {
+            enemy.params.lastTheta = enemy.params.currentTheta = (enemy.params.lastTheta + Math.PI / 4) % (2 * Math.PI);
+            enemy.setMode('shoot');
+        }
+    }
+}
 
 function updateBeetleBoss(state: GameState, enemy: Enemy): void {
     const hitbox = enemy.getHitbox(state);

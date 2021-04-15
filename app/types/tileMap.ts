@@ -296,9 +296,9 @@ export interface SimpleObjectDefinition extends BaseObjectDefinition {
 }
 
 export type EnemyType =
-    'beetle' | 'beetleHorned' | 'beetleMini' | 'beetleWinged'
+    'arrowTurret' | 'beetle' | 'beetleHorned' | 'beetleMini' | 'beetleWinged'
     | 'beetleBossWingedMinionDefinition'
-    | 'snake';
+    | 'snake' | 'wallLaser';
 
 export type BossType =
     'beetleBoss'

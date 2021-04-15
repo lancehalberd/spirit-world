@@ -21,7 +21,7 @@ export function useTool(
             state.hero.magic -= 5;
             const arrow = new Arrow({
                 x: hero.x + 8 + 8 * directionMap[hero.d][0],
-                y: hero.y + 8 * directionMap[hero.d][1],
+                y: hero.y + 8 * directionMap[hero.d][1] + 6,
                 vx: 4 * directionMap[hero.d][0],
                 vy: 4 * directionMap[hero.d][1],
                 direction: hero.d

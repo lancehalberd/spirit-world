@@ -7,7 +7,7 @@ import { drawFrame } from 'app/utils/animations';
 import { getDirection } from 'app/utils/field';
 import { rectanglesOverlap } from 'app/utils/index';
 
-import { Direction, Frame, GameState, ObjectInstance, ObjectStatus, ShortRectangle } from 'app/types';
+import { Clone, Direction, Frame, GameState, ObjectInstance, ObjectStatus, ShortRectangle } from 'app/types';
 
 const [arrowCanvas, arrowContext] = createCanvasAndContext(4, 12);
 arrowContext.fillStyle = 'white';
@@ -62,9 +62,18 @@ export class Arrow implements ObjectInstance {
         if (this.direction === 'up' || this.direction === 'down') {
             return {...this.frame, x: this.x, y: this.y };
         }
-        //adjusts y alignment of arrow fired horizontally to appear more central to the character
-        this.y += 6;
         return { x: this.x, y: this.y, w: this.frame.h, h: this.frame.w };
+    }
+    hitTarget(state: GameState, object: ObjectInstance): boolean {
+        if (!(object instanceof Enemy)) {
+            return;
+        }
+        if (!this.hitTargets.has(object) && rectanglesOverlap(object, this)) {
+            this.hitTargets.add(object);
+            damageActor(state, object, this.damage);
+            this.stuckFrames = 1;
+            return true;
+        }
     }
     update(state: GameState) {
         if (this.stuckFrames > 0) {
@@ -86,13 +95,8 @@ export class Arrow implements ObjectInstance {
             if (object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
                 continue;
             }
-            if (object instanceof Enemy) {
-                if (!this.hitTargets.has(object) && rectanglesOverlap(object, this)) {
-                    this.hitTargets.add(object);
-                    damageActor(state, object, this.damage);
-                    this.stuckFrames = 1;
-                    return;
-                }
+            if (this.hitTarget(state, object)) {
+                return;
             }
             if (object.getHitbox && object.behaviors?.solid) {
                 const hitbox = object.getHitbox(state);
@@ -142,5 +146,34 @@ export class Arrow implements ObjectInstance {
             context.rotate(rotation);
             drawFrame(context, this.frame, { ...this.frame, x: -this.frame.w / 2, y: -this.frame.h / 2 });
         context.restore();
+    }
+}
+
+export class EnemyArrow extends Arrow {
+    hitTarget(state: GameState, object: ObjectInstance): boolean {
+        if (!(object instanceof Clone)) {
+            return;
+        }
+        if (!this.hitTargets.has(object) && rectanglesOverlap(object, this)) {
+            damageActor(state, object, this.damage);
+            //this.hitTargets.add(object);
+            //this.stuckFrames = 1;
+            removeObjectFromArea(state, this);
+            return true;
+        }
+    }
+    update(state: GameState) {
+        // Don't leave enemy arrows on the screen in case there are a lot of them.
+        if (this.stuckFrames > 0) {
+            removeObjectFromArea(state, this);
+            return;
+        }
+        if (!this.hitTargets.has(state.hero) && rectanglesOverlap(state.hero, this)) {
+            damageActor(state, state.hero, this.damage);
+            //this.hitTargets.add(state.hero);
+            //this.stuckFrames = 1;
+            removeObjectFromArea(state, this);
+        }
+        super.update(state);
     }
 }

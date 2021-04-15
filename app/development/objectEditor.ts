@@ -408,7 +408,7 @@ export function getObjectTypeProperties(state: GameState, editingState: EditingS
             rows.push({
                 name: 'type',
                 value: object.enemyType || editingState.enemyType,
-                values: ['beetle', 'beetleHorned', 'beetleMini', 'beetleWinged', 'snake'],
+                values: ['arrowTurret', 'beetle', 'beetleHorned', 'beetleMini', 'beetleWinged', 'snake'],
                 onChange(enemyType: EnemyType) {
                     if (object.id) {
                         object.enemyType = enemyType;
