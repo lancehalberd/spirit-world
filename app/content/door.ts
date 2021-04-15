@@ -5,12 +5,14 @@ import { findObjectInstanceById } from 'app/content/objects';
 import {
     BITMAP_LEFT, BITMAP_RIGHT,
 } from 'app/content/palettes';
+import { showMessage } from 'app/render/renderMessage';
+import { saveGame } from 'app/state';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { directionMap, getDirection } from 'app/utils/field';
 import { boxesIntersect, isObjectInsideTarget, isPointInShortRect } from 'app/utils/index';
 
 import {
-    AreaInstance, DrawPriority, Frame, GameState, ObjectInstance,
+    AreaInstance, Direction, DrawPriority, Frame, GameState, ObjectInstance,
     ObjectStatus, EntranceDefinition, ShortRectangle, TileBehaviors
 } from 'app/types';
 
@@ -216,6 +218,38 @@ export class Door implements ObjectInstance {
             return { x: this.x, y: this.y, w: doorStyles[this.style].w, h: doorStyles[this.style].h};
         }
         return { x: this.x, y: this.y, w: doorStyles[this.style].h, h: doorStyles[this.style].w};
+    }
+    onPush(state: GameState, direction: Direction): void {
+        if (direction === this.definition.d) {
+            this.tryToUnlock(state);
+        }
+    }
+    tryToUnlock(state: GameState): boolean {
+        const dungeonInventory = state.savedState.dungeonInventories[state.location.zoneKey];
+        if (this.status === 'locked' && dungeonInventory?.smallKeys) {
+            dungeonInventory.smallKeys--;
+        } else if (this.status === 'bigKeyLocked' && dungeonInventory?.bigKey) {
+        } else {
+            return false;
+        }
+        this.changeStatus(state, 'normal');
+        state.savedState.objectFlags[this.definition.id] = true;
+        // Unlock the other half of this door if it is in this super tile.
+        for (const object of this.area.objects) {
+            if (object?.definition.type === 'door' && object?.definition.id === this.definition.id) {
+                object.changeStatus(state, 'normal');
+            }
+        }
+        saveGame();
+        return true;
+    }
+    onGrab(state: GameState) {
+        if (!this.tryToUnlock(state)) {
+            if (this.status === 'bigKeyLocked') {
+                showMessage(state, 'You need a special key to open this door.');
+                state.hero.action = null;
+            }
+        }
     }
     // This is probably only needed by the editor since doors are not removed during gameplay.
     remove(state: GameState) {

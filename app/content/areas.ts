@@ -3,6 +3,7 @@ import _ from 'lodash';
 import { changeObjectStatus, createObjectInstance, findObjectInstanceById } from 'app/content/objects';
 import { palettes } from 'app/content/palettes';
 import { dropItemFromTable } from 'app/content/lootObject';
+import { checkToUpdateSpawnLocation } from 'app/content/spawnLocations';
 import { zones } from 'app/content/zones';
 import { createCanvasAndContext } from 'app/dom';
 import { isPointInShortRect } from 'app/utils/index';
@@ -211,6 +212,7 @@ export function enterLocation(
     state.hero.safeY = location.y;
     setAreaSection(state, state.hero.d, true);
     updateCamera(state, 512);
+    checkToUpdateSpawnLocation(state);
 }
 
 export function linkObjects(state: GameState): void {

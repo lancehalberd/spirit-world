@@ -263,7 +263,7 @@ export interface FloorSwitchDefinition extends BaseObjectDefinition {
 }
 
 export interface LootObjectDefinition extends BaseObjectDefinition {
-    type: 'chest' | 'loot',
+    type: 'bigChest' | 'chest' | 'loot',
     lootType: LootType,
     lootAmount?: number,
     // If this is 0/unset it means it is progressive.

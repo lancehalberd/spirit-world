@@ -167,6 +167,21 @@ export function addKeyCommands() {
         }
         if (keyCode === KEY.R) {
             const state = getState();
+            // Reset the entire zone if SHIFT is held.
+            if (keysDown[KEY.SHIFT]) {
+                for (const floor of state.zone.floors) {
+                    for (const grid of [floor.grid, floor.spiritGrid]) {
+                        for (const row of grid) {
+                            for (const areaDefinition of row) {
+                                for (const object of areaDefinition?.objects ?? []) {
+                                    delete state.savedState.objectFlags[object.id];
+                                }
+                            }
+                        }
+                    }
+                }
+                delete state.savedState.dungeonInventories[state.zone.key];
+            }
             state.location.x = state.hero.x;
             state.location.y = state.hero.y;
             // Calling this will instantiate the area again and place the player back in their current location.

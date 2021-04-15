@@ -154,7 +154,7 @@ function moveActorInDirection(
             canJumpDown = false;
         }
         for (const object of objects) {
-            blockedByObject = true;
+            blockedByObject = blockedByObject || object.behaviors?.solid;
             if (canPush) {
                 pushedObjects.push(object);
             }
@@ -185,7 +185,8 @@ function moveActorInDirection(
         actor.jumpingTime = 0;
     }
 
-    if (!blockedByTile && pushedObjects.length === 1) {
+    //if (!blockedByTile && pushedObjects.length === 1) {
+    if (pushedObjects.length === 1) {
         if (pushedObjects[0].onPush) {
             pushedObjects[0].onPush(state, direction);
         }

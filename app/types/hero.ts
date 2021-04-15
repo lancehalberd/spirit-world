@@ -30,8 +30,10 @@ export type PassiveTool = 'gloves'
 export type MagicElement = 'fire' | 'ice' | 'lightning';
 export type Collectible = 'peachOfImmortality' | 'peachOfImmortalityPiece';
 export type CommonLoot = 'money' | 'peach';
+export type DungeonLoot = 'smallKey' | 'bigKey' | 'map';
 
-export type LootType = 'weapon' | ActiveTool | Equipment | PassiveTool | MagicElement | Collectible | CommonLoot | 'unknown';
+export type LootType = 'weapon' | ActiveTool | Equipment | PassiveTool
+    | MagicElement | Collectible | CommonLoot | DungeonLoot | 'unknown';
 
 
 export interface LootTable {
@@ -88,6 +90,7 @@ export interface Actor {
     render: (context: CanvasRenderingContext2D, state: GameState) => void,
     takeDamage?: (state: GameState, damage: number) => void,
 }
+
 
 export interface Hero extends Actor {
     // stats

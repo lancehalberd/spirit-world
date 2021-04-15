@@ -26,6 +26,9 @@ export function getLootTypes(): LootType[] {
             'peachOfImmortalityPiece',
             'money',
             'weapon',
+            'bigKey',
+            'smallKey',
+            'map',
             ...(Object.keys(state.hero.activeTools) as LootType[]),
             ...(Object.keys(state.hero.passiveTools) as LootType[]),
             ...(Object.keys(state.hero.equipment) as LootType[]),
@@ -36,7 +39,7 @@ export function getLootTypes(): LootType[] {
 }
 
 export const combinedObjectTypes: ObjectType[] = [
-    'loot', 'chest', 'sign',
+    'loot', 'chest', 'bigChest', 'sign',
     'door', 'pitEntrance', 'marker',
     'ballGoal', 'crystalSwitch', 'floorSwitch',
     'pushPull', 'rollingBall', 'tippable', 'waterPot',
@@ -120,8 +123,9 @@ function createObjectDefinition(
                 targetObjectId: definition.targetObjectId || editingState.entranceTargetObjectId,
 
             };
-        case 'loot':
-        case 'chest': {
+        case 'chest':
+        case 'bigChest':
+        case 'loot': {
             const lootType = definition.lootType || editingState.lootType;
             return {
                 ...commonProps,
@@ -222,7 +226,7 @@ export function getObjectTypeProperties(state: GameState, editingState: EditingS
                         updateObjectId(state, object, object.id.replace(object.type, objectType));
                     }
                     object.type = objectType as any;
-                    updateObjectInstance(state, createObjectDefinition(state, editingState, object));
+                    updateObjectInstance(state, createObjectDefinition(state, editingState, object), object);
                 } else {
                     editingState.objectType = objectType;
                 }
@@ -331,22 +335,25 @@ export function getObjectTypeProperties(state: GameState, editingState: EditingS
                 rows.push(`No objects of type ${targetType}`);
             }
             break;
-        case 'loot':
-        case 'chest': {
+        case 'bigChest':
+        case 'chest':
+        case 'loot': {
             rows = [...rows, ...getLootFields(state, editingState, object)];
-            rows.push({
-                name: 'status',
-                value: object.status || editingState.objectStatus,
-                values: ['normal', 'hiddenEnemy', 'hiddenSwitch'],
-                onChange(status: ObjectStatus) {
-                    if (object.id) {
-                        object.status = status;
-                        updateObjectInstance(state, object);
-                    } else {
-                        editingState.objectStatus = status;
-                    }
-                },
-            });
+            if (object.type !== 'bigChest') {
+                rows.push({
+                    name: 'status',
+                    value: object.status || editingState.objectStatus,
+                    values: ['normal', 'hiddenEnemy', 'hiddenSwitch'],
+                    onChange(status: ObjectStatus) {
+                        if (object.id) {
+                            object.status = status;
+                            updateObjectInstance(state, object);
+                        } else {
+                            editingState.objectStatus = status;
+                        }
+                    },
+                });
+            }
             break;
         }
         case 'ballGoal':
@@ -483,7 +490,7 @@ function getStyleFields(state: GameState, editingState: EditingState, object: Ob
 }
 
 function getLootFields(state: GameState, editingState: EditingState, object: ObjectDefinition) {
-    if (object.type !== 'loot' && object.type !== 'chest' && object.type !== 'boss') {
+    if (object.type !== 'bigChest' && object.type !== 'loot' && object.type !== 'chest' && object.type !== 'boss') {
         return [];
     }
     let rows = [];
@@ -551,7 +558,7 @@ export function getSelectProperties(state: GameState, editingState: EditingState
             name: 'id',
             value: selectedObject.id,
             onChange(newId: string) {
-                return updateObjectId(state, selectedObject, newId);
+                return updateObjectId(state, selectedObject, newId, false);
             },
         });
         rows = [...rows, ...getObjectTypeProperties(state, editingState, editingState.selectedObject)];
@@ -630,7 +637,7 @@ export function onMouseMoveSelect(state: GameState, editingState: EditingState, 
                 linkedDefinition.x = editingState.selectedObject.x;
                 linkedDefinition.y = editingState.selectedObject.y;
                 console.log(linkedDefinition);
-                updateObjectInstance(state, linkedDefinition, state.alternateAreaInstance);
+                updateObjectInstance(state, linkedDefinition, linkedDefinition, state.alternateAreaInstance);
             }
             updateObjectInstance(state, editingState.selectedObject);
         }
@@ -657,8 +664,8 @@ export function uniqueId(state: GameState, prefix: string, location: ZoneLocatio
     return `${prefix}-${i}`;
 }
 
-export function updateObjectId(state: GameState, object: ObjectDefinition, id: string): string {
-    if (!state.areaInstance.definition.objects.some(o => o !== object && o.id === id)) {
+export function updateObjectId(state: GameState, object: ObjectDefinition, id: string, makeUnique: boolean = true): string {
+    if (!makeUnique || !state.areaInstance.definition.objects.some(o => o !== object && o.id === id)) {
         object.id = id;
         updateObjectInstance(state, object);
         return object.id;
@@ -695,7 +702,7 @@ function checkToAddLinkedObject(state: GameState, definition: ObjectDefinition):
         definition.x === other.definition.x && definition.y === other.definition.y
     );
     if (linkedInstance) {
-        updateObjectInstance(state, {...linkedInstance.definition, linked: definition.linked}, state.alternateAreaInstance);
+        updateObjectInstance(state, {...linkedInstance.definition, linked: definition.linked}, linkedInstance.definition, state.alternateAreaInstance);
         return;
     }
     if (!definition.linked) {
@@ -707,23 +714,23 @@ function checkToAddLinkedObject(state: GameState, definition: ObjectDefinition):
         id: uniqueId(state, definition.type, alternateLocation),
         linked: true, spirit: !definition.spirit
     };
-    updateObjectInstance(state, alternateObject, state.alternateAreaInstance);
+    updateObjectInstance(state, alternateObject, null, state.alternateAreaInstance);
     // Make sure to update the object links when we replace object instances.
-    const instance = state.areaInstance.objects.find(o => o.definition.id === definition.id);
+    const instance = state.areaInstance.objects.find(o => o.definition === definition);
     linkObject(instance);
 }
 
-export function updateObjectInstance(state: GameState, object: ObjectDefinition, area: AreaInstance = null): void {
+export function updateObjectInstance(state: GameState, object: ObjectDefinition, oldDefinition?: ObjectDefinition, area: AreaInstance = null): void {
     if (!area) {
         area = state.areaInstance;
     }
-    const definitionIndex = area.definition.objects.findIndex(d => d.id === object.id);
+    const definitionIndex = area.definition.objects.findIndex(d => d === (oldDefinition || object));
     if (definitionIndex >= 0) {
         area.definition.objects[definitionIndex] = object;
     } else {
         area.definition.objects.push(object);
     }
-    const index = area.objects.findIndex(o => o.definition?.id === object.id);
+    const index = area.objects.findIndex(o => o.definition === (oldDefinition || object));
     const newObject = createObjectInstance(state, object);
     if (index < 0) {
         addObjectToArea(state, area, newObject);
@@ -743,7 +750,7 @@ export function deleteObject(state: GameState, object: ObjectDefinition): void {
         state.areaInstance.definition.objects.splice(index, 1);
     }
     // Remove the associated ObjectInstance if one exists.
-    index = state.areaInstance.objects.findIndex(o => o.definition?.id === object.id);
+    index = state.areaInstance.objects.findIndex(o => o.definition === object);
     if (index >= 0) {
         removeObjectFromArea(state, state.areaInstance.objects[index]);
     }

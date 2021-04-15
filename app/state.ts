@@ -1,10 +1,14 @@
 import { enterLocation } from 'app/content/areas';
+import {
+    SPAWN_LOCATION_DEMO,
+    SPAWN_LOCATION_FULL,
+    fixSpawnLocationOnLoad,
+} from 'app/content/spawnLocations';
 import { zones } from 'app/content/zones';
-import { CANVAS_HEIGHT } from 'app/gameConstants';
 import { updateHeroMagicStats } from 'app/render/spiritBar';
 import { renderHero } from 'app/renderActor';
 
-import { GameState, Hero, SavedState, ZoneLocation } from 'app/types';
+import { GameState, Hero, SavedState } from 'app/types';
 
 
 export function loadSavedData(): boolean {
@@ -25,6 +29,7 @@ export function saveGame(): void {
     // sanitize hero object before saving it.
     delete hero.activeClone;
     delete hero.activeStaff;
+    delete hero.actionTarget;
     delete hero.render;
     delete hero.area;
     delete hero.grabObject;
@@ -53,26 +58,6 @@ export function eraseAllSaves(): void {
     window.localStorage.clear()
 }
 
-export const SPAWN_LOCATION_FULL: ZoneLocation = {
-    zoneKey: 'newPeachCave',
-    floor: 0,
-    x: 112,
-    y: 176,
-    z: CANVAS_HEIGHT,
-    d: 'up',
-    areaGridCoords: {x: 0, y: 1},
-    isSpiritWorld: false,
-};
-export const SPAWN_LOCATION_DEMO: ZoneLocation = {
-    zoneKey: 'demo_entrance',
-    floor: 0,
-    x: 150,
-    y: 100,
-    d: 'up',
-    areaGridCoords: {x: 0, y: 0},
-    isSpiritWorld: false,
-};
-
 export function setSaveFileToState(savedGameIndex: number, gameMode: number = 0): void {
     state.savedGameIndex = savedGameIndex;
     let savedGame = state.savedGames[state.savedGameIndex];
@@ -91,7 +76,7 @@ export function setSaveFileToState(savedGameIndex: number, gameMode: number = 0)
         },
     };
     state.hero = state.savedState.hero;
-    setSpawnLocation(state);
+    fixSpawnLocationOnLoad(state);
     updateHeroMagicStats(state);
     returnToSpawnLocation(state);
 }
@@ -105,7 +90,7 @@ export function selectSaveFile(savedGameIndex: number): void {
         state.hero = getDefaultSavedState().hero;
         state.hero.spawnLocation = SPAWN_LOCATION_FULL;
         state.hero.render = renderHero;
-        setSpawnLocation(state);
+        fixSpawnLocationOnLoad(state);
         updateHeroMagicStats(state);
         returnToSpawnLocation(state);
         return;
@@ -116,7 +101,7 @@ export function selectSaveFile(savedGameIndex: number): void {
 
 export function getDefaultSavedState(): SavedState {
     return {
-        coins: 0,
+        dungeonInventories: {},
         objectFlags: {},
         hero: getDefaultHeroState(),
     };
@@ -261,20 +246,4 @@ export function getState(): GameState {
 window['getState'] = getState;
 
 
-const SPAWN_LOCATION_PEACH_CAVE_EXIT: ZoneLocation = {
-    zoneKey: 'overworld',
-    floor: 0,
-    x: 262,
-    y: 122,
-    z: 0,
-    d: 'down',
-    areaGridCoords: {x: 1, y: 1},
-    isSpiritWorld: false,
-};
-
-function setSpawnLocation(state: GameState): void {
-    if (state.savedState.objectFlags['newPeachCave:boss']) {
-        state.hero.spawnLocation = SPAWN_LOCATION_PEACH_CAVE_EXIT;
-    }
-}
 

@@ -110,10 +110,12 @@ export function getTileBehaviorsAndObstacles(
         if (excludeObjects?.has(object)) {
             continue;
         }
-        if (object.getHitbox && object.behaviors?.solid) {
+        if (object.getHitbox && (object.onPush || object.behaviors?.solid)) {
             if (isPixelInShortRect(x, y, object.getHitbox(state))) {
                 objects.push(object);
-                tileBehavior.solid = true;
+                if (object.behaviors?.solid) {
+                    tileBehavior.solid = true;
+                }
             }
         }
     }

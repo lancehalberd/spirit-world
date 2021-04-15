@@ -1,5 +1,9 @@
 import { checkIfAllEnemiesAreDefeated, enterLocation } from 'app/content/areas';
 import { Enemy } from 'app/content/enemy';
+import {
+    SPAWN_LOCATION_DEMO,
+    SPAWN_LOCATION_FULL,
+} from 'app/content/spawnLocations';
 import { editingState } from 'app/development/tileEditor';
 import {
     FRAME_LENGTH, GAME_KEY,
@@ -16,8 +20,6 @@ import {
     returnToSpawnLocation,
     selectSaveFile,
     setSaveFileToState,
-    SPAWN_LOCATION_DEMO,
-    SPAWN_LOCATION_FULL,
 } from 'app/state';
 import { updateAllHeroes } from 'app/updateActor';
 import { updateCamera } from 'app/updateCamera';

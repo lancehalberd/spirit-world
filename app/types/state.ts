@@ -1,9 +1,17 @@
 import { AreaGrid, AreaInstance, Frame, Hero, ShortRectangle, Zone, ZoneLocation } from 'app/types';
 
 export type SavedState = {
-    coins: number,
     objectFlags: {[key: string]: boolean},
     hero: Hero,
+    dungeonInventories: {
+        [key: string]: DungeonInventory,
+    },
+}
+
+export interface DungeonInventory {
+    bigKey: boolean,
+    map: boolean,
+    smallKeys: number,
 }
 
 export type Scene = 'title'

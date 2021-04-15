@@ -29,6 +29,11 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
         }
         drawFrame(context, frame, {...frame, x: x + i * 11, y: 5});
     }
+    const dungeonInventory = state.savedState.dungeonInventories[state.location.zoneKey];
+    for (let i = 0; i < dungeonInventory?.smallKeys; i++) {
+        context.fillStyle = 'white';
+        context.fillRect(x + 120 + 3 * i, 5, 2, 6);
+    }
     renderSpiritBar(context, state);
 
     let frame = getLootFrame({lootType: state.hero.leftTool, lootLevel: state.hero.activeTools[state.hero.leftTool]});

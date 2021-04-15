@@ -707,7 +707,7 @@ function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, a
             instance.render(context, state);
             // drawFrame(context, frame, {...frame, x: object.x - (frame.content?.x || 0), y: object.y - (frame.content?.y || 0)});
             // While editing, draw the loot inside the chest/boss on top as well.
-            if (object.type === 'chest' || object.type === 'boss') {
+            if (object.type === 'bigChest' || object.type === 'chest' || object.type === 'boss') {
                 const frame = getLootFrame(object);
                 drawFrame(context, frame, {...frame, x: object.x - (frame.content?.x || 0), y: object.y - (frame.content?.y || 0)});
             }

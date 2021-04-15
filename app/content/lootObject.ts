@@ -10,7 +10,7 @@ import { rectanglesOverlap } from 'app/utils/index';
 import { playSound } from 'app/utils/sounds';
 
 import {
-    ActiveTool, AreaInstance, BossObjectDefinition, Frame, GameState, LootObjectDefinition,
+    ActiveTool, AreaInstance, BossObjectDefinition, DungeonInventory, Frame, GameState, LootObjectDefinition,
     LootTable, LootType, ObjectInstance, ObjectStatus, ShortRectangle,
 } from 'app/types';
 
@@ -53,8 +53,16 @@ export class LootGetAnimation implements ObjectInstance {
         const state = getState();
         const frame = getLootFrame(loot);
         const hero = state.hero.activeClone || state.hero;
-        this.x = (loot.type === 'chest' ? loot.x + chestOpenedFrame.w / 2 : hero.x + hero.w / 2) - frame.w / 2;
-        this.y = (loot.type === 'chest' ? loot.y + 8 : hero.y - 4);
+        if (loot.type === 'bigChest') {
+            this.x = loot.x + chestOpenedFrame.w - frame.w / 2;
+            this.y = loot.y + 16;
+        } else if (loot.type === 'chest') {
+            this.x = loot.x + chestOpenedFrame.w / 2 - frame.w / 2;
+            this.y = loot.y + 8;
+        } else {
+            this.x = hero.x + hero.w / 2 - frame.w / 2;
+            this.y = hero.y - 4;
+        }
         this.z = 8;
     }
     update(state: GameState) {
@@ -79,6 +87,16 @@ const equipToolMessage = '{|}Press {B_MENU} to open your menu.'
 
 function showLootMessage(state: GameState, lootType: LootType, lootLevel?: number, lootAmount?: number): void {
     switch (lootType) {
+        case 'bigKey':
+            return showMessage(state, 'You found a special key!'
+                + '{|}This key can open all the special locks in this area!');
+        case 'smallKey':
+            if (!state.savedState.objectFlags.readSmallKeyMessage) {
+                state.savedState.objectFlags.readSmallKeyMessage = true;
+                return showMessage(state, 'You found a small key!'
+                    + '{|}Use it to unlock one locked door.');
+            }
+            return;
         case 'weapon':
             if (state.hero.weapon === 1) {
                 return showMessage(state, 'You found the Chakram! {|} Press {B_WEAPON} to throw the Chakram.'
@@ -276,11 +294,6 @@ export class ChestObject implements ObjectInstance {
             getLoot(state, this.definition);
         }
     }
-    update(state: GameState) {
-        if (this.status === 'hiddenEnemy' || this.status === 'hiddenSwitch') {
-            return;
-        }
-    }
     render(context, state: GameState) {
         if (this.status === 'hiddenEnemy' || this.status === 'hiddenSwitch') {
             return;
@@ -292,6 +305,65 @@ export class ChestObject implements ObjectInstance {
         } else {
             drawFrame(context, chestClosedFrame, {
                 ...chestClosedFrame, x: this.x - chestClosedFrame.content.x, y: this.y - chestClosedFrame.content.y
+            });
+        }
+    }
+}
+
+export class BigChest implements ObjectInstance {
+    area: AreaInstance;
+    definition: LootObjectDefinition;
+    drawPriority: 'sprites' = 'sprites';
+    behaviors = {
+        solid: true,
+        brightness: 1,
+        lightRadius: 24,
+    };
+    frame: Frame;
+    linkedObject: BigChest;
+    x: number;
+    y: number;
+    z: number;
+    status: ObjectStatus;
+    constructor(state: GameState, definition: LootObjectDefinition) {
+        this.definition = definition;
+        this.x = definition.x;
+        this.y = definition.y;
+        this.status = definition.status || 'normal';
+        // Chests that have been opened are always revealed.
+        if (state.savedState.objectFlags[this.definition.id]) {
+            this.status = 'normal';
+        }
+    }
+    getHitbox(state: GameState): ShortRectangle {
+        return { x: this.x, y: this.y, w: 32, h: 32 };
+    }
+    onGrab(state: GameState) {
+        // You can only open a chest from the bottom.
+        const hero = state.hero.activeClone || state.hero;
+        if (hero.d !== 'up' || state.savedState.objectFlags[this.definition.id]) {
+            return;
+        }
+        if (!state.savedState.dungeonInventories[state.location.zoneKey]?.bigKey) {
+            showMessage(state, 'You need a special key to open this chest.');
+            return;
+        }
+        state.savedState.objectFlags[this.definition.id] = true;
+        if (this.linkedObject) {
+            state.savedState.objectFlags[this.linkedObject.definition.id] = true;
+        }
+        getLoot(state, this.definition);
+    }
+    render(context, state: GameState) {
+        if (state.savedState.objectFlags[this.definition.id]) {
+            drawFrame(context, chestOpenedFrame, {
+                x: this.x - chestOpenedFrame.content.x, y: this.y - chestOpenedFrame.content.y,
+                w: chestOpenedFrame.w * 2, h: chestOpenedFrame.h * 2,
+            });
+        } else {
+            drawFrame(context, chestClosedFrame, {
+                x: this.x - chestClosedFrame.content.x, y: this.y - chestClosedFrame.content.y,
+                w: chestClosedFrame.w * 2, h: chestClosedFrame.h * 2,
             });
         }
     }
@@ -378,6 +450,18 @@ export function applyUpgrade(currentLevel: number, loot: LootObjectDefinition | 
     return currentLevel + 1;
 }
 
+function getDungeonInventory(state: GameState): DungeonInventory {
+    return state.savedState.dungeonInventories[state.location.zoneKey] || {
+        bigKey: false,
+        map: false,
+        smallKeys: 0,
+    };
+}
+function updateDungeonInventory(state: GameState, inventory: DungeonInventory): void {
+    state.savedState.dungeonInventories[state.location.zoneKey] = inventory;
+    saveGame();
+}
+
 export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition) => void}> = {
     unknown: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition) => {
         if (loot.lootType === 'weapon') {
@@ -409,6 +493,21 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: Lo
             console.error('Unhandled loot type:', loot.lootType);
         }
         updateHeroMagicStats(state);
+    },
+    bigKey: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition) => {
+        const inventory = getDungeonInventory(state);
+        inventory.bigKey = true;
+        updateDungeonInventory(state, inventory);
+    },
+    map: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition) => {
+        const inventory = getDungeonInventory(state);
+        inventory.map = true;
+        updateDungeonInventory(state, inventory);
+    },
+    smallKey: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition) => {
+        const inventory = getDungeonInventory(state);
+        inventory.smallKeys++;
+        updateDungeonInventory(state, inventory);
     },
     peach: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition) => {
         state.hero.life = Math.min(state.hero.life + 1, state.hero.maxLife);
