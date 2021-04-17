@@ -305,7 +305,7 @@ interface EnemyDefinition {
 
 export const enemyDefinitions: {[key in EnemyType | BossType]: EnemyDefinition} = {
     arrowTurret: {
-        animations: beetleAnimations, life: 4, touchDamage: 1, update: spinAndShoot, flipRight: true,
+        animations: beetleAnimations, life: 4, touchDamage: 1, update: spinAndShoot,
         lootTable: simpleLootTable,
     },
     snake: {

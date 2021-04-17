@@ -1,7 +1,7 @@
 import { getLootFrame } from 'app/content/lootObject';
 import { CANVAS_WIDTH, LEFT_TOOL_COLOR, RIGHT_TOOL_COLOR } from 'app/gameConstants';
 import { renderSpiritBar } from 'app/render/spiritBar';
-import { createAnimation, drawFrame } from 'app/utils/animations';
+import { createAnimation, drawFrame, drawFrameAt } from 'app/utils/animations';
 import { fillRect, pad } from 'app/utils/index';
 import { drawText } from 'app/utils/simpleWhiteFont';
 
@@ -12,6 +12,10 @@ const [emptyHeart, fullHeart, threeQuarters, halfHeart, quarterHeart] =
 
 const [coin] =
     createAnimation('gfx/hud/money.png', {w: 16, h: 16}, {x: 9}).frames;
+
+const [keyFrame, bigKeyFrame] = createAnimation('gfx/hud/icons.png',
+    {w: 18, h: 18, content: {x: 1, y: 1, w: 16, h: 16}}, {x: 6, cols: 2}
+).frames;
 
 export function renderHUD(context: CanvasRenderingContext2D, state: GameState): void {
     let x = 26;
@@ -30,9 +34,11 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
         drawFrame(context, frame, {...frame, x: x + i * 11, y: 5});
     }
     const dungeonInventory = state.savedState.dungeonInventories[state.location.zoneKey];
+    if (dungeonInventory?.bigKey) {
+        drawFrameAt(context, bigKeyFrame, {x: CANVAS_WIDTH - 21, y: 24});
+    }
     for (let i = 0; i < dungeonInventory?.smallKeys; i++) {
-        context.fillStyle = 'white';
-        context.fillRect(x + 120 + 3 * i, 5, 2, 6);
+        drawFrameAt(context, keyFrame, {x: CANVAS_WIDTH - 14 - 4 * i, y: 28});
     }
     renderSpiritBar(context, state);
 

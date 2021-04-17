@@ -80,6 +80,30 @@ export function drawFrame(
     context.drawImage(image, x | 0, y | 0, w | 0, h | 0, tx | 0, ty | 0, tw | 0, th | 0);
 }
 
+export function drawFrameAt(
+    context: CanvasRenderingContext2D,
+    {image, content, x, y, w, h}: Frame,
+    {x: tx, y: ty, w: tw, h: th}: {x: number, y: number, w?: number, h?: number}
+): void {
+    const cw = content?.w ?? w;
+    const ch = content?.h ?? h;
+    // First set tw/th to the target size of the content of the frame.
+    tw = tw ?? cw;
+    th = th ?? ch;
+    const xScale = tw / cw;
+    const yScale = th / ch;
+    // Adjust tx/ty so that x/y will be the top left corner of the content of the frame.
+    tx = tx - (content?.x || 0) * xScale;
+    ty = ty - (content?.y || 0) * yScale;
+    // Before drawing, set tw/th to the target size of the entire frame.
+    tw = xScale * w;
+    th = yScale * h;
+    // (x | 0) is faster than Math.floor(x)
+    context.drawImage(image,
+        x | 0, y | 0, w | 0, h | 0,
+        tx | 0, ty | 0, tw | 0, th | 0);
+}
+
 /*export function drawFrameCenteredInTarget(
     context: CanvasRenderingContext2D,
     {image, x, y, w, h}: Frame,

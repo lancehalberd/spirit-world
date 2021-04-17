@@ -59,6 +59,9 @@ Ability order:
 
 
 Current tasks:
+    - Wall Lasers
+        - Support param editing for enemies
+        - Change how state for various object definitions are stored by keeping the entire ObjectDefinition for the object to create in state.
     - Difficulty shrine:
         - 50 money per point
         - move points around for free

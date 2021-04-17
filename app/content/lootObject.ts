@@ -244,7 +244,7 @@ export class LootDropObject extends LootObject {
 }
 
 
-const [/*smallPeach*/, fullPeachFrame, /*threeQuartersPeach*/, /*halfPeach*/, /*quarterPeach*/, peachPieceFrame] =
+const [/*smallPeach*/, /*fullPeachFrame*/, /*threeQuartersPeach*/, /*halfPeach*/, /*quarterPeach*/, peachPieceFrame] =
     createAnimation('gfx/hud/peaches.png', {w: 18, h: 18}, {cols: 3, rows: 2}).frames;
 
 const [weaponFrame] = createAnimation('gfx/chakram1.png', {w: 16, h: 16}, {x: 9}).frames;
@@ -380,17 +380,28 @@ function createLootFrame(color: string, letter: string, size: number = 16): Fram
     return {image: toolCanvas, x: 0, y: 0, w: toolCanvas.width, h: toolCanvas.height};
 }
 
+
+const [
+    catEyes, /*fullPeachFrame*/, goldPeachFrame, rollFrame,
+    keyOutlineFrame, bigKeyOutlineFrame,
+    /*keyFrame*/, /*bigKeyFrame*/,
+] = createAnimation('gfx/hud/icons.png',
+    {w: 18, h: 18, content: {x: 1, y: 1, w: 16, h: 16}}, {cols: 8}
+).frames;
+
 const lootFrames: Partial<{[key in LootType]: Frame}> = {
+    smallKey: keyOutlineFrame,
+    bigKey: bigKeyOutlineFrame,
     bow: createLootFrame('red', 'B'),
-    catEyes: createLootFrame('blue', 'E'),
+    catEyes: catEyes,
     clone: createLootFrame('red', 'C'),
     invisibility: createLootFrame('red', 'I'),
     trueSight: createLootFrame('blue', 'T'),
     gloves: createLootFrame('blue', 'G'),
-    roll: createLootFrame('green', 'R'),
+    roll: rollFrame,
     staff: createLootFrame('red', 'S'),
     peach: smallPeachFrame,
-    peachOfImmortality: fullPeachFrame,
+    peachOfImmortality: goldPeachFrame,
     peachOfImmortalityPiece: peachPieceFrame,
     spiritSight: createLootFrame('blue', 'SE'),
     unknown: createLootFrame('black', '?'),
