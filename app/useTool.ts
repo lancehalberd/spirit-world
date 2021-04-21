@@ -28,6 +28,7 @@ export function useTool(
                 y: hero.y + 8 * directionMap[direction][1] + 6,
                 vx: 4 * directionMap[direction][0],
                 vy: 4 * directionMap[direction][1],
+                style: 'spirit',
             });
             addObjectToArea(state, state.areaInstance, arrow);
             return;

@@ -29,6 +29,26 @@ const stuckRightAnimation = createAnimation('gfx/effects/arrow.png', {w: 16, h: 
 const stuckUpAnimation = createAnimation('gfx/effects/arrow.png', {w: 16, h: 16, content: upContent}, {y: 2, x: 10, cols: 5, duration: 3}, {loop: false});
 const stuckLeftAnimation = createAnimation('gfx/effects/arrow.png', {w: 16, h: 16, content: leftContent}, {y: 2, x: 15, cols: 5, duration: 3}, {loop: false});
 
+const sdlAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 16, h: 16, content: {x: 2, y: 8, w: 6, h: 6}}, {cols: 2});
+const sdrAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 16, h: 16, content: {x: 8, y: 8, w: 6, h: 6}}, {x: 2, cols: 2});
+const surAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 16, h: 16, content: {x: 8, y: 2, w: 6, h: 6}}, {x: 4, cols: 2});
+const sulAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 16, h: 16, content: {x: 2, y: 2, w: 6, h: 6}}, {x: 6, cols: 2});
+const sdownAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 16, h: 16, content: downContent}, {x: 8, cols: 2});
+const srightAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 16, h: 16, content: rightContent}, {x: 10, cols: 2});
+const supAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 16, h: 16, content: upContent}, {x: 12, cols: 2});
+const sleftAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 16, h: 16, content: leftContent}, {x: 14, cols: 2});
+
+const spoofDownAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 16, h: 16, content: downContent}, {y: 1, cols: 3, duration: 3}, {loop: false});
+const spoofRightAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 16, h: 16, content: rightContent}, {y: 1, x: 3, cols: 3, duration: 3}, {loop: false});
+const spoofUpAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 16, h: 16, content: upContent}, {y: 1, x: 6, cols: 3, duration: 3}, {loop: false});
+const spoofLeftAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 16, h: 16, content: leftContent}, {y: 1, x: 9, cols: 3, duration: 3}, {loop: false});
+const sstuckDownAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 16, h: 16, content: downContent}, {y: 2, cols: 5, duration: 3}, {loop: false});
+const sstuckRightAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 16, h: 16, content: rightContent}, {y: 2, x: 5, cols: 5, duration: 3}, {loop: false});
+const sstuckUpAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 16, h: 16, content: upContent}, {y: 2, x: 10, cols: 5, duration: 3}, {loop: false});
+const sstuckLeftAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 16, h: 16, content: leftContent}, {y: 2, x: 15, cols: 5, duration: 3}, {loop: false});
+
+
+
 interface ArrowAnimations {
     normal: FrameAnimation,
     stuck: FrameAnimation,
@@ -76,6 +96,48 @@ const arrowStyles: {[key: string]: {[key in Direction]: ArrowAnimations}} = {
             normal: drAnimation,
             stuck: stuckDownAnimation,
             blocked: spinAnimation,
+        },
+    },
+    spirit: {
+        upleft: {
+            normal: sulAnimation,
+            stuck: sstuckUpAnimation,
+            blocked: spoofUpAnimation,
+        },
+        up: {
+            normal: supAnimation,
+            stuck: sstuckUpAnimation,
+            blocked: spoofUpAnimation,
+        },
+        upright: {
+            normal: surAnimation,
+            stuck: sstuckUpAnimation,
+            blocked: spoofUpAnimation,
+        },
+        left: {
+            normal: sleftAnimation,
+            stuck: sstuckLeftAnimation,
+            blocked: spoofLeftAnimation,
+        },
+        right: {
+            normal: srightAnimation,
+            stuck: sstuckRightAnimation,
+            blocked: spoofRightAnimation,
+        },
+        downleft: {
+            normal: sdlAnimation,
+            stuck: sstuckDownAnimation,
+            blocked: spoofDownAnimation,
+        },
+        down: {
+            normal: sdownAnimation,
+            stuck: sstuckDownAnimation,
+            blocked: spoofDownAnimation,
+        },
+        downright: {
+            normal: sdrAnimation,
+            stuck: sstuckDownAnimation,
+            blocked: spoofDownAnimation,
         },
     }
 }
@@ -143,18 +205,16 @@ export class Arrow implements ObjectInstance {
         if (this.stuckFrames > 0) {
             this.stuckFrames++;
             if (this.blocked) {
-                /*if (this.vx) {
-                    this.x -= 0.5 * this.vx / Math.abs(this.vx);
-                }
-                if (this.vy) {
-                    this.y -= 0.5 * this.vy / Math.abs(this.vy);
-                }*/
-                if (this.vy > 0) {
-                    this.y -= 0.5;
-                }
-                this.vz -= 0.2;
-                this.z += this.vz;
-                if (this.stuckFrames > 15) {
+                if (this.style !== 'spirit') {
+                    if (this.vy > 0) {
+                        this.y -= 0.5;
+                    }
+                    this.vz -= 0.2;
+                    this.z += this.vz;
+                    if (this.stuckFrames > 15) {
+                        removeObjectFromArea(state, this);
+                    }
+                } else if (this.animationTime >= spoofDownAnimation.duration) {
                     removeObjectFromArea(state, this);
                 }
             } else if (this.animationTime >= stuckDownAnimation.duration + 100) {
