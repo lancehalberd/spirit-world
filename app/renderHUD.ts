@@ -19,8 +19,13 @@ const [keyFrame, bigKeyFrame] = createAnimation('gfx/hud/icons.png',
 
 export function renderHUD(context: CanvasRenderingContext2D, state: GameState): void {
     let x = 26;
+    let y = 5;
     for (let i = 0; i < state.hero.maxLife; i++) {
-        drawFrame(context, emptyHeart, {...emptyHeart, x: x + i * 11, y: 5});
+        if (i === 10) {
+            y += 11;
+            x = 26;
+        }
+        drawFrame(context, emptyHeart, {...emptyHeart, x, y});
         let frame = fullHeart;
         if (i >= state.hero.life) {
             frame = emptyHeart;
@@ -31,7 +36,8 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
         } else if (i >= state.hero.life - 0.75) {
             frame = threeQuarters;
         }
-        drawFrame(context, frame, {...frame, x: x + i * 11, y: 5});
+        drawFrame(context, frame, {...frame, x, y});
+        x += 11;
     }
     const dungeonInventory = state.savedState.dungeonInventories[state.location.zoneKey];
     if (dungeonInventory?.bigKey) {
@@ -43,20 +49,18 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
     renderSpiritBar(context, state);
 
     let frame = getLootFrame({lootType: state.hero.leftTool, lootLevel: state.hero.activeTools[state.hero.leftTool]});
-    let target = {...frame, x: CANVAS_WIDTH - 44, y: 4};
+    let target = {w: frame.content?.w ?? frame.w, h: frame.content?.h ?? frame.h, x: CANVAS_WIDTH - 44, y: 4};
     fillRect(context, pad(target, 2), LEFT_TOOL_COLOR);
+    fillRect(context, target, 'black');
     if (state.hero.leftTool) {
-        drawFrame(context, frame, target)
-    } else {
-        fillRect(context, target, 'black');
+        drawFrameAt(context, frame, target)
     }
     frame = getLootFrame({lootType: state.hero.rightTool, lootLevel: state.hero.activeTools[state.hero.rightTool]});
     target = {...frame, x: CANVAS_WIDTH - 20, y: 4};
     fillRect(context, pad(target, 2), RIGHT_TOOL_COLOR);
+    fillRect(context, target, 'black');
     if (state.hero.rightTool) {
-        drawFrame(context, frame, target);
-    } else {
-        fillRect(context, target, 'black');
+        drawFrameAt(context, frame, target);
     }
 
     drawFrame(context, coin, {...coin, x: CANVAS_WIDTH - 110, y: 4});

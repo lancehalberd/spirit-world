@@ -242,7 +242,7 @@ function renderProperty(property: EditorProperty<any> | HTMLElement | string): s
             const options = property.values.filter(v => !property.value.includes(v));
             const selectedContainer = property.value.length ? `
                 <div class="pp-tag-container" name="${property.id || property.name}">
-                    ${property.value.map(v => `<span class="pp-tag">${v}</span>`).join('')}
+                    ${property.value.map(v => `<span class="pp-tag">${v} </span>`).join('')}
                 </div>
                 ` : '';
 

@@ -31,13 +31,14 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
     const selectableItemFrames = [];
     function renderSelectableTool(tool: ActiveTool): void {
         const frame = getLootFrame({ lootType: tool, lootLevel: state.hero.activeTools[tool] });
-        const target = {...frame, x: (x + 8 - frame.w / 2), y: (y + 8 - frame.h / 2)};
+        const target = {w: frame.content?.w ?? frame.w, h: frame.content?.h ?? frame.h, x, y};
         if (state.hero.leftTool === tool) {
             fillRect(context, pad(target, 2), LEFT_TOOL_COLOR);
         }
         if (state.hero.rightTool === tool) {
             fillRect(context, pad(target, 2), RIGHT_TOOL_COLOR);
         }
+        fillRect(context, target, 'black');
         drawFrame(context, frame, target);
         selectableItemFrames.push(target);
     }

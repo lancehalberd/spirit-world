@@ -2,9 +2,15 @@ import { isPixelInShortRect } from 'app/utils/index';
 
 import { AreaInstance, Direction, GameState, ObjectInstance, Tile, TileBehaviors } from 'app/types';
 
+const root2over2 = Math.sqrt(2) / 2;
+
 export const directionMap = {
+    upleft: [-root2over2, -root2over2],
     up: [0, -1],
+    upright: [root2over2, -root2over2],
+    downleft: [-root2over2, root2over2],
     down: [0, 1],
+    downright: [root2over2, root2over2],
     left: [-1, 0],
     right: [1, 0],
 };
@@ -34,7 +40,20 @@ export const carryMap = {
     'up': [{x: 0, y: -15}, {x: 0, y: -15}, {x: 0, y: -15}, {x: 0, y: -15}, {x: 0, y: -16}, {x: 0, y: -17}, {x: 0, y: -17}],
 };
 
-export function getDirection(dx: number, dy: number): Direction {
+export function getDirection(dx: number, dy: number, includeDiagonals = false): Direction {
+    if (includeDiagonals) {
+        const r = Math.abs(dx) / (Math.abs(dy) + .000001);
+        if (r >= 2) {
+            return dx < 0 ? 'left' : 'right';
+        }
+        if (r <= 1 / 2) {
+            return dy < 0 ? 'up' : 'down';
+        }
+        if (dy < 0) {
+            return dx < 0 ? 'upleft' : 'upright';
+        }
+        return dx < 0 ? 'downleft' : 'downright';
+    }
     if (Math.abs(dx) > Math.abs(dy)) {
         return dx < 0 ? 'left' : 'right';
     }

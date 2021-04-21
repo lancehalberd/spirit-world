@@ -1,9 +1,9 @@
 import {
-    Frame, GameState, Hero, LootTable, LootType, MagicElement,
+    BossType, EnemyType, Frame, GameState, Hero, LootTable, LootType, MagicElement, MinionType,
     ShortRectangle,
 } from 'app/types';
 
-export type Direction = 'up' | 'down' | 'left' | 'right';
+export type Direction = 'up' | 'down' | 'left' | 'right' | 'upleft' | 'upright' | 'downleft' | 'downright';
 
 export interface TileBehaviors {
     // 0-1
@@ -295,22 +295,16 @@ export interface SimpleObjectDefinition extends BaseObjectDefinition {
     type: SimpleObjectType,
 }
 
-export type EnemyType =
-    'arrowTurret' | 'beetle' | 'beetleHorned' | 'beetleMini' | 'beetleWinged'
-    | 'beetleBossWingedMinionDefinition'
-    | 'snake' | 'wallLaser';
-
-export type BossType =
-    'beetleBoss'
-
 export interface EnemyObjectDefinition extends BaseObjectDefinition {
     type: 'enemy',
-    enemyType: EnemyType,
+    enemyType: EnemyType | MinionType,
+    params?: {[key: string]: any},
 }
 
 export interface BossObjectDefinition extends BaseObjectDefinition {
     type: 'boss',
     enemyType: BossType,
+    params?: {[key: string]: any},
     lootType: LootType,
     lootAmount?: number,
     // If this is 0/unset it means it is progressive.

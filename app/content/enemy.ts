@@ -9,15 +9,27 @@ import { FRAME_LENGTH } from 'app/gameConstants';
 import { moveActor } from 'app/moveActor';
 import { saveGame } from 'app/state';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
-import { directionMap, getDirection } from 'app/utils/field';
+import { directionMap } from 'app/utils/field';
 import { playSound } from 'app/utils/sounds';
 
 import {
-    Actor, ActorAnimations, AreaInstance, BossObjectDefinition, BossType, Direction, DrawPriority,
-    EnemyType, EnemyObjectDefinition,
+    Actor, ActorAnimations, AreaInstance, BossObjectDefinition, Direction, DrawPriority,
+    EnemyObjectDefinition,
     Frame, FrameAnimation, FrameDimensions, GameState, Hero, LootTable, MovementProperties,
     ObjectInstance, ObjectStatus, ShortRectangle,
 } from 'app/types';
+
+
+export const enemyTypes = <const>[
+    'arrowTurret', 'beetle', 'beetleHorned', 'beetleMini', 'beetleWinged', 'snake', 'wallLaser',
+];
+// Not intended for use in the editor.
+const minionTypes = <const>['beetleBossWingedMinionDefinition'];
+export const bossTypes = <const>['beetleBoss'];
+export type EnemyType = typeof enemyTypes[number];
+export type BossType = typeof bossTypes[number];
+export type MinionType = typeof minionTypes[number];
+
 
 export class Enemy implements Actor, ObjectInstance {
     type = 'enemy' as 'enemy';
@@ -71,7 +83,10 @@ export class Enemy implements Actor, ObjectInstance {
         this.flying = this.enemyDefinition.flying;
         this.z = this.flying ? 12 : 0;
         this.scale = this.enemyDefinition.scale ?? 1;
-        this.params = {};
+        this.params = {
+            ...(definition.params || {}),
+            ...(this.enemyDefinition.params || {}),
+        };
         if (definition.type === 'boss' && state.savedState.objectFlags[this.definition.id]) {
             this.status = 'gone';
         }
@@ -296,6 +311,7 @@ interface EnemyDefinition {
     hasShadow?: boolean,
     life?: number,
     lootTable: LootTable,
+    params?: any,
     speed?: number,
     acceleration?: number,
     scale?: number,
@@ -303,7 +319,7 @@ interface EnemyDefinition {
     update: (state: GameState, enemy: Enemy) => void,
 }
 
-export const enemyDefinitions: {[key in EnemyType | BossType]: EnemyDefinition} = {
+export const enemyDefinitions: {[key in EnemyType | BossType | MinionType]: EnemyDefinition} = {
     arrowTurret: {
         animations: beetleAnimations, life: 4, touchDamage: 1, update: spinAndShoot,
         lootTable: simpleLootTable,
@@ -350,10 +366,11 @@ export const enemyDefinitions: {[key in EnemyType | BossType]: EnemyDefinition} 
         lootTable: simpleLootTable,
     },
     wallLaser: {
-        animations: beetleAnimations, life: 2, touchDamage: 1, update: paceRandomly, flipRight: true,
-        lootTable: simpleLootTable,
+        animations: snakeAnimations, life: 2, touchDamage: 1, update: updateWallLaser, flipRight: true,
+        lootTable: simpleLootTable, params: { alwaysOpen: false },
     },
 };
+
 
 function spinAndShoot(state: GameState, enemy: Enemy): void {
     if (typeof enemy.params.currentTheta === 'undefined') {
@@ -370,7 +387,6 @@ function spinAndShoot(state: GameState, enemy: Enemy): void {
                     y: hitbox.y + hitbox.h / 2 + hitbox.h / 2 * dy,
                     vx: 4 * dx,
                     vy: 4 * dy,
-                    direction: getDirection(dx, dy),
                 });
                 addObjectToArea(state, state.areaInstance, arrow);
             }
@@ -385,6 +401,10 @@ function spinAndShoot(state: GameState, enemy: Enemy): void {
             enemy.setMode('shoot');
         }
     }
+}
+
+function updateWallLaser(state: GameState, enemy: Enemy): void {
+
 }
 
 function updateBeetleBoss(state: GameState, enemy: Enemy): void {

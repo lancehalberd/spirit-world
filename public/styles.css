@@ -74,16 +74,19 @@
     background: white;
 }
 .pp-tag {
+    display: inline-block;
     background-color: #AAA;
     border-radius: 4px;
     padding: 2px 4px;
     cursor: pointer;
     color: white;
+    margin-right: 2px;
+    margin-bottom: 2px;
 }
-.pp-tag:after-content {
+.pp-tag::after {
     content: 'x';
-    color: #AAA;
+    color: #444;
 }
-.pp-tag:hover:after-content {
+.pp-tag:hover::after {
     color: red;
 }

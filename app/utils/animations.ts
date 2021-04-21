@@ -26,6 +26,10 @@ export function frameAnimation(frame: Frame): FrameAnimation {
     return {frames: [frame], frameDuration: 1, duration: 1};
 }
 
+export function framesAnimation(frames: Frame[], duration = 8, props: ExtraAnimationProperties = {}): FrameAnimation {
+    return {frames, frameDuration: duration, ...props, duration: FRAME_LENGTH * frames.length * duration};
+}
+
 export function createAnimation(
     source: string | HTMLImageElement | HTMLCanvasElement,
     dimensions: FrameDimensions,

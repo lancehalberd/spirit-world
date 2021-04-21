@@ -43,7 +43,7 @@ export interface LootTable {
 }
 
 export type AnimationSet = {
-    [key in Direction]: FrameAnimation
+    [key in Direction]?: FrameAnimation
 }
 export interface ActorAnimations {
     attack?: AnimationSet,

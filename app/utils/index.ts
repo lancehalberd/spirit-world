@@ -2,13 +2,6 @@ import * as _ from 'lodash';
 
 import { FrameDimensions, FullRectangle, ShortRectangle } from 'app/types';
 
-export function ifdefor<T>(value: T, defaultValue: T = null): T {
-    if (value !== undefined && !(typeof value === 'number' && isNaN(value))) {
-        return value;
-    }
-    return defaultValue;
-}
-
 export function isPointInRect(x: number, y: number, l: number, t: number, w: number, h: number): boolean {
     return !(y <= t || y >= (t + h) || x <= l || x >= (l + w));
 }

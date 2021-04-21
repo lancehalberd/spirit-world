@@ -112,7 +112,7 @@ export interface EditorArrayProperty<T> {
     // A button property will have no value.
     value?: T[],
     // If the property is an enum, you can set the list of all values.
-    values?: T[],
+    values?: readonly T[],
     // If the property is editable, you can specify what happens when it is changed.
     onChange: (newValue: T[]) => void,
 }
@@ -140,7 +140,7 @@ export interface EditorSingleProperty<T> {
     // A button property will have no value.
     value?: T,
     // If the property is an enum, you can set the list of all values.
-    values?: T[],
+    values?: readonly T[],
     // If the property is editable, you can specify what happens when it is changed.
     onChange?: (newValue: T) => (T | void),
 }

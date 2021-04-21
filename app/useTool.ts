@@ -2,7 +2,7 @@ import { addObjectToArea } from 'app/content/areas';
 import { Arrow } from 'app/content/arrow';
 import { Clone }  from 'app/content/clone';
 import { Staff } from 'app/content/staff';
-import { directionMap } from 'app/utils/field';
+import { directionMap, getDirection } from 'app/utils/field';
 
 import { ActiveTool, GameState, Hero } from 'app/types'
 
@@ -19,12 +19,15 @@ export function useTool(
                 return;
             }
             state.hero.magic -= 5;
+            let direction = hero.d;
+            if (dx || dy) {
+                direction = getDirection(dx, dy, true);
+            }
             const arrow = new Arrow({
-                x: hero.x + 8 + 8 * directionMap[hero.d][0],
-                y: hero.y + 8 * directionMap[hero.d][1] + 6,
-                vx: 4 * directionMap[hero.d][0],
-                vy: 4 * directionMap[hero.d][1],
-                direction: hero.d
+                x: hero.x + 8 + 8 * directionMap[direction][0],
+                y: hero.y + 8 * directionMap[direction][1] + 6,
+                vx: 4 * directionMap[direction][0],
+                vy: 4 * directionMap[direction][1],
             });
             addObjectToArea(state, state.areaInstance, arrow);
             return;

@@ -256,14 +256,12 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         movementSpeed = 1;
         hero.actionFrame++;
         if (hero.actionFrame === 6) {
-            // const m = Math.sqrt(hero.actionDx * hero.actionDx + hero.actionDy * hero.actionDy);
+            const direction = (hero.actionDx || hero.actionDy) ? getDirection(hero.actionDx, hero.actionDy, true) : hero.d;
             const chakram = new ThrownChakram({
                 x: hero.x + 3,
                 y: hero.y,
-                //vx: 4 * (m ? hero.actionDx / m : directionMap[hero.d][0]) + hero.actionDx,
-                //vy: 4 * (m ? hero.actionDy / m : directionMap[hero.d][1]) + hero.actionDy,
-                vx: 5 * directionMap[hero.d][0],
-                vy: 5 * directionMap[hero.d][1],
+                vx: 5 * directionMap[direction][0],
+                vy: 5 * directionMap[direction][1],
                 returnSpeed: 4,
                 source: hero,
             });

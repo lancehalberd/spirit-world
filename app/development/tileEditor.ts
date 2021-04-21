@@ -5,19 +5,20 @@ import {
     initializeAreaLayerTiles, resetTileBehavior,
     enterLocation,
 } from 'app/content/areas';
+import { bossTypes, enemyTypes } from 'app/content/enemy';
 import { palettes } from 'app/content/palettes';
 import { getLootFrame } from 'app/content/lootObject';
 import { createObjectInstance } from 'app/content/objects';
 import {
+    createObjectDefinition,
     deleteObject,
     getObjectFrame,
     getObjectProperties,
-    getObjectTypeProperties,
-    getSelectProperties,
     onMouseDownObject, onMouseDownSelect,
     onMouseMoveSelect,
     renderObjectPreview,
     combinedObjectTypes,
+    unselectObject,
 } from 'app/development/objectEditor';
 import { displayPropertyPanel, hidePropertyPanel, updateBrushCanvas } from 'app/development/propertyPanel';
 import { getZoneProperties, renderZoneEditor } from 'app/development/zoneEditor';
@@ -31,32 +32,19 @@ import { drawFrame } from 'app/utils/animations';
 import { getMousePosition, isMouseDown } from 'app/utils/mouse';
 
 import {
-    AreaInstance, AreaLayerDefinition, BossType, Direction,  EnemyType, Frame,
-    GameState,
-    LootType, MagicElement,
-    ObjectDefinition, ObjectStatus, ObjectType,
+    AreaInstance, AreaLayerDefinition, BossObjectDefinition,  EnemyObjectDefinition, EnemyType,
+    Frame, GameState,
+    ObjectDefinition,
     PanelRows, PropertyRow, ShortRectangle, Tile, TileGrid,
 } from 'app/types';
 
 type EditorToolType = 'brush' | 'delete' | 'object' | 'enemy' | 'boss' | 'replace' | 'select';
 export interface EditingState {
-    amount: number,
     tool: EditorToolType,
     isEditing: boolean,
     brush: TileGrid,
-    direction: Direction,
     selectedLayerIndex: number,
-    element?: MagicElement,
-    bossType: BossType,
-    enemyType: EnemyType,
-    entranceTargetZone?: string,
-    entranceTargetObjectId?: string,
-    level: number,
-    linked: boolean,
-    lootType: LootType,
     message: string,
-    objectStatus: ObjectStatus,
-    objectType: ObjectType,
     replacePercentage: number,
     selectedObject?: ObjectDefinition,
     showZoneProperties: boolean,
@@ -64,32 +52,16 @@ export interface EditingState {
     showInventoryProperties: boolean,
     showProgressProperties: boolean,
     spirit: boolean,
-    style?: string,
-    switchTargetObjectId?: string,
-    timer: number,
-    toggleOnRelease: boolean,
     dragOffset: {x: number, y: number},
 }
 
 export const editingState: EditingState = {
-    amount: 1,
     tool: 'select',
     isEditing: false,
     brush: null,
-    direction: 'up',
     // Default editing the field, not the floor.
     selectedLayerIndex: 1,
-    element: null,
-    bossType: 'beetleBoss',
-    enemyType: 'snake',
-    entranceTargetZone: null,
-    entranceTargetObjectId: null,
-    level: 0,
-    linked: false,
-    lootType: 'peachOfImmortalityPiece',
     message: '',
-    objectStatus: 'normal',
-    objectType: combinedObjectTypes[0],
     replacePercentage: 100,
     selectedObject: null,
     showZoneProperties: false,
@@ -97,10 +69,6 @@ export const editingState: EditingState = {
     showInventoryProperties: false,
     showProgressProperties: false,
     spirit: false,
-    style: null,
-    switchTargetObjectId: null,
-    timer: 0,
-    toggleOnRelease: false,
     dragOffset: {x: 0, y: 0},
 };
 window['editingState'] = editingState;
@@ -131,6 +99,9 @@ export function startEditing(state: GameState) {
             tiles: [[_.sample(palette.defaultTiles)]],
         }
     }
+    if (!editingState.selectedObject) {
+        editingState.selectedObject = createObjectDefinition(state, editingState, {type: combinedObjectTypes[0]});
+    }
     displayTileEditorPropertyPanel();
     state.areaInstance.tilesDrawn = [];
     state.areaInstance.checkToRedrawTiles = true;
@@ -146,6 +117,24 @@ export function displayTileEditorPropertyPanel() {
     const state = getState();
     if (editingState.selectedLayerIndex >= state.areaInstance.layers.length) {
         editingState.selectedLayerIndex = 0;
+    }
+    if (editingState.tool === 'enemy') {
+        editingState.selectedObject.type = 'enemy';
+        const enemyDefinition = editingState.selectedObject as EnemyObjectDefinition;
+        // TS incorrectly requires search element type to be a subset of the array.
+        if (!enemyTypes.includes(enemyDefinition.enemyType as EnemyType)) {
+            enemyDefinition.enemyType = enemyTypes[0];
+        }
+    } else if (editingState.tool === 'boss') {
+        editingState.selectedObject.type = 'boss';
+        const bossDefinition = editingState.selectedObject as BossObjectDefinition;
+        if (!bossTypes.includes(bossDefinition.enemyType)) {
+            bossDefinition.enemyType = bossTypes[0];
+        }
+    } else if (editingState.tool === 'object') {
+        if (editingState.selectedObject.type === 'enemy' || editingState.selectedObject.type === 'boss') {
+            editingState.selectedObject.type = combinedObjectTypes[0] as any;
+        }
     }
     let rows: PanelRows = [];
     rows = [...rows, ...getZoneProperties(state, editingState)];
@@ -174,199 +163,194 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
         },
     });
     const selectedPaletteKey = state.areaInstance.layers[editingState.selectedLayerIndex].definition.grid.palette;
-    if (editingState.showFieldProperties) {
-        for (let i = 0; i < state.areaInstance.layers.length; i++) {
-            const layer = state.areaInstance.layers[i];
-            const row: PropertyRow = [
-            {
-                name: '',
-                id: `layer-${i}-key`,
-                value: layer.key,
-                onChange(key: string) {
-                    layer.key = key
-                    layer.definition.key = key;
-                    // editingState.selectedLayerIndex = i;
-                    displayTileEditorPropertyPanel();
-                },
-            }];
-            if (i > 0) {
-                row.push({
-                    name: '^',
-                    id: `layer-${i}-up`,
-                    onClick() {
-                        state.areaInstance.layers[i] = state.areaInstance.layers[i - 1];
-                        state.areaInstance.definition.layers[i] = state.areaInstance.definition.layers[i - 1];
-                        state.areaInstance.layers[i - 1] = layer;
-                        state.areaInstance.definition.layers[i - 1] = layer.definition;
-                        state.areaInstance.tilesDrawn = [];
-                        state.areaInstance.checkToRedrawTiles = true;
-                        if (editingState.selectedLayerIndex === i - 1) {
-                            editingState.selectedLayerIndex = i;
-                        } else if (editingState.selectedLayerIndex === i) {
-                            editingState.selectedLayerIndex = i - 1;
-                        }
-                        displayTileEditorPropertyPanel();
-                    },
-                });
-            }
-            if (i < state.areaInstance.layers.length - 1) {
-                row.push({
-                    name: 'v',
-                    id: `layer-${i}-down`,
-                    onClick() {
-                        state.areaInstance.layers[i] = state.areaInstance.layers[i + 1];
-                        state.areaInstance.definition.layers[i] = state.areaInstance.definition.layers[i + 1];
-                        state.areaInstance.layers[i + 1] = layer;
-                        state.areaInstance.definition.layers[i + 1] = layer.definition;
-                        state.areaInstance.tilesDrawn = [];
-                        state.areaInstance.checkToRedrawTiles = true;
-                        if (editingState.selectedLayerIndex === i + 1) {
-                            editingState.selectedLayerIndex = i;
-                        } else if (editingState.selectedLayerIndex === i) {
-                            editingState.selectedLayerIndex = i + 1;
-                        }
-                        displayTileEditorPropertyPanel();
-                    },
-                });
-            }
-            if (editingState.selectedLayerIndex !== i) {
-                row.unshift({
-                    name: '>',
-                    id: `layer-${i}-select`,
-                    onClick() {
-                        editingState.selectedLayerIndex = i;
-                        state.areaInstance.tilesDrawn = [];
-                        state.areaInstance.checkToRedrawTiles = true;
-                        displayTileEditorPropertyPanel();
-                    }
-                })
-            } else {
-                row.unshift('**');
-            }
-            rows.push(row);
-        }
-        rows.push({
-            name: 'Add Layer',
-            onClick() {
-                const definition = state.areaInstance.definition;
-                const alternateDefinition = state.alternateAreaInstance.definition;
-                const key = 'layer-' + definition.layers.length;
-                const topLayerDefinition = definition.layers[definition.layers.length - 1];
-                const alternateTopLayerDefinition = alternateDefinition.layers[alternateDefinition.layers.length - 1];
-                const layerDefinition: AreaLayerDefinition = {
-                    ...topLayerDefinition,
-                    key,
-                    grid: {
-                        ...topLayerDefinition.grid,
-                        // The matrix of tiles
-                        tiles: [],
-                    },
-                };
-                const alternateLayerDefinition: AreaLayerDefinition = {
-                    ...alternateTopLayerDefinition,
-                    key,
-                    grid: {
-                        ...alternateTopLayerDefinition.grid,
-                        // The matrix of tiles
-                        tiles: [],
-                    },
-                };
-                initializeAreaLayerTiles(layerDefinition);
-                initializeAreaLayerTiles(alternateLayerDefinition);
-                definition.layers.push(layerDefinition);
-                alternateDefinition.layers.push(layerDefinition);
-                state.areaInstance.layers.push({
-                    definition: layerDefinition,
-                    ...layerDefinition,
-                    ...layerDefinition.grid,
-                    tiles: _.cloneDeep(layerDefinition.grid.tiles),
-                    originalTiles: _.cloneDeep(layerDefinition.grid.tiles),
-                    palette: palettes[layerDefinition.grid.palette],
-                });
-                state.alternateAreaInstance.layers.push({
-                    definition: alternateLayerDefinition,
-                    ...alternateLayerDefinition,
-                    ...alternateLayerDefinition.grid,
-                    tiles: _.cloneDeep(alternateLayerDefinition.grid.tiles),
-                    originalTiles: _.cloneDeep(alternateLayerDefinition.grid.tiles),
-                    palette: palettes[alternateLayerDefinition.grid.palette],
-                });
-                applyLayerToBehaviorGrid(state.areaInstance.behaviorGrid, layerDefinition,
-                    state.areaInstance.definition.isSpiritWorld ? null : alternateLayerDefinition);
-                applyLayerToBehaviorGrid(state.alternateAreaInstance.behaviorGrid, alternateLayerDefinition,
-                    state.areaInstance.definition.isSpiritWorld ? layerDefinition : null);
-                editingState.selectedLayerIndex = _.findIndex(state.areaInstance.layers, { key });
-                state.areaInstance.tilesDrawn = [];
-                state.alternateAreaInstance.tilesDrawn = [];
-                state.areaInstance.checkToRedrawTiles = true;
-                state.alternateAreaInstance.checkToRedrawTiles = true;
-                displayTileEditorPropertyPanel();
-            }
-        });
-        rows.push({
-            name: 'tool',
-            value: editingState.tool,
-            values: ['select', 'brush', 'delete', 'replace', 'object', 'enemy', 'boss'],
-            onChange(tool: EditorToolType) {
-                editingState.tool = tool;
+    if (!editingState.showFieldProperties) {
+        return rows;
+    }
+    for (let i = 0; i < state.areaInstance.layers.length; i++) {
+        const layer = state.areaInstance.layers[i];
+        const row: PropertyRow = [
+        {
+            name: '',
+            id: `layer-${i}-key`,
+            value: layer.key,
+            onChange(key: string) {
+                layer.key = key
+                layer.definition.key = key;
+                // editingState.selectedLayerIndex = i;
                 displayTileEditorPropertyPanel();
             },
-        });
-        if (editingState.tool !== 'object' && editingState.tool !== 'enemy' && editingState.tool !== 'boss') {
-            rows.push({
-                name: 'palette',
-                value: selectedPaletteKey,
-                values: Object.keys(palettes),
-                onChange(key: string) {
-                    state.areaInstance.definition.layers[editingState.selectedLayerIndex].grid.palette = key;
-                    state.areaInstance.layers[editingState.selectedLayerIndex].palette = palettes[key];
+        }];
+        if (i > 0) {
+            row.push({
+                name: '^',
+                id: `layer-${i}-up`,
+                onClick() {
+                    state.areaInstance.layers[i] = state.areaInstance.layers[i - 1];
+                    state.areaInstance.definition.layers[i] = state.areaInstance.definition.layers[i - 1];
+                    state.areaInstance.layers[i - 1] = layer;
+                    state.areaInstance.definition.layers[i - 1] = layer.definition;
+                    state.areaInstance.tilesDrawn = [];
+                    state.areaInstance.checkToRedrawTiles = true;
+                    if (editingState.selectedLayerIndex === i - 1) {
+                        editingState.selectedLayerIndex = i;
+                    } else if (editingState.selectedLayerIndex === i) {
+                        editingState.selectedLayerIndex = i - 1;
+                    }
+                    displayTileEditorPropertyPanel();
+                },
+            });
+        }
+        if (i < state.areaInstance.layers.length - 1) {
+            row.push({
+                name: 'v',
+                id: `layer-${i}-down`,
+                onClick() {
+                    state.areaInstance.layers[i] = state.areaInstance.layers[i + 1];
+                    state.areaInstance.definition.layers[i] = state.areaInstance.definition.layers[i + 1];
+                    state.areaInstance.layers[i + 1] = layer;
+                    state.areaInstance.definition.layers[i + 1] = layer.definition;
+                    state.areaInstance.tilesDrawn = [];
+                    state.areaInstance.checkToRedrawTiles = true;
+                    if (editingState.selectedLayerIndex === i + 1) {
+                        editingState.selectedLayerIndex = i;
+                    } else if (editingState.selectedLayerIndex === i) {
+                        editingState.selectedLayerIndex = i + 1;
+                    }
+                    displayTileEditorPropertyPanel();
+                },
+            });
+        }
+        if (editingState.selectedLayerIndex !== i) {
+            row.unshift({
+                name: '>',
+                id: `layer-${i}-select`,
+                onClick() {
+                    editingState.selectedLayerIndex = i;
                     state.areaInstance.tilesDrawn = [];
                     state.areaInstance.checkToRedrawTiles = true;
                     displayTileEditorPropertyPanel();
+                }
+            })
+        } else {
+            row.unshift('**');
+        }
+        rows.push(row);
+    }
+    rows.push({
+        name: 'Add Layer',
+        onClick() {
+            const definition = state.areaInstance.definition;
+            const alternateDefinition = state.alternateAreaInstance.definition;
+            const key = 'layer-' + definition.layers.length;
+            const topLayerDefinition = definition.layers[definition.layers.length - 1];
+            const alternateTopLayerDefinition = alternateDefinition.layers[alternateDefinition.layers.length - 1];
+            const layerDefinition: AreaLayerDefinition = {
+                ...topLayerDefinition,
+                key,
+                grid: {
+                    ...topLayerDefinition.grid,
+                    // The matrix of tiles
+                    tiles: [],
                 },
+            };
+            const alternateLayerDefinition: AreaLayerDefinition = {
+                ...alternateTopLayerDefinition,
+                key,
+                grid: {
+                    ...alternateTopLayerDefinition.grid,
+                    // The matrix of tiles
+                    tiles: [],
+                },
+            };
+            initializeAreaLayerTiles(layerDefinition);
+            initializeAreaLayerTiles(alternateLayerDefinition);
+            definition.layers.push(layerDefinition);
+            alternateDefinition.layers.push(layerDefinition);
+            state.areaInstance.layers.push({
+                definition: layerDefinition,
+                ...layerDefinition,
+                ...layerDefinition.grid,
+                tiles: _.cloneDeep(layerDefinition.grid.tiles),
+                originalTiles: _.cloneDeep(layerDefinition.grid.tiles),
+                palette: palettes[layerDefinition.grid.palette],
             });
+            state.alternateAreaInstance.layers.push({
+                definition: alternateLayerDefinition,
+                ...alternateLayerDefinition,
+                ...alternateLayerDefinition.grid,
+                tiles: _.cloneDeep(alternateLayerDefinition.grid.tiles),
+                originalTiles: _.cloneDeep(alternateLayerDefinition.grid.tiles),
+                palette: palettes[alternateLayerDefinition.grid.palette],
+            });
+            applyLayerToBehaviorGrid(state.areaInstance.behaviorGrid, layerDefinition,
+                state.areaInstance.definition.isSpiritWorld ? null : alternateLayerDefinition);
+            applyLayerToBehaviorGrid(state.alternateAreaInstance.behaviorGrid, alternateLayerDefinition,
+                state.areaInstance.definition.isSpiritWorld ? layerDefinition : null);
+            editingState.selectedLayerIndex = _.findIndex(state.areaInstance.layers, { key });
+            state.areaInstance.tilesDrawn = [];
+            state.alternateAreaInstance.tilesDrawn = [];
+            state.areaInstance.checkToRedrawTiles = true;
+            state.alternateAreaInstance.checkToRedrawTiles = true;
+            displayTileEditorPropertyPanel();
+        }
+    });
+    rows.push({
+        name: 'tool',
+        value: editingState.tool,
+        values: ['select', 'brush', 'delete', 'replace', 'object', 'enemy', 'boss'],
+        onChange(tool: EditorToolType) {
+            editingState.tool = tool;
+            displayTileEditorPropertyPanel();
+        },
+    });
+    switch (editingState.tool) {
+        case 'brush':
+            break;
+        case 'replace':
             rows.push({
-                name: 'brush',
-                value: editingState.brush,
-                palette: palettes[selectedPaletteKey],
-                onChange(tiles: TileGrid) {
-                    editingState.brush = tiles;
-                    updateBrushCanvas(editingState.brush);
-                    if (editingState.tool !== 'brush' && editingState.tool !== 'replace') {
-                        editingState.tool = 'brush';
-                        displayTileEditorPropertyPanel();
-                    }
+                name: 'percent',
+                value: editingState.replacePercentage,
+                onChange(percent: number) {
+                    editingState.replacePercentage = Math.max(0, Math.min(100, percent));
+                    return editingState.replacePercentage;
                 }
             });
-        }
-        switch (editingState.tool) {
-            case 'brush':
-                break;
-            case 'replace':
-                rows.push({
-                    name: 'percent',
-                    value: editingState.replacePercentage,
-                    onChange(percent: number) {
-                        editingState.replacePercentage = Math.max(0, Math.min(100, percent));
-                        return editingState.replacePercentage;
-                    }
-                });
-                break;
-            case 'enemy':
-                rows = [...rows, ...getObjectTypeProperties(state, editingState, {type: 'enemy'} as ObjectDefinition)];
-                break;
-            case 'boss':
-                rows = [...rows, ...getObjectTypeProperties(state, editingState, {type: 'boss'} as ObjectDefinition)];
-                break;
-            case 'object':
-                rows = [...rows, ...getObjectProperties(state, editingState)];
-                break;
-            case 'select':
-                rows = [...rows, ...getSelectProperties(state, editingState)];
-                break;
-            default:
-                break;
-        }
+            break;
+        case 'enemy':
+        case 'boss':
+        case 'object':
+        case 'select':
+            rows = [...rows, ...getObjectProperties(state, editingState)];
+            break;
+        default:
+            break;
+    }
+    if (editingState.tool !== 'object' && editingState.tool !== 'enemy' && editingState.tool !== 'boss') {
+        rows.push({
+            name: 'palette',
+            value: selectedPaletteKey,
+            values: Object.keys(palettes),
+            onChange(key: string) {
+                state.areaInstance.definition.layers[editingState.selectedLayerIndex].grid.palette = key;
+                state.areaInstance.layers[editingState.selectedLayerIndex].palette = palettes[key];
+                state.areaInstance.tilesDrawn = [];
+                state.areaInstance.checkToRedrawTiles = true;
+                displayTileEditorPropertyPanel();
+            },
+        });
+        rows.push({
+            name: 'brush',
+            value: editingState.brush,
+            palette: palettes[selectedPaletteKey],
+            onChange(tiles: TileGrid) {
+                editingState.brush = tiles;
+                updateBrushCanvas(editingState.brush);
+                if (editingState.tool !== 'brush' && editingState.tool !== 'replace') {
+                    editingState.tool = 'brush';
+                    displayTileEditorPropertyPanel();
+                }
+            }
+        });
     }
     return rows;
 }
@@ -666,9 +650,8 @@ export function renderEditor(context: CanvasRenderingContext2D, state: GameState
         return;
     }
     // Unselect objects that are no longer in the current area.
-    if (editingState.selectedObject && !state.areaInstance.definition.objects.find(o => o === editingState.selectedObject)) {
-        editingState.selectedObject = null;
-        displayTileEditorPropertyPanel();
+    if (editingState.selectedObject?.id && !state.areaInstance.definition.objects.find(o => o === editingState.selectedObject)) {
+        unselectObject(editingState);
     }
     renderEditorArea(context, state, state.areaInstance);
     if (state.nextAreaInstance) {
@@ -746,7 +729,7 @@ function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, a
                     }
                 }
             }
-            if (editingState.tool === 'select' && editingState.selectedObject) {
+            if (editingState.tool === 'select' && editingState.selectedObject?.id) {
                 const instance = createObjectInstance(state, editingState.selectedObject);
                 let target: ShortRectangle;
                 if (instance.getHitbox) {
@@ -783,9 +766,9 @@ document.addEventListener('keydown', function(event: KeyboardEvent) {
         return;
     }
     if (event.which === KEY.BACK_SPACE) {
-        if (editingState.selectedObject) {
+        if (editingState.selectedObject?.id) {
             deleteObject(getState(), editingState.selectedObject);
-            editingState.selectedObject = null;
+            unselectObject(editingState);
         }
     }
 });

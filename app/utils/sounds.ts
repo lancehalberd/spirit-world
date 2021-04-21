@@ -1,7 +1,5 @@
 import {Howl/*, Howler*/} from 'howler';
 
-import { ifdefor } from 'app/utils/index';
-
 /* globals setTimeout, Set, Map */
 const sounds = new Map();
 window['sounds'] = sounds;
@@ -75,7 +73,7 @@ export function requireSound(key, callback = null) {
     } else {
         const howlerProperties: any = {
             src: [source],
-            loop: ifdefor(loop, false),
+            loop: loop || false,
             volume: (volume || 1) / 50,
             onplay: function () {
                 if (newSound.activeInstances === 0) {

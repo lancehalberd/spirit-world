@@ -369,7 +369,8 @@ export class BigChest implements ObjectInstance {
     }
 }
 
-function createLootFrame(color: string, letter: string, size: number = 16): Frame {
+function createLootFrame(color: string, letter: string): Frame {
+    const size = 16;
     const [toolCanvas, toolContext] = createCanvasAndContext(size, size);
     toolContext.fillStyle = color;
     toolContext.fillRect(0, 0, size, size);
@@ -382,23 +383,25 @@ function createLootFrame(color: string, letter: string, size: number = 16): Fram
 
 
 const [
-    catEyes, /*fullPeachFrame*/, goldPeachFrame, rollFrame,
+    catEyes, /*fullPeachFrame*/, goldPeachFrame, /*rollFrame*/,
     keyOutlineFrame, bigKeyOutlineFrame,
     /*keyFrame*/, /*bigKeyFrame*/,
+    /*bowFrame*/, bowOutlineFrame,
+    /*scroll1*/, /*scroll1*/, mistScrollFrame,
 ] = createAnimation('gfx/hud/icons.png',
-    {w: 18, h: 18, content: {x: 1, y: 1, w: 16, h: 16}}, {cols: 8}
+    {w: 18, h: 18, content: {x: 1, y: 1, w: 16, h: 16}}, {cols: 14}
 ).frames;
 
 const lootFrames: Partial<{[key in LootType]: Frame}> = {
     smallKey: keyOutlineFrame,
     bigKey: bigKeyOutlineFrame,
-    bow: createLootFrame('red', 'B'),
+    bow: bowOutlineFrame,
     catEyes: catEyes,
     clone: createLootFrame('red', 'C'),
     invisibility: createLootFrame('red', 'I'),
     trueSight: createLootFrame('blue', 'T'),
     gloves: createLootFrame('blue', 'G'),
-    roll: rollFrame,
+    roll: mistScrollFrame,
     staff: createLootFrame('red', 'S'),
     peach: smallPeachFrame,
     peachOfImmortality: goldPeachFrame,
