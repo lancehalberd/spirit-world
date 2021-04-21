@@ -50,11 +50,6 @@ export class Sign implements ObjectInstance {
         // Remove the grab action since the hero is reading the sign, not grabbing it.
         hero.action = null;
     }
-    update(state: GameState) {
-        if (this.status === 'hiddenEnemy' || this.status === 'hiddenSwitch') {
-            return;
-        }
-    }
     render(context, state: GameState) {
         const style = this.definition.style || 'short';
         const frame = this.definition.spirit ? signStyles[style].spirit : signStyles[style].normal;

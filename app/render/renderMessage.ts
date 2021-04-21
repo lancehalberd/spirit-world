@@ -57,6 +57,9 @@ function getEscapedFrames(state: GameState, escapedToken: string): Frame[] {
 }
 
 export function showMessage(state: GameState, message: string): void {
+    if (!message){
+        return;
+    }
     state.messageState = {
         pageIndex: 0,
         pages: parseMessage(state, message),
@@ -161,7 +164,7 @@ export function renderMessage(context: CanvasRenderingContext2D, state: GameStat
     const w = messageWidth + 8;
     let r = {
         x: (CANVAS_WIDTH - w) / 2,
-        y: CANVAS_HEIGHT - h - 32,
+        y: CANVAS_HEIGHT - h - 16,
         w,
         h,
     };

@@ -93,6 +93,7 @@ const f0_0x0: AreaDefinition = {
     objects: [
         {id: "elderEntrance", linked: false, spirit: false, status: "normal", x: 112, y: 480, type: "door", style: "cave", targetZone: "overworld", targetObjectId: "elderEntrance", d: "down"},
         {id: "elderDownstairs", linked: false, spirit: false, status: "normal", x: 64, y: 256, type: "door", style: "cave", targetZone: "treeVillage", targetObjectId: "elderUpstairs", d: "up"},
+        {status: "normal", type: "npc", x: 128, y: 336, d: "down", behavior: "none", style: "vanara", dialogue: "So you want to learn more about your Spirit powers?\n{|}\nSeek out the Guardian in the Vanara Tomb to the north.\n{|}\nSearch my cellar for a tool you will need to enter the Tomb.", id: "treeVillage:0:0x0-npc-0"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},

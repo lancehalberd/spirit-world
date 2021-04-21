@@ -187,6 +187,7 @@ const f0_0x1: AreaDefinition = {
         },
     ],
     objects: [
+        {status: "normal", type: "npc", x: 128, y: 272, d: "down", behavior: "none", style: "vanara", dialogue: "Welcome home son!\n{|}\nOur cave is under development, try again later!", id: "overworld:0:1x0-npc-0"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 32},
@@ -726,11 +727,11 @@ const f0_2x0: AreaDefinition = {
                     [t52,t52,t52,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t52,t52,t52,t52,t6,t6,t6,t6,t6,t6,t6,t6,t52,t52,t52],
                     [t52,t52,t52,t6,t6,t6,t6,t6,t6,t6,t6,t52,t52,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t52,t52,t52],
                     [t52,t52,t52,t6,t6,t6,t6,t52,t52,t6,t52,t52,t52,t52,t6,t6,t6,t6,t6,t6,t6,t6,t6,t52,t52,t6,t6,t6,t6,t52,t52,t52],
-                    [t52,t52,t52,t6,t6,t6,t52,t52,t52,t52,t52,t52,t52,t52,t14,t6,t6,t6,t6,t6,t6,t6,t52,t52,t52,t52,t6,t6,t6,t52,t52,t52],
+                    [t52,t52,t52,t6,t6,t6,t52,t52,t52,t52,t52,t52,t52,t52,t6,t6,t6,t6,t6,t6,t6,t6,t52,t52,t52,t52,t6,t6,t6,t52,t52,t52],
                     [t52,t52,t52,t52,t6,t6,t52,t52,t52,t52,t9,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t52,t52,t52,t52,t6,t6,t52,t52,t52,t52],
                     [t52,t52,t52,t52,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t52,t52,t52,t52],
                     [t52,t52,t52,t52,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t52,t52,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t52,t52,t52,t52],
-                    [t52,t52,t52,t6,t6,t6,t6,t6,t52,t52,t6,t6,t6,t14,t6,t52,t52,t52,t52,t6,t6,t6,t6,t6,t6,t6,t6,t6,t52,t52,t52,t52],
+                    [t52,t52,t52,t6,t6,t6,t6,t6,t52,t52,t6,t6,t6,t6,t6,t52,t52,t52,t52,t6,t6,t6,t6,t6,t6,t6,t6,t6,t52,t52,t52,t52],
                     [t52,t52,t52,t6,t6,t6,t6,t52,t52,t52,t52,t6,t6,t6,t6,t52,t52,t52,t52,t6,t6,t6,t6,t52,t52,t6,t6,t6,t6,t52,t52,t52],
                     [t52,t52,t52,t6,t6,t6,t6,t52,t52,t52,t52,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t52,t52,t52,t52,t6,t6,t6,t52,t52,t52],
                     [t52,t52,t52,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t6,t52,t52,t52,t52,t6,t6,t6,t6,t6,t6],
@@ -748,6 +749,8 @@ const f0_2x0: AreaDefinition = {
     ],
     objects: [
         {id: "elderEntrance", linked: false, spirit: false, status: "normal", x: 128, y: 352, type: "door", style: "cave", targetZone: "treeVillage", targetObjectId: "elderEntrance", d: "up"},
+        {status: "normal", type: "npc", x: 144, y: 48, d: "down", behavior: "none", style: "vanara", dialogue: "This is the Vanara village.\n{|}\nYour kind aren't welcome here.", id: "overworld:0:0x2-npc-0"},
+        {status: "normal", type: "npc", x: 288, y: 272, d: "down", behavior: "random", style: "vanara", dialogue: "I'm not supposed to talk to you.", id: "overworld:0:0x2-npc-1"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},

@@ -11,6 +11,7 @@ import { TippableObject } from 'app/content/tippableObject';
 
 import { BallGoal } from 'app/content/objects/ballGoal';
 import { Marker } from 'app/content/objects/marker';
+import { NPC } from 'app/content/objects/npc';
 import { PitEntrance } from 'app/content/objects/pitEntrance';
 import { Sign } from 'app/content/objects/sign';
 import { WaterPot } from 'app/content/objects/waterPot';
@@ -34,6 +35,8 @@ export function createObjectInstance(state: GameState, object: ObjectDefinition)
         return new Door(state, object);
     } else if (object.type === 'floorSwitch') {
         return new FloorSwitch(object);
+    } else if (object.type === 'npc') {
+        return new NPC(object);
     } else if (object.type === 'tippable') {
         return new TippableObject(object);
     } else if (object.type === 'rollingBall') {

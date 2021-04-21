@@ -52,7 +52,7 @@ export class PushPullObject implements ObjectInstance {
         }
     }
     onPull(state: GameState, direction: Direction, hero: Hero): void {
-        this.pushInDirection(state, direction);
+        this.pushInDirection(state, direction, hero);
     }
     pushInDirection(state: GameState, direction: Direction, hero: Hero = null): void {
         if (this.pushDirection) {

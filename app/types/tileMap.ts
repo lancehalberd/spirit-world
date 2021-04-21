@@ -1,5 +1,7 @@
 import {
-    BossType, EnemyType, Frame, GameState, Hero, LootTable, LootType, MagicElement, MinionType,
+    BossType, EnemyType, Frame, GameState,
+    Hero, LootTable, LootType, MagicElement, MinionType,
+    NPCBehavior, NPCStyle,
     ShortRectangle,
 } from 'app/types';
 
@@ -235,6 +237,8 @@ export interface MovementProperties {
     canClimb?: boolean,
     // Whether the mover should wiggle to fit into tight spaces.
     canWiggle?: boolean,
+    // Objects to ignore for hit detection.
+    excludedObjects?: Set<any>
 }
 
 export interface BaseObjectDefinition {
@@ -289,6 +293,13 @@ export interface SignDefinition extends BaseObjectDefinition {
     message: string,
 }
 
+export interface NPCDefinition extends BaseObjectDefinition {
+    type: 'npc',
+    behavior: NPCBehavior,
+    style: NPCStyle,
+    dialogue: string,
+}
+
 export type SimpleObjectType = 'marker' | 'pushPull' | 'rollingBall' | 'tippable' | 'waterPot';
 
 export interface SimpleObjectDefinition extends BaseObjectDefinition {
@@ -319,6 +330,7 @@ export type ObjectDefinition = SimpleObjectDefinition
     | EnemyObjectDefinition
     | FloorSwitchDefinition
     | LootObjectDefinition
+    | NPCDefinition
     | SignDefinition
     ;
 

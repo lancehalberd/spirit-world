@@ -13,7 +13,7 @@ import { directionMap } from 'app/utils/field';
 import { playSound } from 'app/utils/sounds';
 
 import {
-    Actor, ActorAnimations, AreaInstance, BossObjectDefinition, Direction, DrawPriority,
+    Actor, ActorAnimations, AreaInstance, BossObjectDefinition, Clone, Direction, DrawPriority,
     EnemyObjectDefinition,
     Frame, FrameAnimation, FrameDimensions, GameState, Hero, LootTable, MovementProperties,
     ObjectInstance, ObjectStatus, ShortRectangle,
@@ -514,11 +514,12 @@ function moveTo(state: GameState, enemy: Enemy, tx: number, ty: number): number 
     const hitbox = enemy.getHitbox(state);
     const dx = tx - (hitbox.x + hitbox.w / 2), dy = ty - (hitbox.y + hitbox.h / 2);
     const mag = Math.sqrt(dx * dx + dy * dy);
+    const excludedObjects = new Set([state.hero, ...enemy.area.objects.filter(object => object instanceof Clone)]);
     if (mag > enemy.speed) {
-        moveEnemy(state, enemy, enemy.speed * dx / mag, enemy.speed * dy / mag, {});
+        moveEnemy(state, enemy, enemy.speed * dx / mag, enemy.speed * dy / mag, {excludedObjects});
         return mag - enemy.speed;
     }
-    moveEnemy(state, enemy, dx, dy, {});
+    moveEnemy(state, enemy, dx, dy, {excludedObjects});
     return 0;
 }
 

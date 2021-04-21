@@ -12,6 +12,7 @@ export function moveActor(state: GameState, actor: Actor, dx: number, dy: number
     canSwim = false,
     canClimb = false,
     canWiggle = true,
+    excludedObjects = new Set(),
 }: MovementProperties) {
     let sx = dx;
     if (sx < -1 || sx > 1) {
@@ -33,6 +34,7 @@ export function moveActor(state: GameState, actor: Actor, dx: number, dy: number
                 canSwim,
                 canFall,
                 canClimb,
+                excludedObjects
             });
             if (movedX) {
                 mx += sx;
@@ -54,6 +56,7 @@ export function moveActor(state: GameState, actor: Actor, dx: number, dy: number
                 canSwim,
                 canFall,
                 canClimb,
+                excludedObjects
             });
             if (movedY) {
                 my += sy;
@@ -120,7 +123,7 @@ function moveActorInDirection(
             checkPoints = [...checkPoints, {x: ax + actor.w - 1, y: ay + 8}, {x: ax + actor.w - 1, y: ay + 15}];
         }
     }
-    const excludedObjects = new Set<any>([actor]);
+    const excludedObjects = new Set<any>([...movementProperties.excludedObjects, actor]);
     if (actor.pickUpObject) {
         excludedObjects.add(actor.pickUpObject);
     }

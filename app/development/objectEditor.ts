@@ -4,6 +4,7 @@ import { addObjectToArea, linkObject, removeObjectFromArea } from 'app/content/a
 import { createObjectInstance } from 'app/content/objects';
 import { doorStyles } from 'app/content/door';
 import { bossTypes, enemyTypes, enemyDefinitions } from 'app/content/enemy';
+import { npcBehaviors, npcStyles } from 'app/content/objects/npc';
 import { signStyles } from 'app/content/objects/sign';
 import { getLootFrame } from 'app/content/lootObject';
 import { zones } from 'app/content/zones';
@@ -14,7 +15,7 @@ import { isPointInShortRect } from 'app/utils/index';
 import {
     AreaDefinition, AreaInstance, BallGoalDefinition, BossType, CrystalSwitchDefinition, FloorSwitchDefinition,
     FrameDimensions, Direction, EnemyType, GameState,
-    LootType, MagicElement, ObjectDefinition, ObjectStatus, ObjectType, PanelRows,
+    LootType, MagicElement, NPCBehavior, NPCStyle, ObjectDefinition, ObjectStatus, ObjectType, PanelRows,
     Zone, ZoneLocation,
 } from 'app/types';
 
@@ -40,10 +41,9 @@ export function getLootTypes(): LootType[] {
 }
 
 export const combinedObjectTypes: ObjectType[] = [
-    'loot', 'chest', 'bigChest', 'sign',
-    'door', 'pitEntrance', 'marker',
-    'ballGoal', 'crystalSwitch', 'floorSwitch',
-    'pushPull', 'rollingBall', 'tippable', 'waterPot',
+    'ballGoal', 'bigChest', 'chest', 'crystalSwitch',
+    'door', 'floorSwitch', 'loot','marker', 'npc', 'pitEntrance',
+    'pushPull', 'rollingBall',  'sign', 'tippable', 'waterPot',
 ];
 
 export function createObjectDefinition(
@@ -139,7 +139,16 @@ export function createObjectDefinition(
                 ...commonProps,
                 style: definition.style || Object.keys(signStyles)[0],
                 type: definition.type,
-                message: definition.message || editingState.message,
+                message: definition.message || '',
+            };
+        case 'npc':
+            return {
+                ...commonProps,
+                d: definition.d || 'down',
+                behavior: definition.behavior || Object.keys(npcBehaviors)[0] as NPCBehavior,
+                style: definition.style || Object.keys(npcStyles)[0] as NPCStyle,
+                type: definition.type,
+                dialogue: definition.dialogue,
             };
         default:
             throw new Error('Unhandled object type, ' + definition['type']);
@@ -385,14 +394,42 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             rows.push({
                 name: 'message',
                 multiline: true,
-                value: object.id ? object.message : editingState.message,
+                value: object.message || '',
                 onChange(message: string) {
-                    if (object.id) {
-                        object.message = message;
-                        updateObjectInstance(state, object);
-                    } else {
-                        editingState.message = message;
-                    }
+                    object.message = message;
+                    updateObjectInstance(state, object);
+                },
+            });
+            break;
+        case 'npc':
+            rows.push({
+                name: 'dialogue',
+                multiline: true,
+                value: object.dialogue || '',
+                onChange(dialogue: string) {
+                    object.dialogue = dialogue;
+                    updateObjectInstance(state, object);
+                },
+            });
+            rows.push({
+                name: 'direction',
+                value: object.d || 'up',
+                values: ['up', 'down', 'left', 'right'],
+                onChange(direction: Direction) {
+                    object.d = direction;
+                    updateObjectInstance(state, object);
+                },
+            });
+            if (!npcBehaviors[object.behavior]) {
+                object.behavior = Object.keys(npcBehaviors)[0] as NPCBehavior;
+            }
+            rows.push({
+                name: 'behavior',
+                value: object.behavior,
+                values: Object.keys(npcBehaviors) as NPCBehavior[],
+                onChange(behavior: NPCBehavior) {
+                    object.behavior = behavior;
+                    updateObjectInstance(state, object);
                 },
             });
             break;
@@ -442,6 +479,8 @@ function getStyleFields(state: GameState, editingState: EditingState, object: Ob
         styles = signStyles;
     } else if (object.type === 'door') {
         styles = doorStyles;
+    } else if (object.type === 'npc') {
+        styles = npcStyles;
     }
     if (!styles) {
         return [];

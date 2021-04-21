@@ -64,7 +64,7 @@ export function isPointOpen(
     state: GameState,
     area: AreaInstance,
     {x, y}: {x: number, y: number},
-    excludeObjects: Set<any> = null
+    excludedObjects: Set<any> = null
 ): boolean {
     const tx = Math.floor(x / 16);
     const ty = Math.floor(y / 16);
@@ -88,13 +88,18 @@ export function isPointOpen(
         if (object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
             continue;
         }
-        if (excludeObjects?.has(object)) {
+        if (excludedObjects?.has(object)) {
             continue;
         }
         if (object.getHitbox && object.behaviors?.solid) {
             if (isPixelInShortRect(x, y, object.getHitbox(state))) {
                 return false;
             }
+        }
+    }
+    if (!excludedObjects?.has(state.hero)) {
+        if (isPixelInShortRect(x, y, state.hero)) {
+            return false;
         }
     }
     return true;
@@ -104,7 +109,7 @@ export function getTileBehaviorsAndObstacles(
     state: GameState,
     area: AreaInstance,
     {x, y}: Tile,
-    excludeObjects: Set<any> = null
+    excludedObjects: Set<any> = null
 ): {tileBehavior: TileBehaviors, tx: number, ty: number, objects: ObjectInstance[]} {
     const objects: ObjectInstance[] = [];
     const tx = Math.floor(x / 16);
@@ -126,7 +131,7 @@ export function getTileBehaviorsAndObstacles(
         if (object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
             continue;
         }
-        if (excludeObjects?.has(object)) {
+        if (excludedObjects?.has(object)) {
             continue;
         }
         if (object.getHitbox && (object.onPush || object.behaviors?.solid)) {
@@ -136,6 +141,12 @@ export function getTileBehaviorsAndObstacles(
                     tileBehavior.solid = true;
                 }
             }
+        }
+    }
+    if (!excludedObjects?.has(state.hero)) {
+        if (isPixelInShortRect(x, y, state.hero)) {
+            objects.push(state.hero);
+            tileBehavior.solid = true;
         }
     }
     return { tileBehavior, tx, ty, objects };

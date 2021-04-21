@@ -44,7 +44,6 @@ export interface EditingState {
     isEditing: boolean,
     brush: TileGrid,
     selectedLayerIndex: number,
-    message: string,
     replacePercentage: number,
     selectedObject?: ObjectDefinition,
     showZoneProperties: boolean,
@@ -61,7 +60,6 @@ export const editingState: EditingState = {
     brush: null,
     // Default editing the field, not the floor.
     selectedLayerIndex: 1,
-    message: '',
     replacePercentage: 100,
     selectedObject: null,
     showZoneProperties: false,

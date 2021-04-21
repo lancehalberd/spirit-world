@@ -20,8 +20,6 @@ export class Marker implements ObjectInstance {
     getHitbox(state: GameState): ShortRectangle {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
-    update(state: GameState) {
-    }
     render(context: CanvasRenderingContext2D, state: GameState) {
         if (editingState.isEditing) {
             context.strokeStyle = 'red';
