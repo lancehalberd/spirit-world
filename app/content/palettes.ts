@@ -147,6 +147,9 @@ function drawCombinedPalettes(targetPalette: TilePalette, canvas: HTMLCanvasElem
                     x * w, y * h, w, h
                 );
                 const behaviors = palette.behaviors?.[`${px}x${py}`] || palette.behaviors?.all;
+                if (behaviors?.skipped) {
+                    continue;
+                }
                 if (behaviors) {
                     targetPalette.behaviors[`${x}x${y}`] = behaviors;
                 }
@@ -248,6 +251,23 @@ const caveWallsPalette: TilePalette = {
     defaultTiles: [{x: 0, y: 0}]
 };
 
+const shallowWaterPalette: TilePalette = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/water.png'), x: 0, y: 0, w: 64, h: 64},
+    // Currently shallow water has no special behavior.
+    behaviors: {},
+    defaultTiles: []
+};
+
+const deepWaterPalette: TilePalette = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/water.png'), x: 64, y: 0, w: 128, h: 64},
+    // Currently shallow water has no special behavior.
+    behaviors: {'all': deepWaterBehavior, '7x3': { skipped: true }},
+    defaultTiles: []
+};
+
+
 
 const spiritPlantParticles = createAnimation('gfx/tiles/spiritplants.png', {w: 16, h: 16}, {x: 5, cols: 4}).frames;
 
@@ -325,6 +345,8 @@ const fieldPalette = {...combinePalettes([
         spiritPlantsPalette,
         brightGrass,
         treeLeaves,
+        shallowWaterPalette,
+        deepWaterPalette,
     ]),
     defaultTiles: [
         {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0},
@@ -387,10 +409,13 @@ const spiritFieldPalette = {...combinePalettes([
         spiritPlantsPalette,
         brightGrass,
         treeLeaves,
+        shallowWaterPalette,
+        deepWaterPalette,
     ]),
     defaultTiles: [null]
 };
 const spiritFloorPalette = {...spiritFieldPalette, defaultTiles: [null]};
+
 
 export const palettes: {[key: string]: TilePalette} = {
     field: fieldPalette,

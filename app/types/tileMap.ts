@@ -34,6 +34,8 @@ export interface TileBehaviors {
     particles?: Frame[],
     // If a player falls in a pit they will take damage and respawn at their last stable location.
     pit?: boolean,
+    // Assign this to skip tiles in source images.
+    skipped?: boolean,
     // Blocks movement
     solid?: boolean,
     solidMap?: Uint16Array,
