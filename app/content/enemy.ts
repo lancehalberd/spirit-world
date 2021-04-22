@@ -514,12 +514,11 @@ function moveTo(state: GameState, enemy: Enemy, tx: number, ty: number): number 
     const hitbox = enemy.getHitbox(state);
     const dx = tx - (hitbox.x + hitbox.w / 2), dy = ty - (hitbox.y + hitbox.h / 2);
     const mag = Math.sqrt(dx * dx + dy * dy);
-    const excludedObjects = new Set([state.hero, ...enemy.area.objects.filter(object => object instanceof Clone)]);
     if (mag > enemy.speed) {
-        moveEnemy(state, enemy, enemy.speed * dx / mag, enemy.speed * dy / mag, {excludedObjects});
+        moveEnemy(state, enemy, enemy.speed * dx / mag, enemy.speed * dy / mag, {});
         return mag - enemy.speed;
     }
-    moveEnemy(state, enemy, dx, dy, {excludedObjects});
+    moveEnemy(state, enemy, dx, dy, {});
     return 0;
 }
 
@@ -710,7 +709,15 @@ function paceRandomly(state: GameState, enemy: Enemy) {
 }
 
 function moveEnemy(state, enemy, dx, dy, movementProperties: MovementProperties): boolean {
+
     const { section } = getAreaSize(state);
+    if (!movementProperties.excludedObjects) {
+        movementProperties.excludedObjects = new Set();
+    }
+    movementProperties.excludedObjects.add(state.hero);
+    for (const clone of enemy.area.objects.filter(object => object instanceof Clone)) {
+        movementProperties.excludedObjects.add(clone);
+    }
     // Don't allow the enemy to move towards the outer edges of the screen.
     if ((dx < 0 && enemy.x + dx < section.x + 16)
         || (dx > 0 && enemy.x + dx + enemy.w > section.x + section.w - 16)
