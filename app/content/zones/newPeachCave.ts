@@ -413,7 +413,7 @@ const f1_1x0: AreaDefinition = {
         {id: "newPeachCave:1:0x1-door-0", linked: false, spirit: false, status: "cracked", x: 256, y: 96, type: "door", targetZone: null, targetObjectId: null, d: "left", style: "cave"},
         {id: "newPeachCave:pitB", linked: false, spirit: false, status: "normal", x: 368, y: 416, type: "pitEntrance", targetZone: "newPeachCave", targetObjectId: "newPeachCave:markerB"},
         {id: "newPeachCave:pitA", linked: false, spirit: false, status: "normal", x: 112, y: 160, type: "pitEntrance", targetZone: "newPeachCave", targetObjectId: "newPeachCave:markerA"},
-        {id: "newPeachCave:1:0x1-door-1", linked: false, spirit: false, status: "normal", x: 112, y: 480, type: "door", targetZone: null, targetObjectId: "newPeachCave:0:0x0-door-0", d: "down"},
+        {id: "newPeachCave:topEntrance", linked: false, spirit: false, status: "normal", x: 112, y: 480, type: "door", targetZone: "overworld", targetObjectId: "peachCaveTopEntrance", d: "down", style: "cave"},
         {id: "newPeachCave:1:0x1-door-2", linked: false, spirit: false, status: "normal", x: 112, y: 224, type: "door", targetZone: null, targetObjectId: "newPeachCave:0:0x0-door-0", d: "down"},
         {id: "newPeachCave:1:0x1-door-3", linked: false, spirit: false, status: "normal", x: 112, y: 256, type: "door", targetZone: null, targetObjectId: "newPeachCave:0:0x0-door-0", d: "up"},
         {id: "newPeachCave:1:0x1-door-4", linked: false, spirit: false, status: "cracked", x: 224, y: 96, type: "door", targetZone: null, targetObjectId: "newPeachCave:0:0x0-door-0", d: "right", style: "cave"},

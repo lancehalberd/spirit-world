@@ -56,16 +56,25 @@ export function createObjectDefinition(
     const commonProps = {
         // Assign defaults for any props the definitions might require.
         status: 'normal' as ObjectStatus,
-        ...definition,
         id: definition.id || uniqueId(state, definition.type),
+        linked: definition.linked,
+        spirit: definition.spirit,
         x,
         y,
     };
+    // Omit spirit/linked if they are false.
+    if (!commonProps.linked) {
+        delete commonProps.linked;
+    }
+    if (!commonProps.spirit) {
+        delete commonProps.spirit;
+    }
     switch (definition.type) {
         case 'ballGoal':
             return {
                 ...commonProps,
                 type: definition.type,
+                targetObjectId: definition.targetObjectId,
             };
         case 'crystalSwitch':
             return {
@@ -73,6 +82,7 @@ export function createObjectDefinition(
                 type: definition.type,
                 element: definition.element,
                 timer: definition.timer || 0,
+                targetObjectId: definition.targetObjectId,
             };
         case 'door':
         case 'stairs':
@@ -83,35 +93,60 @@ export function createObjectDefinition(
                 targetZone: definition.targetZone,
                 targetObjectId: definition.targetObjectId,
                 d: definition.d || 'up',
+                status: definition.status || commonProps.status,
             };
         case 'boss': {
             const bossType = definition.enemyType;
             const lootType = definition.lootType || getLootTypes()[0];
+            const enemyDefinition = enemyDefinitions[bossType];
+            const params = {};
+            for (let key in enemyDefinition?.params || {}) {
+                if (definition.params?.[key] && definition.params?.[key] !== enemyDefinition.params) {
+                    params[key] = definition.params[key];
+                }
+            }
             return {
                 ...commonProps,
                 type: definition.type,
                 id: definition.id || uniqueId(state, bossType),
                 enemyType: bossType,
                 lootType,
+                lootAmount: definition.lootAmount || 1,
+                lootLevel: definition.lootLevel || 1,
+                d: definition.d || 'down',
+                params,
             };
         }
         case 'enemy': {
             const enemyType = definition.enemyType;
+            const enemyDefinition = enemyDefinitions[enemyType];
+            const params = {};
+            for (let key in enemyDefinition?.params || {}) {
+                if (definition.params?.[key] && definition.params?.[key] !== enemyDefinition.params) {
+                    params[key] = definition.params[key];
+                }
+            }
             return {
                 ...commonProps,
                 type: definition.type,
                 id: definition.id || uniqueId(state, enemyType),
                 enemyType,
+                d: definition.d || 'down',
+                params,
             };
         }
         case 'floorSwitch':
             return {
                 ...commonProps,
+                targetObjectId: definition.targetObjectId,
+                toggleOnRelease: definition.toggleOnRelease,
                 type: definition.type,
             };
         case 'pitEntrance':
             return {
                 ...commonProps,
+                targetZone: definition.targetZone,
+                targetObjectId: definition.targetObjectId,
                 type: definition.type,
             };
         case 'chest':
@@ -123,6 +158,9 @@ export function createObjectDefinition(
                 type: definition.type,
                 id: definition.id || uniqueId(state, lootType),
                 lootType,
+                lootAmount: definition.lootAmount || 1,
+                lootLevel: definition.lootLevel || 1,
+                status: definition.status || commonProps.status,
             };
         }
         case 'marker':
@@ -373,6 +411,8 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                 onChange(enemyType: EnemyType) {
                     object.enemyType = enemyType;
                     updateObjectInstance(state, object);
+                    // We need to refresh the panel to get enemy specific properties.
+                    displayTileEditorPropertyPanel();
                 },
             });
             rows = [...rows, ...getEnemyFields(state, editingState, object)];
@@ -385,6 +425,8 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                 onChange(bossType: BossType) {
                     object.enemyType = bossType;
                     updateObjectInstance(state, object);
+                    // We need to refresh the panel to get boss specific properties.
+                    displayTileEditorPropertyPanel();
                 },
             });
             rows = [...rows, ...getEnemyFields(state, editingState, object)];
@@ -440,7 +482,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
 
 function getEnemyFields(state: GameState, editingState: EditingState, object: ObjectDefinition) {
     let rows = [];
-    if (object.type !== 'enemy') {
+    if (object.type !== 'enemy' && object.type !== 'boss') {
         return;
     }
     rows.push({
@@ -505,7 +547,7 @@ function getLootFields(state: GameState, editingState: EditingState, object: Obj
     if (object.type !== 'bigChest' && object.type !== 'loot' && object.type !== 'chest' && object.type !== 'boss') {
         return [];
     }
-    const lootType = object.lootType;
+    const lootType = object.lootType || 'peachOfImmortalityPiece';
     let rows = [];
     rows.push({
         name: 'lootType',

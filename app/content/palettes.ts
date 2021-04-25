@@ -267,6 +267,28 @@ const deepWaterPalette: TilePalette = {
     defaultTiles: []
 };
 
+const shallowAngledWaterPalette: TilePalette = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/water.png'), x: 0, y: 64, w: 64, h: 32},
+    // Currently shallow water has no special behavior.
+    behaviors: {'2x1': { skipped: true }},
+    defaultTiles: []
+};
+const deepAngledWaterPalette: TilePalette = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/water.png'), x: 64, y: 64, w: 128, h: 32},
+    // Currently shallow water has no special behavior.
+    behaviors: {'2x1': { skipped: true }, '6x1': { skipped: true }},
+    defaultTiles: []
+};
+
+const comboWaterPalette: TilePalette = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/water.png'), x: 192, y: 0, w: 64, h: 96},
+    // Currently shallow water has no special behavior.
+    behaviors: {'2x5': { skipped: true }, '3x1': { skipped: true }, '3x2': { skipped: true }, '3x3': { skipped: true }},
+    defaultTiles: []
+};
 
 
 const spiritPlantParticles = createAnimation('gfx/tiles/spiritplants.png', {w: 16, h: 16}, {x: 5, cols: 4}).frames;
@@ -347,6 +369,9 @@ const fieldPalette = {...combinePalettes([
         treeLeaves,
         shallowWaterPalette,
         deepWaterPalette,
+        shallowAngledWaterPalette,
+        deepAngledWaterPalette,
+        comboWaterPalette,
     ]),
     defaultTiles: [
         {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0}, {x: 0, y: 0},
@@ -411,6 +436,9 @@ const spiritFieldPalette = {...combinePalettes([
         treeLeaves,
         shallowWaterPalette,
         deepWaterPalette,
+        shallowAngledWaterPalette,
+        deepAngledWaterPalette,
+        comboWaterPalette,
     ]),
     defaultTiles: [null]
 };

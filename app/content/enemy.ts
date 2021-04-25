@@ -84,8 +84,8 @@ export class Enemy implements Actor, ObjectInstance {
         this.z = this.flying ? 12 : 0;
         this.scale = this.enemyDefinition.scale ?? 1;
         this.params = {
-            ...(definition.params || {}),
             ...(this.enemyDefinition.params || {}),
+            ...(definition.params || {}),
         };
         if (definition.type === 'boss' && state.savedState.objectFlags[this.definition.id]) {
             this.status = 'gone';
@@ -149,12 +149,18 @@ export class Enemy implements Actor, ObjectInstance {
             );
         }
         addObjectToArea(state, this.area, deathAnimation);
-        if (this.definition.type === 'boss' && !state.savedState.objectFlags[this.definition.id]) {
-            state.savedState.objectFlags[this.definition.id] = true;
-            if (this.definition.lootType) {
-                getLoot(state, this.definition);
+        if (this.definition.type === 'boss') {
+            // If the last boss is defeated kill all regular enemies.
+            if (!this.area.objects.some(object => (object instanceof Enemy) && object.definition.type === 'boss' && object.life > 0)) {
+                this.area.objects.forEach(object => (object instanceof Enemy) && object.takeDamage(state, object.life));
             }
-            saveGame();
+            if (!state.savedState.objectFlags[this.definition.id]) {
+                state.savedState.objectFlags[this.definition.id] = true;
+                if (this.definition.lootType) {
+                    getLoot(state, this.definition);
+                }
+                saveGame();
+            }
         }
     }
     shouldReset(state: GameState) {
@@ -366,8 +372,8 @@ export const enemyDefinitions: {[key in EnemyType | BossType | MinionType]: Enem
         lootTable: simpleLootTable,
     },
     wallLaser: {
-        animations: snakeAnimations, life: 2, touchDamage: 1, update: updateWallLaser, flipRight: true,
-        lootTable: simpleLootTable, params: { alwaysOpen: false },
+        animations: snakeAnimations, life: 1, touchDamage: 1, update: updateWallLaser, flipRight: true,
+        lootTable: simpleLootTable, params: { alwaysShoot: false },
     },
 };
 
@@ -404,7 +410,41 @@ function spinAndShoot(state: GameState, enemy: Enemy): void {
 }
 
 function updateWallLaser(state: GameState, enemy: Enemy): void {
-
+    function shoot() {
+        const hitbox = enemy.getHitbox(state);
+        const dx = directionMap[enemy.d][0];
+        const dy = directionMap[enemy.d][1];
+        const arrow = new EnemyArrow({
+            x: hitbox.x + hitbox.w / 2 + hitbox.w / 2 * dx,
+            y: hitbox.y + hitbox.h / 2 + hitbox.h / 2 * dy,
+            vx: 4 * dx,
+            vy: 4 * dy,
+        });
+        addObjectToArea(state, state.areaInstance, arrow);
+    }
+    if (enemy.params.alwaysShoot) {
+        if (enemy.modeTime % 300 === FRAME_LENGTH) {
+            shoot();
+        }
+        return;
+    }
+    if (enemy.mode === 'shoot') {
+        const {hero} = getLineOfSightTargetAndDirection(state, enemy, enemy.d, true);
+        if (!hero && enemy.modeTime > 1200) {
+            enemy.setMode('wait');
+        } else if (enemy.modeTime % 300 === FRAME_LENGTH) {
+            shoot();
+        }
+    } else if (enemy.mode === 'charge') {
+        if (enemy.modeTime >= 500) {
+            enemy.setMode('shoot');
+        }
+    } else {
+        const {hero} = getLineOfSightTargetAndDirection(state, enemy, enemy.d, true);
+        if (hero) {
+            enemy.setMode('charge');
+        }
+    }
 }
 
 function updateBeetleBoss(state: GameState, enemy: Enemy): void {
@@ -640,10 +680,13 @@ function getVectorToNearbyHero(state: GameState, enemy: Enemy, radius: number): 
     return null;
 }
 
-function getLineOfSightTargetAndDirection(state: GameState, enemy: Enemy): {d: Direction, hero: Hero} {
+function getLineOfSightTargetAndDirection(state: GameState, enemy: Enemy, direction: Direction = null, projectile: boolean = false): {d: Direction, hero: Hero} {
     const hitbox = enemy.getHitbox(state);
     for (const hero of [state.hero, ...state.hero.clones]) {
-        if (hitbox.x < hero.x + hero.w && hitbox.x + hitbox.w > hero.x) {
+        if (hitbox.x < hero.x + hero.w && hitbox.x + hitbox.w > hero.x && (direction !== 'left' && direction !== 'right')) {
+            if ((hero.y < hitbox.y && direction === 'down') || (hero.y > hitbox.y && direction === 'up')) {
+                continue
+            }
             const x = Math.floor(hitbox.x / 16);
             const y1 = Math.floor(hero.y / 16), y2 = Math.floor(hitbox.y / 16);
             const minY = Math.min(y1, y2);
@@ -651,7 +694,7 @@ function getLineOfSightTargetAndDirection(state: GameState, enemy: Enemy): {d: D
             let blocked = false;
             for (let y = minY; y <= maxY; y++) {
                 const tileBehavior = {...(enemy.area?.behaviorGrid[y]?.[x] || {})};
-                if (tileBehavior.solid || tileBehavior.pit || tileBehavior.water) {
+                if (tileBehavior.solid || (!projectile && (tileBehavior.pit || tileBehavior.water))) {
                     blocked = true;
                     break;
                 }
@@ -663,7 +706,10 @@ function getLineOfSightTargetAndDirection(state: GameState, enemy: Enemy): {d: D
                 };
             }
         }
-        if (hitbox.y < hero.y + hero.h && hitbox.y + hitbox.h > hero.y) {
+        if (hitbox.y < hero.y + hero.h && hitbox.y + hitbox.h > hero.y && (direction !== 'up' && direction !== 'down')) {
+            if ((hero.x < hitbox.x && direction === 'right') || (hero.x > hitbox.x && direction === 'left')) {
+                continue
+            }
             const y = Math.floor(hitbox.y / 16);
             const x1 = Math.floor(hero.x / 16), x2 = Math.floor(hitbox.x / 16);
             const minX = Math.min(x1, x2);
@@ -671,7 +717,7 @@ function getLineOfSightTargetAndDirection(state: GameState, enemy: Enemy): {d: D
             let blocked = false;
             for (let x = minX; x <= maxX; x++) {
                 const tileBehavior = {...(enemy.area?.behaviorGrid[y]?.[x] || {})};
-                if (tileBehavior.solid || tileBehavior.pit || tileBehavior.water) {
+                if (tileBehavior.solid || (!projectile && (tileBehavior.pit || tileBehavior.water))) {
                     blocked = true;
                     break;
                 }

@@ -312,10 +312,11 @@ export class EnemyArrow extends Arrow {
             return;
         }
         if (!this.hitTargets.has(state.hero) && rectanglesOverlap(state.hero, this)) {
-            damageActor(state, state.hero, this.damage);
-            //this.hitTargets.add(state.hero);
-            //this.stuckFrames = 1;
-            removeObjectFromArea(state, this);
+            if (damageActor(state, state.hero, this.damage)) {
+                //this.hitTargets.add(state.hero);
+                //this.stuckFrames = 1;
+                removeObjectFromArea(state, this);
+            }
         }
         super.update(state);
     }

@@ -338,7 +338,7 @@ export class Door implements ObjectInstance {
         if (hero.action !== 'entering' || !this.definition.targetZone || !this.definition.targetObjectId) {
             return false;
         }
-        return enterZoneByTarget(state, this.definition.targetZone, this.definition.targetObjectId, false, () => {
+        return enterZoneByTarget(state, this.definition.targetZone, this.definition.targetObjectId, this.definition, false, () => {
             // We need to reassign hero after calling `enterZoneByTarget` because the active hero may change
             // from one clone to another when changing zones.
             hero = state.hero.activeClone || state.hero;

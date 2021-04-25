@@ -638,17 +638,17 @@ export function damageActor(
     damage: number,
     knockback?: {vx: number, vy: number, vz: number},
     overrideInvulnerability: boolean = false
-) {
+): boolean {
     if (actor.life <= 0) {
-        return;
+        return false;
     }
     if (!overrideInvulnerability && (actor.action === 'roll' || actor.action === 'getItem')) {
-        return;
+        return false;
     }
     const hero = state.hero.activeClone || state.hero;
     // Hero is invulnerable during invulnerability frames, but other actors are not.
     if (!overrideInvulnerability && actor === hero && (actor.invulnerableFrames > 0 || state.hero.invisible)) {
-        return;
+        return false;
     }
 
     if (actor.takeDamage) {
@@ -673,6 +673,7 @@ export function damageActor(
         actor.vy = knockback.vy;
         actor.vz = knockback.vz;
     }
+    return true;
 }
 
 const throwSpeed = 6;

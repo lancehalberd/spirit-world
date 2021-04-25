@@ -66,7 +66,7 @@ export function fixSpawnLocationOnLoad(state: GameState): void {
 }
 
 export function setSpawnLocation(state: GameState, spawnLocation: ZoneLocation): void {
-    state.savedState.hero.spawnLocation = spawnLocation;
+    state.hero.spawnLocation = spawnLocation;
     saveGame();
 }
 

@@ -11,7 +11,7 @@ import { updateCamera } from 'app/updateCamera';
 
 import {
     AreaDefinition, AreaInstance, AreaLayerDefinition,
-    Direction, Enemy, GameState, Hero, LayerTile,
+    Direction, Enemy, GameState, Hero, LayerTile, ObjectDefinition,
     ObjectInstance, ShortRectangle, Tile, TileBehaviors,
     ZoneLocation,
 } from 'app/types';
@@ -235,6 +235,7 @@ export function enterZoneByTarget(
     state: GameState,
     zoneKey: string,
     targetObjectId: string,
+    skipObject: ObjectDefinition,
     instant: boolean = true,
     callback: () => void = null
 ): boolean {
@@ -249,7 +250,7 @@ export function enterZoneByTarget(
         for (let y = 0; y < areaGrid.length; y++) {
             for (let x = 0; x < areaGrid[y].length; x++) {
                 for (const object of (areaGrid[y][x]?.objects || [])) {
-                    if (object.id === targetObjectId) {
+                    if (object.id === targetObjectId && object !== skipObject) {
                         enterLocation(state, {
                             zoneKey,
                             floor,
