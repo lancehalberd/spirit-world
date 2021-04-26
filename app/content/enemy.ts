@@ -152,7 +152,7 @@ export class Enemy implements Actor, ObjectInstance {
         if (this.definition.type === 'boss') {
             // If the last boss is defeated kill all regular enemies.
             if (!this.area.objects.some(object => (object instanceof Enemy) && object.definition.type === 'boss' && object.life > 0)) {
-                this.area.objects.forEach(object => (object instanceof Enemy) && object.takeDamage(state, object.life));
+                this.area.objects.forEach(object => (object instanceof Enemy) && object.life > 0 && object.takeDamage(state, object.life));
             }
             if (!state.savedState.objectFlags[this.definition.id]) {
                 state.savedState.objectFlags[this.definition.id] = true;

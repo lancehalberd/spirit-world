@@ -5,6 +5,20 @@ dialogueHash.mom = {
     options: [
         {
             logicCheck: {
+                requiredFlags: ['$spiritSight'],
+                excludedFlags: [],
+            },
+            isExclusive: true,
+            text: [
+                `So you've learned to look into the spirit world...
+                {|}It is forbidden to speak of, but my ancestors gained great powers by summoning beings from the spirit world.
+                {|}They say the ruins in the Southwest are where the ancient summoners lived.
+                {|}Perhaps you can find something there to help you.`,
+                `I'm sure you can find what you need in the summoner ruins to the Southwest!`,
+            ],
+        },
+        {
+            logicCheck: {
                 requiredFlags: [],
                 excludedFlags: ['$staff'],
             },

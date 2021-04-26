@@ -30,38 +30,8 @@ Graphics:
 
 Todo:
 
-Dungeon 1:
-    - Vanara burial grounds
-    - Traps+locks to keep intruders away. Need to use bow to enter
-        - Someone was stealing Vanara remains
-    - Located near the main Vanara village in the Southwest forest
-    - Built around a suspended animation capsule
-        - The Vanara population is too large so they rotate members in and out of suspended animation.
-        - Suspension pods erase Vanara memories to prevent then from becoming restless.
-        - Pods also regenerate Vanara bodies, which would break down without nurishment from the spirit world.
-        - Vanara village population is 20-30 individuals at a time. There are 100-300 total, most suspended.
-    - The goal of the dungeon is to meet with the care taker who looks after and maintains the suspended Vanara.
-        - The original Vanara crew rotate members into the care taker role once every X years.
-    - A facade is built aroaund the structure to disguise it as a mundane structure
-        - The Vanara village posts guards in addition to the traps to keep people out
-    - MCs father refused to go back to sleep, having fallen in love with MCs mother and not wanting to forget about her.
-
-
-Dungeon flavor philosophy:
-    All Vanara structures are part of the Vanara ship and related to some functionality, such as the regeneration pods.
-    Vanara spirit structures allow free exploration in astral projection because Vanara spirits can tether to the Vanara ship and leave their bodies behind. If the MC knows how to teleport, they can use this to free travel around the world.
-    All Native structures are built to native spirit gods who functioned as sevants to the old native spirit beings and were created for specific purposes like resource harvesting, processing and crafting.
-
-Ability order:
-    Completing the Peach Cave awakens MCs spirit abilities giving them their spirit bar + cat eyes.
-    They visit the care taker to obtain spirit sight, they are then instructed to learn astral projection + teleportation to visit the Vanara command center
-
-
-
 Current tasks:
-    - Wall Lasers
-        - Support param editing for enemies
-        - Change how state for various object definitions are stored by keeping the entire ObjectDefinition for the object to create in state.
+    - Dungeon 2: Ruins of Summoner village and Temple of War
     - Difficulty shrine:
         - 50 money per point
         - move points around for free
@@ -70,9 +40,6 @@ Current tasks:
         - Or second chance is only for boss, and have a single refill tank that you can charge like in metroid?
         - Remove boss webs
         - Reduce boss health
-
-Add NPCs:
-    Basically moving signs that look like the MC for now.
 
 Idea:
     Objects you can bounce off of when jumping
@@ -103,11 +70,13 @@ Quick Demo
     - Charge tool to unlock lvl 2 tools
     - Combined tool puzzles
 
-Dungeon 1: Vanara Temple
-    - Find dodge roll technique, required to complete.
-    - Vanara spirit tests you and teaches spirit sight. Maybe mentions the Vanara aren't supposed to be developing their spirit abilities but is obligated to train anyone who proves themselves. Maybe rival has already been there:
-        - Rival is leaving as you enter or
-        - Rival meets you as you are leaving and challenges you to a duel to test your abilities.
+Dungeon 1 Improvements
+    - Add rival fight when you open the door:
+        - Rival guards the tomb
+        - Rival is angered you have the Spirit Bow when you hit one of the switches.
+        - If you are defeated, the elder may save you, otherwise it is game over.
+    - Update wall laser graphics+behavior to actuall shoot lasers + be mounted on walls.
+    - Update arrow turret graphics.
 
 Add ability to charge weapon
     Spin chakram around quickly in a circle twice (can move after throwing)
@@ -207,3 +176,49 @@ Support 64x64 super tiles for world map. Or maybe just 48x48. Probably add this 
 
 Possible tool: Leather gloves protect you from thorn bushes.
 Possible tool: Leather boots let you walk on thorny ground without taking damage.
+
+
+Dungeon flavor philosophy:
+    All Vanara structures are part of the Vanara ship and related to some functionality, such as the regeneration pods.
+    Vanara spirit structures allow free exploration in astral projection because Vanara spirits can tether to the Vanara ship and leave their bodies behind. If the MC knows how to teleport, they can use this to free travel around the world.
+    All Native structures are built to native spirit gods who functioned as sevants to the old native spirit beings and were created for specific purposes like resource harvesting, processing and crafting.
+
+Ability order:
+
+Early Dungeons:
+    Peach Cave: Completing the cave awakens MCs spirit abilities giving them their spirit bar + cat eyes.
+    Vanara Village: Get the bow from the elder.
+    Vanara Tomb: Dodge Roll in big chest, Spirit Sight from the Vanara Guardian.
+    Summoner Ruins: Bracers in big chest, Astral Projection after defeating the boss.
+    Vanara Tomb-Regeneration Unit: Invisibility in big chest, Teleportation from Vanara Guardian.
+    Helix: Tree Staff in big chest, charge from Vanara Captain.
+
+Elemental Beasts: (triggered by Helix or entering the Spirit World)
+    River Temple: ??? Big Chest, Frost Beast(ice element)
+    Mountain Crater: ??? Big Chest, Flame Beast(fire element)
+    Staff Tower: No Big Chest, Storm Beast(lightning element) + Tower Staff
+
+Late Dungeons:
+    Waterfall Tower:
+    The Forge:
+    Jade Palace:
+    Grand Temple:
+    Cloud Temple:
+    Forest Temple:
+
+Final Dungeon:
+    Warship:
+
+Dungeon 1:
+    - Traps+locks to keep intruders away. Need to use bow to enter
+        - Someone was stealing Vanara remains
+    - Built around a suspended animation capsule
+        - The Vanara population is too large so they rotate members in and out of suspended animation.
+        - Suspension pods erase Vanara memories to prevent then from becoming restless.
+        - Pods also regenerate Vanara bodies, which would break down without nurishment from the spirit world.
+        - Vanara village population is 20-30 individuals at a time. There are 100-300 total, most suspended.
+    - The goal of the dungeon is to meet with the care taker who looks after and maintains the suspended Vanara.
+        - The original Vanara crew rotate members into the care taker role once every X years.
+    - A facade is built aroaund the structure to disguise it as a mundane structure
+        - The Vanara village posts guards in addition to the traps to keep people out
+    - MCs father refused to go back to sleep, having fallen in love with MCs mother and not wanting to forget about her.
