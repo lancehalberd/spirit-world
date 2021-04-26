@@ -123,7 +123,7 @@ export function initializeAreaTiles(area: AreaDefinition): AreaDefinition {
 export function swapHeroStates(heroA: Hero, heroB: Hero) {
     const allKeys = [...new Set([...Object.keys(heroA), ...Object.keys(heroB)])];
     for (const key of allKeys) {
-        if (key === 'behaviors') {
+        if (key === 'behaviors' || key === 'magic') {
             continue;
         }
         const temp = heroA[key];

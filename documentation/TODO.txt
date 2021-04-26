@@ -55,6 +55,10 @@ Peach Cave Improvemnts:
         - Spawns eggs
         - Drains light and regains a bit of health for every 25% lost
 
+At some point I should write tests to validate certain things like:
+    - All zone+object targets are defined.
+    - All objectFlags correspond to some object or dialogue key or loot type
+    - All escaped dialogue corresponds to a special frame or loot type.
 
 Apply element to charge abilities.
     Costs an additional 10 mana for the element

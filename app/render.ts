@@ -221,6 +221,11 @@ export function renderField(context: CanvasRenderingContext2D, state: GameState)
     renderAreaObjectsAfterHero(context, state, state.areaInstance);
     renderAreaObjectsAfterHero(context, state, state.nextAreaInstance);
     if (state.hero.spiritRadius > 0) {
+        context.save();
+        context.globalAlpha = 0.6 * state.hero.spiritRadius / MAX_SPIRIT_RADIUS;
+        context.fillStyle = '#888';
+        context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        context.restore();
         updateSpiritCanvas(state, state.hero.spiritRadius);
         context.drawImage(spiritCanvas,
             0, 0, spiritCanvas.width, spiritCanvas.height,

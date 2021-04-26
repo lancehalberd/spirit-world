@@ -205,7 +205,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         }
     } else if (hero.action === 'meditating') {
         movementSpeed = 0;
-        if (isControlled && isGameKeyDown(state, GAME_KEY.PASSIVE_TOOL)) {
+        if (isControlled && isGameKeyDown(state, GAME_KEY.PASSIVE_TOOL) && hero.magic > 0) {
             if (state.hero.clones.length) {
                 // Meditating as a clone will either blow up the current clone, or all clones
                 // except the current if the clone tool is being pressed.
@@ -542,6 +542,10 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         // Invisibility cost returns to 0 while it is off.
         state.hero.invisibilityCost -= 4 * FRAME_LENGTH / 1000;
         state.hero.invisibilityCost = Math.max(0, state.hero.invisibilityCost);
+    }
+    // Meditation consumes 1 spirit energy per second.
+    if (hero.action === 'meditating') {
+        state.hero.magic -= FRAME_LENGTH / 1000;
     }
     if (hero.action !== 'knocked' && hero.action !== 'thrown') {
         // At base mana regen, using cat eyes reduces your mana very slowly unless you are stationary.
