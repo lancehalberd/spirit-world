@@ -18,6 +18,7 @@ import {
     getDefaultSavedState,
     getState,
     returnToSpawnLocation,
+    saveGame,
     selectSaveFile,
     setSaveFileToState,
 } from 'app/state';
@@ -168,6 +169,11 @@ function updateMessage(state: GameState) {
         state.messageState.pageIndex++;
         if (state.messageState.pageIndex >= state.messageState.pages.length) {
             state.messageState.pages = null;
+            if (state.messageState.progressFlag) {
+                state.savedState.objectFlags[state.messageState.progressFlag] = true;
+                saveGame();
+                state.messageState.progressFlag = null;
+            }
         }
     }
 }

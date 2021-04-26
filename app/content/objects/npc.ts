@@ -1,6 +1,7 @@
 import _ from 'lodash';
 
 import { getAreaSize } from 'app/content/areas';
+import { selectDialogueOption } from 'app/content/dialogue';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { moveActor } from 'app/moveActor';
 import { heroAnimations } from 'app/renderActor';
@@ -9,7 +10,7 @@ import { drawFrameAt, getFrame } from 'app/utils/animations';
 import { directionMap, rotateDirection } from 'app/utils/field';
 
 import {
-    Actor, AreaInstance, GameState, Direction, Hero, MovementProperties, NPCDefinition,
+    Actor, AreaInstance, GameState, DialogueOption, Direction, Hero, MovementProperties, NPCDefinition,
     ObjectInstance, ObjectStatus, ShortRectangle,
 } from 'app/types';
 
@@ -84,6 +85,8 @@ export class NPC implements Actor, ObjectInstance  {
     status: ObjectStatus = 'normal';
     params: any;
     showMessage = false;
+    dialogueIndex = 0;
+    lastDialogueOption: DialogueOption;
     constructor(definition: NPCDefinition) {
         this.definition = definition;
         this.d = definition.d || 'down';
@@ -108,7 +111,27 @@ export class NPC implements Actor, ObjectInstance  {
     update(state: GameState) {
         if (this.showMessage) {
             this.showMessage = false;
-            showMessage(state, this.definition.dialogue);
+            if (!this.definition.dialogueKey) {
+                // This text is shown if custom dialogue is set for an NPC but not defined.
+                showMessage(state, this.definition.dialogue ?? '...');
+                return;
+            }
+            const dialogueOption = selectDialogueOption(state, this.definition.dialogueKey);
+            if (!dialogueOption) {
+                // This text is shown if there was no valid dialogue option.
+                showMessage(state, '???');
+                return;
+            }
+            if (dialogueOption !== this.lastDialogueOption) {
+                this.dialogueIndex = 0;
+            }
+            this.lastDialogueOption = dialogueOption;
+            // Need to track if the dialogue option changed here so that we can reset index if it changes.
+            showMessage(state, dialogueOption.text[this.dialogueIndex], dialogueOption.progressFlag);
+            this.dialogueIndex++;
+            if (this.dialogueIndex >= dialogueOption.text.length) {
+                this.dialogueIndex = dialogueOption.repeatIndex ?? this.dialogueIndex - 1;
+            }
             return;
         }
         npcBehaviors[this.definition.behavior]?.(state, this);

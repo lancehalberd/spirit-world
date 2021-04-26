@@ -1,6 +1,7 @@
 import _ from 'lodash';
 
 import { addObjectToArea, linkObject, removeObjectFromArea } from 'app/content/areas';
+import { dialogueHash } from 'app/content/dialogue';
 import { createObjectInstance } from 'app/content/objects';
 import { doorStyles } from 'app/content/door';
 import { bossTypes, enemyTypes, enemyDefinitions } from 'app/content/enemy';
@@ -186,6 +187,7 @@ export function createObjectDefinition(
                 behavior: definition.behavior || Object.keys(npcBehaviors)[0] as NPCBehavior,
                 style: definition.style || Object.keys(npcStyles)[0] as NPCStyle,
                 type: definition.type,
+                dialogueKey: definition.dialogueKey,
                 dialogue: definition.dialogue,
             };
         default:
@@ -445,14 +447,30 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             break;
         case 'npc':
             rows.push({
-                name: 'dialogue',
+                name: 'dialogueKey',
                 multiline: true,
-                value: object.dialogue || '',
-                onChange(dialogue: string) {
-                    object.dialogue = dialogue;
+                value: object.dialogueKey || 'custom',
+                values: ['custom', ...Object.keys(dialogueHash)],
+                onChange(dialogueKey: string) {
+                    if (dialogueKey === 'custom') {
+                        dialogueKey = null;
+                    }
+                    object.dialogueKey = dialogueKey;
                     updateObjectInstance(state, object);
+                    displayTileEditorPropertyPanel();
                 },
             });
+            if (!object.dialogueKey) {
+                rows.push({
+                    name: 'Custom Dialogue',
+                    multiline: true,
+                    value: object.dialogue || '',
+                    onChange(dialogue: string) {
+                        object.dialogue = dialogue;
+                        updateObjectInstance(state, object);
+                    },
+                });
+            }
             rows.push({
                 name: 'direction',
                 value: object.d || 'up',

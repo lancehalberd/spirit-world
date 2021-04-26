@@ -299,7 +299,8 @@ export interface NPCDefinition extends BaseObjectDefinition {
     type: 'npc',
     behavior: NPCBehavior,
     style: NPCStyle,
-    dialogue: string,
+    dialogueKey?: string,
+    dialogue?: string,
 }
 
 export type SimpleObjectType = 'marker' | 'pushPull' | 'rollingBall' | 'tippable' | 'waterPot';

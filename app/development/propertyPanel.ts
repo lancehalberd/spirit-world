@@ -7,6 +7,22 @@ import {
     PanelRows, PropertyRow, TileGrid,
 } from 'app/types';
 
+
+
+let leftPanelElement = null;
+export function displayLeftPanel(content: HTMLElement): void {
+    hideLeftPanel();
+    leftPanelElement = tagElement('div', 'left-container');
+    leftPanelElement.append(content);
+    document.body.append(leftPanelElement);
+}
+export function hideLeftPanel() {
+    if (!leftPanelElement) return;
+    const temp = leftPanelElement;
+    leftPanelElement = null;
+    temp.remove();
+}
+
 let propertyPanelElement = null;
 let propertiesById: {[key: string]: EditorProperty<any>} = {};
 
@@ -68,7 +84,7 @@ export function displayPropertyPanel(properties: PanelRows): void {
             const container = tag.closest('.pp-tag-container') as HTMLElement;
             const property = container && propertiesById[container.getAttribute('name')];
             if (isStringArrayProperty(property)) {
-                const value = tag.textContent;
+                const value = tag.textContent.trim();
                 const index = property.value.indexOf(value);
                 if (index >= 0) {
                     property.value.splice(index, 1);

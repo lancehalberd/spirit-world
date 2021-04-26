@@ -31,12 +31,25 @@
     background-color: #EEE;
 }
 
+.left-container {
+    position: absolute;
+    left: 0px;
+    top: 0;
+    bottom: 0px;
+    width: 400px;
+    padding: 4px;
+    background-color: #EEE;
+    font-size: 16px;
+    font-family: arial;
+    overflow: auto;
+}
+
 .pp-container {
     position: absolute;
     right: 0px;
     top: 0;
+    bottom: 0px;
     width: 400px;
-    max-height: 100%;
     padding: 4px;
     background-color: #EEE;
     font-size: 16px;

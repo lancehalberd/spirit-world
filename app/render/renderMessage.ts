@@ -56,13 +56,14 @@ function getEscapedFrames(state: GameState, escapedToken: string): Frame[] {
     return [];
 }
 
-export function showMessage(state: GameState, message: string): void {
+export function showMessage(state: GameState, message: string, progressFlag: string = null): void {
     if (!message){
         return;
     }
     state.messageState = {
         pageIndex: 0,
         pages: parseMessage(state, message),
+        progressFlag,
     };
 }
 

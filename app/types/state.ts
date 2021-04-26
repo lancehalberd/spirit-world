@@ -58,6 +58,7 @@ export interface GameState {
     messageState?: {
         pageIndex: number,
         pages: Frame[][][],
+        progressFlag?: string,
     },
     isUsingKeyboard?: boolean,
     isUsingXbox?: boolean,

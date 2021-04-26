@@ -20,7 +20,10 @@ import {
     combinedObjectTypes,
     unselectObject,
 } from 'app/development/objectEditor';
-import { displayPropertyPanel, hidePropertyPanel, updateBrushCanvas } from 'app/development/propertyPanel';
+import {
+    displayLeftPanel, hideLeftPanel,
+    displayPropertyPanel, hidePropertyPanel, updateBrushCanvas,
+} from 'app/development/propertyPanel';
 import { getZoneProperties, renderZoneEditor } from 'app/development/zoneEditor';
 import { mainCanvas } from 'app/dom';
 import { CANVAS_SCALE } from 'app/gameConstants';
@@ -29,7 +32,7 @@ import { translateContextForAreaAndCamera } from 'app/render';
 import { updateHeroMagicStats } from 'app/render/spiritBar';
 import { getState } from 'app/state';
 import { drawFrame } from 'app/utils/animations';
-import { getMousePosition, isMouseDown } from 'app/utils/mouse';
+import { getMousePosition, isMouseDown, isMouseOverElement } from 'app/utils/mouse';
 
 import {
     AreaInstance, AreaLayerDefinition, BossObjectDefinition,  EnemyObjectDefinition, EnemyType,
@@ -103,10 +106,76 @@ export function startEditing(state: GameState) {
     displayTileEditorPropertyPanel();
     state.areaInstance.tilesDrawn = [];
     state.areaInstance.checkToRedrawTiles = true;
+    // This was a drag+drop experiment for dialogue editing, but I'm not adding this to
+    // the editor for now, it works better to just edit directly in the code for now.
+    /*const div = document.createElement('div');
+    div.innerHTML = 'DIALOGUE'
+    const dragContainer = document.createElement('div');
+    for (let i = 0; i < 5; i++) {
+        const dragElement = document.createElement('div');
+        dragElement.style.border = '1px solid #888';
+        dragElement.style.padding = '2px';
+        dragElement.style.marginBottom = '2px';
+        dragElement.style.display = 'flex';
+        const dragHandle = document.createElement('div');
+        dragHandle.style.minHeight = '20px';
+        dragHandle.style.width = '5px';
+        dragHandle.style.borderLeft = '5px double #666';
+        dragHandle.style.cursor = 'move';
+        const dragContent = document.createElement('div');
+        dragContent.style.flexGrow = '1';
+        dragContent.innerHTML = `Element ${i}`;
+        dragElement.appendChild(dragHandle);
+        dragElement.appendChild(dragContent);
+        dragContainer.appendChild(dragElement);
+        let dragHelper: HTMLElement;
+        let mouseOffset: number[];
+        function onDrag(event: MouseEvent) {
+            const [x, y] = getMousePosition();
+            dragHelper.style.left = `${x - mouseOffset[0]}px`;
+            dragHelper.style.top = `${y - mouseOffset[1]}px`;
+            let after = false;
+            for (const otherElement of dragContainer.children) {
+                if (otherElement === dragElement) {
+                    after = true;
+                    continue;
+                }
+                if (isMouseOverElement(otherElement as HTMLElement)) {
+                    after
+                        ? otherElement.after(dragElement)
+                        : otherElement.before(dragElement);
+                    break;
+                }
+            }
+        }
+        function stopDrag(event: MouseEvent) {
+            dragHandle.onmousemove = null;
+            document.removeEventListener('mousemove', onDrag);
+            document.removeEventListener('mouseup', stopDrag);
+            dragHelper.remove();
+            dragHelper = null;
+            dragElement.style.opacity = '1';
+        }
+        dragHandle.onmousedown = (event: MouseEvent) => {
+            event.preventDefault();
+            document.addEventListener('mousemove', onDrag);
+            document.addEventListener('mouseup', stopDrag);
+            mouseOffset = getMousePosition(dragElement);
+            dragHelper = dragElement.cloneNode(true) as HTMLElement;
+            dragHelper.style.position = 'absolute';
+            dragHelper.style.width = `${dragElement.clientWidth}px`;
+            onDrag(event);
+            document.body.append(dragHelper);
+            dragElement.style.opacity = '0.5';
+        }
+    }
+    div.appendChild(dragContainer);
+    displayLeftPanel(div);*/
 }
 
 export function stopEditing(state: GameState) {
     hidePropertyPanel();
+    hideLeftPanel();
     state.areaInstance.tilesDrawn = [];
     state.areaInstance.checkToRedrawTiles = true;
 }
