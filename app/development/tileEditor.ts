@@ -21,7 +21,7 @@ import {
     unselectObject,
 } from 'app/development/objectEditor';
 import {
-    displayLeftPanel, hideLeftPanel,
+    /*displayLeftPanel, */hideLeftPanel,
     displayPropertyPanel, hidePropertyPanel, updateBrushCanvas,
 } from 'app/development/propertyPanel';
 import { getZoneProperties, renderZoneEditor } from 'app/development/zoneEditor';
@@ -32,7 +32,7 @@ import { translateContextForAreaAndCamera } from 'app/render';
 import { updateHeroMagicStats } from 'app/render/spiritBar';
 import { getState } from 'app/state';
 import { drawFrame } from 'app/utils/animations';
-import { getMousePosition, isMouseDown, isMouseOverElement } from 'app/utils/mouse';
+import { getMousePosition, isMouseDown, /*isMouseOverElement*/ } from 'app/utils/mouse';
 
 import {
     AreaInstance, AreaLayerDefinition, BossObjectDefinition,  EnemyObjectDefinition, EnemyType,

@@ -10,7 +10,8 @@ import { rectanglesOverlap } from 'app/utils/index';
 import { playSound } from 'app/utils/sounds';
 
 import {
-    ActiveTool, AreaInstance, BossObjectDefinition, DungeonInventory, Frame, GameState, LootObjectDefinition,
+    ActiveTool, AreaInstance, BossObjectDefinition, DialogueLootDefinition,
+    DungeonInventory, Frame, GameState, LootObjectDefinition,
     LootTable, LootType, ObjectInstance, ObjectStatus, ShortRectangle,
 } from 'app/types';
 
@@ -42,13 +43,13 @@ export function dropItemFromTable(state: GameState, area: AreaInstance, lootTabl
 
 export class LootGetAnimation implements ObjectInstance {
     definition = null;
-    loot: LootObjectDefinition | BossObjectDefinition;
+    loot: LootObjectDefinition | BossObjectDefinition | DialogueLootDefinition;
     animationTime: number = 0;
     x: number;
     y: number;
     z: number;
     status: ObjectStatus = 'normal';
-    constructor(loot: LootObjectDefinition | BossObjectDefinition) {
+    constructor(loot: LootObjectDefinition | BossObjectDefinition | DialogueLootDefinition) {
         this.loot = loot;
         const state = getState();
         const frame = getLootFrame(loot);
@@ -217,7 +218,7 @@ export class LootObject implements ObjectInstance {
     }
 }
 
-export function getLoot(this: void, state: GameState, definition: LootObjectDefinition | BossObjectDefinition): void {
+export function getLoot(this: void, state: GameState, definition: LootObjectDefinition | BossObjectDefinition | DialogueLootDefinition): void {
     const onPickup = lootEffects[definition.lootType] || lootEffects.unknown;
     onPickup(state, definition);
     const hero = state.hero.activeClone || state.hero;
@@ -476,7 +477,7 @@ function updateDungeonInventory(state: GameState, inventory: DungeonInventory): 
     saveGame();
 }
 
-export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition) => void}> = {
+export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition | DialogueLootDefinition) => void}> = {
     unknown: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition) => {
         if (loot.lootType === 'weapon') {
             state.hero.weapon = applyUpgrade(state.hero.weapon, loot);

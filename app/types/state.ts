@@ -1,4 +1,4 @@
-import { AreaGrid, AreaInstance, Frame, Hero, ShortRectangle, Zone, ZoneLocation } from 'app/types';
+import { AreaGrid, AreaInstance, Frame, Hero, LootType, ShortRectangle, Zone, ZoneLocation } from 'app/types';
 
 export type SavedState = {
     objectFlags: {[key: string]: boolean},
@@ -17,6 +17,13 @@ export interface DungeonInventory {
 export type Scene = 'title'
     | 'chooseGameMode' | 'deleteSavedGame' | 'deleteSavedGameConfirmation'
     | 'game' | 'credits' | 'options';
+
+export interface DialogueLootDefinition {
+    type: 'dialogueLoot',
+    lootType: LootType,
+    lootLevel?: number,
+    lootAmount?: number,
+}
 
 export interface GameState {
     savedState: SavedState,
@@ -57,7 +64,7 @@ export interface GameState {
     },
     messageState?: {
         pageIndex: number,
-        pages: Frame[][][],
+        pages: (Frame[][] | DialogueLootDefinition)[],
         progressFlag?: string,
     },
     isUsingKeyboard?: boolean,

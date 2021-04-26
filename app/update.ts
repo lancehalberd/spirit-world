@@ -1,5 +1,6 @@
 import { checkIfAllEnemiesAreDefeated, enterLocation } from 'app/content/areas';
 import { Enemy } from 'app/content/enemy';
+import { getLoot } from 'app/content/lootObject';
 import {
     SPAWN_LOCATION_DEMO,
     SPAWN_LOCATION_FULL,
@@ -26,7 +27,7 @@ import { updateAllHeroes } from 'app/updateActor';
 import { updateCamera } from 'app/updateCamera';
 import { areAllImagesLoaded } from 'app/utils/images';
 
-import { ActiveTool, AreaInstance, GameState, MagicElement } from 'app/types';
+import { ActiveTool, AreaInstance, DialogueLootDefinition, GameState, MagicElement } from 'app/types';
 
 let isGameInitialized = false;
 export function update() {
@@ -167,6 +168,17 @@ function updateTitle(state: GameState) {
 function updateMessage(state: GameState) {
     if (isConfirmKeyPressed(state)) {
         state.messageState.pageIndex++;
+        const pageOrLoot = state.messageState.pages[state.messageState.pageIndex]
+        if (pageOrLoot?.['type'] === 'dialogueLoot') {
+            getLoot(state, pageOrLoot as DialogueLootDefinition);
+            // For now cancel remaining dialogue on receiving loot, we have no way to
+            // show the loot animation and then continue dialogue. So all loot should
+            // be set at the end of dialogue for now.
+            state.messageState.pageIndex = state.messageState.pages.length;
+            // TODO: allow obtaining loot in the middle of a message and replace the above
+            // line with the one below.
+            // state.messageState.pageIndex++;
+        }
         if (state.messageState.pageIndex >= state.messageState.pages.length) {
             state.messageState.pages = null;
             if (state.messageState.progressFlag) {

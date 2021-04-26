@@ -59,17 +59,6 @@ Ability order:
 
 
 Current tasks:
-    - Give loot during dialogue
-    - Add dialogue logic UI
-        - Priority list of dialogue options an MC can show
-        - Each entry has the following sections:
-            - A grab bar on the left for dragging the option up/down (copy this UI over for layers as well)
-            - An "if" logic section for all flags required to show the dialogue
-            - A 'not' logic section for any flags that disable the dialogue
-            - A check box indicating dialogue is exclusive. The first valid exclusive dialogue found will be automatically chosen.
-            - A progress flag that can be specified to set a flag when the dialogue has been encountered, similary to unlocking doors, opening chests or beating bosses. Including this id in the 'not' logic makes the dialogue unique and should be done for any dialogue that rewards an item.
-            - A long textbox for the dialogue itself
-        - When talking to an NPC, the list of options is read in order, and all valid options are added to an array. If an exclusive option is found, that dialogue is shown. If not, a random dialogue is shown from the list of valid options. Or perhaps we cycle through all available options in order.
     - Wall Lasers
         - Support param editing for enemies
         - Change how state for various object definitions are stored by keeping the entire ObjectDefinition for the object to create in state.

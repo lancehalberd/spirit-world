@@ -18,7 +18,7 @@ import {
 } from 'app/keyCommands';
 import { checkForFloorEffects, moveActor } from 'app/moveActor';
 import { getTileFrame } from 'app/render';
-import { fallAnimation } from 'app/renderActor';
+import { fallAnimation } from 'app/render/heroAnimations';
 import { useTool } from 'app/useTool';
 import { directionMap, getDirection, isPointOpen } from 'app/utils/field';
 import { rectanglesOverlap } from 'app/utils/index';

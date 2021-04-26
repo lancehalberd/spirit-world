@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import { getLootTypes } from 'app/development/objectEditor';
 import { CANVAS_WIDTH, CANVAS_HEIGHT, GAME_KEY } from 'app/gameConstants';
 import { renderField } from 'app/render';
 import { renderHUD } from 'app/renderHUD';
@@ -6,7 +7,7 @@ import { drawFrame } from 'app/utils/animations';
 import { characterMap, keyboardMap, xboxMap } from 'app/utils/simpleWhiteFont';
 import { fillRect, pad } from 'app/utils/index';
 
-import { Frame, GameState } from 'app/types';
+import { DialogueLootDefinition, Frame, GameState, LootType } from 'app/types';
 
 const characterWidth = 8;
 const messageWidth = 160;
@@ -20,6 +21,20 @@ function getActiveControllerMaps(state: GameState) {
         return [xboxMap];
     }
     return [xboxMap, keyboardMap];
+}
+
+function getEscapedLoot(state: GameState, escapedToken: string): DialogueLootDefinition {
+    const [key, amountOrLevel] = escapedToken.split(':');
+    if (getLootTypes().includes(key as LootType)) {
+        const number = parseInt(amountOrLevel, 10);
+        return {
+            type: 'dialogueLoot',
+            lootType: key as LootType,
+            lootLevel: isNaN(number) ? 0 : number,
+            lootAmount: isNaN(number) ? 0 : number,
+        };
+    }
+    return null;
 }
 
 function getEscapedFrames(state: GameState, escapedToken: string): Frame[] {
@@ -68,9 +83,9 @@ export function showMessage(state: GameState, message: string, progressFlag: str
 }
 
 const messageBreak = '{|}';
-export function parseMessage(state: GameState, message: string): Frame[][][] {
+export function parseMessage(state: GameState, message: string): (Frame[][] | DialogueLootDefinition)[] {
     const chunks = message.split(messageBreak);
-    let pages: Frame[][][] = [];
+    let pages: (Frame[][] | DialogueLootDefinition)[] = [];
     let currentPage: Frame[][] = [];
     let row: Frame[] = [];
     let rowWidth = 0;
@@ -109,6 +124,20 @@ export function parseMessage(state: GameState, message: string): Frame[][][] {
                 }
                 const escapedToken = escapedChunks[i + 1];
                 if (escapedToken) {
+                    const lootDefinition = getEscapedLoot(state, escapedToken);
+                    if (lootDefinition) {
+                        if (row.length) {
+                            currentPage.push(row);
+                        }
+                        if (currentPage.length) {
+                            pages.push(currentPage);
+                        }
+                        pages.push(lootDefinition);
+                        currentPage = [];
+                        row = [];
+                        rowWidth = 0;
+                        continue;
+                    }
                     const tokenFrames = getEscapedFrames(state, escapedToken);
                     if (!tokenFrames?.length) {
                         continue;
@@ -176,7 +205,9 @@ export function renderMessage(context: CanvasRenderingContext2D, state: GameStat
 
     let x = r.x, y = r.y;
     const { pageIndex, pages } = state.messageState;
-    for (const row of pages[pageIndex]) {
+    // pages[pageIndex] can also be DialogueLootDefinition, but `pageIndex` should never
+    // stop on a loot definition.
+    for (const row of (pages[pageIndex] as Frame[][])) {
         for (const frame of row) {
             if (!frame) {
                 x += characterWidth;

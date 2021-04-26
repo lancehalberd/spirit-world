@@ -4,7 +4,7 @@ import { getAreaSize } from 'app/content/areas';
 import { selectDialogueOption } from 'app/content/dialogue';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { moveActor } from 'app/moveActor';
-import { heroAnimations } from 'app/renderActor';
+import { heroAnimations } from 'app/render/heroAnimations';
 import { showMessage } from 'app/render/renderMessage';
 import { drawFrameAt, getFrame } from 'app/utils/animations';
 import { directionMap, rotateDirection } from 'app/utils/field';
