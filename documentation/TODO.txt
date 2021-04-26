@@ -32,6 +32,9 @@ Todo:
 
 Current tasks:
     - Dungeon 2: Ruins of Summoner village and Temple of War
+        - Expected loadout: Cat Eyes, 6 hearts, Dodge, Bow, Spirit Sight
+        - Big Chest: Gloves 1
+        - Boss Reward: Astral Projection
     - Difficulty shrine:
         - 50 money per point
         - move points around for free
@@ -187,6 +190,47 @@ Dungeon flavor philosophy:
     Vanara spirit structures allow free exploration in astral projection because Vanara spirits can tether to the Vanara ship and leave their bodies behind. If the MC knows how to teleport, they can use this to free travel around the world.
     All Native structures are built to native spirit gods who functioned as sevants to the old native spirit beings and were created for specific purposes like resource harvesting, processing and crafting.
 
+
+Ability Locations:
+# Prologue
+    weapon 1            Peach Cave Chest
+    catEyes             Peach Cave Boss
+# Starting Dungeons
+    bow                 Vanara Village
+    roll                Vanara Tomb Chest
+    spiritSight         Vanara Tomb Boss
+    gloves              Summoner Ruins Chest
+    astralProjection    Summoner Ruins Boss
+    invisibility        RU Chest
+    teleportation       RU Boss
+# Treasure Dungeons
+    cloudBoots          Forest Temple Chest
+    clone               Forest Temple Boss
+    invisibility 2      Waterfall Tower Boss
+    ironBoots           Waterfall Tower Chest
+    gloves 2            Forge Chest
+    goldMail            Forge Boss
+    roll 2              Cloud Temple Chest
+    nimbusCloud         Cloud Temple Boss
+    bow 2               Grand Temple Chest
+    ironSkin            Grand Temple Boss
+    trueSight           Jade Palace Chest
+    phoenixCrown        Jade Palace Boss
+# First Quest Dungeon
+    staff               Helix Chest
+    charge              Helix Boss
+# Middle Quest Dungeons
+    fireBlessing        Crater Big Chest
+    fire                Crater Boss Flame Beast
+    waterBlessing       River Temple Big Chest
+    ice                 River Temple Boss Frost Beast
+    lightning           Staff Tower Boss Storm Beast
+    staff 2             Staff Tower "Chest" (after boss)
+    weapon 2            Acquired with first Element
+    charge 2            Acquired with second Element
+# Final Quest Dungeon
+    clone 2             Warship Chest
+
 Ability order:
 
 Early Dungeons:
@@ -198,20 +242,20 @@ Early Dungeons:
     Helix: Tree Staff in big chest, charge from Vanara Captain.
 
 Elemental Beasts: (triggered by Helix or entering the Spirit World)
-    River Temple: ??? Big Chest, Frost Beast(ice element)
-    Mountain Crater: ??? Big Chest, Flame Beast(fire element)
-    Staff Tower: No Big Chest, Storm Beast(lightning element) + Tower Staff
+    River Temple(Old Fertility Temple: Water Blessing Big Chest, Frost Beast(ice element)
+    Mountain Crater: Fire Blessing Big Chest, Flame Beast(fire element)
+    Staff Tower: Storm Beast(lightning element) + Tower Staff in Big Chest after boss
 
 Late Dungeons:
-    Waterfall Tower:
-    The Forge:
-    Jade Palace:
+    Forest Temple(New Fertility Temple):
+    Waterfall Tower: Iron Boots in chest, Invisibility 2 on boss
+    The Forge: Gloves 2 in chest, gold mail on boss
     Grand Temple:
+    Jade Palace:
     Cloud Temple:
-    Forest Temple:
 
 Final Dungeon:
-    Warship:
+    Warship: Clone 2 in big chest
 
 Dungeon 1:
     - Traps+locks to keep intruders away. Need to use bow to enter

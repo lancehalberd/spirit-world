@@ -78,7 +78,7 @@ export function serializeZone(zone: Zone) {
             for (let row = 0; row < areaGrid.length; row++) {
                 for (let column = 0; column < areaGrid[row].length; column++) {
                     const area = areaGrid[row][column];
-                    if (!area || emptySpiritAreas.includes(area)) {
+                    if (!area || (emptySpiritAreas.includes(area) && !area.objects.length)) {
                         lines.push(`const ${key}${floorIndex}_${row}x${column}: AreaDefinition = null;`);
                         continue;
                     }
@@ -87,27 +87,33 @@ export function serializeZone(zone: Zone) {
                         lines.push(`    isSpiritWorld: true,`);
                         lines.push(`    parentDefinition: f${floorIndex}_${row}x${column},`);
                     }
-                    lines.push('    layers: [');
-                    area.layers.map(layer => {
-                        lines.push('        {');
-                        lines.push(`            key: '${layer.key}',`);
-                        if (layer.x) lines.push(`            x: ${layer.x},`);
-                        if (layer.y) lines.push(`            y: ${layer.y},`);
-                        if (layer.grid) {
-                            lines.push('            grid: {');
-                            lines.push(`                w: ${layer.grid.w},`);
-                            lines.push(`                h: ${layer.grid.h},`);
-                            lines.push(`                palette: '${layer.grid.palette}',`);
-                            lines.push('                tiles: [');
-                            for (const row of area[key][layer.key]) {
-                                lines.push(`                    [${row.join(',')}],`);
+                    if (emptySpiritAreas.includes(area)) {
+                        // Setting the layers to null will initialize this to the
+                        // default layers which inherits from parent area.
+                        lines.push('    layers: null,');
+                    } else {
+                        lines.push('    layers: [');
+                        area.layers.map(layer => {
+                            lines.push('        {');
+                            lines.push(`            key: '${layer.key}',`);
+                            if (layer.x) lines.push(`            x: ${layer.x},`);
+                            if (layer.y) lines.push(`            y: ${layer.y},`);
+                            if (layer.grid) {
+                                lines.push('            grid: {');
+                                lines.push(`                w: ${layer.grid.w},`);
+                                lines.push(`                h: ${layer.grid.h},`);
+                                lines.push(`                palette: '${layer.grid.palette}',`);
+                                lines.push('                tiles: [');
+                                for (const row of area[key][layer.key]) {
+                                    lines.push(`                    [${row.join(',')}],`);
+                                }
+                                lines.push('                ],');
+                                lines.push('            },');
                             }
-                            lines.push('                ],');
-                            lines.push('            },');
-                        }
-                        lines.push('        },');
-                    });
-                    lines.push('    ],');
+                            lines.push('        },');
+                        });
+                        lines.push('    ],');
+                    }
                     lines.push('    objects: [');
                     for (const object of area.objects) {
                         lines.push(`        {${Object.keys(object).map(k => `${k}: ${JSON.stringify(object[k])}` ).join(', ')}},`);

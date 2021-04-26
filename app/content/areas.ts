@@ -100,6 +100,9 @@ export function getAreaFromLocation(location: ZoneLocation): AreaDefinition {
     if (!grid[y][x]) {
         grid[y][x] =
             initializeAreaTiles(location.isSpiritWorld ? getDefaultSpiritArea(location) : getDefaultArea());
+    } else if (!grid[y][x].layers) {
+        const defaultLayers = (location.isSpiritWorld ? getDefaultSpiritArea(location) : getDefaultArea()).layers;
+        grid[y][x] = initializeAreaTiles({...grid[y][x], layers: defaultLayers});
     }
     return grid[y][x];
 }
