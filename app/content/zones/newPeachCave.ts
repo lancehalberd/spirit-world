@@ -312,7 +312,7 @@ const f1_0x0: AreaDefinition = {
         {id: "newPeachCave:1:0x0-beetleWinged-1", linked: false, spirit: false, status: "normal", x: 192, y: 288, type: "enemy", enemyType: "beetleWinged"},
         {id: "newPeachCave:1:0x0-beetleWinged-2", linked: false, spirit: false, status: "normal", x: 320, y: 288, type: "enemy", enemyType: "beetleWinged"},
         {id: "newPeachCave:1:0x0-beetleWinged-3", linked: false, spirit: false, status: "normal", x: 400, y: 400, type: "enemy", enemyType: "beetleWinged"},
-        {id: "newPeachCave:boss", linked: false, spirit: false, status: "normal", x: 96, y: 32, type: "boss", enemyType: "beetleBoss", lootType: "catEyes"},
+        {id: "newPeachCave:boss", linked: false, spirit: false, status: "normal", x: 96, y: 32, type: "boss", enemyType: "beetleBoss", lootType: "peachOfImmortality"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},

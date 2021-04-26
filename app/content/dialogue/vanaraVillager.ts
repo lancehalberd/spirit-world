@@ -22,7 +22,7 @@ dialogueHash.vanaraVillager = {
             },
             text: [
                 `The Vanara Elder?
-                {|}He lives in the tree to the Southeast.`,
+                {|}He lives in the tree to the Southwest.`,
                 `We aren't supposed to talk to you.`,
                 `Is it true there are Vanara living with Humans?`,
             ],

@@ -11,8 +11,9 @@ dialogueHash.tombGuardian = {
             isExclusive: true,
             text: [
                 `You've come to learn more about your spirit powers?
-                {|}I knew this day would eventually come.
-                {|}I can teach you look into the spirit realm, but you won't be able to interact with it.
+                {|}I knew this day would come eventually...
+                {|}I can teach you to look into the spirit realm,
+                {|}but you won't be able to interact with it.
                 {|}The summoners used special tools for their powers,
                 {|}maybe your mother could tell you more.
                 {spiritSight:1}`,

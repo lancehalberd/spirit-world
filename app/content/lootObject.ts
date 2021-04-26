@@ -98,6 +98,25 @@ function showLootMessage(state: GameState, lootType: LootType, lootLevel?: numbe
                     + '{|}Use it to unlock one locked door.');
             }
             return;
+        case 'peachOfImmortality':
+            if (!state.hero.passiveTools.catEyes) {
+                return showMessage(state, `You ate a Golden Peach!
+                    {|} Your health has increased and you feel a strange energy...{catEyes}`);
+            }
+            return showMessage(state, `You ate a Golden Peach!
+                {|} Your maximum health has increased!`);
+        case 'peachOfImmortalityPiece':
+            if (state.hero.peachQuarters === 1) {
+                return showMessage(state, 'You found a golden peach slice!{|}Find three more to increase your health!');
+            }
+            if (state.hero.peachQuarters === 2) {
+                return showMessage(state, 'You found a golden peach slice!{|}Find two more to increase your health!');
+            }
+            if (state.hero.peachQuarters === 3) {
+                return showMessage(state, 'You found a golden peach slice!{|}Find one more to increase your health!');
+            }
+            // Finding the 4th slice grants a full peach of immortality.
+            return showMessage(state, 'You found a golden peach slice!{peachOfImmortality}');
         case 'weapon':
             if (state.hero.weapon === 1) {
                 return showMessage(state, 'You found the Chakram! {|} Press {B_WEAPON} to throw the Chakram.'
@@ -145,7 +164,7 @@ function showLootMessage(state: GameState, lootType: LootType, lootLevel?: numbe
             );
         case 'catEyes':
             return showMessage(state, 'You have been blessed with Cat Eyes!'
-                + '{|}You can see much better in the dark now!'
+                + '{|}This strange energy allows you to see much better in the dark.'
                 + '{|}Using cat eyes consumes spirit energy, stand still to recover.'
             );
         case 'spiritSight':
@@ -535,8 +554,7 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: Lo
         state.hero.peachQuarters++;
         if (state.hero.peachQuarters >= 4) {
             state.hero.peachQuarters -= 4;
-            state.hero.maxLife++;
-            state.hero.life = state.hero.maxLife;
+            // You will gain the full peach from the dialogue effect.
         }
     },
 }

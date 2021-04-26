@@ -33,8 +33,10 @@ dialogueHash.vanaraGuard = {
             text: [
                 `This is the Vanara Village.
                 {|} Outsiders aren't welcome here.`,
-                `Go straight to the Elder in the Southeast tree and don't bother the villagers.`
+                `Head straight to the Elder and don't bother the villagers.`,
+                `The Elder lives in the Southwest tree.`,
             ],
+            repeatIndex: 1,
         },
     ],
 };

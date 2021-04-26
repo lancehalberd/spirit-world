@@ -213,7 +213,10 @@ export function initializeState() {
 
 export function returnToSpawnLocation(state: GameState) {
     state.hero.life = state.hero.maxLife;
-    state.hero.magic = state.hero.maxMagic;
+    // Only fill the magic bar if the hero has some magic regen.
+    if (state.hero.magicRegen) {
+        state.hero.magic = state.hero.maxMagic;
+    }
     state.defeated = false;
     // Clear out any state/flags that shouldn't be kept on the hero.
     state.hero.pickUpTile = null;
