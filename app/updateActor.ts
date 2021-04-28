@@ -314,6 +314,8 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         });
         if (!hero.action) {
             hero.action = 'walking';
+            hero.actionDx = 0;
+            hero.actionDy = 0;
             hero.animationTime = 0;
         } else {
             hero.animationTime += FRAME_LENGTH;
@@ -321,6 +323,8 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
     } else {
         if (hero.action === 'walking' || hero.action === 'pushing') {
             hero.action = null;
+            hero.actionDx = 0;
+            hero.actionDy = 0;
             hero.animationTime = 0;
         } else {
             hero.animationTime += FRAME_LENGTH;
@@ -483,7 +487,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         && hero.actionTarget.definition.targetObjectId
     // Do not trigger the scrolling transition when traveling through a zone door.
     // Zone doors will eventually use a screen wipe transition.
-    if (!state.nextAreaInstance && !isMovingThroughZoneDoor) {
+    if (!state.nextAreaSection && !state.nextAreaInstance && !isMovingThroughZoneDoor) {
         // We only move to the next area if the player is moving in the direction of that area.
         // dx/dy handles most cases, but in some cases like moving through doorways we also need to check
         // hero.actionDx
