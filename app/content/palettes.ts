@@ -254,15 +254,13 @@ const caveWallsPalette: TilePalette = {
 const shallowWaterPalette: TilePalette = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/water.png'), x: 0, y: 0, w: 64, h: 64},
-    // Currently shallow water has no special behavior.
-    behaviors: {},
+    behaviors: {'all': {shallowWater: true}},
     defaultTiles: []
 };
 
 const deepWaterPalette: TilePalette = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/water.png'), x: 64, y: 0, w: 128, h: 64},
-    // Currently shallow water has no special behavior.
     behaviors: {'all': deepWaterBehavior, '7x3': { skipped: true }},
     defaultTiles: []
 };
@@ -270,14 +268,12 @@ const deepWaterPalette: TilePalette = {
 const shallowAngledWaterPalette: TilePalette = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/water.png'), x: 0, y: 64, w: 64, h: 32},
-    // Currently shallow water has no special behavior.
     behaviors: {'2x1': { skipped: true }},
     defaultTiles: []
 };
 const deepAngledWaterPalette: TilePalette = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/water.png'), x: 64, y: 64, w: 128, h: 32},
-    // Currently shallow water has no special behavior.
     behaviors: {'2x1': { skipped: true }, '6x1': { skipped: true }},
     defaultTiles: []
 };
@@ -285,8 +281,7 @@ const deepAngledWaterPalette: TilePalette = {
 const comboWaterPalette: TilePalette = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/water.png'), x: 192, y: 0, w: 64, h: 96},
-    // Currently shallow water has no special behavior.
-    behaviors: {'2x5': { skipped: true }, '3x1': { skipped: true }, '3x2': { skipped: true }, '3x3': { skipped: true }},
+    behaviors: {'all': {shallowWater: true}, '2x5': { skipped: true }, '3x1': { skipped: true }, '3x2': { skipped: true }, '3x3': { skipped: true }},
     defaultTiles: []
 };
 

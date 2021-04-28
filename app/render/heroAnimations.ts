@@ -21,6 +21,10 @@ const walkUpAnimation: FrameAnimation = createAnimation('gfx/mcwalking.png', wal
 const walkDownAnimation: FrameAnimation = createAnimation('gfx/mcwalking.png', walkingGeometry, { cols: 8, y: 0, duration: 4});
 const walkLeftAnimation: FrameAnimation = createAnimation('gfx/mcwalking.png', walkingGeometry, { cols: 8, y: 3, duration: 4});
 const walkRightAnimation: FrameAnimation = createAnimation('gfx/mcwalking.png', walkingGeometry, { cols: 8, y: 1, duration: 4});
+const walkShallowUpAnimation: FrameAnimation = createAnimation('gfx/mcwalkingshallow.png', walkingGeometry, { cols: 8, y: 2, duration: 4});
+const walkShallowDownAnimation: FrameAnimation = createAnimation('gfx/mcwalkingshallow.png', walkingGeometry, { cols: 8, y: 0, duration: 4});
+const walkShallowLeftAnimation: FrameAnimation = createAnimation('gfx/mcwalkingshallow.png', walkingGeometry, { cols: 8, y: 3, duration: 4});
+const walkShallowRightAnimation: FrameAnimation = createAnimation('gfx/mcwalkingshallow.png', walkingGeometry, { cols: 8, y: 1, duration: 4});
 
 const attackingGeometry: FrameDimensions = {w: 20, h: 28, content: {x: 2, y: 16 + Y_OFF, w: 16, h: 16}};
 const attackUpAnimation: FrameAnimation = createAnimation('gfx/mcchakramthrow.png', attackingGeometry, { cols: 4, x: 1, y: 2, duration: 3}, {loop: false});
@@ -89,6 +93,12 @@ export const heroAnimations: ActorAnimations = {
         down: walkDownAnimation,
         left: walkLeftAnimation,
         right: walkRightAnimation,
+    },
+    wade: {
+        up: walkShallowUpAnimation,
+        down: walkShallowDownAnimation,
+        left: walkShallowLeftAnimation,
+        right: walkShallowRightAnimation,
     },
     pull: {
         up: pullUpAnimation,

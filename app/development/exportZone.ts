@@ -18,7 +18,7 @@ export function serializeZone(zone: Zone) {
             for (const gridRow of areaGrid) {
                 for (const area of gridRow) {
                     let isEmpty = true;
-                    if (!area) {
+                    if (!area?.layers) {
                         continue;
                     }
                     area[key] = {};
@@ -87,7 +87,7 @@ export function serializeZone(zone: Zone) {
                         lines.push(`    isSpiritWorld: true,`);
                         lines.push(`    parentDefinition: f${floorIndex}_${row}x${column},`);
                     }
-                    if (emptySpiritAreas.includes(area)) {
+                    if (!area.layers || emptySpiritAreas.includes(area)) {
                         // Setting the layers to null will initialize this to the
                         // default layers which inherits from parent area.
                         lines.push('    layers: null,');

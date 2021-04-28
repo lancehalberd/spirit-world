@@ -54,6 +54,7 @@ export interface ActorAnimations {
     hurt?: AnimationSet,
     idle: AnimationSet,
     move?: AnimationSet,
+    wade?: AnimationSet,
     pull?: AnimationSet,
     push?: AnimationSet,
     roll?: AnimationSet,
@@ -89,6 +90,8 @@ export interface Actor {
     life: number,
     render: (context: CanvasRenderingContext2D, state: GameState) => void,
     takeDamage?: (state: GameState, damage: number) => void,
+    wading?: boolean,
+    swimming?: boolean,
 }
 
 

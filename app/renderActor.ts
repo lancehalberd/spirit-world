@@ -55,7 +55,13 @@ function getHeroFrame(state: GameState, hero: Hero): Frame {
         case 'exiting':
         case 'swimming':
         case 'walking':
-            animations = heroAnimations.move;
+            if (hero.swimming) {
+                animations = heroAnimations.wade;
+            } else if (hero.wading) {
+                animations = heroAnimations.wade;
+            } else {
+                animations = heroAnimations.move;
+            }
             break;
         case 'knocked':
             animations = heroAnimations.hurt;
@@ -91,7 +97,7 @@ export function renderHero(this: Hero, context: CanvasRenderingContext2D, state:
         } else if (hero.invulnerableFrames) {
             context.globalAlpha = 0.7 + 0.3 * Math.cos(2 * Math.PI * hero.invulnerableFrames * 3 / 50);
         }
-        if (hero.action === 'swimming') {
+        if (hero.swimming || hero.action === 'swimming') {
             drawFrame(context, {...frame, h: 16}, { x: hero.x - frame.content.x, y: hero.y - frame.content.y - hero.z + frame.h - 22, w: frame.w, h: 16 });
         } else {
             drawFrame(context, frame, { x: hero.x - frame.content.x, y: hero.y - frame.content.y - hero.z, w: frame.w, h: frame.h });
@@ -137,7 +143,7 @@ export function renderCarriedTile(context: CanvasRenderingContext2D, state: Game
 
 
 export function renderHeroShadow(context: CanvasRenderingContext2D, state: GameState, hero: Hero): void {
-    if (hero.action === 'fallen' || hero.action === 'falling' || hero.action === 'swimming') {
+    if (hero.action === 'fallen' || hero.action === 'falling' || hero.action === 'swimming' || hero.swimming || hero.wading) {
         return;
     }
     drawFrame(context, shadowFrame, { ...shadowFrame, x: hero.x, y: hero.y - 3 - Y_OFF });

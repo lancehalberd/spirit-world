@@ -44,6 +44,7 @@ export interface TileBehaviors {
     // Tile to display if this tile is removed (picked up, cut, blown up).
     underTile?: {x: number, y: number},
     growTiles?: Tile[],
+    shallowWater?: boolean,
     water?: boolean,
 }
 

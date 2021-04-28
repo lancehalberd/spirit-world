@@ -6,6 +6,7 @@ import { dropItemFromTable } from 'app/content/lootObject';
 import { checkToUpdateSpawnLocation } from 'app/content/spawnLocations';
 import { zones } from 'app/content/zones';
 import { createCanvasAndContext } from 'app/dom';
+import { checkForFloorEffects } from 'app/moveActor';
 import { isPointInShortRect } from 'app/utils/index';
 import { updateCamera } from 'app/updateCamera';
 
@@ -216,6 +217,8 @@ export function enterLocation(
     setAreaSection(state, state.hero.d, true);
     updateCamera(state, 512);
     checkToUpdateSpawnLocation(state);
+    // Make sure the actor is shown as swimming/wading during the transition frames.
+    checkForFloorEffects(state, state.hero);
 }
 
 export function linkObjects(state: GameState): void {

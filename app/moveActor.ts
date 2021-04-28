@@ -329,15 +329,19 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
     const behaviorGrid = hero.area.behaviorGrid;
     // We don't want a player to be able to walk in between pits without falling, so the character is forced to fall
     // any time all four corners are over pits.
+    hero.wading = true;
+    hero.swimming = true;
     let fallingTopLeft = false, fallingTopRight = false, fallingBottomLeft = false, fallingBottomRight = false;
-    let startSwimming = true;
     let startClimbing = false;
     for (let row = topRow; row <= bottomRow; row++) {
+        if (row < 0 || row >= 32) continue;
         for (let column = leftColumn; column <= rightColumn; column++) {
+            if (column < 0 || column >= 32) continue;
             const behaviors = behaviorGrid?.[row]?.[column];
-            // This will happen when the player moves off the edge of the screen.
+            // Default behavior is open solid ground.
             if (!behaviors) {
-                startSwimming = false;
+                hero.swimming = false;
+                hero.wading = false;
                 continue;
             }
             if (behaviors.climbable) {
@@ -347,7 +351,10 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
                 damageActor(state, hero, behaviors.damage);
             }
             if (!behaviors.water) {
-                startSwimming = false;
+                hero.swimming = false;
+            }
+            if (!behaviors.shallowWater && !behaviors.water) {
+                hero.wading = false;
             }
             if (behaviors.pit && hero.action !== 'roll' && hero.z <= 0) {
                 if (hero.y - row * 16 > 4) {
@@ -378,9 +385,10 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
             }
         }
     }
-    if (startSwimming && hero.action !== 'roll' && hero.action !== 'entering' && hero.action !== 'exiting') {
+
+    if (hero.swimming && hero.action !== 'roll' && hero.action !== 'entering' && hero.action !== 'exiting') {
         hero.action = 'swimming';
-    } else if (!startSwimming && hero.action === 'swimming') {
+    } else if (!hero.swimming && hero.action === 'swimming') {
         hero.action = null;
     }
     if (startClimbing) {
