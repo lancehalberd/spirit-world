@@ -4,14 +4,14 @@ import { FRAME_LENGTH } from 'app/gameConstants';
 import { showMessage } from 'app/render/renderMessage';
 import { updateHeroMagicStats } from 'app/render/spiritBar';
 import { getState, saveGame } from 'app/state';
-import { createAnimation, drawFrame } from 'app/utils/animations';
+import { createAnimation, drawFrame, drawFrameAt, getFrameHitBox } from 'app/utils/animations';
 import { requireImage } from 'app/utils/images';
 import { rectanglesOverlap } from 'app/utils/index';
 import { playSound } from 'app/utils/sounds';
 
 import {
     ActiveTool, AreaInstance, BossObjectDefinition, DialogueLootDefinition,
-    DungeonInventory, Frame, GameState, LootObjectDefinition,
+    DungeonInventory, Frame, FrameDimensions, GameState, LootObjectDefinition,
     LootTable, LootType, ObjectInstance, ObjectStatus, ShortRectangle,
 } from 'app/types';
 
@@ -35,9 +35,9 @@ export function dropItemFromTable(state: GameState, area: AreaInstance, lootTabl
             y,
             status: 'normal'
         });
-        addObjectToArea(state, state.areaInstance, drop);
-        drop.x -= drop.frame.w / 2;
-        drop.y -= drop.frame.h / 2;
+        addObjectToArea(state, area, drop);
+        drop.x -= (drop.frame.content?.w || drop.frame.w) / 2;
+        drop.y -= (drop.frame.content?.h || drop.frame.h) / 2;
     }
 }
 
@@ -207,7 +207,7 @@ export class LootObject implements ObjectInstance {
             return;
         }
         const hero = state.hero.activeClone || state.hero;
-        if (rectanglesOverlap(hero, {...this.frame, x: this.x, y: this.y})) {
+        if (rectanglesOverlap(hero, getFrameHitBox(this.frame, this))) {
             removeObjectFromArea(state, this);
             state.savedState.objectFlags[this.definition.id] = true;
             getLoot(state, this.definition);
@@ -220,7 +220,7 @@ export class LootObject implements ObjectInstance {
         if (this.definition.id !== 'drop' && state.savedState.objectFlags[this.definition.id]) {
             return;
         }
-        drawFrame(context, this.frame, { ...this.frame, x: this.x, y: this.y });
+        drawFrameAt(context, this.frame, { x: this.x, y: this.y });
     }
     renderShadow(context, state: GameState) {
         if (this.status === 'hiddenEnemy' || this.status === 'hiddenSwitch') {
@@ -231,8 +231,8 @@ export class LootObject implements ObjectInstance {
         }
         const frame = getLootShadowFrame(this.definition);
         drawFrame(context, frame, { ...frame,
-            x: this.x - (frame.w - this.frame.w) / 2,
-            y: this.y - (frame.h - this.frame.h),
+            x: this.x - (frame.w - (this.frame.content?.w || this.frame.w)) / 2,
+            y: this.y - (frame.h - (this.frame.content?.h || this.frame.h)),
         });
     }
 }
@@ -252,7 +252,7 @@ export function getLoot(this: void, state: GameState, definition: LootObjectDefi
 export class LootDropObject extends LootObject {
     alwaysReset = true;
     update(state: GameState) {
-        if (rectanglesOverlap(state.hero.activeClone || state.hero, {...this.frame, x: this.x, y: this.y})) {
+        if (this.area === state.areaInstance && rectanglesOverlap(state.hero.activeClone || state.hero, getFrameHitBox(this.frame, this))) {
             const onPickup = lootEffects[this.definition.lootType] || lootEffects.unknown;
             onPickup(state, this.definition);
             if (this.definition.lootType === 'money') {
@@ -424,15 +424,17 @@ const lootFrames: Partial<{[key in LootType]: Frame}> = {
     weapon: weaponFrame,
 };
 
-
+const smallMoneyGeometry: FrameDimensions = {w: 16, h: 16, content:{ x: 4, y: 8, w: 8, h: 8}};
+const largeMoneyGeometry: FrameDimensions = {w: 16, h: 16, content:{ x: 2, y: 4, w: 12, h: 12}};
 const [
     smallShadow, bigShadow,
     /*smallLightHalf*/, /*smallDarkHalf*/,
     lightOrb, darkOrb,
     /* smallWhole*/,
+] = createAnimation('gfx/hud/money.png', smallMoneyGeometry, {cols: 7}).frames;
+const [
     lightHalf, darkHalf, wholeCoin
-] =
-    createAnimation('gfx/hud/money.png', {w: 16, h: 16}, {cols: 10}).frames;
+] = createAnimation('gfx/hud/money.png', largeMoneyGeometry, {x: 7, cols: 3}).frames;
 export function getLootFrame({lootType, lootLevel, lootAmount}:
     {lootType: LootType, lootLevel?: number, lootAmount?: number}
 ): Frame {

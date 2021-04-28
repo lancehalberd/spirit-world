@@ -108,6 +108,14 @@ export function drawFrameAt(
         tx | 0, ty | 0, tw | 0, th | 0);
 }
 
+export function getFrameHitBox({content, w, h}: Frame, {x, y}: {x: number, y: number}): ShortRectangle {
+    return {
+        x, y,
+        w: content?.w ?? w,
+        h: content?.h ?? h,
+    };
+}
+
 /*export function drawFrameCenteredInTarget(
     context: CanvasRenderingContext2D,
     {image, x, y, w, h}: Frame,
