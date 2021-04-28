@@ -430,7 +430,7 @@ function updateWallLaser(state: GameState, enemy: Enemy): void {
     }
     if (enemy.mode === 'shoot') {
         const {hero} = getLineOfSightTargetAndDirection(state, enemy, enemy.d, true);
-        if (!hero && enemy.modeTime > 1200) {
+        if (!hero && enemy.modeTime > 900) {
             enemy.setMode('wait');
         } else if (enemy.modeTime % 300 === FRAME_LENGTH) {
             shoot();
@@ -683,7 +683,10 @@ function getVectorToNearbyHero(state: GameState, enemy: Enemy, radius: number): 
 function getLineOfSightTargetAndDirection(state: GameState, enemy: Enemy, direction: Direction = null, projectile: boolean = false): {d: Direction, hero: Hero} {
     const hitbox = enemy.getHitbox(state);
     for (const hero of [state.hero, ...state.hero.clones]) {
-        if (hitbox.x < hero.x + hero.w && hitbox.x + hitbox.w > hero.x && (direction !== 'left' && direction !== 'right')) {
+        // Reduce dimensions of hitbox for these checks so that the hero is not in line of sight when they are most of a tile
+        // off (like 0.5px in line of sight), otherwise the hero can't hide from line of sight on another tile if
+        // they aren't perfectly lined up with the tile.
+        if (hitbox.x + 1 < hero.x + hero.w && hitbox.x + hitbox.w - 1 > hero.x && (direction !== 'left' && direction !== 'right')) {
             if ((hero.y < hitbox.y && direction === 'down') || (hero.y > hitbox.y && direction === 'up')) {
                 continue
             }
@@ -706,7 +709,7 @@ function getLineOfSightTargetAndDirection(state: GameState, enemy: Enemy, direct
                 };
             }
         }
-        if (hitbox.y < hero.y + hero.h && hitbox.y + hitbox.h > hero.y && (direction !== 'up' && direction !== 'down')) {
+        if (hitbox.y + 1 < hero.y + hero.h && hitbox.y + hitbox.h - 1 > hero.y && (direction !== 'up' && direction !== 'down')) {
             if ((hero.x < hitbox.x && direction === 'right') || (hero.x > hitbox.x && direction === 'left')) {
                 continue
             }

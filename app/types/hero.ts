@@ -32,7 +32,7 @@ export type Collectible = 'peachOfImmortality' | 'peachOfImmortalityPiece';
 export type CommonLoot = 'money' | 'peach';
 export type DungeonLoot = 'smallKey' | 'bigKey' | 'map';
 
-export type LootType = 'weapon' | ActiveTool | Equipment | PassiveTool
+export type LootType = 'empty' | 'weapon' | ActiveTool | Equipment | PassiveTool
     | MagicElement | Collectible | CommonLoot | DungeonLoot | 'unknown';
 
 

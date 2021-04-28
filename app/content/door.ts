@@ -153,7 +153,7 @@ export class Door implements ObjectInstance {
         if (state.savedState.objectFlags[this.definition.id]) {
             if (this.status === 'cracked') {
                 this.status = 'blownOpen';
-            } else if (this.status === 'locked' || this.status === 'bigKeyLocked') {
+            } else {
                 this.status = 'normal';
             }
         }
@@ -169,6 +169,10 @@ export class Door implements ObjectInstance {
         this.status = status;
         if (this.linkedObject && this.linkedObject.status !== status) {
             this.linkedObject.changeStatus(state, status);
+        }
+        if (this.status === 'normal' && this.definition.saveStatus) {
+            state.savedState.objectFlags[this.definition.id] = true;
+            saveGame();
         }
         const y = Math.floor(this.y / 16);
         const x = Math.floor(this.x / 16);

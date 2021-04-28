@@ -109,13 +109,19 @@ export function getTileBehaviorsAndObstacles(
     state: GameState,
     area: AreaInstance,
     {x, y}: Tile,
-    excludedObjects: Set<any> = null
+    excludedObjects: Set<any> = null,
+    nextArea: AreaInstance = null,
 ): {tileBehavior: TileBehaviors, tx: number, ty: number, objects: ObjectInstance[]} {
     const objects: ObjectInstance[] = [];
-    const tx = Math.floor(x / 16);
-    const ty = Math.floor(y / 16);
-    const tileBehavior = {...(area?.behaviorGrid[ty]?.[tx] || {})};
-
+    let tx = Math.floor(x / 16);
+    let ty = Math.floor(y / 16);
+    let definedBehavior = area?.behaviorGrid[ty]?.[tx];
+    if (!definedBehavior && nextArea) {
+        tx = Math.floor((x - nextArea.cameraOffset.x) / 16);
+        ty = Math.floor((y - nextArea.cameraOffset.y) / 16);
+        definedBehavior = nextArea?.behaviorGrid[ty]?.[tx];
+    }
+    const tileBehavior = {...(definedBehavior || {})};
     if (tx < state.areaSection.x || tx >= state.areaSection.x + state.areaSection.w
         || ty < state.areaSection.y || ty >= state.areaSection.y + state.areaSection.h) {
         tileBehavior.outOfBounds = true;

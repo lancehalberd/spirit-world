@@ -334,10 +334,16 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
     let fallingTopLeft = false, fallingTopRight = false, fallingBottomLeft = false, fallingBottomRight = false;
     let startClimbing = false;
     for (let row = topRow; row <= bottomRow; row++) {
-        if (row < 0 || row >= 32) continue;
         for (let column = leftColumn; column <= rightColumn; column++) {
-            if (column < 0 || column >= 32) continue;
-            const behaviors = behaviorGrid?.[row]?.[column];
+            let behaviors = behaviorGrid[row]?.[column];
+            // During screen transitions, the row/column will be out of bounds for the current screen,
+            // so we need to wrap them and work against the next screen.
+            if (row < 0 || row >= 32 || column < 0 || column >= 32) {
+                if (!state.nextAreaInstance) {
+                    continue;
+                }
+                behaviors = state.nextAreaInstance.behaviorGrid[(row + 32) % 32]?.[(column + 32) % 32];
+            }
             // Default behavior is open solid ground.
             if (!behaviors) {
                 hero.swimming = false;

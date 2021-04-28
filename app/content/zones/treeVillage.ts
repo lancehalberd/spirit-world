@@ -196,10 +196,10 @@ const f1_0x0: AreaDefinition = {
         {id: "treeVillage:1:0x0-floorSwitch-0", linked: false, spirit: false, status: "normal", x: 192, y: 304, type: "floorSwitch", targetObjectId: "elderPeachPiece", toggleOnRelease: false},
         {id: "elderPeachPiece", linked: false, spirit: false, status: "hiddenSwitch", x: 176, y: 352, type: "chest", lootType: "peachOfImmortalityPiece", lootLevel: 0, lootAmount: 1},
         {id: "treeVillage:1:0x0-door-0", linked: false, spirit: false, status: "normal", x: 224, y: 384, type: "door", style: "cave", targetZone: null, targetObjectId: null, d: "right"},
-        {id: "bowDoor", linked: false, spirit: false, status: "closedSwitch", x: 256, y: 384, type: "door", style: "cave", targetZone: null, targetObjectId: null, d: "left"},
+        {id: "bowDoor", linked: false, spirit: false, status: "closedSwitch", x: 256, y: 384, type: "door", style: "cave", targetZone: null, targetObjectId: null, d: "left", saveStatus: true},
         {id: "treeVillage:1:0x0-bow-0", linked: false, spirit: false, status: "normal", x: 368, y: 368, type: "chest", lootType: "bow", lootLevel: 1, lootAmount: 1},
-        {id: "treeVillage:1:0x0-crystalSwitch-0", linked: false, spirit: false, status: "normal", x: 448, y: 304, type: "crystalSwitch", element: null, targetObjectId: "bowDoor", timer: 0},
-        {id: "treeVillage:1:0x0-crystalSwitch-1", linked: false, spirit: false, status: "normal", x: 448, y: 448, type: "crystalSwitch", element: null, targetObjectId: "bowDoor", timer: 0},
+        {id: "bowSwitch1", linked: false, spirit: false, status: "normal", x: 448, y: 304, type: "crystalSwitch", element: null, targetObjectId: "bowDoor", timer: 0, saveStatus: true},
+        {id: "bowSwitch2", linked: false, spirit: false, status: "normal", x: 448, y: 448, type: "crystalSwitch", element: null, targetObjectId: "bowDoor", timer: 0, saveStatus: true},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},

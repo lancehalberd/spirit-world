@@ -248,6 +248,8 @@ export interface BaseObjectDefinition {
     id: string,
     // Whether this is linked to an object in the physical/spirit world.
     linked?: boolean,
+    // Whether to save the status of this object permanently (for example switches to open dungeon doors).
+    saveStatus?: boolean,
     // Whether this is a spirit object.
     spirit?: boolean,
     // Stores optional style type for some objects, e.g., 'short' vs 'tall' signs.

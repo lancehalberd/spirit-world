@@ -3,6 +3,7 @@ import {
     deactivateTargets,
 } from 'app/content/objects';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { saveGame } from 'app/state';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 
 import {
@@ -32,10 +33,13 @@ export class CrystalSwitch implements ObjectInstance {
     status: ObjectStatus = 'normal';
     timeLeft: number = 0;
     animationTime: number = 0;
-    constructor(definition: CrystalSwitchDefinition) {
+    constructor(state: GameState, definition: CrystalSwitchDefinition) {
         this.definition = definition;
         this.x = definition.x;
         this.y = definition.y;
+        if (state.savedState.objectFlags[this.definition.id]) {
+            this.status = 'active';
+        }
     }
     getHitbox(state: GameState): ShortRectangle {
         return { x: this.x, y: this.y, w: 16, h: 16 };
@@ -47,6 +51,10 @@ export class CrystalSwitch implements ObjectInstance {
     }
     activate(state: GameState): void {
         this.status = 'active';
+        if (this.definition.saveStatus) {
+            state.savedState.objectFlags[this.definition.id] = true;
+            saveGame();
+        }
         this.animationTime = 0;
         this.timeLeft = this.definition.timer || 0;
         this.behaviors.brightness = 1;

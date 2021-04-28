@@ -25,6 +25,7 @@ export function getLootTypes(): LootType[] {
     if (!allLootTypes) {
         const state = getState();
         allLootTypes = [
+            'empty',
             'peachOfImmortality',
             'peachOfImmortalityPiece',
             'money',
@@ -94,6 +95,7 @@ export function createObjectDefinition(
                 targetZone: definition.targetZone,
                 targetObjectId: definition.targetObjectId,
                 d: definition.d || 'up',
+                saveStatus: definition.saveStatus,
                 status: definition.status || commonProps.status,
             };
         case 'boss': {
@@ -313,6 +315,14 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                     updateObjectInstance(state, object);
                 },
             });
+            rows.push({
+                name: 'saveStatus',
+                value: object.saveStatus || false,
+                onChange(saveStatus: boolean) {
+                    object.saveStatus = saveStatus;
+                    updateObjectInstance(state, object);
+                },
+            });
         case 'pitEntrance':
             const zoneKeys = Object.keys(zones);
             const zoneKey = object.targetZone || 'none';
@@ -373,6 +383,14 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             rows = [...rows, ...getSwitchTargetProperties(state, editingState, object)];
             break;
         case 'crystalSwitch':
+            rows.push({
+                name: 'saveStatus',
+                value: object.saveStatus || false,
+                onChange(saveStatus: boolean) {
+                    object.saveStatus = saveStatus;
+                    updateObjectInstance(state, object);
+                },
+            });
             rows.push({
                 name: 'element',
                 value: object.element || 'none',

@@ -829,7 +829,9 @@ document.addEventListener('keydown', function(event: KeyboardEvent) {
     }
     // Don't process keys if an input is targeted, otherwise we prevent typing in
     // the input.
-    if ((event.target as HTMLElement).closest('input')) {
+    if ((event.target as HTMLElement).closest('input')
+        || (event.target as HTMLElement).closest('textarea')
+        || (event.target as HTMLElement).closest('select')) {
         return;
     }
     if (event.which === KEY.BACK_SPACE) {

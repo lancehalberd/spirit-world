@@ -296,12 +296,15 @@ export class ChestObject implements ObjectInstance {
         this.y = definition.y;
         this.status = definition.status || 'normal';
         // Chests that have been opened are always revealed.
-        if (state.savedState.objectFlags[this.definition.id]) {
+        if (this.isOpen(state)) {
             this.status = 'normal';
         }
     }
     getHitbox(state: GameState): ShortRectangle {
         return { x: this.x, y: this.y, w: 16, h: 16 };
+    }
+    isOpen(state: GameState): boolean {
+        return (state.savedState.objectFlags[this.definition.id] || this.definition.lootType === 'empty');
     }
     onGrab(state: GameState) {
         // You can only open a chest from the bottom.
@@ -318,7 +321,7 @@ export class ChestObject implements ObjectInstance {
         if (this.status === 'hiddenEnemy' || this.status === 'hiddenSwitch') {
             return;
         }
-        if (state.savedState.objectFlags[this.definition.id]) {
+        if (this.isOpen(state)) {
             drawFrame(context, chestOpenedFrame, {
                 ...chestOpenedFrame, x: this.x - chestOpenedFrame.content.x, y: this.y - chestOpenedFrame.content.y
             });
@@ -330,7 +333,7 @@ export class ChestObject implements ObjectInstance {
     }
 }
 
-export class BigChest implements ObjectInstance {
+export class BigChest extends ChestObject implements ObjectInstance {
     area: AreaInstance;
     definition: LootObjectDefinition;
     drawPriority: 'sprites' = 'sprites';
@@ -345,16 +348,6 @@ export class BigChest implements ObjectInstance {
     y: number;
     z: number;
     status: ObjectStatus;
-    constructor(state: GameState, definition: LootObjectDefinition) {
-        this.definition = definition;
-        this.x = definition.x;
-        this.y = definition.y;
-        this.status = definition.status || 'normal';
-        // Chests that have been opened are always revealed.
-        if (state.savedState.objectFlags[this.definition.id]) {
-            this.status = 'normal';
-        }
-    }
     getHitbox(state: GameState): ShortRectangle {
         return { x: this.x, y: this.y, w: 32, h: 32 };
     }
@@ -375,7 +368,7 @@ export class BigChest implements ObjectInstance {
         getLoot(state, this.definition);
     }
     render(context, state: GameState) {
-        if (state.savedState.objectFlags[this.definition.id]) {
+        if (this.isOpen(state)) {
             drawFrame(context, chestOpenedFrame, {
                 x: this.x - chestOpenedFrame.content.x, y: this.y - chestOpenedFrame.content.y,
                 w: chestOpenedFrame.w * 2, h: chestOpenedFrame.h * 2,

@@ -44,7 +44,7 @@ export function createObjectInstance(state: GameState, object: ObjectDefinition)
     } else if (object.type === 'pushPull') {
         return new PushPullObject(object);
     } else if (object.type === 'crystalSwitch') {
-        return new CrystalSwitch(object);
+        return new CrystalSwitch(state, object);
     } else if (object.type === 'pitEntrance') {
         return new PitEntrance(object);
     } else if (object.type === 'marker') {
