@@ -103,8 +103,17 @@ export function render() {
     }
     state.lastTimeRendered = state.time;
     renderField(context, state);
-    if (state.defeated) {
-        renderDefeatedMenu(context, state);
+    if (state.defeatState.defeated) {
+        renderHUD(context, state);
+        context.save();
+            context.globalAlpha = 0.7 * Math.min(1, state.defeatState.time / 1000);
+            context.fillStyle = '#888';
+            context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        context.restore();
+        if (state.defeatState.time >= 1000) {
+            renderDefeatedMenu(context, state);
+        }
+        return;
     } else if (state.paused) {
         renderMenu(context, state);
     }

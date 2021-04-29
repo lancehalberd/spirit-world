@@ -179,7 +179,7 @@ function showLootMessage(state: GameState, lootType: LootType, lootLevel?: numbe
                 + '{|}Press {B_PREV_ELEMENT}/{B_NEXT_ELEMENT} to switch elements.'
                 + '{|}Changing your element has no effect for now.');
         case 'money':
-            return showMessage(state, `You found ${lootAmount || 1} coins!`);
+            return showMessage(state, `You found ${lootAmount || 1} Jade!`);
     }
 }
 

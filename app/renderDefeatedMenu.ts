@@ -4,7 +4,7 @@ import { fillRect, pad } from 'app/utils/index';
 import { GameState } from 'app/types';
 
 const WIDTH = CANVAS_WIDTH * 3 / 4;
-const HEIGHT = CANVAS_HEIGHT / 4;
+const HEIGHT = 3 * CANVAS_HEIGHT / 8;
 
 export function renderDefeatedMenu(context: CanvasRenderingContext2D, state: GameState): void {
 
@@ -26,11 +26,17 @@ export function renderDefeatedMenu(context: CanvasRenderingContext2D, state: Gam
     context.textBaseline = 'middle';
     context.textAlign = 'left';
     context.font = '16px Arial';
+    context.fillStyle = state.hero.money >= 50 ? 'white' : '#666';
+    context.fillText('REVIVE (-50 JADE)', x, y + 2);
+    y = r.y + r.h * 2 / 4;
+    if (state.menuIndex === 1) {
+        selectedY = y;
+    }
     context.fillStyle = 'white';
     context.fillText('CONTINUE', x, y + 2);
 
-    y = r.y + r.h * 3 / 4
-    if (state.menuIndex === 1) {
+    y = r.y + r.h * 3 / 4;
+    if (state.menuIndex === 2) {
         selectedY = y;
     }
     context.fillText('QUIT', x, y + 2);

@@ -367,6 +367,10 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
         values: ['select', 'brush', 'delete', 'replace', 'object', 'enemy', 'boss'],
         onChange(tool: EditorToolType) {
             editingState.tool = tool;
+            editingState.selectedObject = {
+                ...editingState.selectedObject,
+                id: null,
+            };
             displayTileEditorPropertyPanel();
         },
     });

@@ -83,13 +83,13 @@ const LEFT_ANALOG_X_AXIS = 0;
 //const RIGHT_ANALOG_X_AXIS = 2; // eslint-disable-line no-unused-vars
 const GAME_PAD_AXIS_MAPPINGS = {
     // Map the negative y axis of the left stick to the up key.
-    [KEY.UP]: [LEFT_ANALOG_Y_AXIS, -1],
+    [GAME_KEY.UP]: [LEFT_ANALOG_Y_AXIS, -1],
     // Map the positive y axis of the left stick to the down key.
-    [KEY.DOWN]: [LEFT_ANALOG_Y_AXIS, 1],
+    [GAME_KEY.DOWN]: [LEFT_ANALOG_Y_AXIS, 1],
     // Map the negative x axis of the left stick to the up key.
-    [KEY.LEFT]: [LEFT_ANALOG_X_AXIS, -1],
+    [GAME_KEY.LEFT]: [LEFT_ANALOG_X_AXIS, -1],
     // Map the positive x axis of the left stick to the down key.
-    [KEY.RIGHT]: [LEFT_ANALOG_X_AXIS, 1],
+    [GAME_KEY.RIGHT]: [LEFT_ANALOG_X_AXIS, 1],
 };
 
 // Apparently, depending on the button type, either button.pressed or button == 1.0 indicates the button is pressed.
@@ -199,6 +199,9 @@ export function updateKeyboardState(state: GameState) {
     const gameKeysDown: Set<number> = new Set();
     const gameKeysPressed: Set<number> = new Set();
     const gameKeysReleased: Set<number> = new Set();
+    /*for (const gameKey of GAME_PAD_AXIS_MAPPINGS) {
+
+    }*/
     for (let gameKey of Object.values(GAME_KEY)) {
         gameKeyValues[gameKey] = 0;
         for (const keyboardCode of KEYBOARD_MAPPINGS[gameKey]) {

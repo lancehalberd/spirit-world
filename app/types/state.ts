@@ -51,7 +51,10 @@ export interface GameState {
     },
     paused: boolean,
     menuIndex: number,
-    defeated: boolean,
+    defeatState: {
+        defeated: boolean,
+        time: number,
+    },
     scene: Scene,
     keyboard: {
         gameKeyValues: number[],

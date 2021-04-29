@@ -532,7 +532,8 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         }
     }
     if (hero.life <= 0) {
-        state.defeated = true;
+        state.defeatState.defeated = true;
+        state.defeatState.time = 0;
         state.menuIndex = 0;
     }
     state.hero.magic += state.hero.magicRegen * FRAME_LENGTH / 1000;
@@ -668,7 +669,7 @@ export function damageActor(
     } else if (actor === state.hero || state.hero.clones.indexOf(actor as any) >= 0) {
         // If any clones are in use, any damage one takes destroys it until only one clone remains.
         // Damage applies to the hero, not the clone.
-        state.hero.life -= damage;
+        state.hero.life -= damage / 2;
         state.hero.invulnerableFrames = 50;
         // Taking damage resets radius for spirit sight meditation.
         state.hero.spiritRadius = 0;

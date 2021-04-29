@@ -383,7 +383,7 @@ const f0_1x0: AreaDefinition = {
         {status: "normal", id: "tomb:0:0x1-arrowTurret-0", x: 192, y: 304, type: "enemy", enemyType: "wallLaser", d: "down"},
         {status: "normal", id: "tomb:0:0x1-arrowTurret-1", x: 32, y: 288, type: "enemy", enemyType: "wallLaser", d: "down"},
         {status: "normal", id: "tomb:0:0x1-arrowTurret-1", x: 48, y: 304, type: "enemy", enemyType: "wallLaser", d: "down", params: {}},
-        {status: "normal", id: "tomb:0:0x1-arrowTurret-1", x: 208, y: 288, type: "enemy", enemyType: "wallLaser", d: "left", params: {}},
+        {status: "normal", id: "tomb:0:0x1-arrowTurret-1", x: 208, y: 288, type: "enemy", enemyType: "wallLaser", d: "down", params: {}},
         {status: "normal", id: "tomb:0:0x1-arrowTurret-1", x: 48, y: 32, type: "enemy", enemyType: "wallLaser", d: "down", params: {}},
         {status: "normal", id: "tomb:0:0x1-arrowTurret-1", x: 208, y: 144, type: "enemy", enemyType: "wallLaser", d: "left", params: {}},
         {status: "normal", id: "tomb:0:0x1-arrowTurret-1", x: 208, y: 96, type: "enemy", enemyType: "wallLaser", d: "left", params: {}},

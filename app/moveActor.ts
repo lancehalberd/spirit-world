@@ -330,7 +330,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
     // We don't want a player to be able to walk in between pits without falling, so the character is forced to fall
     // any time all four corners are over pits.
     hero.wading = true;
-    hero.swimming = true;
+    hero.swimming = hero.z <= 0;
     let fallingTopLeft = false, fallingTopRight = false, fallingBottomLeft = false, fallingBottomRight = false;
     let startClimbing = false;
     for (let row = topRow; row <= bottomRow; row++) {

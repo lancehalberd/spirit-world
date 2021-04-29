@@ -51,7 +51,7 @@ export function update() {
             state.scene === 'deleteSavedGame' || state.scene === 'deleteSavedGameConfirmation'
         ) {
             updateTitle(state);
-        } else if (state.defeated) {
+        } else if (state.defeatState.defeated) {
             updateDefeated(state);
         } else {
             if (wasGameKeyPressed(state, GAME_KEY.MENU)) {
@@ -225,12 +225,33 @@ function updateMenu(state: GameState) {
 }
 
 function updateDefeated(state: GameState) {
-    if (wasGameKeyPressed(state, GAME_KEY.UP) || wasGameKeyPressed(state, GAME_KEY.DOWN)) {
-        state.menuIndex = (state.menuIndex + 1) % 2;
+    state.defeatState.time += FRAME_LENGTH;
+    if (state.menuIndex === 0 && state.hero.money < 50) {
+        state.menuIndex = 1;
+    }
+    // Add 0.5s pause afer showing menu before taking input so that players don't accidentally take action.
+    if (state.defeatState.time < 1500) {
+        return;
+    }
+    if (wasGameKeyPressed(state, GAME_KEY.UP)) {
+        state.menuIndex = (state.menuIndex + 2) % 3;
+        if (state.menuIndex === 0 && state.hero.money < 50) {
+            state.menuIndex = 2;
+        }
+    } else if (wasGameKeyPressed(state, GAME_KEY.DOWN)) {
+        state.menuIndex = (state.menuIndex + 1) % 3;
+        if (state.menuIndex === 0 && state.hero.money < 50) {
+            state.menuIndex = 1;
+        }
     } else if (isConfirmKeyPressed(state)) {
-        if (state.menuIndex === 0) {
-            returnToSpawnLocation(state);
+        if (state.menuIndex === 0 && state.hero.money >= 50) {
+            state.hero.money -= 50;
+            state.hero.life = state.hero.maxLife;
+            state.defeatState.defeated = false;
+            saveGame();
         } else if (state.menuIndex === 1) {
+            returnToSpawnLocation(state);
+        } else if (state.menuIndex === 2) {
             state.scene = 'title';
             state.menuIndex = state.savedGameIndex;
             setSaveFileToState(state.menuIndex);

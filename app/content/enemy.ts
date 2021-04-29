@@ -3,6 +3,7 @@ import _ from 'lodash';
 import { AnimationEffect } from 'app/content/animationEffect';
 import { EnemyArrow } from 'app/content/arrow';
 import { LightningBolt } from 'app/content/effects/lightningBolt';
+import { Flame } from 'app/content/effects/flame';
 import { FlameWall } from 'app/content/effects/flameWall';
 import { FrostGrenade } from 'app/content/effects/frostGrenade';
 import { dropItemFromTable, getLoot } from 'app/content/lootObject';
@@ -24,7 +25,12 @@ import {
 
 
 export const enemyTypes = <const>[
-    'arrowTurret', 'beetle', 'beetleHorned', 'beetleMini', 'beetleWinged', 'snake', 'wallLaser',
+    'arrowTurret',
+    'beetle', 'beetleHorned', 'beetleMini', 'beetleWinged',
+    'flameSnake', 'frostBeetle',
+    'lightningBug',
+    'snake',
+    'wallLaser',
 ];
 // Not intended for use in the editor.
 const minionTypes = <const>['beetleBossWingedMinionDefinition'];
@@ -70,6 +76,7 @@ export class Enemy implements Actor, ObjectInstance {
     invulnerableFrames = 0;
     status: ObjectStatus = 'normal';
     scale: number = 1;
+    shielded: boolean = false;
     constructor(state: GameState, definition: EnemyObjectDefinition | BossObjectDefinition) {
         this.definition = definition;
         this.enemyDefinition = enemyDefinitions[this.definition.enemyType] || enemyDefinitions.snake;
@@ -130,7 +137,7 @@ export class Enemy implements Actor, ObjectInstance {
         this.modeTime = 0;
     }
     takeDamage(state: GameState, damage: number) {
-        if (this.mode === 'shielded') {
+        if (this.shielded) {
             playSound('getMoney');
             return;
         }
@@ -407,15 +414,123 @@ export const enemyDefinitions: {[key in EnemyType | BossType | MinionType]: Enem
         alwaysReset: true,
         animations: beetleAnimations, scale: 2,
         life: 8, touchDamage: 1, update: updateFrostIdol, render: renderIdolShield,
-    }
+    },
+    flameSnake: {
+        alwaysReset: true,
+        animations: snakeAnimations, speed: 1.2,
+        life: 3, touchDamage: 1, update: updateFlameSnake, flipRight: true,
+    },
+    frostBeetle: {
+        alwaysReset: true,
+        animations: beetleAnimations, speed: 0.7, aggroRadius: 112,
+        life: 5, touchDamage: 1, update: updateFrostBeetle,
+    },
+    lightningBug: {
+        alwaysReset: true,
+        animations: beetleWingedAnimations, acceleration: 0.2, speed: 1.2, aggroRadius: 112, flying: true,
+        life: 3, touchDamage: 1, update: updateStormLightningBug, render: renderLightningShield,
+    },
 };
 
+function updateFlameSnake(state: GameState, enemy: Enemy): void {
+    paceRandomly(state, enemy);
+    if (enemy.params.flameCooldown > 0) {
+        enemy.params.flameCooldown -= FRAME_LENGTH;
+    } else {
+        const hitbox = enemy.getHitbox(state);
+        const flame = new Flame({
+            x: hitbox.x + hitbox.w / 2,
+            y: hitbox.y + hitbox.h / 2 - 1,
+        });
+        flame.x -= flame.w / 2;
+        flame.y -= flame.h / 2;
+        addObjectToArea(state, state.areaInstance, flame);
+        enemy.params.flameCooldown = 400;
+    }
+    enemy.params.shootCooldown = enemy.params.shootCooldown ?? 1000 + Math.random() * 1000;
+    if (enemy.params.shootCooldown > 0) {
+        enemy.params.shootCooldown -= FRAME_LENGTH;
+    } else if (enemy.modeTime >= 200) {
+        const {hero} = getLineOfSightTargetAndDirection(state, enemy, enemy.d);
+        if (!hero) {
+            return;
+        }
+        enemy.params.shootCooldown = 2000;
+        const hitbox = enemy.getHitbox(state);
+        const [dx, dy] = directionMap[enemy.d];
+        const flame = new Flame({
+            x: hitbox.x + hitbox.w / 2 + dx * hitbox.w / 2,
+            y: hitbox.y + hitbox.h / 2 - 1 + dy * hitbox.h / 2,
+            vx: 4 * dx,
+            vy: 4 * dy,
+            ttl: 1000,
+        });
+        flame.x -= flame.w / 2;
+        flame.y -= flame.h / 2;
+        addObjectToArea(state, state.areaInstance, flame);
+        enemy.params.flameCooldown = 400;
+    }
+}
+function updateFrostBeetle(state: GameState, enemy: Enemy): void {
+    if (enemy.params.shootCooldown > 0) {
+        enemy.params.shootCooldown -= FRAME_LENGTH;
+    } else {
+        const attackVector = getVectorToNearbyHero(state, enemy, enemy.aggroRadius / 2);
+        if (attackVector) {
+            throwIceGrenadeAtLocation(state, enemy, {
+                tx: state.hero.x + state.hero.w / 2,
+                ty: state.hero.y + state.hero.h / 2,
+            });
+            enemy.params.shootCooldown = 2000;
+        } else {
+            scurryAndChase(state, enemy);
+        }
+    }
+}
+function updateStormLightningBug(state: GameState, enemy: Enemy): void {
+    enemy.params.shieldColor = 'yellow';
+    scurryAndChase(state, enemy);
+    enemy.params.shieldCooldown = enemy.params.shieldCooldown ?? 1000 + Math.random() * 1000;
+    if (enemy.params.shieldCooldown > 0) {
+        enemy.params.shieldCooldown -= FRAME_LENGTH;
+        if (enemy.params.shieldCooldown < 2000) {
+            enemy.shielded = false;
+        }
+    } else {
+        const chaseVector = getVectorToNearbyHero(state, enemy, enemy.aggroRadius);
+        if (chaseVector) {
+            enemy.params.shieldCooldown = 4000;
+            enemy.shielded = true;
+        }
+    }
+}
+
+function renderLightningShield(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
+    const hitbox = enemy.getHitbox(state);
+    context.strokeStyle = enemy.params.shieldColor ?? '#888';
+    if (enemy.shielded) {
+        context.save();
+            context.globalAlpha = 0.7 + 0.3 * Math.random();
+            context.beginPath();
+            context.arc(hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2, hitbox.w / 2, 0, 2 * Math.PI);
+            context.stroke();
+        context.restore();
+    } else {
+        let theta = Math.random() * Math.PI / 8;
+        for (let i = 0; i < 4; i++) {
+            context.beginPath();
+            context.arc(hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2, hitbox.w / 2, theta, theta + (1 + Math.random()) * Math.PI / 8);
+            theta += 2 * Math.PI / 4 + Math.random() * Math.PI / 8;
+            context.stroke();
+        }
+    }
+}
 function renderIdolShield(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
-    if (enemy.mode === 'shielded') {
+    if (enemy.shielded) {
         const hitbox = enemy.getHitbox(state);
         context.save();
             context.globalAlpha = 0.5;
-            context.fillStyle = enemy.params.color ?? '#888';
+            context.fillStyle = enemy.params.shieldColor ?? '#888';
             context.fillRect(hitbox.x, hitbox.y, hitbox.w, hitbox.h);
         context.restore();
     }
@@ -424,12 +539,14 @@ function updateElementalIdol(state: GameState, enemy: Enemy, attack: () => void)
     if (typeof enemy.params.priority === 'undefined') {
         enemy.params.priority = Math.random();
         enemy.setMode('shielded');
+        enemy.shielded = true;
     }
     // Immediately put up shield on entering pinch mode.
     if (!enemy.params.pinchMode && enemy.life <= 4) {
         enemy.params.pinchMode = true;
         enemy.params.priority = Math.ceil(enemy.params.priority) + Math.random();
         enemy.setMode('shielded');
+        enemy.shielded = true;
     }
     if (!state.areaInstance.objects.some(object => object instanceof Enemy && object.params.priority < enemy.params.priority)) {
         if (enemy.mode === 'attack') {
@@ -446,16 +563,19 @@ function updateElementalIdol(state: GameState, enemy: Enemy, attack: () => void)
             if (enemy.modeTime >= 2000) {
                 enemy.params.priority = Math.ceil(enemy.params.priority) + Math.random();
                 enemy.setMode('shielded');
+                enemy.shielded = true;
             }
         } else if (enemy.modeTime > 1000) {
             enemy.setMode('attack');
+            enemy.shielded = false;
         }
     } else {
         enemy.setMode('shielded');
+        enemy.shielded = true;
     }
 }
 function updateStormIdol(state: GameState, enemy: Enemy): void {
-    enemy.params.color = 'yellow';
+    enemy.params.shieldColor = 'yellow';
     updateElementalIdol(state, enemy, () => {
         enemy.params.theta = (enemy.params.theta || 0) + Math.PI / 4;
         const lightningBolt = new LightningBolt({
@@ -467,7 +587,7 @@ function updateStormIdol(state: GameState, enemy: Enemy): void {
     })
 }
 function updateFlameIdol(state: GameState, enemy: Enemy): void {
-    enemy.params.color = 'red';
+    enemy.params.shieldColor = 'red';
     updateElementalIdol(state, enemy, () => {
         enemy.params.rotations = (enemy.params.rotations ?? Math.floor(Math.random() * 3)) + 1;
         const flameWall = new FlameWall({
@@ -476,29 +596,33 @@ function updateFlameIdol(state: GameState, enemy: Enemy): void {
         addObjectToArea(state, state.areaInstance, flameWall);
     })
 }
+function throwIceGrenadeAtLocation(state: GameState, enemy: Enemy, {tx, ty}: {tx: number, ty: number}): void {
+    const hitbox = enemy.getHitbox(state);
+    const x = hitbox.x + hitbox.w / 2;
+    const y = hitbox.y + hitbox.h / 2;
+    const z = 8;
+    const vz = 4;
+    const az = -0.3;
+    const duration = -2 * vz / az;
+    const frostGrenade = new FrostGrenade({
+        x,
+        y,
+        z,
+        vx: (tx - x) / duration,
+        vy: (ty - y) / duration,
+        vz,
+        az,
+    });
+    addObjectToArea(state, state.areaInstance, frostGrenade);
+}
 function updateFrostIdol(state: GameState, enemy: Enemy): void {
-    enemy.params.color = '#08F';
+    enemy.params.shieldColor = '#08F';
     updateElementalIdol(state, enemy, () => {
         enemy.params.theta = 2 * Math.PI * Math.random();
-        const hitbox = enemy.getHitbox(state);
-        const x = hitbox.x + hitbox.w / 2;
-        const y = hitbox.y + hitbox.h / 2;
-        const z = 8;
-        const vz = 4;
-        const az = -0.3;
-        const duration = -2 * vz / az;
-        const dx = (state.hero.x + state.hero.w / 2 + 16 * Math.cos(enemy.params.theta) - x) || (1 + Math.random());
-        const dy = (state.hero.y + state.hero.h / 2 + 16 * Math.sin(enemy.params.theta) - y) || (1 + Math.random());
-        const frostGrenade = new FrostGrenade({
-            x,
-            y,
-            z,
-            vx: dx / duration,
-            vy: dy / duration,
-            vz,
-            az,
+        throwIceGrenadeAtLocation(state, enemy, {
+            tx: state.hero.x + state.hero.w / 2 + 16 * Math.cos(enemy.params.theta),
+            ty: state.hero.y + state.hero.h / 2 + 16 * Math.sin(enemy.params.theta),
         });
-        addObjectToArea(state, state.areaInstance, frostGrenade);
     })
 }
 

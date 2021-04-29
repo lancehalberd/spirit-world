@@ -27,6 +27,19 @@ Graphics:
 Todo:
 
 Current tasks:
+    - Finish adding enemies to warTemple.
+    - Add development action for switching states:
+        - Set items + health
+        - Set spawn point
+        - Shouldn't need to worry about setting flags, except in specific cases like warTemple door.
+        - States:
+            Start
+            Cave Boss
+            Tomb Start
+            Tomb Boss
+            War Temple Start (summoner ruins w spirit sight)
+            War Temple Interior
+            War Temple Boss
     - Difficulty shrine:
         - 50 money per point
         - move points around for free
@@ -36,19 +49,7 @@ Current tasks:
         - Remove boss webs
         - Reduce boss health
 
-Idea:
-    Objects you can bounce off of when jumping
-        - Just make them solid and knock the player back a bit if the player's y velocity is >= some value?
 
-Peach Cave Improvemnts:
-    - Add enemies:
-        - Eggs that hatch into enemies if not destroyed first
-        - Vine enemies that can be knocked to the ground
-    - Sticky Web Ground
-    - Make cliffs omni directional (but you can't jump from 'climbing')
-    - Add boss:
-        - Spawns eggs
-        - Drains light and regains a bit of health for every 25% lost
 
 At some point I should write tests to validate certain things like:
     - All zone+object targets are defined.
@@ -69,6 +70,17 @@ Quick Demo
     - Charge tool to unlock lvl 2 tools
     - Combined tool puzzles
 
+
+Peach Cave Improvemnts:
+    - Add enemies:
+        - Eggs that hatch into enemies if not destroyed first
+        - Vine enemies that can be knocked to the ground
+    - Sticky Web Ground
+    - Make cliffs omni directional (but you can't jump from 'climbing')
+    - Add boss:
+        - Spawns eggs
+        - Drains light and regains a bit of health for every 25% lost
+
 Dungeon 1 Improvements
     - Add rival fight when you open the door:
         - Rival guards the tomb
@@ -77,12 +89,10 @@ Dungeon 1 Improvements
     - Update wall laser graphics+behavior to actuall shoot lasers + be mounted on walls.
     - Update arrow turret graphics.
 
-
 Dungeon 2 Improvments:
-    - New Enemies:
-        Flame Snake: Leaves a trail of flame behind, shoots a fire ball with 2s cooldown on line of sight, 2 life
-        Ice Golem: 6 life, walks slowly, throws ice grenades when in 64px radius of player with 3s cooldown.
-        Lightning Bug: 2 life, flies towards player within aggro radius, puts up lightning shield for 2s with 4s cooldown.
+    - Add more uses of spirit sight:
+        - See actual elemental beasts in the front room where the statues are located.
+        - Some kind of optional spirit sight puzzle for a peach piece.
     - Finish boss behaviors:
         Storm Idol:
             Add shockwaves to LightningBolt
@@ -172,6 +182,9 @@ Animate hearts refilling
 
 Add spirit element that replaces the default 'none' element when the upgrade is found. In vanilla this would require getting all other elements first.
 
+Idea:
+    Objects you can bounce off of when jumping
+        - Just make them solid and knock the player back a bit if the player's y velocity is >= some value?
 
 Add offering shrines in dungeons that allow players to adjust the difficulty by paying 50 money:
     - Take 1/2 damage

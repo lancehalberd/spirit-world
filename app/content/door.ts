@@ -204,7 +204,7 @@ export class Door implements ObjectInstance {
                     applyBehaviorToTile(this.area, x + 1, y + 1, { solidMap: BITMAP_RIGHT, low: false });
                 }
             } else {
-                const behaviors = { solid: true, low: false};
+                const behaviors = { solid: true, solidMap: undefined, low: false};
                 applyBehaviorToTile(this.area, x, y, behaviors);
                 applyBehaviorToTile(this.area, x + 1, y, behaviors);
                 applyBehaviorToTile(this.area, x, y + 1, behaviors);

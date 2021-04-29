@@ -192,7 +192,10 @@ function getDefaultState(): GameState {
         areaGrid: zones.peachCave.floors[0].grid,
         paused: false,
         menuIndex: 0,
-        defeated: false,
+        defeatState: {
+            defeated: false,
+            time: 0,
+        },
         scene: 'title',
         keyboard: {
             gameKeyValues: [],
@@ -220,7 +223,7 @@ export function returnToSpawnLocation(state: GameState) {
     if (state.hero.magicRegen) {
         state.hero.magic = state.hero.maxMagic;
     }
-    state.defeated = false;
+    state.defeatState.defeated = false;
     // Clear out any state/flags that shouldn't be kept on the hero.
     state.hero.pickUpTile = null;
     state.hero.pickUpObject = null;
