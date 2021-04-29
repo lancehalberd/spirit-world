@@ -2,6 +2,9 @@ import _ from 'lodash';
 
 import { AnimationEffect } from 'app/content/animationEffect';
 import { EnemyArrow } from 'app/content/arrow';
+import { LightningBolt } from 'app/content/effects/lightningBolt';
+import { FlameWall } from 'app/content/effects/flameWall';
+import { FrostGrenade } from 'app/content/effects/frostGrenade';
 import { dropItemFromTable, getLoot } from 'app/content/lootObject';
 import { simpleLootTable, lifeLootTable, moneyLootTable } from 'app/content/lootTables';
 import { addObjectToArea, getAreaSize } from 'app/content/areas';
@@ -9,7 +12,7 @@ import { FRAME_LENGTH } from 'app/gameConstants';
 import { moveActor } from 'app/moveActor';
 import { saveGame } from 'app/state';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
-import { directionMap } from 'app/utils/field';
+import { directionMap, rotateDirection } from 'app/utils/field';
 import { playSound } from 'app/utils/sounds';
 
 import {
@@ -25,7 +28,10 @@ export const enemyTypes = <const>[
 ];
 // Not intended for use in the editor.
 const minionTypes = <const>['beetleBossWingedMinionDefinition'];
-export const bossTypes = <const>['beetleBoss'];
+export const bossTypes = <const>[
+    'beetleBoss',
+    'stormIdol', 'flameIdol', 'frostIdol',
+];
 export type EnemyType = typeof enemyTypes[number];
 export type BossType = typeof bossTypes[number];
 export type MinionType = typeof minionTypes[number];
@@ -124,6 +130,10 @@ export class Enemy implements Actor, ObjectInstance {
         this.modeTime = 0;
     }
     takeDamage(state: GameState, damage: number) {
+        if (this.mode === 'shielded') {
+            playSound('getMoney');
+            return;
+        }
         this.life -= damage;
         // This is actually the number of frames the enemy cannot damage the hero for.
         this.invulnerableFrames = 50;
@@ -149,17 +159,20 @@ export class Enemy implements Actor, ObjectInstance {
             );
         }
         addObjectToArea(state, this.area, deathAnimation);
+        if (this.enemyDefinition.onDeath) {
+            this.enemyDefinition.onDeath(state, this);
+        }
         if (this.definition.type === 'boss') {
             // If the last boss is defeated kill all regular enemies.
             if (!this.area.objects.some(object => (object instanceof Enemy) && object.definition.type === 'boss' && object.life > 0)) {
                 this.area.objects.forEach(object => (object instanceof Enemy) && object.life > 0 && object.takeDamage(state, object.life));
-            }
-            if (!state.savedState.objectFlags[this.definition.id]) {
-                state.savedState.objectFlags[this.definition.id] = true;
-                if (this.definition.lootType) {
-                    getLoot(state, this.definition);
+                if (!state.savedState.objectFlags[this.definition.id]) {
+                    state.savedState.objectFlags[this.definition.id] = true;
+                    if (this.definition.lootType && this.definition.lootType !== 'empty') {
+                        getLoot(state, this.definition);
+                    }
+                    saveGame();
                 }
-                saveGame();
             }
         }
     }
@@ -221,10 +234,13 @@ export class Enemy implements Actor, ObjectInstance {
             context.fillStyle = 'red';
             context.fillRect(hitbox.x, hitbox.y, hitbox.w, hitbox.h);*/
         context.restore();
+        if (this.enemyDefinition.render) {
+            this.enemyDefinition.render(context, state, this);
+        }
     }
 }
 
-const snakeGeometry = { w: 18, h: 18, content: { x: 1, y: 6, w: 16, h: 16} };
+const snakeGeometry = { w: 18, h: 18, content: { x: 2, y: 6, w: 14, h: 11} };
 const leftSnakeAnimation: FrameAnimation = createAnimation('gfx/enemies/snek.png', snakeGeometry, { x: 0});
 const downSnakeAnimation: FrameAnimation = createAnimation('gfx/enemies/snek.png', snakeGeometry, { x: 1});
 const upSnakeAnimation: FrameAnimation = createAnimation('gfx/enemies/snek.png', snakeGeometry, { x: 2});
@@ -236,7 +252,7 @@ const snakeAnimations: ActorAnimations = {
         right: leftSnakeAnimation,
     },
 };
-const beetleGeometry = { w: 18, h: 17, content: { x: 1, y: 4, w: 16, h: 16} };
+const beetleGeometry = { w: 18, h: 17, content: { x: 2, y: 4, w: 14, h: 12} };
 const beetleDownAnimation: FrameAnimation = createAnimation('gfx/enemies/genericbeetle.png', beetleGeometry, { y: 0, cols: 4});
 const beetleRightAnimation: FrameAnimation = createAnimation('gfx/enemies/genericbeetle.png', beetleGeometry, { y: 1, cols: 4});
 const beetleUpAnimation: FrameAnimation = createAnimation('gfx/enemies/genericbeetle.png', beetleGeometry, { y: 2, cols: 4});
@@ -272,7 +288,7 @@ const beetleMiniAnimations: ActorAnimations = {
     },
 };
 
-const beetleHornedGeometry = { w: 22, h: 18, content: { x: 3, y: 4, w: 16, h: 16} };
+const beetleHornedGeometry = { w: 22, h: 18, content: { x: 4, y: 4, w: 14, h: 13} };
 const beetleHornedDownAnimation: FrameAnimation = createAnimation('gfx/enemies/hornedbeetle.png', beetleHornedGeometry, { y: 0, cols: 4});
 const beetleHornedRightAnimation: FrameAnimation = createAnimation('gfx/enemies/hornedbeetle.png', beetleHornedGeometry, { y: 2, cols: 4});
 const beetleHornedUpAnimation: FrameAnimation = createAnimation('gfx/enemies/hornedbeetle.png', beetleHornedGeometry, { y: 4, cols: 4});
@@ -297,7 +313,7 @@ const beetleHornedAnimations: ActorAnimations = {
     }
 };
 
-const beetleWingedGeometry = { w: 22, h: 18, content: { x: 3, y: 4, w: 16, h: 16} };
+const beetleWingedGeometry = { w: 22, h: 18, content: { x: 4, y: 4, w: 14, h: 13} };
 const beetleWingedAnimation: FrameAnimation = createAnimation('gfx/enemies/flyingbeetle.png', beetleWingedGeometry, { cols: 4});
 const beetleWingedAnimations: ActorAnimations = {
     idle: {
@@ -316,13 +332,15 @@ interface EnemyDefinition {
     flying?: boolean,
     hasShadow?: boolean,
     life?: number,
-    lootTable: LootTable,
+    lootTable?: LootTable,
     params?: any,
     speed?: number,
     acceleration?: number,
     scale?: number,
     touchDamage: number,
-    update: (state: GameState, enemy: Enemy) => void,
+    update?: (state: GameState, enemy: Enemy) => void,
+    onDeath?: (state: GameState, enemy: Enemy) => void,
+    render?: (context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) => void,
 }
 
 export const enemyDefinitions: {[key in EnemyType | BossType | MinionType]: EnemyDefinition} = {
@@ -375,8 +393,114 @@ export const enemyDefinitions: {[key in EnemyType | BossType | MinionType]: Enem
         animations: snakeAnimations, life: 1, touchDamage: 1, update: updateWallLaser, flipRight: true,
         lootTable: simpleLootTable, params: { alwaysShoot: false },
     },
+    stormIdol: {
+        alwaysReset: true,
+        animations: beetleWingedAnimations, scale: 2,
+        life: 8, touchDamage: 1, update: updateStormIdol, render: renderIdolShield,
+    },
+    flameIdol: {
+        alwaysReset: true,
+        animations: snakeAnimations, scale: 2,
+        life: 8, touchDamage: 1, update: updateFlameIdol, render: renderIdolShield,
+    },
+    frostIdol: {
+        alwaysReset: true,
+        animations: beetleAnimations, scale: 2,
+        life: 8, touchDamage: 1, update: updateFrostIdol, render: renderIdolShield,
+    }
 };
 
+function renderIdolShield(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
+    if (enemy.mode === 'shielded') {
+        const hitbox = enemy.getHitbox(state);
+        context.save();
+            context.globalAlpha = 0.5;
+            context.fillStyle = enemy.params.color ?? '#888';
+            context.fillRect(hitbox.x, hitbox.y, hitbox.w, hitbox.h);
+        context.restore();
+    }
+}
+function updateElementalIdol(state: GameState, enemy: Enemy, attack: () => void) {
+    if (typeof enemy.params.priority === 'undefined') {
+        enemy.params.priority = Math.random();
+        enemy.setMode('shielded');
+    }
+    // Immediately put up shield on entering pinch mode.
+    if (!enemy.params.pinchMode && enemy.life <= 4) {
+        enemy.params.pinchMode = true;
+        enemy.params.priority = Math.ceil(enemy.params.priority) + Math.random();
+        enemy.setMode('shielded');
+    }
+    if (!state.areaInstance.objects.some(object => object instanceof Enemy && object.params.priority < enemy.params.priority)) {
+        if (enemy.mode === 'attack') {
+            if (!enemy.params.pinchMode) {
+                if (enemy.modeTime === 1000) {
+                    attack();
+                }
+            } else {
+                if (enemy.modeTime === 500 || enemy.modeTime === 1000) {
+                    enemy.params.theta = (enemy.params.theta || 0) + Math.PI / 4;
+                    attack();
+                }
+            }
+            if (enemy.modeTime >= 2000) {
+                enemy.params.priority = Math.ceil(enemy.params.priority) + Math.random();
+                enemy.setMode('shielded');
+            }
+        } else if (enemy.modeTime > 1000) {
+            enemy.setMode('attack');
+        }
+    } else {
+        enemy.setMode('shielded');
+    }
+}
+function updateStormIdol(state: GameState, enemy: Enemy): void {
+    enemy.params.color = 'yellow';
+    updateElementalIdol(state, enemy, () => {
+        enemy.params.theta = (enemy.params.theta || 0) + Math.PI / 4;
+        const lightningBolt = new LightningBolt({
+            x: state.hero.x + state.hero.w / 2,
+            y: state.hero.y + state.hero.h / 2,
+            shockWaveTheta: enemy.params.theta,
+        });
+        addObjectToArea(state, state.areaInstance, lightningBolt);
+    })
+}
+function updateFlameIdol(state: GameState, enemy: Enemy): void {
+    enemy.params.color = 'red';
+    updateElementalIdol(state, enemy, () => {
+        enemy.params.rotations = (enemy.params.rotations ?? Math.floor(Math.random() * 3)) + 1;
+        const flameWall = new FlameWall({
+            direction: rotateDirection('down', enemy.params.rotations),
+        });
+        addObjectToArea(state, state.areaInstance, flameWall);
+    })
+}
+function updateFrostIdol(state: GameState, enemy: Enemy): void {
+    enemy.params.color = '#08F';
+    updateElementalIdol(state, enemy, () => {
+        enemy.params.theta = 2 * Math.PI * Math.random();
+        const hitbox = enemy.getHitbox(state);
+        const x = hitbox.x + hitbox.w / 2;
+        const y = hitbox.y + hitbox.h / 2;
+        const z = 8;
+        const vz = 4;
+        const az = -0.3;
+        const duration = -2 * vz / az;
+        const dx = (state.hero.x + state.hero.w / 2 + 16 * Math.cos(enemy.params.theta) - x) || (1 + Math.random());
+        const dy = (state.hero.y + state.hero.h / 2 + 16 * Math.sin(enemy.params.theta) - y) || (1 + Math.random());
+        const frostGrenade = new FrostGrenade({
+            x,
+            y,
+            z,
+            vx: dx / duration,
+            vy: dy / duration,
+            vz,
+            az,
+        });
+        addObjectToArea(state, state.areaInstance, frostGrenade);
+    })
+}
 
 function spinAndShoot(state: GameState, enemy: Enemy): void {
     if (typeof enemy.params.currentTheta === 'undefined') {

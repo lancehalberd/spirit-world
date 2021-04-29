@@ -304,6 +304,10 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             }
         }
     }
+    if (hero.action !== 'meditating') {
+        hero.spiritRadius = 0;
+        hero.explosionTime = 0;
+    }
     if (dx || dy) {
         const encumbered = hero.pickUpObject || hero.pickUpTile;
         moveActor(state, hero, dx, dy, {

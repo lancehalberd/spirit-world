@@ -73,6 +73,9 @@ export function setSaveFileToState(savedGameIndex: number, gameMode: number = 0)
             ...defaultSavedState.hero,
             ...savedGame.hero,
             render: renderHero,
+            spiritRadius: 0,
+            explosionTime: 0,
+            invulnerableFrames: 0,
         },
     };
     state.hero = state.savedState.hero;

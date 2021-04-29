@@ -27,10 +27,6 @@ Graphics:
 Todo:
 
 Current tasks:
-    - Dungeon 2: Ruins of Summoner village and Temple of War
-        - Expected loadout: Cat Eyes, 6 hearts, Dodge, Bow, Spirit Sight
-        - Big Chest: Gloves 1
-        - Boss Reward: Astral Projection
     - Difficulty shrine:
         - 50 money per point
         - move points around for free
@@ -80,6 +76,23 @@ Dungeon 1 Improvements
         - If you are defeated, the elder may save you, otherwise it is game over.
     - Update wall laser graphics+behavior to actuall shoot lasers + be mounted on walls.
     - Update arrow turret graphics.
+
+
+Dungeon 2 Improvments:
+    - New Enemies:
+        Flame Snake: Leaves a trail of flame behind, shoots a fire ball with 2s cooldown on line of sight, 2 life
+        Ice Golem: 6 life, walks slowly, throws ice grenades when in 64px radius of player with 3s cooldown.
+        Lightning Bug: 2 life, flies towards player within aggro radius, puts up lightning shield for 2s with 4s cooldown.
+    - Finish boss behaviors:
+        Storm Idol:
+            Add shockwaves to LightningBolt
+            When defeated lightning bolts appear above the player once every 5 seconds
+        Flame Idol:
+            When defeated flame walls appear once every 5 seconds.
+        Frost Idol:
+            Add freeze effect to FrostBlast
+            When defeated gradualls change the entire floor to ice.
+
 
 Add ability to charge weapon
     Spin chakram around quickly in a circle twice (can move after throwing)
@@ -266,3 +279,11 @@ Dungeon 1:
     - A facade is built aroaund the structure to disguise it as a mundane structure
         - The Vanara village posts guards in addition to the traps to keep people out
     - MCs father refused to go back to sleep, having fallen in love with MCs mother and not wanting to forget about her.
+
+
+Dungeon 2: Ruins of Summoner village and Temple of War
+    - Expected loadout: Cat Eyes, 6 hearts, Dodge, Bow, Spirit Sight
+    - Enemies: Flame/Frost/Storm mobs
+    - Big Chest: Gloves 1
+    - Boss: Elemental idols
+    - Boss Reward: Astral Projection

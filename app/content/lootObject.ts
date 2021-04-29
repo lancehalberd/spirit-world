@@ -309,7 +309,7 @@ export class ChestObject implements ObjectInstance {
     onGrab(state: GameState) {
         // You can only open a chest from the bottom.
         const hero = state.hero.activeClone || state.hero;
-        if (hero.d === 'up' && !state.savedState.objectFlags[this.definition.id]) {
+        if (hero.d === 'up' && !this.isOpen(state)) {
             state.savedState.objectFlags[this.definition.id] = true;
             if (this.linkedObject) {
                 state.savedState.objectFlags[this.linkedObject.definition.id] = true;
@@ -354,7 +354,7 @@ export class BigChest extends ChestObject implements ObjectInstance {
     onGrab(state: GameState) {
         // You can only open a chest from the bottom.
         const hero = state.hero.activeClone || state.hero;
-        if (hero.d !== 'up' || state.savedState.objectFlags[this.definition.id]) {
+        if (hero.d !== 'up' || this.isOpen(state)) {
             return;
         }
         if (!state.savedState.dungeonInventories[state.location.zoneKey]?.bigKey) {

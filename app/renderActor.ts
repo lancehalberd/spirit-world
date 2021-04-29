@@ -170,7 +170,8 @@ export function renderExplosionRing(context: CanvasRenderingContext2D, state: Ga
 
 export function renderEnemyShadow(context: CanvasRenderingContext2D, state: GameState, object: Enemy): void {
     drawFrame(context, shadowFrame, { ...shadowFrame,
-        x: object.x, y: object.y - 3 * object.scale,
+        x: object.x + (object.w - shadowFrame.w) * object.scale / 2,
+        y: object.y - 3 * object.scale,
         w: shadowFrame.w * object.scale,
         h: shadowFrame.h * object.scale,
     });
