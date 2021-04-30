@@ -1,3 +1,4 @@
+import _ from 'lodash';
 
 import { CANVAS_HEIGHT } from 'app/gameConstants';
 import { applySavedState, getDefaultSavedState, getState, returnToSpawnLocation, saveGame } from 'app/state';
@@ -91,30 +92,7 @@ export const SPAWN_WAR_TEMPLE_BOSS: ZoneLocation = {
 };
 
 function applyItems(savedState: SavedState, items: {[key: string]: number}, objectFlags: string[] = []): SavedState {
-    const newState: SavedState = {
-        ...savedState,
-        dungeonInventories: {
-            ...savedState.dungeonInventories,
-        },
-        objectFlags: {
-            ...savedState.objectFlags,
-        },
-        hero: {
-            ...savedState.hero,
-            activeTools: {
-                ...savedState.hero.activeTools,
-            },
-            elements: {
-                ...savedState.hero.elements,
-            },
-            equipment: {
-                ...savedState.hero.equipment,
-            },
-            passiveTools: {
-                ...savedState.hero.passiveTools,
-            },
-        },
-    };
+    const newState: SavedState = _.cloneDeep(savedState);
     for (const flag of objectFlags) {
         newState.objectFlags[flag] = true;
     }
@@ -234,7 +212,7 @@ export function getTestStateContextMenuOption(): MenuOption {
                     label: `${name}`,
                     onSelect() {
                         const state = getState();
-                        applySavedState(state, spawnLocations[name].savedState);
+                        applySavedState(state, _.cloneDeep(spawnLocations[name].savedState));
                         setSpawnLocation(state, spawnLocations[name].location);
                         returnToSpawnLocation(state);
                         state.scene = 'game';
