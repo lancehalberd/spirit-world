@@ -1,5 +1,7 @@
+import { getSpawnLocationContextMenuOption, getTestStateContextMenuOption } from 'app/content/spawnLocations';
 import { mainCanvas, tagElement } from 'app/dom';
 import { getElementRectangle } from 'app/utils/index';
+import { getMousePosition } from 'app/utils/mouse';
 
 import { MenuOption } from 'app/types';
 
@@ -104,22 +106,10 @@ export function getContextMenu(): MenuOption[] {
 }
 
 function getExampleOption(): MenuOption[] {
-    return [{
-        getLabel() {
-            return 'Example...';
-        },
-        getChildren() {
-            const options = [1, 2, 3].map(index => {
-                return {
-                    label: `Option ${index}`,
-                    onSelect() {
-                        console.log(index);
-                    }
-                }
-            });
-            return options;
-        }
-    }];
+    return [
+        getSpawnLocationContextMenuOption(),
+        getTestStateContextMenuOption(),
+    ];
 }
 
 export function showContextMenu(this: void, menu: MenuOption[], x: number, y: number): void {
@@ -146,4 +136,22 @@ export function hideContextMenu(): void {
         contextMenuState.contextMenu.remove();
         contextMenuState.contextMenu = null;
     }
+}
+
+export function addContextMenuListeners(): void {
+    document.addEventListener('mouseup', function (event) {
+        if (event.which !== 1) {
+            return;
+        }
+        if (!(event.target as HTMLElement).closest('.contextMenu')) {
+            hideContextMenu();
+        }
+    });
+
+    mainCanvas.addEventListener('contextmenu', function (event) {
+        event.preventDefault();
+        const [x, y] = getMousePosition();
+        const menu = getContextMenu();
+        showContextMenu(menu, x, y);
+    });
 }

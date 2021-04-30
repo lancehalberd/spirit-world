@@ -65,13 +65,17 @@ export function setSaveFileToState(savedGameIndex: number, gameMode: number = 0)
         savedGame = getDefaultSavedState();
         savedGame.hero.spawnLocation = gameMode === 0 ? SPAWN_LOCATION_FULL : SPAWN_LOCATION_DEMO;
     }
+    applySavedState(state, savedGame);
+}
+
+export function applySavedState(state: GameState, savedState: SavedState): void {
     const defaultSavedState = getDefaultSavedState();
     state.savedState = {
         ...defaultSavedState,
-        ...savedGame,
+        ...savedState,
         hero: {
             ...defaultSavedState.hero,
-            ...savedGame.hero,
+            ...savedState.hero,
             render: renderHero,
             spiritRadius: 0,
             explosionTime: 0,

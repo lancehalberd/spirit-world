@@ -207,7 +207,7 @@ export function enterLocation(
     state.hero.area = state.areaInstance;
     state.hero.x = location.x;
     state.hero.y = location.y;
-    if (location.z) {
+    if (location.z >= 0) {
         state.hero.z = location.z;
         state.hero.action = 'knocked';
     }
