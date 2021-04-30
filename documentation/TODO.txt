@@ -27,19 +27,6 @@ Graphics:
 Todo:
 
 Current tasks:
-    - Finish adding enemies to warTemple.
-    - Add development action for switching states:
-        - Set items + health
-        - Set spawn point
-        - Shouldn't need to worry about setting flags, except in specific cases like warTemple door.
-        - States:
-            Start
-            Cave Boss
-            Tomb Start
-            Tomb Boss
-            War Temple Start (summoner ruins w spirit sight)
-            War Temple Interior
-            War Temple Boss
     - Difficulty shrine:
         - 50 money per point
         - move points around for free
@@ -93,15 +80,6 @@ Dungeon 2 Improvments:
     - Add more uses of spirit sight:
         - See actual elemental beasts in the front room where the statues are located.
         - Some kind of optional spirit sight puzzle for a peach piece.
-    - Finish boss behaviors:
-        Storm Idol:
-            Add shockwaves to LightningBolt
-            When defeated lightning bolts appear above the player once every 5 seconds
-        Flame Idol:
-            When defeated flame walls appear once every 5 seconds.
-        Frost Idol:
-            Add freeze effect to FrostBlast
-            When defeated gradualls change the entire floor to ice.
 
 
 Add ability to charge weapon

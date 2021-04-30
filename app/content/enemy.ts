@@ -403,17 +403,17 @@ export const enemyDefinitions: {[key in EnemyType | BossType | MinionType]: Enem
     stormIdol: {
         alwaysReset: true,
         animations: beetleWingedAnimations, scale: 2,
-        life: 8, touchDamage: 1, update: updateStormIdol, render: renderIdolShield,
+        life: 9, touchDamage: 1, update: updateStormIdol, render: renderIdolShield,
     },
     flameIdol: {
         alwaysReset: true,
         animations: snakeAnimations, scale: 2,
-        life: 8, touchDamage: 1, update: updateFlameIdol, render: renderIdolShield,
+        life: 9, touchDamage: 1, update: updateFlameIdol, render: renderIdolShield,
     },
     frostIdol: {
         alwaysReset: true,
         animations: beetleAnimations, scale: 2,
-        life: 8, touchDamage: 1, update: updateFrostIdol, render: renderIdolShield,
+        life: 9, touchDamage: 1, update: updateFrostIdol, render: renderIdolShield,
     },
     flameSnake: {
         alwaysReset: true,
@@ -536,13 +536,32 @@ function renderIdolShield(context: CanvasRenderingContext2D, state: GameState, e
     }
 }
 function updateElementalIdol(state: GameState, enemy: Enemy, attack: () => void) {
+    // The statue is "destroyed" at 1 life, it will stay shielded and use its attack every 4 seconds
+    // until all statues are "destroyed".
+    if (enemy.life <= 1) {
+        enemy.params.priority = undefined;
+        // When all bosses are at 1 life or lower, all the statues get destroyed.
+        if (!state.areaInstance.objects.some(object =>
+            object instanceof Enemy && object.definition.type === 'boss' && object.life > 1
+        )) {
+            enemy.shielded = false;
+            enemy.takeDamage(state, 1);
+            return;
+        }
+        enemy.shielded = true;
+        if (enemy.modeTime >= 4000) {
+            attack();
+            enemy.setMode('attack');
+        }
+        return;
+    }
     if (typeof enemy.params.priority === 'undefined') {
         enemy.params.priority = Math.random();
         enemy.setMode('shielded');
         enemy.shielded = true;
     }
     // Immediately put up shield on entering pinch mode.
-    if (!enemy.params.pinchMode && enemy.life <= 4) {
+    if (!enemy.params.pinchMode && enemy.life <= 5) {
         enemy.params.pinchMode = true;
         enemy.params.priority = Math.ceil(enemy.params.priority) + Math.random();
         enemy.setMode('shielded');
@@ -556,7 +575,6 @@ function updateElementalIdol(state: GameState, enemy: Enemy, attack: () => void)
                 }
             } else {
                 if (enemy.modeTime === 500 || enemy.modeTime === 1000) {
-                    enemy.params.theta = (enemy.params.theta || 0) + Math.PI / 4;
                     attack();
                 }
             }
@@ -602,7 +620,7 @@ function throwIceGrenadeAtLocation(state: GameState, enemy: Enemy, {tx, ty}: {tx
     const y = hitbox.y + hitbox.h / 2;
     const z = 8;
     const vz = 4;
-    const az = -0.3;
+    const az = -0.2;
     const duration = -2 * vz / az;
     const frostGrenade = new FrostGrenade({
         x,

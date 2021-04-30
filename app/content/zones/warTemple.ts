@@ -2,7 +2,7 @@ import { zones } from 'app/content/zones/zoneHash';
 
 import { AreaDefinition } from 'app/types';
 
-const t0 = {x: 9, y: 4}, t1 = {x: 10, y: 4}, t2 = {x: 1, y: 4}, t3 = {x: 2, y: 4}, t4 = {x: 11, y: 4}, t5 = {x: 12, y: 4}, t6 = {x: 9, y: 5}, t7 = {x: 10, y: 5}, t8 = {x: 3, y: 4}, t9 = {x: 4, y: 4}, t10 = {x: 11, y: 5}, t11 = {x: 12, y: 5}, t12 = {x: 5, y: 4}, t13 = {x: 6, y: 4}, t14 = {x: 11, y: 2}, t15 = {x: 15, y: 2}, t16 = {x: 10, y: 2}, t17 = {x: 13, y: 3}, t18 = {x: 14, y: 3}, t19 = {x: 7, y: 4}, t20 = {x: 8, y: 4}, t21 = {x: 14, y: 2}, t22 = {x: 3, y: 2}, t23 = {x: 13, y: 2}, t24 = {x: 15, y: 3}, t25 = {x: 0, y: 4}, t26 = {x: 8, y: 2}, t27 = {x: 12, y: 2}, t28 = {x: 9, y: 2}, t29 = {x: 15, y: 4}, t30 = {x: 0, y: 5}, t31 = {x: 9, y: 3}, t32 = {x: 10, y: 3}, t33 = {x: 13, y: 4}, t34 = {x: 14, y: 4}, t35 = {x: 15, y: 5}, t36 = {x: 0, y: 6}, t37 = {x: 11, y: 3}, t38 = {x: 12, y: 3}, t39 = {x: 13, y: 5}, t40 = {x: 14, y: 5}, t41 = {x: 0, y: 0}, t42 = {x: 5, y: 0}, t43 = {x: 6, y: 0}, t44 = {x: 1, y: 5}, t45 = {x: 2, y: 5}, t46 = {x: 3, y: 5}, t47 = {x: 4, y: 5}, t48 = {x: 1, y: 6}, t49 = {x: 2, y: 6}, t50 = {x: 3, y: 6}, t51 = {x: 4, y: 6}, t52 = {x: 5, y: 5}, t53 = {x: 6, y: 5}, t54 = {x: 7, y: 5}, t55 = {x: 8, y: 5}, t56 = {x: 5, y: 6}, t57 = {x: 6, y: 6}, t58 = {x: 7, y: 6}, t59 = {x: 8, y: 6}, t60 = {x: 9, y: 0}, t61 = {x: 9, y: 1}, t62 = {x: 10, y: 1}, t63 = {x: 6, y: 2}, t64 = {x: 3, y: 0};
+const t0 = {x: 9, y: 4}, t1 = {x: 10, y: 4}, t2 = {x: 1, y: 4}, t3 = {x: 2, y: 4}, t4 = {x: 11, y: 4}, t5 = {x: 12, y: 4}, t6 = {x: 9, y: 5}, t7 = {x: 10, y: 5}, t8 = {x: 3, y: 4}, t9 = {x: 4, y: 4}, t10 = {x: 11, y: 5}, t11 = {x: 12, y: 5}, t12 = {x: 5, y: 4}, t13 = {x: 6, y: 4}, t14 = {x: 11, y: 2}, t15 = {x: 15, y: 2}, t16 = {x: 10, y: 2}, t17 = {x: 13, y: 3}, t18 = {x: 14, y: 3}, t19 = {x: 7, y: 4}, t20 = {x: 8, y: 4}, t21 = {x: 14, y: 2}, t22 = {x: 3, y: 2}, t23 = {x: 13, y: 2}, t24 = {x: 15, y: 3}, t25 = {x: 0, y: 4}, t26 = {x: 8, y: 2}, t27 = {x: 12, y: 2}, t28 = {x: 9, y: 2}, t29 = {x: 15, y: 4}, t30 = {x: 0, y: 5}, t31 = {x: 9, y: 3}, t32 = {x: 10, y: 3}, t33 = {x: 13, y: 4}, t34 = {x: 14, y: 4}, t35 = {x: 15, y: 5}, t36 = {x: 0, y: 6}, t37 = {x: 11, y: 3}, t38 = {x: 12, y: 3}, t39 = {x: 13, y: 5}, t40 = {x: 14, y: 5}, t41 = {x: 0, y: 0}, t42 = {x: 5, y: 0}, t43 = {x: 6, y: 0}, t44 = {x: 1, y: 5}, t45 = {x: 2, y: 5}, t46 = {x: 3, y: 5}, t47 = {x: 4, y: 5}, t48 = {x: 1, y: 6}, t49 = {x: 2, y: 6}, t50 = {x: 3, y: 6}, t51 = {x: 4, y: 6}, t52 = {x: 5, y: 5}, t53 = {x: 6, y: 5}, t54 = {x: 7, y: 5}, t55 = {x: 8, y: 5}, t56 = {x: 5, y: 6}, t57 = {x: 6, y: 6}, t58 = {x: 7, y: 6}, t59 = {x: 8, y: 6}, t60 = {x: 9, y: 0}, t61 = {x: 9, y: 1}, t62 = {x: 10, y: 1}, t63 = {x: 6, y: 2}, t64 = {x: 3, y: 0}, t65 = {x: 2, y: 3}, t66 = {x: 3, y: 3};
 const f0_0x0: AreaDefinition = {
     layers: [
         {
@@ -377,12 +377,12 @@ const f0_1x0: AreaDefinition = {
                 tiles: [
                     [t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41],
                     [t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41],
-                    [t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41],
-                    [t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41],
+                    [t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t42,t42,t41,t41],
+                    [t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t43,t42,t41,t41],
                     [t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t42,t42,t41,t41,t41,t41],
                     [t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t43,t42,t41,t41,t41,t41],
-                    [t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41],
-                    [t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41],
+                    [t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t42,t42,t41,t41,t41,t41,t41,t41],
+                    [t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t43,t42,t41,t41,t41,t41,t41,t41],
                     [t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41],
                     [t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41],
                     [t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41],
@@ -414,8 +414,8 @@ const f0_1x0: AreaDefinition = {
     objects: [
         {status: "normal", id: "warTemple:0:0x1-door-0", x: 480, y: 112, type: "door", style: "cave", targetZone: undefined, targetObjectId: undefined, d: "right", saveStatus: undefined},
         {status: "normal", id: "warTemple:0:0x1-door-1", x: 368, y: 0, type: "door", style: "cave", targetZone: undefined, targetObjectId: undefined, d: "up", saveStatus: undefined},
-        {status: "normal", id: "warTemple:0:0x1-flameSnake-0", x: 352, y: 48, type: "enemy", enemyType: "flameSnake", d: "down", params: {}},
-        {status: "normal", id: "warTemple:0:0x1-flameSnake-1", x: 400, y: 48, type: "enemy", enemyType: "flameSnake", d: "down", params: {}},
+        {status: "normal", id: "warTemple:0:0x1-flameSnake-0", x: 304, y: 160, type: "enemy", enemyType: "flameSnake", d: "down", params: {}},
+        {status: "normal", id: "warTemple:0:0x1-flameSnake-1", x: 304, y: 80, type: "enemy", enemyType: "flameSnake", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},
@@ -1235,14 +1235,14 @@ const f2_0x0: AreaDefinition = {
                     [t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41],
                     [t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41],
                     [t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41],
+                    [t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t65,t65,t41,t41,t41,t41,t41,t41,t41],
+                    [t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t65,t65,t41,t41,t41,t41,t41,t41,t41],
                     [t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41],
                     [t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41],
-                    [t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41],
-                    [t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41],
-                    [t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41],
-                    [t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41],
-                    [t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41],
-                    [t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41],
+                    [t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t66,t66,t41,t41,t41,t41,t41,t41,t41],
+                    [t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t66,t66,t41,t41,t41,t41,t41,t41,t41],
+                    [t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t65,t65,t41,t41,t41,t41,t41,t41,t65,t65,t41,t41,t41],
+                    [t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t65,t65,t41,t41,t41,t41,t41,t41,t65,t65,t41,t41,t41],
                     [t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41],
                     [t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41],
                     [t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41],
@@ -1283,6 +1283,12 @@ const f2_0x0: AreaDefinition = {
         {status: "normal", id: "warTempleStairs2", x: 368, y: 0, type: "door", style: "cave", targetZone: "warTemple", targetObjectId: "warTempleStairs2", d: "up", saveStatus: undefined},
         {status: "normal", id: "warTemple:2:0x0-pitEntrance-0", x: 320, y: 320, targetZone: "warTemple", targetObjectId: "warTempleKeyMarker", type: "pitEntrance"},
         {status: "normal", id: "warTemple:2:0x0-pitEntrance-1", x: 160, y: 320, targetZone: "warTemple", targetObjectId: "warTempleMoneyMarker", type: "pitEntrance"},
+        {status: "normal", id: "warTemple:2:0x0-frostBeetle-0", x: 336, y: 432, type: "enemy", enemyType: "frostBeetle", d: "down", params: {}},
+        {status: "normal", id: "warTemple:2:0x0-frostBeetle-1", x: 448, y: 368, type: "enemy", enemyType: "frostBeetle", d: "down", params: {}},
+        {status: "normal", id: "warTemple:2:0x0-lightningBug-0", x: 320, y: 160, type: "enemy", enemyType: "lightningBug", d: "down", params: {}},
+        {status: "normal", id: "warTemple:2:0x0-lightningBug-1", x: 448, y: 160, type: "enemy", enemyType: "lightningBug", d: "down", params: {}},
+        {status: "normal", id: "warTemple:2:0x0-flameSnake-0", x: 64, y: 336, type: "enemy", enemyType: "flameSnake", d: "down", params: {}},
+        {status: "normal", id: "warTemple:2:0x0-flameSnake-1", x: 64, y: 432, type: "enemy", enemyType: "flameSnake", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},

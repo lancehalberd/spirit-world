@@ -1,4 +1,5 @@
-import { removeObjectFromArea } from 'app/content/areas';
+import { addObjectToArea, removeObjectFromArea } from 'app/content/areas';
+import { Spark } from 'app/content/effects/spark';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { damageActor } from 'app/updateActor';
 import { directionMap } from 'app/utils/field';
@@ -73,6 +74,21 @@ export class LightningBolt implements ObjectInstance, Props {
         this.animationTime += FRAME_LENGTH;
         if (this.animationTime === this.delay + LIGHTNING_ANIMATION_DURATION) {
             // Create shockwave here.
+            for (let i = 0; i < this.shockWaves; i++) {
+                const theta = this.shockWaveTheta + i * 2 * Math.PI / this.shockWaves;
+                const dx = Math.cos(theta);
+                const dy = Math.sin(theta);
+                const spark = new Spark({
+                    x: this.x + this.w / 2,
+                    y: this.y + this.h / 2,
+                    vx: 4 * dx,
+                    vy: 4 * dy,
+                    ttl: 1000,
+                });
+                spark.x -= spark.w / 2;
+                spark.y -= spark.h / 2;
+                addObjectToArea(state, state.areaInstance, spark);
+            }
         }
         if (this.animationTime >= this.delay + LIGHTNING_ANIMATION_DURATION) {
             this.checkForHits(state);
