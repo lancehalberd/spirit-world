@@ -237,10 +237,13 @@ export function setSpawnLocation(state: GameState, spawnLocation: ZoneLocation):
 }
 
 export function checkToUpdateSpawnLocation(state: GameState): void {
+    if (state.location.zoneKey === 'overworld' && state.hero.spawnLocation.zoneKey === 'newPeachCave') {
+        return setSpawnLocation(state, SPAWN_LOCATION_PEACH_CAVE_EXIT);
+    }
     if (state.location.zoneKey === 'tomb') {
         return setSpawnLocation(state, SPAWN_LOCATION_TOMB_ENTRANCE);
     }
-    if (state.location.zoneKey === 'overworld' && state.hero.spawnLocation.zoneKey === 'newPeachCave') {
-        return setSpawnLocation(state, SPAWN_LOCATION_PEACH_CAVE_EXIT);
+    if (state.location.zoneKey === 'warTemple' && state.savedState.objectFlags['warTempleEntrance']) {
+        return setSpawnLocation(state, SPAWN_WAR_TEMPLE_ENTRANCE);
     }
 }
