@@ -85,11 +85,16 @@ export class AstralProjection implements Hero, ObjectInstance {
     render(this: Hero, context: CanvasRenderingContext2D, state: GameState): void {
         const hero = this;
         const frame = getHeroFrame(state, hero);
-        const h = 22;
+        const h1 = 14;
+        const h2 = 4;
+        const h3 = 4;
         context.save();
-            context.globalAlpha = 0.8;
-            drawFrame(context, {...frame, h}, { x: hero.x - frame.content.x, y: hero.y - frame.content.y - hero.z + 4, w: frame.w, h });
-
+            context.globalAlpha = 0.7;
+            drawFrame(context, {...frame, h: h1}, { x: hero.x - frame.content.x, y: hero.y - frame.content.y - hero.z + 4, w: frame.w, h: h1 });
+            context.globalAlpha = 0.4;
+            drawFrame(context, {...frame, y: frame.y + h1, h: h2}, { x: hero.x - frame.content.x, y: hero.y - frame.content.y - hero.z + 4 + h1, w: frame.w, h: h2 });
+            context.globalAlpha = 0.1;
+            drawFrame(context, {...frame, y: frame.y + h1 + h2, h: h3}, { x: hero.x - frame.content.x, y: hero.y - frame.content.y - hero.z + 4 + h1 + h2, w: frame.w, h: h3 });
         context.restore();
         if (hero.pickUpTile) {
             renderCarriedTile(context, state, hero);

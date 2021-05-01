@@ -518,7 +518,7 @@ const f0_1x1: AreaDefinition = {
         },
     ],
     objects: [
-        {id: "peachCaveWaterEntrance", linked: false, spirit: false, status: "normal", x: 256, y: 80, type: "door", style: "cave", targetZone: "newPeachCave", targetObjectId: "newPeachCave:waterEntrance", d: "up"},
+        {id: "peachCaveWaterEntrance", linked: true, spirit: false, status: "normal", x: 256, y: 80, type: "door", style: "cave", targetZone: "newPeachCave", targetObjectId: "newPeachCave:waterEntrance", d: "up"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -1145,7 +1145,17 @@ const sf0_1x0: AreaDefinition = {
         {x: 0, y: 16, w: 32, h: 16},
     ],
 };
-const sf0_1x1: AreaDefinition = null;
+const sf0_1x1: AreaDefinition = {
+    isSpiritWorld: true,
+    parentDefinition: f0_1x1,
+    layers: null,
+    objects: [
+        {id: "peachCaveWaterEntrance", linked: true, spirit: true, status: "normal", x: 256, y: 80, type: "door", style: "cave", targetZone: "newPeachCave", targetObjectId: "newPeachCave:waterEntrance", d: "up"},
+    ],
+    sections: [
+        {x: 0, y: 0, w: 32, h: 32},
+    ],
+};
 const sf0_1x2: AreaDefinition = null;
 const sf0_2x0: AreaDefinition = {
     isSpiritWorld: true,

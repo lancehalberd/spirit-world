@@ -203,7 +203,7 @@ const f0_1x0: AreaDefinition = {
         {id: "newPeachCave:0:0x1-door-1", linked: false, spirit: false, status: "cracked", x: 368, y: 224, type: "door", targetZone: null, targetObjectId: null, d: "down", style: "cave"},
         {id: "newPeachCave:markerA", linked: false, spirit: false, status: "normal", x: 112, y: 176, type: "marker"},
         {id: "newPeachCave:markerB", linked: false, spirit: false, status: "normal", x: 384, y: 416, type: "marker"},
-        {id: "newPeachCave:waterEntrance", linked: false, spirit: false, status: "normal", x: 352, y: 496, type: "door", style: "wideEntrance", targetZone: "overworld", targetObjectId: "peachCaveWaterEntrance", d: "down"},
+        {id: "newPeachCave:waterEntrance", linked: true, spirit: false, status: "normal", x: 352, y: 496, type: "door", style: "wideEntrance", targetZone: "overworld", targetObjectId: "peachCaveWaterEntrance", d: "down"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},
@@ -214,7 +214,20 @@ const f0_1x0: AreaDefinition = {
     dark: 75,
 };
 const sf0_0x0: AreaDefinition = null;
-const sf0_1x0: AreaDefinition = null;
+const sf0_1x0: AreaDefinition = {
+    isSpiritWorld: true,
+    parentDefinition: f0_1x0,
+    layers: null,
+    objects: [
+        {id: "newPeachCave:waterEntrance", linked: true, spirit: true, status: "normal", x: 352, y: 496, type: "door", style: "wideEntrance", targetZone: "overworld", targetObjectId: "peachCaveWaterEntrance", d: "down"},
+    ],
+    sections: [
+        {x: 0, y: 0, w: 16, h: 16},
+        {x: 16, y: 0, w: 16, h: 16},
+        {x: 0, y: 16, w: 16, h: 16},
+        {x: 16, y: 16, w: 16, h: 16},
+    ],
+};
 const f1_0x0: AreaDefinition = {
     layers: [
         {

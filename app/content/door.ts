@@ -191,12 +191,18 @@ export class Door implements ObjectInstance {
                 applyBehaviorToTile(this.area, x, y + 3, behaviors);
             }
         } else if (doorStyle.w === 32) {
+            const behaviors = { solid: true, solidMap: undefined, low: false};
+            applyBehaviorToTile(this.area, x, y, behaviors);
+            applyBehaviorToTile(this.area, x + 1, y, behaviors);
+            applyBehaviorToTile(this.area, x, y + 1, behaviors);
+            applyBehaviorToTile(this.area, x + 1, y + 1, behaviors);
             if (this.isOpen()) {
-                if (this.definition.d === 'left' || this.definition.d === 'right') {
-                    applyBehaviorToTile(this.area, x, y, { solidMap: BITMAP_SIDE_DOOR_TOP, low: false });
+                if (this.definition.d === 'left') {
                     applyBehaviorToTile(this.area, x + 1, y, { solidMap: BITMAP_SIDE_DOOR_TOP, low: false });
-                    applyBehaviorToTile(this.area, x, y + 1, { solidMap: BITMAP_SIDE_DOOR_BOTTOM, low: false});
                     applyBehaviorToTile(this.area, x + 1, y + 1, { solidMap: BITMAP_SIDE_DOOR_BOTTOM, low: false });
+                } else if (this.definition.d === 'right') {
+                    applyBehaviorToTile(this.area, x, y, { solidMap: BITMAP_SIDE_DOOR_TOP, low: false });
+                    applyBehaviorToTile(this.area, x, y + 1, { solidMap: BITMAP_SIDE_DOOR_BOTTOM, low: false});
                 } else if (this.definition.d === 'up') {
                     applyBehaviorToTile(this.area, x, y + 1, { solidMap: BITMAP_LEFT, low: false });
                     applyBehaviorToTile(this.area, x + 1, y + 1, { solidMap: BITMAP_RIGHT, low: false });
@@ -204,12 +210,6 @@ export class Door implements ObjectInstance {
                     applyBehaviorToTile(this.area, x, y, { solidMap: BITMAP_LEFT, low: false });
                     applyBehaviorToTile(this.area, x + 1, y, { solidMap: BITMAP_RIGHT, low: false });
                 }
-            } else {
-                const behaviors = { solid: true, solidMap: undefined, low: false};
-                applyBehaviorToTile(this.area, x, y, behaviors);
-                applyBehaviorToTile(this.area, x + 1, y, behaviors);
-                applyBehaviorToTile(this.area, x, y + 1, behaviors);
-                applyBehaviorToTile(this.area, x + 1, y + 1, behaviors);
             }
         }
     }

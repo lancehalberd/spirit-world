@@ -1140,7 +1140,7 @@ const f1_0x1: AreaDefinition = {
         {status: "normal", id: "warTemple:1:1x0-door-0", x: 0, y: 112, type: "door", style: "cave", targetZone: undefined, targetObjectId: undefined, d: "left", saveStatus: undefined},
         {status: "closedEnemy", id: "warTemple:1:1x0-door-1", x: 256, y: 112, type: "door", style: "cave", targetZone: undefined, targetObjectId: undefined, d: "left", saveStatus: undefined},
         {status: "closed", id: "warTemple:1:1x0-door-2", x: 224, y: 112, type: "door", style: "cave", targetZone: undefined, targetObjectId: undefined, d: "right", saveStatus: undefined},
-        {status: "closedEnemy", id: "warTemple:1:1x0-door-3", x: 368, y: 224, type: "door", style: "cave", targetZone: undefined, targetObjectId: undefined, d: "down", saveStatus: undefined},
+        {status: "closed", id: "warTemple:1:1x0-door-3", x: 368, y: 224, type: "door", style: "cave", targetZone: undefined, targetObjectId: undefined, d: "down", saveStatus: undefined},
         {status: "normal", id: "warTemple:1:1x0-door-4", x: 368, y: 256, type: "door", style: "cave", targetZone: undefined, targetObjectId: undefined, d: "up", saveStatus: undefined},
         {status: "normal", id: "warTempleKeyMarker", x: 64, y: 320, type: "marker"},
         {status: "normal", id: "warTempleStairs2", x: 112, y: 0, type: "door", style: "cave", targetZone: "warTemple", targetObjectId: "warTempleStairs2", d: "up", saveStatus: undefined},
@@ -1270,7 +1270,7 @@ const f2_0x0: AreaDefinition = {
     ],
     objects: [
         {status: "closed", id: "warTemple:2:0x0-door-0", x: 112, y: 224, type: "door", style: "cave", targetZone: undefined, targetObjectId: undefined, d: "down", saveStatus: undefined},
-        {status: "closedSwitch", id: "warTempleExit", x: 112, y: 0, type: "door", style: "cave", targetZone: undefined, targetObjectId: undefined, d: "up", saveStatus: undefined, linked: true},
+        {status: "closedSwitch", id: "warTempleExit", x: 112, y: 0, type: "door", style: "cave", targetZone: "overworld", targetObjectId: "warTempleEntrance", d: "up", saveStatus: undefined, linked: true},
         {status: "hiddenEnemy", id: "warTemple:2:0x0-astralProjection-0", spirit: true, x: 64, y: 64, type: "chest", lootType: "astralProjection", lootAmount: 1, lootLevel: 1},
         {status: "normal", id: "warTempleBoss", spirit: true, x: 112, y: 48, type: "boss", enemyType: "stormIdol", lootType: "peachOfImmortality", lootAmount: 1, lootLevel: 1, d: "down", params: {}},
         {status: "normal", id: "warTempleBoss", spirit: true, x: 48, y: 144, type: "boss", enemyType: "flameIdol", lootType: "peachOfImmortality", lootAmount: 1, lootLevel: 1, d: "down", params: {}},
@@ -1284,7 +1284,7 @@ const f2_0x0: AreaDefinition = {
         {status: "normal", id: "warTemple:2:0x0-pitEntrance-0", x: 320, y: 320, targetZone: "warTemple", targetObjectId: "warTempleKeyMarker", type: "pitEntrance"},
         {status: "normal", id: "warTemple:2:0x0-pitEntrance-1", x: 160, y: 320, targetZone: "warTemple", targetObjectId: "warTempleMoneyMarker", type: "pitEntrance"},
         {status: "normal", id: "warTemple:2:0x0-frostBeetle-1", x: 432, y: 432, type: "enemy", enemyType: "frostBeetle", d: "down", params: {}},
-        {status: "normal", id: "warTemple:2:0x0-lightningBug-0", x: 384, y: 192, type: "enemy", enemyType: "lightningBug", d: "down", params: {}},
+        {status: "normal", id: "warTemple:2:0x0-lightningBug-0", x: 400, y: 144, type: "enemy", enemyType: "lightningBug", d: "down", params: {}},
         {status: "normal", id: "warTemple:2:0x0-flameSnake-1", x: 64, y: 432, type: "enemy", enemyType: "flameSnake", d: "down", params: {}},
     ],
     sections: [

@@ -36,7 +36,7 @@ export function getHeroFrame(state: GameState, hero: Hero): Frame {
                 // show the pull animation to suggest the player is *trying* to pull the object they
                 // are grabbing even though it won't move.
                 animations = hero.wading ? heroShallowAnimations.pull : heroAnimations.pull;
-                return getFrame(heroAnimations.pull[hero.d], hero.animationTime);
+                return getFrame(animations[hero.d], hero.animationTime);
             }
             // If the player continously pushes/pulls there is one frame that isn't set correctly,
             // so we use this to play that last animation for an extra frame.

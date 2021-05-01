@@ -364,6 +364,10 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         if (distance > state.hero.spiritRadius) {
             hero.x = state.hero.x + state.hero.spiritRadius * dx / distance;
             hero.y = state.hero.y + state.hero.spiritRadius * dy / distance;
+            if (hero.grabObject) {
+                hero.grabObject = null;
+                hero.action = null;
+            }
         }
     }
     if (isControlled && !isAstralProjection && !hero.swimming && (!hero.action || hero.action === 'walking' || hero.action === 'pushing')
