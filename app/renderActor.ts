@@ -8,13 +8,13 @@ import { carryMap, directionMap, getDirection } from 'app/utils/field';
 
 import { Actor, ActorAnimations, Enemy, Frame, GameState, Hero } from 'app/types';
 
-import { heroAnimations, Y_OFF} from 'app/render/heroAnimations';
+import { heroAnimations, heroShallowAnimations, heroSwimAnimations, Y_OFF} from 'app/render/heroAnimations';
 
 
 const shadowFrame: Frame = createAnimation('gfx/shadow.png', { w: 16, h: 16 }).frames[0];
 
 let lastPullAnimation = null;
-function getHeroFrame(state: GameState, hero: Hero): Frame {
+export function getHeroFrame(state: GameState, hero: Hero): Frame {
     let animations: ActorAnimations['idle'];
     switch (hero.action) {
         case 'falling':
@@ -26,15 +26,16 @@ function getHeroFrame(state: GameState, hero: Hero): Frame {
             const oppositeDirection = getDirection(-dx, -dy);
             const [kdx, kdy] = getCloneMovementDeltas(state, hero);
             if (hero.grabObject?.pullingHeroDirection === oppositeDirection) {
-                lastPullAnimation = heroAnimations.pull;
+                lastPullAnimation = hero.wading ? heroShallowAnimations.pull : heroAnimations.pull;
                 return getFrame(lastPullAnimation[hero.d], hero.animationTime);
             } else if (hero.grabObject?.pullingHeroDirection) {
-                lastPullAnimation = heroAnimations.push;
+                lastPullAnimation = hero.wading ? heroShallowAnimations.push : heroAnimations.push;
                 return getFrame(lastPullAnimation[hero.d], hero.animationTime);
             } else if (kdx * dx < 0 || kdy * dy < 0) {
                 // If the player is not moving but pulling away from the direction they are grabbing,
                 // show the pull animation to suggest the player is *trying* to pull the object they
                 // are grabbing even though it won't move.
+                animations = hero.wading ? heroShallowAnimations.pull : heroAnimations.pull;
                 return getFrame(heroAnimations.pull[hero.d], hero.animationTime);
             }
             // If the player continously pushes/pulls there is one frame that isn't set correctly,
@@ -44,23 +45,20 @@ function getHeroFrame(state: GameState, hero: Hero): Frame {
                 lastPullAnimation = null;
                 return frame;
             }
-            animations = heroAnimations.grab;
+            animations = hero.wading ? heroShallowAnimations.grab : heroAnimations.grab;
             break;
         case 'meditating':
-            return getFrame(heroAnimations.idle.down, hero.animationTime);
+            return getFrame(hero.wading ? heroShallowAnimations.idle.down : heroAnimations.idle.down, hero.animationTime);
         case 'pushing':
-            animations = heroAnimations.push;
+            animations = hero.wading ? heroShallowAnimations.push : heroAnimations.push;
             break;
         case 'entering':
         case 'exiting':
-        case 'swimming':
         case 'walking':
             if (hero.swimming) {
-                animations = heroAnimations.wade;
-            } else if (hero.wading) {
-                animations = heroAnimations.wade;
+                animations = heroSwimAnimations.move;
             } else {
-                animations = heroAnimations.move;
+                animations = hero.wading ? heroShallowAnimations.move : heroAnimations.move;
             }
             break;
         case 'knocked':
@@ -76,10 +74,14 @@ function getHeroFrame(state: GameState, hero: Hero): Frame {
             return getFrame(heroAnimations.push.up, hero.animationTime);
             break;
         case 'attack':
-            animations = heroAnimations.attack;
+            animations = hero.wading ? heroShallowAnimations.attack : heroAnimations.attack;
             break;
         default:
-            animations = heroAnimations.idle;
+            if (hero.swimming) {
+                animations = heroSwimAnimations.idle;
+            } else {
+                animations = hero.wading ? heroShallowAnimations.idle : heroAnimations.idle;
+            }
     }
     return getFrame(animations[hero.d], hero.animationTime);
 }
@@ -97,11 +99,7 @@ export function renderHero(this: Hero, context: CanvasRenderingContext2D, state:
         } else if (hero.invulnerableFrames) {
             context.globalAlpha = 0.7 + 0.3 * Math.cos(2 * Math.PI * hero.invulnerableFrames * 3 / 50);
         }
-        if (hero.swimming || hero.action === 'swimming') {
-            drawFrame(context, {...frame, h: 16}, { x: hero.x - frame.content.x, y: hero.y - frame.content.y - hero.z + frame.h - 22, w: frame.w, h: 16 });
-        } else {
-            drawFrame(context, frame, { x: hero.x - frame.content.x, y: hero.y - frame.content.y - hero.z, w: frame.w, h: frame.h });
-        }
+        drawFrame(context, frame, { x: hero.x - frame.content.x, y: hero.y - frame.content.y - hero.z, w: frame.w, h: frame.h });
     context.restore();
     if (hero.pickUpTile) {
         renderCarriedTile(context, state, hero);
@@ -143,7 +141,7 @@ export function renderCarriedTile(context: CanvasRenderingContext2D, state: Game
 
 
 export function renderHeroShadow(context: CanvasRenderingContext2D, state: GameState, hero: Hero): void {
-    if (hero.action === 'fallen' || hero.action === 'falling' || hero.action === 'swimming' || hero.swimming || hero.wading) {
+    if (hero.action === 'fallen' || hero.action === 'falling' || hero.swimming || hero.wading) {
         return;
     }
     drawFrame(context, shadowFrame, { ...shadowFrame, x: hero.x, y: hero.y - 3 - Y_OFF });

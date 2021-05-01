@@ -110,7 +110,7 @@ export class ThrownChakram implements ObjectInstance {
                 }
             }
         }
-        for (const target of getTilesInRectangle(state, this)) {
+        for (const target of getTilesInRectangle(this.area, this)) {
             const behavior = this.area.behaviorGrid?.[target.y]?.[target.x];
             if (behavior?.cuttable <= state.hero.weapon) {
                 // We need to find the specific cuttable layers that can be destroyed.

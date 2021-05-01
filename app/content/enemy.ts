@@ -155,7 +155,8 @@ export class Enemy implements Actor, ObjectInstance {
         const deathAnimation = new AnimationEffect({
             animation: enemyDeathAnimation,
             x: hitbox.x + hitbox.w / 2 - enemyDeathAnimation.frames[0].w / 2 * this.scale,
-            y: hitbox.y + hitbox.h / 2 - enemyDeathAnimation.frames[0].h / 2 * this.scale,
+            // +1 to make sure the explosion appears in front of enemies the frame they die.
+            y: hitbox.y + hitbox.h / 2 - enemyDeathAnimation.frames[0].h / 2 * this.scale + 1,
             scale: this.scale,
         });
         playSound('enemyDeath');
@@ -417,7 +418,7 @@ export const enemyDefinitions: {[key in EnemyType | BossType | MinionType]: Enem
     },
     flameSnake: {
         alwaysReset: true,
-        animations: snakeAnimations, speed: 1.2,
+        animations: snakeAnimations, speed: 1.1,
         life: 3, touchDamage: 1, update: updateFlameSnake, flipRight: true,
     },
     frostBeetle: {
@@ -481,7 +482,7 @@ function updateFrostBeetle(state: GameState, enemy: Enemy): void {
                 tx: state.hero.x + state.hero.w / 2,
                 ty: state.hero.y + state.hero.h / 2,
             });
-            enemy.params.shootCooldown = 2000;
+            enemy.params.shootCooldown = 3000;
         } else {
             scurryAndChase(state, enemy);
         }
@@ -499,7 +500,7 @@ function updateStormLightningBug(state: GameState, enemy: Enemy): void {
     } else {
         const chaseVector = getVectorToNearbyHero(state, enemy, enemy.aggroRadius);
         if (chaseVector) {
-            enemy.params.shieldCooldown = 4000;
+            enemy.params.shieldCooldown = 6000;
             enemy.shielded = true;
         }
     }
@@ -563,9 +564,19 @@ function updateElementalIdol(state: GameState, enemy: Enemy, attack: () => void)
     // Immediately put up shield on entering pinch mode.
     if (!enemy.params.pinchMode && enemy.life <= 5) {
         enemy.params.pinchMode = true;
-        enemy.params.priority = Math.ceil(enemy.params.priority) + Math.random();
-        enemy.setMode('shielded');
+        enemy.setMode('enraged');
         enemy.shielded = true;
+        return;
+    }
+    // The idol does a single quick string of 4 attacks when enraged.
+    if (enemy.mode === 'enraged') {
+        if (enemy.modeTime % 1000 === 500) {
+            attack();
+        }
+        if (enemy.modeTime >= 4000) {
+            enemy.params.priority = Math.ceil(enemy.params.priority) + Math.random();
+            enemy.setMode('shielded');
+        }
     }
     if (!state.areaInstance.objects.some(object => object instanceof Enemy && object.params.priority < enemy.params.priority)) {
         if (enemy.mode === 'attack') {

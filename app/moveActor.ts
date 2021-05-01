@@ -1,5 +1,6 @@
 import _ from 'lodash';
 
+import { getAreaSize } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { damageActor, throwHeldObject } from 'app/updateActor';
 import { getTileBehaviorsAndObstacles, isPointOpen } from 'app/utils/field';
@@ -7,6 +8,8 @@ import { getTileBehaviorsAndObstacles, isPointOpen } from 'app/utils/field';
 import { Actor, Direction, GameState, Hero, MovementProperties } from 'app/types';
 
 export function moveActor(state: GameState, actor: Actor, dx: number, dy: number, {
+    boundToSection,
+    boundToSectionPadding,
     canPush = false,
     canFall = false,
     canSwim = false,
@@ -29,6 +32,8 @@ export function moveActor(state: GameState, actor: Actor, dx: number, dy: number
         if (sx) {
             // You can't push when moving diagonally.
             movedX = moveActorInDirection(state, actor, sx, (sx < 0) ? 'left' : 'right', {
+                boundToSection,
+                boundToSectionPadding,
                 canPush: canPush && !dy,
                 canWiggle: canWiggle && !dy,
                 canSwim,
@@ -51,6 +56,8 @@ export function moveActor(state: GameState, actor: Actor, dx: number, dy: number
         if (sy) {
             // You can't push when moving diagonally.
             movedY = moveActorInDirection(state, actor, sy, (sy < 0) ? 'up' : 'down', {
+                boundToSection,
+                boundToSectionPadding,
                 canPush: canPush && !dx,
                 canWiggle: canWiggle && !dx,
                 canSwim,
@@ -85,7 +92,7 @@ function moveActorInDirection(
     amount: number,
     direction: Direction,
     movementProperties: MovementProperties
-) {
+): boolean {
     const {
         canPush = false,
         canFall = false,
@@ -98,6 +105,15 @@ function moveActorInDirection(
         ay += amount;
     } else {
         ax += amount;
+    }
+    if (movementProperties.boundToSection) {
+        const p = movementProperties.boundToSectionPadding ?? 0;
+        const { section } = getAreaSize(state);
+        if (ax < section.x + p || ax + actor.w > section.x + section.w - p
+            || ay < section.y + p || ay + actor.h > section.y + section.h - p
+        ) {
+            return false;
+        }
     }
 
     let checkPoints: {x: number, y: number}[];
@@ -330,7 +346,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
     // We don't want a player to be able to walk in between pits without falling, so the character is forced to fall
     // any time all four corners are over pits.
     hero.wading = true;
-    hero.swimming = hero.z <= 0;
+    hero.swimming = hero.action !== 'roll' && hero.z <= 0;
     let fallingTopLeft = false, fallingTopRight = false, fallingBottomLeft = false, fallingBottomRight = false;
     let startClimbing = false;
     for (let row = topRow; row <= bottomRow; row++) {
@@ -390,12 +406,6 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
                 }
             }
         }
-    }
-
-    if (hero.swimming && hero.action !== 'roll' && hero.action !== 'entering' && hero.action !== 'exiting') {
-        hero.action = 'swimming';
-    } else if (!hero.swimming && hero.action === 'swimming') {
-        hero.action = null;
     }
     if (startClimbing) {
         hero.action = 'climbing';

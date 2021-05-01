@@ -27,6 +27,8 @@ Graphics:
 Todo:
 
 Current tasks:
+    - Clean up attack effects on defeating bosses.
+        - Need to set a flag on all attack effects so they are easy to find and remove.
     - Difficulty shrine:
         - 50 money per point
         - move points around for free

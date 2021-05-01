@@ -197,11 +197,12 @@ export class Door implements ObjectInstance {
                     applyBehaviorToTile(this.area, x + 1, y, { solidMap: BITMAP_SIDE_DOOR_TOP, low: false });
                     applyBehaviorToTile(this.area, x, y + 1, { solidMap: BITMAP_SIDE_DOOR_BOTTOM, low: false});
                     applyBehaviorToTile(this.area, x + 1, y + 1, { solidMap: BITMAP_SIDE_DOOR_BOTTOM, low: false });
-                } else {
-                    applyBehaviorToTile(this.area, x, y, { solidMap: BITMAP_LEFT, low: false });
-                    applyBehaviorToTile(this.area, x + 1, y, { solidMap: BITMAP_RIGHT, low: false });
+                } else if (this.definition.d === 'up') {
                     applyBehaviorToTile(this.area, x, y + 1, { solidMap: BITMAP_LEFT, low: false });
                     applyBehaviorToTile(this.area, x + 1, y + 1, { solidMap: BITMAP_RIGHT, low: false });
+                } else if (this.definition.d === 'down') {
+                    applyBehaviorToTile(this.area, x, y, { solidMap: BITMAP_LEFT, low: false });
+                    applyBehaviorToTile(this.area, x + 1, y, { solidMap: BITMAP_RIGHT, low: false });
                 }
             } else {
                 const behaviors = { solid: true, solidMap: undefined, low: false};

@@ -234,6 +234,8 @@ export type ObjectStatus = 'active' | 'closed' | 'closedEnemy' | 'closedSwitch'
     | 'locked' | 'bigKeyLocked' | 'cracked' | 'blownOpen';
 
 export interface MovementProperties {
+    boundToSection?: boolean,
+    boundToSectionPadding?: number,
     canPush?: boolean,
     canFall?: boolean,
     canSwim?: boolean,

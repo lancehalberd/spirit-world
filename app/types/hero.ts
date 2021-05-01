@@ -1,4 +1,5 @@
 import { Clone } from 'app/content/clone';
+import { AstralProjection } from 'app/content/objects/astralProjection';
 import { Staff } from 'app/content/staff';
 
 import {
@@ -11,8 +12,6 @@ export type Action =
     | 'pushing' | 'grabbing' | 'carrying' | 'throwing' | 'thrown' | 'getItem'
     | 'beingCarried' | 'entering' | 'exiting'
     | 'falling' | 'fallen' | 'meditating'
-    // Used when the player is in water. Player cannot use abilities.
-    |'swimming'
     // Used for climbing vines on walls or ladders. The player moves more slowly and cannot use abilities while climbing.
     | 'climbing'
     // Used when jumping off of ledges. This causes the character to move in a specific fall trajectory
@@ -54,7 +53,6 @@ export interface ActorAnimations {
     hurt?: AnimationSet,
     idle: AnimationSet,
     move?: AnimationSet,
-    wade?: AnimationSet,
     pull?: AnimationSet,
     push?: AnimationSet,
     roll?: AnimationSet,
@@ -94,7 +92,6 @@ export interface Actor {
     swimming?: boolean,
 }
 
-
 export interface Hero extends Actor {
     // stats
     maxLife: number,
@@ -114,6 +111,7 @@ export interface Hero extends Actor {
     equipment: {[key in Equipment]: number},
     passiveTools: {[key in PassiveTool]: number},
     elements: {[key in MagicElement]: number},
+    astralProjection?: AstralProjection,
     clones: Clone[],
     activeClone?: Clone,
     activeStaff?: Staff,

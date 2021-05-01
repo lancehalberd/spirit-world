@@ -27,6 +27,7 @@ export function loadSavedData(): boolean {
 export function saveGame(): void {
     const hero = {...state.hero};
     // sanitize hero object before saving it.
+    delete hero.astralProjection;
     delete hero.activeClone;
     delete hero.activeStaff;
     delete hero.actionTarget;
@@ -170,6 +171,7 @@ function getDefaultHeroState(): Hero {
             ice: 0,
             lightning: 0,
         },
+        astralProjection: null,
         clones: [],
         activeClone: null,
         status: 'normal',

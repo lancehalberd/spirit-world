@@ -1,10 +1,10 @@
 import { isPointInShortRect } from 'app/utils/index';
 
-import { Actor, GameState, ObjectInstance, ShortRectangle, Tile } from 'app/types';
+import { Actor, AreaInstance, GameState, ObjectInstance, ShortRectangle, Tile } from 'app/types';
 
 
-export function getTilesInRectangle(state: GameState, rect: ShortRectangle): Tile[] {
-    const tileSize = state.areaInstance.palette.w;
+export function getTilesInRectangle(area: AreaInstance, rect: ShortRectangle): Tile[] {
+    const tileSize = area.palette.w;
     const tiles: Tile[] = []
     const l = Math.floor(rect.x / tileSize);
     const r = Math.floor((rect.x + rect.w - 1) / tileSize);
@@ -19,7 +19,7 @@ export function getTilesInRectangle(state: GameState, rect: ShortRectangle): Til
 }
 
 export function getActorTargets(state: GameState, actor: Actor): {tiles: Tile[], objects: ObjectInstance[]} {
-    const palette = state.areaInstance.palette;
+    const palette = actor.area.palette;
     const tileSize = palette.w;
     const objects: ObjectInstance[] = []
     const tiles: Tile[] = []
@@ -42,7 +42,7 @@ export function getActorTargets(state: GameState, actor: Actor): {tiles: Tile[],
         checkPoints.push({x: actor.x + actor.w - 1, y: actor.y + actor.h + 1});
     }
 
-    for (const object of state.areaInstance.objects.filter(o => o.getHitbox)) {
+    for (const object of actor.area.objects.filter(o => o.getHitbox)) {
         if (object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
             continue;
         }

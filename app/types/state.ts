@@ -1,4 +1,7 @@
-import { AreaGrid, AreaInstance, Frame, Hero, LootType, ShortRectangle, Zone, ZoneLocation } from 'app/types';
+import {
+    AreaGrid, AreaInstance,
+    Frame, Hero, LootType, ShortRectangle, Zone, ZoneLocation,
+} from 'app/types';
 
 export type SavedState = {
     objectFlags: {[key: string]: boolean},

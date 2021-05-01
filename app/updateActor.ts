@@ -7,6 +7,7 @@ import {
 } from 'app/content/areas';
 import { CloneExplosionEffect } from 'app/content/effects/CloneExplosionEffect';
 import { Enemy } from 'app/content/enemy';
+import { AstralProjection } from 'app/content/objects/astralProjection';
 import { editingState } from 'app/development/tileEditor';
 import { EXPLOSION_TIME, FRAME_LENGTH, GAME_KEY, MAX_SPIRIT_RADIUS } from 'app/gameConstants';
 import { getActorTargets } from 'app/getActorTargets';
@@ -50,11 +51,14 @@ export function updateAllHeroes(this: void, state: GameState) {
     for (const clone of state.hero.clones) {
         updateHero(state, clone);
     }
+    if (state.hero.action === 'meditating' && state.hero.spiritRadius >= MAX_SPIRIT_RADIUS && state.hero.astralProjection) {
+        updateHero(state, state.hero.astralProjection);
+    }
     updateHero(state, state.hero);
 }
 
 export function updateHero(this: void, state: GameState, hero: Hero) {
-    const area = state.areaInstance;
+    const area = hero.area;
     let dx = 0, dy = 0;
     let movementSpeed = 2;
 
@@ -63,7 +67,17 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
     const isCloneToolDown = (state.hero.leftTool === 'clone' && isGameKeyDown(state, GAME_KEY.LEFT_TOOL))
         || (state.hero.rightTool === 'clone' && isGameKeyDown(state, GAME_KEY.RIGHT_TOOL));
     const primaryClone = state.hero.activeClone || state.hero;
-    const isControlled = isCloneToolDown || hero === primaryClone;
+    const isAstralProjection = hero instanceof AstralProjection;
+    const isControlled = isAstralProjection || isCloneToolDown || hero === primaryClone;
+
+    // The astral projection uses the weapon tool as the passive tool button
+    // since you have to hold the normal passive tool button down to meditate.
+    const wasPassiveButtonPressed = isAstralProjection
+        ? wasGameKeyPressed(state, GAME_KEY.WEAPON)
+        : wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL);
+    const isPassiveButtonDown = isAstralProjection
+        ? isGameKeyDown(state, GAME_KEY.WEAPON)
+        : isGameKeyDown(state, GAME_KEY.PASSIVE_TOOL);
 
     // Automatically move the character into the bounds of the current section.
     if (editingState.isEditing && isControlled) {
@@ -76,7 +90,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         hero.x += 4 * dx;
         hero.y += 4 * dy;
         if (dx || dy) hero.d = getDirection(dx, dy);
-    } else if (state.nextAreaInstance) {
+    } else if (!isAstralProjection && state.nextAreaInstance) {
         movementSpeed = 0;
         if (state.nextAreaInstance.cameraOffset.x && state.hero.action !== 'entering') {
             // We need to make sure this is low enough that the character doesn't get entirely into the second column,
@@ -86,33 +100,33 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         if (state.nextAreaInstance.cameraOffset.y && state.hero.action !== 'entering') {
             dy = 1 * state.nextAreaInstance.cameraOffset.y / Math.abs(state.nextAreaInstance.cameraOffset.y);
         }
-    } else if (hero.x + hero.w > section.x + section.w + 1) {
+    } else if (!isAstralProjection && hero.x + hero.w > section.x + section.w + 1) {
         movementSpeed = 0;
         hero.x -= 0.5;
         //dx = -1;
-    } else if (hero.x < section.x - 1) {
+    } else if (!isAstralProjection && hero.x < section.x - 1) {
         movementSpeed = 0;
         hero.x += 0.5;
         //dx = 1;
-    } else if (hero.y + hero.h > section.y + section.h + 1) {
+    } else if (!isAstralProjection && hero.y + hero.h > section.y + section.h + 1) {
         movementSpeed = 0;
         hero.y -= 0.5;
         //dy = -1;
-    } else if (hero.y < section.y - 1) {
+    } else if (!isAstralProjection && hero.y < section.y - 1) {
         movementSpeed = 0;
         hero.y += 0.5;
         //dy = 1;
-    } else if (hero.action === 'swimming') {
+    } else if (!isAstralProjection && hero.swimming) {
         movementSpeed = 1.5;
-    } else if (hero.action === 'climbing') {
+    } else if (!isAstralProjection && hero.action === 'climbing') {
         movementSpeed = 1;
-    }  else if (hero.action === 'falling') {
+    }  else if (!isAstralProjection && hero.action === 'falling') {
         movementSpeed = 0;
         if (hero.animationTime >= fallAnimation.duration) {
             hero.action = 'fallen';
             hero.actionFrame = 0;
         }
-    } else if (hero.action === 'fallen') {
+    } else if (!isAstralProjection && hero.action === 'fallen') {
         movementSpeed = 0;
         hero.actionFrame++;
         if (hero.actionFrame >= 8) {
@@ -127,7 +141,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
                 hero.action = null;
             }
         }
-    } else if (hero.action === 'jumpingDown') {
+    } else if (!isAstralProjection && hero.action === 'jumpingDown') {
         movementSpeed = 0;
         // After the hero has jumped a bit, we stop the jump when they hit a position they can successfully move to.
         if (hero.vy > 4 && moveActor(state, hero, hero.vx, hero.vy, {canFall: true})) {
@@ -140,11 +154,11 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             hero.y += hero.vy;
             hero.vy = Math.min(8, hero.vy + 0.5);
         }
-    } else if (hero.action === 'beingCarried') {
+    } else if (!isAstralProjection && hero.action === 'beingCarried') {
         // The clone will update itself to match its carrier.
         hero.animationTime = 0;
         movementSpeed = 0;
-    } else if (hero.action === 'entering' || hero.action === 'exiting') {
+    } else if (!isAstralProjection && (hero.action === 'entering' || hero.action === 'exiting')) {
         // The door will move the player until the action is complete.
         movementSpeed = 0;
         hero.actionFrame++;
@@ -161,7 +175,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         if (hero.grabObject?.pullingHeroDirection) {
             dx = directionMap[hero.grabObject.pullingHeroDirection][0];
             dy = directionMap[hero.grabObject.pullingHeroDirection][1];
-        } else if (!hero.pickUpTile && !hero.pickUpObject && (!isGameKeyDown(state, GAME_KEY.PASSIVE_TOOL))) {
+        } else if (!hero.pickUpTile && !hero.pickUpObject && !isPassiveButtonDown) {
             hero.action = null;
             hero.grabTile = null;
             hero.grabObject = null;
@@ -203,7 +217,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         if (hero.actionFrame === 2) {
             hero.action = null;
         }
-    } else if (hero.action === 'meditating') {
+    } else if (!isAstralProjection && hero.action === 'meditating') {
         movementSpeed = 0;
         if (isControlled && isGameKeyDown(state, GAME_KEY.PASSIVE_TOOL) && hero.magic > 0) {
             if (state.hero.clones.length) {
@@ -229,6 +243,10 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             } else {
                 const maxRadius = MAX_SPIRIT_RADIUS;
                 hero.spiritRadius = Math.min(hero.spiritRadius + 4, maxRadius);
+                if (!hero.astralProjection && hero.area.alternateArea) {
+                    hero.astralProjection = new AstralProjection(hero);
+                    addObjectToArea(state, hero.area.alternateArea, hero.astralProjection);
+                }
             }
         } else {
             hero.explosionTime = 0;
@@ -237,7 +255,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
                 hero.action = null;
             }
         }
-    } else if (hero.action === 'knocked' || hero.action === 'thrown') {
+    } else if (!isAstralProjection && (hero.action === 'knocked' || hero.action === 'thrown')) {
         movementSpeed = 0;
         dx = hero.vx;
         dy = hero.vy;
@@ -248,11 +266,11 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             hero.action = null;
             hero.vz = 0;
         }
-    } else if (hero.z > 0) {
+    } else if (!isAstralProjection && hero.z > 0) {
         hero.action = 'knocked';
         dx = 0;
         dy = 0;
-    } else if (hero.action === 'attack') {
+    } else if (!isAstralProjection && hero.action === 'attack') {
         movementSpeed = 1;
         hero.actionFrame++;
         if (hero.actionFrame === 6) {
@@ -272,7 +290,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             hero.actionDx = 0;
             hero.actionDy = 0;
         }
-    } else if (hero.action === 'roll') {
+    } else if (!isAstralProjection && hero.action === 'roll') {
         movementSpeed = 0;
         dx = directionMap[hero.d][0] * rollSpeed[hero.actionFrame];
         dy = directionMap[hero.d][1] * rollSpeed[hero.actionFrame];
@@ -307,6 +325,10 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
     if (hero.action !== 'meditating') {
         hero.spiritRadius = 0;
         hero.explosionTime = 0;
+        if (hero.astralProjection) {
+            removeObjectFromArea(state, hero.astralProjection);
+            hero.astralProjection = null;
+        }
     }
     if (dx || dy) {
         const encumbered = hero.pickUpObject || hero.pickUpTile;
@@ -315,6 +337,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             canClimb: !encumbered,
             canFall: true,
             canSwim: !encumbered,
+            boundToSection: isAstralProjection,
         });
         if (!hero.action) {
             hero.action = 'walking';
@@ -334,7 +357,16 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             hero.animationTime += FRAME_LENGTH;
         }
     }
-    if (isControlled && (!hero.action || hero.action === 'walking' || hero.action === 'pushing')
+    if (isAstralProjection) {
+        const dx = hero.x - state.hero.x, dy = hero.y - state.hero.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        // The projection cannot move outside of the spirit radius.
+        if (distance > state.hero.spiritRadius) {
+            hero.x = state.hero.x + state.hero.spiritRadius * dx / distance;
+            hero.y = state.hero.y + state.hero.spiritRadius * dy / distance;
+        }
+    }
+    if (isControlled && !isAstralProjection && !hero.swimming && (!hero.action || hero.action === 'walking' || hero.action === 'pushing')
         && !hero.pickUpTile && !hero.pickUpObject &&  hero.weapon > 0
         && wasGameKeyPressed(state, GAME_KEY.WEAPON)
     ) {
@@ -350,7 +382,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
 
     if (hero.toolCooldown > 0) {
         hero.toolCooldown -= FRAME_LENGTH;
-    } else if ((!hero.action || hero.action === 'walking' || hero.action === 'pushing')
+    } else if (!isAstralProjection && !hero.swimming && (!hero.action || hero.action === 'walking' || hero.action === 'pushing')
         && !hero.pickUpTile && !hero.pickUpObject
     ) {
         if (isControlled && state.hero.leftTool && wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL)) {
@@ -361,9 +393,9 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             useTool(state, hero, state.hero.rightTool, dx, dy);
         }
     }
-    if (isControlled &&
+    if (isControlled && !hero.swimming &&
         (!hero.action || hero.action === 'walking' || hero.action === 'pushing') &&
-        !hero.pickUpTile && !hero.pickUpObject && wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL)) {
+        !hero.pickUpTile && !hero.pickUpObject && wasPassiveButtonPressed) {
         const {objects, tiles} = getActorTargets(state, hero);
         if (tiles.some(({x, y}) => area.behaviorGrid?.[y]?.[x]?.solid) || objects.some(o => o.behaviors?.solid)) {
             //console.log({dx, dy, tiles, objects});
@@ -473,7 +505,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             if (hero.action === 'grabbing') {
                 hero.action = null;
             }
-            if (isControlled && wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL)) {
+            if (isControlled && wasPassiveButtonPressed) {
                 throwHeldObject(state, hero);
             }
         }
@@ -482,7 +514,9 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
     if (hero.action !== 'beingCarried' && hero.action !== 'falling' && hero.action !== 'fallen' && hero.action !== 'knocked'
         && hero.action !== 'dead'  && hero.action !== 'getItem'
     ) {
-        checkForFloorEffects(state, hero);
+        if (!isAstralProjection) {
+            checkForFloorEffects(state, hero);
+        }
         checkForEnemyDamage(state, hero);
     }
     // Check for transition to other areas/area sections.
@@ -491,7 +525,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         && hero.actionTarget.definition.targetObjectId
     // Do not trigger the scrolling transition when traveling through a zone door.
     // Zone doors will eventually use a screen wipe transition.
-    if (!state.nextAreaSection && !state.nextAreaInstance && !isMovingThroughZoneDoor) {
+    if (!isAstralProjection && !state.nextAreaSection && !state.nextAreaInstance && !isMovingThroughZoneDoor) {
         // We only move to the next area if the player is moving in the direction of that area.
         // dx/dy handles most cases, but in some cases like moving through doorways we also need to check
         // hero.actionDx

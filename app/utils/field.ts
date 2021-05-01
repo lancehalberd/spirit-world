@@ -97,7 +97,7 @@ export function isPointOpen(
             }
         }
     }
-    if (!excludedObjects?.has(state.hero)) {
+    if (state.hero.area === area && !excludedObjects?.has(state.hero)) {
         if (isPixelInShortRect(x, y, state.hero)) {
             return false;
         }
@@ -149,7 +149,7 @@ export function getTileBehaviorsAndObstacles(
             }
         }
     }
-    if (!excludedObjects?.has(state.hero)) {
+    if (state.hero.area === area && !excludedObjects?.has(state.hero)) {
         if (isPixelInShortRect(x, y, state.hero)) {
             objects.push(state.hero);
             tileBehavior.solid = true;

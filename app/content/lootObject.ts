@@ -172,6 +172,12 @@ function showLootMessage(state: GameState, lootType: LootType, lootLevel?: numbe
                 + '{|}Hold {B_PASSIVE} to gaze into the Spirit World.'
                 + '{|}If an object is in both the Material World and Spirit World,'
                 + '{|}see what happens if you change it in the Material World!');
+        case 'astralProjection':
+            return showMessage(state, 'You have found the Summoner\'s Circlet!'
+                + '{|}Hold {B_PASSIVE} to gaze into the Spirit World.'
+                + '{|}While looking into the Spirit World, use {B_UP} to move your Astral Body.'
+                + '{|}With your Astral Body you can push and pickup light Spirit Objects.'
+                + '{|}In your Astral Body, press {B_WEAPON} to grab or pickup objects.');
         case 'fire':
         case 'ice':
         case 'lightning':
@@ -407,6 +413,8 @@ const [
 
 const lootFrames: Partial<{[key in LootType]: Frame}> = {
     smallKey: keyOutlineFrame,
+    // Summoner's Circlet.
+    astralProjection: createLootFrame('blue', 'SC'),
     bigKey: bigKeyOutlineFrame,
     bow: bowOutlineFrame,
     catEyes: catEyes,
@@ -419,6 +427,7 @@ const lootFrames: Partial<{[key in LootType]: Frame}> = {
     peach: smallPeachFrame,
     peachOfImmortality: goldPeachFrame,
     peachOfImmortalityPiece: peachPieceFrame,
+    // Spirit Eyes
     spiritSight: createLootFrame('blue', 'SE'),
     unknown: createLootFrame('black', '?'),
     weapon: weaponFrame,

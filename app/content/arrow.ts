@@ -7,7 +7,7 @@ import { createAnimation, drawFrameAt, getFrame } from 'app/utils/animations';
 import { getDirection } from 'app/utils/field';
 import { rectanglesOverlap } from 'app/utils/index';
 
-import { Clone, Direction, Frame, FrameAnimation, GameState, ObjectInstance, ObjectStatus } from 'app/types';
+import { AreaInstance, Clone, Direction, Frame, FrameAnimation, GameState, ObjectInstance, ObjectStatus } from 'app/types';
 
 const upContent = {x: 5, y: 2, w: 6, h: 6};
 const downContent = {x: 5, y: 8, w: 6, h: 6};
@@ -154,6 +154,7 @@ interface Props {
 }
 
 export class Arrow implements ObjectInstance {
+    area: AreaInstance;
     definition = null;
     frame: Frame;
     damage: number;
@@ -257,7 +258,7 @@ export class Arrow implements ObjectInstance {
                 }
             }
         }
-        for (const target of getTilesInRectangle(state, this)) {
+        for (const target of getTilesInRectangle(this.area, this)) {
             const area = state.areaInstance;
             const behavior = area.behaviorGrid?.[target.y]?.[target.x];
             const bowLevel = state.hero.activeTools.bow;
