@@ -1035,22 +1035,14 @@ function paceRandomly(state: GameState, enemy: Enemy) {
 }
 
 function moveEnemy(state, enemy, dx, dy, movementProperties: MovementProperties): boolean {
-
-    const { section } = getAreaSize(state);
     if (!movementProperties.excludedObjects) {
         movementProperties.excludedObjects = new Set();
     }
     movementProperties.excludedObjects.add(state.hero);
+    movementProperties.boundToSectionPadding = 16;
+    movementProperties.boundToSection = true;
     for (const clone of enemy.area.objects.filter(object => object instanceof Clone)) {
         movementProperties.excludedObjects.add(clone);
-    }
-    // Don't allow the enemy to move towards the outer edges of the screen.
-    if ((dx < 0 && enemy.x + dx < section.x + 16)
-        || (dx > 0 && enemy.x + dx + enemy.w > section.x + section.w - 16)
-        || (dy < 0 && enemy.y < section.y + 16)
-        || (dy > 0 && enemy.y + enemy.h > section.y + section.h - 16)
-    ) {
-        return false;
     }
     if (enemy.flying) {
         enemy.x += dx;
