@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import { addObjectToArea, convertAreaDefinition, linkObject, removeObjectFromArea } from 'app/content/areas';
+import { addObjectToArea, linkObject, removeObjectFromArea } from 'app/content/areas';
 import { dialogueHash } from 'app/content/dialogue';
 import { createObjectInstance } from 'app/content/objects';
 import { doorStyles } from 'app/content/door';
@@ -203,12 +203,12 @@ function getTargetObjectIdsByTypes(zone: Zone, types: ObjectType[]): string[] {
     for (const floor of zone.floors) {
         for (const row of floor.grid) {
             for (const area of row) {
-                combinedObjectIds.push(getTargetObjectIdsByTypesAndArea(convertAreaDefinition(area), types));
+                combinedObjectIds.push(getTargetObjectIdsByTypesAndArea(area, types));
             }
         }
         for (const row of floor.spiritGrid) {
             for (const area of row) {
-                combinedObjectIds.push(getTargetObjectIdsByTypesAndArea(convertAreaDefinition(area), types));
+                combinedObjectIds.push(getTargetObjectIdsByTypesAndArea(area, types));
             }
         }
     }

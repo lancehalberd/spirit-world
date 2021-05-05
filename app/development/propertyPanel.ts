@@ -172,6 +172,7 @@ export function updateBrushCanvas(selectedTiles: TileGridDefinition): void {
             for (let ty = 0; ty < selectedTiles.h; ty++) {
                 const tile = allTiles[selectedTiles.tiles[ty]?.[tx]];
                 if (!tile) {
+                    drawX(brushContext, tx * 16, ty * 16);
                     continue;
                 }
                 drawFrame(brushContext, tile.frame, {w: 16, h: 16, x: tx * 16, y: ty * 16});
@@ -179,6 +180,16 @@ export function updateBrushCanvas(selectedTiles: TileGridDefinition): void {
         }
     }
     brushContext.restore();
+}
+
+function drawX(context: CanvasRenderingContext2D, x: number, y: number) {
+    context.strokeStyle = 'red';
+    context.beginPath();
+    context.moveTo(x + 2, y + 2);
+    context.lineTo(x + 14, y + 14);
+    context.moveTo(x + 14, y + 2);
+    context.lineTo(x + 2, y + 14);
+    context.stroke();
 }
 
 // TODO: only return HTMLElements from this function
@@ -202,7 +213,10 @@ function renderProperty(property: EditorProperty<any> | HTMLElement | string): s
         for (let i = 0; i < palette.length; i++) {
             for (let j = 0; j < palette[i].length; j++) {
                 const tile = allTiles[palette[i][j]];
-                if (!tile) continue;
+                if (!tile) {
+                    drawX(paletteContext, j * 16, i * 16);
+                    continue;
+                }
                 drawFrame(paletteContext, tile.frame, { x: 16 * j, y: 16 * i, w: 16, h: 16});
             }
         }

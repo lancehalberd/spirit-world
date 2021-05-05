@@ -1,4 +1,3 @@
-import { convertAreaDefinition } from 'app/content/areas';
 import { zones } from 'app/content/zones';
 
 import { AreaGrid, Zone } from 'app/types';
@@ -18,7 +17,6 @@ export function serializeZone(zone: Zone) {
                     if (!area?.layers) {
                         continue;
                     }
-                    convertAreaDefinition(area);
                     area.layers.forEach(layer => {
                         for (let r = 0; r < layer.grid.tiles.length; r++) {
                             for (let c = 0; c < layer.grid.tiles[r].length; c++) {

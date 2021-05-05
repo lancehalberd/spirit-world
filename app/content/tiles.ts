@@ -266,6 +266,17 @@ const treeLeaves = canvasPalette((context: CanvasRenderingContext2D) => {
     context.fill();
 });
 
+const lightCaveCornersPalette: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/cavewalls2temp.png'), x: 32, y: 0, w: 8 * 32, h: 32},
+    behaviors: {'all': {solid: true}},
+};
+const lightCaveWallsPalette: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/cavewalls2temp.png'), x: 0, y: 32, w: 32, h: 4 * 32},
+    behaviors: {'all': {solid: true}},
+};
+
 addTiles([
     // This is the empty tile.
     singleTileSource('gfx/tiles/bush.png', null, -16),
@@ -325,5 +336,7 @@ addTiles([
     },
     singleTileSource('gfx/tiles/bushspirit.png', null, 16),
     singleTileSource('gfx/tiles/thornsspirit.png', null, 16),
+    lightCaveWallsPalette,
+    lightCaveCornersPalette,
 ]);
 

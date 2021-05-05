@@ -15,7 +15,6 @@ import {
     Direction, Enemy, FullTile, GameState, Hero, TileCoords,
     ObjectDefinition,
     ObjectInstance,
-    OldAreaDefinition, OldAreaLayerDefinition, OldTileGridDefinition,
     ShortRectangle, Tile, TileBehaviors,
     ZoneLocation,
 } from 'app/types';
@@ -99,7 +98,7 @@ export function getAreaFromLocation(location: ZoneLocation): AreaDefinition {
             initializeAreaTiles(location.isSpiritWorld ? getDefaultSpiritArea(location) : getDefaultArea());
         return grid[y][x] as AreaDefinition;
     } else if (!grid[y][x].layers) {
-        const areaDefinition = convertAreaDefinition(grid[y][x]);
+        const areaDefinition = grid[y][x];
         const defaultLayers = (location.isSpiritWorld ? getDefaultSpiritArea(location) : getDefaultArea()).layers;
         grid[y][x] = initializeAreaTiles({
             ...areaDefinition,
@@ -107,35 +106,7 @@ export function getAreaFromLocation(location: ZoneLocation): AreaDefinition {
         });
         return grid[y][x] as AreaDefinition;
     }
-    return convertAreaDefinition(grid[y][x]);
-}
-
-export function convertAreaDefinition(area: AreaDefinition | OldAreaDefinition): AreaDefinition {
-    if (area.parentDefinition) {
-        convertAreaDefinition(area.parentDefinition);
-    }
-    if (area.layers) {
-        area.layers.forEach(convertAreaLayer);
-    }
-    return area as AreaDefinition;
-}
-
-function convertAreaLayer(layer: AreaLayerDefinition | OldAreaLayerDefinition): AreaLayerDefinition {
-    for (let i = 0; i < layer.grid.tiles.length; i++) {
-        for (let j = 0; j < layer.grid.tiles.length; j++) {
-            // If we find a number, this layer has already been translated.
-            if (typeof layer.grid.tiles[i][j] === 'number') {
-                return layer as AreaLayerDefinition;
-            }
-            const grid = layer.grid as OldTileGridDefinition;
-            if (!grid.tiles[i][j]) {
-                layer.grid.tiles[i][j] = 0;
-                continue;
-            }
-            layer.grid.tiles[i][j] = 1 + grid.tiles[i][j].x + grid.tiles[i][j].y * 16;
-        }
-    }
-    return layer as AreaLayerDefinition;
+    return grid[y][x];
 }
 
 export function initializeAreaLayerTiles(layer: AreaLayerDefinition) {
