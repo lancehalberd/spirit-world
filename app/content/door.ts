@@ -50,6 +50,27 @@ const [
     /*westLockedDoorWood*/, westLockedDoorSteel, westLockedDoorBig,
 ] = createAnimation('gfx/tiles/cavewalls.png', {w: 32, h: 32}, {x: 1, y: 4, cols: 10}).frames;
 
+
+const [
+    lightSouthCrackedWall, lightSouthCaveFrame, lightSouthCaveCeiling, /*southCave*/,
+    lightSouthCaveDoorFrame, lightSouthCaveDoorCeiling,
+] = createAnimation('gfx/tiles/cavewalls2temp.png', {w: 32, h: 32}, {x: 1, y: 1, cols: 6}).frames;
+
+const [
+    lightEastCrackedWall, lightEastCaveFrame, lightEastCaveCeiling, /*lightEastCave*/,
+    lightEastCaveDoorFrame, lightEastCaveDoorCeiling,
+] = createAnimation('gfx/tiles/cavewalls2temp.png', {w: 32, h: 32}, {x: 1, y: 2, cols: 6}).frames;
+
+const [
+    lightNorthCrackedWall, lightNorthCaveFrame, lightNorthCaveCeiling, /*lightNorthCave*/,
+    lightNorthCaveDoorFrame, lightNorthCaveDoorCeiling,
+] = createAnimation('gfx/tiles/cavewalls2temp.png', {w: 32, h: 32}, {x: 1, y: 3, cols: 6}).frames;
+
+const [
+    lightWestCrackedWall, lightWestCaveFrame, lightWestCaveCeiling, /*lightWestCave*/,
+    lightWestCaveDoorFrame, lightWestCaveDoorCeiling,
+] = createAnimation('gfx/tiles/cavewalls2temp.png', {w: 32, h: 32}, {x: 1, y: 4, cols: 6}).frames;
+
 interface DoorStyleFrames {
     doorFrame: Frame,
     doorCeiling: Frame,
@@ -106,6 +127,46 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
             cracked: westCrackedWall,
             caveFrame: westCaveFrame,
             caveCeiling: westCaveCeiling,
+            cave: westCave,
+            locked: westLockedDoorSteel,
+            bigKeyLocked: westLockedDoorBig,
+        },
+    },
+    lightCave: {
+        w: 32,
+        h: 32,
+        down: {
+            doorFrame: lightSouthCaveDoorFrame, doorCeiling: lightSouthCaveDoorCeiling, doorClosed: southCaveDoorClosed,
+            cracked: lightSouthCrackedWall,
+            caveFrame: lightSouthCaveFrame,
+            caveCeiling: lightSouthCaveCeiling,
+            cave: southCave,
+            locked: southLockedDoorSteel,
+            bigKeyLocked: southLockedDoorBig,
+        },
+        right: {
+            doorFrame: lightEastCaveDoorFrame, doorCeiling: lightEastCaveDoorCeiling, doorClosed: eastCaveDoorClosed,
+            cracked: lightEastCrackedWall,
+            caveFrame: lightEastCaveFrame,
+            caveCeiling: lightEastCaveCeiling,
+            cave: eastCave,
+            locked: eastLockedDoorSteel,
+            bigKeyLocked: eastLockedDoorBig,
+        },
+        up: {
+            doorFrame: lightNorthCaveDoorFrame, doorCeiling: lightNorthCaveDoorCeiling, doorClosed: northCaveDoorClosed,
+            cracked: lightNorthCrackedWall,
+            caveFrame: lightNorthCaveFrame,
+            caveCeiling: lightNorthCaveCeiling,
+            cave: northCave,
+            locked: northLockedDoorSteel,
+            bigKeyLocked: northLockedDoorBig,
+        },
+        left: {
+            doorFrame: lightWestCaveDoorFrame, doorCeiling: lightWestCaveDoorCeiling, doorClosed: westCaveDoorClosed,
+            cracked: lightWestCrackedWall,
+            caveFrame: lightWestCaveFrame,
+            caveCeiling: lightWestCaveCeiling,
             cave: westCave,
             locked: westLockedDoorSteel,
             bigKeyLocked: westLockedDoorBig,
