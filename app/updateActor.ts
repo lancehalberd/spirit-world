@@ -362,10 +362,11 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
     if (isAstralProjection) {
         const dx = hero.x - state.hero.x, dy = hero.y - state.hero.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
+        const maxDistance = state.hero.spiritRadius - 16;
         // The projection cannot move outside of the spirit radius.
-        if (distance > state.hero.spiritRadius) {
-            hero.x = state.hero.x + state.hero.spiritRadius * dx / distance;
-            hero.y = state.hero.y + state.hero.spiritRadius * dy / distance;
+        if (distance > maxDistance) {
+            hero.x = state.hero.x + maxDistance * dx / distance;
+            hero.y = state.hero.y + maxDistance * dy / distance;
             if (hero.grabObject) {
                 hero.grabObject = null;
                 hero.action = null;

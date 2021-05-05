@@ -164,7 +164,7 @@ export function enterLocation(
     callback: () => void = null
 ): void {
     if (!instant) {
-        if (state.location?.zoneKey !== location.zoneKey || state.location?.floor !== location.floor) {
+        //if (state.location?.zoneKey !== location.zoneKey || state.location?.floor !== location.floor) {
             state.transitionState = {
                 callback,
                 nextLocation: location,
@@ -172,7 +172,7 @@ export function enterLocation(
                 type: state.location?.zoneKey !== location.zoneKey ? 'circle' : 'fade',
             };
             return;
-        }
+        //}
     }
     state.location = {
         ...location,

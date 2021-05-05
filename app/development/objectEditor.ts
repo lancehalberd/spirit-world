@@ -45,7 +45,7 @@ export function getLootTypes(): LootType[] {
 export const combinedObjectTypes: ObjectType[] = [
     'ballGoal', 'bigChest', 'chest', 'crystalSwitch',
     'door', 'floorSwitch', 'loot','marker', 'npc', 'pitEntrance',
-    'pushPull', 'rollingBall',  'sign', 'tippable', 'waterPot',
+    'pushPull', 'rollingBall',  'sign', 'teleporter', 'tippable', 'waterPot',
 ];
 
 export function createObjectDefinition(
@@ -146,6 +146,13 @@ export function createObjectDefinition(
                 type: definition.type,
             };
         case 'pitEntrance':
+            return {
+                ...commonProps,
+                targetZone: definition.targetZone,
+                targetObjectId: definition.targetObjectId,
+                type: definition.type,
+            };
+        case 'teleporter':
             return {
                 ...commonProps,
                 targetZone: definition.targetZone,
@@ -324,6 +331,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                 },
             });
         case 'pitEntrance':
+        case 'teleporter':
             const zoneKeys = Object.keys(zones);
             const zoneKey = object.targetZone || 'none';
             rows.push({
@@ -343,14 +351,15 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             const zone = zones[zoneKey];
             // Pit entrances target markers, but other entrances target the same kind of entrnace,
             // for example stairs => stairs, doors => doors.
-            const targetType: ObjectType = object.type === 'pitEntrance' ? 'marker' : object.type;
+            const targetType: ObjectType =
+                object.type === 'pitEntrance' ? 'marker' : object.type;
             const objectIds = zone ? getTargetObjectIdsByTypes(zone, [targetType]) : [];
             if (objectIds.length) {
                 if (objectIds.indexOf(object.targetObjectId) < 0) {
                     object.targetObjectId = objectIds[0];
                 }
                 rows.push({
-                    name: 'target marker',
+                    name: 'target',
                     value: object.targetObjectId,
                     values: objectIds,
                     onChange(targetObjectId: string) {

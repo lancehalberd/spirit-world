@@ -13,6 +13,7 @@ import { BallGoal } from 'app/content/objects/ballGoal';
 import { Marker } from 'app/content/objects/marker';
 import { NPC } from 'app/content/objects/npc';
 import { PitEntrance } from 'app/content/objects/pitEntrance';
+import { Teleporter } from 'app/content/objects/teleporter';
 import { Sign } from 'app/content/objects/sign';
 import { WaterPot } from 'app/content/objects/waterPot';
 
@@ -51,6 +52,8 @@ export function createObjectInstance(state: GameState, object: ObjectDefinition)
         return new Marker(object);
     } else if (object.type === 'sign') {
         return new Sign(object);
+    } else if (object.type === 'teleporter') {
+        return new Teleporter(state, object);
     } else if (object.type === 'waterPot') {
         return new WaterPot(state, object);
     }

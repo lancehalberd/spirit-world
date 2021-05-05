@@ -9,6 +9,7 @@ dialogueHash.tombGuardian = {
                 excludedFlags: ['$spiritSight'],
             },
             isExclusive: true,
+            progressFlag: 'tombTeleporter',
             text: [
                 `You've come to learn more about your spirit powers?
                 {|}I knew this day would come eventually...
@@ -25,9 +26,12 @@ dialogueHash.tombGuardian = {
                 excludedFlags: [],
             },
             isExclusive: true,
+            progressFlag: 'tombTeleporter',
             text: [
                 `I've tought you all I can for now.
-                {|}Talk to your mother to learn more about the summoners.
+                {|}Step into this teleporter to return to the lake.
+                {|}Use the teleporter to return once you can touch the Spirit World.`,
+                `Talk to your mother to learn more about the summoners.
                 {|}The door in the back will take you to the surface.`,
             ],
         },

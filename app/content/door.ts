@@ -28,28 +28,31 @@ const BITMAP_SIDE_DOOR_BOTTOM: Uint16Array = new Uint16Array([
 
 const [
     southCrackedWall, southCaveFrame, southCaveCeiling, southCave,
-    southCaveDoorFrame, southCaveDoorCeiling, southCaveDoorClosed,
+    southCaveDoorFrame, southCaveDoorCeiling, /*southCaveDoorClosed*/,
     /*southLockedDoorWood*/, southLockedDoorSteel, southLockedDoorBig,
 ] = createAnimation('gfx/tiles/cavewalls.png', {w: 32, h: 32}, {x: 1, y: 1, cols: 10}).frames;
 
 const [
     eastCrackedWall, eastCaveFrame, eastCaveCeiling, eastCave,
-    eastCaveDoorFrame, eastCaveDoorCeiling, eastCaveDoorClosed,
+    eastCaveDoorFrame, eastCaveDoorCeiling, /*eastCaveDoorClosed*/,
     /*eastLockedDoorWood*/, eastLockedDoorSteel, eastLockedDoorBig,
 ] = createAnimation('gfx/tiles/cavewalls.png', {w: 32, h: 32}, {x: 1, y: 2, cols: 10}).frames;
 
 const [
     northCrackedWall, northCaveFrame, northCaveCeiling, northCave,
-    northCaveDoorFrame, northCaveDoorCeiling, northCaveDoorClosed,
+    northCaveDoorFrame, northCaveDoorCeiling, /*northCaveDoorClosed*/,
     /*northLockedDoorWood*/, northLockedDoorSteel, northLockedDoorBig,
 ] = createAnimation('gfx/tiles/cavewalls.png', {w: 32, h: 32}, {x: 1, y: 3, cols: 10}).frames;
 
 const [
     westCrackedWall, westCaveFrame, westCaveCeiling, westCave,
-    westCaveDoorFrame, westCaveDoorCeiling, westCaveDoorClosed,
+    westCaveDoorFrame, westCaveDoorCeiling, /*westCaveDoorClosed*/,
     /*westLockedDoorWood*/, westLockedDoorSteel, westLockedDoorBig,
 ] = createAnimation('gfx/tiles/cavewalls.png', {w: 32, h: 32}, {x: 1, y: 4, cols: 10}).frames;
 
+const [
+    southTrapDoor, eastTrapDoor, northTrapDoor, westTrapDoor,
+] = createAnimation('gfx/tiles/trapdoor.png', {w: 32, h: 32}, {rows: 4}).frames;
 
 const [
     lightSouthCrackedWall, lightSouthCaveFrame, lightSouthCaveCeiling, /*southCave*/,
@@ -96,7 +99,7 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
         w: 32,
         h: 32,
         down: {
-            doorFrame: southCaveDoorFrame, doorCeiling: southCaveDoorCeiling, doorClosed: southCaveDoorClosed,
+            doorFrame: southCaveDoorFrame, doorCeiling: southCaveDoorCeiling, doorClosed: southTrapDoor,
             cracked: southCrackedWall,
             caveFrame: southCaveFrame,
             caveCeiling: southCaveCeiling,
@@ -105,7 +108,7 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
             bigKeyLocked: southLockedDoorBig,
         },
         right: {
-            doorFrame: eastCaveDoorFrame, doorCeiling: eastCaveDoorCeiling, doorClosed: eastCaveDoorClosed,
+            doorFrame: eastCaveDoorFrame, doorCeiling: eastCaveDoorCeiling, doorClosed: eastTrapDoor,
             cracked: eastCrackedWall,
             caveFrame: eastCaveFrame,
             caveCeiling: eastCaveCeiling,
@@ -114,7 +117,7 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
             bigKeyLocked: eastLockedDoorBig,
         },
         up: {
-            doorFrame: northCaveDoorFrame, doorCeiling: northCaveDoorCeiling, doorClosed: northCaveDoorClosed,
+            doorFrame: northCaveDoorFrame, doorCeiling: northCaveDoorCeiling, doorClosed: northTrapDoor,
             cracked: northCrackedWall,
             caveFrame: northCaveFrame,
             caveCeiling: northCaveCeiling,
@@ -123,7 +126,7 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
             bigKeyLocked: northLockedDoorBig,
         },
         left: {
-            doorFrame: westCaveDoorFrame, doorCeiling: westCaveDoorCeiling, doorClosed: westCaveDoorClosed,
+            doorFrame: westCaveDoorFrame, doorCeiling: westCaveDoorCeiling, doorClosed: westTrapDoor,
             cracked: westCrackedWall,
             caveFrame: westCaveFrame,
             caveCeiling: westCaveCeiling,
@@ -136,7 +139,7 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
         w: 32,
         h: 32,
         down: {
-            doorFrame: lightSouthCaveDoorFrame, doorCeiling: lightSouthCaveDoorCeiling, doorClosed: southCaveDoorClosed,
+            doorFrame: lightSouthCaveDoorFrame, doorCeiling: lightSouthCaveDoorCeiling, doorClosed: southTrapDoor,
             cracked: lightSouthCrackedWall,
             caveFrame: lightSouthCaveFrame,
             caveCeiling: lightSouthCaveCeiling,
@@ -145,7 +148,7 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
             bigKeyLocked: southLockedDoorBig,
         },
         right: {
-            doorFrame: lightEastCaveDoorFrame, doorCeiling: lightEastCaveDoorCeiling, doorClosed: eastCaveDoorClosed,
+            doorFrame: lightEastCaveDoorFrame, doorCeiling: lightEastCaveDoorCeiling, doorClosed: eastTrapDoor,
             cracked: lightEastCrackedWall,
             caveFrame: lightEastCaveFrame,
             caveCeiling: lightEastCaveCeiling,
@@ -154,7 +157,7 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
             bigKeyLocked: eastLockedDoorBig,
         },
         up: {
-            doorFrame: lightNorthCaveDoorFrame, doorCeiling: lightNorthCaveDoorCeiling, doorClosed: northCaveDoorClosed,
+            doorFrame: lightNorthCaveDoorFrame, doorCeiling: lightNorthCaveDoorCeiling, doorClosed: northTrapDoor,
             cracked: lightNorthCrackedWall,
             caveFrame: lightNorthCaveFrame,
             caveCeiling: lightNorthCaveCeiling,
@@ -163,7 +166,7 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
             bigKeyLocked: northLockedDoorBig,
         },
         left: {
-            doorFrame: lightWestCaveDoorFrame, doorCeiling: lightWestCaveDoorCeiling, doorClosed: westCaveDoorClosed,
+            doorFrame: lightWestCaveDoorFrame, doorCeiling: lightWestCaveDoorCeiling, doorClosed: westTrapDoor,
             cracked: lightWestCrackedWall,
             caveFrame: lightWestCaveFrame,
             caveCeiling: lightWestCaveCeiling,

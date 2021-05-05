@@ -176,7 +176,7 @@ function showLootMessage(state: GameState, lootType: LootType, lootLevel?: numbe
             return showMessage(state, 'You have found the Summoner\'s Circlet!'
                 + '{|}Hold {B_PASSIVE} to gaze into the Spirit World.'
                 + '{|}While looking into the Spirit World, use {B_UP} to move your Astral Body.'
-                + '{|}With your Astral Body you can push and pickup light Spirit Objects.'
+                + '{|}Your Astral Body can touch the Spirit World.'
                 + '{|}In your Astral Body, press {B_WEAPON} to grab or pickup objects.');
         case 'fire':
         case 'ice':

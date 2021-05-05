@@ -109,7 +109,7 @@ export interface CrystalSwitchDefinition extends BaseObjectDefinition {
 }
 
 export interface EntranceDefinition extends BaseObjectDefinition {
-    type: 'pitEntrance' | 'door' | 'stairs',
+    type: 'teleporter' | 'pitEntrance' | 'door' | 'stairs',
     targetZone?: string,
     targetObjectId?: string,
 }
