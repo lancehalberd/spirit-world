@@ -223,12 +223,10 @@ export function renderField(context: CanvasRenderingContext2D, state: GameState)
     renderAreaBackground(context, state, state.nextAreaInstance);
     renderAreaObjectsBeforeHero(context, state, state.areaInstance);
     renderAreaObjectsBeforeHero(context, state, state.nextAreaInstance);
-    if (!editingState.isEditing) {
-        context.save();
-            translateContextForAreaAndCamera(context, state, state.areaInstance);
-            state.hero.render(context, state);
-        context.restore();
-    }
+    context.save();
+        translateContextForAreaAndCamera(context, state, state.areaInstance);
+        state.hero.render(context, state);
+    context.restore();
     renderAreaObjectsAfterHero(context, state, state.areaInstance);
     renderAreaObjectsAfterHero(context, state, state.nextAreaInstance);
     if (state.hero.spiritRadius > 0) {

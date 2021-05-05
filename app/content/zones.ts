@@ -10,6 +10,7 @@ export * from 'app/content/zones/overworld';
 export * from 'app/content/zones/tomb';
 export * from 'app/content/zones/treeVillage';
 export * from 'app/content/zones/warTemple';
+export * from 'app/content/zones/cocoon';
 export * from 'app/content/zones/demo/bow';
 export * from 'app/content/zones/demo/clone';
 export * from 'app/content/zones/demo/entrance';

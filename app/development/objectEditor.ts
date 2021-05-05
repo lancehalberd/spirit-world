@@ -700,7 +700,7 @@ export function fixObjectPosition(state: GameState, object: ObjectDefinition): v
 }
 
 export function onMouseMoveSelect(state: GameState, editingState: EditingState, x: number, y: number): void {
-    if (!editingState.selectedObject?.id) {
+    if (!editingState.selectedObject?.id || !editingState.dragOffset) {
         return;
     }
     const linkedDefinition = getLinkedDefinition(state.alternateAreaInstance.definition, editingState.selectedObject);
@@ -774,7 +774,7 @@ export function isPointInObject(x: number, y: number, object: ObjectDefinition):
 
 function checkToAddLinkedObject(state: GameState, definition: ObjectDefinition): void {
     const linkedInstance = state.alternateAreaInstance.objects.find(other =>
-        definition.x === other.definition.x && definition.y === other.definition.y
+        definition.x === other.definition?.x && definition.y === other.definition?.y
     );
     if (linkedInstance) {
         updateObjectInstance(state, {...linkedInstance.definition, linked: definition.linked}, linkedInstance.definition, state.alternateAreaInstance);

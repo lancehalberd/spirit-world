@@ -28,6 +28,8 @@ Graphics:
 Todo:
 
 Current tasks:
+    - Fix teleporting to transition makes camera jerk:
+        - Probaly just need to 0 out spirit radius on entering a new area.
     - Clean up attack effects on defeating bosses.
         - Need to set a flag on all attack effects so they are easy to find and remove.
     - Difficulty shrine:
@@ -71,7 +73,7 @@ Peach Cave Improvemnts:
         - Spawns eggs
         - Drains light and regains a bit of health for every 25% lost
 
-Dungeon 1 Improvements
+Dungeon 1 Improvements:
     - Add rival fight when you open the door:
         - Rival guards the tomb
         - Rival is angered you have the Spirit Bow when you hit one of the switches.
@@ -204,8 +206,8 @@ Ability Locations:
     spiritSight         Vanara Tomb Boss
     gloves              Summoner Ruins Chest
     astralProjection    Summoner Ruins Boss
-    invisibility        RU Chest
-    teleportation       RU Boss
+    invisibility        Cocoon Chest
+    teleportation       Cocoon Boss
 # Treasure Dungeons
     cloudBoots          Forest Temple Chest
     clone               Forest Temple Boss
@@ -260,7 +262,7 @@ Late Dungeons:
 Final Dungeon:
     Warship: Clone 2 in big chest
 
-Dungeon 1:
+Dungeon 1: Vanara Tomb (fortress around the Cocoon)
     - Traps+locks to keep intruders away. Need to use bow to enter
         - Someone was stealing Vanara remains
     - Built around a suspended animation capsule
@@ -281,3 +283,10 @@ Dungeon 2: Ruins of Summoner village and Temple of War
     - Big Chest: Gloves 1
     - Boss: Elemental idols
     - Boss Reward: Astral Projection
+
+Dungeon 3: Cocoon (Vanara Regeneration Unit)
+    - Expected loadout: Cat Eyes, 7 hearts, Dodge, Bow, Spirit Sight, Gloves, Astral Projection
+    - Enemies
+    - Big Chest: Invisibility Technique
+    - Boss:
+    - Boss Reward: Teleportation (body moves to astral projection when pressing either tool button)

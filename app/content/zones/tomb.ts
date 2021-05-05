@@ -180,7 +180,7 @@ const f0_0x1: AreaDefinition = {
     ],
     objects: [
         {status: "normal", id: "tomb:0:1x0-door-0", x: 112, y: 480, type: "door", style: "cave", targetZone: null, targetObjectId: "tombEntrance", d: "down"},
-        {status: "closed", id: "tomb:0:1x0-door-1", x: 112, y: 0, type: "door", style: "cave", targetZone: "overworld", targetObjectId: "tombEntrance", d: "up"},
+        {status: "closedSwitch", id: "tombExit", x: 112, y: 0, type: "door", style: "cave", targetZone: "cocoon", targetObjectId: "cocoonEntrance", d: "up", linked: true, saveStatus: true},
         {status: "normal", id: "tomb:0:1x0-npc-0", x: 80, y: 208, d: "down", behavior: "none", style: "vanara", type: "npc", dialogueKey: "tombGuardian", dialogue: undefined},
         {status: "normal", id: "tombTeleporter", x: 160, y: 208, targetZone: "overworld", targetObjectId: "tombTeleporter", type: "teleporter"},
     ],
@@ -582,7 +582,22 @@ const f0_1x2: AreaDefinition = {
     ],
 };
 const sf0_0x0: AreaDefinition = null;
-const sf0_0x1: AreaDefinition = null;
+const sf0_0x1: AreaDefinition = {
+    isSpiritWorld: true,
+    parentDefinition: f0_0x1,
+    layers: null,
+    objects: [
+        {status: "closedSwitch", id: "tombExit", x: 112, y: 0, type: "door", style: "cave", targetZone: "overworld", targetObjectId: "tombEntrance", d: "up", linked: true, spirit: true},
+        {status: "normal", id: "tomb:s0:1x0-pushPull-0", x: 80, y: 48, type: "pushPull"},
+        {status: "normal", id: "tomb:s0:1x0-pushPull-1", x: 160, y: 48, type: "pushPull"},
+        {status: "normal", id: "tomb:s0:1x0-floorSwitch-0", x: 176, y: 48, targetObjectId: "tombExit", toggleOnRelease: true, type: "floorSwitch"},
+        {status: "normal", id: "tomb:s0:1x0-floorSwitch-1", x: 64, y: 48, targetObjectId: "tombExit", toggleOnRelease: true, type: "floorSwitch"},
+    ],
+    sections: [
+        {x: 0, y: 0, w: 16, h: 32},
+        {x: 16, y: 0, w: 16, h: 32},
+    ],
+};
 const sf0_0x2: AreaDefinition = null;
 const sf0_1x0: AreaDefinition = null;
 const sf0_1x1: AreaDefinition = null;

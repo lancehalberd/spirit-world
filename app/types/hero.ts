@@ -23,7 +23,7 @@ export type PassiveTool = 'gloves'
     | 'roll'
     | 'charge' | 'nimbusCloud'
     | 'catEyes' | 'spiritSight' | 'trueSight'
-    | 'astralProjection' | 'telekinesis'
+    | 'astralProjection' | 'teleportation'
     | 'ironSkin' | 'goldMail' | 'phoenixCrown'
     | 'waterBlessing' | 'fireBlessing';
 export type MagicElement = 'fire' | 'ice' | 'lightning';

@@ -267,7 +267,7 @@ export function getMovementDeltas(state: GameState): [number, number] {
 
 export function getCloneMovementDeltas(state: GameState, hero: Hero): [number, number] {
     const [dx, dy] = getMovementDeltas(state);
-    const activeClone = state.hero.astralProjection || state.hero.activeClone || state.hero;
+    const activeClone = (state.hero.action === 'meditating' && state.hero.astralProjection) || state.hero.activeClone || state.hero;
     if (activeClone.d === hero.d) {
         return [dx, dy];
     }

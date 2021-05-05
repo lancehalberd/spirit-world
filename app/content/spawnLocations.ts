@@ -90,6 +90,17 @@ export const SPAWN_WAR_TEMPLE_BOSS: ZoneLocation = {
     areaGridCoords: {x: 0, y: 0},
     isSpiritWorld: false,
 };
+export const SPAWN_COCOON_ENTRANCE: ZoneLocation = {
+    zoneKey: 'cocoon',
+    floor: 0,
+    x: 120,
+    y: 440,
+    z: 0,
+    d: 'up',
+    areaGridCoords: {x: 0, y: 0},
+    isSpiritWorld: false,
+};
+
 
 function applyItems(savedState: SavedState, items: {[key: string]: number}, objectFlags: string[] = []): SavedState {
     const newState: SavedState = _.cloneDeep(savedState);
@@ -145,6 +156,7 @@ const tombStartState = applyItems(peachCaveExitState, {bow: 1});
 const tombBossState = applyItems(tombStartState, {roll: 1, 'tomb:bigKey': 1});
 const warTempleStart = applyItems(tombBossState, {maxLife: 1, spiritSight: 1});
 const warTempleBoss = applyItems(warTempleStart, {gloves: 1, 'warTemple:bigKey': 1});
+const cocoonStartState = applyItems(warTempleBoss, {maxLife: 1, astralProjection: 1});
 
 
 const spawnLocations = {
@@ -175,6 +187,10 @@ const spawnLocations = {
     'War Temple Boss': {
         location: SPAWN_WAR_TEMPLE_BOSS,
         savedState: warTempleBoss,
+    },
+    'Cocoon Start': {
+        location: SPAWN_COCOON_ENTRANCE,
+        savedState: cocoonStartState,
     },
 };
 window['spawnLocations'] = spawnLocations;
@@ -245,5 +261,8 @@ export function checkToUpdateSpawnLocation(state: GameState): void {
     }
     if (state.location.zoneKey === 'warTemple' && state.savedState.objectFlags['warTempleEntrance']) {
         return setSpawnLocation(state, SPAWN_WAR_TEMPLE_ENTRANCE);
+    }
+    if (state.location.zoneKey === 'cocoon') {
+        return setSpawnLocation(state, SPAWN_COCOON_ENTRANCE);
     }
 }

@@ -20,7 +20,7 @@ import {
 import { checkForFloorEffects, moveActor } from 'app/moveActor';
 import { fallAnimation } from 'app/render/heroAnimations';
 import { useTool } from 'app/useTool';
-import { directionMap, getDirection, isPointOpen } from 'app/utils/field';
+import { canTeleportToCoords, directionMap, getDirection, isPointOpen } from 'app/utils/field';
 import { rectanglesOverlap } from 'app/utils/index';
 import { playSound } from 'app/utils/sounds';
 
@@ -53,7 +53,7 @@ export function updateAllHeroes(this: void, state: GameState) {
     for (const clone of state.hero.clones) {
         updateHero(state, clone);
     }
-    if (state.hero.action === 'meditating' && state.hero.spiritRadius >= MAX_SPIRIT_RADIUS && state.hero.astralProjection) {
+    if (state.hero.spiritRadius > 0 && state.hero.astralProjection) {
         updateHero(state, state.hero.astralProjection);
     }
     updateHero(state, state.hero);
@@ -70,7 +70,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         || (state.hero.rightTool === 'clone' && isGameKeyDown(state, GAME_KEY.RIGHT_TOOL));
     const primaryClone = state.hero.activeClone || state.hero;
     const isAstralProjection = hero instanceof AstralProjection;
-    const isControlled = isAstralProjection || isCloneToolDown || hero === primaryClone;
+    const isControlled = (state.hero.action === 'meditating' && isAstralProjection) || isCloneToolDown || hero === primaryClone;
 
     // The astral projection uses the weapon tool as the passive tool button
     // since you have to hold the normal passive tool button down to meditate.
@@ -245,7 +245,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             } else {
                 const maxRadius = MAX_SPIRIT_RADIUS;
                 hero.spiritRadius = Math.min(hero.spiritRadius + 4, maxRadius);
-                if (!hero.astralProjection && hero.area.alternateArea) {
+                if (hero.passiveTools.astralProjection && !hero.astralProjection && hero.area.alternateArea) {
                     hero.astralProjection = new AstralProjection(hero);
                     addObjectToArea(state, hero.area.alternateArea, hero.astralProjection);
                 }
@@ -253,6 +253,9 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         } else {
             hero.explosionTime = 0;
             hero.spiritRadius = Math.max(hero.spiritRadius - 8, 0);
+            if (hero.astralProjection) {
+                hero.astralProjection.d = hero.d;
+            }
             if (hero.spiritRadius === 0) {
                 hero.action = null;
             }
@@ -327,10 +330,6 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
     if (hero.action !== 'meditating') {
         hero.spiritRadius = 0;
         hero.explosionTime = 0;
-        if (hero.astralProjection) {
-            removeObjectFromArea(state, hero.astralProjection);
-            hero.astralProjection = null;
-        }
     }
     if (dx || dy) {
         const encumbered = hero.pickUpObject || hero.pickUpTile;
@@ -362,7 +361,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
     if (isAstralProjection) {
         const dx = hero.x - state.hero.x, dy = hero.y - state.hero.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
-        const maxDistance = state.hero.spiritRadius - 16;
+        const maxDistance = Math.max(0, state.hero.spiritRadius - 16);
         // The projection cannot move outside of the spirit radius.
         if (distance > maxDistance) {
             hero.x = state.hero.x + maxDistance * dx / distance;
@@ -370,6 +369,17 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             if (hero.grabObject) {
                 hero.grabObject = null;
                 hero.action = null;
+            }
+        }
+        if (wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL) || wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL)) {
+            if (state.hero.passiveTools.teleportation && state.hero.magic >= 10
+                && canTeleportToCoords(state, state.hero, {x: hero.x, y: hero.y})
+            ) {
+                state.hero.magic -= 10;
+                state.hero.x = hero.x;
+                state.hero.y = hero.y;
+                // match the projection to the hero eyes.
+                hero.d = 'down';
             }
         }
     }
@@ -501,6 +511,11 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
                 hero.d = 'down';
                 hero.actionFrame = 0;
                 hero.spiritRadius = 0;
+                if (hero.astralProjection) {
+                    hero.astralProjection.d = hero.d;
+                    hero.astralProjection.x = hero.x;
+                    hero.astralProjection.y = hero.y;
+                }
             }
         }
     }

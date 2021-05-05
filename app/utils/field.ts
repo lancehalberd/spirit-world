@@ -1,6 +1,6 @@
 import { isPixelInShortRect } from 'app/utils/index';
 
-import { AreaInstance, Direction, GameState, ObjectInstance, Tile, TileBehaviors } from 'app/types';
+import { AreaInstance, Direction, GameState, Hero, ObjectInstance, Tile, TileBehaviors } from 'app/types';
 
 const root2over2 = Math.sqrt(2) / 2;
 
@@ -58,6 +58,14 @@ export function getDirection(dx: number, dy: number, includeDiagonals = false): 
         return dx < 0 ? 'left' : 'right';
     }
     return dy < 0 ? 'up' : 'down';
+}
+
+export function canTeleportToCoords(state: GameState, hero: Hero, {x, y}: Tile): boolean {
+    const excludedObjects = new Set([hero]);
+    return isPointOpen(state, hero.area, {x: x + 2, y: y + 2}, excludedObjects) &&
+        isPointOpen(state, hero.area, {x: x + 14, y: y + 2}, excludedObjects) &&
+        isPointOpen(state, hero.area, {x: x + 2, y: y + 14}, excludedObjects) &&
+        isPointOpen(state, hero.area, {x: x + 14, y: y + 14}, excludedObjects);
 }
 
 export function isPointOpen(

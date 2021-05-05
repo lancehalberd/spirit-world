@@ -142,7 +142,7 @@ function showLootMessage(state: GameState, lootType: LootType, lootLevel?: numbe
             if (state.hero.activeTools.invisibility === 1) {
                 return showMessage(state, 'You learned the Invisibility Technique!' + equipToolMessage
                     + '{|}Press {B_TOOL} to become invisible and immune to most damage.'
-                    + '{|}This rapidly drains your Spirit Energy!'
+                    + '{|}This technique rapidly drains your Spirit Energy!'
                     + '{|}Press {B_TOOL} again to become visible again and recover.');
             }
             return;
@@ -178,6 +178,13 @@ function showLootMessage(state: GameState, lootType: LootType, lootLevel?: numbe
                 + '{|}While looking into the Spirit World, use {B_UP} to move your Astral Body.'
                 + '{|}Your Astral Body can touch the Spirit World.'
                 + '{|}In your Astral Body, press {B_WEAPON} to grab or pickup objects.');
+        case 'teleportation':
+            return showMessage(state, 'You have learned Teleportation!'
+                + '{|}Move your Astral Body away from you in the Sprit World'
+                + '{|}Press {B_TOOL} to teleport your Real Body to your Astral Body.'
+                + '{|}Teleportation consumes spirit energy, stand still to recover'
+                + '{|}Use teleportation to move past obstacles in the Real World.'
+                + '{|}Teleport into Spirit Gates to move your Real Body to the Spirit World.');
         case 'fire':
         case 'ice':
         case 'lightning':
@@ -419,8 +426,8 @@ const lootFrames: Partial<{[key in LootType]: Frame}> = {
     bow: bowOutlineFrame,
     catEyes: catEyes,
     clone: createLootFrame('red', 'C'),
-    invisibility: createLootFrame('red', 'I'),
-    trueSight: createLootFrame('blue', 'T'),
+    invisibility: mistScrollFrame,
+    trueSight: createLootFrame('blue', 'TS'),
     gloves: createLootFrame('blue', 'G'),
     roll: mistScrollFrame,
     staff: createLootFrame('red', 'S'),
@@ -429,6 +436,7 @@ const lootFrames: Partial<{[key in LootType]: Frame}> = {
     peachOfImmortalityPiece: peachPieceFrame,
     // Spirit Eyes
     spiritSight: createLootFrame('blue', 'SE'),
+    teleportation: createLootFrame('blue', 'TE'),
     unknown: createLootFrame('black', '?'),
     weapon: weaponFrame,
 };
@@ -513,7 +521,7 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: Lo
             state.hero.activeTools[loot.lootType] = applyUpgrade(state.hero.activeTools[loot.lootType], loot);
         } else if ([
             'gloves', 'roll', 'charge', 'nimbusCloud', 'catEyes', 'spiritSight',
-            'trueSight', 'astralProjection', 'telekinesis', 'ironSkin', 'goldMail', 'phoenixCrown',
+            'trueSight', 'astralProjection', 'teleportation', 'ironSkin', 'goldMail', 'phoenixCrown',
             'waterBlessing', 'fireBlessing'
         ].includes(loot.lootType)) {
             state.hero.passiveTools[loot.lootType] = applyUpgrade(state.hero.passiveTools[loot.lootType], loot);

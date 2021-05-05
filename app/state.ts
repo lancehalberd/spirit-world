@@ -77,6 +77,22 @@ export function applySavedState(state: GameState, savedState: SavedState): void 
         hero: {
             ...defaultSavedState.hero,
             ...savedState.hero,
+            passiveTools: {
+                ...defaultSavedState.hero.passiveTools,
+                ...savedState.hero.passiveTools,
+            },
+            activeTools: {
+                ...defaultSavedState.hero.activeTools,
+                ...savedState.hero.activeTools,
+            },
+            elements: {
+                ...defaultSavedState.hero.elements,
+                ...savedState.hero.elements,
+            },
+            equipment: {
+                ...defaultSavedState.hero.equipment,
+                ...savedState.hero.equipment,
+            },
             render: renderHero,
             spiritRadius: 0,
             explosionTime: 0,
@@ -158,7 +174,7 @@ function getDefaultHeroState(): Hero {
             spiritSight: 0,
             trueSight: 0,
             astralProjection: 0,
-            telekinesis: 0,
+            teleportation: 0,
             ironSkin: 0,
             goldMail: 0,
             phoenixCrown: 0,
