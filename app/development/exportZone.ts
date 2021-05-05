@@ -1,3 +1,4 @@
+import { convertAreaDefinition } from 'app/content/areas';
 import { zones } from 'app/content/zones';
 
 import { AreaGrid, Zone } from 'app/types';
@@ -8,7 +9,7 @@ export function exportZoneToClipboard(zone: Zone): void {
 }
 
 export function serializeZone(zone: Zone) {
-    const emptySpiritAreas = [];
+    const emptyAreas = [];
     for (const floor of zone.floors) {
         for (const areaGrid of [floor.grid, floor.spiritGrid]) {
             for (const gridRow of areaGrid) {
@@ -17,12 +18,11 @@ export function serializeZone(zone: Zone) {
                     if (!area?.layers) {
                         continue;
                     }
+                    convertAreaDefinition(area);
                     area.layers.forEach(layer => {
-                        for (let r = 0; r < layer.grid.tiles.length && isEmpty; r++) {
-                            for (let c = 0; c < layer.grid.tiles[r].length && isEmpty; c++) {
-                                const tile = layer.grid.tiles[r][c];
-                                // Spirit world tiles will be null when they should inherit from the physical world.
-                                if (!tile) {
+                        for (let r = 0; r < layer.grid.tiles.length; r++) {
+                            for (let c = 0; c < layer.grid.tiles[r].length; c++) {
+                                if (layer.grid.tiles[r][c]) {
                                     isEmpty = false;
                                     return false;
                                 }
@@ -30,7 +30,7 @@ export function serializeZone(zone: Zone) {
                         }
                     });
                     if (isEmpty) {
-                        emptySpiritAreas.push(area);
+                        emptyAreas.push(area);
                     }
                 }
             }
@@ -48,7 +48,7 @@ export function serializeZone(zone: Zone) {
             for (let row = 0; row < areaGrid.length; row++) {
                 for (let column = 0; column < areaGrid[row].length; column++) {
                     const area = areaGrid[row][column];
-                    if (!area || (emptySpiritAreas.includes(area) && !area.objects.length)) {
+                    if (!area || (emptyAreas.includes(area) && !area.objects.length)) {
                         lines.push(`const ${key}${floorIndex}_${row}x${column}: AreaDefinition = null;`);
                         continue;
                     }
@@ -57,7 +57,7 @@ export function serializeZone(zone: Zone) {
                         lines.push(`    isSpiritWorld: true,`);
                         lines.push(`    parentDefinition: f${floorIndex}_${row}x${column},`);
                     }
-                    if (!area.layers || emptySpiritAreas.includes(area)) {
+                    if (!area.layers || emptyAreas.includes(area)) {
                         // Setting the layers to null will initialize this to the
                         // default layers which inherits from parent area.
                         lines.push('    layers: null,');
@@ -74,7 +74,7 @@ export function serializeZone(zone: Zone) {
                                 lines.push(`                h: ${layer.grid.h},`);
                                 lines.push('                tiles: [');
                                 for (const row of layer.grid.tiles) {
-                                    lines.push(`                    [${row.join(',')}],`);
+                                    lines.push(`                    [${row.map(v => v || 0).join(',')}],`);
                                 }
                                 lines.push('                ],');
                                 lines.push('            },');
