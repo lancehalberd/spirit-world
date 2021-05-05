@@ -265,10 +265,8 @@ export class Arrow implements ObjectInstance {
             if (behavior?.cuttable <= bowLevel && !behavior?.low) {
                 // We need to find the specific cuttable layers that can be destroyed.
                 for (const layer of state.areaInstance.layers) {
-                    const palette = layer.palette;
                     const tile = layer.tiles[target.y][target.x];
-                    const behavior = palette.behaviors[`${tile.x}x${tile.y}`];
-                    if (behavior?.cuttable <= bowLevel) {
+                    if (tile?.behaviors?.cuttable <= bowLevel) {
                         destroyTile(state, state.areaInstance, {...target, layerKey: layer.key});
                     }
                 }

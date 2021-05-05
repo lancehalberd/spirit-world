@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 import { changeObjectStatus, createObjectInstance, findObjectInstanceById } from 'app/content/objects';
-import { palettes } from 'app/content/palettes';
+import { allTiles } from 'app/content/tiles';
 import { dropItemFromTable } from 'app/content/lootObject';
 import { checkToUpdateSpawnLocation } from 'app/content/spawnLocations';
 import { zones } from 'app/content/zones';
@@ -12,8 +12,11 @@ import { updateCamera } from 'app/updateCamera';
 
 import {
     AreaDefinition, AreaInstance, AreaLayerDefinition,
-    Direction, Enemy, GameState, Hero, LayerTile, ObjectDefinition,
-    ObjectInstance, ShortRectangle, Tile, TileBehaviors,
+    Direction, Enemy, FullTile, GameState, Hero, TileCoords,
+    ObjectDefinition,
+    ObjectInstance,
+    OldAreaDefinition, OldAreaLayerDefinition, OldTileGridDefinition,
+    ShortRectangle, Tile, TileBehaviors,
     ZoneLocation,
 } from 'app/types';
 
@@ -29,8 +32,6 @@ export function getDefaultArea(): AreaDefinition {
                     // The dimensions of the grid.
                     w: 32,
                     h: 32,
-                    // The palette to use for this grid (controls the size of tiles)
-                    palette: 'floor',
                     // The matrix of tiles
                     tiles: [],
                 },
@@ -41,8 +42,6 @@ export function getDefaultArea(): AreaDefinition {
                     // The dimensions of the grid.
                     w: 32,
                     h: 32,
-                    // The palette to use for this grid (controls the size of tiles)
-                    palette: 'field',
                     // The matrix of tiles
                     tiles: [],
                 },
@@ -65,8 +64,6 @@ export function getDefaultSpiritArea(location: ZoneLocation): AreaDefinition {
                     // The dimensions of the grid.
                     w: 32,
                     h: 32,
-                    // The palette to use for this grid (controls the size of tiles)
-                    palette: 'spiritFloor',
                     // The matrix of tiles
                     tiles: [],
                 },
@@ -77,8 +74,6 @@ export function getDefaultSpiritArea(location: ZoneLocation): AreaDefinition {
                     // The dimensions of the grid.
                     w: 32,
                     h: 32,
-                    // The palette to use for this grid (controls the size of tiles)
-                    palette: 'spiritField',
                     // The matrix of tiles
                     tiles: [],
                 },
@@ -94,6 +89,7 @@ export function getDefaultSpiritArea(location: ZoneLocation): AreaDefinition {
 export function getAreaFromLocation(location: ZoneLocation): AreaDefinition {
     const floor = zones[location.zoneKey].floors[location.floor];
     const grid = location.isSpiritWorld ? floor.spiritGrid : floor.grid;
+
     const {x, y} = location.areaGridCoords;
     if (!grid[y]) {
         grid[y] = [];
@@ -101,20 +97,53 @@ export function getAreaFromLocation(location: ZoneLocation): AreaDefinition {
     if (!grid[y][x]) {
         grid[y][x] =
             initializeAreaTiles(location.isSpiritWorld ? getDefaultSpiritArea(location) : getDefaultArea());
+        return grid[y][x] as AreaDefinition;
     } else if (!grid[y][x].layers) {
+        const areaDefinition = convertAreaDefinition(grid[y][x]);
         const defaultLayers = (location.isSpiritWorld ? getDefaultSpiritArea(location) : getDefaultArea()).layers;
-        grid[y][x] = initializeAreaTiles({...grid[y][x], layers: defaultLayers});
+        grid[y][x] = initializeAreaTiles({
+            ...areaDefinition,
+            layers: defaultLayers
+        });
+        return grid[y][x] as AreaDefinition;
     }
-    return grid[y][x];
+    return convertAreaDefinition(grid[y][x]);
+}
+
+export function convertAreaDefinition(area: AreaDefinition | OldAreaDefinition): AreaDefinition {
+    if (area.parentDefinition) {
+        convertAreaDefinition(area.parentDefinition);
+    }
+    if (area.layers) {
+        area.layers.forEach(convertAreaLayer);
+    }
+    return area as AreaDefinition;
+}
+
+function convertAreaLayer(layer: AreaLayerDefinition | OldAreaLayerDefinition): AreaLayerDefinition {
+    for (let i = 0; i < layer.grid.tiles.length; i++) {
+        for (let j = 0; j < layer.grid.tiles.length; j++) {
+            // If we find a number, this layer has already been translated.
+            if (typeof layer.grid.tiles[i][j] === 'number') {
+                return layer as AreaLayerDefinition;
+            }
+            const grid = layer.grid as OldTileGridDefinition;
+            if (!grid.tiles[i][j]) {
+                layer.grid.tiles[i][j] = 0;
+                continue;
+            }
+            layer.grid.tiles[i][j] = 1 + grid.tiles[i][j].x + grid.tiles[i][j].y * 16;
+        }
+    }
+    return layer as AreaLayerDefinition;
 }
 
 export function initializeAreaLayerTiles(layer: AreaLayerDefinition) {
-    const palette = palettes[layer.grid.palette];
     const tiles = layer.grid.tiles;
     for (let y = 0; y < layer.grid.h; y++) {
         tiles[y] = tiles[y] || [];
         for (let x = 0; x < layer.grid.w; x++) {
-            tiles[y][x] = tiles[y][x] || _.sample(palette.defaultTiles);
+            tiles[y][x] = tiles[y][x] || null;
         }
     }
 }
@@ -290,13 +319,13 @@ export function setNextAreaSection(state: GameState, d: Direction): void {
     removeAllClones(state);
     state.nextAreaSection = state.areaInstance.definition.sections[0];
     const hero = state.hero;
-    let x = hero.x / state.areaInstance.palette.w;
-    let y = hero.y / state.areaInstance.palette.h;
+    let x = hero.x / 16;
+    let y = hero.y / 16;
     if (d === 'right') {
-        x += hero.w / state.areaInstance.palette.w;
+        x += hero.w / 16;
     }
     if (d === 'down') {
-        y += hero.h / state.areaInstance.palette.h;
+        y += hero.h / 16;
     }
     for (const section of state.areaInstance.definition.sections) {
         if (isPointInShortRect(x, y, section)) {
@@ -327,13 +356,13 @@ export function switchToNextAreaSection(state: GameState): void {
 export function setAreaSection(state: GameState, d: Direction, newArea: boolean = false): void {
     const lastAreaSection = state.areaSection;
     state.areaSection = state.areaInstance.definition.sections[0];
-    let x = state.hero.x / state.areaInstance.palette.w;
-    let y = state.hero.y / state.areaInstance.palette.h;
+    let x = state.hero.x / 16;
+    let y = state.hero.y / 16;
     if (d === 'right') {
-        x += state.hero.w / state.areaInstance.palette.w;
+        x += state.hero.w / 16;
     }
     if (d === 'down') {
-        y += state.hero.h / state.areaInstance.palette.h;
+        y += state.hero.h / 16;
     }
     for (const section of state.areaInstance.definition.sections) {
         if (isPointInShortRect(x, y, section)) {
@@ -368,21 +397,20 @@ export function scrollToArea(state: GameState, area: AreaDefinition, direction: 
 }
 
 export function applyLayerToBehaviorGrid(behaviorGrid: TileBehaviors[][], layer: AreaLayerDefinition, parentLayer: AreaLayerDefinition): void {
-    const grid = layer.grid;
-    const palette = palettes[grid.palette];
-    for (let y = 0; y < grid.tiles.length; y++) {
+    const tiles = layer.grid.tiles;
+    for (let y = 0; y < tiles.length; y++) {
         if (!behaviorGrid[y]) {
             behaviorGrid[y] = [];
         }
-        for (let x = 0; x < grid.tiles.length; x++) {
-            let tile = grid.tiles[y][x];
+        for (let x = 0; x < tiles.length; x++) {
+            let tile = tiles[y][x];
             if (!tile && parentLayer) {
                 tile = parentLayer.grid.tiles[y][x];
             }
             if (!tile) {
                 continue;
             }
-            const behaviors = palette.behaviors[`${tile.x}x${tile.y}`];
+            const behaviors = allTiles[tile]?.behaviors;
             // The behavior grid combines behaviors of all layers, with higher layers
             // overriding the behavior of lower layers.
             if (behaviors) {
@@ -390,7 +418,6 @@ export function applyLayerToBehaviorGrid(behaviorGrid: TileBehaviors[][], layer:
                 const brightness = Math.max(behaviorGrid[y][x]?.brightness || 0, behaviors.brightness || 0);
                 behaviorGrid[y][x] = {...(behaviorGrid[y][x] || {}), ...behaviors, lightRadius, brightness};
             }
-
         }
     }
 }
@@ -401,35 +428,45 @@ export function applyLayerToBehaviorGrid(behaviorGrid: TileBehaviors[][], layer:
 export function resetTileBehavior(area: AreaInstance, {x, y}: Tile): void {
     delete area.behaviorGrid?.[y]?.[x];
     for (const layer of area.layers) {
-        const palette = layer.palette;
         const tile = layer.tiles[y]?.[x];
         if (!tile) {
             continue;
         }
-        const behaviors = palette.behaviors[`${tile.x}x${tile.y}`];
         // The behavior grid combines behaviors of all layers, with higher layers
         // overriding the behavior of lower layers.
-        if (behaviors) {
-            area.behaviorGrid[y][x] = {...(area.behaviorGrid[y][x] || {}), ...behaviors};
+        if (tile.behaviors) {
+            if (!area.behaviorGrid[y]) {
+                area.behaviorGrid[y] = [];
+            }
+            area.behaviorGrid[y][x] = {...(area.behaviorGrid[y][x] || {}), ...tile.behaviors};
         }
     }
 }
 
+export function mapTileNumbersToFullTiles(tileNumbers: number[][]): FullTile[][] {
+    const fullTiles: FullTile[][] = [];
+    for (let i = 0; i < tileNumbers.length; i++) {
+        fullTiles[i] = [];
+        for (let j = 0; j < tileNumbers[i].length; j++) {
+            if (tileNumbers[i][j] && typeof tileNumbers[i][j] !== 'number') {
+                console.error('NaN', tileNumbers[i][j]);
+                debugger;
+            }
+            fullTiles[i][j] = allTiles[tileNumbers[i][j]];
+        }
+    }
+    return fullTiles;
+}
+
 export function createAreaInstance(state: GameState, definition: AreaDefinition): AreaInstance {
     const behaviorGrid: TileBehaviors[][] = [];
-    for (let i = 0; i < definition.layers.length; i++) {
-        applyLayerToBehaviorGrid(behaviorGrid, definition.layers[i], definition.parentDefinition?.layers[i]);
-    }
-    // Currently all layers should use matching grids, so just grab the first.
-    const palette = palettes[definition.layers[0].grid.palette];
     const [canvas, context] = createCanvasAndContext(
-        palette.w * definition.layers[0].grid.w,
-        palette.h * definition.layers[0].grid.h,
+        definition.layers[0].grid.w * 16,
+        definition.layers[0].grid.h * 16,
     );
     const instance: AreaInstance = {
         alternateArea: null,
         definition: definition,
-        palette,
         w: definition.layers[0].grid.w,
         h: definition.layers[0].grid.h,
         behaviorGrid,
@@ -439,9 +476,8 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
             definition: layer,
             ...layer,
             ...layer.grid,
-            tiles: _.cloneDeep(layer.grid.tiles),
-            originalTiles: _.cloneDeep(layer.grid.tiles),
-            palette: palettes[layer.grid.palette]
+            tiles: mapTileNumbersToFullTiles(layer.grid.tiles),
+            originalTiles: mapTileNumbersToFullTiles(layer.grid.tiles),
         })),
         objects: [],
         priorityObjects: [],
@@ -449,13 +485,20 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
         context,
         cameraOffset: {x: 0, y: 0},
     };
+    for (let i = 0; i < definition.layers.length; i++) {
+        applyLayerToBehaviorGrid(behaviorGrid, definition.layers[i], definition.parentDefinition?.layers[i]);
+    }
     if (definition.parentDefinition) {
         for (let l = 0; l < instance.layers.length; l++) {
             for (let y = 0; y < instance.layers[l].tiles.length; y++) {
                 for (let x = 0; x < instance.layers[l].tiles[y].length; x++) {
                     if (!instance.layers[l].tiles[y][x]) {
-                        instance.layers[l].tiles[y][x] = definition.parentDefinition.layers[l].grid.tiles[y][x];
-                        instance.layers[l].originalTiles[y][x] = definition.parentDefinition.layers[l].grid.tiles[y][x];
+                        const parentTile = allTiles[definition.parentDefinition.layers[l].grid.tiles[y][x]];
+                        // Tiles with linked offsets map to different tiles than the parent definition.
+                        const linkedOffset = parentTile?.behaviors?.linkedOffset || 0;
+                        const tile = linkedOffset ? allTiles[parentTile.index + linkedOffset] : parentTile;
+                        instance.layers[l].tiles[y][x] = tile;
+                        instance.layers[l].originalTiles[y][x] = tile;
                     }
                 }
 
@@ -470,13 +513,13 @@ export function getAreaSize(state: GameState): {w: number, h: number, section: S
     const area = state.areaInstance;
     const areaSection = state.nextAreaSection || state.areaSection;
     return {
-        w: area.palette.w * area.w,
-        h: area.palette.h * area.h,
+        w: 16 * area.w,
+        h: 16 * area.h,
         section: {
-            x: areaSection.x * state.areaInstance.palette.w,
-            y: areaSection.y * state.areaInstance.palette.h,
-            w: areaSection.w * state.areaInstance.palette.w,
-            h: areaSection.h * state.areaInstance.palette.h,
+            x: areaSection.x * 16,
+            y: areaSection.y * 16,
+            w: areaSection.w * 16,
+            h: areaSection.h * 16,
         },
     }
 }
@@ -557,7 +600,7 @@ export function removeObjectFromArea(state: GameState, object: ObjectInstance): 
     }
 }
 
-export function destroyTile(state: GameState, area: AreaInstance, target: LayerTile): void {
+export function destroyTile(state: GameState, area: AreaInstance, target: TileCoords): void {
     const layer = _.find(area.layers, { key: target.layerKey });
     if (!layer) {
         console.error(`Missing target layer: ${target.layerKey}`);
@@ -568,14 +611,14 @@ export function destroyTile(state: GameState, area: AreaInstance, target: LayerT
         area.tilesDrawn[target.y][target.x] = false;
     }
     area.checkToRedrawTiles = true;
-    const underTile = behavior?.underTile || {x: 0, y: 0};
-    layer.tiles[target.y][target.x] = underTile;
+    const underTile = behavior?.underTile || 0;
+    layer.tiles[target.y][target.x] = allTiles[underTile];
 
     resetTileBehavior(area, target);
     if (behavior?.lootTable) {
         dropItemFromTable(state, area, behavior.lootTable,
-            (target.x + 0.5) * area.palette.w,
-            (target.y + 0.5) * area.palette.h
+            (target.x + 0.5) * 16,
+            (target.y + 0.5) * 16
         );
     }
 }

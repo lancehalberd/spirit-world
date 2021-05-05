@@ -4,9 +4,9 @@ import { carryMap, directionMap, directionToLeftRotationsFromRight, rotateDirect
 
 import {
     Action, ActiveTool, AreaInstance,
-    Direction, DrawPriority, MagicElement, Equipment, Frame,
-    GameState, Hero, LayerTile, ObjectInstance, ObjectStatus, PassiveTool,
-    ShortRectangle, Tile, TileBehaviors, ZoneLocation
+    Direction, DrawPriority, MagicElement, Equipment, Frame, FullTile,
+    GameState, Hero, ObjectInstance, ObjectStatus, PassiveTool,
+    ShortRectangle, TileBehaviors, TileCoords, ZoneLocation
 } from 'app/types';
 
 export class Clone implements Hero, ObjectInstance {
@@ -57,9 +57,9 @@ export class Clone implements Hero, ObjectInstance {
     actionFrame: number;
     carrier: Hero;
     pickUpFrame: number;
-    pickUpTile: LayerTile;
+    pickUpTile: FullTile;
     pickUpObject: ObjectInstance;
-    grabTile: Tile;
+    grabTile: TileCoords;
     grabObject: ObjectInstance;
     invulnerableFrames: number;
     leftTool: ActiveTool;

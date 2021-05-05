@@ -1,9 +1,9 @@
 import { zones } from 'app/content/zones/zoneHash';
 
-import { AreaDefinition } from 'app/types';
+import { OldAreaDefinition } from 'app/types';
 
 const e = null, t0 = {x: 10, y: 0}, t1 = {x: 9, y: 1}, t2 = {x: 10, y: 1}, t3 = {x: 3, y: 2}, t4 = {x: 9, y: 0}, t5 = {x: 0, y: 0}, t6 = {x: 14, y: 0}, t7 = {x: 4, y: 1}, t8 = {x: 2, y: 1}, t9 = {x: 11, y: 0}, t10 = {x: 1, y: 1}, t11 = {x: 15, y: 0}, t12 = {x: 3, y: 1}, t13 = {x: 0, y: 1}, t14 = {x: 13, y: 0}, t15 = {x: 12, y: 4}, t16 = {x: 14, y: 3}, t17 = {x: 12, y: 0}, t18 = {x: 14, y: 7}, t19 = {x: 15, y: 7}, t20 = {x: 13, y: 7}, t21 = {x: 6, y: 9}, t22 = {x: 1, y: 9}, t23 = {x: 6, y: 5}, t24 = {x: 1, y: 4}, t25 = {x: 2, y: 8}, t26 = {x: 11, y: 9}, t27 = {x: 1, y: 5}, t28 = {x: 13, y: 4}, t29 = {x: 0, y: 4}, t30 = {x: 2, y: 6}, t31 = {x: 14, y: 5}, t32 = {x: 5, y: 4}, t33 = {x: 6, y: 4}, t34 = {x: 1, y: 6}, t35 = {x: 7, y: 4}, t36 = {x: 0, y: 5}, t37 = {x: 4, y: 5}, t38 = {x: 13, y: 3}, t39 = {x: 15, y: 5}, t40 = {x: 3, y: 6}, t41 = {x: 4, y: 6}, t42 = {x: 8, y: 4}, t43 = {x: 2, y: 4}, t44 = {x: 7, y: 5}, t45 = {x: 8, y: 5}, t46 = {x: -1, y: -1}, t47 = {x: -1, y: 0}, t48 = {x: 11, y: 1}, t49 = {x: 14, y: 9}, t50 = {x: 0, y: 10}, t51 = {x: 4, y: 8}, t52 = {x: 14, y: 8}, t53 = {x: 8, y: 10}, t54 = {x: 7, y: 9}, t55 = {x: 10, y: 7}, t56 = {x: 8, y: 8}, t57 = {x: 9, y: 4}, t58 = {x: 11, y: 3}, t59 = {x: 12, y: 3}, t60 = {x: 6, y: 10}, t61 = {x: 15, y: 8}, t62 = {x: 2, y: 5}, t63 = {x: 9, y: 3}, t64 = {x: 3, y: 5}, t65 = {x: 6, y: 8}, t66 = {x: 11, y: 7}, t67 = {x: 15, y: 3}, t68 = {x: 7, y: 8}, t69 = {x: 5, y: 5}, t70 = {x: 5, y: 6}, t71 = {x: 6, y: 6}, t72 = {x: 7, y: 6}, t73 = {x: 8, y: 6}, t74 = {x: 9, y: 7}, t75 = {x: 3, y: 4}, t76 = {x: 4, y: 4}, t77 = {x: 11, y: 5}, t78 = {x: 12, y: 5}, t79 = {x: 7, y: 10}, t80 = {x: 12, y: 7}, t81 = {x: 0, y: 8}, t82 = {x: 0, y: 9}, t83 = {x: 8, y: 9}, t84 = {x: 3, y: 8}, t85 = {x: 8, y: 3}, t86 = {x: 13, y: 1}, t87 = {x: 0, y: 2}, t88 = {x: 10, y: 4}, t89 = {x: 11, y: 4}, t90 = {x: 9, y: 5}, t91 = {x: 10, y: 5}, t92 = {x: 10, y: 3}, t93 = {x: 5, y: 0}, t94 = {x: 6, y: 0}, t95 = {x: 4, y: 3}, t96 = {x: 1, y: 0};
-const f0_0x0: AreaDefinition = {
+const f0_0x0: OldAreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -99,7 +99,7 @@ const f0_0x0: AreaDefinition = {
         {x: 0, y: 16, w: 32, h: 16},
     ],
 };
-const f0_0x1: AreaDefinition = {
+const f0_0x1: OldAreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -196,7 +196,7 @@ const f0_0x1: AreaDefinition = {
         {x: 16, y: 16, w: 16, h: 16},
     ],
 };
-const f0_0x2: AreaDefinition = {
+const f0_0x2: OldAreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -290,7 +290,7 @@ const f0_0x2: AreaDefinition = {
         {x: 16, y: 0, w: 16, h: 32},
     ],
 };
-const f0_1x0: AreaDefinition = {
+const f0_1x0: OldAreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -430,7 +430,7 @@ const f0_1x0: AreaDefinition = {
         {x: 0, y: 16, w: 32, h: 16},
     ],
 };
-const f0_1x1: AreaDefinition = {
+const f0_1x1: OldAreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -524,7 +524,7 @@ const f0_1x1: AreaDefinition = {
         {x: 0, y: 0, w: 32, h: 32},
     ],
 };
-const f0_1x2: AreaDefinition = {
+const f0_1x2: OldAreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -619,7 +619,7 @@ const f0_1x2: AreaDefinition = {
         {x: 16, y: 16, w: 16, h: 16},
     ],
 };
-const f0_2x0: AreaDefinition = {
+const f0_2x0: OldAreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -758,7 +758,7 @@ const f0_2x0: AreaDefinition = {
     ],
     dark: 50,
 };
-const f0_2x1: AreaDefinition = {
+const f0_2x1: OldAreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -895,7 +895,7 @@ const f0_2x1: AreaDefinition = {
         {x: 16, y: 0, w: 16, h: 32},
     ],
 };
-const f0_2x2: AreaDefinition = {
+const f0_2x2: OldAreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -1003,10 +1003,10 @@ const f0_2x2: AreaDefinition = {
         {x: 0, y: 0, w: 32, h: 32},
     ],
 };
-const sf0_0x0: AreaDefinition = null;
-const sf0_0x1: AreaDefinition = null;
-const sf0_0x2: AreaDefinition = null;
-const sf0_1x0: AreaDefinition = {
+const sf0_0x0: OldAreaDefinition = null;
+const sf0_0x1: OldAreaDefinition = null;
+const sf0_0x2: OldAreaDefinition = null;
+const sf0_1x0: OldAreaDefinition = {
     isSpiritWorld: true,
     parentDefinition: f0_1x0,
     layers: [
@@ -1145,7 +1145,7 @@ const sf0_1x0: AreaDefinition = {
         {x: 0, y: 16, w: 32, h: 16},
     ],
 };
-const sf0_1x1: AreaDefinition = {
+const sf0_1x1: OldAreaDefinition = {
     isSpiritWorld: true,
     parentDefinition: f0_1x1,
     layers: null,
@@ -1156,8 +1156,8 @@ const sf0_1x1: AreaDefinition = {
         {x: 0, y: 0, w: 32, h: 32},
     ],
 };
-const sf0_1x2: AreaDefinition = null;
-const sf0_2x0: AreaDefinition = {
+const sf0_1x2: OldAreaDefinition = null;
+const sf0_2x0: OldAreaDefinition = {
     isSpiritWorld: true,
     parentDefinition: f0_2x0,
     layers: [
@@ -1294,7 +1294,7 @@ const sf0_2x0: AreaDefinition = {
         {x: 0, y: 0, w: 32, h: 32},
     ],
 };
-const sf0_2x1: AreaDefinition = {
+const sf0_2x1: OldAreaDefinition = {
     isSpiritWorld: true,
     parentDefinition: f0_2x1,
     layers: [
@@ -1433,7 +1433,7 @@ const sf0_2x1: AreaDefinition = {
         {x: 16, y: 0, w: 16, h: 32},
     ],
 };
-const sf0_2x2: AreaDefinition = {
+const sf0_2x2: OldAreaDefinition = {
     isSpiritWorld: true,
     parentDefinition: f0_2x2,
     layers: null,

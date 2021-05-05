@@ -1061,9 +1061,8 @@ export const enemyDeathAnimation: FrameAnimation = createAnimation('gfx/effects/
 
 
 export function checkForFloorEffects(state: GameState, enemy: Enemy) {
-    const palette = enemy.area.palette;
     const behaviorGrid = enemy.area.behaviorGrid;
-    const tileSize = palette.w;
+    const tileSize = 16;
 
     const hitbox = enemy.getHitbox(state);
     let leftColumn = Math.floor((hitbox.x + 6) / tileSize);

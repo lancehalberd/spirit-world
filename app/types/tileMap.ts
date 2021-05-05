@@ -1,7 +1,6 @@
 import {
-    BossType, EnemyType, Frame, GameState,
-    Hero, LootTable, LootType, MagicElement, MinionType,
-    NPCBehavior, NPCStyle,
+    Frame, LootTable,
+    ObjectDefinition, ObjectInstance,
     ShortRectangle,
 } from 'app/types';
 
@@ -22,8 +21,10 @@ export interface TileBehaviors {
     destructible?: boolean,
     // This tile can be jumped over in this direction but is otherwise impassable.
     jumpDirection?: Direction,
-    // If this is true then this tile will link to a matching tile in the alternate world.
-    linked?: boolean,
+    // If this is true then this tile will link to a tile with the given tile index in the alternate world.
+    linkableTiles?: number[],
+    // If this is set, then the default tile in the spirit world will be offset by this number.
+    linkedOffset?: number,
     lootTable?: LootTable,
     // If this is true projectiles can pass over this tile even if it is solid.
     // Also, the bow won't cut low tiles like thorns.
@@ -42,24 +43,19 @@ export interface TileBehaviors {
     // Can be picked up with glove
     pickupWeight?: number,
     // Tile to display if this tile is removed (picked up, cut, blown up).
-    underTile?: {x: number, y: number},
-    growTiles?: Tile[],
+    underTile?: number,
+    growTiles?: number[],
     shallowWater?: boolean,
     water?: boolean,
 }
 
-export interface TilePalette {
-    // The size of the tiles
-    w: number,
-    h: number,
-    // The source frame of the tiles.
-    source: Frame,
-    // Array of tiles to randomly apply by default.
-    defaultTiles?: Tile[],
-    behaviors?: {
-        [key: string]: TileBehaviors,
-    },
-    stamps?: Tile[][][],
+export type TilePalette = number[][];
+
+
+export interface TileCoords {
+    layerKey?: string,
+    x: number,
+    y: number,
 }
 
 export interface Tile {
@@ -68,38 +64,45 @@ export interface Tile {
     y: number,
 }
 
-export interface LayerTile {
-    layerKey: string,
-    linked?: boolean,
-    x: number,
-    y: number,
+export interface FullTile {
+    // The index of this tile in the `allTiles` array.
+    index: number,
+    frame: Frame,
+    behaviors?: TileBehaviors,
+    // This will be set to the linked tile when a player is carrying a linked tile.
+    linkedTile?: FullTile,
+}
+
+export interface TileGridDefinition {
+    // The dimensions of the grid.
+    w: number,
+    h: number,
+    // The matrix of tiles
+    tiles: number[][],
+}
+
+export interface OldTileGridDefinition {
+    // The dimensions of the grid.
+    w: number,
+    h: number,
+    palette?: string,
+    // The matrix of tiles
+    tiles: {x: number, y: number}[][],
 }
 
 export interface TileGrid {
     // The dimensions of the grid.
     w: number,
     h: number,
-    // The palette to use for this grid (controls the size of tiles)
-    palette: TilePalette,
     // The matrix of tiles
-    tiles: Tile[][],
+    tiles: FullTile[][],
 }
 
 export interface AreaTileGrid extends TileGrid {
     // The matrix of tiles as they should be on resetting the area (respawning bushes etc)
     // This is different than the definition because certain effects change the reset behavior
     // but should not actually change the definition of the area.
-    originalTiles: Tile[][],
-}
-
-interface AreaTileGridDefinition {
-    // The dimensions of the grid.
-    w: number,
-    h: number,
-    // The palette to use for this grid (controls the size of tiles)
-    palette: string,
-    // The matrix of tiles
-    tiles: Tile[][],
+    originalTiles: FullTile[][],
 }
 
 export interface ZoneLocation {
@@ -118,7 +121,15 @@ export interface ZoneLocation {
 export interface AreaLayerDefinition {
     // Unique identifier for this layer.
     key: string,
-    grid?: AreaTileGridDefinition,
+    grid?: TileGridDefinition,
+    // Coordinates for the layer origin, if not (0, 0).
+    x?: number,
+    y?: number,
+}
+export interface OldAreaLayerDefinition {
+    // Unique identifier for this layer.
+    key: string,
+    grid?: OldTileGridDefinition,
     // Coordinates for the layer origin, if not (0, 0).
     x?: number,
     y?: number,
@@ -147,6 +158,20 @@ export interface AreaDefinition {
     // Set to true if this is a spirit world area.
     isSpiritWorld?: boolean,
 }
+export interface OldAreaDefinition {
+    default?: boolean,
+    layers: OldAreaLayerDefinition[],
+    objects: ObjectDefinition[],
+    // Used to divide a larger super tile into smaller screens.
+    sections: ShortRectangle[],
+    // 0/undefined = fully lit, 100 = pitch black.
+    dark?: number,
+    // Spirit world areas with real counterparts have this reference set
+    // to make it more convenient to translate real tiles/objects to the spirit world.
+    parentDefinition?: OldAreaDefinition,
+    // Set to true if this is a spirit world area.
+    isSpiritWorld?: boolean,
+}
 
 export interface Zone {
     key: string,
@@ -159,12 +184,11 @@ export interface Floor {
     spiritGrid: AreaGrid,
 }
 
-export type AreaGrid = AreaDefinition[][];
+export type AreaGrid = (AreaDefinition | OldAreaDefinition)[][];
 
 export interface AreaInstance {
     alternateArea: AreaInstance,
     definition: AreaDefinition,
-    palette: TilePalette,
     w: number,
     h: number,
     behaviorGrid: TileBehaviors[][],
@@ -188,159 +212,4 @@ export interface AreaInstance {
     cameraOffset: {x: number, y: number},
 }
 
-export type DrawPriority = 'background' | 'foreground' | 'sprites'
-
-export interface ObjectInstance {
-    area?: AreaInstance,
-    definition?: ObjectDefinition,
-    linkedObject?: ObjectInstance,
-    behaviors?: TileBehaviors,
-    drawPriority?: DrawPriority,
-    // Set this flag for objects that need to update during screen transitions, such as doorways.
-    updateDuringTransition?: boolean,
-    // Setting this true is the same as returning true always for shouldReset+shouldRespawn.
-    alwaysReset?: boolean,
-    // Should revert to its original state if still present
-    shouldReset?: (state: GameState) => boolean,
-    // Should revert to its original state if missing (Defeated enemy, ball that fell in a pit)
-    shouldRespawn?: (state: GameState) => boolean,
-    x: number, y: number, z?: number,
-    status: ObjectStatus,
-    changeStatus?: (state: GameState, status: ObjectStatus) => void,
-    cleanup?: (state: GameState) => void,
-    // This is called when a user grabs a solid tile
-    getHitbox?: (state: GameState) => ShortRectangle,
-    onDestroy?: (state: GameState, dx: number, dy: number) => void,
-    // When the hero tries to pick up the object with the passive skill button.
-    // The direction is the direction the player is facing.
-    onGrab?: (state: GameState, direction: Direction, hero: Hero) => void,
-    // When the hero hits the object with a weapon or tool
-    onHit?: (state: GameState, direction: Direction, element?: MagicElement) => void,
-    // When the hero grabs an object and attempts to move.
-    onPull?: (state: GameState, direction: Direction, hero: Hero) => void,
-    // When the hero walks into an object
-    onPush?: (state: GameState, direction: Direction) => void,
-    pullingHeroDirection?: Direction,
-    update?: (state: GameState) => void,
-    add?: (state: GameState, area: AreaInstance) => void,
-    remove?: (state: GameState) => void,
-    render: (context: CanvasRenderingContext2D, state: GameState) => void,
-    renderShadow?: (context: CanvasRenderingContext2D, state: GameState) => void,
-    renderForeground?: (context: CanvasRenderingContext2D, state: GameState) => void,
-}
-
-export type ObjectStatus = 'active' | 'closed' | 'closedEnemy' | 'closedSwitch'
-    | 'gone' | 'hiddenSwitch' | 'hiddenEnemy' | 'normal'
-    | 'locked' | 'bigKeyLocked' | 'cracked' | 'blownOpen';
-
-export interface MovementProperties {
-    boundToSection?: boolean,
-    boundToSectionPadding?: number,
-    canPush?: boolean,
-    canFall?: boolean,
-    canSwim?: boolean,
-    canClimb?: boolean,
-    // Whether the mover should wiggle to fit into tight spaces.
-    canWiggle?: boolean,
-    // Objects to ignore for hit detection.
-    excludedObjects?: Set<any>
-}
-
-export interface BaseObjectDefinition {
-    id: string,
-    // Whether this is linked to an object in the physical/spirit world.
-    linked?: boolean,
-    // Whether to save the status of this object permanently (for example switches to open dungeon doors).
-    saveStatus?: boolean,
-    // Whether this is a spirit object.
-    spirit?: boolean,
-    // Stores optional style type for some objects, e.g., 'short' vs 'tall' signs.
-    style?: string,
-    status: ObjectStatus,
-    x: number,
-    y: number,
-    d?: Direction,
-}
-
-export interface BallGoalDefinition extends BaseObjectDefinition {
-    type: 'ballGoal',
-    targetObjectId?: string,
-}
-
-export interface FloorSwitchDefinition extends BaseObjectDefinition {
-    type: 'floorSwitch',
-    toggleOnRelease?: boolean,
-    targetObjectId?: string,
-}
-
-export interface LootObjectDefinition extends BaseObjectDefinition {
-    type: 'bigChest' | 'chest' | 'loot',
-    lootType: LootType,
-    lootAmount?: number,
-    // If this is 0/unset it means it is progressive.
-    lootLevel?: number,
-}
-
-export interface CrystalSwitchDefinition extends BaseObjectDefinition {
-    type: 'crystalSwitch',
-    element: MagicElement,
-    // If this is set, this crystal will de-activate after this many milliseconds.
-    timer?: number,
-    targetObjectId?: string,
-}
-
-export interface EntranceDefinition extends BaseObjectDefinition {
-    type: 'pitEntrance' | 'door' | 'stairs',
-    targetZone?: string,
-    targetObjectId?: string,
-}
-
-export interface SignDefinition extends BaseObjectDefinition {
-    type: 'sign',
-    message: string,
-}
-
-export interface NPCDefinition extends BaseObjectDefinition {
-    type: 'npc',
-    behavior: NPCBehavior,
-    style: NPCStyle,
-    dialogueKey?: string,
-    dialogue?: string,
-}
-
-export type SimpleObjectType = 'marker' | 'pushPull' | 'rollingBall' | 'tippable' | 'waterPot';
-
-export interface SimpleObjectDefinition extends BaseObjectDefinition {
-    type: SimpleObjectType,
-}
-
-export interface EnemyObjectDefinition extends BaseObjectDefinition {
-    type: 'enemy',
-    enemyType: EnemyType | MinionType,
-    params?: {[key: string]: any},
-}
-
-export interface BossObjectDefinition extends BaseObjectDefinition {
-    type: 'boss',
-    enemyType: BossType,
-    params?: {[key: string]: any},
-    lootType: LootType,
-    lootAmount?: number,
-    // If this is 0/unset it means it is progressive.
-    lootLevel?: number,
-}
-
-export type ObjectDefinition = SimpleObjectDefinition
-    | BallGoalDefinition
-    | BossObjectDefinition
-    | CrystalSwitchDefinition
-    | EntranceDefinition
-    | EnemyObjectDefinition
-    | FloorSwitchDefinition
-    | LootObjectDefinition
-    | NPCDefinition
-    | SignDefinition
-    ;
-
-export type ObjectType = ObjectDefinition['type'];
 

@@ -3,8 +3,8 @@ import { AstralProjection } from 'app/content/objects/astralProjection';
 import { Staff } from 'app/content/staff';
 
 import {
-    AreaInstance, Direction, FrameAnimation, GameState, LayerTile,
-    ObjectInstance, ObjectStatus, Tile, ZoneLocation,
+    AreaInstance, Direction, FrameAnimation, FullTile, GameState,
+    ObjectInstance, ObjectStatus, TileCoords, ZoneLocation,
 } from 'app/types';
 
 export type Action =
@@ -81,8 +81,8 @@ export interface Actor {
     explosionTime?: number,
     pickUpFrame?: number,
     pickUpObject?: ObjectInstance;
-    pickUpTile?: LayerTile,
-    grabTile?: Tile,
+    pickUpTile?: FullTile,
+    grabTile?: TileCoords,
     grabObject?: ObjectInstance,
     invulnerableFrames?: number,
     life: number,

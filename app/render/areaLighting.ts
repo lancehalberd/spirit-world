@@ -117,10 +117,7 @@ export function renderAreaLighting(context: CanvasRenderingContext2D, state: Gam
             1, state.hero.lightRadius
         );
         if (hero.pickUpTile) {
-            const tile = hero.pickUpTile;
-            const layer = _.find(state.areaInstance.layers, { key: tile.layerKey});
-            const palette = layer.palette;
-            const behaviors = palette.behaviors[`${tile.x}x${tile.y}`];
+            const behaviors = hero.pickUpTile.behaviors;
             if (behaviors?.brightness) {
                 const offset = carryMap[hero.d][Math.min(hero.pickUpFrame, carryMap[hero.d].length - 1)];
                 drawLightGradient(lightingContext,
@@ -153,10 +150,7 @@ export function renderAreaLighting(context: CanvasRenderingContext2D, state: Gam
                 }
                 if (object instanceof Clone) {
                     if (object.pickUpTile) {
-                        const tile = object.pickUpTile;
-                        const layer = _.find(state.areaInstance.layers, { key: tile.layerKey});
-                        const palette = layer.palette;
-                        const behaviors = palette.behaviors[`${tile.x}x${tile.y}`];
+                        const behaviors = object.pickUpTile.behaviors;
                         if (behaviors?.brightness) {
                             const offset = carryMap[object.d][Math.min(object.pickUpFrame, carryMap[object.d].length - 1)];
                             drawLightGradient(lightingContext,

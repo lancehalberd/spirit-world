@@ -4,7 +4,7 @@ import { enterZoneByTarget, resetTileBehavior } from 'app/content/areas';
 import { findObjectInstanceById } from 'app/content/objects';
 import {
     BITMAP_LEFT, BITMAP_RIGHT,
-} from 'app/content/palettes';
+} from 'app/content/bitMasks';
 import { showMessage } from 'app/render/renderMessage';
 import { saveGame } from 'app/state';
 import { createAnimation, drawFrame } from 'app/utils/animations';

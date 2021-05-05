@@ -115,9 +115,8 @@ export class ThrownChakram implements ObjectInstance {
             if (behavior?.cuttable <= state.hero.weapon) {
                 // We need to find the specific cuttable layers that can be destroyed.
                 for (const layer of this.area.layers) {
-                    const palette = layer.palette;
                     const tile = layer.tiles[target.y][target.x];
-                    const behavior = palette.behaviors[`${tile.x}x${tile.y}`];
+                    const behavior = tile?.behaviors;
                     if (behavior?.cuttable <= state.hero.weapon) {
                         destroyTile(state, this.area, {...target, layerKey: layer.key});
                         addParticleAnimations(state, this.area, target.x * 16, target.y * 16, 2, behavior.particles, behavior);

@@ -3,6 +3,7 @@ export * from 'app/types/logic';
 export * from 'app/types/other';
 export * from 'app/types/state';
 export * from 'app/types/tileMap';
+export * from 'app/types/objects';
 
 export { AnimationEffect } from 'app/content/animationEffect';
 export { Clone } from 'app/content/clone';

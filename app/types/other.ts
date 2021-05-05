@@ -1,4 +1,4 @@
-import { TileGrid, TilePalette } from 'app/types';
+import { TileGridDefinition, TilePalette } from 'app/types';
 
 export interface ExtraAnimationProperties {
     // The animation will loop unless this is explicitly set to false.
@@ -122,9 +122,9 @@ export interface EditorPaletteProperty {
     name: string,
     id?: string,
     // The selection is a complete tile grid, but will often be used to represent a single tile.
-    value?: TileGrid,
+    value?: TileGridDefinition,
     palette: TilePalette,
-    onChange: (newValue: TileGrid) => void,
+    onChange: (newValue: TileGridDefinition) => void,
 }
 
 export interface EditorButtonProperty {

@@ -1,10 +1,12 @@
+import { allTiles } from 'app/content/tiles';
 import { createCanvas, tagElement } from 'app/dom';
+import { KEY, isKeyboardKeyDown } from 'app/keyCommands';
 import { drawFrame } from 'app/utils/animations';
 import { getMousePosition, isMouseDown } from 'app/utils/mouse';
 
 import {
     EditorArrayProperty, EditorButtonProperty, EditorPaletteProperty, EditorProperty, EditorSingleProperty,
-    PanelRows, PropertyRow, TileGrid,
+    PanelRows, PropertyRow, TileGridDefinition,
 } from 'app/types';
 
 
@@ -140,13 +142,20 @@ function isPaletteProperty(property: EditorProperty<any>): property is EditorPal
     return !!property?.['palette'];
 }
 
+const paletteCanvas = createCanvas(100, 100);
+paletteCanvas.style.border = '1px solid black';
+paletteCanvas.draggable = false;
+paletteCanvas.style.transformOrigin = '0 0';
+const paletteContext = paletteCanvas.getContext('2d');
+paletteContext.imageSmoothingEnabled = false;
+
 const brushCanvas = createCanvas(100, 100);
 brushCanvas.style.border = '1px solid black';
 const brushContext = brushCanvas.getContext('2d');
 brushContext.imageSmoothingEnabled = false;
-export function updateBrushCanvas(selectedTiles: TileGrid): void {
-    const brushWidth = selectedTiles.w * selectedTiles.palette.w;
-    const brushHeight = selectedTiles.h * selectedTiles.palette.h;
+export function updateBrushCanvas(selectedTiles: TileGridDefinition): void {
+    const brushWidth = selectedTiles.w * 16;
+    const brushHeight = selectedTiles.h * 16;
     const scale = Math.min(brushCanvas.width / brushWidth, brushCanvas.height / brushHeight);
     // TODO: Make this light grey 5px checkers to indicate transparent areas.
     brushContext.fillStyle = 'blue';
@@ -159,21 +168,13 @@ export function updateBrushCanvas(selectedTiles: TileGrid): void {
             (brushCanvas.height - brushHeight * scale) / 2,
         );
         brushContext.scale(scale, scale);
-        const image = selectedTiles.palette.source.image;
-        const w = selectedTiles.palette.w;
-        const h = selectedTiles.palette.h;
         for (let tx = 0; tx < selectedTiles.w; tx++) {
             for (let ty = 0; ty < selectedTiles.h; ty++) {
-                const tile = selectedTiles.tiles[ty]?.[tx];
+                const tile = allTiles[selectedTiles.tiles[ty]?.[tx]];
                 if (!tile) {
                     continue;
                 }
-                const frame = {
-                    image, w, h,
-                    x: selectedTiles.palette.source.x + w * tile.x,
-                    y: selectedTiles.palette.source.y + h * tile.y,
-                };
-                drawFrame(brushContext, frame, {w, h, x: tx * w, y: ty * h});
+                drawFrame(brushContext, tile.frame, {w: 16, h: 16, x: tx * 16, y: ty * 16});
             }
         }
     }
@@ -193,32 +194,76 @@ function renderProperty(property: EditorProperty<any> | HTMLElement | string): s
     if (isPaletteProperty(property)) {
         propertiesById[property.id || property.name] = property;
         const span = tagElement('span', 'pp-property');
-        const image = property.palette.source.image;
+        const palette = property.palette;
+        paletteCanvas.width = palette[0].length * 16;
+        paletteCanvas.height = palette.length * 16;
+        const scale = Math.min(1, 400 / paletteCanvas.height);
+
+        for (let i = 0; i < palette.length; i++) {
+            for (let j = 0; j < palette[i].length; j++) {
+                const tile = allTiles[palette[i][j]];
+                if (!tile) continue;
+                drawFrame(paletteContext, tile.frame, { x: 16 * j, y: 16 * i, w: 16, h: 16});
+            }
+        }
 
         const selectTile = () => {
-            let [x, y] = getMousePosition(image, Math.min(1, 400 / property.palette.source.h));
-            const tx = Math.floor(x / property.palette.w);
-            const ty = Math.floor(y / property.palette.h);
+            let [x, y] = getMousePosition(paletteCanvas, scale);
+            const tx = Math.floor(x / 16);
+            const ty = Math.floor(y / 16);
             property.onChange({
-                palette: property.palette, w: 1, h: 1,
-                tiles: [[{x: tx, y: ty}]],
+                w: 1, h: 1,
+                tiles: [[palette[ty][tx]]],
             });
         }
-        // Prevent dragging ghost preview of the image around.
-        image.draggable = false;
-        image.onclick = (e) => {
-            selectTile();
+        let dragX, dragY;
+        const updateBrushSelection = (x: number, y: number): void => {
+            const tx1 = Math.floor(dragX / 16);
+            const ty1 = Math.floor(dragY / 16);
+            const tx2 = Math.floor(x / 16);
+            const ty2 = Math.floor(y / 16);
+            const L = Math.max(0, Math.min(tx1, tx2));
+            const R = Math.min(paletteCanvas.width / 16 - 1, Math.max(tx1, tx2));
+            const T = Math.max(0, Math.min(ty1, ty2));
+            const B = Math.min(paletteCanvas.height / 16 - 1, Math.max(ty1, ty2));
+            const brush: TileGridDefinition = {
+                w: R - L + 1,
+                h: B - T + 1,
+                tiles: [],
+            }
+            for (let y = 0; y < brush.h; y++) {
+                brush.tiles[y] = [];
+                for (let x = 0; x < brush.w; x++) {
+                    brush.tiles[y][x] = palette[T + y][L + x];
+                }
+            }
+            property.onChange(brush);
         }
-        image.onmousemove = () => {
-            if (isMouseDown()) {
+        // Prevent dragging ghost preview of the image around.
+
+        paletteCanvas.onmousedown = (e) => {
+            if (isKeyboardKeyDown(KEY.SHIFT)) {
+                [dragX, dragY] = getMousePosition(paletteCanvas, scale);
+                updateBrushSelection(dragX, dragY);
+            } else {
                 selectTile();
             }
         }
-        image.style.maxHeight = '400px';
+        paletteCanvas.onmousemove = () => {
+            if (isMouseDown()) {
+                if (isKeyboardKeyDown(KEY.SHIFT)) {
+                    const [x, y] = getMousePosition(paletteCanvas, scale);
+                    updateBrushSelection(x, y);
+                } else {
+                    selectTile();
+                }
+            }
+        }
+        paletteCanvas.style.transform = `scale(${scale})`;
         span.style.display = 'flex';
         span.style.flexDirection = 'column';
         span.style.alignItems = 'center';
-        span.append(property.palette.source.image);
+        span.append(paletteCanvas);
         span.append(brushCanvas);
         return span;
     } else if (isButtonProperty(property)) {

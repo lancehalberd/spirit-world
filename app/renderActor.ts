@@ -2,7 +2,6 @@ import _ from 'lodash';
 
 import { EXPLOSION_RADIUS, EXPLOSION_TIME } from 'app/gameConstants';
 import { getCloneMovementDeltas } from 'app/keyCommands';
-import { getTileFrame } from 'app/render';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { carryMap, directionMap, getDirection } from 'app/utils/field';
 
@@ -134,7 +133,7 @@ export function renderHeroEyes(context: CanvasRenderingContext2D, state: GameSta
 
 export function renderCarriedTile(context: CanvasRenderingContext2D, state: GameState, actor: Actor): void {
     const offset = carryMap[actor.d][Math.min(actor.pickUpFrame, carryMap[actor.d].length - 1)];
-    const frame = getTileFrame(state.areaInstance, actor.pickUpTile);
+    const frame = actor.pickUpTile.frame;
     drawFrame(context, frame,
         { x: actor.x + offset.x, y: actor.y + offset.y, w: frame.w, h: frame.h });
 }

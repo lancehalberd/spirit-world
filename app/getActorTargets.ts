@@ -1,11 +1,11 @@
 import { isPointInShortRect } from 'app/utils/index';
 
-import { Actor, AreaInstance, GameState, ObjectInstance, ShortRectangle, Tile } from 'app/types';
+import { Actor, AreaInstance, GameState, ObjectInstance, ShortRectangle, TileCoords } from 'app/types';
 
 
-export function getTilesInRectangle(area: AreaInstance, rect: ShortRectangle): Tile[] {
-    const tileSize = area.palette.w;
-    const tiles: Tile[] = []
+export function getTilesInRectangle(area: AreaInstance, rect: ShortRectangle): TileCoords[] {
+    const tileSize = 16;
+    const tiles: TileCoords[] = []
     const l = Math.floor(rect.x / tileSize);
     const r = Math.floor((rect.x + rect.w - 1) / tileSize);
     const t = Math.floor(rect.y / tileSize);
@@ -18,11 +18,10 @@ export function getTilesInRectangle(area: AreaInstance, rect: ShortRectangle): T
     return tiles;
 }
 
-export function getActorTargets(state: GameState, actor: Actor): {tiles: Tile[], objects: ObjectInstance[]} {
-    const palette = actor.area.palette;
-    const tileSize = palette.w;
+export function getActorTargets(state: GameState, actor: Actor): {tiles: TileCoords[], objects: ObjectInstance[]} {
+    const tileSize = 16;
     const objects: ObjectInstance[] = []
-    const tiles: Tile[] = []
+    const tiles: TileCoords[] = []
 
     const checkPoints: {x: number, y: number}[] = [];
     if (actor.d === 'left') {

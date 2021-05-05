@@ -1,9 +1,9 @@
 import { zones } from 'app/content/zones/zoneHash';
 
-import { AreaDefinition } from 'app/types';
+import { OldAreaDefinition } from 'app/types';
 
 const t0 = {x: 10, y: 0}, t1 = {x: 0, y: 0}, t2 = {x: 12, y: 0}, t3 = {x: 2, y: 1}, t4 = {x: 1, y: 1}, t5 = {x: 3, y: 1}, t6 = {x: 15, y: 0}, t7 = {x: 14, y: 0}, t8 = {x: 13, y: 0}, t9 = {x: 4, y: 1}, t10 = {x: 0, y: 1}, t11 = {x: 11, y: 0}, t12 = {x: 9, y: 0}, t13 = {x: 6, y: 0}, t14 = {x: 5, y: 0}, t15 = {x: 3, y: 0}, t16 = {x: 1, y: 0}, t17 = {x: 4, y: 0}, t18 = {x: 2, y: 10};
-const f0_0x0: AreaDefinition = {
+const f0_0x0: OldAreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -96,7 +96,7 @@ const f0_0x0: AreaDefinition = {
         {x: 0, y: 0, w: 32, h: 32},
     ],
 };
-const f0_0x1: AreaDefinition = {
+const f0_0x1: OldAreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -203,7 +203,7 @@ const f0_0x1: AreaDefinition = {
     ],
     dark: 100,
 };
-const f0_0x2: AreaDefinition = {
+const f0_0x2: OldAreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -296,7 +296,7 @@ const f0_0x2: AreaDefinition = {
         {x: 0, y: 0, w: 32, h: 32},
     ],
 };
-const f0_1x0: AreaDefinition = {
+const f0_1x0: OldAreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -389,7 +389,7 @@ const f0_1x0: AreaDefinition = {
         {x: 0, y: 0, w: 32, h: 32},
     ],
 };
-const f0_1x1: AreaDefinition = {
+const f0_1x1: OldAreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -507,7 +507,7 @@ const f0_1x1: AreaDefinition = {
         {x: 16, y: 0, w: 16, h: 32},
     ],
 };
-const f0_1x2: AreaDefinition = {
+const f0_1x2: OldAreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -616,9 +616,9 @@ const f0_1x2: AreaDefinition = {
         {x: 16, y: 16, w: 16, h: 16},
     ],
 };
-const f0_2x0: AreaDefinition = null;
-const f0_2x1: AreaDefinition = null;
-const f0_2x2: AreaDefinition = null;
+const f0_2x0: OldAreaDefinition = null;
+const f0_2x1: OldAreaDefinition = null;
+const f0_2x2: OldAreaDefinition = null;
 zones.peachCave = {
     key: 'peachCave',
     floors: [

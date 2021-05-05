@@ -19,7 +19,7 @@ import { renderTitle } from 'app/renderTitle';
 import { getState } from 'app/state';
 import { drawFrame } from 'app/utils/animations';
 
-import { AreaInstance, AreaLayer, AreaLayerDefinition, Frame, GameState, LayerTile } from 'app/types';
+import { AreaInstance, AreaLayer, AreaLayerDefinition, GameState } from 'app/types';
 
 // This is the max size of the s
 const [spiritCanvas, spiritContext] = createCanvasAndContext(MAX_SPIRIT_RADIUS * 2, MAX_SPIRIT_RADIUS * 2);
@@ -174,7 +174,7 @@ export function translateContextForAreaAndCamera(context: CanvasRenderingContext
 
 function checkToRedrawTiles(area: AreaInstance) {
     if (editingState.isEditing) {
-        const {w, h} = area.palette;
+        const w = 16, h = 16;
         for (let y = 0; y < area.h; y++) {
             for (let x = 0; x < area.w; x++) {
                 if (!area.tilesDrawn?.[y]?.[x]) {
@@ -223,10 +223,12 @@ export function renderField(context: CanvasRenderingContext2D, state: GameState)
     renderAreaBackground(context, state, state.nextAreaInstance);
     renderAreaObjectsBeforeHero(context, state, state.areaInstance);
     renderAreaObjectsBeforeHero(context, state, state.nextAreaInstance);
-    context.save();
-        translateContextForAreaAndCamera(context, state, state.areaInstance);
-        state.hero.render(context, state);
-    context.restore();
+    if (!editingState.isEditing) {
+        context.save();
+            translateContextForAreaAndCamera(context, state, state.areaInstance);
+            state.hero.render(context, state);
+        context.restore();
+    }
     renderAreaObjectsAfterHero(context, state, state.areaInstance);
     renderAreaObjectsAfterHero(context, state, state.nextAreaInstance);
     if (state.hero.spiritRadius > 0) {
@@ -292,7 +294,7 @@ export function renderAreaObjectsBeforeHero(context: CanvasRenderingContext2D, s
     }
     context.save();
         translateContextForAreaAndCamera(context, state, area);
-        if (area === state.areaInstance) {
+        if (area === state.areaInstance && !editingState.isEditing) {
             renderHeroShadow(context, state, state.hero);
         }
         // Render shadows before anything else.
@@ -345,34 +347,16 @@ export function renderAreaObjectsAfterHero(context: CanvasRenderingContext2D, st
     context.restore();
 }
 
-export function getTileFrame(area: AreaInstance, tile: LayerTile): Frame {
-    const layer = _.find(area.layers, { key: tile.layerKey});
-    const palette = layer.palette;
-    return {
-        image: palette.source.image,
-        x: palette.source.x + tile.x * palette.w,
-        y: palette.source.y + tile.y * palette.h,
-        w: palette.w,
-        h: palette.h,
-    };
-}
-
 export function renderLayer(area: AreaInstance, layer: AreaLayer, parentLayer: AreaLayerDefinition, isForeground: boolean): void {
-    const palette = layer.palette;
     // Create foreground canvas only as needed.
     if (isForeground && !area.foregroundContext) {
         [area.foregroundCanvas, area.foregroundContext] = createCanvasAndContext(
-            palette.w * layer.definition.grid.w,
-            palette.h * layer.definition.grid.h,
+            16 * layer.definition.grid.w,
+            16 * layer.definition.grid.h,
         );
     }
     const context = isForeground ? area.foregroundContext : area.context;
-    const { w, h } = palette;
-    const baseFrame = {
-        image: palette.source.image,
-        w,
-        h,
-    };
+    const w = 16, h = 16;
     context.save();
     if (editingState.isEditing && getState().areaInstance.layers[editingState.selectedLayerIndex] !== layer) {
         //console.log(getState().areaInstance.layers[editingState.selectedLayerIndex], layer);
@@ -388,17 +372,10 @@ export function renderLayer(area: AreaInstance, layer: AreaLayer, parentLayer: A
             }
             let tile = layer.tiles[y][x];
             if (!tile) {
+                continue;
                 debugger;
             }
-            /*if (!tile && parentLayer) {
-                tile = parentLayer.grid.tiles[y][x];
-            }*/
-            const frame: Frame = {
-                ...baseFrame,
-                x: palette.source.x + tile.x * w,
-                y: palette.source.y + tile.y * h,
-            };
-            drawFrame(context, frame, {x: x * w, y: y * h, w, h});
+            drawFrame(context, tile.frame, {x: x * w, y: y * h, w, h});
         }
     }
     context.restore();

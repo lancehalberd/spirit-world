@@ -1,16 +1,15 @@
 import { zones } from 'app/content/zones/zoneHash';
 
-import { AreaDefinition } from 'app/types';
+import { OldAreaDefinition } from 'app/types';
 
 const e = null, t0 = {x: 9, y: 4}, t1 = {x: 10, y: 4}, t2 = {x: 1, y: 4}, t3 = {x: 2, y: 4}, t4 = {x: 11, y: 4}, t5 = {x: 12, y: 4}, t6 = {x: 9, y: 5}, t7 = {x: 10, y: 5}, t8 = {x: 3, y: 4}, t9 = {x: 4, y: 4}, t10 = {x: 11, y: 5}, t11 = {x: 12, y: 5}, t12 = {x: 5, y: 4}, t13 = {x: 6, y: 4}, t14 = {x: 11, y: 2}, t15 = {x: 15, y: 2}, t16 = {x: 10, y: 2}, t17 = {x: 13, y: 3}, t18 = {x: 14, y: 3}, t19 = {x: 7, y: 4}, t20 = {x: 8, y: 4}, t21 = {x: 14, y: 2}, t22 = {x: 3, y: 2}, t23 = {x: 13, y: 2}, t24 = {x: 15, y: 3}, t25 = {x: 0, y: 4}, t26 = {x: 8, y: 2}, t27 = {x: 12, y: 2}, t28 = {x: 9, y: 2}, t29 = {x: 15, y: 4}, t30 = {x: 0, y: 5}, t31 = {x: 9, y: 3}, t32 = {x: 10, y: 3}, t33 = {x: 13, y: 4}, t34 = {x: 14, y: 4}, t35 = {x: 15, y: 5}, t36 = {x: 0, y: 6}, t37 = {x: 11, y: 3}, t38 = {x: 12, y: 3}, t39 = {x: 13, y: 5}, t40 = {x: 14, y: 5}, t41 = {x: 0, y: 0}, t42 = {x: 7, y: 3}, t43 = {x: 6, y: 3}, t44 = {x: 9, y: 0}, t45 = {x: 1, y: 3}, t46 = {x: 5, y: 0}, t47 = {x: 2, y: 3}, t48 = {x: 0, y: 3}, t49 = {x: 4, y: 3}, t50 = {x: 3, y: 3}, t51 = {x: 6, y: 0};
-const f0_0x0: AreaDefinition = {
+const f0_0x0: OldAreaDefinition = {
     layers: [
         {
             key: 'floor',
             grid: {
                 w: 32,
                 h: 32,
-                palette: 'floor',
                 tiles: [
                     [t0,t1,t2,t3,t2,t3,t2,t3,t2,t3,t2,t3,t2,t3,t4,t5,t0,t1,t2,t3,t2,t3,t2,t3,t2,t3,t2,t3,t2,t3,t4,t5],
                     [t6,t7,t8,t9,t8,t9,t8,t9,t8,t9,t8,t9,t8,t9,t10,t11,t6,t7,t8,t9,t8,t9,t8,t9,t8,t9,t8,t9,t8,t9,t10,t11],
@@ -52,7 +51,6 @@ const f0_0x0: AreaDefinition = {
             grid: {
                 w: 32,
                 h: 32,
-                palette: 'field',
                 tiles: [
                     [t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41],
                     [t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41,t41],
@@ -132,7 +130,7 @@ const f0_0x0: AreaDefinition = {
         {x: 16, y: 16, w: 16, h: 16},
     ],
 };
-const sf0_0x0: AreaDefinition = {
+const sf0_0x0: OldAreaDefinition = {
     isSpiritWorld: true,
     parentDefinition: f0_0x0,
     layers: [
@@ -141,7 +139,6 @@ const sf0_0x0: AreaDefinition = {
             grid: {
                 w: 32,
                 h: 32,
-                palette: 'spiritFloor',
                 tiles: [
                     [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
                     [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
@@ -183,7 +180,6 @@ const sf0_0x0: AreaDefinition = {
             grid: {
                 w: 32,
                 h: 32,
-                palette: 'spiritField',
                 tiles: [
                     [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],
                     [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e],

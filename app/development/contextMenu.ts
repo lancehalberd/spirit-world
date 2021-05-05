@@ -1,5 +1,6 @@
 import { getSpawnLocationContextMenuOption, getTestStateContextMenuOption } from 'app/content/spawnLocations';
 import { mainCanvas, tagElement } from 'app/dom';
+import { KEY, isKeyboardKeyDown } from 'app/keyCommands';
 import { getElementRectangle } from 'app/utils/index';
 import { getMousePosition } from 'app/utils/mouse';
 
@@ -149,6 +150,9 @@ export function addContextMenuListeners(): void {
     });
 
     mainCanvas.addEventListener('contextmenu', function (event) {
+        if (isKeyboardKeyDown(KEY.SHIFT)) {
+            return;
+        }
         event.preventDefault();
         const [x, y] = getMousePosition();
         const menu = getContextMenu();

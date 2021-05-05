@@ -1,4 +1,5 @@
 import { removeObjectFromArea, resetTileBehavior } from 'app/content/areas';
+import { allTiles } from 'app/content/tiles';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { getTileBehaviorsAndObstacles } from 'app/utils/field';
 
@@ -13,9 +14,8 @@ interface Props {
 export function growVine(this: void, area: AreaInstance, tx: number, ty: number): void {
     area.checkToRedrawTiles = true;
     for (const layer of area.layers) {
-        const palette = layer.palette;
         const tile = layer.tiles[ty][tx];
-        const behavior = palette.behaviors[`${tile.x}x${tile.y}`];
+        const behavior = tile?.behaviors;
         if (behavior?.growTiles) {
             // Probably play a splash effect here.
             // Add a vine here.
@@ -29,8 +29,8 @@ export function growVine(this: void, area: AreaInstance, tx: number, ty: number)
                     break;
                 }
                 const growTile = behavior.growTiles[i % behavior.growTiles.length];
-                layer.tiles[y][tx] = growTile;
-                layer.originalTiles[y][tx] = growTile;
+                layer.tiles[y][tx] = allTiles[growTile];
+                layer.originalTiles[y][tx] = allTiles[growTile];
                 if (area.tilesDrawn[y]?.[tx]) {
                     area.tilesDrawn[y][tx] = false;
                 }

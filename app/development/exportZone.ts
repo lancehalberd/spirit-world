@@ -8,49 +8,29 @@ export function exportZoneToClipboard(zone: Zone): void {
 }
 
 export function serializeZone(zone: Zone) {
-    const tileMap = {};
-    let tileIndex = 0;
     const emptySpiritAreas = [];
-    let usedEmptyTile = false;
     for (const floor of zone.floors) {
         for (const areaGrid of [floor.grid, floor.spiritGrid]) {
-            const key = (areaGrid === floor.grid) ? 'f' : 'sf';
             for (const gridRow of areaGrid) {
                 for (const area of gridRow) {
                     let isEmpty = true;
                     if (!area?.layers) {
                         continue;
                     }
-                    area[key] = {};
-                    let usedEmptyTileInternally = false;
-                    area.layers.map(layer => {
-                        const rows = [];
-                        for (let r = 0; r < layer.grid.tiles.length; r++) {
-                            rows[r] = [];
-                            for (let c = 0; c < layer.grid.tiles[r].length; c++) {
+                    area.layers.forEach(layer => {
+                        for (let r = 0; r < layer.grid.tiles.length && isEmpty; r++) {
+                            for (let c = 0; c < layer.grid.tiles[r].length && isEmpty; c++) {
                                 const tile = layer.grid.tiles[r][c];
                                 // Spirit world tiles will be null when they should inherit from the physical world.
                                 if (!tile) {
-                                    rows[r][c] = 'e';
-                                    usedEmptyTileInternally = true;
-                                    continue;
+                                    isEmpty = false;
+                                    return false;
                                 }
-                                isEmpty = false;
-                                const {x, y} = tile;
-                                if (!tileMap[`${x}x${y}`]) {
-                                    tileMap[`${x}x${y}`] = {
-                                        x, y, i: tileIndex++,
-                                    };
-                                }
-                                rows[r][c] = 't' + tileMap[`${x}x${y}`].i;
                             }
                         }
-                        area[key][layer.key] = rows;
                     });
                     if (isEmpty) {
                         emptySpiritAreas.push(area);
-                    } else if (usedEmptyTileInternally) {
-                        usedEmptyTile = true;
                     }
                 }
             }
@@ -61,16 +41,6 @@ export function serializeZone(zone: Zone) {
     lines.push("");
     lines.push("import { AreaDefinition } from 'app/types';");
     lines.push("");
-    const tileAssignments = [];
-    // Only add the empty tile if it was used.
-    if (usedEmptyTile) {
-        tileAssignments.push('e = null');
-    }
-    for (let key in tileMap) {
-        const data = tileMap[key];
-        tileAssignments.push(`t${data.i} = {x: ${data.x}, y: ${data.y}}`);
-    }
-    lines.push(`const ${tileAssignments.join(', ')};`);
     for (let floorIndex = 0; floorIndex < zone.floors.length; floorIndex++) {
         const floor = zone.floors[floorIndex];
         for (const areaGrid of [floor.grid, floor.spiritGrid]) {
@@ -93,7 +63,7 @@ export function serializeZone(zone: Zone) {
                         lines.push('    layers: null,');
                     } else {
                         lines.push('    layers: [');
-                        area.layers.map(layer => {
+                        area.layers.forEach(layer => {
                             lines.push('        {');
                             lines.push(`            key: '${layer.key}',`);
                             if (layer.x) lines.push(`            x: ${layer.x},`);
@@ -102,9 +72,8 @@ export function serializeZone(zone: Zone) {
                                 lines.push('            grid: {');
                                 lines.push(`                w: ${layer.grid.w},`);
                                 lines.push(`                h: ${layer.grid.h},`);
-                                lines.push(`                palette: '${layer.grid.palette}',`);
                                 lines.push('                tiles: [');
-                                for (const row of area[key][layer.key]) {
+                                for (const row of layer.grid.tiles) {
                                     lines.push(`                    [${row.join(',')}],`);
                                 }
                                 lines.push('                ],');

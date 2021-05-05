@@ -18,14 +18,16 @@ import {
     wasGameKeyPressedAndReleased,
 } from 'app/keyCommands';
 import { checkForFloorEffects, moveActor } from 'app/moveActor';
-import { getTileFrame } from 'app/render';
 import { fallAnimation } from 'app/render/heroAnimations';
 import { useTool } from 'app/useTool';
 import { directionMap, getDirection, isPointOpen } from 'app/utils/field';
 import { rectanglesOverlap } from 'app/utils/index';
 import { playSound } from 'app/utils/sounds';
 
-import { Actor, Clone, GameState, Hero, ObjectInstance, ThrownChakram, ThrownObject, Tile } from 'app/types';
+import {
+    Actor, Clone, FullTile, GameState, Hero,
+    ObjectInstance, ThrownChakram, ThrownObject, TileCoords,
+} from 'app/types';
 
 const rollSpeed = [
     5, 5, 5, 5,
@@ -403,7 +405,9 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         const {objects, tiles} = getActorTargets(state, hero);
         if (tiles.some(({x, y}) => area.behaviorGrid?.[y]?.[x]?.solid) || objects.some(o => o.behaviors?.solid)) {
             //console.log({dx, dy, tiles, objects});
-            let closestLiftableTile: Tile = null, closestObject: ObjectInstance = null, closestDistance = 100;
+            let closestLiftableTileCoords: TileCoords = null,
+                closestObject: ObjectInstance = null,
+                closestDistance = 100;
             for (const target of tiles) {
                 const behavior = area.behaviorGrid?.[target.y]?.[target.x];
                 if (behavior?.solid) {
@@ -413,12 +417,12 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
                 if (hero.passiveTools.gloves >= behavior?.pickupWeight) {
                     // This is an unusual distance, but should do what we want still.
                     const distance = (
-                        Math.abs(target.x * area.palette.w - hero.x) +
-                        Math.abs(target.y * area.palette.h - hero.y)
+                        Math.abs(target.x * 16 - hero.x) +
+                        Math.abs(target.y * 16 - hero.y)
                     );
                     if (distance < closestDistance) {
                         closestDistance = distance;
-                        closestLiftableTile = target;
+                        closestLiftableTileCoords = target;
                     }
                 }
             }
@@ -440,32 +444,28 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
                     if (distance < closestDistance) {
                         closestDistance = distance;
                         closestObject = object;
-                        closestLiftableTile = null;
+                        closestLiftableTileCoords = null;
                     }
                 }
             }
             hero.pickUpFrame = 0;
-            if (closestLiftableTile) {
+            if (closestLiftableTileCoords) {
                 for (const layer of state.areaInstance.layers) {
-                    const palette = layer.palette;
-                    const tile = {
-                        ...layer.tiles[closestLiftableTile.y][closestLiftableTile.x],
-                        layerKey: layer.key,
-                    };
-                    const behavior = palette.behaviors[`${tile.x}x${tile.y}`];
+                    const tile: FullTile = layer.tiles[closestLiftableTileCoords.y][closestLiftableTileCoords.x];
+                    const behavior = tile.behaviors;
                     if (behavior?.pickupWeight <= state.hero.passiveTools.gloves) {
                         hero.pickUpTile = tile;
-                        destroyTile(state, state.areaInstance, {...closestLiftableTile, layerKey: layer.key});
-                        if (behavior.linked) {
+                        destroyTile(state, state.areaInstance, {...closestLiftableTileCoords, layerKey: layer.key});
+                        if (behavior.linkableTiles) {
                             const alternateLayer = _.find(state.alternateAreaInstance.layers, {key: layer.key});
                             if(alternateLayer) {
-                                const alternateTile = {
-                                    ...alternateLayer.tiles[closestLiftableTile.y][closestLiftableTile.x],
-                                    layerKey: alternateLayer.key,
-                                };
-                                if (alternateTile.x === tile.x && alternateTile.y === tile.y) {
-                                    hero.pickUpTile.linked = true;
-                                    destroyTile(state, state.alternateAreaInstance, {...closestLiftableTile, layerKey: layer.key});
+                                const linkedTile: FullTile = alternateLayer.tiles[closestLiftableTileCoords.y][closestLiftableTileCoords.x];
+                                if (behavior.linkableTiles.includes(linkedTile.index)) {
+                                    hero.pickUpTile = {
+                                        ...hero.pickUpTile,
+                                        linkedTile,
+                                    };
+                                    destroyTile(state, state.alternateAreaInstance, {...closestLiftableTileCoords, layerKey: layer.key});
                                 }
                             }
                         }
@@ -749,11 +749,9 @@ export function throwHeldObject(state: GameState, hero: Hero){
     hero.action = 'throwing';
     hero.actionFrame = 0;
     const tile = hero.pickUpTile;
-    const layer = _.find(state.areaInstance.layers, { key: tile.layerKey});
-    const palette = layer.palette;
-    const behaviors = palette.behaviors[`${tile.x}x${tile.y}`];
+    const behaviors = tile.behaviors;
     const thrownObject = new ThrownObject({
-        frame: getTileFrame(state.areaInstance, hero.pickUpTile),
+        frame: tile.frame,
         particles: behaviors?.particles,
         x: hero.x,
         y: hero.y,
@@ -764,12 +762,10 @@ export function throwHeldObject(state: GameState, hero: Hero){
     thrownObject.behaviors.brightness = behaviors?.brightness;
     thrownObject.behaviors.lightRadius = behaviors?.lightRadius;
     addObjectToArea(state, state.areaInstance, thrownObject);
-    if (tile.linked) {
-        const layer = _.find(state.alternateAreaInstance.layers, { key: tile.layerKey});
-        const palette = layer.palette;
-        const behaviors = palette.behaviors[`${tile.x}x${tile.y}`];
+    if (tile.linkedTile) {
+        const behaviors = tile.linkedTile.behaviors;
         const alternateThrownObject = new ThrownObject({
-            frame: getTileFrame(state.alternateAreaInstance, hero.pickUpTile),
+            frame: tile.linkedTile.frame,
             particles: behaviors?.particles,
             x: hero.x,
             y: hero.y,
@@ -785,5 +781,3 @@ export function throwHeldObject(state: GameState, hero: Hero){
     }
     hero.pickUpTile = null;
 }
-
-

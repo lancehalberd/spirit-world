@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import { addObjectToArea, linkObject, removeObjectFromArea } from 'app/content/areas';
+import { addObjectToArea, convertAreaDefinition, linkObject, removeObjectFromArea } from 'app/content/areas';
 import { dialogueHash } from 'app/content/dialogue';
 import { createObjectInstance } from 'app/content/objects';
 import { doorStyles } from 'app/content/door';
@@ -203,12 +203,12 @@ function getTargetObjectIdsByTypes(zone: Zone, types: ObjectType[]): string[] {
     for (const floor of zone.floors) {
         for (const row of floor.grid) {
             for (const area of row) {
-                combinedObjectIds.push(getTargetObjectIdsByTypesAndArea(area, types));
+                combinedObjectIds.push(getTargetObjectIdsByTypesAndArea(convertAreaDefinition(area), types));
             }
         }
         for (const row of floor.spiritGrid) {
             for (const area of row) {
-                combinedObjectIds.push(getTargetObjectIdsByTypesAndArea(area, types));
+                combinedObjectIds.push(getTargetObjectIdsByTypesAndArea(convertAreaDefinition(area), types));
             }
         }
     }
@@ -684,12 +684,9 @@ export function onMouseDownSelect(state: GameState, editingState: EditingState, 
 
 export function fixObjectPosition(state: GameState, object: ObjectDefinition): void {
     // Currently all objects snap to the grid except loot outside of chests.
-    /*if (object.type === 'door' && object.style === 'rectangle') {
-        object.x = Math.round(object.x / 8) * 8;
-        object.y = Math.round(object.y / 8) * 8;
-    } else */if (object.type !== 'loot') {
-        object.x = Math.round(object.x / state.areaInstance.palette.w) * state.areaInstance.palette.w;
-        object.y = Math.round(object.y / state.areaInstance.palette.h) * state.areaInstance.palette.h;
+    if (object.type !== 'loot') {
+        object.x = Math.round(object.x / 16) * 16;
+        object.y = Math.round(object.y / 16) * 16;
     }
 }
 
