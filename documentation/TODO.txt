@@ -6,6 +6,7 @@ High Priority Bugs:
         - Pit entrance should pull you in like other pits
 
 Low Priority Bugs:
+    Foreground only renders for the active area, should render for the alternate area as well.
     Pushing on a solid object sitting on thorny ground shouldn't hurt you:
         -return tileBehaviors and objectBehaviors separately, only damage if tile is solid+damaging.
     Doors don't appear open when moving into them from a different section
