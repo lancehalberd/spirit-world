@@ -183,8 +183,7 @@ function showLootMessage(state: GameState, lootType: LootType, lootLevel?: numbe
                 + '{|}Move your Astral Body away from you in the Sprit World'
                 + '{|}Press {B_TOOL} to teleport your Real Body to your Astral Body.'
                 + '{|}Teleportation consumes spirit energy, stand still to recover'
-                + '{|}Use teleportation to move past obstacles in the Real World.'
-                + '{|}Teleport into Spirit Gates to move your Real Body to the Spirit World.');
+                + '{|}Use teleportation to move past obstacles in the Real World.');
         case 'fire':
         case 'ice':
         case 'lightning':
