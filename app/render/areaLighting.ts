@@ -71,8 +71,8 @@ window['debugCanvas'] = (canvas: HTMLCanvasElement) => {
     canvas.style.backgroundColor = 'blue';
 }
 
-export function renderAreaLighting(context: CanvasRenderingContext2D, state: GameState): void {
-    const targetFadeLevel = Math.max(state.areaInstance.definition.dark || 0, state.nextAreaInstance?.definition.dark || 0) / 100;
+export function renderAreaLighting(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance, nextArea: AreaInstance = null): void {
+    const targetFadeLevel = Math.max(area.definition.dark || 0, nextArea?.definition.dark || 0) / 100;
     if (state.fadeLevel < targetFadeLevel) {
         state.fadeLevel = Math.min(state.fadeLevel + 0.05, targetFadeLevel);
     } else if (state.fadeLevel > targetFadeLevel){
@@ -89,18 +89,18 @@ export function renderAreaLighting(context: CanvasRenderingContext2D, state: Gam
 
         // Next add lighting effects from the background.
         lightingContext.globalCompositeOperation = 'destination-out';
-        if (state.areaInstance?.lightingCanvas) {
-            lightingContext.drawImage(state.areaInstance.lightingCanvas,
-                Math.floor((state.camera.x - state.areaInstance.cameraOffset.x) / lightingGranularity),
-                Math.floor((state.camera.y - state.areaInstance.cameraOffset.y) / lightingGranularity),
+        if (area?.lightingCanvas) {
+            lightingContext.drawImage(area.lightingCanvas,
+                Math.floor((state.camera.x - area.cameraOffset.x) / lightingGranularity),
+                Math.floor((state.camera.y - area.cameraOffset.y) / lightingGranularity),
                 lightingCanvas.width, lightingCanvas.height,
                 0, 0, lightingCanvas.width, lightingCanvas.height,
             );
         }
-        if (state.nextAreaInstance?.lightingCanvas) {
-            lightingContext.drawImage(state.nextAreaInstance.lightingCanvas,
-                Math.floor((state.camera.x - state.nextAreaInstance.cameraOffset.x) / lightingGranularity),
-                Math.floor((state.camera.y - state.nextAreaInstance.cameraOffset.y) / lightingGranularity),
+        if (nextArea?.lightingCanvas) {
+            lightingContext.drawImage(nextArea.lightingCanvas,
+                Math.floor((state.camera.x - nextArea.cameraOffset.x) / lightingGranularity),
+                Math.floor((state.camera.y - nextArea.cameraOffset.y) / lightingGranularity),
                 lightingCanvas.width, lightingCanvas.height,
                 0, 0, lightingCanvas.width, lightingCanvas.height,
             );
@@ -110,9 +110,9 @@ export function renderAreaLighting(context: CanvasRenderingContext2D, state: Gam
         drawLightGradient(lightingContext,
             {
                 x: hero.x + hero.w / 2 + 12 * directionMap[hero.d][0]
-                    - state.camera.x + state.areaInstance.cameraOffset.x,
+                    - state.camera.x + area.cameraOffset.x,
                 y: hero.y - hero.z + hero.h / 2 + 12 * directionMap[hero.d][1]
-                    - state.camera.y + state.areaInstance.cameraOffset.y
+                    - state.camera.y + area.cameraOffset.y
             },
             1, state.hero.lightRadius
         );
@@ -122,8 +122,8 @@ export function renderAreaLighting(context: CanvasRenderingContext2D, state: Gam
                 const offset = carryMap[hero.d][Math.min(hero.pickUpFrame, carryMap[hero.d].length - 1)];
                 drawLightGradient(lightingContext,
                     {
-                        x: hero.x + offset.x + 8 - state.camera.x + state.areaInstance.cameraOffset.x,
-                        y: hero.y + offset.y + 8 - state.camera.y + state.areaInstance.cameraOffset.y,
+                        x: hero.x + offset.x + 8 - state.camera.x + area.cameraOffset.x,
+                        y: hero.y + offset.y + 8 - state.camera.y + area.cameraOffset.y,
                     },
                     behaviors.brightness, behaviors.lightRadius
                 );
@@ -131,10 +131,10 @@ export function renderAreaLighting(context: CanvasRenderingContext2D, state: Gam
         }
         lightingContext.save();
             lightingContext.translate(
-                Math.floor((state.areaInstance.cameraOffset.x - state.camera.x) / lightingGranularity),
-                Math.floor((state.areaInstance.cameraOffset.y - state.camera.y) / lightingGranularity)
+                Math.floor((area.cameraOffset.x - state.camera.x) / lightingGranularity),
+                Math.floor((area.cameraOffset.y - state.camera.y) / lightingGranularity)
             )
-            for (const object of state.areaInstance.objects) {
+            for (const object of area.objects) {
                 if (object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
                     continue;
                 }
@@ -155,8 +155,8 @@ export function renderAreaLighting(context: CanvasRenderingContext2D, state: Gam
                             const offset = carryMap[object.d][Math.min(object.pickUpFrame, carryMap[object.d].length - 1)];
                             drawLightGradient(lightingContext,
                                 {
-                                    x: object.x + offset.x + 8 - state.camera.x + state.areaInstance.cameraOffset.x,
-                                    y: object.y + offset.y + 8 - state.camera.y + state.areaInstance.cameraOffset.y,
+                                    x: object.x + offset.x + 8 - state.camera.x + area.cameraOffset.x,
+                                    y: object.y + offset.y + 8 - state.camera.y + area.cameraOffset.y,
                                 },
                                 behaviors.brightness, behaviors.lightRadius
                             );
@@ -165,13 +165,13 @@ export function renderAreaLighting(context: CanvasRenderingContext2D, state: Gam
                 }
             }
         lightingContext.restore();
-        if (state.nextAreaInstance) {
+        if (nextArea) {
             lightingContext.save();
             lightingContext.translate(
-                Math.floor((state.nextAreaInstance.cameraOffset.x - state.camera.x) / lightingGranularity),
-                Math.floor((state.nextAreaInstance.cameraOffset.y - state.camera.y) / lightingGranularity)
+                Math.floor((nextArea.cameraOffset.x - state.camera.x) / lightingGranularity),
+                Math.floor((nextArea.cameraOffset.y - state.camera.y) / lightingGranularity)
             )
-            for (const object of state.nextAreaInstance.objects || []) {
+            for (const object of nextArea.objects || []) {
                 if (object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
                     continue;
                 }

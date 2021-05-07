@@ -318,7 +318,14 @@ function updateField(state: GameState) {
 
 function updateTransition(state: GameState) {
     state.transitionState.time += FRAME_LENGTH;
-    if (state.transitionState.type === 'fade') {
+    if (state.transitionState.type === 'portal') {
+        if (state.transitionState.time === CIRCLE_WIPE_OUT_DURATION) {
+            enterLocation(state, state.transitionState.nextLocation, true);
+            state.transitionState.callback?.();
+            updateCamera(state);
+            state.transitionState = null;
+        }
+    } else if (state.transitionState.type === 'fade') {
         if (state.transitionState.time === FADE_OUT_DURATION) {
             enterLocation(state, state.transitionState.nextLocation, true);
             state.transitionState.callback?.();

@@ -83,8 +83,8 @@ export function render() {
     }
     if (state.transitionState) {
         renderField(context, state);
-        renderHUD(context, state);
         renderTransition(context, state);
+        renderHUD(context, state);
         return;
     }
     if (state.messageState?.pages) {
@@ -125,7 +125,35 @@ export function render() {
 }
 
 function renderTransition(context: CanvasRenderingContext2D, state: GameState) {
-    if (state.transitionState.type === 'fade') {
+    if (state.transitionState.type === 'portal') {
+        if (!state.alternateAreaInstance) {
+            return;
+        }
+        const x = state.hero.x + state.hero.w / 2 - state.camera.x + state.areaInstance.cameraOffset.x;
+        const y = state.hero.y + 2 - state.camera.y + state.areaInstance.cameraOffset.y;
+        if (state.transitionState.time <= CIRCLE_WIPE_OUT_DURATION) {
+            if (!state.transitionState.patternCanvas) {
+                const [patternCanvas, patternContext] = createCanvasAndContext(CANVAS_WIDTH, CANVAS_HEIGHT);
+                state.transitionState.patternCanvas = patternCanvas;
+                renderArea(patternContext, state, state.alternateAreaInstance, true);
+                state.transitionState.pattern = context.createPattern(state.transitionState.patternCanvas, 'repeat');
+            }
+            context.save();
+                const p = state.transitionState.time / CIRCLE_WIPE_OUT_DURATION;
+                const radius = Math.max(CANVAS_WIDTH, CANVAS_HEIGHT) * Math.max(0, Math.min(1, p));
+                context.fillStyle = state.transitionState.pattern;
+                context.beginPath();
+                context.arc(x, y, radius, 0, 2 * Math.PI);
+                context.fill();
+            context.restore();
+        } else {
+            context.save();
+                translateContextForAreaAndCamera(context, state, state.areaInstance);
+                context.fillStyle = state.transitionState.pattern;
+                context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+            context.restore();
+        }
+    } else if (state.transitionState.type === 'fade') {
         if (state.transitionState.time <= FADE_OUT_DURATION) {
             context.save();
                 const p = Math.min(1, 1.5 * state.transitionState.time / FADE_OUT_DURATION);
@@ -250,7 +278,30 @@ export function renderField(context: CanvasRenderingContext2D, state: GameState)
 
     // Render any editor specific graphics if appropriate.
     renderEditor(context, state);
-    renderAreaLighting(context, state);
+    renderAreaLighting(context, state, state.areaInstance, state.nextAreaInstance);
+}
+
+// Fully renders an area to a canvas, but with no state effects like spirit sight.
+// This is used during the transition to and from the spirit world.
+export function renderArea(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance, forceHero: boolean = false): void {
+    // Update any background tiles that have changed.
+    if (area.checkToRedrawTiles) {
+        checkToRedrawTiles(area);
+        updateLightingCanvas(area);
+    }
+    const hero = state.hero.activeClone || state.hero;
+    // Draw the field, enemies, objects and hero.
+    renderAreaBackground(context, state, area);
+    renderAreaObjectsBeforeHero(context, state, area);
+    if (forceHero || hero.area === area) {
+        context.save();
+            translateContextForAreaAndCamera(context, state, area);
+            state.hero.render(context, state);
+        context.restore();
+    }
+    renderAreaObjectsAfterHero(context, state, area);
+    renderAreaForeground(context, state, area);
+    renderAreaLighting(context, state, area);
 }
 
 export function renderAreaBackground(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance): void {

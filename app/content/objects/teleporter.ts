@@ -1,15 +1,16 @@
-import { enterZoneByTarget } from 'app/content/areas';
+import { enterLocation, enterZoneByTarget } from 'app/content/areas';
 import { findObjectInstanceById } from 'app/content/objects';
 import { editingState } from 'app/development/tileEditor';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { isObjectInsideTarget, pad } from 'app/utils/index';
 
 import {
-    DrawPriority, GameState, ObjectInstance,
+    AreaInstance, DrawPriority, GameState, ObjectInstance,
     ObjectStatus, ShortRectangle, EntranceDefinition,
 } from 'app/types';
 
 export class Teleporter implements ObjectInstance {
+    area: AreaInstance;
     drawPriority: DrawPriority = 'sprites';
     definition: EntranceDefinition = null;
     x: number;
@@ -21,13 +22,13 @@ export class Teleporter implements ObjectInstance {
         this.definition = definition;
         this.x = definition.x;
         this.y = definition.y;
-        this.active = definition.targetZone && definition.targetObjectId && state.savedState.objectFlags[this.definition.id];
+        this.active = !definition.targetZone || (this.definition.targetObjectId && state.savedState.objectFlags[this.definition.id]);
     }
     getHitbox(state: GameState): ShortRectangle {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
     update(state: GameState) {
-        if (!this.active) {
+        if (!this.active && state.hero.actionTarget !== this) {
             this.active = this.definition.targetZone && this.definition.targetObjectId && state.savedState.objectFlags[this.definition.id];
             return;
         }
@@ -43,22 +44,37 @@ export class Teleporter implements ObjectInstance {
             } else {
                 hero.y += 2;
             }
-        } else if (isObjectInsideTarget(hero, pad(this.getHitbox(state), 8))) {
-            enterZoneByTarget(state, this.definition.targetZone, this.definition.targetObjectId, this.definition, false, () => {
-                // We need to reassign hero after calling `enterZoneByTarget` because the active hero may change
-                // from one clone to another when changing zones.
-                hero = state.hero.activeClone || state.hero;
-                hero.action = 'exiting';
-                const target = findObjectInstanceById(state.areaInstance, this.definition.targetObjectId) as Teleporter;
-                if (!target){
-                    console.error(state.areaInstance.objects);
-                    console.error(this.definition.targetObjectId);
-                    debugger;
-                }
-                hero.actionTarget = target;
-                // Hero always exits the teleporter moving down currently.
-                hero.d = 'down';
-            });
+        } else if (this.area === hero.area && isObjectInsideTarget(hero, pad(this.getHitbox(state), 8))) {
+            if (!this.definition.targetZone) {
+                // This is the behavior we want for portals eventually, but we are just adding it
+                // to teleporter for now.
+                enterLocation(state, {
+                    ...state.location,
+                    x: hero.x,
+                    y: hero.y,
+                    d: hero.d,
+                    isSpiritWorld: !state.location.isSpiritWorld,
+                }, false, () => {
+                    // In the future, check if there is a teleporter where the hero ends up and set it to control them
+                    // so it moves them off of it.
+                });
+            } else {
+                enterZoneByTarget(state, this.definition.targetZone, this.definition.targetObjectId, this.definition, false, () => {
+                    // We need to reassign hero after calling `enterZoneByTarget` because the active hero may change
+                    // from one clone to another when changing zones.
+                    hero = state.hero.activeClone || state.hero;
+                    hero.action = 'exiting';
+                    const target = findObjectInstanceById(state.areaInstance, this.definition.targetObjectId) as Teleporter;
+                    if (!target){
+                        console.error(state.areaInstance.objects);
+                        console.error(this.definition.targetObjectId);
+                        debugger;
+                    }
+                    hero.actionTarget = target;
+                    // Hero always exits the teleporter moving down currently.
+                    hero.d = 'down';
+                });
+            }
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {

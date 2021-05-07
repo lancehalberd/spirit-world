@@ -147,7 +147,7 @@ export function getZoneProperties(state: GameState, editingState: EditingState):
         },
     }]);
 
-    const floor = _.findIndex(state.zone.floors, {grid: state.areaGrid});
+    const floor = state.location.floor;
     rows.push([{
         name: 'floor',
         value: '' + (floor + 1),
