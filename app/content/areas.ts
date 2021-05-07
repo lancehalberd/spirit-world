@@ -219,7 +219,9 @@ export function enterLocation(
     state.hero.y = location.y;
     if (location.z >= 0) {
         state.hero.z = location.z;
-        state.hero.action = 'knocked';
+        if (location.z > 0) {
+            state.hero.action = 'knocked';
+        }
     }
     state.hero.safeD = state.hero.d;
     state.hero.safeX = location.x;
