@@ -428,7 +428,7 @@ export const enemyDefinitions: {[key in EnemyType | BossType | MinionType]: Enem
     },
     lightningBug: {
         alwaysReset: true,
-        animations: beetleWingedAnimations, acceleration: 0.2, speed: 1.2, aggroRadius: 112, flying: true,
+        animations: beetleWingedAnimations, acceleration: 0.2, speed: 1, aggroRadius: 112, flying: true,
         life: 3, touchDamage: 1, update: updateStormLightningBug, render: renderLightningShield,
     },
 };
@@ -494,13 +494,13 @@ function updateStormLightningBug(state: GameState, enemy: Enemy): void {
     enemy.params.shieldCooldown = enemy.params.shieldCooldown ?? 1000 + Math.random() * 1000;
     if (enemy.params.shieldCooldown > 0) {
         enemy.params.shieldCooldown -= FRAME_LENGTH;
-        if (enemy.params.shieldCooldown < 2000) {
+        if (enemy.params.shieldCooldown < 3000) {
             enemy.shielded = false;
         }
     } else {
         const chaseVector = getVectorToNearbyHero(state, enemy, enemy.aggroRadius);
         if (chaseVector) {
-            enemy.params.shieldCooldown = 6000;
+            enemy.params.shieldCooldown = 5000;
             enemy.shielded = true;
         }
     }
