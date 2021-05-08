@@ -1045,8 +1045,20 @@ function moveEnemy(state, enemy, dx, dy, movementProperties: MovementProperties)
         movementProperties.excludedObjects.add(clone);
     }
     if (enemy.flying) {
-        enemy.x += dx;
-        enemy.y += dy;
+        const hitbox = enemy.getHitbox();
+        const ax = enemy.x + dx;
+        const ay = enemy.y + dy;
+        if (movementProperties.boundToSection) {
+            const p = movementProperties.boundToSectionPadding ?? 0;
+            const { section } = getAreaSize(state);
+            if (ax < section.x + p || ax + hitbox.w > section.x + section.w - p
+                || ay < section.y + p || ay + hitbox.h > section.y + section.h - p
+            ) {
+                return false;
+            }
+        }
+        enemy.x = ax;
+        enemy.y = ay;
         return true;
     }
     return moveActor(state, enemy, dx, dy, movementProperties);
