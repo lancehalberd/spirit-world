@@ -2,6 +2,7 @@ import { enterLocation, enterZoneByTarget } from 'app/content/areas';
 import { findObjectInstanceById } from 'app/content/objects';
 import { editingState } from 'app/development/tileEditor';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { saveGame } from 'app/state';
 import { isObjectInsideTarget, pad } from 'app/utils/index';
 
 import {
@@ -22,14 +23,22 @@ export class Teleporter implements ObjectInstance {
         this.definition = definition;
         this.x = definition.x;
         this.y = definition.y;
-        this.active = !definition.targetZone || (this.definition.targetObjectId && state.savedState.objectFlags[this.definition.id]);
+        this.status = state.savedState.objectFlags[this.definition.id] ? 'normal' : this.definition.status;
+    }
+    changeStatus(state: GameState, status: ObjectStatus) {
+        if (this.status === 'normal' && this.definition.saveStatus) {
+            state.savedState.objectFlags[this.definition.id] = true;
+            saveGame();
+        }
     }
     getHitbox(state: GameState): ShortRectangle {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
     update(state: GameState) {
-        if (!this.active && state.hero.actionTarget !== this) {
-            this.active = this.definition.targetZone && this.definition.targetObjectId && state.savedState.objectFlags[this.definition.id];
+        if (this.status !== 'normal' && state.hero.actionTarget !== this) {
+            if (state.savedState.objectFlags[this.definition.id]) {
+                this.changeStatus(state, 'normal');
+            }
             return;
         }
         this.animationTime += FRAME_LENGTH;
@@ -78,7 +87,7 @@ export class Teleporter implements ObjectInstance {
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
-        if (!this.active && !editingState.isEditing) {
+        if (this.status !== 'normal' && !editingState.isEditing) {
             return;
         }
         const gradient = context.createLinearGradient(0, 0, 0, 16);

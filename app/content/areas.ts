@@ -163,26 +163,24 @@ export function enterLocation(
     instant: boolean = true,
     callback: () => void = null
 ): void {
+    // Remve astral projection when switching areas.
+    if (state.hero.astralProjection) {
+        removeObjectFromArea(state, state.hero.astralProjection);
+        state.hero.astralProjection = null;
+    }
     if (!instant) {
-        //if (state.location?.zoneKey !== location.zoneKey || state.location?.floor !== location.floor) {
-            let type: 'fade' | 'circle' | 'portal' = 'fade';
-            if (!!state.location.isSpiritWorld !== !!location.isSpiritWorld) {
-                type = 'portal';
-                if (state.hero.astralProjection) {
-                    removeObjectFromArea(state, state.hero.astralProjection);
-                    state.hero.astralProjection = null;
-                }
-            } else if (state.location.zoneKey !== location.zoneKey) {
-                type = 'circle';
-            }
-            state.transitionState = {
-                callback,
-                nextLocation: location,
-                time: 0,
-                type,
-            };
-            return;
-        //}
+        state.transitionState = {
+            callback,
+            nextLocation: location,
+            time: 0,
+            type: 'fade',
+        };
+        if (!!state.location.isSpiritWorld !== !!location.isSpiritWorld) {
+            state.transitionState.type = 'portal';
+        } else if (state.location.zoneKey !== location.zoneKey) {
+            state.transitionState.type = 'circle';
+        }
+        return;
     }
     state.location = {
         ...location,

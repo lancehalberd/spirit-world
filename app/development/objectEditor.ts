@@ -158,6 +158,8 @@ export function createObjectDefinition(
                 targetZone: definition.targetZone,
                 targetObjectId: definition.targetObjectId,
                 type: definition.type,
+                saveStatus: definition.saveStatus,
+                status: definition.status || commonProps.status,
             };
         case 'chest':
         case 'bigChest':
@@ -313,23 +315,6 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                     updateObjectInstance(state, object);
                 },
             });
-            rows.push({
-                name: 'status',
-                value: object.status,
-                values: ['normal', 'closed', 'closedEnemy', 'closedSwitch', 'locked', 'bigKeyLocked', 'cracked', 'blownOpen'],
-                onChange(status: ObjectStatus) {
-                    object.status = status;
-                    updateObjectInstance(state, object);
-                },
-            });
-            rows.push({
-                name: 'saveStatus',
-                value: object.saveStatus || false,
-                onChange(saveStatus: boolean) {
-                    object.saveStatus = saveStatus;
-                    updateObjectInstance(state, object);
-                },
-            });
         case 'pitEntrance':
         case 'teleporter':
             const zoneKeys = Object.keys(zones);
@@ -370,6 +355,35 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             } else {
                 rows.push(`No objects of type ${targetType}`);
             }
+            if (object.type === 'teleporter') {
+                rows.push({
+                    name: 'status',
+                    value: object.status,
+                    values: ['normal', 'hidden', 'hiddenEnemy', 'hiddenSwitch'],
+                    onChange(status: ObjectStatus) {
+                        object.status = status;
+                        updateObjectInstance(state, object);
+                    },
+                });
+            } else if (object.type !== 'pitEntrance') {
+                rows.push({
+                    name: 'status',
+                    value: object.status,
+                    values: ['normal', 'closed', 'closedEnemy', 'closedSwitch', 'locked', 'bigKeyLocked', 'cracked', 'blownOpen'],
+                    onChange(status: ObjectStatus) {
+                        object.status = status;
+                        updateObjectInstance(state, object);
+                    },
+                });
+            }
+            rows.push({
+                name: 'saveStatus',
+                value: object.saveStatus || false,
+                onChange(saveStatus: boolean) {
+                    object.saveStatus = saveStatus;
+                    updateObjectInstance(state, object);
+                },
+            });
             break;
         case 'bigChest':
         case 'chest':
