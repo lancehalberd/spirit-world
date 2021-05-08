@@ -61,8 +61,8 @@ const f0_0x0: AreaDefinition = {
                     [0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,1,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                    [0,0,0,0,0,0,0,1,1,0,0,0,1,0,0,0,0,10,10,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                    [0,0,0,0,0,0,0,0,1,1,1,1,1,0,0,0,10,0,0,10,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,1,1,0,0,0,1,0,0,10,10,10,10,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,1,1,1,1,10,0,0,10,10,0,0,10,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,1,10,4,4,10,10,0,0,10,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,10,4,4,10,10,0,0,10,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,1,10,4,4,10,10,4,4,10,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -158,8 +158,8 @@ const sf0_0x0: AreaDefinition = {
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,189,189,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,189,189,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,189,1,1,189,189,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,189,0,0,189,189,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,189,1,1,189,189,0,0,189,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,189,1,1,189,189,0,0,189,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -186,7 +186,8 @@ const sf0_0x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "helix:s0:0x0-door-0", x: 256, y: 96, type: "door", style: "cave", targetZone: undefined, targetObjectId: undefined, d: "up", saveStatus: undefined},
+        {status: "normal", id: "helixSpiritDoor1", x: 256, y: 96, type: "door", style: "cave", targetZone: "helix", targetObjectId: "helixSpiritDoor1", d: "up", saveStatus: undefined, spirit: false},
+        {status: "normal", id: "helix:s0:0x0-teleporter-0", x: 208, y: 160, targetZone: null, targetObjectId: "helix:0:0x0-teleporter-0", type: "teleporter", saveStatus: undefined},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -278,8 +279,8 @@ const f1_0x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "helixStairs1", x: 160, y: 64, type: "door", style: "cave", targetZone: "helix", targetObjectId: "helixStairs1", d: "up", saveStatus: undefined},
-        {status: "normal", id: "helixStairs2", x: 320, y: 64, type: "door", style: "cave", targetZone: "helix", targetObjectId: "helixStairs2", d: "up", saveStatus: undefined},
+        {status: "normal", id: "helixStairs1", x: 160, y: 64, type: "door", style: "cave", targetZone: "helix", targetObjectId: "helixStairs1", d: "up", saveStatus: undefined, linked: undefined},
+        {status: "normal", id: "helixStairs2", x: 320, y: 64, type: "door", style: "cave", targetZone: "helix", targetObjectId: "helixStairs2", d: "up", saveStatus: undefined, linked: undefined},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -373,6 +374,8 @@ const sf1_0x0: AreaDefinition = {
         },
     ],
     objects: [
+        {status: "normal", id: "helixSpiritDoor1", x: 320, y: 64, type: "door", style: "cave", targetZone: "helix", targetObjectId: "helixSpiritDoor1", d: "up", saveStatus: undefined},
+        {status: "normal", id: "helixSpiritDoor2", x: 160, y: 64, type: "door", style: "cave", targetZone: "helix", targetObjectId: "helixSpiritDoor2", d: "up", saveStatus: undefined},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -465,7 +468,7 @@ const f2_0x0: AreaDefinition = {
     ],
     objects: [
         {status: "normal", id: "helixStairs2", x: 368, y: 0, type: "door", style: "cave", targetZone: "helix", targetObjectId: "helixStairs2", d: "up", saveStatus: undefined},
-        {status: "normal", id: "helix:2:0x0-pitEntrance-0", x: 240, y: 240, targetZone: undefined, targetObjectId: undefined, type: "pitEntrance", linked: undefined},
+        {status: "normal", id: "helix:2:0x0-pitEntrance-0", x: 240, y: 240, targetZone: "helix", targetObjectId: "helixMarker", type: "pitEntrance", linked: undefined},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -559,6 +562,7 @@ const sf2_0x0: AreaDefinition = {
         },
     ],
     objects: [
+        {status: "normal", id: "helixSpiritDoor2", x: 112, y: 0, type: "door", style: "cave", targetZone: "helix", targetObjectId: "helixSpiritDoor2", d: "up", saveStatus: undefined},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},

@@ -182,7 +182,7 @@ const f0_0x1: AreaDefinition = {
         {status: "normal", id: "tomb:0:1x0-door-0", x: 112, y: 480, type: "door", style: "cave", targetZone: null, targetObjectId: "tombEntrance", d: "down"},
         {status: "closedSwitch", id: "tombExit", x: 112, y: 0, type: "door", style: "cave", targetZone: "cocoon", targetObjectId: "cocoonEntrance", d: "up", linked: true, saveStatus: true},
         {status: "normal", id: "tomb:0:1x0-npc-0", x: 80, y: 208, d: "down", behavior: "none", style: "vanara", type: "npc", dialogueKey: "tombGuardian", dialogue: undefined},
-        {status: "normal", id: "tombTeleporter", x: 160, y: 208, targetZone: "overworld", targetObjectId: "tombTeleporter", type: "teleporter"},
+        {status: "hidden", id: "tombTeleporter", x: 160, y: 208, targetZone: "overworld", targetObjectId: "tombTeleporter", type: "teleporter"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 32},

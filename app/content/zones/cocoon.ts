@@ -91,7 +91,7 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "cocoon:0:0x0-bigKey-0", x: 80, y: 368, type: "chest", lootType: "bigKey", lootAmount: 1, lootLevel: 1},
         {status: "bigKeyLocked", id: "cocoon:0:0x0-invisibility-0", x: 144, y: 352, type: "bigChest", lootType: "invisibility", lootAmount: 1, lootLevel: 1},
         {status: "normal", id: "cocoon:0:0x0-npc-0", x: 112, y: 112, d: "down", behavior: "none", style: "vanara", type: "npc", dialogueKey: "tombGuardian", dialogue: "This is the Cocoon, but it is still under construction.\n{|}Normally you would need to fight a boss to get to me, but I'll just give you this for now.\n{teleportation:1}"},
-        {status: "normal", id: "cocoonTeleporter", x: 160, y: 64, targetZone: "overworld", targetObjectId: "tombTeleporter", type: "teleporter"},
+        {status: "hidden", id: "cocoonTeleporter", x: 160, y: 64, targetZone: "overworld", targetObjectId: "tombTeleporter", type: "teleporter"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},

@@ -305,7 +305,7 @@ export class Door implements ObjectInstance {
         state.savedState.objectFlags[this.definition.id] = true;
         // Unlock the other half of this door if it is in this super tile.
         for (const object of this.area.objects) {
-            if (object?.definition.type === 'door' && object?.definition.id === this.definition.id) {
+            if (object?.definition?.type === 'door' && object?.definition.id === this.definition.id) {
                 object.changeStatus(state, 'normal');
             }
         }

@@ -174,7 +174,6 @@ const vineTileBase = canvasPalette(context => {
         context.fillStyle = 'green';
         context.fillRect(6, 0, 4, 6);
 }, { growTiles: [28]});
-//}, { growTiles: [{x: 11, y: 1}]});
 
 const rockWallFrame: Frame = {
     image: requireImage('gfx/tiles/rockwalltiles.png'),

@@ -508,8 +508,9 @@ const f0_1x1: AreaDefinition = {
     ],
     objects: [
         {id: "peachCaveWaterEntrance", linked: true, spirit: false, status: "normal", x: 256, y: 80, type: "door", style: "lightCave", targetZone: "newPeachCave", targetObjectId: "newPeachCave:waterEntrance", d: "up"},
-        {status: "normal", id: "tombTeleporter", x: 128, y: 432, targetZone: "tomb", targetObjectId: "tombTeleporter", type: "teleporter"},
+        {status: "hidden", id: "tombTeleporter", x: 128, y: 432, targetZone: "tomb", targetObjectId: "tombTeleporter", type: "teleporter"},
         {status: "normal", id: "lakeTunnelEntrance", x: 112, y: 336, type: "door", style: "lightCave", targetZone: "lakeTunnel", targetObjectId: "lakeTunnelEntrance", d: "up", saveStatus: undefined},
+        {status: "normal", id: "overworld:0:1x1-teleporter-0", x: 416, y: 80, targetZone: undefined, targetObjectId: undefined, type: "teleporter", saveStatus: undefined},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -994,6 +995,7 @@ const sf0_1x1: AreaDefinition = {
     layers: null,
     objects: [
         {id: "peachCaveWaterEntrance", linked: true, spirit: true, status: "normal", x: 256, y: 80, type: "door", style: "lightCave", targetZone: "newPeachCave", targetObjectId: "newPeachCave:waterEntrance", d: "up"},
+        {status: "normal", id: "overworld:s0:1x1-teleporter-0", x: 448, y: 144, targetZone: undefined, targetObjectId: undefined, type: "teleporter", saveStatus: undefined},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
