@@ -277,6 +277,63 @@ const lightCaveWallsPalette: TileSource = {
     behaviors: {'all': {solid: true}},
 };
 
+
+const furnitureCozyTiles: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/temp_furniture.png'), x: 496, y: 0, w: 4 * 16, h: 3 * 16},
+    behaviors: {
+        'all': {solid: true, low: true},
+    },
+};
+
+const furnitureWoodTiles: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/temp_furniture.png'), x: 560, y: 272, w: 4 * 16, h: 6 * 16},
+    behaviors: {
+        'all': {solid: true, low: true},
+    },
+};
+
+const furniturePlantTiles: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/temp_furniture.png'), x: 976, y: 192, w: 3 * 16, h: 1 * 16},
+    behaviors: {
+        'all': {solid: true, low: true},
+    },
+};
+
+const furnitureRugTiles: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/temp_furniture.png'), x: 688, y: 0, w: 4 * 16, h: 4 * 16},
+    behaviors: {
+        'all': {solid: true, low: true},
+    },
+};
+
+const furnitureLampTiles: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/temp_furniture.png'), x: 560, y: 368, w: 1 * 16, h: 1 * 16},
+    behaviors: {
+        'all': {solid: true, low: true, brightness: 0.6, lightRadius: 32},
+    },
+};
+
+const laundryTiles: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/temp_laundry32.png'), x: 0, y: 0, w: 6 * 16, h: 2 * 16},
+    behaviors: {
+        'all': {solid: true, low: false},
+    },
+};
+
+const fireTiles: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/temp_fire.png'), x: 0, y: 0, w: 1 * 16, h: 1 * 16},
+    behaviors: {
+        'all': {solid: true, low: false},
+    },
+};
+
 addTiles([
     // This is the empty tile.
     singleTileSource('gfx/tiles/bush.png', null, -16),
@@ -338,5 +395,12 @@ addTiles([
     singleTileSource('gfx/tiles/thornsspirit.png', null, 16),
     lightCaveWallsPalette,
     lightCaveCornersPalette,
+    furnitureCozyTiles,
+    furnitureWoodTiles,
+    furnitureLampTiles,
+    furniturePlantTiles,
+    furnitureRugTiles,
+    laundryTiles,
+    fireTiles,
 ]);
 
