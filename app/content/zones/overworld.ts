@@ -184,6 +184,7 @@ const f0_0x1: AreaDefinition = {
     objects: [
         {status: "normal", type: "npc", x: 128, y: 272, d: "down", behavior: "none", style: "vanara", dialogueKey: "mom", id: "overworld:0:1x0-npc-0"},
         {status: "normal", id: "peachCaveTopEntrance", x: 368, y: 288, type: "door", style: "lightCave", targetZone: "newPeachCave", targetObjectId: "newPeachCave:topEntrance", d: "up"},
+        {status: "normal", id: "waterfallCaveEntrance", x: 80, y: 240, type: "door", style: "lightCave", targetZone: "waterfallCave", targetObjectId: "waterfallCaveEntrance", d: "up", saveStatus: undefined},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 32},

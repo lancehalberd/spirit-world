@@ -100,7 +100,7 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "waterfallCave:0:0x0-npc-2", x: 320, y: 64, d: "down", behavior: "none", style: "vanara", type: "npc", dialogueKey: undefined, dialogue: "I'm trying to sleep!"},
         {status: "normal", id: "waterfallCave:0:0x0-npc-3", x: 448, y: 176, d: "left", behavior: "random", style: "vanara", type: "npc", dialogueKey: undefined, dialogue: "Welcome to our home."},
         {status: "normal", id: "waterfallCave:0:0x0-npc-5", x: 384, y: 176, d: "right", behavior: "none", style: "vanara", type: "npc", dialogueKey: undefined, dialogue: "I'm knitting a scarf."},
-        {status: "normal", id: "waterfallCave:0:0x0-door-4", x: 160, y: 480, type: "door", style: "cave", targetZone: undefined, targetObjectId: undefined, d: "down", saveStatus: undefined},
+        {status: "normal", id: "waterfallCaveEntrance", x: 160, y: 480, type: "door", style: "cave", targetZone: "overworld", targetObjectId: "waterfallCaveEntrance", d: "down", saveStatus: undefined},
         {status: "normal", id: "waterfallCave:0:0x0-npc-4", x: 32, y: 96, d: "right", behavior: "none", style: "vanara", type: "npc", dialogueKey: undefined, dialogue: "I love my cozy home."},
         {status: "normal", id: "waterfallCave:0:0x0-npc-6", x: 176, y: 32, d: "down", behavior: "none", style: "vanara", type: "npc", dialogueKey: undefined, dialogue: "Zzzz."},
         {status: "normal", id: "waterfallCave:0:0x0-npc-7", x: 208, y: 160, d: "left", behavior: "none", style: "vanara", type: "npc", dialogueKey: undefined, dialogue: "I can't decide what to wear today..."},

@@ -13,8 +13,8 @@ export * from 'app/content/zones/warTemple';
 export * from 'app/content/zones/cocoon';
 export * from 'app/content/zones/lakeTunnel';
 export * from 'app/content/zones/helix';
+export * from 'app/content/zones/waterfallCave';
 // Known remaining zones:
-// waterfall cave - MCs home, Vanara outcast village
 // holy city interior
 // grand temple
 // jade palace
