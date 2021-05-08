@@ -70,8 +70,8 @@ export function useTool(
             const staffLevel = state.hero.activeTools.staff
             const maxLength = staffLevel > 1 ? 64 : 4;
             const staff = new Staff(state, {
-                x: hero.x + 8 + 8 * directionMap[hero.d][0],
-                y: hero.y + 8 + 8 * directionMap[hero.d][1],
+                x: hero.x + 8 + 12 * directionMap[hero.d][0],
+                y: hero.y + 8 + 12 * directionMap[hero.d][1],
                 damage: 4 * staffLevel,
                 direction: hero.d,
                 element: hero.element,
