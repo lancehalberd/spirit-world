@@ -1,6 +1,6 @@
 import {
     AreaInstance, BossType,
-    Direction, EnemyType,
+    DecorationType, Direction, EnemyType,
     GameState, Hero, LootType,
     MagicElement, MinionType,
     NPCBehavior, NPCStyle,
@@ -133,6 +133,14 @@ export interface SimpleObjectDefinition extends BaseObjectDefinition {
     type: SimpleObjectType,
 }
 
+export interface DecorationDefinition extends BaseObjectDefinition {
+    type: 'decoration',
+    decorationType: DecorationType,
+    drawPriority?: DrawPriority,
+    w: number,
+    h: number,
+}
+
 export interface EnemyObjectDefinition extends BaseObjectDefinition {
     type: 'enemy',
     enemyType: EnemyType | MinionType,
@@ -153,6 +161,7 @@ export type ObjectDefinition = SimpleObjectDefinition
     | BallGoalDefinition
     | BossObjectDefinition
     | CrystalSwitchDefinition
+    | DecorationDefinition
     | EntranceDefinition
     | EnemyObjectDefinition
     | FloorSwitchDefinition

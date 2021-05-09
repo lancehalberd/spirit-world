@@ -9,6 +9,7 @@ import { PushPullObject } from 'app/content/pushPullObject';
 import { RollingBallObject } from 'app/content/rollingBallObject';
 import { TippableObject } from 'app/content/tippableObject';
 
+import { Decoration } from 'app/content/objects/decoration';
 import { BallGoal } from 'app/content/objects/ballGoal';
 import { Marker } from 'app/content/objects/marker';
 import { NPC } from 'app/content/objects/npc';
@@ -24,6 +25,8 @@ import {
 export function createObjectInstance(state: GameState, object: ObjectDefinition): ObjectInstance {
     if (object.type === 'ballGoal') {
         return new BallGoal(object);
+    } else if (object.type === 'decoration') {
+        return new Decoration(object);
     } else if (object.type === 'enemy' || object.type === 'boss') {
         return new Enemy(state, object);
     } else if (object.type === 'loot') {

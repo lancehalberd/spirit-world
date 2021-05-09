@@ -489,6 +489,14 @@ export class Door implements ObjectInstance {
         }
     }
     renderForeground(context: CanvasRenderingContext2D, state: GameState) {
+        const hitbox = this.getHitbox(state);
+        // No need to render this unless the player is actually behind this.
+        // This is a hack to keep this from rendering in front of the waterfall
+        // for the entrance to the Waterfall Cave.
+        // There is also probably an issue with this rendering in front of flying enemies.
+        if (this.definition.d === 'up' && hitbox.y + hitbox.h < state.hero.y) {
+            return;
+        }
         const doorStyle = doorStyles[this.style];
         if (doorStyle[this.definition.d] && this.status !== 'cracked') {
             let frame: Frame;
