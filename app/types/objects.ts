@@ -49,7 +49,7 @@ export interface ObjectInstance {
 }
 
 export type ObjectStatus = 'active' | 'closed' | 'closedEnemy' | 'closedSwitch'
-    | 'gone' | 'hiddenSwitch' | 'hiddenEnemy' | 'normal'
+    | 'gone' | 'hidden' | 'hiddenSwitch' | 'hiddenEnemy' | 'normal'
     | 'locked' | 'bigKeyLocked' | 'cracked' | 'blownOpen';
 
 export interface MovementProperties {

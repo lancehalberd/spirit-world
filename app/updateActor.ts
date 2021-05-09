@@ -118,8 +118,6 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         movementSpeed = 0;
         hero.y += 0.5;
         //dy = 1;
-    } else if (!isAstralProjection && hero.swimming) {
-        movementSpeed = 1.5;
     } else if (!isAstralProjection && hero.action === 'climbing') {
         movementSpeed = 1;
     }  else if (!isAstralProjection && hero.action === 'falling') {
@@ -146,7 +144,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
     } else if (!isAstralProjection && hero.action === 'jumpingDown') {
         movementSpeed = 0;
         // After the hero has jumped a bit, we stop the jump when they hit a position they can successfully move to.
-        if (hero.vy > 4 && moveActor(state, hero, hero.vx, hero.vy, {canFall: true})) {
+        if (hero.vy > 4 && moveActor(state, hero, hero.vx, hero.vy, {canFall: true, canSwim: true})) {
             hero.action = null;
             hero.animationTime = 0;
         } else {
@@ -172,6 +170,8 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         if (hero.actionFrame >= 5) {
             hero.action = null;
         }
+    } else if (!isAstralProjection && hero.swimming) {
+        movementSpeed = 1.5;
     } else if (hero.action === 'grabbing') {
         movementSpeed = 0;
         if (hero.grabObject?.pullingHeroDirection) {
@@ -334,7 +334,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
     if (dx || dy) {
         const encumbered = hero.pickUpObject || hero.pickUpTile;
         moveActor(state, hero, dx, dy, {
-            canPush: !encumbered,
+            canPush: !encumbered && !hero.swimming,
             canClimb: !encumbered,
             canFall: true,
             canSwim: !encumbered,
