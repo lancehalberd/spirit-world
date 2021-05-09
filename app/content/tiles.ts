@@ -295,7 +295,7 @@ const furnitureWoodTiles: TileSource = {
 
 const furniturePlantTiles: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/temp_furniture.png'), x: 976, y: 192, w: 3 * 16, h: 1 * 16},
+    source: {image: requireImage('gfx/tiles/temp_woodAndFood.png'), x: 112, y: 206, w: 1 * 16, h: 1 * 16},
     behaviors: {
         'all': {solid: true, low: true},
     },
@@ -329,6 +329,74 @@ const fireTiles: TileSource = {
     behaviors: {
         'all': {solid: true, low: false},
     },
+};
+
+const logChoppingTiles: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/temp_woodAndFood.png'), x: 240, y: 64, w: 1 * 16, h: 1 * 16},
+    behaviors: {
+        'all': {solid: true, low: true},
+    },
+};
+
+const foodBoxTiles: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/temp_woodAndFood.png'), x: 192, y: 102, w: 4 * 16, h: 2 * 16},
+    behaviors: {
+        'all': {solid: true, low: true},
+    },
+};
+
+const logAndFoodBagTiles: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/temp_woodAndFood.png'), x: 64, y: 160, w: 5 * 16, h: 1 * 16},
+    behaviors: {
+        'all': {solid: true, low: true},
+    },
+};
+
+const largeLogPileTiles: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/temp_woodAndFood.png'), x: 112, y: 176, w: 2 * 16, h: 2 * 16},
+    behaviors: {
+        'all': {solid: true, low: true},
+    },
+};
+
+const blueHouseTiles: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/temp_furniture.png'), x: 368, y: 80, w: 4 * 16, h: 5 * 16},
+    behaviors: {
+        'all': {solid: true, low: false},
+    },
+};
+
+const greenHouseTiles: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/temp_furniture.png'), x: 368, y: 160, w: 4 * 16, h: 5 * 16},
+    behaviors: {
+        'all': {solid: true, low: false},
+    },
+};
+
+const fenceTiles: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/temp_furniture.png'), x: 240, y: 0, w: 3 * 16, h: 3 * 16},
+    behaviors: {
+        'all': {solid: true, low: true},
+    },
+};
+
+const bridgeHorizontalTiles: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/temp_bridgeAndTree.png'), x: 128, y: 48, w: 3 * 16, h: 1 * 16},
+    behaviors: {},
+};
+
+const bridgeVerticalTiles: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/temp_bridgeAndTree.png'), x: 144, y: 32, w: 3 * 16, h: 1 * 16},
+    behaviors: {},
 };
 
 addTiles([
@@ -399,5 +467,14 @@ addTiles([
     furnitureRugTiles,
     laundryTiles,
     fireTiles,
+    logChoppingTiles,
+    foodBoxTiles,
+    logAndFoodBagTiles,
+    largeLogPileTiles,
+    blueHouseTiles,
+    greenHouseTiles,
+    fenceTiles,
+    bridgeHorizontalTiles,
+    bridgeVerticalTiles,
 ]);
 
