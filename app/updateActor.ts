@@ -144,7 +144,10 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
     } else if (!isAstralProjection && hero.action === 'jumpingDown') {
         movementSpeed = 0;
         // After the hero has jumped a bit, we stop the jump when they hit a position they can successfully move to.
-        if (hero.vy > 4 && moveActor(state, hero, hero.vx, hero.vy, {canFall: true, canSwim: true})) {
+        if (hero.vy > 4 && moveActor(state, hero, hero.vx / 4, hero.vy / 4, {canFall: true, canSwim: true})) {
+            if (hero.vy > 0 && hero.y % 16 > 0) {
+                hero.y = hero.y - (hero.y % 16) + 16;
+            }
             hero.action = null;
             hero.animationTime = 0;
         } else {
@@ -332,7 +335,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         hero.explosionTime = 0;
     }
     if (dx || dy) {
-        const encumbered = hero.pickUpObject || hero.pickUpTile;
+        const encumbered = hero.pickUpObject || hero.pickUpTile || hero.grabObject || hero.grabTile;
         moveActor(state, hero, dx, dy, {
             canPush: !encumbered && !hero.swimming,
             canClimb: !encumbered,
