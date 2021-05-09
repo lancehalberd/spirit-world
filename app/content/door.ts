@@ -494,7 +494,7 @@ export class Door implements ObjectInstance {
         // This is a hack to keep this from rendering in front of the waterfall
         // for the entrance to the Waterfall Cave.
         // There is also probably an issue with this rendering in front of flying enemies.
-        if (this.definition.d === 'up' && hitbox.y + hitbox.h < state.hero.y) {
+        if (this.definition.d === 'up' && hitbox.y + 24 < state.hero.y) {
             return;
         }
         const doorStyle = doorStyles[this.style];

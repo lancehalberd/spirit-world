@@ -37,11 +37,13 @@ export class Decoration implements ObjectInstance {
 export const decorationTypes = {
     waterfall: {
         render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+            // Draw this 8 pixels past the bottom so that y sorting looks better.
+            const h = decoration.h + 8;
             context.save();
-                context.globalAlpha = 0.7;
+                context.globalAlpha = 0.6;
                 context.fillStyle = '#2B68D5';
-                context.fillRect(decoration.x, decoration.y - decoration.h, decoration.w, decoration.h);
-                context.globalAlpha = 0.9;
+                context.fillRect(decoration.x, decoration.y + 8 - h, decoration.w, h);
+                context.globalAlpha = 0.8;
                 context.fillStyle = 'white';
                 const baseValue = 128 * decoration.animationTime / 1000;
                 let y = baseValue % 64 - 128;
@@ -51,28 +53,28 @@ export const decorationTypes = {
                         const targetTop = Math.sin((y - baseValue + y / 2 + x) / 20) * 32 + y;
                         const targetBottom = targetTop + 48;
                         const actualTop = Math.max(0, targetTop);
-                        const actualBottom = Math.min(decoration.h, targetBottom);
+                        const actualBottom = Math.min(h, targetBottom);
                         if (actualBottom > actualTop) {
                             context.fillRect(
-                                decoration.x + x, decoration.y - decoration.h + actualTop,
+                                decoration.x + x, decoration.y + 8 - h + actualTop,
                                 1, actualBottom - actualTop
                             );
                         }
                     }
                 }
-                context.globalAlpha = 0.8;
+                context.globalAlpha = 0.7;
                 context.fillStyle = '#0034A0';
                 y = baseValue % 64 - 128;
-                for (; y < decoration.h + 32; y += 32) {
+                for (; y < h + 32; y += 32) {
                     let x = ((y - baseValue) % 5 + 5) % 5;
                     for (; x < decoration.w - 1; x += 5) {
                         const targetTop = Math.cos((y - baseValue + y / 2 + x) / 20) * 32 + y;
                         const targetBottom = targetTop + 32;
                         const actualTop = Math.max(0, targetTop);
-                        const actualBottom = Math.min(decoration.h, targetBottom);
+                        const actualBottom = Math.min(h, targetBottom);
                         if (actualBottom > actualTop) {
                             context.fillRect(
-                                decoration.x + x, decoration.y - decoration.h + actualTop,
+                                decoration.x + x, decoration.y + 8 - h + actualTop,
                                 2, actualBottom - actualTop
                             );
                         }
