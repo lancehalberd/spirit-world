@@ -100,6 +100,16 @@ export const SPAWN_COCOON_ENTRANCE: ZoneLocation = {
     areaGridCoords: {x: 0, y: 0},
     isSpiritWorld: false,
 };
+export const SPAWN_HELIX_ENTRANCE: ZoneLocation = {
+    zoneKey: 'helix',
+    floor: 0,
+    x: 248,
+    y: 440,
+    z: 0,
+    d: 'up',
+    areaGridCoords: {x: 0, y: 0},
+    isSpiritWorld: false,
+};
 
 
 function applyItems(savedState: SavedState, items: {[key: string]: number}, objectFlags: string[] = []): SavedState {
@@ -152,11 +162,16 @@ function applyItems(savedState: SavedState, items: {[key: string]: number}, obje
 const defaultSavedState = getDefaultSavedState();
 const peachBossState = applyItems(defaultSavedState, {weapon: 1, money: 50});
 const peachCaveExitState = applyItems(peachBossState, {maxLife: 1, catEyes: 1});
-const tombStartState = applyItems(peachCaveExitState, {bow: 1}, ['tombEntrance']);
+const tombStartState = applyItems(peachCaveExitState, {bow: 1}, ['elderTomb', 'tombEntrance']);
+tombStartState.hero.leftTool = 'bow';
 const tombBossState = applyItems(tombStartState, {roll: 1, 'tomb:bigKey': 1});
-const warTempleStart = applyItems(tombBossState, {maxLife: 1, spiritSight: 1}, ['warTempleEntrance', 'tombTeleporter']);
+const warTempleStart = applyItems(tombBossState, {maxLife: 1, spiritSight: 1},
+    ['tombBoss', 'warTempleEntrance', 'tombTeleporter']);
 const warTempleBoss = applyItems(warTempleStart, {gloves: 1, 'warTemple:bigKey': 1});
-const cocoonStartState = applyItems(warTempleBoss, {maxLife: 1, astralProjection: 1});
+const cocoonStartState = applyItems(warTempleBoss, {maxLife: 1, astralProjection: 1}, ['warTempleBoss']);
+const helixStartState = applyItems(cocoonStartState, {maxLife: 1, teleportation: 1, invisibility: 1},
+    ['cocoonTeleporter', 'lakeTunneBoss']);
+helixStartState.hero.rightTool = 'invisibility';
 
 
 const spawnLocations = {
@@ -191,6 +206,10 @@ const spawnLocations = {
     'Cocoon Start': {
         location: SPAWN_COCOON_ENTRANCE,
         savedState: cocoonStartState,
+    },
+    'Helix Start': {
+        location: SPAWN_HELIX_ENTRANCE,
+        savedState: helixStartState,
     },
 };
 window['spawnLocations'] = spawnLocations;

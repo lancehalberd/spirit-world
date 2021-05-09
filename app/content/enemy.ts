@@ -577,6 +577,7 @@ function updateElementalIdol(state: GameState, enemy: Enemy, attack: () => void)
             enemy.params.priority = Math.ceil(enemy.params.priority) + Math.random();
             enemy.setMode('shielded');
         }
+        return;
     }
     if (!state.areaInstance.objects.some(object => object instanceof Enemy && object.params.priority < enemy.params.priority)) {
         if (enemy.mode === 'attack') {
