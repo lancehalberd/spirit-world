@@ -58,7 +58,8 @@ export class RollingBallObject implements ObjectInstance {
         }
         const x = this.x + 8 + 16 * directionMap[direction][0];
         const y = this.y + 8 + 16 * directionMap[direction][1];
-        if (isPointOpen(state, this.area, {x, y}) && (!this.linkedObject || isPointOpen(state, this.linkedObject.area, {x, y}))) {
+        const excludedObjects = new Set([this, state.hero, state.hero.astralProjection, ...state.hero.clones]);
+        if (isPointOpen(state, this.area, {x, y}, excludedObjects) && (!this.linkedObject || isPointOpen(state, this.linkedObject.area, {x, y}, excludedObjects))) {
             this.rollDirection = direction;
             this.soundReference = playSound('rollingBall');
             if (this.linkedObject) {
@@ -109,7 +110,7 @@ export class RollingBallObject implements ObjectInstance {
             // TODO: rolling balls should damage MC/clones.
             const excludedObjects = new Set([this, state.hero, state.hero.astralProjection, ...state.hero.clones]);
             const { objects, tileBehavior } = getTileBehaviorsAndObstacles(state, this.area, {x, y}, excludedObjects);
-            if (!tileBehavior.solid && !tileBehavior.pit && !tileBehavior.outOfBounds) {
+            if (!tileBehavior.solid && !tileBehavior.outOfBounds) {
                 this.x += dx;
                 this.y += dy;
                 // Hitting enemies with rolling balls does 2 damage.

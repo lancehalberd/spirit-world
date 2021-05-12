@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import { enterZoneByTarget, resetTileBehavior } from 'app/content/areas';
+import { applyBehaviorToTile, enterZoneByTarget, resetTileBehavior } from 'app/content/areas';
 import { findObjectInstanceById } from 'app/content/objects';
 import {
     BITMAP_LEFT, BITMAP_RIGHT,
@@ -13,7 +13,7 @@ import { boxesIntersect, isObjectInsideTarget, isPointInShortRect } from 'app/ut
 
 import {
     AreaInstance, Direction, DrawPriority, Frame, GameState, ObjectInstance,
-    ObjectStatus, EntranceDefinition, ShortRectangle, TileBehaviors
+    ObjectStatus, EntranceDefinition, ShortRectangle, TileBehaviors,
 } from 'app/types';
 
 
@@ -187,15 +187,6 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
 type DoorStyle = keyof typeof doorStyles;
 
 
-function applyBehaviorToTile(area: AreaInstance, x: number, y: number, behavior: TileBehaviors): void {
-    if (!area.behaviorGrid[y]) {
-        area.behaviorGrid[y] = [];
-    }
-    if (!area.behaviorGrid[y][x]) {
-        area.behaviorGrid[y][x] = {};
-    }
-    area.behaviorGrid[y][x] = {...area.behaviorGrid[y][x], ...behavior};
-}
 
 export class Door implements ObjectInstance {
     linkedObject: Door;
@@ -242,7 +233,7 @@ export class Door implements ObjectInstance {
         const x = Math.floor(this.x / 16);
         const doorStyle = doorStyles[this.style];
         if (doorStyle.w === 64) {
-            const behaviors = this.isOpen() ? { solid: false } : { solid: true, low: false};
+            const behaviors: TileBehaviors = this.isOpen() ? { solid: false } : { solid: true, low: false};
             if (this.definition.d === 'up' || this.definition.d === 'down') {
                 applyBehaviorToTile(this.area, x, y, behaviors);
                 applyBehaviorToTile(this.area, x + 1, y, behaviors);
@@ -255,7 +246,7 @@ export class Door implements ObjectInstance {
                 applyBehaviorToTile(this.area, x, y + 3, behaviors);
             }
         } else if (doorStyle.w === 32) {
-            const behaviors = { solid: true, solidMap: undefined, low: false};
+            const behaviors: TileBehaviors = { solid: true, solidMap: undefined, low: false};
             applyBehaviorToTile(this.area, x, y, behaviors);
             applyBehaviorToTile(this.area, x + 1, y, behaviors);
             applyBehaviorToTile(this.area, x, y + 1, behaviors);
@@ -347,6 +338,7 @@ export class Door implements ObjectInstance {
         if (index >= 0) {
             this.area.objects.splice(index, 1);
         }
+        this.area = null;
     }
     update(state: GameState) {
         let hero = state.hero.activeClone || state.hero;

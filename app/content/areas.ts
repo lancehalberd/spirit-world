@@ -505,6 +505,16 @@ export function getAreaSize(state: GameState): {w: number, h: number, section: S
     }
 }
 
+export function applyBehaviorToTile(area: AreaInstance, x: number, y: number, behavior: TileBehaviors): void {
+    if (!area.behaviorGrid[y]) {
+        area.behaviorGrid[y] = [];
+    }
+    if (!area.behaviorGrid[y][x]) {
+        area.behaviorGrid[y][x] = {};
+    }
+    area.behaviorGrid[y][x] = {...area.behaviorGrid[y][x], ...behavior};
+}
+
 export function refreshSection(state: GameState, area: AreaInstance, section: ShortRectangle): void {
     // First reset tiles that need to be reset.
     // This is done before objects since some objects will update the tiles under them.
