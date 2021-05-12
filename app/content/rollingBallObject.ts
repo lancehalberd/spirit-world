@@ -4,7 +4,7 @@ import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { directionMap, getTileBehaviorsAndObstacles, isPointOpen } from 'app/utils/field';
 import { playSound, stopSound } from 'app/utils/sounds';
 
-import { AreaInstance, BallGoal, Direction, GameState, BaseObjectDefinition, ObjectInstance, ObjectStatus, ShortRectangle } from 'app/types';
+import { AreaInstance, BallGoal, Direction, Enemy, GameState, BaseObjectDefinition, ObjectInstance, ObjectStatus, ShortRectangle } from 'app/types';
 
 const rollingAnimation = createAnimation('gfx/tiles/rollingboulder.png', {w: 16, h: 16}, {cols:4});
 const rollingAnimationSpirit = createAnimation('gfx/tiles/rollingboulderspirit.png', {w: 16, h: 16}, {cols:4});
@@ -105,10 +105,21 @@ export class RollingBallObject implements ObjectInstance {
                     return;
                 }
             }
-            const { objects, tileBehavior } = getTileBehaviorsAndObstacles(state, this.area, {x, y}, new Set([this]));
+            // MC + clones do not obstruct rolling balls.
+            // TODO: rolling balls should damage MC/clones.
+            const excludedObjects = new Set([this, state.hero, state.hero.astralProjection, ...state.hero.clones]);
+            const { objects, tileBehavior } = getTileBehaviorsAndObstacles(state, this.area, {x, y}, excludedObjects);
             if (!tileBehavior.solid && !tileBehavior.pit && !tileBehavior.outOfBounds) {
                 this.x += dx;
                 this.y += dy;
+                // Hitting enemies with rolling balls does 2 damage.
+                if (objects.length) {
+                    for (const object of objects) {
+                        if (object instanceof Enemy) {
+                            object.takeDamage(state, 2);
+                        }
+                    }
+                }
             } else {
                 if (objects.length) {
                     for (const object of objects) {

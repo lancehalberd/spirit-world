@@ -2,11 +2,12 @@ import { addObjectToArea, removeObjectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { drawFrame, frameAnimation, getFrame } from 'app/utils/animations';
 
-import { AreaInstance, Frame, FrameAnimation, GameState, ObjectInstance, ObjectStatus, TileBehaviors } from 'app/types';
+import { AreaInstance, DrawPriority, Frame, FrameAnimation, GameState, ObjectInstance, ObjectStatus, TileBehaviors } from 'app/types';
 
 
 interface Props {
     animation: FrameAnimation,
+    drawPriority?: DrawPriority,
     x?: number
     y?: number,
     z?: number,
@@ -20,9 +21,11 @@ interface Props {
 export class AnimationEffect implements ObjectInstance {
     area: AreaInstance;
     definition = null;
+    drawPriority: DrawPriority;
     animation: FrameAnimation;
     animationTime: number;
     behaviors: TileBehaviors;
+    ignorePits = true;
     x: number;
     y: number;
     z: number;
@@ -32,9 +35,10 @@ export class AnimationEffect implements ObjectInstance {
     az: number;
     scale: number;
     status: ObjectStatus = 'normal';
-    constructor({animation, x = 0, y = 0, z = 0, vx = 0, vy = 0, vz = 0, az = 0, scale = 1}: Props) {
+    constructor({animation, drawPriority = 'background', x = 0, y = 0, z = 0, vx = 0, vy = 0, vz = 0, az = 0, scale = 1}: Props) {
         this.animation = animation;
         this.animationTime = 0;
+        this.drawPriority = drawPriority;
         this.x = x;
         this.y = y;
         this.z = z;
@@ -83,6 +87,7 @@ export function addParticleAnimations(
         const vy = Math.sin(theta);
         const particle = new AnimationEffect({
             animation: frameAnimation(frame),
+            drawPriority: 'foreground',
             x: x + vx, y: y + vy, z,
             vx, vy, vz: 1.5, az: -0.2,
         });

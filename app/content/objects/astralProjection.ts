@@ -1,13 +1,61 @@
-import { getHeroFrame, renderCarriedTile } from 'app/renderActor';
-
-import { drawFrame } from 'app/utils/animations';
+import { getCloneMovementDeltas } from 'app/keyCommands';
+import { renderCarriedTile } from 'app/renderActor';
+import { heroSpiritAnimations } from 'app/render/heroAnimations';
+import { drawFrameAt, getFrame } from 'app/utils/animations';
+import { directionMap, getDirection } from 'app/utils/field';
 
 import {
-    Action, ActiveTool, AreaInstance, Clone,
+    Action, ActiveTool, ActorAnimations, AreaInstance, Clone,
     Direction, DrawPriority, MagicElement, Equipment, Frame, FullTile,
     GameState, Hero, ObjectInstance, ObjectStatus, PassiveTool,
     ShortRectangle, TileBehaviors, TileCoords, ZoneLocation
 } from 'app/types';
+
+
+let lastPullAnimation = null;
+export function getSpiritFrame(state: GameState, hero: Hero): Frame {
+    let animations: ActorAnimations['idle'];
+    switch (hero.action) {
+        // Grabbing currently covers animations for pulling/pushing objects that are grabbed.
+        case 'grabbing':
+            const [dx, dy] = directionMap[hero.d];
+            const oppositeDirection = getDirection(-dx, -dy);
+            const [kdx, kdy] = getCloneMovementDeltas(state, hero);
+            if (hero.grabObject?.pullingHeroDirection === oppositeDirection) {
+                lastPullAnimation = heroSpiritAnimations.pull;
+                return getFrame(lastPullAnimation[hero.d], hero.animationTime);
+            } else if (hero.grabObject?.pullingHeroDirection) {
+                lastPullAnimation = heroSpiritAnimations.push;
+                return getFrame(lastPullAnimation[hero.d], hero.animationTime);
+            } else if (kdx * dx < 0 || kdy * dy < 0) {
+                // If the player is not moving but pulling away from the direction they are grabbing,
+                // show the pull animation to suggest the player is *trying* to pull the object they
+                // are grabbing even though it won't move.
+                animations = heroSpiritAnimations.pull;
+                return getFrame(animations[hero.d], hero.animationTime);
+            }
+            // If the player continously pushes/pulls there is one frame that isn't set correctly,
+            // so we use this to play that last animation for an extra frame.
+            if (lastPullAnimation) {
+                const frame = getFrame(lastPullAnimation[hero.d], hero.animationTime);
+                lastPullAnimation = null;
+                return frame;
+            }
+            animations = heroSpiritAnimations.grab;
+            break;
+        case 'pushing':
+            animations = heroSpiritAnimations.push;
+            break;
+        case 'entering':
+        case 'exiting':
+        case 'walking':
+            animations = heroSpiritAnimations.move;
+            break;
+        default:
+            animations = heroSpiritAnimations.idle;
+    }
+    return getFrame(animations[hero.d], hero.animationTime);
+}
 
 export class AstralProjection implements Hero, ObjectInstance {
     area: AreaInstance;
@@ -84,17 +132,10 @@ export class AstralProjection implements Hero, ObjectInstance {
     }
     render(this: Hero, context: CanvasRenderingContext2D, state: GameState): void {
         const hero = this;
-        const frame = getHeroFrame(state, hero);
-        const h1 = 14;
-        const h2 = 4;
-        const h3 = 4;
+        const frame = getSpiritFrame(state, hero);
         context.save();
             context.globalAlpha = 0.7;
-            drawFrame(context, {...frame, h: h1}, { x: hero.x - frame.content.x, y: hero.y - frame.content.y - hero.z + 4, w: frame.w, h: h1 });
-            context.globalAlpha = 0.4;
-            drawFrame(context, {...frame, y: frame.y + h1, h: h2}, { x: hero.x - frame.content.x, y: hero.y - frame.content.y - hero.z + 4 + h1, w: frame.w, h: h2 });
-            context.globalAlpha = 0.1;
-            drawFrame(context, {...frame, y: frame.y + h1 + h2, h: h3}, { x: hero.x - frame.content.x, y: hero.y - frame.content.y - hero.z + 4 + h1 + h2, w: frame.w, h: h3 });
+            drawFrameAt(context, frame, { x: hero.x, y: hero.y });
         context.restore();
         if (hero.pickUpTile) {
             renderCarriedTile(context, state, hero);

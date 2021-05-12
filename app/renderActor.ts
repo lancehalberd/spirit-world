@@ -7,7 +7,12 @@ import { carryMap, directionMap, getDirection } from 'app/utils/field';
 
 import { Actor, ActorAnimations, Enemy, Frame, GameState, Hero } from 'app/types';
 
-import { heroAnimations, heroShallowAnimations, heroSwimAnimations, Y_OFF} from 'app/render/heroAnimations';
+import {
+    heroAnimations,
+    heroShallowAnimations,
+    heroSwimAnimations,
+    Y_OFF,
+} from 'app/render/heroAnimations';
 
 
 const shadowFrame: Frame = createAnimation('gfx/shadow.png', { w: 16, h: 16 }).frames[0];

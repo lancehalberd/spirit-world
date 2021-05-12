@@ -53,8 +53,15 @@ export function updateAllHeroes(this: void, state: GameState) {
     for (const clone of state.hero.clones) {
         updateHero(state, clone);
     }
-    if (state.hero.spiritRadius > 0 && state.hero.astralProjection) {
-        updateHero(state, state.hero.astralProjection);
+    // Destroy existing astral projection if it isn't in the right area.
+    if (state.hero.astralProjection && state.hero.astralProjection.area !== state.hero.area.alternateArea) {
+        removeObjectFromArea(state, state.hero.astralProjection);
+        state.hero.astralProjection = null;
+    }
+    if (state.hero.astralProjection) {
+        if (state.hero.spiritRadius > 0) {
+            updateHero(state, state.hero.astralProjection);
+        }
     }
     updateHero(state, state.hero);
 }
@@ -177,7 +184,10 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         movementSpeed = 1.5;
     } else if (hero.action === 'grabbing') {
         movementSpeed = 0;
-        if (hero.grabObject?.pullingHeroDirection) {
+        if (hero.grabObject && hero.grabObject.area !== hero.area) {
+            hero.action = null;
+            hero.grabObject = null;
+        } else if (hero.grabObject?.pullingHeroDirection) {
             dx = directionMap[hero.grabObject.pullingHeroDirection][0];
             dy = directionMap[hero.grabObject.pullingHeroDirection][1];
         } else if (!hero.pickUpTile && !hero.pickUpObject && !isPassiveButtonDown) {
@@ -248,9 +258,11 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             } else {
                 const maxRadius = MAX_SPIRIT_RADIUS;
                 hero.spiritRadius = Math.min(hero.spiritRadius + 4, maxRadius);
-                if (hero.passiveTools.astralProjection && !hero.astralProjection && hero.area.alternateArea) {
-                    hero.astralProjection = new AstralProjection(hero);
-                    addObjectToArea(state, hero.area.alternateArea, hero.astralProjection);
+                if (hero.passiveTools.astralProjection && hero.area.alternateArea) {
+                    if (!hero.astralProjection) {
+                        hero.astralProjection = new AstralProjection(hero);
+                        addObjectToArea(state, hero.area.alternateArea, hero.astralProjection);
+                    }
                 }
             }
         } else {

@@ -570,6 +570,7 @@ export function addObjectToArea(state: GameState, area: AreaInstance, object: Ob
 export function removeObjectFromArea(state: GameState, object: ObjectInstance): void {
     if (object.remove) {
         object.remove(state);
+        object.area = null;
     } else {
         if (object.cleanup) {
             object.cleanup(state);
@@ -578,6 +579,7 @@ export function removeObjectFromArea(state: GameState, object: ObjectInstance): 
         if (index >= 0) {
             object.area.objects.splice(index, 1);
         }
+        object.area = null;
     }
 }
 

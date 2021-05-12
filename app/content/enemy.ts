@@ -54,6 +54,9 @@ export class Enemy implements Actor, ObjectInstance {
     animationTime: number;
     alwaysReset: boolean = false;
     alwaysUpdate: boolean = false;
+    // This ignores the default pit logic in favor of the ground effects
+    // code used internally.
+    ignorePits = true;
     d: Direction;
     spawnX: number;
     spawnY: number;

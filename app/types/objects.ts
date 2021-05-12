@@ -19,6 +19,7 @@ export interface ObjectInstance {
     updateDuringTransition?: boolean,
     // Setting this true is the same as returning true always for shouldReset+shouldRespawn.
     alwaysReset?: boolean,
+    ignorePits?: boolean,
     // Should revert to its original state if still present
     shouldReset?: (state: GameState) => boolean,
     // Should revert to its original state if missing (Defeated enemy, ball that fell in a pit)

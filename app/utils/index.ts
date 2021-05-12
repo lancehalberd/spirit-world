@@ -14,6 +14,10 @@ export function isPixelInShortRect(x: number, y: number, {x: l = 0, y: t = 0, w 
     return !(y < t || y >= t + h || x < l || x >= l + w);
 }
 
+export function roundRect({x, y, w, h}: ShortRectangle): ShortRectangle {
+    return {x: x | 0, y: y | 0, w: w | 0, h: h | 0 };
+}
+
 // This is similar to rectanglesOverlap, except that the rectangles here represent pixel grids
 // and only overlap if they share an actual pixel.
 export function boxesIntersect(A: ShortRectangle, B: ShortRectangle) {

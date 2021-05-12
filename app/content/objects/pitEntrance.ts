@@ -5,13 +5,14 @@ import { createAnimation, drawFrame } from 'app/utils/animations';
 import { isObjectInsideTarget, pad } from 'app/utils/index';
 
 import {
-    DrawPriority, GameState, ObjectInstance,
+    AreaInstance, DrawPriority, GameState, ObjectInstance,
     ObjectStatus, ShortRectangle, EntranceDefinition,
 } from 'app/types';
 
 const pitFrame = createAnimation('gfx/tiles/pit.png', {w: 16, h: 16}).frames[0];
 
 export class PitEntrance implements ObjectInstance {
+    area: AreaInstance;
     drawPriority: DrawPriority = 'background';
     definition: EntranceDefinition = null;
     x: number;
@@ -27,7 +28,7 @@ export class PitEntrance implements ObjectInstance {
     }
     update(state: GameState) {
         const hero = state.hero.activeClone || state.hero;
-        if (isObjectInsideTarget(hero, pad(this.getHitbox(state), 2))) {
+        if (this.area === hero.area && isObjectInsideTarget(hero, pad(this.getHitbox(state), 2))) {
             if (hero.action === 'fallen') {
                 if (enterZoneByTarget(state, this.definition.targetZone, this.definition.targetObjectId, this.definition, false)) {
                     hero.action = 'knocked';

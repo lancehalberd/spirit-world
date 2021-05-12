@@ -1,45 +1,45 @@
 Test at http://localhost:81/alttp/public/
 
-High Priority Bugs:
-    Objects shouldn't be able to float on top of pits.
-        - Make objects fall in pits.
-        - Pit entrance should pull you in like other pits
-
 Low Priority Bugs:
-    Foreground only renders for the active area, should render for the alternate area as well.
-    Pushing on a solid object sitting on thorny ground shouldn't hurt you:
+    - Clean up attack effects on defeating bosses.
+        - Need to set a flag on all attack effects so they are easy to find and remove.
+    - Foreground only renders for the active area, should render for the alternate area as well.
+    - Pushing on a solid object sitting on thorny ground shouldn't hurt you:
         -return tileBehaviors and objectBehaviors separately, only damage if tile is solid+damaging.
-    Doors don't appear open when moving into them from a different section
+    - Doors don't appear open when moving into them from a different section
         I think this is because the door doesn't update until it is in the current areaInstance
-    nextAreaInstance is not rendered in Safari
-
-Outstanding Questions:
-    - Is default linking bushes/rocks a problem, since they will sometimes hit spirit enemies players cannot see and think it is a bug? Maybe don't have many spirit enemies spawn early in the game, or only have them spawn places where the player is unlikely to throw objects (perhaps places with no objects to throw, or only lvl 2 glove object?)
-    - Do we want to implement one way links like physical effects spirit but not the other? It would make sense, but seems like a lot of work, so let's not do this for now unless we see some obvious wins. It is also a bit more complicated for the player to understand, especially if we have doubly linked, linked each way, and unlinked pairs.
+    - nextAreaInstance is not rendered in Safari
 
 Graphics:
     Sweat animation when pulling on something you cannot move.
     Add Item Get Frame gfx/wukongimportantitem.png 20x28
-    Add fall animation for objects that fall into pits (this isn't implemented yet)
     Add sparkles to peach loot + hud.
     Add damage effects for hitting enemies?
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
-Todo:
 
 Current tasks:
+    - Make pit entrances add pit behavior to underlying tiles:
+        - This will make pit entrance pull you in like other pits
+        - This will make objects fall in pit entrances.
     - Fix teleporting to transition makes camera jerk:
         - Probaly just need to 0 out spirit radius on entering a new area.
-    - Clean up attack effects on defeating bosses.
-        - Need to set a flag on all attack effects so they are easy to find and remove.
-    - Difficulty shrine:
-        - 50 money per point
-        - move points around for free
-        - second chance = faerie
-            - 100/200/300/400 for a filled chance, 50 for a refill
-        - Or second chance is only for boss, and have a single refill tank that you can charge like in metroid?
-        - Remove boss webs
-        - Reduce boss health
+    - Add ability to charge weapon
+        Spin chakram around quickly in a circle twice (can move after throwing)
+        Costs 10 mana
+
+        Charge level 2 requires level 2 charge ability + level 2 weapon
+        Costs 50 mana
+        Similar to level 1 but 2 chakrams spin around you at different radiuses for 4 seconds.
+
+Difficulty shrine:
+    - 50 money per point
+    - move points around for free
+    - second chance = faerie
+        - 100/200/300/400 for a filled chance, 50 for a refill
+    - Or second chance is only for boss, and have a single refill tank that you can charge like in metroid?
+    - Remove boss webs
+    - Reduce boss health
 
 
 
@@ -87,13 +87,6 @@ Dungeon 2 Improvments:
         - Some kind of optional spirit sight puzzle for a peach piece.
 
 
-Add ability to charge weapon
-    Spin chakram around quickly in a circle twice (can move after throwing)
-    Costs 10 mana
-
-    Charge level 2 requires level 2 charge ability + level 2 weapon
-    Costs 50 mana
-    Similar to level 1 but 2 chakrams spin around you at different radiuses for 4 seconds.
 
 Multi-area Boss ideas:
     - Plant-like boss that is growing in several chambers that you have to move between to defeat.
