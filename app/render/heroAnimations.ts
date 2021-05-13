@@ -74,6 +74,10 @@ const pushShallowDownAnimation: FrameAnimation = createAnimation('gfx/mc/mcpushp
 const pushShallowLeftAnimation: FrameAnimation = createAnimation('gfx/mc/mcpushpullshallow.png', pushGeometry, { cols: 3, x: 5, y: 3, duration: 8, frameMap:[0, 1, 0, 2]});
 const pushShallowRightAnimation: FrameAnimation = createAnimation('gfx/mc/mcpushpullshallow.png', pushGeometry, { cols: 3, x: 5, y: 1, duration: 8, frameMap:[0, 1, 0, 2]});
 
+
+const climbGeometry: FrameDimensions = {w: 20, h: 28, content: {x: 2, y: 16 + Y_OFF, w: 16, h: 16}};
+const climbUpAnimation: FrameAnimation = createAnimation('gfx/mc/mcclimb.png', climbGeometry, { cols: 9, duration: 6});
+
 const swimGeometry: FrameDimensions = {w: 20, h: 28, content: {x: 2, y: 16 + Y_OFF, w: 16, h: 16}};
 const floatUpAnimation: FrameAnimation = createAnimation('gfx/mc/wukongswim.png', swimGeometry, { cols: 2, x: 0, y: 2, duration: 16});
 const floatDownAnimation: FrameAnimation = createAnimation('gfx/mc/wukongswim.png', swimGeometry, { cols: 2, x: 0, y: 0, duration: 16});
@@ -108,6 +112,9 @@ export const heroAnimations: ActorAnimations = {
         down: attackDownAnimation,
         left: attackLeftAnimation,
         right: attackRightAnimation,
+    },
+    climbing: {
+        up: climbUpAnimation,
     },
     falling: {
         up: fallAnimation,

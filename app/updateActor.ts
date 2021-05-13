@@ -397,6 +397,12 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             hero.animationTime += FRAME_LENGTH;
         }
     }
+    // Return the climbin animation to a neutral state any time the character isn't moving vertically.
+    // If we allow moving laterally while climbing this would need to be updated, but the animation
+    // would probably also need to be adjusted.
+    if (!dy && hero.action === 'climbing') {
+        hero.animationTime = 4 * 6 * FRAME_LENGTH;
+    }
     if (isAstralProjection) {
         const dx = hero.x - state.hero.x, dy = hero.y - state.hero.y;
         const distance = Math.sqrt(dx * dx + dy * dy);

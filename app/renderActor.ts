@@ -75,7 +75,7 @@ export function getHeroFrame(state: GameState, hero: Hero): Frame {
             animations = heroAnimations.roll;
             break;
         case 'climbing':
-            return getFrame(heroAnimations.push.up, hero.animationTime);
+            return getFrame(heroAnimations.climbing.up, hero.animationTime);
             break;
         case 'attack':
             animations = hero.wading ? heroShallowAnimations.attack : heroAnimations.attack;
@@ -145,7 +145,7 @@ export function renderCarriedTile(context: CanvasRenderingContext2D, state: Game
 
 
 export function renderHeroShadow(context: CanvasRenderingContext2D, state: GameState, hero: Hero): void {
-    if (hero.action === 'fallen' || hero.action === 'falling' || hero.swimming || hero.wading) {
+    if (hero.action === 'fallen' || hero.action === 'falling' || hero.action === 'climbing' || hero.swimming || hero.wading) {
         return;
     }
     drawFrame(context, shadowFrame, { ...shadowFrame, x: hero.x, y: hero.y - 3 - Y_OFF });

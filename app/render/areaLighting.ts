@@ -107,11 +107,12 @@ export function renderAreaLighting(context: CanvasRenderingContext2D, state: Gam
         }
         // Next add light from the player's light radius.
         const hero = state.hero;
+        const d = hero.action !== 'climbing' ? hero.d : 'up';
         drawLightGradient(lightingContext,
             {
-                x: hero.x + hero.w / 2 + 12 * directionMap[hero.d][0]
+                x: hero.x + hero.w / 2 + 12 * directionMap[d][0]
                     - state.camera.x + area.cameraOffset.x,
-                y: hero.y - hero.z + hero.h / 2 + 12 * directionMap[hero.d][1]
+                y: hero.y - hero.z + hero.h / 2 + 12 * directionMap[d][1]
                     - state.camera.y + area.cameraOffset.y
             },
             1, state.hero.lightRadius
