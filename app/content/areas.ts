@@ -219,6 +219,9 @@ export function enterLocation(
         state.hero.z = location.z;
         if (location.z > 0) {
             state.hero.action = 'knocked';
+            // Make sure the character falls straight down.
+            state.hero.vx = 0;
+            state.hero.vy = 0;
         }
     }
     state.hero.safeD = state.hero.d;
@@ -570,6 +573,9 @@ export function refreshSection(state: GameState, area: AreaInstance, section: Sh
     }
 }
 export function addObjectToArea(state: GameState, area: AreaInstance, object: ObjectInstance): void {
+    if (object.area && object.area !== area) {
+        removeObjectFromArea(state, object);
+    }
     object.area = area;
     if (object.add) {
         object.add(state, area);
@@ -578,6 +584,9 @@ export function addObjectToArea(state: GameState, area: AreaInstance, object: Ob
     }
 }
 export function removeObjectFromArea(state: GameState, object: ObjectInstance): void {
+    if (!object.area) {
+        return;
+    }
     if (object.remove) {
         object.remove(state);
         object.area = null;

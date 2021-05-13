@@ -694,9 +694,6 @@ function replaceTiles(x: number, y: number): void {
     const w = 16, h = 16;
     const tile = layer.tiles[((state.camera.y + y) / h) | 0]?.[((state.camera.x + x) / w) | 0];
     const replacement = editingState.brush.tiles[0][0];
-    if (!tile) {
-        return;
-    }
     for (let y = 0; y < layer.tiles.length; y++) {
         for (let x = 0; x < layer.tiles[y].length; x++) {
             const t = layer.tiles[y][x];

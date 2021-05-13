@@ -4,7 +4,10 @@ import { damageActor } from 'app/updateActor';
 import { directionMap } from 'app/utils/field';
 import { rectanglesOverlap } from 'app/utils/index';
 
-import { AreaInstance, Clone, DrawPriority, Frame, GameState, ObjectInstance, ObjectStatus } from 'app/types';
+import {
+    AreaInstance, AstralProjection, Clone, DrawPriority,
+    Frame, GameState, ObjectInstance, ObjectStatus
+} from 'app/types';
 
 interface Props {
     x: number,
@@ -33,6 +36,7 @@ export class Spark implements ObjectInstance, Props {
     az: number;
     w: number = 8;
     h: number = 8;
+    ignorePits = true;
     radius: number;
     animationTime = 0;
     status: ObjectStatus = 'normal';
@@ -51,14 +55,14 @@ export class Spark implements ObjectInstance, Props {
     }
     checkForHits(state: GameState) {
         for (const object of this.area.objects) {
-            if (!(object instanceof Clone)) {
+            if (!(object instanceof Clone) && !(object instanceof AstralProjection)) {
                 continue;
             }
             if (rectanglesOverlap(object, this)) {
                 damageActor(state, object, this.damage);
             }
         }
-        if (rectanglesOverlap(state.hero, this)) {
+        if (state.hero.area === this.area && rectanglesOverlap(state.hero, this)) {
             damageActor(state, state.hero, this.damage, {
                 vx: - 4 * directionMap[state.hero.d][0],
                 vy: - 4 * directionMap[state.hero.d][1],

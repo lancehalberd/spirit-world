@@ -117,6 +117,20 @@ function showLootMessage(state: GameState, lootType: LootType, lootLevel?: numbe
             }
             // Finding the 4th slice grants a full peach of immortality.
             return showMessage(state, 'You found a golden peach slice!{peachOfImmortality}');
+        case 'charge':
+            if (state.hero.passiveTools.charge === 1) {
+                return showMessage(state, `You have learned to Channel Spirit Energy!
+                    {|}Press and hold {B_WEAPON} to channel your Spirit Energy into the Chakram,
+                    then release it to unleash a powerful attack!
+                    {|}Press and hold {B_TOOL} to channel your Spirit Energy into your Tools to make them more powerful.
+                    {|}You can even hold {B_PASSIVE} when picking up an object to channel Spirit Energy into them!
+                `);
+            }
+            if (state.hero.passiveTools.charge === 2) {
+                return showMessage(state, `You have learned to Overcharge objects!
+                    {|}Unleash even more powerful attacks by charging your Chakram and Tools further.`);
+            }
+            return;
         case 'weapon':
             if (state.hero.weapon === 1) {
                 return showMessage(state, 'You found the Chakram! {|} Press {B_WEAPON} to throw the Chakram.'
@@ -424,12 +438,13 @@ const lootFrames: Partial<{[key in LootType]: Frame}> = {
     bigKey: bigKeyOutlineFrame,
     bow: bowOutlineFrame,
     catEyes: catEyes,
-    clone: createLootFrame('red', 'C'),
+    charge: createLootFrame('red', 'CH'),
+    clone: createLootFrame('red', 'CL'),
     invisibility: mistScrollFrame,
     trueSight: createLootFrame('blue', 'TS'),
-    gloves: createLootFrame('blue', 'G'),
+    gloves: createLootFrame('blue', 'GL'),
     roll: mistScrollFrame,
-    staff: createLootFrame('red', 'S'),
+    staff: createLootFrame('red', 'ST'),
     peach: smallPeachFrame,
     peachOfImmortality: goldPeachFrame,
     peachOfImmortalityPiece: peachPieceFrame,

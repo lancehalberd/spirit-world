@@ -19,15 +19,11 @@ Graphics:
 
 
 Current tasks:
-    - Make pit entrances add pit behavior to underlying tiles:
-        - This will make pit entrance pull you in like other pits
-        - This will make objects fall in pit entrances.
     - Fix teleporting to transition makes camera jerk:
         - Probaly just need to 0 out spirit radius on entering a new area.
     - Add ability to charge weapon
         Spin chakram around quickly in a circle twice (can move after throwing)
         Costs 10 mana
-
         Charge level 2 requires level 2 charge ability + level 2 weapon
         Costs 50 mana
         Similar to level 1 but 2 chakrams spin around you at different radiuses for 4 seconds.

@@ -135,10 +135,23 @@ export class AstralProjection implements Hero, ObjectInstance {
         const frame = getSpiritFrame(state, hero);
         context.save();
             context.globalAlpha = 0.7;
+            if (state.hero.magic <= 10 || this.invulnerableFrames > 0) {
+                // Spirit flashes when teleportation will end meditation by bringing magic under 10.
+                context.globalAlpha = (this.animationTime % 200 < 100) ? 0.2 : 0.4;
+            } else if (state.hero.magic < state.hero.maxMagic / 2) {
+                context.globalAlpha = 0.7 * 2 * state.hero.magic / state.hero.maxMagic;
+            }
             drawFrameAt(context, frame, { x: hero.x, y: hero.y });
         context.restore();
         if (hero.pickUpTile) {
             renderCarriedTile(context, state, hero);
         }
+    }
+    takeDamage(state: GameState, damage: number) {
+        // Astral projection damage is applied to the magic meter at 5x effectiveness.
+        state.hero.magic -= Math.max(10, damage * 5);
+        // Astral projection has fewer invulnerability frames since it can't be killed
+        // and magic regenerates automatically.
+        this.invulnerableFrames = 20;
     }
 }

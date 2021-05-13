@@ -8,6 +8,7 @@ export * from 'app/content/dialogue/elder';
 export * from 'app/content/dialogue/mom';
 export * from 'app/content/dialogue/tombGuardian';
 export * from 'app/content/dialogue/vanaraGuard';
+export * from 'app/content/dialogue/vanaraCommander';
 export * from 'app/content/dialogue/vanaraVillager';
 
 export function getDialogue(dialogueKey: string): DialogueSet {

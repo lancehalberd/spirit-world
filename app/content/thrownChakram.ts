@@ -33,6 +33,7 @@ export class ThrownChakram implements ObjectInstance {
     damage: number;
     speed: number;
     returnSpeed: number;
+    ignorePits = true;
     x: number;
     y: number;
     w: number;

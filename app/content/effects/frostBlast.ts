@@ -3,7 +3,7 @@ import { FRAME_LENGTH } from 'app/gameConstants';
 import { damageActor } from 'app/updateActor';
 
 import {
-    AreaInstance, Clone, Frame, GameState,
+    AreaInstance, AstralProjection, Clone, Frame, GameState,
     ObjectInstance, ObjectStatus, ShortRectangle
 } from 'app/types';
 
@@ -31,6 +31,7 @@ export class FrostBlast implements ObjectInstance, Props {
     vy: number;
     w: number = 12;
     h: number = 12;
+    ignorePits = true;
     radius: number;
     animationTime = 0;
     status: ObjectStatus = 'normal';
@@ -51,14 +52,14 @@ export class FrostBlast implements ObjectInstance, Props {
             return dx * dx + dy * dy < r2;
         }
         for (const object of this.area.objects) {
-            if (!(object instanceof Clone)) {
+            if (!(object instanceof Clone) && !(object instanceof AstralProjection)) {
                 continue;
             }
             if (inRange(object)) {
                 damageActor(state, object, this.damage);
             }
         }
-        if (inRange(state.hero)) {
+        if (state.hero.area === this.area && inRange(state.hero)) {
             damageActor(state, state.hero, this.damage);
         }
     }

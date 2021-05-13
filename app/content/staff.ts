@@ -27,6 +27,7 @@ export class Staff implements ObjectInstance {
     definition = null;
     x: number;
     y: number;
+    ignorePits = true;
     invalid: boolean;
     topRow: number;
     bottomRow: number;

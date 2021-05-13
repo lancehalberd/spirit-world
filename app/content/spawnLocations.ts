@@ -284,4 +284,7 @@ export function checkToUpdateSpawnLocation(state: GameState): void {
     if (state.location.zoneKey === 'cocoon') {
         return setSpawnLocation(state, SPAWN_COCOON_ENTRANCE);
     }
+    if (state.location.zoneKey === 'helix') {
+        return setSpawnLocation(state, SPAWN_HELIX_ENTRANCE);
+    }
 }

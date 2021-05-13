@@ -282,6 +282,7 @@ const furnitureCozyTiles: TileSource = {
     source: {image: requireImage('gfx/tiles/temp_furniture.png'), x: 496, y: 0, w: 4 * 16, h: 3 * 16},
     behaviors: {
         'all': {solid: true, low: true},
+        '3x2': {pit: true},
     },
 };
 

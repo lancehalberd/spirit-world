@@ -57,8 +57,8 @@ export class PouredWaterEffect implements ObjectInstance {
         this.y += 4;
         const { tileBehavior, tx, ty } = getTileBehaviorsAndObstacles(state, this.area, {x: this.x, y: this.y});
         if (tileBehavior.growTiles) {
-            removeObjectFromArea(state, this);
             growVine(this.area, tx, ty);
+            removeObjectFromArea(state, this);
         } else if (!tileBehavior.solid) {
             removeObjectFromArea(state, this);
             // Probably play a splash effect here.

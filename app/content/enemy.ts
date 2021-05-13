@@ -448,7 +448,7 @@ function updateFlameSnake(state: GameState, enemy: Enemy): void {
         });
         flame.x -= flame.w / 2;
         flame.y -= flame.h / 2;
-        addObjectToArea(state, state.areaInstance, flame);
+        addObjectToArea(state, enemy.area, flame);
         enemy.params.flameCooldown = 400;
     }
     enemy.params.shootCooldown = enemy.params.shootCooldown ?? 1000 + Math.random() * 1000;
@@ -471,7 +471,7 @@ function updateFlameSnake(state: GameState, enemy: Enemy): void {
         });
         flame.x -= flame.w / 2;
         flame.y -= flame.h / 2;
-        addObjectToArea(state, state.areaInstance, flame);
+        addObjectToArea(state, enemy.area, flame);
         enemy.params.flameCooldown = 400;
     }
 }
@@ -545,7 +545,7 @@ function updateElementalIdol(state: GameState, enemy: Enemy, attack: () => void)
     if (enemy.life <= 1) {
         enemy.params.priority = undefined;
         // When all bosses are at 1 life or lower, all the statues get destroyed.
-        if (!state.areaInstance.objects.some(object =>
+        if (!enemy.area.objects.some(object =>
             object instanceof Enemy && object.definition.type === 'boss' && object.life > 1
         )) {
             enemy.shielded = false;
@@ -582,7 +582,7 @@ function updateElementalIdol(state: GameState, enemy: Enemy, attack: () => void)
         }
         return;
     }
-    if (!state.areaInstance.objects.some(object => object instanceof Enemy && object.params.priority < enemy.params.priority)) {
+    if (!enemy.area.objects.some(object => object instanceof Enemy && object.params.priority < enemy.params.priority)) {
         if (enemy.mode === 'attack') {
             if (!enemy.params.pinchMode) {
                 if (enemy.modeTime === 1000) {
@@ -616,7 +616,7 @@ function updateStormIdol(state: GameState, enemy: Enemy): void {
             y: state.hero.y + state.hero.h / 2,
             shockWaveTheta: enemy.params.theta,
         });
-        addObjectToArea(state, state.areaInstance, lightningBolt);
+        addObjectToArea(state, enemy.area, lightningBolt);
     })
 }
 function updateFlameIdol(state: GameState, enemy: Enemy): void {
@@ -626,7 +626,7 @@ function updateFlameIdol(state: GameState, enemy: Enemy): void {
         const flameWall = new FlameWall({
             direction: rotateDirection('down', enemy.params.rotations),
         });
-        addObjectToArea(state, state.areaInstance, flameWall);
+        addObjectToArea(state, enemy.area, flameWall);
     })
 }
 function throwIceGrenadeAtLocation(state: GameState, enemy: Enemy, {tx, ty}: {tx: number, ty: number}): void {
@@ -646,7 +646,7 @@ function throwIceGrenadeAtLocation(state: GameState, enemy: Enemy, {tx, ty}: {tx
         vz,
         az,
     });
-    addObjectToArea(state, state.areaInstance, frostGrenade);
+    addObjectToArea(state, enemy.area, frostGrenade);
 }
 function updateFrostIdol(state: GameState, enemy: Enemy): void {
     enemy.params.shieldColor = '#08F';
@@ -675,7 +675,7 @@ function spinAndShoot(state: GameState, enemy: Enemy): void {
                     vx: 4 * dx,
                     vy: 4 * dy,
                 });
-                addObjectToArea(state, state.areaInstance, arrow);
+                addObjectToArea(state, enemy.area, arrow);
             }
         }
         if (enemy.modeTime >= 500) {
@@ -701,7 +701,7 @@ function updateWallLaser(state: GameState, enemy: Enemy): void {
             vx: 4 * dx,
             vy: 4 * dy,
         });
-        addObjectToArea(state, state.areaInstance, arrow);
+        addObjectToArea(state, enemy.area, arrow);
     }
     if (enemy.params.alwaysShoot) {
         if (enemy.modeTime % 300 === FRAME_LENGTH) {
@@ -792,6 +792,8 @@ function updateBeetleBoss(state: GameState, enemy: Enemy): void {
                 x: section.x + section.w / 2 + (section.w / 2 + 32) * Math.cos(theta),
                 y: section.y + section.h / 2 + (section.h / 2 + 32) * Math.sin(theta),
             });
+            // Have to set area before calling getVectorToNearbyHero.
+            minion.area = enemy.area;
             const vector = getVectorToNearbyHero(state, minion, 1000);
             if (vector) {
                 minion.vx = minion.speed * vector.x;
@@ -836,7 +838,10 @@ function moveTo(state: GameState, enemy: Enemy, tx: number, ty: number): number 
     const dx = tx - (hitbox.x + hitbox.w / 2), dy = ty - (hitbox.y + hitbox.h / 2);
     const mag = Math.sqrt(dx * dx + dy * dy);
     if (mag > enemy.speed) {
-        moveEnemy(state, enemy, enemy.speed * dx / mag, enemy.speed * dy / mag, {});
+        moveEnemy(state, enemy, enemy.speed * dx / mag, enemy.speed * dy / mag, {
+            boundToSection: false,
+            boundToSectionPadding: 0,
+        });
         return mag - enemy.speed;
     }
     moveEnemy(state, enemy, dx, dy, {});
@@ -950,7 +955,10 @@ function paceAndCharge(state: GameState, enemy: Enemy) {
 
 function getVectorToNearbyHero(state: GameState, enemy: Enemy, radius: number): {x: number, y: number} {
     const hitbox = enemy.getHitbox(state);
-    for (const hero of [state.hero, ...state.hero.clones]) {
+    for (const hero of [state.hero, state.hero.astralProjection, ...state.hero.clones]) {
+        if (!hero || hero.area !== enemy.area) {
+            continue;
+        }
         const dx = (hero.x + hero.w / 2) - (hitbox.x + hitbox.w / 2);
         const dy = (hero.y + hero.h / 2) - (hitbox.y + hitbox.h / 2);
         const mag = Math.sqrt(dx * dx + dy * dy);
@@ -963,7 +971,10 @@ function getVectorToNearbyHero(state: GameState, enemy: Enemy, radius: number): 
 
 function getLineOfSightTargetAndDirection(state: GameState, enemy: Enemy, direction: Direction = null, projectile: boolean = false): {d: Direction, hero: Hero} {
     const hitbox = enemy.getHitbox(state);
-    for (const hero of [state.hero, ...state.hero.clones]) {
+    for (const hero of [state.hero, state.hero.astralProjection, ...state.hero.clones]) {
+        if (!hero || hero.area !== enemy.area) {
+            continue;
+        }
         // Reduce dimensions of hitbox for these checks so that the hero is not in line of sight when they are most of a tile
         // off (like 0.5px in line of sight), otherwise the hero can't hide from line of sight on another tile if
         // they aren't perfectly lined up with the tile.
@@ -1038,18 +1049,19 @@ function paceRandomly(state: GameState, enemy: Enemy) {
     }
 }
 
-function moveEnemy(state, enemy, dx, dy, movementProperties: MovementProperties): boolean {
+function moveEnemy(state: GameState, enemy: Enemy, dx: number, dy: number, movementProperties: MovementProperties): boolean {
     if (!movementProperties.excludedObjects) {
         movementProperties.excludedObjects = new Set();
     }
     movementProperties.excludedObjects.add(state.hero);
-    movementProperties.boundToSectionPadding = 16;
-    movementProperties.boundToSection = true;
+    movementProperties.excludedObjects.add(state.hero.astralProjection);
+    movementProperties.boundToSectionPadding = movementProperties.boundToSectionPadding ?? 16;
+    movementProperties.boundToSection = movementProperties.boundToSection ?? true;
     for (const clone of enemy.area.objects.filter(object => object instanceof Clone)) {
         movementProperties.excludedObjects.add(clone);
     }
     if (enemy.flying) {
-        const hitbox = enemy.getHitbox();
+        const hitbox = enemy.getHitbox(state);
         const ax = enemy.x + dx;
         const ay = enemy.y + dy;
         if (movementProperties.boundToSection) {

@@ -75,6 +75,7 @@ export interface Actor {
     actionFrame?: number,
     actionTarget?: any,
     animationTime: number,
+    invisible?: boolean,
     jumpingTime?: number,
     // If this is set, the actor is being carried by a hero/clone.
     carrier?: Hero,

@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 import {
-    addObjectToArea, destroyTile, getAreaFromLocation, getAreaSize,
+    addObjectToArea, destroyTile, enterLocation, getAreaFromLocation, getAreaSize,
     removeAllClones, removeObjectFromArea, scrollToArea, setNextAreaSection,
     swapHeroStates,
 } from 'app/content/areas';
@@ -9,7 +9,7 @@ import { CloneExplosionEffect } from 'app/content/effects/CloneExplosionEffect';
 import { Enemy } from 'app/content/enemy';
 import { AstralProjection } from 'app/content/objects/astralProjection';
 import { editingState } from 'app/development/tileEditor';
-import { EXPLOSION_TIME, FRAME_LENGTH, GAME_KEY, MAX_SPIRIT_RADIUS } from 'app/gameConstants';
+import { CANVAS_HEIGHT, EXPLOSION_TIME, FRAME_LENGTH, GAME_KEY, MAX_SPIRIT_RADIUS } from 'app/gameConstants';
 import { getActorTargets } from 'app/getActorTargets';
 import {
     getCloneMovementDeltas,
@@ -37,9 +37,6 @@ const rollSpeed = [
 ];
 
 export function updateAllHeroes(this: void, state: GameState) {
-    if (state.hero.invulnerableFrames > 0) {
-        state.hero.invulnerableFrames--;
-    }
     // Switching clones is done outside of updateHero, otherwise the switch gets processed by each clone.
     if (state.hero.clones.length && !state.hero.pickUpObject && (
             (state.hero.leftTool === 'clone' && wasGameKeyPressedAndReleased(state, GAME_KEY.LEFT_TOOL))
@@ -61,12 +58,18 @@ export function updateAllHeroes(this: void, state: GameState) {
     if (state.hero.astralProjection) {
         if (state.hero.spiritRadius > 0) {
             updateHero(state, state.hero.astralProjection);
+        } else {
+            removeObjectFromArea(state, state.hero.astralProjection);
+            state.hero.astralProjection = null;
         }
     }
     updateHero(state, state.hero);
 }
 
 export function updateHero(this: void, state: GameState, hero: Hero) {
+    if (hero.invulnerableFrames > 0) {
+        hero.invulnerableFrames--;
+    }
     const area = hero.area;
     let dx = 0, dy = 0;
     let movementSpeed = 2;
@@ -134,6 +137,19 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             hero.actionFrame = 0;
         }
     } else if (!isAstralProjection && hero.action === 'fallen') {
+        if (state.location.zoneKey === 'sky') {
+            enterLocation(state, {
+                zoneKey: 'overworld',
+                floor: 0,
+                areaGridCoords: state.location.areaGridCoords,
+                x: hero.x,
+                y: hero.y,
+                z: CANVAS_HEIGHT,
+                d: hero.d,
+                isSpiritWorld: state.location.isSpiritWorld,
+            }, false);
+            return;
+        }
         movementSpeed = 0;
         hero.actionFrame++;
         if (hero.actionFrame >= 8) {
@@ -275,14 +291,16 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
                 hero.action = null;
             }
         }
-    } else if (!isAstralProjection && (hero.action === 'knocked' || hero.action === 'thrown')) {
+    } else if (hero.action === 'knocked' || hero.action === 'thrown') {
         movementSpeed = 0;
         dx = hero.vx;
         dy = hero.vy;
         hero.z += hero.vz;
         hero.vz = Math.max(-8, hero.vz - 0.5);
-        if (hero.z <= 0) {
-            hero.z = 0;
+        // The astral projection stays 4px off the ground.
+        const minZ = isAstralProjection ? 4 : 0;
+        if (hero.z <= minZ) {
+            hero.z = minZ;
             hero.action = null;
             hero.vz = 0;
         }
@@ -303,7 +321,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
                 returnSpeed: 4,
                 source: hero,
             });
-            addObjectToArea(state, state.areaInstance, chakram);
+            addObjectToArea(state, hero.area, chakram);
         }
         if (hero.actionFrame > 12) {
             hero.action = null;
@@ -319,6 +337,12 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             hero.action = null;
             hero.animationTime = 0;
         }
+    }
+    if (hero.grabObject && hero.action !== 'grabbing') {
+        hero.grabObject = null;
+    }
+    if (hero.grabTile && hero.action !== 'grabbing') {
+        hero.grabTile = null;
     }
     if (hero.action === 'pushing') {
         hero.animationTime -= 3 * FRAME_LENGTH / 4;
@@ -387,7 +411,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             }
         }
         if (wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL) || wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL)) {
-            if (state.hero.passiveTools.teleportation && state.hero.magic >= 10
+            if (state.hero.passiveTools.teleportation && state.hero.magic > 0
                 && canTeleportToCoords(state, state.hero, {x: hero.x, y: hero.y})
             ) {
                 state.hero.magic -= 10;
@@ -402,7 +426,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         && !hero.pickUpTile && !hero.pickUpObject &&  hero.weapon > 0
         && wasGameKeyPressed(state, GAME_KEY.WEAPON)
     ) {
-        const thrownChakrams = state.areaInstance.objects.filter(o => o instanceof ThrownChakram);
+        const thrownChakrams = hero.area.objects.filter(o => o instanceof ThrownChakram);
         if (state.hero.weapon - thrownChakrams.length > 0) {
             hero.action = 'attack';
             hero.animationTime = 0;
@@ -476,12 +500,12 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             }
             hero.pickUpFrame = 0;
             if (closestLiftableTileCoords) {
-                for (const layer of state.areaInstance.layers) {
+                for (const layer of hero.area.layers) {
                     const tile: FullTile = layer.tiles[closestLiftableTileCoords.y][closestLiftableTileCoords.x];
                     const behavior = tile.behaviors;
                     if (behavior?.pickupWeight <= state.hero.passiveTools.gloves) {
                         hero.pickUpTile = tile;
-                        destroyTile(state, state.areaInstance, {...closestLiftableTileCoords, layerKey: layer.key});
+                        destroyTile(state, hero.area, {...closestLiftableTileCoords, layerKey: layer.key});
                         if (behavior.linkableTiles) {
                             const alternateLayer = _.find(state.alternateAreaInstance.layers, {key: layer.key});
                             if(alternateLayer) {
@@ -491,7 +515,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
                                         ...hero.pickUpTile,
                                         linkedTile,
                                     };
-                                    destroyTile(state, state.alternateAreaInstance, {...closestLiftableTileCoords, layerKey: layer.key});
+                                    destroyTile(state, hero.area, {...closestLiftableTileCoords, layerKey: layer.key});
                                 }
                             }
                         }
@@ -508,7 +532,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             }
         } else if (dx || dy) {
             if (hero.passiveTools.roll > 0) {
-                if (state.hero.magic >= 5) {
+                if (state.hero.magic > 0) {
                     state.hero.magic -= 5;
                     hero.action = 'roll';
                     hero.actionFrame = 0;
@@ -628,8 +652,8 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
     if (hero.action !== 'knocked' && hero.action !== 'thrown') {
         // At base mana regen, using cat eyes reduces your mana very slowly unless you are stationary.
         let targetLightRadius = 20, minLightRadius = 20;
-        if (state.areaInstance.definition.dark) {
-            const coefficient = 100 / state.areaInstance.definition.dark;
+        if (hero.area.definition.dark) {
+            const coefficient = 100 / hero.area.definition.dark;
             minLightRadius *= coefficient;
             if (state.hero.passiveTools.trueSight > 0) {
                 state.hero.magic -= 10 * FRAME_LENGTH / 1000 / coefficient;
@@ -654,7 +678,6 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         state.hero.magic = state.hero.maxMagic;
     }
     if (state.hero.magic < 0) {
-        state.hero.magic = 0;
         state.hero.invisible = false;
         if (state.hero.clones.length) {
             state.hero.x = hero.x;
@@ -673,7 +696,7 @@ export function checkForEnemyDamage(state: GameState, hero: Hero) {
     if (hero.action === 'roll' || hero.action === 'getItem' || hero.invulnerableFrames > 0 || state.hero.invisible) {
         return;
     }
-    for (const enemy of state.areaInstance.objects) {
+    for (const enemy of hero.area.objects) {
         if (!(enemy instanceof Enemy) || enemy.invulnerableFrames > 0) {
             continue;
         }
@@ -728,9 +751,14 @@ export function damageActor(
         return false;
     }
     const hero = state.hero.activeClone || state.hero;
-    // Hero is invulnerable during invulnerability frames, but other actors are not.
-    if (!overrideInvulnerability && actor === hero && (actor.invulnerableFrames > 0 || state.hero.invisible)) {
-        return false;
+    // Enemies have special code for handling invulnerability.
+    if (!overrideInvulnerability && !(actor instanceof Enemy)) {
+        if (actor.invulnerableFrames > 0) {
+            return false;
+        }
+        if (actor.invisible) {
+            return false;
+        }
     }
 
     if (actor.takeDamage) {
@@ -792,7 +820,7 @@ export function throwHeldObject(state: GameState, hero: Hero){
     });
     thrownObject.behaviors.brightness = behaviors?.brightness;
     thrownObject.behaviors.lightRadius = behaviors?.lightRadius;
-    addObjectToArea(state, state.areaInstance, thrownObject);
+    addObjectToArea(state, hero.area, thrownObject);
     if (tile.linkedTile) {
         const behaviors = tile.linkedTile.behaviors;
         const alternateThrownObject = new ThrownObject({
