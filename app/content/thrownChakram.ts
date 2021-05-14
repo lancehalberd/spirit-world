@@ -1,4 +1,4 @@
-import { addParticleAnimations } from 'app/content/animationEffect';
+import { addParticleAnimations, makeSparkleAnimation } from 'app/content/animationEffect';
 import { addObjectToArea, destroyTile, getAreaSize, removeObjectFromArea } from 'app/content/areas';
 import { Enemy } from 'app/content/enemy';
 import { FRAME_LENGTH } from 'app/gameConstants';
@@ -8,7 +8,7 @@ import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { getDirection } from 'app/utils/field';
 import { isPointInShortRect, rectanglesOverlap } from 'app/utils/index';
 
-import { AreaInstance, DrawPriority, Frame, GameState, Hero, ObjectInstance, ObjectStatus } from 'app/types';
+import { AnimationEffect, AreaInstance, DrawPriority, Frame, GameState, Hero, ObjectInstance, ObjectStatus } from 'app/types';
 
 const chakramGeometry = {w: 16, h: 16, content: {x: 2, y: 2, w: 12, h: 12}};
 const chakramAnimation = createAnimation('gfx/chakram1.png', chakramGeometry, {cols: 9, x: 0, duration: 2}, {loopFrame: 1});
@@ -45,6 +45,7 @@ export class ThrownChakram implements ObjectInstance {
     status: ObjectStatus = 'normal';
     source: Hero;
     animationTime = 0;
+    sparkles: AnimationEffect[];
     constructor({x = 0, y = 0, vx = 0, vy = 0, damage = 1, returnSpeed = 4, piercing = false, source}: Props) {
         this.x = x;
         this.y = y;
@@ -58,11 +59,19 @@ export class ThrownChakram implements ObjectInstance {
         this.h = chakramGeometry.content.h;
         this.outFrames = 12;
         this.source = source;
+        this.sparkles = [];
     }
     update(state: GameState) {
         // Chakram returns to the hero if the clone it was thrown from no longer exists.
         if (this.area.objects.indexOf(this.source) < 0) {
             this.source = state.hero;
+        }
+        if (this.piercing && ((this.animationTime < 200 && this.animationTime % 40 === 0) || this.animationTime % 200 === 0)) {
+            this.sparkles.push(makeSparkleAnimation(state, this));
+        }
+        this.sparkles = this.sparkles.filter(s => !s.done);
+        for (const sparkle of this.sparkles) {
+            sparkle.update(state);
         }
         this.animationTime += FRAME_LENGTH;
         if (this.outFrames > 0) {
@@ -135,9 +144,11 @@ export class ThrownChakram implements ObjectInstance {
     render(context, state: GameState) {
         const frame = getFrame(chakramAnimation, this.animationTime);
         drawFrame(context, frame, { ...frame, x: this.x - frame.content.x, y: this.y - frame.content.y });
+        for (const sparkle of this.sparkles) {
+            sparkle.render(context, state);
+        }
     }
 }
-
 
 export class HeldChakram implements ObjectInstance {
     area: AreaInstance;
@@ -159,6 +170,7 @@ export class HeldChakram implements ObjectInstance {
     animationTime = 0;
     changesAreas = true;
     updateDuringTransition = true;
+    sparkles: AnimationEffect[];
     constructor({x = 0, y = 0, vx = 0, vy = 0, damage = 1, source}: Props) {
         this.vx = vx;
         this.vy = vy;
@@ -168,13 +180,19 @@ export class HeldChakram implements ObjectInstance {
         this.outFrames = 12;
         this.hero = source;
         this.updatePosition();
+        this.sparkles = [];
     }
     throw(state: GameState) {
         let speed = 3;
-        if (state.hero.passiveTools.charge < 1) {
-            speed = Math.min(6, speed + this.animationTime / 200);
+        if (state.hero.passiveTools.charge >= 1) {
+            if (state.hero.magic > 0 && this.animationTime >= 1000) {
+                speed = 12;
+                state.hero.magic -= 10;
+            } else {
+                speed = Math.min(6, speed + this.animationTime / 100);
+            }
         } else {
-            speed = Math.min(12, speed + this.animationTime / 100);
+            speed = Math.min(6, speed + this.animationTime / 200);
         }
         const chakram = new ThrownChakram({
             x: this.hero.x + 3,
@@ -199,6 +217,13 @@ export class HeldChakram implements ObjectInstance {
             this.throw(state);
             return;
         }
+        if (this.animationTime >= 1000 && state.hero.passiveTools.charge >= 1 && this.animationTime % 200 === 0) {
+            this.sparkles.push(makeSparkleAnimation(state, this));
+        }
+        this.sparkles = this.sparkles.filter(s => !s.done);
+        for (const sparkle of this.sparkles) {
+            sparkle.update(state);
+        }
         this.updatePosition();
         this.animationTime += FRAME_LENGTH;
         for (const object of this.area.objects) {
@@ -212,8 +237,11 @@ export class HeldChakram implements ObjectInstance {
                     const dy = (enemyHitbox.y + enemyHitbox.h / 2) - (this.hero.y + this.hero.h / 2);
                     const mag = Math.sqrt(dx * dx + dy * dy);
                     const hit = damageActor(state, object, this.damage, mag ? {vx: 4 * dx / mag, vy: 4 * dy / mag, vz: 0} : null);
-                    if (hit && object.life > 0) {
+                    if (hit) {
+                        this.hero.action = null;
+                        removeObjectFromArea(state, this);
                         this.hero.bounce = {vx: -4 * dx / mag, vy: -4 * dy / mag, frames: 10};
+                        return;
                     }
                     this.outFrames = 0;
                 }
@@ -239,14 +267,17 @@ export class HeldChakram implements ObjectInstance {
             return;
         }
         let animationTime = 0;
-        if (state.hero.passiveTools.charge >= 1) {
+        if (state.hero.passiveTools.charge >= 1 && state.hero.magic > 0) {
             if (this.animationTime >= 1000) {
                 animationTime = this.animationTime;
             } else {
-                animationTime = this.animationTime / 8;
+                animationTime = this.animationTime / 10;
             }
         }
         const frame = getFrame(chakramAnimation, animationTime);
         drawFrame(context, frame, { ...frame, x: this.x - frame.content.x, y: this.y - frame.content.y });
+        for (const sparkle of this.sparkles) {
+            sparkle.render(context, state);
+        }
     }
 }

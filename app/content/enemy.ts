@@ -406,6 +406,7 @@ export const enemyDefinitions: {[key in EnemyType | BossType | MinionType]: Enem
     arrowTurret: {
         animations: beetleAnimations, life: 4, touchDamage: 1, update: spinAndShoot,
         lootTable: simpleLootTable,
+        canBeKnockedBack: false,
     },
     snake: {
         animations: snakeAnimations, life: 2, touchDamage: 1, update: paceRandomly, flipRight: true,
@@ -994,6 +995,7 @@ function paceAndCharge(state: GameState, enemy: Enemy) {
         }
         if (!moveEnemy(state, enemy, 3 * enemy.speed * directionMap[enemy.d][0], 3 * enemy.speed * directionMap[enemy.d][1], {canFall: true})) {
             enemy.setMode('stunned');
+            enemy.canBeKnockedBack = true;
             enemy.knockBack(state, {
                 vx: -enemy.speed * directionMap[enemy.d][0],
                 vy: -enemy.speed * directionMap[enemy.d][1],

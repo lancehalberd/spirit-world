@@ -168,6 +168,10 @@ export function enterLocation(
         removeObjectFromArea(state, state.hero.astralProjection);
         state.hero.astralProjection = null;
     }
+    if (state.hero.action === 'meditating') {
+        state.hero.action = null;
+    }
+    state.hero.spiritRadius = 0;
     if (!instant) {
         state.transitionState = {
             callback,
@@ -342,11 +346,13 @@ export function setAreaSection(state: GameState, d: Direction, newArea: boolean 
     state.areaSection = state.areaInstance.definition.sections[0];
     let x = state.hero.x / 16;
     let y = state.hero.y / 16;
-    if (d === 'right') {
-        x += state.hero.w / 16;
-    }
-    if (d === 'down') {
-        y += state.hero.h / 16;
+    if (!newArea) {
+        if (d === 'right') {
+            x += state.hero.w / 16;
+        }
+        if (d === 'down') {
+            y += state.hero.h / 16;
+        }
     }
     for (const section of state.areaInstance.definition.sections) {
         if (isPointInShortRect(x, y, section)) {

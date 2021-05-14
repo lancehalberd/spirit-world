@@ -454,6 +454,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
                 state.hero.y = hero.y;
                 // match the projection to the hero eyes.
                 hero.d = 'down';
+                return;
             }
         }
     }

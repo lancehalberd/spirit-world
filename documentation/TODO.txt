@@ -19,14 +19,7 @@ Graphics:
 
 
 Current tasks:
-    - Fix teleporting to transition makes camera jerk:
-        - Probaly just need to 0 out spirit radius on entering a new area.
-    - Add ability to charge weapon
-        Spin chakram around quickly in a circle twice (can move after throwing)
-        Costs 10 mana
-        Charge level 2 requires level 2 charge ability + level 2 weapon
-        Costs 50 mana
-        Similar to level 1 but 2 chakrams spin around you at different radiuses for 4 seconds.
+    - Decided what to work on next.
 
 Difficulty shrine:
     - 50 money per point
@@ -37,7 +30,9 @@ Difficulty shrine:
     - Remove boss webs
     - Reduce boss health
 
-
+Charge Chakram Attack:
+    - Maybe change level 1 charge to spin around hero in a circle twice? Brief 0.5s invulnerability with attack animation.
+    - Charge level 2 could have 2 chakrams spin at different radiuses and directions? 50 mana, lasts 4 seconds.
 
 At some point I should write tests to validate certain things like:
     - All zone+object targets are defined.
