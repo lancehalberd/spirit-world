@@ -19,7 +19,64 @@ Graphics:
 
 
 Current tasks:
+    - Update layer UI
+        - Don't select layers by default, allow unselecting layers.
+        - Tiles default to the bottom layer, and have a default layer behavior.
+            - If no layer is selected, tiles are drawn to the default layer, adding it if necessary.
+            - Add default layer definitions (key + drawPriority)
+        - Layers are collapsed and show only ID + visibility dropdown + delete action
+        - Selected layers are expanded and have the following additional options
+            - Select logic id (controls whether layer is applied when creating instance)
+            - Select draw priority background or foreground
+            - Move layer up/down in the list.
+
     - Decided what to work on next.
+    - Do a run through to check for bugs.
+
+
+High level list of things left to do:
+    New areas(need enemies, mechanics, bosses, entrances):
+        City
+        Grand Temple
+        Jade Palace
+        Waterfall Tower
+        Staff Tower
+        Sky Temple
+        Forest Temple
+        Crater
+        Forge
+        River Temple
+        Warship
+        Underwater
+    Areas missing significant content:
+        Cocoon
+    Missing Bosses for existing areas:
+        Rival fight before Tomb
+        Rival fight before Helix
+        Cocoon Boss
+    Missing mechanics:
+        Difficulty shrines
+        Underwater areas
+    Items missing implementation:
+        Charge level 2
+        Setting up Staff Tower
+        Bow level 2
+        Bow charge 1 + 2
+        Invis Level 2
+        Invis charge 1 + 2
+        Clone charge 1 + 2
+        fire, ice, lightning elements
+        iron boots
+        cloud boots
+        True Sight
+        Iron Skin (slowly regenerates health shield = 20% total health)
+        Gold Mail (reduce damage by 50%)
+        Gloves charge 1 + 2
+
+Add toasts to development for undoing actions:
+    - Deleting layers
+    - Replacing > 100 tiles
+
 
 Difficulty shrine:
     - 50 money per point

@@ -27,6 +27,7 @@ const lightStoneParticles: Frame[] = createAnimation('gfx/tiles/rocks.png', {w: 
 const heavyStoneParticles: Frame[] = createAnimation('gfx/tiles/rocks.png', {w: 16, h: 16}, {x: 7, cols: 3}).frames;
 const thornParticles: Frame[] = createAnimation('gfx/tiles/thorns.png', {w: 16, h: 16}, {x: 2, cols: 5}).frames;
 const bushBehavior: TileBehaviors = {
+    defaultLayer: 'field',
     solid: true, pickupWeight: 0, cuttable: 1, lootTable: lifeLootTable,
     underTile: 22,
     particles: bushParticles,
@@ -34,6 +35,7 @@ const bushBehavior: TileBehaviors = {
     linkedOffset: 181,
 };
 const lightStoneBehavior: TileBehaviors = {
+    defaultLayer: 'field',
     low: true, solid: true, pickupWeight: 1, lootTable: simpleLootTable,
     particles: lightStoneParticles,
     linkableTiles: [185, 186],
@@ -41,6 +43,7 @@ const lightStoneBehavior: TileBehaviors = {
 };
 
 const heavyStoneBehavior: TileBehaviors = {
+    defaultLayer: 'field',
     low: true, solid: true, pickupWeight: 1, lootTable: moneyLootTable,
     particles: heavyStoneParticles,
     linkableTiles: [187, 188],
@@ -49,15 +52,21 @@ const heavyStoneBehavior: TileBehaviors = {
 const wallBehavior: TileBehaviors = {
     solid: true
 };
-const lowWallBehavior: TileBehaviors = { low: true, solid: true };
-const pitBehavior: TileBehaviors = { pit: true };
+const lowWallBehavior: TileBehaviors = {
+    defaultLayer: 'field',
+    low: true,
+    solid: true,
+};
+const pitBehavior: TileBehaviors = { defaultLayer: 'field', pit: true };
 const thornBehavior: TileBehaviors = {
+    defaultLayer: 'field',
     low: true, damage: 1, cuttable: 1,
     underTile: 23,
     particles: thornParticles,
     linkedOffset: 179,
 };
 const deepWaterBehavior: TileBehaviors = {
+    defaultLayer: 'field',
     water: true,
 }
 const southCliffBehavior: TileBehaviors = {
@@ -66,6 +75,7 @@ const southCliffBehavior: TileBehaviors = {
     low: true,
 }
 const climbableWall: TileBehaviors = {
+    defaultLayer: 'field',
     climbable: true,
     solid: true,
     low: true,
@@ -173,7 +183,7 @@ const vineTile = canvasPalette(context => {
 const vineTileBase = canvasPalette(context => {
         context.fillStyle = 'green';
         context.fillRect(6, 0, 4, 6);
-}, { growTiles: [28]});
+}, { defaultLayer: 'field', growTiles: [28]});
 
 const rockWallFrame: Frame = {
     image: requireImage('gfx/tiles/rockwalltiles.png'),
@@ -201,7 +211,7 @@ const caveWallsPalette: TileSource = {
 const shallowWaterPalette: TileSource = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/water.png'), x: 0, y: 0, w: 64, h: 64},
-    behaviors: {'all': {shallowWater: true}},
+    behaviors: {'all': {defaultLayer: 'field', shallowWater: true}},
 };
 
 const deepWaterPalette: TileSource = {
@@ -224,12 +234,13 @@ const deepAngledWaterPalette: TileSource = {
 const comboWaterPalette: TileSource = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/water.png'), x: 192, y: 0, w: 64, h: 64},
-    behaviors: {'all': {shallowWater: true}, '3x1': { skipped: true }, '3x2': { skipped: true }, '3x3': { skipped: true }},
+    behaviors: {'all': {defaultLayer: 'field', shallowWater: true}, '3x1': { skipped: true }, '3x2': { skipped: true }, '3x3': { skipped: true }},
 };
 
 const spiritPlantParticles = createAnimation('gfx/tiles/spiritplants.png', {w: 16, h: 16}, {x: 5, cols: 4}).frames;
 
-const spiritPlantBehavior = {
+const spiritPlantBehavior: TileBehaviors = {
+    defaultLayer: 'field',
     solid: true, pickupWeight: 0, cuttable: 1, lootTable: lifeLootTable,
     underTile: 110,
     particles: spiritPlantParticles,
@@ -263,7 +274,7 @@ const treeLeaves = canvasPalette((context: CanvasRenderingContext2D) => {
     context.beginPath();
     context.arc(8, 8, 12, 0, 2 * Math.PI);
     context.fill();
-});
+}, { defaultLayer: 'foreground' });
 
 const lightCaveCornersPalette: TileSource = {
     w: 16, h: 16,
@@ -281,7 +292,7 @@ const furnitureCozyTiles: TileSource = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/temp_furniture.png'), x: 496, y: 0, w: 4 * 16, h: 3 * 16},
     behaviors: {
-        'all': {solid: true, low: true},
+        'all': {defaultLayer: 'field', solid: true, low: true},
         '3x2': {pit: true},
     },
 };
@@ -290,7 +301,7 @@ const furnitureWoodTiles: TileSource = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/temp_furniture.png'), x: 560, y: 272, w: 4 * 16, h: 6 * 16},
     behaviors: {
-        'all': {solid: true, low: true},
+        'all': {defaultLayer: 'field', solid: true, low: true},
     },
 };
 
@@ -298,7 +309,7 @@ const furniturePlantTiles: TileSource = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/temp_furniture.png'), x: 976, y: 192, w: 3 * 16, h: 1 * 16},
     behaviors: {
-        'all': {solid: true, low: true},
+        'all': {defaultLayer: 'field', solid: true, low: true},
     },
 };
 
@@ -312,7 +323,7 @@ const furnitureLampTiles: TileSource = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/temp_furniture.png'), x: 560, y: 368, w: 1 * 16, h: 1 * 16},
     behaviors: {
-        'all': {solid: true, low: true, brightness: 0.6, lightRadius: 32},
+        'all': {defaultLayer: 'field', solid: true, low: true, brightness: 0.6, lightRadius: 32},
     },
 };
 
@@ -320,7 +331,7 @@ const laundryTiles: TileSource = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/temp_laundry32.png'), x: 0, y: 0, w: 6 * 16, h: 2 * 16},
     behaviors: {
-        'all': {solid: true, low: false},
+        'all': {defaultLayer: 'field', solid: true, low: false},
     },
 };
 
@@ -328,7 +339,7 @@ const fireTiles: TileSource = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/temp_fire.png'), x: 0, y: 0, w: 1 * 16, h: 1 * 16},
     behaviors: {
-        'all': {solid: true, low: false},
+        'all': {defaultLayer: 'field', solid: true, low: false},
     },
 };
 

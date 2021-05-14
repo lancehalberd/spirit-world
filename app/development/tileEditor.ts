@@ -1,13 +1,14 @@
 import _ from 'lodash';
 
 import {
-    applyLayerToBehaviorGrid,
+    //applyLayerToBehaviorGrid,
     enterLocation,
     initializeAreaLayerTiles,
-    mapTileNumbersToFullTiles,
+    //mapTileNumbersToFullTiles,
     resetTileBehavior,
 } from 'app/content/areas';
 import { bossTypes, enemyTypes } from 'app/content/enemy';
+import { logicHash } from 'app/content/logic';
 import { getLootFrame } from 'app/content/lootObject';
 import { createObjectInstance } from 'app/content/objects';
 import { allTiles } from 'app/content/tiles';
@@ -39,7 +40,9 @@ import { drawFrame } from 'app/utils/animations';
 import { getMousePosition, isMouseDown, /*isMouseOverElement*/ } from 'app/utils/mouse';
 
 import {
-    AreaInstance, AreaLayerDefinition, BossObjectDefinition,  EnemyObjectDefinition, EnemyType,
+    AreaInstance, AreaLayerDefinition, BossObjectDefinition,
+    DrawPriority,
+    EnemyObjectDefinition, EnemyType,
     FullTile, GameState,
     ObjectDefinition,
     PanelRows, PropertyRow, ShortRectangle, TileGridDefinition,
@@ -49,9 +52,9 @@ type EditorToolType = 'brush' | 'delete' | 'object' | 'enemy' | 'boss' | 'replac
 export interface EditingState {
     tool: EditorToolType,
     isEditing: boolean,
-    brush: TileGridDefinition,
+    brush?: {[key: string]: TileGridDefinition},
     paletteKey: string,
-    selectedLayerIndex: number,
+    selectedLayerIndex?: number,
     replacePercentage: number,
     selectedObject?: ObjectDefinition,
     showZoneProperties: boolean,
@@ -65,18 +68,14 @@ export interface EditingState {
 export const editingState: EditingState = {
     tool: 'select',
     isEditing: false,
-    brush: null,
     paletteKey: Object.keys(palettes)[0],
     // Default editing the field, not the floor.
-    selectedLayerIndex: 1,
     replacePercentage: 100,
-    selectedObject: null,
     showZoneProperties: false,
     showFieldProperties: true,
     showInventoryProperties: false,
     showProgressProperties: false,
     spirit: false,
-    dragOffset: null,
 };
 window['editingState'] = editingState;
 export function toggleEditing() {
@@ -93,13 +92,7 @@ export function toggleEditing() {
 }
 export function startEditing(state: GameState) {
     if (!editingState.brush) {
-        editingState.brush = {
-            // The dimensions of the grid.
-            w: 1,
-            h: 1,
-            // The matrix of tiles
-            tiles: [[0]],
-        }
+        editingState.brush = {'none': {w: 1,h: 1,tiles: [[0]]}};
     }
     if (!editingState.selectedObject) {
         editingState.selectedObject = createObjectDefinition(state, editingState, {type: combinedObjectTypes[0]});
@@ -184,7 +177,7 @@ export function stopEditing(state: GameState) {
 export function displayTileEditorPropertyPanel() {
     const state = getState();
     if (editingState.selectedLayerIndex >= state.areaInstance.layers.length) {
-        editingState.selectedLayerIndex = 0;
+        editingState.selectedLayerIndex = null;
     }
     if (editingState.tool === 'enemy') {
         editingState.selectedObject.type = 'enemy';
@@ -235,23 +228,96 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
     }
     for (let i = 0; i < state.areaInstance.layers.length; i++) {
         const layer = state.areaInstance.layers[i];
-        const row: PropertyRow = [
+        const definition = layer.definition;
+        let row: PropertyRow = [
         {
             name: '',
             id: `layer-${i}-key`,
             value: layer.key,
             onChange(key: string) {
                 layer.key = key
-                layer.definition.key = key;
-                // editingState.selectedLayerIndex = i;
+                definition.key = key;
                 displayTileEditorPropertyPanel();
             },
         }];
-        if (i > 0) {
+        if (editingState.selectedLayerIndex !== i) {
+            row.unshift({
+                name: '>',
+                id: `layer-${i}-select`,
+                onClick() {
+                    editingState.selectedLayerIndex = i;
+                    state.areaInstance.tilesDrawn = [];
+                    state.areaInstance.checkToRedrawTiles = true;
+                    displayTileEditorPropertyPanel();
+                }
+            })
+        } else {
+            row.unshift({
+                name: '**',
+                id: `layer-${i}-unselect`,
+                onClick() {
+                    delete editingState.selectedLayerIndex;
+                    state.areaInstance.tilesDrawn = [];
+                    state.areaInstance.checkToRedrawTiles = true;
+                    displayTileEditorPropertyPanel();
+                }
+            })
+        }
+        row.push({
+            name: '',
+            id: `layer-${i}-visibility`,
+            value: definition.visibilityOverride || 'auto',
+            values: ['auto', 'show', 'hide'],
+            onChange(visibilityOverride: 'auto' | 'show' | 'hide') {
+                if (visibilityOverride === 'auto') {
+                    delete definition.visibilityOverride;
+                } else {
+                    definition.visibilityOverride = visibilityOverride;
+                }
+                // Calling this will instantiate the area again and place the player back in their current location.
+                enterLocation(state, state.location);
+                displayTileEditorPropertyPanel();
+            },
+        });
+        // Deleting all layers can causes errors, so don't allow it.
+        if (state.areaInstance.layers.length > 1) {
+            row.push({
+                name: 'X',
+                id: `layer-${i}-delete`,
+                onClick() {
+                    state.areaInstance.layers.splice(i, 1);
+                    state.areaInstance.definition.layers.splice(i, 1);
+                    state.areaInstance.tilesDrawn = [];
+                    state.areaInstance.checkToRedrawTiles = true;
+                    if (editingState.selectedLayerIndex >= state.areaInstance.layers.length) {
+                        editingState.selectedLayerIndex = state.areaInstance.layers.length - 1;
+                    }
+                    displayTileEditorPropertyPanel();
+                },
+            });
+        }
+        if (editingState.selectedLayerIndex === i) {
+            rows.push(row);
+            row = [{
+                name: 'Priority',
+                id: `layer-${i}-priority`,
+                value: definition.drawPriority || (
+                    definition.key === 'foreground' ? 'foreground' : 'background'
+                ),
+                values: ['background', 'foreground'] as DrawPriority[],
+                onChange(drawPriority: DrawPriority) {
+                    definition.drawPriority = drawPriority;
+                    state.areaInstance.tilesDrawn = [];
+                    state.areaInstance.checkToRedrawTiles = true;
+                },
+            }];
             row.push({
                 name: '^',
                 id: `layer-${i}-up`,
                 onClick() {
+                    if (i <= 0) {
+                        return;
+                    }
                     state.areaInstance.layers[i] = state.areaInstance.layers[i - 1];
                     state.areaInstance.definition.layers[i] = state.areaInstance.definition.layers[i - 1];
                     state.areaInstance.layers[i - 1] = layer;
@@ -266,12 +332,30 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
                     displayTileEditorPropertyPanel();
                 },
             });
-        }
-        if (i < state.areaInstance.layers.length - 1) {
+            rows.push(row);
+            row = [{
+                name: 'Logic',
+                id: `layer-${i}-logic`,
+                value: definition.logicKey || 'none',
+                values: ['none', ...Object.keys(logicHash)],
+                onChange(logicKey: string) {
+                    if (logicKey === 'none') {
+                        delete definition.logicKey;
+                    } else {
+                        definition.logicKey = logicKey;
+                    }
+                    // Calling this will instantiate the area again and place the player back in their current location.
+                    enterLocation(state, state.location);
+                    displayTileEditorPropertyPanel();
+                },
+            }];
             row.push({
                 name: 'v',
                 id: `layer-${i}-down`,
                 onClick() {
+                    if (i >= state.areaInstance.layers.length - 1) {
+                        return;
+                    }
                     state.areaInstance.layers[i] = state.areaInstance.layers[i + 1];
                     state.areaInstance.definition.layers[i] = state.areaInstance.definition.layers[i + 1];
                     state.areaInstance.layers[i + 1] = layer;
@@ -286,34 +370,6 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
                     displayTileEditorPropertyPanel();
                 },
             });
-        }
-        row.push({
-            name: 'X',
-            id: `layer-${i}-delete`,
-            onClick() {
-                state.areaInstance.layers.splice(i, 1);
-                state.areaInstance.definition.layers.splice(i, 1);
-                state.areaInstance.tilesDrawn = [];
-                state.areaInstance.checkToRedrawTiles = true;
-                if (editingState.selectedLayerIndex >= state.areaInstance.layers.length) {
-                    editingState.selectedLayerIndex = state.areaInstance.layers.length - 1;
-                }
-                displayTileEditorPropertyPanel();
-            },
-        });
-        if (editingState.selectedLayerIndex !== i) {
-            row.unshift({
-                name: '>',
-                id: `layer-${i}-select`,
-                onClick() {
-                    editingState.selectedLayerIndex = i;
-                    state.areaInstance.tilesDrawn = [];
-                    state.areaInstance.checkToRedrawTiles = true;
-                    displayTileEditorPropertyPanel();
-                }
-            })
-        } else {
-            row.unshift('**');
         }
         rows.push(row);
     }
@@ -347,7 +403,9 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
             initializeAreaLayerTiles(alternateLayerDefinition);
             definition.layers.push(layerDefinition);
             alternateDefinition.layers.push(layerDefinition);
-            state.areaInstance.layers.push({
+            // Calling this will instantiate the area again and place the player back in their current location.
+            enterLocation(state, state.location);
+            /*state.areaInstance.layers.push({
                 definition: layerDefinition,
                 ...layerDefinition,
                 ...layerDefinition.grid,
@@ -370,6 +428,7 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
             state.alternateAreaInstance.tilesDrawn = [];
             state.areaInstance.checkToRedrawTiles = true;
             state.alternateAreaInstance.checkToRedrawTiles = true;
+            */
             displayTileEditorPropertyPanel();
         }
     });
@@ -425,7 +484,7 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
             value: editingState.brush,
             palette: palettes[editingState.paletteKey],
             onChange(tiles: TileGridDefinition) {
-                editingState.brush = tiles;
+                editingState.brush = {'none': tiles};
                 updateBrushCanvas(editingState.brush);
                 if (editingState.tool !== 'brush' && editingState.tool !== 'replace') {
                     editingState.tool = 'brush';
@@ -645,15 +704,36 @@ function getSelectionBounds(state: GameState, x1: number, y1: number, x2: number
 
 function updateBrushSelection(x: number, y: number): void {
     const state = getState();
-    const layerDefinition = state.areaInstance.definition.layers[editingState.selectedLayerIndex];
     const {L, R, T, B} = getSelectionBounds(state, editingState.dragOffset.x, editingState.dragOffset.y, x, y);
-    editingState.brush.w = R - L + 1;
-    editingState.brush.h = B - T + 1;
-    editingState.brush.tiles = [];
-    for (let y = 0; y < editingState.brush.h; y++) {
-        editingState.brush.tiles[y] = [];
-        for (let x = 0; x < editingState.brush.w; x++) {
-            editingState.brush.tiles[y][x] = layerDefinition.grid.tiles[T + y][L + x];
+    editingState.brush = {};
+    if (editingState.selectedLayerIndex >= 0) {
+        const layerGrid: TileGridDefinition = {
+            w: R - L + 1,
+            h: B - T + 1,
+            tiles: [],
+        }
+        const layerDefinition = state.areaInstance.definition.layers[editingState.selectedLayerIndex];
+        for (let y = 0; y < layerGrid.h; y++) {
+            editingState.brush.tiles[y] = [];
+            for (let x = 0; x < layerGrid.w; x++) {
+                layerGrid.tiles[y][x] = layerDefinition.grid.tiles[T + y][L + x];
+            }
+        }
+        editingState.brush.none = layerGrid;
+    } else {
+        for (const layer of state.areaInstance.definition.layers) {
+            const layerGrid: TileGridDefinition = {
+                w: R - L + 1,
+                h: B - T + 1,
+                tiles: [],
+            }
+            editingState.brush[layer.key] = layerGrid;
+            for (let y = 0; y < layerGrid.h; y++) {
+                editingState.brush.tiles[y] = [];
+                for (let x = 0; x < layerGrid.w; x++) {
+                    layerGrid.tiles[y][x] = layer.grid.tiles[T + y][L + x];
+                }
+            }
         }
     }
     updateBrushCanvas(editingState.brush);
@@ -663,28 +743,67 @@ function drawBrush(x: number, y: number): void {
     const sy = Math.floor((state.camera.y + y) / 16);
     const sx = Math.floor((state.camera.x + x) / 16);
     const area = state.areaInstance;
-    const definition = area.definition;
-    const layer = area.layers[editingState.selectedLayerIndex];
-    const layerDefinition = definition.layers[editingState.selectedLayerIndex];
-    for (let y = 0; y < editingState.brush.h; y++) {
-        const row = sy + y;
-        if (row < 0 || row >= layerDefinition.grid.tiles.length) {
+    for (const layer of area.layers) {
+        const layerDefinition = layer.definition;
+        // When a layer is selected, only draw to it.
+        if (editingState.selectedLayerIndex >= 0 && area.layers[editingState.selectedLayerIndex] !== layer) {
             continue;
         }
-        const tileRow = layerDefinition.grid.tiles[row];
-        for (let x = 0; x < editingState.brush.w; x++) {
-            const column = sx + x;
-            if (column < 0 || column >= tileRow.length) {
+        let brushGrid = editingState.brush[layerDefinition.key];
+        if (!brushGrid) {
+            brushGrid = editingState.brush.none;
+            if (!brushGrid) {
                 continue;
             }
-            const tile = editingState.brush.tiles[y][x]
-            tileRow[column] = tile;
-            layer.tiles[row][column] = allTiles[tile];
-            layer.originalTiles[row][column] = allTiles[tile];
-            applyTileChangeToSpiritWorld(area.alternateArea, editingState.selectedLayerIndex, column, row, allTiles[tile]);
-            state.areaInstance.tilesDrawn[row][column] = false;
-            state.areaInstance.checkToRedrawTiles = true;
-            resetTileBehavior(area, {x: column, y: row});
+            for (let y = 0; y < brushGrid.h; y++) {
+                const row = sy + y;
+                if (row < 0 || row >= layerDefinition.grid.tiles.length) {
+                    continue;
+                }
+                const tileRow = layerDefinition.grid.tiles[row];
+                for (let x = 0; x < brushGrid.w; x++) {
+                    const column = sx + x;
+                    if (column < 0 || column >= tileRow.length) {
+                        continue;
+                    }
+                    const tile = brushGrid.tiles[y][x];
+                    const fullTile = allTiles[tile];
+                    const defaultLayer = fullTile?.behaviors?.defaultLayer || 'floor';
+                    // Only apply tiles to their default layer when a specific layer isn't selected.
+                    if (defaultLayer !== layer.key) {
+                        continue;
+                    }
+                    tileRow[column] = tile;
+                    layer.tiles[row][column] = allTiles[tile];
+                    layer.originalTiles[row][column] = allTiles[tile];
+                    applyTileChangeToSpiritWorld(area.alternateArea, editingState.selectedLayerIndex, column, row, allTiles[tile]);
+                    state.areaInstance.tilesDrawn[row][column] = false;
+                    state.areaInstance.checkToRedrawTiles = true;
+                    resetTileBehavior(area, {x: column, y: row});
+                }
+            }
+            continue;
+        }
+        for (let y = 0; y < brushGrid.h; y++) {
+            const row = sy + y;
+            if (row < 0 || row >= layerDefinition.grid.tiles.length) {
+                continue;
+            }
+            const tileRow = layerDefinition.grid.tiles[row];
+            for (let x = 0; x < brushGrid.w; x++) {
+                const column = sx + x;
+                if (column < 0 || column >= tileRow.length) {
+                    continue;
+                }
+                const tile = brushGrid.tiles[y][x]
+                tileRow[column] = tile;
+                layer.tiles[row][column] = allTiles[tile];
+                layer.originalTiles[row][column] = allTiles[tile];
+                applyTileChangeToSpiritWorld(area.alternateArea, editingState.selectedLayerIndex, column, row, allTiles[tile]);
+                state.areaInstance.tilesDrawn[row][column] = false;
+                state.areaInstance.checkToRedrawTiles = true;
+                resetTileBehavior(area, {x: column, y: row});
+            }
         }
     }
 }

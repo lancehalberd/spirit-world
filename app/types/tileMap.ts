@@ -1,4 +1,5 @@
 import {
+    DrawPriority,
     Frame, LootTable,
     ObjectDefinition, ObjectInstance,
     ShortRectangle,
@@ -9,6 +10,7 @@ export type Direction = 'up' | 'down' | 'left' | 'right' | 'upleft' | 'upright' 
 export interface TileBehaviors {
     // 0-1
     brightness?: number,
+    defaultLayer?: 'floor' | 'field' | 'foreground',
     // In pixels
     lightRadius?: number,
     // Sets players action to 'climbing' while on the tile.
@@ -77,6 +79,7 @@ export interface TileGridDefinition {
     // The dimensions of the grid.
     w: number,
     h: number,
+    drawPriority?: DrawPriority,
     // The matrix of tiles
     tiles: number[][],
 }
@@ -112,7 +115,10 @@ export interface ZoneLocation {
 export interface AreaLayerDefinition {
     // Unique identifier for this layer.
     key: string,
+    logicKey?: string,
+    drawPriority?: DrawPriority,
     grid?: TileGridDefinition,
+    visibilityOverride?: 'show' | 'hide',
     // Coordinates for the layer origin, if not (0, 0).
     x?: number,
     y?: number,

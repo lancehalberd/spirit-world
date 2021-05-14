@@ -153,13 +153,27 @@ const brushCanvas = createCanvas(100, 100);
 brushCanvas.style.border = '1px solid black';
 const brushContext = brushCanvas.getContext('2d');
 brushContext.imageSmoothingEnabled = false;
-export function updateBrushCanvas(selectedTiles: TileGridDefinition): void {
-    const brushWidth = selectedTiles.w * 16;
-    const brushHeight = selectedTiles.h * 16;
-    const scale = Math.min(brushCanvas.width / brushWidth, brushCanvas.height / brushHeight);
+export function updateBrushCanvas(selectedTiles: {[key: string]: TileGridDefinition}): void {
     // TODO: Make this light grey 5px checkers to indicate transparent areas.
     brushContext.fillStyle = 'blue';
     brushContext.fillRect(0, 0, brushCanvas.width, brushCanvas.height);
+    // Draw all the non-foreground layers first
+    for (const grid of Object.values(selectedTiles)) {
+        if (grid.drawPriority !== 'foreground') {
+            drawBrushCanvasLayer(grid);
+        }
+    }
+    // Draw the foreground layers last.
+    for (const grid of Object.values(selectedTiles)) {
+        if (grid.drawPriority === 'foreground') {
+            drawBrushCanvasLayer(grid);
+        }
+    }
+}
+function drawBrushCanvasLayer(selectedTiles: TileGridDefinition): void {
+    const brushWidth = selectedTiles.w * 16;
+    const brushHeight = selectedTiles.h * 16;
+    const scale = Math.min(brushCanvas.width / brushWidth, brushCanvas.height / brushHeight);
     brushContext.save();
     {
         // Center the brush in the canvas?
