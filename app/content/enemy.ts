@@ -17,7 +17,7 @@ import { directionMap, rotateDirection } from 'app/utils/field';
 import { playSound } from 'app/utils/sounds';
 
 import {
-    Actor, ActorAnimations, AreaInstance, BossObjectDefinition, Clone, Direction, DrawPriority,
+    Action, Actor, ActorAnimations, AreaInstance, BossObjectDefinition, Clone, Direction, DrawPriority,
     EnemyObjectDefinition,
     Frame, FrameAnimation, FrameDimensions, GameState, Hero, LootTable, MovementProperties,
     ObjectInstance, ObjectStatus, ShortRectangle,
@@ -45,6 +45,7 @@ export type MinionType = typeof minionTypes[number];
 
 export class Enemy implements Actor, ObjectInstance {
     type = 'enemy' as 'enemy';
+    action: Action = null;
     area: AreaInstance;
     drawPriority: DrawPriority = 'sprites';
     definition: EnemyObjectDefinition | BossObjectDefinition;
@@ -68,6 +69,8 @@ export class Enemy implements Actor, ObjectInstance {
     vz: number = 0;
     w: number;
     h: number;
+    canBeKnockedBack: boolean = true;
+    canBeKnockedDown: boolean = true;
     flying: boolean;
     life: number;
     speed: number;
@@ -76,6 +79,7 @@ export class Enemy implements Actor, ObjectInstance {
     mode = 'choose';
     modeTime = 0;
     params: any;
+    enemyInvulnerableFrames = 0;
     invulnerableFrames = 0;
     status: ObjectStatus = 'normal';
     scale: number = 1;
@@ -96,8 +100,10 @@ export class Enemy implements Actor, ObjectInstance {
         this.speed = this.enemyDefinition.speed ?? 1;
         this.acceleration = this.enemyDefinition.acceleration ?? .1;
         this.aggroRadius = this.enemyDefinition.aggroRadius ?? 80;
+        this.canBeKnockedBack = this.enemyDefinition.canBeKnockedBack ?? this.definition.type !== 'boss';
+        this.canBeKnockedDown = this.enemyDefinition.canBeKnockedDown ?? this.definition.type !== 'boss';
         this.flying = this.enemyDefinition.flying;
-        this.z = this.flying ? 12 : 0;
+        this.z = 0;//this.flying ? 12 : 0;
         this.scale = this.enemyDefinition.scale ?? 1;
         this.params = {
             ...(this.enemyDefinition.params || {}),
@@ -139,19 +145,34 @@ export class Enemy implements Actor, ObjectInstance {
         this.mode = mode;
         this.modeTime = 0;
     }
-    takeDamage(state: GameState, damage: number) {
+    knockBack(state: GameState, {vx = 0, vy = 0, vz = 0}: {vx: number, vy: number, vz: number}) {
+        if (!this.canBeKnockedBack) {
+            return;
+        }
+        this.action = 'knocked';
+        this.animationTime = 0;
+        this.vx = vx;
+        this.vy = vy;
+        this.vz = vz;
+    }
+    takeDamage(state: GameState, damage: number): boolean {
+        if (this.enemyInvulnerableFrames) {
+            return false;
+        }
         if (this.shielded) {
             playSound('getMoney');
-            return;
+            return true;
         }
         this.life -= damage;
         // This is actually the number of frames the enemy cannot damage the hero for.
         this.invulnerableFrames = 50;
+        this.enemyInvulnerableFrames = 20;
         if (this.life <= 0) {
             this.showDeathAnimation(state);
         } else {
             playSound('enemyHit');
         }
+        return true;
     }
     showDeathAnimation(state: GameState) {
         const hitbox = this.getHitbox(state);
@@ -200,14 +221,39 @@ export class Enemy implements Actor, ObjectInstance {
         if (!this.alwaysUpdate && !this.isFromCurrentSection(state)) {
             return;
         }
+        if (this.invulnerableFrames > 0) {
+            this.invulnerableFrames--;
+        }
+        if (this.enemyInvulnerableFrames > 0) {
+            this.enemyInvulnerableFrames--;
+        }
+        if (this.action === 'knocked') {
+            this.z += this.vz;
+            this.vz = Math.max(-8, this.vz - 0.5);
+            moveEnemy(state, this, this.vx, this.vy, {canFall: true});
+            const minZ = this.canBeKnockedDown ? 0 : (this.flying ? 12 : 0);
+            if (this.z <= minZ) {
+                this.z = minZ;
+            }
+            this.animationTime += FRAME_LENGTH;
+            if (this.animationTime >= 200 && (!this.canBeKnockedDown || this.z <= minZ)) {
+                this.action = null;
+                this.animationTime = 0;
+            }
+            return;
+        }
+        if (this.flying && this.z < 12) {
+            this.z = Math.min(12, this.z + 2);
+            return;
+        }
+        if (this.flying && this.z > 12) {
+            this.z = Math.max(12, this.z - 2);
+        }
         if (this.enemyDefinition.update) {
             this.enemyDefinition.update(state, this);
         }
         this.modeTime += FRAME_LENGTH;
         this.animationTime += FRAME_LENGTH;
-        if (this.invulnerableFrames > 0) {
-            this.invulnerableFrames--;
-        }
         // Checks if the enemy fell into a pit, for example
         checkForFloorEffects(state, this);
     }
@@ -339,6 +385,8 @@ interface EnemyDefinition {
     alwaysReset?: boolean,
     animations: ActorAnimations,
     aggroRadius?: number,
+    canBeKnockedBack?: boolean,
+    canBeKnockedDown?: boolean,
     flipRight?: boolean,
     flying?: boolean,
     hasShadow?: boolean,
@@ -922,7 +970,6 @@ function paceAndCharge(state: GameState, enemy: Enemy) {
         moveEnemy(state, enemy, enemy.vx, enemy.vy, {canFall: true});
         if (enemy.z < 0) {
             enemy.z = 0;
-            enemy.setMode('stunned');
         }
     } else if (enemy.mode === 'stunned') {
         enemy.animationTime = 0;
@@ -935,6 +982,7 @@ function paceAndCharge(state: GameState, enemy: Enemy) {
         if (hero) {
             enemy.d = d;
             enemy.setMode('charge');
+            enemy.canBeKnockedBack = false;
             enemy.setAnimation('attack', enemy.d);
         } else {
             paceRandomly(state, enemy);
@@ -945,10 +993,12 @@ function paceAndCharge(state: GameState, enemy: Enemy) {
             return;
         }
         if (!moveEnemy(state, enemy, 3 * enemy.speed * directionMap[enemy.d][0], 3 * enemy.speed * directionMap[enemy.d][1], {canFall: true})) {
-            enemy.setMode('knocked');
-            enemy.vx = -enemy.speed * directionMap[enemy.d][0];
-            enemy.vy = -enemy.speed * directionMap[enemy.d][1];
-            enemy.vz = 4;
+            enemy.setMode('stunned');
+            enemy.knockBack(state, {
+                vx: -enemy.speed * directionMap[enemy.d][0],
+                vy: -enemy.speed * directionMap[enemy.d][1],
+                vz: 4,
+            });
         }
     }
 }

@@ -76,7 +76,8 @@ export function getHeroFrame(state: GameState, hero: Hero): Frame {
             break;
         case 'climbing':
             return getFrame(heroAnimations.climbing.up, hero.animationTime);
-            break;
+        case 'charging':
+            return hero.wading ? heroShallowAnimations.attack[hero.d].frames[0] : heroAnimations.attack[hero.d].frames[0];
         case 'attack':
             animations = hero.wading ? heroShallowAnimations.attack : heroAnimations.attack;
             break;

@@ -25,7 +25,7 @@ import { rectanglesOverlap } from 'app/utils/index';
 import { playSound } from 'app/utils/sounds';
 
 import {
-    Actor, Clone, FullTile, GameState, Hero,
+    Actor, Clone, FullTile, GameState, HeldChakram, Hero,
     ObjectInstance, ThrownChakram, ThrownObject, TileCoords,
 } from 'app/types';
 
@@ -91,6 +91,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         ? isGameKeyDown(state, GAME_KEY.WEAPON)
         : isGameKeyDown(state, GAME_KEY.PASSIVE_TOOL);
 
+    const heldChakram = hero.area.objects.find(o => o instanceof HeldChakram) as HeldChakram;
     // Automatically move the character into the bounds of the current section.
     if (editingState.isEditing && isControlled) {
         movementSpeed = 0;
@@ -198,6 +199,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         }
     } else if (!isAstralProjection && hero.swimming) {
         movementSpeed = 1.5;
+        hero.action = null;
     } else if (hero.action === 'grabbing') {
         movementSpeed = 0;
         if (hero.grabObject && hero.grabObject.area !== hero.area) {
@@ -312,18 +314,8 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         movementSpeed = 1;
         hero.actionFrame++;
         if (hero.actionFrame === 6) {
-            const direction = (hero.actionDx || hero.actionDy) ? getDirection(hero.actionDx, hero.actionDy, true) : hero.d;
-            const chakram = new ThrownChakram({
-                x: hero.x + 3,
-                y: hero.y,
-                vx: 5 * directionMap[direction][0],
-                vy: 5 * directionMap[direction][1],
-                returnSpeed: 4,
-                source: hero,
-            });
-            addObjectToArea(state, hero.area, chakram);
         }
-        if (hero.actionFrame > 12) {
+        if (hero.actionFrame > 12 || hero.swimming) {
             hero.action = null;
             hero.actionDx = 0;
             hero.actionDy = 0;
@@ -336,6 +328,19 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         if (hero.actionFrame >= rollSpeed.length) {
             hero.action = null;
             hero.animationTime = 0;
+        }
+    }
+    if (heldChakram || hero.action === 'charging') {
+        movementSpeed = 1.5;
+        if (!heldChakram) {
+            hero.action = null;
+            hero.actionDx = 0;
+            hero.actionDy = 0;
+        } else if (!isGameKeyDown(state, GAME_KEY.WEAPON) || hero.swimming) {
+            hero.action = 'attack';
+            hero.animationTime = 0;
+            hero.actionFrame = 0;
+            heldChakram.throw(state);
         }
     }
     if (hero.grabObject && hero.action !== 'grabbing') {
@@ -353,7 +358,9 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             const m = Math.sqrt(dx * dx + dy * dy);
             dx = movementSpeed * dx / m;
             dy = movementSpeed * dy / m;
-            if (hero.action !== 'attack') {
+            if (hero.action === 'charging') {
+                hero.d = getDirection(hero.actionDx, hero.actionDy);
+            } else if (hero.action !== 'attack') {
                 if (dx < 0 && (hero.d === 'right' || Math.abs(dx) > Math.abs(dy))) {
                     hero.d = 'left';
                 } else if (dx > 0 && (hero.d === 'left' || Math.abs(dx) > Math.abs(dy))) {
@@ -366,18 +373,40 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             }
         }
     }
+    if (heldChakram && heldChakram.area === hero.area && heldChakram.hero === hero && hero.action !== 'charging') {
+        if (hero.action === 'entering' || hero.action === 'exiting') {
+            // take no action while hero is controlled by door.
+        } else if (!hero.action && isGameKeyDown(state, GAME_KEY.WEAPON)) {
+            // resume charing if the weapon button is still down.
+            hero.action = 'charging';
+            hero.actionDx = heldChakram.vx;
+            hero.actionDy = heldChakram.vy;
+        } else {
+            heldChakram.throw(state);
+        }
+    }
     if (hero.action !== 'meditating') {
         hero.spiritRadius = 0;
         hero.explosionTime = 0;
     }
+    if (hero.bounce) {
+        hero.bounce.frames--;
+        if (!(hero.bounce.frames > 0)) {
+            hero.bounce = null;
+        } else {
+            dx = hero.bounce.vx;
+            dy = hero.bounce.vy;
+        }
+    }
     if (dx || dy) {
+        const isCharging = hero.action === 'charging';
         const encumbered = hero.pickUpObject || hero.pickUpTile || hero.grabObject || hero.grabTile;
         moveActor(state, hero, dx, dy, {
-            canPush: !encumbered && !hero.swimming,
-            canClimb: !encumbered,
+            canPush: !encumbered && !hero.swimming && !hero.bounce && !isCharging,
+            canClimb: !encumbered && !hero.bounce && !isCharging,
             canFall: true,
             canSwim: !encumbered,
-            boundToSection: isAstralProjection,
+            boundToSection: isAstralProjection || !!hero.bounce,
         });
         if (!hero.action) {
             hero.action = 'walking';
@@ -429,16 +458,23 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         }
     }
     if (isControlled && !isAstralProjection && !hero.swimming && (!hero.action || hero.action === 'walking' || hero.action === 'pushing')
-        && !hero.pickUpTile && !hero.pickUpObject &&  hero.weapon > 0
+        && !hero.pickUpTile && !hero.pickUpObject && hero.weapon > 0
         && wasGameKeyPressed(state, GAME_KEY.WEAPON)
     ) {
         const thrownChakrams = hero.area.objects.filter(o => o instanceof ThrownChakram);
         if (state.hero.weapon - thrownChakrams.length > 0) {
-            hero.action = 'attack';
+            hero.action = 'charging';
             hero.animationTime = 0;
-            hero.actionDx = dx;
-            hero.actionDy = dy;
+            hero.actionDx = (dx || dy) ? dx : directionMap[hero.d][0];
+            hero.actionDy = (dx || dy) ? dy : directionMap[hero.d][1];
             hero.actionFrame = 0;
+            const direction = getDirection(hero.actionDx, hero.actionDy, true);
+            const chakram = new HeldChakram({
+                vx: directionMap[direction][0],
+                vy: directionMap[direction][1],
+                source: hero,
+            });
+            addObjectToArea(state, hero.area, chakram);
         }
     }
 
@@ -767,8 +803,9 @@ export function damageActor(
         }
     }
 
+    let hit = false;
     if (actor.takeDamage) {
-        actor.takeDamage(state, damage);
+        hit = actor.takeDamage(state, damage);
     } else if (actor === state.hero || state.hero.clones.indexOf(actor as any) >= 0) {
         // If any clones are in use, any damage one takes destroys it until only one clone remains.
         // Damage applies to the hero, not the clone.
@@ -779,17 +816,24 @@ export function damageActor(
         if (state.hero.clones.length) {
             destroyClone(state, actor as any);
         }
+        hit = true;
     }
 
-    if (knockback) {
-        throwHeldObject(state, hero);
-        actor.action = 'knocked';
-        actor.animationTime = 0;
-        actor.vx = knockback.vx;
-        actor.vy = knockback.vy;
-        actor.vz = knockback.vz;
+    if (hit && knockback) {
+        if (actor.knockBack) {
+            actor.knockBack(state, knockback);
+        } else {
+            if (actor=== hero) {
+                throwHeldObject(state, hero);
+            }
+            actor.action = 'knocked';
+            actor.animationTime = 0;
+            actor.vx = knockback.vx;
+            actor.vy = knockback.vy;
+            actor.vz = knockback.vz;
+        }
     }
-    return true;
+    return hit;
 }
 
 const throwSpeed = 6;

@@ -147,11 +147,12 @@ export class AstralProjection implements Hero, ObjectInstance {
             renderCarriedTile(context, state, hero);
         }
     }
-    takeDamage(state: GameState, damage: number) {
+    takeDamage(state: GameState, damage: number): boolean {
         // Astral projection damage is applied to the magic meter at 5x effectiveness.
         state.hero.magic -= Math.max(10, damage * 5);
         // Astral projection has fewer invulnerability frames since it can't be killed
         // and magic regenerates automatically.
         this.invulnerableFrames = 20;
+        return true;
     }
 }

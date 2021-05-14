@@ -17,6 +17,7 @@ export interface ObjectInstance {
     drawPriority?: DrawPriority,
     // Set this flag for objects that need to update during screen transitions, such as doorways.
     updateDuringTransition?: boolean,
+    changesAreas?: boolean,
     // Setting this true is the same as returning true always for shouldReset+shouldRespawn.
     alwaysReset?: boolean,
     ignorePits?: boolean,
