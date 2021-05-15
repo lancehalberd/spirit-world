@@ -720,6 +720,7 @@ function drawBrush(x: number, y: number): void {
     for (const layer of area.layers) {
         const layerDefinition = layer.definition;
         const layerIndex = area.definition.layers.indexOf(layerDefinition);
+        const parentLayer = area.definition.parentDefinition?.layers[layerIndex];
         // When a layer is selected, only draw to it.
         if (editingState.selectedLayerIndex >= 0 && area.layers[editingState.selectedLayerIndex] !== layer) {
             continue;
@@ -748,16 +749,22 @@ function drawBrush(x: number, y: number): void {
                         continue;
                     }
                     const tile = brushGrid.tiles[y][x];
-                    const fullTile = allTiles[tile];
-                    const defaultLayer = fullTile?.behaviors?.defaultLayer || 'floor';
+                    let fullTile = allTiles[tile];
+                    const defaultLayer = fullTile ? (fullTile.behaviors?.defaultLayer || 'floor') : 'field';
                     // Only apply tiles to their default layer when a specific layer isn't selected.
                     if (defaultLayer !== layer.key) {
                         continue;
                     }
                     tileRow[column] = tile;
-                    layer.tiles[row][column] = allTiles[tile];
-                    layer.originalTiles[row][column] = allTiles[tile];
-                    applyTileChangeToSpiritWorld(area.alternateArea, layerIndex, column, row, allTiles[tile]);
+                    if (!fullTile && parentLayer) {
+                        const parentTile = allTiles[parentLayer.grid?.tiles[row][column]];
+                        // Tiles with linked offsets map to different tiles than the parent definition.
+                        const linkedOffset = parentTile?.behaviors?.linkedOffset || 0;
+                        fullTile = linkedOffset ? allTiles[parentTile.index + linkedOffset] : parentTile;
+                    }
+                    layer.tiles[row][column] = fullTile;
+                    layer.originalTiles[row][column] = fullTile;
+                    applyTileChangeToSpiritWorld(area.alternateArea, layerIndex, column, row, fullTile);
                     state.areaInstance.tilesDrawn[row][column] = false;
                     state.areaInstance.checkToRedrawTiles = true;
                     resetTileBehavior(area, {x: column, y: row});
@@ -776,11 +783,18 @@ function drawBrush(x: number, y: number): void {
                 if (column < 0 || column >= tileRow.length) {
                     continue;
                 }
-                const tile = brushGrid.tiles[y][x]
+                const tile = brushGrid.tiles[y][x];
                 tileRow[column] = tile;
-                layer.tiles[row][column] = allTiles[tile];
-                layer.originalTiles[row][column] = allTiles[tile];
-                applyTileChangeToSpiritWorld(area.alternateArea, layerIndex, column, row, allTiles[tile]);
+                let fullTile = allTiles[tile];
+                if (!fullTile && parentLayer) {
+                    const parentTile = allTiles[parentLayer.grid?.tiles[row][column]];
+                    // Tiles with linked offsets map to different tiles than the parent definition.
+                    const linkedOffset = parentTile?.behaviors?.linkedOffset || 0;
+                    fullTile = linkedOffset ? allTiles[parentTile.index + linkedOffset] : parentTile;
+                }
+                layer.tiles[row][column] = fullTile;
+                layer.originalTiles[row][column] = fullTile;
+                applyTileChangeToSpiritWorld(area.alternateArea, layerIndex, column, row, fullTile);
                 state.areaInstance.tilesDrawn[row][column] = false;
                 state.areaInstance.checkToRedrawTiles = true;
                 resetTileBehavior(area, {x: column, y: row});
@@ -791,6 +805,7 @@ function drawBrush(x: number, y: number): void {
 function replaceTiles(x: number, y: number): void {
     const state = getState();
     const layer = state.areaInstance.layers[editingState.selectedLayerIndex];
+    const parentLayer = state.areaInstance.definition.parentDefinition.layers.find(l => l.key === layer.key);
     const w = 16, h = 16;
     const tile = layer.tiles[((state.camera.y + y) / h) | 0]?.[((state.camera.x + x) / w) | 0];
     const replacement: number = editingState.brush.none.tiles[0][0];
@@ -799,7 +814,13 @@ function replaceTiles(x: number, y: number): void {
             const t = layer.tiles[y][x];
             if (t === tile && Math.random() <= editingState.replacePercentage / 100) {
                 layer.definition.grid.tiles[y][x] = replacement;
-                const fullTile = allTiles[replacement]
+                let fullTile = allTiles[replacement];
+                if (!fullTile && parentLayer) {
+                    const parentTile = allTiles[parentLayer.grid?.tiles[y][x]];
+                    // Tiles with linked offsets map to different tiles than the parent definition.
+                    const linkedOffset = parentTile?.behaviors?.linkedOffset || 0;
+                    fullTile = linkedOffset ? allTiles[parentTile.index + linkedOffset] : parentTile;
+                }
                 layer.tiles[y][x] = fullTile;
                 layer.originalTiles[y][x] = fullTile;
                 state.areaInstance.tilesDrawn[y][x] = false;
@@ -941,6 +962,7 @@ function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, a
                     for (const priorityToDraw of ['background', 'foreground']) {
                         for (const layerKey of allLayerKeys) {
                             const currentLayer = state.areaInstance.definition.layers.find(l => l.key === layerKey);
+                            const parentLayer = state.areaInstance.definition.parentDefinition?.layers.find(l => l.key === layerKey);
                             let brush: TileGridDefinition = null, defaultBrush: TileGridDefinition = null;
                             if (currentLayer && currentLayer === selectedLayer) {
                                 brush = editingState.brush[layerKey] || editingState.brush.none;
@@ -963,6 +985,7 @@ function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, a
                                     state,
                                     layerKey,
                                     currentLayer,
+                                    parentLayer,
                                     brush,
                                     defaultBrush,
                                     rectangle,
@@ -1004,6 +1027,7 @@ function drawBrushLayerPreview(
     // The key of the layer being drawn, needed in case the actual layer does not exist.
     layerKey: string,
     layer: AreaLayerDefinition | null,
+    parentLayer: AreaLayerDefinition | null,
     brush: TileGridDefinition | null,
     defaultBrush: TileGridDefinition | null,
     rectangle: ShortRectangle,
@@ -1023,7 +1047,7 @@ function drawBrushLayerPreview(
                 // If no brush is defined, check if the default brush applies, otherwise use the existing
                 // layer tile if present.
                 const defaultTile = allTiles[defaultBrush.tiles[y][x]];
-                const defaultLayer = defaultTile?.behaviors?.defaultLayer ?? 'floor';
+                const defaultLayer = defaultTile ? (defaultTile.behaviors?.defaultLayer ?? 'floor') : 'field';
                 if (defaultLayer === layerKey) {
                     tile = defaultTile;
                 } else if (layer) {
@@ -1032,6 +1056,12 @@ function drawBrushLayerPreview(
             }else if (layer) {
                 // If there is no brush or default brush just use the existing layer tile if present
                 tile = allTiles[layer.grid.tiles[ty][tx]];
+            }
+            if (!tile && parentLayer) {
+                const parentTile = allTiles[parentLayer.grid?.tiles[ty][tx]];
+                // Tiles with linked offsets map to different tiles than the parent definition.
+                const linkedOffset = parentTile?.behaviors?.linkedOffset || 0;
+                tile = linkedOffset ? allTiles[parentTile.index + linkedOffset] : parentTile;
             }
             if (tile) {
                 drawFrame(context, tile.frame, {x: tx * w, y: ty * h, w, h});
