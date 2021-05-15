@@ -19,16 +19,8 @@ Graphics:
 
 
 Current tasks:
-    - Update layer UI
-        - Don't select layers by default, allow unselecting layers.
-        - Tiles default to the bottom layer, and have a default layer behavior.
-            - If no layer is selected, tiles are drawn to the default layer, adding it if necessary.
-            - Add default layer definitions (key + drawPriority)
-        - Layers are collapsed and show only ID + visibility dropdown + delete action
-        - Selected layers are expanded and have the following additional options
-            - Select logic id (controls whether layer is applied when creating instance)
-            - Select draw priority background or foreground
-            - Move layer up/down in the list.
+    - Select logic id (controls whether layer is applied when creating instance)
+    - Select draw priority background or foreground
 
     - Decided what to work on next.
     - Do a run through to check for bugs.

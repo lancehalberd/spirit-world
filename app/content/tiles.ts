@@ -345,7 +345,7 @@ const fireTiles: TileSource = {
 
 addTiles([
     // This is the empty tile.
-    singleTileSource('gfx/tiles/bush.png', null, -16),
+    singleTileSource('gfx/tiles/bush.png', {defaultLayer: 'field'}, -16),
     singleTileSource('gfx/tiles/bush.png', bushBehavior, 0),
     singleTileSource('gfx/tiles/cactussheet.png', {...bushBehavior, damage: 1}),
     singleTileSource('gfx/tiles/pit.png', pitBehavior),

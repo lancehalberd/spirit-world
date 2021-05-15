@@ -40,7 +40,7 @@ import { drawFrame } from 'app/utils/animations';
 import { getMousePosition, isMouseDown, /*isMouseOverElement*/ } from 'app/utils/mouse';
 
 import {
-    AreaInstance, AreaLayerDefinition, BossObjectDefinition,
+    AreaInstance, AreaLayer, AreaLayerDefinition, BossObjectDefinition,
     DrawPriority,
     EnemyObjectDefinition, EnemyType,
     FullTile, GameState,
@@ -662,35 +662,43 @@ document.addEventListener('mouseup', () => {
 
 function deleteTile(x: number, y: number): void {
     const state = getState();
-    y = Math.floor((state.camera.y + y) / 16);
-    x = Math.floor((state.camera.x + x) / 16);
+    const ty = Math.floor((state.camera.y + y) / 16);
+    const tx = Math.floor((state.camera.x + x) / 16);
     const area = state.areaInstance;
+    if (editingState.selectedLayerIndex >= 0) {
+        deleteTileFromLayer(tx, ty, area, area.layers[editingState.selectedLayerIndex]);
+    } else {
+        for (const layer of area.layers) {
+            deleteTileFromLayer(tx, ty, area, layer);
+        }
+    }
+    area.tilesDrawn[ty][tx] = false;
+    area.checkToRedrawTiles = true;
+    resetTileBehavior(area, {x: tx, y: ty});
+}
+function deleteTileFromLayer(tx: number, ty: number, area: AreaInstance, layer: AreaLayer): void {
     const definition = area.definition;
-    const layer = area.layers[editingState.selectedLayerIndex];
-    const layerDefinition = definition.layers[editingState.selectedLayerIndex];
+    const layerDefinition = layer.definition;
     const tiles = layerDefinition.grid.tiles;
-    if (x < 0 || x > tiles[0].length - 1 || y < 0 || y > tiles.length - 1) {
+    if (tx < 0 || tx > tiles[0].length - 1 || ty < 0 || ty > tiles.length - 1) {
         return;
     }
     if (!definition.isSpiritWorld) {
         // In the physical world we just replace tiles with the empty tile.
-        layer.originalTiles[y][x] = layer.tiles[y][x] = null;
-        tiles[y][x] = 0;
-        applyTileChangeToSpiritWorld(area.alternateArea, editingState.selectedLayerIndex, x, y, allTiles[0]);
+        layer.originalTiles[ty][tx] = layer.tiles[ty][tx] = null;
+        tiles[ty][tx] = 0;
+        applyTileChangeToSpiritWorld(area.alternateArea, editingState.selectedLayerIndex, tx, ty, allTiles[0]);
     } else {
         // Clear the tile definition in the spirit world.
-        tiles[y][x] = 0;
+        tiles[ty][tx] = 0;
         // And set the instance to use the tile from the parent definition.
-        layer.originalTiles[y][x] = layer.tiles[y][x] =
-            allTiles[definition.parentDefinition.layers[editingState.selectedLayerIndex].grid.tiles[y][x]];
+        layer.originalTiles[ty][tx] = layer.tiles[ty][tx] =
+            allTiles[definition.parentDefinition.layers[editingState.selectedLayerIndex].grid.tiles[ty][tx]];
     }
-    area.tilesDrawn[y][x] = false;
-    area.checkToRedrawTiles = true;
-    resetTileBehavior(area, {x, y});
 }
 
 function getSelectionBounds(state: GameState, x1: number, y1: number, x2: number, y2: number): {L: number, R: number, T: number, B: number} {
-    const layerDefinition = state.areaInstance.definition.layers[editingState.selectedLayerIndex];
+    const layerDefinition = state.areaInstance.definition.layers[0];
     const tx1 = Math.floor((state.camera.x + x1) / 16);
     const ty1 = Math.floor((state.camera.y + y1) / 16);
     const tx2 = Math.floor((state.camera.x + x2) / 16);
@@ -705,35 +713,14 @@ function getSelectionBounds(state: GameState, x1: number, y1: number, x2: number
 function updateBrushSelection(x: number, y: number): void {
     const state = getState();
     const {L, R, T, B} = getSelectionBounds(state, editingState.dragOffset.x, editingState.dragOffset.y, x, y);
+    const rectangle = {x: L, y: T, w: R - L + 1, h: B - T + 1};
     editingState.brush = {};
     if (editingState.selectedLayerIndex >= 0) {
-        const layerGrid: TileGridDefinition = {
-            w: R - L + 1,
-            h: B - T + 1,
-            tiles: [],
-        }
         const layerDefinition = state.areaInstance.definition.layers[editingState.selectedLayerIndex];
-        for (let y = 0; y < layerGrid.h; y++) {
-            editingState.brush.tiles[y] = [];
-            for (let x = 0; x < layerGrid.w; x++) {
-                layerGrid.tiles[y][x] = layerDefinition.grid.tiles[T + y][L + x];
-            }
-        }
-        editingState.brush.none = layerGrid;
+        editingState.brush.none = getTileGridFromLayer(layerDefinition, rectangle);
     } else {
         for (const layer of state.areaInstance.definition.layers) {
-            const layerGrid: TileGridDefinition = {
-                w: R - L + 1,
-                h: B - T + 1,
-                tiles: [],
-            }
-            editingState.brush[layer.key] = layerGrid;
-            for (let y = 0; y < layerGrid.h; y++) {
-                editingState.brush.tiles[y] = [];
-                for (let x = 0; x < layerGrid.w; x++) {
-                    layerGrid.tiles[y][x] = layer.grid.tiles[T + y][L + x];
-                }
-            }
+            editingState.brush[layer.key] = getTileGridFromLayer(layer, rectangle);
         }
     }
     updateBrushCanvas(editingState.brush);
@@ -750,7 +737,13 @@ function drawBrush(x: number, y: number): void {
             continue;
         }
         let brushGrid = editingState.brush[layerDefinition.key];
-        if (!brushGrid) {
+        if (editingState.selectedLayerIndex >= 0 && !brushGrid) {
+            // If a specific layer is selected, apply the 'none' brush to it.
+            brushGrid = editingState.brush.none;
+            if (!brushGrid) {
+                continue;
+            }
+        } else if (!brushGrid) {
             brushGrid = editingState.brush.none;
             if (!brushGrid) {
                 continue;
@@ -812,7 +805,7 @@ function replaceTiles(x: number, y: number): void {
     const layer = state.areaInstance.layers[editingState.selectedLayerIndex];
     const w = 16, h = 16;
     const tile = layer.tiles[((state.camera.y + y) / h) | 0]?.[((state.camera.x + x) / w) | 0];
-    const replacement = editingState.brush.tiles[0][0];
+    const replacement: number = editingState.brush.none.tiles[0][0];
     for (let y = 0; y < layer.tiles.length; y++) {
         for (let x = 0; x < layer.tiles[y].length; x++) {
             const t = layer.tiles[y][x];
@@ -862,18 +855,33 @@ export function renderEditor(context: CanvasRenderingContext2D, state: GameState
     }
 }
 
+
+function getTileGridFromLayer(layerDefinition: AreaLayerDefinition, rectangle: ShortRectangle): TileGridDefinition {
+    const gridDefinition: TileGridDefinition = {
+        tiles: [],
+        w: rectangle.w,
+        h: rectangle.h
+    }
+    for (let y = 0; y < gridDefinition.h; y++) {
+        gridDefinition.tiles[y] = [];
+        for (let x = 0; x < gridDefinition.w; x++) {
+            gridDefinition.tiles[y][x] = layerDefinition.grid.tiles[rectangle.y + y][rectangle.x + x];
+        }
+    }
+    return gridDefinition;
+}
+
 export function selectSection() {
     const state = getState();
-    const layerDefinition = state.areaInstance.definition.layers[editingState.selectedLayerIndex];
-    editingState.brush.tiles = [];
-    const L = state.areaSection.x;
-    const T = state.areaSection.y;
-    editingState.brush.w = state.areaSection.w;
-    editingState.brush.h = state.areaSection.h;
-    for (let y = 0; y < editingState.brush.h; y++) {
-        editingState.brush.tiles[y] = [];
-        for (let x = 0; x < editingState.brush.w; x++) {
-            editingState.brush.tiles[y][x] = layerDefinition.grid.tiles[T + y][L + x];
+    editingState.brush = {};
+    if (editingState.selectedLayerIndex >= 0) {
+        const layerDefinition = state.areaInstance.definition.layers[editingState.selectedLayerIndex];
+        editingState.brush = {
+            none: getTileGridFromLayer(layerDefinition, state.areaSection),
+        };
+    } else {
+        for (const layer of state.areaInstance.definition.layers) {
+            editingState[layer.key] = getTileGridFromLayer(layer, state.areaSection);
         }
     }
     updateBrushCanvas(editingState.brush);
@@ -910,16 +918,37 @@ function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, a
                     context.strokeStyle = 'white';
                     context.strokeRect(L * w, T * h, (R - L + 1) * w, (B - T + 1) * h);
                 } else {
-                    const sy = Math.floor((state.camera.y + y) / h);
-                    const sx = Math.floor((state.camera.x + x) / w);
-                    for (let y = 0; y < editingState.brush.h; y++) {
-                        const ty = sy + y;
-                        for (let x = 0; x < editingState.brush.w; x++) {
-                            const tx = sx + x;
-                            const tile = allTiles[editingState.brush.tiles[y][x]];
-                            if (tile) {
-                                drawFrame(context, tile.frame, {x: tx * w, y: ty * h, w, h});
+                    if (!(editingState.selectedLayerIndex >= 0)) {
+                        const grid = Object.values(editingState.brush)[0];
+                        const sy = Math.floor((state.camera.y + y) / h) * h;
+                        const sx = Math.floor((state.camera.x + x) / w) * w;
+                        // Erase existing content if no layers are selected.
+                        context.clearRect(sx, sy, grid.w * 16, grid.h * 16);
+                    }
+                    // Draw all the non-foreground layers first
+                    for (let key in editingState.brush) {
+                        // If a particular layer is selected, don't draw the preview for other layers
+                        if (editingState.selectedLayerIndex >= 0) {
+                            if (key !== 'none' && key !== state.areaInstance.layers[editingState.selectedLayerIndex].key) {
+                                continue;
                             }
+                        }
+                        const grid = editingState.brush[key];
+                        if (grid.drawPriority !== 'foreground') {
+                            drawBrushLayerPreview(context, state, grid, x, y);
+                        }
+                    }
+                    // Draw the foreground layers last.
+                    for (let key in editingState.brush) {
+                        // If a particular layer is selected, don't draw the preview for other layers
+                        if (editingState.selectedLayerIndex >= 0) {
+                            if (key !== 'none' && key !== state.areaInstance.layers[editingState.selectedLayerIndex].key) {
+                                continue;
+                            }
+                        }
+                        const grid = editingState.brush[key];
+                        if (grid.drawPriority === 'foreground') {
+                            drawBrushLayerPreview(context, state, grid, x, y);
                         }
                     }
                 }
@@ -946,6 +975,28 @@ function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, a
             }
         }
     context.restore();
+}
+
+function drawBrushLayerPreview(
+    context: CanvasRenderingContext2D,
+    state: GameState,
+    selectedTiles: TileGridDefinition,
+    x: number,
+    y: number
+): void {
+    const w = 16, h = 16;
+    const sy = Math.floor((state.camera.y + y) / h);
+    const sx = Math.floor((state.camera.x + x) / w);
+    for (let y = 0; y < selectedTiles.h; y++) {
+        const ty = sy + y;
+        for (let x = 0; x < selectedTiles.w; x++) {
+            const tx = sx + x;
+            const tile = allTiles[selectedTiles.tiles[y][x]];
+            if (tile) {
+                drawFrame(context, tile.frame, {x: tx * w, y: ty * h, w, h});
+            }
+        }
+    }
 }
 
 document.addEventListener('keydown', function(event: KeyboardEvent) {

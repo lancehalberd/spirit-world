@@ -407,7 +407,7 @@ export function renderLayer(area: AreaInstance, layer: AreaLayer, parentLayer: A
     const context = isForeground ? area.foregroundContext : area.context;
     const w = 16, h = 16;
     context.save();
-    if (editingState.isEditing && getState().areaInstance.layers[editingState.selectedLayerIndex] !== layer) {
+    if (editingState.isEditing && editingState.selectedLayerIndex >= 0 && getState().areaInstance.layers[editingState.selectedLayerIndex] !== layer) {
         //console.log(getState().areaInstance.layers[editingState.selectedLayerIndex], layer);
         context.globalAlpha = 0.5;
     }
