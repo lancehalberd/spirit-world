@@ -926,41 +926,73 @@ function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, a
                     context.strokeStyle = 'white';
                     context.strokeRect(L * w, T * h, (R - L + 1) * w, (B - T + 1) * h);
                 } else {
-                    if (!(editingState.selectedLayerIndex >= 0)) {
-                        const grid = Object.values(editingState.brush)[0];
-                        const sy = Math.floor((state.camera.y + y) / h) * h;
-                        const sx = Math.floor((state.camera.x + x) / w) * w;
-                        // Erase existing content if no layers are selected.
-                        context.clearRect(sx, sy, grid.w * 16, grid.h * 16);
-                    }
-                    // Draw all the non-foreground layers first
+                    const firstBrushGrid = Object.values(editingState.brush)[0];
+                    // Erase existing layers so we can draw an accurate preview.
+                    const rectangle = {
+                        x: Math.floor((state.camera.x + x) / w),
+                        y: Math.floor((state.camera.y + y) / h),
+                        w: firstBrushGrid.w,
+                        h: firstBrushGrid.h,
+                    };
+                    context.clearRect(rectangle.x * 16, rectangle.y * 16, rectangle.w * 16, rectangle.h * 16);
+
+                    // Create the combined set of layer + brush keys for building the preview.
+                    const allLayerKeys = state.areaInstance.layers.map(l => l.key);
+                    // Include extra layer keys. Eventually painting will add extra layers if they are on the brush.
                     for (let key in editingState.brush) {
-                        // If a particular layer is selected, don't draw the preview for other layers
-                        if (editingState.selectedLayerIndex >= 0) {
-                            if (key !== 'none' && key !== state.areaInstance.layers[editingState.selectedLayerIndex].key) {
-                                continue;
-                            }
-                        }
-                        const grid = editingState.brush[key];
-                        if (grid.drawPriority !== 'foreground') {
-                            drawBrushLayerPreview(context, state, grid, x, y);
+                        if (key !== 'none' && !allLayerKeys.includes(key)) {
+                            allLayerKeys.push(key);
                         }
                     }
-                    // Draw the foreground layers last.
-                    for (let key in editingState.brush) {
-                        // If a particular layer is selected, don't draw the preview for other layers
-                        if (editingState.selectedLayerIndex >= 0) {
-                            if (key !== 'none' && key !== state.areaInstance.layers[editingState.selectedLayerIndex].key) {
-                                continue;
-                            }
+                    // If the default brush layer is used and no layer is selected, add all the default layer keys.
+                    if (editingState.brush.none && !(editingState.selectedLayerIndex >= 0)) {
+                        if (!allLayerKeys.includes('floor')) {
+                            allLayerKeys.push('floor');
                         }
-                        const grid = editingState.brush[key];
-                        if (grid.drawPriority === 'foreground') {
-                            drawBrushLayerPreview(context, state, grid, x, y);
+                        if (!allLayerKeys.includes('field')) {
+                            allLayerKeys.push('field');
+                        }
+                        if (!allLayerKeys.includes('foreground')) {
+                            allLayerKeys.push('foreground');
+                        }
+                    }
+                    const selectedLayer = state.areaInstance.definition.layers[editingState.selectedLayerIndex];
+                    // Draw background layers, then foreground layers.
+                    for (const priorityToDraw of ['background', 'foreground']) {
+                        for (const layerKey of allLayerKeys) {
+                            const currentLayer = state.areaInstance.definition.layers.find(l => l.key === layerKey);
+                            let brush: TileGridDefinition = null, defaultBrush: TileGridDefinition = null;
+                            if (currentLayer && currentLayer === selectedLayer) {
+                                brush = editingState.brush[layerKey] || editingState.brush.none;
+                            } else {
+                                brush = editingState.brush[layerKey];
+                                // Default brush is only used when no layers are selected.
+                                if (!selectedLayer) {
+                                    defaultBrush = editingState.brush.none;
+                                }
+                            }
+                            if (selectedLayer && currentLayer !== selectedLayer) {
+                                context.globalAlpha = 0.5;
+                            } else {
+                                context.globalAlpha = 1;
+                            }
+                            let drawPriority = currentLayer?.drawPriority || brush?.drawPriority || (layerKey === 'foreground' ? 'foreground' : 'background');
+                            if (drawPriority === priorityToDraw) {
+                                drawBrushLayerPreview(
+                                    context,
+                                    state,
+                                    layerKey,
+                                    currentLayer,
+                                    brush,
+                                    defaultBrush,
+                                    rectangle,
+                                );
+                            }
                         }
                     }
                 }
             }
+            context.globalAlpha = 0.6;
             if (editingState.tool === 'select' && editingState.selectedObject?.id) {
                 const instance = createObjectInstance(state, editingState.selectedObject);
                 let target: ShortRectangle;
@@ -985,21 +1017,42 @@ function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, a
     context.restore();
 }
 
+
 function drawBrushLayerPreview(
     context: CanvasRenderingContext2D,
     state: GameState,
-    selectedTiles: TileGridDefinition,
-    x: number,
-    y: number
+    // The key of the layer being drawn, needed in case the actual layer does not exist.
+    layerKey: string,
+    layer: AreaLayerDefinition | null,
+    brush: TileGridDefinition | null,
+    defaultBrush: TileGridDefinition | null,
+    rectangle: ShortRectangle,
 ): void {
     const w = 16, h = 16;
-    const sy = Math.floor((state.camera.y + y) / h);
-    const sx = Math.floor((state.camera.x + x) / w);
-    for (let y = 0; y < selectedTiles.h; y++) {
-        const ty = sy + y;
-        for (let x = 0; x < selectedTiles.w; x++) {
-            const tx = sx + x;
-            const tile = allTiles[selectedTiles.tiles[y][x]];
+    for (let y = 0; y < rectangle.h; y++) {
+        const ty = rectangle.y + y;
+        if (ty < 0 || ty >= 32) continue;
+        for (let x = 0; x < rectangle.w; x++) {
+            const tx = rectangle.x + x;
+            if (tx < 0 || tx >= 32) continue;
+            let tile = null;
+            // The brush is used if it is defined.
+            if (brush) {
+                tile = allTiles[brush.tiles[y][x]];
+            } else if (defaultBrush) {
+                // If no brush is defined, check if the default brush applies, otherwise use the existing
+                // layer tile if present.
+                const defaultTile = allTiles[defaultBrush.tiles[y][x]];
+                const defaultLayer = defaultTile?.behaviors?.defaultLayer ?? 'floor';
+                if (defaultLayer === layerKey) {
+                    tile = defaultTile;
+                } else if (layer) {
+                    tile = allTiles[layer.grid.tiles[ty][tx]];
+                }
+            }else if (layer) {
+                // If there is no brush or default brush just use the existing layer tile if present
+                tile = allTiles[layer.grid.tiles[ty][tx]];
+            }
             if (tile) {
                 drawFrame(context, tile.frame, {x: tx * w, y: ty * h, w, h});
             }
