@@ -545,7 +545,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             if (closestLiftableTileCoords) {
                 for (const layer of hero.area.layers) {
                     const tile: FullTile = layer.tiles[closestLiftableTileCoords.y][closestLiftableTileCoords.x];
-                    const behavior = tile.behaviors;
+                    const behavior = tile?.behaviors;
                     if (behavior?.pickupWeight <= state.hero.passiveTools.gloves) {
                         hero.pickUpTile = tile;
                         destroyTile(state, hero.area, {...closestLiftableTileCoords, layerKey: layer.key});

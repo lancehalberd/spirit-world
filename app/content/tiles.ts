@@ -44,7 +44,7 @@ const lightStoneBehavior: TileBehaviors = {
 
 const heavyStoneBehavior: TileBehaviors = {
     defaultLayer: 'field',
-    low: true, solid: true, pickupWeight: 1, lootTable: moneyLootTable,
+    low: true, solid: true, pickupWeight: 2, lootTable: moneyLootTable,
     particles: heavyStoneParticles,
     linkableTiles: [187, 188],
     linkedOffset: 179,
