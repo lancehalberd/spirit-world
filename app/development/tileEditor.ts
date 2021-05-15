@@ -170,6 +170,10 @@ export function startEditing(state: GameState) {
 export function stopEditing(state: GameState) {
     hidePropertyPanel();
     hideLeftPanel();
+    if (editingState.selectedLayerIndex >= 0) {
+        delete editingState.selectedLayerIndex;
+        enterLocation(state, state.location);
+    }
     state.areaInstance.tilesDrawn = [];
     state.areaInstance.checkToRedrawTiles = true;
 }

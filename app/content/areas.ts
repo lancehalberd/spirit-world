@@ -466,7 +466,7 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
         checkToRedrawTiles: true,
         layers: definition.layers.filter((layer, index) => {
             // The selected layer is always visible.
-            if (editingState.selectedLayerIndex === index) {
+            if (editingState.isEditing && editingState.selectedLayerIndex === index) {
                 return true;
             }
             // visibilityOverride dictates state of layers if they are not selected and it is set to show/hide.
