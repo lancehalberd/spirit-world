@@ -232,7 +232,9 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
     }
     for (let i = 0; i < state.areaInstance.definition.layers.length; i++) {
         const definition = state.areaInstance.definition.layers[i];
+        const alternateDefinition = state.areaInstance.alternateArea.definition.layers[i];
         const layer: AreaLayer | null = state.areaInstance.layers.find(layer => layer.definition === definition);
+        const alternateLayer: AreaLayer | null = state.areaInstance.alternateArea.layers.find(layer => layer.definition === alternateDefinition);
         let row: PropertyRow = [
         {
             name: '',
@@ -240,8 +242,12 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
             value: definition.key,
             onChange(key: string) {
                 definition.key = key;
+                alternateDefinition.key = key;
                 if (layer) {
                     layer.key = key;
+                }
+                if (alternateLayer) {
+                    alternateLayer.key = key;
                 }
                 displayTileEditorPropertyPanel();
             },
@@ -252,8 +258,6 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
                 id: `layer-${i}-select`,
                 onClick() {
                     editingState.selectedLayerIndex = i;
-                    // Recreate the area when selecting a layer since this may display
-                    // layers hidden by logic
                     enterLocation(state, state.location);
                     displayTileEditorPropertyPanel();
                 }
@@ -264,8 +268,6 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
                 id: `layer-${i}-unselect`,
                 onClick() {
                     delete editingState.selectedLayerIndex;
-                    // Recreate the area when selecting a layer since this may display
-                    // layers hidden by logic
                     enterLocation(state, state.location);
                     displayTileEditorPropertyPanel();
                 }
@@ -279,8 +281,10 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
             onChange(visibilityOverride: 'auto' | 'show' | 'hide') {
                 if (visibilityOverride === 'auto') {
                     delete definition.visibilityOverride;
+                    delete alternateDefinition.visibilityOverride;
                 } else {
                     definition.visibilityOverride = visibilityOverride;
+                    alternateDefinition.visibilityOverride = visibilityOverride;
                 }
                 // Calling this will instantiate the area again and place the player back in their current location.
                 enterLocation(state, state.location);
@@ -293,13 +297,12 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
                 name: 'X',
                 id: `layer-${i}-delete`,
                 onClick() {
-                    state.areaInstance.layers.splice(i, 1);
                     state.areaInstance.definition.layers.splice(i, 1);
-                    state.areaInstance.tilesDrawn = [];
-                    state.areaInstance.checkToRedrawTiles = true;
+                    state.areaInstance.alternateArea.definition.layers.splice(i, 1);
                     if (editingState.selectedLayerIndex >= state.areaInstance.layers.length) {
                         editingState.selectedLayerIndex = state.areaInstance.layers.length - 1;
                     }
+                    enterLocation(state, state.location);
                     displayTileEditorPropertyPanel();
                 },
             });
@@ -315,8 +318,8 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
                 values: ['background', 'foreground'] as DrawPriority[],
                 onChange(drawPriority: DrawPriority) {
                     definition.drawPriority = drawPriority;
-                    state.areaInstance.tilesDrawn = [];
-                    state.areaInstance.checkToRedrawTiles = true;
+                    alternateDefinition.drawPriority = drawPriority;
+                    enterLocation(state, state.location);
                 },
             }];
             row.push({
@@ -326,17 +329,16 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
                     if (i <= 0) {
                         return;
                     }
-                    state.areaInstance.layers[i] = state.areaInstance.layers[i - 1];
                     state.areaInstance.definition.layers[i] = state.areaInstance.definition.layers[i - 1];
-                    state.areaInstance.layers[i - 1] = layer;
                     state.areaInstance.definition.layers[i - 1] = definition;
-                    state.areaInstance.tilesDrawn = [];
-                    state.areaInstance.checkToRedrawTiles = true;
+                    state.areaInstance.alternateArea.definition.layers[i] = state.areaInstance.alternateArea.definition.layers[i - 1];
+                    state.areaInstance.alternateArea.definition.layers[i - 1] = alternateDefinition;
                     if (editingState.selectedLayerIndex === i - 1) {
                         editingState.selectedLayerIndex = i;
                     } else if (editingState.selectedLayerIndex === i) {
                         editingState.selectedLayerIndex = i - 1;
                     }
+                    enterLocation(state, state.location);
                     displayTileEditorPropertyPanel();
                 },
             });
@@ -349,8 +351,10 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
                 onChange(logicKey: string) {
                     if (logicKey === 'none') {
                         delete definition.logicKey;
+                        delete alternateDefinition.logicKey;
                     } else {
                         definition.logicKey = logicKey;
+                        alternateDefinition.logicKey = logicKey;
                     }
                     // Calling this will instantiate the area again and place the player back in their current location.
                     enterLocation(state, state.location);
@@ -364,17 +368,16 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
                     if (i >= state.areaInstance.layers.length - 1) {
                         return;
                     }
-                    state.areaInstance.layers[i] = state.areaInstance.layers[i + 1];
                     state.areaInstance.definition.layers[i] = state.areaInstance.definition.layers[i + 1];
-                    state.areaInstance.layers[i + 1] = layer;
                     state.areaInstance.definition.layers[i + 1] = definition;
-                    state.areaInstance.tilesDrawn = [];
-                    state.areaInstance.checkToRedrawTiles = true;
+                    state.areaInstance.alternateArea.definition.layers[i] = state.areaInstance.alternateArea.definition.layers[i + 1];
+                    state.areaInstance.alternateArea.definition.layers[i + 1] = alternateDefinition;
                     if (editingState.selectedLayerIndex === i + 1) {
                         editingState.selectedLayerIndex = i;
                     } else if (editingState.selectedLayerIndex === i) {
                         editingState.selectedLayerIndex = i + 1;
                     }
+                    enterLocation(state, state.location);
                     displayTileEditorPropertyPanel();
                 },
             });
@@ -410,33 +413,9 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
             initializeAreaLayerTiles(layerDefinition);
             initializeAreaLayerTiles(alternateLayerDefinition);
             definition.layers.push(layerDefinition);
-            alternateDefinition.layers.push(layerDefinition);
+            alternateDefinition.layers.push(alternateLayerDefinition);
             // Calling this will instantiate the area again and place the player back in their current location.
             enterLocation(state, state.location);
-            /*state.areaInstance.layers.push({
-                definition: layerDefinition,
-                ...layerDefinition,
-                ...layerDefinition.grid,
-                tiles: mapTileNumbersToFullTiles(layerDefinition.grid.tiles),
-                originalTiles: mapTileNumbersToFullTiles(layerDefinition.grid.tiles),
-            });
-            state.alternateAreaInstance.layers.push({
-                definition: alternateLayerDefinition,
-                ...alternateLayerDefinition,
-                ...alternateLayerDefinition.grid,
-                tiles: mapTileNumbersToFullTiles(alternateLayerDefinition.grid.tiles),
-                originalTiles: mapTileNumbersToFullTiles(alternateLayerDefinition.grid.tiles),
-            });
-            applyLayerToBehaviorGrid(state.areaInstance.behaviorGrid, layerDefinition,
-                state.areaInstance.definition.isSpiritWorld ? null : alternateLayerDefinition);
-            applyLayerToBehaviorGrid(state.alternateAreaInstance.behaviorGrid, alternateLayerDefinition,
-                state.areaInstance.definition.isSpiritWorld ? layerDefinition : null);
-            editingState.selectedLayerIndex = _.findIndex(state.areaInstance.layers, { key });
-            state.areaInstance.tilesDrawn = [];
-            state.alternateAreaInstance.tilesDrawn = [];
-            state.areaInstance.checkToRedrawTiles = true;
-            state.alternateAreaInstance.checkToRedrawTiles = true;
-            */
             displayTileEditorPropertyPanel();
         }
     });
@@ -740,6 +719,7 @@ function drawBrush(x: number, y: number): void {
     const area = state.areaInstance;
     for (const layer of area.layers) {
         const layerDefinition = layer.definition;
+        const layerIndex = area.definition.layers.indexOf(layerDefinition);
         // When a layer is selected, only draw to it.
         if (editingState.selectedLayerIndex >= 0 && area.layers[editingState.selectedLayerIndex] !== layer) {
             continue;
@@ -777,7 +757,7 @@ function drawBrush(x: number, y: number): void {
                     tileRow[column] = tile;
                     layer.tiles[row][column] = allTiles[tile];
                     layer.originalTiles[row][column] = allTiles[tile];
-                    applyTileChangeToSpiritWorld(area.alternateArea, editingState.selectedLayerIndex, column, row, allTiles[tile]);
+                    applyTileChangeToSpiritWorld(area.alternateArea, layerIndex, column, row, allTiles[tile]);
                     state.areaInstance.tilesDrawn[row][column] = false;
                     state.areaInstance.checkToRedrawTiles = true;
                     resetTileBehavior(area, {x: column, y: row});
@@ -800,7 +780,7 @@ function drawBrush(x: number, y: number): void {
                 tileRow[column] = tile;
                 layer.tiles[row][column] = allTiles[tile];
                 layer.originalTiles[row][column] = allTiles[tile];
-                applyTileChangeToSpiritWorld(area.alternateArea, editingState.selectedLayerIndex, column, row, allTiles[tile]);
+                applyTileChangeToSpiritWorld(area.alternateArea, layerIndex, column, row, allTiles[tile]);
                 state.areaInstance.tilesDrawn[row][column] = false;
                 state.areaInstance.checkToRedrawTiles = true;
                 resetTileBehavior(area, {x: column, y: row});
@@ -889,7 +869,7 @@ export function selectSection() {
         };
     } else {
         for (const layer of state.areaInstance.definition.layers) {
-            editingState[layer.key] = getTileGridFromLayer(layer, state.areaSection);
+            editingState.brush[layer.key] = getTileGridFromLayer(layer, state.areaSection);
         }
     }
     updateBrushCanvas(editingState.brush);

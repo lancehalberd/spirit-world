@@ -14,6 +14,7 @@ export * from 'app/content/zones/cocoon';
 export * from 'app/content/zones/lakeTunnel';
 export * from 'app/content/zones/helix';
 export * from 'app/content/zones/waterfallCave';
+export * from 'app/content/zones/waterfallTower';
 export * from 'app/content/zones/sky';
 // Known remaining zones:
 // holy city interior

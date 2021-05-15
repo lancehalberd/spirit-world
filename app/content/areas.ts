@@ -58,6 +58,7 @@ export function getDefaultSpiritArea(location: ZoneLocation): AreaDefinition {
     return {
         default: true,
         parentDefinition,
+        isSpiritWorld: true,
         layers: [
             {
                 key: 'floor',
@@ -181,7 +182,7 @@ export function enterLocation(
             time: 0,
             type: 'fade',
         };
-        if (!!state.location.isSpiritWorld !== !!location.isSpiritWorld) {
+        if (!!state.location.isSpiritWorld !== !!location.isSpiritWorld && state.location.zoneKey === location.zoneKey) {
             state.transitionState.type = 'portal';
         } else if (state.location.zoneKey !== location.zoneKey) {
             state.transitionState.type = 'circle';
@@ -269,33 +270,38 @@ export function enterZoneByTarget(
         console.error(`Missing zone: ${zoneKey}`);
         return false;
     }
-    const inSpiritWorld = state.areaInstance.definition.isSpiritWorld;
     for (let floor = 0; floor < zone.floors.length; floor++) {
-        const areaGrid = inSpiritWorld ? zone.floors[floor].spiritGrid : zone.floors[floor].grid;
-        for (let y = 0; y < areaGrid.length; y++) {
-            for (let x = 0; x < areaGrid[y].length; x++) {
-                for (const object of (areaGrid[y][x]?.objects || [])) {
-                    if (object.id === targetObjectId && object !== skipObject) {
-                        enterLocation(state, {
-                            zoneKey,
-                            floor,
-                            areaGridCoords: {x, y},
-                            x: object.x,
-                            y: object.y,
-                            d: state.hero.d,
-                            isSpiritWorld: inSpiritWorld,
-                        }, instant, () => {
-                            const target = findObjectInstanceById(state.areaInstance, targetObjectId);
-                            if (target?.getHitbox) {
-                                const hitbox = target.getHitbox(state);
-                                state.hero.x = hitbox.x + hitbox.w / 2 - state.hero.w / 2;
-                                state.hero.y = hitbox.y + hitbox.h / 2 - state.hero.h / 2;
-                                setAreaSection(state, state.hero.d, true);
-                                updateCamera(state, 512);
-                            }
-                            callback?.();
-                        });
-                        return true;
+        // Search the corresponding spirit/material world before checking in the alternate world.
+        const areaGrids = state.areaInstance.definition.isSpiritWorld
+            ? [zone.floors[floor].spiritGrid, zone.floors[floor].grid]
+            : [zone.floors[floor].grid, zone.floors[floor].spiritGrid];
+        for( const areaGrid of areaGrids){
+            const inSpiritWorld = areaGrid === zone.floors[floor].spiritGrid;
+            for (let y = 0; y < areaGrid.length; y++) {
+                for (let x = 0; x < areaGrid[y].length; x++) {
+                    for (const object of (areaGrid[y][x]?.objects || [])) {
+                        if (object.id === targetObjectId && object !== skipObject) {
+                            enterLocation(state, {
+                                zoneKey,
+                                floor,
+                                areaGridCoords: {x, y},
+                                x: object.x,
+                                y: object.y,
+                                d: state.hero.d,
+                                isSpiritWorld: inSpiritWorld,
+                            }, instant, () => {
+                                const target = findObjectInstanceById(state.areaInstance, targetObjectId);
+                                if (target?.getHitbox) {
+                                    const hitbox = target.getHitbox(state);
+                                    state.hero.x = hitbox.x + hitbox.w / 2 - state.hero.w / 2;
+                                    state.hero.y = hitbox.y + hitbox.h / 2 - state.hero.h / 2;
+                                    setAreaSection(state, state.hero.d, true);
+                                    updateCamera(state, 512);
+                                }
+                                callback?.();
+                            });
+                            return true;
+                        }
                     }
                 }
             }
