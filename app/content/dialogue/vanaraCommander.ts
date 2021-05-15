@@ -23,6 +23,7 @@ dialogueHash.vanaraCommander = {
                 zones: [],
             },
             isExclusive: true,
+            progressFlag: 'elementalBeastsEscaped',
             text: [
                 `I'm impressed that you've made it all the way to the top of the Helix!
                 {|}You might have already realized this, but we Vanara aren't from this world,

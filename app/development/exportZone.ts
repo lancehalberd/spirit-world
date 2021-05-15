@@ -66,6 +66,8 @@ export function serializeZone(zone: Zone) {
                             lines.push(`            key: '${layer.key}',`);
                             if (layer.x) lines.push(`            x: ${layer.x},`);
                             if (layer.y) lines.push(`            y: ${layer.y},`);
+                            if (layer.drawPriority) lines.push(`            drawPriority: '${layer.drawPriority}',`);
+                            if (layer.logicKey) lines.push(`            logicKey: '${layer.logicKey}',`);
                             if (layer.grid) {
                                 lines.push('            grid: {');
                                 lines.push(`                w: ${layer.grid.w},`);

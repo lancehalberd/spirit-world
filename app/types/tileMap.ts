@@ -118,6 +118,7 @@ export interface AreaLayerDefinition {
     logicKey?: string,
     drawPriority?: DrawPriority,
     grid?: TileGridDefinition,
+    // This is not saved on export and is just used when editing.
     visibilityOverride?: 'show' | 'hide',
     // Coordinates for the layer origin, if not (0, 0).
     x?: number,

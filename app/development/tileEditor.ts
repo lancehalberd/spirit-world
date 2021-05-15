@@ -226,17 +226,19 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
     if (!editingState.showFieldProperties) {
         return rows;
     }
-    for (let i = 0; i < state.areaInstance.layers.length; i++) {
-        const layer = state.areaInstance.layers[i];
-        const definition = layer.definition;
+    for (let i = 0; i < state.areaInstance.definition.layers.length; i++) {
+        const definition = state.areaInstance.definition.layers[i];
+        const layer: AreaLayer | null = state.areaInstance.layers.find(layer => layer.definition === definition);
         let row: PropertyRow = [
         {
             name: '',
             id: `layer-${i}-key`,
-            value: layer.key,
+            value: definition.key,
             onChange(key: string) {
-                layer.key = key
                 definition.key = key;
+                if (layer) {
+                    layer.key = key;
+                }
                 displayTileEditorPropertyPanel();
             },
         }];
@@ -246,8 +248,9 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
                 id: `layer-${i}-select`,
                 onClick() {
                     editingState.selectedLayerIndex = i;
-                    state.areaInstance.tilesDrawn = [];
-                    state.areaInstance.checkToRedrawTiles = true;
+                    // Recreate the area when selecting a layer since this may display
+                    // layers hidden by logic
+                    enterLocation(state, state.location);
                     displayTileEditorPropertyPanel();
                 }
             })
@@ -257,8 +260,9 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
                 id: `layer-${i}-unselect`,
                 onClick() {
                     delete editingState.selectedLayerIndex;
-                    state.areaInstance.tilesDrawn = [];
-                    state.areaInstance.checkToRedrawTiles = true;
+                    // Recreate the area when selecting a layer since this may display
+                    // layers hidden by logic
+                    enterLocation(state, state.location);
                     displayTileEditorPropertyPanel();
                 }
             })
@@ -321,7 +325,7 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
                     state.areaInstance.layers[i] = state.areaInstance.layers[i - 1];
                     state.areaInstance.definition.layers[i] = state.areaInstance.definition.layers[i - 1];
                     state.areaInstance.layers[i - 1] = layer;
-                    state.areaInstance.definition.layers[i - 1] = layer.definition;
+                    state.areaInstance.definition.layers[i - 1] = definition;
                     state.areaInstance.tilesDrawn = [];
                     state.areaInstance.checkToRedrawTiles = true;
                     if (editingState.selectedLayerIndex === i - 1) {
@@ -359,7 +363,7 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
                     state.areaInstance.layers[i] = state.areaInstance.layers[i + 1];
                     state.areaInstance.definition.layers[i] = state.areaInstance.definition.layers[i + 1];
                     state.areaInstance.layers[i + 1] = layer;
-                    state.areaInstance.definition.layers[i + 1] = layer.definition;
+                    state.areaInstance.definition.layers[i + 1] = definition;
                     state.areaInstance.tilesDrawn = [];
                     state.areaInstance.checkToRedrawTiles = true;
                     if (editingState.selectedLayerIndex === i + 1) {

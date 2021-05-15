@@ -172,6 +172,8 @@ const cocoonStartState = applyItems(warTempleBoss, {maxLife: 1, astralProjection
 const helixStartState = applyItems(cocoonStartState, {maxLife: 1, teleportation: 1, invisibility: 1},
     ['cocoonTeleporter', 'lakeTunneBoss']);
 helixStartState.hero.rightTool = 'invisibility';
+const helixEndState = applyItems(helixStartState, {charge: 1, staff: 1},
+    ['elementalBeastsEscaped']);
 
 
 const spawnLocations = {
@@ -210,6 +212,10 @@ const spawnLocations = {
     'Helix Start': {
         location: SPAWN_HELIX_ENTRANCE,
         savedState: helixStartState,
+    },
+    'Helix End': {
+        location: SPAWN_LOCATION_PEACH_CAVE_EXIT,
+        savedState: helixEndState,
     },
 };
 window['spawnLocations'] = spawnLocations;

@@ -2,9 +2,11 @@ import _ from 'lodash';
 
 import { changeObjectStatus, createObjectInstance, findObjectInstanceById } from 'app/content/objects';
 import { allTiles } from 'app/content/tiles';
+import { logicHash, isLogicValid } from 'app/content/logic';
 import { dropItemFromTable } from 'app/content/lootObject';
 import { checkToUpdateSpawnLocation } from 'app/content/spawnLocations';
 import { zones } from 'app/content/zones';
+import { editingState } from 'app/development/tileEditor';
 import { createCanvasAndContext } from 'app/dom';
 import { checkForFloorEffects } from 'app/moveActor';
 import { isPointInShortRect } from 'app/utils/index';
@@ -462,7 +464,32 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
         behaviorGrid,
         tilesDrawn: [],
         checkToRedrawTiles: true,
-        layers: definition.layers.map(layer => ({
+        layers: definition.layers.filter((layer, index) => {
+            // The selected layer is always visible.
+            if (editingState.selectedLayerIndex === index) {
+                return true;
+            }
+            // visibilityOverride dictates state of layers if they are not selected and it is set to show/hide.
+            if (layer.visibilityOverride === 'show') {
+                return true;
+            }
+            if (layer.visibilityOverride === 'hide') {
+                return false;
+            }
+            // Layers without logic are visible by default.
+            if (!layer.logicKey) {
+                return true;
+            }
+            const logic = logicHash[layer.logicKey];
+            // Logic should never be missing, so surface an error and hide the layer.
+            if (!logic) {
+                console.error('Missing logic!', layer.logicKey);
+                debugger;
+                return false;
+            }
+            // If the layer has logic, only display it if the logic is valid.
+            return isLogicValid(state, logic);
+        }).map(layer => ({
             definition: layer,
             ...layer,
             ...layer.grid,
@@ -475,20 +502,22 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
         context,
         cameraOffset: {x: 0, y: 0},
     };
-    for (let i = 0; i < definition.layers.length; i++) {
-        applyLayerToBehaviorGrid(behaviorGrid, definition.layers[i], definition.parentDefinition?.layers[i]);
+    for (const layer of instance.layers) {
+        const definitionIndex = definition.layers.indexOf(layer.definition);
+        applyLayerToBehaviorGrid(behaviorGrid, instance.definition.layers[definitionIndex], definition.parentDefinition?.layers[definitionIndex]);
     }
     if (definition.parentDefinition) {
-        for (let l = 0; l < instance.layers.length; l++) {
-            for (let y = 0; y < instance.layers[l].tiles.length; y++) {
-                for (let x = 0; x < instance.layers[l].tiles[y].length; x++) {
-                    if (!instance.layers[l].tiles[y][x]) {
-                        const parentTile = allTiles[definition.parentDefinition.layers[l].grid.tiles[y][x]];
+        for (const layer of instance.layers) {
+            const definitionIndex = definition.layers.indexOf(layer.definition);
+            for (let y = 0; y < layer.tiles.length; y++) {
+                for (let x = 0; x < layer.tiles[y].length; x++) {
+                    if (!layer.tiles[y][x]) {
+                        const parentTile = allTiles[definition.parentDefinition.layers[definitionIndex].grid.tiles[y][x]];
                         // Tiles with linked offsets map to different tiles than the parent definition.
                         const linkedOffset = parentTile?.behaviors?.linkedOffset || 0;
                         const tile = linkedOffset ? allTiles[parentTile.index + linkedOffset] : parentTile;
-                        instance.layers[l].tiles[y][x] = tile;
-                        instance.layers[l].originalTiles[y][x] = tile;
+                        layer.tiles[y][x] = tile;
+                        layer.originalTiles[y][x] = tile;
                     }
                 }
 
@@ -531,8 +560,8 @@ export function refreshSection(state: GameState, area: AreaInstance, section: Sh
         const row = section.y + y;
         for (let x = 0; x < section.w; x++) {
             const column = section.x + x;
-            for (let l = 0; l < area.definition.layers.length; l++) {
-                area.layers[l].tiles[row][column] = area.layers[l].originalTiles[row][column];
+            for (const layer of area.layers) {
+                layer.tiles[row][column] = layer.originalTiles[row][column];
             }
             resetTileBehavior(area, {x: column, y: row});
             if (area.tilesDrawn[row]?.[column]) {

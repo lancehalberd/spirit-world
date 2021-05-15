@@ -214,7 +214,7 @@ function checkToRedrawTiles(area: AreaInstance) {
             }
         }
     }
-    area.layers.map((layer, index) => renderLayer(area, layer, area.definition.parentDefinition?.layers[index], index >= 2));
+    area.layers.map((layer, index) => renderLayer(area, layer, area.definition.parentDefinition?.layers[index]));
     for (let y = 0; y < area.h; y++) {
         if (!area.tilesDrawn[y]) {
             area.tilesDrawn[y] = [];
@@ -396,8 +396,9 @@ export function renderAreaObjectsAfterHero(context: CanvasRenderingContext2D, st
     context.restore();
 }
 
-export function renderLayer(area: AreaInstance, layer: AreaLayer, parentLayer: AreaLayerDefinition, isForeground: boolean): void {
+export function renderLayer(area: AreaInstance, layer: AreaLayer, parentLayer: AreaLayerDefinition): void {
     // Create foreground canvas only as needed.
+    const isForeground = (layer.definition.drawPriority ?? layer.definition.key) === 'foreground';
     if (isForeground && !area.foregroundContext) {
         [area.foregroundCanvas, area.foregroundContext] = createCanvasAndContext(
             16 * layer.definition.grid.w,

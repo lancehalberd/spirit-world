@@ -19,9 +19,6 @@ Graphics:
 
 
 Current tasks:
-    - Select logic id (controls whether layer is applied when creating instance)
-    - Select draw priority background or foreground
-
     - Decided what to work on next.
     - Do a run through to check for bugs.
 
