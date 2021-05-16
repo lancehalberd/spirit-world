@@ -25,7 +25,7 @@ import { updateCamera } from 'app/updateCamera';
 import { updateField } from 'app/updateField';
 import { areAllImagesLoaded } from 'app/utils/images';
 
-import { ActiveTool, DialogueLootDefinition, GameState } from 'app/types';
+import { ActiveTool, DialogueLootDefinition, Equipment, GameState } from 'app/types';
 
 let isGameInitialized = false;
 export function update() {
@@ -202,7 +202,14 @@ function updateMenu(state: GameState) {
     if (state.hero.activeTools.clone) {
         selectableTools.push('clone');
     }
-    if(selectableTools.length) {
+    if (wasGameKeyPressed(state, GAME_KEY.UP) || wasGameKeyPressed(state, GAME_KEY.DOWN)) {
+        state.menuRow = (state.menuRow + 1) % 2;
+    }
+    if(!selectableTools.length && state.menuRow === 0) {
+        state.menuRow = 1;
+    }
+    if (state.menuRow === 0) {
+        // The first row is for selecting tools.
         const selectedTool = selectableTools[state.menuIndex];
         if (wasGameKeyPressed(state, GAME_KEY.LEFT)) {
             state.menuIndex = (state.menuIndex + selectableTools.length - 1) % selectableTools.length;
@@ -218,6 +225,31 @@ function updateMenu(state: GameState) {
                 state.hero.leftTool = state.hero.rightTool;
             }
             state.hero.rightTool = selectedTool;
+        }
+    } else {
+        // The second row is for equipping boots.
+        const selectableEquipment: Equipment[] = [null];
+        if (state.hero.equipment.ironBoots) {
+            selectableEquipment.push('ironBoots');
+        }
+        if (state.hero.equipment.cloudBoots) {
+            selectableEquipment.push('cloudBoots');
+        }
+        if (wasGameKeyPressed(state, GAME_KEY.LEFT)) {
+            state.menuIndex = (state.menuIndex + selectableEquipment.length - 1) % selectableEquipment.length;
+        } else if (wasGameKeyPressed(state, GAME_KEY.RIGHT)) {
+            state.menuIndex = (state.menuIndex + 1) % selectableEquipment.length;
+        } else if (wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL)
+            || wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL)
+            || wasGameKeyPressed(state, GAME_KEY.WEAPON)
+        ) {
+            const selectedEquipment = selectableEquipment[state.menuIndex];
+            if (!selectableEquipment || state.hero.equipedGear[selectedEquipment]) {
+                state.hero.equipedGear = {};
+            } else {
+                state.hero.equipedGear = {};
+                state.hero.equipedGear[selectedEquipment] = true;
+            }
         }
     }
 }
@@ -259,7 +291,14 @@ function updateDefeated(state: GameState) {
 
 function updateTransition(state: GameState) {
     state.transitionState.time += FRAME_LENGTH;
-    if (state.transitionState.type === 'portal') {
+    if (state.transitionState.type === 'diving' || state.transitionState.type === 'surfacing') {
+        if (state.transitionState.time === CIRCLE_WIPE_OUT_DURATION) {
+            enterLocation(state, state.transitionState.nextLocation, true);
+            state.transitionState.callback?.();
+            updateCamera(state);
+            state.transitionState = null;
+        }
+    } else if (state.transitionState.type === 'portal') {
         if (state.transitionState.time === CIRCLE_WIPE_OUT_DURATION) {
             enterLocation(state, state.transitionState.nextLocation, true);
             state.transitionState.callback?.();

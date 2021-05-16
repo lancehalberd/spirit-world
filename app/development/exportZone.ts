@@ -104,6 +104,12 @@ export function serializeZone(zone: Zone) {
 
     lines.push(`zones.${zone.key} = {`);
     lines.push(`    key: '${zone.key}',`);
+    if (zone.surfaceKey) {
+        lines.push(`    surfaceKey: '${zone.surfaceKey}',`);
+    }
+    if (zone.underwaterKey) {
+        lines.push(`    underwaterKey: '${zone.underwaterKey}',`);
+    }
     lines.push(`    floors: [`);
     for (let floorIndex = 0; floorIndex < zone.floors.length; floorIndex++) {
         let areaGrid = zone.floors[floorIndex].grid;

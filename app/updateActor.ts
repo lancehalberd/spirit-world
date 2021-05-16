@@ -73,6 +73,11 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
     const area = hero.area;
     let dx = 0, dy = 0;
     let movementSpeed = 2;
+    if (hero.equipedGear.ironBoots) {
+        movementSpeed *= 0.5;
+    } else if (hero.equipedGear.cloudBoots) {
+        movementSpeed *= 2;
+    }
 
     const { w, h, section } = getAreaSize(state);
 
@@ -103,6 +108,25 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         hero.x += 4 * dx;
         hero.y += 4 * dy;
         if (dx || dy) hero.d = getDirection(dx, dy);
+    } else if (hero.swimming && hero.equipedGear.ironBoots && state.zone.underwaterKey) {
+        enterLocation(state, {
+            ...state.location,
+            zoneKey: state.zone.underwaterKey,
+            x: hero.x,
+            y: hero.y,
+        }, false);
+        hero.swimming = false;
+        hero.wading = false;
+        return;
+    } else if (state.zone.surfaceKey && !hero.equipedGear.ironBoots) {
+        enterLocation(state, {
+            ...state.location,
+            zoneKey: state.zone.surfaceKey,
+            x: hero.x,
+            y: hero.y,
+        }, false);
+        hero.swimming = true;
+        return;
     } else if (!isAstralProjection && state.nextAreaInstance) {
         movementSpeed = 0;
         if (state.nextAreaInstance.cameraOffset.x && state.hero.action !== 'entering') {
@@ -130,7 +154,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         hero.y += 0.5;
         //dy = 1;
     } else if (!isAstralProjection && hero.action === 'climbing') {
-        movementSpeed = 1;
+        movementSpeed *= 0.5;
     }  else if (!isAstralProjection && hero.action === 'falling') {
         movementSpeed = 0;
         if (hero.animationTime >= fallAnimation.duration) {
@@ -198,7 +222,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             hero.action = null;
         }
     } else if (!isAstralProjection && hero.swimming) {
-        movementSpeed = 1.5;
+        movementSpeed *= 0.75;
         hero.action = null;
     } else if (hero.action === 'grabbing') {
         movementSpeed = 0;
@@ -243,7 +267,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             }
         }
     } else if (hero.pickUpTile || hero.pickUpObject) {
-        movementSpeed = 1.5;
+        movementSpeed *= 0.75;
     } else if (hero.action === 'throwing' ) {
         movementSpeed = 0;
         hero.actionFrame++;
@@ -311,7 +335,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         dx = 0;
         dy = 0;
     } else if (!isAstralProjection && hero.action === 'attack') {
-        movementSpeed = 1;
+        movementSpeed *= 0.5;
         hero.actionFrame++;
         if (hero.actionFrame === 6) {
         }
@@ -331,7 +355,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         }
     }
     if (heldChakram || hero.action === 'charging') {
-        movementSpeed = 1.5;
+        movementSpeed *= 0.75;
         if (!heldChakram) {
             hero.action = null;
             hero.actionDx = 0;

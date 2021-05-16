@@ -86,8 +86,16 @@ export class LootGetAnimation implements ObjectInstance {
 const equipToolMessage = '{|}Press {B_MENU} to open your menu.'
     + '{|}Select a tool and press {B_TOOL} to assign it.';
 
+const equipBootsMessage = '{|}Press {B_MENU} to open your menu.'
+    + '{|}Select boots and press {B_WEAPON} to equip them.'
+    + '{|}Press {B_WEAPON} again to unequip them.';
+
 function showLootMessage(state: GameState, lootType: LootType, lootLevel?: number, lootAmount?: number): void {
     switch (lootType) {
+        case 'ironBoots':
+            return showMessage(state, 'You found Iron Boots!' + equipBootsMessage
+                + '{|}Use the Iron Boots to explore under water but watch your breath!'
+                + '{|}Iron boots slow you down but keep you from slipping and being knocked back.');
         case 'bigKey':
             return showMessage(state, 'You found a special key!'
                 + '{|}This key can open all the special locks in this area!');
@@ -452,6 +460,9 @@ const lootFrames: Partial<{[key in LootType]: Frame}> = {
     spiritSight: createLootFrame('blue', 'SE'),
     teleportation: createLootFrame('blue', 'TE'),
     unknown: createLootFrame('black', '?'),
+    empty: createLootFrame('grey', '--'),
+    ironBoots: createLootFrame('grey', 'IB'),
+    cloudBoots: createLootFrame('grey', 'CB'),
     weapon: weaponFrame,
 };
 

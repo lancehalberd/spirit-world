@@ -189,6 +189,8 @@ const sf0_0x0: AreaDefinition = {
     ],
     objects: [
         {status: "normal", id: "waterfallTowerEntrance", x: 384, y: 400, targetZone: "overworld", targetObjectId: "waterfallTowerEntrance", type: "teleporter", saveStatus: undefined},
+        {status: "normal", id: "waterfallTower:s0:0x0-ironBoots-0", x: 336, y: 336, type: "chest", lootType: "ironBoots", lootAmount: 1, lootLevel: 1},
+        {status: "normal", id: "waterfallTower:s0:0x0-sign-0", x: 416, y: 336, style: "short", type: "sign", message: "Under Development!"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},

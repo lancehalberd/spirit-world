@@ -19,16 +19,51 @@ Graphics:
 
 
 Current tasks:
+    - Iron boots
+        - prevent knockback.
+    - Underwater
+        - Add peach cave underwater area + upper cliff underwater area.
+        - Add floating state for when you take off iron boots under water but cannot surface.
+        - Add sinking and floating animations when transitioning between surface and underwater areas.
+    - Being underwater without Varuna's blessing drains spirit energy in an accelerating fashion the same as invisibility, but slower
+        - Running out of spirit energy causes you to take 1 heart of damage spaced out by inv-frames.
+        - Bubbles or something allow you to regenerate spirit energy quickly when standing on them
     - Decided what to work on next.
-    - Do a run through to check for bugs.
+    - Do a run through to check for bugs + push latest version.
+    - Email John outline of River Temple dungeon
 
+River Temple:
+    - Half under water, half over water
+    - Surface entrance becomes accessible when the lake is frozen by using the fire element
+    - Under water entrance is accessible using iron boots from peach cave
+    - Boss is hydra with ice carapace that can be defeated using either fire element or iron boots to attack under water
+    - Boss breaks holes in ice by sticking heads out to attack. Player can use the holes to get under the ice.
+    - Boss refreezes shell and surface periodically or when damaged enough.
+    - Boss can't use ice attacks under the water, but the player has worse mobility as well.
+    - Some underwater enemies
+    - Some crab enemies with ice shells that require fire element to defeat
+    - Underwater floors and surface floors full of ice, at least one place to transition without fire element
+    - Temple unfreezes when boss is defeated
+    - Varuna's Blessing allows you to breathe under water, but can only be obtained after beating the boss or with the fire element.
+    - Beating boss with Fire element, iron boots and varuna's blessing is much easier than beating it with just fire element or iron boots.
+    - No NPCs here, this was the old Fertility Temple, but it was destroyed by the Varuna Ship crashing. The survivors all moved to the new Fertility Temple near the forest (Forest Temple).
+
+Iron Boots:
+    - Prevent knockback
+    - Always set slipping flag false (when implemented)
+
+Cloud Boots:
+    - Always set slipping flag true (when implemented)
+    - Allow running over clouds (when implemented)
+    - Maybe make falling in the sky behave like falling in a pit where you reset to safe location rather than falling to the overworld?
 
 High level list of things left to do:
-    New areas(need enemies, mechanics, bosses, entrances):
+    Missing non-dungeon areas:
         City
+        Underwater
+    New dungeons(need enemies, mechanics, bosses, entrances):
         Grand Temple
         Jade Palace
-        Waterfall Tower
         Staff Tower
         Sky Temple
         Forest Temple
@@ -36,13 +71,15 @@ High level list of things left to do:
         Forge
         River Temple
         Warship
-        Underwater
     Areas missing significant content:
         Cocoon
+        Waterfall Temple
     Missing Bosses for existing areas:
         Rival fight before Tomb
+        Tomb Boss
         Rival fight before Helix
         Cocoon Boss
+        Waterfall Temple Boss
     Missing mechanics:
         Difficulty shrines
         Underwater areas
@@ -75,6 +112,11 @@ Difficulty shrine:
     - Or second chance is only for boss, and have a single refill tank that you can charge like in metroid?
     - Remove boss webs
     - Reduce boss health
+    - Take 1/2 damage
+    - 1/2 boss life
+    - easier traps (disable conveyer belts, remove spikes)
+    - easier puzzles (required chests are made distinct from optional chests, positions of required items are moved to more easily accessible locations)
+
 
 Charge Chakram Attack:
     - Maybe change level 1 charge to spin around hero in a circle twice? Brief 0.5s invulnerability with attack animation.
@@ -92,15 +134,8 @@ Additional Clone Tool Behavior:
     Charging the clone 1 level adds elements to the clones weapon/tools/explosion.
     Charging the clone 1 level without elements makes it invulnerable for 4 seconds.
 
-Quick Demo
-    - Start with 6 hearts + weapon
-    - Invisibility tool section
-    - Staff tool section
-    - Charge tool to unlock lvl 2 tools
-    - Combined tool puzzles
 
-
-Peach Cave Improvemnts:
+Peach Cave Improvements:
     - Add enemies:
         - Eggs that hatch into enemies if not destroyed first
         - Vine enemies that can be knocked to the ground
@@ -146,25 +181,11 @@ Add ability to charge carried objects
     Should add selected element to thrown object
 
 
-Add astral projection + telekinesis abilities
-    - if astral projection is available, you can move around (need to press passive tool on body to return or press something else to return instantly?)
-    - if telekinesis you can pick up real objects if they have stable spirit elements (possibly limited by telekinesis level)
-
-
-Add upstairs/downstairs:
-    Same definition as door, but different graphics + animation
-        - targets are opposite stair types.
-        - log error if stairs without target are found
-            - Maybe log error if stairs don't connect to either a different zone or the correct floor in current zone
-        - Link back to themselves if no target is defined.
-
-
 Improve Tool Selection:
-    - Track most recent input to control keyboard vs controller type
     - Color around the selection + HUD indicator should match the color of the controller button (blue + yellow for X-Box)
     - Display a letter attached to the selection based on the button/keyboard key.
 
-Additionl Invisibility Tool Behavior:
+Additional Invisibility Tool Behavior:
     Charge to deal elemental damage on contact while invisible.
     Can move through activatable crystals and some other obstacles.
         * charge invisibility then dodge roll through a line of crystals to activate them quickly.
@@ -199,20 +220,12 @@ Idea:
     Objects you can bounce off of when jumping
         - Just make them solid and knock the player back a bit if the player's y velocity is >= some value?
 
-Add offering shrines in dungeons that allow players to adjust the difficulty by paying 50 money:
-    - Take 1/2 damage
-    - 1/2 boss life
-    - easier traps (disable conveyer belts, remove spikes)
-    - easier puzzles (required chests are made distinct from optional chests, positions of required items are moved to more easily accessible locations)
-
 Include some random dungeon design in the base game:
     - Location of key under object might change (there should be some clue where it is or use spirit sight).
     - Something like peg cave, but only a single peg needs to be pressed to open it (spirit sight reveals which?).
     - Something like Eastern Palace Foyer except the correct door isn't always the center door.
 
 Keep in mind significance of design elements for future racing/randomizer.
-
-Add quick tool select ring on the right analog stick.
 
 Support 64x64 super tiles for world map. Or maybe just 48x48. Probably add this after Spirit World mechanics to make sure they perform okay together.
 
@@ -222,8 +235,7 @@ Possible tool: Leather boots let you walk on thorny ground without taking damage
 
 Dungeon flavor philosophy:
     All Vanara structures are part of the Vanara ship and related to some functionality, such as the regeneration pods.
-    Vanara spirit structures allow free exploration in astral projection because Vanara spirits can tether to the Vanara ship and leave their bodies behind. If the MC knows how to teleport, they can use this to free travel around the world.
-    All Native structures are built to native spirit gods who functioned as sevants to the old native spirit beings and were created for specific purposes like resource harvesting, processing and crafting.
+    All Native structures are built to native spirit gods who functioned as servants to the old native spirit beings and were created for specific purposes like resource harvesting, processing and crafting.
 
 
 Ability Locations:
@@ -241,8 +253,8 @@ Ability Locations:
 # Treasure Dungeons
     cloudBoots          Forest Temple Chest
     clone               Forest Temple Boss
-    invisibility 2      Waterfall Tower Boss
     ironBoots           Waterfall Tower Chest
+    invisibility 2      Waterfall Tower Boss
     gloves 2            Forge Chest
     goldMail            Forge Boss
     roll 2              Cloud Temple Chest

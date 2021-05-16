@@ -77,6 +77,7 @@ export interface Actor {
     animationTime: number,
     // like being knocked but doesn't stop MC charge or other actions.
     bounce?: {vx: number, vy: number, frames: number},
+    equipedGear?: {[key in Equipment]?: boolean},
     invisible?: boolean,
     jumpingTime?: number,
     // If this is set, the actor is being carried by a hero/clone.

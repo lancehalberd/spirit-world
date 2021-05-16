@@ -553,6 +553,9 @@ function getInventoryProperties(state: GameState, editingState: EditingState) {
         for (let tool in state.hero.equipment) {
             addTool(state.hero.equipment, tool);
         }
+        if (row.length) {
+            rows.push(row);
+        }
     }
     return rows;
 }
@@ -706,8 +709,8 @@ function updateBrushSelection(x: number, y: number): void {
         const layerDefinition = state.areaInstance.definition.layers[editingState.selectedLayerIndex];
         editingState.brush.none = getTileGridFromLayer(layerDefinition, rectangle);
     } else {
-        for (const layer of state.areaInstance.definition.layers) {
-            editingState.brush[layer.key] = getTileGridFromLayer(layer, rectangle);
+        for (const layerDefinition of state.areaInstance.definition.layers) {
+            editingState.brush[layerDefinition.key] = getTileGridFromLayer(layerDefinition, rectangle);
         }
     }
     updateBrushCanvas(editingState.brush);
@@ -804,8 +807,13 @@ function drawBrush(x: number, y: number): void {
 }
 function replaceTiles(x: number, y: number): void {
     const state = getState();
-    const layer = state.areaInstance.layers[editingState.selectedLayerIndex];
-    const parentLayer = state.areaInstance.definition.parentDefinition.layers.find(l => l.key === layer.key);
+    const layer = editingState.selectedLayerIndex >= 0
+        ? state.areaInstance.layers[editingState.selectedLayerIndex]
+        : (
+            state.areaInstance.layers.find(l => l.key === 'field')
+            || state.areaInstance.layers[state.areaInstance.layers.length - 1]
+        );
+    const parentLayer = state.areaInstance.definition.parentDefinition?.layers.find(l => l.key === layer.key)
     const w = 16, h = 16;
     const tile = layer.tiles[((state.camera.y + y) / h) | 0]?.[((state.camera.x + x) / w) | 0];
     const replacement: number = editingState.brush.none.tiles[0][0];

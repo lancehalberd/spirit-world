@@ -151,6 +151,12 @@ export interface AreaDefinition {
 
 export interface Zone {
     key: string,
+    // If this zone is an underwater area, this key is set to the zone key of the surface area.
+    // Travel to the surface is always from the top floor of the underwater zone to the bottom
+    // floor of the surface zone.
+    surfaceKey?: string,
+    // If this zone has a corresponding underwater area, this key is set to the zone key of the underwater area.
+    underwaterKey?: string,
     floors: Floor[],
 }
 
