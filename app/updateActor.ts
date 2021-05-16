@@ -73,9 +73,9 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
     const area = hero.area;
     let dx = 0, dy = 0;
     let movementSpeed = 2;
-    if (hero.equipedGear.ironBoots) {
+    if (hero.equipedGear?.ironBoots) {
         movementSpeed *= 0.5;
-    } else if (hero.equipedGear.cloudBoots) {
+    } else if (hero.equipedGear?.cloudBoots) {
         movementSpeed *= 2;
     }
 
@@ -108,7 +108,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         hero.x += 4 * dx;
         hero.y += 4 * dy;
         if (dx || dy) hero.d = getDirection(dx, dy);
-    } else if (hero.swimming && hero.equipedGear.ironBoots && state.zone.underwaterKey) {
+    } else if (hero.swimming && hero.equipedGear?.ironBoots && state.zone.underwaterKey) {
         enterLocation(state, {
             ...state.location,
             zoneKey: state.zone.underwaterKey,
@@ -118,7 +118,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         hero.swimming = false;
         hero.wading = false;
         return;
-    } else if (state.zone.surfaceKey && !hero.equipedGear.ironBoots) {
+    } else if (state.zone.surfaceKey && !hero.equipedGear?.ironBoots) {
         enterLocation(state, {
             ...state.location,
             zoneKey: state.zone.surfaceKey,
@@ -814,7 +814,7 @@ export function damageActor(
     if (actor.life <= 0) {
         return false;
     }
-    if (!overrideInvulnerability && (actor.action === 'roll' || actor.action === 'getItem')) {
+    if (!overrideInvulnerability && (actor.action === 'roll' || actor.action === 'getItem' || actor.action === 'jumpingDown')) {
         return false;
     }
     const hero = state.hero.activeClone || state.hero;

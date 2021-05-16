@@ -406,7 +406,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
             }
         }
     }
-    if (hero.swimming && hero.equipedGear.cloudBoots) {
+    if (hero.swimming && hero.equipedGear?.cloudBoots) {
         hero.swimming = false;
         hero.wading = true;
     }

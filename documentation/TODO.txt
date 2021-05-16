@@ -1,6 +1,7 @@
 Test at http://localhost:81/alttp/public/
 
 Low Priority Bugs:
+    - Double explosion when defeating the war temple boss.
     - Clean up attack effects on defeating bosses.
         - Need to set a flag on all attack effects so they are easy to find and remove.
     - Foreground only renders for the active area, should render for the alternate area as well.
@@ -9,6 +10,10 @@ Low Priority Bugs:
     - Doors don't appear open when moving into them from a different section
         I think this is because the door doesn't update until it is in the current areaInstance
     - nextAreaInstance is not rendered in Safari
+
+High Priority Bugs:
+
+
 
 Graphics:
     Sweat animation when pulling on something you cannot move.
@@ -19,6 +24,7 @@ Graphics:
 
 
 Current tasks:
+    - Increase range of frost beetles, figure out why frost grenade centers don't match blast center.
     - Iron boots
         - prevent knockback.
     - Underwater

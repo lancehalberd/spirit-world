@@ -208,8 +208,15 @@ export class HeldChakram implements ObjectInstance {
         removeObjectFromArea(state, this);
     }
     updatePosition() {
-        this.x = this.hero.x + 3 + this.vy * 5 + this.vx * 5;
-        this.y = this.hero.y + this.vx * 5 + this.vy * 5;
+        if (this.vx && this.vy) {
+            // When aiming diagonally, place the chakram in the aimed direction.
+            this.x = this.hero.x + 3 + this.vx * 5;
+            this.y = this.hero.y + this.vy * 5;
+        } else {
+            // When aiming cardinally, place the chakram in the left hand.
+            this.x = this.hero.x + 3 + this.vy * 5 + this.vx * 5;
+            this.y = this.hero.y - this.vx * 5 + this.vy * 5;
+        }
     }
     update(state: GameState) {
         // Held chakram is thrown if the hero no longer exists.
