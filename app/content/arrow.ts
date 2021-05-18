@@ -7,7 +7,7 @@ import { createAnimation, drawFrameAt, getFrame } from 'app/utils/animations';
 import { getDirection } from 'app/utils/field';
 import { rectanglesOverlap } from 'app/utils/index';
 
-import { AreaInstance, Clone, Direction, Frame, FrameAnimation, GameState, ObjectInstance, ObjectStatus } from 'app/types';
+import { AreaInstance, AstralProjection, Clone, Direction, Frame, FrameAnimation, GameState, Hero, ObjectInstance, ObjectStatus } from 'app/types';
 
 const upContent = {x: 5, y: 2, w: 6, h: 6};
 const downContent = {x: 5, y: 8, w: 6, h: 6};
@@ -166,6 +166,7 @@ export class Arrow implements ObjectInstance {
     h: number;
     vx: number;
     vy: number;
+    ignorePits = true;
     animationTime = 0;
     hitTargets: Set<any>;
     direction: Direction;
@@ -232,7 +233,7 @@ export class Arrow implements ObjectInstance {
             removeObjectFromArea(state, this);
             return;
         }
-        for (const object of state.areaInstance.objects) {
+        for (const object of this.area.objects) {
             if (object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
                 continue;
             }
@@ -258,16 +259,20 @@ export class Arrow implements ObjectInstance {
                 }
             }
         }
-        for (const target of getTilesInRectangle(this.area, this)) {
-            const area = state.areaInstance;
+        const area = this.area;
+        // If the object was removed by hitting an object, area will no longer be defined here.
+        if (!area) {
+            return;
+        }
+        for (const target of getTilesInRectangle(area, this)) {
             const behavior = area.behaviorGrid?.[target.y]?.[target.x];
             const bowLevel = state.hero.activeTools.bow;
             if (behavior?.cuttable <= bowLevel && !behavior?.low) {
                 // We need to find the specific cuttable layers that can be destroyed.
-                for (const layer of state.areaInstance.layers) {
+                for (const layer of area.layers) {
                     const tile = layer.tiles[target.y][target.x];
                     if (tile?.behaviors?.cuttable <= bowLevel) {
-                        destroyTile(state, state.areaInstance, {...target, layerKey: layer.key});
+                        destroyTile(state, area, {...target, layerKey: layer.key});
                     }
                 }
             } else if ((behavior?.cuttable > bowLevel || behavior?.solid) && !behavior?.low) {
@@ -293,15 +298,17 @@ export class Arrow implements ObjectInstance {
 
 export class EnemyArrow extends Arrow {
     hitTarget(state: GameState, object: ObjectInstance): boolean {
-        if (!(object instanceof Clone)) {
+        if (object !== state.hero && !(object instanceof Clone) && !(object instanceof AstralProjection)) {
             return;
         }
-        if (!this.hitTargets.has(object) && rectanglesOverlap(object, this)) {
-            damageActor(state, object, this.damage);
-            //this.hitTargets.add(object);
-            //this.stuckFrames = 1;
-            removeObjectFromArea(state, this);
-            return true;
+        const castObject = object as (Hero | Clone | AstralProjection);
+        if (!this.hitTargets.has(castObject) && rectanglesOverlap(castObject, this)) {
+            if (damageActor(state, castObject, this.damage)) {
+                //this.hitTargets.add(object);
+                //this.stuckFrames = 1;
+                removeObjectFromArea(state, this);
+                return true;
+            }
         }
     }
     update(state: GameState) {
@@ -310,12 +317,8 @@ export class EnemyArrow extends Arrow {
             removeObjectFromArea(state, this);
             return;
         }
-        if (!this.hitTargets.has(state.hero) && rectanglesOverlap(state.hero, this)) {
-            if (damageActor(state, state.hero, this.damage)) {
-                //this.hitTargets.add(state.hero);
-                //this.stuckFrames = 1;
-                removeObjectFromArea(state, this);
-            }
+        if (state.hero.area === this.area && this.hitTarget(state, state.hero)) {
+            return;
         }
         super.update(state);
     }

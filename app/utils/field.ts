@@ -1,4 +1,4 @@
-import { isPixelInShortRect } from 'app/utils/index';
+import { isPixelInShortRect, roundRect } from 'app/utils/index';
 
 import { AreaInstance, Direction, GameState, Hero, ObjectInstance, Tile, TileBehaviors } from 'app/types';
 
@@ -113,6 +113,35 @@ export function isPointOpen(
     return true;
 }
 
+export function getTileBehaviors(
+    state: GameState,
+    area: AreaInstance,
+    {x, y}: Tile,
+    nextArea: AreaInstance = null,
+): {tileBehavior: TileBehaviors, tx: number, ty: number} {
+    let tx = Math.floor(x / 16);
+    let ty = Math.floor(y / 16);
+    let definedBehavior = area?.behaviorGrid[ty]?.[tx];
+    if (!definedBehavior && nextArea) {
+        tx = Math.floor((x - nextArea.cameraOffset.x) / 16);
+        ty = Math.floor((y - nextArea.cameraOffset.y) / 16);
+        definedBehavior = nextArea?.behaviorGrid[ty]?.[tx];
+    }
+    const tileBehavior = {...(definedBehavior || {})};
+    if (tx < state.areaSection.x || tx >= state.areaSection.x + state.areaSection.w
+        || ty < state.areaSection.y || ty >= state.areaSection.y + state.areaSection.h) {
+        tileBehavior.outOfBounds = true;
+    }
+    // If the behavior has a bitmap for solid pixels, read the exact pixel to see if it is blocked.
+    if (tileBehavior.solidMap) {
+        const sy = (y | 0) % 16;
+        const sx = (x | 0) % 16;
+        // console.log(tileBehavior.solidMap, y, x, sy, sx, tileBehavior.solidMap[sy] >> (15 - sx));
+        tileBehavior.solid = !!(tileBehavior.solidMap[sy] >> (15 - sx) & 1);
+    }
+    return { tileBehavior, tx, ty };
+}
+
 export function getTileBehaviorsAndObstacles(
     state: GameState,
     area: AreaInstance,
@@ -149,7 +178,7 @@ export function getTileBehaviorsAndObstacles(
             continue;
         }
         if (object.getHitbox && (object.onPush || object.behaviors?.solid)) {
-            if (isPixelInShortRect(x, y, object.getHitbox(state))) {
+            if (isPixelInShortRect(x | 0, y | 0, roundRect(object.getHitbox(state)))) {
                 objects.push(object);
                 if (object.behaviors?.solid) {
                     tileBehavior.solid = true;
@@ -158,7 +187,7 @@ export function getTileBehaviorsAndObstacles(
         }
     }
     if (state.hero.area === area && !excludedObjects?.has(state.hero)) {
-        if (isPixelInShortRect(x, y, state.hero)) {
+        if (isPixelInShortRect(x | 0, y | 0, roundRect(state.hero))) {
             objects.push(state.hero);
             tileBehavior.solid = true;
         }

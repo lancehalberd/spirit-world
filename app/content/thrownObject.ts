@@ -29,6 +29,7 @@ export class ThrownObject implements ObjectInstance {
     type = 'thrownObject' as 'thrownObject';
     frame: Frame;
     particles: Frame[];
+    ignorePits = true;
     x: number;
     y: number;
     z: number;
@@ -87,11 +88,11 @@ export class ThrownObject implements ObjectInstance {
     breakOnImpact(state) {
         if (!this.broken) {
             this.broken = true;
-            removeObjectFromArea(state, this);
             addParticleAnimations(state, this.area, this.x, this.y, this.z, this.particles, this.behaviors);
             if (this.linkedObject && !this.linkedObject.broken) {
                 this.linkedObject.breakOnImpact(state);
             }
+            removeObjectFromArea(state, this);
         }
     }
     render(context, state: GameState) {

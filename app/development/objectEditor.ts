@@ -3,6 +3,7 @@ import _ from 'lodash';
 import { addObjectToArea, linkObject, removeObjectFromArea } from 'app/content/areas';
 import { dialogueHash } from 'app/content/dialogue';
 import { createObjectInstance } from 'app/content/objects';
+import { decorationTypes } from 'app/content/objects/decoration';
 import { doorStyles } from 'app/content/door';
 import { bossTypes, enemyTypes, enemyDefinitions } from 'app/content/enemy';
 import { npcBehaviors, npcStyles } from 'app/content/objects/npc';
@@ -15,8 +16,9 @@ import { isPointInShortRect } from 'app/utils/index';
 
 import {
     AreaDefinition, AreaInstance, BallGoalDefinition, BossType, CrystalSwitchDefinition, FloorSwitchDefinition,
-    FrameDimensions, Direction, EnemyType, GameState,
+    FrameDimensions, DecorationType, Direction, DrawPriority, EnemyType, GameState,
     LootType, MagicElement, NPCBehavior, NPCStyle, ObjectDefinition, ObjectStatus, ObjectType, PanelRows,
+    ShortRectangle,
     Zone, ZoneLocation,
 } from 'app/types';
 
@@ -43,7 +45,7 @@ export function getLootTypes(): LootType[] {
 }
 
 export const combinedObjectTypes: ObjectType[] = [
-    'ballGoal', 'bigChest', 'chest', 'crystalSwitch',
+    'ballGoal', 'bigChest', 'chest', 'crystalSwitch', 'decoration',
     'door', 'floorSwitch', 'loot','marker', 'npc', 'pitEntrance',
     'pushPull', 'rollingBall',  'sign', 'teleporter', 'tippable', 'waterPot',
 ];
@@ -120,6 +122,14 @@ export function createObjectDefinition(
                 params,
             };
         }
+        case 'decoration':
+            return {
+                ...commonProps,
+                type: definition.type,
+                w: definition.w || 16,
+                h: definition.h || 16,
+                decorationType: definition.decorationType || Object.keys(decorationTypes)[0] as DecorationType,
+            };
         case 'enemy': {
             const enemyType = definition.enemyType;
             const enemyDefinition = enemyDefinitions[enemyType];
@@ -305,6 +315,42 @@ export function getObjectProperties(state: GameState, editingState: EditingState
         },
     }]);
     switch (object.type) {
+        case 'decoration':
+            rows.push({
+                name: 'style',
+                value: object.decorationType,
+                values: Object.keys(decorationTypes),
+                onChange(decorationType: DecorationType) {
+                    object.decorationType = decorationType;
+                    updateObjectInstance(state, object);
+                },
+            });
+            rows.push({
+                name: 'layer',
+                value: object.drawPriority || 'foreground',
+                values: ['background', 'sprites', 'foreground'],
+                onChange(drawPriority: DrawPriority) {
+                    object.drawPriority = drawPriority;
+                    updateObjectInstance(state, object);
+                },
+            });
+            rows.push({
+                name: 'w',
+                value: object.w,
+                onChange(w: number) {
+                    object.w = w;
+                    updateObjectInstance(state, object);
+                },
+            });
+            rows.push({
+                name: 'h',
+                value: object.h,
+                onChange(h: number) {
+                    object.h = h;
+                    updateObjectInstance(state, object);
+                },
+            });
+            break;
         case 'door':
             rows.push({
                 name: 'direction',
@@ -774,16 +820,26 @@ export function getObjectFrame(object: ObjectDefinition): FrameDimensions {
     return getLootFrame({lootType: 'unknown'});
 }
 
+export function getObjectHitBox(object: ObjectDefinition): ShortRectangle {
+    const state = getState();
+    const instance = createObjectInstance(state, object);
+    if (instance.getHitbox) {
+        return instance.getHitbox(state);
+    }
+    let frame =  getObjectFrame(object);
+    const rectangle = {...frame, x: object.x, y: object.y};
+    if (frame.content) {
+        rectangle.x += frame.content.x;
+        rectangle.y += frame.content.y;
+        rectangle.w = frame.content.w;
+        rectangle.h = frame.content.h;
+    }
+    return rectangle;
+}
+
 export function isPointInObject(x: number, y: number, object: ObjectDefinition): boolean {
     const camera = getState().camera;
-    let frame =  {...getObjectFrame(object), x: object.x, y: object.y};
-    if (frame.content) {
-        frame.x += frame.content.x;
-        frame.y += frame.content.y;
-        frame.w = frame.content.w;
-        frame.h = frame.content.h;
-    }
-    return isPointInShortRect(x + camera.x, y + camera.y, frame);
+    return isPointInShortRect(x + camera.x, y + camera.y, getObjectHitBox(object));
 }
 
 function checkToAddLinkedObject(state: GameState, definition: ObjectDefinition): void {

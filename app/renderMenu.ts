@@ -3,7 +3,7 @@ import { LEFT_TOOL_COLOR, RIGHT_TOOL_COLOR, CANVAS_WIDTH, CANVAS_HEIGHT } from '
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { fillRect, pad } from 'app/utils/index';
 
-import { ActiveTool, GameState, LootType } from 'app/types';
+import { ActiveTool, Equipment, GameState, LootType } from 'app/types';
 
 const MARGIN = 20;
 
@@ -40,7 +40,9 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
         }
         fillRect(context, target, 'black');
         drawFrame(context, frame, target);
-        selectableItemFrames.push(target);
+        if (state.menuRow === 0) {
+            selectableItemFrames.push(target);
+        }
     }
     if (state.hero.activeTools.bow) {
         renderSelectableTool('bow');
@@ -62,6 +64,36 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
     if (state.hero.weapon) {
         const frame = getLootFrame({ lootType: 'weapon', lootLevel: state.hero.weapon });
         drawFrame(context, frame, {...frame, x: (x + 8 - frame.w / 2), y: (y + 8 - frame.h / 2)});
+    }
+
+    function renderBoots(equipment: Equipment): void {
+        const frame = getLootFrame({ lootType: equipment, lootLevel: state.hero.equipment[equipment] });
+        const target = {w: frame.content?.w ?? frame.w, h: frame.content?.h ?? frame.h, x, y};
+        if (state.hero.equipedGear[equipment]) {
+            fillRect(context, pad(target, 2), 'white');
+        }
+        fillRect(context, target, 'black');
+        drawFrame(context, frame, target);
+        if (state.menuRow === 1) {
+            selectableItemFrames.push(target);
+        }
+    }
+
+    x = r.x, y += 30;
+    const frame = getLootFrame({ lootType: 'empty' });
+    const target = {w: frame.content?.w ?? frame.w, h: frame.content?.h ?? frame.h, x, y};
+    fillRect(context, target, 'black');
+    drawFrame(context, frame, target);
+    if (state.menuRow === 1) {
+        selectableItemFrames.push(target);
+    }
+    x += 30;
+    if (state.hero.equipment.ironBoots) {
+        renderBoots('ironBoots');
+    }
+    x += 30;
+    if (state.hero.equipment.cloudBoots) {
+        renderBoots('cloudBoots');
     }
 
     if (selectableItemFrames.length) {

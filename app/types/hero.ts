@@ -8,7 +8,7 @@ import {
 } from 'app/types';
 
 export type Action =
-    'attack' | 'roll' | 'knocked' | 'hurt' | 'dead' | 'walking'
+    'attack' | 'charging' | 'roll' | 'knocked' | 'hurt' | 'dead' | 'walking'
     | 'pushing' | 'grabbing' | 'carrying' | 'throwing' | 'thrown' | 'getItem'
     | 'beingCarried' | 'entering' | 'exiting'
     | 'falling' | 'fallen' | 'meditating'
@@ -75,6 +75,10 @@ export interface Actor {
     actionFrame?: number,
     actionTarget?: any,
     animationTime: number,
+    // like being knocked but doesn't stop MC charge or other actions.
+    bounce?: {vx: number, vy: number, frames: number},
+    equipedGear?: {[key in Equipment]?: boolean},
+    invisible?: boolean,
     jumpingTime?: number,
     // If this is set, the actor is being carried by a hero/clone.
     carrier?: Hero,
@@ -87,7 +91,8 @@ export interface Actor {
     invulnerableFrames?: number,
     life: number,
     render: (context: CanvasRenderingContext2D, state: GameState) => void,
-    takeDamage?: (state: GameState, damage: number) => void,
+    takeDamage?: (state: GameState, damage: number) => boolean,
+    knockBack?: (state: GameState, vector: {vx: number, vy: number, vz: number}) => void,
     wading?: boolean,
     swimming?: boolean,
 }

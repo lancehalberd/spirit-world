@@ -256,6 +256,45 @@ export function getZoneProperties(state: GameState, editingState: EditingState):
         }
     });
     rows.push({
+        name: 'Surface Key',
+        value: state.zone.surfaceKey || 'none',
+        values: ['none', ...Object.keys(zones)],
+        onChange(surfaceKey: string) {
+            if (state.zone.surfaceKey) {
+                delete zones[state.zone.surfaceKey].underwaterKey;
+                delete state.zone.surfaceKey;
+            }
+            if (surfaceKey !== 'none') {
+                state.zone.surfaceKey = surfaceKey;
+                zones[surfaceKey].underwaterKey = state.zone.key;
+                if (state.zone.underwaterKey) {
+                    delete zones[state.zone.underwaterKey].surfaceKey;
+                    delete state.zone.underwaterKey;
+                }
+            }
+            displayTileEditorPropertyPanel();
+        }
+    }, {
+        name: 'Underwater Key',
+        value: state.zone.underwaterKey || 'none',
+        values: ['none', ...Object.keys(zones)],
+        onChange(underwaterKey: string) {
+            if (state.zone.underwaterKey) {
+                delete zones[state.zone.underwaterKey].surfaceKey;
+                delete state.zone.underwaterKey;
+            }
+            if (underwaterKey !== 'none') {
+                state.zone.underwaterKey = underwaterKey;
+                zones[underwaterKey].surfaceKey = state.zone.key;
+                if (state.zone.surfaceKey) {
+                    delete zones[state.zone.surfaceKey].underwaterKey;
+                    delete state.zone.surfaceKey;
+                }
+            }
+            displayTileEditorPropertyPanel();
+        }
+    });
+    rows.push({
         name: 'darkness',
         value: state.areaInstance.definition.dark || 0,
         values: [0, 25, 50, 75, 100],

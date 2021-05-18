@@ -1,11 +1,9 @@
-import { checkIfAllEnemiesAreDefeated, enterLocation } from 'app/content/areas';
-import { Enemy } from 'app/content/enemy';
+import { enterLocation } from 'app/content/areas';
 import { getLoot } from 'app/content/lootObject';
 import {
     SPAWN_LOCATION_DEMO,
     SPAWN_LOCATION_FULL,
 } from 'app/content/spawnLocations';
-import { editingState } from 'app/development/tileEditor';
 import {
     FRAME_LENGTH, GAME_KEY,
     FADE_IN_DURATION, FADE_OUT_DURATION,
@@ -23,11 +21,11 @@ import {
     selectSaveFile,
     setSaveFileToState,
 } from 'app/state';
-import { updateAllHeroes } from 'app/updateActor';
 import { updateCamera } from 'app/updateCamera';
+import { updateField } from 'app/updateField';
 import { areAllImagesLoaded } from 'app/utils/images';
 
-import { ActiveTool, AreaInstance, DialogueLootDefinition, GameState, MagicElement } from 'app/types';
+import { ActiveTool, DialogueLootDefinition, Equipment, GameState } from 'app/types';
 
 let isGameInitialized = false;
 export function update() {
@@ -204,7 +202,14 @@ function updateMenu(state: GameState) {
     if (state.hero.activeTools.clone) {
         selectableTools.push('clone');
     }
-    if(selectableTools.length) {
+    if (wasGameKeyPressed(state, GAME_KEY.UP) || wasGameKeyPressed(state, GAME_KEY.DOWN)) {
+        state.menuRow = (state.menuRow + 1) % 2;
+    }
+    if(!selectableTools.length && state.menuRow === 0) {
+        state.menuRow = 1;
+    }
+    if (state.menuRow === 0) {
+        // The first row is for selecting tools.
         const selectedTool = selectableTools[state.menuIndex];
         if (wasGameKeyPressed(state, GAME_KEY.LEFT)) {
             state.menuIndex = (state.menuIndex + selectableTools.length - 1) % selectableTools.length;
@@ -220,6 +225,31 @@ function updateMenu(state: GameState) {
                 state.hero.leftTool = state.hero.rightTool;
             }
             state.hero.rightTool = selectedTool;
+        }
+    } else {
+        // The second row is for equipping boots.
+        const selectableEquipment: Equipment[] = [null];
+        if (state.hero.equipment.ironBoots) {
+            selectableEquipment.push('ironBoots');
+        }
+        if (state.hero.equipment.cloudBoots) {
+            selectableEquipment.push('cloudBoots');
+        }
+        if (wasGameKeyPressed(state, GAME_KEY.LEFT)) {
+            state.menuIndex = (state.menuIndex + selectableEquipment.length - 1) % selectableEquipment.length;
+        } else if (wasGameKeyPressed(state, GAME_KEY.RIGHT)) {
+            state.menuIndex = (state.menuIndex + 1) % selectableEquipment.length;
+        } else if (wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL)
+            || wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL)
+            || wasGameKeyPressed(state, GAME_KEY.WEAPON)
+        ) {
+            const selectedEquipment = selectableEquipment[state.menuIndex];
+            if (!selectableEquipment || state.hero.equipedGear[selectedEquipment]) {
+                state.hero.equipedGear = {};
+            } else {
+                state.hero.equipedGear = {};
+                state.hero.equipedGear[selectedEquipment] = true;
+            }
         }
     }
 }
@@ -259,66 +289,16 @@ function updateDefeated(state: GameState) {
     }
 }
 
-function switchElement(state: GameState, delta: number): void {
-    const allElements: MagicElement[] = [null];
-    for (const element of ['fire', 'ice', 'lightning'] as MagicElement[]) {
-        if (state.hero.elements[element]) {
-            allElements.push(element);
-        }
-    }
-    const index = allElements.indexOf(state.hero.element);
-    state.hero.element = allElements[(index + delta + allElements.length) % allElements.length];
-}
-
-function updateField(state: GameState) {
-    if (editingState.isEditing) {
-        updateAllHeroes(state);
-        updateCamera(state);
-        return;
-    }
-    // If any priority objects are defined for the area, only process them
-    // until there are none remaining in the queue.
-    if (state.areaInstance.priorityObjects.length) {
-        const priorityObjects = state.areaInstance.priorityObjects.pop();
-        for (let i = 0; i < priorityObjects.length; i++) {
-            if (state.areaInstance.objects.indexOf(priorityObjects[i]) < 0) {
-                priorityObjects.splice(i--, 1);
-                continue;
-            }
-            priorityObjects[i].update?.(state);
-        }
-        if (priorityObjects.length) {
-            state.areaInstance.priorityObjects.push(priorityObjects);
-        }
-        return;
-    }
-    updateAllHeroes(state);
-    updateCamera(state);
-    if (wasGameKeyPressed(state, GAME_KEY.PREVIOUS_ELEMENT)) {
-        switchElement(state, -1);
-    } else if (wasGameKeyPressed(state, GAME_KEY.NEXT_ELEMENT)) {
-        switchElement(state, 1);
-    }
-    removeDefeatedEnemies(state, state.alternateAreaInstance);
-    removeDefeatedEnemies(state, state.areaInstance);
-    const isScreenTransitioning = state.nextAreaInstance || state.nextAreaSection;
-    for (const object of state.alternateAreaInstance?.objects || []) {
-        if (isScreenTransitioning && !object.updateDuringTransition) {
-            continue;
-        }
-        object.update?.(state);
-    }
-    for (const object of state.areaInstance.objects) {
-        if (isScreenTransitioning && !object.updateDuringTransition) {
-            continue;
-        }
-        object.update?.(state);
-    }
-}
-
 function updateTransition(state: GameState) {
     state.transitionState.time += FRAME_LENGTH;
-    if (state.transitionState.type === 'portal') {
+    if (state.transitionState.type === 'diving' || state.transitionState.type === 'surfacing') {
+        if (state.transitionState.time === CIRCLE_WIPE_OUT_DURATION) {
+            enterLocation(state, state.transitionState.nextLocation, true);
+            state.transitionState.callback?.();
+            updateCamera(state);
+            state.transitionState = null;
+        }
+    } else if (state.transitionState.type === 'portal') {
         if (state.transitionState.time === CIRCLE_WIPE_OUT_DURATION) {
             enterLocation(state, state.transitionState.nextLocation, true);
             state.transitionState.callback?.();
@@ -341,14 +321,5 @@ function updateTransition(state: GameState) {
         } else if (state.transitionState.time > CIRCLE_WIPE_OUT_DURATION + CIRCLE_WIPE_IN_DURATION) {
             state.transitionState = null;
         }
-    }
-}
-
-function removeDefeatedEnemies(state: GameState, area: AreaInstance): void {
-    const originalLength = area.objects.length;
-    area.objects = area.objects.filter(e => !(e instanceof Enemy) || (e.life > 0 && e.status !== 'gone'));
-    // If an enemy was defeated, check if all enemies are defeated to see if any doors open or treasures appear.
-    if (originalLength > area.objects.length) {
-        checkIfAllEnemiesAreDefeated(state, area);
     }
 }

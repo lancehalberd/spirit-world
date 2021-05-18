@@ -17,7 +17,7 @@ import { directionMap, rotateDirection } from 'app/utils/field';
 import { playSound } from 'app/utils/sounds';
 
 import {
-    Actor, ActorAnimations, AreaInstance, BossObjectDefinition, Clone, Direction, DrawPriority,
+    Action, Actor, ActorAnimations, AreaInstance, BossObjectDefinition, Clone, Direction, DrawPriority,
     EnemyObjectDefinition,
     Frame, FrameAnimation, FrameDimensions, GameState, Hero, LootTable, MovementProperties,
     ObjectInstance, ObjectStatus, ShortRectangle,
@@ -45,6 +45,7 @@ export type MinionType = typeof minionTypes[number];
 
 export class Enemy implements Actor, ObjectInstance {
     type = 'enemy' as 'enemy';
+    action: Action = null;
     area: AreaInstance;
     drawPriority: DrawPriority = 'sprites';
     definition: EnemyObjectDefinition | BossObjectDefinition;
@@ -54,6 +55,9 @@ export class Enemy implements Actor, ObjectInstance {
     animationTime: number;
     alwaysReset: boolean = false;
     alwaysUpdate: boolean = false;
+    // This ignores the default pit logic in favor of the ground effects
+    // code used internally.
+    ignorePits = true;
     d: Direction;
     spawnX: number;
     spawnY: number;
@@ -65,6 +69,8 @@ export class Enemy implements Actor, ObjectInstance {
     vz: number = 0;
     w: number;
     h: number;
+    canBeKnockedBack: boolean = true;
+    canBeKnockedDown: boolean = true;
     flying: boolean;
     life: number;
     speed: number;
@@ -73,6 +79,7 @@ export class Enemy implements Actor, ObjectInstance {
     mode = 'choose';
     modeTime = 0;
     params: any;
+    enemyInvulnerableFrames = 0;
     invulnerableFrames = 0;
     status: ObjectStatus = 'normal';
     scale: number = 1;
@@ -93,8 +100,10 @@ export class Enemy implements Actor, ObjectInstance {
         this.speed = this.enemyDefinition.speed ?? 1;
         this.acceleration = this.enemyDefinition.acceleration ?? .1;
         this.aggroRadius = this.enemyDefinition.aggroRadius ?? 80;
+        this.canBeKnockedBack = this.enemyDefinition.canBeKnockedBack ?? this.definition.type !== 'boss';
+        this.canBeKnockedDown = this.enemyDefinition.canBeKnockedDown ?? this.definition.type !== 'boss';
         this.flying = this.enemyDefinition.flying;
-        this.z = this.flying ? 12 : 0;
+        this.z = 0;//this.flying ? 12 : 0;
         this.scale = this.enemyDefinition.scale ?? 1;
         this.params = {
             ...(this.enemyDefinition.params || {}),
@@ -136,19 +145,34 @@ export class Enemy implements Actor, ObjectInstance {
         this.mode = mode;
         this.modeTime = 0;
     }
-    takeDamage(state: GameState, damage: number) {
+    knockBack(state: GameState, {vx = 0, vy = 0, vz = 0}: {vx: number, vy: number, vz: number}) {
+        if (!this.canBeKnockedBack) {
+            return;
+        }
+        this.action = 'knocked';
+        this.animationTime = 0;
+        this.vx = vx;
+        this.vy = vy;
+        this.vz = vz;
+    }
+    takeDamage(state: GameState, damage: number): boolean {
+        if (this.enemyInvulnerableFrames) {
+            return false;
+        }
         if (this.shielded) {
             playSound('getMoney');
-            return;
+            return true;
         }
         this.life -= damage;
         // This is actually the number of frames the enemy cannot damage the hero for.
         this.invulnerableFrames = 50;
+        this.enemyInvulnerableFrames = 20;
         if (this.life <= 0) {
             this.showDeathAnimation(state);
         } else {
             playSound('enemyHit');
         }
+        return true;
     }
     showDeathAnimation(state: GameState) {
         const hitbox = this.getHitbox(state);
@@ -197,14 +221,39 @@ export class Enemy implements Actor, ObjectInstance {
         if (!this.alwaysUpdate && !this.isFromCurrentSection(state)) {
             return;
         }
+        if (this.invulnerableFrames > 0) {
+            this.invulnerableFrames--;
+        }
+        if (this.enemyInvulnerableFrames > 0) {
+            this.enemyInvulnerableFrames--;
+        }
+        if (this.action === 'knocked') {
+            this.z += this.vz;
+            this.vz = Math.max(-8, this.vz - 0.5);
+            moveEnemy(state, this, this.vx, this.vy, {canFall: true});
+            const minZ = this.canBeKnockedDown ? 0 : (this.flying ? 12 : 0);
+            if (this.z <= minZ) {
+                this.z = minZ;
+            }
+            this.animationTime += FRAME_LENGTH;
+            if (this.animationTime >= 200 && (!this.canBeKnockedDown || this.z <= minZ)) {
+                this.action = null;
+                this.animationTime = 0;
+            }
+            return;
+        }
+        if (this.flying && this.z < 12) {
+            this.z = Math.min(12, this.z + 2);
+            return;
+        }
+        if (this.flying && this.z > 12) {
+            this.z = Math.max(12, this.z - 2);
+        }
         if (this.enemyDefinition.update) {
             this.enemyDefinition.update(state, this);
         }
         this.modeTime += FRAME_LENGTH;
         this.animationTime += FRAME_LENGTH;
-        if (this.invulnerableFrames > 0) {
-            this.invulnerableFrames--;
-        }
         // Checks if the enemy fell into a pit, for example
         checkForFloorEffects(state, this);
     }
@@ -336,6 +385,8 @@ interface EnemyDefinition {
     alwaysReset?: boolean,
     animations: ActorAnimations,
     aggroRadius?: number,
+    canBeKnockedBack?: boolean,
+    canBeKnockedDown?: boolean,
     flipRight?: boolean,
     flying?: boolean,
     hasShadow?: boolean,
@@ -355,6 +406,7 @@ export const enemyDefinitions: {[key in EnemyType | BossType | MinionType]: Enem
     arrowTurret: {
         animations: beetleAnimations, life: 4, touchDamage: 1, update: spinAndShoot,
         lootTable: simpleLootTable,
+        canBeKnockedBack: false,
     },
     snake: {
         animations: snakeAnimations, life: 2, touchDamage: 1, update: paceRandomly, flipRight: true,
@@ -445,7 +497,7 @@ function updateFlameSnake(state: GameState, enemy: Enemy): void {
         });
         flame.x -= flame.w / 2;
         flame.y -= flame.h / 2;
-        addObjectToArea(state, state.areaInstance, flame);
+        addObjectToArea(state, enemy.area, flame);
         enemy.params.flameCooldown = 400;
     }
     enemy.params.shootCooldown = enemy.params.shootCooldown ?? 1000 + Math.random() * 1000;
@@ -468,7 +520,7 @@ function updateFlameSnake(state: GameState, enemy: Enemy): void {
         });
         flame.x -= flame.w / 2;
         flame.y -= flame.h / 2;
-        addObjectToArea(state, state.areaInstance, flame);
+        addObjectToArea(state, enemy.area, flame);
         enemy.params.flameCooldown = 400;
     }
 }
@@ -542,7 +594,7 @@ function updateElementalIdol(state: GameState, enemy: Enemy, attack: () => void)
     if (enemy.life <= 1) {
         enemy.params.priority = undefined;
         // When all bosses are at 1 life or lower, all the statues get destroyed.
-        if (!state.areaInstance.objects.some(object =>
+        if (!enemy.area.objects.some(object =>
             object instanceof Enemy && object.definition.type === 'boss' && object.life > 1
         )) {
             enemy.shielded = false;
@@ -577,8 +629,9 @@ function updateElementalIdol(state: GameState, enemy: Enemy, attack: () => void)
             enemy.params.priority = Math.ceil(enemy.params.priority) + Math.random();
             enemy.setMode('shielded');
         }
+        return;
     }
-    if (!state.areaInstance.objects.some(object => object instanceof Enemy && object.params.priority < enemy.params.priority)) {
+    if (!enemy.area.objects.some(object => object instanceof Enemy && object.params.priority < enemy.params.priority)) {
         if (enemy.mode === 'attack') {
             if (!enemy.params.pinchMode) {
                 if (enemy.modeTime === 1000) {
@@ -612,7 +665,7 @@ function updateStormIdol(state: GameState, enemy: Enemy): void {
             y: state.hero.y + state.hero.h / 2,
             shockWaveTheta: enemy.params.theta,
         });
-        addObjectToArea(state, state.areaInstance, lightningBolt);
+        addObjectToArea(state, enemy.area, lightningBolt);
     })
 }
 function updateFlameIdol(state: GameState, enemy: Enemy): void {
@@ -622,7 +675,7 @@ function updateFlameIdol(state: GameState, enemy: Enemy): void {
         const flameWall = new FlameWall({
             direction: rotateDirection('down', enemy.params.rotations),
         });
-        addObjectToArea(state, state.areaInstance, flameWall);
+        addObjectToArea(state, enemy.area, flameWall);
     })
 }
 function throwIceGrenadeAtLocation(state: GameState, enemy: Enemy, {tx, ty}: {tx: number, ty: number}): void {
@@ -642,7 +695,7 @@ function throwIceGrenadeAtLocation(state: GameState, enemy: Enemy, {tx, ty}: {tx
         vz,
         az,
     });
-    addObjectToArea(state, state.areaInstance, frostGrenade);
+    addObjectToArea(state, enemy.area, frostGrenade);
 }
 function updateFrostIdol(state: GameState, enemy: Enemy): void {
     enemy.params.shieldColor = '#08F';
@@ -671,7 +724,7 @@ function spinAndShoot(state: GameState, enemy: Enemy): void {
                     vx: 4 * dx,
                     vy: 4 * dy,
                 });
-                addObjectToArea(state, state.areaInstance, arrow);
+                addObjectToArea(state, enemy.area, arrow);
             }
         }
         if (enemy.modeTime >= 500) {
@@ -697,7 +750,7 @@ function updateWallLaser(state: GameState, enemy: Enemy): void {
             vx: 4 * dx,
             vy: 4 * dy,
         });
-        addObjectToArea(state, state.areaInstance, arrow);
+        addObjectToArea(state, enemy.area, arrow);
     }
     if (enemy.params.alwaysShoot) {
         if (enemy.modeTime % 300 === FRAME_LENGTH) {
@@ -788,6 +841,8 @@ function updateBeetleBoss(state: GameState, enemy: Enemy): void {
                 x: section.x + section.w / 2 + (section.w / 2 + 32) * Math.cos(theta),
                 y: section.y + section.h / 2 + (section.h / 2 + 32) * Math.sin(theta),
             });
+            // Have to set area before calling getVectorToNearbyHero.
+            minion.area = enemy.area;
             const vector = getVectorToNearbyHero(state, minion, 1000);
             if (vector) {
                 minion.vx = minion.speed * vector.x;
@@ -832,7 +887,10 @@ function moveTo(state: GameState, enemy: Enemy, tx: number, ty: number): number 
     const dx = tx - (hitbox.x + hitbox.w / 2), dy = ty - (hitbox.y + hitbox.h / 2);
     const mag = Math.sqrt(dx * dx + dy * dy);
     if (mag > enemy.speed) {
-        moveEnemy(state, enemy, enemy.speed * dx / mag, enemy.speed * dy / mag, {});
+        moveEnemy(state, enemy, enemy.speed * dx / mag, enemy.speed * dy / mag, {
+            boundToSection: false,
+            boundToSectionPadding: 0,
+        });
         return mag - enemy.speed;
     }
     moveEnemy(state, enemy, dx, dy, {});
@@ -913,7 +971,6 @@ function paceAndCharge(state: GameState, enemy: Enemy) {
         moveEnemy(state, enemy, enemy.vx, enemy.vy, {canFall: true});
         if (enemy.z < 0) {
             enemy.z = 0;
-            enemy.setMode('stunned');
         }
     } else if (enemy.mode === 'stunned') {
         enemy.animationTime = 0;
@@ -926,6 +983,7 @@ function paceAndCharge(state: GameState, enemy: Enemy) {
         if (hero) {
             enemy.d = d;
             enemy.setMode('charge');
+            enemy.canBeKnockedBack = false;
             enemy.setAnimation('attack', enemy.d);
         } else {
             paceRandomly(state, enemy);
@@ -936,17 +994,23 @@ function paceAndCharge(state: GameState, enemy: Enemy) {
             return;
         }
         if (!moveEnemy(state, enemy, 3 * enemy.speed * directionMap[enemy.d][0], 3 * enemy.speed * directionMap[enemy.d][1], {canFall: true})) {
-            enemy.setMode('knocked');
-            enemy.vx = -enemy.speed * directionMap[enemy.d][0];
-            enemy.vy = -enemy.speed * directionMap[enemy.d][1];
-            enemy.vz = 4;
+            enemy.setMode('stunned');
+            enemy.canBeKnockedBack = true;
+            enemy.knockBack(state, {
+                vx: -enemy.speed * directionMap[enemy.d][0],
+                vy: -enemy.speed * directionMap[enemy.d][1],
+                vz: 4,
+            });
         }
     }
 }
 
 function getVectorToNearbyHero(state: GameState, enemy: Enemy, radius: number): {x: number, y: number} {
     const hitbox = enemy.getHitbox(state);
-    for (const hero of [state.hero, ...state.hero.clones]) {
+    for (const hero of [state.hero, state.hero.astralProjection, ...state.hero.clones]) {
+        if (!hero || hero.area !== enemy.area) {
+            continue;
+        }
         const dx = (hero.x + hero.w / 2) - (hitbox.x + hitbox.w / 2);
         const dy = (hero.y + hero.h / 2) - (hitbox.y + hitbox.h / 2);
         const mag = Math.sqrt(dx * dx + dy * dy);
@@ -959,7 +1023,10 @@ function getVectorToNearbyHero(state: GameState, enemy: Enemy, radius: number): 
 
 function getLineOfSightTargetAndDirection(state: GameState, enemy: Enemy, direction: Direction = null, projectile: boolean = false): {d: Direction, hero: Hero} {
     const hitbox = enemy.getHitbox(state);
-    for (const hero of [state.hero, ...state.hero.clones]) {
+    for (const hero of [state.hero, state.hero.astralProjection, ...state.hero.clones]) {
+        if (!hero || hero.area !== enemy.area) {
+            continue;
+        }
         // Reduce dimensions of hitbox for these checks so that the hero is not in line of sight when they are most of a tile
         // off (like 0.5px in line of sight), otherwise the hero can't hide from line of sight on another tile if
         // they aren't perfectly lined up with the tile.
@@ -1034,18 +1101,19 @@ function paceRandomly(state: GameState, enemy: Enemy) {
     }
 }
 
-function moveEnemy(state, enemy, dx, dy, movementProperties: MovementProperties): boolean {
+function moveEnemy(state: GameState, enemy: Enemy, dx: number, dy: number, movementProperties: MovementProperties): boolean {
     if (!movementProperties.excludedObjects) {
         movementProperties.excludedObjects = new Set();
     }
     movementProperties.excludedObjects.add(state.hero);
-    movementProperties.boundToSectionPadding = 16;
-    movementProperties.boundToSection = true;
+    movementProperties.excludedObjects.add(state.hero.astralProjection);
+    movementProperties.boundToSectionPadding = movementProperties.boundToSectionPadding ?? 16;
+    movementProperties.boundToSection = movementProperties.boundToSection ?? true;
     for (const clone of enemy.area.objects.filter(object => object instanceof Clone)) {
         movementProperties.excludedObjects.add(clone);
     }
     if (enemy.flying) {
-        const hitbox = enemy.getHitbox();
+        const hitbox = enemy.getHitbox(state);
         const ax = enemy.x + dx;
         const ay = enemy.y + dy;
         if (movementProperties.boundToSection) {

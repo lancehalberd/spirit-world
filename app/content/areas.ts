@@ -2,9 +2,11 @@ import _ from 'lodash';
 
 import { changeObjectStatus, createObjectInstance, findObjectInstanceById } from 'app/content/objects';
 import { allTiles } from 'app/content/tiles';
+import { logicHash, isLogicValid } from 'app/content/logic';
 import { dropItemFromTable } from 'app/content/lootObject';
 import { checkToUpdateSpawnLocation } from 'app/content/spawnLocations';
 import { zones } from 'app/content/zones';
+import { editingState } from 'app/development/tileEditor';
 import { createCanvasAndContext } from 'app/dom';
 import { checkForFloorEffects } from 'app/moveActor';
 import { isPointInShortRect } from 'app/utils/index';
@@ -56,6 +58,7 @@ export function getDefaultSpiritArea(location: ZoneLocation): AreaDefinition {
     return {
         default: true,
         parentDefinition,
+        isSpiritWorld: true,
         layers: [
             {
                 key: 'floor',
@@ -168,6 +171,10 @@ export function enterLocation(
         removeObjectFromArea(state, state.hero.astralProjection);
         state.hero.astralProjection = null;
     }
+    if (state.hero.action === 'meditating') {
+        state.hero.action = null;
+    }
+    state.hero.spiritRadius = 0;
     if (!instant) {
         state.transitionState = {
             callback,
@@ -175,7 +182,15 @@ export function enterLocation(
             time: 0,
             type: 'fade',
         };
-        if (!!state.location.isSpiritWorld !== !!location.isSpiritWorld) {
+        if (state.zone.underwaterKey === location.zoneKey) {
+            state.transitionState.type = 'diving';
+            const nextArea = getAreaFromLocation(location);
+            state.transitionState.nextAreaInstance = createAreaInstance(state, nextArea);
+        } else if (state.zone.surfaceKey === location.zoneKey) {
+            state.transitionState.type = 'surfacing';
+            const nextArea = getAreaFromLocation(location);
+            state.transitionState.nextAreaInstance = createAreaInstance(state, nextArea);
+        } else if (!!state.location.isSpiritWorld !== !!location.isSpiritWorld && state.location.zoneKey === location.zoneKey) {
             state.transitionState.type = 'portal';
         } else if (state.location.zoneKey !== location.zoneKey) {
             state.transitionState.type = 'circle';
@@ -219,6 +234,9 @@ export function enterLocation(
         state.hero.z = location.z;
         if (location.z > 0) {
             state.hero.action = 'knocked';
+            // Make sure the character falls straight down.
+            state.hero.vx = 0;
+            state.hero.vy = 0;
         }
     }
     state.hero.safeD = state.hero.d;
@@ -260,33 +278,38 @@ export function enterZoneByTarget(
         console.error(`Missing zone: ${zoneKey}`);
         return false;
     }
-    const inSpiritWorld = state.areaInstance.definition.isSpiritWorld;
     for (let floor = 0; floor < zone.floors.length; floor++) {
-        const areaGrid = inSpiritWorld ? zone.floors[floor].spiritGrid : zone.floors[floor].grid;
-        for (let y = 0; y < areaGrid.length; y++) {
-            for (let x = 0; x < areaGrid[y].length; x++) {
-                for (const object of (areaGrid[y][x]?.objects || [])) {
-                    if (object.id === targetObjectId && object !== skipObject) {
-                        enterLocation(state, {
-                            zoneKey,
-                            floor,
-                            areaGridCoords: {x, y},
-                            x: object.x,
-                            y: object.y,
-                            d: state.hero.d,
-                            isSpiritWorld: inSpiritWorld,
-                        }, instant, () => {
-                            const target = findObjectInstanceById(state.areaInstance, targetObjectId);
-                            if (target?.getHitbox) {
-                                const hitbox = target.getHitbox(state);
-                                state.hero.x = hitbox.x + hitbox.w / 2 - state.hero.w / 2;
-                                state.hero.y = hitbox.y + hitbox.h / 2 - state.hero.h / 2;
-                                setAreaSection(state, state.hero.d, true);
-                                updateCamera(state, 512);
-                            }
-                            callback?.();
-                        });
-                        return true;
+        // Search the corresponding spirit/material world before checking in the alternate world.
+        const areaGrids = state.areaInstance.definition.isSpiritWorld
+            ? [zone.floors[floor].spiritGrid, zone.floors[floor].grid]
+            : [zone.floors[floor].grid, zone.floors[floor].spiritGrid];
+        for( const areaGrid of areaGrids){
+            const inSpiritWorld = areaGrid === zone.floors[floor].spiritGrid;
+            for (let y = 0; y < areaGrid.length; y++) {
+                for (let x = 0; x < areaGrid[y].length; x++) {
+                    for (const object of (areaGrid[y][x]?.objects || [])) {
+                        if (object.id === targetObjectId && object !== skipObject) {
+                            enterLocation(state, {
+                                zoneKey,
+                                floor,
+                                areaGridCoords: {x, y},
+                                x: object.x,
+                                y: object.y,
+                                d: state.hero.d,
+                                isSpiritWorld: inSpiritWorld,
+                            }, instant, () => {
+                                const target = findObjectInstanceById(state.areaInstance, targetObjectId);
+                                if (target?.getHitbox) {
+                                    const hitbox = target.getHitbox(state);
+                                    state.hero.x = hitbox.x + hitbox.w / 2 - state.hero.w / 2;
+                                    state.hero.y = hitbox.y + hitbox.h / 2 - state.hero.h / 2;
+                                    setAreaSection(state, state.hero.d, true);
+                                    updateCamera(state, 512);
+                                }
+                                callback?.();
+                            });
+                            return true;
+                        }
                     }
                 }
             }
@@ -339,11 +362,13 @@ export function setAreaSection(state: GameState, d: Direction, newArea: boolean 
     state.areaSection = state.areaInstance.definition.sections[0];
     let x = state.hero.x / 16;
     let y = state.hero.y / 16;
-    if (d === 'right') {
-        x += state.hero.w / 16;
-    }
-    if (d === 'down') {
-        y += state.hero.h / 16;
+    if (!newArea) {
+        if (d === 'right') {
+            x += state.hero.w / 16;
+        }
+        if (d === 'down') {
+            y += state.hero.h / 16;
+        }
     }
     for (const section of state.areaInstance.definition.sections) {
         if (isPointInShortRect(x, y, section)) {
@@ -453,7 +478,32 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
         behaviorGrid,
         tilesDrawn: [],
         checkToRedrawTiles: true,
-        layers: definition.layers.map(layer => ({
+        layers: definition.layers.filter((layer, index) => {
+            // The selected layer is always visible.
+            if (editingState.isEditing && editingState.selectedLayerIndex === index) {
+                return true;
+            }
+            // visibilityOverride dictates state of layers if they are not selected and it is set to show/hide.
+            if (layer.visibilityOverride === 'show') {
+                return true;
+            }
+            if (layer.visibilityOverride === 'hide') {
+                return false;
+            }
+            // Layers without logic are visible by default.
+            if (!layer.logicKey) {
+                return true;
+            }
+            const logic = logicHash[layer.logicKey];
+            // Logic should never be missing, so surface an error and hide the layer.
+            if (!logic) {
+                console.error('Missing logic!', layer.logicKey);
+                debugger;
+                return false;
+            }
+            // If the layer has logic, only display it if the logic is valid.
+            return isLogicValid(state, logic);
+        }).map(layer => ({
             definition: layer,
             ...layer,
             ...layer.grid,
@@ -466,20 +516,22 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
         context,
         cameraOffset: {x: 0, y: 0},
     };
-    for (let i = 0; i < definition.layers.length; i++) {
-        applyLayerToBehaviorGrid(behaviorGrid, definition.layers[i], definition.parentDefinition?.layers[i]);
+    for (const layer of instance.layers) {
+        const definitionIndex = definition.layers.indexOf(layer.definition);
+        applyLayerToBehaviorGrid(behaviorGrid, instance.definition.layers[definitionIndex], definition.parentDefinition?.layers[definitionIndex]);
     }
     if (definition.parentDefinition) {
-        for (let l = 0; l < instance.layers.length; l++) {
-            for (let y = 0; y < instance.layers[l].tiles.length; y++) {
-                for (let x = 0; x < instance.layers[l].tiles[y].length; x++) {
-                    if (!instance.layers[l].tiles[y][x]) {
-                        const parentTile = allTiles[definition.parentDefinition.layers[l].grid.tiles[y][x]];
+        for (const layer of instance.layers) {
+            const definitionIndex = definition.layers.indexOf(layer.definition);
+            for (let y = 0; y < layer.tiles.length; y++) {
+                for (let x = 0; x < layer.tiles[y].length; x++) {
+                    if (!layer.tiles[y][x]) {
+                        const parentTile = allTiles[definition.parentDefinition.layers[definitionIndex].grid.tiles[y][x]];
                         // Tiles with linked offsets map to different tiles than the parent definition.
                         const linkedOffset = parentTile?.behaviors?.linkedOffset || 0;
                         const tile = linkedOffset ? allTiles[parentTile.index + linkedOffset] : parentTile;
-                        instance.layers[l].tiles[y][x] = tile;
-                        instance.layers[l].originalTiles[y][x] = tile;
+                        layer.tiles[y][x] = tile;
+                        layer.originalTiles[y][x] = tile;
                     }
                 }
 
@@ -505,6 +557,16 @@ export function getAreaSize(state: GameState): {w: number, h: number, section: S
     }
 }
 
+export function applyBehaviorToTile(area: AreaInstance, x: number, y: number, behavior: TileBehaviors): void {
+    if (!area.behaviorGrid[y]) {
+        area.behaviorGrid[y] = [];
+    }
+    if (!area.behaviorGrid[y][x]) {
+        area.behaviorGrid[y][x] = {};
+    }
+    area.behaviorGrid[y][x] = {...area.behaviorGrid[y][x], ...behavior};
+}
+
 export function refreshSection(state: GameState, area: AreaInstance, section: ShortRectangle): void {
     // First reset tiles that need to be reset.
     // This is done before objects since some objects will update the tiles under them.
@@ -512,8 +574,8 @@ export function refreshSection(state: GameState, area: AreaInstance, section: Sh
         const row = section.y + y;
         for (let x = 0; x < section.w; x++) {
             const column = section.x + x;
-            for (let l = 0; l < area.definition.layers.length; l++) {
-                area.layers[l].tiles[row][column] = area.layers[l].originalTiles[row][column];
+            for (const layer of area.layers) {
+                layer.tiles[row][column] = layer.originalTiles[row][column];
             }
             resetTileBehavior(area, {x: column, y: row});
             if (area.tilesDrawn[row]?.[column]) {
@@ -560,6 +622,9 @@ export function refreshSection(state: GameState, area: AreaInstance, section: Sh
     }
 }
 export function addObjectToArea(state: GameState, area: AreaInstance, object: ObjectInstance): void {
+    if (object.area && object.area !== area) {
+        removeObjectFromArea(state, object);
+    }
     object.area = area;
     if (object.add) {
         object.add(state, area);
@@ -568,8 +633,12 @@ export function addObjectToArea(state: GameState, area: AreaInstance, object: Ob
     }
 }
 export function removeObjectFromArea(state: GameState, object: ObjectInstance): void {
+    if (!object.area) {
+        return;
+    }
     if (object.remove) {
         object.remove(state);
+        object.area = null;
     } else {
         if (object.cleanup) {
             object.cleanup(state);
@@ -578,6 +647,7 @@ export function removeObjectFromArea(state: GameState, object: ObjectInstance): 
         if (index >= 0) {
             object.area.objects.splice(index, 1);
         }
+        object.area = null;
     }
 }
 

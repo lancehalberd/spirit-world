@@ -125,7 +125,38 @@ export function render() {
 }
 
 function renderTransition(context: CanvasRenderingContext2D, state: GameState) {
-    if (state.transitionState.type === 'portal') {
+    if (state.transitionState.type === 'diving' || state.transitionState.type === 'surfacing') {
+        const x = state.hero.x + state.hero.w / 2 - state.camera.x + state.areaInstance.cameraOffset.x;
+        const y = state.hero.y + 2 - state.camera.y + state.areaInstance.cameraOffset.y;
+        if (state.transitionState.time <= CIRCLE_WIPE_OUT_DURATION) {
+            if (!state.transitionState.patternCanvas) {
+                const [patternCanvas, patternContext] = createCanvasAndContext(CANVAS_WIDTH, CANVAS_HEIGHT);
+                state.transitionState.patternCanvas = patternCanvas;
+                renderArea(patternContext, state, state.transitionState.nextAreaInstance, true);
+                if (state.transitionState.type === 'diving') {
+                    // This needs to match the styles we use for rendering underwater areas.
+                    patternContext.globalAlpha = 0.6;
+                    patternContext.fillStyle = 'blue';
+                    patternContext.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+                }
+                state.transitionState.pattern = context.createPattern(state.transitionState.patternCanvas, 'repeat');
+            }
+            context.save();
+                const p = state.transitionState.time / CIRCLE_WIPE_OUT_DURATION;
+                const radius = Math.max(CANVAS_WIDTH, CANVAS_HEIGHT) * 1.5 * Math.max(0, Math.min(1, p));
+                context.fillStyle = state.transitionState.pattern;
+                context.beginPath();
+                context.arc(x, y, radius, 0, 2 * Math.PI);
+                context.fill();
+            context.restore();
+        } else {
+            context.save();
+                translateContextForAreaAndCamera(context, state, state.areaInstance);
+                context.fillStyle = state.transitionState.pattern;
+                context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+            context.restore();
+        }
+    } else if (state.transitionState.type === 'portal') {
         if (!state.alternateAreaInstance) {
             return;
         }
@@ -140,7 +171,7 @@ function renderTransition(context: CanvasRenderingContext2D, state: GameState) {
             }
             context.save();
                 const p = state.transitionState.time / CIRCLE_WIPE_OUT_DURATION;
-                const radius = Math.max(CANVAS_WIDTH, CANVAS_HEIGHT) * Math.max(0, Math.min(1, p));
+                const radius = Math.max(CANVAS_WIDTH, CANVAS_HEIGHT) * 1.5 * Math.max(0, Math.min(1, p));
                 context.fillStyle = state.transitionState.pattern;
                 context.beginPath();
                 context.arc(x, y, radius, 0, 2 * Math.PI);
@@ -214,7 +245,7 @@ function checkToRedrawTiles(area: AreaInstance) {
             }
         }
     }
-    area.layers.map((layer, index) => renderLayer(area, layer, area.definition.parentDefinition?.layers[index], index >= 2));
+    area.layers.map((layer, index) => renderLayer(area, layer, area.definition.parentDefinition?.layers[index]));
     for (let y = 0; y < area.h; y++) {
         if (!area.tilesDrawn[y]) {
             area.tilesDrawn[y] = [];
@@ -279,6 +310,13 @@ export function renderField(context: CanvasRenderingContext2D, state: GameState)
     // Render any editor specific graphics if appropriate.
     renderEditor(context, state);
     renderAreaLighting(context, state, state.areaInstance, state.nextAreaInstance);
+    if (state.zone.surfaceKey) {
+        context.save();
+            context.globalAlpha = 0.6;
+            context.fillStyle = 'blue';
+            context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        context.restore();
+    }
 }
 
 // Fully renders an area to a canvas, but with no state effects like spirit sight.
@@ -396,8 +434,9 @@ export function renderAreaObjectsAfterHero(context: CanvasRenderingContext2D, st
     context.restore();
 }
 
-export function renderLayer(area: AreaInstance, layer: AreaLayer, parentLayer: AreaLayerDefinition, isForeground: boolean): void {
+export function renderLayer(area: AreaInstance, layer: AreaLayer, parentLayer: AreaLayerDefinition): void {
     // Create foreground canvas only as needed.
+    const isForeground = (layer.definition.drawPriority ?? layer.definition.key) === 'foreground';
     if (isForeground && !area.foregroundContext) {
         [area.foregroundCanvas, area.foregroundContext] = createCanvasAndContext(
             16 * layer.definition.grid.w,
@@ -407,7 +446,7 @@ export function renderLayer(area: AreaInstance, layer: AreaLayer, parentLayer: A
     const context = isForeground ? area.foregroundContext : area.context;
     const w = 16, h = 16;
     context.save();
-    if (editingState.isEditing && getState().areaInstance.layers[editingState.selectedLayerIndex] !== layer) {
+    if (editingState.isEditing && editingState.selectedLayerIndex >= 0 && getState().areaInstance.layers[editingState.selectedLayerIndex] !== layer) {
         //console.log(getState().areaInstance.layers[editingState.selectedLayerIndex], layer);
         context.globalAlpha = 0.5;
     }

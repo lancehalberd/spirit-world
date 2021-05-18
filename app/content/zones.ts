@@ -4,9 +4,11 @@ import { Zone } from 'app/types';
 
 // Every zone needs to be imported here in order to be added to the zones hash.
 export * from 'app/content/zones/zoneHash';
+export * from 'app/content/zones/sky';
+export * from 'app/content/zones/overworld';
+export * from 'app/content/zones/underwater';
 export * from 'app/content/zones/newPeachCave';
 export * from 'app/content/zones/peachCave';
-export * from 'app/content/zones/overworld';
 export * from 'app/content/zones/tomb';
 export * from 'app/content/zones/treeVillage';
 export * from 'app/content/zones/warTemple';
@@ -14,12 +16,10 @@ export * from 'app/content/zones/cocoon';
 export * from 'app/content/zones/lakeTunnel';
 export * from 'app/content/zones/helix';
 export * from 'app/content/zones/waterfallCave';
-// Known remaining zones:
+export * from 'app/content/zones/waterfallTower';
 // holy city interior
 // grand temple
 // jade palace
-// sky
-// underwater
 // forge
 // waterfall tower
 // forest temple

@@ -196,6 +196,7 @@ function getDefaultHeroState(): Hero {
         render: renderHero,
         spiritRadius: 0,
         spawnLocation: SPAWN_LOCATION_FULL,
+        equipedGear: {},
     };
 }
 
@@ -214,6 +215,7 @@ function getDefaultState(): GameState {
         areaGrid: zones.peachCave.floors[0].grid,
         paused: false,
         menuIndex: 0,
+        menuRow: 0,
         defeatState: {
             defeated: false,
             time: 0,

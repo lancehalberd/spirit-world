@@ -5,7 +5,10 @@ import { damageActor } from 'app/updateActor';
 import { directionMap } from 'app/utils/field';
 import { rectanglesOverlap } from 'app/utils/index';
 
-import { AreaInstance, Clone, Direction, Frame, GameState, ObjectInstance, ObjectStatus } from 'app/types';
+import {
+    AreaInstance, AstralProjection, Clone, Direction,
+    Frame, GameState, ObjectInstance, ObjectStatus,
+} from 'app/types';
 
 
 
@@ -37,6 +40,7 @@ export class LightningBolt implements ObjectInstance, Props {
     vy: number;
     w: number = 12;
     h: number = 12;
+    ignorePits = true;
     delay: number;
     shockWaves: number;
     shockWaveTheta: number;
@@ -55,14 +59,14 @@ export class LightningBolt implements ObjectInstance, Props {
     }
     checkForHits(state: GameState) {
         for (const object of this.area.objects) {
-            if (!(object instanceof Clone)) {
+            if (!(object instanceof Clone) && !(object instanceof AstralProjection)) {
                 continue;
             }
             if (rectanglesOverlap(object, this)) {
                 damageActor(state, object, this.damage);
             }
         }
-        if (rectanglesOverlap(state.hero, this)) {
+        if (state.hero.area === this.area && rectanglesOverlap(state.hero, this)) {
             damageActor(state, state.hero, this.damage, {
                 vx: - 4 * directionMap[state.hero.d][0],
                 vy: - 4 * directionMap[state.hero.d][1],

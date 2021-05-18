@@ -26,6 +26,7 @@ export class Teleporter implements ObjectInstance {
         this.status = state.savedState.objectFlags[this.definition.id] ? 'normal' : this.definition.status;
     }
     changeStatus(state: GameState, status: ObjectStatus) {
+        this.status = status;
         if (this.status === 'normal' && this.definition.saveStatus) {
             state.savedState.objectFlags[this.definition.id] = true;
             saveGame();

@@ -478,7 +478,7 @@ const f0_1x1: AreaDefinition = {
     objects: [
         {status: "bigKeyLocked", id: "tombBossDoor", x: 112, y: 256, type: "door", style: "cave", targetZone: undefined, targetObjectId: undefined, d: "up"},
         {status: "normal", id: "tomb:0:1x1-door-1", x: 0, y: 368, type: "door", style: "cave", targetZone: undefined, targetObjectId: undefined, d: "left"},
-        {status: "closed", id: "tombBossDoor", x: 112, y: 224, type: "door", style: "cave", targetZone: undefined, targetObjectId: undefined, d: "down"},
+        {status: "closed", id: "tombBossDoorInterior", x: 112, y: 224, type: "door", style: "cave", targetZone: undefined, targetObjectId: undefined, d: "down"},
         {status: "normal", id: "tomb:0:1x1-beetleBoss-0", x: 96, y: 64, type: "boss", enemyType: "beetleBoss", lootType: "peachOfImmortality", lootAmount: 1, lootLevel: 1, d: "down", params: {}},
         {status: "normal", id: "tomb:0:1x1-arrowTurret-0", x: 64, y: 80, type: "enemy", enemyType: "wallLaser", d: "down", params: {}},
         {status: "normal", id: "tomb:0:1x1-arrowTurret-1", x: 176, y: 80, type: "enemy", enemyType: "wallLaser", d: "down", params: {}},

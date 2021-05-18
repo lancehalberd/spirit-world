@@ -48,14 +48,17 @@ export interface GameState {
     transitionState?: {
         // The location to switch to after the current screen wipe transition.
         nextLocation: ZoneLocation,
+        // This is used for rendering the next area when diving/surfacing.
+        nextAreaInstance?: AreaInstance,
         time: number,
         callback: () => void,
         patternCanvas?: HTMLCanvasElement,
         pattern?: CanvasPattern,
-        type: 'circle' | 'fade' | 'portal',
+        type: 'circle' | 'fade' | 'portal' | 'diving' | 'surfacing',
     },
     paused: boolean,
     menuIndex: number,
+    menuRow: number,
     defeatState: {
         defeated: boolean,
         time: number,

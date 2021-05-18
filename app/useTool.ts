@@ -15,7 +15,7 @@ export function useTool(
 ): void {
     switch (tool) {
         case 'bow':
-            if (state.hero.magic < 5) {
+            if (state.hero.magic < 0) {
                 return;
             }
             state.hero.magic -= 5;
@@ -38,7 +38,7 @@ export function useTool(
                 state.hero.toolCooldown = 0;
                 return;
             }
-            if (state.hero.magic < state.hero.invisibilityCost) {
+            if (state.hero.magic < 0) {
                 return;
             }
             state.hero.invisibilityCost += 4;
@@ -46,7 +46,7 @@ export function useTool(
             return;
         case 'clone':
             if (!state.hero.clones.length) {
-                if (state.hero.magic < 10 || state.hero.life < 2) {
+                if (state.hero.magic < 0 || state.hero.life < 2) {
                     return;
                 }
                 state.hero.magic -= 10;
@@ -64,7 +64,7 @@ export function useTool(
                 state.hero.toolCooldown = 0;
                 return;
             }
-            if (state.hero.magic < 10) {
+            if (state.hero.magic < 0) {
                 return;
             }
             const staffLevel = state.hero.activeTools.staff

@@ -1,6 +1,6 @@
 import {
     AreaInstance, BossType,
-    Direction, EnemyType,
+    DecorationType, Direction, EnemyType,
     GameState, Hero, LootType,
     MagicElement, MinionType,
     NPCBehavior, NPCStyle,
@@ -17,8 +17,10 @@ export interface ObjectInstance {
     drawPriority?: DrawPriority,
     // Set this flag for objects that need to update during screen transitions, such as doorways.
     updateDuringTransition?: boolean,
+    changesAreas?: boolean,
     // Setting this true is the same as returning true always for shouldReset+shouldRespawn.
     alwaysReset?: boolean,
+    ignorePits?: boolean,
     // Should revert to its original state if still present
     shouldReset?: (state: GameState) => boolean,
     // Should revert to its original state if missing (Defeated enemy, ball that fell in a pit)
@@ -49,7 +51,7 @@ export interface ObjectInstance {
 }
 
 export type ObjectStatus = 'active' | 'closed' | 'closedEnemy' | 'closedSwitch'
-    | 'gone' | 'hiddenSwitch' | 'hiddenEnemy' | 'normal'
+    | 'gone' | 'hidden' | 'hiddenSwitch' | 'hiddenEnemy' | 'normal'
     | 'locked' | 'bigKeyLocked' | 'cracked' | 'blownOpen';
 
 export interface MovementProperties {
@@ -133,6 +135,14 @@ export interface SimpleObjectDefinition extends BaseObjectDefinition {
     type: SimpleObjectType,
 }
 
+export interface DecorationDefinition extends BaseObjectDefinition {
+    type: 'decoration',
+    decorationType: DecorationType,
+    drawPriority?: DrawPriority,
+    w: number,
+    h: number,
+}
+
 export interface EnemyObjectDefinition extends BaseObjectDefinition {
     type: 'enemy',
     enemyType: EnemyType | MinionType,
@@ -153,6 +163,7 @@ export type ObjectDefinition = SimpleObjectDefinition
     | BallGoalDefinition
     | BossObjectDefinition
     | CrystalSwitchDefinition
+    | DecorationDefinition
     | EntranceDefinition
     | EnemyObjectDefinition
     | FloorSwitchDefinition

@@ -7,7 +7,12 @@ import { carryMap, directionMap, getDirection } from 'app/utils/field';
 
 import { Actor, ActorAnimations, Enemy, Frame, GameState, Hero } from 'app/types';
 
-import { heroAnimations, heroShallowAnimations, heroSwimAnimations, Y_OFF} from 'app/render/heroAnimations';
+import {
+    heroAnimations,
+    heroShallowAnimations,
+    heroSwimAnimations,
+    Y_OFF,
+} from 'app/render/heroAnimations';
 
 
 const shadowFrame: Frame = createAnimation('gfx/shadow.png', { w: 16, h: 16 }).frames[0];
@@ -70,8 +75,9 @@ export function getHeroFrame(state: GameState, hero: Hero): Frame {
             animations = heroAnimations.roll;
             break;
         case 'climbing':
-            return getFrame(heroAnimations.push.up, hero.animationTime);
-            break;
+            return getFrame(heroAnimations.climbing.up, hero.animationTime);
+        case 'charging':
+            return hero.wading ? heroShallowAnimations.attack[hero.d].frames[0] : heroAnimations.attack[hero.d].frames[0];
         case 'attack':
             animations = hero.wading ? heroShallowAnimations.attack : heroAnimations.attack;
             break;
@@ -140,7 +146,7 @@ export function renderCarriedTile(context: CanvasRenderingContext2D, state: Game
 
 
 export function renderHeroShadow(context: CanvasRenderingContext2D, state: GameState, hero: Hero): void {
-    if (hero.action === 'fallen' || hero.action === 'falling' || hero.swimming || hero.wading) {
+    if (hero.action === 'fallen' || hero.action === 'falling' || hero.action === 'climbing' || hero.swimming || hero.wading) {
         return;
     }
     drawFrame(context, shadowFrame, { ...shadowFrame, x: hero.x, y: hero.y - 3 - Y_OFF });

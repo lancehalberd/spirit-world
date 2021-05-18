@@ -1,7 +1,7 @@
 import _ from 'lodash';
 
 import {
-    addObjectToArea, destroyTile, getAreaFromLocation, getAreaSize,
+    addObjectToArea, destroyTile, enterLocation, getAreaFromLocation, getAreaSize,
     removeAllClones, removeObjectFromArea, scrollToArea, setNextAreaSection,
     swapHeroStates,
 } from 'app/content/areas';
@@ -9,7 +9,7 @@ import { CloneExplosionEffect } from 'app/content/effects/CloneExplosionEffect';
 import { Enemy } from 'app/content/enemy';
 import { AstralProjection } from 'app/content/objects/astralProjection';
 import { editingState } from 'app/development/tileEditor';
-import { EXPLOSION_TIME, FRAME_LENGTH, GAME_KEY, MAX_SPIRIT_RADIUS } from 'app/gameConstants';
+import { CANVAS_HEIGHT, EXPLOSION_TIME, FRAME_LENGTH, GAME_KEY, MAX_SPIRIT_RADIUS } from 'app/gameConstants';
 import { getActorTargets } from 'app/getActorTargets';
 import {
     getCloneMovementDeltas,
@@ -25,7 +25,7 @@ import { rectanglesOverlap } from 'app/utils/index';
 import { playSound } from 'app/utils/sounds';
 
 import {
-    Actor, Clone, FullTile, GameState, Hero,
+    Actor, Clone, FullTile, GameState, HeldChakram, Hero,
     ObjectInstance, ThrownChakram, ThrownObject, TileCoords,
 } from 'app/types';
 
@@ -37,9 +37,6 @@ const rollSpeed = [
 ];
 
 export function updateAllHeroes(this: void, state: GameState) {
-    if (state.hero.invulnerableFrames > 0) {
-        state.hero.invulnerableFrames--;
-    }
     // Switching clones is done outside of updateHero, otherwise the switch gets processed by each clone.
     if (state.hero.clones.length && !state.hero.pickUpObject && (
             (state.hero.leftTool === 'clone' && wasGameKeyPressedAndReleased(state, GAME_KEY.LEFT_TOOL))
@@ -53,16 +50,34 @@ export function updateAllHeroes(this: void, state: GameState) {
     for (const clone of state.hero.clones) {
         updateHero(state, clone);
     }
-    if (state.hero.spiritRadius > 0 && state.hero.astralProjection) {
-        updateHero(state, state.hero.astralProjection);
+    // Destroy existing astral projection if it isn't in the right area.
+    if (state.hero.astralProjection && state.hero.astralProjection.area !== state.hero.area.alternateArea) {
+        removeObjectFromArea(state, state.hero.astralProjection);
+        state.hero.astralProjection = null;
+    }
+    if (state.hero.astralProjection) {
+        if (state.hero.spiritRadius > 0) {
+            updateHero(state, state.hero.astralProjection);
+        } else {
+            removeObjectFromArea(state, state.hero.astralProjection);
+            state.hero.astralProjection = null;
+        }
     }
     updateHero(state, state.hero);
 }
 
 export function updateHero(this: void, state: GameState, hero: Hero) {
+    if (hero.invulnerableFrames > 0) {
+        hero.invulnerableFrames--;
+    }
     const area = hero.area;
     let dx = 0, dy = 0;
     let movementSpeed = 2;
+    if (hero.equipedGear?.ironBoots) {
+        movementSpeed *= 0.5;
+    } else if (hero.equipedGear?.cloudBoots) {
+        movementSpeed *= 2;
+    }
 
     const { w, h, section } = getAreaSize(state);
 
@@ -81,6 +96,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         ? isGameKeyDown(state, GAME_KEY.WEAPON)
         : isGameKeyDown(state, GAME_KEY.PASSIVE_TOOL);
 
+    const heldChakram = hero.area.objects.find(o => o instanceof HeldChakram) as HeldChakram;
     // Automatically move the character into the bounds of the current section.
     if (editingState.isEditing && isControlled) {
         movementSpeed = 0;
@@ -92,6 +108,25 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         hero.x += 4 * dx;
         hero.y += 4 * dy;
         if (dx || dy) hero.d = getDirection(dx, dy);
+    } else if (hero.swimming && hero.equipedGear?.ironBoots && state.zone.underwaterKey) {
+        enterLocation(state, {
+            ...state.location,
+            zoneKey: state.zone.underwaterKey,
+            x: hero.x,
+            y: hero.y,
+        }, false);
+        hero.swimming = false;
+        hero.wading = false;
+        return;
+    } else if (state.zone.surfaceKey && !hero.equipedGear?.ironBoots) {
+        enterLocation(state, {
+            ...state.location,
+            zoneKey: state.zone.surfaceKey,
+            x: hero.x,
+            y: hero.y,
+        }, false);
+        hero.swimming = true;
+        return;
     } else if (!isAstralProjection && state.nextAreaInstance) {
         movementSpeed = 0;
         if (state.nextAreaInstance.cameraOffset.x && state.hero.action !== 'entering') {
@@ -118,10 +153,8 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         movementSpeed = 0;
         hero.y += 0.5;
         //dy = 1;
-    } else if (!isAstralProjection && hero.swimming) {
-        movementSpeed = 1.5;
     } else if (!isAstralProjection && hero.action === 'climbing') {
-        movementSpeed = 1;
+        movementSpeed *= 0.5;
     }  else if (!isAstralProjection && hero.action === 'falling') {
         movementSpeed = 0;
         if (hero.animationTime >= fallAnimation.duration) {
@@ -129,6 +162,19 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             hero.actionFrame = 0;
         }
     } else if (!isAstralProjection && hero.action === 'fallen') {
+        if (state.location.zoneKey === 'sky') {
+            enterLocation(state, {
+                zoneKey: 'overworld',
+                floor: 0,
+                areaGridCoords: state.location.areaGridCoords,
+                x: hero.x,
+                y: hero.y,
+                z: CANVAS_HEIGHT,
+                d: hero.d,
+                isSpiritWorld: state.location.isSpiritWorld,
+            }, false);
+            return;
+        }
         movementSpeed = 0;
         hero.actionFrame++;
         if (hero.actionFrame >= 8) {
@@ -146,7 +192,10 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
     } else if (!isAstralProjection && hero.action === 'jumpingDown') {
         movementSpeed = 0;
         // After the hero has jumped a bit, we stop the jump when they hit a position they can successfully move to.
-        if (hero.vy > 4 && moveActor(state, hero, hero.vx, hero.vy, {canFall: true})) {
+        if (hero.vy > 4 && moveActor(state, hero, hero.vx / 4, hero.vy / 4, {canFall: true, canSwim: true})) {
+            if (hero.vy > 0 && hero.y % 16 > 0) {
+                hero.y = hero.y - (hero.y % 16) + 16;
+            }
             hero.action = null;
             hero.animationTime = 0;
         } else {
@@ -172,9 +221,15 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         if (hero.actionFrame >= 5) {
             hero.action = null;
         }
+    } else if (!isAstralProjection && hero.swimming) {
+        movementSpeed *= 0.75;
+        hero.action = null;
     } else if (hero.action === 'grabbing') {
         movementSpeed = 0;
-        if (hero.grabObject?.pullingHeroDirection) {
+        if (hero.grabObject && hero.grabObject.area !== hero.area) {
+            hero.action = null;
+            hero.grabObject = null;
+        } else if (hero.grabObject?.pullingHeroDirection) {
             dx = directionMap[hero.grabObject.pullingHeroDirection][0];
             dy = directionMap[hero.grabObject.pullingHeroDirection][1];
         } else if (!hero.pickUpTile && !hero.pickUpObject && !isPassiveButtonDown) {
@@ -212,7 +267,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             }
         }
     } else if (hero.pickUpTile || hero.pickUpObject) {
-        movementSpeed = 1.5;
+        movementSpeed *= 0.75;
     } else if (hero.action === 'throwing' ) {
         movementSpeed = 0;
         hero.actionFrame++;
@@ -245,9 +300,11 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             } else {
                 const maxRadius = MAX_SPIRIT_RADIUS;
                 hero.spiritRadius = Math.min(hero.spiritRadius + 4, maxRadius);
-                if (hero.passiveTools.astralProjection && !hero.astralProjection && hero.area.alternateArea) {
-                    hero.astralProjection = new AstralProjection(hero);
-                    addObjectToArea(state, hero.area.alternateArea, hero.astralProjection);
+                if (hero.passiveTools.astralProjection && hero.area.alternateArea) {
+                    if (!hero.astralProjection) {
+                        hero.astralProjection = new AstralProjection(hero);
+                        addObjectToArea(state, hero.area.alternateArea, hero.astralProjection);
+                    }
                 }
             }
         } else {
@@ -260,14 +317,16 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
                 hero.action = null;
             }
         }
-    } else if (!isAstralProjection && (hero.action === 'knocked' || hero.action === 'thrown')) {
+    } else if (hero.action === 'knocked' || hero.action === 'thrown') {
         movementSpeed = 0;
         dx = hero.vx;
         dy = hero.vy;
         hero.z += hero.vz;
         hero.vz = Math.max(-8, hero.vz - 0.5);
-        if (hero.z <= 0) {
-            hero.z = 0;
+        // The astral projection stays 4px off the ground.
+        const minZ = isAstralProjection ? 4 : 0;
+        if (hero.z <= minZ) {
+            hero.z = minZ;
             hero.action = null;
             hero.vz = 0;
         }
@@ -276,21 +335,11 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         dx = 0;
         dy = 0;
     } else if (!isAstralProjection && hero.action === 'attack') {
-        movementSpeed = 1;
+        movementSpeed *= 0.5;
         hero.actionFrame++;
         if (hero.actionFrame === 6) {
-            const direction = (hero.actionDx || hero.actionDy) ? getDirection(hero.actionDx, hero.actionDy, true) : hero.d;
-            const chakram = new ThrownChakram({
-                x: hero.x + 3,
-                y: hero.y,
-                vx: 5 * directionMap[direction][0],
-                vy: 5 * directionMap[direction][1],
-                returnSpeed: 4,
-                source: hero,
-            });
-            addObjectToArea(state, state.areaInstance, chakram);
         }
-        if (hero.actionFrame > 12) {
+        if (hero.actionFrame > 12 || hero.swimming) {
             hero.action = null;
             hero.actionDx = 0;
             hero.actionDy = 0;
@@ -305,6 +354,25 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             hero.animationTime = 0;
         }
     }
+    if (heldChakram || hero.action === 'charging') {
+        movementSpeed *= 0.75;
+        if (!heldChakram) {
+            hero.action = null;
+            hero.actionDx = 0;
+            hero.actionDy = 0;
+        } else if (!isGameKeyDown(state, GAME_KEY.WEAPON) || hero.swimming) {
+            hero.action = 'attack';
+            hero.animationTime = 0;
+            hero.actionFrame = 0;
+            heldChakram.throw(state);
+        }
+    }
+    if (hero.grabObject && hero.action !== 'grabbing') {
+        hero.grabObject = null;
+    }
+    if (hero.grabTile && hero.action !== 'grabbing') {
+        hero.grabTile = null;
+    }
     if (hero.action === 'pushing') {
         hero.animationTime -= 3 * FRAME_LENGTH / 4;
     }
@@ -314,7 +382,9 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             const m = Math.sqrt(dx * dx + dy * dy);
             dx = movementSpeed * dx / m;
             dy = movementSpeed * dy / m;
-            if (hero.action !== 'attack') {
+            if (hero.action === 'charging') {
+                hero.d = getDirection(hero.actionDx, hero.actionDy);
+            } else if (hero.action !== 'attack') {
                 if (dx < 0 && (hero.d === 'right' || Math.abs(dx) > Math.abs(dy))) {
                     hero.d = 'left';
                 } else if (dx > 0 && (hero.d === 'left' || Math.abs(dx) > Math.abs(dy))) {
@@ -327,18 +397,40 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             }
         }
     }
+    if (heldChakram && heldChakram.area === hero.area && heldChakram.hero === hero && hero.action !== 'charging') {
+        if (hero.action === 'entering' || hero.action === 'exiting') {
+            // take no action while hero is controlled by door.
+        } else if (!hero.action && isGameKeyDown(state, GAME_KEY.WEAPON)) {
+            // resume charing if the weapon button is still down.
+            hero.action = 'charging';
+            hero.actionDx = heldChakram.vx;
+            hero.actionDy = heldChakram.vy;
+        } else {
+            heldChakram.throw(state);
+        }
+    }
     if (hero.action !== 'meditating') {
         hero.spiritRadius = 0;
         hero.explosionTime = 0;
     }
+    if (hero.bounce) {
+        hero.bounce.frames--;
+        if (!(hero.bounce.frames > 0)) {
+            hero.bounce = null;
+        } else {
+            dx = hero.bounce.vx;
+            dy = hero.bounce.vy;
+        }
+    }
     if (dx || dy) {
-        const encumbered = hero.pickUpObject || hero.pickUpTile;
+        const isCharging = hero.action === 'charging';
+        const encumbered = hero.pickUpObject || hero.pickUpTile || hero.grabObject || hero.grabTile;
         moveActor(state, hero, dx, dy, {
-            canPush: !encumbered,
-            canClimb: !encumbered,
+            canPush: !encumbered && !hero.swimming && !hero.bounce && !isCharging,
+            canClimb: !encumbered && !hero.bounce && !isCharging,
             canFall: true,
             canSwim: !encumbered,
-            boundToSection: isAstralProjection,
+            boundToSection: isAstralProjection || !!hero.bounce,
         });
         if (!hero.action) {
             hero.action = 'walking';
@@ -358,6 +450,12 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             hero.animationTime += FRAME_LENGTH;
         }
     }
+    // Return the climbin animation to a neutral state any time the character isn't moving vertically.
+    // If we allow moving laterally while climbing this would need to be updated, but the animation
+    // would probably also need to be adjusted.
+    if (!dy && hero.action === 'climbing') {
+        hero.animationTime = 4 * 6 * FRAME_LENGTH;
+    }
     if (isAstralProjection) {
         const dx = hero.x - state.hero.x, dy = hero.y - state.hero.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
@@ -372,7 +470,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             }
         }
         if (wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL) || wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL)) {
-            if (state.hero.passiveTools.teleportation && state.hero.magic >= 10
+            if (state.hero.passiveTools.teleportation && state.hero.magic > 0
                 && canTeleportToCoords(state, state.hero, {x: hero.x, y: hero.y})
             ) {
                 state.hero.magic -= 10;
@@ -380,20 +478,28 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
                 state.hero.y = hero.y;
                 // match the projection to the hero eyes.
                 hero.d = 'down';
+                return;
             }
         }
     }
     if (isControlled && !isAstralProjection && !hero.swimming && (!hero.action || hero.action === 'walking' || hero.action === 'pushing')
-        && !hero.pickUpTile && !hero.pickUpObject &&  hero.weapon > 0
+        && !hero.pickUpTile && !hero.pickUpObject && hero.weapon > 0
         && wasGameKeyPressed(state, GAME_KEY.WEAPON)
     ) {
-        const thrownChakrams = state.areaInstance.objects.filter(o => o instanceof ThrownChakram);
+        const thrownChakrams = hero.area.objects.filter(o => o instanceof ThrownChakram);
         if (state.hero.weapon - thrownChakrams.length > 0) {
-            hero.action = 'attack';
+            hero.action = 'charging';
             hero.animationTime = 0;
-            hero.actionDx = dx;
-            hero.actionDy = dy;
+            hero.actionDx = (dx || dy) ? dx : directionMap[hero.d][0];
+            hero.actionDy = (dx || dy) ? dy : directionMap[hero.d][1];
             hero.actionFrame = 0;
+            const direction = getDirection(hero.actionDx, hero.actionDy, true);
+            const chakram = new HeldChakram({
+                vx: directionMap[direction][0],
+                vy: directionMap[direction][1],
+                source: hero,
+            });
+            addObjectToArea(state, hero.area, chakram);
         }
     }
 
@@ -461,12 +567,12 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             }
             hero.pickUpFrame = 0;
             if (closestLiftableTileCoords) {
-                for (const layer of state.areaInstance.layers) {
+                for (const layer of hero.area.layers) {
                     const tile: FullTile = layer.tiles[closestLiftableTileCoords.y][closestLiftableTileCoords.x];
-                    const behavior = tile.behaviors;
+                    const behavior = tile?.behaviors;
                     if (behavior?.pickupWeight <= state.hero.passiveTools.gloves) {
                         hero.pickUpTile = tile;
-                        destroyTile(state, state.areaInstance, {...closestLiftableTileCoords, layerKey: layer.key});
+                        destroyTile(state, hero.area, {...closestLiftableTileCoords, layerKey: layer.key});
                         if (behavior.linkableTiles) {
                             const alternateLayer = _.find(state.alternateAreaInstance.layers, {key: layer.key});
                             if(alternateLayer) {
@@ -476,7 +582,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
                                         ...hero.pickUpTile,
                                         linkedTile,
                                     };
-                                    destroyTile(state, state.alternateAreaInstance, {...closestLiftableTileCoords, layerKey: layer.key});
+                                    destroyTile(state, hero.area, {...closestLiftableTileCoords, layerKey: layer.key});
                                 }
                             }
                         }
@@ -493,7 +599,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             }
         } else if (dx || dy) {
             if (hero.passiveTools.roll > 0) {
-                if (state.hero.magic >= 5) {
+                if (state.hero.magic > 0) {
                     state.hero.magic -= 5;
                     hero.action = 'roll';
                     hero.actionFrame = 0;
@@ -613,8 +719,8 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
     if (hero.action !== 'knocked' && hero.action !== 'thrown') {
         // At base mana regen, using cat eyes reduces your mana very slowly unless you are stationary.
         let targetLightRadius = 20, minLightRadius = 20;
-        if (state.areaInstance.definition.dark) {
-            const coefficient = 100 / state.areaInstance.definition.dark;
+        if (hero.area.definition.dark) {
+            const coefficient = 100 / hero.area.definition.dark;
             minLightRadius *= coefficient;
             if (state.hero.passiveTools.trueSight > 0) {
                 state.hero.magic -= 10 * FRAME_LENGTH / 1000 / coefficient;
@@ -639,7 +745,6 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         state.hero.magic = state.hero.maxMagic;
     }
     if (state.hero.magic < 0) {
-        state.hero.magic = 0;
         state.hero.invisible = false;
         if (state.hero.clones.length) {
             state.hero.x = hero.x;
@@ -658,7 +763,7 @@ export function checkForEnemyDamage(state: GameState, hero: Hero) {
     if (hero.action === 'roll' || hero.action === 'getItem' || hero.invulnerableFrames > 0 || state.hero.invisible) {
         return;
     }
-    for (const enemy of state.areaInstance.objects) {
+    for (const enemy of hero.area.objects) {
         if (!(enemy instanceof Enemy) || enemy.invulnerableFrames > 0) {
             continue;
         }
@@ -709,17 +814,23 @@ export function damageActor(
     if (actor.life <= 0) {
         return false;
     }
-    if (!overrideInvulnerability && (actor.action === 'roll' || actor.action === 'getItem')) {
+    if (!overrideInvulnerability && (actor.action === 'roll' || actor.action === 'getItem' || actor.action === 'jumpingDown')) {
         return false;
     }
     const hero = state.hero.activeClone || state.hero;
-    // Hero is invulnerable during invulnerability frames, but other actors are not.
-    if (!overrideInvulnerability && actor === hero && (actor.invulnerableFrames > 0 || state.hero.invisible)) {
-        return false;
+    // Enemies have special code for handling invulnerability.
+    if (!overrideInvulnerability && !(actor instanceof Enemy)) {
+        if (actor.invulnerableFrames > 0) {
+            return false;
+        }
+        if (actor.invisible) {
+            return false;
+        }
     }
 
+    let hit = false;
     if (actor.takeDamage) {
-        actor.takeDamage(state, damage);
+        hit = actor.takeDamage(state, damage);
     } else if (actor === state.hero || state.hero.clones.indexOf(actor as any) >= 0) {
         // If any clones are in use, any damage one takes destroys it until only one clone remains.
         // Damage applies to the hero, not the clone.
@@ -730,17 +841,24 @@ export function damageActor(
         if (state.hero.clones.length) {
             destroyClone(state, actor as any);
         }
+        hit = true;
     }
 
-    if (knockback) {
-        throwHeldObject(state, hero);
-        actor.action = 'knocked';
-        actor.animationTime = 0;
-        actor.vx = knockback.vx;
-        actor.vy = knockback.vy;
-        actor.vz = knockback.vz;
+    if (hit && knockback) {
+        if (actor.knockBack) {
+            actor.knockBack(state, knockback);
+        } else {
+            if (actor=== hero) {
+                throwHeldObject(state, hero);
+            }
+            actor.action = 'knocked';
+            actor.animationTime = 0;
+            actor.vx = knockback.vx;
+            actor.vy = knockback.vy;
+            actor.vz = knockback.vz;
+        }
     }
-    return true;
+    return hit;
 }
 
 const throwSpeed = 6;
@@ -777,7 +895,7 @@ export function throwHeldObject(state: GameState, hero: Hero){
     });
     thrownObject.behaviors.brightness = behaviors?.brightness;
     thrownObject.behaviors.lightRadius = behaviors?.lightRadius;
-    addObjectToArea(state, state.areaInstance, thrownObject);
+    addObjectToArea(state, hero.area, thrownObject);
     if (tile.linkedTile) {
         const behaviors = tile.linkedTile.behaviors;
         const alternateThrownObject = new ThrownObject({

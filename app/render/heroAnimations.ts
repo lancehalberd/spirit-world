@@ -74,6 +74,10 @@ const pushShallowDownAnimation: FrameAnimation = createAnimation('gfx/mc/mcpushp
 const pushShallowLeftAnimation: FrameAnimation = createAnimation('gfx/mc/mcpushpullshallow.png', pushGeometry, { cols: 3, x: 5, y: 3, duration: 8, frameMap:[0, 1, 0, 2]});
 const pushShallowRightAnimation: FrameAnimation = createAnimation('gfx/mc/mcpushpullshallow.png', pushGeometry, { cols: 3, x: 5, y: 1, duration: 8, frameMap:[0, 1, 0, 2]});
 
+
+const climbGeometry: FrameDimensions = {w: 20, h: 28, content: {x: 2, y: 16 + Y_OFF, w: 16, h: 16}};
+const climbUpAnimation: FrameAnimation = createAnimation('gfx/mc/mcclimb.png', climbGeometry, { cols: 9, duration: 6});
+
 const swimGeometry: FrameDimensions = {w: 20, h: 28, content: {x: 2, y: 16 + Y_OFF, w: 16, h: 16}};
 const floatUpAnimation: FrameAnimation = createAnimation('gfx/mc/wukongswim.png', swimGeometry, { cols: 2, x: 0, y: 2, duration: 16});
 const floatDownAnimation: FrameAnimation = createAnimation('gfx/mc/wukongswim.png', swimGeometry, { cols: 2, x: 0, y: 0, duration: 16});
@@ -85,6 +89,20 @@ const swimLeftAnimation: FrameAnimation = createAnimation('gfx/mc/wukongswim.png
 const swimRightAnimation: FrameAnimation = createAnimation('gfx/mc/wukongswim.png', swimGeometry, { cols: 6, x: 2, y: 1, duration: 8});
 
 
+const spiritGeometry: FrameDimensions = {w: 20, h: 28, content: {x: 2, y: 16 + Y_OFF, w: 16, h: 16}};
+const spiritUpAnimation: FrameAnimation = createAnimation('gfx/mc/spiritmovesheet.png', spiritGeometry, { cols: 8, y: 2, duration: 10});
+const spiritDownAnimation: FrameAnimation = createAnimation('gfx/mc/spiritmovesheet.png', spiritGeometry, { cols: 8, y: 0, duration: 10});
+const spiritLeftAnimation: FrameAnimation = createAnimation('gfx/mc/spiritmovesheet.png', spiritGeometry, { cols: 8, y: 3, duration: 10});
+const spiritRightAnimation: FrameAnimation = createAnimation('gfx/mc/spiritmovesheet.png', spiritGeometry, { cols: 8, y: 1, duration: 10});
+const spiritPushUpAnimation: FrameAnimation = createAnimation('gfx/mc/spiritholdpushsheet.png', spiritGeometry, { cols: 8, y: 2, duration: 10});
+const spiritPushDownAnimation: FrameAnimation = createAnimation('gfx/mc/spiritholdpushsheet.png', spiritGeometry, { cols: 8, y: 0, duration: 10});
+const spiritPushLeftAnimation: FrameAnimation = createAnimation('gfx/mc/spiritholdpushsheet.png', spiritGeometry, { cols: 8, y: 3, duration: 10});
+const spiritPushRightAnimation: FrameAnimation = createAnimation('gfx/mc/spiritholdpushsheet.png', spiritGeometry, { cols: 8, y: 1, duration: 10});
+const spiritPullUpAnimation: FrameAnimation = createAnimation('gfx/mc/spiritpullsheet.png', spiritGeometry, { cols: 8, y: 2, duration: 10});
+const spiritPullDownAnimation: FrameAnimation = createAnimation('gfx/mc/spiritpullsheet.png', spiritGeometry, { cols: 8, y: 0, duration: 10});
+const spiritPullLeftAnimation: FrameAnimation = createAnimation('gfx/mc/spiritpullsheet.png', spiritGeometry, { cols: 8, y: 3, duration: 10});
+const spiritPullRightAnimation: FrameAnimation = createAnimation('gfx/mc/spiritpullsheet.png', spiritGeometry, { cols: 8, y: 1, duration: 10});
+
 const fallGeometry: FrameDimensions = {w: 20, h: 28, content: {x: 2, y: 16 + Y_OFF, w: 16, h: 16}};
 export const fallAnimation: FrameAnimation = createAnimation('gfx/mc/mcfall.png', fallGeometry, { cols: 13, duration: 4}, { loop: false });
 
@@ -94,6 +112,9 @@ export const heroAnimations: ActorAnimations = {
         down: attackDownAnimation,
         left: attackLeftAnimation,
         right: attackRightAnimation,
+    },
+    climbing: {
+        up: climbUpAnimation,
     },
     falling: {
         up: fallAnimation,
@@ -197,5 +218,39 @@ export const heroSwimAnimations: ActorAnimations = {
         down: swimDownAnimation,
         left: swimLeftAnimation,
         right: swimRightAnimation,
+    },
+};
+
+
+export const heroSpiritAnimations: ActorAnimations = {
+    grab: {
+        up: spiritPullUpAnimation,
+        down: spiritPullDownAnimation,
+        left: spiritPullLeftAnimation,
+        right: spiritPullRightAnimation,
+    },
+    idle: {
+        up: spiritUpAnimation,
+        down: spiritDownAnimation,
+        left: spiritLeftAnimation,
+        right: spiritRightAnimation,
+    },
+    move: {
+        up: spiritUpAnimation,
+        down: spiritDownAnimation,
+        left: spiritLeftAnimation,
+        right: spiritRightAnimation,
+    },
+    pull: {
+        up: spiritPullUpAnimation,
+        down: spiritPullDownAnimation,
+        left: spiritPullLeftAnimation,
+        right: spiritPullRightAnimation,
+    },
+    push: {
+        up: spiritPushUpAnimation,
+        down: spiritPushDownAnimation,
+        left: spiritPushLeftAnimation,
+        right: spiritPushRightAnimation,
     },
 };

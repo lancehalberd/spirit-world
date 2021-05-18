@@ -1,12 +1,16 @@
 import { addObjectToArea, removeObjectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { drawFrame, frameAnimation, getFrame } from 'app/utils/animations';
+import { createAnimation, drawFrame, frameAnimation, getFrame } from 'app/utils/animations';
 
-import { AreaInstance, Frame, FrameAnimation, GameState, ObjectInstance, ObjectStatus, TileBehaviors } from 'app/types';
+import {
+    AreaInstance, DrawPriority, Frame, FrameAnimation,
+    GameState, ObjectInstance, ObjectStatus, ShortRectangle, TileBehaviors,
+} from 'app/types';
 
 
 interface Props {
     animation: FrameAnimation,
+    drawPriority?: DrawPriority,
     x?: number
     y?: number,
     z?: number,
@@ -15,14 +19,18 @@ interface Props {
     vz?: number,
     az?: number,
     scale?: number,
+    ttl?: number,
 }
 
 export class AnimationEffect implements ObjectInstance {
     area: AreaInstance;
     definition = null;
+    done = false;
+    drawPriority: DrawPriority;
     animation: FrameAnimation;
     animationTime: number;
     behaviors: TileBehaviors;
+    ignorePits = true;
     x: number;
     y: number;
     z: number;
@@ -32,9 +40,11 @@ export class AnimationEffect implements ObjectInstance {
     az: number;
     scale: number;
     status: ObjectStatus = 'normal';
-    constructor({animation, x = 0, y = 0, z = 0, vx = 0, vy = 0, vz = 0, az = 0, scale = 1}: Props) {
+    ttl: number;
+    constructor({animation, drawPriority = 'background', x = 0, y = 0, z = 0, vx = 0, vy = 0, vz = 0, az = 0, scale = 1, ttl}: Props) {
         this.animation = animation;
         this.animationTime = 0;
+        this.drawPriority = drawPriority;
         this.x = x;
         this.y = y;
         this.z = z;
@@ -43,6 +53,7 @@ export class AnimationEffect implements ObjectInstance {
         this.vz = vz;
         this.az = az;
         this.scale = scale;
+        this.ttl = ttl;
         this.behaviors = {};
     }
     getHitbox(state: GameState) {
@@ -58,7 +69,8 @@ export class AnimationEffect implements ObjectInstance {
         if (this.behaviors.brightness > 0) {
             this.behaviors.brightness *= 0.9;
         }
-        if (this.z < 0 || (this.animation.loop === false && this.animationTime >= this.animation.duration)) {
+        if (this.animationTime > this.ttl || this.z < 0 || (this.animation.loop === false && this.animationTime >= this.animation.duration)) {
+            this.done = true;
             removeObjectFromArea(state, this);
         }
     }
@@ -73,7 +85,8 @@ export class AnimationEffect implements ObjectInstance {
 }
 
 export function addParticleAnimations(
-    state: GameState, area: AreaInstance, x: number, y: number, z: number, particles: Frame[], behaviors?: TileBehaviors): void {
+    state: GameState, area: AreaInstance, x: number, y: number, z: number, particles: Frame[], behaviors?: TileBehaviors
+): void {
     if (!particles) {
         return;
     }
@@ -83,6 +96,7 @@ export function addParticleAnimations(
         const vy = Math.sin(theta);
         const particle = new AnimationEffect({
             animation: frameAnimation(frame),
+            drawPriority: 'foreground',
             x: x + vx, y: y + vy, z,
             vx, vy, vz: 1.5, az: -0.2,
         });
@@ -93,4 +107,21 @@ export function addParticleAnimations(
         addObjectToArea(state, area, particle);
         theta += Math.PI * 2 / (particles.length);
     }
+}
+
+const sparkleAnimation = createAnimation('gfx/effects/goldparticles.png', {w: 5, h: 5}, {cols: 3, duration: 4, frameMap: [2,1,0,0,1,2]}, {loop: false});
+export function addSparkleAnimation(
+    state: GameState, area: AreaInstance, hitbox: ShortRectangle
+): void {
+    addObjectToArea(state, area, makeSparkleAnimation(state, hitbox));
+}
+export function makeSparkleAnimation(
+    state: GameState, hitbox: ShortRectangle
+): AnimationEffect {
+    return new AnimationEffect({
+        animation: sparkleAnimation,
+        drawPriority: 'foreground',
+        x: hitbox.x + Math.random() * hitbox.w - 2.5,
+        y: hitbox.y + Math.random() * hitbox.h - 2.5,
+    });
 }
