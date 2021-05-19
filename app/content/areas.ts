@@ -523,6 +523,11 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
     if (definition.parentDefinition) {
         for (const layer of instance.layers) {
             const definitionIndex = definition.layers.indexOf(layer.definition);
+            const parentLayerDefinition = definition.parentDefinition.layers[definitionIndex];
+            if (!parentLayerDefinition) {
+                debugger;
+                continue;
+            }
             for (let y = 0; y < layer.tiles.length; y++) {
                 for (let x = 0; x < layer.tiles[y].length; x++) {
                     if (!layer.tiles[y][x]) {
