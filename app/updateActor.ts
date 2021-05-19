@@ -8,6 +8,7 @@ import {
 import { CloneExplosionEffect } from 'app/content/effects/CloneExplosionEffect';
 import { Enemy } from 'app/content/enemy';
 import { AstralProjection } from 'app/content/objects/astralProjection';
+import { zones } from 'app/content/zones';
 import { editingState } from 'app/development/tileEditor';
 import { CANVAS_HEIGHT, EXPLOSION_TIME, FRAME_LENGTH, GAME_KEY, MAX_SPIRIT_RADIUS } from 'app/gameConstants';
 import { getActorTargets } from 'app/getActorTargets';
@@ -88,6 +89,11 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
     const isAstralProjection = hero instanceof AstralProjection;
     const isControlled = (state.hero.action === 'meditating' && isAstralProjection) || isCloneToolDown || hero === primaryClone;
 
+    const minZ = isAstralProjection ? 4 : (hero.equipedGear?.cloudBoots ? 1 : 0);
+    if (hero.z < minZ) {
+        hero.z = Math.max(hero.z + 1, minZ);
+    }
+
     // The astral projection uses the weapon tool as the passive tool button
     // since you have to hold the normal passive tool button down to meditate.
     const wasPassiveButtonPressed = isAstralProjection
@@ -96,6 +102,10 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
     const isPassiveButtonDown = isAstralProjection
         ? isGameKeyDown(state, GAME_KEY.WEAPON)
         : isGameKeyDown(state, GAME_KEY.PASSIVE_TOOL);
+    if (hero.slipping) {
+        hero.vx *= 0.99;
+        hero.vy *= 0.99;
+    }
 
     const heldChakram = hero.area.objects.find(o => o instanceof HeldChakram) as HeldChakram;
     // Automatically move the character into the bounds of the current section.
@@ -109,22 +119,25 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         hero.x += 4 * dx;
         hero.y += 4 * dy;
         if (dx || dy) hero.d = getDirection(dx, dy);
-    } else if (hero.swimming && hero.equipedGear?.ironBoots && state.zone.underwaterKey) {
+    } else if (hero.swimming && hero.equipedGear?.ironBoots && state.underwaterAreaInstance &&
+        isPointOpen(state, state.underwaterAreaInstance, {x: hero.x + hero.w / 2, y: hero.y + hero.h / 2})
+    ) {
         const mx = hero.x % 16;
         if (mx > 0 && mx < 8) {
             hero.x = Math.max(hero.x - mx, hero.x - 1);
-        } else if (mx > 8) {
+        } else if (mx >= 8) {
             hero.x = Math.min(hero.x - mx + 16, hero.x + 1);
         }
         const my = hero.y % 16;
         if (my > 0 && my < 8) {
             hero.y = Math.max(hero.y - my, hero.y - 1);
-        } else if (my > 8) {
+        } else if (my >= 8) {
             hero.y = Math.min(hero.y - my + 16, hero.y + 1);
         }
         if (hero.x % 16 === 0 && hero.y % 16 === 0) {
             enterLocation(state, {
                 ...state.location,
+                floor: zones[state.zone.underwaterKey].floors.length - 1,
                 zoneKey: state.zone.underwaterKey,
                 x: hero.x,
                 y: hero.y,
@@ -135,49 +148,71 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         }
         return;
     } else if (isHeroFloating(state, hero)) {
-        hero.z += 2;
-        if (hero.z >= 24) {
-            enterLocation(state, {
-                ...state.location,
-                zoneKey: state.zone.surfaceKey,
-                x: hero.x,
-                y: hero.y,
-                z: 0,
-            }, false);
-            hero.swimming = true;
+        hero.z = Math.min(24, hero.z + 1);
+        if (hero.z >= 24 && state.surfaceAreaInstance) {
+            // You can only surface in areas of deep water, that is, where you would be swimming.
+            const testHero = {...hero};
+            testHero.z = 0;
+            testHero.area = state.surfaceAreaInstance;
+            checkForFloorEffects(state, testHero);
+            // If the test hero is swimming, we can surface here.
+            if (testHero.swimming) {
+                enterLocation(state, {
+                    ...state.location,
+                    zoneKey: state.zone.surfaceKey,
+                    x: hero.x,
+                    y: hero.y,
+                    z: 0,
+                }, false);
+                hero.swimming = true;
+            }
         }
     } else if (isHeroSinking(state, hero)) {
         hero.z = Math.max(hero.z - 2, 0);
     } else if (!isAstralProjection && state.nextAreaInstance) {
         movementSpeed = 0;
+        hero.vx = 0;
+        hero.vy = 0;
         if (state.nextAreaInstance.cameraOffset.x && state.hero.action !== 'entering') {
             // We need to make sure this is low enough that the character doesn't get entirely into the second column,
             // otherwise horizontal doors won't work as expected.
-            dx = 0.75 * state.nextAreaInstance.cameraOffset.x / Math.abs(state.nextAreaInstance.cameraOffset.x);
+            //dx = 0.75 * state.nextAreaInstance.cameraOffset.x / Math.abs(state.nextAreaInstance.cameraOffset.x);
+            hero.x += 0.75 * state.nextAreaInstance.cameraOffset.x / Math.abs(state.nextAreaInstance.cameraOffset.x);
         }
         if (state.nextAreaInstance.cameraOffset.y && state.hero.action !== 'entering') {
-            dy = 1 * state.nextAreaInstance.cameraOffset.y / Math.abs(state.nextAreaInstance.cameraOffset.y);
+            //dy = 1 * state.nextAreaInstance.cameraOffset.y / Math.abs(state.nextAreaInstance.cameraOffset.y);
+            hero.y += 0.5 * state.nextAreaInstance.cameraOffset.y / Math.abs(state.nextAreaInstance.cameraOffset.y);
         }
     } else if (!isAstralProjection && hero.x + hero.w > section.x + section.w + 1) {
         movementSpeed = 0;
+        hero.vx = 0;
+        hero.vy = 0;
         hero.x -= 0.5;
         //dx = -1;
     } else if (!isAstralProjection && hero.x < section.x - 1) {
         movementSpeed = 0;
+        hero.vx = 0;
+        hero.vy = 0;
         hero.x += 0.5;
         //dx = 1;
     } else if (!isAstralProjection && hero.y + hero.h > section.y + section.h + 1) {
         movementSpeed = 0;
+        hero.vx = 0;
+        hero.vy = 0;
         hero.y -= 0.5;
         //dy = -1;
     } else if (!isAstralProjection && hero.y < section.y - 1) {
         movementSpeed = 0;
+        hero.vx = 0;
+        hero.vy = 0;
         hero.y += 0.5;
         //dy = 1;
     } else if (!isAstralProjection && hero.action === 'climbing') {
         movementSpeed *= 0.5;
     }  else if (!isAstralProjection && hero.action === 'falling') {
         movementSpeed = 0;
+        hero.vx = 0;
+        hero.vy = 0;
         if (hero.animationTime >= fallAnimation.duration) {
             hero.action = 'fallen';
             hero.actionFrame = 0;
@@ -197,6 +232,8 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             return;
         }
         movementSpeed = 0;
+        hero.vx = 0;
+        hero.vy = 0;
         hero.actionFrame++;
         if (hero.actionFrame >= 8) {
             hero.d = hero.safeD;
@@ -213,7 +250,12 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
     } else if (!isAstralProjection && hero.action === 'jumpingDown') {
         movementSpeed = 0;
         // After the hero has jumped a bit, we stop the jump when they hit a position they can successfully move to.
-        if (hero.vy > 4 && moveActor(state, hero, hero.vx / 4, hero.vy / 4, {canFall: true, canSwim: true})) {
+        let canMove = false;
+        if (hero.vy > 4) {
+            const { mx, my } = moveActor(state, hero, hero.vx / 4, hero.vy / 4, {canFall: true, canSwim: true});
+            canMove = mx !== 0 || my !== 0;
+        }
+        if (canMove) {
             if (hero.vy > 0 && hero.y % 16 > 0) {
                 hero.y = hero.y - (hero.y % 16) + 16;
             }
@@ -230,12 +272,18 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         // The clone will update itself to match its carrier.
         hero.animationTime = 0;
         movementSpeed = 0;
+        hero.vx = 0;
+        hero.vy = 0;
     } else if (!isAstralProjection && (hero.action === 'entering' || hero.action === 'exiting')) {
         // The door will move the player until the action is complete.
         movementSpeed = 0;
+        hero.vx = 0;
+        hero.vy = 0;
         hero.actionFrame++;
     } else if (hero.action === 'getItem') {
         movementSpeed = 0;
+        hero.vx = 0;
+        hero.vy = 0;
         hero.actionFrame++;
         // The hero doesn't update while the loot item is displayed, so we don't
         // need to show this for many frames after the hero starts updating again.
@@ -247,6 +295,8 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         hero.action = null;
     } else if (hero.action === 'grabbing') {
         movementSpeed = 0;
+        hero.vx = 0;
+        hero.vy = 0;
         if (hero.grabObject && hero.grabObject.area !== hero.area) {
             hero.action = null;
             hero.grabObject = null;
@@ -345,13 +395,12 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         hero.z += hero.vz;
         hero.vz = Math.max(-8, hero.vz - 0.5);
         // The astral projection stays 4px off the ground.
-        const minZ = isAstralProjection ? 4 : 0;
         if (hero.z <= minZ) {
             hero.z = minZ;
             hero.action = null;
             hero.vz = 0;
         }
-    } else if (!isAstralProjection && hero.z > 0) {
+    } else if (!isAstralProjection && hero.z > minZ) {
         hero.action = 'knocked';
         dx = 0;
         dy = 0;
@@ -367,8 +416,8 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         }
     } else if (!isAstralProjection && hero.action === 'roll') {
         movementSpeed = 0;
-        dx = directionMap[hero.d][0] * rollSpeed[hero.actionFrame];
-        dy = directionMap[hero.d][1] * rollSpeed[hero.actionFrame];
+        hero.vx = dx = directionMap[hero.d][0] * rollSpeed[hero.actionFrame];
+        hero.vy = dy = directionMap[hero.d][1] * rollSpeed[hero.actionFrame];
         hero.actionFrame++;
         if (hero.actionFrame >= rollSpeed.length) {
             hero.action = null;
@@ -443,16 +492,35 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             dy = hero.bounce.vy;
         }
     }
-    if (dx || dy) {
+    if (dx || dy || (hero.slipping && (Math.abs(hero.vx) > 0.3 || Math.abs(hero.vy) > 0.3))) {
         const isCharging = hero.action === 'charging';
         const encumbered = hero.pickUpObject || hero.pickUpTile || hero.grabObject || hero.grabTile;
-        moveActor(state, hero, dx, dy, {
-            canPush: !encumbered && !hero.swimming && !hero.bounce && !isCharging,
-            canClimb: !encumbered && !hero.bounce && !isCharging,
-            canFall: true,
-            canSwim: !encumbered,
-            boundToSection: isAstralProjection || !!hero.bounce,
-        });
+        if (hero.slipping) {
+            hero.vx = dx / 50 + hero.vx;
+            hero.vy = dy / 50 + hero.vy;
+        } else {
+            hero.vx = dx;
+            hero.vy = dy;
+        }
+        const moveX = Math.abs(hero.vx) > 0.3 ? hero.vx : 0;
+        const moveY = Math.abs(hero.vy) > 0.3 ? hero.vy : 0;
+        if (moveX || moveY) {
+            const {mx, my} = moveActor(state, hero, moveX, moveY, {
+                canPush: !encumbered && !hero.swimming && !hero.bounce && !isCharging
+                    // You can only push if you are moving the direction you are trying to move.
+                    && hero.vx * dx >= 0 && hero.vy * dy >= 0,
+                canClimb: !encumbered && !hero.bounce && !isCharging,
+                canFall: true,
+                canSwim: !encumbered,
+                boundToSection: isAstralProjection || !!hero.bounce,
+            });
+            if (moveX) {
+                hero.vx = mx;
+            }
+            if (moveY) {
+                hero.vy = my;
+            }
+        }
         if (!hero.action) {
             hero.action = 'walking';
             hero.actionDx = 0;
@@ -514,7 +582,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             hero.actionDx = (dx || dy) ? dx : directionMap[hero.d][0];
             hero.actionDy = (dx || dy) ? dy : directionMap[hero.d][1];
             hero.actionFrame = 0;
-            const direction = getDirection(hero.actionDx, hero.actionDy, true);
+            const direction = getDirection(hero.actionDx, hero.actionDy, true, hero.d);
             const chakram = new HeldChakram({
                 vx: directionMap[direction][0],
                 vy: directionMap[direction][1],
@@ -542,7 +610,6 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         !hero.pickUpTile && !hero.pickUpObject && wasPassiveButtonPressed) {
         const {objects, tiles} = getActorTargets(state, hero);
         if (tiles.some(({x, y}) => area.behaviorGrid?.[y]?.[x]?.solid) || objects.some(o => o.behaviors?.solid)) {
-            //console.log({dx, dy, tiles, objects});
             let closestLiftableTileCoords: TileCoords = null,
                 closestObject: ObjectInstance = null,
                 closestDistance = 100;
@@ -676,25 +743,25 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         // We only move to the next area if the player is moving in the direction of that area.
         // dx/dy handles most cases, but in some cases like moving through doorways we also need to check
         // hero.actionDx
-        if (hero.x < 0 && (dx < 0 || hero.actionDx < 0)) {
+        if (hero.x < 0 && (hero.vx < 0 || hero.actionDx < 0)) {
             state.location.areaGridCoords = {
                 x: (state.location.areaGridCoords.x + state.areaGrid[0].length - 1) % state.areaGrid[0].length,
                 y: state.location.areaGridCoords.y,
             };
             scrollToArea(state, getAreaFromLocation(state.location), 'left');
-        } else if (hero.x + hero.w > w && (dx > 0 || hero.actionDx > 0)) {
+        } else if (hero.x + hero.w > w && (hero.vx > 0 || hero.actionDx > 0)) {
             state.location.areaGridCoords = {
                 x: (state.location.areaGridCoords.x + 1) % state.areaGrid[0].length,
                 y: state.location.areaGridCoords.y,
             };
             scrollToArea(state, getAreaFromLocation(state.location), 'right');
-        } else if (hero.x < section.x && (dx < 0 || hero.actionDx < 0)) {
+        } else if (hero.x < section.x && (hero.vx < 0 || hero.actionDx < 0)) {
             setNextAreaSection(state, 'left');
-        } else if (hero.x + hero.w > section.x + section.w && (dx > 0 || hero.actionDx > 0)) {
+        } else if (hero.x + hero.w > section.x + section.w && (hero.vx > 0 || hero.actionDx > 0)) {
             setNextAreaSection(state, 'right');
         }
-        const isHeroMovingDown = (dy > 0 || hero.actionDy > 0 || (hero.action === 'jumpingDown' && hero.vy > 0));
-        if (hero.y < 0 && (dy < 0 || hero.actionDy < 0)) {
+        const isHeroMovingDown = (hero.vy > 0 || hero.actionDy > 0 || (hero.action === 'jumpingDown' && hero.vy > 0));
+        if (hero.y < 0 && (hero.vy < 0 || hero.actionDy < 0)) {
             state.location.areaGridCoords = {
                 x: state.location.areaGridCoords.x,
                 y: (state.location.areaGridCoords.y + state.areaGrid.length - 1) % state.areaGrid.length,
@@ -706,7 +773,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
                 y: (state.location.areaGridCoords.y + 1) % state.areaGrid.length,
             };
             scrollToArea(state, getAreaFromLocation(state.location), 'down');
-        } else if (hero.y < section.y && (dy < 0 || hero.actionDy < 0)) {
+        } else if (hero.y < section.y && (hero.vy < 0 || hero.actionDy < 0)) {
             setNextAreaSection(state, 'up');
         } else if (hero.y + hero.h > section.y + section.h && isHeroMovingDown) {
             setNextAreaSection(state, 'down');
@@ -717,22 +784,26 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         state.defeatState.time = 0;
         state.menuIndex = 0;
     }
-    state.hero.magic += state.hero.magicRegen * FRAME_LENGTH / 1000;
+    if (state.hero.invisible) {
+        state.hero.actualMagicRegen = Math.max(-10, state.hero.actualMagicRegen - 4 * FRAME_LENGTH / 1000);
+    }
+    const isHoldingBreath = !isAstralProjection && !state.hero.passiveTools.waterBlessing && state.surfaceAreaInstance;
+    if (isHoldingBreath) {
+        state.hero.actualMagicRegen = Math.min(-3, state.hero.actualMagicRegen);
+    }
+    if (!state.hero.invisible && !isHoldingBreath) {
+        state.hero.actualMagicRegen = Math.min(
+            !state.hero.action ? 2 * state.hero.magicRegen : state.hero.magicRegen,
+            state.hero.actualMagicRegen + 4 * FRAME_LENGTH / 1000
+        );
+    }
+    state.hero.magic += state.hero.actualMagicRegen * FRAME_LENGTH / 1000;
     // Spirit regenerates twice as quickly when idle.
-    if (!state.hero.action) {
-        state.hero.magic += state.hero.magicRegen * FRAME_LENGTH / 1000;
+    if (!state.hero.action && state.hero.actualMagicRegen > 0) {
+        state.hero.magic += state.hero.actualMagicRegen * FRAME_LENGTH / 1000;
     }
     // Clones drain 2 magic per second.
     state.hero.magic -= 2 * state.hero.clones.length * FRAME_LENGTH / 1000;
-    if (state.hero.invisible) {
-        state.hero.magic -= state.hero.invisibilityCost * FRAME_LENGTH / 1000;
-        // Invisibility cost increases while it is active.
-        state.hero.invisibilityCost += 4 * FRAME_LENGTH / 1000;
-    } else if (state.hero.invisibilityCost > 0 ){
-        // Invisibility cost returns to 0 while it is off.
-        state.hero.invisibilityCost -= 4 * FRAME_LENGTH / 1000;
-        state.hero.invisibilityCost = Math.max(0, state.hero.invisibilityCost);
-    }
     // Meditation consumes 1 spirit energy per second.
     if (hero.action === 'meditating') {
         state.hero.magic -= FRAME_LENGTH / 1000;
@@ -771,6 +842,9 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             state.hero.x = hero.x;
             state.hero.y = hero.y;
             removeAllClones(state);
+        }
+        if (isHoldingBreath) {
+            damageActor(state, hero, 1);
         }
     }
     if (state.hero.magic > state.hero.maxMagic) {
@@ -868,11 +942,11 @@ export function damageActor(
         hit = true;
     }
 
-    if (hit && knockback) {
+    if (hit && knockback && !actor.equipedGear?.ironBoots) {
         if (actor.knockBack) {
             actor.knockBack(state, knockback);
         } else {
-            if (actor=== hero) {
+            if (actor === hero) {
                 throwHeldObject(state, hero);
             }
             actor.action = 'knocked';

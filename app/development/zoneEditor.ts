@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import {
-    enterLocation, setAreaSection,
+    enterLocation, setAreaSection, setConnectedAreas,
 } from 'app/content/areas';
 import { zones } from 'app/content/zones';
 import { exportZoneToClipboard, importZone, serializeZone } from 'app/development/exportZone';
@@ -250,6 +250,7 @@ export function getZoneProperties(state: GameState, editingState: EditingState):
                 state.areaInstance = state.alternateAreaInstance;
                 state.alternateAreaInstance = tempInstance;
                 state.hero.area = state.areaInstance;
+                setConnectedAreas(state);
                 //enterLocation(state, state.location);
                 displayTileEditorPropertyPanel();
             }

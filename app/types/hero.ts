@@ -94,6 +94,7 @@ export interface Actor {
     takeDamage?: (state: GameState, damage: number) => boolean,
     knockBack?: (state: GameState, vector: {vx: number, vy: number, vz: number}) => void,
     wading?: boolean,
+    slipping?: boolean,
     swimming?: boolean,
     floating?: boolean,
     sinking?: boolean,
@@ -105,8 +106,10 @@ export interface Hero extends Actor {
     magic: number,
     // base: 20, max: 100, roll: 5, charge: 10, double-charge: 50
     maxMagic: number,
-    // base 4, max 8-10
+    // base 4, max 8-10 (target mana regen rate)
     magicRegen: number,
+    // This is the actual mana regen rate, which changes depending on circumstances and can even become negative.
+    actualMagicRegen: number,
     lightRadius: number,
     // inventory
     money: number,
@@ -123,7 +126,6 @@ export interface Hero extends Actor {
     activeClone?: Clone,
     activeStaff?: Staff,
     invisible: boolean,
-    invisibilityCost: number,
     safeD: Direction,
     safeX: number,
     safeY: number,

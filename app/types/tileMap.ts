@@ -48,6 +48,7 @@ export interface TileBehaviors {
     underTile?: number,
     growTiles?: number[],
     shallowWater?: boolean,
+    slippery?: boolean,
     water?: boolean,
 }
 

@@ -54,7 +54,8 @@ function moveNPC(state, npc: NPC, dx, dy, movementProperties: MovementProperties
         npc.y += dy;
         return true;
     }
-    return moveActor(state, npc, dx, dy, movementProperties);
+    const { mx, my } = moveActor(state, npc, dx, dy, movementProperties);
+    return mx !== 0 || my !== 0;
 }
 
 export type NPCStyle = keyof typeof npcStyles;

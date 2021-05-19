@@ -1,6 +1,6 @@
 import {
     addObjectToArea, checkIfAllEnemiesAreDefeated, createAreaInstance, getAreaFromLocation, getAreaSize, linkObjects,
-    setAreaSection, switchToNextAreaSection,
+    setAreaSection, setConnectedAreas, switchToNextAreaSection,
 } from 'app/content/areas';
 import { displayTileEditorPropertyPanel, editingState } from 'app/development/tileEditor';
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
@@ -36,7 +36,6 @@ export function updateCamera(state: GameState, speed = cameraSpeed): void {
             // The held chakram can transition between areas with the hero.
             for (const object of state.areaInstance.objects) {
                 if (object.changesAreas) {
-                    console.log('adding', object, state.nextAreaInstance);
                     addObjectToArea(state, state.nextAreaInstance, object);
                     object.x -= state.nextAreaInstance.cameraOffset.x;
                     object.y -= state.nextAreaInstance.cameraOffset.y;
@@ -58,6 +57,7 @@ export function updateCamera(state: GameState, speed = cameraSpeed): void {
             state.alternateAreaInstance.alternateArea = state.areaInstance;
             linkObjects(state);
             setAreaSection(state, state.hero.d);
+            setConnectedAreas(state);
             state.hero.area = state.areaInstance;
             if (editingState.isEditing) {
                 displayTileEditorPropertyPanel();

@@ -58,6 +58,7 @@ export function getSpiritFrame(state: GameState, hero: Hero): Frame {
 }
 
 export class AstralProjection implements Hero, ObjectInstance {
+    actualMagicRegen: number;
     area: AreaInstance;
     behaviors: TileBehaviors = {
         solid: true,
@@ -111,7 +112,6 @@ export class AstralProjection implements Hero, ObjectInstance {
     invulnerableFrames: number;
     leftTool: ActiveTool;
     rightTool: ActiveTool;
-    invisibilityCost: number;
     invisible: boolean;
     lightRadius: number;
     spawnLocation: ZoneLocation;

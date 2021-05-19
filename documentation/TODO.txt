@@ -24,18 +24,13 @@ Graphics:
 
 
 Current tasks:
-    - populate underwaterAreaInstance + surfaceAreaInstance and use them to prevent transitioning when the target tile is blocked.
-    - Increase range of frost beetles, figure out why frost grenade centers don't match blast center.
-    - Iron boots
-        - prevent knockback.
     - Underwater
         - Add peach cave underwater area + upper cliff underwater area.
-    - Being underwater without Varuna's blessing drains spirit energy in an accelerating fashion the same as invisibility, but slower
-        - Running out of spirit energy causes you to take 1 heart of damage spaced out by inv-frames.
-        - Bubbles or something allow you to regenerate spirit energy quickly when standing on them
+    - Bubbles or something allow you to regenerate spirit energy quickly when standing on them
     - Decided what to work on next.
+    - Email John outline of River Temple dungeon.
+    - Increase range of frost beetles, figure out why frost grenade centers don't match blast center.
     - Do a run through to check for bugs + push latest version.
-    - Email John outline of River Temple dungeon
 
 River Temple:
     - Half under water, half over water
@@ -53,12 +48,8 @@ River Temple:
     - Beating boss with Fire element, iron boots and varuna's blessing is much easier than beating it with just fire element or iron boots.
     - No NPCs here, this was the old Fertility Temple, but it was destroyed by the Varuna Ship crashing. The survivors all moved to the new Fertility Temple near the forest (Forest Temple).
 
-Iron Boots:
-    - Prevent knockback
-    - Always set slipping flag false (when implemented)
 
 Cloud Boots:
-    - Always set slipping flag true (when implemented)
     - Allow running over clouds (when implemented)
     - Maybe make falling in the sky behave like falling in a pit where you reset to safe location rather than falling to the overworld?
 

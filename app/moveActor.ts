@@ -16,7 +16,7 @@ export function moveActor(state: GameState, actor: Actor, dx: number, dy: number
     canClimb = false,
     canWiggle = true,
     excludedObjects = new Set(),
-}: MovementProperties) {
+}: MovementProperties): {mx: number, my: number} {
     let sx = dx;
     if (sx < -1 || sx > 1) {
         sx /= Math.abs(sx);
@@ -78,13 +78,13 @@ export function moveActor(state: GameState, actor: Actor, dx: number, dy: number
             }
         }
         if (!movedX && !movedY) {
-            return mx !== 0 || my !== 0;
+            return {mx, my};
         }
     }
     if (s >= 100) {
         console.error('infinite loop');
     }
-    return true;
+    return {mx, my};
 }
 function moveActorInDirection(
     state: GameState,
@@ -202,6 +202,9 @@ function moveActorInDirection(
         actor.jumpingTime = 0;
     } else {
         actor.jumpingTime = 0;
+    }
+    if (actor.action === 'pushing' && !canPush) {
+        actor.action = null;
     }
 
     //if (!blockedByTile && pushedObjects.length === 1) {
@@ -346,6 +349,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
     // any time all four corners are over pits.
     hero.wading = true;
     hero.swimming = hero.action !== 'roll' && hero.z <= 0;
+    hero.slipping = hero.z > 0;
     let fallingTopLeft = false, fallingTopRight = false, fallingBottomLeft = false, fallingBottomRight = false;
     let startClimbing = false;
     for (let row = topRow; row <= bottomRow; row++) {
@@ -373,6 +377,9 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
             }
             if (!behaviors.water) {
                 hero.swimming = false;
+            }
+            if (behaviors.slippery && !hero.equipedGear?.ironBoots) {
+                hero.slipping = true;
             }
             if (!behaviors.shallowWater && !behaviors.water) {
                 hero.wading = false;

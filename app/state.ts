@@ -147,7 +147,8 @@ function getDefaultHeroState(): Hero {
         // base: 20, max: 100, roll: 5, charge: 10, double-charge: 50
         maxMagic: 20,
         // base 4, max 8-10
-        magicRegen: 4,
+        actualMagicRegen: 0,
+        magicRegen: 0,
         // inventory
         money: 0,
         arrows: 0,
@@ -192,7 +193,6 @@ function getDefaultHeroState(): Hero {
         activeClone: null,
         status: 'normal',
         invisible: false,
-        invisibilityCost: 0,
         render: renderHero,
         spiritRadius: 0,
         spawnLocation: SPAWN_LOCATION_FULL,

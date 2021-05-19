@@ -2,7 +2,7 @@ import _ from 'lodash';
 
 import { EXPLOSION_RADIUS, EXPLOSION_TIME } from 'app/gameConstants';
 import { getCloneMovementDeltas } from 'app/keyCommands';
-import { isHeroFloating } from 'app/utils/actor';
+import { isHeroFloating, isHeroSinking } from 'app/utils/actor';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { carryMap, directionMap, getDirection } from 'app/utils/field';
 
@@ -21,6 +21,10 @@ const shadowFrame: Frame = createAnimation('gfx/shadow.png', { w: 16, h: 16 }).f
 let lastPullAnimation = null;
 export function getHeroFrame(state: GameState, hero: Hero): Frame {
     let animations: ActorAnimations['idle'];
+    if (state.transitionState?.type === 'surfacing' || state.transitionState?.type === 'diving') {
+        animations = heroSwimAnimations.idle;
+        return getFrame(animations[hero.d], hero.animationTime);
+    }
     switch (hero.action) {
         case 'falling':
             animations = heroAnimations.falling;
@@ -60,6 +64,12 @@ export function getHeroFrame(state: GameState, hero: Hero): Frame {
         case 'entering':
         case 'exiting':
         case 'walking':
+            if (isHeroFloating(state, hero)) {
+                return heroAnimations.roll[hero.d].frames[0];
+            }
+            if (isHeroSinking(state, hero)) {
+                return heroAnimations.idle[hero.d].frames[0];
+            }
             if (hero.swimming) {
                 animations = heroSwimAnimations.move;
             } else {
@@ -83,11 +93,13 @@ export function getHeroFrame(state: GameState, hero: Hero): Frame {
             animations = hero.wading ? heroShallowAnimations.attack : heroAnimations.attack;
             break;
         default:
-            if (state.transitionState?.type === 'surfacing' || state.transitionState?.type === 'diving') {
-                animations = heroSwimAnimations.idle;
-            } else if (isHeroFloating(state, hero)) {
+            if (isHeroFloating(state, hero)) {
                 return heroAnimations.roll[hero.d].frames[0];
-            } else if (hero.swimming) {
+            }
+            if (isHeroSinking(state, hero)) {
+                return heroAnimations.idle[hero.d].frames[0];
+            }
+            if (hero.swimming) {
                 animations = heroSwimAnimations.idle;
             } else {
                 animations = hero.wading ? heroShallowAnimations.idle : heroAnimations.idle;

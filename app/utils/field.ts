@@ -40,7 +40,16 @@ export const carryMap = {
     'up': [{x: 0, y: -15}, {x: 0, y: -15}, {x: 0, y: -15}, {x: 0, y: -15}, {x: 0, y: -16}, {x: 0, y: -17}, {x: 0, y: -17}],
 };
 
-export function getDirection(dx: number, dy: number, includeDiagonals = false): Direction {
+export function getDirection(dx: number, dy: number, includeDiagonals = false, defaultDirection: Direction = null): Direction {
+    if (Math.abs(dy) < 0.3) {
+        dy = 0;
+    }
+    if (Math.abs(dx) < 0.3) {
+        dx = 0;
+    }
+    if (defaultDirection && !dy && !dx) {
+        return defaultDirection;
+    }
     if (includeDiagonals) {
         const r = Math.abs(dx) / (Math.abs(dy) + .000001);
         if (r >= 2) {

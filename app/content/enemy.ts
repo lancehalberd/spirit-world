@@ -1129,7 +1129,8 @@ function moveEnemy(state: GameState, enemy: Enemy, dx: number, dy: number, movem
         enemy.y = ay;
         return true;
     }
-    return moveActor(state, enemy, dx, dy, movementProperties);
+    const { mx, my } = moveActor(state, enemy, dx, dy, movementProperties);
+    return mx !== 0 || my !== 0;
 }
 
 

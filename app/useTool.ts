@@ -41,7 +41,7 @@ export function useTool(
             if (state.hero.magic < 0) {
                 return;
             }
-            state.hero.invisibilityCost += 4;
+            state.hero.actualMagicRegen -= 4;
             state.hero.invisible = true;
             return;
         case 'clone':

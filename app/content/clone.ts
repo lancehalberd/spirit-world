@@ -10,6 +10,7 @@ import {
 } from 'app/types';
 
 export class Clone implements Hero, ObjectInstance {
+    actualMagicRegen: number;
     area: AreaInstance;
     behaviors: TileBehaviors = {
         solid: true,
@@ -64,7 +65,6 @@ export class Clone implements Hero, ObjectInstance {
     invulnerableFrames: number;
     leftTool: ActiveTool;
     rightTool: ActiveTool;
-    invisibilityCost: number;
     invisible: boolean;
     lightRadius: number;
     spawnLocation: ZoneLocation;

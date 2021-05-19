@@ -204,6 +204,8 @@ export class HeldChakram implements ObjectInstance {
             source: this.hero,
             piercing: speed === 12,
         });
+        this.hero.vx -= chakram.vx / 4;
+        this.hero.vy -= chakram.vy / 4;
         addObjectToArea(state, this.area, chakram);
         removeObjectFromArea(state, this);
     }

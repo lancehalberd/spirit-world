@@ -247,6 +247,34 @@ export function enterLocation(
     checkToUpdateSpawnLocation(state);
     // Make sure the actor is shown as swimming/wading during the transition frames.
     checkForFloorEffects(state, state.hero);
+    setConnectedAreas(state);
+}
+
+export function setConnectedAreas(state: GameState) {
+    state.underwaterAreaInstance = null;
+    if (state.zone.underwaterKey && state.location.floor === 0) {
+        const underwaterArea = getAreaFromLocation({
+            ...state.location,
+            floor: zones[state.zone.underwaterKey].floors.length - 1,
+            zoneKey: state.zone.underwaterKey,
+        })
+        if (!underwaterArea) {
+            debugger;
+        }
+        state.underwaterAreaInstance = createAreaInstance(state, underwaterArea);
+    }
+    state.surfaceAreaInstance = null;
+    if (state.zone.surfaceKey && state.location.floor === state.zone.floors.length - 1) {
+        const surfaceArea = getAreaFromLocation({
+            ...state.location,
+            floor: 0,
+            zoneKey: state.zone.surfaceKey,
+        })
+        if (!surfaceArea) {
+            debugger;
+        }
+        state.surfaceAreaInstance = createAreaInstance(state, surfaceArea);
+    }
 }
 
 export function linkObjects(state: GameState): void {
@@ -360,16 +388,8 @@ export function switchToNextAreaSection(state: GameState): void {
 export function setAreaSection(state: GameState, d: Direction, newArea: boolean = false): void {
     const lastAreaSection = state.areaSection;
     state.areaSection = state.areaInstance.definition.sections[0];
-    let x = state.hero.x / 16;
-    let y = state.hero.y / 16;
-    if (!newArea) {
-        if (d === 'right') {
-            x += state.hero.w / 16;
-        }
-        if (d === 'down') {
-            y += state.hero.h / 16;
-        }
-    }
+    let x = Math.min(32, Math.max(0, (state.hero.x + 8) / 16));
+    let y = Math.min(32, Math.max(0, (state.hero.y + 8) / 16));
     for (const section of state.areaInstance.definition.sections) {
         if (isPointInShortRect(x, y, section)) {
             state.areaSection = section;
