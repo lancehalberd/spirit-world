@@ -17,7 +17,7 @@ export * from 'app/content/zones/lakeTunnel';
 export * from 'app/content/zones/helix';
 export * from 'app/content/zones/waterfallCave';
 export * from 'app/content/zones/waterfallTower';
-// holy city interior
+export * from 'app/content/zones/holyCityInterior';
 // grand temple
 // jade palace
 // forge

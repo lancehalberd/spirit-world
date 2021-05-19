@@ -411,6 +411,11 @@ const bridgeVerticalTiles: TileSource = {
     behaviors: {},
 };
 
+const roomFloorTiles: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/temp_furniture.png'), x: 768, y: 192, w: 3 * 16, h: 1 * 16},
+};
+
 addTiles([
     // This is the empty tile.
     singleTileSource('gfx/tiles/bush.png', {defaultLayer: 'field'}, -16),
@@ -488,5 +493,6 @@ addTiles([
     fenceTiles,
     bridgeHorizontalTiles,
     bridgeVerticalTiles,
+    roomFloorTiles,
 ]);
 
