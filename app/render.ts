@@ -73,6 +73,14 @@ export function updateSpiritCanvas(state: GameState, radius: number): void {
 
         renderAreaObjectsAfterHero(spiritContext, state, area);
     spiritContext.restore();
+    if (state.zone.surfaceKey && !area.definition.isSpiritWorld) {
+        spiritContext.save();
+            spiritContext.globalCompositeOperation = 'source-atop';
+            spiritContext.globalAlpha = 0.6;
+            spiritContext.fillStyle = 'blue';
+            spiritContext.fillRect(0, 0, spiritCanvas.width, spiritCanvas.height);
+        spiritContext.restore();
+    }
 }
 
 export function render() {
@@ -82,7 +90,6 @@ export function render() {
         return;
     }
     if (state.transitionState) {
-        renderField(context, state);
         renderTransition(context, state);
         renderHUD(context, state);
         return;
@@ -106,7 +113,7 @@ export function render() {
     if (state.defeatState.defeated) {
         renderHUD(context, state);
         context.save();
-            context.globalAlpha = 0.7 * Math.min(1, state.defeatState.time / 1000);
+            context.globalAlpha *= 0.7 * Math.min(1, state.defeatState.time / 1000);
             context.fillStyle = '#888';
             context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
         context.restore();
@@ -126,29 +133,74 @@ export function render() {
 
 function renderTransition(context: CanvasRenderingContext2D, state: GameState) {
     if (state.transitionState.type === 'diving' || state.transitionState.type === 'surfacing') {
-        const x = state.hero.x + state.hero.w / 2 - state.camera.x + state.areaInstance.cameraOffset.x;
-        const y = state.hero.y + 2 - state.camera.y + state.areaInstance.cameraOffset.y;
         if (state.transitionState.time <= CIRCLE_WIPE_OUT_DURATION) {
+            context.fillStyle = 'black';
+            context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+            const dz = state.transitionState.nextLocation.z - state.hero.z;
             if (!state.transitionState.patternCanvas) {
                 const [patternCanvas, patternContext] = createCanvasAndContext(CANVAS_WIDTH, CANVAS_HEIGHT);
                 state.transitionState.patternCanvas = patternCanvas;
-                renderArea(patternContext, state, state.transitionState.nextAreaInstance, true);
+                renderArea(patternContext, state, state.transitionState.nextAreaInstance, false);
                 if (state.transitionState.type === 'diving') {
-                    // This needs to match the styles we use for rendering underwater areas.
-                    patternContext.globalAlpha = 0.6;
-                    patternContext.fillStyle = 'blue';
-                    patternContext.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+                    translateContextForAreaAndCamera(patternContext, state, state.transitionState.nextAreaInstance);
+                    renderHeroShadow(patternContext, state, state.hero, true);
                 }
                 state.transitionState.pattern = context.createPattern(state.transitionState.patternCanvas, 'repeat');
             }
-            context.save();
-                const p = state.transitionState.time / CIRCLE_WIPE_OUT_DURATION;
-                const radius = Math.max(CANVAS_WIDTH, CANVAS_HEIGHT) * 1.5 * Math.max(0, Math.min(1, p));
-                context.fillStyle = state.transitionState.pattern;
-                context.beginPath();
-                context.arc(x, y, radius, 0, 2 * Math.PI);
-                context.fill();
-            context.restore();
+            const p = Math.min(1, state.transitionState.time / CIRCLE_WIPE_OUT_DURATION);
+            if (state.transitionState.type === 'surfacing') {
+                context.save();
+                    context.translate(0, dz + 24);
+                    renderField(context, state, false);
+                context.restore();
+                context.save();
+                    translateContextForAreaAndCamera(context, state, state.transitionState.nextAreaInstance);
+                    state.hero.render(context, state);
+                context.restore();
+                context.save();
+                    context.globalAlpha *= 0.6;
+                    // This needs to match the styles we use for rendering underwater areas.
+                    context.fillStyle = 'blue';
+                    context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+                context.restore();
+                context.save();
+                    context.globalAlpha *= p * p;
+                    context.translate(0, dz);
+                    context.fillStyle = state.transitionState.pattern;
+                    context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+                context.restore();
+                context.save();
+                    context.globalAlpha *= p * p;
+                    translateContextForAreaAndCamera(context, state, state.transitionState.nextAreaInstance);
+                    state.hero.render(context, state);
+                context.restore();
+            } else {
+                context.save();
+                    context.translate(0, dz);
+                    context.fillStyle = state.transitionState.pattern;
+                    context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+                context.restore();
+                context.save();
+                    translateContextForAreaAndCamera(context, state, state.transitionState.nextAreaInstance);
+                    state.hero.render(context, state);
+                context.restore();
+                context.save();
+                    context.globalAlpha *= 0.6;
+                    // This needs to match the styles we use for rendering underwater areas.
+                    context.fillStyle = 'blue';
+                    context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+                context.restore();
+                context.save();
+                    context.translate(0, dz - 24);
+                    context.globalAlpha *= (1 - p) * (1 - p);
+                    renderField(context, state, false);
+                context.restore();
+                context.save();
+                    context.globalAlpha *= (1 - p) * (1 - p);
+                    translateContextForAreaAndCamera(context, state, state.transitionState.nextAreaInstance);
+                    state.hero.render(context, state);
+                context.restore();
+            }
         } else {
             context.save();
                 translateContextForAreaAndCamera(context, state, state.areaInstance);
@@ -156,7 +208,11 @@ function renderTransition(context: CanvasRenderingContext2D, state: GameState) {
                 context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
             context.restore();
         }
-    } else if (state.transitionState.type === 'portal') {
+        return;
+    }
+
+    renderField(context, state);
+    if (state.transitionState.type === 'portal') {
         if (!state.alternateAreaInstance) {
             return;
         }
@@ -257,7 +313,7 @@ function checkToRedrawTiles(area: AreaInstance) {
     area.checkToRedrawTiles = false;
 }
 
-export function renderField(context: CanvasRenderingContext2D, state: GameState): void {
+export function renderField(context: CanvasRenderingContext2D, state: GameState, renderHero: boolean = null): void {
     if (editingState.isEditing) {
         context.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     }
@@ -282,12 +338,23 @@ export function renderField(context: CanvasRenderingContext2D, state: GameState)
     renderAreaBackground(context, state, state.nextAreaInstance);
     renderAreaObjectsBeforeHero(context, state, state.areaInstance);
     renderAreaObjectsBeforeHero(context, state, state.nextAreaInstance);
-    context.save();
-        translateContextForAreaAndCamera(context, state, state.areaInstance);
-        state.hero.render(context, state);
-    context.restore();
+    if (renderHero === true || (renderHero !== false && hero.area === state.areaInstance)) {
+        context.save();
+            translateContextForAreaAndCamera(context, state, state.areaInstance);
+            state.hero.render(context, state);
+        context.restore();
+    }
     renderAreaObjectsAfterHero(context, state, state.areaInstance);
     renderAreaObjectsAfterHero(context, state, state.nextAreaInstance);
+    renderAreaForeground(context, state, state.areaInstance);
+    renderAreaForeground(context, state, state.nextAreaInstance);
+    if (state.zone.surfaceKey && !state.areaInstance.definition.isSpiritWorld && state.transitionState?.type !== 'surfacing') {
+        context.save();
+            context.globalAlpha = 0.6;
+            context.fillStyle = 'blue';
+            context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        context.restore();
+    }
     if (state.hero.spiritRadius > 0) {
         context.save();
         context.globalAlpha = 0.6 * state.hero.spiritRadius / MAX_SPIRIT_RADIUS;
@@ -304,24 +371,15 @@ export function renderField(context: CanvasRenderingContext2D, state: GameState)
             spiritCanvas.width, spiritCanvas.height
         );
     }
-    renderAreaForeground(context, state, state.areaInstance);
-    renderAreaForeground(context, state, state.nextAreaInstance);
 
     // Render any editor specific graphics if appropriate.
     renderEditor(context, state);
     renderAreaLighting(context, state, state.areaInstance, state.nextAreaInstance);
-    if (state.zone.surfaceKey) {
-        context.save();
-            context.globalAlpha = 0.6;
-            context.fillStyle = 'blue';
-            context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-        context.restore();
-    }
 }
 
 // Fully renders an area to a canvas, but with no state effects like spirit sight.
 // This is used during the transition to and from the spirit world.
-export function renderArea(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance, forceHero: boolean = false): void {
+export function renderArea(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance, renderHero: boolean = null): void {
     // Update any background tiles that have changed.
     if (area.checkToRedrawTiles) {
         checkToRedrawTiles(area);
@@ -331,7 +389,7 @@ export function renderArea(context: CanvasRenderingContext2D, state: GameState, 
     // Draw the field, enemies, objects and hero.
     renderAreaBackground(context, state, area);
     renderAreaObjectsBeforeHero(context, state, area);
-    if (forceHero || hero.area === area) {
+    if (renderHero === true || (renderHero !== false && hero.area === area)) {
         context.save();
             translateContextForAreaAndCamera(context, state, area);
             state.hero.render(context, state);
@@ -448,7 +506,7 @@ export function renderLayer(area: AreaInstance, layer: AreaLayer, parentLayer: A
     context.save();
     if (editingState.isEditing && editingState.selectedLayerIndex >= 0 && getState().areaInstance.layers[editingState.selectedLayerIndex] !== layer) {
         //console.log(getState().areaInstance.layers[editingState.selectedLayerIndex], layer);
-        context.globalAlpha = 0.5;
+        context.globalAlpha *= 0.5;
     }
     for (let y = 0; y < layer.h; y++) {
         if (!area.tilesDrawn[y]) {

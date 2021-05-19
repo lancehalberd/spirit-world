@@ -20,6 +20,7 @@ import {
 import { checkForFloorEffects, moveActor } from 'app/moveActor';
 import { fallAnimation } from 'app/render/heroAnimations';
 import { useTool } from 'app/useTool';
+import { isHeroFloating, isHeroSinking } from 'app/utils/actor';
 import { canTeleportToCoords, directionMap, getDirection, isPointOpen } from 'app/utils/field';
 import { rectanglesOverlap } from 'app/utils/index';
 import { playSound } from 'app/utils/sounds';
@@ -109,24 +110,44 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         hero.y += 4 * dy;
         if (dx || dy) hero.d = getDirection(dx, dy);
     } else if (hero.swimming && hero.equipedGear?.ironBoots && state.zone.underwaterKey) {
-        enterLocation(state, {
-            ...state.location,
-            zoneKey: state.zone.underwaterKey,
-            x: hero.x,
-            y: hero.y,
-        }, false);
-        hero.swimming = false;
-        hero.wading = false;
+        const mx = hero.x % 16;
+        if (mx > 0 && mx < 8) {
+            hero.x = Math.max(hero.x - mx, hero.x - 1);
+        } else if (mx > 8) {
+            hero.x = Math.min(hero.x - mx + 16, hero.x + 1);
+        }
+        const my = hero.y % 16;
+        if (my > 0 && my < 8) {
+            hero.y = Math.max(hero.y - my, hero.y - 1);
+        } else if (my > 8) {
+            hero.y = Math.min(hero.y - my + 16, hero.y + 1);
+        }
+        if (hero.x % 16 === 0 && hero.y % 16 === 0) {
+            enterLocation(state, {
+                ...state.location,
+                zoneKey: state.zone.underwaterKey,
+                x: hero.x,
+                y: hero.y,
+                z: 24,
+            }, false);
+            hero.swimming = false;
+            hero.wading = false;
+        }
         return;
-    } else if (state.zone.surfaceKey && !hero.equipedGear?.ironBoots) {
-        enterLocation(state, {
-            ...state.location,
-            zoneKey: state.zone.surfaceKey,
-            x: hero.x,
-            y: hero.y,
-        }, false);
-        hero.swimming = true;
-        return;
+    } else if (isHeroFloating(state, hero)) {
+        hero.z += 2;
+        if (hero.z >= 24) {
+            enterLocation(state, {
+                ...state.location,
+                zoneKey: state.zone.surfaceKey,
+                x: hero.x,
+                y: hero.y,
+                z: 0,
+            }, false);
+            hero.swimming = true;
+        }
+    } else if (isHeroSinking(state, hero)) {
+        hero.z = Math.max(hero.z - 2, 0);
     } else if (!isAstralProjection && state.nextAreaInstance) {
         movementSpeed = 0;
         if (state.nextAreaInstance.cameraOffset.x && state.hero.action !== 'entering') {
@@ -762,6 +783,9 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
 export function checkForEnemyDamage(state: GameState, hero: Hero) {
     if (hero.action === 'roll' || hero.action === 'getItem' || hero.invulnerableFrames > 0 || state.hero.invisible) {
         return;
+    }
+    if (!hero.area) {
+        debugger;
     }
     for (const enemy of hero.area.objects) {
         if (!(enemy instanceof Enemy) || enemy.invulnerableFrames > 0) {

@@ -39,6 +39,8 @@ export interface GameState {
     lastTimeRendered: number,
     alternateAreaInstance?: AreaInstance,
     areaInstance?: AreaInstance,
+    surfaceAreaInstance?: AreaInstance,
+    underwaterAreaInstance?: AreaInstance,
     areaSection?: ShortRectangle,
     nextAreaInstance?: AreaInstance,
     nextAreaSection?: ShortRectangle,
@@ -55,6 +57,8 @@ export interface GameState {
         patternCanvas?: HTMLCanvasElement,
         pattern?: CanvasPattern,
         type: 'circle' | 'fade' | 'portal' | 'diving' | 'surfacing',
+        // The targetZ value for the hero after the transition.
+        targetZ?: number,
     },
     paused: boolean,
     menuIndex: number,

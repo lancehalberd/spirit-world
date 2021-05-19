@@ -41,10 +41,18 @@ export function update() {
     state.time += FRAME_LENGTH;
     updateKeyboardState(state);
     try {
+        if (state.scene === 'game' && wasGameKeyPressed(state, GAME_KEY.MENU)) {
+            state.paused = !state.paused;
+            state.menuIndex = 0;
+        }
         if (state.transitionState) {
-            updateTransition(state);
+            if (!state.paused) {
+                updateTransition(state);
+            }
         } else if (state.messageState?.pages) {
-            updateMessage(state);
+            if (!state.paused) {
+                updateMessage(state);
+            }
         } else if (state.scene === 'title' || state.scene === 'chooseGameMode' ||
             state.scene === 'deleteSavedGame' || state.scene === 'deleteSavedGameConfirmation'
         ) {
@@ -52,10 +60,6 @@ export function update() {
         } else if (state.defeatState.defeated) {
             updateDefeated(state);
         } else {
-            if (wasGameKeyPressed(state, GAME_KEY.MENU)) {
-                state.paused = !state.paused;
-                state.menuIndex = 0;
-            }
             if (!state.paused) {
                 updateField(state);
             } else {
@@ -292,6 +296,11 @@ function updateDefeated(state: GameState) {
 function updateTransition(state: GameState) {
     state.transitionState.time += FRAME_LENGTH;
     if (state.transitionState.type === 'diving' || state.transitionState.type === 'surfacing') {
+        if (state.hero.z > state.transitionState.nextLocation.z) {
+            state.hero.z = Math.max(state.transitionState.nextLocation.z, state.hero.z - 1);
+        } else if (state.hero.z < state.transitionState.nextLocation.z) {
+            state.hero.z = Math.min(state.transitionState.nextLocation.z, state.hero.z + 1);
+        }
         if (state.transitionState.time === CIRCLE_WIPE_OUT_DURATION) {
             enterLocation(state, state.transitionState.nextLocation, true);
             state.transitionState.callback?.();

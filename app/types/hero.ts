@@ -95,6 +95,8 @@ export interface Actor {
     knockBack?: (state: GameState, vector: {vx: number, vy: number, vz: number}) => void,
     wading?: boolean,
     swimming?: boolean,
+    floating?: boolean,
+    sinking?: boolean,
 }
 
 export interface Hero extends Actor {

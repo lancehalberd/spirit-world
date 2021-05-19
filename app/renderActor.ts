@@ -2,6 +2,7 @@ import _ from 'lodash';
 
 import { EXPLOSION_RADIUS, EXPLOSION_TIME } from 'app/gameConstants';
 import { getCloneMovementDeltas } from 'app/keyCommands';
+import { isHeroFloating } from 'app/utils/actor';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { carryMap, directionMap, getDirection } from 'app/utils/field';
 
@@ -82,7 +83,11 @@ export function getHeroFrame(state: GameState, hero: Hero): Frame {
             animations = hero.wading ? heroShallowAnimations.attack : heroAnimations.attack;
             break;
         default:
-            if (hero.swimming) {
+            if (state.transitionState?.type === 'surfacing' || state.transitionState?.type === 'diving') {
+                animations = heroSwimAnimations.idle;
+            } else if (isHeroFloating(state, hero)) {
+                return heroAnimations.roll[hero.d].frames[0];
+            } else if (hero.swimming) {
                 animations = heroSwimAnimations.idle;
             } else {
                 animations = hero.wading ? heroShallowAnimations.idle : heroAnimations.idle;
@@ -145,8 +150,10 @@ export function renderCarriedTile(context: CanvasRenderingContext2D, state: Game
 }
 
 
-export function renderHeroShadow(context: CanvasRenderingContext2D, state: GameState, hero: Hero): void {
-    if (hero.action === 'fallen' || hero.action === 'falling' || hero.action === 'climbing' || hero.swimming || hero.wading) {
+export function renderHeroShadow(context: CanvasRenderingContext2D, state: GameState, hero: Hero, forceDraw: boolean = false): void {
+    if (!forceDraw && (
+        hero.action === 'fallen' || hero.action === 'falling' || hero.action === 'climbing' || hero.swimming || hero.wading
+    )) {
         return;
     }
     drawFrame(context, shadowFrame, { ...shadowFrame, x: hero.x, y: hero.y - 3 - Y_OFF });

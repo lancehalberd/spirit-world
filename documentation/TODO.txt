@@ -24,13 +24,12 @@ Graphics:
 
 
 Current tasks:
+    - populate underwaterAreaInstance + surfaceAreaInstance and use them to prevent transitioning when the target tile is blocked.
     - Increase range of frost beetles, figure out why frost grenade centers don't match blast center.
     - Iron boots
         - prevent knockback.
     - Underwater
         - Add peach cave underwater area + upper cliff underwater area.
-        - Add floating state for when you take off iron boots under water but cannot surface.
-        - Add sinking and floating animations when transitioning between surface and underwater areas.
     - Being underwater without Varuna's blessing drains spirit energy in an accelerating fashion the same as invisibility, but slower
         - Running out of spirit energy causes you to take 1 heart of damage spaced out by inv-frames.
         - Bubbles or something allow you to regenerate spirit energy quickly when standing on them
