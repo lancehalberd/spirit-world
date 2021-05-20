@@ -186,10 +186,12 @@ export function enterLocation(
             state.transitionState.type = 'diving';
             const nextArea = getAreaFromLocation(location);
             state.transitionState.nextAreaInstance = createAreaInstance(state, nextArea);
+            state.hero.vx = state.hero.vy = 0;
         } else if (state.zone.surfaceKey === location.zoneKey) {
             state.transitionState.type = 'surfacing';
             const nextArea = getAreaFromLocation(location);
             state.transitionState.nextAreaInstance = createAreaInstance(state, nextArea);
+            state.hero.vx = state.hero.vy = 0;
         } else if (!!state.location.isSpiritWorld !== !!location.isSpiritWorld && state.location.zoneKey === location.zoneKey) {
             state.transitionState.type = 'portal';
         } else if (state.location.zoneKey !== location.zoneKey) {

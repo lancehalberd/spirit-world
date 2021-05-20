@@ -241,6 +241,7 @@ const f0_1x0: AreaDefinition = {
         {id: "newPeachCave:markerA", linked: false, spirit: false, status: "normal", x: 112, y: 176, type: "marker"},
         {id: "newPeachCave:markerB", linked: false, spirit: false, status: "normal", x: 384, y: 416, type: "marker"},
         {id: "newPeachCave:waterEntrance", linked: true, spirit: false, status: "normal", x: 352, y: 496, type: "door", style: "wideEntrance", targetZone: "overworld", targetObjectId: "peachCaveWaterEntrance", d: "down"},
+        {status: "normal", id: "peachCavePiece", x: 144, y: 288, type: "chest", lootType: "peachOfImmortalityPiece", lootAmount: 1, lootLevel: 1},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},
@@ -600,6 +601,7 @@ const sf1_0x0: AreaDefinition = null;
 const sf1_1x0: AreaDefinition = null;
 zones.newPeachCave = {
     key: 'newPeachCave',
+    underwaterKey: 'peachCaveWater',
     floors: [
         {
             grid: [

@@ -118,6 +118,8 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         [dx, dy] = getCloneMovementDeltas(state, hero);
         hero.x += 4 * dx;
         hero.y += 4 * dy;
+        hero.vx = dx;
+        hero.vy = dy;
         if (dx || dy) hero.d = getDirection(dx, dy);
     } else if (hero.swimming && hero.equipedGear?.ironBoots && state.underwaterAreaInstance &&
         isPointOpen(state, state.underwaterAreaInstance, {x: hero.x + hero.w / 2, y: hero.y + hero.h / 2})
@@ -160,6 +162,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
                 enterLocation(state, {
                     ...state.location,
                     zoneKey: state.zone.surfaceKey,
+                    floor: 0,
                     x: hero.x,
                     y: hero.y,
                     z: 0,
@@ -492,7 +495,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             dy = hero.bounce.vy;
         }
     }
-    if (dx || dy || (hero.slipping && (Math.abs(hero.vx) > 0.3 || Math.abs(hero.vy) > 0.3))) {
+    if (!editingState.isEditing && ((dx || dy) || (hero.slipping && (Math.abs(hero.vx) > 0.3 || Math.abs(hero.vy) > 0.3)))) {
         const isCharging = hero.action === 'charging';
         const encumbered = hero.pickUpObject || hero.pickUpTile || hero.grabObject || hero.grabTile;
         if (hero.slipping) {
@@ -530,6 +533,9 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             hero.animationTime += FRAME_LENGTH;
         }
     } else {
+        if (!hero.slipping) {
+            hero.vx = hero.vy = 0;
+        }
         if (hero.action === 'walking' || hero.action === 'pushing') {
             hero.action = null;
             hero.actionDx = 0;

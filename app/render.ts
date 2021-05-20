@@ -110,6 +110,7 @@ export function render() {
     }
     state.lastTimeRendered = state.time;
     renderField(context, state);
+    renderAreaLighting(context, state, state.areaInstance, state.nextAreaInstance);
     if (state.defeatState.defeated) {
         renderHUD(context, state);
         context.save();
@@ -144,6 +145,7 @@ function renderTransition(context: CanvasRenderingContext2D, state: GameState) {
                 if (state.transitionState.type === 'diving') {
                     translateContextForAreaAndCamera(patternContext, state, state.transitionState.nextAreaInstance);
                     renderHeroShadow(patternContext, state, state.hero, true);
+                    renderAreaLighting(patternContext, state, state.transitionState.nextAreaInstance);
                 }
                 state.transitionState.pattern = context.createPattern(state.transitionState.patternCanvas, 'repeat');
             }
@@ -208,10 +210,12 @@ function renderTransition(context: CanvasRenderingContext2D, state: GameState) {
                 context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
             context.restore();
         }
+        renderAreaLighting(context, state, state.areaInstance);
         return;
     }
 
     renderField(context, state);
+    renderAreaLighting(context, state, state.areaInstance, state.nextAreaInstance);
     if (state.transitionState.type === 'portal') {
         if (!state.alternateAreaInstance) {
             return;
@@ -374,7 +378,6 @@ export function renderField(context: CanvasRenderingContext2D, state: GameState,
 
     // Render any editor specific graphics if appropriate.
     renderEditor(context, state);
-    renderAreaLighting(context, state, state.areaInstance, state.nextAreaInstance);
 }
 
 // Fully renders an area to a canvas, but with no state effects like spirit sight.
@@ -397,7 +400,6 @@ export function renderArea(context: CanvasRenderingContext2D, state: GameState, 
     }
     renderAreaObjectsAfterHero(context, state, area);
     renderAreaForeground(context, state, area);
-    renderAreaLighting(context, state, area);
 }
 
 export function renderAreaBackground(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance): void {

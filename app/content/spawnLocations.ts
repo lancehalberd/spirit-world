@@ -174,6 +174,7 @@ const helixStartState = applyItems(cocoonStartState, {maxLife: 1, teleportation:
 helixStartState.hero.rightTool = 'invisibility';
 const helixEndState = applyItems(helixStartState, {charge: 1, staff: 1},
     ['elementalBeastsEscaped']);
+const riverTempleStartState = applyItems(helixEndState, {ironBoots: 1});
 
 
 const spawnLocations = {
@@ -216,6 +217,10 @@ const spawnLocations = {
     'Helix End': {
         location: SPAWN_LOCATION_PEACH_CAVE_EXIT,
         savedState: helixEndState,
+    },
+    'River Temple Start': {
+        location: SPAWN_LOCATION_PEACH_CAVE_EXIT,
+        savedState: riverTempleStartState,
     },
 };
 window['spawnLocations'] = spawnLocations;

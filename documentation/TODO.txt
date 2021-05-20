@@ -24,12 +24,13 @@ Graphics:
 
 
 Current tasks:
-    - Underwater
-        - Add peach cave underwater area + upper cliff underwater area.
+    - Fix attacking under water is broken.
+    - River Temple Rough Draft.
     - Bubbles or something allow you to regenerate spirit energy quickly when standing on them
     - Decided what to work on next.
     - Email John outline of River Temple dungeon.
     - Increase range of frost beetles, figure out why frost grenade centers don't match blast center.
+        - Add ice ground effect to frost blasts.
     - Do a run through to check for bugs + push latest version.
 
 River Temple:

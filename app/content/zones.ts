@@ -8,6 +8,7 @@ export * from 'app/content/zones/sky';
 export * from 'app/content/zones/overworld';
 export * from 'app/content/zones/underwater';
 export * from 'app/content/zones/newPeachCave';
+export * from 'app/content/zones/peachCaveWater';
 export * from 'app/content/zones/peachCave';
 export * from 'app/content/zones/tomb';
 export * from 'app/content/zones/treeVillage';
@@ -17,6 +18,8 @@ export * from 'app/content/zones/lakeTunnel';
 export * from 'app/content/zones/helix';
 export * from 'app/content/zones/waterfallCave';
 export * from 'app/content/zones/waterfallTower';
+export * from 'app/content/zones/riverTemple';
+export * from 'app/content/zones/riverTempleWater';
 export * from 'app/content/zones/holyCityInterior';
 // grand temple
 // jade palace
