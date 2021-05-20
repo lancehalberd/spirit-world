@@ -93,6 +93,10 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
     if (hero.z < minZ) {
         hero.z = Math.max(hero.z + 1, minZ);
     }
+    const canCharge = !isAstralProjection && isControlled && hero.z <= minZ
+        && !hero.swimming && !hero.pickUpTile && !hero.pickUpObject;
+    const canAttack = canCharge && hero.weapon > 0
+         && (!hero.action || hero.action === 'walking' || hero.action === 'pushing');
 
     // The astral projection uses the weapon tool as the passive tool button
     // since you have to hold the normal passive tool button down to meditate.
@@ -122,7 +126,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         hero.vy = dy;
         if (dx || dy) hero.d = getDirection(dx, dy);
     } else if (hero.swimming && hero.equipedGear?.ironBoots && state.underwaterAreaInstance &&
-        isPointOpen(state, state.underwaterAreaInstance, {x: hero.x + hero.w / 2, y: hero.y + hero.h / 2})
+        isPointOpen(state, state.underwaterAreaInstance, {x: hero.x + hero.w / 2, y: hero.y + hero.h / 2}, {canSwim: true})
     ) {
         const mx = hero.x % 16;
         if (mx > 0 && mx < 8) {
@@ -319,7 +323,8 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
                 // direction to be blocked by the object they are grabbing.
                 if ((direction === hero.d && (hero.x === hero.grabObject.x || hero.y === hero.grabObject.y))
                     || points.every(x => points.every(y => isPointOpen(state, hero.area,
-                        {x: hero.x + x + 16 * directionMap[direction][0], y: hero.y + y + 16 * directionMap[direction][1] }
+                        {x: hero.x + x + 16 * directionMap[direction][0], y: hero.y + y + 16 * directionMap[direction][1] },
+                        { canFall: true, canSwim: true }
                     )))
                 ) {
                     hero.grabObject.onPull(state, direction, hero);
@@ -433,7 +438,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             hero.action = null;
             hero.actionDx = 0;
             hero.actionDy = 0;
-        } else if (!isGameKeyDown(state, GAME_KEY.WEAPON) || hero.swimming) {
+        } else if (!isGameKeyDown(state, GAME_KEY.WEAPON) || !canCharge) {
             hero.action = 'attack';
             hero.animationTime = 0;
             hero.actionFrame = 0;
@@ -473,7 +478,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
     if (heldChakram && heldChakram.area === hero.area && heldChakram.hero === hero && hero.action !== 'charging') {
         if (hero.action === 'entering' || hero.action === 'exiting') {
             // take no action while hero is controlled by door.
-        } else if (!hero.action && isGameKeyDown(state, GAME_KEY.WEAPON)) {
+        } else if (!hero.action && isGameKeyDown(state, GAME_KEY.WEAPON) && canCharge) {
             // resume charing if the weapon button is still down.
             hero.action = 'charging';
             hero.actionDx = heldChakram.vx;
@@ -533,7 +538,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             hero.animationTime += FRAME_LENGTH;
         }
     } else {
-        if (!hero.slipping) {
+        if (!hero.slipping && !editingState.isEditing && hero.action !== 'jumpingDown') {
             hero.vx = hero.vy = 0;
         }
         if (hero.action === 'walking' || hero.action === 'pushing') {
@@ -577,10 +582,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             }
         }
     }
-    if (isControlled && !isAstralProjection && !hero.swimming && (!hero.action || hero.action === 'walking' || hero.action === 'pushing')
-        && !hero.pickUpTile && !hero.pickUpObject && hero.weapon > 0
-        && wasGameKeyPressed(state, GAME_KEY.WEAPON)
-    ) {
+    if (canAttack && wasGameKeyPressed(state, GAME_KEY.WEAPON)) {
         const thrownChakrams = hero.area.objects.filter(o => o instanceof ThrownChakram);
         if (state.hero.weapon - thrownChakrams.length > 0) {
             hero.action = 'charging';
@@ -793,9 +795,9 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
     if (state.hero.invisible) {
         state.hero.actualMagicRegen = Math.max(-10, state.hero.actualMagicRegen - 4 * FRAME_LENGTH / 1000);
     }
-    const isHoldingBreath = !isAstralProjection && !state.hero.passiveTools.waterBlessing && state.surfaceAreaInstance;
+    const isHoldingBreath = !isAstralProjection && !state.hero.passiveTools.waterBlessing && state.zone.surfaceKey;
     if (isHoldingBreath) {
-        state.hero.actualMagicRegen = Math.min(-3, state.hero.actualMagicRegen);
+        state.hero.actualMagicRegen = Math.min(-1, state.hero.actualMagicRegen);
     }
     if (!state.hero.invisible && !isHoldingBreath) {
         state.hero.actualMagicRegen = Math.min(

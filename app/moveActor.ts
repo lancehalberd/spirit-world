@@ -237,7 +237,7 @@ function moveActorInDirection(
             for (let l = ax - 1; l >= ax - maxWiggle; l--) {
                 let open = true;
                 for (const x of [l, l + Math.floor(actor.w / 2), l + actor.w - 1]) {
-                    if (!isPointOpen(state, actor.area, {x, y}, excludedObjects)) {
+                    if (!isPointOpen(state, actor.area, {x, y}, movementProperties, excludedObjects)) {
                         open = false;
                         break;
                     }
@@ -254,7 +254,7 @@ function moveActorInDirection(
             for (let l = ax + 1; l <= ax + maxWiggle; l++) {
                 let open = true;
                 for (const x of [l, l + Math.floor(actor.w / 2), l + actor.w - 1]) {
-                    if (!isPointOpen(state, actor.area, {x, y}, excludedObjects)) {
+                    if (!isPointOpen(state, actor.area, {x, y}, movementProperties, excludedObjects)) {
                         open = false;
                         break;
                     }
@@ -271,7 +271,7 @@ function moveActorInDirection(
             for (let t = ay - 1; t >= ay - maxWiggle; t--) {
                 let open = true;
                 for (const y of [t, t + Math.floor(actor.h / 2), t + actor.h - 1]) {
-                    if (!isPointOpen(state, actor.area, {x, y}, excludedObjects)) {
+                    if (!isPointOpen(state, actor.area, {x, y}, movementProperties, excludedObjects)) {
                         open = false;
                         break;
                     }
@@ -288,7 +288,7 @@ function moveActorInDirection(
             for (let t = ay + 1; t <= ay + maxWiggle; t++) {
                 let open = true;
                 for (const y of [t, t + Math.floor(actor.h / 2), t + actor.h - 1]) {
-                    if (!isPointOpen(state, actor.area, {x, y}, excludedObjects)) {
+                    if (!isPointOpen(state, actor.area, {x, y}, movementProperties, excludedObjects)) {
                         open = false;
                         break;
                     }
@@ -384,7 +384,8 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
             if (!behaviors.shallowWater && !behaviors.water) {
                 hero.wading = false;
             }
-            if (behaviors.pit && hero.action !== 'roll' && hero.z <= 0) {
+            // Use z <= 1 so that feather boots are still caught here.
+            if (behaviors.pit && hero.action !== 'roll' && hero.z <= 1) {
                 if (hero.y - row * 16 > 4) {
                     if (hero.x - column * 16 > 4) {
                         fallingTopLeft = true;

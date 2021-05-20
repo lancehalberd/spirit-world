@@ -48,8 +48,9 @@ export class Staff implements ObjectInstance {
         this.damage = damage;
         let row = this.topRow = this.bottomRow = Math.floor(y / 16);
         let column = this.leftColumn = this.rightColumn = Math.floor(x / 16);
+        const movementProps = {canFall: true, canSwim: true};
         const excludedObjects = new Set([state.hero]);
-        if (!isPointOpen(state, this.area, {x: column * 16 + 8, y: row * 16 + 8 }, excludedObjects)) {
+        if (!isPointOpen(state, this.area, {x: column * 16 + 8, y: row * 16 + 8 }, movementProps, excludedObjects)) {
             this.invalid = true;
             return;
         }
@@ -57,7 +58,7 @@ export class Staff implements ObjectInstance {
         if (direction === 'left') {
             for (let i = 1; i < maxLength; i++) {
                 column = this.rightColumn - i;
-                if (!isPointOpen(state, this.area, {x: column * 16 + 8, y: row * 16 + 8 }, excludedObjects)) {
+                if (!isPointOpen(state, this.area, {x: column * 16 + 8, y: row * 16 + 8 }, movementProps,  excludedObjects)) {
                     break;
                 }
                 this.leftColumn = column;
@@ -65,7 +66,7 @@ export class Staff implements ObjectInstance {
         }else if (direction === 'right') {
             for (let i = 1; i < maxLength; i++) {
                 column = this.leftColumn + i;
-                if (!isPointOpen(state, this.area, {x: column * 16 + 8, y: row * 16 + 8 }, excludedObjects)) {
+                if (!isPointOpen(state, this.area, {x: column * 16 + 8, y: row * 16 + 8 }, movementProps,  excludedObjects)) {
                     break;
                 }
                 this.rightColumn = column;
@@ -73,7 +74,7 @@ export class Staff implements ObjectInstance {
         } else if (direction === 'up') {
             for (let i = 1; i < maxLength; i++) {
                 row = this.bottomRow - i;
-                if (!isPointOpen(state, this.area, {x: column * 16 + 8, y: row * 16 + 8 }, excludedObjects)) {
+                if (!isPointOpen(state, this.area, {x: column * 16 + 8, y: row * 16 + 8 }, movementProps,  excludedObjects)) {
                     break;
                 }
                 this.topRow = row;
@@ -81,7 +82,7 @@ export class Staff implements ObjectInstance {
         } else if (direction === 'down') {
             for (let i = 1; i < maxLength; i++) {
                 row = this.topRow + i;
-                if (!isPointOpen(state, this.area, {x: column * 16 + 8, y: row * 16 + 8 }, excludedObjects)) {
+                if (!isPointOpen(state, this.area, {x: column * 16 + 8, y: row * 16 + 8 }, movementProps,  excludedObjects)) {
                     break;
                 }
                 this.bottomRow = row;

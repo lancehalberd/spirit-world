@@ -59,7 +59,9 @@ export class RollingBallObject implements ObjectInstance {
         const x = this.x + 8 + 16 * directionMap[direction][0];
         const y = this.y + 8 + 16 * directionMap[direction][1];
         const excludedObjects = new Set([this, state.hero, state.hero.astralProjection, ...state.hero.clones]);
-        if (isPointOpen(state, this.area, {x, y}, excludedObjects) && (!this.linkedObject || isPointOpen(state, this.linkedObject.area, {x, y}, excludedObjects))) {
+        if (isPointOpen(state, this.area, {x, y}, {canFall: true}, excludedObjects)
+            && (!this.linkedObject || isPointOpen(state, this.linkedObject.area, {x, y}, {canFall: true}, excludedObjects))
+        ) {
             this.rollDirection = direction;
             this.soundReference = playSound('rollingBall');
             if (this.linkedObject) {

@@ -1,6 +1,6 @@
 import { isPixelInShortRect, roundRect } from 'app/utils/index';
 
-import { AreaInstance, Direction, GameState, Hero, ObjectInstance, Tile, TileBehaviors } from 'app/types';
+import { AreaInstance, Direction, GameState, Hero, MovementProperties, ObjectInstance, Tile, TileBehaviors } from 'app/types';
 
 const root2over2 = Math.sqrt(2) / 2;
 
@@ -71,16 +71,17 @@ export function getDirection(dx: number, dy: number, includeDiagonals = false, d
 
 export function canTeleportToCoords(state: GameState, hero: Hero, {x, y}: Tile): boolean {
     const excludedObjects = new Set([hero]);
-    return isPointOpen(state, hero.area, {x: x + 2, y: y + 2}, excludedObjects) &&
-        isPointOpen(state, hero.area, {x: x + 14, y: y + 2}, excludedObjects) &&
-        isPointOpen(state, hero.area, {x: x + 2, y: y + 14}, excludedObjects) &&
-        isPointOpen(state, hero.area, {x: x + 14, y: y + 14}, excludedObjects);
+    return isPointOpen(state, hero.area, {x: x + 2, y: y + 2}, {canSwim: true}, excludedObjects) &&
+        isPointOpen(state, hero.area, {x: x + 14, y: y + 2}, {canSwim: true}, excludedObjects) &&
+        isPointOpen(state, hero.area, {x: x + 2, y: y + 14}, {canSwim: true}, excludedObjects) &&
+        isPointOpen(state, hero.area, {x: x + 14, y: y + 14}, {canSwim: true}, excludedObjects);
 }
 
 export function isPointOpen(
     state: GameState,
     area: AreaInstance,
     {x, y}: {x: number, y: number},
+    movementProperties: MovementProperties,
     excludedObjects: Set<any> = null
 ): boolean {
     const tx = Math.floor(x / 16);
@@ -98,7 +99,13 @@ export function isPointOpen(
         if (tileBehavior.solidMap[sy] >> (15 - sx) & 1) {
             return false;
         }
-    } else if (tileBehavior?.solid && !tileBehavior?.climbable) {
+    } else if (tileBehavior?.solid && (!tileBehavior?.climbable || !movementProperties.canClimb)) {
+        return false;
+    }
+    if (tileBehavior?.water && !movementProperties.canSwim) {
+        return false;
+    }
+    if (tileBehavior?.pit && !movementProperties.canFall) {
         return false;
     }
     for (const object of area.objects) {

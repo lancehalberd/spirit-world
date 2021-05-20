@@ -12,7 +12,7 @@ Low Priority Bugs:
     - nextAreaInstance is not rendered in Safari
 
 High Priority Bugs:
-
+    Sometimes can't enter peach cave when sliding on ice?
 
 
 Graphics:
@@ -24,7 +24,6 @@ Graphics:
 
 
 Current tasks:
-    - Fix attacking under water is broken.
     - River Temple Rough Draft.
     - Bubbles or something allow you to regenerate spirit energy quickly when standing on them
     - Decided what to work on next.

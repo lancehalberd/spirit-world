@@ -3,6 +3,7 @@ import { addObjectToArea } from 'app/content/areas';
 import { growVine, PouredWaterEffect } from 'app/content/effects/PouredWaterEffect';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { directionMap } from 'app/utils/field';
+import { saveGame } from 'app/state';
 
 import {
     AreaInstance, Direction, DrawPriority, FrameAnimation, GameState,
@@ -125,6 +126,7 @@ export class WaterPot implements ObjectInstance {
                 y: this.y + 2 + 16 * directionMap[this.fallDirection][1],
             }));
             state.savedState.objectFlags[this.definition.id] = true;
+            saveGame();
         }
         if (!this.pushedLastFrame) {
             this.pushCounter = 0;

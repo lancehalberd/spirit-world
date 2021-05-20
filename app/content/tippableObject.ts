@@ -82,7 +82,10 @@ export class TippableObject implements ObjectInstance {
         }
         const x = this.x + 8 + 16 * directionMap[direction][0];
         const y = this.y + 8 + 16 * directionMap[direction][1];
-        if (isPointOpen(state, this.area, {x, y}) && (!this.linkedObject || isPointOpen(state, this.linkedObject.area, {x, y}))) {
+        const movementProps = { canFall: true };
+        if (isPointOpen(state, this.area, {x, y}, movementProps)
+            && (!this.linkedObject || isPointOpen(state, this.linkedObject.area, {x, y}, movementProps))
+        ) {
             this.fallDirection = direction;
             this.animationTime = -80;
             this.pullingHeroDirection = direction;
