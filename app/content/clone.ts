@@ -1,4 +1,5 @@
 import { renderHero } from 'app/renderActor';
+import { onHitHero } from 'app/updateActor';
 
 import { carryMap, directionMap, directionToLeftRotationsFromRight, rotateDirection } from 'app/utils/field';
 
@@ -18,6 +19,7 @@ export class Clone implements Hero, ObjectInstance {
     definition = null;
     drawPriority: DrawPriority = 'sprites';
     frame: Frame;
+    isAllyTarget = true;
     element: MagicElement;
     life: number;
     x: number;
@@ -111,4 +113,5 @@ export class Clone implements Hero, ObjectInstance {
         this.d = rotateDirection(this.carrier.d, this.carryRotationOffset);
     }
     render = renderHero;
+    onHit = onHitHero;
 }

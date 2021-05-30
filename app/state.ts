@@ -7,6 +7,7 @@ import {
 import { zones } from 'app/content/zones';
 import { updateHeroMagicStats } from 'app/render/spiritBar';
 import { renderHero } from 'app/renderActor';
+import { onHitHero } from 'app/updateActor';
 
 import { GameState, Hero, SavedState } from 'app/types';
 
@@ -94,6 +95,7 @@ export function applySavedState(state: GameState, savedState: SavedState): void 
                 ...savedState.hero.equipment,
             },
             render: renderHero,
+            onHit: onHitHero,
             spiritRadius: 0,
             explosionTime: 0,
             invulnerableFrames: 0,
@@ -114,6 +116,7 @@ export function selectSaveFile(savedGameIndex: number): void {
         state.hero = getDefaultSavedState().hero;
         state.hero.spawnLocation = SPAWN_LOCATION_FULL;
         state.hero.render = renderHero;
+        state.hero.onHit = onHitHero;
         fixSpawnLocationOnLoad(state);
         updateHeroMagicStats(state);
         returnToSpawnLocation(state);
@@ -133,6 +136,7 @@ export function getDefaultSavedState(): SavedState {
 
 function getDefaultHeroState(): Hero {
     return {
+        isAllyTarget: true,
         area: null,
         x: 150, y: 445, z: 0,
         safeD: 'down', safeX: 150, safeY: 445,
@@ -194,6 +198,7 @@ function getDefaultHeroState(): Hero {
         status: 'normal',
         invisible: false,
         render: renderHero,
+        onHit: onHitHero,
         spiritRadius: 0,
         spawnLocation: SPAWN_LOCATION_FULL,
         equipedGear: {},

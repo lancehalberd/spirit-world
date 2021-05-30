@@ -9,13 +9,15 @@ import { PushPullObject } from 'app/content/pushPullObject';
 import { RollingBallObject } from 'app/content/rollingBallObject';
 import { TippableObject } from 'app/content/tippableObject';
 
+import { AirBubbles } from 'app/content/objects/airBubbles';
 import { Decoration } from 'app/content/objects/decoration';
 import { BallGoal } from 'app/content/objects/ballGoal';
 import { Marker } from 'app/content/objects/marker';
 import { NPC } from 'app/content/objects/npc';
 import { PitEntrance } from 'app/content/objects/pitEntrance';
-import { Teleporter } from 'app/content/objects/teleporter';
 import { Sign } from 'app/content/objects/sign';
+import { Teleporter } from 'app/content/objects/teleporter';
+import { Torch } from 'app/content/objects/torch';
 import { WaterPot } from 'app/content/objects/waterPot';
 
 import {
@@ -23,7 +25,9 @@ import {
 } from 'app/types';
 
 export function createObjectInstance(state: GameState, object: ObjectDefinition): ObjectInstance {
-    if (object.type === 'ballGoal') {
+    if (object.type === 'airBubbles') {
+        return new AirBubbles(state, object);
+    } else if (object.type === 'ballGoal') {
         return new BallGoal(object);
     } else if (object.type === 'decoration') {
         return new Decoration(object);
@@ -57,6 +61,8 @@ export function createObjectInstance(state: GameState, object: ObjectDefinition)
         return new Sign(object);
     } else if (object.type === 'teleporter') {
         return new Teleporter(state, object);
+    } else if (object.type === 'torch') {
+        return new Torch(state, object);
     } else if (object.type === 'waterPot') {
         return new WaterPot(state, object);
     }

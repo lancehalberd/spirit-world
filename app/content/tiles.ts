@@ -316,7 +316,7 @@ const furniturePlantTiles: TileSource = {
 const furnitureRugTiles: TileSource = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/temp_furniture.png'), x: 688, y: 0, w: 4 * 16, h: 4 * 16},
-    behaviors: {'all': {water: false, shallowWater: false, slippery: true, solid: false, solidMap: null}},
+    behaviors: {'all': {water: false, shallowWater: false, slippery: true, elementTiles: {fire: 0}, solid: false, solidMap: null}},
 };
 
 const furnitureLampTiles: TileSource = {
@@ -416,6 +416,13 @@ const roomFloorTiles: TileSource = {
     source: {image: requireImage('gfx/tiles/temp_furniture.png'), x: 768, y: 192, w: 3 * 16, h: 1 * 16},
 };
 
+
+const cloudTiles: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/cloud.png'), x: 0, y: 0, w: 64, h: 96},
+    behaviors: {'all': {cloudGround: true, defaultLayer: 'field'}, '2x4': { skipped: true },  '2x5': { skipped: true },  '3x4': { skipped: true },  '3x5': { skipped: true }},
+};
+
 addTiles([
     // This is the empty tile.
     singleTileSource('gfx/tiles/bush.png', {defaultLayer: 'field'}, -16),
@@ -494,5 +501,6 @@ addTiles([
     bridgeHorizontalTiles,
     bridgeVerticalTiles,
     roomFloorTiles,
+    cloudTiles,
 ]);
 

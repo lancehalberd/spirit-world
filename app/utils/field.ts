@@ -1,6 +1,12 @@
-import { isPixelInShortRect, roundRect } from 'app/utils/index';
+import { destroyTile } from 'app/content/areas';
+import { getTilesInRectangle } from 'app/getActorTargets';
+import { isPixelInShortRect, rectanglesOverlap, roundRect } from 'app/utils/index';
 
-import { AreaInstance, Direction, GameState, Hero, MovementProperties, ObjectInstance, Tile, TileBehaviors } from 'app/types';
+import {
+    AreaInstance, Direction, GameState, Hero,
+    HitProperties, HitResult, MovementProperties,
+    ObjectInstance, Tile, TileBehaviors,
+} from 'app/types';
 
 const root2over2 = Math.sqrt(2) / 2;
 
@@ -210,4 +216,101 @@ export function getTileBehaviorsAndObstacles(
     }
     return { tileBehavior, tx, ty, objects };
 }
+
+export function hitTargets(this: void, state: GameState, area: AreaInstance, hit: HitProperties): HitResult {
+    const combinedResult: HitResult = { pierced: true };
+    let targets: ObjectInstance[] = [];
+    if (hit.hitEnemies) {
+        targets = [...targets, ...area.enemyTargets];
+    }
+    if (hit.hitAllies) {
+        targets = [...targets, ...area.allyTargets];
+    }
+    if (hit.hitObjects) {
+        targets = [...targets, ...area.neutralTargets];
+    }
+    for (const object of targets) {
+        if (!object.getHitbox) {
+            continue;
+        }
+        if (object.status === 'hidden' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch' || object.status === 'gone') {
+            continue;
+        }
+        const hitbox = object.getHitbox(state);
+        if (hit.hitCircle) {
+            const r = hit.hitCircle.r;
+            // Fudge a little by pretending the target is an oval.
+            const r2 = (r + hitbox.w / 2) * (r + hitbox.h / 2);
+            const dx = hitbox.x + hitbox.w / 2 - hit.hitCircle.x;
+            const dy = hitbox.y + hitbox.h / 2 - hit.hitCircle.y;
+            if (dx * dx + dy * dy < r2) {
+                if (object.onHit) {
+                    const result = object.onHit(state, { ...hit, direction: getDirection(dx, dy) });
+                    combinedResult.hit ||= result.hit;
+                    combinedResult.blocked ||= result.blocked;
+                    combinedResult.pierced &&= ((!result.hit && !result.blocked) || result.pierced);
+                    combinedResult.stopped ||= result.stopped;
+                    combinedResult.setElement ||= result.setElement;
+                    combinedResult.knockback ||= result.knockback;
+                } else if (object.behaviors?.solid) {
+                    combinedResult.hit = true;
+                    if (!object.behaviors.low) {
+                        combinedResult.pierced = false;
+                    }
+                }
+            }
+        } else if (hit.hitbox && rectanglesOverlap(hitbox, hit.hitbox)) {
+            const direction = getDirection(
+                hitbox.x - hit.hitbox.x + 8 * (hit.vx || 0),
+                hitbox.y - hit.hitbox.y + 8 * (hit.vy || 0)
+            );
+            let knockback = hit.knockback;
+            if (!hit.knockback && hit.knockAwayFrom) {
+                const dx = (hitbox.x + hitbox.w / 2) - hit.knockAwayFrom.x;
+                const dy = (hitbox.y + hitbox.h / 2) - hit.knockAwayFrom.y;
+                const mag = Math.sqrt(dx * dx + dy * dy);
+                knockback = mag ? {vx: 4 * dx / mag, vy: 4 * dy / mag, vz: 0} : null;
+            }
+            if (object.onHit) {
+                const result = object.onHit(state, { ...hit, direction, knockback });
+                combinedResult.hit ||= result.hit;
+                combinedResult.blocked ||= result.blocked;
+                combinedResult.pierced &&= ((!result.hit && !result.blocked) || result.pierced);
+                combinedResult.stopped ||= result.stopped;
+                combinedResult.setElement ||= result.setElement;
+                combinedResult.knockback ||= result.knockback;
+            } else if (object.behaviors?.solid) {
+                combinedResult.hit = true;
+                if (!object.behaviors.low) {
+                    combinedResult.pierced = false;
+                }
+            }
+        }
+    }
+    if (hit.hitTiles && hit.hitbox) {
+        for (const target of getTilesInRectangle(area, hit.hitbox)) {
+            const behavior = area.behaviorGrid?.[target.y]?.[target.x];
+            if (behavior?.cuttable <= hit.damage && !behavior?.low) {
+                // We need to find the specific cuttable layers that can be destroyed.
+                for (const layer of area.layers) {
+                    const tile = layer.tiles[target.y][target.x];
+                    if (tile?.behaviors?.cuttable <= hit.damage) {
+                        destroyTile(state, area, {...target, layerKey: layer.key});
+                    }
+                }
+                combinedResult.hit = true;
+            } else if ((behavior?.cuttable > hit.damage || behavior?.solid) && !behavior?.low) {
+                combinedResult.hit = true;
+                combinedResult.pierced = false;
+                if (behavior?.cuttable > hit.damage) {
+                    combinedResult.blocked = true;
+                }
+            }
+        }
+    }
+
+    return combinedResult;
+}
+
+
 

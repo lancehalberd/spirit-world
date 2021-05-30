@@ -6,6 +6,7 @@ import {
     swapHeroStates,
 } from 'app/content/areas';
 import { CloneExplosionEffect } from 'app/content/effects/CloneExplosionEffect';
+import { AirBubbles } from 'app/content/objects/airBubbles';
 import { Enemy } from 'app/content/enemy';
 import { AstralProjection } from 'app/content/objects/astralProjection';
 import { zones } from 'app/content/zones';
@@ -27,7 +28,7 @@ import { rectanglesOverlap } from 'app/utils/index';
 import { playSound } from 'app/utils/sounds';
 
 import {
-    Actor, Clone, FullTile, GameState, HeldChakram, Hero,
+    Clone, FullTile, GameState, HeldChakram, Hero, HitProperties, HitResult,
     ObjectInstance, ThrownChakram, ThrownObject, TileCoords,
 } from 'app/types';
 
@@ -246,7 +247,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             hero.d = hero.safeD;
             hero.x = hero.safeX;
             hero.y = hero.safeY;
-            damageActor(state, hero, 1, null, true);
+            applyDamageToHero(state, hero, 1);
             // For now leave the hero in the 'fallen' state if they died, otherwise they reappear
             // just fine when the continue/quit option shows up.
             // Once the death animation is added we can probably remove this check if we want.
@@ -732,6 +733,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             }
         }
     }
+    let isTouchingAirBubble = false;
     // Mostly don't check for pits/damage when the player cannot control themselves.
     if (hero.action !== 'beingCarried' && hero.action !== 'falling' && hero.action !== 'fallen' && hero.action !== 'knocked'
         && hero.action !== 'dead'  && hero.action !== 'getItem'
@@ -740,6 +742,14 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             checkForFloorEffects(state, hero);
         }
         checkForEnemyDamage(state, hero);
+        for (const object of hero.area.objects) {
+            if (object instanceof AirBubbles) {
+                if (rectanglesOverlap(hero, object.getHitbox(state))) {
+                    isTouchingAirBubble = true;
+                    break;
+                }
+            }
+        }
     }
     // Check for transition to other areas/area sections.
     const isMovingThroughZoneDoor = hero.actionTarget?.definition?.type === 'door'
@@ -795,7 +805,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
     if (state.hero.invisible) {
         state.hero.actualMagicRegen = Math.max(-10, state.hero.actualMagicRegen - 4 * FRAME_LENGTH / 1000);
     }
-    const isHoldingBreath = !isAstralProjection && !state.hero.passiveTools.waterBlessing && state.zone.surfaceKey;
+    const isHoldingBreath = !isTouchingAirBubble && !isAstralProjection && !state.hero.passiveTools.waterBlessing && state.zone.surfaceKey;
     if (isHoldingBreath) {
         state.hero.actualMagicRegen = Math.min(-1, state.hero.actualMagicRegen);
     }
@@ -852,7 +862,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             removeAllClones(state);
         }
         if (isHoldingBreath) {
-            damageActor(state, hero, 1);
+            hero.onHit(state, {damage: 1});
         }
     }
     if (state.hero.magic > state.hero.maxMagic) {
@@ -876,10 +886,13 @@ export function checkForEnemyDamage(state: GameState, hero: Hero) {
         if (enemy.enemyDefinition.touchDamage && rectanglesOverlap(hero, enemy.getHitbox(state))) {
             //const dx = (hero.x + hero.w / 2) - (enemy.x + enemy.w / 2);
             //const dy = (hero.y + hero.h / 2) - (enemy.y + enemy.h / 2);
-            damageActor(state, hero, enemy.enemyDefinition.touchDamage, {
-                vx: - 4 * directionMap[hero.d][0],
-                vy: - 4 * directionMap[hero.d][1],
-                vz: 2,
+            hero.onHit(state, {
+                damage: enemy.enemyDefinition.touchDamage,
+                knockback: {
+                    vx: - 4 * directionMap[hero.d][0],
+                    vy: - 4 * directionMap[hero.d][1],
+                    vz: 2,
+                },
             });
         }
     }
@@ -910,61 +923,45 @@ export function destroyClone(state: GameState, clone: Hero): void {
     }
 }
 
-export function damageActor(
-    state: GameState,
-    actor: Actor,
-    damage: number,
-    knockback?: {vx: number, vy: number, vz: number},
-    overrideInvulnerability: boolean = false
-): boolean {
-    if (actor.life <= 0) {
-        return false;
+export function onHitHero(this: Hero, state: GameState, hit: HitProperties): HitResult {
+    if (this.life <= 0) {
+        return {};
     }
-    if (!overrideInvulnerability && (actor.action === 'roll' || actor.action === 'getItem' || actor.action === 'jumpingDown')) {
-        return false;
+    if (this.action === 'roll' || this.action === 'getItem' || this.action === 'jumpingDown') {
+        return {};
     }
-    const hero = state.hero.activeClone || state.hero;
     // Enemies have special code for handling invulnerability.
-    if (!overrideInvulnerability && !(actor instanceof Enemy)) {
-        if (actor.invulnerableFrames > 0) {
-            return false;
-        }
-        if (actor.invisible) {
-            return false;
-        }
+    if (this.invulnerableFrames > 0 || this.invisible) {
+        return {};
     }
-
-    let hit = false;
-    if (actor.takeDamage) {
-        hit = actor.takeDamage(state, damage);
-    } else if (actor === state.hero || state.hero.clones.indexOf(actor as any) >= 0) {
-        // If any clones are in use, any damage one takes destroys it until only one clone remains.
-        // Damage applies to the hero, not the clone.
-        state.hero.life -= damage / 2;
-        state.hero.invulnerableFrames = 50;
-        // Taking damage resets radius for spirit sight meditation.
-        state.hero.spiritRadius = 0;
-        if (state.hero.clones.length) {
-            destroyClone(state, actor as any);
-        }
-        hit = true;
+    if (hit.damage) {
+        applyDamageToHero(state, this, hit.damage);
     }
-
-    if (hit && knockback && !actor.equipedGear?.ironBoots) {
-        if (actor.knockBack) {
-            actor.knockBack(state, knockback);
+    if (hit.knockback && !this.equipedGear?.ironBoots) {
+        if (this.knockBack) {
+            this.knockBack(state, hit.knockback);
         } else {
-            if (actor === hero) {
-                throwHeldObject(state, hero);
-            }
-            actor.action = 'knocked';
-            actor.animationTime = 0;
-            actor.vx = knockback.vx;
-            actor.vy = knockback.vy;
-            actor.vz = knockback.vz;
+            throwHeldObject(state, this);
+            this.action = 'knocked';
+            this.animationTime = 0;
+            this.vx = hit.knockback.vx;
+            this.vy = hit.knockback.vy;
+            this.vz = hit.knockback.vz || 0;
         }
     }
-    return hit;
+    return { hit: true };
+}
+
+export function applyDamageToHero(state: GameState, hero: Hero, damage: number) {
+    // Damage applies to the hero, not the clone.
+    state.hero.life -= damage / 2;
+    state.hero.invulnerableFrames = 50;
+    // Taking damage resets radius for spirit sight meditation.
+    state.hero.spiritRadius = 0;
+    // If any clones are in use, any damage one takes destroys it until only one clone remains.
+    if (state.hero.clones.length) {
+        destroyClone(state, hero);
+    }
 }
 
 const throwSpeed = 6;

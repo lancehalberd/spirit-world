@@ -90,6 +90,8 @@ const f0_1x0: AreaDefinition = {
     ],
     objects: [
         {status: "normal", id: "peachCaveWaterEntrance", x: 352, y: 496, type: "door", style: "wideEntrance", targetZone: "underwater", targetObjectId: "peachCaveWaterEntrance", d: "down", saveStatus: undefined},
+        {status: "normal", id: "", x: 336, y: 480, saveStatus: undefined, type: "airBubbles"},
+        {status: "normal", id: "", x: 128, y: 192, saveStatus: undefined, type: "airBubbles"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},

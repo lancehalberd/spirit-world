@@ -110,6 +110,16 @@ export const SPAWN_HELIX_ENTRANCE: ZoneLocation = {
     areaGridCoords: {x: 0, y: 0},
     isSpiritWorld: false,
 };
+export const RIVER_TEMPLE_BOSS: ZoneLocation = {
+    zoneKey: 'riverTemple',
+    floor: 0,
+    x: 250,
+    y: 440,
+    z: 0,
+    d: 'up',
+    areaGridCoords: {y: 0, x: 0},
+    isSpiritWorld: false,
+};
 
 
 function applyItems(savedState: SavedState, items: {[key: string]: number}, objectFlags: string[] = []): SavedState {
@@ -175,7 +185,7 @@ helixStartState.hero.rightTool = 'invisibility';
 const helixEndState = applyItems(helixStartState, {charge: 1, staff: 1},
     ['elementalBeastsEscaped']);
 const riverTempleStartState = applyItems(helixEndState, {ironBoots: 1});
-
+const riverTempleBossState = applyItems(riverTempleStartState, {'riverTemple:bigKey': 1});
 
 const spawnLocations = {
     'Peach Cave Start': {
@@ -221,6 +231,10 @@ const spawnLocations = {
     'River Temple Start': {
         location: SPAWN_LOCATION_PEACH_CAVE_EXIT,
         savedState: riverTempleStartState,
+    },
+    'River Temple Boss': {
+        location: RIVER_TEMPLE_BOSS,
+        savedState: riverTempleBossState,
     },
 };
 window['spawnLocations'] = spawnLocations;

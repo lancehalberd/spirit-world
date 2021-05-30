@@ -55,7 +55,7 @@ export class CloneExplosionEffect implements ObjectInstance {
                 } else if (object.behaviors?.destructible) {
                     removeObjectFromArea(state, object);
                 } else if (object.onHit) {
-                    object.onHit(state, getDirection(-dx, -dy));
+                    object.onHit(state, { damage: 4, direction: getDirection(-dx, -dy) });
                 }
             }
         }

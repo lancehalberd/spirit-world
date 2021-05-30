@@ -1,10 +1,13 @@
 import { removeObjectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
-import { directionMap, getTileBehaviorsAndObstacles, isPointOpen } from 'app/utils/field';
+import { directionMap, getTileBehaviorsAndObstacles, hitTargets, isPointOpen } from 'app/utils/field';
 import { playSound, stopSound } from 'app/utils/sounds';
 
-import { AreaInstance, BallGoal, Direction, Enemy, GameState, BaseObjectDefinition, ObjectInstance, ObjectStatus, ShortRectangle } from 'app/types';
+import {
+    AreaInstance, BallGoal, Direction, GameState, HitProperties, HitResult,
+    BaseObjectDefinition, ObjectInstance, ObjectStatus, ShortRectangle,
+} from 'app/types';
 
 const rollingAnimation = createAnimation('gfx/tiles/rollingboulder.png', {w: 16, h: 16}, {cols:4});
 const rollingAnimationSpirit = createAnimation('gfx/tiles/rollingboulderspirit.png', {w: 16, h: 16}, {cols:4});
@@ -15,6 +18,7 @@ export class RollingBallObject implements ObjectInstance {
     behaviors = {
         solid: true,
     };
+    isNeutralTarget = true;
     drawPriority: 'sprites' = 'sprites';
     definition = null;
     x: number;
@@ -38,10 +42,14 @@ export class RollingBallObject implements ObjectInstance {
     getHitbox(state: GameState): ShortRectangle {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
-    onHit(state: GameState, direction: Direction): void {
+    onHit(state: GameState, {canPush, direction}: HitProperties): HitResult {
         if (!this.rollDirection) {
-            this.rollInDirection(state, direction);
+            if (canPush) {
+                this.rollInDirection(state, direction);
+            }
+            return { hit: true };
         }
+        return {};
     }
     onPush(state: GameState, direction: Direction): void {
         if (!this.rollDirection) {
@@ -108,29 +116,24 @@ export class RollingBallObject implements ObjectInstance {
                     return;
                 }
             }
+            // Rolling balls hurt actors and push on other objects.
+            hitTargets(state, this.area, {
+                canPush: true,
+                damage: 2,
+                direction: this.rollDirection,
+                hitbox: this.getHitbox(state),
+                hitObjects: true,
+                hitEnemies: true,
+                hitAllies: true,
+                knockAwayFrom: {x: this.x + 8, y: this.y + 8},
+            });
             // MC + clones do not obstruct rolling balls.
-            // TODO: rolling balls should damage MC/clones.
             const excludedObjects = new Set([this, state.hero, state.hero.astralProjection, ...state.hero.clones]);
-            const { objects, tileBehavior } = getTileBehaviorsAndObstacles(state, this.area, {x, y}, excludedObjects);
+            const { tileBehavior } = getTileBehaviorsAndObstacles(state, this.area, {x, y}, excludedObjects);
             if (!tileBehavior.solid && !tileBehavior.outOfBounds) {
                 this.x += dx;
                 this.y += dy;
-                // Hitting enemies with rolling balls does 2 damage.
-                if (objects.length) {
-                    for (const object of objects) {
-                        if (object instanceof Enemy) {
-                            object.takeDamage(state, 2);
-                        }
-                    }
-                }
             } else {
-                if (objects.length) {
-                    for (const object of objects) {
-                        if (object.onHit) {
-                            object.onHit(state, this.rollDirection);
-                        }
-                    }
-                }
                 this.stopRollingSound();
                 this.linkedObject?.stopRollingSound();
                 playSound('rollingBallHit');

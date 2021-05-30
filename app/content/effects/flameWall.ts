@@ -1,11 +1,9 @@
 import { getAreaSize, removeObjectFromArea } from 'app/content/areas';
 import { CANVAS_HEIGHT, CANVAS_WIDTH, FRAME_LENGTH } from 'app/gameConstants';
-import { damageActor } from 'app/updateActor';
-import { directionMap } from 'app/utils/field';
-import { rectanglesOverlap } from 'app/utils/index';
+import { directionMap, hitTargets } from 'app/utils/field';
 
 import {
-    AreaInstance, AstralProjection, Clone, Direction,
+    AreaInstance, Direction,
     Frame, GameState, ObjectInstance, ObjectStatus,
 } from 'app/types';
 
@@ -42,23 +40,6 @@ export class FlameWall implements ObjectInstance, Props {
         this.damage = damage;
         this.direction = direction;
         this.length = length;
-    }
-    checkForHits(state: GameState) {
-        for (const object of this.area.objects) {
-            if (!(object instanceof Clone) && !(object instanceof AstralProjection)) {
-                continue;
-            }
-            if (rectanglesOverlap(object, this)) {
-                damageActor(state, object, this.damage);
-            }
-        }
-        if (state.hero.area === this.area && rectanglesOverlap(state.hero, this)) {
-            damageActor(state, state.hero, this.damage, {
-                vx: - 4 * directionMap[this.direction][0],
-                vy: - 4 * directionMap[this.direction][1],
-                vz: 2,
-            });
-        }
     }
     update(state: GameState) {
         const { section } = getAreaSize(state);
@@ -100,7 +81,13 @@ export class FlameWall implements ObjectInstance, Props {
             if (this.x < left || this.x + this.w > right || this.y < top || this.y + this.h > bottom) {
                 removeObjectFromArea(state, this);
             } else {
-                this.checkForHits(state);
+                hitTargets(state, this.area, {
+                    canPush: false,
+                    damage: this.damage,
+                    hitbox: this,
+                    element: 'fire',
+                    hitAllies: true,
+                });
             }
         }
     }

@@ -1,14 +1,13 @@
-import { addParticleAnimations, makeSparkleAnimation } from 'app/content/animationEffect';
-import { addObjectToArea, destroyTile, getAreaSize, removeObjectFromArea } from 'app/content/areas';
-import { Enemy } from 'app/content/enemy';
+import { makeSparkleAnimation } from 'app/content/animationEffect';
+import { addObjectToArea, getAreaSize, removeObjectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { getTilesInRectangle } from 'app/getActorTargets';
-import { damageActor } from 'app/updateActor';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
-import { getDirection } from 'app/utils/field';
-import { isPointInShortRect, rectanglesOverlap } from 'app/utils/index';
+import { hitTargets } from 'app/utils/field';
+import { isPointInShortRect } from 'app/utils/index';
 
-import { AnimationEffect, AreaInstance, DrawPriority, Frame, GameState, Hero, ObjectInstance, ObjectStatus } from 'app/types';
+import {
+    AnimationEffect, AreaInstance, DrawPriority, Frame, GameState, Hero, HitProperties, ObjectInstance, ObjectStatus,
+} from 'app/types';
 
 const chakramGeometry = {w: 16, h: 16, content: {x: 2, y: 2, w: 12, h: 12}};
 const chakramAnimation = createAnimation('gfx/chakram1.png', chakramGeometry, {cols: 9, x: 0, duration: 2}, {loopFrame: 1});
@@ -97,48 +96,24 @@ export class ThrownChakram implements ObjectInstance {
                 return;
             }
         }
-        for (const object of this.area.objects) {
-            if (object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
-                continue;
-            }
-            if (object instanceof Enemy) {
-                if (rectanglesOverlap(object.getHitbox(state), this)) {
-                    if (damageActor(state, object, this.damage, {vx: this.vx / 2, vy: this.vy / 2, vz: 0})) {
-                        if (!this.piercing) {
-                            this.outFrames = 0;
-                        }
-                    }
-                }
-            }
-            // Only hit objects on the way out to prevent accidentally dragging objects towards the player.
-            if (this.outFrames > 0) {
-                if (object.getHitbox && object.onHit) {
-                    const hitbox = object.getHitbox(state);
-                    if (rectanglesOverlap(hitbox, this)) {
-                        const direction = getDirection(hitbox.x - this.x + 8 * this.vx, hitbox.y - this.y + 8 * this.vy);
-                        object.onHit(state, direction);
-                        this.outFrames = 0;
-                    }
-                }
-            }
+
+        const hit: HitProperties = {
+            damage: this.damage,
+            vx: this.vx,
+            vy: this.vy,
+            hitbox: this,
+            hitEnemies: true,
+            hitObjects: true,
+            hitTiles: true,
         }
-        for (const target of getTilesInRectangle(this.area, this)) {
-            const behavior = this.area.behaviorGrid?.[target.y]?.[target.x];
-            if (behavior?.cuttable <= state.hero.weapon) {
-                // We need to find the specific cuttable layers that can be destroyed.
-                for (const layer of this.area.layers) {
-                    const tile = layer.tiles[target.y][target.x];
-                    const behavior = tile?.behaviors;
-                    if (behavior?.cuttable <= state.hero.weapon) {
-                        destroyTile(state, this.area, {...target, layerKey: layer.key});
-                        addParticleAnimations(state, this.area, target.x * 16, target.y * 16, 2, behavior.particles, behavior);
-                    }
-                }
-            } else if (behavior?.cuttable > state.hero.weapon ||
-                ((behavior?.solid || behavior?.solidMap) && !behavior?.low)
-            ) {
-                this.outFrames = 0;
-            }
+        // Only push objects on the way out to prevent accidentally dragging objects towards the player.
+        if (this.outFrames > 0) {
+            hit.canPush = true;
+            hit.knockback = {vx: this.vx / 2, vy: this.vy / 2, vz: 0};
+        }
+        const hitResult = hitTargets(state, this.area, hit);
+        if (((hitResult.hit || hitResult.blocked) && !this.piercing && !hitResult.pierced) || hitResult.stopped) {
+            this.outFrames = 0;
         }
     }
     render(context, state: GameState) {
@@ -157,7 +132,6 @@ export class HeldChakram implements ObjectInstance {
     drawPriority: DrawPriority = 'sprites';
     type = 'heldChakram' as 'heldChakram';
     frame: Frame;
-    outFrames: number;
     damage: number;
     ignorePits = true;
     x: number;
@@ -177,7 +151,6 @@ export class HeldChakram implements ObjectInstance {
         this.damage = damage;
         this.w = chakramGeometry.content.w;
         this.h = chakramGeometry.content.h;
-        this.outFrames = 12;
         this.hero = source;
         this.updatePosition();
         this.sparkles = [];
@@ -235,40 +208,25 @@ export class HeldChakram implements ObjectInstance {
         }
         this.updatePosition();
         this.animationTime += FRAME_LENGTH;
-        for (const object of this.area.objects) {
-            if (object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
-                continue;
-            }
-            if (object instanceof Enemy) {
-                const enemyHitbox = object.getHitbox(state);
-                if (rectanglesOverlap(object.getHitbox(state), this)) {
-                    const dx = (enemyHitbox.x + enemyHitbox.w / 2) - (this.hero.x + this.hero.w / 2);
-                    const dy = (enemyHitbox.y + enemyHitbox.h / 2) - (this.hero.y + this.hero.h / 2);
-                    const mag = Math.sqrt(dx * dx + dy * dy);
-                    const hit = damageActor(state, object, this.damage, mag ? {vx: 4 * dx / mag, vy: 4 * dy / mag, vz: 0} : null);
-                    if (hit) {
-                        this.hero.action = null;
-                        removeObjectFromArea(state, this);
-                        this.hero.bounce = {vx: -4 * dx / mag, vy: -4 * dy / mag, frames: 10};
-                        return;
-                    }
-                    this.outFrames = 0;
-                }
-            }
+
+        const hit: HitProperties = {
+            damage: this.damage,
+            vx: this.vx,
+            vy: this.vy,
+            hitbox: this,
+            hitEnemies: true,
+            hitObjects: true,
+            hitTiles: true,
+            knockAwayFrom: { x: this.hero.x + this.hero.w / 2, y: this.hero.y + this.hero.h / 2 },
+        };
+        const hitResult = hitTargets(state, this.area, hit);
+        if (hitResult.hit) {
+            this.hero.action = null;
+            removeObjectFromArea(state, this);
+            return;
         }
-        for (const target of getTilesInRectangle(this.area, this)) {
-            const behavior = this.area.behaviorGrid?.[target.y]?.[target.x];
-            if (behavior?.cuttable <= state.hero.weapon) {
-                // We need to find the specific cuttable layers that can be destroyed.
-                for (const layer of this.area.layers) {
-                    const tile = layer.tiles[target.y][target.x];
-                    const behavior = tile?.behaviors;
-                    if (behavior?.cuttable <= state.hero.weapon) {
-                        destroyTile(state, this.area, {...target, layerKey: layer.key});
-                        addParticleAnimations(state, this.area, target.x * 16, target.y * 16, 2, behavior.particles, behavior);
-                    }
-                }
-            }
+        if (hitResult.knockback) {
+            this.hero.bounce = {vx: hitResult.knockback.vx, vy: hitResult.knockback.vy, frames: 10};
         }
     }
     render(context, state: GameState) {

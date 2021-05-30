@@ -1,11 +1,13 @@
 import _ from 'lodash';
 
 import { addObjectToArea, linkObject, removeObjectFromArea } from 'app/content/areas';
+import { bossTypes } from 'app/content/bosses';
 import { dialogueHash } from 'app/content/dialogue';
 import { createObjectInstance } from 'app/content/objects';
 import { decorationTypes } from 'app/content/objects/decoration';
 import { doorStyles } from 'app/content/door';
-import { bossTypes, enemyTypes, enemyDefinitions } from 'app/content/enemy';
+import { enemyDefinitions } from 'app/content/enemies/enemyHash';
+import { enemyTypes } from 'app/content/enemies';
 import { npcBehaviors, npcStyles } from 'app/content/objects/npc';
 import { signStyles } from 'app/content/objects/sign';
 import { getLootFrame } from 'app/content/lootObject';
@@ -45,9 +47,9 @@ export function getLootTypes(): LootType[] {
 }
 
 export const combinedObjectTypes: ObjectType[] = [
-    'ballGoal', 'bigChest', 'chest', 'crystalSwitch', 'decoration',
+    'airBubbles', 'ballGoal', 'bigChest', 'chest', 'crystalSwitch', 'decoration',
     'door', 'floorSwitch', 'loot','marker', 'npc', 'pitEntrance',
-    'pushPull', 'rollingBall',  'sign', 'teleporter', 'tippable', 'waterPot',
+    'pushPull', 'rollingBall',  'sign', 'teleporter', 'tippable', 'torch', 'waterPot',
 ];
 
 export function createObjectDefinition(
@@ -60,7 +62,7 @@ export function createObjectDefinition(
     const commonProps = {
         // Assign defaults for any props the definitions might require.
         status: 'normal' as ObjectStatus,
-        id: definition.id || uniqueId(state, definition.type),
+        id: definition.id || '',
         linked: definition.linked,
         spirit: definition.spirit,
         x,
@@ -185,13 +187,17 @@ export function createObjectDefinition(
                 status: definition.status || commonProps.status,
             };
         }
+        case 'airBubbles':
         case 'marker':
         case 'pushPull':
         case 'rollingBall':
         case 'tippable':
+        case 'torch':
         case 'waterPot':
             return {
                 ...commonProps,
+                saveStatus: definition.saveStatus,
+                status: definition.status || commonProps.status,
                 type: definition.type,
             };
         case 'sign':
@@ -231,19 +237,19 @@ function getTargetObjectIdsByTypes(zone: Zone, types: ObjectType[]): string[] {
             }
         }
     }
-    return _.flatten(combinedObjectIds);
+    return _.flatten(combinedObjectIds).filter(id => id);
 }
 
 function getTargetObjectIdsByTypesAndArea(area: AreaDefinition, types: ObjectType[]): string[] {
     if (!area) {
         return [];
     }
-    return area.objects.filter(object => types.includes(object.type)).map(object => object.id);
+    return area.objects.filter(object => types.includes(object.type)).map(object => object.id).filter(id => id);
 }
 
 export function getSwitchTargetProperties(state: GameState, editingState: EditingState, object: BallGoalDefinition | CrystalSwitchDefinition | FloorSwitchDefinition ): PanelRows {
     const rows: PanelRows = [];
-    const objectIds = ['all', ...getTargetObjectIdsByTypesAndArea(state.areaInstance.definition, ['door', 'chest', 'loot'])];
+    const objectIds = ['all', ...getTargetObjectIdsByTypesAndArea(state.areaInstance.definition, ['door', 'chest', 'loot', 'airBubbles', 'torch'])];
 
     if (object.id && objectIds.indexOf(object.targetObjectId) < 0) {
         delete object.targetObjectId;
@@ -265,17 +271,19 @@ export function getObjectProperties(state: GameState, editingState: EditingState
 
     const object: ObjectDefinition = editingState.selectedObject;
 
-    if (editingState.selectedObject?.id) {
-        const selectedObject = editingState.selectedObject;
+    const selectedObject = state.areaInstance.definition.objects.includes(editingState.selectedObject)
+        ? editingState.selectedObject : null;
+    if (selectedObject) {
         rows.push({
             name: 'id',
             value: selectedObject.id,
             onChange(newId: string) {
-                return updateObjectId(state, selectedObject, newId, false);
+                selectedObject.id = newId;
+                updateObjectInstance(state, selectedObject);
             },
         });
     }
-    if (editingState.tool === 'select' && !editingState.selectedObject?.id) {
+    if (editingState.tool === 'select' && !selectedObject) {
         return rows;
     }
     if (object.type !== 'enemy' && object.type !== 'boss') {
@@ -285,10 +293,6 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             values: combinedObjectTypes,
             onChange(objectType: ObjectType) {
                 if (object.id) {
-                    // Replace instances of the loot type in the id with the new loot type.
-                    if (object.id.includes(object.type)) {
-                        updateObjectId(state, object, object.id.replace(object.type, objectType));
-                    }
                     object.type = objectType as any;
                     updateObjectInstance(state, createObjectDefinition(state, editingState, object), object);
                 } else {
@@ -314,6 +318,14 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             updateObjectInstance(state, object);
         },
     }]);
+    rows.push({
+        name: 'saveStatus',
+        value: object.saveStatus || false,
+        onChange(saveStatus: boolean) {
+            object.saveStatus = saveStatus;
+            updateObjectInstance(state, object);
+        },
+    });
     switch (object.type) {
         case 'decoration':
             rows.push({
@@ -422,14 +434,6 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                     },
                 });
             }
-            rows.push({
-                name: 'saveStatus',
-                value: object.saveStatus || false,
-                onChange(saveStatus: boolean) {
-                    object.saveStatus = saveStatus;
-                    updateObjectInstance(state, object);
-                },
-            });
             break;
         case 'bigChest':
         case 'chest':
@@ -448,18 +452,32 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             }
             break;
         }
+        case 'airBubbles':
+            rows.push({
+                name: 'status',
+                value: object.status,
+                values: ['normal', 'hidden', 'hiddenEnemy', 'hiddenSwitch'],
+                onChange(status: ObjectStatus) {
+                    object.status = status;
+                    updateObjectInstance(state, object);
+                },
+            });
+            break;
+        case 'torch':
+            rows.push({
+                name: 'status',
+                value: object.status,
+                values: ['normal', 'active', 'hidden', 'hiddenEnemy', 'hiddenSwitch'],
+                onChange(status: ObjectStatus) {
+                    object.status = status;
+                    updateObjectInstance(state, object);
+                },
+            });
+            break;
         case 'ballGoal':
             rows = [...rows, ...getSwitchTargetProperties(state, editingState, object)];
             break;
         case 'crystalSwitch':
-            rows.push({
-                name: 'saveStatus',
-                value: object.saveStatus || false,
-                onChange(saveStatus: boolean) {
-                    object.saveStatus = saveStatus;
-                    updateObjectInstance(state, object);
-                },
-            });
             rows.push({
                 name: 'element',
                 value: object.element || 'none',
@@ -659,10 +677,6 @@ function getLootFields(state: GameState, editingState: EditingState, object: Obj
         value: lootType,
         values: getLootTypes(),
         onChange(lootType: LootType) {
-            // Replace instances of the loot type in the id with the new loot type.
-            if (object.id?.includes(object.lootType)) {
-                updateObjectId(state, object, object.id.replace(object.lootType, lootType));
-            }
             object.lootType = lootType;
             updateObjectInstance(state, object);
             displayTileEditorPropertyPanel();
@@ -713,7 +727,7 @@ export function onMouseDownObject(state: GameState, editingState: EditingState, 
     newObject.x -= (frame.content?.w || frame.w) / 2;
     newObject.y -= (frame.content?.h || frame.h) / 2;
     fixObjectPosition(state, newObject);
-    updateObjectInstance(state, newObject);
+    updateObjectInstance(state, newObject, null, state.areaInstance, true);
 }
 
 export function unselectObject(editingState: EditingState, refresh: boolean = true) {
@@ -724,13 +738,13 @@ export function unselectObject(editingState: EditingState, refresh: boolean = tr
 
 export function onMouseDownSelect(state: GameState, editingState: EditingState, x: number, y: number): void {
     let changedSelection = false;
-    if (editingState.selectedObject?.id) {
+    if (state.areaInstance.definition.objects.includes(editingState.selectedObject)) {
         if (!isPointInObject(x, y, editingState.selectedObject)) {
             unselectObject(editingState, false);
             changedSelection = true;
         }
     }
-    if (!editingState.selectedObject?.id) {
+    if (!state.areaInstance.definition.objects.includes(editingState.selectedObject)) {
         for (const object of state.areaInstance.definition.objects) {
             if (isPointInObject(x, y, object)) {
                 editingState.selectedObject = object;
@@ -743,7 +757,7 @@ export function onMouseDownSelect(state: GameState, editingState: EditingState, 
         displayTileEditorPropertyPanel();
     }
     // If selectedObject is still set, then we are dragging it, so indicate the drag offset.
-    if (editingState.selectedObject?.id) {
+    if (state.areaInstance.definition.objects.includes(editingState.selectedObject)) {
         editingState.dragOffset = {
             x: editingState.selectedObject.x - x,
             y: editingState.selectedObject.y - y,
@@ -760,7 +774,7 @@ export function fixObjectPosition(state: GameState, object: ObjectDefinition): v
 }
 
 export function onMouseMoveSelect(state: GameState, editingState: EditingState, x: number, y: number): void {
-    if (!editingState.selectedObject?.id || !editingState.dragOffset) {
+    if (!state.areaInstance.definition.objects.includes(editingState.selectedObject) || !editingState.dragOffset) {
         return;
     }
     const linkedDefinition = getLinkedDefinition(state.alternateAreaInstance.definition, editingState.selectedObject);
@@ -770,10 +784,10 @@ export function onMouseMoveSelect(state: GameState, editingState: EditingState, 
     fixObjectPosition(state, editingState.selectedObject);
     if (oldX !== editingState.selectedObject.x || oldY !== editingState.selectedObject.y) {
         if (linkedDefinition) {
-            console.log("Updating linked definition");
+            //console.log("Updating linked definition");
             linkedDefinition.x = editingState.selectedObject.x;
             linkedDefinition.y = editingState.selectedObject.y;
-            console.log(linkedDefinition);
+            //console.log(linkedDefinition);
             updateObjectInstance(state, linkedDefinition, linkedDefinition, state.alternateAreaInstance);
         }
         updateObjectInstance(state, editingState.selectedObject);
@@ -797,15 +811,6 @@ export function uniqueId(state: GameState, prefix: string, location: ZoneLocatio
         i++;
     }
     return `${prefix}-${i}`;
-}
-
-export function updateObjectId(state: GameState, object: ObjectDefinition, id: string, makeUnique: boolean = true): string {
-    if (!makeUnique || !state.areaInstance.definition.objects.some(o => o !== object && o.id === id)) {
-        object.id = id;
-        updateObjectInstance(state, object);
-        return object.id;
-    }
-    return updateObjectId(state, object, `${id}-1`);
 }
 
 export function getObjectFrame(object: ObjectDefinition): FrameDimensions {
@@ -853,29 +858,27 @@ function checkToAddLinkedObject(state: GameState, definition: ObjectDefinition):
     if (!definition.linked) {
         return;
     }
-    const alternateLocation = {...state.location, isSpiritWorld: !state.location.isSpiritWorld};
     const alternateObject = {
         ...definition,
-        id: uniqueId(state, definition.type, alternateLocation),
         linked: true, spirit: !definition.spirit
     };
-    updateObjectInstance(state, alternateObject, null, state.alternateAreaInstance);
+    updateObjectInstance(state, alternateObject, null, state.alternateAreaInstance, true);
     // Make sure to update the object links when we replace object instances.
     const instance = state.areaInstance.objects.find(o => o.definition === definition);
     linkObject(instance);
 }
 
-export function updateObjectInstance(state: GameState, object: ObjectDefinition, oldDefinition?: ObjectDefinition, area: AreaInstance = null): void {
-    if (!object.id) {
-        return;
-    }
-    if (!area) {
+export function updateObjectInstance(state: GameState, object: ObjectDefinition, oldDefinition?: ObjectDefinition, area: AreaInstance = null, create: boolean = false): void {
+     if (!area) {
         area = state.areaInstance;
     }
     const definitionIndex = area.definition.objects.findIndex(d => d === (oldDefinition || object));
     if (definitionIndex >= 0) {
         area.definition.objects[definitionIndex] = object;
     } else {
+        if (!create) {
+            return;
+        }
         area.definition.objects.push(object);
     }
     const index = area.objects.findIndex(o => o.definition === (oldDefinition || object));

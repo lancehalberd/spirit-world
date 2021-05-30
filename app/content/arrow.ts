@@ -1,13 +1,12 @@
-import { destroyTile, getAreaSize, removeObjectFromArea } from 'app/content/areas';
-import { Enemy } from 'app/content/enemy';
+import { getAreaSize, removeObjectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { getTilesInRectangle } from 'app/getActorTargets';
-import { damageActor } from 'app/updateActor';
 import { createAnimation, drawFrameAt, getFrame } from 'app/utils/animations';
-import { getDirection } from 'app/utils/field';
-import { rectanglesOverlap } from 'app/utils/index';
+import { getDirection, hitTargets } from 'app/utils/field';
 
-import { AreaInstance, AstralProjection, Clone, Direction, Frame, FrameAnimation, GameState, Hero, ObjectInstance, ObjectStatus } from 'app/types';
+import {
+    AreaInstance, Direction, Frame, FrameAnimation,
+    GameState, HitProperties, MagicElement, ObjectInstance, ObjectStatus
+} from 'app/types';
 
 const upContent = {x: 5, y: 2, w: 6, h: 6};
 const downContent = {x: 5, y: 8, w: 6, h: 6};
@@ -150,6 +149,7 @@ interface Props {
     vx?: number,
     vy?: number,
     damage?: number,
+    element?: MagicElement,
     style?: ArrowStyle,
 }
 
@@ -158,6 +158,7 @@ export class Arrow implements ObjectInstance {
     definition = null;
     frame: Frame;
     damage: number;
+    element: MagicElement = null;
     x: number;
     y: number;
     z: number = 0;
@@ -168,39 +169,36 @@ export class Arrow implements ObjectInstance {
     vy: number;
     ignorePits = true;
     animationTime = 0;
-    hitTargets: Set<any>;
     direction: Direction;
     blocked = false;
     stuckFrames: number = 0;
     status: ObjectStatus = 'normal';
     style: ArrowStyle = 'normal';
-    constructor({x = 0, y = 0, vx = 0, vy = 0, damage = 1, style = 'normal'}: Props) {
+    constructor({x = 0, y = 0, vx = 0, vy = 0, damage = 1, element = null, style = 'normal'}: Props) {
         this.x = x | 0;
         this.y = y | 0;
         this.vx = vx;
         this.vy = vy;
         this.direction = getDirection(this.vx, this.vy, true);
         this.damage = damage;
+        this.element = element;
         this.w = 6;
         this.h = 6;
         this.x -= this.w / 2 ;
         this.y -= this.h / 2 ;
-        this.hitTargets = new Set();
         this.style = style;
     }
-    hitTarget(state: GameState, object: ObjectInstance): boolean {
-        if (!(object instanceof Enemy) || this.hitTargets.has(object)) {
-            return false;
-        }
-        if (rectanglesOverlap(object.getHitbox(state), this)) {
-            this.hitTargets.add(object);
-            damageActor(state, object, this.damage);
-            if (object.life > 0) {
-                this.stuckFrames = 1;
-                this.animationTime = 0;
-            }
-            return true;
-        }
+    getHitProperties(state: GameState): HitProperties {
+        return {
+            canPush: true,
+            hitbox: this,
+            vx: this.vx,
+            vy: this.vy, element:
+            this.element,
+            hitEnemies: true,
+            hitObjects: true,
+            hitTiles: true,
+        };
     }
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;
@@ -233,57 +231,26 @@ export class Arrow implements ObjectInstance {
             removeObjectFromArea(state, this);
             return;
         }
-        for (const object of this.area.objects) {
-            if (object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
-                continue;
-            }
-            if (this.hitTarget(state, object)) {
-                if (this.stuckFrames > 0) {
-                    return;
-                }
-                continue;
-            }
-            if (object.getHitbox && object.behaviors?.solid) {
-                const hitbox = object.getHitbox(state);
-                if (!this.hitTargets.has(object) && rectanglesOverlap(hitbox, this)) {
-                    this.hitTargets.add(object);
-                    const direction = getDirection(hitbox.x - this.x + 8 * this.vx, hitbox.y - this.y + 8 * this.vy);
-                    object.onHit?.(state, direction);
-                    if (!object.behaviors?.low){
-                        this.stuckFrames = 1;
-                        this.blocked = true;
-                        this.vz = 1;
-                        this.animationTime = 0;
-                        return;
-                    }
-                }
-            }
-        }
-        const area = this.area;
-        // If the object was removed by hitting an object, area will no longer be defined here.
-        if (!area) {
+        const hitResult = hitTargets(state, this.area, this.getHitProperties(state));
+        if (hitResult.blocked) {
+            this.stuckFrames = 1;
+            this.blocked = true;
+            this.vz = 1;
+            this.animationTime = 0;
             return;
         }
-        for (const target of getTilesInRectangle(area, this)) {
-            const behavior = area.behaviorGrid?.[target.y]?.[target.x];
-            const bowLevel = state.hero.activeTools.bow;
-            if (behavior?.cuttable <= bowLevel && !behavior?.low) {
-                // We need to find the specific cuttable layers that can be destroyed.
-                for (const layer of area.layers) {
-                    const tile = layer.tiles[target.y][target.x];
-                    if (tile?.behaviors?.cuttable <= bowLevel) {
-                        destroyTile(state, area, {...target, layerKey: layer.key});
-                    }
-                }
-            } else if ((behavior?.cuttable > bowLevel || behavior?.solid) && !behavior?.low) {
-                this.stuckFrames = 1;
-                this.blocked = true;
-                this.vz = 1;
-                this.animationTime = 0;
-            }
+        if (hitResult.hit && !hitResult.pierced) {
+            this.stuckFrames = 1;
+            this.animationTime = 0;
+            return;
+        }
+        // This is used to make torches light arrows on fire.
+        if (hitResult.setElement) {
+            this.element = hitResult.setElement;
+            console.log('arrow element', hitResult.setElement);
         }
     }
-    render(context, state: GameState) {
+    render(context: CanvasRenderingContext2D, state: GameState) {
         const animationSet = arrowStyles[this.style][this.direction];
         let animation = animationSet.normal;
         if (this.blocked) {
@@ -293,31 +260,40 @@ export class Arrow implements ObjectInstance {
         }
         const frame = getFrame(animation, this.animationTime);
         drawFrameAt(context, frame, { x: this.x, y: this.y - this.z });
+        if (this.element) {
+            context.save();
+                context.globalAlpha = 0.8;
+                context.beginPath();
+                context.fillStyle = {fire: 'red', ice: '#08F', lightning: 'yellow'}[this.element];
+                context.arc(
+                    this.x + 3,
+                    this.y - this.z + 3,
+                    3,
+                    0, 2 * Math.PI
+                );
+                context.fill();
+            context.restore();
+        }
     }
 }
 
 export class EnemyArrow extends Arrow {
-    hitTarget(state: GameState, object: ObjectInstance): boolean {
-        if (object !== state.hero && !(object instanceof Clone) && !(object instanceof AstralProjection)) {
-            return;
-        }
-        const castObject = object as (Hero | Clone | AstralProjection);
-        if (!this.hitTargets.has(castObject) && rectanglesOverlap(castObject, this)) {
-            if (damageActor(state, castObject, this.damage)) {
-                //this.hitTargets.add(object);
-                //this.stuckFrames = 1;
-                removeObjectFromArea(state, this);
-                return true;
-            }
-        }
+    getHitProperties(state: GameState): HitProperties {
+        return {
+            canPush: false,
+            hitbox: this,
+            vx: this.vx,
+            vy: this.vy, element:
+            this.element,
+            hitAllies: true,
+            hitObjects: true,
+            hitTiles: true,
+        };
     }
     update(state: GameState) {
         // Don't leave enemy arrows on the screen in case there are a lot of them.
         if (this.stuckFrames > 0 && !this.blocked) {
             removeObjectFromArea(state, this);
-            return;
-        }
-        if (state.hero.area === this.area && this.hitTarget(state, state.hero)) {
             return;
         }
         super.update(state);

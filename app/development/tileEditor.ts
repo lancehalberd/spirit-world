@@ -7,7 +7,8 @@ import {
     //mapTileNumbersToFullTiles,
     resetTileBehavior,
 } from 'app/content/areas';
-import { bossTypes, enemyTypes } from 'app/content/enemy';
+import { bossTypes } from 'app/content/bosses';
+import { enemyTypes } from 'app/content/enemies';
 import { logicHash } from 'app/content/logic';
 import { getLootFrame } from 'app/content/lootObject';
 import { createObjectInstance } from 'app/content/objects';
@@ -242,7 +243,9 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
             value: definition.key,
             onChange(key: string) {
                 definition.key = key;
-                alternateDefinition.key = key;
+                if (alternateDefinition) {
+                    alternateDefinition.key = key;
+                }
                 if (layer) {
                     layer.key = key;
                 }
@@ -281,10 +284,14 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
             onChange(visibilityOverride: 'auto' | 'show' | 'hide') {
                 if (visibilityOverride === 'auto') {
                     delete definition.visibilityOverride;
-                    delete alternateDefinition.visibilityOverride;
+                    if (alternateDefinition) {
+                        delete alternateDefinition.visibilityOverride;
+                    }
                 } else {
                     definition.visibilityOverride = visibilityOverride;
-                    alternateDefinition.visibilityOverride = visibilityOverride;
+                    if (alternateDefinition) {
+                        alternateDefinition.visibilityOverride = visibilityOverride;
+                    }
                 }
                 // Calling this will instantiate the area again and place the player back in their current location.
                 enterLocation(state, state.location);
@@ -318,7 +325,9 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
                 values: ['background', 'foreground'] as DrawPriority[],
                 onChange(drawPriority: DrawPriority) {
                     definition.drawPriority = drawPriority;
-                    alternateDefinition.drawPriority = drawPriority;
+                    if (alternateDefinition) {
+                        alternateDefinition.drawPriority = drawPriority;
+                    }
                     enterLocation(state, state.location);
                 },
             }];
@@ -354,7 +363,9 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
                         delete alternateDefinition.logicKey;
                     } else {
                         definition.logicKey = logicKey;
-                        alternateDefinition.logicKey = logicKey;
+                        if (alternateDefinition) {
+                            alternateDefinition.logicKey = logicKey;
+                        }
                     }
                     // Calling this will instantiate the area again and place the player back in their current location.
                     enterLocation(state, state.location);
@@ -1004,7 +1015,7 @@ function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, a
                 }
             }
             context.globalAlpha = 0.6;
-            if (editingState.tool === 'select' && editingState.selectedObject?.id) {
+            if (editingState.tool === 'select' && state.areaInstance.definition.objects.includes(editingState.selectedObject)) {
                 const instance = createObjectInstance(state, editingState.selectedObject);
                 let target: ShortRectangle;
                 if (instance.getHitbox) {
@@ -1093,8 +1104,9 @@ document.addEventListener('keydown', function(event: KeyboardEvent) {
         return;
     }
     if (event.which === KEY.BACK_SPACE) {
-        if (editingState.selectedObject?.id) {
-            deleteObject(getState(), editingState.selectedObject);
+        const state = getState();
+        if (state.areaInstance.definition.objects.includes(editingState.selectedObject)) {
+            deleteObject(state, editingState.selectedObject);
             unselectObject(editingState);
         }
     }

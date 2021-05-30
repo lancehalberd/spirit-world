@@ -102,6 +102,20 @@ const houseRoom: TilePalette = [
     [352,353,353,353,353,353,353,353,353,353,353,353,353,353,353,354],
 ];
 
+const clouds: TilePalette= [
+    [398, 399, 400, 410, 399, 411, 0],
+    [402, 403, 404, 402, 403, 404, 0],
+    [406, 407, 408, 412, 407, 413, 0],
+    [394, 407, 395, 394, 395, 398, 400],
+    [404, 0, 402, 396, 397, 406, 408],
+    [396, 399, 397, 410, 411, 0, 0],
+    [0, 0, 0, 412, 413, 0, 0],
+];
+
+// Use this to export the current brush as a palette grid.
+/**
+console.log(editingState.brush.none.tiles.map(t => "\t[" + t.join(", ") + "],").join("\n"));
+ */
 export const palettes = {
     overworld,
     cave,
@@ -110,5 +124,6 @@ export const palettes = {
     town,
     townAndMarketDecoration,
     houseRoom,
+    clouds,
     everything,
 };

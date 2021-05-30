@@ -108,6 +108,22 @@ export function drawFrameAt(
         tx | 0, ty | 0, tw | 0, th | 0);
 }
 
+export function drawFrameCenteredAt(
+    context: CanvasRenderingContext2D,
+    {image, content, x, y, w, h}: Frame,
+    {x: tx, y: ty, w: tw, h: th}: {x: number, y: number, w: number, h: number}
+): void {
+    const cw = content?.w ?? w;
+    const ch = content?.h ?? h;
+    // Adjust tx/ty so that x/y will be the top left corner of the content of the frame.
+    tx = tx - (content?.x || 0) + (tw - cw) / 2;
+    ty = ty - (content?.y || 0) + (th - ch) / 2;
+    // (x | 0) is faster than Math.floor(x)
+    context.drawImage(image,
+        x | 0, y | 0, w | 0, h | 0,
+        tx | 0, ty | 0, w | 0, h | 0);
+}
+
 export function getFrameHitBox({content, w, h}: Frame, {x, y}: {x: number, y: number}): ShortRectangle {
     return {
         x, y,

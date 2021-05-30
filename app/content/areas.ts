@@ -182,15 +182,13 @@ export function enterLocation(
             time: 0,
             type: 'fade',
         };
-        if (state.zone.underwaterKey === location.zoneKey) {
+        if (state.underwaterAreaInstance && state.zone.underwaterKey === location.zoneKey) {
             state.transitionState.type = 'diving';
-            const nextArea = getAreaFromLocation(location);
-            state.transitionState.nextAreaInstance = createAreaInstance(state, nextArea);
+            state.transitionState.nextAreaInstance = state.underwaterAreaInstance;
             state.hero.vx = state.hero.vy = 0;
         } else if (state.zone.surfaceKey === location.zoneKey) {
             state.transitionState.type = 'surfacing';
-            const nextArea = getAreaFromLocation(location);
-            state.transitionState.nextAreaInstance = createAreaInstance(state, nextArea);
+            state.transitionState.nextAreaInstance = state.surfaceAreaInstance;
             state.hero.vx = state.hero.vy = 0;
         } else if (!!state.location.isSpiritWorld !== !!location.isSpiritWorld && state.location.zoneKey === location.zoneKey) {
             state.transitionState.type = 'portal';
@@ -224,7 +222,9 @@ export function enterLocation(
     // Remove all clones on changing areas.
     removeAllClones(state);
     state.hero.activeStaff?.remove(state);
-    state.areaInstance = createAreaInstance(state, area);
+    const lastAreaInstance = state.areaInstance;
+    // Use the existing area instance on the transition state if it is present.
+    state.areaInstance = state.transitionState?.nextAreaInstance || createAreaInstance(state, area);
     state.alternateAreaInstance = createAreaInstance(state, alternateArea);
     state.areaInstance.alternateArea = state.alternateAreaInstance;
     state.alternateAreaInstance.alternateArea = state.areaInstance;
@@ -249,10 +249,10 @@ export function enterLocation(
     checkToUpdateSpawnLocation(state);
     // Make sure the actor is shown as swimming/wading during the transition frames.
     checkForFloorEffects(state, state.hero);
-    setConnectedAreas(state);
+    setConnectedAreas(state, lastAreaInstance);
 }
 
-export function setConnectedAreas(state: GameState) {
+export function setConnectedAreas(state: GameState, lastAreaInstance: AreaInstance) {
     state.underwaterAreaInstance = null;
     if (state.zone.underwaterKey && state.location.floor === 0) {
         const underwaterArea = getAreaFromLocation({
@@ -263,7 +263,12 @@ export function setConnectedAreas(state: GameState) {
         if (!underwaterArea) {
             debugger;
         }
-        state.underwaterAreaInstance = createAreaInstance(state, underwaterArea);
+        // Keep using the existing instance if one is present.
+        if (lastAreaInstance?.definition === underwaterArea) {
+            state.underwaterAreaInstance = lastAreaInstance;
+        } else {
+            state.underwaterAreaInstance = createAreaInstance(state, underwaterArea);
+        }
     }
     state.surfaceAreaInstance = null;
     if (state.zone.surfaceKey && state.location.floor === state.zone.floors.length - 1) {
@@ -275,7 +280,12 @@ export function setConnectedAreas(state: GameState) {
         if (!surfaceArea) {
             debugger;
         }
-        state.surfaceAreaInstance = createAreaInstance(state, surfaceArea);
+        // Keep using the existing instance if one is present.
+        if (lastAreaInstance?.definition === surfaceArea) {
+            state.surfaceAreaInstance = lastAreaInstance;
+        } else {
+            state.surfaceAreaInstance = createAreaInstance(state, surfaceArea);
+        }
     }
 }
 
@@ -537,6 +547,9 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
         canvas,
         context,
         cameraOffset: {x: 0, y: 0},
+        allyTargets: [],
+        enemyTargets: [],
+        neutralTargets: [],
     };
     for (const layer of instance.layers) {
         const definitionIndex = definition.layers.indexOf(layer.definition);

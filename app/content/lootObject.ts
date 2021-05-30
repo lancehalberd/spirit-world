@@ -428,15 +428,16 @@ function createLootFrame(color: string, letter: string): Frame {
     return {image: toolCanvas, x: 0, y: 0, w: toolCanvas.width, h: toolCanvas.height};
 }
 
-
 const [
-    catEyes, /*fullPeachFrame*/, goldPeachFrame, /*rollFrame*/,
+    invisibilityFrame,
+    catEyes, spiritSightFrame, /*fullPeachFrame*/, goldPeachFrame, /*rollFrame*/,
     keyOutlineFrame, bigKeyOutlineFrame,
     /*keyFrame*/, /*bigKeyFrame*/,
     /*bowFrame*/, bowOutlineFrame,
     /*scroll1*/, /*scroll1*/, mistScrollFrame,
+    /*threeCloneFrame*/, twoCloneFrame, gloveFrame
 ] = createAnimation('gfx/hud/icons.png',
-    {w: 18, h: 18, content: {x: 1, y: 1, w: 16, h: 16}}, {cols: 14}
+    {w: 18, h: 18, content: {x: 1, y: 1, w: 16, h: 16}}, {cols: 18}
 ).frames;
 
 const lootFrames: Partial<{[key in LootType]: Frame}> = {
@@ -447,17 +448,17 @@ const lootFrames: Partial<{[key in LootType]: Frame}> = {
     bow: bowOutlineFrame,
     catEyes: catEyes,
     charge: createLootFrame('red', 'CH'),
-    clone: createLootFrame('red', 'CL'),
-    invisibility: mistScrollFrame,
+    clone: twoCloneFrame,
+    invisibility: invisibilityFrame,
     trueSight: createLootFrame('blue', 'TS'),
-    gloves: createLootFrame('blue', 'GL'),
+    gloves: gloveFrame,
     roll: mistScrollFrame,
     staff: createLootFrame('red', 'ST'),
     peach: smallPeachFrame,
     peachOfImmortality: goldPeachFrame,
     peachOfImmortalityPiece: peachPieceFrame,
     // Spirit Eyes
-    spiritSight: createLootFrame('blue', 'SE'),
+    spiritSight: spiritSightFrame,
     teleportation: createLootFrame('blue', 'TE'),
     unknown: createLootFrame('black', '?'),
     empty: createLootFrame('grey', '--'),
@@ -585,7 +586,7 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: Lo
     },
     peachOfImmortality: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition) => {
         state.hero.maxLife++;
-        state.hero.life++;
+        state.hero.life = state.hero.maxLife;
     },
     peachOfImmortalityPiece: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition) => {
         state.hero.peachQuarters++;

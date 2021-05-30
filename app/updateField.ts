@@ -11,7 +11,7 @@ import { getTileBehaviors } from 'app/utils/field';
 
 import {
     AreaInstance, FrameAnimation, FrameDimensions,
-    GameState, MagicElement, ObjectInstance,
+    GameState, MagicElement,
 } from 'app/types';
 
 const fallGeometry: FrameDimensions = {w: 24, h: 24};
@@ -49,40 +49,50 @@ export function updateField(this: void, state: GameState) {
     }
     removeDefeatedEnemies(state, state.alternateAreaInstance);
     removeDefeatedEnemies(state, state.areaInstance);
+    updateAreaObjects(state, state.areaInstance);
+    updateAreaObjects(state, state.alternateAreaInstance);
+}
+export function updateAreaObjects(this: void, state: GameState, area: AreaInstance) {
     const isScreenTransitioning = state.nextAreaInstance || state.nextAreaSection;
-    for (const object of state.alternateAreaInstance?.objects || []) {
+    area.allyTargets = [state.hero];
+    area.enemyTargets = [];
+    area.neutralTargets = [];
+    for (const object of area?.objects || []) {
+        if (object.isAllyTarget) {
+            area.allyTargets.push(object);
+        }
+        if (object.isEnemyTarget) {
+            area.enemyTargets.push(object);
+        }
+        if (object.isNeutralTarget) {
+            area.neutralTargets.push(object);
+        }
+    }
+    for (const object of area?.objects || []) {
         if (isScreenTransitioning && !object.updateDuringTransition) {
             continue;
         }
-        updateObject(state, object);
-    }
-    for (const object of state.areaInstance.objects) {
-        if (isScreenTransitioning && !object.updateDuringTransition) {
-            continue;
-        }
-        updateObject(state, object);
-    }
-}
-export function updateObject(this: void, state: GameState, object: ObjectInstance) {
-    object.update?.(state);
-    if (!object.ignorePits && object.getHitbox) {
-        const hitbox = object.getHitbox(state);
-        const x = hitbox.x + hitbox.w / 2;
-        const y = hitbox.y + hitbox.h / 2;
-        const { tileBehavior } = getTileBehaviors(state, object.area, {x, y});
-        if (!tileBehavior) {
-            return;
-        }
-        if (tileBehavior.pit && !(object.z > 0)) {
-            const pitAnimation = new AnimationEffect({
-                animation: objectFallAnimation,
-                x: ((x / 16) | 0) * 16 - 4, y: ((y / 16) | 0) * 16 - 4,
-            });
-            addObjectToArea(state, object.area, pitAnimation);
-            removeObjectFromArea(state, object);
+        object.update?.(state);
+        if (!object.ignorePits && object.getHitbox) {
+            const hitbox = object.getHitbox(state);
+            const x = hitbox.x + hitbox.w / 2;
+            const y = hitbox.y + hitbox.h / 2;
+            const { tileBehavior } = getTileBehaviors(state, object.area, {x, y});
+            if (!tileBehavior) {
+                return;
+            }
+            if (tileBehavior.pit && !(object.z > 0)) {
+                const pitAnimation = new AnimationEffect({
+                    animation: objectFallAnimation,
+                    x: ((x / 16) | 0) * 16 - 4, y: ((y / 16) | 0) * 16 - 4,
+                });
+                addObjectToArea(state, object.area, pitAnimation);
+                removeObjectFromArea(state, object);
+            }
         }
     }
 }
+
 
 function switchElement(state: GameState, delta: number): void {
     const allElements: MagicElement[] = [null];

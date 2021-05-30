@@ -2,7 +2,7 @@ import _ from 'lodash';
 
 import { getAreaSize } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { damageActor, throwHeldObject } from 'app/updateActor';
+import { throwHeldObject } from 'app/updateActor';
 import { getTileBehaviorsAndObstacles, isPointOpen } from 'app/utils/field';
 
 import { Actor, Direction, GameState, Hero, MovementProperties } from 'app/types';
@@ -150,11 +150,11 @@ function moveActorInDirection(
     for (const point of checkPoints) {
         const { tileBehavior, objects} = getTileBehaviorsAndObstacles(state, actor.area, point, excludedObjects);
         if (tileBehavior?.solid && tileBehavior?.damage > 0) {
-            damageActor(state, actor, tileBehavior.damage, {
+            actor.onHit?.(state, { damage: tileBehavior.damage, knockback: {
                 vx: - 4 * (ax - actor.x),
                 vy: - 4 * (ay - actor.y),
                 vz: 2,
-            });
+            }});
         }
         // Climbable overrides solid tile behavior. This allows use to place tiles marked climbable on top
         // of solid tiles to make them passable.
@@ -336,6 +336,7 @@ function moveActorInDirection(
     actor.y = ay;
     return true;
 }
+
 export function checkForFloorEffects(state: GameState, hero: Hero) {
     const tileSize = 16;
 
@@ -372,8 +373,8 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
             if (behaviors.climbable) {
                 startClimbing = true;
             }
-            if (behaviors.damage > 0) {
-                damageActor(state, hero, behaviors.damage);
+            if (behaviors.damage > 0 && hero.onHit) {
+                hero.onHit(state, { damage: behaviors.damage });
             }
             if (!behaviors.water) {
                 hero.swimming = false;

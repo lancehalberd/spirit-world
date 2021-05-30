@@ -1,13 +1,14 @@
 import { getCloneMovementDeltas } from 'app/keyCommands';
 import { renderCarriedTile } from 'app/renderActor';
 import { heroSpiritAnimations } from 'app/render/heroAnimations';
+import { throwHeldObject } from 'app/updateActor';
 import { drawFrameAt, getFrame } from 'app/utils/animations';
 import { directionMap, getDirection } from 'app/utils/field';
 
 import {
     Action, ActiveTool, ActorAnimations, AreaInstance, Clone,
     Direction, DrawPriority, MagicElement, Equipment, Frame, FullTile,
-    GameState, Hero, ObjectInstance, ObjectStatus, PassiveTool,
+    GameState, Hero, HitProperties, HitResult, ObjectInstance, ObjectStatus, PassiveTool,
     ShortRectangle, TileBehaviors, TileCoords, ZoneLocation
 } from 'app/types';
 
@@ -63,6 +64,7 @@ export class AstralProjection implements Hero, ObjectInstance {
     behaviors: TileBehaviors = {
         solid: true,
     };
+    isAllyTarget = true;
     definition = null;
     drawPriority: DrawPriority = 'sprites';
     frame: Frame;
@@ -147,12 +149,28 @@ export class AstralProjection implements Hero, ObjectInstance {
             renderCarriedTile(context, state, hero);
         }
     }
-    takeDamage(state: GameState, damage: number): boolean {
-        // Astral projection damage is applied to the magic meter at 5x effectiveness.
-        state.hero.magic -= Math.max(10, damage * 5);
-        // Astral projection has fewer invulnerability frames since it can't be killed
-        // and magic regenerates automatically.
-        this.invulnerableFrames = 20;
-        return true;
+    onHit(state: GameState, hit: HitProperties): HitResult {
+        if (this.invulnerableFrames > 0) {
+            return {};
+        }
+        if (hit.damage) {
+            // Astral projection damage is applied to the magic meter at 5x effectiveness.
+            state.hero.magic -= Math.max(10, hit.damage * 5);
+            // Astral projection has fewer invulnerability frames since it can't be killed
+            // and magic regenerates automatically.
+            this.invulnerableFrames = 20;
+        }
+        if (hit.knockback) {
+            throwHeldObject(state, this);
+            this.action = 'knocked';
+            this.animationTime = 0;
+            this.vx = hit.knockback.vx;
+            this.vy = hit.knockback.vy;
+            this.vz = hit.knockback.vz;
+        }
+        return {
+            hit: true,
+            pierced: true,
+        }
     }
 }

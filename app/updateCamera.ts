@@ -41,6 +41,7 @@ export function updateCamera(state: GameState, speed = cameraSpeed): void {
                     object.y -= state.nextAreaInstance.cameraOffset.y;
                 }
             }
+            const lastAreaInstance = state.areaInstance;
             state.areaInstance = state.nextAreaInstance;
             state.hero.x -= state.areaInstance.cameraOffset.x;
             state.hero.y -= state.areaInstance.cameraOffset.y;
@@ -57,7 +58,7 @@ export function updateCamera(state: GameState, speed = cameraSpeed): void {
             state.alternateAreaInstance.alternateArea = state.areaInstance;
             linkObjects(state);
             setAreaSection(state, state.hero.d);
-            setConnectedAreas(state);
+            setConnectedAreas(state, lastAreaInstance);
             state.hero.area = state.areaInstance;
             if (editingState.isEditing) {
                 displayTileEditorPropertyPanel();

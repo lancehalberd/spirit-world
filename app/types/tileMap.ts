@@ -1,6 +1,6 @@
 import {
     DrawPriority,
-    Frame, LootTable,
+    Frame, LootTable, MagicElement,
     ObjectDefinition, ObjectInstance,
     ShortRectangle,
 } from 'app/types';
@@ -15,12 +15,16 @@ export interface TileBehaviors {
     lightRadius?: number,
     // Sets players action to 'climbing' while on the tile.
     climbable?: boolean,
+    // Indicates this is a cloud ground tile that the player can walk on if they have cloud walking boots equipped.
+    cloudGround?: boolean,
     // Can be destroyed by weapon
     cuttable?: number,
     // Deals damage on contact
     damage?: number,
     // Can be destroyed by an explosion.
     destructible?: boolean,
+    // Elemental association that can be passed to other objects.
+    element?: MagicElement,
     // This tile can be jumped over in this direction but is otherwise impassable.
     jumpDirection?: Direction,
     // If this is true then this tile will link to a tile with the given tile index in the alternate world.
@@ -31,6 +35,8 @@ export interface TileBehaviors {
     // If this is true projectiles can pass over this tile even if it is solid.
     // Also, the bow won't cut low tiles like thorns.
     low?: boolean,
+    // Tile to replace this with if it is exposed to an element (fire melts/burns things, ice freezes things, etc)
+    elementTiles?: {[key in MagicElement]?: number},
     // Indicates this tile is outside of the current area section.
     outOfBounds?: boolean,
     // Array of frames to use for particles when this tile/object is destroyed.
@@ -177,6 +183,7 @@ export interface AreaInstance {
     behaviorGrid: TileBehaviors[][],
     checkToRedrawTiles: boolean,
     tilesDrawn: boolean[][],
+    underwater?: boolean,
     layers: AreaLayer[],
     objects: ObjectInstance[],
     priorityObjects: ObjectInstance[][],
@@ -193,6 +200,9 @@ export interface AreaInstance {
     // This is used during transitions to indicate that the top left corner
     // of this area is offset from the camera origin by this many pixels.
     cameraOffset: {x: number, y: number},
+    allyTargets: ObjectInstance[],
+    enemyTargets: ObjectInstance[],
+    neutralTargets: ObjectInstance[],
 }
 
 

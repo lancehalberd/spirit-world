@@ -1,11 +1,9 @@
 import { removeObjectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { damageActor } from 'app/updateActor';
-import { directionMap } from 'app/utils/field';
-import { rectanglesOverlap } from 'app/utils/index';
+import { hitTargets } from 'app/utils/field';
 
 import {
-    AreaInstance, AstralProjection, Clone, DrawPriority,
+    AreaInstance, DrawPriority,
     Frame, GameState, ObjectInstance, ObjectStatus,
 } from 'app/types';
 
@@ -53,23 +51,6 @@ export class Flame implements ObjectInstance, Props {
         this.az = az;
         this.ttl = ttl;
     }
-    checkForHits(state: GameState) {
-        for (const object of this.area.objects) {
-            if (!(object instanceof Clone) && !(object instanceof AstralProjection)) {
-                continue;
-            }
-            if (rectanglesOverlap(object, this)) {
-                damageActor(state, object, this.damage);
-            }
-        }
-        if (state.hero.area === this.area && rectanglesOverlap(state.hero, this)) {
-            damageActor(state, state.hero, this.damage, {
-                vx: - 4 * directionMap[state.hero.d][0],
-                vy: - 4 * directionMap[state.hero.d][1],
-                vz: 2,
-            });
-        }
-    }
     update(state: GameState) {
         this.x += this.vx;
         this.y += this.vy;
@@ -80,7 +61,13 @@ export class Flame implements ObjectInstance, Props {
         if (this.animationTime >= this.ttl) {
             removeObjectFromArea(state, this);
         } else {
-            this.checkForHits(state);
+            hitTargets(state, this.area, {
+                canPush: false,
+                damage: this.damage,
+                hitbox: this,
+                element: 'fire',
+                hitAllies: true,
+            });
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {

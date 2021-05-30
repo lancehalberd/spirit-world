@@ -250,7 +250,7 @@ export function getZoneProperties(state: GameState, editingState: EditingState):
                 state.areaInstance = state.alternateAreaInstance;
                 state.alternateAreaInstance = tempInstance;
                 state.hero.area = state.areaInstance;
-                setConnectedAreas(state);
+                setConnectedAreas(state, tempInstance);
                 //enterLocation(state, state.location);
                 displayTileEditorPropertyPanel();
             }

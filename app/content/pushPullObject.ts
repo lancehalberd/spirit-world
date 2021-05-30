@@ -2,7 +2,7 @@ import { createAnimation, drawFrame } from 'app/utils/animations';
 import { directionMap, isPointOpen } from 'app/utils/field';
 
 import {
-    AreaInstance, Direction, Frame, GameState, Hero, ObjectInstance,
+    AreaInstance, Direction, Frame, GameState, Hero, HitProperties, HitResult, ObjectInstance,
     ObjectStatus, SimpleObjectDefinition, ShortRectangle,
 } from 'app/types';
 
@@ -14,6 +14,7 @@ export class PushPullObject implements ObjectInstance {
     behaviors = {
         solid: true,
     };
+    isNeutralTarget = true;
     drawPriority: 'sprites' = 'sprites';
     definition: SimpleObjectDefinition = null;
     x: number;
@@ -37,10 +38,14 @@ export class PushPullObject implements ObjectInstance {
     onGrab(state: GameState, direction: Direction): void {
         this.grabDirection = direction;
     }
-    onHit(state: GameState, direction: Direction): void {
+    onHit(state: GameState, {canPush, direction}: HitProperties): HitResult {
         if (!this.pushDirection) {
-            this.pushInDirection(state, direction);
+            if (canPush) {
+                this.pushInDirection(state, direction);
+            }
+            return {hit: true};
         }
+        return {blocked: true, hit: true};
     }
     onPush(state: GameState, direction: Direction): void {
         if (!this.pushDirection) {

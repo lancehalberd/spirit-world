@@ -1,12 +1,10 @@
 import { addObjectToArea, removeObjectFromArea } from 'app/content/areas';
 import { Spark } from 'app/content/effects/spark';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { damageActor } from 'app/updateActor';
-import { directionMap } from 'app/utils/field';
-import { rectanglesOverlap } from 'app/utils/index';
+import { hitTargets } from 'app/utils/field';
 
 import {
-    AreaInstance, AstralProjection, Clone, Direction,
+    AreaInstance, Direction,
     Frame, GameState, ObjectInstance, ObjectStatus,
 } from 'app/types';
 
@@ -57,23 +55,6 @@ export class LightningBolt implements ObjectInstance, Props {
         this.shockWaveTheta = shockWaveTheta;
         this.damage = damage;
     }
-    checkForHits(state: GameState) {
-        for (const object of this.area.objects) {
-            if (!(object instanceof Clone) && !(object instanceof AstralProjection)) {
-                continue;
-            }
-            if (rectanglesOverlap(object, this)) {
-                damageActor(state, object, this.damage);
-            }
-        }
-        if (state.hero.area === this.area && rectanglesOverlap(state.hero, this)) {
-            damageActor(state, state.hero, this.damage, {
-                vx: - 4 * directionMap[state.hero.d][0],
-                vy: - 4 * directionMap[state.hero.d][1],
-                vz: 2,
-            });
-        }
-    }
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;
         if (this.animationTime === this.delay + LIGHTNING_ANIMATION_DURATION) {
@@ -95,7 +76,13 @@ export class LightningBolt implements ObjectInstance, Props {
             }
         }
         if (this.animationTime >= this.delay + LIGHTNING_ANIMATION_DURATION) {
-            this.checkForHits(state);
+            hitTargets(state, this.area, {
+                damage: this.damage,
+                hitbox: this,
+                knockAwayFrom: {x: this.x + this.w / 2, y: this.y + this.h / 2},
+                element: 'lightning',
+                hitAllies: true,
+            });
         }
         if (this.animationTime >= this.delay + LIGHTNING_ANIMATION_DURATION + STRIKE_DURATION) {
             removeObjectFromArea(state, this);

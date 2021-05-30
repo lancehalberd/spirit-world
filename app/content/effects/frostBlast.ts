@@ -1,10 +1,10 @@
 import { removeObjectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { damageActor } from 'app/updateActor';
+import { hitTargets } from 'app/utils/field';
 
 import {
-    AreaInstance, AstralProjection, Clone, Frame, GameState,
-    ObjectInstance, ObjectStatus, ShortRectangle
+    AreaInstance, Frame, GameState,
+    ObjectInstance, ObjectStatus,
 } from 'app/types';
 
 
@@ -42,33 +42,24 @@ export class FrostBlast implements ObjectInstance, Props {
         this.x = x;
         this.y = y;
     }
-    checkForHits(state: GameState) {
-        const r = this.radius * Math.min(1, this.animationTime / EXPANSION_TIME);
-        const inRange = (rect: ShortRectangle): boolean => {
-            // Fudge a little by pretending the target is an oval.
-            const r2 = (r + rect.w / 2) * (r + rect.h / 2);
-            const dx = rect.x + rect.w / 2 - this.x;
-            const dy = rect.y + rect.h / 2 - this.y;
-            return dx * dx + dy * dy < r2;
-        }
-        for (const object of this.area.objects) {
-            if (!(object instanceof Clone) && !(object instanceof AstralProjection)) {
-                continue;
-            }
-            if (inRange(object)) {
-                damageActor(state, object, this.damage);
-            }
-        }
-        if (state.hero.area === this.area && inRange(state.hero)) {
-            damageActor(state, state.hero, this.damage);
-        }
-    }
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;
         if (this.animationTime >= EXPANSION_TIME + PERSIST_TIME) {
             removeObjectFromArea(state, this);
         } else {
-            this.checkForHits(state);
+            hitTargets(state, this.area, {
+                damage: this.damage,
+                element: 'ice',
+                hitCircle: {
+                    x: this.x,
+                    y: this.y,
+                    r: this.radius * Math.min(1, this.animationTime / EXPANSION_TIME),
+                },
+                hitAllies: true,
+                hitObjects: true,
+                hitTiles: true,
+                knockAwayFrom: {x: this.x, y: this.y},
+            });
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {

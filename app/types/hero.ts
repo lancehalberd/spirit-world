@@ -3,7 +3,7 @@ import { AstralProjection } from 'app/content/objects/astralProjection';
 import { Staff } from 'app/content/staff';
 
 import {
-    AreaInstance, Direction, FrameAnimation, FullTile, GameState,
+    Direction, FrameAnimation, FullTile, GameState,
     ObjectInstance, ObjectStatus, TileCoords, ZoneLocation,
 } from 'app/types';
 
@@ -58,11 +58,7 @@ export interface ActorAnimations {
     roll?: AnimationSet,
 }
 
-export interface Actor {
-    area: AreaInstance,
-    x: number,
-    y: number,
-    z: number,
+export interface Actor extends ObjectInstance {
     w: number,
     h: number,
     vx: number,
@@ -90,14 +86,13 @@ export interface Actor {
     grabObject?: ObjectInstance,
     invulnerableFrames?: number,
     life: number,
-    render: (context: CanvasRenderingContext2D, state: GameState) => void,
-    takeDamage?: (state: GameState, damage: number) => boolean,
     knockBack?: (state: GameState, vector: {vx: number, vy: number, vz: number}) => void,
     wading?: boolean,
     slipping?: boolean,
     swimming?: boolean,
     floating?: boolean,
     sinking?: boolean,
+    inAirBubbles?: boolean,
 }
 
 export interface Hero extends Actor {

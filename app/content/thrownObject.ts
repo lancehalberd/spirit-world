@@ -1,10 +1,7 @@
 import { addParticleAnimations } from 'app/content/animationEffect';
 import { removeObjectFromArea } from 'app/content/areas';
-import { Enemy } from 'app/content/enemy';
-import { damageActor } from 'app/updateActor';
 import { drawFrame } from 'app/utils/animations';
-import { getDirection } from 'app/utils/field';
-import { rectanglesOverlap } from 'app/utils/index';
+import { hitTargets } from 'app/utils/field';
 
 import { AreaInstance, Frame, GameState, ObjectInstance, ObjectStatus, TileBehaviors } from 'app/types';
 
@@ -61,27 +58,16 @@ export class ThrownObject implements ObjectInstance {
         this.y += this.vy;
         this.z += this.vz;
         this.vz -= 0.5;
-        const hitbox = this.getHitbox(state);
-        for (const object of this.area.objects) {
-            if (object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
-                continue;
-            }
-            if (object instanceof Enemy) {
-                if (rectanglesOverlap(object.getHitbox(state), hitbox)) {
-                    damageActor(state, object, this.damage);
-                    this.breakOnImpact(state);
-                }
-            }
-            if (object.getHitbox && object.onHit) {
-                const targetHitbox = object.getHitbox(state);
-                if (rectanglesOverlap(targetHitbox, hitbox)) {
-                    const direction = getDirection(targetHitbox.x - hitbox.x + 8 * this.vx, targetHitbox.y - hitbox.y + 8 * this.vy);
-                    object.onHit(state, direction);
-                    this.breakOnImpact(state);
-                }
-            }
-        }
-        if (this.z <= 0) {
+        const hitResult = hitTargets(state, this.area, {
+            canPush: true,
+            damage: this.damage,
+            hitbox: this.getHitbox(state),
+            vx: this.vx,
+            vy: this.vy,
+            hitEnemies: true,
+            hitObjects: true,
+        });
+        if (hitResult.hit || hitResult.blocked || this.z <= 0) {
             this.breakOnImpact(state);
         }
     }

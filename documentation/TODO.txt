@@ -1,7 +1,6 @@
 Test at http://localhost:81/alttp/public/
 
 Low Priority Bugs:
-    - Double explosion when defeating the war temple boss.
     - Clean up attack effects on defeating bosses.
         - Need to set a flag on all attack effects so they are easy to find and remove.
     - Foreground only renders for the active area, should render for the alternate area as well.
@@ -25,7 +24,17 @@ Graphics:
 
 Current tasks:
     - River Temple Rough Draft.
-    - Bubbles or something allow you to regenerate spirit energy quickly when standing on them
+        - Add torches tied to lightning switches in the upper floor
+        - Add upper floor paths
+        - Add Big Key Chest + Big Chest with water blessing
+        - Add ice barrier that can be destroyed with fire element, link paired barriers on doors together or place them with space to stand inside the door.
+        - Add placeholder ice boss heart
+            - On surface can only be hurt by fire element
+            - Underwater can be hurt by anything
+        - Underwater Large snake that circles you then pauses and charges at you
+            - revived after 10s if the heart is still alive.
+            - revived one last time when the heart is destroyed and becomes enraged
+        - On surface periodically breaks the ice under the player with a tell, knocking them back and damaging them, then attacks the player with a series of ice attacks
     - Decided what to work on next.
     - Email John outline of River Temple dungeon.
     - Increase range of frost beetles, figure out why frost grenade centers don't match blast center.

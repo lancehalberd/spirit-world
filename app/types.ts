@@ -7,7 +7,9 @@ export * from 'app/types/objects';
 
 export { AnimationEffect } from 'app/content/animationEffect';
 export { Clone } from 'app/content/clone';
-export { BossType, Enemy, EnemyType, MinionType } from 'app/content/enemy';
+export { BossType, MinionType } from 'app/content/bosses';
+export { EnemyDefinition, EnemyType } from 'app/content/enemies';
+export { Enemy } from 'app/content/enemy';
 export { ChestObject, LootObject } from 'app/content/lootObject';
 export { HeldChakram, ThrownChakram } from 'app/content/thrownChakram';
 export { ThrownObject } from 'app/content/thrownObject';

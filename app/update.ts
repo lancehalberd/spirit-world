@@ -41,7 +41,7 @@ export function update() {
     state.time += FRAME_LENGTH;
     updateKeyboardState(state);
     try {
-        if (state.scene === 'game' && wasGameKeyPressed(state, GAME_KEY.MENU)) {
+        if (state.scene === 'game' && !state.messageState?.pages && wasGameKeyPressed(state, GAME_KEY.MENU)) {
             state.paused = !state.paused;
             state.menuIndex = 0;
         }
@@ -50,9 +50,7 @@ export function update() {
                 updateTransition(state);
             }
         } else if (state.messageState?.pages) {
-            if (!state.paused) {
-                updateMessage(state);
-            }
+            updateMessage(state);
         } else if (state.scene === 'title' || state.scene === 'chooseGameMode' ||
             state.scene === 'deleteSavedGame' || state.scene === 'deleteSavedGameConfirmation'
         ) {

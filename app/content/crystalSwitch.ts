@@ -7,8 +7,8 @@ import { saveGame } from 'app/state';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 
 import {
-    AreaInstance, CrystalSwitchDefinition, Direction, DrawPriority, GameState,
-    MagicElement, ObjectInstance, ObjectStatus, ShortRectangle,
+    AreaInstance, CrystalSwitchDefinition, DrawPriority, GameState,
+    HitProperties, HitResult, ObjectInstance, ObjectStatus, ShortRectangle,
 } from 'app/types';
 
 const crystalGeometry = {w: 16, h: 20, content: {x: 0, y: 4, w: 16, h: 16, }};
@@ -25,6 +25,7 @@ export class CrystalSwitch implements ObjectInstance {
         brightness: 0.5,
         lightRadius: 16,
     };
+    isNeutralTarget = true;
     drawPriority: DrawPriority = 'sprites';
     definition: CrystalSwitchDefinition = null;
     linkedObject: CrystalSwitch;
@@ -44,10 +45,11 @@ export class CrystalSwitch implements ObjectInstance {
     getHitbox(state: GameState): ShortRectangle {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
-    onHit(state: GameState, direction: Direction, element: MagicElement): void {
-        if (!this.definition.element || this.definition.element === element) {
+    onHit(state: GameState, hit: HitProperties): HitResult {
+        if (!this.definition.element || this.definition.element === hit.element) {
             this.activate(state);
         }
+        return { pierced: true, hit: true };
     }
     activate(state: GameState): void {
         this.status = 'active';

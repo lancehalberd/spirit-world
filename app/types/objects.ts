@@ -1,5 +1,5 @@
 import {
-    AreaInstance, BossType,
+    Actor, AreaInstance, BossType,
     DecorationType, Direction, EnemyType,
     GameState, Hero, LootType,
     MagicElement, MinionType,
@@ -36,7 +36,7 @@ export interface ObjectInstance {
     // The direction is the direction the player is facing.
     onGrab?: (state: GameState, direction: Direction, hero: Hero) => void,
     // When the hero hits the object with a weapon or tool
-    onHit?: (state: GameState, direction: Direction, element?: MagicElement) => void,
+    onHit?: (state: GameState, hit: HitProperties) => HitResult,
     // When the hero grabs an object and attempts to move.
     onPull?: (state: GameState, direction: Direction, hero: Hero) => void,
     // When the hero walks into an object
@@ -48,6 +48,9 @@ export interface ObjectInstance {
     render: (context: CanvasRenderingContext2D, state: GameState) => void,
     renderShadow?: (context: CanvasRenderingContext2D, state: GameState) => void,
     renderForeground?: (context: CanvasRenderingContext2D, state: GameState) => void,
+    isEnemyTarget?: boolean,
+    isAllyTarget?: boolean,
+    isNeutralTarget?: boolean,
 }
 
 export type ObjectStatus = 'active' | 'closed' | 'closedEnemy' | 'closedSwitch'
@@ -65,6 +68,52 @@ export interface MovementProperties {
     canWiggle?: boolean,
     // Objects to ignore for hit detection.
     excludedObjects?: Set<any>
+}
+
+export interface HitProperties {
+    direction?: Direction,
+    damage?: number,
+    element?: MagicElement,
+    hitbox?: ShortRectangle,
+    hitCircle?: {x: number, y: number, r: number},
+    source?: Actor,
+    // Whether this hit can push puzzle elements like rolling balls, push/pull blocks, etc.
+    canPush?: boolean,
+    knockback?: {vx: number, vy: number, vz: number},
+    // If this is set, knockback will be added as a vector from this point towards the hit target.
+    knockAwayFrom?: {x: number, y: number},
+    // The velocity of the object the hit is from, will effect the calculated direction of certain hits.
+    // For example, if the hit is slightly to one side, but the velocity is vertical, the verical direction would be favored.
+    vx?: number,
+    vy?: number,
+    // Hits enemies/bosses.
+    hitEnemies?: boolean,
+    // Hits hero, clones, astral projection
+    hitAllies?: boolean,
+    // Hits torches, crystals, rolling balls, etc
+    hitObjects?: boolean,
+    // Hits background tiles like bushes, rocks, solid walls
+    hitTiles?: boolean,
+}
+
+export interface HitResult {
+    // Indicates the hit connected with something solid.
+    // This is generally true unless the hit is invalidated by some special condition like
+    // an enemies invulnerability frames.
+    hit?: boolean,
+    // Indicates the hit was blocked, preventing damage + knockback.
+    // For example, some enemies have shields that protect them from all or certain kinds of damage.
+    blocked?: boolean,
+    // If this is set the hero will be knocked back when they hit while holding the chakram in their hand.
+    knockback?: {vx: number, vy: number, vz: number},
+    // Indicates that a projectile should continue through this object even when it hit.
+    pierced?: boolean,
+    // Indicates that projectile should never pierce this object.
+    // For example, projectiles hitting puzzle objects stop after hitting the first such object.
+    stopped?: boolean,
+    // Indicates this element should be applied as a consequence of the hit.
+    // For example an arrow hitting a lit torch will gain the 'fire' element.
+    setElement?: MagicElement,
 }
 
 export interface BaseObjectDefinition {
@@ -129,7 +178,7 @@ export interface NPCDefinition extends BaseObjectDefinition {
     dialogue?: string,
 }
 
-export type SimpleObjectType = 'marker' | 'pushPull' | 'rollingBall' | 'tippable' | 'waterPot';
+export type SimpleObjectType = 'airBubbles' | 'marker' | 'pushPull' | 'rollingBall' | 'tippable' | 'torch' | 'waterPot';
 
 export interface SimpleObjectDefinition extends BaseObjectDefinition {
     type: SimpleObjectType,

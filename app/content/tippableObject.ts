@@ -5,7 +5,7 @@ import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { directionMap, isPointOpen } from 'app/utils/field';
 
 import {
-    AreaInstance, Direction, DrawPriority, Frame, FrameAnimation, GameState,
+    AreaInstance, Direction, DrawPriority, Frame, FrameAnimation, GameState, HitProperties, HitResult,
     BaseObjectDefinition, ObjectInstance, ObjectStatus, ShortRectangle,
 } from 'app/types';
 
@@ -50,10 +50,14 @@ export class TippableObject implements ObjectInstance {
     onGrab(state: GameState, direction: Direction): void {
         this.grabDirection = direction;
     }
-    onHit(state: GameState, direction: Direction): void {
+    onHit(state: GameState, hit: HitProperties): HitResult {
         if (!this.fallDirection) {
-            this.fallInDirection(state, direction);
+            if (hit.canPush) {
+                this.fallInDirection(state, hit.direction);
+            }
+            return { hit: true };
         }
+        return { hit: true, blocked: true };
     }
     onPull(state: GameState, direction: Direction): void {
         if (!this.fallDirection && !this.fallingInPlace && this.grabDirection === direction) {

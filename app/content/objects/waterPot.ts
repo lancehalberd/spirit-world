@@ -6,7 +6,7 @@ import { directionMap } from 'app/utils/field';
 import { saveGame } from 'app/state';
 
 import {
-    AreaInstance, Direction, DrawPriority, FrameAnimation, GameState,
+    AreaInstance, Direction, DrawPriority, FrameAnimation, GameState, HitProperties, HitResult,
     ObjectInstance, ObjectStatus, ShortRectangle, SimpleObjectDefinition,
 } from 'app/types';
 
@@ -28,6 +28,7 @@ export class WaterPot implements ObjectInstance {
     fallFrame = 0;
     fallDirection: Direction;
     grabDirection: Direction;
+    isNeutralTarget = true;
     linkedObject: WaterPot;
     pushCounter: number = 0;
     pushedLastFrame: boolean = false;
@@ -76,10 +77,13 @@ export class WaterPot implements ObjectInstance {
     onGrab(state: GameState, direction: Direction): void {
         this.grabDirection = direction;
     }
-    onHit(state: GameState, direction: Direction): void {
-        if (!this.fallDirection && direction === 'left' || direction === 'right') {
-            this.pourInDirection(state, direction);
+    onHit(state: GameState, hit: HitProperties): HitResult {
+        if (!this.fallDirection && hit.direction === 'left' || hit.direction === 'right') {
+            if (hit.canPush) {
+                this.pourInDirection(state, hit.direction);
+            }
         }
+        return { hit: true };
     }
     onPull(state: GameState, direction: Direction): void {
         if (!this.fallDirection && this.grabDirection === direction) {
