@@ -1,9 +1,10 @@
-import { destroyTile } from 'app/content/areas';
-import { getTilesInRectangle } from 'app/getActorTargets';
+import { destroyTile, resetTileBehavior } from 'app/content/areas';
+import { allTiles } from 'app/content/tiles';
+import { getTilesInCircle, getTilesInRectangle } from 'app/getActorTargets';
 import { isPixelInShortRect, rectanglesOverlap, roundRect } from 'app/utils/index';
 
 import {
-    AreaInstance, Direction, GameState, Hero,
+    AreaInstance, AreaLayer, Direction, GameState, Hero,
     HitProperties, HitResult, MovementProperties,
     ObjectInstance, Tile, TileBehaviors,
 } from 'app/types';
@@ -218,7 +219,7 @@ export function getTileBehaviorsAndObstacles(
 }
 
 export function hitTargets(this: void, state: GameState, area: AreaInstance, hit: HitProperties): HitResult {
-    const combinedResult: HitResult = { pierced: true };
+    const combinedResult: HitResult = { pierced: true, hitTargets: new Set() };
     let targets: ObjectInstance[] = [];
     if (hit.hitEnemies) {
         targets = [...targets, ...area.enemyTargets];
@@ -236,22 +237,36 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
         if (object.status === 'hidden' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch' || object.status === 'gone') {
             continue;
         }
+        if (hit.ignoreTargets?.has(object)) {
+            continue;
+        }
         const hitbox = object.getHitbox(state);
         if (hit.hitCircle) {
             const r = hit.hitCircle.r;
-            // Fudge a little by pretending the target is an oval.
-            const r2 = (r + hitbox.w / 2) * (r + hitbox.h / 2);
+            // Fudge a little by pretending the target is a circle.
+            const fakeRadius = hitbox.w / 4 + hitbox.h / 4;
+            const r2 = (r + fakeRadius) ** 2;
             const dx = hitbox.x + hitbox.w / 2 - hit.hitCircle.x;
             const dy = hitbox.y + hitbox.h / 2 - hit.hitCircle.y;
             if (dx * dx + dy * dy < r2) {
                 if (object.onHit) {
-                    const result = object.onHit(state, { ...hit, direction: getDirection(dx, dy) });
+                    let knockback = hit.knockback;
+                    if (!hit.knockback && hit.knockAwayFrom) {
+                        const dx = (hitbox.x + hitbox.w / 2) - hit.knockAwayFrom.x;
+                        const dy = (hitbox.y + hitbox.h / 2) - hit.knockAwayFrom.y;
+                        const mag = Math.sqrt(dx * dx + dy * dy);
+                        knockback = mag ? {vx: 4 * dx / mag, vy: 4 * dy / mag, vz: 0} : null;
+                    }
+                    const result = object.onHit(state, { ...hit, direction: getDirection(dx, dy), knockback });
                     combinedResult.hit ||= result.hit;
                     combinedResult.blocked ||= result.blocked;
                     combinedResult.pierced &&= ((!result.hit && !result.blocked) || result.pierced);
                     combinedResult.stopped ||= result.stopped;
                     combinedResult.setElement ||= result.setElement;
                     combinedResult.knockback ||= result.knockback;
+                    if (result.hit || result.blocked) {
+                        combinedResult.hitTargets.add(object);
+                    }
                 } else if (object.behaviors?.solid) {
                     combinedResult.hit = true;
                     if (!object.behaviors.low) {
@@ -279,6 +294,9 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
                 combinedResult.stopped ||= result.stopped;
                 combinedResult.setElement ||= result.setElement;
                 combinedResult.knockback ||= result.knockback;
+                    if (result.hit || result.blocked) {
+                        combinedResult.hitTargets.add(object);
+                    }
             } else if (object.behaviors?.solid) {
                 combinedResult.hit = true;
                 if (!object.behaviors.low) {
@@ -287,24 +305,70 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
             }
         }
     }
+    let hitTiles = [];
     if (hit.hitTiles && hit.hitbox) {
-        for (const target of getTilesInRectangle(area, hit.hitbox)) {
-            const behavior = area.behaviorGrid?.[target.y]?.[target.x];
-            if (behavior?.cuttable <= hit.damage && !behavior?.low) {
-                // We need to find the specific cuttable layers that can be destroyed.
-                for (const layer of area.layers) {
-                    const tile = layer.tiles[target.y][target.x];
-                    if (tile?.behaviors?.cuttable <= hit.damage) {
-                        destroyTile(state, area, {...target, layerKey: layer.key});
-                    }
+        hitTiles = getTilesInRectangle(area, hit.hitbox);
+    }
+    if (hit.hitTiles && hit.hitCircle) {
+        hitTiles = [...hitTiles, ...getTilesInCircle(area, hit.hitCircle)];
+    }
+    for (const target of hitTiles) {
+        const behavior = area.behaviorGrid?.[target.y]?.[target.x];
+        // Ice hits that effect tiles cover them in ice as long as they aren't pits or walls.
+        if (hit.element === 'ice' && typeof behavior?.elementTiles?.fire === 'undefined' && !behavior?.solid && !behavior?.pit) {
+            let topLayer: AreaLayer = area.layers[0];
+            for (const layer of area.layers) {
+                if (layer.definition.drawPriority !== 'foreground') {
+                    topLayer = layer;
+                } else {
+                    break;
                 }
-                combinedResult.hit = true;
-            } else if ((behavior?.cuttable > hit.damage || behavior?.solid) && !behavior?.low) {
-                combinedResult.hit = true;
-                combinedResult.pierced = false;
-                if (behavior?.cuttable > hit.damage) {
-                    combinedResult.blocked = true;
+            }
+            // Fabricate a frozen tile that has the original tile "underneath it", so it will
+            // return to the original state if exposed to fire.
+            topLayer.tiles[target.y][target.x] = {
+                ...allTiles[294],
+                behaviors: {
+                    ...allTiles[294].behaviors,
+                    elementTiles: {
+                        fire: topLayer.tiles[target.y][target.x]?.index || 0,
+                    },
+                },
+            };
+            if (area.tilesDrawn[target.y]?.[target.x]) {
+                area.tilesDrawn[target.y][target.x] = false;
+            }
+            area.checkToRedrawTiles = true;
+            resetTileBehavior(area, target);
+            //console.log('froze tile', area.behaviorGrid?.[target.y]?.[target.x]);
+        } else if (hit.element === 'fire' && typeof behavior?.elementTiles?.fire !== 'undefined') {
+            for (const layer of area.layers) {
+                const tile = layer.tiles?.[target.y]?.[target.x];
+                const fireTile = tile?.behaviors?.elementTiles?.fire;
+                if (typeof fireTile !== 'undefined') {
+                    layer.tiles[target.y][target.x] = layer.originalTiles[target.y][target.x] = allTiles[fireTile];
                 }
+            }
+            if (area.tilesDrawn[target.y]?.[target.x]) {
+                area.tilesDrawn[target.y][target.x] = false;
+            }
+            area.checkToRedrawTiles = true;
+            resetTileBehavior(area, target);
+        }
+        if (behavior?.cuttable <= hit.damage && !behavior?.low) {
+            // We need to find the specific cuttable layers that can be destroyed.
+            for (const layer of area.layers) {
+                const tile = layer.tiles[target.y][target.x];
+                if (tile?.behaviors?.cuttable <= hit.damage) {
+                    destroyTile(state, area, {...target, layerKey: layer.key});
+                }
+            }
+            combinedResult.hit = true;
+        } else if ((behavior?.cuttable > hit.damage || behavior?.solid) && !behavior?.low) {
+            combinedResult.hit = true;
+            combinedResult.pierced = false;
+            if (behavior?.cuttable > hit.damage) {
+                combinedResult.blocked = true;
             }
         }
     }

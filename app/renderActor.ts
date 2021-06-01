@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { EXPLOSION_RADIUS, EXPLOSION_TIME } from 'app/gameConstants';
 import { getCloneMovementDeltas } from 'app/keyCommands';
 import { isHeroFloating, isHeroSinking } from 'app/utils/actor';
-import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
+import { createAnimation, drawFrame, drawFrameAt, getFrame } from 'app/utils/animations';
 import { carryMap, directionMap, getDirection } from 'app/utils/field';
 
 import { Actor, ActorAnimations, Enemy, Frame, GameState, Hero } from 'app/types';
@@ -117,14 +117,27 @@ export function renderHero(this: Hero, context: CanvasRenderingContext2D, state:
     const activeClone = state.hero.activeClone || state.hero;
     context.save();
         if (hero !== activeClone) {
-            context.globalAlpha = 0.8;
+            context.globalAlpha *= 0.8;
         } else if (hero.invulnerableFrames) {
-            context.globalAlpha = 0.7 + 0.3 * Math.cos(2 * Math.PI * hero.invulnerableFrames * 3 / 50);
+            context.globalAlpha *= (0.7 + 0.3 * Math.cos(2 * Math.PI * hero.invulnerableFrames * 3 / 50));
         }
-        drawFrame(context, frame, { x: hero.x - frame.content.x, y: hero.y - frame.content.y - hero.z, w: frame.w, h: frame.h });
+        drawFrameAt(context, frame, { x: hero.x, y: hero.y - hero.z });
     context.restore();
     if (hero.pickUpTile) {
         renderCarriedTile(context, state, hero);
+    }
+    if (hero.frozenDuration > 0) {
+        context.save();
+            context.fillStyle = 'white';
+            const p = Math.round(Math.min(3, hero.frozenDuration / 200));
+            context.globalAlpha *= (0.3 + 0.2 * p);
+            context.fillRect(
+                Math.round(hero.x - frame.content.x - p),
+                Math.round(hero.y - hero.z - frame.content.y - p),
+                Math.round(frame.w + 2 * p),
+                Math.round(frame.h + 2 * p)
+            );
+        context.restore();
     }
     renderExplosionRing(context, state, hero);
 }
@@ -182,7 +195,7 @@ export function renderExplosionRing(context: CanvasRenderingContext2D, state: Ga
     context.strokeStyle = 'red';
     context.stroke();
     context.save();
-        context.globalAlpha = hero.explosionTime / EXPLOSION_TIME;
+        context.globalAlpha *= (hero.explosionTime / EXPLOSION_TIME);
         context.beginPath();
         context.arc(hero.x + hero.w / 2, hero.y + hero.h / 2, r, 0, 2 * Math.PI);
         context.fillStyle = 'red';

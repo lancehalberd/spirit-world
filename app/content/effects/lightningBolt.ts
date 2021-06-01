@@ -91,7 +91,7 @@ export class LightningBolt implements ObjectInstance, Props {
     render(context: CanvasRenderingContext2D, state: GameState) {
         // Animate a transparent orb growing in the air
         context.save();
-            context.globalAlpha = 0.5 + Math.min(0.5, 0.5 * this.animationTime / this.delay);
+            context.globalAlpha *= (0.5 + Math.min(0.5, 0.5 * this.animationTime / this.delay));
             context.fillStyle = 'yellow';
             const r = 10 * Math.min(1, this.animationTime / this.delay);
             context.beginPath();
@@ -115,7 +115,7 @@ export class LightningBolt implements ObjectInstance, Props {
     }
     renderShadow(context: CanvasRenderingContext2D, state: GameState) {
         context.save();
-            context.globalAlpha = 0.5;
+            context.globalAlpha *= 0.5;
             context.fillStyle = 'yellow';
             context.beginPath();
             context.arc(this.x + this.w / 2, this.y + this.h / 2, this.w / 2, 0, 2 * Math.PI);

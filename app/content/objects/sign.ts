@@ -34,6 +34,7 @@ export class Sign implements ObjectInstance {
     x: number;
     y: number;
     status: ObjectStatus = 'normal';
+    isNeutralTarget = true;
     constructor(definition: SignDefinition) {
         this.definition = definition;
         this.x = definition.x;

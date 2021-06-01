@@ -450,7 +450,7 @@ export function renderAreaObjectsBeforeHero(context: CanvasRenderingContext2D, s
                 object.renderShadow(context, state);
             } else if (object instanceof Clone) {
                 renderHeroShadow(context, state, object);
-            } else if (object instanceof Enemy && object.hasShadow && object.status !== 'gone') {
+            } else if (object instanceof Enemy && object.hasShadow && object.status !== 'gone' && object.status !== 'hidden') {
                 renderEnemyShadow(context, state, object);
             }
         }

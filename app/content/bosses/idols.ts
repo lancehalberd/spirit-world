@@ -15,16 +15,19 @@ enemyDefinitions.stormIdol = {
     alwaysReset: true,
     animations: beetleWingedAnimations, scale: 2,
     life: 9, touchDamage: 1, update: updateStormIdol, render: renderIdolShield,
+    immunities: ['lightning'],
 };
 enemyDefinitions.flameIdol = {
     alwaysReset: true,
     animations: snakeAnimations, scale: 2,
     life: 9, touchDamage: 1, update: updateFlameIdol, render: renderIdolShield,
+    immunities: ['fire'],
 };
 enemyDefinitions.frostIdol = {
     alwaysReset: true,
     animations: beetleAnimations, scale: 2,
     life: 9, touchDamage: 1, update: updateFrostIdol, render: renderIdolShield,
+    immunities: ['ice'],
 };
 
 function updateStormIdol(state: GameState, enemy: Enemy): void {
@@ -134,7 +137,7 @@ function renderIdolShield(context: CanvasRenderingContext2D, state: GameState, e
     if (enemy.shielded) {
         const hitbox = enemy.getHitbox(state);
         context.save();
-            context.globalAlpha = 0.5;
+            context.globalAlpha *= 0.5;
             context.fillStyle = enemy.params.shieldColor ?? '#888';
             context.fillRect(hitbox.x, hitbox.y, hitbox.w, hitbox.h);
         context.restore();

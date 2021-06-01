@@ -66,7 +66,7 @@ export class FrostGrenade implements ObjectInstance, Props {
         // Animate a transparent orb growing in the air
         context.fillStyle = 'white';
         context.save();
-            context.globalAlpha = 0.3;
+            context.globalAlpha *= 0.3;
             context.beginPath();
             const r = 3 * this.w / 4 + Math.cos(this.animationTime / 500) * this.w / 4;
             context.arc(this.x, this.y - this.z, r, 0, 2 * Math.PI);

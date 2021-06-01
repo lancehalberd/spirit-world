@@ -442,6 +442,9 @@ const [
 
 const lootFrames: Partial<{[key in LootType]: Frame}> = {
     smallKey: keyOutlineFrame,
+    fire: createLootFrame('red', 'FIR'),
+    ice: createLootFrame('08F', 'ICE'),
+    lightning: createLootFrame('#A80', 'LIT'),
     // Summoner's Circlet.
     astralProjection: createLootFrame('blue', 'SC'),
     bigKey: bigKeyOutlineFrame,

@@ -25,7 +25,7 @@ import { updateCamera } from 'app/updateCamera';
 import { updateField } from 'app/updateField';
 import { areAllImagesLoaded } from 'app/utils/images';
 
-import { ActiveTool, DialogueLootDefinition, Equipment, GameState } from 'app/types';
+import { ActiveTool, DialogueLootDefinition, Equipment, GameState, MagicElement } from 'app/types';
 
 let isGameInitialized = false;
 export function update() {
@@ -204,8 +204,10 @@ function updateMenu(state: GameState) {
     if (state.hero.activeTools.clone) {
         selectableTools.push('clone');
     }
-    if (wasGameKeyPressed(state, GAME_KEY.UP) || wasGameKeyPressed(state, GAME_KEY.DOWN)) {
-        state.menuRow = (state.menuRow + 1) % 2;
+    if (wasGameKeyPressed(state, GAME_KEY.UP)) {
+        state.menuRow = (state.menuRow + 2) % 3;
+    } else if (wasGameKeyPressed(state, GAME_KEY.DOWN)) {
+        state.menuRow = (state.menuRow + 1) % 3;
     }
     if(!selectableTools.length && state.menuRow === 0) {
         state.menuRow = 1;
@@ -228,7 +230,7 @@ function updateMenu(state: GameState) {
             }
             state.hero.rightTool = selectedTool;
         }
-    } else {
+    } else if (state.menuRow === 1) {
         // The second row is for equipping boots.
         const selectableEquipment: Equipment[] = [null];
         if (state.hero.equipment.ironBoots) {
@@ -251,6 +253,32 @@ function updateMenu(state: GameState) {
             } else {
                 state.hero.equipedGear = {};
                 state.hero.equipedGear[selectedEquipment] = true;
+            }
+        }
+    }  else if (state.menuRow === 2) {
+        // The second row is for equipping boots.
+        const selectableElements: MagicElement[] = [null];
+        if (state.hero.elements.fire) {
+            selectableElements.push('fire');
+        }
+        if (state.hero.elements.ice) {
+            selectableElements.push('ice');
+        }
+        if (state.hero.elements.lightning) {
+            selectableElements.push('lightning');
+        }
+        if (wasGameKeyPressed(state, GAME_KEY.LEFT)) {
+            state.menuIndex = (state.menuIndex + selectableElements.length - 1) % selectableElements.length;
+        } else if (wasGameKeyPressed(state, GAME_KEY.RIGHT)) {
+            state.menuIndex = (state.menuIndex + 1) % selectableElements.length;
+        } else if (wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL)
+            || wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL)
+            || wasGameKeyPressed(state, GAME_KEY.WEAPON)
+        ) {
+            if (state.hero.element === selectableElements[state.menuIndex]) {
+                state.hero.element = null;
+            } else {
+                state.hero.element = selectableElements[state.menuIndex];
             }
         }
     }
@@ -281,12 +309,15 @@ function updateDefeated(state: GameState) {
             state.hero.life = state.hero.maxLife;
             state.defeatState.defeated = false;
             saveGame();
+            state.paused = false;
         } else if (state.menuIndex === 1) {
             returnToSpawnLocation(state);
+            state.paused = false;
         } else if (state.menuIndex === 2) {
             state.scene = 'title';
             state.menuIndex = state.savedGameIndex;
             setSaveFileToState(state.menuIndex);
+            state.paused = false;
         }
     }
 }

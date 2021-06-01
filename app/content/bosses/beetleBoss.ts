@@ -1,7 +1,7 @@
 import { addObjectToArea, getAreaSize } from 'app/content/areas';
 import {
     accelerateInDirection,
-    getVectorToNearbyHero,
+    getVectorToNearbyTarget,
     moveEnemyToTargetLocation,
 } from 'app/content/enemies';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
@@ -40,7 +40,7 @@ function updateBeetleBoss(state: GameState, enemy: Enemy): void {
             if (Math.random() < 0.3) {
                 enemy.setMode('circle');
             } else if (Math.random() < 0.5) {
-                const vector = getVectorToNearbyHero(state, enemy, 32 * 32);
+                const vector = getVectorToNearbyTarget(state, enemy, 32 * 32, enemy.area.allyTargets);
                 if (vector) {
                     enemy.setMode('rush');
                     enemy.vx = vector.x;
@@ -54,7 +54,7 @@ function updateBeetleBoss(state: GameState, enemy: Enemy): void {
             if (Math.random() < 0.25) {
                 enemy.setMode('circle');
             } else if (Math.random() < 0.25) {
-                const vector = getVectorToNearbyHero(state, enemy, 32 * 32);
+                const vector = getVectorToNearbyTarget(state, enemy, 32 * 32, enemy.area.allyTargets);
                 if (vector) {
                     enemy.setMode('rush');
                     enemy.vx = vector.x;
@@ -91,9 +91,9 @@ function updateBeetleBoss(state: GameState, enemy: Enemy): void {
                 x: section.x + section.w / 2 + (section.w / 2 + 32) * Math.cos(theta),
                 y: section.y + section.h / 2 + (section.h / 2 + 32) * Math.sin(theta),
             });
-            // Have to set area before calling getVectorToNearbyHero.
+            // Have to set area before calling getVectorToNearbyTarget.
             minion.area = enemy.area;
-            const vector = getVectorToNearbyHero(state, minion, 1000);
+            const vector = getVectorToNearbyTarget(state, minion, 1000, enemy.area.allyTargets);
             if (vector) {
                 minion.vx = minion.speed * vector.x;
                 minion.vy = minion.speed * vector.y;
@@ -119,7 +119,7 @@ function updateBeetleBoss(state: GameState, enemy: Enemy): void {
             if (enemy.life > 8 || Math.random() < 0.5) {
                 enemy.setMode('return');
             } else {
-                const vector = getVectorToNearbyHero(state, enemy, 32 * 32);
+                const vector = getVectorToNearbyTarget(state, enemy, 32 * 32, enemy.area.allyTargets);
                 if (vector) {
                     enemy.setMode('rush');
                     enemy.vx = vector.x;

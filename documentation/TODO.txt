@@ -23,22 +23,23 @@ Graphics:
 
 
 Current tasks:
+    - Add ability to charge tools
+        - Bow
+            - Double damage
+            - Add equipped element
+
     - River Temple Rough Draft.
-        - Add torches tied to lightning switches in the upper floor
         - Add upper floor paths
         - Add Big Key Chest + Big Chest with water blessing
         - Add ice barrier that can be destroyed with fire element, link paired barriers on doors together or place them with space to stand inside the door.
         - Add placeholder ice boss heart
-            - On surface can only be hurt by fire element
             - Underwater can be hurt by anything
         - Underwater Large snake that circles you then pauses and charges at you
             - revived after 10s if the heart is still alive.
             - revived one last time when the heart is destroyed and becomes enraged
         - On surface periodically breaks the ice under the player with a tell, knocking them back and damaging them, then attacks the player with a series of ice attacks
     - Decided what to work on next.
-    - Email John outline of River Temple dungeon.
     - Increase range of frost beetles, figure out why frost grenade centers don't match blast center.
-        - Add ice ground effect to frost blasts.
     - Do a run through to check for bugs + push latest version.
 
 River Temple:
@@ -63,9 +64,6 @@ Cloud Boots:
     - Maybe make falling in the sky behave like falling in a pit where you reset to safe location rather than falling to the overworld?
 
 High level list of things left to do:
-    Missing non-dungeon areas:
-        City
-        Underwater
     New dungeons(need enemies, mechanics, bosses, entrances):
         Grand Temple
         Jade Palace
@@ -74,12 +72,13 @@ High level list of things left to do:
         Forest Temple
         Crater
         Forge
-        River Temple
         Warship
     Areas missing significant content:
         Cocoon
         Waterfall Temple
+        River Temple
     Missing Bosses for existing areas:
+        River Temple Boss
         Rival fight before Tomb
         Tomb Boss
         Rival fight before Helix
@@ -87,7 +86,6 @@ High level list of things left to do:
         Waterfall Temple Boss
     Missing mechanics:
         Difficulty shrines
-        Underwater areas
     Items missing implementation:
         Charge level 2
         Setting up Staff Tower
@@ -97,7 +95,6 @@ High level list of things left to do:
         Invis charge 1 + 2
         Clone charge 1 + 2
         fire, ice, lightning elements
-        iron boots
         cloud boots
         True Sight
         Iron Skin (slowly regenerates health shield = 20% total health)

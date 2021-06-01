@@ -35,7 +35,7 @@ export class FlameWall implements ObjectInstance, Props {
     direction: Direction;
     status: ObjectStatus = 'normal';
     speed = 0;
-    constructor({damage = 2, delay = 800, direction = 'down', length = 6}: Props) {
+    constructor({damage = 1, delay = 800, direction = 'down', length = 6}: Props) {
         this.delay = delay;
         this.damage = damage;
         this.direction = direction;
@@ -87,6 +87,8 @@ export class FlameWall implements ObjectInstance, Props {
                     hitbox: this,
                     element: 'fire',
                     hitAllies: true,
+                    hitTiles: true,
+                    knockback: {vx: 4 * directionMap[this.direction][0], vy: 4 * directionMap[this.direction][1], vz: 2},
                 });
             }
         }

@@ -31,6 +31,8 @@ export interface ObjectInstance {
     cleanup?: (state: GameState) => void,
     // This is called when a user grabs a solid tile
     getHitbox?: (state: GameState) => ShortRectangle,
+    onActivate?: (state: GameState) => void,
+    onDeactivate?: (state: GameState) => void,
     onDestroy?: (state: GameState, dx: number, dy: number) => void,
     // When the hero tries to pick up the object with the passive skill button.
     // The direction is the direction the player is facing.
@@ -94,6 +96,8 @@ export interface HitProperties {
     hitObjects?: boolean,
     // Hits background tiles like bushes, rocks, solid walls
     hitTiles?: boolean,
+    // Targets to ignore.
+    ignoreTargets?: Set<ObjectInstance>,
 }
 
 export interface HitResult {
@@ -114,6 +118,8 @@ export interface HitResult {
     // Indicates this element should be applied as a consequence of the hit.
     // For example an arrow hitting a lit torch will gain the 'fire' element.
     setElement?: MagicElement,
+    // Returns the set of targets hit.
+    hitTargets?: Set<ObjectInstance>,
 }
 
 export interface BaseObjectDefinition {

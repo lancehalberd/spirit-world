@@ -66,14 +66,25 @@ export function renderSpiritBar(context: CanvasRenderingContext2D, state: GameSt
             drawFrame(context, spiritLine, {...spiritLine, x, y: y + topCap.h + barHeight - fillHeight});
         }
     }
-    /*let manaColor = '#AAA';
-    if (state.hero.element === 'fire') {
-        manaColor = '#F00';
-    } else if (state.hero.element === 'ice') {
-        manaColor = '#AAF';
-    } else if (state.hero.element === 'lightning') {
-        manaColor = '#FF8';
-    }*/
+    if (state.hero.passiveTools.charge) {
+        let elementColor = '#AAA';
+        if (state.hero.element === 'fire') {
+            elementColor = '#F00';
+        } else if (state.hero.element === 'ice') {
+            elementColor = '#AAF';
+        } else if (state.hero.element === 'lightning') {
+            elementColor = '#FF8';
+        }
+        context.save();
+            context.globalAlpha = 0.6;
+            context.fillStyle = (state.hero.action === 'charging' && state.time % 200 < 100) ? 'white' : elementColor;
+            context.beginPath();
+            context.arc(x + 8, y + topCap.h + barHeight + 6, 10,0, 2 * Math.PI);
+            context.fill();
+        context.restore();
+
+    }
+
 }
 
 export function updateHeroMagicStats(state: GameState) {

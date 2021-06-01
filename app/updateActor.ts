@@ -94,10 +94,17 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
     if (hero.z < minZ) {
         hero.z = Math.max(hero.z + 1, minZ);
     }
+    const isFrozen = hero.frozenDuration > 0;
+    // Unless wearing the iron boots, the hero is always slipping while frozen.
+    if (isFrozen && !hero.equipedGear?.ironBoots) {
+        hero.slipping = true;
+    }
     const canCharge = !isAstralProjection && isControlled && hero.z <= minZ
-        && !hero.swimming && !hero.pickUpTile && !hero.pickUpObject;
+        && !hero.swimming && !hero.pickUpTile && !hero.pickUpObject && !isFrozen;
     const canAttack = canCharge && hero.weapon > 0
          && (!hero.action || hero.action === 'walking' || hero.action === 'pushing');
+    // This might be a better approach than setting movementSpeed = 0, we could just set this flag to false.
+    //const canMove = isControlled && hero.z <= minZ && !isFrozen
 
     // The astral projection uses the weapon tool as the passive tool button
     // since you have to hold the normal passive tool button down to meditate.
@@ -110,6 +117,10 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
     if (hero.slipping) {
         hero.vx *= 0.99;
         hero.vy *= 0.99;
+    }
+    if (isFrozen) {
+        movementSpeed = 0;
+        hero.frozenDuration -= FRAME_LENGTH;
     }
 
     const heldChakram = hero.area.objects.find(o => o instanceof HeldChakram) as HeldChakram;
@@ -301,7 +312,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
     } else if (!isAstralProjection && hero.swimming) {
         movementSpeed *= 0.75;
         hero.action = null;
-    } else if (hero.action === 'grabbing') {
+    } else if (!isFrozen && hero.action === 'grabbing') {
         movementSpeed = 0;
         hero.vx = 0;
         hero.vy = 0;
@@ -348,13 +359,13 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         }
     } else if (hero.pickUpTile || hero.pickUpObject) {
         movementSpeed *= 0.75;
-    } else if (hero.action === 'throwing' ) {
+    } else if (!isFrozen && hero.action === 'throwing' ) {
         movementSpeed = 0;
         hero.actionFrame++;
         if (hero.actionFrame === 2) {
             hero.action = null;
         }
-    } else if (!isAstralProjection && hero.action === 'meditating') {
+    } else if (!isAstralProjection && !isFrozen && hero.action === 'meditating') {
         movementSpeed = 0;
         if (isControlled && isGameKeyDown(state, GAME_KEY.PASSIVE_TOOL) && hero.magic > 0) {
             if (state.hero.clones.length) {
@@ -413,7 +424,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         hero.action = 'knocked';
         dx = 0;
         dy = 0;
-    } else if (!isAstralProjection && hero.action === 'attack') {
+    } else if (!isAstralProjection && !isFrozen && hero.action === 'attack') {
         movementSpeed *= 0.5;
         hero.actionFrame++;
         if (hero.actionFrame === 6) {
@@ -433,7 +444,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             hero.animationTime = 0;
         }
     }
-    if (heldChakram || hero.action === 'charging') {
+    if (!isFrozen && (heldChakram || hero.action === 'charging')) {
         movementSpeed *= 0.75;
         if (!heldChakram) {
             hero.action = null;
@@ -452,7 +463,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
     if (hero.grabTile && hero.action !== 'grabbing') {
         hero.grabTile = null;
     }
-    if (hero.action === 'pushing') {
+    if (!isFrozen && hero.action === 'pushing') {
         hero.animationTime -= 3 * FRAME_LENGTH / 4;
     }
     if (isControlled && movementSpeed) {
@@ -535,7 +546,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             hero.actionDx = 0;
             hero.actionDy = 0;
             hero.animationTime = 0;
-        } else {
+        } else if (!isFrozen) {
             hero.animationTime += FRAME_LENGTH;
         }
     } else {
@@ -547,7 +558,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             hero.actionDx = 0;
             hero.actionDy = 0;
             hero.animationTime = 0;
-        } else {
+        } else if (!isFrozen) {
             hero.animationTime += FRAME_LENGTH;
         }
     }
@@ -880,7 +891,7 @@ export function checkForEnemyDamage(state: GameState, hero: Hero) {
         debugger;
     }
     for (const enemy of hero.area.objects) {
-        if (!(enemy instanceof Enemy) || enemy.invulnerableFrames > 0) {
+        if (!(enemy instanceof Enemy) || enemy.invulnerableFrames > 0 || enemy.status === 'hidden') {
             continue;
         }
         if (enemy.enemyDefinition.touchDamage && rectanglesOverlap(hero, enemy.getHitbox(state))) {
@@ -946,8 +957,15 @@ export function onHitHero(this: Hero, state: GameState, hit: HitProperties): Hit
             this.animationTime = 0;
             this.vx = hit.knockback.vx;
             this.vy = hit.knockback.vy;
-            this.vz = hit.knockback.vz || 0;
+            this.vz = hit.knockback.vz || 2;
         }
+    }
+    // Getting hit while frozen unfreezes you.
+    if (this.frozenDuration > 0) {
+        this.frozenDuration = 0;
+    } else if (hit.element === 'ice') {
+        // Getting hit by ice freezes you.
+        this.frozenDuration = 1500;
     }
     return { hit: true };
 }

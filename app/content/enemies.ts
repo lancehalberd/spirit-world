@@ -22,7 +22,7 @@ import { directionMap } from 'app/utils/field';
 import {
     ActorAnimations, Clone, Direction,
     Enemy, FrameAnimation, FrameDimensions, GameState,
-    Hero, HitProperties, HitResult, LootTable, MovementProperties,
+    Hero, HitProperties, HitResult, LootTable, MagicElement, MovementProperties, ObjectInstance,
 } from 'app/types';
 
 
@@ -48,6 +48,7 @@ export interface EnemyDefinition {
     hasShadow?: boolean,
     life?: number,
     lootTable?: LootTable,
+    immunities?: MagicElement[],
     params?: any,
     speed?: number,
     acceleration?: number,
@@ -55,7 +56,7 @@ export interface EnemyDefinition {
     touchDamage: number,
     update?: (state: GameState, enemy: Enemy) => void,
     onDeath?: (state: GameState, enemy: Enemy) => void,
-    onHit?: (state: GameState, hit: HitProperties) => HitResult,
+    onHit?: (state: GameState, enemy: Enemy, hit: HitProperties) => HitResult,
     render?: (context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) => void,
 }
 
@@ -97,16 +98,19 @@ enemyDefinitions.flameSnake = {
     alwaysReset: true,
     animations: snakeAnimations, speed: 1.1,
     life: 3, touchDamage: 1, update: updateFlameSnake, flipRight: true,
+    immunities: ['fire'],
 };
 enemyDefinitions.frostBeetle = {
     alwaysReset: true,
     animations: beetleAnimations, speed: 0.7, aggroRadius: 112,
     life: 5, touchDamage: 1, update: updateFrostBeetle,
+    immunities: ['ice'],
 };
 enemyDefinitions.lightningBug = {
     alwaysReset: true,
     animations: beetleWingedAnimations, acceleration: 0.2, speed: 1, aggroRadius: 112, flying: true,
     life: 3, touchDamage: 1, update: updateStormLightningBug, render: renderLightningShield,
+    immunities: ['lightning'],
 };
 
 function updateFlameSnake(state: GameState, enemy: Enemy): void {
@@ -152,7 +156,7 @@ function updateFrostBeetle(state: GameState, enemy: Enemy): void {
     if (enemy.params.shootCooldown > 0) {
         enemy.params.shootCooldown -= FRAME_LENGTH;
     } else {
-        const attackVector = getVectorToNearbyHero(state, enemy, enemy.aggroRadius / 2);
+        const attackVector = getVectorToNearbyTarget(state, enemy, enemy.aggroRadius / 2, enemy.area.allyTargets);
         if (attackVector) {
             throwIceGrenadeAtLocation(state, enemy, {
                 tx: state.hero.x + state.hero.w / 2,
@@ -174,7 +178,7 @@ function updateStormLightningBug(state: GameState, enemy: Enemy): void {
             enemy.shielded = false;
         }
     } else {
-        const chaseVector = getVectorToNearbyHero(state, enemy, enemy.aggroRadius);
+        const chaseVector = getVectorToNearbyTarget(state, enemy, enemy.aggroRadius, enemy.area.allyTargets);
         if (chaseVector) {
             enemy.params.shieldCooldown = 5000;
             enemy.shielded = true;
@@ -187,7 +191,7 @@ function renderLightningShield(context: CanvasRenderingContext2D, state: GameSta
     context.strokeStyle = enemy.params.shieldColor ?? '#888';
     if (enemy.shielded) {
         context.save();
-            context.globalAlpha = 0.7 + 0.3 * Math.random();
+            context.globalAlpha *= (0.7 + 0.3 * Math.random());
             context.beginPath();
             context.arc(hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2, hitbox.w / 2, 0, 2 * Math.PI);
             context.stroke();
@@ -202,7 +206,7 @@ function renderLightningShield(context: CanvasRenderingContext2D, state: GameSta
         }
     }
 }
-export function throwIceGrenadeAtLocation(state: GameState, enemy: Enemy, {tx, ty}: {tx: number, ty: number}): void {
+export function throwIceGrenadeAtLocation(state: GameState, enemy: Enemy, {tx, ty}: {tx: number, ty: number}, damage = 1): void {
     const hitbox = enemy.getHitbox(state);
     const x = hitbox.x + hitbox.w / 2;
     const y = hitbox.y + hitbox.h / 2;
@@ -211,6 +215,7 @@ export function throwIceGrenadeAtLocation(state: GameState, enemy: Enemy, {tx, t
     const az = -0.2;
     const duration = -2 * vz / az;
     const frostGrenade = new FrostGrenade({
+        damage,
         x,
         y,
         z,
@@ -346,7 +351,7 @@ export function accelerateInDirection(state: GameState, enemy: Enemy, a: {x: num
 }
 
 function scurryAndChase(state: GameState, enemy: Enemy) {
-    const chaseVector = getVectorToNearbyHero(state, enemy, enemy.aggroRadius);
+    const chaseVector = getVectorToNearbyTarget(state, enemy, enemy.aggroRadius, enemy.area.allyTargets);
     if (chaseVector) {
         accelerateInDirection(state, enemy, chaseVector);
         moveEnemy(state, enemy, enemy.vx, enemy.vy, {});
@@ -397,14 +402,15 @@ export function paceAndCharge(state: GameState, enemy: Enemy) {
     }
 }
 
-export function getVectorToNearbyHero(state: GameState, enemy: Enemy, radius: number): {x: number, y: number} {
+export function getVectorToNearbyTarget(state: GameState, enemy: Enemy, radius: number, targets: ObjectInstance[]): {x: number, y: number} {
     const hitbox = enemy.getHitbox(state);
-    for (const hero of [state.hero, state.hero.astralProjection, ...state.hero.clones]) {
-        if (!hero || hero.area !== enemy.area) {
+    for (const target of targets) {
+        if (!target || target.area !== enemy.area || !target.getHitbox) {
             continue;
         }
-        const dx = (hero.x + hero.w / 2) - (hitbox.x + hitbox.w / 2);
-        const dy = (hero.y + hero.h / 2) - (hitbox.y + hitbox.h / 2);
+        const targetHitbox = target.getHitbox(state);
+        const dx = (targetHitbox.x + targetHitbox.w / 2) - (hitbox.x + hitbox.w / 2);
+        const dy = (targetHitbox.y + targetHitbox.h / 2) - (hitbox.y + hitbox.h / 2);
         const mag = Math.sqrt(dx * dx + dy * dy);
         if (mag <= radius) {
             return {x: dx / mag, y: dy / mag};

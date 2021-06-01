@@ -9,7 +9,7 @@ import { updateHeroMagicStats } from 'app/render/spiritBar';
 import { renderHero } from 'app/renderActor';
 import { onHitHero } from 'app/updateActor';
 
-import { GameState, Hero, SavedState } from 'app/types';
+import { GameState, Hero, SavedState, ShortRectangle } from 'app/types';
 
 
 export function loadSavedData(): boolean {
@@ -32,6 +32,8 @@ export function saveGame(): void {
     delete hero.activeClone;
     delete hero.activeStaff;
     delete hero.actionTarget;
+    delete hero.getHitbox;
+    delete hero.onHit;
     delete hero.render;
     delete hero.area;
     delete hero.grabObject;
@@ -94,6 +96,7 @@ export function applySavedState(state: GameState, savedState: SavedState): void 
                 ...defaultSavedState.hero.equipment,
                 ...savedState.hero.equipment,
             },
+            getHitbox: getHeroHitbox,
             render: renderHero,
             onHit: onHitHero,
             spiritRadius: 0,
@@ -115,6 +118,7 @@ export function selectSaveFile(savedGameIndex: number): void {
         // Adjust the current state so we can show the correct background preview.
         state.hero = getDefaultSavedState().hero;
         state.hero.spawnLocation = SPAWN_LOCATION_FULL;
+        state.hero.getHitbox = getHeroHitbox;
         state.hero.render = renderHero;
         state.hero.onHit = onHitHero;
         fixSpawnLocationOnLoad(state);
@@ -197,6 +201,7 @@ function getDefaultHeroState(): Hero {
         activeClone: null,
         status: 'normal',
         invisible: false,
+        getHitbox: getHeroHitbox,
         render: renderHero,
         onHit: onHitHero,
         spiritRadius: 0,
@@ -276,6 +281,10 @@ export function returnToSpawnLocation(state: GameState) {
     state.hero.d = state.hero.spawnLocation.d;
     enterLocation(state, state.hero.spawnLocation);
     state.fadeLevel = (state.areaInstance.definition.dark || 0) / 100;
+}
+
+function getHeroHitbox(this: Hero, state: GameState): ShortRectangle {
+    return { x: this.x, y: this.y, w: 16, h: 16 };
 }
 
 export function getState(): GameState {

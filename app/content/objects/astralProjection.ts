@@ -136,12 +136,12 @@ export class AstralProjection implements Hero, ObjectInstance {
         const hero = this;
         const frame = getSpiritFrame(state, hero);
         context.save();
-            context.globalAlpha = 0.7;
+            context.globalAlpha *= 0.7;
             if (state.hero.magic <= 10 || this.invulnerableFrames > 0) {
                 // Spirit flashes when teleportation will end meditation by bringing magic under 10.
-                context.globalAlpha = (this.animationTime % 200 < 100) ? 0.2 : 0.4;
+                context.globalAlpha *= ((this.animationTime % 200 < 100) ? 0.2 : 0.4);
             } else if (state.hero.magic < state.hero.maxMagic / 2) {
-                context.globalAlpha = 0.7 * 2 * state.hero.magic / state.hero.maxMagic;
+                context.globalAlpha *= 0.7 * 2 * state.hero.magic / state.hero.maxMagic;
             }
             drawFrameAt(context, frame, { x: hero.x, y: hero.y });
         context.restore();

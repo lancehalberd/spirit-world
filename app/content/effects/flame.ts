@@ -67,6 +67,7 @@ export class Flame implements ObjectInstance, Props {
                 hitbox: this,
                 element: 'fire',
                 hitAllies: true,
+                hitTiles: true,
             });
         }
     }
@@ -74,7 +75,7 @@ export class Flame implements ObjectInstance, Props {
         // Sold red circle in a transparent rectangle
         context.fillStyle = 'red';
         context.save();
-            context.globalAlpha = 0.6;
+            context.globalAlpha *= 0.6;
             context.fillRect(this.x, this.y - this.z, this.w, this.h);
         context.restore();
         context.beginPath();

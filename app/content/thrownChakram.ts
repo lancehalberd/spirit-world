@@ -6,7 +6,7 @@ import { hitTargets } from 'app/utils/field';
 import { isPointInShortRect } from 'app/utils/index';
 
 import {
-    AnimationEffect, AreaInstance, DrawPriority, Frame, GameState, Hero, HitProperties, ObjectInstance, ObjectStatus,
+    AnimationEffect, AreaInstance, DrawPriority, Frame, GameState, Hero, HitProperties, MagicElement, ObjectInstance, ObjectStatus,
 } from 'app/types';
 
 const chakramGeometry = {w: 16, h: 16, content: {x: 2, y: 2, w: 12, h: 12}};
@@ -18,6 +18,7 @@ interface Props {
     vx?: number,
     vy?: number,
     damage?: number,
+    element?: MagicElement,
     piercing?: boolean,
     returnSpeed?: number,
     source: Hero,
@@ -28,6 +29,7 @@ export class ThrownChakram implements ObjectInstance {
     definition = null;
     drawPriority: DrawPriority = 'sprites';
     type = 'thrownChakram' as 'thrownChakram';
+    element: MagicElement;
     frame: Frame;
     outFrames: number;
     damage: number;
@@ -45,7 +47,7 @@ export class ThrownChakram implements ObjectInstance {
     source: Hero;
     animationTime = 0;
     sparkles: AnimationEffect[];
-    constructor({x = 0, y = 0, vx = 0, vy = 0, damage = 1, returnSpeed = 4, piercing = false, source}: Props) {
+    constructor({x = 0, y = 0, vx = 0, vy = 0, damage = 1, element = null, returnSpeed = 4, piercing = false, source}: Props) {
         this.x = x;
         this.y = y;
         this.vx = vx;
@@ -59,6 +61,7 @@ export class ThrownChakram implements ObjectInstance {
         this.outFrames = 12;
         this.source = source;
         this.sparkles = [];
+        this.element = element;
     }
     update(state: GameState) {
         // Chakram returns to the hero if the clone it was thrown from no longer exists.
@@ -99,6 +102,7 @@ export class ThrownChakram implements ObjectInstance {
 
         const hit: HitProperties = {
             damage: this.damage,
+            element: this.element,
             vx: this.vx,
             vy: this.vy,
             hitbox: this,
@@ -121,6 +125,20 @@ export class ThrownChakram implements ObjectInstance {
         drawFrame(context, frame, { ...frame, x: this.x - frame.content.x, y: this.y - frame.content.y });
         for (const sparkle of this.sparkles) {
             sparkle.render(context, state);
+        }
+        if (this.element) {
+            context.save();
+                context.globalAlpha *= 0.8;
+                context.beginPath();
+                context.fillStyle = {fire: 'red', ice: '#08F', lightning: 'yellow'}[this.element];
+                context.arc(
+                    this.x - frame.content.x + frame.w / 2,
+                    this.y - frame.content.y + frame.h / 2,
+                    6,
+                    0, 2 * Math.PI
+                );
+                context.fill();
+            context.restore();
         }
     }
 }
@@ -157,10 +175,12 @@ export class HeldChakram implements ObjectInstance {
     }
     throw(state: GameState) {
         let speed = 3;
+        let element: MagicElement = null;
         if (state.hero.passiveTools.charge >= 1) {
             if (state.hero.magic > 0 && this.animationTime >= 1000) {
                 speed = 12;
                 state.hero.magic -= 10;
+                element = state.hero.element;
             } else {
                 speed = Math.min(6, speed + this.animationTime / 100);
             }
@@ -174,6 +194,7 @@ export class HeldChakram implements ObjectInstance {
             vy: speed * this.vy,
             returnSpeed: 4,
             damage: this.damage * Math.round(Math.max(1, speed / 4)),
+            element,
             source: this.hero,
             piercing: speed === 12,
         });
@@ -223,10 +244,10 @@ export class HeldChakram implements ObjectInstance {
         if (hitResult.hit) {
             this.hero.action = null;
             removeObjectFromArea(state, this);
-            return;
-        }
-        if (hitResult.knockback) {
-            this.hero.bounce = {vx: hitResult.knockback.vx, vy: hitResult.knockback.vy, frames: 10};
+            // console.log(hitResult.knockback);
+            if (hitResult.knockback) {
+                this.hero.bounce = {vx: hitResult.knockback.vx, vy: hitResult.knockback.vy, frames: 10};
+            }
         }
     }
     render(context, state: GameState) {
@@ -234,9 +255,11 @@ export class HeldChakram implements ObjectInstance {
             return;
         }
         let animationTime = 0;
+        let element = null;
         if (state.hero.passiveTools.charge >= 1 && state.hero.magic > 0) {
             if (this.animationTime >= 1000) {
                 animationTime = this.animationTime;
+                element = state.hero.element;
             } else {
                 animationTime = this.animationTime / 10;
             }
@@ -245,6 +268,20 @@ export class HeldChakram implements ObjectInstance {
         drawFrame(context, frame, { ...frame, x: this.x - frame.content.x, y: this.y - frame.content.y });
         for (const sparkle of this.sparkles) {
             sparkle.render(context, state);
+        }
+        if (element) {
+            context.save();
+                context.globalAlpha *= 0.8;
+                context.beginPath();
+                context.fillStyle = {fire: 'red', ice: '#08F', lightning: 'yellow'}[element];
+                context.arc(
+                    this.x - frame.content.x + frame.w / 2,
+                    this.y - frame.content.y + frame.h / 2,
+                    6,
+                    0, 2 * Math.PI
+                );
+                context.fill();
+            context.restore();
         }
     }
 }

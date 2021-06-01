@@ -191,6 +191,7 @@ export class Arrow implements ObjectInstance {
     getHitProperties(state: GameState): HitProperties {
         return {
             canPush: true,
+            damage: this.damage,
             hitbox: this,
             vx: this.vx,
             vy: this.vy, element:
@@ -247,7 +248,6 @@ export class Arrow implements ObjectInstance {
         // This is used to make torches light arrows on fire.
         if (hitResult.setElement) {
             this.element = hitResult.setElement;
-            console.log('arrow element', hitResult.setElement);
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
@@ -262,7 +262,7 @@ export class Arrow implements ObjectInstance {
         drawFrameAt(context, frame, { x: this.x, y: this.y - this.z });
         if (this.element) {
             context.save();
-                context.globalAlpha = 0.8;
+                context.globalAlpha *= 0.8;
                 context.beginPath();
                 context.fillStyle = {fire: 'red', ice: '#08F', lightning: 'yellow'}[this.element];
                 context.arc(
@@ -281,6 +281,7 @@ export class EnemyArrow extends Arrow {
     getHitProperties(state: GameState): HitProperties {
         return {
             canPush: false,
+            damage: this.damage,
             hitbox: this,
             vx: this.vx,
             vy: this.vy, element:

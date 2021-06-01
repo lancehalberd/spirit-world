@@ -103,12 +103,20 @@ export function checkIfAllSwitchesAreActivated(state: GameState, area: AreaInsta
 export function deactivateTargets(state: GameState, area: AreaInstance, targetObjectId: string = null): void {
     if (targetObjectId) {
         const target = findObjectInstanceById(area, targetObjectId);
+        if (target.onDeactivate) {
+            target.onDeactivate(state);
+            return;
+        }
         if (target && target.definition.status === 'closedSwitch') {
             changeObjectStatus(state, target, 'closedSwitch');
         }
         return;
     }
     for (const object of state.areaInstance.objects) {
+        if (object.onDeactivate) {
+            object.onDeactivate(state);
+            continue;
+        }
         if (object.definition?.status === 'closedSwitch') {
             changeObjectStatus(state, object, 'closedSwitch');
         }
@@ -116,6 +124,10 @@ export function deactivateTargets(state: GameState, area: AreaInstance, targetOb
 }
 
 export function activateTarget(state: GameState, target: ObjectInstance): void {
+    if (target.onActivate) {
+        target.onActivate(state);
+        return;
+    }
     if (target.status === 'hiddenSwitch') {
         changeObjectStatus(state, target, 'normal');
     }

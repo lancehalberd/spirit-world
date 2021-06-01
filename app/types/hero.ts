@@ -93,6 +93,7 @@ export interface Actor extends ObjectInstance {
     floating?: boolean,
     sinking?: boolean,
     inAirBubbles?: boolean,
+    frozenDuration?: number,
 }
 
 export interface Hero extends Actor {

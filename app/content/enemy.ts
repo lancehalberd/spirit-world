@@ -5,22 +5,18 @@ import { checkForFloorEffects, moveEnemy } from 'app/content/enemies';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { dropItemFromTable, getLoot } from 'app/content/lootObject';
 import { addObjectToArea, getAreaSize } from 'app/content/areas';
+import { enemyDeathAnimation } from 'app/content/enemyAnimations';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { saveGame } from 'app/state';
-import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
+import { drawFrame, getFrame } from 'app/utils/animations';
 import { playSound } from 'app/utils/sounds';
 
 import {
     Action, Actor, AreaInstance, BossObjectDefinition, Direction, DrawPriority,
     EnemyDefinition, EnemyObjectDefinition,
-    Frame, FrameAnimation, FrameDimensions, GameState, HitProperties, HitResult,
+    Frame, FrameAnimation, GameState, HitProperties, HitResult,
     ObjectInstance, ObjectStatus, ShortRectangle,
 } from 'app/types';
-
-
-const enemyDeathGeometry: FrameDimensions = {w: 20, h: 20};
-export const enemyDeathAnimation: FrameAnimation = createAnimation('gfx/effects/enemydeath.png', enemyDeathGeometry, { cols: 9, duration: 4}, { loop: false });
-
 
 export class Enemy implements Actor, ObjectInstance {
     type = 'enemy' as 'enemy';
@@ -142,7 +138,7 @@ export class Enemy implements Actor, ObjectInstance {
             return {};
         }
         if (this.enemyDefinition.onHit) {
-            return this.enemyDefinition.onHit(state, hit);
+            return this.enemyDefinition.onHit(state, this, hit);
         }
         return this.defaultOnHit(state, hit);
     }
@@ -150,12 +146,16 @@ export class Enemy implements Actor, ObjectInstance {
         if (this.life <= 0 || this.status === 'gone' || this.enemyInvulnerableFrames) {
             return {};
         }
+        // Ignore attacks that this enemy is immune to.
+        if (this.enemyDefinition.immunities?.includes(hit.element)) {
+            return {};
+        }
         if (this.shielded) {
             if (this.blockInvulnerableFrames) {
                 return {};
             }
             playSound('blockAttack');
-            this.blockInvulnerableFrames = 10;
+            this.blockInvulnerableFrames = 30;
             return {
                 hit: true,
                 blocked: true,
@@ -273,19 +273,19 @@ export class Enemy implements Actor, ObjectInstance {
         checkForFloorEffects(state, this);
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
-        if (this.status === 'gone') {
+        if (this.status === 'gone' || this.status === 'hidden') {
             return;
         }
         const frame = this.getFrame();
         context.save();
             if (this.invulnerableFrames) {
-                context.globalAlpha = 0.7 + 0.3 * Math.cos(2 * Math.PI * this.invulnerableFrames * 3 / 50);
+                context.globalAlpha *= (0.7 + 0.3 * Math.cos(2 * Math.PI * this.invulnerableFrames * 3 / 50));
             }
             if (this.d === 'right' && this.enemyDefinition.flipRight) {
                 // Flip the frame when facing right. We may need an additional flag for this behavior
                 // if we don't do it for all enemies on the right frames.
                 const w = frame.content?.w ?? frame.w;
-                context.translate((this.x | 0) + (frame?.content?.x || 0) + w / 2, 0);
+                context.translate((this.x | 0) + ((frame?.content?.x || 0) + w / 2) * this.scale, 0);
                 context.scale(-1, 1);
                 drawFrame(context, frame, { ...frame,
                     x: - w / 2 - (frame?.content?.x || 0) * this.scale,

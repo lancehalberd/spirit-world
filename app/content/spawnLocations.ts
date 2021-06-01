@@ -185,7 +185,7 @@ helixStartState.hero.rightTool = 'invisibility';
 const helixEndState = applyItems(helixStartState, {charge: 1, staff: 1},
     ['elementalBeastsEscaped']);
 const riverTempleStartState = applyItems(helixEndState, {ironBoots: 1});
-const riverTempleBossState = applyItems(riverTempleStartState, {'riverTemple:bigKey': 1});
+const riverTempleBossState = applyItems(riverTempleStartState, {'riverTemple:bigKey': 1, 'fire': 1, 'lightning': 1});
 
 const spawnLocations = {
     'Peach Cave Start': {

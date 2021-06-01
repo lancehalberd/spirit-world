@@ -4,7 +4,7 @@ import { hitTargets } from 'app/utils/field';
 
 import {
     AreaInstance, DrawPriority,
-    Frame, GameState, ObjectInstance, ObjectStatus
+    Frame, GameState, ObjectInstance, ObjectStatus,
 } from 'app/types';
 
 interface Props {
@@ -12,6 +12,7 @@ interface Props {
     y: number,
     z?: number,
     damage?: number,
+    ignoreTargets: Set<ObjectInstance>;
     vx?: number,
     vy?: number,
     vz?: number,
@@ -19,7 +20,7 @@ interface Props {
     ttl?: number,
 }
 
-export class Spark implements ObjectInstance, Props {
+export class Frost implements ObjectInstance, Props {
     drawPriority: DrawPriority = 'sprites';
     area: AreaInstance = null;
     definition = null;
@@ -32,15 +33,16 @@ export class Spark implements ObjectInstance, Props {
     vx: number;
     vy: number;
     az: number;
-    w: number = 8;
-    h: number = 8;
+    w: number = 12;
+    h: number = 12;
     ignorePits = true;
+    ignoreTargets: Set<ObjectInstance>;
     radius: number;
     animationTime = 0;
     status: ObjectStatus = 'normal';
     speed = 0;
     ttl: number;
-    constructor({x, y, z = 0, vx = 0, vy = 0, vz = 0, az = -0.3, damage = 1, ttl = 2000}: Props) {
+    constructor({x, y, z = 4, vx = 0, vy = 0, vz = 0, az = -0.1, damage = 1, ttl = 400, ignoreTargets}: Props) {
         this.damage = damage;
         this.x = x;
         this.y = y;
@@ -50,6 +52,7 @@ export class Spark implements ObjectInstance, Props {
         this.vz = vz;
         this.az = az;
         this.ttl = ttl;
+        this.ignoreTargets = ignoreTargets;
     }
     update(state: GameState) {
         this.x += this.vx;
@@ -62,26 +65,30 @@ export class Spark implements ObjectInstance, Props {
             removeObjectFromArea(state, this);
         } else {
             hitTargets(state, this.area, {
+                canPush: false,
                 damage: this.damage,
                 hitbox: this,
-                element: 'lightning',
+                element: 'ice',
                 hitAllies: true,
-                knockAwayFrom: {x: this.x + this.w / 2, y: this.y + this.h / 2},
+                hitEnemies: true,
+                hitObjects: true,
+                hitTiles: true,
+                ignoreTargets: this.ignoreTargets,
             });
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
         // Sold red circle in a transparent rectangle
-        context.fillStyle = 'yellow';
+        context.fillStyle = 'white';
         context.save();
+            context.beginPath();
             context.globalAlpha *= 0.6;
-            context.fillRect(this.x, this.y - this.z, this.w, this.h);
+            context.arc(
+                this.x + this.w / 2,
+                this.y + this.h / 2 - this.z,
+                this.w / 2, 0, 2 * Math.PI
+            );
+            context.fill();
         context.restore();
-        context.beginPath();
-        context.strokeStyle = 'yellow';
-        context.lineWidth = 2;
-        context.moveTo(this.x + this.w / 2 - 2 * this.vx, this.y + this.h / 2 - 2 * this.vy);
-        context.lineTo(this.x + this.w / 2 + 2 * this.vx, this.y + this.h / 2 + 2 * this.vy);
-        context.stroke();
     }
 }

@@ -36,18 +36,20 @@ export class FrostBlast implements ObjectInstance, Props {
     animationTime = 0;
     status: ObjectStatus = 'normal';
     speed = 0;
+    hitTargets: Set<ObjectInstance>;
     constructor({x, y, damage = 2, radius = 32}: Props) {
         this.radius = radius
         this.damage = damage;
         this.x = x;
         this.y = y;
+        this.hitTargets = new Set();
     }
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;
         if (this.animationTime >= EXPANSION_TIME + PERSIST_TIME) {
             removeObjectFromArea(state, this);
         } else {
-            hitTargets(state, this.area, {
+            const hitResult = hitTargets(state, this.area, {
                 damage: this.damage,
                 element: 'ice',
                 hitCircle: {
@@ -58,14 +60,16 @@ export class FrostBlast implements ObjectInstance, Props {
                 hitAllies: true,
                 hitObjects: true,
                 hitTiles: true,
-                knockAwayFrom: {x: this.x, y: this.y},
+                hitEnemies: true,
+                ignoreTargets: this.hitTargets,
             });
+            this.hitTargets = new Set([...this.hitTargets, ...hitResult.hitTargets])
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
         // Animate a transparent orb growing in the air
         context.save();
-            context.globalAlpha = 0.6;
+            context.globalAlpha *= 0.6;
             context.beginPath();
             context.fillStyle = 'white'
             const r = this.radius * Math.min(1, this.animationTime / EXPANSION_TIME);

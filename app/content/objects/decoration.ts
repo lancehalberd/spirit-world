@@ -40,10 +40,12 @@ export const decorationTypes = {
             // Draw this 8 pixels past the bottom so that y sorting looks better.
             const h = decoration.h + 8;
             context.save();
-                context.globalAlpha = 0.6;
+                context.globalAlpha *= 0.6;
                 context.fillStyle = '#2B68D5';
                 context.fillRect(decoration.x, decoration.y + 8 - h, decoration.w, h);
-                context.globalAlpha = 0.8;
+            context.restore();
+            context.save();
+                context.globalAlpha *= 0.8;
                 context.fillStyle = 'white';
                 const baseValue = 128 * decoration.animationTime / 1000;
                 let y = baseValue % 64 - 128;
@@ -62,7 +64,9 @@ export const decorationTypes = {
                         }
                     }
                 }
-                context.globalAlpha = 0.7;
+            context.restore();
+            context.save();
+                context.globalAlpha *= 0.7;
                 context.fillStyle = '#0034A0';
                 y = baseValue % 64 - 128;
                 for (; y < h + 32; y += 32) {

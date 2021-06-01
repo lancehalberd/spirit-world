@@ -1,7 +1,8 @@
-import { resetTileBehavior } from 'app/content/areas';
-import { allTiles } from 'app/content/tiles';
+//import { resetTileBehavior } from 'app/content/areas';
+//import { allTiles } from 'app/content/tiles';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { saveGame } from 'app/state';
+import { hitTargets } from 'app/utils/field';
 
 import {
     AreaInstance, GameState, HitProperties, HitResult, ObjectInstance,
@@ -16,6 +17,7 @@ export class Torch implements ObjectInstance {
     };
     drawPriority: 'sprites' = 'sprites';
     definition: SimpleObjectDefinition = null;
+    isNeutralTarget = true;
     x: number;
     y: number;
     status: ObjectStatus = 'normal';
@@ -48,8 +50,21 @@ export class Torch implements ObjectInstance {
         }
         return { hit: true, pierced: true, setElement: this.behaviors.element };
     }
+    onActivate(state: GameState) {
+        this.status = 'active';
+        this.behaviors.element = 'fire';
+    }
     applyFireToTiles(state: GameState) {
-        const tx = (this.x / 16) | 0, ty = (this.y / 16) | 0;
+        hitTargets(state, this.area, {
+            element: 'fire',
+            hitCircle: {
+                x: this.x + 8,
+                y: this.y + 8,
+                r: 36,
+            },
+            hitTiles: true,
+        });
+        /*const tx = (this.x / 16) | 0, ty = (this.y / 16) | 0;
         for(let dy = -2; dy <= 2; dy++) {
             for(let dx = -2; dx <= 2; dx++) {
                 if (dx * dx + dy * dy >= 8) continue;
@@ -70,7 +85,7 @@ export class Torch implements ObjectInstance {
                     resetTileBehavior(this.area, {x: tx + dx, y: ty + dy});
                 }
             }
-        }
+        }*/
         this.appliedFireToTiles = true;
     }
     update(state: GameState) {
@@ -96,7 +111,7 @@ export class Torch implements ObjectInstance {
         if (this.status === 'active') {
             context.fillStyle = 'red';
             context.save();
-                context.globalAlpha = 0.6;
+                context.globalAlpha *= 0.6;
                 context.fillRect(this.x, this.y, 16, 16);
             context.restore();
             context.beginPath();
