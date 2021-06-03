@@ -272,6 +272,18 @@ export class Enemy implements Actor, ObjectInstance {
         // Checks if the enemy fell into a pit, for example
         checkForFloorEffects(state, this);
     }
+    getHealthPercent(state): number {
+        if (this.enemyDefinition.getHealthPercent) {
+            return this.enemyDefinition.getHealthPercent(state, this);
+        }
+        return this.life / this.enemyDefinition.life;
+    }
+    getShieldPercent(state): number {
+        if (this.enemyDefinition.getShieldPercent) {
+            return this.enemyDefinition.getShieldPercent(state, this);
+        }
+        return this.shielded ? 1 : 0;
+    }
     render(context: CanvasRenderingContext2D, state: GameState) {
         if (this.status === 'gone' || this.status === 'hidden') {
             return;

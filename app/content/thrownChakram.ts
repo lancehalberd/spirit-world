@@ -237,7 +237,6 @@ export class HeldChakram implements ObjectInstance {
             hitbox: this,
             hitEnemies: true,
             hitObjects: true,
-            hitTiles: true,
             knockAwayFrom: { x: this.hero.x + this.hero.w / 2, y: this.hero.y + this.hero.h / 2 },
         };
         const hitResult = hitTargets(state, this.area, hit);
@@ -248,7 +247,13 @@ export class HeldChakram implements ObjectInstance {
             if (hitResult.knockback) {
                 this.hero.bounce = {vx: hitResult.knockback.vx, vy: hitResult.knockback.vy, frames: 10};
             }
+            return;
         }
+        // Check for hitting tiles separate as we don't want this to remove the held chakram.
+        hit.hitEnemies = false;
+        hit.hitObjects = false;
+        hit.hitTiles = true;
+        hitTargets(state, this.area, hit);
     }
     render(context, state: GameState) {
         if (this.animationTime < 100) {

@@ -4,7 +4,10 @@ import { addObjectToArea } from 'app/content/areas';
 import { Frost } from 'app/content/effects/frost';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import {
+    accelerateInDirection,
     getVectorToNearbyTarget,
+    moveEnemy,
+    moveEnemyToTargetLocation,
     throwIceGrenadeAtLocation,
 } from 'app/content/enemies';
 import { enemyDeathAnimation, snakeAnimations } from 'app/content/enemyAnimations';
@@ -14,7 +17,7 @@ import { playSound } from 'app/utils/sounds';
 import { getDirection, hitTargets } from 'app/utils/field';
 
 
-import { Enemy, GameState, HitProperties, HitResult } from 'app/types';
+import { AreaInstance, Enemy, GameState, HitProperties, HitResult } from 'app/types';
 
 
 const peachAnimation = createAnimation('gfx/hud/icons.png', {w: 18, h: 18, content: {x: 1, y: 1, w: 16, h: 16}}, {x: 3});
@@ -33,6 +36,7 @@ enemyDefinitions.frostHeart = {
         enrageLevel: 0,
         shieldLife: 8,
     },
+    immunities: ['ice'],
     render: renderIceShield,
     onHit(state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
         // If the shield is up, only fire damage can hurt it.
@@ -52,27 +56,73 @@ enemyDefinitions.frostHeart = {
             if (enemy.blockInvulnerableFrames > 0) {
                 return {};
             }
-            console.log('healed shield', enemy.params.shieldLife, hit.damage, state.time);
+            //console.log('healed shield', enemy.params.shieldLife, hit.damage, state.time);
             enemy.params.shieldLife = Math.min(8, enemy.params.shieldLife + hit.damage);
-            console.log('healed shield', enemy.params.shieldLife);
-            enemy.blockInvulnerableFrames = 30;
+            //console.log('healed shield', enemy.params.shieldLife);
+            enemy.blockInvulnerableFrames = 50;
             playSound('blocked');
             return { hit: true };
         }
+        if (enemy.area.underwater) {
+            hit.damage /= 2;
+        }
         // Use the default hit behavior, the attack will be blocked if the shield is still up.
         return enemy.defaultOnHit(state, hit);
+    },
+    getShieldPercent(state: GameState, enemy: Enemy) {
+        return enemy.params.shieldLife / 8;
     }
 };
 enemyDefinitions.frostSerpent = {
-    animations: snakeAnimations, life: 48, scale: 3, touchDamage: 2, update: updateFrostSerpent, flipRight: true,
+    animations: snakeAnimations, life: 36, scale: 3, touchDamage: 2, update: updateFrostSerpent, flipRight: true,
+    acceleration: 0.3, speed: 2,
+    immunities: ['ice'],
     params: {
         submerged: true,
     },
 };
 
+function getFrostHeart(this: void, state: GameState, area: AreaInstance): Enemy {
+    return area.objects.find(target => target instanceof Enemy && target.definition.enemyType === 'frostHeart') as Enemy;
+}
+
+function getFrostSerpent(this: void, state: GameState, area: AreaInstance): Enemy {
+    return area.objects.find(target => target instanceof Enemy && target.definition.enemyType === 'frostSerpent') as Enemy;
+}
+
+function isEnemyDefeated(enemy: Enemy): boolean {
+    return !enemy || enemy.life <= 0 || enemy.status === 'gone';
+}
+
 function updateFrostHeart(this: void, state: GameState, enemy: Enemy): void {
+    // The surface+underwater heart are actually two bosses in two different areas that
+    // are combined as if a single boss. Simlarly for the serpents.
+    let surfaceHeart, underwaterHeart;
+    if (state.surfaceAreaInstance) {
+        surfaceHeart = getFrostHeart(state, state.surfaceAreaInstance);
+        underwaterHeart = enemy;
+    } else if (state.underwaterAreaInstance) {
+        surfaceHeart = enemy;
+        underwaterHeart = getFrostHeart(state, state.underwaterAreaInstance);
+    }
+    // If either form is defeated, both are defeated.
+    if (isEnemyDefeated(surfaceHeart) || isEnemyDefeated(underwaterHeart)) {
+        enemy.status = 'gone';
+        return;
+    }
+    if (enemy === underwaterHeart && surfaceHeart?.params?.active) {
+        enemy.life = surfaceHeart.life;
+        surfaceHeart.params.active = false;
+        surfaceHeart.params.shieldLife = 8;
+    } else if (enemy === surfaceHeart && underwaterHeart?.params?.active) {
+        enemy.life = underwaterHeart.life;
+        underwaterHeart.params.active = false;
+    }
+    // Mark that this was the last active heart.
+    enemy.params.active = true;
     // The frost heart does nothing when attacking it from under the water.
     if (enemy.area.underwater) {
+        enemy.params.shieldLife = 0;
         enemy.shielded = false;
         return;
     }
@@ -130,42 +180,193 @@ function renderIceShield(context: CanvasRenderingContext2D, state: GameState, en
 
 
 function updateFrostSerpent(this: void, state: GameState, enemy: Enemy): void {
-    // The frost heart does nothing when attacking it from under the water.
-    if (enemy.area.underwater) {
-        // Underwater behavior
+    let surfaceSerpent, underwaterSerpent;
+    if (state.surfaceAreaInstance) {
+        surfaceSerpent = getFrostSerpent(state, state.surfaceAreaInstance);
+        underwaterSerpent = enemy;
+    } else if (state.underwaterAreaInstance) {
+        surfaceSerpent = enemy;
+        underwaterSerpent = getFrostSerpent(state, state.underwaterAreaInstance);
+    }
+    // If either form is defeated, both are defeated.
+    if (isEnemyDefeated(surfaceSerpent) || isEnemyDefeated(underwaterSerpent)) {
+        enemy.status = 'gone';
         return;
     }
-    if (enemy.status === 'hidden' && !enemy.params.submerged) {
+    if (enemy === underwaterSerpent && surfaceSerpent?.params?.active) {
+        enemy.life = surfaceSerpent.life;
+        surfaceSerpent.params.active = false;
+        surfaceSerpent.params.submerged = false;
+        surfaceSerpent.status = 'hidden';
+        enemy.params.submerged = false;
+    } else if (enemy === surfaceSerpent && underwaterSerpent?.params?.active) {
+        enemy.life = underwaterSerpent.life;
+        underwaterSerpent.params.active = false;
+        underwaterSerpent.params.submerged = true;
+        underwaterSerpent.status = 'hidden';
+        enemy.params.submerged = true;
+    }
+    const isHidden = (enemy.area.underwater && !enemy.params.submerged)
+        || (!enemy.area.underwater && enemy.params.submerged);
+    if (enemy.status === 'hidden' && !isHidden) {
         enemy.status = 'normal';
-    } else if (enemy.status === 'normal' && enemy.params.submerged) {
+    } else if (enemy.status === 'normal' && isHidden) {
         enemy.status = 'hidden';
     }
-    const heart = enemy.area.enemyTargets.find(target => target instanceof Enemy && target.definition.enemyType === 'frostHeart') as Enemy;
+    enemy.params.active = true;
+    const heart = getFrostHeart(state, enemy.area);
     const isEnraged = !heart || heart.life <= 1;
-    if (isEnraged) {
-        // Enraged behavior
-    }
-    if (enemy.mode === 'regenerate') {
-        if (enemy.modeTime % 500 === 0) {
-            enemy.life += 1;
+    if (!isEnraged) {
+        if (enemy.mode === 'regenerate') {
+            if (enemy.modeTime % 500 === 0) {
+                enemy.life += 0.5;
+                if (enemy.area.underwater) {
+                    enemy.life += 0.5;
+                }
+            }
+            if (enemy.life >= enemy.enemyDefinition.life) {
+                enemy.setMode('swimming');
+            } else {
+                enemy.status = 'hidden';
+            }
+            return;
         }
-        if (enemy.life >= enemy.enemyDefinition.life) {
-            enemy.setMode('swimming');
+        if (enemy.life < enemy.enemyDefinition.life * 2 / 3) {
+            const hitbox = enemy.getHitbox(state);
+            const deathAnimation = new AnimationEffect({
+                animation: enemyDeathAnimation,
+                x: hitbox.x + hitbox.w / 2 - enemyDeathAnimation.frames[0].w / 2 * enemy.scale,
+                // +1 to make sure the explosion appears in front of enemies the frame they die.
+                y: hitbox.y + hitbox.h / 2 - enemyDeathAnimation.frames[0].h / 2 * enemy.scale + 1,
+                scale: enemy.scale,
+            });
+            addObjectToArea(state, enemy.area, deathAnimation);
+            enemy.setMode('regenerate');
+            enemy.params.submerged = true;
+            return;
+        }
+    }
+    // The frost heart does nothing when attacking it from under the water.
+    if (enemy.area.underwater) {
+        if (isEnraged) {
+            // Surface when enraged.
+            if (enemy.params.submerged) {
+                enemy.params.submerged = false;
+                return;
+            }
+            return;
+        }
+        const target = _.sample(enemy.area.allyTargets);
+        const hitbox = target.getHitbox(state);
+        const dx = hitbox.x + hitbox.w / 2 - 256;
+        const dy = hitbox.y + hitbox.h / 2 - 256;
+        const theta = Math.atan2(dy, dx);
+        const enemyHitbox = enemy.getHitbox(state);
+        const targetX = 256 + Math.cos(theta) * 64 - enemyHitbox.w / 2;
+        const targetY = 256 + Math.sin(theta) * 64 - enemyHitbox.h / 2;
+        if (!enemy.params.submerged) {
+            enemy.params.submerged = true;
+            enemy.x = targetX;
+            enemy.y = targetY;
+            return;
+        }
+        // Underwater behavior (not enraged only)
+        if (enemy.mode === 'guard') {
+            enemy.d = getDirection(Math.cos(theta), Math.sin(theta));
+            enemy.params.attackTheta = theta;
+            moveEnemyToTargetLocation(state, enemy, targetX, targetY);
+            if (enemy.modeTime >= 2000) {
+                enemy.setMode('prepare');
+            }
+        } else if (enemy.mode === 'prepare') {
+            if (enemy.modeTime >= 500) {
+                enemy.setMode('charge');
+            }
+        } else if (enemy.mode === 'charge') {
+            accelerateInDirection(state, enemy, {
+                x: Math.cos(enemy.params.attackTheta),
+                y: Math.sin(enemy.params.attackTheta)
+            });
+            moveEnemy(state, enemy, enemy.vx, enemy.vy, {canSwim: true});
+            if (enemy.modeTime >= 1500) {
+                enemy.setMode('guard');
+            }
+        } else {
+            enemy.setMode('guard');
         }
         return;
     }
-    if (enemy.life < 32) {
-        const hitbox = enemy.getHitbox(state);
-        const deathAnimation = new AnimationEffect({
-            animation: enemyDeathAnimation,
-            x: hitbox.x + hitbox.w / 2 - enemyDeathAnimation.frames[0].w / 2 * enemy.scale,
-            // +1 to make sure the explosion appears in front of enemies the frame they die.
-            y: hitbox.y + hitbox.h / 2 - enemyDeathAnimation.frames[0].h / 2 * enemy.scale + 1,
-            scale: enemy.scale,
-        });
-        addObjectToArea(state, enemy.area, deathAnimation);
-        enemy.setMode('regenerate');
-        enemy.params.submerged = true;
+    if (isEnraged) {
+        if (enemy.params.submerged) {
+            const enemyHitbox = enemy.getHitbox(state);
+            enemy.x = 256 - enemyHitbox.w / 2;
+            enemy.y = 256 - enemyHitbox.h / 2;
+            enemy.params.submerged = false;
+            enemy.setMode('chooseTarget');
+            // Destroy the ice where the serpent emerges.
+            hitTargets(state, enemy.area, {
+                element: 'fire',
+                hitCircle: {
+                    x: enemy.x + enemyHitbox.w / 2,
+                    y: enemy.y + enemyHitbox.h / 2,
+                    r: 36,
+                },
+                hitTiles: true,
+            });
+            return;
+        }
+        if (enemy.mode === 'chooseTarget') {
+            if (enemy.modeTime < 1000) {
+                return;
+            }
+            enemy.params.attacksLeft--;
+            const breathRange = 128;
+            let attackVector = getVectorToNearbyTarget(state, enemy, breathRange, enemy.area.allyTargets);
+            if (attackVector) {
+                enemy.d = getDirection(attackVector.x, attackVector.y);
+                enemy.params.attackTheta = atan3(attackVector.y, attackVector.x);
+                enemy.setMode('frostBreathArc');
+                return;
+            }
+            const chargeRange = 512;
+            attackVector = getVectorToNearbyTarget(state, enemy, chargeRange, enemy.area.allyTargets);
+            if (attackVector) {
+                enemy.d = getDirection(attackVector.x, attackVector.y);
+                enemy.params.attackTheta = atan3(attackVector.y, attackVector.x);
+                enemy.setMode('charge');
+                return;
+            }
+            return;
+        } else if (enemy.mode === 'frostBreathArc') {
+            if (enemy.modeTime % 40 === 0) {
+                // Track a nearby target when using the frostBreathArc attack, otherwise attack in the same direction.
+                const attackVector = getVectorToNearbyTarget(state, enemy, 128, enemy.area.allyTargets);
+                if (attackVector) {
+                    const targetTheta = atan3(attackVector.y, attackVector.x);
+                    const dTheta = targetTheta - enemy.params.attackTheta;
+                    if ((dTheta > 0 && dTheta <= Math.PI) || dTheta <= -Math.PI) {
+                        enemy.params.attackTheta = (enemy.params.attackTheta + 0.05) % (2 * Math.PI);
+                    } else if ((dTheta < 0 && dTheta >= -Math.PI) || dTheta >= Math.PI) {
+                        enemy.params.attackTheta = (enemy.params.attackTheta - 0.05 + 2 * Math.PI) % (2 * Math.PI);
+                    }
+                    enemy.d = getDirection(Math.cos(enemy.params.attackTheta), Math.sin(enemy.params.attackTheta));
+                }
+                shootFrostInCone(state, enemy, enemy.params.attackTheta, 1, 5);
+            }
+            if (enemy.modeTime >= 1500) {
+                enemy.setMode('chooseTarget');
+            }
+            return;
+        } else if (enemy.mode === 'charge') {
+            accelerateInDirection(state, enemy, {
+                x: Math.cos(enemy.params.attackTheta),
+                y: Math.sin(enemy.params.attackTheta)
+            });
+            moveEnemy(state, enemy, enemy.vx, enemy.vy, {canSwim: true});
+            if (enemy.modeTime >= 1500) {
+                enemy.setMode('chooseTarget');
+            }
+        }
         return;
     }
     if (enemy.params.submerged) {
@@ -179,7 +380,7 @@ function updateFrostSerpent(this: void, state: GameState, enemy: Enemy): void {
             enemy.x = 256 + Math.cos(theta) * 64 - enemyHitbox.w / 2;
             enemy.y = 256 + Math.sin(theta) * 64 - enemyHitbox.h / 2;
             enemy.params.submerged = false;
-            enemy.params.attacksLeft = 3;
+            enemy.params.attacksLeft = 2;
             if (!heart || heart.life <= 10) enemy.params.attacksLeft++;
             if (!heart || heart.life <= 4) enemy.params.attacksLeft++;
             enemy.setMode('chooseTarget');
@@ -192,7 +393,7 @@ function updateFrostSerpent(this: void, state: GameState, enemy: Enemy): void {
                     r: 36,
                 },
                 hitTiles: true,
-            })
+            });
         }
         return;
     }
@@ -267,17 +468,17 @@ function atan3(y, x) {
     return (Math.atan2(y, x) + 2 * Math.PI) % (2 * Math.PI);
 }
 
-function shootFrostInCone(state: GameState, enemy: Enemy, theta: number, damage = 1): void {
+function shootFrostInCone(state: GameState, enemy: Enemy, theta: number, damage = 1, speed = 4): void {
     const hitbox = enemy.getHitbox(state);
     const x = hitbox.x + hitbox.w / 2 + Math.cos(theta) * hitbox.w / 2;
     const y = hitbox.y + hitbox.h / 2 + Math.sin(theta) * hitbox.h / 2;
-    const attackTheta = theta - Math.PI / 12 + Math.random() * Math.PI / 6;
+    const attackTheta = theta - Math.PI / 10 + Math.random() * Math.PI / 5;
     const frost = new Frost({
         damage,
         x,
         y,
-        vx: 4 * Math.cos(attackTheta),
-        vy: 4 * Math.sin(attackTheta),
+        vx: speed * Math.cos(attackTheta),
+        vy: speed * Math.sin(attackTheta),
         ignoreTargets: new Set([enemy]),
     });
     addObjectToArea(state, enemy.area, frost);

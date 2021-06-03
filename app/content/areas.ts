@@ -287,6 +287,7 @@ export function setConnectedAreas(state: GameState, lastAreaInstance: AreaInstan
             state.surfaceAreaInstance = createAreaInstance(state, surfaceArea);
         }
     }
+    state.areaInstance.underwater = !!state.surfaceAreaInstance;
 }
 
 export function linkObjects(state: GameState): void {

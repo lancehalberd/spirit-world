@@ -16,19 +16,26 @@ enemyDefinitions.stormIdol = {
     animations: beetleWingedAnimations, scale: 2,
     life: 9, touchDamage: 1, update: updateStormIdol, render: renderIdolShield,
     immunities: ['lightning'],
+    getHealthPercent: getIdolHealthPercent,
 };
 enemyDefinitions.flameIdol = {
     alwaysReset: true,
     animations: snakeAnimations, scale: 2,
     life: 9, touchDamage: 1, update: updateFlameIdol, render: renderIdolShield,
     immunities: ['fire'],
+    getHealthPercent: getIdolHealthPercent,
 };
 enemyDefinitions.frostIdol = {
     alwaysReset: true,
     animations: beetleAnimations, scale: 2,
     life: 9, touchDamage: 1, update: updateFrostIdol, render: renderIdolShield,
     immunities: ['ice'],
+    getHealthPercent: getIdolHealthPercent,
 };
+
+function getIdolHealthPercent(state: GameState, enemy: Enemy) {
+    return (enemy.life - 1) / (enemy.enemyDefinition.life - 1);
+}
 
 function updateStormIdol(state: GameState, enemy: Enemy): void {
     enemy.params.shieldColor = 'yellow';

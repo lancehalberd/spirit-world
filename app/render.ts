@@ -9,7 +9,7 @@ import {
     FADE_IN_DURATION, FADE_OUT_DURATION,
     CIRCLE_WIPE_IN_DURATION, CIRCLE_WIPE_OUT_DURATION,
 } from 'app/gameConstants';
-import { renderAreaLighting, updateLightingCanvas } from 'app/render/areaLighting';
+import { renderAreaLighting, renderSurfaceLighting, updateLightingCanvas, updateWaterSurfaceCanvas } from 'app/render/areaLighting';
 import { renderHeroEyes, renderHeroShadow, renderEnemyShadow } from 'app/renderActor';
 import { renderDefeatedMenu } from 'app/renderDefeatedMenu';
 import { renderHUD } from 'app/renderHUD';
@@ -111,6 +111,7 @@ export function render() {
     state.lastTimeRendered = state.time;
     renderField(context, state);
     renderAreaLighting(context, state, state.areaInstance, state.nextAreaInstance);
+    renderSurfaceLighting(context, state, state.areaInstance);
     if (state.defeatState.defeated) {
         renderHUD(context, state);
         context.save();
@@ -134,18 +135,21 @@ export function render() {
 
 function renderTransition(context: CanvasRenderingContext2D, state: GameState) {
     if (state.transitionState.type === 'diving' || state.transitionState.type === 'surfacing') {
+        const dz = state.transitionState.nextLocation.z - state.hero.z;
         if (state.transitionState.time <= CIRCLE_WIPE_OUT_DURATION) {
             context.fillStyle = 'black';
             context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-            const dz = state.transitionState.nextLocation.z - state.hero.z;
             if (!state.transitionState.patternCanvas) {
                 const [patternCanvas, patternContext] = createCanvasAndContext(CANVAS_WIDTH, CANVAS_HEIGHT);
                 state.transitionState.patternCanvas = patternCanvas;
                 renderArea(patternContext, state, state.transitionState.nextAreaInstance, false);
                 if (state.transitionState.type === 'diving') {
-                    translateContextForAreaAndCamera(patternContext, state, state.transitionState.nextAreaInstance);
-                    renderHeroShadow(patternContext, state, state.hero, true);
+                    patternContext.save();
+                        translateContextForAreaAndCamera(patternContext, state, state.transitionState.nextAreaInstance);
+                        renderHeroShadow(patternContext, state, state.hero, true);
+                    patternContext.restore();
                     renderAreaLighting(patternContext, state, state.transitionState.nextAreaInstance);
+                    renderSurfaceLighting(patternContext, state, state.transitionState.nextAreaInstance);
                 }
                 state.transitionState.pattern = context.createPattern(state.transitionState.patternCanvas, 'repeat');
             }
@@ -211,11 +215,16 @@ function renderTransition(context: CanvasRenderingContext2D, state: GameState) {
             context.restore();
         }
         renderAreaLighting(context, state, state.areaInstance);
+        context.save();
+            context.translate(0, dz + 24);
+            renderSurfaceLighting(context, state, state.areaInstance);
+        context.restore();
         return;
     }
 
     renderField(context, state);
     renderAreaLighting(context, state, state.areaInstance, state.nextAreaInstance);
+    renderSurfaceLighting(context, state, state.areaInstance);
     if (state.transitionState.type === 'portal') {
         if (!state.alternateAreaInstance) {
             return;
@@ -325,6 +334,9 @@ export function renderField(context: CanvasRenderingContext2D, state: GameState,
     if (state.areaInstance.checkToRedrawTiles) {
         checkToRedrawTiles(state.areaInstance);
         updateLightingCanvas(state.areaInstance);
+        if (state.underwaterAreaInstance) {
+            updateWaterSurfaceCanvas(state);
+        }
     }
     if (state.hero.spiritRadius > 0 && state.alternateAreaInstance.checkToRedrawTiles) {
         checkToRedrawTiles(state.alternateAreaInstance);

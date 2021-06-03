@@ -197,6 +197,10 @@ export interface AreaInstance {
     // These are recalculated when from scratch when tiles with lighting behavior are changed.
     lightingCanvas?: HTMLCanvasElement,
     lightingContext?: CanvasRenderingContext2D,
+    // These cache the tile based lights from tiles where you can surface under water and are stored
+    // on the underwater area but updated any time the surfae area is redrawn.
+    waterSurfaceCanvas?: HTMLCanvasElement,
+    waterSurfaceContext?: CanvasRenderingContext2D,
     // This is used during transitions to indicate that the top left corner
     // of this area is offset from the camera origin by this many pixels.
     cameraOffset: {x: number, y: number},

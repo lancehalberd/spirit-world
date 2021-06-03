@@ -102,6 +102,7 @@ export function applySavedState(state: GameState, savedState: SavedState): void 
             spiritRadius: 0,
             explosionTime: 0,
             invulnerableFrames: 0,
+            frozenDuration: 0,
         },
     };
     state.hero = state.savedState.hero;
@@ -268,6 +269,7 @@ export function returnToSpawnLocation(state: GameState) {
     state.hero.invisible = false;
     state.hero.activeStaff = null;
     state.hero.activeClone = null;
+    state.hero.frozenDuration = 0;
     state.hero.vx = 0;
     state.hero.vy = 0;
     state.hero.vz = 0;

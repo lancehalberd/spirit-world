@@ -58,6 +58,8 @@ export interface EnemyDefinition {
     onDeath?: (state: GameState, enemy: Enemy) => void,
     onHit?: (state: GameState, enemy: Enemy, hit: HitProperties) => HitResult,
     render?: (context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) => void,
+    getHealthPercent?: (state: GameState, enemy: Enemy) => number,
+    getShieldPercent?: (state: GameState, enemy: Enemy) => number,
 }
 
 enemyDefinitions.arrowTurret = {

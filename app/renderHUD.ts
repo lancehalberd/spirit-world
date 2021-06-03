@@ -1,10 +1,10 @@
 import { getLootFrame } from 'app/content/lootObject';
-import { CANVAS_WIDTH } from 'app/gameConstants';
+import { CANVAS_HEIGHT, CANVAS_WIDTH } from 'app/gameConstants';
 import { renderSpiritBar } from 'app/render/spiritBar';
 import { createAnimation, drawFrame, drawFrameAt, drawFrameCenteredAt } from 'app/utils/animations';
 import { drawText } from 'app/utils/simpleWhiteFont';
 
-import { GameState } from 'app/types';
+import { Enemy, GameState } from 'app/types';
 
 const [emptyHeart, fullHeart, threeQuarters, halfHeart, quarterHeart] =
     createAnimation('gfx/hud/hearts.png', {w: 10, h: 10}, {cols: 5}).frames;
@@ -75,4 +75,29 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
         textAlign: 'left',
         size: 16,
     });
+
+    const bosses = state.areaInstance.enemyTargets.filter(e => e instanceof Enemy && e.definition.type === 'boss') as Enemy[];
+    if (bosses.length) {
+        const totalSpace = CANVAS_WIDTH - 32 - bosses.length * 4 + 4;
+        const barHeight = 6;
+        const barWidth = (totalSpace / bosses.length) | 0;
+        y = CANVAS_HEIGHT - 16 - 6;
+        x = 16;
+        for (const boss of bosses) {
+            context.fillStyle = 'black';
+            context.fillRect(x, y, barWidth, barHeight);
+            const healthWidth = barWidth * boss.getHealthPercent(state) | 0;
+            if (healthWidth > 0) {
+                context.fillStyle = 'red';
+                context.fillRect(x, y, healthWidth, barHeight);
+            }
+            const shieldWidth = barWidth * boss.getShieldPercent(state) | 0;
+            if (shieldWidth > 0) {
+                context.fillStyle = 'white';
+                context.fillRect(x, y, shieldWidth, 2);
+                context.fillRect(x, y + barHeight - 2, shieldWidth, 2);
+            }
+            x += barWidth + 4;
+        }
+    }
 }

@@ -130,15 +130,15 @@ const f0_0x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "bigKeyLocked", id: "riverTempleBossDoor", x: 240, y: 480, type: "door", style: "cave", targetZone: null, targetObjectId: "peachCaveTopEntrance", d: "down", saveStatus: undefined},
+        {status: "closedEnemy", id: "", x: 240, y: 480, type: "door", style: "cave", targetZone: null, targetObjectId: "peachCaveTopEntrance", d: "down", saveStatus: undefined},
         {status: "normal", id: "bossTorchSW", x: 144, y: 352, saveStatus: true, type: "torch"},
         {status: "normal", id: "bossTorchNW", x: 144, y: 144, saveStatus: true, type: "torch"},
         {status: "normal", id: "bossTorchNE", x: 352, y: 144, saveStatus: true, type: "torch"},
         {status: "normal", id: "bossTorchSE", x: 352, y: 352, saveStatus: true, type: "torch"},
-        {status: "normal", id: "riverTemple:0:0x0-frostHeart-0", x: 224, y: 224, type: "boss", enemyType: "frostHeart", lootType: "empty", lootAmount: 1, lootLevel: 1, d: "down", params: {}},
+        {status: "normal", id: "frostBeast", x: 224, y: 224, type: "boss", enemyType: "frostHeart", lootType: "empty", lootAmount: 1, lootLevel: 1, d: "down", params: {}},
         {status: "normal", id: "", x: 128, y: 336, type: "crystalSwitch", element: "lightning", timer: 1000, targetObjectId: "bossTorchSW"},
         {status: "normal", id: "", x: 368, y: 336, type: "crystalSwitch", element: "lightning", timer: 1000, targetObjectId: "bossTorchSE"},
-        {status: "normal", id: "riverTemple:0:0x0-frostSerpent-0", x: 240, y: 176, type: "boss", enemyType: "frostSerpent", lootType: "empty", lootAmount: 1, lootLevel: 1, d: "down", params: {}},
+        {status: "normal", id: "frostBeast", x: 224, y: 176, type: "boss", enemyType: "frostSerpent", lootType: "empty", lootAmount: 1, lootLevel: 1, d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
