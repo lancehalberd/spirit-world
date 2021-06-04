@@ -355,7 +355,7 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
             area.checkToRedrawTiles = true;
             resetTileBehavior(area, target);
         }
-        if (behavior?.cuttable <= hit.damage && !behavior?.low) {
+        if (behavior?.cuttable <= hit.damage && (!behavior?.low || hit.cutsGround)) {
             // We need to find the specific cuttable layers that can be destroyed.
             for (const layer of area.layers) {
                 const tile = layer.tiles[target.y][target.x];
@@ -364,7 +364,7 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
                 }
             }
             combinedResult.hit = true;
-        } else if ((behavior?.cuttable > hit.damage || behavior?.solid) && !behavior?.low) {
+        } else if ((behavior?.cuttable > hit.damage || behavior?.solid) && (!behavior?.low || hit.cutsGround)) {
             combinedResult.hit = true;
             combinedResult.pierced = false;
             if (behavior?.cuttable > hit.damage) {

@@ -181,7 +181,7 @@ export function stopEditing(state: GameState) {
 
 export function displayTileEditorPropertyPanel() {
     const state = getState();
-    if (editingState.selectedLayerIndex >= state.areaInstance.layers.length) {
+    if (editingState.selectedLayerIndex >= state.areaInstance.definition.layers.length) {
         editingState.selectedLayerIndex = null;
     }
     if (editingState.tool === 'enemy') {
@@ -299,15 +299,15 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
             },
         });
         // Deleting all layers can causes errors, so don't allow it.
-        if (state.areaInstance.layers.length > 1) {
+        if (state.areaInstance.definition.layers.length > 1) {
             row.push({
                 name: 'X',
                 id: `layer-${i}-delete`,
                 onClick() {
                     state.areaInstance.definition.layers.splice(i, 1);
                     state.areaInstance.alternateArea.definition.layers.splice(i, 1);
-                    if (editingState.selectedLayerIndex >= state.areaInstance.layers.length) {
-                        editingState.selectedLayerIndex = state.areaInstance.layers.length - 1;
+                    if (editingState.selectedLayerIndex >= state.areaInstance.definition.layers.length) {
+                        editingState.selectedLayerIndex = state.areaInstance.definition.layers.length - 1;
                     }
                     enterLocation(state, state.location);
                     displayTileEditorPropertyPanel();
@@ -376,7 +376,7 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
                 name: 'v',
                 id: `layer-${i}-down`,
                 onClick() {
-                    if (i >= state.areaInstance.layers.length - 1) {
+                    if (i >= state.areaInstance.definition.layers.length - 1) {
                         return;
                     }
                     state.areaInstance.definition.layers[i] = state.areaInstance.definition.layers[i + 1];
@@ -736,7 +736,7 @@ function drawBrush(x: number, y: number): void {
         const layerIndex = area.definition.layers.indexOf(layerDefinition);
         const parentLayer = area.definition.parentDefinition?.layers[layerIndex];
         // When a layer is selected, only draw to it.
-        if (editingState.selectedLayerIndex >= 0 && area.layers[editingState.selectedLayerIndex] !== layer) {
+        if (editingState.selectedLayerIndex >= 0 && editingState.selectedLayerIndex !== layerIndex) {
             continue;
         }
         let brushGrid = editingState.brush[layerDefinition.key];
@@ -852,13 +852,18 @@ function replaceTiles(x: number, y: number): void {
 }
 // Apply a tile change to the spirit world if it doesn't have its own tile definition (the tile is null).
 function applyTileChangeToSpiritWorld(area: AreaInstance, layerIndex: number, x: number, y: number, tile: FullTile): void {
-    if (!area.definition.isSpiritWorld || !area.definition.layers[layerIndex]) {
+    const layerDefinition = area.definition.layers[layerIndex];
+    if (!area.definition.isSpiritWorld || !layerDefinition) {
         return;
     }
-    if (area.definition.layers[layerIndex].grid.tiles[y][x]) {
+    if (layerDefinition.grid.tiles[y][x]) {
         return;
     }
-    area.layers[layerIndex].tiles[y][x] = tile;
+    const areaLayer = area.layers.find(layer => layer.definition === layerDefinition);
+    if (!areaLayer) {
+        return;
+    }
+    areaLayer.tiles[y][x] = tile;
     if (area.tilesDrawn[y]?.[x]) {
         area.tilesDrawn[y][x] = false;
     }

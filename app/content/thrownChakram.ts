@@ -103,6 +103,7 @@ export class ThrownChakram implements ObjectInstance {
         const hit: HitProperties = {
             damage: this.damage,
             element: this.element,
+            cutsGround: true,
             vx: this.vx,
             vy: this.vy,
             hitbox: this,

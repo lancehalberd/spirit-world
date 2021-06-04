@@ -43,10 +43,10 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
     }
     const dungeonInventory = state.savedState.dungeonInventories[state.location.zoneKey];
     if (dungeonInventory?.bigKey) {
-        drawFrameAt(context, bigKeyFrame, {x: CANVAS_WIDTH - 21, y: 24});
+        drawFrameAt(context, bigKeyFrame, {x: CANVAS_WIDTH - 21, y: 26});
     }
     for (let i = 0; i < dungeonInventory?.smallKeys; i++) {
-        drawFrameAt(context, keyFrame, {x: CANVAS_WIDTH - 14 - 4 * i, y: 28});
+        drawFrameAt(context, keyFrame, {x: CANVAS_WIDTH - 14 - 4 * i, y: 30});
     }
     renderSpiritBar(context, state);
 
@@ -76,12 +76,14 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
         size: 16,
     });
 
-    const bosses = state.areaInstance.enemyTargets.filter(e => e instanceof Enemy && e.definition.type === 'boss') as Enemy[];
+    const bosses = state.areaInstance.enemyTargets.filter(
+        e => e instanceof Enemy && e.definition.type === 'boss' && e.isFromCurrentSection(state)
+    ) as Enemy[];
     if (bosses.length) {
         const totalSpace = CANVAS_WIDTH - 32 - bosses.length * 4 + 4;
         const barHeight = 6;
         const barWidth = (totalSpace / bosses.length) | 0;
-        y = CANVAS_HEIGHT - 16 - 6;
+        y = CANVAS_HEIGHT - 16;
         x = 16;
         for (const boss of bosses) {
             context.fillStyle = 'black';

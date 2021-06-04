@@ -81,6 +81,8 @@ export interface HitProperties {
     source?: Actor,
     // Whether this hit can push puzzle elements like rolling balls, push/pull blocks, etc.
     canPush?: boolean,
+    // Whether this can cut ground tiles like thorns.
+    cutsGround?: boolean,
     knockback?: {vx: number, vy: number, vz: number},
     // If this is set, knockback will be added as a vector from this point towards the hit target.
     knockAwayFrom?: {x: number, y: number},

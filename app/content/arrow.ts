@@ -191,6 +191,7 @@ export class Arrow implements ObjectInstance {
     getHitProperties(state: GameState): HitProperties {
         return {
             canPush: true,
+            direction: this.direction,
             damage: this.damage,
             hitbox: this,
             vx: this.vx,
@@ -282,6 +283,7 @@ export class EnemyArrow extends Arrow {
         return {
             canPush: false,
             damage: this.damage,
+            direction: this.direction,
             hitbox: this,
             vx: this.vx,
             vy: this.vy, element:

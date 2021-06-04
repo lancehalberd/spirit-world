@@ -24,6 +24,7 @@ export class TippableObject implements ObjectInstance {
         destructible: true,
         solid: true,
     };
+    isNeutralTarget = true;
     drawPriority: DrawPriority = 'sprites';
     definition = null;
     x: number;

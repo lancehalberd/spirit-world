@@ -55,15 +55,24 @@ export function updateWaterSurfaceCanvas(state: GameState): void {
     context.save();
         context.clearRect(0, 0, underwaterArea.waterSurfaceCanvas.width, underwaterArea.waterSurfaceCanvas.height);
         //context.globalAlpha = 0.3;
-        context.fillStyle = gradient;
         for (let y = 0; y < surfaceArea.behaviorGrid?.length; y++) {
             for (let x = 0; x < surfaceArea.behaviorGrid[y]?.length; x++) {
                 if (surfaceArea.behaviorGrid[y][x]?.water) {
-                    context.save();
-                        context.translate((x + 0.5) * 16 / waterSurfaceGranularity, (y + 0.5) * 16 / waterSurfaceGranularity);
-                        context.scale(1 / waterSurfaceGranularity, 1 / waterSurfaceGranularity);
-                        context.fillRect(-8, -24, 16, 32);
-                    context.restore();
+                    if (surfaceArea.behaviorGrid[y - 1]?.[x]?.water) {
+                        context.fillStyle = 'rgba(255, 255, 255, 0.1)';
+                        context.save();
+                            context.translate((x + 0.5) * 16 / waterSurfaceGranularity, (y + 0.5) * 16 / waterSurfaceGranularity);
+                            context.scale(1 / waterSurfaceGranularity, 1 / waterSurfaceGranularity);
+                            context.fillRect(-8, -8, 16, 16);
+                        context.restore();
+                    } else {
+                        context.fillStyle = gradient;
+                        context.save();
+                            context.translate((x + 0.5) * 16 / waterSurfaceGranularity, (y + 0.5) * 16 / waterSurfaceGranularity);
+                            context.scale(1 / waterSurfaceGranularity, 1 / waterSurfaceGranularity);
+                            context.fillRect(-8, -24, 16, 32);
+                        context.restore();
+                    }
                 }
             }
         }

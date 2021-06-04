@@ -391,12 +391,12 @@ const f1_1x0: AreaDefinition = {
     ],
     objects: [
         {status: "normal", id: "riverTempleWaterStairs", x: 416, y: 0, type: "door", style: "cave", targetZone: "riverTempleWater", targetObjectId: "riverTempleWaterStairs", d: "up", saveStatus: undefined},
-        {status: "normal", id: "", x: 224, y: 368, type: "door", style: "cave", targetZone: "riverTempleWater", targetObjectId: "riverTempleWaterStairs", d: "right", saveStatus: undefined},
-        {status: "normal", id: "", x: 112, y: 256, type: "door", style: "cave", targetZone: "riverTempleWater", targetObjectId: "riverTempleWaterStairs", d: "up", saveStatus: undefined},
-        {status: "normal", id: "", x: 256, y: 368, type: "door", style: "cave", targetZone: "riverTempleWater", targetObjectId: "riverTempleWaterStairs", d: "left", saveStatus: undefined},
-        {status: "normal", id: "", x: 368, y: 256, type: "door", style: "cave", targetZone: "riverTempleWater", targetObjectId: "riverTempleWaterStairs", d: "up", saveStatus: undefined},
-        {status: "normal", id: "", x: 368, y: 224, type: "door", style: "cave", targetZone: "riverTempleWater", targetObjectId: "riverTempleWaterStairs", d: "down", saveStatus: undefined},
-        {status: "normal", id: "", x: 112, y: 224, type: "door", style: "cave", targetZone: "riverTempleWater", targetObjectId: "riverTempleWaterStairs", d: "down", saveStatus: undefined},
+        {status: "normal", id: "", x: 224, y: 368, type: "door", style: "cave", d: "right", saveStatus: undefined},
+        {status: "normal", id: "", x: 112, y: 256, type: "door", style: "cave", d: "up", saveStatus: undefined},
+        {status: "normal", id: "", x: 256, y: 368, type: "door", style: "cave", d: "left", saveStatus: undefined},
+        {status: "normal", id: "", x: 368, y: 256, type: "door", style: "cave", d: "up", saveStatus: undefined},
+        {status: "normal", id: "", x: 368, y: 224, type: "door", style: "cave", d: "down", saveStatus: undefined},
+        {status: "normal", id: "", x: 112, y: 224, type: "door", style: "cave", d: "down", saveStatus: undefined},
         {status: "normal", id: "", x: 192, y: 176, saveStatus: undefined, type: "airBubbles"},
     ],
     sections: [
