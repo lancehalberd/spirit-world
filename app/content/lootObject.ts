@@ -90,6 +90,9 @@ const equipBootsMessage = '{|}Press {B_MENU} to open your menu.'
     + '{|}Select boots and press {B_WEAPON} to equip them.'
     + '{|}Press {B_WEAPON} again to unequip them.';
 
+const equipElementMessage = '{|}Press {B_PREVIOUS_ELEMENT}/{B_NEXT_ELEMENT} to switch elements.'
+    + '{|}The equipped element will be applied any time you charge an attack.';
+
 function showLootMessage(state: GameState, lootType: LootType, lootLevel?: number, lootAmount?: number): void {
     switch (lootType) {
         case 'ironBoots':
@@ -207,11 +210,30 @@ function showLootMessage(state: GameState, lootType: LootType, lootLevel?: numbe
                 + '{|}Teleportation consumes spirit energy, stand still to recover'
                 + '{|}Use teleportation to move past obstacles in the Real World.');
         case 'fire':
+            return showMessage(state, 'You have received the Fire Element!'
+                + equipElementMessage
+                + '{|}Fire can be used to light torches and melt ice.');
         case 'ice':
+            return showMessage(state, 'You have received the Ice Element!'
+                + equipElementMessage
+                + '{|}Ice can be used to freeze objects and enemies.');
         case 'lightning':
-            return showMessage(state, 'You found a new element!'
-                + '{|}Press {B_PREV_ELEMENT}/{B_NEXT_ELEMENT} to switch elements.'
-                + '{|}Changing your element has no effect for now.');
+            return showMessage(state, 'You have received the Lightning Element!'
+                + equipElementMessage
+                + '{|}Lightning stuns enemies and activates some objects.');
+        case 'fireBlessing':
+            return showMessage(state, 'You have received the Blessing of Fire!'
+                + 'Burning hot rooms will no longer damage you.');
+        case 'waterBlessing':
+            return showMessage(state, 'You have received the Blessing of Water!'
+                + 'Being underwater will no longer drain your spirit energy or damage you.');
+        case 'bow':
+            if (state.hero.activeTools.bow === 1) {
+                return showMessage(state, 'You found the Bow!' + equipToolMessage
+                    + '{|}Press {B_TOOL} to shoot a magic arrow.'
+                    + '{|}Use the bow to hit distant enemies and objects.');
+            }
+            return;
         case 'money':
             return showMessage(state, `You found ${lootAmount || 1} Jade!`);
     }
@@ -428,45 +450,59 @@ function createLootFrame(color: string, letter: string): Frame {
     return {image: toolCanvas, x: 0, y: 0, w: toolCanvas.width, h: toolCanvas.height};
 }
 
-const [
-    invisibilityFrame,
-    catEyes, spiritSightFrame, /*fullPeachFrame*/, goldPeachFrame, /*rollFrame*/,
+export const [
+    /*fullPeachFrame*/, goldPeachFrame,
     keyOutlineFrame, bigKeyOutlineFrame,
-    /*keyFrame*/, /*bigKeyFrame*/,
-    /*bowFrame*/, bowOutlineFrame,
-    /*scroll1*/, /*scroll1*/, mistScrollFrame,
-    /*threeCloneFrame*/, twoCloneFrame, gloveFrame
+    bowOutlineFrame, mistScrollFrame,
+    spiritSightFrame,
+    catEyes,
+    twoCloneFrame, threeCloneFrame, /* fourCloneFrame */,
+    invisibilityFrame,
+    /* bracelet */, gloveFrame,
+    normalBoots, ironBoots, cloudBoots,
+    circlet, phoenixCrown,
+    teleportFrame, /* teleportFrame2 */,
+    treeStaff, towerStaff,
 ] = createAnimation('gfx/hud/icons.png',
-    {w: 18, h: 18, content: {x: 1, y: 1, w: 16, h: 16}}, {cols: 18}
+    {w: 18, h: 18, content: {x: 1, y: 1, w: 16, h: 16}}, {cols: 23}
 ).frames;
+export const [
+    /* container */, fireElement, iceElement, lightningElement, neutralElement, /* elementShine */
+] = createAnimation('gfx/hud/elementhud.png',
+    {w: 20, h: 20, content: {x: 2, y: 2, w: 16, h: 16}}, {cols: 6}
+).frames;
+
 
 const lootFrames: Partial<{[key in LootType]: Frame}> = {
     smallKey: keyOutlineFrame,
-    fire: createLootFrame('red', 'FIR'),
-    ice: createLootFrame('08F', 'ICE'),
-    lightning: createLootFrame('#A80', 'LIT'),
+    fire: fireElement,
+    ice: iceElement,
+    lightning: lightningElement,
     // Summoner's Circlet.
-    astralProjection: createLootFrame('blue', 'SC'),
+    astralProjection: circlet,
+    phoenixCrown: phoenixCrown,
     bigKey: bigKeyOutlineFrame,
     bow: bowOutlineFrame,
     catEyes: catEyes,
-    charge: createLootFrame('red', 'CH'),
+    charge: neutralElement,
     clone: twoCloneFrame,
     invisibility: invisibilityFrame,
     trueSight: createLootFrame('blue', 'TS'),
     gloves: gloveFrame,
     roll: mistScrollFrame,
-    staff: createLootFrame('red', 'ST'),
+    staff: treeStaff,
     peach: smallPeachFrame,
     peachOfImmortality: goldPeachFrame,
     peachOfImmortalityPiece: peachPieceFrame,
     // Spirit Eyes
     spiritSight: spiritSightFrame,
-    teleportation: createLootFrame('blue', 'TE'),
+    teleportation: teleportFrame,
     unknown: createLootFrame('black', '?'),
     empty: createLootFrame('grey', '--'),
-    ironBoots: createLootFrame('grey', 'IB'),
-    cloudBoots: createLootFrame('grey', 'CB'),
+    ironBoots: ironBoots,
+    cloudBoots: cloudBoots,
+    fireBlessing: createLootFrame('red', 'Fir'),
+    waterBlessing: createLootFrame('blue', 'Wat'),
     weapon: weaponFrame,
 };
 

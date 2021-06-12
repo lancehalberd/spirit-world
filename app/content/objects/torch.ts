@@ -29,7 +29,7 @@ export class Torch implements ObjectInstance {
         this.x = definition.x;
         this.y = definition.y;
         this.status = this.definition.status;
-        if (state.savedState.objectFlags[this.definition.id]) {
+        if (this.definition.id && state.savedState.objectFlags[this.definition.id]) {
             this.status = 'active';
         }
         if (this.status === 'active') {

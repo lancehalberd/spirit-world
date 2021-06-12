@@ -9,6 +9,7 @@ Low Priority Bugs:
     - Doors don't appear open when moving into them from a different section
         I think this is because the door doesn't update until it is in the current areaInstance
     - nextAreaInstance is not rendered in Safari
+    - frost grenade blast isn't centered.
 
 High Priority Bugs:
     Sometimes can't enter peach cave when sliding on ice?
@@ -28,40 +29,6 @@ Current tasks:
             - Double damage
             - Add equipped element
 
-    - River Temple Rough Draft.
-        - Add upper floor paths
-        - Add Big Key Chest + Big Chest with water blessing
-        - Add ice barrier that can be destroyed with fire element, link paired barriers on doors together or place them with space to stand inside the door.
-        - Add placeholder ice boss heart
-            - Underwater can be hurt by anything
-        - Underwater Large snake that circles you then pauses and charges at you
-            - revived after 10s if the heart is still alive.
-            - revived one last time when the heart is destroyed and becomes enraged
-        - On surface periodically breaks the ice under the player with a tell, knocking them back and damaging them, then attacks the player with a series of ice attacks
-    - Decided what to work on next.
-    - Increase range of frost beetles, figure out why frost grenade centers don't match blast center.
-    - Do a run through to check for bugs + push latest version.
-
-River Temple:
-    - Half under water, half over water
-    - Surface entrance becomes accessible when the lake is frozen by using the fire element
-    - Under water entrance is accessible using iron boots from peach cave
-    - Boss is hydra with ice carapace that can be defeated using either fire element or iron boots to attack under water
-    - Boss breaks holes in ice by sticking heads out to attack. Player can use the holes to get under the ice.
-    - Boss refreezes shell and surface periodically or when damaged enough.
-    - Boss can't use ice attacks under the water, but the player has worse mobility as well.
-    - Some underwater enemies
-    - Some crab enemies with ice shells that require fire element to defeat
-    - Underwater floors and surface floors full of ice, at least one place to transition without fire element
-    - Temple unfreezes when boss is defeated
-    - Varuna's Blessing allows you to breathe under water, but can only be obtained after beating the boss or with the fire element.
-    - Beating boss with Fire element, iron boots and varuna's blessing is much easier than beating it with just fire element or iron boots.
-    - No NPCs here, this was the old Fertility Temple, but it was destroyed by the Varuna Ship crashing. The survivors all moved to the new Fertility Temple near the forest (Forest Temple).
-
-
-Cloud Boots:
-    - Allow running over clouds (when implemented)
-    - Maybe make falling in the sky behave like falling in a pit where you reset to safe location rather than falling to the overworld?
 
 High level list of things left to do:
     New dungeons(need enemies, mechanics, bosses, entrances):
@@ -94,8 +61,8 @@ High level list of things left to do:
         Invis Level 2
         Invis charge 1 + 2
         Clone charge 1 + 2
-        fire, ice, lightning elements
-        cloud boots
+        Cloud boots: walking on clouds
+        Fire Blessing
         True Sight
         Iron Skin (slowly regenerates health shield = 20% total health)
         Gold Mail (reduce damage by 50%)
@@ -105,6 +72,9 @@ Add toasts to development for undoing actions:
     - Deleting layers
     - Replacing > 100 tiles
 
+Cloud Boots:
+    - Allow running over clouds (when implemented)
+    - Maybe make falling in the sky behave like falling in a pit where you reset to safe location rather than falling to the overworld?
 
 Difficulty shrine:
     - 50 money per point
@@ -126,6 +96,7 @@ Charge Chakram Attack:
 
 At some point I should write tests to validate certain things like:
     - All zone+object targets are defined.
+    - All bombable + locked doors have ids, all objects with saveStatus set have ids.
     - All objectFlags correspond to some object or dialogue key or loot type
     - All escaped dialogue corresponds to a special frame or loot type.
 
@@ -155,11 +126,14 @@ Dungeon 1 Improvements:
     - Update wall laser graphics+behavior to actuall shoot lasers + be mounted on walls.
     - Update arrow turret graphics.
 
-Dungeon 2 Improvments:
+Dungeon 2 Improvements:
     - Add more uses of spirit sight:
         - See actual elemental beasts in the front room where the statues are located.
         - Some kind of optional spirit sight puzzle for a peach piece.
 
+River Temple Improvements:
+    - Some underwater enemies
+    - Some crab enemies with ice shells that require fire element to defeat
 
 
 Multi-area Boss ideas:
@@ -334,3 +308,7 @@ Dungeon 3: Cocoon (Vanara Regeneration Unit)
     - Big Chest: Invisibility Technique
     - Boss:
     - Boss Reward: Teleportation (body moves to astral projection when pressing either tool button)
+
+
+River Temple:
+    - No NPCs here, this was the old Fertility Temple, but it was destroyed by the Varuna Ship crashing. The survivors all moved to the new Fertility Temple near the forest (Forest Temple).

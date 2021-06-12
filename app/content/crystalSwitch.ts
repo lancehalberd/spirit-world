@@ -38,7 +38,7 @@ export class CrystalSwitch implements ObjectInstance {
         this.definition = definition;
         this.x = definition.x;
         this.y = definition.y;
-        if (state.savedState.objectFlags[this.definition.id]) {
+        if (this.definition.id && state.savedState.objectFlags[this.definition.id]) {
             this.status = 'active';
         }
     }
@@ -53,7 +53,7 @@ export class CrystalSwitch implements ObjectInstance {
     }
     activate(state: GameState): void {
         this.status = 'active';
-        if (this.definition.saveStatus) {
+        if (this.definition.id && this.definition.saveStatus) {
             state.savedState.objectFlags[this.definition.id] = true;
             saveGame();
         }
@@ -110,6 +110,20 @@ export class CrystalSwitch implements ObjectInstance {
             }*/
         } else {
             drawFrame(context, crystalFrame, target);
+        }
+        if (this.definition.element) {
+            context.save();
+                context.globalAlpha *= 0.8;
+                context.beginPath();
+                context.fillStyle = {fire: 'red', ice: '#08F', lightning: 'yellow'}[this.definition.element];
+                context.arc(
+                    this.x + 8,
+                    this.y + 2,
+                    2,
+                    0, 2 * Math.PI
+                );
+                context.fill();
+            context.restore();
         }
     }
 }

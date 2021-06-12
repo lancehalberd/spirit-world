@@ -427,7 +427,10 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                 rows.push({
                     name: 'status',
                     value: object.status,
-                    values: ['normal', 'closed', 'closedEnemy', 'closedSwitch', 'locked', 'bigKeyLocked', 'cracked', 'blownOpen'],
+                    values: [
+                        'normal', 'closed', 'closedEnemy', 'closedSwitch', 'locked', 'bigKeyLocked', 'cracked', 'blownOpen',
+                        'frozen',
+                    ],
                     onChange(status: ObjectStatus) {
                         object.status = status;
                         updateObjectInstance(state, object);

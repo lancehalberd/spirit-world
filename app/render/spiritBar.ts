@@ -22,11 +22,17 @@ const [
 ] =
     createAnimation('gfx/hud/magicbar.png', {w: 16, h: 16}, {cols: 9}).frames;
 
+export const [
+    elementContainer , fireElement, iceElement, lightningElement, neutralElement, elementShine
+] = createAnimation('gfx/hud/elementhud.png',
+    {w: 20, h: 20}, {cols: 6}
+).frames;
+
 // This frame needs to have the exact height+y set on it so that it stretches verically correctly.
 spiritFill.y = 13;
 spiritFill.h = 1;
 
-const [spiritBarFrameCanvas, spiritBarFrameContext] = createCanvasAndContext(16, 100 + 32);
+const [spiritBarFrameCanvas, spiritBarFrameContext] = createCanvasAndContext(20, 100 + 32);
 const spiritFrame: Frame = {
     image: spiritBarFrameCanvas,
     x: 0, y: 0,
@@ -40,18 +46,22 @@ function updateSpiritBarFrame(state: GameState): void {
     const context = spiritBarFrameContext;
     lastFrameHeight = state.hero.maxMagic;
     context.clearRect(0, 0, spiritFrame.w, spiritFrame.h);
-    drawFrame(context, barBack, {...barBack, x: 0, y: topCap.h, h: lastFrameHeight});
-    drawFrame(context, topCap, {...topCap, x: 0, y: 0});
-    drawFrame(context, topBar, {...topBar, x: 0, y: topCap.h});
-    drawFrame(context, bottomCap, {...bottomCap, x: 0, y: topCap.h + lastFrameHeight});
-    drawFrame(context, bottomBar, {...bottomBar, x: 0, y: topCap.h + lastFrameHeight - bottomBar.h});
+    drawFrame(context, barBack, {...barBack, x:2, y: topCap.h, h: lastFrameHeight});
+    drawFrame(context, topCap, {...topCap, x: 2, y: 0});
+    drawFrame(context, topBar, {...topBar, x: 2, y: topCap.h});
+    drawFrame(context, bottomBar, {...bottomBar, x: 2, y: topCap.h + lastFrameHeight - bottomBar.h});
+    if (state.hero.passiveTools.charge > 0) {
+        drawFrame(context, elementContainer, {...elementContainer, x: 0, y: topCap.h + lastFrameHeight});
+    } else {
+        drawFrame(context, bottomCap, {...bottomCap, x: 2, y: topCap.h + lastFrameHeight});
+    }
 }
 
 export function renderSpiritBar(context: CanvasRenderingContext2D, state: GameState): void {
     context.fillStyle = 'black';
     updateSpiritBarFrame(state);
     const x = 5, y = 5;
-    drawFrame(context, spiritFrame, {...spiritFrame, x, y});
+    drawFrame(context, spiritFrame, {...spiritFrame, x: x - 2, y});
     const barHeight = state.hero.maxMagic;
     if (state.hero.magic > 0) {
         drawFrame(context, spiritBottom, {...spiritBottom, x, y: y + topCap.h + barHeight - spiritBottom.h + 1});
@@ -67,21 +77,23 @@ export function renderSpiritBar(context: CanvasRenderingContext2D, state: GameSt
         }
     }
     if (state.hero.passiveTools.charge) {
-        let elementColor = '#AAA';
+        let elementFrame = neutralElement;
         if (state.hero.element === 'fire') {
-            elementColor = '#F00';
+            elementFrame = fireElement;
         } else if (state.hero.element === 'ice') {
-            elementColor = '#AAF';
+            elementFrame = iceElement;
         } else if (state.hero.element === 'lightning') {
-            elementColor = '#FF8';
+            elementFrame = lightningElement;
         }
-        context.save();
+        drawFrame(context, elementFrame, {...elementFrame, x: x - 2, y: y + topCap.h + barHeight});
+        drawFrame(context, elementShine, {...elementShine, x: x - 2, y: y + topCap.h + barHeight});
+        /*context.save();
             context.globalAlpha = 0.6;
             context.fillStyle = (state.hero.action === 'charging' && state.time % 200 < 100) ? 'white' : elementColor;
             context.beginPath();
             context.arc(x + 8, y + topCap.h + barHeight + 6, 10,0, 2 * Math.PI);
             context.fill();
-        context.restore();
+        context.restore();*/
 
     }
 

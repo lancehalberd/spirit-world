@@ -20,7 +20,7 @@ import { getDirection, hitTargets } from 'app/utils/field';
 import { AreaInstance, Enemy, GameState, HitProperties, HitResult } from 'app/types';
 
 
-const peachAnimation = createAnimation('gfx/hud/icons.png', {w: 18, h: 18, content: {x: 1, y: 1, w: 16, h: 16}}, {x: 3});
+const peachAnimation = createAnimation('gfx/hud/icons.png', {w: 18, h: 18, content: {x: 1, y: 1, w: 16, h: 16}}, {x: 0});
 const peachAnimations = {
     idle: {
         up: peachAnimation,
@@ -126,9 +126,23 @@ function updateFrostHeart(this: void, state: GameState, enemy: Enemy): void {
         enemy.shielded = false;
         return;
     }
+    enemy.shielded = enemy.params.shieldLife > 0;
     if (enemy.params.enrageTime > 0) {
         enemy.params.enrageTime -= FRAME_LENGTH;
-        if (enemy.modeTime % 100 == 0) {
+        if (enemy.params.enrageTime < 3000) {
+            if (enemy.modeTime % 600 === 0) {
+                const hitbox = enemy.getHitbox(state);
+                const p = 1 + (3000 - enemy.params.enrageTime) / 600;
+                for (let t = 0; t < 12; t++) {
+                    const theta = 2 * Math.PI * (t + p / 2) / 12;
+                    throwIceGrenadeAtLocation(state, enemy, {
+                        tx: hitbox.x + hitbox.w / 2 + 2.5 * 16 * p * Math.cos(theta),
+                        ty: hitbox.y + hitbox.h / 2 + 2.5 * 16 * p * Math.sin(theta),
+                    }, 2);
+                }
+                enemy.params.shieldLife = Math.min(8, enemy.params.shieldLife + 1);
+            }
+        } else if (enemy.modeTime % 200 === 0) {
             const theta = 2 * Math.PI * Math.random();
             throwIceGrenadeAtLocation(state, enemy, {
                 tx: state.hero.x + state.hero.w / 2 + 16 * Math.cos(theta),
@@ -138,19 +152,17 @@ function updateFrostHeart(this: void, state: GameState, enemy: Enemy): void {
         }
         return;
     }
-    enemy.shielded = enemy.params.shieldLife > 0;
     let chargeRate = 20;
-    if (enemy.life < 16) chargeRate += 10;
-    if (enemy.life < 10) chargeRate += 10;
+    if (enemy.life < 12) chargeRate += 10;
     if (enemy.life < 8) chargeRate += 20;
     if (enemy.life <= 10 && enemy.params.enrageLevel === 0) {
         enemy.params.enrageLevel = 1;
-        enemy.params.enrageTime = 4000;
+        enemy.params.enrageTime = 5000;
         enemy.params.shieldLife++;
         enemy.modeTime = 0;
     } else if (enemy.life <= 4 && enemy.params.enrageLevel === 1) {
         enemy.params.enrageLevel = 2;
-        enemy.params.enrageTime = 6000;
+        enemy.params.enrageTime = 7000;
         enemy.params.shieldLife++;
         enemy.modeTime = 0;
     }
@@ -215,7 +227,7 @@ function updateFrostSerpent(this: void, state: GameState, enemy: Enemy): void {
     }
     enemy.params.active = true;
     const heart = getFrostHeart(state, enemy.area);
-    const isEnraged = !heart || heart.life <= 1;
+    const isEnraged = isEnemyDefeated(heart);
     if (!isEnraged) {
         if (enemy.mode === 'regenerate') {
             if (enemy.modeTime % 500 === 0) {

@@ -13,11 +13,13 @@ const [coin] =
     createAnimation('gfx/hud/money.png', {w: 16, h: 16}, {x: 9}).frames;
 
 const [keyFrame, bigKeyFrame] = createAnimation('gfx/hud/icons.png',
-    {w: 18, h: 18, content: {x: 1, y: 1, w: 16, h: 16}}, {x: 8, cols: 2}
+    {w: 18, h: 18, content: {x: 1, y: 1, w: 16, h: 16}}, {x: 2, cols: 2}
 ).frames;
 
-const yellowFrame = createAnimation('gfx/hud/toprighttemp1.png', {w: 22, h: 22}).frames[0];
-const blueFrame = createAnimation('gfx/hud/toprighttemp2.png', {w: 22, h: 22}).frames[0];
+const frameSize = 24;
+
+const yellowFrame = createAnimation('gfx/hud/toprighttemp1.png', {w: frameSize, h: frameSize}).frames[0];
+const blueFrame = createAnimation('gfx/hud/toprighttemp2.png', {w: frameSize, h: frameSize}).frames[0];
 
 export function renderHUD(context: CanvasRenderingContext2D, state: GameState): void {
     let x = 26;
@@ -43,15 +45,15 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
     }
     const dungeonInventory = state.savedState.dungeonInventories[state.location.zoneKey];
     if (dungeonInventory?.bigKey) {
-        drawFrameAt(context, bigKeyFrame, {x: CANVAS_WIDTH - 21, y: 26});
+        drawFrameAt(context, bigKeyFrame, {x: CANVAS_WIDTH - 21, y: 28});
     }
     for (let i = 0; i < dungeonInventory?.smallKeys; i++) {
-        drawFrameAt(context, keyFrame, {x: CANVAS_WIDTH - 14 - 4 * i, y: 30});
+        drawFrameAt(context, keyFrame, {x: CANVAS_WIDTH - 14 - 4 * i, y: 32});
     }
     renderSpiritBar(context, state);
 
     let frame = getLootFrame({lootType: state.hero.leftTool, lootLevel: state.hero.activeTools[state.hero.leftTool]});
-    let target = {w: 22, h: 22, x: CANVAS_WIDTH - 48, y: 4};
+    let target = {w: frameSize, h: frameSize, x: CANVAS_WIDTH - 50, y: 4};
     //fillRect(context, pad(target, 2), LEFT_TOOL_COLOR);
     //fillRect(context, target, 'black');
     drawFrameAt(context, blueFrame, target);
@@ -59,7 +61,7 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
         drawFrameCenteredAt(context, frame, target)
     }
     frame = getLootFrame({lootType: state.hero.rightTool, lootLevel: state.hero.activeTools[state.hero.rightTool]});
-    target = {w: 22, h: 22, x: CANVAS_WIDTH - 24, y: 4};
+    target = {w: frameSize, h: frameSize, x: CANVAS_WIDTH - 25, y: 4};
     //fillRect(context, pad(target, 2), RIGHT_TOOL_COLOR);
     //fillRect(context, target, 'black');
     drawFrameAt(context, yellowFrame, target);

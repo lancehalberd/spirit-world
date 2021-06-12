@@ -57,7 +57,7 @@ export interface ObjectInstance {
 
 export type ObjectStatus = 'active' | 'closed' | 'closedEnemy' | 'closedSwitch'
     | 'gone' | 'hidden' | 'hiddenSwitch' | 'hiddenEnemy' | 'normal'
-    | 'locked' | 'bigKeyLocked' | 'cracked' | 'blownOpen';
+    | 'locked' | 'bigKeyLocked' | 'cracked' | 'blownOpen' | 'frozen';
 
 export interface MovementProperties {
     boundToSection?: boolean,
@@ -135,6 +135,7 @@ export interface BaseObjectDefinition {
     // Stores optional style type for some objects, e.g., 'short' vs 'tall' signs.
     style?: string,
     status: ObjectStatus,
+    isFrozen?: boolean,
     x: number,
     y: number,
     d?: Direction,

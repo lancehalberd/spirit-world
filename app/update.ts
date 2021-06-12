@@ -212,6 +212,9 @@ function updateMenu(state: GameState) {
     if(!selectableTools.length && state.menuRow === 0) {
         state.menuRow = 1;
     }
+    if(!state.hero.passiveTools.charge && state.menuRow === 2) {
+        state.menuRow = 1;
+    }
     if (state.menuRow === 0) {
         // The first row is for selecting tools.
         const selectedTool = selectableTools[state.menuIndex];

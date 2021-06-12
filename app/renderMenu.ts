@@ -1,4 +1,4 @@
-import { getLootFrame } from 'app/content/lootObject';
+import { getLootFrame, normalBoots, neutralElement } from 'app/content/lootObject';
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
 import { createAnimation, drawFrame, drawFrameCenteredAt } from 'app/utils/animations';
 import { fillRect, pad } from 'app/utils/index';
@@ -11,9 +11,10 @@ const MARGIN = 20;
 const [, fullPeach, threeQuartersPeach, halfPeach, quarterPeach] =
     createAnimation('gfx/hud/peaches.png', {w: 18, h: 18}, {cols: 3, rows: 2}).frames;
 
-const yellowFrame = createAnimation('gfx/hud/toprighttemp1.png', {w: 22, h: 22}).frames[0];
-const blueFrame = createAnimation('gfx/hud/toprighttemp2.png', {w: 22, h: 22}).frames[0];
-const cursor = createAnimation('gfx/hud/cursortemp.png', {w: 22, h: 22}).frames[0];
+const frameSize = 24;
+const yellowFrame = createAnimation('gfx/hud/toprighttemp1.png', {w: frameSize, h: frameSize}).frames[0];
+const blueFrame = createAnimation('gfx/hud/toprighttemp2.png', {w: frameSize, h: frameSize}).frames[0];
+const cursor = createAnimation('gfx/hud/cursortemp.png', {w: frameSize, h: frameSize}).frames[0];
 
 const menuSlices = createAnimation('gfx/hud/menu9slice.png', {w: 8, h: 8}, {cols: 3, rows: 3}).frames;
 
@@ -49,7 +50,7 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
     const selectableItemFrames = [];
     function renderSelectableTool(tool: ActiveTool): void {
         const frame = getLootFrame({ lootType: tool, lootLevel: state.hero.activeTools[tool] });
-        const target = {w: 22, h: 22, x, y};
+        const target = {w: frameSize, h: frameSize, x, y};
         if (state.hero.leftTool === tool) {
             drawFrame(context, blueFrame, target);
         }
@@ -80,12 +81,12 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
 
     if (state.hero.weapon) {
         const frame = getLootFrame({ lootType: 'weapon', lootLevel: state.hero.weapon });
-        drawFrameCenteredAt(context, frame, {x, y, w: 22, h: 22});
+        drawFrameCenteredAt(context, frame, {x, y, w: frameSize, h: frameSize});
     }
 
     function renderBoots(equipment: Equipment): void {
         const frame = getLootFrame({ lootType: equipment, lootLevel: state.hero.equipment[equipment] });
-        const target = {w: 22, h: 22, x, y};
+        const target = {w: frameSize, h: frameSize, x, y};
         if (state.hero.equipedGear[equipment]) {
             fillRect(context, target, 'white');
             fillRect(context, pad(target, -2), 'black');
@@ -96,10 +97,14 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
         }
     }
 
-    x = r.x, y += 24;
-    let frame = getLootFrame({ lootType: 'empty' });
-    let target = {x, y, w: 22, h: 22};
-    fillRect(context, target, 'black');
+    x = r.x, y += frameSize + 2;
+    let frame = normalBoots;
+    let target = {x, y, w: frameSize, h: frameSize};
+    //fillRect(context, target, 'black');
+    if (!state.hero.equipedGear.ironBoots && !state.hero.equipedGear.cloudBoots) {
+        fillRect(context, target, 'white');
+        fillRect(context, pad(target, -2), 'black');
+    }
     drawFrameCenteredAt(context, frame, target);
     if (state.menuRow === 1) {
         selectableItemFrames.push(target);
@@ -121,7 +126,7 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
 
     function renderElement(element: MagicElement): void {
         const frame = getLootFrame({ lootType: element, lootLevel: state.hero.elements[element] });
-        const target = {w: 22, h: 22, x, y};
+        const target = {w: frameSize, h: frameSize, x, y};
         if (state.hero.element === element) {
             fillRect(context, target, 'white');
             fillRect(context, pad(target, -2), 'black');
@@ -132,11 +137,17 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
         }
     }
 
-    x = r.x, y += 24;
-    frame = getLootFrame({ lootType: 'empty' });
-    target = {x, y, w: 22, h: 22};
-    fillRect(context, target, 'black');
-    drawFrameCenteredAt(context, frame, target);
+    x = r.x, y += frameSize + 2;
+    if (state.hero.passiveTools.charge > 0) {
+        frame = neutralElement;
+        target = {x, y, w: frameSize, h: frameSize};
+        //fillRect(context, target, 'black');
+        if (!state.hero.element) {
+            fillRect(context, target, 'white');
+            fillRect(context, pad(target, -2), 'black');
+        }
+        drawFrameCenteredAt(context, frame, target);
+    }
     if (state.menuRow === 2) {
         selectableItemFrames.push(target);
     }
@@ -162,16 +173,19 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
     x = r.x, y += 30;
     function renderLoot(lootType: LootType, lootLevel: number): void {
         const frame = getLootFrame({ lootType, lootLevel });
-        drawFrameCenteredAt(context, frame, {x, y, w: 22, h: 22});
+        drawFrameCenteredAt(context, frame, {x, y, w: frameSize, h: frameSize});
         x += 30;
         if (x + 30 >= r.x + r.w) {
-            y += 24;
+            y += 22;
             x = r.x
         }
     }
 
 
     for (let key in state.hero.passiveTools) {
+        if (key === 'charge') {
+            continue;
+        }
         if (state.hero.passiveTools[key] > 0) {
             renderLoot(key as LootType, state.hero.passiveTools[key]);
         }

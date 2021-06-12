@@ -12,7 +12,7 @@ import { directionMap, getDirection } from 'app/utils/field';
 import { boxesIntersect, isObjectInsideTarget, isPointInShortRect } from 'app/utils/index';
 
 import {
-    AreaInstance, Direction, DrawPriority, Frame, GameState, ObjectInstance,
+    AreaInstance, Direction, DrawPriority, Frame, GameState, HitProperties, HitResult, ObjectInstance,
     ObjectStatus, EntranceDefinition, ShortRectangle, TileBehaviors,
 } from 'app/types';
 
@@ -195,6 +195,7 @@ export class Door implements ObjectInstance {
     area: AreaInstance;
     drawPriority: DrawPriority = 'background';
     definition: EntranceDefinition = null;
+    isNeutralTarget = true;
     x: number;
     y: number;
     status: ObjectStatus = 'normal';
@@ -205,7 +206,7 @@ export class Door implements ObjectInstance {
         this.y = definition.y;
         this.status = definition.status || 'normal';
         // If the player already opened this door, set it to the appropriate open status.
-        if (state.savedState.objectFlags[this.definition.id]) {
+        if (this.definition.id && state.savedState.objectFlags[this.definition.id]) {
             if (this.status === 'cracked') {
                 this.status = 'blownOpen';
             } else {
@@ -225,7 +226,7 @@ export class Door implements ObjectInstance {
         if (this.linkedObject && this.linkedObject.status !== status) {
             this.linkedObject.changeStatus(state, status);
         }
-        if (this.status === 'normal' && this.definition.saveStatus) {
+        if (this.definition.id && this.status === 'normal' && this.definition.saveStatus) {
             state.savedState.objectFlags[this.definition.id] = true;
             saveGame();
         }
@@ -293,7 +294,12 @@ export class Door implements ObjectInstance {
             return false;
         }
         this.changeStatus(state, 'normal');
-        state.savedState.objectFlags[this.definition.id] = true;
+        if (this.definition.id) {
+            state.savedState.objectFlags[this.definition.id] = true;
+        } else {
+            console.error('Locked door was missing an id', this);
+            debugger;
+        }
         // Unlock the other half of this door if it is in this super tile.
         for (const object of this.area.objects) {
             if (object?.definition?.type === 'door' && object?.definition.id === this.definition.id) {
@@ -310,6 +316,16 @@ export class Door implements ObjectInstance {
                 state.hero.action = null;
             }
         }
+    }
+    onHit(state: GameState, hit: HitProperties): HitResult {
+        if (this.status === 'frozen') {
+            if (hit.element === 'fire') {
+                this.changeStatus(state, 'normal');
+                return { hit: true };
+            }
+            return { hit: true, blocked: true };
+        }
+        return {};
     }
     // This is probably only needed by the editor since doors are not removed during gameplay.
     remove(state: GameState) {
@@ -438,6 +454,14 @@ export class Door implements ObjectInstance {
                 }
                 drawFrame(context, frame, { ...frame, x: this.x, y: this.y });
             }
+            if (this.status === 'frozen') {
+                context.save();
+                    context.globalAlpha = 0.5;
+                    context.fillStyle = 'white';
+                    context.fillRect(this.x, this.y, 32, 32);
+                context.restore();
+                return;
+            }
             if (this.status === 'normal' || state.hero.actionTarget === this) {
                 return;
             }
@@ -486,18 +510,32 @@ export class Door implements ObjectInstance {
         // This is a hack to keep this from rendering in front of the waterfall
         // for the entrance to the Waterfall Cave.
         // There is also probably an issue with this rendering in front of flying enemies.
-        if (this.definition.d === 'up' && hitbox.y + 24 < state.hero.y) {
-            return;
-        }
-        const doorStyle = doorStyles[this.style];
-        if (doorStyle[this.definition.d] && this.status !== 'cracked') {
-            let frame: Frame;
-            if (this.status === 'blownOpen') {
-                frame = doorStyle[this.definition.d].caveCeiling;
-            } else {
-                frame = doorStyle[this.definition.d].doorCeiling;
+        if (this.definition.d !== 'up' || hitbox.y + 24 >= state.hero.y) {
+            const doorStyle = doorStyles[this.style];
+            if (doorStyle[this.definition.d] && this.status !== 'cracked') {
+                let frame: Frame;
+                if (this.status === 'blownOpen') {
+                    frame = doorStyle[this.definition.d].caveCeiling;
+                } else {
+                    frame = doorStyle[this.definition.d].doorCeiling;
+                }
+                drawFrame(context, frame, { ...frame, x: this.x, y: this.y });
             }
-            drawFrame(context, frame, { ...frame, x: this.x, y: this.y });
+            if (this.status === 'frozen') {
+                context.save();
+                    context.globalAlpha = 0.5;
+                    context.fillStyle = 'white';
+                    if (this.definition.d === 'up') {
+                        context.fillRect(this.x, this.y, 32, 12);
+                    } else if (this.definition.d === 'down') {
+                        context.fillRect(this.x, this.y + 20, 32, 12);
+                    } else if (this.definition.d === 'left') {
+                        context.fillRect(this.x, this.y, 12, 32);
+                    } else if (this.definition.d === 'right') {
+                        context.fillRect(this.x + 20, this.y, 12, 32);
+                    }
+                context.restore();
+            }
         }
     }
 }

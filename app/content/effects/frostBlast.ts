@@ -16,7 +16,7 @@ interface Props {
 }
 
 const EXPANSION_TIME = 200;
-const PERSIST_TIME = 800;
+const PERSIST_TIME = 400;
 
 export class FrostBlast implements ObjectInstance, Props {
     area: AreaInstance = null;

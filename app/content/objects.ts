@@ -88,31 +88,20 @@ export function checkIfAllSwitchesAreActivated(state: GameState, area: AreaInsta
     )) {
         return;
     }
-    if (switchInstance.definition.targetObjectId) {
-        const target = findObjectInstanceById(area, switchInstance.definition.targetObjectId);
-        if (target) {
-            activateTarget(state, target);
-        }
-        return;
-    }
+
     for (const object of state.areaInstance.objects) {
+        if (switchInstance.definition.targetObjectId && object.definition?.id !== switchInstance.definition.targetObjectId) {
+            continue;
+        }
         activateTarget(state, object);
     }
 }
 
 export function deactivateTargets(state: GameState, area: AreaInstance, targetObjectId: string = null): void {
-    if (targetObjectId) {
-        const target = findObjectInstanceById(area, targetObjectId);
-        if (target.onDeactivate) {
-            target.onDeactivate(state);
-            return;
-        }
-        if (target && target.definition.status === 'closedSwitch') {
-            changeObjectStatus(state, target, 'closedSwitch');
-        }
-        return;
-    }
     for (const object of state.areaInstance.objects) {
+        if (targetObjectId && object.definition?.id !== targetObjectId) {
+            continue;
+        }
         if (object.onDeactivate) {
             object.onDeactivate(state);
             continue;

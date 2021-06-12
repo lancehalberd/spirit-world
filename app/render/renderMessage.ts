@@ -66,6 +66,10 @@ function getEscapedFrames(state: GameState, escapedToken: string): Frame[] {
             return getGameKeyFrames(GAME_KEY.PASSIVE_TOOL);
         case 'B_MENU':
             return getGameKeyFrames(GAME_KEY.MENU);
+        case 'B_PREVIOUS_ELEMENT':
+            return getGameKeyFrames(GAME_KEY.PREVIOUS_ELEMENT);
+        case 'B_NEXT_ELEMENT':
+            return getGameKeyFrames(GAME_KEY.NEXT_ELEMENT);
     }
     console.log('Unhandled escape sequence', escapedToken);
     debugger;

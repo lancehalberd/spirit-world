@@ -181,6 +181,9 @@ export class HeldChakram implements ObjectInstance {
             if (state.hero.magic > 0 && this.animationTime >= 1000) {
                 speed = 12;
                 state.hero.magic -= 10;
+                if (state.hero.element) {
+                    state.hero.magic -= 10;
+                }
                 element = state.hero.element;
             } else {
                 speed = Math.min(6, speed + this.animationTime / 100);
@@ -241,7 +244,7 @@ export class HeldChakram implements ObjectInstance {
             knockAwayFrom: { x: this.hero.x + this.hero.w / 2, y: this.hero.y + this.hero.h / 2 },
         };
         const hitResult = hitTargets(state, this.area, hit);
-        if (hitResult.hit) {
+        if (hitResult.hit && !hitResult.pierced) {
             this.hero.action = null;
             removeObjectFromArea(state, this);
             // console.log(hitResult.knockback);
