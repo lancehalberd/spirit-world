@@ -40,6 +40,13 @@ export class RollingBallObject implements ObjectInstance {
         this.stopRollingSound();
     }
     getHitbox(state: GameState): ShortRectangle {
+        // This is a little bit of a hack.
+        // When rolling, shorten the hitbox so that it doesn't the player when they
+        // are pushing into it.
+        if (this.rollDirection) {
+            const [dx, dy] = directionMap[this.rollDirection];
+            return { x: this.x + 1 + dx, y: this.y + 1 + dy, w: 14, h: 14 };
+        }
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
     onHit(state: GameState, {canPush, direction}: HitProperties): HitResult {

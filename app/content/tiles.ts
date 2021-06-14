@@ -423,6 +423,19 @@ const cloudTiles: TileSource = {
     behaviors: {'all': {cloudGround: true, defaultLayer: 'field'}, '2x4': { skipped: true },  '2x5': { skipped: true },  '3x4': { skipped: true },  '3x5': { skipped: true }},
 };
 
+
+const railsTiles: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/rails.png'), x: 0, y: 0, w: 64, h: 16},
+    behaviors: {'all': {solid: true, defaultLayer: 'field', linkedOffset: 4}},
+};
+
+const spiritRailsTiles: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/rails.png'), x: 0, y: 16, w: 64, h: 16},
+    behaviors: {'all': {solid: true, defaultLayer: 'field'}},
+};
+
 addTiles([
     // This is the empty tile.
     singleTileSource('gfx/tiles/bush.png', {defaultLayer: 'field'}, -16),
@@ -502,5 +515,7 @@ addTiles([
     bridgeVerticalTiles,
     roomFloorTiles,
     cloudTiles,
+    railsTiles,
+    spiritRailsTiles,
 ]);
 

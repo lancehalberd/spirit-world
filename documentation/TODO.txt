@@ -12,6 +12,7 @@ Low Priority Bugs:
     - frost grenade blast isn't centered.
 
 High Priority Bugs:
+    Can't get past thorns at the beginning
     Sometimes can't enter peach cave when sliding on ice?
 
 

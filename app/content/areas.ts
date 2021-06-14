@@ -59,28 +59,14 @@ export function getDefaultSpiritArea(location: ZoneLocation): AreaDefinition {
         default: true,
         parentDefinition,
         isSpiritWorld: true,
-        layers: [
-            {
-                key: 'floor',
-                grid: {
-                    // The dimensions of the grid.
-                    w: 32,
-                    h: 32,
-                    // The matrix of tiles
-                    tiles: [],
-                },
+        layers: parentDefinition.layers.map(layer => ({
+            key: layer.key,
+            grid: {
+                ...layer.grid,
+                // The matrix of tiles
+                tiles: [],
             },
-            {
-                key: 'field',
-                grid: {
-                    // The dimensions of the grid.
-                    w: 32,
-                    h: 32,
-                    // The matrix of tiles
-                    tiles: [],
-                },
-            },
-        ],
+        })),
         objects: [],
         // Spirit world sections should match their parent definition, otherwise the
         // camera will not be aligned correctly when switching back and forth.
