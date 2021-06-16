@@ -565,7 +565,9 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
             }
         }
     }
-    definition.objects.map(o => addObjectToArea(state, instance, createObjectInstance(state, o)));
+    definition.objects.filter(
+        object => isObjectLogicValid(state, object)
+    ).map(o => addObjectToArea(state, instance, createObjectInstance(state, o)));
     return instance;
 }
 
@@ -592,6 +594,20 @@ export function applyBehaviorToTile(area: AreaInstance, x: number, y: number, be
         area.behaviorGrid[y][x] = {};
     }
     area.behaviorGrid[y][x] = {...area.behaviorGrid[y][x], ...behavior};
+}
+
+export function isObjectLogicValid(state: GameState, definition: ObjectDefinition): boolean {
+    if (!definition.logicKey) {
+        return true;
+    }
+    const logic = logicHash[definition.logicKey];
+    // Logic should never be missing, so surface an error and hide the layer.
+    if (!logic) {
+        console.error('Missing logic!', definition.logicKey);
+        debugger;
+        return false;
+    }
+    return isLogicValid(state, logic, definition.invertLogic);
 }
 
 export function refreshSection(state: GameState, area: AreaInstance, section: ShortRectangle): void {
@@ -626,9 +642,11 @@ export function refreshSection(state: GameState, area: AreaInstance, section: Sh
             removeObjectFromArea(state, object);
             // Transient effects or minions summoned by a boss should just be despawned when reset.
             if (definition) {
+                if (!isObjectLogicValid(state, definition)) {
+                    continue;
+                }
                 const object = createObjectInstance(state, definition);
                 addObjectToArea(state, area, object);
-            } else {
             }
         }
     }
@@ -637,6 +655,9 @@ export function refreshSection(state: GameState, area: AreaInstance, section: Sh
         const definition = area.definition.objects[i];
         // Ignore objects defined outside of this section.
         if (definition.x >= l + section.w * 16 || definition.x < l || definition.y >= t + section.h * 16 || definition.y < t) {
+            continue;
+        }
+        if (!isObjectLogicValid(state, definition)) {
             continue;
         }
         let object = findObjectInstanceById(area, definition.id, true);

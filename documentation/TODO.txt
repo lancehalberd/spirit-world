@@ -12,7 +12,6 @@ Low Priority Bugs:
     - frost grenade blast isn't centered.
 
 High Priority Bugs:
-    Can't get past thorns at the beginning
     Sometimes can't enter peach cave when sliding on ice?
 
 
@@ -29,13 +28,21 @@ Current tasks:
         - Bow
             - Double damage
             - Add equipped element
+    - Add rock/door/switch sound effects
+    - implement logic for obtaining and moving the Tower.
+        - staffTowerActivated flag gets set by turning on a mechanism in the tower
+        - When set, there is a glowing switch on the outside that you can interact with:
+            - The tower disappears and then you gain the staff
+                - Tower Staff only displays help text the first time you obtain it
+        - When the Tower Staff is in your inventory, there is a glowing point to interact with in each tower location
+            - Interacting with it removes Tower Staff from your inventory and creates the new tower by setting its location on savedState
+    - brainstorm some dungeon/boss ideas, maybe for Staff Tower
 
 
 High level list of things left to do:
     New dungeons(need enemies, mechanics, bosses, entrances):
         Grand Temple
         Jade Palace
-        Staff Tower
         Sky Temple
         Forest Temple
         Crater
@@ -45,6 +52,7 @@ High level list of things left to do:
         Cocoon
         Waterfall Temple
         River Temple
+        Staff Tower
     Missing Bosses for existing areas:
         River Temple Boss
         Rival fight before Tomb
@@ -150,12 +158,11 @@ Add Small Loot to editor that creates LootDrop
     - Add an editor option to clear the history of picked up small loots.
 
 
-Add ability to charge tools.
-
 Add ability to charge carried objects
     Hold the passive button when picking up an object to charge
     Charge level is limited both by level of gloves/bracers and charge level.
     Should add selected element to thrown object
+    Apply element changes to tiles while you hold them (bush might burn up into ash in your hands with fire element, or turn to ice)
 
 
 Improve Tool Selection:

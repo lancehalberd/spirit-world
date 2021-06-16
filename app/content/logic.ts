@@ -6,33 +6,39 @@ export function isItemLogicTrue(state: GameState, itemFlag: string): boolean {
         || state.hero.elements[itemFlag]  || state.hero.equipment[itemFlag];
 }
 
-export function isLogicValid(state: GameState, logic: LogicCheck): boolean {
+export function isLogicValid(state: GameState, logic: LogicCheck, invertLogic = false): boolean {
+    const trueResult = !invertLogic, falseResult = !!invertLogic;
     for (const requiredFlag of logic.requiredFlags) {
         if (requiredFlag[0] === '$') {
             if (!isItemLogicTrue(state, requiredFlag.substring(1))) {
-                return false;
+                return falseResult;
             }
             continue;
         }
         if (!state.savedState.objectFlags[requiredFlag]) {
-            return false;
+            return falseResult;
         }
     }
     for (const excludedFlag of logic.excludedFlags) {
         if (excludedFlag[0] === '$') {
             if (isItemLogicTrue(state, excludedFlag.substring(1))) {
-                return false;
+                return falseResult;
             }
             continue;
         }
         if (state.savedState.objectFlags[excludedFlag]) {
-            return false;
+            return falseResult;
         }
     }
-    if (logic.zones?.length) {
-        return logic.zones.includes(state.location.zoneKey);
+    if (logic.zones?.length && !logic.zones.includes(state.location.zoneKey)) {
+        return falseResult;
     }
-    return true;
+    if (logic.staffTowerLocation) {
+        if (state.hero.activeTools.staff >= 2 || logic.staffTowerLocation !== state.savedState.staffTowerLocation) {
+            return falseResult;
+        }
+    }
+    return trueResult;
 }
 
 export const logicHash: {[key: string]: LogicCheck} = {
@@ -48,4 +54,19 @@ export const logicHash: {[key: string]: LogicCheck} = {
         // Mountain lava is replaced by cooled lava after the flame beast is defeated.
         excludedFlags: ['flameBeast'],
     },
+    desertTower: {
+        requiredFlags: [],
+        excludedFlags: [],
+        staffTowerLocation: 'desert',
+    },
+    forestTower: {
+        requiredFlags: [],
+        excludedFlags: [],
+        staffTowerLocation: 'forest',
+    },
+    mountainTower: {
+        requiredFlags: [],
+        excludedFlags: [],
+        staffTowerLocation: 'mountain',
+    }
 };

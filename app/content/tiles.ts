@@ -72,13 +72,11 @@ const deepWaterBehavior: TileBehaviors = {
 const southCliffBehavior: TileBehaviors = {
     jumpDirection: 'down',
     solid: true,
-    low: true,
 }
 const climbableWall: TileBehaviors = {
     defaultLayer: 'field',
     climbable: true,
     solid: true,
-    low: true,
 }
 
 const spiritBushParticles: Frame[] = createAnimation('gfx/tiles/bushspirit.png', {w: 16, h: 16}, {x: 2, cols: 3}).frames;
@@ -463,7 +461,7 @@ addTiles([
     solidColorTile('#0000FF', deepWaterBehavior), // deep water
     solidColorTile('#A0A0FF'), // shallow water
     gradientColorTile(['#A08000', '#806000'], 0, 0, 0, 16, southCliffBehavior), // southCliffTop
-    solidColorTile('#806000', lowWallBehavior), // cliffBottom
+    solidColorTile('#806000', wallBehavior), // cliffBottom
     vineTile,
     vineTileBase,
     stampTileSource(rockWallFrame, {

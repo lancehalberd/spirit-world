@@ -1,12 +1,16 @@
+import { StaffTowerLocation } from 'app/types';
 
 export interface LogicCheck {
     // This logic check is false unless all required flags are set.
     requiredFlags: string[],
     // This logic check is false if any excluded flag is set.
     excludedFlags: string[],
+    // If this is set, this logic is false if the staff tower is in the player's inventory or if it's location
+    // does not match the specified location.
+    staffTowerLocation?: StaffTowerLocation,
     // If this set is populated, this check is false if the current zone is not among the defined zones.
     // This is useful for restricting an NPCs dialogue to a particular area or set of areas.
-    zones?: string[]
+    zones?: string[],
 }
 
 

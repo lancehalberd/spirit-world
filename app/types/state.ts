@@ -3,12 +3,15 @@ import {
     Frame, Hero, LootType, ShortRectangle, Zone, ZoneLocation,
 } from 'app/types';
 
+export type StaffTowerLocation = 'desert' | 'forest' | 'mountain';
+
 export type SavedState = {
     objectFlags: {[key: string]: boolean},
     hero: Hero,
     dungeonInventories: {
         [key: string]: DungeonInventory,
     },
+    staffTowerLocation: StaffTowerLocation,
 }
 
 export interface DungeonInventory {

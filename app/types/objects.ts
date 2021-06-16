@@ -128,6 +128,12 @@ export interface BaseObjectDefinition {
     id: string,
     // Whether this is linked to an object in the physical/spirit world.
     linked?: boolean,
+    // If true, use the inverse of the given logic check.
+    invertLogic?: boolean,
+    // This can be set to control the presence of this object with a logic check.
+    // For example, frozen doors vs normal doors are displayed in river temple based on the status of the frost beast,
+    // and doors for the Staff Tower are only added when the Staff Tower is in the corresponding location.
+    logicKey?: string,
     // Whether to save the status of this object permanently (for example switches to open dungeon doors).
     saveStatus?: boolean,
     // Whether this is a spirit object.

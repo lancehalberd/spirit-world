@@ -1,8 +1,9 @@
 import _ from 'lodash';
 
-import { addObjectToArea, linkObject, removeObjectFromArea } from 'app/content/areas';
+import { addObjectToArea, isObjectLogicValid, linkObject, removeObjectFromArea } from 'app/content/areas';
 import { bossTypes } from 'app/content/bosses';
 import { dialogueHash } from 'app/content/dialogue';
+import { logicHash } from 'app/content/logic';
 import { createObjectInstance } from 'app/content/objects';
 import { decorationTypes } from 'app/content/objects/decoration';
 import { doorStyles } from 'app/content/door';
@@ -64,6 +65,7 @@ export function createObjectDefinition(
         status: 'normal' as ObjectStatus,
         id: definition.id || '',
         linked: definition.linked,
+        logicKey: definition.logicKey,
         spirit: definition.spirit,
         x,
         y,
@@ -323,6 +325,31 @@ export function getObjectProperties(state: GameState, editingState: EditingState
         value: object.saveStatus || false,
         onChange(saveStatus: boolean) {
             object.saveStatus = saveStatus;
+            updateObjectInstance(state, object);
+        },
+    });
+    rows.push({
+        name: 'Logic',
+        value: object.logicKey || 'none',
+        values: ['none', ...Object.keys(logicHash)],
+        onChange(logicKey: string) {
+            if (logicKey === 'none') {
+                delete object.logicKey;
+            } else {
+                object.logicKey = logicKey;
+            }
+            updateObjectInstance(state, object);
+        },
+    },
+    {
+        name: 'Invert Logic',
+        value: object.invertLogic || false,
+        onChange(invertLogic: boolean) {
+            if (invertLogic) {
+                object.invertLogic = invertLogic;
+            } else {
+                delete object.invertLogic;
+            }
             updateObjectInstance(state, object);
         },
     });
@@ -883,6 +910,9 @@ export function updateObjectInstance(state: GameState, object: ObjectDefinition,
             return;
         }
         area.definition.objects.push(object);
+    }
+    if (!isObjectLogicValid(state, object)) {
+        return;
     }
     const index = area.objects.findIndex(o => o.definition === (oldDefinition || object));
     const newObject = createObjectInstance(state, object);

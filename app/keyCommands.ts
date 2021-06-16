@@ -1,7 +1,9 @@
 /* global navigator */
 import { enterLocation } from 'app/content/areas';
+import { editingState } from 'app/development/tileEditor';
 import { exportZoneToClipboard } from 'app/development/exportZone';
 import { selectSection, toggleEditing } from 'app/development/tileEditor';
+import { updateObjectInstance } from 'app/development/objectEditor';
 import { GAME_KEY } from 'app/gameConstants';
 import { getState } from 'app/state';
 
@@ -156,8 +158,20 @@ export function addKeyCommands() {
         }
         keysDown[keyCode] = 1;
         if (keyCode === KEY.C && commandIsDown) {
-            exportZoneToClipboard(getState().zone);
-            event.preventDefault();
+            if (getState().areaInstance.definition.objects.includes(editingState.selectedObject)) {
+                editingState.clipboardObject = {...editingState.selectedObject};
+                console.log('copied object to clipboard');
+            } else {
+                exportZoneToClipboard(getState().zone);
+                event.preventDefault();
+            }
+        }
+        if (keyCode === KEY.V && commandIsDown) {
+            if (editingState.clipboardObject) {
+                const state = getState();
+                updateObjectInstance(state, {...editingState.clipboardObject}, null, state.areaInstance, true);
+                console.log('pasted object to area');
+            }
         }
         if (event.which === KEY.A && commandIsDown) {
             selectSection();

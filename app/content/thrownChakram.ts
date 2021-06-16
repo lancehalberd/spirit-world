@@ -3,7 +3,7 @@ import { addObjectToArea, getAreaSize, removeObjectFromArea } from 'app/content/
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { hitTargets } from 'app/utils/field';
-import { isPointInShortRect } from 'app/utils/index';
+import { isPointInShortRect, pad } from 'app/utils/index';
 
 import {
     AnimationEffect, AreaInstance, DrawPriority, Frame, GameState, Hero, HitProperties, MagicElement, ObjectInstance, ObjectStatus,
@@ -100,7 +100,9 @@ export class ThrownChakram implements ObjectInstance {
             }
         }
 
-        const hit: HitProperties = {
+        // We do three collision checks
+        // A full hitbox check for hitting objects/enemies:
+        let hit: HitProperties = {
             damage: this.damage,
             element: this.element,
             cutsGround: true,
@@ -109,14 +111,36 @@ export class ThrownChakram implements ObjectInstance {
             hitbox: this,
             hitEnemies: true,
             hitObjects: true,
-            hitTiles: true,
         }
         // Only push objects on the way out to prevent accidentally dragging objects towards the player.
         if (this.outFrames > 0) {
             hit.canPush = true;
             hit.knockback = {vx: this.vx / 2, vy: this.vy / 2, vz: 0};
         }
-        const hitResult = hitTargets(state, this.area, hit);
+        let hitResult = hitTargets(state, this.area, hit);
+        if (((hitResult.hit || hitResult.blocked) && !this.piercing && !hitResult.pierced) || hitResult.stopped) {
+            this.outFrames = 0;
+        }
+        // A full hitbox check for hitting tiles.
+        hit = {
+            damage: this.damage,
+            element: this.element,
+            cutsGround: true,
+            vx: this.vx,
+            vy: this.vy,
+            hitbox: this,
+            hitTiles: true,
+        };
+        hitResult = hitTargets(state, this.area, hit);
+        // A small hitbox check for hitting tiles that stops on any impact, this allows the chakram to go partially
+        // into solid tiles and hit things at the base of walls.
+        hit = {
+            vx: this.vx,
+            vy: this.vy,
+            hitbox: pad(this, -4),
+            hitTiles: true,
+        };
+        hitResult = hitTargets(state, this.area, hit);
         if (((hitResult.hit || hitResult.blocked) && !this.piercing && !hitResult.pierced) || hitResult.stopped) {
             this.outFrames = 0;
         }

@@ -136,6 +136,7 @@ export function getDefaultSavedState(): SavedState {
         dungeonInventories: {},
         objectFlags: {},
         hero: getDefaultHeroState(),
+        staffTowerLocation: 'desert',
     };
 }
 

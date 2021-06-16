@@ -299,8 +299,8 @@ const f1_0x0: AreaDefinition = {
         {status: "hidden", id: "bossBubblesWeset", x: 112, y: 240, saveStatus: undefined, type: "airBubbles"},
         {status: "hidden", id: "bossBubblesEast", x: 384, y: 256, saveStatus: undefined, type: "airBubbles"},
         {status: "hidden", id: "bossBubblesNorth", x: 256, y: 112, saveStatus: undefined, type: "airBubbles"},
-        {status: "normal", id: "frostBeast", x: 224, y: 224, type: "boss", enemyType: "frostHeart", lootType: "empty", lootAmount: 1, lootLevel: 1, d: "down", params: {}},
-        {status: "normal", id: "frostBeast", x: 224, y: 176, type: "boss", enemyType: "frostSerpent", lootType: "empty", lootAmount: 1, lootLevel: 1, d: "down", params: {}},
+        {status: "normal", id: "frostBeast", x: 224, y: 224, type: "boss", enemyType: "frostHeart", lootType: "empty", lootAmount: 1, lootLevel: 1, d: "down", params: {}, logicKey: "frozenLake"},
+        {status: "normal", id: "frostBeast", x: 224, y: 176, type: "boss", enemyType: "frostSerpent", lootType: "empty", lootAmount: 1, lootLevel: 1, d: "down", params: {}, logicKey: "frozenLake"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},

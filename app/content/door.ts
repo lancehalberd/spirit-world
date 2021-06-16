@@ -226,9 +226,20 @@ export class Door implements ObjectInstance {
         if (this.linkedObject && this.linkedObject.status !== status) {
             this.linkedObject.changeStatus(state, status);
         }
-        if (this.definition.id && this.status === 'normal' && this.definition.saveStatus) {
-            state.savedState.objectFlags[this.definition.id] = true;
-            saveGame();
+        if (this.definition.id && this.status === 'normal') {
+            // Update the other half of this door if it is in the same super tile.
+            for (const object of this.area.objects) {
+                if (object?.definition?.type === 'door' &&
+                    object?.definition.id === this.definition.id &&
+                    object.status !== 'normal'
+                ) {
+                    object.changeStatus(state, 'normal');
+                }
+            }
+            if (this.definition.saveStatus) {
+                state.savedState.objectFlags[this.definition.id] = true;
+                saveGame();
+            }
         }
         const y = Math.floor(this.y / 16);
         const x = Math.floor(this.x / 16);
@@ -299,12 +310,6 @@ export class Door implements ObjectInstance {
         } else {
             console.error('Locked door was missing an id', this);
             debugger;
-        }
-        // Unlock the other half of this door if it is in this super tile.
-        for (const object of this.area.objects) {
-            if (object?.definition?.type === 'door' && object?.definition.id === this.definition.id) {
-                object.changeStatus(state, 'normal');
-            }
         }
         saveGame();
         return true;

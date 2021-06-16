@@ -54,6 +54,7 @@ export interface EditingState {
     tool: EditorToolType,
     isEditing: boolean,
     brush?: {[key: string]: TileGridDefinition},
+    clipboardObject?: ObjectDefinition,
     paletteKey: string,
     selectedLayerIndex?: number,
     replacePercentage: number,

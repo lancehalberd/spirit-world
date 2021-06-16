@@ -7,6 +7,7 @@ import { Flame } from 'app/content/effects/flame';
 import { FrostGrenade } from 'app/content/effects/frostGrenade';
 import {
     beetleAnimations,
+    climbingBeetleAnimations,
     beetleHornedAnimations,
     beetleMiniAnimations,
     beetleWingedAnimations,
@@ -28,7 +29,7 @@ import {
 
 export const enemyTypes = <const>[
     'arrowTurret',
-    'beetle', 'beetleHorned', 'beetleMini', 'beetleWinged',
+    'beetle', 'climbingBeetle', 'beetleHorned', 'beetleMini', 'beetleWinged',
     'flameSnake', 'frostBeetle',
     'lightningBug',
     'snake',
@@ -73,6 +74,10 @@ enemyDefinitions.snake = {
 };
 enemyDefinitions.beetle = {
     animations: beetleAnimations, acceleration: 0.05, life: 2, touchDamage: 1, update: scurryAndChase,
+    lootTable: simpleLootTable,
+};
+enemyDefinitions.climbingBeetle = {
+    animations: climbingBeetleAnimations, acceleration: 0.05, life: 2, touchDamage: 1,
     lootTable: simpleLootTable,
 };
 enemyDefinitions.beetleHorned = {

@@ -40,6 +40,15 @@ export const beetleAnimations: ActorAnimations = {
     },
 };
 
+export const climbingBeetleAnimations: ActorAnimations = {
+    idle: {
+        up: beetleClimbAnimation,
+        down: beetleClimbAnimation,
+        left: beetleClimbAnimation,
+        right: beetleClimbAnimation,
+    },
+};
+
 const beetleMiniGeometry: FrameDimensions = { w: 10, h: 10 };
 const beetleMiniDownAnimation: FrameAnimation = createAnimation('gfx/enemies/smallbeetle.png', beetleMiniGeometry, { x: 0, cols: 2});
 const beetleMiniRightAnimation: FrameAnimation = createAnimation('gfx/enemies/smallbeetle.png', beetleMiniGeometry, { x: 2, cols: 2});
