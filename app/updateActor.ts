@@ -448,6 +448,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         if (hero.action !== 'entering' && hero.action !== 'exiting') {
             movementSpeed *= 0.75;
             hero.chargeTime += FRAME_LENGTH;
+            hero.action = 'charging';
             if (hero.chargingLeftTool && !isGameKeyDown(state, GAME_KEY.LEFT_TOOL)) {
                 hero.toolCooldown = 200;
                 useTool(state, hero, hero.leftTool, hero.actionDx, hero.actionDy);
@@ -487,7 +488,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             const m = Math.sqrt(dx * dx + dy * dy);
             dx = movementSpeed * dx / m;
             dy = movementSpeed * dy / m;
-            if (hero.action === 'charging' || hero.chargingLeftTool || hero.chargingRightTool) {
+            if (hero.action === 'charging') {
                 hero.d = getDirection(hero.actionDx, hero.actionDy);
             } else if (hero.action !== 'attack') {
                 if (dx < 0 && (hero.d === 'right' || Math.abs(dx) > Math.abs(dy))) {
