@@ -101,7 +101,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
     }
     const canCharge = !isAstralProjection && isControlled && hero.z <= minZ
         && !hero.swimming && !hero.pickUpTile && !hero.pickUpObject && !isFrozen;
-    const canAttack = canCharge && hero.weapon > 0
+    const canAttack = canCharge && hero.weapon > 0 && !hero.chargingLeftTool && !hero.chargingRightTool
          && (!hero.action || hero.action === 'walking' || hero.action === 'pushing');
     // This might be a better approach than setting movementSpeed = 0, we could just set this flag to false.
     //const canMove = isControlled && hero.z <= minZ && !isFrozen
@@ -444,7 +444,22 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             hero.animationTime = 0;
         }
     }
-    if (!isFrozen && (heldChakram || hero.action === 'charging')) {
+    if (!isFrozen && (hero.chargingLeftTool || hero.chargingRightTool)) {
+        if (hero.action !== 'entering' && hero.action !== 'exiting') {
+            movementSpeed *= 0.75;
+            hero.chargeTime += FRAME_LENGTH;
+            if (hero.chargingLeftTool && !isGameKeyDown(state, GAME_KEY.LEFT_TOOL)) {
+                hero.toolCooldown = 200;
+                useTool(state, hero, hero.leftTool, hero.actionDx, hero.actionDy);
+                hero.chargingLeftTool = false;
+            }
+            if (hero.chargingRightTool && !isGameKeyDown(state, GAME_KEY.RIGHT_TOOL)) {
+                hero.toolCooldown = 200;
+                useTool(state, hero, hero.rightTool, hero.actionDx, hero.actionDy);
+                hero.chargingRightTool = false;
+            }
+        }
+    } else if (!isFrozen && (heldChakram || hero.action === 'charging')) {
         movementSpeed *= 0.75;
         if (!heldChakram) {
             hero.action = null;
@@ -472,7 +487,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             const m = Math.sqrt(dx * dx + dy * dy);
             dx = movementSpeed * dx / m;
             dy = movementSpeed * dy / m;
-            if (hero.action === 'charging') {
+            if (hero.action === 'charging' || hero.chargingLeftTool || hero.chargingRightTool) {
                 hero.d = getDirection(hero.actionDx, hero.actionDy);
             } else if (hero.action !== 'attack') {
                 if (dx < 0 && (hero.d === 'right' || Math.abs(dx) > Math.abs(dy))) {
@@ -541,7 +556,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
                 hero.vy = my;
             }
         }
-        if (!hero.action) {
+        if (!hero.action && !hero.chargingLeftTool && !hero.chargingRightTool) {
             hero.action = 'walking';
             hero.actionDx = 0;
             hero.actionDy = 0;
@@ -553,7 +568,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         if (!hero.slipping && !editingState.isEditing && hero.action !== 'jumpingDown') {
             hero.vx = hero.vy = 0;
         }
-        if (hero.action === 'walking' || hero.action === 'pushing') {
+        if ((hero.action === 'walking' || hero.action === 'pushing') && !hero.chargingLeftTool && !hero.chargingRightTool) {
             hero.action = null;
             hero.actionDx = 0;
             hero.actionDy = 0;
@@ -618,11 +633,17 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         && !hero.pickUpTile && !hero.pickUpObject
     ) {
         if (isControlled && state.hero.leftTool && wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL)) {
-            hero.toolCooldown = 500;
-            useTool(state, hero, state.hero.leftTool, dx, dy);
+            hero.chargingLeftTool = true;
+            hero.chargeTime = 0;
+            const direction = getDirection((dx || dy) ? dx : directionMap[hero.d][0], (dx || dy) ? dy : directionMap[hero.d][1], true, hero.d);
+            hero.actionDx = directionMap[direction][0];
+            hero.actionDy = directionMap[direction][1];
         } else if (isControlled && state.hero.rightTool && wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL)) {
-            hero.toolCooldown = 500;
-            useTool(state, hero, state.hero.rightTool, dx, dy);
+            hero.chargingRightTool = true;
+            hero.chargeTime = 0;
+            const direction = getDirection((dx || dy) ? dx : directionMap[hero.d][0], (dx || dy) ? dy : directionMap[hero.d][1], true, hero.d);
+            hero.actionDx = directionMap[direction][0];
+            hero.actionDy = directionMap[direction][1];
         }
     }
     if (isControlled && !hero.swimming &&

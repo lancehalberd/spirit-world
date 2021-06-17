@@ -1,4 +1,4 @@
-import { addObjectToArea, removeObjectFromArea } from 'app/content/areas';
+import { addObjectToArea, enterLocation, removeObjectFromArea } from 'app/content/areas';
 import { createCanvasAndContext } from 'app/dom';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { showMessage } from 'app/render/renderMessage';
@@ -172,6 +172,11 @@ function showLootMessage(state: GameState, lootType: LootType, lootLevel?: numbe
             }
             return;
         case 'staff':
+            if (state.hero.activeTools.staff === 2) {
+                // Refresh the location to hide the tower.
+                enterLocation(state, state.location);
+                return showMessage(state, 'You have obtained the Tower Staff!!');
+            }
             if (state.hero.activeTools.staff === 1) {
                 return showMessage(state, 'You have obtained the Tree Staff!' + equipToolMessage
                     + '{|}Press {B_TOOL} to summon the staff and slam it to the ground.'
@@ -256,7 +261,7 @@ export class LootObject implements ObjectInstance {
         this.status = definition.status || 'normal';
     }
     update(state: GameState) {
-        if (this.status === 'hiddenEnemy' || this.status === 'hiddenSwitch') {
+        if (this.status === 'hidden' || this.status === 'hiddenEnemy' || this.status === 'hiddenSwitch') {
             return;
         }
         if (state.savedState.objectFlags[this.definition.id]) {
@@ -270,7 +275,7 @@ export class LootObject implements ObjectInstance {
         }
     }
     render(context, state: GameState) {
-        if (this.status === 'hiddenEnemy' || this.status === 'hiddenSwitch') {
+        if (this.status === 'hidden' || this.status === 'hiddenEnemy' || this.status === 'hiddenSwitch') {
             return;
         }
         if (this.definition.id !== 'drop' && state.savedState.objectFlags[this.definition.id]) {
@@ -279,7 +284,7 @@ export class LootObject implements ObjectInstance {
         drawFrameAt(context, this.frame, { x: this.x, y: this.y });
     }
     renderShadow(context, state: GameState) {
-        if (this.status === 'hiddenEnemy' || this.status === 'hiddenSwitch') {
+        if (this.status === 'hidden' || this.status === 'hiddenEnemy' || this.status === 'hiddenSwitch') {
             return;
         }
         if (this.definition.id !== 'drop' && state.savedState.objectFlags[this.definition.id]) {
@@ -374,7 +379,7 @@ export class ChestObject implements ObjectInstance {
         }
     }
     render(context, state: GameState) {
-        if (this.status === 'hiddenEnemy' || this.status === 'hiddenSwitch') {
+        if (this.status === 'hidden' || this.status === 'hiddenEnemy' || this.status === 'hiddenSwitch') {
             return;
         }
         if (this.isOpen(state)) {
@@ -553,6 +558,10 @@ function getLootShadowFrame({lootType, lootLevel, lootAmount}:
 }
 
 export function applyUpgrade(currentLevel: number, loot: LootObjectDefinition | BossObjectDefinition): number {
+    // Negative number indicates losing loot, and currently is just for setting down the Tower Staff.
+    if (loot.lootLevel < 0) {
+        return Math.max(0, currentLevel + loot.lootLevel);
+    }
     // Non-progressive upgrades specify the exact level of the item. Lower level items will be ignored
     // if the player already possesses a better version.
     if (loot.lootLevel) {

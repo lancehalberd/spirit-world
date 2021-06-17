@@ -21,7 +21,7 @@ import {
     AreaDefinition, AreaInstance, BallGoalDefinition, BossType, CrystalSwitchDefinition, FloorSwitchDefinition,
     FrameDimensions, DecorationType, Direction, DrawPriority, EnemyType, GameState,
     LootType, MagicElement, NPCBehavior, NPCStyle, ObjectDefinition, ObjectStatus, ObjectType, PanelRows,
-    ShortRectangle,
+    ShortRectangle, StaffTowerLocation,
     Zone, ZoneLocation,
 } from 'app/types';
 
@@ -50,7 +50,7 @@ export function getLootTypes(): LootType[] {
 export const combinedObjectTypes: ObjectType[] = [
     'airBubbles', 'ballGoal', 'bigChest', 'chest', 'crystalSwitch', 'decoration',
     'door', 'floorSwitch', 'loot','marker', 'npc', 'pitEntrance',
-    'pushPull', 'rollingBall',  'sign', 'teleporter', 'tippable', 'torch', 'waterPot',
+    'pushPull', 'rollingBall',  'sign', 'staffTowerPoint', 'teleporter', 'tippable', 'torch', 'waterPot',
 ];
 
 export function createObjectDefinition(
@@ -209,6 +209,12 @@ export function createObjectDefinition(
                 type: definition.type,
                 message: definition.message || '',
             };
+        case 'staffTowerPoint':
+            return {
+                ...commonProps,
+                type: definition.type,
+                location: definition.location,
+            };
         case 'npc':
             return {
                 ...commonProps,
@@ -294,13 +300,9 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             value: object.type,
             values: combinedObjectTypes,
             onChange(objectType: ObjectType) {
-                if (object.id) {
-                    object.type = objectType as any;
-                    updateObjectInstance(state, createObjectDefinition(state, editingState, object), object);
-                } else {
-                    object.type = objectType as any;
-                    editingState.selectedObject = createObjectDefinition(state, editingState, object);
-                }
+                object.type = objectType as any;
+                editingState.selectedObject = createObjectDefinition(state, editingState, object);
+                updateObjectInstance(state, editingState.selectedObject, object);
                 displayTileEditorPropertyPanel();
             },
         });
@@ -353,6 +355,43 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             updateObjectInstance(state, object);
         },
     });
+    let possibleStatuses: ObjectStatus[] = ['normal'];
+    switch (object.type) {
+        case 'airBubbles':
+            possibleStatuses = ['normal', 'hidden', 'hiddenEnemy', 'hiddenSwitch'];
+            break;
+        case 'torch':
+            possibleStatuses = ['normal', 'active', 'hidden', 'hiddenEnemy', 'hiddenSwitch'];
+            break;
+        case 'teleporter':
+            possibleStatuses = ['normal', 'hidden', 'hiddenEnemy', 'hiddenSwitch'];
+            break;
+        case 'door':
+        case 'stairs':
+            possibleStatuses = ['normal', 'closed', 'closedEnemy', 'closedSwitch',
+                'locked', 'bigKeyLocked', 'cracked', 'blownOpen',
+                'frozen',
+            ];
+            break;
+        case 'chest':
+            possibleStatuses = ['normal', 'hiddenEnemy', 'hiddenSwitch'];
+            break;
+    }
+    if (!possibleStatuses.includes(object.status)) {
+        object.status = possibleStatuses[0];
+    }
+    if (possibleStatuses.length > 1) {
+        rows.push({
+            name: 'status',
+            value: object.status,
+            values: possibleStatuses,
+            onChange(status: ObjectStatus) {
+                object.status = status;
+                updateObjectInstance(state, object);
+            },
+        });
+    }
+
     switch (object.type) {
         case 'decoration':
             rows.push({
@@ -440,70 +479,13 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             } else {
                 rows.push(`No objects of type ${targetType}`);
             }
-            if (object.type === 'teleporter') {
-                rows.push({
-                    name: 'status',
-                    value: object.status,
-                    values: ['normal', 'hidden', 'hiddenEnemy', 'hiddenSwitch'],
-                    onChange(status: ObjectStatus) {
-                        object.status = status;
-                        updateObjectInstance(state, object);
-                    },
-                });
-            } else if (object.type !== 'pitEntrance') {
-                rows.push({
-                    name: 'status',
-                    value: object.status,
-                    values: [
-                        'normal', 'closed', 'closedEnemy', 'closedSwitch', 'locked', 'bigKeyLocked', 'cracked', 'blownOpen',
-                        'frozen',
-                    ],
-                    onChange(status: ObjectStatus) {
-                        object.status = status;
-                        updateObjectInstance(state, object);
-                    },
-                });
-            }
             break;
         case 'bigChest':
         case 'chest':
         case 'loot': {
             rows = [...rows, ...getLootFields(state, editingState, object)];
-            if (object.type !== 'bigChest') {
-                rows.push({
-                    name: 'status',
-                    value: object.status,
-                    values: ['normal', 'hiddenEnemy', 'hiddenSwitch'],
-                    onChange(status: ObjectStatus) {
-                        object.status = status;
-                        updateObjectInstance(state, object);
-                    },
-                });
-            }
             break;
         }
-        case 'airBubbles':
-            rows.push({
-                name: 'status',
-                value: object.status,
-                values: ['normal', 'hidden', 'hiddenEnemy', 'hiddenSwitch'],
-                onChange(status: ObjectStatus) {
-                    object.status = status;
-                    updateObjectInstance(state, object);
-                },
-            });
-            break;
-        case 'torch':
-            rows.push({
-                name: 'status',
-                value: object.status,
-                values: ['normal', 'active', 'hidden', 'hiddenEnemy', 'hiddenSwitch'],
-                onChange(status: ObjectStatus) {
-                    object.status = status;
-                    updateObjectInstance(state, object);
-                },
-            });
-            break;
         case 'ballGoal':
             rows = [...rows, ...getSwitchTargetProperties(state, editingState, object)];
             break;
@@ -628,6 +610,22 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                 },
             });
             break;
+        case 'staffTowerPoint':
+            const locations: StaffTowerLocation[] = ['desert', 'forest', 'mountain'];
+            if (!locations.includes(object.location)) {
+                object.location = locations[0];
+            }
+            rows.push({
+                name: 'location',
+                value: object.location,
+                values: locations,
+                onChange(location: StaffTowerLocation) {
+                    object.location = location;
+                    updateObjectInstance(state, object);
+                },
+            });
+            break;
+
     }
     rows = [...rows, ...getStyleFields(state, editingState, object)];
     return rows;
@@ -899,7 +897,7 @@ function checkToAddLinkedObject(state: GameState, definition: ObjectDefinition):
 }
 
 export function updateObjectInstance(state: GameState, object: ObjectDefinition, oldDefinition?: ObjectDefinition, area: AreaInstance = null, create: boolean = false): void {
-     if (!area) {
+    if (!area) {
         area = state.areaInstance;
     }
     const definitionIndex = area.definition.objects.findIndex(d => d === (oldDefinition || object));

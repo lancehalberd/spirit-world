@@ -4,7 +4,7 @@ import {
     GameState, Hero, LootType,
     MagicElement, MinionType,
     NPCBehavior, NPCStyle,
-    ShortRectangle, TileBehaviors,
+    ShortRectangle, StaffTowerLocation, TileBehaviors,
 } from 'app/types';
 
 export type DrawPriority = 'background' | 'foreground' | 'sprites'
@@ -207,6 +207,11 @@ export interface DecorationDefinition extends BaseObjectDefinition {
     h: number,
 }
 
+export interface StaffTowerPointDefinition extends BaseObjectDefinition {
+    type: 'staffTowerPoint',
+    location: StaffTowerLocation,
+}
+
 export interface EnemyObjectDefinition extends BaseObjectDefinition {
     type: 'enemy',
     enemyType: EnemyType | MinionType,
@@ -234,6 +239,7 @@ export type ObjectDefinition = SimpleObjectDefinition
     | LootObjectDefinition
     | NPCDefinition
     | SignDefinition
+    | StaffTowerPointDefinition
     ;
 
 export type ObjectType = ObjectDefinition['type'];

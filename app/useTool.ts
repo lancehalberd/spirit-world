@@ -4,7 +4,25 @@ import { Clone }  from 'app/content/clone';
 import { Staff } from 'app/content/staff';
 import { directionMap, getDirection } from 'app/utils/field';
 
-import { ActiveTool, GameState, Hero } from 'app/types'
+import { ActiveTool, GameState, Hero, MagicElement } from 'app/types'
+
+export function getChargeLevelAndElement(state: GameState, hero: Hero, tool: ActiveTool) {
+    let chargeLevel = 0;
+    let element: MagicElement = null;
+    if (state.hero.passiveTools.charge >= 2) {
+        if (hero.chargeTime >= 1200) {
+            chargeLevel = 2;
+        } else if (hero.chargeTime >= 600) {
+            chargeLevel = 1;
+        }
+    } else if (state.hero.passiveTools.charge >= 1 && hero.chargeTime >= 800) {
+        chargeLevel = 1;
+    }
+    if (chargeLevel >= 1) {
+        element = state.hero.element;
+    }
+    return { chargeLevel, element};
+}
 
 export function useTool(
     state: GameState,
@@ -13,17 +31,26 @@ export function useTool(
     dx: number,
     dy: number,
 ): void {
+    const { chargeLevel, element } = getChargeLevelAndElement(state, hero, tool);
     switch (tool) {
         case 'bow':
             if (state.hero.magic < 0) {
                 return;
             }
             state.hero.magic -= 5;
+            if (chargeLevel === 1) {
+                state.hero.magic -= 5;
+            }
+            if (state.hero.element) {
+                state.hero.magic -= 10;
+            }
             let direction = hero.d;
             if (dx || dy) {
                 direction = getDirection(dx, dy, true);
             }
             const arrow = new Arrow({
+                damage: 2 ** chargeLevel,
+                element,
                 x: hero.x + 8 + 8 * directionMap[direction][0],
                 y: hero.y + 8 * directionMap[direction][1] + 6,
                 vx: 4 * directionMap[direction][0],

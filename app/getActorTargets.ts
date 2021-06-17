@@ -26,7 +26,7 @@ export function getActorTargets(state: GameState, actor: Actor): {tiles: TileCoo
     }
 
     for (const object of actor.area.objects.filter(o => o.getHitbox)) {
-        if (object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
+        if (object.status === 'hidden' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
             continue;
         }
         const hitbox = object.getHitbox(state);

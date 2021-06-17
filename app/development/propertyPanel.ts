@@ -237,11 +237,11 @@ function renderProperty(property: EditorProperty<any> | HTMLElement | string): s
 
         const selectTile = () => {
             let [x, y] = getMousePosition(paletteCanvas, scale);
-            const tx = Math.floor(x / 16);
             const ty = Math.floor(y / 16);
+            const tx = Math.floor(x / 16);
             property.onChange({
                 w: 1, h: 1,
-                tiles: [[palette[ty][tx]]],
+                tiles: [[palette[ty]?.[tx]]],
             });
         }
         let dragX, dragY;

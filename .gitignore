@@ -64,6 +64,8 @@ etc/
 public/client.js
 # Don't include old graphics.
 public/gfx/old
+# Don't include sfx that haven't been processed yet.
+public/sfx/staging
 # Don't include rsync command.
 rsync.txt
 

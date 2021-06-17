@@ -24,18 +24,7 @@ Graphics:
 
 
 Current tasks:
-    - Add ability to charge tools
-        - Bow
-            - Double damage
-            - Add equipped element
     - Add rock/door/switch sound effects
-    - implement logic for obtaining and moving the Tower.
-        - staffTowerActivated flag gets set by turning on a mechanism in the tower
-        - When set, there is a glowing switch on the outside that you can interact with:
-            - The tower disappears and then you gain the staff
-                - Tower Staff only displays help text the first time you obtain it
-        - When the Tower Staff is in your inventory, there is a glowing point to interact with in each tower location
-            - Interacting with it removes Tower Staff from your inventory and creates the new tower by setting its location on savedState
     - brainstorm some dungeon/boss ideas, maybe for Staff Tower
 
 

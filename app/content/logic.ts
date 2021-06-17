@@ -2,8 +2,13 @@ import { GameState, LogicCheck } from 'app/types';
 
 
 export function isItemLogicTrue(state: GameState, itemFlag: string): boolean {
-    return state.hero.activeTools[itemFlag] || state.hero.passiveTools[itemFlag]
-        || state.hero.elements[itemFlag]  || state.hero.equipment[itemFlag];
+    let level = 1, levelString;
+    if (itemFlag.includes(':')) {
+        [itemFlag, levelString] = itemFlag.split(':');
+        level = parseInt(levelString, 10);
+    }
+    return state.hero.activeTools[itemFlag] >= level || state.hero.passiveTools[itemFlag] >= level
+        || state.hero.elements[itemFlag] >= level || state.hero.equipment[itemFlag] >= level;
 }
 
 export function isLogicValid(state: GameState, logic: LogicCheck, invertLogic = false): boolean {
@@ -54,6 +59,12 @@ export const logicHash: {[key: string]: LogicCheck} = {
         // Mountain lava is replaced by cooled lava after the flame beast is defeated.
         excludedFlags: ['flameBeast'],
     },
+    towerStorm: {
+        // Storm around the tower is only shown after the beasts escape
+        requiredFlags: ['elementalBeastsEscaped'],
+        // Storm is gone after the storm beast is gone.
+        excludedFlags: ['stormBeast'],
+    },
     desertTower: {
         requiredFlags: [],
         excludedFlags: [],
@@ -68,5 +79,9 @@ export const logicHash: {[key: string]: LogicCheck} = {
         requiredFlags: [],
         excludedFlags: [],
         staffTowerLocation: 'mountain',
-    }
+    },
+    towerStaff: {
+        requiredFlags: ['$staff:2'],
+        excludedFlags: [],
+    },
 };

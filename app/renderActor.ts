@@ -2,11 +2,12 @@ import _ from 'lodash';
 
 import { EXPLOSION_RADIUS, EXPLOSION_TIME } from 'app/gameConstants';
 import { getCloneMovementDeltas } from 'app/keyCommands';
+import { getChargeLevelAndElement } from 'app/useTool';
 import { isHeroFloating, isHeroSinking } from 'app/utils/actor';
 import { createAnimation, drawFrame, drawFrameAt, getFrame } from 'app/utils/animations';
 import { carryMap, directionMap, getDirection } from 'app/utils/field';
 
-import { Actor, ActorAnimations, Enemy, Frame, GameState, Hero } from 'app/types';
+import { ActiveTool, Actor, ActorAnimations, Enemy, Frame, GameState, Hero } from 'app/types';
 
 import {
     heroAnimations,
@@ -140,6 +141,29 @@ export function renderHero(this: Hero, context: CanvasRenderingContext2D, state:
         context.restore();
     }
     renderExplosionRing(context, state, hero);
+    const chargingTool = ((hero.chargingLeftTool && hero.leftTool) || (hero.chargingRightTool && hero.rightTool)) as ActiveTool;
+    if (chargingTool) {
+        const { chargeLevel, element } = getChargeLevelAndElement(state, hero, chargingTool);
+        context.fillStyle = {fire: 'red', ice: '#08F', lightning: 'yellow'}[element] || '#888';
+        const r = 5 * chargeLevel || 2;
+        context.save();
+        context.globalAlpha *= 0.6;
+        if (r < 5) {
+            context.globalAlpha *= 0.6;
+            context.fillStyle = 'white';
+        }
+        context.beginPath();
+        context.arc(
+            hero.x - frame.content.x + frame.w / 2 + hero.actionDx * 6,
+            hero.y - hero.z - frame.content.y + 2 * frame.h / 3 + hero.actionDy * 4,
+            r,
+            0,
+            2 * Math.PI
+        );
+        context.fill();
+        context.restore();
+    }
+
 }
 export function renderHeroEyes(context: CanvasRenderingContext2D, state: GameState, hero: Hero) {
     const frame = getHeroFrame(state, hero);

@@ -160,7 +160,6 @@ export function addKeyCommands() {
         if (keyCode === KEY.C && commandIsDown) {
             if (getState().areaInstance.definition.objects.includes(editingState.selectedObject)) {
                 editingState.clipboardObject = {...editingState.selectedObject};
-                console.log('copied object to clipboard');
             } else {
                 exportZoneToClipboard(getState().zone);
                 event.preventDefault();
@@ -170,7 +169,6 @@ export function addKeyCommands() {
             if (editingState.clipboardObject) {
                 const state = getState();
                 updateObjectInstance(state, {...editingState.clipboardObject}, null, state.areaInstance, true);
-                console.log('pasted object to area');
             }
         }
         if (event.which === KEY.A && commandIsDown) {

@@ -316,6 +316,9 @@ export function enterZoneByTarget(
                 for (let x = 0; x < areaGrid[y].length; x++) {
                     for (const object of (areaGrid[y][x]?.objects || [])) {
                         if (object.id === targetObjectId && object !== skipObject) {
+                            if (!isObjectLogicValid(state, object)) {
+                                continue;
+                            }
                             enterLocation(state, {
                                 zoneKey,
                                 floor,
