@@ -311,7 +311,10 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         }
     } else if (!isAstralProjection && hero.swimming) {
         movementSpeed *= 0.75;
-        hero.action = null;
+        // The only action a hero can perform while swimming is "walking".
+        if (hero.action !== 'walking') {
+            hero.action = null;
+        }
     } else if (!isFrozen && hero.action === 'grabbing') {
         movementSpeed = 0;
         hero.vx = 0;
