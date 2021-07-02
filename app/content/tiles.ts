@@ -390,14 +390,6 @@ const roomFloorTiles: TileSource = {
     source: {image: requireImage('gfx/tiles/temp_furniture.png'), x: 768, y: 192, w: 3 * 16, h: 1 * 16},
 };
 
-
-const cloudTiles: TileSource = {
-    w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/cloud.png'), x: 0, y: 0, w: 64, h: 96},
-    behaviors: {'all': {cloudGround: true, defaultLayer: 'field'}, '2x4': { skipped: true },  '2x5': { skipped: true },  '3x4': { skipped: true },  '3x5': { skipped: true }},
-};
-
-
 const railsTiles: TileSource = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/rails.png'), x: 0, y: 0, w: 64, h: 16},
@@ -490,6 +482,24 @@ const shoreAnglesMask: TileSource = {
     },
 };
 
+
+const clouds: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/cloud.png'), x: 0, y: 0, w: 64, h: 80},
+    behaviors: {
+        'all': { cloudGround: true, defaultLayer: 'field' },
+    },
+};
+const cloudAngles: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/cloud.png'), x: 64, y: 0, w: 64, h: 64},
+    behaviors: {
+        'all': { cloudGround: true, defaultLayer: 'field' },
+        '0x0': { skipped: true }, '3x0': { skipped: true },
+        '0x3': { skipped: true }, '3x3': { skipped: true },
+    },
+};
+
 function applyMask(targetSource: TileSource, maskSource: TileSource) {
     const {w, h} = targetSource;
     for (let py = 0; py < targetSource.source.h / h; py ++) {
@@ -565,8 +575,8 @@ addTiles([
     treeLeaves,
     shore,
     shoreAngles,
-    //30 empty tiles where old water tiles used to be.
-    ...deletedTiles(30),
+    cloudAngles,
+    ...deletedTiles(18),
     singleTileSource('gfx/tiles/bushspirit.png', spiritBushBehavior, 0),
     singleTileSource('gfx/tiles/thornsspirit.png', spiritThornBehavior),
     singleTileSource('gfx/tiles/rocksspirit.png', spiritLightStoneBehavior),
@@ -599,7 +609,7 @@ addTiles([
     bridgeHorizontalTiles,
     bridgeVerticalTiles,
     roomFloorTiles,
-    cloudTiles,
+    clouds,
     railsTiles,
     spiritRailsTiles,
     shallowToDeep,

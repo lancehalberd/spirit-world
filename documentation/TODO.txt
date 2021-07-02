@@ -24,10 +24,7 @@ Graphics:
 
 
 Current tasks:
-    - update cloud graphics
-        - Add new graphics over deleted water graphics.
-        - Run migration to switch to new graphics
-        - Delete old cloud graphics.
+    - Add first pass at randomizer logic
     - brainstorm some dungeon/boss ideas, maybe for Staff Tower
     - Do a regression test and release latest version.
 
