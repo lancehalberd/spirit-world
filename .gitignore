@@ -61,6 +61,7 @@ typings/
 etc/
 
 # Don't include built js file.
+public/app
 public/client.js
 # Don't include old graphics.
 public/gfx/old

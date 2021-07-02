@@ -73,6 +73,12 @@ export function getDefaultSpiritArea(location: ZoneLocation): AreaDefinition {
                 // The matrix of tiles
                 tiles: [],
             },
+            // Add the mask from the parent layer but only if it is defined.
+            ...(layer.mask ? { mask: {
+                ...layer.mask,
+                // The matrix of tiles
+                tiles: [],
+            }} : {}),
         })),
         objects: [],
         // Spirit world sections should match their parent definition, otherwise the
@@ -105,14 +111,17 @@ export function getAreaFromLocation(location: ZoneLocation): AreaDefinition {
     return grid[y][x];
 }
 
-export function initializeAreaLayerTiles(layer: AreaLayerDefinition) {
+export function initializeAreaLayerTiles(layer: AreaLayerDefinition): AreaLayerDefinition {
     const tiles = layer.grid.tiles;
     for (let y = 0; y < layer.grid.h; y++) {
         tiles[y] = tiles[y] || [];
+        // We need to do this so that each row has the correct number of elements, as in some places
+        // we use row.length for iterating through tiles or checking the bounds of the grid.
         for (let x = 0; x < layer.grid.w; x++) {
             tiles[y][x] = tiles[y][x] || null;
         }
     }
+    return layer;
 }
 
 export function initializeAreaTiles(area: AreaDefinition): AreaDefinition {

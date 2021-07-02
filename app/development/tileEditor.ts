@@ -782,14 +782,14 @@ function drawBrush(x: number, y: number): void {
             continue;
         }
         for (let y = 0; y < brushGrid.h; y++) {
+            const grid = layerDefinition.grid;
             const row = sy + y;
-            if (row < 0 || row >= layerDefinition.grid.tiles.length) {
+            if (row < 0 || row >= grid.h) {
                 continue;
             }
-            const tileRow = layerDefinition.grid.tiles[row];
             for (let x = 0; x < brushGrid.w; x++) {
                 const column = sx + x;
-                if (column < 0 || column >= tileRow.length) {
+                if (column < 0 || column >= grid.w) {
                     continue;
                 }
                 const tile = brushGrid.tiles[y][x];
@@ -1218,14 +1218,14 @@ function fixMismatchedLayers(): void {
                             return spiritLayer;
                         }
                         changed = true;
-                        return {
+                        return initializeAreaLayerTiles({
                             key: layer.key,
                             grid: {
                                 ...layer.grid,
                                 // The matrix of tiles
                                 tiles: [],
                             },
-                        };
+                        });
                     });
                 }
             }
