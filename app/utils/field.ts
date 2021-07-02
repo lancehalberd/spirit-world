@@ -99,6 +99,9 @@ export function isPointOpen(
     const tileBehavior = area?.behaviorGrid[ty]?.[tx];
     // If the behavior has a bitmap for solid pixels, read the exact pixel to see if it is blocked.
     if (tileBehavior?.solidMap && !tileBehavior?.climbable) {
+        if (movementProperties.needsFullTile) {
+            return false;
+        }
         const sy = (y | 0) % 16;
         const sx = (x | 0) % 16;
         // console.log(tileBehavior.solidMap, y, x, sy, sx, tileBehavior.solidMap[sy] >> (15 - sx));

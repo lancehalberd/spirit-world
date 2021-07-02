@@ -14,6 +14,7 @@ import { getLootFrame } from 'app/content/lootObject';
 import { createObjectInstance } from 'app/content/objects';
 import { allTiles } from 'app/content/tiles';
 import { palettes } from 'app/content/palettes';
+import { zones } from 'app/content/zones';
 import {
     createObjectDefinition,
     deleteObject,
@@ -46,7 +47,7 @@ import {
     EnemyObjectDefinition, EnemyType,
     FullTile, GameState,
     ObjectDefinition,
-    PanelRows, PropertyRow, ShortRectangle, TileGridDefinition,
+    PanelRows, PropertyRow, ShortRectangle, TileGridDefinition, TilePalette,
 } from 'app/types';
 
 type EditorToolType = 'brush' | 'delete' | 'object' | 'enemy' | 'boss' | 'replace' | 'select';
@@ -56,7 +57,7 @@ export interface EditingState {
     brush?: {[key: string]: TileGridDefinition},
     clipboardObject?: ObjectDefinition,
     paletteKey: string,
-    selectedLayerIndex?: number,
+    selectedLayerKey?: string,
     replacePercentage: number,
     selectedObject?: ObjectDefinition,
     showZoneProperties: boolean,
@@ -172,8 +173,8 @@ export function startEditing(state: GameState) {
 export function stopEditing(state: GameState) {
     hidePropertyPanel();
     hideLeftPanel();
-    if (editingState.selectedLayerIndex >= 0) {
-        delete editingState.selectedLayerIndex;
+    if (editingState.selectedLayerKey) {
+        delete editingState.selectedLayerKey;
         enterLocation(state, state.location);
     }
     state.areaInstance.tilesDrawn = [];
@@ -182,8 +183,8 @@ export function stopEditing(state: GameState) {
 
 export function displayTileEditorPropertyPanel() {
     const state = getState();
-    if (editingState.selectedLayerIndex >= state.areaInstance.definition.layers.length) {
-        editingState.selectedLayerIndex = null;
+    if (!state.areaInstance.definition.layers.find(layer => layer.key === editingState.selectedLayerKey)) {
+        delete editingState.selectedLayerKey;
     }
     if (editingState.tool === 'enemy') {
         editingState.selectedObject.type = 'enemy';
@@ -256,12 +257,12 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
                 displayTileEditorPropertyPanel();
             },
         }];
-        if (editingState.selectedLayerIndex !== i) {
+        if (editingState.selectedLayerKey !== definition.key) {
             row.unshift({
                 name: '>',
                 id: `layer-${i}-select`,
                 onClick() {
-                    editingState.selectedLayerIndex = i;
+                    editingState.selectedLayerKey = definition.key;
                     enterLocation(state, state.location);
                     displayTileEditorPropertyPanel();
                 }
@@ -271,7 +272,7 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
                 name: '**',
                 id: `layer-${i}-unselect`,
                 onClick() {
-                    delete editingState.selectedLayerIndex;
+                    delete editingState.selectedLayerKey;
                     enterLocation(state, state.location);
                     displayTileEditorPropertyPanel();
                 }
@@ -307,15 +308,12 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
                 onClick() {
                     state.areaInstance.definition.layers.splice(i, 1);
                     state.areaInstance.alternateArea.definition.layers.splice(i, 1);
-                    if (editingState.selectedLayerIndex >= state.areaInstance.definition.layers.length) {
-                        editingState.selectedLayerIndex = state.areaInstance.definition.layers.length - 1;
-                    }
                     enterLocation(state, state.location);
                     displayTileEditorPropertyPanel();
                 },
             });
         }
-        if (editingState.selectedLayerIndex === i) {
+        if (editingState.selectedLayerKey === definition.key) {
             rows.push(row);
             row = [{
                 name: 'Priority',
@@ -343,11 +341,6 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
                     state.areaInstance.definition.layers[i - 1] = definition;
                     state.areaInstance.alternateArea.definition.layers[i] = state.areaInstance.alternateArea.definition.layers[i - 1];
                     state.areaInstance.alternateArea.definition.layers[i - 1] = alternateDefinition;
-                    if (editingState.selectedLayerIndex === i - 1) {
-                        editingState.selectedLayerIndex = i;
-                    } else if (editingState.selectedLayerIndex === i) {
-                        editingState.selectedLayerIndex = i - 1;
-                    }
                     enterLocation(state, state.location);
                     displayTileEditorPropertyPanel();
                 },
@@ -384,11 +377,6 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
                     state.areaInstance.definition.layers[i + 1] = definition;
                     state.areaInstance.alternateArea.definition.layers[i] = state.areaInstance.alternateArea.definition.layers[i + 1];
                     state.areaInstance.alternateArea.definition.layers[i + 1] = alternateDefinition;
-                    if (editingState.selectedLayerIndex === i + 1) {
-                        editingState.selectedLayerIndex = i;
-                    } else if (editingState.selectedLayerIndex === i) {
-                        editingState.selectedLayerIndex = i + 1;
-                    }
                     enterLocation(state, state.location);
                     displayTileEditorPropertyPanel();
                 },
@@ -667,8 +655,8 @@ function deleteTile(x: number, y: number): void {
     const ty = Math.floor((state.camera.y + y) / 16);
     const tx = Math.floor((state.camera.x + x) / 16);
     const area = state.areaInstance;
-    if (editingState.selectedLayerIndex >= 0) {
-        deleteTileFromLayer(tx, ty, area, area.layers[editingState.selectedLayerIndex]);
+    if (editingState.selectedLayerKey) {
+        deleteTileFromLayer(tx, ty, area, area.layers.find(layer => layer.key === editingState.selectedLayerKey));
     } else {
         for (const layer of area.layers) {
             deleteTileFromLayer(tx, ty, area, layer);
@@ -685,17 +673,23 @@ function deleteTileFromLayer(tx: number, ty: number, area: AreaInstance, layer: 
     if (tx < 0 || tx > tiles[0].length - 1 || ty < 0 || ty > tiles.length - 1) {
         return;
     }
+    if (layerDefinition.mask?.tiles?.[ty]?.[tx]) {
+        layerDefinition.mask.tiles[ty][tx] = null;
+        layer.maskTiles[ty][tx] = null;
+    }
     if (!definition.isSpiritWorld) {
         // In the physical world we just replace tiles with the empty tile.
         layer.originalTiles[ty][tx] = layer.tiles[ty][tx] = null;
         tiles[ty][tx] = 0;
-        applyTileChangeToSpiritWorld(area.alternateArea, editingState.selectedLayerIndex, tx, ty, allTiles[0]);
+        applyTileChangeToSpiritWorld(area.alternateArea, layerDefinition, tx, ty, allTiles[0]);
     } else {
         // Clear the tile definition in the spirit world.
         tiles[ty][tx] = 0;
         // And set the instance to use the tile from the parent definition.
-        layer.originalTiles[ty][tx] = layer.tiles[ty][tx] =
-            allTiles[definition.parentDefinition.layers[editingState.selectedLayerIndex].grid.tiles[ty][tx]];
+        const parentLayer = definition.parentDefinition?.layers.find(layer => layer.key === editingState.selectedLayerKey);
+        if (parentLayer) {
+            layer.originalTiles[ty][tx] = layer.tiles[ty][tx] = allTiles[parentLayer.grid.tiles[ty][tx]];
+        }
     }
 }
 
@@ -717,8 +711,8 @@ function updateBrushSelection(x: number, y: number): void {
     const {L, R, T, B} = getSelectionBounds(state, editingState.dragOffset.x, editingState.dragOffset.y, x, y);
     const rectangle = {x: L, y: T, w: R - L + 1, h: B - T + 1};
     editingState.brush = {};
-    if (editingState.selectedLayerIndex >= 0) {
-        const layerDefinition = state.areaInstance.definition.layers[editingState.selectedLayerIndex];
+    if (editingState.selectedLayerKey) {
+        const layerDefinition = state.areaInstance.definition.layers.find(layer => layer.key === editingState.selectedLayerKey);
         editingState.brush.none = getTileGridFromLayer(layerDefinition, rectangle);
     } else {
         for (const layerDefinition of state.areaInstance.definition.layers) {
@@ -734,14 +728,13 @@ function drawBrush(x: number, y: number): void {
     const area = state.areaInstance;
     for (const layer of area.layers) {
         const layerDefinition = layer.definition;
-        const layerIndex = area.definition.layers.indexOf(layerDefinition);
-        const parentLayer = area.definition.parentDefinition?.layers[layerIndex];
+        const parentLayer = area.definition.parentDefinition?.layers?.find(parentLayer => parentLayer.key === layer.key);
         // When a layer is selected, only draw to it.
-        if (editingState.selectedLayerIndex >= 0 && editingState.selectedLayerIndex !== layerIndex) {
+        if (editingState.selectedLayerKey && layer.key !== editingState.selectedLayerKey) {
             continue;
         }
         let brushGrid = editingState.brush[layerDefinition.key];
-        if (editingState.selectedLayerIndex >= 0 && !brushGrid) {
+        if (editingState.selectedLayerKey && !brushGrid) {
             // If a specific layer is selected, apply the 'none' brush to it.
             brushGrid = editingState.brush.none;
             if (!brushGrid) {
@@ -770,7 +763,8 @@ function drawBrush(x: number, y: number): void {
                     if (defaultLayer !== layer.key) {
                         continue;
                     }
-                    tileRow[column] = tile;
+                    paintSingleTile(area, layer, parentLayer, column, row, tile);
+                    /*tileRow[column] = tile;
                     if (!fullTile && parentLayer) {
                         const parentTile = allTiles[parentLayer.grid?.tiles[row][column]];
                         // Tiles with linked offsets map to different tiles than the parent definition.
@@ -779,10 +773,10 @@ function drawBrush(x: number, y: number): void {
                     }
                     layer.tiles[row][column] = fullTile;
                     layer.originalTiles[row][column] = fullTile;
-                    applyTileChangeToSpiritWorld(area.alternateArea, layerIndex, column, row, fullTile);
+                    applyTileChangeToSpiritWorld(area.alternateArea, layer.key, column, row, fullTile);
                     state.areaInstance.tilesDrawn[row][column] = false;
                     state.areaInstance.checkToRedrawTiles = true;
-                    resetTileBehavior(area, {x: column, y: row});
+                    resetTileBehavior(area, {x: column, y: row});*/
                 }
             }
             continue;
@@ -799,7 +793,8 @@ function drawBrush(x: number, y: number): void {
                     continue;
                 }
                 const tile = brushGrid.tiles[y][x];
-                tileRow[column] = tile;
+                paintSingleTile(area, layer, parentLayer, column, row, tile);
+                /*tileRow[column] = tile;
                 let fullTile = allTiles[tile];
                 if (!fullTile && parentLayer) {
                     const parentTile = allTiles[parentLayer.grid?.tiles[row][column]];
@@ -809,18 +804,56 @@ function drawBrush(x: number, y: number): void {
                 }
                 layer.tiles[row][column] = fullTile;
                 layer.originalTiles[row][column] = fullTile;
-                applyTileChangeToSpiritWorld(area.alternateArea, layerIndex, column, row, fullTile);
+                applyTileChangeToSpiritWorld(area.alternateArea, layer.key, column, row, fullTile);
                 state.areaInstance.tilesDrawn[row][column] = false;
                 state.areaInstance.checkToRedrawTiles = true;
-                resetTileBehavior(area, {x: column, y: row});
+                resetTileBehavior(area, {x: column, y: row});*/
             }
         }
     }
 }
+function paintSingleTile(area: AreaInstance, layer: AreaLayer, parentDefinition: AreaLayerDefinition, x: number, y: number, tile: number) {
+    if (!layer) {
+        return;
+    }
+    let fullTile = allTiles[tile];
+    // If this tile was erased, replace it with the tile dictated by the parent definition if there is one.
+    if (!fullTile && parentDefinition) {
+        const parentTile = allTiles[parentDefinition.grid?.tiles[y][x]];
+        // Tiles with linked offsets map to different tiles than the parent definition.
+        const linkedOffset = parentTile?.behaviors?.linkedOffset || 0;
+        fullTile = linkedOffset ? allTiles[parentTile.index + linkedOffset] : parentTile;
+    }
+    if (fullTile?.behaviors?.maskFrame) {
+        if (!layer.definition.mask) {
+            layer.definition.mask = {
+                w: layer.definition.grid.w,
+                h: layer.definition.grid.h,
+                tiles: [],
+            };
+        }
+        layer.definition.mask.tiles[y] = layer.definition.mask.tiles[y] || [];
+        layer.definition.mask.tiles[y][x] = tile;
+        layer.maskTiles = layer.maskTiles || [];
+        layer.maskTiles[y] = layer.maskTiles[y] || [];
+        layer.maskTiles[y][x] = fullTile;
+        // console.log(layer.key, layer.tiles[y][x], layer.maskTiles[y][x]);
+    } else {
+        layer.definition.grid.tiles[y][x] = tile;
+        layer.tiles[y][x] = fullTile;
+        layer.originalTiles[y][x] = fullTile;
+    }
+    applyTileChangeToSpiritWorld(area.alternateArea, layer.definition, x, y, fullTile);
+    if (area.tilesDrawn[y]?.[x]) {
+        area.tilesDrawn[y][x] = false;
+    }
+    area.checkToRedrawTiles = true;
+    resetTileBehavior(area, {x, y});
+}
 function replaceTiles(x: number, y: number): void {
     const state = getState();
-    const layer = editingState.selectedLayerIndex >= 0
-        ? state.areaInstance.layers[editingState.selectedLayerIndex]
+    const layer = editingState.selectedLayerKey
+        ? state.areaInstance.layers.find(layer => layer.key === editingState.selectedLayerKey)
         : (
             state.areaInstance.layers.find(l => l.key === 'field')
             || state.areaInstance.layers[state.areaInstance.layers.length - 1]
@@ -833,7 +866,8 @@ function replaceTiles(x: number, y: number): void {
         for (let x = 0; x < layer.tiles[y].length; x++) {
             const t = layer.tiles[y][x];
             if (t === tile && Math.random() <= editingState.replacePercentage / 100) {
-                layer.definition.grid.tiles[y][x] = replacement;
+                paintSingleTile(state.areaInstance, layer, parentLayer, x, y, replacement);
+                /*layer.definition.grid.tiles[y][x] = replacement;
                 let fullTile = allTiles[replacement];
                 if (!fullTile && parentLayer) {
                     const parentTile = allTiles[parentLayer.grid?.tiles[y][x]];
@@ -846,14 +880,14 @@ function replaceTiles(x: number, y: number): void {
                 state.areaInstance.tilesDrawn[y][x] = false;
                 state.areaInstance.checkToRedrawTiles = true;
                 resetTileBehavior(state.areaInstance, {x, y});
-                applyTileChangeToSpiritWorld(state.alternateAreaInstance, editingState.selectedLayerIndex, x, y, fullTile);
+                applyTileChangeToSpiritWorld(state.alternateAreaInstance, layer.key, x, y, fullTile);*/
             }
         }
     }
 }
 // Apply a tile change to the spirit world if it doesn't have its own tile definition (the tile is null).
-function applyTileChangeToSpiritWorld(area: AreaInstance, layerIndex: number, x: number, y: number, tile: FullTile): void {
-    const layerDefinition = area.definition.layers[layerIndex];
+function applyTileChangeToSpiritWorld(area: AreaInstance, parentDefinition: AreaLayerDefinition, x: number, y: number, tile: FullTile): void {
+    const layerDefinition = area.definition.layers.find(layer => layer.key === parentDefinition.key);
     if (!area.definition.isSpiritWorld || !layerDefinition) {
         return;
     }
@@ -861,7 +895,8 @@ function applyTileChangeToSpiritWorld(area: AreaInstance, layerIndex: number, x:
         return;
     }
     const areaLayer = area.layers.find(layer => layer.definition === layerDefinition);
-    if (!areaLayer) {
+    paintSingleTile(area, areaLayer, parentDefinition, x, y, tile?.index || 0);
+    /*if (!areaLayer) {
         return;
     }
     areaLayer.tiles[y][x] = tile;
@@ -869,7 +904,7 @@ function applyTileChangeToSpiritWorld(area: AreaInstance, layerIndex: number, x:
         area.tilesDrawn[y][x] = false;
     }
     area.checkToRedrawTiles = true;
-    resetTileBehavior(area, {x, y});
+    resetTileBehavior(area, {x, y});*/
 }
 
 export function renderEditor(context: CanvasRenderingContext2D, state: GameState): void {
@@ -908,8 +943,8 @@ function getTileGridFromLayer(layerDefinition: AreaLayerDefinition, rectangle: S
 export function selectSection() {
     const state = getState();
     editingState.brush = {};
-    if (editingState.selectedLayerIndex >= 0) {
-        const layerDefinition = state.areaInstance.definition.layers[editingState.selectedLayerIndex];
+    if (editingState.selectedLayerKey) {
+        const layerDefinition = state.areaInstance.definition.layers.find(l => l.key === editingState.selectedLayerKey);
         editingState.brush = {
             none: getTileGridFromLayer(layerDefinition, state.areaSection),
         };
@@ -971,7 +1006,7 @@ function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, a
                         }
                     }
                     // If the default brush layer is used and no layer is selected, add all the default layer keys.
-                    if (editingState.brush.none && !(editingState.selectedLayerIndex >= 0)) {
+                    if (editingState.brush.none && !editingState.selectedLayerKey) {
                         if (!allLayerKeys.includes('floor')) {
                             allLayerKeys.push('floor');
                         }
@@ -982,7 +1017,7 @@ function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, a
                             allLayerKeys.push('foreground');
                         }
                     }
-                    const selectedLayer = state.areaInstance.definition.layers[editingState.selectedLayerIndex];
+                    const selectedLayer = state.areaInstance.definition.layers.find(l => l.key === editingState.selectedLayerKey);
                     // Draw background layers, then foreground layers.
                     for (const priorityToDraw of ['background', 'foreground']) {
                         for (const layerKey of allLayerKeys) {
@@ -1117,4 +1152,96 @@ document.addEventListener('keydown', function(event: KeyboardEvent) {
         }
     }
 });
+
+function performGlobalTileReplacement(oldPalette: TilePalette, newPalette: TilePalette): void {
+    const map: number[] = [];
+    for (let y = 0; y < oldPalette.length; y++) {
+        for (let x = 0; x < oldPalette[y].length; x++) {
+            map[oldPalette[y][x]] = newPalette[y][x];
+        }
+    }
+    for (let zoneKey in zones) {
+        const zone = zones[zoneKey];
+        let changed = false;
+        for (const floor of zone.floors) {
+            for (const grid of [floor.grid, floor.spiritGrid]) {
+                if (!grid) continue;
+                for (const areaRow of grid) {
+                    for (const area of areaRow) {
+                        if (!area?.layers) continue;
+                        for (const layer of area.layers) {
+                            for (const tileRow of layer.grid.tiles) {
+                                for (let x = 0; x < tileRow.length; x++) {
+                                    if (map[tileRow[x]]) {
+                                        console.log(tileRow[x] + ' => ' + map[tileRow[x]]);
+                                        tileRow[x] = map[tileRow[x]];
+                                        changed = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (changed) {
+            console.log('Updated' + zone.key);
+            const state = getState();
+            if (state.location.zoneKey !== zoneKey) {
+                state.location.zoneKey = zoneKey;
+                state.location.floor = 0;
+                enterLocation(state, state.location);
+                displayTileEditorPropertyPanel();
+            }
+            return;
+        }
+    }
+}
+window['performGlobalTileReplacement'] = performGlobalTileReplacement;
+
+
+function fixMismatchedLayers(): void {
+    for (let zoneKey in zones) {
+        const zone = zones[zoneKey];
+        let changed = false;
+        for (const floor of zone.floors) {
+            for (let row = 0; row < floor.grid.length; row++) {
+                for (let column = 0; column < floor.grid[row].length; column++) {
+                    const area = floor.grid[row][column];
+                    const spiritArea = floor.spiritGrid[row][column];
+                    if (!spiritArea?.layers) {
+                        continue;
+                    }
+                    spiritArea.layers = area.layers.map(layer => {
+                        const spiritLayer = spiritArea.layers.find(spiritLayer => spiritLayer.key === layer.key);
+                        if (spiritLayer) {
+                            return spiritLayer;
+                        }
+                        changed = true;
+                        return {
+                            key: layer.key,
+                            grid: {
+                                ...layer.grid,
+                                // The matrix of tiles
+                                tiles: [],
+                            },
+                        };
+                    });
+                }
+            }
+        }
+        if (changed) {
+            console.log('Updated' + zone.key);
+            const state = getState();
+            if (state.location.zoneKey !== zoneKey) {
+                state.location.zoneKey = zoneKey;
+                state.location.floor = 0;
+                enterLocation(state, state.location);
+                displayTileEditorPropertyPanel();
+            }
+            return;
+        }
+    }
+}
+window['fixMismatchedLayers'] = fixMismatchedLayers;
 

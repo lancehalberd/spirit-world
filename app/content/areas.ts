@@ -10,6 +10,7 @@ import { editingState } from 'app/development/tileEditor';
 import { createCanvasAndContext } from 'app/dom';
 import { checkForFloorEffects } from 'app/moveActor';
 import { isPointInShortRect } from 'app/utils/index';
+import { playSound } from 'app/utils/sounds';
 import { updateCamera } from 'app/updateCamera';
 
 import {
@@ -22,6 +23,12 @@ import {
 } from 'app/types';
 
 
+export function playAreaSound(state: GameState, area: AreaInstance, key: string) {
+    if (!key || state.areaInstance !== area) {
+        return;
+    }
+    playSound(key);
+}
 
 export function getDefaultArea(): AreaDefinition {
     return {
@@ -472,10 +479,13 @@ export function resetTileBehavior(area: AreaInstance, {x, y}: Tile): void {
 }
 
 export function mapTileNumbersToFullTiles(tileNumbers: number[][]): FullTile[][] {
+    if (!tileNumbers) {
+        return null;
+    }
     const fullTiles: FullTile[][] = [];
     for (let i = 0; i < tileNumbers.length; i++) {
         fullTiles[i] = [];
-        for (let j = 0; j < tileNumbers[i].length; j++) {
+        for (let j = 0; j < tileNumbers[i]?.length; j++) {
             if (tileNumbers[i][j] && typeof tileNumbers[i][j] !== 'number') {
                 console.error('NaN', tileNumbers[i][j]);
                 debugger;
@@ -500,9 +510,9 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
         behaviorGrid,
         tilesDrawn: [],
         checkToRedrawTiles: true,
-        layers: definition.layers.filter((layer, index) => {
+        layers: definition.layers.filter((layer) => {
             // The selected layer is always visible.
-            if (editingState.isEditing && editingState.selectedLayerIndex === index) {
+            if (editingState.isEditing && editingState.selectedLayerKey === layer.key) {
                 return true;
             }
             // visibilityOverride dictates state of layers if they are not selected and it is set to show/hide.
@@ -530,6 +540,7 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
             ...layer,
             ...layer.grid,
             tiles: mapTileNumbersToFullTiles(layer.grid.tiles),
+            maskTiles: mapTileNumbersToFullTiles(layer.mask?.tiles),
             originalTiles: mapTileNumbersToFullTiles(layer.grid.tiles),
         })),
         objects: [],

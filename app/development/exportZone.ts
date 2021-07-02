@@ -79,6 +79,17 @@ export function serializeZone(zone: Zone) {
                                 lines.push('                ],');
                                 lines.push('            },');
                             }
+                            if (layer.mask && layer.mask.tiles.some(row => row?.some(element => element))) {
+                                lines.push('            mask: {');
+                                lines.push(`                w: ${layer.mask.w},`);
+                                lines.push(`                h: ${layer.mask.h},`);
+                                lines.push('                tiles: [');
+                                for (const row of layer.mask.tiles) {
+                                    lines.push(`                    [${row?.map(v => v || 0).join(',') || ''}],`);
+                                }
+                                lines.push('                ],');
+                                lines.push('            },');
+                            }
                             lines.push('        },');
                         });
                         lines.push('    ],');

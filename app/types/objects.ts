@@ -60,16 +60,17 @@ export type ObjectStatus = 'active' | 'closed' | 'closedEnemy' | 'closedSwitch'
     | 'locked' | 'bigKeyLocked' | 'cracked' | 'blownOpen' | 'frozen';
 
 export interface MovementProperties {
-    boundToSection?: boolean,
-    boundToSectionPadding?: number,
-    canPush?: boolean,
-    canFall?: boolean,
-    canSwim?: boolean,
-    canClimb?: boolean,
+    boundToSection?: boolean
+    boundToSectionPadding?: number
+    canPush?: boolean
+    canFall?: boolean
+    canSwim?: boolean
+    canClimb?: boolean
     // Whether the mover should wiggle to fit into tight spaces.
-    canWiggle?: boolean,
+    canWiggle?: boolean
     // Objects to ignore for hit detection.
     excludedObjects?: Set<any>
+    needsFullTile?: boolean
 }
 
 export interface HitProperties {

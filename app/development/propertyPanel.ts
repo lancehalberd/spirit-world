@@ -189,6 +189,9 @@ function drawBrushCanvasLayer(selectedTiles: TileGridDefinition): void {
                     drawX(brushContext, tx * 16, ty * 16);
                     continue;
                 }
+                if (tile.behaviors?.maskFrame) {
+                    drawFrame(brushContext, tile.behaviors.maskFrame, {w: 16, h: 16, x: tx * 16, y: ty * 16});
+                }
                 drawFrame(brushContext, tile.frame, {w: 16, h: 16, x: tx * 16, y: ty * 16});
             }
         }
@@ -222,7 +225,7 @@ function renderProperty(property: EditorProperty<any> | HTMLElement | string): s
         const palette = property.palette;
         paletteCanvas.width = palette[0].length * 16;
         paletteCanvas.height = palette.length * 16;
-        const scale = Math.min(1, 400 / paletteCanvas.height);
+        const scale = Math.min(1, 1024 / paletteCanvas.height);
 
         for (let i = 0; i < palette.length; i++) {
             for (let j = 0; j < palette[i].length; j++) {
@@ -230,6 +233,9 @@ function renderProperty(property: EditorProperty<any> | HTMLElement | string): s
                 if (!tile) {
                     drawX(paletteContext, j * 16, i * 16);
                     continue;
+                }
+                if (tile.behaviors?.maskFrame) {
+                    drawFrame(paletteContext, tile.behaviors.maskFrame, {w: 16, h: 16, x: j * 16, y: i * 16});
                 }
                 drawFrame(paletteContext, tile.frame, { x: 16 * j, y: 16 * i, w: 16, h: 16});
             }

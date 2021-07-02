@@ -333,10 +333,12 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
                 const points = [0, 5, 10, 15];
                 // There is special logic for pushing in the direction the hero is facing since we expect that
                 // direction to be blocked by the object they are grabbing.
+                const excludedObjects = new Set([hero, hero.grabObject]);
                 if ((direction === hero.d && (hero.x === hero.grabObject.x || hero.y === hero.grabObject.y))
                     || points.every(x => points.every(y => isPointOpen(state, hero.area,
                         {x: hero.x + x + 16 * directionMap[direction][0], y: hero.y + y + 16 * directionMap[direction][1] },
-                        { canFall: true, canSwim: true }
+                        { canFall: true, canSwim: true },
+                        excludedObjects
                     )))
                 ) {
                     hero.grabObject.onPull(state, direction, hero);
@@ -702,6 +704,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
                     const behavior = tile?.behaviors;
                     if (behavior?.pickupWeight <= state.hero.passiveTools.gloves) {
                         hero.pickUpTile = tile;
+                        playSound('pickUpObject');
                         destroyTile(state, hero.area, {...closestLiftableTileCoords, layerKey: layer.key});
                         if (behavior.linkableTiles) {
                             const alternateLayer = _.find(state.alternateAreaInstance.layers, {key: layer.key});
@@ -1029,21 +1032,19 @@ export function throwHeldObject(state: GameState, hero: Hero){
     const behaviors = tile.behaviors;
     const thrownObject = new ThrownObject({
         frame: tile.frame,
-        particles: behaviors?.particles,
+        behaviors,
         x: hero.x,
         y: hero.y,
         vx: directionMap[hero.d][0] * throwSpeed,
         vy: directionMap[hero.d][1] * throwSpeed,
         vz: 2,
     });
-    thrownObject.behaviors.brightness = behaviors?.brightness;
-    thrownObject.behaviors.lightRadius = behaviors?.lightRadius;
     addObjectToArea(state, hero.area, thrownObject);
     if (tile.linkedTile) {
         const behaviors = tile.linkedTile.behaviors;
         const alternateThrownObject = new ThrownObject({
             frame: tile.linkedTile.frame,
-            particles: behaviors?.particles,
+            behaviors,
             x: hero.x,
             y: hero.y,
             vx: directionMap[hero.d][0] * throwSpeed,
@@ -1051,8 +1052,6 @@ export function throwHeldObject(state: GameState, hero: Hero){
             vz: 2,
         });
         alternateThrownObject.linkedObject = thrownObject;
-        alternateThrownObject.behaviors.brightness = behaviors?.brightness;
-        alternateThrownObject.behaviors.lightRadius = behaviors?.lightRadius;
         thrownObject.linkedObject = alternateThrownObject;
         addObjectToArea(state, state.alternateAreaInstance, alternateThrownObject);
     }

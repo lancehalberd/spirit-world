@@ -1,5 +1,5 @@
 import { addParticleAnimations } from 'app/content/animationEffect';
-import { removeObjectFromArea } from 'app/content/areas';
+import { playAreaSound, removeObjectFromArea } from 'app/content/areas';
 import { drawFrame } from 'app/utils/animations';
 import { hitTargets } from 'app/utils/field';
 
@@ -7,15 +7,15 @@ import { AreaInstance, Frame, GameState, ObjectInstance, ObjectStatus, TileBehav
 
 
 interface Props {
-    frame: Frame,
-    particles?: Frame[],
+    frame: Frame
+    behaviors: TileBehaviors
     x?: number
-    y?: number,
-    z?: number,
-    vx?: number,
-    vy?: number,
-    vz?: number,
-    damage?: number,
+    y?: number
+    z?: number
+    vx?: number
+    vy?: number
+    vz?: number
+    damage?: number
 }
 
 export class ThrownObject implements ObjectInstance {
@@ -25,7 +25,6 @@ export class ThrownObject implements ObjectInstance {
     linkedObject: ThrownObject;
     type = 'thrownObject' as 'thrownObject';
     frame: Frame;
-    particles: Frame[];
     ignorePits = true;
     x: number;
     y: number;
@@ -36,9 +35,8 @@ export class ThrownObject implements ObjectInstance {
     damage;
     broken = false;
     status: ObjectStatus = 'normal';
-    constructor({frame, particles = [], x = 0, y = 0, z = 17, vx = 0, vy = 0, vz = 0, damage = 1 }: Props) {
+    constructor({frame, behaviors, x = 0, y = 0, z = 17, vx = 0, vy = 0, vz = 0, damage = 1 }: Props) {
         this.frame = frame;
-        this.particles = particles;
         this.x = x;
         this.y = y;
         this.z = z;
@@ -46,7 +44,7 @@ export class ThrownObject implements ObjectInstance {
         this.vy = vy;
         this.vz = vz;
         this.damage = damage;
-        this.behaviors = {};
+        this.behaviors = behaviors ?? {};
     }
     getHitbox(state: GameState) {
         // Technically it is unrealistic to use the z-component in the hitbox, but practically
@@ -74,7 +72,8 @@ export class ThrownObject implements ObjectInstance {
     breakOnImpact(state) {
         if (!this.broken) {
             this.broken = true;
-            addParticleAnimations(state, this.area, this.x, this.y, this.z, this.particles, this.behaviors);
+            playAreaSound(state, this.area, this.behaviors.breakSound);
+            addParticleAnimations(state, this.area, this.x, this.y, this.z, this.behaviors.particles, this.behaviors);
             if (this.linkedObject && !this.linkedObject.broken) {
                 this.linkedObject.breakOnImpact(state);
             }

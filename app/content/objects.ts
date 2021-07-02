@@ -109,7 +109,7 @@ export function deactivateTargets(state: GameState, area: AreaInstance, targetOb
             object.onDeactivate(state);
             continue;
         }
-        if (object.definition?.status === 'closedSwitch') {
+        if (object.definition?.status === 'closedSwitch' && !object.definition.saveStatus) {
             changeObjectStatus(state, object, 'closedSwitch');
         }
     }

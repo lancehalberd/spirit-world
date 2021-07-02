@@ -39,8 +39,11 @@ export interface TileBehaviors {
     elementTiles?: {[key in MagicElement]?: number},
     // Indicates this tile is outside of the current area section.
     outOfBounds?: boolean,
+    maskFrame?: Frame,
     // Array of frames to use for particles when this tile/object is destroyed.
     particles?: Frame[],
+    // Key for the sound to play when this tile/object is destroyed.
+    breakSound?: string,
     // If a player falls in a pit they will take damage and respawn at their last stable location.
     pit?: boolean,
     // Assign this to skip tiles in source images.
@@ -104,6 +107,7 @@ export interface AreaTileGrid extends TileGrid {
     // This is different than the definition because certain effects change the reset behavior
     // but should not actually change the definition of the area.
     originalTiles: FullTile[][],
+    maskTiles?: FullTile[][],
 }
 
 export interface ZoneLocation {
@@ -125,6 +129,7 @@ export interface AreaLayerDefinition {
     logicKey?: string,
     drawPriority?: DrawPriority,
     grid?: TileGridDefinition,
+    mask?: TileGridDefinition,
     // This is not saved on export and is just used when editing.
     visibilityOverride?: 'show' | 'hide',
     // Coordinates for the layer origin, if not (0, 0).

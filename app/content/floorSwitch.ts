@@ -6,7 +6,7 @@ import {
 } from 'app/content/objects';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { rectanglesOverlap } from 'app/utils/index';
-import { playSound } from 'app/utils/sounds';
+import { playAreaSound } from 'app/content/areas';
 
 import {
     AreaInstance, DrawPriority, FloorSwitchDefinition, GameState,
@@ -53,19 +53,21 @@ export class FloorSwitch implements ObjectInstance {
             this.status = 'active';
         }
         if (this.definition.toggleOnRelease && this.definition.targetObjectId) {
-            playSound('switch');
             if (this.status === 'active') {
+                playAreaSound(state, this.area, 'switch');
                 checkIfAllSwitchesAreActivated(state, this.area, this);
             } else {
+                playAreaSound(state, this.area, 'smallSwitch');
                 deactivateTargets(state, this.area, this.definition.targetObjectId);
             }
             return;
         }
         // Don't apply the toggle effect on release unless toggleOnRelease is true.
         if (this.status === 'normal' && !this.definition.toggleOnRelease) {
+            playAreaSound(state, this.area, 'smallSwitch');
             return;
         }
-        playSound('switch');
+        playAreaSound(state, this.area, 'switch');
         if (this.definition.targetObjectId) {
             const object = findObjectInstanceById(this.area, this.definition.targetObjectId);
             this.toggleTargetStatus(state, object);

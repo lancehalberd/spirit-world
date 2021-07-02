@@ -65,9 +65,10 @@ export class PushPullObject implements ObjectInstance {
         }
         const x = this.x + 8 + 16 * directionMap[direction][0];
         const y = this.y + 8 + 16 * directionMap[direction][1];
-        const excludedObjects = new Set([hero]);
-        if (isPointOpen(state, this.area, {x, y}, {canFall: true}, excludedObjects)
-            && (!this.linkedObject || isPointOpen(state, this.linkedObject.area, {x, y}, {canFall: true}, excludedObjects))
+        const excludedObjects = new Set([hero, this, this.linkedObject]);
+        const movementProperties = {canFall: true, needsFullTile: true};
+        if (isPointOpen(state, this.area, {x, y}, movementProperties, excludedObjects)
+            && (!this.linkedObject || isPointOpen(state, this.linkedObject.area, {x, y}, movementProperties, excludedObjects))
         ) {
             this.pushDirection = direction;
             this.pullingHeroDirection = direction;

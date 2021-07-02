@@ -245,7 +245,8 @@ export function isPlayingTrack() {
 
 const preloadSounds = () => {
     [
-        {key: 'switch', source: 'sfx/switch.wav', volume: 10, limit: 2},
+        {key: 'switch', source: 'sfx/Diamond 1_odrive_bip.wav', volume: 10, limit: 2},
+        {key: 'smallSwitch', source: 'sfx/Cube click 2_Ocrive.wav', volume: 10, limit: 2},
         {key: 'rollingBall', source: 'sfx/rollingBall.wav',
             offset: '0:1400', loop: true, volume: 10, limit: 2
         },
@@ -262,6 +263,12 @@ const preloadSounds = () => {
             offset: '0:250', volume: 10, limit: 2},
         {key: 'blockAttack', source: 'sfx/coin wood c.wav',
             offset: '0:100', volume: 10, limit: 5},
+        {key: 'pickUpObject', source: 'sfx/Tricube 1_odrive.wav', volume: 50, limit: 1},
+        {key: 'bushShatter', source: 'sfx/Cube 2_odrive.wav', volume: 15, limit: 2},
+        {key: 'rockShatter', source: 'sfx/3x3_odrive.wav', volume: 15, limit: 2},
+        {key: 'doorClose', source: 'sfx/Cube-24_odrive.wav', volume: 10, limit: 1},
+        {key: 'doorOpen', source: 'sfx/cube-24.slide_odrive.wav', volume: 10, limit: 1},
+
     ].forEach(sound => requireSound(sound));
 };
 preloadSounds();

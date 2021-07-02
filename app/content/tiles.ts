@@ -31,6 +31,7 @@ const bushBehavior: TileBehaviors = {
     solid: true, pickupWeight: 0, cuttable: 1, lootTable: lifeLootTable,
     underTile: 22,
     particles: bushParticles,
+    breakSound: 'bushShatter',
     linkableTiles: [183],
     linkedOffset: 181,
 };
@@ -38,6 +39,7 @@ const lightStoneBehavior: TileBehaviors = {
     defaultLayer: 'field',
     low: true, solid: true, pickupWeight: 1, lootTable: simpleLootTable,
     particles: lightStoneParticles,
+    breakSound: 'rockShatter',
     linkableTiles: [185, 186],
     linkedOffset: 179,
 };
@@ -46,6 +48,7 @@ const heavyStoneBehavior: TileBehaviors = {
     defaultLayer: 'field',
     low: true, solid: true, pickupWeight: 2, lootTable: moneyLootTable,
     particles: heavyStoneParticles,
+    breakSound: 'rockShatter',
     linkableTiles: [187, 188],
     linkedOffset: 179,
 };
@@ -87,6 +90,7 @@ const spiritBushBehavior: TileBehaviors = {
     ...bushBehavior,
     underTile: 201,
     particles: spiritBushParticles,
+    breakSound: 'bushShatter',
     linkableTiles: [2],
 };
 const spiritLightStoneBehavior: TileBehaviors = {
@@ -206,35 +210,6 @@ const caveWallsPalette: TileSource = {
     behaviors: {'all': {solid: true}},
 };
 
-const shallowWaterPalette: TileSource = {
-    w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/water.png'), x: 0, y: 0, w: 64, h: 64},
-    behaviors: {'all': {defaultLayer: 'field', shallowWater: true}},
-};
-
-const deepWaterPalette: TileSource = {
-    w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/water.png'), x: 64, y: 0, w: 128, h: 64},
-    behaviors: {'all': deepWaterBehavior, '7x3': { skipped: true }},
-};
-/*
-const shallowAngledWaterPalette: TileSource = {
-    w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/water.png'), x: 0, y: 64, w: 64, h: 32},
-    behaviors: {'2x1': { skipped: true }},
-};
-const deepAngledWaterPalette: TileSource = {
-    w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/water.png'), x: 64, y: 64, w: 128, h: 32},
-    behaviors: {'2x1': { skipped: true }, '6x1': { skipped: true }},
-};
-*/
-const comboWaterPalette: TileSource = {
-    w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/water.png'), x: 192, y: 0, w: 64, h: 64},
-    behaviors: {'all': {defaultLayer: 'field', shallowWater: true}, '3x1': { skipped: true }, '3x2': { skipped: true }, '3x3': { skipped: true }},
-};
-
 const spiritPlantParticles = createAnimation('gfx/tiles/spiritplants.png', {w: 16, h: 16}, {x: 5, cols: 4}).frames;
 
 const spiritPlantBehavior: TileBehaviors = {
@@ -242,6 +217,7 @@ const spiritPlantBehavior: TileBehaviors = {
     solid: true, pickupWeight: 0, cuttable: 1, lootTable: lifeLootTable,
     underTile: 110,
     particles: spiritPlantParticles,
+    breakSound: 'bushShatter',
     brightness: 0.6,
     lightRadius: 48,
 };
@@ -434,6 +410,118 @@ const spiritRailsTiles: TileSource = {
     behaviors: {'all': {solid: true, defaultLayer: 'field'}},
 };
 
+const shallowWaterBehavior: TileBehaviors = { defaultLayer: 'field', shallowWater: true };
+const deepToShallow: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/deeptoshallowwater.png'), x: 0, y: 0, w: 64, h: 80},
+    behaviors: {
+        'all': shallowWaterBehavior,
+        '0x3': deepWaterBehavior, '1x3': deepWaterBehavior,
+        '0x4': deepWaterBehavior, '1x4': deepWaterBehavior,
+        '3x2': { skipped: true }
+    },
+};
+const deepToShallowAngles: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/deeptoshallowwater.png'), x: 64, y: 0, w: 64, h: 64},
+    behaviors: {
+        'all': deepWaterBehavior,
+        '0x0': { skipped: true }, '3x0': { skipped: true },
+        '0x3': { skipped: true }, '3x3': { skipped: true },
+        '1x1': shallowWaterBehavior, '1x2': shallowWaterBehavior,
+        '2x1': shallowWaterBehavior, '2x2': shallowWaterBehavior,
+    },
+};
+const shallowToDeep: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/shallowtodeepwater1.png'), x: 0, y: 0, w: 64, h: 80},
+    behaviors: {
+        'all': deepWaterBehavior,
+        '0x3': shallowWaterBehavior, '1x3': shallowWaterBehavior,
+        '0x4': shallowWaterBehavior, '1x4': shallowWaterBehavior,
+        '3x2': { skipped: true }
+    },
+};
+const shallowToDeepAngles: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/shallowtodeepwater1.png'), x: 64, y: 0, w: 64, h: 64},
+    behaviors: {
+        'all': shallowWaterBehavior,
+        '0x0': { skipped: true }, '3x0': { skipped: true },
+        '0x3': { skipped: true }, '3x3': { skipped: true },
+        '1x1': deepWaterBehavior, '1x2': deepWaterBehavior,
+        '2x1': deepWaterBehavior, '2x2': deepWaterBehavior,
+    },
+};
+
+const shore: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/watershore.png'), x: 0, y: 0, w: 64, h: 80},
+    behaviors: {
+        'all': { defaultLayer: 'floor' },
+        '3x0': { skipped: true }, '3x1': { skipped: true },
+    },
+};
+const shoreAngles: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/watershore.png'), x: 64, y: 0, w: 64, h: 64},
+    behaviors: {
+        'all': { defaultLayer: 'floor' },
+        '0x0': { skipped: true }, '3x0': { skipped: true },
+        '0x3': { skipped: true }, '3x3': { skipped: true },
+    },
+};
+
+const shoreMask: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/blackmaskground.png'), x: 0, y: 0, w: 64, h: 80},
+    behaviors: {
+        'all': { defaultLayer: 'floor' },
+        '3x0': { skipped: true }, '3x1': { skipped: true },
+    },
+};
+const shoreAnglesMask: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/blackmaskground.png'), x: 64, y: 0, w: 64, h: 64},
+    behaviors: {
+        'all': { defaultLayer: 'floor' },
+        '0x0': { skipped: true }, '3x0': { skipped: true },
+        '0x3': { skipped: true }, '3x3': { skipped: true },
+    },
+};
+
+function applyMask(targetSource: TileSource, maskSource: TileSource) {
+    const {w, h} = targetSource;
+    for (let py = 0; py < targetSource.source.h / h; py ++) {
+        for (let px = 0; px < targetSource.source.w / w; px ++) {
+            const behaviors = targetSource.behaviors?.[`${px}x${py}`] || targetSource.behaviors?.all || {};
+            if (behaviors?.skipped) {
+                continue;
+            }
+            targetSource.behaviors[`${px}x${py}`] = {
+                ...behaviors,
+                maskFrame: {
+                    image: maskSource.source.image,
+                    x: maskSource.source.x + px * w,
+                    y: maskSource.source.y + py * h,
+                    w,
+                    h,
+                },
+            };
+        }
+    }
+}
+
+applyMask(shore, shoreMask);
+applyMask(shoreAngles, shoreAnglesMask);
+
+
+
+const deletedTileSource: TileSource = solidColorTile('#FF0000');
+function deletedTiles(n: number): TileSource[] {
+    return [...new Array(n)].map(() => deletedTileSource);
+}
+
 addTiles([
     // This is the empty tile.
     singleTileSource('gfx/tiles/bush.png', {defaultLayer: 'field'}, -16),
@@ -475,11 +563,10 @@ addTiles([
     spiritPlantsPalette,
     brightGrass,
     treeLeaves,
-    shallowWaterPalette,
-    deepWaterPalette,
-    //shallowAngledWaterPalette,
-    //deepAngledWaterPalette,
-    comboWaterPalette,
+    shore,
+    shoreAngles,
+    //30 empty tiles where old water tiles used to be.
+    ...deletedTiles(30),
     singleTileSource('gfx/tiles/bushspirit.png', spiritBushBehavior, 0),
     singleTileSource('gfx/tiles/thornsspirit.png', spiritThornBehavior),
     singleTileSource('gfx/tiles/rocksspirit.png', spiritLightStoneBehavior),
@@ -515,5 +602,9 @@ addTiles([
     cloudTiles,
     railsTiles,
     spiritRailsTiles,
+    shallowToDeep,
+    shallowToDeepAngles,
+    deepToShallow,
+    deepToShallowAngles,
 ]);
 

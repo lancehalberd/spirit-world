@@ -1,6 +1,6 @@
 import _ from 'lodash';
 
-import { applyBehaviorToTile, enterZoneByTarget, resetTileBehavior } from 'app/content/areas';
+import { applyBehaviorToTile, enterZoneByTarget, playAreaSound, resetTileBehavior } from 'app/content/areas';
 import { findObjectInstanceById } from 'app/content/objects';
 import {
     BITMAP_LEFT, BITMAP_RIGHT,
@@ -222,6 +222,13 @@ export class Door implements ObjectInstance {
         return this.status === 'normal' || this.status === 'blownOpen';
     }
     changeStatus(state: GameState, status: ObjectStatus): void {
+        const wasClosed = this.status === 'closed' || this.status === 'closedSwitch' || this.status === 'closedEnemy';
+        const isClosed = status === 'closed' || status === 'closedSwitch' || status === 'closedEnemy';
+        if (wasClosed && status === 'normal') {
+            playAreaSound(state, this.area, 'doorOpen');
+        } else if (isClosed && this.status === 'normal') {
+            playAreaSound(state, this.area, 'doorClose');
+        }
         this.status = status;
         if (this.linkedObject && this.linkedObject.status !== status) {
             this.linkedObject.changeStatus(state, status);

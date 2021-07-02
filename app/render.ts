@@ -506,6 +506,7 @@ export function renderAreaObjectsAfterHero(context: CanvasRenderingContext2D, st
     context.restore();
 }
 
+const [maskCanvas, maskContext] = createCanvasAndContext(16, 16);
 export function renderLayer(area: AreaInstance, layer: AreaLayer, parentLayer: AreaLayerDefinition): void {
     // Create foreground canvas only as needed.
     const isForeground = (layer.definition.drawPriority ?? layer.definition.key) === 'foreground';
@@ -518,8 +519,7 @@ export function renderLayer(area: AreaInstance, layer: AreaLayer, parentLayer: A
     const context = isForeground ? area.foregroundContext : area.context;
     const w = 16, h = 16;
     context.save();
-    if (editingState.isEditing && editingState.selectedLayerIndex >= 0 && getState().areaInstance.layers[editingState.selectedLayerIndex] !== layer) {
-        //console.log(getState().areaInstance.layers[editingState.selectedLayerIndex], layer);
+    if (editingState.isEditing && editingState.selectedLayerKey && editingState.selectedLayerKey !== layer.key) {
         context.globalAlpha *= 0.5;
     }
     for (let y = 0; y < layer.h; y++) {
@@ -531,11 +531,23 @@ export function renderLayer(area: AreaInstance, layer: AreaLayer, parentLayer: A
                 continue;
             }
             let tile = layer.tiles[y][x];
-            if (!tile) {
-                continue;
-                debugger;
+            const maskTile = layer.maskTiles?.[y]?.[x];
+            if (maskTile) {
+                // Create the masked tile to draw underneath the mask frame.
+                if (tile) {
+                    maskContext.clearRect(0, 0, 16, 16);
+                    maskContext.globalCompositeOperation = 'source-over';
+                    drawFrame(maskContext, maskTile.behaviors.maskFrame, {x: 0, y: 0, w: 16, h: 16});
+                    maskContext.globalCompositeOperation = 'source-in';
+                    drawFrame(maskContext, tile.frame, {x: 0, y: 0, w: 16, h: 16});
+                    // Draw the masked content first, then the mask frame on top.
+                    //window['debugCanvas'](maskCanvas);
+                    context.drawImage(maskCanvas, 0, 0, 16, 16, x * w, y * h, w, h);
+                }
+                drawFrame(context, maskTile.frame, {x: x * w, y: y * h, w, h});
+            } else if (tile) {
+                drawFrame(context, tile.frame, {x: x * w, y: y * h, w, h});
             }
-            drawFrame(context, tile.frame, {x: x * w, y: y * h, w, h});
         }
     }
     context.restore();
