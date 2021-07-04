@@ -37,5 +37,8 @@ export * from 'app/content/zones/demo/gloves';
 export * from 'app/content/zones/demo/sight';
 
 export function getZone(zoneKey: string): Zone {
+    if (!zones[zoneKey]) {
+        console.error('Missing zone: ', zoneKey);
+    }
     return zones[zoneKey];
 }

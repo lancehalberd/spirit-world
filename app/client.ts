@@ -2,6 +2,7 @@ import { addContextMenuListeners } from 'app/development/contextMenu';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { update } from 'app/update';
 import { render } from 'app/render';
+export * from 'app/randomizer/utils';
 
 setInterval(update, FRAME_LENGTH);
 

@@ -1,18 +1,30 @@
 import { StaffTowerLocation } from 'app/types';
 
-export interface LogicCheck {
+export interface SimpleLogicCheck {
+    operation?: 'isTrue' | 'isFalse'
     // This logic check is false unless all required flags are set.
-    requiredFlags: string[],
+    requiredFlags?: string[]
     // This logic check is false if any excluded flag is set.
-    excludedFlags: string[],
+    excludedFlags?: string[]
     // If this is set, this logic is false if the staff tower is in the player's inventory or if it's location
     // does not match the specified location.
-    staffTowerLocation?: StaffTowerLocation,
+    staffTowerLocation?: StaffTowerLocation
     // If this set is populated, this check is false if the current zone is not among the defined zones.
     // This is useful for restricting an NPCs dialogue to a particular area or set of areas.
-    zones?: string[],
+    zones?: string[]
 }
 
+export interface AndLogicCheck {
+    operation: 'and'
+    logicChecks: LogicCheck[]
+}
+
+export interface OrLogicCheck {
+    operation: 'or'
+    logicChecks: LogicCheck[]
+}
+
+export type LogicCheck = SimpleLogicCheck | AndLogicCheck | OrLogicCheck;
 
 export interface DialogueOption {
     // The logic that determines if this dialogue option is valid for the current game state.
@@ -36,4 +48,33 @@ export interface DialogueSet {
     key: string,
     // The dialogue options in priority order.
     options: DialogueOption[],
+}
+
+// Node used for building the logical graph of the game used for randomization.
+export interface LogicNode {
+    // The id of the zone this node is in
+    zoneId: string
+    // The id for this node, used for targeting it from other nodes.
+    nodeId: string
+    // The ids of any loot checks in this node.
+    checks?: {
+        // The id of the object that grants loot, could be a boss, chest, loot (eventually NPC).
+        objectId: string
+        logic?: LogicCheck
+    }[]
+    // Array of fixed paths to other logic nodes along with requirements for using them.
+    paths?: {
+        nodeId: string
+        logic?: LogicCheck
+    }[],
+    // Ids of any entrance objects
+    entranceIds?: string[]
+    // Ids of any exits along with logic requirements for using them. These ids are for objects
+    // and the exits will point to entranceIds of objects in other nodes.
+    exits?: {
+        // The id of the object, which can be used to find connected nodes by finding the connected exit
+        // and then finding the logic node with the corresponding entranceId.
+        objectId: string
+        logic?: LogicCheck
+    }[]
 }

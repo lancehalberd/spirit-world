@@ -1,5 +1,14 @@
-import { GameState, LogicCheck } from 'app/types';
+import { AndLogicCheck, GameState, LogicCheck, OrLogicCheck } from 'app/types';
 
+export function andLogic(...logicChecks: LogicCheck[]): AndLogicCheck {
+    return { operation: 'and', logicChecks};
+}
+window['andLogic'] = andLogic;
+
+export function orLogic(...logicChecks: LogicCheck[]): OrLogicCheck {
+    return { operation: 'or', logicChecks};
+}
+window['orLogic'] = orLogic;
 
 export function isItemLogicTrue(state: GameState, itemFlag: string): boolean {
     let level = 1, levelString;
@@ -7,13 +16,22 @@ export function isItemLogicTrue(state: GameState, itemFlag: string): boolean {
         [itemFlag, levelString] = itemFlag.split(':');
         level = parseInt(levelString, 10);
     }
+    if (itemFlag === 'weapon') {
+        return state.hero.weapon >= level;
+    }
     return state.hero.activeTools[itemFlag] >= level || state.hero.passiveTools[itemFlag] >= level
         || state.hero.elements[itemFlag] >= level || state.hero.equipment[itemFlag] >= level;
 }
 
 export function isLogicValid(state: GameState, logic: LogicCheck, invertLogic = false): boolean {
     const trueResult = !invertLogic, falseResult = !!invertLogic;
-    for (const requiredFlag of logic.requiredFlags) {
+    if (logic.operation === 'and') {
+        return logic.logicChecks.some(logicCheck => !isLogicValid(state, logicCheck)) ? falseResult : trueResult;
+    }
+    if (logic.operation === 'or') {
+        return logic.logicChecks.some(logicCheck => isLogicValid(state, logicCheck)) ? trueResult : falseResult;
+    }
+    for (const requiredFlag of (logic?.requiredFlags || [])) {
         if (requiredFlag[0] === '$') {
             if (!isItemLogicTrue(state, requiredFlag.substring(1))) {
                 return falseResult;
@@ -24,7 +42,7 @@ export function isLogicValid(state: GameState, logic: LogicCheck, invertLogic = 
             return falseResult;
         }
     }
-    for (const excludedFlag of logic.excludedFlags) {
+    for (const excludedFlag of (logic?.excludedFlags || [])) {
         if (excludedFlag[0] === '$') {
             if (isItemLogicTrue(state, excludedFlag.substring(1))) {
                 return falseResult;
@@ -45,6 +63,19 @@ export function isLogicValid(state: GameState, logic: LogicCheck, invertLogic = 
     }
     return trueResult;
 }
+window['isLogicValid'] = isLogicValid;
+
+export const hasClone: LogicCheck = { requiredFlags: ['$clone'] };
+export const hasIronBoots: LogicCheck = { requiredFlags: ['$ironBoots'] };
+export const hasTeleportation: LogicCheck = { requiredFlags: ['$astralProjection', '$spiritSight', '$teleportation'] };
+export const hasGloves: LogicCheck = { requiredFlags: ['$gloves'] };
+export const hasMitts: LogicCheck = { requiredFlags: ['$gloves:2'] };
+export const hasSpiritSight: LogicCheck = { requiredFlags: ['$spiritSight'] };
+
+// This check will be added automatically to any tiles that have 100% darkness effect.
+//const hasEyes: LogicCheck = { requiredFlags: ['$catEyes:1'] };
+export const hasWeaponCheck: OrLogicCheck = orLogic({requiredFlags: ['$weapon']}, {requiredFlags: ['$bow']});
+export const hasMediumRange: OrLogicCheck = orLogic({requiredFlags: ['$weapon', '$charge']}, {requiredFlags: ['$bow']});
 
 export const logicHash: {[key: string]: LogicCheck} = {
     frozenLake: {
@@ -85,3 +116,5 @@ export const logicHash: {[key: string]: LogicCheck} = {
         excludedFlags: [],
     },
 };
+
+

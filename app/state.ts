@@ -212,7 +212,7 @@ function getDefaultHeroState(): Hero {
     };
 }
 
-function getDefaultState(): GameState {
+export function getDefaultState(): GameState {
     const state: GameState = {
         savedState: getDefaultSavedState(),
         savedGames: [null, null, null],
