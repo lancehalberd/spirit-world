@@ -24,10 +24,38 @@ Graphics:
 
 
 Current tasks:
-    - Add first pass at randomizer logic
+    - Implement key logic for randomizer:
+        - Key doors are out of logic unless:
+            - State has keys >= total number of available locked doors
+            - This insures valid placement when there aren't branching locked paths behind locked doors.
+                - Maybe instead of this we need to simulate all choices?
+                    - This is computationally challenging if we allow placing items across all currently open dungeons.
+                - What about 100% chance to place key if dungeon checks left <= locks available and:
+                    - doors are out of logic if they aren't forced open yet.
+                        - A door is forced open if it is the only possible locked door available and a key is placed.
+                        - A door is forced open if all keys for the dungeon are placed.
+            - May want to revisit this for door randomization.
+    - Change odds of placing progress items to min(1 / checksLeft, progress / total) to avoid making progress items too likely early on.
     - brainstorm some dungeon/boss ideas, maybe for Staff Tower
     - Do a regression test and release latest version.
 
+Randomizer logic improvements based on chatting:
+    - Switch to reverse fill:
+        Start with all items.
+        Choose an item to place.
+        Calculate all accessible locations without that item
+            - This involves simulating picking up all immediately accessible items and then iterating until no new locations are found.
+        Please the item in one of the accessible locations and repeat
+    - Fill items by category: Goal rewards, big keys, little keys, dungeon items, progress items, trash
+    - To calculate the number of keys to open a locked door:
+        - Count the number of locked doors that can be reached without unlocking the current door and add one to this value.
+            EG: There is a locked door with one locked door behind it and another locked door elsewhere with another locked door behind it. Then this door require 3 keys, as the two other locked doors can be reached without unlocking it, but the locked door behind it cannot be reached except by unlocking it.
+        - This should be done at the start of the algorithm once and assuming the player has all progress items.
+
+1 possible locked doors:
+    out of logic until 1 key is possed.
+
+2 possible locked doors:
 
 High level list of things left to do:
     New dungeons(need enemies, mechanics, bosses, entrances):

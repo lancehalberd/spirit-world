@@ -25,10 +25,12 @@ export type Scene = 'title'
     | 'game' | 'credits' | 'options';
 
 export interface DialogueLootDefinition {
-    type: 'dialogueLoot',
-    lootType: LootType,
-    lootLevel?: number,
-    lootAmount?: number,
+    type: 'dialogueLoot'
+    // The id of the object associated with this dialogue (used during randomization).
+    id?: string
+    lootType: LootType
+    lootLevel?: number
+    lootAmount?: number
 }
 
 export interface GameState {
@@ -83,7 +85,6 @@ export interface GameState {
     messageState?: {
         pageIndex: number,
         pages: (Frame[][] | DialogueLootDefinition)[],
-        progressFlag?: string,
     },
     isUsingKeyboard?: boolean,
     isUsingXbox?: boolean,

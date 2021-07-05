@@ -1,4 +1,4 @@
-import { hasClone, hasIronBoots, hasWeaponCheck } from 'app/content/logic';
+import { hasClone, hasIronBoots, hasWeapon } from 'app/content/logic';
 
 import { LogicNode } from 'app/types';
 
@@ -11,7 +11,7 @@ export const peachCaveNodes: LogicNode[] = [
         paths: [
             { nodeId: 'peachCaveWaterEntrance', logic: hasIronBoots },
             { nodeId: 'newPeachCave:markerB', logic: hasClone },
-            { nodeId: 'newPeachCave:stairsUp', logic: hasWeaponCheck },
+            { nodeId: 'newPeachCave:stairsUp', logic: hasWeapon },
         ],
         entranceIds: ['newPeachCave:markerA'],
     },
@@ -29,7 +29,7 @@ export const peachCaveNodes: LogicNode[] = [
         zoneId,
         nodeId: 'newPeachCave:stairsDown',
         paths: [
-            { nodeId: 'newPeachCave:boss', logic: hasWeaponCheck },
+            { nodeId: 'newPeachCave:boss', logic: hasWeapon },
         ],
         entranceIds: ['newPeachCave:stairsDown'],
         exits: [{ objectId: 'newPeachCave:stairsDown' }],
@@ -37,12 +37,12 @@ export const peachCaveNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'newPeachCave:boss',
-        checks: [{ objectId: 'newPeachCave:boss', logic: hasWeaponCheck }],
+        checks: [{ objectId: 'newPeachCave:boss', logic: hasWeapon }],
         paths: [
             // There is no path to `newPeachCave:stairsDown` from here because:
             // You can only return to `newPeachCave:stairsDown` from here if you've grown 
             // the vine to the boss, which means you have access to `newPeachCave:stairsDown` already
-            { nodeId: 'newPeachCave:pitB', logic: hasWeaponCheck },
+            { nodeId: 'newPeachCave:pitB', logic: hasWeapon },
         ],
     },
     {
@@ -87,7 +87,7 @@ export const peachCaveNodes: LogicNode[] = [
         nodeId: 'peachCavePiece',
         checks: [{ objectId: 'peachCavePiece' }],
         paths: [
-            { nodeId: 'peachCaveWater:markerA', logic: hasIronBoots },
+            { nodeId: 'newPeachCave:markerA', logic: hasIronBoots },
             { nodeId: 'newPeachCave:markerB' },
         ],
     },

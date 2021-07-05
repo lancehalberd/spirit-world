@@ -1,6 +1,5 @@
 import {
-    hasIronBoots, hasGloves, hasMitts, hasTeleportation,
-    hasMediumRange, hasSpiritSight, orLogic,
+    hasMediumRange,
 } from 'app/content/logic';
 
 import { LogicNode } from 'app/types';
@@ -26,10 +25,10 @@ export const treeVillageNodes: LogicNode[] = [
             { objectId: 'treeVillage:1:0x0-bow-0' },
         ],
         entranceIds: [
-            'elderDownstairs',
+            'elderUpstairs',
         ],
         exits: [
-            { objectId: 'elderDownstairs' },
+            { objectId: 'elderUpstairs' },
         ],
     },
 ];

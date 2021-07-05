@@ -83,7 +83,7 @@ class SRandom {
             const keys = Object.keys(collection);
             const key = this.element(keys);
             const value = collection[key];
-            collection[key] = null;
+            delete collection[key];
             return value;
         }
         if (collection.constructor == Array) {

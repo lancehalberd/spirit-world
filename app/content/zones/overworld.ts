@@ -383,7 +383,7 @@ const f0_0x1: AreaDefinition = {
     ],
     objects: [
         {status: "normal", type: "npc", x: 128, y: 272, d: "down", behavior: "none", style: "vanara", dialogueKey: "mom", id: "overworld:0:1x0-npc-0"},
-        {status: "normal", id: "peachCaveTopEntrance", x: 368, y: 288, type: "door", style: "lightCave", targetZone: "newPeachCave", targetObjectId: "newPeachCave:topEntrance", d: "up"},
+        {status: "normal", id: "peachCaveTopEntrance", x: 368, y: 288, type: "door", style: "lightCave", targetZone: "newPeachCave", targetObjectId: "peachCaveTopEntrance", d: "up"},
         {status: "normal", id: "waterfallCaveEntrance", x: 80, y: 240, type: "door", style: "lightCave", targetZone: "waterfallCave", targetObjectId: "waterfallCaveEntrance", d: "up", saveStatus: undefined},
         {status: "normal", id: "overworld:0:1x0-decoration-1", x: 64, y: 272, type: "decoration", w: 64, h: 96, decorationType: "waterfall", drawPriority: "sprites"},
         {status: "normal", id: "overworld:0:1x0-decoration-0", x: 64, y: 368, type: "decoration", w: 80, h: 64, decorationType: "waterfall", drawPriority: "sprites"},
@@ -2906,7 +2906,7 @@ const sf0_2x2: AreaDefinition = {
     parentDefinition: f0_2x2,
     layers: null,
     objects: [
-        {status: "closedSwitch", id: "warTempleEntrance", x: 240, y: 320, type: "door", style: "lightCave", targetZone: "newPeachCave", targetObjectId: "newPeachCave:topEntrance", d: "up", linked: true, spirit: true},
+        {status: "closedSwitch", id: "warTempleEntrance", x: 240, y: 320, type: "door", style: "lightCave", targetZone: "warTemple", targetObjectId: "warTempleMainEntrance", d: "up", linked: true, spirit: true},
         {status: "normal", id: "overworld:s0:2x2-pushPull-0", linked: true, x: 224, y: 352, type: "pushPull", spirit: true},
         {status: "normal", id: "overworld:s0:2x2-pushPull-1", linked: true, x: 288, y: 352, type: "pushPull", spirit: true},
         {status: "normal", id: "overworld:s0:2x2-floorSwitch-0", x: 208, y: 416, toggleOnRelease: true, type: "floorSwitch", targetObjectId: "warTempleEntrance"},

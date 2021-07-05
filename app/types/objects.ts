@@ -179,6 +179,10 @@ export interface EntranceDefinition extends BaseObjectDefinition {
     type: 'teleporter' | 'pitEntrance' | 'door' | 'stairs',
     targetZone?: string,
     targetObjectId?: string,
+    // This is the number of keys that the player must have access to use this door in
+    // the randomizer logic. This value is calculated by the randomizer logic if it is not
+    // manually set.
+    requiredKeysForLogic?: number,
 }
 
 export interface SignDefinition extends BaseObjectDefinition {

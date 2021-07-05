@@ -1,4 +1,4 @@
-import { StaffTowerLocation } from 'app/types';
+import { DialogueLootDefinition, StaffTowerLocation } from 'app/types';
 
 export interface SimpleLogicCheck {
     operation?: 'isTrue' | 'isFalse'
@@ -62,10 +62,18 @@ export interface LogicNode {
         objectId: string
         logic?: LogicCheck
     }[]
+    npcs?: {
+        loot: DialogueLootDefinition
+        logic?: LogicCheck
+        progressFlags?: string[]
+    }[]
     // Array of fixed paths to other logic nodes along with requirements for using them.
     paths?: {
         nodeId: string
         logic?: LogicCheck
+        // If there is a door blocking this path that might be blocked, use the id instead
+        // of specifying logic so that the logic can be based on the state of the door.
+        doorId?: string
     }[],
     // Ids of any entrance objects
     entranceIds?: string[]

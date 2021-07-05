@@ -181,11 +181,6 @@ function updateMessage(state: GameState) {
         }
         if (state.messageState.pageIndex >= state.messageState.pages.length) {
             state.messageState.pages = null;
-            if (state.messageState.progressFlag) {
-                state.savedState.objectFlags[state.messageState.progressFlag] = true;
-                saveGame();
-                state.messageState.progressFlag = null;
-            }
         }
     }
 }

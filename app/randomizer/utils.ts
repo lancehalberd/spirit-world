@@ -1,16 +1,22 @@
-import _ from 'lodash';
+import { cloneDeep } from 'lodash';
 import { isLogicValid } from 'app/content/logic';
 import { lootEffects } from 'app/content/lootObject';
 import { getZone, zones } from 'app/content/zones';
 
 import { peachCaveNodes } from 'app/randomizer/logic/peachCaveLogic';
+import { treeVillageNodes } from 'app/randomizer/logic/otherLogic'
 import { overworldNodes } from 'app/randomizer/logic/overworldLogic';
+import { tombNodes } from 'app/randomizer/logic/tombLogic';
+import { warTempleNodes } from 'app/randomizer/logic/warTempleLogic';
+
+import SRandom from 'app/utils/SRandom';
 
 import { applySavedState, getDefaultState } from 'app/state';
 
 import {
-    BossObjectDefinition, EntranceDefinition,
-    GameState, LogicNode, LootObjectDefinition, LootType, ObjectDefinition,
+    BossObjectDefinition, DialogueLootDefinition, EntranceDefinition,
+    GameState, LogicNode, LootObjectDefinition, LootType, NPCDefinition,
+    ObjectDefinition,
     Zone, ZoneLocation,
 } from 'app/types';
 
@@ -51,7 +57,7 @@ function getAllLootDrops(): LootData {
                                 d: null,
                             },
                             object,
-                        })
+                        });
                     }
                     const spiritArea = floor.spiritGrid[row][column];
                     for (const object of (spiritArea?.objects || [])) {
@@ -69,7 +75,7 @@ function getAllLootDrops(): LootData {
                                 d: null,
                             },
                             object,
-                        })
+                        });
                     }
                 }
             }
@@ -92,17 +98,37 @@ function exportLootData() {
 }
 window['exportLootData'] = exportLootData;
 
-export type AnyLootDefinition = BossObjectDefinition | LootObjectDefinition;
+export type AnyLootDefinition = BossObjectDefinition | DialogueLootDefinition | LootObjectDefinition;
+
+interface LootWithLocation {
+    location: ZoneLocation
+    lootObject: AnyLootDefinition
+    progressFlags?: string[]
+}
 
 interface LootAssignment {
+    source: LootWithLocation
     lootType: LootType
     lootLevel: number
     lootAmount: number
-    target: AnyLootDefinition
-    previousState: GameState
+    target: LootWithLocation
 }
 
-function findObjectById(zone: Zone, id: string, state: GameState = null, skipObject: ObjectDefinition = null) {
+interface AssignmentState {
+    // The array of loot assignments that can be used to apply this assignment state to the game.
+    assignments: LootAssignment[]
+    // The ids of all the checks that have contents assigned to them already.
+    assignedLocations: string[]
+    // The ids of all the check contents that have been assigned to some location.
+    assignedContents: string[]
+}
+
+function findObjectById(
+    zone: Zone,
+    id: string,
+    state: GameState = null,
+    skipObject: ObjectDefinition = null
+): {object: ObjectDefinition, location: ZoneLocation} {
     let foundObjectOutOfLogic = null;
     for (let floor = 0; floor < zone.floors.length; floor++) {
         for( const areaGrid of [zone.floors[floor].spiritGrid, zone.floors[floor].grid]){
@@ -116,7 +142,18 @@ function findObjectById(zone: Zone, id: string, state: GameState = null, skipObj
                                 foundObjectOutOfLogic = object;
                                 break;
                             }
-                            return object;
+                            return {
+                                object,
+                                location: {
+                                    zoneKey: zone.key,
+                                    floor,
+                                    areaGridCoords: {x, y},
+                                    isSpiritWorld: areaGrid === zone.floors[floor].spiritGrid,
+                                    x: object.x,
+                                    y: object.y,
+                                    d: null,
+                                },
+                            };
                         }
                     }
                 }
@@ -124,13 +161,15 @@ function findObjectById(zone: Zone, id: string, state: GameState = null, skipObj
         }
     }
     if (!foundObjectOutOfLogic) {
-        console.error('Missing object: ', id);
+        warnOnce(missingObjectSet, zone.key + id, 'Missing object: ');
+    } else {
+        // console.warn(zone.key + id, ' is out of logic');
     }
+    return {object: null, location: null};
 }
 
-
-function getLootObjects(nodes: LogicNode[], state: GameState = null): AnyLootDefinition[] {
-    const lootObjects: AnyLootDefinition[] = [];
+function getLootObjects(nodes: LogicNode[], state: GameState = null): LootWithLocation[] {
+    const lootObjects: LootWithLocation[] = [];
     for (const node of nodes) {
         const zone = getZone(node.zoneId);
         if (!zone) {
@@ -141,25 +180,76 @@ function getLootObjects(nodes: LogicNode[], state: GameState = null): AnyLootDef
             if (state && check.logic && !isLogicValid(state, check.logic)) {
                 continue;
             }
-            const object = findObjectById(zone, check.objectId, state) as AnyLootDefinition;
+            const {object, location} = findObjectById(zone, check.objectId, state);
             if (!object) {
                 continue;
             }
-            lootObjects.push(object);
+            if (object.type === 'bigChest') {
+                if (state && !state.savedState.dungeonInventories[zone.key]?.bigKey) {
+                    continue;
+                }
+            }
+            lootObjects.push({
+                lootObject: object as AnyLootDefinition,
+                location,
+            });
+        }
+        for (const npc of (node.npcs || [])) {
+            // If state is passed in, only include this loot check if it is in logic.
+            if (state && npc.logic && !isLogicValid(state, npc.logic)) {
+                continue;
+            }
+            const {object, location} = findObjectById(zone, npc.loot.id, state);
+            if (!object) {
+                continue;
+            }
+            lootObjects.push({
+                lootObject: npc.loot,
+                location,
+                progressFlags: npc.progressFlags,
+            });
         }
     }
     return lootObjects;
 }
 
-function findReachableChecks(allNodes: LogicNode[], startingNodes: LogicNode[], assignedChecks: string[], state: GameState): string[] {
+const missingNodeSet = new Set<string>();
+const missingExitNodeSet = new Set<string>();
+const missingObjectSet = new Set<string>();
+function warnOnce(warningSet: Set<string>, objectId: string, message: string) {
+    if (warningSet.has(objectId)) {
+        return;
+    }
+    warningSet.add(objectId);
+    console.warn(message, objectId);
+}
+
+function findReachableChecks(allNodes: LogicNode[], startingNodes: LogicNode[], state: GameState): LootWithLocation[] {
     const reachableNodes: LogicNode[] = findReachableNodes(allNodes, startingNodes, state);
-    return getLootObjects(reachableNodes, state).map(object => object.id).filter(id => !assignedChecks.includes(id));
+    return getLootObjects(reachableNodes, state);
+}
+
+function canOpenDoor(zone: Zone, state: GameState, door: EntranceDefinition): boolean {
+    if (!door) {
+        return false;
+    }
+    // Only pass through
+    if (door.status === 'locked') {
+        const dungeonInventory = state.savedState.dungeonInventories[zone.key];
+        return dungeonInventory?.smallKeys >= door.requiredKeysForLogic;
+    }
+    if (door.status === 'bigKeyLocked') {
+        const dungeonInventory = state.savedState.dungeonInventories[zone.key];
+        return dungeonInventory?.bigKey;
+    }
+    return true;
 }
 
 function findReachableNodes(allNodes: LogicNode[], startingNodes: LogicNode[], state: GameState): LogicNode[] {
     const reachableNodes = [...startingNodes];
     for (let i = 0; i < reachableNodes.length; i++) {
         const currentNode = reachableNodes[i];
+        //console.log('node: ', currentNode.nodeId);
         const zone = getZone(currentNode.zoneId);
         if (!zone) {
             continue
@@ -168,9 +258,15 @@ function findReachableNodes(allNodes: LogicNode[], startingNodes: LogicNode[], s
             if (path.logic && !isLogicValid(state, path.logic)) {
                 continue;
             }
+            if (path.doorId) {
+                const { object } = findObjectById(zone, path.doorId);
+                if (!canOpenDoor(zone, state, object as EntranceDefinition)) {
+                    continue;
+                }
+            }
             const nextNode = allNodes.find(node => node.nodeId === path.nodeId);
             if (!nextNode) {
-                console.error('Missing node: ', path.nodeId);
+                warnOnce(missingNodeSet, path.nodeId, 'Missing node: ');
                 continue;
             }
             if (!reachableNodes.includes(nextNode)) {
@@ -181,16 +277,21 @@ function findReachableNodes(allNodes: LogicNode[], startingNodes: LogicNode[], s
             if (exit.logic && !isLogicValid(state, exit.logic)) {
                 continue;
             }
-            const exitObject = findObjectById(zone, exit.objectId, state) as EntranceDefinition;
-            if (!exitObject) {
+            const { object } = findObjectById(zone, exit.objectId, state);
+            const exitObject = object as EntranceDefinition;
+           // console.log(exit.objectId);
+            if (!canOpenDoor(zone, state, exitObject)) {
+                //console.log('cannot open', exitObject);
                 continue;
             }
+            //console.log('->', exitObject.targetZone + ':' + exitObject.targetObjectId);
             const nextNode = allNodes.find(node =>
-                node.zoneId === exitObject.targetZone
+                node !== currentNode
+                && node.zoneId === exitObject.targetZone
                 && node.entranceIds?.includes(exitObject.targetObjectId)
             );
             if (!nextNode) {
-                console.warn('Missing node for exit: ', exitObject.targetZone, exitObject.targetObjectId);
+                warnOnce(missingExitNodeSet, exitObject.targetZone + exitObject.targetObjectId, 'Missing node for exit: ');
                 continue;
             }
             if (!reachableNodes.includes(nextNode)) {
@@ -200,119 +301,291 @@ function findReachableNodes(allNodes: LogicNode[], startingNodes: LogicNode[], s
     }
     return reachableNodes;
 }
-
-function organizeLootObjects(lootObjects: AnyLootDefinition[], state: GameState) {
-    const progressLoot: AnyLootDefinition[] = [];
-    const trashLoot: AnyLootDefinition[] = [];
-    for (const lootObject of lootObjects) {
-        switch (lootObject.lootType) {
-            case 'peachOfImmortality':
-            case 'peachOfImmortalityPiece':
-                if (state.hero.passiveTools.catEyes) {
-                    trashLoot.push(lootObject);
+function calculateKeyLogic(allNodes: LogicNode[], startingNodes: LogicNode[]) {
+    for (const node of allNodes) {
+        const zone = getZone(node.zoneId);
+        if (!zone) {
+            continue
+        }
+        function checkExit(objectId: string) {
+            const { object } = findObjectById(zone, objectId);
+            const exitObject = object as EntranceDefinition;
+            if (!exitObject) {
+                return;
+            }
+            if (exitObject.status === 'locked' && !exitObject.requiredKeysForLogic) {
+                countRequiredKeysForEntrance(allNodes, startingNodes, zone.key, exitObject);
+            }
+        }
+        for (const path of (node.paths || [])) {
+            if (path.doorId) {
+                checkExit(path.doorId);
+            }
+        }
+        for (const exit of (node.exits || [])) {
+            checkExit(exit.objectId);
+        }
+    }
+}
+function countRequiredKeysForEntrance(allNodes: LogicNode[], startingNodes: LogicNode[], zoneKey: string, exitToUpdate: EntranceDefinition) {
+    const countedDoorIds = new Set<string>();
+    exitToUpdate.requiredKeysForLogic = 1;
+    const reachableNodes = [...startingNodes];
+    for (let i = 0; i < reachableNodes.length; i++) {
+        const currentNode = reachableNodes[i];
+        const zone = getZone(currentNode.zoneId);
+        if (!zone) {
+            continue
+        }
+        for (const path of (currentNode.paths || [])) {
+            if (path.doorId) {
+                const { object } = findObjectById(zone, path.doorId);
+                const exitObject = object as EntranceDefinition;
+                if (!exitObject || exitObject === exitToUpdate) {
                     continue;
                 }
-                break;
+                if (zone.key === zoneKey && exitObject.status === 'locked' && !countedDoorIds.has(exitObject.id)) {
+                    countedDoorIds.add(exitObject.id);
+                    exitToUpdate.requiredKeysForLogic++;
+                }
+            }
+            const nextNode = allNodes.find(node => node.nodeId === path.nodeId);
+            if (!nextNode) {
+                warnOnce(missingNodeSet, path.nodeId, 'Missing node: ');
+                continue;
+            }
+            if (!reachableNodes.includes(nextNode)) {
+                reachableNodes.push(nextNode);
+            }
+        }
+        for (const exit of (currentNode.exits || [])) {
+            const { object } = findObjectById(zone, exit.objectId);
+            const exitObject = object as EntranceDefinition;
+            if (!exitObject || exitObject === exitToUpdate) {
+                continue;
+            }
+            if (zone.key === zoneKey && exitObject.status === 'locked' && !countedDoorIds.has(exitObject.id)) {
+                countedDoorIds.add(exitObject.id);
+                exitToUpdate.requiredKeysForLogic++;
+            }
+            const nextNode = allNodes.find(node =>
+                node !== currentNode
+                && node.zoneId === exitObject.targetZone
+                && node.entranceIds?.includes(exitObject.targetObjectId)
+            );
+            if (!nextNode) {
+                warnOnce(missingExitNodeSet, exitObject.targetZone + exitObject.targetObjectId, 'Missing node for exit: ');
+                continue;
+            }
+            if (!reachableNodes.includes(nextNode)) {
+                reachableNodes.push(nextNode);
+            }
+        }
+    }
+    console.log(exitToUpdate.id, exitToUpdate.requiredKeysForLogic);
+}
+
+function organizeLootObjects(lootObjects: LootWithLocation[]) {
+    const bigKeys: LootWithLocation[] = [];
+    const smallKeys: LootWithLocation[] = [];
+    const progressLoot: LootWithLocation[] = [];
+    const trashLoot: LootWithLocation[] = [];
+    for (const lootWithLocation of lootObjects) {
+        // peach+peach pieces are considered progress since some areas may require certain life totals
+        // and the first full peach grants the cat eyes ability.
+        switch (lootWithLocation.lootObject.lootType) {
             case 'money':
             case 'peach':
             case 'empty':
-                trashLoot.push(lootObject);
-                continue;
+                trashLoot.push(lootWithLocation);
+                break;
+            case 'bigKey':
+                bigKeys.push(lootWithLocation);
+                break;
+            case 'smallKey':
+                smallKeys.push(lootWithLocation);
+                break;
+            default:
+                progressLoot.push(lootWithLocation);
         }
-
-        progressLoot.push(lootObject);
     }
 
-    return { progressLoot, trashLoot };
+    return { bigKeys, smallKeys, progressLoot, trashLoot };
 }
 
-function applyLootObjectToState(state: GameState, lootObject: AnyLootDefinition): GameState {
-    const onPickup = lootEffects[lootObject.lootType] || lootEffects.unknown;
-    const stateCopy = _.cloneDeep(state);
-    onPickup(stateCopy, lootObject);
+function applyLootObjectToState(state: GameState, lootWithLocation: LootWithLocation): GameState {
+    if (lootWithLocation.lootObject.lootType === 'empty') {
+        return state;
+    }
+    // We need to set the current location to the loot location so that dungeon items are applied to the correct state.
+    const stateCopy = cloneDeep(state);
+    stateCopy.location = lootWithLocation.location;
+    const onPickup = lootEffects[lootWithLocation.lootObject.lootType] || lootEffects.unknown;
+    onPickup(stateCopy, lootWithLocation.lootObject);
+    if (!stateCopy.hero.passiveTools.catEyes && stateCopy.hero.maxLife > 4) {
+        stateCopy.hero.passiveTools.catEyes = 1;
+    }
     return stateCopy;
 }
 
-export function generateAssignments(allNodes: LogicNode[], startingNodes: LogicNode[]): LootAssignment[] {
+export function reverseFill(random: typeof SRandom, allNodes: LogicNode[], startingNodes: LogicNode[]): LootAssignment[] {
+    calculateKeyLogic(allNodes, startingNodes);
     console.log({ allNodes, startingNodes });
     const allLootObjects = getLootObjects(allNodes);
-    let finalState = getDefaultState();
-    applySavedState(finalState, finalState.savedState);
-    for (const lootObject of allLootObjects) {
-        finalState = applyLootObjectToState(finalState, lootObject);
+    let initialState = getDefaultState();
+    applySavedState(initialState, initialState.savedState);
+
+    let finalState = cloneDeep(initialState);
+    for (const lootWithLocation of allLootObjects) {
+        finalState = applyLootObjectToState(finalState, lootWithLocation);
     }
-    const allReachableChecks = findReachableChecks(allNodes, startingNodes, [], finalState);
-    for (const lootObject of allLootObjects) {
-        if (!allReachableChecks.includes(lootObject.id)) {
-            console.warn(lootObject.id, ' will never be reachable');
+    const allReachableCheckIds = findReachableChecks(allNodes, startingNodes, finalState).map(l => l.lootObject.id);
+    for (const lootWithLocation of allLootObjects) {
+        if (!allReachableCheckIds.includes(lootWithLocation.lootObject.id)) {
+            console.warn(lootWithLocation.lootObject.id, ' will never be reachable');
         }
     }
-    console.log({ allLootObjects, allReachableChecks });
-    const assignments: LootAssignment[] = [];
-    const assignedCheckLocations: string[] = [];
-    const assignedCheckContents: string[] = [];
-    let state = getDefaultState();
-    applySavedState(state, state.savedState);
-    let counter = 1;
-    while (true) {
-        if (counter++ % 100 === 0) {
-            console.error('Infinite Loop?');
-            debugger;
-            return [];
-        }
-        if (assignments.length >= allReachableChecks.length) {
-            break;
-        }
-        console.log('-------');
-        //console.log({ assignedCheckContents, assignedCheckLocations, assignments, state });
-        const assignableChecks: string[] = findReachableChecks(allNodes, startingNodes, assignedCheckLocations, state);
-        //console.log({ assignableChecks });
-        if (assignableChecks.length === 0) {
-            if (assignments.length === 0) {
-                console.error('Failed to generate game');
-                debugger;
-                return [];
+    console.log({ allLootObjects, allReachableCheckIds });
+    const assignmentsState: AssignmentState = {
+        assignments: [],
+        assignedLocations: [],
+        assignedContents: [],
+    }
+    let { bigKeys, smallKeys, progressLoot, trashLoot } = organizeLootObjects(allLootObjects);
+    progressLoot = random.shuffle(progressLoot);
+    random.generateAndMutate();
+    trashLoot = random.shuffle(trashLoot);
+    random.generateAndMutate();
+    let remainingLoot = [...allLootObjects];
+    // TODO: assign trash loot without checking logic since it doesn't matter.
+    for (let itemSet of [bigKeys, smallKeys, progressLoot, trashLoot]) {
+        while (itemSet.length) {
+            const itemToPlace = random.removeElement(itemSet);
+            random.generateAndMutate();
+            remainingLoot.splice(remainingLoot.indexOf(itemToPlace), 1);
+            // Compute the current state without the chosen item or any of the previously placed items.
+            let state = cloneDeep(initialState);
+            for (const lootWithLocation of remainingLoot) {
+                state = applyLootObjectToState(state, lootWithLocation);
             }
-            const lastAssignment = assignments.pop();
-            assignedCheckLocations.pop();
-            assignedCheckContents.pop();
-            state = lastAssignment.previousState;
+            // console.log(state.hero);
+            try {
+                placeItem(random, allNodes, startingNodes, state, assignmentsState, itemToPlace);
+            } catch (e) {
+                // No issue if we run out of space for trash
+                if (itemSet === trashLoot) {
+                    break;
+                }
+                debugger;
+                throw e;
+            }
+        }
+    }
+    return assignmentsState.assignments;
+}
+
+function placeItem(random: typeof SRandom, allNodes: LogicNode[], startingNodes: LogicNode[], originalState: GameState, assignmentsState: AssignmentState, loot: LootWithLocation): string {
+    console.log('Placing: ', loot.lootObject.id);
+    let currentState = originalState;
+    let previousState = originalState;
+    let counter = 0;
+    do {
+        if (counter++ > 100) {
+            console.error('infinite loop');
+            debugger;
+            return null;
+        }
+        previousState = currentState;
+        currentState = collectAllLoot(allNodes, startingNodes, previousState, assignmentsState);
+    } while (currentState !== previousState);
+    let assignableChecks: LootWithLocation[] = findReachableChecks(allNodes, startingNodes, currentState);
+    assignableChecks = assignableChecks.filter(lootWithLocation => !assignmentsState.assignedLocations.includes(lootWithLocation.lootObject.id));
+    if (loot.lootObject.lootType === 'bigKey' || loot.lootObject.lootType === 'smallKey') {
+        assignableChecks = assignableChecks.filter(lootWithLocation => lootWithLocation.location.zoneKey === loot.location.zoneKey);
+    }
+    //console.log(currentState);
+    //console.log(assignableChecks);
+    const assignedLocation = random.element(assignableChecks);
+    random.generateAndMutate();
+    if (!assignedLocation) {
+        // console.error('Failed to place item', { assignmentsState, originalState, currentState, loot});
+        throw new Error('Failed to place item')
+    }
+    assignmentsState.assignments.push({
+        lootType: loot.lootObject.lootType,
+        lootAmount: loot.lootObject.lootAmount,
+        lootLevel: loot.lootObject.lootLevel,
+        source: loot,
+        target: assignedLocation,
+    });
+    assignmentsState.assignedContents.push(loot.lootObject.id);
+    assignmentsState.assignedLocations.push(assignedLocation.lootObject.id);
+}
+
+function collectAllLoot(allNodes: LogicNode[], startingNodes: LogicNode[], state: GameState, assignmentsState: AssignmentState): GameState {
+    const reachableChecks: LootWithLocation[] = findReachableChecks(allNodes, startingNodes, state);
+    for (const check of reachableChecks) {
+        // We can only open checks that have been assigned, contents of other checks are not yet determined.
+        //if (!assignmentsState.assignedLocations.includes(check.lootObject.id)) {
+        //    continue;
+        //}
+        // Don't open a check that has already been opened.
+        if (state.savedState.objectFlags[check.lootObject.id]) {
             continue;
         }
-        const remainingLootObjects = allLootObjects.filter(object => !assignedCheckContents.includes(object.id));
-        const { progressLoot, trashLoot } = organizeLootObjects(remainingLootObjects, state);
-        //console.log({ remainingLootObjects, progressLoot, trashLoot });
-        const lootObject = (Math.random() < 1 / assignableChecks.length) ? _.sample(progressLoot) : _.sample(trashLoot);
-        const check = _.sample(assignableChecks);
-        //console.log({ lootObject, check });
-        assignments.push({
-            lootType: lootObject.lootType,
-            lootAmount: lootObject.lootAmount,
-            lootLevel: lootObject.lootLevel,
-            target: allLootObjects.find(object => object.id === check),
-            previousState: state,
-        });
-        assignedCheckContents.push(lootObject.id);
-        assignedCheckLocations.push(check);
-        state = applyLootObjectToState(state, lootObject);
+        const assignment = assignmentsState.assignments.find(assignment => assignment.target.lootObject.id === check.lootObject.id);
+        if (!assignment) {
+            continue;
+        }
+        state = applyLootObjectToState(state, assignment.source);
+        // Indicate this check has already been opened.
+        state.savedState.objectFlags[check.lootObject.id] = true;
     }
-    return assignments;
+    return state;
 }
 
 export function applyLootAssignments(assignments: LootAssignment[]): void {
     console.log('applying assignments:');
     console.log(assignments);
     for (const assignment of assignments) {
-        assignment.target.lootType = assignment.lootType;
-        assignment.target.lootAmount = assignment.lootAmount;
-        assignment.target.lootLevel = assignment.lootLevel;
+        if (assignment.target.lootObject.type === 'dialogueLoot') {
+            const {object} = findObjectById(zones[assignment.target.location.zoneKey], assignment.target.lootObject.id);
+            const npc = object as NPCDefinition;
+            const number = assignment.lootAmount || assignment.lootLevel;
+            if (number) {
+                npc.dialogue = `Here you go! {item:${assignment.lootType}:${number}}`;
+            } else {
+                npc.dialogue = `Here you go! {item:${assignment.lootType}}`;
+            }
+            npc.dialogueKey = null;
+            npc.dialogue += (assignment.target.progressFlags || []).map(flag => `{flag:${flag}}`).join(' ');
+        } else {
+            assignment.target.lootObject.lootType = assignment.lootType;
+            assignment.target.lootObject.lootAmount = assignment.lootAmount;
+            assignment.target.lootObject.lootLevel = assignment.lootLevel;
+        }
     }
 }
 
 const allNodes = [
-    ...peachCaveNodes,
     ...overworldNodes,
+    ...peachCaveNodes,
+    ...tombNodes,
+    ...warTempleNodes,
+    ...treeVillageNodes,
 ];
 
-applyLootAssignments(generateAssignments(allNodes, [peachCaveNodes[0]]));
+function readGetParameter(parameterName: string): string {
+    for (const item of location.search.substr(1).split('&')) {
+        const tmp = item.split('=');
+        if (tmp[0] === parameterName) {
+            return decodeURIComponent(tmp[1]);
+        }
+    }
+}
+const seed = readGetParameter('seed');
+
+if (seed) {
+    applyLootAssignments(reverseFill(SRandom.seed(Number(seed)), allNodes, [overworldNodes[0]]));
+}
 

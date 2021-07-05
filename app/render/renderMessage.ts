@@ -24,18 +24,28 @@ function getActiveControllerMaps(state: GameState) {
     return [xboxMap, keyboardMap];
 }
 
+function getEscapedProgressFlag(state: GameState, escapedToken: string): string {
+    const [tokenType, flag] = escapedToken.split(':');
+    if (tokenType === 'flag') {
+        return flag;
+    }
+    return null;
+}
 function getEscapedLoot(state: GameState, escapedToken: string): DialogueLootDefinition {
-    const [key, amountOrLevel] = escapedToken.split(':');
-    if (getLootTypes().includes(key as LootType)) {
+    const [tokenType, lootType, amountOrLevel] = escapedToken.split(':');
+    if (tokenType !== 'item') {
+        return null;
+    }
+    if (getLootTypes().includes(lootType as LootType)) {
         const number = parseInt(amountOrLevel, 10);
         return {
             type: 'dialogueLoot',
-            lootType: key as LootType,
+            lootType: lootType as LootType,
             lootLevel: isNaN(number) ? 0 : number,
             lootAmount: isNaN(number) ? 0 : number,
         };
     }
-    return null;
+    throw new Error('Unknown loot type: ' + lootType);
 }
 
 function getEscapedFrames(state: GameState, escapedToken: string): Frame[] {
@@ -76,14 +86,13 @@ function getEscapedFrames(state: GameState, escapedToken: string): Frame[] {
     return [];
 }
 
-export function showMessage(state: GameState, message: string, progressFlag: string = null): void {
+export function showMessage(state: GameState, message: string): void {
     if (!message){
         return;
     }
     state.messageState = {
         pageIndex: 0,
         pages: parseMessage(state, message),
-        progressFlag,
     };
 }
 
@@ -129,6 +138,11 @@ export function parseMessage(state: GameState, message: string): (Frame[][] | Di
                 }
                 const escapedToken = escapedChunks[i + 1];
                 if (escapedToken) {
+                    const progressFlag = getEscapedProgressFlag(state, escapedToken);
+                    if (progressFlag) {
+                        state.savedState.objectFlags[progressFlag] = true;
+                        continue;
+                    }
                     const lootDefinition = getEscapedLoot(state, escapedToken);
                     if (lootDefinition) {
                         if (row.length) {

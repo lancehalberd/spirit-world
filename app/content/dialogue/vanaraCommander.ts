@@ -23,7 +23,6 @@ dialogueHash.vanaraCommander = {
                 zones: [],
             },
             isExclusive: true,
-            progressFlag: 'elementalBeastsEscaped',
             text: [
                 `I'm impressed that you've made it all the way to the top of the Helix!
                 {|}You might have already realized this, but we Vanara aren't from this world,
@@ -32,7 +31,8 @@ dialogueHash.vanaraCommander = {
                 {|}Several powerful Spirit Beasts have escaped into the Material Realm and are attacking the Holy City.
                 {|}Unfortunately, it appears another Vanara is responsible for releasing them.
                 {|}Take this and go to Holy City and see if you can help their Hero protect the people.
-                {charge:1}`
+                {flag:elementalBeastsEscaped}
+                {item:charge:1}`
             ],
         },
     ],

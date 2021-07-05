@@ -8,12 +8,12 @@ dialogueHash.elder = {
                 requiredFlags: [],
                 excludedFlags: ['$bow', 'tombEntrance'],
             },
-            progressFlag: 'elderTomb',
             isExclusive: true,
             text: [
                 `So you want to learn more about your Spirit powers?
                 {|}Seek out the Guardian in the Vanara Tomb to the north.
-                {|}Search my cellar for a tool you will need to enter the Tomb.`,
+                {|}Search my cellar for a tool you will need to enter the Tomb.
+                {flag:elderTomb}`,
                 `Search my cellar for a tool you will need to enter the Tomb.`,
             ],
             notes: `If this flag is set the elder will rescue you if you are defeated

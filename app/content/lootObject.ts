@@ -112,7 +112,7 @@ function showLootMessage(state: GameState, lootType: LootType, lootLevel?: numbe
         case 'peachOfImmortality':
             if (!state.hero.passiveTools.catEyes) {
                 return showMessage(state, `You ate a Golden Peach!
-                    {|} Your health has increased and you feel a strange energy...{catEyes}`);
+                    {|} Your health has increased and you feel a strange energy...{item:catEyes}`);
             }
             return showMessage(state, `You ate a Golden Peach!
                 {|} Your maximum health has increased!`);
@@ -127,7 +127,7 @@ function showLootMessage(state: GameState, lootType: LootType, lootLevel?: numbe
                 return showMessage(state, 'You found a golden peach slice!{|}Find one more to increase your health!');
             }
             // Finding the 4th slice grants a full peach of immortality.
-            return showMessage(state, 'You found a golden peach slice!{peachOfImmortality}');
+            return showMessage(state, 'You found a golden peach slice!{item:peachOfImmortality}');
         case 'charge':
             if (state.hero.passiveTools.charge === 1) {
                 return showMessage(state, `You have learned to Channel Spirit Energy!
@@ -577,9 +577,11 @@ function getDungeonInventory(state: GameState): DungeonInventory {
         smallKeys: 0,
     };
 }
-function updateDungeonInventory(state: GameState, inventory: DungeonInventory): void {
+function updateDungeonInventory(state: GameState, inventory: DungeonInventory, save: boolean = true): void {
     state.savedState.dungeonInventories[state.location.zoneKey] = inventory;
-    saveGame();
+    if (save) {
+        saveGame();
+    }
 }
 
 export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition | DialogueLootDefinition) => void}> = {
@@ -617,17 +619,17 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: Lo
     bigKey: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition) => {
         const inventory = getDungeonInventory(state);
         inventory.bigKey = true;
-        updateDungeonInventory(state, inventory);
+        updateDungeonInventory(state, inventory, false);
     },
     map: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition) => {
         const inventory = getDungeonInventory(state);
         inventory.map = true;
-        updateDungeonInventory(state, inventory);
+        updateDungeonInventory(state, inventory, false);
     },
     smallKey: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition) => {
         const inventory = getDungeonInventory(state);
         inventory.smallKeys++;
-        updateDungeonInventory(state, inventory);
+        updateDungeonInventory(state, inventory, false);
     },
     peach: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition) => {
         state.hero.life = Math.min(state.hero.life + 1, state.hero.maxLife);
