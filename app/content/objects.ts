@@ -92,7 +92,7 @@ export function checkIfAllSwitchesAreActivated(state: GameState, area: AreaInsta
         return;
     }
 
-    for (const object of state.areaInstance.objects) {
+    for (const object of area.objects) {
         if (switchInstance.definition.targetObjectId && object.definition?.id !== switchInstance.definition.targetObjectId) {
             continue;
         }
@@ -101,7 +101,7 @@ export function checkIfAllSwitchesAreActivated(state: GameState, area: AreaInsta
 }
 
 export function deactivateTargets(state: GameState, area: AreaInstance, targetObjectId: string = null): void {
-    for (const object of state.areaInstance.objects) {
+    for (const object of area.objects) {
         if (targetObjectId && object.definition?.id !== targetObjectId) {
             continue;
         }

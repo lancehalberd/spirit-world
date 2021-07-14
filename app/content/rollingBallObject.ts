@@ -40,13 +40,6 @@ export class RollingBallObject implements ObjectInstance {
         this.stopRollingSound();
     }
     getHitbox(state: GameState): ShortRectangle {
-        // This is a little bit of a hack.
-        // When rolling, shorten the hitbox so that it doesn't the player when they
-        // are pushing into it.
-        if (this.rollDirection) {
-            const [dx, dy] = directionMap[this.rollDirection];
-            return { x: this.x + 1 + dx, y: this.y + 1 + dy, w: 14, h: 14 };
-        }
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
     onHit(state: GameState, {canPush, direction}: HitProperties): HitResult {
@@ -97,7 +90,7 @@ export class RollingBallObject implements ObjectInstance {
             const dy = 2 * directionMap[this.rollDirection][1];
             const x = this.x + dx + (this.rollDirection === 'right' ? 15 : 0);
             const y = this.y + dy + (this.rollDirection === 'down' ? 15 : 0);
-            for (const object of state.areaInstance.objects) {
+            for (const object of this.area.objects) {
                 if (object.definition?.type !== 'ballGoal') {
                     continue;
                 }
@@ -124,13 +117,34 @@ export class RollingBallObject implements ObjectInstance {
                 }
             }
             // Rolling balls hurt actors and push on other objects.
+            // Use a slightly larger hitbox so we trigger hitting objects before stopping.
+            const bigHitbox = { x: this.x, y: this.y, w: 16, h: 16 };
+            if (dx) {
+                bigHitbox.w += 2;
+                bigHitbox.x -= dx / 2;
+            }
+            if (dy) {
+                bigHitbox.h += 2;
+                bigHitbox.y -= dy / 2;
+            }
             hitTargets(state, this.area, {
                 canPush: true,
                 damage: 2,
                 direction: this.rollDirection,
-                hitbox: this.getHitbox(state),
+                hitbox: bigHitbox,
                 hitObjects: true,
                 hitEnemies: true,
+                knockAwayFrom: {x: this.x + 8, y: this.y + 8},
+            });
+            // This is a little bit of a hack.
+            // When rolling, shorten the hitbox so that it doesn't the player when they
+            // are pushing into it or less than a full pixel overlapping the ball.
+            const smallHitbox = { x: this.x + 1 + dx / 2, y: this.y + 1 + dy / 2, w: 14, h: 14 };
+            hitTargets(state, this.area, {
+                canPush: true,
+                damage: 2,
+                direction: this.rollDirection,
+                hitbox: smallHitbox,
                 hitAllies: true,
                 knockAwayFrom: {x: this.x + 8, y: this.y + 8},
             });

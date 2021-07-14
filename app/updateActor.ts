@@ -555,10 +555,10 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
                 canSwim: !encumbered,
                 boundToSection: isAstralProjection || !!hero.bounce,
             });
-            if (moveX) {
+            if (moveX && hero.action !== 'knocked') {
                 hero.vx = mx;
             }
-            if (moveY) {
+            if (moveY && hero.action !== 'knocked') {
                 hero.vy = my;
             }
         }
@@ -666,7 +666,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
                     hero.action = 'grabbing';
                     hero.grabTile = target;
                 }
-                if (hero.passiveTools.gloves >= behavior?.pickupWeight) {
+                if (hero.passiveTools.gloves >= behavior?.pickupWeight || behavior?.pickupWeight === 0) {
                     // This is an unusual distance, but should do what we want still.
                     const distance = (
                         Math.abs(target.x * 16 - hero.x) +
@@ -713,12 +713,12 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
                             const alternateLayer = _.find(state.alternateAreaInstance.layers, {key: layer.key});
                             if(alternateLayer) {
                                 const linkedTile: FullTile = alternateLayer.tiles[closestLiftableTileCoords.y][closestLiftableTileCoords.x];
-                                if (behavior.linkableTiles.includes(linkedTile.index)) {
+                                if (linkedTile && behavior.linkableTiles.includes(linkedTile.index)) {
                                     hero.pickUpTile = {
                                         ...hero.pickUpTile,
                                         linkedTile,
                                     };
-                                    destroyTile(state, hero.area, {...closestLiftableTileCoords, layerKey: layer.key});
+                                    destroyTile(state, hero.area.alternateArea, {...closestLiftableTileCoords, layerKey: layer.key});
                                 }
                             }
                         }

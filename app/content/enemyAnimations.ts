@@ -98,3 +98,14 @@ export const beetleWingedAnimations: ActorAnimations = {
         right: beetleWingedAnimation,
     },
 };
+
+const entGeometry: FrameDimensions = { w: 40, h: 38, content: { x: 4, y: 6, w: 32, h: 32} };
+const entAnimation: FrameAnimation = createAnimation('gfx/enemies/ent.png', entGeometry, { cols: 1});
+export const entAnimations: ActorAnimations = {
+    idle: {
+        up: entAnimation,
+        down: entAnimation,
+        left: entAnimation,
+        right: entAnimation,
+    },
+};

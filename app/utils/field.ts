@@ -208,6 +208,9 @@ export function getTileBehaviorsAndObstacles(
                 if (object.behaviors?.solid) {
                     tileBehavior.solid = true;
                 }
+                if (object.behaviors?.damage) {
+                    tileBehavior.damage = Math.max(tileBehavior.damage || 0, object.behaviors.damage);
+                }
             }
         }
     }

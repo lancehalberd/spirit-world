@@ -15,11 +15,12 @@ import {
     Action, Actor, AreaInstance, BossObjectDefinition, Direction, DrawPriority,
     EnemyDefinition, EnemyObjectDefinition,
     Frame, FrameAnimation, GameState, HitProperties, HitResult,
-    ObjectInstance, ObjectStatus, ShortRectangle,
+    ObjectInstance, ObjectStatus, ShortRectangle, TileBehaviors,
 } from 'app/types';
 
 export class Enemy implements Actor, ObjectInstance {
     type = 'enemy' as 'enemy';
+    behaviors: TileBehaviors;
     isEnemyTarget = true;
     action: Action = null;
     area: AreaInstance;
@@ -65,6 +66,9 @@ export class Enemy implements Actor, ObjectInstance {
     constructor(state: GameState, definition: EnemyObjectDefinition | BossObjectDefinition) {
         this.definition = definition;
         this.enemyDefinition = enemyDefinitions[this.definition.enemyType] || enemyDefinitions.snake;
+        this.behaviors = {
+            ...(this.enemyDefinition.tileBehaviors || {}),
+        };
         this.d = definition.d || 'down';
         this.hasShadow = this.enemyDefinition.hasShadow ?? true;
         this.currentAnimation = this.enemyDefinition.animations.idle[this.d];

@@ -155,6 +155,7 @@ function moveActorInDirection(
                 vy: - 4 * (ay - actor.y),
                 vz: 2,
             }});
+            return false;
         }
         // Climbable overrides solid tile behavior. This allows use to place tiles marked climbable on top
         // of solid tiles to make them passable.

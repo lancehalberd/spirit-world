@@ -19,6 +19,7 @@ export class Teleporter implements ObjectInstance {
     active: boolean = false;
     status: ObjectStatus = 'normal';
     animationTime = 0;
+    linkedObject: Teleporter;
     constructor(state: GameState, definition: EntranceDefinition) {
         this.definition = definition;
         this.x = definition.x;
@@ -67,6 +68,11 @@ export class Teleporter implements ObjectInstance {
                 }, false, () => {
                     // In the future, check if there is a teleporter where the hero ends up and set it to control them
                     // so it moves them off of it.
+                    if (this.linkedObject) {
+                        hero.actionTarget = this.linkedObject;
+                        // Hero always exits the teleporter moving down currently.
+                        hero.d = 'down';
+                    }
                 });
             } else {
                 enterZoneByTarget(state, this.definition.targetZone, this.definition.targetObjectId, this.definition, false, () => {

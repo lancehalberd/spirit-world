@@ -13,7 +13,6 @@ dialogueHash.tombGuardian = {
             text: [
                 `You can use your teleportation skill to leave here through that portal.
                 {|} Move your Astral Body where you want to go and press {B_TOOL} to teleport.
-                {flag:cocoonTeleporter}
                 `
             ],
         },
@@ -25,9 +24,9 @@ dialogueHash.tombGuardian = {
             },
             isExclusive: true,
             text: [
-                `This is the Cocoon, but it is still under construction.
-                {|}Normally you would need to fight a boss to get to me, but I'll just give you this for now.
-                {flag:cocoonTeleporter}
+                `You are ready to learn my final technique.{|}
+                You won't be able to travel between the material and spirit worlds as freely
+                as a pure blooded Vanara, but this should be enough for you to climb the Helix.
                 {item:teleportation:1}`
             ],
         },

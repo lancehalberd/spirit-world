@@ -72,7 +72,7 @@ export class LightningBolt implements ObjectInstance, Props {
                 });
                 spark.x -= spark.w / 2;
                 spark.y -= spark.h / 2;
-                addObjectToArea(state, state.areaInstance, spark);
+                addObjectToArea(state, this.area, spark);
             }
         }
         if (this.animationTime >= this.delay + LIGHTNING_ANIMATION_DURATION) {

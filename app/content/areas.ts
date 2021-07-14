@@ -197,6 +197,11 @@ export function enterLocation(
         } else if (state.location.zoneKey !== location.zoneKey) {
             state.transitionState.type = 'circle';
         }
+        const targetAreaDefinition = getAreaFromLocation(location);
+        if (state.alternateAreaInstance.definition === targetAreaDefinition) {
+            state.transitionState.nextAreaInstance = state.alternateAreaInstance;
+            state.transitionState.nextAlternateAreaInstance = state.areaInstance;
+        }
         return;
     }
     state.location = {
@@ -225,9 +230,11 @@ export function enterLocation(
     removeAllClones(state);
     state.hero.activeStaff?.remove(state);
     const lastAreaInstance = state.areaInstance;
-    // Use the existing area instance on the transition state if it is present.
-    state.areaInstance = state.transitionState?.nextAreaInstance || createAreaInstance(state, area);
-    state.alternateAreaInstance = createAreaInstance(state, alternateArea);
+    // Use the existing area instances on the transition state if any are present.
+    state.areaInstance = state.transitionState?.nextAreaInstance
+        || createAreaInstance(state, area);
+    state.alternateAreaInstance = state.transitionState?.nextAlternateAreaInstance
+        || createAreaInstance(state, alternateArea);
     state.areaInstance.alternateArea = state.alternateAreaInstance;
     state.alternateAreaInstance.alternateArea = state.areaInstance;
     linkObjects(state);

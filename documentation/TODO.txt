@@ -25,8 +25,6 @@ Graphics:
 
 Current tasks:
     - Dungeon 3: Cocoon
-        - Required puzzle: kill enemy in spirit world with rolling ball to get small key
-        - Required puzzle: Use astral projection to move pot out of the way to roll ball to get big key
         Boss
             - Astral projection of Tomb Guardian(material world) Tomb Guardian(spirit world)
             - Tomb Guardian appears randomly in four quadrants, each has different puzzle for hitting

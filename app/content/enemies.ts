@@ -5,12 +5,14 @@ import { AnimationEffect } from 'app/content/animationEffect';
 import { EnemyArrow } from 'app/content/arrow';
 import { Flame } from 'app/content/effects/flame';
 import { FrostGrenade } from 'app/content/effects/frostGrenade';
+import { GrowingThorn } from 'app/content/effects/growingThorn';
 import {
     beetleAnimations,
     climbingBeetleAnimations,
     beetleHornedAnimations,
     beetleMiniAnimations,
     beetleWingedAnimations,
+    entAnimations,
     snakeAnimations,
 } from 'app/content/enemyAnimations';
 import { simpleLootTable, lifeLootTable, moneyLootTable } from 'app/content/lootTables';
@@ -24,12 +26,14 @@ import {
     ActorAnimations, Clone, Direction,
     Enemy, FrameAnimation, FrameDimensions, GameState,
     Hero, HitProperties, HitResult, LootTable, MagicElement, MovementProperties, ObjectInstance,
+    TileBehaviors,
 } from 'app/types';
 
 
 export const enemyTypes = <const>[
     'arrowTurret',
     'beetle', 'climbingBeetle', 'beetleHorned', 'beetleMini', 'beetleWinged',
+    'ent',
     'flameSnake', 'frostBeetle',
     'lightningBug',
     'snake',
@@ -42,11 +46,13 @@ export interface EnemyDefinition {
     alwaysReset?: boolean,
     animations: ActorAnimations,
     aggroRadius?: number,
+    tileBehaviors?: TileBehaviors,
     canBeKnockedBack?: boolean,
     canBeKnockedDown?: boolean,
     flipRight?: boolean,
     flying?: boolean,
     hasShadow?: boolean,
+    ignorePits?: boolean,
     life?: number,
     lootTable?: LootTable,
     immunities?: MagicElement[],
@@ -119,6 +125,46 @@ enemyDefinitions.lightningBug = {
     life: 3, touchDamage: 1, update: updateStormLightningBug, render: renderLightningShield,
     immunities: ['lightning'],
 };
+
+enemyDefinitions.ent = {
+    alwaysReset: true,
+    animations: entAnimations, aggroRadius: 128,
+    life: 8, touchDamage: 2, update: updateEnt,
+    ignorePits: true,
+    // The damage from tile behaviors will trigger when the player attempts to move into the same pixel,
+    // which is more specific than touch damage on enemies which requires actually being in the same pixel.
+    tileBehaviors: {damage: 2, solid: true},
+};
+
+function updateEnt(state: GameState, enemy: Enemy): void {
+    if (enemy.mode === 'attack') {
+        const target = getNearbyTarget(state, enemy, enemy.enemyDefinition.aggroRadius, enemy.area.allyTargets, new Set([state.hero.astralProjection]));
+
+        if (enemy.modeTime > 0 && enemy.modeTime % 500 === 0 && target) {
+            const targetHitbox = target.getHitbox(state);
+            const thorns = new GrowingThorn({
+                x: targetHitbox.x + targetHitbox.w / 2,
+                y: targetHitbox.y + targetHitbox.h / 2,
+                damage: 2,
+            });
+            addObjectToArea(state, enemy.area, thorns);
+        }
+        if (enemy.modeTime >= 3000) {
+            enemy.setMode('recover')
+        }
+    } else if (enemy.mode === 'recover') {
+        if (enemy.modeTime >= 3000) {
+            enemy.setMode('wait')
+        }
+    } else {
+        if (enemy.modeTime >= 1000) {
+            const target = getNearbyTarget(state, enemy, enemy.enemyDefinition.aggroRadius, enemy.area.allyTargets, new Set([state.hero.astralProjection]));
+            if (target) {
+                enemy.setMode('attack');
+            }
+        }
+    }
+}
 
 function updateFlameSnake(state: GameState, enemy: Enemy): void {
     paceRandomly(state, enemy);
@@ -426,6 +472,23 @@ export function getVectorToNearbyTarget(state: GameState, enemy: Enemy, radius: 
     return null;
 }
 
+export function getNearbyTarget(state: GameState, enemy: Enemy, radius: number, targets: ObjectInstance[], ignoreTargets: Set<ObjectInstance> = null): ObjectInstance {
+    const hitbox = enemy.getHitbox(state);
+    for (const target of targets) {
+        if (!target || target.area !== enemy.area || !target.getHitbox || ignoreTargets.has(target)) {
+            continue;
+        }
+        const targetHitbox = target.getHitbox(state);
+        const dx = (targetHitbox.x + targetHitbox.w / 2) - (hitbox.x + hitbox.w / 2);
+        const dy = (targetHitbox.y + targetHitbox.h / 2) - (hitbox.y + hitbox.h / 2);
+        const mag = Math.sqrt(dx * dx + dy * dy);
+        if (mag <= radius) {
+            return target;
+        }
+    }
+    return null;
+}
+
 function getLineOfSightTargetAndDirection(state: GameState, enemy: Enemy, direction: Direction = null, projectile: boolean = false): {d: Direction, hero: Hero} {
     const hitbox = enemy.getHitbox(state);
     for (const hero of [state.hero, state.hero.astralProjection, ...state.hero.clones]) {
@@ -566,7 +629,7 @@ export function checkForFloorEffects(state: GameState, enemy: Enemy) {
             if (!behaviors.water) {
                 startSwimming = false;
             }*/
-            if (behaviors.pit && enemy.z <= 0 && !enemy.flying) {
+            if (behaviors.pit && enemy.z <= 0 && !enemy.flying && !enemy.enemyDefinition.ignorePits) {
                 const pitAnimation = new AnimationEffect({
                     animation: enemyFallAnimation,
                     x: column * 16 - 4, y: row * 16 - 4,

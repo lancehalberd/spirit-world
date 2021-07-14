@@ -56,7 +56,10 @@ export interface GameState {
         // The location to switch to after the current screen wipe transition.
         nextLocation: ZoneLocation,
         // This is used for rendering the next area when diving/surfacing.
+        // It is also used to avoid recreating areas when teleporting between spirit+material worlds.
         nextAreaInstance?: AreaInstance,
+        // This is used to avoid recreating areas then teleporting between spirit+material worlds.
+        nextAlternateAreaInstance?: AreaInstance,
         time: number,
         callback: () => void,
         patternCanvas?: HTMLCanvasElement,
