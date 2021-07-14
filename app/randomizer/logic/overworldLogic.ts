@@ -16,7 +16,7 @@ export const overworldNodes: LogicNode[] = [
             { nodeId: 'warTempleArea' },
         ],
         entranceIds: [
-            'elderEntrance',
+            'elderEntrance', 'tombTeleporter',
             'lakeTunnelEntrance', 'peachCaveTopEntrance', 'peachCaveWaterEntrance', 'staffTowerEntrance',
             'tombEntrance', 'waterfallCaveEntrance',
         ],

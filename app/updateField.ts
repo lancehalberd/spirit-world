@@ -54,7 +54,10 @@ export function updateField(this: void, state: GameState) {
 }
 export function updateAreaObjects(this: void, state: GameState, area: AreaInstance) {
     const isScreenTransitioning = state.nextAreaInstance || state.nextAreaSection;
-    area.allyTargets = [state.hero];
+    area.allyTargets = [];
+    if (area === state.hero.area) {
+        area.allyTargets.push(state.hero);
+    }
     area.enemyTargets = [];
     area.neutralTargets = [];
     for (const object of area?.objects || []) {

@@ -1274,7 +1274,7 @@ const sf2_0x0: AreaDefinition = {
     parentDefinition: f2_0x0,
     layers: null,
     objects: [
-        {status: "closedSwitch", id: "warTempleExit", x: 112, y: 0, type: "door", style: "cave", targetZone: undefined, targetObjectId: undefined, d: "up", saveStatus: undefined, linked: true, spirit: true},
+        {status: "closedSwitch", id: "warTempleExit", x: 112, y: 0, type: "door", style: "cave", targetZone: "overworld", targetObjectId: "warTempleEntrance", d: "up", saveStatus: undefined, linked: true, spirit: true},
         {status: "normal", id: "warTemple:s2:0x0-floorSwitch-0", spirit: true, x: 176, y: 64, targetObjectId: undefined, toggleOnRelease: undefined, type: "floorSwitch"},
         {status: "normal", id: "warTemple:s2:0x0-pushPull-0", spirit: true, x: 160, y: 64, type: "pushPull"},
     ],

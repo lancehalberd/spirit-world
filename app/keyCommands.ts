@@ -31,6 +31,8 @@ export const KEY = {
     J: 'J'.charCodeAt(0),
     L: 'L'.charCodeAt(0),
     M: 'M'.charCodeAt(0),
+    P: 'P'.charCodeAt(0),
+    Q: 'Q'.charCodeAt(0),
     R: 'R'.charCodeAt(0),
     S: 'S'.charCodeAt(0),
     T: 'T'.charCodeAt(0),
@@ -42,7 +44,7 @@ export const KEY = {
 
 const KEYBOARD_MAPPINGS = {
     [GAME_KEY.WEAPON]: [KEY.SPACE], // A (bottom button)
-    [GAME_KEY.PASSIVE_TOOL]: [KEY.SHIFT], // B (right button)
+    [GAME_KEY.PASSIVE_TOOL]: [KEY.SHIFT, KEY.P, KEY.Q], // B (right button)
     [GAME_KEY.LEFT_TOOL]: [KEY.C], // X (left button)
     [GAME_KEY.RIGHT_TOOL]: [KEY.V], // Y (top button)
     [GAME_KEY.MENU]: [KEY.ENTER], // START

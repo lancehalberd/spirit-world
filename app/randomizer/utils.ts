@@ -2,6 +2,11 @@ import { cloneDeep } from 'lodash';
 import { isLogicValid } from 'app/content/logic';
 import { lootEffects } from 'app/content/lootObject';
 import { getZone, zones } from 'app/content/zones';
+import {
+    SPAWN_LOCATION_DEMO,
+    SPAWN_LOCATION_FULL,
+    SPAWN_LOCATION_PEACH_CAVE_EXIT,
+} from 'app/content/spawnLocations';
 
 import { peachCaveNodes } from 'app/randomizer/logic/peachCaveLogic';
 import { treeVillageNodes } from 'app/randomizer/logic/otherLogic'
@@ -9,6 +14,7 @@ import { overworldNodes } from 'app/randomizer/logic/overworldLogic';
 import { tombNodes } from 'app/randomizer/logic/tombLogic';
 import { warTempleNodes } from 'app/randomizer/logic/warTempleLogic';
 
+import { readGetParameter } from 'app/utils/index';
 import SRandom from 'app/utils/SRandom';
 
 import { applySavedState, getDefaultState } from 'app/state';
@@ -123,49 +129,57 @@ interface AssignmentState {
     assignedContents: string[]
 }
 
+
+const findObjectByIdCache: {[key: string]: {
+    object: ObjectDefinition,
+    location: ZoneLocation,
+    needsEyes: boolean,
+}} = {};
 function findObjectById(
     zone: Zone,
     id: string,
     state: GameState = null,
     skipObject: ObjectDefinition = null
 ): {object: ObjectDefinition, location: ZoneLocation} {
-    let foundObjectOutOfLogic = null;
+    const cacheKey = zone.key + ':' + id;
+    const cachedResult = findObjectByIdCache[cacheKey];
+    if (cachedResult) {
+        if (state && !state.hero.passiveTools.catEyes && cachedResult.needsEyes) {
+            return {object: null, location: null};
+        }
+        return {object: cachedResult.object, location: cachedResult.location};
+    }
     for (let floor = 0; floor < zone.floors.length; floor++) {
         for( const areaGrid of [zone.floors[floor].spiritGrid, zone.floors[floor].grid]){
             for (let y = 0; y < areaGrid.length; y++) {
                 for (let x = 0; x < areaGrid[y].length; x++) {
                     // All objects in 100% dark areas are considered out of logic unless you can see in the dark.
-                    const isOutOfLogic = state && areaGrid[y][x]?.dark >= 100 && !state.hero.passiveTools.catEyes;
+                    const needsEyes = areaGrid[y][x]?.dark >= 100;
                     for (const object of (areaGrid[y][x]?.objects || [])) {
                         if (object.id === id && object !== skipObject) {
-                            if (isOutOfLogic) {
-                                foundObjectOutOfLogic = object;
-                                break;
-                            }
-                            return {
-                                object,
-                                location: {
-                                    zoneKey: zone.key,
-                                    floor,
-                                    areaGridCoords: {x, y},
-                                    isSpiritWorld: areaGrid === zone.floors[floor].spiritGrid,
-                                    x: object.x,
-                                    y: object.y,
-                                    d: null,
-                                },
+                            const location = {
+                                zoneKey: zone.key,
+                                floor,
+                                areaGridCoords: {x, y},
+                                isSpiritWorld: areaGrid === zone.floors[floor].spiritGrid,
+                                x: object.x,
+                                y: object.y,
+                                d: null,
                             };
+                            findObjectByIdCache[cacheKey] = {object, location, needsEyes};
+                            if (state && !state.hero.passiveTools.catEyes && needsEyes) {
+                                return {object: null, location: null};
+                            }
+                            return findObjectByIdCache[cacheKey];
                         }
                     }
                 }
             }
         }
     }
-    if (!foundObjectOutOfLogic) {
-        warnOnce(missingObjectSet, zone.key + id, 'Missing object: ');
-    } else {
-        // console.warn(zone.key + id, ' is out of logic');
-    }
-    return {object: null, location: null};
+    warnOnce(missingObjectSet, zone.key + id, 'Missing object: ');
+    findObjectByIdCache[cacheKey] = {object: null, location: null, needsEyes: false};
+    return findObjectByIdCache[cacheKey];
 }
 
 function getLootObjects(nodes: LogicNode[], state: GameState = null): LootWithLocation[] {
@@ -413,12 +427,31 @@ function organizeLootObjects(lootObjects: LootWithLocation[]) {
     return { bigKeys, smallKeys, progressLoot, trashLoot };
 }
 
+// Make a deep copy of the state.
+function copyState(state: GameState): GameState {
+    return {
+        ...state,
+        hero: {
+            ...state.hero,
+            activeTools: {...state.hero.activeTools},
+            passiveTools: {...state.hero.passiveTools},
+            elements: {...state.hero.elements},
+            equipment: {...state.hero.equipment},
+        },
+        savedState: {
+            ...state.savedState,
+            dungeonInventories: cloneDeep(state.savedState.dungeonInventories),
+            objectFlags: {...state.savedState.objectFlags},
+        },
+    };
+}
+
 function applyLootObjectToState(state: GameState, lootWithLocation: LootWithLocation): GameState {
     if (lootWithLocation.lootObject.lootType === 'empty') {
         return state;
     }
     // We need to set the current location to the loot location so that dungeon items are applied to the correct state.
-    const stateCopy = cloneDeep(state);
+    const stateCopy = copyState(state);
     stateCopy.location = lootWithLocation.location;
     const onPickup = lootEffects[lootWithLocation.lootObject.lootType] || lootEffects.unknown;
     onPickup(stateCopy, lootWithLocation.lootObject);
@@ -428,14 +461,15 @@ function applyLootObjectToState(state: GameState, lootWithLocation: LootWithLoca
     return stateCopy;
 }
 
+
 export function reverseFill(random: typeof SRandom, allNodes: LogicNode[], startingNodes: LogicNode[]): LootAssignment[] {
     calculateKeyLogic(allNodes, startingNodes);
-    console.log({ allNodes, startingNodes });
+    // console.log({ allNodes, startingNodes });
     const allLootObjects = getLootObjects(allNodes);
     let initialState = getDefaultState();
     applySavedState(initialState, initialState.savedState);
 
-    let finalState = cloneDeep(initialState);
+    let finalState = copyState(initialState);
     for (const lootWithLocation of allLootObjects) {
         finalState = applyLootObjectToState(finalState, lootWithLocation);
     }
@@ -456,36 +490,49 @@ export function reverseFill(random: typeof SRandom, allNodes: LogicNode[], start
     random.generateAndMutate();
     trashLoot = random.shuffle(trashLoot);
     random.generateAndMutate();
-    let remainingLoot = [...allLootObjects];
-    // TODO: assign trash loot without checking logic since it doesn't matter.
-    for (let itemSet of [bigKeys, smallKeys, progressLoot, trashLoot]) {
+    let remainingLoot = [...bigKeys, ...smallKeys, ...progressLoot];
+    for (let itemSet of [bigKeys, smallKeys, progressLoot]) {
         while (itemSet.length) {
             const itemToPlace = random.removeElement(itemSet);
             random.generateAndMutate();
             remainingLoot.splice(remainingLoot.indexOf(itemToPlace), 1);
             // Compute the current state without the chosen item or any of the previously placed items.
-            let state = cloneDeep(initialState);
+            //const startTime = Date.now();
+            let state = copyState(initialState);
+            //console.log('cloned ', (Date.now() - startTime) / 1000);
             for (const lootWithLocation of remainingLoot) {
                 state = applyLootObjectToState(state, lootWithLocation);
             }
+            //console.log('startState ', (Date.now() - startTime) / 1000);
             // console.log(state.hero);
-            try {
-                placeItem(random, allNodes, startingNodes, state, assignmentsState, itemToPlace);
-            } catch (e) {
-                // No issue if we run out of space for trash
-                if (itemSet === trashLoot) {
-                    break;
-                }
-                debugger;
-                throw e;
-            }
+            placeItem(random, allNodes, startingNodes, state, assignmentsState, itemToPlace);
+            //console.log('placed ', (Date.now() - startTime) / 1000);
         }
+    }
+    for (const location of allLootObjects) {
+        if (!trashLoot.length) {
+            break;
+        }
+        // console.log('Placing: ', loot.lootObject.id);
+        if (assignmentsState.assignedLocations.includes(location.lootObject.id)) {
+            continue;
+        }
+        const loot = trashLoot.pop();
+        assignmentsState.assignments.push({
+            lootType: loot.lootObject.lootType,
+            lootAmount: loot.lootObject.lootAmount,
+            lootLevel: loot.lootObject.lootLevel,
+            source: loot,
+            target: location,
+        });
+        assignmentsState.assignedContents.push(loot.lootObject.id);
+        assignmentsState.assignedLocations.push(location.lootObject.id);
     }
     return assignmentsState.assignments;
 }
 
 function placeItem(random: typeof SRandom, allNodes: LogicNode[], startingNodes: LogicNode[], originalState: GameState, assignmentsState: AssignmentState, loot: LootWithLocation): string {
-    console.log('Placing: ', loot.lootObject.id);
+    // console.log('Placing: ', loot.lootObject.id);
     let currentState = originalState;
     let previousState = originalState;
     let counter = 0;
@@ -508,7 +555,8 @@ function placeItem(random: typeof SRandom, allNodes: LogicNode[], startingNodes:
     const assignedLocation = random.element(assignableChecks);
     random.generateAndMutate();
     if (!assignedLocation) {
-        // console.error('Failed to place item', { assignmentsState, originalState, currentState, loot});
+        console.error('Failed to place item', { assignmentsState, originalState, currentState, loot});
+        debugger;
         throw new Error('Failed to place item')
     }
     assignmentsState.assignments.push({
@@ -546,8 +594,9 @@ function collectAllLoot(allNodes: LogicNode[], startingNodes: LogicNode[], state
 
 export function applyLootAssignments(assignments: LootAssignment[]): void {
     console.log('applying assignments:');
-    console.log(assignments);
+    // console.log(assignments);
     for (const assignment of assignments) {
+        console.log(assignment.source.lootObject.id, ' => ', assignment.target.lootObject.id);
         if (assignment.target.lootObject.type === 'dialogueLoot') {
             const {object} = findObjectById(zones[assignment.target.location.zoneKey], assignment.target.lootObject.id);
             const npc = object as NPCDefinition;
@@ -575,17 +624,14 @@ const allNodes = [
     ...treeVillageNodes,
 ];
 
-function readGetParameter(parameterName: string): string {
-    for (const item of location.search.substr(1).split('&')) {
-        const tmp = item.split('=');
-        if (tmp[0] === parameterName) {
-            return decodeURIComponent(tmp[1]);
-        }
-    }
-}
 const seed = readGetParameter('seed');
 
 if (seed) {
     applyLootAssignments(reverseFill(SRandom.seed(Number(seed)), allNodes, [overworldNodes[0]]));
+    for (let key in SPAWN_LOCATION_PEACH_CAVE_EXIT) {
+        SPAWN_LOCATION_DEMO[key] = SPAWN_LOCATION_PEACH_CAVE_EXIT[key];
+        SPAWN_LOCATION_FULL[key] = SPAWN_LOCATION_PEACH_CAVE_EXIT[key];
+    }
+
 }
 

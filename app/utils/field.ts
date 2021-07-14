@@ -349,8 +349,8 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
         }
     }
     let hitTiles = [];
-    if (hit.hitTiles && hit.hitbox) {
-        hitTiles = getTilesInRectangle(area, hit.hitbox);
+    if (hit.hitTiles && (hit.tileHitbox || hit.hitbox)) {
+        hitTiles = getTilesInRectangle(area, hit.tileHitbox || hit.hitbox);
     }
     if (hit.hitTiles && hit.hitCircle) {
         hitTiles = [...hitTiles, ...getTilesInCircle(area, hit.hitCircle)];

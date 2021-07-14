@@ -194,6 +194,12 @@ export class Arrow implements ObjectInstance {
             direction: this.direction,
             damage: this.damage,
             hitbox: this,
+            tileHitbox: {
+                w: this.w,
+                h: this.h,
+                x: this.x - this.vx,
+                y: this.y - this.vy,
+            },
             vx: this.vx,
             vy: this.vy, element:
             this.element,
@@ -285,6 +291,12 @@ export class EnemyArrow extends Arrow {
             damage: this.damage,
             direction: this.direction,
             hitbox: this,
+            tileHitbox: {
+                w: this.w,
+                h: this.h,
+                x: this.x - this.vx,
+                y: this.y - this.vy,
+            },
             vx: this.vx,
             vy: this.vy, element:
             this.element,

@@ -75,12 +75,20 @@ export const tombNodes: LogicNode[] = [
     },
     {
         zoneId,
-        nodeId: 'beforeTombBoss',
+        nodeId: 'tombBasementEntrance',
         paths: [
-            {nodeId: 'tombBoss', doorId: 'tombBossDoor'},
+            {nodeId: 'beforeTombBoss', logic: canCrossSmallGapsOrTeleport},
         ],
         entranceIds: ['tombBasementEntrance'],
         exits: [{ objectId: 'tombBasementEntrance'}],
+    },
+    {
+        zoneId,
+        nodeId: 'beforeTombBoss',
+        paths: [
+            {nodeId: 'tombBasementEntrance', logic: canCrossSmallGapsOrTeleport},
+            {nodeId: 'tombBoss', doorId: 'tombBossDoor'},
+        ],
     },
     {
         zoneId,

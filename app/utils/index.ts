@@ -175,3 +175,12 @@ export function readFromFile(): Promise<string> {
         };
     });
 }
+
+export function readGetParameter(parameterName: string): string {
+    for (const item of location.search.substr(1).split('&')) {
+        const tmp = item.split('=');
+        if (tmp[0] === parameterName) {
+            return decodeURIComponent(tmp[1]);
+        }
+    }
+}

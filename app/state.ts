@@ -8,6 +8,7 @@ import { zones } from 'app/content/zones';
 import { updateHeroMagicStats } from 'app/render/spiritBar';
 import { renderHero } from 'app/renderActor';
 import { onHitHero } from 'app/updateActor';
+import { readGetParameter } from 'app/utils/index';
 
 import { GameState, Hero, SavedState, ShortRectangle } from 'app/types';
 
@@ -17,7 +18,9 @@ export function loadSavedData(): boolean {
     if (window.location.search.substr(1) === 'reset' && confirm('Clear your saved data?')) {
         return false;
     }
-    const importedSaveData = window.localStorage.getItem('savedGames');
+
+    const seed = readGetParameter('seed');
+    const importedSaveData = window.localStorage.getItem('savedGames' + seed);
     if (importedSaveData) {
         state.savedGames = JSON.parse(importedSaveData);
         return true;
@@ -49,9 +52,10 @@ export function saveGame(): void {
             delete savedGame.hero.area;
         }
     }
+    const seed = readGetParameter('seed');
     // console.log(exportState(getState()));
     try {
-        window.localStorage.setItem('savedGames', JSON.stringify(state.savedGames));
+        window.localStorage.setItem('savedGames' + seed, JSON.stringify(state.savedGames));
     } catch (e) {
         console.error(e);
         debugger;

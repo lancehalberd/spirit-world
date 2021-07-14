@@ -99,6 +99,8 @@ export interface HitProperties {
     hitObjects?: boolean,
     // Hits background tiles like bushes, rocks, solid walls
     hitTiles?: boolean,
+    // Alternate hitbox to use when checking for tile hits.
+    tileHitbox?: ShortRectangle
     // Targets to ignore.
     ignoreTargets?: Set<ObjectInstance>,
 }

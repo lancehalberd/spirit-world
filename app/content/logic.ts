@@ -65,23 +65,23 @@ export function isLogicValid(state: GameState, logic: LogicCheck, invertLogic = 
 }
 window['isLogicValid'] = isLogicValid;
 
-export const hasClone: LogicCheck = { requiredFlags: ['$clone'] };
+export const hasClone: LogicCheck = { requiredFlags: ['$clone', '$catEyes'] };
 export const hasIronBoots: LogicCheck = { requiredFlags: ['$ironBoots'] };
-export const hasAstralProjection: LogicCheck = { requiredFlags: ['$astralProjection', '$spiritSight'] };
-export const hasTeleportation: LogicCheck = { requiredFlags: ['$astralProjection', '$spiritSight', '$teleportation'] };
+export const hasAstralProjection: LogicCheck = { requiredFlags: ['$astralProjection', '$spiritSight', '$catEyes'] };
+export const hasTeleportation: LogicCheck = { requiredFlags: ['$astralProjection', '$spiritSight', '$teleportation', '$catEyes'] };
 export const hasGloves: LogicCheck = { requiredFlags: ['$gloves'] };
 export const hasMitts: LogicCheck = { requiredFlags: ['$gloves:2'] };
-export const hasSpiritSight: LogicCheck = { requiredFlags: ['$spiritSight'] };
+export const hasSpiritSight: LogicCheck = { requiredFlags: ['$spiritSight', '$catEyes'] };
 export const hasSmallKey: LogicCheck = { requiredFlags: ['$smallKey'] };
 export const hasBigKey: LogicCheck = { requiredFlags: ['$bigKey'] };
 
 // This check will be added automatically to any tiles that have 100% darkness effect.
 //const hasEyes: LogicCheck = { requiredFlags: ['$catEyes:1'] };
 export const hasBow: LogicCheck = {requiredFlags: ['$bow', '$catEyes']};
-export const hasRoll: LogicCheck = {requiredFlags: ['$roll']};
-export const hasStaff: LogicCheck = {requiredFlags: ['$staff']};
+export const hasRoll: LogicCheck = {requiredFlags: ['$roll', '$catEyes']};
+export const hasStaff: LogicCheck = {requiredFlags: ['$staff', '$catEyes']};
 export const hasWeapon: OrLogicCheck = orLogic({requiredFlags: ['$weapon']}, hasBow);
-export const hasMediumRange: OrLogicCheck = orLogic({requiredFlags: ['$weapon', '$charge']}, hasBow);
+export const hasMediumRange: OrLogicCheck = orLogic({requiredFlags: ['$weapon', '$charge', '$catEyes']}, hasBow);
 
 // Can cross gaps 2 units wide in logic.
 export const canCrossSmallGaps: OrLogicCheck = orLogic(hasRoll, hasStaff);

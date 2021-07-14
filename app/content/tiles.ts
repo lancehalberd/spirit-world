@@ -196,6 +196,11 @@ const rockWallFrame: Frame = {
 const caveFloorPalette: TileSource = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/cavefloor.png'), x: 0, y: 0, w: 336, h: 16},
+    behaviors: {all: {linkedOffset: 448}},
+};
+const caveFloorSpiritPalette: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/cavefloorspirit.png'), x: 0, y: 0, w: 336, h: 16},
     behaviors: {},
 };
 
@@ -525,6 +530,48 @@ function applyMask(targetSource: TileSource, maskSource: TileSource) {
 applyMask(shore, shoreMask);
 applyMask(shoreAngles, shoreAnglesMask);
 
+const treeBase: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/64treebase.png'), x: 0, y: 0, w: 64, h: 64},
+    behaviors: {
+        'all': { defaultLayer: 'field', solid: true },
+    },
+};
+const treeLeft: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/64treeleft.png'), x: 48, y: 0, w: 16, h: 64},
+    behaviors: {
+        'all': { defaultLayer: 'foreground' },
+    },
+};
+const treeRight: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/64treeright.png'), x: 0, y: 0, w: 16, h: 64},
+    behaviors: {
+        'all': { defaultLayer: 'foreground' },
+    },
+};
+const treeOverlapLeft: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/64treeoverlapleft.png'), x: 48, y: 0, w: 16, h: 64},
+    behaviors: {
+        'all': { defaultLayer: 'foreground' },
+    },
+};
+const treeOverlapRight: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/64treeoverlapright.png'), x: 0, y: 0, w: 16, h: 64},
+    behaviors: {
+        'all': { defaultLayer: 'foreground' },
+    },
+};
+const treeTop: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/64treetop.png'), x: 8, y: 48, w: 64, h: 16},
+    behaviors: {
+        'all': { defaultLayer: 'foreground' },
+    },
+};
 
 
 const deletedTileSource: TileSource = solidColorTile('#FF0000');
@@ -616,5 +663,12 @@ addTiles([
     shallowToDeepAngles,
     deepToShallow,
     deepToShallowAngles,
+    caveFloorSpiritPalette,
+    treeBase,
+    treeTop,
+    treeLeft,
+    treeRight,
+    treeOverlapLeft,
+    treeOverlapRight,
 ]);
 
