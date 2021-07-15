@@ -1,4 +1,5 @@
 import { cloneDeep } from 'lodash';
+import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 import { isLogicValid } from 'app/content/logic';
 import { lootEffects } from 'app/content/lootObject';
 import { getZone, zones } from 'app/content/zones';
@@ -13,6 +14,7 @@ import { treeVillageNodes } from 'app/randomizer/logic/otherLogic'
 import { overworldNodes } from 'app/randomizer/logic/overworldLogic';
 import { tombNodes } from 'app/randomizer/logic/tombLogic';
 import { warTempleNodes } from 'app/randomizer/logic/warTempleLogic';
+import { cocoonNodes } from 'app/randomizer/logic/cocoonLogic';
 
 import { readGetParameter } from 'app/utils/index';
 import SRandom from 'app/utils/SRandom';
@@ -293,7 +295,7 @@ function findReachableNodes(allNodes: LogicNode[], startingNodes: LogicNode[], s
             }
             const { object } = findObjectById(zone, exit.objectId, state);
             const exitObject = object as EntranceDefinition;
-           // console.log(exit.objectId);
+            // console.log(exit.objectId);
             if (!canOpenDoor(zone, state, exitObject)) {
                 //console.log('cannot open', exitObject);
                 continue;
@@ -473,13 +475,14 @@ export function reverseFill(random: typeof SRandom, allNodes: LogicNode[], start
     for (const lootWithLocation of allLootObjects) {
         finalState = applyLootObjectToState(finalState, lootWithLocation);
     }
+    // console.log({ finalState });
     const allReachableCheckIds = findReachableChecks(allNodes, startingNodes, finalState).map(l => l.lootObject.id);
     for (const lootWithLocation of allLootObjects) {
         if (!allReachableCheckIds.includes(lootWithLocation.lootObject.id)) {
             console.warn(lootWithLocation.lootObject.id, ' will never be reachable');
         }
     }
-    console.log({ allLootObjects, allReachableCheckIds });
+    // console.log({ allLootObjects, allReachableCheckIds });
     const assignmentsState: AssignmentState = {
         assignments: [],
         assignedLocations: [],
@@ -600,14 +603,29 @@ export function applyLootAssignments(assignments: LootAssignment[]): void {
         if (assignment.target.lootObject.type === 'dialogueLoot') {
             const {object} = findObjectById(zones[assignment.target.location.zoneKey], assignment.target.lootObject.id);
             const npc = object as NPCDefinition;
+            const npcKey = `${assignment.target.location.zoneKey}-${assignment.target.lootObject.id}`;
             const number = assignment.lootAmount || assignment.lootLevel;
+            let text: string;
             if (number) {
-                npc.dialogue = `Here you go! {item:${assignment.lootType}:${number}}`;
+                text = `Here you go! {flag:${npcKey}} {item:${assignment.lootType}:${number}}`;
             } else {
-                npc.dialogue = `Here you go! {item:${assignment.lootType}}`;
+                text = `Here you go! {flag:${npcKey}} {item:${assignment.lootType}}`;
             }
-            npc.dialogueKey = null;
-            npc.dialogue += (assignment.target.progressFlags || []).map(flag => `{flag:${flag}}`).join(' ');
+            npc.dialogueKey = npcKey;
+            text += (assignment.target.progressFlags || []).map(flag => `{flag:${flag}}`).join(' ');
+            dialogueHash[npcKey] = {
+                key: npcKey,
+                options: [
+                    {
+                        logicCheck: { excludedFlags: [`${npcKey}`] },
+                        text: [text],
+                    },
+                    {
+                        logicCheck: {},
+                        text: ['You already got it!'],
+                    },
+                ],
+            };
         } else {
             assignment.target.lootObject.lootType = assignment.lootType;
             assignment.target.lootObject.lootAmount = assignment.lootAmount;
@@ -619,9 +637,10 @@ export function applyLootAssignments(assignments: LootAssignment[]): void {
 const allNodes = [
     ...overworldNodes,
     ...peachCaveNodes,
+    ...treeVillageNodes,
     ...tombNodes,
     ...warTempleNodes,
-    ...treeVillageNodes,
+    ...cocoonNodes,
 ];
 
 const seed = readGetParameter('seed');
