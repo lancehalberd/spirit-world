@@ -55,6 +55,8 @@ export interface EnemyDefinition {
     ignorePits?: boolean,
     life?: number,
     lootTable?: LootTable,
+    // This enemy won't be destroyed when reaching 0 life.
+    isImmortal?: boolean,
     immunities?: MagicElement[],
     params?: any,
     speed?: number,
@@ -149,7 +151,7 @@ function updateEnt(state: GameState, enemy: Enemy): void {
             });
             addObjectToArea(state, enemy.area, thorns);
         }
-        if (enemy.modeTime >= 3000) {
+        if (enemy.modeTime >= 2000) {
             enemy.setMode('recover')
         }
     } else if (enemy.mode === 'recover') {
@@ -453,6 +455,18 @@ export function paceAndCharge(state: GameState, enemy: Enemy) {
             });
         }
     }
+}
+
+export function getVectorToTarget(state: GameState, enemy: Enemy, target: ObjectInstance):{x: number, y: number, mag: number} {
+    const hitbox = enemy.getHitbox(state);
+    const targetHitbox = target.getHitbox(state);
+    const dx = (targetHitbox.x + targetHitbox.w / 2) - (hitbox.x + hitbox.w / 2);
+    const dy = (targetHitbox.y + targetHitbox.h / 2) - (hitbox.y + hitbox.h / 2);
+    const mag = Math.sqrt(dx * dx + dy * dy);
+    if (mag) {
+        return {mag, x: dx / mag, y: dy / mag};
+    }
+    return null;
 }
 
 export function getVectorToNearbyTarget(state: GameState, enemy: Enemy, radius: number, targets: ObjectInstance[]): {x: number, y: number} {

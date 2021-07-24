@@ -14,28 +14,25 @@ import { Enemy, GameState } from 'app/types';
 enemyDefinitions.stormIdol = {
     alwaysReset: true,
     animations: beetleWingedAnimations, scale: 2,
-    life: 9, touchDamage: 1, update: updateStormIdol, render: renderIdolShield,
+    isImmortal: true,
+    life: 8, touchDamage: 1, update: updateStormIdol, render: renderIdolShield,
     immunities: ['lightning'],
-    getHealthPercent: getIdolHealthPercent,
 };
 enemyDefinitions.flameIdol = {
     alwaysReset: true,
     animations: snakeAnimations, scale: 2,
-    life: 9, touchDamage: 1, update: updateFlameIdol, render: renderIdolShield,
+    isImmortal: true,
+    life: 8, touchDamage: 1, update: updateFlameIdol, render: renderIdolShield,
     immunities: ['fire'],
-    getHealthPercent: getIdolHealthPercent,
 };
 enemyDefinitions.frostIdol = {
     alwaysReset: true,
     animations: beetleAnimations, scale: 2,
-    life: 9, touchDamage: 1, update: updateFrostIdol, render: renderIdolShield,
+    isImmortal: true,
+    life: 8, touchDamage: 1, update: updateFrostIdol, render: renderIdolShield,
     immunities: ['ice'],
-    getHealthPercent: getIdolHealthPercent,
 };
 
-function getIdolHealthPercent(state: GameState, enemy: Enemy) {
-    return (enemy.life - 1) / (enemy.enemyDefinition.life - 1);
-}
 
 function updateStormIdol(state: GameState, enemy: Enemy): void {
     enemy.params.shieldColor = 'yellow';
@@ -73,15 +70,13 @@ function updateFrostIdol(state: GameState, enemy: Enemy): void {
 function updateElementalIdol(state: GameState, enemy: Enemy, attack: () => void) {
     // The statue is "destroyed" at 1 life, it will stay shielded and use its attack every 4 seconds
     // until all statues are "destroyed".
-    if (enemy.life <= 1) {
+    if (enemy.life <= 0) {
         enemy.params.priority = undefined;
         // When all bosses are at 1 life or lower, all the statues get destroyed.
         if (!enemy.area.objects.some(object =>
-            object instanceof Enemy && object.definition.type === 'boss' && object.life > 1
+            object instanceof Enemy && object.definition.type === 'boss' && object.life > 0
         )) {
-            enemy.shielded = false;
-            // Apply damage directly since this needs to kill the boss even if it is invulnerable.
-            enemy.applyDamage(state, 1);
+            enemy.showDeathAnimation(state);
             return;
         }
         enemy.shielded = true;
@@ -97,7 +92,7 @@ function updateElementalIdol(state: GameState, enemy: Enemy, attack: () => void)
         enemy.shielded = true;
     }
     // Immediately put up shield on entering pinch mode.
-    if (!enemy.params.pinchMode && enemy.life <= 5) {
+    if (!enemy.params.pinchMode && enemy.life <= 4) {
         enemy.params.pinchMode = true;
         enemy.setMode('enraged');
         enemy.shielded = true;

@@ -21,7 +21,6 @@ import {
 export class Enemy implements Actor, ObjectInstance {
     type = 'enemy' as 'enemy';
     behaviors: TileBehaviors;
-    isEnemyTarget = true;
     action: Action = null;
     area: AreaInstance;
     drawPriority: DrawPriority = 'sprites';
@@ -49,6 +48,7 @@ export class Enemy implements Actor, ObjectInstance {
     canBeKnockedBack: boolean = true;
     canBeKnockedDown: boolean = true;
     flying: boolean;
+    isImmortal: boolean = false;
     life: number;
     speed: number;
     acceleration: number;
@@ -85,6 +85,7 @@ export class Enemy implements Actor, ObjectInstance {
         this.canBeKnockedBack = this.enemyDefinition.canBeKnockedBack ?? this.definition.type !== 'boss';
         this.canBeKnockedDown = this.enemyDefinition.canBeKnockedDown ?? this.definition.type !== 'boss';
         this.flying = this.enemyDefinition.flying;
+        this.isImmortal = this.enemyDefinition.isImmortal;
         this.z = 0;//this.flying ? 12 : 0;
         this.scale = this.enemyDefinition.scale ?? 1;
         this.params = {
@@ -182,7 +183,7 @@ export class Enemy implements Actor, ObjectInstance {
         // This is actually the number of frames the enemy cannot damage the hero for.
         this.invulnerableFrames = 50;
         this.enemyInvulnerableFrames = 20;
-        if (this.life <= 0) {
+        if (this.life <= 0 && !this.isImmortal) {
             this.showDeathAnimation(state);
         } else {
             playSound('enemyHit');
@@ -190,6 +191,9 @@ export class Enemy implements Actor, ObjectInstance {
         return true;
     }
     showDeathAnimation(state: GameState) {
+        if (this.status === 'gone') {
+            return;
+        }
         const hitbox = this.getHitbox(state);
         const deathAnimation = new AnimationEffect({
             animation: enemyDeathAnimation,
@@ -212,8 +216,10 @@ export class Enemy implements Actor, ObjectInstance {
         this.status = 'gone';
         if (this.definition.type === 'boss') {
             // If the last boss is defeated kill all regular enemies.
-            if (!this.area.objects.some(object => (object instanceof Enemy) && object.definition.type === 'boss' && object.life > 0)) {
-                this.area.objects.forEach(object => (object instanceof Enemy) && object.definition.type !== 'boss' && object.life > 0 && object.applyDamage(state, object.life));
+            // Bosses in both material+spirit realms must be defeated before the battle is over.
+            const allEnemies = [...this.area.enemyTargets, ...this.area.alternateArea.enemyTargets];
+            if (!allEnemies.some(object => object.definition.type === 'boss' && object.status !== 'gone')) {
+                allEnemies.forEach(object => object.showDeathAnimation(state));
                 if (!state.savedState.objectFlags[this.definition.id]) {
                     state.savedState.objectFlags[this.definition.id] = true;
                     if (this.definition.lootType && this.definition.lootType !== 'empty') {

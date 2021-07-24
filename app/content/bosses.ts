@@ -2,11 +2,13 @@
 export * from 'app/content/enemies/enemyHash';
 export * from 'app/content/bosses/beetleBoss';
 export * from 'app/content/bosses/idols';
+export * from 'app/content/bosses/guardian';
 export * from 'app/content/bosses/frostSerpent';
 
 export const bossTypes = <const>[
     'beetleBoss',
     'stormIdol', 'flameIdol', 'frostIdol',
+    'guardian', 'guardianProjection',
     'frostHeart', 'frostSerpent',
 ];
 export type BossType = typeof bossTypes[number];

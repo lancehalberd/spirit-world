@@ -188,7 +188,7 @@ function moveActorInDirection(
         }
         if (canJumpDown) {
             actor.jumpingTime = (actor.jumpingTime || 0) + FRAME_LENGTH;
-            if (actor.jumpingTime >= 500) {
+            if (actor.jumpingTime >= 250) {
                 actor.action = 'jumpingDown';
                 actor.animationTime = 0;
                 actor.vx = ax - actor.x;

@@ -5,6 +5,20 @@ dialogueHash.tombGuardian = {
     options: [
         {
             logicCheck: {
+                requiredFlags: [],
+                excludedFlags: ['cocoonBossStarted'],
+                zones: ['cocoon'],
+            },
+            isExclusive: true,
+            text: [
+                `You have come so far in such a short time, but are you worthy of taking the next step?
+                {|}Prove your worth and show me what you've learned!
+                {flag:cocoonBossStarted}
+                `
+            ],
+        },
+        {
+            logicCheck: {
                 requiredFlags: ['$teleportation'],
                 excludedFlags: [],
                 zones: ['cocoon'],
@@ -18,7 +32,7 @@ dialogueHash.tombGuardian = {
         },
         {
             logicCheck: {
-                requiredFlags: [],
+                requiredFlags: ['cocoonBoss'],
                 excludedFlags: ['$teleportation'],
                 zones: ['cocoon'],
             },

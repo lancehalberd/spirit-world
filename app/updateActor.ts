@@ -561,6 +561,9 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             if (moveY && hero.action !== 'knocked') {
                 hero.vy = my;
             }
+        } else {
+            // Reset jumping time if the actor stopped moving.
+            hero.jumpingTime = 0;
         }
         if (!hero.action && !hero.chargingLeftTool && !hero.chargingRightTool) {
             hero.action = 'walking';
@@ -573,6 +576,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
     } else {
         if (!hero.slipping && !editingState.isEditing && hero.action !== 'jumpingDown') {
             hero.vx = hero.vy = 0;
+            hero.jumpingTime = 0;
         }
         if ((hero.action === 'walking' || hero.action === 'pushing') && !hero.chargingLeftTool && !hero.chargingRightTool) {
             hero.action = null;

@@ -78,8 +78,9 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
         size: 16,
     });
 
-    const bosses = state.areaInstance.enemyTargets.filter(
-        e => e instanceof Enemy && e.definition.type === 'boss' && e.isFromCurrentSection(state)
+    // Show boss health bars from both realms.
+    const bosses = [...state.areaInstance.enemyTargets, ...state.alternateAreaInstance.enemyTargets].filter(
+        e => e.status !== 'gone' && e.definition.type === 'boss' && e.isFromCurrentSection(state)
     ) as Enemy[];
     if (bosses.length) {
         const totalSpace = CANVAS_WIDTH - 32 - bosses.length * 4 + 4;

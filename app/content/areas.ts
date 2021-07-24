@@ -560,6 +560,7 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
             originalTiles: mapTileNumbersToFullTiles(layer.grid.tiles),
         })),
         objects: [],
+        removedObjectIds: [],
         priorityObjects: [],
         canvas,
         context,
@@ -614,6 +615,28 @@ export function getAreaSize(state: GameState): {w: number, h: number, section: S
             h: areaSection.h * 16,
         },
     }
+}
+
+export function refreshAreaLogic(state: GameState, area: AreaInstance): void {
+    for (const object of area.definition.objects) {
+        if (!object.logicKey) {
+            continue;
+        }
+        let instance = area.objects.find(o => o.definition === object);
+        if (isObjectLogicValid(state, object)) {
+            // If the object is valid but was never added to the area, add it now.
+            if (!instance && object.id && !area.removedObjectIds.includes(object.id)) {
+                instance = createObjectInstance(state, object);
+                addObjectToArea(state, area, instance);
+            }
+        } else {
+            // If the object is invalid but present, remove it from the area.
+            if (instance) {
+                removeObjectFromArea(state, instance);
+            }
+        }
+    }
+    checkIfAllEnemiesAreDefeated(state, area);
 }
 
 export function applyBehaviorToTile(area: AreaInstance, x: number, y: number, behavior: TileBehaviors): void {
@@ -710,9 +733,12 @@ export function addObjectToArea(state: GameState, area: AreaInstance, object: Ob
         area.objects.push(object);
     }
 }
-export function removeObjectFromArea(state: GameState, object: ObjectInstance): void {
+export function removeObjectFromArea(state: GameState, object: ObjectInstance, trackId: boolean = true): void {
     if (!object.area) {
         return;
+    }
+    if (object.definition?.id && trackId) {
+        object.area.removedObjectIds.push(object.definition.id);
     }
     if (object.remove) {
         object.remove(state);
@@ -754,9 +780,8 @@ export function destroyTile(state: GameState, area: AreaInstance, target: TileCo
 
 
 export function checkIfAllEnemiesAreDefeated(state: GameState, area: AreaInstance): void {
-    if (area.objects.some(e => (e instanceof Enemy) && e.isInCurrentSection(state))) {
-        return;
-    }
+    // Don't use `enemyTargets` here since this runs before it is populated sometimes.
+    const enemiesAreDefeated = !area.objects.some(e => (e instanceof Enemy) && e.isInCurrentSection(state));
     const { section } = getAreaSize(state);
     for (const object of area.objects) {
         if (!object.getHitbox) {
@@ -770,11 +795,18 @@ export function checkIfAllEnemiesAreDefeated(state: GameState, area: AreaInstanc
         ) {
             continue;
         }
-        if (object.status === 'hiddenEnemy') {
-            changeObjectStatus(state, object, 'normal');
-        }
-        if (object.status === 'closedEnemy') {
-            changeObjectStatus(state, object, 'normal');
+        if (enemiesAreDefeated) {
+            if (object.status === 'hiddenEnemy') {
+                changeObjectStatus(state, object, 'normal');
+            }
+            if (object.status === 'closedEnemy') {
+                changeObjectStatus(state, object, 'normal');
+            }
+        } else {
+            // Close doors if new enemies appear.
+            if (object.definition?.status === 'closedEnemy') {
+                changeObjectStatus(state, object, 'closedEnemy');
+            }
         }
     }
 }

@@ -27,8 +27,8 @@ const peachAnimations = {
         down: peachAnimation,
         left: peachAnimation,
         right: peachAnimation,
-    }
-}
+    },
+};
 
 enemyDefinitions.frostHeart = {
     animations: peachAnimations, life: 16, scale: 3, touchDamage: 1, update: updateFrostHeart, params: {
@@ -91,7 +91,7 @@ function getFrostSerpent(this: void, state: GameState, area: AreaInstance): Enem
 }
 
 function isEnemyDefeated(enemy: Enemy): boolean {
-    return !enemy || enemy.life <= 0 || enemy.status === 'gone';
+    return !enemy || (enemy.life <= 0 && !enemy.isImmortal) || enemy.status === 'gone';
 }
 
 function updateFrostHeart(this: void, state: GameState, enemy: Enemy): void {
@@ -200,7 +200,7 @@ function updateFrostSerpent(this: void, state: GameState, enemy: Enemy): void {
         surfaceSerpent = enemy;
         underwaterSerpent = getFrostSerpent(state, state.underwaterAreaInstance);
     }
-    // If either form is defeated, both are defeated.
+    // If either serpent is defeated, both are defeated.
     if (isEnemyDefeated(surfaceSerpent) || isEnemyDefeated(underwaterSerpent)) {
         enemy.status = 'gone';
         return;
@@ -228,6 +228,8 @@ function updateFrostSerpent(this: void, state: GameState, enemy: Enemy): void {
     enemy.params.active = true;
     const heart = getFrostHeart(state, enemy.area);
     const isEnraged = isEnemyDefeated(heart);
+    // The serpent cannot be defeated as long as the heart is alive.
+    enemy.isImmortal = !isEnraged;
     if (!isEnraged) {
         if (enemy.mode === 'regenerate') {
             if (enemy.modeTime % 500 === 0) {

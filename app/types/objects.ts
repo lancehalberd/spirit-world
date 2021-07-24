@@ -50,7 +50,6 @@ export interface ObjectInstance {
     render: (context: CanvasRenderingContext2D, state: GameState) => void,
     renderShadow?: (context: CanvasRenderingContext2D, state: GameState) => void,
     renderForeground?: (context: CanvasRenderingContext2D, state: GameState) => void,
-    isEnemyTarget?: boolean,
     isAllyTarget?: boolean,
     isNeutralTarget?: boolean,
 }

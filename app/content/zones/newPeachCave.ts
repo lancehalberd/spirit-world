@@ -90,11 +90,10 @@ const f0_0x0: AreaDefinition = {
     objects: [
         {id: "newPeachCave:0:0x0-waterPot-0", linked: false, spirit: false, status: "normal", x: 336, y: 96, type: "waterPot"},
         {id: "newPeachCave:0:0x0-door-0", linked: false, spirit: false, status: "normal", x: 64, y: 256, type: "door", targetZone: null, targetObjectId: null, d: "up"},
-        {id: "newPeachCave:0:0x0-door-1", linked: false, spirit: false, status: "closedEnemy", x: 64, y: 224, type: "door", targetZone: null, targetObjectId: null, d: "down"},
         {id: "newPeachCave:0:0x0-weapon-0", linked: false, spirit: false, status: "closedEnemy", x: 144, y: 48, type: "chest", lootType: "weapon", lootLevel: 0, lootAmount: 1},
         {id: "newPeachCave:stairsUp", linked: false, spirit: false, status: "normal", x: 256, y: 48, type: "door", targetZone: "newPeachCave", targetObjectId: "newPeachCave:stairsDown", d: "left"},
-        {id: "newPeachCave:0:0x0-beetle-0", linked: false, spirit: false, status: "normal", x: 64, y: 48, type: "enemy", enemyType: "beetle"},
-        {id: "newPeachCave:0:0x0-beetle-1", linked: false, spirit: false, status: "normal", x: 192, y: 144, type: "enemy", enemyType: "beetle"},
+        {id: "newPeachCave:0:0x0-beetle-0", linked: false, spirit: false, status: "normal", x: 48, y: 128, type: "enemy", enemyType: "beetle", logicKey: "hasWeapon"},
+        {id: "newPeachCave:0:0x0-beetle-1", linked: false, spirit: false, status: "normal", x: 112, y: 160, type: "enemy", enemyType: "beetle", logicKey: "hasWeapon"},
         {id: "newPeachCave:0:0x0-beetleMini-0", linked: false, spirit: false, status: "normal", x: 48, y: 320, type: "enemy", enemyType: "beetleMini"},
         {id: "newPeachCave:0:0x0-beetleMini-1", linked: false, spirit: false, status: "normal", x: 144, y: 448, type: "enemy", enemyType: "beetleMini"},
         {id: "", linked: false, spirit: false, status: "normal", x: 304, y: 240, type: "enemy", enemyType: "beetleMini"},
@@ -102,6 +101,7 @@ const f0_0x0: AreaDefinition = {
         {id: "newPeachCave:0:0x0-money-0", linked: false, spirit: false, status: "normal", x: 464, y: 352, type: "chest", lootType: "money", lootLevel: 0, lootAmount: 50},
         {status: "normal", id: "", x: 336, y: 304, type: "enemy", enemyType: "climbingBeetle", d: "down", params: {}},
         {status: "normal", id: "", x: 464, y: 144, type: "enemy", enemyType: "climbingBeetle", d: "down", params: {}},
+        {id: "", linked: false, spirit: false, status: "closedEnemy", x: 64, y: 224, type: "door", targetZone: null, targetObjectId: null, d: "down", style: "cave"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},

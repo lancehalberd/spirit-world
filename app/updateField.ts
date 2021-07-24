@@ -54,6 +54,8 @@ export function updateField(this: void, state: GameState) {
 }
 export function updateAreaObjects(this: void, state: GameState, area: AreaInstance) {
     const isScreenTransitioning = state.nextAreaInstance || state.nextAreaSection;
+    // Time passes slowly for everything but the astral projection while meditating.
+    const skipFrame = state.hero.action === 'meditating' && (state.hero.animationTime % 100) !== 0;
     area.allyTargets = [];
     if (area === state.hero.area) {
         area.allyTargets.push(state.hero);
@@ -64,7 +66,7 @@ export function updateAreaObjects(this: void, state: GameState, area: AreaInstan
         if (object.isAllyTarget) {
             area.allyTargets.push(object);
         }
-        if (object.isEnemyTarget) {
+        if (object instanceof Enemy) {
             area.enemyTargets.push(object);
         }
         if (object.isNeutralTarget) {
@@ -73,6 +75,10 @@ export function updateAreaObjects(this: void, state: GameState, area: AreaInstan
     }
     for (const object of area?.objects || []) {
         if (isScreenTransitioning && !object.updateDuringTransition) {
+            continue;
+        }
+        // Time passes slowly for everything but the astral projection while meditating.
+        if (skipFrame && object !== state.hero.astralProjection) {
             continue;
         }
         object.update?.(state);
@@ -110,7 +116,7 @@ function switchElement(state: GameState, delta: number): void {
 
 function removeDefeatedEnemies(state: GameState, area: AreaInstance): void {
     const originalLength = area.objects.length;
-    area.objects = area.objects.filter(e => !(e instanceof Enemy) || (e.life > 0 && e.status !== 'gone'));
+    area.objects = area.objects.filter(e => !(e instanceof Enemy) || (e.status !== 'gone'));
     // If an enemy was defeated, check if all enemies are defeated to see if any doors open or treasures appear.
     if (originalLength > area.objects.length) {
         checkIfAllEnemiesAreDefeated(state, area);

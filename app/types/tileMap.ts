@@ -1,5 +1,5 @@
 import {
-    DrawPriority,
+    DrawPriority, Enemy,
     Frame, LootTable, MagicElement,
     ObjectDefinition, ObjectInstance,
     ShortRectangle,
@@ -192,6 +192,9 @@ export interface AreaInstance {
     layers: AreaLayer[],
     objects: ObjectInstance[],
     priorityObjects: ObjectInstance[][],
+    // Array of object ids that were created on this instance but have been removed.
+    // This is used when refreshing area logic to only add objects that had not already been present.
+    removedObjectIds: string[]
     // These cached the tile backgrounds and are only updated when specific tile are marked to be redrawn.
     canvas: HTMLCanvasElement,
     context: CanvasRenderingContext2D,
@@ -210,7 +213,7 @@ export interface AreaInstance {
     // of this area is offset from the camera origin by this many pixels.
     cameraOffset: {x: number, y: number},
     allyTargets: ObjectInstance[],
-    enemyTargets: ObjectInstance[],
+    enemyTargets: Enemy[],
     neutralTargets: ObjectInstance[],
 }
 

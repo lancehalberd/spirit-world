@@ -89,6 +89,13 @@ export const canCrossSmallGaps: OrLogicCheck = orLogic(hasRoll, hasStaff);
 export const canCrossSmallGapsOrTeleport: OrLogicCheck = orLogic(canCrossSmallGaps, hasTeleportation);
 
 export const logicHash: {[key: string]: LogicCheck} = {
+    hasWeapon,
+    cocoonBossStarted: {
+        requiredFlags: ['cocoonBossStarted'],
+    },
+    cocoonBossDefeated: {
+        requiredFlags: ['cocoonBoss'],
+    },
     frozenLake: {
         // Frozen lake is only displayed after beasts escaped.
         requiredFlags: ['elementalBeastsEscaped'],

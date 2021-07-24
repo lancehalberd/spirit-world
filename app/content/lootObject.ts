@@ -1,4 +1,4 @@
-import { addObjectToArea, enterLocation, removeObjectFromArea } from 'app/content/areas';
+import { addObjectToArea, enterLocation, refreshAreaLogic, removeObjectFromArea } from 'app/content/areas';
 import { createCanvasAndContext } from 'app/dom';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { showMessage } from 'app/render/renderMessage';
@@ -306,6 +306,9 @@ export function getLoot(this: void, state: GameState, definition: LootObjectDefi
     const lootAnimation = new LootGetAnimation(definition);
     addObjectToArea(state, hero.area, lootAnimation);
     hero.area.priorityObjects.push([lootAnimation]);
+    // Refresh the area so that the guardian NPC moves to the correct location now that the boss is defeated.
+    refreshAreaLogic(state, state.areaInstance);
+    refreshAreaLogic(state, state.alternateAreaInstance);
     saveGame();
 }
 

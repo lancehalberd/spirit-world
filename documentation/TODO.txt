@@ -24,11 +24,9 @@ Graphics:
 
 
 Current tasks:
-    - Dungeon 3: Cocoon
-        Boss
-            - Astral projection of Tomb Guardian(material world) Tomb Guardian(spirit world)
-            - Tomb Guardian appears randomly in four quadrants, each has different puzzle for hitting
-            - Astral projection attacks you in the material world, if defeated it retreats to the guardian's position in the spirit world and regenerates.
+    - Add dialogue objects that can trigger on entering areas or other triggers.
+    - Change message rendering system to use the priority queue system to support nested messages.
+    - Prevent the door from trapping you in the bow room if you don't have ranged attack.
 
     - Randomizer improvements
         - Forward fill progress items until  (remainingProgressItems / 2) checks are available.
@@ -146,6 +144,10 @@ Dungeon 2 Improvements:
     - Add more uses of spirit sight:
         - See actual elemental beasts in the front room where the statues are located.
         - Some kind of optional spirit sight puzzle for a peach piece.
+
+Dungeon 3 Improvements:
+    - Make the guardian's projection use more interesting attacks.
+    - Animate the ents when they attack.
 
 River Temple Improvements:
     - Some underwater enemies

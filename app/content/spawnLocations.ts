@@ -100,6 +100,16 @@ export const SPAWN_COCOON_ENTRANCE: ZoneLocation = {
     areaGridCoords: {x: 0, y: 0},
     isSpiritWorld: false,
 };
+export const SPAWN_COCOON_BOSS: ZoneLocation = {
+    zoneKey: 'cocoon',
+    floor: 0,
+    x: 112,
+    y: 380,
+    z: 0,
+    d: 'up',
+    areaGridCoords: {x: 0, y: 0},
+    isSpiritWorld: true,
+};
 export const SPAWN_HELIX_ENTRANCE: ZoneLocation = {
     zoneKey: 'helix',
     floor: 0,
@@ -179,7 +189,8 @@ const warTempleStart = applyItems(tombBossState, {maxLife: 1, spiritSight: 1},
     ['tombBoss', 'warTempleEntrance', 'tombTeleporter']);
 const warTempleBoss = applyItems(warTempleStart, {gloves: 1, 'warTemple:bigKey': 1});
 const cocoonStartState = applyItems(warTempleBoss, {maxLife: 1, astralProjection: 1}, ['warTempleBoss']);
-const helixStartState = applyItems(cocoonStartState, {maxLife: 1, teleportation: 1, invisibility: 1},
+const cocoonBossState = applyItems(cocoonStartState, {invisibility: 1}, ['warTempleBoss']);
+const helixStartState = applyItems(cocoonBossState, {maxLife: 1, teleportation: 1},
     ['cocoonTeleporter', 'lakeTunneBoss']);
 helixStartState.hero.rightTool = 'invisibility';
 const helixEndState = applyItems(helixStartState, {charge: 1, staff: 1},
@@ -222,6 +233,10 @@ const spawnLocations = {
     'Cocoon Start': {
         location: SPAWN_COCOON_ENTRANCE,
         savedState: cocoonStartState,
+    },
+    'Cocoon Boss': {
+        location: SPAWN_COCOON_BOSS,
+        savedState: cocoonBossState,
     },
     'Helix Start': {
         location: SPAWN_HELIX_ENTRANCE,
@@ -300,7 +315,7 @@ export function setSpawnLocation(state: GameState, spawnLocation: ZoneLocation):
 }
 
 export function checkToUpdateSpawnLocation(state: GameState): void {
-    if (state.location.zoneKey === 'overworld' && state.hero.spawnLocation.zoneKey === 'newPeachCave') {
+    if (state.location.zoneKey === 'overworld') {
         return setSpawnLocation(state, SPAWN_LOCATION_PEACH_CAVE_EXIT);
     }
     if (state.location.zoneKey === 'tomb') {

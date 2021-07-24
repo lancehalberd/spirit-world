@@ -87,7 +87,7 @@ export interface GameState {
     },
     messageState?: {
         pageIndex: number,
-        pages: (Frame[][] | DialogueLootDefinition)[],
+        pages: (Frame[][] | DialogueLootDefinition | string)[],
     },
     isUsingKeyboard?: boolean,
     isUsingXbox?: boolean,

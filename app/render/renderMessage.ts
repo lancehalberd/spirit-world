@@ -97,9 +97,9 @@ export function showMessage(state: GameState, message: string): void {
 }
 
 const messageBreak = '{|}';
-export function parseMessage(state: GameState, message: string): (Frame[][] | DialogueLootDefinition)[] {
+export function parseMessage(state: GameState, message: string): (Frame[][] | DialogueLootDefinition | string)[] {
     const chunks = message.split(messageBreak);
-    let pages: (Frame[][] | DialogueLootDefinition)[] = [];
+    let pages: (Frame[][] | DialogueLootDefinition | string)[] = [];
     let currentPage: Frame[][] = [];
     let row: Frame[] = [];
     let rowWidth = 0;
@@ -140,7 +140,16 @@ export function parseMessage(state: GameState, message: string): (Frame[][] | Di
                 if (escapedToken) {
                     const progressFlag = getEscapedProgressFlag(state, escapedToken);
                     if (progressFlag) {
-                        state.savedState.objectFlags[progressFlag] = true;
+                        if (row.length) {
+                            currentPage.push(row);
+                        }
+                        if (currentPage.length) {
+                            pages.push(currentPage);
+                        }
+                        pages.push(progressFlag);
+                        currentPage = [];
+                        row = [];
+                        rowWidth = 0;
                         continue;
                     }
                     const lootDefinition = getEscapedLoot(state, escapedToken);

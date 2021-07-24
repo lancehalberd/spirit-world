@@ -1,4 +1,4 @@
-import { enterLocation } from 'app/content/areas';
+import { enterLocation, refreshAreaLogic } from 'app/content/areas';
 import { getLoot } from 'app/content/lootObject';
 import {
     SPAWN_LOCATION_DEMO,
@@ -168,9 +168,15 @@ function updateTitle(state: GameState) {
 function updateMessage(state: GameState) {
     if (isConfirmKeyPressed(state)) {
         state.messageState.pageIndex++;
-        const pageOrLoot = state.messageState.pages[state.messageState.pageIndex]
-        if (pageOrLoot?.['type'] === 'dialogueLoot') {
-            getLoot(state, pageOrLoot as DialogueLootDefinition);
+        const pageOrLootOrFlag = state.messageState.pages[state.messageState.pageIndex]
+        if (typeof pageOrLootOrFlag === 'string') {
+            state.savedState.objectFlags[pageOrLootOrFlag] = true;
+            saveGame();
+            refreshAreaLogic(state, state.areaInstance);
+            refreshAreaLogic(state, state.areaInstance.alternateArea);
+            state.messageState.pageIndex++;
+        } else if (pageOrLootOrFlag?.['type'] === 'dialogueLoot') {
+            getLoot(state, pageOrLootOrFlag as DialogueLootDefinition);
             // For now cancel remaining dialogue on receiving loot, we have no way to
             // show the loot animation and then continue dialogue. So all loot should
             // be set at the end of dialogue for now.
