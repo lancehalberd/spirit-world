@@ -50,7 +50,8 @@ export function getLootTypes(): LootType[] {
 export const combinedObjectTypes: ObjectType[] = [
     'airBubbles', 'ballGoal', 'bigChest', 'chest', 'crystalSwitch', 'decoration',
     'door', 'floorSwitch', 'loot','marker', 'npc', 'pitEntrance',
-    'pushPull', 'rollingBall',  'sign', 'staffTowerPoint', 'teleporter', 'tippable', 'torch', 'waterPot',
+    'pushPull', 'rollingBall',  'sign', 'staffTowerPoint', 'teleporter', 'tippable', 'torch',
+    'vineSprout', 'waterPot',
 ];
 
 export function createObjectDefinition(
@@ -195,6 +196,7 @@ export function createObjectDefinition(
         case 'rollingBall':
         case 'tippable':
         case 'torch':
+        case 'vineSprout':
         case 'waterPot':
             return {
                 ...commonProps,

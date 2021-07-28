@@ -19,6 +19,7 @@ import { Sign } from 'app/content/objects/sign';
 import { StaffTowerPoint }  from 'app/content/objects/staffTowerPoint';
 import { Teleporter } from 'app/content/objects/teleporter';
 import { Torch } from 'app/content/objects/torch';
+import { VineSprout } from 'app/content/objects/vineSprout';
 import { WaterPot } from 'app/content/objects/waterPot';
 
 import {
@@ -66,6 +67,8 @@ export function createObjectInstance(state: GameState, object: ObjectDefinition)
         return new Teleporter(state, object);
     } else if (object.type === 'torch') {
         return new Torch(state, object);
+    } else if (object.type === 'vineSprout') {
+        return new VineSprout(state, object);
     } else if (object.type === 'waterPot') {
         return new WaterPot(state, object);
     }

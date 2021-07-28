@@ -1,19 +1,17 @@
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { addObjectToArea } from 'app/content/areas';
-import { growVine, PouredWaterEffect } from 'app/content/effects/PouredWaterEffect';
+import { PouredWaterEffect } from 'app/content/effects/PouredWaterEffect';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
-import { directionMap } from 'app/utils/field';
-import { saveGame } from 'app/state';
 
 import {
-    AreaInstance, Direction, DrawPriority, FrameAnimation, GameState, HitProperties, HitResult,
+    AreaInstance, Direction, DrawPriority, GameState, HitProperties, HitResult,
     ObjectInstance, ObjectStatus, ShortRectangle, SimpleObjectDefinition,
 } from 'app/types';
 
+const fullPodAnimation = createAnimation('gfx/tiles/pod.png', {w: 16, h: 16}, {cols: 2, y: 0, duration: 24});
+const tippingPodAnimation = createAnimation('gfx/tiles/pod.png', {w: 16, h: 16}, {cols: 4, y: 1, duration: 4});
+const emptyPodAnimation = createAnimation('gfx/tiles/pod.png', {w: 16, h: 16}, {cols: 2, y: 2, duration: 24});
 
-const fallingAnimation: FrameAnimation = createAnimation('gfx/tiles/tippablepot.png', {w: 16, h: 18},
-    {cols: 6, duration: 4}, {loop: false}
-);
 
 export class WaterPot implements ObjectInstance {
     area: AreaInstance;
@@ -26,7 +24,6 @@ export class WaterPot implements ObjectInstance {
     x: number;
     y: number;
     fallFrame = 0;
-    fallDirection: Direction;
     grabDirection: Direction;
     isNeutralTarget = true;
     linkedObject: WaterPot;
@@ -34,42 +31,11 @@ export class WaterPot implements ObjectInstance {
     pushedLastFrame: boolean = false;
     status: ObjectStatus = 'normal';
     animationTime = 0;
-    shattered = false;
+    tipped = false;
     constructor(state: GameState, definition: SimpleObjectDefinition) {
         this.definition = definition;
         this.x = definition.x;
         this.y = definition.y;
-    }
-    add(state: GameState, area: AreaInstance) {
-        this.area = area;
-        area.objects.push(this);
-        if (!state.savedState.objectFlags[this.definition.id]) {
-            return;
-        }
-        // If this water pot was already tipped over, we need to start in the tipped state, and find a vine
-        // to grow nearby.
-        this.shattered = true;
-        this.animationTime = 2000;
-        this.fallDirection = 'left'; // This just needs to be set to any direction.
-        const tx = Math.floor(this.x / 16);
-        const ty = Math.floor(this.y / 16);
-        for (let x = tx - 1; x <= tx + 1; x++) {
-            for (let y = ty; y < 32; y++) {
-                // ignore the tile this object is on.
-                if (x === tx && y === ty) {
-                    continue;
-                }
-                const tileBehavior = area?.behaviorGrid[y]?.[x];
-                if (tileBehavior?.growTiles) {
-                    growVine(this.area, x, y);
-                    return;
-                }
-                // Stop searching once we find a non-solid tile.
-                if (!tileBehavior?.solid) {
-                    break;
-                }
-            }
-        }
     }
     getHitbox(state: GameState): ShortRectangle {
         return { x: this.x, y: this.y, w: 16, h: 16 };
@@ -78,59 +44,45 @@ export class WaterPot implements ObjectInstance {
         this.grabDirection = direction;
     }
     onHit(state: GameState, hit: HitProperties): HitResult {
-        if (!this.fallDirection && hit.direction === 'left' || hit.direction === 'right') {
+        if (hit.direction === 'left') {
             if (hit.canPush) {
-                this.pourInDirection(state, hit.direction);
+                this.pour(state);
             }
         }
         return { hit: true };
     }
     onPull(state: GameState, direction: Direction): void {
-        if (!this.fallDirection && this.grabDirection === direction) {
-            this.pourInDirection(state, direction);
+        if (this.grabDirection === direction && direction === 'left') {
+            this.pour(state);
         }
     }
     onPush(state: GameState, direction: Direction): void {
-        if (!this.fallDirection) {
+        if (direction === 'left') {
             this.pushCounter++;
             this.pushedLastFrame = true;
-            if (this.pushCounter >= 25) {
-                this.pourInDirection(state, direction);
+            if (this.pushCounter >= 15) {
+                this.pour(state);
             }
         }
     }
-    pourInDirection(state: GameState, direction: Direction): void {
-        if (this.fallDirection) {
+    pour(state: GameState): void {
+        if (this.tipped) {
             return;
         }
-        this.fallDirection = direction;
-        this.animationTime = -80;
+        this.tipped = true;
+        this.animationTime = 0;
         if (this.linkedObject) {
-            this.linkedObject.fallDirection = direction;
-            this.linkedObject.animationTime = -80;
+            this.linkedObject.tipped = true;
+            this.linkedObject.animationTime = 0;
         }
     }
     update(state: GameState) {
-        if (this.fallDirection) {
-            this.animationTime += FRAME_LENGTH;
-            if (this.fallFrame < 16) {
-                this.fallFrame++;
-            }
-        }
-        if (!this.shattered && this.animationTime >= (fallingAnimation.frames.length - 1) * FRAME_LENGTH * fallingAnimation.frameDuration) {
-            this.shattered = true;
-            for (const hero of [state.hero, ...state.hero.clones]) {
-                if (hero.grabObject === this) {
-                    hero.grabObject = null;
-                    hero.action = null;
-                }
-            }
+        this.animationTime += FRAME_LENGTH;
+        if (this.tipped && this.animationTime === FRAME_LENGTH * tippingPodAnimation.frameDuration) {
             addObjectToArea(state, this.area, new PouredWaterEffect({
-                x: this.x + 8 + 16 * directionMap[this.fallDirection][0],
-                y: this.y + 2 + 16 * directionMap[this.fallDirection][1],
+                x: this.x - 12,
+                y: this.y + 2,
             }));
-            state.savedState.objectFlags[this.definition.id] = true;
-            saveGame();
         }
         if (!this.pushedLastFrame) {
             this.pushCounter = 0;
@@ -139,13 +91,14 @@ export class WaterPot implements ObjectInstance {
         }
     }
     render(context, state: GameState) {
-        const frame = getFrame(fallingAnimation, this.animationTime);
-        drawFrame(context, frame, { ...frame, x: this.x, y: this.y - 2 });
-        if (!this.shattered) {
-            context.beginPath();
-            context.fillStyle = '#9999FF';
-            context.arc(this.x + 8, this.y + 2, 4, 0, 2 * Math.PI);
-            context.fill();
+        let frame;
+        if (!this.tipped) {
+            frame = getFrame(fullPodAnimation, this.animationTime);
+        } else if (this.animationTime < tippingPodAnimation.duration) {
+            frame = getFrame(tippingPodAnimation, this.animationTime);
+        } else {
+            frame = getFrame(emptyPodAnimation, this.animationTime);
         }
+        drawFrame(context, frame, { ...frame, x: this.x, y: this.y });
     }
 }

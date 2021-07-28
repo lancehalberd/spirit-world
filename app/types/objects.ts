@@ -199,7 +199,8 @@ export interface NPCDefinition extends BaseObjectDefinition {
     dialogue?: string,
 }
 
-export type SimpleObjectType = 'airBubbles' | 'marker' | 'pushPull' | 'rollingBall' | 'tippable' | 'torch' | 'waterPot';
+export type SimpleObjectType = 'airBubbles' | 'marker' | 'pushPull' | 'rollingBall'
+    | 'tippable' | 'torch' | 'vineSprout' | 'waterPot';
 
 export interface SimpleObjectDefinition extends BaseObjectDefinition {
     type: SimpleObjectType,

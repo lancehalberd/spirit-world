@@ -178,15 +178,6 @@ function gradientColorTile(colors: string[], x0, y0, x1, y1, behaviors: TileBeha
     }, behaviors);
 }
 
-const vineTile = canvasPalette(context => {
-        context.fillStyle = 'green';
-        context.fillRect(6, 0, 4, 16);
-}, climbableWall);
-const vineTileBase = canvasPalette(context => {
-        context.fillStyle = 'green';
-        context.fillRect(6, 0, 4, 6);
-}, { defaultLayer: 'field', growTiles: [28]});
-
 const rockWallFrame: Frame = {
     image: requireImage('gfx/tiles/rockwalltiles.png'),
     x: 0, y: 0, w: 48, h: 32,
@@ -505,6 +496,28 @@ const cloudAngles: TileSource = {
     },
 };
 
+const vineBase: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/vines.png'), x: 112, y: 0, w: 16, h: 16},
+    behaviors: {
+        'all': climbableWall,
+    },
+};
+const vineMiddle: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/vines.png'), x: 80, y: 16, w: 16, h: 32},
+    behaviors: {
+        'all': climbableWall,
+    },
+};
+const vineTop: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/vines.png'), x: 128, y: 48, w: 16, h: 16},
+    behaviors: {
+        'all': climbableWall
+    },
+};
+
 function applyMask(targetSource: TileSource, maskSource: TileSource) {
     const {w, h} = targetSource;
     for (let py = 0; py < targetSource.source.h / h; py ++) {
@@ -607,8 +620,7 @@ addTiles([
     solidColorTile('#A0A0FF'), // shallow water
     gradientColorTile(['#A08000', '#806000'], 0, 0, 0, 16, southCliffBehavior), // southCliffTop
     solidColorTile('#806000', wallBehavior), // cliffBottom
-    vineTile,
-    vineTileBase,
+    ...deletedTiles(2),
     stampTileSource(rockWallFrame, {
         '0x0': wallBehavior, '1x0': wallBehavior, '2x0': wallBehavior,
         '0x1': wallBehavior, '1x1': wallBehavior, '2x1': wallBehavior,
@@ -623,7 +635,10 @@ addTiles([
     shore,
     shoreAngles,
     cloudAngles,
-    ...deletedTiles(18),
+    vineBase,
+    vineMiddle,
+    vineTop,
+    ...deletedTiles(14),
     singleTileSource('gfx/tiles/bushspirit.png', spiritBushBehavior, 0),
     singleTileSource('gfx/tiles/thornsspirit.png', spiritThornBehavior),
     singleTileSource('gfx/tiles/rocksspirit.png', spiritLightStoneBehavior),

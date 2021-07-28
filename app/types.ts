@@ -17,3 +17,4 @@ export { AstralProjection } from 'app/content/objects/astralProjection';
 export { BallGoal } from 'app/content/objects/ballGoal';
 export { NPCBehavior, NPCStyle, NPC } from 'app/content/objects/npc';
 export { DecorationType } from 'app/content/objects/decoration';
+export { VineSprout } from 'app/content/objects/vineSprout';
