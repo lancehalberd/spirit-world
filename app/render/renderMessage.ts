@@ -25,9 +25,9 @@ function getActiveControllerMaps(state: GameState) {
 }
 
 function getEscapedProgressFlag(state: GameState, escapedToken: string): string {
-    const [tokenType, flag] = escapedToken.split(':');
+    const [tokenType, ...rest] = escapedToken.split(':');
     if (tokenType === 'flag') {
-        return flag;
+        return rest.join(':');
     }
     return null;
 }
@@ -234,9 +234,13 @@ export function renderMessage(context: CanvasRenderingContext2D, state: GameStat
 
     let x = r.x, y = r.y;
     const { pageIndex, pages } = state.messageState;
+    const pageOrLootOrFlag = pages[pageIndex];
+    if (typeof pageOrLootOrFlag === 'string' || pageOrLootOrFlag?.['type'] === 'dialogueLoot') {
+        return;
+    }
     // pages[pageIndex] can also be DialogueLootDefinition, but `pageIndex` should never
     // stop on a loot definition.
-    for (const row of (pages[pageIndex] as Frame[][])) {
+    for (const row of (pageOrLootOrFlag as Frame[][])) {
         for (const frame of row) {
             if (!frame) {
                 x += characterWidth;

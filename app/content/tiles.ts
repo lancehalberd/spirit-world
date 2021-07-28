@@ -71,16 +71,17 @@ const thornBehavior: TileBehaviors = {
 const deepWaterBehavior: TileBehaviors = {
     defaultLayer: 'field',
     water: true,
-}
+};
 const southCliffBehavior: TileBehaviors = {
     jumpDirection: 'down',
     solid: true,
-}
+};
 const climbableWall: TileBehaviors = {
     defaultLayer: 'field',
     climbable: true,
     solid: true,
-}
+    low: true,
+};
 
 const spiritBushParticles: Frame[] = createAnimation('gfx/tiles/bushspirit.png', {w: 16, h: 16}, {x: 2, cols: 3}).frames;
 const spiritLightStoneParticles: Frame[] = createAnimation('gfx/tiles/rocksspirit.png', {w: 16, h: 16}, {x: 2, cols: 3}).frames;

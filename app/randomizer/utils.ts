@@ -607,9 +607,9 @@ export function applyLootAssignments(assignments: LootAssignment[]): void {
             const number = assignment.lootAmount || assignment.lootLevel;
             let text: string;
             if (number) {
-                text = `Here you go! {flag:${npcKey}} {item:${assignment.lootType}:${number}}`;
+                text = `Here you go! {flag:${npcKey}}{item:${assignment.lootType}:${number}}`;
             } else {
-                text = `Here you go! {flag:${npcKey}} {item:${assignment.lootType}}`;
+                text = `Here you go! {flag:${npcKey}}{item:${assignment.lootType}}`;
             }
             npc.dialogueKey = npcKey;
             text += (assignment.target.progressFlags || []).map(flag => `{flag:${flag}}`).join(' ');

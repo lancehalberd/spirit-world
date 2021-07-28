@@ -168,22 +168,26 @@ function updateTitle(state: GameState) {
 function updateMessage(state: GameState) {
     if (isConfirmKeyPressed(state)) {
         state.messageState.pageIndex++;
-        const pageOrLootOrFlag = state.messageState.pages[state.messageState.pageIndex]
-        if (typeof pageOrLootOrFlag === 'string') {
-            state.savedState.objectFlags[pageOrLootOrFlag] = true;
-            saveGame();
-            refreshAreaLogic(state, state.areaInstance);
-            refreshAreaLogic(state, state.areaInstance.alternateArea);
+        while (state.messageState.pageIndex < state.messageState.pages.length) {
+            const pageOrLootOrFlag = state.messageState.pages[state.messageState.pageIndex];
+            if (typeof pageOrLootOrFlag === 'string') {
+                state.savedState.objectFlags[pageOrLootOrFlag] = true;
+                saveGame();
+                refreshAreaLogic(state, state.areaInstance);
+                refreshAreaLogic(state, state.areaInstance.alternateArea);
+            } else if (pageOrLootOrFlag?.['type'] === 'dialogueLoot') {
+                getLoot(state, pageOrLootOrFlag as DialogueLootDefinition);
+                // For now cancel remaining dialogue on receiving loot, we have no way to
+                // show the loot animation and then continue dialogue. So all loot should
+                // be set at the end of dialogue for now.
+                // state.messageState.pageIndex = state.messageState.pages.length;
+                // TODO: allow obtaining loot in the middle of a message and replace the above
+                // line with the one below.
+                // state.messageState.pageIndex++;
+            } else {
+                break;
+            }
             state.messageState.pageIndex++;
-        } else if (pageOrLootOrFlag?.['type'] === 'dialogueLoot') {
-            getLoot(state, pageOrLootOrFlag as DialogueLootDefinition);
-            // For now cancel remaining dialogue on receiving loot, we have no way to
-            // show the loot animation and then continue dialogue. So all loot should
-            // be set at the end of dialogue for now.
-            state.messageState.pageIndex = state.messageState.pages.length;
-            // TODO: allow obtaining loot in the middle of a message and replace the above
-            // line with the one below.
-            // state.messageState.pageIndex++;
         }
         if (state.messageState.pageIndex >= state.messageState.pages.length) {
             state.messageState.pages = null;
