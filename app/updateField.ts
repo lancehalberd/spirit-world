@@ -78,7 +78,7 @@ export function updateAreaObjects(this: void, state: GameState, area: AreaInstan
             continue;
         }
         // Time passes slowly for everything but the astral projection while meditating.
-        if (skipFrame && object !== state.hero.astralProjection) {
+        if (skipFrame && object !== state.hero.astralProjection && object !== state.hero.astralProjection?.grabObject) {
             continue;
         }
         object.update?.(state);
