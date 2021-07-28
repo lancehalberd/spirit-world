@@ -188,7 +188,7 @@ const sf0_0x0: AreaDefinition = {
     ],
     objects: [
         {status: "normal", id: "cocoonBossMarker", logicKey: undefined, x: 96, y: 400, saveStatus: undefined, type: "marker"},
-        {status: "normal", id: "", logicKey: "cocoonBossStarted", x: 144, y: 352, targetZone: undefined, targetObjectId: undefined, type: "teleporter", saveStatus: undefined},
+        {status: "normal", id: "cocoonBossTeleporter", logicKey: "cocoonBossStarted", x: 144, y: 352, targetZone: undefined, targetObjectId: undefined, type: "teleporter", saveStatus: undefined},
         {status: "normal", id: "cocoonGuardian", x: 144, y: 352, d: "down", behavior: "none", style: "vanara", type: "npc", dialogueKey: "tombGuardian", dialogue: "This is the Cocoon, but it is still under construction.\n{|}Normally you would need to fight a boss to get to me, but I'll just give you this for now.\n{teleportation:1}", logicKey: "cocoonBossStarted", invertLogic: true},
         {status: "normal", id: "", logicKey: undefined, x: 400, y: 96, targetZone: "overworld", targetObjectId: "tombTeleporter", type: "teleporter", saveStatus: undefined},
         {status: "normal", id: "cocoonBossMoney", logicKey: undefined, x: 416, y: 336, type: "chest", lootType: "money", lootAmount: 50, lootLevel: 1},
@@ -204,7 +204,7 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "guardianMarkerHard", logicKey: undefined, x: 352, y: 352, saveStatus: undefined, type: "marker"},
         {status: "normal", id: "guardianMarkerEasy", logicKey: undefined, x: 80, y: 416, saveStatus: undefined, type: "marker"},
         {status: "normal", id: "guardianMarkerHard", logicKey: undefined, x: 144, y: 384, saveStatus: undefined, type: "marker"},
-        {status: "normal", id: "cocoonGuardian", x: 112, y: 112, d: "down", behavior: "none", style: "vanara", type: "npc", dialogueKey: "tombGuardian", dialogue: "This is the Cocoon, but it is still under construction.\n{|}Normally you would need to fight a boss to get to me, but I'll just give you this for now.\n{teleportation:1}", logicKey: "cocoonBossDefeated"},
+        {status: "normal", id: "cocoonGuardianPostBoss", x: 112, y: 112, d: "down", behavior: "none", style: "vanara", type: "npc", dialogueKey: "tombGuardian", dialogue: "This is the Cocoon, but it is still under construction.\n{|}Normally you would need to fight a boss to get to me, but I'll just give you this for now.\n{teleportation:1}", logicKey: "cocoonBossDefeated"},
         {status: "normal", id: "cocoonBoss", logicKey: "cocoonBossStarted", x: 400, y: 144, type: "boss", enemyType: "guardian", lootType: "empty", lootAmount: 1, lootLevel: 1, d: "down", params: {}},
     ],
     sections: [

@@ -105,7 +105,7 @@ export const cocoonNodes: LogicNode[] = [
             {objectId: 'cocoonBossMoney', logic: andLogic(hasWeapon, hasTeleportation)},
         ],
         npcs: [
-            {loot: {type: 'dialogueLoot', id: 'cocoonGuardian', lootType: 'teleportation'}},
+            {loot: {type: 'dialogueLoot', id: 'cocoonGuardianPostBoss', lootType: 'teleportation'}},
         ],
     },
 ];
