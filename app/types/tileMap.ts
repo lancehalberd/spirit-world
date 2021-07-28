@@ -10,7 +10,7 @@ export type Direction = 'up' | 'down' | 'left' | 'right' | 'upleft' | 'upright' 
 export interface TileBehaviors {
     // 0-1
     brightness?: number,
-    defaultLayer?: 'floor' | 'field' | 'foreground',
+    defaultLayer?: 'floor' | 'field' | 'field2' | 'foreground' | 'foreground2',
     // In pixels
     lightRadius?: number,
     // Sets players action to 'climbing' while on the tile.

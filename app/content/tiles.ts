@@ -235,17 +235,6 @@ const brightGrass: TileSource = {
     },
 };
 
-const treeLeaves = canvasPalette((context: CanvasRenderingContext2D) => {
-    context.fillStyle = 'green';
-    context.fillRect(0, 8, 16, 8);
-    context.globalAlpha = 0.6;
-    context.arc(8, 8, 8, 0, 2 * Math.PI);
-    context.fill();
-    context.beginPath();
-    context.arc(8, 8, 12, 0, 2 * Math.PI);
-    context.fill();
-}, { defaultLayer: 'foreground' });
-
 const lightCaveCornersPalette: TileSource = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/cavewalls2temp.png'), x: 32, y: 0, w: 8 * 32, h: 32},
@@ -543,46 +532,60 @@ function applyMask(targetSource: TileSource, maskSource: TileSource) {
 applyMask(shore, shoreMask);
 applyMask(shoreAngles, shoreAnglesMask);
 
-const treeBase: TileSource = {
+const treeStump: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/64treebase.png'), x: 0, y: 0, w: 64, h: 64},
+    source: {image: requireImage('gfx/tiles/treesheet.png'), x: 0, y: 128, w: 64, h: 48},
     behaviors: {
         'all': { defaultLayer: 'field', solid: true },
     },
 };
-const treeLeft: TileSource = {
+const treeLeavesTop: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/64treeleft.png'), x: 48, y: 0, w: 16, h: 64},
+    source: {image: requireImage('gfx/tiles/treesheet.png'), x: 80, y: 0, w: 64, h: 16},
+    behaviors: {
+        'all': { defaultLayer: 'foreground2' },
+    },
+};
+const treeLeaves: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/treesheet.png'), x: 64, y: 16, w: 96, h: 48},
     behaviors: {
         'all': { defaultLayer: 'foreground' },
     },
 };
-const treeRight: TileSource = {
+const treeLeavesBottom: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/64treeright.png'), x: 0, y: 0, w: 16, h: 64},
+    source: {image: requireImage('gfx/tiles/treesheet.png'), x: 96, y: 64, w: 32, h: 16},
     behaviors: {
         'all': { defaultLayer: 'foreground' },
     },
 };
-const treeOverlapLeft: TileSource = {
+const treeLeavesDoor: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/64treeoverlapleft.png'), x: 48, y: 0, w: 16, h: 64},
+    source: {image: requireImage('gfx/tiles/treesheet.png'), x: 16, y: 96, w: 32, h: 16},
     behaviors: {
         'all': { defaultLayer: 'foreground' },
     },
 };
-const treeOverlapRight: TileSource = {
+const treeLeavesMerged: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/64treeoverlapright.png'), x: 0, y: 0, w: 16, h: 64},
+    source: {image: requireImage('gfx/tiles/treesheet.png'), x: 160, y: 16, w: 32, h: 48},
     behaviors: {
         'all': { defaultLayer: 'foreground' },
     },
 };
-const treeTop: TileSource = {
+const treeLeavesCorridor: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/64treetop.png'), x: 8, y: 48, w: 64, h: 16},
+    source: {image: requireImage('gfx/tiles/treesheet.png'), x: 224, y: 16, w: 16, h: 48},
     behaviors: {
         'all': { defaultLayer: 'foreground' },
+    },
+};
+const treeStumpDoor: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/treesheet.png'), x: 64, y: 96, w: 64, h: 32},
+    behaviors: {
+        'all': { defaultLayer: 'field', solid: true },
     },
 };
 
@@ -631,7 +634,7 @@ addTiles([
     caveCornersPalette,
     spiritPlantsPalette,
     brightGrass,
-    treeLeaves,
+    ...deletedTiles(1),
     shore,
     shoreAngles,
     cloudAngles,
@@ -679,11 +682,13 @@ addTiles([
     deepToShallow,
     deepToShallowAngles,
     caveFloorSpiritPalette,
-    treeBase,
-    treeTop,
-    treeLeft,
-    treeRight,
-    treeOverlapLeft,
-    treeOverlapRight,
+    treeStump,
+    treeLeavesTop,
+    treeLeaves,
+    treeLeavesBottom,
+    treeLeavesDoor,
+    treeLeavesMerged,
+    treeLeavesCorridor,
+    treeStumpDoor,
 ]);
 

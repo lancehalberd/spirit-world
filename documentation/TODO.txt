@@ -24,9 +24,8 @@ Graphics:
 
 
 Current tasks:
+    - Add missing layers when painting tiles.
     - Add new waterfall graphics
-    - Add updated tree graphics
-        - Add trees to the vanara village
     - Add dialogue objects that can trigger on entering areas or other triggers.
     - Change message rendering system to use the priority queue system to support nested messages.
     - Prevent the door from trapping you in the bow room if you don't have ranged attack.

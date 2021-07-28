@@ -68,6 +68,7 @@ export function getDefaultSpiritArea(location: ZoneLocation): AreaDefinition {
         isSpiritWorld: true,
         layers: parentDefinition.layers.map(layer => ({
             key: layer.key,
+            drawPriority: layer.key.startsWith('foreground') ? 'foreground' : 'background',
             grid: {
                 ...layer.grid,
                 // The matrix of tiles

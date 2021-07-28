@@ -74,13 +74,16 @@ const [
     lightWestCaveDoorFrame, lightWestCaveDoorCeiling,
 ] = createAnimation('gfx/tiles/cavewalls2temp.png', {w: 32, h: 32}, {x: 1, y: 4, cols: 6}).frames;
 
+
+const [ treeDoorOpen ] = createAnimation('gfx/tiles/treesheet.png', {w: 32, h: 32}, {left: 128, top: 96, cols: 1}).frames;
+
 interface DoorStyleFrames {
     doorFrame: Frame,
-    doorCeiling: Frame,
+    doorCeiling?: Frame,
     doorClosed: Frame,
     cracked: Frame,
     caveFrame: Frame,
-    caveCeiling: Frame,
+    caveCeiling?: Frame,
     cave: Frame,
     locked: Frame,
     bigKeyLocked: Frame,
@@ -173,6 +176,20 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
             cave: westCave,
             locked: westLockedDoorSteel,
             bigKeyLocked: westLockedDoorBig,
+        },
+    },
+    tree: {
+        w: 32,
+        h: 32,
+        up: {
+            doorFrame: treeDoorOpen,
+            doorClosed: treeDoorOpen,
+            cracked: treeDoorOpen,
+            caveFrame: treeDoorOpen,
+            caveCeiling: treeDoorOpen,
+            cave: treeDoorOpen,
+            locked: treeDoorOpen,
+            bigKeyLocked: treeDoorOpen,
         },
     },
     square: {
@@ -531,7 +548,9 @@ export class Door implements ObjectInstance {
                 } else {
                     frame = doorStyle[this.definition.d].doorCeiling;
                 }
-                drawFrame(context, frame, { ...frame, x: this.x, y: this.y });
+                if (frame) {
+                    drawFrame(context, frame, { ...frame, x: this.x, y: this.y });
+                }
             }
             if (this.status === 'frozen') {
                 context.save();
