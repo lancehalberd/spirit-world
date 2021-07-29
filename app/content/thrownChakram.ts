@@ -264,7 +264,7 @@ export class HeldChakram implements ObjectInstance {
             vy: this.vy,
             hitbox: this,
             hitEnemies: true,
-            hitObjects: true,
+            hitObjects: false,
             knockAwayFrom: { x: this.hero.x + this.hero.w / 2, y: this.hero.y + this.hero.h / 2 },
         };
         const hitResult = hitTargets(state, this.area, hit);

@@ -24,7 +24,6 @@ Graphics:
 
 
 Current tasks:
-    - Allow hitting pots at point blank range.
     - Add missing layers when painting tiles.
     - Add new waterfall graphics
     - Add dialogue objects that can trigger on entering areas or other triggers.
