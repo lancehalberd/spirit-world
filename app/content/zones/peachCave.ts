@@ -485,7 +485,7 @@ const f0_1x1: AreaDefinition = {
         {id: "1-1-rollingBall-1", status: "normal", type: "rollingBall", x: 464, y: 128},
         {id: "1-1-rollingBall-2", status: "normal", type: "rollingBall", x: 432, y: 128},
         {id: "1-1-rollingBall-3-1", status: "normal", type: "rollingBall", x: 400, y: 128},
-        {type: "chest", id: "1-1-invisibility-0", lootType: "invisibility", status: "normal", x: 32, y: 416},
+        {type: "chest", id: "1-1-cloak-0", lootType: "cloak", status: "normal", x: 32, y: 416},
         {type: "marker", id: "peachCave:0:1x1-marker-0", status: "normal", x: 272, y: 448},
         {type: "pitEntrance", id: "peachCave:0:1x1-pitEntrance-0", status: "normal", targetZone: "overworld", targetObjectId: "overworld:0:0x0-marker-0", x: 32, y: 464},
         {type: "marker", id: "peachCave:0:1x1-entranceMarker", status: "normal", x: 160, y: 448},

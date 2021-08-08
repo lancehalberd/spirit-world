@@ -70,8 +70,8 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
         renderSelectableTool('staff');
     }
     x += 30;
-    if (state.hero.activeTools.invisibility) {
-        renderSelectableTool('invisibility');
+    if (state.hero.activeTools.cloak) {
+        renderSelectableTool('cloak');
     }
     x += 30;
     if (state.hero.activeTools.clone) {

@@ -110,12 +110,16 @@ export function updateHeroMagicStats(state: GameState) {
     }
     state.hero.maxMagic = 20;
     state.hero.magicRegen = 4;
+    // Cloak increases max magic but not magic regen.
+    if (state.hero.activeTools.cloak) {
+        state.hero.maxMagic += 10;
+    }
     if (state.hero.passiveTools.charge >= 1) {
         state.hero.maxMagic += 10;
         state.hero.magicRegen += 1;
     }
     if (state.hero.passiveTools.charge >= 2) {
-        state.hero.maxMagic += 20;
+        state.hero.maxMagic += 10;
         state.hero.magicRegen += 2;
     }
     if (state.hero.elements.fire) {

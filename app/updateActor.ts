@@ -845,14 +845,15 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         state.defeatState.time = 0;
         state.menuIndex = 0;
     }
-    if (state.hero.invisible) {
-        state.hero.actualMagicRegen = Math.max(-10, state.hero.actualMagicRegen - 4 * FRAME_LENGTH / 1000);
+    if (state.hero.isInvisible || state.hero.hasBarrier) {
+        // state.hero.actualMagicRegen = Math.max(-10, state.hero.actualMagicRegen - 4 * FRAME_LENGTH / 1000);
+        state.hero.actualMagicRegen = !state.hero.action ? 2 : 1;
     }
     const isHoldingBreath = !isTouchingAirBubble && !isAstralProjection && !state.hero.passiveTools.waterBlessing && state.zone.surfaceKey;
     if (isHoldingBreath) {
         state.hero.actualMagicRegen = Math.min(-1, state.hero.actualMagicRegen);
     }
-    if (!state.hero.invisible && !isHoldingBreath) {
+    if (!state.hero.isInvisible && !isHoldingBreath) {
         state.hero.actualMagicRegen = Math.min(
             !state.hero.action ? 2 * state.hero.magicRegen : state.hero.magicRegen,
             state.hero.actualMagicRegen + 4 * FRAME_LENGTH / 1000
@@ -898,7 +899,8 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         state.hero.magic = state.hero.maxMagic;
     }
     if (state.hero.magic < 0) {
-        state.hero.invisible = false;
+        state.hero.hasBarrier = false;
+        state.hero.isInvisible = false;
         if (state.hero.clones.length) {
             state.hero.x = hero.x;
             state.hero.y = hero.y;
@@ -916,7 +918,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
 }
 
 export function checkForEnemyDamage(state: GameState, hero: Hero) {
-    if (hero.action === 'roll' || hero.action === 'getItem' || hero.invulnerableFrames > 0 || state.hero.invisible) {
+    if (hero.action === 'roll' || hero.action === 'getItem' || hero.invulnerableFrames > 0 || state.hero.isInvisible) {
         return;
     }
     if (!hero.area) {
@@ -929,7 +931,7 @@ export function checkForEnemyDamage(state: GameState, hero: Hero) {
         if (enemy.enemyDefinition.touchDamage && rectanglesOverlap(hero, enemy.getHitbox(state))) {
             //const dx = (hero.x + hero.w / 2) - (enemy.x + enemy.w / 2);
             //const dy = (hero.y + hero.h / 2) - (enemy.y + enemy.h / 2);
-            hero.onHit(state, {
+            const hitResult = hero.onHit(state, {
                 damage: enemy.enemyDefinition.touchDamage,
                 knockback: {
                     vx: - 4 * directionMap[hero.d][0],
@@ -937,6 +939,11 @@ export function checkForEnemyDamage(state: GameState, hero: Hero) {
                     vz: 2,
                 },
             });
+            if (hitResult.returnHit) {
+                enemy.onHit(state, hitResult.returnHit);
+            } else if (hitResult.knockback) {
+                enemy.knockBack(state, hitResult.knockback);
+            }
         }
     }
 }
@@ -973,8 +980,29 @@ export function onHitHero(this: Hero, state: GameState, hit: HitProperties): Hit
     if (this.action === 'roll' || this.action === 'getItem' || this.action === 'jumpingDown') {
         return {};
     }
+    if (this.hasBarrier) {
+        if (hit.damage && state.hero.invulnerableFrames <= 0) {
+            state.hero.magic -= Math.max(10, hit.damage * 5);
+            state.hero.invulnerableFrames = Math.max(state.hero.invulnerableFrames, 10);
+        }
+        const hitbox = this.getHitbox(state);
+        let reflectDamage = this.barrierLevel;
+        if (!this.barrierElement) {
+            reflectDamage++;
+        }
+        return { hit: true, reflected: true,
+            returnHit: {
+                damage: reflectDamage,
+                element: this.barrierElement,
+                knockAwayFrom: {
+                    x: hitbox.x + hitbox.w / 2,
+                    y: hitbox.y + hitbox.h / 2,
+                },
+            },
+        };
+    }
     // Enemies have special code for handling invulnerability.
-    if (this.invulnerableFrames > 0 || this.invisible) {
+    if (this.invulnerableFrames > 0 || this.isInvisible) {
         return {};
     }
     if (hit.damage) {

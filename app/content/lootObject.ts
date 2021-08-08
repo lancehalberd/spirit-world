@@ -163,12 +163,19 @@ function showLootMessage(state: GameState, lootType: LootType, lootLevel?: numbe
                     + '{|}Hold {B_PASSIVE} to make a clone explode!');
             }
             return;
-        case 'invisibility':
-            if (state.hero.activeTools.invisibility === 1) {
-                return showMessage(state, 'You learned the Invisibility Technique!' + equipToolMessage
-                    + '{|}Press {B_TOOL} to become invisible and immune to most damage.'
-                    + '{|}This technique rapidly drains your Spirit Energy!'
-                    + '{|}Press {B_TOOL} again to become visible again and recover.');
+        case 'cloak':
+            if (state.hero.activeTools.cloak === 1) {
+                return showMessage(state, 'You have obtained the Spirit Cloak!' + equipToolMessage
+                    + '{|}Press {B_TOOL} to create a Spirit Barrier around you.'
+                    + '{|}The barrier will damage enemies and reflect projectiles at the cost of your Spirit Energy!'
+                    + '{|}Your Spirit Energy will regenerate more slowly while the barrier is on,'
+                    + '{|}and the barrier will fail if you run out of Spirit Energy.'
+                    + '{|}Press {B_TOOL} again to deactivate the barrier.');
+            }
+            if (state.hero.activeTools.cloak === 2) {
+                return showMessage(state, 'You have obtained the Invisibility Cloak!' + equipToolMessage
+                    + '{|}Now your Spirit Barrier will also make you invisible.'
+                    + '{|}Invisibility makes you undetectable and allows you to pass through traps!');
             }
             return;
         case 'staff':
@@ -481,7 +488,7 @@ export const [
 ).frames;
 
 
-const lootFrames: Partial<{[key in LootType]: Frame}> = {
+const lootFrames: {[key in string]: Frame} = {
     smallKey: keyOutlineFrame,
     fire: fireElement,
     ice: iceElement,
@@ -494,7 +501,8 @@ const lootFrames: Partial<{[key in LootType]: Frame}> = {
     catEyes: catEyes,
     charge: neutralElement,
     clone: twoCloneFrame,
-    invisibility: invisibilityFrame,
+    invisibilityCloak: invisibilityFrame,
+    spiritCloak: createLootFrame('green', 'SC'),
     trueSight: createLootFrame('blue', 'TS'),
     gloves: gloveFrame,
     roll: mistScrollFrame,
@@ -542,6 +550,12 @@ export function getLootFrame({lootType, lootLevel, lootAmount}:
             return darkHalf;
         }
         return wholeCoin;
+    }
+    if (lootType === 'cloak') {
+        if (lootLevel === 1) {
+            return lootFrames.spiritCloak;
+        }
+        return lootFrames.invisibilityCloak;
     }
     return lootFrames[lootType] || lootFrames.unknown;
 }
@@ -591,10 +605,10 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: Lo
     unknown: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition) => {
         if (loot.lootType === 'weapon') {
             state.hero.weapon = applyUpgrade(state.hero.weapon, loot);
-        } else if (['bow', 'staff', 'clone', 'invisibility'].includes(loot.lootType)) {
-            if (!state.hero.leftTool) {
+        } else if (['bow', 'staff', 'clone', 'cloak'].includes(loot.lootType)) {
+            if (!state.hero.leftTool && state.hero.rightTool !== loot.lootType) {
                 state.hero.leftTool = loot.lootType as ActiveTool;
-            } else if (!state.hero.rightTool) {
+            } else if (!state.hero.rightTool && state.hero.leftTool !== loot.lootType) {
                 state.hero.rightTool = loot.lootType as ActiveTool;
             }
             state.hero.activeTools[loot.lootType] = applyUpgrade(state.hero.activeTools[loot.lootType], loot);

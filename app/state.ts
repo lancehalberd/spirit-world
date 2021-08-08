@@ -174,7 +174,7 @@ function getDefaultHeroState(): Hero {
             bow: 0,
             staff: 0,
             clone: 0,
-            invisibility: 0,
+            cloak: 0,
         },
         equipment: {
             cloudBoots: 0,
@@ -206,7 +206,8 @@ function getDefaultHeroState(): Hero {
         clones: [],
         activeClone: null,
         status: 'normal',
-        invisible: false,
+        hasBarrier: false,
+        isInvisible: false,
         getHitbox: getHeroHitbox,
         render: renderHero,
         onHit: onHitHero,
@@ -271,7 +272,8 @@ export function returnToSpawnLocation(state: GameState) {
     state.hero.grabTile = null;
     state.hero.action = null;
     state.hero.invulnerableFrames = 0;
-    state.hero.invisible = false;
+    state.hero.hasBarrier = false;
+    state.hero.isInvisible = false;
     state.hero.activeStaff = null;
     state.hero.activeClone = null;
     state.hero.frozenDuration = 0;

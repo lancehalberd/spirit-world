@@ -90,6 +90,7 @@ export const canCrossSmallGapsOrTeleport: OrLogicCheck = orLogic(canCrossSmallGa
 
 export const logicHash: {[key: string]: LogicCheck} = {
     hasWeapon,
+    hasMediumRange,
     cocoonBossStarted: {
         requiredFlags: ['cocoonBossStarted'],
     },

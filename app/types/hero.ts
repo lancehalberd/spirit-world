@@ -17,7 +17,7 @@ export type Action =
     // Used when jumping off of ledges. This causes the character to move in a specific fall trajectory
     // based on the direction they jump down until they "land" on a walkable tile.
     | 'jumpingDown';
-export type ActiveTool = 'bow' | 'staff' | 'clone' | 'invisibility';
+export type ActiveTool = 'bow' | 'staff' | 'clone' | 'cloak';
 export type Equipment = 'cloudBoots' | 'ironBoots';
 export type PassiveTool = 'gloves'
     | 'roll'
@@ -74,7 +74,8 @@ export interface Actor extends ObjectInstance {
     // like being knocked but doesn't stop MC charge or other actions.
     bounce?: {vx: number, vy: number, frames: number},
     equipedGear?: {[key in Equipment]?: boolean},
-    invisible?: boolean,
+    hasBarrier?: boolean,
+    isInvisible?: boolean,
     jumpingTime?: number,
     // If this is set, the actor is being carried by a hero/clone.
     carrier?: Hero,
@@ -121,7 +122,10 @@ export interface Hero extends Actor {
     clones: Clone[],
     activeClone?: Clone,
     activeStaff?: Staff,
-    invisible: boolean,
+    hasBarrier?: boolean,
+    barrierElement?: MagicElement,
+    barrierLevel?: number,
+    isInvisible?: boolean,
     safeD: Direction,
     safeX: number,
     safeY: number,

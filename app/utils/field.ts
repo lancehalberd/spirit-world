@@ -310,6 +310,7 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
                     combinedResult.stopped ||= result.stopped;
                     combinedResult.setElement ||= result.setElement;
                     combinedResult.knockback ||= result.knockback;
+                    combinedResult.reflected ||= result.reflected;
                     if (result.hit || result.blocked) {
                         combinedResult.hitTargets.add(object);
                     }
@@ -340,9 +341,10 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
                 combinedResult.stopped ||= result.stopped;
                 combinedResult.setElement ||= result.setElement;
                 combinedResult.knockback ||= result.knockback;
-                    if (result.hit || result.blocked) {
-                        combinedResult.hitTargets.add(object);
-                    }
+                combinedResult.reflected ||= result.reflected;
+                if (result.hit || result.blocked) {
+                    combinedResult.hitTargets.add(object);
+                }
             } else if (object.behaviors?.solid) {
                 combinedResult.hit = true;
                 if (!object.behaviors.low) {

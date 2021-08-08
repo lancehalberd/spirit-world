@@ -741,7 +741,7 @@ const sf2_0x0: AreaDefinition = {
     objects: [
         {status: "normal", id: "cocoonMarkerNW", logicKey: undefined, x: 160, y: 96, saveStatus: undefined, type: "marker"},
         {status: "normal", id: "cocoonMarkerNE", logicKey: undefined, x: 336, y: 96, saveStatus: undefined, type: "marker"},
-        {status: "normal", id: "cocoonBigChest", logicKey: undefined, x: 400, y: 48, type: "bigChest", lootType: "invisibility", lootAmount: 1, lootLevel: 1},
+        {status: "normal", id: "cocoonBigChest", logicKey: undefined, x: 400, y: 48, type: "bigChest", lootType: "cloak", lootAmount: 1, lootLevel: 1},
         {status: "normal", id: "cocoonBackPit", logicKey: undefined, x: 400, y: 160, targetZone: "cocoon", targetObjectId: "cocoonBackMarker", type: "pitEntrance"},
         {status: "normal", id: "", logicKey: undefined, x: 352, y: 144, targetZone: undefined, targetObjectId: undefined, type: "teleporter", saveStatus: undefined},
         {status: "normal", id: "", logicKey: undefined, x: 400, y: 400, targetZone: undefined, targetObjectId: undefined, type: "teleporter", saveStatus: undefined},

@@ -2,6 +2,7 @@ import { getAreaSize, removeObjectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrameAt, getFrame } from 'app/utils/animations';
 import { getDirection, hitTargets } from 'app/utils/field';
+import { playSound } from 'app/utils/sounds';
 
 import {
     AreaInstance, Direction, Frame, FrameAnimation,
@@ -171,6 +172,7 @@ export class Arrow implements ObjectInstance {
     animationTime = 0;
     direction: Direction;
     blocked = false;
+    reflected: boolean = false;
     stuckFrames: number = 0;
     status: ObjectStatus = 'normal';
     style: ArrowStyle = 'normal';
@@ -203,7 +205,8 @@ export class Arrow implements ObjectInstance {
             vx: this.vx,
             vy: this.vy, element:
             this.element,
-            hitEnemies: true,
+            hitAllies: this.reflected,
+            hitEnemies: !this.reflected,
             hitObjects: true,
             hitTiles: true,
         };
@@ -240,6 +243,14 @@ export class Arrow implements ObjectInstance {
             return;
         }
         const hitResult = hitTargets(state, this.area, this.getHitProperties(state));
+        if (hitResult.reflected) {
+            this.vx = -this.vx;
+            this.vy = -this.vy;
+            this.reflected = true;
+            playSound('blockAttack');
+            this.direction = getDirection(this.vx, this.vy, true);
+            return;
+        }
         if (hitResult.blocked) {
             this.stuckFrames = 1;
             this.blocked = true;
@@ -300,7 +311,8 @@ export class EnemyArrow extends Arrow {
             vx: this.vx,
             vy: this.vy, element:
             this.element,
-            hitAllies: true,
+            hitAllies: !this.reflected,
+            hitEnemies: this.reflected,
             hitObjects: true,
             hitTiles: true,
         };

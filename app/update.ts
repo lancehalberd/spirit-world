@@ -203,8 +203,8 @@ function updateMenu(state: GameState) {
     if (state.hero.activeTools.staff) {
         selectableTools.push('staff');
     }
-    if (state.hero.activeTools.invisibility) {
-        selectableTools.push('invisibility');
+    if (state.hero.activeTools.cloak) {
+        selectableTools.push('cloak');
     }
     if (state.hero.activeTools.clone) {
         selectableTools.push('clone');

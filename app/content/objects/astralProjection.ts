@@ -114,7 +114,8 @@ export class AstralProjection implements Hero, ObjectInstance {
     invulnerableFrames: number;
     leftTool: ActiveTool;
     rightTool: ActiveTool;
-    invisible: boolean;
+    hasBarrier: boolean;
+    isInvisible: boolean;
     lightRadius: number;
     spawnLocation: ZoneLocation;
     spiritRadius: number;

@@ -116,6 +116,9 @@ export interface HitResult {
     knockback?: {vx: number, vy: number, vz: number},
     // Indicates that a projectile should continue through this object even when it hit.
     pierced?: boolean,
+    // Indicates that a projectile should be knocked back and swap hitAllies/hitEnemies.
+    reflected?: boolean,
+    returnHit?: HitProperties,
     // Indicates that projectile should never pierce this object.
     // For example, projectiles hitting puzzle objects stop after hitting the first such object.
     stopped?: boolean,

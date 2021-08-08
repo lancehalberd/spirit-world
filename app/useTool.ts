@@ -59,17 +59,29 @@ export function useTool(
             });
             addObjectToArea(state, state.areaInstance, arrow);
             return;
-        case 'invisibility':
-            if (state.hero.invisible) {
-                state.hero.invisible = false;
+        case 'cloak':
+            if (state.hero.isInvisible || state.hero.hasBarrier) {
+                state.hero.hasBarrier = false;
+                state.hero.isInvisible = false;
                 state.hero.toolCooldown = 0;
                 return;
             }
-            if (state.hero.magic < 0) {
+            let cost = 5;
+            if (chargeLevel === 1) {
+                cost += 5;
+            }
+            if (state.hero.magic < cost) {
                 return;
             }
-            state.hero.actualMagicRegen -= 4;
-            state.hero.invisible = true;
+            state.hero.magic -= cost;
+            state.hero.barrierLevel = chargeLevel;
+            if (chargeLevel === 1) {
+                state.hero.barrierElement = element;
+            }
+            state.hero.hasBarrier = true;
+            if (state.hero.activeTools.cloak >= 2) {
+                state.hero.isInvisible = true;
+            }
             return;
         case 'clone':
             if (!state.hero.clones.length) {

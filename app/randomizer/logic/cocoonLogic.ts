@@ -79,7 +79,7 @@ export const cocoonNodes: LogicNode[] = [
         zoneId,
         nodeId: 'cocoon3SW',
         paths: [{nodeId: 'cocoon3'}],
-        entranceIds: ['cocoonMarkerNW'],
+        entranceIds: ['cocoonMarkerNW', 'cocoonOpenDoor'],
         exits: [{objectId: 'cocoonOpenDoor'}]
     },
     {

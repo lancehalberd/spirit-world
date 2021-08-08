@@ -456,7 +456,9 @@ function applyLootObjectToState(state: GameState, lootWithLocation: LootWithLoca
     const stateCopy = copyState(state);
     stateCopy.location = lootWithLocation.location;
     const onPickup = lootEffects[lootWithLocation.lootObject.lootType] || lootEffects.unknown;
-    onPickup(stateCopy, lootWithLocation.lootObject);
+    // Loot is always progressive in the randomizer, so set lootLevel to 0.
+    // onPickup(stateCopy, lootWithLocation.lootObject);
+    onPickup(stateCopy, {...lootWithLocation.lootObject, lootLevel: 0});
     if (!stateCopy.hero.passiveTools.catEyes && stateCopy.hero.maxLife > 4) {
         stateCopy.hero.passiveTools.catEyes = 1;
     }
@@ -565,7 +567,9 @@ function placeItem(random: typeof SRandom, allNodes: LogicNode[], startingNodes:
     assignmentsState.assignments.push({
         lootType: loot.lootObject.lootType,
         lootAmount: loot.lootObject.lootAmount,
-        lootLevel: loot.lootObject.lootLevel,
+        // Only progressive loot is placed in randomizer.
+        lootLevel: 0,
+        //lootLevel: loot.lootObject.lootLevel,
         source: loot,
         target: assignedLocation,
     });
