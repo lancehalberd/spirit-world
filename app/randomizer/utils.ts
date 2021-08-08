@@ -631,11 +631,28 @@ export function applyLootAssignments(assignments: LootAssignment[]): void {
                 ],
             };
         } else {
-            assignment.target.lootObject.lootType = assignment.lootType;
-            assignment.target.lootObject.lootAmount = assignment.lootAmount;
-            assignment.target.lootObject.lootLevel = assignment.lootLevel;
+            for (const target of findAllTargetObjects(assignment.target)) {
+                target.lootType = assignment.lootType;
+                target.lootAmount = assignment.lootAmount;
+                target.lootLevel = assignment.lootLevel;
+            }
         }
     }
+}
+
+function findAllTargetObjects(lootWithLocation: LootWithLocation): (LootObjectDefinition | BossObjectDefinition)[] {
+    const results: (LootObjectDefinition | BossObjectDefinition)[] = [];
+    const zone = zones[lootWithLocation.location.zoneKey];
+    const floor = lootWithLocation.location.floor;
+    for( const areaGrid of [zone.floors[floor].spiritGrid, zone.floors[floor].grid]){
+        const areaDefinition = areaGrid[lootWithLocation.location.areaGridCoords.y][lootWithLocation.location.areaGridCoords.x];
+        for (const object of (areaDefinition?.objects || [])) {
+            if (object.id === lootWithLocation.lootObject.id) {
+                results.push(object as (LootObjectDefinition | BossObjectDefinition));
+            }
+        }
+    }
+    return results;
 }
 
 const allNodes = [
