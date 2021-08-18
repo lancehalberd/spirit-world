@@ -1,6 +1,8 @@
 import {
     andLogic,
-    hasAstralProjection, hasGloves, hasRoll,
+    hasAstralProjection,
+    hasBossWeapon,
+    hasGloves, hasRoll,
     hasSpiritSight, hasWeapon,
 } from 'app/content/logic';
 
@@ -166,8 +168,8 @@ export const warTempleNodes: LogicNode[] = [
         zoneId,
         nodeId: 'warTempleBoss',
         checks: [
-            {objectId: 'warTempleBoss', logic: andLogic(hasWeapon, hasRoll)},
-            {objectId: 'warTemple:2:0x0-astralProjection-0', logic: andLogic(hasWeapon, hasRoll)},
+            {objectId: 'warTempleBoss', logic: andLogic(hasBossWeapon, hasRoll)},
+            {objectId: 'warTemple:2:0x0-astralProjection-0', logic: andLogic(hasBossWeapon, hasRoll)},
         ],
         exits: [
             {objectId: 'warTempleExit', logic: hasAstralProjection},

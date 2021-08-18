@@ -1,7 +1,7 @@
 import {
     andLogic, canCrossSmallGapsOrTeleport, orLogic,
-    hasAstralProjection, hasBow, hasGloves, hasMediumRange,
-    hasWeapon,
+    hasAstralProjection, hasBossWeapon, hasGloves, hasMediumRange,
+    hasRangedPush, hasWeapon,
 } from 'app/content/logic';
 
 import {LogicNode } from 'app/types';
@@ -36,7 +36,7 @@ export const tombNodes: LogicNode[] = [
         zoneId,
         nodeId: 'tombBigChest',
         checks: [
-            {objectId: 'tombKey2', logic: hasWeapon},
+            {objectId: 'tombKey2', logic: hasRangedPush},
             {objectId: 'tomb:1:1x0-roll-0'},
         ],
         paths: [
@@ -45,7 +45,7 @@ export const tombNodes: LogicNode[] = [
             {nodeId: 'tombMiddleHallway'},
             {nodeId: 'tombBeforeBigKey', doorId: 'tombLock2'},
             {nodeId: 'tombBigKey', doorId: 'tombBigLock3'},
-            {nodeId: 'tombPeachPiece', logic: andLogic(hasBow, orLogic(canCrossSmallGapsOrTeleport, hasGloves))},
+            {nodeId: 'tombPeachPiece', logic: andLogic(hasMediumRange, orLogic(canCrossSmallGapsOrTeleport, hasGloves))},
         ],
         entranceIds: ['tombBasementEntrance'],
         exits: [{ objectId: 'tombBasementEntrance'}],
@@ -94,9 +94,9 @@ export const tombNodes: LogicNode[] = [
         zoneId,
         nodeId: 'tombBoss',
         checks: [
-            {objectId: 'tomb:0:1x1-beetleBoss-0', logic: hasWeapon},
+            {objectId: 'tomb:0:1x1-beetleBoss-0', logic: hasBossWeapon},
         ],
-        paths: [{ nodeId: 'tombExit', logic: hasWeapon}],
+        paths: [{ nodeId: 'tombExit', logic: hasBossWeapon}],
     },
     {
         zoneId,

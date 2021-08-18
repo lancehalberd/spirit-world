@@ -5,7 +5,7 @@ import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 
 import {
     AreaInstance, Direction, DrawPriority, GameState, HitProperties, HitResult,
-    ObjectInstance, ObjectStatus, ShortRectangle, SimpleObjectDefinition,
+    ObjectInstance, ObjectStatus, Rect, SimpleObjectDefinition,
 } from 'app/types';
 
 const fullPodAnimation = createAnimation('gfx/tiles/pod.png', {w: 16, h: 16}, {cols: 2, y: 0, duration: 24});
@@ -37,7 +37,7 @@ export class WaterPot implements ObjectInstance {
         this.x = definition.x;
         this.y = definition.y;
     }
-    getHitbox(state: GameState): ShortRectangle {
+    getHitbox(state: GameState): Rect {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
     onGrab(state: GameState, direction: Direction): void {

@@ -6,7 +6,7 @@ import { playSound, stopSound } from 'app/utils/sounds';
 
 import {
     AreaInstance, BallGoal, Direction, GameState, HitProperties, HitResult,
-    BaseObjectDefinition, ObjectInstance, ObjectStatus, ShortRectangle,
+    BaseObjectDefinition, ObjectInstance, ObjectStatus, Rect,
 } from 'app/types';
 
 const rollingAnimation = createAnimation('gfx/tiles/rollingboulder.png', {w: 16, h: 16}, {cols:4});
@@ -39,7 +39,7 @@ export class RollingBallObject implements ObjectInstance {
     cleanup() {
         this.stopRollingSound();
     }
-    getHitbox(state: GameState): ShortRectangle {
+    getHitbox(state: GameState): Rect {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
     onHit(state: GameState, {canPush, direction}: HitProperties): HitResult {

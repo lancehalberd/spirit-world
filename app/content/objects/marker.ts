@@ -2,7 +2,7 @@ import { editingState } from 'app/development/tileEditor';
 
 import {
     DrawPriority, GameState, ObjectInstance,
-    ObjectStatus, ShortRectangle, SimpleObjectDefinition,
+    ObjectStatus, Rect, SimpleObjectDefinition,
 } from 'app/types';
 
 
@@ -17,7 +17,7 @@ export class Marker implements ObjectInstance {
         this.x = definition.x;
         this.y = definition.y;
     }
-    getHitbox(state: GameState): ShortRectangle {
+    getHitbox(state: GameState): Rect {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
     render(context: CanvasRenderingContext2D, state: GameState) {

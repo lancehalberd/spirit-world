@@ -2,7 +2,7 @@ import {
     DrawPriority, Enemy,
     Frame, LootTable, MagicElement,
     ObjectDefinition, ObjectInstance,
-    ShortRectangle,
+    Rect,
 } from 'app/types';
 
 export type Direction = 'up' | 'down' | 'left' | 'right' | 'upleft' | 'upright' | 'downleft' | 'downright';
@@ -151,7 +151,7 @@ export interface AreaDefinition {
     layers: AreaLayerDefinition[],
     objects: ObjectDefinition[],
     // Used to divide a larger super tile into smaller screens.
-    sections: ShortRectangle[],
+    sections: Rect[],
     // 0/undefined = fully lit, 100 = pitch black.
     dark?: number,
     // Spirit world areas with real counterparts have this reference set

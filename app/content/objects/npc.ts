@@ -11,7 +11,7 @@ import { directionMap, rotateDirection } from 'app/utils/field';
 
 import {
     Actor, AreaInstance, GameState, DialogueOption, Direction, Hero, MovementProperties, NPCDefinition,
-    ObjectInstance, ObjectStatus, ShortRectangle,
+    ObjectInstance, ObjectStatus, Rect,
 } from 'app/types';
 
 export const npcStyles = {
@@ -95,7 +95,7 @@ export class NPC implements Actor, ObjectInstance  {
         this.y = definition.y;
         this.params = {};
     }
-    getHitbox(state: GameState): ShortRectangle {
+    getHitbox(state: GameState): Rect {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
     onGrab(state: GameState, direction: Direction, hero: Hero) {

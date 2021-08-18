@@ -1,10 +1,7 @@
-import { Clone } from 'app/content/clone';
-import { AstralProjection } from 'app/content/objects/astralProjection';
-import { Staff } from 'app/content/staff';
-
+//import { Staff } from 'app/content/staff';
 import {
-    Direction, FrameAnimation, FullTile, GameState,
-    ObjectInstance, ObjectStatus, TileCoords, ZoneLocation,
+    Direction, FrameAnimation, FullTile, GameState, Hero,
+    ObjectInstance, TileCoords, ZoneLocation,
 } from 'app/types';
 
 export type Action =
@@ -36,109 +33,111 @@ export type LootType = 'empty' | 'weapon' | ActiveTool | Equipment | PassiveTool
 
 
 export interface LootTable {
-    totalWeight: number,
-    thresholds:  number[],
-    loot: {type: LootType, amount?: number}[],
+    totalWeight: number
+    thresholds:  number[]
+    loot: {type: LootType, amount?: number}[]
 }
 
 export type AnimationSet = {
     [key in Direction]?: FrameAnimation
 }
 export interface ActorAnimations {
-    attack?: AnimationSet,
-    climbing?: AnimationSet,
-    death?: AnimationSet,
-    falling?: AnimationSet,
-    grab?: AnimationSet,
-    hurt?: AnimationSet,
-    idle: AnimationSet,
-    move?: AnimationSet,
-    pull?: AnimationSet,
-    push?: AnimationSet,
-    roll?: AnimationSet,
+    attack?: AnimationSet
+    climbing?: AnimationSet
+    death?: AnimationSet
+    falling?: AnimationSet
+    grab?: AnimationSet
+    hurt?: AnimationSet
+    idle: AnimationSet
+    move?: AnimationSet
+    pull?: AnimationSet
+    push?: AnimationSet
+    roll?: AnimationSet
 }
 
 export interface Actor extends ObjectInstance {
-    w: number,
-    h: number,
-    vx: number,
-    vy: number,
-    vz: number,
-    d: Direction,
-    action?: Action,
-    actionDx?: number,
-    actionDy?: number,
-    actionFrame?: number,
-    actionTarget?: any,
-    animationTime: number,
+    w: number
+    h: number
+    vx: number
+    vy: number
+    vz: number
+    d: Direction
+    action?: Action
+    actionDx?: number
+    actionDy?: number
+    actionFrame?: number
+    actionTarget?: any
+    animationTime: number
     // like being knocked but doesn't stop MC charge or other actions.
-    bounce?: {vx: number, vy: number, frames: number},
-    equipedGear?: {[key in Equipment]?: boolean},
-    hasBarrier?: boolean,
-    isInvisible?: boolean,
-    jumpingTime?: number,
-    // If this is set, the actor is being carried by a hero/clone.
-    carrier?: Hero,
-    explosionTime?: number,
-    pickUpFrame?: number,
-    pickUpObject?: ObjectInstance;
-    pickUpTile?: FullTile,
-    grabTile?: TileCoords,
-    grabObject?: ObjectInstance,
-    invulnerableFrames?: number,
-    life: number,
-    knockBack?: (state: GameState, vector: {vx: number, vy: number, vz: number}) => void,
-    wading?: boolean,
-    slipping?: boolean,
-    swimming?: boolean,
-    floating?: boolean,
-    sinking?: boolean,
-    inAirBubbles?: boolean,
-    frozenDuration?: number,
+    bounce?: {vx: number, vy: number, frames: number}
+    equipedGear?: {[key in Equipment]?: boolean}
+    hasBarrier?: boolean
+    isInvisible?: boolean
+    jumpingTime?: number
+    // If this is set the actor is being carried by a hero/clone.
+    carrier?: Hero
+    explosionTime?: number
+    pickUpFrame?: number
+    pickUpObject?: ObjectInstance
+    pickUpTile?: FullTile
+    grabTile?: TileCoords
+    grabObject?: ObjectInstance
+    invulnerableFrames?: number
+    life: number
+    knockBack?: (state: GameState, vector: {vx: number, vy: number, vz: number}) => void
+    wading?: boolean
+    slipping?: boolean
+    swimming?: boolean
+    floating?: boolean
+    sinking?: boolean
+    inAirBubbles?: boolean
+    frozenDuration?: number
 }
+/* In case using the Hero class causes dependency issues, maybe switching to this interface could help.
+export interface Hero extends Actor, SavedHeroData {
+    isAstralProjection: boolean
+    isClone: boolean
 
-export interface Hero extends Actor {
+
     // stats
-    maxLife: number,
-    magic: number,
+    magic: number
     // base: 20, max: 100, roll: 5, charge: 10, double-charge: 50
-    maxMagic: number,
+    maxMagic: number
     // base 4, max 8-10 (target mana regen rate)
-    magicRegen: number,
+    magicRegen: number
     // This is the actual mana regen rate, which changes depending on circumstances and can even become negative.
-    actualMagicRegen: number,
-    lightRadius: number,
+    actualMagicRegen: number
+    lightRadius: number
     // inventory
-    money: number,
-    arrows: number,
-    peachQuarters: number,
-    spiritTokens: number,
-    toolCooldown: number,
-    activeTools: {[key in ActiveTool]: number},
-    equipment: {[key in Equipment]: number},
-    passiveTools: {[key in PassiveTool]: number},
-    elements: {[key in MagicElement]: number},
-    astralProjection?: AstralProjection,
-    clones: Clone[],
-    activeClone?: Clone,
-    activeStaff?: Staff,
-    hasBarrier?: boolean,
-    barrierElement?: MagicElement,
-    barrierLevel?: number,
-    isInvisible?: boolean,
-    safeD: Direction,
-    safeX: number,
-    safeY: number,
-    weapon: number,
-    leftTool?: ActiveTool,
-    chargingLeftTool?: boolean,
-    rightTool?: ActiveTool,
-    chargingRightTool?: boolean,
-    chargingHeldObject?: boolean,
-    chargeTime?: number,
-    element?: MagicElement,
-    spiritRadius: number,
-    status: ObjectStatus,
-    spawnLocation: ZoneLocation,
-}
+    toolCooldown: number
+    astralProjection?: Hero
+    clones: Hero[]
+    activeClone?: Hero
+    activeStaff?: Staff
+    barrierElement?: MagicElement
+    barrierLevel?: number
+    safeD: Direction
+    safeX: number
+    safeY: number
+    chargingLeftTool?: boolean
+    chargingRightTool?: boolean
+    chargingHeldObject?: boolean
+    chargeTime?: number
+    spiritRadius: number
+}*/
 
+export interface SavedHeroData {
+    maxLife: number
+    money: number
+    peachQuarters: number
+    spiritTokens: number
+    activeTools: {[key in ActiveTool]: number}
+    equipment: {[key in Equipment]: number}
+    passiveTools: {[key in PassiveTool]: number}
+    elements: {[key in MagicElement]: number}
+    weapon: number
+    leftTool?: ActiveTool
+    rightTool?: ActiveTool
+    element?: MagicElement
+    spawnLocation: ZoneLocation
+}

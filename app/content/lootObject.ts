@@ -12,7 +12,7 @@ import { playSound } from 'app/utils/sounds';
 import {
     ActiveTool, AreaInstance, BossObjectDefinition, DialogueLootDefinition,
     DungeonInventory, Frame, FrameDimensions, GameState, LootObjectDefinition,
-    LootTable, LootType, ObjectInstance, ObjectStatus, ShortRectangle,
+    LootTable, LootType, ObjectInstance, ObjectStatus, Rect,
 } from 'app/types';
 
 
@@ -371,7 +371,7 @@ export class ChestObject implements ObjectInstance {
             this.status = 'normal';
         }
     }
-    getHitbox(state: GameState): ShortRectangle {
+    getHitbox(state: GameState): Rect {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
     isOpen(state: GameState): boolean {
@@ -419,7 +419,7 @@ export class BigChest extends ChestObject implements ObjectInstance {
     y: number;
     z: number;
     status: ObjectStatus;
-    getHitbox(state: GameState): ShortRectangle {
+    getHitbox(state: GameState): Rect {
         return { x: this.x, y: this.y, w: 32, h: 32 };
     }
     onGrab(state: GameState) {
@@ -472,7 +472,7 @@ export const [
     spiritSightFrame,
     catEyes,
     twoCloneFrame, threeCloneFrame, /* fourCloneFrame */,
-    invisibilityFrame,
+    /*invisibilityFrame*/,
     /* bracelet */, gloveFrame,
     normalBoots, ironBoots, cloudBoots,
     circlet, phoenixCrown,
@@ -485,6 +485,13 @@ export const [
     /* container */, fireElement, iceElement, lightningElement, neutralElement, /* elementShine */
 ] = createAnimation('gfx/hud/elementhud.png',
     {w: 20, h: 20, content: {x: 2, y: 2, w: 16, h: 16}}, {cols: 6}
+).frames;
+
+const [spiritCloak] = createAnimation('gfx/hud/cloak1.png',
+    {w: 18, h: 18, content: {x: 1, y: 1, w: 16, h: 16}}
+).frames;
+const [invisibilityCloak] = createAnimation('gfx/hud/cloak2.png',
+    {w: 18, h: 18, content: {x: 1, y: 1, w: 16, h: 16}}
 ).frames;
 
 
@@ -501,8 +508,8 @@ const lootFrames: {[key in string]: Frame} = {
     catEyes: catEyes,
     charge: neutralElement,
     clone: twoCloneFrame,
-    invisibilityCloak: invisibilityFrame,
-    spiritCloak: createLootFrame('green', 'SC'),
+    invisibilityCloak,
+    spiritCloak,
     trueSight: createLootFrame('blue', 'TS'),
     gloves: gloveFrame,
     roll: mistScrollFrame,

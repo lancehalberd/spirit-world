@@ -5,7 +5,7 @@ import { isPixelInShortRect, rectanglesOverlap, roundRect } from 'app/utils/inde
 import {
     AreaInstance, AreaLayer, Direction, GameState, Hero,
     HitProperties, HitResult, MovementProperties,
-    ObjectInstance, ShortRectangle, Tile, TileCoords, TileBehaviors,
+    ObjectInstance, Rect, Tile, TileCoords, TileBehaviors,
 } from 'app/types';
 
 const root2over2 = Math.sqrt(2) / 2;
@@ -223,7 +223,7 @@ export function getTileBehaviorsAndObstacles(
     return { tileBehavior, tx, ty, objects };
 }
 
-export function getTilesInRectangle(area: AreaInstance, rect: ShortRectangle): TileCoords[] {
+export function getTilesInRectangle(area: AreaInstance, rect: Rect): TileCoords[] {
     const tileSize = 16;
     const tiles: TileCoords[] = []
     const l = Math.floor(rect.x / tileSize);

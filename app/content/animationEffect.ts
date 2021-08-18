@@ -4,7 +4,7 @@ import { createAnimation, drawFrame, frameAnimation, getFrame } from 'app/utils/
 
 import {
     AreaInstance, DrawPriority, Frame, FrameAnimation,
-    GameState, ObjectInstance, ObjectStatus, ShortRectangle, TileBehaviors,
+    GameState, ObjectInstance, ObjectStatus, Rect, TileBehaviors,
 } from 'app/types';
 
 
@@ -111,12 +111,12 @@ export function addParticleAnimations(
 
 const sparkleAnimation = createAnimation('gfx/effects/goldparticles.png', {w: 5, h: 5}, {cols: 3, duration: 4, frameMap: [2,1,0,0,1,2]}, {loop: false});
 export function addSparkleAnimation(
-    state: GameState, area: AreaInstance, hitbox: ShortRectangle
+    state: GameState, area: AreaInstance, hitbox: Rect
 ): void {
     addObjectToArea(state, area, makeSparkleAnimation(state, hitbox));
 }
 export function makeSparkleAnimation(
-    state: GameState, hitbox: ShortRectangle
+    state: GameState, hitbox: Rect
 ): AnimationEffect {
     return new AnimationEffect({
         animation: sparkleAnimation,

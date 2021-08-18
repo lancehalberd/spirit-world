@@ -124,7 +124,10 @@ export function render() {
         }
         return;
     } else if (state.paused) {
-        renderMenu(context, state);
+        // Debug: don't show the menu when pausing during transitions
+        if (!state.nextAreaInstance && !state.nextAreaSection) {
+            renderMenu(context, state);
+        }
     }
     // Don't draw the HUD while editing since it obscures some tiles.
     if (!editingState.isEditing) {

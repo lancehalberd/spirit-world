@@ -68,6 +68,7 @@ window['isLogicValid'] = isLogicValid;
 export const hasClone: LogicCheck = { requiredFlags: ['$clone', '$catEyes'] };
 export const hasIronBoots: LogicCheck = { requiredFlags: ['$ironBoots'] };
 export const hasAstralProjection: LogicCheck = { requiredFlags: ['$astralProjection', '$spiritSight', '$catEyes'] };
+export const hasSpiritBarrier: LogicCheck = { requiredFlags: ['$cloak', '$catEyes'] };
 export const hasTeleportation: LogicCheck = { requiredFlags: ['$astralProjection', '$spiritSight', '$teleportation', '$catEyes'] };
 export const hasGloves: LogicCheck = { requiredFlags: ['$gloves'] };
 export const hasMitts: LogicCheck = { requiredFlags: ['$gloves:2'] };
@@ -80,7 +81,15 @@ export const hasBigKey: LogicCheck = { requiredFlags: ['$bigKey'] };
 export const hasBow: LogicCheck = {requiredFlags: ['$bow', '$catEyes']};
 export const hasRoll: LogicCheck = {requiredFlags: ['$roll', '$catEyes']};
 export const hasStaff: LogicCheck = {requiredFlags: ['$staff', '$catEyes']};
-export const hasWeapon: OrLogicCheck = orLogic({requiredFlags: ['$weapon']}, hasBow);
+// This check is for having a weapon that can be used to defeat most bosses.
+// Primarily we don't want having the Spirit Cloak to put any bosses in logic since
+// it is excessively tedious to defeat bosses with.
+export const hasBossWeapon: OrLogicCheck = orLogic({requiredFlags: ['$weapon']}, hasBow);
+// This check is for being able to push objects at the range of the chakram like pots.
+export const hasRangedPush: OrLogicCheck = orLogic({requiredFlags: ['$weapon']}, hasBow);
+// This check is used for being able to defeat enemies at all.
+export const hasWeapon: OrLogicCheck = orLogic({requiredFlags: ['$weapon']}, hasBow, hasSpiritBarrier);
+// This check is used for weapons that have the range of the charged chakram or greater.
 export const hasMediumRange: OrLogicCheck = orLogic({requiredFlags: ['$weapon', '$charge', '$catEyes']}, hasBow);
 
 // Can cross gaps 2 units wide in logic.

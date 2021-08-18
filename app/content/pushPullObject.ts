@@ -3,7 +3,7 @@ import { directionMap, isPointOpen } from 'app/utils/field';
 
 import {
     AreaInstance, Direction, Frame, GameState, Hero, HitProperties, HitResult, ObjectInstance,
-    ObjectStatus, SimpleObjectDefinition, ShortRectangle,
+    ObjectStatus, SimpleObjectDefinition, Rect,
 } from 'app/types';
 
 const potFrame: Frame = createAnimation('gfx/tiles/movablepot.png', {w: 16, h: 18}).frames[0];
@@ -32,7 +32,7 @@ export class PushPullObject implements ObjectInstance {
         this.x = definition.x;
         this.y = definition.y;
     }
-    getHitbox(state: GameState): ShortRectangle {
+    getHitbox(state: GameState): Rect {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
     onGrab(state: GameState, direction: Direction): void {

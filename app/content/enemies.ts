@@ -1,5 +1,6 @@
 import _ from 'lodash';
 
+import { Clone } from 'app/content/clone';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { AnimationEffect } from 'app/content/animationEffect';
 import { EnemyArrow } from 'app/content/arrow';
@@ -23,7 +24,7 @@ import { createAnimation } from 'app/utils/animations';
 import { directionMap } from 'app/utils/field';
 
 import {
-    ActorAnimations, Clone, Direction,
+    ActorAnimations, Direction,
     Enemy, FrameAnimation, FrameDimensions, GameState,
     Hero, HitProperties, HitResult, LootTable, MagicElement, MovementProperties, ObjectInstance,
     TileBehaviors,

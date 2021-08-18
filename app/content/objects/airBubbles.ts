@@ -2,7 +2,7 @@ import { saveGame } from 'app/state';
 
 import {
     AreaInstance, GameState, ObjectInstance,
-    ObjectStatus, SimpleObjectDefinition, ShortRectangle,
+    ObjectStatus, SimpleObjectDefinition, Rect,
 } from 'app/types';
 
 export class AirBubbles implements ObjectInstance {
@@ -21,7 +21,7 @@ export class AirBubbles implements ObjectInstance {
             this.status = 'normal';
         }
     }
-    getHitbox(state: GameState): ShortRectangle {
+    getHitbox(state: GameState): Rect {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
     update(state: GameState) {

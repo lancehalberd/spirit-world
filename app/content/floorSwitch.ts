@@ -10,7 +10,7 @@ import { playAreaSound } from 'app/content/areas';
 
 import {
     AreaInstance, DrawPriority, FloorSwitchDefinition, GameState,
-    ObjectInstance, ObjectStatus, ShortRectangle,
+    ObjectInstance, ObjectStatus, Rect,
 } from 'app/types';
 
 const [upFrame, downFrame] = createAnimation('gfx/tiles/toggletiles.png', {w: 16, h: 16}, {cols: 2}).frames;
@@ -28,7 +28,7 @@ export class FloorSwitch implements ObjectInstance {
         this.x = definition.x;
         this.y = definition.y;
     }
-    getHitbox(state: GameState): ShortRectangle {
+    getHitbox(state: GameState): Rect {
         return { x: this.x + 2, y: this.y + 2, w: 12, h: 12 };
     }
     isDepressed(state: GameState): boolean {

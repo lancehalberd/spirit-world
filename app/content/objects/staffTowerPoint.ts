@@ -4,7 +4,7 @@ import { createAnimation, drawFrame } from 'app/utils/animations';
 
 import {
     AreaInstance, GameState, Direction, Hero, StaffTowerPointDefinition,
-    ObjectInstance, ObjectStatus, ShortRectangle,
+    ObjectInstance, ObjectStatus, Rect,
 } from 'app/types';
 
 const signGeometry = {w: 16, h: 19, content: {x: 0, y: 3, w: 16, h: 16}};
@@ -34,7 +34,7 @@ export class StaffTowerPoint implements ObjectInstance {
             this.status = 'hidden';
         }
     }
-    getHitbox(state: GameState): ShortRectangle {
+    getHitbox(state: GameState): Rect {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
     onGrab(state: GameState, direction: Direction, hero: Hero) {

@@ -1,35 +1,35 @@
 import * as _ from 'lodash';
 
-import { FrameDimensions, FullRectangle, ShortRectangle } from 'app/types';
+import { FrameDimensions, FullRectangle, Rect } from 'app/types';
 
 export function isPointInRect(x: number, y: number, l: number, t: number, w: number, h: number): boolean {
     return !(y <= t || y >= (t + h) || x <= l || x >= (l + w));
 }
 
-export function isPointInShortRect(x: number, y: number, {x: l = 0, y: t = 0, w = 0, h = 0}: ShortRectangle): boolean {
+export function isPointInShortRect(x: number, y: number, {x: l = 0, y: t = 0, w = 0, h = 0}: Rect): boolean {
     return !(y <= t || y >= t + h || x <= l || x >= l + w);
 }
 
-export function isPixelInShortRect(x: number, y: number, {x: l = 0, y: t = 0, w = 0, h = 0}: ShortRectangle): boolean {
+export function isPixelInShortRect(x: number, y: number, {x: l = 0, y: t = 0, w = 0, h = 0}: Rect): boolean {
     return !(y < t || y >= t + h || x < l || x >= l + w);
 }
 
-export function roundRect({x, y, w, h}: ShortRectangle): ShortRectangle {
+export function roundRect({x, y, w, h}: Rect): Rect {
     return {x: x | 0, y: y | 0, w: w | 0, h: h | 0 };
 }
 
 // This is similar to rectanglesOverlap, except that the rectangles here represent pixel grids
 // and only overlap if they share an actual pixel.
-export function boxesIntersect(A: ShortRectangle, B: ShortRectangle) {
+export function boxesIntersect(A: Rect, B: Rect) {
     return !(A.y + A.h - 1 < B.y || A.y > B.y + B.h - 1 || A.x + A.w - 1 < B.x || A.x > B.x + B.w - 1);
 }
 
-export function isObjectInsideTarget(object: ShortRectangle, target: ShortRectangle): boolean {
+export function isObjectInsideTarget(object: Rect, target: Rect): boolean {
     return object.x >= target.x && object.y >= target.y
         && object.x + object.w <= target.x + target.w && object.y + object.h <= target.y + target.h;
 }
 
-export function rectanglesOverlap(A: ShortRectangle, B: ShortRectangle) {
+export function rectanglesOverlap(A: Rect, B: Rect) {
     return !(A.y + A.h <= B.y || A.y >= B.y + B.h || A.x + A.w <= B.x || A.x >= B.x + B.w);
 }
 
@@ -58,7 +58,7 @@ export function getCollisionArea(element1: HTMLElement, element2: HTMLElement) {
     return Math.max(Math.min(B - t, b - T), 0) * Math.max(Math.min(R - l, r - L), 0);
 }
 
-export function getElementRectangle(element: HTMLElement, container = null): ShortRectangle {
+export function getElementRectangle(element: HTMLElement, container = null): Rect {
     let b = element.getBoundingClientRect();
     const rect = { x: b.left, y: b.top, w: b.width, h: b.height };
     // If container is specified, return the rectangle relative to the container's coordinates.
@@ -70,26 +70,26 @@ export function getElementRectangle(element: HTMLElement, container = null): Sho
     return rect;
 }
 
-export function fillRect(context: CanvasRenderingContext2D, {x, y, w, h}: ShortRectangle, color: string = null) {
+export function fillRect(context: CanvasRenderingContext2D, {x, y, w, h}: Rect, color: string = null) {
     if (color) {
         context.fillStyle = color;
     }
     context.fillRect(x, y, w, h);
 }
-export function drawRect(context: CanvasRenderingContext2D, rectangle: ShortRectangle) {
+export function drawRect(context: CanvasRenderingContext2D, rectangle: Rect) {
     context.rect(rectangle.x, rectangle.y, rectangle.w, rectangle.h);
 }
 
 export function rectangle(left: number, top: number, width: number, height: number): FullRectangle {
     return {left: left, top: top, width: width, height: height, right: left + width, bottom: top + height};
 }
-export function r(x: number, y: number, w: number, h: number): ShortRectangle {
+export function r(x: number, y: number, w: number, h: number): Rect {
     return {x, y, w, h};
 }
 export function d(w: number, h: number): FrameDimensions {
     return {w, h};
 }
-export function pad({x, y, w, h}: ShortRectangle, m: number): ShortRectangle {
+export function pad({x, y, w, h}: Rect, m: number): Rect {
     return {x: x - m, w: w + 2 * m, y: y - m, h: h + 2 * m};
 }
 export function rectangleCenter(rectangle: FullRectangle): [number, number] {

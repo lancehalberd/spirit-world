@@ -21,7 +21,7 @@ export type Range = [number, number];
 export type Tags = {[key: string]: true};
 
 export interface Renderable {
-    render(context: CanvasRenderingContext2D, target: ShortRectangle): void
+    render(context: CanvasRenderingContext2D, target: Rect): void
 }
 
 export type GameContext = 'cutscene' | 'enchant' | 'field' | 'item' | 'jewel' | 'jewelCrafting' | 'map';
@@ -34,11 +34,11 @@ export interface FullRectangle {
     right?: number,
     bottom?: number,
 }
-export interface ShortRectangle {
-    x: number,
-    y: number,
-    w: number,
-    h: number,
+export interface Rect {
+    x: number
+    y: number
+    w: number
+    h: number
 }
 export interface FrameDimensions {
     w: number,
@@ -52,14 +52,14 @@ export interface FrameDimensions {
     // the main content, not as actual in game geometry.
     // Contrast thiis with AreaObjectTarget where the `h` value is the height of the object in the game,
     // which is typically less than the height of the image (imageContentHeight = gameHeight + gameDepth / 2).
-    content?: ShortRectangle,
+    content?: Rect,
 }
-export interface FrameRectangle extends ShortRectangle {
+export interface FrameRectangle extends Rect {
     // When a frame does not perfectly fit the size of the content, this content rectangle can be
     // set to specify the portion of the image that is functionally part of the object in the frame.
     // For example, a character with a long time may have the content around the character's body and
     // exclude the tail when looking at the width/height of the character.
-    content?: ShortRectangle,
+    content?: Rect,
 }
 
 export interface Frame extends FrameRectangle {
@@ -92,7 +92,7 @@ export type PointsType = 'anima' | 'coins' | 'divinity' | 'fame';
 // Cost is an amount of coins or a map of points types to amounts.
 export type Cost = number | {[key in PointsType]?: number};
 
-export interface HUDElement extends ShortRectangle {
+export interface HUDElement extends Rect {
     isPointOver: (x: number, y: number) => boolean,
     helpMethod?: () => string,
     onClick?: () => void,

@@ -1,85 +1,26 @@
-import { renderHero } from 'app/renderActor';
-import { onHitHero } from 'app/updateActor';
+import { removeObjectFromArea } from 'app/content/areas';
+import { Hero } from 'app/content/hero';
 
 import { carryMap, directionMap, directionToLeftRotationsFromRight, rotateDirection } from 'app/utils/field';
 
 import {
-    Action, ActiveTool, AreaInstance,
-    Direction, DrawPriority, MagicElement, Equipment, Frame, FullTile,
-    GameState, Hero, ObjectInstance, ObjectStatus, PassiveTool,
-    ShortRectangle, TileBehaviors, TileCoords, ZoneLocation
+    Direction, GameState, Rect, TileBehaviors,
 } from 'app/types';
 
-export class Clone implements Hero, ObjectInstance {
-    actualMagicRegen: number;
-    area: AreaInstance;
+export class Clone extends Hero {
     behaviors: TileBehaviors = {
         solid: true,
     };
-    definition = null;
-    drawPriority: DrawPriority = 'sprites';
-    frame: Frame;
-    isAllyTarget = true;
-    element: MagicElement;
-    life: number;
-    x: number;
-    y: number;
-    z: number;
-    safeD:Direction;
-    safeX: number;
-    safeY: number;
-    vx: number;
-    vy: number;
-    vz: number;
-    w: number;
-    h: number;
-    d: Direction;
-    arrows: number;
-    peachQuarters: number;
-    magic: number;
-    magicRegen: number;
-    money: number;
-    maxLife: number;
-    maxMagic: number;
-    spiritTokens: number;
-    toolCooldown: number;
-    weapon: number;
-    activeTools: {[key in ActiveTool]: number};
-    equipment: {[key in Equipment]: number};
-    passiveTools: {[key in PassiveTool]: number};
-    elements: {[key in MagicElement]: number};
-    activeClone: Clone;
-    clones: Clone[]
-    stuckFrames: number = 0;
-    status: ObjectStatus = 'normal';
-    animationTime: number = 0;
-    action: Action;
-    actionTarget: any;
-    actionDx: number;
-    actionDy: number;
-    actionFrame: number;
-    carrier: Hero;
-    pickUpFrame: number;
-    pickUpTile: FullTile;
-    pickUpObject: ObjectInstance;
-    grabTile: TileCoords;
-    grabObject: ObjectInstance;
-    invulnerableFrames: number;
-    leftTool: ActiveTool;
-    rightTool: ActiveTool;
-    hasBarrier: boolean;
-    isInvisible: boolean;
-    lightRadius: number;
-    spawnLocation: ZoneLocation;
-    spiritRadius: number;
     carryRotationOffset: number;
     constructor(hero: Hero) {
+        super();
         for (let k in hero) {
             this[k] = hero[k];
         }
+        this.isClone = true;
         this.invulnerableFrames = 0;
     }
-    getHitbox(state: GameState): ShortRectangle {
+    getHitbox(state: GameState): Rect {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
 
@@ -113,6 +54,29 @@ export class Clone implements Hero, ObjectInstance {
         this.z = -offset.y;
         this.d = rotateDirection(this.carrier.d, this.carryRotationOffset);
     }
-    render = renderHero;
-    onHit = onHitHero;
+}
+
+export function destroyClone(state: GameState, clone: Hero): void {
+    // Cannot destroy a clone if none remain.
+    if (!state.hero.clones.length) {
+        return;
+    }
+    if (clone === state.hero) {
+        // If the "clone" destroyed was the hero, then pop the last clone and move the hero to it.
+        const lastClone = state.hero.clones.pop();
+        state.hero.x = lastClone.x;
+        state.hero.y = lastClone.y;
+        removeObjectFromArea(state, lastClone);
+    } else {
+        // If a non-hero clone is destroyed we just remove it from the array of clones.
+        const index = state.hero.clones.indexOf(clone as any);
+        if (index >= 0) {
+            state.hero.clones.splice(index, 1);
+        }
+        removeObjectFromArea(state, clone);
+    }
+    // If the active clone is destroyed, we return control to the main hero.
+    if (state.hero.activeClone === clone) {
+        state.hero.activeClone = null;
+    }
 }

@@ -13,7 +13,7 @@ import { boxesIntersect, isObjectInsideTarget, isPointInShortRect } from 'app/ut
 
 import {
     AreaInstance, Direction, DrawPriority, Frame, GameState, HitProperties, HitResult, ObjectInstance,
-    ObjectStatus, EntranceDefinition, ShortRectangle, TileBehaviors,
+    ObjectStatus, EntranceDefinition, Rect, TileBehaviors,
 } from 'app/types';
 
 
@@ -309,7 +309,7 @@ export class Door implements ObjectInstance {
         area.objects.push(this);
         this.changeStatus(state, this.status);
     }
-    getHitbox(state: GameState): ShortRectangle {
+    getHitbox(state: GameState): Rect {
         if (this.definition.d === 'up' || this.definition.d === 'down') {
             return { x: this.x, y: this.y, w: doorStyles[this.style].w, h: doorStyles[this.style].h};
         }
@@ -539,7 +539,7 @@ export class Door implements ObjectInstance {
         // This is a hack to keep this from rendering in front of the waterfall
         // for the entrance to the Waterfall Cave.
         // There is also probably an issue with this rendering in front of flying enemies.
-        if (this.definition.d !== 'up' || hitbox.y + 24 >= state.hero.y) {
+        if (this.definition.d !== 'up' || hitbox.y + 24 + this.area.cameraOffset.y >= state.hero.y) {
             const doorStyle = doorStyles[this.style];
             if (doorStyle[this.definition.d] && this.status !== 'cracked') {
                 let frame: Frame;

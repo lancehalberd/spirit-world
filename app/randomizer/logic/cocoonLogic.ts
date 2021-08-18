@@ -1,11 +1,12 @@
 import {
     andLogic,
-    hasAstralProjection, hasGloves,
+    hasAstralProjection,
+    hasBossWeapon,
+    hasGloves,
     hasTeleportation,
-    hasWeapon,
 } from 'app/content/logic';
 
-import {LogicNode } from 'app/types';
+import { LogicNode } from 'app/types';
 
 const zoneId = 'cocoon';
 export const cocoonNodes: LogicNode[] = [
@@ -13,8 +14,8 @@ export const cocoonNodes: LogicNode[] = [
         zoneId,
         nodeId: 'cocoonEntrance',
         paths: [
-            {nodeId: 'cocoon4NW', logic: hasWeapon},
-            {nodeId: 'cocoon4NE', logic: hasWeapon},
+            {nodeId: 'cocoon4NW', logic: hasBossWeapon},
+            {nodeId: 'cocoon4NE', logic: hasBossWeapon},
         ],
         entranceIds: ['cocoonEntrance'],
         exits: [{objectId: 'cocoonEntrance'}],
@@ -22,13 +23,13 @@ export const cocoonNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'cocoon4NW',
-        exits: [{objectId: 'cocoonPitNW', logic: hasWeapon}],
+        exits: [{objectId: 'cocoonPitNW', logic: hasBossWeapon}],
     },
     {
         zoneId,
         nodeId: 'cocoon4NE',
         exits: [
-            {objectId: 'cocoonPitNE', logic: hasWeapon},
+            {objectId: 'cocoonPitNE', logic: hasBossWeapon},
             {objectId: 'cocoonBigLock'},
         ],
     },
@@ -93,7 +94,7 @@ export const cocoonNodes: LogicNode[] = [
         zoneId,
         nodeId: 'cocoonBack',
         paths: [
-            {nodeId: 'cocoonBoss', logic: hasWeapon},
+            {nodeId: 'cocoonBoss', logic: hasBossWeapon},
         ],
         entranceIds: ['cocoonBackMarker'],
     },
@@ -101,8 +102,8 @@ export const cocoonNodes: LogicNode[] = [
         zoneId,
         nodeId: 'cocoonBoss',
         checks: [
-            {objectId: 'cocoonBoss', logic: andLogic(hasWeapon, hasAstralProjection)},
-            {objectId: 'cocoonBossMoney', logic: andLogic(hasWeapon, hasTeleportation)},
+            {objectId: 'cocoonBoss', logic: hasAstralProjection},
+            {objectId: 'cocoonBossMoney', logic: hasTeleportation},
         ],
         npcs: [
             {loot: {type: 'dialogueLoot', id: 'cocoonGuardianPostBoss', lootType: 'teleportation'}},

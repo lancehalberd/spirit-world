@@ -5,6 +5,7 @@ import {
     removeAllClones, removeObjectFromArea, scrollToArea, setNextAreaSection,
     swapHeroStates,
 } from 'app/content/areas';
+import { destroyClone } from 'app/content/clone';
 import { CloneExplosionEffect } from 'app/content/effects/CloneExplosionEffect';
 import { AirBubbles } from 'app/content/objects/airBubbles';
 import { Enemy } from 'app/content/enemy';
@@ -28,8 +29,8 @@ import { rectanglesOverlap } from 'app/utils/index';
 import { playSound } from 'app/utils/sounds';
 
 import {
-    Clone, FullTile, GameState, HeldChakram, Hero, HitProperties, HitResult,
-    ObjectInstance, ThrownChakram, ThrownObject, TileCoords,
+    FullTile, GameState, HeldChakram, Hero,
+    ObjectInstance, ThrownChakram, TileCoords,
 } from 'app/types';
 
 const rollSpeed = [
@@ -87,7 +88,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
     const isCloneToolDown = (state.hero.leftTool === 'clone' && isGameKeyDown(state, GAME_KEY.LEFT_TOOL))
         || (state.hero.rightTool === 'clone' && isGameKeyDown(state, GAME_KEY.RIGHT_TOOL));
     const primaryClone = state.hero.activeClone || state.hero;
-    const isAstralProjection = hero instanceof AstralProjection;
+    const isAstralProjection = hero.isAstralProjection;
     const isControlled = (state.hero.action === 'meditating' && isAstralProjection) || isCloneToolDown || hero === primaryClone;
 
     const minZ = isAstralProjection ? 4 : (hero.equipedGear?.cloudBoots ? 1 : 0);
@@ -169,7 +170,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         hero.z = Math.min(24, hero.z + 1);
         if (hero.z >= 24 && state.surfaceAreaInstance) {
             // You can only surface in areas of deep water, that is, where you would be swimming.
-            const testHero = {...hero};
+            const testHero = hero.getCopy();
             testHero.z = 0;
             testHero.area = state.surfaceAreaInstance;
             checkForFloorEffects(state, testHero);
@@ -258,7 +259,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             hero.d = hero.safeD;
             hero.x = hero.safeX;
             hero.y = hero.safeY;
-            applyDamageToHero(state, hero, 1);
+            hero.takeDamage(state, 1);
             // For now leave the hero in the 'fallen' state if they died, otherwise they reappear
             // just fine when the continue/quit option shows up.
             // Once the death animation is added we can probably remove this check if we want.
@@ -772,7 +773,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
                 hero.action = null;
             }
             if (isControlled && wasPassiveButtonPressed) {
-                throwHeldObject(state, hero);
+                hero.throwHeldObject(state);
             }
         }
     }
@@ -946,149 +947,4 @@ export function checkForEnemyDamage(state: GameState, hero: Hero) {
             }
         }
     }
-}
-
-export function destroyClone(state: GameState, clone: Hero): void {
-    // Cannot destroy a clone if none remain.
-    if (!state.hero.clones.length) {
-        return;
-    }
-    if (clone === state.hero) {
-        // If the "clone" destroyed was the hero, then pop the last clone and move the hero to it.
-        const lastClone = state.hero.clones.pop();
-        state.hero.x = lastClone.x;
-        state.hero.y = lastClone.y;
-        removeObjectFromArea(state, lastClone);
-    } else {
-        // If a non-hero clone is destroyed we just remove it from the array of clones.
-        const index = state.hero.clones.indexOf(clone as any);
-        if (index >= 0) {
-            state.hero.clones.splice(index, 1);
-        }
-        removeObjectFromArea(state, clone);
-    }
-    // If the active clone is destroyed, we return control to the main hero.
-    if (state.hero.activeClone === clone) {
-        state.hero.activeClone = null;
-    }
-}
-
-export function onHitHero(this: Hero, state: GameState, hit: HitProperties): HitResult {
-    if (this.life <= 0) {
-        return {};
-    }
-    if (this.action === 'roll' || this.action === 'getItem' || this.action === 'jumpingDown') {
-        return {};
-    }
-    if (this.hasBarrier) {
-        if (hit.damage && state.hero.invulnerableFrames <= 0) {
-            state.hero.magic -= Math.max(10, hit.damage * 5);
-            state.hero.invulnerableFrames = Math.max(state.hero.invulnerableFrames, 10);
-        }
-        const hitbox = this.getHitbox(state);
-        let reflectDamage = this.barrierLevel;
-        if (!this.barrierElement) {
-            reflectDamage++;
-        }
-        return { hit: true, reflected: true,
-            returnHit: {
-                damage: reflectDamage,
-                element: this.barrierElement,
-                knockAwayFrom: {
-                    x: hitbox.x + hitbox.w / 2,
-                    y: hitbox.y + hitbox.h / 2,
-                },
-            },
-        };
-    }
-    // Enemies have special code for handling invulnerability.
-    if (this.invulnerableFrames > 0 || this.isInvisible) {
-        return {};
-    }
-    if (hit.damage) {
-        applyDamageToHero(state, this, hit.damage);
-    }
-    if (hit.knockback && !this.equipedGear?.ironBoots) {
-        if (this.knockBack) {
-            this.knockBack(state, hit.knockback);
-        } else {
-            throwHeldObject(state, this);
-            this.action = 'knocked';
-            this.animationTime = 0;
-            this.vx = hit.knockback.vx;
-            this.vy = hit.knockback.vy;
-            this.vz = hit.knockback.vz || 2;
-        }
-    }
-    // Getting hit while frozen unfreezes you.
-    if (this.frozenDuration > 0) {
-        this.frozenDuration = 0;
-    } else if (hit.element === 'ice') {
-        // Getting hit by ice freezes you.
-        this.frozenDuration = 1500;
-    }
-    return { hit: true };
-}
-
-export function applyDamageToHero(state: GameState, hero: Hero, damage: number) {
-    // Damage applies to the hero, not the clone.
-    state.hero.life -= damage / 2;
-    state.hero.invulnerableFrames = 50;
-    // Taking damage resets radius for spirit sight meditation.
-    state.hero.spiritRadius = 0;
-    // If any clones are in use, any damage one takes destroys it until only one clone remains.
-    if (state.hero.clones.length) {
-        destroyClone(state, hero);
-    }
-}
-
-const throwSpeed = 6;
-export function throwHeldObject(state: GameState, hero: Hero){
-    if (hero.pickUpObject) {
-        // This assumes only clones can be picked up and thrown. We will have to update this if
-        // we add other objects to this category.
-        const clone = hero.pickUpObject as Clone;
-        clone.d = hero.d;
-        clone.vx = directionMap[hero.d][0] * throwSpeed;
-        clone.vy = directionMap[hero.d][1] * throwSpeed;
-        clone.vz = 2;
-        clone.action = 'thrown';
-        clone.animationTime = 0;
-        clone.carrier = null;
-        hero.pickUpObject = null;
-        return;
-    }
-    if (!hero.pickUpTile) {
-        return;
-    }
-    hero.action = 'throwing';
-    hero.actionFrame = 0;
-    const tile = hero.pickUpTile;
-    const behaviors = tile.behaviors;
-    const thrownObject = new ThrownObject({
-        frame: tile.frame,
-        behaviors,
-        x: hero.x,
-        y: hero.y,
-        vx: directionMap[hero.d][0] * throwSpeed,
-        vy: directionMap[hero.d][1] * throwSpeed,
-        vz: 2,
-    });
-    addObjectToArea(state, hero.area, thrownObject);
-    if (tile.linkedTile) {
-        const behaviors = tile.linkedTile.behaviors;
-        const alternateThrownObject = new ThrownObject({
-            frame: tile.linkedTile.frame,
-            behaviors,
-            x: hero.x,
-            y: hero.y,
-            vx: directionMap[hero.d][0] * throwSpeed,
-            vy: directionMap[hero.d][1] * throwSpeed,
-            vz: 2,
-        });
-        alternateThrownObject.linkedObject = thrownObject;
-        thrownObject.linkedObject = alternateThrownObject;
-        addObjectToArea(state, state.alternateAreaInstance, alternateThrownObject);
-    }
-    hero.pickUpTile = null;
 }

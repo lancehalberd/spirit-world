@@ -1,12 +1,11 @@
 import { applyBehaviorToTile, enterZoneByTarget, resetTileBehavior } from 'app/content/areas';
 import { CANVAS_HEIGHT } from 'app/gameConstants';
-import { throwHeldObject } from 'app/updateActor';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { isObjectInsideTarget, pad } from 'app/utils/index';
 
 import {
     AreaInstance, DrawPriority, GameState, ObjectInstance,
-    ObjectStatus, ShortRectangle, EntranceDefinition, TileBehaviors,
+    ObjectStatus, Rect, EntranceDefinition, TileBehaviors,
 } from 'app/types';
 
 const pitFrame = createAnimation('gfx/tiles/pit.png', {w: 16, h: 16}).frames[0];
@@ -24,7 +23,7 @@ export class PitEntrance implements ObjectInstance {
         this.x = definition.x;
         this.y = definition.y;
     }
-    getHitbox(state: GameState): ShortRectangle {
+    getHitbox(state: GameState): Rect {
         return { x: this.x, y: this.y, w: 32, h: 32 };
     }
     update(state: GameState) {
@@ -42,7 +41,7 @@ export class PitEntrance implements ObjectInstance {
                     hero.safeY = hero.y;
                 }
             } else if (hero.action !== 'falling') {
-                throwHeldObject(state, hero);
+                hero.throwHeldObject(state);
                 hero.action = 'falling';
                 hero.animationTime = 0;
             }

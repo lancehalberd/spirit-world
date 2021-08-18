@@ -2,7 +2,7 @@ import {  CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
 import { renderField } from 'app/render';
 import { renderAreaLighting } from 'app/render/areaLighting';
 import { renderHUD } from 'app/renderHUD';
-import { getTitleOptions } from 'app/update';
+import { getTitleOptions } from 'app/state';
 import { drawText } from 'app/utils/simpleWhiteFont';
 import { fillRect, pad } from 'app/utils/index';
 

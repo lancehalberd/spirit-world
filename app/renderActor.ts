@@ -2,12 +2,11 @@ import _ from 'lodash';
 
 import { EXPLOSION_RADIUS, EXPLOSION_TIME } from 'app/gameConstants';
 import { getCloneMovementDeltas } from 'app/keyCommands';
-import { getChargeLevelAndElement } from 'app/useTool';
 import { isHeroFloating, isHeroSinking } from 'app/utils/actor';
-import { createAnimation, drawFrame, drawFrameAt, getFrame } from 'app/utils/animations';
+import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { carryMap, directionMap, getDirection } from 'app/utils/field';
 
-import { ActiveTool, Actor, ActorAnimations, Enemy, Frame, GameState, Hero } from 'app/types';
+import { Actor, ActorAnimations, Enemy, Frame, GameState, Hero } from 'app/types';
 
 import {
     heroAnimations,
@@ -126,72 +125,6 @@ export function renderHeroBarrier(context: CanvasRenderingContext2D, state: Game
     context.restore();
 }
 
-export function renderHero(this: Hero, context: CanvasRenderingContext2D, state: GameState): void {
-    const hero = this;
-    // Currently the hero always has the barrier when invisible, but this could change.
-    if (state.hero.isInvisible) {
-        if (hero.hasBarrier) {
-            renderHeroBarrier(context, state, hero);
-        }
-        return;
-    }
-    if (hero.action === 'fallen') {
-        return;
-    }
-    const frame = getHeroFrame(state, hero);
-    const activeClone = state.hero.activeClone || state.hero;
-    context.save();
-        if (hero !== activeClone) {
-            context.globalAlpha *= 0.8;
-        } else if (hero.invulnerableFrames) {
-            context.globalAlpha *= (0.7 + 0.3 * Math.cos(2 * Math.PI * hero.invulnerableFrames * 3 / 50));
-        }
-        drawFrameAt(context, frame, { x: hero.x, y: hero.y - hero.z });
-    context.restore();
-    if (hero.pickUpTile) {
-        renderCarriedTile(context, state, hero);
-    }
-    if (hero.hasBarrier) {
-        renderHeroBarrier(context, state, hero);
-    }
-    if (hero.frozenDuration > 0) {
-        context.save();
-            context.fillStyle = 'white';
-            const p = Math.round(Math.min(3, hero.frozenDuration / 200));
-            context.globalAlpha *= (0.3 + 0.2 * p);
-            context.fillRect(
-                Math.round(hero.x - frame.content.x - p),
-                Math.round(hero.y - hero.z - frame.content.y - p),
-                Math.round(frame.w + 2 * p),
-                Math.round(frame.h + 2 * p)
-            );
-        context.restore();
-    }
-    renderExplosionRing(context, state, hero);
-    const chargingTool = ((hero.chargingLeftTool && hero.leftTool) || (hero.chargingRightTool && hero.rightTool)) as ActiveTool;
-    if (chargingTool) {
-        const { chargeLevel, element } = getChargeLevelAndElement(state, hero, chargingTool);
-        context.fillStyle = {fire: 'red', ice: '#08F', lightning: 'yellow'}[element] || '#888';
-        const r = 5 * chargeLevel || 2;
-        context.save();
-        context.globalAlpha *= 0.6;
-        if (r < 5) {
-            context.globalAlpha *= 0.6;
-            context.fillStyle = 'white';
-        }
-        context.beginPath();
-        context.arc(
-            hero.x - frame.content.x + frame.w / 2 + hero.actionDx * 6,
-            hero.y - hero.z - frame.content.y + 2 * frame.h / 3 + hero.actionDy * 4,
-            r,
-            0,
-            2 * Math.PI
-        );
-        context.fill();
-        context.restore();
-    }
-
-}
 export function renderHeroEyes(context: CanvasRenderingContext2D, state: GameState, hero: Hero) {
     const frame = getHeroFrame(state, hero);
     // This only works since we force this to be the idle down frame.

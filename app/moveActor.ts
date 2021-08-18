@@ -2,7 +2,6 @@ import _ from 'lodash';
 
 import { getAreaSize } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { throwHeldObject } from 'app/updateActor';
 import { getTileBehaviorsAndObstacles, isPointOpen } from 'app/utils/field';
 
 import { Actor, Direction, GameState, Hero, MovementProperties } from 'app/types';
@@ -426,7 +425,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
         hero.action = null;
     }
     if (fallingTopLeft && fallingTopRight && fallingBottomLeft && fallingBottomRight) {
-        throwHeldObject(state, hero);
+        hero.throwHeldObject(state);
         hero.action = 'falling';
         hero.x = Math.round(hero.x / tileSize) * tileSize;
         hero.y = Math.round(hero.y / tileSize) * tileSize;

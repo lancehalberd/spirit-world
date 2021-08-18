@@ -15,7 +15,7 @@ import {
     Action, Actor, AreaInstance, BossObjectDefinition, Direction, DrawPriority,
     EnemyDefinition, EnemyObjectDefinition,
     Frame, FrameAnimation, GameState, HitProperties, HitResult,
-    ObjectInstance, ObjectStatus, ShortRectangle, TileBehaviors,
+    ObjectInstance, ObjectStatus, Rect, TileBehaviors,
 } from 'app/types';
 
 export class Enemy implements Actor, ObjectInstance {
@@ -101,7 +101,7 @@ export class Enemy implements Actor, ObjectInstance {
     getFrame(): Frame {
         return getFrame(this.currentAnimation, this.animationTime);
     }
-    getHitbox(state: GameState): ShortRectangle {
+    getHitbox(state: GameState): Rect {
         const frame = this.getFrame();
         return {
             x: this.x,

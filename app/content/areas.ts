@@ -18,7 +18,7 @@ import {
     Direction, Enemy, FullTile, GameState, Hero, TileCoords,
     ObjectDefinition,
     ObjectInstance,
-    ShortRectangle, Tile, TileBehaviors,
+    Rect, Tile, TileBehaviors,
     ZoneLocation,
 } from 'app/types';
 
@@ -603,7 +603,7 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
     return instance;
 }
 
-export function getAreaSize(state: GameState): {w: number, h: number, section: ShortRectangle} {
+export function getAreaSize(state: GameState): {w: number, h: number, section: Rect} {
     const area = state.areaInstance;
     const areaSection = state.nextAreaSection || state.areaSection;
     return {
@@ -664,7 +664,7 @@ export function isObjectLogicValid(state: GameState, definition: ObjectDefinitio
     return isLogicValid(state, logic, definition.invertLogic);
 }
 
-export function refreshSection(state: GameState, area: AreaInstance, section: ShortRectangle): void {
+export function refreshSection(state: GameState, area: AreaInstance, section: Rect): void {
     // First reset tiles that need to be reset.
     // This is done before objects since some objects will update the tiles under them.
     for (let y = 0; y < section.h; y++) {

@@ -47,7 +47,7 @@ import {
     EnemyObjectDefinition, EnemyType,
     FullTile, GameState,
     ObjectDefinition,
-    PanelRows, PropertyRow, ShortRectangle, TileGridDefinition, TilePalette,
+    PanelRows, PropertyRow, Rect, TileGridDefinition, TilePalette,
 } from 'app/types';
 
 type EditorToolType = 'brush' | 'delete' | 'object' | 'enemy' | 'boss' | 'replace' | 'select';
@@ -764,19 +764,6 @@ function drawBrush(x: number, y: number): void {
                         continue;
                     }
                     paintSingleTile(area, layer, parentLayer, column, row, tile);
-                    /*tileRow[column] = tile;
-                    if (!fullTile && parentLayer) {
-                        const parentTile = allTiles[parentLayer.grid?.tiles[row][column]];
-                        // Tiles with linked offsets map to different tiles than the parent definition.
-                        const linkedOffset = parentTile?.behaviors?.linkedOffset || 0;
-                        fullTile = linkedOffset ? allTiles[parentTile.index + linkedOffset] : parentTile;
-                    }
-                    layer.tiles[row][column] = fullTile;
-                    layer.originalTiles[row][column] = fullTile;
-                    applyTileChangeToSpiritWorld(area.alternateArea, layer.key, column, row, fullTile);
-                    state.areaInstance.tilesDrawn[row][column] = false;
-                    state.areaInstance.checkToRedrawTiles = true;
-                    resetTileBehavior(area, {x: column, y: row});*/
                 }
             }
             continue;
@@ -794,20 +781,6 @@ function drawBrush(x: number, y: number): void {
                 }
                 const tile = brushGrid.tiles[y][x];
                 paintSingleTile(area, layer, parentLayer, column, row, tile);
-                /*tileRow[column] = tile;
-                let fullTile = allTiles[tile];
-                if (!fullTile && parentLayer) {
-                    const parentTile = allTiles[parentLayer.grid?.tiles[row][column]];
-                    // Tiles with linked offsets map to different tiles than the parent definition.
-                    const linkedOffset = parentTile?.behaviors?.linkedOffset || 0;
-                    fullTile = linkedOffset ? allTiles[parentTile.index + linkedOffset] : parentTile;
-                }
-                layer.tiles[row][column] = fullTile;
-                layer.originalTiles[row][column] = fullTile;
-                applyTileChangeToSpiritWorld(area.alternateArea, layer.key, column, row, fullTile);
-                state.areaInstance.tilesDrawn[row][column] = false;
-                state.areaInstance.checkToRedrawTiles = true;
-                resetTileBehavior(area, {x: column, y: row});*/
             }
         }
     }
@@ -867,20 +840,6 @@ function replaceTiles(x: number, y: number): void {
             const t = layer.tiles[y][x];
             if (t === tile && Math.random() <= editingState.replacePercentage / 100) {
                 paintSingleTile(state.areaInstance, layer, parentLayer, x, y, replacement);
-                /*layer.definition.grid.tiles[y][x] = replacement;
-                let fullTile = allTiles[replacement];
-                if (!fullTile && parentLayer) {
-                    const parentTile = allTiles[parentLayer.grid?.tiles[y][x]];
-                    // Tiles with linked offsets map to different tiles than the parent definition.
-                    const linkedOffset = parentTile?.behaviors?.linkedOffset || 0;
-                    fullTile = linkedOffset ? allTiles[parentTile.index + linkedOffset] : parentTile;
-                }
-                layer.tiles[y][x] = fullTile;
-                layer.originalTiles[y][x] = fullTile;
-                state.areaInstance.tilesDrawn[y][x] = false;
-                state.areaInstance.checkToRedrawTiles = true;
-                resetTileBehavior(state.areaInstance, {x, y});
-                applyTileChangeToSpiritWorld(state.alternateAreaInstance, layer.key, x, y, fullTile);*/
             }
         }
     }
@@ -895,16 +854,7 @@ function applyTileChangeToSpiritWorld(area: AreaInstance, parentDefinition: Area
         return;
     }
     const areaLayer = area.layers.find(layer => layer.definition === layerDefinition);
-    paintSingleTile(area, areaLayer, parentDefinition, x, y, tile?.index || 0);
-    /*if (!areaLayer) {
-        return;
-    }
-    areaLayer.tiles[y][x] = tile;
-    if (area.tilesDrawn[y]?.[x]) {
-        area.tilesDrawn[y][x] = false;
-    }
-    area.checkToRedrawTiles = true;
-    resetTileBehavior(area, {x, y});*/
+    paintSingleTile(area, areaLayer, parentDefinition, x, y, 0);
 }
 
 export function renderEditor(context: CanvasRenderingContext2D, state: GameState): void {
@@ -925,7 +875,7 @@ export function renderEditor(context: CanvasRenderingContext2D, state: GameState
 }
 
 
-function getTileGridFromLayer(layerDefinition: AreaLayerDefinition, rectangle: ShortRectangle): TileGridDefinition {
+function getTileGridFromLayer(layerDefinition: AreaLayerDefinition, rectangle: Rect): TileGridDefinition {
     const gridDefinition: TileGridDefinition = {
         tiles: [],
         w: rectangle.w,
@@ -1058,7 +1008,7 @@ function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, a
             context.globalAlpha = 0.6;
             if (editingState.tool === 'select' && state.areaInstance.definition.objects.includes(editingState.selectedObject)) {
                 const instance = createObjectInstance(state, editingState.selectedObject);
-                let target: ShortRectangle;
+                let target: Rect;
                 if (instance.getHitbox) {
                     target = instance.getHitbox(state);
                 } else {
@@ -1090,7 +1040,7 @@ function drawBrushLayerPreview(
     parentLayer: AreaLayerDefinition | null,
     brush: TileGridDefinition | null,
     defaultBrush: TileGridDefinition | null,
-    rectangle: ShortRectangle,
+    rectangle: Rect,
 ): void {
     const w = 16, h = 16;
     for (let y = 0; y < rectangle.h; y++) {

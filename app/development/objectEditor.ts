@@ -21,7 +21,7 @@ import {
     AreaDefinition, AreaInstance, BallGoalDefinition, BossType, CrystalSwitchDefinition, FloorSwitchDefinition,
     FrameDimensions, DecorationType, Direction, DrawPriority, EnemyType, GameState,
     LootType, MagicElement, NPCBehavior, NPCStyle, ObjectDefinition, ObjectStatus, ObjectType, PanelRows,
-    ShortRectangle, StaffTowerLocation,
+    Rect, StaffTowerLocation,
     Zone, ZoneLocation,
 } from 'app/types';
 
@@ -855,7 +855,7 @@ export function getObjectFrame(object: ObjectDefinition): FrameDimensions {
     return getLootFrame({lootType: 'unknown'});
 }
 
-export function getObjectHitBox(object: ObjectDefinition): ShortRectangle {
+export function getObjectHitBox(object: ObjectDefinition): Rect {
     const state = getState();
     const instance = createObjectInstance(state, object);
     if (instance.getHitbox) {

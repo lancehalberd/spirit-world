@@ -3,7 +3,7 @@ import { createAnimation, drawFrame } from 'app/utils/animations';
 
 import {
     AreaInstance, BallGoalDefinition, DrawPriority, GameState,
-    ObjectInstance, ObjectStatus, ShortRectangle,
+    ObjectInstance, ObjectStatus, Rect,
 } from 'app/types';
 
 const [emptyFrame, filledFrame] = createAnimation('gfx/tiles/circulardepression.png', {w: 16, h: 16}, {cols: 2}).frames;
@@ -25,7 +25,7 @@ export class BallGoal implements ObjectInstance {
         this.x = definition.x;
         this.y = definition.y;
     }
-    getHitbox(state: GameState): ShortRectangle {
+    getHitbox(state: GameState): Rect {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
     activate(state: GameState): void {

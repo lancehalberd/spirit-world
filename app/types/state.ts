@@ -1,13 +1,13 @@
 import {
     AreaGrid, AreaInstance,
-    Frame, Hero, LootType, ShortRectangle, Zone, ZoneLocation,
+    Frame, Hero, LootType, SavedHeroData, Rect, Zone, ZoneLocation,
 } from 'app/types';
 
 export type StaffTowerLocation = 'desert' | 'forest' | 'mountain';
 
 export type SavedState = {
     objectFlags: {[key: string]: boolean},
-    hero: Hero,
+    savedHeroData: SavedHeroData,
     dungeonInventories: {
         [key: string]: DungeonInventory,
     },
@@ -46,9 +46,9 @@ export interface GameState {
     areaInstance?: AreaInstance,
     surfaceAreaInstance?: AreaInstance,
     underwaterAreaInstance?: AreaInstance,
-    areaSection?: ShortRectangle,
+    areaSection?: Rect,
     nextAreaInstance?: AreaInstance,
-    nextAreaSection?: ShortRectangle,
+    nextAreaSection?: Rect,
     zone: Zone,
     areaGrid: AreaGrid,
     location: ZoneLocation,

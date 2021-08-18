@@ -139,15 +139,15 @@ function applyItems(savedState: SavedState, items: {[key: string]: number}, obje
     }
     for (let key in items) {
         if (key === 'maxLife') {
-            newState.hero.maxLife += items[key];
+            newState.savedHeroData.maxLife += items[key];
             continue;
         }
         if (key === 'money') {
-            newState.hero.money += items[key];
+            newState.savedHeroData.money += items[key];
             continue;
         }
         if (key === 'weapon') {
-            newState.hero.weapon = items[key];
+            newState.savedHeroData.weapon = items[key];
             continue;
         }
         if (key.indexOf(':') >= 0) {
@@ -158,20 +158,20 @@ function applyItems(savedState: SavedState, items: {[key: string]: number}, obje
             };
             continue;
         }
-        if (typeof newState.hero.activeTools[key] !== 'undefined') {
-            newState.hero.activeTools[key] = items[key];
+        if (typeof newState.savedHeroData.activeTools[key] !== 'undefined') {
+            newState.savedHeroData.activeTools[key] = items[key];
             continue;
         }
-        if (typeof newState.hero.elements[key] !== 'undefined') {
-            newState.hero.elements[key] = items[key];
+        if (typeof newState.savedHeroData.elements[key] !== 'undefined') {
+            newState.savedHeroData.elements[key] = items[key];
             continue;
         }
-        if (typeof newState.hero.equipment[key] !== 'undefined') {
-            newState.hero.equipment[key] = items[key];
+        if (typeof newState.savedHeroData.equipment[key] !== 'undefined') {
+            newState.savedHeroData.equipment[key] = items[key];
             continue;
         }
-        if (typeof newState.hero.passiveTools[key] !== 'undefined') {
-            newState.hero.passiveTools[key] = items[key];
+        if (typeof newState.savedHeroData.passiveTools[key] !== 'undefined') {
+            newState.savedHeroData.passiveTools[key] = items[key];
             continue;
         }
         console.log('Could not find key', key, items[key]);
@@ -183,7 +183,7 @@ const defaultSavedState = getDefaultSavedState();
 const peachBossState = applyItems(defaultSavedState, {weapon: 1, money: 50});
 const peachCaveExitState = applyItems(peachBossState, {maxLife: 1, catEyes: 1});
 const tombStartState = applyItems(peachCaveExitState, {bow: 1}, ['elderTomb', 'tombEntrance']);
-tombStartState.hero.leftTool = 'bow';
+tombStartState.savedHeroData.leftTool = 'bow';
 const tombBossState = applyItems(tombStartState, {roll: 1, 'tomb:bigKey': 1});
 const warTempleStart = applyItems(tombBossState, {maxLife: 1, spiritSight: 1},
     ['tombBoss', 'warTempleEntrance', 'tombTeleporter']);
@@ -192,7 +192,7 @@ const cocoonStartState = applyItems(warTempleBoss, {maxLife: 1, astralProjection
 const cocoonBossState = applyItems(cocoonStartState, {cloak: 1}, ['warTempleBoss']);
 const helixStartState = applyItems(cocoonBossState, {maxLife: 1, teleportation: 1},
     ['cocoonTeleporter', 'lakeTunneBoss']);
-helixStartState.hero.rightTool = 'cloak';
+helixStartState.savedHeroData.rightTool = 'cloak';
 const helixEndState = applyItems(helixStartState, {charge: 1, staff: 1},
     ['elementalBeastsEscaped']);
 const riverTempleStartState = applyItems(helixEndState, {ironBoots: 1});
@@ -315,6 +315,11 @@ export function setSpawnLocation(state: GameState, spawnLocation: ZoneLocation):
 }
 
 export function checkToUpdateSpawnLocation(state: GameState): void {
+    // Only set the spawn location when in the game scene. This is to avoid accidentally setting
+    // it from the title scene which can trigger unexpected saves.
+    if (state.scene !== 'game') {
+        return;
+    }
     if (state.location.zoneKey === 'overworld') {
         return setSpawnLocation(state, SPAWN_LOCATION_PEACH_CAVE_EXIT);
     }

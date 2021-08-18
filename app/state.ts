@@ -6,11 +6,9 @@ import {
 } from 'app/content/spawnLocations';
 import { zones } from 'app/content/zones';
 import { updateHeroMagicStats } from 'app/render/spiritBar';
-import { renderHero } from 'app/renderActor';
-import { onHitHero } from 'app/updateActor';
 import { readGetParameter } from 'app/utils/index';
 
-import { GameState, Hero, SavedState, ShortRectangle } from 'app/types';
+import { GameState, Hero, SavedHeroData, SavedState } from 'app/types';
 
 
 export function loadSavedData(): boolean {
@@ -22,36 +20,36 @@ export function loadSavedData(): boolean {
     const seed = readGetParameter('seed');
     const importedSaveData = window.localStorage.getItem('savedGames' + seed);
     if (importedSaveData) {
-        state.savedGames = JSON.parse(importedSaveData);
+        const rawSavedGames = JSON.parse(importedSaveData);
+        // Migrate hero => savedHeroData for older save files.
+        for (const savedGame of rawSavedGames) {
+            if (savedGame?.hero) {
+                savedGame.savedHeroData = savedGame.hero;
+                delete savedGame.hero;
+            }
+        }
+        state.savedGames = rawSavedGames.slice(0, 3);
+        // Only show a single save file when using seeds.
+        if (seed) {
+           state.savedGames = rawSavedGames.slice(0, 1);
+        }
         return true;
+    } else {
+        if (seed) {
+            state.savedGames = [null];
+        }
     }
     return false;
 }
 
 export function saveGame(): void {
-    const hero = {...state.hero};
-    // sanitize hero object before saving it.
-    delete hero.astralProjection;
-    delete hero.activeClone;
-    delete hero.activeStaff;
-    delete hero.actionTarget;
-    delete hero.getHitbox;
-    delete hero.onHit;
-    delete hero.render;
-    delete hero.area;
-    delete hero.grabObject;
-    delete hero.grabTile;
-    delete hero.pickUpObject;
-    delete hero.pickUpTile;
-    hero.clones = [];
-    state.savedState.hero = hero;
-    state.savedGames[state.savedGameIndex] = state.savedState;
-    // These can get set on other files when previewing the saved game.
-    for (const savedGame of state.savedGames) {
-        if (savedGame?.hero) {
-            delete savedGame.hero.area;
-        }
-    }
+    state.savedState.savedHeroData = state.hero.exportSavedHeroData();
+    // There is a bug where selecting the delete option in randomizer triggers the `saveGame`
+    // function and saves a new file to the delete index which keeps creating more save files.
+    // This is a hack to prevent this from happening.
+    //if (state.savedGameIndex < state.savedGames.length) {
+    //    state.savedGames[state.savedGameIndex] = state.savedState;
+    //}
     const seed = readGetParameter('seed');
     // console.log(exportState(getState()));
     try {
@@ -71,45 +69,21 @@ export function setSaveFileToState(savedGameIndex: number, gameMode: number = 0)
     let savedGame = state.savedGames[state.savedGameIndex];
     if (!savedGame) {
         savedGame = getDefaultSavedState();
-        savedGame.hero.spawnLocation = gameMode === 0 ? SPAWN_LOCATION_FULL : SPAWN_LOCATION_DEMO;
+        savedGame.savedHeroData.spawnLocation = gameMode === 0 ? SPAWN_LOCATION_FULL : SPAWN_LOCATION_DEMO;
     }
     applySavedState(state, savedGame);
 }
 
 export function applySavedState(state: GameState, savedState: SavedState): void {
     const defaultSavedState = getDefaultSavedState();
+    state.hero = new Hero();
+    state.hero.applySavedHeroData(defaultSavedState.savedHeroData, savedState.savedHeroData);
     state.savedState = {
         ...defaultSavedState,
         ...savedState,
-        hero: {
-            ...defaultSavedState.hero,
-            ...savedState.hero,
-            passiveTools: {
-                ...defaultSavedState.hero.passiveTools,
-                ...savedState.hero.passiveTools,
-            },
-            activeTools: {
-                ...defaultSavedState.hero.activeTools,
-                ...savedState.hero.activeTools,
-            },
-            elements: {
-                ...defaultSavedState.hero.elements,
-                ...savedState.hero.elements,
-            },
-            equipment: {
-                ...defaultSavedState.hero.equipment,
-                ...savedState.hero.equipment,
-            },
-            getHitbox: getHeroHitbox,
-            render: renderHero,
-            onHit: onHitHero,
-            spiritRadius: 0,
-            explosionTime: 0,
-            invulnerableFrames: 0,
-            frozenDuration: 0,
-        },
+        //
+        savedHeroData: state.hero.exportSavedHeroData(),
     };
-    state.hero = state.savedState.hero;
     fixSpawnLocationOnLoad(state);
     updateHeroMagicStats(state);
     returnToSpawnLocation(state);
@@ -118,18 +92,23 @@ export function applySavedState(state: GameState, savedState: SavedState): void 
 export function selectSaveFile(savedGameIndex: number): void {
     let savedGame = state.savedGames[state.savedGameIndex];
     if (!savedGame) {
-        state.scene = 'chooseGameMode';
-        state.menuIndex = 0;
-        // Adjust the current state so we can show the correct background preview.
-        state.hero = getDefaultSavedState().hero;
+        // For now go directly to starting the full game when selecting "New Game".
         state.hero.spawnLocation = SPAWN_LOCATION_FULL;
-        state.hero.getHitbox = getHeroHitbox;
-        state.hero.render = renderHero;
-        state.hero.onHit = onHitHero;
-        fixSpawnLocationOnLoad(state);
+        state.scene = 'game';
         updateHeroMagicStats(state);
         returnToSpawnLocation(state);
         return;
+        // Old code for showing the "Choose Game Mode" menu when selecting "New Game".
+        /*state.scene = 'chooseGameMode';
+        state.menuIndex = 0;
+        // Adjust the current state so we can show the correct background preview.
+        state.hero = new Hero();
+        state.hero.applySavedHeroData(getDefaultSavedState().savedHeroData);
+        state.hero.spawnLocation = SPAWN_LOCATION_FULL;
+        fixSpawnLocationOnLoad(state);
+        updateHeroMagicStats(state);
+        returnToSpawnLocation(state);
+        return;*/
     }
     setSaveFileToState(savedGameIndex);
     state.scene = 'game';
@@ -139,42 +118,30 @@ export function getDefaultSavedState(): SavedState {
     return {
         dungeonInventories: {},
         objectFlags: {},
-        hero: getDefaultHeroState(),
+        savedHeroData: getDefaultSavedHeroData(),
         staffTowerLocation: 'desert',
     };
 }
 
-function getDefaultHeroState(): Hero {
+
+function getDefaultSavedHeroData(): SavedHeroData {
     return {
-        isAllyTarget: true,
-        area: null,
-        x: 150, y: 445, z: 0,
-        safeD: 'down', safeX: 150, safeY: 445,
-        vx: 0, vy: 0, vz: 0,
-        w: 16, h: 16,
-        d: 'down',
-        actionFrame: 0,
-        animationTime: 0,
-        life: 4, maxLife: 4,
-        lightRadius: 20,
-        magic: 0,
-        // base: 20, max: 100, roll: 5, charge: 10, double-charge: 50
-        maxMagic: 20,
-        // base 4, max 8-10
-        actualMagicRegen: 0,
-        magicRegen: 0,
-        // inventory
+        maxLife: 4,
         money: 0,
-        arrows: 0,
         peachQuarters: 0,
         spiritTokens: 0,
-        toolCooldown: 0,
         weapon: 0,
         activeTools: {
             bow: 0,
             staff: 0,
             clone: 0,
             cloak: 0,
+        },
+        element: null,
+        elements: {
+            fire: 0,
+            ice: 0,
+            lightning: 0,
         },
         equipment: {
             cloudBoots: 0,
@@ -196,24 +163,7 @@ function getDefaultHeroState(): Hero {
             waterBlessing: 0,
             fireBlessing: 0,
         },
-        element: null,
-        elements: {
-            fire: 0,
-            ice: 0,
-            lightning: 0,
-        },
-        astralProjection: null,
-        clones: [],
-        activeClone: null,
-        status: 'normal',
-        hasBarrier: false,
-        isInvisible: false,
-        getHitbox: getHeroHitbox,
-        render: renderHero,
-        onHit: onHitHero,
-        spiritRadius: 0,
         spawnLocation: SPAWN_LOCATION_FULL,
-        equipedGear: {},
     };
 }
 
@@ -292,14 +242,26 @@ export function returnToSpawnLocation(state: GameState) {
     state.fadeLevel = (state.areaInstance.definition.dark || 0) / 100;
 }
 
-function getHeroHitbox(this: Hero, state: GameState): ShortRectangle {
-    return { x: this.x, y: this.y, w: 16, h: 16 };
-}
-
 export function getState(): GameState {
     return state;
 }
 window['getState'] = getState;
 
-
-
+export function getTitleOptions(state: GameState): string[] {
+    if (state.scene === 'chooseGameMode') {
+        return ['Full Game', 'Quick Demo', 'Cancel'];
+    }
+    if (state.scene === 'deleteSavedGameConfirmation') {
+        return ['CANCEL', 'DELETE'];
+    }
+    const gameFiles = state.savedGames.map(savedGame => {
+        if (!savedGame) {
+            return 'New Game';
+        }
+        return savedGame.savedHeroData.spawnLocation.zoneKey;// + ' ' + 'V'.repeat(savedGame.hero.maxLife) + ' life';
+    });
+    if (state.scene === 'deleteSavedGame') {
+        return [...gameFiles, 'CANCEL'];
+    }
+    return [...gameFiles, 'DELETE'];
+}

@@ -8,7 +8,7 @@ import { createAnimation, drawFrame } from 'app/utils/animations';
 
 import {
     AreaInstance, CrystalSwitchDefinition, DrawPriority, GameState,
-    HitProperties, HitResult, ObjectInstance, ObjectStatus, ShortRectangle,
+    HitProperties, HitResult, ObjectInstance, ObjectStatus, Rect,
 } from 'app/types';
 
 const crystalGeometry = {w: 16, h: 20, content: {x: 0, y: 4, w: 16, h: 16, }};
@@ -42,7 +42,7 @@ export class CrystalSwitch implements ObjectInstance {
             this.status = 'active';
         }
     }
-    getHitbox(state: GameState): ShortRectangle {
+    getHitbox(state: GameState): Rect {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
     onHit(state: GameState, hit: HitProperties): HitResult {

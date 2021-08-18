@@ -4,7 +4,7 @@ import {
     GameState, Hero, LootType,
     MagicElement, MinionType,
     NPCBehavior, NPCStyle,
-    ShortRectangle, StaffTowerLocation, TileBehaviors,
+    Rect, StaffTowerLocation, TileBehaviors,
 } from 'app/types';
 
 export type DrawPriority = 'background' | 'foreground' | 'sprites'
@@ -30,7 +30,7 @@ export interface ObjectInstance {
     changeStatus?: (state: GameState, status: ObjectStatus) => void,
     cleanup?: (state: GameState) => void,
     // This is called when a user grabs a solid tile
-    getHitbox?: (state: GameState) => ShortRectangle,
+    getHitbox?: (state: GameState) => Rect,
     onActivate?: (state: GameState) => void,
     onDeactivate?: (state: GameState) => void,
     onDestroy?: (state: GameState, dx: number, dy: number) => void,
@@ -76,7 +76,7 @@ export interface HitProperties {
     direction?: Direction,
     damage?: number,
     element?: MagicElement,
-    hitbox?: ShortRectangle,
+    hitbox?: Rect,
     hitCircle?: {x: number, y: number, r: number},
     source?: Actor,
     // Whether this hit can push puzzle elements like rolling balls, push/pull blocks, etc.
@@ -99,7 +99,7 @@ export interface HitProperties {
     // Hits background tiles like bushes, rocks, solid walls
     hitTiles?: boolean,
     // Alternate hitbox to use when checking for tile hits.
-    tileHitbox?: ShortRectangle
+    tileHitbox?: Rect
     // Targets to ignore.
     ignoreTargets?: Set<ObjectInstance>,
 }

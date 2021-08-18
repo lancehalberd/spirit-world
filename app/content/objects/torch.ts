@@ -6,7 +6,7 @@ import { hitTargets } from 'app/utils/field';
 
 import {
     AreaInstance, GameState, HitProperties, HitResult, ObjectInstance,
-    ObjectStatus, SimpleObjectDefinition, ShortRectangle, TileBehaviors,
+    ObjectStatus, SimpleObjectDefinition, Rect, TileBehaviors,
 } from 'app/types';
 
 export class Torch implements ObjectInstance {
@@ -36,7 +36,7 @@ export class Torch implements ObjectInstance {
             this.behaviors.element = 'fire';
         }
     }
-    getHitbox(state: GameState): ShortRectangle {
+    getHitbox(state: GameState): Rect {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
     onHit(state: GameState, hit: HitProperties): HitResult {

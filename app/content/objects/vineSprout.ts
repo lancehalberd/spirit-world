@@ -6,7 +6,7 @@ import { saveGame } from 'app/state';
 
 import {
     AreaInstance, AreaLayer, DrawPriority, FrameAnimation, GameState,
-    ObjectInstance, ObjectStatus, ShortRectangle, SimpleObjectDefinition,
+    ObjectInstance, ObjectStatus, Rect, SimpleObjectDefinition,
 } from 'app/types';
 
 
@@ -105,7 +105,7 @@ export class VineSprout implements ObjectInstance {
         this.growingAnimationA = baseGrowAnimation;
         this.growingAnimationB = middleGrowAnimationA;
     }
-    getHitbox(state: GameState): ShortRectangle {
+    getHitbox(state: GameState): Rect {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
     update(state: GameState) {

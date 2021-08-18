@@ -1,15 +1,12 @@
+import { Hero } from 'app/content/hero';
 import { getCloneMovementDeltas } from 'app/keyCommands';
 import { renderCarriedTile } from 'app/renderActor';
 import { heroSpiritAnimations } from 'app/render/heroAnimations';
-import { throwHeldObject } from 'app/updateActor';
 import { drawFrameAt, getFrame } from 'app/utils/animations';
 import { directionMap, getDirection } from 'app/utils/field';
 
 import {
-    Action, ActiveTool, ActorAnimations, AreaInstance, Clone,
-    Direction, DrawPriority, MagicElement, Equipment, Frame, FullTile,
-    GameState, Hero, HitProperties, HitResult, ObjectInstance, ObjectStatus, PassiveTool,
-    ShortRectangle, TileBehaviors, TileCoords, ZoneLocation
+    ActorAnimations, Frame, GameState, HitProperties, HitResult,
 } from 'app/types';
 
 
@@ -58,68 +55,10 @@ export function getSpiritFrame(state: GameState, hero: Hero): Frame {
     return getFrame(animations[hero.d], hero.animationTime);
 }
 
-export class AstralProjection implements Hero, ObjectInstance {
-    actualMagicRegen: number;
-    area: AreaInstance;
-    behaviors: TileBehaviors = {
-        solid: true,
-    };
-    isAllyTarget = true;
-    definition = null;
-    drawPriority: DrawPriority = 'sprites';
-    frame: Frame;
-    element: MagicElement;
-    life: number;
-    x: number;
-    y: number;
-    z: number;
-    safeD:Direction;
-    safeX: number;
-    safeY: number;
-    vx: number = 0;
-    vy: number = 0;
-    vz: number = 0;
-    w: number;
-    h: number;
-    d: Direction;
-    arrows: number;
-    peachQuarters: number;
-    magic: number;
-    magicRegen: number;
-    money: number;
-    maxLife: number;
-    maxMagic: number;
-    spiritTokens: number;
-    toolCooldown: number;
-    weapon: number;
-    activeTools: {[key in ActiveTool]: number} = {} as any;
-    equipment: {[key in Equipment]: number} = {} as any;
-    passiveTools: {[key in PassiveTool]: number} = {} as any;
-    elements: {[key in MagicElement]: number} = {} as any;
-    activeClone: Clone;
-    clones: Clone[] = [];
-    stuckFrames: number = 0;
-    status: ObjectStatus = 'normal';
-    animationTime: number = 0;
-    action: Action;
-    actionTarget: any;
-    actionDx: number = 0;
-    actionDy: number = 0;
-    actionFrame: number = 0;
-    pickUpFrame: number = 0;
-    pickUpTile: FullTile;
-    pickUpObject: ObjectInstance;
-    grabTile: TileCoords;
-    grabObject: ObjectInstance;
-    invulnerableFrames: number;
-    leftTool: ActiveTool;
-    rightTool: ActiveTool;
-    hasBarrier: boolean;
-    isInvisible: boolean;
-    lightRadius: number;
-    spawnLocation: ZoneLocation;
-    spiritRadius: number;
+export class AstralProjection extends Hero {
     constructor(hero: Hero) {
+        super();
+        this.isAstralProjection = true;
         this.life = hero.magic;
         this.x = hero.x;
         this.y = hero.y;
@@ -129,9 +68,6 @@ export class AstralProjection implements Hero, ObjectInstance {
         this.invulnerableFrames = 0;
         this.leftTool = this.rightTool = null;
         this.z = 4;
-    }
-    getHitbox(state: GameState): ShortRectangle {
-        return { x: this.x, y: this.y, w: 16, h: 16 };
     }
     render(this: Hero, context: CanvasRenderingContext2D, state: GameState): void {
         const hero = this;
@@ -162,7 +98,7 @@ export class AstralProjection implements Hero, ObjectInstance {
             this.invulnerableFrames = 20;
         }
         if (hit.knockback) {
-            throwHeldObject(state, this);
+            this.throwHeldObject(state);
             this.action = 'knocked';
             this.animationTime = 0;
             this.vx = hit.knockback.vx;

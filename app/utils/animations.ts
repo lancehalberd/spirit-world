@@ -2,7 +2,7 @@ import { FRAME_LENGTH } from 'app/gameConstants';
 import { requireImage } from 'app/utils/images';
 import {
     ExtraAnimationProperties, Frame, FrameAnimation, FrameDimensions, FrameRectangle,
-    ShortRectangle
+    Rect
 } from 'app/types';
 
 interface CreateAnimationOptions {
@@ -16,7 +16,7 @@ interface CreateAnimationOptions {
 
 export function frame(
     x: number, y: number, w: number, h: number,
-    content: ShortRectangle = null
+    content: Rect = null
 ): FrameRectangle {
     return {x, y, w, h, content};
 }
@@ -78,7 +78,7 @@ export function getFrame(animation: FrameAnimation, animationTime: number): Fram
 export function drawFrame(
     context: CanvasRenderingContext2D,
     {image, x, y, w, h}: Frame,
-    {x: tx, y: ty, w: tw, h: th}: ShortRectangle
+    {x: tx, y: ty, w: tw, h: th}: Rect
 ): void {
     // (x | 0) is faster than Math.floor(x)
     context.drawImage(image, x | 0, y | 0, w | 0, h | 0, tx | 0, ty | 0, tw | 0, th | 0);
@@ -124,7 +124,7 @@ export function drawFrameCenteredAt(
         tx | 0, ty | 0, w | 0, h | 0);
 }
 
-export function getFrameHitBox({content, w, h}: Frame, {x, y}: {x: number, y: number}): ShortRectangle {
+export function getFrameHitBox({content, w, h}: Frame, {x, y}: {x: number, y: number}): Rect {
     return {
         x, y,
         w: content?.w ?? w,
@@ -135,7 +135,7 @@ export function getFrameHitBox({content, w, h}: Frame, {x, y}: {x: number, y: nu
 /*export function drawFrameCenteredInTarget(
     context: CanvasRenderingContext2D,
     {image, x, y, w, h}: Frame,
-    {x: tx, y: ty, w: tw, h: th}: ShortRectangle
+    {x: tx, y: ty, w: tw, h: th}: Rect
 ): void {
     tx += Math.ceil((tw - w) / 2);
     ty += Math.ceil((th - h) / 2);

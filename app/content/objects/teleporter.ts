@@ -7,7 +7,7 @@ import { isObjectInsideTarget, pad } from 'app/utils/index';
 
 import {
     AreaInstance, DrawPriority, GameState, ObjectInstance,
-    ObjectStatus, ShortRectangle, EntranceDefinition,
+    ObjectStatus, Rect, EntranceDefinition,
 } from 'app/types';
 
 export class Teleporter implements ObjectInstance {
@@ -33,7 +33,7 @@ export class Teleporter implements ObjectInstance {
             saveGame();
         }
     }
-    getHitbox(state: GameState): ShortRectangle {
+    getHitbox(state: GameState): Rect {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
     update(state: GameState) {

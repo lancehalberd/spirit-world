@@ -1,4 +1,4 @@
-import { hasClone, hasIronBoots, hasWeapon } from 'app/content/logic';
+import { hasBossWeapon, hasClone, hasIronBoots, hasWeapon } from 'app/content/logic';
 
 import { LogicNode } from 'app/types';
 
@@ -37,12 +37,12 @@ export const peachCaveNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'newPeachCave:boss',
-        checks: [{ objectId: 'newPeachCave:boss', logic: hasWeapon }],
+        checks: [{ objectId: 'newPeachCave:boss', logic: hasBossWeapon }],
         paths: [
             // There is no path to `newPeachCave:stairsDown` from here because:
             // You can only return to `newPeachCave:stairsDown` from here if you've grown 
             // the vine to the boss, which means you have access to `newPeachCave:stairsDown` already
-            { nodeId: 'newPeachCave:pitB', logic: hasWeapon },
+            { nodeId: 'newPeachCave:pitB', logic: hasBossWeapon },
         ],
     },
     {

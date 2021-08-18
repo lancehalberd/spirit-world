@@ -1,5 +1,6 @@
 import _ from 'lodash';
 
+import { Clone } from 'app/content/clone';
 import { editingState } from 'app/development/tileEditor';
 import { createCanvasAndContext } from 'app/dom';
 import {
@@ -8,7 +9,7 @@ import {
 
 import { carryMap, directionMap } from 'app/utils/field';
 
-import { AreaInstance, Clone, GameState } from 'app/types';
+import { AreaInstance, GameState } from 'app/types';
 
 const lightingGranularity = 1;
 const [lightingCanvas, lightingContext] = createCanvasAndContext(

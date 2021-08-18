@@ -433,13 +433,7 @@ function organizeLootObjects(lootObjects: LootWithLocation[]) {
 function copyState(state: GameState): GameState {
     return {
         ...state,
-        hero: {
-            ...state.hero,
-            activeTools: {...state.hero.activeTools},
-            passiveTools: {...state.hero.passiveTools},
-            elements: {...state.hero.elements},
-            equipment: {...state.hero.equipment},
-        },
+        hero: state.hero.getCopy(),
         savedState: {
             ...state.savedState,
             dungeonInventories: cloneDeep(state.savedState.dungeonInventories),

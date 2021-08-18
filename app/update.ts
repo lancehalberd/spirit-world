@@ -1,4 +1,5 @@
 import { enterLocation, refreshAreaLogic } from 'app/content/areas';
+import { Hero } from 'app/content/hero';
 import { getLoot } from 'app/content/lootObject';
 import {
     SPAWN_LOCATION_DEMO,
@@ -16,6 +17,7 @@ import { updateHeroMagicStats } from 'app/render/spiritBar';
 import {
     getDefaultSavedState,
     getState,
+    getTitleOptions,
     returnToSpawnLocation,
     saveGame,
     selectSaveFile,
@@ -70,25 +72,6 @@ export function update() {
     }
 }
 
-export function getTitleOptions(state: GameState): string[] {
-    if (state.scene === 'chooseGameMode') {
-        return ['Full Game', 'Quick Demo', 'Cancel'];
-    }
-    if (state.scene === 'deleteSavedGameConfirmation') {
-        return ['CANCEL', 'DELETE'];
-    }
-    const gameFiles = state.savedGames.map(savedGame => {
-        if (!savedGame) {
-            return 'New Game';
-        }
-        return savedGame.hero.spawnLocation.zoneKey;// + ' ' + 'V'.repeat(savedGame.hero.maxLife) + ' life';
-    });
-    if (state.scene === 'deleteSavedGame') {
-        return [...gameFiles, 'CANCEL'];
-    }
-    return [...gameFiles, 'DELETE'];
-}
-
 export function isConfirmKeyPressed(state: GameState): boolean {
     return !!(wasGameKeyPressed(state, GAME_KEY.WEAPON)
         || wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL)
@@ -117,6 +100,7 @@ function updateTitle(state: GameState) {
             case 'deleteSavedGameConfirmation':
                 if (state.menuIndex === 1) {
                     state.savedGames[state.savedGameIndex] = null;
+                    console.log(state.savedGames);
                 }
                 state.scene = 'title';
                 state.menuIndex = state.savedGameIndex;
@@ -134,7 +118,8 @@ function updateTitle(state: GameState) {
                 break;
             case 'chooseGameMode':
                 state.savedState = getDefaultSavedState();
-                state.hero = state.savedState.hero;
+                state.hero = new Hero();
+                state.hero.applySavedHeroData(state.savedState.savedHeroData);
                 if (state.menuIndex === 0) {
                     // Full Game
                     state.hero.spawnLocation = SPAWN_LOCATION_FULL;
