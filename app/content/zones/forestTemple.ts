@@ -387,9 +387,9 @@ const sf0_0x0: AreaDefinition = {
     layers: null,
     objects: [
         {status: "normal", id: "", logicKey: undefined, x: 480, y: 368, type: "door", style: "cave", targetZone: undefined, targetObjectId: undefined, d: "right", saveStatus: undefined},
-        {status: "normal", id: "forestTempleLadder4", logicKey: undefined, x: 320, y: 0, type: "door", style: "cave", targetZone: "overworld", targetObjectId: "forestTempleLadder4", d: "up", saveStatus: undefined},
+        {status: "normal", id: "forestTempleLadder4", logicKey: undefined, x: 336, y: 0, type: "door", style: "ladderUp", targetZone: "overworld", targetObjectId: "forestTempleLadder4", d: "up", saveStatus: undefined},
         {status: "normal", id: "", logicKey: undefined, x: 112, y: 480, type: "door", style: "cave", targetZone: undefined, targetObjectId: undefined, d: "down", saveStatus: undefined},
-        {status: "normal", id: "forestTempleLadder5", logicKey: undefined, x: 64, y: 256, type: "door", style: "cave", targetZone: "overworld", targetObjectId: "forestTempleLadder5", d: "up", saveStatus: undefined},
+        {status: "normal", id: "forestTempleLadder5", logicKey: undefined, x: 64, y: 256, type: "door", style: "ladderUp", targetZone: "overworld", targetObjectId: "forestTempleLadder5", d: "up", saveStatus: undefined},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 32},
@@ -402,10 +402,10 @@ const sf0_0x1: AreaDefinition = {
     layers: null,
     objects: [
         {status: "normal", id: "", logicKey: undefined, x: 368, y: 480, type: "door", style: "cave", targetZone: undefined, targetObjectId: undefined, d: "down", saveStatus: undefined},
-        {status: "normal", id: "forestTempleLadder2", logicKey: undefined, x: 432, y: 288, type: "door", style: "cave", targetZone: "overworld", targetObjectId: "forestTempleLadder2", d: "up", saveStatus: undefined},
+        {status: "normal", id: "forestTempleLadder2", logicKey: undefined, x: 432, y: 288, type: "door", style: "ladderUp", targetZone: "overworld", targetObjectId: "forestTempleLadder2", d: "up", saveStatus: undefined},
         {status: "normal", id: "", logicKey: undefined, x: 112, y: 256, type: "door", style: "cave", targetZone: undefined, targetObjectId: undefined, d: "up", saveStatus: undefined},
         {status: "normal", id: "", logicKey: undefined, x: 112, y: 224, type: "door", style: "cave", targetZone: undefined, targetObjectId: undefined, d: "down", saveStatus: undefined},
-        {status: "normal", id: "forestTempleLadder3", logicKey: undefined, x: 400, y: 0, type: "door", style: "cave", targetZone: "overworld", targetObjectId: "forestTempleLadder3", d: "up", saveStatus: undefined},
+        {status: "normal", id: "forestTempleLadder3", logicKey: undefined, x: 400, y: 0, type: "door", style: "ladderUp", targetZone: "overworld", targetObjectId: "forestTempleLadder3", d: "up", saveStatus: undefined},
         {status: "normal", id: "", logicKey: undefined, x: 0, y: 368, type: "door", style: "cave", targetZone: undefined, targetObjectId: undefined, d: "left", saveStatus: undefined},
     ],
     sections: [
@@ -440,7 +440,7 @@ const sf0_1x1: AreaDefinition = {
         {status: "normal", id: "", logicKey: undefined, x: 112, y: 352, type: "door", style: "cave", targetZone: undefined, targetObjectId: undefined, d: "up", saveStatus: undefined},
         {status: "normal", id: "", logicKey: undefined, x: 112, y: 224, type: "door", style: "cave", targetZone: undefined, targetObjectId: undefined, d: "down", saveStatus: undefined},
         {status: "normal", id: "", logicKey: undefined, x: 368, y: 0, type: "door", style: "cave", targetZone: undefined, targetObjectId: undefined, d: "up", saveStatus: undefined},
-        {status: "normal", id: "forestTempleLadder1", logicKey: undefined, x: 416, y: 256, type: "door", style: "cave", targetZone: "overworld", targetObjectId: "forestTempleLadder1", d: "up", saveStatus: undefined},
+        {status: "normal", id: "forestTempleLadder1", logicKey: undefined, x: 416, y: 256, type: "door", style: "ladderUp", targetZone: "overworld", targetObjectId: "forestTempleLadder1", d: "up", saveStatus: undefined},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16},

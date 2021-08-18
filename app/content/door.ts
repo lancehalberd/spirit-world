@@ -77,6 +77,10 @@ const [
 
 const [ treeDoorOpen ] = createAnimation('gfx/tiles/treesheet.png', {w: 32, h: 32}, {left: 128, top: 96, cols: 1}).frames;
 
+const [
+    ladderTop, ladderMiddle, /*ladderMiddle*/, ladderBottom, ladderDown
+] = createAnimation('gfx/tiles/ladder.png', {w: 16, h: 16}, {rows: 5}).frames;
+
 interface DoorStyleFrames {
     doorFrame: Frame,
     doorCeiling?: Frame,
@@ -91,6 +95,7 @@ interface DoorStyleFrames {
 interface DoorStyleDefinition {
     w: number,
     h: number,
+    render?: (context: CanvasRenderingContext2D, state: GameState, door: Door) => void
     down?: DoorStyleFrames,
     right?: DoorStyleFrames,
     up?: DoorStyleFrames,
@@ -192,6 +197,28 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
             bigKeyLocked: treeDoorOpen,
         },
     },
+    ladderUp: {
+        w: 16,
+        h: 32,
+        render(this: void, context, state, door) {
+            if (door.status !== 'normal') {
+                return;
+            }
+            drawFrame(context, ladderMiddle, {x: door.x, y: door.y, w: 16, h: 16});
+            drawFrame(context, ladderBottom, {x: door.x, y: door.y + 16, w: 16, h: 16});
+        }
+    },
+    ladderDown: {
+        w: 16,
+        h: 16,
+        render(this: void, context, state, door) {
+            if (door.status !== 'normal') {
+                return;
+            }
+            drawFrame(context, ladderTop, {x: door.x, y: door.y - 16, w: 16, h: 16});
+            drawFrame(context, ladderDown, {x: door.x, y: door.y, w: 16, h: 16});
+        }
+    },
     square: {
         w: 32,
         h: 32,
@@ -268,7 +295,14 @@ export class Door implements ObjectInstance {
         const y = Math.floor(this.y / 16);
         const x = Math.floor(this.x / 16);
         const doorStyle = doorStyles[this.style];
-        if (doorStyle.w === 64) {
+        if (this.style === 'ladderDown') {
+            const behaviors: TileBehaviors = this.isOpen() ? { climbable: true } : { solid: true, low: false};
+            applyBehaviorToTile(this.area, x, y, behaviors);
+        } else if (this.style === 'ladderUp') {
+            const behaviors: TileBehaviors = this.isOpen() ? { climbable: true } : { solid: true, low: false};
+            applyBehaviorToTile(this.area, x, y, behaviors);
+            applyBehaviorToTile(this.area, x, y + 1, behaviors);
+        } else if (doorStyle.w === 64) {
             const behaviors: TileBehaviors = this.isOpen() ? { solid: false } : { solid: true, low: false};
             if (this.definition.d === 'up' || this.definition.d === 'down') {
                 applyBehaviorToTile(this.area, x, y, behaviors);
@@ -361,7 +395,12 @@ export class Door implements ObjectInstance {
         const y = Math.floor(this.y / 16);
         const x = Math.floor(this.x / 16);
         const doorStyle = doorStyles[this.style];
-        if (doorStyle.w === 64) {
+        if (this.style === 'ladderDown') {
+            resetTileBehavior(this.area, {x, y});
+        } else if (this.style === 'ladderUp') {
+            resetTileBehavior(this.area, {x, y});
+            resetTileBehavior(this.area, {x, y: y + 1});
+        } else if (doorStyle.w === 64) {
             if (this.definition.d === 'up' || this.definition.d === 'down') {
                 resetTileBehavior(this.area, {x, y});
                 resetTileBehavior(this.area, {x: x + 1, y});
@@ -427,7 +466,32 @@ export class Door implements ObjectInstance {
             const x = hero.x + hero.w / 2 + hero.actionDx * hero.w / 2;
             const y = hero.y + hero.h / 2 + hero.actionDy * hero.h / 2;
             const hitbox = this.getHitbox(state);
-            const changedZones = (!isPointInShortRect(x, y, hitbox) || isObjectInsideTarget(hero, hitbox)) && this.travelToZone(state);
+            let changedZones = false;
+            if (this.style === 'ladderUp') {
+                const reachedTop = hero.y <= this.y;
+                if (reachedTop) {
+                    changedZones = this.travelToZone(state);
+                    // 'ladderUp' is only for changing zones so make the hero climb back down if changing zones fails.
+                    if (!changedZones) {
+                        hero.action = 'exiting';
+                        hero.actionDx = -directionMap[this.definition.d][0];
+                        hero.actionDy = -directionMap[this.definition.d][1];
+                    }
+                }
+            } else if (this.style === 'ladderDown') {
+                const reachedBottom = hero.y >= this.y;
+                if (reachedBottom) {
+                    changedZones = this.travelToZone(state);
+                    // 'ladderDown' is only for changing zones so make the hero climb back down if changing zones fails.
+                    if (!changedZones) {
+                        hero.action = 'exiting';
+                        hero.actionDx = -directionMap[this.definition.d][0];
+                        hero.actionDy = -directionMap[this.definition.d][1];
+                    }
+                }
+            } else {
+                changedZones = (!isPointInShortRect(x, y, hitbox) || isObjectInsideTarget(hero, hitbox)) && this.travelToZone(state);
+            }
             if (!changedZones && !heroIsTouchingDoor) {
                 hero.action = null;
                 hero.actionTarget = null;
@@ -441,7 +505,7 @@ export class Door implements ObjectInstance {
     }
     travelToZone(state: GameState) {
         let hero = state.hero.activeClone || state.hero;
-        if (hero.action !== 'entering' || !this.definition.targetZone || !this.definition.targetObjectId) {
+        if (hero.action === 'exiting' || !this.definition.targetZone || !this.definition.targetObjectId) {
             return false;
         }
         return enterZoneByTarget(state, this.definition.targetZone, this.definition.targetObjectId, this.definition, false, () => {
@@ -463,6 +527,9 @@ export class Door implements ObjectInstance {
                 }
             }
             hero.actionTarget = target;
+            if (target.style === 'ladderUp' || target.style === 'ladderDown') {
+                hero.action = 'climbing';
+            }
             // Make sure the hero is coming *out* of the target door.
             hero.actionDx = -directionMap[target.definition.d][0];
             hero.actionDy = -directionMap[target.definition.d][1];
@@ -473,6 +540,10 @@ export class Door implements ObjectInstance {
     render(context: CanvasRenderingContext2D, state: GameState) {
         const doorStyle = doorStyles[this.style];
         context.fillStyle = '#888';
+        if (doorStyle.render) {
+            doorStyle.render(context, state, this);
+            return;
+        }
         if (doorStyle[this.definition.d]) {
             let frame: Frame;
             if (this.status !== 'cracked') {

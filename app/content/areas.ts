@@ -769,6 +769,9 @@ export function destroyTile(state: GameState, area: AreaInstance, target: TileCo
     area.checkToRedrawTiles = true;
     const underTile = behavior?.underTile || 0;
     layer.tiles[target.y][target.x] = allTiles[underTile];
+    if (behavior.breakSound) {
+        playAreaSound(state, area, behavior.breakSound);
+    }
 
     resetTileBehavior(area, target);
     if (behavior?.lootTable) {

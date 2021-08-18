@@ -4,6 +4,7 @@ import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { hitTargets } from 'app/utils/field';
 import { isPointInShortRect, pad } from 'app/utils/index';
+import { playSound } from 'app/utils/sounds';
 
 import {
     AnimationEffect, AreaInstance, DrawPriority, Frame, GameState, Hero, HitProperties, MagicElement, ObjectInstance, ObjectStatus,
@@ -221,11 +222,18 @@ export class HeldChakram implements ObjectInstance {
             vx: speed * this.vx,
             vy: speed * this.vy,
             returnSpeed: 4,
-            damage: this.damage * Math.round(Math.max(1, speed / 4)),
+            damage: this.damage * Math.round(1 + speed / 6),
             element,
             source: this.hero,
             piercing: speed === 12,
         });
+        if (chakram.speed >= 12) {
+            playSound('strongChakram');
+        } else if (chakram.speed >= 6) {
+            playSound('normalChakram');
+        } else {
+            playSound('weakChakram');
+        }
         this.hero.vx -= chakram.vx / 4;
         this.hero.vy -= chakram.vy / 4;
         addObjectToArea(state, this.area, chakram);
@@ -243,6 +251,15 @@ export class HeldChakram implements ObjectInstance {
         }
     }
     update(state: GameState) {
+        // Only play the held sound if they actually hold the chakram for a moment.
+        // This also happens to be the exact time that damage is doubled with level one charge.
+        if (state.hero.passiveTools.charge >= 1 && this.animationTime === 300) {
+            playSound('chakramCharge1');
+        }
+        // Play a second sound when damage is doubled using the base charge (level 0).
+        if (!state.hero.passiveTools.charge && this.animationTime === 600) {
+            playSound('chakramCharge1');
+        }
         // Held chakram is thrown if the hero no longer exists.
         if (this.hero !== state.hero && this.area.objects.indexOf(this.hero) < 0) {
             this.throw(state);

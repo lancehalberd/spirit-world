@@ -264,10 +264,16 @@ const preloadSounds = () => {
         {key: 'blockAttack', source: 'sfx/coin wood c.wav',
             offset: '0:100', volume: 10, limit: 5},
         {key: 'pickUpObject', source: 'sfx/Tricube 1_odrive.wav', volume: 50, limit: 1},
-        {key: 'bushShatter', source: 'sfx/Cube 2_odrive.wav', volume: 15, limit: 2},
+        {key: 'bushShatter', source: 'sfx/Cube 2_odrive.wav', volume: 15, limit: 3},
         {key: 'rockShatter', source: 'sfx/3x3_odrive.wav', volume: 15, limit: 2},
         {key: 'doorClose', source: 'sfx/Cube-24_odrive.wav', volume: 10, limit: 1},
         {key: 'doorOpen', source: 'sfx/cube-24.slide_odrive.wav', volume: 10, limit: 1},
+        {key: 'chakramHold', source: 'sfx/chakram 5.wav', volume: 1 / 2, offset: '60:100', limit: 1},
+        {key: 'chakramCharge1', source: 'sfx/chakram 5.wav', volume: 1 / 2, offset: '60:100', limit: 1},
+        {key: 'weakChakram', source: 'sfx/chakram 5.wav', volume: 1 / 2, offset: '0:80', limit: 2},
+        {key: 'normalChakram', source: 'sfx/chakram 5.wav', volume: 2, limit: 2},
+        {key: 'strongChakram', source: 'sfx/chakram 5.wav', volume: 5, limit: 2},
+
 
     ].forEach(sound => requireSound(sound));
 };
