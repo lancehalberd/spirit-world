@@ -44,6 +44,15 @@ export function createFrameCanvas(frame: Frame, scale: number = 1): HTMLCanvasEl
     return canvas;
 }
 
+
+export function debugCanvas(canvas: HTMLCanvasElement) {
+    document.body.append(canvas);
+    canvas.style.position = 'absolute';
+    canvas.style.top = '0';
+    canvas.style.backgroundColor = 'blue';
+}
+window['debugCanvas'] = debugCanvas;
+
 export const mouseContainer:HTMLElement = query('.js-mouseContainer');
 export const mainContent: HTMLElement = query('.js-gameContent');
 

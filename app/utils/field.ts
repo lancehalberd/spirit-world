@@ -128,7 +128,17 @@ export function isPointOpen(
             if (isPixelInShortRect(x, y, object.getHitbox(state))) {
                 return false;
             }
-        }
+        } /*else if (object.getHitbox && object.behaviors?.solidMap) {
+            // Currently we don't support solidMap on objects. They can just apply this
+            // to the tile map if necessary, otherwise, maybe we should add something like
+            // getPixelBehavior(x: number, y: number): TileBehaviors to objects.
+            const hitbox = object.getHitbox(state);
+            let sx = (x - hitbox.x) | 0;
+            let sy = (y - hitbox.y) | 0;
+            if (tileBehavior.solidMap[sy] >> (15 - sx) & 1) {
+                return false;
+            }
+        }*/
     }
     if (state.hero.area === area && !excludedObjects?.has(state.hero)) {
         if (isPixelInShortRect(x, y, state.hero)) {
@@ -173,6 +183,7 @@ export function getTileBehaviorsAndObstacles(
     {x, y}: Tile,
     excludedObjects: Set<any> = null,
     nextArea: AreaInstance = null,
+    objectTest: (object: ObjectInstance) => boolean = null,
 ): {tileBehavior: TileBehaviors, tx: number, ty: number, objects: ObjectInstance[]} {
     const objects: ObjectInstance[] = [];
     let tx = Math.floor(x / 16);
@@ -202,9 +213,11 @@ export function getTileBehaviorsAndObstacles(
         if (excludedObjects?.has(object)) {
             continue;
         }
-        if (object.getHitbox && (object.onPush || object.behaviors?.solid)) {
+        if (object.getHitbox && (object.onPush || object.behaviors?.solid || objectTest)) {
             if (isPixelInShortRect(x | 0, y | 0, roundRect(object.getHitbox(state)))) {
-                objects.push(object);
+                if (!objectTest || objectTest(object)) {
+                    objects.push(object);
+                }
                 if (object.behaviors?.solid) {
                     tileBehavior.solid = true;
                 }

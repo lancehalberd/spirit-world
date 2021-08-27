@@ -125,13 +125,6 @@ export function updateLightingCanvas(area: AreaInstance): void {
     }
 }
 
-window['debugCanvas'] = (canvas: HTMLCanvasElement) => {
-    document.body.append(canvas);
-    canvas.style.position = 'absolute';
-    canvas.style.top = '0';
-    canvas.style.backgroundColor = 'blue';
-}
-
 export function renderSurfaceLighting(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance) {
     if (!area.waterSurfaceCanvas) {
         updateWaterSurfaceCanvas(state);

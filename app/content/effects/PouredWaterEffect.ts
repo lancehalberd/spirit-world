@@ -29,8 +29,11 @@ export class PouredWaterEffect implements ObjectInstance {
         this.animationTime += FRAME_LENGTH;
         if (!this.hasHit) {
             this.y += 4;
-            const { objects, tileBehavior } = getTileBehaviorsAndObstacles(state, this.area, {x: this.x, y: this.y});
-            const sprout = objects.find(o => o.definition?.type === 'vineSprout') as VineSprout;
+            const { objects, tileBehavior } = getTileBehaviorsAndObstacles(
+                state, this.area, {x: this.x, y: this.y},
+                null, null, object => object.definition?.type === 'vineSprout'
+            );
+            const sprout = objects[0] as VineSprout;
             if (sprout) {
                 sprout.grow(state);
                 this.hasHit = true;

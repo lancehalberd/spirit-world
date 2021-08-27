@@ -193,13 +193,13 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         movementSpeed = 0;
         hero.vx = 0;
         hero.vy = 0;
-        if (state.nextAreaInstance.cameraOffset.x && state.hero.action !== 'entering') {
+        if (state.nextAreaInstance.cameraOffset.x && !state.hero.isEntering) {
             // We need to make sure this is low enough that the character doesn't get entirely into the second column,
             // otherwise horizontal doors won't work as expected.
             //dx = 0.75 * state.nextAreaInstance.cameraOffset.x / Math.abs(state.nextAreaInstance.cameraOffset.x);
             hero.x += 0.75 * state.nextAreaInstance.cameraOffset.x / Math.abs(state.nextAreaInstance.cameraOffset.x);
         }
-        if (state.nextAreaInstance.cameraOffset.y && state.hero.action !== 'entering') {
+        if (state.nextAreaInstance.cameraOffset.y && !state.hero.isEntering) {
             //dy = 1 * state.nextAreaInstance.cameraOffset.y / Math.abs(state.nextAreaInstance.cameraOffset.y);
             hero.y += 0.5 * state.nextAreaInstance.cameraOffset.y / Math.abs(state.nextAreaInstance.cameraOffset.y);
         }
@@ -227,6 +227,12 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         hero.vy = 0;
         hero.y += 0.5;
         //dy = 1;
+    } else if (!isAstralProjection && (hero.isEntering || hero.isExiting)) {
+        // The door will move the player until the action is complete.
+        movementSpeed = 0;
+        hero.vx = 0;
+        hero.vy = 0;
+        hero.actionFrame++;
     } else if (!isAstralProjection && hero.action === 'climbing') {
         movementSpeed *= 0.5;
     }  else if (!isAstralProjection && hero.action === 'falling') {
@@ -294,12 +300,6 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         movementSpeed = 0;
         hero.vx = 0;
         hero.vy = 0;
-    } else if (!isAstralProjection && (hero.action === 'entering' || hero.action === 'exiting')) {
-        // The door will move the player until the action is complete.
-        movementSpeed = 0;
-        hero.vx = 0;
-        hero.vy = 0;
-        hero.actionFrame++;
     } else if (hero.action === 'getItem') {
         movementSpeed = 0;
         hero.vx = 0;
@@ -451,7 +451,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         }
     }
     if (!isFrozen && (hero.chargingLeftTool || hero.chargingRightTool)) {
-        if (hero.action !== 'entering' && hero.action !== 'exiting') {
+        if (!hero.isEntering && !hero.isExiting) {
             movementSpeed *= 0.75;
             hero.chargeTime += FRAME_LENGTH;
             hero.action = 'charging';
@@ -510,7 +510,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         }
     }
     if (heldChakram && heldChakram.area === hero.area && heldChakram.hero === hero && hero.action !== 'charging') {
-        if (hero.action === 'entering' || hero.action === 'exiting') {
+        if (hero.isEntering || hero.isExiting) {
             // take no action while hero is controlled by door.
         } else if (!hero.action && isGameKeyDown(state, GAME_KEY.WEAPON) && canCharge) {
             // resume charing if the weapon button is still down.

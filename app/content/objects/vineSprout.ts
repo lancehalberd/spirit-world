@@ -10,13 +10,14 @@ import {
 } from 'app/types';
 
 
-const sproutAnimation = createAnimation('gfx/tiles/vines.png', {w: 16, h: 16}, {cols: 4, y: 4, duration: 12});
-
 const growFrameDuration = 4;
-const baseGrowAnimation = createAnimation('gfx/tiles/vines.png', {w: 16, h: 16}, {cols: 7, y: 0, duration: growFrameDuration});
+const sproutIdleAnimation = createAnimation('gfx/tiles/vinebase.png', {w: 16, h: 16}, {cols: 4, y: 0, duration: 12});
+// There is an extra 10px white space in between the rows of this animation for some reason.
+const sproutingAnimation = createAnimation('gfx/tiles/vinebase.png', {w: 16, h: 16}, {cols: 7, top: 26, duration: growFrameDuration});
+const baseGrowAnimation = createAnimation('gfx/tiles/vines.png', {w: 16, h: 16}, {cols: 3, y: 0, duration: growFrameDuration});
 const middleGrowAnimationA = createAnimation('gfx/tiles/vines.png', {w: 16, h: 16}, {cols: 5, y: 1, duration: growFrameDuration});
 const middleGrowAnimationB = createAnimation('gfx/tiles/vines.png', {w: 16, h: 16}, {cols: 5, y: 2, duration: growFrameDuration});
-const topGrowAnimation = createAnimation('gfx/tiles/vines.png', {w: 16, h: 16}, {cols: 8, y: 3, duration: growFrameDuration});
+const topGrowAnimation = createAnimation('gfx/tiles/vines.png', {w: 16, h: 16}, {cols: 5, y: 3, duration: growFrameDuration});
 // Each grow animation overlaps the previous animation by exactly 1 frame.
 const growOverlap = growFrameDuration * 1 * FRAME_LENGTH;
 
@@ -64,12 +65,10 @@ function growVine(this: void, area: AreaInstance, tx: number, ty: number): void 
 
 export class VineSprout implements ObjectInstance {
     area: AreaInstance;
-    behaviors = {
-        solid: true,
-    };
     drawPriority: DrawPriority = 'background';
     definition: SimpleObjectDefinition = null;
     growing = false;
+    sprouting = false;
     x: number;
     y: number;
     status: ObjectStatus = 'normal';
@@ -95,22 +94,25 @@ export class VineSprout implements ObjectInstance {
     grow(state: GameState) {
         state.savedState.objectFlags[this.definition.id] = true;
         saveGame();
-        this.growing = true;
-        this.behaviors = {
-            ...this.behaviors,
-            solid: false,
-        };
-        this.growingY = (this.y / 16) | 0;
-        this.growingFrameTime = this.growingTime = 0;
-        this.growingAnimationA = baseGrowAnimation;
-        this.growingAnimationB = middleGrowAnimationA;
+        this.sprouting = true;
+        this.animationTime = 0;
     }
     getHitbox(state: GameState): Rect {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;
-        if (this.growing) {
+        if (this.sprouting) {
+            if (this.animationTime >= sproutingAnimation.duration) {
+                this.animationTime = 0;
+                this.sprouting = false;
+                this.growing = true;
+                this.growingY = (this.y / 16) | 0;
+                this.growingFrameTime = this.growingTime = 0;
+                this.growingAnimationA = baseGrowAnimation;
+                this.growingAnimationB = middleGrowAnimationA;
+            }
+        } else if (this.growing) {
             this.growingTime += FRAME_LENGTH;
             // As each portion of the vine growing animation finishes, add the actual vine tiles to the map.
             const tx = (this.x / 16) | 0;
@@ -171,7 +173,11 @@ export class VineSprout implements ObjectInstance {
         }
     }
     render(context, state: GameState) {
-        if (this.growing) {
+        if (this.sprouting) {
+            const frame = getFrame(sproutingAnimation, this.animationTime);
+            // Offset where this is drawn so that it matches where the vine will grow.
+            drawFrame(context, frame, { ...frame, x: this.x, y: this.y - 11 });
+        } else if (this.growing) {
             let frame = getFrame(this.growingAnimationA, this.growingFrameTime);
             drawFrame(context, frame, { ...frame, x: this.x, y: this.growingY * 16 });
             const frameBTime = this.growingFrameTime - (this.growingAnimationA.duration - growOverlap);
@@ -180,8 +186,9 @@ export class VineSprout implements ObjectInstance {
                 drawFrame(context, frame, { ...frame, x: this.x, y: (this.growingY - 1) * 16 });
             }
         } else {
-            const frame = getFrame(sproutAnimation, this.animationTime);
-            drawFrame(context, frame, { ...frame, x: this.x, y: this.y });
+            const frame = getFrame(sproutIdleAnimation, this.animationTime);
+            // Offset where this is drawn so that it matches where the vine will grow.
+            drawFrame(context, frame, { ...frame, x: this.x, y: this.y - 11 });
         }
     }
 }

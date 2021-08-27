@@ -61,8 +61,6 @@ export function getHeroFrame(state: GameState, hero: Hero): Frame {
         case 'pushing':
             animations = hero.wading ? heroShallowAnimations.push : heroAnimations.push;
             break;
-        case 'entering':
-        case 'exiting':
         case 'walking':
             if (isHeroFloating(state, hero)) {
                 return heroAnimations.roll[hero.d].frames[0];

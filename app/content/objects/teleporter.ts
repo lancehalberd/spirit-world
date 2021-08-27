@@ -48,7 +48,8 @@ export class Teleporter implements ObjectInstance {
         if (hero.actionTarget === this) {
             if (hero.y > this.y + 16) {
                 hero.actionTarget = null;
-                hero.action = null;
+                hero.isExiting = false;
+                hero.isEntering = false;
                 hero.safeD = hero.d;
                 hero.safeX = hero.x;
                 hero.safeY = hero.y;
@@ -79,7 +80,8 @@ export class Teleporter implements ObjectInstance {
                     // We need to reassign hero after calling `enterZoneByTarget` because the active hero may change
                     // from one clone to another when changing zones.
                     hero = state.hero.activeClone || state.hero;
-                    hero.action = 'exiting';
+                    hero.isEntering = false;
+                    hero.isExiting = true;
                     const target = findObjectInstanceById(state.areaInstance, this.definition.targetObjectId) as Teleporter;
                     if (!target){
                         console.error(state.areaInstance.objects);

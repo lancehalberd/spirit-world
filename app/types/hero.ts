@@ -7,7 +7,7 @@ import {
 export type Action =
     'attack' | 'charging' | 'roll' | 'knocked' | 'hurt' | 'dead' | 'walking'
     | 'pushing' | 'grabbing' | 'carrying' | 'throwing' | 'thrown' | 'getItem'
-    | 'beingCarried' | 'entering' | 'exiting'
+    | 'beingCarried'
     | 'falling' | 'fallen' | 'meditating'
     // Used for climbing vines on walls or ladders. The player moves more slowly and cannot use abilities while climbing.
     | 'climbing'
@@ -92,6 +92,9 @@ export interface Actor extends ObjectInstance {
     sinking?: boolean
     inAirBubbles?: boolean
     frozenDuration?: number
+    // These flags are set when an actor is being forced to move through door objects.
+    isEntering?: boolean
+    isExiting?: boolean
 }
 /* In case using the Hero class causes dependency issues, maybe switching to this interface could help.
 export interface Hero extends Actor, SavedHeroData {

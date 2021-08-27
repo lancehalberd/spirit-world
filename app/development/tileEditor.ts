@@ -388,7 +388,21 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
         name: 'Add Layer',
         onClick() {
             const definition = state.areaInstance.definition;
-            const alternateDefinition = state.alternateAreaInstance.definition;
+            const lastLayer = definition.layers[definition.layers.length - 1];
+            const previousLayerKey = editingState.selectedLayerKey || lastLayer.key;
+            const previousLayerIndex = definition.layers.findIndex(layer => layer.key === previousLayerKey);
+            const lastLayerIndex = layersInOrder.indexOf(previousLayerKey);
+            let key = 'layer-' + definition.layers.length;
+            if (lastLayerIndex + 1 < layersInOrder.length) {
+                // Use the next default layer key.
+                key = layersInOrder[lastLayerIndex + 1];
+                // If the key is in use, go back to the default key.
+                if (definition.layers.find(layer => layer.key === key)) {
+                    key = 'layer-' + definition.layers.length;
+                }
+            }
+            addNewLayer(state, key, previousLayerIndex + 1);
+            /*const alternateDefinition = state.alternateAreaInstance.definition;
             const key = 'layer-' + definition.layers.length;
             const topLayerDefinition = definition.layers[definition.layers.length - 1];
             const alternateTopLayerDefinition = alternateDefinition.layers[alternateDefinition.layers.length - 1];
@@ -413,8 +427,11 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
             initializeAreaLayerTiles(layerDefinition);
             initializeAreaLayerTiles(alternateLayerDefinition);
             definition.layers.push(layerDefinition);
-            alternateDefinition.layers.push(alternateLayerDefinition);
+            alternateDefinition.layers.push(alternateLayerDefinition);*/
             // Calling this will instantiate the area again and place the player back in their current location.
+            if (editingState.selectedLayerKey) {
+                editingState.selectedLayerKey = key;
+            }
             enterLocation(state, state.location);
             displayTileEditorPropertyPanel();
         }
@@ -721,11 +738,79 @@ function updateBrushSelection(x: number, y: number): void {
     }
     updateBrushCanvas(editingState.brush);
 }
+
+const layersInOrder = ['floor', 'floor2', 'field', 'field2', 'foreground', 'foreground2'];
+function addNewLayer(state: GameState, layerKey: string, layerIndex: number) {
+    const definition = state.areaInstance.definition;
+    const alternateDefinition = state.alternateAreaInstance.definition;
+    const topLayerDefinition = definition.layers[definition.layers.length - 1];
+    const alternateTopLayerDefinition = alternateDefinition.layers[alternateDefinition.layers.length - 1];
+    const layerDefinition: AreaLayerDefinition = {
+        ...topLayerDefinition,
+        key: layerKey,
+        grid: {
+            ...topLayerDefinition.grid,
+            // The matrix of tiles
+            tiles: [],
+        },
+    };
+    const alternateLayerDefinition: AreaLayerDefinition = {
+        ...alternateTopLayerDefinition,
+        key: layerKey,
+        grid: {
+            ...alternateTopLayerDefinition.grid,
+            // The matrix of tiles
+            tiles: [],
+        },
+    };
+    initializeAreaLayerTiles(layerDefinition);
+    initializeAreaLayerTiles(alternateLayerDefinition);
+    definition.layers.splice(layerIndex, 0, layerDefinition);
+    alternateDefinition.layers.splice(layerIndex, 0, alternateLayerDefinition);
+}
+function addMissingLayer(state: GameState, layerKey: string) {
+    const layerIndex = layersInOrder.indexOf(layerKey);
+    const definition = state.areaInstance.definition;
+    for (let i = 0; i < definition.layers.length; i++) {
+        if (layersInOrder.indexOf(definition.layers[i].key) > layerIndex) {
+            return addNewLayer(state, layerKey, i);
+        }
+    }
+}
 function drawBrush(x: number, y: number): void {
     const state = getState();
     const sy = Math.floor((state.camera.y + y) / 16);
     const sx = Math.floor((state.camera.x + x) / 16);
     const area = state.areaInstance;
+    if (!editingState.selectedLayerKey) {
+        let addedNewLayer = false;
+        for (let layerKey in editingState.brush) {
+            if (layerKey === 'none') {
+                const brushGrid = editingState.brush.none;
+                for (let y = 0; y < brushGrid.h; y++) {
+                    for (let x = 0; x < brushGrid.w; x++) {
+                        const tile = brushGrid.tiles[y][x];
+                        let fullTile = allTiles[tile];
+                        const defaultLayer = fullTile ? (fullTile.behaviors?.defaultLayer || 'floor') : 'field';
+                        if (!area.definition.layers.find(layer => layer.key === defaultLayer)) {
+                            addMissingLayer(state, defaultLayer);
+                            addedNewLayer = true;
+                        }
+                    }
+                }
+            } else {
+                if (!area.definition.layers.find(layer => layer.key === layerKey)) {
+                    addMissingLayer(state, layerKey);
+                    addedNewLayer = true;
+                }
+            }
+        }
+        if (addedNewLayer) {
+            // Calling this will instantiate the area again and place the player back in their current location.
+            enterLocation(state, state.location);
+            displayTileEditorPropertyPanel();
+        }
+    }
     for (const layer of area.layers) {
         const layerDefinition = layer.definition;
         const parentLayer = area.definition.parentDefinition?.layers?.find(parentLayer => parentLayer.key === layer.key);

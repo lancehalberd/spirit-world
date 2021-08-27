@@ -44,8 +44,6 @@ export function getSpiritFrame(state: GameState, hero: Hero): Frame {
         case 'pushing':
             animations = heroSpiritAnimations.push;
             break;
-        case 'entering':
-        case 'exiting':
         case 'walking':
             animations = heroSpiritAnimations.move;
             break;

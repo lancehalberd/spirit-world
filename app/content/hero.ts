@@ -65,6 +65,8 @@ export class Hero implements Actor, SavedHeroData {
     sinking?: boolean;
     inAirBubbles?: boolean;
     frozenDuration?: number;
+    isEntering?: boolean;
+    isExiting?: boolean;
     // stats
     magic: number = 0;
     // base: 20, max: 100, roll: 5, charge: 10, double-charge: 50

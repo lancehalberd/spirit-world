@@ -432,7 +432,7 @@ export class Door implements ObjectInstance {
         }
         const heroIsTouchingDoor = boxesIntersect(hero, this.getHitbox(state));
         if ((!hero.actionTarget || hero.actionTarget === this) && heroIsTouchingDoor) {
-            let shouldEnterDoor = (hero.action !== 'entering' && hero.action !== 'exiting');
+            let shouldEnterDoor = (!hero.isEntering && !hero.isExiting);
             if (!shouldEnterDoor && hero.actionTarget !== this) {
                 const direction = getDirection(-hero.actionDx, -hero.actionDy);
                 // If the hero is moving in the direction opposite this door, then we should take over the movement,
@@ -442,7 +442,7 @@ export class Door implements ObjectInstance {
                 }
             }
             if (shouldEnterDoor && hero.actionTarget !== this) {
-                hero.action = 'entering';
+                hero.isEntering = true;
                 hero.actionFrame = 0;
                 hero.actionTarget = this;
                 hero.actionDx = 0;
@@ -473,7 +473,8 @@ export class Door implements ObjectInstance {
                     changedZones = this.travelToZone(state);
                     // 'ladderUp' is only for changing zones so make the hero climb back down if changing zones fails.
                     if (!changedZones) {
-                        hero.action = 'exiting';
+                        hero.isEntering = false;
+                        hero.isExiting = true;
                         hero.actionDx = -directionMap[this.definition.d][0];
                         hero.actionDy = -directionMap[this.definition.d][1];
                     }
@@ -484,7 +485,8 @@ export class Door implements ObjectInstance {
                     changedZones = this.travelToZone(state);
                     // 'ladderDown' is only for changing zones so make the hero climb back down if changing zones fails.
                     if (!changedZones) {
-                        hero.action = 'exiting';
+                        hero.isEntering = false;
+                        hero.isExiting = true;
                         hero.actionDx = -directionMap[this.definition.d][0];
                         hero.actionDy = -directionMap[this.definition.d][1];
                     }
@@ -493,7 +495,8 @@ export class Door implements ObjectInstance {
                 changedZones = (!isPointInShortRect(x, y, hitbox) || isObjectInsideTarget(hero, hitbox)) && this.travelToZone(state);
             }
             if (!changedZones && !heroIsTouchingDoor) {
-                hero.action = null;
+                hero.isEntering = false;
+                hero.isExiting = false;
                 hero.actionTarget = null;
                 hero.actionDx = 0;
                 hero.actionDy = 0;
@@ -505,14 +508,15 @@ export class Door implements ObjectInstance {
     }
     travelToZone(state: GameState) {
         let hero = state.hero.activeClone || state.hero;
-        if (hero.action === 'exiting' || !this.definition.targetZone || !this.definition.targetObjectId) {
+        if (hero.isExiting || !this.definition.targetZone || !this.definition.targetObjectId) {
             return false;
         }
         return enterZoneByTarget(state, this.definition.targetZone, this.definition.targetObjectId, this.definition, false, () => {
             // We need to reassign hero after calling `enterZoneByTarget` because the active hero may change
             // from one clone to another when changing zones.
             hero = state.hero.activeClone || state.hero;
-            hero.action = 'exiting';
+            hero.isEntering = false;
+            hero.isExiting = true;
             const target = findObjectInstanceById(state.areaInstance, this.definition.targetObjectId) as Door;
             if (!target){
                 console.error(state.areaInstance.objects);

@@ -488,9 +488,9 @@ const cloudAngles: TileSource = {
 
 const vineBase: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/vines.png'), x: 112, y: 0, w: 16, h: 16},
+    source: {image: requireImage('gfx/tiles/vines.png'), x: 48, y: 0, w: 16, h: 16},
     behaviors: {
-        'all': climbableWall,
+        'all': { defaultLayer: 'field' },
     },
 };
 const vineMiddle: TileSource = {
@@ -502,9 +502,9 @@ const vineMiddle: TileSource = {
 };
 const vineTop: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/vines.png'), x: 128, y: 48, w: 16, h: 16},
+    source: {image: requireImage('gfx/tiles/vines.png'), x: 80, y: 48, w: 16, h: 16},
     behaviors: {
-        'all': climbableWall
+        'all': { defaultLayer: 'field' },
     },
 };
 
