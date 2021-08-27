@@ -71,6 +71,14 @@ export function updateAllHeroes(this: void, state: GameState) {
 }
 
 export function updateHero(this: void, state: GameState, hero: Hero) {
+    if (hero.isEntering || hero.isExiting) {
+        hero.action = 'walking';
+        hero.animationTime += FRAME_LENGTH;
+        // This makes sure the hero displays as swimming/climbing.
+        checkForFloorEffects(state, hero);
+        updateScreenTransition(state, hero);
+        return;
+    }
     if (hero.invulnerableFrames > 0) {
         hero.invulnerableFrames--;
     }
@@ -83,7 +91,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         movementSpeed *= 2;
     }
 
-    const { w, h, section } = getAreaSize(state);
+    const { section } = getAreaSize(state);
 
     const isCloneToolDown = (state.hero.leftTool === 'clone' && isGameKeyDown(state, GAME_KEY.LEFT_TOOL))
         || (state.hero.rightTool === 'clone' && isGameKeyDown(state, GAME_KEY.RIGHT_TOOL));
@@ -193,13 +201,13 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         movementSpeed = 0;
         hero.vx = 0;
         hero.vy = 0;
-        if (state.nextAreaInstance.cameraOffset.x && !state.hero.isEntering) {
+        if (state.nextAreaInstance.cameraOffset.x) {
             // We need to make sure this is low enough that the character doesn't get entirely into the second column,
             // otherwise horizontal doors won't work as expected.
             //dx = 0.75 * state.nextAreaInstance.cameraOffset.x / Math.abs(state.nextAreaInstance.cameraOffset.x);
             hero.x += 0.75 * state.nextAreaInstance.cameraOffset.x / Math.abs(state.nextAreaInstance.cameraOffset.x);
         }
-        if (state.nextAreaInstance.cameraOffset.y && !state.hero.isEntering) {
+        if (state.nextAreaInstance.cameraOffset.y) {
             //dy = 1 * state.nextAreaInstance.cameraOffset.y / Math.abs(state.nextAreaInstance.cameraOffset.y);
             hero.y += 0.5 * state.nextAreaInstance.cameraOffset.y / Math.abs(state.nextAreaInstance.cameraOffset.y);
         }
@@ -227,12 +235,6 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         hero.vy = 0;
         hero.y += 0.5;
         //dy = 1;
-    } else if (!isAstralProjection && (hero.isEntering || hero.isExiting)) {
-        // The door will move the player until the action is complete.
-        movementSpeed = 0;
-        hero.vx = 0;
-        hero.vy = 0;
-        hero.actionFrame++;
     } else if (!isAstralProjection && hero.action === 'climbing') {
         movementSpeed *= 0.5;
     }  else if (!isAstralProjection && hero.action === 'falling') {
@@ -451,20 +453,18 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         }
     }
     if (!isFrozen && (hero.chargingLeftTool || hero.chargingRightTool)) {
-        if (!hero.isEntering && !hero.isExiting) {
-            movementSpeed *= 0.75;
-            hero.chargeTime += FRAME_LENGTH;
-            hero.action = 'charging';
-            if (hero.chargingLeftTool && !isGameKeyDown(state, GAME_KEY.LEFT_TOOL)) {
-                hero.toolCooldown = 200;
-                useTool(state, hero, hero.leftTool, hero.actionDx, hero.actionDy);
-                hero.chargingLeftTool = false;
-            }
-            if (hero.chargingRightTool && !isGameKeyDown(state, GAME_KEY.RIGHT_TOOL)) {
-                hero.toolCooldown = 200;
-                useTool(state, hero, hero.rightTool, hero.actionDx, hero.actionDy);
-                hero.chargingRightTool = false;
-            }
+        movementSpeed *= 0.75;
+        hero.chargeTime += FRAME_LENGTH;
+        hero.action = 'charging';
+        if (hero.chargingLeftTool && !isGameKeyDown(state, GAME_KEY.LEFT_TOOL)) {
+            hero.toolCooldown = 200;
+            useTool(state, hero, hero.leftTool, hero.actionDx, hero.actionDy);
+            hero.chargingLeftTool = false;
+        }
+        if (hero.chargingRightTool && !isGameKeyDown(state, GAME_KEY.RIGHT_TOOL)) {
+            hero.toolCooldown = 200;
+            useTool(state, hero, hero.rightTool, hero.actionDx, hero.actionDy);
+            hero.chargingRightTool = false;
         }
     } else if (!isFrozen && (heldChakram || hero.action === 'charging')) {
         movementSpeed *= 0.75;
@@ -510,9 +510,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         }
     }
     if (heldChakram && heldChakram.area === hero.area && heldChakram.hero === hero && hero.action !== 'charging') {
-        if (hero.isEntering || hero.isExiting) {
-            // take no action while hero is controlled by door.
-        } else if (!hero.action && isGameKeyDown(state, GAME_KEY.WEAPON) && canCharge) {
+        if (!hero.action && isGameKeyDown(state, GAME_KEY.WEAPON) && canCharge) {
             // resume charing if the weapon button is still down.
             hero.action = 'charging';
             hero.actionDx = heldChakram.vx;
@@ -795,52 +793,6 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             }
         }
     }
-    // Check for transition to other areas/area sections.
-    const isMovingThroughZoneDoor = hero.actionTarget?.definition?.type === 'door'
-        && hero.actionTarget.definition.targetZone
-        && hero.actionTarget.definition.targetObjectId
-    // Do not trigger the scrolling transition when traveling through a zone door.
-    // Zone doors will eventually use a screen wipe transition.
-    if (!isAstralProjection && !state.nextAreaSection && !state.nextAreaInstance && !isMovingThroughZoneDoor) {
-        // We only move to the next area if the player is moving in the direction of that area.
-        // dx/dy handles most cases, but in some cases like moving through doorways we also need to check
-        // hero.actionDx
-        if (hero.x < 0 && (hero.vx < 0 || hero.actionDx < 0)) {
-            state.location.areaGridCoords = {
-                x: (state.location.areaGridCoords.x + state.areaGrid[0].length - 1) % state.areaGrid[0].length,
-                y: state.location.areaGridCoords.y,
-            };
-            scrollToArea(state, getAreaFromLocation(state.location), 'left');
-        } else if (hero.x + hero.w > w && (hero.vx > 0 || hero.actionDx > 0)) {
-            state.location.areaGridCoords = {
-                x: (state.location.areaGridCoords.x + 1) % state.areaGrid[0].length,
-                y: state.location.areaGridCoords.y,
-            };
-            scrollToArea(state, getAreaFromLocation(state.location), 'right');
-        } else if (hero.x < section.x && (hero.vx < 0 || hero.actionDx < 0)) {
-            setNextAreaSection(state, 'left');
-        } else if (hero.x + hero.w > section.x + section.w && (hero.vx > 0 || hero.actionDx > 0)) {
-            setNextAreaSection(state, 'right');
-        }
-        const isHeroMovingDown = (hero.vy > 0 || hero.actionDy > 0 || (hero.action === 'jumpingDown' && hero.vy > 0));
-        if (hero.y < 0 && (hero.vy < 0 || hero.actionDy < 0)) {
-            state.location.areaGridCoords = {
-                x: state.location.areaGridCoords.x,
-                y: (state.location.areaGridCoords.y + state.areaGrid.length - 1) % state.areaGrid.length,
-            };
-            scrollToArea(state, getAreaFromLocation(state.location), 'up');
-        } else if (hero.y + hero.h > h && isHeroMovingDown) {
-            state.location.areaGridCoords = {
-                x: state.location.areaGridCoords.x,
-                y: (state.location.areaGridCoords.y + 1) % state.areaGrid.length,
-            };
-            scrollToArea(state, getAreaFromLocation(state.location), 'down');
-        } else if (hero.y < section.y && (hero.vy < 0 || hero.actionDy < 0)) {
-            setNextAreaSection(state, 'up');
-        } else if (hero.y + hero.h > section.y + section.h && isHeroMovingDown) {
-            setNextAreaSection(state, 'down');
-        }
-    }
     if (hero.life <= 0) {
         state.defeatState.defeated = true;
         state.defeatState.time = 0;
@@ -914,8 +866,64 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
     if (state.hero.magic > state.hero.maxMagic) {
         state.hero.magic = state.hero.maxMagic;
     }
+    updateScreenTransition(state, hero);
     state.location.x = state.hero.x;
     state.location.y = state.hero.y;
+}
+
+export function updateScreenTransition(state: GameState, hero: Hero) {
+    if (hero.isAstralProjection) {
+        return;
+    }
+    // Check for transition to other areas/area sections.
+    const isMovingThroughZoneDoor = hero.actionTarget?.definition?.type === 'door'
+        && hero.actionTarget.definition.targetZone
+        && hero.actionTarget.definition.targetObjectId
+    // Do not trigger the scrolling transition when traveling through a zone door.
+    // Zone doors will eventually use a screen wipe transition.
+    if (state.nextAreaSection || state.nextAreaInstance || isMovingThroughZoneDoor) {
+        return;
+    }
+
+    const { w, h, section } = getAreaSize(state);
+    // We only move to the next area if the player is moving in the direction of that area.
+    // dx/dy handles most cases, but in some cases like moving through doorways we also need to check
+    // hero.actionDx
+    if (hero.x < 0 && (hero.vx < 0 || hero.actionDx < 0)) {
+        state.location.areaGridCoords = {
+            x: (state.location.areaGridCoords.x + state.areaGrid[0].length - 1) % state.areaGrid[0].length,
+            y: state.location.areaGridCoords.y,
+        };
+        scrollToArea(state, getAreaFromLocation(state.location), 'left');
+    } else if (hero.x + hero.w > w && (hero.vx > 0 || hero.actionDx > 0)) {
+        state.location.areaGridCoords = {
+            x: (state.location.areaGridCoords.x + 1) % state.areaGrid[0].length,
+            y: state.location.areaGridCoords.y,
+        };
+        scrollToArea(state, getAreaFromLocation(state.location), 'right');
+    } else if (hero.x < section.x && (hero.vx < 0 || hero.actionDx < 0)) {
+        setNextAreaSection(state, 'left');
+    } else if (hero.x + hero.w > section.x + section.w && (hero.vx > 0 || hero.actionDx > 0)) {
+        setNextAreaSection(state, 'right');
+    }
+    const isHeroMovingDown = (hero.vy > 0 || hero.actionDy > 0 || (hero.action === 'jumpingDown' && hero.vy > 0));
+    if (hero.y < 0 && (hero.vy < 0 || hero.actionDy < 0)) {
+        state.location.areaGridCoords = {
+            x: state.location.areaGridCoords.x,
+            y: (state.location.areaGridCoords.y + state.areaGrid.length - 1) % state.areaGrid.length,
+        };
+        scrollToArea(state, getAreaFromLocation(state.location), 'up');
+    } else if (hero.y + hero.h > h && isHeroMovingDown) {
+        state.location.areaGridCoords = {
+            x: state.location.areaGridCoords.x,
+            y: (state.location.areaGridCoords.y + 1) % state.areaGrid.length,
+        };
+        scrollToArea(state, getAreaFromLocation(state.location), 'down');
+    } else if (hero.y < section.y && (hero.vy < 0 || hero.actionDy < 0)) {
+        setNextAreaSection(state, 'up');
+    } else if (hero.y + hero.h > section.y + section.h && isHeroMovingDown) {
+        setNextAreaSection(state, 'down');
+    }
 }
 
 export function checkForEnemyDamage(state: GameState, hero: Hero) {
