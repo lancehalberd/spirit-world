@@ -24,7 +24,13 @@ import { checkForFloorEffects, moveActor } from 'app/moveActor';
 import { fallAnimation } from 'app/render/heroAnimations';
 import { useTool } from 'app/useTool';
 import { isHeroFloating, isHeroSinking } from 'app/utils/actor';
-import { canTeleportToCoords, directionMap, getDirection, isPointOpen } from 'app/utils/field';
+import {
+    canTeleportToCoords,
+    directionMap,
+    getDirection,
+    getTileBehaviorsAndObstacles,
+    isPointOpen,
+} from 'app/utils/field';
 import { rectanglesOverlap } from 'app/utils/index';
 import { playSound } from 'app/utils/sounds';
 
@@ -76,6 +82,67 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         hero.animationTime += FRAME_LENGTH;
         // This makes sure the hero displays as swimming/climbing.
         checkForFloorEffects(state, hero);
+        updateScreenTransition(state, hero);
+        return;
+    }
+    if (hero.action === 'jumpingDown' && !editingState.isEditing) {
+        // Maybe we should add a jumping down animation, but for now we play the roll
+        // animation slowed down a bit.
+        hero.animationTime += 8;
+        // Freeze at the leaping frame, the flip looks bad if the jump isn't the right length.
+        hero.animationTime = Math.min(hero.animationTime, 100);
+        const groundZ = hero.equipedGear?.cloudBoots ? 1 : 0;
+        if (hero.jumpDirection === 'down') {
+            // After the hero has jumped a bit, we stop the jump when they hit a position they can successfully move to.
+            let shouldLand = false;
+            // As the hero approaches each new row of tiles, check if they should land on this row of tiles.
+            // The player can fall as many as 4 pixels per frame, so we check when the user is in the last 4 pixels
+            // of the previous row.
+            if (hero.y % 16 >= 12) {
+                const y = ((hero.y / 16) | 0) * 16 + 16;
+                const excludedObjects = new Set([hero]);
+                const { tileBehavior: b1 } = getTileBehaviorsAndObstacles(state, hero.area, {x: hero.x, y }, excludedObjects, state.nextAreaInstance);
+                const { tileBehavior: b2 } = getTileBehaviorsAndObstacles(state, hero.area, {x: hero.x + hero.w - 1, y}, excludedObjects, state.nextAreaInstance);
+                // console.log(hero.x, y, b1.solid, b1.cannotLand, b2.solid, b2.cannotLand);
+                shouldLand = !b1.solid && !b2.solid && !b1.cannotLand && !b2.cannotLand;
+            }
+            if (shouldLand) {
+                hero.z = groundZ;
+                hero.y = ((hero.y / 16) | 0) * 16 + 16;
+                hero.action = null;
+                hero.animationTime = 0;
+                checkForFloorEffects(state, hero);
+            } else {
+                hero.x += hero.jumpingVx;
+                hero.y += hero.jumpingVy;
+                hero.z += hero.jumpingVz;
+                // Don't allow z to fall below 4 until landing so the shadow stays small while falling.
+                if (hero.z <= 4) {
+                    hero.y += (4 - hero.z);
+                    hero.z = 4;
+                }
+                // Since the player can fall arbitrarily far when jumping in the 'down' direction,
+                // we limit them with a terminal velocity of -2 (so net -4 vy when hitting min z value)
+                hero.jumpingVz = Math.max(-2, hero.jumpingVz - 0.5);
+            }
+        } else {
+            // When jumping any direction but down, the jump is precomputed so we just
+            // move the character along the arc until they reach the ground.
+            hero.x += hero.jumpingVx;
+            hero.y += hero.jumpingVy;
+            hero.z += hero.jumpingVz;
+            hero.jumpingVz -= 0.5;
+            // console.log([hero.x, hero.y, hero.z], ' -> ', [hero.jumpingVx, hero.jumpingVy, hero.jumpingVz]);
+            if (hero.z <= groundZ) {
+                hero.z = groundZ
+                hero.action = null;
+                hero.animationTime = 0;
+                checkForFloorEffects(state, hero);
+            }
+        }
+        // Make sure vx/vy are updated for screen transition/slipping logic on landing.
+        hero.vx = hero.jumpingVx;
+        hero.vy = hero.jumpingVy;
         updateScreenTransition(state, hero);
         return;
     }
@@ -209,7 +276,12 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         }
         if (state.nextAreaInstance.cameraOffset.y) {
             //dy = 1 * state.nextAreaInstance.cameraOffset.y / Math.abs(state.nextAreaInstance.cameraOffset.y);
-            hero.y += 0.5 * state.nextAreaInstance.cameraOffset.y / Math.abs(state.nextAreaInstance.cameraOffset.y);
+            const dy = state.nextAreaInstance.cameraOffset.y / Math.abs(state.nextAreaInstance.cameraOffset.y);
+            if (dy > 0 && hero.y < 512 + 32) {
+                hero.y += 0.5;
+            } else if (dy < 0 && hero.y > - 32) {
+                hero.y -= 0.5;
+            }
         }
     } else if (!isAstralProjection && hero.x + hero.w > section.x + section.w + 1) {
         movementSpeed = 0;
@@ -274,27 +346,6 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             if (hero.life > 0) {
                 hero.action = null;
             }
-        }
-    } else if (!isAstralProjection && hero.action === 'jumpingDown') {
-        movementSpeed = 0;
-        // After the hero has jumped a bit, we stop the jump when they hit a position they can successfully move to.
-        let canMove = false;
-        if (hero.vy > 4) {
-            const { mx, my } = moveActor(state, hero, hero.vx / 4, hero.vy / 4, {canFall: true, canSwim: true});
-            canMove = mx !== 0 || my !== 0;
-        }
-        if (canMove) {
-            if (hero.vy > 0 && hero.y % 16 > 0) {
-                hero.y = hero.y - (hero.y % 16) + 16;
-            }
-            hero.action = null;
-            hero.animationTime = 0;
-        } else {
-            // This is necessary to ignore any changes to actions that calling `moveActor` might trigger.
-            hero.action = 'jumpingDown';
-            hero.x += hero.vx;
-            hero.y += hero.vy;
-            hero.vy = Math.min(8, hero.vy + 0.5);
         }
     } else if (!isAstralProjection && hero.action === 'beingCarried') {
         // The clone will update itself to match its carrier.

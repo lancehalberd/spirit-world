@@ -50,6 +50,7 @@ export function saveGame(): void {
     //if (state.savedGameIndex < state.savedGames.length) {
     //    state.savedGames[state.savedGameIndex] = state.savedState;
     //}
+    state.savedGames[state.savedGameIndex] = state.savedState;
     const seed = readGetParameter('seed');
     // console.log(exportState(getState()));
     try {

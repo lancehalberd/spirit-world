@@ -207,8 +207,8 @@ const f1_0x0: AreaDefinition = {
         {id: "treeVillage:1:0x0-door-0", linked: undefined, spirit: false, status: "normal", x: 224, y: 384, type: "door", style: "cave", targetZone: null, targetObjectId: null, d: "right"},
         {id: "closedBowDoor", linked: undefined, spirit: false, status: "closedSwitch", x: 256, y: 384, type: "door", style: "cave", targetZone: null, targetObjectId: null, d: "left", saveStatus: true, logicKey: "hasMediumRange"},
         {id: "treeVillage:1:0x0-bow-0", linked: false, spirit: false, status: "normal", x: 368, y: 368, type: "chest", lootType: "bow", lootLevel: 1, lootAmount: 1},
-        {id: "bowSwitch1", linked: false, spirit: false, status: "normal", x: 448, y: 304, type: "crystalSwitch", element: null, timer: 0, saveStatus: true},
-        {id: "bowSwitch2", linked: false, spirit: false, status: "normal", x: 448, y: 448, type: "crystalSwitch", element: null, timer: 0, saveStatus: true},
+        {id: "bowSwitch1", linked: false, spirit: false, status: "normal", x: 448, y: 304, type: "crystalSwitch", element: null, timer: 0, saveStatus: true, targetObjectId: "closedBowDoor"},
+        {id: "bowSwitch2", linked: false, spirit: false, status: "normal", x: 448, y: 448, type: "crystalSwitch", element: null, timer: 0, saveStatus: true, targetObjectId: "closedBowDoor"},
         {id: "openBowDoor", linked: undefined, spirit: false, status: "normal", x: 256, y: 384, type: "door", style: "cave", targetZone: null, targetObjectId: null, d: "left", saveStatus: false, logicKey: "hasMediumRange", invertLogic: true},
     ],
     sections: [

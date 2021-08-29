@@ -2,7 +2,7 @@ import _ from 'lodash';
 
 import { getAreaSize } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { getTileBehaviorsAndObstacles, isPointOpen } from 'app/utils/field';
+import { directionMap, getTileBehaviorsAndObstacles, isPointOpen } from 'app/utils/field';
 
 import { Actor, Direction, GameState, Hero, MovementProperties } from 'app/types';
 
@@ -188,11 +188,69 @@ function moveActorInDirection(
         if (canJumpDown) {
             actor.jumpingTime = (actor.jumpingTime || 0) + FRAME_LENGTH;
             if (actor.jumpingTime >= 250) {
-                actor.action = 'jumpingDown';
+                const [dx, dy] = directionMap[direction];
+                if (direction === 'down') {
+                    actor.action = 'jumpingDown';
+                    actor.jumpDirection = direction;
+                    actor.jumpingVx = dx * 2;
+                    actor.jumpingVy = dy * 2;
+                    actor.jumpingVz = 4;
+                } else if (direction === 'up') {
+                    let targetY: number = null
+                    for (let i = 1; i <= 6; i++) {
+                        const y = Math.round(actor.y / 16 + i * dy) * 16;
+                        const { tileBehavior: b1 } = getTileBehaviorsAndObstacles(state, actor.area, {x: actor.x, y});
+                        const { tileBehavior: b2 } = getTileBehaviorsAndObstacles(state, actor.area, {x: actor.x + actor.w - 1, y});
+                        if (!b1.solid && !b2.solid && !b1.cannotLand && !b2.cannotLand) {
+                            targetY = y;
+                            break;
+                        }
+                    }
+                    //console.log(actor.x, targetY);
+                    if (targetY !== null) {
+                        const distance = actor.y - targetY;
+                        actor.action = 'jumpingDown';
+                        actor.jumpDirection = direction;
+                        //const speed = distance > 54 ? 4 : 2;
+                        const speed = Math.min(4, Math.round(distance / 15));
+                        const frames = Math.round(distance / speed);
+                        actor.jumpingVy = dy * distance / frames;
+                        actor.jumpingVx = 0;
+                        const az = -0.5;
+                        actor.jumpingVz = -(frames - 1) * az / 2;
+                    } else {
+                        actor.jumpingTime = 0;
+                    }
+                } else {
+                    let targetX: number = null
+                    for (let i = 1; i <= 6; i++) {
+                        const x = Math.round(actor.x / 16 + i * dx) * 16;
+                        const { tileBehavior: b1 } = getTileBehaviorsAndObstacles(state, actor.area, {x, y: actor.y});
+                        const { tileBehavior: b2 } = getTileBehaviorsAndObstacles(state, actor.area, {x, y: actor.y + actor.h - 1});
+                        //console.log(x, actor.y, b1.solid, b1.cannotLand, b2.solid, b2.cannotLand);
+                        if (!b1.solid && !b2.solid && !b1.cannotLand && !b2.cannotLand) {
+                            targetX = x;
+                            break;
+                        }
+                    }
+                    //console.log(targetX, actor.y);
+                    if (targetX !== null) {
+                        actor.action = 'jumpingDown';
+                        actor.jumpDirection = direction;
+                        const distance = Math.abs(actor.x - targetX);
+                        //const speed = distance > 54 ? 4 : 2;
+                        const speed = Math.min(4, Math.round(distance / 15));
+                        const frames = Math.round(distance / speed);
+                        actor.jumpingVx = dx * distance / frames;
+                        actor.jumpingVy = 0;
+                        const az = -0.5;
+                        actor.jumpingVz = -(frames - 1) * az / 2;
+                        //console.log(distance, frames, actor.jumpingVx, actor.jumpingVz);
+                    } else {
+                        actor.jumpingTime = 0;
+                    }
+                }
                 actor.animationTime = 0;
-                actor.vx = ax - actor.x;
-                // Make the actor "jump up" a bit at the start.
-                actor.vy = ay - actor.y - 2;
             }
         } else {
             actor.jumpingTime = 0;

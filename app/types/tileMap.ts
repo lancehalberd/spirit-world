@@ -13,6 +13,8 @@ export interface TileBehaviors {
     defaultLayer?: 'floor' | 'floor2' | 'field' | 'field2' | 'foreground' | 'foreground2',
     // In pixels
     lightRadius?: number,
+    // Flag set to indicate tile is invalid for landing on when jumping down a cliff.
+    cannotLand?: boolean,
     // Sets players action to 'climbing' while on the tile.
     climbable?: boolean,
     // Indicates this is a cloud ground tile that the player can walk on if they have cloud walking boots equipped.

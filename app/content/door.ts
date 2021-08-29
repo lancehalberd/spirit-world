@@ -296,14 +296,14 @@ export class Door implements ObjectInstance {
         const x = Math.floor(this.x / 16);
         const doorStyle = doorStyles[this.style];
         if (this.style === 'ladderDown') {
-            const behaviors: TileBehaviors = this.isOpen() ? { climbable: true } : { solid: true, low: false};
+            const behaviors: TileBehaviors = this.isOpen() ? { cannotLand: true, climbable: true } : { solid: true, low: false};
             applyBehaviorToTile(this.area, x, y, behaviors);
         } else if (this.style === 'ladderUp') {
-            const behaviors: TileBehaviors = this.isOpen() ? { climbable: true } : { solid: true, low: false};
+            const behaviors: TileBehaviors = this.isOpen() ? { cannotLand: true, climbable: true } : { solid: true, low: false};
             applyBehaviorToTile(this.area, x, y, behaviors);
             applyBehaviorToTile(this.area, x, y + 1, behaviors);
         } else if (doorStyle.w === 64) {
-            const behaviors: TileBehaviors = this.isOpen() ? { solid: false } : { solid: true, low: false};
+            const behaviors: TileBehaviors = this.isOpen() ? { cannotLand: true, solid: false } : { solid: true, low: false};
             if (this.definition.d === 'up' || this.definition.d === 'down') {
                 applyBehaviorToTile(this.area, x, y, behaviors);
                 applyBehaviorToTile(this.area, x + 1, y, behaviors);
@@ -316,7 +316,7 @@ export class Door implements ObjectInstance {
                 applyBehaviorToTile(this.area, x, y + 3, behaviors);
             }
         } else if (doorStyle.w === 32) {
-            const behaviors: TileBehaviors = { solid: true, solidMap: undefined, low: false};
+            const behaviors: TileBehaviors = { cannotLand: true, solid: true, solidMap: undefined, low: false};
             applyBehaviorToTile(this.area, x, y, behaviors);
             applyBehaviorToTile(this.area, x + 1, y, behaviors);
             applyBehaviorToTile(this.area, x, y + 1, behaviors);
@@ -427,7 +427,8 @@ export class Door implements ObjectInstance {
     update(state: GameState) {
         let hero = state.hero.activeClone || state.hero;
         // Nothing to update if the hero isn't in the same world as this door.
-        if (hero.area !== this.area) {
+        // Also, heroes cannot enter doors while they are jumping down.
+        if (hero.area !== this.area || hero.action === 'jumpingDown') {
             return;
         }
         const heroIsTouchingDoor = boxesIntersect(hero, this.getHitbox(state));
@@ -609,6 +610,10 @@ export class Door implements ObjectInstance {
         }
     }
     renderForeground(context: CanvasRenderingContext2D, state: GameState) {
+        // Don't render this in front of the hero when they are jumping down from a cliff.
+        if (state.hero.action === 'jumpingDown') {
+            return;
+        }
         const hitbox = this.getHitbox(state);
         // No need to render this unless the player is actually behind this.
         // This is a hack to keep this from rendering in front of the waterfall

@@ -17,6 +17,7 @@ import {
 
 
 const shadowFrame: Frame = createAnimation('gfx/shadow.png', { w: 16, h: 16 }).frames[0];
+const smallShadowFrame: Frame = createAnimation('gfx/smallshadow.png', { w: 16, h: 16 }).frames[0];
 
 let lastPullAnimation = null;
 export function getHeroFrame(state: GameState, hero: Hero): Frame {
@@ -163,7 +164,8 @@ export function renderHeroShadow(context: CanvasRenderingContext2D, state: GameS
     )) {
         return;
     }
-    drawFrame(context, shadowFrame, { ...shadowFrame, x: hero.x, y: hero.y - 3 - Y_OFF });
+    const frame = hero.z >= 4 ? smallShadowFrame : shadowFrame;
+    drawFrame(context, frame, { ...frame, x: hero.x, y: hero.y - 3 - Y_OFF });
 }
 export function renderExplosionRing(context: CanvasRenderingContext2D, state: GameState, hero: Hero): void {
     if (!(hero.explosionTime > 0)) {
@@ -186,10 +188,11 @@ export function renderExplosionRing(context: CanvasRenderingContext2D, state: Ga
 }
 
 export function renderEnemyShadow(context: CanvasRenderingContext2D, state: GameState, object: Enemy): void {
-    drawFrame(context, shadowFrame, { ...shadowFrame,
+    const frame = object.z >= 4 ? smallShadowFrame : shadowFrame;
+    drawFrame(context, frame, { ...frame,
         x: object.x + (object.w - shadowFrame.w) * object.scale / 2,
         y: object.y - 3 * object.scale,
-        w: shadowFrame.w * object.scale,
-        h: shadowFrame.h * object.scale,
+        w: frame.w * object.scale,
+        h: frame.h * object.scale,
     });
 }

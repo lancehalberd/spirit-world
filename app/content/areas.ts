@@ -375,6 +375,7 @@ export function enterZoneByTarget(
 }
 
 export function setNextAreaSection(state: GameState, d: Direction): void {
+    //console.log('setNextAreaSection', d);
     removeAllClones(state);
     state.nextAreaSection = state.areaInstance.definition.sections[0];
     const hero = state.hero;
@@ -413,6 +414,7 @@ export function switchToNextAreaSection(state: GameState): void {
 }
 
 export function setAreaSection(state: GameState, d: Direction, newArea: boolean = false): void {
+    //console.log('setAreaSection', state.hero.x, state.hero.y, d);
     const lastAreaSection = state.areaSection;
     state.areaSection = state.areaInstance.definition.sections[0];
     let x = Math.min(32, Math.max(0, (state.hero.x + 8) / 16));
@@ -433,6 +435,7 @@ export function setAreaSection(state: GameState, d: Direction, newArea: boolean 
 }
 
 export function scrollToArea(state: GameState, area: AreaDefinition, direction: Direction): void {
+    //console.log('scrollToArea', direction);
     removeAllClones(state);
     state.nextAreaInstance = createAreaInstance(state, area);
     if (direction === 'up') {

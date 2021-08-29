@@ -1,9 +1,9 @@
 import _ from 'lodash';
 
 import { simpleLootTable, lifeLootTable, moneyLootTable } from 'app/content/lootTables';
-import { createCanvasAndContext } from 'app/dom';
-import { createAnimation } from 'app/utils/animations';
-import { requireImage } from 'app/utils/images';
+import { createCanvasAndContext, debugCanvas } from 'app/dom';
+import { createAnimation, drawFrame } from 'app/utils/animations';
+import { allImagesLoaded, requireImage } from 'app/utils/images';
 
 import { Frame, FullTile, TileBehaviors } from 'app/types';
 
@@ -20,6 +20,7 @@ export interface TileSource {
     behaviors?: {
         [key: string]: TileBehaviors,
     },
+    tileCoordinates?: number[][],
 }
 
 const bushParticles: Frame[] = createAnimation('gfx/tiles/bush.png', {w: 16, h: 16}, {x: 2, cols: 3}).frames;
@@ -108,32 +109,93 @@ const spiritThornBehavior: TileBehaviors = {
     particles: spiritThornParticles,
 };
 
+let index = 1;
+function addSingleTileFromTileSource(tileSource: TileSource, x: number, y: number) {
+    const behaviors = tileSource.behaviors?.[`${x}x${y}`] || tileSource.behaviors?.all;
+    if (behaviors?.skipped) {
+        return;
+    }
+    const w = 16, h = 16;
+    allTiles[index] = {
+        index,
+        frame: {
+            image: tileSource.source.image,
+            x: tileSource.source.x + x * w,
+            y: tileSource.source.y + y * h,
+            w,
+            h
+        },
+        behaviors,
+    };
+    index++;
+}
+
 function addTiles(palettes: TileSource[]) {
     const w = 16, h = 16;
-    let index = 1;
     for (const palette of palettes) {
-        for (let py = 0; py < palette.source.h / h; py ++) {
-            for (let px = 0; px < palette.source.w / w; px ++) {
-                const behaviors = palette.behaviors?.[`${px}x${py}`] || palette.behaviors?.all;
-                if (behaviors?.skipped) {
-                    continue;
+        // Use specified array of coordinates if found.
+        if (palette.tileCoordinates) {
+            for (const coordinates of palette.tileCoordinates) {
+                const [x, y] = coordinates;
+                addSingleTileFromTileSource(palette, x, y);
+            }
+        } else {
+            // Otherwise loop over all coordinates.
+            for (let py = 0; py < palette.source.h / h; py ++) {
+                for (let px = 0; px < palette.source.w / w; px ++) {
+                    addSingleTileFromTileSource(palette, px, py);
                 }
-                allTiles[index] = {
-                    index,
-                    frame: {
-                        image: palette.source.image,
-                        x: palette.source.x + px * w,
-                        y: palette.source.y + py * h,
-                        w,
-                        h
-                    },
-                    behaviors,
-                };
-                index++;
             }
         }
     }
 }
+
+const emptyKey = [...new Array(16 * 16 * 4)].map(() => 0).join(',');
+export async function findUniqueTiles(source: Frame) {
+    await allImagesLoaded();
+    const [canvas, context] = createCanvasAndContext(source.w, source.h);
+    drawFrame(context, source, source);
+    debugCanvas(canvas);
+    context.fillStyle = 'red';
+    const imageData = context.getImageData(0, 0, source.w, source.h).data;
+    //console.log(imageData.length, source.w * source.h * 4);
+    const imageMap: {[key: string]: {x: number, y: number}} = {};
+    for (let y = 0; y < source.h; y += 16) {
+        for (let x = 0; x < source.w; x += 16) {
+            // Special exemption for CLIFF graphics.
+            if (x >= 368 && (y >= 64 && y < 192)) {
+                continue;
+            }
+            const pixels: string[] = [];
+            for (let sy = 0; sy < 16; sy++) {
+                const py = y + sy;
+                const i = (py * source.w + x) * 4;
+                const slice = imageData.slice(i, i + 16 * 4);
+                //console.log(slice.length, ':', slice);
+                pixels.push(slice.join(','));
+            }
+            const key = pixels.join(',');
+            if (key === emptyKey) {
+                continue;
+            }
+            if (!imageMap[key]) {
+                imageMap[key] = {x: x / 16, y: y / 16};
+            } else {
+                context.fillRect(x, y, 16, 16);
+            }
+        }
+    }
+    return Object.values(imageMap);
+}
+/*const allCliffTiles: Frame = {
+    image: requireImage('gfx/tiles/cliffwalls.png'),
+    x: 0, y: 0,
+    //w: 48, h: 48,
+    w: 368, h: 288,
+};
+allImagesLoaded().then(async () => {
+    console.log(await findUniqueTiles(allCliffTiles).map(o => `[${o.x},${o.y}]`).join(','));
+});*/
 
 function singleTileSource(source: string, behaviors: TileBehaviors = null, x = 0, y = 0, w = 16, h = 16): TileSource {
     return {
@@ -590,6 +652,100 @@ const treeStumpDoor: TileSource = {
     },
 };
 
+const crackedFloor: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/clifffloors.png'), x: 0, y: 0, w: 48, h: 16},
+    behaviors: {
+        'all': { defaultLayer: 'floor' },
+    },
+};
+
+const stairs: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/exteriorstairs.png'), x: 0, y: 0, w: 48, h: 64},
+    behaviors: {
+        'all': { defaultLayer: 'floor2' },
+    },
+    tileCoordinates: [[0,0],[1,0],[2,0],[0,1],[1,1],[2,1],[0,2],[2,2],[0,3],[1,3],[2,3]]
+};
+
+const cliffs: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/cliffwalls.png'), x: 0, y: 0, w: 48, h: 64},
+    behaviors: {
+        // use `floor2` as default so that the edges of these can appear on top of textured floor
+        'all': { defaultLayer: 'floor2', solid: true },
+        '4x2': { defaultLayer: 'floor2', solid: true, jumpDirection: 'up' },
+        '2x3': { defaultLayer: 'floor2', solid: true, jumpDirection: 'left' },
+        '6x3': { defaultLayer: 'floor2', solid: true, jumpDirection: 'right' },
+        '4x6': { defaultLayer: 'floor2', solid: true, jumpDirection: 'down' },
+        // Eventually would want to add solidMap behaviors for all the angled tiles here as well.
+    },
+    tileCoordinates: [
+        [0,0],[1,0],[8,0],             [9,0],[11,0],[17,0],
+        [0,1],[1,1],[2,1],[7,1],[8,1], [10,1],[13,1],[16,1],
+        [1,2],[4,2],[7,2],             [9,2],[11,2],[13,2],[15,2],[17,2],  [18,2],[19,2],[20,2],[21,2],
+        [2,3],[6,3],[8,3],             [11,3],[15,3],                      [18,3],[19,3],[20,3],[21,3],
+                                                                           [18,4], [19,4],[20,4],[21,4],
+                                                                           [18,5],[19,5],[20,5],
+        [2,6],[4,6],[6,6],             [11,6],[12,6],[15,6],               [18,6],[19,6],[20,6],[22,6],
+                                       [10,7],[16,7],                      [18,7],[19,7],
+        [0,8],[4,8],[8,8],             [9,8],[10,8],[17,8],                [18,8],[19,8],
+
+        [0,9],[1,9],[8,9],  [10,9],[13,9],[16,9],[19,9],
+        [0,10],[8,10],      [10,10],[11,10],[12,10],[13,10],[16,10],[17,10],[18,10],[19,10],
+                            [9,11],[10,11],[13,11],[14,11],[15,11],[16,11],[19,11],[20,11],
+                            [9,12],[10,12],[11,12],[12,12],[13,12],[14,12],[15,12],[16,12],[17,12],[18,12],[19,12],[20,12],
+                            [9,13],[10,13],[11,13],[12,13],[14,13],[15,13],[16,13],[17,13],[18,13],[19,13],[20,13],
+                            [10,14],[11,14],[12,14],[16,14],[17,14],[18,14],
+                            [10,15],[11,15],[12,15],[13,15],[16,15],[17,15],[18,15],[19,15],
+        [0,17],[1,17],[8,17]
+    ],
+};
+
+
+
+/*const newCliffTiles: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/CLIFF.png'), x: 0, y: 0, w: 560, h: 400},
+    behaviors: {
+        'all': { defaultLayer: 'floor2', solid: true, low: false },
+    },
+    tileCoordinates: [
+        [0,0],[1,0],[4,0],[5,0],[8,0],[9,0],[10,0],[11,0],[13,0],[19,0],[20,0],[21,0],
+        [22,0],[23,0],[28,0],[29,0], [30,0],[31,0],[32,0],[0,1],[1,1],[2,1],[7,1],[8,1],
+        [9,1],[10,1],[13,1],[19,1],[23,1],[28,1],[29,1],[31,1],[32,1],[1,2],[3,2],[4,2],
+        [7,2],[9,2],[13,2],[17,2],[18,2],[20,2],[21,2],[22,2],[23,2],[24,2],[25,2],[26,2],
+        [27,2],[33,2],[34,2],[0,3],[2,3],[3,3],[6,3],[8,3],[9,3],[13,3],[20,3],[21,3],
+        [22,3],[23,3],[0,4],[2,4],[6,4],[8,4],[9,4],[10,4],[13,4],[16,4],[19,4],[20,4],
+        [21,4],[22,4],[2,5],[6,5],[9,5],[10,5],[12,5],[13,5],[16,5],[17,5],[18,5],[19,5],
+        [20,5],[21,5],[22,5],[0,6],[2,6],[3,6],[4,6],[6,6],[8,6],[9,6],[10,6],[11,6],
+        [14,6],[17,6],[18,6],[20,6],[22,6],[2,7],[7,7],[11,7],[14,7],[17,7],[18,7],[20,7],
+        [21,7],[22,7],[0,8],[1,8],[4,8],[5,8],[8,8],[12,8],[13,8],[16,8],[17,8],[18,8],
+        [19,8],[20,8],[21,8],[22,8],[0,9],[1,9],[3,9],[4,9],[6,9],[8,9],[11,9],[13,9],
+        [16,9],[17,9],[18,9],[19,9],[0,10],[1,10],[2,10],[7,10],[8,10],[2,11],[3,11],
+        [4,11],[6,11],[9,11],[15,11],[2,12],[6,12],[9,12],[10,12],[14,12],[15,12],[19,12],
+        [20,12],[21,12],[22,12],[23,12],[24,12],[25,12],[26,12],[9,13],[15,13],[19,13],
+        [22,13],[23,13],[26,13],[29,13],[30,13],[31,13],[32,13],[2,14],[6,14],[11,14],
+        [12,14],[13,14],[19,14],[22,14],[23,14],[26,14],[29,14],[30,14],[31,14],[32,14],
+        [2,15],[3,15],[6,15],[19,15],[20,15],[21,15],[22,15],[23,15],[24,15],[25,15],
+        [26,15],[28,15],[29,15],[32,15],[33,15],[1,16],[7,16],[28,16],[29,16],[32,16],
+        [33,16],[0,17],[1,17],[2,17],[8,17],[19,17],[20,17],[24,17],[25,17],[28,17],
+        [29,17],[30,17],[31,17],[32,17],[33,17],[0,18],[1,18],[2,18],[3,18],[4,18],[5,18],
+        [7,18],[10,18],[13,18],[16,18],[19,18],[20,18],[24,18],[25,18],[30,18],[31,18],
+        [0,19],[1,19],[2,19],[3,19],[7,19],[8,19],[9,19],[10,19],[13,19],[14,19],[15,19],
+        [16,19],[21,19],[22,19],[23,19],[24,19],[25,19],[27,19],[28,19],[0,20],[1,20],
+        [2,20],[3,20],[6,20],[7,20],[10,20],[11,20],[12,20],[13,20],[16,20],[17,20],[21,20],
+        [25,20],[27,20],[28,20],[0,21],[1,21],[2,21],[6,21],[7,21],[8,21],[9,21],[10,21],
+        [11,21],[12,21],[13,21],[14,21],[15,21],[16,21],[17,21],[19,21],[20,21],[26,21],
+        [27,21],[0,22],[1,22],[2,22],[6,22],[7,22],[8,22],[9,22],[11,22],[12,22],[13,22],
+        [14,22],[15,22],[17,22],[19,22],[20,22],[22,22],[23,22],[24,22],[25,22],[26,22],
+        [0,23],[1,23],[7,23],[8,23],[9,23],[13,23],[14,23],[15,23],[19,23],[20,23],[22,23],
+        [26,23],[0,24],[1,24],[7,24],[8,24],[9,24],[10,24],[13,24],[14,24],[15,24],[16,24],
+        [20,24],[21,24],[27,24],[28,24]
+    ],
+};*/
+
 
 const deletedTileSource: TileSource = solidColorTile('#FF0000');
 function deletedTiles(n: number): TileSource[] {
@@ -642,7 +798,8 @@ addTiles([
     vineBase,
     vineMiddle,
     vineTop,
-    ...deletedTiles(14),
+    crackedFloor,
+    stairs,
     singleTileSource('gfx/tiles/bushspirit.png', spiritBushBehavior, 0),
     singleTileSource('gfx/tiles/thornsspirit.png', spiritThornBehavior),
     singleTileSource('gfx/tiles/rocksspirit.png', spiritLightStoneBehavior),
@@ -691,5 +848,6 @@ addTiles([
     treeLeavesMerged,
     treeLeavesCorridor,
     treeStumpDoor,
+    cliffs,
 ]);
 

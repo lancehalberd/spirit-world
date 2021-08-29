@@ -74,6 +74,10 @@ export interface Actor extends ObjectInstance {
     hasBarrier?: boolean
     isInvisible?: boolean
     jumpingTime?: number
+    jumpDirection?: Direction
+    jumpingVx?: number
+    jumpingVy?: number
+    jumpingVz?: number
     // If this is set the actor is being carried by a hero/clone.
     carrier?: Hero
     explosionTime?: number
