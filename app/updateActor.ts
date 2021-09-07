@@ -561,7 +561,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         }
     }
     if (heldChakram && heldChakram.area === hero.area && heldChakram.hero === hero && hero.action !== 'charging') {
-        if (!hero.action && isGameKeyDown(state, GAME_KEY.WEAPON) && canCharge) {
+        if ((!hero.action || hero.action === 'walking') && isGameKeyDown(state, GAME_KEY.WEAPON) && canCharge) {
             // resume charing if the weapon button is still down.
             hero.action = 'charging';
             hero.actionDx = heldChakram.vx;
