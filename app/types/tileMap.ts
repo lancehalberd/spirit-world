@@ -65,6 +65,11 @@ export interface TileBehaviors {
 
 export type TilePalette = number[][];
 
+export interface SourcePalette {
+    source: Frame
+    tiles: number[]
+}
+
 
 export interface TileCoords {
     layerKey?: string,

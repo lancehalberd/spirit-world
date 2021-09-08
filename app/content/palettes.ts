@@ -1,10 +1,20 @@
 import { allTiles } from 'app/content/tiles';
 
-import { TilePalette } from 'app/types';
+import { SourcePalette, TilePalette } from 'app/types';
 
+export const sourcePalettes: {[key: string]: SourcePalette} = {};
 const everything: TilePalette = [[]];
 let x = 0, y = 0;
 for (let i = 0; i < allTiles.length; i++) {
+    const image = allTiles[i]?.frame?.image;
+    if (image instanceof HTMLImageElement) {
+        const key = image.src.split('public/gfx/')[1];
+        sourcePalettes[key] = sourcePalettes[key] || {
+            source: allTiles[i].frame,
+            tiles: [],
+        };
+        sourcePalettes[key].tiles.push(i);
+    }
     if (!everything[y]) {
         everything[y] = [];
     }

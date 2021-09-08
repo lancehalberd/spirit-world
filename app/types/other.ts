@@ -1,4 +1,4 @@
-import { TileGridDefinition, TilePalette } from 'app/types';
+import { SourcePalette, TileGridDefinition, TilePalette } from 'app/types';
 
 export interface ExtraAnimationProperties {
     // The animation will loop unless this is explicitly set to false.
@@ -119,12 +119,21 @@ export interface EditorArrayProperty<T> {
 
 // This is used to allow a user to select a tile/group of tiles from a tile palette.
 export interface EditorPaletteProperty {
-    name: string,
-    id?: string,
+    name: string
+    id?: string
     // The selection is a complete tile grid, but will often be used to represent a single tile.
-    value?: TileGridDefinition,
-    palette: TilePalette,
-    onChange: (newValue: TileGridDefinition) => void,
+    value?: TileGridDefinition
+    palette: TilePalette
+    onChange: (newValue: TileGridDefinition) => void
+}
+
+export interface EditorSourcePaletteProperty {
+    name: string
+    id?: string
+    // The selection is a complete tile grid, but will often be used to represent a single tile.
+    value?: TileGridDefinition
+    sourcePalette: SourcePalette
+    onChange: (newValue: TileGridDefinition) => void
 }
 
 export interface EditorButtonProperty {
@@ -144,7 +153,12 @@ export interface EditorSingleProperty<T> {
     // If the property is editable, you can specify what happens when it is changed.
     onChange?: (newValue: T) => (T | void),
 }
-export type EditorProperty<T> = EditorArrayProperty<T> | EditorSingleProperty<T> | EditorButtonProperty | EditorPaletteProperty;
+export type EditorProperty<T> = EditorArrayProperty<T>
+    | EditorSingleProperty<T>
+    | EditorButtonProperty
+    | EditorPaletteProperty
+    | EditorSourcePaletteProperty;
+
 export type PropertyRow = (EditorProperty<any> | HTMLElement | string)[];
 
 export type PanelRows = (EditorProperty<any> | PropertyRow | HTMLElement | string)[];

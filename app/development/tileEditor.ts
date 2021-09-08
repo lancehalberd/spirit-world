@@ -13,7 +13,7 @@ import { logicHash } from 'app/content/logic';
 import { getLootFrame } from 'app/content/lootObject';
 import { createObjectInstance } from 'app/content/objects';
 import { allTiles } from 'app/content/tiles';
-import { palettes } from 'app/content/palettes';
+import { palettes, sourcePalettes } from 'app/content/palettes';
 import { zones } from 'app/content/zones';
 import {
     createObjectDefinition,
@@ -475,7 +475,7 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
         rows.push({
             name: 'palette',
             value: editingState.paletteKey,
-            values: Object.keys(palettes),
+            values: [...Object.keys(palettes), ...Object.keys(sourcePalettes)],
             onChange(key: string) {
                 editingState.paletteKey = key;
                 state.areaInstance.tilesDrawn = [];
@@ -483,19 +483,35 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
                 displayTileEditorPropertyPanel();
             },
         });
-        rows.push({
-            name: 'brush',
-            value: editingState.brush,
-            palette: palettes[editingState.paletteKey],
-            onChange(tiles: TileGridDefinition) {
-                editingState.brush = {'none': tiles};
-                updateBrushCanvas(editingState.brush);
-                if (editingState.tool !== 'brush' && editingState.tool !== 'replace') {
-                    editingState.tool = 'brush';
-                    displayTileEditorPropertyPanel();
+        if (palettes[editingState.paletteKey]) {
+            rows.push({
+                name: 'brush',
+                value: editingState.brush,
+                palette: palettes[editingState.paletteKey],
+                onChange(tiles: TileGridDefinition) {
+                    editingState.brush = {'none': tiles};
+                    updateBrushCanvas(editingState.brush);
+                    if (editingState.tool !== 'brush' && editingState.tool !== 'replace') {
+                        editingState.tool = 'brush';
+                        displayTileEditorPropertyPanel();
+                    }
                 }
-            }
-        });
+            });
+        } else if (sourcePalettes[editingState.paletteKey]) {
+            rows.push({
+                name: 'brush',
+                value: editingState.brush,
+                sourcePalette: sourcePalettes[editingState.paletteKey],
+                onChange(tiles: TileGridDefinition) {
+                    editingState.brush = {'none': tiles};
+                    updateBrushCanvas(editingState.brush);
+                    if (editingState.tool !== 'brush' && editingState.tool !== 'replace') {
+                        editingState.tool = 'brush';
+                        displayTileEditorPropertyPanel();
+                    }
+                }
+            });
+        }
     }
     return rows;
 }

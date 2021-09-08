@@ -5,7 +5,9 @@ import { drawFrame } from 'app/utils/animations';
 import { getMousePosition, isMouseDown } from 'app/utils/mouse';
 
 import {
-    EditorArrayProperty, EditorButtonProperty, EditorPaletteProperty, EditorProperty, EditorSingleProperty,
+    EditorArrayProperty, EditorButtonProperty, EditorPaletteProperty,
+    EditorProperty, EditorSingleProperty,
+    EditorSourcePaletteProperty,
     PanelRows, PropertyRow, TileGridDefinition,
 } from 'app/types';
 
@@ -140,6 +142,9 @@ function isButtonProperty(property: EditorProperty<any>): property is EditorButt
 }
 function isPaletteProperty(property: EditorProperty<any>): property is EditorPaletteProperty {
     return !!property?.['palette'];
+}
+function isSourcePaletteProperty(property: EditorProperty<any>): property is EditorSourcePaletteProperty {
+    return !!property?.['sourcePalette'];
 }
 
 const paletteCanvas = createCanvas(100, 100);
@@ -298,6 +303,69 @@ function renderProperty(property: EditorProperty<any> | HTMLElement | string): s
         span.style.flexDirection = 'column';
         span.style.alignItems = 'center';
         span.append(paletteCanvas);
+        span.append(brushCanvas);
+        return span;
+    } else if (isSourcePaletteProperty(property)) {
+        propertiesById[property.id || property.name] = property;
+        const span = tagElement('span', 'pp-property');
+        const frame = {
+            image: property.sourcePalette.source.image,
+            x: 0,
+            y: 0,
+            w: property.sourcePalette.source.image.width,
+            h: property.sourcePalette.source.image.height,
+        };
+        paletteCanvas.width = frame.w;
+        paletteCanvas.height = frame.h;
+        const scale = Math.min(1, 1024 / paletteCanvas.height, 400 / paletteCanvas.width);
+        paletteContext.save();
+            paletteContext.globalAlpha *= 0.4;
+            drawFrame(paletteContext, frame, {...frame, x: 0,y: 0});
+        paletteContext.restore();
+
+        const tiles = property.sourcePalette.tiles;
+        for (let i = 0; i < tiles.length; i++) {
+            const tile = allTiles[tiles[i]];
+            drawFrame(paletteContext, tile.frame, { x: tile.frame.x, y: tile.frame.y, w: 16, h: 16});
+        }
+
+       const selectTile = () => {
+            let [x, y] = getMousePosition(paletteCanvas, scale);
+            const ty = Math.floor(y / 16);
+            const tx = Math.floor(x / 16);
+            for (const tile of tiles) {
+                const fullTile = allTiles[tile];
+                if (fullTile.frame.x === tx * 16 && fullTile.frame.y === ty * 16) {
+                    property.onChange({
+                        w: 1, h: 1,
+                        tiles: [[tile]],
+                    });
+                    return;
+                }
+            }
+        }
+        // Prevent dragging ghost preview of the image around.
+        paletteCanvas.onmousedown = (e) => {
+            selectTile();
+        }
+        paletteCanvas.onmousemove = () => {
+            if (isMouseDown()) {
+                selectTile();
+            }
+        }
+        paletteCanvas.style.transform = `scale(${scale})`;
+        span.style.display = 'flex';
+        span.style.flexDirection = 'column';
+        span.style.alignItems = 'center';
+        // The scale transform interacts poorly directly inside a flex display, so we add
+        // a div with the correct width wrapping the palette.
+        const paletteDiv = tagElement('div');
+        paletteDiv.style.width = '400px';
+        paletteDiv.style.height = `${paletteCanvas.height * scale}px`;
+        paletteDiv.style.textAlign = 'center';
+        paletteDiv.style.marginBottom = '10px';
+        paletteDiv.append(paletteCanvas);
+        span.append(paletteDiv);
         span.append(brushCanvas);
         return span;
     } else if (isButtonProperty(property)) {
