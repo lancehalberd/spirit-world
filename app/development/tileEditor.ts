@@ -39,6 +39,7 @@ import { translateContextForAreaAndCamera } from 'app/render';
 import { updateHeroMagicStats } from 'app/render/spiritBar';
 import { getState } from 'app/state';
 import { drawFrame } from 'app/utils/animations';
+import { readImageFromFile } from 'app/utils/index';
 import { getMousePosition, isMouseDown, /*isMouseOverElement*/ } from 'app/utils/mouse';
 
 import {
@@ -472,7 +473,7 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
             break;
     }
     if (editingState.tool !== 'object' && editingState.tool !== 'enemy' && editingState.tool !== 'boss') {
-        rows.push({
+        rows.push([{
             name: 'palette',
             value: editingState.paletteKey,
             values: [...Object.keys(palettes), ...Object.keys(sourcePalettes)],
@@ -482,7 +483,24 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
                 state.areaInstance.checkToRedrawTiles = true;
                 displayTileEditorPropertyPanel();
             },
-        });
+        },{
+            name: 'Add Source',
+            async onClick() {
+                const { image, fileName } = await readImageFromFile();
+                sourcePalettes[fileName] = {
+                    source: {
+                        image,
+                        x: 0, y: 0, w: image.width, h: image.height,
+                    },
+                    tiles: [],
+                    grid: [],
+                };
+                editingState.paletteKey = fileName;
+                state.areaInstance.tilesDrawn = [];
+                state.areaInstance.checkToRedrawTiles = true;
+                displayTileEditorPropertyPanel();
+            },
+        }]);
         if (palettes[editingState.paletteKey]) {
             rows.push({
                 name: 'brush',
@@ -792,6 +810,7 @@ function addMissingLayer(state: GameState, layerKey: string) {
             return addNewLayer(state, layerKey, i);
         }
     }
+    return addNewLayer(state, layerKey, definition.layers.length);
 }
 function drawBrush(x: number, y: number): void {
     const state = getState();

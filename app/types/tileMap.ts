@@ -23,6 +23,9 @@ export interface TileBehaviors {
     cuttable?: number,
     // Deals damage on contact
     damage?: number,
+    // Special development flag indicating that this tile has been deleted from the game
+    // and its index is available to be used by a new tile type.
+    deleted?: boolean,
     // Can be destroyed by an explosion.
     destructible?: boolean,
     // Elemental association that can be passed to other objects.
@@ -67,7 +70,20 @@ export type TilePalette = number[][];
 
 export interface SourcePalette {
     source: Frame
+    // This stores the unique set of tiles that have already been imported
+    // from this source palette.
     tiles: number[]
+    // This stores a mapping of grid coordinates to full tiles that have been imported.
+    // Determining matching tile requires comparing each pixel in a tile to existing tiles which
+    // is quite expensive so this grid is only populated on demand as each tile is requested.
+    grid: number[][]
+}
+
+// A hash for storing full tiles.
+// Currently just used to map pixel strings to tiles when checking for unique
+// or matching tiles in SourcePalettes.
+export interface TileHashMap {
+    [key: string]: FullTile
 }
 
 

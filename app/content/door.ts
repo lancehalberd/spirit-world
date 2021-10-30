@@ -4,11 +4,14 @@ import { applyBehaviorToTile, enterZoneByTarget, playAreaSound, resetTileBehavio
 import { findObjectInstanceById } from 'app/content/objects';
 import {
     BITMAP_LEFT, BITMAP_RIGHT,
+    BITMAP_BOTTOM, BITMAP_BOTTOM_LEFT_8, BITMAP_BOTTOM_RIGHT_8,
+    BITMAP_TOP,
 } from 'app/content/bitMasks';
 import { showMessage } from 'app/render/renderMessage';
 import { saveGame } from 'app/state';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { directionMap, getDirection } from 'app/utils/field';
+import { requireImage } from 'app/utils/images';
 import { boxesIntersect, isObjectInsideTarget, isPointInShortRect } from 'app/utils/index';
 
 import {
@@ -96,13 +99,64 @@ interface DoorStyleDefinition {
     w: number,
     h: number,
     render?: (context: CanvasRenderingContext2D, state: GameState, door: Door) => void
+    renderForeground?: (context: CanvasRenderingContext2D, state: GameState, door: Door) => void
     down?: DoorStyleFrames,
     right?: DoorStyleFrames,
     up?: DoorStyleFrames,
     left?: DoorStyleFrames,
 }
+const woodImage = requireImage('gfx/tiles/woodhousetilesarranged.png');
+const woodenSouthCrackedWall: Frame = {image: woodImage, x: 32, y: 96, w: 16, h: 16};
+const [woodenSouthDoorClosed, woodenSouthDoorOpen, woodenSouthDoorEmpty] = createAnimation('gfx/tiles/woodhousetilesarranged.png', {w: 64, h: 16},
+    {left: 368, y: 7, rows: 3}).frames;
+function renderWoodenDoor(context: CanvasRenderingContext2D, state: GameState, door: Door) {
+    /*if (door.definition.d === 'down') {
+        let frame = woodenSouthDoorEmpty;
+        if (door.isOpen()) {
+            if (door.definition.status === 'locked'
+                || door.definition.status === 'bigKeyLocked'
+                || door.definition.status === 'closed') {
+                frame = woodenSouthDoorOpen;
+            }
+        } else if (door.status === 'locked' || door.status === 'bigKeyLocked' || door.status === 'closed') {
+            frame = woodenSouthDoorClosed;
+        }
+        drawFrame(context, frame, {...frame, x: door.x, y: door.y});
+        // Draw cracked tiles on top fo the door frame graphic.
+        if (door.status === 'cracked') {
+            drawFrame(context, woodenSouthCrackedWall, {x: door.x + 16, y: door.y, w: 16, h: 16});
+            drawFrame(context, woodenSouthCrackedWall, {x: door.x + 32, y: door.y, w: 16, h: 16});
+        }
+    }*/
+}
+function renderWoodenDoorForeground(context: CanvasRenderingContext2D, state: GameState, door: Door) {
+    if (door.definition.d === 'down') {
+        let frame = woodenSouthDoorEmpty;
+        if (door.isOpen()) {
+            if (door.definition.status === 'locked'
+                || door.definition.status === 'bigKeyLocked'
+                || door.definition.status === 'closed') {
+                frame = woodenSouthDoorOpen;
+            }
+        } else if (door.status === 'locked' || door.status === 'bigKeyLocked' || door.status === 'closed') {
+            frame = woodenSouthDoorClosed;
+        }
+        drawFrame(context, frame, {...frame, x: door.x, y: door.y});
+        // Draw cracked tiles on top fo the door frame graphic.
+        if (door.status === 'cracked') {
+            drawFrame(context, woodenSouthCrackedWall, {x: door.x + 16, y: door.y, w: 16, h: 16});
+            drawFrame(context, woodenSouthCrackedWall, {x: door.x + 32, y: door.y, w: 16, h: 16});
+        }
+    }
+}
 
 export const doorStyles: {[key: string]: DoorStyleDefinition} = {
+    wooden: {
+        w: 64,
+        h: 16,
+        render: renderWoodenDoor,
+        renderForeground: renderWoodenDoorForeground
+    },
     cave: {
         w: 32,
         h: 32,
@@ -230,8 +284,6 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
 };
 type DoorStyle = keyof typeof doorStyles;
 
-
-
 export class Door implements ObjectInstance {
     linkedObject: Door;
     alwaysReset = true;
@@ -295,7 +347,31 @@ export class Door implements ObjectInstance {
         const y = Math.floor(this.y / 16);
         const x = Math.floor(this.x / 16);
         const doorStyle = doorStyles[this.style];
-        if (this.style === 'ladderDown') {
+        if (this.style === 'wooden') {
+            if (this.definition.d === 'down') {
+                applyBehaviorToTile(this.area, x, y, { solidMap: BITMAP_BOTTOM, low: false});
+                applyBehaviorToTile(this.area, x + 3, y, { solidMap: BITMAP_BOTTOM, low: false});
+                if (this.isOpen()) {
+                    applyBehaviorToTile(this.area, x + 1, y, { solidMap: BITMAP_BOTTOM_LEFT_8, low: false });
+                    applyBehaviorToTile(this.area, x + 2, y, { solidMap: BITMAP_BOTTOM_RIGHT_8, low: false });
+                } else {
+                    applyBehaviorToTile(this.area, x + 1, y, { solidMap: BITMAP_BOTTOM, low: false});
+                    applyBehaviorToTile(this.area, x + 2, y, { solidMap: BITMAP_BOTTOM, low: false});
+                }
+            } else if (this.definition.d === 'up') {
+
+            } else { // left + right are the same
+                applyBehaviorToTile(this.area, x, y, { solid: true, low: false });
+                applyBehaviorToTile(this.area, x, y + 3, { solid: true, low: false });
+                if (this.isOpen()) {
+                    applyBehaviorToTile(this.area, x, y + 1, { solidMap: BITMAP_TOP, low: false });
+                    applyBehaviorToTile(this.area, x, y + 2, { solidMap: BITMAP_BOTTOM, low: false });
+                } else {
+                    applyBehaviorToTile(this.area, x, y + 1, { solid: true, low: false });
+                    applyBehaviorToTile(this.area, x, y + 2, { solid: true, low: false });
+                }
+            }
+        } else if (this.style === 'ladderDown') {
             const behaviors: TileBehaviors = this.isOpen() ? { cannotLand: true, climbable: true } : { solid: true, low: false};
             applyBehaviorToTile(this.area, x, y, behaviors);
         } else if (this.style === 'ladderUp') {
@@ -345,6 +421,9 @@ export class Door implements ObjectInstance {
     }
     getHitbox(state: GameState): Rect {
         if (this.definition.d === 'up' || this.definition.d === 'down') {
+            if (this.definition.style === 'wooden') {
+                return {x: this.x, y: this.y + 8, w: doorStyles[this.style].w, h: 8 };
+            }
             return { x: this.x, y: this.y, w: doorStyles[this.style].w, h: doorStyles[this.style].h};
         }
         return { x: this.x, y: this.y, w: doorStyles[this.style].h, h: doorStyles[this.style].w};
@@ -610,8 +689,13 @@ export class Door implements ObjectInstance {
         }
     }
     renderForeground(context: CanvasRenderingContext2D, state: GameState) {
+        const doorStyle = doorStyles[this.style];
         // Don't render this in front of the hero when they are jumping down from a cliff.
         if (state.hero.action === 'jumpingDown') {
+            return;
+        }
+        if (doorStyle.renderForeground) {
+            doorStyle.renderForeground(context, state, this);
             return;
         }
         const hitbox = this.getHitbox(state);

@@ -1,5 +1,5 @@
 
-export const images = {};
+export const images: {[key: string]: HTMLImageElement & { originalSource?: string}} = {};
 
 function loadImage(source, callback) {
     images[source] = new Image();
@@ -27,7 +27,7 @@ const allImagesLoadedPromise = new Promise(resolve => {
     const intervalId = setInterval(() => {
         if (startedLoading && numberOfImagesLeftToLoad <= 0) {
             clearInterval(intervalId);
-            resolve();
+            resolve(true);
         }
     }, 50);
 });

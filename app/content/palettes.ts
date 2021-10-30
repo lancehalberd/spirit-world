@@ -8,10 +8,11 @@ let x = 0, y = 0;
 for (let i = 0; i < allTiles.length; i++) {
     const image = allTiles[i]?.frame?.image;
     if (image instanceof HTMLImageElement) {
-        const key = image.src.split('public/gfx/')[1];
+        const key = image.src.split('/gfx/')[1];
         sourcePalettes[key] = sourcePalettes[key] || {
             source: allTiles[i].frame,
             tiles: [],
+            grid: [],
         };
         sourcePalettes[key].tiles.push(i);
     }

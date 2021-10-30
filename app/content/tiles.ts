@@ -1,11 +1,20 @@
 import _ from 'lodash';
 
+import {
+    BITMAP_BOTTOM,
+    BITMAP_BOTTOM_LEFT_8, BITMAP_BOTTOM_RIGHT_8,
+    BITMAP_TOP_LEFT_8_STRIP, BITMAP_TOP_RIGHT_8_STRIP,
+    BITMAP_BOTTOM_LEFT, BITMAP_BOTTOM_RIGHT,
+    BITMAP_TOP_LEFT, BITMAP_TOP_RIGHT,
+    BITMAP_LEFT_6, BITMAP_LEFT_6_BOTTOM_9, BITMAP_LEFT_6_TOP_5,
+    BITMAP_RIGHT_6, BITMAP_RIGHT_6_BOTTOM_9, BITMAP_RIGHT_6_TOP_5,
+} from 'app/content/bitMasks';
 import { simpleLootTable, lifeLootTable, moneyLootTable } from 'app/content/lootTables';
 import { createCanvasAndContext, debugCanvas } from 'app/dom';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { allImagesLoaded, requireImage } from 'app/utils/images';
 
-import { Frame, FullTile, TileBehaviors } from 'app/types';
+import { Frame, FullTile, TileBehaviors, TileHashMap } from 'app/types';
 
 
 export const allTiles: FullTile[] = [null];
@@ -54,7 +63,9 @@ const heavyStoneBehavior: TileBehaviors = {
     linkedOffset: 179,
 };
 const wallBehavior: TileBehaviors = {
-    solid: true
+    solid: true,
+    // Wall appear behind the player except over doorways.
+    defaultLayer: 'field',
 };
 const lowWallBehavior: TileBehaviors = {
     defaultLayer: 'field',
@@ -154,7 +165,7 @@ const emptyKey = [...new Array(16 * 16 * 4)].map(() => 0).join(',');
 export async function findUniqueTiles(source: Frame) {
     await allImagesLoaded();
     const [canvas, context] = createCanvasAndContext(source.w, source.h);
-    drawFrame(context, source, source);
+    drawFrame(context, source, {...source, x: 0, y: 0});
     debugCanvas(canvas);
     context.fillStyle = 'red';
     const imageData = context.getImageData(0, 0, source.w, source.h).data;
@@ -163,9 +174,9 @@ export async function findUniqueTiles(source: Frame) {
     for (let y = 0; y < source.h; y += 16) {
         for (let x = 0; x < source.w; x += 16) {
             // Special exemption for CLIFF graphics.
-            if (x >= 368 && (y >= 64 && y < 192)) {
-                continue;
-            }
+            //if (x >= 368 && (y >= 64 && y < 192)) {
+            //    continue;
+            //}
             const pixels: string[] = [];
             for (let sy = 0; sy < 16; sy++) {
                 const py = y + sy;
@@ -179,23 +190,79 @@ export async function findUniqueTiles(source: Frame) {
                 continue;
             }
             if (!imageMap[key]) {
-                imageMap[key] = {x: x / 16, y: y / 16};
+                imageMap[key] = {x: (x + source.x) / 16, y: (y + source.y) / 16};
             } else {
+                console.log(x, y);
                 context.fillRect(x, y, 16, 16);
             }
         }
     }
     return Object.values(imageMap);
 }
-/*const allCliffTiles: Frame = {
-    image: requireImage('gfx/tiles/cliffwalls.png'),
+export function generateTileHash({ frame }): string {
+    const [, context] = createCanvasAndContext(16, 16);
+    drawFrame(context, frame, {x: 0, y: 0, w: 16, h: 16});
+    const imageData = context.getImageData(0, 0, 16, 16).data;
+    return imageData.join(',');
+}
+let imageMap: TileHashMap;
+export function generateTileHashMap(): TileHashMap {
+    if (imageMap) {
+        return imageMap;
+    }
+    imageMap = {};
+    imageMap[emptyKey] = allTiles[1];
+    // don't add the null+empty tiles.
+    addTilesToTileHashMap(allTiles.slice(2));
+    return imageMap;
+}
+export function addTilesToTileHashMap(tiles: FullTile[]) {
+    for (const tile of tiles) {
+        if (!tile || tile?.behaviors?.deleted) {
+            continue;
+        }
+        const hashKey = generateTileHash(tile);
+        if (hashKey !== emptyKey && imageMap[hashKey]) {
+            const otherTile = imageMap[hashKey];
+            // We don't want to use the same tile from multiple places, so log an error if we discover
+            // the same tile being sampled from multiple places. It is okay to sample the same place twice
+            // since we may want tiles that look the same with different behaviors.
+            if (otherTile.frame.image !== tile.frame.image ||
+                otherTile.frame.x !== tile.frame.x ||
+                otherTile.frame.y !== tile.frame.y
+            ) {
+                console.error('Found duplicate tiles:', imageMap[hashKey].index, tile.index);
+            }
+            continue;
+        }
+        imageMap[hashKey] = tile;
+    }
+}
+
+let newTileInsertPoint = 0;
+export function addNewTile(frame: Frame): FullTile {
+    //console.log('Adding new tile', (frame.image as HTMLImageElement)?.src, frame.x, frame.y);
+    // Move to the next tile insert point.
+    for(;newTileInsertPoint < allTiles.length; newTileInsertPoint++) {
+        if (allTiles[newTileInsertPoint]?.behaviors?.deleted) {
+            break;
+        }
+    }
+    //console.log('Adding new tile', newTileInsertPoint);
+    allTiles[newTileInsertPoint] = {
+        index: newTileInsertPoint,
+        frame,
+    };
+    addTilesToTileHashMap([allTiles[newTileInsertPoint]]);
+    return allTiles[newTileInsertPoint];
+}
+const newTiles: Frame = {
+    image: requireImage('gfx/tiles/shadowtiles.png'),
     x: 0, y: 0,
     //w: 48, h: 48,
-    w: 368, h: 288,
+    w: 176, h: 96,
 };
-allImagesLoaded().then(async () => {
-    console.log(await findUniqueTiles(allCliffTiles).map(o => `[${o.x},${o.y}]`).join(','));
-});*/
+(async () => console.log((await findUniqueTiles(newTiles)).map(o => `[${o.x},${o.y}]`).join(',')));//();
 
 function singleTileSource(source: string, behaviors: TileBehaviors = null, x = 0, y = 0, w = 16, h = 16): TileSource {
     return {
@@ -668,10 +735,10 @@ const stairs: TileSource = {
     },
     tileCoordinates: [[0,0],[1,0],[2,0],[0,1],[1,1],[2,1],[0,2],[2,2],[0,3],[1,3],[2,3]]
 };
-
+/*
 const cliffs: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/cliffwalls.png'), x: 0, y: 0, w: 48, h: 64},
+    source: {image: requireImage('gfx/tiles/cliffwalls1412.png'), x: 0, y: 0, w: 48, h: 64},
     behaviors: {
         // use `floor2` as default so that the edges of these can appear on top of textured floor
         'all': { defaultLayer: 'floor2', solid: true },
@@ -701,8 +768,143 @@ const cliffs: TileSource = {
                             [10,15],[11,15],[12,15],[13,15],[16,15],[17,15],[18,15],[19,15],
         [0,17],[1,17],[8,17]
     ],
+};*/
+
+// use `foreground2` as default so that it can appear on top of walls that might be on `foreground`
+// All of these solid maps are set so that only the bottom half of the ceiling graphics are solid.
+const ceilingBehavior: TileBehaviors = { defaultLayer: 'foreground2', solidMap: BITMAP_BOTTOM};
+const topLeftCeiling: TileBehaviors = { ...ceilingBehavior, solidMap: BITMAP_TOP_LEFT_8_STRIP};
+const topRightCeiling: TileBehaviors = { ...ceilingBehavior, solidMap: BITMAP_TOP_RIGHT_8_STRIP};
+const bottomLeftCeiling: TileBehaviors = { ...ceilingBehavior, solidMap: BITMAP_BOTTOM_LEFT_8};
+const bottomRightCeiling: TileBehaviors = { ...ceilingBehavior, solidMap: BITMAP_BOTTOM_RIGHT_8};
+
+
+const woodCeiling: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/woodhousetilesarranged.png'), x: 0, y: 0, w: 48, h: 64},
+    behaviors: {
+        'all': ceilingBehavior,
+        '0x4': topLeftCeiling, '4x4': topLeftCeiling, '1x7': topLeftCeiling,
+        '1x4': topRightCeiling, '5x4': topRightCeiling, '0x7': topRightCeiling,
+        '5x3': bottomLeftCeiling, '0x5': bottomLeftCeiling, '1x6': bottomLeftCeiling,
+        '4x3': bottomRightCeiling, '1x5': bottomRightCeiling, '0x6': bottomRightCeiling,
+        // Breakable tiles: [2,5] + [2,6] should be door sprites.
+    },
+    tileCoordinates: [
+        [0,0],            [3,0],
+        [0,1],[1,1],[2,1],[3,1],[4,1],
+        [0,2],[1,2],[2,2],[3,2],[4,2],
+        [0,3],[1,3],[2,3],[3,3],[4,3],[5,3],
+        [0,4],[1,4],[2,4],      [4,4],[5,4],
+        [0,5],[1,5],// [2,5],
+        [0,6],[1,6],// [2,6],
+        [0,7],[1,7]
+    ],
 };
 
+const topLeftWall: TileBehaviors = { ...wallBehavior, solidMap: BITMAP_TOP_LEFT};
+const topRightWall: TileBehaviors = { ...wallBehavior, solidMap: BITMAP_TOP_RIGHT};
+const bottomLeftWall: TileBehaviors = { ...wallBehavior, solidMap: BITMAP_BOTTOM_LEFT};
+const bottomRightWall: TileBehaviors = { ...wallBehavior, solidMap: BITMAP_BOTTOM_RIGHT};
+
+const woodWalls: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/woodhousetilesarranged.png'), x: 0, y: 0, w: 48, h: 64},
+    behaviors: {
+        'all': wallBehavior,
+        '11x4': topLeftWall, '12x4': topLeftWall,
+        '9x4': topRightWall, '10x4': topRightWall,
+        '9x0': bottomLeftWall, '10x0': bottomLeftWall,
+        '11x0': bottomRightWall, '12x0': bottomRightWall,
+    },
+    tileCoordinates: [
+        [7,0],[8,0],[9,0],[10,0],[11,0],[12,0],
+        [7,1],[8,1],[9,1],[10,1],[11,1],[12,1],
+        [7,2],[8,2],[9,2],[10,2],[11,2],[12,2],
+        [7,3],      [9,3],[10,3],[11,3],[12,3],
+        [7,4],      [9,4],[10,4],[11,4],[12,4],
+        [7,5]
+    ],
+};
+const woodStairs: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/woodhousetilesarranged.png'), x: 0, y: 0, w: 48, h: 64},
+    behaviors: {
+        'all': { defaultLayer: 'field' },
+        '13x0': { defaultLayer: 'field', solidMap: BITMAP_LEFT_6_BOTTOM_9},
+        '13x1': { defaultLayer: 'field', solidMap: BITMAP_LEFT_6},
+        '13x2': { defaultLayer: 'field', solidMap: BITMAP_LEFT_6},
+        '13x3': { defaultLayer: 'field', solidMap: BITMAP_LEFT_6},
+        '13x4': { defaultLayer: 'field', solidMap: BITMAP_LEFT_6_TOP_5},
+        '15x0': { defaultLayer: 'field', solidMap: BITMAP_RIGHT_6_BOTTOM_9},
+        '15x1': { defaultLayer: 'field', solidMap: BITMAP_RIGHT_6},
+        '15x2': { defaultLayer: 'field', solidMap: BITMAP_RIGHT_6},
+        '15x3': { defaultLayer: 'field', solidMap: BITMAP_RIGHT_6},
+        '15x4': { defaultLayer: 'field', solidMap: BITMAP_RIGHT_6_TOP_5},
+    },
+    tileCoordinates: [
+        [13,0],[14,0],[15,0],
+        [13,1],[14,1],[15,1],
+        [13,2],[14,2],[15,2],
+        [13,3],[14,3],[15,3],
+        [13,4],[14,4],[15,4]
+    ],
+};
+
+const woodLedges: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/woodhousetilesarranged.png'), x: 0, y: 0, w: 48, h: 64},
+    behaviors: {
+        'all': { defaultLayer: 'floor2' },
+    },
+    tileCoordinates: [
+        // This is a quare
+        [8,9], [9,9], [10,9],
+        [8,10],       [10,10],
+        [8,11],[9,11],[10,11],
+        // Diamond
+        [9,12],[10,12], // TL,TR
+        [9,13],[10,13], // Inner TL, Inner TR
+        [8,14],[9,14],[10,14],[11,14] //BL, Inner BL, Inner BR, BR
+
+    ],
+};
+const woodFloorDecorations: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/woodhousetilesarranged.png'), x: 0, y: 0, w: 48, h: 64},
+    behaviors: {
+        'all': { defaultLayer: 'floor2' },
+    },
+    tileCoordinates: [
+        [14,9],[15,9],[16,9],[17,9],[18,9],[14,10],[16,10],[17,10],[18,10],
+        [14,11],[15,11],[16,11],[15,12],[16,12],[14,13],[15,13],[16,13],[17,13],
+        [14,14],[15,14],[16,14],[17,14],[15,15],[16,15]
+
+    ],
+};
+const woodFloor: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/woodhousetilesarranged.png'), x: 0, y: 0, w: 48, h: 64},
+    behaviors: {
+        'all': { defaultLayer: 'floor' },
+    },
+    tileCoordinates: [
+        [13,6],[14,6],[15,6],[16,6],[13,7],[14,7],[15,7],[13,8],[14,8],[16,8]
+    ],
+};
+
+const shadows: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/shadowtiles.png'), x: 0, y: 0, w: 48, h: 64},
+    behaviors: {
+        'all': { defaultLayer: 'field2' },
+    },
+    tileCoordinates: [
+        [0,0],[1,0],[2,0],[3,0],[4,0],[6,0],[7,0],[8,0],[9,0],[0,1],[2,1],[3,1],[4,1],[6,1],[7,1],[8,1],[9,1],
+        [0,2],[2,2],[3,2],[4,2],[5,2],[7,2],[8,2],[10,2],[0,3],[4,3],[5,3],[7,3],[8,3],[10,3],
+        [0,4],[1,4],[2,4],[3,4],[4,4],[5,4],[6,4],[7,4],[8,4],[9,4],[10,4],[0,5],[7,5],[8,5]
+    ],
+};
 
 
 /*const newCliffTiles: TileSource = {
@@ -747,7 +949,7 @@ const cliffs: TileSource = {
 };*/
 
 
-const deletedTileSource: TileSource = solidColorTile('#FF0000');
+const deletedTileSource: TileSource = solidColorTile('#FF0000', {deleted: true});
 function deletedTiles(n: number): TileSource[] {
     return [...new Array(n)].map(() => deletedTileSource);
 }
@@ -776,8 +978,7 @@ addTiles([
     },
     singleTileSource('gfx/tiles/bush.png', null, 16),
     singleTileSource('gfx/tiles/thorns.png', null, 16),
-    solidColorTile('#0000FF', deepWaterBehavior), // deep water
-    solidColorTile('#A0A0FF'), // shallow water
+    ...deletedTiles(2),
     gradientColorTile(['#A08000', '#806000'], 0, 0, 0, 16, southCliffBehavior), // southCliffTop
     solidColorTile('#806000', wallBehavior), // cliffBottom
     ...deletedTiles(2),
@@ -848,6 +1049,19 @@ addTiles([
     treeLeavesMerged,
     treeLeavesCorridor,
     treeStumpDoor,
-    cliffs,
+    woodCeiling,
+    woodWalls,
+    woodFloor,
+    woodFloorDecorations,
+    woodLedges,
+    woodStairs,
+    shadows,
 ]);
+
+// This invalid is in the middle of a bunch of other tiles so it is easiest to just delete after adding it.
+allTiles[127] = {
+    index: 127,
+    frame: deletedTileSource.source,
+    behaviors: { deleted: true },
+};
 

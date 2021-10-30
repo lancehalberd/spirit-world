@@ -176,6 +176,36 @@ export function readFromFile(): Promise<string> {
     });
 }
 
+export function readImageFromFile(): Promise<{image: HTMLImageElement, fileName: string}> {
+    return new Promise((resolve, reject) => {
+        const input = document.createElement("input");
+        input.type = 'file';
+        input.click();
+        input.onchange = function (event: Event) {
+            const target = (event.target as HTMLInputElement);
+            const files = target.files;
+            if (!input.files[0]) {
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = function () {
+                const source = reader.result;
+                const image = new Image();
+                image.src = source.toString();
+                image.onload = () => {
+                    resolve({image, fileName: files.item(0).name});
+                };
+            }
+            reader.onerror = function (event) {
+                console.log(event);
+                reject("error reading image file");
+                debugger;
+            }
+            reader.readAsDataURL(files[0]);
+        };
+    });
+}
+
 export function readGetParameter(parameterName: string): string {
     for (const item of location.search.substr(1).split('&')) {
         const tmp = item.split('=');

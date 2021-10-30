@@ -12,6 +12,7 @@ Low Priority Bugs:
     - frost grenade blast isn't centered.
 
 High Priority Bugs:
+    Couldn't grab objects as astral projection.
     Sometimes can't enter peach cave when sliding on ice?
 
 
@@ -24,9 +25,16 @@ Graphics:
 
 
 Current tasks:
-    - Add new waterfall graphics
+    - Allow selecting new tiles from SourcePalette:
+        - hash exact pixel values for all used tiles, and select existing used tile if the tile matches
+        - when a tile is selected, highlight all matching tiles on the source palette
+        - set to tile 1 if the tile matches the empty tile
+        - if the new tile doesn't match, add a new tile to the palette at the first empty slot
+        - Add an import tileset action just above the source palette options.
+            -> browser to file, create Image+SourcePalette, then display then select the palette.
     - Add dialogue objects that can trigger on entering areas or other triggers.
     - Change message rendering system to use the priority queue system to support nested messages.
+    - Add new waterfall graphics
 
     - Randomizer improvements
         - Forward fill progress items until  (remainingProgressItems / 2) checks are available.

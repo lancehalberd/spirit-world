@@ -1,4 +1,5 @@
-import { allTiles } from 'app/content/tiles';
+import { palettes } from 'app/content/palettes';
+import { addNewTile, allTiles, generateTileHash, generateTileHashMap } from 'app/content/tiles';
 import { createCanvas, tagElement } from 'app/dom';
 import { KEY, isKeyboardKeyDown } from 'app/keyCommands';
 import { drawFrame } from 'app/utils/animations';
@@ -7,7 +8,7 @@ import { getMousePosition, isMouseDown } from 'app/utils/mouse';
 import {
     EditorArrayProperty, EditorButtonProperty, EditorPaletteProperty,
     EditorProperty, EditorSingleProperty,
-    EditorSourcePaletteProperty,
+    EditorSourcePaletteProperty, FullTile,
     PanelRows, PropertyRow, TileGridDefinition,
 } from 'app/types';
 
@@ -318,39 +319,99 @@ function renderProperty(property: EditorProperty<any> | HTMLElement | string): s
         paletteCanvas.width = frame.w;
         paletteCanvas.height = frame.h;
         const scale = Math.min(1, 1024 / paletteCanvas.height, 400 / paletteCanvas.width);
-        paletteContext.save();
-            paletteContext.globalAlpha *= 0.4;
-            drawFrame(paletteContext, frame, {...frame, x: 0,y: 0});
-        paletteContext.restore();
+        // Remember to only use arrow functions inside of if blocks.
+        const refreshPaletteCanvas = () => {
+            paletteContext.clearRect(0, 0, paletteCanvas.width, paletteCanvas.height)
+            paletteContext.save();
+                paletteContext.globalAlpha *= 0.4;
+                drawFrame(paletteContext, frame, {...frame, x: 0,y: 0});
+            paletteContext.restore();
 
-        const tiles = property.sourcePalette.tiles;
-        for (let i = 0; i < tiles.length; i++) {
-            const tile = allTiles[tiles[i]];
-            drawFrame(paletteContext, tile.frame, { x: tile.frame.x, y: tile.frame.y, w: 16, h: 16});
+            const tiles = property.sourcePalette.tiles;
+            for (let i = 0; i < tiles.length; i++) {
+                const tile = allTiles[tiles[i]];
+                drawFrame(paletteContext, tile.frame, { x: tile.frame.x, y: tile.frame.y, w: 16, h: 16});
+            }
+        };
+        refreshPaletteCanvas();
+
+        const getOrImportTile = (x: number, y: number): FullTile => {
+            const gx = x / 16, gy = y / 16;
+            property.sourcePalette[gy] = property.sourcePalette[gy] || [];
+            if (property.sourcePalette[gy][gx] >= 0) {
+                return allTiles[property.sourcePalette[gy][gx]];
+            }
+            const tileHashMap = generateTileHashMap();
+            const frame = {
+                image: property.sourcePalette.source.image,
+                x, y, w: 16, h: 16
+            }
+            const hashKey = generateTileHash({ frame });
+            let tile = tileHashMap[hashKey]
+            if (!tile) {
+                tile = addNewTile(frame);
+                // Add the new tile to the sourcePalette definition
+                property.sourcePalette.tiles.push(tile.index);
+                // Add the new tile to the "everything" palette.
+                let py = (tile.index / 16) | 0;
+                let px = tile.index % 16;
+                palettes.everything[py] = palettes.everything[py] || [];
+                palettes.everything[py][px] = tile.index;
+                refreshPaletteCanvas();
+            }
+            property.sourcePalette[gy][gx] = tile?.index || 0;
+            return tile;
         }
 
-       const selectTile = () => {
+        const selectTile = () => {
             let [x, y] = getMousePosition(paletteCanvas, scale);
-            const ty = Math.floor(y / 16);
-            const tx = Math.floor(x / 16);
-            for (const tile of tiles) {
-                const fullTile = allTiles[tile];
-                if (fullTile.frame.x === tx * 16 && fullTile.frame.y === ty * 16) {
-                    property.onChange({
-                        w: 1, h: 1,
-                        tiles: [[tile]],
-                    });
-                    return;
+            x = ((x / 16) | 0) * 16;
+            y = ((y / 16) | 0) * 16;
+            const tile = getOrImportTile(x, y);
+            property.onChange({
+                w: 1, h: 1,
+                tiles: [[tile?.index || 0]],
+            });
+        }
+        let dragX, dragY;
+        const updateBrushSelection = (x: number, y: number): void => {
+            const tx1 = Math.floor(dragX / 16);
+            const ty1 = Math.floor(dragY / 16);
+            const tx2 = Math.floor(x / 16);
+            const ty2 = Math.floor(y / 16);
+            const L = Math.max(0, Math.min(tx1, tx2));
+            const R = Math.min(paletteCanvas.width / 16 - 1, Math.max(tx1, tx2));
+            const T = Math.max(0, Math.min(ty1, ty2));
+            const B = Math.min(paletteCanvas.height / 16 - 1, Math.max(ty1, ty2));
+            const brush: TileGridDefinition = {
+                w: R - L + 1,
+                h: B - T + 1,
+                tiles: [],
+            }
+            for (let y = 0; y < brush.h; y++) {
+                brush.tiles[y] = [];
+                for (let x = 0; x < brush.w; x++) {
+                    brush.tiles[y][x] = getOrImportTile((L + x) * 16, (T + y) * 16)?.index || 0;
                 }
             }
+            property.onChange(brush);
         }
-        // Prevent dragging ghost preview of the image around.
         paletteCanvas.onmousedown = (e) => {
-            selectTile();
+            if (isKeyboardKeyDown(KEY.SHIFT)) {
+                [dragX, dragY] = getMousePosition(paletteCanvas, scale);
+                updateBrushSelection(dragX, dragY);
+            } else {
+                selectTile();
+            }
         }
         paletteCanvas.onmousemove = () => {
             if (isMouseDown()) {
-                selectTile();
+                if (isKeyboardKeyDown(KEY.SHIFT)) {
+                    const [x, y] = getMousePosition(paletteCanvas, scale);
+                    updateBrushSelection(x, y);
+                } else {
+                    selectTile();
+                }
             }
         }
         paletteCanvas.style.transform = `scale(${scale})`;
@@ -364,6 +425,7 @@ function renderProperty(property: EditorProperty<any> | HTMLElement | string): s
         paletteDiv.style.height = `${paletteCanvas.height * scale}px`;
         paletteDiv.style.textAlign = 'center';
         paletteDiv.style.marginBottom = '10px';
+        paletteDiv.style.overflow = 'hidden';
         paletteDiv.append(paletteCanvas);
         span.append(paletteDiv);
         span.append(brushCanvas);
