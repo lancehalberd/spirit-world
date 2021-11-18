@@ -78,6 +78,9 @@ export interface Actor extends ObjectInstance {
     jumpingVx?: number
     jumpingVy?: number
     jumpingVz?: number
+    // This is set when the actor jumps south and is used to determine when to
+    // start checking for a landing position.
+    jumpingDownY?: number
     // If this is set the actor is being carried by a hero/clone.
     carrier?: Hero
     explosionTime?: number

@@ -30,6 +30,16 @@ export interface TileBehaviors {
     destructible?: boolean,
     // Elemental association that can be passed to other objects.
     element?: MagicElement,
+    // Cliff edges in this tile, for example, if cliff edge up is true,
+    // then the tile cannot be entered from the north, and can be jumped off of
+    // from the south.
+    // TBD: include upleft/etc which will cut tiles in half diagonally.
+    edges?: {
+        up?: true,
+        down?: true,
+        left?: true,
+        right?: true,
+    }
     // This tile can be jumped over in this direction but is otherwise impassable.
     jumpDirection?: Direction,
     // If this is true then this tile will link to a tile with the given tile index in the alternate world.

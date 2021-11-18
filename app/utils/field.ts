@@ -97,18 +97,26 @@ export function isPointOpen(
         return false;
     }
     const tileBehavior = area?.behaviorGrid[ty]?.[tx];
+    const sy = (y | 0) % 16;
+    const sx = (x | 0) % 16;
     // If the behavior has a bitmap for solid pixels, read the exact pixel to see if it is blocked.
     if (tileBehavior?.solidMap && !tileBehavior?.climbable) {
         if (movementProperties.needsFullTile) {
             return false;
         }
-        const sy = (y | 0) % 16;
-        const sx = (x | 0) % 16;
         // console.log(tileBehavior.solidMap, y, x, sy, sx, tileBehavior.solidMap[sy] >> (15 - sx));
         if (tileBehavior.solidMap[sy] >> (15 - sx) & 1) {
             return false;
         }
     } else if (tileBehavior?.solid && (!tileBehavior?.climbable || !movementProperties.canClimb)) {
+        return false;
+    } else if (tileBehavior.edges?.up && sy === 0) {
+        return false;
+    } else if (tileBehavior.edges?.down && sy === 15) {
+        return false;
+    } else if (tileBehavior.edges?.left && sx === 0) {
+        return false;
+    } else if (tileBehavior.edges?.right && sx === 15) {
         return false;
     }
     if (tileBehavior?.water && !movementProperties.canSwim) {
@@ -199,10 +207,10 @@ export function getTileBehaviorsAndObstacles(
         || ty < state.areaSection.y || ty >= state.areaSection.y + state.areaSection.h) {
         tileBehavior.outOfBounds = true;
     }
+    const sy = (y | 0) % 16;
+    const sx = (x | 0) % 16;
     // If the behavior has a bitmap for solid pixels, read the exact pixel to see if it is blocked.
     if (tileBehavior.solidMap) {
-        const sy = (y | 0) % 16;
-        const sx = (x | 0) % 16;
         // console.log(tileBehavior.solidMap, y, x, sy, sx, tileBehavior.solidMap[sy] >> (15 - sx));
         tileBehavior.solid = !!(tileBehavior.solidMap[sy] >> (15 - sx) & 1);
     }
@@ -231,6 +239,23 @@ export function getTileBehaviorsAndObstacles(
         if (isPixelInShortRect(x | 0, y | 0, roundRect(state.hero))) {
             objects.push(state.hero);
             tileBehavior.solid = true;
+        }
+    }
+    // Edge behaviors only apply to specific lines in the tiles.
+    if (tileBehavior.edges) {
+        // Copy this so we don't edit the source behavior.
+        tileBehavior.edges = {...tileBehavior.edges};
+        if (tileBehavior.edges?.up && sy !== 0) {
+            delete tileBehavior.edges.up;
+        }
+        if (tileBehavior.edges?.down && sy !== 15) {
+            delete tileBehavior.edges.down;
+        }
+        if (tileBehavior.edges?.left && sx !== 0) {
+            delete tileBehavior.edges.left;
+        }
+        if (tileBehavior.edges?.right && sx !== 15) {
+            delete tileBehavior.edges.right;
         }
     }
     return { tileBehavior, tx, ty, objects };

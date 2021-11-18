@@ -98,7 +98,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             // As the hero approaches each new row of tiles, check if they should land on this row of tiles.
             // The player can fall as many as 4 pixels per frame, so we check when the user is in the last 4 pixels
             // of the previous row.
-            if (hero.y % 16 >= 12) {
+            if (hero.y >= hero.jumpingDownY + 8 && hero.y % 16 >= 12) {
                 const y = ((hero.y / 16) | 0) * 16 + 16;
                 const excludedObjects = new Set([hero]);
                 const { tileBehavior: b1 } = getTileBehaviorsAndObstacles(state, hero.area, {x: hero.x, y }, excludedObjects, state.nextAreaInstance);

@@ -856,6 +856,14 @@ const woodLedges: TileSource = {
     source: {image: requireImage('gfx/tiles/woodhousetilesarranged.png'), x: 0, y: 0, w: 48, h: 64},
     behaviors: {
         'all': { defaultLayer: 'floor2' },
+        '8x9': { defaultLayer: 'floor2', edges: { up: true, left: true}},
+        '9x9': { defaultLayer: 'floor2', edges: { up: true }},
+        '10x9': { defaultLayer: 'floor2', edges: { up: true, right: true}},
+        '8x10': { defaultLayer: 'floor2', edges: { left: true}},
+        '10x10': { defaultLayer: 'floor2', edges: {right: true}},
+        '8x11': { defaultLayer: 'floor2', edges: { down: true, left: true}},
+        '9x11': { defaultLayer: 'floor2', edges: { down: true }},
+        '10x11': { defaultLayer: 'floor2', edges: { down: true, right: true}},
     },
     tileCoordinates: [
         // This is a quare

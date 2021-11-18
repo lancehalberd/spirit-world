@@ -169,7 +169,27 @@ function moveActorInDirection(
         if (tileBehavior?.climbable && !canClimb) {
             blockedByTile = true;
         }
-        if (!isTilePassable && tileBehavior?.jumpDirection !== direction) {
+        if (tileBehavior.edges?.up
+            || tileBehavior.edges?.down
+            || tileBehavior.edges?.left
+            || tileBehavior.edges?.right
+        ) {
+            //console.log(tileBehavior.edges);
+            /*if (tileBehavior.edges?.up && direction !== 'up') {
+                blockedByTile = true;
+            }
+            if (tileBehavior.edges?.down && direction !== 'down') {
+                blockedByTile = true;
+            }
+            if (tileBehavior.edges?.left && direction !== 'left') {
+                blockedByTile = true;
+            }
+            if (tileBehavior.edges?.right && direction !== 'right') {
+                blockedByTile = true;
+            }*/
+            blockedByTile = true;
+            canJumpDown = !!tileBehavior.edges[direction];
+        } else if (!isTilePassable && tileBehavior?.jumpDirection !== direction) {
             canJumpDown = false;
         }
         for (const object of objects) {
@@ -195,9 +215,10 @@ function moveActorInDirection(
                     actor.jumpingVx = dx * 2;
                     actor.jumpingVy = dy * 2;
                     actor.jumpingVz = 4;
+                    actor.jumpingDownY = actor.y;
                 } else if (direction === 'up') {
                     let targetY: number = null
-                    for (let i = 1; i <= 6; i++) {
+                    for (let i = 2; i <= 6; i++) {
                         const y = Math.round(actor.y / 16 + i * dy) * 16;
                         const { tileBehavior: b1 } = getTileBehaviorsAndObstacles(state, actor.area, {x: actor.x, y});
                         const { tileBehavior: b2 } = getTileBehaviorsAndObstacles(state, actor.area, {x: actor.x + actor.w - 1, y});
@@ -223,7 +244,7 @@ function moveActorInDirection(
                     }
                 } else {
                     let targetX: number = null
-                    for (let i = 1; i <= 6; i++) {
+                    for (let i = 2; i <= 6; i++) {
                         const x = Math.round(actor.x / 16 + i * dx) * 16;
                         const { tileBehavior: b1 } = getTileBehaviorsAndObstacles(state, actor.area, {x, y: actor.y});
                         const { tileBehavior: b2 } = getTileBehaviorsAndObstacles(state, actor.area, {x, y: actor.y + actor.h - 1});

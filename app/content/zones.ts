@@ -23,7 +23,7 @@ export * from 'app/content/zones/waterfallTower';
 export * from 'app/content/zones/riverTemple';
 export * from 'app/content/zones/riverTempleWater';
 export * from 'app/content/zones/staffTower';
-// grand temple
+export * from 'app/content/zones/grandTemple';
 // jade palace
 // forge
 // waterfall tower

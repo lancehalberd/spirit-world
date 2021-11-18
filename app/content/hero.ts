@@ -51,6 +51,7 @@ export class Hero implements Actor, SavedHeroData {
     jumpingVx?: number;
     jumpingVy?: number;
     jumpingVz?: number;
+    jumpingDownY?: number;
     // If this is set; the actor is being carried by a hero/clone.
     carrier?: Hero;
     explosionTime?: number;
