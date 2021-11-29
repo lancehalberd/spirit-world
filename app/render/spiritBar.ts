@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import { createCanvasAndContext } from 'app/dom';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 

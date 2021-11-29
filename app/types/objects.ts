@@ -51,7 +51,11 @@ export interface ObjectInstance {
     renderShadow?: (context: CanvasRenderingContext2D, state: GameState) => void,
     renderForeground?: (context: CanvasRenderingContext2D, state: GameState) => void,
     isAllyTarget?: boolean,
+    isEnemyTarget?: boolean,
     isNeutralTarget?: boolean,
+    // This function can be defined to override the default logic for checking if an object is active,
+    // which is used by switch toggling logic to determine whether to activate or deactivate next.
+    isActive?: (state: GameState) => boolean,
 }
 
 export type ObjectStatus = 'active' | 'closed' | 'closedEnemy' | 'closedSwitch'
@@ -79,6 +83,9 @@ export interface HitProperties {
     hitbox?: Rect,
     hitCircle?: {x: number, y: number, r: number},
     source?: Actor,
+    // Whether this hit can break crystal shields on certain enemies like
+    // the Crystal Guardians and Crystal Collector in the Waterfall Tower.
+    canDamageCrystalShields?: boolean
     // Whether this hit can push puzzle elements like rolling balls, push/pull blocks, etc.
     canPush?: boolean,
     // Whether this can cut ground tiles like thorns.
@@ -140,7 +147,9 @@ export interface BaseObjectDefinition {
     // and doors for the Staff Tower are only added when the Staff Tower is in the corresponding location.
     logicKey?: string,
     // Whether to save the status of this object permanently (for example switches to open dungeon doors).
-    saveStatus?: boolean,
+    // If this is unset, the default behavior depends on the object type, for examples enemies are saved for
+    // the zone, bosses are saved forever, and most objects aren't saved at all.
+    saveStatus?: 'forever' | 'zone' | 'never',
     // Whether this is a spirit object.
     spirit?: boolean,
     // Stores optional style type for some objects, e.g., 'short' vs 'tall' signs.
@@ -157,9 +166,20 @@ export interface BallGoalDefinition extends BaseObjectDefinition {
     targetObjectId?: string,
 }
 
+export interface BeadCascadeDefinition extends BaseObjectDefinition {
+    type: 'beadCascade'
+    onInterval?: number
+    offInterval?: number
+}
+
 export interface FloorSwitchDefinition extends BaseObjectDefinition {
     type: 'floorSwitch',
     toggleOnRelease?: boolean,
+    targetObjectId?: string,
+}
+
+export interface KeyBlockDefinition extends BaseObjectDefinition {
+    type: 'keyBlock',
     targetObjectId?: string,
 }
 
@@ -173,7 +193,7 @@ export interface LootObjectDefinition extends BaseObjectDefinition {
 
 export interface CrystalSwitchDefinition extends BaseObjectDefinition {
     type: 'crystalSwitch',
-    element: MagicElement,
+    element?: MagicElement,
     // If this is set, this crystal will de-activate after this many milliseconds.
     timer?: number,
     targetObjectId?: string,
@@ -202,7 +222,7 @@ export interface NPCDefinition extends BaseObjectDefinition {
     dialogue?: string,
 }
 
-export type SimpleObjectType = 'airBubbles' | 'marker' | 'pushPull' | 'rollingBall'
+export type SimpleObjectType = 'airBubbles' | 'beadGrate' | 'marker' | 'pushPull' | 'rollingBall'
     | 'tippable' | 'torch' | 'vineSprout' | 'waterPot';
 
 export interface SimpleObjectDefinition extends BaseObjectDefinition {
@@ -240,12 +260,14 @@ export interface BossObjectDefinition extends BaseObjectDefinition {
 
 export type ObjectDefinition = SimpleObjectDefinition
     | BallGoalDefinition
+    | BeadCascadeDefinition
     | BossObjectDefinition
     | CrystalSwitchDefinition
     | DecorationDefinition
     | EntranceDefinition
     | EnemyObjectDefinition
     | FloorSwitchDefinition
+    | KeyBlockDefinition
     | LootObjectDefinition
     | NPCDefinition
     | SignDefinition

@@ -1,4 +1,4 @@
-import { saveGame } from 'app/state';
+import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
 
 import {
     AreaInstance, GameState, ObjectInstance,
@@ -17,7 +17,7 @@ export class AirBubbles implements ObjectInstance {
         this.status = this.definition.status || 'normal';
         this.x = definition.x;
         this.y = definition.y;
-        if (state.savedState.objectFlags[this.definition.id]) {
+        if (getObjectStatus(state, definition)) {
             this.status = 'normal';
         }
     }
@@ -25,9 +25,8 @@ export class AirBubbles implements ObjectInstance {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
     update(state: GameState) {
-        if (this.definition.saveStatus && this.status === 'normal' && this.definition.id && !state.savedState.objectFlags[this.definition.id]) {
-            state.savedState.objectFlags[this.definition.id] = true;
-            saveGame();
+        if (this.status === 'normal') {
+            saveObjectStatus(state, this.definition);
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {

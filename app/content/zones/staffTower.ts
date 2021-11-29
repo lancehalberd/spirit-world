@@ -88,11 +88,11 @@ const f0_0x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "staffTowerEntrance", x: 240, y: 480, type: "door", style: "cave", targetZone: "overworld", targetObjectId: "staffTowerEntrance", d: "down", saveStatus: undefined},
-        {status: "cracked", id: "towerCrack", x: 112, y: 256, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerEntrance", d: "up", saveStatus: undefined},
-        {status: "cracked", id: "towerCrack", x: 112, y: 224, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerEntrance", d: "down", saveStatus: undefined},
-        {status: "cracked", id: "", logicKey: undefined, x: 64, y: 64, targetZone: null, targetObjectId: "staffTowerEntrance", type: "teleporter", saveStatus: undefined},
-        {status: "normal", id: "", logicKey: undefined, x: 432, y: 64, targetZone: null, targetObjectId: "staffTowerEntrance", type: "teleporter", saveStatus: undefined},
+        {status: "normal", id: "staffTowerEntrance", x: 240, y: 480, type: "door", style: "cave", targetZone: "overworld", targetObjectId: "staffTowerEntrance", d: "down"},
+        {status: "cracked", id: "towerCrack", x: 112, y: 256, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerEntrance", d: "up"},
+        {status: "cracked", id: "towerCrack", x: 112, y: 224, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerEntrance", d: "down"},
+        {status: "cracked", id: "", logicKey: undefined, x: 64, y: 64, targetZone: null, targetObjectId: "staffTowerEntrance", type: "teleporter"},
+        {status: "normal", id: "", logicKey: undefined, x: 432, y: 64, targetZone: null, targetObjectId: "staffTowerEntrance", type: "teleporter"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -186,8 +186,8 @@ const sf0_0x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "cracked", id: "", logicKey: undefined, x: 64, y: 432, targetZone: null, targetObjectId: "staffTowerEntrance", type: "teleporter", saveStatus: undefined},
-        {status: "cracked", id: "", logicKey: undefined, x: 432, y: 432, targetZone: null, targetObjectId: "staffTowerEntrance", type: "teleporter", saveStatus: undefined},
+        {status: "cracked", id: "", logicKey: undefined, x: 64, y: 432, targetZone: null, targetObjectId: "staffTowerEntrance", type: "teleporter"},
+        {status: "cracked", id: "", logicKey: undefined, x: 432, y: 432, targetZone: null, targetObjectId: "staffTowerEntrance", type: "teleporter"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},

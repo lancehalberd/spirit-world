@@ -1,12 +1,13 @@
-import { removeObjectFromArea, resetTileBehavior } from 'app/content/areas';
-import { allTiles } from 'app/content/tiles';
+import { removeObjectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { hitTargets } from 'app/utils/field';
+import { coverTile, hitTargets } from 'app/utils/field';
 
 import {
-    AreaInstance, AreaLayer, Direction,
+    AreaInstance, Direction,
     Frame, GameState, ObjectInstance, ObjectStatus,
 } from 'app/types';
+
+const thornsTilesIndex = 5;
 
 interface Props {
     x?: number
@@ -49,7 +50,8 @@ export class GrowingThorn implements ObjectInstance, Props {
             // Grow thorns at this location if possible.
             const tx = (this.x / 16) | 0;
             const ty = (this.y / 16) | 0;
-            const behavior = this.area.behaviorGrid?.[ty]?.[tx];
+            if (coverTile(state, this.area, tx, ty, thornsTilesIndex)) {
+            /*const behavior = this.area.behaviorGrid?.[ty]?.[tx];
             // Don't grow thorns over pits/walls
             if (!behavior?.solid && !behavior?.pit) {
                 let topLayer: AreaLayer = this.area.layers[0];
@@ -70,7 +72,7 @@ export class GrowingThorn implements ObjectInstance, Props {
                     this.area.tilesDrawn[ty][tx] = false;
                 }
                 this.area.checkToRedrawTiles = true;
-                resetTileBehavior(this.area, {x: tx, y: ty});
+                resetTileBehavior(this.area, {x: tx, y: ty});*/
                 hitTargets(state, this.area, {
                     damage: this.damage,
                     hitbox: this,

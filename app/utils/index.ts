@@ -14,6 +14,9 @@ export function isPixelInShortRect(x: number, y: number, {x: l = 0, y: t = 0, w 
     return !(y < t || y >= t + h || x < l || x >= l + w);
 }
 
+// Warning: For some reason I noticed this function was taking 200x longer than other simple function calls
+// made inside field::getTileBehaviorsAndObstacles when profiling.
+// I assume this is because chrome was not optimizing the call, and may have to do with the object spreading.
 export function roundRect({x, y, w, h}: Rect): Rect {
     return {x: x | 0, y: y | 0, w: w | 0, h: h | 0 };
 }

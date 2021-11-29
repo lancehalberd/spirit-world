@@ -1,5 +1,3 @@
-import _ from 'lodash';
-
 import {
     //applyLayerToBehaviorGrid,
     enterLocation,
@@ -47,7 +45,7 @@ import {
     DrawPriority,
     EnemyObjectDefinition, EnemyType,
     FullTile, GameState,
-    ObjectDefinition,
+    ObjectDefinition, ObjectType,
     PanelRows, PropertyRow, Rect, TileGridDefinition, TilePalette,
 } from 'app/types';
 
@@ -99,7 +97,9 @@ export function startEditing(state: GameState) {
         editingState.brush = {'none': {w: 1,h: 1,tiles: [[0]]}};
     }
     if (!editingState.selectedObject) {
-        editingState.selectedObject = createObjectDefinition(state, editingState, {type: combinedObjectTypes[0]});
+        editingState.selectedObject = createObjectDefinition(state, editingState,
+            {type: combinedObjectTypes[0]} as Partial<ObjectDefinition> & { type: ObjectType }
+        );
     }
     displayTileEditorPropertyPanel();
     state.areaInstance.tilesDrawn = [];
@@ -340,7 +340,8 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
                     }
                     state.areaInstance.definition.layers[i] = state.areaInstance.definition.layers[i - 1];
                     state.areaInstance.definition.layers[i - 1] = definition;
-                    state.areaInstance.alternateArea.definition.layers[i] = state.areaInstance.alternateArea.definition.layers[i - 1];
+                    state.areaInstance.alternateArea.definition.layers[i]
+                        = state.areaInstance.alternateArea.definition.layers[i - 1];
                     state.areaInstance.alternateArea.definition.layers[i - 1] = alternateDefinition;
                     enterLocation(state, state.location);
                     displayTileEditorPropertyPanel();
@@ -447,6 +448,8 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
                 ...editingState.selectedObject,
                 id: null,
             };
+            // Always switch back to default saveStatus when switching tool type.
+            delete editingState.selectedObject.saveStatus;
             displayTileEditorPropertyPanel();
         },
     });
@@ -781,19 +784,19 @@ function addNewLayer(state: GameState, layerKey: string, layerIndex: number) {
     const alternateTopLayerDefinition = alternateDefinition.layers[alternateDefinition.layers.length - 1];
     const layerDefinition: AreaLayerDefinition = {
         ...topLayerDefinition,
+        drawPriority: layerKey.startsWith('foreground') ? 'foreground' : 'background',
         key: layerKey,
         grid: {
             ...topLayerDefinition.grid,
-            // The matrix of tiles
             tiles: [],
         },
     };
     const alternateLayerDefinition: AreaLayerDefinition = {
         ...alternateTopLayerDefinition,
+        drawPriority: layerKey.startsWith('foreground') ? 'foreground' : 'background',
         key: layerKey,
         grid: {
             ...alternateTopLayerDefinition.grid,
-            // The matrix of tiles
             tiles: [],
         },
     };
@@ -816,7 +819,7 @@ function drawBrush(x: number, y: number): void {
     const state = getState();
     const sy = Math.floor((state.camera.y + y) / 16);
     const sx = Math.floor((state.camera.x + x) / 16);
-    const area = state.areaInstance;
+    let area = state.areaInstance;
     if (!editingState.selectedLayerKey) {
         let addedNewLayer = false;
         for (let layerKey in editingState.brush) {
@@ -843,6 +846,7 @@ function drawBrush(x: number, y: number): void {
         if (addedNewLayer) {
             // Calling this will instantiate the area again and place the player back in their current location.
             enterLocation(state, state.location);
+            area = state.areaInstance;
             displayTileEditorPropertyPanel();
         }
     }

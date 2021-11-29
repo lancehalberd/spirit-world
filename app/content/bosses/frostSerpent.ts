@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import { sample } from 'lodash';
 import { AnimationEffect } from 'app/content/animationEffect';
 import { addObjectToArea } from 'app/content/areas';
 import { Frost } from 'app/content/effects/frost';
@@ -37,7 +37,7 @@ enemyDefinitions.frostHeart = {
         shieldLife: 8,
     },
     immunities: ['ice'],
-    render: renderIceShield,
+    renderOver: renderIceShield,
     onHit(state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
         // If the shield is up, only fire damage can hurt it.
         if (enemy.params.shieldLife > 0) {
@@ -270,7 +270,7 @@ function updateFrostSerpent(this: void, state: GameState, enemy: Enemy): void {
             }
             return;
         }
-        const target = _.sample(enemy.area.allyTargets);
+        const target = sample(enemy.area.allyTargets);
         const hitbox = target.getHitbox(state);
         const dx = hitbox.x + hitbox.w / 2 - 256;
         const dy = hitbox.y + hitbox.h / 2 - 256;
@@ -385,7 +385,7 @@ function updateFrostSerpent(this: void, state: GameState, enemy: Enemy): void {
     }
     if (enemy.params.submerged) {
         if (enemy.modeTime >= 3000) {
-            const target = _.sample(enemy.area.allyTargets);
+            const target = sample(enemy.area.allyTargets);
             const hitbox = target.getHitbox(state);
             const dx = hitbox.x + hitbox.w / 2 - 256;
             const dy = hitbox.y + hitbox.h / 2 - 256;

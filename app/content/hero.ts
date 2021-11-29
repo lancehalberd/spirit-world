@@ -62,7 +62,6 @@ export class Hero implements Actor, SavedHeroData {
     grabObject?: ObjectInstance;
     invulnerableFrames?: number;
     life: number;
-    knockBack?: (state: GameState, vector: {vx: number; vy: number; vz: number}) => void;
     wading?: boolean;
     slipping?: boolean;
     swimming?: boolean;
@@ -72,6 +71,7 @@ export class Hero implements Actor, SavedHeroData {
     frozenDuration?: number;
     isEntering?: boolean;
     isExiting?: boolean;
+    isControlledByObject?: boolean;
     // stats
     magic: number = 0;
     // base: 20, max: 100, roll: 5, charge: 10, double-charge: 50
@@ -170,6 +170,18 @@ export class Hero implements Actor, SavedHeroData {
         for (let i in this) {
             copy[i] = this[i];
         }
+        copy.passiveTools = {
+            ...this.passiveTools,
+        };
+        copy.activeTools = {
+            ...this.activeTools,
+        };
+        copy.elements = {
+            ...this.elements,
+        };
+        copy.equipment = {
+            ...this.equipment,
+        };
         return copy;
     }
 
@@ -213,16 +225,7 @@ export class Hero implements Actor, SavedHeroData {
             this.takeDamage(state, hit.damage);
         }
         if (hit.knockback && !this.equipedGear?.ironBoots) {
-            if (this.knockBack) {
-                this.knockBack(state, hit.knockback);
-            } else {
-                this.throwHeldObject(state);
-                this.action = 'knocked';
-                this.animationTime = 0;
-                this.vx = hit.knockback.vx;
-                this.vy = hit.knockback.vy;
-                this.vz = hit.knockback.vz || 2;
-            }
+            this.knockBack(state, hit.knockback);
         }
         // Getting hit while frozen unfreezes you.
         if (this.frozenDuration > 0) {
@@ -232,6 +235,15 @@ export class Hero implements Actor, SavedHeroData {
             this.frozenDuration = 1500;
         }
         return { hit: true };
+    }
+
+    knockBack(state: GameState, knockback: {vx: number; vy: number; vz: number}) {
+        this.throwHeldObject(state);
+        this.action = 'knocked';
+        this.animationTime = 0;
+        this.vx = knockback.vx;
+        this.vy = knockback.vy;
+        this.vz = knockback.vz || 2;
     }
 
     takeDamage(this: Hero, state: GameState, damage: number): void {

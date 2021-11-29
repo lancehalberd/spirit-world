@@ -79,7 +79,7 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
     });
 
     // Show boss health bars from both realms.
-    const bosses = [...state.areaInstance.enemyTargets, ...state.alternateAreaInstance.enemyTargets].filter(
+    const bosses = [...state.areaInstance.enemies, ...state.alternateAreaInstance.enemies].filter(
         e => e.status !== 'gone' && e.definition.type === 'boss' && e.isFromCurrentSection(state)
     ) as Enemy[];
     if (bosses.length) {
@@ -89,14 +89,15 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
         y = CANVAS_HEIGHT - 16;
         x = 16;
         for (const boss of bosses) {
+            const animatedWidth = barWidth * Math.min(1, boss.healthBarTime / 1000);
             context.fillStyle = 'black';
-            context.fillRect(x, y, barWidth, barHeight);
-            const healthWidth = barWidth * boss.getHealthPercent(state) | 0;
+            context.fillRect(x, y, animatedWidth, barHeight);
+            const healthWidth = animatedWidth * boss.getHealthPercent(state) | 0;
             if (healthWidth > 0) {
                 context.fillStyle = 'red';
                 context.fillRect(x, y, healthWidth, barHeight);
             }
-            const shieldWidth = barWidth * boss.getShieldPercent(state) | 0;
+            const shieldWidth = animatedWidth * boss.getShieldPercent(state) | 0;
             if (shieldWidth > 0) {
                 context.fillStyle = 'white';
                 context.fillRect(x, y, shieldWidth, 2);

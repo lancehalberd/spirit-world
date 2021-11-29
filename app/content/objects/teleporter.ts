@@ -1,8 +1,8 @@
 import { enterLocation, enterZoneByTarget } from 'app/content/areas';
+import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
 import { findObjectInstanceById } from 'app/content/objects';
 import { editingState } from 'app/development/tileEditor';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { saveGame } from 'app/state';
 import { isObjectInsideTarget, pad } from 'app/utils/index';
 
 import {
@@ -24,13 +24,12 @@ export class Teleporter implements ObjectInstance {
         this.definition = definition;
         this.x = definition.x;
         this.y = definition.y;
-        this.status = state.savedState.objectFlags[this.definition.id] ? 'normal' : this.definition.status;
+        this.status = getObjectStatus(state, definition) ? 'normal' : this.definition.status;
     }
     changeStatus(state: GameState, status: ObjectStatus) {
         this.status = status;
-        if (this.status === 'normal' && this.definition.saveStatus) {
-            state.savedState.objectFlags[this.definition.id] = true;
-            saveGame();
+        if (this.status === 'normal') {
+            saveObjectStatus(state, this.definition);
         }
     }
     getHitbox(state: GameState): Rect {

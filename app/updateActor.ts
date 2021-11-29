@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import { find } from 'lodash';
 
 import {
     addObjectToArea, destroyTile, enterLocation, getAreaFromLocation, getAreaSize,
@@ -77,6 +77,17 @@ export function updateAllHeroes(this: void, state: GameState) {
 }
 
 export function updateHero(this: void, state: GameState, hero: Hero) {
+    // Remove action targets from old areas.
+    if (hero.actionTarget && hero.actionTarget.area !== hero.area) {
+        hero.actionTarget = null;
+    }
+    if (hero.isControlledByObject) {
+        hero.animationTime += FRAME_LENGTH;
+        updateScreenTransition(state, hero);
+        // Objects must set this flag every frame to keep it set.
+        hero.isControlledByObject = false;
+        return;
+    }
     if (hero.isEntering || hero.isExiting) {
         hero.action = 'walking';
         hero.animationTime += FRAME_LENGTH;
@@ -363,9 +374,9 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         if (hero.actionFrame >= 5) {
             hero.action = null;
         }
-    } else if (!isAstralProjection && hero.swimming) {
+    } else if (!isAstralProjection && hero.swimming && hero.action !== 'knocked') {
         movementSpeed *= 0.75;
-        // The only action a hero can perform while swimming is "walking".
+        // Abort any unsupported actions while swimming.
         if (hero.action !== 'walking') {
             hero.action = null;
         }
@@ -764,7 +775,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
                         playSound('pickUpObject');
                         destroyTile(state, hero.area, {...closestLiftableTileCoords, layerKey: layer.key});
                         if (behavior.linkableTiles) {
-                            const alternateLayer = _.find(state.alternateAreaInstance.layers, {key: layer.key});
+                            const alternateLayer = find(state.alternateAreaInstance.layers, {key: layer.key});
                             if(alternateLayer) {
                                 const linkedTile: FullTile = alternateLayer.tiles[closestLiftableTileCoords.y][closestLiftableTileCoords.x];
                                 if (linkedTile && behavior.linkableTiles.includes(linkedTile.index)) {
@@ -854,8 +865,18 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         state.hero.actualMagicRegen = !state.hero.action ? 2 : 1;
     }
     const isHoldingBreath = !isTouchingAirBubble && !isAstralProjection && !state.hero.passiveTools.waterBlessing && state.zone.surfaceKey;
-    if (isHoldingBreath) {
+    // The waterfall tower area drains mana unless you have the water blessing.
+    // Might make more sense to have this related to the water tiles in the material world or have
+    // it be configurable on the area like `darkness` but for now just using the zone key is fine.
+    const isWaterDrainingMagic = !isTouchingAirBubble && !isAstralProjection && !state.hero.passiveTools.waterBlessing && state.zone.key === 'waterfallTower';
+    if (isWaterDrainingMagic) {
+        state.hero.actualMagicRegen = Math.min(-20, state.hero.actualMagicRegen);
+    } else if (isHoldingBreath) {
         state.hero.actualMagicRegen = Math.min(-1, state.hero.actualMagicRegen);
+    } else if (isTouchingAirBubble) {
+        // "airBubbles" are actually going to be "Spirit Recharge" points that regenerate mana quickly.
+        state.hero.magic = Math.max(0, state.hero.magic);
+        state.hero.actualMagicRegen = Math.max(5, state.hero.actualMagicRegen);
     }
     if (!state.hero.isInvisible && !isHoldingBreath) {
         state.hero.actualMagicRegen = Math.min(

@@ -100,7 +100,6 @@ function updateTitle(state: GameState) {
             case 'deleteSavedGameConfirmation':
                 if (state.menuIndex === 1) {
                     state.savedGames[state.savedGameIndex] = null;
-                    console.log(state.savedGames);
                 }
                 state.scene = 'title';
                 state.menuIndex = state.savedGameIndex;

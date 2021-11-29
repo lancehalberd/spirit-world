@@ -1,6 +1,9 @@
 Test at http://localhost:81/alttp/public/
 
 Low Priority Bugs:
+    - Enemies can walk on stairs cases and over bead flows
+        - Add an invisible enemy wall object?
+    - Astral Projection appears in front of waterfall graphics only when south of main body in waterfall tower.
     - Clean up attack effects on defeating bosses.
         - Need to set a flag on all attack effects so they are easy to find and remove.
     - Foreground only renders for the active area, should render for the alternate area as well.
@@ -12,7 +15,6 @@ Low Priority Bugs:
     - frost grenade blast isn't centered.
 
 High Priority Bugs:
-    Couldn't grab objects as astral projection.
     Sometimes can't enter peach cave when sliding on ice?
 
 
@@ -25,33 +27,39 @@ Graphics:
 
 
 Current tasks:
-    - Allow selecting new tiles from SourcePalette:
-        - hash exact pixel values for all used tiles, and select existing used tile if the tile matches
-        - when a tile is selected, highlight all matching tiles on the source palette
-        - set to tile 1 if the tile matches the empty tile
-        - if the new tile doesn't match, add a new tile to the palette at the first empty slot
-        - Add an import tileset action just above the source palette options.
-            -> browser to file, create Image+SourcePalette, then display then select the palette.
+    - Waterfall Tower
+        - Make bead flows act like shallow water for when you are walking in them?
+            - This might not be the right animation for beads though.
+        - Missing mechanics
+            Make Crystal Spikes uncover the tiles they hit.
+                - Add uncover effect to hits.
+            Bead flows
+                It would be nice to somehow treat the south edge of the flow as a wall when walking north, the current treatment is jittery with the knockback.
+            Rusty floor switch that only activates if you fall on it wearing iron boots.
+        - Boss: Crystal Collector
+            - Add better spike attacks for main phase
+            - Add better spike attacks for enrage
+            - Passively summon spikes periodically whenever there are no floor eyes.
+            - Passively enable bead cascades for 4 seconds every 5 seconds
+                - Reduce to every 3 seconds for the final phase
+
+
     - Add dialogue objects that can trigger on entering areas or other triggers.
+    - Add saveStatusLocally flag that saves an id to a hash that is erased when changing zones.
+        - Use this to prevent large enemies like ents + crystal guardians from respawning when you just leave a screen.
     - Change message rendering system to use the priority queue system to support nested messages.
     - Add new waterfall graphics
+    - Add touchHit behavior to tiles that can define full hit properties for tiles/objects on touch
+        - Add 'barrierDamage' to hit properties that will control exact magic damage when hitting the spirit barrier.
+        - Set barrierDamage lower for clearable traps like thorns to allow players to walk through and clear them using spirit barrier. Set even lower for floor traps that cannot be cleared since they will hit every frame.
 
     - Randomizer improvements
-        - Forward fill progress items until  (remainingProgressItems / 2) checks are available.
         - Add a goal
     - Change level 1 invisibility to spirit barrier
-        - Like byrna, but drains spirit when taking damage or damaging enemies
         - Charge adds element effect to barrier and reduces spirit loss to damage of that type
-        - Reduces mana regen, but does not drain it like invisibility
         - Level 2 adds invisibility which allows you to pass through damage barriers entirely and ignore ground effects like ice
     - brainstorm some dungeon/boss ideas, maybe for Staff Tower
-    - Do a regression test and release latest version.
 
-
-1 possible locked doors:
-    out of logic until 1 key is possed.
-
-2 possible locked doors:
 
 High level list of things left to do:
     New dungeons(need enemies, mechanics, bosses, entrances):
@@ -80,7 +88,6 @@ High level list of things left to do:
         Setting up Staff Tower
         Bow level 2
         Bow charge 1 + 2
-        Invis Level 2
         Invis charge 1 + 2
         Clone charge 1 + 2
         Cloud boots: walking on clouds
@@ -95,6 +102,9 @@ Add toasts to development for undoing actions:
     - Replacing > 100 tiles
 
 Cloud Boots:
+    - Fall slower while wearing cloud boots
+    - While moving with cloud boots on, slowly increase z value up to +4 as long as you are on solid ground. You should then naturally fall back to 0 while still or over pits.
+        - The idea is that you can run over short gaps with cloud boots and also avoid floor damage as long as you keep moving.
     - Allow running over clouds (when implemented)
     - Maybe make falling in the sky behave like falling in a pit where you reset to safe location rather than falling to the overworld?
 
@@ -154,6 +164,7 @@ Dungeon 2 Improvements:
         - Some kind of optional spirit sight puzzle for a peach piece.
 
 Dungeon 3 Improvements:
+    - Add a required progress puzzle defeating enemies with rolling stones using spirit sight.
     - Make the guardian's projection use more interesting attacks.
     - Animate the ents when they attack.
 
@@ -249,13 +260,13 @@ Ability Locations:
     spiritSight         Vanara Tomb Boss
     gloves              Summoner Ruins Chest
     astralProjection    Summoner Ruins Boss
-    invisibility        Cocoon Chest
+    spiritCloak         Cocoon Chest
     teleportation       Cocoon Boss
 # Treasure Dungeons
     cloudBoots          Forest Temple Chest
     clone               Forest Temple Boss
     ironBoots           Waterfall Tower Chest
-    invisibility 2      Waterfall Tower Boss
+    spiritCloak 2       Waterfall Tower Boss
     gloves 2            Forge Chest
     goldMail            Forge Boss
     roll 2              Cloud Temple Chest
@@ -286,7 +297,7 @@ Early Dungeons:
     Vanara Village: Get the bow from the elder.
     Vanara Tomb: Dodge Roll in big chest, Spirit Sight from the Vanara Guardian.
     Summoner Ruins: Bracers in big chest, Astral Projection after defeating the boss.
-    Vanara Tomb-Regeneration Unit: Invisibility in big chest, Teleportation from Vanara Guardian.
+    Vanara Tomb-Regeneration Unit: spiritCloak in big chest, Teleportation from Vanara Guardian.
     Helix: Tree Staff in big chest, charge from Vanara Captain.
 
 Elemental Beasts: (triggered by Helix or entering the Spirit World)
@@ -296,11 +307,11 @@ Elemental Beasts: (triggered by Helix or entering the Spirit World)
 
 Late Dungeons:
     Forest Temple(New Fertility Temple):
-    Waterfall Tower: Iron Boots in chest, Invisibility 2 on boss
+    Waterfall Tower: Iron Boots in chest, spiritCloak 2 on boss
     The Forge: Gloves 2 in chest, gold mail on boss
-    Grand Temple:
-    Jade Palace:
-    Cloud Temple:
+    Grand Temple: Bow 2 chest, iron Skin from boss
+    Jade Palace: True Sight in chest, Phoenix Crown on boss
+    Cloud Temple: Roll 2 in chest, Nimbus Cloud on boss.
 
 Final Dungeon:
     Warship: Clone 2 in big chest

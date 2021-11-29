@@ -96,7 +96,7 @@ export function serializeZone(zone: Zone) {
                     }
                     lines.push('    objects: [');
                     for (const object of area.objects) {
-                        lines.push(`        {${Object.keys(object).map(k => `${k}: ${JSON.stringify(object[k])}` ).join(', ')}},`);
+                        lines.push(`        {${Object.keys(object).filter(k => object[k] !== undefined && object[k] !== null).map(k => `${k}: ${JSON.stringify(object[k])}` ).join(', ')}},`);
                     }
                     lines.push('    ],');
                     lines.push('    sections: [');

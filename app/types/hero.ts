@@ -102,6 +102,9 @@ export interface Actor extends ObjectInstance {
     // These flags are set when an actor is being forced to move through door objects.
     isEntering?: boolean
     isExiting?: boolean
+    // Generic flag set to remove player control when the hero is controlled by
+    // various objects like a BeadCascade BeadSection that sweeps them south.
+    isControlledByObject?: boolean
 }
 /* In case using the Hero class causes dependency issues, maybe switching to this interface could help.
 export interface Hero extends Actor, SavedHeroData {

@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import { sample } from 'lodash';
 import { refreshAreaLogic } from 'app/content/areas';
 import {
     accelerateInDirection,
@@ -37,7 +37,7 @@ enemyDefinitions.guardian = {
 
 
 function updateProjection(this: void, state: GameState, enemy: Enemy): void {
-    const guardian = enemy.area.alternateArea.enemyTargets.find(o =>
+    const guardian = enemy.area.alternateArea.enemies.find(o =>
         o.definition.type === 'boss' && o.definition.enemyType === 'guardian' && o.definition.id === enemy.definition.id
     );
     // The projection is defeated when the guardian is defeated.
@@ -126,7 +126,7 @@ function teleportToNextMarker(this: void, state: GameState, guardian: Enemy): vo
     }
     const markerId = guardian.life <= 4 ? 'guardianMarkerHard' : 'guardianMarkerEasy';
     const markers = guardian.area.objects.filter(o => o.definition?.id === markerId && !guardian.params.usedMarkers.has(o));
-    const marker = _.sample(markers);
+    const marker = sample(markers);
     if (marker) {
         guardian.x = marker.x;
         guardian.y = marker.y;

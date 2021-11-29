@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import { flatten } from 'lodash';
 
 import { addObjectToArea, isObjectLogicValid, linkObject, removeObjectFromArea } from 'app/content/areas';
 import { bossTypes } from 'app/content/bosses';
@@ -18,7 +18,8 @@ import { getState } from 'app/state';
 import { isPointInShortRect } from 'app/utils/index';
 
 import {
-    AreaDefinition, AreaInstance, BallGoalDefinition, BossType, CrystalSwitchDefinition, FloorSwitchDefinition,
+    AreaDefinition, AreaInstance, BallGoalDefinition,
+    BossType, CrystalSwitchDefinition, FloorSwitchDefinition, KeyBlockDefinition,
     FrameDimensions, DecorationType, Direction, DrawPriority, EnemyType, GameState,
     LootType, MagicElement, NPCBehavior, NPCStyle, ObjectDefinition, ObjectStatus, ObjectType, PanelRows,
     Rect, StaffTowerLocation,
@@ -48,22 +49,22 @@ export function getLootTypes(): LootType[] {
 }
 
 export const combinedObjectTypes: ObjectType[] = [
-    'airBubbles', 'ballGoal', 'bigChest', 'chest', 'crystalSwitch', 'decoration',
-    'door', 'floorSwitch', 'loot','marker', 'npc', 'pitEntrance',
-    'pushPull', 'rollingBall',  'sign', 'staffTowerPoint', 'teleporter', 'tippable', 'torch',
+    'airBubbles', 'ballGoal', 'beadCascade', 'beadGrate', 'bigChest', 'chest', 'crystalSwitch', 'decoration',
+    'door', 'floorSwitch', 'keyBlock', 'loot','marker', 'npc', 'pitEntrance',
+    'pushPull', 'rollingBall', 'sign', 'staffTowerPoint', 'teleporter', 'tippable', 'torch',
     'vineSprout', 'waterPot',
 ];
 
 export function createObjectDefinition(
     state: GameState,
     editingState: EditingState,
-    definition: Partial<ObjectDefinition> & {type: ObjectType}
+    definition: Partial<ObjectDefinition> & { type: ObjectType }
 ): ObjectDefinition {
     const x = definition.x || 0;
     const y = definition.y || 0;
     const commonProps = {
         // Assign defaults for any props the definitions might require.
-        status: 'normal' as ObjectStatus,
+        status: getPossibleStatuses(definition.type)[0],
         id: definition.id || '',
         linked: definition.linked,
         logicKey: definition.logicKey,
@@ -85,11 +86,20 @@ export function createObjectDefinition(
                 type: definition.type,
                 targetObjectId: definition.targetObjectId,
             };
+        case 'beadCascade':
+            return {
+                ...commonProps,
+                saveStatus: definition.saveStatus,
+                type: definition.type,
+                offInterval: definition.offInterval,
+                onInterval: definition.onInterval,
+            };
         case 'crystalSwitch':
             return {
                 ...commonProps,
                 type: definition.type,
                 element: definition.element,
+                saveStatus: definition.saveStatus,
                 timer: definition.timer || 0,
                 targetObjectId: definition.targetObjectId,
             };
@@ -124,6 +134,7 @@ export function createObjectDefinition(
                 lootAmount: definition.lootAmount || 1,
                 lootLevel: definition.lootLevel || 1,
                 d: definition.d || 'down',
+                saveStatus: definition.saveStatus,
                 params,
             };
         }
@@ -150,6 +161,7 @@ export function createObjectDefinition(
                 id: definition.id || uniqueId(state, enemyType),
                 enemyType,
                 d: definition.d || 'down',
+                saveStatus: definition.saveStatus,
                 params,
             };
         }
@@ -159,6 +171,13 @@ export function createObjectDefinition(
                 targetObjectId: definition.targetObjectId,
                 toggleOnRelease: definition.toggleOnRelease,
                 type: definition.type,
+            };
+        case 'keyBlock':
+            return {
+                ...commonProps,
+                type: definition.type,
+                status: definition.status || commonProps.status,
+                targetObjectId: definition.targetObjectId,
             };
         case 'pitEntrance':
             return {
@@ -191,6 +210,7 @@ export function createObjectDefinition(
             };
         }
         case 'airBubbles':
+        case 'beadGrate':
         case 'marker':
         case 'pushPull':
         case 'rollingBall':
@@ -247,7 +267,7 @@ function getTargetObjectIdsByTypes(zone: Zone, types: ObjectType[]): string[] {
             }
         }
     }
-    return _.flatten(combinedObjectIds).filter(id => id);
+    return flatten(combinedObjectIds).filter(id => id);
 }
 
 function getTargetObjectIdsByTypesAndArea(area: AreaDefinition, types: ObjectType[]): string[] {
@@ -257,9 +277,13 @@ function getTargetObjectIdsByTypesAndArea(area: AreaDefinition, types: ObjectTyp
     return area.objects.filter(object => types.includes(object.type)).map(object => object.id).filter(id => id);
 }
 
-export function getSwitchTargetProperties(state: GameState, editingState: EditingState, object: BallGoalDefinition | CrystalSwitchDefinition | FloorSwitchDefinition ): PanelRows {
+export function getSwitchTargetProperties(
+    state: GameState,
+    editingState: EditingState,
+    object: BallGoalDefinition | CrystalSwitchDefinition | FloorSwitchDefinition | KeyBlockDefinition
+): PanelRows {
     const rows: PanelRows = [];
-    const objectIds = ['all', ...getTargetObjectIdsByTypesAndArea(state.areaInstance.definition, ['door', 'chest', 'loot', 'airBubbles', 'torch'])];
+    const objectIds = ['all', ...getTargetObjectIdsByTypesAndArea(state.areaInstance.definition, ['door', 'chest', 'loot', 'airBubbles', 'beadGrate', 'beadCascade', 'torch'])];
 
     if (object.id && objectIds.indexOf(object.targetObjectId) < 0) {
         delete object.targetObjectId;
@@ -274,6 +298,33 @@ export function getSwitchTargetProperties(state: GameState, editingState: Editin
         },
     });
     return rows;
+}
+
+function getPossibleStatuses(type: ObjectType): ObjectStatus[] {
+    switch (type) {
+        case 'airBubbles':
+        case 'beadCascade':
+        case 'beadGrate':
+        case 'pitEntrance':
+            return ['normal', 'hidden', 'hiddenEnemy', 'hiddenSwitch'];
+        case 'torch':
+            return ['normal', 'active', 'hidden', 'hiddenEnemy', 'hiddenSwitch'];
+        case 'teleporter':
+            return ['normal', 'hidden', 'hiddenEnemy', 'hiddenSwitch'];
+        case 'keyBlock':
+            return ['locked', 'bigKeyLocked'];
+        case 'door':
+        case 'stairs':
+            return ['normal', 'closed', 'closedEnemy', 'closedSwitch',
+                'locked', 'bigKeyLocked', 'cracked', 'blownOpen',
+                'frozen',
+            ];
+        case 'chest':
+            return ['normal', 'hiddenEnemy', 'hiddenSwitch'];
+        default:
+            return ['normal'];
+    }
+
 }
 
 export function getObjectProperties(state: GameState, editingState: EditingState): PanelRows {
@@ -326,9 +377,14 @@ export function getObjectProperties(state: GameState, editingState: EditingState
     }]);
     rows.push({
         name: 'saveStatus',
-        value: object.saveStatus || false,
-        onChange(saveStatus: boolean) {
-            object.saveStatus = saveStatus;
+        value: object.saveStatus || 'default',
+        values: ['default', 'forever', 'zone', 'never'],
+        onChange(saveStatus: 'default' | 'forever' | 'zone' | 'never') {
+            if (saveStatus === 'default'){
+                delete object.saveStatus;
+            } else {
+                object.saveStatus = saveStatus;
+            }
             updateObjectInstance(state, object);
         },
     });
@@ -357,28 +413,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             updateObjectInstance(state, object);
         },
     });
-    let possibleStatuses: ObjectStatus[] = ['normal'];
-    switch (object.type) {
-        case 'airBubbles':
-            possibleStatuses = ['normal', 'hidden', 'hiddenEnemy', 'hiddenSwitch'];
-            break;
-        case 'torch':
-            possibleStatuses = ['normal', 'active', 'hidden', 'hiddenEnemy', 'hiddenSwitch'];
-            break;
-        case 'teleporter':
-            possibleStatuses = ['normal', 'hidden', 'hiddenEnemy', 'hiddenSwitch'];
-            break;
-        case 'door':
-        case 'stairs':
-            possibleStatuses = ['normal', 'closed', 'closedEnemy', 'closedSwitch',
-                'locked', 'bigKeyLocked', 'cracked', 'blownOpen',
-                'frozen',
-            ];
-            break;
-        case 'chest':
-            possibleStatuses = ['normal', 'hiddenEnemy', 'hiddenSwitch'];
-            break;
-    }
+    const possibleStatuses = getPossibleStatuses(object.type);
     if (!possibleStatuses.includes(object.status)) {
         object.status = possibleStatuses[0];
     }
@@ -491,6 +526,24 @@ export function getObjectProperties(state: GameState, editingState: EditingState
         case 'ballGoal':
             rows = [...rows, ...getSwitchTargetProperties(state, editingState, object)];
             break;
+        case 'beadCascade':
+            rows.push({
+                name: 'onInterval',
+                value: object.onInterval || 0,
+                onChange(onInterval: number) {
+                    object.onInterval = onInterval;
+                    updateObjectInstance(state, object);
+                },
+            });
+            rows.push({
+                name: 'offInterval',
+                value: object.offInterval || 0,
+                onChange(offInterval: number) {
+                    object.offInterval = offInterval;
+                    updateObjectInstance(state, object);
+                },
+            });
+            break;
         case 'crystalSwitch':
             rows.push({
                 name: 'element',
@@ -522,6 +575,9 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                     updateObjectInstance(state, object);
                 },
             });
+            rows = [...rows, ...getSwitchTargetProperties(state, editingState, object)];
+            break;
+        case 'keyBlock':
             rows = [...rows, ...getSwitchTargetProperties(state, editingState, object)];
             break;
         case 'enemy':

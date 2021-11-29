@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import { find } from 'lodash';
 
 import { changeObjectStatus, createObjectInstance, findObjectInstanceById } from 'app/content/objects';
 import { allTiles } from 'app/content/tiles';
@@ -461,7 +461,7 @@ export function applyLayerToBehaviorGrid(behaviorGrid: TileBehaviors[][], layer:
         for (let x = 0; x < tiles.length; x++) {
             let tile = tiles[y][x];
             if (!tile && parentLayer) {
-                tile = parentLayer.grid.tiles[y][x];
+                tile = parentLayer.grid.tiles[y]?.[x];
             }
             if (!tile) {
                 continue;
@@ -533,6 +533,10 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
         checkToRedrawTiles: true,
         layers: definition.layers.filter((layer) => {
             // The selected layer is always visible.
+            if (!layer) {
+                console.error('missing layer', definition);
+                debugger;
+            }
             if (editingState.isEditing && editingState.selectedLayerKey === layer.key) {
                 return true;
             }
@@ -573,6 +577,7 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
         allyTargets: [],
         enemyTargets: [],
         neutralTargets: [],
+        enemies: [],
     };
     for (const layer of instance.layers) {
         const definitionIndex = definition.layers.indexOf(layer.definition);
@@ -583,13 +588,22 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
             const definitionIndex = definition.layers.indexOf(layer.definition);
             const parentLayerDefinition = definition.parentDefinition.layers[definitionIndex];
             if (!parentLayerDefinition) {
-                debugger;
+                console.warn('Missing parent layer definition for layer', layer);
+                console.warn('Copying child layer to parent');
+                definition.parentDefinition.layers[definitionIndex] = initializeAreaLayerTiles({
+                    ...layer.definition,
+                    grid: {
+                        ...layer.definition.grid,
+                        tiles: [],
+                    },
+                });
+                //debugger;
                 continue;
             }
             for (let y = 0; y < layer.tiles.length; y++) {
                 for (let x = 0; x < layer.tiles[y].length; x++) {
                     if (!layer.tiles[y][x]) {
-                        const parentTile = allTiles[definition.parentDefinition.layers[definitionIndex].grid.tiles[y][x]];
+                        const parentTile = allTiles[definition.parentDefinition.layers[definitionIndex].grid.tiles[y]?.[x]];
                         // Tiles with linked offsets map to different tiles than the parent definition.
                         const linkedOffset = parentTile?.behaviors?.linkedOffset || 0;
                         const tile = linkedOffset ? allTiles[parentTile.index + linkedOffset] : parentTile;
@@ -761,7 +775,7 @@ export function removeObjectFromArea(state: GameState, object: ObjectInstance, t
 }
 
 export function destroyTile(state: GameState, area: AreaInstance, target: TileCoords): void {
-    const layer = _.find(area.layers, { key: target.layerKey });
+    const layer = find(area.layers, { key: target.layerKey });
     if (!layer) {
         console.error(`Missing target layer: ${target.layerKey}`);
         return;

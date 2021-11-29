@@ -1,5 +1,5 @@
 import {
-    changeObjectStatus,
+    toggleTarget,
     checkIfAllSwitchesAreActivated,
     deactivateTargets,
     findObjectInstanceById,
@@ -70,18 +70,11 @@ export class FloorSwitch implements ObjectInstance {
         playAreaSound(state, this.area, 'switch');
         if (this.definition.targetObjectId) {
             const object = findObjectInstanceById(this.area, this.definition.targetObjectId);
-            this.toggleTargetStatus(state, object);
+            toggleTarget(state, object);
         } else {
             for (const object of this.area.objects) {
-                this.toggleTargetStatus(state, object);
+                toggleTarget(state, object);
             }
-        }
-    }
-    toggleTargetStatus(state: GameState, target: ObjectInstance): void {
-        if (target.status === 'hiddenSwitch' || target.status === 'closedSwitch') {
-            changeObjectStatus(state, target, 'normal');
-        } else if (target.definition?.status === 'closedSwitch') {
-            changeObjectStatus(state, target, 'closedSwitch');
         }
     }
 

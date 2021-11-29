@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import { sample } from 'lodash';
 
 import { Clone } from 'app/content/clone';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
@@ -7,6 +7,8 @@ import { EnemyArrow } from 'app/content/arrow';
 import { Flame } from 'app/content/effects/flame';
 import { FrostGrenade } from 'app/content/effects/frostGrenade';
 import { GrowingThorn } from 'app/content/effects/growingThorn';
+import { GroundSpike } from 'app/content/effects/groundSpike';
+import { SpikePod } from 'app/content/effects/spikePod';
 import {
     beetleAnimations,
     climbingBeetleAnimations,
@@ -16,12 +18,14 @@ import {
     entAnimations,
     snakeAnimations,
 } from 'app/content/enemyAnimations';
-import { simpleLootTable, lifeLootTable, moneyLootTable } from 'app/content/lootTables';
+import { certainLifeLootTable, simpleLootTable, lifeLootTable, moneyLootTable } from 'app/content/lootTables';
 import { addObjectToArea, getAreaSize } from 'app/content/areas';
+import { editingState } from 'app/development/tileEditor';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { moveActor } from 'app/moveActor';
 import { createAnimation } from 'app/utils/animations';
 import { directionMap } from 'app/utils/field';
+import { playSound } from 'app/utils/sounds';
 
 import {
     ActorAnimations, Direction,
@@ -34,8 +38,10 @@ import {
 export const enemyTypes = <const>[
     'arrowTurret',
     'beetle', 'climbingBeetle', 'beetleHorned', 'beetleMini', 'beetleWinged',
+    'crystalGuardian',
     'ent',
     'flameSnake', 'frostBeetle',
+    'floorEye',
     'lightningBug',
     'snake',
     'wallLaser',
@@ -59,6 +65,7 @@ export interface EnemyDefinition {
     // This enemy won't be destroyed when reaching 0 life.
     isImmortal?: boolean,
     immunities?: MagicElement[],
+    initialMode?: string,
     params?: any,
     speed?: number,
     acceleration?: number,
@@ -67,7 +74,10 @@ export interface EnemyDefinition {
     update?: (state: GameState, enemy: Enemy) => void,
     onDeath?: (state: GameState, enemy: Enemy) => void,
     onHit?: (state: GameState, enemy: Enemy, hit: HitProperties) => HitResult,
+    // Optional render function called instead of the standard render logic.
     render?: (context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) => void,
+    // Optional render function called after the standard render.
+    renderOver?: (context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) => void,
     getHealthPercent?: (state: GameState, enemy: Enemy) => number,
     getShieldPercent?: (state: GameState, enemy: Enemy) => number,
 }
@@ -125,7 +135,7 @@ enemyDefinitions.frostBeetle = {
 enemyDefinitions.lightningBug = {
     alwaysReset: true,
     animations: beetleWingedAnimations, acceleration: 0.2, speed: 1, aggroRadius: 112, flying: true,
-    life: 3, touchDamage: 1, update: updateStormLightningBug, render: renderLightningShield,
+    life: 3, touchDamage: 1, update: updateStormLightningBug, renderOver: renderLightningShield,
     immunities: ['lightning'],
 };
 
@@ -137,6 +147,70 @@ enemyDefinitions.ent = {
     // The damage from tile behaviors will trigger when the player attempts to move into the same pixel,
     // which is more specific than touch damage on enemies which requires actually being in the same pixel.
     tileBehaviors: {damage: 2, solid: true},
+};
+
+enemyDefinitions.crystalGuardian = {
+    alwaysReset: true,
+    params: {
+        shieldLife: 2,
+    },
+    animations: entAnimations, aggroRadius: 128,
+    life: 8, touchDamage: 2,
+    onHit(state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
+        // If the shield is up, only fire damage can hurt it.
+        if (enemy.params.shieldLife > 0) {
+            console.log('pen?', hit.canDamageCrystalShields, hit);
+            if (hit.canDamageCrystalShields) {
+                enemy.params.shieldLife = Math.max(0, enemy.params.shieldLife - hit.damage);
+                playSound('enemyHit');
+                return { hit: true };
+            }
+        }
+        // Use the default hit behavior, the attack will be blocked if the shield is still up.
+        return enemy.defaultOnHit(state, hit);
+    },
+    update(state: GameState, enemy: Enemy): void {
+        enemy.shielded = enemy.params.shieldLife > 0;
+        // Summon a pod once very 2 seconds if a target is nearby.
+        if (enemy.modeTime >= 2000) {
+            const v = getVectorToNearbyTarget(state, enemy, enemy.enemyDefinition.aggroRadius, enemy.area.allyTargets);
+            if (v) {
+                const {x, y} = v;
+                // This should spawn in a ficed radius around the guardian in between it and the target.
+                addObjectToArea(state, enemy.area, new SpikePod({
+                    x: enemy.x + enemy.w / 2 + 48 * x,
+                    y: enemy.y + enemy.h / 2 + 48 * y,
+                    damage: 2,
+                }));
+                enemy.modeTime = 0;
+            }
+        }
+    },
+    ignorePits: true,
+    // The damage from tile behaviors will trigger when the player attempts to move into the same pixel,
+    // which is more specific than touch damage on enemies which requires actually being in the same pixel.
+    tileBehaviors: {damage: 2, solid: true},
+    renderOver(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
+        const defaultParams = enemyDefinitions.crystalGuardian.params;
+        if (enemy.params.shieldLife <= 0) {
+            return;
+        }
+        const hitbox = enemy.getHitbox(state);
+        context.save();
+            context.globalAlpha *= (0.4 + 0.4 * enemy.params.shieldLife / defaultParams.shieldLife);
+            context.fillStyle = 'white';
+            context.fillRect(hitbox.x, hitbox.y, hitbox.w, hitbox.h);
+        context.restore();
+        // Debug the vector to where the pod will by created.
+        /*const v = getVectorToNearbyTarget(state, enemy, enemy.enemyDefinition.aggroRadius, enemy.area.allyTargets);
+        if (v) {
+            context.beginPath();
+            context.moveTo(enemy.x + enemy.w / 2, enemy.y + enemy.h / 2);
+            context.lineTo(enemy.x + enemy.w / 2 + v.x * 48, enemy.y + enemy.h / 2 + v.y * 48);
+            context.strokeStyle = 'red';
+            context.stroke();
+        }*/
+    }
 };
 
 function updateEnt(state: GameState, enemy: Enemy): void {
@@ -164,6 +238,83 @@ function updateEnt(state: GameState, enemy: Enemy): void {
             const target = getNearbyTarget(state, enemy, enemy.enemyDefinition.aggroRadius, enemy.area.allyTargets, new Set([state.hero.astralProjection]));
             if (target) {
                 enemy.setMode('attack');
+            }
+        }
+    }
+}
+
+
+enemyDefinitions.floorEye = {
+    animations: climbingBeetleAnimations, aggroRadius: 96,
+    hasShadow: false,
+    initialMode: 'closed',
+    lootTable: certainLifeLootTable,
+    // TODO: Set this to 2 and add a way to remove touch damage when the eye is not fully open.
+    touchDamage: 0,
+    life: 4, update: updateFloorEye,
+    render: renderUnderTiles,
+};
+function renderUnderTiles(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
+    // Render normally while editing.
+    if (editingState.isEditing) {
+        enemy.defaultRender(context, state);
+    }
+    const hitbox = enemy.getHitbox(state);
+    const tx = Math.floor((hitbox.x + hitbox.w / 2) / 16);
+    const ty = Math.floor((hitbox.y + hitbox.h / 2) / 16);
+    if (!enemy.area) {
+        return;
+    }
+    const behavior = enemy.area.behaviorGrid?.[ty]?.[tx];
+    // Hide the enemy as long as there is something on top of it.
+    if (behavior?.solid || behavior?.cuttable || enemy.mode === 'closed') {
+        return;
+    }
+    context.save();
+        if (enemy.mode === 'closing') {
+            context.globalAlpha *= Math.max(0, 1 - enemy.modeTime / 1000);
+        } else if (enemy.mode === 'opening') {
+            context.globalAlpha *= Math.min(1, enemy.modeTime / 1000);
+        } else if (enemy.mode === 'closed') {
+            context.globalAlpha = 0;
+        }
+        enemy.defaultRender(context, state);
+    context.restore();
+}
+function updateFloorEye(state: GameState, enemy: Enemy): void {
+    if (enemy.mode === 'attack') {
+        enemy.isInvulnerable = false;
+        const target = getNearbyTarget(state, enemy, enemy.enemyDefinition.aggroRadius, enemy.area.allyTargets);
+
+        if (target && enemy.modeTime % 1000 === 0) {
+            const targetHitbox = target.getHitbox(state);
+            const spike = new GroundSpike({
+                x: targetHitbox.x + targetHitbox.w / 2,
+                y: targetHitbox.y + targetHitbox.h / 2,
+                damage: 4,
+            });
+            addObjectToArea(state, enemy.area, spike);
+        }
+        if (enemy.modeTime >= 2000) {
+            enemy.setMode('closing')
+        }
+    } else if (enemy.mode === 'opening') {
+        enemy.isInvulnerable = true;
+        if (enemy.modeTime >= 1000) {
+            enemy.setMode('attack')
+        }
+    } else if (enemy.mode === 'closing') {
+        enemy.isInvulnerable = true;
+        if (enemy.modeTime >= 1000) {
+            enemy.setMode('closed')
+        }
+    } else {
+        enemy.isInvulnerable = true;
+        enemy.mode = 'closed';
+        if (enemy.modeTime >= 1000) {
+            const target = getNearbyTarget(state, enemy, enemy.enemyDefinition.aggroRadius, enemy.area.allyTargets);
+            if (target) {
+                enemy.setMode('opening');
             }
         }
     }
@@ -458,8 +609,8 @@ export function paceAndCharge(state: GameState, enemy: Enemy) {
     }
 }
 
-export function getVectorToTarget(state: GameState, enemy: Enemy, target: ObjectInstance):{x: number, y: number, mag: number} {
-    const hitbox = enemy.getHitbox(state);
+export function getVectorToTarget(state: GameState, source: ObjectInstance, target: ObjectInstance):{x: number, y: number, mag: number} {
+    const hitbox = source.getHitbox(state);
     const targetHitbox = target.getHitbox(state);
     const dx = (targetHitbox.x + targetHitbox.w / 2) - (hitbox.x + hitbox.w / 2);
     const dy = (targetHitbox.y + targetHitbox.h / 2) - (hitbox.y + hitbox.h / 2);
@@ -470,10 +621,10 @@ export function getVectorToTarget(state: GameState, enemy: Enemy, target: Object
     return null;
 }
 
-export function getVectorToNearbyTarget(state: GameState, enemy: Enemy, radius: number, targets: ObjectInstance[]): {x: number, y: number} {
-    const hitbox = enemy.getHitbox(state);
+export function getVectorToNearbyTarget(state: GameState, source: ObjectInstance, radius: number, targets: ObjectInstance[]): {x: number, y: number} {
+    const hitbox = source.getHitbox(state);
     for (const target of targets) {
-        if (!target || target.area !== enemy.area || !target.getHitbox) {
+        if (!target || target.area !== source.area || !target.getHitbox) {
             continue;
         }
         const targetHitbox = target.getHitbox(state);
@@ -487,10 +638,24 @@ export function getVectorToNearbyTarget(state: GameState, enemy: Enemy, radius: 
     return null;
 }
 
+export function getVectorToNearestTargetOrRandom(state: GameState, source: ObjectInstance, targets: ObjectInstance[]): {x: number, y: number} {
+    const v = getVectorToNearbyTarget(state, source, 1000, targets);
+    if (v) {
+        return v;
+    }
+    const dx = Math.random();
+    const dy = Math.random();
+    if (!dx && !dy) {
+        return {x: 0, y: 1};
+    }
+    const mag = Math.sqrt(dx * dx + dy * dy);
+    return {x: dx / mag, y: dy / mag};
+}
+
 export function getNearbyTarget(state: GameState, enemy: Enemy, radius: number, targets: ObjectInstance[], ignoreTargets: Set<ObjectInstance> = null): ObjectInstance {
     const hitbox = enemy.getHitbox(state);
     for (const target of targets) {
-        if (!target || target.area !== enemy.area || !target.getHitbox || ignoreTargets.has(target)) {
+        if (!target || target.area !== enemy.area || !target.getHitbox || ignoreTargets?.has(target)) {
             continue;
         }
         const targetHitbox = target.getHitbox(state);
@@ -568,7 +733,7 @@ function getLineOfSightTargetAndDirection(state: GameState, enemy: Enemy, direct
 function paceRandomly(state: GameState, enemy: Enemy) {
     if (enemy.mode === 'choose' && enemy.modeTime > 200) {
         enemy.setMode('walk');
-        enemy.d = _.sample(['up', 'down', 'left', 'right']);
+        enemy.d = sample(['up', 'down', 'left', 'right']);
         enemy.currentAnimation = enemy.enemyDefinition.animations.idle[enemy.d];
     }
     if (enemy.mode === 'walk') {

@@ -1,5 +1,3 @@
-import _ from 'lodash';
-
 import { Clone } from 'app/content/clone';
 import { editingState } from 'app/development/tileEditor';
 import { createCanvasAndContext } from 'app/dom';

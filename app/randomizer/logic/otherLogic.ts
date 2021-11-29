@@ -1,5 +1,5 @@
 import {
-    hasMediumRange,
+    hasCatEyes, hasMediumRange,
 } from 'app/content/logic';
 
 import { LogicNode } from 'app/types';
@@ -22,7 +22,7 @@ export const treeVillageNodes: LogicNode[] = [
         nodeId: 'elderDownstairs',
         checks: [
             { objectId: 'elderPeachPiece', logic: hasMediumRange },
-            { objectId: 'treeVillage:1:0x0-bow-0' },
+            { objectId: 'treeVillage:1:0x0-bow-0', logic: hasCatEyes },
         ],
         entranceIds: [
             'elderUpstairs',

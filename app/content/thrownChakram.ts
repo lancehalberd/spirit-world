@@ -112,6 +112,7 @@ export class ThrownChakram implements ObjectInstance {
             hitbox: this,
             hitEnemies: true,
             hitObjects: true,
+            source: this.source,
         }
         // Only push objects on the way out to prevent accidentally dragging objects towards the player.
         if (this.outFrames > 0) {
@@ -222,7 +223,7 @@ export class HeldChakram implements ObjectInstance {
             vx: speed * this.vx,
             vy: speed * this.vy,
             returnSpeed: 4,
-            damage: this.damage * Math.round(1 + speed / 6),
+            damage: this.damage * Math.floor(1 + speed / 6),
             element,
             source: this.hero,
             piercing: speed === 12,
@@ -283,6 +284,7 @@ export class HeldChakram implements ObjectInstance {
             hitEnemies: true,
             hitObjects: false,
             knockAwayFrom: { x: this.hero.x + this.hero.w / 2, y: this.hero.y + this.hero.h / 2 },
+            source: this.hero,
         };
         const hitResult = hitTargets(state, this.area, hit);
         if (hitResult.hit && !hitResult.pierced) {

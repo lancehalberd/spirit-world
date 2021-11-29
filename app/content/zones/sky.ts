@@ -452,7 +452,7 @@ const f0_1x1: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "helixSkyEntrance", x: 368, y: 192, type: "door", style: "lightCave", targetZone: "helix", targetObjectId: "helixSkyEntrance", d: "up", saveStatus: undefined},
+        {status: "normal", id: "helixSkyEntrance", x: 368, y: 192, type: "door", style: "lightCave", targetZone: "helix", targetObjectId: "helixSkyEntrance", d: "up"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},

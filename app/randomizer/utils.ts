@@ -604,7 +604,9 @@ export function applyLootAssignments(assignments: LootAssignment[]): void {
             const npcKey = `${assignment.target.location.zoneKey}-${assignment.target.lootObject.id}`;
             const number = assignment.lootAmount || assignment.lootLevel;
             let text: string;
-            if (number) {
+            if (assignment.lootType === 'empty') {
+                text = `I'm sorry you came all this way for nothing.`;
+            } else if (number) {
                 text = `Here you go! {flag:${npcKey}}{item:${assignment.lootType}:${number}}`;
             } else {
                 text = `Here you go! {flag:${npcKey}}{item:${assignment.lootType}}`;

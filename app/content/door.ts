@@ -1,7 +1,5 @@
-import _ from 'lodash';
-
 import { applyBehaviorToTile, enterZoneByTarget, playAreaSound, resetTileBehavior } from 'app/content/areas';
-import { findObjectInstanceById } from 'app/content/objects';
+import { findObjectInstanceById, getObjectStatus, saveObjectStatus } from 'app/content/objects';
 import {
     BITMAP_LEFT, BITMAP_RIGHT,
     BITMAP_BOTTOM, BITMAP_BOTTOM_LEFT_8, BITMAP_BOTTOM_RIGHT_8,
@@ -105,10 +103,12 @@ interface DoorStyleDefinition {
     up?: DoorStyleFrames,
     left?: DoorStyleFrames,
 }
-const woodImage = requireImage('gfx/tiles/woodhousetilesarranged.png');
+const woodImage = requireImage('gfx/tiles/woodhousetilesarrangedv3.png');
 const woodenSouthCrackedWall: Frame = {image: woodImage, x: 32, y: 96, w: 16, h: 16};
-const [woodenSouthDoorClosed, woodenSouthDoorOpen, woodenSouthDoorEmpty] = createAnimation('gfx/tiles/woodhousetilesarranged.png', {w: 64, h: 16},
-    {left: 368, y: 7, rows: 3}).frames;
+const [
+    woodenSouthDoorClosed, woodenSouthDoorOpen, woodenSouthDoorEmpty
+] = createAnimation('gfx/tiles/woodhousetilesarrangedv3.png', {w: 64, h: 16},
+    {left: 336, y: 7, rows: 3}).frames;
 function renderWoodenDoor(context: CanvasRenderingContext2D, state: GameState, door: Door) {
     /*if (door.definition.d === 'down') {
         let frame = woodenSouthDoorEmpty;
@@ -302,7 +302,7 @@ export class Door implements ObjectInstance {
         this.y = definition.y;
         this.status = definition.status || 'normal';
         // If the player already opened this door, set it to the appropriate open status.
-        if (this.definition.id && state.savedState.objectFlags[this.definition.id]) {
+        if (getObjectStatus(state, this.definition)) {
             if (this.status === 'cracked') {
                 this.status = 'blownOpen';
             } else {
@@ -339,10 +339,7 @@ export class Door implements ObjectInstance {
                     object.changeStatus(state, 'normal');
                 }
             }
-            if (this.definition.saveStatus) {
-                state.savedState.objectFlags[this.definition.id] = true;
-                saveGame();
-            }
+            saveObjectStatus(state, this.definition, true);
         }
         const y = Math.floor(this.y / 16);
         const x = Math.floor(this.x / 16);

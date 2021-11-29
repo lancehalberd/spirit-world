@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import { flatten } from 'lodash';
 import { getLootTypes } from 'app/development/objectEditor';
 import { CANVAS_WIDTH, CANVAS_HEIGHT, GAME_KEY } from 'app/gameConstants';
 import { renderField } from 'app/render';
@@ -51,7 +51,7 @@ function getEscapedLoot(state: GameState, escapedToken: string): DialogueLootDef
 function getEscapedFrames(state: GameState, escapedToken: string): Frame[] {
     const controllerMaps = getActiveControllerMaps(state);
     function getGameKeyFrames(key: number) {
-        return _.flatten(controllerMaps.map(controllerMap => controllerMap[key]));
+        return flatten(controllerMaps.map(controllerMap => controllerMap[key]));
     }
     switch (escapedToken.toUpperCase()) {
         case 'B_DPAD':
@@ -67,7 +67,7 @@ function getEscapedFrames(state: GameState, escapedToken: string): Frame[] {
         case 'B_WEAPON':
             return getGameKeyFrames(GAME_KEY.WEAPON);
         case 'B_TOOL':
-            return _.flatten([
+            return flatten([
                 getGameKeyFrames(GAME_KEY.LEFT_TOOL),
                 characterMap['/'],
                 getGameKeyFrames(GAME_KEY.RIGHT_TOOL),

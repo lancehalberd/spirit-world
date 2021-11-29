@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import { uniq } from 'lodash';
 
 import { getAreaSize } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
@@ -199,7 +199,7 @@ function moveActorInDirection(
             }
         }
     }
-    pushedObjects = _.uniq(pushedObjects);
+    pushedObjects = uniq(pushedObjects);
     if (canPush && (blockedByTile || pushedObjects.length) && (!actor.action || actor.action === 'walking' || actor.action === 'pushing')) {
         if (!canJumpDown && actor.action !== 'pushing') {
             actor.action = 'pushing';

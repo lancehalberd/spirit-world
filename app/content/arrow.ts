@@ -1,4 +1,4 @@
-import { getAreaSize, removeObjectFromArea } from 'app/content/areas';
+import { addObjectToArea, getAreaSize, removeObjectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrameAt, getFrame } from 'app/utils/animations';
 import { getDirection, hitTargets } from 'app/utils/field';
@@ -146,12 +146,13 @@ type ArrowStyle = keyof typeof arrowStyles;
 
 interface Props {
     x?: number
-    y?: number,
-    vx?: number,
-    vy?: number,
-    damage?: number,
-    element?: MagicElement,
-    style?: ArrowStyle,
+    y?: number
+    vx?: number
+    vy?: number
+    damage?: number
+    element?: MagicElement
+    reflected?: boolean
+    style?: ArrowStyle
 }
 
 export class Arrow implements ObjectInstance {
@@ -176,7 +177,7 @@ export class Arrow implements ObjectInstance {
     stuckFrames: number = 0;
     status: ObjectStatus = 'normal';
     style: ArrowStyle = 'normal';
-    constructor({x = 0, y = 0, vx = 0, vy = 0, damage = 1, element = null, style = 'normal'}: Props) {
+    constructor({x = 0, y = 0, vx = 0, vy = 0, damage = 1, element = null, reflected = false, style = 'normal'}: Props) {
         this.x = x | 0;
         this.y = y | 0;
         this.vx = vx;
@@ -189,6 +190,7 @@ export class Arrow implements ObjectInstance {
         this.x -= this.w / 2 ;
         this.y -= this.h / 2 ;
         this.style = style;
+        this.reflected = reflected;
     }
     getHitProperties(state: GameState): HitProperties {
         return {
@@ -199,8 +201,9 @@ export class Arrow implements ObjectInstance {
             tileHitbox: {
                 w: this.w,
                 h: this.h,
-                x: this.x - this.vx,
-                y: this.y - this.vy,
+                x: this.x,
+                // Hit box is lowered for northern walls to match the perspective.
+                y: this.y - Math.max(0, this.vy),
             },
             vx: this.vx,
             vy: this.vy, element:
@@ -246,7 +249,7 @@ export class Arrow implements ObjectInstance {
         if (hitResult.reflected) {
             this.vx = -this.vx;
             this.vy = -this.vy;
-            this.reflected = true;
+            this.reflected = !this.reflected;
             playSound('blockAttack');
             this.direction = getDirection(this.vx, this.vy, true);
             return;
@@ -311,6 +314,43 @@ export class EnemyArrow extends Arrow {
             vx: this.vx,
             vy: this.vy, element:
             this.element,
+            hitAllies: !this.reflected,
+            hitEnemies: this.reflected,
+            hitObjects: true,
+            hitTiles: true,
+        };
+    }
+    update(state: GameState) {
+        // Don't leave enemy arrows on the screen in case there are a lot of them.
+        if (this.stuckFrames > 0 && !this.blocked) {
+            removeObjectFromArea(state, this);
+            return;
+        }
+        super.update(state);
+    }
+}
+
+export class CrystalSpike extends Arrow {
+    static spawn(state: GameState, area: AreaInstance, arrowProps: Props) {
+        const spike = new CrystalSpike(arrowProps);
+        addObjectToArea(state, area, spike);
+    }
+    getHitProperties(state: GameState): HitProperties {
+        return {
+            canPush: false,
+            damage: this.damage,
+            canDamageCrystalShields: true,
+            direction: this.direction,
+            hitbox: this,
+            tileHitbox: {
+                w: this.w,
+                h: this.h,
+                x: this.x - this.vx,
+                y: this.y - this.vy,
+            },
+            vx: this.vx,
+            vy: this.vy,
+            element: null,
             hitAllies: !this.reflected,
             hitEnemies: this.reflected,
             hitObjects: true,

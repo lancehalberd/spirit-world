@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import { cloneDeep } from 'lodash';
 
 import { CANVAS_HEIGHT } from 'app/gameConstants';
 import { applySavedState, getDefaultSavedState, getState, returnToSpawnLocation, saveGame } from 'app/state';
@@ -120,6 +120,28 @@ export const SPAWN_HELIX_ENTRANCE: ZoneLocation = {
     areaGridCoords: {x: 0, y: 0},
     isSpiritWorld: false,
 };
+
+export const SPAWN_WATERFALL_ENTRANCE: ZoneLocation = {
+    zoneKey: 'waterfallTower',
+    floor: 0,
+    x: 448,
+    y: 448,
+    z: 0,
+    d: 'up',
+    areaGridCoords: {x: 0, y: 1},
+    isSpiritWorld: true,
+};
+export const SPAWN_WATERFALL_BOSS: ZoneLocation = {
+    zoneKey: 'waterfallTower',
+    floor: 1,
+    x: 240,
+    y: 208,
+    z: 0,
+    d: 'up',
+    areaGridCoords: {x: 0, y: 1},
+    isSpiritWorld: true,
+};
+
 export const RIVER_TEMPLE_BOSS: ZoneLocation = {
     zoneKey: 'riverTemple',
     floor: 0,
@@ -133,7 +155,7 @@ export const RIVER_TEMPLE_BOSS: ZoneLocation = {
 
 
 function applyItems(savedState: SavedState, items: {[key: string]: number}, objectFlags: string[] = []): SavedState {
-    const newState: SavedState = _.cloneDeep(savedState);
+    const newState: SavedState = cloneDeep(savedState);
     for (const flag of objectFlags) {
         newState.objectFlags[flag] = true;
     }
@@ -195,8 +217,8 @@ const helixStartState = applyItems(cocoonBossState, {maxLife: 1, teleportation: 
 helixStartState.savedHeroData.rightTool = 'cloak';
 const helixEndState = applyItems(helixStartState, {charge: 1, staff: 1},
     ['elementalBeastsEscaped']);
-const riverTempleStartState = applyItems(helixEndState, {ironBoots: 1});
-const riverTempleBossState = applyItems(riverTempleStartState,
+const waterfallBossState = applyItems(helixStartState, {ironBoots: 1});
+const riverTempleBossState = applyItems(waterfallBossState,
     {maxLife: 3, 'riverTemple:bigKey': 1, 'fire': 1, 'lightning': 1},
     ['bossBubblesNorth','bossBubblesSouth', 'bossBubblesWest', 'bossBubblesEast']
 );
@@ -242,13 +264,17 @@ const spawnLocations = {
         location: SPAWN_HELIX_ENTRANCE,
         savedState: helixStartState,
     },
-    'Helix End': {
-        location: SPAWN_LOCATION_PEACH_CAVE_EXIT,
+    'Waterfall Start': {
+        location: SPAWN_WATERFALL_ENTRANCE,
         savedState: helixEndState,
+    },
+    'Waterfall Boss': {
+        location: SPAWN_WATERFALL_BOSS,
+        savedState: waterfallBossState,
     },
     'River Temple Start': {
         location: SPAWN_LOCATION_PEACH_CAVE_EXIT,
-        savedState: riverTempleStartState,
+        savedState: waterfallBossState,
     },
     'River Temple Boss': {
         location: RIVER_TEMPLE_BOSS,
@@ -290,7 +316,7 @@ export function getTestStateContextMenuOption(): MenuOption {
                     label: `${name}`,
                     onSelect() {
                         const state = getState();
-                        applySavedState(state, _.cloneDeep(spawnLocations[name].savedState));
+                        applySavedState(state, cloneDeep(spawnLocations[name].savedState));
                         setSpawnLocation(state, spawnLocations[name].location);
                         returnToSpawnLocation(state);
                         state.scene = 'game';

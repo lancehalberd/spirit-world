@@ -1,5 +1,3 @@
-import _ from 'lodash';
-
 import { Clone } from 'app/content/clone';
 import { Enemy } from 'app/content/enemy';
 import { editingState, renderEditor } from 'app/development/tileEditor';
@@ -490,21 +488,31 @@ export function renderAreaObjectsAfterHero(context: CanvasRenderingContext2D, st
     }
     context.save();
         translateContextForAreaAndCamera(context, state, area);
-        const objectsToRender = [];
+        const spriteObjects = [];
+        const foregroundObjects = [];
         for (const object of area.objects) {
             if (object.renderForeground) {
-                object.renderForeground(context, state);
+                foregroundObjects.push(object);
             } else if (!object.drawPriority || object.drawPriority === 'foreground') {
-                object.render?.(context, state);
+                foregroundObjects.push(object);
             } else if (object.drawPriority === 'sprites' && object.y > state.hero.y) {
                 if (object.render) {
-                    objectsToRender.push(object);
+                    spriteObjects.push(object);
                 }
             }
         }
-        objectsToRender.sort((A, B) => A.y - B.y);
-        for (const object of objectsToRender) {
+        // Sprite objects are rendered in order of their y positions.
+        spriteObjects.sort((A, B) => A.y - B.y);
+        for (const object of spriteObjects) {
             object.render(context, state);
+        }
+        // All foreground elements should be rendered after sprite elements
+        for (const object of foregroundObjects) {
+            if (object.renderForeground) {
+                object.renderForeground(context, state);
+            } else {
+                object.render?.(context, state);
+            }
         }
     context.restore();
 }

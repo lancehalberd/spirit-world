@@ -38,7 +38,7 @@ export function isLogicValid(state: GameState, logic: LogicCheck, invertLogic = 
             }
             continue;
         }
-        if (!state.savedState.objectFlags[requiredFlag]) {
+        if (!state.savedState.objectFlags[requiredFlag] && !state.savedState.zoneFlags[requiredFlag]) {
             return falseResult;
         }
     }
@@ -49,7 +49,7 @@ export function isLogicValid(state: GameState, logic: LogicCheck, invertLogic = 
             }
             continue;
         }
-        if (state.savedState.objectFlags[excludedFlag]) {
+        if (state.savedState.objectFlags[excludedFlag] || state.savedState.zoneFlags[excludedFlag]) {
             return falseResult;
         }
     }
@@ -65,6 +65,7 @@ export function isLogicValid(state: GameState, logic: LogicCheck, invertLogic = 
 }
 window['isLogicValid'] = isLogicValid;
 
+export const hasCatEyes: LogicCheck = { requiredFlags: ['$catEyes'] };
 export const hasClone: LogicCheck = { requiredFlags: ['$clone', '$catEyes'] };
 export const hasIronBoots: LogicCheck = { requiredFlags: ['$ironBoots'] };
 export const hasAstralProjection: LogicCheck = { requiredFlags: ['$astralProjection', '$spiritSight', '$catEyes'] };

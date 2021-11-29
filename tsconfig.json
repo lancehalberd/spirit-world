@@ -6,7 +6,8 @@
     "module": "esnext",
     "noImplicitAny": false,
     "noUnusedLocals": true,
-    "outDir": "./public/",
+    "outDir": "./tsc/",
+    // "strictNullChecks": true,
     "target": "ES2019"
   }
 }

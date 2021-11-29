@@ -22,11 +22,15 @@ export class PitEntrance implements ObjectInstance {
         this.definition = definition;
         this.x = definition.x;
         this.y = definition.y;
+        this.status = this.definition.status;
     }
     getHitbox(state: GameState): Rect {
         return { x: this.x, y: this.y, w: 32, h: 32 };
     }
     update(state: GameState) {
+        if (this.status !== 'normal') {
+            return;
+        }
         const hero = state.hero.activeClone || state.hero;
         if (this.area === hero.area && isObjectInsideTarget(hero, pad(this.getHitbox(state), 2))) {
             if (hero.action === 'fallen') {
@@ -47,16 +51,27 @@ export class PitEntrance implements ObjectInstance {
             }
         }
     }
+    changeStatus(state: GameState, status: ObjectStatus) {
+        this.status = status;
+        const y = Math.floor(this.y / 16);
+        const x = Math.floor(this.x / 16);
+        if (this.status === 'normal') {
+            const pitBehaviors: TileBehaviors = {solid: false, solidMap: null, pit: true };
+            applyBehaviorToTile(this.area, x, y, pitBehaviors);
+            applyBehaviorToTile(this.area, x, y + 1, pitBehaviors);
+            applyBehaviorToTile(this.area, x + 1, y, pitBehaviors);
+            applyBehaviorToTile(this.area, x + 1, y + 1, pitBehaviors);
+        } else {
+            resetTileBehavior(this.area, {x, y});
+            resetTileBehavior(this.area, {x: x + 1, y});
+            resetTileBehavior(this.area, {x: x, y: y + 1});
+            resetTileBehavior(this.area, {x: x + 1, y: y + 1});
+        }
+    }
     add(state: GameState, area: AreaInstance) {
         this.area = area;
         area.objects.push(this);
-        const y = Math.floor(this.y / 16);
-        const x = Math.floor(this.x / 16);
-        const pitBehaviors: TileBehaviors = {solid: false, solidMap: null, pit: true };
-        applyBehaviorToTile(this.area, x, y, pitBehaviors);
-        applyBehaviorToTile(this.area, x, y + 1, pitBehaviors);
-        applyBehaviorToTile(this.area, x + 1, y, pitBehaviors);
-        applyBehaviorToTile(this.area, x + 1, y + 1, pitBehaviors);
+        this.changeStatus(state, this.status);
     }
     remove(state: GameState) {
         const index = this.area.objects.indexOf(this);
@@ -72,6 +87,9 @@ export class PitEntrance implements ObjectInstance {
         this.area = null;
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
+        if (this.status !== 'normal') {
+            return;
+        }
         drawFrame(context, pitFrame, this.getHitbox(state));
     }
 }

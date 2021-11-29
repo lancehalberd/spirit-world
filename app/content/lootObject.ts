@@ -1,4 +1,5 @@
 import { addObjectToArea, enterLocation, refreshAreaLogic, removeObjectFromArea } from 'app/content/areas';
+import { getObjectStatus } from 'app/content/objects';
 import { createCanvasAndContext } from 'app/dom';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { showMessage } from 'app/render/renderMessage';
@@ -26,7 +27,7 @@ function rollItem(table: LootTable) {
 export function dropItemFromTable(state: GameState, area: AreaInstance, lootTable: LootTable, x: number, y: number) {
     const item = rollItem(lootTable);
     if (item) {
-        const drop = new LootDropObject({
+        const drop = new LootDropObject(state, {
             id: 'drop',
             type: 'loot',
             lootType: item.type,
@@ -260,41 +261,43 @@ export class LootObject implements ObjectInstance {
     y: number;
     z: number;
     status: ObjectStatus;
-    constructor(definition: LootObjectDefinition) {
+    constructor(state: GameState, definition: LootObjectDefinition) {
         this.definition = definition;
         this.frame = getLootFrame(definition);
         this.x = definition.x;
         this.y = definition.y;
         this.status = definition.status || 'normal';
+        if (getObjectStatus(state, this.definition)) {
+            this.status = 'gone';
+        }
     }
     update(state: GameState) {
-        if (this.status === 'hidden' || this.status === 'hiddenEnemy' || this.status === 'hiddenSwitch') {
-            return;
-        }
-        if (state.savedState.objectFlags[this.definition.id]) {
+        if (this.status === 'hidden' || this.status === 'hiddenEnemy'
+            || this.status === 'hiddenSwitch' || this.status === 'gone'
+        ) {
             return;
         }
         const hero = state.hero.activeClone || state.hero;
         if (rectanglesOverlap(hero, getFrameHitBox(this.frame, this))) {
             removeObjectFromArea(state, this);
-            state.savedState.objectFlags[this.definition.id] = true;
+            if (this.definition.id !== 'drop') {
+                state.savedState.objectFlags[this.definition.id] = true;
+            }
             getLoot(state, this.definition);
         }
     }
     render(context, state: GameState) {
-        if (this.status === 'hidden' || this.status === 'hiddenEnemy' || this.status === 'hiddenSwitch') {
-            return;
-        }
-        if (this.definition.id !== 'drop' && state.savedState.objectFlags[this.definition.id]) {
+        if (this.status === 'hidden' || this.status === 'hiddenEnemy'
+            || this.status === 'hiddenSwitch' || this.status === 'gone'
+        ) {
             return;
         }
         drawFrameAt(context, this.frame, { x: this.x, y: this.y });
     }
     renderShadow(context, state: GameState) {
-        if (this.status === 'hidden' || this.status === 'hiddenEnemy' || this.status === 'hiddenSwitch') {
-            return;
-        }
-        if (this.definition.id !== 'drop' && state.savedState.objectFlags[this.definition.id]) {
+        if (this.status === 'hidden' || this.status === 'hiddenEnemy'
+            || this.status === 'hiddenSwitch' || this.status === 'gone'
+        ) {
             return;
         }
         const frame = getLootShadowFrame(this.definition);
@@ -589,8 +592,10 @@ export function applyUpgrade(currentLevel: number, loot: LootObjectDefinition | 
     // Non-progressive upgrades specify the exact level of the item. Lower level items will be ignored
     // if the player already possesses a better version.
     if (loot.lootLevel) {
+        console.log(loot.lootType, 'max', currentLevel, loot.lootLevel);
         return Math.max(currentLevel, loot.lootLevel);
     }
+    console.log(loot.lootType, 'increment', currentLevel);
     return currentLevel + 1;
 }
 
@@ -618,7 +623,9 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: Lo
             } else if (!state.hero.rightTool && state.hero.leftTool !== loot.lootType) {
                 state.hero.rightTool = loot.lootType as ActiveTool;
             }
+            console.log(loot.lootType, state.hero.activeTools[loot.lootType]);
             state.hero.activeTools[loot.lootType] = applyUpgrade(state.hero.activeTools[loot.lootType], loot);
+            console.log('->', loot.lootType, state.hero.activeTools[loot.lootType]);
         } else if ([
             'gloves', 'roll', 'charge', 'nimbusCloud', 'catEyes', 'spiritSight',
             'trueSight', 'astralProjection', 'teleportation', 'ironSkin', 'goldMail', 'phoenixCrown',

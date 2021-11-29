@@ -119,11 +119,11 @@ export function getDefaultSavedState(): SavedState {
     return {
         dungeonInventories: {},
         objectFlags: {},
+        zoneFlags: {},
         savedHeroData: getDefaultSavedHeroData(),
         staffTowerLocation: 'desert',
     };
 }
-
 
 function getDefaultSavedHeroData(): SavedHeroData {
     return {

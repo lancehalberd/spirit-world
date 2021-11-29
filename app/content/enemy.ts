@@ -1,13 +1,11 @@
-import _ from 'lodash';
-
 import { AnimationEffect } from 'app/content/animationEffect';
 import { checkForFloorEffects, moveEnemy } from 'app/content/enemies';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { dropItemFromTable, getLoot } from 'app/content/lootObject';
 import { addObjectToArea, getAreaSize } from 'app/content/areas';
 import { enemyDeathAnimation } from 'app/content/enemyAnimations';
+import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { saveGame } from 'app/state';
 import { drawFrame, getFrame } from 'app/utils/animations';
 import { playSound } from 'app/utils/sounds';
 
@@ -49,12 +47,18 @@ export class Enemy implements Actor, ObjectInstance {
     canBeKnockedDown: boolean = true;
     flying: boolean;
     isImmortal: boolean = false;
+    isInvulnerable: boolean = false;
+    isEnemyTarget: boolean = true;
     life: number;
     speed: number;
     acceleration: number;
     aggroRadius: number;
     mode = 'choose';
     modeTime = 0;
+    // Used to control animation of the healthBar for bosses.
+    // This will be incremented each frame, but a boss can reset it to 0 on update to hide the
+    // healthbar.
+    healthBarTime = 0;
     params: any;
     enemyInvulnerableFrames = 0;
     // This is used to prevent the block effect from happening too frequently
@@ -92,11 +96,12 @@ export class Enemy implements Actor, ObjectInstance {
             ...(this.enemyDefinition.params || {}),
             ...(definition.params || {}),
         };
-        if (definition.type === 'boss' && state.savedState.objectFlags[this.definition.id]) {
+        if (getObjectStatus(state, this.definition)) {
             this.status = 'gone';
         }
         this.alwaysReset = this.enemyDefinition.alwaysReset;
         this.drawPriority = this.flying ? 'foreground' : 'sprites';
+        this.mode = this.enemyDefinition.initialMode || 'choose';
     }
     getFrame(): Frame {
         return getFrame(this.currentAnimation, this.animationTime);
@@ -126,7 +131,9 @@ export class Enemy implements Actor, ObjectInstance {
     }
     setMode(mode: string) {
         this.mode = mode;
-        this.modeTime = 0;
+        // Setting it this way means that `modeTime` will be 0 during the next update loop,
+        // since we increment modeTime by FRAME_LENGTH between each update.
+        this.modeTime = -FRAME_LENGTH;
     }
     knockBack(state: GameState, {vx = 0, vy = 0, vz = 0}: {vx: number, vy: number, vz: number}) {
         if (!this.canBeKnockedBack) {
@@ -148,7 +155,7 @@ export class Enemy implements Actor, ObjectInstance {
         return this.defaultOnHit(state, hit);
     }
     defaultOnHit(state: GameState, hit: HitProperties): HitResult {
-        if (this.life <= 0 || this.status === 'gone' || this.enemyInvulnerableFrames) {
+        if (this.life <= 0 || this.status === 'gone' || this.enemyInvulnerableFrames || this.isInvulnerable) {
             return {};
         }
         // Ignore attacks that this enemy is immune to.
@@ -217,16 +224,16 @@ export class Enemy implements Actor, ObjectInstance {
         if (this.definition.type === 'boss') {
             // If the last boss is defeated kill all regular enemies.
             // Bosses in both material+spirit realms must be defeated before the battle is over.
-            const allEnemies = [...this.area.enemyTargets, ...this.area.alternateArea.enemyTargets];
+            const allEnemies = [...this.area.enemies, ...this.area.alternateArea.enemies];
             if (!allEnemies.some(object => object.definition.type === 'boss' && object.status !== 'gone')) {
                 allEnemies.forEach(object => object.showDeathAnimation(state));
-                if (!state.savedState.objectFlags[this.definition.id]) {
-                    state.savedState.objectFlags[this.definition.id] = true;
+                // Gain loot if this boss hasn't been defeated yet.
+                if (!getObjectStatus(state, this.definition)) {
                     if (this.definition.lootType && this.definition.lootType !== 'empty') {
                         getLoot(state, this.definition);
                     }
-                    saveGame();
                 }
+                saveObjectStatus(state, this.definition);
             }
         }
     }
@@ -243,6 +250,7 @@ export class Enemy implements Actor, ObjectInstance {
         if (!this.alwaysUpdate && !this.isFromCurrentSection(state)) {
             return;
         }
+        this.healthBarTime += FRAME_LENGTH;
         if (this.invulnerableFrames > 0) {
             this.invulnerableFrames--;
         }
@@ -295,9 +303,19 @@ export class Enemy implements Actor, ObjectInstance {
         return this.shielded ? 1 : 0;
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
-        if (this.status === 'gone' || this.status === 'hidden') {
+        if (!this.area || this.status === 'gone' || this.status === 'hidden') {
             return;
         }
+        if (this.enemyDefinition.render) {
+            this.enemyDefinition.render(context, state, this);
+        } else {
+            this.defaultRender(context, state);
+        }
+        if (this.enemyDefinition.renderOver) {
+            this.enemyDefinition.renderOver(context, state, this);
+        }
+    }
+    defaultRender(context: CanvasRenderingContext2D, state: GameState) {
         const frame = this.getFrame();
         context.save();
             if (this.invulnerableFrames) {
@@ -328,8 +346,5 @@ export class Enemy implements Actor, ObjectInstance {
             context.fillStyle = 'red';
             context.fillRect(hitbox.x, hitbox.y, hitbox.w, hitbox.h);*/
         context.restore();
-        if (this.enemyDefinition.render) {
-            this.enemyDefinition.render(context, state, this);
-        }
     }
 }

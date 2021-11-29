@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import { sample } from 'lodash';
 
 import { getAreaSize } from 'app/content/areas';
 import { selectDialogueOption } from 'app/content/dialogue';
@@ -26,7 +26,7 @@ export const npcBehaviors = {
     random(state: GameState, npc: NPC) {
         if (npc.mode === 'choose' && npc.modeTime > 200) {
             npc.setMode('walk');
-            npc.d = _.sample(['up', 'down', 'left', 'right']);
+            npc.d = sample(['up', 'down', 'left', 'right']);
         }
         if (npc.mode === 'walk') {
             if (!moveNPC(state, npc, npc.speed * directionMap[npc.d][0], npc.speed * directionMap[npc.d][1], {})) {

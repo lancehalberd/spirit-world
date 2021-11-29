@@ -60,17 +60,23 @@ export function updateAreaObjects(this: void, state: GameState, area: AreaInstan
     if (area === state.hero.area) {
         area.allyTargets.push(state.hero);
     }
+    // These are anything that hits against enemies can hit, which might include certain objects.
     area.enemyTargets = [];
+    // This is the array of literal Enemy instances.
+    area.enemies = [];
     area.neutralTargets = [];
     for (const object of area?.objects || []) {
         if (object.isAllyTarget) {
             area.allyTargets.push(object);
         }
-        if (object instanceof Enemy) {
+        if (object.isEnemyTarget) {
             area.enemyTargets.push(object);
         }
         if (object.isNeutralTarget) {
             area.neutralTargets.push(object);
+        }
+        if (object instanceof Enemy) {
+            area.enemies.push(object);
         }
     }
     for (const object of area?.objects || []) {

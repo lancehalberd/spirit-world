@@ -6,18 +6,21 @@ import {
 export type StaffTowerLocation = 'desert' | 'forest' | 'mountain';
 
 export type SavedState = {
-    objectFlags: {[key: string]: boolean},
-    savedHeroData: SavedHeroData,
+    // Flags that are set permanently for objects, like opened treasure chests or defeated bosses.
+    objectFlags: {[key: string]: boolean}
+    // Flags that remain set as long as the character does not leave the current zone.
+    zoneFlags: {[key: string]: boolean}
+    savedHeroData: SavedHeroData
     dungeonInventories: {
-        [key: string]: DungeonInventory,
-    },
-    staffTowerLocation: StaffTowerLocation,
+        [key: string]: DungeonInventory
+    }
+    staffTowerLocation: StaffTowerLocation
 }
 
 export interface DungeonInventory {
-    bigKey: boolean,
-    map: boolean,
-    smallKeys: number,
+    bigKey: boolean
+    map: boolean
+    smallKeys: number
 }
 
 export type Scene = 'title'

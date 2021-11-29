@@ -245,8 +245,9 @@ export interface AreaInstance {
     // This is used during transitions to indicate that the top left corner
     // of this area is offset from the camera origin by this many pixels.
     cameraOffset: {x: number, y: number},
+    enemies: Enemy[],
     allyTargets: ObjectInstance[],
-    enemyTargets: Enemy[],
+    enemyTargets: ObjectInstance[],
     neutralTargets: ObjectInstance[],
 }
 

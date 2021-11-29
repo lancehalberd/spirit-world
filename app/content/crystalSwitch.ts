@@ -1,9 +1,10 @@
 import {
     checkIfAllSwitchesAreActivated,
     deactivateTargets,
+    getObjectStatus,
+    saveObjectStatus,
 } from 'app/content/objects';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { saveGame } from 'app/state';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 
 import {
@@ -38,7 +39,7 @@ export class CrystalSwitch implements ObjectInstance {
         this.definition = definition;
         this.x = definition.x;
         this.y = definition.y;
-        if (this.definition.id && state.savedState.objectFlags[this.definition.id]) {
+        if (getObjectStatus(state, this.definition)) {
             this.status = 'active';
         }
     }
@@ -53,10 +54,7 @@ export class CrystalSwitch implements ObjectInstance {
     }
     activate(state: GameState): void {
         this.status = 'active';
-        if (this.definition.id && this.definition.saveStatus) {
-            state.savedState.objectFlags[this.definition.id] = true;
-            saveGame();
-        }
+        saveObjectStatus(state, this.definition);
         this.animationTime = 0;
         this.timeLeft = this.definition.timer || 0;
         this.behaviors.brightness = 1;

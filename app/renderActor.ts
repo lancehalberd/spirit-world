@@ -1,5 +1,3 @@
-import _ from 'lodash';
-
 import { EXPLOSION_RADIUS, EXPLOSION_TIME } from 'app/gameConstants';
 import { getCloneMovementDeltas } from 'app/keyCommands';
 import { isHeroFloating, isHeroSinking } from 'app/utils/actor';

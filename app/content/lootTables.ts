@@ -32,6 +32,12 @@ export const lifeLootTable = createLootTable(200, [
     {type: 'peach', weight: 50},
 ]);
 
+export const certainLifeLootTable = createLootTable(100, [
+    {type: 'peach', weight: 90},
+    // Make this a big peach that gives 5 life.
+    {type: 'peach', weight: 10},
+]);
+
 export const moneyLootTable = createLootTable(100, [
     {type: 'money', amount: 20, weight: 5},
     {type: 'money', amount: 10, weight: 10},

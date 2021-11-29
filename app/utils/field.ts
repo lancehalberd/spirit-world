@@ -1,6 +1,6 @@
 import { destroyTile, resetTileBehavior } from 'app/content/areas';
 import { allTiles } from 'app/content/tiles';
-import { isPixelInShortRect, rectanglesOverlap, roundRect } from 'app/utils/index';
+import { isPixelInShortRect, rectanglesOverlap } from 'app/utils/index';
 
 import {
     AreaInstance, AreaLayer, Direction, GameState, Hero,
@@ -92,7 +92,7 @@ export function isPointOpen(
 ): boolean {
     const tx = Math.floor(x / 16);
     const ty = Math.floor(y / 16);
-    if (tx < state.areaSection.x || tx >= state.areaSection.x + state.areaSection.w
+    if (!state.areaSection ||tx < state.areaSection.x || tx >= state.areaSection.x + state.areaSection.w
         || ty < state.areaSection.y || ty >= state.areaSection.y + state.areaSection.h) {
         return false;
     }
@@ -110,13 +110,13 @@ export function isPointOpen(
         }
     } else if (tileBehavior?.solid && (!tileBehavior?.climbable || !movementProperties.canClimb)) {
         return false;
-    } else if (tileBehavior.edges?.up && sy === 0) {
+    } else if (tileBehavior?.edges?.up && sy === 0) {
         return false;
-    } else if (tileBehavior.edges?.down && sy === 15) {
+    } else if (tileBehavior?.edges?.down && sy === 15) {
         return false;
-    } else if (tileBehavior.edges?.left && sx === 0) {
+    } else if (tileBehavior?.edges?.left && sx === 0) {
         return false;
-    } else if (tileBehavior.edges?.right && sx === 15) {
+    } else if (tileBehavior?.edges?.right && sx === 15) {
         return false;
     }
     if (tileBehavior?.water && !movementProperties.canSwim) {
@@ -171,7 +171,7 @@ export function getTileBehaviors(
         definedBehavior = nextArea?.behaviorGrid[ty]?.[tx];
     }
     const tileBehavior = {...(definedBehavior || {})};
-    if (tx < state.areaSection.x || tx >= state.areaSection.x + state.areaSection.w
+    if (!state.areaSection || tx < state.areaSection.x || tx >= state.areaSection.x + state.areaSection.w
         || ty < state.areaSection.y || ty >= state.areaSection.y + state.areaSection.h) {
         tileBehavior.outOfBounds = true;
     }
@@ -203,7 +203,7 @@ export function getTileBehaviorsAndObstacles(
         definedBehavior = nextArea?.behaviorGrid[ty]?.[tx];
     }
     const tileBehavior = {...(definedBehavior || {})};
-    if (tx < state.areaSection.x || tx >= state.areaSection.x + state.areaSection.w
+    if (!state.areaSection || tx < state.areaSection.x || tx >= state.areaSection.x + state.areaSection.w
         || ty < state.areaSection.y || ty >= state.areaSection.y + state.areaSection.h) {
         tileBehavior.outOfBounds = true;
     }
@@ -222,10 +222,18 @@ export function getTileBehaviorsAndObstacles(
             continue;
         }
         if (object.getHitbox && (object.onPush || object.behaviors?.solid || objectTest)) {
-            if (isPixelInShortRect(x | 0, y | 0, roundRect(object.getHitbox(state)))) {
-                if (!objectTest || objectTest(object)) {
-                    objects.push(object);
+            const hitbox = object.getHitbox(state);
+            if (isPixelInShortRect(x | 0, y | 0,
+                { x: hitbox.x | 0, y: hitbox.y | 0, w: hitbox.w | 0, h: hitbox.h | 0 }
+            )) {
+                // If objectTest is defined, only include objects that match it.
+                if (objectTest) {
+                    if (objectTest(object)) {
+                        objects.push(object);
+                    }
+                    continue;
                 }
+                objects.push(object);
                 if (object.behaviors?.solid) {
                     tileBehavior.solid = true;
                 }
@@ -236,8 +244,12 @@ export function getTileBehaviorsAndObstacles(
         }
     }
     if (state.hero.area === area && !excludedObjects?.has(state.hero)) {
-        if (isPixelInShortRect(x | 0, y | 0, roundRect(state.hero))) {
-            objects.push(state.hero);
+        if (isPixelInShortRect(x | 0, y | 0,
+            { x: state.hero.x | 0, y: state.hero.y | 0, w: state.hero.w | 0, h: state.hero.h | 0 }
+        )) {
+            if (!objectTest || objectTest(state.hero)) {
+                objects.push(state.hero);
+            }
             tileBehavior.solid = true;
         }
     }
@@ -463,5 +475,56 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
     return combinedResult;
 }
 
+export function coverTile(
+    this: void, state: GameState, area: AreaInstance, tx: number, ty: number, coverTile: number
+): boolean {
+    const behavior = area.behaviorGrid?.[ty]?.[tx];
+    // For now solid tiles and pits cannot be covered
+    if (behavior?.solid || behavior?.pit) {
+        return false;
+    }
+    let topLayer: AreaLayer = area.layers[0];
+    for (const layer of area.layers) {
+        if (layer.definition.drawPriority === 'foreground') {
+            break;
+        }
+        topLayer = layer;
+    }
+    const currentIndex = topLayer.tiles[ty][tx]?.index || 0;
+    if (currentIndex === coverTile) {
+        return false;
+    }
+    topLayer.tiles[ty][tx] = {
+        ...allTiles[coverTile],
+        behaviors: {
+            ...allTiles[coverTile].behaviors,
+            underTile: currentIndex,
+        },
+    };
+    if (area.tilesDrawn[ty]?.[tx]) {
+        area.tilesDrawn[ty][tx] = false;
+    }
+    area.checkToRedrawTiles = true;
+    resetTileBehavior(area, {x: tx, y: ty});
+    return true;
+}
+
+export function uncoverTile(
+    this: void, state: GameState, area: AreaInstance, tx: number, ty: number
+): boolean {
+    const behavior = area.behaviorGrid?.[ty]?.[tx];
+    // If the tile is not cuttable and has no underTile behavior, it cannot be uncovered.
+    if (!behavior?.cuttable && !behavior?.underTile) {
+        return false;
+    }
+    // We need to find the specific cuttable layers that can be destroyed.
+    for (const layer of area.layers) {
+        const tile = layer.tiles[ty][tx];
+        if (tile?.behaviors?.cuttable || behavior?.underTile) {
+            destroyTile(state, area, {x: tx, y: ty, layerKey: layer.key});
+            return true;
+        }
+    }
+}
 
 

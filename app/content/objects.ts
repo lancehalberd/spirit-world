@@ -1,4 +1,4 @@
-import _ from 'lodash';
+import { find } from 'lodash';
 
 import { Enemy } from 'app/content/enemy';
 import { BigChest, ChestObject, LootObject } from 'app/content/lootObject';
@@ -12,6 +12,8 @@ import { TippableObject } from 'app/content/tippableObject';
 import { AirBubbles } from 'app/content/objects/airBubbles';
 import { Decoration } from 'app/content/objects/decoration';
 import { BallGoal } from 'app/content/objects/ballGoal';
+import { BeadCascade, BeadGrate } from 'app/content/objects/beadCascade';
+import { KeyBlock } from 'app/content/objects/keyBlock';
 import { Marker } from 'app/content/objects/marker';
 import { NPC } from 'app/content/objects/npc';
 import { PitEntrance } from 'app/content/objects/pitEntrance';
@@ -22,6 +24,8 @@ import { Torch } from 'app/content/objects/torch';
 import { VineSprout } from 'app/content/objects/vineSprout';
 import { WaterPot } from 'app/content/objects/waterPot';
 
+import { saveGame } from 'app/state';
+
 import {
     AreaInstance, GameState, ObjectDefinition, ObjectInstance, ObjectStatus,
 } from 'app/types';
@@ -31,12 +35,16 @@ export function createObjectInstance(state: GameState, object: ObjectDefinition)
         return new AirBubbles(state, object);
     } else if (object.type === 'ballGoal') {
         return new BallGoal(object);
-    } else if (object.type === 'decoration') {
+    } else if (object.type === 'beadGrate') {
+        return new BeadGrate(state, object);
+    } else if (object.type === 'beadCascade') {
+        return new BeadCascade(state, object);
+    } else  if (object.type === 'decoration') {
         return new Decoration(object);
     } else if (object.type === 'enemy' || object.type === 'boss') {
         return new Enemy(state, object);
     } else if (object.type === 'loot') {
-        return new LootObject(object);
+        return new LootObject(state, object);
     } else if (object.type === 'bigChest') {
         return new BigChest(state, object);
     } else if (object.type === 'chest') {
@@ -45,7 +53,9 @@ export function createObjectInstance(state: GameState, object: ObjectDefinition)
         return new Door(state, object);
     } else if (object.type === 'floorSwitch') {
         return new FloorSwitch(object);
-    } else if (object.type === 'npc') {
+    } else if (object.type === 'keyBlock') {
+        return new KeyBlock(state, object);
+    }  else if (object.type === 'npc') {
         return new NPC(object);
     } else if (object.type === 'tippable') {
         return new TippableObject(object);
@@ -78,7 +88,7 @@ export function createObjectInstance(state: GameState, object: ObjectDefinition)
 }
 
 export function findObjectInstanceById(areaInstance: AreaInstance, id: string, allowMissing: boolean = false): ObjectInstance {
-    const object = _.find(areaInstance.objects, {definition: {id}});
+    const object = find(areaInstance.objects, {definition: {id}});
     if (!object && !allowMissing) {
         console.error('Missing target', id);
     }
@@ -108,13 +118,7 @@ export function deactivateTargets(state: GameState, area: AreaInstance, targetOb
         if (targetObjectId && object.definition?.id !== targetObjectId) {
             continue;
         }
-        if (object.onDeactivate) {
-            object.onDeactivate(state);
-            continue;
-        }
-        if (object.definition?.status === 'closedSwitch' && !object.definition.saveStatus) {
-            changeObjectStatus(state, object, 'closedSwitch');
-        }
+        deactivateTarget(state, object);
     }
 }
 
@@ -131,6 +135,27 @@ export function activateTarget(state: GameState, target: ObjectInstance): void {
     }
 }
 
+export function deactivateTarget(state: GameState, target: ObjectInstance): void {
+    if (target.onDeactivate) {
+        target.onDeactivate(state);
+        return;
+    }
+    if (target.definition?.status === 'closedSwitch' && !target.definition.saveStatus) {
+        changeObjectStatus(state, target, 'closedSwitch');
+    }
+}
+
+export function toggleTarget(state: GameState, target: ObjectInstance): void {
+    const isActive = target.isActive
+        ? target.isActive(state)
+        : target.status !== 'hidden' && target.status !== 'hiddenSwitch' && target.status !== 'closedSwitch';
+    if (isActive) {
+        deactivateTarget(state, target);
+    } else {
+        activateTarget(state, target);
+    }
+}
+
 export function changeObjectStatus(state: GameState, object: ObjectInstance, newStatus: ObjectStatus): void {
     if (object.changeStatus) {
         object.changeStatus(state, newStatus);
@@ -140,4 +165,34 @@ export function changeObjectStatus(state: GameState, object: ObjectInstance, new
             object.linkedObject.status = newStatus;
         }
     }
+}
+
+export function saveObjectStatus(this: void, state: GameState, definition: ObjectDefinition, flag: boolean = true): void {
+    let treatment = definition.saveStatus;
+    if (!treatment) {
+        if (definition.type === 'boss') {
+            treatment = 'forever';
+        } else if (definition.type === 'enemy') {
+            treatment = 'zone';
+        }
+    }
+    if (treatment === 'forever' || treatment === 'zone') {
+        const hash = treatment === 'zone'
+            ? state.savedState.objectFlags
+            : state.savedState.zoneFlags;
+        if (!definition.id) {
+            console.error('Missing object id', definition);
+        }
+        if (flag && !hash[definition.id]) {
+            hash[definition.id] = true;
+            saveGame();
+        } else if (!flag && hash[definition.id]) {
+            delete hash[definition.id];
+            saveGame();
+        }
+    }
+}
+
+export function getObjectStatus(this: void, state: GameState, definition: ObjectDefinition): boolean {
+    return state.savedState.zoneFlags[definition.id] || state.savedState.objectFlags[definition.id];
 }

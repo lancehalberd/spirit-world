@@ -104,8 +104,8 @@ const sf0_0x0: AreaDefinition = {
     parentDefinition: f0_0x0,
     layers: null,
     objects: [
-        {status: "normal", id: "elderSpiritEntrance", logicKey: undefined, x: 112, y: 480, type: "door", style: "cave", targetZone: "overworld", targetObjectId: "elderSpiritEntrance", d: "down", saveStatus: undefined},
-        {status: "normal", id: "elderSpiritStairs", logicKey: undefined, x: 64, y: 256, type: "door", style: "cave", targetZone: "treeVillage", targetObjectId: "elderSpiritStairs", d: "up", saveStatus: undefined},
+        {status: "normal", id: "elderSpiritEntrance", logicKey: undefined, x: 112, y: 480, type: "door", style: "cave", targetZone: "overworld", targetObjectId: "elderSpiritEntrance", d: "down"},
+        {status: "normal", id: "elderSpiritStairs", logicKey: undefined, x: 64, y: 256, type: "door", style: "cave", targetZone: "treeVillage", targetObjectId: "elderSpiritStairs", d: "up"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},
@@ -205,11 +205,11 @@ const f1_0x0: AreaDefinition = {
         {id: "treeVillage:1:0x0-floorSwitch-0", linked: false, spirit: false, status: "normal", x: 192, y: 304, type: "floorSwitch", targetObjectId: "elderPeachPiece", toggleOnRelease: false},
         {id: "elderPeachPiece", linked: false, spirit: false, status: "hiddenSwitch", x: 176, y: 352, type: "chest", lootType: "peachOfImmortalityPiece", lootLevel: 0, lootAmount: 1},
         {id: "treeVillage:1:0x0-door-0", linked: undefined, spirit: false, status: "normal", x: 224, y: 384, type: "door", style: "cave", targetZone: null, targetObjectId: null, d: "right"},
-        {id: "closedBowDoor", linked: undefined, spirit: false, status: "closedSwitch", x: 256, y: 384, type: "door", style: "cave", targetZone: null, targetObjectId: null, d: "left", saveStatus: true, logicKey: "hasMediumRange"},
+        {id: "closedBowDoor", linked: undefined, spirit: false, status: "closedSwitch", x: 256, y: 384, type: "door", style: "cave", targetZone: null, targetObjectId: null, d: "left", saveStatus: 'forever', logicKey: "hasMediumRange"},
         {id: "treeVillage:1:0x0-bow-0", linked: false, spirit: false, status: "normal", x: 368, y: 368, type: "chest", lootType: "bow", lootLevel: 1, lootAmount: 1},
-        {id: "bowSwitch1", linked: false, spirit: false, status: "normal", x: 448, y: 304, type: "crystalSwitch", element: null, timer: 0, saveStatus: true, targetObjectId: "closedBowDoor"},
-        {id: "bowSwitch2", linked: false, spirit: false, status: "normal", x: 448, y: 448, type: "crystalSwitch", element: null, timer: 0, saveStatus: true, targetObjectId: "closedBowDoor"},
-        {id: "openBowDoor", linked: undefined, spirit: false, status: "normal", x: 256, y: 384, type: "door", style: "cave", targetZone: null, targetObjectId: null, d: "left", saveStatus: false, logicKey: "hasMediumRange", invertLogic: true},
+        {id: "bowSwitch1", linked: false, spirit: false, status: "normal", x: 448, y: 304, type: "crystalSwitch", element: null, timer: 0, saveStatus: 'forever', targetObjectId: "closedBowDoor"},
+        {id: "bowSwitch2", linked: false, spirit: false, status: "normal", x: 448, y: 448, type: "crystalSwitch", element: null, timer: 0, saveStatus: 'forever', targetObjectId: "closedBowDoor"},
+        {id: "openBowDoor", linked: undefined, spirit: false, status: "normal", x: 256, y: 384, type: "door", style: "cave", targetZone: null, targetObjectId: null, d: "left", logicKey: "hasMediumRange", invertLogic: true},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},
@@ -309,9 +309,9 @@ const sf1_0x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "elderSpiritStairs", logicKey: undefined, x: 64, y: 256, type: "door", style: "cave", targetZone: "treeVillage", targetObjectId: "elderSpiritStairs", d: "up", saveStatus: undefined},
-        {status: "normal", id: "", logicKey: undefined, x: 224, y: 384, type: "door", style: "cave", targetZone: null, targetObjectId: "elderSpiritStairs", d: "right", saveStatus: undefined, linked: undefined},
-        {status: "normal", id: "", logicKey: undefined, x: 256, y: 384, type: "door", style: "cave", targetZone: null, targetObjectId: "elderSpiritStairs", d: "left", saveStatus: undefined, linked: undefined},
+        {status: "normal", id: "elderSpiritStairs", logicKey: undefined, x: 64, y: 256, type: "door", style: "cave", targetZone: "treeVillage", targetObjectId: "elderSpiritStairs", d: "up"},
+        {status: "normal", id: "", logicKey: undefined, x: 224, y: 384, type: "door", style: "cave", targetZone: null, targetObjectId: "elderSpiritStairs", d: "right", linked: undefined},
+        {status: "normal", id: "", logicKey: undefined, x: 256, y: 384, type: "door", style: "cave", targetZone: null, targetObjectId: "elderSpiritStairs", d: "left", linked: undefined},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},

@@ -15,21 +15,21 @@ enemyDefinitions.stormIdol = {
     alwaysReset: true,
     animations: beetleWingedAnimations, scale: 2,
     isImmortal: true,
-    life: 8, touchDamage: 1, update: updateStormIdol, render: renderIdolShield,
+    life: 8, touchDamage: 1, update: updateStormIdol, renderOver: renderIdolShield,
     immunities: ['lightning'],
 };
 enemyDefinitions.flameIdol = {
     alwaysReset: true,
     animations: snakeAnimations, scale: 2,
     isImmortal: true,
-    life: 8, touchDamage: 1, update: updateFlameIdol, render: renderIdolShield,
+    life: 8, touchDamage: 1, update: updateFlameIdol, renderOver: renderIdolShield,
     immunities: ['fire'],
 };
 enemyDefinitions.frostIdol = {
     alwaysReset: true,
     animations: beetleAnimations, scale: 2,
     isImmortal: true,
-    life: 8, touchDamage: 1, update: updateFrostIdol, render: renderIdolShield,
+    life: 8, touchDamage: 1, update: updateFrostIdol, renderOver: renderIdolShield,
     immunities: ['ice'],
 };
 

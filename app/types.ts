@@ -14,6 +14,8 @@ export { ChestObject, LootObject } from 'app/content/lootObject';
 export { HeldChakram, ThrownChakram } from 'app/content/thrownChakram';
 export { ThrownObject } from 'app/content/thrownObject';
 export { BallGoal } from 'app/content/objects/ballGoal';
+export { BeadCascade } from 'app/content/objects/beadCascade';
+export { KeyBlock } from 'app/content/objects/keyBlock';
 export { NPCBehavior, NPCStyle, NPC } from 'app/content/objects/npc';
 export { DecorationType } from 'app/content/objects/decoration';
 export { VineSprout } from 'app/content/objects/vineSprout';

@@ -1,7 +1,7 @@
 //import { resetTileBehavior } from 'app/content/areas';
 //import { allTiles } from 'app/content/tiles';
+import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { saveGame } from 'app/state';
 import { hitTargets } from 'app/utils/field';
 
 import {
@@ -29,7 +29,7 @@ export class Torch implements ObjectInstance {
         this.x = definition.x;
         this.y = definition.y;
         this.status = this.definition.status;
-        if (this.definition.id && state.savedState.objectFlags[this.definition.id]) {
+        if (getObjectStatus(state, this.definition)) {
             this.status = 'active';
         }
         if (this.status === 'active') {
@@ -90,10 +90,7 @@ export class Torch implements ObjectInstance {
     }
     update(state: GameState) {
         if (this.area && this.status === 'active' && !this.appliedFireToTiles) {
-            if (this.definition.saveStatus && this.definition.id && !state.savedState.objectFlags[this.definition.id]) {
-                state.savedState.objectFlags[this.definition.id] = true;
-                saveGame();
-            }
+            saveObjectStatus(state, this.definition);
             this.applyFireToTiles(state);
         }
         this.animationTime += FRAME_LENGTH;

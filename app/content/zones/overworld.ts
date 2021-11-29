@@ -210,7 +210,7 @@ const f0_0x0: AreaDefinition = {
     ],
     objects: [
         {status: "normal", id: "", x: 48, y: 448, style: "short", type: "staffTowerPoint", location: "mountain"},
-        {status: "normal", id: "staffTowerEntrance", logicKey: "mountainTower", x: 64, y: 416, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerEntrance", d: "up", saveStatus: undefined},
+        {status: "normal", id: "staffTowerEntrance", logicKey: "mountainTower", x: 64, y: 416, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerEntrance", d: "up"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16},
@@ -384,11 +384,11 @@ const f0_0x1: AreaDefinition = {
     objects: [
         {status: "normal", type: "npc", x: 128, y: 272, d: "down", behavior: "none", style: "vanara", dialogueKey: "mom", id: "overworld:0:1x0-npc-0"},
         {status: "normal", id: "peachCaveTopEntrance", x: 368, y: 288, type: "door", style: "lightCave", targetZone: "newPeachCave", targetObjectId: "peachCaveTopEntrance", d: "up"},
-        {status: "normal", id: "waterfallCaveEntrance", x: 80, y: 240, type: "door", style: "lightCave", targetZone: "waterfallCave", targetObjectId: "waterfallCaveEntrance", d: "up", saveStatus: undefined},
+        {status: "normal", id: "waterfallCaveEntrance", x: 80, y: 240, type: "door", style: "lightCave", targetZone: "waterfallCave", targetObjectId: "waterfallCaveEntrance", d: "up"},
         {status: "normal", id: "overworld:0:1x0-decoration-1", x: 64, y: 272, type: "decoration", w: 64, h: 96, decorationType: "waterfall", drawPriority: "sprites"},
         {status: "normal", id: "overworld:0:1x0-decoration-0", x: 64, y: 368, type: "decoration", w: 80, h: 64, decorationType: "waterfall", drawPriority: "sprites"},
         {status: "normal", id: "overworld:0:1x0-decoration-2", x: 64, y: 32, type: "decoration", w: 64, h: 32, decorationType: "waterfall", drawPriority: "sprites"},
-        {status: "normal", id: "waterfallTowerEntrance", x: 80, y: 16, targetZone: "waterfallTower", targetObjectId: "waterfallTowerEntrance", type: "teleporter", saveStatus: undefined},
+        {status: "normal", id: "waterfallTowerEntrance", x: 80, y: 16, targetZone: "waterfallTower", targetObjectId: "waterfallTowerEntrance", type: "teleporter"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 32},
@@ -643,12 +643,12 @@ const f0_0x2: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "overworld:holyCityClothesHouse", x: 48, y: 400, type: "door", style: "lightCave", targetZone: "holyCityInterior", targetObjectId: "clothesHouse", d: "up", saveStatus: undefined},
-        {status: "normal", id: "overworld:holyCityWoodHouse", x: 112, y: 256, type: "door", style: "lightCave", targetZone: "holyCityInterior", targetObjectId: "woodHouse", d: "up", saveStatus: undefined},
-        {status: "normal", id: "overworld:holyCityFoodHouse", x: 144, y: 112, type: "door", style: "lightCave", targetZone: "holyCityInterior", targetObjectId: "foodHouse", d: "up", saveStatus: undefined},
-        {status: "normal", id: "overworld:holyCityBridgeHouse", x: 432, y: 384, type: "door", style: "lightCave", targetZone: "holyCityInterior", targetObjectId: "bridgeHouse", d: "up", saveStatus: undefined},
-        {status: "normal", id: "overworld:holyCityGardenHouse", x: 416, y: 160, type: "door", style: "lightCave", targetZone: "holyCityInterior", targetObjectId: "gardenHouse", d: "up", saveStatus: undefined},
-        {status: "normal", id: "overworld:holyCityTemple", x: 288, y: 0, type: "door", style: "lightCave", targetZone: "holyCityInterior", targetObjectId: "temple", d: "up", saveStatus: undefined},
+        {status: "normal", id: "overworld:holyCityClothesHouse", x: 48, y: 400, type: "door", style: "lightCave", targetZone: "holyCityInterior", targetObjectId: "clothesHouse", d: "up"},
+        {status: "normal", id: "overworld:holyCityWoodHouse", x: 112, y: 256, type: "door", style: "lightCave", targetZone: "holyCityInterior", targetObjectId: "woodHouse", d: "up"},
+        {status: "normal", id: "overworld:holyCityFoodHouse", x: 144, y: 112, type: "door", style: "lightCave", targetZone: "holyCityInterior", targetObjectId: "foodHouse", d: "up"},
+        {status: "normal", id: "overworld:holyCityBridgeHouse", x: 432, y: 384, type: "door", style: "lightCave", targetZone: "holyCityInterior", targetObjectId: "bridgeHouse", d: "up"},
+        {status: "normal", id: "overworld:holyCityGardenHouse", x: 416, y: 160, type: "door", style: "lightCave", targetZone: "holyCityInterior", targetObjectId: "gardenHouse", d: "up"},
+        {status: "normal", id: "overworld:holyCityTemple", x: 288, y: 0, type: "door", style: "lightCave", targetZone: "holyCityInterior", targetObjectId: "temple", d: "up"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -875,9 +875,9 @@ const f0_1x0: AreaDefinition = {
         },
     ],
     objects: [
-        {id: "tombEntrance", linked: false, spirit: false, status: "closedSwitch", x: 112, y: 80, type: "door", style: "lightCave", targetZone: "tomb", targetObjectId: "tombEntrance", d: "up", saveStatus: true},
-        {id: "overworld:0:0x1-crystalSwitch-0", linked: false, spirit: false, status: "normal", x: 192, y: 48, type: "crystalSwitch", element: null, targetObjectId: "tombEntrance", timer: 0, saveStatus: true},
-        {id: "overworld:0:0x1-crystalSwitch-1", linked: false, spirit: false, status: "normal", x: 48, y: 48, type: "crystalSwitch", element: null, targetObjectId: "tombEntrance", timer: 0, saveStatus: true},
+        {id: "tombEntrance", linked: false, spirit: false, status: "closedSwitch", x: 112, y: 80, type: "door", style: "lightCave", targetZone: "tomb", targetObjectId: "tombEntrance", d: "up", saveStatus: 'forever'},
+        {id: "overworld:0:0x1-crystalSwitch-0", linked: false, spirit: false, status: "normal", x: 192, y: 48, type: "crystalSwitch", element: null, targetObjectId: "tombEntrance", timer: 0, saveStatus: 'forever'},
+        {id: "overworld:0:0x1-crystalSwitch-1", linked: false, spirit: false, status: "normal", x: 48, y: 48, type: "crystalSwitch", element: null, targetObjectId: "tombEntrance", timer: 0, saveStatus: 'forever'},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},
@@ -1182,7 +1182,7 @@ const f0_1x1: AreaDefinition = {
     objects: [
         {id: "peachCaveWaterEntrance", linked: true, spirit: false, status: "normal", x: 256, y: 80, type: "door", style: "lightCave", targetZone: "newPeachCave", targetObjectId: "newPeachCave:waterEntrance", d: "up"},
         {status: "hidden", id: "tombTeleporter", x: 128, y: 432, targetZone: "tomb", targetObjectId: "tombTeleporter", type: "teleporter"},
-        {status: "normal", id: "lakeTunnelEntrance", x: 112, y: 336, type: "door", style: "lightCave", targetZone: "lakeTunnel", targetObjectId: "lakeTunnelEntrance", d: "up", saveStatus: undefined},
+        {status: "normal", id: "lakeTunnelEntrance", x: 112, y: 336, type: "door", style: "lightCave", targetZone: "lakeTunnel", targetObjectId: "lakeTunnelEntrance", d: "up"},
         {status: "normal", id: "riverTemplePitEntrance", x: 240, y: 176, targetZone: "riverTemple", targetObjectId: "riverTemplePitEntrance", type: "pitEntrance"},
     ],
     sections: [
@@ -1452,7 +1452,7 @@ const f0_1x2: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "staffTowerEntrance", logicKey: "desertTower", x: 160, y: 352, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerEntrance", d: "up", saveStatus: undefined},
+        {status: "normal", id: "staffTowerEntrance", logicKey: "desertTower", x: 160, y: 352, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerEntrance", d: "up"},
         {status: "normal", id: "", x: 144, y: 384, style: "short", type: "staffTowerPoint", location: "desert"},
     ],
     sections: [
@@ -1851,8 +1851,8 @@ const f0_2x1: AreaDefinition = {
     ],
     objects: [
         {status: "normal", id: "", x: 160, y: 128, style: "short", type: "staffTowerPoint", location: "forest"},
-        {status: "normal", id: "staffTowerEntrance", logicKey: "forestTower", x: 176, y: 96, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerEntrance", d: "up", saveStatus: undefined},
-        {status: "normal", id: "", logicKey: undefined, x: 96, y: 320, type: "door", style: "cave", targetZone: undefined, targetObjectId: undefined, d: "up", saveStatus: undefined},
+        {status: "normal", id: "staffTowerEntrance", logicKey: "forestTower", x: 176, y: 96, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerEntrance", d: "up"},
+        {status: "normal", id: "", logicKey: undefined, x: 96, y: 320, type: "door", style: "cave", targetZone: undefined, targetObjectId: undefined, d: "up"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},
@@ -1946,7 +1946,7 @@ const f0_2x2: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "closedSwitch", id: "warTempleEntrance", x: 240, y: 320, type: "door", style: "lightCave", targetZone: "warTemple", targetObjectId: "warTempleMainEntrance", d: "up", linked: true, saveStatus: true},
+        {status: "closedSwitch", id: "warTempleEntrance", x: 240, y: 320, type: "door", style: "lightCave", targetZone: "warTemple", targetObjectId: "warTempleMainEntrance", d: "up", linked: true, saveStatus: 'forever'},
         {status: "normal", id: "overworld:0:2x2-pushPull-1", x: 208, y: 368, type: "pushPull"},
         {status: "normal", id: "overworld:0:2x2-pushPull-2", x: 208, y: 352, type: "pushPull"},
         {status: "normal", id: "overworld:0:2x2-pushPull-3", x: 272, y: 352, type: "pushPull"},
@@ -3119,7 +3119,7 @@ const sf0_1x1: AreaDefinition = {
     ],
     objects: [
         {id: "peachCaveWaterEntrance", linked: true, spirit: true, status: "normal", x: 256, y: 80, type: "door", style: "lightCave", targetZone: "newPeachCave", targetObjectId: "newPeachCave:waterEntrance", d: "up"},
-        {status: "normal", id: "overworld:s0:1x1-teleporter-0", x: 448, y: 144, targetZone: undefined, targetObjectId: undefined, type: "teleporter", saveStatus: undefined},
+        {status: "normal", id: "overworld:s0:1x1-teleporter-0", x: 448, y: 144, targetZone: undefined, targetObjectId: undefined, type: "teleporter"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -3570,12 +3570,12 @@ const sf0_2x0: AreaDefinition = {
     ],
     objects: [
         {id: "elderSpiritEntrance", linked: false, spirit: false, status: "normal", x: 160, y: 368, type: "door", style: "tree", targetZone: "treeVillage", targetObjectId: "elderSpiritEntrance", d: "up"},
-        {status: "normal", id: "", logicKey: undefined, x: 400, y: 288, type: "door", style: "cave", targetZone: undefined, targetObjectId: undefined, d: "up", saveStatus: undefined},
-        {status: "normal", id: "forestTempleLadder1", logicKey: undefined, x: 400, y: 352, type: "door", style: "ladderDown", targetZone: "forestTemple", targetObjectId: "forestTempleLadder1", d: "down", saveStatus: undefined},
-        {status: "normal", id: "forestTempleLadder2", logicKey: undefined, x: 432, y: 128, type: "door", style: "ladderDown", targetZone: "forestTemple", targetObjectId: "forestTempleLadder2", d: "down", saveStatus: undefined},
-        {status: "normal", id: "forestTempleLadder3", logicKey: undefined, x: 368, y: 64, type: "door", style: "ladderDown", targetZone: "forestTemple", targetObjectId: "forestTempleLadder3", d: "down", saveStatus: undefined},
-        {status: "normal", id: "forestTempleLadder4", logicKey: undefined, x: 128, y: 96, type: "door", style: "ladderDown", targetZone: "forestTemple", targetObjectId: "forestTempleLadder4", d: "down", saveStatus: undefined},
-        {status: "normal", id: "forestTempleLadder5", logicKey: undefined, x: 48, y: 128, type: "door", style: "ladderDown", targetZone: "forestTemple", targetObjectId: "forestTempleLadder5", d: "down", saveStatus: undefined},
+        {status: "normal", id: "", logicKey: undefined, x: 400, y: 288, type: "door", style: "cave", targetZone: undefined, targetObjectId: undefined, d: "up"},
+        {status: "normal", id: "forestTempleLadder1", logicKey: undefined, x: 400, y: 352, type: "door", style: "ladderDown", targetZone: "forestTemple", targetObjectId: "forestTempleLadder1", d: "down"},
+        {status: "normal", id: "forestTempleLadder2", logicKey: undefined, x: 432, y: 128, type: "door", style: "ladderDown", targetZone: "forestTemple", targetObjectId: "forestTempleLadder2", d: "down"},
+        {status: "normal", id: "forestTempleLadder3", logicKey: undefined, x: 368, y: 64, type: "door", style: "ladderDown", targetZone: "forestTemple", targetObjectId: "forestTempleLadder3", d: "down"},
+        {status: "normal", id: "forestTempleLadder4", logicKey: undefined, x: 128, y: 96, type: "door", style: "ladderDown", targetZone: "forestTemple", targetObjectId: "forestTempleLadder4", d: "down"},
+        {status: "normal", id: "forestTempleLadder5", logicKey: undefined, x: 48, y: 128, type: "door", style: "ladderDown", targetZone: "forestTemple", targetObjectId: "forestTempleLadder5", d: "down"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -3798,7 +3798,7 @@ const sf0_2x1: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "", logicKey: undefined, x: 96, y: 320, type: "door", style: "cave", targetZone: undefined, targetObjectId: undefined, d: "up", saveStatus: undefined, linked: undefined},
+        {status: "normal", id: "", logicKey: undefined, x: 96, y: 320, type: "door", style: "cave", targetZone: undefined, targetObjectId: undefined, d: "up", linked: undefined},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},

@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import {
     enterLocation, setAreaSection, setConnectedAreas,
 } from 'app/content/areas';
