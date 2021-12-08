@@ -69,8 +69,8 @@ export class Hero implements Actor, SavedHeroData {
     sinking?: boolean;
     inAirBubbles?: boolean;
     frozenDuration?: number;
-    isEntering?: boolean;
-    isExiting?: boolean;
+    isUsingDoor?: boolean;
+    isExitingDoor?: boolean;
     isControlledByObject?: boolean;
     // stats
     magic: number = 0;

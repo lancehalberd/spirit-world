@@ -100,8 +100,10 @@ export interface Actor extends ObjectInstance {
     inAirBubbles?: boolean
     frozenDuration?: number
     // These flags are set when an actor is being forced to move through door objects.
-    isEntering?: boolean
-    isExiting?: boolean
+    isUsingDoor?: boolean
+    // This flag insures that when the user is exiting a door we don't accidentally try
+    // to switch to the connected exit. We could probably solve this some other way.
+    isExitingDoor?: boolean
     // Generic flag set to remove player control when the hero is controlled by
     // various objects like a BeadCascade BeadSection that sweeps them south.
     isControlledByObject?: boolean

@@ -146,15 +146,6 @@ export function removeAllClones(state: GameState): void {
     // Modify the hero to match the state of the active clone before it is removed.
     if (state.hero.activeClone) {
         swapHeroStates(state.hero, state.hero.activeClone);
-        /*state.hero.x = state.hero.activeClone.x;
-        state.hero.y = state.hero.activeClone.y;
-        state.hero.d = state.hero.activeClone.d;
-        state.hero.animationTime = state.hero.activeClone.animationTime;
-        state.hero.action = state.hero.activeClone.action;
-        state.hero.actionFrame = state.hero.activeClone.actionFrame;
-        state.hero.actionDx = state.hero.activeClone.actionDx;
-        state.hero.actionDy = state.hero.activeClone.actionDy;
-        state.hero.actionTarget = state.hero.activeClone.actionTarget;*/
     }
     for (const clone of state.hero.clones) {
         removeObjectFromArea(state, clone);

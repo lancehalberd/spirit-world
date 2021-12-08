@@ -31,7 +31,7 @@ import {
     getTileBehaviorsAndObstacles,
     isPointOpen,
 } from 'app/utils/field';
-import { rectanglesOverlap } from 'app/utils/index';
+import { boxesIntersect, rectanglesOverlap } from 'app/utils/index';
 import { playSound } from 'app/utils/sounds';
 
 import {
@@ -76,6 +76,19 @@ export function updateAllHeroes(this: void, state: GameState) {
     updateHero(state, state.hero);
 }
 
+export function isHeroOnOpenTile(this: void, state: GameState, hero: Hero) {
+    const L = hero.x + 3, R = hero.x + hero.w - 4, T = hero.y + 3, B = hero.y + hero.h - 4;
+    const points = [{x: L, y: T}, {x: R, y: T}, {x: L, y: B}, {x: R, y: B}];
+    const excludedObjects = new Set([hero]);
+    for (const point of points) {
+        const { tileBehavior } = getTileBehaviorsAndObstacles(state, hero.area, point, excludedObjects, state.nextAreaInstance);
+        if (tileBehavior.solid) {
+            return false
+        }
+    }
+    return true;
+}
+
 export function updateHero(this: void, state: GameState, hero: Hero) {
     // Remove action targets from old areas.
     if (hero.actionTarget && hero.actionTarget.area !== hero.area) {
@@ -88,12 +101,30 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         hero.isControlledByObject = false;
         return;
     }
-    if (hero.isEntering || hero.isExiting) {
+    if (hero.isUsingDoor) {
         hero.action = 'walking';
         hero.animationTime += FRAME_LENGTH;
+        // Automatically move the hero forward in the direction set by the door, ignoring obstacles.
+        // Reduce speed to the regular screen transition speed if the player transitions screens while
+        // moving through the door.
+        const speed = state.nextAreaInstance ? 0.75 : 2;
+        hero.x += speed * hero.actionDx;
+        hero.y += speed * hero.actionDy;
         // This makes sure the hero displays as swimming/climbing.
         checkForFloorEffects(state, hero);
         updateScreenTransition(state, hero);
+        // Check if the hero is done moving through the door meaning:
+        // They are no longer intersecting the door object
+        // They are in an open tile.
+        const touchingTarget = hero.actionTarget && boxesIntersect(hero, hero.actionTarget.getHitbox(state));
+        if (!touchingTarget && isHeroOnOpenTile(state, hero)) {
+            hero.actionTarget = null;
+            hero.isUsingDoor = false;
+            hero.isExitingDoor = false;
+            hero.safeD = hero.d;
+            hero.safeX = hero.x;
+            hero.safeY = hero.y;
+        }
         return;
     }
     if (hero.action === 'jumpingDown' && !editingState.isEditing) {
