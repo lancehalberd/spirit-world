@@ -45,11 +45,26 @@ export function createFrameCanvas(frame: Frame, scale: number = 1): HTMLCanvasEl
 }
 
 
-export function debugCanvas(canvas: HTMLCanvasElement) {
-    document.body.append(canvas);
-    canvas.style.position = 'absolute';
-    canvas.style.top = '0';
-    canvas.style.backgroundColor = 'blue';
+export function debugCanvas(canvas: HTMLCanvasElement | Frame) {
+    if (canvas instanceof HTMLCanvasElement) {
+        document.body.append(canvas);
+        canvas.style.position = 'absolute';
+        canvas.style.top = '0';
+        canvas.style.backgroundColor = 'blue';
+    } else {
+        document.body.append(canvas.image);
+        canvas.image.style.position = 'absolute';
+        canvas.image.style.top = '0';
+        canvas.image.style.backgroundColor = 'blue';
+        const div = document.createElement('div');
+        div.style.position = 'absolute';
+        div.style.top = `${canvas.y}px`;
+        div.style.left = `${canvas.x}px`;
+        div.style.height = `${canvas.h}px`;
+        div.style.width = `${canvas.w}px`;
+        div.style.border = '1px solid red';
+        document.body.append(div);
+    }
 }
 window['debugCanvas'] = debugCanvas;
 

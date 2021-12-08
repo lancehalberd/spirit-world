@@ -97,3 +97,13 @@ export const BITMAP_RIGHT_6_TOP_5: Uint16Array = new Uint16Array([
     0x003F, 0x003F, 0x003F, 0x003F, 0x003F, 0x0000, 0x0000, 0x0000,
     0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
 ]);
+
+// A strip 9 px wide from TL to BR corner centered in the tile.
+export const BITMAP_MIDDLE_DOWN_RIGHT: Uint16Array = new Uint16Array([
+    0xF800, 0xFC00, 0xFE00, 0xFF00, 0xFF80, 0x7FC0, 0x3FE0, 0x1FF0,
+    0x0FF8, 0x07FC, 0x03FE, 0x01FF, 0x00FF, 0x007F, 0x003F, 0x001F,
+]);
+// A strip 9 px wide from BL to TR corner centered in the tile.
+export const BITMAP_MIDDLE_UP_RIGHT: Uint16Array = new Uint16Array([...BITMAP_MIDDLE_DOWN_RIGHT].reverse());
+
+

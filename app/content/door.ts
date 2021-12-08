@@ -103,12 +103,12 @@ interface DoorStyleDefinition {
     up?: DoorStyleFrames,
     left?: DoorStyleFrames,
 }
-const woodImage = requireImage('gfx/tiles/woodhousetilesarrangedv3.png');
+const woodImage = requireImage('gfx/tiles/woodhousetilesarranged.png');
 const woodenSouthCrackedWall: Frame = {image: woodImage, x: 32, y: 96, w: 16, h: 16};
 const [
-    woodenSouthDoorClosed, woodenSouthDoorOpen, woodenSouthDoorEmpty
-] = createAnimation('gfx/tiles/woodhousetilesarrangedv3.png', {w: 64, h: 16},
-    {left: 336, y: 7, rows: 3}).frames;
+    woodenSouthDoorClosed, /* empty space */, woodenSouthDoorOpen, woodenSouthDoorEmpty
+] = createAnimation('gfx/tiles/woodhousetilesarranged.png', {w: 64, h: 16},
+    {left: 304, y: 13, cols: 2, rows: 2}).frames;
 function renderWoodenDoor(context: CanvasRenderingContext2D, state: GameState, door: Door) {
     /*if (door.definition.d === 'down') {
         let frame = woodenSouthDoorEmpty;

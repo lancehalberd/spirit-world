@@ -1,4 +1,5 @@
 import {
+    BITMAP_MIDDLE_DOWN_RIGHT, BITMAP_MIDDLE_UP_RIGHT,
     BITMAP_BOTTOM, BITMAP_BOTTOM_6,
     BITMAP_BOTTOM_LEFT_8, BITMAP_BOTTOM_RIGHT_8,
     BITMAP_TOP_LEFT_8_STRIP, BITMAP_TOP_RIGHT_8_STRIP,
@@ -805,7 +806,7 @@ const bottomRightCeiling: TileBehaviors = { ...ceilingBehavior, solidMap: BITMAP
 
 const woodCeiling: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/woodhousetilesarrangedv3.png'), x: 0, y: 0, w: 48, h: 64},
+    source: {image: requireImage('gfx/tiles/woodhousetilesarranged.png'), x: 0, y: 0, w: 48, h: 64},
     behaviors: {
         'all': ceilingBehavior,
         '0x4': topLeftCeiling, '4x4': topLeftCeiling, '1x7': topLeftCeiling,
@@ -833,7 +834,7 @@ const bottomRightWall: TileBehaviors = { ...wallBehavior, solidMap: BITMAP_BOTTO
 
 const woodWalls: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/woodhousetilesarrangedv3.png'), x: 0, y: 0, w: 48, h: 80},
+    source: {image: requireImage('gfx/tiles/woodhousetilesarranged.png'), x: 0, y: 0, w: 48, h: 80},
     behaviors: {
         'all': wallBehavior,
         '11x4': topLeftWall, '12x4': topLeftWall,
@@ -852,7 +853,7 @@ const woodWalls: TileSource = {
 };
 const extraWoodWalls: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/woodhousetilesarrangedv3.png'), x: 0, y: 0, w: 48, h: 80},
+    source: {image: requireImage('gfx/tiles/woodhousetilesarranged.png'), x: 0, y: 0, w: 48, h: 80},
     behaviors: {
         'all': wallBehavior,
     },
@@ -862,7 +863,7 @@ const extraWoodWalls: TileSource = {
 };
 const woodStairs: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/woodhousetilesarrangedv3.png'), x: 0, y: 0, w: 48, h: 64},
+    source: {image: requireImage('gfx/tiles/woodhousetilesarranged.png'), x: 0, y: 0, w: 48, h: 64},
     behaviors: {
         'all': { defaultLayer: 'field' },
         '13x0': { defaultLayer: 'field', solidMap: BITMAP_LEFT_6_BOTTOM_9},
@@ -887,7 +888,7 @@ const woodStairs: TileSource = {
 
 const woodLedges: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/woodhousetilesarrangedv3.png'), x: 0, y: 0, w: 48, h: 64},
+    source: {image: requireImage('gfx/tiles/woodhousetilesarranged.png'), x: 0, y: 0, w: 48, h: 64},
     behaviors: {
         'all': { defaultLayer: 'floor2' },
         '8x9': { defaultLayer: 'floor2', edges: { up: true, left: true}},
@@ -913,7 +914,7 @@ const woodLedges: TileSource = {
 };
 const woodFloorDecorations: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/woodhousetilesarrangedv3.png'), x: 0, y: 0, w: 48, h: 64},
+    source: {image: requireImage('gfx/tiles/woodhousetilesarranged.png'), x: 0, y: 0, w: 48, h: 64},
     behaviors: {
         'all': { defaultLayer: 'floor2' },
     },
@@ -926,7 +927,7 @@ const woodFloorDecorations: TileSource = {
 };
 const woodFloor: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/woodhousetilesarrangedv3.png'), x: 0, y: 0, w: 48, h: 64},
+    source: {image: requireImage('gfx/tiles/woodhousetilesarranged.png'), x: 0, y: 0, w: 48, h: 64},
     behaviors: {
         'all': { defaultLayer: 'floor' },
     },
@@ -953,17 +954,29 @@ const caveCeiling: TileSource = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/cavearranged.png'), x: 0, y: 0, w: 48, h: 64},
     behaviors: {
-        'all': ceilingBehavior,
+        'all': { defaultLayer: 'foreground2' },
         '0x12': bottomLeftCeiling, '1x12': bottomLeftCeiling,
         '2x12': bottomRightCeiling, '3x12': bottomRightCeiling,
     },
     tileCoordinates: [
                         [ 2, 7],[ 3, 7],[ 4, 7],[ 5, 7],
                         [ 2, 8],[ 3, 8],[ 4, 8],[ 5, 8],
-        [ 0, 9],[ 1, 9],[ 2, 9],[ 3, 9],
+                        [ 2, 9],[ 3, 9],
         [ 0,10],[ 1,10],[ 2,10],[ 3,10],
-        [ 0,11],[ 1,11],[ 2,11],[ 3,11],
+
         [ 0,12],[ 1,12],[ 2,12],[ 3,12],
+    ],
+};
+
+const caveCeilingTopAngles: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/cavearranged.png'), x: 0, y: 0, w: 48, h: 80},
+    behaviors: {
+        '8x2': bottomLeftCeiling, '9x2': bottomLeftCeiling,
+        '10x2': bottomRightCeiling, '11x2': bottomRightCeiling,
+    },
+    tileCoordinates: [
+        [ 8, 2],[ 9, 2],[10, 2],[11, 2],
     ],
 };
 
@@ -1003,79 +1016,63 @@ const caveLedges: TileSource = {
     source: {image: requireImage('gfx/tiles/cavearranged.png'), x: 0, y: 0, w: 48, h: 64},
     behaviors: {
         'all': { defaultLayer: 'floor2' },
-        '8x8': { defaultLayer: 'floor2', jumpDirection: 'left', solidMap: BITMAP_RIGHT_6 },
-        '9x8': { defaultLayer: 'floor2', jumpDirection: 'left', solidMap: BITMAP_RIGHT_6 },
-        '10x8': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_LEFT },
-        '11x8': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_LEFT },
-        '12x8': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_RIGHT },
-        '13x8': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_RIGHT },
+        '8x8': { defaultLayer: 'floor2', edges: { right: true } },
+        '9x8': { defaultLayer: 'floor2', edges: { right: true } },
 
-        '8x9': { defaultLayer: 'floor2', jumpDirection: 'right', solidMap: BITMAP_LEFT_6 },
-        '9x9': { defaultLayer: 'floor2', jumpDirection: 'right', solidMap: BITMAP_LEFT_6 },
-        '10x9': { defaultLayer: 'floor2', jumpDirection: 'up', solidMap: BITMAP_BOTTOM_6 },
-        '11x9': { defaultLayer: 'floor2', jumpDirection: 'up', solidMap: BITMAP_BOTTOM_6 },
-        '12x9': { defaultLayer: 'floor2', jumpDirection: 'down', solid: true },
-        '13x9': { defaultLayer: 'floor2', jumpDirection: 'down', solid: true },
+        '8x9': { defaultLayer: 'floor2', edges: { left: true } },
+        '9x9': { defaultLayer: 'floor2', edges: { left: true } },
+        '10x9': { defaultLayer: 'floor2', edges: { down: true } },
+        '11x9': { defaultLayer: 'floor2', edges: { down: true } },
+        '12x9': { defaultLayer: 'floor2', jumpDirection: 'up', solidMap: BITMAP_BOTTOM_6 },
+        '13x9': { defaultLayer: 'floor2', jumpDirection: 'up', solidMap: BITMAP_BOTTOM_6 },
 
         '8x10': { defaultLayer: 'floor2', solidMap: BITMAP_RIGHT_6 },
         '9x10': { defaultLayer: 'floor2', solidMap: BITMAP_RIGHT_6 },
-        '10x10': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_LEFT },
-        '11x10': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_LEFT },
-        '12x10': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_RIGHT },
-        '13x10': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_RIGHT },
 
         '8x11': { defaultLayer: 'floor2', solidMap: BITMAP_LEFT_6 },
         '9x11': { defaultLayer: 'floor2', solidMap: BITMAP_LEFT_6 },
         '10x11': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_6 },
         '11x11': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_6 },
-        '12x11': { defaultLayer: 'floor2', solid: true },
-        '13x11': { defaultLayer: 'floor2', solid: true },
+        '12x11': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_6 },
+        '13x11': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_6 },
 
-        '7x12': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_RIGHT },
-        '8x12': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_LEFT },
-        '9x12': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_RIGHT },
-        '10x12': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_LEFT},
-        '11x12': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_RIGHT },
-        '12x12': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_LEFT },
-        '13x12': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_RIGHT },
-        '14x12': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_LEFT },
+        '8x12': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_RIGHT, jumpDirection: 'downright' },
+        '9x12': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_LEFT, jumpDirection: 'downleft' },
+        '10x12': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_RIGHT, jumpDirection: 'downleft' },
+        '11x12': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_LEFT, jumpDirection: 'downright' },
+        '12x12': { defaultLayer: 'floor2'},
+        '13x12': { defaultLayer: 'floor2'},
 
-        '7x13': { defaultLayer: 'floor2', solidMap: BITMAP_TOP_RIGHT },
-        '8x13': { defaultLayer: 'floor2', solidMap: BITMAP_TOP_LEFT },
-        '9x13': { defaultLayer: 'floor2', solidMap: BITMAP_TOP_RIGHT },
-        '10x13': { defaultLayer: 'floor2', solidMap: BITMAP_TOP_LEFT},
-        '11x13': { defaultLayer: 'floor2', solidMap: BITMAP_TOP_RIGHT },
-        '12x13': { defaultLayer: 'floor2', solidMap: BITMAP_TOP_LEFT },
-        '13x13': { defaultLayer: 'floor2', solidMap: BITMAP_TOP_RIGHT },
-        '14x13': { defaultLayer: 'floor2', solidMap: BITMAP_TOP_LEFT },
+        '8x13': { defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_DOWN_RIGHT },
+        '9x13': { defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_UP_RIGHT },
+        '10x13': { defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_DOWN_RIGHT },
+        '11x13': { defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_UP_RIGHT},
+        '12x13': { defaultLayer: 'floor2'},
+        '13x13': { defaultLayer: 'floor2'},
 
-        '7x14': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_RIGHT },
-        '8x14': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_LEFT },
-        '9x14': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_RIGHT },
-        '10x14': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_LEFT},
-        '11x14': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_RIGHT },
-        '12x14': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_LEFT },
-        '13x14': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_RIGHT },
-        '14x14': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_LEFT },
+        '8x14': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_RIGHT },
+        '9x14': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_LEFT },
+        '10x14': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_RIGHT },
+        '11x14': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_LEFT},
+        '12x14': { defaultLayer: 'floor2'},
+        '13x14': { defaultLayer: 'floor2'},
 
-        '7x15': { defaultLayer: 'floor2', solidMap: BITMAP_TOP_RIGHT },
-        '8x15': { defaultLayer: 'floor2', solidMap: BITMAP_TOP_LEFT },
-        '9x15': { defaultLayer: 'floor2', solidMap: BITMAP_TOP_RIGHT },
-        '10x15': { defaultLayer: 'floor2', solidMap: BITMAP_TOP_LEFT},
-        '11x15': { defaultLayer: 'floor2', solidMap: BITMAP_TOP_RIGHT },
-        '12x15': { defaultLayer: 'floor2', solidMap: BITMAP_TOP_LEFT },
-        '13x15': { defaultLayer: 'floor2', solidMap: BITMAP_TOP_RIGHT },
-        '14x15': { defaultLayer: 'floor2', solidMap: BITMAP_TOP_LEFT },
+        '8x15': { defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_DOWN_RIGHT },
+        '9x15': { defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_UP_RIGHT },
+        '10x15': { defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_DOWN_RIGHT },
+        '11x15': { defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_UP_RIGHT},
+        '12x15': { defaultLayer: 'floor2'},
+        '13x15': { defaultLayer: 'floor2'},
     },
     tileCoordinates: [
-                [ 8, 8],[ 9, 8],[10, 8],[11, 8],[12, 8],[13, 8],
-                [ 8, 9],[ 9, 9],[10, 9],[11, 9],[12, 9],[13, 9],
-                [ 8,10],[ 9,10],[10,10],[11,10],[12,10],[13,10],
-                [ 8,11],[ 9,11],[10,11],[11,11],[12,11],[13,11],
-        [ 7,12],[ 8,12],[ 9,12],[10,12],[11,12],[12,12],[13,12],[14,12],
-        [ 7,13],[ 8,13],[ 9,13],[10,13],[11,13],[12,13],[13,13],[14,13],
-        [ 7,14],[ 8,14],[ 9,14],[10,14],[11,14],[12,14],[13,14],[14,14],
-        [ 7,15],[ 8,15],[ 9,15],[10,15],[11,15],[12,15],[13,15],[14,15],
+        [ 8, 8],[ 9, 8],
+        [ 8, 9],[ 9, 9],[10, 9],[11, 9],[12, 9],[13, 9],
+        [ 8,10],[ 9,10],
+        [ 8,11],[ 9,11],[10,11],[11,11],[12,11],[13,11],
+        [ 8,12],[ 9,12],[10,12],[11,12],[12,12],[13,12],
+        [ 8,13],[ 9,13],[10,13],[11,13],[12,13],[13,13],
+        [ 8,14],[ 9,14],[10,14],[11,14],[12,14],[13,14],
+        [ 8,15],[ 9,15],[10,15],[11,15],[12,15],[13,15],
     ],
 };
 
@@ -1086,17 +1083,17 @@ const caveFloorDecorations: TileSource = {
         'all': { defaultLayer: 'floor2' },
     },
     tileCoordinates: [
-                        [16, 5],[17, 5],[18, 5],
-                        [16, 6],[17, 6],[18, 6],
-                                [17, 7],[18, 7],
-
-        [14, 9],[15, 9],[16, 9],[17, 9],[18, 9],
-        [14,10],        [16,10],[17,10],[18,10],
-        [14,11],[15,11],[16,11],
-                        [16,12],[17,12],
-                [15,13],[16,13],[17,13],[18,13],
-                [15,14],[16,14],[17,14],[18,14],
-                        [16,15],[17,15],
+        [15, 5],[16, 5],[17, 5],[18, 5],
+        [15, 6],[16, 6],[17, 6],[18, 6],
+        [15, 7],[16, 7],[17, 7],[18, 7],
+                        [17, 8],[18, 8],
+                [16, 9],[17, 9],[18, 9],
+                [16,10],        [18,10],
+                [16,11],[17,11],[18,11],
+                [16,12],[17,12],
+        [15,13],[16,13],[17,13],[18,13],
+        [15,14],[16,14],[17,14],[18,14],
+                [16,15],[17,15],
     ],
 };
 
@@ -1107,14 +1104,28 @@ const caveFloor: TileSource = {
         'all': { defaultLayer: 'floor' },
     },
     tileCoordinates: [
-        [11, 6], [14, 6],
+        [12, 5],
+        [12, 6],
+    ],
+};
+const caveFloorEdges: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/cavearranged.png'), x: 0, y: 0, w: 48, h: 64},
+    behaviors: {
+        'all': { defaultLayer: 'floor2' },
+    },
+    tileCoordinates: [
+        [ 8, 4],[ 9, 4],[10, 4],[11, 4],
+        [ 8, 5],[ 9, 5],[10, 5],[11, 5],
+        [ 8, 6],[ 9, 6],[10, 6],[11, 6],
+        [ 8, 7],[ 9, 7],[10, 7],[11, 7],
     ],
 };
 const newTiles: Frame = {
     image: requireImage('gfx/tiles/cavearranged.png'),
-    x: 224, y: 80,
+    x: 128, y: 64,
     //w: 48, h: 48,
-    w: 80, h: 176,
+    w: 80, h: 64,
 };
 //(async () => console.log((await findUniqueTiles(newTiles)).map(o => `[${o.x},${o.y}]`).join(',')));//();
 (() => logUniqueTiles(newTiles));//();
@@ -1233,9 +1244,11 @@ addTiles([
     caveCeiling,
     caveWalls,
     caveFloor,
+    caveFloorEdges,
     caveFloorDecorations,
     caveLedges,
     caveStairs,
+    caveCeilingTopAngles,
 ]);
 
 // This invalid is in the middle of a bunch of other tiles so it is easiest to just delete after adding it.

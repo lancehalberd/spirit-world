@@ -152,7 +152,7 @@ enemyDefinitions.ent = {
 enemyDefinitions.crystalGuardian = {
     alwaysReset: true,
     params: {
-        shieldLife: 2,
+        shieldLife: 4,
     },
     animations: entAnimations, aggroRadius: 128,
     life: 8, touchDamage: 2,
