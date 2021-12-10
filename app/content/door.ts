@@ -2,15 +2,14 @@ import { applyBehaviorToTile, enterZoneByTarget, playAreaSound, resetTileBehavio
 import { findObjectInstanceById, getObjectStatus, saveObjectStatus } from 'app/content/objects';
 import {
     BITMAP_LEFT, BITMAP_RIGHT,
-    BITMAP_BOTTOM, BITMAP_BOTTOM_LEFT_8, BITMAP_BOTTOM_RIGHT_8,
-    BITMAP_TOP,
+    BITMAP_BOTTOM, BITMAP_BOTTOM_LEFT_QUARTER, BITMAP_BOTTOM_RIGHT_QUARTER,
 } from 'app/content/bitMasks';
 import { showMessage } from 'app/render/renderMessage';
 import { saveGame } from 'app/state';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { directionMap, getDirection } from 'app/utils/field';
 import { requireImage } from 'app/utils/images';
-import { boxesIntersect, isObjectInsideTarget, isPointInShortRect, pad } from 'app/utils/index';
+import { boxesIntersect, isObjectInsideTarget, isPointInShortRect } from 'app/utils/index';
 
 import {
     AreaInstance, Direction, DrawPriority, Frame, GameState, HitProperties, HitResult, ObjectInstance,
@@ -96,6 +95,7 @@ interface DoorStyleFrames {
 interface DoorStyleDefinition {
     w: number,
     h: number,
+    getHitbox?: (state: GameState, door: Door) => Rect
     render?: (context: CanvasRenderingContext2D, state: GameState, door: Door) => void
     renderForeground?: (context: CanvasRenderingContext2D, state: GameState, door: Door) => void
     down?: DoorStyleFrames,
@@ -133,9 +133,9 @@ function renderWoodenDoorForeground(context: CanvasRenderingContext2D, state: Ga
     if (door.definition.d === 'down') {
         let frame = woodenSouthDoorEmpty;
         if (door.isOpen()) {
-            if (door.definition.status === 'locked'
-                || door.definition.status === 'bigKeyLocked'
-                || door.definition.status === 'closed') {
+            if (door.definition.status !== 'normal'
+                && door.definition.status !== 'cracked'
+            ) {
                 frame = woodenSouthDoorOpen;
             }
         } else if (door.status === 'locked' || door.status === 'bigKeyLocked' || door.status === 'closed') {
@@ -150,7 +150,152 @@ function renderWoodenDoorForeground(context: CanvasRenderingContext2D, state: Ga
     }
 }
 
+
+const cavernImage = requireImage('gfx/tiles/cavearranged.png');
+const cavernCrackedBackground: Frame = {image: cavernImage, x: 0, y: 240, w: 16, h: 16};
+const cavernEastCrackedWall: Frame = {image: cavernImage, x: 304, y: 64, w: 16, h: 16};
+const cavernWestCrackedWall: Frame = {image: cavernImage, x: 320, y: 64, w: 16, h: 16};
+//const cavernNorthCrackedWall: Frame = {image: cavernImage, x: 304, y: 80, w: 16, h: 16};
+const cavernSouthCrackedWall: Frame = {image: cavernImage, x: 320, y: 80, w: 16, h: 16};
+const [
+    cavernSouthDoorClosed, cavernSouthDoorOpen, cavernSouthDoorEmpty
+] = createAnimation('gfx/tiles/cavearranged.png', {w: 64, h: 16},
+    {left: 432, y: 9, cols: 1, rows: 3}).frames;
+const [
+    cavernWestDoorClosed, cavernEastDoorClosed, cavernWestDoorOpen, cavernEastDoorOpen,
+    /* */, /* */, cavernWestDoorEmpty, cavernEastDoorEmpty,
+] = createAnimation('gfx/tiles/cavearranged.png', {w: 16, h: 64},
+    {left: 432, y: 0, cols: 4, rows: 2}).frames;
+const [
+    cavernWestDoorOpenForeground, cavernEastDoorOpenForeground,
+    cavernWestDoorEmptyForeground, cavernEastDoorEmptyForeground,
+] = createAnimation('gfx/tiles/cavearranged.png', {w: 16, h: 64},
+    {left: 432, top: 192, cols: 4, rows: 1}).frames;
+const [
+    /*cavernStairsUp*/, /*cavernStairsDown*/, cavernNorthDoorway, cavernNorthBlownup,
+    /*cavernStairs*/, cavernNorthCrack,
+] = createAnimation('gfx/tiles/cavearranged.png', {w: 32, h: 32},
+    {left: 304, y: 0, cols: 4, rows: 2}).frames;
+const [
+    blockedDoorCover, lockedDoorCover, bigLockedDoorCover,
+] = createAnimation('gfx/tiles/cavearranged.png', {w: 32, h: 32},
+    {left: 304, y: 14, cols: 3, rows: 1}).frames;
+
+function renderCavernDoor(context: CanvasRenderingContext2D, state: GameState, door: Door) {
+    if (door.definition.d === 'up') {
+        let frame = cavernNorthDoorway, overFrame: Frame = null;
+        if (door.isOpen()) {
+            if (door.definition.status === 'cracked') {
+                frame = cavernNorthBlownup;
+            }
+        } else if (door.status === 'locked') {
+            overFrame = lockedDoorCover;
+        } else if (door.status === 'bigKeyLocked' ) {
+            overFrame = bigLockedDoorCover;
+        } else if (door.status === 'cracked') {
+            frame = cavernNorthCrack;
+        } else {
+            // This covers closed, closedEnemy + closedSwitch
+            overFrame = blockedDoorCover;
+        }
+        drawFrame(context, frame, {...frame, x: door.x, y: door.y});
+        if (overFrame) {
+            drawFrame(context, overFrame, {...overFrame, x: door.x, y: door.y});
+        }
+    } else if (door.definition.d === 'left') {
+        if (door.status === 'cracked') {
+            return;
+        }
+        let frame = cavernWestDoorEmpty;
+        if (door.definition.status !== 'normal' && door.definition.status !== 'cracked') {
+            frame = door.renderOpen(state) ? cavernWestDoorOpen : cavernWestDoorClosed;
+        }
+        drawFrame(context, frame, {...frame, x: door.x, y: door.y});
+    } else if (door.definition.d === 'right') {
+        if (door.status === 'cracked') {
+            return;
+        }
+        let frame = cavernEastDoorEmpty;
+        if (door.definition.status !== 'normal' && door.definition.status !== 'cracked') {
+            frame = door.renderOpen(state) ? cavernEastDoorOpen : cavernEastDoorClosed;
+        }
+        drawFrame(context, frame, {...frame, x: door.x, y: door.y});
+    }
+}
+function renderCavernDoorForeground(context: CanvasRenderingContext2D, state: GameState, door: Door) {
+    if (door.definition.d === 'down') {
+        let frame = cavernSouthDoorEmpty;
+        // This frame is used if the doorway can have a door in it (closed or locked).
+        if (door.definition.status !== 'normal' && door.definition.status !== 'cracked') {
+            frame = door.renderOpen(state) ? cavernSouthDoorOpen : cavernSouthDoorClosed;
+        }
+        // Draw cracked tiles instead of the door.
+        if (door.status === 'cracked') {
+            drawFrame(context, cavernCrackedBackground, {x: door.x, y: door.y, w: 16, h: 16});
+            drawFrame(context, cavernCrackedBackground, {x: door.x + 16, y: door.y, w: 16, h: 16});
+            drawFrame(context, cavernCrackedBackground, {x: door.x + 32, y: door.y, w: 16, h: 16});
+            drawFrame(context, cavernCrackedBackground, {x: door.x + 48, y: door.y, w: 16, h: 16});
+            drawFrame(context, cavernSouthCrackedWall, {x: door.x + 16, y: door.y, w: 16, h: 16});
+            drawFrame(context, cavernSouthCrackedWall, {x: door.x + 32, y: door.y, w: 16, h: 16});
+        } else {
+            drawFrame(context, frame, {...frame, x: door.x, y: door.y});
+        }
+    } else if (door.definition.d === 'up') {
+        let frame = cavernNorthDoorway;
+        if (door.definition.status === 'cracked') {
+            frame = door.renderOpen(state) ? cavernNorthBlownup : null;
+        }
+        // Only draw the top 12 pixels of southern facing doors over the player.
+        drawFrame(context, {...cavernNorthDoorway, h: 12}, {...frame, x: door.x, y: door.y, h: 12});
+    } else if (door.definition.d === 'left') {
+        let frame = cavernWestDoorEmptyForeground;
+        if (door.definition.status !== 'normal' && door.definition.status !== 'cracked') {
+            frame = door.renderOpen(state) ? cavernWestDoorOpenForeground : null;
+        }
+        // Draw cracked tiles on top fo the door frame graphic.
+        if (door.status === 'cracked') {
+            drawFrame(context, cavernCrackedBackground, {x: door.x, y: door.y, w: 16, h: 16});
+            drawFrame(context, cavernCrackedBackground, {x: door.x, y: door.y + 16, w: 16, h: 16});
+            drawFrame(context, cavernCrackedBackground, {x: door.x, y: door.y + 32, w: 16, h: 16});
+            drawFrame(context, cavernWestCrackedWall, {x: door.x, y: door.y + 16, w: 16, h: 16});
+            drawFrame(context, cavernWestCrackedWall, {x: door.x, y: door.y + 32, w: 16, h: 16});
+        } else if (frame) {
+            drawFrame(context, frame, {...frame, x: door.x, y: door.y});
+        }
+    } else if (door.definition.d === 'right') {
+        let frame = cavernEastDoorEmptyForeground;
+        if (door.definition.status !== 'normal' && door.definition.status !== 'cracked') {
+            frame = door.renderOpen(state) ? cavernEastDoorOpenForeground : null;
+        }
+        // Draw cracked tiles on top fo the door frame graphic.
+        if (door.status === 'cracked') {
+            drawFrame(context, cavernCrackedBackground, {x: door.x, y: door.y, w: 16, h: 16});
+            drawFrame(context, cavernCrackedBackground, {x: door.x, y: door.y + 16, w: 16, h: 16});
+            drawFrame(context, cavernCrackedBackground, {x: door.x, y: door.y + 32, w: 16, h: 16});
+            drawFrame(context, cavernEastCrackedWall, {x: door.x, y: door.y + 16, w: 16, h: 16});
+            drawFrame(context, cavernEastCrackedWall, {x: door.x, y: door.y + 32, w: 16, h: 16});
+        } else if (frame) {
+            drawFrame(context, frame, {...frame, x: door.x, y: door.y});
+        }
+    }
+}
+
 export const doorStyles: {[key: string]: DoorStyleDefinition} = {
+    cavern: {
+        w: 64,
+        h: 16,
+        getHitbox(state: GameState, door: Door) {
+            if (door.definition.d === 'up') {
+                return {x: door.x, y: door.y, w: 32, h: 32};
+            }
+            if (door.definition.d === 'down') {
+                return {x: door.x, y: door.y + 8, w: 64, h: 8};
+            }
+            return {x: door.x, y: door.y, w: 16, h: 64};
+        },
+        render: renderCavernDoor,
+        renderForeground: renderCavernDoorForeground
+    },
     wooden: {
         w: 64,
         h: 16,
@@ -301,6 +446,11 @@ export class Door implements ObjectInstance {
         this.x = definition.x;
         this.y = definition.y;
         this.status = definition.status || 'normal';
+        // 'closedEnemy' doors will start open and only close when we confirm there are enemies in the current
+        // are section.
+        if (this.status === 'closedEnemy') {
+            this.status = 'normal';
+        }
         // If the player already opened this door, set it to the appropriate open status.
         if (getObjectStatus(state, this.definition)) {
             if (this.status === 'cracked') {
@@ -316,6 +466,9 @@ export class Door implements ObjectInstance {
     }
     isOpen(): boolean {
         return this.status === 'normal' || this.status === 'blownOpen';
+    }
+    renderOpen(state: GameState): boolean {
+        return this.status === 'normal' || this.status === 'blownOpen' || state.hero.actionTarget === this;
     }
     changeStatus(state: GameState, status: ObjectStatus): void {
         const wasClosed = this.status === 'closed' || this.status === 'closedSwitch' || this.status === 'closedEnemy';
@@ -344,27 +497,26 @@ export class Door implements ObjectInstance {
         const y = Math.floor(this.y / 16);
         const x = Math.floor(this.x / 16);
         const doorStyle = doorStyles[this.style];
-        if (this.style === 'wooden') {
+        if (this.style === 'wooden' || this.style === 'cavern') {
             if (this.definition.d === 'down') {
                 applyBehaviorToTile(this.area, x, y, { solidMap: BITMAP_BOTTOM, low: false});
                 applyBehaviorToTile(this.area, x + 3, y, { solidMap: BITMAP_BOTTOM, low: false});
                 if (this.isOpen()) {
-                    applyBehaviorToTile(this.area, x + 1, y, { solidMap: BITMAP_BOTTOM_LEFT_8, low: false });
-                    applyBehaviorToTile(this.area, x + 2, y, { solidMap: BITMAP_BOTTOM_RIGHT_8, low: false });
+                    applyBehaviorToTile(this.area, x + 1, y, { solidMap: BITMAP_BOTTOM_LEFT_QUARTER, low: false });
+                    applyBehaviorToTile(this.area, x + 2, y, { solidMap: BITMAP_BOTTOM_RIGHT_QUARTER, low: false });
                 } else {
                     applyBehaviorToTile(this.area, x + 1, y, { solidMap: BITMAP_BOTTOM, low: false});
                     applyBehaviorToTile(this.area, x + 2, y, { solidMap: BITMAP_BOTTOM, low: false});
                 }
             } else if (this.definition.d === 'up') {
-
+                this.applySquareDoorBehavior();
             } else { // left + right are the same
                 applyBehaviorToTile(this.area, x, y, { solid: true, low: false });
+                applyBehaviorToTile(this.area, x, y + 1, { solid: true, low: false });
                 applyBehaviorToTile(this.area, x, y + 3, { solid: true, low: false });
                 if (this.isOpen()) {
-                    applyBehaviorToTile(this.area, x, y + 1, { solidMap: BITMAP_TOP, low: false });
-                    applyBehaviorToTile(this.area, x, y + 2, { solidMap: BITMAP_BOTTOM, low: false });
+                    applyBehaviorToTile(this.area, x, y + 2, { solid: false });
                 } else {
-                    applyBehaviorToTile(this.area, x, y + 1, { solid: true, low: false });
                     applyBehaviorToTile(this.area, x, y + 2, { solid: true, low: false });
                 }
             }
@@ -389,25 +541,30 @@ export class Door implements ObjectInstance {
                 applyBehaviorToTile(this.area, x, y + 3, behaviors);
             }
         } else if (doorStyle.w === 32) {
-            const behaviors: TileBehaviors = { cannotLand: true, solid: true, solidMap: undefined, low: false};
-            applyBehaviorToTile(this.area, x, y, behaviors);
-            applyBehaviorToTile(this.area, x + 1, y, behaviors);
-            applyBehaviorToTile(this.area, x, y + 1, behaviors);
-            applyBehaviorToTile(this.area, x + 1, y + 1, behaviors);
-            if (this.isOpen()) {
-                if (this.definition.d === 'left') {
-                    applyBehaviorToTile(this.area, x + 1, y, { solidMap: BITMAP_SIDE_DOOR_TOP, low: false });
-                    applyBehaviorToTile(this.area, x + 1, y + 1, { solidMap: BITMAP_SIDE_DOOR_BOTTOM, low: false });
-                } else if (this.definition.d === 'right') {
-                    applyBehaviorToTile(this.area, x, y, { solidMap: BITMAP_SIDE_DOOR_TOP, low: false });
-                    applyBehaviorToTile(this.area, x, y + 1, { solidMap: BITMAP_SIDE_DOOR_BOTTOM, low: false});
-                } else if (this.definition.d === 'up') {
-                    applyBehaviorToTile(this.area, x, y + 1, { solidMap: BITMAP_LEFT, low: false });
-                    applyBehaviorToTile(this.area, x + 1, y + 1, { solidMap: BITMAP_RIGHT, low: false });
-                } else if (this.definition.d === 'down') {
-                    applyBehaviorToTile(this.area, x, y, { solidMap: BITMAP_LEFT, low: false });
-                    applyBehaviorToTile(this.area, x + 1, y, { solidMap: BITMAP_RIGHT, low: false });
-                }
+            this.applySquareDoorBehavior();
+        }
+    }
+    applySquareDoorBehavior() {
+        const y = Math.floor(this.y / 16);
+        const x = Math.floor(this.x / 16);
+        const behaviors: TileBehaviors = { cannotLand: true, solid: true, solidMap: undefined, low: false};
+        applyBehaviorToTile(this.area, x, y, behaviors);
+        applyBehaviorToTile(this.area, x + 1, y, behaviors);
+        applyBehaviorToTile(this.area, x, y + 1, behaviors);
+        applyBehaviorToTile(this.area, x + 1, y + 1, behaviors);
+        if (this.isOpen()) {
+            if (this.definition.d === 'left') {
+                applyBehaviorToTile(this.area, x + 1, y, { solidMap: BITMAP_SIDE_DOOR_TOP, low: false });
+                applyBehaviorToTile(this.area, x + 1, y + 1, { solidMap: BITMAP_SIDE_DOOR_BOTTOM, low: false });
+            } else if (this.definition.d === 'right') {
+                applyBehaviorToTile(this.area, x, y, { solidMap: BITMAP_SIDE_DOOR_TOP, low: false });
+                applyBehaviorToTile(this.area, x, y + 1, { solidMap: BITMAP_SIDE_DOOR_BOTTOM, low: false});
+            } else if (this.definition.d === 'up') {
+                applyBehaviorToTile(this.area, x, y + 1, { solidMap: BITMAP_LEFT, low: false });
+                applyBehaviorToTile(this.area, x + 1, y + 1, { solidMap: BITMAP_RIGHT, low: false });
+            } else if (this.definition.d === 'down') {
+                applyBehaviorToTile(this.area, x, y, { solidMap: BITMAP_LEFT, low: false });
+                applyBehaviorToTile(this.area, x + 1, y, { solidMap: BITMAP_RIGHT, low: false });
             }
         }
     }
@@ -417,6 +574,10 @@ export class Door implements ObjectInstance {
         this.changeStatus(state, this.status);
     }
     getHitbox(state: GameState): Rect {
+        const doorStyle = doorStyles[this.style];
+        if (doorStyle.getHitbox) {
+            return doorStyle.getHitbox(state, this);
+        }
         if (this.definition.d === 'up' || this.definition.d === 'down') {
             if (this.definition.style === 'wooden') {
                 return {x: this.x, y: this.y + 8, w: doorStyles[this.style].w, h: 8 };
@@ -508,13 +669,15 @@ export class Door implements ObjectInstance {
             return;
         }
         const heroIsTouchingDoor = boxesIntersect(hero, this.getHitbox(state));
-        if (
+        if (heroIsTouchingDoor &&
             // If the hero has no action target, have the door control them as soon as they touch it
-            (!hero.actionTarget && heroIsTouchingDoor) ||
-            // If the hero already has a different target, only take control over when they 75% inside this door
-            // to avoid ambiguity about which door should take over at any point in time.
-            (hero.actionTarget && hero.actionTarget !== this && isObjectInsideTarget(hero, pad(this.getHitbox(state), 4)))
+            (!hero.actionTarget || (hero.actionTarget !== this && !hero.isExitingDoor))
         ) {
+            // When doorways come in pairs, we set `isExitingDoor` to true when control
+            // passes from the entrance door to the door they are exiting from.
+            if (hero.actionTarget && hero.actionTarget !== this) {
+                hero.isExitingDoor = true;
+            }
             hero.isUsingDoor = true;
             hero.actionFrame = 0;
             hero.actionTarget = this;
@@ -580,6 +743,9 @@ export class Door implements ObjectInstance {
                 const style = doorStyles[target.style];
                 if (style.h === 32 && target.definition.d !== 'down') {
                     hero.y += 3;
+                }
+                if (style.w === 64 && (target.definition.d === 'left' || target.definition.d === 'right')) {
+                    hero.y += 8;
                 }
             }
             hero.actionTarget = target;

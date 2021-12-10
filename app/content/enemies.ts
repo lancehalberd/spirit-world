@@ -267,16 +267,16 @@ function renderUnderTiles(context: CanvasRenderingContext2D, state: GameState, e
     }
     const behavior = enemy.area.behaviorGrid?.[ty]?.[tx];
     // Hide the enemy as long as there is something on top of it.
-    if (behavior?.solid || behavior?.cuttable || enemy.mode === 'closed') {
+    if (behavior?.solid || behavior?.cuttable) {
         return;
     }
     context.save();
         if (enemy.mode === 'closing') {
-            context.globalAlpha *= Math.max(0, 1 - enemy.modeTime / 1000);
+            context.globalAlpha *= Math.max(0.3, 1 - enemy.modeTime / 1000);
         } else if (enemy.mode === 'opening') {
-            context.globalAlpha *= Math.min(1, enemy.modeTime / 1000);
+            context.globalAlpha *= Math.min(1, 0.3 + enemy.modeTime / 1000);
         } else if (enemy.mode === 'closed') {
-            context.globalAlpha = 0;
+            context.globalAlpha = 0.3;
         }
         enemy.defaultRender(context, state);
     context.restore();

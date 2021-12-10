@@ -235,6 +235,8 @@ export class Enemy implements Actor, ObjectInstance {
                 }
                 saveObjectStatus(state, this.definition);
             }
+        } else {
+            saveObjectStatus(state, this.definition);
         }
     }
     shouldReset(state: GameState) {
