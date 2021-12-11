@@ -2,101 +2,101 @@ import { hasBossWeapon, hasClone, hasIronBoots, hasWeapon } from 'app/content/lo
 
 import { LogicNode } from 'app/types';
 
-const zoneId = 'newPeachCave';
+const zoneId = 'peachCave';
 export const peachCaveNodes: LogicNode[] = [
     {
         zoneId,
-        nodeId: 'newPeachCave:markerA',
-        checks: [{ objectId: 'newPeachCave:0:0x0-weapon-0' }],
+        nodeId: 'peachCave:markerA',
+        checks: [{ objectId: 'peachCave:0:0x0-weapon-0' }],
         paths: [
             { nodeId: 'peachCaveWaterEntrance', logic: hasIronBoots },
-            { nodeId: 'newPeachCave:markerB', logic: hasClone },
-            { nodeId: 'newPeachCave:stairsUp', logic: hasWeapon },
+            { nodeId: 'peachCave:markerB', logic: hasClone },
+            { nodeId: 'peachCave:stairsUp', logic: hasWeapon },
         ],
-        entranceIds: ['newPeachCave:markerA'],
+        entranceIds: ['peachCave:markerA'],
     },
     {
         zoneId,
-        nodeId: 'newPeachCave:stairsUp',
-        checks: [{ objectId: 'newPeachCave:0:0x0-money-0' }],
+        nodeId: 'peachCave:stairsUp',
+        checks: [{ objectId: 'peachCave:0:0x0-money-0' }],
         paths: [
-            { nodeId: 'newPeachCave:markerA' },
+            { nodeId: 'peachCave:markerA' },
         ],
-        entranceIds: ['newPeachCave:stairsUp'],
-        exits: [{ objectId: 'newPeachCave:stairsUp' }],
+        entranceIds: ['peachCave:stairsUp'],
+        exits: [{ objectId: 'peachCave:stairsUp' }],
     },
     {
         zoneId,
-        nodeId: 'newPeachCave:stairsDown',
+        nodeId: 'peachCave:stairsDown',
         paths: [
-            { nodeId: 'newPeachCave:boss', logic: hasWeapon },
+            { nodeId: 'peachCave:boss', logic: hasWeapon },
         ],
-        entranceIds: ['newPeachCave:stairsDown'],
-        exits: [{ objectId: 'newPeachCave:stairsDown' }],
+        entranceIds: ['peachCave:stairsDown'],
+        exits: [{ objectId: 'peachCave:stairsDown' }],
     },
     {
         zoneId,
-        nodeId: 'newPeachCave:boss',
-        checks: [{ objectId: 'newPeachCave:boss', logic: hasBossWeapon }],
+        nodeId: 'peachCave:boss',
+        checks: [{ objectId: 'peachCave:boss', logic: hasBossWeapon }],
         paths: [
-            // There is no path to `newPeachCave:stairsDown` from here because:
-            // You can only return to `newPeachCave:stairsDown` from here if you've grown 
-            // the vine to the boss, which means you have access to `newPeachCave:stairsDown` already
-            { nodeId: 'newPeachCave:pitB', logic: hasBossWeapon },
+            // There is no path to `peachCave:stairsDown` from here because:
+            // You can only return to `peachCave:stairsDown` from here if you've grown
+            // the vine to the boss, which means you have access to `peachCave:stairsDown` already
+            { nodeId: 'peachCave:pitB', logic: hasBossWeapon },
         ],
     },
     {
         zoneId,
-        nodeId: 'newPeachCave:pitB',
+        nodeId: 'peachCave:pitB',
         paths: [
-            { nodeId: 'newPeachCave:pitA', logic: hasClone },
-            { nodeId: 'newPeachCave:boss', },
+            { nodeId: 'peachCave:pitA', logic: hasClone },
+            { nodeId: 'peachCave:boss', },
         ],
-        exits: [{ objectId: 'newPeachCave:pitB' }],
+        exits: [{ objectId: 'peachCave:pitB' }],
     },
     {
         zoneId,
-        nodeId: 'newPeachCave:markerB',
+        nodeId: 'peachCave:markerB',
         paths: [
-            { nodeId: 'newPeachCave:markerA', logic: hasClone },
+            { nodeId: 'peachCave:markerA', logic: hasClone },
             { nodeId: 'peachCaveWaterEntrance', logic: hasIronBoots },
         ],
-        entranceIds: ['newPeachCave:waterEntrance', 'newPeachCave:markerB'],
-        exits: [{ objectId: 'newPeachCave:waterEntrance' }],
+        entranceIds: ['peachCave:waterEntrance', 'peachCave:markerB'],
+        exits: [{ objectId: 'peachCave:waterEntrance' }],
     },
     {
         zoneId,
         nodeId: 'peachCaveTopEntrance',
         paths: [
-            { nodeId: 'newPeachCave:pitA' },
+            { nodeId: 'peachCave:pitA' },
         ],
         entranceIds: ['peachCaveTopEntrance'],
         exits: [{ objectId: 'peachCaveTopEntrance' }],
     },
     {
         zoneId,
-        nodeId: 'newPeachCave:pitA',
+        nodeId: 'peachCave:pitA',
         paths: [
             { nodeId: 'peachCaveTopEntrance' },
-            { nodeId: 'newPeachCave:pitB', logic: hasClone },
+            { nodeId: 'peachCave:pitB', logic: hasClone },
         ],
-        exits: [{ objectId: 'newPeachCave:pitA' }],
+        exits: [{ objectId: 'peachCave:pitA' }],
     },
     {
         zoneId,
         nodeId: 'peachCavePiece',
         checks: [{ objectId: 'peachCavePiece' }],
         paths: [
-            { nodeId: 'newPeachCave:markerA', logic: hasIronBoots },
-            { nodeId: 'newPeachCave:markerB' },
+            { nodeId: 'peachCave:markerA', logic: hasIronBoots },
+            { nodeId: 'peachCave:markerB' },
         ],
     },
     {
         zoneId: 'peachCaveWater',
         nodeId: 'peachCaveWaterEntrance',
         paths: [
-            { nodeId: 'newPeachCave:markerA' },
-            { nodeId: 'newPeachCave:markerB' },
+            { nodeId: 'peachCave:markerA' },
+            { nodeId: 'peachCave:markerB' },
             { nodeId: 'peachCavePiece' },
         ],
     },

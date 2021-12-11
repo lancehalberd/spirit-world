@@ -8,7 +8,7 @@ import { GameState, SavedState, ZoneLocation } from 'app/types';
 
 
 export const SPAWN_LOCATION_FULL: ZoneLocation = {
-    zoneKey: 'newPeachCave',
+    zoneKey: 'peachCave',
     floor: 0,
     x: 112,
     y: 176,
@@ -28,7 +28,7 @@ export const SPAWN_LOCATION_DEMO: ZoneLocation = {
 };
 
 export const SPAWN_LOCATION_PEACH_CAVE_BOSS: ZoneLocation = {
-    zoneKey: 'newPeachCave',
+    zoneKey: 'peachCave',
     floor: 1,
     x: 120,
     y: 132,
@@ -330,7 +330,7 @@ export function getTestStateContextMenuOption(): MenuOption {
 
 export function fixSpawnLocationOnLoad(state: GameState): void {
     // The player restarts at the defeated boss if they haven't made it to the overworld yet.
-    if (state.hero.spawnLocation.zoneKey === 'newPeachCave' && state.savedState.objectFlags['newPeachCave:boss']) {
+    if (state.hero.spawnLocation.zoneKey === 'peachCave' && state.savedState.objectFlags['peachCave:boss']) {
         state.hero.spawnLocation = SPAWN_LOCATION_PEACH_CAVE_BOSS;
     }
 }

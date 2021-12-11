@@ -383,7 +383,7 @@ const f0_0x1: AreaDefinition = {
     ],
     objects: [
         {status: "normal", type: "npc", x: 128, y: 272, d: "down", behavior: "none", style: "vanara", dialogueKey: "mom", id: "overworld:0:1x0-npc-0"},
-        {status: "normal", id: "peachCaveTopEntrance", x: 368, y: 288, type: "door", style: "lightCave", targetZone: "newPeachCave", targetObjectId: "peachCaveTopEntrance", d: "up"},
+        {status: "normal", id: "peachCaveTopEntrance", x: 368, y: 288, type: "door", style: "lightCave", targetZone: "peachCave", targetObjectId: "peachCaveTopEntrance", d: "up"},
         {status: "normal", id: "waterfallCaveEntrance", x: 80, y: 240, type: "door", style: "lightCave", targetZone: "waterfallCave", targetObjectId: "waterfallCaveEntrance", d: "up"},
         {status: "normal", id: "overworld:0:1x0-decoration-1", x: 64, y: 272, type: "decoration", w: 64, h: 96, decorationType: "waterfall", drawPriority: "sprites"},
         {status: "normal", id: "overworld:0:1x0-decoration-0", x: 64, y: 368, type: "decoration", w: 80, h: 64, decorationType: "waterfall", drawPriority: "sprites"},
@@ -1222,7 +1222,7 @@ const f0_1x1: AreaDefinition = {
         },
     ],
     objects: [
-        {id: "peachCaveWaterEntrance", linked: true, spirit: false, status: "normal", x: 256, y: 80, type: "door", style: "lightCave", targetZone: "newPeachCave", targetObjectId: "newPeachCave:waterEntrance", d: "up"},
+        {id: "peachCaveWaterEntrance", linked: true, spirit: false, status: "normal", x: 256, y: 80, type: "door", style: "lightCave", targetZone: "peachCave", targetObjectId: "peachCave:waterEntrance", d: "up"},
         {status: "hidden", id: "tombTeleporter", x: 128, y: 432, targetZone: "tomb", targetObjectId: "tombTeleporter", type: "teleporter"},
         {status: "normal", id: "lakeTunnelEntrance", x: 112, y: 336, type: "door", style: "lightCave", targetZone: "lakeTunnel", targetObjectId: "lakeTunnelEntrance", d: "up"},
         {status: "normal", id: "riverTemplePitEntrance", x: 240, y: 176, targetZone: "riverTemple", targetObjectId: "riverTemplePitEntrance", type: "pitEntrance"},
@@ -3202,7 +3202,7 @@ const sf0_1x1: AreaDefinition = {
         },
     ],
     objects: [
-        {id: "peachCaveWaterEntrance", linked: true, spirit: true, status: "normal", x: 256, y: 80, type: "door", style: "lightCave", targetZone: "newPeachCave", targetObjectId: "newPeachCave:waterEntrance", d: "up"},
+        {id: "peachCaveWaterEntrance", linked: true, spirit: true, status: "normal", x: 256, y: 80, type: "door", style: "lightCave", targetZone: "peachCave", targetObjectId: "peachCave:waterEntrance", d: "up"},
         {status: "normal", id: "overworld:s0:1x1-teleporter-0", x: 448, y: 144, type: "teleporter"},
     ],
     sections: [

@@ -357,7 +357,7 @@ const sf0_0x0: AreaDefinition = null;
 const sf0_1x0: AreaDefinition = null;
 zones.peachCaveWater = {
     key: 'peachCaveWater',
-    surfaceKey: 'newPeachCave',
+    surfaceKey: 'peachCave',
     floors: [
         {
             grid: [
