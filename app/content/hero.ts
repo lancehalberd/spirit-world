@@ -1,9 +1,10 @@
 import { addObjectToArea } from 'app/content/areas';
 import { destroyClone } from 'app/content/clone';
 import { Staff } from 'app/content/staff';
+import { chargeBackAnimation, chargeFrontAnimation } from 'app/render/heroAnimations';
 import { getHeroFrame, renderCarriedTile, renderExplosionRing, renderHeroBarrier } from 'app/renderActor';
 import { getChargeLevelAndElement } from 'app/useTool';
-import { drawFrameAt } from 'app/utils/animations';
+import { drawFrameAt, getFrame } from 'app/utils/animations';
 import { directionMap } from 'app/utils/field';
 
 import {
@@ -270,6 +271,16 @@ export class Hero implements Actor, SavedHeroData {
         if (hero.action === 'fallen') {
             return;
         }
+        if (hero.passiveTools.charge && hero.action === 'charging') {
+            const { chargeLevel } = getChargeLevelAndElement(state, hero);
+            if (chargeLevel) {
+                context.save();
+                    context.globalAlpha *= 0.8;
+                    const frame = getFrame(chargeBackAnimation, hero.chargeTime);
+                    drawFrameAt(context, frame, { x: hero.x, y: hero.y - hero.z });
+                context.restore();
+            }
+        }
         const frame = getHeroFrame(state, hero);
         const activeClone = state.hero.activeClone || state.hero;
         context.save();
@@ -321,6 +332,13 @@ export class Hero implements Actor, SavedHeroData {
             );
             context.fill();
             context.restore();
+        }
+        if (hero.passiveTools.charge && hero.action === 'charging') {
+                context.save();
+                    context.globalAlpha *= 0.8;
+                    const frame = getFrame(chargeFrontAnimation, hero.chargeTime);
+                    drawFrameAt(context, frame, { x: hero.x, y: hero.y - hero.z });
+                context.restore();
         }
     }
 

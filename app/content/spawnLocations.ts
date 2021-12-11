@@ -217,7 +217,7 @@ const helixStartState = applyItems(cocoonBossState, {maxLife: 1, teleportation: 
 helixStartState.savedHeroData.rightTool = 'cloak';
 const helixEndState = applyItems(helixStartState, {charge: 1, staff: 1},
     ['elementalBeastsEscaped']);
-const waterfallBossState = applyItems(helixStartState, {ironBoots: 1});
+const waterfallBossState = applyItems(helixEndState, {ironBoots: 1});
 const riverTempleBossState = applyItems(waterfallBossState,
     {maxLife: 3, 'riverTemple:bigKey': 1, 'fire': 1, 'lightning': 1},
     ['bossBubblesNorth','bossBubblesSouth', 'bossBubblesWest', 'bossBubblesEast']
@@ -274,7 +274,7 @@ const spawnLocations = {
     },
     'River Temple Start': {
         location: SPAWN_LOCATION_PEACH_CAVE_EXIT,
-        savedState: waterfallBossState,
+        savedState: helixEndState,
     },
     'River Temple Boss': {
         location: RIVER_TEMPLE_BOSS,

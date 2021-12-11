@@ -578,6 +578,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             hero.chargingRightTool = false;
         }
     } else if (!isFrozen && (heldChakram || hero.action === 'charging')) {
+        hero.chargeTime += FRAME_LENGTH;
         movementSpeed *= 0.75;
         if (!heldChakram) {
             hero.action = null;
@@ -605,9 +606,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             const m = Math.sqrt(dx * dx + dy * dy);
             dx = movementSpeed * dx / m;
             dy = movementSpeed * dy / m;
-            if (hero.action === 'charging') {
-                hero.d = getDirection(hero.actionDx, hero.actionDy);
-            } else if (hero.action !== 'attack') {
+            if (hero.action !== 'attack') {
                 if (dx < 0 && (hero.d === 'right' || Math.abs(dx) > Math.abs(dy))) {
                     hero.d = 'left';
                 } else if (dx > 0 && (hero.d === 'left' || Math.abs(dx) > Math.abs(dy))) {
@@ -617,6 +616,13 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
                 } else if (dy > 0 && (hero.d === 'up' || Math.abs(dy) > Math.abs(dx))) {
                     hero.d = 'down';
                 }
+                const direction = getDirection(dx, dy, true, hero.d);
+                if (heldChakram) {
+                    heldChakram.vx = directionMap[direction][0];
+                    heldChakram.vy = directionMap[direction][1];
+                }
+                hero.actionDx = directionMap[direction][0];
+                hero.actionDy = directionMap[direction][1];
             }
         }
     }
@@ -733,6 +739,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         const thrownChakrams = hero.area.objects.filter(o => o instanceof ThrownChakram);
         if (state.hero.weapon - thrownChakrams.length > 0) {
             hero.action = 'charging';
+            hero.chargeTime = 0;
             hero.animationTime = 0;
             hero.actionDx = (dx || dy) ? dx : directionMap[hero.d][0];
             hero.actionDy = (dx || dy) ? dy : directionMap[hero.d][1];
