@@ -31,6 +31,9 @@ export class Teleporter implements ObjectInstance {
         if (this.status === 'normal') {
             saveObjectStatus(state, this.definition);
         }
+        if (this.linkedObject && this.linkedObject.status !== status) {
+            this.linkedObject.changeStatus(state, status);
+        }
     }
     getHitbox(state: GameState): Rect {
         return { x: this.x, y: this.y, w: 16, h: 16 };
@@ -61,8 +64,11 @@ export class Teleporter implements ObjectInstance {
                 // so it moves them off of it.
                 if (this.linkedObject) {
                     hero.actionTarget = this.linkedObject;
+                    hero.isUsingDoor = true;
                     // Hero always exits the teleporter moving down currently.
                     hero.d = 'down';
+                    hero.actionDx = 0;
+                    hero.actionDy = 1;
                 }
             });
         } else {

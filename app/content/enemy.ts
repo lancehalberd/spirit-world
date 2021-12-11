@@ -229,11 +229,14 @@ export class Enemy implements Actor, ObjectInstance {
                 allEnemies.forEach(object => object.showDeathAnimation(state));
                 // Gain loot if this boss hasn't been defeated yet.
                 if (!getObjectStatus(state, this.definition)) {
+                    // Make sure to save status before gaining loot since gaining loot refreshes object status.
+                    saveObjectStatus(state, this.definition);
                     if (this.definition.lootType && this.definition.lootType !== 'empty') {
                         getLoot(state, this.definition);
                     }
+                } else {
+                    saveObjectStatus(state, this.definition);
                 }
-                saveObjectStatus(state, this.definition);
             }
         } else {
             saveObjectStatus(state, this.definition);

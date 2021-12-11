@@ -757,9 +757,15 @@ export class Door implements ObjectInstance {
             // When passing horizontally through narrow doors, we need to start 3px lower than usual.
             if (target.definition.type === 'door') {
                 const style = doorStyles[target.style];
+                // When exiting new style doors, the MCs head appears above the frame, so start them lower.
+                if (style.w === 64 && target.definition.d === 'up') {
+                    hero.y += 6;
+                }
+                // This is for old 32x32 side doors.
                 if (style.h === 32 && target.definition.d !== 'down') {
                     hero.y += 3;
                 }
+                // This is for new side doors.
                 if (style.w === 64 && (target.definition.d === 'left' || target.definition.d === 'right')) {
                     hero.y += 8;
                 }

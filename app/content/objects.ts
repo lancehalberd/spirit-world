@@ -177,7 +177,7 @@ export function saveObjectStatus(this: void, state: GameState, definition: Objec
         }
     }
     if (treatment === 'forever' || treatment === 'zone') {
-        const hash = treatment === 'zone'
+        const hash = treatment === 'forever'
             ? state.savedState.objectFlags
             : state.savedState.zoneFlags;
         if (!definition.id) {

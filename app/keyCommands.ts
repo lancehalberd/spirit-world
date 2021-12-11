@@ -190,6 +190,7 @@ export function addKeyCommands() {
                             for (const areaDefinition of row) {
                                 for (const object of areaDefinition?.objects ?? []) {
                                     delete state.savedState.objectFlags[object.id];
+                                    delete state.savedState.zoneFlags[object.id];
                                 }
                             }
                         }
