@@ -1,8 +1,7 @@
 import { flatten } from 'lodash';
 import { getLootTypes } from 'app/development/objectEditor';
 import { CANVAS_WIDTH, CANVAS_HEIGHT, GAME_KEY } from 'app/gameConstants';
-import { renderField } from 'app/render';
-import { renderAreaLighting } from 'app/render/areaLighting';
+import { renderStandardFieldStack } from 'app/render';
 import { renderHUD } from 'app/renderHUD';
 import { drawFrame } from 'app/utils/animations';
 import { characterMap, keyboardMap, xboxMap } from 'app/utils/simpleWhiteFont';
@@ -216,8 +215,7 @@ export function parseMessage(state: GameState, message: string): (Frame[][] | Di
 }
 
 export function renderMessage(context: CanvasRenderingContext2D, state: GameState): void {
-    renderField(context, state);
-    renderAreaLighting(context, state, state.areaInstance, state.nextAreaInstance);
+    renderStandardFieldStack(context, state);
     renderHUD(context, state);
     const h = messageRows * (16 + 2) + 6;
     const w = messageWidth + 8;

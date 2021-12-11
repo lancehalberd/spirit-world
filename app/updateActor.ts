@@ -822,7 +822,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
                     if (behavior?.pickupWeight <= state.hero.passiveTools.gloves) {
                         hero.pickUpTile = tile;
                         playSound('pickUpObject');
-                        destroyTile(state, hero.area, {...closestLiftableTileCoords, layerKey: layer.key});
+                        destroyTile(state, hero.area, {...closestLiftableTileCoords, layerKey: layer.key}, true);
                         if (behavior.linkableTiles) {
                             const alternateLayer = find(state.alternateAreaInstance.layers, {key: layer.key});
                             if(alternateLayer) {
@@ -832,7 +832,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
                                         ...hero.pickUpTile,
                                         linkedTile,
                                     };
-                                    destroyTile(state, hero.area.alternateArea, {...closestLiftableTileCoords, layerKey: layer.key});
+                                    destroyTile(state, hero.area.alternateArea, {...closestLiftableTileCoords, layerKey: layer.key}, true);
                                 }
                             }
                         }

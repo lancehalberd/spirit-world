@@ -21,9 +21,7 @@ import { AreaInstance, AreaLayer, AreaLayerDefinition, GameState } from 'app/typ
 
 // This is the max size of the s
 const [spiritCanvas, spiritContext] = createCanvasAndContext(MAX_SPIRIT_RADIUS * 2, MAX_SPIRIT_RADIUS * 2);
-/*document.body.append(spiritCanvas);
-spiritCanvas.style.position = 'absolute';
-spiritCanvas.style.top = '0';*/
+
 //let spiritCanvasRadius: number;
 export function updateSpiritCanvas(state: GameState, radius: number): void {
     //if (radius === spiritCanvasRadius) {
@@ -33,8 +31,8 @@ export function updateSpiritCanvas(state: GameState, radius: number): void {
     const spiritAlpha = 0.2 + 0.8 * radius / MAX_SPIRIT_RADIUS;
     const x = spiritCanvas.width / 2;
     const y = spiritCanvas.height / 2
+    const area = state.alternateAreaInstance;
     spiritContext.save();
-        const area = state.alternateAreaInstance;
         spiritContext.clearRect(0, 0, spiritCanvas.width, spiritCanvas.height);
         const gradient = spiritContext.createRadialGradient(x, y, 0, x, y, radius);
         gradient.addColorStop(0.7, 'rgba(0, 0, 0, 1)');
@@ -45,17 +43,6 @@ export function updateSpiritCanvas(state: GameState, radius: number): void {
         spiritContext.beginPath();
         spiritContext.arc(x, y, radius, 0, 2 * Math.PI);
         spiritContext.fill();
-        /*spiritContext.beginPath();
-        spiritContext.arc(x, y, 3 * radius / 4, 0, 2 * Math.PI);
-        spiritContext.fill();
-        spiritContext.globalAlpha = 0.6 * spiritAlpha;
-        spiritContext.beginPath();
-        spiritContext.arc(x, y, 7 * radius / 8, 0, 2 * Math.PI);
-        spiritContext.fill();
-        spiritContext.globalAlpha = 0.6 * spiritAlpha;
-        spiritContext.beginPath();
-        spiritContext.arc(x, y, radius, 0, 2 * Math.PI);
-        spiritContext.fill();*/
         spiritContext.translate(
             -(state.hero.x + state.hero.w / 2 - state.camera.x - spiritCanvas.width / 2),
             -(state.hero.y - state.camera.y - spiritCanvas.height / 2)
@@ -68,8 +55,9 @@ export function updateSpiritCanvas(state: GameState, radius: number): void {
             translateContextForAreaAndCamera(spiritContext, state, area);
             renderHeroEyes(spiritContext, state, state.hero.activeClone || state.hero);
         spiritContext.restore();
-
         renderAreaObjectsAfterHero(spiritContext, state, area);
+        renderAreaForeground(spiritContext, state, area);
+        renderForegroundObjects(spiritContext, state, area);
     spiritContext.restore();
     if (state.zone.surfaceKey && !area.definition.isSpiritWorld) {
         spiritContext.save();
@@ -79,6 +67,22 @@ export function updateSpiritCanvas(state: GameState, radius: number): void {
             spiritContext.fillRect(0, 0, spiritCanvas.width, spiritCanvas.height);
         spiritContext.restore();
     }
+}
+
+export function renderStandardFieldStack(context: CanvasRenderingContext2D, state: GameState, renderHero: boolean = null): void {
+    renderField(context, state, renderHero);
+    renderSurfaceLighting(context, state, state.areaInstance);
+    renderFieldForeground(context, state);
+    renderWaterOverlay(context, state);
+    renderSpiritOverlay(context, state);
+    renderAreaLighting(context, state, state.areaInstance, state.nextAreaInstance);
+}
+export function renderStandardFieldStackWithoutWaterOverlay(context: CanvasRenderingContext2D, state: GameState, renderHero: boolean = null): void {
+    renderField(context, state, renderHero);
+    renderSurfaceLighting(context, state, state.areaInstance);
+    renderFieldForeground(context, state);
+    renderSpiritOverlay(context, state);
+    renderAreaLighting(context, state, state.areaInstance, state.nextAreaInstance);
 }
 
 export function render() {
@@ -107,9 +111,10 @@ export function render() {
         return;
     }
     state.lastTimeRendered = state.time;
-    renderField(context, state);
-    renderAreaLighting(context, state, state.areaInstance, state.nextAreaInstance);
-    renderSurfaceLighting(context, state, state.areaInstance);
+    renderStandardFieldStack(context, state);
+
+    // Render any editor specific graphics if appropriate.
+    renderEditor(context, state);
     if (state.defeatState.defeated) {
         renderHUD(context, state);
         context.save();
@@ -158,7 +163,7 @@ function renderTransition(context: CanvasRenderingContext2D, state: GameState) {
             if (state.transitionState.type === 'surfacing') {
                 context.save();
                     context.translate(0, dz + 24);
-                    renderField(context, state, false);
+                    renderStandardFieldStackWithoutWaterOverlay(context, state, false);
                 context.restore();
                 context.save();
                     translateContextForAreaAndCamera(context, state, state.transitionState.nextAreaInstance);
@@ -200,7 +205,7 @@ function renderTransition(context: CanvasRenderingContext2D, state: GameState) {
                 context.save();
                     context.translate(0, dz - 24);
                     context.globalAlpha *= (1 - p) * (1 - p);
-                    renderField(context, state, false);
+                    renderStandardFieldStackWithoutWaterOverlay(context, state, false);
                 context.restore();
                 context.save();
                     context.globalAlpha *= (1 - p) * (1 - p);
@@ -223,9 +228,7 @@ function renderTransition(context: CanvasRenderingContext2D, state: GameState) {
         return;
     }
 
-    renderField(context, state);
-    renderAreaLighting(context, state, state.areaInstance, state.nextAreaInstance);
-    renderSurfaceLighting(context, state, state.areaInstance);
+    renderStandardFieldStack(context, state);
     if (state.transitionState.type === 'portal') {
         if (!state.alternateAreaInstance) {
             return;
@@ -363,8 +366,16 @@ export function renderField(context: CanvasRenderingContext2D, state: GameState,
     }
     renderAreaObjectsAfterHero(context, state, state.areaInstance);
     renderAreaObjectsAfterHero(context, state, state.nextAreaInstance);
+}
+
+export function renderFieldForeground(context: CanvasRenderingContext2D, state: GameState) {
     renderAreaForeground(context, state, state.areaInstance);
     renderAreaForeground(context, state, state.nextAreaInstance);
+    renderForegroundObjects(context, state, state.areaInstance);
+    renderForegroundObjects(context, state, state.nextAreaInstance);
+}
+
+export function renderWaterOverlay(context: CanvasRenderingContext2D, state: GameState) {
     if (!editingState.isEditing && state.zone.surfaceKey && !state.areaInstance.definition.isSpiritWorld && state.transitionState?.type !== 'surfacing') {
         context.save();
             context.globalAlpha = 0.6;
@@ -372,6 +383,10 @@ export function renderField(context: CanvasRenderingContext2D, state: GameState,
             context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
         context.restore();
     }
+}
+
+export function renderSpiritOverlay(context: CanvasRenderingContext2D, state: GameState) {
+    const hero = state.hero.activeClone || state.hero;
     if (state.hero.spiritRadius > 0) {
         context.save();
         context.globalAlpha = 0.6 * state.hero.spiritRadius / MAX_SPIRIT_RADIUS;
@@ -387,15 +402,16 @@ export function renderField(context: CanvasRenderingContext2D, state: GameState,
              - state.camera.y + state.areaInstance.cameraOffset.y,
             spiritCanvas.width, spiritCanvas.height
         );
+        /*context.drawImage(spiritForegroundCanvas,
+            0, 0, spiritForegroundCanvas.width, spiritForegroundCanvas.height,
+            hero.x + hero.w / 2 - spiritForegroundCanvas.width / 2
+            - state.camera.x + state.areaInstance.cameraOffset.x,
+            hero.y - spiritForegroundCanvas.height / 2
+             - state.camera.y + state.areaInstance.cameraOffset.y,
+            spiritForegroundCanvas.width, spiritForegroundCanvas.height
+        );*/
     }
-
-    // Render any editor specific graphics if appropriate.
-    renderEditor(context, state);
 }
-
-/*export function renderFieldForeground(context: CanvasRenderingContext2D, state: GameState, renderHero: boolean = null) {
-
-}*/
 
 // Fully renders an area to a canvas, but with no state effects like spirit sight.
 // This is used during the transition to and from the spirit world.
@@ -450,6 +466,7 @@ export function renderAreaForeground(context: CanvasRenderingContext2D, state: G
             state.camera.x - area.cameraOffset.x, state.camera.y - area.cameraOffset.y, CANVAS_WIDTH, CANVAS_HEIGHT,
         );
     context.restore();
+    renderForegroundObjects(context, state, area);
 }
 
 export function renderAreaObjectsBeforeHero(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance): void {
@@ -493,13 +510,8 @@ export function renderAreaObjectsAfterHero(context: CanvasRenderingContext2D, st
     context.save();
         translateContextForAreaAndCamera(context, state, area);
         const spriteObjects = [];
-        const foregroundObjects = [];
         for (const object of area.objects) {
-            if (object.renderForeground) {
-                foregroundObjects.push(object);
-            } else if (!object.drawPriority || object.drawPriority === 'foreground') {
-                foregroundObjects.push(object);
-            } else if (object.drawPriority === 'sprites' && object.y > state.hero.y) {
+            if (object.drawPriority === 'sprites' && object.y > state.hero.y) {
                 if (object.render) {
                     spriteObjects.push(object);
                 }
@@ -510,7 +522,23 @@ export function renderAreaObjectsAfterHero(context: CanvasRenderingContext2D, st
         for (const object of spriteObjects) {
             object.render(context, state);
         }
-        // All foreground elements should be rendered after sprite elements
+    context.restore();
+}
+
+export function renderForegroundObjects(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance): void {
+    if (!area) {
+        return;
+    }
+    context.save();
+        translateContextForAreaAndCamera(context, state, area);
+        const foregroundObjects = [];
+        for (const object of area.objects) {
+            if (object.renderForeground) {
+                foregroundObjects.push(object);
+            } else if (!object.drawPriority || object.drawPriority === 'foreground') {
+                foregroundObjects.push(object);
+            }
+        }
         for (const object of foregroundObjects) {
             if (object.renderForeground) {
                 object.renderForeground(context, state);

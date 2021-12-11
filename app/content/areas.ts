@@ -766,7 +766,7 @@ export function removeObjectFromArea(state: GameState, object: ObjectInstance, t
     }
 }
 
-export function destroyTile(state: GameState, area: AreaInstance, target: TileCoords): void {
+export function destroyTile(state: GameState, area: AreaInstance, target: TileCoords, noParticles: boolean = false): void {
     const layer = find(area.layers, { key: target.layerKey });
     if (!layer) {
         console.error(`Missing target layer: ${target.layerKey}`);
@@ -784,7 +784,7 @@ export function destroyTile(state: GameState, area: AreaInstance, target: TileCo
     }
 
     resetTileBehavior(area, target);
-    if (behavior.particles) {
+    if (!noParticles && behavior.particles) {
         addParticleAnimations(state, area, target.x * 16, target.y * 16, 4, behavior.particles, behavior);
     }
     if (behavior?.lootTable) {

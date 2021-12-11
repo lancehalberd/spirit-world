@@ -1,6 +1,5 @@
 import {  CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
-import { renderField } from 'app/render';
-import { renderAreaLighting } from 'app/render/areaLighting';
+import { renderStandardFieldStack } from 'app/render';
 import { renderHUD } from 'app/renderHUD';
 import { getTitleOptions } from 'app/state';
 import { drawText } from 'app/utils/simpleWhiteFont';
@@ -15,8 +14,7 @@ const ROW_HEIGHT = 20;
 
 
 export function renderTitle(context: CanvasRenderingContext2D, state: GameState): void {
-    renderField(context, state);
-    renderAreaLighting(context, state, state.areaInstance, state.nextAreaInstance);
+    renderStandardFieldStack(context, state);
     renderHUD(context, state);
     const options = getTitleOptions(state);
     const h = ROW_HEIGHT * options.length + 8;
