@@ -5,6 +5,17 @@ dialogueHash.mom = {
     options: [
         {
             logicCheck: {
+                requiredFlags: ['$astralProjection'],
+                excludedFlags: [],
+            },
+            isExclusive: true,
+            text: [
+                `May our ancestors watch over you.
+                `
+            ],
+        },
+        {
+            logicCheck: {
                 requiredFlags: ['$spiritSight'],
                 excludedFlags: [],
             },
