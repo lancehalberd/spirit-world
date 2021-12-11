@@ -297,7 +297,7 @@ const f1_0x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "hidden", id: "cocoonBackTeleporter", x: 160, y: 336, type: "teleporter", saveStatus: 'forever', linked: true},
+        {status: "hidden", id: "cocoonBackTeleporter", x: 160, y: 336, type: "teleporter", saveStatus: "forever", linked: true},
         {status: "normal", id: "", x: 336, y: 336, type: "teleporter"},
         {status: "normal", id: "", x: 160, y: 160, type: "teleporter"},
         {status: "normal", id: "cocoon:1:0x0-arrowTurret-0", x: 160, y: 160, type: "enemy", enemyType: "arrowTurret", d: "down", params: {}},
@@ -408,7 +408,7 @@ const sf1_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 128, y: 96, type: "pushPull"},
         {status: "normal", id: "", x: 368, y: 400, type: "pushPull"},
         {status: "normal", id: "", x: 368, y: 384, type: "pushPull"},
-        {status: "hiddenEnemy", id: "cocoonBackTeleporter", x: 160, y: 336, type: "teleporter", saveStatus: 'forever', linked: true, spirit: true},
+        {status: "hiddenEnemy", id: "cocoonBackTeleporter", x: 160, y: 336, type: "teleporter", saveStatus: "forever", linked: true, spirit: true},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -915,9 +915,9 @@ const f3_0x0: AreaDefinition = {
     ],
     objects: [
         {status: "normal", id: "cocoonEntrance", x: 112, y: 480, type: "door", style: "cave", targetZone: "tomb", targetObjectId: "tombExit", d: "down"},
-        {status: "normal", id: "", x: 96, y: 96, type: "enemy", enemyType: "arrowTurret", d: "down", params: {}},
-        {status: "normal", id: "", x: 400, y: 96, type: "enemy", enemyType: "arrowTurret", d: "down", params: {}},
-        {status: "normal", id: "cocoon:2:0x0-arrowTurret-2", x: 400, y: 400, type: "enemy", enemyType: "arrowTurret", d: "down", params: {}},
+        {status: "normal", id: "cocoonTurret1", x: 96, y: 96, type: "enemy", enemyType: "arrowTurret", d: "down", params: {}},
+        {status: "normal", id: "cocoonTurret2", x: 400, y: 96, type: "enemy", enemyType: "arrowTurret", d: "down", params: {}},
+        {status: "normal", id: "cocoonTurret3", x: 400, y: 400, type: "enemy", enemyType: "arrowTurret", d: "down", params: {}},
         {status: "normal", id: "", x: 400, y: 96, type: "teleporter"},
         {status: "normal", id: "", x: 96, y: 96, type: "teleporter"},
         {status: "normal", id: "", linked: true, x: 320, y: 400, type: "rollingBall", spirit: true},

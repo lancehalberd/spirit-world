@@ -592,10 +592,10 @@ export function applyUpgrade(currentLevel: number, loot: LootObjectDefinition | 
     // Non-progressive upgrades specify the exact level of the item. Lower level items will be ignored
     // if the player already possesses a better version.
     if (loot.lootLevel) {
-        console.log(loot.lootType, 'max', currentLevel, loot.lootLevel);
+        //console.log(loot.lootType, 'max', currentLevel, loot.lootLevel);
         return Math.max(currentLevel, loot.lootLevel);
     }
-    console.log(loot.lootType, 'increment', currentLevel);
+    //console.log(loot.lootType, 'increment', currentLevel);
     return currentLevel + 1;
 }
 
