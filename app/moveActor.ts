@@ -212,8 +212,8 @@ function moveActorInDirection(
                 if (direction === 'down') {
                     actor.action = 'jumpingDown';
                     actor.jumpDirection = direction;
-                    actor.jumpingVx = dx * 2;
-                    actor.jumpingVy = dy * 2;
+                    actor.jumpingVx = 2 * dx;
+                    actor.jumpingVy = 2 * dy;
                     actor.jumpingVz = 4;
                     actor.jumpingDownY = actor.y;
                 } else if (direction === 'up') {

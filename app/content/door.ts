@@ -207,7 +207,10 @@ function renderCavernDoor(context: CanvasRenderingContext2D, state: GameState, d
             return;
         }
         let frame = cavernWestDoorEmpty;
-        if (door.definition.status !== 'normal' && door.definition.status !== 'cracked') {
+        if (door.definition.status !== 'normal'
+            && door.definition.status !== 'cracked'
+            && door.definition.status !== 'blownOpen'
+        ) {
             frame = door.renderOpen(state) ? cavernWestDoorOpen : cavernWestDoorClosed;
         }
         drawFrame(context, frame, {...frame, x: door.x, y: door.y});
@@ -216,17 +219,24 @@ function renderCavernDoor(context: CanvasRenderingContext2D, state: GameState, d
             return;
         }
         let frame = cavernEastDoorEmpty;
-        if (door.definition.status !== 'normal' && door.definition.status !== 'cracked') {
+        if (door.definition.status !== 'normal'
+            && door.definition.status !== 'cracked'
+            && door.definition.status !== 'blownOpen'
+        ) {
             frame = door.renderOpen(state) ? cavernEastDoorOpen : cavernEastDoorClosed;
         }
         drawFrame(context, frame, {...frame, x: door.x, y: door.y});
     }
+    // There is no background frame for southern doors.
 }
 function renderCavernDoorForeground(context: CanvasRenderingContext2D, state: GameState, door: Door) {
     if (door.definition.d === 'down') {
         let frame = cavernSouthDoorEmpty;
         // This frame is used if the doorway can have a door in it (closed or locked).
-        if (door.definition.status !== 'normal' && door.definition.status !== 'cracked') {
+        if (door.definition.status !== 'normal'
+            && door.definition.status !== 'cracked'
+            && door.definition.status !== 'blownOpen'
+        ) {
             frame = door.renderOpen(state) ? cavernSouthDoorOpen : cavernSouthDoorClosed;
         }
         // Draw cracked tiles instead of the door.
@@ -242,14 +252,17 @@ function renderCavernDoorForeground(context: CanvasRenderingContext2D, state: Ga
         }
     } else if (door.definition.d === 'up') {
         let frame = cavernNorthDoorway;
-        if (door.definition.status === 'cracked') {
+        if (door.definition.status === 'cracked' || door.definition.status === 'blownOpen') {
             frame = door.renderOpen(state) ? cavernNorthBlownup : null;
         }
         // Only draw the top 12 pixels of southern facing doors over the player.
         drawFrame(context, {...cavernNorthDoorway, h: 12}, {...frame, x: door.x, y: door.y, h: 12});
     } else if (door.definition.d === 'left') {
         let frame = cavernWestDoorEmptyForeground;
-        if (door.definition.status !== 'normal' && door.definition.status !== 'cracked') {
+        if (door.definition.status !== 'normal'
+            && door.definition.status !== 'cracked'
+            && door.definition.status !== 'blownOpen'
+        ) {
             frame = door.renderOpen(state) ? cavernWestDoorOpenForeground : null;
         }
         // Draw cracked tiles on top fo the door frame graphic.
@@ -264,7 +277,10 @@ function renderCavernDoorForeground(context: CanvasRenderingContext2D, state: Ga
         }
     } else if (door.definition.d === 'right') {
         let frame = cavernEastDoorEmptyForeground;
-        if (door.definition.status !== 'normal' && door.definition.status !== 'cracked') {
+        if (door.definition.status !== 'normal'
+            && door.definition.status !== 'cracked'
+            && door.definition.status !== 'blownOpen'
+        ) {
             frame = door.renderOpen(state) ? cavernEastDoorOpenForeground : null;
         }
         // Draw cracked tiles on top fo the door frame graphic.
@@ -764,9 +780,7 @@ export class Door implements ObjectInstance {
         context.fillStyle = '#888';
         if (doorStyle.render) {
             doorStyle.render(context, state, this);
-            return;
-        }
-        if (doorStyle[this.definition.d]) {
+        } else if (doorStyle[this.definition.d]) {
             let frame: Frame;
             if (this.status !== 'cracked') {
                 if (this.status === 'blownOpen') {
@@ -825,11 +839,15 @@ export class Door implements ObjectInstance {
                 context.fillRect(this.x, this.y, 32, 32);
             }
         }
-    }
-    renderForeground(context: CanvasRenderingContext2D, state: GameState) {
-        const doorStyle = doorStyles[this.style];
-        // Don't render this in front of the hero when they are jumping down from a cliff.
         if (state.hero.action === 'jumpingDown') {
+            this.renderForeground(context, state, true);
+        }
+    }
+    renderForeground(context: CanvasRenderingContext2D, state: GameState, force = false) {
+        const doorStyle = doorStyles[this.style];
+        // Foreground is rendered as part of the background when a player is jumping
+        // in case they jump over the top of the door.
+        if (!force && state.hero.action === 'jumpingDown') {
             return;
         }
         if (doorStyle.renderForeground) {

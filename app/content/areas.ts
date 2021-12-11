@@ -1,5 +1,6 @@
 import { find } from 'lodash';
 
+import { addParticleAnimations } from 'app/content/animationEffect';
 import { changeObjectStatus, createObjectInstance, findObjectInstanceById } from 'app/content/objects';
 import { allTiles } from 'app/content/tiles';
 import { logicHash, isLogicValid } from 'app/content/logic';
@@ -783,6 +784,9 @@ export function destroyTile(state: GameState, area: AreaInstance, target: TileCo
     }
 
     resetTileBehavior(area, target);
+    if (behavior.particles) {
+        addParticleAnimations(state, area, target.x * 16, target.y * 16, 4, behavior.particles, behavior);
+    }
     if (behavior?.lootTable) {
         dropItemFromTable(state, area, behavior.lootTable,
             (target.x + 0.5) * 16,

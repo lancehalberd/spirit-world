@@ -365,7 +365,7 @@ export function renderField(context: CanvasRenderingContext2D, state: GameState,
     renderAreaObjectsAfterHero(context, state, state.nextAreaInstance);
     renderAreaForeground(context, state, state.areaInstance);
     renderAreaForeground(context, state, state.nextAreaInstance);
-    if (state.zone.surfaceKey && !state.areaInstance.definition.isSpiritWorld && state.transitionState?.type !== 'surfacing') {
+    if (!editingState.isEditing && state.zone.surfaceKey && !state.areaInstance.definition.isSpiritWorld && state.transitionState?.type !== 'surfacing') {
         context.save();
             context.globalAlpha = 0.6;
             context.fillStyle = 'blue';
@@ -392,6 +392,10 @@ export function renderField(context: CanvasRenderingContext2D, state: GameState,
     // Render any editor specific graphics if appropriate.
     renderEditor(context, state);
 }
+
+/*export function renderFieldForeground(context: CanvasRenderingContext2D, state: GameState, renderHero: boolean = null) {
+
+}*/
 
 // Fully renders an area to a canvas, but with no state effects like spirit sight.
 // This is used during the transition to and from the spirit world.

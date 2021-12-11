@@ -56,8 +56,14 @@ export function updateWaterSurfaceCanvas(state: GameState): void {
         //context.globalAlpha = 0.3;
         for (let y = 0; y < surfaceArea.behaviorGrid?.length; y++) {
             for (let x = 0; x < surfaceArea.behaviorGrid[y]?.length; x++) {
-                if (surfaceArea.behaviorGrid[y][x]?.water) {
-                    if (surfaceArea.behaviorGrid[y - 1]?.[x]?.water) {
+                if (surfaceArea.behaviorGrid[y][x]?.water
+                    && !surfaceArea.behaviorGrid[y][x]?.solid
+                    && !surfaceArea.behaviorGrid[y][x]?.solidMap
+                ) {
+                    if (surfaceArea.behaviorGrid[y - 1]?.[x]?.water
+                        && !surfaceArea.behaviorGrid[y - 1][x]?.solid
+                        && !surfaceArea.behaviorGrid[y - 1][x]?.solidMap
+                    ) {
                         context.fillStyle = 'rgba(255, 255, 255, 0.1)';
                         context.save();
                             context.translate((x + 0.5) * 16 / waterSurfaceGranularity, (y + 0.5) * 16 / waterSurfaceGranularity);

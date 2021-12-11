@@ -134,14 +134,26 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         // Freeze at the leaping frame, the flip looks bad if the jump isn't the right length.
         hero.animationTime = Math.min(hero.animationTime, 100);
         const groundZ = hero.equipedGear?.cloudBoots ? 1 : 0;
+        // Once the hero is over their landing tile, they fall straight down until they hit the ground.
+        if (!hero.jumpingVy && !hero.jumpingVx) {
+            hero.z += hero.jumpingVz;
+            hero.jumpingVz = Math.max(-2, hero.jumpingVz - 0.5);
+            if (hero.z <= groundZ) {
+                hero.z = groundZ;
+                hero.action = null;
+                hero.animationTime = 0;
+                checkForFloorEffects(state, hero);
+            }
+            return;
+        }
         if (hero.jumpDirection === 'down') {
             // After the hero has jumped a bit, we stop the jump when they hit a position they can successfully move to.
             let shouldLand = false;
             // As the hero approaches each new row of tiles, check if they should land on this row of tiles.
             // The player can fall as many as 4 pixels per frame, so we check when the user is in the last 4 pixels
             // of the previous row.
-            if (hero.y >= hero.jumpingDownY + 8 && hero.y % 16 >= 12) {
-                const y = ((hero.y / 16) | 0) * 16 + 16;
+            if (hero.y >= hero.jumpingDownY + 8 && (hero.y % 16 > 12 || hero.y % 16 === 0)) {
+                const y = (((hero.y - 1) / 16) | 0) * 16 + 16;
                 const excludedObjects = new Set([hero]);
                 const { tileBehavior: b1 } = getTileBehaviorsAndObstacles(state, hero.area, {x: hero.x, y }, excludedObjects, state.nextAreaInstance);
                 const { tileBehavior: b2 } = getTileBehaviorsAndObstacles(state, hero.area, {x: hero.x + hero.w - 1, y}, excludedObjects, state.nextAreaInstance);
@@ -149,11 +161,11 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
                 shouldLand = !b1.solid && !b2.solid && !b1.cannotLand && !b2.cannotLand;
             }
             if (shouldLand) {
-                hero.z = groundZ;
-                hero.y = ((hero.y / 16) | 0) * 16 + 16;
-                hero.action = null;
-                hero.animationTime = 0;
-                checkForFloorEffects(state, hero);
+                hero.y = (((hero.y - 1) / 16) | 0) * 16 + 16;
+                hero.jumpingVy = 0;
+                hero.jumpingVx = 0;
+                hero.vz = hero.jumpingVz;
+                return;
             } else {
                 hero.x += hero.jumpingVx;
                 hero.y += hero.jumpingVy;
@@ -522,9 +534,15 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             hero.vz = 0;
         }
     } else if (!isAstralProjection && hero.z > minZ) {
-        hero.action = 'knocked';
+        hero.action = null;
         dx = 0;
         dy = 0;
+        hero.z += hero.vz;
+        hero.vz = Math.max(-8, hero.vz - 0.5);
+        if (hero.z <= minZ) {
+            hero.z = minZ;
+            hero.vz = 0;
+        }
     } else if (!isAstralProjection && !isFrozen && hero.action === 'attack') {
         movementSpeed *= 0.5;
         hero.actionFrame++;
