@@ -329,6 +329,11 @@ export function getTestStateContextMenuOption(): MenuOption {
 }
 
 export function fixSpawnLocationOnLoad(state: GameState): void {
+    // Rather than fix individual spawn locations like this, we should force the loaded spawn location to
+    // be in an enumeration of defined spawn locations, and just have logic to choose the best one.
+    if (state.hero.spawnLocation.zoneKey === 'newPeachCave') {
+        state.hero.spawnLocation.zoneKey = 'peachCave';
+    }
     // The player restarts at the defeated boss if they haven't made it to the overworld yet.
     if (state.hero.spawnLocation.zoneKey === 'peachCave' && state.savedState.objectFlags['peachCave:boss']) {
         state.hero.spawnLocation = SPAWN_LOCATION_PEACH_CAVE_BOSS;
