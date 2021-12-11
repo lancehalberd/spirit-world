@@ -844,6 +844,10 @@ export class Door implements ObjectInstance {
         }
     }
     renderForeground(context: CanvasRenderingContext2D, state: GameState, force = false) {
+        // Hack to prevent the top of this specific door from rendering on top of the waterfall.
+        if (this.definition.id === 'waterfallCaveEntrance') {
+            return;
+        }
         const doorStyle = doorStyles[this.style];
         // Foreground is rendered as part of the background when a player is jumping
         // in case they jump over the top of the door.
