@@ -1,9 +1,10 @@
-import { applyBehaviorToTile, enterZoneByTarget, playAreaSound, resetTileBehavior } from 'app/content/areas';
-import { findObjectInstanceById, getObjectStatus, saveObjectStatus } from 'app/content/objects';
+import { applyBehaviorToTile, enterZoneByTarget, findEntranceById, playAreaSound, resetTileBehavior } from 'app/content/areas';
+import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
 import {
     BITMAP_LEFT, BITMAP_RIGHT,
     BITMAP_BOTTOM, BITMAP_BOTTOM_LEFT_QUARTER, BITMAP_BOTTOM_RIGHT_QUARTER,
 } from 'app/content/bitMasks';
+import { debugCanvas } from 'app/dom';
 import { showMessage } from 'app/render/renderMessage';
 import { saveGame } from 'app/state';
 import { createAnimation, drawFrame } from 'app/utils/animations';
@@ -150,7 +151,6 @@ function renderWoodenDoorForeground(context: CanvasRenderingContext2D, state: Ga
     }
 }
 
-
 const cavernImage = requireImage('gfx/tiles/cavearranged.png');
 const cavernCrackedBackground: Frame = {image: cavernImage, x: 0, y: 240, w: 16, h: 16};
 const cavernEastCrackedWall: Frame = {image: cavernImage, x: 304, y: 64, w: 16, h: 16};
@@ -179,7 +179,9 @@ const [
 const [
     blockedDoorCover, lockedDoorCover, bigLockedDoorCover,
 ] = createAnimation('gfx/tiles/cavearranged.png', {w: 32, h: 32},
-    {left: 304, y: 14, cols: 3, rows: 1}).frames;
+    {left: 304, top: 192, cols: 3, rows: 1}).frames;
+
+debugCanvas;//(blockedDoorCover);
 
 function renderCavernDoor(context: CanvasRenderingContext2D, state: GameState, door: Door) {
     if (door.definition.d === 'up') {
@@ -678,6 +680,9 @@ export class Door implements ObjectInstance {
         this.area = null;
     }
     update(state: GameState) {
+        if (this.status !== 'normal' && getObjectStatus(state, this.definition)) {
+            this.changeStatus(state, 'normal');
+        }
         let hero = state.hero.activeClone || state.hero;
         // Nothing to update if the hero isn't in the same world as this door.
         // Also, heroes cannot enter doors while they are jumping down.
@@ -748,7 +753,7 @@ export class Door implements ObjectInstance {
             hero = state.hero.activeClone || state.hero;
             hero.isUsingDoor = true;
             hero.isExitingDoor = true;
-            const target = findObjectInstanceById(state.areaInstance, this.definition.targetObjectId) as Door;
+            const target = findEntranceById(state.areaInstance, this.definition.targetObjectId, [this.definition]) as Door;
             if (!target){
                 console.error(state.areaInstance.objects);
                 console.error(this.definition.targetObjectId);
@@ -777,6 +782,8 @@ export class Door implements ObjectInstance {
             // Make sure the hero is coming *out* of the target door.
             hero.actionDx = -directionMap[target.definition.d][0];
             hero.actionDy = -directionMap[target.definition.d][1];
+            hero.vx = 0;
+            hero.vy = 0;
             // This will be the opposite direction of the door they are coming out of.
             hero.d = getDirection(hero.actionDx, hero.actionDy);
         });

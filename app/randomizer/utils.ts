@@ -15,6 +15,7 @@ import { overworldNodes } from 'app/randomizer/logic/overworldLogic';
 import { tombNodes } from 'app/randomizer/logic/tombLogic';
 import { warTempleNodes } from 'app/randomizer/logic/warTempleLogic';
 import { cocoonNodes } from 'app/randomizer/logic/cocoonLogic';
+import { waterfallTowerNodes } from 'app/randomizer/logic/waterfallTower';
 
 import { readGetParameter } from 'app/utils/index';
 import SRandom from 'app/utils/SRandom';
@@ -658,6 +659,7 @@ const allNodes = [
     ...tombNodes,
     ...warTempleNodes,
     ...cocoonNodes,
+    ...waterfallTowerNodes,
 ];
 
 const seed = readGetParameter('seed');

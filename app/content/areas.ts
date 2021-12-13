@@ -308,6 +308,18 @@ export function linkObject(object: ObjectInstance): void {
     }
 }
 
+export function findEntranceById(areaInstance: AreaInstance, id: string, skippedDefinitions: ObjectDefinition[]): ObjectInstance {
+    for (const object of areaInstance.objects) {
+        if (skippedDefinitions?.includes(object.definition)) {
+            continue;
+        }
+        if (object.definition.type !== 'enemy' && object.definition.type !== 'boss' && object.definition.id === id) {
+            return object;
+        }
+    }
+    console.error('Missing target', id);
+}
+
 export function enterZoneByTarget(
     state: GameState,
     zoneKey: string,
@@ -344,7 +356,7 @@ export function enterZoneByTarget(
                                 d: state.hero.d,
                                 isSpiritWorld: inSpiritWorld,
                             }, instant, () => {
-                                const target = findObjectInstanceById(state.areaInstance, targetObjectId);
+                                const target = findEntranceById(state.areaInstance, targetObjectId, [skipObject]);
                                 if (target?.getHitbox) {
                                     const hitbox = target.getHitbox(state);
                                     state.hero.x = hitbox.x + hitbox.w / 2 - state.hero.w / 2;

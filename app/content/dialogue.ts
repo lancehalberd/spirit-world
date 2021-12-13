@@ -11,6 +11,7 @@ export * from 'app/content/dialogue/tombGuardian';
 export * from 'app/content/dialogue/vanaraGuard';
 export * from 'app/content/dialogue/vanaraCommander';
 export * from 'app/content/dialogue/vanaraVillager';
+export * from 'app/content/dialogue/waterfallDragon';
 
 export function getDialogue(dialogueKey: string): DialogueSet {
     return dialogueHash[dialogueKey];

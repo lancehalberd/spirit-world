@@ -29,6 +29,7 @@ export const KEY = {
     G: 'G'.charCodeAt(0),
     I: 'I'.charCodeAt(0),
     J: 'J'.charCodeAt(0),
+    K: 'K'.charCodeAt(0),
     L: 'L'.charCodeAt(0),
     M: 'M'.charCodeAt(0),
     P: 'P'.charCodeAt(0),
@@ -165,6 +166,13 @@ export function addKeyCommands() {
             } else {
                 exportZoneToClipboard(getState().zone);
                 event.preventDefault();
+            }
+        }
+        if (keyCode === KEY.K && commandIsDown) {
+            const state = getState();
+            const allEnemies = [...state.areaInstance?.enemies, ...state.alternateAreaInstance?.enemies];
+            for (const enemy of allEnemies) {
+                enemy.showDeathAnimation(state);
             }
         }
         if (keyCode === KEY.V && commandIsDown) {

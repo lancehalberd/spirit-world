@@ -2,20 +2,38 @@ import { sample } from 'lodash';
 
 import { getAreaSize } from 'app/content/areas';
 import { selectDialogueOption } from 'app/content/dialogue';
+import { snakeAnimations } from 'app/content/enemyAnimations';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { moveActor } from 'app/moveActor';
 import { heroAnimations } from 'app/render/heroAnimations';
+import { shadowFrame, smallShadowFrame } from 'app/renderActor';
 import { showMessage } from 'app/render/renderMessage';
-import { drawFrameAt, getFrame } from 'app/utils/animations';
+import { drawFrame, getFrame } from 'app/utils/animations';
 import { directionMap, rotateDirection } from 'app/utils/field';
 
 import {
-    Actor, AreaInstance, GameState, DialogueOption, Direction, Hero, MovementProperties, NPCDefinition,
+    Actor, ActorAnimations, AreaInstance, GameState, DialogueOption, Direction, Hero, MovementProperties, NPCDefinition,
     ObjectInstance, ObjectStatus, Rect,
 } from 'app/types';
 
+interface NPCStyleDefinition {
+    animations: ActorAnimations
+    scale?: number
+    shadowOffset?: number
+    flipRight?: boolean
+}
+
 export const npcStyles = {
-    vanara: heroAnimations,
+    giantSnake: {
+        animations: snakeAnimations,
+        scale: 3,
+        shadowOffset: -3,
+        flipRight: true,
+    } as NPCStyleDefinition,
+    vanara: {
+        animations: heroAnimations,
+        shadowOffset: 1,
+    } as NPCStyleDefinition,
 };
 
 export const npcBehaviors = {
@@ -96,7 +114,8 @@ export class NPC implements Actor, ObjectInstance  {
         this.params = {};
     }
     getHitbox(state: GameState): Rect {
-        return { x: this.x, y: this.y, w: 16, h: 16 };
+        const animationStyle = npcStyles[this.definition.style];
+        return { x: this.x, y: this.y, w: 16 * (animationStyle.scale || 1), h: 16 * (animationStyle.scale || 1) };
     }
     onGrab(state: GameState, direction: Direction, hero: Hero) {
         this.showMessage = true;
@@ -141,8 +160,44 @@ export class NPC implements Actor, ObjectInstance  {
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
         const animationStyle = npcStyles[this.definition.style];
-        const animations = this.mode === 'choose' ? animationStyle.idle : animationStyle.move || animationStyle.idle;
+        const animations = this.mode === 'choose'
+            ? animationStyle.animations.idle
+            : animationStyle.animations.move || animationStyle.animations.idle;
         const frame = getFrame(animations[this.d], this.animationTime);
-        drawFrameAt(context, frame, this);
+        const scale = animationStyle.scale || 1;
+        if (this.d === 'right' && animationStyle.flipRight) {
+            // Flip the frame when facing right. We may need an additional flag for this behavior
+            // if we don't do it for all enemies on the right frames.
+            const w = frame.content?.w ?? frame.w;
+            context.save();
+                context.translate((this.x | 0) + ((frame?.content?.x || 0) + w / 2) * scale, 0);
+                context.scale(-1, 1);
+                drawFrame(context, frame, { ...frame,
+                    x: - w / 2 - (frame?.content?.x || 0) * scale,
+                    y: this.y - (frame?.content?.y || 0) * scale - this.z,
+                    w: frame.w * scale,
+                    h: frame.h * scale,
+                });
+            context.restore();
+        } else {
+            drawFrame(context, frame, { ...frame,
+                x: this.x - (frame?.content?.x || 0) * scale,
+                y: this.y - (frame?.content?.y || 0) * scale - this.z,
+                w: frame.w * scale,
+                h: frame.h * scale,
+            });
+        }
+        //drawFrameAt(context, frame, this);
+    }
+    renderShadow(context: CanvasRenderingContext2D, state: GameState) {
+        const animationStyle = npcStyles[this.definition.style];
+        const scale = animationStyle.scale || 1;
+        const frame = this.z >= 4 ? smallShadowFrame : shadowFrame;
+        drawFrame(context, frame, { ...frame,
+            x: this.x + (this.w - shadowFrame.w) * scale / 2,
+            y: this.y + animationStyle.shadowOffset * scale,
+            w: frame.w * scale,
+            h: frame.h * scale,
+        });
     }
 }

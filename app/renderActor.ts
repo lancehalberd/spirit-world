@@ -14,8 +14,8 @@ import {
 } from 'app/render/heroAnimations';
 
 
-const shadowFrame: Frame = createAnimation('gfx/shadow.png', { w: 16, h: 16 }).frames[0];
-const smallShadowFrame: Frame = createAnimation('gfx/smallshadow.png', { w: 16, h: 16 }).frames[0];
+export const shadowFrame: Frame = createAnimation('gfx/shadow.png', { w: 16, h: 16 }).frames[0];
+export const smallShadowFrame: Frame = createAnimation('gfx/smallshadow.png', { w: 16, h: 16 }).frames[0];
 
 let lastPullAnimation = null;
 export function getHeroFrame(state: GameState, hero: Hero): Frame {
