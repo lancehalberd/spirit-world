@@ -59,6 +59,9 @@ export const overworldNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'overworldMountain',
+        checks: [
+            { objectId: 'overworldCliffPeachPiece' },
+        ],
         paths: [
             { nodeId: 'overworldMain' },
             { nodeId: 'overworldWaterfall', logic: orLogic(hasTeleportation, hasIronBoots, hasMitts) },

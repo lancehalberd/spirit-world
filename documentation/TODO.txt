@@ -244,6 +244,28 @@ Support 64x64 super tiles for world map. Or maybe just 48x48. Probably add this 
 Possible tool: Leather gloves protect you from thorn bushes.
 Possible tool: Leather boots let you walk on thorny ground without taking damage.
 
+Paths to Elemental Beast Dungeons:
+
+River Temple:
+    Iron Boots(Waterfall Tower) -> Peach Cave -> Underwater Entrance
+    Cloud Boots(Forest Temple) + Fire(Crater) -> Crater sky path to Temple roof opens after defeating Fire Elemental
+    Cloud Boots(Forest Temple) + Lightning(Staff Tower) -> Tower B sky path connects to Temple roof
+
+
+Staff Tower:
+    Fire(Crater) -> Blow up door by using fire on plants near door
+    Clone(Forest Temple) -> Blow up door with clone
+    Ice(River Temple) -> Create Ice floor for slide teleport
+    Cloud Boots(Forest Temple) -> Use cloud boots for slide teleport
+    Cloud Boots(Forest Temple) -> Sky path from Helix to Tower Balcony
+    Staff + Cloud Boots + Roll -> Glide then roll across the gap
+    Staff + Roll 2(Cloud Temple) -> Double roll across the gap
+
+Crater:
+    Cloud Boots(Forest Temple) -> Sky path from Helix to Crater Peak
+    Cloud Boots(Forest Temple) + Tower Staff(Staff Tower) + Ice(River Temple) =>  Tower B Sky path connects to Crater Peak
+    Ice(River Temple) -> Use Ice to pass lava in cave to Crater Peak
+
 
 Dungeon flavor philosophy:
     All Vanara structures are part of the Vanara ship and related to some functionality, such as the regeneration pods.

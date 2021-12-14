@@ -664,8 +664,10 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             hero.vx = dx;
             hero.vy = dy;
         }
-        const moveX = Math.abs(hero.vx) > 0.3 ? hero.vx : 0;
-        const moveY = Math.abs(hero.vy) > 0.3 ? hero.vy : 0;
+        // Only move if the hero is trying to move in the current direction or if
+        // their velocity is sufficiently large enough from slipping to keep them moving.
+        const moveX = (Math.abs(hero.vx) > 0.3 || dx * hero.vx > 0) ? hero.vx : 0;
+        const moveY = (Math.abs(hero.vy) > 0.3 || dy * hero.vy > 0) ? hero.vy : 0;
         if (moveX || moveY) {
             const {mx, my} = moveActor(state, hero, moveX, moveY, {
                 canPush: !encumbered && !hero.swimming && !hero.bounce && !isCharging
