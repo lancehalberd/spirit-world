@@ -617,12 +617,17 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
                     hero.d = 'down';
                 }
                 const direction = getDirection(dx, dy, true, hero.d);
-                if (heldChakram) {
+                // Don't change direction while charging when the button for the action is no longer pressed.
+                if (heldChakram && isGameKeyDown(state, GAME_KEY.WEAPON)) {
                     heldChakram.vx = directionMap[direction][0];
                     heldChakram.vy = directionMap[direction][1];
                 }
-                hero.actionDx = directionMap[direction][0];
-                hero.actionDy = directionMap[direction][1];
+                if ((hero.chargingLeftTool && isGameKeyDown(state, GAME_KEY.LEFT_TOOL))
+                    || (hero.chargingRightTool && isGameKeyDown(state, GAME_KEY.RIGHT_TOOL))
+                ) {
+                    hero.actionDx = directionMap[direction][0];
+                    hero.actionDy = directionMap[direction][1];
+                }
             }
         }
     }
