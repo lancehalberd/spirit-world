@@ -32,3 +32,16 @@ export const treeVillageNodes: LogicNode[] = [
         ],
     },
 ];
+
+export const waterfallCaveNodes: LogicNode[] = [
+    {
+        zoneId: 'waterfallCave',
+        nodeId: 'elderEntrance',
+        checks: [
+            { objectId: 'waterfallCaveBigMoney' },
+            { objectId: 'waterfallCaveLittleMoney'} ,
+        ],
+        entranceIds: ['waterfallCaveEntrance'],
+        exits: [{ objectId: 'waterfallCaveEntrance' }],
+    },
+];

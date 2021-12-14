@@ -10,7 +10,7 @@ import {
 } from 'app/content/spawnLocations';
 
 import { peachCaveNodes } from 'app/randomizer/logic/peachCaveLogic';
-import { treeVillageNodes } from 'app/randomizer/logic/otherLogic'
+import { treeVillageNodes, waterfallCaveNodes } from 'app/randomizer/logic/otherLogic'
 import { overworldNodes } from 'app/randomizer/logic/overworldLogic';
 import { tombNodes } from 'app/randomizer/logic/tombLogic';
 import { warTempleNodes } from 'app/randomizer/logic/warTempleLogic';
@@ -654,6 +654,7 @@ function findAllTargetObjects(lootWithLocation: LootWithLocation): (LootObjectDe
 
 const allNodes = [
     ...overworldNodes,
+    ...waterfallCaveNodes,
     ...peachCaveNodes,
     ...treeVillageNodes,
     ...tombNodes,

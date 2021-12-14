@@ -16,11 +16,6 @@ export const waterfallTowerNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'waterfallTowerEntrance',
-        checks: [
-            {objectId: 'warTemple:0:0x2-empty-0'},
-            {objectId: 'warTemple:0:0x2-gloves-0'},
-            {objectId: 'warTemple:0:0x2-empty-1'},
-        ],
         paths: [
             {nodeId: 'waterfallTowerFirstKey', logic: andLogic(hasGloves, hasRoll)},
             {nodeId: 'waterfallTowerFirstKey', logic: hasIronBoots},
@@ -57,7 +52,7 @@ export const waterfallTowerNodes: LogicNode[] = [
             // You can run up the center with the iron boots to reach the big key area directly.
             {nodeId: 'waterfallTowerBigKey', logic: hasIronBoots},
             // Just cross the middle stream to reach the big chest area with iron boots or roll across with water blessing.
-            {nodeId: 'waterfallTowerBigKChest', logic: orLogic(andLogic(hasWaterBlessing, hasRoll), hasIronBoots)},
+            {nodeId: 'waterfallTowerBigChest', logic: orLogic(andLogic(hasWaterBlessing, hasRoll), hasIronBoots)},
         ],
         exits: [{objectId: 'waterfallTower-backEntrance', logic: hasIronBoots}],
     },
@@ -92,23 +87,11 @@ export const waterfallTowerNodes: LogicNode[] = [
         zoneId,
         nodeId: 'waterfallTowerBigKey',
         checks: [{objectId: 'waterfallTower:s0:0x0-bigKey-0'}],
-        paths: [
-            {nodeId: 'warTempleKeyDoor'},
-        ],
     },
     {
         zoneId,
         nodeId: 'waterfallTowerBigChest',
         checks: [{objectId: 'waterfallTower-ironBoots'}],
-        paths: [
-            {nodeId: 'warTempleKeyDoor'},
-            {nodeId: 'warTemple:0:1x0-smallKey-0', logic: hasGloves},
-        ],
-        entranceIds: ['warTempleMainEntrance', 'warTempleLock1'],
-        exits: [
-            {objectId: 'warTempleMainEntrance'},
-            {objectId: 'warTempleLock1'},
-        ],
     },
     {
         zoneId,

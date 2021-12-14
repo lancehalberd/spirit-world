@@ -623,9 +623,9 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: Lo
             } else if (!state.hero.rightTool && state.hero.leftTool !== loot.lootType) {
                 state.hero.rightTool = loot.lootType as ActiveTool;
             }
-            console.log(loot.lootType, state.hero.activeTools[loot.lootType]);
+            // console.log(loot.lootType, state.hero.activeTools[loot.lootType]);
             state.hero.activeTools[loot.lootType] = applyUpgrade(state.hero.activeTools[loot.lootType], loot);
-            console.log('->', loot.lootType, state.hero.activeTools[loot.lootType]);
+            // console.log('->', loot.lootType, state.hero.activeTools[loot.lootType]);
         } else if ([
             'gloves', 'roll', 'charge', 'nimbusCloud', 'catEyes', 'spiritSight',
             'trueSight', 'astralProjection', 'teleportation', 'ironSkin', 'goldMail', 'phoenixCrown',
