@@ -97,6 +97,7 @@ function moveActorInDirection(
         canFall = false,
         canSwim = false,
         canClimb = false,
+        canJump = false,
         canWiggle = true,
     } = movementProperties;
     let ax = actor.x, ay = actor.y;
@@ -143,7 +144,7 @@ function moveActorInDirection(
         excludedObjects.add(actor.pickUpObject);
     }
 
-    let blockedByTile = false, canJumpDown = true;
+    let blockedByTile = false, canJumpDown = canJump;
     let blockedByObject = false;
     let pushedObjects = [];
     for (const point of checkPoints) {
@@ -188,13 +189,13 @@ function moveActorInDirection(
                 blockedByTile = true;
             }*/
             blockedByTile = true;
-            canJumpDown = !!tileBehavior.edges[direction];
+            canJumpDown = canJumpDown && !!tileBehavior.edges[direction];
         } else if (!isTilePassable && tileBehavior?.jumpDirection !== direction) {
             canJumpDown = false;
         }
         for (const object of objects) {
             blockedByObject = blockedByObject || object.behaviors?.solid;
-            if (canPush) {
+            if (canPush && object.behaviors?.solid) {
                 pushedObjects.push(object);
             }
         }
@@ -459,7 +460,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
                 hero.swimming = false;
             }
             if (behaviors.slippery && !hero.equipedGear?.ironBoots) {
-                hero.slipping = true;
+                hero.slipping = !hero.isAstralProjection;
             }
             if (!behaviors.shallowWater && !behaviors.water) {
                 hero.wading = false;

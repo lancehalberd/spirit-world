@@ -448,6 +448,7 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
 type DoorStyle = keyof typeof doorStyles;
 
 export class Door implements ObjectInstance {
+    behaviors: TileBehaviors = { }
     linkedObject: Door;
     alwaysReset = true;
     updateDuringTransition = true;
@@ -560,6 +561,11 @@ export class Door implements ObjectInstance {
             }
         } else if (doorStyle.w === 32) {
             this.applySquareDoorBehavior();
+        }
+        if (this.status === 'normal') {
+            this.behaviors = { };
+        } else {
+            this.behaviors = { solid: true };
         }
     }
     applySquareDoorBehavior() {

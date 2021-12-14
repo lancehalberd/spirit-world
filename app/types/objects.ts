@@ -69,6 +69,7 @@ export interface MovementProperties {
     canFall?: boolean
     canSwim?: boolean
     canClimb?: boolean
+    canJump?: boolean
     // Whether the mover should wiggle to fit into tight spaces.
     canWiggle?: boolean
     // Objects to ignore for hit detection.

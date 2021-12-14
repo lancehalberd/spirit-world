@@ -310,7 +310,7 @@ export function linkObject(object: ObjectInstance): void {
 
 export function findEntranceById(areaInstance: AreaInstance, id: string, skippedDefinitions: ObjectDefinition[]): ObjectInstance {
     for (const object of areaInstance.objects) {
-        if (skippedDefinitions?.includes(object.definition)) {
+        if (!object.definition || skippedDefinitions?.includes(object.definition)) {
             continue;
         }
         if (object.definition.type !== 'enemy' && object.definition.type !== 'boss' && object.definition.id === id) {

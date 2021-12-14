@@ -73,11 +73,6 @@ export class PushPullObject implements ObjectInstance {
             this.pushDirection = direction;
             this.pullingHeroDirection = direction;
             this.pushFrame = 0;
-            if (this.linkedObject) {
-                this.linkedObject.pushDirection = direction;
-                this.linkedObject.pullingHeroDirection = direction;
-                this.linkedObject.pushFrame = 0;
-            }
         }
     }
     update(state: GameState) {
@@ -86,6 +81,10 @@ export class PushPullObject implements ObjectInstance {
                 this.pushFrame++;
                 this.x += directionMap[this.pushDirection][0];
                 this.y += directionMap[this.pushDirection][1];
+                if (this.linkedObject) {
+                    this.linkedObject.x = this.x;
+                    this.linkedObject.y = this.y;
+                }
             } else {
                 this.pullingHeroDirection = null;
                 this.pushDirection = null;

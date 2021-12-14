@@ -1102,6 +1102,7 @@ const caveFloor: TileSource = {
     source: {image: requireImage('gfx/tiles/cavearranged.png'), x: 0, y: 0, w: 48, h: 64},
     behaviors: {
         'all': { defaultLayer: 'floor' },
+        '12x5': { defaultLayer: 'floor', linkedOffset: -291 /* 775 -> 484 */}
     },
     tileCoordinates: [
         [12, 5],

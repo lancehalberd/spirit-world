@@ -668,6 +668,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
                     && hero.vx * dx >= 0 && hero.vy * dy >= 0,
                 canClimb: !encumbered && !hero.bounce && !isCharging,
                 canFall: true,
+                canJump: !isAstralProjection,
                 canSwim: !encumbered,
                 boundToSection: isAstralProjection || !!hero.bounce,
             });
