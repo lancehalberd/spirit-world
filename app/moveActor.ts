@@ -11,6 +11,7 @@ export function moveActor(state: GameState, actor: Actor, dx: number, dy: number
     boundToSectionPadding,
     canPush = false,
     canFall = false,
+    canJump = false,
     canSwim = false,
     canClimb = false,
     canWiggle = true,
@@ -33,6 +34,7 @@ export function moveActor(state: GameState, actor: Actor, dx: number, dy: number
             movedX = moveActorInDirection(state, actor, sx, (sx < 0) ? 'left' : 'right', {
                 boundToSection,
                 boundToSectionPadding,
+                canJump,
                 canPush: canPush && !dy,
                 canWiggle: canWiggle && !dy,
                 canSwim,
@@ -57,6 +59,7 @@ export function moveActor(state: GameState, actor: Actor, dx: number, dy: number
             movedY = moveActorInDirection(state, actor, sy, (sy < 0) ? 'up' : 'down', {
                 boundToSection,
                 boundToSectionPadding,
+                canJump,
                 canPush: canPush && !dx,
                 canWiggle: canWiggle && !dx,
                 canSwim,
