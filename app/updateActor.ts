@@ -658,8 +658,19 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         const isCharging = hero.action === 'charging';
         const encumbered = hero.pickUpObject || hero.pickUpTile || hero.grabObject || hero.grabTile;
         if (hero.slipping) {
-            hero.vx = dx / 50 + hero.vx;
-            hero.vy = dy / 50 + hero.vy;
+            if (hero.equipedGear.cloudBoots) {
+                hero.vx = dx / 10 + hero.vx;
+                hero.vy = dy / 10 + hero.vy;
+            } else {
+                hero.vx = dx / 40 + hero.vx;
+                hero.vy = dy / 40 + hero.vy;
+            }
+            const mag = Math.sqrt(hero.vx * hero.vx + hero.vy * hero.vy);
+            const maxSpeed = 2.5;
+            if (mag > maxSpeed) {
+                hero.vx *= maxSpeed / mag;
+                hero.vy *= maxSpeed / mag;
+            }
         } else {
             hero.vx = dx;
             hero.vy = dy;
