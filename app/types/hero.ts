@@ -99,6 +99,7 @@ export interface Actor extends ObjectInstance {
     sinking?: boolean
     inAirBubbles?: boolean
     frozenDuration?: number
+    isOverPit?: boolean
     // These flags are set when an actor is being forced to move through door objects.
     isUsingDoor?: boolean
     // This flag insures that when the user is exiting a door we don't accidentally try

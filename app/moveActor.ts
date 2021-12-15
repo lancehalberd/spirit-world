@@ -150,6 +150,7 @@ function moveActorInDirection(
     let blockedByTile = false, canJumpDown = canJump;
     let blockedByObject = false;
     let pushedObjects = [];
+    let quickJump = false;
     for (const point of checkPoints) {
         const { tileBehavior, objects} = getTileBehaviorsAndObstacles(state, actor.area, point, excludedObjects);
         if (tileBehavior?.solid && tileBehavior?.damage > 0) {
@@ -162,7 +163,7 @@ function moveActorInDirection(
         }
         // Climbable overrides solid tile behavior. This allows use to place tiles marked climbable on top
         // of solid tiles to make them passable.
-        const isTilePassable = (!tileBehavior?.solid || tileBehavior.climbable);
+        const isTilePassable = (!tileBehavior?.solid || tileBehavior.climbable || (tileBehavior.cloudGround && !tileBehavior.solidMap));
         // The second condition is a hack to prevent enemies from walking over pits.
         if (!isTilePassable || (tileBehavior?.pit && !canFall)) {
             blockedByTile = true;
@@ -191,6 +192,9 @@ function moveActorInDirection(
             if (tileBehavior.edges?.right && direction !== 'right') {
                 blockedByTile = true;
             }*/
+            if (tileBehavior.cloudGround) {
+                quickJump = true;
+            }
             blockedByTile = true;
             canJumpDown = canJumpDown && !!tileBehavior.edges[direction];
         } else if (!isTilePassable && tileBehavior?.jumpDirection !== direction) {
@@ -211,7 +215,7 @@ function moveActorInDirection(
         }
         if (canJumpDown) {
             actor.jumpingTime = (actor.jumpingTime || 0) + FRAME_LENGTH;
-            if (actor.jumpingTime >= 250) {
+            if (actor.jumpingTime >= 250 || (quickJump && actor.jumpingTime > 50)) {
                 const [dx, dy] = directionMap[direction];
                 if (direction === 'down') {
                     actor.action = 'jumpingDown';
@@ -457,7 +461,9 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
                 startClimbing = true;
             }
             if (behaviors.damage > 0 && hero.onHit) {
-                hero.onHit(state, { damage: behaviors.damage });
+                if (!behaviors.low || hero.z <= 0) {
+                    hero.onHit(state, { damage: behaviors.damage });
+                }
             }
             if (!behaviors.water) {
                 hero.swimming = false;
@@ -469,7 +475,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
                 hero.wading = false;
             }
             // Use z <= 1 so that feather boots are still caught here.
-            if (behaviors.pit && hero.action !== 'roll' && hero.z <= 1) {
+            if (behaviors.pit && (!hero.equipedGear.cloudBoots || !behaviors.cloudGround)) {
                 if (hero.y - row * 16 > 4) {
                     if (hero.x - column * 16 > 4) {
                         fallingTopLeft = true;
@@ -507,13 +513,16 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
     } else if (!startClimbing && hero.action === 'climbing') {
         hero.action = null;
     }
-    if (fallingTopLeft && fallingTopRight && fallingBottomLeft && fallingBottomRight) {
-        hero.throwHeldObject(state);
-        hero.action = 'falling';
-        hero.x = Math.round(hero.x / tileSize) * tileSize;
-        hero.y = Math.round(hero.y / tileSize) * tileSize;
-        hero.animationTime = 0;
-    } else {
+    hero.isOverPit = fallingTopLeft && fallingTopRight && fallingBottomLeft && fallingBottomRight;
+    if (hero.isOverPit) {
+        if (hero.z <= 0 && hero.action !== 'roll') {
+            hero.throwHeldObject(state);
+            hero.action = 'falling';
+            hero.x = Math.round(hero.x / tileSize) * tileSize;
+            hero.y = Math.round(hero.y / tileSize) * tileSize;
+            hero.animationTime = 0;
+        }
+    } else if (hero.z <= 0 && hero.action !== 'roll') {
         if (fallingTopLeft && fallingTopRight) {
             hero.y -= 0.1;
         }

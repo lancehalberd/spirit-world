@@ -46,6 +46,8 @@ const rollSpeed = [
     2, 2, 2, 2,
 ];
 
+const maxCloudBootsZ = 3;
+
 export function updateAllHeroes(this: void, state: GameState) {
     // Switching clones is done outside of updateHero, otherwise the switch gets processed by each clone.
     if (state.hero.clones.length && !state.hero.pickUpObject && (
@@ -133,13 +135,13 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         hero.animationTime += 8;
         // Freeze at the leaping frame, the flip looks bad if the jump isn't the right length.
         hero.animationTime = Math.min(hero.animationTime, 100);
-        const groundZ = hero.equipedGear?.cloudBoots ? 1 : 0;
+        const groundZ = 0;
         // Once the hero is over their landing tile, they fall straight down until they hit the ground.
         if (!hero.jumpingVy && !hero.jumpingVx) {
             hero.z += hero.jumpingVz;
             hero.jumpingVz = Math.max(-2, hero.jumpingVz - 0.5);
-            if (hero.z <= groundZ) {
-                hero.z = groundZ;
+            if (hero.z <= 0) {
+                hero.z = 0;
                 hero.action = null;
                 hero.animationTime = 0;
                 checkForFloorEffects(state, hero);
@@ -152,7 +154,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             // As the hero approaches each new row of tiles, check if they should land on this row of tiles.
             // The player can fall as many as 4 pixels per frame, so we check when the user is in the last 4 pixels
             // of the previous row.
-            if (hero.y >= hero.jumpingDownY + 8 && (hero.y % 16 > 12 || hero.y % 16 === 0)) {
+            if (hero.y >= hero.jumpingDownY + 24 && (hero.y % 16 > 12 || hero.y % 16 === 0)) {
                 const y = (((hero.y - 1) / 16) | 0) * 16 + 16;
                 const excludedObjects = new Set([hero]);
                 const { tileBehavior: b1 } = getTileBehaviorsAndObstacles(state, hero.area, {x: hero.x, y }, excludedObjects, state.nextAreaInstance);
@@ -220,16 +222,24 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
     const isAstralProjection = hero.isAstralProjection;
     const isControlled = (state.hero.action === 'meditating' && isAstralProjection) || isCloneToolDown || hero === primaryClone;
 
-    const minZ = isAstralProjection ? 4 : (hero.equipedGear?.cloudBoots ? 1 : 0);
+    const minZ = isAstralProjection ? 4 : 0;
     if (hero.z < minZ) {
-        hero.z = Math.max(hero.z + 1, minZ);
+        hero.z = Math.min(hero.z + 1, minZ);
     }
+    if (hero.action !== 'roll') {
+        if (hero.equipedGear.cloudBoots && hero.vx * hero.vx + hero.vy * hero.vy >= 4 && !hero.isOverPit) {
+            hero.z = Math.min(hero.z + 0.1, maxCloudBootsZ);
+        } else if (hero.z >= minZ) {
+            hero.z -= 0.2;
+        }
+    }
+    const isFallingToGround = hero.z > minZ && (!hero.equipedGear.cloudBoots || hero.z > maxCloudBootsZ);
     const isFrozen = hero.frozenDuration > 0;
     // Unless wearing the iron boots, the hero is always slipping while frozen.
     if (isFrozen && !hero.equipedGear?.ironBoots) {
         hero.slipping = true;
     }
-    const canCharge = !isAstralProjection && isControlled && hero.z <= minZ
+    const canCharge = !isAstralProjection && isControlled && !isFallingToGround
         && !hero.swimming && !hero.pickUpTile && !hero.pickUpObject && !isFrozen;
     const canAttack = canCharge && hero.weapon > 0 && !hero.chargingLeftTool && !hero.chargingRightTool
          && (!hero.action || hero.action === 'walking' || hero.action === 'pushing');
@@ -533,7 +543,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             hero.action = null;
             hero.vz = 0;
         }
-    } else if (!isAstralProjection && hero.z > minZ) {
+    } else if (isFallingToGround) {
         hero.action = null;
         dx = 0;
         dy = 0;

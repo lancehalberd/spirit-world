@@ -616,13 +616,35 @@ const shoreAnglesMask: TileSource = {
 };
 
 
+const cloudBehavior = <const>{ cloudGround: true, defaultLayer: 'field' };
 const clouds: TileSource = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/cloud.png'), x: 0, y: 0, w: 64, h: 80},
     behaviors: {
-        'all': { cloudGround: true, defaultLayer: 'field' },
+        'all': cloudBehavior,
+        '0x0': { ...cloudBehavior, edges: {up: true, left: true}},
+        '1x0': { ...cloudBehavior, edges: {up: true}},
+        '2x0': { ...cloudBehavior, edges: {up: true, right: true}},
+        '0x1': { ...cloudBehavior, edges: {left: true}},
+        '2x1': { ...cloudBehavior, edges: {right: true}},
+        '0x2': { ...cloudBehavior, edges: {down: true, left: true}},
+        '1x2': { ...cloudBehavior, edges: {down: true}},
+        '2x2': { ...cloudBehavior, edges: {down: true, right: true}},
+        '0x3': { ...cloudBehavior, edges: {up: true, left: true}},
+        '1x3': { ...cloudBehavior, edges: {up: true, right: true}},
+        '0x4': { ...cloudBehavior, edges: {down: true, left: true}},
+        '1x4': { ...cloudBehavior, edges: {down: true, right: true}},
+        //'0x3': { ...cloudBehavior, solidMap: BITMAP_TOP_LEFT, jumpDirection: 'upleft'},
+        //'1x3': { ...cloudBehavior, solidMap: BITMAP_TOP_RIGHT, jumpDirection: 'upright'},
+        //'2x3': { ...cloudBehavior, solidMap: BITMAP_BOTTOM_RIGHT, jumpDirection: 'downright'},
+        //'3x3': { ...cloudBehavior, solidMap: BITMAP_BOTTOM_LEFT, jumpDirection: 'downleft'},
+        //'0x4': { ...cloudBehavior, solidMap: BITMAP_BOTTOM_LEFT, jumpDirection: 'downleft'},
+        //'1x4': { ...cloudBehavior, solidMap: BITMAP_BOTTOM_RIGHT, jumpDirection: 'downright'},
+        //'2x4': { ...cloudBehavior, solidMap: BITMAP_TOP_RIGHT, jumpDirection: 'upright'},
+        //'3x4': { ...cloudBehavior, solidMap: BITMAP_TOP_LEFT, jumpDirection: 'upleft'},
     },
 };
+// This is being used in place of the crystal bead covered ground in the waterfall tower.
 const singleCloudTile: TileSource = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/cloud.png'), x: 48, y: 32, w: 16, h: 16},
@@ -634,9 +656,17 @@ const cloudAngles: TileSource = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/cloud.png'), x: 64, y: 0, w: 64, h: 64},
     behaviors: {
-        'all': { cloudGround: true, defaultLayer: 'field' },
+        'all': cloudBehavior,
         '0x0': { skipped: true }, '3x0': { skipped: true },
         '0x3': { skipped: true }, '3x3': { skipped: true },
+        '1x0': { ...cloudBehavior, solidMap: BITMAP_TOP_LEFT, jumpDirection: 'upleft'},
+        '0x1': { ...cloudBehavior, solidMap: BITMAP_TOP_LEFT, jumpDirection: 'upleft'},
+        '2x0': { ...cloudBehavior, solidMap: BITMAP_TOP_RIGHT, jumpDirection: 'upright'},
+        '3x1': { ...cloudBehavior, solidMap: BITMAP_TOP_RIGHT, jumpDirection: 'upright'},
+        '0x2': { ...cloudBehavior, solidMap: BITMAP_BOTTOM_LEFT, jumpDirection: 'downleft'},
+        '1x3': { ...cloudBehavior, solidMap: BITMAP_BOTTOM_LEFT, jumpDirection: 'downleft'},
+        '2x3': { ...cloudBehavior, solidMap: BITMAP_BOTTOM_RIGHT, jumpDirection: 'downright'},
+        '3x2': { ...cloudBehavior, solidMap: BITMAP_BOTTOM_RIGHT, jumpDirection: 'downright'},
     },
 };
 

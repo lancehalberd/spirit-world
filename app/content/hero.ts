@@ -73,6 +73,7 @@ export class Hero implements Actor, SavedHeroData {
     isUsingDoor?: boolean;
     isExitingDoor?: boolean;
     isControlledByObject?: boolean;
+    isOverPit?: boolean;
     // stats
     magic: number = 0;
     // base: 20, max: 100, roll: 5, charge: 10, double-charge: 50
