@@ -32,7 +32,9 @@ export class PitEntrance implements ObjectInstance {
             return;
         }
         const hero = state.hero.activeClone || state.hero;
-        if (this.area === hero.area && isObjectInsideTarget(hero, pad(this.getHitbox(state), 2))) {
+        if (this.area === hero.area && hero.z <= 0  && hero.action !== 'roll'
+            && isObjectInsideTarget(hero, pad(this.getHitbox(state), 2))
+        ) {
             if (hero.action === 'fallen') {
                 if (enterZoneByTarget(state, this.definition.targetZone, this.definition.targetObjectId, this.definition, false)) {
                     hero.action = 'knocked';
