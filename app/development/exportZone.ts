@@ -1,4 +1,5 @@
 import { zones } from 'app/content/zones';
+import { readGetParameter } from 'app/utils/index';
 
 import { AreaGrid, Zone } from 'app/types';
 
@@ -8,6 +9,10 @@ export function exportZoneToClipboard(zone: Zone): void {
 }
 
 export function serializeZone(zone: Zone) {
+    const seed = readGetParameter('seed');
+    if (seed) {
+        throw new Error('Cannot export zone while randomizer is active, item placements will be changed.');
+    }
     const emptyAreas = [];
     for (const floor of zone.floors) {
         for (const areaGrid of [floor.grid, floor.spiritGrid]) {
