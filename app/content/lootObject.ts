@@ -372,6 +372,12 @@ export class ChestObject implements ObjectInstance {
         // Chests that have been opened are always revealed.
         if (this.isOpen(state)) {
             this.status = 'normal';
+            // Make sure empty chese are recorded as opened for the randomizer, since some logic
+            // depends on whether a chest was opened yet (cocoon small key chest, for example).
+            if (!state.savedState.objectFlags[this.definition.id]) {
+                state.savedState.objectFlags[this.definition.id] = true;
+                saveGame();
+            }
         }
     }
     getHitbox(state: GameState): Rect {
