@@ -1,6 +1,7 @@
 import {
     andLogic,
     hasBossWeapon,
+    hasChakram,
     hasGloves, hasIronBoots,
     hasMediumRange, hasRoll,
     hasWeapon,
@@ -10,6 +11,10 @@ import {
 
 import {LogicNode } from 'app/types';
 
+// Magic is drained inside the waterfall tower unless you have the water blessing,
+// So the chakram is the only useable weapon without the water blessing.
+const hasWaterfallWeapon = orLogic(hasChakram, andLogic(hasWaterBlessing, hasWeapon));
+const hasWaterfallBossWeapon = orLogic(hasChakram, andLogic(hasWaterBlessing, hasBossWeapon));
 
 const zoneId = 'waterfallTower';
 export const waterfallTowerNodes: LogicNode[] = [
@@ -34,7 +39,7 @@ export const waterfallTowerNodes: LogicNode[] = [
             // There is a switch the hero must hit after the block to advance to the next section requiring medium range.
             {
                 nodeId: 'waterfallTowerAfterFirstLock',
-                logic: andLogic(hasGloves, hasMediumRange),
+                logic: andLogic(hasGloves, orLogic(hasChakram, andLogic(hasWaterBlessing, hasMediumRange))),
                 doorId: 'waterfallTowerKeyBlock'
             },
             // Can just walk through the flows if you posess iron boots.
@@ -47,7 +52,7 @@ export const waterfallTowerNodes: LogicNode[] = [
         nodeId: 'waterfallTowerAfterFirstLock',
         paths: [
             // Must have a weapon to defeat the crystal guardian in order to hit the switch to advance.
-            {nodeId: 'waterfallTowerAfterGuardian', logic: hasWeapon},
+            {nodeId: 'waterfallTowerAfterGuardian', logic: hasWaterfallWeapon},
             {nodeId: 'waterfallTowerAfterGuardian', logic: hasIronBoots},
             // You can run up the center with the iron boots to reach the big key area directly.
             {nodeId: 'waterfallTowerBigKey', logic: hasIronBoots},
@@ -81,7 +86,7 @@ export const waterfallTowerNodes: LogicNode[] = [
         zoneId,
         nodeId: 'waterfallTowerBeforeSecondGuardian',
         // You have to defeat the crystal guardian to reach the big key from here.
-        paths: [{nodeId: 'waterfallTowerBigKey', logic: hasWeapon}],
+        paths: [{nodeId: 'waterfallTowerBigKey', logic: hasWaterfallWeapon}],
     },
     {
         zoneId,
@@ -98,7 +103,7 @@ export const waterfallTowerNodes: LogicNode[] = [
         nodeId: 'waterfallTowerBack',
         paths: [
             // Just need to defeat the floor eyes to reach the boss chamber.
-            {nodeId: 'waterfallTowerBoss', logic: hasWeapon},
+            {nodeId: 'waterfallTowerBoss', logic: hasWaterfallWeapon},
         ],
         entranceIds: ['waterfallTower-backEntrance'],
         exits: [{objectId: 'waterfallTower-backEntrance'}],
@@ -107,11 +112,11 @@ export const waterfallTowerNodes: LogicNode[] = [
         zoneId,
         nodeId: 'waterfallTowerBoss',
         checks: [
-            {objectId: 'waterfallTowerBoss', logic: andLogic(hasBossWeapon, hasIronBoots)},
+            {objectId: 'waterfallTowerBoss', logic: andLogic(hasWaterfallBossWeapon, hasIronBoots)},
         ],
         paths: [
             // Defeating the boss opens the door to the throne room
-            {nodeId: 'waterfallTowerThroneRoom', logic: andLogic(hasBossWeapon, hasIronBoots)},
+            {nodeId: 'waterfallTowerThroneRoom', logic: andLogic(hasWaterfallBossWeapon, hasIronBoots)},
         ],
     },
     {
