@@ -292,6 +292,7 @@ function findReachableNodes(allNodes: LogicNode[], startingNodes: LogicNode[], s
         }
         for (const exit of (currentNode.exits || [])) {
             if (exit.logic && !isLogicValid(state, exit.logic)) {
+                //console.log('Invalid logic', exit);
                 continue;
             }
             const { object } = findObjectById(zone, exit.objectId, state);
@@ -319,6 +320,7 @@ function findReachableNodes(allNodes: LogicNode[], startingNodes: LogicNode[], s
     return reachableNodes;
 }
 function calculateKeyLogic(allNodes: LogicNode[], startingNodes: LogicNode[]) {
+    const handledIds = new Set<string>();
     for (const node of allNodes) {
         const zone = getZone(node.zoneId);
         if (!zone) {
@@ -330,9 +332,15 @@ function calculateKeyLogic(allNodes: LogicNode[], startingNodes: LogicNode[]) {
             if (!exitObject) {
                 return;
             }
+            if (handledIds.has(exitObject.id)) {
+                return;
+            }
             if (exitObject.status === 'locked' && !exitObject.requiredKeysForLogic) {
                 countRequiredKeysForEntrance(allNodes, startingNodes, zone.key, exitObject);
+            } else if (exitObject.requiredKeysForLogic) {
+                console.log(exitObject.id, 'manually set to', exitObject.requiredKeysForLogic, 'keys');
             }
+            handledIds.add(exitObject.id);
         }
         for (const path of (node.paths || [])) {
             if (path.doorId) {
@@ -399,7 +407,7 @@ function countRequiredKeysForEntrance(allNodes: LogicNode[], startingNodes: Logi
             }
         }
     }
-    console.log(exitToUpdate.id, exitToUpdate.requiredKeysForLogic);
+    console.log(exitToUpdate.id, 'calculated as', exitToUpdate.requiredKeysForLogic, 'keys');
 }
 
 function organizeLootObjects(lootObjects: LootWithLocation[]) {
@@ -453,7 +461,7 @@ function applyLootObjectToState(state: GameState, lootWithLocation: LootWithLoca
     const onPickup = lootEffects[lootWithLocation.lootObject.lootType] || lootEffects.unknown;
     // Loot is always progressive in the randomizer, so set lootLevel to 0.
     // onPickup(stateCopy, lootWithLocation.lootObject);
-    onPickup(stateCopy, {...lootWithLocation.lootObject, lootLevel: 0});
+    onPickup(stateCopy, {...lootWithLocation.lootObject, lootLevel: 0}, true);
     if (!stateCopy.hero.passiveTools.catEyes && stateCopy.hero.maxLife > 4) {
         stateCopy.hero.passiveTools.catEyes = 1;
     }
@@ -465,6 +473,7 @@ export function reverseFill(random: typeof SRandom, allNodes: LogicNode[], start
     calculateKeyLogic(allNodes, startingNodes);
     // console.log({ allNodes, startingNodes });
     const allLootObjects = getLootObjects(allNodes);
+    //console.log(allLootObjects.map(object => object.lootObject.lootType + ':' + object.location.zoneKey));
     let initialState = getDefaultState();
     applySavedState(initialState, initialState.savedState);
 
@@ -472,7 +481,7 @@ export function reverseFill(random: typeof SRandom, allNodes: LogicNode[], start
     for (const lootWithLocation of allLootObjects) {
         finalState = applyLootObjectToState(finalState, lootWithLocation);
     }
-    // console.log({ finalState });
+    //console.log({ finalState });
     const allReachableCheckIds = findReachableChecks(allNodes, startingNodes, finalState).map(l => l.lootObject.id);
     for (const lootWithLocation of allLootObjects) {
         if (!allReachableCheckIds.includes(lootWithLocation.lootObject.id)) {
@@ -532,7 +541,6 @@ export function reverseFill(random: typeof SRandom, allNodes: LogicNode[], start
 }
 
 function placeItem(random: typeof SRandom, allNodes: LogicNode[], startingNodes: LogicNode[], originalState: GameState, assignmentsState: AssignmentState, loot: LootWithLocation): string {
-    // console.log('Placing: ', loot.lootObject.id);
     let currentState = originalState;
     let previousState = originalState;
     let counter = 0;
@@ -545,17 +553,17 @@ function placeItem(random: typeof SRandom, allNodes: LogicNode[], startingNodes:
         previousState = currentState;
         currentState = collectAllLoot(allNodes, startingNodes, previousState, assignmentsState);
     } while (currentState !== previousState);
-    let assignableChecks: LootWithLocation[] = findReachableChecks(allNodes, startingNodes, currentState);
-    assignableChecks = assignableChecks.filter(lootWithLocation => !assignmentsState.assignedLocations.includes(lootWithLocation.lootObject.id));
+    const allReachableChecks: LootWithLocation[] = findReachableChecks(allNodes, startingNodes, currentState);
+    const allAvailableChecks = allReachableChecks.filter(lootWithLocation => !assignmentsState.assignedLocations.includes(lootWithLocation.lootObject.id));
+    let allAppropriateChecks = allAvailableChecks;
     if (loot.lootObject.lootType === 'bigKey' || loot.lootObject.lootType === 'smallKey') {
-        assignableChecks = assignableChecks.filter(lootWithLocation => lootWithLocation.location.zoneKey === loot.location.zoneKey);
+        allAppropriateChecks = allAppropriateChecks.filter(lootWithLocation => lootWithLocation.location.zoneKey === loot.location.zoneKey);
     }
-    //console.log(currentState);
-    //console.log(assignableChecks);
-    const assignedLocation = random.element(assignableChecks);
+    const assignedLocation = random.element(allAppropriateChecks);
     random.generateAndMutate();
     if (!assignedLocation) {
         console.error('Failed to place item', { assignmentsState, originalState, currentState, loot});
+        console.error({ allReachableChecks, allAvailableChecks, allAppropriateChecks });
         debugger;
         throw new Error('Failed to place item')
     }

@@ -843,7 +843,7 @@ const f1_0x1: AreaDefinition = {
     objects: [
         {id: "tombBigLock2", linked: false, spirit: false, status: "bigKeyLocked", x: 240, y: 480, type: "door", style: "cave", targetZone: null, targetObjectId: null, d: "down"},
         {id: "tomb:1:1x0-door-1", linked: false, spirit: false, status: "normal", x: 0, y: 112, type: "door", style: "cave", targetZone: null, targetObjectId: null, d: "left"},
-        {id: "tombLock2", linked: false, spirit: false, status: "locked", x: 480, y: 112, type: "door", style: "cave", targetZone: null, targetObjectId: null, d: "right", requiredKeysForLogic: 2},
+        {id: "tombLock2", linked: false, spirit: false, status: "locked", x: 480, y: 112, type: "door", style: "cave", targetZone: null, targetObjectId: null, d: "right"},
         {id: "tombBigLock3", linked: false, spirit: false, status: "bigKeyLocked", x: 480, y: 368, type: "door", style: "cave", targetZone: null, targetObjectId: null, d: "right"},
         {id: "tomb:1:1x0-door-4", linked: false, spirit: false, status: "normal", x: 0, y: 368, type: "door", style: "cave", targetZone: null, targetObjectId: null, d: "left"},
         {id: "tombBasementEntrance", linked: false, spirit: false, status: "bigKeyLocked", x: 240, y: 0, type: "door", style: "cave", targetZone: "tomb", targetObjectId: "tombBasementEntrance", d: "up"},
@@ -1164,7 +1164,7 @@ const f1_1x1: AreaDefinition = {
         {id: "tombEntrance", linked: false, spirit: false, status: "normal", x: 240, y: 480, type: "door", style: "cave", targetZone: "overworld", targetObjectId: "tombEntrance", d: "down"},
         {id: "tomb:1:1x1-door-0", linked: false, spirit: false, status: "normal", x: 0, y: 400, type: "door", style: "cave", targetZone: null, targetObjectId: null, d: "left"},
         {id: "tomb:1:1x1-door-1", linked: false, spirit: false, status: "normal", x: 480, y: 400, type: "door", style: "cave", targetZone: null, targetObjectId: null, d: "right"},
-        {id: "tombLock1", linked: false, spirit: false, status: "locked", x: 480, y: 112, type: "door", style: "cave", targetZone: null, targetObjectId: null, d: "right", requiredKeysForLogic: 2},
+        {id: "tombLock1", linked: false, spirit: false, status: "locked", x: 480, y: 112, type: "door", style: "cave", targetZone: null, targetObjectId: null, d: "right"},
         {id: "tomb:1:1x1-door-3", linked: false, spirit: false, status: "normal", x: 0, y: 112, type: "door", style: "cave", targetZone: null, targetObjectId: null, d: "left"},
         {id: "tombBigLock1", linked: false, spirit: false, status: "normal", x: 240, y: 256, type: "door", style: "cave", targetZone: null, targetObjectId: null, d: "up"},
         {id: "tombBigLock1", linked: false, spirit: false, status: "normal", x: 240, y: 224, type: "door", style: "cave", targetZone: null, targetObjectId: null, d: "down"},

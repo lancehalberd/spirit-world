@@ -71,6 +71,7 @@ export const warTempleNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'warTemplePitEntrance',
+        checks: [{objectId: 'warTemple:0:2x2-peachOfImmortalityPiece-0'}],
         paths: [
             {nodeId: 'warTempleKeyDoor'},
         ],

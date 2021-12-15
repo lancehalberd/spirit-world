@@ -619,8 +619,8 @@ function updateDungeonInventory(state: GameState, inventory: DungeonInventory, s
     }
 }
 
-export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition | DialogueLootDefinition) => void}> = {
-    unknown: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition) => {
+export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition | DialogueLootDefinition, simulate?: boolean) => void}> = {
+    unknown: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
         if (loot.lootType === 'weapon') {
             state.hero.weapon = applyUpgrade(state.hero.weapon, loot);
         } else if (['bow', 'staff', 'clone', 'cloak'].includes(loot.lootType)) {
@@ -629,15 +629,17 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: Lo
             } else if (!state.hero.rightTool && state.hero.leftTool !== loot.lootType) {
                 state.hero.rightTool = loot.lootType as ActiveTool;
             }
-            // console.log(loot.lootType, state.hero.activeTools[loot.lootType]);
+            //console.log(loot.lootType, state.hero.activeTools[loot.lootType]);
             state.hero.activeTools[loot.lootType] = applyUpgrade(state.hero.activeTools[loot.lootType], loot);
-            // console.log('->', loot.lootType, state.hero.activeTools[loot.lootType]);
+            //console.log('->', loot.lootType, state.hero.activeTools[loot.lootType]);
         } else if ([
             'gloves', 'roll', 'charge', 'nimbusCloud', 'catEyes', 'spiritSight',
             'trueSight', 'astralProjection', 'teleportation', 'ironSkin', 'goldMail', 'phoenixCrown',
             'waterBlessing', 'fireBlessing'
         ].includes(loot.lootType)) {
+            //console.log(loot.lootType, state.hero.passiveTools[loot.lootType]);
             state.hero.passiveTools[loot.lootType] = applyUpgrade(state.hero.passiveTools[loot.lootType], loot);
+            //console.log('->', loot.lootType, state.hero.passiveTools[loot.lootType]);
         } else if ([
             'fire', 'lightning', 'ice'
         ].includes(loot.lootType)) {
@@ -653,32 +655,35 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: Lo
         }
         updateHeroMagicStats(state);
     },
-    bigKey: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition) => {
+    bigKey: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
         const inventory = getDungeonInventory(state);
         inventory.bigKey = true;
         updateDungeonInventory(state, inventory, false);
     },
-    map: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition) => {
+    map: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
         const inventory = getDungeonInventory(state);
         inventory.map = true;
         updateDungeonInventory(state, inventory, false);
     },
-    smallKey: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition) => {
+    smallKey: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
         const inventory = getDungeonInventory(state);
         inventory.smallKeys++;
         updateDungeonInventory(state, inventory, false);
     },
-    peach: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition) => {
+    peach: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
         state.hero.life = Math.min(state.hero.life + 1, state.hero.maxLife);
     },
-    peachOfImmortality: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition) => {
+    peachOfImmortality: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
         state.hero.maxLife++;
         state.hero.life = state.hero.maxLife;
     },
-    peachOfImmortalityPiece: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition) => {
+    peachOfImmortalityPiece: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
         state.hero.peachQuarters++;
         if (state.hero.peachQuarters >= 4) {
             state.hero.peachQuarters -= 4;
+            if (simulate) {
+                state.hero.maxLife++;
+            }
             // You will gain the full peach from the dialogue effect.
         }
     },

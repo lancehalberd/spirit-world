@@ -205,7 +205,7 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "guardianMarkerEasy", x: 80, y: 416, type: "marker"},
         {status: "normal", id: "guardianMarkerHard", x: 144, y: 384, type: "marker"},
         {status: "normal", id: "cocoonGuardianPostBoss", x: 112, y: 112, d: "down", behavior: "none", style: "vanara", type: "npc", dialogueKey: "tombGuardian", dialogue: "This is the Cocoon, but it is still under construction.\n{|}Normally you would need to fight a boss to get to me, but I'll just give you this for now.\n{teleportation:1}", logicKey: "cocoonBossDefeated"},
-        {status: "normal", id: "cocoonBoss", logicKey: "cocoonBossStarted", x: 400, y: 144, type: "boss", enemyType: "guardian", lootType: "empty", lootAmount: 1, lootLevel: 1, d: "down", params: {}},
+        {status: "normal", id: "cocoonBoss", logicKey: "cocoonBossStarted", x: 368, y: 112, type: "boss", enemyType: "guardian", lootType: "peachOfImmortality", lootAmount: 1, lootLevel: 1, d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -745,7 +745,7 @@ const sf2_0x0: AreaDefinition = {
         {status: "normal", id: "cocoonBackPit", x: 400, y: 160, targetZone: "cocoon", targetObjectId: "cocoonBackMarker", type: "pitEntrance"},
         {status: "normal", id: "", x: 352, y: 144, type: "teleporter"},
         {status: "normal", id: "", x: 400, y: 400, type: "teleporter"},
-        {status: "locked", id: "cocoonLockedDoor", x: 368, y: 480, type: "door", style: "cave", targetZone: "cocoon", targetObjectId: "cocoonSealedLockedDoor", d: "down", requiredKeysForLogic: 1},
+        {status: "locked", id: "cocoonLockedDoor", x: 368, y: 480, type: "door", style: "cave", targetZone: "cocoon", targetObjectId: "cocoonSealedLockedDoor", d: "down"},
         {status: "normal", id: "cocoonOpenDoor", x: 112, y: 480, type: "door", style: "cave", targetZone: "cocoon", targetObjectId: "cocoonOpenDoor", d: "down"},
         {status: "closed", id: "cocoonSealedDoor", x: 368, y: 0, type: "door", style: "cave", targetZone: "cocoon", targetObjectId: "cocoonLockedDoor", d: "up"},
         {status: "normal", id: "", x: 144, y: 144, type: "teleporter"},
