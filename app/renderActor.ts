@@ -106,12 +106,16 @@ export function getHeroFrame(state: GameState, hero: Hero): Frame {
 }
 
 export function renderHeroBarrier(context: CanvasRenderingContext2D, state: GameState, hero: Hero): void {
+    // Don't render the shield when the full player sprite isn't rendered.
+    if (hero.action === 'falling') {
+        return;
+    }
     context.save();
         if (hero.invulnerableFrames) {
             context.globalAlpha *= (0.7 + 0.3 * Math.cos(2 * Math.PI * hero.invulnerableFrames * 3 / 50));
         }
         context.beginPath();
-        context.arc(hero.x + hero.w / 2, hero.y + hero.h / 2, 8, 0 , 2 * Math.PI);
+        context.arc(hero.x + hero.w / 2, hero.y + hero.h / 2 - hero.z, 8, 0 , 2 * Math.PI);
         context.save();
             context.fillStyle = '#0088FF';
             context.globalAlpha *= 0.4 + 0.1 * Math.sin(state.time / 200);
