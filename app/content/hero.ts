@@ -284,7 +284,7 @@ export class Hero implements Actor, SavedHeroData {
             }
             return;
         }
-        if (hero.action === 'fallen') {
+        if (hero.action === 'fallen' || hero.action === 'sankInLava') {
             return;
         }
         if (hero.passiveTools.charge && hero.action === 'charging') {

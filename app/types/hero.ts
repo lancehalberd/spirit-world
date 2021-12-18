@@ -8,7 +8,9 @@ export type Action =
     'attack' | 'charging' | 'roll' | 'knocked' | 'hurt' | 'dead' | 'walking'
     | 'pushing' | 'grabbing' | 'carrying' | 'throwing' | 'thrown' | 'getItem'
     | 'beingCarried'
-    | 'falling' | 'fallen' | 'meditating'
+    | 'falling' | 'fallen'
+    | 'sinkingInLava' | 'sankInLava'
+    | 'meditating'
     // Used for climbing vines on walls or ladders. The player moves more slowly and cannot use abilities while climbing.
     | 'climbing'
     // Used when jumping off of ledges. This causes the character to move in a specific fall trajectory

@@ -165,7 +165,7 @@ function moveActorInDirection(
         // of solid tiles to make them passable.
         const isTilePassable = (!tileBehavior?.solid || tileBehavior.climbable);
         // The second condition is a hack to prevent enemies from walking over pits.
-        if (!isTilePassable || (tileBehavior?.pit && !canFall)) {
+        if (!isTilePassable || ((tileBehavior?.pit || tileBehavior?.isLava) && !canFall)) {
             blockedByTile = true;
         }
         if (tileBehavior?.water && !canSwim) {
@@ -479,7 +479,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
                 hero.wading = false;
             }
             // Use z <= 1 so that feather boots are still caught here.
-            if (behaviors.pit && (!hero.equipedGear.cloudBoots || !behaviors.cloudGround)) {
+            if ((behaviors.pit || behaviors.isLava) && (!hero.equipedGear.cloudBoots || !behaviors.cloudGround)) {
                 if (hero.y - row * 16 > 4) {
                     if (hero.x - column * 16 > 4) {
                         fallingTopLeft = true;
@@ -525,6 +525,10 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
             hero.x = Math.round(hero.x / tileSize) * tileSize;
             hero.y = Math.round(hero.y / tileSize) * tileSize;
             hero.animationTime = 0;
+            let behaviors = behaviorGrid[(hero.y / 16) | 0]?.[(hero.x / 16) | 0];
+            if (behaviors?.isLava) {
+                hero.action = 'sinkingInLava';
+            }
         }
     } else if (hero.z <= 0 && hero.action !== 'roll') {
         if (fallingTopLeft && fallingTopRight) {

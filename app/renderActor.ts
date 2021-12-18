@@ -27,6 +27,7 @@ export function getHeroFrame(state: GameState, hero: Hero): Frame {
     }
     switch (hero.action) {
         case 'falling':
+        case 'sinkingInLava':
             animations = heroAnimations.falling;
             break;
         // Grabbing currently covers animations for pulling/pushing objects that are grabbed.
@@ -113,7 +114,7 @@ export function getHeroFrame(state: GameState, hero: Hero): Frame {
 
 export function renderHeroBarrier(context: CanvasRenderingContext2D, state: GameState, hero: Hero): void {
     // Don't render the shield when the full player sprite isn't rendered.
-    if (hero.action === 'falling') {
+    if (hero.action === 'falling' || hero.action === 'sinkingInLava') {
         return;
     }
     context.save();
@@ -168,7 +169,10 @@ export function renderCarriedTile(context: CanvasRenderingContext2D, state: Game
 
 export function renderHeroShadow(context: CanvasRenderingContext2D, state: GameState, hero: Hero, forceDraw: boolean = false): void {
     if (!forceDraw && (
-        hero.action === 'fallen' || hero.action === 'falling' || hero.action === 'climbing' || hero.swimming || hero.wading
+        hero.action === 'fallen' || hero.action === 'falling'
+        || hero.action === 'sinkingInLava'  || hero.action === 'sankInLava'
+        || hero.action === 'climbing'
+        || hero.swimming || hero.wading
     )) {
         return;
     }

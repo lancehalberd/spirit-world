@@ -378,16 +378,16 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         //dy = 1;
     } else if (!isAstralProjection && hero.action === 'climbing') {
         movementSpeed *= 0.5;
-    }  else if (!isAstralProjection && hero.action === 'falling') {
+    } else if (!isAstralProjection && (hero.action === 'falling' || hero.action === 'sinkingInLava')) {
         movementSpeed = 0;
         hero.vx = 0;
         hero.vy = 0;
         if (hero.animationTime >= fallAnimation.duration) {
-            hero.action = 'fallen';
+            hero.action = hero.action === 'falling' ? 'fallen' : 'sankInLava';
             hero.actionFrame = 0;
         }
-    } else if (!isAstralProjection && hero.action === 'fallen') {
-        if (state.location.zoneKey === 'sky') {
+    } else if (!isAstralProjection && (hero.action === 'fallen' || hero.action === 'sankInLava')) {
+        if (hero.action === 'fallen' && state.location.zoneKey === 'sky') {
             enterLocation(state, {
                 zoneKey: 'overworld',
                 floor: 0,
@@ -408,7 +408,14 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             hero.d = hero.safeD;
             hero.x = hero.safeX;
             hero.y = hero.safeY;
-            hero.takeDamage(state, 1);
+            let damage = 1;
+            if (hero.action === 'sankInLava') {
+                damage = 8;
+                if (hero.passiveTools.fireBlessing) {
+                    damage /= 2;
+                }
+            }
+            hero.takeDamage(state, damage);
             // For now leave the hero in the 'fallen' state if they died, otherwise they reappear
             // just fine when the continue/quit option shows up.
             // Once the death animation is added we can probably remove this check if we want.
@@ -932,7 +939,10 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
     }
     let isTouchingAirBubble = false;
     // Mostly don't check for pits/damage when the player cannot control themselves.
-    if (hero.action !== 'beingCarried' && hero.action !== 'falling' && hero.action !== 'fallen' && hero.action !== 'knocked'
+    if (hero.action !== 'beingCarried'
+        && hero.action !== 'falling' && hero.action !== 'fallen'
+        && hero.action !== 'sinkingInLava' && hero.action !== 'sankInLava'
+        && hero.action !== 'knocked'
         && hero.action !== 'dead'  && hero.action !== 'getItem'
     ) {
         if (!isAstralProjection) {
