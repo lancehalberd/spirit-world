@@ -28,10 +28,7 @@ Graphics:
 
 Current tasks:
     - Crater Dungeon
-        - Add lava tiles
-            - Lava tiles ignore the behavior of tiles underneath them.
-            - Act similar to pits except can be solidified and deal 4 hearts of fire damage.
-            - Eventually want a mechanism to gradually melt solidified magma or frozen tiles.
+        - Entrance should be blocked by cooled solid magma until elemental beasts are released.
         - Add Shepard's Maw enemy
             - Like a carnivorous plant in the spirit world
             - Projects fake enemies on tendrils into the material world to herd prey to its mouth
@@ -68,6 +65,9 @@ Current tasks:
 
     - Randomizer improvements
         - Add a goal
+        - Add passage to the peak peach piece in logic.
+            - Chest is only in logic if the player has ice magic, gloves 2 or defeated the fire beast, even though it is obtainable without any of these before the fire beast is released.
+        - Add crater to logic once it has checks.
     - brainstorm some dungeon/boss ideas, maybe for Staff Tower
 
 
@@ -103,6 +103,9 @@ High level list of things left to do:
         Iron Skin (slowly regenerates health shield = 20% total health)
         Gold Mail (reduce damage by 50%)
         Gloves charge 1 + 2
+
+Lava improvments:
+    - Temporarily create solid ground when hit by ice.
 
 Add toasts to development for undoing actions:
     - Deleting layers
