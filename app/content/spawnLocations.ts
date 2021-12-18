@@ -154,6 +154,18 @@ export const RIVER_TEMPLE_BOSS: ZoneLocation = {
 };
 
 
+export const SPAWN_CRATER_ENTRANCE: ZoneLocation = {
+    zoneKey: 'crater',
+    floor: 0,
+    x: 60,
+    y: 440,
+    z: 0,
+    d: 'up',
+    areaGridCoords: {y: 2, x: 0},
+    isSpiritWorld: false,
+};
+
+
 function applyItems(savedState: SavedState, items: {[key: string]: number}, objectFlags: string[] = []): SavedState {
     const newState: SavedState = cloneDeep(savedState);
     for (const flag of objectFlags) {
@@ -365,5 +377,11 @@ export function checkToUpdateSpawnLocation(state: GameState): void {
     }
     if (state.location.zoneKey === 'helix') {
         return setSpawnLocation(state, SPAWN_HELIX_ENTRANCE);
+    }
+    if (state.location.zoneKey === 'waterfallTower') {
+        return setSpawnLocation(state, SPAWN_WATERFALL_ENTRANCE);
+    }
+    if (state.location.zoneKey === 'crater') {
+        return setSpawnLocation(state, SPAWN_CRATER_ENTRANCE);
     }
 }

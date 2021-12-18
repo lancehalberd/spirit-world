@@ -562,8 +562,12 @@ export function renderLayer(area: AreaInstance, layer: AreaLayer, parentLayer: A
     const context = isForeground ? area.foregroundContext : area.context;
     const w = 16, h = 16;
     context.save();
-    if (editingState.isEditing && editingState.selectedLayerKey && editingState.selectedLayerKey !== layer.key) {
-        context.globalAlpha *= 0.5;
+    if (editingState.isEditing && editingState.selectedLayerKey !== layer.key) {
+        if (layer.definition.visibilityOverride === 'fade') {
+            context.globalAlpha *= 0.3;
+        } else if (editingState.selectedLayerKey) {
+            context.globalAlpha *= 0.5;
+        }
     }
     for (let y = 0; y < layer.h; y++) {
         if (!area.tilesDrawn[y]) {

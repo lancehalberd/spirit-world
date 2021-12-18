@@ -474,9 +474,7 @@ export function applyLayerToBehaviorGrid(behaviorGrid: TileBehaviors[][], layer:
             // The behavior grid combines behaviors of all layers, with higher layers
             // overriding the behavior of lower layers.
             if (behaviors) {
-                const lightRadius = Math.max(behaviorGrid[y][x]?.lightRadius || 0, behaviors.lightRadius || 0);
-                const brightness = Math.max(behaviorGrid[y][x]?.brightness || 0, behaviors.brightness || 0);
-                behaviorGrid[y][x] = {...(behaviorGrid[y][x] || {}), ...behaviors, lightRadius, brightness};
+                applyTileBehaviorToGrid(behaviorGrid, {x, y}, behaviors);
             }
         }
     }
@@ -498,9 +496,19 @@ export function resetTileBehavior(area: AreaInstance, {x, y}: Tile): void {
             if (!area.behaviorGrid[y]) {
                 area.behaviorGrid[y] = [];
             }
-            area.behaviorGrid[y][x] = {...(area.behaviorGrid[y][x] || {}), ...tile.behaviors};
+            applyTileBehaviorToGrid(area.behaviorGrid, {x, y}, tile.behaviors);
         }
     }
+}
+
+export function applyTileBehaviorToGrid(behaviorGrid: TileBehaviors[][], {x, y}: Tile, behaviors: TileBehaviors): void {
+    // Lava + clouds erase the behaviors of tiles underneath them.
+    if (behaviors.isLava || behaviors.cloudGround) {
+        behaviorGrid[y][x] = {};
+    }
+    const lightRadius = Math.max(behaviorGrid[y][x]?.lightRadius || 0, behaviors.lightRadius || 0);
+    const brightness = Math.max(behaviorGrid[y][x]?.brightness || 0, behaviors.brightness || 0);
+    behaviorGrid[y][x] = {...(behaviorGrid[y][x] || {}), ...behaviors, lightRadius, brightness};
 }
 
 export function mapTileNumbersToFullTiles(tileNumbers: number[][]): FullTile[][] {
@@ -544,12 +552,18 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
             if (editingState.isEditing && editingState.selectedLayerKey === layer.key) {
                 return true;
             }
-            // visibilityOverride dictates state of layers if they are not selected and it is set to show/hide.
-            if (layer.visibilityOverride === 'show') {
+            // visibilityOverride dictates state of layers if they are not selected and it is set to show/fade/hide.
+            if (layer.visibilityOverride === 'show' || layer.visibilityOverride === 'fade') {
                 return true;
             }
             if (layer.visibilityOverride === 'hide') {
                 return false;
+            }
+            // Custom logic can be specified instead of a logic key for single flag checks.
+            if (layer.hasCustomLogic && layer.customLogic) {
+                return isLogicValid(state, {
+                    requiredFlags: [layer.customLogic]
+                }, layer.invertLogic);
             }
             // Layers without logic are visible by default.
             if (!layer.logicKey) {
@@ -563,7 +577,7 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
                 return false;
             }
             // If the layer has logic, only display it if the logic is valid.
-            return isLogicValid(state, logic);
+            return isLogicValid(state, logic, layer.invertLogic);
         }).map(layer => ({
             definition: layer,
             ...layer,
@@ -583,10 +597,6 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
         neutralTargets: [],
         enemies: [],
     };
-    for (const layer of instance.layers) {
-        const definitionIndex = definition.layers.indexOf(layer.definition);
-        applyLayerToBehaviorGrid(behaviorGrid, instance.definition.layers[definitionIndex], definition.parentDefinition?.layers[definitionIndex]);
-    }
     if (definition.parentDefinition) {
         for (const layer of instance.layers) {
             const definitionIndex = definition.layers.indexOf(layer.definition);
@@ -619,6 +629,10 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
             }
         }
     }
+    for (const layer of instance.layers) {
+        const definitionIndex = definition.layers.indexOf(layer.definition);
+        applyLayerToBehaviorGrid(behaviorGrid, instance.definition.layers[definitionIndex], definition.parentDefinition?.layers[definitionIndex]);
+    }
     definition.objects.filter(
         object => isObjectLogicValid(state, object)
     ).map(o => addObjectToArea(state, instance, createObjectInstance(state, o)));
@@ -641,8 +655,63 @@ export function getAreaSize(state: GameState): {w: number, h: number, section: R
 }
 
 export function refreshAreaLogic(state: GameState, area: AreaInstance): void {
+    let lastLayerIndex = -1, refreshBehavior = false;
+    for (let i = 0; i < area.definition.layers.length; i++) {
+        const layerDefinition = area.definition.layers[i];
+        const layerIndex = area.layers.findIndex(l => l.definition === layerDefinition);
+        if (layerIndex >= 0) {
+            lastLayerIndex = layerIndex;
+        }
+        if (!layerDefinition.hasCustomLogic && !layerDefinition.logicKey) {
+            continue;
+        }
+        let showLayer = false;
+        if (layerDefinition.hasCustomLogic) {
+            showLayer = isLogicValid(state, {
+                requiredFlags: [layerDefinition.customLogic]
+            }, layerDefinition.invertLogic);
+        }
+        if (layerDefinition.logicKey) {
+            showLayer = isLogicValid(state, logicHash[layerDefinition.logicKey], layerDefinition.invertLogic);
+        }
+        if (layerIndex >= 0 && !showLayer) {
+            // Remove the layer if it is present but should be hidden.
+            area.layers.splice(layerIndex, 1);
+            area.alternateArea.layers.splice(layerIndex, 1);
+            refreshBehavior = true;
+        } else if (layerIndex < 0 && showLayer) {
+            // Add the layer if it is hidden but should be present.
+            for (const instance of [area, area.alternateArea]) {
+                const definition = instance.definition.layers[i];
+                const newLayer = {
+                    definition: definition,
+                    ...definition,
+                    ...definition.grid,
+                    tiles: mapTileNumbersToFullTiles(definition.grid.tiles),
+                    maskTiles: mapTileNumbersToFullTiles(definition.mask?.tiles),
+                    originalTiles: mapTileNumbersToFullTiles(definition.grid.tiles),
+                }
+                instance.layers.splice(lastLayerIndex, 0, newLayer);
+            }
+            refreshBehavior = true;
+        }
+    }
+    if (refreshBehavior) {
+        for (const instance of [area, area.alternateArea]) {
+            instance.tilesDrawn = [];
+            instance.checkToRedrawTiles = true;
+            instance.behaviorGrid = [];
+            for (const layer of instance.layers) {
+                const definitionIndex = instance.definition.layers.indexOf(layer.definition);
+                applyLayerToBehaviorGrid(instance.behaviorGrid,
+                    instance.definition.layers[definitionIndex],
+                    instance.definition.parentDefinition?.layers[definitionIndex]
+                );
+            }
+        }
+    }
     for (const object of area.definition.objects) {
-        if (!object.logicKey) {
+        if (!object.logicKey && !object.hasCustomLogic) {
             continue;
         }
         let instance = area.objects.find(o => o.definition === object);
@@ -673,6 +742,9 @@ export function applyBehaviorToTile(area: AreaInstance, x: number, y: number, be
 }
 
 export function isObjectLogicValid(state: GameState, definition: ObjectDefinition): boolean {
+    if (definition.hasCustomLogic && definition.customLogic) {
+        return isLogicValid(state, {requiredFlags: [definition.customLogic]}, definition.invertLogic);
+    }
     if (!definition.logicKey) {
         return true;
     }

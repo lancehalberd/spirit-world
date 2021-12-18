@@ -1,12 +1,14 @@
+import { playAreaSound, refreshAreaLogic } from 'app/content/areas';
 import {
     toggleTarget,
     checkIfAllSwitchesAreActivated,
     deactivateTargets,
     findObjectInstanceById,
+    getObjectStatus,
+    saveObjectStatus,
 } from 'app/content/objects';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { rectanglesOverlap } from 'app/utils/index';
-import { playAreaSound } from 'app/content/areas';
 
 import {
     AreaInstance, DrawPriority, FloorSwitchDefinition, GameState,
@@ -23,10 +25,13 @@ export class FloorSwitch implements ObjectInstance {
     x: number;
     y: number;
     status: ObjectStatus = 'normal';
-    constructor(definition: FloorSwitchDefinition) {
+    constructor(state: GameState, definition: FloorSwitchDefinition) {
         this.definition = definition;
         this.x = definition.x;
         this.y = definition.y;
+        if (getObjectStatus(state, definition)) {
+            this.status = 'active';
+        }
     }
     getHitbox(state: GameState): Rect {
         return { x: this.x + 2, y: this.y + 2, w: 12, h: 12 };
@@ -51,6 +56,12 @@ export class FloorSwitch implements ObjectInstance {
             this.status = 'normal';
         } else {
             this.status = 'active';
+            saveObjectStatus(state, this.definition, true);
+            if (this.definition.id && (this.definition.saveStatus === 'forever' || this.definition.saveStatus === 'zone')) {
+                // Refresh the area to update layer logic, for example drainging lava in the crater.
+                refreshAreaLogic(state, state.areaInstance);
+                refreshAreaLogic(state, state.alternateAreaInstance);
+            }
         }
         if (this.definition.toggleOnRelease && this.definition.targetObjectId) {
             if (this.status === 'active') {
@@ -79,6 +90,10 @@ export class FloorSwitch implements ObjectInstance {
     }
 
     update(state: GameState) {
+        // Switches with save status turned on stay depressed after they are stepped on.
+        if ((this.definition.saveStatus === 'zone' || this.definition.saveStatus === 'forever') && this.status === 'active') {
+            return;
+        }
         if (this.status === 'active' && !this.isDepressed(state)) {
             this.onToggle(state);
         } else if (this.status === 'normal' && this.isDepressed(state)) {

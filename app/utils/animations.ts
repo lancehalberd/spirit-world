@@ -1,8 +1,9 @@
+import { createCanvasAndContext, debugCanvas } from 'app/dom';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { requireImage } from 'app/utils/images';
 import {
     ExtraAnimationProperties, Frame, FrameAnimation, FrameDimensions, FrameRectangle,
-    Rect
+    Rect, TintedFrame,
 } from 'app/types';
 
 interface CreateAnimationOptions {
@@ -131,6 +132,44 @@ export function getFrameHitBox({content, w, h}: Frame, {x, y}: {x: number, y: nu
         h: content?.h ?? h,
     };
 }
+
+export function drawSolidTintedFrame(context, frame: TintedFrame, target: Rect) {
+    const [tintCanvas, tintContext] = createCanvasAndContext(frame.w, frame.h);
+    // First make a solid color in the shape of the image to tint.
+    tintContext.save();
+        tintContext.fillStyle = frame.color;
+        tintContext.clearRect(0, 0, frame.w, frame.h);
+        const tintRectangle = {...frame, x: 0, y: 0};
+        drawFrame(tintContext, frame, tintRectangle);
+        tintContext.globalCompositeOperation = "source-in";
+        tintContext.fillRect(0, 0, frame.w, frame.h);
+        drawFrame(context, {...tintRectangle, image: tintCanvas}, target);
+    tintContext.restore();
+}
+
+export function drawTintedImage(
+    context: CanvasRenderingContext2D,
+    frame: TintedFrame,
+    target: Rect
+) {
+    const [tintCanvas, tintContext] = createCanvasAndContext(frame.w, frame.h);
+    // First make a solid color in the shape of the image to tint.
+    tintContext.save();
+        tintContext.fillStyle = frame.color;
+        tintContext.clearRect(0, 0, frame.w, frame.h);
+        tintContext.drawImage(frame.image, frame.x, frame.y, frame.w, frame.h, 0, 0, frame.w, frame.h);
+        tintContext.globalCompositeOperation = "source-in";
+        tintContext.fillRect(0, 0, frame.w, frame.h);
+    tintContext.restore();
+    context.save();
+        // Next draw the untinted image to the target.
+        context.drawImage(frame.image, frame.x, frame.y, frame.w, frame.h, target.x, target.y, target.w, target.h);
+        // Finally draw the tint color on top of the target with the desired opacity.
+        context.globalAlpha *= frame.amount; // This needs to be multiplicative since we might be drawing a partially transparent image already.
+        context.drawImage(tintCanvas, 0, 0, frame.w, frame.h, target.x, target.y, target.w, target.h);
+    context.restore();
+}
+debugCanvas;
 
 /*export function drawFrameCenteredInTarget(
     context: CanvasRenderingContext2D,

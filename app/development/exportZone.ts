@@ -73,6 +73,10 @@ export function serializeZone(zone: Zone) {
                             if (layer.y) lines.push(`            y: ${layer.y},`);
                             if (layer.drawPriority) lines.push(`            drawPriority: '${layer.drawPriority}',`);
                             if (layer.logicKey) lines.push(`            logicKey: '${layer.logicKey}',`);
+                            if (layer.hasCustomLogic) {
+                                lines.push(`            hasCustomLogic: true, customLogic: '${layer.customLogic || ''}',`);
+                            }
+                            if (layer.invertLogic) lines.push(`            invertLogic: true,`);
                             if (layer.grid) {
                                 lines.push('            grid: {');
                                 lines.push(`                w: ${layer.grid.w},`);

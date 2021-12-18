@@ -10,7 +10,7 @@ import {
 } from 'app/content/bitMasks';
 import { simpleLootTable, lifeLootTable, moneyLootTable } from 'app/content/lootTables';
 import { createCanvasAndContext, debugCanvas } from 'app/dom';
-import { createAnimation, drawFrame } from 'app/utils/animations';
+import { createAnimation, drawFrame, drawTintedImage } from 'app/utils/animations';
 import { allImagesLoaded, requireImage } from 'app/utils/images';
 
 import { Frame, FullTile, TileBehaviors, TileHashMap } from 'app/types';
@@ -1161,6 +1161,25 @@ const newTiles: Frame = {
 //(async () => console.log((await findUniqueTiles(newTiles)).map(o => `[${o.x},${o.y}]`).join(',')));//();
 (() => logUniqueTiles(newTiles));//();
 
+
+const [lavaCanvas, lavaContext] = createCanvasAndContext(64, 80);
+const createLavaTiles = async () => {
+    await allImagesLoaded();
+    drawTintedImage(lavaContext,
+        {image: requireImage('gfx/tiles/cloud.png'), x: 0, y: 0, w: 64, h: 80, color: '#F00', amount: 0.6},
+        {x: 0, y: 0, w: lavaCanvas.width, h: lavaCanvas.height }
+    );
+}
+createLavaTiles();
+//debugCanvas(lavaCanvas);
+const lava: TileSource = {
+    w: 16, h: 16,
+    source: {image: lavaCanvas, x: 0, y: 0, w: 64, h: 80},
+    behaviors: {
+        'all': { defaultLayer: 'floor2', isLava: true },
+    },
+};
+
 const deletedTileSource: TileSource = solidColorTile('#FF0000', {deleted: true});
 function deletedTiles(n: number): TileSource[] {
     return [...new Array(n)].map(() => deletedTileSource);
@@ -1280,6 +1299,7 @@ addTiles([
     caveLedges,
     caveStairs,
     caveCeilingTopAngles,
+    lava,
 ]);
 
 // This invalid is in the middle of a bunch of other tiles so it is easiest to just delete after adding it.

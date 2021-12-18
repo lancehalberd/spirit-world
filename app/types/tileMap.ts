@@ -160,16 +160,19 @@ export interface ZoneLocation {
 
 export interface AreaLayerDefinition {
     // Unique identifier for this layer.
-    key: string,
-    logicKey?: string,
-    drawPriority?: DrawPriority,
-    grid?: TileGridDefinition,
-    mask?: TileGridDefinition,
+    key: string
+    logicKey?: string
+    invertLogic?: boolean
+    hasCustomLogic?: boolean
+    customLogic?: string
+    drawPriority?: DrawPriority
+    grid?: TileGridDefinition
+    mask?: TileGridDefinition
     // This is not saved on export and is just used when editing.
-    visibilityOverride?: 'show' | 'hide',
+    visibilityOverride?: 'show' | 'fade' | 'hide'
     // Coordinates for the layer origin, if not (0, 0).
-    x?: number,
-    y?: number,
+    x?: number
+    y?: number
 }
 
 export interface AreaLayer extends AreaTileGrid {

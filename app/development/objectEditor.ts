@@ -390,18 +390,34 @@ export function getObjectProperties(state: GameState, editingState: EditingState
     });
     rows.push({
         name: 'Logic',
-        value: object.logicKey || 'none',
-        values: ['none', ...Object.keys(logicHash)],
+        value: object.hasCustomLogic ? 'custom' : (object.logicKey || 'none'),
+        values: ['none', 'custom', ...Object.keys(logicHash)],
         onChange(logicKey: string) {
             if (logicKey === 'none') {
                 delete object.logicKey;
-            } else {
+                delete object.hasCustomLogic;
+            } else if (logicKey === 'custom') {
+                delete object.logicKey;
+                object.hasCustomLogic = true;
+            } else{
                 object.logicKey = logicKey;
+                delete object.hasCustomLogic;
             }
             updateObjectInstance(state, object);
+            displayTileEditorPropertyPanel();
         },
-    },
-    {
+    });
+    if (object.hasCustomLogic) {
+        rows.push({
+            name: 'Custom Logic',
+            value: object.customLogic || '',
+            onChange(customLogic: string) {
+                object.customLogic = customLogic;
+                updateObjectInstance(state, object);
+            },
+        });
+    }
+    rows.push({
         name: 'Invert Logic',
         value: object.invertLogic || false,
         onChange(invertLogic: boolean) {

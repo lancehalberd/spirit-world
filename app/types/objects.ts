@@ -138,28 +138,30 @@ export interface HitResult {
 }
 
 export interface BaseObjectDefinition {
-    id: string,
+    id: string
     // Whether this is linked to an object in the physical/spirit world.
-    linked?: boolean,
+    linked?: boolean
     // If true, use the inverse of the given logic check.
-    invertLogic?: boolean,
+    invertLogic?: boolean
     // This can be set to control the presence of this object with a logic check.
     // For example, frozen doors vs normal doors are displayed in river temple based on the status of the frost beast,
     // and doors for the Staff Tower are only added when the Staff Tower is in the corresponding location.
-    logicKey?: string,
+    logicKey?: string
+    hasCustomLogic?: boolean
+    customLogic?: string
     // Whether to save the status of this object permanently (for example switches to open dungeon doors).
     // If this is unset, the default behavior depends on the object type, for examples enemies are saved for
     // the zone, bosses are saved forever, and most objects aren't saved at all.
-    saveStatus?: 'forever' | 'zone' | 'never',
+    saveStatus?: 'forever' | 'zone' | 'never'
     // Whether this is a spirit object.
-    spirit?: boolean,
+    spirit?: boolean
     // Stores optional style type for some objects, e.g., 'short' vs 'tall' signs.
-    style?: string,
-    status: ObjectStatus,
-    isFrozen?: boolean,
-    x: number,
-    y: number,
-    d?: Direction,
+    style?: string
+    status: ObjectStatus
+    isFrozen?: boolean
+    x: number
+    y: number
+    d?: Direction
 }
 
 export interface BallGoalDefinition extends BaseObjectDefinition {

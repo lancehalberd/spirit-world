@@ -178,6 +178,12 @@ const shadows: TilePalette = [
     [683, 687, 688, 691, 705, 706, 721, 722, ],
     [714, 718, 719, 724, , , , , ],
 ];
+const lava: TilePalette = [
+    [886, 887, 888, 898, 899, 0, 898, 899, 0],
+    [890, 891, 892, 902, 903, 898, 905, 904, 899],
+    [894, 895, 896, 900, 901, 902, 901, 900, 903],
+    [889, 893, 897, 904, 905, 0, 902, 903, 0],
+]
 // Use this to export the current brush as a palette grid.
 /**
 console.log(editingState.brush.none.tiles.map(t => "\t[" + t.join(", ") + "],").join("\n"));
@@ -185,6 +191,7 @@ console.log(editingState.brush.none.tiles.map(t => "\t[" + t.join(", ") + "],").
 export const palettes = {
     overworld,
     cave,
+    lava,
     caveRoom,
     water,
     town,

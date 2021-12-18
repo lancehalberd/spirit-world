@@ -52,7 +52,7 @@ export function createObjectInstance(state: GameState, object: ObjectDefinition)
     } else if (object.type === 'door' || object.type === 'stairs') {
         return new Door(state, object);
     } else if (object.type === 'floorSwitch') {
-        return new FloorSwitch(object);
+        return new FloorSwitch(state, object);
     } else if (object.type === 'keyBlock') {
         return new KeyBlock(state, object);
     }  else if (object.type === 'npc') {

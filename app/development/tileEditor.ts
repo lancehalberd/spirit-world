@@ -283,8 +283,8 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
             name: '',
             id: `layer-${i}-visibility`,
             value: definition.visibilityOverride || 'auto',
-            values: ['auto', 'show', 'hide'],
-            onChange(visibilityOverride: 'auto' | 'show' | 'hide') {
+            values: ['auto', 'show', 'fade', 'hide'],
+            onChange(visibilityOverride: 'auto' | 'show' | 'fade' | 'hide') {
                 if (visibilityOverride === 'auto') {
                     delete definition.visibilityOverride;
                     if (alternateDefinition) {
@@ -348,26 +348,74 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
                 },
             });
             rows.push(row);
-            row = [{
+            rows.push({
                 name: 'Logic',
                 id: `layer-${i}-logic`,
-                value: definition.logicKey || 'none',
-                values: ['none', ...Object.keys(logicHash)],
+                value: definition.hasCustomLogic ? 'custom' : (definition.logicKey || 'none'),
+                values: ['none', 'custom', ...Object.keys(logicHash)],
                 onChange(logicKey: string) {
                     if (logicKey === 'none') {
                         delete definition.logicKey;
-                        delete alternateDefinition.logicKey;
+                        delete definition.hasCustomLogic;
+                        if (alternateDefinition) {
+                            delete alternateDefinition.logicKey;
+                            delete alternateDefinition.hasCustomLogic;
+                        }
+                    } else if (logicKey === 'custom') {
+                        definition.hasCustomLogic = true;
+                        delete definition.logicKey;
+                        if (alternateDefinition) {
+                            alternateDefinition.hasCustomLogic = true;
+                            delete alternateDefinition.logicKey;
+                        }
                     } else {
                         definition.logicKey = logicKey;
+                        delete definition.hasCustomLogic;
                         if (alternateDefinition) {
                             alternateDefinition.logicKey = logicKey;
+                            delete alternateDefinition.hasCustomLogic;
                         }
                     }
                     // Calling this will instantiate the area again and place the player back in their current location.
                     enterLocation(state, state.location);
                     displayTileEditorPropertyPanel();
                 },
-            }];
+            });
+            if (definition.hasCustomLogic ) {
+                rows.push({
+                    name: 'Custom Logic',
+                    value: definition.customLogic || '',
+                    onChange(customLogic: string) {
+                        definition.customLogic = customLogic;
+                        if (alternateDefinition) {
+                            alternateDefinition.customLogic = customLogic;
+                        }
+                        // Calling this will instantiate the area again and place the player back in their current location.
+                        enterLocation(state, state.location);
+                        displayTileEditorPropertyPanel();
+                    },
+                });
+            }
+            rows.push({
+                name: 'Invert Logic',
+                value: definition.invertLogic || false,
+                onChange(invertLogic: boolean) {
+                    if (invertLogic) {
+                        definition.invertLogic = invertLogic;
+                        if (alternateDefinition) {
+                            alternateDefinition.invertLogic = invertLogic;
+                        }
+                    } else {
+                        delete definition.invertLogic;
+                        if (alternateDefinition) {
+                            delete alternateDefinition.invertLogic;
+                        }
+                    }
+                    // Calling this will instantiate the area again and place the player back in their current location.
+                    enterLocation(state, state.location);
+                    displayTileEditorPropertyPanel();
+                },
+            });
             row.push({
                 name: 'v',
                 id: `layer-${i}-down`,
@@ -1110,7 +1158,11 @@ function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, a
                             if (selectedLayer && currentLayer !== selectedLayer) {
                                 context.globalAlpha = 0.5;
                             } else {
-                                context.globalAlpha = 1;
+                                if (currentLayer?.visibilityOverride === 'fade') {
+                                    context.globalAlpha = 0.3;
+                                } else {
+                                    context.globalAlpha = 1;
+                                }
                             }
                             let drawPriority = currentLayer?.drawPriority || brush?.drawPriority || (layerKey === 'foreground' ? 'foreground' : 'background');
                             if (drawPriority === priorityToDraw) {

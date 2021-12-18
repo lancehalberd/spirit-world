@@ -163,7 +163,7 @@ function moveActorInDirection(
         }
         // Climbable overrides solid tile behavior. This allows use to place tiles marked climbable on top
         // of solid tiles to make them passable.
-        const isTilePassable = (!tileBehavior?.solid || tileBehavior.climbable || (tileBehavior.cloudGround && !tileBehavior.solidMap));
+        const isTilePassable = (!tileBehavior?.solid || tileBehavior.climbable);
         // The second condition is a hack to prevent enemies from walking over pits.
         if (!isTilePassable || (tileBehavior?.pit && !canFall)) {
             blockedByTile = true;
