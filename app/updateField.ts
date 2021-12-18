@@ -117,7 +117,7 @@ function switchElement(state: GameState, delta: number): void {
         }
     }
     const index = allElements.indexOf(state.hero.element);
-    state.hero.element = allElements[(index + delta + allElements.length) % allElements.length];
+    state.hero.setElement(allElements[(index + delta + allElements.length) % allElements.length])
 }
 
 function removeDefeatedEnemies(state: GameState, area: AreaInstance): void {

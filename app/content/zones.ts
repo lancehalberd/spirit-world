@@ -7,6 +7,7 @@ export * from 'app/content/zones/zoneHash';
 export * from 'app/content/zones/sky';
 export * from 'app/content/zones/overworld';
 export * from 'app/content/zones/underwater';
+export * from 'app/content/zones/caves';
 export * from 'app/content/zones/holyCityInterior';
 export * from 'app/content/zones/treeVillage';
 export * from 'app/content/zones/peachCave';
@@ -21,6 +22,7 @@ export * from 'app/content/zones/waterfallCave';
 export * from 'app/content/zones/waterfallTower';
 export * from 'app/content/zones/riverTemple';
 export * from 'app/content/zones/riverTempleWater';
+export * from 'app/content/zones/crater';
 export * from 'app/content/zones/staffTower';
 export * from 'app/content/zones/grandTemple';
 // jade palace

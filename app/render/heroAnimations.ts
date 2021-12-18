@@ -30,6 +30,16 @@ const walkShallowUpAnimation: FrameAnimation = createAnimation('gfx/mc/mcwalking
 const walkShallowDownAnimation: FrameAnimation = createAnimation('gfx/mc/mcwalkingshallow.png', walkingGeometry, { cols: 8, y: 0, duration: 4});
 const walkShallowLeftAnimation: FrameAnimation = createAnimation('gfx/mc/mcwalkingshallow.png', walkingGeometry, { cols: 8, y: 3, duration: 4});
 const walkShallowRightAnimation: FrameAnimation = createAnimation('gfx/mc/mcwalkingshallow.png', walkingGeometry, { cols: 8, y: 1, duration: 4});
+const walkChargeUpAnimation: FrameAnimation = createAnimation('gfx/mc/mcchakramwalkcharge.png', walkingGeometry, { cols: 8, y: 2, duration: 4});
+const walkChargeDownAnimation: FrameAnimation = createAnimation('gfx/mc/mcchakramwalkcharge.png', walkingGeometry, { cols: 8, y: 0, duration: 4});
+const walkChargeLeftAnimation: FrameAnimation = createAnimation('gfx/mc/mcchakramwalkcharge.png', walkingGeometry, { cols: 8, y: 3, duration: 4});
+const walkChargeRightAnimation: FrameAnimation = createAnimation('gfx/mc/mcchakramwalkcharge.png', walkingGeometry, { cols: 8, y: 1, duration: 4});
+const idleChargeUpAnimation: FrameAnimation = createAnimation('gfx/mc/mcchakramwalkcharge.png', walkingGeometry, { cols: 1, x: 7, y: 2, duration: 4});
+const idleChargeDownAnimation: FrameAnimation = createAnimation('gfx/mc/mcchakramwalkcharge.png', walkingGeometry, { cols: 1, x: 7, y: 0, duration: 4});
+const idleChargeLeftAnimation: FrameAnimation = createAnimation('gfx/mc/mcchakramwalkcharge.png', walkingGeometry, { cols: 1, x: 7, y: 3, duration: 4});
+const idleChargeRightAnimation: FrameAnimation = createAnimation('gfx/mc/mcchakramwalkcharge.png', walkingGeometry, { cols: 1, x: 7, y: 1, duration: 4});
+
+
 
 const attackingGeometry: FrameDimensions = {w: 20, h: 28, content: {x: 2, y: 16 + Y_OFF, w: 16, h: 16}};
 const attackUpAnimation: FrameAnimation = createAnimation('gfx/mc/mcchakramthrow.png', attackingGeometry, { cols: 4, x: 1, y: 2, duration: 3}, {loop: false});
@@ -109,6 +119,12 @@ export const fallAnimation: FrameAnimation = createAnimation('gfx/mc/mcfall.png'
 const chargeGeometry: FrameDimensions = {w: 24, h: 32, content: {x: 4, y: 16, w: 16, h: 16} };
 export const chargeBackAnimation: FrameAnimation = createAnimation('gfx/mc/aura.png', chargeGeometry, { cols: 4, y: 0, duration: 5});
 export const chargeFrontAnimation: FrameAnimation = createAnimation('gfx/mc/aura.png', chargeGeometry, { cols: 4, y: 1, duration: 5});
+export const chargeFireBackAnimation: FrameAnimation = createAnimation('gfx/mc/aura_fire.png', chargeGeometry, { cols: 4, y: 0, duration: 5});
+export const chargeFireFrontAnimation: FrameAnimation = createAnimation('gfx/mc/aura_fire.png', chargeGeometry, { cols: 4, y: 1, duration: 5});
+export const chargeIceBackAnimation: FrameAnimation = createAnimation('gfx/mc/aura_ice.png', chargeGeometry, { cols: 4, y: 0, duration: 5});
+export const chargeIceFrontAnimation: FrameAnimation = createAnimation('gfx/mc/aura_ice.png', chargeGeometry, { cols: 4, y: 1, duration: 5});
+export const chargeLightningBackAnimation: FrameAnimation = createAnimation('gfx/mc/aura_lightning.png', chargeGeometry, { cols: 4, y: 0, duration: 5});
+export const chargeLightningFrontAnimation: FrameAnimation = createAnimation('gfx/mc/aura_lightning.png', chargeGeometry, { cols: 4, y: 1, duration: 5});
 
 
 export const heroAnimations: ActorAnimations = {
@@ -207,6 +223,21 @@ export const heroShallowAnimations: ActorAnimations = {
         down: pushShallowDownAnimation,
         left: pushShallowLeftAnimation,
         right: pushShallowRightAnimation,
+    },
+};
+
+export const heroChargeAnimations: ActorAnimations = {
+    idle: {
+        up: idleChargeUpAnimation,
+        down: idleChargeDownAnimation,
+        left: idleChargeLeftAnimation,
+        right: idleChargeRightAnimation,
+    },
+    move: {
+        up: walkChargeUpAnimation,
+        down: walkChargeDownAnimation,
+        left: walkChargeLeftAnimation,
+        right: walkChargeRightAnimation,
     },
 };
 

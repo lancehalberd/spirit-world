@@ -9,71 +9,73 @@ export type Direction = 'up' | 'down' | 'left' | 'right' | 'upleft' | 'upright' 
 
 export interface TileBehaviors {
     // 0-1
-    brightness?: number,
-    defaultLayer?: 'floor' | 'floor2' | 'field' | 'field2' | 'foreground' | 'foreground2',
+    brightness?: number
+    defaultLayer?: 'floor' | 'floor2' | 'field' | 'field2' | 'foreground' | 'foreground2'
     // In pixels
-    lightRadius?: number,
+    lightRadius?: number
     // Flag set to indicate tile is invalid for landing on when jumping down a cliff.
-    cannotLand?: boolean,
+    cannotLand?: boolean
     // Sets players action to 'climbing' while on the tile.
-    climbable?: boolean,
+    climbable?: boolean
     // Indicates this is a cloud ground tile that the player can walk on if they have cloud walking boots equipped.
-    cloudGround?: boolean,
+    cloudGround?: boolean
     // Can be destroyed by weapon
-    cuttable?: number,
+    cuttable?: number
     // Deals damage on contact
-    damage?: number,
+    damage?: number
     // Special development flag indicating that this tile has been deleted from the game
     // and its index is available to be used by a new tile type.
-    deleted?: boolean,
+    deleted?: boolean
     // Can be destroyed by an explosion.
-    destructible?: boolean,
+    destructible?: boolean
     // Elemental association that can be passed to other objects.
-    element?: MagicElement,
+    element?: MagicElement
     // Cliff edges in this tile, for example, if cliff edge up is true,
     // then the tile cannot be entered from the north, and can be jumped off of
     // from the south.
     // TBD: include upleft/etc which will cut tiles in half diagonally.
     edges?: {
-        up?: true,
-        down?: true,
-        left?: true,
-        right?: true,
+        up?: true
+        down?: true
+        left?: true
+        right?: true
     }
     // This tile can be jumped over in this direction but is otherwise impassable.
-    jumpDirection?: Direction,
+    jumpDirection?: Direction
     // If this is true then this tile will link to a tile with the given tile index in the alternate world.
-    linkableTiles?: number[],
+    linkableTiles?: number[]
     // If this is set, then the default tile in the spirit world will be offset by this number.
-    linkedOffset?: number,
-    lootTable?: LootTable,
+    linkedOffset?: number
+    lootTable?: LootTable
     // If this is true projectiles can pass over this tile even if it is solid.
     // Also, the bow won't cut low tiles like thorns.
-    low?: boolean,
+    low?: boolean
     // Tile to replace this with if it is exposed to an element (fire melts/burns things, ice freezes things, etc)
-    elementTiles?: {[key in MagicElement]?: number},
+    elementTiles?: {[key in MagicElement]?: number}
     // Indicates this tile is outside of the current area section.
-    outOfBounds?: boolean,
-    maskFrame?: Frame,
+    outOfBounds?: boolean
+    maskFrame?: Frame
     // Array of frames to use for particles when this tile/object is destroyed.
-    particles?: Frame[],
+    particles?: Frame[]
     // Key for the sound to play when this tile/object is destroyed.
-    breakSound?: string,
+    breakSound?: string
     // If a player falls in a pit they will take damage and respawn at their last stable location.
-    pit?: boolean,
+    pit?: boolean
+    isLava?: Boolean
+    isLavaMap?: Uint16Array
     // Assign this to skip tiles in source images.
-    skipped?: boolean,
+    skipped?: boolean
     // Blocks movement
-    solid?: boolean,
-    solidMap?: Uint16Array,
+    solid?: boolean
+    solidMap?: Uint16Array
     // Can be picked up with glove
-    pickupWeight?: number,
+    pickupWeight?: number
     // Tile to display if this tile is removed (picked up, cut, blown up).
-    underTile?: number,
-    growTiles?: number[],
-    shallowWater?: boolean,
-    slippery?: boolean,
-    water?: boolean,
+    underTile?: number
+    growTiles?: number[]
+    shallowWater?: boolean
+    slippery?: boolean
+    water?: boolean
 }
 
 export type TilePalette = number[][];

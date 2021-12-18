@@ -69,8 +69,15 @@ export class ThrownChakram implements ObjectInstance {
         if (this.area.objects.indexOf(this.source) < 0) {
             this.source = state.hero;
         }
-        if (this.piercing && ((this.animationTime < 200 && this.animationTime % 40 === 0) || this.animationTime % 200 === 0)) {
-            this.sparkles.push(makeSparkleAnimation(state, this));
+        let spawnTime = 200;
+        if (this.animationTime < 200) {
+            spawnTime /= 5;
+        }
+        //if (this.element === 'lightning') {
+        //    spawnTime /= 2;
+        //}
+        if (this.piercing && this.animationTime % spawnTime === 0) {
+            this.sparkles.push(makeSparkleAnimation(state, this, this.element, {x: this.vx, y: this.vy}));
         }
         this.sparkles = this.sparkles.filter(s => !s.done);
         for (const sparkle of this.sparkles) {
@@ -152,20 +159,6 @@ export class ThrownChakram implements ObjectInstance {
         drawFrame(context, frame, { ...frame, x: this.x - frame.content.x, y: this.y - frame.content.y });
         for (const sparkle of this.sparkles) {
             sparkle.render(context, state);
-        }
-        if (this.element) {
-            context.save();
-                context.globalAlpha *= 0.8;
-                context.beginPath();
-                context.fillStyle = {fire: 'red', ice: '#08F', lightning: 'yellow'}[this.element];
-                context.arc(
-                    this.x - frame.content.x + frame.w / 2,
-                    this.y - frame.content.y + frame.h / 2,
-                    6,
-                    0, 2 * Math.PI
-                );
-                context.fill();
-            context.restore();
         }
     }
 }
@@ -267,7 +260,7 @@ export class HeldChakram implements ObjectInstance {
             return;
         }
         if (this.animationTime >= 1000 && state.hero.passiveTools.charge >= 1 && this.animationTime % 200 === 0) {
-            this.sparkles.push(makeSparkleAnimation(state, this));
+            this.sparkles.push(makeSparkleAnimation(state, this, this.hero.element));
         }
         this.sparkles = this.sparkles.filter(s => !s.done);
         for (const sparkle of this.sparkles) {
@@ -307,11 +300,9 @@ export class HeldChakram implements ObjectInstance {
             return;
         }
         let animationTime = 0;
-        let element = null;
         if (state.hero.passiveTools.charge >= 1 && state.hero.magic > 0) {
             if (this.animationTime >= 1000) {
                 animationTime = this.animationTime;
-                element = state.hero.element;
             } else {
                 animationTime = this.animationTime / 10;
             }
@@ -320,20 +311,6 @@ export class HeldChakram implements ObjectInstance {
         drawFrame(context, frame, { ...frame, x: this.x - frame.content.x, y: this.y - frame.content.y });
         for (const sparkle of this.sparkles) {
             sparkle.render(context, state);
-        }
-        if (element) {
-            context.save();
-                context.globalAlpha *= 0.8;
-                context.beginPath();
-                context.fillStyle = {fire: 'red', ice: '#08F', lightning: 'yellow'}[element];
-                context.arc(
-                    this.x - frame.content.x + frame.w / 2,
-                    this.y - frame.content.y + frame.h / 2,
-                    6,
-                    0, 2 * Math.PI
-                );
-                context.fill();
-            context.restore();
         }
     }
 }

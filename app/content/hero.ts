@@ -1,7 +1,12 @@
 import { addObjectToArea } from 'app/content/areas';
 import { destroyClone } from 'app/content/clone';
 import { Staff } from 'app/content/staff';
-import { chargeBackAnimation, chargeFrontAnimation } from 'app/render/heroAnimations';
+import {
+    chargeBackAnimation, chargeFrontAnimation,
+    chargeFireBackAnimation, chargeFireFrontAnimation,
+    chargeIceBackAnimation, chargeIceFrontAnimation,
+    chargeLightningBackAnimation, chargeLightningFrontAnimation,
+} from 'app/render/heroAnimations';
 import { getHeroFrame, renderCarriedTile, renderExplosionRing, renderHeroBarrier } from 'app/renderActor';
 import { getChargeLevelAndElement } from 'app/useTool';
 import { drawFrameAt, getFrame } from 'app/utils/animations';
@@ -83,8 +88,9 @@ export class Hero implements Actor, SavedHeroData {
     // This is the actual mana regen rate, which changes depending on circumstances and can even become negative.
     actualMagicRegen: number = 0;
     lightRadius: number = 20;
-    // inventory
+    rollCooldown: number = 0;
     toolCooldown: number = 0;
+    // inventory
     astralProjection?: Hero;
     clones: Hero[];
     activeClone?: Hero;
@@ -248,6 +254,15 @@ export class Hero implements Actor, SavedHeroData {
         this.vz = knockback.vz || 2;
     }
 
+    setElement(nextElement: MagicElement): void {
+        if (this.element !== nextElement) {
+            this.element = nextElement;
+            // Reduce charge time to 500ms when switching between elements,
+            // as if it takes some effort to change elements.
+            this.chargeTime = Math.min(this.chargeTime, 500);
+        }
+    }
+
     takeDamage(this: Hero, state: GameState, damage: number): void {
         // Damage applies to the hero, not the clone.
         state.hero.life -= damage / 2;
@@ -275,9 +290,16 @@ export class Hero implements Actor, SavedHeroData {
         if (hero.passiveTools.charge && hero.action === 'charging') {
             const { chargeLevel } = getChargeLevelAndElement(state, hero);
             if (chargeLevel) {
+                const animation = !hero.element
+                    ? chargeBackAnimation
+                    : {
+                        fire: chargeFireBackAnimation,
+                        ice: chargeIceBackAnimation,
+                        lightning: chargeLightningBackAnimation
+                    }[hero.element];
                 context.save();
                     context.globalAlpha *= 0.8;
-                    const frame = getFrame(chargeBackAnimation, hero.chargeTime);
+                    const frame = getFrame(animation, hero.chargeTime);
                     drawFrameAt(context, frame, { x: hero.x, y: hero.y - hero.z });
                 context.restore();
             }
@@ -335,11 +357,18 @@ export class Hero implements Actor, SavedHeroData {
             context.restore();
         }
         if (hero.passiveTools.charge && hero.action === 'charging') {
-                context.save();
-                    context.globalAlpha *= 0.8;
-                    const frame = getFrame(chargeFrontAnimation, hero.chargeTime);
-                    drawFrameAt(context, frame, { x: hero.x, y: hero.y - hero.z });
-                context.restore();
+            const animation = !hero.element
+                ? chargeFrontAnimation
+                : {
+                    fire: chargeFireFrontAnimation,
+                    ice: chargeIceFrontAnimation,
+                    lightning: chargeLightningFrontAnimation
+                }[hero.element];
+            context.save();
+                context.globalAlpha *= 0.8;
+                const frame = getFrame(animation, hero.chargeTime);
+                drawFrameAt(context, frame, { x: hero.x, y: hero.y - hero.z });
+            context.restore();
         }
     }
 

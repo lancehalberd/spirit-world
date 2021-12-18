@@ -4,22 +4,24 @@ import { createAnimation, drawFrame, frameAnimation, getFrame } from 'app/utils/
 
 import {
     AreaInstance, DrawPriority, Frame, FrameAnimation,
-    GameState, ObjectInstance, ObjectStatus, Rect, TileBehaviors,
+    GameState, MagicElement, ObjectInstance, ObjectStatus, Rect, TileBehaviors,
 } from 'app/types';
 
 
-interface Props {
-    animation: FrameAnimation,
-    drawPriority?: DrawPriority,
+interface AnimationProps {
+    animation: FrameAnimation
+    drawPriority?: DrawPriority
     x?: number
-    y?: number,
-    z?: number,
-    vx?: number,
-    vy?: number,
-    vz?: number,
-    az?: number,
-    scale?: number,
-    ttl?: number,
+    y?: number
+    z?: number
+    vx?: number
+    vy?: number
+    vz?: number
+    vstep?: number
+    az?: number
+    rotation?: number
+    scale?: number
+    ttl?: number
 }
 
 export class AnimationEffect implements ObjectInstance {
@@ -37,11 +39,13 @@ export class AnimationEffect implements ObjectInstance {
     vx: number;
     vy: number;
     vz: number;
+    vstep: number;
     az: number;
+    rotation: number;
     scale: number;
     status: ObjectStatus = 'normal';
     ttl: number;
-    constructor({animation, drawPriority = 'background', x = 0, y = 0, z = 0, vx = 0, vy = 0, vz = 0, az = 0, scale = 1, ttl}: Props) {
+    constructor({animation, drawPriority = 'background', x = 0, y = 0, z = 0, vx = 0, vy = 0, vz = 0, vstep = 0, az = 0, rotation = 0, scale = 1, ttl}: AnimationProps) {
         this.animation = animation;
         this.animationTime = 0;
         this.drawPriority = drawPriority;
@@ -51,7 +55,9 @@ export class AnimationEffect implements ObjectInstance {
         this.vx = vx;
         this.vy = vy;
         this.vz = vz;
+        this.vstep = vstep;
         this.az = az;
+        this.rotation = rotation;
         this.scale = scale;
         this.ttl = ttl;
         this.behaviors = {};
@@ -61,10 +67,12 @@ export class AnimationEffect implements ObjectInstance {
         return {x: this.x, y: this.y - this.z, w: frame.w, h: frame.h};
     }
     update(state: GameState) {
-        this.x += this.vx;
-        this.y += this.vy;
-        this.z += this.vz;
         this.animationTime += FRAME_LENGTH;
+        if (!this.vstep || this.animationTime % this.vstep === 0) {
+            this.x += this.vx;
+            this.y += this.vy;
+            this.z += this.vz;
+        }
         this.vz += this.az;
         if (this.behaviors.brightness > 0) {
             this.behaviors.brightness *= 0.9;
@@ -74,13 +82,25 @@ export class AnimationEffect implements ObjectInstance {
             removeObjectFromArea(state, this);
         }
     }
-    render(context, state: GameState) {
+    render(context: CanvasRenderingContext2D, state: GameState) {
         const frame = getFrame(this.animation, this.animationTime);
-        drawFrame(context, frame, { ...frame,
-            x: this.x, y: this.y - this.z,
-            w: frame.w * this.scale,
-            h: frame.h * this.scale,
-        });
+        if (this.rotation) {
+            context.save();
+                context.translate(this.x + frame.w / 2, this.y + frame.h / 2);
+                context.rotate(this.rotation);
+                drawFrame(context, frame, { ...frame,
+                    x: -frame.w / 2, y: -frame.h / 2,
+                    w: frame.w * this.scale,
+                    h: frame.h * this.scale,
+                });
+            context.restore();
+        } else {
+            drawFrame(context, frame, { ...frame,
+                x: this.x, y: this.y - this.z,
+                w: frame.w * this.scale,
+                h: frame.h * this.scale,
+            });
+        }
     }
 }
 
@@ -109,19 +129,53 @@ export function addParticleAnimations(
     }
 }
 
+
 const sparkleAnimation = createAnimation('gfx/effects/goldparticles.png', {w: 5, h: 5}, {cols: 3, duration: 4, frameMap: [2,1,0,0,1,2]}, {loop: false});
+//const whiteSparkleAnimation = createAnimation('gfx/effects/aura_particles.png', {w: 10, h: 10}, {cols: 2, x: 0, duration: 6, frameMap: [0,1,0]}, {loop: false});
+const iceSparkleAnimation = createAnimation('gfx/effects/aura_particles.png', {w: 10, h: 10}, {cols: 2, x: 2, duration: 6}, {loop: false});
+const fireSparkleAnimation = createAnimation('gfx/effects/aura_particles.png', {w: 10, h: 10}, {cols: 2, x: 4, duration: 6,  frameMap: [0,1,0,0]}, {loop: false});
+const lightningSparkleAnimation = createAnimation('gfx/effects/aura_particles.png', {w: 10, h: 10}, {cols: 2, x: 6, duration: 6, frameMap: [0, 1, 0]}, {loop: false});
+
+
 export function addSparkleAnimation(
     state: GameState, area: AreaInstance, hitbox: Rect
 ): void {
     addObjectToArea(state, area, makeSparkleAnimation(state, hitbox));
 }
 export function makeSparkleAnimation(
-    state: GameState, hitbox: Rect
+    state: GameState, hitbox: Rect, element?: MagicElement, velocity?: {x: number, y: number}
 ): AnimationEffect {
-    return new AnimationEffect({
-        animation: sparkleAnimation,
+    const animation = element
+        ? {
+            fire: fireSparkleAnimation,
+            ice: iceSparkleAnimation,
+            lightning: lightningSparkleAnimation,
+        }[element] : sparkleAnimation;
+    const animationProps: AnimationProps = {
+        animation: animation,
         drawPriority: 'foreground',
-        x: hitbox.x + Math.random() * hitbox.w - 2.5,
-        y: hitbox.y + Math.random() * hitbox.h - 2.5,
-    });
+        x: hitbox.x + Math.random() * hitbox.w - animation.frames[0].w / 2,
+        y: hitbox.y + Math.random() * hitbox.h - animation.frames[0].h / 2,
+    }
+    if (element === 'fire') {
+        animationProps.vz = 0.3 + Math.random() / 2;
+        animationProps.vx = 0.8 * Math.random() - 0.4;
+    }
+    if (element === 'lightning') {
+        animationProps.rotation = ((Math.random() * 4) | 0) / 4 * 2 * Math.PI;
+        animationProps.vx = (Math.random() - 0.5) * 8;
+        animationProps.vy = (Math.random() - 0.5) * 8;
+        animationProps.vstep = FRAME_LENGTH * animation.frameDuration;
+        if (velocity?.x > 0) {
+            animationProps.vx = 6;
+        } else if (velocity?.x < 0) {
+            animationProps.vx = -6;
+        }
+        if (velocity?.y > 0) {
+            animationProps.vy = 6;
+        } else if (velocity?.y < 0) {
+            animationProps.vy = -6;
+        }
+    }
+    return new AnimationEffect(animationProps);
 }

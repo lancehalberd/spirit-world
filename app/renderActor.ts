@@ -8,6 +8,7 @@ import { Actor, ActorAnimations, Enemy, Frame, GameState, Hero } from 'app/types
 
 import {
     heroAnimations,
+    heroChargeAnimations,
     heroShallowAnimations,
     heroSwimAnimations,
     Y_OFF,
@@ -85,6 +86,11 @@ export function getHeroFrame(state: GameState, hero: Hero): Frame {
         case 'climbing':
             return getFrame(heroAnimations.climbing.up, hero.animationTime);
         case 'charging':
+            if (hero.vx || hero.vy) {
+                return getFrame(heroChargeAnimations.move[hero.d], hero.animationTime);
+            } else {
+                return getFrame(heroChargeAnimations.idle[hero.d], hero.animationTime);
+            }
             return hero.wading ? heroShallowAnimations.attack[hero.d].frames[0] : heroAnimations.attack[hero.d].frames[0];
         case 'attack':
             animations = hero.wading ? heroShallowAnimations.attack : heroAnimations.attack;

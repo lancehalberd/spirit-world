@@ -137,6 +137,16 @@ export function parseMessage(state: GameState, message: string): (Frame[][] | Di
                 }
                 const escapedToken = escapedChunks[i + 1];
                 if (escapedToken) {
+                    if (escapedToken === '-') {
+                        currentPage.push(row);
+                        if (currentPage.length >= messageRows) {
+                            pages.push(currentPage);
+                            currentPage = [];
+                        }
+                        row = [];
+                        rowWidth = 0;
+                        continue;
+                    }
                     const progressFlag = getEscapedProgressFlag(state, escapedToken);
                     if (progressFlag) {
                         if (row.length) {

@@ -268,9 +268,9 @@ function updateMenu(state: GameState) {
             || wasGameKeyPressed(state, GAME_KEY.WEAPON)
         ) {
             if (state.hero.element === selectableElements[state.menuIndex]) {
-                state.hero.element = null;
+                state.hero.setElement(null);
             } else {
-                state.hero.element = selectableElements[state.menuIndex];
+                state.hero.setElement(selectableElements[state.menuIndex]);
             }
         }
     }

@@ -27,26 +27,39 @@ Graphics:
 
 
 Current tasks:
-    - Waterfall Tower
-        - Make bead flows act like shallow water for when you are walking in them?
-            - This might not be the right animation for beads though.
-        - Missing mechanics
-            Make Crystal Spikes uncover the tiles they hit.
-                - Add uncover effect to hits.
-            Bead flows
-                It would be nice to somehow treat the south edge of the flow as a wall when walking north, the current treatment is jittery with the knockback.
-            Rusty floor switch that only activates if you fall on it wearing iron boots.
-        - Boss: Crystal Collector
-            - Add better spike attacks for main phase
-            - Add better spike attacks for enrage
-            - Passively summon spikes periodically whenever there are no floor eyes.
-            - Passively enable bead cascades for 4 seconds every 5 seconds
-                - Reduce to every 3 seconds for the final phase
-
+    - Crater Dungeon
+        - Add lava tiles
+            - Lava tiles ignore the behavior of tiles underneath them.
+            - Act similar to pits except can be solidified and deal 4 hearts of fire damage.
+            - Eventually want a mechanism to gradually melt solidified magma or frozen tiles.
+        - Add Shepard's Maw enemy
+            - Like a carnivorous plant in the spirit world
+            - Projects fake enemies on tendrils into the material world to herd prey to its mouth
+                - Fake enemies attack with projectiles or hot gas
+            - Bites into the material world when the prey is near
+            - Kill by evading the maw attack and then hitting it while it is briefly in material world
+                - Or fight it in the spirit world if you are there
+        - Add heat sink enemies
+            - Like ghosts in material world
+            - Become solid+vulnerable when they try to pump heat from the material world
+            - Can turn lava tiles solid briefly, or solid tiles to ice
+            - Will try to chase and freeze the player if they get near
+                - Will lose interest in the player while frozen
+            - 1 or 2 second cool down on freezing anything
+        - Add Engorge Heat Sink mini boss
+            - Giant heat sink that is cooling one of the under lava caves you uncover
+            - 4x as large and slow, but shrinks and speeds up as damaged
+            - About 2x faster than normal heats sinks at minimum size
+            - On defeat it possesses the player giving them the "Cooling Spirit" ability (Fire Blessing).
+            - The cave becomes hot again after the boss is defeated but they player is now immune to the effect.
+    - Add target landing locations when falling from sky (also apply to the forest temple pits).
+    - Add new hold+walk chakram animations
+        - play last 2 frames of attack animation on release.
+    - Add elemental particles
+        - Replace bow glow with neutral charge particles and elemental particles.
+        - Remove charge glow from all other tools.
 
     - Add dialogue objects that can trigger on entering areas or other triggers.
-    - Add saveStatusLocally flag that saves an id to a hash that is erased when changing zones.
-        - Use this to prevent large enemies like ents + crystal guardians from respawning when you just leave a screen.
     - Change message rendering system to use the priority queue system to support nested messages.
     - Add new waterfall graphics
     - Add touchHit behavior to tiles that can define full hit properties for tiles/objects on touch
@@ -55,9 +68,6 @@ Current tasks:
 
     - Randomizer improvements
         - Add a goal
-    - Change level 1 invisibility to spirit barrier
-        - Charge adds element effect to barrier and reduces spirit loss to damage of that type
-        - Level 2 adds invisibility which allows you to pass through damage barriers entirely and ignore ground effects like ice
     - brainstorm some dungeon/boss ideas, maybe for Staff Tower
 
 
@@ -71,7 +81,6 @@ High level list of things left to do:
         Forge
         Warship
     Areas missing significant content:
-        Waterfall Temple
         River Temple
         Staff Tower
     Missing Bosses for existing areas:
@@ -80,19 +89,17 @@ High level list of things left to do:
         Tomb Boss
         Rival fight before Helix
         Cocoon Boss
-        Waterfall Temple Boss
     Missing mechanics:
         Difficulty shrines
     Items missing implementation:
         Charge level 2
         Setting up Staff Tower
         Bow level 2
-        Bow charge 1 + 2
-        Invis charge 1 + 2
+        Bow charge 2
         Clone charge 1 + 2
-        Cloud boots: walking on clouds
-        Fire Blessing
-        True Sight
+        Fire Blessing (no damage from hot rooms, 50% fire damage)
+        Water Blessing (50% reduced ice damage)
+        True Sight (Render certain enemies/objects flagged for true sight)
         Iron Skin (slowly regenerates health shield = 20% total health)
         Gold Mail (reduce damage by 50%)
         Gloves charge 1 + 2
@@ -100,13 +107,6 @@ High level list of things left to do:
 Add toasts to development for undoing actions:
     - Deleting layers
     - Replacing > 100 tiles
-
-Cloud Boots:
-    - Fall slower while wearing cloud boots
-    - While moving with cloud boots on, slowly increase z value up to +4 as long as you are on solid ground. You should then naturally fall back to 0 while still or over pits.
-        - The idea is that you can run over short gaps with cloud boots and also avoid floor damage as long as you keep moving.
-    - Allow running over clouds (when implemented)
-    - Maybe make falling in the sky behave like falling in a pit where you reset to safe location rather than falling to the overworld?
 
 Difficulty shrine:
     - 50 money per point
@@ -121,6 +121,11 @@ Difficulty shrine:
     - easier traps (disable conveyer belts, remove spikes)
     - easier puzzles (required chests are made distinct from optional chests, positions of required items are moved to more easily accessible locations)
 
+Spirit Barrier Improvements
+    - Charge adds element effect to barrier and reduces spirit loss to damage of that type
+    - Make invisibility ignore certain ground effects+hazards: spikes, ice floor, fire barriers
+    - Can move through activatable crystals and some other obstacles.
+        * charge invisibility then dodge roll through a line of crystals to activate them quickly.
 
 Charge Chakram Attack:
     - Maybe change level 1 charge to spin around hero in a circle twice? Brief 0.5s invulnerability with attack animation.
@@ -132,9 +137,6 @@ At some point I should write tests to validate certain things like:
     - All objectFlags correspond to some object or dialogue key or loot type
     - All escaped dialogue corresponds to a special frame or loot type.
 
-Apply element to charge abilities.
-    Costs an additional 10 mana for the element
-
 Additional Clone Tool Behavior:
     Charging the clone 1 level adds elements to the clones weapon/tools/explosion.
     Charging the clone 1 level without elements makes it invulnerable for 4 seconds.
@@ -145,7 +147,6 @@ Peach Cave Improvements:
         - Eggs that hatch into enemies if not destroyed first
         - Vine enemies that can be knocked to the ground
     - Sticky Web Ground
-    - Make cliffs omni directional (but you can't jump from 'climbing')
     - Add boss:
         - Spawns eggs
         - Drains light and regains a bit of health for every 25% lost
@@ -167,6 +168,22 @@ Dungeon 3 Improvements:
     - Add a required progress puzzle defeating enemies with rolling stones using spirit sight.
     - Make the guardian's projection use more interesting attacks.
     - Animate the ents when they attack.
+
+Waterfall Tower Improvments:
+    - Make bead flows act like shallow water for when you are walking in them?
+        - This might not be the right animation for beads though.
+    - Missing mechanics
+        Make Crystal Spikes uncover the tiles they hit.
+            - Add uncover effect to hits.
+        Bead flows
+            It would be nice to somehow treat the south edge of the flow as a wall when walking north, the current treatment is jittery with the knockback.
+        Rusty floor switch that only activates if you fall on it wearing iron boots.
+    - Boss: Crystal Collector
+        - Add better spike attacks for main phase
+        - Add better spike attacks for enrage
+        - Passively summon spikes periodically whenever there are no floor eyes.
+        - Passively enable bead cascades for 4 seconds every 5 seconds
+            - Reduce to every 3 seconds for the final phase
 
 River Temple Improvements:
     - Some underwater enemies
@@ -196,11 +213,6 @@ Add ability to charge carried objects
 Improve Tool Selection:
     - Color around the selection + HUD indicator should match the color of the controller button (blue + yellow for X-Box)
     - Display a letter attached to the selection based on the button/keyboard key.
-
-Additional Invisibility Tool Behavior:
-    Charge to deal elemental damage on contact while invisible.
-    Can move through activatable crystals and some other obstacles.
-        * charge invisibility then dodge roll through a line of crystals to activate them quickly.
 
 Additional Staff Behavior:
     Should damage enemies + knock them away

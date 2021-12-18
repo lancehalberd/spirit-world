@@ -92,6 +92,9 @@ export function isHeroOnOpenTile(this: void, state: GameState, hero: Hero) {
 }
 
 export function updateHero(this: void, state: GameState, hero: Hero) {
+    if (hero.rollCooldown > 0) {
+        hero.rollCooldown -= FRAME_LENGTH;
+    }
     // Remove action targets from old areas.
     if (hero.actionTarget && hero.actionTarget.area !== hero.area) {
         hero.actionTarget = null;
@@ -211,7 +214,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
     if (hero.equipedGear?.ironBoots) {
         movementSpeed *= 0.5;
     } else if (hero.equipedGear?.cloudBoots) {
-        movementSpeed *= 2;
+        movementSpeed *= 1.5;
     }
 
     const { section } = getAreaSize(state);
@@ -230,8 +233,10 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         if (hero.equipedGear.cloudBoots && hero.vx * hero.vx + hero.vy * hero.vy >= 4 && !hero.isOverPit) {
             hero.z = Math.min(hero.z + 0.1, maxCloudBootsZ);
         } else if (hero.z >= minZ) {
-            hero.z -= 0.2;
+            hero.z = Math.max(minZ, hero.z - 0.2);
         }
+    } else if (hero.z >= minZ) {
+        hero.z = Math.max(minZ, hero.z - 0.4);
     }
     const isFallingToGround = hero.z > minZ && (!hero.equipedGear.cloudBoots || hero.z > maxCloudBootsZ);
     const isFrozen = hero.frozenDuration > 0;
@@ -571,9 +576,12 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         if (hero.actionFrame >= rollSpeed.length) {
             hero.action = null;
             hero.animationTime = 0;
+            // Don't allow rolling for two frames after completing a roll.
+            // This helps keep players from rolling over pits.
+            hero.rollCooldown = 40;
         }
     }
-    if (!isFrozen && (hero.chargingLeftTool || hero.chargingRightTool)) {
+    if (!isFrozen && (hero.chargingLeftTool || hero.chargingRightTool) && !editingState.isEditing) {
         movementSpeed *= 0.75;
         hero.chargeTime += FRAME_LENGTH;
         hero.action = 'charging';
@@ -667,7 +675,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
     if (!editingState.isEditing && ((dx || dy) || (hero.slipping && (Math.abs(hero.vx) > 0.3 || Math.abs(hero.vy) > 0.3)))) {
         const isCharging = hero.action === 'charging';
         const encumbered = hero.pickUpObject || hero.pickUpTile || hero.grabObject || hero.grabTile;
-        if (hero.slipping) {
+        if (hero.slipping && hero.action !== 'roll') {
             if (hero.equipedGear.cloudBoots) {
                 hero.vx = dx / 10 + hero.vx;
                 hero.vy = dy / 10 + hero.vy;
@@ -884,7 +892,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
 
             }
         } else if (dx || dy) {
-            if (hero.passiveTools.roll > 0) {
+            if (hero.passiveTools.roll > 0 && hero.rollCooldown <= 0) {
                 if (state.hero.magic > 0) {
                     state.hero.magic -= 5;
                     hero.action = 'roll';
