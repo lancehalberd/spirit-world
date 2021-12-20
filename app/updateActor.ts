@@ -1112,11 +1112,13 @@ export function checkForEnemyDamage(state: GameState, hero: Hero) {
         if (!(enemy instanceof Enemy) || enemy.invulnerableFrames > 0 || enemy.status === 'hidden') {
             continue;
         }
-        if (enemy.enemyDefinition.touchDamage && rectanglesOverlap(hero, enemy.getHitbox(state))) {
+        const touchHit = enemy.enemyDefinition.touchDamage
+            ? { damage: enemy.enemyDefinition.touchDamage } : enemy.touchHit;
+        if (touchHit && rectanglesOverlap(hero, enemy.getHitbox(state))) {
             //const dx = (hero.x + hero.w / 2) - (enemy.x + enemy.w / 2);
             //const dy = (hero.y + hero.h / 2) - (enemy.y + enemy.h / 2);
             const hitResult = hero.onHit(state, {
-                damage: enemy.enemyDefinition.touchDamage,
+                ...touchHit,
                 knockback: {
                     vx: - 4 * directionMap[hero.d][0],
                     vy: - 4 * directionMap[hero.d][1],

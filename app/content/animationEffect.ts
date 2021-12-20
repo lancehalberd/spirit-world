@@ -138,12 +138,12 @@ const lightningSparkleAnimation = createAnimation('gfx/effects/aura_particles.pn
 
 
 export function addSparkleAnimation(
-    state: GameState, area: AreaInstance, hitbox: Rect
+    state: GameState, area: AreaInstance, hitbox: Rect, element?: MagicElement, velocity?: {x: number, y: number}, z?: number
 ): void {
-    addObjectToArea(state, area, makeSparkleAnimation(state, hitbox));
+    addObjectToArea(state, area, makeSparkleAnimation(state, hitbox, element, velocity, z));
 }
 export function makeSparkleAnimation(
-    state: GameState, hitbox: Rect, element?: MagicElement, velocity?: {x: number, y: number}
+    state: GameState, hitbox: Rect, element?: MagicElement, velocity?: {x: number, y: number}, z?: number
 ): AnimationEffect {
     const animation = element
         ? {
@@ -156,6 +156,7 @@ export function makeSparkleAnimation(
         drawPriority: 'foreground',
         x: hitbox.x + Math.random() * hitbox.w - animation.frames[0].w / 2,
         y: hitbox.y + Math.random() * hitbox.h - animation.frames[0].h / 2,
+        z: (hitbox.z || 0) + Math.random() * (hitbox.zd || 0)
     }
     if (element === 'fire') {
         animationProps.vz = 0.3 + Math.random() / 2;

@@ -1,3 +1,4 @@
+import { addSparkleAnimation } from 'app/content/animationEffect';
 import { addObjectToArea, removeObjectFromArea } from 'app/content/areas';
 import { FrostBlast } from 'app/content/effects/frostBlast';
 import { FRAME_LENGTH } from 'app/gameConstants';
@@ -60,6 +61,10 @@ export class FrostGrenade implements ObjectInstance, Props {
             });
             addObjectToArea(state, this.area, frostBlast);
             removeObjectFromArea(state, this);
+        } else {
+            if (this.animationTime % 200 === 0) {
+                addSparkleAnimation(state, this.area, this, 'ice');
+            }
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {

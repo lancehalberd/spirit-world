@@ -153,7 +153,6 @@ export const RIVER_TEMPLE_BOSS: ZoneLocation = {
     isSpiritWorld: false,
 };
 
-
 export const SPAWN_CRATER_ENTRANCE: ZoneLocation = {
     zoneKey: 'crater',
     floor: 0,
@@ -162,6 +161,16 @@ export const SPAWN_CRATER_ENTRANCE: ZoneLocation = {
     z: 0,
     d: 'up',
     areaGridCoords: {y: 2, x: 0},
+    isSpiritWorld: false,
+};
+export const SPAWN_CRATER_BOSS: ZoneLocation = {
+    zoneKey: 'crater',
+    floor: 0,
+    x: 250,
+    y: 180,
+    z: 0,
+    d: 'up',
+    areaGridCoords: {y: 1, x: 1},
     isSpiritWorld: false,
 };
 
@@ -235,6 +244,11 @@ const riverTempleBossState = applyItems(waterfallBossState,
     ['bossBubblesNorth','bossBubblesSouth', 'bossBubblesWest', 'bossBubblesEast']
 );
 
+const craterStartState = applyItems(helixEndState, {cloudBoots: 1, irontBoots: 1, ice: 1, lightning: 1, waterBlessing: 1});
+const craterBossState = applyItems(craterStartState, {fireBlessing: 1},
+    ['craterLava1', 'craterLava2', 'craterLava3', 'craterLava4', 'craterLava5']
+);
+
 const spawnLocations = {
     'Peach Cave Start': {
         location: SPAWN_LOCATION_FULL,
@@ -291,6 +305,14 @@ const spawnLocations = {
     'River Temple Boss': {
         location: RIVER_TEMPLE_BOSS,
         savedState: riverTempleBossState,
+    },
+    'Crater Start': {
+        location: SPAWN_CRATER_ENTRANCE,
+        savedState: craterStartState,
+    },
+    'Crater Boss': {
+        location: SPAWN_CRATER_BOSS,
+        savedState: craterBossState,
     },
 };
 window['spawnLocations'] = spawnLocations;

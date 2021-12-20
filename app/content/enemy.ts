@@ -41,6 +41,7 @@ export class Enemy implements Actor, ObjectInstance {
     vx: number = 0;
     vy: number = 0;
     vz: number = 0;
+    az: number = 0;
     w: number;
     h: number;
     canBeKnockedBack: boolean = true;
@@ -67,6 +68,7 @@ export class Enemy implements Actor, ObjectInstance {
     status: ObjectStatus = 'normal';
     scale: number = 1;
     shielded: boolean = false;
+    touchHit: HitProperties;
     constructor(state: GameState, definition: EnemyObjectDefinition | BossObjectDefinition) {
         this.definition = definition;
         this.enemyDefinition = enemyDefinitions[this.definition.enemyType] || enemyDefinitions.snake;
@@ -102,6 +104,7 @@ export class Enemy implements Actor, ObjectInstance {
         this.alwaysReset = this.enemyDefinition.alwaysReset;
         this.drawPriority = this.flying ? 'foreground' : 'sprites';
         this.mode = this.enemyDefinition.initialMode || 'choose';
+        this.touchHit = this.enemyDefinition.touchHit;
     }
     getFrame(): Frame {
         return getFrame(this.currentAnimation, this.animationTime);
@@ -146,7 +149,7 @@ export class Enemy implements Actor, ObjectInstance {
         this.vz = vz;
     }
     onHit(state: GameState, hit: HitProperties): HitResult {
-        if (this.status === 'gone' || this.life <= 0) {
+        if (this.status === 'gone' || this.status === 'hidden' || this.life <= 0) {
             return {};
         }
         if (this.enemyDefinition.onHit) {
@@ -175,7 +178,8 @@ export class Enemy implements Actor, ObjectInstance {
             };
         }
         if (hit.damage) {
-            this.applyDamage(state, hit.damage);
+            const multiplier = this.enemyDefinition.elementalMultipliers?.[hit.element] || 1;
+            this.applyDamage(state, multiplier * hit.damage);
         }
         return {
             hit: true,

@@ -1,5 +1,6 @@
 import { sample } from 'lodash';
 
+import { addSparkleAnimation } from 'app/content/animationEffect';
 import { Clone } from 'app/content/clone';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { AnimationEffect } from 'app/content/animationEffect';
@@ -50,36 +51,38 @@ export const enemyTypes = <const>[
 export type EnemyType = typeof enemyTypes[number];
 
 export interface EnemyDefinition {
-    alwaysReset?: boolean,
-    animations: ActorAnimations,
-    aggroRadius?: number,
-    tileBehaviors?: TileBehaviors,
-    canBeKnockedBack?: boolean,
-    canBeKnockedDown?: boolean,
-    flipRight?: boolean,
-    flying?: boolean,
-    hasShadow?: boolean,
-    ignorePits?: boolean,
-    life?: number,
-    lootTable?: LootTable,
+    alwaysReset?: boolean
+    animations: ActorAnimations
+    aggroRadius?: number
+    tileBehaviors?: TileBehaviors
+    canBeKnockedBack?: boolean
+    canBeKnockedDown?: boolean
+    flipRight?: boolean
+    flying?: boolean
+    hasShadow?: boolean
+    ignorePits?: boolean
+    life?: number
+    lootTable?: LootTable
     // This enemy won't be destroyed when reaching 0 life.
-    isImmortal?: boolean,
-    immunities?: MagicElement[],
-    initialMode?: string,
-    params?: any,
-    speed?: number,
-    acceleration?: number,
-    scale?: number,
-    touchDamage: number,
-    update?: (state: GameState, enemy: Enemy) => void,
-    onDeath?: (state: GameState, enemy: Enemy) => void,
-    onHit?: (state: GameState, enemy: Enemy, hit: HitProperties) => HitResult,
+    isImmortal?: boolean
+    immunities?: MagicElement[]
+    elementalMultipliers?: {[key in MagicElement]?: number}
+    initialMode?: string
+    params?: any
+    speed?: number
+    acceleration?: number
+    scale?: number
+    touchDamage?: number
+    touchHit?: HitProperties
+    update?: (state: GameState, enemy: Enemy) => void
+    onDeath?: (state: GameState, enemy: Enemy) => void
+    onHit?: (state: GameState, enemy: Enemy, hit: HitProperties) => HitResult
     // Optional render function called instead of the standard render logic.
-    render?: (context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) => void,
+    render?: (context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) => void
     // Optional render function called after the standard render.
-    renderOver?: (context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) => void,
-    getHealthPercent?: (state: GameState, enemy: Enemy) => number,
-    getShieldPercent?: (state: GameState, enemy: Enemy) => number,
+    renderOver?: (context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) => void
+    getHealthPercent?: (state: GameState, enemy: Enemy) => number
+    getShieldPercent?: (state: GameState, enemy: Enemy) => number
 }
 
 enemyDefinitions.arrowTurret = {
@@ -389,6 +392,33 @@ function updateStormLightningBug(state: GameState, enemy: Enemy): void {
         if (chaseVector) {
             enemy.params.shieldCooldown = 5000;
             enemy.shielded = true;
+        }
+    }
+    if (enemy.shielded) {
+        if (enemy.animationTime % 200 === 0) {
+            const hitbox = enemy.getHitbox(state);
+            for (let i = 0; i < 4; i ++) {
+                const theta = Math.PI / 2 + 2 * Math.PI * i / 4;
+                addSparkleAnimation(state, enemy.area, {
+                    ...hitbox,
+                    x: hitbox.x + 4 * Math.cos(theta),
+                    y: hitbox.y + 4 * Math.sin(theta),
+                    w: hitbox.w / 2,
+                    h: hitbox.h / 2,
+                }, 'lightning', {x: enemy.vx, y: enemy.vy});
+            }
+        }
+    } else {
+        if (enemy.animationTime % 300 === 0) {
+            const hitbox = enemy.getHitbox(state);
+            const theta = Math.PI / 2 + 2 * Math.PI * enemy.animationTime / 900;
+            addSparkleAnimation(state, enemy.area, {
+                ...hitbox,
+                x: hitbox.x + 4 * Math.cos(theta),
+                y: hitbox.y + 4 * Math.sin(theta),
+                w: hitbox.w / 2,
+                h: hitbox.h / 2,
+            }, 'lightning', {x: enemy.vx, y: enemy.vy});
         }
     }
 }
@@ -730,8 +760,8 @@ function getLineOfSightTargetAndDirection(state: GameState, enemy: Enemy, direct
 
 // The enemy pauses to choose a random direction, then moves in that direction for a bit and repeats.
 // If the enemy encounters an obstacle, it will change directions more quickly.
-function paceRandomly(state: GameState, enemy: Enemy) {
-    if (enemy.mode === 'choose' && enemy.modeTime > 200) {
+export function paceRandomly(state: GameState, enemy: Enemy) {
+    if (enemy.mode !== 'walk' && enemy.modeTime > 200) {
         enemy.setMode('walk');
         enemy.d = sample(['up', 'down', 'left', 'right']);
         enemy.currentAnimation = enemy.enemyDefinition.animations.idle[enemy.d];

@@ -1,3 +1,4 @@
+import { addSparkleAnimation } from 'app/content/animationEffect';
 import { removeObjectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { hitTargets } from 'app/utils/field';
@@ -49,13 +50,14 @@ export class FrostBlast implements ObjectInstance, Props {
         if (this.animationTime >= EXPANSION_TIME + PERSIST_TIME) {
             removeObjectFromArea(state, this);
         } else {
+            const r = this.radius * Math.min(1, this.animationTime / EXPANSION_TIME);
             const hitResult = hitTargets(state, this.area, {
                 damage: this.damage,
                 element: 'ice',
                 hitCircle: {
                     x: this.x,
                     y: this.y,
-                    r: this.radius * Math.min(1, this.animationTime / EXPANSION_TIME),
+                    r,
                 },
                 hitAllies: true,
                 hitObjects: true,
@@ -63,7 +65,19 @@ export class FrostBlast implements ObjectInstance, Props {
                 hitEnemies: true,
                 ignoreTargets: this.hitTargets,
             });
-            this.hitTargets = new Set([...this.hitTargets, ...hitResult.hitTargets])
+            this.hitTargets = new Set([...this.hitTargets, ...hitResult.hitTargets]);
+            if (this.animationTime === 40 || this.animationTime === 80 || this.animationTime === 140 || this.animationTime === 200) {
+                let theta = Math.random() * 2 * Math.PI;
+                let count = 2 + (3 * Math.random()) | 0;
+                for (let i = 0; i < count; i++) {
+                    addSparkleAnimation(state, this.area, {
+                        x: this.x + (r - 3) * Math.cos(theta + i * 2 * Math.PI / count),
+                        y: this.y + (r - 3) * Math.sin(theta + i * 2 * Math.PI / count),
+                        w: 6,
+                        h: 6,
+                    }, 'ice');
+                }
+            }
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {

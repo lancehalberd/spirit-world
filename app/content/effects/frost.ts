@@ -1,3 +1,4 @@
+import { addSparkleAnimation } from 'app/content/animationEffect';
 import { removeObjectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { hitTargets } from 'app/utils/field';
@@ -42,6 +43,7 @@ export class Frost implements ObjectInstance, Props {
     status: ObjectStatus = 'normal';
     speed = 0;
     ttl: number;
+    animationOffset: number;
     constructor({x, y, z = 4, vx = 0, vy = 0, vz = 0, az = -0.1, damage = 1, ttl = 400, ignoreTargets}: Props) {
         this.damage = damage;
         this.x = x;
@@ -53,6 +55,7 @@ export class Frost implements ObjectInstance, Props {
         this.az = az;
         this.ttl = ttl;
         this.ignoreTargets = ignoreTargets;
+        this.animationOffset = ((Math.random() * 10) | 0) * 20;
     }
     update(state: GameState) {
         this.x += this.vx;
@@ -75,6 +78,9 @@ export class Frost implements ObjectInstance, Props {
                 hitTiles: true,
                 ignoreTargets: this.ignoreTargets,
             });
+            if (this.animationTime % 200 === this.animationOffset) {
+                addSparkleAnimation(state, this.area, this, 'ice');
+            }
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {

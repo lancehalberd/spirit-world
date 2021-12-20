@@ -39,6 +39,8 @@ export interface Rect {
     y: number
     w: number
     h: number
+    z?: number
+    zd?: number
 }
 export interface FrameDimensions {
     w: number,

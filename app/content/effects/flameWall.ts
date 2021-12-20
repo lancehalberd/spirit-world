@@ -1,18 +1,27 @@
-import { getAreaSize, removeObjectFromArea } from 'app/content/areas';
+import { addSparkleAnimation } from 'app/content/animationEffect';
+import { addObjectToArea, getAreaSize, removeObjectFromArea } from 'app/content/areas';
 import { CANVAS_HEIGHT, CANVAS_WIDTH, FRAME_LENGTH } from 'app/gameConstants';
-import { directionMap, hitTargets } from 'app/utils/field';
+import { createAnimation, drawFrame } from 'app/utils/animations';
+import { directionMap, hitTargets, rotateDirection } from 'app/utils/field';
 
 import {
     AreaInstance, Direction,
     Frame, GameState, ObjectInstance, ObjectStatus,
 } from 'app/types';
 
+export const [
+    /* container */, fireElement, /* elementShine */
+] = createAnimation('gfx/hud/elementhud.png',
+    {w: 20, h: 20, content: {x: 2, y: 2, w: 16, h: 16}}, {cols: 6}
+).frames;
+
 
 interface Props {
-    direction: Direction,
-    damage?: number,
-    delay?: number,
-    length?: number,
+    direction: Direction
+    damage?: number
+    delay?: number
+    fromPoint?: {x: number, y: number}
+    length?: number
 }
 
 export class FlameWall implements ObjectInstance, Props {
@@ -28,6 +37,7 @@ export class FlameWall implements ObjectInstance, Props {
     vy: number;
     w: number = 12;
     h: number = 12;
+    fromPoint: Props['fromPoint']
     ignorePits = true;
     length = 6;
     delay: number;
@@ -35,11 +45,21 @@ export class FlameWall implements ObjectInstance, Props {
     direction: Direction;
     status: ObjectStatus = 'normal';
     speed = 0;
-    constructor({damage = 1, delay = 800, direction = 'down', length = 6}: Props) {
+    distance = 0;
+    constructor({damage = 1, delay = 800, direction = 'down', length = 6, fromPoint}: Props) {
         this.delay = delay;
         this.damage = damage;
         this.direction = direction;
         this.length = length;
+        this.fromPoint = fromPoint;
+    }
+    getHitbox(state: GameState) {
+        return {
+            x: this.x - this.w / 2,
+            y: this.y - this.h / 2,
+            w: this.w,
+            h: this.h,
+        }
     }
     update(state: GameState) {
         const { section } = getAreaSize(state);
@@ -52,25 +72,33 @@ export class FlameWall implements ObjectInstance, Props {
             right = Math.min(state.camera.x + CANVAS_WIDTH - 16, right);
             top = Math.max(state.camera.y, top);
             bottom = Math.min(state.camera.y + CANVAS_HEIGHT - 16, bottom);
-            if (this.direction === 'up' || this.direction === 'down') {
-                this.x = state.hero.x + state.hero.w / 2 + 32 - this.length * 16 + Math.floor(Math.random() * (this.length * 16 - 64));
-                this.w = this.length * 16;
-                this.x = Math.max(left, Math.min(right - this.w, this.x));
-                this.h = 16;
+            if (this.fromPoint) {
+                this.x = this.fromPoint.x;
+                this.y = this.fromPoint.y;
+                // This will always start 1 tile wide, but grow each tile it moves until it reaches max length
+                this.w = this.h = 16;
             } else {
-                this.y = state.hero.y + state.hero.y / 2 + 32 - this.length * 16 + Math.floor(Math.random() * (this.length * 16 - 64));
-                this.h = this.length * 16;
-                this.y = Math.max(top, Math.min(bottom - this.h, this.y));
-                this.w = 16;
-            }
-            if (this.direction === 'down') {
-                this.y = top;
-            } else if (this.direction === 'up') {
-                this.y = bottom - this.h;
-            } else if (this.direction === 'right') {
-                this.x = left
-            } else if (this.direction === 'left') {
-                this.x = right - this.w;
+                if (this.direction === 'up' || this.direction === 'down') {
+                    this.w = this.length * 16;
+                    // Appear 2 tiles left or right of centered on the player.
+                    this.x = state.hero.x + state.hero.w / 2 + 32 - Math.floor(Math.random() * 64);
+                    this.x = Math.max(left, Math.min(right - this.w, this.x));
+                    this.h = 16;
+                } else {
+                    this.h = this.length * 16;
+                    this.y = state.hero.y + state.hero.y / 2 + 32 - Math.floor(Math.random() * 64);
+                    this.y = Math.max(top, Math.min(bottom - this.h, this.y));
+                    this.w = 16;
+                }
+                if (this.direction === 'down') {
+                    this.y = top + 8;
+                } else if (this.direction === 'up') {
+                    this.y = bottom - this.h - 8;
+                } else if (this.direction === 'right') {
+                    this.x = left + 8;
+                } else if (this.direction === 'left') {
+                    this.x = right - this.w - 8;
+                }
             }
         }
         this.animationTime += FRAME_LENGTH;
@@ -78,27 +106,68 @@ export class FlameWall implements ObjectInstance, Props {
             this.speed = Math.min(4, this.speed + 0.5);
             this.x += this.speed * directionMap[this.direction][0];
             this.y += this.speed * directionMap[this.direction][1];
-            if (this.x < left || this.x + this.w > right || this.y < top || this.y + this.h > bottom) {
+            // Grow wider as the flame advances from its starting point.
+            if (this.fromPoint) {
+                this.distance += this.speed;
+                const length = Math.min(16 + this.distance, this.length * 16);
+                if (this.direction === 'up' || this.direction === 'down') {
+                    this.w = length;
+                } else {
+                    this.h = length;
+                }
+            }
+            if ((this.direction === 'left' && this.x < left)
+                || (this.direction === 'right' && this.x > right)
+                || (this.direction === 'up' && this.y < top)
+                || (this.direction === 'down' && this.y > bottom)
+            ) {
                 removeObjectFromArea(state, this);
             } else {
+                const hitbox = this.getHitbox(state);
                 hitTargets(state, this.area, {
                     canPush: false,
                     damage: this.damage,
-                    hitbox: this,
+                    hitbox,
                     element: 'fire',
                     hitAllies: true,
                     hitTiles: true,
                     knockback: {vx: 4 * directionMap[this.direction][0], vy: 4 * directionMap[this.direction][1], vz: 2},
                 });
+                if (this.animationTime % 100 === 0) {
+                    addSparkleAnimation(state, this.area, hitbox, 'fire');
+                }
             }
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
-        // Animate a transparent orb growing in the air
-        context.save();
-            context.globalAlpha = 0.5 + Math.min(0.5, 0.5 * this.animationTime / this.delay);
-            context.fillStyle = 'red';
-            context.fillRect(this.x, this.y, this.w, this.h);
-        context.restore();
+        const hitbox = this.getHitbox(state);
+        const h = fireElement.h * Math.min(1, this.animationTime / this.delay);
+        //context.fillRect(hitbox.x, hitbox.y, hitbox.w, hitbox.h);
+        for (let i = 0; i < this.length; i++) {
+            drawFrame(context,
+                {...fireElement, y: fireElement.y + fireElement.h - h, h},
+                {
+                    x: hitbox.x + i * (hitbox.w - 16) / ((this.length - 1) || 1) - fireElement.content.x,
+                    y: hitbox.y + i * (hitbox.h - 16) / ((this.length - 1) || 1) - fireElement.content.y
+                        // This anchors the flame to the bottom of the frame so it draws from bottom to top.
+                        + fireElement.h - h
+                        // Make the frame bob a little bit.
+                        + 2 * Math.sin(this.animationTime / 100 + i),
+                    h,
+                    w: fireElement.w
+                }
+            );
+        }
+    }
+
+    static createRadialFlameWall(state: GameState, area: AreaInstance, fromPoint: Props['fromPoint'], length = 4) {
+        for (let i = 0; i < 4; i++) {
+            const flameWall = new FlameWall({
+                direction: rotateDirection('down', i),
+                fromPoint,
+                length,
+            });
+            addObjectToArea(state, area, flameWall);
+        }
     }
 }

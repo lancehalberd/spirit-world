@@ -54,7 +54,7 @@ function updateFlameIdol(state: GameState, enemy: Enemy): void {
             direction: rotateDirection('down', enemy.params.rotations),
         });
         addObjectToArea(state, enemy.area, flameWall);
-    })
+    });
 }
 function updateFrostIdol(state: GameState, enemy: Enemy): void {
     enemy.params.shieldColor = '#08F';

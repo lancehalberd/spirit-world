@@ -230,7 +230,17 @@ export class Hero implements Actor, SavedHeroData {
             return {};
         }
         if (hit.damage) {
-            this.takeDamage(state, hit.damage);
+            let damage = hit.damage;
+            if (hit.element === 'fire' && state.hero.passiveTools.fireBlessing) {
+                damage /= 2;
+            }
+            if (hit.element === 'ice' && state.hero.passiveTools.waterBlessing) {
+                damage /= 2;
+            }
+            if (state.hero.passiveTools.goldMail) {
+                damage /= 2;
+            }
+            this.takeDamage(state, damage);
         }
         if (hit.knockback && !this.equipedGear?.ironBoots) {
             this.knockBack(state, hit.knockback);

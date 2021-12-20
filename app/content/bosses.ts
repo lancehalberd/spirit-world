@@ -4,6 +4,7 @@ export * from 'app/content/bosses/beetleBoss';
 export * from 'app/content/bosses/crystalCollector';
 export * from 'app/content/bosses/idols';
 export * from 'app/content/bosses/guardian';
+export * from 'app/content/bosses/fireBeast';
 export * from 'app/content/bosses/frostSerpent';
 
 export const bossTypes = <const>[
@@ -12,6 +13,7 @@ export const bossTypes = <const>[
     'guardian', 'guardianProjection',
     'crystalCollector',
     'frostHeart', 'frostSerpent',
+    'fireHeart', 'fireBeast',
 ];
 export type BossType = typeof bossTypes[number];
 

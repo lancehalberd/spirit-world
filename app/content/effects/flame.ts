@@ -1,11 +1,19 @@
+import { addSparkleAnimation } from 'app/content/animationEffect';
 import { removeObjectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { createAnimation, drawFrameAt } from 'app/utils/animations';
 import { hitTargets } from 'app/utils/field';
 
 import {
     AreaInstance, DrawPriority,
     Frame, GameState, ObjectInstance, ObjectStatus,
 } from 'app/types';
+
+export const [
+    /* container */, fireElement, /* elementShine */
+] = createAnimation('gfx/hud/elementhud.png',
+    {w: 20, h: 20, content: {x: 2, y: 2, w: 16, h: 16}}, {cols: 6}
+).frames;
 
 interface Props {
     x: number,
@@ -69,21 +77,17 @@ export class Flame implements ObjectInstance, Props {
                 hitAllies: true,
                 hitTiles: true,
             });
+            // Create sparks less often when the flame is still.
+            const rate = (this.vx || this.vy) ? 100 : 400;
+            if (this.animationTime % rate === 0) {
+                addSparkleAnimation(state, this.area, this, 'fire');
+            }
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
-        // Sold red circle in a transparent rectangle
-        context.fillStyle = 'red';
-        context.save();
-            context.globalAlpha *= 0.6;
-            context.fillRect(this.x, this.y - this.z, this.w, this.h);
-        context.restore();
-        context.beginPath();
-        context.arc(
-            this.x + this.w / 2,
-            this.y + this.h / 2 - this.z - 5 + 1 * Math.cos(this.animationTime / 120),
-            this.w / 3, 0, 2 * Math.PI
-        );
-        context.fill();
+        drawFrameAt(context, fireElement, {
+            x: this.x - 2,
+            y: this.y - 2 + 2 + 2 * Math.sin(this.animationTime / 150),
+        });
     }
 }
