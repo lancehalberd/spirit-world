@@ -235,11 +235,13 @@ function showLootMessage(state: GameState, lootType: LootType, lootLevel?: numbe
                 + equipElementMessage
                 + '{|}Lightning stuns enemies and activates some objects.');
         case 'fireBlessing':
-            return showMessage(state, 'You have received the Blessing of Fire!'
-                + 'Burning hot rooms will no longer damage you.');
+            return showMessage(state, 'You have absorbed a Cooling Spirit!'
+                + '{|}Burning hot rooms will no longer damage you.'
+                + '{|}You will also take half damage from fire.');
         case 'waterBlessing':
             return showMessage(state, 'You have received the Blessing of Water!'
-                + 'Being underwater will no longer drain your spirit energy or damage you.');
+                + '{|}Being underwater will no longer drain your spirit energy or damage you.'
+                + '{|}You will also take half damage from ice.');
         case 'bow':
             if (state.hero.activeTools.bow === 1) {
                 return showMessage(state, 'You found the Bow!' + equipToolMessage

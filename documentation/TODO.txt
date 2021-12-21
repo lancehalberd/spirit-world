@@ -28,9 +28,6 @@ Graphics:
 
 Current tasks:
     - Crater Dungeon
-        - Add hot rooms with logic
-            - Locked cave should become hot on defeating the mini boss.
-            - Deal 1/2 heart every 0.5 seconds without fire blessing
         - Entrance should be blocked by cooled solid magma until elemental beasts are released.
 
     - Add target landing locations when falling from sky (also apply to the forest temple pits).
