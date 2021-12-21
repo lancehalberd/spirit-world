@@ -13,7 +13,7 @@ import { npcBehaviors, npcStyles } from 'app/content/objects/npc';
 import { signStyles } from 'app/content/objects/sign';
 import { getLootFrame } from 'app/content/lootObject';
 import { zones } from 'app/content/zones';
-import { displayTileEditorPropertyPanel, EditingState } from 'app/development/tileEditor';
+import { displayTileEditorPropertyPanel, editingState, EditingState } from 'app/development/tileEditor';
 import { getState } from 'app/state';
 import { isPointInShortRect } from 'app/utils/index';
 
@@ -499,7 +499,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             rows.push({
                 name: 'target zone',
                 value: zoneKey,
-                values: ['none', ...zoneKeys],
+                values: ['none', state.location.zoneKey, ...zoneKeys],
                 onChange(targetZone: string) {
                     if (targetZone === 'none') {
                         targetZone = null;
@@ -971,6 +971,7 @@ function checkToAddLinkedObject(state: GameState, definition: ObjectDefinition):
 }
 
 export function updateObjectInstance(state: GameState, object: ObjectDefinition, oldDefinition?: ObjectDefinition, area: AreaInstance = null, create: boolean = false): void {
+    editingState.hasChanges = true;
     if (!area) {
         area = state.areaInstance;
     }

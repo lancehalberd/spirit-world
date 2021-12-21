@@ -28,27 +28,11 @@ Graphics:
 
 Current tasks:
     - Crater Dungeon
+        - Add hot rooms with logic
+            - Locked cave should become hot on defeating the mini boss.
+            - Deal 1/2 heart every 0.5 seconds without fire blessing
         - Entrance should be blocked by cooled solid magma until elemental beasts are released.
-        - Add Shepard's Maw enemy
-            - Like a carnivorous plant in the spirit world
-            - Projects fake enemies on tendrils into the material world to herd prey to its mouth
-                - Fake enemies attack with projectiles or hot gas
-            - Bites into the material world when the prey is near
-            - Kill by evading the maw attack and then hitting it while it is briefly in material world
-                - Or fight it in the spirit world if you are there
-        - Add heat sink enemies
-            - Like ghosts in material world
-            - Become solid+vulnerable when they try to pump heat from the material world
-            - Can turn lava tiles solid briefly, or solid tiles to ice
-            - Will try to chase and freeze the player if they get near
-                - Will lose interest in the player while frozen
-            - 1 or 2 second cool down on freezing anything
-        - Add Engorge Heat Sink mini boss
-            - Giant heat sink that is cooling one of the under lava caves you uncover
-            - 4x as large and slow, but shrinks and speeds up as damaged
-            - About 2x faster than normal heats sinks at minimum size
-            - On defeat it possesses the player giving them the "Cooling Spirit" ability (Fire Blessing).
-            - The cave becomes hot again after the boss is defeated but they player is now immune to the effect.
+
     - Add target landing locations when falling from sky (also apply to the forest temple pits).
     - Add new hold+walk chakram animations
         - play last 2 frames of attack animation on release.
@@ -67,7 +51,10 @@ Current tasks:
         - Add a goal
         - Add passage to the peak peach piece in logic.
             - Chest is only in logic if the player has ice magic, gloves 2 or defeated the fire beast, even though it is obtainable without any of these before the fire beast is released.
-        - Add crater to logic once it has checks.
+        - Add Helix to logic
+        - Add river temple to logic
+        - Add forest temple to logic
+        - Add crater to logic
     - brainstorm some dungeon/boss ideas, maybe for Staff Tower
 
 
@@ -77,7 +64,6 @@ High level list of things left to do:
         Jade Palace
         Sky Temple
         Forest Temple
-        Crater
         Forge
         Warship
     Areas missing significant content:
@@ -89,6 +75,8 @@ High level list of things left to do:
         Tomb Boss
         Rival fight before Helix
         Cocoon Boss
+            - Instead of fighting this boss, you will see it, but then abort because of the beasts attacking the city
+            - Then you will actually fight this boss at the end of the Grand Temple or Jade Palace or possibly as a mid boss on the Warship.
     Missing mechanics:
         Difficulty shrines
     Items missing implementation:
@@ -97,12 +85,13 @@ High level list of things left to do:
         Bow level 2
         Bow charge 2
         Clone charge 1 + 2
-        Fire Blessing (no damage from hot rooms, 50% fire damage)
-        Water Blessing (50% reduced ice damage)
         True Sight (Render certain enemies/objects flagged for true sight)
         Iron Skin (slowly regenerates health shield = 20% total health)
         Gold Mail (reduce damage by 50%)
         Gloves charge 1 + 2
+
+Generic boss improvements
+    - Add vulnerable phases for bosses where they take ~5x damage, increase boss health by ~2x
 
 Lava improvments:
     - Temporarily create solid ground when hit by ice.
@@ -191,6 +180,39 @@ Waterfall Tower Improvments:
 River Temple Improvements:
     - Some underwater enemies
     - Some crab enemies with ice shells that require fire element to defeat
+
+
+Crater Improvements
+    - Add platforms floating on lava.
+    - Add peg switches that require hitting with the staff to activate, replace all regular switches with these.
+    - Add same area transition for lowering lava
+        - Just draw the udpated area behind the old area, and then delete every 8th then 4th then 2nd then all rows of pixels.
+        - Don't spend too much time on this since we might not use it in the end.
+    - Add Flame Guardian enemies
+        - Stationary like Crystal Guardian
+        - Replace ents with Flame Guardians
+    - Lava Fireballs that spawn from lava in an anulus around player about ever 4 seconds
+        - Rise into the air then explode into 8 fireballs.
+    - Add Shepard's Maw enemy
+        - Like a carnivorous plant in the spirit world
+        - Projects fake enemies on tendrils into the material world to herd prey to its mouth
+            - Fake enemies attack with projectiles or hot gas
+        - Bites into the material world when the prey is near
+        - Kill by evading the maw attack and then hitting it while it is briefly in material world
+            - Or fight it in the spirit world if you are there
+    - Add heat sink enemies
+        - Like ghosts in material world
+        - Become solid+vulnerable when they try to pump heat from the material world
+        - Can turn lava tiles solid briefly, or solid tiles to ice
+        - Will try to chase and freeze the player if they get near
+            - Will lose interest in the player while frozen
+        - 1 or 2 second cool down on freezing anything
+    - Add Engorge Heat Sink mini boss
+        - Giant heat sink that is cooling one of the under lava caves you uncover
+        - 4x as large and slow, but shrinks and speeds up as damaged
+        - About 2x faster than normal heats sinks at minimum size
+        - On defeat it possesses the player giving them the "Cooling Spirit" ability (Fire Blessing).
+        - The cave becomes hot again after the boss is defeated but they player is now immune to the effect.
 
 
 Multi-area Boss ideas:

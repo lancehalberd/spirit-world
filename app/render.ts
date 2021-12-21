@@ -579,6 +579,12 @@ export function renderLayer(area: AreaInstance, layer: AreaLayer, parentLayer: A
             }
             let tile = layer.tiles[y][x];
             const maskTile = layer.maskTiles?.[y]?.[x];
+            context.save();
+            if (editingState.isEditing) {
+                if (tile?.behaviors?.editorTransparency) {
+                    context.globalAlpha *= tile.behaviors.editorTransparency;
+                }
+            }
             if (maskTile) {
                 // Create the masked tile to draw underneath the mask frame.
                 if (tile) {
@@ -595,6 +601,7 @@ export function renderLayer(area: AreaInstance, layer: AreaLayer, parentLayer: A
             } else if (tile) {
                 drawFrame(context, tile.frame, {x: x * w, y: y * h, w, h});
             }
+            context.restore();
         }
     }
     context.restore();

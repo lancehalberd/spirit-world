@@ -51,24 +51,26 @@ import {
 
 type EditorToolType = 'brush' | 'delete' | 'object' | 'enemy' | 'boss' | 'replace' | 'select';
 export interface EditingState {
-    tool: EditorToolType,
-    isEditing: boolean,
-    brush?: {[key: string]: TileGridDefinition},
-    clipboardObject?: ObjectDefinition,
-    paletteKey: string,
-    selectedLayerKey?: string,
-    replacePercentage: number,
-    selectedObject?: ObjectDefinition,
-    showZoneProperties: boolean,
-    showFieldProperties: boolean,
-    showInventoryProperties: boolean,
-    showProgressProperties: boolean,
-    spirit: boolean,
-    dragOffset?: {x: number, y: number},
+    tool: EditorToolType
+    hasChanges: boolean
+    isEditing: boolean
+    brush?: {[key: string]: TileGridDefinition}
+    clipboardObject?: ObjectDefinition
+    paletteKey: string
+    selectedLayerKey?: string
+    replacePercentage: number
+    selectedObject?: ObjectDefinition
+    showZoneProperties: boolean
+    showFieldProperties: boolean
+    showInventoryProperties: boolean
+    showProgressProperties: boolean
+    spirit: boolean
+    dragOffset?: {x: number, y: number}
 }
 
 export const editingState: EditingState = {
     tool: 'select',
+    hasChanges: false,
     isEditing: false,
     paletteKey: Object.keys(palettes)[0],
     // Default editing the field, not the floor.
@@ -80,6 +82,12 @@ export const editingState: EditingState = {
     spirit: false,
 };
 window['editingState'] = editingState;
+window.onbeforeunload = () => {
+    if (editingState.hasChanges) {
+        // Chrome ignores this message but displays an appropriate message.
+        return 'You have may unsaved changes.';
+    }
+}
 export function toggleEditing() {
     const state = getState();
     state.scene = 'game';
@@ -961,6 +969,7 @@ function paintSingleTile(area: AreaInstance, layer: AreaLayer, parentDefinition:
     if (!layer) {
         return;
     }
+    editingState.hasChanges = true;
     let fullTile = allTiles[tile];
     // If this tile was erased, replace it with the tile dictated by the parent definition if there is one.
     if (!fullTile && parentDefinition) {
@@ -1250,7 +1259,12 @@ function drawBrushLayerPreview(
                 tile = linkedOffset ? allTiles[parentTile.index + linkedOffset] : parentTile;
             }
             if (tile) {
+                context.save();
+                if (tile.behaviors?.editorTransparency) {
+                    context.globalAlpha *= tile.behaviors.editorTransparency;
+                }
                 drawFrame(context, tile.frame, {x: tx * w, y: ty * h, w, h});
+                context.restore();
             }
         }
     }

@@ -43,7 +43,11 @@ export function update() {
     state.time += FRAME_LENGTH;
     updateKeyboardState(state);
     try {
-        if (state.scene === 'game' && !state.messageState?.pages && wasGameKeyPressed(state, GAME_KEY.MENU)) {
+        if (state.scene === 'game'
+            && !state.defeatState.defeated
+            && !state.messageState?.pages
+            && wasGameKeyPressed(state, GAME_KEY.MENU)
+         ) {
             state.paused = !state.paused;
             state.menuIndex = 0;
         }
@@ -296,6 +300,7 @@ function updateDefeated(state: GameState) {
             state.menuIndex = 1;
         }
     } else if (isConfirmKeyPressed(state)) {
+        console.log(state.menuIndex);
         if (state.menuIndex === 0 && state.hero.money >= 50) {
             state.hero.money -= 50;
             state.hero.life = state.hero.maxLife;

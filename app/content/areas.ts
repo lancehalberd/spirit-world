@@ -506,6 +506,11 @@ export function applyTileBehaviorToGrid(behaviorGrid: TileBehaviors[][], {x, y}:
     if (behaviors.isLava || behaviors.cloudGround) {
         behaviorGrid[y][x] = {};
     }
+    // Anything rendered on top of lava removes the lava behavior from it.
+    if (behaviorGrid[y]?.[x] && !behaviors.isLava && !behaviors.isLavaMap) {
+        delete behaviorGrid[y][x].isLava;
+        delete behaviorGrid[y][x].isLavaMap;
+    }
     const lightRadius = Math.max(behaviorGrid[y][x]?.lightRadius || 0, behaviors.lightRadius || 0);
     const brightness = Math.max(behaviorGrid[y][x]?.brightness || 0, behaviors.brightness || 0);
     behaviorGrid[y][x] = {...(behaviorGrid[y][x] || {}), ...behaviors, lightRadius, brightness};

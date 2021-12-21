@@ -55,7 +55,10 @@ export class Enemy implements Actor, ObjectInstance {
     acceleration: number;
     aggroRadius: number;
     mode = 'choose';
+    // This time resets to 0 with every mode change.
     modeTime = 0;
+    // This time starts at 0 and updates with every enemy update call and shouldn't be reset.
+    time = 0;
     // Used to control animation of the healthBar for bosses.
     // This will be incremented each frame, but a boss can reset it to 0 on update to hide the
     // healthbar.
@@ -259,6 +262,9 @@ export class Enemy implements Actor, ObjectInstance {
         if (!this.alwaysUpdate && !this.isFromCurrentSection(state)) {
             return;
         }
+        this.time += FRAME_LENGTH;
+        this.modeTime += FRAME_LENGTH;
+        this.animationTime += FRAME_LENGTH;
         this.healthBarTime += FRAME_LENGTH;
         if (this.invulnerableFrames > 0) {
             this.invulnerableFrames--;
@@ -294,8 +300,6 @@ export class Enemy implements Actor, ObjectInstance {
         if (this.enemyDefinition.update) {
             this.enemyDefinition.update(state, this);
         }
-        this.modeTime += FRAME_LENGTH;
-        this.animationTime += FRAME_LENGTH;
         // Checks if the enemy fell into a pit, for example
         checkForFloorEffects(state, this);
     }
@@ -328,12 +332,15 @@ export class Enemy implements Actor, ObjectInstance {
         const frame = this.getFrame();
         context.save();
             if (this.invulnerableFrames) {
-                context.globalAlpha *= (0.7 + 0.3 * Math.cos(2 * Math.PI * this.invulnerableFrames * 3 / 50));
+                context.globalAlpha *= (0.7 + 0.3 * Math.cos(2 * Math.PI * this.time / 150));
             }
             if (this.d === 'right' && this.enemyDefinition.flipRight) {
                 // Flip the frame when facing right. We may need an additional flag for this behavior
                 // if we don't do it for all enemies on the right frames.
                 const w = frame.content?.w ?? frame.w;
+                if (this.definition.enemyType === 'flameHeart') {
+                    console.log(frame, frame.content, w);
+                }
                 context.translate((this.x | 0) + ((frame?.content?.x || 0) + w / 2) * this.scale, 0);
                 context.scale(-1, 1);
                 drawFrame(context, frame, { ...frame,

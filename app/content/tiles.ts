@@ -1176,7 +1176,7 @@ const lava: TileSource = {
     w: 16, h: 16,
     source: {image: lavaCanvas, x: 0, y: 0, w: 64, h: 80},
     behaviors: {
-        'all': { defaultLayer: 'floor2', isLava: true },
+        'all': { defaultLayer: 'floor2', isLava: true, editorTransparency: 0.3 },
     },
 };
 

@@ -479,6 +479,9 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
                 hero.wading = false;
             }
             // Use z <= 1 so that feather boots are still caught here.
+            // Lava is like a pit for the sake of cloud walking boots sinking over them, but it damages
+            // like normal damaging ground rather than a pit. This was done because there were many instances
+            // it was difficult to reset the player's position when transition screens over lava.
             if ((behaviors.pit || behaviors.isLava) && (!hero.equipedGear.cloudBoots || !behaviors.cloudGround)) {
                 if (hero.y - row * 16 > 4) {
                     if (hero.x - column * 16 > 4) {
@@ -518,16 +521,18 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
         hero.action = null;
     }
     hero.isOverPit = fallingTopLeft && fallingTopRight && fallingBottomLeft && fallingBottomRight;
-    if (hero.isOverPit) {
+    if (hero.isOverPit && !state.nextAreaSection && !state.nextAreaInstance) {
         if (hero.z <= 0 && hero.action !== 'roll') {
-            hero.throwHeldObject(state);
-            hero.action = 'falling';
-            hero.x = Math.round(hero.x / tileSize) * tileSize;
-            hero.y = Math.round(hero.y / tileSize) * tileSize;
-            hero.animationTime = 0;
-            let behaviors = behaviorGrid[(hero.y / 16) | 0]?.[(hero.x / 16) | 0];
+            let behaviors = behaviorGrid[Math.round(hero.y / tileSize)]?.[Math.round(hero.x / tileSize)];
             if (behaviors?.isLava) {
-                hero.action = 'sinkingInLava';
+                hero.onHit(state, { damage: 8, element: 'fire' });
+            } else {
+                console.log(behaviors, )
+                hero.throwHeldObject(state);
+                hero.action = 'falling';
+                hero.x = Math.round(hero.x / tileSize) * tileSize;
+                hero.y = Math.round(hero.y / tileSize) * tileSize;
+                hero.animationTime = 0;
             }
         }
     } else if (hero.z <= 0 && hero.action !== 'roll') {

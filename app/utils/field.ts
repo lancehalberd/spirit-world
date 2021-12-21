@@ -413,7 +413,11 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
     for (const target of hitTiles) {
         const behavior = area.behaviorGrid?.[target.y]?.[target.x];
         // Ice hits that effect tiles cover them in ice as long as they aren't pits or walls.
-        if (hit.element === 'ice' && typeof behavior?.elementTiles?.fire === 'undefined' && !behavior?.solid && !behavior?.pit) {
+        if (hit.element === 'ice' && typeof behavior?.elementTiles?.fire === 'undefined'
+            && !behavior?.solid  && !behavior?.solidMap
+            && !behavior?.pit && !behavior?.edges
+            && !behavior?.isLava &&  !behavior?.isLavaMap
+        ) {
             let topLayer: AreaLayer = area.layers[0];
             for (const layer of area.layers) {
                 if (layer.definition.drawPriority !== 'foreground') {

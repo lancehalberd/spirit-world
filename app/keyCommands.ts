@@ -165,6 +165,7 @@ export function addKeyCommands() {
                 editingState.clipboardObject = {...editingState.selectedObject};
             } else {
                 exportZoneToClipboard(getState().zone);
+                editingState.hasChanges = false;
                 event.preventDefault();
             }
         }

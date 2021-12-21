@@ -213,7 +213,7 @@ const f0_0x0: AreaDefinition = {
             },
         },
         {
-            key: 'fireBeastLava',
+            key: 'flameBeastLava',
             drawPriority: 'background',
             logicKey: 'mountainLava',
             grid: {

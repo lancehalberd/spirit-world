@@ -1,20 +1,14 @@
 import { addSparkleAnimation } from 'app/content/animationEffect';
 import { addObjectToArea, getAreaSize, removeObjectFromArea } from 'app/content/areas';
+import { flameAnimation } from 'app/content/effects/flame';
 import { CANVAS_HEIGHT, CANVAS_WIDTH, FRAME_LENGTH } from 'app/gameConstants';
-import { createAnimation, drawFrame } from 'app/utils/animations';
+import { drawFrame, getFrame } from 'app/utils/animations';
 import { directionMap, hitTargets, rotateDirection } from 'app/utils/field';
 
 import {
     AreaInstance, Direction,
     Frame, GameState, ObjectInstance, ObjectStatus,
 } from 'app/types';
-
-export const [
-    /* container */, fireElement, /* elementShine */
-] = createAnimation('gfx/hud/elementhud.png',
-    {w: 20, h: 20, content: {x: 2, y: 2, w: 16, h: 16}}, {cols: 6}
-).frames;
-
 
 interface Props {
     direction: Direction
@@ -42,6 +36,7 @@ export class FlameWall implements ObjectInstance, Props {
     length = 6;
     delay: number;
     animationTime = 0;
+    time = 0;
     direction: Direction;
     status: ObjectStatus = 'normal';
     speed = 0;
@@ -52,6 +47,7 @@ export class FlameWall implements ObjectInstance, Props {
         this.direction = direction;
         this.length = length;
         this.fromPoint = fromPoint;
+        this.animationTime = Math.floor(Math.random() * 10) * FRAME_LENGTH;
     }
     getHitbox(state: GameState) {
         return {
@@ -67,7 +63,7 @@ export class FlameWall implements ObjectInstance, Props {
         let top = section.y + 32;
         let right = section.x + section.w - 32;
         let bottom = section.y + section.h - 32;
-        if (this.animationTime === 0) {
+        if (this.time === 0) {
             left = Math.max(state.camera.x, left);
             right = Math.min(state.camera.x + CANVAS_WIDTH - 16, right);
             top = Math.max(state.camera.y, top);
@@ -101,6 +97,7 @@ export class FlameWall implements ObjectInstance, Props {
                 }
             }
         }
+        this.time += FRAME_LENGTH;
         this.animationTime += FRAME_LENGTH;
         if (this.animationTime >= this.delay) {
             this.speed = Math.min(4, this.speed + 0.5);
@@ -140,21 +137,22 @@ export class FlameWall implements ObjectInstance, Props {
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
+        const frame = getFrame(flameAnimation, this.animationTime);
         const hitbox = this.getHitbox(state);
-        const h = fireElement.h * Math.min(1, this.animationTime / this.delay);
+        const h = frame.h * Math.min(1, this.animationTime / this.delay);
         //context.fillRect(hitbox.x, hitbox.y, hitbox.w, hitbox.h);
         for (let i = 0; i < this.length; i++) {
             drawFrame(context,
-                {...fireElement, y: fireElement.y + fireElement.h - h, h},
+                {...frame, y: frame.y + frame.h - h, h},
                 {
-                    x: hitbox.x + i * (hitbox.w - 16) / ((this.length - 1) || 1) - fireElement.content.x,
-                    y: hitbox.y + i * (hitbox.h - 16) / ((this.length - 1) || 1) - fireElement.content.y
+                    x: hitbox.x + i * (hitbox.w - 16) / ((this.length - 1) || 1) - frame.content.x,
+                    y: hitbox.y + i * (hitbox.h - 16) / ((this.length - 1) || 1) - frame.content.y
                         // This anchors the flame to the bottom of the frame so it draws from bottom to top.
-                        + fireElement.h - h
+                        + frame.h - h
                         // Make the frame bob a little bit.
                         + 2 * Math.sin(this.animationTime / 100 + i),
                     h,
-                    w: fireElement.w
+                    w: frame.w
                 }
             );
         }

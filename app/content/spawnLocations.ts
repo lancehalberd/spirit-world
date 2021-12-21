@@ -244,7 +244,7 @@ const riverTempleBossState = applyItems(waterfallBossState,
     ['bossBubblesNorth','bossBubblesSouth', 'bossBubblesWest', 'bossBubblesEast']
 );
 
-const craterStartState = applyItems(helixEndState, {cloudBoots: 1, irontBoots: 1, ice: 1, lightning: 1, waterBlessing: 1});
+const craterStartState = applyItems(helixEndState, {cloudBoots: 1, ironBoots: 1, ice: 1, lightning: 1, waterBlessing: 1});
 const craterBossState = applyItems(craterStartState, {fireBlessing: 1},
     ['craterLava1', 'craterLava2', 'craterLava3', 'craterLava4', 'craterLava5']
 );
