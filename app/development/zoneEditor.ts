@@ -1,6 +1,7 @@
 import {
     enterLocation, setAreaSection, setConnectedAreas,
 } from 'app/content/areas';
+import { logicHash } from 'app/content/logic';
 import { zones } from 'app/content/zones';
 import { exportZoneToClipboard, importZone, serializeZone } from 'app/development/exportZone';
 import { displayTileEditorPropertyPanel, EditingState } from 'app/development/tileEditor';
@@ -10,7 +11,7 @@ import { getState } from 'app/state';
 import { readFromFile, saveToFile } from 'app/utils/index';
 
 import {
-    Floor, GameState, PanelRows, Zone
+    Floor, GameState, LogicDefinition, PanelRows, PropertyRow, Zone
 } from 'app/types';
 
 const fullSection = {x: 0, y: 0, w: 32, h: 32};
@@ -64,7 +65,7 @@ export function renderZoneEditor(context: CanvasRenderingContext2D, state: GameS
 }
 
 export function getZoneProperties(state: GameState, editingState: EditingState): PanelRows {
-    const rows: PanelRows = [];
+    let rows: PanelRows = [];
     rows.push({
         name: editingState.showZoneProperties ? 'Zone -' : 'Zone +',
         onClick() {
@@ -306,6 +307,12 @@ export function getZoneProperties(state: GameState, editingState: EditingState):
             }
         }
     });
+    rows.push('Is Hot?');
+    rows = [...rows, ...getLogicProperties(state, state.areaInstance.definition.hotLogic || {}, updatedLogic => {
+        state.areaInstance.definition.hotLogic = updatedLogic;
+        enterLocation(state, state.location);
+        displayTileEditorPropertyPanel();
+    })];
     rows.push({
         name: 'Refresh Area',
         onClick() {
@@ -313,6 +320,74 @@ export function getZoneProperties(state: GameState, editingState: EditingState):
             state.location.y = state.hero.y;
             // Calling this will instantiate the area again and place the player back in their current location.
             enterLocation(state, state.location);
+        }
+    });
+    return rows;
+}
+
+export function getLogicProperties(
+    state: GameState,
+    logic: LogicDefinition,
+    updateLogic: (newLogic?: LogicDefinition) => void
+): PanelRows {
+    const rows: PanelRows = [];
+    let currentValue = 'none';
+    if (logic.isTrue) {
+        currentValue = 'true';
+    } else if (logic.hasCustomLogic) {
+        currentValue = 'custom';
+    } else if (logic.logicKey) {
+        currentValue = logic.logicKey;
+    }
+    const row: PropertyRow = [{
+        name: 'Logic',
+        value: currentValue,
+        values: ['none', 'true', 'custom', ...Object.keys(logicHash)],
+        onChange(logicType: string) {
+            if (logicType === 'none') {
+                updateLogic();
+            } else if (logicType === 'true') {
+                updateLogic({
+                    isTrue: true,
+                    isInverted: !!logic.isInverted,
+                });
+            } else if (logicType === 'custom') {
+                updateLogic({
+                    hasCustomLogic: true,
+                    customLogic: logic.customLogic || '',
+                    isInverted: !!logic.isInverted,
+                });
+            } else {
+                updateLogic({
+                    logicKey: logicType,
+                    isInverted: !!logic.isInverted,
+                });
+            }
+        }
+    }];
+    if (currentValue === 'custom') {
+        row.push({
+            name: 'Flag',
+            value: logic.customLogic || '',
+            onChange(customLogic: string) {
+                const updatedLogic = {...logic};
+                updatedLogic.customLogic = customLogic;
+                updateLogic(updatedLogic);
+            },
+        });
+    }
+    rows.push(row);
+    rows.push({
+        name: 'Invert',
+        value: !!logic.isInverted,
+        onChange(isInverted: boolean) {
+            const updatedLogic = {...logic};
+            if (!isInverted) {
+                delete updatedLogic.isInverted;
+            } else {
+                updatedLogic.isInverted = true;
+            }
+            updateLogic(updatedLogic);
         }
     });
     return rows;

@@ -17,6 +17,7 @@ import { updateCamera } from 'app/updateCamera';
 import {
     AreaDefinition, AreaInstance, AreaLayerDefinition,
     Direction, Enemy, FullTile, GameState, Hero, TileCoords,
+    LogicDefinition,
     ObjectDefinition,
     ObjectInstance,
     Rect, Tile, TileBehaviors,
@@ -641,7 +642,21 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
     definition.objects.filter(
         object => isObjectLogicValid(state, object)
     ).map(o => addObjectToArea(state, instance, createObjectInstance(state, o)));
+    instance.isHot = evaluateLogicDefinition(state, instance.definition.hotLogic, false);
     return instance;
+}
+
+export function evaluateLogicDefinition(state: GameState, logicDefinition?: LogicDefinition, defaultValue: boolean = true): boolean {
+    if (!logicDefinition) {
+        return defaultValue;
+    }
+    if (logicDefinition.isTrue) {
+        return !logicDefinition.isInverted;
+    }
+    if (logicDefinition.hasCustomLogic) {
+        return isLogicValid(state, { requiredFlags: [logicDefinition.customLogic] }, logicDefinition.isInverted);
+    }
+    return isLogicValid(state, logicHash[logicDefinition.logicKey], logicDefinition.isInverted);
 }
 
 export function getAreaSize(state: GameState): {w: number, h: number, section: Rect} {
@@ -715,6 +730,7 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance): void {
             }
         }
     }
+    area.isHot = evaluateLogicDefinition(state, area.definition.hotLogic, false);
     for (const object of area.definition.objects) {
         if (!object.logicKey && !object.hasCustomLogic) {
             continue;

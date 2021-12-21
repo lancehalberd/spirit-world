@@ -99,6 +99,12 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
     if (hero.actionTarget && hero.actionTarget.area !== hero.area) {
         hero.actionTarget = null;
     }
+    // Hero takes one damage every half second while in a hot room without the fire blessing.
+    if (!editingState.isEditing && hero.area?.isHot && !hero.passiveTools.fireBlessing) {
+        if (state.time % 500 === 0) {
+            hero.takeDamage(state, 1);
+        }
+    }
     if (hero.isControlledByObject) {
         hero.animationTime += FRAME_LENGTH;
         updateScreenTransition(state, hero);

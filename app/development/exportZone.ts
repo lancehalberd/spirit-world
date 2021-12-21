@@ -116,6 +116,9 @@ export function serializeZone(zone: Zone) {
                     if (area.dark) {
                         lines.push(`    dark: ${area.dark},`);
                     }
+                    if (area.hotLogic) {
+                        lines.push(`    hotLogic: ${JSON.stringify(area.hotLogic)},`);
+                    }
                     lines.push('};');
                 }
             }

@@ -1,6 +1,6 @@
 import {
     DrawPriority, Enemy,
-    Frame, LootTable, MagicElement,
+    Frame, LogicDefinition, LootTable, MagicElement,
     ObjectDefinition, ObjectInstance,
     Rect,
 } from 'app/types';
@@ -195,6 +195,7 @@ export interface AreaDefinition {
     sections: Rect[],
     // 0/undefined = fully lit, 100 = pitch black.
     dark?: number,
+    hotLogic?: LogicDefinition
     // Spirit world areas with real counterparts have this reference set
     // to make it more convenient to translate real tiles/objects to the spirit world.
     parentDefinition?: AreaDefinition,
@@ -222,41 +223,42 @@ export interface Floor {
 export type AreaGrid = AreaDefinition[][];
 
 export interface AreaInstance {
-    alternateArea: AreaInstance,
-    definition: AreaDefinition,
-    w: number,
-    h: number,
-    behaviorGrid: TileBehaviors[][],
-    checkToRedrawTiles: boolean,
-    tilesDrawn: boolean[][],
-    underwater?: boolean,
-    layers: AreaLayer[],
-    objects: ObjectInstance[],
-    priorityObjects: ObjectInstance[][],
+    alternateArea: AreaInstance
+    definition: AreaDefinition
+    w: number
+    h: number
+    behaviorGrid: TileBehaviors[][]
+    checkToRedrawTiles: boolean
+    tilesDrawn: boolean[][]
+    underwater?: boolean
+    layers: AreaLayer[]
+    objects: ObjectInstance[]
+    priorityObjects: ObjectInstance[][]
     // Array of object ids that were created on this instance but have been removed.
     // This is used when refreshing area logic to only add objects that had not already been present.
     removedObjectIds: string[]
     // These cached the tile backgrounds and are only updated when specific tile are marked to be redrawn.
-    canvas: HTMLCanvasElement,
-    context: CanvasRenderingContext2D,
+    canvas: HTMLCanvasElement
+    context: CanvasRenderingContext2D
     // Foreground is only created as needed.
-    foregroundCanvas?: HTMLCanvasElement,
-    foregroundContext?: CanvasRenderingContext2D,
+    foregroundCanvas?: HTMLCanvasElement
+    foregroundContext?: CanvasRenderingContext2D
     // These cache the tile based lighting and are only created when lighting effects are in play.
     // These are recalculated when from scratch when tiles with lighting behavior are changed.
-    lightingCanvas?: HTMLCanvasElement,
-    lightingContext?: CanvasRenderingContext2D,
+    lightingCanvas?: HTMLCanvasElement
+    lightingContext?: CanvasRenderingContext2D
     // These cache the tile based lights from tiles where you can surface under water and are stored
     // on the underwater area but updated any time the surfae area is redrawn.
-    waterSurfaceCanvas?: HTMLCanvasElement,
-    waterSurfaceContext?: CanvasRenderingContext2D,
+    waterSurfaceCanvas?: HTMLCanvasElement
+    waterSurfaceContext?: CanvasRenderingContext2D
     // This is used during transitions to indicate that the top left corner
     // of this area is offset from the camera origin by this many pixels.
-    cameraOffset: {x: number, y: number},
-    enemies: Enemy[],
-    allyTargets: ObjectInstance[],
-    enemyTargets: ObjectInstance[],
-    neutralTargets: ObjectInstance[],
+    cameraOffset: {x: number, y: number}
+    enemies: Enemy[]
+    allyTargets: ObjectInstance[]
+    enemyTargets: ObjectInstance[]
+    neutralTargets: ObjectInstance[]
+    isHot?: boolean
 }
 
 

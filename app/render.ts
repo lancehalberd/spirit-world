@@ -74,6 +74,7 @@ export function renderStandardFieldStack(context: CanvasRenderingContext2D, stat
     renderSurfaceLighting(context, state, state.areaInstance);
     renderFieldForeground(context, state);
     renderWaterOverlay(context, state);
+    renderHeatOverlay(context, state);
     renderSpiritOverlay(context, state);
     renderAreaLighting(context, state, state.areaInstance, state.nextAreaInstance);
 }
@@ -380,6 +381,15 @@ export function renderWaterOverlay(context: CanvasRenderingContext2D, state: Gam
         context.save();
             context.globalAlpha = 0.6;
             context.fillStyle = 'blue';
+            context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        context.restore();
+    }
+}
+export function renderHeatOverlay(context: CanvasRenderingContext2D, state: GameState) {
+    if (!editingState.isEditing && state.areaInstance?.isHot) {
+        context.save();
+            context.globalAlpha = 0.4;
+            context.fillStyle = 'red';
             context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
         context.restore();
     }

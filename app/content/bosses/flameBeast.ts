@@ -211,6 +211,10 @@ function updateFireBeast(this: void, state: GameState, enemy: Enemy): void {
             enemy.z = Math.max(0, enemy.z + enemy.vz);
             return;
         }
+        if (!isEnemyDefeated(flameHeart)) {
+            enemy.setMode('choose');
+            return;
+        }
         // Cannot deal or take damage whil regenerating.
         enemy.enemyInvulnerableFrames = enemy.invulnerableFrames = 20;
         if (enemy.modeTime % 1000 === 0) {

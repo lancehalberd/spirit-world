@@ -14,6 +14,18 @@ export interface SimpleLogicCheck {
     zones?: string[]
 }
 
+export interface LogicDefinition {
+    // Set this to indicate something is always in logic
+    isTrue?: boolean
+    // This can be set to a single key to check.
+    hasCustomLogic?: boolean
+    customLogic?: string
+    // This can be set to a specific logic key to use.
+    logicKey?: string
+    // If this is true, then the logic is inverted.
+    isInverted?: boolean
+}
+
 export interface AndLogicCheck {
     operation: 'and'
     logicChecks: LogicCheck[]
