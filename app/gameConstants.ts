@@ -39,3 +39,4 @@ export const FADE_IN_DURATION = 600;
 export const FADE_OUT_DURATION = 600;
 export const CIRCLE_WIPE_IN_DURATION = 1000;
 export const CIRCLE_WIPE_OUT_DURATION = 1000;
+export const MUTATE_DURATION = 1200;

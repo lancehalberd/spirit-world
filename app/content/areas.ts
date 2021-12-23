@@ -722,8 +722,9 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance): void {
             refreshBehavior = true;
         }
     }
-    if (refreshBehavior) {
-        for (const instance of [area, area.alternateArea]) {
+    const shouldBeHot = evaluateLogicDefinition(state, area.definition.hotLogic, false);
+    if (refreshBehavior || area.isHot !== shouldBeHot) {
+        /*for (const instance of [area, area.alternateArea]) {
             instance.tilesDrawn = [];
             instance.checkToRedrawTiles = true;
             instance.behaviorGrid = [];
@@ -734,9 +735,17 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance): void {
                     instance.definition.parentDefinition?.layers[definitionIndex]
                 );
             }
-        }
+        }*/
+
+        state.transitionState = {
+            callback: () => null,
+            nextLocation: state.location,
+            time: 0,
+            type: 'mutating',
+            nextAreaInstance: createAreaInstance(state, state.areaInstance.definition),
+        };
+        state.hero.vx = state.hero.vy = 0;
     }
-    area.isHot = evaluateLogicDefinition(state, area.definition.hotLogic, false);
     for (const object of area.definition.objects) {
         if (!object.logicKey && !object.hasCustomLogic) {
             continue;

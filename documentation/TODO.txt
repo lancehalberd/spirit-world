@@ -4,9 +4,6 @@ Low Priority Bugs:
     - Enemies can walk on stairs cases and over bead flows
         - Add an invisible enemy wall object?
     - Astral Projection appears in front of waterfall graphics only when south of main body in waterfall tower.
-    - Clean up attack effects on defeating bosses.
-        - Need to set a flag on all attack effects so they are easy to find and remove.
-    - Foreground only renders for the active area, should render for the alternate area as well.
     - Pushing on a solid object sitting on thorny ground shouldn't hurt you:
         -return tileBehaviors and objectBehaviors separately, only damage if tile is solid+damaging.
     - Doors don't appear open when moving into them from a different section
@@ -29,13 +26,7 @@ Graphics:
 
 
 Current tasks:
-    Bug Fixes:
-        - Standing on clouds without cloud boots
-        - Melt ice tiles after end of crater miniboss
-        - Melt ice tiles after end of ice boss
-
     - Forest Temple
-        - Add locked doors and chests and big chest with cloud boots
         - Add temporary boss with clone tool.
     - Crater Dungeon
         - Entrance should be blocked by cooled solid magma until elemental beasts are released.

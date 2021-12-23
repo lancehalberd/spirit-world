@@ -215,7 +215,9 @@ export function getTileBehaviorsAndObstacles(
         tileBehavior.solid = !!(tileBehavior.solidMap[sy] >> (15 - sx) & 1);
     }
     for (const object of area.objects) {
-        if (object.status === 'hidden' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
+        if (object.status === 'hidden' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch'
+            || object.status === 'gone'
+        ) {
             continue;
         }
         if (excludedObjects?.has(object)) {

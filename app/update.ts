@@ -9,6 +9,7 @@ import {
     FRAME_LENGTH, GAME_KEY,
     FADE_IN_DURATION, FADE_OUT_DURATION,
     CIRCLE_WIPE_IN_DURATION, CIRCLE_WIPE_OUT_DURATION,
+    MUTATE_DURATION,
 } from 'app/gameConstants';
 import { updateKeyboardState } from 'app/keyCommands';
 import { initializeGame } from 'app/initialize';
@@ -51,12 +52,12 @@ export function update() {
             state.paused = !state.paused;
             state.menuIndex = 0;
         }
-        if (state.transitionState) {
+        if (state.messageState?.pages) {
+            updateMessage(state);
+        } else if (state.transitionState && !state.areaInstance.priorityObjects?.length) {
             if (!state.paused) {
                 updateTransition(state);
             }
-        } else if (state.messageState?.pages) {
-            updateMessage(state);
         } else if (state.scene === 'title' || state.scene === 'chooseGameMode' ||
             state.scene === 'deleteSavedGame' || state.scene === 'deleteSavedGameConfirmation'
         ) {
@@ -327,6 +328,13 @@ function updateTransition(state: GameState) {
             state.hero.z = Math.min(state.transitionState.nextLocation.z, state.hero.z + 1);
         }
         if (state.transitionState.time === CIRCLE_WIPE_OUT_DURATION) {
+            enterLocation(state, state.transitionState.nextLocation, true);
+            state.transitionState.callback?.();
+            updateCamera(state);
+            state.transitionState = null;
+        }
+    } else if (state.transitionState.type === 'mutating') {
+        if (state.transitionState.time === MUTATE_DURATION) {
             enterLocation(state, state.transitionState.nextLocation, true);
             state.transitionState.callback?.();
             updateCamera(state);

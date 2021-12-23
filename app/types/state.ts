@@ -57,19 +57,21 @@ export interface GameState {
     location: ZoneLocation,
     transitionState?: {
         // The location to switch to after the current screen wipe transition.
-        nextLocation: ZoneLocation,
+        nextLocation: ZoneLocation
         // This is used for rendering the next area when diving/surfacing.
         // It is also used to avoid recreating areas when teleporting between spirit+material worlds.
-        nextAreaInstance?: AreaInstance,
+        nextAreaInstance?: AreaInstance
         // This is used to avoid recreating areas then teleporting between spirit+material worlds.
-        nextAlternateAreaInstance?: AreaInstance,
-        time: number,
-        callback: () => void,
-        patternCanvas?: HTMLCanvasElement,
-        pattern?: CanvasPattern,
-        type: 'circle' | 'fade' | 'portal' | 'diving' | 'surfacing',
+        nextAlternateAreaInstance?: AreaInstance
+        time: number
+        callback: () => void
+        patternCanvas?: HTMLCanvasElement
+        patternContext?: CanvasRenderingContext2D
+        pattern?: CanvasPattern
+        underCanvas?: HTMLCanvasElement
+        type: 'circle' | 'fade' | 'portal' | 'diving' | 'surfacing' | 'mutating'
         // The targetZ value for the hero after the transition.
-        targetZ?: number,
+        targetZ?: number
     },
     paused: boolean,
     menuIndex: number,

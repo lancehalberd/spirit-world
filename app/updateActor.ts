@@ -1115,7 +1115,9 @@ export function checkForEnemyDamage(state: GameState, hero: Hero) {
         debugger;
     }
     for (const enemy of hero.area.objects) {
-        if (!(enemy instanceof Enemy) || enemy.invulnerableFrames > 0 || enemy.status === 'hidden') {
+        if (!(enemy instanceof Enemy) || enemy.invulnerableFrames > 0
+            || enemy.status === 'hidden' || enemy.status === 'gone'
+        ) {
             continue;
         }
         const touchHit = enemy.enemyDefinition.touchDamage
