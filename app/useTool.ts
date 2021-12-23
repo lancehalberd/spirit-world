@@ -7,6 +7,9 @@ import { directionMap, getDirection } from 'app/utils/field';
 import { ActiveTool, GameState, Hero, MagicElement } from 'app/types'
 
 export function getChargeLevelAndElement(state: GameState, hero: Hero, tool: ActiveTool = null) {
+    if (state.hero.magic <= 0) {
+        return { chargeLevel: 0, element: null };
+    }
     let chargeLevel = 0;
     let element: MagicElement = null;
     if (state.hero.passiveTools.charge >= 2) {

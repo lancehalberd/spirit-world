@@ -1,6 +1,6 @@
 import { uniq } from 'lodash';
 
-import { getAreaSize } from 'app/content/areas';
+import { destroyTile, getAreaSize } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { directionMap, getTileBehaviorsAndObstacles, isPointOpen } from 'app/utils/field';
 
@@ -165,7 +165,7 @@ function moveActorInDirection(
         // of solid tiles to make them passable.
         const isTilePassable = (!tileBehavior?.solid || tileBehavior.climbable);
         // The second condition is a hack to prevent enemies from walking over pits.
-        if (!isTilePassable || ((tileBehavior?.pit || tileBehavior?.isLava) && !canFall)) {
+        if (!isTilePassable || ((tileBehavior?.pit || tileBehavior?.isLava || tileBehavior?.isBrittleGround) && !canFall)) {
             blockedByTile = true;
         }
         if (tileBehavior?.water && !canSwim) {
@@ -443,19 +443,31 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
     for (let row = topRow; row <= bottomRow; row++) {
         for (let column = leftColumn; column <= rightColumn; column++) {
             let behaviors = behaviorGrid[row]?.[column];
+            let actualRow = row;
+            let actualColumn = column;
             // During screen transitions, the row/column will be out of bounds for the current screen,
             // so we need to wrap them and work against the next screen.
             if (row < 0 || row >= 32 || column < 0 || column >= 32) {
                 if (!state.nextAreaInstance) {
                     continue;
                 }
-                behaviors = state.nextAreaInstance.behaviorGrid[(row + 32) % 32]?.[(column + 32) % 32];
+                actualRow = (row + 32) % 32;
+                actualColumn = (column + 32) % 32;
+                behaviors = state.nextAreaInstance.behaviorGrid[actualRow]?.[actualColumn];
             }
             // Default behavior is open solid ground.
             if (!behaviors) {
                 hero.swimming = false;
                 hero.wading = false;
                 continue;
+            }
+            if (behaviors?.isBrittleGround && hero.z <= 0 && hero.action !== 'roll') {
+                for (const layer of hero.area.layers) {
+                    const tile = layer.tiles[actualRow]?.[actualColumn];
+                    if (tile?.behaviors?.isBrittleGround) {
+                        destroyTile(state, hero.area, {x: actualColumn, y: actualRow, layerKey: layer.key});
+                    }
+                }
             }
             if (behaviors.climbable) {
                 startClimbing = true;
@@ -527,7 +539,6 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
             if (behaviors?.isLava) {
                 hero.onHit(state, { damage: 8, element: 'fire' });
             } else {
-                console.log(behaviors, )
                 hero.throwHeldObject(state);
                 hero.action = 'falling';
                 hero.x = Math.round(hero.x / tileSize) * tileSize;

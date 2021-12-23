@@ -96,6 +96,10 @@ const equipElementMessage = '{|}Press {B_PREVIOUS_ELEMENT}/{B_NEXT_ELEMENT} to s
 
 function showLootMessage(state: GameState, lootType: LootType, lootLevel?: number, lootAmount?: number): void {
     switch (lootType) {
+        case 'cloudBoots':
+            return showMessage(state, 'You found Cloud Boots!' + equipBootsMessage
+                + '{|}Use the Cloud Boots to glide over dangerous ground and even walk in the clouds!'
+                + '{|}Cloud Boots allow you to move faster but with less control.');
         case 'ironBoots':
             return showMessage(state, 'You found Iron Boots!' + equipBootsMessage
                 + '{|}Use the Iron Boots to explore under water but watch your breath!'
@@ -282,7 +286,7 @@ export class LootObject implements ObjectInstance {
         const hero = state.hero.activeClone || state.hero;
         if (rectanglesOverlap(hero, getFrameHitBox(this.frame, this))) {
             removeObjectFromArea(state, this);
-            if (this.definition.id !== 'drop') {
+            if (this.definition.id && this.definition.id !== 'drop') {
                 state.savedState.objectFlags[this.definition.id] = true;
             }
             getLoot(state, this.definition);
@@ -376,7 +380,7 @@ export class ChestObject implements ObjectInstance {
             this.status = 'normal';
             // Make sure empty chese are recorded as opened for the randomizer, since some logic
             // depends on whether a chest was opened yet (cocoon small key chest, for example).
-            if (!state.savedState.objectFlags[this.definition.id]) {
+            if (this.definition.id && !state.savedState.objectFlags[this.definition.id]) {
                 state.savedState.objectFlags[this.definition.id] = true;
                 saveGame();
             }
@@ -391,9 +395,9 @@ export class ChestObject implements ObjectInstance {
     onGrab(state: GameState) {
         // You can only open a chest from the bottom.
         const hero = state.hero.activeClone || state.hero;
-        if (hero.d === 'up' && !this.isOpen(state)) {
+        if (this.definition.id && hero.d === 'up' && !this.isOpen(state)) {
             state.savedState.objectFlags[this.definition.id] = true;
-            if (this.linkedObject) {
+            if (this.linkedObject?.definition?.id) {
                 state.savedState.objectFlags[this.linkedObject.definition.id] = true;
             }
             getLoot(state, this.definition);
@@ -443,11 +447,13 @@ export class BigChest extends ChestObject implements ObjectInstance {
             showMessage(state, 'You need a special key to open this chest.');
             return;
         }
-        state.savedState.objectFlags[this.definition.id] = true;
-        if (this.linkedObject) {
-            state.savedState.objectFlags[this.linkedObject.definition.id] = true;
+        if (this.definition.id && !state.savedState.objectFlags[this.definition.id]) {
+            state.savedState.objectFlags[this.definition.id] = true;
+            if (this.linkedObject?.definition?.id) {
+                state.savedState.objectFlags[this.linkedObject.definition.id] = true;
+            }
+            getLoot(state, this.definition);
         }
-        getLoot(state, this.definition);
     }
     render(context, state: GameState) {
         if (this.isOpen(state)) {

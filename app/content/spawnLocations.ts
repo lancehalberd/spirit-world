@@ -121,6 +121,28 @@ export const SPAWN_HELIX_ENTRANCE: ZoneLocation = {
     isSpiritWorld: false,
 };
 
+
+export const SPAWN_FOREST_ENTRANCE: ZoneLocation = {
+    zoneKey: 'overworld',
+    floor: 0,
+    x: 400,
+    y: 330,
+    z: 0,
+    d: 'down',
+    areaGridCoords: {x: 0, y: 2},
+    isSpiritWorld: true,
+};
+export const SPAWN_FOREST_BACK: ZoneLocation = {
+    zoneKey: 'treeVillage',
+    floor: 1,
+    x: 320,
+    y: 375,
+    z: 0,
+    d: 'right',
+    areaGridCoords: {x: 0, y: 0},
+    isSpiritWorld: true,
+};
+
 export const SPAWN_WATERFALL_ENTRANCE: ZoneLocation = {
     zoneKey: 'waterfallTower',
     floor: 0,
@@ -238,6 +260,7 @@ const helixStartState = applyItems(cocoonBossState, {maxLife: 1, teleportation: 
 helixStartState.savedHeroData.rightTool = 'cloak';
 const helixEndState = applyItems(helixStartState, {charge: 1, staff: 1},
     ['elementalBeastsEscaped']);
+const forestBackState = applyItems(helixEndState, {cloudBoots: 1, 'forestTemple:bigKey': 1});
 const waterfallBossState = applyItems(helixEndState, {ironBoots: 1});
 const riverTempleBossState = applyItems(waterfallBossState,
     {maxLife: 3, 'riverTemple:bigKey': 1, 'fire': 1, 'lightning': 1},
@@ -290,6 +313,14 @@ const spawnLocations = {
         location: SPAWN_HELIX_ENTRANCE,
         savedState: helixStartState,
     },
+    'Forest Start': {
+        location: SPAWN_FOREST_ENTRANCE,
+        savedState: helixEndState,
+    },
+    'Forest Back': {
+        location: SPAWN_FOREST_BACK,
+        savedState: forestBackState,
+    },
     'Waterfall Start': {
         location: SPAWN_WATERFALL_ENTRANCE,
         savedState: helixEndState,
@@ -298,11 +329,11 @@ const spawnLocations = {
         location: SPAWN_WATERFALL_BOSS,
         savedState: waterfallBossState,
     },
-    'River Temple Start': {
+    'Lake Start': {
         location: SPAWN_LOCATION_PEACH_CAVE_EXIT,
         savedState: helixEndState,
     },
-    'River Temple Boss': {
+    'Lake Boss': {
         location: RIVER_TEMPLE_BOSS,
         savedState: riverTempleBossState,
     },
@@ -405,5 +436,15 @@ export function checkToUpdateSpawnLocation(state: GameState): void {
     }
     if (state.location.zoneKey === 'crater') {
         return setSpawnLocation(state, SPAWN_CRATER_ENTRANCE);
+    }
+    // If you are in the forest temple, or in overworld area that is part of the temple, respawn
+    // at the forest temple entrance.
+    if (state.location.zoneKey === 'forestTemple' || (
+        state.location.zoneKey === 'overworld'
+        && state.location.isSpiritWorld
+        && state.location.areaGridCoords[0] === 0
+        && state.location.areaGridCoords[0] === 1
+    )) {
+        return setSpawnLocation(state, SPAWN_FOREST_ENTRANCE);
     }
 }

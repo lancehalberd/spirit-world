@@ -237,13 +237,19 @@ export function enterLocation(
     state.hero.y = location.y;
     if (location.z >= 0) {
         state.hero.z = location.z;
-        if (location.z > 0) {
+        /*if (location.z > 0) {
             state.hero.action = 'knocked';
             // Make sure the character falls straight down.
             state.hero.vx = 0;
             state.hero.vy = 0;
-        }
+        }*/
     }
+    state.hero.vx = 0;
+    state.hero.vy = 0;
+    // Don't let magic become infinitely negative while being drained.
+    // We could also set magic to at least 0 during any zone transition instead of this.
+    state.hero.magic = Math.max(state.hero.magic, 0);
+    state.hero.actualMagicRegen = Math.max(state.hero.actualMagicRegen, 0);
     state.hero.safeD = state.hero.d;
     state.hero.safeX = location.x;
     state.hero.safeY = location.y;

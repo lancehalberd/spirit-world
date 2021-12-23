@@ -105,33 +105,84 @@ interface DoorStyleDefinition {
     left?: DoorStyleFrames,
 }
 const woodImage = requireImage('gfx/tiles/woodhousetilesarranged.png');
+//const woodenCrackedSouthBackground: Frame = {image: woodImage, x: 48, y: 0, w: 16, h: 16};
 const woodenSouthCrackedWall: Frame = {image: woodImage, x: 32, y: 96, w: 16, h: 16};
+//const woodenCrackedEastBackground: Frame = {image: woodImage, x: 0, y: 0, w: 16, h: 16};
+const woodenEastCrackedWall: Frame = {image: woodImage, x: 32, y: 80, w: 16, h: 16};
+//const woodenCrackedWestBackground: Frame = {image: woodImage, x: 0, y: 0, w: 16, h: 16};
+const woodenWestCrackedWall: Frame = {image: woodImage, x: 32, y: 80, w: 16, h: 16};
 const [
     woodenSouthDoorClosed, /* empty space */, woodenSouthDoorOpen, woodenSouthDoorEmpty
 ] = createAnimation('gfx/tiles/woodhousetilesarranged.png', {w: 64, h: 16},
     {left: 304, y: 13, cols: 2, rows: 2}).frames;
+const [
+    woodenWestDoorClosed, woodenEastDoorClosed, woodenWestDoorOpen, woodenEastDoorOpen,
+    woodenWestDoorEmpty, woodenEastDoorEmpty,
+] = createAnimation('gfx/tiles/woodhousetilesarranged.png', {w: 16, h: 48},
+    {left: 304, top: 160, cols: 6}).frames;
+const [
+    woodenWestDoorOpenForeground, woodenEastDoorOpenForeground,
+    woodenWestDoorEmptyForeground, woodenEastDoorEmptyForeground,
+] = createAnimation('gfx/tiles/woodhousetilesarranged.png', {w: 16, h: 48},
+    {left: 304, top: 160, cols: 4}).frames;
+const [
+    woodenNorthCrack, woodenNorthBlownup,
+] = createAnimation('gfx/tiles/woodhousetilesarranged.png', {w: 32, h: 32},
+    {left: 368, top: 64, rows: 2}).frames;
+const [
+    woodenNorthDoorway,
+] = createAnimation('gfx/tiles/woodhousetilesarranged.png', {w: 32, h: 32},
+    {left: 368, top: 128}).frames;
 function renderWoodenDoor(context: CanvasRenderingContext2D, state: GameState, door: Door) {
-    /*if (door.definition.d === 'down') {
-        let frame = woodenSouthDoorEmpty;
+    if (door.definition.d === 'up') {
+        let frame = woodenNorthDoorway, overFrame: Frame = null;
         if (door.isOpen()) {
-            if (door.definition.status === 'locked'
-                || door.definition.status === 'bigKeyLocked'
-                || door.definition.status === 'closed') {
-                frame = woodenSouthDoorOpen;
+            if (door.definition.status === 'cracked') {
+                frame = woodenNorthBlownup;
             }
-        } else if (door.status === 'locked' || door.status === 'bigKeyLocked' || door.status === 'closed') {
-            frame = woodenSouthDoorClosed;
+        } else if (door.status === 'locked') {
+            overFrame = lockedDoorCover;
+        } else if (door.status === 'bigKeyLocked' ) {
+            overFrame = bigLockedDoorCover;
+        } else if (door.status === 'cracked') {
+            frame = woodenNorthCrack;
+        } else {
+            // This covers closed, closedEnemy + closedSwitch
+            overFrame = blockedDoorCover;
         }
         drawFrame(context, frame, {...frame, x: door.x, y: door.y});
-        // Draw cracked tiles on top fo the door frame graphic.
-        if (door.status === 'cracked') {
-            drawFrame(context, woodenSouthCrackedWall, {x: door.x + 16, y: door.y, w: 16, h: 16});
-            drawFrame(context, woodenSouthCrackedWall, {x: door.x + 32, y: door.y, w: 16, h: 16});
+        if (overFrame) {
+            drawFrame(context, overFrame, {...overFrame, x: door.x, y: door.y});
         }
-    }*/
+    } else if (door.definition.d === 'left') {
+        if (door.status === 'cracked') {
+            return;
+        }
+        let frame = woodenWestDoorEmpty;
+        if (door.definition.status !== 'normal'
+            && door.definition.status !== 'cracked'
+            && door.definition.status !== 'blownOpen'
+        ) {
+            frame = door.renderOpen(state) ? woodenWestDoorOpen : woodenWestDoorClosed;
+        }
+        drawFrame(context, frame, {...frame, x: door.x, y: door.y});
+    } else if (door.definition.d === 'right') {
+        if (door.status === 'cracked') {
+            return;
+        }
+        let frame = woodenEastDoorEmpty;
+        if (door.definition.status !== 'normal'
+            && door.definition.status !== 'cracked'
+            && door.definition.status !== 'blownOpen'
+        ) {
+            frame = door.renderOpen(state) ? woodenEastDoorOpen : woodenEastDoorClosed;
+        }
+        drawFrame(context, frame, {...frame, x: door.x, y: door.y});
+    }
+    // There is no background frame for southern doors.
 }
 function renderWoodenDoorForeground(context: CanvasRenderingContext2D, state: GameState, door: Door) {
-    if (door.definition.d === 'down') {
+    /*if (door.definition.d === 'down') {
         let frame = woodenSouthDoorEmpty;
         if (door.isOpen()) {
             if (door.definition.status !== 'normal'
@@ -147,6 +198,72 @@ function renderWoodenDoorForeground(context: CanvasRenderingContext2D, state: Ga
         if (door.status === 'cracked') {
             drawFrame(context, woodenSouthCrackedWall, {x: door.x + 16, y: door.y, w: 16, h: 16});
             drawFrame(context, woodenSouthCrackedWall, {x: door.x + 32, y: door.y, w: 16, h: 16});
+        }
+    }*/
+    if (door.definition.d === 'down') {
+        let frame = woodenSouthDoorEmpty;
+        // This frame is used if the doorway can have a door in it (closed or locked).
+        if (door.definition.status !== 'normal'
+            && door.definition.status !== 'cracked'
+            && door.definition.status !== 'blownOpen'
+        ) {
+            frame = door.renderOpen(state) ? woodenSouthDoorOpen : woodenSouthDoorClosed;
+        }
+        // Draw cracked tiles instead of the door.
+        if (door.status === 'cracked') {
+            //drawFrame(context, woodenCrackedSouthBackground, {x: door.x, y: door.y, w: 16, h: 16});
+            drawFrame(context, woodenSouthCrackedWall, {x: door.x, y: door.y, w: 16, h: 16});
+            drawFrame(context, woodenSouthCrackedWall, {x: door.x + 16, y: door.y, w: 16, h: 16});
+            drawFrame(context, woodenSouthCrackedWall, {x: door.x + 32, y: door.y, w: 16, h: 16});
+            drawFrame(context, woodenSouthCrackedWall, {x: door.x + 48, y: door.y, w: 16, h: 16});
+            //drawFrame(context, woodenCrackedSouthBackground, {x: door.x + 48, y: door.y, w: 16, h: 16});
+        } else {
+            drawFrame(context, frame, {...frame, x: door.x, y: door.y});
+        }
+    } else if (door.definition.d === 'up') {
+        let frame = woodenNorthDoorway;
+        if (door.definition.status === 'cracked' || door.definition.status === 'blownOpen') {
+            frame = door.renderOpen(state) ? woodenNorthBlownup : null;
+        }
+        // Only draw the top 12 pixels of southern facing doors over the player.
+        drawFrame(context, {...woodenNorthDoorway, h: 12}, {...frame, x: door.x, y: door.y, h: 12});
+    } else if (door.definition.d === 'left') {
+        let frame = woodenWestDoorEmptyForeground;
+        if (door.definition.status !== 'normal'
+            && door.definition.status !== 'cracked'
+            && door.definition.status !== 'blownOpen'
+        ) {
+            frame = door.renderOpen(state) ? woodenWestDoorOpenForeground : null;
+        }
+        // Draw cracked tiles on top fo the door frame graphic.
+        if (door.status === 'cracked') {
+            //drawFrame(context, woodenCrackedWestBackground, {x: door.x, y: door.y, w: 16, h: 16});
+            drawFrame(context, woodenWestCrackedWall, {x: door.x, y: door.y, w: 16, h: 16});
+            drawFrame(context, woodenWestCrackedWall, {x: door.x, y: door.y + 16, w: 16, h: 16});
+            drawFrame(context, woodenWestCrackedWall, {x: door.x, y: door.y + 32, w: 16, h: 16});
+            drawFrame(context, woodenWestCrackedWall, {x: door.x, y: door.y + 48, w: 16, h: 16});
+            //drawFrame(context, woodenCrackedWestBackground, {x: door.x, y: door.y + 48, w: 16, h: 16});
+        } else if (frame) {
+            drawFrame(context, frame, {...frame, x: door.x, y: door.y});
+        }
+    } else if (door.definition.d === 'right') {
+        let frame = woodenEastDoorEmptyForeground;
+        if (door.definition.status !== 'normal'
+            && door.definition.status !== 'cracked'
+            && door.definition.status !== 'blownOpen'
+        ) {
+            frame = door.renderOpen(state) ? woodenEastDoorOpenForeground : null;
+        }
+        // Draw cracked tiles on top of the door frame graphic.
+        if (door.status === 'cracked') {
+            //drawFrame(context, woodenCrackedEastBackground, {x: door.x, y: door.y, w: 16, h: 16});
+            drawFrame(context, woodenEastCrackedWall, {x: door.x, y: door.y, w: 16, h: 16});
+            drawFrame(context, woodenEastCrackedWall, {x: door.x, y: door.y + 16, w: 16, h: 16});
+            drawFrame(context, woodenEastCrackedWall, {x: door.x, y: door.y + 32, w: 16, h: 16});
+            drawFrame(context, woodenEastCrackedWall, {x: door.x, y: door.y + 48, w: 16, h: 16});
+            //drawFrame(context, woodenCrackedEastBackground, {x: door.x, y: door.y + 48, w: 16, h: 16});
+        } else if (frame) {
+            drawFrame(context, frame, {...frame, x: door.x, y: door.y});
         }
     }
 }
@@ -317,6 +434,15 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
     wooden: {
         w: 64,
         h: 16,
+        getHitbox(state: GameState, door: Door) {
+            if (door.definition.d === 'up') {
+                return {x: door.x, y: door.y, w: 32, h: 32};
+            }
+            if (door.definition.d === 'down') {
+                return {x: door.x, y: door.y + 8, w: 64, h: 8};
+            }
+            return {x: door.x, y: door.y, w: 16, h: 64};
+        },
         render: renderWoodenDoor,
         renderForeground: renderWoodenDoorForeground
     },

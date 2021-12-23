@@ -300,7 +300,6 @@ function updateDefeated(state: GameState) {
             state.menuIndex = 1;
         }
     } else if (isConfirmKeyPressed(state)) {
-        console.log(state.menuIndex);
         if (state.menuIndex === 0 && state.hero.money >= 50) {
             state.hero.money -= 50;
             state.hero.life = state.hero.maxLife;

@@ -414,6 +414,8 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
         const behavior = area.behaviorGrid?.[target.y]?.[target.x];
         // Ice hits that effect tiles cover them in ice as long as they aren't pits or walls.
         if (hit.element === 'ice' && typeof behavior?.elementTiles?.fire === 'undefined'
+            // Cannot freeze ground in hot areas.
+            && !area.isHot
             && !behavior?.solid  && !behavior?.solidMap
             && !behavior?.pit && !behavior?.edges
             && !behavior?.isLava &&  !behavior?.isLavaMap

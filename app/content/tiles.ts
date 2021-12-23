@@ -782,6 +782,14 @@ const crackedFloor: TileSource = {
     },
 };
 
+const breakableFloor: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/clifffloors.png'), x: 0, y: 0, w: 16, h: 16},
+    behaviors: {
+        'all': { defaultLayer: 'field', underTile: 4, isBrittleGround: true},
+    },
+};
+
 const stairs: TileSource = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/exteriorstairs.png'), x: 0, y: 0, w: 48, h: 64},
@@ -790,40 +798,6 @@ const stairs: TileSource = {
     },
     tileCoordinates: [[0,0],[1,0],[2,0],[0,1],[1,1],[2,1],[0,2],[2,2],[0,3],[1,3],[2,3]]
 };
-/*
-const cliffs: TileSource = {
-    w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/cliffwalls1412.png'), x: 0, y: 0, w: 48, h: 64},
-    behaviors: {
-        // use `floor2` as default so that the edges of these can appear on top of textured floor
-        'all': { defaultLayer: 'floor2', solid: true },
-        '4x2': { defaultLayer: 'floor2', solid: true, jumpDirection: 'up' },
-        '2x3': { defaultLayer: 'floor2', solid: true, jumpDirection: 'left' },
-        '6x3': { defaultLayer: 'floor2', solid: true, jumpDirection: 'right' },
-        '4x6': { defaultLayer: 'floor2', solid: true, jumpDirection: 'down' },
-        // Eventually would want to add solidMap behaviors for all the angled tiles here as well.
-    },
-    tileCoordinates: [
-        [0,0],[1,0],[8,0],             [9,0],[11,0],[17,0],
-        [0,1],[1,1],[2,1],[7,1],[8,1], [10,1],[13,1],[16,1],
-        [1,2],[4,2],[7,2],             [9,2],[11,2],[13,2],[15,2],[17,2],  [18,2],[19,2],[20,2],[21,2],
-        [2,3],[6,3],[8,3],             [11,3],[15,3],                      [18,3],[19,3],[20,3],[21,3],
-                                                                           [18,4], [19,4],[20,4],[21,4],
-                                                                           [18,5],[19,5],[20,5],
-        [2,6],[4,6],[6,6],             [11,6],[12,6],[15,6],               [18,6],[19,6],[20,6],[22,6],
-                                       [10,7],[16,7],                      [18,7],[19,7],
-        [0,8],[4,8],[8,8],             [9,8],[10,8],[17,8],                [18,8],[19,8],
-
-        [0,9],[1,9],[8,9],  [10,9],[13,9],[16,9],[19,9],
-        [0,10],[8,10],      [10,10],[11,10],[12,10],[13,10],[16,10],[17,10],[18,10],[19,10],
-                            [9,11],[10,11],[13,11],[14,11],[15,11],[16,11],[19,11],[20,11],
-                            [9,12],[10,12],[11,12],[12,12],[13,12],[14,12],[15,12],[16,12],[17,12],[18,12],[19,12],[20,12],
-                            [9,13],[10,13],[11,13],[12,13],[14,13],[15,13],[16,13],[17,13],[18,13],[19,13],[20,13],
-                            [10,14],[11,14],[12,14],[16,14],[17,14],[18,14],
-                            [10,15],[11,15],[12,15],[13,15],[16,15],[17,15],[18,15],[19,15],
-        [0,17],[1,17],[8,17]
-    ],
-};*/
 
 // use `foreground2` as default so that it can appear on top of walls that might be on `foreground`
 // All of these solid maps are set so that only the bottom half of the ceiling graphics are solid.
@@ -1210,7 +1184,7 @@ addTiles([
     singleTileSource('gfx/tiles/bush.png', null, 16),
     singleTileSource('gfx/tiles/thorns.png', null, 16),
     singleTileSource('gfx/tiles/thornsspirit.png', { damage: 1, defaultLayer: 'field' }),
-    ...deletedTiles(1),
+    breakableFloor,
     gradientColorTile(['#A08000', '#806000'], 0, 0, 0, 16, southCliffBehavior), // southCliffTop
     solidColorTile('#806000', wallBehavior), // cliffBottom
     ...deletedTiles(2),

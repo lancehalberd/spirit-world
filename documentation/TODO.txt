@@ -13,6 +13,8 @@ Low Priority Bugs:
         I think this is because the door doesn't update until it is in the current areaInstance
     - nextAreaInstance is not rendered in Safari
     - frost grenade blast isn't centered.
+    - Don't open enemy doors when bosses are still alive?
+        - Tomb boss door can open when killing snakes in some cases.
 
 High Priority Bugs:
     Sometimes can't enter peach cave when sliding on ice?
@@ -27,8 +29,25 @@ Graphics:
 
 
 Current tasks:
+    Bug Fixes:
+        - Standing on clouds without cloud boots
+        - Melt ice tiles after end of crater miniboss
+        - Melt ice tiles after end of ice boss
+
+    - Forest Temple
+        - Add locked doors and chests and big chest with cloud boots
+        - Add temporary boss with clone tool.
     - Crater Dungeon
         - Entrance should be blocked by cooled solid magma until elemental beasts are released.
+    - Randomizer improvements
+        - Add a goal
+        - Add passage to the peak peach piece in logic.
+            - Chest is only in logic if the player has ice magic, gloves 2 or defeated the fire beast, even though it is obtainable without any of these before the fire beast is released.
+        - Add Helix to logic
+        - Add river temple to logic
+        - Add forest temple to logic
+        - Add crater to logic
+    - brainstorm some dungeon/boss ideas, maybe for Staff Tower
 
     - Add target landing locations when falling from sky (also apply to the forest temple pits).
     - Add new hold+walk chakram animations
@@ -44,15 +63,6 @@ Current tasks:
         - Add 'barrierDamage' to hit properties that will control exact magic damage when hitting the spirit barrier.
         - Set barrierDamage lower for clearable traps like thorns to allow players to walk through and clear them using spirit barrier. Set even lower for floor traps that cannot be cleared since they will hit every frame.
 
-    - Randomizer improvements
-        - Add a goal
-        - Add passage to the peak peach piece in logic.
-            - Chest is only in logic if the player has ice magic, gloves 2 or defeated the fire beast, even though it is obtainable without any of these before the fire beast is released.
-        - Add Helix to logic
-        - Add river temple to logic
-        - Add forest temple to logic
-        - Add crater to logic
-    - brainstorm some dungeon/boss ideas, maybe for Staff Tower
 
 
 High level list of things left to do:

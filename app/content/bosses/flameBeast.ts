@@ -211,7 +211,7 @@ function updateFireBeast(this: void, state: GameState, enemy: Enemy): void {
             enemy.z = Math.max(0, enemy.z + enemy.vz);
             return;
         }
-        if (!isEnemyDefeated(flameHeart)) {
+        if (isEnemyDefeated(flameHeart)) {
             enemy.setMode('choose');
             return;
         }

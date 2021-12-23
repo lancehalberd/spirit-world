@@ -59,6 +59,8 @@ export interface TileBehaviors {
     particles?: Frame[]
     // Key for the sound to play when this tile/object is destroyed.
     breakSound?: string
+    // This ground is destroyed if the player walks on it or something lands on it.
+    isBrittleGround?: boolean
     // If a player falls in a pit they will take damage and respawn at their last stable location.
     pit?: boolean
     isLava?: Boolean

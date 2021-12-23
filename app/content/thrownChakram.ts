@@ -259,7 +259,7 @@ export class HeldChakram implements ObjectInstance {
             this.throw(state);
             return;
         }
-        if (this.animationTime >= 1000 && state.hero.passiveTools.charge >= 1 && this.animationTime % 200 === 0) {
+        if (state.hero.magic > 0 && this.animationTime >= 1000 && state.hero.passiveTools.charge >= 1 && this.animationTime % 200 === 0) {
             this.sparkles.push(makeSparkleAnimation(state, this, this.hero.element));
         }
         this.sparkles = this.sparkles.filter(s => !s.done);

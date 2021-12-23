@@ -182,6 +182,7 @@ export function saveObjectStatus(this: void, state: GameState, definition: Objec
             : state.savedState.zoneFlags;
         if (!definition.id) {
             console.error('Missing object id', definition);
+            return;
         }
         if (flag && !hash[definition.id]) {
             hash[definition.id] = true;
@@ -194,5 +195,8 @@ export function saveObjectStatus(this: void, state: GameState, definition: Objec
 }
 
 export function getObjectStatus(this: void, state: GameState, definition: ObjectDefinition): boolean {
+    if (!definition.id) {
+        return false;
+    }
     return state.savedState.zoneFlags[definition.id] || state.savedState.objectFlags[definition.id];
 }

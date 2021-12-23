@@ -297,7 +297,7 @@ export class Hero implements Actor, SavedHeroData {
         if (hero.action === 'fallen' || hero.action === 'sankInLava') {
             return;
         }
-        if (hero.passiveTools.charge && hero.action === 'charging') {
+        if (state.hero.magic > 0 && hero.passiveTools.charge && hero.action === 'charging') {
             const { chargeLevel } = getChargeLevelAndElement(state, hero);
             if (chargeLevel) {
                 const animation = !hero.element
@@ -366,7 +366,7 @@ export class Hero implements Actor, SavedHeroData {
             context.fill();
             context.restore();
         }
-        if (hero.passiveTools.charge && hero.action === 'charging') {
+        if (state.hero.magic > 0 && hero.passiveTools.charge && hero.action === 'charging') {
             const animation = !hero.element
                 ? chargeFrontAnimation
                 : {

@@ -538,7 +538,7 @@ const sf0_0x0: AreaDefinition = {
         {status: "hidden", id: "waterfallTowerBeadCascade", x: 416, y: 32, type: "beadCascade", saveStatus: "forever"},
         {status: "normal", id: "", x: 288, y: 432, type: "airBubbles"},
         {status: "hiddenSwitch", id: "waterfallTower-hiddenBubbles", x: 368, y: 112, type: "airBubbles", saveStatus: "forever"},
-        {status: "normal", id: "", x: 336, y: 224, targetObjectId: "waterfallTower-hiddenBubbles", type: "floorSwitch", saveStatus: "forever"},
+        {status: "normal", id: "waterfallTowerRustySwitch", x: 336, y: 224, targetObjectId: "waterfallTower-hiddenBubbles", type: "floorSwitch", saveStatus: "forever"},
         {status: "normal", id: "", x: 352, y: 224, style: "short", type: "sign", message: "This rusted switch is harder to activate than normal switches."},
         {status: "normal", id: "", x: 64, y: 176, type: "crystalSwitch", timer: 4000, targetObjectId: "waterfallTower-grateD"},
         {status: "normal", id: "waterfallTower:s0:0x0-ent-0", x: 48, y: 192, type: "enemy", enemyType: "crystalGuardian", d: "down", params: {}},
