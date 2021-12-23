@@ -428,6 +428,9 @@ const sf0_1x0: AreaDefinition = {
         {status: "normal", id: "forestTempleBackDoor", x: 0, y: 368, type: "door", style: "cave", targetZone: "treeVillage", targetObjectId: "forestTempleBackDoor", d: "left"},
         {status: "bigKeyLocked", id: "forestTempleBossDoor", x: 224, y: 368, type: "door", style: "cave", targetObjectId: "forestTempleBackDoor", d: "right"},
         {status: "closed", id: "", x: 256, y: 368, type: "door", style: "cave", targetObjectId: "forestTempleBackDoor", d: "left"},
+        {status: "normal", id: "forestTempleBoss", x: 368, y: 320, type: "boss", enemyType: "flameIdol", lootType: "clone", lootAmount: 1, lootLevel: 1, d: "down", params: {}},
+        {status: "normal", id: "forestTempleBoss", x: 368, y: 416, type: "boss", enemyType: "flameIdol", lootType: "clone", lootAmount: 1, lootLevel: 1, d: "down", params: {}},
+        {status: "normal", id: "forestTempleExit", x: 384, y: 256, type: "door", style: "ladderUp", targetZone: "overworld", targetObjectId: "forestTempleLadder1", d: "up", hasCustomLogic: true, customLogic: "forestTempleBoss"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},

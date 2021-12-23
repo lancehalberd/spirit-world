@@ -61,14 +61,14 @@ High level list of things left to do:
         Grand Temple
         Jade Palace
         Sky Temple
-        Forest Temple
         Forge
         Warship
     Areas missing significant content:
+        Forest Temple
         River Temple
         Staff Tower
     Missing Bosses for existing areas:
-        River Temple Boss
+        Crater midboss
         Rival fight before Tomb
         Tomb Boss
         Rival fight before Helix
@@ -76,10 +76,15 @@ High level list of things left to do:
             - Instead of fighting this boss, you will see it, but then abort because of the beasts attacking the city
             - Then you will actually fight this boss at the end of the Grand Temple or Jade Palace or possibly as a mid boss on the Warship.
     Missing mechanics:
-        Difficulty shrines
+        Difficulty shrines for dungeons/bosses
+        Hero helping during first elemental beast fight
+        Rival during last elemental beast fight
+        Spirit Gates + Spirit Keys
+        Normal shops
+        Spirit shop + Jade Idols
+        Fertility shrine donations
     Items missing implementation:
         Charge level 2
-        Setting up Staff Tower
         Bow level 2
         Bow charge 2
         Clone charge 1 + 2
@@ -183,9 +188,6 @@ River Temple Improvements:
 Crater Improvements
     - Add platforms floating on lava.
     - Add peg switches that require hitting with the staff to activate, replace all regular switches with these.
-    - Add same area transition for lowering lava
-        - Just draw the udpated area behind the old area, and then delete every 8th then 4th then 2nd then all rows of pixels.
-        - Don't spend too much time on this since we might not use it in the end.
     - Add Flame Guardian enemies
         - Stationary like Crystal Guardian
         - Replace ents with Flame Guardians
