@@ -299,6 +299,7 @@ export class Arrow implements ObjectInstance {
 }
 
 export class EnemyArrow extends Arrow {
+    isEnemyAttack = true;
     getHitProperties(state: GameState): HitProperties {
         return {
             canPush: false,
@@ -331,6 +332,7 @@ export class EnemyArrow extends Arrow {
 }
 
 export class CrystalSpike extends Arrow {
+    isEnemyAttack = true;
     static spawn(state: GameState, area: AreaInstance, arrowProps: Props) {
         const spike = new CrystalSpike(arrowProps);
         addObjectToArea(state, area, spike);

@@ -22,6 +22,7 @@ interface Props {
 export class Spark implements ObjectInstance, Props {
     drawPriority: DrawPriority = 'sprites';
     area: AreaInstance = null;
+    isEnemyAttack = true;
     definition = null;
     frame: Frame;
     damage: number;

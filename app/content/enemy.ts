@@ -233,6 +233,8 @@ export class Enemy implements Actor, ObjectInstance {
             // Bosses in both material+spirit realms must be defeated before the battle is over.
             const allEnemies = [...this.area.enemies, ...this.area.alternateArea.enemies];
             if (!allEnemies.some(object => object.definition.type === 'boss' && object.status !== 'gone')) {
+                // Remove all enemy attacks from the screen when a boss is defeated.
+                this.area.objects = this.area.objects.filter(object => !object.isEnemyAttack);
                 allEnemies.forEach(object => object.showDeathAnimation(state));
                 // Gain loot if this boss hasn't been defeated yet.
                 if (!getObjectStatus(state, this.definition)) {

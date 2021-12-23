@@ -45,6 +45,7 @@ interface Props {
 
 export class Flame implements ObjectInstance, Props {
     drawPriority: DrawPriority = 'sprites';
+    isEnemyAttack = true;
     area: AreaInstance = null;
     definition = null;
     frame: Frame;

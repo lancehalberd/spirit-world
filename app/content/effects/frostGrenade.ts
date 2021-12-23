@@ -20,6 +20,7 @@ interface Props {
 export class FrostGrenade implements ObjectInstance, Props {
     area: AreaInstance = null;
     definition = null;
+    isEnemyAttack = true;
     frame: Frame;
     damage: number;
     x: number;

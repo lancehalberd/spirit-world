@@ -28,6 +28,7 @@ const BOLT_HEIGHT = 48;
 export class LightningBolt implements ObjectInstance, Props {
     area: AreaInstance = null;
     definition = null;
+    isEnemyAttack = true;
     frame: Frame;
     damage: number;
     x: number;

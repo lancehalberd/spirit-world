@@ -56,6 +56,8 @@ export interface ObjectInstance {
     // This function can be defined to override the default logic for checking if an object is active,
     // which is used by switch toggling logic to determine whether to activate or deactivate next.
     isActive?: (state: GameState) => boolean,
+    // This will cause this effect to be removed when a boss is defeated.
+    isEnemyAttack?: boolean
 }
 
 export type ObjectStatus = 'active' | 'closed' | 'closedEnemy' | 'closedSwitch'

@@ -23,6 +23,7 @@ const fadeDuration = 200;
 export class SpikePod implements ObjectInstance, Props {
     area: AreaInstance = null;
     definition = null;
+    isEnemyAttack = true;
     frame: Frame;
     damage: number;
     x: number;

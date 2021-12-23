@@ -22,6 +22,7 @@ const PERSIST_TIME = 400;
 export class FrostBlast implements ObjectInstance, Props {
     area: AreaInstance = null;
     definition = null;
+    isEnemyAttack = true;
     frame: Frame;
     damage: number;
     x: number;
