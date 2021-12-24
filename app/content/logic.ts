@@ -68,6 +68,7 @@ window['isLogicValid'] = isLogicValid;
 export const hasCatEyes: LogicCheck = { requiredFlags: ['$catEyes'] };
 export const hasClone: LogicCheck = { requiredFlags: ['$clone', '$catEyes'] };
 export const hasIronBoots: LogicCheck = { requiredFlags: ['$ironBoots'] };
+export const hasCloudBoots: LogicCheck = { requiredFlags: ['$cloudBoots'] };
 export const hasAstralProjection: LogicCheck = { requiredFlags: ['$astralProjection', '$spiritSight', '$catEyes'] };
 export const hasSpiritBarrier: LogicCheck = { requiredFlags: ['$cloak', '$catEyes'] };
 export const hasTeleportation: LogicCheck = { requiredFlags: ['$astralProjection', '$spiritSight', '$teleportation', '$catEyes'] };
@@ -78,6 +79,9 @@ export const hasSmallKey: LogicCheck = { requiredFlags: ['$smallKey'] };
 export const hasBigKey: LogicCheck = { requiredFlags: ['$bigKey'] };
 export const hasWaterBlessing: LogicCheck = {requiredFlags: ['$waterBlessing']};
 export const hasChakram: LogicCheck = {requiredFlags: ['$weapon']};
+export const hasFire: LogicCheck = {requiredFlags: ['$fire']};
+export const hasIce: LogicCheck = {requiredFlags: ['$ice']};
+export const hasLightning: LogicCheck = {requiredFlags: ['$lightning']};
 
 // This check will be added automatically to any tiles that have 100% darkness effect.
 //const hasEyes: LogicCheck = { requiredFlags: ['$catEyes:1'] };
@@ -95,10 +99,20 @@ export const hasWeapon: OrLogicCheck = orLogic({requiredFlags: ['$weapon']}, has
 // This check is used for weapons that have the range of the charged chakram or greater.
 export const hasMediumRange: OrLogicCheck = orLogic({requiredFlags: ['$weapon', '$charge', '$catEyes']}, hasBow);
 
-// Can cross gaps 2 units wide in logic.
-export const canCrossSmallGaps: OrLogicCheck = orLogic(hasRoll, hasStaff);
-// Used when teleportation is an option for getting over gaps.
-export const canCrossSmallGapsOrTeleport: OrLogicCheck = orLogic(canCrossSmallGaps, hasTeleportation);
+// Note that in some areas teleportation may not be possible contextually, for example if the player cannot
+// stand still at the edge of the gap.
+// Rough rule of thumb:
+// roll = 2 (technically allows 3)
+// cloud boots = 2 (requires a running start, but not necessarily in a straight line)
+// teleportation = 3
+// staff = 4
+// teleportation can only be combined with the staff.
+export const canCross2Gaps: OrLogicCheck = orLogic(hasCloudBoots, hasRoll, hasStaff, hasTeleportation);
+export const canCross4Gaps: OrLogicCheck = orLogic(andLogic(hasRoll, hasCloudBoots), hasStaff);
+export const canCross6Gaps: AndLogicCheck = andLogic(orLogic(hasRoll, hasCloudBoots, hasTeleportation), hasStaff);
+export const canCross8Gaps: AndLogicCheck = andLogic(hasRoll, hasCloudBoots, hasStaff);
+
+export const canTravelFarUnderWater = andLogic(hasIronBoots, orLogic(hasWaterBlessing, hasCatEyes));
 
 export const logicHash: {[key: string]: LogicCheck} = {
     hasWeapon,

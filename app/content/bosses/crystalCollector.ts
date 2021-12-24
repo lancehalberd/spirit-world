@@ -1,4 +1,5 @@
 import { addObjectToArea } from 'app/content/areas';
+import { CrystalSpike } from 'app/content/arrow';
 import { GroundSpike } from 'app/content/effects/groundSpike';
 import { SpikePod } from 'app/content/effects/spikePod';
 import { getNearbyTarget } from 'app/content/enemies';
@@ -9,7 +10,7 @@ import { playSound } from 'app/utils/sounds';
 import Random from 'app/utils/Random';
 
 
-import { AreaInstance, Enemy, GameState, Hero, HitProperties, HitResult } from 'app/types';
+import { AreaInstance, Enemy, GameState, Hero, HitProperties, HitResult, ObjectInstance } from 'app/types';
 
 const maxShieldLife = 6;
 
@@ -81,6 +82,7 @@ function addFloorEye(state: GameState, area: AreaInstance, tx: number, ty: numbe
         y: ty * 16,
     });
     addObjectToArea(state, area, floorEye);
+    //floorEye.showDeathAnimation(state);
 }
 
 function summonSpikeUnderPlayer(this: void, state: GameState, enemy: Enemy): void {
@@ -119,8 +121,77 @@ function summonSpikeAheadOfPlayer(this: void, state: GameState, enemy: Enemy): v
         addObjectToArea(state, enemy.area, spike);
     }
 }
+const summonShrinkingRingOfSpikes = (state: GameState, enemy: Enemy) => {
+    const target = getNearbyTarget(state, enemy, 512, enemy.area.allyTargets) as Hero;
+    if (!target) {
+        return;
+    }
+    const targetHitbox = target.getHitbox(state);
+    const spikePattern = [
+        [
+            [0, -4], [4, 0], [0, 4], [-4, 0],
+            [3, 2], [3, -2], [-3, 2], [-3, -2],
+            [2, 3], [2, -3], [-2, 3], [-2, -3],
+        ],
+        [[0, -2], [2, 0], [0, 2], [-2, 0]],
+        [],
+        [],
+        [[0, -1], [-1, 0],[1, 0], [0, 1]],
+    ];
+    for (let i = 0; i < spikePattern.length; i++) {
+        for (const coords of spikePattern[i]) {
+            const spike = new GroundSpike({
+                x: targetHitbox.x + targetHitbox.w / 2 + coords[0] * 16,
+                y: targetHitbox.y + targetHitbox.h / 2 + coords[1] * 16,
+                damage: 4,
+                delay: 260 * i,
+            });
+            addObjectToArea(state, enemy.area, spike);
+        }
+    }
+};
+
+const turnOnRandomCascade = (state: GameState, enemy: Enemy, count = 1) => {
+    const beadCascades = enemy.area.objects.filter(o => o.definition?.type === 'beadCascade');
+    let numberEnabled = 0;
+    while (beadCascades.length) {
+        const cascade = Random.removeElement(beadCascades);
+        if (cascade.status !== 'normal') {
+            cascade.onActivate(state);
+            numberEnabled++;
+            if (numberEnabled >= count) {
+                return;
+            }
+        }
+    }
+};
+
+const summonProjectiles = (state: GameState, enemy: Enemy, target: ObjectInstance) => {
+    if (!target) {
+        return;
+    }
+    const targetHitbox = target.getHitbox(state);
+    const x = targetHitbox.x + targetHitbox.w / 2;
+    let left = Math.max(104, x - 48);
+    let right = Math.min(512 - 104, left + 96);
+    left = Math.min(left, right - 96);
+    let delay = 600;
+    for (let x = left; x <= right; x += 12) {
+        CrystalSpike.spawn(state, enemy.area, {
+            x,
+            y: 40,
+            damage: 2,
+            delay,
+            ignoreWallsDuration: 1000,
+            vx: 0,
+            vy: 4,
+        });
+        delay += 200;
+    }
+};
 
 function updateCrystalCollector(this: void, state: GameState, enemy: Enemy): void {
+    // enemy.params.shieldLife = 0;
     const { enrageLevel } = enemy.params;
     // Check if we should start an enraged phase
     // Enrage attacks are:
@@ -141,6 +212,8 @@ function updateCrystalCollector(this: void, state: GameState, enemy: Enemy): voi
         enemy.params.enrageLevel = 1;
         enemy.params.shieldLife = maxShieldLife;
     }
+
+
     enemy.shielded = enemy.params.shieldLife > 0;
     // Enraged behavior
     if (enemy.params.enrageTime > 0) {
@@ -152,19 +225,20 @@ function updateCrystalCollector(this: void, state: GameState, enemy: Enemy): voi
             [tx, ty] = Random.removeElement(enemy.params.eyeLocations);
             addFloorEye(state, enemy.area, tx, ty);
         } else if (enemy.params.enrageTime <= 3000) {
+            const beadCascades = enemy.area.objects.filter(o => o.definition?.type === 'beadCascade');
             // Activate all bead cascades from left to right, one each 100ms, for 1000ms
             // This assumes the index of the cascades is in order of their left to right position.
-            const beadCascades = enemy.area.objects.filter(o => o.definition?.type === 'beadCascade');
             for (let i = 0; i < beadCascades.length; i++) {
                 if (enemy.params.enrageTime === 3000 - 100 * i) {
-                    beadCascades[i].status = 'normal';
-                } else if (enemy.params.enrageTime === 3000 - 100 * i - 1000) {
-                    beadCascades[i].status = 'hidden';
+                    beadCascades[i].onActivate(state);
                 }
             }
         } else {
-            if (enemy.params.enrageTime % 300 === 0) {
+            const spikeCount = enemy.area.objects.filter(o => o instanceof GroundSpike).length;
+            if (enemy.params.enrageTime % 300 === 0 && spikeCount < 5) {
                 if (Math.random() < 0.5) {
+                    summonShrinkingRingOfSpikes(state, enemy);
+                } else if (Math.random() < 0.5) {
                     summonSpikeUnderPlayer(state, enemy);
                 } else {
                     summonSpikeAheadOfPlayer(state, enemy);
@@ -174,6 +248,19 @@ function updateCrystalCollector(this: void, state: GameState, enemy: Enemy): voi
         }
         return;
     }
+
+
+    // Bead Cascade control
+    if (enemy.params.enrageLevel >= 2) {
+        if (enemy.time % 4000 === 0) {
+            turnOnRandomCascade(state, enemy);
+        }
+    } else if (enemy.params.enrageLevel >= 1) {
+        if (enemy.time % 6000 === 0) {
+            turnOnRandomCascade(state, enemy);
+        }
+    }
+
     // Normal behavior.
     if (enemy.mode === 'initial') {
         enemy.healthBarTime = 0;
@@ -203,7 +290,14 @@ function updateCrystalCollector(this: void, state: GameState, enemy: Enemy): voi
                 || enemy.area.objects.find(o => o instanceof SpikePod)
                 || getFloorEye(state, enemy.area)
             ) {
-                enemy.setMode('summonSpikes');
+                if (enemy.params.enrageLevel > 0 && Math.random() < 0.5) {
+                    turnOnRandomCascade(state, enemy, enemy.params.enrageLevel);
+                }
+                if (Math.random() < 0.3) {
+                    enemy.setMode('summonProjectiles');
+                } else {
+                    enemy.setMode('summonSpikes');
+                }
             } else {
                 enemy.setMode('summonPod');
             }
@@ -222,21 +316,32 @@ function updateCrystalCollector(this: void, state: GameState, enemy: Enemy): voi
         if (enemy.modeTime >= 1000) {
             enemy.setMode('choose');
         }
-    } else if (enemy.mode === 'summonSpikes') {
+    } if (enemy.mode === 'summonSpikes') {
         // Define sets of easy/medium/hard patterns, then randomly choose a pattern based
         // on remaining health and attack with spikes in that pattern
         // enrage level 0: 3 in a row or a column
         // enrage level 1: An entire row or column, an expanding ring
         // enrage level 2: A full plus, leading the player in one of the dimensions if they are moving
         // A wave of 4 columns sweeping towards the middle of the battlefield
-        if (enemy.modeTime % 600 === 0) {
-            if (enrageLevel === 0 || Math.random() < 0.5) {
+        const spikeCount = enemy.area.objects.filter(o => o instanceof GroundSpike).length;
+        if (enemy.modeTime % 600 === 0 && spikeCount < 3) {
+            // Don't do any complicated spike patterns while the floor eyes are still active.
+            if (enrageLevel > 0 && !getFloorEye(state, enemy.area) && Math.random() < 0.5) {
+                summonShrinkingRingOfSpikes(state, enemy);
+            } else if (enrageLevel === 0 || Math.random() < 0.5) {
                 summonSpikeUnderPlayer(state, enemy);
             } else {
                 summonSpikeAheadOfPlayer(state, enemy);
             }
         }
         if (enemy.modeTime >= 2000 + enrageLevel * 2000) {
+            enemy.setMode('choose');
+        }
+    } else if (enemy.mode === 'summonProjectiles') {
+        if (enemy.modeTime === 20) {
+            summonProjectiles(state, enemy, getNearbyTarget(state, enemy, 1000, enemy.area.allyTargets));
+        }
+        if (enemy.modeTime >= 6000 - enrageLevel * 1000) {
             enemy.setMode('choose');
         }
     }

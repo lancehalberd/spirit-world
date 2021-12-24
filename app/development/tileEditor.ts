@@ -322,8 +322,8 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
                 },
             });
         }
+        rows.push(row);
         if (editingState.selectedLayerKey === definition.key) {
-            rows.push(row);
             row = [{
                 name: 'Priority',
                 id: `layer-${i}-priority`,
@@ -351,6 +351,21 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
                     state.areaInstance.alternateArea.definition.layers[i]
                         = state.areaInstance.alternateArea.definition.layers[i - 1];
                     state.areaInstance.alternateArea.definition.layers[i - 1] = alternateDefinition;
+                    enterLocation(state, state.location);
+                    displayTileEditorPropertyPanel();
+                },
+            });
+            row.push({
+                name: 'v',
+                id: `layer-${i}-down`,
+                onClick() {
+                    if (i >= state.areaInstance.definition.layers.length - 1) {
+                        return;
+                    }
+                    state.areaInstance.definition.layers[i] = state.areaInstance.definition.layers[i + 1];
+                    state.areaInstance.definition.layers[i + 1] = definition;
+                    state.areaInstance.alternateArea.definition.layers[i] = state.areaInstance.alternateArea.definition.layers[i + 1];
+                    state.areaInstance.alternateArea.definition.layers[i + 1] = alternateDefinition;
                     enterLocation(state, state.location);
                     displayTileEditorPropertyPanel();
                 },
@@ -424,23 +439,7 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
                     displayTileEditorPropertyPanel();
                 },
             });
-            row.push({
-                name: 'v',
-                id: `layer-${i}-down`,
-                onClick() {
-                    if (i >= state.areaInstance.definition.layers.length - 1) {
-                        return;
-                    }
-                    state.areaInstance.definition.layers[i] = state.areaInstance.definition.layers[i + 1];
-                    state.areaInstance.definition.layers[i + 1] = definition;
-                    state.areaInstance.alternateArea.definition.layers[i] = state.areaInstance.alternateArea.definition.layers[i + 1];
-                    state.areaInstance.alternateArea.definition.layers[i + 1] = alternateDefinition;
-                    enterLocation(state, state.location);
-                    displayTileEditorPropertyPanel();
-                },
-            });
         }
-        rows.push(row);
     }
     rows.push({
         name: 'Add Layer',

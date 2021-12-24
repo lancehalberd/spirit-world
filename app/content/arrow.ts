@@ -150,6 +150,10 @@ interface Props {
     vx?: number
     vy?: number
     damage?: number
+    // Don't update until this many frames have passed
+    delay?: number
+    // Don't collide with walls for this many milliseconds.
+    ignoreWallsDuration?: number
     element?: MagicElement
     reflected?: boolean
     style?: ArrowStyle
@@ -160,6 +164,8 @@ export class Arrow implements ObjectInstance {
     definition = null;
     frame: Frame;
     damage: number;
+    delay: number;
+    ignoreWallsDuration: number;
     element: MagicElement = null;
     x: number;
     y: number;
@@ -177,13 +183,17 @@ export class Arrow implements ObjectInstance {
     stuckFrames: number = 0;
     status: ObjectStatus = 'normal';
     style: ArrowStyle = 'normal';
-    constructor({x = 0, y = 0, vx = 0, vy = 0, damage = 1, element = null, reflected = false, style = 'normal'}: Props) {
+    constructor({x = 0, y = 0, vx = 0, vy = 0, damage = 1, delay = 0, element = null, reflected = false, style = 'normal',
+        ignoreWallsDuration = 0,
+    }: Props) {
         this.x = x | 0;
         this.y = y | 0;
         this.vx = vx;
         this.vy = vy;
         this.direction = getDirection(this.vx, this.vy, true);
         this.damage = damage;
+        this.delay = delay;
+        this.ignoreWallsDuration = ignoreWallsDuration;
         this.element = element;
         this.w = 6;
         this.h = 6;
@@ -211,10 +221,14 @@ export class Arrow implements ObjectInstance {
             hitAllies: this.reflected,
             hitEnemies: !this.reflected,
             hitObjects: true,
-            hitTiles: true,
+            hitTiles: this.animationTime >= this.ignoreWallsDuration,
         };
     }
     update(state: GameState) {
+        if (this.delay > 0) {
+            this.delay -= FRAME_LENGTH;
+            return;
+        }
         this.animationTime += FRAME_LENGTH;
         if (this.stuckFrames > 0) {
             this.stuckFrames++;
@@ -318,7 +332,7 @@ export class EnemyArrow extends Arrow {
             hitAllies: !this.reflected,
             hitEnemies: this.reflected,
             hitObjects: true,
-            hitTiles: true,
+            hitTiles: this.animationTime >= this.ignoreWallsDuration,
         };
     }
     update(state: GameState) {
@@ -356,7 +370,7 @@ export class CrystalSpike extends Arrow {
             hitAllies: !this.reflected,
             hitEnemies: this.reflected,
             hitObjects: true,
-            hitTiles: true,
+            hitTiles: this.animationTime >= this.ignoreWallsDuration,
         };
     }
     update(state: GameState) {

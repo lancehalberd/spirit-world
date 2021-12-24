@@ -26,19 +26,19 @@ Graphics:
 
 
 Current tasks:
-    - Forest Temple
-        - Add temporary boss with clone tool.
-    - Crater Dungeon
-        - Entrance should be blocked by cooled solid magma until elemental beasts are released.
+    - Bug fixes
+        - Picked up items are invisible while using cloak
+        - Charging during scrolling transition gets you stuck in a loop
+            - Use a standard speed for transition, not one relative to your action.
+        - Charging allows you to walk on top of water currently.
+            - Instead let's remove ability to go on deep water while charing.
+
     - Randomizer improvements
-        - Add a goal
-        - Add passage to the peak peach piece in logic.
-            - Chest is only in logic if the player has ice magic, gloves 2 or defeated the fire beast, even though it is obtainable without any of these before the fire beast is released.
-        - Add Helix to logic
-        - Add river temple to logic
-        - Add forest temple to logic
         - Add crater to logic
+        - Add a goal
     - brainstorm some dungeon/boss ideas, maybe for Staff Tower
+
+    - Charged arrows should move a bit faster
 
     - Add target landing locations when falling from sky (also apply to the forest temple pits).
     - Add new hold+walk chakram animations
@@ -82,6 +82,7 @@ High level list of things left to do:
         Spirit Gates + Spirit Keys
         Normal shops
         Spirit shop + Jade Idols
+        Treasure Hunter Shop
         Fertility shrine donations
     Items missing implementation:
         Charge level 2
@@ -103,6 +104,34 @@ Add toasts to development for undoing actions:
     - Deleting layers
     - Replacing > 100 tiles
 
+Treasure Hunter Store
+    - Initially can only carry 200 coins
+    - Treasure hunter sells
+        - Full life for  20 coins
+        - 500 coin wallet for 50 coins
+        - 1000 coin wallet for 200 coins
+    - The first time you find money in a chest that would exceed wallet size you find a coupon from the treasure hunter for the value of the chest advertising his store.
+    - Future chests that would exceed your wallet size contain treasures that you can sell to the treasure hunter for the value of the coins from the chest.
+    - Every 5 chests containing money unlock new items in the treasure hunter store
+        - Peach Piece for 100 coins
+        - 1000 coin wallet for 200 coins
+        - Jade Idol for 300 coins
+        - Lodestone necklace (50% damage from lightning attacks) for 500 coins
+
+Fertility Shrine
+    - Donate 50 coins at a time in the material world
+    - Chests will appear in the spirit world based on the total amount donated
+        50 -> Jade Idol
+        100 -> Peach Piece
+        200 -> Spirit Key (cannot donate more than 200 coins)
+
+Spirit Store(s)
+    - Items might be split between different vendors
+    - Trade Jade Idols for items
+        2 -> Peach Piece
+        3 -> Spirit Key
+        5 -> Quick Charge (40% reduction in time to charge)
+
 Difficulty shrine:
     - 50 money per point
     - move points around for free
@@ -118,6 +147,7 @@ Difficulty shrine:
 
 Spirit Barrier Improvements
     - Charge adds element effect to barrier and reduces spirit loss to damage of that type
+    - Enemies should not be able to target you while invisible.
     - Make invisibility ignore certain ground effects+hazards: spikes, ice floor, fire barriers
     - Can move through activatable crystals and some other obstacles.
         * charge invisibility then dodge roll through a line of crystals to activate them quickly.

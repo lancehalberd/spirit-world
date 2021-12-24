@@ -394,6 +394,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         }
     } else if (!isAstralProjection && (hero.action === 'fallen' || hero.action === 'sankInLava')) {
         if (hero.action === 'fallen' && state.location.zoneKey === 'sky') {
+            hero.action = 'knocked';
             enterLocation(state, {
                 zoneKey: 'overworld',
                 floor: 0,
@@ -715,7 +716,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
                 canPush: !encumbered && !hero.swimming && !hero.bounce && !isCharging
                     // You can only push if you are moving the direction you are trying to move.
                     && hero.vx * dx >= 0 && hero.vy * dy >= 0,
-                canClimb: !encumbered && !hero.bounce && !isCharging,
+                canClimb: !encumbered && !hero.bounce && !isCharging && !isAstralProjection,
                 canFall: true,
                 canJump: !isAstralProjection,
                 canSwim: !encumbered,
