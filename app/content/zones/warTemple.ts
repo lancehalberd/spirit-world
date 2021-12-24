@@ -901,7 +901,7 @@ const f0_2x2: AreaDefinition = {
         {status: "normal", id: "warTemplePitEntrance", x: 384, y: 112, type: "marker"},
         {status: "normal", id: "warTemple:0:2x2-bigKey-0", x: 160, y: 112, type: "chest", lootType: "bigKey", lootAmount: 1, lootLevel: 1},
         {status: "normal", id: "warTemple:0:2x2-door-0", x: 112, y: 0, type: "door", style: "cave", d: "up"},
-        {status: "normal", id: "warTemple:0:2x2-peachOfImmortalityPiece-0", x: 432, y: 48, type: "chest", lootType: "peachOfImmortalityPiece", lootAmount: 1, lootLevel: 1},
+        {status: "normal", id: "warTemple:0:2x2-peachOfImmortalityPiece-0", x: 418, y: 65, type: "loot", lootType: "peachOfImmortalityPiece", lootAmount: 1, lootLevel: 1},
         {status: "bigKeyLocked", id: "warTempleKeyDoor", x: 144, y: 224, type: "door", style: "cave", targetZone: "overworld", targetObjectId: "warTempleKeyDoor", d: "down"},
     ],
     sections: [

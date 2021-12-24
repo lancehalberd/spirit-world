@@ -390,7 +390,7 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "forestTempleLadder4", x: 336, y: 0, type: "door", style: "ladderUp", targetZone: "overworld", targetObjectId: "forestTempleLadder4", d: "up"},
         {status: "bigKeyLocked", id: "forestTempleBigDoor", x: 112, y: 480, type: "door", style: "cave", d: "down"},
         {status: "normal", id: "forestTempleLadder5", x: 64, y: 256, type: "door", style: "ladderUp", targetZone: "overworld", targetObjectId: "forestTempleLadder5", d: "up"},
-        {status: "normal", id: "forestTemple:s0:0x0-bigKey-0", x: 112, y: 112, type: "chest", lootType: "bigKey", lootAmount: 1, lootLevel: 1},
+        {status: "normal", id: "forestTempleBigKey", x: 112, y: 112, type: "chest", lootType: "bigKey", lootAmount: 1, lootLevel: 1},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 32},
@@ -408,7 +408,7 @@ const sf0_0x1: AreaDefinition = {
         {status: "normal", id: "", x: 112, y: 224, type: "door", style: "cave", d: "down"},
         {status: "normal", id: "forestTempleLadder3", x: 400, y: 0, type: "door", style: "ladderUp", targetZone: "overworld", targetObjectId: "forestTempleLadder3", d: "up"},
         {status: "locked", id: "forestTempleLockedDoor", x: 0, y: 368, type: "door", style: "cave", d: "left"},
-        {status: "normal", id: "forestTemple:s0:1x0-smallKey-0", x: 128, y: 112, type: "chest", lootType: "smallKey", lootAmount: 1, lootLevel: 1},
+        {status: "normal", id: "forestTempleSmallKey", x: 128, y: 112, type: "chest", lootType: "smallKey", lootAmount: 1, lootLevel: 1},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16},

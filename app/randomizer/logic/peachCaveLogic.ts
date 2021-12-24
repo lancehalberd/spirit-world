@@ -1,4 +1,4 @@
-import { hasBossWeapon, hasClone, hasIronBoots, hasWeapon } from 'app/content/logic';
+import { canTravelFarUnderWater, hasBossWeapon, hasClone, hasIronBoots, hasWeapon } from 'app/content/logic';
 
 import { LogicNode } from 'app/types';
 
@@ -98,6 +98,10 @@ export const peachCaveNodes: LogicNode[] = [
             { nodeId: 'peachCave:markerA' },
             { nodeId: 'peachCave:markerB' },
             { nodeId: 'peachCavePiece' },
+        ],
+        entranceIds: ['peachCaveWaterEntrance'],
+        exits: [
+            { objectId: 'peachCaveWaterEntrance', logic: canTravelFarUnderWater  },
         ],
     },
 ];

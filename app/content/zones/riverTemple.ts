@@ -212,7 +212,7 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "bossTorchNW", x: 144, y: 144, saveStatus: "forever", type: "torch"},
         {status: "normal", id: "bossTorchNE", x: 352, y: 144, saveStatus: "forever", type: "torch"},
         {status: "normal", id: "bossTorchSE", x: 352, y: 352, saveStatus: "forever", type: "torch"},
-        {status: "normal", id: "frostBeast", x: 224, y: 224, type: "boss", enemyType: "frostHeart", lootType: "empty", lootAmount: 1, lootLevel: 1, d: "down", params: {}, logicKey: "frozenLake"},
+        {status: "normal", id: "frostBeast", x: 224, y: 224, type: "boss", enemyType: "frostHeart", lootType: "ice", lootAmount: 1, lootLevel: 1, d: "down", params: {}, logicKey: "frozenLake"},
         {status: "normal", id: "", x: 128, y: 336, type: "crystalSwitch", element: "lightning", timer: 1000, targetObjectId: "bossTorchSW"},
         {status: "normal", id: "", x: 368, y: 336, type: "crystalSwitch", element: "lightning", timer: 1000, targetObjectId: "bossTorchSE"},
         {status: "normal", id: "frostBeast", x: 224, y: 176, type: "boss", enemyType: "frostSerpent", lootType: "ice", lootAmount: 1, lootLevel: 1, d: "down", params: {}, logicKey: "frozenLake"},

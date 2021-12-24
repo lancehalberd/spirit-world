@@ -1,5 +1,6 @@
 import { cloneDeep } from 'lodash';
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
+import { enemyTypes } from 'app/content/enemies';
 import { isLogicValid } from 'app/content/logic';
 import { lootEffects } from 'app/content/lootObject';
 import { getZone, zones } from 'app/content/zones';
@@ -10,12 +11,15 @@ import {
 } from 'app/content/spawnLocations';
 
 import { peachCaveNodes } from 'app/randomizer/logic/peachCaveLogic';
-import { treeVillageNodes, waterfallCaveNodes } from 'app/randomizer/logic/otherLogic'
-import { overworldNodes } from 'app/randomizer/logic/overworldLogic';
+import { cavesNodes, treeVillageNodes, waterfallCaveNodes } from 'app/randomizer/logic/otherLogic'
+import { overworldNodes, underwaterNodes } from 'app/randomizer/logic/overworldLogic';
 import { tombNodes } from 'app/randomizer/logic/tombLogic';
 import { warTempleNodes } from 'app/randomizer/logic/warTempleLogic';
 import { cocoonNodes } from 'app/randomizer/logic/cocoonLogic';
+import { helixNodes } from 'app/randomizer/logic/helixLogic';
+import { forestTempleNodes } from 'app/randomizer/logic/forestTempleLogic';
 import { waterfallTowerNodes } from 'app/randomizer/logic/waterfallTower';
+import { riverTempleNodes, riverTempleWaterNodes } from 'app/randomizer/logic/riverTempleLogic';
 
 import { readGetParameter } from 'app/utils/index';
 import SRandom from 'app/utils/SRandom';
@@ -23,11 +27,29 @@ import SRandom from 'app/utils/SRandom';
 import { applySavedState, getDefaultState } from 'app/state';
 
 import {
+    AreaDefinition,
     BossObjectDefinition, DialogueLootDefinition, EntranceDefinition,
     GameState, LogicNode, LootObjectDefinition, LootType, NPCDefinition,
     ObjectDefinition,
     Zone, ZoneLocation,
 } from 'app/types';
+
+const allNodes = [
+    ...overworldNodes,
+    ...cavesNodes,
+    ...underwaterNodes,
+    ...waterfallCaveNodes,
+    ...peachCaveNodes,
+    ...treeVillageNodes,
+    ...tombNodes,
+    ...warTempleNodes,
+    ...cocoonNodes,
+    ...helixNodes,
+    ...forestTempleNodes,
+    ...waterfallTowerNodes,
+    ...riverTempleNodes,
+    ...riverTempleWaterNodes,
+];
 
 interface LootData {
     loot: {
@@ -660,18 +682,8 @@ function findAllTargetObjects(lootWithLocation: LootWithLocation): (LootObjectDe
     return results;
 }
 
-const allNodes = [
-    ...overworldNodes,
-    ...waterfallCaveNodes,
-    ...peachCaveNodes,
-    ...treeVillageNodes,
-    ...tombNodes,
-    ...warTempleNodes,
-    ...cocoonNodes,
-    ...waterfallTowerNodes,
-];
-
 const seed = readGetParameter('seed');
+const enemySeed = readGetParameter('enemySeed');
 
 if (seed) {
     applyLootAssignments(reverseFill(SRandom.seed(Number(seed)), allNodes, [overworldNodes[0]]));
@@ -681,4 +693,52 @@ if (seed) {
     }
 
 }
+if (enemySeed) {
+    let enemyRandom = SRandom.seed(Number(seed))
+    everyObject((location, zone, area, object) => {
+        if (object.type === 'enemy') {
+            object.enemyType = enemyRandom.element([...enemyTypes]);
+            enemyRandom.generateAndMutate();
+        }
+    });
+}
 
+
+function everyZone(callback: (location: Partial<ZoneLocation>, zone: Zone) => void ) {
+    for (const zoneKey in zones) {
+        callback({zoneKey}, zones[zoneKey]);
+    }
+}
+function everyArea(callback: (location: ZoneLocation, zone: Zone, area: AreaDefinition) => void ) {
+    everyZone((location, zone) => {
+        for (let floor = 0; floor < zone.floors.length; floor++) {
+            for (const grid of [zone.floors[floor].grid, zone.floors[floor].spiritGrid]) {
+                if (!grid) {
+                    continue;
+                }
+                const isSpiritWorld = grid === zone.floors[floor].spiritGrid;
+                for (let y = 0; y < grid.length; y++) {
+                    for (let x = 0; x < grid[y].length; x++) {
+                        if (!grid[y][x]) {
+                            continue;
+                        }
+                        callback({
+                            zoneKey: location.zoneKey,
+                            floor,
+                            isSpiritWorld,
+                            areaGridCoords: {x, y},
+                            x: 0, y: 0, d: 'up',
+                        }, zone, grid[y][x]);
+                    }
+                }
+            }
+        }
+    });
+}
+function everyObject(callback: (location: ZoneLocation, zone: Zone, area: AreaDefinition, objectDefinition: ObjectDefinition) => void) {
+    everyArea((location, zone, area) => {
+        for (let i = 0; i < area.objects.length; i++) {
+            callback(location, zone, area, area.objects[i]);
+        }
+    });
+}
