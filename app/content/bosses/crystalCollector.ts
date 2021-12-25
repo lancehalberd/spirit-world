@@ -176,17 +176,35 @@ const summonProjectiles = (state: GameState, enemy: Enemy, target: ObjectInstanc
     let right = Math.min(512 - 104, left + 96);
     left = Math.min(left, right - 96);
     let delay = 600;
-    for (let x = left; x <= right; x += 12) {
-        CrystalSpike.spawn(state, enemy.area, {
-            x,
-            y: 40,
-            damage: 2,
-            delay,
-            ignoreWallsDuration: 1000,
-            vx: 0,
-            vy: 4,
-        });
-        delay += 200;
+    // Arrows furthest towards the edges of the field start first, forcing the player
+    // to the center. This avoids the edges either being traps or always having to
+    // be safe from arrows.
+    if ((left + right) / 2 > 256) {
+        for (let x = right; x >= left; x -= 12) {
+            CrystalSpike.spawn(state, enemy.area, {
+                x,
+                y: 40,
+                damage: 2,
+                delay,
+                ignoreWallsDuration: 1000,
+                vx: 0,
+                vy: 4,
+            });
+            delay += 200;
+        }
+    } else {
+        for (let x = left; x <= right; x += 12) {
+            CrystalSpike.spawn(state, enemy.area, {
+                x,
+                y: 40,
+                damage: 2,
+                delay,
+                ignoreWallsDuration: 1000,
+                vx: 0,
+                vy: 4,
+            });
+            delay += 200;
+        }
     }
 };
 
