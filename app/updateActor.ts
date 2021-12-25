@@ -211,6 +211,52 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         updateScreenTransition(state, hero);
         return;
     }
+    const isAstralProjection = hero.isAstralProjection;
+    const { section } = getAreaSize(state);
+    // Handle super tile transitions.
+    if (!isAstralProjection && state.nextAreaInstance) {
+        hero.vx = 0;
+        hero.vy = 0;
+        // If we see issues with the screen transition code for super tiles,
+        // update this logic to match the section transition code below and stop
+        // the player at exactly the threshold.
+        if (state.nextAreaInstance.cameraOffset.x) {
+            // We need to make sure this is low enough that the character doesn't get entirely into the second column,
+            // otherwise horizontal doors won't work as expected.\
+            hero.x += 0.75 * state.nextAreaInstance.cameraOffset.x / Math.abs(state.nextAreaInstance.cameraOffset.x);
+        }
+        if (state.nextAreaInstance.cameraOffset.y) {
+            const dy = state.nextAreaInstance.cameraOffset.y / Math.abs(state.nextAreaInstance.cameraOffset.y);
+            if (dy > 0 && hero.y < 512 + 18) {
+                hero.y += 0.7;
+            } else if (dy < 0 && hero.y > -18) {
+                hero.y -= 0.7;
+            }
+        }
+        return;
+    }
+    // Handle section transitions.
+    if (!isAstralProjection && hero.x + hero.w > section.x + section.w) {
+        hero.actionDx = Math.min(0, hero.actionDx);
+        hero.vx = Math.min(0, hero.vx);
+        hero.x = Math.max(hero.x - 1, section.x + section.w - hero.w);
+        return;
+    } else if (!isAstralProjection && hero.x < section.x) {
+        hero.actionDx = Math.max(0, hero.actionDx);
+        hero.vx = Math.max(0, hero.vx);
+        hero.x = Math.min(hero.x + 1, section.x);
+        return;
+    } else if (!isAstralProjection && hero.y + hero.h > section.y + section.h) {
+        hero.actionDy = Math.min(0, hero.actionDy);
+        hero.vy = Math.min(0, hero.vy);
+        hero.y = Math.max(hero.y - 1, section.y + section.h - hero.h);
+        return;
+    } else if (!isAstralProjection && hero.y < section.y) {
+        hero.actionDy = Math.max(0, hero.actionDy);
+        hero.vy = Math.max(0, hero.vy);
+        hero.y = Math.min(hero.y + 1, section.y);
+        return;
+    }
     if (hero.invulnerableFrames > 0) {
         hero.invulnerableFrames--;
     }
@@ -223,12 +269,9 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         movementSpeed *= 1.5;
     }
 
-    const { section } = getAreaSize(state);
-
     const isCloneToolDown = (state.hero.leftTool === 'clone' && isGameKeyDown(state, GAME_KEY.LEFT_TOOL))
         || (state.hero.rightTool === 'clone' && isGameKeyDown(state, GAME_KEY.RIGHT_TOOL));
     const primaryClone = state.hero.activeClone || state.hero;
-    const isAstralProjection = hero.isAstralProjection;
     const isControlled = (state.hero.action === 'meditating' && isAstralProjection) || isCloneToolDown || hero === primaryClone;
 
     const minZ = isAstralProjection ? 4 : 0;
@@ -339,49 +382,6 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         }
     } else if (isHeroSinking(state, hero)) {
         hero.z = Math.max(hero.z - 2, 0);
-    } else if (!isAstralProjection && state.nextAreaInstance) {
-        movementSpeed = 0;
-        hero.vx = 0;
-        hero.vy = 0;
-        if (state.nextAreaInstance.cameraOffset.x) {
-            // We need to make sure this is low enough that the character doesn't get entirely into the second column,
-            // otherwise horizontal doors won't work as expected.
-            //dx = 0.75 * state.nextAreaInstance.cameraOffset.x / Math.abs(state.nextAreaInstance.cameraOffset.x);
-            hero.x += 0.75 * state.nextAreaInstance.cameraOffset.x / Math.abs(state.nextAreaInstance.cameraOffset.x);
-        }
-        if (state.nextAreaInstance.cameraOffset.y) {
-            //dy = 1 * state.nextAreaInstance.cameraOffset.y / Math.abs(state.nextAreaInstance.cameraOffset.y);
-            const dy = state.nextAreaInstance.cameraOffset.y / Math.abs(state.nextAreaInstance.cameraOffset.y);
-            if (dy > 0 && hero.y < 512 + 32) {
-                hero.y += 0.5;
-            } else if (dy < 0 && hero.y > - 32) {
-                hero.y -= 0.5;
-            }
-        }
-    } else if (!isAstralProjection && hero.x + hero.w > section.x + section.w + 1) {
-        movementSpeed = 0;
-        hero.vx = 0;
-        hero.vy = 0;
-        hero.x -= 0.5;
-        //dx = -1;
-    } else if (!isAstralProjection && hero.x < section.x - 1) {
-        movementSpeed = 0;
-        hero.vx = 0;
-        hero.vy = 0;
-        hero.x += 0.5;
-        //dx = 1;
-    } else if (!isAstralProjection && hero.y + hero.h > section.y + section.h + 1) {
-        movementSpeed = 0;
-        hero.vx = 0;
-        hero.vy = 0;
-        hero.y -= 0.5;
-        //dy = -1;
-    } else if (!isAstralProjection && hero.y < section.y - 1) {
-        movementSpeed = 0;
-        hero.vx = 0;
-        hero.vy = 0;
-        hero.y += 0.5;
-        //dy = 1;
     } else if (!isAstralProjection && hero.action === 'climbing') {
         movementSpeed *= 0.5;
     } else if (!isAstralProjection && (hero.action === 'falling' || hero.action === 'sinkingInLava')) {
