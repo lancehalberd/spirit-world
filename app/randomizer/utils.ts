@@ -12,7 +12,7 @@ import {
 
 import { peachCaveNodes } from 'app/randomizer/logic/peachCaveLogic';
 import { cavesNodes, treeVillageNodes, waterfallCaveNodes } from 'app/randomizer/logic/otherLogic'
-import { overworldNodes, underwaterNodes } from 'app/randomizer/logic/overworldLogic';
+import { overworldNodes, underwaterNodes, skyNodes } from 'app/randomizer/logic/overworldLogic';
 import { tombNodes } from 'app/randomizer/logic/tombLogic';
 import { warTempleNodes } from 'app/randomizer/logic/warTempleLogic';
 import { cocoonNodes } from 'app/randomizer/logic/cocoonLogic';
@@ -38,6 +38,7 @@ const allNodes = [
     ...overworldNodes,
     ...cavesNodes,
     ...underwaterNodes,
+    ...skyNodes,
     ...waterfallCaveNodes,
     ...peachCaveNodes,
     ...treeVillageNodes,

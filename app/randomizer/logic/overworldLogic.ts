@@ -15,6 +15,7 @@ export const overworldNodes: LogicNode[] = [
         paths: [
             { nodeId: 'overworldMountain', logic: hasGloves },
             { nodeId: 'warTempleArea' },
+            { nodeId: 'mainSpiritWorld', logic: hasTeleportation },
         ],
         entranceIds: [
             'elderEntrance', 'tombTeleporter',
@@ -29,7 +30,6 @@ export const overworldNodes: LogicNode[] = [
             { objectId: 'staffTowerEntrance' },
             { objectId: 'tombEntrance', logic: hasMediumRange },
             { objectId: 'waterfallCaveEntrance' },
-            { objectId: 'mainSpiritWorld', logic: hasTeleportation },
         ],
     },
     {
@@ -68,6 +68,7 @@ export const overworldNodes: LogicNode[] = [
             { nodeId: 'overworldMain' },
             { nodeId: 'overworldWaterfall', logic: orLogic(hasTeleportation, hasIronBoots, hasMitts) },
         ],
+        entranceIds: ['caves-ascentEntrance'],
         exits: [{objectId: 'caves-ascentEntrance' }],
     },
     {
@@ -137,11 +138,41 @@ export const underwaterNodes: LogicNode[] = [
             {nodeId: 'overworldMain', logic: {requiredFlags: ['iceBeast']}},
         ],
         entranceIds: [
-            'peachCaveWaterEntrance', 'riverTempleWaterEntrance',
+            'peachCaveUnderwaterEntrance', 'riverTempleWaterEntrance',
         ],
         exits: [
-            { objectId: 'peachCaveWaterEntrance', logic: canTravelFarUnderWater  },
+            { objectId: 'peachCaveUnderwaterEntrance', logic: canTravelFarUnderWater  },
             { objectId: 'riverTempleWaterEntrance', logic: canTravelFarUnderWater  },
         ],
     },
+];
+
+zoneId = 'sky';
+export const skyNodes: LogicNode[] = [
+    {
+        zoneId,
+        nodeId: 'outsideCrater',
+        paths: [
+            { nodeId: 'overworldMountain' },
+            { nodeId: 'outsideHelix', logic: hasCloudBoots },
+        ],
+        entranceIds: ['caves-ascentExit'],
+        exits: [
+            { objectId: 'craterEntrance', logic: {requiredFlags: ['elementalBeastsEscaped']} },
+        ],
+    },
+    {
+        zoneId,
+        nodeId: 'outsideHelix',
+        paths: [
+            { nodeId: 'outsideCrater', logic: hasCloudBoots },
+        ],
+        entranceIds: ['helixSkyEntrance'],
+        exits: [
+            { objectId: 'helixSkyEntrance' },
+        ],
+    }
+    // Over river temple is not implemented yet
+    // outside waterfall tower is not interesting in the material world currently.
+    // No tower connections in sky yet
 ];

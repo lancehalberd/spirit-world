@@ -99,9 +99,9 @@ export const peachCaveNodes: LogicNode[] = [
             { nodeId: 'peachCave:markerB' },
             { nodeId: 'peachCavePiece' },
         ],
-        entranceIds: ['peachCaveWaterEntrance'],
+        entranceIds: ['peachCaveUnderwaterEntrance'],
         exits: [
-            { objectId: 'peachCaveWaterEntrance', logic: canTravelFarUnderWater  },
+            { objectId: 'peachCaveUnderwaterEntrance', logic: canTravelFarUnderWater  },
         ],
     },
 ];

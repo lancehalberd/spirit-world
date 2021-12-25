@@ -16,7 +16,7 @@ export const forestTempleNodes: LogicNode[] = [
         paths: [
             {nodeId: 'forestTempleAfterLock', doorId: 'forestTempleLockedDoor'},
         ],
-        entranceIds: ['forestTempleLadder1'],
+        entranceIds: ['forestTempleLadder1', 'forestTempleLadder2'],
         exits: [
             {objectId: 'forestTempleLadder1'},
             {objectId: 'forestTempleLadder2', logic: hasBossWeapon}

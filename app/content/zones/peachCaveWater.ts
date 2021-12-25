@@ -341,7 +341,7 @@ const f0_1x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "peachCaveWaterEntrance", x: 352, y: 496, type: "door", style: "wideEntrance", targetZone: "underwater", targetObjectId: "peachCaveWaterEntrance", d: "down"},
+        {status: "normal", id: "peachCaveUnderwaterEntrance", x: 352, y: 496, type: "door", style: "wideEntrance", targetZone: "underwater", targetObjectId: "peachCaveUnderwaterEntrance", d: "down"},
         {status: "normal", id: "", x: 352, y: 432, type: "airBubbles"},
         {status: "normal", id: "", x: 128, y: 192, type: "airBubbles"},
     ],

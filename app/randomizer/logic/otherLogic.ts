@@ -1,6 +1,6 @@
 import {
     andLogic, canCross2Gaps,
-    hasCatEyes, hasMediumRange, hasMitts, hasIce, hasTeleportation,
+    hasBossWeapon, hasCatEyes, hasMediumRange, hasMitts, hasIce, hasTeleportation,
     orLogic,
 } from 'app/content/logic';
 
@@ -86,6 +86,24 @@ export const cavesNodes: LogicNode[] = [
         exits: [
             { objectId: 'caves-ascentExit', logic:canAscendToCrater },
             { objectId: 'caves-ascentEntrance'}
+        ],
+    },
+    {
+        zoneId: 'lakeTunnel',
+        nodeId: 'lakeTunnelFront',
+        paths: [{ nodeId: 'lakeTunnelBack', logic: andLogic(hasTeleportation, hasBossWeapon)}],
+        entranceIds: ['lakeTunnelEntrance'],
+        exits: [
+            { objectId: 'lakeTunnelEntrance' },
+        ],
+    },
+    {
+        zoneId: 'lakeTunnel',
+        nodeId: 'lakeTunnelBack',
+        paths: [{ nodeId: 'lakeTunnelFront', logic: andLogic(hasTeleportation, hasBossWeapon)}],
+        entranceIds: ['helixEntrance'],
+        exits: [
+            { objectId: 'helixEntrance' },
         ],
     },
 ];

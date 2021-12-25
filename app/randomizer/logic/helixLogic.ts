@@ -96,6 +96,7 @@ export const helixNodes: LogicNode[] = [
         zoneId,
         nodeId: 'helix4',
         paths: [{nodeId: 'helix4Spirit'}],
+        entranceIds: ['helixSkyEntrance'],
         exits: [
             {objectId: 'helixSkyEntrance'},
         ],

@@ -92,6 +92,7 @@ export const riverTempleNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'riverTempleSWArea',
+        checks: [{objectId: 'riverTempleBigKey'}],
         paths: [
             {nodeId: 'riverTempleMainHall', doorId: 'riverTempleBigKeyDoor'},
             {nodeId: 'riverTempleWaterMaze2', logic: hasIronBoots},

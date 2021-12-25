@@ -361,7 +361,7 @@ const f0_1x1: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "peachCaveWaterEntrance", x: 256, y: 96, type: "door", style: "cave", targetZone: "peachCaveWater", targetObjectId: "peachCaveWaterEntrance", d: "up"},
+        {status: "normal", id: "peachCaveUnderwaterEntrance", x: 256, y: 96, type: "door", style: "cave", targetZone: "peachCaveWater", targetObjectId: "peachCaveUnderwaterEntrance", d: "up"},
         {status: "normal", id: "riverTempleWaterEntrance", x: 240, y: 272, type: "door", style: "cave", targetZone: "riverTempleWater", targetObjectId: "riverTempleWaterEntrance", d: "up"},
     ],
     sections: [
