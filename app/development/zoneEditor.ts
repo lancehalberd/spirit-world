@@ -377,18 +377,20 @@ export function getLogicProperties(
         });
     }
     rows.push(row);
-    rows.push({
-        name: 'Invert',
-        value: !!logic.isInverted,
-        onChange(isInverted: boolean) {
-            const updatedLogic = {...logic};
-            if (!isInverted) {
-                delete updatedLogic.isInverted;
-            } else {
-                updatedLogic.isInverted = true;
+    if (currentValue !== 'none' && currentValue !== 'true') {
+        rows.push({
+            name: 'Invert',
+            value: !!logic.isInverted,
+            onChange(isInverted: boolean) {
+                const updatedLogic = {...logic};
+                if (!isInverted) {
+                    delete updatedLogic.isInverted;
+                } else {
+                    updatedLogic.isInverted = true;
+                }
+                updateLogic(updatedLogic);
             }
-            updateLogic(updatedLogic);
-        }
-    });
+        });
+    }
     return rows;
 }

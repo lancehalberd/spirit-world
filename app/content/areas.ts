@@ -662,7 +662,10 @@ export function evaluateLogicDefinition(state: GameState, logicDefinition?: Logi
     if (logicDefinition.hasCustomLogic) {
         return isLogicValid(state, { requiredFlags: [logicDefinition.customLogic] }, logicDefinition.isInverted);
     }
-    return isLogicValid(state, logicHash[logicDefinition.logicKey], logicDefinition.isInverted);
+    if (logicDefinition.logicKey) {
+        return isLogicValid(state, logicHash[logicDefinition.logicKey], logicDefinition.isInverted);
+    }
+    return defaultValue;
 }
 
 export function getAreaSize(state: GameState): {w: number, h: number, section: Rect} {
