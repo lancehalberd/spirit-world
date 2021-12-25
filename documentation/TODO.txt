@@ -28,13 +28,45 @@ Graphics:
 Current tasks:
     - Bug fixes
         - Picked up items are invisible while using cloak
-        - Charging during scrolling transition gets you stuck in a loop
-            - Use a standard speed for transition, not one relative to your action.
+        - Piercing projectiles that can push things should be stopped by the first object they push
+            or not be able to push additional objects, for example, the charged chakram.
         - Charging allows you to walk on top of water currently.
             - Instead let's remove ability to go on deep water while charing.
 
+    Staff Tower
+        - Machines, traps + lightning
+        - Conveyer belts/escalators.
+            - Slow ones that just push the player around
+            - Fast ones that cause the player to lose control until they are pushed off
+            - Cloud boots allow you to ignore the conveyer belts while moving
+            - Ice magic can freeze the conveyer belts which stops them but makes them slippery.
+        - Lightning barriers
+            - Deal 4 lightning damage and knock the player back.
+                - Player is still knocked back with spirit barrier or iframes.
+                - Invisibility allows the player to pass through unharmed.
+            - Can be permanently on, toggled on/off on timer, or toggled by switches
+            - Shows a 500ms warning when about to turn on, maybe sparks on either end of where the beam will be, or a smaller non damaging beam.
+        - All machine enemies have an offline state where they cannot be damaged, and possibly can be pushed around.
+            - Hitting offline machines with lightning will turn them on.
+            - Machines all default to offline except in the material world when the Storm Beast is active.
+        - Lightning drones
+            - Lightning shields up normally
+            - In range, fly quickly towards a player and stop nearby
+            - Drops shield and prepares a lightning AOE attack with 500ms warning with a ring showing the hit area.
+        - Sentries
+            - Large robots with high health and big attacks
+            - Used as barriers when not powered.
+            - Can have an area with a lot of these enemies in the material world that is safer to return to after defeating the storm beast.
+        -  Bi-directional spirit world portals that can only be used once activated with lightning element in the spirit world.
+        - Ground level exit + sky level exit for each tower location.
+        - Fast Conveyer belt puzzle with lightning barriers over it requiring you to either freeze the conveyer belts or run over them with clouds boots without getting knocked down by the lightning barriers.
+        - Slow Conveyer belt puzzle with out of sync lightning barriers across it.
+
+    Storm Beast
+        - Storm Heart is protected by a layer of bouncy clouds that the MC can slowly deform to reveal the heart. The clouds
+
+
     - Randomizer improvements
-        - Add crater to logic
         - Add a goal
     - brainstorm some dungeon/boss ideas, maybe for Staff Tower
 
