@@ -77,6 +77,7 @@ export const hasMitts: LogicCheck = { requiredFlags: ['$gloves:2'] };
 export const hasSpiritSight: LogicCheck = { requiredFlags: ['$spiritSight', '$catEyes'] };
 export const hasSmallKey: LogicCheck = { requiredFlags: ['$smallKey'] };
 export const hasBigKey: LogicCheck = { requiredFlags: ['$bigKey'] };
+export const hasFireBlessing: LogicCheck = {requiredFlags: ['$fireBlessing']};
 export const hasWaterBlessing: LogicCheck = {requiredFlags: ['$waterBlessing']};
 export const hasChakram: LogicCheck = {requiredFlags: ['$weapon']};
 export const hasFire: LogicCheck = {requiredFlags: ['$fire']};
@@ -113,6 +114,8 @@ export const canCross6Gaps: AndLogicCheck = andLogic(orLogic(hasRoll, hasCloudBo
 export const canCross8Gaps: AndLogicCheck = andLogic(hasRoll, hasCloudBoots, hasStaff);
 
 export const canTravelFarUnderWater = andLogic(hasIronBoots, orLogic(hasWaterBlessing, hasCatEyes));
+
+export const canReleaseBeasts = andLogic(canCross6Gaps, hasTeleportation, hasBossWeapon);
 
 export const logicHash: {[key: string]: LogicCheck} = {
     hasWeapon,

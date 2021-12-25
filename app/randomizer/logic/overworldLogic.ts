@@ -1,5 +1,5 @@
 import {
-    canTravelFarUnderWater,
+    canReleaseBeasts, canTravelFarUnderWater,
     hasCloudBoots, hasIronBoots, hasGloves, hasMitts, hasTeleportation,
     hasMediumRange, hasSpiritSight, orLogic,
 } from 'app/content/logic';
@@ -156,9 +156,9 @@ export const skyNodes: LogicNode[] = [
             { nodeId: 'overworldMountain' },
             { nodeId: 'outsideHelix', logic: hasCloudBoots },
         ],
-        entranceIds: ['caves-ascentExit'],
+        entranceIds: ['caves-ascentExit', 'craterEntrance'],
         exits: [
-            { objectId: 'craterEntrance', logic: {requiredFlags: ['elementalBeastsEscaped']} },
+            { objectId: 'craterEntrance', logic: canReleaseBeasts },
         ],
     },
     {

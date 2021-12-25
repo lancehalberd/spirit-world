@@ -20,6 +20,7 @@ import { helixNodes } from 'app/randomizer/logic/helixLogic';
 import { forestTempleNodes } from 'app/randomizer/logic/forestTempleLogic';
 import { waterfallTowerNodes } from 'app/randomizer/logic/waterfallTower';
 import { riverTempleNodes, riverTempleWaterNodes } from 'app/randomizer/logic/riverTempleLogic';
+import { craterNodes } from 'app/randomizer/logic/craterLogic';
 
 import { readGetParameter } from 'app/utils/index';
 import SRandom from 'app/utils/SRandom';
@@ -50,6 +51,7 @@ const allNodes = [
     ...waterfallTowerNodes,
     ...riverTempleNodes,
     ...riverTempleWaterNodes,
+    ...craterNodes,
 ];
 
 interface LootData {
