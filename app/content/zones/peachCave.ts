@@ -785,7 +785,7 @@ const f0_1x0: AreaDefinition = {
         {id: "peachCave:markerA", linked: false, spirit: false, status: "normal", x: 112, y: 176, type: "marker"},
         {id: "peachCave:markerB", linked: false, spirit: false, status: "normal", x: 384, y: 416, type: "marker"},
         {id: "peachCave:waterEntrance", linked: true, spirit: false, status: "normal", x: 352, y: 496, type: "door", style: "wideEntrance", targetZone: "overworld", targetObjectId: "peachCaveWaterEntrance", d: "down"},
-        {status: "normal", id: "peachCavePiece", x: 144, y: 288, type: "chest", lootType: "peachOfImmortalityPiece", lootAmount: 1, lootLevel: 1},
+        {status: "normal", id: "peachCavePiece", x: 144, y: 288, type: "chest", lootType: "peachOfImmortalityPiece", lootLevel: 1},
         {status: "normal", id: "movementInstructions", x: 224, y: 112, type: "narration", message: "", w: 32, h: 64, delay: 2000},
         {status: "normal", id: "climbInstructions", x: 256, y: 112, type: "narration", message: "Wow, the cave is full of glowing plants!\n{|}I bet I could use that vine to climb up the ledge.\n{|}(Approach a vine and use {B_UP} to climb)", w: 32, h: 64, delay: 500},
         {status: "normal", id: "movementInstructions", x: 112, y: 160, type: "narration", message: "This cave is so dark I didn't see that hole until it was too late...\n{|}Huh, there is a strange glow over there.\n{|}(Use {B_DPAD} to investigate the light to the east.)", w: 32, h: 32, delay: 2000},

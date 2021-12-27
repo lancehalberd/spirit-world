@@ -49,7 +49,7 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
 
     const selectableItemFrames = [];
     function renderSelectableTool(tool: ActiveTool): void {
-        const frame = getLootFrame({ lootType: tool, lootLevel: state.hero.activeTools[tool] });
+        const frame = getLootFrame(state, { lootType: tool, lootLevel: state.hero.activeTools[tool] });
         const target = {w: frameSize, h: frameSize, x, y};
         if (state.hero.leftTool === tool) {
             drawFrame(context, blueFrame, target);
@@ -80,12 +80,12 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
     x += 60;
 
     if (state.hero.weapon) {
-        const frame = getLootFrame({ lootType: 'weapon', lootLevel: state.hero.weapon });
+        const frame = getLootFrame(state, { lootType: 'weapon', lootLevel: state.hero.weapon });
         drawFrameCenteredAt(context, frame, {x, y, w: frameSize, h: frameSize});
     }
 
     function renderBoots(equipment: Equipment): void {
-        const frame = getLootFrame({ lootType: equipment, lootLevel: state.hero.equipment[equipment] });
+        const frame = getLootFrame(state, { lootType: equipment, lootLevel: state.hero.equipment[equipment] });
         const target = {w: frameSize, h: frameSize, x, y};
         if (state.hero.equipedGear[equipment]) {
             fillRect(context, target, 'white');
@@ -125,7 +125,7 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
     }
 
     function renderElement(element: MagicElement): void {
-        const frame = getLootFrame({ lootType: element, lootLevel: state.hero.elements[element] });
+        const frame = getLootFrame(state, { lootType: element, lootLevel: state.hero.elements[element] });
         const target = {w: frameSize, h: frameSize, x, y};
         if (state.hero.element === element) {
             fillRect(context, target, 'white');
@@ -172,7 +172,7 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
 
     x = r.x, y += 30;
     function renderLoot(lootType: LootType, lootLevel: number): void {
-        const frame = getLootFrame({ lootType, lootLevel });
+        const frame = getLootFrame(state, { lootType, lootLevel });
         drawFrameCenteredAt(context, frame, {x, y, w: frameSize, h: frameSize});
         x += 30;
         if (x + 30 >= r.x + r.w) {

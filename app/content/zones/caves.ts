@@ -343,7 +343,7 @@ const f0_0x0: AreaDefinition = {
     objects: [
         {status: "normal", id: "caves-ascentEntrance", x: 64, y: 496, type: "door", style: "cavern", targetZone: "overworld", targetObjectId: "caves-ascentEntrance", d: "down"},
         {status: "normal", id: "caves-ascentExit", x: 96, y: 240, type: "door", style: "cavern", targetZone: "sky", targetObjectId: "caves-ascentExit", d: "down"},
-        {status: "normal", id: "caves-ascentPeachPiece", x: 144, y: 112, type: "chest", lootType: "peachOfImmortalityPiece", lootAmount: 1, lootLevel: 1},
+        {status: "normal", id: "caves-ascentPeachPiece", x: 144, y: 112, type: "chest", lootType: "peachOfImmortalityPiece", lootLevel: 1},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},

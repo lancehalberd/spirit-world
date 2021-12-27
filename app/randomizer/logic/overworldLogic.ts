@@ -24,7 +24,7 @@ export const overworldNodes: LogicNode[] = [
         ],
         exits: [
             { objectId: 'elderEntrance' },
-            { objectId: 'lakeTunnelEntrance' },
+            { objectId: 'lakeTunnelEntrance', logic: hasGloves },
             { objectId: 'peachCaveTopEntrance' },
             { objectId: 'peachCaveWaterEntrance' },
             { objectId: 'staffTowerEntrance' },

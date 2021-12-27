@@ -44,6 +44,7 @@ export function dropItemFromTable(state: GameState, area: AreaInstance, lootTabl
 
 export class LootGetAnimation implements ObjectInstance {
     definition = null;
+    frame: Frame;
     loot: LootObjectDefinition | BossObjectDefinition | DialogueLootDefinition;
     animationTime: number = 0;
     x: number;
@@ -53,16 +54,16 @@ export class LootGetAnimation implements ObjectInstance {
     constructor(loot: LootObjectDefinition | BossObjectDefinition | DialogueLootDefinition) {
         this.loot = loot;
         const state = getState();
-        const frame = getLootFrame(loot);
+        this.frame = getLootFrame(state, loot);
         const hero = state.hero.activeClone || state.hero;
         if (loot.type === 'bigChest') {
-            this.x = loot.x + chestOpenedFrame.w - frame.w / 2;
+            this.x = loot.x + chestOpenedFrame.w - this.frame.w / 2;
             this.y = loot.y + 16;
         } else if (loot.type === 'chest') {
-            this.x = loot.x + chestOpenedFrame.w / 2 - frame.w / 2;
+            this.x = loot.x + chestOpenedFrame.w / 2 - this.frame.w / 2;
             this.y = loot.y + 8;
         } else {
-            this.x = hero.x + hero.w / 2 - frame.w / 2;
+            this.x = hero.x + hero.w / 2 - this.frame.w / 2;
             this.y = hero.y - 4;
         }
         this.z = 8;
@@ -79,7 +80,7 @@ export class LootGetAnimation implements ObjectInstance {
         }
     }
     render(context, state: GameState) {
-        const frame = getLootFrame(this.loot);
+        const frame = this.frame;
         drawFrame(context, frame, { ...frame, x: this.x, y: this.y - this.z });
     }
 }
@@ -269,7 +270,7 @@ export class LootObject implements ObjectInstance {
     status: ObjectStatus;
     constructor(state: GameState, definition: LootObjectDefinition) {
         this.definition = definition;
-        this.frame = getLootFrame(definition);
+        this.frame = getLootFrame(state, definition);
         this.x = definition.x;
         this.y = definition.y;
         this.status = definition.status || 'normal';
@@ -316,10 +317,11 @@ export class LootObject implements ObjectInstance {
 
 export function getLoot(this: void, state: GameState, definition: LootObjectDefinition | BossObjectDefinition | DialogueLootDefinition): void {
     const onPickup = lootEffects[definition.lootType] || lootEffects.unknown;
-    onPickup(state, definition);
     const hero = state.hero.activeClone || state.hero;
     hero.action = 'getItem';
     const lootAnimation = new LootGetAnimation(definition);
+    // Apply the pickup after creating the loot animation so that it uses the correct graphic for progressive items.
+    onPickup(state, definition);
     addObjectToArea(state, hero.area, lootAnimation);
     hero.area.priorityObjects.push([lootAnimation]);
     // Refresh the area so that the guardian NPC moves to the correct location now that the boss is defeated.
@@ -557,7 +559,7 @@ const [
 const [
     lightHalf, darkHalf, wholeCoin
 ] = createAnimation('gfx/hud/money.png', largeMoneyGeometry, {x: 7, cols: 3}).frames;
-export function getLootFrame({lootType, lootLevel, lootAmount}:
+export function getLootFrame(state: GameState, {lootType, lootLevel, lootAmount}:
     {lootType: LootType, lootLevel?: number, lootAmount?: number}
 ): Frame {
     if (lootType === 'money') {
@@ -576,7 +578,7 @@ export function getLootFrame({lootType, lootLevel, lootAmount}:
         return wholeCoin;
     }
     if (lootType === 'cloak') {
-        if (lootLevel === 1) {
+        if (lootLevel === 1 || (lootLevel === 0 && !state.hero.activeTools.cloak)){
             return lootFrames.spiritCloak;
         }
         return lootFrames.invisibilityCloak;

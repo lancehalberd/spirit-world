@@ -88,7 +88,7 @@ const f0_0x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "helix:0:0x0-staff-0", x: 240, y: 224, type: "chest", lootType: "staff", lootAmount: 1, lootLevel: 1, linked: undefined},
+        {status: "normal", id: "helix:0:0x0-staff-0", x: 240, y: 224, type: "chest", lootType: "staff", lootLevel: 1, linked: undefined},
         {status: "normal", id: "helixEntrance", x: 240, y: 480, type: "door", style: "cave", targetZone: "lakeTunnel", targetObjectId: "helixEntrance", d: "down"},
         {status: "normal", id: "helixStairs1", x: 208, y: 64, type: "door", style: "cave", targetZone: "helix", targetObjectId: "helixStairs1", d: "up"},
         {status: "normal", id: "helixMarker", x: 240, y: 272, type: "marker", linked: undefined},

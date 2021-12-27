@@ -92,8 +92,8 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "lakeTunnel:0:0x0-door-1", x: 112, y: 256, type: "door", style: "cave", d: "up"},
         {status: "normal", id: "lakeTunnelEntrance", x: 112, y: 480, type: "door", style: "cave", targetZone: "overworld", targetObjectId: "lakeTunnelEntrance", d: "down"},
         {status: "closedEnemy", id: "lakeTunnel:0:0x0-door-3", x: 112, y: 224, type: "door", style: "cave", d: "down"},
-        {status: "normal", id: "lakeTunneBoss", x: 64, y: 64, type: "boss", enemyType: "stormIdol", lootType: "empty", lootAmount: 1, lootLevel: 1, d: "up", params: {}},
-        {status: "normal", id: "lakeTunneBoss", x: 160, y: 64, type: "boss", enemyType: "stormIdol", lootType: "empty", lootAmount: 1, lootLevel: 1, d: "up", params: {}},
+        {status: "normal", id: "lakeTunneBoss", x: 64, y: 64, type: "boss", enemyType: "stormIdol", lootType: "empty", lootLevel: 1, d: "up", params: {}},
+        {status: "normal", id: "lakeTunneBoss", x: 160, y: 64, type: "boss", enemyType: "stormIdol", lootType: "empty", lootLevel: 1, d: "up", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},

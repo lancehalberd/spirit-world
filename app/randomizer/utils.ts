@@ -636,7 +636,7 @@ export function applyLootAssignments(assignments: LootAssignment[]): void {
             const {object} = findObjectById(zones[assignment.target.location.zoneKey], assignment.target.lootObject.id);
             const npc = object as NPCDefinition;
             const npcKey = `${assignment.target.location.zoneKey}-${assignment.target.lootObject.id}`;
-            const number = assignment.lootAmount || assignment.lootLevel;
+            const number = assignment.lootAmount || 0;//assignment.lootLevel;
             let text: string;
             if (assignment.lootType === 'empty') {
                 text = `I'm sorry you came all this way for nothing.`;
@@ -664,7 +664,7 @@ export function applyLootAssignments(assignments: LootAssignment[]): void {
             for (const target of findAllTargetObjects(assignment.target)) {
                 target.lootType = assignment.lootType;
                 target.lootAmount = assignment.lootAmount;
-                target.lootLevel = assignment.lootLevel;
+                target.lootLevel = 0;//assignment.lootLevel;
             }
         }
     }

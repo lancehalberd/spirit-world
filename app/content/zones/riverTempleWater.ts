@@ -199,7 +199,7 @@ const f0_1x0: AreaDefinition = {
         {status: "normal", id: "riverTempleWaterStairs", x: 416, y: 0, type: "door", style: "cave", targetZone: "riverTempleWater", targetObjectId: "riverTempleWaterStairs", d: "up"},
         {status: "locked", id: "riverTempleLockedDoor", x: 368, y: 224, type: "door", style: "cave", targetZone: undefined, targetObjectId: undefined, d: "down"},
         {status: "locked", id: "riverTempleLockedDoor", x: 368, y: 256, type: "door", style: "cave", targetZone: undefined, targetObjectId: undefined, d: "up"},
-        {status: "locked", id: "riverTempleSmallKey", x: 384, y: 128, type: "chest", lootType: "smallKey", lootAmount: 1, lootLevel: 1},
+        {status: "locked", id: "riverTempleSmallKey", x: 384, y: 128, type: "chest", lootType: "smallKey", lootLevel: 1},
         {status: "locked", id: "", x: 336, y: 112, type: "airBubbles"},
     ],
     sections: [
@@ -299,8 +299,8 @@ const f1_0x0: AreaDefinition = {
         {status: "hidden", id: "bossBubblesWeset", x: 112, y: 240, type: "airBubbles"},
         {status: "hidden", id: "bossBubblesEast", x: 384, y: 256, type: "airBubbles"},
         {status: "hidden", id: "bossBubblesNorth", x: 256, y: 112, type: "airBubbles"},
-        {status: "normal", id: "frostBeast", x: 224, y: 224, type: "boss", enemyType: "frostHeart", lootType: "empty", lootAmount: 1, lootLevel: 1, d: "down", params: {}, logicKey: "frozenLake"},
-        {status: "normal", id: "frostBeast", x: 224, y: 176, type: "boss", enemyType: "frostSerpent", lootType: "empty", lootAmount: 1, lootLevel: 1, d: "down", params: {}, logicKey: "frozenLake"},
+        {status: "normal", id: "frostBeast", x: 224, y: 224, type: "boss", enemyType: "frostHeart", lootType: "empty", lootLevel: 1, d: "down", params: {}, logicKey: "frozenLake"},
+        {status: "normal", id: "frostBeast", x: 224, y: 176, type: "boss", enemyType: "frostSerpent", lootType: "empty", lootLevel: 1, d: "down", params: {}, logicKey: "frozenLake"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},

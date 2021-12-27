@@ -20,7 +20,7 @@ import { isPointInShortRect } from 'app/utils/index';
 import {
     AreaDefinition, AreaInstance, BallGoalDefinition,
     BossType, CrystalSwitchDefinition, FloorSwitchDefinition, KeyBlockDefinition,
-    FrameDimensions, DecorationType, Direction, DrawPriority, EnemyType, GameState,
+    FrameDimensions, DecorationType, Direction, DrawPriority, EnemyType, GameState, LootObjectDefinition,
     LootType, MagicElement, NPCBehavior, NPCStyle, ObjectDefinition, ObjectStatus, ObjectType, PanelRows,
     Rect, StaffTowerLocation,
     Zone, ZoneLocation,
@@ -199,15 +199,19 @@ export function createObjectDefinition(
         case 'bigChest':
         case 'loot': {
             const lootType = definition.lootType || getLootTypes()[0];
-            return {
+            const lootDefinition: LootObjectDefinition = {
                 ...commonProps,
                 type: definition.type,
                 id: definition.id || uniqueId(state, lootType),
                 lootType,
-                lootAmount: definition.lootAmount || 1,
-                lootLevel: definition.lootLevel || 1,
                 status: definition.status || commonProps.status,
             };
+            if (lootType === 'money') {
+                lootDefinition.lootAmount = definition.lootAmount || 1;
+            } else {
+                lootDefinition.lootLevel = definition.lootLevel || 1;
+            }
+            return lootDefinition;
         }
         case 'airBubbles':
         case 'beadGrate':
@@ -960,15 +964,15 @@ export function uniqueId(state: GameState, prefix: string, location: ZoneLocatio
 }
 
 export function getObjectFrame(object: ObjectDefinition): FrameDimensions {
-    if (object.type === 'loot') {
-        return getLootFrame(object);
-    }
     const state = getState();
+    if (object.type === 'loot') {
+        return getLootFrame(state, object);
+    }
     const instance = createObjectInstance(state, object);
     if (instance.getHitbox) {
         return instance.getHitbox(state);
     }
-    return getLootFrame({lootType: 'unknown'});
+    return getLootFrame(state, {lootType: 'unknown'});
 }
 
 export function getObjectHitBox(object: ObjectDefinition): Rect {

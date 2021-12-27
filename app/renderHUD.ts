@@ -52,7 +52,7 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
     }
     renderSpiritBar(context, state);
 
-    let frame = getLootFrame({lootType: state.hero.leftTool, lootLevel: state.hero.activeTools[state.hero.leftTool]});
+    let frame = getLootFrame(state, {lootType: state.hero.leftTool, lootLevel: state.hero.activeTools[state.hero.leftTool]});
     let target = {w: frameSize, h: frameSize, x: CANVAS_WIDTH - 50, y: 4};
     //fillRect(context, pad(target, 2), LEFT_TOOL_COLOR);
     //fillRect(context, target, 'black');
@@ -60,7 +60,7 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
     if (state.hero.leftTool) {
         drawFrameCenteredAt(context, frame, target)
     }
-    frame = getLootFrame({lootType: state.hero.rightTool, lootLevel: state.hero.activeTools[state.hero.rightTool]});
+    frame = getLootFrame(state, {lootType: state.hero.rightTool, lootLevel: state.hero.activeTools[state.hero.rightTool]});
     target = {w: frameSize, h: frameSize, x: CANVAS_WIDTH - 25, y: 4};
     //fillRect(context, pad(target, 2), RIGHT_TOOL_COLOR);
     //fillRect(context, target, 'black');

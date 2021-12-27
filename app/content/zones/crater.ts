@@ -304,7 +304,7 @@ const f0_0x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "craterPeachPiece", x: 176, y: 64, type: "chest", lootType: "peachOfImmortalityPiece", lootAmount: 1, lootLevel: 1, hasCustomLogic: true, customLogic: "craterLava1"},
+        {status: "normal", id: "craterPeachPiece", x: 176, y: 64, type: "chest", lootType: "peachOfImmortalityPiece", lootLevel: 1, hasCustomLogic: true, customLogic: "craterLava1"},
         {status: "normal", id: "craterUpperDoor", x: 256, y: 16, type: "door", style: "cavern", d: "up", targetZone: "crater", targetObjectId: "craterUpperDoor"},
         {status: "normal", id: "craterLowerDoor", x: 368, y: 304, type: "door", style: "cavern", d: "up", hasCustomLogic: true, customLogic: "craterLava2", targetZone: "crater", targetObjectId: "craterLowerDoor"},
         {status: "normal", id: "crater:0:2x0-flameSnake-0", x: 256, y: 240, type: "enemy", enemyType: "flameSnake", d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava1"},
@@ -926,7 +926,7 @@ const f0_0x2: AreaDefinition = {
     ],
     objects: [
         {status: "normal", id: "craterLava1", x: 416, y: 80, type: "floorSwitch", saveStatus: "forever"},
-        {status: "normal", id: "craterKey", x: 176, y: 272, type: "chest", lootType: "smallKey", lootAmount: 1, lootLevel: 1, hasCustomLogic: true, customLogic: "craterLava1"},
+        {status: "normal", id: "craterKey", x: 176, y: 272, type: "chest", lootType: "smallKey", lootLevel: 1, hasCustomLogic: true, customLogic: "craterLava1"},
         {status: "normal", id: "crater:0:2x0-ent-0", x: 384, y: 80, type: "enemy", enemyType: "ent", d: "down", params: {}},
         {status: "normal", id: "crater:0:2x0-flameSnake-2", x: 256, y: 240, type: "enemy", enemyType: "flameSnake", d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava1"},
         {status: "normal", id: "crater:0:2x0-ent-1", x: 128, y: 320, type: "enemy", enemyType: "ent", d: "down", params: {}},
@@ -1548,8 +1548,8 @@ const f0_1x1: AreaDefinition = {
     objects: [
         {status: "normal", id: "craterLava5", x: 352, y: 240, type: "floorSwitch", saveStatus: "forever", hasCustomLogic: true, customLogic: "craterLava4"},
         {status: "normal", id: "craterLava4", x: 256, y: 432, type: "floorSwitch", saveStatus: "forever", hasCustomLogic: true, customLogic: "craterLava3"},
-        {status: "normal", id: "flameBeast", x: 224, y: 240, type: "boss", enemyType: "flameHeart", lootType: "fire", lootAmount: 1, lootLevel: 1, d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava5"},
-        {status: "normal", id: "flameBeast", x: 224, y: 144, type: "boss", enemyType: "flameBeast", lootType: "fire", lootAmount: 1, lootLevel: 1, d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava5"},
+        {status: "normal", id: "flameBeast", x: 224, y: 240, type: "boss", enemyType: "flameHeart", lootType: "fire", lootLevel: 1, d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava5"},
+        {status: "normal", id: "flameBeast", x: 224, y: 144, type: "boss", enemyType: "flameBeast", lootType: "fire", lootLevel: 1, d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava5"},
         {status: "normal", id: "craterBossPortal", x: 256, y: 272, targetZone: "crater", targetObjectId: "craterBossPortal", type: "teleporter", hasCustomLogic: true, customLogic: "flameBeast"},
     ],
     sections: [
@@ -3501,7 +3501,7 @@ const f1_0x0: AreaDefinition = {
     ],
     objects: [
         {status: "locked", id: "craterLockedDoor", x: 96, y: 368, type: "door", style: "cavern", d: "down", targetZone: "crater", targetObjectId: "craterLockedDoor"},
-        {status: "normal", id: "craterMiniBoss", x: 400, y: 160, type: "boss", enemyType: "frostIdol", lootType: "fireBlessing", lootAmount: 1, lootLevel: 1, d: "down", params: {}},
+        {status: "normal", id: "craterMiniBoss", x: 400, y: 160, type: "boss", enemyType: "frostIdol", lootType: "fireBlessing", lootLevel: 1, d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 32},

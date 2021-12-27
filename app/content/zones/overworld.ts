@@ -296,7 +296,7 @@ const f0_0x0: AreaDefinition = {
     objects: [
         {status: "normal", id: "", x: 48, y: 448, style: "short", type: "staffTowerPoint", location: "mountain"},
         {status: "normal", id: "staffTowerEntrance", logicKey: "mountainTower", x: 64, y: 416, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerEntrance", d: "up"},
-        {status: "normal", id: "overworldCliffPeachPiece", x: 208, y: 256, type: "chest", lootType: "peachOfImmortalityPiece", lootAmount: 1, lootLevel: 1},
+        {status: "normal", id: "overworldCliffPeachPiece", x: 208, y: 256, type: "chest", lootType: "peachOfImmortalityPiece", lootLevel: 1},
         {status: "normal", id: "caves-ascentEntrance", x: 240, y: 32, type: "door", style: "cavern", targetZone: "caves", targetObjectId: "caves-ascentEntrance", d: "up"},
     ],
     sections: [
@@ -1733,7 +1733,7 @@ const f0_1x1: AreaDefinition = {
         {status: "normal", id: "lakeTunnelEntrance", x: 112, y: 336, type: "door", style: "cavern", targetZone: "lakeTunnel", targetObjectId: "lakeTunnelEntrance", d: "up"},
         {status: "normal", id: "riverTemplePitEntrance", x: 240, y: 176, targetZone: "riverTemple", targetObjectId: "riverTemplePitEntrance", type: "pitEntrance"},
         {status: "normal", id: "overworld:s0:1x1-teleporter-0", x: 400, y: 64, type: "teleporter", linked: true, spirit: true},
-        {status: "normal", id: "overworldLakePiece", linked: false, spirit: false, x: 399, y: 35, type: "loot", lootType: "peachOfImmortalityPiece", lootAmount: 1, lootLevel: 1},
+        {status: "normal", id: "overworldLakePiece", linked: false, spirit: false, x: 399, y: 35, type: "loot", lootType: "peachOfImmortalityPiece", lootLevel: 1},
         {status: "normal", id: "homeInstructions", x: 256, y: 112, type: "narration", message: "Well that was fun!\n{|}But I was gone a lot longer than I expected. Maybe I should head back to the waterfall.\n{|}I hope I didn't miss dinner!\n{|}(Follow the river home north to the waterfall.)", delay: 0, w: 32, h: 32},
     ],
     sections: [
