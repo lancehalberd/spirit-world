@@ -6,7 +6,7 @@ import {
 } from 'app/content/enemies';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { beetleWingedAnimations } from 'app/content/enemyAnimations';
-import { lifeLootTable } from 'app/content/lootTables';
+import { certainLifeLootTable } from 'app/content/lootTables';
 
 
 import { Enemy, GameState } from 'app/types';
@@ -24,7 +24,7 @@ enemyDefinitions.beetleBossWingedMinionDefinition = {
     animations: beetleWingedAnimations,
     flying: true, acceleration: 0.5, speed: 3,
     life: 1, touchDamage: 1, update: flyBy,
-    lootTable: lifeLootTable,
+    lootTable: certainLifeLootTable,
 };
 
 function updateBeetleBoss(state: GameState, enemy: Enemy): void {
