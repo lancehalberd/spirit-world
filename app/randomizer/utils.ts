@@ -21,6 +21,7 @@ import { forestTempleNodes } from 'app/randomizer/logic/forestTempleLogic';
 import { waterfallTowerNodes } from 'app/randomizer/logic/waterfallTower';
 import { riverTempleNodes, riverTempleWaterNodes } from 'app/randomizer/logic/riverTempleLogic';
 import { craterNodes } from 'app/randomizer/logic/craterLogic';
+import { addCheck } from 'app/randomizer/checks';
 
 import { readGetParameter } from 'app/utils/index';
 import SRandom from 'app/utils/SRandom';
@@ -631,15 +632,18 @@ export function applyLootAssignments(assignments: LootAssignment[]): void {
     console.log('applying assignments:');
     // console.log(assignments);
     for (const assignment of assignments) {
+        const zoneKey = assignment.target.location.zoneKey;
         console.log(assignment.source.lootObject.id, ' => ', assignment.target.lootObject.id);
         if (assignment.target.lootObject.type === 'dialogueLoot') {
-            const {object} = findObjectById(zones[assignment.target.location.zoneKey], assignment.target.lootObject.id);
+            const {object} = findObjectById(zones[zoneKey], assignment.target.lootObject.id);
             const npc = object as NPCDefinition;
-            const npcKey = `${assignment.target.location.zoneKey}-${assignment.target.lootObject.id}`;
+            const npcKey = `${zoneKey}-${assignment.target.lootObject.id}`;
+            addCheck(npcKey, zoneKey);
             const number = assignment.lootAmount || 0;//assignment.lootLevel;
             let text: string;
             if (assignment.lootType === 'empty') {
-                text = `I'm sorry you came all this way for nothing.`;
+                // Include the flag so that we can still count the check for the check counter.
+                text = `I'm sorry you came all this way for nothing. {flag:${npcKey}}`;
             } else if (number) {
                 text = `Here you go! {flag:${npcKey}}{item:${assignment.lootType}:${number}}`;
             } else {
@@ -661,6 +665,7 @@ export function applyLootAssignments(assignments: LootAssignment[]): void {
                 ],
             };
         } else {
+            addCheck(assignment.target.lootObject.id, zoneKey);
             for (const target of findAllTargetObjects(assignment.target)) {
                 target.lootType = assignment.lootType;
                 target.lootAmount = assignment.lootAmount;

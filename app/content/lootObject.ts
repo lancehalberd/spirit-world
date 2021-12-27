@@ -1,7 +1,7 @@
 import { addObjectToArea, enterLocation, refreshAreaLogic, removeObjectFromArea } from 'app/content/areas';
 import { getObjectStatus } from 'app/content/objects';
 import { createCanvasAndContext } from 'app/dom';
-import { FRAME_LENGTH } from 'app/gameConstants';
+import { CANVAS_WIDTH, CANVAS_HEIGHT, FRAME_LENGTH } from 'app/gameConstants';
 import { showMessage } from 'app/render/renderMessage';
 import { updateHeroMagicStats } from 'app/render/spiritBar';
 import { getState, saveGame } from 'app/state';
@@ -284,6 +284,14 @@ export class LootObject implements ObjectInstance {
         ) {
             return;
         }
+        if (this.x + 16 > state.camera.x && this.x < state.camera.x + CANVAS_WIDTH
+            && this.y + 16 > state.camera.y && this.y < state.camera.y + CANVAS_HEIGHT
+            && this.definition.lootType === 'empty'
+        ) {
+            state.savedState.objectFlags[this.definition.id] = true;
+            this.status = 'gone';
+            return;
+        }
         const hero = state.hero.activeClone || state.hero;
         if (rectanglesOverlap(hero, getFrameHitBox(this.frame, this))) {
             removeObjectFromArea(state, this);
@@ -382,10 +390,10 @@ export class ChestObject implements ObjectInstance {
             this.status = 'normal';
             // Make sure empty chese are recorded as opened for the randomizer, since some logic
             // depends on whether a chest was opened yet (cocoon small key chest, for example).
-            if (this.definition.id && !state.savedState.objectFlags[this.definition.id]) {
+            /*if (this.definition.id && !state.savedState.objectFlags[this.definition.id]) {
                 state.savedState.objectFlags[this.definition.id] = true;
                 saveGame();
-            }
+            }*/
         }
     }
     getHitbox(state: GameState): Rect {
@@ -403,6 +411,22 @@ export class ChestObject implements ObjectInstance {
                 state.savedState.objectFlags[this.linkedObject.definition.id] = true;
             }
             getLoot(state, this.definition);
+        }
+    }
+    update(state: GameState) {
+        // Make sure empty chese are recorded as opened for the randomizer, since some logic
+        // depends on whether a chest was opened yet (cocoon small key chest, for example).
+        if (this.definition.id && !state.savedState.objectFlags[this.definition.id] && this.isOpen(state)) {
+            if (this.x + 16 > state.camera.x && this.x < state.camera.x + CANVAS_WIDTH
+                && this.y + 16 > state.camera.y && this.y < state.camera.y + CANVAS_HEIGHT
+                && this.definition.lootType === 'empty'
+            ) {
+                state.savedState.objectFlags[this.definition.id] = true;
+                // Refresh the area so that the guardian NPC moves to the correct location now that the boss is defeated.
+                refreshAreaLogic(state, state.areaInstance);
+                refreshAreaLogic(state, state.alternateAreaInstance);
+                saveGame();
+            }
         }
     }
     render(context, state: GameState) {

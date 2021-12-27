@@ -12,7 +12,6 @@ export const forestTempleNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'forestTempleFirstArea',
-        checks: [{objectId: 'forestTempleSmallKey'}],
         paths: [
             {nodeId: 'forestTempleAfterLock', doorId: 'forestTempleLockedDoor'},
         ],

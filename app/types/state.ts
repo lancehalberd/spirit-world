@@ -37,24 +37,24 @@ export interface DialogueLootDefinition {
 }
 
 export interface GameState {
-    savedState: SavedState,
-    savedGames: SavedState[],
-    savedGameIndex: number,
-    hero: Hero,
-    camera: { x: number, y: number },
-    time: number,
-    gameHasBeenInitialized: boolean,
-    lastTimeRendered: number,
-    alternateAreaInstance?: AreaInstance,
-    areaInstance?: AreaInstance,
-    surfaceAreaInstance?: AreaInstance,
-    underwaterAreaInstance?: AreaInstance,
-    areaSection?: Rect,
-    nextAreaInstance?: AreaInstance,
-    nextAreaSection?: Rect,
-    zone: Zone,
-    areaGrid: AreaGrid,
-    location: ZoneLocation,
+    savedState: SavedState
+    savedGames: SavedState[]
+    savedGameIndex: number
+    hero: Hero
+    camera: { x: number, y: number }
+    time: number
+    gameHasBeenInitialized: boolean
+    lastTimeRendered: number
+    alternateAreaInstance?: AreaInstance
+    areaInstance?: AreaInstance
+    surfaceAreaInstance?: AreaInstance
+    underwaterAreaInstance?: AreaInstance
+    areaSection?: Rect
+    nextAreaInstance?: AreaInstance
+    nextAreaSection?: Rect
+    zone: Zone
+    areaGrid: AreaGrid
+    location: ZoneLocation
     transitionState?: {
         // The location to switch to after the current screen wipe transition.
         nextLocation: ZoneLocation
@@ -72,23 +72,23 @@ export interface GameState {
         type: 'circle' | 'fade' | 'portal' | 'diving' | 'surfacing' | 'mutating'
         // The targetZ value for the hero after the transition.
         targetZ?: number
-    },
-    paused: boolean,
-    menuIndex: number,
-    menuRow: number,
+    }
+    paused: boolean
+    menuIndex: number
+    menuRow: number
     defeatState: {
-        defeated: boolean,
-        time: number,
+        defeated: boolean
+        time: number
     },
-    scene: Scene,
+    scene: Scene
     keyboard: {
-        gameKeyValues: number[],
-        gameKeysDown: Set<number>,
-        gameKeysPressed: Set<number>,
+        gameKeyValues: number[]
+        gameKeysDown: Set<number>
+        gameKeysPressed: Set<number>
         // The set of most recent keys pressed, which is recalculated any time
         // a new key is pressed to be those keys pressed in that same frame.
-        mostRecentKeysPressed: Set<number>,
-        gameKeysReleased: Set<number>,
+        mostRecentKeysPressed: Set<number>
+        gameKeysReleased: Set<number>
     },
     messageState?: {
         // How long to show each page before automatically advancing
@@ -99,8 +99,8 @@ export interface GameState {
         currentPageTime: number
         pageIndex: number
         pages: (Frame[][] | DialogueLootDefinition | string)[]
-    },
-    isUsingKeyboard?: boolean,
-    isUsingXbox?: boolean,
-    fadeLevel: number,
+    }
+    isUsingKeyboard?: boolean
+    isUsingXbox?: boolean
+    fadeLevel: number
 }
