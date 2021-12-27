@@ -50,7 +50,7 @@ export function getLootTypes(): LootType[] {
 
 export const combinedObjectTypes: ObjectType[] = [
     'airBubbles', 'ballGoal', 'beadCascade', 'beadGrate', 'bigChest', 'chest', 'crystalSwitch', 'decoration',
-    'door', 'floorSwitch', 'keyBlock', 'loot','marker', 'npc', 'pitEntrance',
+    'door', 'floorSwitch', 'keyBlock', 'loot','marker', 'narration', 'npc', 'pitEntrance',
     'pushPull', 'rollingBall', 'sign', 'staffTowerPoint', 'teleporter', 'tippable', 'torch',
     'vineSprout', 'waterPot',
 ];
@@ -223,6 +223,15 @@ export function createObjectDefinition(
                 saveStatus: definition.saveStatus,
                 status: definition.status || commonProps.status,
                 type: definition.type,
+            };
+        case 'narration':
+            return {
+                ...commonProps,
+                type: definition.type,
+                message: definition.message || '',
+                delay: definition.delay || 0,
+                w: definition.w || 32,
+                h: definition.h || 32,
             };
         case 'sign':
             return {
@@ -632,6 +641,41 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                 value: object.message || '',
                 onChange(message: string) {
                     object.message = message;
+                    updateObjectInstance(state, object);
+                },
+            });
+            break;
+        case 'narration':
+            rows.push({
+                name: 'message',
+                multiline: true,
+                value: object.message || '',
+                onChange(message: string) {
+                    object.message = message;
+                    updateObjectInstance(state, object);
+                },
+            });
+            rows.push({
+                name: 'w',
+                value: object.w || 32,
+                onChange(w: number) {
+                    object.w = w;
+                    updateObjectInstance(state, object);
+                },
+            });
+            rows.push({
+                name: 'h',
+                value: object.h || 32,
+                onChange(h: number) {
+                    object.h = h;
+                    updateObjectInstance(state, object);
+                },
+            });
+            rows.push({
+                name: 'delay',
+                value: object.delay || 0,
+                onChange(delay: number) {
+                    object.delay = delay;
                     updateObjectInstance(state, object);
                 },
             });

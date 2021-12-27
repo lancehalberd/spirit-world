@@ -15,6 +15,7 @@ import { BallGoal } from 'app/content/objects/ballGoal';
 import { BeadCascade, BeadGrate } from 'app/content/objects/beadCascade';
 import { KeyBlock } from 'app/content/objects/keyBlock';
 import { Marker } from 'app/content/objects/marker';
+import { Narration } from 'app/content/objects/narration';
 import { NPC } from 'app/content/objects/npc';
 import { PitEntrance } from 'app/content/objects/pitEntrance';
 import { Sign } from 'app/content/objects/sign';
@@ -69,6 +70,8 @@ export function createObjectInstance(state: GameState, object: ObjectDefinition)
         return new PitEntrance(object);
     } else if (object.type === 'marker') {
         return new Marker(object);
+    } else if (object.type === 'narration') {
+        return new Narration(state, object);
     } else if (object.type === 'sign') {
         return new Sign(object);
     } else if (object.type === 'staffTowerPoint') {
@@ -174,6 +177,8 @@ export function saveObjectStatus(this: void, state: GameState, definition: Objec
             treatment = 'forever';
         } else if (definition.type === 'enemy') {
             treatment = 'zone';
+        } else if (definition.type === 'narration') {
+            treatment = 'forever';
         }
     }
     if (treatment === 'forever' || treatment === 'zone') {

@@ -85,12 +85,20 @@ function getEscapedFrames(state: GameState, escapedToken: string): Frame[] {
     return [];
 }
 
-export function showMessage(state: GameState, message: string): void {
+export function showMessage(
+    state: GameState,
+    message: string,
+    advanceTime: number = 0,
+    continueUpdatingState: boolean = false
+): void {
     if (!message){
         return;
     }
     state.messageState = {
+        advanceTime,
+        continueUpdatingState,
         pageIndex: 0,
+        currentPageTime: state.time,
         pages: parseMessage(state, message),
     };
 }

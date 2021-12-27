@@ -242,6 +242,14 @@ export interface DecorationDefinition extends BaseObjectDefinition {
     h: number,
 }
 
+export interface NarrationDefinition extends BaseObjectDefinition {
+    type: 'narration'
+    message: string
+    delay: number
+    w: number
+    h: number
+}
+
 export interface StaffTowerPointDefinition extends BaseObjectDefinition {
     type: 'staffTowerPoint',
     location: StaffTowerLocation,
@@ -274,6 +282,7 @@ export type ObjectDefinition = SimpleObjectDefinition
     | FloorSwitchDefinition
     | KeyBlockDefinition
     | LootObjectDefinition
+    | NarrationDefinition
     | NPCDefinition
     | SignDefinition
     | StaffTowerPointDefinition

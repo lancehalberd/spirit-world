@@ -54,7 +54,11 @@ export function update() {
         }
         if (state.messageState?.pages) {
             updateMessage(state);
-        } else if (state.transitionState && !state.areaInstance.priorityObjects?.length) {
+            if (!state.messageState.continueUpdatingState) {
+                return;
+            }
+        }
+        if (state.transitionState && !state.areaInstance.priorityObjects?.length) {
             if (!state.paused) {
                 updateTransition(state);
             }
@@ -77,7 +81,7 @@ export function update() {
     }
 }
 
-export function isConfirmKeyPressed(state: GameState): boolean {
+export function wasConfirmKeyPressed(state: GameState): boolean {
     return !!(wasGameKeyPressed(state, GAME_KEY.WEAPON)
         || wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL)
         || wasGameKeyPressed(state, GAME_KEY.MENU));
@@ -100,7 +104,7 @@ function updateTitle(state: GameState) {
             setSaveFileToState(state.savedGameIndex, state.menuIndex);
         }
     }
-    if (isConfirmKeyPressed(state)) {
+    if (wasConfirmKeyPressed(state)) {
         switch (state.scene) {
             case 'deleteSavedGameConfirmation':
                 if (state.menuIndex === 1) {
@@ -155,7 +159,11 @@ function updateTitle(state: GameState) {
 }
 
 function updateMessage(state: GameState) {
-    if (isConfirmKeyPressed(state)) {
+    // Advance to the next page if the player pressed a confirm key or if the auto time duration expires.
+    if (wasConfirmKeyPressed(state) || (
+        state.messageState.advanceTime > 0 &&
+        state.time - state.messageState.currentPageTime >= state.messageState.advanceTime
+    )) {
         state.messageState.pageIndex++;
         while (state.messageState.pageIndex < state.messageState.pages.length) {
             const pageOrLootOrFlag = state.messageState.pages[state.messageState.pageIndex];
@@ -177,6 +185,7 @@ function updateMessage(state: GameState) {
                 break;
             }
             state.messageState.pageIndex++;
+            state.messageState.currentPageTime = state.time;
         }
         if (state.messageState.pageIndex >= state.messageState.pages.length) {
             state.messageState.pages = null;
@@ -300,7 +309,7 @@ function updateDefeated(state: GameState) {
         if (state.menuIndex === 0 && state.hero.money < 50) {
             state.menuIndex = 1;
         }
-    } else if (isConfirmKeyPressed(state)) {
+    } else if (wasConfirmKeyPressed(state)) {
         if (state.menuIndex === 0 && state.hero.money >= 50) {
             state.hero.money -= 50;
             state.hero.life = state.hero.maxLife;

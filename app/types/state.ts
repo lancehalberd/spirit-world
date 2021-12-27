@@ -91,8 +91,14 @@ export interface GameState {
         gameKeysReleased: Set<number>,
     },
     messageState?: {
-        pageIndex: number,
-        pages: (Frame[][] | DialogueLootDefinition | string)[],
+        // How long to show each page before automatically advancing
+        advanceTime?: number
+        // Whether to continue updating the field in the background while text is displayed
+        continueUpdatingState?: boolean
+        // Time the current page was displayed
+        currentPageTime: number
+        pageIndex: number
+        pages: (Frame[][] | DialogueLootDefinition | string)[]
     },
     isUsingKeyboard?: boolean,
     isUsingXbox?: boolean,

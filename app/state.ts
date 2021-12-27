@@ -5,6 +5,7 @@ import {
     fixSpawnLocationOnLoad,
 } from 'app/content/spawnLocations';
 import { zones } from 'app/content/zones';
+import { showMessage } from 'app/render/renderMessage';
 import { updateHeroMagicStats } from 'app/render/spiritBar';
 import { readGetParameter } from 'app/utils/index';
 
@@ -98,6 +99,12 @@ export function selectSaveFile(savedGameIndex: number): void {
         state.scene = 'game';
         updateHeroMagicStats(state);
         returnToSpawnLocation(state);
+        const seed = readGetParameter('seed');
+        if (!seed) {
+            showMessage(state, 'Waaaaaah!', 1000, true);
+        } else {
+            showMessage(state, 'All the treasure in the world has been shuffled');
+        }
         return;
         // Old code for showing the "Choose Game Mode" menu when selecting "New Game".
         /*state.scene = 'chooseGameMode';
