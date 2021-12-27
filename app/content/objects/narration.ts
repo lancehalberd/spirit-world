@@ -20,6 +20,7 @@ export class Narration implements ObjectInstance {
     drawPriority = <const>'foreground';
     x: number;
     y: number;
+    ignorePits = true;
     status: ObjectStatus = 'normal';
     time: number;
     constructor(state: GameState, definition: NarrationDefinition) {
@@ -47,7 +48,7 @@ export class Narration implements ObjectInstance {
             return;
         }
         const hero = state.hero.activeClone || state.hero;
-        if (rectanglesOverlap(this.getHitbox(state), hero.getHitbox(state))) {
+        if (hero.action !== 'knocked' && rectanglesOverlap(this.getHitbox(state), hero.getHitbox(state))) {
             showMessage(state, this.definition.message);
             saveObjectStatus(state, this.definition);
             this.status = 'gone';

@@ -246,14 +246,14 @@ function applyItems(savedState: SavedState, items: {[key: string]: number}, obje
 
 const defaultSavedState = getDefaultSavedState();
 const peachBossState = applyItems(defaultSavedState, {weapon: 1, money: 50});
-const peachCaveExitState = applyItems(peachBossState, {maxLife: 1, catEyes: 1});
+const peachCaveExitState = applyItems(peachBossState, {maxLife: 1, catEyes: 1}, ['homeInstructions']);
 const tombStartState = applyItems(peachCaveExitState, {bow: 1}, ['elderTomb', 'tombEntrance']);
 tombStartState.savedHeroData.leftTool = 'bow';
 const tombBossState = applyItems(tombStartState, {roll: 1, 'tomb:bigKey': 1});
 const warTempleStart = applyItems(tombBossState, {maxLife: 1, spiritSight: 1},
     ['tombBoss', 'warTempleEntrance', 'tombTeleporter']);
 const warTempleBoss = applyItems(warTempleStart, {gloves: 1, 'warTemple:bigKey': 1});
-const cocoonStartState = applyItems(warTempleBoss, {maxLife: 1, astralProjection: 1}, ['warTempleBoss']);
+const cocoonStartState = applyItems(warTempleBoss, {maxLife: 1, astralProjection: 1}, ['warTempleBoss', 'tombExit']);
 const cocoonBossState = applyItems(cocoonStartState, {cloak: 1}, ['warTempleBoss']);
 const helixStartState = applyItems(cocoonBossState, {maxLife: 1, teleportation: 1},
     ['cocoonTeleporter', 'lakeTunneBoss']);

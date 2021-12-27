@@ -135,7 +135,8 @@ export const underwaterNodes: LogicNode[] = [
         zoneId,
         nodeId: 'underLake',
         paths: [
-            {nodeId: 'overworldMain', logic: {requiredFlags: ['iceBeast']}},
+            // This logic doesn't work since the randomizer doesn't currently set flags when simulating.
+            {nodeId: 'overworldMain', logic: {requiredFlags: ['frostBeast']}},
         ],
         entranceIds: [
             'peachCaveUnderwaterEntrance', 'riverTempleWaterEntrance',

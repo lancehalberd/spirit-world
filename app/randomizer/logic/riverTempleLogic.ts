@@ -6,7 +6,7 @@ import {
 
 import { LogicNode } from 'app/types';
 
-const canMeltIce = orLogic({requiredFlags: ['iceBeast']}, andLogic(orLogic(hasLightning, hasFire), hasMediumRange));
+const canMeltIce = orLogic({requiredFlags: ['frostBeast']}, andLogic(orLogic(hasLightning, hasFire), hasMediumRange));
 
 // This logic does not appropriately support traversing the tower in reverse.
 let zoneId = 'riverTempleWater';

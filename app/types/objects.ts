@@ -245,7 +245,7 @@ export interface DecorationDefinition extends BaseObjectDefinition {
 export interface NarrationDefinition extends BaseObjectDefinition {
     type: 'narration'
     message: string
-    delay: number
+    delay?: number
     w: number
     h: number
 }

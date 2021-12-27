@@ -1734,6 +1734,7 @@ const f0_1x1: AreaDefinition = {
         {status: "normal", id: "riverTemplePitEntrance", x: 240, y: 176, targetZone: "riverTemple", targetObjectId: "riverTemplePitEntrance", type: "pitEntrance"},
         {status: "normal", id: "overworld:s0:1x1-teleporter-0", x: 400, y: 64, type: "teleporter", linked: true, spirit: true},
         {status: "normal", id: "overworldLakePiece", linked: false, spirit: false, x: 399, y: 35, type: "loot", lootType: "peachOfImmortalityPiece", lootAmount: 1, lootLevel: 1},
+        {status: "normal", id: "homeInstructions", x: 256, y: 112, type: "narration", message: "Well that was fun!\n{|}But I was gone a lot longer than I expected. Maybe I should head back to the waterfall.\n{|}I hope I didn't miss dinner!\n{|}(Follow the river home north to the waterfall.)", delay: 0, w: 32, h: 32},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -4187,7 +4188,7 @@ const sf0_1x1: AreaDefinition = {
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
