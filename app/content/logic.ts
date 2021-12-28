@@ -80,9 +80,6 @@ export const hasBigKey: LogicCheck = { requiredFlags: ['$bigKey'] };
 export const hasFireBlessing: LogicCheck = {requiredFlags: ['$fireBlessing']};
 export const hasWaterBlessing: LogicCheck = {requiredFlags: ['$waterBlessing']};
 export const hasChakram: LogicCheck = {requiredFlags: ['$weapon']};
-export const hasFire: LogicCheck = {requiredFlags: ['$fire']};
-export const hasIce: LogicCheck = {requiredFlags: ['$ice']};
-export const hasLightning: LogicCheck = {requiredFlags: ['$lightning']};
 
 // This check will be added automatically to any tiles that have 100% darkness effect.
 //const hasEyes: LogicCheck = { requiredFlags: ['$catEyes:1'] };
@@ -99,6 +96,11 @@ export const hasRangedPush: OrLogicCheck = orLogic({requiredFlags: ['$weapon']},
 export const hasWeapon: OrLogicCheck = orLogic({requiredFlags: ['$weapon']}, hasBow, hasSpiritBarrier);
 // This check is used for weapons that have the range of the charged chakram or greater.
 export const hasMediumRange: OrLogicCheck = orLogic({requiredFlags: ['$weapon', '$charge', '$catEyes']}, hasBow);
+
+export const hasFire: LogicCheck = andLogic(orLogic(hasBow, hasWeapon), {requiredFlags: ['$fire', '$charge', '$catEyes']});
+export const hasIce: LogicCheck = andLogic(orLogic(hasBow, hasWeapon), {requiredFlags: ['$ice', '$charge', '$catEyes']});
+export const hasLightning: LogicCheck = andLogic(orLogic(hasBow, hasWeapon), {requiredFlags: ['$lightning', '$charge', '$catEyes']});
+
 
 // Note that in some areas teleportation may not be possible contextually, for example if the player cannot
 // stand still at the edge of the gap.

@@ -274,7 +274,7 @@ export class LootObject implements ObjectInstance {
         this.x = definition.x;
         this.y = definition.y;
         this.status = definition.status || 'normal';
-        if (getObjectStatus(state, this.definition) || definition.lootType === 'empty') {
+        if (getObjectStatus(state, this.definition)) {
             this.status = 'gone';
         }
     }

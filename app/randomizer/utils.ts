@@ -507,10 +507,11 @@ export function reverseFill(random: typeof SRandom, allNodes: LogicNode[], start
     for (const lootWithLocation of allLootObjects) {
         finalState = applyLootObjectToState(finalState, lootWithLocation);
     }
-    //console.log({ finalState });
+    //debugState(finalState);
     const allReachableCheckIds = findReachableChecks(allNodes, startingNodes, finalState).map(l => l.lootObject.id);
     for (const lootWithLocation of allLootObjects) {
         if (!allReachableCheckIds.includes(lootWithLocation.lootObject.id)) {
+            debugState(finalState);
             console.warn(lootWithLocation.lootObject.id, ' will never be reachable');
         }
     }
@@ -566,6 +567,12 @@ export function reverseFill(random: typeof SRandom, allNodes: LogicNode[], start
     return assignmentsState.assignments;
 }
 
+function debugState(state: GameState) {
+    console.log(state.hero.activeTools);
+    console.log(state.hero.passiveTools);
+    console.log(Object.keys(state.savedState.objectFlags));
+}
+
 function placeItem(random: typeof SRandom, allNodes: LogicNode[], startingNodes: LogicNode[], originalState: GameState, assignmentsState: AssignmentState, loot: LootWithLocation): string {
     let currentState = originalState;
     let previousState = originalState;
@@ -593,6 +600,8 @@ function placeItem(random: typeof SRandom, allNodes: LogicNode[], startingNodes:
         debugger;
         throw new Error('Failed to place item')
     }
+    //debugState(currentState);
+    //console.log('placing', loot.lootObject.lootType, ' at ', assignedLocation.location.zoneKey, assignedLocation.lootObject.id);
     assignmentsState.assignments.push({
         lootType: loot.lootObject.lootType,
         lootAmount: loot.lootObject.lootAmount,

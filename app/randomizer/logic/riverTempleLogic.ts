@@ -1,11 +1,12 @@
 import {
-    andLogic, orLogic, canTravelFarUnderWater,
+    andLogic, orLogic, canReleaseBeasts, canTravelFarUnderWater,
     hasBossWeapon, hasIronBoots,  hasMediumRange,
     hasFire, hasLightning,
 } from 'app/content/logic';
 
 import { LogicNode } from 'app/types';
 
+// The frostBeast flag is set correctly during simulation, so this logic works as expected.
 const canMeltIce = orLogic({requiredFlags: ['frostBeast']}, andLogic(orLogic(hasLightning, hasFire), hasMediumRange));
 
 // This logic does not appropriately support traversing the tower in reverse.
@@ -102,6 +103,6 @@ export const riverTempleNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'riverTempleBoss',
-        checks: [{objectId: 'frostBeast', logic: andLogic(orLogic(hasIronBoots, canMeltIce), hasBossWeapon) }],
+        checks: [{objectId: 'frostBeast', logic: andLogic(canReleaseBeasts, orLogic(hasIronBoots, canMeltIce), hasBossWeapon) }],
     },
 ];
