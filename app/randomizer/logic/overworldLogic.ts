@@ -91,10 +91,18 @@ export const overworldNodes: LogicNode[] = [
         zoneId,
         nodeId: 'mainSpiritWorld',
         paths: [
+            { nodeId: 'spiritWorldMountain', logic: hasGloves },
             { nodeId: 'overworldLakePiece' },
             // For door randomizer I would need to add the small fertility area in between here.
             // I will need to add it eventually when I add checks to the fertility temple.
             { nodeId: 'forestTempleSEArea' },
+        ],
+    },
+    {
+        zoneId,
+        nodeId: 'spiritWorldMountain',
+        paths: [
+            { nodeId: 'mainSpiritWorld' },
         ],
     },
     {
@@ -172,6 +180,14 @@ export const skyNodes: LogicNode[] = [
         exits: [
             { objectId: 'helixSkyEntrance' },
         ],
+    },
+    {
+        zoneId,
+        // Note that this is in the spirit world.
+        nodeId: 'waterfallTowerSky',
+        paths: [{ nodeId: 'spiritWorldMountain' }],
+        entranceIds: ['waterfallTowerTopEntrance'],
+        exits: [{ objectId: 'waterfallTowerTopEntrance' }],
     }
     // Over river temple is not implemented yet
     // outside waterfall tower is not interesting in the material world currently.

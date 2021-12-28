@@ -125,9 +125,19 @@ export const waterfallTowerNodes: LogicNode[] = [
         npcs: [
             {loot: {type: 'dialogueLoot', id: 'waterfallDragon', lootType: 'cloak'}, progressFlags: ['waterfallTowerThroneDoor']},
         ],
-        entranceIds: ['waterfallTower-backEntrance'],
-        exits: [{objectId: 'waterfallTower-backEntrance'}],
+        paths: [
+            {nodeId: 'waterfallTowerOutsideThroneRoom'},
+        ],
     },
-    // Could add logic for the top entrance eventually, as this might be a significant path for reaching the sky area in the
-    // spirit world.
+    {
+        zoneId,
+        nodeId: 'waterfallTowerOutsideThroneRoom',
+        paths: [
+            // Fall into the pit to the entrance
+            {nodeId: 'waterfallTowerEntrance'},
+            // There is a path to the throne room, but only after completing the dungeon.
+        ],
+        entranceIds: ['waterfallTowerTopEntrance'],
+        exits: [{objectId: 'waterfallTowerTopEntrance'}],
+    },
 ];

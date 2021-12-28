@@ -495,7 +495,7 @@ function applyLootObjectToState(state: GameState, lootWithLocation: LootWithLoca
 }
 
 
-export function reverseFill(random: typeof SRandom, allNodes: LogicNode[], startingNodes: LogicNode[]): LootAssignment[] {
+export function reverseFill(random: typeof SRandom, allNodes: LogicNode[], startingNodes: LogicNode[]): AssignmentState {
     calculateKeyLogic(allNodes, startingNodes);
     // console.log({ allNodes, startingNodes });
     const allLootObjects = getLootObjects(allNodes);
@@ -564,7 +564,7 @@ export function reverseFill(random: typeof SRandom, allNodes: LogicNode[], start
         assignmentsState.assignedContents.push(loot.lootObject.id);
         assignmentsState.assignedLocations.push(location.lootObject.id);
     }
-    return assignmentsState.assignments;
+    return assignmentsState;
 }
 
 function debugState(state: GameState) {
@@ -613,6 +613,51 @@ function placeItem(random: typeof SRandom, allNodes: LogicNode[], startingNodes:
     });
     assignmentsState.assignedContents.push(loot.lootObject.id);
     assignmentsState.assignedLocations.push(assignedLocation.lootObject.id);
+}
+
+window['showRandomizerSolution'] = function () {
+    let currentState = getDefaultState();
+    applySavedState(currentState, currentState.savedState);
+    let previousState = currentState;
+    let counter = 0;
+    const startingNodes = [overworldNodes[0]];
+    do {
+        if (counter++ > 200) {
+            console.error('infinite loop');
+            debugger;
+            return null;
+        }
+        previousState = currentState;
+        console.log(`Sphere ${counter}`);
+        currentState = collectAllLootForSolution(allNodes, startingNodes, previousState);
+    } while (currentState !== previousState);
+}
+
+function collectAllLootForSolution(allNodes: LogicNode[], startingNodes: LogicNode[], state: GameState): GameState {
+    const reachableChecks: LootWithLocation[] = findReachableChecks(allNodes, startingNodes, state);
+    for (const check of reachableChecks) {
+        // We can only open checks that have been assigned, contents of other checks are not yet determined.
+        //if (!assignmentsState.assignedLocations.includes(check.lootObject.id)) {
+        //    continue;
+        //}
+        // Don't open a check that has already been opened.
+        if (state.savedState.objectFlags[check.lootObject.id]) {
+            continue;
+        }
+        if (check.lootObject.lootType !== 'money' && check.lootObject.lootType !== 'empty') {
+            if (!state.hero.passiveTools.catEyes || (
+                check.lootObject.lootType !== 'peachOfImmortality'
+                && check.lootObject.lootType !== 'peachOfImmortalityPiece'
+            )) {
+                // debugState(state);
+                console.log(`Get ${check.lootObject.lootType} at ${check.location.zoneKey}:${check.lootObject.id}`);
+            }
+        }
+        state = applyLootObjectToState(state, check);
+        // Indicate this check has already been opened.
+        state.savedState.objectFlags[check.lootObject.id] = true;
+    }
+    return state;
 }
 
 function collectAllLoot(allNodes: LogicNode[], startingNodes: LogicNode[], state: GameState, assignmentsState: AssignmentState): GameState {
@@ -673,6 +718,9 @@ export function applyLootAssignments(assignments: LootAssignment[]): void {
                     },
                 ],
             };
+            assignment.target.lootObject.lootType = assignment.lootType;
+            assignment.target.lootObject.lootAmount = assignment.lootAmount;
+            assignment.target.lootObject.lootLevel = 0;
         } else {
             addCheck(assignment.target.lootObject.id, zoneKey);
             for (const target of findAllTargetObjects(assignment.target)) {
@@ -703,7 +751,8 @@ const seed = readGetParameter('seed');
 const enemySeed = readGetParameter('enemySeed');
 
 if (seed) {
-    applyLootAssignments(reverseFill(SRandom.seed(Number(seed)), allNodes, [overworldNodes[0]]));
+    const assignmentsState = reverseFill(SRandom.seed(Number(seed)), allNodes, [overworldNodes[0]]);
+    applyLootAssignments(assignmentsState.assignments);
     for (let key in SPAWN_LOCATION_PEACH_CAVE_EXIT) {
         SPAWN_LOCATION_DEMO[key] = SPAWN_LOCATION_PEACH_CAVE_EXIT[key];
         SPAWN_LOCATION_FULL[key] = SPAWN_LOCATION_PEACH_CAVE_EXIT[key];
