@@ -1,3 +1,5 @@
+import { Staff } from 'app/content/staff';
+
 import {
     AreaGrid, AreaInstance,
     Frame, Hero, LootType, SavedHeroData, Rect, Zone, ZoneLocation,
@@ -41,6 +43,7 @@ export interface GameState {
     savedGames: SavedState[]
     savedGameIndex: number
     hero: Hero
+    activeStaff?: Staff
     camera: { x: number, y: number }
     time: number
     gameHasBeenInitialized: boolean

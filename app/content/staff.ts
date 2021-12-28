@@ -139,7 +139,7 @@ export class Staff implements ObjectInstance {
             }
         }
         this.area.checkToRedrawTiles = true;
-        state.hero.activeStaff = null;
+        state.activeStaff = null;
     }
     render(context, state: GameState) {
         // Nothing to render here, the staff is rendered to the background when it is placed.

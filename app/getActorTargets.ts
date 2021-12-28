@@ -1,6 +1,6 @@
 import { isPointInShortRect } from 'app/utils/index';
 
-import { Actor, GameState, ObjectInstance, TileCoords } from 'app/types';
+import { Actor, GameState, Hero, ObjectInstance, TileCoords } from 'app/types';
 
 export function getActorTargets(state: GameState, actor: Actor): {tiles: TileCoords[], objects: ObjectInstance[]} {
     const tileSize = 16;
@@ -27,6 +27,10 @@ export function getActorTargets(state: GameState, actor: Actor): {tiles: TileCoo
 
     for (const object of actor.area.objects.filter(o => o.getHitbox)) {
         if (object.status === 'hidden' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
+            continue;
+        }
+        // thrown clones are not interactive or solid.
+        if (object instanceof Hero && object.action === 'thrown') {
             continue;
         }
         const hitbox = object.getHitbox(state);

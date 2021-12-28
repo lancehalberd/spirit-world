@@ -222,7 +222,7 @@ export function enterLocation(
 
     // Remove all clones on changing areas.
     removeAllClones(state);
-    state.hero.activeStaff?.remove(state);
+    state.activeStaff?.remove(state);
     const lastAreaInstance = state.areaInstance;
     // Use the existing area instances on the transition state if any are present.
     state.areaInstance = state.transitionState?.nextAreaInstance
@@ -416,7 +416,7 @@ export function switchToNextAreaSection(state: GameState): void {
     linkObjects(state);
     state.areaSection = state.nextAreaSection;
     removeAllClones(state);
-    state.hero.activeStaff?.remove(state);
+    state.activeStaff?.remove(state);
     state.hero.safeD = state.hero.d;
     state.hero.safeX = state.hero.x;
     state.hero.safeY = state.hero.y;
@@ -438,7 +438,7 @@ export function setAreaSection(state: GameState, d: Direction, newArea: boolean 
     }
     if (newArea || lastAreaSection !== state.areaSection) {
         removeAllClones(state);
-        state.hero.activeStaff?.remove(state);
+        state.activeStaff?.remove(state);
         state.hero.safeD = state.hero.d;
         state.hero.safeX = state.hero.x;
         state.hero.safeY = state.hero.y;

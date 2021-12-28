@@ -1,6 +1,5 @@
 import { addObjectToArea } from 'app/content/areas';
 import { destroyClone } from 'app/content/clone';
-import { Staff } from 'app/content/staff';
 import {
     chargeBackAnimation, chargeFrontAnimation,
     chargeFireBackAnimation, chargeFireFrontAnimation,
@@ -94,7 +93,6 @@ export class Hero implements Actor, SavedHeroData {
     astralProjection?: Hero;
     clones: Hero[];
     activeClone?: Hero;
-    activeStaff?: Staff;
     barrierElement?: MagicElement;
     barrierLevel?: number;
     safeD: Direction;
@@ -121,6 +119,8 @@ export class Hero implements Actor, SavedHeroData {
     rightTool?: ActiveTool;
     element?: MagicElement;
     spawnLocation: ZoneLocation;
+    // Heroes have special handling for pits and shouldn't use the object pit logic.
+    ignorePits = true;
 
     constructor() {
         this.life = this.maxLife;

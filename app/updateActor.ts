@@ -59,7 +59,8 @@ export function updateAllHeroes(this: void, state: GameState) {
         swapHeroStates(state.hero, state.hero.clones[0]);
         state.hero.clones.push(state.hero.clones.shift());
     }
-    for (const clone of state.hero.clones) {
+    for (let i = 0; i < state.hero.clones.length; i++) {
+        const clone = state.hero.clones[i];
         updateHero(state, clone);
     }
     // Destroy existing astral projection if it isn't in the right area.
@@ -103,6 +104,10 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
     if (!editingState.isEditing && hero.area?.isHot && !hero.passiveTools.fireBlessing) {
         if (state.time % 500 === 0) {
             hero.takeDamage(state, 1);
+            // Stop updating this hero if it was destroyed by taking damage,
+            if (!hero.area) {
+                return;
+            }
         }
     }
     if (hero.isControlledByObject) {
@@ -316,7 +321,6 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         movementSpeed = 0;
         hero.frozenDuration -= FRAME_LENGTH;
     }
-
     const heldChakram = hero.area.objects.find(o => o instanceof HeldChakram) as HeldChakram;
     // Automatically move the character into the bounds of the current section.
     if (editingState.isEditing && isControlled) {
@@ -423,6 +427,10 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
                 }
             }
             hero.takeDamage(state, damage);
+            // stop updating this hero if it was a clone that got destroyed by taking damage.
+            if (!hero.area) {
+                return;
+            }
             // For now leave the hero in the 'fallen' state if they died, otherwise they reappear
             // just fine when the continue/quit option shows up.
             // Once the death animation is added we can probably remove this check if we want.
@@ -689,7 +697,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
     if (!editingState.isEditing && ((dx || dy) || (hero.slipping && (Math.abs(hero.vx) > 0.3 || Math.abs(hero.vy) > 0.3)))) {
         const isCharging = hero.action === 'charging';
         const encumbered = hero.pickUpObject || hero.pickUpTile || hero.grabObject || hero.grabTile;
-        if (hero.slipping && hero.action !== 'roll') {
+        if (hero.slipping && hero.action !== 'roll' && hero.action !== 'thrown') {
             if (hero.equipedGear.cloudBoots) {
                 hero.vx = dx / 10 + hero.vx;
                 hero.vy = dy / 10 + hero.vy;
@@ -712,6 +720,22 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         const moveX = (Math.abs(hero.vx) > 0.3 || dx * hero.vx > 0) ? hero.vx : 0;
         const moveY = (Math.abs(hero.vy) > 0.3 || dy * hero.vy > 0) ? hero.vy : 0;
         if (moveX || moveY) {
+            const excludedObjects = new Set<ObjectInstance>();
+            if (hero.action === 'thrown') {
+                excludedObjects.add(state.hero);
+                for (const clone of state.hero.clones) {
+                    excludedObjects.add(clone);
+                }
+            } else {
+                /*if (state.hero.action === 'thrown') {
+                    excludedObjects.add(state.hero);
+                }
+                for (const clone of state.hero.clones) {
+                    if (clone.action === 'thrown') {
+                        excludedObjects.add(clone);
+                    }
+                }*/
+            }
             const {mx, my} = moveActor(state, hero, moveX, moveY, {
                 canPush: !encumbered && !hero.swimming && !hero.bounce && !isCharging
                     // You can only push if you are moving the direction you are trying to move.
@@ -721,11 +745,12 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
                 canJump: !isAstralProjection,
                 canSwim: !encumbered,
                 boundToSection: isAstralProjection || !!hero.bounce,
+                excludedObjects
             });
-            if (moveX && hero.action !== 'knocked') {
+            if (moveX && hero.action !== 'knocked' && hero.action !== 'thrown') {
                 hero.vx = mx;
             }
-            if (moveY && hero.action !== 'knocked') {
+            if (moveY && hero.action !== 'knocked' && hero.action !== 'thrown') {
                 hero.vy = my;
             }
         } else {
@@ -810,13 +835,17 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
     } else if (!isAstralProjection && !hero.swimming && (!hero.action || hero.action === 'walking' || hero.action === 'pushing')
         && !hero.pickUpTile && !hero.pickUpObject
     ) {
-        if (isControlled && state.hero.leftTool && wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL)) {
+        if (isControlled && state.hero.leftTool && wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL)
+            && (state.hero.leftTool !== 'clone' || !state.hero.clones.length)
+        ) {
             hero.chargingLeftTool = true;
             hero.chargeTime = 0;
             const direction = getDirection((dx || dy) ? dx : directionMap[hero.d][0], (dx || dy) ? dy : directionMap[hero.d][1], true, hero.d);
             hero.actionDx = directionMap[direction][0];
             hero.actionDy = directionMap[direction][1];
-        } else if (isControlled && state.hero.rightTool && wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL)) {
+        } else if (isControlled && state.hero.rightTool && wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL)
+            && (state.hero.rightTool !== 'clone' || !state.hero.clones.length)
+        ) {
             hero.chargingRightTool = true;
             hero.chargeTime = 0;
             const direction = getDirection((dx || dy) ? dx : directionMap[hero.d][0], (dx || dy) ? dy : directionMap[hero.d][1], true, hero.d);
@@ -1054,7 +1083,8 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
 }
 
 export function updateScreenTransition(state: GameState, hero: Hero) {
-    if (hero.isAstralProjection) {
+    const primaryClone = state.hero.activeClone || state.hero;
+    if (hero.isAstralProjection || hero !== primaryClone) {
         return;
     }
     // Check for transition to other areas/area sections.

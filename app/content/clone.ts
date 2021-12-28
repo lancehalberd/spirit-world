@@ -12,6 +12,7 @@ export class Clone extends Hero {
         solid: true,
     };
     carryRotationOffset: number;
+    ignorePits = true;
     constructor(hero: Hero) {
         super();
         for (let k in hero) {

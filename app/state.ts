@@ -286,7 +286,7 @@ export function returnToSpawnLocation(state: GameState) {
     state.hero.invulnerableFrames = 0;
     state.hero.hasBarrier = false;
     state.hero.isInvisible = false;
-    state.hero.activeStaff = null;
+    state.activeStaff = null;
     state.hero.activeClone = null;
     state.hero.frozenDuration = 0;
     state.hero.vx = 0;
