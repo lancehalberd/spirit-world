@@ -27,7 +27,6 @@ Graphics:
 
 Current tasks:
     - Bug fixes
-        - Tree is showing up in middle of lava in crater, must have incorrect custom logic
         - Clone tool bugs
             - Mana regen is wrong when using clone tools (seems to multiply consumption/regen by number of clones)
             - Should destroy clones when the clone technique is unequipped.
@@ -41,6 +40,9 @@ Current tasks:
             or not be able to push additional objects, for example, the charged chakram.
         - Charging allows you to walk on top of water currently.
             - Instead let's remove ability to go on deep water while charing.
+
+    Add new shallow water graphics
+        - shallow.png, works more like shadows, can be drawn behind any MC/enemy frame that makes sense.
 
     Staff Tower
         - Machines, traps + lightning
@@ -88,7 +90,6 @@ Current tasks:
         - Replace bow glow with neutral charge particles and elemental particles.
         - Remove charge glow from all other tools.
 
-    - Add dialogue objects that can trigger on entering areas or other triggers.
     - Change message rendering system to use the priority queue system to support nested messages.
     - Add new waterfall graphics
     - Add touchHit behavior to tiles that can define full hit properties for tiles/objects on touch
@@ -361,13 +362,12 @@ River Temple:
 
 
 Staff Tower:
-    Fire(Crater) -> Blow up door by using fire on plants near door
-    Clone(Forest Temple) -> Blow up door with clone
-    Ice(River Temple) -> Create Ice floor for slide teleport
-    Cloud Boots(Forest Temple) -> Use cloud boots for slide teleport
-    Cloud Boots(Forest Temple) -> Sky path from Helix to Tower Balcony
-    Staff + Cloud Boots + Roll -> Glide then roll across the gap
-    Staff + Roll 2(Cloud Temple) -> Double roll across the gap
+    Fire(Crater) -> Blow up pots in front of escalator using fire on explosive plants
+    Clone(Forest Temple) -> Blow up pots in front of escalator with clone
+    Ice(River Temple) -> Use ice magic to freeze the down escalator and walk up it.
+    Cloud Boots(Forest Temple) -> Use cloud boots to walk up the down escalator
+    Cloud Boots(Forest Temple) -> Sky path from Helix to Tower Balcony?
+    Staff + Roll 2(Cloud Temple) -> Double roll up the down escalator?
 
 Crater:
     Cloud Boots(Forest Temple) -> Sky path from Helix to Crater Peak
@@ -424,10 +424,12 @@ Ability order:
 
 Early Dungeons:
     Peach Cave: Completing the cave awakens MCs spirit abilities giving them their spirit bar + cat eyes.
-    Vanara Village: Get the bow from the elder.
+(Head home, mother indicates you should head to Vanara Village to speak with the elder.)
+(Vanara Village: Get the bow from the elder.)
     Vanara Tomb: Dodge Roll in big chest, Spirit Sight from the Vanara Guardian.
+(mother indicates you should head to Summoner Ruins.)
     Summoner Ruins: Bracers in big chest, Astral Projection after defeating the boss.
-    Vanara Tomb-Regeneration Unit: spiritCloak in big chest, Teleportation from Vanara Guardian.
+    Cocoon: spiritCloak in big chest, Teleportation from Vanara Guardian.
     Helix: Tree Staff in big chest, charge from Vanara Captain.
 
 Elemental Beasts: (triggered by Helix or entering the Spirit World)
@@ -436,12 +438,12 @@ Elemental Beasts: (triggered by Helix or entering the Spirit World)
     Staff Tower: Storm Beast(lightning element) + Tower Staff in Big Chest after boss
 
 Late Dungeons:
-    Forest Temple(New Fertility Temple):
-    Waterfall Tower: Iron Boots in chest, spiritCloak 2 on boss
-    The Forge: Gloves 2 in chest, gold mail on boss
-    Grand Temple: Bow 2 chest, iron Skin from boss
-    Jade Palace: True Sight in chest, Phoenix Crown on boss
-    Cloud Temple: Roll 2 in chest, Nimbus Cloud on boss.
+    Forest Temple(New Fertility Temple): Cloud Boots in chest, Clone after boss
+    Waterfall Tower: Iron Boots in chest, spiritCloak 2 after boss
+    The Forge: Gloves 2 in chest, gold mail after boss
+    Grand Temple: Bow 2 chest, iron Skin after boss
+    Jade Palace: True Sight in chest, Phoenix Crown after boss
+    Cloud Temple: Roll 2 in chest, Nimbus Cloud after boss.
 
 Final Dungeon:
     Warship: Clone 2 in big chest

@@ -929,7 +929,7 @@ const f0_0x2: AreaDefinition = {
         {status: "normal", id: "craterKey", x: 176, y: 272, type: "chest", lootType: "smallKey", lootLevel: 1, hasCustomLogic: true, customLogic: "craterLava1"},
         {status: "normal", id: "crater:0:2x0-ent-0", x: 384, y: 80, type: "enemy", enemyType: "ent", d: "down", params: {}},
         {status: "normal", id: "crater:0:2x0-flameSnake-2", x: 256, y: 240, type: "enemy", enemyType: "flameSnake", d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava1"},
-        {status: "normal", id: "crater:0:2x0-ent-1", x: 128, y: 320, type: "enemy", enemyType: "ent", d: "down", params: {}},
+        {status: "normal", id: "crater:0:2x0-ent-1", x: 128, y: 320, type: "enemy", enemyType: "ent", d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava1"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
