@@ -1,6 +1,7 @@
 import { makeSparkleAnimation } from 'app/content/animationEffect';
 import { addObjectToArea, getAreaSize, removeObjectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { getChargeLevelAndElement } from 'app/useTool';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { hitTargets } from 'app/utils/field';
 import { isPointInShortRect, pad } from 'app/utils/index';
@@ -195,18 +196,16 @@ export class HeldChakram implements ObjectInstance {
     }
     throw(state: GameState) {
         let speed = 3;
-        let element: MagicElement = null;
-        if (state.hero.passiveTools.charge >= 1) {
-            if (state.hero.magic > 0 && this.animationTime >= 1000) {
-                speed = 12;
+        const { chargeLevel, element } = getChargeLevelAndElement(state, this.hero);
+        if (chargeLevel >= 1) {
+            speed = 12;
+            state.hero.magic -= 10;
+            if (state.hero.element) {
                 state.hero.magic -= 10;
-                if (state.hero.element) {
-                    state.hero.magic -= 10;
-                }
-                element = state.hero.element;
-            } else {
-                speed = Math.min(6, speed + this.animationTime / 100);
             }
+        } else if (state.hero.passiveTools.charge >= 1) {
+            // Chakram reaches max speed twice as fast once you have the charge tool.
+            speed = Math.min(6, speed + this.animationTime / 100);
         } else {
             speed = Math.min(6, speed + this.animationTime / 200);
         }
@@ -301,7 +300,8 @@ export class HeldChakram implements ObjectInstance {
         }
         let animationTime = 0;
         if (state.hero.passiveTools.charge >= 1 && state.hero.magic > 0) {
-            if (this.animationTime >= 1000) {
+            const { chargeLevel } = getChargeLevelAndElement(state, this.hero);
+            if (chargeLevel >= 1) {
                 animationTime = this.animationTime;
             } else {
                 animationTime = this.animationTime / 10;

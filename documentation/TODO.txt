@@ -13,10 +13,6 @@ Low Priority Bugs:
     - Don't open enemy doors when bosses are still alive?
         - Tomb boss door can open when killing snakes in some cases.
 
-High Priority Bugs:
-    Sometimes can't enter peach cave when sliding on ice?
-
-
 Graphics:
     Sweat animation when pulling on something you cannot move.
     Add Item Get Frame gfx/wukongimportantitem.png 20x28
@@ -38,11 +34,11 @@ Current tasks:
         - Picked up items are invisible while using cloak
         - Piercing projectiles that can push things should be stopped by the first object they push
             or not be able to push additional objects, for example, the charged chakram.
-        - Charging allows you to walk on top of water currently.
-            - Instead let's remove ability to go on deep water while charing.
 
-    Add new shallow water graphics
-        - shallow.png, works more like shadows, can be drawn behind any MC/enemy frame that makes sense.
+    - Alvaro suggests adding an element to the menu to trigger the current help dialog.
+
+    Make mutation transition use the same area instance so contents don't reset
+        - Will need to add special handling to remove extra ice tiles from frost beast+heat sink battles.
 
     Staff Tower
         - Machines, traps + lightning

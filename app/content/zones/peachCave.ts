@@ -1762,7 +1762,7 @@ const f1_1x0: AreaDefinition = {
         {id: "peachCave:1:0x1-door-2", linked: false, spirit: false, status: "normal", x: 112, y: 224, type: "door", targetObjectId: "peachCave:0:0x0-door-0", d: "down"},
         {id: "peachCave:1:0x1-door-3", linked: false, spirit: false, status: "normal", x: 112, y: 256, type: "door", targetObjectId: "peachCave:0:0x0-door-0", d: "up"},
         {id: "peachCave:1:0x1-door-4", linked: false, spirit: false, status: "cracked", x: 224, y: 96, type: "door", targetObjectId: "peachCave:0:0x0-door-0", d: "right", style: "cave"},
-        {status: "normal", id: "pitInstructions", x: 320, y: 368, type: "narration", message: "It looks like jumping down this hole is my only option.\n{|}Here we go again...\n{|}(Walk into the large hole to drop down to somewhere new)", delay: 0, w: 96, h: 96},
+        {status: "normal", id: "pitInstructions", x: 336, y: 384, type: "narration", message: "It looks like jumping down this hole is my only option.\n{|}Here we go again...\n{|}(Walk into the large hole to drop down to somewhere new)", delay: 0, w: 80, h: 80},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},

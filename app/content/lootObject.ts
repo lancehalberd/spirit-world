@@ -73,6 +73,17 @@ export class LootGetAnimation implements ObjectInstance {
             this.z += 0.5;
         }
         this.animationTime += FRAME_LENGTH;
+        if (this.animationTime === 100) {
+            if (this.loot.lootType === 'empty' || this.loot.lootType === 'unknown') {
+
+            } else if (this.loot.lootType === 'peachOfImmortalityPiece' || this.loot.lootType === 'money'
+                || this.loot.lootType === 'smallKey' || this.loot.lootType === 'map' || this.loot.lootType === 'peach'
+            ) {
+                playSound('smallSuccessChime');
+            } else {
+                playSound('bigSuccessChime');
+            }
+        }
         if (this.animationTime === 1000) {
             showLootMessage(state, this.loot.lootType, this.loot.lootLevel, this.loot.lootAmount);
         } else if (this.animationTime > 1000) {
@@ -92,8 +103,16 @@ const equipBootsMessage = '{|}Press {B_MENU} to open your menu.'
     + '{|}Select boots and press {B_WEAPON} to equip them.'
     + '{|}Press {B_WEAPON} again to unequip them.';
 
-const equipElementMessage = '{|}Press {B_PREVIOUS_ELEMENT}/{B_NEXT_ELEMENT} to switch elements.'
-    + '{|}The equipped element will be applied any time you charge an attack.';
+function getEquipElementMessage(state: GameState) {
+    if (state.isUsingKeyboard) {
+        return '{|}Press {B_MENU} to open your menu.'
+            + '{|}Select an element and press {B_WEAPON} to equip it.'
+            + '{|}Press {B_WEAPON} again to unequip the element.'
+            + '{|}The equipped element will be applied any time you charge an attack.';
+    }
+    return '{|}Press {B_PREVIOUS_ELEMENT}/{B_NEXT_ELEMENT} to switch elements.'
+        + '{|}The equipped element will be applied any time you charge an attack.';
+}
 
 function showLootMessage(state: GameState, lootType: LootType, lootLevel?: number, lootAmount?: number): void {
     switch (lootType) {
@@ -166,7 +185,7 @@ function showLootMessage(state: GameState, lootType: LootType, lootLevel?: numbe
                 return showMessage(state, 'You learned the Clone Techique!' + equipToolMessage
                     + '{|}Press {B_TOOL} to create a clone or switch between clones.'
                     + '{|}Hold {B_TOOL} to control all clones at once!'
-                    + '{|}Hold {B_PASSIVE} to make a clone explode!');
+                    + '{|}Hold {B_MEDITATE} to make a clone explode!');
             }
             return;
         case 'cloak':
@@ -202,7 +221,7 @@ function showLootMessage(state: GameState, lootType: LootType, lootLevel?: numbe
                 + '{|}Face an object and use {B_PASSIVE} to try to lift it.');
         case 'roll':
             return showMessage(state, 'You learned the Mist Roll Technique!'
-                + '{|}Press {B_PASSIVE} while moving to do a quick roll.'
+                + '{|}Press {B_ROLL} to do a quick roll forward.'
                 + '{|}You can avoid most damage while rolling and cross small gaps.'
             );
         case 'catEyes':
@@ -212,15 +231,15 @@ function showLootMessage(state: GameState, lootType: LootType, lootLevel?: numbe
             );
         case 'spiritSight':
             return showMessage(state, 'You have been blessed with Spirit Sight!'
-                + '{|}Hold {B_PASSIVE} to gaze into the Spirit World.'
+                + '{|}Hold {B_MEDITATE} to gaze into the Spirit World.'
                 + '{|}If an object is in both the Material World and Spirit World,'
                 + '{|}see what happens if you change it in the Material World!');
         case 'astralProjection':
             return showMessage(state, 'You have found the Summoner\'s Circlet!'
-                + '{|}Hold {B_PASSIVE} to gaze into the Spirit World.'
+                + '{|}Hold {B_MEDITATE} to gaze into the Spirit World.'
                 + '{|}While looking into the Spirit World, use {B_UP} to move your Astral Body.'
                 + '{|}Your Astral Body can touch the Spirit World.'
-                + '{|}In your Astral Body, press {B_WEAPON} to grab or pickup objects.');
+                + '{|}In your Astral Body, press {B_PASSIVE} to grab or pickup objects.');
         case 'teleportation':
             return showMessage(state, 'You have learned Teleportation!'
                 + '{|}Move your Astral Body away from you in the Sprit World'
@@ -229,15 +248,15 @@ function showLootMessage(state: GameState, lootType: LootType, lootLevel?: numbe
                 + '{|}Use teleportation to move past obstacles in the Real World.');
         case 'fire':
             return showMessage(state, 'You have received the Fire Element!'
-                + equipElementMessage
+                + getEquipElementMessage(state)
                 + '{|}Fire can be used to light torches and melt ice.');
         case 'ice':
             return showMessage(state, 'You have received the Ice Element!'
-                + equipElementMessage
+                + getEquipElementMessage(state)
                 + '{|}Ice can be used to freeze objects and enemies.');
         case 'lightning':
             return showMessage(state, 'You have received the Lightning Element!'
-                + equipElementMessage
+                + getEquipElementMessage(state)
                 + '{|}Lightning stuns enemies and activates some objects.');
         case 'fireBlessing':
             return showMessage(state, 'You have absorbed a Cooling Spirit!'

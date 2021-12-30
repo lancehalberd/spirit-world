@@ -26,11 +26,11 @@ const [
     xbox_y, xbox_b, xbox_a, xbox_x,
     xbox_start, /*xbox_select*/, xbox_dpad,
     /*xbox_rightStick*/, xbox_leftStick,
-    xbox_r1, xbox_l1, /*xbox_r2*/, /*xbox_l2*/,
+    xbox_r1, xbox_l1, xbox_r2, xbox_l2,
     ps_dpad, ps_start,
     /*ps_rightStick*/, ps_leftStick,
     ps_x, ps_circle, ps_square, ps_triangle,
-    ps_r1, ps_l1, /*ps_r2*/, /*ps_l2*/,
+    ps_r1, ps_l1, ps_r2, ps_l2,
     keyboard_enter,
     /*keyboard_w*/, /*keyboard_d*/, /*keyboard_s*/, /*keyboard_a*/,
     keyboard_wasd,
@@ -62,6 +62,8 @@ export const xboxMap = {
     [GAME_KEY.RIGHT_TOOL]: [xbox_x],
     [GAME_KEY.PREVIOUS_ELEMENT]: [xbox_l1],
     [GAME_KEY.NEXT_ELEMENT]: [xbox_r1],
+    [GAME_KEY.ROLL]: [xbox_l2],
+    [GAME_KEY.MEDITATE]: [xbox_r2],
 };
 
 export const psMap = {
@@ -76,6 +78,8 @@ export const psMap = {
     [GAME_KEY.RIGHT_TOOL]: [ps_triangle],
     [GAME_KEY.PREVIOUS_ELEMENT]: [ps_l1],
     [GAME_KEY.NEXT_ELEMENT]: [ps_r1],
+    [GAME_KEY.ROLL]: [ps_l2],
+    [GAME_KEY.MEDITATE]: [ps_r2],
 };
 
 export const keyboardMap = {
@@ -88,8 +92,8 @@ export const keyboardMap = {
     [GAME_KEY.PASSIVE_TOOL]: [keyboard_shift],
     [GAME_KEY.LEFT_TOOL]: [keyboard_c],
     [GAME_KEY.RIGHT_TOOL]: [keyboard_v],
-    [GAME_KEY.PREVIOUS_ELEMENT]: [keyboard_z],
-    [GAME_KEY.NEXT_ELEMENT]: [keyboard_x],
+    [GAME_KEY.ROLL]: [keyboard_z],
+    [GAME_KEY.MEDITATE]: [keyboard_x],
 };
 
 export function drawText(context: CanvasRenderingContext2D, text: string, x: number, y: number,

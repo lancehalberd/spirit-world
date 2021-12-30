@@ -73,6 +73,10 @@ function getEscapedFrames(state: GameState, escapedToken: string): Frame[] {
             ]);
         case 'B_PASSIVE':
             return getGameKeyFrames(GAME_KEY.PASSIVE_TOOL);
+        case 'B_ROLL':
+            return getGameKeyFrames(GAME_KEY.ROLL);
+        case 'B_MEDITATE':
+            return getGameKeyFrames(GAME_KEY.MEDITATE);
         case 'B_MENU':
             return getGameKeyFrames(GAME_KEY.MENU);
         case 'B_PREVIOUS_ELEMENT':

@@ -24,6 +24,7 @@ import { Teleporter } from 'app/content/objects/teleporter';
 import { Torch } from 'app/content/objects/torch';
 import { VineSprout } from 'app/content/objects/vineSprout';
 import { WaterPot } from 'app/content/objects/waterPot';
+import { playSound } from 'app/utils/sounds';
 
 import { saveGame } from 'app/state';
 
@@ -112,7 +113,7 @@ export function checkIfAllSwitchesAreActivated(state: GameState, area: AreaInsta
         if (switchInstance.definition.targetObjectId && object.definition?.id !== switchInstance.definition.targetObjectId) {
             continue;
         }
-        activateTarget(state, object);
+        activateTarget(state, object, true);
     }
 }
 
@@ -125,16 +126,22 @@ export function deactivateTargets(state: GameState, area: AreaInstance, targetOb
     }
 }
 
-export function activateTarget(state: GameState, target: ObjectInstance): void {
+export function activateTarget(state: GameState, target: ObjectInstance, playChime = false): void {
     if (target.onActivate) {
         target.onActivate(state);
         return;
     }
     if (target.status === 'hiddenSwitch') {
         changeObjectStatus(state, target, 'normal');
+        if (playChime) {
+            playSound('secretChime');
+        }
     }
     if (target.status === 'closedSwitch') {
         changeObjectStatus(state, target, 'normal');
+        if (playChime) {
+            playSound('secretChime');
+        }
     }
 }
 
@@ -156,6 +163,7 @@ export function toggleTarget(state: GameState, target: ObjectInstance): void {
         deactivateTarget(state, target);
     } else {
         activateTarget(state, target);
+        playSound('secretChime');
     }
 }
 

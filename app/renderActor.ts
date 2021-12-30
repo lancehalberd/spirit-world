@@ -1,10 +1,10 @@
 import { EXPLOSION_RADIUS, EXPLOSION_TIME } from 'app/gameConstants';
 import { getCloneMovementDeltas } from 'app/keyCommands';
 import { isHeroFloating, isHeroSinking } from 'app/utils/actor';
-import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
+import { createAnimation, drawFrame, drawFrameAt, getFrame } from 'app/utils/animations';
 import { carryMap, directionMap, getDirection } from 'app/utils/field';
 
-import { Actor, ActorAnimations, Enemy, Frame, GameState, Hero } from 'app/types';
+import { Actor, ActorAnimations, Enemy, Frame, FrameDimensions, GameState, Hero } from 'app/types';
 
 import {
     heroAnimations,
@@ -14,9 +14,10 @@ import {
     Y_OFF,
 } from 'app/render/heroAnimations';
 
-
+const shallowGeometry: FrameDimensions = {w: 20, h: 28, content: {x: 2, y: 16 + Y_OFF, w: 16, h: 16}};
 export const shadowFrame: Frame = createAnimation('gfx/shadow.png', { w: 16, h: 16 }).frames[0];
 export const smallShadowFrame: Frame = createAnimation('gfx/smallshadow.png', { w: 16, h: 16 }).frames[0];
+export const wadingFrame: Frame = createAnimation('gfx/shallow.png', shallowGeometry).frames[0];
 
 let lastPullAnimation = null;
 export function getHeroFrame(state: GameState, hero: Hero): Frame {
@@ -168,6 +169,10 @@ export function renderCarriedTile(context: CanvasRenderingContext2D, state: Game
 
 
 export function renderHeroShadow(context: CanvasRenderingContext2D, state: GameState, hero: Hero, forceDraw: boolean = false): void {
+    if (hero.wading && !hero.swimming) {
+        drawFrameAt(context, wadingFrame, { x: hero.x, y: hero.y - hero.z });
+    }
+
     if (!forceDraw && (
         hero.action === 'fallen' || hero.action === 'falling'
         || hero.action === 'sinkingInLava'  || hero.action === 'sankInLava'

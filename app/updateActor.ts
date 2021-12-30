@@ -307,12 +307,9 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
 
     // The astral projection uses the weapon tool as the passive tool button
     // since you have to hold the normal passive tool button down to meditate.
-    const wasPassiveButtonPressed = isAstralProjection
-        ? wasGameKeyPressed(state, GAME_KEY.WEAPON)
-        : wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL);
-    const isPassiveButtonDown = isAstralProjection
-        ? isGameKeyDown(state, GAME_KEY.WEAPON)
-        : isGameKeyDown(state, GAME_KEY.PASSIVE_TOOL);
+    const wasPassiveButtonPressed = wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL);
+    const isPassiveButtonDown = isGameKeyDown(state, GAME_KEY.PASSIVE_TOOL);
+
     if (hero.slipping) {
         hero.vx *= 0.99;
         hero.vy *= 0.99;
@@ -517,7 +514,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         }
     } else if (!isAstralProjection && !isFrozen && hero.action === 'meditating') {
         movementSpeed = 0;
-        if (isControlled && isGameKeyDown(state, GAME_KEY.PASSIVE_TOOL) && hero.magic > 0) {
+        if (isControlled && isGameKeyDown(state, GAME_KEY.MEDITATE) && hero.magic > 0) {
             if (state.hero.clones.length) {
                 // Meditating as a clone will either blow up the current clone, or all clones
                 // except the current if the clone tool is being pressed.
@@ -607,12 +604,12 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         movementSpeed *= 0.75;
         hero.chargeTime += FRAME_LENGTH;
         hero.action = 'charging';
-        if (hero.chargingLeftTool && !isGameKeyDown(state, GAME_KEY.LEFT_TOOL)) {
+        if (hero.chargingLeftTool && (!isGameKeyDown(state, GAME_KEY.LEFT_TOOL) || !canCharge)) {
             hero.toolCooldown = 200;
             useTool(state, hero, hero.leftTool, hero.actionDx, hero.actionDy);
             hero.chargingLeftTool = false;
         }
-        if (hero.chargingRightTool && !isGameKeyDown(state, GAME_KEY.RIGHT_TOOL)) {
+        if (hero.chargingRightTool && (!isGameKeyDown(state, GAME_KEY.RIGHT_TOOL) || !canCharge)) {
             hero.toolCooldown = 200;
             useTool(state, hero, hero.rightTool, hero.actionDx, hero.actionDy);
             hero.chargingRightTool = false;
@@ -855,7 +852,8 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
     }
     if (isControlled && !hero.swimming &&
         (!hero.action || hero.action === 'walking' || hero.action === 'pushing') &&
-        !hero.pickUpTile && !hero.pickUpObject && wasPassiveButtonPressed) {
+        !hero.pickUpTile && !hero.pickUpObject && wasPassiveButtonPressed
+    ) {
         const {objects, tiles} = getActorTargets(state, hero);
         if (tiles.some(({x, y}) => area.behaviorGrid?.[y]?.[x]?.solid) || objects.some(o => o.behaviors?.solid)) {
             let closestLiftableTileCoords: TileCoords = null,
@@ -931,34 +929,32 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
                     closestObject.onGrab(state, hero.d, hero);
                 }
                 hero.grabObject = closestObject;
-            } else if (hero !== state.hero) {
-
             }
-        } else if (dx || dy) {
-            if (hero.passiveTools.roll > 0 && hero.rollCooldown <= 0) {
-                if (state.hero.magic > 0) {
-                    state.hero.magic -= 5;
-                    hero.action = 'roll';
-                    hero.actionFrame = 0;
-                    hero.animationTime = 0;
-                } else {
-                    // Hack to freeze player for a moment
-                    hero.action = 'getItem';
-                    hero.actionFrame = 30;
-                    // We should play an insufficient mana sound here.
-                }
-            }
-        } else {
-            if (state.hero.clones.length || hero.passiveTools.spiritSight > 0) {
-                hero.action = 'meditating';
-                hero.d = 'down';
+        }
+    } else if (wasGameKeyPressed(state, GAME_KEY.ROLL)) {
+        if (hero.passiveTools.roll > 0 && hero.rollCooldown <= 0) {
+            if (state.hero.magic > 0) {
+                state.hero.magic -= 5;
+                hero.action = 'roll';
                 hero.actionFrame = 0;
-                hero.spiritRadius = 0;
-                if (hero.astralProjection) {
-                    hero.astralProjection.d = hero.d;
-                    hero.astralProjection.x = hero.x;
-                    hero.astralProjection.y = hero.y;
-                }
+                hero.animationTime = 0;
+            } else {
+                // Hack to freeze player for a moment
+                hero.action = 'getItem';
+                hero.actionFrame = 30;
+                // We should play an insufficient mana sound here.
+            }
+        }
+    } else if (wasGameKeyPressed(state, GAME_KEY.MEDITATE)) {
+        if (state.hero.clones.length || hero.passiveTools.spiritSight > 0) {
+            hero.action = 'meditating';
+            hero.d = 'down';
+            hero.actionFrame = 0;
+            hero.spiritRadius = 0;
+            if (hero.astralProjection) {
+                hero.astralProjection.d = hero.d;
+                hero.astralProjection.x = hero.x;
+                hero.astralProjection.y = hero.y;
             }
         }
     }

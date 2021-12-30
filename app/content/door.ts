@@ -689,9 +689,18 @@ export class Door implements ObjectInstance {
             this.applySquareDoorBehavior();
         }
         if (this.status === 'normal') {
-            this.behaviors = { };
+            delete this.behaviors.solid;
+            if (this.definition.status === 'closed'
+                || this.definition.status === 'closedSwitch'
+                || this.definition.status === 'closedEnemy'
+            ) {
+                this.behaviors.brightness = 0.5;
+                this.behaviors.lightRadius = 36;
+            }
         } else {
-            this.behaviors = { solid: true };
+            this.behaviors.solid = true;
+            delete this.behaviors.brightness;
+            delete this.behaviors.lightRadius;
         }
     }
     applySquareDoorBehavior() {

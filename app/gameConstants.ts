@@ -33,6 +33,8 @@ export const GAME_KEY = {
     DOWN: 8,
     LEFT: 9,
     RIGHT: 10,
+    ROLL: 11,
+    MEDITATE: 12,
 };
 
 export const FADE_IN_DURATION = 600;

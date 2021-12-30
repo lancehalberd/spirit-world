@@ -53,8 +53,8 @@ const KEYBOARD_MAPPINGS = {
     [GAME_KEY.DOWN]: [KEY.DOWN, KEY.S],
     [GAME_KEY.LEFT]: [KEY.LEFT, KEY.A],
     [GAME_KEY.RIGHT]: [KEY.RIGHT, KEY.D],
-    [GAME_KEY.PREVIOUS_ELEMENT]: [KEY.Z], // L Front Bumper
-    [GAME_KEY.NEXT_ELEMENT]: [KEY.X],  // R Front bumper
+    [GAME_KEY.ROLL]: [KEY.Z], // L Front Bumper
+    [GAME_KEY.MEDITATE]: [KEY.X],  // R Front bumper
 }
 
 // Under this threshold, the analog buttons are considered "released" for the sake of
@@ -79,6 +79,8 @@ const GAME_PAD_MAPPINGS = {
     [GAME_KEY.RIGHT]: 15,
     [GAME_KEY.PREVIOUS_ELEMENT]: 4, // L Front Bumper
     [GAME_KEY.NEXT_ELEMENT]: 5,  // R Front bumper
+    [GAME_KEY.ROLL]: 6, // L Front Bumper
+    [GAME_KEY.MEDITATE]: 7,  // R Front bumper
 };
 
 const LEFT_ANALOG_Y_AXIS = 1;
@@ -228,7 +230,7 @@ export function updateKeyboardState(state: GameState) {
     }*/
     for (let gameKey of Object.values(GAME_KEY)) {
         gameKeyValues[gameKey] = 0;
-        for (const keyboardCode of KEYBOARD_MAPPINGS[gameKey]) {
+        for (const keyboardCode of (KEYBOARD_MAPPINGS[gameKey] || [])) {
             gameKeyValues[gameKey] = isKeyboardKeyDown(keyboardCode);
             if (gameKeyValues[gameKey]) {
                 break;

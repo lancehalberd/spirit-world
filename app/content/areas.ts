@@ -69,7 +69,7 @@ export function getDefaultSpiritArea(location: ZoneLocation): AreaDefinition {
         parentDefinition,
         isSpiritWorld: true,
         layers: parentDefinition.layers.map(layer => ({
-            key: layer.key,
+            ...layer,
             drawPriority: layer.key.startsWith('foreground') ? 'foreground' : 'background',
             grid: {
                 ...layer.grid,
@@ -923,6 +923,7 @@ export function checkIfAllEnemiesAreDefeated(state: GameState, area: AreaInstanc
     // Don't use `enemyTargets` here since this runs before it is populated sometimes.
     const enemiesAreDefeated = !area.objects.some(e => (e instanceof Enemy) && e.isInCurrentSection(state));
     const { section } = getAreaSize(state);
+    let playChime = false;
     for (const object of area.objects) {
         if (!object.getHitbox) {
             continue;
@@ -938,9 +939,11 @@ export function checkIfAllEnemiesAreDefeated(state: GameState, area: AreaInstanc
         if (enemiesAreDefeated) {
             if (object.status === 'hiddenEnemy') {
                 changeObjectStatus(state, object, 'normal');
+                playChime = true;
             }
             if (object.status === 'closedEnemy') {
                 changeObjectStatus(state, object, 'normal');
+                playChime = true;
             }
         } else {
             // Close doors if new enemies appear.
@@ -948,5 +951,8 @@ export function checkIfAllEnemiesAreDefeated(state: GameState, area: AreaInstanc
                 changeObjectStatus(state, object, 'closedEnemy');
             }
         }
+    }
+    if (playChime) {
+        playSound('secretChime');
     }
 }

@@ -257,8 +257,9 @@ const preloadSounds = () => {
         //     offset: '200:300', volume: 10, limit: 2},
         {key: 'enemyHit', source: 'sfx/enemyDeath.wav',
              offset: '300:200', volume: 10, limit: 2},
-        {key: 'enemyDeath', source: 'sfx/enemyDeath.wav',
-             offset: '170:300', volume: 10, limit: 2},
+        //{key: 'enemyDeath', source: 'sfx/enemyDeath.wav',
+        //     offset: '170:300', volume: 10, limit: 2},
+        {key: 'enemyDeath', source: 'sfx/enemy death.wav', volume: 10, limit: 2},
         {key: 'getMoney', source: 'sfx/coin wood c.wav',
             offset: '0:250', volume: 10, limit: 2},
         {key: 'blockAttack', source: 'sfx/coin wood c.wav',
@@ -270,11 +271,15 @@ const preloadSounds = () => {
         {key: 'doorOpen', source: 'sfx/cube-24.slide_odrive.wav', volume: 10, limit: 1},
         {key: 'chakramHold', source: 'sfx/chakram 5.wav', volume: 1 / 2, offset: '60:100', limit: 1},
         {key: 'chakramCharge1', source: 'sfx/chakram 5.wav', volume: 1 / 2, offset: '60:100', limit: 1},
-        {key: 'weakChakram', source: 'sfx/chakram 5.wav', volume: 1 / 2, offset: '0:80', limit: 2},
-        {key: 'normalChakram', source: 'sfx/chakram 5.wav', volume: 2, limit: 2},
-        {key: 'strongChakram', source: 'sfx/chakram 5.wav', volume: 5, limit: 2},
-
-
+        //{key: 'weakChakram', source: 'sfx/chakram 5.wav', volume: 1 / 2, offset: '0:80', limit: 2},
+        //{key: 'normalChakram', source: 'sfx/chakram 5.wav', volume: 2, limit: 2},
+        //{key: 'strongChakram', source: 'sfx/chakram 5.wav', volume: 5, limit: 2},
+        {key: 'weakChakram', source: 'sfx/chakram sweep.wav', volume: 1, limit: 2},
+        {key: 'normalChakram', source: 'sfx/chakram sweep.wav', volume: 3, limit: 2},
+        {key: 'strongChakram', source: 'sfx/chakram sweep.wav', volume: 5, limit: 2},
+        {key: 'secretChime', source: 'sfx/chime 14_1.wav', volume: 5, limit: 2},
+        {key: 'bigSuccessChime', source: 'sfx/chime 06.wav', offset: '0:2000', volume: 5, limit: 2},
+        {key: 'smallSuccessChime', source: 'sfx/chime 15.wav', offset: '0:2000', volume: 5, limit: 2},
     ].forEach(sound => requireSound(sound));
 };
 preloadSounds();

@@ -2,6 +2,7 @@ import { FRAME_LENGTH } from 'app/gameConstants';
 import { removeObjectFromArea, resetTileBehavior } from 'app/content/areas';
 import { allTiles } from 'app/content/tiles';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
+import { playSound } from 'app/utils/sounds';
 import { saveGame } from 'app/state';
 
 import {
@@ -93,6 +94,7 @@ export class VineSprout implements ObjectInstance {
     }
     grow(state: GameState) {
         state.savedState.objectFlags[this.definition.id] = true;
+        playSound('secretChime');
         saveGame();
         this.sprouting = true;
         this.animationTime = 0;
