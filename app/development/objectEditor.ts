@@ -6,6 +6,7 @@ import { dialogueHash } from 'app/content/dialogue';
 import { logicHash } from 'app/content/logic';
 import { createObjectInstance } from 'app/content/objects';
 import { decorationTypes } from 'app/content/objects/decoration';
+import { escalatorStyles } from 'app/content/objects/escalator';
 import { doorStyles } from 'app/content/door';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { enemyTypes } from 'app/content/enemies';
@@ -50,7 +51,7 @@ export function getLootTypes(): LootType[] {
 
 export const combinedObjectTypes: ObjectType[] = [
     'airBubbles', 'ballGoal', 'beadCascade', 'beadGrate', 'bigChest', 'chest', 'crystalSwitch', 'decoration',
-    'door', 'floorSwitch', 'keyBlock', 'loot','marker', 'narration', 'npc', 'pitEntrance',
+    'door', 'escalator', 'floorSwitch', 'keyBlock', 'loot','marker', 'narration', 'npc', 'pitEntrance',
     'pushPull', 'rollingBall', 'sign', 'staffTowerPoint', 'teleporter', 'tippable', 'torch',
     'vineSprout', 'waterPot',
 ];
@@ -163,6 +164,17 @@ export function createObjectDefinition(
                 d: definition.d || 'down',
                 saveStatus: definition.saveStatus,
                 params,
+            };
+        }
+        case 'escalator': {
+            return {
+                ...commonProps,
+                speed: definition.speed || 'slow',
+                d: definition.d || 'down',
+                w: definition.w || 16,
+                h: definition.h || 16,
+                style: definition.style || Object.keys(escalatorStyles)[0],
+                type: definition.type,
             };
         }
         case 'floorSwitch':
@@ -684,6 +696,42 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                 },
             });
             break;
+        case 'escalator':
+            rows.push({
+                name: 'direction',
+                value: object.d,
+                values: ['up', 'down', 'left', 'right'],
+                onChange(direction: Direction) {
+                    object.d = direction;
+                    updateObjectInstance(state, object);
+                },
+            });
+            rows.push({
+                name: 'speed',
+                value: object.speed || 'slow',
+                values: ['slow', 'fast'],
+                onChange(speed: 'fast' | 'slow') {
+                    object.speed = speed;
+                    updateObjectInstance(state, object);
+                },
+            });
+            rows.push({
+                name: 'w',
+                value: object.w || 16,
+                onChange(w: number) {
+                    object.w = w;
+                    updateObjectInstance(state, object);
+                },
+            });
+            rows.push({
+                name: 'h',
+                value: object.h || 16,
+                onChange(h: number) {
+                    object.h = h;
+                    updateObjectInstance(state, object);
+                },
+            });
+            break;
         case 'npc':
             rows.push({
                 name: 'dialogueKey',
@@ -796,6 +844,8 @@ function getStyleFields(state: GameState, editingState: EditingState, object: Ob
         styles = doorStyles;
     } else if (object.type === 'npc') {
         styles = npcStyles;
+    } else if (object.type === 'escalator') {
+        styles = escalatorStyles;
     }
     if (!styles) {
         return [];
@@ -916,11 +966,17 @@ export function onMouseDownSelect(state: GameState, editingState: EditingState, 
 }
 
 export function fixObjectPosition(state: GameState, object: ObjectDefinition): void {
-    // Currently all objects snap to the grid except loot outside of chests.
+    if (object.type === 'escalator') {
+        //object.x = Math.round(object.x / 8) * 8;
+        //object.y = Math.round(object.y / 8) * 8;
+        return;
+    }
+    // Default behavior is to snap to grid.
     if (object.type !== 'loot') {
         object.x = Math.round(object.x / 16) * 16;
         object.y = Math.round(object.y / 16) * 16;
     }
+
 }
 
 export function onMouseMoveSelect(state: GameState, editingState: EditingState, x: number, y: number): void {

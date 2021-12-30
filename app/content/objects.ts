@@ -11,6 +11,7 @@ import { TippableObject } from 'app/content/tippableObject';
 
 import { AirBubbles } from 'app/content/objects/airBubbles';
 import { Decoration } from 'app/content/objects/decoration';
+import { Escalator } from 'app/content/objects/escalator';
 import { BallGoal } from 'app/content/objects/ballGoal';
 import { BeadCascade, BeadGrate } from 'app/content/objects/beadCascade';
 import { KeyBlock } from 'app/content/objects/keyBlock';
@@ -53,7 +54,9 @@ export function createObjectInstance(state: GameState, object: ObjectDefinition)
         return new ChestObject(state, object);
     } else if (object.type === 'door' || object.type === 'stairs') {
         return new Door(state, object);
-    } else if (object.type === 'floorSwitch') {
+    } else if (object.type === 'escalator') {
+        return new Escalator(state, object);
+    }  else if (object.type === 'floorSwitch') {
         return new FloorSwitch(state, object);
     } else if (object.type === 'keyBlock') {
         return new KeyBlock(state, object);

@@ -62,7 +62,7 @@ export interface ObjectInstance {
 
 export type ObjectStatus = 'active' | 'closed' | 'closedEnemy' | 'closedSwitch'
     | 'gone' | 'hidden' | 'hiddenSwitch' | 'hiddenEnemy' | 'normal'
-    | 'locked' | 'bigKeyLocked' | 'cracked' | 'blownOpen' | 'frozen';
+    | 'locked' | 'bigKeyLocked' | 'cracked' | 'blownOpen' | 'frozen' | 'off';
 
 export interface MovementProperties {
     boundToSection?: boolean
@@ -250,6 +250,13 @@ export interface NarrationDefinition extends BaseObjectDefinition {
     h: number
 }
 
+export interface EscalatorDefinition extends BaseObjectDefinition {
+    type: 'escalator'
+    speed: 'slow' | 'fast'
+    w: number
+    h: number
+}
+
 export interface StaffTowerPointDefinition extends BaseObjectDefinition {
     type: 'staffTowerPoint',
     location: StaffTowerLocation,
@@ -279,6 +286,7 @@ export type ObjectDefinition = SimpleObjectDefinition
     | DecorationDefinition
     | EntranceDefinition
     | EnemyObjectDefinition
+    | EscalatorDefinition
     | FloorSwitchDefinition
     | KeyBlockDefinition
     | LootObjectDefinition

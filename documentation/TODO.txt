@@ -43,9 +43,6 @@ Current tasks:
     Staff Tower
         - Machines, traps + lightning
         - Conveyer belts/escalators.
-            - Slow ones that just push the player around
-            - Fast ones that cause the player to lose control until they are pushed off
-            - Cloud boots allow you to ignore the conveyer belts while moving
             - Ice magic can freeze the conveyer belts which stops them but makes them slippery.
         - Lightning barriers
             - Deal 4 lightning damage and knock the player back.

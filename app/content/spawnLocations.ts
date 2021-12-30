@@ -196,6 +196,16 @@ export const SPAWN_CRATER_BOSS: ZoneLocation = {
     isSpiritWorld: false,
 };
 
+export const SPAWN_STAFF_ENTRANCE: ZoneLocation = {
+    zoneKey: 'staffTower',
+    floor: 0,
+    x: 250,
+    y: 440,
+    z: 0,
+    d: 'up',
+    areaGridCoords: {y: 0, x: 0},
+    isSpiritWorld: false,
+};
 
 function applyItems(savedState: SavedState, items: {[key: string]: number}, objectFlags: string[] = []): SavedState {
     const newState: SavedState = cloneDeep(savedState);
@@ -262,17 +272,43 @@ const helixEndState = applyItems(helixStartState, {charge: 1, staff: 1},
     ['elementalBeastsEscaped']);
 const forestBackState = applyItems(helixEndState, {cloudBoots: 1, 'forestTemple:bigKey': 1});
 const waterfallBossState = applyItems(helixEndState, {ironBoots: 1});
+
+const riverTempleStartState = applyItems(helixEndState, {
+    cloudBoots: 1, clone: 1,
+    ironBoots: 1, cloak: 2,
+    maxLife: 2,
+    staff: 2, lightning: 1,
+    fireBlessing: 1, fire: 1,
+});
 const riverTempleBossState = applyItems(waterfallBossState,
     {maxLife: 3, 'riverTemple:bigKey': 1, 'fire': 1, 'lightning': 1},
     ['bossBubblesNorth','bossBubblesSouth', 'bossBubblesWest', 'bossBubblesEast']
 );
 
-const craterStartState = applyItems(helixEndState, {cloudBoots: 1, ironBoots: 1, ice: 1, lightning: 1, waterBlessing: 1});
+const craterStartState = applyItems(helixEndState, {
+    cloudBoots: 1, clone: 1,
+    ironBoots: 1, cloak: 2,
+    maxLife: 2,
+    staff: 2, lightning: 1,
+    waterBlessing: 1, ice: 1,
+});
 const craterBossState = applyItems(craterStartState, {fireBlessing: 1},
     ['craterLava1', 'craterLava2', 'craterLava3', 'craterLava4', 'craterLava5']
 );
 
-const spawnLocations = {
+const staffStartState = applyItems(helixEndState, {
+    cloudBoots: 1, clone: 1,
+    ironBoots: 1, cloak: 2,
+    maxLife: 2,
+    fireBlessing: 1, fire: 1,
+    waterBlessing: 1, ice: 1,
+});
+
+interface SpawnLocationOptions {
+    [key: string]: {location: ZoneLocation, savedState: SavedState},
+}
+
+const earlySpawnLocations: SpawnLocationOptions = {
     'Peach Cave Start': {
         location: SPAWN_LOCATION_FULL,
         savedState: defaultSavedState,
@@ -313,6 +349,9 @@ const spawnLocations = {
         location: SPAWN_HELIX_ENTRANCE,
         savedState: helixStartState,
     },
+};
+
+const middleSpawnLocations: SpawnLocationOptions = {
     'Forest Start': {
         location: SPAWN_FOREST_ENTRANCE,
         savedState: helixEndState,
@@ -329,9 +368,12 @@ const spawnLocations = {
         location: SPAWN_WATERFALL_BOSS,
         savedState: waterfallBossState,
     },
+};
+
+const lateSpawnLocations: SpawnLocationOptions = {
     'Lake Start': {
         location: SPAWN_LOCATION_PEACH_CAVE_EXIT,
-        savedState: helixEndState,
+        savedState: riverTempleStartState,
     },
     'Lake Boss': {
         location: RIVER_TEMPLE_BOSS,
@@ -345,8 +387,28 @@ const spawnLocations = {
         location: SPAWN_CRATER_BOSS,
         savedState: craterBossState,
     },
+    'Tower Start': {
+        location: SPAWN_STAFF_ENTRANCE,
+        savedState: staffStartState,
+    },
 };
-window['spawnLocations'] = spawnLocations;
+
+function getSpawnLocationOptions(spawnLocations: SpawnLocationOptions, useSavedState = false) {
+    return Object.keys(spawnLocations).map(name => {
+        return {
+            label: `${name}`,
+            onSelect() {
+                const state = getState();
+                if (useSavedState) {
+                    applySavedState(state, cloneDeep(spawnLocations[name].savedState));
+                }
+                setSpawnLocation(state, spawnLocations[name].location);
+                returnToSpawnLocation(state);
+                state.scene = 'game';
+            }
+        }
+    });
+}
 
 export function getSpawnLocationContextMenuOption(): MenuOption {
     return {
@@ -354,18 +416,27 @@ export function getSpawnLocationContextMenuOption(): MenuOption {
             return 'Teleport...';
         },
         getChildren() {
-            const options = Object.keys(spawnLocations).map(name => {
-                return {
-                    label: `${name}`,
-                    onSelect() {
-                        const state = getState();
-                        setSpawnLocation(state, spawnLocations[name].location);
-                        returnToSpawnLocation(state);
-                        state.scene = 'game';
+            return [
+                { label: 'Teleport To...'},
+                {
+                    label: 'Early',
+                    getChildren() {
+                        return getSpawnLocationOptions(earlySpawnLocations);
                     }
-                }
-            });
-            return options;
+                },
+                {
+                    label: 'Mid',
+                    getChildren() {
+                        return getSpawnLocationOptions(middleSpawnLocations);
+                    }
+                },
+                {
+                    label: 'Late',
+                    getChildren() {
+                        return getSpawnLocationOptions(lateSpawnLocations);
+                    }
+                },
+            ];
         }
     }
 }
@@ -376,19 +447,27 @@ export function getTestStateContextMenuOption(): MenuOption {
             return 'Test State...';
         },
         getChildren() {
-            const options = Object.keys(spawnLocations).map(name => {
-                return {
-                    label: `${name}`,
-                    onSelect() {
-                        const state = getState();
-                        applySavedState(state, cloneDeep(spawnLocations[name].savedState));
-                        setSpawnLocation(state, spawnLocations[name].location);
-                        returnToSpawnLocation(state);
-                        state.scene = 'game';
+            return [
+                { label: 'Set State To...'},
+                {
+                    label: 'Early',
+                    getChildren() {
+                        return getSpawnLocationOptions(earlySpawnLocations, true);
                     }
-                }
-            });
-            return options;
+                },
+                {
+                    label: 'Mid',
+                    getChildren() {
+                        return getSpawnLocationOptions(middleSpawnLocations, true);
+                    }
+                },
+                {
+                    label: 'Late',
+                    getChildren() {
+                        return getSpawnLocationOptions(lateSpawnLocations, true);
+                    }
+                },
+            ];
         }
     }
 }
@@ -436,6 +515,9 @@ export function checkToUpdateSpawnLocation(state: GameState): void {
     }
     if (state.location.zoneKey === 'crater') {
         return setSpawnLocation(state, SPAWN_CRATER_ENTRANCE);
+    }
+    if (state.location.zoneKey === 'staffTower') {
+        return setSpawnLocation(state, SPAWN_STAFF_ENTRANCE);
     }
     // If you are in the forest temple, or in overworld area that is part of the temple, respawn
     // at the forest temple entrance.
