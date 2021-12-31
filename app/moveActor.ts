@@ -15,6 +15,7 @@ export function moveActor(state: GameState, actor: Actor, dx: number, dy: number
     canSwim = false,
     canClimb = false,
     canWiggle = true,
+    direction,
     excludedObjects = new Set(),
 }: MovementProperties): {mx: number, my: number} {
     let sx = dx;
@@ -40,6 +41,7 @@ export function moveActor(state: GameState, actor: Actor, dx: number, dy: number
                 canSwim,
                 canFall,
                 canClimb,
+                direction,
                 excludedObjects
             });
             if (movedX) {
@@ -65,6 +67,7 @@ export function moveActor(state: GameState, actor: Actor, dx: number, dy: number
                 canSwim,
                 canFall,
                 canClimb,
+                direction,
                 excludedObjects
             });
             if (movedY) {
@@ -152,7 +155,9 @@ function moveActorInDirection(
     let pushedObjects = [];
     let quickJump = false;
     for (const point of checkPoints) {
-        const { tileBehavior, objects} = getTileBehaviorsAndObstacles(state, actor.area, point, excludedObjects);
+        const { tileBehavior, objects} = getTileBehaviorsAndObstacles(
+            state, actor.area, point, excludedObjects, null, null, direction
+        );
         if (tileBehavior?.solid && tileBehavior?.damage > 0) {
             actor.onHit?.(state, { damage: tileBehavior.damage, knockback: {
                 vx: - 4 * (ax - actor.x),
@@ -316,7 +321,7 @@ function moveActorInDirection(
     if (blockedByTile || blockedByObject) {
         // If this is true, wiggle the character up to Npx to get around corners.
         // This makes it much smoother to try and get into pixel perfect gaps.
-        if (!canWiggle) {
+        if (!canWiggle || canJumpDown) {
             return false;
         }
         const maxWiggle = 8;

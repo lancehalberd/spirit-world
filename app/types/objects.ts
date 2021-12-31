@@ -74,6 +74,9 @@ export interface MovementProperties {
     canJump?: boolean
     // Whether the mover should wiggle to fit into tight spaces.
     canWiggle?: boolean
+    // The direction of the movement, can effect whether a tile is considered open,
+    // for example edges the player can jump off of in one or two directions.
+    direction?: Direction
     // Objects to ignore for hit detection.
     excludedObjects?: Set<any>
     needsFullTile?: boolean

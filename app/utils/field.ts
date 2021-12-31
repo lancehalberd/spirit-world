@@ -110,13 +110,13 @@ export function isPointOpen(
         }
     } else if (tileBehavior?.solid && (!tileBehavior?.climbable || !movementProperties.canClimb)) {
         return false;
-    } else if (tileBehavior?.edges?.up && sy === 0) {
+    } else if (tileBehavior?.edges?.up && sy === 0 && movementProperties.direction !== 'up') {
         return false;
-    } else if (tileBehavior?.edges?.down && sy === 15) {
+    } else if (tileBehavior?.edges?.down && sy === 15 && movementProperties.direction !== 'down') {
         return false;
-    } else if (tileBehavior?.edges?.left && sx === 0) {
+    } else if (tileBehavior?.edges?.left && sx === 0 && movementProperties.direction !== 'left') {
         return false;
-    } else if (tileBehavior?.edges?.right && sx === 15) {
+    } else if (tileBehavior?.edges?.right && sx === 15 && movementProperties.direction !== 'right') {
         return false;
     }
     if (tileBehavior?.water && !movementProperties.canSwim) {
@@ -192,6 +192,7 @@ export function getTileBehaviorsAndObstacles(
     excludedObjects: Set<any> = null,
     nextArea: AreaInstance = null,
     objectTest: (object: ObjectInstance) => boolean = null,
+    direction?: Direction,
 ): {tileBehavior: TileBehaviors, tx: number, ty: number, objects: ObjectInstance[]} {
     const objects: ObjectInstance[] = [];
     let tx = Math.floor(x / 16);
@@ -270,6 +271,32 @@ export function getTileBehaviorsAndObstacles(
         }
         if (tileBehavior.edges?.right && sx !== 15) {
             delete tileBehavior.edges.right;
+        }
+    }
+    // If the actor is at the edge of a tile moving into the next tile,
+    // Check if the tile they are currently moving out of has an edge in the direction of the movement.
+    if (sy === 15 && direction === 'up') {
+        if (area?.behaviorGrid[ty + 1]?.[tx]?.edges?.up) {
+            tileBehavior.edges = tileBehavior.edges || {};
+            tileBehavior.edges.up = true;
+        }
+    }
+    if (sy === 0 && direction === 'down') {
+        if (area?.behaviorGrid[ty - 1]?.[tx]?.edges?.down) {
+            tileBehavior.edges = tileBehavior.edges || {};
+            tileBehavior.edges.down = true;
+        }
+    }
+    if (sx === 15 && direction === 'left') {
+        if (area?.behaviorGrid[ty]?.[tx + 1]?.edges?.left) {
+            tileBehavior.edges = tileBehavior.edges || {};
+            tileBehavior.edges.left = true;
+        }
+    }
+    if (sx === 0 && direction === 'right') {
+        if (area?.behaviorGrid[ty]?.[tx - 1]?.edges?.right) {
+            tileBehavior.edges = tileBehavior.edges || {};
+            tileBehavior.edges.right = true;
         }
     }
     return { tileBehavior, tx, ty, objects };

@@ -741,6 +741,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
                 canFall: true,
                 canJump: !isAstralProjection,
                 canSwim: !encumbered,
+                direction: hero.d,
                 boundToSection: isAstralProjection || !!hero.bounce,
                 excludedObjects
             });
