@@ -109,3 +109,14 @@ export const entAnimations: ActorAnimations = {
         right: entAnimation,
     },
 };
+
+const droneGeometry: FrameDimensions = { w: 18, h: 17, content: { x: 2, y: 4, w: 14, h: 12} };
+const droneAnimation: FrameAnimation = createAnimation('gfx/enemies/drone.png', droneGeometry, { cols: 4});
+export const droneAnimations: ActorAnimations = {
+    idle: {
+        up: droneAnimation,
+        down: droneAnimation,
+        left: droneAnimation,
+        right: droneAnimation,
+    },
+};
