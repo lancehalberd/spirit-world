@@ -83,7 +83,6 @@ export function applySavedState(state: GameState, savedState: SavedState): void 
     state.savedState = {
         ...defaultSavedState,
         ...savedState,
-        //
         savedHeroData: state.hero.exportSavedHeroData(),
     };
     fixSpawnLocationOnLoad(state);
@@ -300,7 +299,7 @@ export function returnToSpawnLocation(state: GameState) {
     state.zone = zones[state.location.zoneKey];
     state.areaGrid = state.zone.floors[state.location.floor].grid;*/
     state.hero.d = state.hero.spawnLocation.d;
-    enterLocation(state, state.hero.spawnLocation);
+    enterLocation(state, state.hero.spawnLocation, true, null, true);
     state.fadeLevel = (state.areaInstance.definition.dark || 0) / 100;
 }
 

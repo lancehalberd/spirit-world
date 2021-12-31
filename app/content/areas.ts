@@ -160,7 +160,8 @@ export function enterLocation(
     state: GameState,
     location: ZoneLocation,
     instant: boolean = true,
-    callback: () => void = null
+    callback: () => void = null,
+    preserveZoneFlags = false
 ): void {
     // Remve astral projection when switching areas.
     if (state.hero.astralProjection) {
@@ -199,7 +200,7 @@ export function enterLocation(
         return;
     }
     // Clear zone flags when changing zones.
-    if (state.location.zoneKey !== location.zoneKey) {
+    if (!preserveZoneFlags && state.location.zoneKey !== location.zoneKey) {
         state.savedState.zoneFlags = {};
     }
     state.location = {
