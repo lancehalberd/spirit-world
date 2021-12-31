@@ -101,11 +101,12 @@ export class Enemy implements Actor, ObjectInstance {
             ...(this.enemyDefinition.params || {}),
             ...(definition.params || {}),
         };
+        this.status = definition.status;
         if (getObjectStatus(state, this.definition)) {
             this.status = 'gone';
         }
         this.alwaysReset = this.enemyDefinition.alwaysReset;
-        this.drawPriority = this.flying ? 'foreground' : 'sprites';
+        this.updateDrawPriority();
         this.mode = this.enemyDefinition.initialMode || 'choose';
         this.touchHit = this.enemyDefinition.touchHit;
     }
@@ -160,7 +161,25 @@ export class Enemy implements Actor, ObjectInstance {
         }
         return this.defaultOnHit(state, hit);
     }
+    updateDrawPriority() {
+        this.drawPriority = this.flying ? 'foreground' : 'sprites';
+    }
     defaultOnHit(state: GameState, hit: HitProperties): HitResult {
+        if (this.status === 'off') {
+            if (hit.element === 'lightning') {
+                this.status = 'normal';
+                this.behaviors = {
+                    ...(this.enemyDefinition.tileBehaviors || {}),
+                };
+                this.flying = this.enemyDefinition.flying;
+                this.updateDrawPriority();
+                return {
+                    hit: true,
+                    blocked: true,
+                };
+            }
+            return {};
+        }
         if (this.life <= 0 || this.status === 'gone' || this.enemyInvulnerableFrames || this.isInvulnerable) {
             return {};
         }
@@ -265,6 +284,18 @@ export class Enemy implements Actor, ObjectInstance {
             return;
         }
         this.time += FRAME_LENGTH;
+        // Only time counter advances for enemies that are off.
+        // This status is only meant to apply to machines.
+        if (this.status === 'off') {
+            this.behaviors = {solid: true};
+            this.flying = false;
+            this.updateDrawPriority();
+            if (this.z > 0) {
+                this.z = Math.max(0, this.z + this.vz);
+                this.vz = Math.max(-8, this.vz - 0.5);
+            }
+            return;
+        }
         this.modeTime += FRAME_LENGTH;
         this.animationTime += FRAME_LENGTH;
         this.healthBarTime += FRAME_LENGTH;

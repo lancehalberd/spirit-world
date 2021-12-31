@@ -198,6 +198,10 @@ export function enterLocation(
         }
         return;
     }
+    // Clear zone flags when changing zones.
+    if (state.location.zoneKey !== location.zoneKey) {
+        state.savedState.zoneFlags = {};
+    }
     state.location = {
         ...location,
         areaGridCoords: {...location.areaGridCoords},

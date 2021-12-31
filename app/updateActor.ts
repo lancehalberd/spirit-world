@@ -1143,7 +1143,7 @@ export function checkForEnemyDamage(state: GameState, hero: Hero) {
     }
     for (const enemy of hero.area.objects) {
         if (!(enemy instanceof Enemy) || enemy.invulnerableFrames > 0
-            || enemy.status === 'hidden' || enemy.status === 'gone'
+            || enemy.status === 'hidden' || enemy.status === 'gone' || enemy.status === 'off'
         ) {
             continue;
         }
