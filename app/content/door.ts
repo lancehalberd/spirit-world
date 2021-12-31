@@ -136,7 +136,7 @@ const [
 function renderWoodenDoor(context: CanvasRenderingContext2D, state: GameState, door: Door) {
     if (door.definition.d === 'up') {
         let frame = woodenNorthDoorway, overFrame: Frame = null;
-        if (door.isOpen()) {
+        if (door.renderOpen(state)) {
             if (door.definition.status === 'cracked') {
                 frame = woodenNorthBlownup;
             }
@@ -303,7 +303,7 @@ debugCanvas;//(blockedDoorCover);
 function renderCavernDoor(context: CanvasRenderingContext2D, state: GameState, door: Door) {
     if (door.definition.d === 'up') {
         let frame = cavernNorthDoorway, overFrame: Frame = null;
-        if (door.isOpen()) {
+        if (door.renderOpen(state)) {
             if (door.definition.status === 'cracked') {
                 frame = cavernNorthBlownup;
             }
