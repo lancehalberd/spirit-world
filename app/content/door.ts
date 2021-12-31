@@ -1033,6 +1033,9 @@ export class Door implements ObjectInstance {
         }
     }
     renderForeground(context: CanvasRenderingContext2D, state: GameState, force = false) {
+        if (this.area !== state.areaInstance) {
+            return;
+        }
         // Hack to prevent the top of this specific door from rendering on top of the waterfall.
         if (this.definition.id === 'waterfallCaveEntrance') {
             return;

@@ -119,7 +119,7 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         return;
     }
     if (hero.isUsingDoor) {
-        const isUsingStairs = (hero.actionTarget as Door).isStairs?.(state);
+        const isUsingStairs = (hero.actionTarget as Door)?.isStairs?.(state);
         hero.action = 'walking';
         hero.animationTime += FRAME_LENGTH;
         // Automatically move the hero forward in the direction set by the door, ignoring obstacles.

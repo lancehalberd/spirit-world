@@ -214,11 +214,11 @@ const f0_0x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "staffTowerEntrance", x: 224, y: 496, type: "door", style: "wooden", targetZone: "overworld", targetObjectId: "staffTowerEntrance", d: "down"},
+        {status: "normal", id: "staffTowerEntrance", x: 224, y: 496, type: "door", style: "wooden", targetZone: "overworld", targetObjectId: "staffTowerEntrance", d: "down", locationCue: "Tower 1F"},
         {status: "normal", id: "", x: 224, y: 304, type: "tippable"},
         {status: "normal", id: "", x: 240, y: 304, type: "tippable"},
         {status: "normal", id: "", x: 224, y: 400, d: "down", behavior: "none", style: "vanara", type: "npc", dialogue: "This tower disappears into the clouds but there is no way to reach the upper floors.\n{|}Nobody knows who built the tower, but I read it is even older than the ruins to the South.", hasCustomLogic: true, customLogic: "elementalBeastsEscaped", invertLogic: true},
-        {status: "normal", id: "", x: 231, y: 209, speed: "fast", d: "up", w: 18, h: 96, style: "escalator", type: "escalator"},
+        {status: "normal", id: "", x: 231, y: 209, speed: "slow", d: "up", w: 18, h: 96, style: "escalator", type: "escalator"},
         {status: "normal", id: "", x: 272, y: 432, speed: "slow", d: "left", w: 96, h: 16, style: "belt", type: "escalator"},
         {status: "normal", id: "", x: 263, y: 209, speed: "fast", d: "down", w: 18, h: 96, style: "escalator", type: "escalator"},
         {status: "normal", id: "", x: 352, y: 336, speed: "slow", d: "down", w: 16, h: 96, style: "belt", type: "escalator"},

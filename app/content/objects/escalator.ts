@@ -15,16 +15,29 @@ import {
 // Middle wooden stair tile for escalator.
 const woodenStairs: Frame = {image: requireImage('gfx/tiles/woodhousetilesarranged.png'), x: 224, y: 32, w: 16, h: 16};
 const verticalBelt: Frame = {image: requireImage('gfx/tiles/woodhousetilesarranged.png'), x: 208, y: 96, w: 16, h: 16};
-const [beltCanvas, beltContext] = createCanvasAndContext(16, 16);
-const horizontalBelt: Frame = {image: beltCanvas, x: 0, y: 0, w: 16, h: 16};
+const [horizontalBeltCanvas, horizontalBeltContext] = createCanvasAndContext(16, 16);
+const [verticalBeltCanvas, verticalBeltContext] = createCanvasAndContext(16, 16);
+const [escalatorCanvas, escalatorContext] = createCanvasAndContext(16, 16);
+const horizontalBelt: Frame = {image: horizontalBeltCanvas, x: 0, y: 0, w: 16, h: 16};
+// Scale up all the images so that they look good moving quickly.
 const createHorizontalBelt = async () => {
     await allImagesLoaded();
-    beltContext.save();
-        beltContext.translate(8, 8);
-        beltContext.rotate(Math.PI / 2);
-        beltContext.translate(-8, -8);
-        drawFrameAt(beltContext, verticalBelt, {x: 0, y: 0});
-    beltContext.restore();
+    horizontalBeltContext.save();
+        horizontalBeltContext.translate(8, 8);
+        horizontalBeltContext.rotate(Math.PI / 2);
+        horizontalBeltContext.translate(-8, -8);
+        drawFrameAt(horizontalBeltContext, verticalBelt, {x: 0, y: 0, w: 48, h: 48});
+    horizontalBeltContext.restore();
+
+    drawFrameAt(verticalBeltContext, verticalBelt, {x: 0, y: 0, w: 48, h: 48});
+    verticalBelt.x = 0;
+    verticalBelt.y = 0;
+    verticalBelt.image = verticalBeltCanvas;
+
+    drawFrameAt(escalatorContext, woodenStairs, {x: 0, y: 0, w: 48, h: 48});
+    woodenStairs.x = 0;
+    woodenStairs.y = 0;
+    woodenStairs.image = escalatorCanvas;
 }
 createHorizontalBelt();
 debugCanvas;//(beltCanvas);
@@ -79,14 +92,14 @@ export class Escalator implements ObjectInstance {
         this.animationTime += FRAME_LENGTH;
         const dx = directionMap[this.definition.d][0];
         const dy = directionMap[this.definition.d][1];
-        const speed = (this.definition.speed === 'slow') ? 1 : 2;
+        let speed = (this.definition.speed === 'slow') ? 1 : 3;
         if (this.status === 'normal') {
             this.offsetX += dx * speed;
             this.offsetY += dy * speed;
         }
         // If touching center of player, pull player in and push them south.
         const hero = state.hero.activeClone || state.hero;
-        if (hero.area === this.area) {
+        if (hero.area === this.area && this.status === 'normal') {
             const heroHitbox = hero.getHitbox(state);
             const touchingHero = isObjectInsideTarget(heroHitbox, this.getHitbox(state))
                 && hero.action !== 'roll' && hero.z <= 0;
@@ -118,7 +131,7 @@ export class Escalator implements ObjectInstance {
                 }
                 if (hero.actionTarget === this) {
                     hero.isControlledByObject = true;
-                    const speed = state.nextAreaInstance ? 0.75 : 2;
+                    speed = state.nextAreaInstance ? 0.75 : speed;
                     hero.actionDx = speed * dx;
                     hero.actionDy = speed * dy;
                     hero.x += hero.actionDx;
