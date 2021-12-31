@@ -213,9 +213,6 @@ function updateMenu(state: GameState) {
     } else if (wasGameKeyPressed(state, GAME_KEY.DOWN)) {
         state.menuRow = (state.menuRow + 1) % 3;
     }
-    if(!selectableTools.length && state.menuRow === 0) {
-        state.menuRow = 1;
-    }
     if(!state.hero.passiveTools.charge && state.menuRow === 2) {
         state.menuRow = 1;
     }
