@@ -63,18 +63,13 @@ export class Escalator implements ObjectInstance {
         this.y = this.definition.y;
     }
     getHitbox(state: GameState) {
-        const hitbox = {
-            x: this.definition.x,
-            y: this.definition.y,
-            w: this.definition.w,
-            h: this.definition.h,
-        }
+        const hitbox = pad(this.definition, 8);
         if (this.definition.d === 'down' || this.definition.d === 'up') {
-            hitbox.y -= 12;
-            hitbox.h += 24;
+            hitbox.y -= 6;
+            hitbox.h += 12;
         } else {
-            hitbox.x -= 12;
-            hitbox.w += 24;
+            hitbox.x -= 6;
+            hitbox.w += 12;
         }
         return hitbox;
     }
@@ -91,7 +86,7 @@ export class Escalator implements ObjectInstance {
         const hero = state.hero.activeClone || state.hero;
         if (hero.area === this.area) {
             const heroHitbox = hero.getHitbox(state);
-            const touchingHero = isObjectInsideTarget(heroHitbox, pad(this.getHitbox(state), 4))
+            const touchingHero = isObjectInsideTarget(heroHitbox, this.getHitbox(state))
                 && hero.action !== 'roll' && hero.z <= 0;
             if (this.definition.speed === 'slow' && touchingHero) {
                 moveActor(state, hero, speed * dx, speed * dy, {

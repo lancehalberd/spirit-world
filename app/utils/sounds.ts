@@ -63,13 +63,20 @@ export function requireSound(key, callback = null) {
         // A track can specify another track source to automatically transition to without crossfade.
         if (nextTrack) {
             howlerProperties.onend = function() {
-                playTrack(nextTrack, 0, this.mute(), false, false);
                 this.stop();
+                playingTracks = [];
+                window['playingTracks'] = playingTracks;
+                playTrack(nextTrack, 0, this.mute(), false, false);
             };
         }
         newSound.howl = new Howl(howlerProperties);
         newSound.props = howlerProperties;
         newSound.nextTrack = nextTrack;
+        sounds.set(key, newSound);
+        // Make sure the next track is preloaded.
+        if (newSound.nextTrack) {
+            requireSound(musicTracks[newSound.nextTrack]);
+        }
     } else {
         const howlerProperties: any = {
             src: [source],
@@ -116,8 +123,8 @@ export function requireSound(key, callback = null) {
         newSound.activeInstances = 0;
         newSound.instanceLimit = limit || 5;
         newSound.props = howlerProperties;
+        sounds.set(key, newSound);
     }
-    sounds.set(key, newSound);
     return newSound;
 }
 
@@ -166,24 +173,45 @@ window['stopSound'] = stopSound;
 
 let playingTracks = [], trackIsPlaying = false;
 window['playingTracks'] = playingTracks;
-export function playTrack(source, timeOffset, muted = false, fadeOutOthers = true, crossFade = true) {
-    const sound = requireSound(source);
+
+
+const musicTracks = {
+    // Tracks from Nick
+    // Used in various caves
+    caveTheme: {key: 'caveTheme', type: 'bgm', source: 'bgm/Spirit 1.mp3', volume: 10 },
+    // Used on the title screen and world map
+    mainTheme: {key: 'mainTheme', type: 'bgm', source: 'bgm/Spirit 4 Demo.mp3', volume: 5 },
+    tombTheme: {key: 'tombTheme', type: 'bgm', source: 'bgm/Spirit 5 Demo.mp3', volume: 5 },
+    // Used for Vanara ship dungeons like cocoon, helix and forest temple.
+    cocoonTheme: {key: 'cocoonTheme', type: 'bgm', source: 'bgm/Spirit 6 Demo.mp3', volume: 5 },
+
+    // Tracks from Leon
+    // For War Temple and other dungeons
+    dungeonTheme: {key: 'dungeonTheme', type: 'bgm', source: 'bgm/SpiritQuestSong_Leon1.mp3', volume: 10 },
+    idleTheme: {key: 'idleTheme', type: 'bgm', source: 'bgm/IdleMusic.mp3', volume: 5 },
+    bossIntro: {key: 'bossIntro', type: 'bgm', source: 'bgm/SpookyThemeIntro.mp3', volume: 20, nextTrack: 'bossA' },
+    bossA: {key: 'bossA', type: 'bgm', source: 'bgm/SpookyThemeA.mp3', volume: 20, nextTrack: 'bossB' },
+    bossB: {key: 'bossB', type: 'bgm', source: 'bgm/SpookyThemeB.mp3', volume: 20, nextTrack: 'bossA' },
+};
+type TrackKey = keyof typeof musicTracks;
+export function playTrack(trackKey: TrackKey, timeOffset, muted = false, fadeOutOthers = true, crossFade = true) {
+    const sound = requireSound(musicTracks[trackKey]);
     if (!sound.howl || !sound.howl.duration()) {
         return false;
     }
     // Do nothing if the sound is already playing.
-    if (playingTracks.includes(sound) || sound.howl.playing()) {
+    if (playingTracks.includes(sound)) {
         return sound;
     }
     // Do nothing if the sound has transitioned to the next track.
     // This allows treating preventing restarting the sound when the source is still the original track.
     // This currently only supports one instance of nextTrack set per sound.
-    if (sound.nextTrack) {
-        const nextTrackSound = requireSound(sound.nextTrack);
+    /*if (sound.nextTrack) {
+        const nextTrackSound = requireSound(musicTracks[sound.nextTrack]);
         if (playingTracks.includes(nextTrackSound) || nextTrackSound.howl.playing()) {
             return nextTrackSound;
         }
-    }
+    }*/
     //console.log('playTrack', playingTracks, source, sound);
     trackIsPlaying = false;
     if (fadeOutOthers) {
@@ -239,8 +267,12 @@ function stopTrack() {
     playingTracks = [];
     window['playingTracks'] = playingTracks;
 }
-export function isPlayingTrack() {
+export function isATrackPlaying() {
     return trackIsPlaying;
+}
+export function isTrackPlaying(trackKey: TrackKey): boolean {
+    const sound = requireSound(musicTracks[trackKey]);
+    return playingTracks.includes(sound);
 }
 
 const preloadSounds = () => {
@@ -259,7 +291,7 @@ const preloadSounds = () => {
              offset: '300:200', volume: 10, limit: 2},
         //{key: 'enemyDeath', source: 'sfx/enemyDeath.wav',
         //     offset: '170:300', volume: 10, limit: 2},
-        {key: 'enemyDeath', source: 'sfx/enemy death.wav', volume: 10, limit: 2},
+        {key: 'enemyDeath', source: 'sfx/enemy death.wav', volume: 5, limit: 2},
         {key: 'getMoney', source: 'sfx/coin wood c.wav',
             offset: '0:250', volume: 10, limit: 2},
         {key: 'blockAttack', source: 'sfx/coin wood c.wav',
@@ -277,12 +309,15 @@ const preloadSounds = () => {
         {key: 'weakChakram', source: 'sfx/chakram sweep.wav', volume: 1, limit: 2},
         {key: 'normalChakram', source: 'sfx/chakram sweep.wav', volume: 3, limit: 2},
         {key: 'strongChakram', source: 'sfx/chakram sweep.wav', volume: 5, limit: 2},
-        {key: 'secretChime', source: 'sfx/chime 14_1.wav', volume: 5, limit: 2},
-        {key: 'bigSuccessChime', source: 'sfx/chime 06.wav', offset: '0:2000', volume: 5, limit: 2},
-        {key: 'smallSuccessChime', source: 'sfx/chime 15.wav', offset: '0:2000', volume: 5, limit: 2},
+        {key: 'secretChime', source: 'sfx/chime 14_1.wav', volume: 4, limit: 2},
+        {key: 'bigSuccessChime', source: 'sfx/chime 06.wav', offset: '0:2000', volume: 4, limit: 2},
+        {key: 'smallSuccessChime', source: 'sfx/chime 15.wav', offset: '0:2000', volume: 4, limit: 2},
+        musicTracks.mainTheme,
     ].forEach(sound => requireSound(sound));
 };
 preloadSounds();
+
+
 /*export function muteSounds() {
     for (const sound of playingSounds) sound.howl.mute(true);
 }
