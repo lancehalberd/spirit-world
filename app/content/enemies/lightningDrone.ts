@@ -6,7 +6,7 @@ import {
 } from 'app/content/enemies';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import {
-    beetleWingedAnimations,
+    droneAnimations,
 } from 'app/content/enemyAnimations';
 import { lifeLootTable } from 'app/content/lootTables';
 import { hitTargets } from 'app/utils/field';
@@ -30,7 +30,7 @@ const updateTarget = (state: GameState, enemy: Enemy): boolean => {
 }
 
 enemyDefinitions.lightningDrone = {
-    animations: beetleWingedAnimations,
+    animations: droneAnimations,
     flying: true, acceleration: 0.2, aggroRadius: 112, speed: 2,
     life: 4, touchHit: { damage: 2, element: 'lightning'},
     lootTable: lifeLootTable,
