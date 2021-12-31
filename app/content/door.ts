@@ -7,7 +7,7 @@ import {
 import { debugCanvas } from 'app/dom';
 import { showMessage } from 'app/render/renderMessage';
 import { saveGame } from 'app/state';
-import { createAnimation, drawFrame } from 'app/utils/animations';
+import { createAnimation, drawFrame, drawFrameAt } from 'app/utils/animations';
 import { directionMap, getDirection } from 'app/utils/field';
 import { requireImage } from 'app/utils/images';
 import { boxesIntersect, isObjectInsideTarget, isPointInShortRect } from 'app/utils/index';
@@ -289,7 +289,7 @@ const [
 ] = createAnimation('gfx/tiles/cavearranged.png', {w: 16, h: 64},
     {left: 432, top: 192, cols: 4, rows: 1}).frames;
 const [
-    /*cavernStairsUp*/, /*cavernStairsDown*/, cavernNorthDoorway, cavernNorthBlownup,
+    cavernStairsUp, cavernStairsDown, cavernNorthDoorway, cavernNorthBlownup,
     /*cavernStairs*/, cavernNorthCrack,
 ] = createAnimation('gfx/tiles/cavearranged.png', {w: 32, h: 32},
     {left: 304, y: 0, cols: 4, rows: 2}).frames;
@@ -416,6 +416,38 @@ function renderCavernDoorForeground(context: CanvasRenderingContext2D, state: Ga
 }
 
 export const doorStyles: {[key: string]: DoorStyleDefinition} = {
+    cavernDownstairs: {
+        w: 32,
+        h: 32,
+        render(context: CanvasRenderingContext2D, state: GameState, door: Door) {
+            if (door.status !== 'normal') {
+                doorStyles.cavern.render(context, state, door);
+                return;
+            }
+            const frame = cavernStairsDown;
+            drawFrameAt(context, frame, {x: door.x, y: door.y});
+        },
+        renderForeground(context: CanvasRenderingContext2D, state: GameState, door: Door) {
+            const frame = cavernStairsDown;
+            drawFrame(context, {...frame, h: 12}, {...frame, x: door.x, y: door.y, h: 12});
+        }
+    },
+    cavernUpstairs: {
+        w: 32,
+        h: 32,
+        render(context: CanvasRenderingContext2D, state: GameState, door: Door) {
+            if (door.status !== 'normal') {
+                doorStyles.cavern.render(context, state, door);
+                return;
+            }
+            const frame = cavernStairsUp;
+            drawFrameAt(context, frame, {x: door.x, y: door.y});
+        },
+        renderForeground(context: CanvasRenderingContext2D, state: GameState, door: Door) {
+            const frame = cavernStairsUp;
+            drawFrame(context, {...frame, h: 12}, {...frame, x: door.x, y: door.y, h: 12});
+        }
+    },
     cavern: {
         w: 64,
         h: 16,
@@ -819,6 +851,9 @@ export class Door implements ObjectInstance {
             this.area.objects.splice(index, 1);
         }
         this.area = null;
+    }
+    isStairs(state: GameState) {
+        return this.style === 'cavernUpstairs' || this.style === 'cavernDownstairs';
     }
     update(state: GameState) {
         if (this.status !== 'normal' && getObjectStatus(state, this.definition)) {

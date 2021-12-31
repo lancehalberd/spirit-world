@@ -1,6 +1,7 @@
 import { find } from 'lodash';
 
 import { addParticleAnimations } from 'app/content/animationEffect';
+import { TextCue } from 'app/content/effects/textCue';
 import { changeObjectStatus, createObjectInstance, findObjectInstanceById } from 'app/content/objects';
 import { allTiles } from 'app/content/tiles';
 import { logicHash, isLogicValid } from 'app/content/logic';
@@ -16,7 +17,7 @@ import { updateCamera } from 'app/updateCamera';
 
 import {
     AreaDefinition, AreaInstance, AreaLayerDefinition,
-    Direction, Enemy, FullTile, GameState, Hero, TileCoords,
+    Direction, Enemy, EntranceDefinition, FullTile, GameState, Hero, TileCoords,
     LogicDefinition,
     ObjectDefinition,
     ObjectInstance,
@@ -376,6 +377,12 @@ export function enterZoneByTarget(
                                     setAreaSection(state, state.hero.d, true);
                                     checkForFloorEffects(state, state.hero);
                                     updateCamera(state, 512);
+                                }
+                                // Technically this could also be a MarkerDefinition.
+                                const definition = target.definition as EntranceDefinition;
+                                if (definition.locationCue) {
+                                    const textCue = new TextCue({ text: definition.locationCue});
+                                    addObjectToArea(state, state.areaInstance, textCue);
                                 }
                                 callback?.();
                             });

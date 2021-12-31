@@ -436,7 +436,7 @@ const f0_1x0: AreaDefinition = {
         {status: "normal", id: "riverTempleBigKey", x: 64, y: 400, type: "chest", lootType: "bigKey", lootLevel: 1},
         {status: "bigKeyLocked", id: "riverTempleBigKeyDoor", x: 176, y: 256, type: "door", style: "cave", d: "up"},
         {status: "bigKeyLocked", id: "riverTempleBigKeyDoor", x: 176, y: 224, type: "door", style: "cave", d: "down"},
-        {status: "normal", id: "unfrozenStairs", x: 112, y: 0, type: "door", style: "cave", targetZone: "riverTemple", targetObjectId: "unfrozenStairs", d: "up", logicKey: "frozenLake", invertLogic: true},
+        {status: "normal", id: "unfrozenStairs", x: 112, y: 0, type: "door", style: "cavernUpstairs", targetZone: "riverTemple", targetObjectId: "unfrozenStairs", d: "up", logicKey: "frozenLake", invertLogic: true, locationCue: "Lake Temple 2F"},
         {status: "normal", id: "foyerTorch", x: 368, y: 128, saveStatus: "forever", type: "torch"},
         {status: "normal", id: "", x: 400, y: 96, type: "crystalSwitch", element: "lightning", timer: 1000, targetObjectId: "foyerTorch"},
         {status: "normal", id: "", x: 400, y: 400, type: "crystalSwitch", element: "lightning", timer: 1000, targetObjectId: "cornerTorch"},
@@ -717,7 +717,7 @@ const f1_0x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "riverTemplePitEntrance", x: 400, y: 384, type: "marker"},
+        {status: "normal", id: "riverTemplePitEntrance", x: 400, y: 384, type: "marker", locationCue: "Lake Temple 3F"},
         {status: "normal", id: "", x: 368, y: 480, type: "door", style: "cave", d: "down"},
     ],
     sections: [
@@ -813,7 +813,7 @@ const f1_1x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "unfrozenStairs", x: 112, y: 0, type: "door", style: "cave", targetZone: "riverTemple", targetObjectId: "unfrozenStairs", d: "up", invertLogic: true, logicKey: "frozenLake"},
+        {status: "normal", id: "unfrozenStairs", x: 112, y: 0, type: "door", style: "cavernDownstairs", targetZone: "riverTemple", targetObjectId: "unfrozenStairs", d: "up", invertLogic: true, logicKey: "frozenLake", locationCue: "Lake Temple 3F"},
         {status: "frozen", id: "riverTempleBigChest", x: 112, y: 144, type: "bigChest", lootType: "waterBlessing", lootLevel: 1},
         {status: "normal", id: "", x: 368, y: 0, type: "door", style: "cave", d: "up"},
         {status: "normal", id: "", x: 224, y: 80, type: "door", style: "cave", d: "right", logicKey: "frozenLake", invertLogic: true},

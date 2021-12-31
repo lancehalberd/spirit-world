@@ -88,11 +88,11 @@ const f0_0x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "helix:0:0x0-staff-0", x: 240, y: 224, type: "chest", lootType: "staff", lootLevel: 1, linked: undefined},
-        {status: "normal", id: "helixEntrance", x: 240, y: 480, type: "door", style: "cave", targetZone: "lakeTunnel", targetObjectId: "helixEntrance", d: "down"},
-        {status: "normal", id: "helixStairs1", x: 208, y: 64, type: "door", style: "cave", targetZone: "helix", targetObjectId: "helixStairs1", d: "up"},
-        {status: "normal", id: "helixMarker", x: 240, y: 272, type: "marker", linked: undefined},
-        {status: "normal", id: "helix:0:0x0-teleporter-0", x: 256, y: 208, targetZone: undefined, targetObjectId: undefined, type: "teleporter", linked: undefined},
+        {status: "normal", id: "helix:0:0x0-staff-0", x: 240, y: 224, type: "chest", lootType: "staff", lootLevel: 1},
+        {status: "normal", id: "helixEntrance", x: 240, y: 480, type: "door", style: "cave", targetZone: "lakeTunnel", targetObjectId: "helixEntrance", d: "down", locationCue: "Helix 1F"},
+        {status: "normal", id: "helixStairs1", x: 208, y: 64, type: "door", style: "cavernUpstairs", targetZone: "helix", targetObjectId: "helixStairs1", d: "up", locationCue: "Helix 1F"},
+        {status: "normal", id: "helixMarker", x: 240, y: 272, type: "marker", locationCue: "Helix 1F"},
+        {status: "normal", id: "helix:0:0x0-teleporter-0", x: 256, y: 208, type: "teleporter"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -186,8 +186,8 @@ const sf0_0x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "helixSpiritDoor1", x: 272, y: 64, type: "door", style: "cave", targetZone: "helix", targetObjectId: "helixSpiritDoor1", d: "up", spirit: false},
-        {status: "normal", id: "helix:s0:0x0-teleporter-0", x: 256, y: 272, targetZone: undefined, targetObjectId: undefined, type: "teleporter"},
+        {status: "normal", id: "helixSpiritDoor1", x: 272, y: 64, type: "door", style: "cavernUpstairs", targetZone: "helix", targetObjectId: "helixSpiritDoor1", d: "up", spirit: false, locationCue: "Helix 1F"},
+        {status: "normal", id: "helix:s0:0x0-teleporter-0", x: 256, y: 272, type: "teleporter"},
         {status: "normal", id: "helix:s0:0x0-wallLaser-0", x: 288, y: 304, type: "enemy", enemyType: "wallLaser", d: "up", params: {}},
         {status: "normal", id: "helix:s0:0x0-wallLaser-1", x: 304, y: 304, type: "enemy", enemyType: "wallLaser", d: "up", params: {}},
         {status: "normal", id: "helix:s0:0x0-wallLaser-2", x: 192, y: 128, type: "enemy", enemyType: "wallLaser", d: "down", params: {}},
@@ -287,8 +287,8 @@ const f1_0x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "helixStairs1", x: 160, y: 64, type: "door", style: "cave", targetZone: "helix", targetObjectId: "helixStairs1", d: "up", linked: undefined},
-        {status: "normal", id: "helixStairs2", x: 320, y: 64, type: "door", style: "cave", targetZone: "helix", targetObjectId: "helixStairs2", d: "up", linked: undefined},
+        {status: "normal", id: "helixStairs1", x: 160, y: 64, type: "door", style: "cavernDownstairs", targetZone: "helix", targetObjectId: "helixStairs1", d: "up", locationCue: "Helix 2F"},
+        {status: "normal", id: "helixStairs2", x: 320, y: 64, type: "door", style: "cavernUpstairs", targetZone: "helix", targetObjectId: "helixStairs2", d: "up", locationCue: "Helix 2F"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -382,8 +382,8 @@ const sf1_0x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "helixSpiritDoor1", x: 320, y: 64, type: "door", style: "cave", targetZone: "helix", targetObjectId: "helixSpiritDoor1", d: "up"},
-        {status: "normal", id: "helixSpiritDoor2", x: 160, y: 64, type: "door", style: "cave", targetZone: "helix", targetObjectId: "helixSpiritDoor2", d: "up"},
+        {status: "normal", id: "helixSpiritDoor1", x: 320, y: 64, type: "door", style: "cavernDownstairs", targetZone: "helix", targetObjectId: "helixSpiritDoor1", d: "up", locationCue: "Helix 2F"},
+        {status: "normal", id: "helixSpiritDoor2", x: 160, y: 64, type: "door", style: "cavernUpstairs", targetZone: "helix", targetObjectId: "helixSpiritDoor2", d: "up", locationCue: "Helix 2F"},
         {status: "normal", id: "helix:s1:0x0-pushPull-0", x: 368, y: 224, type: "pushPull"},
         {status: "normal", id: "helix:s1:0x0-pushPull-1", x: 368, y: 208, type: "pushPull"},
         {status: "normal", id: "helix:s1:0x0-pushPull-2", x: 368, y: 192, type: "pushPull"},
@@ -481,8 +481,8 @@ const f2_0x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "helixStairs2", x: 368, y: 0, type: "door", style: "cave", targetZone: "helix", targetObjectId: "helixStairs2", d: "up"},
-        {status: "normal", id: "helix:2:0x0-pitEntrance-0", x: 240, y: 240, targetZone: "helix", targetObjectId: "helixMarker", type: "pitEntrance", linked: undefined},
+        {status: "normal", id: "helixStairs2", x: 368, y: 0, type: "door", style: "cavernDownstairs", targetZone: "helix", targetObjectId: "helixStairs2", d: "up", locationCue: "Helix 3F"},
+        {status: "normal", id: "helix:2:0x0-pitEntrance-0", x: 240, y: 240, targetZone: "helix", targetObjectId: "helixMarker", type: "pitEntrance"},
         {status: "normal", id: "helix:2:0x0-tippable-0", linked: true, x: 256, y: 96, type: "tippable"},
         {status: "normal", id: "helix:2:0x0-tippable-1", x: 256, y: 80, type: "tippable"},
         {status: "normal", id: "helix:2:0x0-rollingBall-0", linked: true, x: 128, y: 224, type: "rollingBall"},
@@ -584,7 +584,7 @@ const sf2_0x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "helixSpiritDoor2", x: 112, y: 0, type: "door", style: "cave", targetZone: "helix", targetObjectId: "helixSpiritDoor2", d: "up"},
+        {status: "normal", id: "helixSpiritDoor2", x: 112, y: 0, type: "door", style: "cavernDownstairs", targetZone: "helix", targetObjectId: "helixSpiritDoor2", d: "up", locationCue: "Helix 3F"},
         {status: "normal", id: "helix:s2:0x0-tippable-0", linked: true, x: 256, y: 96, type: "tippable", spirit: true},
         {status: "normal", id: "helix:s2:0x0-rollingBall-0", linked: true, x: 128, y: 224, type: "rollingBall", spirit: true},
         {status: "normal", id: "helix:s2:0x0-pushPull-0", linked: true, x: 368, y: 336, type: "pushPull", spirit: true},
@@ -595,7 +595,7 @@ const sf2_0x0: AreaDefinition = {
         {status: "normal", id: "helix:s2:0x0-frostBeetle-2", x: 192, y: 320, type: "enemy", enemyType: "frostBeetle", d: "up", params: {}},
         {status: "normal", id: "helix:s2:0x0-flameSnake-0", x: 368, y: 144, type: "enemy", enemyType: "snake", d: "up", params: {}},
         {status: "normal", id: "helix:s2:0x0-snake-0", x: 160, y: 384, type: "enemy", enemyType: "snake", d: "up", params: {}},
-        {status: "normal", id: "helixTopTeleporter", x: 256, y: 240, targetZone: "helix", targetObjectId: "helixTopTeleporter", type: "teleporter"},
+        {status: "normal", id: "helixTopTeleporter", x: 256, y: 240, targetZone: "helix", targetObjectId: "helixTopTeleporter", type: "teleporter", locationCue: "Helix 3F"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -687,8 +687,8 @@ const f3_0x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "helix:3:0x0-teleporter-0", x: 304, y: 96, targetZone: undefined, targetObjectId: undefined, type: "teleporter"},
-        {status: "normal", id: "helixSkyEntrance", x: 240, y: 400, type: "door", style: "cave", targetZone: "sky", targetObjectId: "helixSkyEntrance", d: "down"},
+        {status: "normal", id: "helix:3:0x0-teleporter-0", x: 304, y: 96, type: "teleporter"},
+        {status: "normal", id: "helixSkyEntrance", x: 240, y: 400, type: "door", style: "cave", targetZone: "sky", targetObjectId: "helixSkyEntrance", d: "down", locationCue: "Helix Bridge"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -782,9 +782,9 @@ const sf3_0x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "helixTopTeleporter", x: 256, y: 240, targetZone: "helix", targetObjectId: "helixTopTeleporter", type: "teleporter"},
-        {status: "normal", id: "helix:s3:0x0-npc-0", x: 256, y: 144, d: "down", behavior: "none", style: "vanara", type: "npc", dialogueKey: "vanaraCommander", dialogue: undefined},
-        {status: "normal", id: "helix:s3:0x0-teleporter-0", x: 208, y: 96, targetZone: undefined, targetObjectId: undefined, type: "teleporter"},
+        {status: "normal", id: "helixTopTeleporter", x: 256, y: 240, targetZone: "helix", targetObjectId: "helixTopTeleporter", type: "teleporter", locationCue: "Helix Bridge"},
+        {status: "normal", id: "helix:s3:0x0-npc-0", x: 256, y: 144, d: "down", behavior: "none", style: "vanara", type: "npc", dialogueKey: "vanaraCommander"},
+        {status: "normal", id: "helix:s3:0x0-teleporter-0", x: 208, y: 96, type: "teleporter"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},

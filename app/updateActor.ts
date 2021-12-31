@@ -8,6 +8,7 @@ import {
 import { destroyClone } from 'app/content/clone';
 import { CloneExplosionEffect } from 'app/content/effects/CloneExplosionEffect';
 import { AirBubbles } from 'app/content/objects/airBubbles';
+import { Door } from 'app/content/door';
 import { Enemy } from 'app/content/enemy';
 import { AstralProjection } from 'app/content/objects/astralProjection';
 import { zones } from 'app/content/zones';
@@ -118,12 +119,13 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
         return;
     }
     if (hero.isUsingDoor) {
+        const isUsingStairs = (hero.actionTarget as Door).isStairs?.(state);
         hero.action = 'walking';
         hero.animationTime += FRAME_LENGTH;
         // Automatically move the hero forward in the direction set by the door, ignoring obstacles.
         // Reduce speed to the regular screen transition speed if the player transitions screens while
         // moving through the door.
-        const speed = state.nextAreaInstance ? 0.75 : 2;
+        const speed = isUsingStairs ? 0.75 : (state.nextAreaInstance ? 0.75 : 2);
         hero.x += speed * hero.actionDx;
         hero.y += speed * hero.actionDy;
         // This makes sure the hero displays as swimming/climbing.

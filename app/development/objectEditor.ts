@@ -113,8 +113,17 @@ export function createObjectDefinition(
                 targetZone: definition.targetZone,
                 targetObjectId: definition.targetObjectId,
                 d: definition.d || 'up',
+                locationCue: definition.locationCue,
                 saveStatus: definition.saveStatus,
                 status: definition.status || commonProps.status,
+            };
+        case 'marker':
+            return {
+                ...commonProps,
+                locationCue: definition.locationCue,
+                saveStatus: definition.saveStatus,
+                status: definition.status || commonProps.status,
+                type: definition.type,
             };
         case 'boss': {
             const bossType = definition.enemyType;
@@ -227,7 +236,6 @@ export function createObjectDefinition(
         }
         case 'airBubbles':
         case 'beadGrate':
-        case 'marker':
         case 'pushPull':
         case 'rollingBall':
         case 'tippable':
@@ -521,6 +529,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                     updateObjectInstance(state, object);
                 },
             });
+            // This intentionally continue on to the marker properties.
         case 'pitEntrance':
         case 'teleporter':
             const zoneKeys = Object.keys(zones);
@@ -561,6 +570,16 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             } else {
                 rows.push(`No objects of type ${targetType}`);
             }
+            // This intentionally continue on to the marker properties.
+        case 'marker':
+            rows.push({
+                name: 'Cue',
+                value: object.locationCue || '',
+                onChange(locationCue: string) {
+                    object.locationCue = locationCue;
+                    updateObjectInstance(state, object);
+                },
+            });
             break;
         case 'bigChest':
         case 'chest':

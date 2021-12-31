@@ -264,7 +264,7 @@ const warTempleStart = applyItems(tombBossState, {maxLife: 1, spiritSight: 1},
     ['tombBoss', 'warTempleEntrance', 'tombTeleporter']);
 const warTempleBoss = applyItems(warTempleStart, {gloves: 1, 'warTemple:bigKey': 1});
 const cocoonStartState = applyItems(warTempleBoss, {maxLife: 1, astralProjection: 1}, ['warTempleBoss', 'tombExit']);
-const cocoonBossState = applyItems(cocoonStartState, {cloak: 1}, ['warTempleBoss']);
+const cocoonBossState = applyItems(cocoonStartState, {'cocoon:bigKey': 1}, []);
 const helixStartState = applyItems(cocoonBossState, {maxLife: 1, teleportation: 1},
     ['cocoonTeleporter', 'lakeTunneBoss']);
 helixStartState.savedHeroData.rightTool = 'cloak';

@@ -2345,7 +2345,7 @@ const f0_2x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "craterEntrance", x: 32, y: 496, type: "door", style: "wideEntrance", targetZone: "sky", targetObjectId: "craterEntrance", d: "down"},
+        {status: "normal", id: "craterEntrance", x: 32, y: 496, type: "door", style: "wideEntrance", targetZone: "sky", targetObjectId: "craterEntrance", d: "down", locationCue: "Crater"},
         {status: "normal", id: "craterBossPortal", x: 96, y: 304, targetZone: "crater", targetObjectId: "craterBossPortal", type: "teleporter", hasCustomLogic: true, customLogic: "flameBeast"},
         {status: "normal", id: "craterLava2", x: 224, y: 112, type: "floorSwitch", saveStatus: "forever", hasCustomLogic: true, customLogic: "craterLava1"},
         {status: "normal", id: "craterBigMoney", x: 336, y: 16, type: "chest", lootType: "money", lootAmount: 100, lootLevel: 1},

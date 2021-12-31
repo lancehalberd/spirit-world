@@ -2,17 +2,17 @@ import { editingState } from 'app/development/tileEditor';
 
 import {
     DrawPriority, GameState, ObjectInstance,
-    ObjectStatus, Rect, SimpleObjectDefinition,
+    ObjectStatus, Rect, MarkerDefinition,
 } from 'app/types';
 
 
 export class Marker implements ObjectInstance {
     drawPriority: DrawPriority = 'background';
-    definition: SimpleObjectDefinition = null;
+    definition: MarkerDefinition = null;
     x: number;
     y: number;
     status: ObjectStatus = 'normal';
-    constructor(definition: SimpleObjectDefinition) {
+    constructor(definition: MarkerDefinition) {
         this.definition = definition;
         this.x = definition.x;
         this.y = definition.y;

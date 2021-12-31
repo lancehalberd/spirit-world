@@ -7,7 +7,7 @@ import {
     Rect, StaffTowerLocation, TileBehaviors,
 } from 'app/types';
 
-export type DrawPriority = 'background' | 'foreground' | 'sprites'
+export type DrawPriority = 'background' | 'foreground' | 'sprites' | 'hud';
 
 export interface ObjectInstance {
     area?: AreaInstance,
@@ -215,6 +215,13 @@ export interface EntranceDefinition extends BaseObjectDefinition {
     // the randomizer logic. This value is calculated by the randomizer logic if it is not
     // manually set.
     requiredKeysForLogic?: number,
+    // This message will be displayed as a location indicator when arriving at this entrance.
+    locationCue?: string,
+}
+export interface MarkerDefinition extends BaseObjectDefinition {
+    type: 'marker',
+    // This message will be displayed as a location indicator when arriving at this entrance.
+    locationCue?: string,
 }
 
 export interface SignDefinition extends BaseObjectDefinition {
@@ -230,7 +237,7 @@ export interface NPCDefinition extends BaseObjectDefinition {
     dialogue?: string,
 }
 
-export type SimpleObjectType = 'airBubbles' | 'beadGrate' | 'marker' | 'pushPull' | 'rollingBall'
+export type SimpleObjectType = 'airBubbles' | 'beadGrate' | 'pushPull' | 'rollingBall'
     | 'tippable' | 'torch' | 'vineSprout' | 'waterPot';
 
 export interface SimpleObjectDefinition extends BaseObjectDefinition {
@@ -293,6 +300,7 @@ export type ObjectDefinition = SimpleObjectDefinition
     | FloorSwitchDefinition
     | KeyBlockDefinition
     | LootObjectDefinition
+    | MarkerDefinition
     | NarrationDefinition
     | NPCDefinition
     | SignDefinition

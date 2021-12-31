@@ -89,7 +89,7 @@ const f0_0x0: AreaDefinition = {
     ],
     objects: [
         {id: "elderEntrance", spirit: false, status: "normal", x: 112, y: 480, type: "door", style: "cave", targetZone: "overworld", targetObjectId: "elderEntrance", d: "down"},
-        {id: "elderDownstairs", spirit: false, status: "normal", x: 64, y: 256, type: "door", style: "cave", targetZone: "treeVillage", targetObjectId: "elderUpstairs", d: "up"},
+        {id: "elderDownstairs", spirit: false, status: "normal", x: 64, y: 256, type: "door", style: "cavernDownstairs", targetZone: "treeVillage", targetObjectId: "elderUpstairs", d: "up"},
         {status: "normal", type: "npc", x: 128, y: 336, d: "down", behavior: "none", style: "vanara", dialogueKey: "elder", id: "treeVillage:0:0x0-npc-0"},
     ],
     sections: [
@@ -200,7 +200,7 @@ const f1_0x0: AreaDefinition = {
         },
     ],
     objects: [
-        {id: "elderUpstairs", spirit: false, status: "normal", x: 64, y: 256, type: "door", style: "cave", targetZone: "treeVillage", targetObjectId: "elderDownstairs", d: "up"},
+        {id: "elderUpstairs", spirit: false, status: "normal", x: 64, y: 256, type: "door", style: "cavernUpstairs", targetZone: "treeVillage", targetObjectId: "elderDownstairs", d: "up"},
         {id: "treeVillage:1:0x0-tippable-0", linked: false, spirit: false, status: "normal", x: 176, y: 304, type: "tippable"},
         {id: "treeVillage:1:0x0-floorSwitch-0", linked: false, spirit: false, status: "normal", x: 192, y: 304, type: "floorSwitch", targetObjectId: "elderPeachPiece", toggleOnRelease: false},
         {id: "elderPeachPiece", linked: false, spirit: false, status: "hiddenSwitch", x: 176, y: 352, type: "chest", lootType: "peachOfImmortalityPiece", lootLevel: 0, lootAmount: 1},
