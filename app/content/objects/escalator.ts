@@ -29,7 +29,9 @@ const createHorizontalBelt = async () => {
 createHorizontalBelt();
 debugCanvas;//(beltCanvas);
 
-export const escalatorStyles: {[key: string]: {[key in Direction]?: Frame}} = {
+type FrameWithPattern = Frame & { pattern?: CanvasPattern};
+
+export const escalatorStyles: {[key: string]: {[key in Direction]?: FrameWithPattern}} = {
     escalator: {
         up: woodenStairs,
         down: woodenStairs,
@@ -125,18 +127,20 @@ export class Escalator implements ObjectInstance {
             }
         }
     }
-    render(context, state: GameState) {
+    render(context: CanvasRenderingContext2D, state: GameState) {
         const style = escalatorStyles[this.definition.style as keyof typeof escalatorStyles] || escalatorStyles.belt;
         const frame = style[this.definition.d];
         if (!frame) {
             debugger;
         }
-        const [patternCanvas, patternContext] = createCanvasAndContext(frame.w, frame.h);
-        drawFrameAt(patternContext, frame, {x: 0, y: 0});
-        const pattern = context.createPattern(patternCanvas, 'repeat');
+        if (!frame.pattern ) {
+            const [patternCanvas, patternContext] = createCanvasAndContext(frame.w, frame.h);
+            drawFrameAt(patternContext, frame, {x: 0, y: 0});
+            frame.pattern = context.createPattern(patternCanvas, 'repeat');
+        }
         context.save();
             context.translate(this.offsetX, this.offsetY);
-            context.fillStyle = pattern;
+            context.fillStyle = frame.pattern;
             context.fillRect(this.x - this.offsetX, this.y - this.offsetY, this.definition.w, this.definition.h);
         context.restore();
     }
