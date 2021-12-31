@@ -23,6 +23,7 @@ import {
     saveGame,
     selectSaveFile,
     setSaveFileToState,
+    showHint,
 } from 'app/state';
 import { updateCamera } from 'app/updateCamera';
 import { updateField } from 'app/updateField';
@@ -220,11 +221,21 @@ function updateMenu(state: GameState) {
     }
     if (state.menuRow === 0) {
         // The first row is for selecting tools.
-        const selectedTool = selectableTools[state.menuIndex];
+        const numberOfOptions = selectableTools.length + 1;
+        const toolIndex = state.menuIndex - 1;
+        const selectedTool = selectableTools[toolIndex];
         if (wasGameKeyPressed(state, GAME_KEY.LEFT)) {
-            state.menuIndex = (state.menuIndex + selectableTools.length - 1) % selectableTools.length;
+            state.menuIndex = (state.menuIndex + numberOfOptions - 1) % numberOfOptions;
         } else if (wasGameKeyPressed(state, GAME_KEY.RIGHT)) {
-            state.menuIndex = (state.menuIndex + 1) % selectableTools.length;
+            state.menuIndex = (state.menuIndex + 1) % numberOfOptions;
+        } else if (state.menuIndex === 0 && (
+            wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL)
+            || wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL)
+            || wasGameKeyPressed(state, GAME_KEY.WEAPON)
+        )) {
+            state.paused = false;
+            showHint(state);
+            return;
         } else if (wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL)) {
             if (state.hero.rightTool === selectedTool) {
                 state.hero.rightTool = state.hero.leftTool;

@@ -1,5 +1,6 @@
 import { getLootFrame, normalBoots, neutralElement } from 'app/content/lootObject';
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
+import { characterMap } from 'app/utils/simpleWhiteFont';
 import { createAnimation, drawFrame, drawFrameCenteredAt } from 'app/utils/animations';
 import { fillRect, pad } from 'app/utils/index';
 
@@ -62,6 +63,13 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
             selectableItemFrames.push(target);
         }
     }
+    let target = {w: frameSize, h: frameSize, x, y};
+    let frame = characterMap['?'];
+    drawFrameCenteredAt(context, frame, target);
+    if (state.menuRow === 0) {
+        selectableItemFrames.push(target);
+    }
+    x += 30;
     if (state.hero.activeTools.bow) {
         renderSelectableTool('bow');
     }
@@ -98,8 +106,8 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
     }
 
     x = r.x, y += frameSize + 2;
-    let frame = normalBoots;
-    let target = {x, y, w: frameSize, h: frameSize};
+    frame = normalBoots;
+    target = {x, y, w: frameSize, h: frameSize};
     //fillRect(context, target, 'black');
     if (!state.hero.equipedGear.ironBoots && !state.hero.equipedGear.cloudBoots) {
         fillRect(context, target, 'white');

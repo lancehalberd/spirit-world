@@ -23,7 +23,6 @@ Graphics:
 
 Current tasks:
     - Bug fixes
-        - Opening editor while jumping with a door on the screen while paused crashes the game.
         - Clone tool bugs
             - Mana regen is wrong when using clone tools (seems to multiply consumption/regen by number of clones)
             - Should destroy clones when the clone technique is unequipped.
@@ -35,8 +34,6 @@ Current tasks:
         - Picked up items are invisible while using cloak
         - Piercing projectiles that can push things should be stopped by the first object they push
             or not be able to push additional objects, for example, the charged chakram.
-
-    - Alvaro suggests adding an element to the menu to trigger the current help dialog.
 
     Make mutation transition use the same area instance so contents don't reset
         - Will need to add special handling to remove extra ice tiles from frost beast+heat sink battles.
