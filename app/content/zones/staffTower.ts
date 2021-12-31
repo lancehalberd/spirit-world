@@ -224,6 +224,7 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 352, y: 336, speed: "slow", d: "down", w: 16, h: 96, style: "belt", type: "escalator"},
         {status: "normal", id: "", x: 256, y: 352, speed: "slow", d: "up", w: 16, h: 96, style: "belt", type: "escalator"},
         {status: "normal", id: "", x: 256, y: 336, speed: "slow", d: "right", w: 96, h: 16, style: "belt", type: "escalator"},
+        {status: "normal", id: "staffTower:0:0x0-lightningDrone-0", x: 128, y: 336, type: "enemy", enemyType: "lightningDrone", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},

@@ -288,7 +288,7 @@ const preloadSounds = () => {
         //{key: 'enemyHit', source: 'sfx/cloneExplosion.wav',
         //     offset: '200:300', volume: 10, limit: 2},
         {key: 'enemyHit', source: 'sfx/enemyDeath.wav',
-             offset: '300:200', volume: 10, limit: 2},
+             offset: '300:200', volume: 20, limit: 2},
         //{key: 'enemyDeath', source: 'sfx/enemyDeath.wav',
         //     offset: '170:300', volume: 10, limit: 2},
         {key: 'enemyDeath', source: 'sfx/enemy death.wav', volume: 5, limit: 2},

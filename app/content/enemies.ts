@@ -35,6 +35,7 @@ import {
     TileBehaviors,
 } from 'app/types';
 
+export * from 'app/content/enemies/lightningDrone';
 
 export const enemyTypes = <const>[
     'arrowTurret',
@@ -43,7 +44,7 @@ export const enemyTypes = <const>[
     'ent',
     'flameSnake', 'frostBeetle',
     'floorEye',
-    'lightningBug',
+    'lightningBug', 'lightningDrone',
     'snake',
     'wallLaser',
 ];
@@ -651,7 +652,7 @@ export function getVectorToTarget(state: GameState, source: ObjectInstance, targ
     return null;
 }
 
-export function getVectorToNearbyTarget(state: GameState, source: ObjectInstance, radius: number, targets: ObjectInstance[]): {x: number, y: number} {
+export function getVectorToNearbyTarget(state: GameState, source: ObjectInstance, radius: number, targets: ObjectInstance[]): {x: number, y: number, mag: number} | null {
     const hitbox = source.getHitbox(state);
     for (const target of targets) {
         if (!target || target.area !== source.area || !target.getHitbox) {
@@ -662,7 +663,7 @@ export function getVectorToNearbyTarget(state: GameState, source: ObjectInstance
         const dy = (targetHitbox.y + targetHitbox.h / 2) - (hitbox.y + hitbox.h / 2);
         const mag = Math.sqrt(dx * dx + dy * dy);
         if (mag <= radius) {
-            return {x: dx / mag, y: dy / mag};
+            return {x: dx / mag, y: dy / mag, mag};
         }
     }
     return null;
