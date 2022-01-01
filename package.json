@@ -9,10 +9,11 @@
     "server": "node server"
   },
   "dependencies": {
-    "howler": "^2.1.3",
+    "howler": "^2.2.3",
     "lodash": "^4.17.19"
   },
   "devDependencies": {
+    "@types/howler": "^2.2.4",
     "@types/lodash": "^4.14.149",
     "express": "4.15.4",
     "ts-loader": "^8.0.11",

@@ -1,8 +1,12 @@
-import {Howl/*, Howler*/} from 'howler';
+import {Howl} from 'howler';
 
 /* globals setTimeout, Set, Map */
 const sounds = new Map();
 window['sounds'] = sounds;
+let audioUnlocked = false;
+export function unlockAudio() {
+    audioUnlocked = true;
+}
 
 export function requireSound(key, callback = null) {
     let source, loop, offset, volume, duration, limit, repeatFrom, nextTrack, type = 'default';
@@ -26,22 +30,30 @@ export function requireSound(key, callback = null) {
     if (type === 'bgm') {
         const howlerProperties: any = {
             src: [source],
-            loop: true,
+            html5: true,
+            loop: false,
             volume: volume / 50,
             // Stop the track when it finishes fading out.
             onfade: function () {
-                //console.log('finished fade', newSound.props.src, newSound.shouldPlay, this.volume());
+                //console.log('finished fade', newSound.props.src, newSound.shouldPlay, newSound.howl.volume());
                 // console.log(id, 'fadein', currentTrackSource, key, this.volume());
                 // Documentation says this only runs when fade completes,
                 // but it seems to run at the start and end of fades.
                 if (!newSound.shouldPlay) {
                     //console.log('Stopping from onFade ', newSound.props.src);
-                    this.stop();
+                    newSound.howl.stop();
                     // this.volume(volume / 50);
                 }
             },
-            onplay: function () {
-                trackIsPlaying = true;
+            onplay() {
+                //console.log('onplay', newSound.props.src, newSound.shouldFadeIn);
+                if (newSound.shouldFadeIn) {
+                    //console.log('newSound.howl.fade', newSound.targetVolume);
+                    newSound.howl.fade(0, newSound.targetVolume, 1000);
+                }
+            },
+            onplayerror: function (error) {
+                //console.log('onplayerror', newSound.props.src, error);
             },
             onload: function () {
                 if (callback) {
@@ -49,21 +61,17 @@ export function requireSound(key, callback = null) {
                 }
             },
         };
-        if (repeatFrom) {
-            howlerProperties.onend = function() {
-                // console.log('onend', repeatFrom, currentTrackSource, key);
-                // Only repeat the track on end if it matches
-                // the current track source still.
-                // I don't think this was necessary but leaving it in comments in case.
-                //if (playingTracks.includes(newSound)) {
-                this.seek((repeatFrom || 0) / 1000);
-                //}
-            };
-        }
+        howlerProperties.onend = function() {
+            //console.log('onend repeatFrom', repeatFrom, newSound.props.src, key);
+            newSound.shouldFadeIn = false;
+            newSound.howl.seek((repeatFrom || 0) / 1000);
+            newSound.howl.play();
+        };
         // A track can specify another track source to automatically transition to without crossfade.
         if (nextTrack) {
             howlerProperties.onend = function() {
-                this.stop();
+                //console.log('onend nextTrack', repeatFrom, newSound.props.src, key);
+                newSound.howl.stop();
                 playingTracks = [];
                 window['playingTracks'] = playingTracks;
                 playTrack(nextTrack, 0, this.mute(), false, false);
@@ -87,6 +95,7 @@ export function requireSound(key, callback = null) {
                     playingSounds.add(newSound);
                 }
                 newSound.activeInstances++;
+                audioUnlocked = true;
                 //console.log('playing sound', newSound.activeInstances);
             },
             onstop: function () {
@@ -195,6 +204,9 @@ const musicTracks = {
 };
 type TrackKey = keyof typeof musicTracks;
 export function playTrack(trackKey: TrackKey, timeOffset, muted = false, fadeOutOthers = true, crossFade = true) {
+    if (!audioUnlocked) {
+        return;
+    }
     const sound = requireSound(musicTracks[trackKey]);
     if (!sound.howl || !sound.howl.duration()) {
         return false;
@@ -224,15 +236,23 @@ export function playTrack(trackKey: TrackKey, timeOffset, muted = false, fadeOut
     if (sound.howl.duration()) {
         offset = offset % sound.howl.duration();
     }
-    // console.log(timeOffset, sound.howl.duration(), offset);
+    //console.log('play', sound.props.src, timeOffset, sound.howl.duration(), offset);
+    //sound.howl.seek(offset);
     sound.howl.seek(offset);
     sound.howl.play();
+    sound.targetVolume = volume;
     sound.shouldPlay = true;
     // console.log({volume});
     // console.log('fade in new track', sound);
     //console.log('Fade in ' + sound.props.src);
-    if (crossFade) sound.howl.fade(0, volume, 1000);
-    else sound.howl.volume(volume);
+    if (crossFade) {
+        //console.log('fade in', sound.props.src, sound.howl.volume(), sound.howl.seek(), volume);
+        sound.shouldFadeIn = true;
+    } else {
+        //console.log('hard start', volume);
+        sound.howl.volume(volume);
+        sound.shouldFadeIn = false;
+    }
     sound.howl.mute(muted);
     playingTracks.push(sound);
     return sound;
@@ -261,7 +281,7 @@ function fadeOutPlayingTracks(currentTracks = []) {
 function stopTrack() {
     trackIsPlaying = false;
     for (const playingTrack of playingTracks) {
-        // console.log('Stopping from stopTrack ', playingTrack.props.src);
+        //console.log('Stopping from stopTrack ', playingTrack.props.src);
         playingTrack.howl.stop();
     }
     playingTracks = [];
@@ -277,6 +297,7 @@ export function isTrackPlaying(trackKey: TrackKey): boolean {
 
 const preloadSounds = () => {
     [
+        {key: 'menuTick', source: 'sfx/Cube click_odrive.wav', volume: 10, offset: '0:200', limit: 2},
         {key: 'switch', source: 'sfx/Diamond 1_odrive_bip.wav', volume: 10, limit: 2},
         {key: 'smallSwitch', source: 'sfx/Cube click 2_Ocrive.wav', volume: 10, limit: 2},
         {key: 'rollingBall', source: 'sfx/rollingBall.wav',
@@ -312,7 +333,6 @@ const preloadSounds = () => {
         {key: 'secretChime', source: 'sfx/chime 14_1.wav', volume: 4, limit: 2},
         {key: 'bigSuccessChime', source: 'sfx/chime 06.wav', offset: '0:2000', volume: 4, limit: 2},
         {key: 'smallSuccessChime', source: 'sfx/chime 15.wav', offset: '0:2000', volume: 4, limit: 2},
-        musicTracks.mainTheme,
     ].forEach(sound => requireSound(sound));
 };
 preloadSounds();

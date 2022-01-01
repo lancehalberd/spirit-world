@@ -85,7 +85,7 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
     if (state.hero.activeTools.clone) {
         renderSelectableTool('clone');
     }
-    x += 60;
+    x += 35;
 
     if (state.hero.weapon) {
         const frame = getLootFrame(state, { lootType: 'weapon', lootLevel: state.hero.weapon });

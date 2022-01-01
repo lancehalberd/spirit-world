@@ -28,6 +28,7 @@ import {
 import { updateCamera } from 'app/updateCamera';
 import { updateField } from 'app/updateField';
 import { areAllImagesLoaded } from 'app/utils/images';
+import { playSound } from 'app/utils/sounds';
 
 import { ActiveTool, DialogueLootDefinition, Equipment, GameState, MagicElement } from 'app/types';
 
@@ -94,9 +95,11 @@ function updateTitle(state: GameState) {
     if (wasGameKeyPressed(state, GAME_KEY.UP)) {
         state.menuIndex = (state.menuIndex - 1 + options.length) % options.length;
         changedOption = true;
+        playSound('menuTick');
     } else if (wasGameKeyPressed(state, GAME_KEY.DOWN)) {
         state.menuIndex = (state.menuIndex + 1) % options.length;
         changedOption = true;
+        playSound('menuTick');
     }
     if (changedOption) {
         if (state.scene === 'title' || state.scene === 'deleteSavedGame') {
@@ -106,6 +109,7 @@ function updateTitle(state: GameState) {
         }
     }
     if (wasConfirmKeyPressed(state)) {
+        playSound('menuTick');
         switch (state.scene) {
             case 'deleteSavedGameConfirmation':
                 if (state.menuIndex === 1) {

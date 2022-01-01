@@ -6,6 +6,7 @@ import { selectSection, toggleEditing } from 'app/development/tileEditor';
 import { updateObjectInstance } from 'app/development/objectEditor';
 import { GAME_KEY } from 'app/gameConstants';
 import { getState } from 'app/state';
+import { unlockAudio } from 'app/utils/sounds';
 
 import { GameState, Hero } from 'app/types'
 
@@ -142,6 +143,7 @@ export function addKeyCommands() {
     document.addEventListener('keyup', function(event) {
         const keyCode: number = event.which;
         keysDown[keyCode] = null;
+        unlockAudio();
     });
     document.addEventListener('keydown', function(event: KeyboardEvent) {
         if (event.repeat) {
