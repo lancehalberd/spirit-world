@@ -40,7 +40,21 @@ Current tasks:
     Make mutation transition use the same area instance so contents don't reset
         - Will need to add special handling to remove extra ice tiles from frost beast+heat sink battles.
 
+    Storm Beast
+        - Storm Heart is protected by a layer of bouncy clouds that the MC can slowly deform to reveal the heart. The clouds reform slowly over time.
+        - Storm Heart uses a large discharge attack a few seconds after taking damage, which also full restores the clouds.
+        - Storm Heart summons lightning bolts while enraged.
+        - Storm Beast flies in and out of the battle field.
+        - Storm Beast can turn into lightning and teleport as a beam sending shockwaves out at both ends.
+        - Storm Beast can charge south to exit the battle field
+
     Staff Tower
+        - Lightning barriers
+            - Deal 4 lightning damage and knock the player back.
+                - Player is still knocked back with spirit barrier or iframes.
+                - Invisibility allows the player to pass through unharmed.
+            - Can be permanently on, toggled on/off on timer, or toggled by switches
+            - Shows a 500ms warning when about to turn on, maybe sparks on either end of where the beam will be, or a smaller non damaging beam.
         - Elevator only in spirit world (similar to cocoon)
             - Trying to open the elevator on the first floor will give a message about power flow in the spirit world being disrupted by excess energy in the material world. Maybe something about starting backup power.
             - Elevator is stuck on floor 3
@@ -50,12 +64,6 @@ Current tasks:
         - Maybe stairs connect only pairs of floors in each world:
             - 1 is isolated in material world, but 2+3 are connected, and 4+5, etc
             - 1+2, 3+4, 5+6 are connected in the spirit world.
-        - Lightning barriers
-            - Deal 4 lightning damage and knock the player back.
-                - Player is still knocked back with spirit barrier or iframes.
-                - Invisibility allows the player to pass through unharmed.
-            - Can be permanently on, toggled on/off on timer, or toggled by switches
-            - Shows a 500ms warning when about to turn on, maybe sparks on either end of where the beam will be, or a smaller non damaging beam.
         - All machine enemies have an offline state where they cannot be damaged, and possibly can be pushed around.
             - Hitting offline machines with lightning will turn them on.
             - Machines all default to offline except in the material world when the Storm Beast is active.
@@ -73,15 +81,6 @@ Current tasks:
         - Slow Conveyer belt puzzle with out of sync lightning barriers across it.
         - Disabled conveyer belt with pots on it that needs to be turned on to move the pots out of the way.
 
-    Storm Beast
-        - Storm Heart is protected by a layer of bouncy clouds that the MC can slowly deform to reveal the heart. The clouds reform slowly over time.
-        - Storm Heart uses a large discharge attack a few seconds after taking damage, which also full restores the clouds.
-        - Storm Heart summons lightning bolts while enraged.
-        - Storm Beast flies in and out of the battle field.
-        - Storm Beast can turn into lightning and teleport as a beam sending shockwaves out at both ends.
-        - Storm Beast can charge south to exit the battle field
-
-
     - Randomizer improvements
         - Add a goal
     - brainstorm some dungeon/boss ideas, maybe for Staff Tower
@@ -95,9 +94,6 @@ Current tasks:
 
     - Change message rendering system to use the priority queue system to support nested messages.
     - Add new waterfall graphics
-    - Add touchHit behavior to tiles that can define full hit properties for tiles/objects on touch
-        - Add 'barrierDamage' to hit properties that will control exact magic damage when hitting the spirit barrier.
-        - Set barrierDamage lower for clearable traps like thorns to allow players to walk through and clear them using spirit barrier. Set even lower for floor traps that cannot be cleared since they will hit every frame.
 
 
 
@@ -190,13 +186,12 @@ Difficulty shrine:
     - easier traps (disable conveyer belts, remove spikes)
     - easier puzzles (required chests are made distinct from optional chests, positions of required items are moved to more easily accessible locations)
 
-Spirit Barrier Improvements
+Spirit Cloak Improvements
     - Need a way to optionally enable invisibility
         - Invisibility should make you mostly invulnerable but drain mana over time.
         - No barrier while invisible.
         - Press once for a barrier, a second time to turn invisible, and a third time to disable both?
         - Press twice quickly to turn invisible?
-    - Charge adds element effect to barrier and reduces spirit loss to damage of that type
     - Enemies should not be able to target you while invisible.
     - Make invisibility ignore certain ground effects+hazards: spikes, ice floor, fire barriers
     - Can move through activatable crystals and some other obstacles.
@@ -252,17 +247,7 @@ Waterfall Tower Improvments:
     - Make bead flows act like shallow water for when you are walking in them?
         - This might not be the right animation for beads though.
     - Missing mechanics
-        Make Crystal Spikes uncover the tiles they hit.
-            - Add uncover effect to hits.
-        Bead flows
-            It would be nice to somehow treat the south edge of the flow as a wall when walking north, the current treatment is jittery with the knockback.
         Rusty floor switch that only activates if you fall on it wearing iron boots.
-    - Boss: Crystal Collector
-        - Add better spike attacks for main phase
-        - Add better spike attacks for enrage
-        - Passively summon spikes periodically whenever there are no floor eyes.
-        - Passively enable bead cascades for 4 seconds every 5 seconds
-            - Reduce to every 3 seconds for the final phase
 
 River Temple Improvements:
     - Some underwater enemies
@@ -368,21 +353,20 @@ Possible tool: Leather boots let you walk on thorny ground without taking damage
 Paths to Elemental Beast Dungeons:
 
 River Temple:
-    Iron Boots(Waterfall Tower) -> Peach Cave -> Underwater Entrance
+    (Implemented) Iron Boots(Waterfall Tower) -> Peach Cave -> Underwater Entrance
     Cloud Boots(Forest Temple) + Fire(Crater) -> Crater sky path to Temple roof opens after defeating Fire Elemental
     Cloud Boots(Forest Temple) + Lightning(Staff Tower) -> Tower B sky path connects to Temple roof
 
 
 Staff Tower:
     Fire(Crater) -> Blow up pots in front of escalator using fire on explosive plants
-    Clone(Forest Temple) -> Blow up pots in front of escalator with clone
+    (Implemented) Clone(Forest Temple) -> Blow up pots in front of escalator with clone
     Ice(River Temple) -> Use ice magic to freeze the down escalator and walk up it.
-    Cloud Boots(Forest Temple) -> Use cloud boots to walk up the down escalator
-    Cloud Boots(Forest Temple) -> Sky path from Helix to Tower Balcony?
-    Staff + Roll 2(Cloud Temple) -> Double roll up the down escalator?
+    (Implemented) Cloud Boots(Forest Temple) -> Use cloud boots to walk up the down escalator
+    Cloud Boots(Forest Temple) -> Sky path from Helix to Tower Balcony
 
 Crater:
-    Cloud Boots(Forest Temple) -> Sky path from Helix to Crater Peak
+    (Implemented) Cloud Boots(Forest Temple) -> Sky path from Helix to Crater Peak
     Cloud Boots(Forest Temple) + Tower Staff(Staff Tower) + Ice(River Temple) =>  Tower B Sky path connects to Crater Peak
     Ice(River Temple) -> Use Ice to pass lava in cave to Crater Peak
 

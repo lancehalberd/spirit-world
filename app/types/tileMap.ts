@@ -1,6 +1,6 @@
 import {
-    DrawPriority, Enemy,
-    Frame, LogicDefinition, LootTable, MagicElement,
+    DrawPriority, Enemy, Frame,
+    HitProperties, LogicDefinition, LootTable, MagicElement,
     ObjectDefinition, ObjectInstance,
     Rect,
 } from 'app/types';
@@ -21,8 +21,8 @@ export interface TileBehaviors {
     cloudGround?: boolean
     // Can be destroyed by weapon
     cuttable?: number
-    // Deals damage on contact
-    damage?: number
+    // Hit applies to enemies/heroes on contact.
+    touchHit?: HitProperties
     // Special development flag indicating that this tile has been deleted from the game
     // and its index is available to be used by a new tile type.
     deleted?: boolean

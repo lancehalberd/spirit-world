@@ -151,7 +151,7 @@ enemyDefinitions.ent = {
     ignorePits: true,
     // The damage from tile behaviors will trigger when the player attempts to move into the same pixel,
     // which is more specific than touch damage on enemies which requires actually being in the same pixel.
-    tileBehaviors: {damage: 2, solid: true},
+    tileBehaviors: {touchHit: { damage: 2}, solid: true},
 };
 
 enemyDefinitions.crystalGuardian = {
@@ -194,7 +194,7 @@ enemyDefinitions.crystalGuardian = {
     ignorePits: true,
     // The damage from tile behaviors will trigger when the player attempts to move into the same pixel,
     // which is more specific than touch damage on enemies which requires actually being in the same pixel.
-    tileBehaviors: {damage: 2, solid: true},
+    tileBehaviors: {touchHit: {damage: 2 }, solid: true},
     renderOver(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
         const defaultParams = enemyDefinitions.crystalGuardian.params;
         if (enemy.params.shieldLife <= 0) {

@@ -150,6 +150,7 @@ interface Props {
     vx?: number
     vy?: number
     damage?: number
+    spiritCloakDamage?: number
     // Don't update until this many frames have passed
     delay?: number
     // Don't collide with walls for this many milliseconds.
@@ -164,6 +165,7 @@ export class Arrow implements ObjectInstance {
     definition = null;
     frame: Frame;
     damage: number;
+    spiritCloakDamage: number;
     delay: number;
     ignoreWallsDuration: number;
     element: MagicElement = null;
@@ -183,7 +185,7 @@ export class Arrow implements ObjectInstance {
     stuckFrames: number = 0;
     status: ObjectStatus = 'normal';
     style: ArrowStyle = 'normal';
-    constructor({x = 0, y = 0, vx = 0, vy = 0, damage = 1, delay = 0, element = null, reflected = false, style = 'normal',
+    constructor({x = 0, y = 0, vx = 0, vy = 0, damage = 1, spiritCloakDamage = 5, delay = 0, element = null, reflected = false, style = 'normal',
         ignoreWallsDuration = 0,
     }: Props) {
         this.x = x | 0;
@@ -192,6 +194,7 @@ export class Arrow implements ObjectInstance {
         this.vy = vy;
         this.direction = getDirection(this.vx, this.vy, true);
         this.damage = damage;
+        this.spiritCloakDamage = spiritCloakDamage;
         this.delay = delay;
         this.ignoreWallsDuration = ignoreWallsDuration;
         this.element = element;
@@ -207,6 +210,7 @@ export class Arrow implements ObjectInstance {
             canPush: true,
             direction: this.direction,
             damage: this.damage,
+            spiritCloakDamage: this.spiritCloakDamage,
             hitbox: this,
             tileHitbox: {
                 w: this.w,
@@ -318,6 +322,7 @@ export class EnemyArrow extends Arrow {
         return {
             canPush: false,
             damage: this.damage,
+            spiritCloakDamage: this.spiritCloakDamage,
             direction: this.direction,
             hitbox: this,
             tileHitbox: {
@@ -355,6 +360,7 @@ export class CrystalSpike extends Arrow {
         return {
             canPush: false,
             damage: this.damage,
+            spiritCloakDamage: this.spiritCloakDamage,
             canDamageCrystalShields: true,
             direction: this.direction,
             hitbox: this,

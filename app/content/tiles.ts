@@ -74,7 +74,7 @@ const lowWallBehavior: TileBehaviors = {
 const pitBehavior: TileBehaviors = { defaultLayer: 'field', pit: true };
 const thornBehavior: TileBehaviors = {
     defaultLayer: 'field',
-    low: true, damage: 1, cuttable: 1,
+    low: true, touchHit: {damage: 1, spiritCloakDamage: 5, isGroundHit: true }, cuttable: 1,
     underTile: 23,
     particles: thornParticles,
     linkedOffset: 179,
@@ -1163,7 +1163,7 @@ addTiles([
     // This is the empty tile.
     singleTileSource('gfx/tiles/bush.png', {defaultLayer: 'field'}, -16),
     singleTileSource('gfx/tiles/bush.png', bushBehavior, 0),
-    singleTileSource('gfx/tiles/cactussheet.png', {...bushBehavior, damage: 1}),
+    singleTileSource('gfx/tiles/cactussheet.png', {...bushBehavior, touchHit: { damage: 1, spiritCloakDamage: 5, }}),
     singleTileSource('gfx/tiles/pit.png', pitBehavior),
     singleTileSource('gfx/tiles/thorns.png', thornBehavior),
     singleTileSource('gfx/tiles/rocks.png', lightStoneBehavior),
@@ -1183,7 +1183,7 @@ addTiles([
     },
     singleTileSource('gfx/tiles/bush.png', null, 16),
     singleTileSource('gfx/tiles/thorns.png', null, 16),
-    singleTileSource('gfx/tiles/thornsspirit.png', { damage: 1, defaultLayer: 'field' }),
+    singleTileSource('gfx/tiles/thornsspirit.png', { touchHit: {damage: 1, spiritCloakDamage: 2, isGroundHit: true }, defaultLayer: 'field' }),
     breakableFloor,
     gradientColorTile(['#A08000', '#806000'], 0, 0, 0, 16, southCliffBehavior), // southCliffTop
     solidColorTile('#806000', wallBehavior), // cliffBottom
