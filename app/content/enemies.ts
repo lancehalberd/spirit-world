@@ -25,7 +25,7 @@ import { editingState } from 'app/development/tileEditor';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { moveActor } from 'app/moveActor';
 import { createAnimation } from 'app/utils/animations';
-import { directionMap } from 'app/utils/field';
+import { directionMap, getDirection } from 'app/utils/field';
 import { playSound } from 'app/utils/sounds';
 
 import {
@@ -36,6 +36,7 @@ import {
 } from 'app/types';
 
 export * from 'app/content/enemies/lightningDrone';
+export * from 'app/content/enemies/sentryBot';
 
 export const enemyTypes = <const>[
     'arrowTurret',
@@ -45,7 +46,7 @@ export const enemyTypes = <const>[
     'flameSnake', 'frostBeetle',
     'floorEye',
     'lightningBug', 'lightningDrone',
-    'snake',
+    'sentryBot', 'snake',
     'wallLaser',
 ];
 // Not intended for use in the editor.
@@ -537,6 +538,8 @@ function updateWallLaser(state: GameState, enemy: Enemy): void {
 export function moveEnemyToTargetLocation(state: GameState, enemy: Enemy, tx: number, ty: number): number {
     const hitbox = enemy.getHitbox(state);
     const dx = tx - (hitbox.x + hitbox.w / 2), dy = ty - (hitbox.y + hitbox.h / 2);
+    enemy.d = getDirection(dx, dy);
+    enemy.currentAnimation = enemy.enemyDefinition.animations.idle[enemy.d];
     const mag = Math.sqrt(dx * dx + dy * dy);
     if (mag > enemy.speed) {
         moveEnemy(state, enemy, enemy.speed * dx / mag, enemy.speed * dy / mag, {
