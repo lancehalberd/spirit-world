@@ -359,7 +359,7 @@ function updateCrystalCollector(this: void, state: GameState, enemy: Enemy): voi
         if (enemy.modeTime === 20) {
             summonProjectiles(state, enemy, getNearbyTarget(state, enemy, 1000, enemy.area.allyTargets));
         }
-        if (enemy.modeTime >= 6000 - enrageLevel * 1000) {
+        if (enemy.modeTime >= 4000 - enrageLevel * 500) {
             enemy.setMode('choose');
         }
     }
