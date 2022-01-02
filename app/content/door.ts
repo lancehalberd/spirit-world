@@ -131,8 +131,13 @@ const [
     {left: 368, top: 64, rows: 2}).frames;
 const [
     woodenNorthDoorway,
-] = createAnimation('gfx/tiles/woodhousetilesarranged.png', {w: 32, h: 32},
-    {left: 368, top: 128}).frames;
+] = createAnimation('gfx/tiles/woodhousetilesarranged.png', {w: 32, h: 32}, {left: 368, top: 128}).frames;
+const [
+    woodenStairsUp,
+] = createAnimation('gfx/tiles/woodhousetilesarranged.png', {w: 32, h: 32}, {left: 304, top: 64}).frames;
+const [
+    woodenStairsDown,
+] = createAnimation('gfx/tiles/woodhousetilesarranged.png', {w: 32, h: 32}, {left: 304, top: 96}).frames;
 function renderWoodenDoor(context: CanvasRenderingContext2D, state: GameState, door: Door) {
     if (door.definition.d === 'up') {
         let frame = woodenNorthDoorway, overFrame: Frame = null;
@@ -462,6 +467,38 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
         },
         render: renderCavernDoor,
         renderForeground: renderCavernDoorForeground
+    },
+    woodenDownstairs: {
+        w: 32,
+        h: 32,
+        render(context: CanvasRenderingContext2D, state: GameState, door: Door) {
+            if (door.status !== 'normal') {
+                doorStyles.wooden.render(context, state, door);
+                return;
+            }
+            const frame = woodenStairsDown;
+            drawFrameAt(context, frame, {x: door.x, y: door.y});
+        },
+        renderForeground(context: CanvasRenderingContext2D, state: GameState, door: Door) {
+            const frame = woodenStairsDown;
+            drawFrame(context, {...frame, h: 12}, {...frame, x: door.x, y: door.y, h: 12});
+        }
+    },
+    woodenUpstairs: {
+        w: 32,
+        h: 32,
+        render(context: CanvasRenderingContext2D, state: GameState, door: Door) {
+            if (door.status !== 'normal') {
+                doorStyles.wooden.render(context, state, door);
+                return;
+            }
+            const frame = woodenStairsUp;
+            drawFrameAt(context, frame, {x: door.x, y: door.y});
+        },
+        renderForeground(context: CanvasRenderingContext2D, state: GameState, door: Door) {
+            const frame = woodenStairsUp;
+            drawFrame(context, {...frame, h: 12}, {...frame, x: door.x, y: door.y, h: 12});
+        }
     },
     wooden: {
         w: 64,

@@ -12,6 +12,8 @@ Low Priority Bugs:
     - frost grenade blast isn't centered.
     - Don't open enemy doors when bosses are still alive?
         - Tomb boss door can open when killing snakes in some cases.
+    - Enemies with small hitboxes are checking pixels outside of their hitbox while moving.
+        - For example snakes when moving left/right will be forced to move up if there is a wall to their south.
 
 Graphics:
     Sweat animation when pulling on something you cannot move.
@@ -39,6 +41,21 @@ Current tasks:
         - Will need to add special handling to remove extra ice tiles from frost beast+heat sink battles.
 
     Staff Tower
+        - Elevator only in spirit world (similar to cocoon)
+            - Trying to open the elevator on the first floor will give a message about power flow in the spirit world being disrupted by excess energy in the material world. Maybe something about starting backup power.
+            - Elevator is stuck on floor 3
+            - Disabling emergency breaks in the elevator grants access to the basement+backup generators (mini boss?)
+            - Fixing elevator grants access to upper floors, but last two floors must be done in material world to reach the roof and boss.
+            - 5th floor in spirit world has device for re-activating the tower after defeating elemental beast, which is what gives access to the Tower Staff tool upgrade. This also disables all machine enemies by default.
+        - Maybe stairs connect only pairs of floors in each world:
+            - 1 is isolated in material world, but 2+3 are connected, and 4+5, etc
+            - 1+2, 3+4, 5+6 are connected in the spirit world.
+        - Lightning barriers
+            - Deal 4 lightning damage and knock the player back.
+                - Player is still knocked back with spirit barrier or iframes.
+                - Invisibility allows the player to pass through unharmed.
+            - Can be permanently on, toggled on/off on timer, or toggled by switches
+            - Shows a 500ms warning when about to turn on, maybe sparks on either end of where the beam will be, or a smaller non damaging beam.
         - All machine enemies have an offline state where they cannot be damaged, and possibly can be pushed around.
             - Hitting offline machines with lightning will turn them on.
             - Machines all default to offline except in the material world when the Storm Beast is active.
@@ -46,12 +63,6 @@ Current tasks:
             - Conveyer belts should also effect movable object/enemies on the ground touching them.
             - Ice magic can freeze the conveyer belts which stops them but makes them slippery.
             - Lightning magic will turn a conveyer belt on if it is off.
-        - Lightning barriers
-            - Deal 4 lightning damage and knock the player back.
-                - Player is still knocked back with spirit barrier or iframes.
-                - Invisibility allows the player to pass through unharmed.
-            - Can be permanently on, toggled on/off on timer, or toggled by switches
-            - Shows a 500ms warning when about to turn on, maybe sparks on either end of where the beam will be, or a smaller non damaging beam.
         - Sentries
             - Large robots with high health and big attacks
             - Used as barriers when not powered.
@@ -63,14 +74,17 @@ Current tasks:
         - Disabled conveyer belt with pots on it that needs to be turned on to move the pots out of the way.
 
     Storm Beast
-        - Storm Heart is protected by a layer of bouncy clouds that the MC can slowly deform to reveal the heart. The clouds
+        - Storm Heart is protected by a layer of bouncy clouds that the MC can slowly deform to reveal the heart. The clouds reform slowly over time.
+        - Storm Heart uses a large discharge attack a few seconds after taking damage, which also full restores the clouds.
+        - Storm Heart summons lightning bolts while enraged.
+        - Storm Beast flies in and out of the battle field.
+        - Storm Beast can turn into lightning and teleport as a beam sending shockwaves out at both ends.
+        - Storm Beast can charge south to exit the battle field
 
 
     - Randomizer improvements
         - Add a goal
     - brainstorm some dungeon/boss ideas, maybe for Staff Tower
-
-    - Charged arrows should move a bit faster
 
     - Add target landing locations when falling from sky (also apply to the forest temple pits).
     - Add new hold+walk chakram animations
@@ -177,6 +191,11 @@ Difficulty shrine:
     - easier puzzles (required chests are made distinct from optional chests, positions of required items are moved to more easily accessible locations)
 
 Spirit Barrier Improvements
+    - Need a way to optionally enable invisibility
+        - Invisibility should make you mostly invulnerable but drain mana over time.
+        - No barrier while invisible.
+        - Press once for a barrier, a second time to turn invisible, and a third time to disable both?
+        - Press twice quickly to turn invisible?
     - Charge adds element effect to barrier and reduces spirit loss to damage of that type
     - Enemies should not be able to target you while invisible.
     - Make invisibility ignore certain ground effects+hazards: spikes, ice floor, fire barriers
@@ -197,6 +216,10 @@ Additional Clone Tool Behavior:
     Charging the clone 1 level adds elements to the clones weapon/tools/explosion.
     Charging the clone 1 level without elements makes it invulnerable for 4 seconds.
 
+Additional Bow Behavior:
+    Charging attacks makes arrow faster
+    Charge level 2 creates an elemental explosion
+        - Neutral element can destroy objects similar to clone explosion.
 
 Peach Cave Improvements:
     - Add enemies:
