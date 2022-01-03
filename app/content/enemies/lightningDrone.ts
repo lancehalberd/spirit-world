@@ -1,4 +1,6 @@
 import { addSparkleAnimation } from 'app/content/animationEffect';
+import { addObjectToArea } from 'app/content/areas';
+import { LightningDischarge } from 'app/content/effects/lightningDischarge';
 import {
     getVectorToNearbyTarget,
     moveEnemyToTargetLocation,
@@ -9,7 +11,6 @@ import {
     droneAnimations,
 } from 'app/content/enemyAnimations';
 import { lifeLootTable } from 'app/content/lootTables';
-import { hitTargets } from 'app/utils/field';
 
 import { Enemy, GameState } from 'app/types';
 
@@ -49,40 +50,22 @@ enemyDefinitions.lightningDrone = {
             } else if (enemy.modeTime >= 500) {
                 if (moveEnemyToTargetLocation(state, enemy, enemy.params.targetX, enemy.params.targetY) === 0) {
                     enemy.setMode('discharge');
+                    const hitbox = enemy.getHitbox(state);
+                    const discharge = new LightningDischarge({
+                        x: hitbox.x + hitbox.w / 2,
+                        y: hitbox.y + hitbox.h / 2,
+                        tellDuration: chargeTime,
+                        radius: dischargeRadius,
+                    });
+                    addObjectToArea(state, enemy.area, discharge);
                 }
             }
         } else if (enemy.mode === 'discharge') {
-            const hitbox = enemy.getHitbox(state);
+            // Draw some extra lightning over the drone while the discharge is charging.
             if (enemy.modeTime % 100 === 60) {
-                addSparkleAnimation(state, enemy.area, hitbox, 'lightning');
+                addSparkleAnimation(state, enemy.area, enemy.getHitbox(state), 'lightning');
             }
             if (enemy.modeTime >= chargeTime) {
-                const cx = hitbox.x + hitbox.w / 2;
-                const cy = hitbox.y + hitbox.h / 2;
-                for (let i = 0; i < 6; i++) {
-                    const theta = i * 2 * Math.PI / 6;
-                    addSparkleAnimation(state, enemy.area, {
-                        ...hitbox,
-                        x: cx + 32 * Math.cos(theta) - 4,
-                        y: cy + 32 * Math.sin(theta) - 4,
-                        w: 8,
-                        h: 8,
-                    }, 'lightning');
-                }
-                hitTargets(state, enemy.area, {
-                    damage: 4,
-                    element: 'lightning',
-                    hitCircle: {
-                        x: cx,
-                        y: cy,
-                        r: dischargeRadius,
-                    },
-                    hitAllies: true,
-                    hitObjects: true,
-                    hitTiles: true,
-                    hitEnemies: true,
-                    knockAwayFrom: {x: cx, y: cy},
-                });
                 enemy.setMode('choose');
             }
         }
@@ -97,23 +80,6 @@ enemyDefinitions.lightningDrone = {
                 context.beginPath();
                 context.arc(hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2, hitbox.w / 2, 0, 2 * Math.PI);
                 context.stroke();
-            context.restore();
-        }
-        if (enemy.mode === 'discharge') {
-            const p = Math.max(0, enemy.modeTime / chargeTime);
-            context.save();
-                // Darker yellow outline shows the full radius of the attack.
-                context.globalAlpha *= 0.3;
-                context.beginPath();
-                context.arc(hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2, dischargeRadius, 0, 2 * Math.PI);
-                context.strokeStyle = 'yellow';
-                context.stroke();
-                // Lighter fill grows to indicate when the attack will hit.
-                context.globalAlpha *= 0.3;
-                context.beginPath();
-                context.arc(hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2, p * dischargeRadius, 0, 2 * Math.PI);
-                context.fillStyle = 'yellow';
-                context.fill();
             context.restore();
         }
     },

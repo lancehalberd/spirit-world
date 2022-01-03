@@ -1,6 +1,8 @@
 import {
+    andLogic,
     hasFireBlessing,
     hasBossWeapon,
+    hasRoll,
 } from 'app/content/logic';
 
 import { LogicNode } from 'app/types';
@@ -81,7 +83,7 @@ export const craterNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'craterBoss',
-        checks: [{objectId: 'flameBeast'}],
+        checks: [{objectId: 'flameBeast', logic: andLogic(hasRoll, hasBossWeapon)}],
         entranceIds: ['craterLavaDoor'],
         exits: [
             {objectId: 'craterLavaDoor'},

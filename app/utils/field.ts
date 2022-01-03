@@ -3,7 +3,7 @@ import { allTiles } from 'app/content/tiles';
 import { isPixelInShortRect, rectanglesOverlap } from 'app/utils/index';
 
 import {
-    AreaInstance, AreaLayer, Direction, GameState, Hero,
+    AreaInstance, AreaLayer, Direction, Enemy, GameState, Hero,
     HitProperties, HitResult, MovementProperties,
     ObjectInstance, Rect, Tile, TileCoords, TileBehaviors,
 } from 'app/types';
@@ -240,8 +240,14 @@ export function getTileBehaviorsAndObstacles(
                 if (object.behaviors?.solid) {
                     tileBehavior.solid = true;
                 }
-                if (object.behaviors?.damage) {
-                    tileBehavior.damage = Math.max(tileBehavior.damage || 0, object.behaviors.damage);
+                if (object.behaviors?.touchHit) {
+                    // Don't apply touchHit from enemies during iframes when they shouldn't damage the hero.
+                    if (!(object instanceof Enemy) || !(object.invulnerableFrames > 0)) {
+                        tileBehavior.touchHit = {...object.behaviors.touchHit};
+                        if (object instanceof Enemy) {
+                            tileBehavior.touchHit.source = object;
+                        }
+                    }
                 }
             }
         }

@@ -196,11 +196,31 @@ export const SPAWN_CRATER_BOSS: ZoneLocation = {
     isSpiritWorld: false,
 };
 
-export const SPAWN_STAFF_ENTRANCE: ZoneLocation = {
+export const SPAWN_STAFF_LOWER_ENTRANCE: ZoneLocation = {
     zoneKey: 'staffTower',
     floor: 0,
     x: 250,
     y: 440,
+    z: 0,
+    d: 'up',
+    areaGridCoords: {y: 0, x: 0},
+    isSpiritWorld: false,
+};
+export const SPAWN_STAFF_UPPER_ENTRANCE: ZoneLocation = {
+    zoneKey: 'staffTower',
+    floor: 2,
+    x: 250,
+    y: 440,
+    z: 0,
+    d: 'up',
+    areaGridCoords: {y: 1, x: 0},
+    isSpiritWorld: true,
+};
+export const SPAWN_STAFF_BOSS: ZoneLocation = {
+    zoneKey: 'staffTower',
+    floor: 3,
+    x: 248,
+    y: 248,
     z: 0,
     d: 'up',
     areaGridCoords: {y: 0, x: 0},
@@ -264,10 +284,10 @@ const warTempleStart = applyItems(tombBossState, {maxLife: 1, spiritSight: 1},
     ['tombBoss', 'warTempleEntrance', 'tombTeleporter']);
 const warTempleBoss = applyItems(warTempleStart, {gloves: 1, 'warTemple:bigKey': 1});
 const cocoonStartState = applyItems(warTempleBoss, {maxLife: 1, astralProjection: 1}, ['warTempleBoss', 'tombExit']);
-const cocoonBossState = applyItems(cocoonStartState, {'cocoon:bigKey': 1}, []);
+const cocoonBossState = applyItems(cocoonStartState, {'cocoon:bigKey': 1, 'cloak': 1}, []);
+cocoonBossState.savedHeroData.rightTool = 'cloak';
 const helixStartState = applyItems(cocoonBossState, {maxLife: 1, teleportation: 1},
     ['cocoonTeleporter', 'lakeTunneBoss']);
-helixStartState.savedHeroData.rightTool = 'cloak';
 const helixEndState = applyItems(helixStartState, {charge: 1, staff: 1},
     ['elementalBeastsEscaped']);
 const forestBackState = applyItems(helixEndState, {cloudBoots: 1, 'forestTemple:bigKey': 1});
@@ -303,6 +323,7 @@ const staffStartState = applyItems(helixEndState, {
     fireBlessing: 1, fire: 1,
     waterBlessing: 1, ice: 1,
 });
+const staffBossState = applyItems(staffStartState, {});
 
 interface SpawnLocationOptions {
     [key: string]: {location: ZoneLocation, savedState: SavedState},
@@ -387,9 +408,17 @@ const lateSpawnLocations: SpawnLocationOptions = {
         location: SPAWN_CRATER_BOSS,
         savedState: craterBossState,
     },
-    'Tower Start': {
-        location: SPAWN_STAFF_ENTRANCE,
+    'Tower Lower': {
+        location: SPAWN_STAFF_LOWER_ENTRANCE,
         savedState: staffStartState,
+    },
+    'Tower Upper': {
+        location: SPAWN_STAFF_UPPER_ENTRANCE,
+        savedState: staffStartState,
+    },
+    'Tower Boss': {
+        location: SPAWN_STAFF_BOSS,
+        savedState: staffBossState,
     },
 };
 
@@ -516,9 +545,10 @@ export function checkToUpdateSpawnLocation(state: GameState): void {
     if (state.location.zoneKey === 'crater') {
         return setSpawnLocation(state, SPAWN_CRATER_ENTRANCE);
     }
-    if (state.location.zoneKey === 'staffTower') {
-        return setSpawnLocation(state, SPAWN_STAFF_ENTRANCE);
-    }
+    // We need better logic to indicate whether to start at the upper or lower entrance.
+    //if (state.location.zoneKey === 'staffTower') {
+    //    return setSpawnLocation(state, SPAWN_STAFF_ENTRANCE);
+    //}
     // If you are in the forest temple, or in overworld area that is part of the temple, respawn
     // at the forest temple entrance.
     if (state.location.zoneKey === 'forestTemple' || (

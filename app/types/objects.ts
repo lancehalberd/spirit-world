@@ -83,38 +83,42 @@ export interface MovementProperties {
 }
 
 export interface HitProperties {
-    direction?: Direction,
-    damage?: number,
-    element?: MagicElement,
-    hitbox?: Rect,
-    hitCircle?: {x: number, y: number, r: number},
-    source?: Actor,
+    direction?: Direction
+    damage?: number
+    // When defined this damage will be used when hitting the spirit cloak.
+    spiritCloakDamage?: number
+    element?: MagicElement
+    hitbox?: Rect
+    hitCircle?: {x: number, y: number, r: number}
+    source?: Actor
     // Whether this hit can break crystal shields on certain enemies like
     // the Crystal Guardians and Crystal Collector in the Waterfall Tower.
     canDamageCrystalShields?: boolean
     // Whether this hit can push puzzle elements like rolling balls, push/pull blocks, etc.
-    canPush?: boolean,
+    canPush?: boolean
     // Whether this can cut ground tiles like thorns.
-    cutsGround?: boolean,
-    knockback?: {vx: number, vy: number, vz: number},
+    cutsGround?: boolean
+    knockback?: {vx: number, vy: number, vz: number}
     // If this is set, knockback will be added as a vector from this point towards the hit target.
-    knockAwayFrom?: {x: number, y: number},
+    knockAwayFrom?: {x: number, y: number}
     // The velocity of the object the hit is from, will effect the calculated direction of certain hits.
     // For example, if the hit is slightly to one side, but the velocity is vertical, the verical direction would be favored.
-    vx?: number,
-    vy?: number,
+    vx?: number
+    vy?: number
     // Hits enemies/bosses.
-    hitEnemies?: boolean,
+    hitEnemies?: boolean
     // Hits hero, clones, astral projection
-    hitAllies?: boolean,
+    hitAllies?: boolean
     // Hits torches, crystals, rolling balls, etc
-    hitObjects?: boolean,
+    hitObjects?: boolean
     // Hits background tiles like bushes, rocks, solid walls
-    hitTiles?: boolean,
+    hitTiles?: boolean
     // Alternate hitbox to use when checking for tile hits.
     tileHitbox?: Rect
     // Targets to ignore.
-    ignoreTargets?: Set<ObjectInstance>,
+    ignoreTargets?: Set<ObjectInstance>
+    // If true this hit will only apply to objects touching the ground.
+    isGroundHit?: boolean
 }
 
 export interface HitResult {

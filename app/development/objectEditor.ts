@@ -354,8 +354,9 @@ function getPossibleStatuses(type: ObjectType): ObjectStatus[] {
             ];
         case 'chest':
             return ['normal', 'hiddenEnemy', 'hiddenSwitch'];
+        case 'boss':
         case 'enemy':
-            return ['normal', 'off'];
+            return ['normal', 'hidden', 'off'];
         case 'escalator':
             return ['normal', 'off', 'frozen'];
         default:

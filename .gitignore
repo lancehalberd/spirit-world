@@ -60,6 +60,9 @@ typings/
 # Directory for files related to the project but not in the repo
 etc/
 
+# Don't commit compiled TS files.
+tsc/
+
 # Don't include built js file.
 public/app
 public/client.js

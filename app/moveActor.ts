@@ -155,15 +155,27 @@ function moveActorInDirection(
     let pushedObjects = [];
     let quickJump = false;
     for (const point of checkPoints) {
-        const { tileBehavior, objects} = getTileBehaviorsAndObstacles(
+        const { tileBehavior, objects, tx, ty} = getTileBehaviorsAndObstacles(
             state, actor.area, point, excludedObjects, null, null, direction
         );
-        if (tileBehavior?.solid && tileBehavior?.damage > 0) {
-            actor.onHit?.(state, { damage: tileBehavior.damage, knockback: {
+        if (tileBehavior?.solid && (tileBehavior?.touchHit && !tileBehavior?.touchHit?.isGroundHit)) {
+            const { returnHit } = actor.onHit?.(state, { ...tileBehavior.touchHit, knockback: {
                 vx: - 4 * (ax - actor.x),
                 vy: - 4 * (ay - actor.y),
                 vz: 2,
             }});
+            // Apply reflected damage to enemies if they were the source of the `touchHit`.
+            if (returnHit && tileBehavior.touchHit.source?.onHit) {
+                tileBehavior.touchHit.source.onHit(state, returnHit);
+            }
+            if (tileBehavior.cuttable && tileBehavior.cuttable <= returnHit?.damage) {
+                for (const layer of actor.area.layers) {
+                    const tile = layer.tiles[ty]?.[tx];
+                    if (tile?.behaviors?.cuttable <= returnHit.damage) {
+                        destroyTile(state, actor.area, { x: tx, y: ty, layerKey: layer.key });
+                    }
+                }
+            }
             return false;
         }
         // Climbable overrides solid tile behavior. This allows use to place tiles marked climbable on top
@@ -477,9 +489,18 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
             if (behaviors.climbable) {
                 startClimbing = true;
             }
-            if (behaviors.damage > 0 && hero.onHit) {
-                if (!behaviors.low || hero.z <= 0) {
-                    hero.onHit(state, { damage: behaviors.damage });
+            if (behaviors.touchHit && hero.onHit) {
+                if (!behaviors.touchHit.isGroundHit || hero.z <= 0) {
+                    const { returnHit } = hero.onHit(state, behaviors.touchHit);
+
+                    if (behaviors.cuttable && behaviors.cuttable <= returnHit?.damage) {
+                        for (const layer of hero.area.layers) {
+                            const tile = layer.tiles[actualRow]?.[actualColumn];
+                            if (tile?.behaviors?.cuttable <= returnHit.damage) {
+                                destroyTile(state, hero.area, { x: actualColumn, y: actualRow, layerKey: layer.key });
+                            }
+                        }
+                    }
                 }
             }
             if (!behaviors.water) {

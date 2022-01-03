@@ -31,7 +31,8 @@ import { playSound } from 'app/utils/sounds';
 import {
     ActorAnimations, Direction,
     Enemy, FrameAnimation, FrameDimensions, GameState,
-    Hero, HitProperties, HitResult, LootTable, MagicElement, MovementProperties, ObjectInstance,
+    Hero, HitProperties, HitResult, LootTable,
+    MagicElement, MovementProperties, ObjectInstance, Rect,
     TileBehaviors,
 } from 'app/types';
 
@@ -85,6 +86,7 @@ export interface EnemyDefinition {
     renderOver?: (context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) => void
     getHealthPercent?: (state: GameState, enemy: Enemy) => number
     getShieldPercent?: (state: GameState, enemy: Enemy) => number
+    getHitbox?: (state: GameState, enemy: Enemy) => Rect
 }
 
 enemyDefinitions.arrowTurret = {
@@ -151,7 +153,7 @@ enemyDefinitions.ent = {
     ignorePits: true,
     // The damage from tile behaviors will trigger when the player attempts to move into the same pixel,
     // which is more specific than touch damage on enemies which requires actually being in the same pixel.
-    tileBehaviors: {damage: 2, solid: true},
+    tileBehaviors: {touchHit: { damage: 2}, solid: true},
 };
 
 enemyDefinitions.crystalGuardian = {
@@ -194,7 +196,7 @@ enemyDefinitions.crystalGuardian = {
     ignorePits: true,
     // The damage from tile behaviors will trigger when the player attempts to move into the same pixel,
     // which is more specific than touch damage on enemies which requires actually being in the same pixel.
-    tileBehaviors: {damage: 2, solid: true},
+    tileBehaviors: {touchHit: {damage: 2 }, solid: true},
     renderOver(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
         const defaultParams = enemyDefinitions.crystalGuardian.params;
         if (enemy.params.shieldLife <= 0) {
@@ -843,7 +845,13 @@ export function checkForFloorEffects(state: GameState, enemy: Enemy) {
             if (!behaviors.water) {
                 startSwimming = false;
             }*/
-            if (behaviors.pit && enemy.z <= 0 && !enemy.flying && !enemy.enemyDefinition.ignorePits) {
+            if (behaviors.pit && enemy.z <= 0
+                && !enemy.flying
+                // Bosses don't fall in pits.
+                && enemy.definition?.type !== 'boss'
+                // Specific enemies can be set to ignore pits.
+                && !enemy.enemyDefinition.ignorePits
+            ) {
                 const pitAnimation = new AnimationEffect({
                     animation: enemyFallAnimation,
                     x: column * 16 - 4, y: row * 16 - 4,
@@ -854,4 +862,13 @@ export function checkForFloorEffects(state: GameState, enemy: Enemy) {
             }
         }
     }
+}
+
+export function hasEnemyLeftSection(state: GameState, enemy: Enemy): boolean {
+    const { section } = getAreaSize(state);
+    const hitbox = enemy.getHitbox(state);
+    return (enemy.vx < 0 && hitbox.x + hitbox.w < section.x - 32)
+        || (enemy.vx > 0 && hitbox.x > section.x + section.w + 32)
+        || (enemy.vy < 0 && hitbox.y + hitbox.h < section.y - 32)
+        || (enemy.vy > 0 && hitbox.y > section.y + section.h + 32);
 }

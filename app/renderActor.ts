@@ -204,12 +204,14 @@ export function renderExplosionRing(context: CanvasRenderingContext2D, state: Ga
     context.restore();
 }
 
-export function renderEnemyShadow(context: CanvasRenderingContext2D, state: GameState, object: Enemy): void {
-    const frame = object.z >= 4 ? smallShadowFrame : shadowFrame;
-    drawFrame(context, frame, { ...frame,
-        x: object.x + (object.w - shadowFrame.w) * object.scale / 2,
-        y: object.y - 3 * object.scale,
-        w: frame.w * object.scale,
-        h: frame.h * object.scale,
-    });
+export function renderEnemyShadow(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
+    const frame = enemy.z >= 4 ? smallShadowFrame : shadowFrame;
+    const hitbox = enemy.getHitbox(state);
+    const target = {
+        x: hitbox.x + (hitbox.w - frame.w * enemy.scale) / 2,
+        y: hitbox.y + hitbox.h - frame.h * enemy.scale + enemy.z, // - 3 * enemy.scale,
+        w: frame.w * enemy.scale,
+        h: frame.h * enemy.scale,
+    };
+    drawFrame(context, frame, target);
 }

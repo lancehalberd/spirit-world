@@ -746,7 +746,7 @@ const sf0_1x0: AreaDefinition = {
         {status: "normal", id: "", x: 224, y: 48, type: "floorSwitch", targetObjectId: "waterfallTower-grateC"},
         {status: "normal", id: "", x: 288, y: 400, type: "airBubbles"},
         {status: "normal", id: "", x: 304, y: 208, type: "airBubbles"},
-        {status: "normal", id: "", x: 416, y: 0, type: "beadCascade"},
+        {status: "hidden", id: "waterfallTowerBeadCascade", x: 416, y: 0, type: "beadCascade"},
         {status: "normal", id: "", x: 240, y: 0, type: "beadCascade"},
         {status: "normal", id: "", x: 128, y: 0, type: "beadCascade"},
         {status: "normal", id: "", x: 352, y: 176, type: "beadCascade"},

@@ -114,6 +114,9 @@ export class Enemy implements Actor, ObjectInstance {
         return getFrame(this.currentAnimation, this.animationTime);
     }
     getHitbox(state: GameState): Rect {
+        if (this.enemyDefinition.getHitbox) {
+            return this.enemyDefinition.getHitbox(state, this);
+        }
         const frame = this.getFrame();
         return {
             x: this.x,

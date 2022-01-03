@@ -205,8 +205,13 @@ export class Hero implements Actor, SavedHeroData {
             return {};
         }
         if (this.hasBarrier) {
+            let spiritDamage = hit.spiritCloakDamage || Math.max(10, hit.damage * 5);
+            // The cloak halves incoming damage that matches its current element.
+            if (hit.element && hit.element === this.barrierElement) {
+                spiritDamage /= 2;
+            }
             if (hit.damage && state.hero.invulnerableFrames <= 0) {
-                state.hero.magic -= Math.max(10, hit.damage * 5);
+                state.hero.magic -= spiritDamage;
                 state.hero.invulnerableFrames = Math.max(state.hero.invulnerableFrames, 10);
             }
             const hitbox = this.getHitbox(state);
