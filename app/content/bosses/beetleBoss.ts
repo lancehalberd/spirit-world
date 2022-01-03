@@ -2,6 +2,7 @@ import { addObjectToArea, getAreaSize } from 'app/content/areas';
 import {
     accelerateInDirection,
     getVectorToNearbyTarget,
+    hasEnemyLeftSection,
     moveEnemyToTargetLocation,
 } from 'app/content/enemies';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
@@ -135,13 +136,8 @@ function updateBeetleBoss(state: GameState, enemy: Enemy): void {
 function flyBy(state: GameState, enemy: Enemy): void {
     enemy.x += enemy.vx;
     enemy.y += enemy.vy;
-    const { section } = getAreaSize(state);
     // Remove the enemy once it has moved off the screen entirely.
-    if ((enemy.vx < 0 && enemy.x + enemy.w < section.x - 16)
-        || (enemy.vx > 0 && enemy.x > section.x + section.w + 16)
-        || (enemy.vy < 0 && enemy.y + enemy.h < section.y - 16)
-        || (enemy.vy > 0 && enemy.y > section.y + section.h + 16)
-    ) {
+    if (hasEnemyLeftSection(state, enemy)) {
         // The main control loop will remove enemies with this status and then
         // check if anything should trigger if all enemies are defeated.
         enemy.status = 'gone';

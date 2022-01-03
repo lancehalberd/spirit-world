@@ -37,9 +37,6 @@ Current tasks:
         - Piercing projectiles that can push things should be stopped by the first object they push
             or not be able to push additional objects, for example, the charged chakram.
 
-    Make mutation transition use the same area instance so contents don't reset
-        - Will need to add special handling to remove extra ice tiles from frost beast+heat sink battles.
-
     Storm Beast
         - Storm Heart is protected by a layer of bouncy clouds that the MC can slowly deform to reveal the heart. The clouds reform slowly over time.
         - Storm Heart uses a large discharge attack a few seconds after taking damage, which also full restores the clouds.
@@ -47,6 +44,10 @@ Current tasks:
         - Storm Beast flies in and out of the battle field.
         - Storm Beast can turn into lightning and teleport as a beam sending shockwaves out at both ends.
         - Storm Beast can charge south to exit the battle field
+
+    Make mutation transition use the same area instance so contents don't reset
+        - Will need to add special handling to remove extra ice tiles from frost beast+heat sink battles.
+
 
     Staff Tower
         - Lightning barriers

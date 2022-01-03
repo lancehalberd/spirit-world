@@ -843,7 +843,13 @@ export function checkForFloorEffects(state: GameState, enemy: Enemy) {
             if (!behaviors.water) {
                 startSwimming = false;
             }*/
-            if (behaviors.pit && enemy.z <= 0 && !enemy.flying && !enemy.enemyDefinition.ignorePits) {
+            if (behaviors.pit && enemy.z <= 0
+                && !enemy.flying
+                // Bosses don't fall in pits.
+                && enemy.definition?.type !== 'boss'
+                // Specific enemies can be set to ignore pits.
+                && !enemy.enemyDefinition.ignorePits
+            ) {
                 const pitAnimation = new AnimationEffect({
                     animation: enemyFallAnimation,
                     x: column * 16 - 4, y: row * 16 - 4,
@@ -854,4 +860,13 @@ export function checkForFloorEffects(state: GameState, enemy: Enemy) {
             }
         }
     }
+}
+
+export function hasEnemyLeftSection(state: GameState, enemy: Enemy): boolean {
+    const { section } = getAreaSize(state);
+    const hitbox = enemy.getHitbox(state);
+    return (enemy.vx < 0 && hitbox.x + hitbox.w < section.x - 32)
+        || (enemy.vx > 0 && hitbox.x > section.x + section.w + 32)
+        || (enemy.vy < 0 && hitbox.y + hitbox.h < section.y - 32)
+        || (enemy.vy > 0 && hitbox.y > section.y + section.h + 32);
 }
