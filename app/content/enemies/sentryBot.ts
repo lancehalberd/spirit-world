@@ -14,7 +14,9 @@ import { hitTargets } from 'app/utils/field';
 import { Enemy, GameState } from 'app/types';
 
 const chargeTime = 1000;
-const dischargeRadius = 48;
+// const dischargeRadius = 48;
+const dischargeLength = 300;
+const dischargeW = 10;
 
 const updateTarget = (state: GameState, enemy: Enemy): boolean => {
     const vector = getVectorToNearbyTarget(state, enemy, enemy.aggroRadius, enemy.area.allyTargets);
@@ -54,34 +56,34 @@ enemyDefinitions.sentryBot = {
         } else if (enemy.mode === 'discharge') {
             const hitbox = enemy.getHitbox(state);
             if (enemy.modeTime % 100 === 60) {
-                addSparkleAnimation(state, enemy.area, hitbox, 'lightning');
+                // addSparkleAnimation(state, enemy.area, hitbox, 'lightning');
             }
             if (enemy.modeTime >= chargeTime) {
                 const cx = hitbox.x + hitbox.w / 2;
                 const cy = hitbox.y + hitbox.h / 2;
-                for (let i = 0; i < 6; i++) {
-                    const theta = i * 2 * Math.PI / 6;
-                    addSparkleAnimation(state, enemy.area, {
-                        ...hitbox,
-                        x: cx + 32 * Math.cos(theta) - 4,
-                        y: cy + 32 * Math.sin(theta) - 4,
-                        w: 8,
-                        h: 8,
-                    }, 'lightning');
-                }
+                // for (let i = 0; i < 6; i++) {
+                //     const theta = i * 2 * Math.PI / 6;
+                //     addSparkleAnimation(state, enemy.area, {
+                //         ...hitbox,
+                //         x: cx + 32 * Math.cos(theta) - 4,
+                //         y: cy + 32 * Math.sin(theta) - 4,
+                //         w: 8,
+                //         h: 8,
+                //     }, 'lightning');
+                // }
                 hitTargets(state, enemy.area, {
                     damage: 4,
                     element: 'lightning',
-                    hitCircle: {
+                    hitbox: {
                         x: cx,
                         y: cy,
-                        r: dischargeRadius,
+                        w: 8,
+                        h: 800,
                     },
                     hitAllies: true,
                     hitObjects: true,
                     hitTiles: true,
                     hitEnemies: true,
-                    knockAwayFrom: {x: cx, y: cy},
                 });
                 enemy.setMode('choose');
             }
@@ -99,22 +101,71 @@ enemyDefinitions.sentryBot = {
                 context.stroke();
             context.restore();
         }
+        // if (enemy.mode === 'discharge') {
+        //     const p = Math.max(0, enemy.modeTime / chargeTime);
+        //     context.save();
+        //         // Darker yellow outline shows the full radius of the attack.
+        //         context.globalAlpha *= 0.3;
+        //         context.beginPath();
+        //         context.arc(hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2, dischargeRadius, 0, 2 * Math.PI);
+        //         context.strokeStyle = 'yellow';
+        //         context.stroke();
+        //         // Lighter fill grows to indicate when the attack will hit.
+        //         context.globalAlpha *= 0.3;
+        //         context.beginPath();
+        //         context.arc(hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2, p * dischargeRadius, 0, 2 * Math.PI);
+        //         context.fillStyle = 'yellow';
+        //         context.fill();
+        //     context.restore();
+        // }
         if (enemy.mode === 'discharge') {
-            const p = Math.max(0, enemy.modeTime / chargeTime);
-            context.save();
-                // Darker yellow outline shows the full radius of the attack.
-                context.globalAlpha *= 0.3;
-                context.beginPath();
-                context.arc(hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2, dischargeRadius, 0, 2 * Math.PI);
-                context.strokeStyle = 'yellow';
-                context.stroke();
+            const cx = (hitbox.x + hitbox.w / 2) - dischargeW/2;
+            const cy = hitbox.y + hitbox.h / 2;
+            if (enemy.modeTime < chargeTime - 500) {
+                const p = Math.max(0, enemy.modeTime / chargeTime);
+                context.save();
+                // red rectangle outline shows where lazer will hit
+                // context.globalAlpha *= 0.3;
+                // context.beginPath();
+                // context.rect(cx, cy, dischargeW, dischargeLength);
+                // context.strokeStyle = 'purple';
+                // context.stroke();
                 // Lighter fill grows to indicate when the attack will hit.
-                context.globalAlpha *= 0.3;
+                context.globalAlpha *= 0.7;
                 context.beginPath();
-                context.arc(hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2, p * dischargeRadius, 0, 2 * Math.PI);
-                context.fillStyle = 'yellow';
+                context.rect(cx, cy, dischargeW, p * dischargeLength);
+                context.fillStyle = 'red';
                 context.fill();
-            context.restore();
+                context.restore();
+            }
+            if (enemy.modeTime >= chargeTime - 500) {
+                context.save();
+                context.globalAlpha = 1;
+                // shoot a lazer
+                // Create a linear gradient
+                const gradient = context.createLinearGradient(
+                    cx - dischargeW / 2,
+                    cx + dischargeW,
+                    cx + dischargeW,
+                    cx + dischargeW
+                );
+
+                // Add color stops
+                gradient.addColorStop(0, "rgba(252,70,107,0)");
+                gradient.addColorStop(0.3, "rgba(252,70,107,0.1)");
+                gradient.addColorStop(0.4, "rgba(252,70,107,0.4)");
+                gradient.addColorStop(0.42, "rgba(251,63,215,1)");
+                gradient.addColorStop(0.5, "rgba(250,250,250,1)");
+                gradient.addColorStop(0.58, "rgba(251,63,215,1)");
+                gradient.addColorStop(0.6, "rgba(252,70,107,0.4)");
+                gradient.addColorStop(0.7, "rgba(252,70,107,0.1)");
+                gradient.addColorStop(1, "rgba(252,70,107,0)");
+
+                // Set the fill style and draw a rectangle
+                context.fillStyle = gradient;
+                context.fillRect(cx, cy, dischargeW, dischargeLength);
+                context.restore();
+            }
         }
     },
 };
