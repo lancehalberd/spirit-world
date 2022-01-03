@@ -2,6 +2,7 @@ import { addObjectToArea } from 'app/content/areas';
 import { LightningBolt } from 'app/content/effects/lightningBolt';
 import { LightningDischarge } from 'app/content/effects/lightningDischarge';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
+import { allTiles } from 'app/content/tiles';
 import { debugCanvas } from 'app/dom';
 import {
     accelerateInDirection,
@@ -15,10 +16,11 @@ import {
 } from 'app/content/enemies';
 import { beetleWingedAnimations } from 'app/content/enemyAnimations';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { createAnimation } from 'app/utils/animations';
+import { createAnimation, drawFrameAt } from 'app/utils/animations';
 import { getDirection } from 'app/utils/field';
+import { playSound } from 'app/utils/sounds';
 
-import { AreaInstance, Enemy, GameState } from 'app/types';
+import { AreaInstance, Enemy, GameState, HitProperties, HitResult, Rect } from 'app/types';
 
 // This is just the spirit sight frame.
 export const stormHeartAnimation = createAnimation('gfx/hud/icons.png',
@@ -37,6 +39,40 @@ const stormHeartAnimations = {
     },
 };
 
+const cloudFormations = [
+    [0,406,395,395,407,0,0,406,395,395,407,0,0,406,395,395,407,0,0,406,395,395,407,0],
+    [406,413,399,399,412,407,406,413,399,399,412,407,406,413,399,399,412,407,406,413,399,399,412,407],
+    [398,399,399,399,399,400,398,399,399,399,399,400,398,399,399,399,399,400,398,399,399,399,399,400],
+    [398,399,399,399,399,400,398,399,399,399,399,400,398,399,399,399,399,400,398,399,399,399,399,400],
+    [398,399,399,399,399,400,398,399,399,399,399,400,398,399,399,399,399,400,398,399,408,409,399,400],
+    [410,409,399,399,408,411,410,409,408,409,408,411,410,403,403,403,403,411,410,403,411,410,403,411],
+    [0,410,403,403,411,0,0,410,411,410,411,0,0,0,0,0,0,0,0,0,0,0,0,0],
+    [0,406,395,395,407,0,0,406,395,395,407,0,0,406,395,395,407,0,0,406,395,395,407,0],
+    [406,413,399,399,412,407,406,413,399,399,412,407,406,413,399,399,412,407,406,413,399,399,412,407],
+    [398,399,399,399,399,400,398,399,399,399,399,400,398,399,399,399,399,400,398,399,408,409,399,400],
+    [398,399,399,399,399,400,398,399,408,409,399,400,398,408,403,403,409,400,398,408,411,410,409,400],
+    [398,408,403,403,409,400,398,408,411,410,409,400,398,400,0,0,398,400,398,400,0,0,398,400],
+    [410,411,0,0,410,411,410,411,0,0,410,411,410,411,0,0,410,411,410,411,0,0,410,411],
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+];
+
+const drawCloudFormation = (context: CanvasRenderingContext2D, state: GameState, enemy: Enemy, frame: number): void => {
+    for (let row = 0; row < 7; row++) {
+        const ty = row + (frame >= 4 ? 7 : 0);
+        for (let column = 0; column < 6; column++) {
+            const tx = column + (frame % 4) * 6;
+            const tile = allTiles[cloudFormations[ty][tx]];
+            if (tile) {
+                drawFrameAt(context, tile.frame, {
+                    x: enemy.x - 32 + 16 * column,
+                    y: enemy.y - 32 + 16 * row,
+                });
+            }
+        }
+    }
+}
+
+
 enemyDefinitions.stormHeart = {
     // The storm heart is smaller than other hearts, but takes up a lot of space with its cloud barrier.
     animations: stormHeartAnimations, life: 24, scale: 2, touchHit: { damage: 4, element: 'lightning'},
@@ -46,6 +82,25 @@ enemyDefinitions.stormHeart = {
         counterAttackTimer: 0,
     },
     immunities: ['lightning'],
+    renderOver(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
+        drawCloudFormation(context, state, enemy, enemy.params.cloudLife);
+    },
+    getHitbox(state: GameState, enemy: Enemy): Rect {
+        return {
+            x: enemy.x - 32,
+            y: enemy.y - 32,
+            w: 96,
+            h: 112,
+        };
+    },
+    onHit(state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
+        // If the shield is up, only fire damage can hurt it.
+        if (enemy.params.cloudLife > 0) {
+            enemy.params.cloudLife--;
+            playSound('enemyHit');
+            return { hit: true, stopped: true };
+        }
+    }
 };
 enemyDefinitions.stormBeast = {
     animations: beetleWingedAnimations, life: 36, scale: 4, update: updateStormBeast, flying: true,

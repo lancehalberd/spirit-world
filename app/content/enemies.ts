@@ -31,7 +31,8 @@ import { playSound } from 'app/utils/sounds';
 import {
     ActorAnimations, Direction,
     Enemy, FrameAnimation, FrameDimensions, GameState,
-    Hero, HitProperties, HitResult, LootTable, MagicElement, MovementProperties, ObjectInstance,
+    Hero, HitProperties, HitResult, LootTable,
+    MagicElement, MovementProperties, ObjectInstance, Rect,
     TileBehaviors,
 } from 'app/types';
 
@@ -85,6 +86,7 @@ export interface EnemyDefinition {
     renderOver?: (context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) => void
     getHealthPercent?: (state: GameState, enemy: Enemy) => number
     getShieldPercent?: (state: GameState, enemy: Enemy) => number
+    getHitbox?: (state: GameState, enemy: Enemy) => Rect
 }
 
 enemyDefinitions.arrowTurret = {
