@@ -63,7 +63,7 @@ enemyDefinitions.lightningDrone = {
         } else if (enemy.mode === 'discharge') {
             // Draw some extra lightning over the drone while the discharge is charging.
             if (enemy.modeTime % 100 === 60) {
-                addSparkleAnimation(state, enemy.area, enemy.getHitbox(state), 'lightning');
+                addSparkleAnimation(state, enemy.area, enemy.getHitbox(state), { element: 'lightning' });
             }
             if (enemy.modeTime >= chargeTime) {
                 enemy.setMode('choose');

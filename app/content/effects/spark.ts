@@ -33,10 +33,8 @@ export class Spark implements ObjectInstance, Props {
     vx: number;
     vy: number;
     az: number;
-    w: number = 8;
-    h: number = 8;
+    radius: number = 3;
     ignorePits = true;
-    radius: number;
     animationTime = 0;
     status: ObjectStatus = 'normal';
     speed = 0;
@@ -64,25 +62,24 @@ export class Spark implements ObjectInstance, Props {
         } else {
             hitTargets(state, this.area, {
                 damage: this.damage,
-                hitbox: this,
+                hitCircle: {x: this.x, y: this.y, r: this.radius},
                 element: 'lightning',
                 hitAllies: true,
-                knockAwayFrom: {x: this.x + this.w / 2, y: this.y + this.h / 2},
+                knockAwayFrom: {x: this.x, y: this.y},
             });
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
-        // Sold red circle in a transparent rectangle
         context.fillStyle = 'yellow';
         context.save();
             context.globalAlpha *= 0.6;
-            context.fillRect(this.x, this.y - this.z, this.w, this.h);
+            context.fillRect(this.x - this.radius, this.y - this.radius - this.z, 2 * this.radius, 2 * this.radius);
         context.restore();
         context.beginPath();
         context.strokeStyle = 'yellow';
         context.lineWidth = 2;
-        context.moveTo(this.x + this.w / 2 - 2 * this.vx, this.y + this.h / 2 - 2 * this.vy);
-        context.lineTo(this.x + this.w / 2 + 2 * this.vx, this.y + this.h / 2 + 2 * this.vy);
+        context.moveTo(this.x - 2 * this.vx, this.y - 2 * this.vy);
+        context.lineTo(this.x + 2 * this.vx, this.y + 2 * this.vy);
         context.stroke();
     }
 }

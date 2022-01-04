@@ -1,6 +1,9 @@
+import { addSparkleAnimation } from 'app/content/animationEffect';
 import { addObjectToArea, removeObjectFromArea } from 'app/content/areas';
 import { Spark } from 'app/content/effects/spark';
+import { allTiles } from 'app/content/tiles';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { drawFrameAt } from 'app/utils/animations';
 import { hitTargets } from 'app/utils/field';
 
 import {
@@ -22,8 +25,13 @@ interface Props {
 // How long the lightning animation takes. Shockwaves are created at the end of this duration.
 const LIGHTNING_ANIMATION_DURATION = FRAME_LENGTH * 6;
 // How long the lightning animation persists after the animation plays.
-const STRIKE_DURATION = FRAME_LENGTH * 12;
+const STRIKE_DURATION = FRAME_LENGTH * 6;
 const BOLT_HEIGHT = 48;
+
+const cloudFrames = [
+    [406,407],
+    [410,411],
+];
 
 export class LightningBolt implements ObjectInstance, Props {
     area: AreaInstance = null;
@@ -37,8 +45,7 @@ export class LightningBolt implements ObjectInstance, Props {
     vz: number = 0;
     vx: number;
     vy: number;
-    w: number = 12;
-    h: number = 12;
+    radius: number = 6;
     ignorePits = true;
     delay: number;
     shockWaves: number;
@@ -49,8 +56,6 @@ export class LightningBolt implements ObjectInstance, Props {
     constructor({x = 0, y = 0, damage = 2, delay = 800, shockWaves = 4, shockWaveTheta = 0}: Props) {
         this.x = x | 0;
         this.y = y | 0;
-        this.x -= this.w / 2;
-        this.y -= this.h / 2;
         this.delay = delay;
         this.shockWaves = shockWaves;
         this.shockWaveTheta = shockWaveTheta;
@@ -65,22 +70,43 @@ export class LightningBolt implements ObjectInstance, Props {
                 const dx = Math.cos(theta);
                 const dy = Math.sin(theta);
                 const spark = new Spark({
-                    x: this.x + this.w / 2,
-                    y: this.y + this.h / 2,
+                    x: this.x,
+                    y: this.y,
                     vx: 4 * dx,
                     vy: 4 * dy,
                     ttl: 1000,
                 });
-                spark.x -= spark.w / 2;
-                spark.y -= spark.h / 2;
                 addObjectToArea(state, this.area, spark);
             }
         }
-        if (this.animationTime >= this.delay + LIGHTNING_ANIMATION_DURATION) {
+        if (this.animationTime < this.delay) {
+            if (this.animationTime % 40 === 0) {
+                addSparkleAnimation(state, this.area, {
+                    x: this.x - 12,
+                    y: this.y - 12 - BOLT_HEIGHT,
+                    w: 24,
+                    h: 24,
+                }, { element: 'lightning' });
+            }
+        } else if (this.animationTime < this.delay + LIGHTNING_ANIMATION_DURATION) {
+            const h = BOLT_HEIGHT * Math.min(1, (this.animationTime - this.delay) / LIGHTNING_ANIMATION_DURATION);
+            addSparkleAnimation(state, this.area, {
+                x: this.x - 2,
+                y: this.y - BOLT_HEIGHT + h,
+                w: 4,
+                h: 4,
+            }, { element: 'lightning' });
+        } else if (this.animationTime >= this.delay + LIGHTNING_ANIMATION_DURATION) {
+            addSparkleAnimation(state, this.area, {
+                x: this.x - 2,
+                y: this.y - 2,
+                w: 4,
+                h: 4,
+            }, { element: 'lightning' });
             hitTargets(state, this.area, {
                 damage: this.damage,
-                hitbox: this,
-                knockAwayFrom: {x: this.x + this.w / 2, y: this.y + this.h / 2},
+                hitCircle: {x: this.x, y: this.y, r: this.radius},
+                knockAwayFrom: {x: this.x, y: this.y},
                 element: 'lightning',
                 hitAllies: true,
             });
@@ -91,36 +117,52 @@ export class LightningBolt implements ObjectInstance, Props {
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
         // Animate a transparent orb growing in the air
-        context.save();
-            context.globalAlpha *= (0.5 + Math.min(0.5, 0.5 * this.animationTime / this.delay));
-            context.fillStyle = 'yellow';
-            const r = 10 * Math.min(1, this.animationTime / this.delay);
-            context.beginPath();
-            context.arc(this.x + this.w / 2, this.y + this.h / 2 - 48, r, 0, 2 * Math.PI);
-            context.fill();
-        context.restore();
+        if (this.animationTime < this.delay + 100) {
+            context.save();
+                context.globalAlpha *= (0.4 + Math.min(0.4, 0.4 * this.animationTime / this.delay));
+                /*context.fillStyle = 'yellow';
+                const r = 10 * Math.min(1, this.animationTime / this.delay);
+                context.beginPath();
+                context.arc(this.x + this.w / 2, this.y + this.h / 2 - 48, r, 0, 2 * Math.PI);
+                context.fill();*/
+                for (let ty = 0; ty < 2; ty++) {
+                    for (let tx = 0; tx < 2; tx++) {
+                        const tile = allTiles[cloudFrames[ty][tx]];
+                        if (tile) {
+                            drawFrameAt(context, tile.frame, {
+                                x: this.x - 16 + 16 * tx,
+                                y: this.y - BOLT_HEIGHT - 16 + 16 * ty,
+                            });
+                        }
+                    }
+                }
+            context.restore();
+        }
         if (this.animationTime < this.delay) {
             return;
         }
         // Animate the bolt coming down
-        const h = BOLT_HEIGHT * Math.min(1, (this.animationTime - this.delay) / LIGHTNING_ANIMATION_DURATION);
+        /*const h = BOLT_HEIGHT * Math.min(1, (this.animationTime - this.delay) / LIGHTNING_ANIMATION_DURATION);
         context.fillStyle = 'yellow';
-        context.fillRect(this.x + this.w / 2 - 2, this.y + this.h / 2 - 48, 4, h);
+        context.fillRect(this.x - 1, this.y - BOLT_HEIGHT, 2, h);
         if (this.animationTime < this.delay + LIGHTNING_ANIMATION_DURATION) {
             return;
-        }
+        }*/
         // Animate the strike point
-        context.beginPath();
-        context.arc(this.x + this.w / 2, this.y + this.h / 2, 6, 0, 2 * Math.PI);
-        context.fill();
+        /*context.beginPath();
+        context.fillStyle = 'yellow';
+        context.arc(this.x, this.y, 6, 0, 2 * Math.PI);
+        context.fill();*/
     }
     renderShadow(context: CanvasRenderingContext2D, state: GameState) {
-        context.save();
-            context.globalAlpha *= 0.5;
-            context.fillStyle = 'yellow';
-            context.beginPath();
-            context.arc(this.x + this.w / 2, this.y + this.h / 2, this.w / 2, 0, 2 * Math.PI);
-            context.fill();
-        context.restore();
+        if (this.animationTime <= this.delay) {
+            context.save();
+                context.globalAlpha *= 0.5;
+                context.fillStyle = 'yellow';
+                context.beginPath();
+                context.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
+                context.fill();
+            context.restore();
+        }
     }
 }

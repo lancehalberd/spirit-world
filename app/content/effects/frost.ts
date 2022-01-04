@@ -80,7 +80,7 @@ export class Frost implements ObjectInstance, Props {
                 ignoreTargets: this.ignoreTargets,
             });
             if (this.animationTime % 200 === this.animationOffset) {
-                addSparkleAnimation(state, this.area, this, 'ice');
+                addSparkleAnimation(state, this.area, this, { element: 'ice' });
             }
         }
     }

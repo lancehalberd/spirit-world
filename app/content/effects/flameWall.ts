@@ -132,7 +132,7 @@ export class FlameWall implements ObjectInstance, Props {
                     knockback: {vx: 4 * directionMap[this.direction][0], vy: 4 * directionMap[this.direction][1], vz: 2},
                 });
                 if (this.animationTime % 100 === 0) {
-                    addSparkleAnimation(state, this.area, hitbox, 'fire');
+                    addSparkleAnimation(state, this.area, hitbox, { element: 'fire' });
                 }
             }
         }

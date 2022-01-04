@@ -90,6 +90,7 @@ export interface HitProperties {
     element?: MagicElement
     hitbox?: Rect
     hitCircle?: {x: number, y: number, r: number}
+    hitRay?: {x1: number, y1: number, x2: number, y2: number, r: number}
     source?: Actor
     // Whether this hit can break crystal shields on certain enemies like
     // the Crystal Guardians and Crystal Collector in the Waterfall Tower.
@@ -98,6 +99,8 @@ export interface HitProperties {
     canPush?: boolean
     // Whether this can cut ground tiles like thorns.
     cutsGround?: boolean
+    // If this is true, the hit will knock targets away from the hit itself based on the geometry.
+    knockAwayFromHit?: boolean
     knockback?: {vx: number, vy: number, vz: number}
     // If this is set, knockback will be added as a vector from this point towards the hit target.
     knockAwayFrom?: {x: number, y: number}

@@ -30,15 +30,43 @@ const walkShallowUpAnimation: FrameAnimation = createAnimation('gfx/mc/mcwalking
 const walkShallowDownAnimation: FrameAnimation = createAnimation('gfx/mc/mcwalkingshallow.png', walkingGeometry, { cols: 8, y: 0, duration: 4});
 const walkShallowLeftAnimation: FrameAnimation = createAnimation('gfx/mc/mcwalkingshallow.png', walkingGeometry, { cols: 8, y: 3, duration: 4});
 const walkShallowRightAnimation: FrameAnimation = createAnimation('gfx/mc/mcwalkingshallow.png', walkingGeometry, { cols: 8, y: 1, duration: 4});
-const walkChargeUpAnimation: FrameAnimation = createAnimation('gfx/mc/mcchakramwalkcharge.png', walkingGeometry, { cols: 8, y: 2, duration: 4});
-const walkChargeDownAnimation: FrameAnimation = createAnimation('gfx/mc/mcchakramwalkcharge.png', walkingGeometry, { cols: 8, y: 0, duration: 4});
-const walkChargeLeftAnimation: FrameAnimation = createAnimation('gfx/mc/mcchakramwalkcharge.png', walkingGeometry, { cols: 8, y: 3, duration: 4});
-const walkChargeRightAnimation: FrameAnimation = createAnimation('gfx/mc/mcchakramwalkcharge.png', walkingGeometry, { cols: 8, y: 1, duration: 4});
-const idleChargeUpAnimation: FrameAnimation = createAnimation('gfx/mc/mcchakramwalkcharge.png', walkingGeometry, { cols: 1, x: 7, y: 2, duration: 4});
-const idleChargeDownAnimation: FrameAnimation = createAnimation('gfx/mc/mcchakramwalkcharge.png', walkingGeometry, { cols: 1, x: 7, y: 0, duration: 4});
-const idleChargeLeftAnimation: FrameAnimation = createAnimation('gfx/mc/mcchakramwalkcharge.png', walkingGeometry, { cols: 1, x: 7, y: 3, duration: 4});
-const idleChargeRightAnimation: FrameAnimation = createAnimation('gfx/mc/mcchakramwalkcharge.png', walkingGeometry, { cols: 1, x: 7, y: 1, duration: 4});
 
+
+const walkChargeDownAnimation: FrameAnimation = createAnimation('gfx/mc/mcchakramwalkcharge.png', walkingGeometry, { cols: 8, y: 0, duration: 4});
+const walkChargeDownRightAnimation: FrameAnimation = createAnimation('gfx/mc/mcchakramwalkcharge.png', walkingGeometry, { cols: 8, y: 1, duration: 4});
+const walkChargeRightAnimation: FrameAnimation = createAnimation('gfx/mc/mcchakramwalkcharge.png', walkingGeometry, { cols: 8, y: 2, duration: 4});
+const walkChargeUpRightAnimation: FrameAnimation = createAnimation('gfx/mc/mcchakramwalkcharge.png', walkingGeometry, { cols: 8, y: 3, duration: 4});
+const walkChargeUpAnimation: FrameAnimation = createAnimation('gfx/mc/mcchakramwalkcharge.png', walkingGeometry, { cols: 8, y: 4, duration: 4});
+const walkChargeUpLeftAnimation: FrameAnimation = createAnimation('gfx/mc/mcchakramwalkcharge.png', walkingGeometry, { cols: 8, y: 5, duration: 4});
+const walkChargeLeftAnimation: FrameAnimation = createAnimation('gfx/mc/mcchakramwalkcharge.png', walkingGeometry, { cols: 8, y: 6, duration: 4});
+const walkChargeDownLeftAnimation: FrameAnimation = createAnimation('gfx/mc/mcchakramwalkcharge.png', walkingGeometry, { cols: 8, y: 7, duration: 4});
+
+const idleChargeDownAnimation: FrameAnimation = createAnimation('gfx/mc/mcchakramwalkcharge.png', walkingGeometry, { cols: 1, x: 7, y: 0, duration: 4});
+const idleChargeDownRightAnimation: FrameAnimation = createAnimation('gfx/mc/mcchakramwalkcharge.png', walkingGeometry, { cols: 1, x: 7, y: 1, duration: 4});
+const idleChargeRightAnimation: FrameAnimation = createAnimation('gfx/mc/mcchakramwalkcharge.png', walkingGeometry, { cols: 1, x: 7, y: 2, duration: 4});
+const idleChargeUpRightAnimation: FrameAnimation = createAnimation('gfx/mc/mcchakramwalkcharge.png', walkingGeometry, { cols: 1, x: 7, y: 3, duration: 4});
+const idleChargeUpAnimation: FrameAnimation = createAnimation('gfx/mc/mcchakramwalkcharge.png', walkingGeometry, { cols: 1, x: 7, y: 4, duration: 4});
+const idleChargeUpLeftAnimation: FrameAnimation = createAnimation('gfx/mc/mcchakramwalkcharge.png', walkingGeometry, { cols: 1, x: 7, y: 5, duration: 4});
+const idleChargeLeftAnimation: FrameAnimation = createAnimation('gfx/mc/mcchakramwalkcharge.png', walkingGeometry, { cols: 1, x: 7, y: 6, duration: 4});
+const idleChargeDownLeftAnimation: FrameAnimation = createAnimation('gfx/mc/mcchakramwalkcharge.png', walkingGeometry, { cols: 1, x: 7, y: 7, duration: 4});
+
+const walkChargeBowDownAnimation: FrameAnimation = createAnimation('gfx/mc/mcbowwalk.png', walkingGeometry, { cols: 8, y: 0, duration: 4});
+const walkChargeBowDownRightAnimation: FrameAnimation = createAnimation('gfx/mc/mcbowwalk.png', walkingGeometry, { cols: 8, y: 1, duration: 4});
+const walkChargeBowRightAnimation: FrameAnimation = createAnimation('gfx/mc/mcbowwalk.png', walkingGeometry, { cols: 8, y: 2, duration: 4});
+const walkChargeBowUpRightAnimation: FrameAnimation = createAnimation('gfx/mc/mcbowwalk.png', walkingGeometry, { cols: 8, y: 3, duration: 4});
+const walkChargeBowUpAnimation: FrameAnimation = createAnimation('gfx/mc/mcbowwalk.png', walkingGeometry, { cols: 8, y: 4, duration: 4});
+const walkChargeBowUpLeftAnimation: FrameAnimation = createAnimation('gfx/mc/mcbowwalk.png', walkingGeometry, { cols: 8, y: 5, duration: 4});
+const walkChargeBowLeftAnimation: FrameAnimation = createAnimation('gfx/mc/mcbowwalk.png', walkingGeometry, { cols: 8, y: 6, duration: 4});
+const walkChargeBowDownLeftAnimation: FrameAnimation = createAnimation('gfx/mc/mcbowwalk.png', walkingGeometry, { cols: 8, y: 7, duration: 4});
+
+const idleChargeBowDownAnimation: FrameAnimation = createAnimation('gfx/mc/mcbowwalk.png', walkingGeometry, { cols: 1, x: 7, y: 0, duration: 4});
+const idleChargeBowDownRightAnimation: FrameAnimation = createAnimation('gfx/mc/mcbowwalk.png', walkingGeometry, { cols: 1, x: 7, y: 1, duration: 4});
+const idleChargeBowRightAnimation: FrameAnimation = createAnimation('gfx/mc/mcbowwalk.png', walkingGeometry, { cols: 1, x: 7, y: 2, duration: 4});
+const idleChargeBowUpRightAnimation: FrameAnimation = createAnimation('gfx/mc/mcbowwalk.png', walkingGeometry, { cols: 1, x: 7, y: 3, duration: 4});
+const idleChargeBowUpAnimation: FrameAnimation = createAnimation('gfx/mc/mcbowwalk.png', walkingGeometry, { cols: 1, x: 7, y: 4, duration: 4});
+const idleChargeBowUpLeftAnimation: FrameAnimation = createAnimation('gfx/mc/mcbowwalk.png', walkingGeometry, { cols: 1, x: 7, y: 5, duration: 4});
+const idleChargeBowLeftAnimation: FrameAnimation = createAnimation('gfx/mc/mcbowwalk.png', walkingGeometry, { cols: 1, x: 7, y: 6, duration: 4});
+const idleChargeBowDownLeftAnimation: FrameAnimation = createAnimation('gfx/mc/mcbowwalk.png', walkingGeometry, { cols: 1, x: 7, y: 7, duration: 4});
 
 
 const attackingGeometry: FrameDimensions = {w: 20, h: 28, content: {x: 2, y: 16 + Y_OFF, w: 16, h: 16}};
@@ -226,21 +254,51 @@ export const heroShallowAnimations: ActorAnimations = {
     },
 };
 
-export const heroChargeAnimations: ActorAnimations = {
+export const heroChargeChakramAnimations: ActorAnimations = {
     idle: {
         up: idleChargeUpAnimation,
+        upleft: idleChargeUpLeftAnimation,
+        upright: idleChargeUpRightAnimation,
         down: idleChargeDownAnimation,
+        downleft: idleChargeDownLeftAnimation,
+        downright: idleChargeDownRightAnimation,
         left: idleChargeLeftAnimation,
         right: idleChargeRightAnimation,
     },
     move: {
         up: walkChargeUpAnimation,
+        upleft: walkChargeUpLeftAnimation,
+        upright: walkChargeUpRightAnimation,
         down: walkChargeDownAnimation,
+        downleft: walkChargeDownLeftAnimation,
+        downright: walkChargeDownRightAnimation,
         left: walkChargeLeftAnimation,
         right: walkChargeRightAnimation,
     },
 };
 
+export const heroChargeBowAnimations: ActorAnimations = {
+    idle: {
+        up: idleChargeBowUpAnimation,
+        upleft: idleChargeBowUpLeftAnimation,
+        upright: idleChargeBowUpRightAnimation,
+        down: idleChargeBowDownAnimation,
+        downleft: idleChargeBowDownLeftAnimation,
+        downright: idleChargeBowDownRightAnimation,
+        left: idleChargeBowLeftAnimation,
+        right: idleChargeBowRightAnimation,
+    },
+    move: {
+        up: walkChargeBowUpAnimation,
+        upleft: walkChargeBowUpLeftAnimation,
+        upright: walkChargeBowUpRightAnimation,
+        down: walkChargeBowDownAnimation,
+        downleft: walkChargeBowDownLeftAnimation,
+        downright: walkChargeBowDownRightAnimation,
+        left: walkChargeBowLeftAnimation,
+        right: walkChargeBowRightAnimation,
+    },
+};
 
 export const heroSwimAnimations: ActorAnimations = {
     idle: {

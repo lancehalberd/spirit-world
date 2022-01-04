@@ -37,6 +37,9 @@ Current tasks:
         - Piercing projectiles that can push things should be stopped by the first object they push
             or not be able to push additional objects, for example, the charged chakram.
 
+    - Discharge should optionally include the enemy source, and be removed if the source is defeated before the tell duration is over.
+        - Add `isActive` to enemy to indicate whether it is a valid source for attacks: if (sourceEnemy && !sourceEnemy.isActive(state)) { ... }
+
     Storm Beast
         - Storm Heart is protected by a layer of bouncy clouds that the MC can slowly deform to reveal the heart. The clouds reform slowly over time.
         - Storm Heart uses a large discharge attack a few seconds after taking damage, which also full restores the clouds.

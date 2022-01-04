@@ -104,7 +104,7 @@ export class Flame implements ObjectInstance, Props {
             // Create sparks less often when the flame is still.
             const rate = (this.vx || this.vy) ? 100 : 400;
             if (this.animationTime % rate === 0) {
-                addSparkleAnimation(state, this.area, this, 'fire');
+                addSparkleAnimation(state, this.area, this, { element: 'fire' });
             }
         }
     }

@@ -1144,6 +1144,7 @@ export function checkForEnemyDamage(state: GameState, hero: Hero) {
     if (!hero.area) {
         debugger;
     }
+    const heroHitbox = hero.getHitbox(state);
     for (const enemy of hero.area.objects) {
         if (!(enemy instanceof Enemy) || enemy.invulnerableFrames > 0
             || enemy.status === 'hidden' || enemy.status === 'gone' || enemy.status === 'off'
@@ -1152,14 +1153,28 @@ export function checkForEnemyDamage(state: GameState, hero: Hero) {
         }
         const touchHit = enemy.enemyDefinition.touchDamage
             ? { damage: enemy.enemyDefinition.touchDamage } : enemy.touchHit;
-        if (touchHit && rectanglesOverlap(hero, enemy.getHitbox(state))) {
-            //const dx = (hero.x + hero.w / 2) - (enemy.x + enemy.w / 2);
-            //const dy = (hero.y + hero.h / 2) - (enemy.y + enemy.h / 2);
+        if (!touchHit) {
+            continue;
+        }
+        const enemyHitbox = enemy.getHitbox(state);
+        if (rectanglesOverlap(heroHitbox, enemyHitbox)) {
+            let dx = (heroHitbox.x + heroHitbox.w / 2) - (enemyHitbox.x + enemyHitbox.w / 2);
+            let dy = (heroHitbox.y + heroHitbox.h / 2) - (enemyHitbox.y + enemyHitbox.h / 2);
+            if (!dx && !dy) {
+                dx = -directionMap[hero.d][0];
+                dy = -directionMap[hero.d][1];
+            } else {
+                const mag = Math.sqrt(dx*dx + dy*dy);
+                dx /= mag;
+                dy /= mag;
+            }
             const hitResult = hero.onHit(state, {
                 ...touchHit,
                 knockback: {
-                    vx: - 4 * directionMap[hero.d][0],
-                    vy: - 4 * directionMap[hero.d][1],
+                    // vx: - 4 * directionMap[hero.d][0],
+                    // vy: - 4 * directionMap[hero.d][1],
+                    vx: 4 * dx,
+                    vy: 4 * dy,
                     vz: 2,
                 },
             });

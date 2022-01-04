@@ -64,7 +64,7 @@ export class FrostGrenade implements ObjectInstance, Props {
             removeObjectFromArea(state, this);
         } else {
             if (this.animationTime % 200 === 0) {
-                addSparkleAnimation(state, this.area, this, 'ice');
+                addSparkleAnimation(state, this.area, this, { element: 'ice' });
             }
         }
     }

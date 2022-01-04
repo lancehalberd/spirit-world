@@ -123,10 +123,10 @@ export const droneAnimations: ActorAnimations = {
 
 const sentryBotGeometry: FrameDimensions = { w: 40, h: 39, content: { x: 4, y: 8, w: 32, h: 32} };
 const sentryBotSideGeometry: FrameDimensions = { w: 40, h: 39, content: { x: 14, y: 8, w: 12, h: 32} };
-const sentryBotAnimationDown: FrameAnimation = createAnimation('gfx/enemies/sentryBot.png', sentryBotGeometry, { cols: 4});
-const sentryBotAnimationRight: FrameAnimation = createAnimation('gfx/enemies/sentryBot.png', sentryBotSideGeometry, { cols: 4, y: 1});
-const sentryBotAnimationUp: FrameAnimation = createAnimation('gfx/enemies/sentryBot.png', sentryBotGeometry, { cols: 4, y: 2});
-const sentryBotAnimationLeft: FrameAnimation = createAnimation('gfx/enemies/sentryBot.png', sentryBotSideGeometry, { cols: 4, y: 3});
+const sentryBotAnimationDown: FrameAnimation = createAnimation('gfx/enemies/sentrybot.png', sentryBotGeometry, { cols: 4});
+const sentryBotAnimationRight: FrameAnimation = createAnimation('gfx/enemies/sentrybot.png', sentryBotSideGeometry, { cols: 4, y: 1});
+const sentryBotAnimationUp: FrameAnimation = createAnimation('gfx/enemies/sentrybot.png', sentryBotGeometry, { cols: 4, y: 2});
+const sentryBotAnimationLeft: FrameAnimation = createAnimation('gfx/enemies/sentrybot.png', sentryBotSideGeometry, { cols: 4, y: 3});
 export const sentryBotAnimations: ActorAnimations = {
     idle: {
         up: sentryBotAnimationUp,

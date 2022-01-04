@@ -409,7 +409,7 @@ function updateStormLightningBug(state: GameState, enemy: Enemy): void {
                     y: hitbox.y + 4 * Math.sin(theta),
                     w: hitbox.w / 2,
                     h: hitbox.h / 2,
-                }, 'lightning', {x: enemy.vx, y: enemy.vy});
+                }, {element: 'lightning', velocity: {x: enemy.vx, y: enemy.vy}});
             }
         }
     } else {
@@ -422,7 +422,7 @@ function updateStormLightningBug(state: GameState, enemy: Enemy): void {
                 y: hitbox.y + 4 * Math.sin(theta),
                 w: hitbox.w / 2,
                 h: hitbox.h / 2,
-            }, 'lightning', {x: enemy.vx, y: enemy.vy});
+            }, { element: 'lightning', velocity: {x: enemy.vx, y: enemy.vy}});
         }
     }
 }

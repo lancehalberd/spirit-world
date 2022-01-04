@@ -76,7 +76,7 @@ export class FrostBlast implements ObjectInstance, Props {
                         y: this.y + (r - 3) * Math.sin(theta + i * 2 * Math.PI / count),
                         w: 6,
                         h: 6,
-                    }, 'ice');
+                    }, { element: 'ice' });
                 }
             }
         }

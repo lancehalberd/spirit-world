@@ -78,7 +78,10 @@ export class ThrownChakram implements ObjectInstance {
         //    spawnTime /= 2;
         //}
         if (this.piercing && this.animationTime % spawnTime === 0) {
-            this.sparkles.push(makeSparkleAnimation(state, this, this.element, {x: this.vx, y: this.vy}));
+            this.sparkles.push(makeSparkleAnimation(state, this, {
+                element: this.element,
+                velocity: {x: this.vx, y: this.vy},
+            }));
         }
         this.sparkles = this.sparkles.filter(s => !s.done);
         for (const sparkle of this.sparkles) {
@@ -233,15 +236,15 @@ export class HeldChakram implements ObjectInstance {
         removeObjectFromArea(state, this);
     }
     updatePosition() {
-        if (this.vx && this.vy) {
+        //if (this.vx && this.vy) {
             // When aiming diagonally, place the chakram in the aimed direction.
-            this.x = this.hero.x + 3 + this.vx * 5;
-            this.y = this.hero.y + this.vy * 5;
-        } else {
-            // When aiming cardinally, place the chakram in the left hand.
-            this.x = this.hero.x + 3 + this.vy * 5 + this.vx * 5;
-            this.y = this.hero.y - this.vx * 5 + this.vy * 5;
-        }
+          //  this.x = this.hero.x + 3 + this.vx * 5;
+           // this.y = this.hero.y + this.vy * 5;
+        //} else {
+            // When aiming cardinally, place the chakram in the right hand.
+            this.x = this.hero.x + 3 - this.vy * 5 + this.vx * 5;
+            this.y = this.hero.y + this.vx * 5 + this.vy * 5;
+        //}
     }
     update(state: GameState) {
         // Only play the held sound if they actually hold the chakram for a moment.
@@ -259,7 +262,7 @@ export class HeldChakram implements ObjectInstance {
             return;
         }
         if (state.hero.magic > 0 && this.animationTime >= 1000 && state.hero.passiveTools.charge >= 1 && this.animationTime % 200 === 0) {
-            this.sparkles.push(makeSparkleAnimation(state, this, this.hero.element));
+            this.sparkles.push(makeSparkleAnimation(state, this, { element: this.hero.element }));
         }
         this.sparkles = this.sparkles.filter(s => !s.done);
         for (const sparkle of this.sparkles) {

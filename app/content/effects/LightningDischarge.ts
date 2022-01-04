@@ -43,7 +43,7 @@ export class LightningDischarge implements ObjectInstance {
                     y: this.y + (this.radius * 2 / 3) * Math.sin(theta) - 8,
                     w: 16,
                     h: 16,
-                }, 'lightning');
+                }, { element: 'lightning' });
             }
             hitTargets(state, this.area, {
                 damage: 4,
