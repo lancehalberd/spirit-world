@@ -1,6 +1,6 @@
 import { createAnimation } from 'app/utils/animations';
 
-import { ActorAnimations, FrameAnimation, FrameDimensions } from 'app/types';
+import { ActorAnimations, AnimationSet, FrameAnimation, FrameDimensions } from 'app/types';
 
 export const Y_OFF = -4;
 
@@ -154,6 +154,48 @@ export const chargeIceFrontAnimation: FrameAnimation = createAnimation('gfx/mc/a
 export const chargeLightningBackAnimation: FrameAnimation = createAnimation('gfx/mc/aura_lightning.png', chargeGeometry, { cols: 4, y: 0, duration: 5});
 export const chargeLightningFrontAnimation: FrameAnimation = createAnimation('gfx/mc/aura_lightning.png', chargeGeometry, { cols: 4, y: 1, duration: 5});
 
+
+
+const bowGeometry: FrameDimensions = {w: 30, h: 28};
+const bowDownAnimation: FrameAnimation = createAnimation('gfx/mc/bow1.png', bowGeometry, { cols: 3, x: 1, duration: 4});
+const bowDownRightAnimation: FrameAnimation = createAnimation('gfx/mc/bow1.png', bowGeometry, { cols: 3, x: 5, duration: 4});
+const bowRightAnimation: FrameAnimation = createAnimation('gfx/mc/bow1.png', bowGeometry, { cols: 3, x: 9, duration: 4});
+const bowUpRightAnimation: FrameAnimation = createAnimation('gfx/mc/bow1.png', bowGeometry, { cols: 3, x: 13, duration: 4});
+const bowUpAnimation: FrameAnimation = createAnimation('gfx/mc/bow1.png', bowGeometry, { cols: 1, x: 16, duration: 4});
+const bowUpLeftAnimation: FrameAnimation = createAnimation('gfx/mc/bow1.png', bowGeometry, { cols: 3, x: 18, duration: 4});
+const bowLeftAnimation: FrameAnimation = createAnimation('gfx/mc/bow1.png', bowGeometry, { cols: 3, x: 22, duration: 4});
+const bowDownLeftAnimation: FrameAnimation = createAnimation('gfx/mc/bow1.png', bowGeometry, { cols: 3, x: 26, duration: 4});
+
+const dlArrowAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 16, h: 16}, {cols: 1});
+const drArrowAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 16, h: 16}, {x: 2, cols: 1});
+const urArrowAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 16, h: 16}, {x: 4, cols: 1});
+const ulArrowAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 16, h: 16}, {x: 6, cols: 1});
+const downArrowAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 16, h: 16}, {x: 8, cols: 1});
+const rightArrowAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 16, h: 16}, {x: 10, cols: 1});
+const upArrowAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 16, h: 16}, {x: 12, cols: 1});
+const leftArrowAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 16, h: 16}, {x: 14, cols: 1});
+
+export const bowAnimations: AnimationSet = {
+    up: bowUpAnimation,
+    upleft: bowUpLeftAnimation,
+    upright: bowUpRightAnimation,
+    down: bowDownAnimation,
+    downleft: bowDownLeftAnimation,
+    downright: bowDownRightAnimation,
+    left: bowLeftAnimation,
+    right: bowRightAnimation,
+}
+
+export const arrowAnimations: AnimationSet = {
+    up: upArrowAnimation,
+    upleft: ulArrowAnimation,
+    upright: urArrowAnimation,
+    down: downArrowAnimation,
+    downleft: dlArrowAnimation,
+    downright: drArrowAnimation,
+    left: leftArrowAnimation,
+    right: rightArrowAnimation,
+}
 
 export const heroAnimations: ActorAnimations = {
     attack: {

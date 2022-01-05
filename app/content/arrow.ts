@@ -1,3 +1,4 @@
+import { addSparkleAnimation } from 'app/content/animationEffect';
 import { addObjectToArea, getAreaSize, removeObjectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrameAt, getFrame } from 'app/utils/animations';
@@ -5,7 +6,7 @@ import { getDirection, hitTargets } from 'app/utils/field';
 import { playSound } from 'app/utils/sounds';
 
 import {
-    AreaInstance, Direction, Frame, FrameAnimation,
+    AreaInstance, Direction, DrawPriority, Frame, FrameAnimation,
     GameState, HitProperties, MagicElement, ObjectInstance, ObjectStatus
 } from 'app/types';
 
@@ -163,6 +164,7 @@ interface Props {
 export class Arrow implements ObjectInstance {
     area: AreaInstance;
     definition = null;
+    drawPriority: DrawPriority = 'sprites';
     frame: Frame;
     damage: number;
     spiritCloakDamage: number;
@@ -263,6 +265,9 @@ export class Arrow implements ObjectInstance {
             removeObjectFromArea(state, this);
             return;
         }
+        if (!this.stuckFrames && this.damage > 1 && this.animationTime % 60 === 0) {
+            addSparkleAnimation(state, this.area, this, { element: this.element });
+        }
         const hitResult = hitTargets(state, this.area, this.getHitProperties(state));
         if (hitResult.reflected) {
             this.vx = -this.vx;
@@ -299,20 +304,6 @@ export class Arrow implements ObjectInstance {
         }
         const frame = getFrame(animation, this.animationTime);
         drawFrameAt(context, frame, { x: this.x, y: this.y - this.z });
-        if (this.element) {
-            context.save();
-                context.globalAlpha *= 0.8;
-                context.beginPath();
-                context.fillStyle = {fire: 'red', ice: '#08F', lightning: 'yellow'}[this.element];
-                context.arc(
-                    this.x + 3,
-                    this.y - this.z + 3,
-                    3,
-                    0, 2 * Math.PI
-                );
-                context.fill();
-            context.restore();
-        }
     }
 }
 

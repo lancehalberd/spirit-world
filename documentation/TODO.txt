@@ -25,6 +25,8 @@ Graphics:
 
 Current tasks:
     - Bug fixes
+        - Using spirit sight while charging should do nothing.
+        - Using roll while charging should abort the charge and do the roll action.
         - Clone tool bugs
             - Mana regen is wrong when using clone tools (seems to multiply consumption/regen by number of clones)
             - Should destroy clones when the clone technique is unequipped.
@@ -92,9 +94,6 @@ Current tasks:
     - Add target landing locations when falling from sky (also apply to the forest temple pits).
     - Add new hold+walk chakram animations
         - play last 2 frames of attack animation on release.
-    - Add elemental particles
-        - Replace bow glow with neutral charge particles and elemental particles.
-        - Remove charge glow from all other tools.
 
     - Change message rendering system to use the priority queue system to support nested messages.
     - Add new waterfall graphics

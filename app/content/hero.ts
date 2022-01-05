@@ -1,6 +1,7 @@
 import { addObjectToArea } from 'app/content/areas';
 import { destroyClone } from 'app/content/clone';
 import {
+    arrowAnimations, bowAnimations,
     chargeBackAnimation, chargeFrontAnimation,
     chargeFireBackAnimation, chargeFireFrontAnimation,
     chargeIceBackAnimation, chargeIceFrontAnimation,
@@ -9,7 +10,7 @@ import {
 import { getHeroFrame, renderCarriedTile, renderExplosionRing, renderHeroBarrier } from 'app/renderActor';
 import { getChargeLevelAndElement } from 'app/useTool';
 import { drawFrameAt, getFrame } from 'app/utils/animations';
-import { directionMap } from 'app/utils/field';
+import { directionMap, getDirection } from 'app/utils/field';
 
 import {
     Action, ActiveTool, Actor, AreaInstance,
@@ -89,6 +90,8 @@ export class Hero implements Actor, SavedHeroData {
     lightRadius: number = 20;
     rollCooldown: number = 0;
     toolCooldown: number = 0;
+    // Used to render the bow after firing it.
+    toolOnCooldown?: ActiveTool;
     // inventory
     astralProjection?: Hero;
     clones: Hero[];
@@ -290,6 +293,28 @@ export class Hero implements Actor, SavedHeroData {
         }
     }
 
+    renderBow(this: Hero, context: CanvasRenderingContext2D, state: GameState, bowDirection: Direction): void {
+        const isChargingBow = state.hero.toolOnCooldown !== 'bow';
+        const bowAnimationTime = isChargingBow ? 0 : (200 - state.hero.toolCooldown);
+        let arrowXOffset = 8, arrowYOffset = 8;
+        if (directionMap[bowDirection][0] < 0) {
+            arrowXOffset -= directionMap[bowDirection][1] === 0 ? 8 : 4;
+        } else if (directionMap[bowDirection][0] > 0) {
+            arrowXOffset += directionMap[bowDirection][1] === 0 ? 8 : 4;
+        }
+        if (directionMap[bowDirection][1] < 0) {
+            arrowYOffset -= directionMap[bowDirection][0] === 0 ? 8 : 4;
+        } else if (directionMap[bowDirection][1] > 0) {
+            arrowYOffset += directionMap[bowDirection][0] === 0 ? 8 : 4;
+        }
+        const frame = getFrame(bowAnimations[bowDirection], bowAnimationTime);
+        drawFrameAt(context, frame, { x: this.x - 6, y: this.y - this.z - 11 });
+        if (isChargingBow && state.hero.magic > 0) {
+            const arrowFrame = getFrame(arrowAnimations[bowDirection], bowAnimationTime);
+            drawFrameAt(context, arrowFrame, { x: this.x - 7 + arrowXOffset, y: this.y - this.z - 11 + arrowYOffset });
+        }
+    }
+
     render(this: Hero, context: CanvasRenderingContext2D, state: GameState): void {
         const hero = this;
         // Currently the hero always has the barrier when invisible, but this could change.
@@ -319,6 +344,14 @@ export class Hero implements Actor, SavedHeroData {
                 context.restore();
             }
         }
+        const isChargingBow = (hero.chargingRightTool && hero.rightTool === 'bow')
+                || (hero.chargingLeftTool && hero.leftTool === 'bow');
+        const shouldDrawBow = isChargingBow || state.hero.toolOnCooldown === 'bow';
+        const bowDirection = getDirection(hero.actionDx, hero.actionDy, true, hero.d);
+        const drawBowUnderHero = bowDirection === 'up' || bowDirection === 'upleft' || bowDirection === 'upright';
+        if (shouldDrawBow && drawBowUnderHero) {
+            this.renderBow(context, state, bowDirection);
+        }
         const frame = getHeroFrame(state, hero);
         const activeClone = state.hero.activeClone || state.hero;
         context.save();
@@ -329,6 +362,9 @@ export class Hero implements Actor, SavedHeroData {
             }
             drawFrameAt(context, frame, { x: hero.x, y: hero.y - hero.z });
         context.restore();
+        if (shouldDrawBow && !drawBowUnderHero) {
+            this.renderBow(context, state, bowDirection);
+        }
         if (hero.pickUpTile) {
             renderCarriedTile(context, state, hero);
         }
@@ -349,28 +385,6 @@ export class Hero implements Actor, SavedHeroData {
             context.restore();
         }
         renderExplosionRing(context, state, hero);
-        const chargingTool = ((hero.chargingLeftTool && hero.leftTool) || (hero.chargingRightTool && hero.rightTool)) as ActiveTool;
-        if (chargingTool) {
-            const { chargeLevel, element } = getChargeLevelAndElement(state, hero, chargingTool);
-            context.fillStyle = {fire: 'red', ice: '#08F', lightning: 'yellow'}[element] || '#888';
-            const r = 5 * chargeLevel || 2;
-            context.save();
-            context.globalAlpha *= 0.6;
-            if (r < 5) {
-                context.globalAlpha *= 0.6;
-                context.fillStyle = 'white';
-            }
-            context.beginPath();
-            context.arc(
-                hero.x - frame.content.x + frame.w / 2 + hero.actionDx * 6,
-                hero.y - hero.z - frame.content.y + 2 * frame.h / 3 + hero.actionDy * 4,
-                r,
-                0,
-                2 * Math.PI
-            );
-            context.fill();
-            context.restore();
-        }
         if (state.hero.magic > 0 && hero.passiveTools.charge && hero.action === 'charging') {
             const animation = !hero.element
                 ? chargeFrontAnimation

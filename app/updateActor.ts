@@ -1,5 +1,6 @@
 import { find } from 'lodash';
 
+import { addSparkleAnimation } from 'app/content/animationEffect';
 import {
     addObjectToArea, destroyTile, enterLocation, getAreaFromLocation, getAreaSize,
     removeAllClones, removeObjectFromArea, scrollToArea, setNextAreaSection,
@@ -23,7 +24,7 @@ import {
 } from 'app/keyCommands';
 import { checkForFloorEffects, moveActor } from 'app/moveActor';
 import { fallAnimation } from 'app/render/heroAnimations';
-import { useTool } from 'app/useTool';
+import { getChargeLevelAndElement, useTool } from 'app/useTool';
 import { isHeroFloating, isHeroSinking } from 'app/utils/actor';
 import {
     canTeleportToCoords,
@@ -610,11 +611,22 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
             hero.toolCooldown = 200;
             useTool(state, hero, hero.leftTool, hero.actionDx, hero.actionDy);
             hero.chargingLeftTool = false;
-        }
-        if (hero.chargingRightTool && (!isGameKeyDown(state, GAME_KEY.RIGHT_TOOL) || !canCharge)) {
+        } else if (hero.chargingRightTool && (!isGameKeyDown(state, GAME_KEY.RIGHT_TOOL) || !canCharge)) {
             hero.toolCooldown = 200;
             useTool(state, hero, hero.rightTool, hero.actionDx, hero.actionDy);
             hero.chargingRightTool = false;
+        } else {
+            const tool = hero.chargingLeftTool ? hero.leftTool : hero.rightTool;
+            const { chargeLevel, element } = getChargeLevelAndElement(state, hero, tool);
+            if (chargeLevel > 0 && state.time % 100 === 0) {
+                const hitbox = hero.getHitbox(state);
+                addSparkleAnimation(state, hero.area, {
+                    x: hitbox.x + hitbox.w / 2 + hero.actionDx * 12,
+                    y: hitbox.y + hitbox.h / 2 - hero.z + hero.actionDy * 12 - 6,
+                    w: 4,
+                    h: 4,
+                },{ element });
+            }
         }
     } else if (!isFrozen && (heldChakram || hero.action === 'charging')) {
         hero.chargeTime += FRAME_LENGTH;
@@ -832,6 +844,9 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
 
     if (hero.toolCooldown > 0) {
         hero.toolCooldown -= FRAME_LENGTH;
+        if (hero.toolCooldown <= 0) {
+            hero.toolOnCooldown = null;
+        }
     } else if (!isAstralProjection && !hero.swimming && (!hero.action || hero.action === 'walking' || hero.action === 'pushing')
         && !hero.pickUpTile && !hero.pickUpObject
     ) {
