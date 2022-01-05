@@ -523,7 +523,8 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
         ) {
             let topLayer: AreaLayer = area.layers[0];
             for (const layer of area.layers) {
-                if (layer.definition.drawPriority !== 'foreground') {
+                // 'foreground' layer defaults to being in the foreground regardless of drawPriority.
+                if (layer.definition.key !== 'foreground' && layer.definition.drawPriority !== 'foreground') {
                     topLayer = layer;
                 } else {
                     break;
