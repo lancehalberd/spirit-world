@@ -7,7 +7,7 @@ import { drawFrame } from 'app/utils/animations';
 import { characterMap, keyboardMap, xboxMap } from 'app/utils/simpleWhiteFont';
 import { fillRect, pad } from 'app/utils/index';
 
-import { DialogueLootDefinition, Frame, GameState, LootType } from 'app/types';
+import { DialogueChoiceDefinition, DialogueLootDefinition, Frame, GameState, LootType } from 'app/types';
 
 const characterWidth = 8;
 const messageWidth = 160;
@@ -84,7 +84,7 @@ function getEscapedFrames(state: GameState, escapedToken: string): Frame[] {
         case 'B_NEXT_ELEMENT':
             return getGameKeyFrames(GAME_KEY.NEXT_ELEMENT);
     }
-    console.log('Unhandled escape sequence', escapedToken);
+    console.error('Unhandled escape sequence', escapedToken);
     debugger;
     return [];
 }
@@ -108,121 +108,12 @@ export function showMessage(
 }
 
 const messageBreak = '{|}';
-export function parseMessage(state: GameState, message: string): (Frame[][] | DialogueLootDefinition | string)[] {
-    const chunks = message.split(messageBreak);
-    let pages: (Frame[][] | DialogueLootDefinition | string)[] = [];
+export function parseMessage(state: GameState, message: string): (Frame[][] | DialogueLootDefinition | DialogueChoiceDefinition | string)[] {
+    let pages: (Frame[][] | DialogueLootDefinition | DialogueChoiceDefinition | string)[] = [];
     let currentPage: Frame[][] = [];
     let row: Frame[] = [];
     let rowWidth = 0;
-    for (const chunk of chunks) {
-        const spacedChunks = chunk.split(/[ \n]+/);
-        for (const spacedChunk of spacedChunks) {
-            // This will split the spaced chunk into a sequence of elements like:
-            // ['string', 'escapedToken', 'string', ...].
-            // For example: ['Press', 'B_WEAPON', 'to']
-            const escapedChunks = spacedChunk.split(/[{}]/);
-            for (let i = 0; i < escapedChunks.length; i += 2) {
-                const stringToken = escapedChunks[i];
-                if (stringToken) {
-                    // If this is the first word added from a spaced chunk, we add an additional space before it
-                    // but only if it is not at the beginning of a row.
-                    const addedWidth = stringToken.length * characterWidth + (i === 0 ? characterWidth : 0);
-                    // Wrap to the next line if this string is too long to add to the end of this row.
-                    if (row.length && rowWidth + addedWidth > messageWidth) {
-                        currentPage.push(row);
-                        if (currentPage.length >= messageRows) {
-                            pages.push(currentPage);
-                            currentPage = [];
-                        }
-                        row = [];
-                        rowWidth = 0;
-                    }
-                    if (i === 0 && row.length) {
-                        // Add a space before the next word if the row isn't empty.
-                        row.push(null);
-                        rowWidth += characterWidth;
-                    }
-                    for (const c of stringToken) {
-                        row.push(characterMap[c]);
-                        rowWidth += characterMap[c].w;
-                    }
-                }
-                const escapedToken = escapedChunks[i + 1];
-                if (escapedToken) {
-                    if (escapedToken === '-') {
-                        currentPage.push(row);
-                        if (currentPage.length >= messageRows) {
-                            pages.push(currentPage);
-                            currentPage = [];
-                        }
-                        row = [];
-                        rowWidth = 0;
-                        continue;
-                    }
-                    const progressFlag = getEscapedProgressFlag(state, escapedToken);
-                    if (progressFlag) {
-                        if (row.length) {
-                            currentPage.push(row);
-                        }
-                        if (currentPage.length) {
-                            pages.push(currentPage);
-                        }
-                        pages.push(progressFlag);
-                        currentPage = [];
-                        row = [];
-                        rowWidth = 0;
-                        continue;
-                    }
-                    const lootDefinition = getEscapedLoot(state, escapedToken);
-                    if (lootDefinition) {
-                        if (row.length) {
-                            currentPage.push(row);
-                        }
-                        if (currentPage.length) {
-                            pages.push(currentPage);
-                        }
-                        pages.push(lootDefinition);
-                        currentPage = [];
-                        row = [];
-                        rowWidth = 0;
-                        continue;
-                    }
-                    const tokenFrames = getEscapedFrames(state, escapedToken);
-                    if (!tokenFrames?.length) {
-                        continue;
-                    }
-                    // Add the space if this is the fist escapedToken and there was no string token before it.
-                    const shouldAddSpace = i === 0 && !stringToken;
-                    let tokenWidth;
-                    try {
-                        tokenWidth = tokenFrames.reduce((sum, {w}) => sum + w, 0);
-                    } catch (e) {
-                        debugger;
-                    }
-                    if (shouldAddSpace) {
-                        tokenWidth += characterWidth;
-                    }
-                    if (rowWidth + tokenWidth > messageWidth) {
-                        currentPage.push(row);
-                        if (currentPage.length >= messageRows) {
-                            pages.push(currentPage);
-                            currentPage = [];
-                        }
-                        row = [];
-                        rowWidth = 0;
-                    }
-                    if (row.length && shouldAddSpace) {
-                        // Add a space before the next word if the row isn't empty.
-                        row.push(null);
-                        rowWidth += characterWidth;
-                    }
-                    for (const frame of tokenFrames) {
-                        row.push(frame);
-                        rowWidth += frame.w;
-                    }
-                }
-            }
-        }
+    const nextPage = () => {
         if (row.length) {
             currentPage.push(row);
         }
@@ -232,30 +123,191 @@ export function parseMessage(state: GameState, message: string): (Frame[][] | Di
         currentPage = [];
         row = [];
         rowWidth = 0;
+    };
+    const nextRow = () => {
+        if (row.length) {
+            currentPage.push(row);
+            if (currentPage.length >= messageRows) {
+                pages.push(currentPage);
+                currentPage = [];
+            }
+            row = [];
+            rowWidth = 0;
+        }
+    };
+    const messagesAndChoices = message.split(/[\]\[]/);
+    while (messagesAndChoices.length) {
+        const nextMessage = messagesAndChoices.shift();
+        const chunks = nextMessage.split(messageBreak);
+        for (const chunk of chunks) {
+            const spacedChunks = chunk.split(/[ \n]+/);
+            for (const spacedChunk of spacedChunks) {
+                // This will split the spaced chunk into a sequence of elements like:
+                // ['string', 'escapedToken', 'string', ...].
+                // For example: ['Press', 'B_WEAPON', 'to']
+                const escapedChunks = spacedChunk.split(/[{}]/);
+                for (let i = 0; i < escapedChunks.length; i += 2) {
+                    const stringToken = escapedChunks[i];
+                    if (stringToken) {
+                        // If this is the first word added from a spaced chunk, we add an additional space before it
+                        // but only if it is not at the beginning of a row.
+                        const addedWidth = stringToken.length * characterWidth + (i === 0 ? characterWidth : 0);
+                        // Wrap to the next line if this string is too long to add to the end of this row.
+                        if (row.length && rowWidth + addedWidth > messageWidth) {
+                            nextRow();
+                        }
+                        if (i === 0 && row.length) {
+                            // Add a space before the next word if the row isn't empty.
+                            row.push(null);
+                            rowWidth += characterWidth;
+                        }
+                        for (const c of stringToken) {
+                            row.push(characterMap[c]);
+                            rowWidth += characterMap[c].w;
+                        }
+                    }
+                    const escapedToken = escapedChunks[i + 1];
+                    if (escapedToken) {
+                        if (escapedToken === '-') {
+                            nextRow();
+                            continue;
+                        }
+                        if (escapedToken[0] === '@') {
+                            nextPage();
+                            pages.push(escapedToken);
+                            continue;
+                        }
+                        if (escapedToken[0] === '!') {
+                            nextPage();
+                            pages.push(escapedToken);
+                            continue;
+                        }
+                        const progressFlag = getEscapedProgressFlag(state, escapedToken);
+                        if (progressFlag) {
+                            nextPage();
+                            pages.push(progressFlag);
+                            continue;
+                        }
+                        const lootDefinition = getEscapedLoot(state, escapedToken);
+                        if (lootDefinition) {
+                            nextPage();
+                            pages.push(lootDefinition);
+                            continue;
+                        }
+                        const tokenFrames = getEscapedFrames(state, escapedToken);
+                        if (!tokenFrames?.length) {
+                            continue;
+                        }
+                        // Add the space if this is the fist escapedToken and there was no string token before it.
+                        const shouldAddSpace = i === 0 && !stringToken;
+                        let tokenWidth;
+                        try {
+                            tokenWidth = tokenFrames.reduce((sum, {w}) => sum + w, 0);
+                        } catch (e) {
+                            debugger;
+                        }
+                        if (shouldAddSpace) {
+                            tokenWidth += characterWidth;
+                        }
+                        if (rowWidth + tokenWidth > messageWidth) {
+                            nextRow();
+                        }
+                        if (row.length && shouldAddSpace) {
+                            // Add a space before the next word if the row isn't empty.
+                            row.push(null);
+                            rowWidth += characterWidth;
+                        }
+                        for (const frame of tokenFrames) {
+                            row.push(frame);
+                            rowWidth += frame.w;
+                        }
+                    }
+                }
+            }
+        }
+        nextPage();
+        const nextChoice = messagesAndChoices.shift();
+        if (nextChoice) {
+            const [prompt, ...optionStrings] = nextChoice.split('|');
+            const options = optionStrings.map(o => {
+                const [text, key] = o.split(':');
+                return { text, key };
+            })
+            pages.push({
+                prompt,
+                options,
+            });
+
+        }
     }
     return pages;
+}
+
+export function renderTextRow(context: CanvasRenderingContext2D, text: string, {x, y}: {x: number, y: number}): void {
+    for (const character of text) {
+        const frame = characterMap[character];
+        if (!frame) {
+            x += characterWidth;
+            continue;
+        }
+        drawFrame(context, frame, {
+            x: x - (frame.content?.x || 0),
+            y: y - (frame.content?.y || 0), w: frame.w, h: frame.h});
+        x += frame.w;
+    }
 }
 
 export function renderMessage(context: CanvasRenderingContext2D, state: GameState): void {
     renderStandardFieldStack(context, state);
     renderHUD(context, state);
-    const h = messageRows * (16 + 2) + 6;
-    const w = messageWidth + 8;
+    let h = messageRows * (16 + 2) + 6;
+    let w = messageWidth + 8;
     let r = {
         x: (CANVAS_WIDTH - w) / 2,
         y: CANVAS_HEIGHT - h - 16,
         w,
         h,
     };
+    const { pageIndex, pages, choice } = state.messageState;
+    if (choice) {
+        let choiceIndex = state.messageState.choiceIndex || 0;
+        h = Math.max(h, (1 + choice.options.length) * (16 + 2) + 6);
+        let r = {
+            x: (CANVAS_WIDTH - w) / 2,
+            y: CANVAS_HEIGHT - h - 16,
+            w,
+            h,
+        };
+        fillRect(context, pad(r, 2), 'white');
+        fillRect(context, r, 'black');
+        r = pad(r, -4);
+        let y = r.y, x = r.x;
+        renderTextRow(context, choice.prompt, {x, y});
+        y += 18;
+        x += 20;
+        for (let i = 0; i < choice.options.length; i++) {
+            renderTextRow(context, choice.options[i].text, {x, y});
+            if (choiceIndex === i) {
+                // Draw an arrow next to the selected option.
+                context.fillStyle = 'white';
+                context.beginPath();
+                context.moveTo(r.x + 8, y);
+                context.lineTo(r.x + 16, y + 8);
+                context.lineTo(r.x + 8, y + 16);
+                context.fill();
+            }
+            y += 18;
+        }
+        return;
+    }
     fillRect(context, pad(r, 2), 'white');
     fillRect(context, r, 'black');
 
     r = pad(r, -4);
 
     let x = r.x, y = r.y;
-    const { pageIndex, pages } = state.messageState;
     const pageOrLootOrFlag = pages[pageIndex];
-    if (typeof pageOrLootOrFlag === 'string' || pageOrLootOrFlag?.['type'] === 'dialogueLoot') {
+    if (typeof pageOrLootOrFlag === 'string' || pageOrLootOrFlag?.['type'] === 'dialogueLoot' || pageOrLootOrFlag?.['prompt']) {
         return;
     }
     // pages[pageIndex] can also be DialogueLootDefinition, but `pageIndex` should never
@@ -274,5 +326,4 @@ export function renderMessage(context: CanvasRenderingContext2D, state: GameStat
         y += 18;
         x = r.x;
     }
-
 }

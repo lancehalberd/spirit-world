@@ -1,7 +1,7 @@
 import { Staff } from 'app/content/staff';
 
 import {
-    AreaGrid, AreaInstance,
+    AreaGrid, AreaInstance, DialogueChoiceDefinition,
     Frame, Hero, LootType, SavedHeroData, Rect, Zone, ZoneLocation,
 } from 'app/types';
 
@@ -101,7 +101,9 @@ export interface GameState {
         // Time the current page was displayed
         currentPageTime: number
         pageIndex: number
-        pages: (Frame[][] | DialogueLootDefinition | string)[]
+        pages: (Frame[][] | DialogueLootDefinition | DialogueChoiceDefinition | string)[]
+        choice?: DialogueChoiceDefinition
+        choiceIndex?: number
     }
     isUsingKeyboard?: boolean
     isUsingXbox?: boolean

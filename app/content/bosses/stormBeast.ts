@@ -2,6 +2,7 @@ import { addSparkleAnimation } from 'app/content/animationEffect';
 import { addObjectToArea } from 'app/content/areas';
 import { LightningBolt } from 'app/content/effects/lightningBolt';
 import { LightningDischarge } from 'app/content/effects/lightningDischarge';
+import { Spark } from 'app/content/effects/spark';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { allTiles } from 'app/content/tiles';
 import { debugCanvas } from 'app/dom';
@@ -12,7 +13,7 @@ import {
     getVectorToTarget,
     hasEnemyLeftSection,
     // moveEnemy,
-    //moveEnemyToTargetLocation,
+    moveEnemyToTargetLocation,
     //paceRandomly,
 } from 'app/content/enemies';
 import { beetleWingedAnimations } from 'app/content/enemyAnimations';
@@ -21,6 +22,7 @@ import { createAnimation, drawFrameAt } from 'app/utils/animations';
 import { pad, rectanglesOverlap } from 'app/utils/index';
 import { getDirection } from 'app/utils/field';
 import { playSound } from 'app/utils/sounds';
+import Random from 'app/utils/Random';
 
 import { AreaInstance, Enemy, GameState, HitProperties, HitResult, Rect } from 'app/types';
 
@@ -248,6 +250,17 @@ function updateStormHeart(this: void, state: GameState, enemy: Enemy): void {
     }
 }
 
+interface Path {
+    start: number[]
+    end: number[]
+}
+
+const stormBeastPaths = [
+    { start: [256, -64], end: [128, 256]},
+    { start: [-64, 256], end: [256, 384]},
+    { start: [256, 576], end: [384, 256]},
+];
+
 function updateStormBeast(this: void, state: GameState, enemy: Enemy): void {
     const stormHeart = getStormHeart(state, enemy.area);
     const target = getNearbyTarget(state, enemy, 2000, enemy.area.allyTargets);
@@ -274,17 +287,28 @@ function updateStormBeast(this: void, state: GameState, enemy: Enemy): void {
             }
             return;
         }
-        if (!target) {
+        enemy.status = 'normal';
+        // Occasionally the Storm Beast will just fly across the screen at the player.
+        if (target && Math.random() <= 0.2) {
+            const theta = 2 * Math.PI * Math.random();
+            enemy.x = 256 + 400 * Math.cos(theta);
+            enemy.y = 256 + 400 * Math.sin(theta);
+            enemy.params.targetVector = getVectorToTarget(state, enemy, target);
+            enemy.vx = enemy.params.targetVector.x;
+            enemy.vy = enemy.params.targetVector.y;
+            enemy.setMode('charge');
             return;
         }
-        const theta = 2 * Math.PI * Math.random();
-        enemy.x = 256 + 400 * Math.cos(theta);
-        enemy.y = 256 + 400 * Math.sin(theta);
-        enemy.params.targetVector = getVectorToTarget(state, enemy, target);
-        enemy.vx = enemy.params.targetVector.x;
-        enemy.vy = enemy.params.targetVector.y;
-        enemy.status = 'normal';
-        enemy.setMode('charge');
+        // Usually the Storm Beast will pick a location near the platform to fly to
+        // and perform an attack.
+        if (!enemy.params.paths?.length) {
+            enemy.params.paths = [...stormBeastPaths];
+        }
+        const path = Random.removeElement(enemy.params.paths as Path[]);
+        enemy.params.targetLocation = path.end;
+        enemy.x = path.start[0];
+        enemy.y = path.start[1];
+        enemy.setMode('approach');
         return;
     }
     if (enemy.life < enemy.enemyDefinition.life * 2 / 3) {
@@ -318,6 +342,37 @@ function updateStormBeast(this: void, state: GameState, enemy: Enemy): void {
     if (enemy.mode === 'choose') {
         enemy.d = getDirection(targetVector.x, targetVector.y);
         enemy.setAnimation('idle', enemy.d);
+    } else if (enemy.mode === 'approach') {
+        const [x, y] = enemy.params.targetLocation;
+        if (moveEnemyToTargetLocation(state, enemy, x, y) < 5) {
+            enemy.setMode('attackPlatform');
+        }
+    } else if (enemy.mode === 'attackPlatform') {
+        const hitbox = enemy.getHitbox(state);
+        const cx = hitbox.x + hitbox.w / 2, cy = hitbox.y + hitbox.h / 2;
+        if (enemy.modeTime && enemy.modeTime % 800 === 0) {
+            const sparkCount = 3 + enemy.modeTime / 800;
+            const baseTheta = Math.atan2(256 - cy, 256 - cx);
+            for (let i = 0; i < sparkCount; i++) {
+                const theta = baseTheta - Math.PI / 6 + Math.PI / 3 * i / (sparkCount - 1);
+                const dx = Math.cos(theta), dy = Math.sin(theta);
+                const spark = new Spark({
+                    x: cx + 16 * dx,
+                    y: cy + 16 * dy,
+                    vx: 3 * dx,
+                    vy: 3 * dy,
+                    ttl: 2000,
+                });
+                addObjectToArea(state, enemy.area, spark);
+            }
+        }
+        const timeLimit = isEnemyDefeated(stormHeart) ? 3000 : 2000;
+        if (enemy.modeTime >= timeLimit) {
+            // Fly away from the platform.
+            enemy.params.targetVector = {x: cx - 256, y: cy - 256};
+            enemy.vy = enemy.vx = 0;
+            enemy.setMode('charge');
+        }
     } else if (enemy.mode === 'charge') {
         accelerateInDirection(state, enemy, enemy.params.targetVector);
         enemy.x += enemy.vx;

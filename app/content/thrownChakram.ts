@@ -243,7 +243,7 @@ export class HeldChakram implements ObjectInstance {
         //} else {
             // When aiming cardinally, place the chakram in the right hand.
             this.x = this.hero.x + 3 - this.vy * 5 + this.vx * 5;
-            this.y = this.hero.y + this.vx * 5 + this.vy * 5;
+            this.y = this.hero.y + this.vx * 5 + this.vy * 4;
         //}
     }
     update(state: GameState) {

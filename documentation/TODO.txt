@@ -43,12 +43,11 @@ Current tasks:
         - Add `isActive` to enemy to indicate whether it is a valid source for attacks: if (sourceEnemy && !sourceEnemy.isActive(state)) { ... }
 
     Storm Beast
-        - Storm Heart is protected by a layer of bouncy clouds that the MC can slowly deform to reveal the heart. The clouds reform slowly over time.
-        - Storm Heart uses a large discharge attack a few seconds after taking damage, which also full restores the clouds.
-        - Storm Heart summons lightning bolts while enraged.
         - Storm Beast flies in and out of the battle field.
         - Storm Beast can turn into lightning and teleport as a beam sending shockwaves out at both ends.
         - Storm Beast can charge south to exit the battle field
+        - Storm Beast flies to the sides or bottom of the arena and performs attacks towards the arena
+            - Clouds to the sides of the Storm Beast are safe from these attacks.
 
     Make mutation transition use the same area instance so contents don't reset
         - Will need to add special handling to remove extra ice tiles from frost beast+heat sink battles.
@@ -98,6 +97,13 @@ Current tasks:
     - Change message rendering system to use the priority queue system to support nested messages.
     - Add new waterfall graphics
 
+
+Add advanced tutorials
+    - Maybe NPCs in home cave, or some kind of training/tutorial dojo?
+    - Hitting enemies with chakram held in hand
+    - Default Charged chakram attack
+    - Maybe different sections for different tools.
+    - Reflecting projectiles
 
 
 High level list of things left to do:
