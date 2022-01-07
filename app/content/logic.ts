@@ -15,6 +15,10 @@ export function isItemLogicTrue(state: GameState, itemFlag: string): boolean {
     if (itemFlag.includes(':')) {
         [itemFlag, levelString] = itemFlag.split(':');
         level = parseInt(levelString, 10);
+        if (isNaN(level)) {
+            // assume levelString is item string, itemFlag is zone key
+            return !!state.savedState.dungeonInventories[itemFlag]?.[levelString];
+        }
     }
     if (itemFlag === 'weapon') {
         return state.hero.weapon >= level;
