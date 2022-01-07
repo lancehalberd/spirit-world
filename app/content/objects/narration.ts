@@ -1,7 +1,7 @@
 import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
 import { editingState } from 'app/development/tileEditor';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { showMessage } from 'app/render/renderMessage';
+import { setScript } from 'app/scriptEvents';
 import { readGetParameter, rectanglesOverlap } from 'app/utils/index';
 
 
@@ -49,7 +49,7 @@ export class Narration implements ObjectInstance {
         }
         const hero = state.hero.activeClone || state.hero;
         if (hero.action !== 'knocked' && rectanglesOverlap(this.getHitbox(state), hero.getHitbox(state))) {
-            showMessage(state, this.definition.message);
+            setScript(state, this.definition.message);
             saveObjectStatus(state, this.definition);
             this.status = 'gone';
         }

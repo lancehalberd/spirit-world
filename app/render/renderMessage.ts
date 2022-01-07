@@ -1,13 +1,13 @@
 import { flatten } from 'lodash';
 import { getLootTypes } from 'app/development/objectEditor';
 import { CANVAS_WIDTH, CANVAS_HEIGHT, GAME_KEY } from 'app/gameConstants';
-import { renderStandardFieldStack } from 'app/render';
-import { renderHUD } from 'app/renderHUD';
 import { drawFrame } from 'app/utils/animations';
 import { characterMap, keyboardMap, xboxMap } from 'app/utils/simpleWhiteFont';
 import { fillRect, pad } from 'app/utils/index';
 
-import { DialogueChoiceDefinition, DialogueLootDefinition, Frame, GameState, LootType } from 'app/types';
+import { setScript } from 'app/scriptEvents';
+
+import { DialogueChoiceDefinition, DialogueLootDefinition, Frame, GameState, LootType, ShowChoiceBoxActiveScriptEvent } from 'app/types';
 
 const characterWidth = 8;
 const messageWidth = 160;
@@ -91,20 +91,12 @@ function getEscapedFrames(state: GameState, escapedToken: string): Frame[] {
 
 export function showMessage(
     state: GameState,
-    message: string,
-    advanceTime: number = 0,
-    continueUpdatingState: boolean = false
+    message: string
 ): void {
     if (!message){
         return;
     }
-    state.messageState = {
-        advanceTime,
-        continueUpdatingState,
-        pageIndex: 0,
-        currentPageTime: state.time,
-        pages: parseMessage(state, message),
-    };
+    setScript(state, message);
 }
 
 const messageBreak = '{|}';
@@ -220,14 +212,14 @@ export function parseMessage(state: GameState, message: string): (Frame[][] | Di
                     const nextChoice = actionToken.substring(1);
                     console.log(nextChoice);
                     const [prompt, ...optionStrings] = nextChoice.split('|');
-                    const options = optionStrings.map(o => {
+                    const choices = optionStrings.map(o => {
                         const [text, key] = o.split(':');
                         return { text, key };
                     })
-                    console.log(prompt, options);
+                    console.log(prompt, choices);
                     pages.push({
                         prompt,
-                        options,
+                        choices,
                     });
                     continue;
                 }
@@ -266,8 +258,6 @@ export function renderTextRow(context: CanvasRenderingContext2D, text: string, {
 }
 
 export function renderMessage(context: CanvasRenderingContext2D, state: GameState): void {
-    renderStandardFieldStack(context, state);
-    renderHUD(context, state);
     let h = messageRows * (16 + 2) + 6;
     let w = messageWidth + 8;
     let r = {
@@ -276,10 +266,44 @@ export function renderMessage(context: CanvasRenderingContext2D, state: GameStat
         w,
         h,
     };
-    const { pageIndex, pages, choice } = state.messageState;
+    let { pageIndex, pages, choice } = state.messageState || {};
+    if (!pages && state.messagePage) {
+        pages = [state.messagePage];
+        pageIndex = 0;
+    }
+    const pageOrLootOrFlag = pages?.[pageIndex];
+
+    if (pageOrLootOrFlag && typeof pageOrLootOrFlag !== 'string'
+        && pageOrLootOrFlag?.['type'] !== 'dialogueLoot' && !pageOrLootOrFlag?.['prompt']
+    ) {
+        fillRect(context, pad(r, 2), 'white');
+        fillRect(context, r, 'black');
+        r = pad(r, -4);
+        let x = r.x, y = r.y;
+        // pages[pageIndex] can also be DialogueLootDefinition, but `pageIndex` should never
+        // stop on a loot definition.
+        for (const row of (pageOrLootOrFlag as Frame[][])) {
+            for (const frame of row) {
+                if (!frame) {
+                    x += characterWidth;
+                    continue;
+                }
+                drawFrame(context, frame, {
+                    x: x - (frame.content?.x || 0),
+                    y: y - (frame.content?.y || 0), w: frame.w, h: frame.h});
+                x += frame.w;
+            }
+            y += 18;
+            x = r.x;
+        }
+    }
+    if (!choice) {
+        const event = state.scriptEvents.activeEvents.find(event => event.type === 'showChoiceBox') as ShowChoiceBoxActiveScriptEvent;
+        choice = event;
+    }
     if (choice) {
         let choiceIndex = state.messageState.choiceIndex || 0;
-        h = Math.max(h, (1 + choice.options.length) * (16 + 2) + 6);
+        h = Math.max(h, (1 + choice.choices.length) * (16 + 2) + 6);
         let r = {
             x: (CANVAS_WIDTH - w) / 2,
             y: CANVAS_HEIGHT - h - 16,
@@ -290,11 +314,13 @@ export function renderMessage(context: CanvasRenderingContext2D, state: GameStat
         fillRect(context, r, 'black');
         r = pad(r, -4);
         let y = r.y, x = r.x;
-        renderTextRow(context, choice.prompt, {x, y});
-        y += 18;
+        if (choice.prompt) {
+            renderTextRow(context, choice.prompt, {x, y});
+            y += 18;
+        }
         x += 20;
-        for (let i = 0; i < choice.options.length; i++) {
-            renderTextRow(context, choice.options[i].text, {x, y});
+        for (let i = 0; i < choice.choices.length; i++) {
+            renderTextRow(context, choice.choices[i].text, {x, y});
             if (choiceIndex === i) {
                 // Draw an arrow next to the selected option.
                 context.fillStyle = 'white';
@@ -306,32 +332,5 @@ export function renderMessage(context: CanvasRenderingContext2D, state: GameStat
             }
             y += 18;
         }
-        return;
-    }
-    fillRect(context, pad(r, 2), 'white');
-    fillRect(context, r, 'black');
-
-    r = pad(r, -4);
-
-    let x = r.x, y = r.y;
-    const pageOrLootOrFlag = pages[pageIndex];
-    if (typeof pageOrLootOrFlag === 'string' || pageOrLootOrFlag?.['type'] === 'dialogueLoot' || pageOrLootOrFlag?.['prompt']) {
-        return;
-    }
-    // pages[pageIndex] can also be DialogueLootDefinition, but `pageIndex` should never
-    // stop on a loot definition.
-    for (const row of (pageOrLootOrFlag as Frame[][])) {
-        for (const frame of row) {
-            if (!frame) {
-                x += characterWidth;
-                continue;
-            }
-            drawFrame(context, frame, {
-                x: x - (frame.content?.x || 0),
-                y: y - (frame.content?.y || 0), w: frame.w, h: frame.h});
-            x += frame.w;
-        }
-        y += 18;
-        x = r.x;
     }
 }

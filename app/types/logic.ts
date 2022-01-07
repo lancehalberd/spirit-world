@@ -56,8 +56,8 @@ export interface DialogueOption {
 }
 
 export interface DialogueChoiceDefinition {
-    prompt: string
-    options: {
+    prompt?: string
+    choices: {
         text: string
         key: string
     }[]

@@ -92,8 +92,8 @@ export function render() {
     if (!state?.gameHasBeenInitialized) {
         return;
     }
-    if (state.messageState?.pages) {
-        renderMessage(context, state);
+    // Only render if the state has actually progressed since the last render.
+    if (state.lastTimeRendered >= state.time) {
         return;
     }
     if (state.transitionState && !state.areaInstance?.priorityObjects?.length) {
@@ -107,12 +107,9 @@ export function render() {
         renderTitle(context, state);
         return;
     }
-    // Only render if the state has actually progressed since the last render.
-    if (state.lastTimeRendered >= state.time) {
-        return;
-    }
     state.lastTimeRendered = state.time;
     renderStandardFieldStack(context, state);
+    renderMessage(context, state);
 
     // Render any editor specific graphics if appropriate.
     renderEditor(context, state);

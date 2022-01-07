@@ -419,7 +419,7 @@ export class ChestObject implements ObjectInstance {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
     isOpen(state: GameState): boolean {
-        return (state.savedState.objectFlags[this.definition.id] || this.definition.lootType === 'empty');
+        return (!!state.savedState.objectFlags[this.definition.id] || this.definition.lootType === 'empty');
     }
     onGrab(state: GameState) {
         // You can only open a chest from the bottom.

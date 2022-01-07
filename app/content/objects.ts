@@ -214,5 +214,5 @@ export function getObjectStatus(this: void, state: GameState, definition: Object
     if (!definition.id) {
         return false;
     }
-    return state.savedState.zoneFlags[definition.id] || state.savedState.objectFlags[definition.id];
+    return !!state.savedState.zoneFlags[definition.id] || !!state.savedState.objectFlags[definition.id];
 }

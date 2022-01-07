@@ -14,9 +14,10 @@ import {
 } from 'app/gameConstants';
 import { updateKeyboardState } from 'app/keyCommands';
 import { initializeGame } from 'app/initialize';
-import { wasGameKeyPressed } from 'app/keyCommands';
+import { wasGameKeyPressed, wasConfirmKeyPressed } from 'app/keyCommands';
 import { showMessage } from 'app/render/renderMessage';
 import { updateHeroMagicStats } from 'app/render/spiritBar';
+import { updateScriptEvents } from 'app/scriptEvents'
 import {
     getDefaultSavedState,
     getState,
@@ -48,14 +49,6 @@ export function update() {
     state.time += FRAME_LENGTH;
     updateKeyboardState(state);
     try {
-        if (state.scene === 'game'
-            && !state.defeatState.defeated
-            && !state.messageState?.pages
-            && wasGameKeyPressed(state, GAME_KEY.MENU)
-         ) {
-            state.paused = !state.paused;
-            state.menuIndex = 0;
-        }
         if (state.messageState?.pages) {
             updateMessage(state);
             if (!state.messageState.continueUpdatingState) {
@@ -63,6 +56,10 @@ export function update() {
             }
         }
         if (state.transitionState && !state.areaInstance.priorityObjects?.length) {
+            if (wasGameKeyPressed(state, GAME_KEY.MENU)) {
+                state.paused = !state.paused;
+                state.menuIndex = 0;
+            }
             if (!state.paused) {
                 updateTransition(state);
             }
@@ -73,22 +70,25 @@ export function update() {
         } else if (state.defeatState.defeated) {
             updateDefeated(state);
         } else {
-            if (!state.paused) {
-                updateField(state);
-            } else {
-                updateMenu(state);
+            updateScriptEvents(state);
+            if (!state.scriptEvents.blockFieldUpdates) {
+                // Make sure we don't handle script event input twice in one frame.
+                // We could also manage this by unsetting game keys on the state.
+                if (!state.scriptEvents.handledInput  && wasGameKeyPressed(state, GAME_KEY.MENU)) {
+                    state.paused = !state.paused;
+                    state.menuIndex = 0;
+                }
+                if (!state.paused) {
+                    updateField(state);
+                } else {
+                    updateMenu(state);
+                }
             }
         }
     } catch (e) {
         console.log(e.stack);
         debugger;
     }
-}
-
-export function wasConfirmKeyPressed(state: GameState): boolean {
-    return !!(wasGameKeyPressed(state, GAME_KEY.WEAPON)
-        || wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL)
-        || wasGameKeyPressed(state, GAME_KEY.MENU));
 }
 
 function updateTitle(state: GameState) {
@@ -236,12 +236,12 @@ function processNonDialoguePages(state: GameState) {
 
 function updateMessageChoice(state: GameState) {
     if (wasConfirmKeyPressed(state)) {
-        const option = state.messageState.choice.options[state.messageState.choiceIndex];
+        const option = state.messageState.choice.choices[state.messageState.choiceIndex];
         delete state.messageState.choice;
         followMessagePointer(state, option.key);
         return;
     }
-    const optionCount = state.messageState.choice.options.length;
+    const optionCount = state.messageState.choice.choices.length;
     if (wasGameKeyPressed(state, GAME_KEY.UP)) {
         state.messageState.choiceIndex = (state.messageState.choiceIndex + optionCount - 1) % optionCount;
     } else if (wasGameKeyPressed(state, GAME_KEY.DOWN)) {
