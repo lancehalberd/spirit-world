@@ -14,6 +14,7 @@ import {
 
 // Clears all current script events and queues up events parsed from the new script.
 export function setScript(state: GameState, script: string): void {
+    console.log('setScript', script);
     state.scriptEvents.queue = parseEventScript(state, script);
     state.scriptEvents.activeEvents = [];
 }
@@ -97,25 +98,28 @@ export function parseEventScript(state: GameState, script: string): ScriptEvent[
             events.push({
                 type: 'setFlag',
                 flag,
-                value: isNaN(valueNumber) ? value : valueNumber,
+                value: isNaN(valueNumber) ? (value || true) : valueNumber,
+            });
+            events.push({
+                type: 'refreshAreaLogic',
             });
             continue;
         }
         if (actionToken.startsWith('item:')) {
             const [ /* 'loot' */, lootType, amountOrLevel] = actionToken.split(':');
-            if (getLootTypes().includes(lootType as LootType)) {
-                const number = parseInt(amountOrLevel, 10);
-                events.push({
-                    type: 'gainLoot',
-                    lootDefinition: {
-                        lootType: lootType as LootType,
-                        lootLevel: isNaN(number) ? 0 : number,
-                        lootAmount: isNaN(number) ? 0 : number,
-                    },
-                });
+            if (!getLootTypes().includes(lootType as LootType)) {
+                throw new Error('Unknown loot type: ' + lootType);
             }
-            throw new Error('Unknown loot type: ' + lootType);
-            continue;
+            const number = parseInt(amountOrLevel, 10);
+            events.push({
+                type: 'gainLoot',
+                lootDefinition: {
+                    lootType: lootType as LootType,
+                    lootLevel: isNaN(number) ? 0 : number,
+                    lootAmount: isNaN(number) ? 0 : number,
+                },
+            });
+            continue
         }
         console.error('Unhandled actiont token', actionToken);
     }
@@ -179,18 +183,23 @@ export const updateScriptEvents = (state: GameState): void => {
     }
     while (state.scriptEvents.queue.length) {
         const event = state.scriptEvents.queue.shift();
+        console.log('Running event', event.type, event);
         switch (event.type) {
             case 'wait':
                 state.scriptEvents.activeEvents.push({
                     ...event,
                     time: state.time,
                 });
+                if (event.blockFieldUpdates) {
+                    state.scriptEvents.blockFieldUpdates = true;
+                }
                 return;
             case 'showChoiceBox':
                 state.scriptEvents.activeEvents.push({
                     ...event,
                     choiceIndex: 0,
                 });
+                state.scriptEvents.blockFieldUpdates = true;
                 return;
             case 'showTextBox':
                 state.messagePage = event.textPage;
@@ -203,6 +212,7 @@ export const updateScriptEvents = (state: GameState): void => {
                 break;
             case 'refreshAreaLogic':
                 refreshAreaLogic(state, state.areaInstance);
+                refreshAreaLogic(state, state.areaInstance.alternateArea);
                 break;
             case 'gainLoot':
                 getLoot(state, {type: 'dialogueLoot', ...event.lootDefinition});

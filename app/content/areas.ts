@@ -696,6 +696,9 @@ export function getAreaSize(state: GameState): {w: number, h: number, section: R
 }
 
 export function refreshAreaLogic(state: GameState, area: AreaInstance): void {
+    if (!area) {
+        return;
+    }
     let lastLayerIndex = -1, refreshBehavior = false;
     for (let i = 0; i < area.definition.layers.length; i++) {
         const layerDefinition = area.definition.layers[i];

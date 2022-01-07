@@ -1,7 +1,7 @@
 import { Staff } from 'app/content/staff';
 
 import {
-    ActiveScriptEvent, AreaGrid, AreaInstance, DialogueChoiceDefinition,
+    ActiveScriptEvent, AreaGrid, AreaInstance,
     Frame, Hero, LootData, SavedHeroData, Rect, ScriptEvent,
     Zone, ZoneLocation,
 } from 'app/types';
@@ -92,18 +92,6 @@ export interface GameState {
         gameKeysReleased: Set<number>
     },
     messagePage?: Frame[][]
-    messageState?: {
-        // How long to show each page before automatically advancing
-        advanceTime?: number
-        // Whether to continue updating the field in the background while text is displayed
-        continueUpdatingState?: boolean
-        // Time the current page was displayed
-        currentPageTime: number
-        pageIndex: number
-        pages: (Frame[][] | DialogueLootDefinition | DialogueChoiceDefinition | string)[]
-        choice?: DialogueChoiceDefinition
-        choiceIndex?: number
-    }
     scriptEvents: {
         activeEvents: ActiveScriptEvent[]
         blockEventQueue: boolean
