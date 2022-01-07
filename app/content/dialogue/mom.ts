@@ -4,7 +4,7 @@ import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 dialogueHash.mom = {
     key: 'mom',
     mappedOptions: {
-        rest: `[Do you want to rest?|Yes:mom.yesRest|No:mom.noRest]`,
+        rest: `{?Do you want to rest?|Yes:mom.yesRest|No:mom.noRest}`,
         yesRest: 'Sweet dreams! {!rest}',
         noRest: 'Be careful out there!',
     },

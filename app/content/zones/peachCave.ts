@@ -356,10 +356,10 @@ const f0_0x0: AreaDefinition = {
         {id: "", linked: false, spirit: false, status: "closedEnemy", x: 48, y: 240, type: "door", d: "down", style: "cavern"},
         {status: "normal", id: "peachCaveSprout1", x: 320, y: 128, type: "vineSprout"},
         {status: "normal", id: "thornsInstructions", x: 112, y: 352, type: "narration", message: "", w: 32, h: 144},
-        {status: "normal", id: "chestInstructions", x: 64, y: 208, type: "narration", message: "Hey, a chest!\n{|}Maybe it has something in it that will help.\n{|}(Approach a chest from the south and press {B_PASSIVE} to open it)", w: 32, h: 32},
+        {status: "normal", id: "chestInstructions", x: 64, y: 208, type: "narration", message: "Hey, a chest!\n{|}Maybe it has something in it that will help.\n{|}(Approach a chest from the south and press [B_PASSIVE] to open it)", w: 32, h: 32},
         {status: "normal", id: "exploreInstructions", x: 320, y: 320, type: "narration", message: "That bug on the vine doesn't look friendly.\n{|}I won't be able to climb with it in the way.\n{|}(Explore the cave to find something to remove the beetle.)", w: 48, h: 32, hasCustomLogic: true, customLogic: "$weapon", invertLogic: true},
         {status: "normal", id: "thornsInstructions", x: 224, y: 448, type: "narration", message: "I don't like the look of those thorns...\n{|}Maybe I can find another way?", w: 32, h: 48, delay: 500},
-        {status: "normal", id: "cliffInstructions", x: 224, y: 368, type: "narration", message: "It looks like I could jump down over there.\n{|}(Hold {B_LEFT} against the ledge to jump down.)", w: 32, h: 48, delay: 500},
+        {status: "normal", id: "cliffInstructions", x: 224, y: 368, type: "narration", message: "It looks like I could jump down over there.\n{|}(Hold [B_LEFT] against the ledge to jump down.)", w: 32, h: 48, delay: 500},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},
@@ -787,8 +787,8 @@ const f0_1x0: AreaDefinition = {
         {id: "peachCave:waterEntrance", linked: true, spirit: false, status: "normal", x: 352, y: 496, type: "door", style: "wideEntrance", targetZone: "overworld", targetObjectId: "peachCaveWaterEntrance", d: "down"},
         {status: "normal", id: "peachCavePiece", x: 144, y: 288, type: "chest", lootType: "peachOfImmortalityPiece", lootLevel: 1},
         {status: "normal", id: "movementInstructions", x: 224, y: 112, type: "narration", message: "", w: 32, h: 64, delay: 2000},
-        {status: "normal", id: "climbInstructions", x: 256, y: 112, type: "narration", message: "Wow, the cave is full of glowing plants!\n{|}I bet I could use that vine to climb up the ledge.\n{|}(Approach a vine and use {B_UP} to climb)", w: 32, h: 64, delay: 500},
-        {status: "normal", id: "movementInstructions", x: 112, y: 160, type: "narration", message: "This cave is so dark I didn't see that hole until it was too late...\n{|}Huh, there is a strange glow over there.\n{|}(Use {B_DPAD} to investigate the light to the east.)", w: 32, h: 32, delay: 2000},
+        {status: "normal", id: "climbInstructions", x: 256, y: 112, type: "narration", message: "Wow, the cave is full of glowing plants!\n{|}I bet I could use that vine to climb up the ledge.\n{|}(Approach a vine and use [B_UP] to climb)", w: 32, h: 64, delay: 500},
+        {status: "normal", id: "movementInstructions", x: 112, y: 160, type: "narration", message: "This cave is so dark I didn't see that hole until it was too late...\n{|}Huh, there is a strange glow over there.\n{|}(Use [B_DPAD] to investigate the light to the east.)", w: 32, h: 32, delay: 2000},
         {status: "normal", id: "peachCaveFinalNarration", x: 368, y: 416, type: "narration", message: "Hey I know this place...\n{|}This is the cave by the lake, I can swim out over there!", delay: 500, w: 32, h: 32},
     ],
     sections: [

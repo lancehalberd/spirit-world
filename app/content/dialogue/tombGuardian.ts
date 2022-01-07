@@ -26,7 +26,7 @@ dialogueHash.tombGuardian = {
             isExclusive: true,
             text: [
                 `You can use your teleportation skill to leave here through that portal.
-                {|} Move your Astral Body where you want to go and press {B_TOOL} to teleport.
+                {|} Move your Astral Body where you want to go and press [B_TOOL] to teleport.
                 `
             ],
         },
@@ -52,7 +52,7 @@ dialogueHash.tombGuardian = {
             isExclusive: true,
             text: [
                 `Now that you can touch the Spirit World you can open the door behind me.`,
-                `Press {B_PASSIVE} to gaze into the Spirit World and find a way to open the door.`,
+                `Press [B_PASSIVE] to gaze into the Spirit World and find a way to open the door.`,
             ],
         },
         {

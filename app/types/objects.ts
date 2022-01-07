@@ -9,6 +9,15 @@ import {
 
 export type DrawPriority = 'background' | 'foreground' | 'sprites' | 'hud';
 
+export interface LootData {
+    lootType: LootType
+    // Only applies to 'money' loot currently.
+    lootAmount?: number
+    // Only matters for certain active tools, chakram, and some passive tools like charge.
+    // If this is 0/unset it means it is progressive.
+    lootLevel?: number
+}
+
 export interface ObjectInstance {
     area?: AreaInstance,
     definition?: ObjectDefinition,
@@ -198,12 +207,8 @@ export interface KeyBlockDefinition extends BaseObjectDefinition {
     targetObjectId?: string,
 }
 
-export interface LootObjectDefinition extends BaseObjectDefinition {
+export type LootObjectDefinition = BaseObjectDefinition & LootData & {
     type: 'bigChest' | 'chest' | 'loot',
-    lootType: LootType,
-    lootAmount?: number,
-    // If this is 0/unset it means it is progressive.
-    lootLevel?: number,
 }
 
 export interface CrystalSwitchDefinition extends BaseObjectDefinition {
@@ -285,14 +290,10 @@ export interface EnemyObjectDefinition extends BaseObjectDefinition {
     params?: {[key: string]: any},
 }
 
-export interface BossObjectDefinition extends BaseObjectDefinition {
+export type BossObjectDefinition = BaseObjectDefinition & LootData & {
     type: 'boss',
     enemyType: BossType,
     params?: {[key: string]: any},
-    lootType: LootType,
-    lootAmount?: number,
-    // If this is 0/unset it means it is progressive.
-    lootLevel?: number,
 }
 
 export type ObjectDefinition = SimpleObjectDefinition
