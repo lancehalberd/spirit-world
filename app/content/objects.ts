@@ -72,7 +72,7 @@ export function createObjectInstance(state: GameState, object: ObjectDefinition)
         return new CrystalSwitch(state, object);
     } else if (object.type === 'pitEntrance') {
         return new PitEntrance(object);
-    } else if (object.type === 'marker') {
+    } else if (object.type === 'marker' || object.type === 'spawnMarker') {
         return new Marker(object);
     } else if (object.type === 'narration') {
         return new Narration(state, object);

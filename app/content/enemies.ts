@@ -654,7 +654,7 @@ export function getVectorToTarget(state: GameState, source: ObjectInstance, targ
     if (mag) {
         return {mag, x: dx / mag, y: dy / mag};
     }
-    return null;
+    return {mag, x: 0, y: 1};
 }
 
 export function getVectorToNearbyTarget(state: GameState, source: ObjectInstance, radius: number, targets: ObjectInstance[]): {x: number, y: number, mag: number} | null {
@@ -668,7 +668,10 @@ export function getVectorToNearbyTarget(state: GameState, source: ObjectInstance
         const dy = (targetHitbox.y + targetHitbox.h / 2) - (hitbox.y + hitbox.h / 2);
         const mag = Math.sqrt(dx * dx + dy * dy);
         if (mag <= radius) {
-            return {x: dx / mag, y: dy / mag, mag};
+            if (mag) {
+                return {mag, x: dx / mag, y: dy / mag};
+            }
+            return {mag, x: 0, y: 1};
         }
     }
     return null;

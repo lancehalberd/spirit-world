@@ -105,6 +105,8 @@ export interface Actor extends ObjectInstance {
     sinking?: boolean
     inAirBubbles?: boolean
     frozenDuration?: number
+    // If the hero is touching a pit we won't update there safe location.
+    isTouchingPit?: boolean
     isOverPit?: boolean
     // These flags are set when an actor is being forced to move through door objects.
     isUsingDoor?: boolean

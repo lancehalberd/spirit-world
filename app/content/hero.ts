@@ -78,6 +78,7 @@ export class Hero implements Actor, SavedHeroData {
     isUsingDoor?: boolean;
     isExitingDoor?: boolean;
     isControlledByObject?: boolean;
+    isTouchingPit?: boolean;
     isOverPit?: boolean;
     // stats
     magic: number = 0;

@@ -231,7 +231,7 @@ export interface EntranceDefinition extends BaseObjectDefinition {
     locationCue?: string,
 }
 export interface MarkerDefinition extends BaseObjectDefinition {
-    type: 'marker',
+    type: 'marker' | 'spawnMarker',
     // This message will be displayed as a location indicator when arriving at this entrance.
     locationCue?: string,
 }

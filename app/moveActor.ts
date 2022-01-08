@@ -557,6 +557,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
     } else if (!startClimbing && hero.action === 'climbing') {
         hero.action = null;
     }
+    hero.isTouchingPit = fallingTopLeft || fallingTopRight || fallingBottomLeft || fallingBottomRight;
     hero.isOverPit = fallingTopLeft && fallingTopRight && fallingBottomLeft && fallingBottomRight;
     if (hero.isOverPit && !state.nextAreaSection && !state.nextAreaInstance) {
         if (hero.z <= 0 && hero.action !== 'roll') {

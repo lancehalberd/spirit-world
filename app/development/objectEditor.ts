@@ -55,7 +55,7 @@ export const combinedObjectTypes: ObjectType[] = [
     'airBubbles', 'ballGoal', 'beadCascade', 'beadGrate', 'bigChest', 'chest', 'crystalSwitch', 'decoration',
     'door', 'escalator', 'floorSwitch', 'keyBlock', 'loot','marker', 'narration', 'npc', 'pitEntrance',
     'pushPull', 'rollingBall', 'sign', 'staffTowerPoint', 'teleporter', 'tippable', 'torch',
-    'vineSprout', 'waterPot',
+    'vineSprout', 'waterPot', 'spawnMarker',
 ];
 
 export function createObjectDefinition(
@@ -120,6 +120,7 @@ export function createObjectDefinition(
                 status: definition.status || commonProps.status,
             };
         case 'marker':
+        case 'spawnMarker':
             return {
                 ...commonProps,
                 locationCue: definition.locationCue,
@@ -575,6 +576,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             }
             // This intentionally continue on to the marker properties.
         case 'marker':
+        case 'spawnMarker':
             rows.push({
                 name: 'Cue',
                 value: object.locationCue || '',
