@@ -152,9 +152,6 @@ function updateFrostHeart(this: void, state: GameState, enemy: Enemy): void {
         }
         return;
     }
-    let chargeRate = 20;
-    if (enemy.life < 12) chargeRate += 10;
-    if (enemy.life < 8) chargeRate += 20;
     if (enemy.life <= 10 && enemy.params.enrageLevel === 0) {
         enemy.params.enrageLevel = 1;
         enemy.params.enrageTime = 5000;
@@ -166,14 +163,18 @@ function updateFrostHeart(this: void, state: GameState, enemy: Enemy): void {
         enemy.params.shieldLife++;
         enemy.modeTime = 0;
     }
-    enemy.params.chargeLevel = (enemy.params.chargeLevel || 0) + chargeRate;
+    enemy.params.chargeLevel += FRAME_LENGTH;
     if (enemy.params.chargeLevel >= 4000) {
-        enemy.params.chargeLevel = 0;
-        const theta = 2 * Math.PI * Math.random();
-        throwIceGrenadeAtLocation(state, enemy, {
-            tx: state.hero.x + state.hero.w / 2 + 16 * Math.cos(theta),
-            ty: state.hero.y + state.hero.h / 2 + 16 * Math.sin(theta),
-        }, 2);
+        if (enemy.params.chargeLevel % 500 === 0) {
+            const theta = 2 * Math.PI * Math.random();
+            throwIceGrenadeAtLocation(state, enemy, {
+                tx: state.hero.x + state.hero.w / 2 + 16 * Math.cos(theta),
+                ty: state.hero.y + state.hero.h / 2 + 16 * Math.sin(theta),
+            }, 2);
+        }
+        if (enemy.params.chargeLevel >= 4000 + 500 * enemy.params.enrageLevel) {
+            enemy.params.chargeLevel = 0;
+        }
     }
 }
 
@@ -351,7 +352,7 @@ function updateFrostSerpent(this: void, state: GameState, enemy: Enemy): void {
                 return;
             }
             return;
-        } else if (enemy.mode === 'frostBreathArc') {
+        } else if (enemy.mode === 'frostBreathArc' || enemy.mode === 'frostBreath') {
             if (enemy.modeTime % 40 === 0) {
                 // Track a nearby target when using the frostBreathArc attack, otherwise attack in the same direction.
                 const attackVector = getVectorToNearbyTarget(state, enemy, 128, enemy.area.allyTargets);

@@ -103,6 +103,8 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             const testHero = hero.getCopy();
             testHero.z = 0;
             testHero.area = state.surfaceAreaInstance;
+            // Remove equipment from test hero in case it prevents them from swimming (like cloud boots).
+            testHero.equipedGear = {};
             checkForFloorEffects(state, testHero);
             // If the test hero is swimming, we can surface here.
             if (testHero.swimming) {

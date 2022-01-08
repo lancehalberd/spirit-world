@@ -28,6 +28,9 @@ Current tasks:
     - Bug fixes
         - Using spirit sight while charging should do nothing.
         - Using roll while charging should abort the charge and do the roll action.
+        - Floating in water bugs:
+            - Chakram spawns at ground level
+            - shouldn't be able to pass through doorways while z > 4.
         - Clone tool bugs
             - Mana regen is wrong when using clone tools (seems to multiply consumption/regen by number of clones)
             - Should destroy clones when the clone technique is unequipped.
