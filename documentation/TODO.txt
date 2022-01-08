@@ -24,6 +24,7 @@ Graphics:
 
 
 Current tasks:
+    - Check character action for regressions and fix
     - Bug fixes
         - Using spirit sight while charging should do nothing.
         - Using roll while charging should abort the charge and do the roll action.

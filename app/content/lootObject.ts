@@ -115,6 +115,17 @@ function getEquipElementMessage(state: GameState) {
 }
 
 function showLootMessage(state: GameState, lootType: LootType, lootLevel?: number, lootAmount?: number): void {
+    if (lootType === 'spiritPower') {
+        // showLootMessage is run after the upgrade is already applied, so we check what the highest level
+        // spirit power the user has and show that message.
+        if (state.hero.passiveTools.teleportation) {
+            lootType = 'teleportation';
+        } else if (state.hero.passiveTools.astralProjection) {
+            lootType = 'astralProjection';
+        } else {
+            lootType = 'spiritSight';
+        }
+    }
     switch (lootType) {
         case 'cloudBoots':
             return showMessage(state, 'You found Cloud Boots!' + equipBootsMessage
@@ -620,6 +631,15 @@ export function getLootFrame(state: GameState, {lootType, lootLevel, lootAmount}
         }
         return wholeCoin;
     }
+    if (lootType === 'spiritPower') {
+        if (!state.hero.passiveTools.spiritSight) {
+            return lootFrames.spiritSight;
+        }
+        if (!state.hero.passiveTools.astralProjection) {
+            return lootFrames.astralProjection;
+        }
+        return lootFrames.teleportation;
+    }
     if (lootType === 'cloak') {
         if (lootLevel === 1 || (lootLevel === 0 && !state.hero.activeTools.cloak)){
             return lootFrames.spiritCloak;
@@ -740,4 +760,15 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: Lo
             // You will gain the full peach from the dialogue effect.
         }
     },
+    spiritPower: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
+        if (loot.lootType === 'spiritPower') {
+            if (!state.hero.passiveTools.spiritSight) {
+                state.hero.passiveTools.spiritSight = 1;
+            } else if (!state.hero.passiveTools.astralProjection) {
+                state.hero.passiveTools.astralProjection = 1;
+            } else {
+                state.hero.passiveTools.teleportation = 1;
+            }
+        }
+    }
 }

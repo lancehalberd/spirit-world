@@ -40,6 +40,8 @@ export function getLootTypes(): LootType[] {
             'bigKey',
             'smallKey',
             'map',
+            // This is the special progressive spirit power loot used by the randomizer.
+            'spiritPower',
             ...(Object.keys(state.hero.activeTools) as LootType[]),
             ...(Object.keys(state.hero.passiveTools) as LootType[]),
             ...(Object.keys(state.hero.equipment) as LootType[]),

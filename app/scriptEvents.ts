@@ -93,7 +93,8 @@ export function parseEventScript(state: GameState, script: string): ScriptEvent[
             continue;
         }
         if (actionToken.startsWith('flag:')) {
-            const [ /* 'flag' */, flag, value] = actionToken.split(':');
+            const valueToken = actionToken.substring('flag:'.length);
+            const [flag, value] = valueToken.split('=');
             const valueNumber = parseInt(value, 10);
             events.push({
                 type: 'setFlag',
@@ -106,7 +107,8 @@ export function parseEventScript(state: GameState, script: string): ScriptEvent[
             continue;
         }
         if (actionToken.startsWith('item:')) {
-            const [ /* 'item' */, lootType, amountOrLevel] = actionToken.split(':');
+            const valueToken = actionToken.substring('item:'.length);
+            const [lootType, amountOrLevel] = valueToken.split('=');
             if (!getLootTypes().includes(lootType as LootType)) {
                 throw new Error('Unknown loot type: ' + lootType);
             }

@@ -30,7 +30,11 @@ export type Collectible = 'peachOfImmortality' | 'peachOfImmortalityPiece';
 export type CommonLoot = 'money' | 'peach';
 export type DungeonLoot = 'smallKey' | 'bigKey' | 'map';
 
-export type LootType = 'empty' | 'weapon' | ActiveTool | Equipment | PassiveTool
+export type LootType = 'empty' | 'weapon'
+    // In the randomizer spiritSight, astralProjection + teleportation are changed to this progressive spirit power
+    // ability so that you will always get the abilities in an order that they can be used immediately.
+    | 'spiritPower'
+    | ActiveTool | Equipment | PassiveTool
     | MagicElement | Collectible | CommonLoot | DungeonLoot | 'unknown';
 
 

@@ -41,7 +41,7 @@ dialogueHash.tombGuardian = {
                 `You are ready to learn my final technique.{|}
                 You won't be able to travel between the material and spirit worlds as freely
                 as a pure blooded Vanara, but this should be enough for you to climb the Helix.
-                {item:teleportation:1}`
+                {item:teleportation}`
             ],
         },
         {
@@ -69,7 +69,7 @@ dialogueHash.tombGuardian = {
                 {|}The summoners used special tools for their powers,
                 {|}maybe your mother could tell you more.
                 {flag:tombTeleporter}
-                {item:spiritSight:1}`,
+                {item:spiritSight}`,
             ],
         },
         {

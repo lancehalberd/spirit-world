@@ -32,7 +32,7 @@ dialogueHash.vanaraCommander = {
                 {|}Unfortunately, it appears another Vanara is responsible for releasing them.
                 {|}Take this and go to Holy City and see if you can help their Hero protect the people.
                 {flag:elementalBeastsEscaped}
-                {item:charge:1}`
+                {item:charge=1}`
             ],
         },
     ],

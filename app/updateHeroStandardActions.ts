@@ -169,7 +169,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             hero.action = null;
             hero.grabTile = null;
             hero.grabObject = null;
-        } else if (isPlayerControlled && !isMovementBlocked && hero.grabObject?.onPull) {
+        } else if (isPlayerControlled && hero.grabObject?.onPull) {
             const [pulldx, pulldy] = getCloneMovementDeltas(state, hero);
             if (pulldx || pulldy) {
                 const direction = getDirection(pulldx, pulldy);
@@ -557,6 +557,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         }
     }
     if (wasGameKeyPressed(state, GAME_KEY.ROLL)
+        && !isActionBlocked
         && !hero.isAstralProjection
         && hero.passiveTools.roll > 0
         && hero.rollCooldown <= 0
@@ -569,7 +570,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         return;
     }
     // You can meditate as long as you have access to spirit energy (granted with cat eyes).
-    if (wasGameKeyPressed(state, GAME_KEY.MEDITATE) && hero.passiveTools.catEyes) {
+    if (wasGameKeyPressed(state, GAME_KEY.MEDITATE) && !isActionBlocked && hero.passiveTools.catEyes) {
         hero.action = 'meditating';
         hero.d = 'down';
         hero.actionFrame = 0;
