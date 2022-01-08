@@ -2,7 +2,7 @@ import { find } from 'lodash';
 
 import { addSparkleAnimation } from 'app/content/animationEffect';
 import {
-    addObjectToArea, destroyTile, enterLocation,
+    addObjectToArea, destroyTile, enterLocation, removeObjectFromArea,
 } from 'app/content/areas';
 import { destroyClone } from 'app/content/clone';
 import { CloneExplosionEffect } from 'app/content/effects/CloneExplosionEffect';
@@ -555,6 +555,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                     closestObject.onGrab(state, hero.d, hero);
                 }
                 hero.grabObject = closestObject;
+                hero.lastTouchedObject = closestObject;
             }
         }
     }
@@ -565,6 +566,11 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         && hero.rollCooldown <= 0
         && state.hero.magic > 0
     ) {
+        hero.chargeTime = 0;
+        if (heldChakram) {
+            removeObjectFromArea(state, heldChakram);
+        }
+        hero.chargingLeftTool = hero.chargingRightTool = false;
         state.hero.magic -= 5;
         hero.action = 'roll';
         hero.actionFrame = 0;
@@ -572,7 +578,10 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         return;
     }
     // You can meditate as long as you have access to spirit energy (granted with cat eyes).
-    if (wasGameKeyPressed(state, GAME_KEY.MEDITATE) && !isActionBlocked && hero.passiveTools.catEyes) {
+    if (wasGameKeyPressed(state, GAME_KEY.MEDITATE)
+        && !isActionBlocked && hero.passiveTools.catEyes
+        && !heldChakram && !hero.chargingLeftTool && !hero.chargingRightTool
+    ) {
         hero.action = 'meditating';
         hero.d = 'down';
         hero.actionFrame = 0;

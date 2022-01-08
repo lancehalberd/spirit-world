@@ -66,6 +66,7 @@ export class Hero implements Actor, SavedHeroData {
     pickUpTile?: FullTile;
     grabTile?: TileCoords;
     grabObject?: ObjectInstance;
+    lastTouchedObject?: ObjectInstance;
     invulnerableFrames?: number;
     life: number;
     wading?: boolean;
@@ -434,6 +435,7 @@ export class Hero implements Actor, SavedHeroData {
             vy: directionMap[hero.d][1] * throwSpeed,
             vz: 2,
         });
+        hero.lastTouchedObject = thrownObject;
         addObjectToArea(state, hero.area, thrownObject);
         if (tile.linkedTile) {
             const behaviors = tile.linkedTile.behaviors;

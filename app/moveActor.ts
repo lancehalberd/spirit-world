@@ -315,6 +315,7 @@ function moveActorInDirection(
     if (pushedObjects.length === 1) {
         if (pushedObjects[0].onPush) {
             pushedObjects[0].onPush(state, direction);
+            actor.lastTouchedObject = pushedObjects[0];
         }
     } else if (pushedObjects.length >= 1) {
         for (const object of pushedObjects) {
@@ -326,6 +327,7 @@ function moveActorInDirection(
             ) {
                 if (object.onPush) {
                     object.onPush(state, direction);
+                    actor.lastTouchedObject = pushedObjects[0];
                 }
             }
         }

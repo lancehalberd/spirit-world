@@ -261,6 +261,10 @@ export class HeldChakram implements ObjectInstance {
             this.throw(state);
             return;
         }
+        // Remove a chakram if it is not in the are with the hero.
+        if (!state.transitionState && this.hero.area !== this.area) {
+            removeObjectFromArea(state, this);
+        }
         if (state.hero.magic > 0 && this.animationTime >= 1000 && state.hero.passiveTools.charge >= 1 && this.animationTime % 200 === 0) {
             this.sparkles.push(makeSparkleAnimation(state, this, { element: this.hero.element }));
         }

@@ -17,7 +17,7 @@ import { updateCamera } from 'app/updateCamera';
 
 import {
     AreaDefinition, AreaInstance, AreaLayerDefinition,
-    Direction, Enemy, EntranceDefinition, FullTile, GameState, Hero, TileCoords,
+    Direction, Enemy, EntranceDefinition, FullTile, GameState, HeldChakram, Hero, TileCoords,
     LogicDefinition,
     ObjectDefinition,
     ObjectInstance,
@@ -197,6 +197,14 @@ export function enterLocation(
         if (state.alternateAreaInstance.definition === targetAreaDefinition) {
             state.transitionState.nextAreaInstance = state.alternateAreaInstance;
             state.transitionState.nextAlternateAreaInstance = state.areaInstance;
+
+            const primaryHero = state.hero.activeClone || state.hero;
+            const heldChakram = primaryHero.area.objects.find(o => o instanceof HeldChakram) as HeldChakram;
+            // Bring the held chakram with you.
+            if (heldChakram) {
+                removeObjectFromArea(state, heldChakram);
+                addObjectToArea(state, state.transitionState.nextAreaInstance, heldChakram);
+            }
         }
         return;
     }

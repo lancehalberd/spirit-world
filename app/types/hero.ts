@@ -95,6 +95,7 @@ export interface Actor extends ObjectInstance {
     pickUpTile?: FullTile
     grabTile?: TileCoords
     grabObject?: ObjectInstance
+    lastTouchedObject?: ObjectInstance
     invulnerableFrames?: number
     life: number
     knockBack?: (state: GameState, vector: {vx: number, vy: number, vz: number}) => void

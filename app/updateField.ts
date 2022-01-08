@@ -83,8 +83,13 @@ export function updateAreaObjects(this: void, state: GameState, area: AreaInstan
         if (isScreenTransitioning && !object.updateDuringTransition) {
             continue;
         }
-        // Time passes slowly for everything but the astral projection while meditating.
-        if (skipFrame && object !== state.hero.astralProjection && object !== state.hero.astralProjection?.grabObject) {
+        // Time passes slowly for everything but the astral projection while meditating and things it is
+        // or has recently interacted with.
+        if (skipFrame
+            && object !== state.hero.astralProjection && object !== state.hero.astralProjection?.grabObject
+            && object !== state.hero.astralProjection?.lastTouchedObject
+            && object.linkedObject !== state.hero.astralProjection?.lastTouchedObject
+        ) {
             continue;
         }
         object.update?.(state);
