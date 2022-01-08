@@ -2,7 +2,7 @@ import { AnimationEffect } from 'app/content/animationEffect';
 import { checkForFloorEffects, moveEnemy } from 'app/content/enemies';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { dropItemFromTable, getLoot } from 'app/content/lootObject';
-import { addObjectToArea, getAreaSize } from 'app/content/areas';
+import { addObjectToArea, getAreaSize, refreshAreaLogic } from 'app/content/areas';
 import { enemyDeathAnimation } from 'app/content/enemyAnimations';
 import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
 import { FRAME_LENGTH } from 'app/gameConstants';
@@ -264,6 +264,9 @@ export class Enemy implements Actor, ObjectInstance {
                     saveObjectStatus(state, this.definition);
                     if (this.definition.lootType && this.definition.lootType !== 'empty') {
                         getLoot(state, this.definition);
+                    } else {
+                        refreshAreaLogic(state, state.areaInstance);
+                        refreshAreaLogic(state, state.alternateAreaInstance);
                     }
                 } else {
                     saveObjectStatus(state, this.definition);
