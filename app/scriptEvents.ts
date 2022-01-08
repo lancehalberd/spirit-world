@@ -77,9 +77,9 @@ export function parseEventScript(state: GameState, script: string): ScriptEvent[
             continue;
         }
         if (actionToken.startsWith('choice:')) {
-            const nextChoice = actionToken.substring(1);
-            console.log(nextChoice);
-            const [prompt, ...optionStrings] = nextChoice.split('|');
+            const choiceToken = actionToken.substring('choice:'.length);
+            console.log(choiceToken);
+            const [prompt, ...optionStrings] = choiceToken.split('|');
             const choices = optionStrings.map(o => {
                 const [text, key] = o.split(':');
                 return { text, key };
@@ -106,7 +106,7 @@ export function parseEventScript(state: GameState, script: string): ScriptEvent[
             continue;
         }
         if (actionToken.startsWith('item:')) {
-            const [ /* 'loot' */, lootType, amountOrLevel] = actionToken.split(':');
+            const [ /* 'item' */, lootType, amountOrLevel] = actionToken.split(':');
             if (!getLootTypes().includes(lootType as LootType)) {
                 throw new Error('Unknown loot type: ' + lootType);
             }

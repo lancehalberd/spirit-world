@@ -25,7 +25,7 @@ function getActiveControllerMaps(state: GameState) {
 function getEscapedFrames(state: GameState, escapedToken: string): Frame[] {
     const controllerMaps = getActiveControllerMaps(state);
     function getGameKeyFrames(key: number) {
-        return flatten(controllerMaps.map(controllerMap => controllerMap[key]));
+        return flatten(controllerMaps.map(controllerMap => controllerMap[key])).filter(f => f);
     }
     switch (escapedToken.toUpperCase()) {
         case 'B_DPAD':
@@ -92,60 +92,62 @@ export function parseMessage(state: GameState, message: string): Frame[][][] {
         }
         rowNeedsSpace = false;
     };
-    // This will split the spaced chunk into a sequence of elements like:
-    // ['string', 'escapedToken', 'string', ...].
-    // For example: ['Press', 'B_WEAPON', 'to']
     const spacedChunks = message.split(/[ \n]+/);
     for (const spacedChunk of spacedChunks) {
-        if (spacedChunk[0] === '[') {
-            const iconToken = spacedChunk.substring(1, spacedChunk.length - 1);
-            const tokenFrames = getEscapedFrames(state, iconToken);
-            if (!tokenFrames?.length) {
-                continue;
-            }
-            let tokenWidth;
-            try {
-                tokenWidth = tokenFrames.reduce((sum, {w}) => sum + w, 0);
-            } catch (e) {
-                debugger;
-            }
-            if (rowNeedsSpace) {
-                tokenWidth += characterWidth;
-            }
-            if (rowWidth + tokenWidth > messageWidth) {
-                nextRow();
-            }
-            if (row.length && rowNeedsSpace) {
+        // This will split the spaced chunk into a sequence of elements like:
+        // ['string', 'escapedToken', 'string', ...].
+        // For example: ['Press', '[B_WEAPON', 'to']
+        const stringAndIconTokens = spacedChunk.split(/[\[\]]+/);
+        while (stringAndIconTokens.length) {
+            const stringToken = stringAndIconTokens.shift();
+            if (stringToken) {
+                // Extra character is included here for the space before this word.
+                const addedWidth = stringToken.length * characterWidth + characterWidth;
+                // Wrap to the next line if this string is too long to add to the end of this row.
+                if (row.length && rowWidth + addedWidth > messageWidth) {
+                    nextRow();
+                }
                 // Add a space before the next word if the row isn't empty.
-                row.push(null);
-                rowWidth += characterWidth;
+                if (row.length) {
+                    row.push(null);
+                    rowWidth += characterWidth;
+                }
+                for (const c of stringToken) {
+                    row.push(characterMap[c]);
+                    rowWidth += characterMap[c].w;
+                }
+                rowNeedsSpace = true;
             }
-            for (const frame of tokenFrames) {
-                row.push(frame);
-                rowWidth += frame.w;
+            const iconToken = stringAndIconTokens.shift();
+            if (iconToken) {
+                const tokenFrames = getEscapedFrames(state, iconToken);
+                if (!tokenFrames?.length) {
+                    continue;
+                }
+                let tokenWidth;
+                try {
+                    tokenWidth = tokenFrames.reduce((sum, {w}) => sum + w, 0);
+                } catch (e) {
+                    debugger;
+                }
+                if (rowNeedsSpace) {
+                    tokenWidth += characterWidth;
+                }
+                if (rowWidth + tokenWidth > messageWidth) {
+                    nextRow();
+                }
+                if (row.length && rowNeedsSpace) {
+                    // Add a space before the next word if the row isn't empty.
+                    row.push(null);
+                    rowWidth += characterWidth;
+                }
+                for (const frame of tokenFrames) {
+                    row.push(frame);
+                    rowWidth += frame.w;
+                }
+                // We don't need a space between icons.
+                rowNeedsSpace = false;
             }
-            // We don't need a space between icons.
-            rowNeedsSpace = false;
-            continue;
-        }
-        if (spacedChunk) {
-            const stringToken = spacedChunk;
-            // Extra character is included here for the space before this word.
-            const addedWidth = stringToken.length * characterWidth + characterWidth;
-            // Wrap to the next line if this string is too long to add to the end of this row.
-            if (row.length && rowWidth + addedWidth > messageWidth) {
-                nextRow();
-            }
-            // Add a space before the next word if the row isn't empty.
-            if (row.length) {
-                row.push(null);
-                rowWidth += characterWidth;
-            }
-            for (const c of stringToken) {
-                row.push(characterMap[c]);
-                rowWidth += characterMap[c].w;
-            }
-            rowNeedsSpace = true;
         }
     }
     nextRow();

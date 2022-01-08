@@ -5,7 +5,7 @@ dialogueHash.mom = {
     key: 'mom',
     mappedOptions: {
         rest: `{choice:Do you want to rest?|Yes:mom.yesRest|No:mom.noRest}`,
-        yesRest: 'Sweet dreams! {!rest}',
+        yesRest: 'Sweet dreams! {rest}',
         noRest: 'Be careful out there!',
     },
     options: [
