@@ -105,7 +105,6 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
     }
     if (hero.action === 'fallen' || hero.action === 'sankInLava') {
         if (hero.action === 'fallen' && state.location.zoneKey === 'sky') {
-            hero.action = 'knocked';
             enterLocation(state, {
                 zoneKey: 'overworld',
                 floor: 0,
@@ -115,7 +114,9 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 z: CANVAS_HEIGHT,
                 d: hero.d,
                 isSpiritWorld: state.location.isSpiritWorld,
-            }, false);
+            }, false, () => {
+                hero.action = 'knocked';
+            });
             return true;
         }
         hero.vx = 0;
