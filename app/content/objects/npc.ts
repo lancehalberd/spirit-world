@@ -6,6 +6,7 @@ import { snakeAnimations } from 'app/content/enemyAnimations';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { moveActor } from 'app/moveActor';
 import { heroAnimations } from 'app/render/heroAnimations';
+import { momAnimations } from 'app/render/npcAnimations';
 import { shadowFrame, smallShadowFrame } from 'app/renderActor';
 import { showMessage } from 'app/render/renderMessage';
 import { drawFrame, getFrame } from 'app/utils/animations';
@@ -33,6 +34,11 @@ export const npcStyles = {
     vanara: {
         animations: heroAnimations,
         shadowOffset: 1,
+    } as NPCStyleDefinition,
+    mom: {
+        animations: momAnimations,
+        shadowOffset: 1,
+        scale: .75,
     } as NPCStyleDefinition,
 };
 
@@ -113,9 +119,23 @@ export class NPC implements Actor, ObjectInstance  {
         this.y = definition.y;
         this.params = {};
     }
-    getHitbox(state: GameState): Rect {
+    getFrame() {
         const animationStyle = npcStyles[this.definition.style];
-        return { x: this.x, y: this.y, w: 16 * (animationStyle.scale || 1), h: 16 * (animationStyle.scale || 1) };
+        const animations = this.mode === 'choose'
+            ? animationStyle.animations.idle
+            : animationStyle.animations.move || animationStyle.animations.idle;
+        return getFrame(animations[this.d], this.animationTime);
+    }
+    getHitbox(state: GameState): Rect {
+        const frame = this.getFrame();
+        const animationStyle = npcStyles[this.definition.style];
+        const scale = animationStyle.scale || 1;
+        return {
+            x: this.x,
+            y: this.y,
+            w: (frame.content?.w || frame.w) * scale,
+            h: (frame.content?.h || frame.h) * scale,
+        };
     }
     onGrab(state: GameState, direction: Direction, hero: Hero) {
         this.showMessage = true;
@@ -160,10 +180,7 @@ export class NPC implements Actor, ObjectInstance  {
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
         const animationStyle = npcStyles[this.definition.style];
-        const animations = this.mode === 'choose'
-            ? animationStyle.animations.idle
-            : animationStyle.animations.move || animationStyle.animations.idle;
-        const frame = getFrame(animations[this.d], this.animationTime);
+        const frame = this.getFrame();
         const scale = animationStyle.scale || 1;
         if (this.d === 'right' && animationStyle.flipRight) {
             // Flip the frame when facing right. We may need an additional flag for this behavior
