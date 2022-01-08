@@ -124,7 +124,7 @@ const [
     woodenWestDoorOpenForeground, woodenEastDoorOpenForeground,
     woodenWestDoorEmptyForeground, woodenEastDoorEmptyForeground,
 ] = createAnimation('gfx/tiles/woodhousetilesarranged.png', {w: 16, h: 48},
-    {left: 304, top: 160, cols: 4}).frames;
+    {left: 336, top: 160, cols: 4}).frames;
 const [
     woodenNorthCrack, woodenNorthBlownup,
 ] = createAnimation('gfx/tiles/woodhousetilesarranged.png', {w: 32, h: 32},
@@ -711,7 +711,32 @@ export class Door implements ObjectInstance {
         const y = Math.floor(this.y / 16);
         const x = Math.floor(this.x / 16);
         const doorStyle = doorStyles[this.style];
-        if (this.style === 'wooden' || this.style === 'cavern') {
+       if (this.style === 'wooden') {
+            if (this.definition.d === 'down') {
+                applyBehaviorToTile(this.area, x, y, { solidMap: BITMAP_BOTTOM, low: false});
+                applyBehaviorToTile(this.area, x + 3, y, { solidMap: BITMAP_BOTTOM, low: false});
+                if (this.isOpen()) {
+                    applyBehaviorToTile(this.area, x + 1, y, { solidMap: BITMAP_BOTTOM_LEFT_QUARTER, low: false });
+                    applyBehaviorToTile(this.area, x + 2, y, { solidMap: BITMAP_BOTTOM_RIGHT_QUARTER, low: false });
+                } else {
+                    applyBehaviorToTile(this.area, x + 1, y, { solidMap: BITMAP_BOTTOM, low: false});
+                    applyBehaviorToTile(this.area, x + 2, y, { solidMap: BITMAP_BOTTOM, low: false});
+                }
+            } else if (this.definition.d === 'up') {
+                this.applySquareDoorBehavior();
+            } else { // left + right are the same
+                applyBehaviorToTile(this.area, x, y, { solid: true, low: false });
+                applyBehaviorToTile(this.area, x, y + 1, { solid: true, low: false });
+                applyBehaviorToTile(this.area, x, y + 3, { solid: true, low: false });
+                if (this.isOpen()) {
+                    applyBehaviorToTile(this.area, x, y + 1, { solid: false });
+                    applyBehaviorToTile(this.area, x, y + 2, { solid: false });
+                } else {
+                    applyBehaviorToTile(this.area, x, y + 1, { solid: true, low: false });
+                    applyBehaviorToTile(this.area, x, y + 2, { solid: true, low: false });
+                }
+            }
+        } else  if (this.style === 'cavern') {
             if (this.definition.d === 'down') {
                 applyBehaviorToTile(this.area, x, y, { solidMap: BITMAP_BOTTOM, low: false});
                 applyBehaviorToTile(this.area, x + 3, y, { solidMap: BITMAP_BOTTOM, low: false});

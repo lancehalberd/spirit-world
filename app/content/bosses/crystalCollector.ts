@@ -21,9 +21,9 @@ enemyDefinitions.crystalCollector = {
         enrageTime: 0,
     },
     hasShadow: false,
-    initialMode: 'initial',
+    initialMode: 'hidden',
     renderOver(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
-        if (enemy.mode === 'initial' || enemy.mode === 'sleeping') {
+        if (enemy.mode === 'hidden' || enemy.mode === 'sleeping') {
             return;
         }
         if (enemy.params.shieldLife <= 0) {
@@ -37,7 +37,7 @@ enemyDefinitions.crystalCollector = {
         context.restore();
     },
     render(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
-        if (enemy.mode === 'initial' || enemy.mode === 'sleeping') {
+        if (enemy.mode === 'hidden' || enemy.mode === 'sleeping') {
             return;
         }
         context.save();
@@ -50,7 +50,7 @@ enemyDefinitions.crystalCollector = {
     },
     onHit(state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
         // Ignore hits while hidden.
-        if (enemy.mode === 'initial' || enemy.mode === 'sleeping') {
+        if (enemy.mode === 'hidden' || enemy.mode === 'sleeping') {
             return {};
         }
         // If the shield is up, only fire damage can hurt it.
@@ -280,8 +280,7 @@ function updateCrystalCollector(this: void, state: GameState, enemy: Enemy): voi
     }
 
     // Normal behavior.
-    if (enemy.mode === 'initial') {
-        enemy.healthBarTime = 0;
+    if (enemy.mode === 'hidden') {
         enemy.params.eyeLocations = [
             [9, 6],  [22, 6],
             [14, 8],  [17, 8],
