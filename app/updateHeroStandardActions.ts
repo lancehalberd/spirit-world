@@ -1,8 +1,8 @@
 import { find } from 'lodash';
 
-import { addSparkleAnimation } from 'app/content/animationEffect';
+import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import {
-    addObjectToArea, destroyTile, enterLocation, removeObjectFromArea,
+    addEffectToArea, addObjectToArea, destroyTile, enterLocation, removeEffectFromArea,
 } from 'app/content/areas';
 import { destroyClone } from 'app/content/clone';
 import { CloneExplosionEffect } from 'app/content/effects/CloneExplosionEffect';
@@ -37,15 +37,15 @@ const maxCloudBootsZ = 3;
 export function updateHeroStandardActions(this: void, state: GameState, hero: Hero) {
     const wasPassiveButtonPressed = wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL);
     const isPassiveButtonDown = isGameKeyDown(state, GAME_KEY.PASSIVE_TOOL);
-    const heldChakram = hero.area.objects.find(o => o instanceof HeldChakram) as HeldChakram;
+    const heldChakram = hero.area.effects.find(o => o instanceof HeldChakram) as HeldChakram;
     const isCloneToolDown = (state.hero.leftTool === 'clone' && isGameKeyDown(state, GAME_KEY.LEFT_TOOL))
         || (state.hero.rightTool === 'clone' && isGameKeyDown(state, GAME_KEY.RIGHT_TOOL));
     const primaryClone = state.hero.activeClone || state.hero;
     const isPlayerControlled = (state.hero.action === 'meditating' && hero.isAstralProjection) || isCloneToolDown || hero === primaryClone;
     const minZ = hero.isAstralProjection ? 4 : 0;
     const isMovementBlocked = hero.action === 'meditating'
-        || hero.action === 'throwing' || hero.action === 'grabbing' || hero.action === 'attack';
-    const isActionBlocked = isMovementBlocked || hero.swimming || hero.pickUpTile || hero.pickUpObject;
+        || hero.action === 'throwing' || hero.action === 'grabbing';
+    const isActionBlocked = isMovementBlocked || hero.swimming || hero.pickUpTile || hero.pickUpObject || hero.action === 'attack';
     const canCharge = !hero.isAstralProjection && isPlayerControlled && !isActionBlocked;
     const canAttack = canCharge && hero.weapon > 0 && !hero.chargingLeftTool && !hero.chargingRightTool;
     // console.log('move', !isMovementBlocked, 'act', !isActionBlocked, 'charge', canCharge, 'attack', canAttack);
@@ -222,7 +222,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                         hero.action = null;
                         hero.explosionTime = 0;
                         playSound('cloneExplosion');
-                        addObjectToArea(state, hero.area, new CloneExplosionEffect({
+                        addEffectToArea(state, hero.area, new CloneExplosionEffect({
                             x: hero.x + hero.w / 2,
                             y: hero.y + hero.h / 2,
                         }));
@@ -440,7 +440,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
 
     // Check to start charging the chakram
     if (canAttack && wasGameKeyPressed(state, GAME_KEY.WEAPON)) {
-        const thrownChakrams = hero.area.objects.filter(o => o instanceof ThrownChakram);
+        const thrownChakrams = hero.area.effects.filter(o => o instanceof ThrownChakram);
         if (state.hero.weapon - thrownChakrams.length > 0) {
             hero.action = 'charging';
             hero.chargeTime = 0;
@@ -454,7 +454,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 vy: directionMap[direction][1],
                 source: hero,
             });
-            addObjectToArea(state, hero.area, chakram);
+            addEffectToArea(state, hero.area, chakram);
             return;
         }
     }
@@ -568,7 +568,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     ) {
         hero.chargeTime = 0;
         if (heldChakram) {
-            removeObjectFromArea(state, heldChakram);
+            removeEffectFromArea(state, heldChakram);
         }
         hero.chargingLeftTool = hero.chargingRightTool = false;
         state.hero.magic -= 5;

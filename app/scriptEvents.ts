@@ -123,6 +123,18 @@ export function parseEventScript(state: GameState, script: string): ScriptEvent[
             });
             continue
         }
+        if (actionToken.startsWith('wait:')) {
+            const valueToken = actionToken.substring('wait:'.length);
+            let duration = parseInt(valueToken, 10);
+            if (isNaN(duration)) {
+                duration = 1000;
+            }
+            events.push({
+                type: 'wait',
+                duration,
+            });
+            continue
+        }
         console.error('Unhandled actiont token', actionToken);
     }
     events.push({ type: 'clearTextBox' });
@@ -141,7 +153,7 @@ export const updateScriptEvents = (state: GameState): void => {
                     break;
                 }
                 let finished = false;
-                for (const gameKey of event.keys) {
+                for (const gameKey of (event.keys || [])) {
                     if (wasGameKeyPressed(state, gameKey)) {
                         finished = true;
                         state.scriptEvents.handledInput = true;

@@ -1,5 +1,5 @@
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { addObjectToArea } from 'app/content/areas';
+import { addEffectToArea } from 'app/content/areas';
 import { PouredWaterEffect } from 'app/content/effects/PouredWaterEffect';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 
@@ -79,7 +79,7 @@ export class WaterPot implements ObjectInstance {
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;
         if (this.tipped && this.animationTime === FRAME_LENGTH * tippingPodAnimation.frameDuration) {
-            addObjectToArea(state, this.area, new PouredWaterEffect({
+            addEffectToArea(state, this.area, new PouredWaterEffect({
                 x: this.x - 12,
                 y: this.y + 2,
             }));

@@ -1,5 +1,5 @@
-import { addSparkleAnimation } from 'app/content/animationEffect';
-import { addObjectToArea } from 'app/content/areas';
+import { addSparkleAnimation } from 'app/content/effects/animationEffect';
+import { addEffectToArea } from 'app/content/areas';
 import { LightningDischarge } from 'app/content/effects/lightningDischarge';
 import {
     getVectorToNearbyTarget,
@@ -57,7 +57,7 @@ enemyDefinitions.lightningDrone = {
                         tellDuration: chargeTime,
                         radius: dischargeRadius,
                     });
-                    addObjectToArea(state, enemy.area, discharge);
+                    addEffectToArea(state, enemy.area, discharge);
                 }
             }
         } else if (enemy.mode === 'discharge') {

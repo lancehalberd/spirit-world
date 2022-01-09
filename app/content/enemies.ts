@@ -1,10 +1,10 @@
 import { sample } from 'lodash';
 
-import { addSparkleAnimation } from 'app/content/animationEffect';
+import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { Clone } from 'app/content/clone';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
-import { AnimationEffect } from 'app/content/animationEffect';
-import { EnemyArrow } from 'app/content/arrow';
+import { AnimationEffect } from 'app/content/effects/animationEffect';
+import { EnemyArrow } from 'app/content/effects/arrow';
 import { Flame } from 'app/content/effects/flame';
 import { FrostGrenade } from 'app/content/effects/frostGrenade';
 import { GrowingThorn } from 'app/content/effects/growingThorn';
@@ -20,7 +20,7 @@ import {
     snakeAnimations,
 } from 'app/content/enemyAnimations';
 import { certainLifeLootTable, simpleLootTable, lifeLootTable, moneyLootTable } from 'app/content/lootTables';
-import { addObjectToArea, getAreaSize } from 'app/content/areas';
+import { addEffectToArea, getAreaSize } from 'app/content/areas';
 import { editingState } from 'app/development/tileEditor';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { moveActor } from 'app/moveActor';
@@ -29,7 +29,7 @@ import { directionMap, getDirection } from 'app/utils/field';
 import { playSound } from 'app/utils/sounds';
 
 import {
-    ActorAnimations, Direction,
+    ActorAnimations, Direction, EffectInstance,
     Enemy, FrameAnimation, FrameDimensions, GameState,
     Hero, HitProperties, HitResult, LootTable,
     MagicElement, MovementProperties, ObjectInstance, Rect,
@@ -184,7 +184,7 @@ enemyDefinitions.crystalGuardian = {
             if (v) {
                 const {x, y} = v;
                 // This should spawn in a ficed radius around the guardian in between it and the target.
-                addObjectToArea(state, enemy.area, new SpikePod({
+                addEffectToArea(state, enemy.area, new SpikePod({
                     x: enemy.x + enemy.w / 2 + 48 * x,
                     y: enemy.y + enemy.h / 2 + 48 * y,
                     damage: 2,
@@ -231,7 +231,7 @@ function updateEnt(state: GameState, enemy: Enemy): void {
                 y: targetHitbox.y + targetHitbox.h / 2,
                 damage: 2,
             });
-            addObjectToArea(state, enemy.area, thorns);
+            addEffectToArea(state, enemy.area, thorns);
         }
         if (enemy.modeTime >= 2000) {
             enemy.setMode('recover')
@@ -300,7 +300,7 @@ function updateFloorEye(state: GameState, enemy: Enemy): void {
                 y: targetHitbox.y + targetHitbox.h / 2,
                 damage: 4,
             });
-            addObjectToArea(state, enemy.area, spike);
+            addEffectToArea(state, enemy.area, spike);
         }
         if (enemy.modeTime >= 2000) {
             enemy.setMode('closing')
@@ -339,7 +339,7 @@ function updateFlameSnake(state: GameState, enemy: Enemy): void {
         });
         flame.x -= flame.w / 2;
         flame.y -= flame.h / 2;
-        addObjectToArea(state, enemy.area, flame);
+        addEffectToArea(state, enemy.area, flame);
         enemy.params.flameCooldown = 400;
     }
     enemy.params.shootCooldown = enemy.params.shootCooldown ?? 1000 + Math.random() * 1000;
@@ -362,7 +362,7 @@ function updateFlameSnake(state: GameState, enemy: Enemy): void {
         });
         flame.x -= flame.w / 2;
         flame.y -= flame.h / 2;
-        addObjectToArea(state, enemy.area, flame);
+        addEffectToArea(state, enemy.area, flame);
         enemy.params.flameCooldown = 400;
     }
 }
@@ -465,7 +465,7 @@ export function throwIceGrenadeAtLocation(state: GameState, enemy: Enemy, {tx, t
         vz,
         az,
     });
-    addObjectToArea(state, enemy.area, frostGrenade);
+    addEffectToArea(state, enemy.area, frostGrenade);
 }
 
 function spinAndShoot(state: GameState, enemy: Enemy): void {
@@ -484,7 +484,7 @@ function spinAndShoot(state: GameState, enemy: Enemy): void {
                     vx: 4 * dx,
                     vy: 4 * dy,
                 });
-                addObjectToArea(state, enemy.area, arrow);
+                addEffectToArea(state, enemy.area, arrow);
             }
         }
         if (enemy.modeTime >= 500) {
@@ -510,7 +510,7 @@ function updateWallLaser(state: GameState, enemy: Enemy): void {
             vx: 4 * dx,
             vy: 4 * dy,
         });
-        addObjectToArea(state, enemy.area, arrow);
+        addEffectToArea(state, enemy.area, arrow);
     }
     if (enemy.params.alwaysShoot) {
         if (enemy.modeTime % 300 === FRAME_LENGTH) {
@@ -645,7 +645,7 @@ export function paceAndCharge(state: GameState, enemy: Enemy) {
     }
 }
 
-export function getVectorToTarget(state: GameState, source: ObjectInstance, target: ObjectInstance):{x: number, y: number, mag: number} {
+export function getVectorToTarget(state: GameState, source: EffectInstance | ObjectInstance, target: EffectInstance | ObjectInstance):{x: number, y: number, mag: number} {
     const hitbox = source.getHitbox(state);
     const targetHitbox = target.getHitbox(state);
     const dx = (targetHitbox.x + targetHitbox.w / 2) - (hitbox.x + hitbox.w / 2);
@@ -657,7 +657,10 @@ export function getVectorToTarget(state: GameState, source: ObjectInstance, targ
     return {mag, x: 0, y: 1};
 }
 
-export function getVectorToNearbyTarget(state: GameState, source: ObjectInstance, radius: number, targets: ObjectInstance[]): {x: number, y: number, mag: number} | null {
+export function getVectorToNearbyTarget(state: GameState,
+    source: EffectInstance | ObjectInstance, radius: number,
+    targets: (EffectInstance | ObjectInstance)[]
+): {x: number, y: number, mag: number} | null {
     const hitbox = source.getHitbox(state);
     for (const target of targets) {
         if (!target || target.area !== source.area || !target.getHitbox) {
@@ -677,7 +680,9 @@ export function getVectorToNearbyTarget(state: GameState, source: ObjectInstance
     return null;
 }
 
-export function getVectorToNearestTargetOrRandom(state: GameState, source: ObjectInstance, targets: ObjectInstance[]): {x: number, y: number} {
+export function getVectorToNearestTargetOrRandom(state: GameState, source: EffectInstance | ObjectInstance,
+    targets: (EffectInstance | ObjectInstance)[]
+): {x: number, y: number} {
     const v = getVectorToNearbyTarget(state, source, 1000, targets);
     if (v) {
         return v;
@@ -691,7 +696,9 @@ export function getVectorToNearestTargetOrRandom(state: GameState, source: Objec
     return {x: dx / mag, y: dy / mag};
 }
 
-export function getNearbyTarget(state: GameState, enemy: Enemy, radius: number, targets: ObjectInstance[], ignoreTargets: Set<ObjectInstance> = null): ObjectInstance {
+export function getNearbyTarget(state: GameState, enemy: Enemy, radius: number,
+    targets: (EffectInstance | ObjectInstance)[], ignoreTargets: Set<EffectInstance | ObjectInstance> = null
+): EffectInstance | ObjectInstance {
     const hitbox = enemy.getHitbox(state);
     for (const target of targets) {
         if (!target || target.area !== enemy.area || !target.getHitbox || ignoreTargets?.has(target)) {
@@ -859,7 +866,7 @@ export function checkForFloorEffects(state: GameState, enemy: Enemy) {
                     animation: enemyFallAnimation,
                     x: column * 16 - 4, y: row * 16 - 4,
                 });
-                addObjectToArea(state, enemy.area, pitAnimation);
+                addEffectToArea(state, enemy.area, pitAnimation);
                 enemy.status = 'gone';
                 return;
             }

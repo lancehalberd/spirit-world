@@ -1,5 +1,5 @@
-import { addObjectToArea } from 'app/content/areas';
-import { CrystalSpike } from 'app/content/arrow';
+import { addEffectToArea } from 'app/content/areas';
+import { CrystalSpike } from 'app/content/effects/arrow';
 import { GroundSpike } from 'app/content/effects/groundSpike';
 import { SpikePod } from 'app/content/effects/spikePod';
 import { getNearbyTarget } from 'app/content/enemies';
@@ -10,7 +10,7 @@ import { playSound } from 'app/utils/sounds';
 import Random from 'app/utils/Random';
 
 
-import { AreaInstance, Enemy, GameState, Hero, HitProperties, HitResult, ObjectInstance } from 'app/types';
+import { AreaInstance, EffectInstance, Enemy, GameState, Hero, HitProperties, HitResult, ObjectInstance } from 'app/types';
 
 const maxShieldLife = 6;
 
@@ -81,7 +81,7 @@ function addFloorEye(state: GameState, area: AreaInstance, tx: number, ty: numbe
         x: tx * 16,
         y: ty * 16,
     });
-    addObjectToArea(state, area, floorEye);
+    addEffectToArea(state, area, floorEye);
     //floorEye.showDeathAnimation(state);
 }
 
@@ -94,7 +94,7 @@ function summonSpikeUnderPlayer(this: void, state: GameState, enemy: Enemy): voi
             y: targetHitbox.y + targetHitbox.h / 2,
             damage: 4,
         });
-        addObjectToArea(state, enemy.area, spike);
+        addEffectToArea(state, enemy.area, spike);
     }
 }
 function summonSpikeAheadOfPlayer(this: void, state: GameState, enemy: Enemy): void {
@@ -118,7 +118,7 @@ function summonSpikeAheadOfPlayer(this: void, state: GameState, enemy: Enemy): v
         if (target.vy < 0) {
             spike.y += Random.element([16, 32]);
         }
-        addObjectToArea(state, enemy.area, spike);
+        addEffectToArea(state, enemy.area, spike);
     }
 }
 const summonShrinkingRingOfSpikes = (state: GameState, enemy: Enemy) => {
@@ -146,7 +146,7 @@ const summonShrinkingRingOfSpikes = (state: GameState, enemy: Enemy) => {
                 damage: 4,
                 delay: 260 * i,
             });
-            addObjectToArea(state, enemy.area, spike);
+            addEffectToArea(state, enemy.area, spike);
         }
     }
 };
@@ -166,7 +166,7 @@ const turnOnRandomCascade = (state: GameState, enemy: Enemy, count = 1) => {
     }
 };
 
-const summonProjectiles = (state: GameState, enemy: Enemy, target: ObjectInstance) => {
+const summonProjectiles = (state: GameState, enemy: Enemy, target: EffectInstance | ObjectInstance) => {
     if (!target) {
         return;
     }
@@ -252,7 +252,7 @@ function updateCrystalCollector(this: void, state: GameState, enemy: Enemy): voi
                 }
             }
         } else {
-            const spikeCount = enemy.area.objects.filter(o => o instanceof GroundSpike).length;
+            const spikeCount = enemy.area.effects.filter(o => o instanceof GroundSpike).length;
             if (enemy.params.enrageTime % 300 === 0 && spikeCount < 5) {
                 if (Math.random() < 0.5) {
                     summonShrinkingRingOfSpikes(state, enemy);
@@ -304,7 +304,7 @@ function updateCrystalCollector(this: void, state: GameState, enemy: Enemy): voi
         if (enemy.modeTime >= 1000) {
             // Only summon spike pods when shielded and if there are no floor eyes or pods present.
             if (!enemy.shielded
-                || enemy.area.objects.find(o => o instanceof SpikePod)
+                || enemy.area.effects.find(o => o instanceof SpikePod)
                 || getFloorEye(state, enemy.area)
             ) {
                 if (enemy.params.enrageLevel > 0 && Math.random() < 0.5) {
@@ -324,7 +324,7 @@ function updateCrystalCollector(this: void, state: GameState, enemy: Enemy): voi
             || enemy.modeTime === 1000
         ) {
             // Pod spawn location spreads out with enrage level.
-            addObjectToArea(state, enemy.area, new SpikePod({
+            addEffectToArea(state, enemy.area, new SpikePod({
                 x: enemy.x + enemy.w / 2 - (32 + 16 * enrageLevel) + Math.random() * (64 + 32 * enrageLevel),
                 y: enemy.y + enemy.h + 48 + Math.random() * (16 + 16 * enrageLevel),
                 damage: 2,
@@ -340,7 +340,7 @@ function updateCrystalCollector(this: void, state: GameState, enemy: Enemy): voi
         // enrage level 1: An entire row or column, an expanding ring
         // enrage level 2: A full plus, leading the player in one of the dimensions if they are moving
         // A wave of 4 columns sweeping towards the middle of the battlefield
-        const spikeCount = enemy.area.objects.filter(o => o instanceof GroundSpike).length;
+        const spikeCount = enemy.area.effects.filter(o => o instanceof GroundSpike).length;
         if (enemy.modeTime % 600 === 0 && spikeCount < 3) {
             // Don't do any complicated spike patterns while the floor eyes are still active.
             if (enrageLevel > 0 && !getFloorEye(state, enemy.area) && Math.random() < 0.5) {

@@ -24,10 +24,6 @@ Graphics:
 
 
 Current tasks:
-    - Check character action for regressions and fix
-        - Spikes triggering switches in waterfall
-        - Stuck at bottom of waterfall when facing up before big chest.
-        - Not sliding back with cloud boots on charge attack.
     - Put cracked ground in logic in forest temple with ice floor effect.
     - Probably should move hero back to safe location on reviving.
     - Bug fixes
@@ -104,6 +100,7 @@ Current tasks:
     - Change message rendering system to use the priority queue system to support nested messages.
     - Add new waterfall graphics
 
+Throwing an object into a pit should make use the pit animation rather than breaking.
 
 Add advanced tutorials
     - Maybe NPCs in home cave, or some kind of training/tutorial dojo?

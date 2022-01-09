@@ -48,6 +48,12 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         }
         return true;
     }
+    if (hero.isControlledByObject) {
+        hero.animationTime += FRAME_LENGTH;
+        // Objects must set this flag every frame to keep it set.
+        hero.isControlledByObject = false;
+        return true;
+    }
     // Handle section transitions.
     const { section } = getAreaSize(state);
     if (isPrimaryHero && hero.x + hero.w > section.x + section.w) {
@@ -86,12 +92,6 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         if (dx || dy) {
             hero.d = getDirection(dx, dy);
         }
-        return true;
-    }
-    if (hero.isControlledByObject) {
-        hero.animationTime += FRAME_LENGTH;
-        // Objects must set this flag every frame to keep it set.
-        hero.isControlledByObject = false;
         return true;
     }
     if (hero.action === 'falling' || hero.action === 'sinkingInLava') {
@@ -262,7 +262,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         hero.vy = hero.jumpingVy;
         return true;
     }
-    if (hero.action === 'knocked' || hero.action === 'thrown') {
+    if (hero.action === 'knocked' || hero.action === 'knockedHard' || hero.action === 'thrown') {
         hero.z += hero.vz;
         hero.vz = Math.max(-8, hero.vz - 0.5);
         // Clones ignore collisions with heroes/other clones when being thrown or knocked.
@@ -273,8 +273,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             canFall: true,
             canSwim: true,
             direction: hero.d,
-            // Open question whether knocked players can be knocked to other screens.
-            boundToSection: true,
+            boundToSection: hero.action !== 'knockedHard',
             excludedObjects
         });
         // The astral projection stays 4px off the ground.
@@ -283,6 +282,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             hero.action = null;
             hero.vz = 0;
         }
+        console.log(hero.actionDy, hero.vy);
         return true;
     }
     const isFallingToGround = !isUnderwater(state, hero)

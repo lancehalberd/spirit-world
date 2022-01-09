@@ -1,11 +1,14 @@
 //import { Staff } from 'app/content/staff';
 import {
-    Direction, FrameAnimation, FullTile, GameState, Hero,
+    Direction, EffectInstance, FrameAnimation, FullTile, GameState, Hero,
     ObjectInstance, TileCoords, ZoneLocation,
 } from 'app/types';
 
 export type Action =
-    'attack' | 'charging' | 'roll' | 'knocked' | 'hurt' | 'dead' | 'walking'
+    'attack' | 'charging' | 'roll'
+    // Hero can be forced into screen transitions when knockedHard.
+    | 'knocked' | 'knockedHard'
+    | 'hurt' | 'dead' | 'walking'
     | 'pushing' | 'grabbing' | 'carrying' | 'throwing' | 'thrown' | 'getItem'
     | 'beingCarried'
     | 'falling' | 'fallen'
@@ -95,7 +98,7 @@ export interface Actor extends ObjectInstance {
     pickUpTile?: FullTile
     grabTile?: TileCoords
     grabObject?: ObjectInstance
-    lastTouchedObject?: ObjectInstance
+    lastTouchedObject?: EffectInstance | ObjectInstance
     invulnerableFrames?: number
     life: number
     knockBack?: (state: GameState, vector: {vx: number, vy: number, vz: number}) => void

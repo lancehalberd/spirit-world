@@ -1,9 +1,9 @@
-import { removeObjectFromArea } from 'app/content/areas';
+import { removeEffectFromArea } from 'app/content/areas';
 import { EXPLOSION_RADIUS, FRAME_LENGTH } from 'app/gameConstants';
 //import { drawFrame, getFrame } from 'app/utils/animations';
 import { getDirection } from 'app/utils/field';
 
-import { AreaInstance, GameState, ObjectInstance, ObjectStatus } from 'app/types';
+import { AreaInstance, GameState, EffectInstance, ObjectInstance } from 'app/types';
 
 
 interface Props {
@@ -13,14 +13,12 @@ interface Props {
 
 const duration = 500;
 
-export class CloneExplosionEffect implements ObjectInstance {
+export class CloneExplosionEffect implements EffectInstance {
     area: AreaInstance;
-    definition = null;
     animationTime: number;
     destroyedObjects: boolean = false;
     x: number;
     y: number;
-    status: ObjectStatus = 'normal';
     constructor({x = 0, y = 0 }: Props) {
         this.animationTime = 0;
         this.x = x;
@@ -53,14 +51,14 @@ export class CloneExplosionEffect implements ObjectInstance {
                 if (object.onDestroy) {
                     object.onDestroy(state, -dx, -dy);
                 } else if (object.behaviors?.destructible) {
-                    removeObjectFromArea(state, object);
+                    removeEffectFromArea(state, object);
                 } else if (object.onHit) {
                     object.onHit(state, { damage: 4, direction: getDirection(-dx, -dy) });
                 }
             }
         }
         if (this.animationTime > duration) {
-            removeObjectFromArea(state, this);
+            removeEffectFromArea(state, this);
         }
     }
     render(context, state: GameState) {

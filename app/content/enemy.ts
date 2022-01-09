@@ -1,8 +1,8 @@
-import { AnimationEffect } from 'app/content/animationEffect';
+import { AnimationEffect } from 'app/content/effects/animationEffect';
 import { checkForFloorEffects, moveEnemy } from 'app/content/enemies';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { dropItemFromTable, getLoot } from 'app/content/lootObject';
-import { addObjectToArea, getAreaSize, refreshAreaLogic } from 'app/content/areas';
+import { addEffectToArea, getAreaSize, refreshAreaLogic } from 'app/content/areas';
 import { enemyDeathAnimation } from 'app/content/enemyAnimations';
 import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
 import { FRAME_LENGTH } from 'app/gameConstants';
@@ -245,7 +245,7 @@ export class Enemy implements Actor, ObjectInstance {
                 hitbox.y + hitbox.h / 2
             );
         }
-        addObjectToArea(state, this.area, deathAnimation);
+        addEffectToArea(state, this.area, deathAnimation);
         if (this.enemyDefinition.onDeath) {
             this.enemyDefinition.onDeath(state, this);
         }
@@ -256,7 +256,7 @@ export class Enemy implements Actor, ObjectInstance {
             const allEnemies = [...this.area.enemies, ...this.area.alternateArea.enemies];
             if (!allEnemies.some(object => object.definition.type === 'boss' && object.status !== 'gone')) {
                 // Remove all enemy attacks from the screen when a boss is defeated.
-                this.area.objects = this.area.objects.filter(object => !object.isEnemyAttack);
+                this.area.effects = this.area.effects.filter(effect => !effect.isEnemyAttack);
                 allEnemies.forEach(object => object.showDeathAnimation(state));
                 // Gain loot if this boss hasn't been defeated yet.
                 if (!getObjectStatus(state, this.definition)) {

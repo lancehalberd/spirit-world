@@ -1,5 +1,5 @@
-import { addSparkleAnimation } from 'app/content/animationEffect';
-import { addObjectToArea } from 'app/content/areas';
+import { addSparkleAnimation } from 'app/content/effects/animationEffect';
+import { addEffectToArea } from 'app/content/areas';
 import { LightningBolt } from 'app/content/effects/lightningBolt';
 import { LightningDischarge } from 'app/content/effects/lightningDischarge';
 import { Spark } from 'app/content/effects/spark';
@@ -185,7 +185,7 @@ function updateStormHeart(this: void, state: GameState, enemy: Enemy): void {
                     tellDuration: 3000,
                     radius: 96,
                 });
-                addObjectToArea(state, enemy.area, discharge);
+                addEffectToArea(state, enemy.area, discharge);
             }
         } else if (enemy.params.counterAttackMode === 'bolts') {
             // When the hero is far away, the heart will summon a series of targeted
@@ -198,7 +198,7 @@ function updateStormHeart(this: void, state: GameState, enemy: Enemy): void {
                     y: hitbox.y + hitbox.h / 2,
                     shockWaveTheta: enemy.params.theta,
                 });
-                addObjectToArea(state, enemy.area, lightningBolt);
+                addEffectToArea(state, enemy.area, lightningBolt);
             }
         }
         if (enemy.params.counterAttackTimer <= 0) {
@@ -235,7 +235,7 @@ function updateStormHeart(this: void, state: GameState, enemy: Enemy): void {
                     y: hitbox.y + hitbox.h / 2 + 64 * Math.sin(theta),
                     shockWaveTheta: enemy.params.theta,
                 });
-                addObjectToArea(state, enemy.area, lightningBolt);
+                addEffectToArea(state, enemy.area, lightningBolt);
             }
         }
     }
@@ -363,7 +363,7 @@ function updateStormBeast(this: void, state: GameState, enemy: Enemy): void {
                     vy: 3 * dy,
                     ttl: 2000,
                 });
-                addObjectToArea(state, enemy.area, spark);
+                addEffectToArea(state, enemy.area, spark);
             }
         }
         const timeLimit = isEnemyDefeated(stormHeart) ? 3000 : 2000;

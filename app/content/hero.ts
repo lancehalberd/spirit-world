@@ -1,4 +1,4 @@
-import { addObjectToArea } from 'app/content/areas';
+import { addEffectToArea } from 'app/content/areas';
 import { destroyClone } from 'app/content/clone';
 import {
     arrowAnimations, bowAnimations,
@@ -14,7 +14,8 @@ import { directionMap, getDirection } from 'app/utils/field';
 
 import {
     Action, ActiveTool, Actor, AreaInstance,
-    Direction, DrawPriority, Equipment, FullTile, GameState, HitProperties, HitResult,
+    Direction, DrawPriority, EffectInstance, Equipment,
+    FullTile, GameState, HitProperties, HitResult,
     MagicElement, ObjectInstance, ObjectStatus,
     PassiveTool, Rect, SavedHeroData, ThrownObject, TileBehaviors, TileCoords, ZoneLocation
 } from 'app/types';
@@ -66,7 +67,7 @@ export class Hero implements Actor, SavedHeroData {
     pickUpTile?: FullTile;
     grabTile?: TileCoords;
     grabObject?: ObjectInstance;
-    lastTouchedObject?: ObjectInstance;
+    lastTouchedObject?: EffectInstance | ObjectInstance;
     invulnerableFrames?: number;
     life: number;
     wading?: boolean;
@@ -436,7 +437,7 @@ export class Hero implements Actor, SavedHeroData {
             vz: 2,
         });
         hero.lastTouchedObject = thrownObject;
-        addObjectToArea(state, hero.area, thrownObject);
+        addEffectToArea(state, hero.area, thrownObject);
         if (tile.linkedTile) {
             const behaviors = tile.linkedTile.behaviors;
             const alternateThrownObject = new ThrownObject({
@@ -450,7 +451,7 @@ export class Hero implements Actor, SavedHeroData {
             });
             alternateThrownObject.linkedObject = thrownObject;
             thrownObject.linkedObject = alternateThrownObject;
-            addObjectToArea(state, state.alternateAreaInstance, alternateThrownObject);
+            addEffectToArea(state, state.alternateAreaInstance, alternateThrownObject);
         }
         hero.pickUpTile = null;
     }

@@ -19,54 +19,83 @@ export interface LootData {
 }
 
 export interface ObjectInstance {
-    area?: AreaInstance,
-    definition?: ObjectDefinition,
-    linkedObject?: ObjectInstance,
-    behaviors?: TileBehaviors,
-    drawPriority?: DrawPriority,
+    area?: AreaInstance
+    definition?: ObjectDefinition
+    linkedObject?: ObjectInstance
+    behaviors?: TileBehaviors
+    drawPriority?: DrawPriority
     // Set this flag for objects that need to update during screen transitions, such as doorways.
-    updateDuringTransition?: boolean,
-    changesAreas?: boolean,
+    updateDuringTransition?: boolean
+    changesAreas?: boolean
     // Setting this true is the same as returning true always for shouldReset+shouldRespawn.
-    alwaysReset?: boolean,
-    ignorePits?: boolean,
+    alwaysReset?: boolean
+    ignorePits?: boolean
     // Should revert to its original state if still present
-    shouldReset?: (state: GameState) => boolean,
+    shouldReset?: (state: GameState) => boolean
     // Should revert to its original state if missing (Defeated enemy, ball that fell in a pit)
-    shouldRespawn?: (state: GameState) => boolean,
-    x: number, y: number, z?: number,
-    status: ObjectStatus,
-    changeStatus?: (state: GameState, status: ObjectStatus) => void,
+    shouldRespawn?: (state: GameState) => boolean
+    x: number, y: number, z?: number
+    status: ObjectStatus
+    changeStatus?: (state: GameState, status: ObjectStatus) => void
     cleanup?: (state: GameState) => void,
     // This is called when a user grabs a solid tile
-    getHitbox?: (state: GameState) => Rect,
-    onActivate?: (state: GameState) => void,
-    onDeactivate?: (state: GameState) => void,
-    onDestroy?: (state: GameState, dx: number, dy: number) => void,
+    getHitbox?: (state: GameState) => Rect
+    onActivate?: (state: GameState) => void
+    onDeactivate?: (state: GameState) => void
+    onDestroy?: (state: GameState, dx: number, dy: number) => void
     // When the hero tries to pick up the object with the passive skill button.
     // The direction is the direction the player is facing.
-    onGrab?: (state: GameState, direction: Direction, hero: Hero) => void,
+    onGrab?: (state: GameState, direction: Direction, hero: Hero) => void
     // When the hero hits the object with a weapon or tool
-    onHit?: (state: GameState, hit: HitProperties) => HitResult,
+    onHit?: (state: GameState, hit: HitProperties) => HitResult
     // When the hero grabs an object and attempts to move.
-    onPull?: (state: GameState, direction: Direction, hero: Hero) => void,
+    onPull?: (state: GameState, direction: Direction, hero: Hero) => void
     // When the hero walks into an object
-    onPush?: (state: GameState, direction: Direction) => void,
-    pullingHeroDirection?: Direction,
-    update?: (state: GameState) => void,
-    add?: (state: GameState, area: AreaInstance) => void,
-    remove?: (state: GameState) => void,
-    render: (context: CanvasRenderingContext2D, state: GameState) => void,
-    renderShadow?: (context: CanvasRenderingContext2D, state: GameState) => void,
-    renderForeground?: (context: CanvasRenderingContext2D, state: GameState) => void,
-    isAllyTarget?: boolean,
-    isEnemyTarget?: boolean,
-    isNeutralTarget?: boolean,
+    onPush?: (state: GameState, direction: Direction) => void
+    pullingHeroDirection?: Direction
+    update?: (state: GameState) => void
+    add?: (state: GameState, area: AreaInstance) => void
+    remove?: (state: GameState) => void
+    render: (context: CanvasRenderingContext2D, state: GameState) => void
+    renderShadow?: (context: CanvasRenderingContext2D, state: GameState) => void
+    renderForeground?: (context: CanvasRenderingContext2D, state: GameState) => void
+    isAllyTarget?: boolean
+    isEnemyTarget?: boolean
+    isNeutralTarget?: boolean
     // This function can be defined to override the default logic for checking if an object is active,
     // which is used by switch toggling logic to determine whether to activate or deactivate next.
-    isActive?: (state: GameState) => boolean,
+    isActive?: (state: GameState) => boolean
+}
+
+export interface EffectInstance {
+    area?: AreaInstance
+    linkedObject?: EffectInstance
+    // This is used for effects that create light around them.
+    behaviors?: TileBehaviors
+    // Only used by the held chakram at the moment.
+    changesAreas?: boolean
+    drawPriority?: DrawPriority
+    x?: number, y?: number, z?: number
+    cleanup?: (state: GameState) => void
+    // This is called when a user grabs a solid tile
+    getHitbox?: (state: GameState) => Rect
+    // When the hero hits the effect with a weapon or tool.
+    // This is used by certain enemy attacks, but it might be better to change those to objects.
+    onHit?: (state: GameState, hit: HitProperties) => HitResult
+    update?: (state: GameState) => void
+    add?: (state: GameState, area: AreaInstance) => void
+    remove?: (state: GameState) => void
+    render: (context: CanvasRenderingContext2D, state: GameState) => void
+    renderShadow?: (context: CanvasRenderingContext2D, state: GameState) => void
+    renderForeground?: (context: CanvasRenderingContext2D, state: GameState) => void
+    isAllyTarget?: boolean
+    isEnemyTarget?: boolean
+    isNeutralTarget?: boolean
     // This will cause this effect to be removed when a boss is defeated.
     isEnemyAttack?: boolean
+    // The following are added for convenience when we have ambiguous type `EffectInstance | ObjectInstance`
+    status?: ObjectStatus
+    definition?: ObjectDefinition
 }
 
 export type ObjectStatus = 'active' | 'closed' | 'closedEnemy' | 'closedSwitch'
@@ -128,7 +157,7 @@ export interface HitProperties {
     // Alternate hitbox to use when checking for tile hits.
     tileHitbox?: Rect
     // Targets to ignore.
-    ignoreTargets?: Set<ObjectInstance>
+    ignoreTargets?: Set<EffectInstance | ObjectInstance>
     // If true this hit will only apply to objects touching the ground.
     isGroundHit?: boolean
 }
@@ -155,7 +184,7 @@ export interface HitResult {
     // For example an arrow hitting a lit torch will gain the 'fire' element.
     setElement?: MagicElement,
     // Returns the set of targets hit.
-    hitTargets?: Set<ObjectInstance>,
+    hitTargets?: Set<EffectInstance | ObjectInstance>,
 }
 
 export interface BaseObjectDefinition {

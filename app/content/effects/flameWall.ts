@@ -1,13 +1,13 @@
-import { addSparkleAnimation } from 'app/content/animationEffect';
-import { addObjectToArea, getAreaSize, removeObjectFromArea } from 'app/content/areas';
+import { addSparkleAnimation } from 'app/content/effects/animationEffect';
+import { addEffectToArea, getAreaSize, removeEffectFromArea } from 'app/content/areas';
 import { flameAnimation } from 'app/content/effects/flame';
 import { CANVAS_HEIGHT, CANVAS_WIDTH, FRAME_LENGTH } from 'app/gameConstants';
 import { drawFrame, getFrame } from 'app/utils/animations';
 import { directionMap, hitTargets, rotateDirection } from 'app/utils/field';
 
 import {
-    AreaInstance, Direction,
-    Frame, GameState, ObjectInstance, ObjectStatus,
+    AreaInstance, Direction, EffectInstance,
+    Frame, GameState, ObjectStatus,
 } from 'app/types';
 
 interface Props {
@@ -18,7 +18,7 @@ interface Props {
     length?: number
 }
 
-export class FlameWall implements ObjectInstance, Props {
+export class FlameWall implements EffectInstance, Props {
     area: AreaInstance = null;
     isEnemyAttack = true;
     definition = null;
@@ -119,7 +119,7 @@ export class FlameWall implements ObjectInstance, Props {
                 || (this.direction === 'up' && this.y < top)
                 || (this.direction === 'down' && this.y > bottom)
             ) {
-                removeObjectFromArea(state, this);
+                removeEffectFromArea(state, this);
             } else {
                 const hitbox = this.getHitbox(state);
                 hitTargets(state, this.area, {
@@ -166,7 +166,7 @@ export class FlameWall implements ObjectInstance, Props {
                 fromPoint,
                 length,
             });
-            addObjectToArea(state, area, flameWall);
+            addEffectToArea(state, area, flameWall);
         }
     }
 }

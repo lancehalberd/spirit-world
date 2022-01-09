@@ -1,10 +1,10 @@
-import { addObjectToArea, removeObjectFromArea } from 'app/content/areas';
+import { addEffectToArea, removeEffectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, frameAnimation, getFrame } from 'app/utils/animations';
 
 import {
-    AreaInstance, DrawPriority, Frame, FrameAnimation,
-    GameState, MagicElement, ObjectInstance, ObjectStatus, Rect, TileBehaviors,
+    AreaInstance, DrawPriority, EffectInstance, Frame, FrameAnimation,
+    GameState, MagicElement, Rect, TileBehaviors,
 } from 'app/types';
 
 
@@ -25,16 +25,14 @@ interface AnimationProps {
     delay?: number
 }
 
-export class AnimationEffect implements ObjectInstance {
+export class AnimationEffect implements EffectInstance {
     area: AreaInstance;
-    definition = null;
     delay: number = 0;
     done = false;
     drawPriority: DrawPriority;
     animation: FrameAnimation;
     animationTime: number;
     behaviors: TileBehaviors;
-    ignorePits = true;
     x: number;
     y: number;
     z: number;
@@ -45,7 +43,6 @@ export class AnimationEffect implements ObjectInstance {
     az: number;
     rotation: number;
     scale: number;
-    status: ObjectStatus = 'normal';
     ttl: number;
     constructor({
         animation, drawPriority = 'background',
@@ -91,7 +88,7 @@ export class AnimationEffect implements ObjectInstance {
         }
         if (this.animationTime > this.ttl || this.z < 0 || (this.animation.loop === false && this.animationTime >= this.animation.duration)) {
             this.done = true;
-            removeObjectFromArea(state, this);
+            removeEffectFromArea(state, this);
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
@@ -139,7 +136,7 @@ export function addParticleAnimations(
             particle.behaviors.brightness = behaviors.brightness;
             particle.behaviors.lightRadius = (behaviors.lightRadius || 32) / 2;
         }
-        addObjectToArea(state, area, particle);
+        addEffectToArea(state, area, particle);
         theta += Math.PI * 2 / (particles.length);
     }
 }
@@ -161,7 +158,7 @@ interface SparkleProps {
 export function addSparkleAnimation(
     state: GameState, area: AreaInstance, hitbox: Rect, sparkleProps: SparkleProps
 ): void {
-    addObjectToArea(state, area, makeSparkleAnimation(state, hitbox, sparkleProps));
+    addEffectToArea(state, area, makeSparkleAnimation(state, hitbox, sparkleProps));
 }
 export function makeSparkleAnimation(
     state: GameState,

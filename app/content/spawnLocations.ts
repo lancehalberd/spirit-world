@@ -300,8 +300,8 @@ const riverTempleStartState = applyItems(helixEndState, {
     staff: 2, lightning: 1,
     fireBlessing: 1, fire: 1,
 });
-const riverTempleBossState = applyItems(waterfallBossState,
-    {maxLife: 3, 'riverTemple:bigKey': 1, 'fire': 1, 'lightning': 1},
+const riverTempleBossState = applyItems(riverTempleStartState,
+    {'riverTemple:bigKey': 1, 'fire': 1, 'lightning': 1},
     ['bossBubblesNorth','bossBubblesSouth', 'bossBubblesWest', 'bossBubblesEast']
 );
 

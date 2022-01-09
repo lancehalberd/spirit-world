@@ -299,7 +299,8 @@ function checkToStartScreenTransition(state: GameState, hero: Hero) {
     } else if (hero.x + hero.w > section.x + section.w && (hero.vx > 0 || hero.actionDx > 0)) {
         setNextAreaSection(state, 'right');
     }
-    const isHeroMovingDown = (hero.vy > 0 || hero.actionDy > 0 || (hero.action === 'jumpingDown' && hero.vy > 0));
+    //const isHeroMovingDown = (hero.vy > 0 || hero.actionDy > 0 || (hero.action === 'jumpingDown' && hero.vy > 0));
+    const isHeroMovingDown = hero.vy > 0 || hero.actionDy > 0;
     if (hero.y < 0 && (hero.vy < 0 || hero.actionDy < 0)) {
         state.location.areaGridCoords = {
             x: state.location.areaGridCoords.x,

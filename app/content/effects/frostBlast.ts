@@ -1,11 +1,11 @@
-import { addSparkleAnimation } from 'app/content/animationEffect';
-import { removeObjectFromArea } from 'app/content/areas';
+import { addSparkleAnimation } from 'app/content/effects/animationEffect';
+import { removeEffectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { hitTargets } from 'app/utils/field';
 
 import {
-    AreaInstance, Frame, GameState,
-    ObjectInstance, ObjectStatus,
+    AreaInstance, EffectInstance, Frame, GameState,
+    ObjectInstance,
 } from 'app/types';
 
 
@@ -19,9 +19,8 @@ interface Props {
 const EXPANSION_TIME = 200;
 const PERSIST_TIME = 400;
 
-export class FrostBlast implements ObjectInstance, Props {
+export class FrostBlast implements EffectInstance, Props {
     area: AreaInstance = null;
-    definition = null;
     isEnemyAttack = true;
     frame: Frame;
     damage: number;
@@ -33,12 +32,10 @@ export class FrostBlast implements ObjectInstance, Props {
     vy: number;
     w: number = 12;
     h: number = 12;
-    ignorePits = true;
     radius: number;
     animationTime = 0;
-    status: ObjectStatus = 'normal';
     speed = 0;
-    hitTargets: Set<ObjectInstance>;
+    hitTargets: Set<EffectInstance | ObjectInstance>;
     constructor({x, y, damage = 2, radius = 32}: Props) {
         this.radius = radius
         this.damage = damage;
@@ -49,7 +46,7 @@ export class FrostBlast implements ObjectInstance, Props {
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;
         if (this.animationTime >= EXPANSION_TIME + PERSIST_TIME) {
-            removeObjectFromArea(state, this);
+            removeEffectFromArea(state, this);
         } else {
             const r = this.radius * Math.min(1, this.animationTime / EXPANSION_TIME);
             const hitResult = hitTargets(state, this.area, {

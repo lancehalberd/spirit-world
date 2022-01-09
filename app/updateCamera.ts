@@ -1,5 +1,6 @@
 import {
-    addObjectToArea, checkIfAllEnemiesAreDefeated, createAreaInstance, getAreaFromLocation, getAreaSize, linkObjects,
+    addEffectToArea, addObjectToArea, checkIfAllEnemiesAreDefeated,
+    createAreaInstance, getAreaFromLocation, getAreaSize, linkObjects,
     setAreaSection, setConnectedAreas, switchToNextAreaSection,
 } from 'app/content/areas';
 import { displayTileEditorPropertyPanel, editingState } from 'app/development/tileEditor';
@@ -39,6 +40,13 @@ export function updateCamera(state: GameState, speed = cameraSpeed): void {
                     addObjectToArea(state, state.nextAreaInstance, object);
                     object.x -= state.nextAreaInstance.cameraOffset.x;
                     object.y -= state.nextAreaInstance.cameraOffset.y;
+                }
+            }
+            for (const effect of state.areaInstance.effects) {
+                if (effect.changesAreas) {
+                    addEffectToArea(state, state.nextAreaInstance, effect);
+                    effect.x -= state.nextAreaInstance.cameraOffset.x;
+                    effect.y -= state.nextAreaInstance.cameraOffset.y;
                 }
             }
             const lastAreaInstance = state.areaInstance;

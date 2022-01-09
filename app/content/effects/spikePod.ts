@@ -1,13 +1,12 @@
-import { removeObjectFromArea } from 'app/content/areas';
+import { removeEffectFromArea } from 'app/content/areas';
 import { getVectorToNearestTargetOrRandom } from 'app/content/enemies';
-import { CrystalSpike } from 'app/content/arrow';
+import { CrystalSpike } from 'app/content/effects/arrow';
 import { FRAME_LENGTH } from 'app/gameConstants';
 
 import {
-    AreaInstance, Direction,
+    AreaInstance, EffectInstance,
     Frame, GameState,
     HitProperties, HitResult,
-    ObjectInstance, ObjectStatus,
 } from 'app/types';
 
 interface Props {
@@ -20,9 +19,8 @@ interface Props {
 const growDuration = 1500;
 const fadeDuration = 200;
 
-export class SpikePod implements ObjectInstance, Props {
+export class SpikePod implements EffectInstance, Props {
     area: AreaInstance = null;
-    definition = null;
     isEnemyAttack = true;
     frame: Frame;
     damage: number;
@@ -37,8 +35,6 @@ export class SpikePod implements ObjectInstance, Props {
     shockWaves: number;
     shockWaveTheta: number;
     animationTime = 0;
-    direction: Direction;
-    status: ObjectStatus = 'normal';
     hasBurst: boolean = false;
     isEnemyTarget: boolean = true;
     constructor({x = 0, y = 0, damage = 2}: Props) {
@@ -85,7 +81,7 @@ export class SpikePod implements ObjectInstance, Props {
             }
             return;
         } else if (this.animationTime >= fadeDuration) {
-            removeObjectFromArea(state, this);
+            removeEffectFromArea(state, this);
         }
     }
     renderShadow(context: CanvasRenderingContext2D, state: GameState) {

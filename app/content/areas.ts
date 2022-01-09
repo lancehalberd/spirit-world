@@ -1,6 +1,6 @@
 import { find } from 'lodash';
 
-import { addParticleAnimations } from 'app/content/animationEffect';
+import { addParticleAnimations } from 'app/content/effects/animationEffect';
 import { TextCue } from 'app/content/effects/textCue';
 import { changeObjectStatus, createObjectInstance, findObjectInstanceById } from 'app/content/objects';
 import { allTiles } from 'app/content/tiles';
@@ -17,7 +17,8 @@ import { updateCamera } from 'app/updateCamera';
 
 import {
     AreaDefinition, AreaInstance, AreaLayerDefinition,
-    Direction, Enemy, EntranceDefinition, FullTile, GameState, HeldChakram, Hero, TileCoords,
+    Direction, EffectInstance, Enemy, EntranceDefinition,
+    FullTile, GameState, HeldChakram, Hero, TileCoords,
     LogicDefinition,
     ObjectDefinition,
     ObjectInstance,
@@ -199,11 +200,11 @@ export function enterLocation(
             state.transitionState.nextAlternateAreaInstance = state.areaInstance;
 
             const primaryHero = state.hero.activeClone || state.hero;
-            const heldChakram = primaryHero.area.objects.find(o => o instanceof HeldChakram) as HeldChakram;
+            const heldChakram = primaryHero.area.effects.find(o => o instanceof HeldChakram) as HeldChakram;
             // Bring the held chakram with you.
             if (heldChakram) {
-                removeObjectFromArea(state, heldChakram);
-                addObjectToArea(state, state.transitionState.nextAreaInstance, heldChakram);
+                removeEffectFromArea(state, heldChakram);
+                addEffectToArea(state, state.transitionState.nextAreaInstance, heldChakram);
             }
         }
         return;
@@ -390,7 +391,7 @@ export function enterZoneByTarget(
                                 const definition = target.definition as EntranceDefinition;
                                 if (definition.locationCue) {
                                     const textCue = new TextCue({ text: definition.locationCue});
-                                    addObjectToArea(state, state.areaInstance, textCue);
+                                    addEffectToArea(state, state.areaInstance, textCue);
                                 }
                                 callback?.();
                             });
@@ -618,6 +619,7 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
             maskTiles: mapTileNumbersToFullTiles(layer.mask?.tiles),
             originalTiles: mapTileNumbersToFullTiles(layer.grid.tiles),
         })),
+        effects: [],
         objects: [],
         removedObjectIds: [],
         priorityObjects: [],
@@ -837,6 +839,7 @@ export function refreshSection(state: GameState, area: AreaInstance, section: Re
         }
     }
     area.checkToRedrawTiles = true;
+    area.effects = [];
     const l = section.x * 16;
     const t = section.y * 16;
     // Remove any objects from that area that should be reset.
@@ -909,6 +912,36 @@ export function removeObjectFromArea(state: GameState, object: ObjectInstance, t
             object.area.objects.splice(index, 1);
         }
         object.area = null;
+    }
+}
+
+export function addEffectToArea(state: GameState, area: AreaInstance, effect: EffectInstance): void {
+    if (effect.area && effect.area !== area) {
+        removeEffectFromArea(state, effect);
+    }
+    effect.area = area;
+    if (effect.add) {
+        effect.add(state, area);
+    } else {
+        area.effects.push(effect);
+    }
+}
+export function removeEffectFromArea(state: GameState, effect: EffectInstance): void {
+    if (!effect.area) {
+        return;
+    }
+    if (effect.remove) {
+        effect.remove(state);
+        effect.area = null;
+    } else {
+        if (effect.cleanup) {
+            effect.cleanup(state);
+        }
+        const index = effect.area.effects.indexOf(effect);
+        if (index >= 0) {
+            effect.area.effects.splice(index, 1);
+        }
+        effect.area = null;
     }
 }
 

@@ -1,4 +1,4 @@
-import { addObjectToArea, enterLocation, refreshAreaLogic, removeObjectFromArea } from 'app/content/areas';
+import { addEffectToArea, addObjectToArea, enterLocation, refreshAreaLogic, removeEffectFromArea, removeObjectFromArea } from 'app/content/areas';
 import { getObjectStatus } from 'app/content/objects';
 import { createCanvasAndContext } from 'app/dom';
 import { CANVAS_WIDTH, CANVAS_HEIGHT, FRAME_LENGTH } from 'app/gameConstants';
@@ -87,7 +87,7 @@ export class LootGetAnimation implements ObjectInstance {
         if (this.animationTime === 1000) {
             showLootMessage(state, this.loot.lootType, this.loot.lootLevel, this.loot.lootAmount);
         } else if (this.animationTime > 1000) {
-            removeObjectFromArea(state, this);
+            removeEffectFromArea(state, this);
         }
     }
     render(context, state: GameState) {
@@ -148,7 +148,7 @@ function showLootMessage(state: GameState, lootType: LootType, lootLevel?: numbe
         case 'peachOfImmortality':
             if (!state.hero.passiveTools.catEyes) {
                 return showMessage(state, `You ate a Golden Peach!
-                    {|} Your health has increased and you feel a strange energy...{item:catEyes}`);
+                    {|} Your health has increased and you feel a strange energy...{wait:200}{item:catEyes}`);
             }
             return showMessage(state, `You ate a Golden Peach!
                 {|} Your maximum health has increased!`);
@@ -360,7 +360,7 @@ export function getLoot(this: void, state: GameState, definition: LootObjectDefi
     const lootAnimation = new LootGetAnimation(definition);
     // Apply the pickup after creating the loot animation so that it uses the correct graphic for progressive items.
     onPickup(state, definition);
-    addObjectToArea(state, hero.area, lootAnimation);
+    addEffectToArea(state, hero.area, lootAnimation);
     hero.area.priorityObjects.push([lootAnimation]);
     // Refresh the area so that the guardian NPC moves to the correct location now that the boss is defeated.
     refreshAreaLogic(state, state.areaInstance);

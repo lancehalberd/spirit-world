@@ -1,5 +1,5 @@
-import { addObjectToArea, checkIfAllEnemiesAreDefeated, removeObjectFromArea } from 'app/content/areas';
-import { AnimationEffect } from 'app/content/animationEffect';
+import { addEffectToArea, checkIfAllEnemiesAreDefeated, removeObjectFromArea } from 'app/content/areas';
+import { AnimationEffect } from 'app/content/effects/animationEffect';
 import { Enemy } from 'app/content/enemy';
 import { editingState } from 'app/development/tileEditor';
 import { GAME_KEY } from 'app/gameConstants';
@@ -11,7 +11,7 @@ import { getTileBehaviors } from 'app/utils/field';
 
 import {
     AreaInstance, FrameAnimation, FrameDimensions,
-    GameState, MagicElement,
+    GameState, MagicElement, ObjectInstance
 } from 'app/types';
 
 const fallGeometry: FrameDimensions = {w: 24, h: 24};
@@ -29,7 +29,9 @@ export function updateField(this: void, state: GameState) {
     if (state.areaInstance.priorityObjects.length) {
         const priorityObjects = state.areaInstance.priorityObjects.pop();
         for (let i = 0; i < priorityObjects.length; i++) {
-            if (state.areaInstance.objects.indexOf(priorityObjects[i]) < 0) {
+            if (state.areaInstance.objects.indexOf(priorityObjects[i] as ObjectInstance) < 0
+                && state.areaInstance.effects.indexOf(priorityObjects[i]) < 0
+            ) {
                 priorityObjects.splice(i--, 1);
                 continue;
             }
@@ -65,7 +67,7 @@ export function updateAreaObjects(this: void, state: GameState, area: AreaInstan
     // This is the array of literal Enemy instances.
     area.enemies = [];
     area.neutralTargets = [];
-    for (const object of area?.objects || []) {
+    for (const object of [...area?.objects || [], ...area?.effects || []] ) {
         if (object.isAllyTarget) {
             area.allyTargets.push(object);
         }
@@ -106,10 +108,24 @@ export function updateAreaObjects(this: void, state: GameState, area: AreaInstan
                     animation: objectFallAnimation,
                     x: ((x / 16) | 0) * 16 - 4, y: ((y / 16) | 0) * 16 - 4,
                 });
-                addObjectToArea(state, object.area, pitAnimation);
+                addEffectToArea(state, object.area, pitAnimation);
                 removeObjectFromArea(state, object);
             }
         }
+    }
+    for (const effect of area?.effects || []) {
+        if (isScreenTransitioning) {
+            continue;
+        }
+        // Time passes slowly for everything but the astral projection while meditating and things it is
+        // or has recently interacted with.
+        if (skipFrame
+            && effect !== state.hero.astralProjection?.lastTouchedObject
+            && effect.linkedObject !== state.hero.astralProjection?.lastTouchedObject
+        ) {
+            continue;
+        }
+        effect.update?.(state);
     }
 }
 

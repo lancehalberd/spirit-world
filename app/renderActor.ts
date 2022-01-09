@@ -77,6 +77,7 @@ export function getHeroFrame(state: GameState, hero: Hero): Frame {
                 animations = hero.wading ? heroShallowAnimations.move : heroAnimations.move;
             }
             break;
+        case 'knockedHard':
         case 'knocked':
             animations = heroAnimations.hurt;
             break;
@@ -94,7 +95,7 @@ export function getHeroFrame(state: GameState, hero: Hero): Frame {
             const animationSet = isChargingBow ? heroChargeBowAnimations : heroChargeChakramAnimations;
             let direction = hero.d;
             if (!isChargingBow) {
-                const heldChakram = hero.area.objects.find(o => o instanceof HeldChakram) as HeldChakram;
+                const heldChakram = hero.area.effects.find(o => o instanceof HeldChakram) as HeldChakram;
                 if (heldChakram) {
                     direction = getDirection(heldChakram.vx, heldChakram.vy, true, hero.d);
                 }

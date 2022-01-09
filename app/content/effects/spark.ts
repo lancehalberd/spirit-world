@@ -1,10 +1,10 @@
-import { removeObjectFromArea } from 'app/content/areas';
+import { removeEffectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { hitTargets } from 'app/utils/field';
 
 import {
-    AreaInstance, DrawPriority,
-    Frame, GameState, ObjectInstance, ObjectStatus
+    AreaInstance, DrawPriority, EffectInstance,
+    Frame, GameState,
 } from 'app/types';
 
 interface Props {
@@ -19,11 +19,10 @@ interface Props {
     ttl?: number,
 }
 
-export class Spark implements ObjectInstance, Props {
+export class Spark implements EffectInstance, Props {
     drawPriority: DrawPriority = 'sprites';
     area: AreaInstance = null;
     isEnemyAttack = true;
-    definition = null;
     frame: Frame;
     damage: number;
     x: number;
@@ -34,9 +33,7 @@ export class Spark implements ObjectInstance, Props {
     vy: number;
     az: number;
     radius: number = 3;
-    ignorePits = true;
     animationTime = 0;
-    status: ObjectStatus = 'normal';
     speed = 0;
     ttl: number;
     constructor({x, y, z = 0, vx = 0, vy = 0, vz = 0, az = -0.3, damage = 1, ttl = 2000}: Props) {
@@ -58,7 +55,7 @@ export class Spark implements ObjectInstance, Props {
         this.animationTime += FRAME_LENGTH;
 
         if (this.animationTime >= this.ttl) {
-            removeObjectFromArea(state, this);
+            removeEffectFromArea(state, this);
         } else {
             hitTargets(state, this.area, {
                 damage: this.damage,

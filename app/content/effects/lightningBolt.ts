@@ -1,5 +1,5 @@
-import { addSparkleAnimation } from 'app/content/animationEffect';
-import { addObjectToArea, removeObjectFromArea } from 'app/content/areas';
+import { addSparkleAnimation } from 'app/content/effects/animationEffect';
+import { addEffectToArea, removeEffectFromArea } from 'app/content/areas';
 import { Spark } from 'app/content/effects/spark';
 import { allTiles } from 'app/content/tiles';
 import { FRAME_LENGTH } from 'app/gameConstants';
@@ -7,8 +7,8 @@ import { drawFrameAt } from 'app/utils/animations';
 import { hitTargets } from 'app/utils/field';
 
 import {
-    AreaInstance, Direction,
-    Frame, GameState, ObjectInstance, ObjectStatus,
+    AreaInstance, EffectInstance,
+    Frame, GameState,
 } from 'app/types';
 
 
@@ -33,9 +33,8 @@ const cloudFrames = [
     [410,411],
 ];
 
-export class LightningBolt implements ObjectInstance, Props {
+export class LightningBolt implements EffectInstance, Props {
     area: AreaInstance = null;
-    definition = null;
     isEnemyAttack = true;
     frame: Frame;
     damage: number;
@@ -46,13 +45,10 @@ export class LightningBolt implements ObjectInstance, Props {
     vx: number;
     vy: number;
     radius: number = 6;
-    ignorePits = true;
     delay: number;
     shockWaves: number;
     shockWaveTheta: number;
     animationTime = 0;
-    direction: Direction;
-    status: ObjectStatus = 'normal';
     constructor({x = 0, y = 0, damage = 2, delay = 800, shockWaves = 4, shockWaveTheta = 0}: Props) {
         this.x = x | 0;
         this.y = y | 0;
@@ -76,7 +72,7 @@ export class LightningBolt implements ObjectInstance, Props {
                     vy: 4 * dy,
                     ttl: 1000,
                 });
-                addObjectToArea(state, this.area, spark);
+                addEffectToArea(state, this.area, spark);
             }
         }
         if (this.animationTime < this.delay) {
@@ -112,7 +108,7 @@ export class LightningBolt implements ObjectInstance, Props {
             });
         }
         if (this.animationTime >= this.delay + LIGHTNING_ANIMATION_DURATION + STRIKE_DURATION) {
-            removeObjectFromArea(state, this);
+            removeEffectFromArea(state, this);
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {

@@ -1,6 +1,6 @@
 import { sample } from 'lodash';
-import { AnimationEffect } from 'app/content/animationEffect';
-import { addObjectToArea } from 'app/content/areas';
+import { AnimationEffect } from 'app/content/effects/animationEffect';
+import { addEffectToArea } from 'app/content/areas';
 import { Frost } from 'app/content/effects/frost';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import {
@@ -255,7 +255,7 @@ function updateFrostSerpent(this: void, state: GameState, enemy: Enemy): void {
                 y: hitbox.y + hitbox.h / 2 - enemyDeathAnimation.frames[0].h / 2 * enemy.scale + 1,
                 scale: enemy.scale,
             });
-            addObjectToArea(state, enemy.area, deathAnimation);
+            addEffectToArea(state, enemy.area, deathAnimation);
             enemy.setMode('regenerate');
             enemy.params.submerged = true;
             return;
@@ -496,6 +496,6 @@ function shootFrostInCone(state: GameState, enemy: Enemy, theta: number, damage 
         vy: speed * Math.sin(attackTheta),
         ignoreTargets: new Set([enemy]),
     });
-    addObjectToArea(state, enemy.area, frost);
+    addEffectToArea(state, enemy.area, frost);
 }
 

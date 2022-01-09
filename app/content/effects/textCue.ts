@@ -1,10 +1,10 @@
-import { removeObjectFromArea } from 'app/content/areas';
+import { removeEffectFromArea } from 'app/content/areas';
 import { CANVAS_HEIGHT, FRAME_LENGTH } from 'app/gameConstants';
 import { drawFrame } from 'app/utils/animations';
 import { characterMap } from 'app/utils/simpleWhiteFont';
 
 import {
-    AreaInstance, DrawPriority, GameState, ObjectInstance, ObjectStatus, TileBehaviors,
+    AreaInstance, DrawPriority, EffectInstance, GameState, TileBehaviors,
 } from 'app/types';
 
 const characterWidth = 8;
@@ -15,17 +15,14 @@ interface TextCueProps {
     duration?: number
 }
 
-export class TextCue implements ObjectInstance {
+export class TextCue implements EffectInstance {
     area: AreaInstance;
-    definition = null;
     done = false;
     drawPriority: DrawPriority = 'hud';
     behaviors: TileBehaviors;
-    ignorePits = true;
     x: number;
     y: number;
     text: string;
-    status: ObjectStatus = 'normal';
     time: number = 0;
     duration: number;
     constructor({ duration = 3000, text }: TextCueProps) {
@@ -36,7 +33,7 @@ export class TextCue implements ObjectInstance {
         this.time += FRAME_LENGTH;
         if (this.time >= this.duration) {
             this.done = true;
-            removeObjectFromArea(state, this);
+            removeEffectFromArea(state, this);
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {

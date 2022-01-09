@@ -1,5 +1,5 @@
-import { makeSparkleAnimation } from 'app/content/animationEffect';
-import { addObjectToArea, getAreaSize, removeObjectFromArea } from 'app/content/areas';
+import { makeSparkleAnimation } from 'app/content/effects/animationEffect';
+import { addEffectToArea, getAreaSize, removeEffectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { getChargeLevelAndElement } from 'app/useTool';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
@@ -107,7 +107,7 @@ export class ThrownChakram implements ObjectInstance {
             this.x += this.vx;
             this.y += this.vy;
             if (isPointInShortRect(this.source.x + this.source.w / 2, this.source.y + this.source.h / 2, this)) {
-                removeObjectFromArea(state, this);
+                removeEffectFromArea(state, this);
                 return;
             }
         }
@@ -232,8 +232,8 @@ export class HeldChakram implements ObjectInstance {
         }
         this.hero.vx -= chakram.vx / 4;
         this.hero.vy -= chakram.vy / 4;
-        addObjectToArea(state, this.area, chakram);
-        removeObjectFromArea(state, this);
+        addEffectToArea(state, this.area, chakram);
+        removeEffectFromArea(state, this);
     }
     updatePosition() {
         //if (this.vx && this.vy) {
@@ -263,7 +263,7 @@ export class HeldChakram implements ObjectInstance {
         }
         // Remove a chakram if it is not in the are with the hero.
         if (!state.transitionState && this.hero.area !== this.area) {
-            removeObjectFromArea(state, this);
+            removeEffectFromArea(state, this);
         }
         if (state.hero.magic > 0 && this.animationTime >= 1000 && state.hero.passiveTools.charge >= 1 && this.animationTime % 200 === 0) {
             this.sparkles.push(makeSparkleAnimation(state, this, { element: this.hero.element }));
@@ -288,7 +288,7 @@ export class HeldChakram implements ObjectInstance {
         const hitResult = hitTargets(state, this.area, hit);
         if (hitResult.hit && !hitResult.pierced) {
             this.hero.action = null;
-            removeObjectFromArea(state, this);
+            removeEffectFromArea(state, this);
             // console.log(hitResult.knockback);
             if (hitResult.knockback) {
                 this.hero.bounce = {vx: hitResult.knockback.vx, vy: hitResult.knockback.vy, frames: 10};

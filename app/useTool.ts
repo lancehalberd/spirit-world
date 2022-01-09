@@ -1,5 +1,5 @@
-import { addObjectToArea } from 'app/content/areas';
-import { Arrow } from 'app/content/arrow';
+import { addObjectToArea, addEffectToArea } from 'app/content/areas';
+import { Arrow } from 'app/content/effects/arrow';
 import { Clone }  from 'app/content/clone';
 import { Staff } from 'app/content/staff';
 import { directionMap, getDirection } from 'app/utils/field';
@@ -63,7 +63,7 @@ export function useTool(
                 vy: speed * directionMap[direction][1],
                 style: 'spirit',
             });
-            addObjectToArea(state, state.areaInstance, arrow);
+            addEffectToArea(state, state.areaInstance, arrow);
             return;
         case 'cloak':
             if (state.hero.isInvisible || state.hero.hasBarrier) {

@@ -1,10 +1,10 @@
-import { removeObjectFromArea } from 'app/content/areas';
+import { removeEffectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { coverTile, hitTargets } from 'app/utils/field';
 
 import {
-    AreaInstance, Direction,
-    Frame, GameState, ObjectInstance, ObjectStatus,
+    AreaInstance, EffectInstance,
+    Frame, GameState,
 } from 'app/types';
 
 const thornsTilesIndex = 5;
@@ -16,9 +16,8 @@ interface Props {
     delay?: number,
 }
 
-export class GrowingThorn implements ObjectInstance, Props {
+export class GrowingThorn implements EffectInstance, Props {
     area: AreaInstance = null;
-    definition = null;
     isEnemyAttack = true;
     frame: Frame;
     damage: number;
@@ -30,13 +29,8 @@ export class GrowingThorn implements ObjectInstance, Props {
     vy: number;
     w: number = 16;
     h: number = 16;
-    ignorePits = true;
     delay: number;
-    shockWaves: number;
-    shockWaveTheta: number;
     animationTime = 0;
-    direction: Direction;
-    status: ObjectStatus = 'normal';
     constructor({x = 0, y = 0, damage = 2, delay = 800}: Props) {
         this.x -= this.w / 2;
         this.y -= this.h / 2;
@@ -81,7 +75,7 @@ export class GrowingThorn implements ObjectInstance, Props {
                     hitAllies: true,
                 });
             }
-            removeObjectFromArea(state, this);
+            removeEffectFromArea(state, this);
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {

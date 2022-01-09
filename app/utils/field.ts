@@ -3,7 +3,7 @@ import { allTiles } from 'app/content/tiles';
 import { isPixelInShortRect, rectanglesOverlap } from 'app/utils/index';
 
 import {
-    AreaInstance, AreaLayer, Direction, Enemy, GameState, Hero,
+    AreaInstance, AreaLayer, Direction, EffectInstance, Enemy, GameState, Hero,
     HitProperties, HitResult, MovementProperties,
     ObjectInstance, Rect, Tile, TileCoords, TileBehaviors,
 } from 'app/types';
@@ -191,7 +191,7 @@ export function getTileBehaviorsAndObstacles(
     {x, y}: Tile,
     excludedObjects: Set<any> = null,
     nextArea: AreaInstance = null,
-    objectTest: (object: ObjectInstance) => boolean = null,
+    objectTest: (object: EffectInstance | ObjectInstance) => boolean = null,
     direction?: Direction,
 ): {tileBehavior: TileBehaviors, tx: number, ty: number, objects: ObjectInstance[]} {
     const objects: ObjectInstance[] = [];
@@ -374,7 +374,7 @@ function distanceToSegment({x, y}, {x1, y1, x2, y2}) {
 
 export function hitTargets(this: void, state: GameState, area: AreaInstance, hit: HitProperties): HitResult {
     const combinedResult: HitResult = { pierced: true, hitTargets: new Set() };
-    let targets: ObjectInstance[] = [];
+    let targets: (EffectInstance | ObjectInstance)[] = [];
     if (hit.hitEnemies) {
         targets = [...targets, ...area.enemyTargets];
     }

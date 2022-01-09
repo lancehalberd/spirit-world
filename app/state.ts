@@ -102,6 +102,7 @@ export function selectSaveFile(savedGameIndex: number): void {
         returnToSpawnLocation(state);
         if (!isRandomizer) {
             state.scriptEvents.queue = parseScriptText(state, 'Waaaaah!', 1000, false);
+            state.scriptEvents.queue.push({type: 'clearTextBox'});
         } else {
             setScript(state, 'All the treasure in the world has been shuffled!');
         }
