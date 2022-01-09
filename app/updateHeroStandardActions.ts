@@ -47,7 +47,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         || hero.action === 'throwing' || hero.action === 'grabbing';
     const isActionBlocked =
         isMovementBlocked || hero.swimming || hero.pickUpTile || hero.pickUpObject || hero.action === 'attack' ||
-        hero.z > minZ;
+        hero.z > maxCloudBootsZ;
     const canCharge = !hero.isAstralProjection && isPlayerControlled && !isActionBlocked;
     const canAttack = canCharge && hero.weapon > 0 && !hero.chargingLeftTool && !hero.chargingRightTool;
     // console.log('move', !isMovementBlocked, 'act', !isActionBlocked, 'charge', canCharge, 'attack', canAttack);
