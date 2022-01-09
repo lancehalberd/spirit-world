@@ -1,17 +1,18 @@
 import { Staff } from 'app/content/staff';
 
 import {
-    AreaGrid, AreaInstance,
-    Frame, Hero, LootType, SavedHeroData, Rect, Zone, ZoneLocation,
+    ActiveScriptEvent, AreaGrid, AreaInstance,
+    Frame, Hero, LootData, SavedHeroData, Rect, ScriptEvent,
+    Zone, ZoneLocation,
 } from 'app/types';
 
 export type StaffTowerLocation = 'desert' | 'forest' | 'mountain';
 
 export type SavedState = {
     // Flags that are set permanently for objects, like opened treasure chests or defeated bosses.
-    objectFlags: {[key: string]: boolean}
+    objectFlags: {[key: string]: boolean | number | string}
     // Flags that remain set as long as the character does not leave the current zone.
-    zoneFlags: {[key: string]: boolean}
+    zoneFlags: {[key: string]: boolean | number | string}
     savedHeroData: SavedHeroData
     dungeonInventories: {
         [key: string]: DungeonInventory
@@ -29,13 +30,10 @@ export type Scene = 'title'
     | 'chooseGameMode' | 'deleteSavedGame' | 'deleteSavedGameConfirmation'
     | 'game' | 'credits' | 'options';
 
-export interface DialogueLootDefinition {
+export type DialogueLootDefinition = LootData & {
     type: 'dialogueLoot'
     // The id of the object associated with this dialogue (used during randomization).
     id?: string
-    lootType: LootType
-    lootLevel?: number
-    lootAmount?: number
 }
 
 export interface GameState {
@@ -93,15 +91,13 @@ export interface GameState {
         mostRecentKeysPressed: Set<number>
         gameKeysReleased: Set<number>
     },
-    messageState?: {
-        // How long to show each page before automatically advancing
-        advanceTime?: number
-        // Whether to continue updating the field in the background while text is displayed
-        continueUpdatingState?: boolean
-        // Time the current page was displayed
-        currentPageTime: number
-        pageIndex: number
-        pages: (Frame[][] | DialogueLootDefinition | string)[]
+    messagePage?: Frame[][]
+    scriptEvents: {
+        activeEvents: ActiveScriptEvent[]
+        blockEventQueue: boolean
+        blockFieldUpdates: boolean
+        handledInput: boolean
+        queue: ScriptEvent[]
     }
     isUsingKeyboard?: boolean
     isUsingXbox?: boolean

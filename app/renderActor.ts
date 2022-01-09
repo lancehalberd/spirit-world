@@ -4,11 +4,12 @@ import { isHeroFloating, isHeroSinking } from 'app/utils/actor';
 import { createAnimation, drawFrame, drawFrameAt, getFrame } from 'app/utils/animations';
 import { carryMap, directionMap, getDirection } from 'app/utils/field';
 
-import { Actor, ActorAnimations, Enemy, Frame, FrameDimensions, GameState, Hero } from 'app/types';
+import { Actor, ActorAnimations, Enemy, Frame, FrameDimensions, GameState, HeldChakram, Hero } from 'app/types';
 
 import {
     heroAnimations,
-    heroChargeAnimations,
+    heroChargeBowAnimations,
+    heroChargeChakramAnimations,
     heroShallowAnimations,
     heroSwimAnimations,
     Y_OFF,
@@ -17,7 +18,7 @@ import {
 const shallowGeometry: FrameDimensions = {w: 20, h: 28, content: {x: 2, y: 16 + Y_OFF, w: 16, h: 16}};
 export const shadowFrame: Frame = createAnimation('gfx/shadow.png', { w: 16, h: 16 }).frames[0];
 export const smallShadowFrame: Frame = createAnimation('gfx/smallshadow.png', { w: 16, h: 16 }).frames[0];
-export const wadingFrame: Frame = createAnimation('gfx/shallow.png', shallowGeometry).frames[0];
+export const wadingAnimation = createAnimation('gfx/shallowloop.png', shallowGeometry, {cols: 3, duration: 10});
 
 let lastPullAnimation = null;
 export function getHeroFrame(state: GameState, hero: Hero): Frame {
@@ -76,6 +77,7 @@ export function getHeroFrame(state: GameState, hero: Hero): Frame {
                 animations = hero.wading ? heroShallowAnimations.move : heroAnimations.move;
             }
             break;
+        case 'knockedHard':
         case 'knocked':
             animations = heroAnimations.hurt;
             break;
@@ -88,12 +90,23 @@ export function getHeroFrame(state: GameState, hero: Hero): Frame {
         case 'climbing':
             return getFrame(heroAnimations.climbing.up, hero.animationTime);
         case 'charging':
-            if (hero.vx || hero.vy) {
-                return getFrame(heroChargeAnimations.move[hero.d], hero.animationTime);
+            const isChargingBow = (hero.chargingRightTool && hero.rightTool === 'bow')
+                || (hero.chargingLeftTool && hero.leftTool === 'bow');
+            const animationSet = isChargingBow ? heroChargeBowAnimations : heroChargeChakramAnimations;
+            let direction = hero.d;
+            if (!isChargingBow) {
+                const heldChakram = hero.area.effects.find(o => o instanceof HeldChakram) as HeldChakram;
+                if (heldChakram) {
+                    direction = getDirection(heldChakram.vx, heldChakram.vy, true, hero.d);
+                }
             } else {
-                return getFrame(heroChargeAnimations.idle[hero.d], hero.animationTime);
+                direction = getDirection(hero.actionDx, hero.actionDy, true, hero.d);
             }
-            return hero.wading ? heroShallowAnimations.attack[hero.d].frames[0] : heroAnimations.attack[hero.d].frames[0];
+            if (hero.vx || hero.vy) {
+                return getFrame(animationSet.move[direction], hero.animationTime);
+            } else {
+                return getFrame(animationSet.idle[direction], hero.animationTime);
+            }
         case 'attack':
             animations = hero.wading ? heroShallowAnimations.attack : heroAnimations.attack;
             break;
@@ -170,7 +183,8 @@ export function renderCarriedTile(context: CanvasRenderingContext2D, state: Game
 
 export function renderHeroShadow(context: CanvasRenderingContext2D, state: GameState, hero: Hero, forceDraw: boolean = false): void {
     if (hero.wading && !hero.swimming) {
-        drawFrameAt(context, wadingFrame, { x: hero.x, y: hero.y - hero.z });
+        const frame = getFrame(wadingAnimation, hero.animationTime);
+        drawFrameAt(context, frame, { x: hero.x, y: hero.y - hero.z });
     }
 
     if (!forceDraw && (

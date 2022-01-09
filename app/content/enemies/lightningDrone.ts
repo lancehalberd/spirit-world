@@ -1,5 +1,5 @@
-import { addSparkleAnimation } from 'app/content/animationEffect';
-import { addObjectToArea } from 'app/content/areas';
+import { addSparkleAnimation } from 'app/content/effects/animationEffect';
+import { addEffectToArea } from 'app/content/areas';
 import { LightningDischarge } from 'app/content/effects/lightningDischarge';
 import {
     getVectorToNearbyTarget,
@@ -57,13 +57,13 @@ enemyDefinitions.lightningDrone = {
                         tellDuration: chargeTime,
                         radius: dischargeRadius,
                     });
-                    addObjectToArea(state, enemy.area, discharge);
+                    addEffectToArea(state, enemy.area, discharge);
                 }
             }
         } else if (enemy.mode === 'discharge') {
             // Draw some extra lightning over the drone while the discharge is charging.
             if (enemy.modeTime % 100 === 60) {
-                addSparkleAnimation(state, enemy.area, enemy.getHitbox(state), 'lightning');
+                addSparkleAnimation(state, enemy.area, enemy.getHitbox(state), { element: 'lightning' });
             }
             if (enemy.modeTime >= chargeTime) {
                 enemy.setMode('choose');

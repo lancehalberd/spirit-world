@@ -3,7 +3,7 @@ import { allTiles } from 'app/content/tiles';
 import { isPixelInShortRect, rectanglesOverlap } from 'app/utils/index';
 
 import {
-    AreaInstance, AreaLayer, Direction, Enemy, GameState, Hero,
+    AreaInstance, AreaLayer, Direction, EffectInstance, Enemy, GameState, Hero,
     HitProperties, HitResult, MovementProperties,
     ObjectInstance, Rect, Tile, TileCoords, TileBehaviors,
 } from 'app/types';
@@ -191,7 +191,7 @@ export function getTileBehaviorsAndObstacles(
     {x, y}: Tile,
     excludedObjects: Set<any> = null,
     nextArea: AreaInstance = null,
-    objectTest: (object: ObjectInstance) => boolean = null,
+    objectTest: (object: EffectInstance | ObjectInstance) => boolean = null,
     direction?: Direction,
 ): {tileBehavior: TileBehaviors, tx: number, ty: number, objects: ObjectInstance[]} {
     const objects: ObjectInstance[] = [];
@@ -349,9 +349,32 @@ export function getTilesInCircle(area: AreaInstance, {x, y, r}: {x: number, y: n
     return tiles;
 }
 
+function distanceToSegment({x, y}, {x1, y1, x2, y2}) {
+    const lengthSquared = (x2 - x1) ** 2 + (y2 - y1) ** 2;
+    if (lengthSquared == 0) {
+        const dx = x2 - x, dy = y2 - y;
+        return {
+            distance: Math.sqrt(dx * dx + dy * dy),
+            // Return the vector pointing from the point to the closest point on the line.
+            dx, dy,
+        };
+    }
+    // The dot product of A * B over the length gives the full length of the projection of
+    // A onto B, dividing by the length a second time changes it to a percentage of the length of B.
+    let t = ((x - x1) * (x2 - x1) + (y - y1) * (y2 - y1)) / lengthSquared;
+    t = Math.max(0, Math.min(1, t));
+    const closestX = x1 + t * (x2 - x1), closestY = y1 + t * (y2 - y1);
+    const dx = closestX - x, dy = closestY - y;
+    return {
+        distance: Math.sqrt(dx * dx + dy * dy),
+        // Return the vector pointing from the point to the closest point on the line.
+        dx, dy,
+    }
+}
+
 export function hitTargets(this: void, state: GameState, area: AreaInstance, hit: HitProperties): HitResult {
     const combinedResult: HitResult = { pierced: true, hitTargets: new Set() };
-    let targets: ObjectInstance[] = [];
+    let targets: (EffectInstance | ObjectInstance)[] = [];
     if (hit.hitEnemies) {
         targets = [...targets, ...area.enemyTargets];
     }
@@ -387,6 +410,49 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
                         const dy = (hitbox.y + hitbox.h / 2) - hit.knockAwayFrom.y;
                         const mag = Math.sqrt(dx * dx + dy * dy);
                         knockback = mag ? {vx: 4 * dx / mag, vy: 4 * dy / mag, vz: 0} : null;
+                    }
+                    const result = object.onHit(state, { ...hit, direction: getDirection(dx, dy), knockback });
+                    combinedResult.hit ||= result.hit;
+                    combinedResult.blocked ||= result.blocked;
+                    combinedResult.pierced &&= ((!result.hit && !result.blocked) || result.pierced);
+                    combinedResult.stopped ||= result.stopped;
+                    combinedResult.setElement ||= result.setElement;
+                    combinedResult.knockback ||= result.knockback;
+                    combinedResult.reflected ||= result.reflected;
+                    if (result.hit || result.blocked) {
+                        combinedResult.hitTargets.add(object);
+                    }
+                } else if (object.behaviors?.solid) {
+                    combinedResult.hit = true;
+                    if (!object.behaviors.low) {
+                        combinedResult.pierced = false;
+                    }
+                }
+            }
+        } else if (hit.hitRay) {
+            const fakeRadius = hitbox.w / 4 + hitbox.h / 4;
+            const { distance, dx, dy } = distanceToSegment(
+                { x: hitbox.x + hitbox.w / 2, y: hitbox.y + hitbox.h / 2},
+                hit.hitRay
+            );
+            const didHit = distance <= (hit.hitRay.r + fakeRadius);
+            if (didHit) {
+                if (object.onHit) {
+                    let knockback = hit.knockback;
+                    if (!knockback && hit.knockAwayFrom) {
+                        const dx = (hitbox.x + hitbox.w / 2) - hit.knockAwayFrom.x;
+                        const dy = (hitbox.y + hitbox.h / 2) - hit.knockAwayFrom.y;
+                        const mag = Math.sqrt(dx * dx + dy * dy);
+                        knockback = mag ? {vx: 4 * dx / mag, vy: 4 * dy / mag, vz: 2} : null;
+                    }
+                    if (!knockback && hit.knockAwayFromHit) {
+                        if (distance) {
+                            knockback = {vx: -4 * dx / distance, vy: -4 * dy / distance, vz: 2};
+                        } else {
+                            const dx = hit.hitRay.x2 - hit.hitRay.x1, dy = hit.hitRay.y2 - hit.hitRay.y1;
+                            const distance = Math.sqrt(dx * dx + dy * dy);
+                            knockback = {vx: 4 * dx / distance, vy: 4 * dy / distance, vz: 2};
+                        }
                     }
                     const result = object.onHit(state, { ...hit, direction: getDirection(dx, dy), knockback });
                     combinedResult.hit ||= result.hit;
@@ -457,7 +523,8 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
         ) {
             let topLayer: AreaLayer = area.layers[0];
             for (const layer of area.layers) {
-                if (layer.definition.drawPriority !== 'foreground') {
+                // 'foreground' layer defaults to being in the foreground regardless of drawPriority.
+                if (layer.definition.key !== 'foreground' && layer.definition.drawPriority !== 'foreground') {
                     topLayer = layer;
                 } else {
                     break;

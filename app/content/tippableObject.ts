@@ -1,4 +1,4 @@
-import { addParticleAnimations } from 'app/content/animationEffect';
+import { addParticleAnimations } from 'app/content/effects/animationEffect';
 import { removeObjectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';

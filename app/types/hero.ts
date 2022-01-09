@@ -1,11 +1,14 @@
 //import { Staff } from 'app/content/staff';
 import {
-    Direction, FrameAnimation, FullTile, GameState, Hero,
+    Direction, EffectInstance, FrameAnimation, FullTile, GameState, Hero,
     ObjectInstance, TileCoords, ZoneLocation,
 } from 'app/types';
 
 export type Action =
-    'attack' | 'charging' | 'roll' | 'knocked' | 'hurt' | 'dead' | 'walking'
+    'attack' | 'charging' | 'roll'
+    // Hero can be forced into screen transitions when knockedHard.
+    | 'knocked' | 'knockedHard'
+    | 'hurt' | 'dead' | 'walking'
     | 'pushing' | 'grabbing' | 'carrying' | 'throwing' | 'thrown' | 'getItem'
     | 'beingCarried'
     | 'falling' | 'fallen'
@@ -30,7 +33,11 @@ export type Collectible = 'peachOfImmortality' | 'peachOfImmortalityPiece';
 export type CommonLoot = 'money' | 'peach';
 export type DungeonLoot = 'smallKey' | 'bigKey' | 'map';
 
-export type LootType = 'empty' | 'weapon' | ActiveTool | Equipment | PassiveTool
+export type LootType = 'empty' | 'weapon'
+    // In the randomizer spiritSight, astralProjection + teleportation are changed to this progressive spirit power
+    // ability so that you will always get the abilities in an order that they can be used immediately.
+    | 'spiritPower'
+    | ActiveTool | Equipment | PassiveTool
     | MagicElement | Collectible | CommonLoot | DungeonLoot | 'unknown';
 
 
@@ -91,6 +98,7 @@ export interface Actor extends ObjectInstance {
     pickUpTile?: FullTile
     grabTile?: TileCoords
     grabObject?: ObjectInstance
+    lastTouchedObject?: EffectInstance | ObjectInstance
     invulnerableFrames?: number
     life: number
     knockBack?: (state: GameState, vector: {vx: number, vy: number, vz: number}) => void
@@ -101,6 +109,8 @@ export interface Actor extends ObjectInstance {
     sinking?: boolean
     inAirBubbles?: boolean
     frozenDuration?: number
+    // If the hero is touching a pit we won't update there safe location.
+    isTouchingPit?: boolean
     isOverPit?: boolean
     // These flags are set when an actor is being forced to move through door objects.
     isUsingDoor?: boolean

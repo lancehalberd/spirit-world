@@ -1,6 +1,5 @@
-import { enterLocation, refreshAreaLogic } from 'app/content/areas';
+import { enterLocation } from 'app/content/areas';
 import { Hero } from 'app/content/hero';
-import { getLoot } from 'app/content/lootObject';
 import {
     SPAWN_LOCATION_DEMO,
     SPAWN_LOCATION_FULL,
@@ -13,8 +12,9 @@ import {
 } from 'app/gameConstants';
 import { updateKeyboardState } from 'app/keyCommands';
 import { initializeGame } from 'app/initialize';
-import { wasGameKeyPressed } from 'app/keyCommands';
+import { wasGameKeyPressed, wasConfirmKeyPressed } from 'app/keyCommands';
 import { updateHeroMagicStats } from 'app/render/spiritBar';
+import { updateScriptEvents } from 'app/scriptEvents'
 import {
     getDefaultSavedState,
     getState,
@@ -30,7 +30,7 @@ import { updateField } from 'app/updateField';
 import { areAllImagesLoaded } from 'app/utils/images';
 import { playSound } from 'app/utils/sounds';
 
-import { ActiveTool, DialogueLootDefinition, Equipment, GameState, MagicElement } from 'app/types';
+import { ActiveTool, Equipment, GameState, MagicElement } from 'app/types';
 
 let isGameInitialized = false;
 export function update() {
@@ -46,21 +46,11 @@ export function update() {
     state.time += FRAME_LENGTH;
     updateKeyboardState(state);
     try {
-        if (state.scene === 'game'
-            && !state.defeatState.defeated
-            && !state.messageState?.pages
-            && wasGameKeyPressed(state, GAME_KEY.MENU)
-         ) {
-            state.paused = !state.paused;
-            state.menuIndex = 0;
-        }
-        if (state.messageState?.pages) {
-            updateMessage(state);
-            if (!state.messageState.continueUpdatingState) {
-                return;
-            }
-        }
         if (state.transitionState && !state.areaInstance.priorityObjects?.length) {
+            if (wasGameKeyPressed(state, GAME_KEY.MENU)) {
+                state.paused = !state.paused;
+                state.menuIndex = 0;
+            }
             if (!state.paused) {
                 updateTransition(state);
             }
@@ -71,22 +61,25 @@ export function update() {
         } else if (state.defeatState.defeated) {
             updateDefeated(state);
         } else {
-            if (!state.paused) {
-                updateField(state);
-            } else {
-                updateMenu(state);
+            updateScriptEvents(state);
+            // Make sure we don't handle script event input twice in one frame.
+            // We could also manage this by unsetting game keys on the state.
+            if (!state.scriptEvents.blockFieldUpdates && !state.scriptEvents.handledInput) {
+                if (wasGameKeyPressed(state, GAME_KEY.MENU)) {
+                    state.paused = !state.paused;
+                    state.menuIndex = 0;
+                }
+                if (!state.paused) {
+                    updateField(state);
+                } else {
+                    updateMenu(state);
+                }
             }
         }
     } catch (e) {
         console.log(e.stack);
         debugger;
     }
-}
-
-export function wasConfirmKeyPressed(state: GameState): boolean {
-    return !!(wasGameKeyPressed(state, GAME_KEY.WEAPON)
-        || wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL)
-        || wasGameKeyPressed(state, GAME_KEY.MENU));
 }
 
 function updateTitle(state: GameState) {
@@ -159,41 +152,6 @@ function updateTitle(state: GameState) {
                     selectSaveFile(state.menuIndex);
                 }
                 break;
-        }
-    }
-}
-
-function updateMessage(state: GameState) {
-    // Advance to the next page if the player pressed a confirm key or if the auto time duration expires.
-    if (wasConfirmKeyPressed(state) || (
-        state.messageState.advanceTime > 0 &&
-        state.time - state.messageState.currentPageTime >= state.messageState.advanceTime
-    )) {
-        state.messageState.pageIndex++;
-        while (state.messageState.pageIndex < state.messageState.pages.length) {
-            const pageOrLootOrFlag = state.messageState.pages[state.messageState.pageIndex];
-            if (typeof pageOrLootOrFlag === 'string') {
-                state.savedState.objectFlags[pageOrLootOrFlag] = true;
-                saveGame();
-                refreshAreaLogic(state, state.areaInstance);
-                refreshAreaLogic(state, state.areaInstance.alternateArea);
-            } else if (pageOrLootOrFlag?.['type'] === 'dialogueLoot') {
-                getLoot(state, pageOrLootOrFlag as DialogueLootDefinition);
-                // For now cancel remaining dialogue on receiving loot, we have no way to
-                // show the loot animation and then continue dialogue. So all loot should
-                // be set at the end of dialogue for now.
-                // state.messageState.pageIndex = state.messageState.pages.length;
-                // TODO: allow obtaining loot in the middle of a message and replace the above
-                // line with the one below.
-                // state.messageState.pageIndex++;
-            } else {
-                break;
-            }
-            state.messageState.pageIndex++;
-            state.messageState.currentPageTime = state.time;
-        }
-        if (state.messageState.pageIndex >= state.messageState.pages.length) {
-            state.messageState.pages = null;
         }
     }
 }

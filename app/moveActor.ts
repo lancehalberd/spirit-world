@@ -315,6 +315,7 @@ function moveActorInDirection(
     if (pushedObjects.length === 1) {
         if (pushedObjects[0].onPush) {
             pushedObjects[0].onPush(state, direction);
+            actor.lastTouchedObject = pushedObjects[0];
         }
     } else if (pushedObjects.length >= 1) {
         for (const object of pushedObjects) {
@@ -326,6 +327,7 @@ function moveActorInDirection(
             ) {
                 if (object.onPush) {
                     object.onPush(state, direction);
+                    actor.lastTouchedObject = pushedObjects[0];
                 }
             }
         }
@@ -557,6 +559,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
     } else if (!startClimbing && hero.action === 'climbing') {
         hero.action = null;
     }
+    hero.isTouchingPit = fallingTopLeft || fallingTopRight || fallingBottomLeft || fallingBottomRight;
     hero.isOverPit = fallingTopLeft && fallingTopRight && fallingBottomLeft && fallingBottomRight;
     if (hero.isOverPit && !state.nextAreaSection && !state.nextAreaInstance) {
         if (hero.z <= 0 && hero.action !== 'roll') {

@@ -24,7 +24,12 @@ Graphics:
 
 
 Current tasks:
+    - Put cracked ground in logic in forest temple with ice floor effect.
+    - Probably should move hero back to safe location on reviving.
     - Bug fixes
+        - Floating in water bugs:
+            - Chakram spawns at ground level
+            - shouldn't be able to pass through doorways while z > 4.
         - Clone tool bugs
             - Mana regen is wrong when using clone tools (seems to multiply consumption/regen by number of clones)
             - Should destroy clones when the clone technique is unequipped.
@@ -37,13 +42,15 @@ Current tasks:
         - Piercing projectiles that can push things should be stopped by the first object they push
             or not be able to push additional objects, for example, the charged chakram.
 
+    - Discharge should optionally include the enemy source, and be removed if the source is defeated before the tell duration is over.
+        - Add `isActive` to enemy to indicate whether it is a valid source for attacks: if (sourceEnemy && !sourceEnemy.isActive(state)) { ... }
+
     Storm Beast
-        - Storm Heart is protected by a layer of bouncy clouds that the MC can slowly deform to reveal the heart. The clouds reform slowly over time.
-        - Storm Heart uses a large discharge attack a few seconds after taking damage, which also full restores the clouds.
-        - Storm Heart summons lightning bolts while enraged.
         - Storm Beast flies in and out of the battle field.
         - Storm Beast can turn into lightning and teleport as a beam sending shockwaves out at both ends.
         - Storm Beast can charge south to exit the battle field
+        - Storm Beast flies to the sides or bottom of the arena and performs attacks towards the arena
+            - Clouds to the sides of the Storm Beast are safe from these attacks.
 
     Make mutation transition use the same area instance so contents don't reset
         - Will need to add special handling to remove extra ice tiles from frost beast+heat sink battles.
@@ -89,13 +96,18 @@ Current tasks:
     - Add target landing locations when falling from sky (also apply to the forest temple pits).
     - Add new hold+walk chakram animations
         - play last 2 frames of attack animation on release.
-    - Add elemental particles
-        - Replace bow glow with neutral charge particles and elemental particles.
-        - Remove charge glow from all other tools.
 
     - Change message rendering system to use the priority queue system to support nested messages.
     - Add new waterfall graphics
 
+Throwing an object into a pit should make use the pit animation rather than breaking.
+
+Add advanced tutorials
+    - Maybe NPCs in home cave, or some kind of training/tutorial dojo?
+    - Hitting enemies with chakram held in hand
+    - Default Charged chakram attack
+    - Maybe different sections for different tools.
+    - Reflecting projectiles
 
 
 High level list of things left to do:

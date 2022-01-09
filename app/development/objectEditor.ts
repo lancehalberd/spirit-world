@@ -40,6 +40,8 @@ export function getLootTypes(): LootType[] {
             'bigKey',
             'smallKey',
             'map',
+            // This is the special progressive spirit power loot used by the randomizer.
+            'spiritPower',
             ...(Object.keys(state.hero.activeTools) as LootType[]),
             ...(Object.keys(state.hero.passiveTools) as LootType[]),
             ...(Object.keys(state.hero.equipment) as LootType[]),
@@ -53,7 +55,7 @@ export const combinedObjectTypes: ObjectType[] = [
     'airBubbles', 'ballGoal', 'beadCascade', 'beadGrate', 'bigChest', 'chest', 'crystalSwitch', 'decoration',
     'door', 'escalator', 'floorSwitch', 'keyBlock', 'loot','marker', 'narration', 'npc', 'pitEntrance',
     'pushPull', 'rollingBall', 'sign', 'staffTowerPoint', 'teleporter', 'tippable', 'torch',
-    'vineSprout', 'waterPot',
+    'vineSprout', 'waterPot', 'spawnMarker',
 ];
 
 export function createObjectDefinition(
@@ -118,6 +120,7 @@ export function createObjectDefinition(
                 status: definition.status || commonProps.status,
             };
         case 'marker':
+        case 'spawnMarker':
             return {
                 ...commonProps,
                 locationCue: definition.locationCue,
@@ -573,6 +576,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             }
             // This intentionally continue on to the marker properties.
         case 'marker':
+        case 'spawnMarker':
             rows.push({
                 name: 'Cue',
                 value: object.locationCue || '',
@@ -990,7 +994,7 @@ export function onMouseDownSelect(state: GameState, editingState: EditingState, 
 }
 
 export function fixObjectPosition(state: GameState, object: ObjectDefinition): void {
-    if (object.type === 'escalator') {
+    if (object.type === 'escalator' || object.type === 'decoration') {
         //object.x = Math.round(object.x / 8) * 8;
         //object.y = Math.round(object.y / 8) * 8;
         return;

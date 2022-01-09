@@ -1,9 +1,9 @@
-import { addParticleAnimations } from 'app/content/animationEffect';
-import { playAreaSound, removeObjectFromArea } from 'app/content/areas';
+import { addParticleAnimations } from 'app/content/effects/animationEffect';
+import { playAreaSound, removeEffectFromArea } from 'app/content/areas';
 import { drawFrame } from 'app/utils/animations';
 import { hitTargets } from 'app/utils/field';
 
-import { AreaInstance, Frame, GameState, ObjectInstance, ObjectStatus, TileBehaviors } from 'app/types';
+import { AreaInstance, Frame, GameState, EffectInstance, TileBehaviors } from 'app/types';
 
 
 interface Props {
@@ -18,14 +18,12 @@ interface Props {
     damage?: number
 }
 
-export class ThrownObject implements ObjectInstance {
+export class ThrownObject implements EffectInstance {
     area: AreaInstance;
     behaviors: TileBehaviors;
-    definition = null;
     linkedObject: ThrownObject;
     type = 'thrownObject' as 'thrownObject';
     frame: Frame;
-    ignorePits = true;
     x: number;
     y: number;
     z: number;
@@ -34,7 +32,6 @@ export class ThrownObject implements ObjectInstance {
     vz: number;
     damage;
     broken = false;
-    status: ObjectStatus = 'normal';
     constructor({frame, behaviors, x = 0, y = 0, z = 17, vx = 0, vy = 0, vz = 0, damage = 1 }: Props) {
         this.frame = frame;
         this.x = x;
@@ -77,7 +74,7 @@ export class ThrownObject implements ObjectInstance {
             if (this.linkedObject && !this.linkedObject.broken) {
                 this.linkedObject.breakOnImpact(state);
             }
-            removeObjectFromArea(state, this);
+            removeEffectFromArea(state, this);
         }
     }
     render(context, state: GameState) {

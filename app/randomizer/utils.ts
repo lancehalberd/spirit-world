@@ -686,6 +686,13 @@ export function applyLootAssignments(assignments: LootAssignment[]): void {
     console.log('applying assignments:');
     // console.log(assignments);
     for (const assignment of assignments) {
+        // Change spirit powers into progressive spirit powers.
+        if (assignment.lootType === 'spiritSight'
+            || assignment.lootType === 'astralProjection'
+            || assignment.lootType === 'teleportation'
+        ) {
+            assignment.lootType = 'spiritPower';
+        }
         const zoneKey = assignment.target.location.zoneKey;
         console.log(assignment.source.lootObject.id, ' => ', assignment.target.lootObject.id);
         if (assignment.target.lootObject.type === 'dialogueLoot') {
@@ -699,7 +706,7 @@ export function applyLootAssignments(assignments: LootAssignment[]): void {
                 // Include the flag so that we can still count the check for the check counter.
                 text = `I'm sorry you came all this way for nothing. {flag:${npcKey}}`;
             } else if (number) {
-                text = `Here you go! {flag:${npcKey}}{item:${assignment.lootType}:${number}}`;
+                text = `Here you go! {flag:${npcKey}}{item:${assignment.lootType}=${number}}`;
             } else {
                 text = `Here you go! {flag:${npcKey}}{item:${assignment.lootType}}`;
             }

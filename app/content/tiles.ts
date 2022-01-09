@@ -674,21 +674,21 @@ const vineBase: TileSource = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/vines.png'), x: 48, y: 0, w: 16, h: 16},
     behaviors: {
-        'all': { defaultLayer: 'field' },
+        'all': { defaultLayer: 'field', brightness: 0.5, lightRadius: 24 },
     },
 };
 const vineMiddle: TileSource = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/vines.png'), x: 80, y: 16, w: 16, h: 32},
     behaviors: {
-        'all': climbableWall,
+        'all': {...climbableWall, brightness: 0.5, lightRadius: 24},
     },
 };
 const vineTop: TileSource = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/vines.png'), x: 80, y: 48, w: 16, h: 16},
     behaviors: {
-        'all': { defaultLayer: 'field' },
+        'all': { defaultLayer: 'field', brightness: 0.5, lightRadius: 24 },
     },
 };
 

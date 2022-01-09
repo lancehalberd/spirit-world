@@ -1,4 +1,4 @@
-import { addObjectToArea } from 'app/content/areas';
+import { addEffectToArea } from 'app/content/areas';
 import { LightningBolt } from 'app/content/effects/lightningBolt';
 import { FlameWall } from 'app/content/effects/flameWall';
 import {
@@ -43,7 +43,7 @@ function updateStormIdol(state: GameState, enemy: Enemy): void {
             y: state.hero.y + state.hero.h / 2,
             shockWaveTheta: enemy.params.theta,
         });
-        addObjectToArea(state, enemy.area, lightningBolt);
+        addEffectToArea(state, enemy.area, lightningBolt);
     })
 }
 function updateFlameIdol(state: GameState, enemy: Enemy): void {
@@ -53,7 +53,7 @@ function updateFlameIdol(state: GameState, enemy: Enemy): void {
         const flameWall = new FlameWall({
             direction: rotateDirection('down', enemy.params.rotations),
         });
-        addObjectToArea(state, enemy.area, flameWall);
+        addEffectToArea(state, enemy.area, flameWall);
     });
 }
 function updateFrostIdol(state: GameState, enemy: Enemy): void {

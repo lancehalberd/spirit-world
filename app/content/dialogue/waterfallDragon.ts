@@ -27,7 +27,7 @@ dialogueHash.waterfallDragon = {
                 {|}...
                 {|}Very well, take this cloak and be gone from here.
                 {flag:waterfallTowerThroneDoor}
-                {item:cloak:2}`,
+                {item:cloak=2}`,
             ],
         },
         {

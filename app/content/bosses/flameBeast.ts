@@ -1,4 +1,4 @@
-import { addObjectToArea } from 'app/content/areas';
+import { addEffectToArea } from 'app/content/areas';
 import { Flame } from 'app/content/effects/flame';
 import { FlameWall } from 'app/content/effects/flameWall';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
@@ -18,7 +18,7 @@ import { createAnimation, drawFrame } from 'app/utils/animations';
 import { getDirection } from 'app/utils/field';
 import { allImagesLoaded } from 'app/utils/images';
 
-import { AreaInstance, Enemy, GameState, ObjectInstance } from 'app/types';
+import { AreaInstance, EffectInstance, Enemy, GameState, ObjectInstance } from 'app/types';
 
 const flameGeometry = {w: 20, h: 20, content: {x: 2, y: 2, w: 16, h: 16}};
 export const [
@@ -135,7 +135,7 @@ function updateFireHeart(this: void, state: GameState, enemy: Enemy): void {
                 });
                 flame.x -= flame.w / 2;
                 flame.y -= flame.h / 2;
-                addObjectToArea(state, enemy.area, flame);
+                addEffectToArea(state, enemy.area, flame);
             }
             enemy.params.theta += Math.PI / 20;
         }
@@ -154,7 +154,7 @@ function updateFireHeart(this: void, state: GameState, enemy: Enemy): void {
     }
 }
 
-const flameBeastLeapStrike = (state: GameState, enemy: Enemy, target: ObjectInstance): void => {
+const flameBeastLeapStrike = (state: GameState, enemy: Enemy, target: EffectInstance | ObjectInstance): void => {
     const enemyHitbox = enemy.getHitbox(state);
     const targetHitbox = target.getHitbox(state);
     const x = enemyHitbox.x + enemyHitbox.w / 2;
@@ -185,7 +185,7 @@ const spawnGiantFlame = (state: GameState, enemy: Enemy): void => {
     });
     flame.x -= flame.w / 2;
     flame.y -= flame.h / 2;
-    addObjectToArea(state, enemy.area, flame);
+    addEffectToArea(state, enemy.area, flame);
 };
 
 function updateFireBeast(this: void, state: GameState, enemy: Enemy): void {

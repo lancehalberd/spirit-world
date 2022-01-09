@@ -1,10 +1,10 @@
-import { addObjectToArea, removeObjectFromArea } from 'app/content/areas';
+import { addEffectToArea, removeEffectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, frameAnimation, getFrame } from 'app/utils/animations';
 
 import {
-    AreaInstance, DrawPriority, Frame, FrameAnimation,
-    GameState, MagicElement, ObjectInstance, ObjectStatus, Rect, TileBehaviors,
+    AreaInstance, DrawPriority, EffectInstance, Frame, FrameAnimation,
+    GameState, MagicElement, Rect, TileBehaviors,
 } from 'app/types';
 
 
@@ -22,17 +22,17 @@ interface AnimationProps {
     rotation?: number
     scale?: number
     ttl?: number
+    delay?: number
 }
 
-export class AnimationEffect implements ObjectInstance {
+export class AnimationEffect implements EffectInstance {
     area: AreaInstance;
-    definition = null;
+    delay: number = 0;
     done = false;
     drawPriority: DrawPriority;
     animation: FrameAnimation;
     animationTime: number;
     behaviors: TileBehaviors;
-    ignorePits = true;
     x: number;
     y: number;
     z: number;
@@ -43,9 +43,13 @@ export class AnimationEffect implements ObjectInstance {
     az: number;
     rotation: number;
     scale: number;
-    status: ObjectStatus = 'normal';
     ttl: number;
-    constructor({animation, drawPriority = 'background', x = 0, y = 0, z = 0, vx = 0, vy = 0, vz = 0, vstep = 0, az = 0, rotation = 0, scale = 1, ttl}: AnimationProps) {
+    constructor({
+        animation, drawPriority = 'background',
+        x = 0, y = 0, z = 0, vx = 0, vy = 0, vz = 0, vstep = 0, az = 0,
+        rotation = 0, scale = 1,
+        ttl, delay = 0
+     }: AnimationProps) {
         this.animation = animation;
         this.animationTime = 0;
         this.drawPriority = drawPriority;
@@ -60,6 +64,7 @@ export class AnimationEffect implements ObjectInstance {
         this.rotation = rotation;
         this.scale = scale;
         this.ttl = ttl;
+        this.delay = delay;
         this.behaviors = {};
     }
     getHitbox(state: GameState) {
@@ -67,6 +72,10 @@ export class AnimationEffect implements ObjectInstance {
         return {x: this.x, y: this.y - this.z, w: frame.w, h: frame.h};
     }
     update(state: GameState) {
+        if (this.delay > 0) {
+            this.delay -= FRAME_LENGTH;
+            return;
+        }
         this.animationTime += FRAME_LENGTH;
         if (!this.vstep || this.animationTime % this.vstep === 0) {
             this.x += this.vx;
@@ -79,10 +88,13 @@ export class AnimationEffect implements ObjectInstance {
         }
         if (this.animationTime > this.ttl || this.z < 0 || (this.animation.loop === false && this.animationTime >= this.animation.duration)) {
             this.done = true;
-            removeObjectFromArea(state, this);
+            removeEffectFromArea(state, this);
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
+        if (this.delay > 0) {
+            return;
+        }
         const frame = getFrame(this.animation, this.animationTime);
         if (this.rotation) {
             context.save();
@@ -124,7 +136,7 @@ export function addParticleAnimations(
             particle.behaviors.brightness = behaviors.brightness;
             particle.behaviors.lightRadius = (behaviors.lightRadius || 32) / 2;
         }
-        addObjectToArea(state, area, particle);
+        addEffectToArea(state, area, particle);
         theta += Math.PI * 2 / (particles.length);
     }
 }
@@ -136,14 +148,27 @@ const iceSparkleAnimation = createAnimation('gfx/effects/aura_particles.png', {w
 const fireSparkleAnimation = createAnimation('gfx/effects/aura_particles.png', {w: 10, h: 10}, {cols: 2, x: 4, duration: 6,  frameMap: [0,1,0,0]}, {loop: false});
 const lightningSparkleAnimation = createAnimation('gfx/effects/aura_particles.png', {w: 10, h: 10}, {cols: 2, x: 6, duration: 6, frameMap: [0, 1, 0]}, {loop: false});
 
+interface SparkleProps {
+    delay?: number
+    element?: MagicElement
+    velocity?: {x: number, y: number}
+    z?: number
+}
 
 export function addSparkleAnimation(
-    state: GameState, area: AreaInstance, hitbox: Rect, element?: MagicElement, velocity?: {x: number, y: number}, z?: number
+    state: GameState, area: AreaInstance, hitbox: Rect, sparkleProps: SparkleProps
 ): void {
-    addObjectToArea(state, area, makeSparkleAnimation(state, hitbox, element, velocity, z));
+    addEffectToArea(state, area, makeSparkleAnimation(state, hitbox, sparkleProps));
 }
 export function makeSparkleAnimation(
-    state: GameState, hitbox: Rect, element?: MagicElement, velocity?: {x: number, y: number}, z?: number
+    state: GameState,
+    hitbox: Rect,
+    {
+        delay,
+        element,
+        velocity,
+        z,
+    }: SparkleProps
 ): AnimationEffect {
     const animation = element
         ? {
@@ -153,6 +178,7 @@ export function makeSparkleAnimation(
         }[element] : sparkleAnimation;
     const animationProps: AnimationProps = {
         animation: animation,
+        delay,
         drawPriority: 'foreground',
         x: hitbox.x + Math.random() * hitbox.w - animation.frames[0].w / 2,
         y: hitbox.y + Math.random() * hitbox.h - animation.frames[0].h / 2,

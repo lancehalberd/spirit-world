@@ -222,6 +222,7 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "towerEscalatorDownOn", x: 263, y: 212, speed: "fast", d: "down", w: 18, h: 96, style: "escalator", type: "escalator", logicKey: "towerStorm"},
         {status: "off", id: "towerEscalatorDownOfff", x: 263, y: 212, speed: "fast", d: "down", w: 18, h: 96, style: "escalator", type: "escalator", logicKey: "towerStorm", invertLogic: true},
         {status: "off", id: "towerEscalatorUpOff", x: 231, y: 209, speed: "slow", d: "up", w: 18, h: 96, style: "escalator", type: "escalator", logicKey: "towerStorm", invertLogic: true},
+        {status: "normal", id: "staffTower:0:0x0-sentryBot-0", x: 176, y: 336, type: "enemy", enemyType: "sentryBot", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},

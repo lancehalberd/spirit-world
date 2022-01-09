@@ -37,33 +37,20 @@ function updateBeetleBoss(state: GameState, enemy: Enemy): void {
     }
     if (enemy.mode === 'choose' && enemy.modeTime > 500) {
         enemy.vx = enemy.vy = 0;
-        if (enemy.life > 8) {
-            if (Math.random() < 0.3) {
-                enemy.setMode('circle');
-            } else if (Math.random() < 0.5) {
-                const vector = getVectorToNearbyTarget(state, enemy, 32 * 32, enemy.area.allyTargets);
-                if (vector) {
-                    enemy.setMode('rush');
-                    enemy.vx = vector.x;
-                    enemy.vy = vector.y;
-                }
-            } else {
-                enemy.setMode('summon');
-                enemy.params.summonTheta = Math.random() * 2 * Math.PI;
-            }
+        // This boss is meant to not be too challenging for new players,
+        // so it summons minions that drop life rewards more frequently as the player loses life.
+        const summonChance = 0.2 + Math.max(0, 0.6 * (4 - state.hero.life) / 2);
+        if (Math.random() < summonChance) {
+            enemy.setMode('summon');
+            enemy.params.summonTheta = Math.random() * 2 * Math.PI;
+        } else if (Math.random() < 0.3) {
+            enemy.setMode('circle');
         } else {
-            if (Math.random() < 0.25) {
-                enemy.setMode('circle');
-            } else if (Math.random() < 0.25) {
-                const vector = getVectorToNearbyTarget(state, enemy, 32 * 32, enemy.area.allyTargets);
-                if (vector) {
-                    enemy.setMode('rush');
-                    enemy.vx = vector.x;
-                    enemy.vy = vector.y;
-                }
-            } else {
-                enemy.setMode('summon');
-                enemy.params.summonTheta = Math.random() * 2 * Math.PI;
+            const vector = getVectorToNearbyTarget(state, enemy, 32 * 32, enemy.area.allyTargets);
+            if (vector) {
+                enemy.setMode('rush');
+                enemy.vx = vector.x;
+                enemy.vy = vector.y;
             }
         }
     } else if (enemy.mode === 'circle') {
@@ -117,7 +104,9 @@ function updateBeetleBoss(state: GameState, enemy: Enemy): void {
             enemy.y += enemy.vy;
         }
         if (enemy.modeTime >= 1500) {
-            if (enemy.life > 8 || Math.random() < 0.5) {
+            // If the player has less than 2 health always return immediately.
+            const returnChance = 0.4 + Math.max(0, 0.6 * (4 - state.hero.life) / 2);
+            if (enemy.life > 8 || Math.random() > returnChance) {
                 enemy.setMode('return');
             } else {
                 const vector = getVectorToNearbyTarget(state, enemy, 32 * 32, enemy.area.allyTargets);

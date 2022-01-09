@@ -1,5 +1,5 @@
 import {
-    DrawPriority, Enemy, Frame,
+    DrawPriority, EffectInstance, Enemy, Frame,
     HitProperties, LogicDefinition, LootTable, MagicElement,
     ObjectDefinition, ObjectInstance,
     Rect,
@@ -234,8 +234,9 @@ export interface AreaInstance {
     tilesDrawn: boolean[][]
     underwater?: boolean
     layers: AreaLayer[]
+    effects: EffectInstance[]
     objects: ObjectInstance[]
-    priorityObjects: ObjectInstance[][]
+    priorityObjects: (EffectInstance | ObjectInstance)[][]
     // Array of object ids that were created on this instance but have been removed.
     // This is used when refreshing area logic to only add objects that had not already been present.
     removedObjectIds: string[]
@@ -257,9 +258,9 @@ export interface AreaInstance {
     // of this area is offset from the camera origin by this many pixels.
     cameraOffset: {x: number, y: number}
     enemies: Enemy[]
-    allyTargets: ObjectInstance[]
-    enemyTargets: ObjectInstance[]
-    neutralTargets: ObjectInstance[]
+    allyTargets: (EffectInstance | ObjectInstance)[]
+    enemyTargets: (EffectInstance | ObjectInstance)[]
+    neutralTargets: (EffectInstance | ObjectInstance)[]
     isHot?: boolean
 }
 

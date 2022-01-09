@@ -26,7 +26,7 @@ dialogueHash.tombGuardian = {
             isExclusive: true,
             text: [
                 `You can use your teleportation skill to leave here through that portal.
-                {|} Move your Astral Body where you want to go and press {B_TOOL} to teleport.
+                {|} Move your Astral Body where you want to go and press [B_TOOL] to teleport.
                 `
             ],
         },
@@ -41,7 +41,7 @@ dialogueHash.tombGuardian = {
                 `You are ready to learn my final technique.{|}
                 You won't be able to travel between the material and spirit worlds as freely
                 as a pure blooded Vanara, but this should be enough for you to climb the Helix.
-                {item:teleportation:1}`
+                {item:teleportation}`
             ],
         },
         {
@@ -52,7 +52,7 @@ dialogueHash.tombGuardian = {
             isExclusive: true,
             text: [
                 `Now that you can touch the Spirit World you can open the door behind me.`,
-                `Press {B_PASSIVE} to gaze into the Spirit World and find a way to open the door.`,
+                `Press [B_PASSIVE] to gaze into the Spirit World and find a way to open the door.`,
             ],
         },
         {
@@ -69,7 +69,7 @@ dialogueHash.tombGuardian = {
                 {|}The summoners used special tools for their powers,
                 {|}maybe your mother could tell you more.
                 {flag:tombTeleporter}
-                {item:spiritSight:1}`,
+                {item:spiritSight}`,
             ],
         },
         {

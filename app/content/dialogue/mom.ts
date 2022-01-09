@@ -1,7 +1,13 @@
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 
+
 dialogueHash.mom = {
     key: 'mom',
+    mappedOptions: {
+        rest: `{choice:Do you want to rest?|Yes:mom.yesRest|No:mom.noRest}`,
+        yesRest: 'Sweet dreams! {rest}',
+        noRest: 'Be careful out there!',
+    },
     options: [
         {
             logicCheck: {
@@ -11,7 +17,8 @@ dialogueHash.mom = {
             isExclusive: true,
             text: [
                 `May our ancestors watch over you.
-                `
+                `,
+                `{@mom.rest}`,
             ],
         },
         {
@@ -26,12 +33,13 @@ dialogueHash.mom = {
                 {|}They say the ruins in the Southeast are where the ancient summoners lived.
                 {|}Perhaps you can find something there to help you.`,
                 `I'm sure you can find what you need in the summoner ruins to the Southeast!`,
+                `{@mom.rest}`,
             ],
         },
         {
             logicCheck: {
                 requiredFlags: [],
-                excludedFlags: ['$staff'],
+                excludedFlags: [],
             },
             text: [
                 `Welcome home son!
@@ -41,17 +49,7 @@ dialogueHash.mom = {
                 {|}Actually I just don't have my own graphics yet!
                 {|}You should head Southwest to the Vanara Village if you want to learn more about your powers.`,
                 `This waterfall is a great disguise for our cave, but I wish it wasn't so cold!`,
-            ],
-            repeatIndex: 0,
-        },
-        {
-            logicCheck: {
-                requiredFlags: ['$staff'],
-                excludedFlags: [],
-            },
-            text: [
-                `Enjoy the present!`,
-                `Remember to visit the Vanara Village to the Southwest.`,
+                `{@mom.rest}`,
             ],
             repeatIndex: 0,
         },

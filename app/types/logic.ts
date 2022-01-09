@@ -55,9 +55,22 @@ export interface DialogueOption {
     notes?: string,
 }
 
+export interface DialogueChoiceDefinition {
+    prompt?: string
+    choices: {
+        text: string
+        key: string
+    }[]
+}
+
 export interface DialogueSet {
     // The identifier for this dialogue set, used to attach it to a particular NPC.
     key: string,
+    // Mapped dialogue options are trigged through {@key} indicators in text.
+    // This can be used to create dialogue trees or to map to the same dialogue from multiple places.
+    mappedOptions?: {
+        [key: string]: string
+    }
     // The dialogue options in priority order.
     options: DialogueOption[],
 }

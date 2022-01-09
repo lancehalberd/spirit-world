@@ -1,9 +1,9 @@
-import { addSparkleAnimation } from 'app/content/animationEffect';
-import { removeObjectFromArea } from 'app/content/areas';
+import { addSparkleAnimation } from 'app/content/effects/animationEffect';
+import { removeEffectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { hitTargets } from 'app/utils/field';
 
-import { AreaInstance, GameState, ObjectInstance, ObjectStatus } from 'app/types';
+import { AreaInstance, EffectInstance, GameState } from 'app/types';
 
 interface Props {
     x: number
@@ -13,17 +13,14 @@ interface Props {
     tellDuration?: number
 }
 
-export class LightningDischarge implements ObjectInstance {
+export class LightningDischarge implements EffectInstance {
     area: AreaInstance;
-    definition = null;
     animationTime: number = 0;
-    destroyedObjects: boolean = false;
     x: number;
     y: number;
     damage: number;
     radius: number;
     tellDuration: number;
-    status: ObjectStatus = 'normal';
     constructor({x = 0, y = 0, damage = 2, radius = 48, tellDuration = 1000}: Props) {
         this.animationTime = 0;
         this.x = x;
@@ -43,7 +40,7 @@ export class LightningDischarge implements ObjectInstance {
                     y: this.y + (this.radius * 2 / 3) * Math.sin(theta) - 8,
                     w: 16,
                     h: 16,
-                }, 'lightning');
+                }, { element: 'lightning' });
             }
             hitTargets(state, this.area, {
                 damage: 4,
@@ -59,7 +56,7 @@ export class LightningDischarge implements ObjectInstance {
                 hitEnemies: true,
                 knockAwayFrom: {x: this.x, y: this.y},
             });
-            removeObjectFromArea(state, this);
+            removeEffectFromArea(state, this);
         }
     }
     render(context, state: GameState) {

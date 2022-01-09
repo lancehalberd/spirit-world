@@ -72,7 +72,7 @@ export function createObjectInstance(state: GameState, object: ObjectDefinition)
         return new CrystalSwitch(state, object);
     } else if (object.type === 'pitEntrance') {
         return new PitEntrance(object);
-    } else if (object.type === 'marker') {
+    } else if (object.type === 'marker' || object.type === 'spawnMarker') {
         return new Marker(object);
     } else if (object.type === 'narration') {
         return new Narration(state, object);
@@ -214,5 +214,5 @@ export function getObjectStatus(this: void, state: GameState, definition: Object
     if (!definition.id) {
         return false;
     }
-    return state.savedState.zoneFlags[definition.id] || state.savedState.objectFlags[definition.id];
+    return !!state.savedState.zoneFlags[definition.id] || !!state.savedState.objectFlags[definition.id];
 }

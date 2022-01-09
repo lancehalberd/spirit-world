@@ -1,12 +1,13 @@
-import { addObjectToArea, getAreaSize, removeObjectFromArea } from 'app/content/areas';
+import { addSparkleAnimation } from 'app/content/effects/animationEffect';
+import { addEffectToArea, getAreaSize, removeEffectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrameAt, getFrame } from 'app/utils/animations';
 import { getDirection, hitTargets } from 'app/utils/field';
 import { playSound } from 'app/utils/sounds';
 
 import {
-    AreaInstance, Direction, Frame, FrameAnimation,
-    GameState, HitProperties, MagicElement, ObjectInstance, ObjectStatus
+    AreaInstance, Direction, DrawPriority, EffectInstance, Frame, FrameAnimation,
+    GameState, HitProperties, MagicElement,
 } from 'app/types';
 
 const upContent = {x: 5, y: 2, w: 6, h: 6};
@@ -160,9 +161,9 @@ interface Props {
     style?: ArrowStyle
 }
 
-export class Arrow implements ObjectInstance {
+export class Arrow implements EffectInstance {
     area: AreaInstance;
-    definition = null;
+    drawPriority: DrawPriority = 'sprites';
     frame: Frame;
     damage: number;
     spiritCloakDamage: number;
@@ -177,13 +178,11 @@ export class Arrow implements ObjectInstance {
     h: number;
     vx: number;
     vy: number;
-    ignorePits = true;
     animationTime = 0;
     direction: Direction;
     blocked = false;
     reflected: boolean = false;
     stuckFrames: number = 0;
-    status: ObjectStatus = 'normal';
     style: ArrowStyle = 'normal';
     constructor({x = 0, y = 0, vx = 0, vy = 0, damage = 1, spiritCloakDamage = 5, delay = 0, element = null, reflected = false, style = 'normal',
         ignoreWallsDuration = 0,
@@ -244,13 +243,13 @@ export class Arrow implements ObjectInstance {
                     this.vz -= 0.2;
                     this.z += this.vz;
                     if (this.stuckFrames > 15) {
-                        removeObjectFromArea(state, this);
+                        removeEffectFromArea(state, this);
                     }
                 } else if (this.animationTime >= spoofDownAnimation.duration) {
-                    removeObjectFromArea(state, this);
+                    removeEffectFromArea(state, this);
                 }
             } else if (this.animationTime >= stuckDownAnimation.duration + 100) {
-                removeObjectFromArea(state, this);
+                removeEffectFromArea(state, this);
             }
             return;
         }
@@ -260,8 +259,11 @@ export class Arrow implements ObjectInstance {
         if (this.x + this.w <= section.x || this.y + this.h <= section.y
             || this.x >= section.x + section.w || this.y  >= section.y + section.h
         ) {
-            removeObjectFromArea(state, this);
+            removeEffectFromArea(state, this);
             return;
+        }
+        if (!this.stuckFrames && this.damage > 1 && this.animationTime % 60 === 0) {
+            addSparkleAnimation(state, this.area, this, { element: this.element });
         }
         const hitResult = hitTargets(state, this.area, this.getHitProperties(state));
         if (hitResult.reflected) {
@@ -299,20 +301,6 @@ export class Arrow implements ObjectInstance {
         }
         const frame = getFrame(animation, this.animationTime);
         drawFrameAt(context, frame, { x: this.x, y: this.y - this.z });
-        if (this.element) {
-            context.save();
-                context.globalAlpha *= 0.8;
-                context.beginPath();
-                context.fillStyle = {fire: 'red', ice: '#08F', lightning: 'yellow'}[this.element];
-                context.arc(
-                    this.x + 3,
-                    this.y - this.z + 3,
-                    3,
-                    0, 2 * Math.PI
-                );
-                context.fill();
-            context.restore();
-        }
     }
 }
 
@@ -343,7 +331,7 @@ export class EnemyArrow extends Arrow {
     update(state: GameState) {
         // Don't leave enemy arrows on the screen in case there are a lot of them.
         if (this.stuckFrames > 0 && !this.blocked) {
-            removeObjectFromArea(state, this);
+            removeEffectFromArea(state, this);
             return;
         }
         super.update(state);
@@ -354,7 +342,7 @@ export class CrystalSpike extends Arrow {
     isEnemyAttack = true;
     static spawn(state: GameState, area: AreaInstance, arrowProps: Props) {
         const spike = new CrystalSpike(arrowProps);
-        addObjectToArea(state, area, spike);
+        addEffectToArea(state, area, spike);
     }
     getHitProperties(state: GameState): HitProperties {
         return {
@@ -382,7 +370,7 @@ export class CrystalSpike extends Arrow {
     update(state: GameState) {
         // Don't leave enemy arrows on the screen in case there are a lot of them.
         if (this.stuckFrames > 0 && !this.blocked) {
-            removeObjectFromArea(state, this);
+            removeEffectFromArea(state, this);
             return;
         }
         super.update(state);

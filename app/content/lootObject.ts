@@ -1,4 +1,4 @@
-import { addObjectToArea, enterLocation, refreshAreaLogic, removeObjectFromArea } from 'app/content/areas';
+import { addEffectToArea, addObjectToArea, enterLocation, refreshAreaLogic, removeEffectFromArea, removeObjectFromArea } from 'app/content/areas';
 import { getObjectStatus } from 'app/content/objects';
 import { createCanvasAndContext } from 'app/dom';
 import { CANVAS_WIDTH, CANVAS_HEIGHT, FRAME_LENGTH } from 'app/gameConstants';
@@ -87,7 +87,7 @@ export class LootGetAnimation implements ObjectInstance {
         if (this.animationTime === 1000) {
             showLootMessage(state, this.loot.lootType, this.loot.lootLevel, this.loot.lootAmount);
         } else if (this.animationTime > 1000) {
-            removeObjectFromArea(state, this);
+            removeEffectFromArea(state, this);
         }
     }
     render(context, state: GameState) {
@@ -96,25 +96,36 @@ export class LootGetAnimation implements ObjectInstance {
     }
 }
 
-const equipToolMessage = '{|}Press {B_MENU} to open your menu.'
-    + '{|}Select a tool and press {B_TOOL} to assign it.';
+const equipToolMessage = '{|}Press [B_MENU] to open your menu.'
+    + '{|}Select a tool and press [B_TOOL] to assign it.';
 
-const equipBootsMessage = '{|}Press {B_MENU} to open your menu.'
-    + '{|}Select boots and press {B_WEAPON} to equip them.'
-    + '{|}Press {B_WEAPON} again to unequip them.';
+const equipBootsMessage = '{|}Press [B_MENU] to open your menu.'
+    + '{|}Select boots and press [B_WEAPON] to equip them.'
+    + '{|}Press [B_WEAPON] again to unequip them.';
 
 function getEquipElementMessage(state: GameState) {
     if (state.isUsingKeyboard) {
-        return '{|}Press {B_MENU} to open your menu.'
-            + '{|}Select an element and press {B_WEAPON} to equip it.'
-            + '{|}Press {B_WEAPON} again to unequip the element.'
+        return '{|}Press [B_MENU] to open your menu.'
+            + '{|}Select an element and press [B_WEAPON] to equip it.'
+            + '{|}Press [B_WEAPON] again to unequip the element.'
             + '{|}The equipped element will be applied any time you charge an attack.';
     }
-    return '{|}Press {B_PREVIOUS_ELEMENT}/{B_NEXT_ELEMENT} to switch elements.'
+    return '{|}Press [B_PREVIOUS_ELEMENT]/[B_NEXT_ELEMENT] to switch elements.'
         + '{|}The equipped element will be applied any time you charge an attack.';
 }
 
 function showLootMessage(state: GameState, lootType: LootType, lootLevel?: number, lootAmount?: number): void {
+    if (lootType === 'spiritPower') {
+        // showLootMessage is run after the upgrade is already applied, so we check what the highest level
+        // spirit power the user has and show that message.
+        if (state.hero.passiveTools.teleportation) {
+            lootType = 'teleportation';
+        } else if (state.hero.passiveTools.astralProjection) {
+            lootType = 'astralProjection';
+        } else {
+            lootType = 'spiritSight';
+        }
+    }
     switch (lootType) {
         case 'cloudBoots':
             return showMessage(state, 'You found Cloud Boots!' + equipBootsMessage
@@ -137,7 +148,7 @@ function showLootMessage(state: GameState, lootType: LootType, lootLevel?: numbe
         case 'peachOfImmortality':
             if (!state.hero.passiveTools.catEyes) {
                 return showMessage(state, `You ate a Golden Peach!
-                    {|} Your health has increased and you feel a strange energy...{item:catEyes}`);
+                    {|} Your health has increased and you feel a strange energy...{wait:200}{item:catEyes}`);
             }
             return showMessage(state, `You ate a Golden Peach!
                 {|} Your maximum health has increased!`);
@@ -156,10 +167,10 @@ function showLootMessage(state: GameState, lootType: LootType, lootLevel?: numbe
         case 'charge':
             if (state.hero.passiveTools.charge === 1) {
                 return showMessage(state, `You have learned to Channel Spirit Energy!
-                    {|}Press and hold {B_WEAPON} to channel your Spirit Energy into the Chakram,
+                    {|}Press and hold [B_WEAPON] to channel your Spirit Energy into the Chakram,
                     then release it to unleash a powerful attack!
-                    {|}Press and hold {B_TOOL} to channel your Spirit Energy into your Tools to make them more powerful.
-                    {|}You can even hold {B_PASSIVE} when picking up an object to channel Spirit Energy into them!
+                    {|}Press and hold [B_TOOL] to channel your Spirit Energy into your Tools to make them more powerful.
+                    {|}You can even hold [B_PASSIVE] when picking up an object to channel Spirit Energy into them!
                 `);
             }
             if (state.hero.passiveTools.charge === 2) {
@@ -169,33 +180,33 @@ function showLootMessage(state: GameState, lootType: LootType, lootLevel?: numbe
             return;
         case 'weapon':
             if (state.hero.weapon === 1) {
-                return showMessage(state, 'You found the Chakram! {|} Press {B_WEAPON} to throw the Chakram.'
+                return showMessage(state, 'You found the Chakram! {|} Press [B_WEAPON] to throw the Chakram.'
                     + '{|}Use it to defeat enemies or destroy some obstacles.');
             }
             return;
         case 'bow':
             if (state.hero.activeTools.bow === 1) {
                 return showMessage(state, 'You found the Bow!' + equipToolMessage
-                    + '{|}Press {B_TOOL} to shoot a magic arrow.'
+                    + '{|}Press [B_TOOL] to shoot a magic arrow.'
                     + '{|}Use the bow to hit distant enemies and objects.');
             }
             return;
         case 'clone':
             if (state.hero.activeTools.clone === 1) {
                 return showMessage(state, 'You learned the Clone Techique!' + equipToolMessage
-                    + '{|}Press {B_TOOL} to create a clone or switch between clones.'
-                    + '{|}Hold {B_TOOL} to control all clones at once!'
-                    + '{|}Hold {B_MEDITATE} to make a clone explode!');
+                    + '{|}Press [B_TOOL] to create a clone or switch between clones.'
+                    + '{|}Hold [B_TOOL] to control all clones at once!'
+                    + '{|}Hold [B_MEDITATE] to make a clone explode!');
             }
             return;
         case 'cloak':
             if (state.hero.activeTools.cloak === 1) {
                 return showMessage(state, 'You have obtained the Spirit Cloak!' + equipToolMessage
-                    + '{|}Press {B_TOOL} to create a Spirit Barrier around you.'
+                    + '{|}Press [B_TOOL] to create a Spirit Barrier around you.'
                     + '{|}The barrier will damage enemies and reflect projectiles at the cost of your Spirit Energy!'
                     + '{|}Your Spirit Energy will regenerate more slowly while the barrier is on,'
                     + '{|}and the barrier will fail if you run out of Spirit Energy.'
-                    + '{|}Press {B_TOOL} again to deactivate the barrier.');
+                    + '{|}Press [B_TOOL] again to deactivate the barrier.');
             }
             if (state.hero.activeTools.cloak === 2) {
                 return showMessage(state, 'You have obtained the Invisibility Cloak!' + equipToolMessage
@@ -211,17 +222,17 @@ function showLootMessage(state: GameState, lootType: LootType, lootLevel?: numbe
             }
             if (state.hero.activeTools.staff === 1) {
                 return showMessage(state, 'You have obtained the Tree Staff!' + equipToolMessage
-                    + '{|}Press {B_TOOL} to summon the staff and slam it to the ground.'
+                    + '{|}Press [B_TOOL] to summon the staff and slam it to the ground.'
                     + '{|}You can use the staff as a weapon and a bridge!'
-                    + '{|}Press {B_TOOL} again to summon the staff back to you.');
+                    + '{|}Press [B_TOOL] again to summon the staff back to you.');
             }
             return;
         case 'gloves':
             return showMessage(state, 'You found magical bracers! {|} Now you can lift heavier objects.'
-                + '{|}Face an object and use {B_PASSIVE} to try to lift it.');
+                + '{|}Face an object and use [B_PASSIVE] to try to lift it.');
         case 'roll':
             return showMessage(state, 'You learned the Mist Roll Technique!'
-                + '{|}Press {B_ROLL} to do a quick roll forward.'
+                + '{|}Press [B_ROLL] to do a quick roll forward.'
                 + '{|}You can avoid most damage while rolling and cross small gaps.'
             );
         case 'catEyes':
@@ -231,19 +242,19 @@ function showLootMessage(state: GameState, lootType: LootType, lootLevel?: numbe
             );
         case 'spiritSight':
             return showMessage(state, 'You have been blessed with Spirit Sight!'
-                + '{|}Hold {B_MEDITATE} to gaze into the Spirit World.'
+                + '{|}Hold [B_MEDITATE] to gaze into the Spirit World.'
                 + '{|}If an object is in both the Material World and Spirit World,'
                 + '{|}see what happens if you change it in the Material World!');
         case 'astralProjection':
             return showMessage(state, 'You have found the Summoner\'s Circlet!'
-                + '{|}Hold {B_MEDITATE} to gaze into the Spirit World.'
-                + '{|}While looking into the Spirit World, use {B_UP} to move your Astral Body.'
+                + '{|}Hold [B_MEDITATE] to gaze into the Spirit World.'
+                + '{|}While looking into the Spirit World, use [B_UP] to move your Astral Body.'
                 + '{|}Your Astral Body can touch the Spirit World.'
-                + '{|}In your Astral Body, press {B_PASSIVE} to grab or pickup objects.');
+                + '{|}In your Astral Body, press [B_PASSIVE] to grab or pickup objects.');
         case 'teleportation':
             return showMessage(state, 'You have learned Teleportation!'
                 + '{|}Move your Astral Body away from you in the Sprit World'
-                + '{|}Press {B_TOOL} to teleport your Real Body to your Astral Body.'
+                + '{|}Press [B_TOOL] to teleport your Real Body to your Astral Body.'
                 + '{|}Teleportation consumes spirit energy, stand still to recover'
                 + '{|}Use teleportation to move past obstacles in the Real World.');
         case 'fire':
@@ -269,7 +280,7 @@ function showLootMessage(state: GameState, lootType: LootType, lootLevel?: numbe
         case 'bow':
             if (state.hero.activeTools.bow === 1) {
                 return showMessage(state, 'You found the Bow!' + equipToolMessage
-                    + '{|}Press {B_TOOL} to shoot a magic arrow.'
+                    + '{|}Press [B_TOOL] to shoot a magic arrow.'
                     + '{|}Use the bow to hit distant enemies and objects.');
             }
             return;
@@ -349,7 +360,7 @@ export function getLoot(this: void, state: GameState, definition: LootObjectDefi
     const lootAnimation = new LootGetAnimation(definition);
     // Apply the pickup after creating the loot animation so that it uses the correct graphic for progressive items.
     onPickup(state, definition);
-    addObjectToArea(state, hero.area, lootAnimation);
+    addEffectToArea(state, hero.area, lootAnimation);
     hero.area.priorityObjects.push([lootAnimation]);
     // Refresh the area so that the guardian NPC moves to the correct location now that the boss is defeated.
     refreshAreaLogic(state, state.areaInstance);
@@ -419,7 +430,7 @@ export class ChestObject implements ObjectInstance {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
     isOpen(state: GameState): boolean {
-        return (state.savedState.objectFlags[this.definition.id] || this.definition.lootType === 'empty');
+        return (!!state.savedState.objectFlags[this.definition.id] || this.definition.lootType === 'empty');
     }
     onGrab(state: GameState) {
         // You can only open a chest from the bottom.
@@ -620,6 +631,15 @@ export function getLootFrame(state: GameState, {lootType, lootLevel, lootAmount}
         }
         return wholeCoin;
     }
+    if (lootType === 'spiritPower') {
+        if (!state.hero.passiveTools.spiritSight) {
+            return lootFrames.spiritSight;
+        }
+        if (!state.hero.passiveTools.astralProjection) {
+            return lootFrames.astralProjection;
+        }
+        return lootFrames.teleportation;
+    }
     if (lootType === 'cloak') {
         if (lootLevel === 1 || (lootLevel === 0 && !state.hero.activeTools.cloak)){
             return lootFrames.spiritCloak;
@@ -740,4 +760,15 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: Lo
             // You will gain the full peach from the dialogue effect.
         }
     },
+    spiritPower: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
+        if (loot.lootType === 'spiritPower') {
+            if (!state.hero.passiveTools.spiritSight) {
+                state.hero.passiveTools.spiritSight = 1;
+            } else if (!state.hero.passiveTools.astralProjection) {
+                state.hero.passiveTools.astralProjection = 1;
+            } else {
+                state.hero.passiveTools.teleportation = 1;
+            }
+        }
+    }
 }

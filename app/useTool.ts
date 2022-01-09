@@ -1,5 +1,5 @@
-import { addObjectToArea } from 'app/content/areas';
-import { Arrow } from 'app/content/arrow';
+import { addObjectToArea, addEffectToArea } from 'app/content/areas';
+import { Arrow } from 'app/content/effects/arrow';
 import { Clone }  from 'app/content/clone';
 import { Staff } from 'app/content/staff';
 import { directionMap, getDirection } from 'app/utils/field';
@@ -40,13 +40,16 @@ export function useTool(
             if (state.hero.magic < 0) {
                 return;
             }
+            let speed = 4;
             state.hero.magic -= 5;
             if (chargeLevel === 1) {
+                speed = 6;
                 state.hero.magic -= 5;
             }
             if (state.hero.element) {
                 state.hero.magic -= 10;
             }
+            hero.toolOnCooldown = 'bow';
             let direction = hero.d;
             if (dx || dy) {
                 direction = getDirection(dx, dy, true);
@@ -56,17 +59,18 @@ export function useTool(
                 element,
                 x: hero.x + 8 + 8 * directionMap[direction][0],
                 y: hero.y + 8 * directionMap[direction][1] + 6,
-                vx: 4 * directionMap[direction][0],
-                vy: 4 * directionMap[direction][1],
+                vx: speed * directionMap[direction][0],
+                vy: speed * directionMap[direction][1],
                 style: 'spirit',
             });
-            addObjectToArea(state, state.areaInstance, arrow);
+            addEffectToArea(state, state.areaInstance, arrow);
             return;
         case 'cloak':
             if (state.hero.isInvisible || state.hero.hasBarrier) {
                 state.hero.hasBarrier = false;
                 state.hero.isInvisible = false;
                 state.hero.toolCooldown = 0;
+                hero.toolOnCooldown = null;
                 return;
             }
             let cost = 5;
@@ -77,6 +81,7 @@ export function useTool(
                 return;
             }
             state.hero.magic -= cost;
+            hero.toolOnCooldown = 'cloak';
             state.hero.barrierLevel = chargeLevel;
             if (chargeLevel === 1) {
                 state.hero.barrierElement = element;
@@ -92,6 +97,7 @@ export function useTool(
                     return;
                 }
                 state.hero.magic -= 10;
+                hero.toolOnCooldown = 'clone';
                 for (let i = 0; i < state.hero.activeTools.clone && i < state.hero.life - 1; i++) {
                     const clone = new Clone(state.hero);
                     //state.hero.activeClone = clone;
@@ -104,6 +110,7 @@ export function useTool(
             if (state.activeStaff) {
                 state.activeStaff.remove(state);
                 state.hero.toolCooldown = 0;
+                hero.toolOnCooldown = null;
                 return;
             }
             if (state.hero.magic < 0) {
@@ -129,6 +136,7 @@ export function useTool(
                 staff.remove(state);
             } else {
                 state.hero.magic -= 10;
+                hero.toolOnCooldown = 'staff';
             }
             return;
     }

@@ -1,10 +1,10 @@
-import { removeObjectFromArea } from 'app/content/areas';
+import { removeEffectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { hitTargets } from 'app/utils/field';
 
 import {
-    AreaInstance, DrawPriority, Direction,
-    Frame, GameState, ObjectInstance, ObjectStatus,
+    AreaInstance, DrawPriority, EffectInstance,
+    Frame, GameState,
 } from 'app/types';
 
 interface Props {
@@ -18,11 +18,10 @@ interface Props {
 const animationDuration = 100;
 const fadeDuration = 200;
 
-export class GroundSpike implements ObjectInstance, Props {
+export class GroundSpike implements EffectInstance, Props {
     drawPriority: DrawPriority = 'sprites';
     area: AreaInstance = null;
     isEnemyAttack = true;
-    definition = null;
     frame: Frame;
     damage: number;
     x: number;
@@ -33,14 +32,9 @@ export class GroundSpike implements ObjectInstance, Props {
     vy: number;
     w: number = 16;
     h: number = 16;
-    ignorePits = true;
     delay: number;
     tellDuration: number;
-    shockWaves: number;
-    shockWaveTheta: number;
     animationTime = 0;
-    direction: Direction;
-    status: ObjectStatus = 'normal';
     constructor({x = 0, y = 0, damage = 2, delay = 0, tellDuration = 1000}: Props) {
         this.x -= this.w / 2;
         this.y -= this.h / 2;
@@ -67,7 +61,7 @@ export class GroundSpike implements ObjectInstance, Props {
             });
         }
         if (this.animationTime >= this.tellDuration + animationDuration + fadeDuration) {
-            removeObjectFromArea(state, this);
+            removeEffectFromArea(state, this);
         }
     }
     getHitbox(state: GameState) {

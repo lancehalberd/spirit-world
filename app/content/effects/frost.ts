@@ -1,11 +1,11 @@
-import { addSparkleAnimation } from 'app/content/animationEffect';
-import { removeObjectFromArea } from 'app/content/areas';
+import { addSparkleAnimation } from 'app/content/effects/animationEffect';
+import { removeEffectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { hitTargets } from 'app/utils/field';
 
 import {
-    AreaInstance, DrawPriority,
-    Frame, GameState, ObjectInstance, ObjectStatus,
+    AreaInstance, DrawPriority, EffectInstance,
+    Frame, GameState, ObjectInstance,
 } from 'app/types';
 
 interface Props {
@@ -21,11 +21,10 @@ interface Props {
     ttl?: number,
 }
 
-export class Frost implements ObjectInstance, Props {
+export class Frost implements EffectInstance, Props {
     drawPriority: DrawPriority = 'sprites';
     area: AreaInstance = null;
     isEnemyAttack = true;
-    definition = null;
     frame: Frame;
     damage: number;
     x: number;
@@ -37,11 +36,9 @@ export class Frost implements ObjectInstance, Props {
     az: number;
     w: number = 12;
     h: number = 12;
-    ignorePits = true;
     ignoreTargets: Set<ObjectInstance>;
     radius: number;
     animationTime = 0;
-    status: ObjectStatus = 'normal';
     speed = 0;
     ttl: number;
     animationOffset: number;
@@ -66,7 +63,7 @@ export class Frost implements ObjectInstance, Props {
         this.animationTime += FRAME_LENGTH;
 
         if (this.animationTime >= this.ttl) {
-            removeObjectFromArea(state, this);
+            removeEffectFromArea(state, this);
         } else {
             hitTargets(state, this.area, {
                 canPush: false,
@@ -80,7 +77,7 @@ export class Frost implements ObjectInstance, Props {
                 ignoreTargets: this.ignoreTargets,
             });
             if (this.animationTime % 200 === this.animationOffset) {
-                addSparkleAnimation(state, this.area, this, 'ice');
+                addSparkleAnimation(state, this.area, this, { element: 'ice' });
             }
         }
     }

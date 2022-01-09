@@ -118,7 +118,8 @@ export class Escalator implements ObjectInstance {
                     hero.vx = dx;
                     hero.vy = dy;
                     hero.vz = 2;
-                    hero.action = 'knocked';
+                    // Use 'knockedHard' to allow transitioning to the next screen when necessary.
+                    hero.action = 'knockedHard';
                     hero.isControlledByObject = false;
                     hero.safeD = hero.d;
                     hero.safeX = hero.x;

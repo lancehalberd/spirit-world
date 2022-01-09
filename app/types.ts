@@ -4,8 +4,9 @@ export * from 'app/types/other';
 export * from 'app/types/state';
 export * from 'app/types/tileMap';
 export * from 'app/types/objects';
+export * from 'app/types/scriptEvents';
 
-export { AnimationEffect } from 'app/content/animationEffect';
+export { AnimationEffect } from 'app/content/effects/animationEffect';
 export { BossType, MinionType } from 'app/content/bosses';
 export { EnemyDefinition, EnemyType } from 'app/content/enemies';
 export { Enemy } from 'app/content/enemy';

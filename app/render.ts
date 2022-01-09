@@ -17,7 +17,7 @@ import { renderTitle } from 'app/renderTitle';
 import { getState } from 'app/state';
 import { drawFrame } from 'app/utils/animations';
 
-import { AreaInstance, AreaLayer, AreaLayerDefinition, GameState } from 'app/types';
+import { AreaInstance, AreaLayer, AreaLayerDefinition, EffectInstance, ObjectInstance, GameState } from 'app/types';
 
 // This is the max size of the s
 const [spiritCanvas, spiritContext] = createCanvasAndContext(MAX_SPIRIT_RADIUS * 2, MAX_SPIRIT_RADIUS * 2);
@@ -92,8 +92,8 @@ export function render() {
     if (!state?.gameHasBeenInitialized) {
         return;
     }
-    if (state.messageState?.pages) {
-        renderMessage(context, state);
+    // Only render if the state has actually progressed since the last render.
+    if (state.lastTimeRendered >= state.time) {
         return;
     }
     if (state.transitionState && !state.areaInstance?.priorityObjects?.length) {
@@ -107,12 +107,9 @@ export function render() {
         renderTitle(context, state);
         return;
     }
-    // Only render if the state has actually progressed since the last render.
-    if (state.lastTimeRendered >= state.time) {
-        return;
-    }
     state.lastTimeRendered = state.time;
     renderStandardFieldStack(context, state);
+    renderMessage(context, state);
 
     // Render any editor specific graphics if appropriate.
     renderEditor(context, state);
@@ -518,6 +515,11 @@ export function renderAreaBackground(context: CanvasRenderingContext2D, state: G
                 object.render?.(context, state);
             }
         }
+        for (const effect of area.effects) {
+            if (effect.drawPriority === 'background') {
+                effect.render?.(context, state);
+            }
+        }
     context.restore();
 }
 
@@ -557,17 +559,29 @@ export function renderAreaObjectsBeforeHero(context: CanvasRenderingContext2D, s
                 renderEnemyShadow(context, state, object);
             }
         }
-        const objectsToRender = [];
+        for (const effect of area.effects) {
+            if (effect.renderShadow) {
+                effect.renderShadow(context, state);
+            }
+        }
+        const spriteObjects: (EffectInstance | ObjectInstance)[] = [];
         for (const object of area.objects) {
             if (object.drawPriority === 'sprites' && object.y <= state.hero.y) {
                 if (object.render) {
-                    objectsToRender.push(object);
+                    spriteObjects.push(object);
                 }
             }
         }
-        objectsToRender.sort((A, B) => A.y - B.y);
-        for (const object of objectsToRender) {
-            object.render(context, state);
+        for (const effect of area.effects) {
+            if (effect.drawPriority === 'sprites' && effect.y <= state.hero.y) {
+                if (effect.render) {
+                    spriteObjects.push(effect);
+                }
+            }
+        }
+        spriteObjects.sort((A, B) => A.y - B.y);
+        for (const objectOrEffect of spriteObjects) {
+            objectOrEffect.render(context, state);
         }
     context.restore();
 }
@@ -578,7 +592,7 @@ export function renderAreaObjectsAfterHero(context: CanvasRenderingContext2D, st
     }
     context.save();
         translateContextForAreaAndCamera(context, state, area);
-        const spriteObjects = [];
+        const spriteObjects: (EffectInstance | ObjectInstance)[] = [];
         for (const object of area.objects) {
             if (object.drawPriority === 'sprites' && object.y > state.hero.y) {
                 if (object.render) {
@@ -586,10 +600,17 @@ export function renderAreaObjectsAfterHero(context: CanvasRenderingContext2D, st
                 }
             }
         }
+        for (const effect of area.effects) {
+            if (effect.drawPriority === 'sprites' && effect.y > state.hero.y) {
+                if (effect.render) {
+                    spriteObjects.push(effect);
+                }
+            }
+        }
         // Sprite objects are rendered in order of their y positions.
         spriteObjects.sort((A, B) => A.y - B.y);
-        for (const object of spriteObjects) {
-            object.render(context, state);
+        for (const objectOrEffect of spriteObjects) {
+            objectOrEffect.render(context, state);
         }
     context.restore();
 }
@@ -600,12 +621,19 @@ export function renderForegroundObjects(context: CanvasRenderingContext2D, state
     }
     context.save();
         translateContextForAreaAndCamera(context, state, area);
-        const foregroundObjects = [];
+        const foregroundObjects: (EffectInstance | ObjectInstance)[] = [];
         for (const object of area.objects) {
             if (object.renderForeground) {
                 foregroundObjects.push(object);
             } else if (!object.drawPriority || object.drawPriority === 'foreground') {
                 foregroundObjects.push(object);
+            }
+        }
+        for (const effect of area.effects) {
+            if (effect.renderForeground) {
+                foregroundObjects.push(effect);
+            } else if (!effect.drawPriority || effect.drawPriority === 'foreground') {
+                foregroundObjects.push(effect);
             }
         }
         for (const object of foregroundObjects) {

@@ -226,7 +226,8 @@ export class BeadSection implements ObjectInstance {
                 hero.vx = 0;
                 hero.vy = 1;
                 hero.vz = 2;
-                hero.action = 'knocked';
+                // Use 'knockedHard` so that the player can transition to the next screen if necessary.
+                hero.action = 'knockedHard';
                 hero.isControlledByObject = false;
                 hero.safeD = hero.d;
                 hero.safeX = hero.x;

@@ -309,3 +309,9 @@ export function getCloneMovementDeltas(state: GameState, hero: Hero): [number, n
     }
     return [-dx, -dy];
 }
+
+export function wasConfirmKeyPressed(state: GameState): boolean {
+    return !!(wasGameKeyPressed(state, GAME_KEY.WEAPON)
+        || wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL)
+        || wasGameKeyPressed(state, GAME_KEY.MENU));
+}

@@ -1,9 +1,9 @@
-import { removeObjectFromArea,  } from 'app/content/areas';
+import { removeEffectFromArea,  } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { getTileBehaviorsAndObstacles } from 'app/utils/field';
 
-import { AreaInstance, GameState, ObjectInstance, ObjectStatus, VineSprout } from 'app/types';
+import { AreaInstance, EffectInstance, GameState, VineSprout } from 'app/types';
 
 const waterDropFallAnimation = createAnimation('gfx/tiles/pod.png', {w: 16, h: 16}, {y: 3, cols: 4, duration: 8});
 const waterDropHitAnimation = createAnimation('gfx/tiles/pod.png', {w: 16, h: 16}, {y: 4, cols: 3, duration: 8});
@@ -12,13 +12,11 @@ interface Props {
     x?: number
     y?: number,
 }
-export class PouredWaterEffect implements ObjectInstance {
+export class PouredWaterEffect implements EffectInstance {
     area: AreaInstance;
-    definition = null;
     animationTime: number;
     x: number;
     y: number;
-    status: ObjectStatus = 'normal';
     hasHit = false;
     constructor({x = 0, y = 0 }: Props) {
         this.animationTime = 0;
@@ -43,11 +41,11 @@ export class PouredWaterEffect implements ObjectInstance {
                 this.animationTime = 0;
             } else if (this.y > 32 * 16) {
                 // Destroy the water if it drops of the bottom of the screen.
-                removeObjectFromArea(state, this);
+                removeEffectFromArea(state, this);
             }
         } else {
             if (this.animationTime >= waterDropHitAnimation.duration) {
-                removeObjectFromArea(state, this);
+                removeEffectFromArea(state, this);
             }
         }
     }

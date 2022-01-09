@@ -1,9 +1,9 @@
-import { addSparkleAnimation } from 'app/content/animationEffect';
-import { addObjectToArea, removeObjectFromArea } from 'app/content/areas';
+import { addSparkleAnimation } from 'app/content/effects/animationEffect';
+import { addEffectToArea, removeEffectFromArea } from 'app/content/areas';
 import { FrostBlast } from 'app/content/effects/frostBlast';
 import { FRAME_LENGTH } from 'app/gameConstants';
 
-import { AreaInstance, Frame, GameState, ObjectInstance, ObjectStatus } from 'app/types';
+import { AreaInstance, EffectInstance, Frame, GameState } from 'app/types';
 
 interface Props {
     x: number,
@@ -17,9 +17,8 @@ interface Props {
     az?: number,
 }
 
-export class FrostGrenade implements ObjectInstance, Props {
+export class FrostGrenade implements EffectInstance, Props {
     area: AreaInstance = null;
-    definition = null;
     isEnemyAttack = true;
     frame: Frame;
     damage: number;
@@ -34,7 +33,6 @@ export class FrostGrenade implements ObjectInstance, Props {
     h: number = 12;
     radius: number;
     animationTime = 0;
-    status: ObjectStatus = 'normal';
     speed = 0;
     constructor({x, y, z = 0, vx, vy, vz = 4, az = -0.3, damage = 1, radius = 32}: Props) {
         this.radius = radius
@@ -60,11 +58,11 @@ export class FrostGrenade implements ObjectInstance, Props {
                 radius: this.radius,
                 damage: this.damage,
             });
-            addObjectToArea(state, this.area, frostBlast);
-            removeObjectFromArea(state, this);
+            addEffectToArea(state, this.area, frostBlast);
+            removeEffectFromArea(state, this);
         } else {
             if (this.animationTime % 200 === 0) {
-                addSparkleAnimation(state, this.area, this, 'ice');
+                addSparkleAnimation(state, this.area, this, { element: 'ice' });
             }
         }
     }
