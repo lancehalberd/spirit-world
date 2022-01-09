@@ -721,7 +721,7 @@ const f0_0x1: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", type: "npc", x: 128, y: 272, d: "down", behavior: "none", style: "vanara", dialogueKey: "mom", id: "overworld:0:1x0-npc-0"},
+        {status: "normal", type: "npc", x: 128, y: 272, d: "down", behavior: "random", style: "mom", dialogueKey: "mom", id: "overworld:0:1x0-npc-0"},
         {status: "normal", id: "peachCaveTopEntrance", x: 256, y: 384, type: "door", style: "cavern", targetZone: "peachCave", targetObjectId: "peachCaveTopEntrance", d: "up"},
         {status: "normal", id: "waterfallCaveEntrance", x: 80, y: 240, type: "door", style: "cavern", targetZone: "waterfallCave", targetObjectId: "waterfallCaveEntrance", d: "up"},
         {status: "normal", id: "overworld:0:1x0-decoration-1", x: 64, y: 272, type: "decoration", w: 64, h: 96, decorationType: "waterfall", drawPriority: "sprites"},
