@@ -282,7 +282,6 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             hero.action = null;
             hero.vz = 0;
         }
-        console.log(hero.actionDy, hero.vy);
         return true;
     }
     const isFallingToGround = !isUnderwater(state, hero)

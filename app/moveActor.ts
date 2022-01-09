@@ -185,8 +185,8 @@ function moveActorInDirection(
         if (!isTilePassable || ((tileBehavior?.pit || tileBehavior?.isLava || tileBehavior?.isBrittleGround) && !canFall)) {
             blockedByTile = true;
         }
-        // !canSwim is a hack to keep enemies out of low ceiling doorways.
-        if (tileBehavior?.lowCeiling && (actor.z > 4 || !canSwim)) {
+        // !canSwim is a hack to keep enemies/astralProjection out of low ceiling doorways.
+        if (tileBehavior?.lowCeiling && (actor.z > 3 || !canSwim)) {
             blockedByTile = true;
         }
         if (tileBehavior?.water && !canSwim) {
