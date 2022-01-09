@@ -1,4 +1,4 @@
-import { addEffectToArea } from 'app/content/areas';
+import { addEffectToArea, addObjectToArea } from 'app/content/areas';
 import { CrystalSpike } from 'app/content/effects/arrow';
 import { GroundSpike } from 'app/content/effects/groundSpike';
 import { SpikePod } from 'app/content/effects/spikePod';
@@ -81,7 +81,7 @@ function addFloorEye(state: GameState, area: AreaInstance, tx: number, ty: numbe
         x: tx * 16,
         y: ty * 16,
     });
-    addEffectToArea(state, area, floorEye);
+    addObjectToArea(state, area, floorEye);
     //floorEye.showDeathAnimation(state);
 }
 
