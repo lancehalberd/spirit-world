@@ -50,6 +50,8 @@ export interface TileBehaviors {
     // If this is true projectiles can pass over this tile even if it is solid.
     // Also, the bow won't cut low tiles like thorns.
     low?: boolean
+    // Low ceiling is solid if the hero has z > 4, also enemies can't move through it by default.
+    lowCeiling?: boolean
     // Tile to replace this with if it is exposed to an element (fire melts/burns things, ice freezes things, etc)
     elementTiles?: {[key in MagicElement]?: number}
     // Indicates this tile is outside of the current area section.

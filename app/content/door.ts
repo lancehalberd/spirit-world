@@ -732,14 +732,14 @@ export class Door implements ObjectInstance {
         const doorStyle = doorStyles[this.style];
        if (this.style === 'wooden') {
             if (this.definition.d === 'down') {
-                applyBehaviorToTile(this.area, x, y, { solidMap: BITMAP_BOTTOM, low: false});
+                applyBehaviorToTile(this.area, x, y, { solidMap: BITMAP_BOTTOM, low: false, lowCeiling: true});
                 applyBehaviorToTile(this.area, x + 3, y, { solidMap: BITMAP_BOTTOM, low: false});
                 if (this.isOpen()) {
-                    applyBehaviorToTile(this.area, x + 1, y, { solidMap: BITMAP_BOTTOM_LEFT_QUARTER, low: false });
-                    applyBehaviorToTile(this.area, x + 2, y, { solidMap: BITMAP_BOTTOM_RIGHT_QUARTER, low: false });
+                    applyBehaviorToTile(this.area, x + 1, y, { solidMap: BITMAP_BOTTOM_LEFT_QUARTER, low: false, lowCeiling: true });
+                    applyBehaviorToTile(this.area, x + 2, y, { solidMap: BITMAP_BOTTOM_RIGHT_QUARTER, low: false, lowCeiling: true });
                 } else {
-                    applyBehaviorToTile(this.area, x + 1, y, { solidMap: BITMAP_BOTTOM, low: false});
-                    applyBehaviorToTile(this.area, x + 2, y, { solidMap: BITMAP_BOTTOM, low: false});
+                    applyBehaviorToTile(this.area, x + 1, y, { solidMap: BITMAP_BOTTOM, low: false, lowCeiling: true});
+                    applyBehaviorToTile(this.area, x + 2, y, { solidMap: BITMAP_BOTTOM, low: false, lowCeiling: true});
                 }
             } else if (this.definition.d === 'up') {
                 this.applySquareDoorBehavior();
@@ -748,8 +748,8 @@ export class Door implements ObjectInstance {
                 applyBehaviorToTile(this.area, x, y + 1, { solid: true, low: false });
                 applyBehaviorToTile(this.area, x, y + 3, { solid: true, low: false });
                 if (this.isOpen()) {
-                    applyBehaviorToTile(this.area, x, y + 1, { solid: false });
-                    applyBehaviorToTile(this.area, x, y + 2, { solid: false });
+                    applyBehaviorToTile(this.area, x, y + 1, { solid: false, lowCeiling: true });
+                    applyBehaviorToTile(this.area, x, y + 2, { solid: false, lowCeiling: true  });
                 } else {
                     applyBehaviorToTile(this.area, x, y + 1, { solid: true, low: false });
                     applyBehaviorToTile(this.area, x, y + 2, { solid: true, low: false });
@@ -757,14 +757,14 @@ export class Door implements ObjectInstance {
             }
         } else  if (this.style === 'cavern') {
             if (this.definition.d === 'down') {
-                applyBehaviorToTile(this.area, x, y, { solidMap: BITMAP_BOTTOM, low: false});
-                applyBehaviorToTile(this.area, x + 3, y, { solidMap: BITMAP_BOTTOM, low: false});
+                applyBehaviorToTile(this.area, x, y, { solidMap: BITMAP_BOTTOM, low: false, lowCeiling: true});
+                applyBehaviorToTile(this.area, x + 3, y, { solidMap: BITMAP_BOTTOM, low: false, lowCeiling: true});
                 if (this.isOpen()) {
-                    applyBehaviorToTile(this.area, x + 1, y, { solidMap: BITMAP_BOTTOM_LEFT_QUARTER, low: false });
-                    applyBehaviorToTile(this.area, x + 2, y, { solidMap: BITMAP_BOTTOM_RIGHT_QUARTER, low: false });
+                    applyBehaviorToTile(this.area, x + 1, y, { solidMap: BITMAP_BOTTOM_LEFT_QUARTER, low: false, lowCeiling: true });
+                    applyBehaviorToTile(this.area, x + 2, y, { solidMap: BITMAP_BOTTOM_RIGHT_QUARTER, low: false, lowCeiling: true });
                 } else {
-                    applyBehaviorToTile(this.area, x + 1, y, { solidMap: BITMAP_BOTTOM, low: false});
-                    applyBehaviorToTile(this.area, x + 2, y, { solidMap: BITMAP_BOTTOM, low: false});
+                    applyBehaviorToTile(this.area, x + 1, y, { solidMap: BITMAP_BOTTOM, low: false, lowCeiling: true});
+                    applyBehaviorToTile(this.area, x + 2, y, { solidMap: BITMAP_BOTTOM, low: false, lowCeiling: true});
                 }
             } else if (this.definition.d === 'up') {
                 this.applySquareDoorBehavior();
@@ -773,7 +773,7 @@ export class Door implements ObjectInstance {
                 applyBehaviorToTile(this.area, x, y + 1, { solid: true, low: false });
                 applyBehaviorToTile(this.area, x, y + 3, { solid: true, low: false });
                 if (this.isOpen()) {
-                    applyBehaviorToTile(this.area, x, y + 2, { solid: false });
+                    applyBehaviorToTile(this.area, x, y + 2, { solid: false, lowCeiling: true  });
                 } else {
                     applyBehaviorToTile(this.area, x, y + 2, { solid: true, low: false });
                 }
@@ -786,7 +786,7 @@ export class Door implements ObjectInstance {
             applyBehaviorToTile(this.area, x, y, behaviors);
             applyBehaviorToTile(this.area, x, y + 1, behaviors);
         } else if (doorStyle.w === 64) {
-            const behaviors: TileBehaviors = this.isOpen() ? { cannotLand: true, solid: false } : { solid: true, low: false};
+            const behaviors: TileBehaviors = this.isOpen() ? { cannotLand: true, solid: false, lowCeiling: true  } : { solid: true, low: false};
             if (this.definition.d === 'up' || this.definition.d === 'down') {
                 applyBehaviorToTile(this.area, x, y, behaviors);
                 applyBehaviorToTile(this.area, x + 1, y, behaviors);
@@ -826,17 +826,17 @@ export class Door implements ObjectInstance {
         applyBehaviorToTile(this.area, x + 1, y + 1, behaviors);
         if (this.isOpen()) {
             if (this.definition.d === 'left') {
-                applyBehaviorToTile(this.area, x + 1, y, { solidMap: BITMAP_SIDE_DOOR_TOP, low: false });
-                applyBehaviorToTile(this.area, x + 1, y + 1, { solidMap: BITMAP_SIDE_DOOR_BOTTOM, low: false });
+                applyBehaviorToTile(this.area, x + 1, y, { solidMap: BITMAP_SIDE_DOOR_TOP, low: false, lowCeiling: true });
+                applyBehaviorToTile(this.area, x + 1, y + 1, { solidMap: BITMAP_SIDE_DOOR_BOTTOM, low: false, lowCeiling: true });
             } else if (this.definition.d === 'right') {
-                applyBehaviorToTile(this.area, x, y, { solidMap: BITMAP_SIDE_DOOR_TOP, low: false });
-                applyBehaviorToTile(this.area, x, y + 1, { solidMap: BITMAP_SIDE_DOOR_BOTTOM, low: false});
+                applyBehaviorToTile(this.area, x, y, { solidMap: BITMAP_SIDE_DOOR_TOP, low: false, lowCeiling: true });
+                applyBehaviorToTile(this.area, x, y + 1, { solidMap: BITMAP_SIDE_DOOR_BOTTOM, low: false, lowCeiling: true });
             } else if (this.definition.d === 'up') {
-                applyBehaviorToTile(this.area, x, y + 1, { solidMap: BITMAP_LEFT, low: false });
-                applyBehaviorToTile(this.area, x + 1, y + 1, { solidMap: BITMAP_RIGHT, low: false });
+                applyBehaviorToTile(this.area, x, y + 1, { solidMap: BITMAP_LEFT, low: false, lowCeiling: true });
+                applyBehaviorToTile(this.area, x + 1, y + 1, { solidMap: BITMAP_RIGHT, low: false, lowCeiling: true });
             } else if (this.definition.d === 'down') {
-                applyBehaviorToTile(this.area, x, y, { solidMap: BITMAP_LEFT, low: false });
-                applyBehaviorToTile(this.area, x + 1, y, { solidMap: BITMAP_RIGHT, low: false });
+                applyBehaviorToTile(this.area, x, y, { solidMap: BITMAP_LEFT, low: false, lowCeiling: true });
+                applyBehaviorToTile(this.area, x + 1, y, { solidMap: BITMAP_RIGHT, low: false, lowCeiling: true });
             }
         }
     }

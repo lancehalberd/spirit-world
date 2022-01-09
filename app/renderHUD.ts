@@ -1,6 +1,7 @@
 import { getLootFrame } from 'app/content/lootObject';
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from 'app/gameConstants';
 import { getCheckInfo } from 'app/randomizer/checks';
+import { renderTextRow } from 'app/render/renderMessage';
 import { renderSpiritBar } from 'app/render/spiritBar';
 import { createAnimation, drawFrame, drawFrameAt, drawFrameCenteredAt } from 'app/utils/animations';
 import { readGetParameter } from 'app/utils/index';
@@ -127,5 +128,10 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
         if (effects.drawPriority === 'hud') {
             effects.render(context, state);
         }
+    }
+    if (state.paused && !state.defeatState.defeated && !state.areaInstance?.priorityObjects?.length
+        && (state.transitionState || state.nextAreaInstance || state.nextAreaSection)
+    ) {
+        renderTextRow(context, 'PAUSED', {x: 8, y: CANVAS_HEIGHT - 22});
     }
 }
