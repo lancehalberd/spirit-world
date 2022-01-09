@@ -123,9 +123,9 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
             size: 16,
         });
     }
-    for (const object of (state.areaInstance?.objects || [])) {
-        if (object.drawPriority === 'hud') {
-            object.render(context, state);
+    for (const effects of (state.areaInstance?.effects || [])) {
+        if (effects.drawPriority === 'hud') {
+            effects.render(context, state);
         }
     }
 }
