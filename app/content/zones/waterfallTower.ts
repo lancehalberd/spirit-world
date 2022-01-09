@@ -550,6 +550,10 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "waterfallTower:s0:0x0-snake-2", x: 16, y: 400, type: "enemy", enemyType: "snake", d: "down", params: {}},
         {status: "normal", id: "waterfallTower:s0:0x0-snake-3", x: 80, y: 416, type: "enemy", enemyType: "snake", d: "down", params: {}},
         {status: "bigKeyLocked", id: "WaterfallTowerBigKeyBlock", x: 400, y: 80, type: "keyBlock", targetObjectId: "waterfallTowerBeadCascade"},
+        {status: "normal", id: "", x: 368, y: 96, type: "spawnMarker"},
+        {status: "normal", id: "", x: 480, y: 96, type: "spawnMarker"},
+        {status: "normal", id: "", x: 416, y: 96, type: "spawnMarker"},
+        {status: "normal", id: "", x: 352, y: 256, type: "spawnMarker"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},

@@ -166,7 +166,6 @@ enemyDefinitions.crystalGuardian = {
     onHit(state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
         // If the shield is up, only fire damage can hurt it.
         if (enemy.params.shieldLife > 0) {
-            console.log('pen?', hit.canDamageCrystalShields, hit);
             if (hit.canDamageCrystalShields) {
                 enemy.params.shieldLife = Math.max(0, enemy.params.shieldLife - hit.damage);
                 playSound('enemyHit');

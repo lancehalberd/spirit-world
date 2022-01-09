@@ -41,33 +41,20 @@ Current tasks:
     - Discharge should optionally include the enemy source, and be removed if the source is defeated before the tell duration is over.
         - Add `isActive` to enemy to indicate whether it is a valid source for attacks: if (sourceEnemy && !sourceEnemy.isActive(state)) { ... }
 
-    Storm Beast
-        - Storm Beast flies in and out of the battle field.
-        - Storm Beast can turn into lightning and teleport as a beam sending shockwaves out at both ends.
-        - Storm Beast can charge south to exit the battle field
-        - Storm Beast flies to the sides or bottom of the arena and performs attacks towards the arena
-            - Clouds to the sides of the Storm Beast are safe from these attacks.
-
-    Make mutation transition use the same area instance so contents don't reset
-        - Will need to add special handling to remove extra ice tiles from frost beast+heat sink battles.
-
 
     Staff Tower
-        - Lightning barriers
-            - Deal 4 lightning damage and knock the player back.
-                - Player is still knocked back with spirit barrier or iframes.
-                - Invisibility allows the player to pass through unharmed.
-            - Can be permanently on, toggled on/off on timer, or toggled by switches
-            - Shows a 500ms warning when about to turn on, maybe sparks on either end of where the beam will be, or a smaller non damaging beam.
         - Elevator only in spirit world (similar to cocoon)
             - Trying to open the elevator on the first floor will give a message about power flow in the spirit world being disrupted by excess energy in the material world. Maybe something about starting backup power.
             - Elevator is stuck on floor 3
             - Disabling emergency breaks in the elevator grants access to the basement+backup generators (mini boss?)
             - Fixing elevator grants access to upper floors, but last two floors must be done in material world to reach the roof and boss.
             - 5th floor in spirit world has device for re-activating the tower after defeating elemental beast, which is what gives access to the Tower Staff tool upgrade. This also disables all machine enemies by default.
-        - Maybe stairs connect only pairs of floors in each world:
-            - 1 is isolated in material world, but 2+3 are connected, and 4+5, etc
-            - 1+2, 3+4, 5+6 are connected in the spirit world.
+        - Lightning barriers
+            - Deal 4 lightning damage and knock the player back.
+                - Player is still knocked back with spirit barrier or iframes.
+                - Invisibility allows the player to pass through unharmed.
+            - Can be permanently on, toggled on/off on timer, or toggled by switches
+            - Shows a 500ms warning when about to turn on, maybe sparks on either end of where the beam will be, or a smaller non damaging beam.
         - All machine enemies have an offline state where they cannot be damaged, and possibly can be pushed around.
             - Hitting offline machines with lightning will turn them on.
             - Machines all default to offline except in the material world when the Storm Beast is active.
@@ -85,6 +72,14 @@ Current tasks:
         - Slow Conveyer belt puzzle with out of sync lightning barriers across it.
         - Disabled conveyer belt with pots on it that needs to be turned on to move the pots out of the way.
 
+
+    Storm Beast
+        - Storm Beast can turn into lightning and teleport as a beam sending shockwaves out at both ends.
+        - Storm Beast can charge south to exit the battle field
+
+    Make mutation transition use the same area instance so contents don't reset
+        - Will need to add special handling to remove extra ice tiles from frost beast+heat sink battles.
+
     - Randomizer improvements
         - Add a goal
     - brainstorm some dungeon/boss ideas, maybe for Staff Tower
@@ -93,7 +88,6 @@ Current tasks:
     - Add new hold+walk chakram animations
         - play last 2 frames of attack animation on release.
 
-    - Change message rendering system to use the priority queue system to support nested messages.
     - Add new waterfall graphics
 
 Throwing an object into a pit should make use the pit animation rather than breaking.

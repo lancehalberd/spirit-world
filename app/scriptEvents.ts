@@ -14,7 +14,7 @@ import {
 
 // Clears all current script events and queues up events parsed from the new script.
 export function setScript(state: GameState, script: string): void {
-    console.log('setScript', script);
+    //console.log('setScript', script);
     state.scriptEvents.queue = parseEventScript(state, script);
     state.scriptEvents.activeEvents = [];
 }
@@ -78,13 +78,13 @@ export function parseEventScript(state: GameState, script: string): ScriptEvent[
         }
         if (actionToken.startsWith('choice:')) {
             const choiceToken = actionToken.substring('choice:'.length);
-            console.log(choiceToken);
+            //console.log(choiceToken);
             const [prompt, ...optionStrings] = choiceToken.split('|');
             const choices = optionStrings.map(o => {
                 const [text, key] = o.split(':');
                 return { text, key };
             })
-            console.log(prompt, choices);
+            //console.log(prompt, choices);
             events.push({
                 type: 'showChoiceBox',
                 prompt,
@@ -197,7 +197,7 @@ export const updateScriptEvents = (state: GameState): void => {
     }
     while (state.scriptEvents.queue.length) {
         const event = state.scriptEvents.queue.shift();
-        console.log('Running event', event.type, event);
+        //console.log('Running event', event.type, event);
         switch (event.type) {
             case 'wait':
                 state.scriptEvents.activeEvents.push({
