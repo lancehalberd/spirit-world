@@ -1,6 +1,6 @@
 import {
     canReleaseBeasts, canTravelFarUnderWater,
-    hasCloudBoots, hasIronBoots, hasGloves, hasMitts, hasTeleportation,
+    hasCloudBoots, hasIronBoots, hasGloves, hasIce, hasMitts, hasTeleportation,
     hasMediumRange, hasSpiritSight, orLogic,
 } from 'app/content/logic';
 
@@ -110,9 +110,9 @@ export const overworldNodes: LogicNode[] = [
         nodeId: 'forestTempleSEArea',
         paths: [
             { nodeId: 'mainSpiritWorld' },
-            { nodeId: 'forestTempleSWArea', logic: hasCloudBoots },
-            { nodeId: 'forestTempleNEArea', logic: hasCloudBoots },
-            { nodeId: 'forestTempleNWArea', logic: hasCloudBoots },
+            { nodeId: 'forestTempleSWArea', logic: orLogic(hasCloudBoots, hasIce) },
+            { nodeId: 'forestTempleNEArea', logic: orLogic(hasCloudBoots, hasIce) },
+            { nodeId: 'forestTempleNWArea', logic: orLogic(hasCloudBoots, hasIce) },
         ],
         entranceIds: ['forestTempleLadder1'],
         exits: [{ objectId: 'forestTempleLadder1' }],
