@@ -6,7 +6,7 @@ import { snakeAnimations } from 'app/content/enemyAnimations';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { moveActor } from 'app/moveActor';
 import { heroAnimations } from 'app/render/heroAnimations';
-import { momAnimations } from 'app/render/npcAnimations';
+import { momAnimations, vanaraBlackAnimations, vanaraBrownAnimations, vanaraGoldAnimations, zoroAnimations } from 'app/render/npcAnimations';
 import { shadowFrame, smallShadowFrame } from 'app/renderActor';
 import { showMessage } from 'app/render/renderMessage';
 import { drawFrame, getFrame } from 'app/utils/animations';
@@ -35,10 +35,25 @@ export const npcStyles = {
         animations: heroAnimations,
         shadowOffset: 1,
     } as NPCStyleDefinition,
+    vanaraBlack: {
+        animations: vanaraBlackAnimations,
+        shadowOffset: 1,
+    } as NPCStyleDefinition,
+    vanaraBrown: {
+        animations: vanaraBrownAnimations,
+        shadowOffset: 1,
+    } as NPCStyleDefinition,
+    vanaraGold: {
+        animations: vanaraGoldAnimations,
+        shadowOffset: 1,
+    } as NPCStyleDefinition,
     mom: {
         animations: momAnimations,
         shadowOffset: 1,
-        scale: .75,
+    } as NPCStyleDefinition,
+    zoro: {
+        animations: zoroAnimations,
+        shadowOffset: 1,
     } as NPCStyleDefinition,
 };
 
