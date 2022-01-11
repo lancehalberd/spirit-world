@@ -1,3 +1,5 @@
+import { Door } from 'app/content/door';
+import { Sign } from 'app/content/objects/sign';
 import {
     Actor, AreaInstance, BossType,
     DecorationType, Direction, EnemyType,
@@ -203,6 +205,8 @@ export interface BaseObjectDefinition {
     // If this is unset, the default behavior depends on the object type, for examples enemies are saved for
     // the zone, bosses are saved forever, and most objects aren't saved at all.
     saveStatus?: 'forever' | 'zone' | 'never'
+    // Key for the associated special behaviors from the specialBehaviors hash.
+    specialBehaviorKey?: string
     // Whether this is a spirit object.
     spirit?: boolean
     // Stores optional style type for some objects, e.g., 'short' vs 'tall' signs.
@@ -345,3 +349,24 @@ export type ObjectDefinition = SimpleObjectDefinition
     ;
 
 export type ObjectType = ObjectDefinition['type'];
+
+
+export interface SpecialDoorBehavior {
+    type: 'door'
+    apply: (state: GameState, object: Door) => void
+}
+export interface SpecialSignBehavior {
+    type: 'sign'
+    apply: (state: GameState, object: Sign) => void
+}
+
+
+export interface SpecialAreaBehavior {
+    type: 'area'
+    apply: (state: GameState, area: AreaInstance) => void
+}
+
+export type SpecialBehavior
+    = SpecialDoorBehavior
+    | SpecialSignBehavior
+    | SpecialAreaBehavior;

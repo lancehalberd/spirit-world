@@ -32,6 +32,10 @@ export interface SetFlagScriptEvent {
 	flag: string
 	value?: boolean | number | string
 }
+export interface ClearFlagScriptEvent {
+	type: 'clearFlag'
+	flag: string
+}
 export interface RefreshAreaLogicScriptEvent {
 	type: 'refreshAreaLogic'
 	// Perhaps define whether to use a transition here.
@@ -66,6 +70,7 @@ export interface RestScriptEvent {
 
 export type ScriptEvent
 	= AttemptPurchaseScriptEvent
+	| ClearFlagScriptEvent
 	| ClearTextBoxScriptEvent
 	| GainLootScriptEvent
 	| PlaySoundScriptEvent

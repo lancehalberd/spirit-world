@@ -14,6 +14,7 @@ import { checkForFloorEffects } from 'app/moveActor';
 import { isPointInShortRect } from 'app/utils/index';
 import { playSound } from 'app/utils/sounds';
 import { updateCamera } from 'app/updateCamera';
+import { specialBehaviorsHash } from 'app/content/specialBehaviors';
 
 import {
     AreaDefinition, AreaInstance, AreaLayerDefinition,
@@ -776,6 +777,12 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance): void {
     }
     for (const object of area.definition.objects) {
         if (!object.logicKey && !object.hasCustomLogic) {
+            if (object.specialBehaviorKey) {
+                const instance = area.objects.find(o => o.definition === object);
+                if (instance) {
+                    specialBehaviorsHash[instance.definition.specialBehaviorKey].apply(state, instance as any);
+                }
+            }
             continue;
         }
         let instance = area.objects.find(o => o.definition === object);
@@ -784,6 +791,10 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance): void {
             if (!instance && object.id && !area.removedObjectIds.includes(object.id)) {
                 instance = createObjectInstance(state, object);
                 addObjectToArea(state, area, instance);
+            } else if (instance) {
+                if (instance.definition.specialBehaviorKey) {
+                    specialBehaviorsHash[instance.definition.specialBehaviorKey].apply(state, instance as any);
+                }
             }
         } else {
             // If the object is invalid but present, remove it from the area.
@@ -891,6 +902,10 @@ export function addObjectToArea(state: GameState, area: AreaInstance, object: Ob
         object.add(state, area);
     } else {
         area.objects.push(object);
+    }
+
+    if (object.definition?.specialBehaviorKey) {
+        specialBehaviorsHash[object.definition?.specialBehaviorKey].apply(state, object as any);
     }
 }
 export function removeObjectFromArea(state: GameState, object: ObjectInstance, trackId: boolean = true): void {

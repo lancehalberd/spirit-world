@@ -210,7 +210,7 @@ export const SPAWN_STAFF_UPPER_ENTRANCE: ZoneLocation = {
     zoneKey: 'staffTower',
     floor: 2,
     x: 250,
-    y: 440,
+    y: 456,
     z: 0,
     d: 'up',
     areaGridCoords: {y: 1, x: 0},

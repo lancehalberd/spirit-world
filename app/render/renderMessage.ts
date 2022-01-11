@@ -120,6 +120,10 @@ export function parseMessage(state: GameState, message: string): Frame[][][] {
             }
             const iconToken = stringAndIconTokens.shift();
             if (iconToken) {
+                if (iconToken === '-') {
+                    nextRow();
+                    continue;
+                }
                 const tokenFrames = getEscapedFrames(state, iconToken);
                 if (!tokenFrames?.length) {
                     continue;
