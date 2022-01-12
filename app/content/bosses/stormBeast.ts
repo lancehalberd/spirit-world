@@ -21,7 +21,7 @@ import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrameAt } from 'app/utils/animations';
 import { pad, rectanglesOverlap } from 'app/utils/index';
 import { getDirection } from 'app/utils/field';
-import { playSound } from 'app/utils/sounds';
+import { playSound } from 'app/musicController';
 import Random from 'app/utils/Random';
 
 import { AreaInstance, Enemy, GameState, HitProperties, HitResult, Rect } from 'app/types';

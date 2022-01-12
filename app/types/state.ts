@@ -20,6 +20,11 @@ export type SavedState = {
     staffTowerLocation: StaffTowerLocation
 }
 
+// These settings are global and can be saved independent of saved state
+export interface Settings {
+    muteAllSounds?: boolean
+}
+
 export interface DungeonInventory {
     bigKey: boolean
     map: boolean
@@ -38,6 +43,7 @@ export type DialogueLootDefinition = LootData & {
 
 export interface GameState {
     savedState: SavedState
+    settings: Settings
     savedGames: SavedState[]
     savedGameIndex: number
     hero: Hero

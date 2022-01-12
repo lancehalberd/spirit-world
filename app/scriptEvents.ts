@@ -6,7 +6,7 @@ import { GAME_KEY } from 'app/gameConstants';
 
 import { wasConfirmKeyPressed, wasGameKeyPressed } from 'app/keyCommands';
 import { parseMessage } from 'app/render/renderMessage';
-import { playSound } from 'app/utils/sounds';
+import { playSound } from 'app/musicController';
 
 import {
     ActiveScriptEvent, Frame, GameState, LootType, ScriptEvent,

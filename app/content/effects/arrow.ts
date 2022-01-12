@@ -3,7 +3,7 @@ import { addEffectToArea, getAreaSize, removeEffectFromArea } from 'app/content/
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrameAt, getFrame } from 'app/utils/animations';
 import { getDirection, hitTargets } from 'app/utils/field';
-import { playSound } from 'app/utils/sounds';
+import { playSound } from 'app/musicController';
 
 import {
     AreaInstance, Direction, DrawPriority, EffectInstance, Frame, FrameAnimation,

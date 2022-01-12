@@ -12,7 +12,7 @@ import { editingState } from 'app/development/tileEditor';
 import { createCanvasAndContext } from 'app/dom';
 import { checkForFloorEffects } from 'app/moveActor';
 import { isPointInShortRect } from 'app/utils/index';
-import { playSound } from 'app/utils/sounds';
+import { playSound } from 'app/musicController';
 import { updateCamera } from 'app/updateCamera';
 import { specialBehaviorsHash } from 'app/content/specialBehaviors';
 

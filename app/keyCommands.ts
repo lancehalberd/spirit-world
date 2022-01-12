@@ -5,8 +5,8 @@ import { exportZoneToClipboard } from 'app/development/exportZone';
 import { selectSection, toggleEditing } from 'app/development/tileEditor';
 import { updateObjectInstance } from 'app/development/objectEditor';
 import { GAME_KEY } from 'app/gameConstants';
-import { getState } from 'app/state';
-import { unlockAudio } from 'app/utils/sounds';
+import { getState, saveSettings } from 'app/state';
+import { setTrackMute, unlockAudio } from 'app/utils/sounds';
 
 import { GameState, Hero } from 'app/types'
 
@@ -192,6 +192,12 @@ export function addKeyCommands() {
         }
         if (keyCode === KEY.E) {
             toggleEditing();
+        }
+        if (keyCode === KEY.M) {
+            const state = getState();
+            state.settings.muteAllSounds = !state.settings.muteAllSounds;
+            setTrackMute(state.settings.muteAllSounds);
+            saveSettings(state);
         }
         if (keyCode === KEY.R) {
             const state = getState();

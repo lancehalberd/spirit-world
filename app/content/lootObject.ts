@@ -8,7 +8,7 @@ import { getState, saveGame } from 'app/state';
 import { createAnimation, drawFrame, drawFrameAt, getFrameHitBox } from 'app/utils/animations';
 import { requireImage } from 'app/utils/images';
 import { rectanglesOverlap } from 'app/utils/index';
-import { playSound } from 'app/utils/sounds';
+import { playSound } from 'app/musicController';
 
 import {
     ActiveTool, AreaInstance, BossObjectDefinition, DialogueLootDefinition,

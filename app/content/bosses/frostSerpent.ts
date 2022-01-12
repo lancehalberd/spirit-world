@@ -13,7 +13,7 @@ import {
 import { enemyDeathAnimation, snakeAnimations } from 'app/content/enemyAnimations';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation } from 'app/utils/animations';
-import { playSound } from 'app/utils/sounds';
+import { playSound } from 'app/musicController';
 import { getDirection, hitTargets } from 'app/utils/field';
 
 

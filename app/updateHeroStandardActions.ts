@@ -24,7 +24,7 @@ import {
     getDirection,
     isPointOpen,
 } from 'app/utils/field';
-import { playSound } from 'app/utils/sounds';
+import { playSound } from 'app/musicController';
 
 import {
     FullTile, GameState, HeldChakram, Hero,
