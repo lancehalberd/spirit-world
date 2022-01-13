@@ -2,6 +2,7 @@ import {
     enterLocation, setAreaSection, setConnectedAreas,
 } from 'app/content/areas';
 import { logicHash } from 'app/content/logic';
+import { specialBehaviorsHash } from 'app/content/specialBehaviors';
 import { zones } from 'app/content/zones';
 import { exportZoneToClipboard, importZone, serializeZone } from 'app/development/exportZone';
 import { displayTileEditorPropertyPanel, EditingState } from 'app/development/tileEditor';
@@ -256,6 +257,25 @@ export function getZoneProperties(state: GameState, editingState: EditingState):
             }
         }
     });
+    const specialBehaviorKeys = Object.keys(specialBehaviorsHash).filter(
+        key => specialBehaviorsHash[key].type === 'area'
+    );
+    if (specialBehaviorKeys.length) {
+        rows.push({
+            name: 'Special Behavior',
+            value: state.areaInstance.definition.specialBehaviorKey || 'none',
+            values: ['none', ...specialBehaviorKeys],
+            onChange(specialBehaviorKey: string) {
+                if (specialBehaviorKey === 'none') {
+                    delete state.areaInstance.definition.specialBehaviorKey;
+                } else {
+                    state.areaInstance.definition.specialBehaviorKey = specialBehaviorKey;
+                }
+                enterLocation(state, state.location);
+                displayTileEditorPropertyPanel();
+            },
+        });
+    }
     rows.push({
         name: 'Surface Key',
         value: state.zone.surfaceKey || 'none',

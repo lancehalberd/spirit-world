@@ -2,7 +2,7 @@ import { removeObjectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { directionMap, getTileBehaviorsAndObstacles, hitTargets, isPointOpen } from 'app/utils/field';
-import { playSound, stopSound } from 'app/utils/sounds';
+import { playSound, stopSound } from 'app/musicController';
 
 import {
     AreaInstance, BallGoal, Direction, GameState, HitProperties, HitResult,

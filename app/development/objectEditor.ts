@@ -7,6 +7,7 @@ import { logicHash } from 'app/content/logic';
 import { createObjectInstance } from 'app/content/objects';
 import { decorationTypes } from 'app/content/objects/decoration';
 import { escalatorStyles } from 'app/content/objects/escalator';
+import { specialBehaviorsHash } from 'app/content/specialBehaviors';
 import { doorStyles } from 'app/content/door';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { enemyTypes } from 'app/content/enemies';
@@ -71,6 +72,7 @@ export function createObjectDefinition(
         id: definition.id || '',
         linked: definition.linked,
         logicKey: definition.logicKey,
+        specialBehaviorKey: definition.specialBehaviorKey,
         spirit: definition.spirit,
         x,
         y,
@@ -481,6 +483,25 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             values: possibleStatuses,
             onChange(status: ObjectStatus) {
                 object.status = status;
+                updateObjectInstance(state, object);
+            },
+        });
+    }
+    const specialBehaviorKeys = Object.keys(specialBehaviorsHash).filter(
+        key => specialBehaviorsHash[key].type === object.type
+    );
+
+    if (specialBehaviorKeys.length) {
+        rows.push({
+            name: 'Special Behavior',
+            value: object.specialBehaviorKey || 'none',
+            values: ['none', ...specialBehaviorKeys],
+            onChange(specialBehaviorKey: string) {
+                if (specialBehaviorKey === 'none') {
+                    delete object.specialBehaviorKey;
+                } else {
+                    object.specialBehaviorKey = specialBehaviorKey;
+                }
                 updateObjectInstance(state, object);
             },
         });

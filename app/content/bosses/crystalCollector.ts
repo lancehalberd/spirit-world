@@ -6,7 +6,7 @@ import { getNearbyTarget } from 'app/content/enemies';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { beetleAnimations } from 'app/content/enemyAnimations';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { playSound } from 'app/utils/sounds';
+import { playSound } from 'app/musicController';
 import Random from 'app/utils/Random';
 
 

@@ -8,12 +8,12 @@ import { getState, saveGame } from 'app/state';
 import { createAnimation, drawFrame, drawFrameAt, getFrameHitBox } from 'app/utils/animations';
 import { requireImage } from 'app/utils/images';
 import { rectanglesOverlap } from 'app/utils/index';
-import { playSound } from 'app/utils/sounds';
+import { playSound } from 'app/musicController';
 
 import {
     ActiveTool, AreaInstance, BossObjectDefinition, DialogueLootDefinition,
     DungeonInventory, Frame, FrameDimensions, GameState, LootObjectDefinition,
-    LootTable, LootType, ObjectInstance, ObjectStatus, Rect,
+    LootTable, LootType, ObjectInstance, ObjectStatus, Rect, TileBehaviors,
 } from 'app/types';
 
 
@@ -291,6 +291,7 @@ function showLootMessage(state: GameState, lootType: LootType, lootLevel?: numbe
 
 export class LootObject implements ObjectInstance {
     area: AreaInstance;
+    behaviors: TileBehaviors;
     definition: LootObjectDefinition;
     drawPriority: 'sprites' = 'sprites';
     frame: Frame;
@@ -298,6 +299,7 @@ export class LootObject implements ObjectInstance {
     y: number;
     z: number;
     status: ObjectStatus;
+    time = 0;
     constructor(state: GameState, definition: LootObjectDefinition) {
         this.definition = definition;
         this.frame = getLootFrame(state, definition);
@@ -307,8 +309,15 @@ export class LootObject implements ObjectInstance {
         if (getObjectStatus(state, this.definition)) {
             this.status = 'gone';
         }
+        this.behaviors = { brightness: 0, lightRadius: 0 };
+    }
+    getHitbox(state: GameState) {
+        return getFrameHitBox(this.frame, this);
     }
     update(state: GameState) {
+        this.time += FRAME_LENGTH;
+        this.behaviors.brightness = Math.min(1, this.time / 2000);
+        this.behaviors.lightRadius = 24 * Math.min(1, this.time / 1000) + 2 * Math.sin(this.time / 500);
         if (this.status === 'hidden' || this.status === 'hiddenEnemy'
             || this.status === 'hiddenSwitch' || this.status === 'gone'
         ) {

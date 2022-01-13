@@ -5,7 +5,7 @@ import { getChargeLevelAndElement } from 'app/useTool';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { hitTargets } from 'app/utils/field';
 import { isPointInShortRect, pad } from 'app/utils/index';
-import { playSound } from 'app/utils/sounds';
+import { playSound } from 'app/musicController';
 
 import {
     AnimationEffect, AreaInstance, DrawPriority, Frame, GameState, Hero, HitProperties, MagicElement, ObjectInstance, ObjectStatus,

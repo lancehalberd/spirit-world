@@ -24,6 +24,12 @@ export function updateField(this: void, state: GameState) {
         updateCamera(state);
         return;
     }
+    const targetFadeLevel = Math.max(state.areaInstance.dark || 0, state.nextAreaInstance?.dark || 0) / 100;
+    if (state.fadeLevel < targetFadeLevel) {
+        state.fadeLevel = Math.min(state.fadeLevel + 0.05, targetFadeLevel);
+    } else if (state.fadeLevel > targetFadeLevel){
+        state.fadeLevel = Math.max(state.fadeLevel - 0.05, targetFadeLevel);
+    }
     // If any priority objects are defined for the area, only process them
     // until there are none remaining in the queue.
     if (state.areaInstance.priorityObjects.length) {

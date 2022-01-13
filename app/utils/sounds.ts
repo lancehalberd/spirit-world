@@ -47,8 +47,11 @@ export function requireSound(key, callback = null) {
             },
             onplay() {
                 //console.log('onplay', newSound.props.src, newSound.shouldFadeIn);
-                if (newSound.shouldFadeIn) {
+                if (newSound.muted) {
+                    newSound.howl.mute(true);
+                } else if (newSound.shouldFadeIn) {
                     //console.log('newSound.howl.fade', newSound.targetVolume);
+                    newSound.howl.mute(false);
                     newSound.howl.fade(0, newSound.targetVolume, 1000);
                 }
             },
@@ -241,6 +244,7 @@ export function playTrack(trackKey: TrackKey, timeOffset, muted = false, fadeOut
     sound.howl.seek(offset);
     sound.howl.play();
     sound.targetVolume = volume;
+    sound.muted = muted;
     sound.shouldPlay = true;
     // console.log({volume});
     // console.log('fade in new track', sound);
@@ -278,7 +282,18 @@ function fadeOutPlayingTracks(currentTracks = []) {
     window['playingTracks'] = playingTracks;
 }
 
-function stopTrack() {
+export function setTrackMute(muted: boolean) {
+    for (const playingTrack of playingTracks) {
+        //console.log('Stopping from stopTrack ', playingTrack.props.src);
+        playingTrack.howl.mute(muted);
+        // In case the last mute interrupted a fade in, set the track to its full volume on unmute.
+        if (!muted) {
+            playingTrack.howl.volume(playingTrack.targetVolume);
+        }
+    }
+}
+
+export function stopTrack() {
     trackIsPlaying = false;
     for (const playingTrack of playingTracks) {
         //console.log('Stopping from stopTrack ', playingTrack.props.src);
@@ -310,8 +325,8 @@ const preloadSounds = () => {
         //     offset: '200:300', volume: 10, limit: 2},
         {key: 'enemyHit', source: 'sfx/enemyDeath.wav',
              offset: '300:200', volume: 20, limit: 2},
-        //{key: 'enemyDeath', source: 'sfx/enemyDeath.wav',
-        //     offset: '170:300', volume: 10, limit: 2},
+        {key: 'bossDeath', source: 'sfx/enemyDeath.wav',
+             offset: '170:300', volume: 20, limit: 2},
         {key: 'enemyDeath', source: 'sfx/enemy death.wav', volume: 5, limit: 2},
         {key: 'getMoney', source: 'sfx/coin wood c.wav',
             offset: '0:250', volume: 10, limit: 2},

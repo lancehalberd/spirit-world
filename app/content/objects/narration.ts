@@ -58,7 +58,7 @@ export class Narration implements ObjectInstance {
     render(context: CanvasRenderingContext2D, state: GameState) {
         if (editingState.isEditing) {
             context.save();
-                context.globalAlpha = 0.4;
+                context.globalAlpha *= 0.1;
                 context.fillStyle = 'yellow';
                 const hitbox = this.getHitbox(state);
                 context.fillRect(hitbox.x, hitbox.y, hitbox.w, hitbox.h);

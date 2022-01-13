@@ -2,7 +2,7 @@ import { FRAME_LENGTH } from 'app/gameConstants';
 import { removeObjectFromArea, resetTileBehavior } from 'app/content/areas';
 import { allTiles } from 'app/content/tiles';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
-import { playSound } from 'app/utils/sounds';
+import { playSound } from 'app/musicController';
 import { saveGame } from 'app/state';
 
 import {

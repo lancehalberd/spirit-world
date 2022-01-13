@@ -13,6 +13,18 @@ const [tallSign] = createAnimation('gfx/tiles/signtall.png', signGeometry).frame
 const [tallSignSpirit] = createAnimation('gfx/tiles/signtallspirit.png', signGeometry).frames;
 
 export const signStyles = {
+    displayScreen: {
+        render(context: CanvasRenderingContext2D, state: GameState, sign: Sign) {
+            context.fillStyle = '#AAA';
+            context.fillRect(sign.x, sign.y, 16, 14);
+            context.fillStyle = '#000';
+            context.fillRect(sign.x + 1, sign.y + 1, 14, 12);
+            if (state.time % 1000 < 500) {
+                context.fillStyle = '#FFF';
+                context.fillRect(sign.x + 3, sign.y + 3, 1, 2);
+            }
+        }
+    },
     short: {
         normal: shortSign,
         spirit: shortSignSpirit,
@@ -53,6 +65,10 @@ export class Sign implements ObjectInstance {
     }
     render(context, state: GameState) {
         const style = this.definition.style || 'short';
+        if (signStyles[style].render) {
+            signStyles[style].render(context, state, this);
+            return;
+        }
         const frame = this.definition.spirit ? signStyles[style].spirit : signStyles[style].normal;
         drawFrame(context, frame, { ...frame, x: this.x - frame.content.x, y: this.y - frame.content.y });
     }

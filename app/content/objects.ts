@@ -25,7 +25,7 @@ import { Teleporter } from 'app/content/objects/teleporter';
 import { Torch } from 'app/content/objects/torch';
 import { VineSprout } from 'app/content/objects/vineSprout';
 import { WaterPot } from 'app/content/objects/waterPot';
-import { playSound } from 'app/utils/sounds';
+import { playSound } from 'app/musicController';
 
 import { saveGame } from 'app/state';
 

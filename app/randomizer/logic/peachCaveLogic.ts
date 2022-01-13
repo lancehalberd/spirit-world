@@ -37,7 +37,7 @@ export const peachCaveNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'peachCave:boss',
-        checks: [{ objectId: 'peachCave:boss', logic: hasBossWeapon }],
+        checks: [{ objectId: 'peachCave:fullPeach', logic: hasBossWeapon }],
         paths: [
             // There is no path to `peachCave:stairsDown` from here because:
             // You can only return to `peachCave:stairsDown` from here if you've grown

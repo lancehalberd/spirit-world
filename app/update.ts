@@ -28,7 +28,7 @@ import {
 import { updateCamera } from 'app/updateCamera';
 import { updateField } from 'app/updateField';
 import { areAllImagesLoaded } from 'app/utils/images';
-import { playSound } from 'app/utils/sounds';
+import { playSound } from 'app/musicController';
 
 import { ActiveTool, Equipment, GameState, MagicElement } from 'app/types';
 

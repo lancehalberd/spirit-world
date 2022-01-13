@@ -17,6 +17,14 @@ export function loadSavedData(): boolean {
     if (window.location.search.substr(1) === 'reset' && confirm('Clear your saved data?')) {
         return false;
     }
+    const importedSettings = window.localStorage.getItem('settings');
+    if (importedSettings) {
+        const defaultState = getDefaultState();
+        state.settings = {
+            ...defaultState.settings,
+            ...JSON.parse(importedSettings),
+        };
+    }
 
     const seed = readGetParameter('seed');
     const importedSaveData = window.localStorage.getItem('savedGames' + seed);
@@ -61,6 +69,9 @@ export function saveGame(): void {
         debugger;
     }
 
+}
+export function saveSettings(state: GameState) {
+    window.localStorage.setItem('settings', JSON.stringify(state.settings));
 }
 export function eraseAllSaves(): void {
     window.localStorage.clear()
@@ -260,6 +271,9 @@ export function getDefaultState(): GameState {
         savedState: getDefaultSavedState(),
         savedGames: [null, null, null],
         savedGameIndex: 0,
+        settings: {
+            muteAllSounds: false,
+        },
         hero: null,
         camera: { x: 0, y: 0 },
         time: 0,
@@ -334,7 +348,7 @@ export function returnToSpawnLocation(state: GameState) {
     state.areaGrid = state.zone.floors[state.location.floor].grid;*/
     state.hero.d = state.hero.spawnLocation.d;
     enterLocation(state, state.hero.spawnLocation, true, null, true);
-    state.fadeLevel = (state.areaInstance.definition.dark || 0) / 100;
+    state.fadeLevel = (state.areaInstance.dark || 0) / 100;
 }
 
 export function getState(): GameState {

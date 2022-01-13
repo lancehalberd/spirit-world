@@ -7,7 +7,7 @@ import { enemyDeathAnimation } from 'app/content/enemyAnimations';
 import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { drawFrame, getFrame } from 'app/utils/animations';
-import { playSound } from 'app/utils/sounds';
+import { playSound } from 'app/musicController';
 
 import {
     Action, Actor, AreaInstance, BossObjectDefinition, Direction, DrawPriority,

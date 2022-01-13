@@ -173,8 +173,8 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
     //if (hero.action !== 'knocked' && hero.action !== 'thrown') {
         // At base mana regen, using cat eyes reduces your mana very slowly unless you are stationary.
         let targetLightRadius = 20, minLightRadius = 20;
-        if (hero.area.definition.dark) {
-            const coefficient = 100 / hero.area.definition.dark;
+        if (hero.area.dark) {
+            const coefficient = 100 / hero.area.dark;
             minLightRadius *= coefficient;
             if (state.hero.passiveTools.trueSight > 0) {
                 state.hero.magic -= 10 * FRAME_LENGTH / 1000 / coefficient;

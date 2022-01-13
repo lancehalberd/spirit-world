@@ -6,7 +6,7 @@ import { GAME_KEY } from 'app/gameConstants';
 
 import { wasConfirmKeyPressed, wasGameKeyPressed } from 'app/keyCommands';
 import { parseMessage } from 'app/render/renderMessage';
-import { playSound } from 'app/utils/sounds';
+import { playSound } from 'app/musicController';
 
 import {
     ActiveScriptEvent, Frame, GameState, LootType, ScriptEvent,
@@ -86,6 +86,9 @@ export function parseEventScript(state: GameState, script: string): ScriptEvent[
             })
             //console.log(prompt, choices);
             events.push({
+                type: 'clearTextBox',
+            });
+            events.push({
                 type: 'showChoiceBox',
                 prompt,
                 choices,
@@ -103,6 +106,31 @@ export function parseEventScript(state: GameState, script: string): ScriptEvent[
             });
             events.push({
                 type: 'refreshAreaLogic',
+            });
+            continue;
+        }
+        if (actionToken.startsWith('clearFlag:')) {
+            const flag = actionToken.substring('clearFlag:'.length);
+            events.push({
+                type: 'clearFlag',
+                flag,
+            });
+            events.push({
+                type: 'refreshAreaLogic',
+            });
+            continue;
+        }
+        if (actionToken.startsWith('clearTextBox')) {
+            events.push({
+                type: 'clearTextBox',
+            });
+            continue;
+        }
+        if (actionToken.startsWith('playSound:')) {
+            const sound = actionToken.substring('playSound:'.length);
+            events.push({
+                type: 'playSound',
+                sound,
             });
             continue;
         }
@@ -221,8 +249,15 @@ export const updateScriptEvents = (state: GameState): void => {
             case 'clearTextBox':
                 state.messagePage = null;
                 break;
+            case 'clearFlag':
+                delete state.savedState.objectFlags[event.flag];
+                refreshAreaLogic(state, state.areaInstance);
+                refreshAreaLogic(state, state.areaInstance.alternateArea);
+                break;
             case 'setFlag':
                 state.savedState.objectFlags[event.flag] = event.value;
+                refreshAreaLogic(state, state.areaInstance);
+                refreshAreaLogic(state, state.areaInstance.alternateArea);
                 break;
             case 'refreshAreaLogic':
                 refreshAreaLogic(state, state.areaInstance);
@@ -268,6 +303,9 @@ export const updateScriptEvents = (state: GameState): void => {
 }
 
 function followMessagePointer(state: GameState, pointer) {
+    if (!pointer) {
+        return;
+    }
     const [dialogueKey, optionKey] = pointer.split('.');
     const dialogueSet = dialogueHash[dialogueKey];
     if (!dialogueSet) {

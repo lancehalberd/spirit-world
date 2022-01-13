@@ -1093,6 +1093,7 @@ function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, a
         context.globalAlpha = 0.6;
         for (const object of area.definition.objects) {
             const instance = createObjectInstance(state, object);
+            instance.area = area;
             instance.status = 'normal';
             instance.render(context, state);
             // drawFrame(context, frame, {...frame, x: object.x - (frame.content?.x || 0), y: object.y - (frame.content?.y || 0)});
