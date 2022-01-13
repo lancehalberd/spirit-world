@@ -145,12 +145,6 @@ export function renderSurfaceLighting(context: CanvasRenderingContext2D, state: 
 }
 
 export function renderAreaLighting(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance, nextArea: AreaInstance = null): void {
-    const targetFadeLevel = Math.max(area.definition.dark || 0, nextArea?.definition.dark || 0) / 100;
-    if (state.fadeLevel < targetFadeLevel) {
-        state.fadeLevel = Math.min(state.fadeLevel + 0.05, targetFadeLevel);
-    } else if (state.fadeLevel > targetFadeLevel){
-        state.fadeLevel = Math.max(state.fadeLevel - 0.05, targetFadeLevel);
-    }
     if (!(state.fadeLevel > 0) || editingState.isEditing) {
         return;
     }
@@ -211,7 +205,7 @@ export function renderAreaLighting(context: CanvasRenderingContext2D, state: Gam
             Math.floor((area.cameraOffset.y - state.camera.y) / lightingGranularity)
         )
         for (const object of area.objects) {
-            if (object.status === 'hidden' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
+            if (object.status === 'gone' || object.status === 'hidden' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
                 continue;
             }
             if (object.getHitbox && object.behaviors?.brightness) {

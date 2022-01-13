@@ -348,7 +348,7 @@ export function returnToSpawnLocation(state: GameState) {
     state.areaGrid = state.zone.floors[state.location.floor].grid;*/
     state.hero.d = state.hero.spawnLocation.d;
     enterLocation(state, state.hero.spawnLocation, true, null, true);
-    state.fadeLevel = (state.areaInstance.definition.dark || 0) / 100;
+    state.fadeLevel = (state.areaInstance.dark || 0) / 100;
 }
 
 export function getState(): GameState {

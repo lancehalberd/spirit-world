@@ -275,11 +275,19 @@ function applyItems(savedState: SavedState, items: {[key: string]: number}, obje
 }
 
 const defaultSavedState = getDefaultSavedState();
-const peachBossState = applyItems(defaultSavedState, {weapon: 1, money: 50});
-const peachCaveExitState = applyItems(peachBossState, {maxLife: 1, catEyes: 1}, ['homeInstructions']);
-const tombStartState = applyItems(peachCaveExitState, {bow: 1}, ['elderTomb', 'tombEntrance']);
+const peachBossState = applyItems(defaultSavedState, {weapon: 1, money: 50},
+    ['peachCave:0:0x0-weapon-0', 'peachCaveSprout1', 'peachCaveSprout2']
+);
+const peachCaveExitState = applyItems(peachBossState, {maxLife: 1, catEyes: 1},
+    ['peachCave:boss', 'peachCave:fullPeach', 'homeInstructions']
+);
+const tombStartState = applyItems(peachCaveExitState, {bow: 1},
+    ['treeVillage:1:0x0-bow-0', 'closedBowDoor', 'elderTomb', 'tombEntrance']
+);
 tombStartState.savedHeroData.leftTool = 'bow';
-const tombBossState = applyItems(tombStartState, {roll: 1, 'tomb:bigKey': 1});
+const tombBossState = applyItems(tombStartState, {roll: 1, 'tomb:bigKey': 1},
+    ['tombKey1', 'tombKey2', 'tombBigKey', 'tomb:1:1x0-roll-0']
+);
 const warTempleStart = applyItems(tombBossState, {maxLife: 1, spiritSight: 1},
     ['tombBoss', 'warTempleEntrance', 'tombTeleporter']);
 const warTempleBoss = applyItems(warTempleStart, {gloves: 1, 'warTemple:bigKey': 1});

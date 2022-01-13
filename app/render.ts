@@ -5,7 +5,7 @@ import { createCanvasAndContext, mainContext } from 'app/dom';
 import {
     CANVAS_HEIGHT, CANVAS_WIDTH, MAX_SPIRIT_RADIUS,
     FADE_IN_DURATION, FADE_OUT_DURATION,
-    CIRCLE_WIPE_IN_DURATION, CIRCLE_WIPE_OUT_DURATION,
+    CIRCLE_WIPE_IN_DURATION, CIRCLE_WIPE_OUT_DURATION, MUTATE_DURATION,
 } from 'app/gameConstants';
 import { renderAreaLighting, renderSurfaceLighting, updateLightingCanvas, updateWaterSurfaceCanvas } from 'app/render/areaLighting';
 import { renderHeroEyes, renderHeroShadow, renderEnemyShadow } from 'app/renderActor';
@@ -241,8 +241,6 @@ function renderTransition(context: CanvasRenderingContext2D, state: GameState) {
             const [underCanvas, underContext] = createCanvasAndContext(CANVAS_WIDTH, CANVAS_HEIGHT);
             state.transitionState.underCanvas = underCanvas;
             const area = state.transitionState.nextAreaInstance;
-            underContext.fillStyle = 'red';
-            underContext.fillRect(50, 50, 100, 100);
             // Update any background tiles that have changed.
             if (area.checkToRedrawTiles) {
                 checkToRedrawTiles(area);
@@ -265,7 +263,7 @@ function renderTransition(context: CanvasRenderingContext2D, state: GameState) {
             renderHeatOverlay(underContext, state, area);
             renderAreaLighting(underContext, state, area);
         }
-        const offsets = [0, 4, 2, 6, 1, 5, 3, 7];
+        /*const offsets = [0, 4, 2, 6, 1, 5, 3, 7];
         if (state.transitionState.time > 0
             && state.transitionState.time % 100 === 0
             && state.transitionState.time / 100 <= offsets.length
@@ -275,9 +273,10 @@ function renderTransition(context: CanvasRenderingContext2D, state: GameState) {
                     0, y, CANVAS_WIDTH, 1
                 );
             }
-        }
+        }*/
         context.save();
             context.drawImage(state.transitionState.underCanvas, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+            context.globalAlpha *= Math.max(0, (MUTATE_DURATION - state.transitionState.time) / MUTATE_DURATION);
             context.drawImage(state.transitionState.patternCanvas, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
         context.restore();
         return;

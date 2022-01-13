@@ -119,6 +119,9 @@ export function serializeZone(zone: Zone) {
                     if (area.hotLogic) {
                         lines.push(`    hotLogic: ${JSON.stringify(area.hotLogic)},`);
                     }
+                    if (area.specialBehaviorKey) {
+                        lines.push(`    specialBehaviorKey: '${area.specialBehaviorKey}',`);
+                    }
                     lines.push('};');
                 }
             }

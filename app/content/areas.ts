@@ -23,7 +23,7 @@ import {
     LogicDefinition,
     ObjectDefinition,
     ObjectInstance,
-    Rect, Tile, TileBehaviors,
+    Rect, SpecialAreaBehavior, Tile, TileBehaviors,
     ZoneLocation,
 } from 'app/types';
 
@@ -572,6 +572,7 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
     const instance: AreaInstance = {
         alternateArea: null,
         definition: definition,
+        dark: definition.dark,
         w: definition.layers[0].grid.w,
         h: definition.layers[0].grid.h,
         behaviorGrid,
@@ -672,6 +673,10 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
         object => isObjectLogicValid(state, object)
     ).map(o => addObjectToArea(state, instance, createObjectInstance(state, o)));
     instance.isHot = evaluateLogicDefinition(state, instance.definition.hotLogic, false);
+    if (definition.specialBehaviorKey) {
+        const specialBehavior = specialBehaviorsHash[definition.specialBehaviorKey] as SpecialAreaBehavior;
+        specialBehavior?.apply(state, instance);
+    }
     return instance;
 }
 
@@ -751,6 +756,12 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance): void {
             refreshBehavior = true;
         }
     }
+    for (const instance of [area, area.alternateArea]) {
+        if (instance.definition.specialBehaviorKey) {
+            const specialBehavior = specialBehaviorsHash[instance.definition.specialBehaviorKey] as SpecialAreaBehavior;
+            specialBehavior?.apply(state, instance);
+        }
+    }
     const shouldBeHot = evaluateLogicDefinition(state, area.definition.hotLogic, false);
     if (refreshBehavior || area.isHot !== shouldBeHot) {
         /*for (const instance of [area, area.alternateArea]) {
@@ -765,7 +776,7 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance): void {
                 );
             }
         }*/
-
+        state.fadeLevel = (state.areaInstance.dark || 0) / 100;
         state.transitionState = {
             callback: () => null,
             nextLocation: state.location,

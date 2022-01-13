@@ -192,19 +192,20 @@ export interface AreaLayer extends AreaTileGrid {
 }
 
 export interface AreaDefinition {
-    default?: boolean,
-    layers: AreaLayerDefinition[],
-    objects: ObjectDefinition[],
+    default?: boolean
+    layers: AreaLayerDefinition[]
+    objects: ObjectDefinition[]
     // Used to divide a larger super tile into smaller screens.
-    sections: Rect[],
+    sections: Rect[]
     // 0/undefined = fully lit, 100 = pitch black.
-    dark?: number,
+    dark?: number
     hotLogic?: LogicDefinition
     // Spirit world areas with real counterparts have this reference set
     // to make it more convenient to translate real tiles/objects to the spirit world.
-    parentDefinition?: AreaDefinition,
+    parentDefinition?: AreaDefinition
+    specialBehaviorKey?: string
     // Set to true if this is a spirit world area.
-    isSpiritWorld?: boolean,
+    isSpiritWorld?: boolean
 }
 
 export interface Zone {
@@ -233,6 +234,7 @@ export interface AreaInstance {
     h: number
     behaviorGrid: TileBehaviors[][]
     checkToRedrawTiles: boolean
+    dark?: number
     tilesDrawn: boolean[][]
     underwater?: boolean
     layers: AreaLayer[]
