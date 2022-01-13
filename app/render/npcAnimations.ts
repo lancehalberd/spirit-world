@@ -2,15 +2,25 @@ import { createAnimation } from 'app/utils/animations';
 
 import { ActorAnimations, FrameAnimation, FrameDimensions } from 'app/types';
 
-const momGeometry: FrameDimensions = {w: 21, h: 32, content: {x: 2, y: 16, w: 16, h: 16}};
-const momUpAnimation: FrameAnimation = createAnimation('gfx/npcs/21x32-mom.png', momGeometry, { x: 2});
-const momDownAnimation: FrameAnimation = createAnimation('gfx/npcs/21x32-mom.png', momGeometry, { x: 0});
-const momLeftAnimation: FrameAnimation = createAnimation('gfx/npcs/21x32-mom.png', momGeometry, { x: 3});
-const momRightAnimation: FrameAnimation = createAnimation('gfx/npcs/21x32-mom.png', momGeometry, { x: 1});
-const momWalkUpAnimation: FrameAnimation = createAnimation('gfx/npcs/21x32-mom.png', momGeometry, { cols: 4, y: 3, duration: 4});
-const momWalkDownAnimation: FrameAnimation = createAnimation('gfx/npcs/21x32-mom.png', momGeometry, { cols: 4, y: 0, duration: 4});
-const momWalkLeftAnimation: FrameAnimation = createAnimation('gfx/npcs/21x32-mom.png', momGeometry, { cols: 4, y: 2, duration: 4});
-const momWalkRightAnimation: FrameAnimation = createAnimation('gfx/npcs/21x32-mom.png', momGeometry, { cols: 4, y: 1, duration: 4});
+const momGeometry: FrameDimensions = {w: 24, h: 36, content: {x: 4, y: 20, w: 16, h: 16}};
+const momUpAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-mom.png', momGeometry, { x: 2});
+const momDownAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-mom.png', momGeometry, { x: 0});
+const momLeftAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-mom.png', momGeometry, { x: 3});
+const momRightAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-mom.png', momGeometry, { x: 1});
+const momWalkUpAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-mom.png', momGeometry, { cols: 4, y: 3, duration: 4});
+const momWalkDownAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-mom.png', momGeometry, { cols: 4, y: 0, duration: 4});
+const momWalkLeftAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-mom.png', momGeometry, { cols: 4, y: 2, duration: 4});
+const momWalkRightAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-mom.png', momGeometry, { cols: 4, y: 1, duration: 4});
+
+const guyGeometry: FrameDimensions = {w: 24, h: 36, content: {x: 4, y: 20, w: 16, h: 16}};
+const guyUpAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', guyGeometry, { x: 2});
+const guyDownAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', guyGeometry, { x: 0});
+const guyLeftAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', guyGeometry, { x: 3});
+const guyRightAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', guyGeometry, { x: 1});
+const guyWalkUpAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', guyGeometry, { cols: 4, y: 3, duration: 4});
+const guyWalkDownAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', guyGeometry, { cols: 4, y: 0, duration: 4});
+const guyWalkLeftAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', guyGeometry, { cols: 4, y: 2, duration: 4});
+const guyWalkRightAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', guyGeometry, { cols: 4, y: 1, duration: 4});
 
 const zoroGeometry: FrameDimensions = {w: 21, h: 32, content: {x: 2, y: 16, w: 16, h: 16}};
 const zoroUpAnimation: FrameAnimation = createAnimation('gfx/npcs/21x32-zoro.png', zoroGeometry, { x: 2});
@@ -32,6 +42,28 @@ const vanaraBlackWalkUpAnimation: FrameAnimation = createAnimation('gfx/npcs/van
 const vanaraBlackWalkDownAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-black-walking.png', vanaraBlackWalkingGeometry, { cols: 8, y: 0, duration: 4});
 const vanaraBlackWalkLeftAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-black-walking.png', vanaraBlackWalkingGeometry, { cols: 8, y: 3, duration: 4});
 const vanaraBlackWalkRightAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-black-walking.png', vanaraBlackWalkingGeometry, { cols: 8, y: 1, duration: 4});
+
+const vanaraBlueGeometry: FrameDimensions = {w: 18, h: 26, content: {x: 1, y: 11, w: 16, h: 16}};
+const vanaraBlueUpAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-black-facing.png', vanaraBlueGeometry, { x: 2});
+const vanaraBlueDownAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-black-facing.png', vanaraBlueGeometry, { x: 0});
+const vanaraBlueLeftAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-black-facing.png', vanaraBlueGeometry, { x: 3});
+const vanaraBlueRightAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-black-facing.png', vanaraBlueGeometry, { x: 1});
+const vanaraBlueWalkingGeometry: FrameDimensions = {w: 20, h: 28, content: {x: 2, y: 12, w: 16, h: 16}};
+const vanaraBlueWalkUpAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-black-walking.png', vanaraBlueWalkingGeometry, { cols: 8, y: 2, duration: 4});
+const vanaraBlueWalkDownAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-black-walking.png', vanaraBlueWalkingGeometry, { cols: 8, y: 0, duration: 4});
+const vanaraBlueWalkLeftAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-black-walking.png', vanaraBlueWalkingGeometry, { cols: 8, y: 3, duration: 4});
+const vanaraBlueWalkRightAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-black-walking.png', vanaraBlueWalkingGeometry, { cols: 8, y: 1, duration: 4});
+
+const vanaraPurpleGeometry: FrameDimensions = {w: 18, h: 26, content: {x: 1, y: 11, w: 16, h: 16}};
+const vanaraPurpleUpAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-purple-facing.png', vanaraPurpleGeometry, { x: 2});
+const vanaraPurpleDownAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-purple-facing.png', vanaraPurpleGeometry, { x: 0});
+const vanaraPurpleLeftAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-purple-facing.png', vanaraPurpleGeometry, { x: 3});
+const vanaraPurpleRightAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-purple-facing.png', vanaraPurpleGeometry, { x: 1});
+const vanaraPurpleWalkingGeometry: FrameDimensions = {w: 20, h: 28, content: {x: 2, y: 12, w: 16, h: 16}};
+const vanaraPurpleWalkUpAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-purple-walking.png', vanaraPurpleWalkingGeometry, { cols: 8, y: 2, duration: 4});
+const vanaraPurpleWalkDownAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-purple-walking.png', vanaraPurpleWalkingGeometry, { cols: 8, y: 0, duration: 4});
+const vanaraPurpleWalkLeftAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-purple-walking.png', vanaraPurpleWalkingGeometry, { cols: 8, y: 3, duration: 4});
+const vanaraPurpleWalkRightAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-purple-walking.png', vanaraPurpleWalkingGeometry, { cols: 8, y: 1, duration: 4});
 
 const vanaraBrownGeometry: FrameDimensions = {w: 18, h: 26, content: {x: 1, y: 11, w: 16, h: 16}};
 const vanaraBrownUpAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-brown-facing.png', vanaraBrownGeometry, { x: 2});
@@ -55,6 +87,43 @@ const vanaraGoldWalkDownAnimation: FrameAnimation = createAnimation('gfx/npcs/va
 const vanaraGoldWalkLeftAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-gold-walking.png', vanaraGoldWalkingGeometry, { cols: 8, y: 3, duration: 4});
 const vanaraGoldWalkRightAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-gold-walking.png', vanaraGoldWalkingGeometry, { cols: 8, y: 1, duration: 4});
 
+const vanaraGrayGeometry: FrameDimensions = {w: 18, h: 26, content: {x: 1, y: 11, w: 16, h: 16}};
+const vanaraGrayUpAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-gray-facing.png', vanaraGrayGeometry, { x: 2});
+const vanaraGrayDownAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-gray-facing.png', vanaraGrayGeometry, { x: 0});
+const vanaraGrayLeftAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-gray-facing.png', vanaraGrayGeometry, { x: 3});
+const vanaraGrayRightAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-gray-facing.png', vanaraGrayGeometry, { x: 1});
+const vanaraGrayWalkingGeometry: FrameDimensions = {w: 20, h: 28, content: {x: 2, y: 12, w: 16, h: 16}};
+const vanaraGrayWalkUpAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-gray-walking.png', vanaraGrayWalkingGeometry, { cols: 8, y: 2, duration: 4});
+const vanaraGrayWalkDownAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-gray-walking.png', vanaraGrayWalkingGeometry, { cols: 8, y: 0, duration: 4});
+const vanaraGrayWalkLeftAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-gray-walking.png', vanaraGrayWalkingGeometry, { cols: 8, y: 3, duration: 4});
+const vanaraGrayWalkRightAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-gray-walking.png', vanaraGrayWalkingGeometry, { cols: 8, y: 1, duration: 4});
+
+const vanaraRedGeometry: FrameDimensions = {w: 18, h: 26, content: {x: 1, y: 11, w: 16, h: 16}};
+const vanaraRedUpAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-red-facing.png', vanaraRedGeometry, { x: 2});
+const vanaraRedDownAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-red-facing.png', vanaraRedGeometry, { x: 0});
+const vanaraRedLeftAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-red-facing.png', vanaraRedGeometry, { x: 3});
+const vanaraRedRightAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-red-facing.png', vanaraRedGeometry, { x: 1});
+const vanaraRedWalkingGeometry: FrameDimensions = {w: 20, h: 28, content: {x: 2, y: 12, w: 16, h: 16}};
+const vanaraRedWalkUpAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-red-walking.png', vanaraRedWalkingGeometry, { cols: 8, y: 2, duration: 4});
+const vanaraRedWalkDownAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-red-walking.png', vanaraRedWalkingGeometry, { cols: 8, y: 0, duration: 4});
+const vanaraRedWalkLeftAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-red-walking.png', vanaraRedWalkingGeometry, { cols: 8, y: 3, duration: 4});
+const vanaraRedWalkRightAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-red-walking.png', vanaraRedWalkingGeometry, { cols: 8, y: 1, duration: 4});
+
+export const guyAnimations: ActorAnimations = {
+    idle: {
+        up: guyUpAnimation,
+        down: guyDownAnimation,
+        left: guyLeftAnimation,
+        right: guyRightAnimation,
+    },
+    move: {
+        up: guyWalkUpAnimation,
+        down: guyWalkDownAnimation,
+        left: guyWalkLeftAnimation,
+        right: guyWalkRightAnimation,
+    },
+};
+
 export const momAnimations: ActorAnimations = {
     idle: {
         up: momUpAnimation,
@@ -70,6 +139,21 @@ export const momAnimations: ActorAnimations = {
     },
 };
 
+export const vanaraPurpleAnimations: ActorAnimations = {
+    idle: {
+        up: vanaraPurpleUpAnimation,
+        down: vanaraPurpleDownAnimation,
+        left: vanaraPurpleLeftAnimation,
+        right: vanaraPurpleRightAnimation,
+    },
+    move: {
+        up: vanaraPurpleWalkUpAnimation,
+        down: vanaraPurpleWalkDownAnimation,
+        left: vanaraPurpleWalkLeftAnimation,
+        right: vanaraPurpleWalkRightAnimation,
+    },
+};
+
 export const vanaraBlackAnimations: ActorAnimations = {
     idle: {
         up: vanaraBlackUpAnimation,
@@ -82,6 +166,21 @@ export const vanaraBlackAnimations: ActorAnimations = {
         down: vanaraBlackWalkDownAnimation,
         left: vanaraBlackWalkLeftAnimation,
         right: vanaraBlackWalkRightAnimation,
+    },
+};
+
+export const vanaraBlueAnimations: ActorAnimations = {
+    idle: {
+        up: vanaraBlueUpAnimation,
+        down: vanaraBlueDownAnimation,
+        left: vanaraBlueLeftAnimation,
+        right: vanaraBlueRightAnimation,
+    },
+    move: {
+        up: vanaraBlueWalkUpAnimation,
+        down: vanaraBlueWalkDownAnimation,
+        left: vanaraBlueWalkLeftAnimation,
+        right: vanaraBlueWalkRightAnimation,
     },
 };
 
@@ -112,6 +211,36 @@ export const vanaraGoldAnimations: ActorAnimations = {
         down: vanaraGoldWalkDownAnimation,
         left: vanaraGoldWalkLeftAnimation,
         right: vanaraGoldWalkRightAnimation,
+    },
+};
+
+export const vanaraGrayAnimations: ActorAnimations = {
+    idle: {
+        up: vanaraGrayUpAnimation,
+        down: vanaraGrayDownAnimation,
+        left: vanaraGrayLeftAnimation,
+        right: vanaraGrayRightAnimation,
+    },
+    move: {
+        up: vanaraGrayWalkUpAnimation,
+        down: vanaraGrayWalkDownAnimation,
+        left: vanaraGrayWalkLeftAnimation,
+        right: vanaraGrayWalkRightAnimation,
+    },
+};
+
+export const vanaraRedAnimations: ActorAnimations = {
+    idle: {
+        up: vanaraRedUpAnimation,
+        down: vanaraRedDownAnimation,
+        left: vanaraRedLeftAnimation,
+        right: vanaraRedRightAnimation,
+    },
+    move: {
+        up: vanaraRedWalkUpAnimation,
+        down: vanaraRedWalkDownAnimation,
+        left: vanaraRedWalkLeftAnimation,
+        right: vanaraRedWalkRightAnimation,
     },
 };
 

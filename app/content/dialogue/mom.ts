@@ -16,8 +16,7 @@ dialogueHash.mom = {
             },
             isExclusive: true,
             text: [
-                `May our ancestors watch over you.
-                `,
+                `May our ancestors watch over you.`,
                 `{@mom.rest}`,
             ],
         },

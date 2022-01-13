@@ -6,7 +6,13 @@ import { snakeAnimations } from 'app/content/enemyAnimations';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { moveActor } from 'app/moveActor';
 import { heroAnimations } from 'app/render/heroAnimations';
-import { momAnimations, vanaraBlackAnimations, vanaraBrownAnimations, vanaraGoldAnimations, zoroAnimations } from 'app/render/npcAnimations';
+import {
+    guyAnimations, momAnimations,
+    vanaraBlackAnimations, vanaraBlueAnimations,
+    vanaraBrownAnimations, vanaraGoldAnimations,
+    vanaraGrayAnimations, vanaraPurpleAnimations,
+    vanaraRedAnimations, zoroAnimations,
+} from 'app/render/npcAnimations';
 import { shadowFrame, smallShadowFrame } from 'app/renderActor';
 import { showMessage } from 'app/render/renderMessage';
 import { drawFrame, getFrame } from 'app/utils/animations';
@@ -31,6 +37,10 @@ export const npcStyles = {
         shadowOffset: -3,
         flipRight: true,
     } as NPCStyleDefinition,
+    guy: {
+        animations: guyAnimations,
+        shadowOffset: 1,
+    } as NPCStyleDefinition,
     vanara: {
         animations: heroAnimations,
         shadowOffset: 1,
@@ -39,12 +49,28 @@ export const npcStyles = {
         animations: vanaraBlackAnimations,
         shadowOffset: 1,
     } as NPCStyleDefinition,
+    vanaraBlue: {
+        animations: vanaraBlueAnimations,
+        shadowOffset: 1,
+    } as NPCStyleDefinition,
     vanaraBrown: {
         animations: vanaraBrownAnimations,
         shadowOffset: 1,
     } as NPCStyleDefinition,
     vanaraGold: {
         animations: vanaraGoldAnimations,
+        shadowOffset: 1,
+    } as NPCStyleDefinition,
+    vanaraGray: {
+        animations: vanaraGrayAnimations,
+        shadowOffset: 1,
+    } as NPCStyleDefinition,
+    vanaraPurple: {
+        animations: vanaraPurpleAnimations,
+        shadowOffset: 1,
+    } as NPCStyleDefinition,
+    vanaraRed: {
+        animations: vanaraRedAnimations,
         shadowOffset: 1,
     } as NPCStyleDefinition,
     mom: {

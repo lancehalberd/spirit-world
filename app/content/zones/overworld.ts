@@ -2266,8 +2266,8 @@ const f0_2x0: AreaDefinition = {
     ],
     objects: [
         {id: "elderEntrance", linked: false, spirit: false, status: "normal", x: 160, y: 368, type: "door", style: "tree", targetZone: "treeVillage", targetObjectId: "elderEntrance", d: "up"},
-        {status: "normal", type: "npc", x: 144, y: 48, d: "down", behavior: "none", style: "vanara", dialogueKey: "vanaraGuard", id: "vanaraGuard"},
-        {status: "normal", type: "npc", x: 288, y: 272, d: "down", behavior: "random", style: "vanara", dialogueKey: "vanaraVillager", id: "vanaraVillager"},
+        {status: "normal", type: "npc", x: 144, y: 48, d: "down", behavior: "none", style: "vanaraBrown", dialogueKey: "vanaraGuard", id: "vanaraGuard"},
+        {status: "normal", type: "npc", x: 288, y: 272, d: "down", behavior: "random", style: "vanaraBrown", dialogueKey: "vanaraVillager", id: "vanaraVillager"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -2678,7 +2678,7 @@ const f0_2x2: AreaDefinition = {
         {status: "normal", id: "warTempleEastEntrance", x: 400, y: 272, type: "door", style: "cavern", targetZone: "warTemple", targetObjectId: "warTempleEastEntrance", d: "up"},
         {status: "normal", id: "warTemplePeachEntrance", x: 448, y: 368, targetZone: "warTemple", targetObjectId: "warTemplePitEntrance", type: "pitEntrance"},
         {status: "closed", id: "warTempleKeyDoor", x: 368, y: 416, type: "door", style: "cavern", targetZone: "warTemple", targetObjectId: "warTempleKeyDoor", d: "up"},
-        {status: "normal", id: "overworld:0:2x2-npc-0", x: 288, y: 80, d: "down", behavior: "none", style: "vanara", type: "npc", dialogue: "Explorers have already taken most of the treasure here.{|}\nIf only we could get past those monsters or open the sealed door!"},
+        {status: "normal", id: "overworld:0:2x2-npc-0", x: 288, y: 80, d: "down", behavior: "none", style: "vanaraBrown", type: "npc", dialogue: "Explorers have already taken most of the treasure here.{|}\nIf only we could get past those monsters or open the sealed door!"},
         {status: "normal", id: "overworld:0:2x2-sign-0", x: 352, y: 112, style: "short", type: "sign", message: "!Warning!\n{|}\nDangerous monsters and traps inside!"},
     ],
     sections: [
