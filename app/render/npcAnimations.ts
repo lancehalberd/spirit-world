@@ -2,25 +2,48 @@ import { createAnimation } from 'app/utils/animations';
 
 import { ActorAnimations, FrameAnimation, FrameDimensions } from 'app/types';
 
-const momGeometry: FrameDimensions = {w: 24, h: 36, content: {x: 4, y: 20, w: 16, h: 16}};
-const momUpAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-mom.png', momGeometry, { x: 2});
-const momDownAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-mom.png', momGeometry, { x: 0});
-const momLeftAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-mom.png', momGeometry, { x: 3});
-const momRightAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-mom.png', momGeometry, { x: 1});
-const momWalkUpAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-mom.png', momGeometry, { cols: 4, y: 3, duration: 4});
-const momWalkDownAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-mom.png', momGeometry, { cols: 4, y: 0, duration: 4});
-const momWalkLeftAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-mom.png', momGeometry, { cols: 4, y: 2, duration: 4});
-const momWalkRightAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-mom.png', momGeometry, { cols: 4, y: 1, duration: 4});
+/*
 
-const guyGeometry: FrameDimensions = {w: 24, h: 36, content: {x: 4, y: 20, w: 16, h: 16}};
-const guyUpAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', guyGeometry, { x: 2});
-const guyDownAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', guyGeometry, { x: 0});
-const guyLeftAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', guyGeometry, { x: 3});
-const guyRightAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', guyGeometry, { x: 1});
-const guyWalkUpAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', guyGeometry, { cols: 4, y: 3, duration: 4});
-const guyWalkDownAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', guyGeometry, { cols: 4, y: 0, duration: 4});
-const guyWalkLeftAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', guyGeometry, { cols: 4, y: 2, duration: 4});
-const guyWalkRightAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', guyGeometry, { cols: 4, y: 1, duration: 4});
+
+createAnimation(
+    source: string | HTMLImageElement | HTMLCanvasElement, dimensions: FrameDimensions,
+    { x, y, rows, cols, xSpace, top, left, duration, frameMap }?: CreateAnimationOptions,
+    props?: ExtraAnimationProperties): FrameAnimation
+import createAnimation
+*/
+
+const humanGeometry: FrameDimensions = {w: 24, h: 36, content: {x: 4, y: 20, w: 16, h: 16}};
+const momImage: string = 'gfx/npcs/24x36-mom.png'; 
+
+const momUpAnimation: FrameAnimation = createAnimation(momImage, humanGeometry, { x: 0, y: 3});
+const momDownAnimation: FrameAnimation = createAnimation(momImage, humanGeometry, { x: 0, y: 0});
+const momLeftAnimation: FrameAnimation = createAnimation(momImage, humanGeometry, { x: 0, y: 2});
+const momRightAnimation: FrameAnimation = createAnimation(momImage, humanGeometry, { x: 0, y: 1});
+const momIdleUpAnimation: FrameAnimation =
+    createAnimation(momImage, humanGeometry, { cols: 4, y: 3, duration: 4});
+const momIdleDownAnimation: FrameAnimation =
+    createAnimation(momImage, humanGeometry, { cols: 4, y: 0, duration: 4});
+const momIdleLeftAnimation: FrameAnimation =
+    createAnimation(momImage, humanGeometry, { cols: 4, y: 2, duration: 4});
+const momIdleRightAnimation: FrameAnimation =
+    createAnimation(momImage, humanGeometry, { cols: 4, y: 1, duration: 4});
+const momWalkUpAnimation: FrameAnimation =
+    createAnimation(momImage, humanGeometry, { cols: 4, y: 7, duration: 4});
+const momWalkDownAnimation: FrameAnimation =
+    createAnimation(momImage, humanGeometry, { cols: 4, y: 4, duration: 4});
+const momWalkLeftAnimation: FrameAnimation =
+    createAnimation(momImage, humanGeometry, { cols: 4, y: 6, duration: 4});
+const momWalkRightAnimation: FrameAnimation =
+    createAnimation(momImage, humanGeometry, { cols: 4, y: 5, duration: 4});
+
+const guyUpAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', humanGeometry, { x: 2});
+const guyDownAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', humanGeometry, { x: 0});
+const guyLeftAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', humanGeometry, { x: 3});
+const guyRightAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', humanGeometry, { x: 1});
+const guyWalkUpAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', humanGeometry, { cols: 4, y: 3, duration: 4});
+const guyWalkDownAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', humanGeometry, { cols: 4, y: 0, duration: 4});
+const guyWalkLeftAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', humanGeometry, { cols: 4, y: 2, duration: 4});
+const guyWalkRightAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', humanGeometry, { cols: 4, y: 1, duration: 4});
 
 const zoroGeometry: FrameDimensions = {w: 21, h: 32, content: {x: 2, y: 16, w: 16, h: 16}};
 const zoroUpAnimation: FrameAnimation = createAnimation('gfx/npcs/21x32-zoro.png', zoroGeometry, { x: 2});
@@ -125,11 +148,17 @@ export const guyAnimations: ActorAnimations = {
 };
 
 export const momAnimations: ActorAnimations = {
-    idle: {
+    still: {
         up: momUpAnimation,
         down: momDownAnimation,
         left: momLeftAnimation,
         right: momRightAnimation,
+    },
+    idle: {
+        up: momIdleUpAnimation,
+        down: momIdleDownAnimation,
+        left: momIdleLeftAnimation,
+        right: momIdleRightAnimation,
     },
     move: {
         up: momWalkUpAnimation,
