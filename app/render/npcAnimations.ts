@@ -13,37 +13,118 @@ import createAnimation
 */
 
 const humanGeometry: FrameDimensions = {w: 24, h: 36, content: {x: 4, y: 20, w: 16, h: 16}};
-const momImage: string = 'gfx/npcs/24x36-mom.png'; 
 
+const momImage: string = 'gfx/npcs/24x36-mom.png'; 
 const momUpAnimation: FrameAnimation = createAnimation(momImage, humanGeometry, { x: 0, y: 3});
 const momDownAnimation: FrameAnimation = createAnimation(momImage, humanGeometry, { x: 0, y: 0});
 const momLeftAnimation: FrameAnimation = createAnimation(momImage, humanGeometry, { x: 0, y: 2});
 const momRightAnimation: FrameAnimation = createAnimation(momImage, humanGeometry, { x: 0, y: 1});
-const momIdleUpAnimation: FrameAnimation =
-    createAnimation(momImage, humanGeometry, { cols: 4, y: 3, duration: 4});
-const momIdleDownAnimation: FrameAnimation =
-    createAnimation(momImage, humanGeometry, { cols: 4, y: 0, duration: 4});
-const momIdleLeftAnimation: FrameAnimation =
-    createAnimation(momImage, humanGeometry, { cols: 4, y: 2, duration: 4});
-const momIdleRightAnimation: FrameAnimation =
-    createAnimation(momImage, humanGeometry, { cols: 4, y: 1, duration: 4});
-const momWalkUpAnimation: FrameAnimation =
-    createAnimation(momImage, humanGeometry, { cols: 4, y: 7, duration: 4});
-const momWalkDownAnimation: FrameAnimation =
-    createAnimation(momImage, humanGeometry, { cols: 4, y: 4, duration: 4});
-const momWalkLeftAnimation: FrameAnimation =
-    createAnimation(momImage, humanGeometry, { cols: 4, y: 6, duration: 4});
-const momWalkRightAnimation: FrameAnimation =
-    createAnimation(momImage, humanGeometry, { cols: 4, y: 5, duration: 4});
+const momIdleUpAnimation: FrameAnimation = createAnimation(momImage, humanGeometry, { cols: 4, y: 3, duration: 4});
+const momIdleDownAnimation: FrameAnimation = createAnimation(momImage, humanGeometry, { cols: 4, y: 0, duration: 4});
+const momIdleLeftAnimation: FrameAnimation = createAnimation(momImage, humanGeometry, { cols: 4, y: 2, duration: 4});
+const momIdleRightAnimation: FrameAnimation = createAnimation(momImage, humanGeometry, { cols: 4, y: 1, duration: 4});
+const momWalkUpAnimation: FrameAnimation = createAnimation(momImage, humanGeometry, { cols: 4, y: 7, duration: 4});
+const momWalkDownAnimation: FrameAnimation = createAnimation(momImage, humanGeometry, { cols: 4, y: 4, duration: 4});
+const momWalkLeftAnimation: FrameAnimation = createAnimation(momImage, humanGeometry, { cols: 4, y: 6, duration: 4});
+const momWalkRightAnimation: FrameAnimation = createAnimation(momImage, humanGeometry, { cols: 4, y: 5, duration: 4});
 
-const guyUpAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', humanGeometry, { x: 2});
-const guyDownAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', humanGeometry, { x: 0});
-const guyLeftAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', humanGeometry, { x: 3});
-const guyRightAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', humanGeometry, { x: 1});
-const guyWalkUpAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', humanGeometry, { cols: 4, y: 3, duration: 4});
-const guyWalkDownAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', humanGeometry, { cols: 4, y: 0, duration: 4});
-const guyWalkLeftAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', humanGeometry, { cols: 4, y: 2, duration: 4});
-const guyWalkRightAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', humanGeometry, { cols: 4, y: 1, duration: 4});
+const guyImage: string = 'gfx/npcs/24x36-guy.png'; 
+const guyUpAnimation: FrameAnimation = createAnimation(guyImage, humanGeometry, { x: 0, y: 3});
+const guyDownAnimation: FrameAnimation = createAnimation(guyImage, humanGeometry, { x: 0, y: 0});
+const guyLeftAnimation: FrameAnimation = createAnimation(guyImage, humanGeometry, { x: 0, y: 2});
+const guyRightAnimation: FrameAnimation = createAnimation(guyImage, humanGeometry, { x: 0, y: 1});
+const guyIdleUpAnimation: FrameAnimation = createAnimation(guyImage, humanGeometry, { cols: 4, y: 3, duration: 4});
+const guyIdleDownAnimation: FrameAnimation = createAnimation(guyImage, humanGeometry, { cols: 4, y: 0, duration: 4});
+const guyIdleLeftAnimation: FrameAnimation = createAnimation(guyImage, humanGeometry, { cols: 4, y: 2, duration: 4});
+const guyIdleRightAnimation: FrameAnimation = createAnimation(guyImage, humanGeometry, { cols: 4, y: 1, duration: 4});
+const guyWalkUpAnimation: FrameAnimation = createAnimation(guyImage, humanGeometry, { cols: 4, y: 7, duration: 4});
+const guyWalkDownAnimation: FrameAnimation = createAnimation(guyImage, humanGeometry, { cols: 4, y: 4, duration: 4});
+const guyWalkLeftAnimation: FrameAnimation = createAnimation(guyImage, humanGeometry, { cols: 4, y: 6, duration: 4});
+const guyWalkRightAnimation: FrameAnimation = createAnimation(guyImage, humanGeometry, { cols: 4, y: 5, duration: 4});
+
+const guy2Image: string = 'gfx/npcs/24x36-guy2.png'; 
+const guy2UpAnimation: FrameAnimation = createAnimation(guy2Image, humanGeometry, { x: 0, y: 3});
+const guy2DownAnimation: FrameAnimation = createAnimation(guy2Image, humanGeometry, { x: 0, y: 0});
+const guy2LeftAnimation: FrameAnimation = createAnimation(guy2Image, humanGeometry, { x: 0, y: 2});
+const guy2RightAnimation: FrameAnimation = createAnimation(guy2Image, humanGeometry, { x: 0, y: 1});
+const guy2IdleUpAnimation: FrameAnimation = createAnimation(guy2Image, humanGeometry, { cols: 4, y: 3, duration: 4});
+const guy2IdleDownAnimation: FrameAnimation = createAnimation(guy2Image, humanGeometry, { cols: 4, y: 0, duration: 4});
+const guy2IdleLeftAnimation: FrameAnimation = createAnimation(guy2Image, humanGeometry, { cols: 4, y: 2, duration: 4});
+const guy2IdleRightAnimation: FrameAnimation = createAnimation(guy2Image, humanGeometry, { cols: 4, y: 1, duration: 4});
+const guy2WalkUpAnimation: FrameAnimation = createAnimation(guy2Image, humanGeometry, { cols: 4, y: 7, duration: 4});
+const guy2WalkDownAnimation: FrameAnimation = createAnimation(guy2Image, humanGeometry, { cols: 4, y: 4, duration: 4});
+const guy2WalkLeftAnimation: FrameAnimation = createAnimation(guy2Image, humanGeometry, { cols: 4, y: 6, duration: 4});
+const guy2WalkRightAnimation: FrameAnimation = createAnimation(guy2Image, humanGeometry, { cols: 4, y: 5, duration: 4});
+
+const galImage: string = 'gfx/npcs/24x36-gal.png'; 
+const galUpAnimation: FrameAnimation = createAnimation(galImage, humanGeometry, { x: 0, y: 3});
+const galDownAnimation: FrameAnimation = createAnimation(galImage, humanGeometry, { x: 0, y: 0});
+const galLeftAnimation: FrameAnimation = createAnimation(galImage, humanGeometry, { x: 0, y: 2});
+const galRightAnimation: FrameAnimation = createAnimation(galImage, humanGeometry, { x: 0, y: 1});
+const galIdleUpAnimation: FrameAnimation = createAnimation(galImage, humanGeometry, { cols: 4, y: 3, duration: 4});
+const galIdleDownAnimation: FrameAnimation = createAnimation(galImage, humanGeometry, { cols: 4, y: 0, duration: 4});
+const galIdleLeftAnimation: FrameAnimation = createAnimation(galImage, humanGeometry, { cols: 4, y: 2, duration: 4});
+const galIdleRightAnimation: FrameAnimation = createAnimation(galImage, humanGeometry, { cols: 4, y: 1, duration: 4});
+const galWalkUpAnimation: FrameAnimation = createAnimation(galImage, humanGeometry, { cols: 4, y: 7, duration: 4});
+const galWalkDownAnimation: FrameAnimation = createAnimation(galImage, humanGeometry, { cols: 4, y: 4, duration: 4});
+const galWalkLeftAnimation: FrameAnimation = createAnimation(galImage, humanGeometry, { cols: 4, y: 6, duration: 4});
+const galWalkRightAnimation: FrameAnimation = createAnimation(galImage, humanGeometry, { cols: 4, y: 5, duration: 4});
+
+const gal2Image: string = 'gfx/npcs/24x36-gal2.png'; 
+const gal2UpAnimation: FrameAnimation = createAnimation(gal2Image, humanGeometry, { x: 0, y: 3});
+const gal2DownAnimation: FrameAnimation = createAnimation(gal2Image, humanGeometry, { x: 0, y: 0});
+const gal2LeftAnimation: FrameAnimation = createAnimation(gal2Image, humanGeometry, { x: 0, y: 2});
+const gal2RightAnimation: FrameAnimation = createAnimation(gal2Image, humanGeometry, { x: 0, y: 1});
+const gal2IdleUpAnimation: FrameAnimation = createAnimation(gal2Image, humanGeometry, { cols: 4, y: 3, duration: 4});
+const gal2IdleDownAnimation: FrameAnimation = createAnimation(gal2Image, humanGeometry, { cols: 4, y: 0, duration: 4});
+const gal2IdleLeftAnimation: FrameAnimation = createAnimation(gal2Image, humanGeometry, { cols: 4, y: 2, duration: 4});
+const gal2IdleRightAnimation: FrameAnimation = createAnimation(gal2Image, humanGeometry, { cols: 4, y: 1, duration: 4});
+const gal2WalkUpAnimation: FrameAnimation = createAnimation(gal2Image, humanGeometry, { cols: 4, y: 7, duration: 4});
+const gal2WalkDownAnimation: FrameAnimation = createAnimation(gal2Image, humanGeometry, { cols: 4, y: 4, duration: 4});
+const gal2WalkLeftAnimation: FrameAnimation = createAnimation(gal2Image, humanGeometry, { cols: 4, y: 6, duration: 4});
+const gal2WalkRightAnimation: FrameAnimation = createAnimation(gal2Image, humanGeometry, { cols: 4, y: 5, duration: 4});
+
+const paleMonkImage: string = 'gfx/npcs/24x36-paleMonk.png'; 
+const paleMonkUpAnimation: FrameAnimation = createAnimation(paleMonkImage, humanGeometry, { x: 0, y: 3});
+const paleMonkDownAnimation: FrameAnimation = createAnimation(paleMonkImage, humanGeometry, { x: 0, y: 0});
+const paleMonkLeftAnimation: FrameAnimation = createAnimation(paleMonkImage, humanGeometry, { x: 0, y: 2});
+const paleMonkRightAnimation: FrameAnimation = createAnimation(paleMonkImage, humanGeometry, { x: 0, y: 1});
+const paleMonkIdleUpAnimation: FrameAnimation = createAnimation(paleMonkImage, humanGeometry, { cols: 4, y: 3, duration: 4});
+const paleMonkIdleDownAnimation: FrameAnimation = createAnimation(paleMonkImage, humanGeometry, { cols: 4, y: 0, duration: 4});
+const paleMonkIdleLeftAnimation: FrameAnimation = createAnimation(paleMonkImage, humanGeometry, { cols: 4, y: 2, duration: 4});
+const paleMonkIdleRightAnimation: FrameAnimation = createAnimation(paleMonkImage, humanGeometry, { cols: 4, y: 1, duration: 4});
+const paleMonkWalkUpAnimation: FrameAnimation = createAnimation(paleMonkImage, humanGeometry, { cols: 4, y: 7, duration: 4});
+const paleMonkWalkDownAnimation: FrameAnimation = createAnimation(paleMonkImage, humanGeometry, { cols: 4, y: 4, duration: 4});
+const paleMonkWalkLeftAnimation: FrameAnimation = createAnimation(paleMonkImage, humanGeometry, { cols: 4, y: 6, duration: 4});
+const paleMonkWalkRightAnimation: FrameAnimation = createAnimation(paleMonkImage, humanGeometry, { cols: 4, y: 5, duration: 4});
+
+const midMonkImage: string = 'gfx/npcs/24x36-midMonk.png'; 
+const midMonkUpAnimation: FrameAnimation = createAnimation(midMonkImage, humanGeometry, { x: 0, y: 3});
+const midMonkDownAnimation: FrameAnimation = createAnimation(midMonkImage, humanGeometry, { x: 0, y: 0});
+const midMonkLeftAnimation: FrameAnimation = createAnimation(midMonkImage, humanGeometry, { x: 0, y: 2});
+const midMonkRightAnimation: FrameAnimation = createAnimation(midMonkImage, humanGeometry, { x: 0, y: 1});
+const midMonkIdleUpAnimation: FrameAnimation = createAnimation(midMonkImage, humanGeometry, { cols: 4, y: 3, duration: 4});
+const midMonkIdleDownAnimation: FrameAnimation = createAnimation(midMonkImage, humanGeometry, { cols: 4, y: 0, duration: 4});
+const midMonkIdleLeftAnimation: FrameAnimation = createAnimation(midMonkImage, humanGeometry, { cols: 4, y: 2, duration: 4});
+const midMonkIdleRightAnimation: FrameAnimation = createAnimation(midMonkImage, humanGeometry, { cols: 4, y: 1, duration: 4});
+const midMonkWalkUpAnimation: FrameAnimation = createAnimation(midMonkImage, humanGeometry, { cols: 4, y: 7, duration: 4});
+const midMonkWalkDownAnimation: FrameAnimation = createAnimation(midMonkImage, humanGeometry, { cols: 4, y: 4, duration: 4});
+const midMonkWalkLeftAnimation: FrameAnimation = createAnimation(midMonkImage, humanGeometry, { cols: 4, y: 6, duration: 4});
+const midMonkWalkRightAnimation: FrameAnimation = createAnimation(midMonkImage, humanGeometry, { cols: 4, y: 5, duration: 4});
+
+const darkMonkImage: string = 'gfx/npcs/24x36-darkMonk.png'; 
+const darkMonkUpAnimation: FrameAnimation = createAnimation(darkMonkImage, humanGeometry, { x: 0, y: 3});
+const darkMonkDownAnimation: FrameAnimation = createAnimation(darkMonkImage, humanGeometry, { x: 0, y: 0});
+const darkMonkLeftAnimation: FrameAnimation = createAnimation(darkMonkImage, humanGeometry, { x: 0, y: 2});
+const darkMonkRightAnimation: FrameAnimation = createAnimation(darkMonkImage, humanGeometry, { x: 0, y: 1});
+const darkMonkIdleUpAnimation: FrameAnimation = createAnimation(darkMonkImage, humanGeometry, { cols: 4, y: 3, duration: 4});
+const darkMonkIdleDownAnimation: FrameAnimation = createAnimation(darkMonkImage, humanGeometry, { cols: 4, y: 0, duration: 4});
+const darkMonkIdleLeftAnimation: FrameAnimation = createAnimation(darkMonkImage, humanGeometry, { cols: 4, y: 2, duration: 4});
+const darkMonkIdleRightAnimation: FrameAnimation = createAnimation(darkMonkImage, humanGeometry, { cols: 4, y: 1, duration: 4});
+const darkMonkWalkUpAnimation: FrameAnimation = createAnimation(darkMonkImage, humanGeometry, { cols: 4, y: 7, duration: 4});
+const darkMonkWalkDownAnimation: FrameAnimation = createAnimation(darkMonkImage, humanGeometry, { cols: 4, y: 4, duration: 4});
+const darkMonkWalkLeftAnimation: FrameAnimation = createAnimation(darkMonkImage, humanGeometry, { cols: 4, y: 6, duration: 4});
+const darkMonkWalkRightAnimation: FrameAnimation = createAnimation(darkMonkImage, humanGeometry, { cols: 4, y: 5, duration: 4});
 
 const zoroGeometry: FrameDimensions = {w: 21, h: 32, content: {x: 2, y: 16, w: 16, h: 16}};
 const zoroUpAnimation: FrameAnimation = createAnimation('gfx/npcs/21x32-zoro.png', zoroGeometry, { x: 2});
@@ -132,18 +213,150 @@ const vanaraRedWalkDownAnimation: FrameAnimation = createAnimation('gfx/npcs/van
 const vanaraRedWalkLeftAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-red-walking.png', vanaraRedWalkingGeometry, { cols: 8, y: 3, duration: 4});
 const vanaraRedWalkRightAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-red-walking.png', vanaraRedWalkingGeometry, { cols: 8, y: 1, duration: 4});
 
-export const guyAnimations: ActorAnimations = {
+export const galAnimations: ActorAnimations = {
+    still: {
+        up: galUpAnimation,
+        down: galDownAnimation,
+        left: galLeftAnimation,
+        right: galRightAnimation,
+    },
     idle: {
+        up: galIdleUpAnimation,
+        down: galIdleDownAnimation,
+        left: galIdleLeftAnimation,
+        right: galIdleRightAnimation,
+    },
+    move: {
+        up: galWalkUpAnimation,
+        down: galWalkDownAnimation,
+        left: galWalkLeftAnimation,
+        right: galWalkRightAnimation,
+    },
+};
+
+export const gal2Animations: ActorAnimations = {
+    still: {
+        up: gal2UpAnimation,
+        down: gal2DownAnimation,
+        left: gal2LeftAnimation,
+        right: gal2RightAnimation,
+    },
+    idle: {
+        up: gal2IdleUpAnimation,
+        down: gal2IdleDownAnimation,
+        left: gal2IdleLeftAnimation,
+        right: gal2IdleRightAnimation,
+    },
+    move: {
+        up: gal2WalkUpAnimation,
+        down: gal2WalkDownAnimation,
+        left: gal2WalkLeftAnimation,
+        right: gal2WalkRightAnimation,
+    },
+};
+
+export const darkMonkAnimations: ActorAnimations = {
+    still: {
+        up: darkMonkUpAnimation,
+        down: darkMonkDownAnimation,
+        left: darkMonkLeftAnimation,
+        right: darkMonkRightAnimation,
+    },
+    idle: {
+        up: darkMonkIdleUpAnimation,
+        down: darkMonkIdleDownAnimation,
+        left: darkMonkIdleLeftAnimation,
+        right: darkMonkIdleRightAnimation,
+    },
+    move: {
+        up: darkMonkWalkUpAnimation,
+        down: darkMonkWalkDownAnimation,
+        left: darkMonkWalkLeftAnimation,
+        right: darkMonkWalkRightAnimation,
+    },
+};
+
+export const midMonkAnimations: ActorAnimations = {
+    still: {
+        up: midMonkUpAnimation,
+        down: midMonkDownAnimation,
+        left: midMonkLeftAnimation,
+        right: midMonkRightAnimation,
+    },
+    idle: {
+        up: midMonkIdleUpAnimation,
+        down: midMonkIdleDownAnimation,
+        left: midMonkIdleLeftAnimation,
+        right: midMonkIdleRightAnimation,
+    },
+    move: {
+        up: midMonkWalkUpAnimation,
+        down: midMonkWalkDownAnimation,
+        left: midMonkWalkLeftAnimation,
+        right: midMonkWalkRightAnimation,
+    },
+};
+
+export const paleMonkAnimations: ActorAnimations = {
+    still: {
+        up: paleMonkUpAnimation,
+        down: paleMonkDownAnimation,
+        left: paleMonkLeftAnimation,
+        right: paleMonkRightAnimation,
+    },
+    idle: {
+        up: paleMonkIdleUpAnimation,
+        down: paleMonkIdleDownAnimation,
+        left: paleMonkIdleLeftAnimation,
+        right: paleMonkIdleRightAnimation,
+    },
+    move: {
+        up: paleMonkWalkUpAnimation,
+        down: paleMonkWalkDownAnimation,
+        left: paleMonkWalkLeftAnimation,
+        right: paleMonkWalkRightAnimation,
+    },
+};
+
+export const guyAnimations: ActorAnimations = {
+    still: {
         up: guyUpAnimation,
         down: guyDownAnimation,
         left: guyLeftAnimation,
         right: guyRightAnimation,
+    },
+    idle: {
+        up: guyIdleUpAnimation,
+        down: guyIdleDownAnimation,
+        left: guyIdleLeftAnimation,
+        right: guyIdleRightAnimation,
     },
     move: {
         up: guyWalkUpAnimation,
         down: guyWalkDownAnimation,
         left: guyWalkLeftAnimation,
         right: guyWalkRightAnimation,
+    },
+};
+
+export const guy2Animations: ActorAnimations = {
+    still: {
+        up: guy2UpAnimation,
+        down: guy2DownAnimation,
+        left: guy2LeftAnimation,
+        right: guy2RightAnimation,
+    },
+    idle: {
+        up: guy2IdleUpAnimation,
+        down: guy2IdleDownAnimation,
+        left: guy2IdleLeftAnimation,
+        right: guy2IdleRightAnimation,
+    },
+    move: {
+        up: guy2WalkUpAnimation,
+        down: guy2WalkDownAnimation,
+        left: guy2WalkLeftAnimation,
+        right: guy2WalkRightAnimation,
     },
 };
 

@@ -143,9 +143,9 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "waterfallCave:0:0x0-npc-5", x: 368, y: 176, d: "left", behavior: "none", style: "vanaraGold", type: "npc", dialogue: "I'm knitting a scarf for my human friend. Necks with no hair get cold so easily!"},
         {status: "normal", id: "waterfallCaveEntrance", x: 160, y: 480, type: "door", style: "cave", targetZone: "overworld", targetObjectId: "waterfallCaveEntrance", d: "down"},
         {status: "normal", id: "waterfallCave:0:0x0-npc-4", x: 48, y: 48, d: "right", behavior: "none", style: "guy", type: "npc", dialogue: "I love my cozy home."},
-        {status: "normal", id: "waterfallCave:0:0x0-npc-6", x: 144, y: 48, d: "down", behavior: "none", style: "guy", type: "npc", dialogue: "Zzzz."},
+        {status: "normal", id: "waterfallCave:0:0x0-npc-6", x: 144, y: 48, d: "down", behavior: "none", style: "gal", type: "npc", dialogue: "Zzzz."},
         {status: "normal", id: "waterfallCave:0:0x0-npc-7", x: 208, y: 160, d: "left", behavior: "none", style: "vanaraGold", type: "npc", dialogue: "I can't decide what to wear today..."},
-        {status: "normal", id: "waterfallCave:0:0x0-npc-8", x: 432, y: 432, d: "down", behavior: "none", style: "guy", type: "npc", dialogue: "I have to check all of the food for freshness. Maybe I'll have a little snack while I work..."},
+        {status: "normal", id: "waterfallCave:0:0x0-npc-8", x: 432, y: 432, d: "down", behavior: "none", style: "gal", type: "npc", dialogue: "I have to check all of the food for freshness. Maybe I'll have a little snack while I work..."},
         {status: "normal", id: "waterfallCave:0:0x0-npc-10", x: 240, y: 384, d: "right", behavior: "none", style: "vanaraGold", type: "npc", dialogue: "Chopping wood sure calms me down."},
     ],
     sections: [
