@@ -5,7 +5,8 @@
   "main": "src/client.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack -w --progress",
+    "start": "npm-run-all -p -r webpack server",
+    "webpack": "webpack -w --progress",
     "server": "node server"
   },
   "dependencies": {
@@ -15,12 +16,13 @@
   "devDependencies": {
     "@types/howler": "^2.2.4",
     "@types/lodash": "^4.14.149",
-    "express": "4.15.4",
-    "ts-loader": "^8.0.11",
+    "express": "^4.17.2",
+    "npm-run-all": "^4.1.5",
+    "ts-loader": "^9.2.6",
     "ts-unused-exports": "^6.2.4",
-    "typescript": "^4.0.5",
-    "webpack": "^5.4.0",
-    "webpack-cli": "^4.2.0"
+    "typescript": "^4.5.4",
+    "webpack": "^5.66.0",
+    "webpack-cli": "^4.9.1"
   },
   "author": "",
   "license": "ISC"

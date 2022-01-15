@@ -3,6 +3,7 @@ import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
 import { findObjectInstanceById } from 'app/content/objects';
 import { editingState } from 'app/development/tileEditor';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { directionMap } from 'app/utils/field';
 import { isObjectInsideTarget, pad } from 'app/utils/index';
 
 import {
@@ -19,6 +20,7 @@ export class Teleporter implements ObjectInstance {
     active: boolean = false;
     status: ObjectStatus = 'normal';
     animationTime = 0;
+    disabledTime = 0;
     linkedObject: Teleporter;
     constructor(state: GameState, definition: EntranceDefinition) {
         this.definition = definition;
@@ -47,6 +49,10 @@ export class Teleporter implements ObjectInstance {
         }
         this.animationTime += FRAME_LENGTH;
         let hero = state.hero.activeClone || state.hero;
+        if (this.disabledTime > 0) {
+            this.disabledTime -= FRAME_LENGTH;
+            return;
+        }
         if (hero.actionTarget === this || this.area !== hero.area || !isObjectInsideTarget(hero, pad(this.getHitbox(state), 8))) {
             return;
         }
@@ -64,11 +70,10 @@ export class Teleporter implements ObjectInstance {
                 // so it moves them off of it.
                 if (this.linkedObject) {
                     hero.actionTarget = this.linkedObject;
+                    this.linkedObject.disabledTime = 500;
                     hero.isUsingDoor = true;
-                    // Hero always exits the teleporter moving down currently.
-                    hero.d = 'down';
-                    hero.actionDx = 0;
-                    hero.actionDy = 1;
+                    hero.actionDx = directionMap[hero.d][0];
+                    hero.actionDy = directionMap[hero.d][1];
                 }
             });
         } else {
@@ -84,10 +89,9 @@ export class Teleporter implements ObjectInstance {
                     debugger;
                 }
                 hero.actionTarget = target;
-                // Hero always exits the teleporter moving down currently.
-                hero.d = 'down';
-                hero.actionDx = 0;
-                hero.actionDy = 1;
+                target.disabledTime = 500;
+                hero.actionDx = directionMap[hero.d][0];
+                hero.actionDy = directionMap[hero.d][1];
             });
         }
     }

@@ -105,6 +105,7 @@ enemyDefinitions.beetle = {
 enemyDefinitions.climbingBeetle = {
     animations: climbingBeetleAnimations, acceleration: 0.05, life: 2, touchDamage: 1,
     lootTable: simpleLootTable,
+    tileBehaviors: {touchHit: { damage: 1}, solid: true},
 };
 enemyDefinitions.beetleHorned = {
     animations: beetleHornedAnimations, life: 3, touchDamage: 1, update: paceAndCharge,
