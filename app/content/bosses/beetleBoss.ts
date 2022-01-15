@@ -41,7 +41,7 @@ function updateBeetleBoss(state: GameState, enemy: Enemy): void {
         // so it summons minions that drop life rewards more frequently as the player loses life.
         const summonChance = 0.2 + Math.max(0, 0.6 * (4 - state.hero.life) / 2);
         if (Math.random() < summonChance) {
-            enemy.setMode('summon');
+            enemy.setMode('retreat');
             enemy.params.summonTheta = Math.random() * 2 * Math.PI;
         } else if (Math.random() < 0.3) {
             enemy.setMode('circle');
@@ -67,6 +67,10 @@ function updateBeetleBoss(state: GameState, enemy: Enemy): void {
     } else if (enemy.mode === 'return') {
         if (moveEnemyToTargetLocation(state, enemy, section.x + section.w / 2, section.y + 16 + hitbox.h / 2) === 0) {
             enemy.setMode('choose');
+        }
+    } else if (enemy.mode === 'retreat') {
+        if (moveEnemyToTargetLocation(state, enemy, section.x + section.w / 2, section.y - 32 + hitbox.h / 2) === 0) {
+            enemy.setMode('summon');
         }
     } else if (enemy.mode === 'summon') {
         if (enemy.modeTime === 500 || enemy.modeTime === 1000 || enemy.modeTime === 1500) {
