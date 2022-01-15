@@ -77,6 +77,8 @@ export interface EffectInstance {
     // Only used by the held chakram at the moment.
     changesAreas?: boolean
     drawPriority?: DrawPriority
+    // Set this flag for objects that need to update during screen transitions, such as doorways.
+    updateDuringTransition?: boolean
     x?: number, y?: number, z?: number
     cleanup?: (state: GameState) => void
     // This is called when a user grabs a solid tile

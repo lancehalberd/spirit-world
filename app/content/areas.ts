@@ -247,6 +247,7 @@ export function enterLocation(
         || createAreaInstance(state, alternateArea);
     state.areaInstance.alternateArea = state.alternateAreaInstance;
     state.alternateAreaInstance.alternateArea = state.areaInstance;
+    state.fadeLevel = (state.areaInstance.dark || 0) / 100;
     linkObjects(state);
     state.hero.area = state.areaInstance;
     state.hero.x = location.x;
