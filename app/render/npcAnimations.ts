@@ -67,15 +67,15 @@ const vanaraBlackWalkLeftAnimation: FrameAnimation = createAnimation('gfx/npcs/v
 const vanaraBlackWalkRightAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-black-walking.png', vanaraBlackWalkingGeometry, { cols: 8, y: 1, duration: 4});
 
 const vanaraBlueGeometry: FrameDimensions = {w: 18, h: 26, content: {x: 1, y: 11, w: 16, h: 16}};
-const vanaraBlueUpAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-black-facing.png', vanaraBlueGeometry, { x: 2});
-const vanaraBlueDownAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-black-facing.png', vanaraBlueGeometry, { x: 0});
-const vanaraBlueLeftAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-black-facing.png', vanaraBlueGeometry, { x: 3});
-const vanaraBlueRightAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-black-facing.png', vanaraBlueGeometry, { x: 1});
+const vanaraBlueUpAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-blue-facing.png', vanaraBlueGeometry, { x: 2});
+const vanaraBlueDownAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-blue-facing.png', vanaraBlueGeometry, { x: 0});
+const vanaraBlueLeftAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-blue-facing.png', vanaraBlueGeometry, { x: 3});
+const vanaraBlueRightAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-blue-facing.png', vanaraBlueGeometry, { x: 1});
 const vanaraBlueWalkingGeometry: FrameDimensions = {w: 20, h: 28, content: {x: 2, y: 12, w: 16, h: 16}};
-const vanaraBlueWalkUpAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-black-walking.png', vanaraBlueWalkingGeometry, { cols: 8, y: 2, duration: 4});
-const vanaraBlueWalkDownAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-black-walking.png', vanaraBlueWalkingGeometry, { cols: 8, y: 0, duration: 4});
-const vanaraBlueWalkLeftAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-black-walking.png', vanaraBlueWalkingGeometry, { cols: 8, y: 3, duration: 4});
-const vanaraBlueWalkRightAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-black-walking.png', vanaraBlueWalkingGeometry, { cols: 8, y: 1, duration: 4});
+const vanaraBlueWalkUpAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-blue-walking.png', vanaraBlueWalkingGeometry, { cols: 8, y: 2, duration: 4});
+const vanaraBlueWalkDownAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-blue-walking.png', vanaraBlueWalkingGeometry, { cols: 8, y: 0, duration: 4});
+const vanaraBlueWalkLeftAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-blue-walking.png', vanaraBlueWalkingGeometry, { cols: 8, y: 3, duration: 4});
+const vanaraBlueWalkRightAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-blue-walking.png', vanaraBlueWalkingGeometry, { cols: 8, y: 1, duration: 4});
 
 const vanaraPurpleGeometry: FrameDimensions = {w: 18, h: 26, content: {x: 1, y: 11, w: 16, h: 16}};
 const vanaraPurpleUpAnimation: FrameAnimation = createAnimation('gfx/npcs/vanara-purple-facing.png', vanaraPurpleGeometry, { x: 2});
