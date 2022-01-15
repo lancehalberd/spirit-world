@@ -69,5 +69,5 @@ export const updateMusic = (): void => {
 
 export function playSound(key: string) {
 	const state = getState();
-	playSoundProper(key, state.settings.muteAllSounds);
+	return playSoundProper(key, state.settings.muteAllSounds);
 }

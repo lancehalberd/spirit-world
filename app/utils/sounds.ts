@@ -143,7 +143,9 @@ export function requireSound(key, callback = null) {
 const playingSounds = new Set<any>();
 export function playSound(key, muted = false) {
     const sound = requireSound(key);
-    if (sound.activeInstances >= sound.instanceLimit) return;
+    if (sound.activeInstances >= sound.instanceLimit) {
+        return;
+    }
     const now = Date.now();
     const customDelay = sound.customDelay || 40;
     if (sound.canPlayAfter && sound.canPlayAfter > now) {
@@ -153,7 +155,7 @@ export function playSound(key, muted = false) {
         if (delay <= sound.instanceLimit * customDelay) {
             setTimeout(() => playSound(key, muted), delay);
         }
-        return;
+        return sound;
     }
     sound.canPlayAfter = now + customDelay;
     try {

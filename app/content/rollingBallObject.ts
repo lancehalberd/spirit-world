@@ -1,8 +1,8 @@
-import { removeObjectFromArea } from 'app/content/areas';
+import { playAreaSound, removeObjectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { directionMap, getTileBehaviorsAndObstacles, hitTargets, isPointOpen } from 'app/utils/field';
-import { playSound, stopSound } from 'app/musicController';
+import { stopSound } from 'app/musicController';
 
 import {
     AreaInstance, BallGoal, Direction, GameState, HitProperties, HitResult,
@@ -71,11 +71,15 @@ export class RollingBallObject implements ObjectInstance {
             && (!this.linkedObject || isPointOpen(state, this.linkedObject.area, {x, y}, {canFall: true}, excludedObjects))
         ) {
             this.rollDirection = direction;
-            this.soundReference = playSound('rollingBall');
+            this.startRollingSound(state);
             if (this.linkedObject) {
                 this.linkedObject.rollDirection = direction;
+                this.linkedObject.startRollingSound(state);
             }
         }
+    }
+    startRollingSound(state) {
+        this.soundReference = playAreaSound(state, this.area, 'rollingBall');
     }
     stopRollingSound() {
         if (this.soundReference) {
@@ -96,7 +100,7 @@ export class RollingBallObject implements ObjectInstance {
                 }
                 if (Math.abs(this.x - object.x) <= 2 && Math.abs(this.y - object.y) <= 2) {
                     this.stopRollingSound();
-                    playSound('rollingBallSocket');
+                    playAreaSound(state, this.area, 'rollingBallSocket');
                     (object as BallGoal).activate(state);
                     // The activated BallGoal will render the ball in the depression, so we remove
                     // the original ball from the area.
@@ -157,7 +161,7 @@ export class RollingBallObject implements ObjectInstance {
             } else {
                 this.stopRollingSound();
                 this.linkedObject?.stopRollingSound();
-                playSound('rollingBallHit');
+                playAreaSound(state, this.area, 'rollingBallHit');
                 this.rollDirection = null;
             }
         }

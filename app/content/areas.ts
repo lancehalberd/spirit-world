@@ -28,11 +28,11 @@ import {
 } from 'app/types';
 
 
-export function playAreaSound(state: GameState, area: AreaInstance, key: string) {
+export function playAreaSound(state: GameState, area: AreaInstance, key: string): any {
     if (!key || state.areaInstance !== area) {
         return;
     }
-    playSound(key);
+    return playSound(key);
 }
 
 export function getDefaultArea(): AreaDefinition {
