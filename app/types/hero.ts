@@ -62,6 +62,7 @@ export interface ActorAnimations {
     pull?: AnimationSet
     push?: AnimationSet
     roll?: AnimationSet
+    still?: AnimationSet //displays a still frame
 }
 
 export interface Actor extends ObjectInstance {

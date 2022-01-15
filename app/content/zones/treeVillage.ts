@@ -90,7 +90,7 @@ const f0_0x0: AreaDefinition = {
     objects: [
         {id: "elderEntrance", spirit: false, status: "normal", x: 112, y: 480, type: "door", style: "cave", targetZone: "overworld", targetObjectId: "elderEntrance", d: "down"},
         {id: "elderDownstairs", spirit: false, status: "normal", x: 64, y: 256, type: "door", style: "cavernDownstairs", targetZone: "treeVillage", targetObjectId: "elderUpstairs", d: "up"},
-        {status: "normal", type: "npc", x: 128, y: 336, d: "down", behavior: "none", style: "vanara", dialogueKey: "elder", id: "treeVillage:0:0x0-npc-0"},
+        {status: "normal", type: "npc", x: 128, y: 336, d: "down", behavior: "none", style: "vanaraGray", dialogueKey: "elder", id: "treeVillage:0:0x0-npc-0"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},

@@ -6,7 +6,13 @@ import { snakeAnimations } from 'app/content/enemyAnimations';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { moveActor } from 'app/moveActor';
 import { heroAnimations } from 'app/render/heroAnimations';
-import { momAnimations, vanaraBlackAnimations, vanaraBrownAnimations, vanaraGoldAnimations, zoroAnimations } from 'app/render/npcAnimations';
+import {
+    guyAnimations, momAnimations,
+    vanaraBlackAnimations, vanaraBlueAnimations,
+    vanaraBrownAnimations, vanaraGoldAnimations,
+    vanaraGrayAnimations, vanaraPurpleAnimations,
+    vanaraRedAnimations, zoroAnimations,
+} from 'app/render/npcAnimations';
 import { shadowFrame, smallShadowFrame } from 'app/renderActor';
 import { showMessage } from 'app/render/renderMessage';
 import { drawFrame, getFrame } from 'app/utils/animations';
@@ -31,6 +37,10 @@ export const npcStyles = {
         shadowOffset: -3,
         flipRight: true,
     } as NPCStyleDefinition,
+    guy: {
+        animations: guyAnimations,
+        shadowOffset: 1,
+    } as NPCStyleDefinition,
     vanara: {
         animations: heroAnimations,
         shadowOffset: 1,
@@ -39,12 +49,28 @@ export const npcStyles = {
         animations: vanaraBlackAnimations,
         shadowOffset: 1,
     } as NPCStyleDefinition,
+    vanaraBlue: {
+        animations: vanaraBlueAnimations,
+        shadowOffset: 1,
+    } as NPCStyleDefinition,
     vanaraBrown: {
         animations: vanaraBrownAnimations,
         shadowOffset: 1,
     } as NPCStyleDefinition,
     vanaraGold: {
         animations: vanaraGoldAnimations,
+        shadowOffset: 1,
+    } as NPCStyleDefinition,
+    vanaraGray: {
+        animations: vanaraGrayAnimations,
+        shadowOffset: 1,
+    } as NPCStyleDefinition,
+    vanaraPurple: {
+        animations: vanaraPurpleAnimations,
+        shadowOffset: 1,
+    } as NPCStyleDefinition,
+    vanaraRed: {
+        animations: vanaraRedAnimations,
         shadowOffset: 1,
     } as NPCStyleDefinition,
     mom: {
@@ -63,16 +89,32 @@ export const npcBehaviors = {
         npc.d = npc.definition.d || 'down';
     },
     random(state: GameState, npc: NPC) {
-        if (npc.mode === 'choose' && npc.modeTime > 200) {
+        if ((npc.mode === '' || npc.mode === 'chooseIdling')) {
+            npc.setMode('chooseWalking');
+        }
+        if (npc.mode === 'chooseWalking' && npc.modeTime > 200) {
             npc.setMode('walk');
             npc.d = sample(['up', 'down', 'left', 'right']);
         }
         if (npc.mode === 'walk') {
             if (!moveNPC(state, npc, npc.speed * directionMap[npc.d][0], npc.speed * directionMap[npc.d][1], {})) {
-                npc.setMode('choose');
+                npc.setMode('chooseWalking');
             }
             if (npc.modeTime > 2000 && Math.random() < (npc.modeTime - 700) / 3000) {
-                npc.setMode('choose');
+                npc.setMode('chooseWalking');
+            }
+        }
+    },
+    idle(state: GameState, npc: NPC) {
+        if (npc.mode === '' || npc.mode === 'chooseWalking') {
+            npc.setMode('chooseIdling');
+        }
+        if (npc.mode === 'chooseIdling' && npc.modeTime > 2000 && Math.random() < (npc.modeTime - 700) / 3000) {
+            npc.setMode('idle');
+        }
+        if (npc.mode === 'idle') {
+            if (npc.modeTime > 190) {
+                npc.setMode('chooseIdling');
             }
         }
     }
@@ -119,7 +161,8 @@ export class NPC implements Actor, ObjectInstance  {
     w = 16;
     h = 16;
     animationTime = 0;
-    mode = 'choose';
+    animations = 'still';
+    mode = '';
     modeTime = 0;
     speed = 1;
     status: ObjectStatus = 'normal';
@@ -136,9 +179,23 @@ export class NPC implements Actor, ObjectInstance  {
     }
     getFrame() {
         const animationStyle = npcStyles[this.definition.style];
-        const animations = this.mode === 'choose'
-            ? animationStyle.animations.idle
-            : animationStyle.animations.move || animationStyle.animations.idle;
+        let animations;
+        switch (this.mode) {
+            case 'chooseIdling':
+                animations = animationStyle.animations.still || animationStyle.animations.idle;
+                break;
+            case 'chooseMoving':
+                animations = animationStyle.animations.idle;
+                break;
+            case 'idle':
+                animations = animationStyle.animations.idle;
+                break;
+            case 'walk':
+                animations = animationStyle.animations.move;
+                break;
+            default:
+                animations = animationStyle.animations.still || animationStyle.animations.idle;
+        }
         return getFrame(animations[this.d], this.animationTime);
     }
     getHitbox(state: GameState): Rect {

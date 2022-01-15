@@ -1010,7 +1010,7 @@ const sf3_0x0: AreaDefinition = {
     ],
     objects: [
         {status: "normal", id: "helixTopTeleporter", x: 256, y: 240, targetZone: "helix", targetObjectId: "helixTopTeleporter", type: "teleporter", locationCue: "Helix Bridge"},
-        {status: "normal", id: "helix:s3:0x0-npc-0", x: 256, y: 144, d: "down", behavior: "none", style: "vanara", type: "npc", dialogueKey: "vanaraCommander"},
+        {status: "normal", id: "helix:s3:0x0-npc-0", x: 256, y: 144, d: "down", behavior: "none", style: "vanaraPurple", type: "npc", dialogueKey: "vanaraCommander"},
         {status: "normal", id: "helix:s3:0x0-teleporter-0", x: 208, y: 96, type: "teleporter"},
     ],
     sections: [

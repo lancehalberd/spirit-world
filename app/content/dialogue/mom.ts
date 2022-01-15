@@ -16,8 +16,7 @@ dialogueHash.mom = {
             },
             isExclusive: true,
             text: [
-                `May our ancestors watch over you.
-                `,
+                `May our ancestors watch over you.`,
                 `{@mom.rest}`,
             ],
         },
@@ -45,9 +44,8 @@ dialogueHash.mom = {
                 `Welcome home son!
                 {|}Try not to get too wet going into our cave.
                 {|}Talk to me again if you want a hint.`,
-                `I'm your mom. I'm a human disguised as a Vanara...
-                {|}Actually I just don't have my own graphics yet!
-                {|}You should head Southwest to the Vanara Village if you want to learn more about your powers.`,
+                `You should head Southwest to the Vanara Village if you want to learn
+                {|}more about the Vanara powers you inherited from your father.`,
                 `This waterfall is a great disguise for our cave, but I wish it wasn't so cold!`,
                 `{@mom.rest}`,
             ],
