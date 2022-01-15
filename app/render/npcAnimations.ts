@@ -15,10 +15,10 @@ import createAnimation
 const humanGeometry: FrameDimensions = {w: 24, h: 36, content: {x: 4, y: 20, w: 16, h: 16}};
 const momImage: string = 'gfx/npcs/24x36-mom.png'; 
 
-const momUpAnimation: FrameAnimation = createAnimation(momImage, humanGeometry, { x: 0, y: 3});
-const momDownAnimation: FrameAnimation = createAnimation(momImage, humanGeometry, { x: 0, y: 0});
-const momLeftAnimation: FrameAnimation = createAnimation(momImage, humanGeometry, { x: 0, y: 2});
-const momRightAnimation: FrameAnimation = createAnimation(momImage, humanGeometry, { x: 0, y: 1});
+const momUpAnimation: FrameAnimation = createAnimation(momImage, humanGeometry, { y: 3});
+const momDownAnimation: FrameAnimation = createAnimation(momImage, humanGeometry, { y: 0});
+const momLeftAnimation: FrameAnimation = createAnimation(momImage, humanGeometry, { y: 2});
+const momRightAnimation: FrameAnimation = createAnimation(momImage, humanGeometry, { y: 1});
 const momIdleUpAnimation: FrameAnimation =
     createAnimation(momImage, humanGeometry, { cols: 4, y: 3, duration: 4});
 const momIdleDownAnimation: FrameAnimation =
@@ -36,14 +36,14 @@ const momWalkLeftAnimation: FrameAnimation =
 const momWalkRightAnimation: FrameAnimation =
     createAnimation(momImage, humanGeometry, { cols: 4, y: 5, duration: 4});
 
-const guyUpAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', humanGeometry, { x: 2});
-const guyDownAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', humanGeometry, { x: 0});
-const guyLeftAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', humanGeometry, { x: 3});
-const guyRightAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', humanGeometry, { x: 1});
-const guyWalkUpAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', humanGeometry, { cols: 4, y: 3, duration: 4});
-const guyWalkDownAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', humanGeometry, { cols: 4, y: 0, duration: 4});
-const guyWalkLeftAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', humanGeometry, { cols: 4, y: 2, duration: 4});
-const guyWalkRightAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', humanGeometry, { cols: 4, y: 1, duration: 4});
+const guyUpAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', humanGeometry, { y: 3});
+const guyDownAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', humanGeometry, { y: 0});
+const guyLeftAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', humanGeometry, { y: 2});
+const guyRightAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', humanGeometry, { y: 1});
+const guyWalkUpAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', humanGeometry, { cols: 4, y: 7, duration: 4});
+const guyWalkDownAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', humanGeometry, { cols: 4, y: 4, duration: 4});
+const guyWalkLeftAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', humanGeometry, { cols: 4, y: 6, duration: 4});
+const guyWalkRightAnimation: FrameAnimation = createAnimation('gfx/npcs/24x36-guy.png', humanGeometry, { cols: 4, y: 5, duration: 4});
 
 const zoroGeometry: FrameDimensions = {w: 21, h: 32, content: {x: 2, y: 16, w: 16, h: 16}};
 const zoroUpAnimation: FrameAnimation = createAnimation('gfx/npcs/21x32-zoro.png', zoroGeometry, { x: 2});
