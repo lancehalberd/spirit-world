@@ -37,7 +37,7 @@ export function useTool(
     const { chargeLevel, element } = getChargeLevelAndElement(state, hero, tool);
     switch (tool) {
         case 'bow':
-            if (state.hero.magic < 0) {
+            if (state.hero.magic <= 0) {
                 return;
             }
             let speed = 4;
@@ -93,7 +93,7 @@ export function useTool(
             return;
         case 'clone':
             if (!state.hero.clones.length) {
-                if (state.hero.magic < 0 || state.hero.life < 2) {
+                if (state.hero.magic <= 0 || state.hero.life < 2) {
                     return;
                 }
                 state.hero.magic -= 10;
@@ -113,7 +113,7 @@ export function useTool(
                 hero.toolOnCooldown = null;
                 return;
             }
-            if (state.hero.magic < 0) {
+            if (state.hero.magic <= 0) {
                 return;
             }
             const staffLevel = state.hero.activeTools.staff

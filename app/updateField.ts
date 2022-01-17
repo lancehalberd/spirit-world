@@ -58,6 +58,9 @@ export function updateField(this: void, state: GameState) {
     removeDefeatedEnemies(state, state.alternateAreaInstance);
     removeDefeatedEnemies(state, state.areaInstance);
     updateAreaObjects(state, state.areaInstance);
+    if (state.nextAreaInstance) {
+        updateAreaObjects(state, state.nextAreaInstance);
+    }
     updateAreaObjects(state, state.alternateAreaInstance);
 }
 export function updateAreaObjects(this: void, state: GameState, area: AreaInstance) {
@@ -120,7 +123,7 @@ export function updateAreaObjects(this: void, state: GameState, area: AreaInstan
         }
     }
     for (const effect of area?.effects || []) {
-        if (isScreenTransitioning) {
+        if (isScreenTransitioning && !effect.updateDuringTransition) {
             continue;
         }
         // Time passes slowly for everything but the astral projection while meditating and things it is

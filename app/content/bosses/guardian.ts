@@ -7,7 +7,8 @@ import {
     moveEnemy,
 } from 'app/content/enemies';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
-import { heroAnimations, heroSpiritAnimations } from 'app/render/heroAnimations';
+import { heroSpiritAnimations } from 'app/render/heroAnimations';
+import { vanaraBlueAnimations } from 'app/render/npcAnimations';
 import { directionMap, getDirection } from 'app/utils/field';
 
 
@@ -22,7 +23,9 @@ enemyDefinitions.guardianProjection = {
     },
 };
 enemyDefinitions.guardian = {
-    animations: heroAnimations, life: 12, touchDamage: 0, update: updateGuardian,
+    // This should match the NPC style of the Tomb Guardian.
+    animations: vanaraBlueAnimations,
+    life: 12, touchDamage: 0, update: updateGuardian,
     onHit(this: void, state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
         const result = enemy.defaultOnHit(state, hit);
         if (enemy.life > 0) {

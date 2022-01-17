@@ -1,17 +1,24 @@
 Test at http://localhost:81/alttp/public/
 
-Low Priority Bugs:
+Known Bugs:
+    - Clone tool bugs
+        - Mana regen is wrong when using clone tools (seems to multiply consumption/regen by number of clones)
+        - Should destroy clones when the clone technique is unequipped.
+        - Clones should all share the same tools (store tools on state instead of hero)
+        - Unable to charge weapon while clones are active, multiple clones don't attack at the same time
+        - Staff won't be placed when controlling multiple clones (one places, another retrieves?)
+            - Should probably just have the primary clone place the staff
+        - Check if multiple clones can charge weapon + fire bow
+    - Picked up items are invisible while using cloak
+    - Piercing projectiles that can push things should be stopped by the first object they push
+        or not be able to push additional objects, for example, the charged chakram.
     - Enemies can walk on stairs cases and over bead flows
         - Add an invisible enemy wall object?
     - Astral Projection appears in front of waterfall graphics only when south of main body in waterfall tower.
     - Pushing on a solid object sitting on thorny ground shouldn't hurt you:
         -return tileBehaviors and objectBehaviors separately, only damage if tile is solid+damaging.
-    - Doors don't appear open when moving into them from a different section
-        I think this is because the door doesn't update until it is in the current areaInstance
     - nextAreaInstance is not rendered in Safari
     - frost grenade blast isn't centered.
-    - Don't open enemy doors when bosses are still alive?
-        - Tomb boss door can open when killing snakes in some cases.
     - Enemies with small hitboxes are checking pixels outside of their hitbox while moving.
         - For example snakes when moving left/right will be forced to move up if there is a wall to their south.
 
@@ -24,25 +31,10 @@ Graphics:
 
 
 Current tasks:
-    - Make Beetle Boss retreat north before summoning minions
-
-    - Probably should move hero back to safe location on reviving.
-    - Bug fixes
-        - Clone tool bugs
-            - Mana regen is wrong when using clone tools (seems to multiply consumption/regen by number of clones)
-            - Should destroy clones when the clone technique is unequipped.
-            - Clones should all share the same tools (store tools on state instead of hero)
-            - Unable to charge weapon while clones are active, multiple clones don't attack at the same time
-            - Staff won't be placed when controlling multiple clones (one places, another retrieves?)
-                - Should probably just have the primary clone place the staff
-            - Check if multiple clones can charge weapon + fire bow
-        - Picked up items are invisible while using cloak
-        - Piercing projectiles that can push things should be stopped by the first object they push
-            or not be able to push additional objects, for example, the charged chakram.
+    - Game occasionally plays small bits of music while muted.
 
     - Discharge should optionally include the enemy source, and be removed if the source is defeated before the tell duration is over.
         - Add `isActive` to enemy to indicate whether it is a valid source for attacks: if (sourceEnemy && !sourceEnemy.isActive(state)) { ... }
-
 
     Staff Tower
         - Elevator only in spirit world (similar to cocoon)
@@ -81,6 +73,8 @@ Current tasks:
 
     Make mutation transition use the same area instance so contents don't reset
         - Will need to add special handling to remove extra ice tiles from frost beast+heat sink battles.
+
+    - Probably should move hero back to safe location on reviving.
 
     - Randomizer improvements
         - Add a goal

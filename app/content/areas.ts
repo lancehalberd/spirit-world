@@ -247,6 +247,7 @@ export function enterLocation(
         || createAreaInstance(state, alternateArea);
     state.areaInstance.alternateArea = state.alternateAreaInstance;
     state.alternateAreaInstance.alternateArea = state.areaInstance;
+    state.fadeLevel = (state.areaInstance.dark || 0) / 100;
     linkObjects(state);
     state.hero.area = state.areaInstance;
     state.hero.x = location.x;
@@ -275,6 +276,7 @@ export function enterLocation(
     // Make sure the actor is shown as swimming/wading during the transition frames.
     checkForFloorEffects(state, state.hero);
     setConnectedAreas(state, lastAreaInstance);
+    checkIfAllEnemiesAreDefeated(state, state.areaInstance);
 }
 
 export function setConnectedAreas(state: GameState, lastAreaInstance: AreaInstance) {
@@ -1003,7 +1005,9 @@ export function destroyTile(state: GameState, area: AreaInstance, target: TileCo
 
 export function checkIfAllEnemiesAreDefeated(state: GameState, area: AreaInstance): void {
     // Don't use `enemyTargets` here since this runs before it is populated sometimes.
-    const enemiesAreDefeated = !area.objects.some(e => (e instanceof Enemy) && e.isInCurrentSection(state));
+    const enemiesAreDefeated = !area.objects.some(e =>
+        (e instanceof Enemy) && e.status !== 'gone' && e.isFromCurrentSection(state)
+    );
     const { section } = getAreaSize(state);
     let playChime = false;
     for (const object of area.objects) {

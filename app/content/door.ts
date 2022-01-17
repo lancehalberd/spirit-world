@@ -681,9 +681,9 @@ export class Door implements ObjectInstance {
         this.status = definition.status || 'normal';
         // 'closedEnemy' doors will start open and only close when we confirm there are enemies in the current
         // are section.
-        if (this.status === 'closedEnemy') {
-            this.status = 'normal';
-        }
+        //if (this.status === 'closedEnemy') {
+        //    this.status = 'normal';
+        //}
         // If the player already opened this door, set it to the appropriate open status.
         if (getObjectStatus(state, this.definition)) {
             if (this.status === 'cracked') {
@@ -701,7 +701,9 @@ export class Door implements ObjectInstance {
         return this.status === 'normal' || this.status === 'blownOpen';
     }
     renderOpen(state: GameState): boolean {
-        return this.status === 'normal' || this.status === 'blownOpen' || this.status === 'frozen' || state.hero.actionTarget === this;
+        const hero = state.hero.activeClone || state.hero;
+        const heroIsTouchingDoor = boxesIntersect(hero, this.getHitbox(state));
+        return heroIsTouchingDoor || this.status === 'normal' || this.status === 'blownOpen' || this.status === 'frozen' || state.hero.actionTarget === this;
     }
     changeStatus(state: GameState, status: ObjectStatus): void {
         const wasClosed = this.status === 'closed' || this.status === 'closedSwitch' || this.status === 'closedEnemy';
@@ -1114,9 +1116,9 @@ export class Door implements ObjectInstance {
         }
     }
     renderForeground(context: CanvasRenderingContext2D, state: GameState, force = false) {
-        if (this.area !== state.areaInstance) {
-            return;
-        }
+        //if (this.area !== state.areaInstance) {
+        //    return;
+        //}
         // Hack to prevent the top of this specific door from rendering on top of the waterfall.
         if (this.definition.id === 'waterfallCaveEntrance') {
             return;
