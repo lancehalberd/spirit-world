@@ -42,6 +42,7 @@ export class Sign implements ObjectInstance {
     behaviors = {
         solid: true,
     };
+    isObject = <const>true;
     linkedObject: Sign;
     x: number;
     y: number;

@@ -1,7 +1,7 @@
 import { sample } from 'lodash';
 
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
-import { Clone } from 'app/content/clone';
+import { Clone } from 'app/content/objects/clone';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { AnimationEffect } from 'app/content/effects/animationEffect';
 import { EnemyArrow } from 'app/content/effects/arrow';

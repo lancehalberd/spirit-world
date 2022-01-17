@@ -20,6 +20,7 @@ interface Props {
 
 export class FlameWall implements EffectInstance, Props {
     area: AreaInstance = null;
+    isEffect = <const>true;
     isEnemyAttack = true;
     definition = null;
     frame: Frame;

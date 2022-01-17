@@ -1,4 +1,4 @@
-import { Door } from 'app/content/door';
+import { Door } from 'app/content/objects/door';
 import { Sign } from 'app/content/objects/sign';
 import {
     Actor, AreaInstance, BossType,
@@ -21,6 +21,7 @@ export interface LootData {
 }
 
 export interface ObjectInstance {
+    isObject: true
     area?: AreaInstance
     definition?: ObjectDefinition
     linkedObject?: ObjectInstance
@@ -70,6 +71,7 @@ export interface ObjectInstance {
 }
 
 export interface EffectInstance {
+    isEffect: true
     area?: AreaInstance
     linkedObject?: EffectInstance
     // This is used for effects that create light around them.
@@ -141,6 +143,8 @@ export interface HitProperties {
     canPush?: boolean
     // Whether this can cut ground tiles like thorns.
     cutsGround?: boolean
+    // Whether this can destroy destructible objects like pots and cracked doorways.
+    destroysObjects?: boolean
     // If this is true, the hit will knock targets away from the hit itself based on the geometry.
     knockAwayFromHit?: boolean
     knockback?: {vx: number, vy: number, vz: number}

@@ -22,6 +22,7 @@ export class FloorSwitch implements ObjectInstance {
     area: AreaInstance;
     drawPriority: DrawPriority = 'background';
     definition: FloorSwitchDefinition = null;
+    isObject = <const>true;
     x: number;
     y: number;
     status: ObjectStatus = 'normal';

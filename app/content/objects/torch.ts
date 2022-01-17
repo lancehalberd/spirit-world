@@ -17,6 +17,7 @@ export class Torch implements ObjectInstance {
     };
     drawPriority: 'sprites' = 'sprites';
     definition: SimpleObjectDefinition = null;
+    isObject = <const>true;
     isNeutralTarget = true;
     x: number;
     y: number;

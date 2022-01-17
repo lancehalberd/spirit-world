@@ -1,4 +1,4 @@
-import { getLootFrame } from 'app/content/lootObject';
+import { getLootFrame } from 'app/content/objects/lootObject';
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from 'app/gameConstants';
 import { getCheckInfo } from 'app/randomizer/checks';
 import { renderTextRow } from 'app/render/renderMessage';

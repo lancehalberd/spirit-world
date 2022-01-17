@@ -29,6 +29,7 @@ export class Staff implements ObjectInstance {
     y: number;
     ignorePits = true;
     invalid: boolean;
+    isObject = <const>true;
     topRow: number;
     bottomRow: number;
     leftColumn: number;

@@ -6,7 +6,6 @@ import {
 } from 'app/content/bitMasks';
 import { debugCanvas } from 'app/dom';
 import { showMessage } from 'app/render/renderMessage';
-import { saveGame } from 'app/state';
 import { createAnimation, drawFrame, drawFrameAt } from 'app/utils/animations';
 import { directionMap, getDirection } from 'app/utils/field';
 import { requireImage } from 'app/utils/images';
@@ -143,6 +142,8 @@ function renderWoodenDoor(this: void, context: CanvasRenderingContext2D, state: 
         let frame = woodenNorthDoorway, overFrame: Frame = null;
         if (door.renderOpen(state)) {
             if (door.definition.status === 'cracked') {
+                context.fillStyle = 'black';
+                context.fillRect(door.x, door.y, 32, 32);
                 frame = woodenNorthBlownup;
             }
         } else if (door.status === 'locked') {
@@ -240,7 +241,7 @@ function renderWoodenDoorForeground(context: CanvasRenderingContext2D, state: Ga
             frame = door.renderOpen(state) ? woodenNorthBlownup : null;
         }
         // Only draw the top 12 pixels of southern facing doors over the player.
-        drawFrame(context, {...woodenNorthDoorway, h: 12}, {...frame, x: door.x, y: door.y, h: 12});
+        drawFrame(context, {...frame, h: 12}, {...frame, x: door.x, y: door.y, h: 12});
     } else if (door.definition.d === 'left') {
         let frame = woodenWestDoorEmptyForeground;
         if (door.definition.status !== 'normal'
@@ -319,6 +320,8 @@ function renderCavernDoor(this: void, context: CanvasRenderingContext2D, state: 
         let frame = cavernNorthDoorway, overFrame: Frame = null;
         if (door.renderOpen(state)) {
             if (door.definition.status === 'cracked') {
+                context.fillStyle = 'black';
+                context.fillRect(door.x, door.y, 32, 32);
                 frame = cavernNorthBlownup;
             }
         } else if (door.status === 'locked') {
@@ -369,6 +372,7 @@ function renderCavernDoor(this: void, context: CanvasRenderingContext2D, state: 
     }
     // There is no background frame for southern doors.
 }
+
 function renderCavernDoorForeground(context: CanvasRenderingContext2D, state: GameState, door: Door) {
     if (door.definition.d === 'down') {
         let frame = cavernSouthDoorEmpty;
@@ -399,7 +403,7 @@ function renderCavernDoorForeground(context: CanvasRenderingContext2D, state: Ga
             frame = door.renderOpen(state) ? cavernNorthBlownup : null;
         }
         // Only draw the top 12 pixels of southern facing doors over the player.
-        drawFrame(context, {...cavernNorthDoorway, h: 12}, {...frame, x: door.x, y: door.y, h: 12});
+        drawFrame(context, {...frame, h: 12}, {...frame, x: door.x, y: door.y, h: 12});
     } else if (door.definition.d === 'left') {
         let frame = cavernWestDoorEmptyForeground;
         if (door.definition.status !== 'normal'
@@ -663,6 +667,7 @@ type DoorStyle = keyof typeof doorStyles;
 
 export class Door implements ObjectInstance {
     behaviors: TileBehaviors = { }
+    isObject = <const>true;
     linkedObject: Door;
     alwaysReset = true;
     updateDuringTransition = true;
@@ -875,13 +880,6 @@ export class Door implements ObjectInstance {
             return false;
         }
         this.changeStatus(state, 'normal');
-        if (this.definition.id) {
-            state.savedState.objectFlags[this.definition.id] = true;
-        } else {
-            console.error('Locked door was missing an id', this);
-            debugger;
-        }
-        saveGame();
         return true;
     }
     onGrab(state: GameState) {
@@ -890,6 +888,11 @@ export class Door implements ObjectInstance {
                 showMessage(state, 'You need a special key to open this door.');
                 state.hero.action = null;
             }
+        }
+    }
+    onDestroy(state: GameState) {
+        if (this.status === 'cracked') {
+            this.changeStatus(state, 'normal');
         }
     }
     onHit(state: GameState, hit: HitProperties): HitResult {

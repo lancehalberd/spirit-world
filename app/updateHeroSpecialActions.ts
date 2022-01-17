@@ -1,5 +1,5 @@
 import { enterLocation, getAreaSize } from 'app/content/areas';
-import { Door } from 'app/content/door';
+import { Door } from 'app/content/objects/door';
 import { CANVAS_HEIGHT, FRAME_LENGTH } from 'app/gameConstants';
 import { editingState } from 'app/development/tileEditor';
 import { getCloneMovementDeltas } from 'app/keyCommands';

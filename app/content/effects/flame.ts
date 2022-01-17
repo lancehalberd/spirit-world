@@ -45,6 +45,7 @@ interface Props {
 
 export class Flame implements EffectInstance, Props {
     drawPriority: DrawPriority = 'sprites';
+    isEffect = <const>true;
     isEnemyAttack = true;
     area: AreaInstance = null;
     frame: Frame;

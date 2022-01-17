@@ -147,6 +147,7 @@ export class NPC implements Actor, ObjectInstance  {
     d: Direction;
     definition: NPCDefinition;
     drawPriority: 'sprites' = 'sprites';
+    isObject = <const>true;
     behaviors = {
         solid: true,
     };

@@ -19,6 +19,7 @@ interface Props {
 
 export class FrostGrenade implements EffectInstance, Props {
     area: AreaInstance = null;
+    isEffect = <const>true;
     isEnemyAttack = true;
     frame: Frame;
     damage: number;

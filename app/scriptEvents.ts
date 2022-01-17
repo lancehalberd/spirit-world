@@ -1,6 +1,6 @@
 import { refreshAreaLogic } from 'app/content/areas';
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
-import { getLoot } from 'app/content/lootObject';
+import { getLoot } from 'app/content/objects/lootObject';
 import { getLootTypes } from 'app/development/objectEditor';
 import { GAME_KEY } from 'app/gameConstants';
 

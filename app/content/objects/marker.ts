@@ -12,6 +12,7 @@ export class Marker implements ObjectInstance {
     area: AreaInstance;
     drawPriority: DrawPriority = 'background';
     definition: MarkerDefinition = null;
+    isObject = <const>true;
     x: number;
     y: number;
     status: ObjectStatus = 'normal';

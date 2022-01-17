@@ -8,6 +8,7 @@ export class Decoration implements ObjectInstance {
     area: AreaInstance;
     definition: DecorationDefinition;
     drawPriority: DrawPriority = 'foreground';
+    isObject = <const>true;
     x: number;
     y: number;
     w: number;

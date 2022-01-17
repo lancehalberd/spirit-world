@@ -25,6 +25,7 @@ export class TippableObject implements ObjectInstance {
         solid: true,
     };
     isNeutralTarget = true;
+    isObject = <const>true;
     drawPriority: DrawPriority = 'sprites';
     definition = null;
     x: number;

@@ -8,7 +8,7 @@ import { isPointInShortRect, pad } from 'app/utils/index';
 import { playSound } from 'app/musicController';
 
 import {
-    AnimationEffect, AreaInstance, DrawPriority, Frame, GameState, Hero, HitProperties, MagicElement, ObjectInstance, ObjectStatus,
+    AnimationEffect, AreaInstance, DrawPriority, EffectInstance, Frame, GameState, Hero, HitProperties, MagicElement,
 } from 'app/types';
 
 const chakramGeometry = {w: 16, h: 16, content: {x: 2, y: 2, w: 12, h: 12}};
@@ -26,13 +26,13 @@ interface Props {
     source: Hero,
 }
 
-export class ThrownChakram implements ObjectInstance {
+export class ThrownChakram implements EffectInstance {
     area: AreaInstance;
-    definition = null;
     drawPriority: DrawPriority = 'sprites';
     type = 'thrownChakram' as 'thrownChakram';
     element: MagicElement;
     frame: Frame;
+    isEffect = <const>true;
     outFrames: number;
     damage: number;
     speed: number;
@@ -45,7 +45,6 @@ export class ThrownChakram implements ObjectInstance {
     h: number;
     vx: number;
     vy: number;
-    status: ObjectStatus = 'normal';
     source: Hero;
     animationTime = 0;
     sparkles: AnimationEffect[];
@@ -167,22 +166,21 @@ export class ThrownChakram implements ObjectInstance {
     }
 }
 
-export class HeldChakram implements ObjectInstance {
+export class HeldChakram implements EffectInstance {
     area: AreaInstance;
     hero: Hero;
-    definition = null;
     drawPriority: DrawPriority = 'sprites';
     type = 'heldChakram' as 'heldChakram';
     frame: Frame;
     damage: number;
     ignorePits = true;
+    isEffect = <const>true;
     x: number;
     y: number;
     w: number;
     h: number;
     vx: number;
     vy: number;
-    status: ObjectStatus = 'normal';
     animationTime = 0;
     changesAreas = true;
     updateDuringTransition = true;

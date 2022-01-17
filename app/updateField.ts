@@ -10,7 +10,7 @@ import { createAnimation } from 'app/utils/animations';
 import { getTileBehaviors } from 'app/utils/field';
 
 import {
-    AreaInstance, FrameAnimation, FrameDimensions,
+    AreaInstance, EffectInstance, FrameAnimation, FrameDimensions,
     GameState, MagicElement, ObjectInstance
 } from 'app/types';
 
@@ -36,7 +36,7 @@ export function updateField(this: void, state: GameState) {
         const priorityObjects = state.areaInstance.priorityObjects.pop();
         for (let i = 0; i < priorityObjects.length; i++) {
             if (state.areaInstance.objects.indexOf(priorityObjects[i] as ObjectInstance) < 0
-                && state.areaInstance.effects.indexOf(priorityObjects[i]) < 0
+                && state.areaInstance.effects.indexOf(priorityObjects[i] as EffectInstance) < 0
             ) {
                 priorityObjects.splice(i--, 1);
                 continue;

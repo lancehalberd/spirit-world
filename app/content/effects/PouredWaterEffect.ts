@@ -15,6 +15,7 @@ interface Props {
 export class PouredWaterEffect implements EffectInstance {
     area: AreaInstance;
     animationTime: number;
+    isEffect = <const>true;
     x: number;
     y: number;
     hasHit = false;

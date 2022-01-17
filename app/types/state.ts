@@ -1,4 +1,4 @@
-import { Staff } from 'app/content/staff';
+import { Staff } from 'app/content/objects/staff';
 
 import {
     ActiveScriptEvent, AreaGrid, AreaInstance,

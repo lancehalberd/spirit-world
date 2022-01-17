@@ -1,7 +1,7 @@
 import { AnimationEffect } from 'app/content/effects/animationEffect';
 import { checkForFloorEffects, moveEnemy } from 'app/content/enemies';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
-import { dropItemFromTable, getLoot } from 'app/content/lootObject';
+import { dropItemFromTable, getLoot } from 'app/content/objects/lootObject';
 import { addEffectToArea, getAreaSize, refreshAreaLogic } from 'app/content/areas';
 import { enemyDeathAnimation } from 'app/content/enemyAnimations';
 import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
@@ -19,6 +19,7 @@ import {
 export class Enemy implements Actor, ObjectInstance {
     type = 'enemy' as 'enemy';
     behaviors: TileBehaviors;
+    isObject = <const>true;
     action: Action = null;
     area: AreaInstance;
     drawPriority: DrawPriority = 'sprites';

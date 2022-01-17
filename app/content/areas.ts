@@ -5,7 +5,7 @@ import { TextCue } from 'app/content/effects/textCue';
 import { changeObjectStatus, createObjectInstance, findObjectInstanceById } from 'app/content/objects';
 import { allTiles } from 'app/content/tiles';
 import { logicHash, isLogicValid } from 'app/content/logic';
-import { dropItemFromTable } from 'app/content/lootObject';
+import { dropItemFromTable } from 'app/content/objects/lootObject';
 import { checkToUpdateSpawnLocation } from 'app/content/spawnLocations';
 import { zones } from 'app/content/zones';
 import { editingState } from 'app/development/tileEditor';

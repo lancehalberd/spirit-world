@@ -30,6 +30,7 @@ export class CrystalSwitch implements ObjectInstance {
     drawPriority: DrawPriority = 'sprites';
     definition: CrystalSwitchDefinition = null;
     linkedObject: CrystalSwitch;
+    isObject = <const>true;
     x: number;
     y: number;
     status: ObjectStatus = 'normal';

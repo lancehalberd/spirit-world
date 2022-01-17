@@ -180,6 +180,7 @@ export class Arrow implements EffectInstance {
     spiritCloakDamage: number;
     delay: number;
     ignoreWallsDuration: number;
+    isEffect = <const>true;
     chargeLevel: number = 0;
     element: MagicElement = null;
     x: number;

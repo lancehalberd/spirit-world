@@ -1,13 +1,13 @@
 import { find } from 'lodash';
 
 import { Enemy } from 'app/content/enemy';
-import { BigChest, ChestObject, LootObject } from 'app/content/lootObject';
-import { CrystalSwitch } from 'app/content/crystalSwitch';
-import { Door } from 'app/content/door';
-import { FloorSwitch } from 'app/content/floorSwitch';
-import { PushPullObject } from 'app/content/pushPullObject';
-import { RollingBallObject } from 'app/content/rollingBallObject';
-import { TippableObject } from 'app/content/tippableObject';
+import { BigChest, ChestObject, LootObject } from 'app/content/objects/lootObject';
+import { CrystalSwitch } from 'app/content/objects/crystalSwitch';
+import { Door } from 'app/content/objects/door';
+import { FloorSwitch } from 'app/content/objects/floorSwitch';
+import { PushPullObject } from 'app/content/objects/pushPullObject';
+import { RollingBallObject } from 'app/content/objects/rollingBallObject';
+import { TippableObject } from 'app/content/objects/tippableObject';
 
 import { AirBubbles } from 'app/content/objects/airBubbles';
 import { Decoration } from 'app/content/objects/decoration';
@@ -183,6 +183,19 @@ export function changeObjectStatus(state: GameState, object: ObjectInstance, new
 
 export function saveObjectStatus(this: void, state: GameState, definition: ObjectDefinition, flag: boolean = true): void {
     let treatment = definition.saveStatus;
+    // Make sure treatment is forever for locked doors. Might as well do the same for frozen/cracked doors.
+    if (definition.type === 'door' && (
+        definition.status === 'locked'
+        || definition.status === 'bigKeyLocked'
+        || definition.status === 'cracked'
+        || definition.status === 'frozen'
+    )) {
+        treatment = 'forever';
+        if (!definition.id) {
+            console.error('Locked door was missing an id', this);
+            debugger;
+        }
+    }
     if (!treatment) {
         if (definition.type === 'boss') {
             treatment = 'forever';

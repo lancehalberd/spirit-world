@@ -16,6 +16,8 @@ interface Props {
 export class LightningDischarge implements EffectInstance {
     area: AreaInstance;
     animationTime: number = 0;
+    isEffect = <const>true;
+    isEnemyAttack = true;
     x: number;
     y: number;
     damage: number;

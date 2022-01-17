@@ -23,6 +23,7 @@ export class RollingBallObject implements ObjectInstance {
     definition = null;
     x: number;
     y: number;
+    isObject = <const>true;
     linkedObject: RollingBallObject;
     rollDirection: Direction;
     pushCounter: number = 0;

@@ -33,6 +33,7 @@ export class AnimationEffect implements EffectInstance {
     animation: FrameAnimation;
     animationTime: number;
     behaviors: TileBehaviors;
+    isEffect = <const>true;
     x: number;
     y: number;
     z: number;

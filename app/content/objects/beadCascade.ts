@@ -32,6 +32,7 @@ export class BeadCascade implements ObjectInstance {
     y: number;
     w: number = 32;
     h: number = 16;
+    isObject = <const>true;
     status: ObjectStatus = 'normal';
     animationTime = 0;
     constructor(state: GameState, definition: BeadCascadeDefinition) {
@@ -93,6 +94,7 @@ export class BeadGrate implements ObjectInstance {
     area: AreaInstance;
     definition: SimpleObjectDefinition;
     drawPriority: DrawPriority = 'background';
+    isObject = <const>true;
     x: number;
     y: number;
     w: number = 32;
@@ -148,6 +150,7 @@ export class BeadSection implements ObjectInstance {
     definition = null;
     animationTime: number;
     drawPriority: DrawPriority = 'background';
+    isObject = <const>true;
     h: number;
     w: number = 32;
     x: number;

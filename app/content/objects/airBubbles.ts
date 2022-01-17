@@ -9,6 +9,7 @@ export class AirBubbles implements ObjectInstance {
     area: AreaInstance;
     drawPriority: 'sprites' = 'sprites';
     definition: SimpleObjectDefinition = null;
+    isObject = <const>true;
     x: number;
     y: number;
     status: ObjectStatus = 'normal';

@@ -1,4 +1,4 @@
-import { getLootFrame, normalBoots, neutralElement } from 'app/content/lootObject';
+import { getLootFrame, normalBoots, neutralElement } from 'app/content/objects/lootObject';
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
 import { characterMap } from 'app/utils/simpleWhiteFont';
 import { createAnimation, drawFrame, drawFrameCenteredAt } from 'app/utils/animations';

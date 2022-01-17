@@ -66,6 +66,7 @@ export class Escalator implements ObjectInstance {
     offsetY: number = 0;
     definition: EscalatorDefinition;
     drawPriority: DrawPriority = 'background';
+    isObject = <const>true;
     x: number;
     y: number;
     pattern: CanvasPattern;

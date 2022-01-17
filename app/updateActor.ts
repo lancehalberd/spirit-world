@@ -63,6 +63,9 @@ export function updateHero(this: void, state: GameState, hero: Hero) {
     if (!blockNormalActions) {
         // This update relates to hero performing or completing actions + movement.
         updateHeroStandardActions(state, hero);
+        if (!hero.area) {
+            return;
+        }
         checkForEnemyDamage(state, hero);
         // Mostly don't check for pits/damage when the player cannot control themselves
         if (!hero.isAstralProjection) {

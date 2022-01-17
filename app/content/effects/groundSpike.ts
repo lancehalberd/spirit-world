@@ -21,6 +21,7 @@ const fadeDuration = 200;
 export class GroundSpike implements EffectInstance, Props {
     drawPriority: DrawPriority = 'sprites';
     area: AreaInstance = null;
+    isEffect = <const>true;
     isEnemyAttack = true;
     frame: Frame;
     damage: number;

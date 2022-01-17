@@ -1,4 +1,4 @@
-import { destroyTile, resetTileBehavior } from 'app/content/areas';
+import { destroyTile, removeEffectFromArea, removeObjectFromArea, resetTileBehavior } from 'app/content/areas';
 import { allTiles } from 'app/content/tiles';
 import { isPixelInShortRect, rectanglesOverlap } from 'app/utils/index';
 
@@ -403,31 +403,14 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
             const dx = hitbox.x + hitbox.w / 2 - hit.hitCircle.x;
             const dy = hitbox.y + hitbox.h / 2 - hit.hitCircle.y;
             if (dx * dx + dy * dy < r2) {
-                if (object.onHit) {
-                    let knockback = hit.knockback;
-                    if (!hit.knockback && hit.knockAwayFrom) {
-                        const dx = (hitbox.x + hitbox.w / 2) - hit.knockAwayFrom.x;
-                        const dy = (hitbox.y + hitbox.h / 2) - hit.knockAwayFrom.y;
-                        const mag = Math.sqrt(dx * dx + dy * dy);
-                        knockback = mag ? {vx: 4 * dx / mag, vy: 4 * dy / mag, vz: 0} : null;
-                    }
-                    const result = object.onHit(state, { ...hit, direction: getDirection(dx, dy), knockback });
-                    combinedResult.hit ||= result.hit;
-                    combinedResult.blocked ||= result.blocked;
-                    combinedResult.pierced &&= ((!result.hit && !result.blocked) || result.pierced);
-                    combinedResult.stopped ||= result.stopped;
-                    combinedResult.setElement ||= result.setElement;
-                    combinedResult.knockback ||= result.knockback;
-                    combinedResult.reflected ||= result.reflected;
-                    if (result.hit || result.blocked) {
-                        combinedResult.hitTargets.add(object);
-                    }
-                } else if (object.behaviors?.solid) {
-                    combinedResult.hit = true;
-                    if (!object.behaviors.low) {
-                        combinedResult.pierced = false;
-                    }
+                let knockback = hit.knockback;
+                if (!hit.knockback && hit.knockAwayFrom) {
+                    const dx = (hitbox.x + hitbox.w / 2) - hit.knockAwayFrom.x;
+                    const dy = (hitbox.y + hitbox.h / 2) - hit.knockAwayFrom.y;
+                    const mag = Math.sqrt(dx * dx + dy * dy);
+                    knockback = mag ? {vx: 4 * dx / mag, vy: 4 * dy / mag, vz: 0} : null;
                 }
+                applyHitToObject(state, object, {...hit, direction: getDirection(dx, dy), knockback}, combinedResult);
             }
         } else if (hit.hitRay) {
             const fakeRadius = hitbox.w / 4 + hitbox.h / 4;
@@ -437,40 +420,23 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
             );
             const didHit = distance <= (hit.hitRay.r + fakeRadius);
             if (didHit) {
-                if (object.onHit) {
-                    let knockback = hit.knockback;
-                    if (!knockback && hit.knockAwayFrom) {
-                        const dx = (hitbox.x + hitbox.w / 2) - hit.knockAwayFrom.x;
-                        const dy = (hitbox.y + hitbox.h / 2) - hit.knockAwayFrom.y;
-                        const mag = Math.sqrt(dx * dx + dy * dy);
-                        knockback = mag ? {vx: 4 * dx / mag, vy: 4 * dy / mag, vz: 2} : null;
-                    }
-                    if (!knockback && hit.knockAwayFromHit) {
-                        if (distance) {
-                            knockback = {vx: -4 * dx / distance, vy: -4 * dy / distance, vz: 2};
-                        } else {
-                            const dx = hit.hitRay.x2 - hit.hitRay.x1, dy = hit.hitRay.y2 - hit.hitRay.y1;
-                            const distance = Math.sqrt(dx * dx + dy * dy);
-                            knockback = {vx: 4 * dx / distance, vy: 4 * dy / distance, vz: 2};
-                        }
-                    }
-                    const result = object.onHit(state, { ...hit, direction: getDirection(dx, dy), knockback });
-                    combinedResult.hit ||= result.hit;
-                    combinedResult.blocked ||= result.blocked;
-                    combinedResult.pierced &&= ((!result.hit && !result.blocked) || result.pierced);
-                    combinedResult.stopped ||= result.stopped;
-                    combinedResult.setElement ||= result.setElement;
-                    combinedResult.knockback ||= result.knockback;
-                    combinedResult.reflected ||= result.reflected;
-                    if (result.hit || result.blocked) {
-                        combinedResult.hitTargets.add(object);
-                    }
-                } else if (object.behaviors?.solid) {
-                    combinedResult.hit = true;
-                    if (!object.behaviors.low) {
-                        combinedResult.pierced = false;
+                let knockback = hit.knockback;
+                if (!knockback && hit.knockAwayFrom) {
+                    const dx = (hitbox.x + hitbox.w / 2) - hit.knockAwayFrom.x;
+                    const dy = (hitbox.y + hitbox.h / 2) - hit.knockAwayFrom.y;
+                    const mag = Math.sqrt(dx * dx + dy * dy);
+                    knockback = mag ? {vx: 4 * dx / mag, vy: 4 * dy / mag, vz: 2} : null;
+                }
+                if (!knockback && hit.knockAwayFromHit) {
+                    if (distance) {
+                        knockback = {vx: -4 * dx / distance, vy: -4 * dy / distance, vz: 2};
+                    } else {
+                        const dx = hit.hitRay.x2 - hit.hitRay.x1, dy = hit.hitRay.y2 - hit.hitRay.y1;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        knockback = {vx: 4 * dx / distance, vy: 4 * dy / distance, vz: 2};
                     }
                 }
+                applyHitToObject(state, object, {...hit, direction: getDirection(dx, dy), knockback}, combinedResult);
             }
         } else if (hit.hitbox && rectanglesOverlap(hitbox, hit.hitbox)) {
             const direction = getDirection(
@@ -484,24 +450,7 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
                 const mag = Math.sqrt(dx * dx + dy * dy);
                 knockback = mag ? {vx: 4 * dx / mag, vy: 4 * dy / mag, vz: 0} : null;
             }
-            if (object.onHit) {
-                const result = object.onHit(state, { ...hit, direction, knockback });
-                combinedResult.hit ||= result.hit;
-                combinedResult.blocked ||= result.blocked;
-                combinedResult.pierced &&= ((!result.hit && !result.blocked) || result.pierced);
-                combinedResult.stopped ||= result.stopped;
-                combinedResult.setElement ||= result.setElement;
-                combinedResult.knockback ||= result.knockback;
-                combinedResult.reflected ||= result.reflected;
-                if (result.hit || result.blocked) {
-                    combinedResult.hitTargets.add(object);
-                }
-            } else if (object.behaviors?.solid) {
-                combinedResult.hit = true;
-                if (!object.behaviors.low) {
-                    combinedResult.pierced = false;
-                }
-            }
+            applyHitToObject(state, object, {...hit, direction, knockback}, combinedResult);
         }
     }
     let hitTiles = [];
@@ -511,6 +460,7 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
     if (hit.hitTiles && hit.hitCircle) {
         hitTiles = [...hitTiles, ...getTilesInCircle(area, hit.hitCircle)];
     }
+    // TODO: Get tiles hit by ray
     for (const target of hitTiles) {
         const behavior = area.behaviorGrid?.[target.y]?.[target.x];
         // Ice hits that effect tiles cover them in ice as long as they aren't pits or walls.
@@ -581,6 +531,77 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
     }
 
     return combinedResult;
+}
+
+/*
+
+            // Destroy destructible tiles like bushes/thorns (calc min/max row, min/max col then test each tile)
+            const hitObjects: ObjectInstance[] = [];
+            for (const object of this.area.objects) {
+                if (!object.getHitbox) {
+                    continue;
+                }
+                const hitbox = object.getHitbox(state);
+                const r = (hitbox.w + hitbox.h) / 4;
+                const dx = this.x - hitbox.x - hitbox.w / 2;
+                const dy = this.y - hitbox.y - hitbox.h / 2;
+                const distance = Math.sqrt(dx*dx+dy*dy);
+                if (distance - r < EXPLOSION_RADIUS) {
+                    hitObjects.push(object);
+                }
+            }
+            for (const object of hitObjects) {
+                const hitbox = object.getHitbox(state);
+                const dx = this.x - hitbox.x - hitbox.w / 2;
+                const dy = this.y - hitbox.y - hitbox.h / 2;
+                if (object.onDestroy) {
+                    object.onDestroy(state, -dx, -dy);
+                } else if (object.behaviors?.destructible) {
+                    removeEffectFromArea(state, object);
+                } else if (object.onHit) {
+                    object.onHit(state, { damage: 4, direction: getDirection(-dx, -dy) });
+                }
+            }
+
+*/
+
+function isObject(object: ObjectInstance | EffectInstance): object is ObjectInstance {
+    return !!(object as ObjectInstance).isObject;
+}
+
+function applyHitToObject(state: GameState, object: ObjectInstance | EffectInstance, hit: HitProperties, combinedResult: HitResult) {
+    if (object.onHit) {
+        const result = object.onHit(state, hit);
+        combinedResult.hit ||= result.hit;
+        combinedResult.blocked ||= result.blocked;
+        combinedResult.pierced &&= ((!result.hit && !result.blocked) || result.pierced);
+        combinedResult.stopped ||= result.stopped;
+        combinedResult.setElement ||= result.setElement;
+        combinedResult.knockback ||= result.knockback;
+        combinedResult.reflected ||= result.reflected;
+        if (result.hit || result.blocked) {
+            combinedResult.hitTargets.add(object);
+        }
+    } else if (object.behaviors?.solid) {
+        combinedResult.hit = true;
+        if (!object.behaviors.low) {
+            combinedResult.pierced = false;
+        }
+    }
+    if (hit.destroysObjects) {
+        if (isObject(object)) {
+            if ((object as ObjectInstance).onDestroy) {
+                const [dx, dy] = directionMap[hit.direction];
+                object.onDestroy(state, dx, dy);
+            } else if (object.behaviors?.destructible) {
+                removeObjectFromArea(state, object);
+            }
+        } else {
+            if (object.behaviors?.destructible) {
+                removeEffectFromArea(state, object);
+            }
+        }
+    }
 }
 
 export function coverTile(

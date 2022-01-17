@@ -1,7 +1,7 @@
 import { addObjectToArea, addEffectToArea } from 'app/content/areas';
 import { Arrow } from 'app/content/effects/arrow';
-import { Clone }  from 'app/content/clone';
-import { Staff } from 'app/content/staff';
+import { Clone }  from 'app/content/objects/clone';
+import { Staff } from 'app/content/objects/staff';
 import { directionMap, getDirection } from 'app/utils/field';
 
 import { ActiveTool, GameState, Hero, MagicElement } from 'app/types'

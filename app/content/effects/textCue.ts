@@ -20,6 +20,7 @@ export class TextCue implements EffectInstance {
     done = false;
     drawPriority: DrawPriority = 'hud';
     behaviors: TileBehaviors;
+    isEffect = <const>true;
     x: number;
     y: number;
     text: string;

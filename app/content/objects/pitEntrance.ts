@@ -14,6 +14,7 @@ export class PitEntrance implements ObjectInstance {
     area: AreaInstance;
     drawPriority: DrawPriority = 'background';
     definition: EntranceDefinition = null;
+    isObject = <const>true;
     x: number;
     ignorePits = true;
     y: number;

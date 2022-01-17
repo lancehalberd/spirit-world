@@ -1,5 +1,5 @@
 import { addEffectToArea } from 'app/content/areas';
-import { destroyClone } from 'app/content/clone';
+import { destroyClone } from 'app/content/objects/clone';
 import { getChargedArrowAnimation } from 'app/content/effects/arrow';
 import {
     arrowAnimations, bowAnimations,
@@ -27,6 +27,7 @@ export class Hero implements Actor, SavedHeroData {
     isAstralProjection = false;
     isClone = false;
     isAllyTarget = true;
+    isObject = <const>true;
     // These aren't used by the Hero itself since it has special handling,
     // but these are used on objects that inherit from hero: AstralProjection and Clone.
     drawPriority: DrawPriority = 'sprites';

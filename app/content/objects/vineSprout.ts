@@ -68,6 +68,7 @@ export class VineSprout implements ObjectInstance {
     area: AreaInstance;
     drawPriority: DrawPriority = 'background';
     definition: SimpleObjectDefinition = null;
+    isObject = <const>true;
     growing = false;
     sprouting = false;
     x: number;

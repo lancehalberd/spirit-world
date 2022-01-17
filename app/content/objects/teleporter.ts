@@ -21,6 +21,7 @@ export class Teleporter implements ObjectInstance {
     status: ObjectStatus = 'normal';
     animationTime = 0;
     disabledTime = 0;
+    isObject = <const>true;
     linkedObject: Teleporter;
     constructor(state: GameState, definition: EntranceDefinition) {
         this.definition = definition;

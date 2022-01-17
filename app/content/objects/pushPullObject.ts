@@ -20,6 +20,7 @@ export class PushPullObject implements ObjectInstance {
     x: number;
     y: number;
     grabDirection: Direction;
+    isObject = <const>true;
     linkedObject: PushPullObject;
     pullingHeroDirection: Direction;
     pushFrame = 0;

@@ -21,6 +21,7 @@ interface Props {
 export class ThrownObject implements EffectInstance {
     area: AreaInstance;
     behaviors: TileBehaviors;
+    isEffect = <const>true;
     linkedObject: ThrownObject;
     type = 'thrownObject' as 'thrownObject';
     frame: Frame;

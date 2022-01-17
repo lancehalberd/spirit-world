@@ -1,4 +1,4 @@
-import { Clone } from 'app/content/clone';
+import { Clone } from 'app/content/objects/clone';
 import { Enemy } from 'app/content/enemy';
 import { editingState, renderEditor } from 'app/development/tileEditor';
 import { createCanvasAndContext, mainContext } from 'app/dom';

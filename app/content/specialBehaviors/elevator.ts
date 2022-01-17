@@ -1,4 +1,4 @@
-import { Door } from 'app/content/door';
+import { Door } from 'app/content/objects/door';
 import { Sign } from 'app/content/objects/sign';
 import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';

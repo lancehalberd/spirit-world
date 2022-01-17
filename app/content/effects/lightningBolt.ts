@@ -35,6 +35,7 @@ const cloudFrames = [
 
 export class LightningBolt implements EffectInstance, Props {
     area: AreaInstance = null;
+    isEffect = <const>true;
     isEnemyAttack = true;
     frame: Frame;
     damage: number;

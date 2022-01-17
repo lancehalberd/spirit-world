@@ -4,7 +4,7 @@ import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import {
     addEffectToArea, addObjectToArea, destroyTile, enterLocation, removeEffectFromArea,
 } from 'app/content/areas';
-import { destroyClone } from 'app/content/clone';
+import { destroyClone } from 'app/content/objects/clone';
 import { CloneExplosionEffect } from 'app/content/effects/CloneExplosionEffect';
 import { AstralProjection } from 'app/content/objects/astralProjection';
 import { zones } from 'app/content/zones';

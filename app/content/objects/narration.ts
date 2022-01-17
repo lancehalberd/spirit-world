@@ -18,6 +18,7 @@ export class Narration implements ObjectInstance {
     area: AreaInstance;
     definition: NarrationDefinition;
     drawPriority = <const>'foreground';
+    isObject = <const>true;
     x: number;
     y: number;
     ignorePits = true;

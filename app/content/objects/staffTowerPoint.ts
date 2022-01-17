@@ -1,5 +1,5 @@
 import { enterLocation } from 'app/content/areas';
-import { getLoot } from 'app/content/lootObject';
+import { getLoot } from 'app/content/objects/lootObject';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 
 import {
@@ -18,6 +18,7 @@ export class StaffTowerPoint implements ObjectInstance {
     behaviors = {
         solid: true,
     };
+    isObject = <const>true;
     x: number;
     y: number;
     status: ObjectStatus = 'normal';

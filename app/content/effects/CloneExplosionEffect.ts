@@ -1,9 +1,8 @@
 import { removeEffectFromArea } from 'app/content/areas';
 import { EXPLOSION_RADIUS, FRAME_LENGTH } from 'app/gameConstants';
-//import { drawFrame, getFrame } from 'app/utils/animations';
-import { getDirection } from 'app/utils/field';
+import { hitTargets } from 'app/utils/field';
 
-import { AreaInstance, GameState, EffectInstance, ObjectInstance } from 'app/types';
+import { AreaInstance, GameState, EffectInstance } from 'app/types';
 
 
 interface Props {
@@ -17,6 +16,7 @@ export class CloneExplosionEffect implements EffectInstance {
     area: AreaInstance;
     animationTime: number;
     destroyedObjects: boolean = false;
+    isEffect = <const>true;
     x: number;
     y: number;
     constructor({x = 0, y = 0 }: Props) {
@@ -27,35 +27,17 @@ export class CloneExplosionEffect implements EffectInstance {
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;
         const r = EXPLOSION_RADIUS * Math.max(0.25, Math.min(1, 2 * this.animationTime / duration));
-        if (!this.destroyedObjects && r >= EXPLOSION_RADIUS) {
-            this.destroyedObjects = true;
-            // Destroy destructible tiles like bushes/thorns (calc min/max row, min/max col then test each tile)
-            const hitObjects: ObjectInstance[] = [];
-            for (const object of this.area.objects) {
-                if (!object.getHitbox) {
-                    continue;
-                }
-                const hitbox = object.getHitbox(state);
-                const r = (hitbox.w + hitbox.h) / 4;
-                const dx = this.x - hitbox.x - hitbox.w / 2;
-                const dy = this.y - hitbox.y - hitbox.h / 2;
-                const distance = Math.sqrt(dx*dx+dy*dy);
-                if (distance - r < EXPLOSION_RADIUS) {
-                    hitObjects.push(object);
-                }
-            }
-            for (const object of hitObjects) {
-                const hitbox = object.getHitbox(state);
-                const dx = this.x - hitbox.x - hitbox.w / 2;
-                const dy = this.y - hitbox.y - hitbox.h / 2;
-                if (object.onDestroy) {
-                    object.onDestroy(state, -dx, -dy);
-                } else if (object.behaviors?.destructible) {
-                    removeEffectFromArea(state, object);
-                } else if (object.onHit) {
-                    object.onHit(state, { damage: 4, direction: getDirection(-dx, -dy) });
-                }
-            }
+        if (this.animationTime == duration) {
+            hitTargets(state, this.area, {
+                damage: 4,
+                canPush: true,
+                cutsGround: true,
+                destroysObjects: true,
+                knockAwayFromHit: true,
+                hitCircle: {x: this.x, y: this.y, r},
+                hitObjects: true,
+                hitTiles: true,
+            });
         }
         if (this.animationTime > duration) {
             removeEffectFromArea(state, this);
@@ -67,8 +49,6 @@ export class CloneExplosionEffect implements EffectInstance {
         context.arc(this.x, this.y, r, 0, 2 * Math.PI);
         context.fillStyle = 'red';
         context.fill();
-        //const frame = getFrame(this.animation, this.animationTime);
-        //drawFrame(context, frame, { ...frame, x: this.x, y: this.y - this.z });
     }
 }
 

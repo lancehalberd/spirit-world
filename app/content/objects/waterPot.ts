@@ -26,6 +26,7 @@ export class WaterPot implements ObjectInstance {
     fallFrame = 0;
     grabDirection: Direction;
     isNeutralTarget = true;
+    isObject = <const>true;
     linkedObject: WaterPot;
     pushCounter: number = 0;
     pushedLastFrame: boolean = false;

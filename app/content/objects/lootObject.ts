@@ -12,7 +12,7 @@ import { playSound } from 'app/musicController';
 
 import {
     ActiveTool, AreaInstance, BossObjectDefinition, DialogueLootDefinition,
-    DungeonInventory, Frame, FrameDimensions, GameState, LootObjectDefinition,
+    DungeonInventory, EffectInstance, Frame, FrameDimensions, GameState, LootObjectDefinition,
     LootTable, LootType, ObjectInstance, ObjectStatus, Rect, TileBehaviors,
 } from 'app/types';
 
@@ -42,11 +42,12 @@ export function dropItemFromTable(state: GameState, area: AreaInstance, lootTabl
     }
 }
 
-export class LootGetAnimation implements ObjectInstance {
+export class LootGetAnimation implements EffectInstance {
     definition = null;
     frame: Frame;
     loot: LootObjectDefinition | BossObjectDefinition | DialogueLootDefinition;
     animationTime: number = 0;
+    isEffect = <const>true;
     x: number;
     y: number;
     z: number;
@@ -307,6 +308,7 @@ export class LootObject implements ObjectInstance {
     definition: LootObjectDefinition;
     drawPriority: 'sprites' = 'sprites';
     frame: Frame;
+    isObject = <const>true;
     x: number;
     y: number;
     z: number;
@@ -392,6 +394,7 @@ export function getLoot(this: void, state: GameState, definition: LootObjectDefi
 // Simple loot drop doesn't show the loot animation when collected.
 export class LootDropObject extends LootObject {
     alwaysReset = true;
+    isObject = <const>true;
     update(state: GameState) {
         if (this.area === state.areaInstance && rectanglesOverlap(state.hero.activeClone || state.hero, getFrameHitBox(this.frame, this))) {
             const onPickup = lootEffects[this.definition.lootType] || lootEffects.unknown;
@@ -426,6 +429,7 @@ export class ChestObject implements ObjectInstance {
         lightRadius: 12,
     };
     frame: Frame;
+    isObject = <const>true;
     linkedObject: ChestObject;
     x: number;
     y: number;

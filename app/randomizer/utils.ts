@@ -2,7 +2,7 @@ import { cloneDeep } from 'lodash';
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 import { enemyTypes } from 'app/content/enemies';
 import { isLogicValid } from 'app/content/logic';
-import { lootEffects } from 'app/content/lootObject';
+import { lootEffects } from 'app/content/objects/lootObject';
 import { getZone, zones } from 'app/content/zones';
 import {
     SPAWN_LOCATION_DEMO,

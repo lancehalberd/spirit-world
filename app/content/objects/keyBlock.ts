@@ -18,6 +18,7 @@ export class KeyBlock implements ObjectInstance {
     area: AreaInstance;
     definition: KeyBlockDefinition;
     drawPriority: 'sprites' = 'sprites';
+    isObject = <const>true;
     behaviors = {
         solid: true,
     };
