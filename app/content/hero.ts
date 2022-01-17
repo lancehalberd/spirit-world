@@ -1,5 +1,6 @@
 import { addEffectToArea } from 'app/content/areas';
 import { destroyClone } from 'app/content/clone';
+import { getChargedArrowAnimation } from 'app/content/effects/arrow';
 import {
     arrowAnimations, bowAnimations,
     chargeBackAnimation, chargeFrontAnimation,
@@ -315,6 +316,24 @@ export class Hero implements Actor, SavedHeroData {
         if (isChargingBow && state.hero.magic > 0) {
             const arrowFrame = getFrame(arrowAnimations[bowDirection], bowAnimationTime);
             drawFrameAt(context, arrowFrame, { x: this.x - 7 + arrowXOffset, y: this.y - this.z - 11 + arrowYOffset });
+            const { chargeLevel, element } = getChargeLevelAndElement(state, this);
+            const chargeAnimation = getChargedArrowAnimation(chargeLevel, element);
+            if (chargeAnimation) {
+                const chargeFrame = getFrame(chargeAnimation, state.time);
+                let x = this.x + 5, y = this.y + 1 - this.z;
+                if (directionMap[bowDirection][0] < 0) {
+                    x -= directionMap[bowDirection][1] === 0 ? 15 : 8;
+                } else if (directionMap[bowDirection][0] > 0) {
+                    x += directionMap[bowDirection][1] === 0 ? 15 : 8;
+                }
+                if (directionMap[bowDirection][1] < 0) {
+                    y -= directionMap[bowDirection][0] === 0 ? 15 : 8;
+                } else if (directionMap[bowDirection][1] > 0) {
+                    y += directionMap[bowDirection][0] === 0 ? 15 : 8;
+                }
+
+                drawFrameAt(context, chargeFrame, { x, y });
+            }
         }
     }
 

@@ -10,43 +10,53 @@ import {
     GameState, HitProperties, MagicElement,
 } from 'app/types';
 
-const upContent = {x: 5, y: 2, w: 6, h: 6};
-const downContent = {x: 5, y: 8, w: 6, h: 6};
-const leftContent = {x: 2, y: 5, w: 6, h: 6};
-const rightContent = {x: 8, y: 5, w: 6, h: 6};
+const upGeometry = {w: 16, h: 16, content: {x: 4, y: 0, w: 7, h: 5}};
+const downGeometry = {w: 16, h: 16, content: {x: 4, y: 11, w: 7, h: 5}};
+const leftGeometry = {w: 16, h: 16, content: {x: 0, y: 4, w: 5, h: 7}};
+const rightGeometry = {w: 16, h: 16, content: {x: 11, y: 4, w: 5, h: 7}};
+const dlGeometry = {w: 16, h: 16, content: {x: 0, y: 10, w: 6, h: 6}};
+const drGeometry = {w: 16, h: 16, content: {x: 10, y: 10, w: 6, h: 6}};
+const ulGeometry = {w: 16, h: 16, content: {x: 0, y: 0, w: 6, h: 6}};
+const urGeometry = {w: 16, h: 16, content: {x: 10, y: 0, w: 6, h: 6}};
 
-const dlAnimation = createAnimation('gfx/effects/arrow.png', {w: 16, h: 16, content: {x: 2, y: 8, w: 6, h: 6}}, {cols: 2});
-const drAnimation = createAnimation('gfx/effects/arrow.png', {w: 16, h: 16, content: {x: 8, y: 8, w: 6, h: 6}}, {x: 2, cols: 2});
-const urAnimation = createAnimation('gfx/effects/arrow.png', {w: 16, h: 16, content: {x: 8, y: 2, w: 6, h: 6}}, {x: 4, cols: 2});
-const ulAnimation = createAnimation('gfx/effects/arrow.png', {w: 16, h: 16, content: {x: 2, y: 2, w: 6, h: 6}}, {x: 6, cols: 2});
-const downAnimation = createAnimation('gfx/effects/arrow.png', {w: 16, h: 16, content: downContent}, {x: 8, cols: 2});
-const rightAnimation = createAnimation('gfx/effects/arrow.png', {w: 16, h: 16, content: rightContent}, {x: 10, cols: 2});
-const upAnimation = createAnimation('gfx/effects/arrow.png', {w: 16, h: 16, content: upContent}, {x: 12, cols: 2});
-const leftAnimation = createAnimation('gfx/effects/arrow.png', {w: 16, h: 16, content: leftContent}, {x: 14, cols: 2});
+const dlAnimation = createAnimation('gfx/effects/arrow.png', dlGeometry, {cols: 2});
+const drAnimation = createAnimation('gfx/effects/arrow.png', drGeometry, {x: 2, cols: 2});
+const urAnimation = createAnimation('gfx/effects/arrow.png', urGeometry, {x: 4, cols: 2});
+const ulAnimation = createAnimation('gfx/effects/arrow.png', ulGeometry, {x: 6, cols: 2});
+const downAnimation = createAnimation('gfx/effects/arrow.png', downGeometry, {x: 8, cols: 2});
+const rightAnimation = createAnimation('gfx/effects/arrow.png', rightGeometry, {x: 10, cols: 2});
+const upAnimation = createAnimation('gfx/effects/arrow.png', upGeometry, {x: 12, cols: 2});
+const leftAnimation = createAnimation('gfx/effects/arrow.png', leftGeometry, {x: 14, cols: 2});
 
 const spinAnimation = createAnimation('gfx/effects/arrow.png', {w: 16, h: 16, content: {x: 5, y: 5, w: 6, h: 6}}, {y: 1, cols: 4, duration: 3});
-const stuckDownAnimation = createAnimation('gfx/effects/arrow.png', {w: 16, h: 16, content: downContent}, {y: 2, cols: 5, duration: 3}, {loop: false});
-const stuckRightAnimation = createAnimation('gfx/effects/arrow.png', {w: 16, h: 16, content: rightContent}, {y: 2, x: 5, cols: 5, duration: 3}, {loop: false});
-const stuckUpAnimation = createAnimation('gfx/effects/arrow.png', {w: 16, h: 16, content: upContent}, {y: 2, x: 10, cols: 5, duration: 3}, {loop: false});
-const stuckLeftAnimation = createAnimation('gfx/effects/arrow.png', {w: 16, h: 16, content: leftContent}, {y: 2, x: 15, cols: 5, duration: 3}, {loop: false});
+const stuckDownAnimation = createAnimation('gfx/effects/arrow.png', downGeometry, {y: 2, cols: 5, duration: 3}, {loop: false});
+const stuckRightAnimation = createAnimation('gfx/effects/arrow.png', rightGeometry, {y: 2, x: 5, cols: 5, duration: 3}, {loop: false});
+const stuckUpAnimation = createAnimation('gfx/effects/arrow.png', upGeometry, {y: 2, x: 10, cols: 5, duration: 3}, {loop: false});
+const stuckLeftAnimation = createAnimation('gfx/effects/arrow.png', leftGeometry, {y: 2, x: 15, cols: 5, duration: 3}, {loop: false});
 
-const sdlAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 16, h: 16, content: {x: 2, y: 8, w: 6, h: 6}}, {cols: 2});
-const sdrAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 16, h: 16, content: {x: 8, y: 8, w: 6, h: 6}}, {x: 2, cols: 2});
-const surAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 16, h: 16, content: {x: 8, y: 2, w: 6, h: 6}}, {x: 4, cols: 2});
-const sulAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 16, h: 16, content: {x: 2, y: 2, w: 6, h: 6}}, {x: 6, cols: 2});
-const sdownAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 16, h: 16, content: downContent}, {x: 8, cols: 2});
-const srightAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 16, h: 16, content: rightContent}, {x: 10, cols: 2});
-const supAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 16, h: 16, content: upContent}, {x: 12, cols: 2});
-const sleftAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 16, h: 16, content: leftContent}, {x: 14, cols: 2});
+const sdlAnimation = createAnimation('gfx/effects/spiritarrow.png', dlGeometry, {cols: 2});
+const sdrAnimation = createAnimation('gfx/effects/spiritarrow.png', drGeometry, {x: 2, cols: 2});
+const surAnimation = createAnimation('gfx/effects/spiritarrow.png', urGeometry, {x: 4, cols: 2});
+const sulAnimation = createAnimation('gfx/effects/spiritarrow.png', ulGeometry, {x: 6, cols: 2});
+const sdownAnimation = createAnimation('gfx/effects/spiritarrow.png', downGeometry, {x: 8, cols: 2});
+const srightAnimation = createAnimation('gfx/effects/spiritarrow.png', rightGeometry, {x: 10, cols: 2});
+const supAnimation = createAnimation('gfx/effects/spiritarrow.png', upGeometry, {x: 12, cols: 2});
+const sleftAnimation = createAnimation('gfx/effects/spiritarrow.png', leftGeometry, {x: 14, cols: 2});
 
-const spoofDownAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 16, h: 16, content: downContent}, {y: 1, cols: 3, duration: 3}, {loop: false});
-const spoofRightAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 16, h: 16, content: rightContent}, {y: 1, x: 3, cols: 3, duration: 3}, {loop: false});
-const spoofUpAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 16, h: 16, content: upContent}, {y: 1, x: 6, cols: 3, duration: 3}, {loop: false});
-const spoofLeftAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 16, h: 16, content: leftContent}, {y: 1, x: 9, cols: 3, duration: 3}, {loop: false});
-const sstuckDownAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 16, h: 16, content: downContent}, {y: 2, cols: 5, duration: 3}, {loop: false});
-const sstuckRightAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 16, h: 16, content: rightContent}, {y: 2, x: 5, cols: 5, duration: 3}, {loop: false});
-const sstuckUpAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 16, h: 16, content: upContent}, {y: 2, x: 10, cols: 5, duration: 3}, {loop: false});
-const sstuckLeftAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 16, h: 16, content: leftContent}, {y: 2, x: 15, cols: 5, duration: 3}, {loop: false});
+const spoofDownAnimation = createAnimation('gfx/effects/spiritarrow.png', downGeometry, {y: 1, cols: 3, duration: 3}, {loop: false});
+const spoofRightAnimation = createAnimation('gfx/effects/spiritarrow.png', rightGeometry, {y: 1, x: 3, cols: 3, duration: 3}, {loop: false});
+const spoofUpAnimation = createAnimation('gfx/effects/spiritarrow.png', upGeometry, {y: 1, x: 6, cols: 3, duration: 3}, {loop: false});
+const spoofLeftAnimation = createAnimation('gfx/effects/spiritarrow.png', leftGeometry, {y: 1, x: 9, cols: 3, duration: 3}, {loop: false});
+const sstuckDownAnimation = createAnimation('gfx/effects/spiritarrow.png', downGeometry, {y: 2, cols: 5, duration: 3}, {loop: false});
+const sstuckRightAnimation = createAnimation('gfx/effects/spiritarrow.png', rightGeometry, {y: 2, x: 5, cols: 5, duration: 3}, {loop: false});
+const sstuckUpAnimation = createAnimation('gfx/effects/spiritarrow.png', upGeometry, {y: 2, x: 10, cols: 5, duration: 3}, {loop: false});
+const sstuckLeftAnimation = createAnimation('gfx/effects/spiritarrow.png', leftGeometry, {y: 2, x: 15, cols: 5, duration: 3}, {loop: false});
+
+const chargeGeometry = {w: 12, h: 10, content: {x: 3, y: 3, w: 6, h: 6}};
+const lightningArrowAnimation = createAnimation('gfx/effects/wukongbowcharging.png', chargeGeometry, {x: 0, cols: 4, duration: 5});
+const iceArrowAnimation = createAnimation('gfx/effects/wukongbowcharging.png', chargeGeometry, {x: 4, cols: 4, duration: 5});
+const fireArrowAnimation = createAnimation('gfx/effects/wukongbowcharging.png', chargeGeometry, {x: 10, cols: 4, duration: 5});
+const chargedArrowAnimation = createAnimation('gfx/effects/wukongbowcharging.png', chargeGeometry, {x: 14, cols: 4, duration: 5});
 
 
 
@@ -150,6 +160,7 @@ interface Props {
     y?: number
     vx?: number
     vy?: number
+    chargeLevel?: number;
     damage?: number
     spiritCloakDamage?: number
     // Don't update until this many frames have passed
@@ -169,6 +180,7 @@ export class Arrow implements EffectInstance {
     spiritCloakDamage: number;
     delay: number;
     ignoreWallsDuration: number;
+    chargeLevel: number = 0;
     element: MagicElement = null;
     x: number;
     y: number;
@@ -184,7 +196,7 @@ export class Arrow implements EffectInstance {
     reflected: boolean = false;
     stuckFrames: number = 0;
     style: ArrowStyle = 'normal';
-    constructor({x = 0, y = 0, vx = 0, vy = 0, damage = 1, spiritCloakDamage = 5, delay = 0, element = null, reflected = false, style = 'normal',
+    constructor({x = 0, y = 0, vx = 0, vy = 0, chargeLevel = 0, damage = 1, spiritCloakDamage = 5, delay = 0, element = null, reflected = false, style = 'normal',
         ignoreWallsDuration = 0,
     }: Props) {
         this.x = x | 0;
@@ -196,6 +208,7 @@ export class Arrow implements EffectInstance {
         this.spiritCloakDamage = spiritCloakDamage;
         this.delay = delay;
         this.ignoreWallsDuration = ignoreWallsDuration;
+        this.chargeLevel = chargeLevel;
         this.element = element;
         this.w = 6;
         this.h = 6;
@@ -299,8 +312,29 @@ export class Arrow implements EffectInstance {
         } else if (this.stuckFrames > 0) {
             animation = animationSet.stuck;
         }
-        const frame = getFrame(animation, this.animationTime);
+        let frame = getFrame(animation, this.animationTime);
+
         drawFrameAt(context, frame, { x: this.x, y: this.y - this.z });
+        const chargeAnimation = getChargedArrowAnimation(this.chargeLevel, this.element);
+        if (chargeAnimation) {
+            frame = getFrame(chargeAnimation, this.animationTime);
+            drawFrameAt(context, frame, { x: this.x, y: this.y - this.z });
+        }
+    }
+}
+
+export function getChargedArrowAnimation(this: void, chargeLevel: number, element: MagicElement): FrameAnimation {
+    if (element === 'lightning') {
+        return lightningArrowAnimation;
+    }
+    if (element === 'ice') {
+        return iceArrowAnimation;
+    }
+    if (element === 'fire') {
+        return fireArrowAnimation;
+    }
+    if (chargeLevel) {
+        return chargedArrowAnimation;
     }
 }
 

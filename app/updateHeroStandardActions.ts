@@ -271,13 +271,23 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             const tool = hero.chargingLeftTool ? hero.leftTool : hero.rightTool;
             const { chargeLevel, element } = getChargeLevelAndElement(state, hero, tool);
             if (chargeLevel > 0 && state.time % 100 === 0) {
-                const hitbox = hero.getHitbox(state);
-                addSparkleAnimation(state, hero.area, {
-                    x: hitbox.x + hitbox.w / 2 + hero.actionDx * 12,
-                    y: hitbox.y + hitbox.h / 2 - hero.z + hero.actionDy * 12 - 6,
-                    w: 4,
-                    h: 4,
-                },{ element });
+                let skipSparkle = false;
+                // These sparkles don't look good with the base bow charge animations.
+                if (tool === 'bow' && !element) {
+                    skipSparkle = true;
+                }
+                if (tool === 'bow' && element === 'ice') {
+                    skipSparkle = true;
+                }
+                if (!skipSparkle) {
+                    const hitbox = hero.getHitbox(state);
+                    addSparkleAnimation(state, hero.area, {
+                        x: hitbox.x + hitbox.w / 2 + hero.actionDx * 12,
+                        y: hitbox.y + hitbox.h / 2 - hero.z + hero.actionDy * 12 - 6,
+                        w: 4,
+                        h: 4,
+                    },{ element });
+                }
             }
         }
     } else if (hero.action === 'charging') {

@@ -55,6 +55,7 @@ export function useTool(
                 direction = getDirection(dx, dy, true);
             }
             const arrow = new Arrow({
+                chargeLevel,
                 damage: 2 ** chargeLevel,
                 element,
                 x: hero.x + 8 + 8 * directionMap[direction][0],
