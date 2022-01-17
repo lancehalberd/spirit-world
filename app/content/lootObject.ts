@@ -116,7 +116,7 @@ function getEquipElementMessage(state: GameState) {
 
 function showLootMessage(state: GameState, lootType: LootType, lootLevel?: number, lootAmount?: number): void {
     // Skip instructions during the randomizer.
-    if (state.randomizer.seed) {
+    if (state.randomizer?.seed) {
         if (lootType === 'peachOfImmortalityPiece' && state.hero.peachQuarters === 0) {
             showMessage(state, '{item:peachOfImmortality}');
             return;
