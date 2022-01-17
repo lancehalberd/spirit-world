@@ -22,7 +22,8 @@ import { drawFrame, getFrame } from 'app/utils/animations';
 import { directionMap, rotateDirection } from 'app/utils/field';
 
 import {
-    Actor, ActorAnimations, AreaInstance, GameState, DialogueOption, Direction, Hero, MovementProperties, NPCDefinition,
+    Actor, ActorAnimations, AreaInstance, GameState, DialogueOption, Direction,
+    Frame, FrameAnimation, Hero, MovementProperties, NPCDefinition,
     ObjectInstance, ObjectStatus, Rect,
 } from 'app/types';
 
@@ -114,40 +115,57 @@ export const npcBehaviors = {
     none(state: GameState, npc: NPC) {
         // Always update to face original direction.
         npc.d = npc.definition.d || 'down';
+        npc.changeToAnimation('still');
     },
     random(state: GameState, npc: NPC) {
-        if ((npc.mode === '' || npc.mode === 'chooseIdling')) {
-            npc.setMode('chooseWalking');
-        }
-        if (npc.mode === 'chooseWalking' && npc.modeTime > 200) {
-            npc.setMode('walk');
-            npc.d = sample(['up', 'down', 'left', 'right']);
+        if (npc.mode === 'choose' && npc.modeTime > 200) {
+            npc.changeToAnimation('still');
+            if (Math.random() < 0.2) {
+                npc.setMode('rest');
+            } else {
+                npc.setMode('walk');
+                npc.d = sample(['up', 'down', 'left', 'right']);
+            }
         }
         if (npc.mode === 'walk') {
+            npc.changeToAnimation('move');
             if (!moveNPC(state, npc, npc.speed * directionMap[npc.d][0], npc.speed * directionMap[npc.d][1], {})) {
-                npc.setMode('chooseWalking');
+                npc.setMode('choose');
             }
             if (npc.modeTime > 2000 && Math.random() < (npc.modeTime - 700) / 3000) {
-                npc.setMode('chooseWalking');
+                npc.setMode('choose');
+            }
+        }
+        if (npc.mode === 'rest') {
+            npc.changeToAnimation('still');
+            if (Math.random() < 0.01) {
+                npc.setMode('idleAnimation');
+            }
+            if (npc.modeTime > 1000) {
+                npc.setMode('choose');
+            }
+        }
+        if (npc.mode === 'idleAnimation') {
+            npc.changeToAnimation('idle');
+            if (npc.animationTime >= npc.currentAnimation.duration) {
+                npc.setMode('choose');
             }
         }
     },
     idle(state: GameState, npc: NPC) {
-        // const idleTime: number = npc.modeTime + Math.random()*800;
-        if (npc.mode === '' || npc.mode === 'chooseWalking') {
-            npc.setMode('chooseIdling');
-            console.log('chooseIdling');
-        }
-        if (npc.mode === 'chooseIdling') {
-            if (npc.modeTime > 2000 && Math.random() < (npc.modeTime - 700) / 3000) {
-                npc.setMode('idle');
-                // console.log('idle:', idleTime);
+        const { animations } = npcStyles[npc.definition.style];
+        if (npc.currentAnimation === animations.still[npc.d]) {
+            const defaultDirection = npc.definition.d || 'down';
+            if (npc.d !== defaultDirection) {
+                npc.d = defaultDirection;
+                npc.changeToAnimation('still');
             }
-        }
-        if (npc.mode === 'idle') {
-            if (npc.modeTime > 190) {
-                npc.setMode('chooseIdling');
-                console.log('chooseIdling again');
+            if (Math.random() < (npc.animationTime - 3000) / 7000) {
+                npc.setAnimation('idle', npc.d);
+            }
+        } else {
+            if (npc.animationTime >= npc.currentAnimation.duration) {
+                npc.setAnimation('still', npc.d);
             }
         }
     }
@@ -194,9 +212,9 @@ export class NPC implements Actor, ObjectInstance  {
     z = 0;
     w = 16;
     h = 16;
+    currentAnimation: FrameAnimation;
     animationTime = 0;
-    animations = 'still';
-    mode = '';
+    mode = 'choose';
     modeTime = 0;
     speed = 1;
     status: ObjectStatus = 'normal';
@@ -209,28 +227,12 @@ export class NPC implements Actor, ObjectInstance  {
         this.d = definition.d || 'down';
         this.x = definition.x;
         this.y = definition.y;
+        const animationStyle = npcStyles[this.definition.style];
+        this.currentAnimation = animationStyle.animations.idle[this.d];
         this.params = {};
     }
-    getFrame() {
-        const animationStyle = npcStyles[this.definition.style];
-        let animations;
-        switch (this.mode) {
-            case 'chooseIdling':
-                animations = animationStyle.animations.still || animationStyle.animations.idle;
-                break;
-            case 'chooseMoving':
-                animations = animationStyle.animations.idle;
-                break;
-            case 'idle':
-                animations = animationStyle.animations.idle;
-                break;
-            case 'walk':
-                animations = animationStyle.animations.move;
-                break;
-            default:
-                animations = animationStyle.animations.still || animationStyle.animations.idle;
-        }
-        return getFrame(animations[this.d], this.animationTime);
+    getFrame(): Frame {
+        return getFrame(this.currentAnimation, this.animationTime);
     }
     getHitbox(state: GameState): Rect {
         const frame = this.getFrame();
@@ -247,8 +249,24 @@ export class NPC implements Actor, ObjectInstance  {
         this.showMessage = true;
         // Face the player while talking.
         this.d = rotateDirection(hero.d, 2);
+        this.changeToAnimation('still');
         // Remove the grab action since the hero is talking to the NPC, not grabbing it.
         hero.action = null;
+    }
+    changeToAnimation(type: string) {
+        const animationStyle = npcStyles[this.definition.style];
+        const animationSet = animationStyle.animations[type] || animationStyle.animations.idle;
+        const targetAnimation = animationSet[this.d];
+        if (this.currentAnimation !== targetAnimation) {
+            this.currentAnimation = targetAnimation;
+            this.animationTime = 0;
+        }
+    }
+    setAnimation(type: string, d: Direction, time: number = 0) {
+        const animationStyle = npcStyles[this.definition.style];
+        const animationSet = animationStyle.animations[type] || animationStyle.animations.idle;
+        this.currentAnimation = animationSet[d];
+        this.animationTime = time;
     }
     setMode(mode: string) {
         this.mode = mode;
