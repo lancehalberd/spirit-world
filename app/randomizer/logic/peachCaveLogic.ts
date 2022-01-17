@@ -1,4 +1,7 @@
-import { canTravelFarUnderWater, hasBossWeapon, hasClone, hasIronBoots, hasWeapon } from 'app/content/logic';
+import {
+    canTravelFarUnderWater, hasBossWeapon, hasCatEyes,
+    hasClone, hasIronBoots, hasMitts, hasWeapon,
+} from 'app/content/logic';
 
 import { LogicNode } from 'app/types';
 
@@ -49,8 +52,9 @@ export const peachCaveNodes: LogicNode[] = [
         zoneId,
         nodeId: 'peachCave:pitB',
         paths: [
-            { nodeId: 'peachCave:pitA', logic: hasClone },
-            { nodeId: 'peachCave:boss', },
+            // Need mitts to lift rocks at the top of the stairs.
+            { nodeId: 'peachCave:upperPeachPiece', logic: hasMitts },
+            { nodeId: 'peachCave:boss' },
         ],
         exits: [{ objectId: 'peachCave:pitB' }],
     },
@@ -68,7 +72,7 @@ export const peachCaveNodes: LogicNode[] = [
         zoneId,
         nodeId: 'peachCaveTopEntrance',
         paths: [
-            { nodeId: 'peachCave:pitA' },
+            { nodeId: 'peachCave:pitA', logic: hasCatEyes },
         ],
         entranceIds: ['peachCaveTopEntrance'],
         exits: [{ objectId: 'peachCaveTopEntrance' }],
@@ -77,8 +81,20 @@ export const peachCaveNodes: LogicNode[] = [
         zoneId,
         nodeId: 'peachCave:pitA',
         paths: [
-            { nodeId: 'peachCaveTopEntrance' },
-            { nodeId: 'peachCave:pitB', logic: hasClone },
+            { nodeId: 'peachCaveTopEntrance', logic: hasCatEyes },
+            { nodeId: 'peachCave:upperPeachPiece', logic: hasClone },
+        ],
+        exits: [{ objectId: 'peachCave:pitA' }],
+    },
+    {
+        zoneId,
+        nodeId: 'peachCave:upperPeachPiece',
+        checks: [{ objectId: 'peachCaveUpperPeachPiece' }],
+        paths: [
+            // Blow up the crack to the west to reach pitA
+            { nodeId: 'peachCave:pitA', logic: hasClone },
+            // Just jump down to reach pitB
+            { nodeId: 'peachCave:pitB' },
         ],
         exits: [{ objectId: 'peachCave:pitA' }],
     },

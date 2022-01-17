@@ -241,7 +241,9 @@ function renderWoodenDoorForeground(context: CanvasRenderingContext2D, state: Ga
             frame = door.renderOpen(state) ? woodenNorthBlownup : null;
         }
         // Only draw the top 12 pixels of southern facing doors over the player.
-        drawFrame(context, {...frame, h: 12}, {...frame, x: door.x, y: door.y, h: 12});
+        if (frame) {
+            drawFrame(context, {...frame, h: 12}, {...frame, x: door.x, y: door.y, h: 12});
+        }
     } else if (door.definition.d === 'left') {
         let frame = woodenWestDoorEmptyForeground;
         if (door.definition.status !== 'normal'
@@ -403,7 +405,9 @@ function renderCavernDoorForeground(context: CanvasRenderingContext2D, state: Ga
             frame = door.renderOpen(state) ? cavernNorthBlownup : null;
         }
         // Only draw the top 12 pixels of southern facing doors over the player.
-        drawFrame(context, {...frame, h: 12}, {...frame, x: door.x, y: door.y, h: 12});
+        if (frame) {
+            drawFrame(context, {...frame, h: 12}, {...frame, x: door.x, y: door.y, h: 12});
+        }
     } else if (door.definition.d === 'left') {
         let frame = cavernWestDoorEmptyForeground;
         if (door.definition.status !== 'normal'
