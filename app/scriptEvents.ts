@@ -151,6 +151,17 @@ export function parseEventScript(state: GameState, script: string): ScriptEvent[
             });
             continue
         }
+        if (actionToken.startsWith('buy:')) {
+            const valueToken = actionToken.substring('buy:'.length);
+            const [cost, successScript, failScript] = valueToken.split(':');
+            events.push({
+                type: 'attemptPurchase',
+                cost: parseInt(cost, 10),
+                successScript,
+                failScript,
+            });
+            continue;
+        }
         if (actionToken.startsWith('wait:')) {
             const valueToken = actionToken.substring('wait:'.length);
             let duration = parseInt(valueToken, 10);
@@ -280,7 +291,7 @@ export const updateScriptEvents = (state: GameState): void => {
                 // Since this overwrites remaining events, don't continue processing events this frame.
                 return;
             case 'attemptPurchase':
-                if (event.cost < state.hero.money) {
+                if (event.cost <= state.hero.money) {
                     state.hero.money -= event.cost;
                     followMessagePointer(state, event.successScript);
                 } else {

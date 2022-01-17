@@ -3,6 +3,8 @@ import { GameState } from 'app/types';
 
 const allChecks = new Set<string>();
 const checksByZone: {[key: string]: Set<string>} = {};
+window['allChecks'] = allChecks;
+window['checksByZone'] = checksByZone;
 
 export function getCheckInfo(state: GameState) {
     let checksCompleted = 0;

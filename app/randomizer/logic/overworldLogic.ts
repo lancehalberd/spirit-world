@@ -12,6 +12,9 @@ export const overworldNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'overworldMain',
+        complexNpcs: [
+            {dialogueKey: 'streetVendor', optionKey: 'purchase1'},
+        ],
         paths: [
             { nodeId: 'overworldMountain', logic: hasGloves },
             { nodeId: 'warTempleArea' },
@@ -20,7 +23,7 @@ export const overworldNodes: LogicNode[] = [
         entranceIds: [
             'elderEntrance', 'tombTeleporter',
             'lakeTunnelEntrance', 'peachCaveTopEntrance', 'peachCaveWaterEntrance', 'staffTowerEntrance',
-            'tombEntrance', 'waterfallCaveEntrance', 'templeCrackedDoor'
+            'tombEntrance', 'waterfallCaveEntrance', 'templeCrackedDoor', 'templeDoor', 'foodHouse',
         ],
         exits: [
             { objectId: 'elderEntrance' },
@@ -31,6 +34,8 @@ export const overworldNodes: LogicNode[] = [
             { objectId: 'tombEntrance', logic: hasMediumRange },
             { objectId: 'waterfallCaveEntrance' },
             { objectId: 'templeCrackedDoor' },
+            { objectId: 'templeDoor' },
+            { objectId: 'foodHouse' },
         ],
     },
     {

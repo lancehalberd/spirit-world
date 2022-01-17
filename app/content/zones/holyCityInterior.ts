@@ -133,11 +133,12 @@ const f0_0x0: AreaDefinition = {
         {status: "cracked", id: "templeCrackedDoor", x: 416, y: 496, type: "door", style: "wooden", targetZone: "overworld", targetObjectId: "templeCrackedDoor", d: "down"},
         {status: "normal", id: "gardenHouse", x: 112, y: 224, type: "door", style: "cave", targetZone: "overworld", targetObjectId: "overworld:holyCityGardenHouse", d: "down"},
         {status: "normal", id: "bridgeHouse", x: 368, y: 224, type: "door", style: "cave", targetZone: "overworld", targetObjectId: "overworld:holyCityBridgeHouse", d: "down"},
-        {status: "normal", id: "holyCityInterior:0:0x0-npc-0", x: 240, y: 416, d: "down", behavior: "random", style: "paleMonk", type: "npc", dialogue: "Ommmmmmm..."},
+        {status: "normal", id: "generousPriest", x: 48, y: 320, d: "down", behavior: "idle", style: "midMonk", type: "npc", dialogue: "Ommmmmmm...", dialogueKey: "generousPriest"},
         {status: "normal", id: "holyCityInterior:0:0x0-npc-1", x: 400, y: 176, d: "left", behavior: "idle", style: "darkMonk", type: "npc", dialogue: "I love being a little outside of town. The hustle and bustle stresses me out."},
         {status: "normal", id: "holyCityInterior:0:0x0-npc-2", x: 96, y: 160, d: "right", behavior: "idle", style: "midMonk", type: "npc", dialogue: "Tending my flowers makes feel closer to the spirits."},
         {status: "normal", id: "templePeachPiece", x: 438, y: 411, type: "loot", lootType: "peachOfImmortalityPiece", lootLevel: 1},
         {status: "normal", id: "templeDoor", x: 224, y: 496, type: "door", style: "wooden", targetZone: "overworld", targetObjectId: "templeDoor", d: "down"},
+        {status: "normal", id: "holyCityInterior:0:0x0-npc-0", x: 240, y: 416, d: "down", behavior: "random", style: "paleMonk", type: "npc", dialogue: "Ommmmmmm..."},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},
@@ -278,6 +279,7 @@ const f0_0x1: AreaDefinition = {
         {status: "normal", id: "clothesHouse", x: 352, y: 496, type: "door", style: "wooden", targetZone: "overworld", targetObjectId: "overworld:holyCityClothesHouse", d: "down"},
         {status: "normal", id: "holyCityInterior:0:1x0-npc-1", x: 416, y: 352, d: "down", behavior: "idle", style: "paleMonk", type: "npc", dialogue: "You're practically dressed in rags! I guess I shouldn't expect any better of a dirty Vanara!"},
         {status: "normal", id: "holyCityInterior:0:1x0-npc-2", x: 256, y: 128, d: "down", behavior: "idle", style: "midMonk", type: "npc", dialogue: "All this sawdust is making me cough! I really should sweep soon."},
+        {status: "normal", id: "meanPerson", x: 64, y: 320, d: "down", behavior: "idle", style: "darkMonk", type: "npc", dialogue: "We don't serve Vanara food here, just regular food. Go somewhere else!", dialogueKey: "meanPerson"},
         {status: "normal", id: "holyCityInterior:0:1x0-npc-0", x: 192, y: 416, d: "left", behavior: "idle", style: "darkMonk", type: "npc", dialogue: "We don't serve Vanara food here, just regular food. Go somewhere else!"},
     ],
     sections: [

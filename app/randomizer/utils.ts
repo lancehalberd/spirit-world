@@ -139,7 +139,10 @@ window['exportLootData'] = exportLootData;
 export type AnyLootDefinition = BossObjectDefinition | DialogueLootDefinition | LootObjectDefinition;
 
 interface LootWithLocation {
-    location: ZoneLocation
+    // Either location will be set or dialogueKey+optionKey will be set
+    location?: ZoneLocation
+    dialogueKey?: string
+    optionKey?: string
     lootObject: AnyLootDefinition
     progressFlags?: string[]
 }
@@ -253,6 +256,21 @@ function getLootObjects(nodes: LogicNode[], state: GameState = null): LootWithLo
                 lootObject: npc.loot,
                 location,
                 progressFlags: npc.progressFlags,
+            });
+        }
+        for (const npc of (node.complexNpcs || [])) {
+            // If state is passed in, only include this loot check if it is in logic.
+            if (state && npc.logic && !isLogicValid(state, npc.logic)) {
+                continue;
+            }
+            const {dialogueKey, optionKey} = npc;
+            const script = dialogueHash[dialogueKey].mappedOptions[optionKey];
+            const lootToken = script.split('{item:')[1].split('}')[0];
+            const [lootType, amountOrLevel] = lootToken.split('=');
+            lootObjects.push({
+                lootObject: {type: 'dialogueLoot', lootType: lootType, amount: parseInt(amountOrLevel, 10) || 0} as AnyLootDefinition,
+                dialogueKey,
+                optionKey
             });
         }
     }
@@ -495,7 +513,9 @@ function applyLootObjectToState(state: GameState, lootWithLocation: LootWithLoca
     }
     // We need to set the current location to the loot location so that dungeon items are applied to the correct state.
     const stateCopy = copyState(state);
-    stateCopy.location = lootWithLocation.location;
+    if (lootWithLocation.location) {
+        stateCopy.location = lootWithLocation.location;
+    }
     const onPickup = lootEffects[lootWithLocation.lootObject.lootType] || lootEffects.unknown;
     // Loot is always progressive in the randomizer, so set lootLevel to 0.
     // onPickup(stateCopy, lootWithLocation.lootObject);
@@ -606,7 +626,9 @@ function placeItem(random: typeof SRandom, allNodes: LogicNode[], startingNodes:
     const allAvailableChecks = allReachableChecks.filter(lootWithLocation => !assignmentsState.assignedLocations.includes(lootWithLocation.lootObject.id));
     let allAppropriateChecks = allAvailableChecks;
     if (loot.lootObject.lootType === 'bigKey' || loot.lootObject.lootType === 'smallKey') {
-        allAppropriateChecks = allAppropriateChecks.filter(lootWithLocation => lootWithLocation.location.zoneKey === loot.location.zoneKey);
+        allAppropriateChecks = allAppropriateChecks.filter(lootWithLocation => {
+            return lootWithLocation.location?.zoneKey === loot.location?.zoneKey
+        });
     }
     const assignedLocation = random.element(allAppropriateChecks);
     random.generateAndMutate();
@@ -666,7 +688,11 @@ function collectAllLootForSolution(allNodes: LogicNode[], startingNodes: LogicNo
                 && check.lootObject.lootType !== 'peachOfImmortalityPiece'
             )) {
                 // debugState(state);
-                console.log(`Get ${check.lootObject.lootType} at ${check.location.zoneKey}:${check.lootObject.id}`);
+                if (check.location) {
+                    console.log(`Get ${check.lootObject.lootType} at ${check.location.zoneKey}:${check.lootObject.id}`);
+                } else {
+                    console.log(`Get ${check.lootObject.lootType} frome ${check.dialogueKey}:${check.optionKey}`);
+                }
             }
         }
         state = applyLootObjectToState(state, check);
@@ -709,47 +735,70 @@ export function applyLootAssignments(assignments: LootAssignment[]): void {
         ) {
             assignment.lootType = 'spiritPower';
         }
-        const zoneKey = assignment.target.location.zoneKey;
-        // console.log(assignment.source.lootObject.id, ' => ', assignment.target.lootObject.id);
-        if (assignment.target.lootObject.type === 'dialogueLoot') {
-            const {object} = findObjectById(zones[zoneKey], assignment.target.lootObject.id);
-            const npc = object as NPCDefinition;
-            const npcKey = `${zoneKey}-${assignment.target.lootObject.id}`;
-            addCheck(npcKey, zoneKey);
+        if (assignment.target.dialogueKey) {
+            const {dialogueKey, optionKey} = assignment.target;
+            const script = dialogueHash[dialogueKey].mappedOptions[optionKey];
+            console.log('Changing ', script, 'to');
+            const [beginning, middle] = script.split('{item:');
+            const end = middle.substring(middle.indexOf('}') + 1);
             const number = assignment.lootAmount || 0;//assignment.lootLevel;
-            let text: string;
+            const flag = `${dialogueKey}-${optionKey}`;
+            const flagScript = `{flag:${flag}}`;
+            addCheck(flag, 'overworld');
+            let newScript;
             if (assignment.lootType === 'empty') {
                 // Include the flag so that we can still count the check for the check counter.
-                text = `I'm sorry you came all this way for nothing. {flag:${npcKey}}`;
+                newScript = `${beginning}{|}${flagScript}Haha, scammed you!{|}${end}`;
             } else if (number) {
-                text = `Here you go! {flag:${npcKey}}{item:${assignment.lootType}=${number}}`;
+                newScript = `${beginning}${flagScript}{item:${assignment.lootType}=${number}}${end}`;
             } else {
-                text = `Here you go! {flag:${npcKey}}{item:${assignment.lootType}}`;
+                newScript = `${beginning}${flagScript}{item:${assignment.lootType}}${end}`;
             }
-            npc.dialogueKey = npcKey;
-            text += (assignment.target.progressFlags || []).map(flag => `{flag:${flag}}`).join(' ');
-            dialogueHash[npcKey] = {
-                key: npcKey,
-                options: [
-                    {
-                        logicCheck: { excludedFlags: [`${npcKey}`] },
-                        text: [text],
-                    },
-                    {
-                        logicCheck: {},
-                        text: ['You already got it!'],
-                    },
-                ],
-            };
-            assignment.target.lootObject.lootType = assignment.lootType;
-            assignment.target.lootObject.lootAmount = assignment.lootAmount;
-            assignment.target.lootObject.lootLevel = 0;
+            console.log(newScript);
+            dialogueHash[dialogueKey].mappedOptions[optionKey] = newScript;
         } else {
-            addCheck(assignment.target.lootObject.id, zoneKey);
-            for (const target of findAllTargetObjects(assignment.target)) {
-                target.lootType = assignment.lootType;
-                target.lootAmount = assignment.lootAmount;
-                target.lootLevel = 0;//assignment.lootLevel;
+            const zoneKey = assignment.target.location.zoneKey;
+            // console.log(assignment.source.lootObject.id, ' => ', assignment.target.lootObject.id);
+            if (assignment.target.lootObject.type === 'dialogueLoot') {
+                const {object} = findObjectById(zones[zoneKey], assignment.target.lootObject.id);
+                const npc = object as NPCDefinition;
+                const npcKey = `${zoneKey}-${assignment.target.lootObject.id}`;
+                addCheck(npcKey, zoneKey);
+                const number = assignment.lootAmount || 0;//assignment.lootLevel;
+                let text: string;
+                if (assignment.lootType === 'empty') {
+                    // Include the flag so that we can still count the check for the check counter.
+                    text = `I'm sorry you came all this way for nothing. {flag:${npcKey}}`;
+                } else if (number) {
+                    text = `Here you go! {flag:${npcKey}}{item:${assignment.lootType}=${number}}`;
+                } else {
+                    text = `Here you go! {flag:${npcKey}}{item:${assignment.lootType}}`;
+                }
+                npc.dialogueKey = npcKey;
+                text += (assignment.target.progressFlags || []).map(flag => `{flag:${flag}}`).join(' ');
+                dialogueHash[npcKey] = {
+                    key: npcKey,
+                    options: [
+                        {
+                            logicCheck: { excludedFlags: [`${npcKey}`] },
+                            text: [text],
+                        },
+                        {
+                            logicCheck: {},
+                            text: ['You already got it!'],
+                        },
+                    ],
+                };
+                assignment.target.lootObject.lootType = assignment.lootType;
+                assignment.target.lootObject.lootAmount = assignment.lootAmount;
+                assignment.target.lootObject.lootLevel = 0;
+            } else {
+                addCheck(assignment.target.lootObject.id, zoneKey);
+                for (const target of findAllTargetObjects(assignment.target)) {
+                    target.lootType = assignment.lootType;
+                    target.lootAmount = assignment.lootAmount;
+                    target.lootLevel = 0;//assignment.lootLevel;
+                }
             }
         }
     }

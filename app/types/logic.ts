@@ -87,6 +87,11 @@ export interface LogicNode {
         objectId: string
         logic?: LogicCheck
     }[]
+    complexNpcs?: {
+        dialogueKey: string
+        optionKey: string
+        logic?: LogicCheck
+    }[]
     npcs?: {
         loot: DialogueLootDefinition
         logic?: LogicCheck

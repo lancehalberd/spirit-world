@@ -120,5 +120,23 @@ export const holyCityNodes: LogicNode[] = [
         entranceIds: ['templeCrackedDoor'],
         exits: [{ objectId: 'templeCrackedDoor' }],
     },
+    {
+        zoneId: 'holyCityInterior',
+        nodeId: 'templeMain',
+        npcs: [
+            {loot: {type: 'dialogueLoot', id: 'generousPriest', lootType: 'money', lootAmount: 10}},
+        ],
+        entranceIds: ['templeDoor'],
+        exits: [{ objectId: 'templeDoor' }],
+    },
+    {
+        zoneId: 'holyCityInterior',
+        nodeId: 'kitchen',
+        npcs: [
+            {loot: {type: 'dialogueLoot', id: 'meanPerson', lootType: 'money', lootAmount: 1}},
+        ],
+        entranceIds: ['foodHouse'],
+        exits: [{ objectId: 'foodHouse' }],
+    },
 ];
 

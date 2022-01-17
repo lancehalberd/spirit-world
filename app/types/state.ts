@@ -39,6 +39,8 @@ export type DialogueLootDefinition = LootData & {
     type: 'dialogueLoot'
     // The id of the object associated with this dialogue (used during randomization).
     id?: string
+    // This can be set for shop loot.
+    cost?: number
 }
 
 export interface GameState {

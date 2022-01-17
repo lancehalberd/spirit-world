@@ -154,7 +154,8 @@ export const npcBehaviors = {
     },
     idle(state: GameState, npc: NPC) {
         const { animations } = npcStyles[npc.definition.style];
-        if (npc.currentAnimation === animations.still[npc.d]) {
+        const stillSet = animations.still || animations.idle;
+        if (npc.currentAnimation === stillSet[npc.d]) {
             const defaultDirection = npc.definition.d || 'down';
             if (npc.d !== defaultDirection) {
                 npc.d = defaultDirection;
