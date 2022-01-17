@@ -26,8 +26,13 @@ export function loadSavedData(): boolean {
         };
     }
 
-    const seed = readGetParameter('seed');
-    const importedSaveData = window.localStorage.getItem('savedGames' + seed);
+    const seed = parseInt(readGetParameter('seed'), 10) || 0;
+    if (seed) {
+        state.randomizer = {
+            seed,
+        };
+    }
+    const importedSaveData = window.localStorage.getItem('savedGames' + (seed || ''));
     if (importedSaveData) {
         const rawSavedGames = JSON.parse(importedSaveData);
         // Migrate hero => savedHeroData for older save files.
@@ -60,10 +65,10 @@ export function saveGame(): void {
     //    state.savedGames[state.savedGameIndex] = state.savedState;
     //}
     state.savedGames[state.savedGameIndex] = state.savedState;
-    const seed = readGetParameter('seed');
+    const seed = state.randomizer?.seed || 0;
     // console.log(exportState(getState()));
     try {
-        window.localStorage.setItem('savedGames' + seed, JSON.stringify(state.savedGames));
+        window.localStorage.setItem('savedGames' + (seed || ''), JSON.stringify(state.savedGames));
     } catch (e) {
         console.error(e);
         debugger;

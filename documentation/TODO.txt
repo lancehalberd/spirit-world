@@ -21,6 +21,8 @@ Known Bugs:
     - frost grenade blast isn't centered.
     - Enemies with small hitboxes are checking pixels outside of their hitbox while moving.
         - For example snakes when moving left/right will be forced to move up if there is a wall to their south.
+    - Some water instead of ice west of the lake in the spirit world.
+    - Can get to undefined area in city.
 
 Graphics:
     Sweat animation when pulling on something you cannot move.

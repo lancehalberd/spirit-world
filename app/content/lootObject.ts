@@ -115,6 +115,18 @@ function getEquipElementMessage(state: GameState) {
 }
 
 function showLootMessage(state: GameState, lootType: LootType, lootLevel?: number, lootAmount?: number): void {
+    // Skip instructions during the randomizer.
+    if (state.randomizer.seed) {
+        if (lootType === 'peachOfImmortalityPiece' && state.hero.peachQuarters === 0) {
+            showMessage(state, '{item:peachOfImmortality}');
+            return;
+        }
+        if (lootType === 'peachOfImmortality' && !state.hero.passiveTools.catEyes) {
+            showMessage(state, '{item:catEyes}');
+            return;
+        }
+        return;
+    }
     if (lootType === 'spiritPower') {
         // showLootMessage is run after the upgrade is already applied, so we check what the highest level
         // spirit power the user has and show that message.

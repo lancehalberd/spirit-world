@@ -98,6 +98,9 @@ export interface GameState {
         gameKeysReleased: Set<number>
     },
     messagePage?: Frame[][]
+    randomizer?: {
+        seed: number
+    },
     scriptEvents: {
         activeEvents: ActiveScriptEvent[]
         blockEventQueue: boolean
