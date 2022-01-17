@@ -7,7 +7,10 @@ import { FRAME_LENGTH } from 'app/gameConstants';
 import { moveActor } from 'app/moveActor';
 import { heroAnimations } from 'app/render/heroAnimations';
 import {
-    guyAnimations, momAnimations,
+    galAnimations, gal2Animations,
+    guyAnimations, guy2Animations,
+    momAnimations, paleMonkAnimations,
+    midMonkAnimations, darkMonkAnimations,
     vanaraBlackAnimations, vanaraBlueAnimations,
     vanaraBrownAnimations, vanaraGoldAnimations,
     vanaraGrayAnimations, vanaraPurpleAnimations,
@@ -37,8 +40,36 @@ export const npcStyles = {
         shadowOffset: -3,
         flipRight: true,
     } as NPCStyleDefinition,
+    gal: {
+        animations: galAnimations,
+        shadowOffset: 1,
+    } as NPCStyleDefinition,
+    gal2: {
+        animations: gal2Animations,
+        shadowOffset: 1,
+    } as NPCStyleDefinition,
     guy: {
         animations: guyAnimations,
+        shadowOffset: 1,
+    } as NPCStyleDefinition,
+    guy2: {
+        animations: guy2Animations,
+        shadowOffset: 1,
+    } as NPCStyleDefinition,
+    mom: {
+        animations: momAnimations,
+        shadowOffset: 1,
+    } as NPCStyleDefinition,
+    paleMonk: {
+        animations: paleMonkAnimations,
+        shadowOffset: 1,
+    } as NPCStyleDefinition,
+    midMonk: {
+        animations: midMonkAnimations,
+        shadowOffset: 1,
+    } as NPCStyleDefinition,
+    darkMonk: {
+        animations: darkMonkAnimations,
         shadowOffset: 1,
     } as NPCStyleDefinition,
     vanara: {
@@ -73,10 +104,6 @@ export const npcStyles = {
         animations: vanaraRedAnimations,
         shadowOffset: 1,
     } as NPCStyleDefinition,
-    mom: {
-        animations: momAnimations,
-        shadowOffset: 1,
-    } as NPCStyleDefinition,
     zoro: {
         animations: zoroAnimations,
         shadowOffset: 1,
@@ -106,15 +133,21 @@ export const npcBehaviors = {
         }
     },
     idle(state: GameState, npc: NPC) {
+        // const idleTime: number = npc.modeTime + Math.random()*800;
         if (npc.mode === '' || npc.mode === 'chooseWalking') {
             npc.setMode('chooseIdling');
+            console.log('chooseIdling');
         }
-        if (npc.mode === 'chooseIdling' && npc.modeTime > 2000 && Math.random() < (npc.modeTime - 700) / 3000) {
-            npc.setMode('idle');
+        if (npc.mode === 'chooseIdling') {
+            if (npc.modeTime > 2000 && Math.random() < (npc.modeTime - 700) / 3000) {
+                npc.setMode('idle');
+                // console.log('idle:', idleTime);
+            }
         }
         if (npc.mode === 'idle') {
             if (npc.modeTime > 190) {
                 npc.setMode('chooseIdling');
+                console.log('chooseIdling again');
             }
         }
     }
