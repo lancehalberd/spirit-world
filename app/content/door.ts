@@ -680,10 +680,11 @@ export class Door implements ObjectInstance {
         this.y = definition.y;
         this.status = definition.status || 'normal';
         // 'closedEnemy' doors will start open and only close when we confirm there are enemies in the current
-        // are section.
-        //if (this.status === 'closedEnemy') {
-        //    this.status = 'normal';
-        //}
+        // are section. This way we don't play the secret chime every time we enter a room with a closed enemy
+        // door where the enemies are already defeated (or there are not yet enemies).
+        if (this.status === 'closedEnemy') {
+            this.status = 'normal';
+        }
         // If the player already opened this door, set it to the appropriate open status.
         if (getObjectStatus(state, this.definition)) {
             if (this.status === 'cracked') {
