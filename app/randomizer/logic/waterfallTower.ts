@@ -59,6 +59,7 @@ export const waterfallTowerNodes: LogicNode[] = [
             // Just cross the middle stream to reach the big chest area with iron boots or roll across with water blessing.
             {nodeId: 'waterfallTowerBigChest', logic: orLogic(andLogic(hasWaterBlessing, hasRoll), hasIronBoots)},
         ],
+        entranceIds: ['waterfallTower-backEntrance'],
         exits: [{objectId: 'waterfallTower-backEntrance', logic: hasIronBoots}],
     },
     {

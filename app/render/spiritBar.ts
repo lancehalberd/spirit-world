@@ -99,9 +99,10 @@ export function renderSpiritBar(context: CanvasRenderingContext2D, state: GameSt
 }
 
 export function updateHeroMagicStats(state: GameState) {
-    // Hero has no spirit energy until they have eaten a golden peach,
+    // Normally, Hero has no spirit energy until they have eaten a golden peach,
     // which automatically gives them magic + catEyes.
-    if (!state.hero.passiveTools.catEyes) {
+    // During randomizer seeds, Hero always has access to spirit energy.
+    if (!state.hero.passiveTools.catEyes && !state.randomizer?.seed) {
         state.hero.maxMagic = 20;
         state.hero.magic = 0;
         state.hero.magicRegen = 0;

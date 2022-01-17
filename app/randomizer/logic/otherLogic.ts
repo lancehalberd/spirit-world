@@ -108,3 +108,17 @@ export const cavesNodes: LogicNode[] = [
         ],
     },
 ];
+
+
+export const holyCityNodes: LogicNode[] = [
+    {
+        zoneId: 'holyCityInterior',
+        nodeId: 'templePeachPiece',
+        checks: [
+            { objectId: 'templePeachPiece' },
+        ],
+        entranceIds: ['templeCrackedDoor'],
+        exits: [{ objectId: 'templeCrackedDoor' }],
+    },
+];
+

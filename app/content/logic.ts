@@ -70,15 +70,15 @@ export function isLogicValid(state: GameState, logic: LogicCheck, invertLogic = 
 window['isLogicValid'] = isLogicValid;
 
 export const hasCatEyes: LogicCheck = { requiredFlags: ['$catEyes'] };
-export const hasClone: LogicCheck = { requiredFlags: ['$clone', '$catEyes'] };
+export const hasClone: LogicCheck = { requiredFlags: ['$clone'] };
 export const hasIronBoots: LogicCheck = { requiredFlags: ['$ironBoots'] };
 export const hasCloudBoots: LogicCheck = { requiredFlags: ['$cloudBoots'] };
-export const hasAstralProjection: LogicCheck = { requiredFlags: ['$astralProjection', '$spiritSight', '$catEyes'] };
-export const hasSpiritBarrier: LogicCheck = { requiredFlags: ['$cloak', '$catEyes'] };
-export const hasTeleportation: LogicCheck = { requiredFlags: ['$astralProjection', '$spiritSight', '$teleportation', '$catEyes'] };
+export const hasSpiritSight: LogicCheck = { requiredFlags: ['$spiritSight'] };
+export const hasAstralProjection: LogicCheck = { requiredFlags: ['$astralProjection', '$spiritSight'] };
+export const hasTeleportation: LogicCheck = { requiredFlags: ['$astralProjection', '$spiritSight', '$teleportation'] };
+export const hasSpiritBarrier: LogicCheck = { requiredFlags: ['$cloak'] };
 export const hasGloves: LogicCheck = { requiredFlags: ['$gloves'] };
 export const hasMitts: LogicCheck = { requiredFlags: ['$gloves:2'] };
-export const hasSpiritSight: LogicCheck = { requiredFlags: ['$spiritSight', '$catEyes'] };
 export const hasSmallKey: LogicCheck = { requiredFlags: ['$smallKey'] };
 export const hasBigKey: LogicCheck = { requiredFlags: ['$bigKey'] };
 export const hasFireBlessing: LogicCheck = {requiredFlags: ['$fireBlessing']};
@@ -87,9 +87,9 @@ export const hasChakram: LogicCheck = {requiredFlags: ['$weapon']};
 
 // This check will be added automatically to any tiles that have 100% darkness effect.
 //const hasEyes: LogicCheck = { requiredFlags: ['$catEyes:1'] };
-export const hasBow: LogicCheck = {requiredFlags: ['$bow', '$catEyes']};
-export const hasRoll: LogicCheck = {requiredFlags: ['$roll', '$catEyes']};
-export const hasStaff: LogicCheck = {requiredFlags: ['$staff', '$catEyes']};
+export const hasBow: LogicCheck = {requiredFlags: ['$bow']};
+export const hasRoll: LogicCheck = {requiredFlags: ['$roll']};
+export const hasStaff: LogicCheck = {requiredFlags: ['$staff']};
 // This check is for having a weapon that can be used to defeat most bosses.
 // Primarily we don't want having the Spirit Cloak to put any bosses in logic since
 // it is excessively tedious to defeat bosses with.
@@ -99,11 +99,11 @@ export const hasRangedPush: OrLogicCheck = orLogic({requiredFlags: ['$weapon']},
 // This check is used for being able to defeat enemies at all.
 export const hasWeapon: OrLogicCheck = orLogic({requiredFlags: ['$weapon']}, hasBow, hasSpiritBarrier);
 // This check is used for weapons that have the range of the charged chakram or greater.
-export const hasMediumRange: OrLogicCheck = orLogic({requiredFlags: ['$weapon', '$charge', '$catEyes']}, hasBow);
+export const hasMediumRange: OrLogicCheck = orLogic({requiredFlags: ['$weapon', '$charge']}, hasBow);
 
-export const hasFire: LogicCheck = andLogic(orLogic(hasBow, hasWeapon), {requiredFlags: ['$fire', '$charge', '$catEyes']});
-export const hasIce: LogicCheck = andLogic(orLogic(hasBow, hasWeapon), {requiredFlags: ['$ice', '$charge', '$catEyes']});
-export const hasLightning: LogicCheck = andLogic(orLogic(hasBow, hasWeapon), {requiredFlags: ['$lightning', '$charge', '$catEyes']});
+export const hasFire: LogicCheck = andLogic(orLogic(hasBow, hasWeapon), {requiredFlags: ['$fire', '$charge']});
+export const hasIce: LogicCheck = andLogic(orLogic(hasBow, hasWeapon), {requiredFlags: ['$ice', '$charge']});
+export const hasLightning: LogicCheck = andLogic(orLogic(hasBow, hasWeapon), {requiredFlags: ['$lightning', '$charge']});
 
 
 // Note that in some areas teleportation may not be possible contextually, for example if the player cannot
@@ -119,7 +119,7 @@ export const canCross4Gaps: OrLogicCheck = orLogic(andLogic(hasRoll, hasCloudBoo
 export const canCross6Gaps: AndLogicCheck = andLogic(orLogic(hasRoll, hasCloudBoots, hasTeleportation, hasClone), orLogic(hasStaff));
 export const canCross8Gaps: AndLogicCheck = andLogic(hasRoll, hasCloudBoots, hasStaff);
 
-export const canTravelFarUnderWater = andLogic(hasIronBoots, orLogic(hasWaterBlessing, hasCatEyes));
+export const canTravelFarUnderWater = andLogic(hasIronBoots);
 
 export const canReleaseBeasts = andLogic(canCross6Gaps, hasTeleportation, hasBossWeapon);
 

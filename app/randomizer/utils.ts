@@ -11,7 +11,7 @@ import {
 } from 'app/content/spawnLocations';
 
 import { peachCaveNodes } from 'app/randomizer/logic/peachCaveLogic';
-import { cavesNodes, treeVillageNodes, waterfallCaveNodes } from 'app/randomizer/logic/otherLogic'
+import { cavesNodes, holyCityNodes, treeVillageNodes, waterfallCaveNodes } from 'app/randomizer/logic/otherLogic'
 import { overworldNodes, underwaterNodes, skyNodes } from 'app/randomizer/logic/overworldLogic';
 import { tombNodes } from 'app/randomizer/logic/tombLogic';
 import { warTempleNodes } from 'app/randomizer/logic/warTempleLogic';
@@ -21,6 +21,7 @@ import { forestTempleNodes } from 'app/randomizer/logic/forestTempleLogic';
 import { waterfallTowerNodes } from 'app/randomizer/logic/waterfallTower';
 import { riverTempleNodes, riverTempleWaterNodes } from 'app/randomizer/logic/riverTempleLogic';
 import { craterNodes } from 'app/randomizer/logic/craterLogic';
+import { staffTowerNodes } from 'app/randomizer/logic/staffTower';
 import { addCheck } from 'app/randomizer/checks';
 
 import { readGetParameter } from 'app/utils/index';
@@ -44,6 +45,7 @@ const allNodes = [
     ...waterfallCaveNodes,
     ...peachCaveNodes,
     ...treeVillageNodes,
+    ...holyCityNodes,
     ...tombNodes,
     ...warTempleNodes,
     ...cocoonNodes,
@@ -53,6 +55,7 @@ const allNodes = [
     ...riverTempleNodes,
     ...riverTempleWaterNodes,
     ...craterNodes,
+    ...staffTowerNodes,
 ];
 
 interface LootData {
@@ -285,6 +288,10 @@ function canOpenDoor(zone: Zone, state: GameState, door: EntranceDefinition): bo
         const dungeonInventory = state.savedState.dungeonInventories[zone.key];
         return dungeonInventory?.bigKey;
     }
+    if (door.status === 'cracked') {
+        // console.log(door.id, state.hero.activeTools.clone > 0 && state.hero.passiveTools.catEyes > 0);
+        return state.hero.activeTools.clone > 0 && state.hero.passiveTools.catEyes > 0;
+    }
     return true;
 }
 
@@ -433,13 +440,14 @@ function countRequiredKeysForEntrance(allNodes: LogicNode[], startingNodes: Logi
             }
         }
     }
-    console.log(exitToUpdate.id, 'calculated as', exitToUpdate.requiredKeysForLogic, 'keys');
+    // console.log(exitToUpdate.id, 'calculated as', exitToUpdate.requiredKeysForLogic, 'keys');
 }
 
 function organizeLootObjects(lootObjects: LootWithLocation[]) {
     const bigKeys: LootWithLocation[] = [];
     const smallKeys: LootWithLocation[] = [];
     const progressLoot: LootWithLocation[] = [];
+    const peachLoot: LootWithLocation[] = [];
     const trashLoot: LootWithLocation[] = [];
     for (const lootWithLocation of lootObjects) {
         // peach+peach pieces are considered progress since some areas may require certain life totals
@@ -456,12 +464,16 @@ function organizeLootObjects(lootObjects: LootWithLocation[]) {
             case 'smallKey':
                 smallKeys.push(lootWithLocation);
                 break;
+            case 'peachOfImmortality':
+            case 'peachOfImmortalityPiece':
+                peachLoot.push(lootWithLocation);
+                break;
             default:
                 progressLoot.push(lootWithLocation);
         }
     }
 
-    return { bigKeys, smallKeys, progressLoot, trashLoot };
+    return { bigKeys, smallKeys, progressLoot, peachLoot, trashLoot };
 }
 
 // Make a deep copy of the state.
@@ -497,7 +509,7 @@ function applyLootObjectToState(state: GameState, lootWithLocation: LootWithLoca
 
 export function reverseFill(random: typeof SRandom, allNodes: LogicNode[], startingNodes: LogicNode[]): AssignmentState {
     calculateKeyLogic(allNodes, startingNodes);
-    // console.log({ allNodes, startingNodes });
+    //console.log({ allNodes, startingNodes });
     const allLootObjects = getLootObjects(allNodes);
     //console.log(allLootObjects.map(object => object.lootObject.lootType + ':' + object.location.zoneKey));
     let initialState = getDefaultState();
@@ -507,6 +519,8 @@ export function reverseFill(random: typeof SRandom, allNodes: LogicNode[], start
     for (const lootWithLocation of allLootObjects) {
         finalState = applyLootObjectToState(finalState, lootWithLocation);
     }
+    //const initialCheckIds = findReachableChecks(allNodes, startingNodes, initialState).map(l => l.lootObject.id);
+    //console.log(initialCheckIds);
     //debugState(finalState);
     const allReachableCheckIds = findReachableChecks(allNodes, startingNodes, finalState).map(l => l.lootObject.id);
     for (const lootWithLocation of allLootObjects) {
@@ -515,19 +529,21 @@ export function reverseFill(random: typeof SRandom, allNodes: LogicNode[], start
             console.warn(lootWithLocation.lootObject.id, ' will never be reachable');
         }
     }
-    // console.log({ allLootObjects, allReachableCheckIds });
+    //console.log({ allLootObjects, allReachableCheckIds });
     const assignmentsState: AssignmentState = {
         assignments: [],
         assignedLocations: [],
         assignedContents: [],
     }
-    let { bigKeys, smallKeys, progressLoot, trashLoot } = organizeLootObjects(allLootObjects);
+    let { bigKeys, smallKeys, peachLoot, progressLoot, trashLoot } = organizeLootObjects(allLootObjects);
     progressLoot = random.shuffle(progressLoot);
+    random.generateAndMutate();
+    peachLoot = random.shuffle(peachLoot);
     random.generateAndMutate();
     trashLoot = random.shuffle(trashLoot);
     random.generateAndMutate();
-    let remainingLoot = [...bigKeys, ...smallKeys, ...progressLoot];
-    for (let itemSet of [bigKeys, smallKeys, progressLoot]) {
+    let remainingLoot = [...bigKeys, ...smallKeys, ...progressLoot, ...peachLoot];
+    for (let itemSet of [bigKeys, smallKeys, progressLoot, peachLoot]) {
         while (itemSet.length) {
             const itemToPlace = random.removeElement(itemSet);
             random.generateAndMutate();
@@ -683,7 +699,7 @@ function collectAllLoot(allNodes: LogicNode[], startingNodes: LogicNode[], state
 }
 
 export function applyLootAssignments(assignments: LootAssignment[]): void {
-    console.log('applying assignments:');
+    // console.log('applying assignments:');
     // console.log(assignments);
     for (const assignment of assignments) {
         // Change spirit powers into progressive spirit powers.
@@ -694,7 +710,7 @@ export function applyLootAssignments(assignments: LootAssignment[]): void {
             assignment.lootType = 'spiritPower';
         }
         const zoneKey = assignment.target.location.zoneKey;
-        console.log(assignment.source.lootObject.id, ' => ', assignment.target.lootObject.id);
+        // console.log(assignment.source.lootObject.id, ' => ', assignment.target.lootObject.id);
         if (assignment.target.lootObject.type === 'dialogueLoot') {
             const {object} = findObjectById(zones[zoneKey], assignment.target.lootObject.id);
             const npc = object as NPCDefinition;

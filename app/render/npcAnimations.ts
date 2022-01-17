@@ -93,10 +93,10 @@ const paleMonkIdleUpAnimation: FrameAnimation = createAnimation(paleMonkImage, h
 const paleMonkIdleDownAnimation: FrameAnimation = createAnimation(paleMonkImage, humanGeometry, { cols: 4, y: 0, duration: 4});
 const paleMonkIdleLeftAnimation: FrameAnimation = createAnimation(paleMonkImage, humanGeometry, { cols: 4, y: 2, duration: 4});
 const paleMonkIdleRightAnimation: FrameAnimation = createAnimation(paleMonkImage, humanGeometry, { cols: 4, y: 1, duration: 4});
-const paleMonkWalkUpAnimation: FrameAnimation = createAnimation(paleMonkImage, humanGeometry, { cols: 4, y: 7, duration: 4});
-const paleMonkWalkDownAnimation: FrameAnimation = createAnimation(paleMonkImage, humanGeometry, { cols: 4, y: 4, duration: 4});
-const paleMonkWalkLeftAnimation: FrameAnimation = createAnimation(paleMonkImage, humanGeometry, { cols: 4, y: 6, duration: 4});
-const paleMonkWalkRightAnimation: FrameAnimation = createAnimation(paleMonkImage, humanGeometry, { cols: 4, y: 5, duration: 4});
+const paleMonkWalkUpAnimation: FrameAnimation = createAnimation(paleMonkImage, humanGeometry, { cols: 4, y: 7, duration: 8});
+const paleMonkWalkDownAnimation: FrameAnimation = createAnimation(paleMonkImage, humanGeometry, { cols: 4, y: 4, duration: 8});
+const paleMonkWalkLeftAnimation: FrameAnimation = createAnimation(paleMonkImage, humanGeometry, { cols: 4, y: 6, duration: 8});
+const paleMonkWalkRightAnimation: FrameAnimation = createAnimation(paleMonkImage, humanGeometry, { cols: 4, y: 5, duration: 8});
 
 const midMonkImage: string = 'gfx/npcs/24x36-midMonk.png'; 
 const midMonkUpAnimation: FrameAnimation = createAnimation(midMonkImage, humanGeometry, { x: 0, y: 3});
