@@ -23,7 +23,7 @@ export const overworldNodes: LogicNode[] = [
         entranceIds: [
             'elderEntrance', 'tombTeleporter',
             'lakeTunnelEntrance', 'peachCaveTopEntrance', 'peachCaveWaterEntrance', 'staffTowerEntrance',
-            'tombEntrance', 'waterfallCaveEntrance', 'templeCrackedDoor', 'templeDoor', 'foodHouse',
+            'tombEntrance', 'waterfallCaveEntrance', 'templeCrackedDoor', 'templeDoor', 'overworld:holyCityFoodHouse',
         ],
         exits: [
             { objectId: 'elderEntrance' },
@@ -35,7 +35,7 @@ export const overworldNodes: LogicNode[] = [
             { objectId: 'waterfallCaveEntrance' },
             { objectId: 'templeCrackedDoor' },
             { objectId: 'templeDoor' },
-            { objectId: 'foodHouse' },
+            { objectId: 'overworld:holyCityFoodHouse' },
         ],
     },
     {

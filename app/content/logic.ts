@@ -93,17 +93,18 @@ export const hasStaff: LogicCheck = {requiredFlags: ['$staff']};
 // This check is for having a weapon that can be used to defeat most bosses.
 // Primarily we don't want having the Spirit Cloak to put any bosses in logic since
 // it is excessively tedious to defeat bosses with.
-export const hasBossWeapon: OrLogicCheck = orLogic({requiredFlags: ['$weapon']}, hasBow);
+export const hasBossWeapon: OrLogicCheck = orLogic(hasChakram, hasBow, hasStaff);
 // This check is for being able to push objects at the range of the chakram like pots.
-export const hasRangedPush: OrLogicCheck = orLogic({requiredFlags: ['$weapon']}, hasBow);
+export const hasRangedPush: OrLogicCheck = orLogic(hasChakram, hasBow);
 // This check is used for being able to defeat enemies at all.
-export const hasWeapon: OrLogicCheck = orLogic({requiredFlags: ['$weapon']}, hasBow, hasSpiritBarrier);
+export const hasWeapon: OrLogicCheck = orLogic(hasChakram, hasBow, hasSpiritBarrier, hasStaff);
+export const hasElementalWeapon: OrLogicCheck = orLogic(hasChakram, hasBow);
 // This check is used for weapons that have the range of the charged chakram or greater.
 export const hasMediumRange: OrLogicCheck = orLogic({requiredFlags: ['$weapon', '$charge']}, hasBow);
 
-export const hasFire: LogicCheck = andLogic(orLogic(hasBow, hasWeapon), {requiredFlags: ['$fire', '$charge']});
-export const hasIce: LogicCheck = andLogic(orLogic(hasBow, hasWeapon), {requiredFlags: ['$ice', '$charge']});
-export const hasLightning: LogicCheck = andLogic(orLogic(hasBow, hasWeapon), {requiredFlags: ['$lightning', '$charge']});
+export const hasFire: LogicCheck = andLogic(hasElementalWeapon, {requiredFlags: ['$fire', '$charge']});
+export const hasIce: LogicCheck = andLogic(hasElementalWeapon, {requiredFlags: ['$ice', '$charge']});
+export const hasLightning: LogicCheck = andLogic(hasElementalWeapon, {requiredFlags: ['$lightning', '$charge']});
 
 
 // Note that in some areas teleportation may not be possible contextually, for example if the player cannot

@@ -1920,7 +1920,6 @@ const f0_1x2: AreaDefinition = {
         },
         {
             key: 'foreground',
-            logicKey: 'desertTower',
             grid: {
                 w: 32,
                 h: 32,
@@ -1963,7 +1962,6 @@ const f0_1x2: AreaDefinition = {
         {
             key: 'foreground2',
             drawPriority: 'foreground',
-            logicKey: 'desertTower',
             grid: {
                 w: 32,
                 h: 32,

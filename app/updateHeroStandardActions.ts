@@ -589,9 +589,8 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         hero.animationTime = 0;
         return;
     }
-    // You can meditate as long as you have access to spirit energy (granted with cat eyes).
     if (wasGameKeyPressed(state, GAME_KEY.MEDITATE)
-        && !isActionBlocked && hero.passiveTools.catEyes
+        && !isActionBlocked && hero.passiveTools.spiritSight
         && !heldChakram && !hero.chargingLeftTool && !hero.chargingRightTool
     ) {
         hero.action = 'meditating';

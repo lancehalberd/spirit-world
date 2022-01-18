@@ -1,8 +1,8 @@
-import { addObjectToArea, addEffectToArea } from 'app/content/areas';
+import { addObjectToArea, addEffectToArea, playAreaSound } from 'app/content/areas';
 import { Arrow } from 'app/content/effects/arrow';
 import { Clone }  from 'app/content/objects/clone';
 import { Staff } from 'app/content/objects/staff';
-import { directionMap, getDirection } from 'app/utils/field';
+import { directionMap, getDirection, hitTargets } from 'app/utils/field';
 
 import { ActiveTool, GameState, Hero, MagicElement } from 'app/types'
 
@@ -135,9 +135,23 @@ export function useTool(
             // A staff that takes up a single tile is also an invalid use, but we remove it after adding it.
             if (staff.topRow === staff.bottomRow && staff.leftColumn === staff.rightColumn) {
                 staff.remove(state);
+                playAreaSound(state, state.areaInstance, 'menuTick');
             } else {
                 state.hero.magic -= 10;
                 hero.toolOnCooldown = 'staff';
+                playAreaSound(state, state.areaInstance, 'bossDeath');
+                hitTargets(state, state.areaInstance, {
+                    damage: 4 * staffLevel,
+                    hitbox: {
+                        x: staff.leftColumn * 16 - 2,
+                        y: staff.topRow * 16 - 2,
+                        w: (staff.rightColumn - staff.leftColumn + 1) * 16 + 4,
+                        h: (staff.bottomRow - staff.topRow + 1) * 16 + 4,
+                    },
+                    hitEnemies: true,
+                    hitObjects: true,
+                    knockAwayFromHit: true,
+                });
             }
             return;
     }
