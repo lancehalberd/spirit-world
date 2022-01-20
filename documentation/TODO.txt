@@ -46,7 +46,7 @@ Current tasks:
     Staff Tower
         - Elevator only in spirit world (similar to cocoon)
             - Trying to open the elevator on the first floor will give a message about power flow in the spirit world being disrupted by excess energy in the material world. Maybe something about starting backup power.
-            - Elevator is stuck on floor 3
+            - Elevator is stuck on floor 2 but you need to drop down from floor 3 to reach it.
             - Disabling emergency breaks in the elevator grants access to the basement+backup generators (mini boss?)
             - Fixing elevator grants access to upper floors, but last two floors must be done in material world to reach the roof and boss.
             - 5th floor in spirit world has device for re-activating the tower after defeating elemental beast, which is what gives access to the Tower Staff tool upgrade. This also disables all machine enemies by default.
@@ -218,14 +218,13 @@ Additional Clone Tool Behavior:
     Charging the clone 1 level without elements makes it invulnerable for 4 seconds.
 
 Additional Bow Behavior:
-    Charging attacks makes arrow faster
+    Arrows should have stuck frames for diagonals or stick out orthoganal to whatever they hit.
     Charge level 2 creates an elemental explosion
         - Neutral element can destroy objects similar to clone explosion.
 
 Peach Cave Improvements:
     - Add enemies:
         - Eggs that hatch into enemies if not destroyed first
-        - Vine enemies that can be knocked to the ground
     - Sticky Web Ground
     - Add boss:
         - Spawns eggs

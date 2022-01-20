@@ -1176,8 +1176,6 @@ export function renderObjectPreview(
     const definition: ObjectDefinition = createObjectDefinition(state, editingState, {
         id: uniqueId(state, editingState.selectedObject.type),
         ...editingState.selectedObject,
-        // This is set to 'normal' so we can see the preview during edit even if it would otherwise be hidden.
-        status: 'normal',
         x: Math.round(x + state.camera.x),
         y: Math.round(y + state.camera.y),
     });
@@ -1185,5 +1183,11 @@ export function renderObjectPreview(
     definition.x -= (frame.content?.w || frame.w) / 2;
     definition.y -= (frame.content?.h || frame.h) / 2;
     fixObjectPosition(state, definition);
-    createObjectInstance(state, definition).render(context, state);
+    const object = createObjectInstance(state, definition);
+    object.area = state.areaInstance;
+    // This is set to 'normal' so we can see the preview during edit even if it would otherwise be hidden.
+    if (object.status === 'hidden' || object.status === 'gone' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
+        object.status = 'normal';
+    }
+    object.render(context, state);
 }

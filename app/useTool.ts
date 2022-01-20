@@ -112,6 +112,7 @@ export function useTool(
                 state.activeStaff.remove(state);
                 state.hero.toolCooldown = 0;
                 hero.toolOnCooldown = null;
+                playAreaSound(state, state.areaInstance, 'menuTick');
                 return;
             }
             if (state.hero.magic <= 0) {

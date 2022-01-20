@@ -476,11 +476,23 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         if (state.hero.leftTool && wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL)
             && (state.hero.leftTool !== 'clone' || !state.hero.clones.length)
         ) {
-            hero.chargingLeftTool = true;
+            // Currently only the bow tool can be charged.
+            if (state.hero.leftTool === 'bow') {
+                hero.chargingLeftTool = true;
+            } else {
+                const direction = getDirection((dx || dy) ? dx : directionMap[hero.d][0], (dx || dy) ? dy : directionMap[hero.d][1], true, hero.d);
+                useTool(state, hero, state.hero.leftTool, directionMap[direction][0], directionMap[direction][1]);
+            }
         } else if (state.hero.rightTool && wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL)
             && (state.hero.rightTool !== 'clone' || !state.hero.clones.length)
         ) {
-            hero.chargingRightTool = true;
+            // Currently only the bow tool can be charged.
+            if (state.hero.rightTool === 'bow') {
+                hero.chargingRightTool = true;
+            } else {
+                const direction = getDirection((dx || dy) ? dx : directionMap[hero.d][0], (dx || dy) ? dy : directionMap[hero.d][1], true, hero.d);
+                useTool(state, hero, state.hero.rightTool, directionMap[direction][0], directionMap[direction][1]);
+            }
         }
         if (hero.chargingRightTool || hero.chargingLeftTool) {
             hero.chargeTime = 0;
