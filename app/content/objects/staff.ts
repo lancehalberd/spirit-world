@@ -1,7 +1,8 @@
+import { getAreaSize } from 'app/content/areas';
 import { debugCanvas } from 'app/dom';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
-import { isPointOpen } from 'app/utils/field';
+// import { isPointOpen } from 'app/utils/field';
 
 import { AreaInstance, Direction, DrawPriority, MagicElement, GameState, ObjectInstance, ObjectStatus, TileBehaviors } from 'app/types';
 
@@ -53,42 +54,65 @@ export class Staff implements ObjectInstance {
         this.damage = damage;
         let row = this.topRow = this.bottomRow = Math.floor(y / 16);
         let column = this.leftColumn = this.rightColumn = Math.floor(x / 16);
-        const movementProps = {canFall: true, canSwim: true};
-        const excludedObjects = new Set([state.hero]);
-        if (!isPointOpen(state, this.area, {x: column * 16 + 8, y: row * 16 + 8 }, movementProps, excludedObjects)) {
+        //const movementProps = {canFall: true, canSwim: true};
+        //const excludedObjects = new Set([state.hero]);
+        const tileBehavior = this.area?.behaviorGrid[row]?.[column];
+        if (tileBehavior?.solid || tileBehavior?.solidMap || tileBehavior?.edges) {
             this.invalid = true;
             return;
         }
+        /*if (!isPointOpen(state, this.area, {x: column * 16 + 8, y: row * 16 + 8 }, movementProps, excludedObjects)) {
+            this.invalid = true;
+            return;
+        }*/
+        const { section } = getAreaSize(state);
         if (direction === 'left') {
             for (let i = 1; i < maxLength; i++) {
                 column = this.rightColumn - i;
-                if (!isPointOpen(state, this.area, {x: column * 16 + 8, y: row * 16 + 8 }, movementProps,  excludedObjects)) {
+                const tileBehavior = this.area?.behaviorGrid[row]?.[column];
+                if (column * 16 < section.x || tileBehavior?.solid || tileBehavior?.solidMap || tileBehavior?.edges) {
                     break;
                 }
+
+                /*if (!isPointOpen(state, this.area, {x: column * 16 + 8, y: row * 16 + 8 }, movementProps,  excludedObjects)) {
+                    break;
+                }*/
                 this.leftColumn = column;
             }
         }else if (direction === 'right') {
             for (let i = 1; i < maxLength; i++) {
                 column = this.leftColumn + i;
-                if (!isPointOpen(state, this.area, {x: column * 16 + 8, y: row * 16 + 8 }, movementProps,  excludedObjects)) {
+                const tileBehavior = this.area?.behaviorGrid[row]?.[column];
+                if (column * 16 >= section.x + section.w || tileBehavior?.solid || tileBehavior?.solidMap || tileBehavior?.edges) {
                     break;
                 }
+                /*if (!isPointOpen(state, this.area, {x: column * 16 + 8, y: row * 16 + 8 }, movementProps,  excludedObjects)) {
+                    break;
+                }*/
                 this.rightColumn = column;
             }
         } else if (direction === 'up') {
             for (let i = 1; i < maxLength; i++) {
                 row = this.bottomRow - i;
-                if (!isPointOpen(state, this.area, {x: column * 16 + 8, y: row * 16 + 8 }, movementProps,  excludedObjects)) {
+                const tileBehavior = this.area?.behaviorGrid[row]?.[column];
+                if (row * 16 < section.y || tileBehavior?.solid || tileBehavior?.solidMap || tileBehavior?.edges) {
                     break;
                 }
+                /*if (!isPointOpen(state, this.area, {x: column * 16 + 8, y: row * 16 + 8 }, movementProps,  excludedObjects)) {
+                    break;
+                }*/
                 this.topRow = row;
             }
         } else if (direction === 'down') {
             for (let i = 1; i < maxLength; i++) {
                 row = this.topRow + i;
-                if (!isPointOpen(state, this.area, {x: column * 16 + 8, y: row * 16 + 8 }, movementProps,  excludedObjects)) {
+                const tileBehavior = this.area?.behaviorGrid[row]?.[column];
+                if (row * 16 >= section.y + section.h || tileBehavior?.solid || tileBehavior?.solidMap || tileBehavior?.edges) {
                     break;
                 }
+                /*if (!isPointOpen(state, this.area, {x: column * 16 + 8, y: row * 16 + 8 }, movementProps,  excludedObjects)) {
+                    break;
+                }*/
                 this.bottomRow = row;
             }
         }

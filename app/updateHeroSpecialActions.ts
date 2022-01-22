@@ -295,17 +295,17 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             const mx = hero.x % 16;
             const my = hero.y % 16;
             if (hero.d === 'up' || hero.d === 'down') {
-                if (mx >= 8 && mx < 15) {
+                if (mx >= 8 && mx < 14) {
                     hero.x++;
                 }
-                if (mx < 8 && mx < 15) {
+                if (mx < 8 && mx > 2) {
                     hero.x--;
                 }
             } else {
-                if (my >= 8 && my < 15) {
+                if (my >= 8 && my < 14) {
                     hero.y++;
                 }
-                if (my < 8 && my < 15) {
+                if (my < 8 && my > 2) {
                     hero.y--;
                 }
             }
