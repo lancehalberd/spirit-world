@@ -17,7 +17,7 @@ import {
 } from 'app/keyCommands';
 import { checkForFloorEffects, moveActor } from 'app/moveActor';
 import { getChargeLevelAndElement, useTool } from 'app/useTool';
-import { isHeroFloating, isHeroSinking } from 'app/utils/actor';
+import { isHeroFloating, isHeroSinking, isUnderwater } from 'app/utils/actor';
 import {
     canTeleportToCoords,
     directionMap,
@@ -601,7 +601,12 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         hero.animationTime = 0;
         return;
     }
-    if (wasGameKeyPressed(state, GAME_KEY.MEDITATE)
+    if ((hero.swimming || isUnderwater(state, hero)) && wasGameKeyPressed(state, GAME_KEY.MEDITATE)) {
+        // The meditate key can be used to quickly toggle iron boots in/under water.
+        if (hero.equipment.ironBoots) {
+            hero.equipedGear.ironBoots = !hero.equipedGear.ironBoots;
+        }
+    } else if (wasGameKeyPressed(state, GAME_KEY.MEDITATE)
         && !isActionBlocked && hero.passiveTools.spiritSight
         && !heldChakram && !hero.chargingLeftTool && !hero.chargingRightTool
     ) {

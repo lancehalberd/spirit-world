@@ -53,8 +53,11 @@ export function update() {
             return;
         }
         if (wasGameKeyPressed(state, GAME_KEY.MENU)) {
-            state.paused = !state.paused;
-            state.menuIndex = 0;
+            // Don't allow pausing while dialogue is displayed.
+            if (state.paused || !state.messagePage?.length) {
+                state.paused = !state.paused;
+                state.menuIndex = 0;
+            }
         }
         if (state.paused && !(state.hideMenu && wasGameKeyPressed(state, GAME_KEY.MEDITATE))) {
             if (!state.hideMenu) {

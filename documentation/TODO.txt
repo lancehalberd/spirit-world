@@ -23,7 +23,7 @@ Known Bugs:
     - Some water instead of ice west of the lake in the spirit world.
     - Can get to undefined area in city.
     - Cliff Edge issues:
-        - Staff can cover thin cliff edges
+        - Would be nice if staff could go across edges.
         - Bow can fire up thin cliffs
         - Bow cannot fire down southern cliffs.
     - Projectiles can fire in betwen black abyss tiles.
