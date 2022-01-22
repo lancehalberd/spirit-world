@@ -135,6 +135,14 @@ export class Enemy implements Actor, ObjectInstance {
         return !(this.spawnX < section.x || this.spawnX > section.x + section.w ||
                 this.spawnY < section.y || this.spawnY > section.y + section.h)
     }
+    changeToAnimation(type: string) {
+        const animationSet = this.enemyDefinition.animations[type] || this.enemyDefinition.animations.idle;
+        const targetAnimation = animationSet[this.d];
+        if (this.currentAnimation !== targetAnimation) {
+            this.currentAnimation = targetAnimation;
+            this.animationTime = 0;
+        }
+    }
     setAnimation(type: string, d: Direction, time: number = 0) {
         const animationSet = this.enemyDefinition.animations[type] || this.enemyDefinition.animations.idle;
         this.currentAnimation = animationSet[d];

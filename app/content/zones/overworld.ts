@@ -298,6 +298,13 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "staffTowerEntrance", logicKey: "mountainTower", x: 64, y: 416, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerEntrance", d: "up"},
         {status: "normal", id: "overworldCliffPeachPiece", x: 208, y: 256, type: "chest", lootType: "peachOfImmortalityPiece", lootLevel: 1},
         {status: "normal", id: "caves-ascentEntrance", x: 240, y: 32, type: "door", style: "cavern", targetZone: "caves", targetObjectId: "caves-ascentEntrance", d: "up"},
+        {status: "normal", id: "overworld:0:0x0-squirrel-0", x: 272, y: 384, type: "enemy", enemyType: "squirrel", d: "down", params: {}},
+        {status: "normal", id: "overworld:0:0x0-squirrel-1", x: 272, y: 448, type: "enemy", enemyType: "squirrel", d: "down", params: {}},
+        {status: "normal", id: "overworld:0:0x0-beetleWinged-0", x: 64, y: 96, type: "enemy", enemyType: "beetleWinged", d: "down", params: {}},
+        {status: "normal", id: "overworld:0:0x0-beetleWinged-1", x: 144, y: 32, type: "enemy", enemyType: "beetleWinged", d: "down", params: {}},
+        {status: "normal", id: "overworld:0:0x0-beetleWinged-2", x: 336, y: 48, type: "enemy", enemyType: "beetleWinged", d: "down", params: {}},
+        {status: "normal", id: "overworld:0:0x0-beetle-0", x: 192, y: 176, type: "enemy", enemyType: "beetle", d: "down", params: {}},
+        {status: "normal", id: "overworld:0:0x0-beetle-1", x: 384, y: 144, type: "enemy", enemyType: "beetle", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16},
@@ -728,6 +735,10 @@ const f0_0x1: AreaDefinition = {
         {status: "normal", id: "overworld:0:1x0-decoration-0", x: 68, y: 368, type: "decoration", w: 72, h: 64, decorationType: "waterfall", drawPriority: "sprites"},
         {status: "normal", id: "overworld:0:1x0-decoration-2", x: 69, y: 48, type: "decoration", w: 56, h: 48, decorationType: "waterfall", drawPriority: "sprites"},
         {status: "normal", id: "waterfallTowerEntrance", x: 80, y: 32, targetZone: "waterfallTower", targetObjectId: "waterfallTowerEntrance", type: "teleporter"},
+        {status: "normal", id: "overworld:0:1x0-beetleHorned-0", x: 368, y: 192, type: "enemy", enemyType: "beetleHorned", d: "down", params: {}},
+        {status: "normal", id: "overworld:0:1x0-beetleHorned-1", x: 384, y: 80, type: "enemy", enemyType: "beetleHorned", d: "down", params: {}},
+        {status: "normal", id: "overworld:0:1x0-beetleMini-0", x: 384, y: 352, type: "enemy", enemyType: "beetleMini", d: "down", params: {}},
+        {status: "normal", id: "overworld:0:1x0-beetleMini-1", x: 432, y: 384, type: "enemy", enemyType: "beetleMini", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -1302,6 +1313,9 @@ const f0_1x0: AreaDefinition = {
         {id: "tombEntrance", linked: false, spirit: false, status: "closedSwitch", x: 112, y: 80, type: "door", style: "lightCave", targetZone: "tomb", targetObjectId: "tombEntrance", d: "up", saveStatus: "forever"},
         {id: "overworld:0:0x1-crystalSwitch-0", linked: false, spirit: false, status: "normal", x: 192, y: 48, type: "crystalSwitch", targetObjectId: "tombEntrance", timer: 0, saveStatus: "forever"},
         {id: "overworld:0:0x1-crystalSwitch-1", linked: false, spirit: false, status: "normal", x: 48, y: 48, type: "crystalSwitch", targetObjectId: "tombEntrance", timer: 0, saveStatus: "forever"},
+        {status: "normal", id: "overworld:0:0x1-squirrel-0", x: 304, y: 64, type: "enemy", enemyType: "squirrel", d: "down", params: {}},
+        {status: "normal", id: "overworld:0:0x1-snake-0", x: 160, y: 336, type: "enemy", enemyType: "snake", d: "down", params: {}},
+        {status: "normal", id: "overworld:0:0x1-snake-1", x: 304, y: 336, type: "enemy", enemyType: "snake", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},
@@ -1737,6 +1751,11 @@ const f0_1x1: AreaDefinition = {
         {status: "normal", id: "overworld:s0:1x1-teleporter-0", x: 400, y: 64, type: "teleporter", linked: true, spirit: true},
         {status: "normal", id: "overworldLakePiece", linked: false, spirit: false, x: 399, y: 35, type: "loot", lootType: "peachOfImmortalityPiece", lootLevel: 1},
         {status: "normal", id: "homeInstructions", x: 256, y: 112, type: "narration", message: "Well that was fun!\n{|}But I was gone a lot longer than I expected. Maybe I should head back to the waterfall.\n{|}I hope I didn't miss dinner!\n{|}(Follow the river home north to the waterfall.)", delay: 500, w: 32, h: 32},
+        {status: "normal", id: "overworld:0:1x1-snake-0", x: 336, y: 96, type: "enemy", enemyType: "snake", d: "down", params: {}},
+        {status: "normal", id: "overworld:0:1x1-snake-1", x: 64, y: 240, type: "enemy", enemyType: "snake", d: "down", params: {}},
+        {status: "normal", id: "overworld:0:1x1-snake-2", x: 192, y: 80, type: "enemy", enemyType: "snake", d: "down", params: {}},
+        {status: "normal", id: "overworld:0:1x1-snake-3", x: 272, y: 448, type: "enemy", enemyType: "snake", d: "down", params: {}},
+        {status: "normal", id: "overworld:0:1x1-snake-4", x: 448, y: 224, type: "enemy", enemyType: "snake", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -2005,6 +2024,10 @@ const f0_1x2: AreaDefinition = {
     objects: [
         {status: "normal", id: "staffTowerEntrance", logicKey: "desertTower", x: 160, y: 352, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerEntrance", d: "up"},
         {status: "normal", id: "", x: 144, y: 384, style: "short", type: "staffTowerPoint", location: "desert"},
+        {status: "normal", id: "overworld:0:2x1-squirrel-0", x: 112, y: 416, type: "enemy", enemyType: "squirrel", d: "down", params: {}},
+        {status: "normal", id: "overworld:0:2x1-squirrel-1", x: 384, y: 400, type: "enemy", enemyType: "squirrel", d: "down", params: {}},
+        {status: "normal", id: "overworld:0:2x1-squirrel-2", x: 192, y: 128, type: "enemy", enemyType: "squirrel", d: "down", params: {}},
+        {status: "normal", id: "overworld:0:2x1-squirrel-3", x: 336, y: 160, type: "enemy", enemyType: "squirrel", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16},
@@ -2530,6 +2553,10 @@ const f0_2x1: AreaDefinition = {
         {status: "normal", id: "", x: 160, y: 128, style: "short", type: "staffTowerPoint", location: "forest"},
         {status: "normal", id: "staffTowerEntrance", logicKey: "forestTower", x: 176, y: 96, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerEntrance", d: "up"},
         {status: "normal", id: "fertilityTempleEntrance", x: 96, y: 320, type: "door", style: "wooden", d: "up", targetZone: "caves", targetObjectId: "fertilityTempleEntrance"},
+        {status: "normal", id: "overworld:0:1x2-squirrel-0", x: 176, y: 176, type: "enemy", enemyType: "squirrel", d: "down", params: {}},
+        {status: "normal", id: "overworld:0:1x2-squirrel-1", x: 160, y: 368, type: "enemy", enemyType: "squirrel", d: "down", params: {}},
+        {status: "normal", id: "overworld:0:1x2-squirrel-2", x: 320, y: 176, type: "enemy", enemyType: "squirrel", d: "down", params: {}},
+        {status: "normal", id: "overworld:0:1x2-squirrel-3", x: 336, y: 256, type: "enemy", enemyType: "squirrel", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},
@@ -2979,6 +3006,13 @@ const sf0_0x0: AreaDefinition = {
         },
     ],
     objects: [
+        {status: "normal", id: "overworld:s0:0x0-frostBeetle-0", x: 192, y: 176, type: "enemy", enemyType: "frostBeetle", d: "down", params: {}},
+        {status: "normal", id: "overworld:s0:0x0-frostBeetle-1", x: 384, y: 144, type: "enemy", enemyType: "frostBeetle", d: "down", params: {}},
+        {status: "normal", id: "overworld:s0:0x0-lightningBug-0", x: 336, y: 48, type: "enemy", enemyType: "lightningBug", d: "down", params: {}},
+        {status: "normal", id: "overworld:s0:0x0-lightningBug-1", x: 144, y: 32, type: "enemy", enemyType: "lightningBug", d: "down", params: {}},
+        {status: "normal", id: "overworld:s0:0x0-lightningBug-2", x: 64, y: 96, type: "enemy", enemyType: "lightningBug", d: "down", params: {}},
+        {status: "normal", id: "overworld:s0:0x0-electricSquirrel-0", x: 272, y: 384, type: "enemy", enemyType: "electricSquirrel", d: "down", params: {}},
+        {status: "normal", id: "overworld:s0:0x0-electricSquirrel-1", x: 272, y: 448, type: "enemy", enemyType: "electricSquirrel", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16},
@@ -3404,6 +3438,12 @@ const sf0_0x1: AreaDefinition = {
         },
     ],
     objects: [
+        {status: "normal", id: "overworld:s0:1x0-arrowTurret-0", x: 400, y: 352, type: "enemy", enemyType: "arrowTurret", d: "down", params: {}},
+        {status: "normal", id: "overworld:s0:1x0-ent-0", x: 352, y: 320, type: "enemy", enemyType: "ent", d: "down", params: {}},
+        {status: "normal", id: "overworld:s0:1x0-ent-1", x: 192, y: 368, type: "enemy", enemyType: "ent", d: "down", params: {}},
+        {status: "normal", id: "overworld:s0:1x0-arrowTurret-1", x: 448, y: 64, type: "enemy", enemyType: "arrowTurret", d: "down", params: {}},
+        {status: "normal", id: "overworld:s0:1x0-frostBeetle-0", x: 368, y: 128, type: "enemy", enemyType: "frostBeetle", d: "down", params: {}},
+        {status: "normal", id: "overworld:s0:1x0-frostBeetle-1", x: 208, y: 48, type: "enemy", enemyType: "frostBeetle", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -3964,6 +4004,12 @@ const sf0_1x0: AreaDefinition = {
         },
     ],
     objects: [
+        {status: "normal", id: "overworld:s0:0x1-flameSnake-0", x: 304, y: 336, type: "enemy", enemyType: "flameSnake", d: "down", params: {}},
+        {status: "normal", id: "overworld:s0:0x1-flameSnake-1", x: 160, y: 336, type: "enemy", enemyType: "flameSnake", d: "down", params: {}},
+        {status: "normal", id: "overworld:s0:0x1-electricSquirrel-0", x: 304, y: 64, type: "enemy", enemyType: "electricSquirrel", d: "down", params: {}},
+        {status: "normal", id: "overworld:s0:0x1-ent-0", x: 192, y: 416, type: "enemy", enemyType: "ent", d: "down", params: {}},
+        {status: "normal", id: "overworld:s0:0x1-ent-1", x: 288, y: 368, type: "enemy", enemyType: "ent", d: "down", params: {}},
+        {status: "normal", id: "overworld:s0:0x1-ent-2", x: 32, y: 352, type: "enemy", enemyType: "ent", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},
@@ -4385,6 +4431,12 @@ const sf0_1x1: AreaDefinition = {
     objects: [
         {id: "peachCaveWaterEntrance", linked: true, spirit: true, status: "normal", x: 256, y: 80, type: "door", style: "lightCave", targetZone: "peachCave", targetObjectId: "peachCave:waterEntrance", d: "up"},
         {status: "normal", id: "overworld:s0:1x1-teleporter-0", x: 400, y: 64, type: "teleporter", linked: true},
+        {status: "normal", id: "overworld:s0:1x1-frostBeetle-0", x: 64, y: 240, type: "enemy", enemyType: "frostBeetle", d: "down", params: {}},
+        {status: "normal", id: "overworld:s0:1x1-frostBeetle-1", x: 272, y: 448, type: "enemy", enemyType: "frostBeetle", d: "down", params: {}},
+        {status: "normal", id: "overworld:s0:1x1-frostBeetle-2", x: 448, y: 224, type: "enemy", enemyType: "frostBeetle", d: "down", params: {}},
+        {status: "normal", id: "overworld:s0:1x1-frostBeetle-3", x: 336, y: 96, type: "enemy", enemyType: "frostBeetle", d: "down", params: {}},
+        {status: "normal", id: "overworld:s0:1x1-frostBeetle-4", x: 192, y: 80, type: "enemy", enemyType: "frostBeetle", d: "down", params: {}},
+        {status: "normal", id: "overworld:s0:1x1-ent-0", x: 48, y: 432, type: "enemy", enemyType: "ent", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -4654,6 +4706,11 @@ const sf0_1x2: AreaDefinition = {
         },
     ],
     objects: [
+        {status: "normal", id: "overworld:s0:2x1-electricSquirrel-0", x: 112, y: 416, type: "enemy", enemyType: "electricSquirrel", d: "down", params: {}},
+        {status: "normal", id: "overworld:s0:2x1-electricSquirrel-1", x: 384, y: 400, type: "enemy", enemyType: "electricSquirrel", d: "down", params: {}},
+        {status: "normal", id: "overworld:s0:2x1-electricSquirrel-2", x: 336, y: 160, type: "enemy", enemyType: "electricSquirrel", d: "down", params: {}},
+        {status: "normal", id: "overworld:s0:2x1-electricSquirrel-3", x: 192, y: 128, type: "enemy", enemyType: "electricSquirrel", d: "down", params: {}},
+        {status: "normal", id: "overworld:s0:2x1-ent-0", x: 208, y: 192, type: "enemy", enemyType: "ent", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16},
@@ -5191,6 +5248,11 @@ const sf0_2x1: AreaDefinition = {
     ],
     objects: [
         {status: "normal", id: "fertilityTempleEntrance", x: 96, y: 320, type: "door", style: "wooden", d: "up", targetZone: "caves", targetObjectId: "fertilityTempleEntrance"},
+        {status: "normal", id: "overworld:s0:1x2-electricSquirrel-0", x: 176, y: 176, type: "enemy", enemyType: "electricSquirrel", d: "down", params: {}},
+        {status: "normal", id: "overworld:s0:1x2-electricSquirrel-1", x: 160, y: 368, type: "enemy", enemyType: "electricSquirrel", d: "down", params: {}},
+        {status: "normal", id: "overworld:s0:1x2-electricSquirrel-2", x: 336, y: 256, type: "enemy", enemyType: "electricSquirrel", d: "down", params: {}},
+        {status: "normal", id: "overworld:s0:1x2-electricSquirrel-3", x: 320, y: 176, type: "enemy", enemyType: "electricSquirrel", d: "down", params: {}},
+        {status: "normal", id: "overworld:s0:1x2-ent-0", x: 112, y: 464, type: "enemy", enemyType: "ent", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},

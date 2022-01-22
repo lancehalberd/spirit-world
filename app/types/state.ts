@@ -85,6 +85,7 @@ export interface GameState {
     paused: boolean
     menuIndex: number
     menuRow: number
+    hideMenu?: boolean
     defeatState: {
         defeated: boolean
         time: number

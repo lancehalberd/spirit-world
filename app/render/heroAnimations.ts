@@ -1,4 +1,5 @@
 import { createAnimation } from 'app/utils/animations';
+import { debugCanvas } from 'app/dom';
 
 import { ActorAnimations, AnimationSet, FrameAnimation, FrameDimensions } from 'app/types';
 
@@ -175,6 +176,25 @@ const rightArrowAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 1
 const upArrowAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 16, h: 16}, {x: 12, cols: 1});
 const leftArrowAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 16, h: 16}, {x: 14, cols: 1});
 
+
+const mcStaffGeometry = {w: 21, h: 28, content: {x: 3, y: 12, w: 16, h: 16} };
+const mcStaffJumpDownAnimation: FrameAnimation = createAnimation('gfx/mc/wukong_staff_mc.png', mcStaffGeometry, { cols: 3, x: 1, duration: 3,  frameMap: [0, 1, 1, 1, 1, 2, 2, 2, 2]});
+const mcStaffJumpRightAnimation: FrameAnimation = createAnimation('gfx/mc/wukong_staff_mc.png', mcStaffGeometry, { cols: 3, x: 6, duration: 3, frameMap: [0, 1, 1, 1, 1, 2, 2, 2, 2]});
+const mcStaffJumpUpAnimation: FrameAnimation = createAnimation('gfx/mc/wukong_staff_mc.png', mcStaffGeometry, { cols: 2, x: 11, duration: 3,   frameMap: [0, 0, 0, 0, 0, 1, 1, 1, 1]});
+const mcStaffJumpLeftAnimation: FrameAnimation = createAnimation('gfx/mc/wukong_staff_mc.png', mcStaffGeometry, { cols: 3, x: 15, duration: 3, frameMap: [0, 1, 1, 1, 1, 2, 2, 2, 2]});
+const mcStaffSlamDownAnimation: FrameAnimation = createAnimation('gfx/mc/wukong_staff_mc.png', mcStaffGeometry, { cols: 1, x: 4, duration: 9});
+const mcStaffSlamRightAnimation: FrameAnimation = createAnimation('gfx/mc/wukong_staff_mc.png', mcStaffGeometry, { cols: 1, x: 9, duration: 9});
+const mcStaffSlamUpAnimation: FrameAnimation = createAnimation('gfx/mc/wukong_staff_mc.png', mcStaffGeometry, { cols: 1, x: 13, duration: 9});
+const mcStaffSlamLeftAnimation: FrameAnimation = createAnimation('gfx/mc/wukong_staff_mc.png', mcStaffGeometry, { cols: 1, x: 18, duration: 9});
+
+const staffGeometry = {w: 123, h: 181};
+const staffDownAnimation: FrameAnimation = createAnimation('gfx/effects/wukong_staff.png', staffGeometry, { cols: 8, x: 0, duration: 3, frameMap: [0, 1, 2, 3, 4, 5, 6, 6, 6, 7]}, {loop: false});
+const staffRightAnimation: FrameAnimation = createAnimation('gfx/effects/wukong_staff.png', staffGeometry, { cols: 10, x: 8, duration: 3}, {loop: false});
+const staffUpAnimation: FrameAnimation = createAnimation('gfx/effects/wukong_staff.png', staffGeometry, { cols: 8, x: 18, duration: 3, frameMap: [0, 1, 2, 3, 4, 5, 6, 6, 6, 7]}, {loop: false});
+const staffLeftAnimation: FrameAnimation = createAnimation('gfx/effects/wukong_staff.png', staffGeometry, { cols: 10, x: 26, duration: 3}, {loop: false});
+
+debugCanvas;//(staffDownAnimation.frames[0]);
+
 export const bowAnimations: AnimationSet = {
     up: bowUpAnimation,
     upleft: bowUpLeftAnimation,
@@ -197,12 +217,32 @@ export const arrowAnimations: AnimationSet = {
     right: rightArrowAnimation,
 }
 
+
+export const staffAnimations: AnimationSet = {
+    up: staffUpAnimation,
+    down: staffDownAnimation,
+    left: staffLeftAnimation,
+    right: staffRightAnimation,
+}
+
 export const heroAnimations: ActorAnimations = {
     attack: {
         up: attackUpAnimation,
         down: attackDownAnimation,
         left: attackLeftAnimation,
         right: attackRightAnimation,
+    },
+    staffJump: {
+        up: mcStaffJumpUpAnimation,
+        down: mcStaffJumpDownAnimation,
+        left: mcStaffJumpLeftAnimation,
+        right: mcStaffJumpRightAnimation,
+    },
+    staffSlam: {
+        up: mcStaffSlamUpAnimation,
+        down: mcStaffSlamDownAnimation,
+        left: mcStaffSlamLeftAnimation,
+        right: mcStaffSlamRightAnimation,
     },
     climbing: {
         up: climbUpAnimation,

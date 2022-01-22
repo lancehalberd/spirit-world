@@ -125,8 +125,7 @@ export function render() {
         }
         return;
     } else if (state.paused) {
-        // Debug: don't show the menu when pausing during transitions
-        if (!state.nextAreaInstance && !state.nextAreaSection) {
+        if (!state.hideMenu) {
             renderMenu(context, state);
         }
     }
@@ -642,6 +641,8 @@ export function renderForegroundObjects(context: CanvasRenderingContext2D, state
                 object.render?.(context, state);
             }
         }
+        const hero = state.hero.activeClone || state.hero;
+        hero.renderForeground?.(context, state);
     context.restore();
 }
 

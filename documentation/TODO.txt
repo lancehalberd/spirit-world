@@ -18,7 +18,6 @@ Known Bugs:
     - Pushing on a solid object sitting on thorny ground shouldn't hurt you:
         -return tileBehaviors and objectBehaviors separately, only damage if tile is solid+damaging.
     - nextAreaInstance is not rendered in Safari
-    - frost grenade blast isn't centered.
     - Enemies with small hitboxes are checking pixels outside of their hitbox while moving.
         - For example snakes when moving left/right will be forced to move up if there is a wall to their south.
     - Some water instead of ice west of the lake in the spirit world.
@@ -30,6 +29,7 @@ Known Bugs:
     - Projectiles can fire in betwen black abyss tiles.
 
 Graphics:
+    Add slam effects for the staff.
     Sweat animation when pulling on something you cannot move.
     Add Item Get Frame gfx/wukongimportantitem.png 20x28
     Add sparkles to peach loot + hud.
@@ -38,10 +38,32 @@ Graphics:
 
 
 Current tasks:
+    - Add screen shake
+        - Elevator
+        - Staff slam
     - Game occasionally plays small bits of music while muted.
+    - Game music occasionally doesn't pick up correctly
+        - At the end of tracks
+        - Transition between boss tracks
+    - Ents summoning thorns on foreground layers.
 
-    - Discharge should optionally include the enemy source, and be removed if the source is defeated before the tell duration is over.
-        - Add `isActive` to enemy to indicate whether it is a valid source for attacks: if (sourceEnemy && !sourceEnemy.isActive(state)) { ... }
+    Peach Cave improvements
+        - Add new graphics to 2F
+        - Fix spirit world tiles
+            - Add 4 easy checks to top floor and bombable pit entrance to basement
+            - Use crystal floor graphics in place of water when it is ready.
+            - Require Mitts for entering from the bottom floor.
+            - Add harder beetle boss with a Peach piece on it
+            - Add 3 checks behind different tool combinations
+                - cracked ground for cloud boots/ice magic
+                - staff or teleportation to get across pits
+                - bow+torches or fire element to unfreeze a chest
+
+    - Add behavior that prevents non-flying enemies from crossing tiles/objects, use for cracked ground, escalators, bead cascades, etc.
+        - Anything that doesn't handle enemies gracefully either needs to keep enemies out or add handling.
+
+
+    - Consider adding `isActive(state, area)` method on enemy that returns true if the enemy can attack in the given area. Use in logic for removing discharge from area if enemy source is invalid.
 
     Staff Tower
         - Elevator only in spirit world (similar to cocoon)

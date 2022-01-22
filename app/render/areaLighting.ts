@@ -234,6 +234,21 @@ export function renderAreaLighting(context: CanvasRenderingContext2D, state: Gam
                 }
             }
         }
+        for (const effect of area.effects) {
+            if (effect.status === 'gone') {
+                continue;
+            }
+            if (effect.getHitbox && effect.behaviors?.brightness) {
+                const hitbox = effect.getHitbox(state);
+                drawLightGradient(lightingContext,
+                    {
+                        x: hitbox.x + hitbox.w / 2,
+                        y: hitbox.y + hitbox.h / 2,
+                    },
+                    effect.behaviors.brightness, effect.behaviors.lightRadius
+                );
+            }
+        }
     lightingContext.restore();
     if (nextArea) {
         lightingContext.save();

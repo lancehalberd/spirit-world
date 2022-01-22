@@ -1,12 +1,13 @@
-import { enterLocation, getAreaSize } from 'app/content/areas';
+import { addObjectToArea, enterLocation, getAreaSize, playAreaSound } from 'app/content/areas';
 import { Door } from 'app/content/objects/door';
+import { Staff } from 'app/content/objects/staff';
 import { CANVAS_HEIGHT, FRAME_LENGTH } from 'app/gameConstants';
 import { editingState } from 'app/development/tileEditor';
 import { getCloneMovementDeltas } from 'app/keyCommands';
 import { checkForFloorEffects, moveActor } from 'app/moveActor';
-import { fallAnimation } from 'app/render/heroAnimations';
+import { fallAnimation, heroAnimations } from 'app/render/heroAnimations';
 import { isUnderwater } from 'app/utils/actor';
-import { directionMap, getDirection, getTileBehaviorsAndObstacles } from 'app/utils/field';
+import { directionMap, getDirection, getTileBehaviorsAndObstacles, hitTargets } from 'app/utils/field';
 import { boxesIntersect } from 'app/utils/index';
 
 
@@ -281,6 +282,67 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             hero.z = minZ;
             hero.action = null;
             hero.vz = 0;
+        }
+        return true;
+    }
+    if (hero.action === 'usingStaff') {
+        const jumpDuration = heroAnimations.staffJump[hero.d].duration;
+        const slamDuration = heroAnimations.staffSlam[hero.d].duration;
+       // console.log(hero.animationTime, jumpDuration, slamDuration);
+        if (hero.animationTime < jumpDuration - FRAME_LENGTH) {
+            hero.vz = 1 - 1 * hero.animationTime / jumpDuration;
+            hero.z += hero.vz;
+            const mx = hero.x % 16;
+            const my = hero.y % 16;
+            if (hero.d === 'up' || hero.d === 'down') {
+                if (mx >= 8 && mx < 15) {
+                    hero.x++;
+                }
+                if (mx < 8 && mx < 15) {
+                    hero.x--;
+                }
+            } else {
+                if (my >= 8 && my < 15) {
+                    hero.y++;
+                }
+                if (my < 8 && my < 15) {
+                    hero.y--;
+                }
+            }
+        } else if (hero.animationTime === jumpDuration - FRAME_LENGTH) {
+            hero.vz = -4;
+            hero.z = Math.max(hero.z + hero.vz, minZ);
+        } else if (hero.animationTime === jumpDuration) {
+            hero.z = Math.max(hero.z + hero.vz, minZ);
+            const staffLevel = state.hero.activeTools.staff;
+            const maxLength = staffLevel > 1 ? 64 : 4;
+            const staff = new Staff(state, {
+                x: hero.x + 8 + 12 * directionMap[hero.d][0],
+                y: hero.y + 8 + 12 * directionMap[hero.d][1],
+                damage: 4 * staffLevel,
+                direction: hero.d,
+                element: hero.element,
+                maxLength,
+            });
+            state.activeStaff = staff;
+            addObjectToArea(state, state.areaInstance, staff);
+            playAreaSound(state, state.areaInstance, 'bossDeath');
+            hitTargets(state, state.areaInstance, {
+                damage: 4 * staffLevel,
+                hitbox: {
+                    x: staff.leftColumn * 16 - 2,
+                    y: staff.topRow * 16 - 2,
+                    w: (staff.rightColumn - staff.leftColumn + 1) * 16 + 4,
+                    h: (staff.bottomRow - staff.topRow + 1) * 16 + 4,
+                },
+                hitEnemies: true,
+                hitObjects: true,
+                knockAwayFromHit: true,
+            });
+        } else if (hero.animationTime < jumpDuration + slamDuration) {
+             hero.z = Math.max(hero.z + hero.vz, minZ);
+        } else if (hero.animationTime >= jumpDuration + slamDuration) {
+            hero.action = null;
         }
         return true;
     }

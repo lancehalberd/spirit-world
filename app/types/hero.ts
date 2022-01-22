@@ -5,7 +5,7 @@ import {
 } from 'app/types';
 
 export type Action =
-    'attack' | 'charging' | 'roll'
+    'attack' | 'charging' | 'roll' | 'usingStaff'
     // Hero can be forced into screen transitions when knockedHard.
     | 'knocked' | 'knockedHard'
     | 'hurt' | 'dead' | 'walking'
@@ -62,6 +62,8 @@ export interface ActorAnimations {
     pull?: AnimationSet
     push?: AnimationSet
     roll?: AnimationSet
+    staffJump?: AnimationSet
+    staffSlam?: AnimationSet
     still?: AnimationSet //displays a still frame
 }
 

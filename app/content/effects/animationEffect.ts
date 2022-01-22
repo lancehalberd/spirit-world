@@ -205,5 +205,13 @@ export function makeSparkleAnimation(
             animationProps.vy = -6;
         }
     }
-    return new AnimationEffect(animationProps);
+    const effect = new AnimationEffect(animationProps);
+    if (element === 'fire') {
+        effect.behaviors.brightness = 0.5;
+        effect.behaviors.lightRadius = 40;
+    } else if (element === 'lightning') {
+        effect.behaviors.brightness = 1;
+        effect.behaviors.lightRadius = 16;
+    }
+    return effect;
 }

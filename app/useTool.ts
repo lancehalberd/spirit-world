@@ -2,7 +2,7 @@ import { addObjectToArea, addEffectToArea, playAreaSound } from 'app/content/are
 import { Arrow } from 'app/content/effects/arrow';
 import { Clone }  from 'app/content/objects/clone';
 import { Staff } from 'app/content/objects/staff';
-import { directionMap, getDirection, hitTargets } from 'app/utils/field';
+import { directionMap, getDirection } from 'app/utils/field';
 
 import { ActiveTool, GameState, Hero, MagicElement } from 'app/types'
 
@@ -108,17 +108,17 @@ export function useTool(
             }
             return;
         case 'staff':
-            if (state.activeStaff) {
-                state.activeStaff.remove(state);
+            if (state.activeStaff?.area && !state.activeStaff.recalling) {
+                state.activeStaff.recall(state);
                 state.hero.toolCooldown = 0;
                 hero.toolOnCooldown = null;
                 playAreaSound(state, state.areaInstance, 'menuTick');
                 return;
             }
-            if (state.hero.magic <= 0) {
+            if (state.activeStaff?.area || state.hero.magic <= 0) {
                 return;
             }
-            const staffLevel = state.hero.activeTools.staff
+            const staffLevel = state.hero.activeTools.staff;
             const maxLength = staffLevel > 1 ? 64 : 4;
             const staff = new Staff(state, {
                 x: hero.x + 8 + 12 * directionMap[hero.d][0],
@@ -131,29 +131,10 @@ export function useTool(
             if (staff.invalid) {
                 return;
             }
-            state.activeStaff = staff;
-            addObjectToArea(state, state.areaInstance, staff);
-            // A staff that takes up a single tile is also an invalid use, but we remove it after adding it.
-            if (staff.topRow === staff.bottomRow && staff.leftColumn === staff.rightColumn) {
-                staff.remove(state);
-                playAreaSound(state, state.areaInstance, 'menuTick');
-            } else {
-                state.hero.magic -= 10;
-                hero.toolOnCooldown = 'staff';
-                playAreaSound(state, state.areaInstance, 'bossDeath');
-                hitTargets(state, state.areaInstance, {
-                    damage: 4 * staffLevel,
-                    hitbox: {
-                        x: staff.leftColumn * 16 - 2,
-                        y: staff.topRow * 16 - 2,
-                        w: (staff.rightColumn - staff.leftColumn + 1) * 16 + 4,
-                        h: (staff.bottomRow - staff.topRow + 1) * 16 + 4,
-                    },
-                    hitEnemies: true,
-                    hitObjects: true,
-                    knockAwayFromHit: true,
-                });
-            }
+            state.hero.magic -= 10;
+            hero.toolOnCooldown = 'staff';
+            hero.action = 'usingStaff';
+            hero.animationTime = 0;
             return;
     }
 }

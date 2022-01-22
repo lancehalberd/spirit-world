@@ -48,6 +48,7 @@ export class ThrownChakram implements EffectInstance {
     source: Hero;
     animationTime = 0;
     sparkles: AnimationEffect[];
+    isPlayerAttack = true;
     constructor({x = 0, y = 0, vx = 0, vy = 0, damage = 1, element = null, returnSpeed = 4, piercing = false, source}: Props) {
         this.x = x;
         this.y = y;
@@ -185,6 +186,7 @@ export class HeldChakram implements EffectInstance {
     changesAreas = true;
     updateDuringTransition = true;
     sparkles: AnimationEffect[];
+    isPlayerAttack = true;
     constructor({x = 0, y = 0, vx = 0, vy = 0, damage = 1, source}: Props) {
         this.vx = vx;
         this.vy = vy;

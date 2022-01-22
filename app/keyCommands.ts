@@ -22,6 +22,9 @@ export const KEY = {
     BACK_SPACE: 8,
     COMMAND: 91,
     CONTROL: 17,
+    LEFT_BRACKET: 219,
+    BACK_SLASH: 220,
+    RIGHT_BRACKET: 221,
     A: 'A'.charCodeAt(0),
     C: 'C'.charCodeAt(0),
     D: 'D'.charCodeAt(0),
@@ -159,6 +162,7 @@ export function addKeyCommands() {
         }
         const commandIsDown = (keysDown[KEY.CONTROL] || keysDown[KEY.COMMAND]);
         const keyCode: number = event.which;
+        //console.log(keyCode);
         // Don't override the refresh page command.
         if (keyCode === KEY.R && commandIsDown) {
             return;
@@ -172,6 +176,10 @@ export function addKeyCommands() {
                 editingState.hasChanges = false;
                 event.preventDefault();
             }
+        }
+        if (keyCode === KEY.BACK_SLASH) {
+            const state = getState();
+            state.hideMenu = !state.hideMenu;
         }
         if (keyCode === KEY.K && commandIsDown) {
             const state = getState();

@@ -28,6 +28,13 @@ export function getHeroFrame(state: GameState, hero: Hero): Frame {
         return getFrame(animations[hero.d], hero.animationTime);
     }
     switch (hero.action) {
+        case 'usingStaff':
+            const jumpAnimation = heroAnimations.staffJump[hero.d];
+            if (hero.animationTime < jumpAnimation.duration) {
+                return getFrame(jumpAnimation, hero.animationTime);
+            }
+            const slamAnimation = heroAnimations.staffSlam[hero.d];
+            return getFrame(slamAnimation, hero.animationTime - jumpAnimation.duration);
         case 'falling':
         case 'sinkingInLava':
             animations = heroAnimations.falling;

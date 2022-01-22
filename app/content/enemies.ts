@@ -36,18 +36,20 @@ import {
     TileBehaviors,
 } from 'app/types';
 
+export * from 'app/content/enemies/electricSquirrel';
 export * from 'app/content/enemies/lightningDrone';
 export * from 'app/content/enemies/sentryBot';
+export * from 'app/content/enemies/squirrel';
 
 export const enemyTypes = <const>[
     'arrowTurret',
     'beetle', 'climbingBeetle', 'beetleHorned', 'beetleMini', 'beetleWinged',
     'crystalGuardian',
-    'ent',
+    'electricSquirrel', 'ent',
     'flameSnake', 'frostBeetle',
     'floorEye',
     'lightningBug', 'lightningDrone',
-    'sentryBot', 'snake',
+    'sentryBot', 'snake', 'squirrel',
     'wallLaser',
 ];
 // Not intended for use in the editor.
@@ -795,7 +797,19 @@ export function paceRandomly(state: GameState, enemy: Enemy) {
     }
 }
 
+// Returns true if the enemy moves at all.
 export function moveEnemy(state: GameState, enemy: Enemy, dx: number, dy: number, movementProperties: MovementProperties): boolean {
+    const {mx, my} = moveEnemyProper(state, enemy, dx, dy, movementProperties);
+    return mx !== 0 || my !== 0;
+}
+
+// Returns true only if the enemy moves the full amount.
+export function moveEnemyFull(state: GameState, enemy: Enemy, dx: number, dy: number, movementProperties: MovementProperties): boolean {
+    const {mx, my} = moveEnemyProper(state, enemy, dx, dy, movementProperties);
+    return Math.abs(mx - dx) < 0.01 && Math.abs(my - dy) < 0.01;
+}
+
+export function moveEnemyProper(state: GameState, enemy: Enemy, dx: number, dy: number, movementProperties: MovementProperties): {mx: number, my: number} {
     if (!movementProperties.excludedObjects) {
         movementProperties.excludedObjects = new Set();
     }
@@ -816,15 +830,14 @@ export function moveEnemy(state: GameState, enemy: Enemy, dx: number, dy: number
             if (ax < section.x + p || ax + hitbox.w > section.x + section.w - p
                 || ay < section.y + p || ay + hitbox.h > section.y + section.h - p
             ) {
-                return false;
+                return {mx: 0, my: 0};
             }
         }
         enemy.x = ax;
         enemy.y = ay;
-        return true;
+        return {mx: dx, my: dy};
     }
-    const { mx, my } = moveActor(state, enemy, dx, dy, movementProperties);
-    return mx !== 0 || my !== 0;
+    return moveActor(state, enemy, dx, dy, movementProperties);
 }
 
 const fallGeometry: FrameDimensions = {w: 24, h: 24};

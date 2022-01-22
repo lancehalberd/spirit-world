@@ -19,6 +19,7 @@ export class CloneExplosionEffect implements EffectInstance {
     isEffect = <const>true;
     x: number;
     y: number;
+    isPlayerAttack = true;
     constructor({x = 0, y = 0 }: Props) {
         this.animationTime = 0;
         this.x = x;

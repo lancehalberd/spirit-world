@@ -197,6 +197,7 @@ export class Arrow implements EffectInstance {
     reflected: boolean = false;
     stuckFrames: number = 0;
     style: ArrowStyle = 'normal';
+    isPlayerAttack = true;
     constructor({x = 0, y = 0, vx = 0, vy = 0, chargeLevel = 0, damage = 1, spiritCloakDamage = 5, delay = 0, element = null, reflected = false, style = 'normal',
         ignoreWallsDuration = 0,
     }: Props) {
@@ -340,6 +341,7 @@ export function getChargedArrowAnimation(this: void, chargeLevel: number, elemen
 }
 
 export class EnemyArrow extends Arrow {
+    isPlayerAttack = false;
     isEnemyAttack = true;
     getHitProperties(state: GameState): HitProperties {
         return {
@@ -374,6 +376,7 @@ export class EnemyArrow extends Arrow {
 }
 
 export class CrystalSpike extends Arrow {
+    isPlayerAttack = false;
     isEnemyAttack = true;
     static spawn(state: GameState, area: AreaInstance, arrowProps: Props) {
         const spike = new CrystalSpike(arrowProps);

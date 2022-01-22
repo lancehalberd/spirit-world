@@ -46,18 +46,24 @@ export function update() {
     state.time += FRAME_LENGTH;
     updateKeyboardState(state);
     try {
-        if (state.transitionState && !state.areaInstance.priorityObjects?.length) {
-            if (wasGameKeyPressed(state, GAME_KEY.MENU)) {
-                state.paused = !state.paused;
-                state.menuIndex = 0;
-            }
-            if (!state.paused) {
-                updateTransition(state);
-            }
-        } else if (state.scene === 'title' || state.scene === 'chooseGameMode' ||
+        if (state.scene === 'title' || state.scene === 'chooseGameMode' ||
             state.scene === 'deleteSavedGame' || state.scene === 'deleteSavedGameConfirmation'
         ) {
             updateTitle(state);
+            return;
+        }
+        if (wasGameKeyPressed(state, GAME_KEY.MENU)) {
+            state.paused = !state.paused;
+            state.menuIndex = 0;
+        }
+        if (state.paused && !(state.hideMenu && wasGameKeyPressed(state, GAME_KEY.MEDITATE))) {
+            if (!state.hideMenu) {
+                updateMenu(state);
+            }
+        } else if (state.transitionState && !state.areaInstance.priorityObjects?.length) {
+            if (!state.paused) {
+                updateTransition(state);
+            }
         } else if (state.defeatState.defeated) {
             updateDefeated(state);
         } else {
@@ -65,15 +71,7 @@ export function update() {
             // Make sure we don't handle script event input twice in one frame.
             // We could also manage this by unsetting game keys on the state.
             if (!state.scriptEvents.blockFieldUpdates && !state.scriptEvents.handledInput) {
-                if (wasGameKeyPressed(state, GAME_KEY.MENU)) {
-                    state.paused = !state.paused;
-                    state.menuIndex = 0;
-                }
-                if (!state.paused) {
-                    updateField(state);
-                } else {
-                    updateMenu(state);
-                }
+                updateField(state);
             }
         }
     } catch (e) {

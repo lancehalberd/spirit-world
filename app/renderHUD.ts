@@ -129,9 +129,7 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
             effects.render(context, state);
         }
     }
-    if (state.paused && !state.defeatState.defeated && !state.areaInstance?.priorityObjects?.length
-        && (state.transitionState || state.nextAreaInstance || state.nextAreaSection)
-    ) {
+    if (state.paused && state.hideMenu) {
         renderTextRow(context, 'PAUSED', {x: 8, y: CANVAS_HEIGHT - 22});
     }
 }

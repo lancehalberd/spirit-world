@@ -1,17 +1,18 @@
-import { createAnimation, drawFrame } from 'app/utils/animations';
+import { debugCanvas } from 'app/dom';
+import { FRAME_LENGTH } from 'app/gameConstants';
+import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { isPointOpen } from 'app/utils/field';
 
-import { AreaInstance, Direction, MagicElement, Frame, GameState, ObjectInstance, ObjectStatus, TileBehaviors } from 'app/types';
+import { AreaInstance, Direction, DrawPriority, MagicElement, GameState, ObjectInstance, ObjectStatus, TileBehaviors } from 'app/types';
 
-const tilesFrame = createAnimation('gfx/tiles/overworld.png', {w: 384, h: 640}).frames[0];
-export const normalFrame: Frame = {image: tilesFrame.image, x: 16 * 0, y: 16 * 35, w: 16, h: 16};
-const leftFrame: Frame = {image: tilesFrame.image, x: 16 * 12, y: 16 * 15, w: 16, h: 16};
-const horizontalFrame: Frame = {image: tilesFrame.image, x: 16 * 13, y: 16 * 15, w: 16, h: 16};
-const rightFrame: Frame = {image: tilesFrame.image, x: 16 * 14, y: 16 * 15, w: 16, h: 16};
-
-const topFrame: Frame = {image: tilesFrame.image, x: 16 * 15, y: 16 * 12, w: 16, h: 16};
-const verticalFrame: Frame = {image: tilesFrame.image, x: 16 * 15, y: 16 * 13, w: 16, h: 16};
-const bottomFrame: Frame = {image: tilesFrame.image, x: 16 * 15, y: 16 * 14, w: 16, h: 16};
+const staffPartGeometry = {w: 20, h: 17};
+const leftAnimation = createAnimation('gfx/effects/wukong_staff_parts.png', staffPartGeometry, {x: 0, y: 3, rows: 3, frameMap: [2, 1,0], duration: 3}, {loop: false});
+const horizontalAnimation = createAnimation('gfx/effects/wukong_staff_parts.png', staffPartGeometry, {x: 1, y: 3, rows: 3, frameMap: [2, 1,0], duration: 3}, {loop: false});
+const rightAnimation = createAnimation('gfx/effects/wukong_staff_parts.png', staffPartGeometry, {x: 2, y: 3, rows: 3, frameMap: [2, 1,0], duration: 3}, {loop: false});
+const topAnimation = createAnimation('gfx/effects/wukong_staff_parts.png', staffPartGeometry, {x: 0, y: 0, rows: 3, frameMap: [1, 2,0], duration: 3}, {loop: false});
+const verticalAnimation = createAnimation('gfx/effects/wukong_staff_parts.png', staffPartGeometry, {x: 1, y: 0, rows: 3, frameMap: [1, 2,0], duration: 3}, {loop: false});
+const bottomAnimation = createAnimation('gfx/effects/wukong_staff_parts.png', staffPartGeometry, {x: 2, y: 0, rows: 3, frameMap: [1, 2,0], duration: 3}, {loop: false});
+debugCanvas;//(leftAnimation.frames[0]);
 
 interface Props {
     x?: number
@@ -25,6 +26,7 @@ interface Props {
 export class Staff implements ObjectInstance {
     area: AreaInstance;
     definition = null;
+    drawPriority: DrawPriority = 'background';
     x: number;
     y: number;
     ignorePits = true;
@@ -39,6 +41,8 @@ export class Staff implements ObjectInstance {
     direction: Direction;
     element: MagicElement;
     storedBehaviors: TileBehaviors[][];
+    animationTime: number = 0;
+    recalling: boolean = false;
     constructor(state: GameState, { x = 0, y = 0, damage = 1, direction, element, maxLength = 4 }: Props) {
         // Note this assumes the staff is always added to the area the hero is in.
         this.area = state.areaInstance;
@@ -55,7 +59,6 @@ export class Staff implements ObjectInstance {
             this.invalid = true;
             return;
         }
-
         if (direction === 'left') {
             for (let i = 1; i < maxLength; i++) {
                 column = this.rightColumn - i;
@@ -89,42 +92,40 @@ export class Staff implements ObjectInstance {
                 this.bottomRow = row;
             }
         }
+        if (this.leftColumn === this.rightColumn && this.topRow === this.bottomRow) {
+            this.invalid = true;
+        }
+    }
+    add(state: GameState, area: AreaInstance) {
+        this.area = area;
+        area.objects.push(this);
         // Store the behaviors on the staff as we delete them, the staff turns all covered tiles
         // into open ground.
         this.storedBehaviors = [];
-        for (row = this.topRow; row <= this.bottomRow; row++) {
+        for (let row = this.topRow; row <= this.bottomRow; row++) {
             this.storedBehaviors[row] = []
-            for (column = this.leftColumn; column <= this.rightColumn; column++) {
+            for (let column = this.leftColumn; column <= this.rightColumn; column++) {
                 this.storedBehaviors[row][column] = state.areaInstance.behaviorGrid[row][column];
                 state.areaInstance.behaviorGrid[row][column] = null;
             }
         }
-        if (direction === 'left' || direction === 'right') {
-            row = this.topRow;
-            for (column = this.leftColumn; column <= this.rightColumn; column++) {
-                let frame = horizontalFrame;
-                if (column === this.leftColumn) {
-                    frame = leftFrame;
-                } else if (column === this.rightColumn) {
-                    frame = rightFrame;
-                }
-                drawFrame(state.areaInstance.context, frame, {...frame, x: column * 16, y: row * 16});
-            }
-        }
-        if (direction === 'up' || direction === 'down') {
-            column = this.leftColumn;
-            for (row = this.topRow; row <= this.bottomRow; row++) {
-                let frame = verticalFrame;
-                if (row === this.topRow) {
-                    frame = topFrame;
-                } else if (row === this.bottomRow) {
-                    frame = bottomFrame;
-                }
-                drawFrame(state.areaInstance.context, frame, {...frame, x: column * 16, y: row * 16});
-            }
-        }
+    }
+    recall(state: GameState) {
+        this.recalling = true;
+        this.animationTime = leftAnimation.duration;
     }
     update(state: GameState) {
+        if (this.recalling) {
+            this.animationTime -= FRAME_LENGTH;
+            if (this.animationTime <= 0) {
+                this.remove(state);
+            }
+            return;
+        }
+        this.animationTime += FRAME_LENGTH;
+        if (this.invalid && this.animationTime > 100) {
+            this.remove(state);
+        }
     }
     remove(state: GameState) {
         const index = this.area.objects.indexOf(this);
@@ -146,5 +147,30 @@ export class Staff implements ObjectInstance {
         // Nothing to render here, the staff is rendered to the background when it is placed.
         // Eventually this might render the animation of the staff being placed, which would require
         // updating the tiles at the end of the animation instead of on creation.
+        if (this.direction === 'left' || this.direction === 'right') {
+            let frame = getFrame(leftAnimation, this.animationTime);
+            const y = this.topRow * 16 - 1;
+            drawFrame(context, frame, {...frame, x: this.leftColumn * 16 - 2, y});
+            const length = this.rightColumn - this.leftColumn - 1;
+            if (length > 0) {
+                frame = getFrame(horizontalAnimation, this.animationTime);
+                // This frame is 16px center in 20px space, but we need the exact rectangle to stretch it correctly.
+                drawFrame(context, {...frame, x: frame.x + 2, w: 16}, {...frame, x: this.leftColumn * 16 + 16, y, w: length * 16});
+            }
+            frame = getFrame(rightAnimation, this.animationTime);
+            drawFrame(context, frame, {...frame, x: this.rightColumn * 16 - 2, y});
+        } else {
+            let frame = getFrame(topAnimation, this.animationTime);
+            const x = this.leftColumn * 16 - 2;
+            drawFrame(context, frame, {...frame, x, y: this.topRow * 16 - 1});
+            const length = this.bottomRow - this.topRow - 1;
+            if (length > 0) {
+                frame = getFrame(verticalAnimation, this.animationTime);
+                // This frame is 16px offset by 1px in 17px space, but we need the exact rectangle to stretch it correctly.
+                drawFrame(context, {...frame, y: frame.y + 1, h: 16}, {...frame, x, y: this.topRow * 16 + 16, h: length * 16});
+            }
+            frame = getFrame(bottomAnimation, this.animationTime);
+            drawFrame(context, frame, {...frame, x, y: this.bottomRow * 16 - 1});
+        }
     }
 }

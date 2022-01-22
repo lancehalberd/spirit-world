@@ -7,6 +7,8 @@ import {
     chargeFireBackAnimation, chargeFireFrontAnimation,
     chargeIceBackAnimation, chargeIceFrontAnimation,
     chargeLightningBackAnimation, chargeLightningFrontAnimation,
+    heroAnimations,
+    staffAnimations,
 } from 'app/render/heroAnimations';
 import { getHeroFrame, renderCarriedTile, renderExplosionRing, renderHeroBarrier } from 'app/renderActor';
 import { getChargeLevelAndElement } from 'app/useTool';
@@ -338,6 +340,27 @@ export class Hero implements Actor, SavedHeroData {
         }
     }
 
+    renderStaff(this: Hero, context: CanvasRenderingContext2D, state: GameState, staffDirection: Direction, foreground = false): void {
+        if (this.animationTime < staffAnimations[staffDirection].duration) {
+            const frame = getFrame(staffAnimations[staffDirection], this.animationTime);
+            let x = this.x - 61 + 7, y = this.y - 32 - 90 + 6;
+            if (this.animationTime < heroAnimations.staffJump[staffDirection].duration) {
+                y -= this.z;
+            }
+            if (foreground) {
+                drawFrameAt(context, {...frame, h: 120}, { x, y });
+            } else {
+                drawFrameAt(context, frame, { x, y });
+            }
+        }
+    }
+
+    renderForeground(this: Hero, context: CanvasRenderingContext2D, state: GameState) {
+        if (this.action === 'usingStaff') {
+            this.renderStaff(context, state, this.d, true);
+        }
+    }
+
     render(this: Hero, context: CanvasRenderingContext2D, state: GameState): void {
         const hero = this;
         // Currently the hero always has the barrier when invisible, but this could change.
@@ -375,6 +398,9 @@ export class Hero implements Actor, SavedHeroData {
         if (shouldDrawBow && drawBowUnderHero) {
             this.renderBow(context, state, bowDirection);
         }
+        if (hero.action === 'usingStaff' && hero.d === 'up') {
+            this.renderStaff(context, state, hero.d);
+        }
         const frame = getHeroFrame(state, hero);
         const activeClone = state.hero.activeClone || state.hero;
         context.save();
@@ -387,6 +413,9 @@ export class Hero implements Actor, SavedHeroData {
         context.restore();
         if (shouldDrawBow && !drawBowUnderHero) {
             this.renderBow(context, state, bowDirection);
+        }
+        if (hero.action === 'usingStaff' && hero.d !== 'up') {
+            this.renderStaff(context, state, hero.d);
         }
         if (hero.pickUpTile) {
             renderCarriedTile(context, state, hero);

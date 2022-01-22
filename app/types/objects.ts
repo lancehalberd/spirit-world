@@ -99,6 +99,8 @@ export interface EffectInstance {
     isNeutralTarget?: boolean
     // This will cause this effect to be removed when a boss is defeated.
     isEnemyAttack?: boolean
+    // Some enemies respond to player attacks.
+    isPlayerAttack?: boolean
     // The following are added for convenience when we have ambiguous type `EffectInstance | ObjectInstance`
     status?: ObjectStatus
     definition?: ObjectDefinition
