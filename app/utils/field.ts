@@ -614,7 +614,7 @@ export function coverTile(
     }
     let topLayer: AreaLayer = area.layers[0];
     for (const layer of area.layers) {
-        if (layer.definition.drawPriority === 'foreground') {
+        if (layer.definition.key === 'foreground' || layer.definition.drawPriority === 'foreground') {
             break;
         }
         topLayer = layer;

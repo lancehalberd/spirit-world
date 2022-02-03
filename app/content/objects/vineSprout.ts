@@ -38,7 +38,7 @@ function setTile(area: AreaInstance, layer: AreaLayer, tx: number, ty: number, t
 function getTargetLayer(area: AreaInstance): AreaLayer {
     let targetLayer;
     for (const layer of area.layers) {
-        if (layer.definition.drawPriority === 'foreground') {
+        if (layer.definition.key === 'foreground' || layer.definition.drawPriority === 'foreground') {
             break;
         }
         targetLayer = layer;

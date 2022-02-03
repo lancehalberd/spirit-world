@@ -21,12 +21,12 @@ Known Bugs:
     - Enemies with small hitboxes are checking pixels outside of their hitbox while moving.
         - For example snakes when moving left/right will be forced to move up if there is a wall to their south.
     - Some water instead of ice west of the lake in the spirit world.
-    - Can get to undefined area in city.
+    - Can get to undefined area in city by sinking in the water.
     - Cliff Edge issues:
         - Would be nice if staff could go across edges.
         - Bow can fire up thin cliffs
         - Bow cannot fire down southern cliffs.
-    - Projectiles can fire in betwen black abyss tiles.
+    - Projectiles can fire in between black abyss tiles, for example, shooting a bow at an east or west wall it may go through instead of stopping.
 
 Graphics:
     Add slam effects for the staff.
@@ -41,6 +41,13 @@ Current tasks:
     - Add screen shake
         - Elevator
         - Staff slam
+    - Lightning barriers
+        - Deal 4 lightning damage and knock the player back.
+            - Player is still knocked back with spirit barrier or iframes.
+            - Invisibility allows the player to pass through unharmed.
+        - Can be permanently on, toggled on/off on timer, or toggled by switches
+        - Shows a 500ms warning when about to turn on, maybe sparks on either end of where the beam will be, or a smaller non damaging beam.
+    - Make the staff ground raised, use floorHeight tileBehavior to control minZ+raise the shadow so they don't look like they are floating.
     - Game occasionally plays small bits of music while muted.
     - Game music occasionally doesn't pick up correctly
         - At the end of tracks
@@ -72,12 +79,6 @@ Current tasks:
             - Disabling emergency breaks in the elevator grants access to the basement+backup generators (mini boss?)
             - Fixing elevator grants access to upper floors, but last two floors must be done in material world to reach the roof and boss.
             - 5th floor in spirit world has device for re-activating the tower after defeating elemental beast, which is what gives access to the Tower Staff tool upgrade. This also disables all machine enemies by default.
-        - Lightning barriers
-            - Deal 4 lightning damage and knock the player back.
-                - Player is still knocked back with spirit barrier or iframes.
-                - Invisibility allows the player to pass through unharmed.
-            - Can be permanently on, toggled on/off on timer, or toggled by switches
-            - Shows a 500ms warning when about to turn on, maybe sparks on either end of where the beam will be, or a smaller non damaging beam.
         - All machine enemies have an offline state where they cannot be damaged, and possibly can be pushed around.
             - Hitting offline machines with lightning will turn them on.
             - Machines all default to offline except in the material world when the Storm Beast is active.
@@ -99,6 +100,21 @@ Current tasks:
     Storm Beast
         - Storm Beast can turn into lightning and teleport as a beam sending shockwaves out at both ends.
         - Storm Beast can charge south to exit the battle field
+
+    Warship
+        - Requires all elements to complete
+        - Fight rival near the start to claim the last element
+        - Possibly flow:
+            Enter throne room of the War Temple in the Spirit World and fight rival, get last element and open tunnel entrance
+            Tunnel takes you to the Core(Seed?) of the Vanara Ship, which has the terraforming engine
+            The War God will use the engine to make a breeding ground for his drone soldiers, the MC might use it to synthesize the Vanara and Native life to coexist.
+            Sub goal is to gain the upgraded clone ability, then use it to combine all three elements to continue forward.
+            Final boss has phases where specific elements are required to damage it.
+            Final boss has phases designed for each tool, but does not require them
+                - Tools can give extra opportunities to damage the boss
+                    - Barrier to reflect projectiles
+                    - Bow to shoot distant weak spots
+                - Tools can make it easier to avoid attacks
 
     Make mutation transition use the same area instance so contents don't reset
         - Will need to add special handling to remove extra ice tiles from frost beast+heat sink battles.
@@ -279,6 +295,7 @@ Waterfall Tower Improvments:
 River Temple Improvements:
     - Some underwater enemies
     - Some crab enemies with ice shells that require fire element to defeat
+    - Maybe torches should stay lit during the boss fight once turned on.
 
 
 Crater Improvements
@@ -341,6 +358,8 @@ Additional Staff Behavior:
     - The sides of the staff should function as a wall rather than open ground.
     Charging the staff does a very large spin attack that knocks enemies away.
         Lvl 2 charge is a screen wide attack the applies damage+element to all enemies.
+    Top N pixels of character should be drawn on foreground as well so that it appears in front of staff when facing north.
+        - Probably should disable staff when character is standing on any tiles marked with low ceiling just in case.
 
 
 
