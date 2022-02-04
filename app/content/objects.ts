@@ -5,6 +5,7 @@ import { BigChest, ChestObject, LootObject } from 'app/content/objects/lootObjec
 import { CrystalSwitch } from 'app/content/objects/crystalSwitch';
 import { Door } from 'app/content/objects/door';
 import { FloorSwitch } from 'app/content/objects/floorSwitch';
+import { Anode, Cathode } from 'app/content/objects/lightningBarrier';
 import { PushPullObject } from 'app/content/objects/pushPullObject';
 import { RollingBallObject } from 'app/content/objects/rollingBallObject';
 import { TippableObject } from 'app/content/objects/tippableObject';
@@ -34,7 +35,11 @@ import {
 } from 'app/types';
 
 export function createObjectInstance(state: GameState, object: ObjectDefinition): ObjectInstance {
-    if (object.type === 'airBubbles') {
+    if (object.type === 'anode') {
+        return new Anode(state, object);
+    } else if (object.type === 'cathode') {
+        return new Cathode(object);
+    } else if (object.type === 'airBubbles') {
         return new AirBubbles(state, object);
     } else if (object.type === 'ballGoal') {
         return new BallGoal(object);

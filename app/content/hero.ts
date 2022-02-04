@@ -207,11 +207,16 @@ export class Hero implements Actor, SavedHeroData {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
 
+
     onHit(this: Hero, state: GameState, hit: HitProperties): HitResult {
         if (this.life <= 0) {
             return {};
         }
-        if (this.action === 'roll' || this.action === 'getItem' || this.action === 'jumpingDown') {
+        if (this.action === 'getItem' || this.action === 'jumpingDown') {
+            return {};
+        }
+        // Most damage is ignored while the hero is using the dodge roll ability.
+        if (this.action === 'roll' && !hit.canDamageRollingHero) {
             return {};
         }
         if (this.hasBarrier) {
@@ -229,6 +234,9 @@ export class Hero implements Actor, SavedHeroData {
             if (!this.barrierElement) {
                 reflectDamage++;
             }
+            if (hit.canAlwaysKnockback && hit.knockback) {
+                this.knockBack(state, hit.knockback);
+            }
             return { hit: true, reflected: true,
                 returnHit: {
                     damage: reflectDamage,
@@ -242,6 +250,10 @@ export class Hero implements Actor, SavedHeroData {
         }
         // Enemies have special code for handling invulnerability.
         if (this.invulnerableFrames > 0 || this.isInvisible) {
+            if (!this.isInvisible && hit.knockback && hit.canAlwaysKnockback) {
+                this.knockBack(state, hit.knockback);
+                return { hit: true };
+            }
             return {};
         }
         if (hit.damage) {
@@ -257,7 +269,7 @@ export class Hero implements Actor, SavedHeroData {
             }
             this.takeDamage(state, damage);
         }
-        if (hit.knockback && !this.equipedGear?.ironBoots) {
+        if (hit.knockback && (hit.canAlwaysKnockback || !this.equipedGear?.ironBoots)) {
             this.knockBack(state, hit.knockback);
         }
         // Getting hit while frozen unfreezes you.

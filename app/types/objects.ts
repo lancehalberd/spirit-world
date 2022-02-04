@@ -141,6 +141,11 @@ export interface HitProperties {
     // Whether this hit can break crystal shields on certain enemies like
     // the Crystal Guardians and Crystal Collector in the Waterfall Tower.
     canDamageCrystalShields?: boolean
+    // Lightning barriers hurt the hero even when rolling.
+    canDamageRollingHero?: boolean
+    // Normally spirit barrier + iron boots prevent the hero from being knocked back, but if this property is
+    // set they will be knocked back no matter what.
+    canAlwaysKnockback?: boolean
     // Whether this hit can push puzzle elements like rolling balls, push/pull blocks, etc.
     canPush?: boolean
     // Whether this can cut ground tiles like thorns.
@@ -236,6 +241,11 @@ export interface BeadCascadeDefinition extends BaseObjectDefinition {
     onInterval?: number
     offInterval?: number
 }
+export interface AnodeDefinition extends BaseObjectDefinition {
+    type: 'anode'
+    onInterval?: number
+    offInterval?: number
+}
 
 export interface FloorSwitchDefinition extends BaseObjectDefinition {
     type: 'floorSwitch',
@@ -290,7 +300,7 @@ export interface NPCDefinition extends BaseObjectDefinition {
     dialogue?: string,
 }
 
-export type SimpleObjectType = 'airBubbles' | 'beadGrate' | 'pushPull' | 'rollingBall'
+export type SimpleObjectType = 'airBubbles' | 'beadGrate' | 'cathode' | 'pushPull' | 'rollingBall'
     | 'tippable' | 'torch' | 'vineSprout' | 'waterPot';
 
 export interface SimpleObjectDefinition extends BaseObjectDefinition {
@@ -338,6 +348,7 @@ export type BossObjectDefinition = BaseObjectDefinition & LootData & {
 }
 
 export type ObjectDefinition = SimpleObjectDefinition
+    | AnodeDefinition
     | BallGoalDefinition
     | BeadCascadeDefinition
     | BossObjectDefinition

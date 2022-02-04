@@ -53,7 +53,7 @@ export function getLootTypes(): LootType[] {
 }
 
 export const combinedObjectTypes: ObjectType[] = [
-    'airBubbles', 'ballGoal', 'beadCascade', 'beadGrate', 'bigChest', 'chest', 'crystalSwitch', 'decoration',
+    'anode', 'cathode', 'airBubbles', 'ballGoal', 'beadCascade', 'beadGrate', 'bigChest', 'chest', 'crystalSwitch', 'decoration',
     'door', 'escalator', 'floorSwitch', 'keyBlock', 'loot','marker', 'narration', 'npc', 'pitEntrance',
     'pushPull', 'rollingBall', 'sign', 'staffTowerPoint', 'teleporter', 'tippable', 'torch',
     'vineSprout', 'waterPot', 'spawnMarker',
@@ -85,6 +85,14 @@ export function createObjectDefinition(
         delete commonProps.spirit;
     }
     switch (definition.type) {
+        case 'anode':
+            return {
+                ...commonProps,
+                saveStatus: definition.saveStatus,
+                type: definition.type,
+                offInterval: definition.offInterval,
+                onInterval: definition.onInterval,
+            };
         case 'ballGoal':
             return {
                 ...commonProps,
@@ -241,6 +249,7 @@ export function createObjectDefinition(
         }
         case 'airBubbles':
         case 'beadGrate':
+        case 'cathode':
         case 'pushPull':
         case 'rollingBall':
         case 'tippable':
@@ -343,6 +352,7 @@ function getPossibleStatuses(type: ObjectType): ObjectStatus[] {
         case 'airBubbles':
         case 'beadCascade':
         case 'beadGrate':
+        case 'cathode':
         case 'pitEntrance':
             return ['normal', 'hidden', 'hiddenEnemy', 'hiddenSwitch'];
         case 'torch':
@@ -362,6 +372,7 @@ function getPossibleStatuses(type: ObjectType): ObjectStatus[] {
         case 'boss':
         case 'enemy':
             return ['normal', 'hidden', 'off'];
+        case 'anode':
         case 'escalator':
             return ['normal', 'off', 'frozen'];
         default:
@@ -616,6 +627,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
         case 'ballGoal':
             rows = [...rows, ...getSwitchTargetProperties(state, editingState, object)];
             break;
+        case 'anode':
         case 'beadCascade':
             rows.push({
                 name: 'onInterval',
