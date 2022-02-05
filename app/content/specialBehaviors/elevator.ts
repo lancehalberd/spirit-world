@@ -23,12 +23,15 @@ dialogueHash.elevator = {
             {playSound:switch}
             {flag:elevatorClosed}
             {wait:1000}
+            {startScreenShake:2:0:elevator}
             {playSound:enemyDeath}{wait:600}
             {playSound:enemyDeath}{wait:400}
             {playSound:enemyDeath}{wait:400}
             {playSound:enemyDeath}{wait:200}
             {playSound:enemyDeath}{wait:600}
-            {playSound:cloneExplosion}{wait:1000}
+            {screenShake:0:10:500}
+            {playSound:cloneExplosion}{wait:500}
+            {stopScreenShake:elevator}{wait:500}
             {clearFlag:elevatorClosed}
             {flag:elevatorDropped}
             {clearFlag:elevatorFalling}

@@ -76,6 +76,24 @@ export function parseEventScript(state: GameState, script: string): ScriptEvent[
             events.push({ type: 'rest' });
             continue;
         }
+        // {screenShake:2:0:2200}
+        if (actionToken.startsWith('screenShake:')) {
+            const paramToken = actionToken.substring('screenShake:'.length);
+            const [dx, dy, duration] = paramToken.split(':').map(Number);
+            events.push({ type: 'screenShake', dx, dy, duration });
+            continue;
+        }
+        if (actionToken.startsWith('startScreenShake:')) {
+            const paramToken = actionToken.substring('startScreenShake:'.length);
+            const [dx, dy, id] = paramToken.split(':');
+            events.push({ type: 'startScreenShake', dx: Number(dx), dy: Number(dy), id });
+            continue;
+        }
+        if (actionToken.startsWith('stopScreenShake:')) {
+            const id = actionToken.substring('stopScreenShake:'.length);
+            events.push({ type: 'stopScreenShake', id });
+            continue;
+        }
         if (actionToken.startsWith('choice:')) {
             const choiceToken = actionToken.substring('choice:'.length);
             //console.log(choiceToken);
@@ -174,7 +192,7 @@ export function parseEventScript(state: GameState, script: string): ScriptEvent[
             });
             continue
         }
-        console.error('Unhandled actiont token', actionToken);
+        console.error('Unhandled action token', actionToken);
     }
     events.push({ type: 'clearTextBox' });
     return events;
@@ -245,6 +263,30 @@ export const updateScriptEvents = (state: GameState): void => {
                 });
                 if (event.blockFieldUpdates) {
                     state.scriptEvents.blockFieldUpdates = true;
+                }
+                return;
+            case 'screenShake':
+                state.screenShakes.push({
+                    dx: event.dx,
+                    dy: event.dy,
+                    startTime: state.time,
+                    endTime: state.time + event.duration,
+                });
+                return;
+            case 'startScreenShake':
+                state.screenShakes.push({
+                    dx: event.dx,
+                    dy: event.dy,
+                    startTime: state.time,
+                    id: event.id,
+                });
+                return;
+            case 'stopScreenShake':
+                const index = state.screenShakes.findIndex(screenShake => screenShake.id === event.id);
+                if (index >= 0) {
+                    state.screenShakes.splice(index, 1);
+                } else {
+                    console.error(`screenShake id not found: ${event.id}`, state.screenShakes);
                 }
                 return;
             case 'showChoiceBox':

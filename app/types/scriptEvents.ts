@@ -67,6 +67,22 @@ export interface AttemptPurchaseScriptEvent {
 export interface RestScriptEvent {
 	type: 'rest'
 }
+export interface ScreenShakeScriptEvent {
+    type: 'screenShake'
+    dx: number
+    dy: number
+    duration: number
+}
+export interface StartScreenShakeScriptEvent {
+    type: 'startScreenShake'
+    dx: number
+    dy: number
+    id: string
+}
+export interface StopScreenShakeScriptEvent {
+    type: 'stopScreenShake'
+    id: string
+}
 
 export type ScriptEvent
 	= AttemptPurchaseScriptEvent
@@ -77,9 +93,12 @@ export type ScriptEvent
 	| RefreshAreaLogicScriptEvent
 	| RestScriptEvent
 	| RunDialogueScriptScriptEvent
+    | ScreenShakeScriptEvent
 	| SetFlagScriptEvent
 	| ShowChoiceBoxScriptEvent
 	| ShowTextBoxScriptEvent
+    | StartScreenShakeScriptEvent
+    | StopScreenShakeScriptEvent
 	| WaitScriptEvent
 	;
 

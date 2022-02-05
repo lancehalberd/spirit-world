@@ -74,7 +74,9 @@ export function applyScreenShakes(context: CanvasRenderingContext2D, state: Game
     for (const screenShake of state.screenShakes) {
         const t = state.time - screenShake.startTime;
         // If endTime is falsey, p stays at 1 the entire time.
-        const p = screenShake.endTime ? t / (screenShake.endTime - screenShake.startTime) : 1;
+        const p = screenShake.endTime
+            ? ( 1 - t / (screenShake.endTime - screenShake.startTime))
+            : 1;
         const amplitude = p * Math.sin(t / 20);
         context.translate(screenShake.dx * amplitude, screenShake.dy * amplitude);
     }

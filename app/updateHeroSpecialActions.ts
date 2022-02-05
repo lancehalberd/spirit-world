@@ -340,7 +340,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 knockAwayFromHit: true,
             });
             state.screenShakes.push({
-                dx: 0, dy: 5, startTime: state.time, endTime: state.time + 200
+                dx: 0, dy: staffLevel > 1 ? 5 : 2, startTime: state.time, endTime: state.time + 200
             })
         } else if (hero.animationTime < jumpDuration + slamDuration) {
              hero.z = Math.max(hero.z + hero.vz, minZ);

@@ -38,8 +38,6 @@ Graphics:
 
 
 Current tasks:
-    - Add screen shake
-        - Elevator
     - Make the staff ground raised, use floorHeight tileBehavior to control minZ+raise the shadow so they don't look like they are floating.
     - Game occasionally plays small bits of music while muted.
     - Game music occasionally doesn't pick up correctly
@@ -131,6 +129,15 @@ Add advanced tutorials
     - Default Charged chakram attack
     - Maybe different sections for different tools.
     - Reflecting projectiles
+
+Add more screen shakes:
+    - Lava draining transition
+    - Probably for some impactful boss attacks.
+    - Maybe when falling from a large height.
+    - Scene where elemental beasts escape and attack the holy city
+        - Maybe could be periodic large shake+explosion as if there is a large explosion nearby
+        - Could have different combination of effects to signify attacks from each type of elemental beast
+        - Could make sure these effects are also used when actually fighting the beasts for consistency
 
 
 High level list of things left to do:
