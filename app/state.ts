@@ -309,7 +309,8 @@ export function getDefaultState(): GameState {
             blockFieldUpdates: false,
             handledInput: false,
             queue: [],
-        }
+        },
+        screenShakes: [],
     };
     return state;
 }

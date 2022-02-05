@@ -62,6 +62,13 @@ export function updateField(this: void, state: GameState) {
         updateAreaObjects(state, state.nextAreaInstance);
     }
     updateAreaObjects(state, state.alternateAreaInstance);
+    // Remove completed screenshakes.
+    for (let i = 0; i < state.screenShakes.length; i++) {
+        const endTime = state.screenShakes[i].endTime;
+        if (endTime && state.time >= endTime) {
+            state.screenShakes.splice(i--, 1);
+        }
+    }
 }
 export function updateAreaObjects(this: void, state: GameState, area: AreaInstance) {
     const isScreenTransitioning = state.nextAreaInstance || state.nextAreaSection;

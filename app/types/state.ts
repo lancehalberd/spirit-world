@@ -43,6 +43,15 @@ export type DialogueLootDefinition = LootData & {
     cost?: number
 }
 
+export interface ScreenShake {
+    dx: number
+    dy: number
+    startTime: number
+    endTime?: number
+    // This can be set to help removing a specific screen shake later.
+    id?: string
+}
+
 export interface GameState {
     savedState: SavedState
     settings: Settings
@@ -114,4 +123,5 @@ export interface GameState {
     isUsingKeyboard?: boolean
     isUsingXbox?: boolean
     fadeLevel: number
+    screenShakes: ScreenShake[]
 }

@@ -69,14 +69,31 @@ export function updateSpiritCanvas(state: GameState, radius: number): void {
     }
 }
 
+export function applyScreenShakes(context: CanvasRenderingContext2D, state: GameState) {
+    context.save();
+    for (const screenShake of state.screenShakes) {
+        const t = state.time - screenShake.startTime;
+        // If endTime is falsey, p stays at 1 the entire time.
+        const p = screenShake.endTime ? t / (screenShake.endTime - screenShake.startTime) : 1;
+        const amplitude = p * Math.sin(t / 20);
+        context.translate(screenShake.dx * amplitude, screenShake.dy * amplitude);
+    }
+}
+
+export function removeScreenShakes(context: CanvasRenderingContext2D, state: GameState) {
+    context.restore();
+}
+
 export function renderStandardFieldStack(context: CanvasRenderingContext2D, state: GameState, renderHero: boolean = null): void {
-    renderField(context, state, renderHero);
-    renderSurfaceLighting(context, state, state.areaInstance);
-    renderFieldForeground(context, state);
-    renderWaterOverlay(context, state);
-    renderHeatOverlay(context, state, state.areaInstance);
-    renderSpiritOverlay(context, state);
-    renderAreaLighting(context, state, state.areaInstance, state.nextAreaInstance);
+    applyScreenShakes(context, state);
+        renderField(context, state, renderHero);
+        renderSurfaceLighting(context, state, state.areaInstance);
+        renderFieldForeground(context, state);
+        renderWaterOverlay(context, state);
+        renderHeatOverlay(context, state, state.areaInstance);
+        renderSpiritOverlay(context, state);
+        renderAreaLighting(context, state, state.areaInstance, state.nextAreaInstance);
+    removeScreenShakes(context, state);
 }
 export function renderStandardFieldStackWithoutWaterOverlay(context: CanvasRenderingContext2D, state: GameState, renderHero: boolean = null): void {
     renderField(context, state, renderHero);

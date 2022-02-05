@@ -40,19 +40,11 @@ Graphics:
 Current tasks:
     - Add screen shake
         - Elevator
-        - Staff slam
-    - Lightning barriers
-        - Deal 4 lightning damage and knock the player back.
-            - Player is still knocked back with spirit barrier or iframes.
-            - Invisibility allows the player to pass through unharmed.
-        - Can be permanently on, toggled on/off on timer, or toggled by switches
-        - Shows a 500ms warning when about to turn on, maybe sparks on either end of where the beam will be, or a smaller non damaging beam.
     - Make the staff ground raised, use floorHeight tileBehavior to control minZ+raise the shadow so they don't look like they are floating.
     - Game occasionally plays small bits of music while muted.
     - Game music occasionally doesn't pick up correctly
         - At the end of tracks
         - Transition between boss tracks
-    - Ents summoning thorns on foreground layers.
 
     Peach Cave improvements
         - Add new graphics to 2F
