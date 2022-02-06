@@ -71,12 +71,20 @@ export class Escalator implements ObjectInstance {
     y: number;
     pattern: CanvasPattern;
     // 'normal' is running 'off' is stopped.
+    speed: EscalatorDefinition['speed']
     status: ObjectStatus = 'normal';
     constructor(state: GameState, definition: EscalatorDefinition) {
         this.definition = definition;
         this.status = definition.status;
         this.x = this.definition.x;
         this.y = this.definition.y;
+        this.speed = this.definition.speed;
+    }
+    onActivate(state: GameState) {
+        this.status = 'normal';
+    }
+    onDeactivate(state: GameState) {
+        this.status = 'off';
     }
     getHitbox(state: GameState) {
         const hitbox = pad(this.definition, 8);
@@ -93,7 +101,7 @@ export class Escalator implements ObjectInstance {
         this.animationTime += FRAME_LENGTH;
         const dx = directionMap[this.definition.d][0];
         const dy = directionMap[this.definition.d][1];
-        let speed = (this.definition.speed === 'slow') ? 1 : 3;
+        let speed = (this.speed === 'slow') ? 1 : 3;
         if (this.status === 'normal') {
             this.offsetX += dx * speed;
             this.offsetY += dy * speed;
@@ -104,13 +112,13 @@ export class Escalator implements ObjectInstance {
             const heroHitbox = hero.getHitbox(state);
             const touchingHero = isObjectInsideTarget(heroHitbox, this.getHitbox(state))
                 && hero.action !== 'roll' && hero.z <= 0;
-            if (this.definition.speed === 'slow' && touchingHero) {
+            if (this.speed === 'slow' && touchingHero) {
                 moveActor(state, hero, speed * dx, speed * dy, {
                     canFall: true,
                     canJump: true,
                     canSwim: true,
                 });
-            } else if (this.definition.speed === 'fast') {
+            } else if (this.speed === 'fast') {
                 if (hero.actionTarget === this && !touchingHero) {
                     hero.actionTarget = null;
                     hero.actionDx = 0;

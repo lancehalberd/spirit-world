@@ -2,7 +2,7 @@ import { Door } from 'app/content/objects/door';
 import { Sign } from 'app/content/objects/sign';
 import {
     Actor, AreaInstance, BossType,
-    DecorationType, Direction, EnemyType,
+    DecorationType, Direction, Enemy, EnemyType,
     GameState, Hero, LootType,
     MagicElement, MinionType,
     NPCBehavior, NPCStyle,
@@ -374,6 +374,11 @@ export interface SpecialDoorBehavior {
     type: 'door'
     apply: (state: GameState, object: Door) => void
 }
+export interface SpecialEnemyBehavior {
+    type: 'enemy'
+    apply: (state: GameState, object: Enemy) => void
+}
+
 export interface SpecialSignBehavior {
     type: 'sign'
     apply: (state: GameState, object: Sign) => void

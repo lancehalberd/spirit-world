@@ -1,4 +1,4 @@
-import { refreshAreaLogic } from 'app/content/areas';
+import { enterLocation, refreshAreaLogic } from 'app/content/areas';
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 import { getLoot } from 'app/content/objects/lootObject';
 import { getLootTypes } from 'app/development/objectEditor';
@@ -74,6 +74,20 @@ export function parseEventScript(state: GameState, script: string): ScriptEvent[
         }
         if (actionToken === 'rest') {
             events.push({ type: 'rest' });
+            continue;
+        }
+        if (actionToken === 'teleport') {
+            const hero = state.hero.activeClone || state.hero;
+            events.push({
+                type: 'enterLocation',
+                location: {
+                    ...state.location,
+                    x: hero.x,
+                    y: hero.y,
+                    d: hero.d,
+                    isSpiritWorld: !state.location.isSpiritWorld,
+                },
+            });
             continue;
         }
         // {screenShake:2:0:2200}
@@ -350,6 +364,9 @@ export const updateScriptEvents = (state: GameState): void => {
                     time: 0,
                     type: 'fade',
                 };
+                return;
+            case 'enterLocation':
+                enterLocation(state, event.location, false);
                 break;
         }
     }

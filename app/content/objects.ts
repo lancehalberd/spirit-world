@@ -166,7 +166,8 @@ export function deactivateTarget(state: GameState, target: ObjectInstance): void
 export function toggleTarget(state: GameState, target: ObjectInstance): void {
     const isActive = target.isActive
         ? target.isActive(state)
-        : target.status !== 'hidden' && target.status !== 'hiddenSwitch' && target.status !== 'closedSwitch';
+        : target.status !== 'hidden' && target.status !== 'hiddenSwitch' && target.status !== 'closedSwitch'
+            && target.status !== 'off';
     if (isActive) {
         deactivateTarget(state, target);
     } else {

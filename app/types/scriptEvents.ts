@@ -1,4 +1,4 @@
-import { Frame, LootData } from 'app/types';
+import { Frame, LootData, ZoneLocation } from 'app/types';
 
 export interface ShowTextBoxScriptEvent {
     type: 'showTextBox'
@@ -83,11 +83,16 @@ export interface StopScreenShakeScriptEvent {
     type: 'stopScreenShake'
     id: string
 }
+export interface EnterLocationScriptEvent {
+    type: 'enterLocation'
+    location: ZoneLocation
+}
 
 export type ScriptEvent
     = AttemptPurchaseScriptEvent
     | ClearFlagScriptEvent
     | ClearTextBoxScriptEvent
+    | EnterLocationScriptEvent
     | GainLootScriptEvent
     | PlaySoundScriptEvent
     | RefreshAreaLogicScriptEvent

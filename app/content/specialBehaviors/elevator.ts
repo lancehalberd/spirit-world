@@ -49,19 +49,19 @@ specialBehaviorsHash.elevatorControls = {
         const elevatorFalling = !!state.savedState.objectFlags.elevatorFalling;
         // Elevator controls don't work while the elevator is falling.
         if (elevatorFalling) {
-            sign.definition.message = '';
+            sign.message = '';
             return;
         }
         const elevatorFixed = !!state.savedState.objectFlags.elevatorFixed;
         const elevatorDropped = !!state.savedState.objectFlags.elevatorDropped;
         if (!elevatorFixed) {
-            sign.definition.message = elevatorDropped
+            sign.message = elevatorDropped
                 ? dialogueHash.elevator.mappedOptions.powerFailureDropped
                 : dialogueHash.elevator.mappedOptions.powerFailure;
             return;
         }
         // After the elevator is fixed, it functions normally.
-        sign.definition.message = dialogueHash.elevator.mappedOptions.chooseFloor;
+        sign.message = dialogueHash.elevator.mappedOptions.chooseFloor;
         const elevatorFloor = state.savedState.objectFlags.elevatorFloor || 2;
         // Set the results of choosing a floor based on the current floor the elevator is on:
         for (let i = 0; i < 6; i++) {

@@ -944,7 +944,8 @@ export class Door implements ObjectInstance {
         this.area = null;
     }
     isStairs(state: GameState) {
-        return this.style === 'cavernUpstairs' || this.style === 'cavernDownstairs';
+        return this.style === 'cavernUpstairs' || this.style === 'cavernDownstairs'
+            || this.style === 'woodenUpstairs' || this.style === 'woodenDownstairs';
     }
     update(state: GameState) {
         if (this.status !== 'normal' && getObjectStatus(state, this.definition)) {

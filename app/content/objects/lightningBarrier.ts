@@ -1,5 +1,5 @@
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
-import { getObjectStatus } from 'app/content/objects';
+import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
 import { getVectorToTarget } from 'app/content/enemies';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { hitTargets } from 'app/utils/field';
@@ -31,8 +31,9 @@ export class Anode implements ObjectInstance {
         this.status = this.definition.status || 'normal';
         this.x = definition.x;
         this.y = definition.y;
+        // If the flag is set, then the status is toggled to the opposite of the definition.
         if (getObjectStatus(state, definition)) {
-            this.status = 'normal';
+            this.status = this.definition.status === 'normal' ? 'off' : 'normal';
         }
     }
     onActivate(state: GameState) {
@@ -67,6 +68,11 @@ export class Anode implements ObjectInstance {
     }
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;
+        if (this.status !== this.definition.status && !getObjectStatus(state, this.definition)) {
+            saveObjectStatus(state, this.definition);
+        } else if (this.status === this.definition.status && getObjectStatus(state, this.definition)) {
+            saveObjectStatus(state, this.definition, false);
+        }
         if (this.status === 'off') {
             if (this.definition.offInterval && this.animationTime >= this.definition.offInterval) {
                 this.onActivate(state);

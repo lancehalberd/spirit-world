@@ -19,7 +19,7 @@ export const signStyles = {
             context.fillRect(sign.x, sign.y, 16, 14);
             context.fillStyle = '#000';
             context.fillRect(sign.x + 1, sign.y + 1, 14, 12);
-            if (state.time % 1000 < 500) {
+            if (sign.status === 'normal' && state.time % 1000 < 500) {
                 context.fillStyle = '#FFF';
                 context.fillRect(sign.x + 3, sign.y + 3, 1, 2);
             }
@@ -48,19 +48,21 @@ export class Sign implements ObjectInstance {
     y: number;
     status: ObjectStatus = 'normal';
     isNeutralTarget = true;
+    message: string;
     constructor(definition: SignDefinition) {
         this.definition = definition;
         this.x = definition.x;
         this.y = definition.y;
+        this.message = this.definition.message;
     }
     getHitbox(state: GameState): Rect {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
     onGrab(state: GameState, direction: Direction, hero: Hero) {
-        if (direction !== 'up') {
+        if (direction !== 'up' || this.status !== 'normal') {
             return;
         }
-        showMessage(state, this.definition.message);
+        showMessage(state, this.message);
         // Remove the grab action since the hero is reading the sign, not grabbing it.
         hero.action = null;
     }

@@ -38,31 +38,20 @@ Graphics:
 
 
 Current tasks:
-    - Make the staff ground raised, use floorHeight tileBehavior to control minZ+raise the shadow so they don't look like they are floating.
-    - Game occasionally plays small bits of music while muted.
-    - Game music occasionally doesn't pick up correctly
-        - At the end of tracks
-        - Transition between boss tracks
-
-    Peach Cave improvements
-        - Add new graphics to 2F
-        - Fix spirit world tiles
-            - Add 4 easy checks to top floor and bombable pit entrance to basement
-            - Use crystal floor graphics in place of water when it is ready.
-            - Require Mitts for entering from the bottom floor.
-            - Add harder beetle boss with a Peach piece on it
-            - Add 3 checks behind different tool combinations
-                - cracked ground for cloud boots/ice magic
-                - staff or teleportation to get across pits
-                - bow+torches or fire element to unfreeze a chest
-
-    - Add behavior that prevents non-flying enemies from crossing tiles/objects, use for cracked ground, escalators, bead cascades, etc.
-        - Anything that doesn't handle enemies gracefully either needs to keep enemies out or add handling.
-
-
-    - Consider adding `isActive(state, area)` method on enemy that returns true if the enemy can attack in the given area. Use in logic for removing discharge from area if enemy source is invalid.
-
     Staff Tower
+        - Allow escape from basement:
+            - If the elevator has fallen but base power is not on, always spawn in the elevator.
+            - Defeating the monsters in the basement should restore base power.
+                - Change to a single electric squirrel boss (just 2x size and increased aoe for now).
+        - Improve path to elevator:
+            - Add enemies to the spirit world
+            - Add obstacles to material world
+        - Lightning drones in the spirit world create invulnerable lightning balls in the material world.
+        - Add checks to the tower (see notes)
+
+        - Create path to elevator entrance:
+            - 1F -> 1F Spirit -> (around broken elevator door) -> 2F Spirit (around blocked off elevator entrance)
+                -> 2F Material -> 3F Material -> 3F Spirit (around chest by blocked off elevator entrance) -> 2f Spirit elevator
         - Elevator only in spirit world (similar to cocoon)
             - Trying to open the elevator on the first floor will give a message about power flow in the spirit world being disrupted by excess energy in the material world. Maybe something about starting backup power.
             - Elevator is stuck on floor 2 but you need to drop down from floor 3 to reach it.
@@ -86,6 +75,23 @@ Current tasks:
         - Slow Conveyer belt puzzle with out of sync lightning barriers across it.
         - Disabled conveyer belt with pots on it that needs to be turned on to move the pots out of the way.
 
+    Peach Cave improvements
+        - Add new graphics to 2F
+        - Fix spirit world tiles
+            - Add 4 easy checks to top floor and bombable pit entrance to basement
+            - Use crystal floor graphics in place of water when it is ready.
+            - Require Mitts for entering from the bottom floor.
+            - Add harder beetle boss with a Peach piece on it
+            - Add 3 checks behind different tool combinations
+                - cracked ground for cloud boots/ice magic
+                - staff or teleportation to get across pits
+                - bow+torches or fire element to unfreeze a chest
+
+    - Add behavior that prevents non-flying enemies from crossing tiles/objects, use for cracked ground, escalators, bead cascades, etc.
+        - Anything that doesn't handle enemies gracefully either needs to keep enemies out or add handling.
+
+
+    - Consider adding `isActive(state, area)` method on enemy that returns true if the enemy can attack in the given area. Use in logic for removing discharge from area if enemy source is invalid.
 
     Storm Beast
         - Storm Beast can turn into lightning and teleport as a beam sending shockwaves out at both ends.
@@ -105,6 +111,12 @@ Current tasks:
                     - Barrier to reflect projectiles
                     - Bow to shoot distant weak spots
                 - Tools can make it easier to avoid attacks
+
+    - Make the staff ground raised, use floorHeight tileBehavior to control minZ+raise the shadow so they don't look like they are floating.
+    - Game occasionally plays small bits of music while muted.
+    - Game music occasionally doesn't pick up correctly
+        - At the end of tracks
+        - Transition between boss tracks
 
     Make mutation transition use the same area instance so contents don't reset
         - Will need to add special handling to remove extra ice tiles from frost beast+heat sink battles.

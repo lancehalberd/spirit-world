@@ -24,7 +24,7 @@ import {
     BossType, CrystalSwitchDefinition, FloorSwitchDefinition, KeyBlockDefinition,
     FrameDimensions, DecorationType, Direction, DrawPriority, EnemyType, GameState, LootObjectDefinition,
     LootType, MagicElement, NPCBehavior, NPCStyle, ObjectDefinition, ObjectStatus, ObjectType, PanelRows,
-    Rect, StaffTowerLocation,
+    Rect, SpecialAreaBehavior, StaffTowerLocation,
     Zone, ZoneLocation,
 } from 'app/types';
 
@@ -330,7 +330,12 @@ export function getSwitchTargetProperties(
     object: BallGoalDefinition | CrystalSwitchDefinition | FloorSwitchDefinition | KeyBlockDefinition
 ): PanelRows {
     const rows: PanelRows = [];
-    const objectIds = ['all', ...getTargetObjectIdsByTypesAndArea(state.areaInstance.definition, ['door', 'chest', 'loot', 'airBubbles', 'beadGrate', 'beadCascade', 'torch'])];
+    const objectIds = [
+        'all',
+        ...getTargetObjectIdsByTypesAndArea(state.areaInstance.definition,
+            ['door', 'chest', 'loot', 'airBubbles', 'beadGrate', 'beadCascade', 'torch', 'escalator', 'anode']
+        )
+    ];
 
     if (object.id && objectIds.indexOf(object.targetObjectId) < 0) {
         delete object.targetObjectId;
@@ -1164,6 +1169,11 @@ export function updateObjectInstance(state: GameState, object: ObjectDefinition,
         checkToAddLinkedObject(state, object);
     }
     linkObject(newObject);
+    // If the current area has special behaviors, apply it in case it effects the updated object.
+    if (area.definition.specialBehaviorKey) {
+        const specialBehavior = specialBehaviorsHash[area.definition.specialBehaviorKey] as SpecialAreaBehavior;
+        specialBehavior?.apply(state, area);
+    }
 }
 
 export function deleteObject(state: GameState, object: ObjectDefinition): void {
