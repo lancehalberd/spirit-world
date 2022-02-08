@@ -1,6 +1,5 @@
 import {Howl} from 'howler';
 
-/* globals setTimeout, Set, Map */
 const sounds = new Map();
 window['sounds'] = sounds;
 let audioUnlocked = false;

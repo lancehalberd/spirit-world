@@ -80,10 +80,11 @@ specialBehaviorsHash.elevatorDoor = {
         const elevatorFixed = !!state.savedState.objectFlags.elevatorFixed;
         const elevatorDropped = !!state.savedState.objectFlags.elevatorDropped;
         const elevatorClosed = !!state.savedState.objectFlags.elevatorClosed;
+        const startingFloor = elevatorDropped ? 0 : 2;
         // Elevator is broken down at level 2 by default. 0 = basement, 1 = first floor, etc.
         const elevatorFloor = elevatorFixed
-            ? (state.savedState.objectFlags.elevatorFloor || 2)
-            : (elevatorDropped ? 0 : 2);
+            ? (state.savedState.objectFlags.elevatorFloor ?? startingFloor)
+            : startingFloor;
         // The interior elevator door.
         if (door.definition.id === 'elevatorDoor') {
             door.changeStatus(state, elevatorClosed ? 'closed' : 'normal');
@@ -100,10 +101,10 @@ specialBehaviorsHash.elevatorDoor = {
                 door.changeStatus(state, 'normal');
             } else {
                 door.changeStatus(state, 'closed');
-                const doorFloor = parseInt(door.definition.id, 10);
+                const doorFloor = parseInt(door.definition.id.substring('elevatorDoor'.length), 10);
                 // Interacting with the closed door will call the door to the current floor if the elevator is fixed.
                 door.onGrab = (state: GameState) => {
-                    setScript(state, elevatorFixed
+                    setScript(state, !elevatorFixed
                         ? `The door won't open.`
                         : `{playSound:switch}{wait:1500}{flag:elevatorFloor=${doorFloor}}`
                     );

@@ -216,6 +216,16 @@ export const SPAWN_STAFF_UPPER_ENTRANCE: ZoneLocation = {
     areaGridCoords: {y: 1, x: 0},
     isSpiritWorld: true,
 };
+export const SPAWN_STAFF_ELEVATOR: ZoneLocation = {
+    zoneKey: 'staffTower',
+    floor: 3,
+    d: 'up',
+    x: 248,
+    y: 416,
+    z: 0,
+    areaGridCoords: {y: 1, x: 0},
+    isSpiritWorld: true,
+};
 export const SPAWN_STAFF_BOSS: ZoneLocation = {
     zoneKey: 'staffTower',
     floor: 3,
@@ -518,6 +528,11 @@ export function fixSpawnLocationOnLoad(state: GameState): void {
     // The player restarts at the defeated boss if they haven't made it to the overworld yet.
     if (state.hero.spawnLocation.zoneKey === 'peachCave' && state.savedState.objectFlags['peachCave:boss']) {
         state.hero.spawnLocation = SPAWN_LOCATION_PEACH_CAVE_BOSS;
+    }
+    // Once the elavator has been dropped, the player spawns in the elevator until it is fixed,
+    // otherwise they have no path back to the basement.
+    if (state.savedState.objectFlags.elevatorDropped && !state.savedState.objectFlags.elevatorFixed) {
+        state.hero.spawnLocation = SPAWN_STAFF_ELEVATOR;
     }
 }
 

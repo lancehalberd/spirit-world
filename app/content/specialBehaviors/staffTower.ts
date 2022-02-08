@@ -9,8 +9,8 @@ import { AreaInstance, GameState } from 'app/types';
 specialBehaviorsHash.staffTower = {
     type: 'area',
     apply(state: GameState, area: AreaInstance) {
-        const towerIsOn = !!state.savedState.objectFlags['elementalBeastsEscaped'];
-        const towerIsHaywire = towerIsOn && !state.savedState.objectFlags['stormBeast'];
+        const towerIsOn = !!state.savedState.objectFlags.elementalBeastsEscaped;
+        const towerIsHaywire = towerIsOn && !state.savedState.objectFlags.stormBeast;
         if (!towerIsOn) {
             // Before the tower is turned on, everything is off and dark.
             area.dark = Math.max(area.definition.dark || 0, 50);
@@ -22,6 +22,10 @@ specialBehaviorsHash.staffTower = {
                 }
             }
         } else {
+            // Once the elevator is fixed, the basement gets brighter.
+            if (state.savedState.objectFlags.elevatorFixed) {
+                area.dark = Math.min(area.dark, 50);
+            }
             if (!towerIsHaywire) {
                 // After the tower is fixed, most things are on, but traps/obstacles are disbabled.
                 for (const object of area.objects) {

@@ -919,7 +919,11 @@ export function addObjectToArea(state: GameState, area: AreaInstance, object: Ob
     }
 
     if (object.definition?.specialBehaviorKey) {
-        specialBehaviorsHash[object.definition?.specialBehaviorKey].apply(state, object as any);
+        try {
+            specialBehaviorsHash[object.definition.specialBehaviorKey].apply(state, object as any);
+        } catch (error) {
+            console.error(object.definition.specialBehaviorKey);
+        }
     }
 }
 export function removeObjectFromArea(state: GameState, object: ObjectInstance, trackId: boolean = true): void {

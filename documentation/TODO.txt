@@ -39,10 +39,6 @@ Graphics:
 
 Current tasks:
     Staff Tower
-        - Allow escape from basement:
-            - If the elevator has fallen but base power is not on, always spawn in the elevator.
-            - Defeating the monsters in the basement should restore base power.
-                - Change to a single electric squirrel boss (just 2x size and increased aoe for now).
         - Improve path to elevator:
             - Add enemies to the spirit world
             - Add obstacles to material world
