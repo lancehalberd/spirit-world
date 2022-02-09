@@ -39,11 +39,13 @@ Graphics:
 
 Current tasks:
     Staff Tower
-        - Improve path to elevator:
-            - Add enemies to the spirit world
-            - Add obstacles to material world
-        - Lightning drones in the spirit world create invulnerable lightning balls in the material world.
+        - Fix switch plays sound when turning barrier on rather than off.
         - Add checks to the tower (see notes)
+        - Flying enemies should not move over abyss tiles(make abyss tiles + ceiling tiles impassable to flying enemies).
+
+        - conveyer belt + cloud boots puzzle
+            - Floor is fast moving conveyer belts that will return you to start if you land
+            - Walls are lightning that will knock you onto the belt so you have to navigate using the cloud boots without running into any walls.
 
         - Create path to elevator entrance:
             - 1F -> 1F Spirit -> (around broken elevator door) -> 2F Spirit (around blocked off elevator entrance)
@@ -120,8 +122,7 @@ Current tasks:
     - Probably should move hero back to safe location on reviving.
 
     - Randomizer improvements
-        - Add a goal
-    - brainstorm some dungeon/boss ideas, maybe for Staff Tower
+        - Add configurable goal
 
     - Add target landing locations when falling from sky (also apply to the forest temple pits).
     - Add new hold+walk chakram animations

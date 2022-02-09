@@ -8,7 +8,7 @@ import { destroyClone } from 'app/content/objects/clone';
 import { CloneExplosionEffect } from 'app/content/effects/CloneExplosionEffect';
 import { AstralProjection } from 'app/content/objects/astralProjection';
 import { zones } from 'app/content/zones';
-import { EXPLOSION_TIME, FRAME_LENGTH, GAME_KEY, MAX_SPIRIT_RADIUS } from 'app/gameConstants';
+import { EXPLOSION_TIME, FALLING_HEIGHT, MAX_FLOAT_HEIGHT, FRAME_LENGTH, GAME_KEY, MAX_SPIRIT_RADIUS } from 'app/gameConstants';
 import { getActorTargets } from 'app/getActorTargets';
 import {
     getCloneMovementDeltas,
@@ -31,9 +31,6 @@ import {
     ObjectInstance, ThrownChakram, TileCoords,
 } from 'app/types';
 
-
-const maxCloudBootsZ = 3;
-
 export function updateHeroStandardActions(this: void, state: GameState, hero: Hero) {
     const wasPassiveButtonPressed = wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL);
     const isPassiveButtonDown = isGameKeyDown(state, GAME_KEY.PASSIVE_TOOL);
@@ -42,12 +39,13 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         || (state.hero.rightTool === 'clone' && isGameKeyDown(state, GAME_KEY.RIGHT_TOOL));
     const primaryClone = state.hero.activeClone || state.hero;
     const isPlayerControlled = (state.hero.action === 'meditating' && hero.isAstralProjection) || isCloneToolDown || hero === primaryClone;
-    const minZ = hero.isAstralProjection ? 4 : 0;
+    const minZ = hero.groundHeight + (hero.isAstralProjection ? 4 : 0);
     const isMovementBlocked = hero.action === 'meditating'
         || hero.action === 'throwing' || hero.action === 'grabbing';
+    const maxCloudBootsZ = hero.groundHeight + MAX_FLOAT_HEIGHT;
     const isActionBlocked =
         isMovementBlocked || hero.swimming || hero.pickUpTile || hero.pickUpObject || hero.action === 'attack' ||
-        hero.z > Math.max(maxCloudBootsZ, minZ);
+        hero.z > Math.max(FALLING_HEIGHT, minZ);
     const canCharge = !hero.isAstralProjection && isPlayerControlled && !isActionBlocked;
     const canAttack = canCharge && hero.weapon > 0 && !hero.chargingLeftTool && !hero.chargingRightTool;
     // console.log('move', !isMovementBlocked, 'act', !isActionBlocked, 'charge', canCharge, 'attack', canAttack);
@@ -94,7 +92,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     // Handle various effects that alter the heroes z value, like sinking/floating in water
     // or running with cloud boots. None of these effects prevent the player from moving or acting.
     if (hero.z < minZ) {
-        hero.z = Math.min(hero.z + 1, minZ);
+        hero.z = Math.max(hero.groundHeight, Math.min(hero.z + 1, minZ));
     }
     if (isHeroSinking(state, hero)) {
         hero.z = Math.max(hero.z - 2, minZ);

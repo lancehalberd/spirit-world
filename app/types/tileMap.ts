@@ -67,6 +67,8 @@ export interface TileBehaviors {
     pit?: boolean
     isLava?: Boolean
     isLavaMap?: Uint16Array
+    // number of pixels to raise the player when on this tile. Created for the staff ground.
+    groundHeight?: number
     // Assign this to skip tiles in source images.
     skipped?: boolean
     // Blocks movement

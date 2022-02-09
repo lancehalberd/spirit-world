@@ -213,6 +213,7 @@ export class NPC implements Actor, ObjectInstance  {
     z = 0;
     w = 16;
     h = 16;
+    groundHeight = 0;
     currentAnimation: FrameAnimation;
     animationTime = 0;
     mode = 'choose';

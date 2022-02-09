@@ -1,7 +1,7 @@
 import { addObjectToArea, enterLocation, getAreaSize, playAreaSound } from 'app/content/areas';
 import { Door } from 'app/content/objects/door';
 import { Staff } from 'app/content/objects/staff';
-import { CANVAS_HEIGHT, FRAME_LENGTH } from 'app/gameConstants';
+import { CANVAS_HEIGHT, FALLING_HEIGHT, FRAME_LENGTH } from 'app/gameConstants';
 import { editingState } from 'app/development/tileEditor';
 import { getCloneMovementDeltas } from 'app/keyCommands';
 import { checkForFloorEffects, moveActor } from 'app/moveActor';
@@ -15,8 +15,6 @@ import {
     GameState, Hero, ObjectInstance,
 } from 'app/types';
 
-const maxCloudBootsZ = 3;
-
 const rollSpeed = [
     5, 5, 5, 5,
     4, 4, 4, 4,
@@ -26,7 +24,7 @@ const rollSpeed = [
 
 export function updateHeroSpecialActions(this: void, state: GameState, hero: Hero): boolean {
     const isPrimaryHero = hero === (state.hero.activeClone || state.hero);
-    const minZ = hero.isAstralProjection ? 4 : 0;
+    const minZ = hero.groundHeight + (hero.isAstralProjection ? 4 : 0);
     // Handle super tile transitions.
     if (isPrimaryHero && state.nextAreaInstance) {
         hero.vx = 0;
@@ -202,8 +200,8 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         if (!hero.jumpingVy && !hero.jumpingVx) {
             hero.z += hero.jumpingVz;
             hero.jumpingVz = Math.max(-2, hero.jumpingVz - 0.5);
-            if (hero.z <= 0) {
-                hero.z = 0;
+            if (hero.z <= hero.groundHeight) {
+                hero.z = hero.groundHeight;
                 hero.action = null;
                 hero.animationTime = 0;
                 checkForFloorEffects(state, hero);
@@ -350,7 +348,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         return true;
     }
     const isFallingToGround = !isUnderwater(state, hero)
-        && hero.z > minZ && (!hero.equipedGear.cloudBoots || hero.z > maxCloudBootsZ);
+        && hero.z > minZ && (!hero.equipedGear.cloudBoots || hero.z > FALLING_HEIGHT);
     if (isFallingToGround) {
         hero.action = null;
         hero.z += hero.vz;

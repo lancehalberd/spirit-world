@@ -11,6 +11,7 @@ import {
     droneAnimations,
 } from 'app/content/enemyAnimations';
 import { lifeLootTable } from 'app/content/lootTables';
+import { hitTargets } from 'app/utils/field';
 
 import { Enemy, GameState } from 'app/types';
 
@@ -70,6 +71,22 @@ enemyDefinitions.lightningDrone = {
             }
         }
         enemy.shielded = enemy.mode !== 'discharge';
+        if (enemy.area !== state.areaInstance) {
+            const hitbox = enemy.getHitbox(state);
+            if (enemy.modeTime % 60 === 0) {
+                addSparkleAnimation(state, state.areaInstance, hitbox, { element: 'lightning' });
+            }
+            hitTargets(state, state.areaInstance, {
+                damage: 4,
+                element: 'lightning',
+                hitbox,
+                hitAllies: true,
+                hitObjects: true,
+                hitTiles: true,
+                hitEnemies: true,
+                knockAwayFrom: {x: hitbox.x + hitbox.w / 2, y: hitbox.y + hitbox.h / 2},
+            });
+        }
     },
     renderOver(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) {
         const hitbox = enemy.getHitbox(state);

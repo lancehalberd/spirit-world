@@ -45,6 +45,7 @@ export class Hero implements Actor, SavedHeroData {
     vx: number = 0;
     vy: number = 0;
     vz: number = 0;
+    groundHeight = 0;
     d: Direction = 'down';
     action?: Action;
     actionDx?: number;

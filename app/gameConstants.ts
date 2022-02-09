@@ -42,3 +42,8 @@ export const FADE_OUT_DURATION = 600;
 export const CIRCLE_WIPE_IN_DURATION = 1000;
 export const CIRCLE_WIPE_OUT_DURATION = 1000;
 export const MUTATE_DURATION = 1200;
+
+export const MAX_FLOAT_HEIGHT = 3;
+export const MAX_FLOOR_HEIGHT = 3;
+// Anything higher than the max floor height plus the max floating height causes the player to be falling.
+export const FALLING_HEIGHT = MAX_FLOAT_HEIGHT + MAX_FLOOR_HEIGHT + 1;

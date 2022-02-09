@@ -43,6 +43,16 @@ dialogueHash.elevator = {
     options: [],
 }
 
+function getElevatorFloor(state: GameState): number {
+    const elevatorFixed = !!state.savedState.objectFlags.elevatorFixed;
+    const elevatorDropped = !!state.savedState.objectFlags.elevatorDropped;
+    const startingFloor = elevatorDropped ? 0 : 2;
+    // Elevator is broken down at level 2 by default. 0 = basement, 1 = first floor, etc.
+     return elevatorFixed
+            ? state.savedState.objectFlags.elevatorFloor as number ?? startingFloor
+            : startingFloor;
+}
+
 specialBehaviorsHash.elevatorControls = {
     type: 'sign',
     apply(state: GameState, sign: Sign) {
@@ -62,7 +72,7 @@ specialBehaviorsHash.elevatorControls = {
         }
         // After the elevator is fixed, it functions normally.
         sign.message = dialogueHash.elevator.mappedOptions.chooseFloor;
-        const elevatorFloor = state.savedState.objectFlags.elevatorFloor || 2;
+        const elevatorFloor = getElevatorFloor(state);
         // Set the results of choosing a floor based on the current floor the elevator is on:
         for (let i = 0; i < 6; i++) {
             dialogueHash.elevator.mappedOptions[`f${i}`] = (i === elevatorFloor)
@@ -80,11 +90,7 @@ specialBehaviorsHash.elevatorDoor = {
         const elevatorFixed = !!state.savedState.objectFlags.elevatorFixed;
         const elevatorDropped = !!state.savedState.objectFlags.elevatorDropped;
         const elevatorClosed = !!state.savedState.objectFlags.elevatorClosed;
-        const startingFloor = elevatorDropped ? 0 : 2;
-        // Elevator is broken down at level 2 by default. 0 = basement, 1 = first floor, etc.
-        const elevatorFloor = elevatorFixed
-            ? (state.savedState.objectFlags.elevatorFloor ?? startingFloor)
-            : startingFloor;
+        const elevatorFloor = getElevatorFloor(state);
         // The interior elevator door.
         if (door.definition.id === 'elevatorDoor') {
             door.changeStatus(state, elevatorClosed ? 'closed' : 'normal');

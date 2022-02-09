@@ -83,6 +83,7 @@ export interface Actor extends ObjectInstance {
     // like being knocked but doesn't stop MC charge or other actions.
     bounce?: {vx: number, vy: number, frames: number}
     equipedGear?: {[key in Equipment]?: boolean}
+    groundHeight: number
     hasBarrier?: boolean
     isInvisible?: boolean
     jumpingTime?: number

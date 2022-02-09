@@ -45,6 +45,7 @@ export class Enemy implements Actor, ObjectInstance {
     az: number = 0;
     w: number;
     h: number;
+    groundHeight = 0;
     canBeKnockedBack: boolean = true;
     canBeKnockedDown: boolean = true;
     flying: boolean;

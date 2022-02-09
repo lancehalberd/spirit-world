@@ -460,9 +460,10 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
     // any time all four corners are over pits.
     hero.wading = hero.z <= 0;
     hero.swimming = hero.action !== 'roll' && hero.z <= 0;
-    hero.slipping = hero.z > 0;
+    hero.slipping = !!hero.equipedGear?.cloudBoots;
     let fallingTopLeft = false, fallingTopRight = false, fallingBottomLeft = false, fallingBottomRight = false;
     let startClimbing = false;
+    hero.groundHeight = 0;
     for (let row = topRow; row <= bottomRow; row++) {
         for (let column = leftColumn; column <= rightColumn; column++) {
             let behaviors = behaviorGrid[row]?.[column];
@@ -483,6 +484,9 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
                 hero.swimming = false;
                 hero.wading = false;
                 continue;
+            }
+            if (behaviors.groundHeight > hero.groundHeight) {
+                hero.groundHeight = behaviors.groundHeight;
             }
             if (behaviors?.isBrittleGround && hero.z <= 0 && hero.action !== 'roll') {
                 for (const layer of hero.area.layers) {

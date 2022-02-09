@@ -4,7 +4,7 @@ import { Escalator } from 'app/content/objects/escalator';
 import { Anode } from 'app/content/objects/lightningBarrier';
 import { Sign } from 'app/content/objects/sign';
 
-import { AreaInstance, GameState } from 'app/types';
+import { AreaInstance, Enemy, GameState } from 'app/types';
 
 specialBehaviorsHash.staffTower = {
     type: 'area',
@@ -15,6 +15,11 @@ specialBehaviorsHash.staffTower = {
             // Before the tower is turned on, everything is off and dark.
             area.dark = Math.max(area.definition.dark || 0, 50);
             for (const object of area.objects) {
+                if (object instanceof Enemy) {
+                    if (object.definition.enemyType === 'lightningDrone' || object.definition.enemyType === 'sentryBot') {
+                        object.status = 'off';
+                    }
+                }
                 switch (object.definition.type) {
                     case 'sign':
                     case 'escalator':

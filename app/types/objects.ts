@@ -62,6 +62,9 @@ export interface ObjectInstance {
     render: (context: CanvasRenderingContext2D, state: GameState) => void
     renderShadow?: (context: CanvasRenderingContext2D, state: GameState) => void
     renderForeground?: (context: CanvasRenderingContext2D, state: GameState) => void
+    alternateRender?: (context: CanvasRenderingContext2D, state: GameState) => void
+    alternateRenderShadow?: (context: CanvasRenderingContext2D, state: GameState) => void
+    alternateRenderForeground?: (context: CanvasRenderingContext2D, state: GameState) => void
     isAllyTarget?: boolean
     isEnemyTarget?: boolean
     isNeutralTarget?: boolean
