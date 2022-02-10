@@ -168,11 +168,19 @@ export function toggleTarget(state: GameState, target: ObjectInstance): void {
         ? target.isActive(state)
         : target.status !== 'hidden' && target.status !== 'hiddenSwitch' && target.status !== 'closedSwitch'
             && target.status !== 'off';
+    // Consider moving these to properties on `ObjectInstance` instead.
+    const playChimeOnActivation = target.definition?.type !== 'anode';
+    const playChimeOnDeactivation = target.definition?.type === 'anode';
     if (isActive) {
         deactivateTarget(state, target);
+        if (playChimeOnDeactivation) {
+            playSound('secretChime');
+        }
     } else {
         activateTarget(state, target);
-        playSound('secretChime');
+        if (playChimeOnActivation) {
+            playSound('secretChime');
+        }
     }
 }
 

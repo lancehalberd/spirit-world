@@ -39,13 +39,21 @@ Graphics:
 
 Current tasks:
     Staff Tower
-        - Fix switch plays sound when turning barrier on rather than off.
-        - Add checks to the tower (see notes)
+        - Add check to 3rd floor spirit world only reachable from elevator, 100 coins
+        - Add spirit world exit on first floor that must be opened from the inside
+        - Add 4th floor entrance
+            - Add tower layers to sky areas in each section it can be placed
+            - Sky door is closed in the material world initially until it is opened from inside
+            - Sky door is open in the spirit world initially
+        - Make sentry bots defeatable and include them somewhere in the upper spirit world floors
         - Flying enemies should not move over abyss tiles(make abyss tiles + ceiling tiles impassable to flying enemies).
 
-        - conveyer belt + cloud boots puzzle
+        - conveyer belt + cloud boots puzzle (probably spirit 3 right side),
             - Floor is fast moving conveyer belts that will return you to start if you land
             - Walls are lightning that will knock you onto the belt so you have to navigate using the cloud boots without running into any walls.
+            - Instead of walls we could use pits to be less heavy and simpler to deal with
+            - Can be easily solved after the boss is defeated with barriers disabled and
+            - required path on the left could use slow moving
 
         - Create path to elevator entrance:
             - 1F -> 1F Spirit -> (around broken elevator door) -> 2F Spirit (around blocked off elevator entrance)
