@@ -3013,6 +3013,7 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "overworld:s0:0x0-lightningBug-2", x: 64, y: 96, type: "enemy", enemyType: "lightningBug", d: "down", params: {}},
         {status: "normal", id: "overworld:s0:0x0-electricSquirrel-0", x: 272, y: 384, type: "enemy", enemyType: "electricSquirrel", d: "down", params: {}},
         {status: "normal", id: "overworld:s0:0x0-electricSquirrel-1", x: 272, y: 448, type: "enemy", enemyType: "electricSquirrel", d: "down", params: {}},
+        {status: "closed", id: "staffTowerSpiritEntrance", logicKey: "mountainTower", x: 64, y: 416, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerSpiritEntrance", d: "up"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16},
@@ -5254,6 +5255,7 @@ const sf0_2x1: AreaDefinition = {
         {status: "normal", id: "overworld:s0:1x2-electricSquirrel-2", x: 336, y: 256, type: "enemy", enemyType: "electricSquirrel", d: "down", params: {}},
         {status: "normal", id: "overworld:s0:1x2-electricSquirrel-3", x: 320, y: 176, type: "enemy", enemyType: "electricSquirrel", d: "down", params: {}},
         {status: "normal", id: "overworld:s0:1x2-ent-0", x: 112, y: 464, type: "enemy", enemyType: "ent", d: "down", params: {}},
+        {status: "closed", id: "staffTowerSpiritEntrance", logicKey: "forestTower", x: 176, y: 96, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerSpiritEntrance", d: "up"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},
