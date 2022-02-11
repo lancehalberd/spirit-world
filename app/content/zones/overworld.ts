@@ -4711,6 +4711,7 @@ const sf0_1x2: AreaDefinition = {
         {status: "normal", id: "overworld:s0:2x1-electricSquirrel-2", x: 336, y: 160, type: "enemy", enemyType: "electricSquirrel", d: "down", params: {}},
         {status: "normal", id: "overworld:s0:2x1-electricSquirrel-3", x: 192, y: 128, type: "enemy", enemyType: "electricSquirrel", d: "down", params: {}},
         {status: "normal", id: "overworld:s0:2x1-ent-0", x: 208, y: 192, type: "enemy", enemyType: "ent", d: "down", params: {}},
+        {status: "closed", id: "staffTowerSpiritEntrance", logicKey: "desertTower", x: 160, y: 352, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerSpiritEntrance", d: "up"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16},
