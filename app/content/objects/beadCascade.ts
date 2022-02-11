@@ -28,6 +28,7 @@ export class BeadCascade implements ObjectInstance {
     area: AreaInstance;
     definition: BeadCascadeDefinition;
     drawPriority: DrawPriority = 'background';
+    ignorePits = true;
     x: number;
     y: number;
     w: number = 32;

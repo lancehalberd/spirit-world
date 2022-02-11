@@ -2238,13 +2238,14 @@ const f2_1x0: AreaDefinition = {
                     [0,0,0,0,0,582,577,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,576,581,0,0,0,0,0],
                     [0,0,0,0,0,0,582,577,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,576,581,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,582,577,0,0,0,0,0,0,0,0,0,0,0,0,0,0,576,581,0,0,0,0,0,0,0],
-                    [0,0,0,0,0,0,0,0,582,561,561,561,561,561,561,561,561,561,561,561,561,561,561,581,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,582,561,561,561,561,561,0,0,0,0,561,561,561,561,561,581,0,0,0,0,0,0,0,0],
                 ],
             },
         },
     ],
     objects: [
         {status: "normal", id: "staffTower4F5F", x: 192, y: 32, type: "door", style: "woodenUpstairs", targetZone: "staffTower", targetObjectId: "staffTower4F5F", d: "up", locationCue: "Tower 4F"},
+        {status: "closedSwitch", id: "staffTowerSkyEntrance", x: 224, y: 496, type: "door", style: "wooden", targetZone: "sky", targetObjectId: "staffTowerSkyEntrance", d: "down", locationCue: "Tower 1F", saveStatus: "forever"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -2517,7 +2518,7 @@ const sf2_1x0: AreaDefinition = {
                     [0,0,0,0,0,0,190,190,190,190,190,190,190,190,190,190,190,190,190,190,190,190,190,190,190,190,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,190,190,190,190,190,190,190,190,190,190,190,190,190,190,190,190,190,190,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,190,190,190,190,190,190,190,190,190,190,190,190,190,190,190,190,0,0,0,0,0,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,190,190,190,190,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                 ],
             },
         },
@@ -2693,6 +2694,7 @@ const sf2_1x0: AreaDefinition = {
     objects: [
         {status: "closed", id: "elevatorDoor4", x: 240, y: 416, type: "door", style: "wooden", targetZone: "staffTower", targetObjectId: "elevatorDoor", d: "up", specialBehaviorKey: "elevatorDoor", locationCue: "Tower 4F"},
         {status: "normal", id: "staffTower3F4F", x: 288, y: 32, type: "door", style: "woodenDownstairs", targetZone: "staffTower", targetObjectId: "staffTower3F4F", d: "up", locationCue: "Tower 4F"},
+        {status: "normal", id: "staffTowerSpiritSkyEntrance", x: 224, y: 496, type: "door", style: "wooden", targetZone: "sky", targetObjectId: "staffTowerSpiritSkyEntrance", d: "down", locationCue: "Tower 1F", saveStatus: "forever"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},

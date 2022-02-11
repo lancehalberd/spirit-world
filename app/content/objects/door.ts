@@ -670,7 +670,8 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
 type DoorStyle = keyof typeof doorStyles;
 
 export class Door implements ObjectInstance {
-    behaviors: TileBehaviors = { }
+    behaviors: TileBehaviors = { };
+    ignorePits = true;
     isObject = <const>true;
     linkedObject: Door;
     alwaysReset = true;

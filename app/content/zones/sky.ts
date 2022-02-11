@@ -261,6 +261,7 @@ const f0_0x0: AreaDefinition = {
     objects: [
         {status: "normal", id: "caves-ascentExit", x: 208, y: 0, type: "door", style: "cavern", targetZone: "caves", targetObjectId: "caves-ascentExit", d: "up"},
         {status: "normal", id: "craterEntrance", x: 64, y: 0, type: "door", style: "wideEntrance", targetZone: "crater", targetObjectId: "craterEntrance", d: "up"},
+        {status: "closed", id: "staffTowerSkyEntrance", logicKey: "mountainTower", x: 64, y: 416, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerSkyEntrance", d: "up"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -658,6 +659,48 @@ const f0_1x0: AreaDefinition = {
                 ],
             },
         },
+        {
+            key: 'foreground',
+            drawPriority: 'foreground',
+            grid: {
+                w: 32,
+                h: 32,
+                tiles: [
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                ],
+            },
+        },
     ],
     objects: [
     ],
@@ -970,6 +1013,7 @@ const f0_1x2: AreaDefinition = {
         },
     ],
     objects: [
+        {status: "closed", id: "staffTowerSkyEntrance", logicKey: "desertTower", x: 160, y: 352, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerSkyEntrance", d: "up"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -1195,6 +1239,7 @@ const f0_2x1: AreaDefinition = {
         },
     ],
     objects: [
+        {status: "closed", id: "staffTowerSkyEntrance", logicKey: "forestTower", x: 176, y: 96, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerSkyEntrance", d: "up"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -1291,7 +1336,17 @@ const f0_2x2: AreaDefinition = {
         {x: 0, y: 0, w: 32, h: 32},
     ],
 };
-const sf0_0x0: AreaDefinition = null;
+const sf0_0x0: AreaDefinition = {
+    isSpiritWorld: true,
+    parentDefinition: f0_0x0,
+    layers: null,
+    objects: [
+        {status: "normal", id: "staffTowerSpiritSkyEntrance", logicKey: "mountainTower", x: 64, y: 416, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerSpiritSkyEntrance", d: "up"},
+    ],
+    sections: [
+        {x: 0, y: 0, w: 32, h: 32},
+    ],
+};
 const sf0_0x1: AreaDefinition = {
     isSpiritWorld: true,
     parentDefinition: f0_0x1,
@@ -1482,9 +1537,29 @@ const sf0_1x1: AreaDefinition = {
         {x: 0, y: 0, w: 32, h: 32},
     ],
 };
-const sf0_1x2: AreaDefinition = null;
+const sf0_1x2: AreaDefinition = {
+    isSpiritWorld: true,
+    parentDefinition: f0_1x2,
+    layers: null,
+    objects: [
+        {status: "normal", id: "staffTowerSpiritSkyEntrance", logicKey: "desertTower", x: 160, y: 352, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerSpiritSkyEntrance", d: "up"},
+    ],
+    sections: [
+        {x: 0, y: 0, w: 32, h: 32},
+    ],
+};
 const sf0_2x0: AreaDefinition = null;
-const sf0_2x1: AreaDefinition = null;
+const sf0_2x1: AreaDefinition = {
+    isSpiritWorld: true,
+    parentDefinition: f0_2x1,
+    layers: null,
+    objects: [
+        {status: "normal", id: "staffTowerSpiritSkyEntrance", logicKey: "forestTower", x: 176, y: 96, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerSpiritSkyEntrance", d: "up"},
+    ],
+    sections: [
+        {x: 0, y: 0, w: 32, h: 32},
+    ],
+};
 const sf0_2x2: AreaDefinition = null;
 zones.sky = {
     key: 'sky',
