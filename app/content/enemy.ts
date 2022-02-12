@@ -314,7 +314,6 @@ export class Enemy implements Actor, ObjectInstance {
         }
         this.modeTime += FRAME_LENGTH;
         this.animationTime += FRAME_LENGTH;
-        this.healthBarTime += FRAME_LENGTH;
         if (this.invulnerableFrames > 0) {
             this.invulnerableFrames--;
         }
@@ -346,6 +345,7 @@ export class Enemy implements Actor, ObjectInstance {
         if (this.flying && this.z > 12) {
             this.z = Math.max(12, this.z - 2);
         }
+        this.healthBarTime += FRAME_LENGTH;
         if (this.enemyDefinition.update) {
             this.enemyDefinition.update(state, this);
         }

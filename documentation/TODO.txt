@@ -40,10 +40,6 @@ Graphics:
 Current tasks:
     Staff Tower
         - Add check to 3rd floor spirit world only reachable from elevator, 100 coins
-        - Add spirit world exit on first floor that must be opened from the inside
-        - Add 4th floor entrance
-            - Sky door is closed in the material world initially until it is opened from inside
-            - Sky door is open in the spirit world initially
         - Make sentry bots defeatable and include them somewhere in the upper spirit world floors
         - Flying enemies should not move over abyss tiles(make abyss tiles + ceiling tiles impassable to flying enemies).
 

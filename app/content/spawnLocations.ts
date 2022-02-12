@@ -341,7 +341,11 @@ const staffStartState = applyItems(helixEndState, {
     fireBlessing: 1, fire: 1,
     waterBlessing: 1, ice: 1,
 });
-const staffBossState = applyItems(staffStartState, {});
+const staffBossState = applyItems(staffStartState, {}, [
+    'staffTowerSpiritEntrance', 'tower2FBarrier',
+    'elevatorDropped', 'elevatorFixed',
+    'tower3FBarrier', 'staffTowerSkyEntrance',
+]);
 
 interface SpawnLocationOptions {
     [key: string]: {location: ZoneLocation, savedState: SavedState},

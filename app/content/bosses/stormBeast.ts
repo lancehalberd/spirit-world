@@ -89,6 +89,7 @@ enemyDefinitions.stormHeart = {
         cloudRegenerateTimer: 0,
     },
     immunities: ['lightning'],
+    initialMode: 'hidden',
     renderOver(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
         let frameIndex = Math.floor(7 - enemy.params.cloudLife);
         frameIndex = Math.min(7, Math.max(0, frameIndex));
@@ -153,6 +154,7 @@ enemyDefinitions.stormBeast = {
     acceleration: 0.3, speed: 4,
     touchHit: { damage: 4, element: 'lightning'},
     immunities: ['lightning'],
+    initialMode: 'hidden',
     params: {
         enrageLevel: 0,
     },
@@ -172,6 +174,13 @@ function isEnemyDefeated(enemy: Enemy): boolean {
 }
 
 function updateStormHeart(this: void, state: GameState, enemy: Enemy): void {
+    if (enemy.mode === 'hidden') {
+        if (enemy.area === state.areaInstance) {
+            enemy.setMode('choose');
+        }
+        enemy.healthBarTime = 0;
+        return;
+    }
     if (enemy.params.counterAttackTimer > 0) {
         enemy.params.counterAttackTimer -= FRAME_LENGTH;
         if (enemy.params.counterAttackMode === 'discharge') {
@@ -262,6 +271,13 @@ const stormBeastPaths = [
 ];
 
 function updateStormBeast(this: void, state: GameState, enemy: Enemy): void {
+    if (enemy.mode === 'hidden') {
+        if (enemy.area === state.areaInstance) {
+            enemy.setMode('choose');
+        }
+        enemy.healthBarTime = 0;
+        return;
+    }
     const stormHeart = getStormHeart(state, enemy.area);
     const target = getNearbyTarget(state, enemy, 2000, enemy.area.allyTargets);
     if (enemy.status === 'hidden') {
