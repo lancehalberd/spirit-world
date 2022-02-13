@@ -2487,7 +2487,8 @@ const sf2_0x0: AreaDefinition = {
     ],
     objects: [
         {status: "closed", id: "elevatorDoor5", x: 240, y: 416, type: "door", style: "wooden", targetZone: "staffTower", targetObjectId: "elevatorDoor", d: "up", specialBehaviorKey: "elevatorDoor", locationCue: "Tower 5F"},
-        {status: "normal", id: "staffTowerRoof", x: 240, y: 32, type: "door", style: "woodenUpstairs", targetZone: "staffTower", targetObjectId: "staffTowerRoof", d: "up", locationCue: "Tower 5F"},
+        {status: "closedEnemy", id: "staffTowerRoof", x: 240, y: 32, type: "door", style: "woodenUpstairs", targetZone: "staffTower", targetObjectId: "staffTowerRoof", d: "up", locationCue: "Tower 5F"},
+        {status: "normal", id: "staffTower:s2:0x0-sentryBot-0", x: 240, y: 80, type: "enemy", enemyType: "sentryBot", d: "down", saveStatus: "forever", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -2714,7 +2715,7 @@ const sf2_1x0: AreaDefinition = {
         {status: "normal", id: "staffTower3F4F", x: 288, y: 32, type: "door", style: "woodenDownstairs", targetZone: "staffTower", targetObjectId: "staffTower3F4F", d: "up", locationCue: "Tower 4F"},
         {status: "normal", id: "staffTowerSpiritSkyEntrance", x: 224, y: 496, type: "door", style: "wooden", targetZone: "sky", targetObjectId: "staffTowerSpiritSkyEntrance", d: "down", locationCue: "Tower 1F", saveStatus: "forever"},
         {status: "normal", id: "", specialBehaviorKey: "towerTeleporter", x: 336, y: 80, style: "displayScreen", type: "sign", message: ""},
-        {status: "normal", id: "staffTower:s2:0x1-sentryBot-0", x: 240, y: 208, type: "enemy", enemyType: "sentryBot", d: "down", params: {}},
+        {status: "normal", id: "staffTower:s2:0x1-sentryBot-0", x: 240, y: 208, type: "enemy", enemyType: "sentryBot", d: "down", params: {}, saveStatus: "forever"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},

@@ -39,7 +39,10 @@ Graphics:
 
 Current tasks:
     Staff Tower
-        - Flying enemies should not move over abyss tiles(make abyss tiles + ceiling tiles impassable to flying enemies).
+        - Add teleportation puzzle to both material/spirit floor 5
+        - Add terminal to gain control of the tower to material floor 5
+        - Replace staff tower point with terminal with special behavior
+            - Allow reclaiming the tower as well
 
 
         - All machine enemies have an offline state where they cannot be damaged, and possibly can be pushed around.
@@ -50,6 +53,8 @@ Current tasks:
             - Ice magic can freeze the conveyer belts which stops them but makes them slippery.
             - Lightning magic will turn a conveyer belt on if it is off.
         - Disabled conveyer belt with pots on it that needs to be turned on to move the pots out of the way.
+
+    - Flying enemies should not move over abyss tiles(make abyss tiles + ceiling tiles impassable to flying enemies).
 
     Peach Cave improvements
         - Add new graphics to 2F
