@@ -6,7 +6,7 @@ import {
 } from 'app/content/enemies';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import {
-    beetleAnimations,
+    electricSquirrelAnimations, superElectricSquirrelAnimations,
 } from 'app/content/enemyAnimations';
 import { lifeLootTable } from 'app/content/lootTables';
 
@@ -36,7 +36,7 @@ function jumpTowardsPoint(state: GameState, enemy: Enemy, {x: tx, y: ty}, radius
 
 const touchHit: HitProperties = { damage: 4, element: 'lightning'};
 enemyDefinitions.electricSquirrel = {
-    animations: beetleAnimations,
+    animations: electricSquirrelAnimations,
     acceleration: 0.2, aggroRadius: 112, speed: 3,
     life: 6, touchHit,
     lootTable: lifeLootTable,
@@ -146,7 +146,7 @@ enemyDefinitions.electricSquirrel = {
 };
 
 enemyDefinitions.superSquirrel = {
-    animations: beetleAnimations,
+    animations: superElectricSquirrelAnimations,
     acceleration: 0.2, aggroRadius: 112, speed: 2.5, scale: 2,
     life: 12, touchHit,
     lootTable: lifeLootTable,

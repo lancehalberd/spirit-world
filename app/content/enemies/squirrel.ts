@@ -4,14 +4,14 @@ import {
 } from 'app/content/enemies';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import {
-    beetleAnimations,
+    brownSquirrelAnimations,
 } from 'app/content/enemyAnimations';
 import { lifeLootTable } from 'app/content/lootTables';
 
 import { Enemy, GameState } from 'app/types';
 
 enemyDefinitions.squirrel = {
-    animations: beetleAnimations,
+    animations: brownSquirrelAnimations,
     speed: 2,
     life: 2, touchHit: { damage: 1},
     lootTable: lifeLootTable,
