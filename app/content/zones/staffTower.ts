@@ -2042,7 +2042,7 @@ const f2_0x0: AreaDefinition = {
     ],
     objects: [
         {status: "normal", id: "staffTower4F5F", x: 192, y: 32, type: "door", style: "woodenDownstairs", targetZone: "staffTower", targetObjectId: "staffTower4F5F", d: "up", locationCue: "Tower 5F"},
-        {status: "normal", id: "", x: 240, y: 416, style: "largeDisplayScreen", type: "sign", message: ""},
+        {status: "normal", id: "", x: 240, y: 416, style: "largeDisplayScreen", type: "sign", message: "", specialBehaviorKey: "towerLargeTerminal"},
         {status: "normal", id: "", x: 432, y: 256, type: "anode"},
         {status: "normal", id: "", x: 16, y: 352, type: "anode"},
         {status: "normal", id: "", x: 192, y: 352, type: "cathode"},

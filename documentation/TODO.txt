@@ -39,10 +39,14 @@ Graphics:
 
 Current tasks:
     Staff Tower
-        - Add teleportation puzzle to both material/spirit floor 5
-        - Add terminal to gain control of the tower to material floor 5
-        - Replace staff tower point with terminal with special behavior
-            - Allow reclaiming the tower as well
+        - Add ability to setup tower again:
+            - First Pass
+                - When using the staff tower on screens with object with id `towerTerminal:desert` set tower position to desert.
+            - Maybe should create a staff tower object and use this instead of the current layer solution
+                - Then we can detect if you are facing the object and not standing inside it to deploy the tower.
+                - Would force the tower to look consistent and make it easy to update when we have better graphics
+                - Can also detect zone overworld vs sky to create the upper+lower parts correctly.
+                - Can render consistent ground graphics for when the tower is not present.
 
 
         - All machine enemies have an offline state where they cannot be damaged, and possibly can be pushed around.

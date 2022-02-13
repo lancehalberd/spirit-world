@@ -83,7 +83,7 @@ specialBehaviorsHash.towerLargeTerminal = {
             `;
             return;
         }
-        object.message = 'TOWER CONTROLS TRANSFERED TO NEW OPERATOR.{-}USE EXTERIOR TERMINAL TO MOVE TOWER.';
+        object.message = 'TOWER CONTROLS TRANSFERED TO NEW OPERATOR.[-]USE EXTERIOR TERMINAL TO MOVE TOWER.';
     }
 };
 dialogueHash.towerLargeTerminal = {
@@ -106,7 +106,7 @@ dialogueHash.towerLargeTerminal = {
             SCAN COMPLETE[-]
             {flag:staffTowerActivated}
             ...
-            TOWER CONTROLS TRANSFERED TO NEW OPERATOR.{-}
+            TOWER CONTROLS TRANSFERED TO NEW OPERATOR.[-]
             USE EXTERIOR TERMINAL TO MOVE TOWER.
         `,
     },
