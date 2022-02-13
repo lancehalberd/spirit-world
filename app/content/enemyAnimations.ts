@@ -2,7 +2,6 @@ import { createAnimation } from 'app/utils/animations';
 
 import { ActorAnimations, FrameAnimation, FrameDimensions } from 'app/types';
 
-
 const enemyDeathGeometry: FrameDimensions = {w: 20, h: 20};
 export const enemyDeathAnimation: FrameAnimation = createAnimation('gfx/effects/enemydeath.png', enemyDeathGeometry, { cols: 9, duration: 4}, { loop: false });
 
@@ -133,5 +132,70 @@ export const sentryBotAnimations: ActorAnimations = {
         down: sentryBotAnimationDown,
         left: sentryBotAnimationLeft,
         right: sentryBotAnimationRight,
+    },
+};
+
+const squirrelGeometry: FrameDimensions = { w: 24, h: 24, content: { x: 3, y: 7, w: 18, h: 18} };
+type SquirrelObject = {
+    down: FrameAnimation;
+    right: FrameAnimation;
+    up: FrameAnimation;
+    left: FrameAnimation;
+    climb: FrameAnimation;
+}
+function createSquirrelAnimation(squirrelType: string): SquirrelObject {
+    const down: FrameAnimation = createAnimation(`gfx/enemies/${squirrelType}.png`, squirrelGeometry, { y: 0, cols: 4, duration: 10});
+    const right: FrameAnimation = createAnimation(`gfx/enemies/${squirrelType}.png`, squirrelGeometry, { y: 1, cols: 4, duration: 10});
+    const up: FrameAnimation = createAnimation(`gfx/enemies/${squirrelType}.png`, squirrelGeometry, { y: 2, cols: 4, duration: 10});
+    const left: FrameAnimation = createAnimation(`gfx/enemies/${squirrelType}.png`, squirrelGeometry, { y: 4, cols: 4, duration: 10});
+    const climb: FrameAnimation = createAnimation(`gfx/enemies/${squirrelType}.png`, squirrelGeometry, { y: 3, cols: 4, duration: 10});
+    return {down, right, up, left, climb};
+}
+
+const electricSquirrelAnimation = createSquirrelAnimation('electricsquirrel');
+export const electricSquirrelAnimations: ActorAnimations = {
+    climbing: {
+        up: electricSquirrelAnimation.climb,
+        down: electricSquirrelAnimation.down,
+        left: electricSquirrelAnimation.left,
+        right: electricSquirrelAnimation.right,
+    },
+    idle: {
+        up: electricSquirrelAnimation.up,
+        down: electricSquirrelAnimation.down,
+        left: electricSquirrelAnimation.left,
+        right: electricSquirrelAnimation.right,
+    },
+};
+
+const superElectricSquirrelAnimation = createSquirrelAnimation('superelectricsquirrel');
+export const superElectricSquirrelAnimations: ActorAnimations = {
+    climbing: {
+        up: superElectricSquirrelAnimation.climb,
+        down: superElectricSquirrelAnimation.down,
+        left: superElectricSquirrelAnimation.left,
+        right: superElectricSquirrelAnimation.right,
+    },
+    idle: {
+        up: superElectricSquirrelAnimation.up,
+        down: superElectricSquirrelAnimation.down,
+        left: superElectricSquirrelAnimation.left,
+        right: superElectricSquirrelAnimation.right,
+    },
+};
+
+const brownSquirrelAnimation = createSquirrelAnimation('brownsquirrel');
+export const brownSquirrelAnimations: ActorAnimations = {
+    climbing: {
+        up: brownSquirrelAnimation.climb,
+        down: brownSquirrelAnimation.down,
+        left: brownSquirrelAnimation.left,
+        right: brownSquirrelAnimation.right,
+    },
+    idle: {
+        up: brownSquirrelAnimation.up,
+        down: brownSquirrelAnimation.down,
+        left: brownSquirrelAnimation.left,
+        right: brownSquirrelAnimation.right,
     },
 };
