@@ -14,6 +14,8 @@ const [tallSignSpirit] = createAnimation('gfx/tiles/signtallspirit.png', signGeo
 
 export const signStyles = {
     displayScreen: {
+        w: 32,
+        h: 32,
         render(context: CanvasRenderingContext2D, state: GameState, sign: Sign) {
             context.fillStyle = '#AAA';
             context.fillRect(sign.x, sign.y, 16, 14);
@@ -25,11 +27,29 @@ export const signStyles = {
             }
         }
     },
+    largeDisplayScreen: {
+        w: 16,
+        h: 16,
+        render(context: CanvasRenderingContext2D, state: GameState, sign: Sign) {
+            context.fillStyle = '#AAA';
+            context.fillRect(sign.x, sign.y, 32, 28);
+            context.fillStyle = '#000';
+            context.fillRect(sign.x + 1, sign.y + 1, 30, 26);
+            if (sign.status === 'normal' && state.time % 1000 < 500) {
+                context.fillStyle = '#FFF';
+                context.fillRect(sign.x + 3, sign.y + 3, 1, 3);
+            }
+        }
+    },
     short: {
+        w: 16,
+        h: 16,
         normal: shortSign,
         spirit: shortSignSpirit,
     },
     tall: {
+        w: 16,
+        h: 16,
         normal: tallSign,
         spirit: tallSignSpirit,
     },
@@ -56,7 +76,8 @@ export class Sign implements ObjectInstance {
         this.message = this.definition.message;
     }
     getHitbox(state: GameState): Rect {
-        return { x: this.x, y: this.y, w: 16, h: 16 };
+        const style = signStyles[this.definition.style] || signStyles.short;
+        return { x: this.x, y: this.y, w: style.w, h: style.h };
     }
     onGrab(state: GameState, direction: Direction, hero: Hero) {
         if (direction !== 'up' || this.status !== 'normal') {
@@ -67,12 +88,12 @@ export class Sign implements ObjectInstance {
         hero.action = null;
     }
     render(context, state: GameState) {
-        const style = this.definition.style || 'short';
-        if (signStyles[style].render) {
-            signStyles[style].render(context, state, this);
+        const style = signStyles[this.definition.style] || signStyles.short;
+        if (style.render) {
+            style.render(context, state, this);
             return;
         }
-        const frame = this.definition.spirit ? signStyles[style].spirit : signStyles[style].normal;
+        const frame = this.definition.spirit ? style.spirit : style.normal;
         drawFrame(context, frame, { ...frame, x: this.x - frame.content.x, y: this.y - frame.content.y });
     }
 }

@@ -1194,7 +1194,9 @@ function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, a
             if (editingState.tool === 'select' && state.areaInstance.definition.objects.includes(editingState.selectedObject)) {
                 const instance = createObjectInstance(state, editingState.selectedObject);
                 let target: Rect;
-                if (instance.getHitbox) {
+                if (instance.getEditorHitbox) {
+                    target = instance.getEditorHitbox(state);
+                } else if(instance.getHitbox) {
                     target = instance.getHitbox(state);
                 } else {
                     const frame = getObjectFrame(editingState.selectedObject);

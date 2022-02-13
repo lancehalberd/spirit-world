@@ -86,6 +86,9 @@ export class Escalator implements ObjectInstance {
     onDeactivate(state: GameState) {
         this.status = 'off';
     }
+    getEditorHitbox(state: GameState) {
+        return this.definition;
+    }
     getHitbox(state: GameState) {
         const hitbox = pad(this.definition, 8);
         if (this.definition.d === 'down' || this.definition.d === 'up') {

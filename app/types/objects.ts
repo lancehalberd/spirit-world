@@ -43,6 +43,8 @@ export interface ObjectInstance {
     cleanup?: (state: GameState) => void,
     // This is called when a user grabs a solid tile
     getHitbox?: (state: GameState) => Rect
+    // This will be used for the hitbox for the editor only if it is defined.
+    getEditorHitbox?: (state: GameState) => Rect
     onActivate?: (state: GameState) => void
     onDeactivate?: (state: GameState) => void
     onDestroy?: (state: GameState, dx: number, dy: number) => void
