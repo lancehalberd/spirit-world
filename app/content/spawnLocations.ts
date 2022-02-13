@@ -346,6 +346,10 @@ const staffBossState = applyItems(staffStartState, {}, [
     'elevatorDropped', 'elevatorFixed',
     'tower3FBarrier', 'staffTowerSkyEntrance',
 ]);
+const staffAquiredState = applyItems(staffBossState, {lightning: 1}, [
+    'stormBeast',
+    'staffTowerActivated'
+]);
 
 interface SpawnLocationOptions {
     [key: string]: {location: ZoneLocation, savedState: SavedState},
@@ -441,6 +445,10 @@ const lateSpawnLocations: SpawnLocationOptions = {
     'Tower Boss': {
         location: SPAWN_STAFF_BOSS,
         savedState: staffBossState,
+    },
+    'Tower Aquired': {
+        location: SPAWN_STAFF_LOWER_ENTRANCE,
+        savedState: staffAquiredState,
     },
 };
 

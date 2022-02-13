@@ -6,7 +6,7 @@ import {
     GameState, Hero, LootType,
     MagicElement, MinionType,
     NPCBehavior, NPCStyle,
-    Rect, StaffTowerLocation, TileBehaviors,
+    Rect, TileBehaviors,
 } from 'app/types';
 
 export type DrawPriority = 'background' | 'foreground' | 'sprites' | 'hud';
@@ -335,11 +335,6 @@ export interface EscalatorDefinition extends BaseObjectDefinition {
     h: number
 }
 
-export interface StaffTowerPointDefinition extends BaseObjectDefinition {
-    type: 'staffTowerPoint',
-    location: StaffTowerLocation,
-}
-
 export interface EnemyObjectDefinition extends BaseObjectDefinition {
     type: 'enemy',
     enemyType: EnemyType | MinionType,
@@ -369,7 +364,6 @@ export type ObjectDefinition = SimpleObjectDefinition
     | NarrationDefinition
     | NPCDefinition
     | SignDefinition
-    | StaffTowerPointDefinition
     ;
 
 export type ObjectType = ObjectDefinition['type'];

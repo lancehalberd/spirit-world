@@ -51,7 +51,7 @@ specialBehaviorsHash.towerTeleporter = {
             ? 'THIS TERMINAL CONTROLS TRANSFER TO THE CORE?{choice:TRANSFER?|Yes:towerTeleporter.teleport|No}'
             : 'THIS TERMINAL CONTROLS TRANSFER TO THE PERIPHERY.{choice:TRANSFER?|Yes:towerTeleporter.teleport|No}'
     }
-}
+};
 
 dialogueHash.towerTeleporter = {
     key: 'towerTeleporter',
@@ -59,4 +59,93 @@ dialogueHash.towerTeleporter = {
         teleport: `{teleport}`,
     },
     options: [],
-}
+};
+
+specialBehaviorsHash.towerLargeTerminal = {
+    type: 'sign',
+    apply(state: GameState, object: Sign) {
+        const towerIsHaywire = !state.savedState.objectFlags.stormBeast;
+        if (towerIsHaywire) {
+            object.message = `
+                !WARNING![-]
+                ENERGY SURGES HAVE COMPROMISED PRIMARY FUNCTIONS.{|}
+                UNABLE TO COMPENSATE.{|}
+                MANUAL REPAIRS MAY BE REQUIRED IF ENERGY SURGES DO NOT DISPERSE.
+            `;
+            return;
+        }
+        if (!state.savedState.objectFlags.staffTowerActivated) {
+            object.message = `
+                PRIMARY FUNCTION RESTORED[-]
+                ...{|}
+                OPERATIONAL MANIFEST CORRUPTED, CREATE NEW MANIFEST?
+                {choice:CREATE MANIFEST?|Yes:towerLargeTerminal.initialize|No:towerLargeTerminal.no}
+            `;
+            return;
+        }
+        object.message = 'TOWER CONTROLS TRANSFERED TO NEW OPERATOR.{-}USE EXTERIOR TERMINAL TO MOVE TOWER.';
+    }
+};
+dialogueHash.towerLargeTerminal = {
+    key: 'towerTeleporter',
+    mappedOptions: {
+        no: `OPERATIONAL MANIFEST CORRUPTED, AWAITING NEW MANIFEST.`,
+        notOperator: `
+            UNABLE TO COMPLETE OPERATION.[-]
+            NEW OPERATOR MUST BE PRESENT FOR SCANNING.
+        `,
+        initialize: `
+            CREATING NEW MANIFEST[-]
+            ARE YOU THE OPERATOR?
+            {choice:CONFIRM?|Yes:towerLargeTerminal.assignOperator|No:towerLargeTerminal.notOperator}
+        `,
+        assignOperator: `
+            INITIALIZING SCAN[-]
+            ...
+            {wait:500}
+            SCAN COMPLETE[-]
+            {flag:staffTowerActivated}
+            ...
+            TOWER CONTROLS TRANSFERED TO NEW OPERATOR.{-}
+            USE EXTERIOR TERMINAL TO MOVE TOWER.
+        `,
+    },
+    options: [],
+};
+
+specialBehaviorsHash.towerExteriorTerminal = {
+    type: 'sign',
+    apply(state: GameState, object: Sign) {
+        const towerIsOn = !!state.savedState.objectFlags.elementalBeastsEscaped;
+        if (!towerIsOn) {
+            object.status = 'off';
+            return;
+        }
+        if (!state.savedState.objectFlags.stormBeast) {
+            object.message = `
+                !WARNING![-]
+                ENERGY SURGES HAVE COMPROMISED PRIMARY FUNCTIONS.
+            `;
+            return;
+        }
+        if (!state.savedState.objectFlags.staffTowerActivated) {
+            object.message = `
+                THIS TERMINAL CONTROLS TOWER DEPLOYMENT.{|}
+                UNAUTHORIZED OPERATION IS PROHIBITED.
+            `;
+            return;
+        }
+        object.message = `
+            THIS TERMINAL CONTROLS TOWER DEPLOYMENT.{|}
+            COLLAPSE TOWER FOR RELOCATION?
+            {choice:COLLAPSE?|Yes:towerExteriorTerminal.collapse|No}
+        `;
+    }
+};
+dialogueHash.towerExteriorTerminal = {
+    key: 'towerTeleporter',
+    mappedOptions: {
+        collapse: `{item:staff=2}`,
+    },
+    options: [],
+};

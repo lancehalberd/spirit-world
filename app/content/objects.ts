@@ -21,7 +21,6 @@ import { Narration } from 'app/content/objects/narration';
 import { NPC } from 'app/content/objects/npc';
 import { PitEntrance } from 'app/content/objects/pitEntrance';
 import { Sign } from 'app/content/objects/sign';
-import { StaffTowerPoint }  from 'app/content/objects/staffTowerPoint';
 import { Teleporter } from 'app/content/objects/teleporter';
 import { Torch } from 'app/content/objects/torch';
 import { VineSprout } from 'app/content/objects/vineSprout';
@@ -83,9 +82,7 @@ export function createObjectInstance(state: GameState, object: ObjectDefinition)
         return new Narration(state, object);
     } else if (object.type === 'sign') {
         return new Sign(object);
-    } else if (object.type === 'staffTowerPoint') {
-        return new StaffTowerPoint(state, object);
-    }  else if (object.type === 'teleporter') {
+    } else if (object.type === 'teleporter') {
         return new Teleporter(state, object);
     } else if (object.type === 'torch') {
         return new Torch(state, object);

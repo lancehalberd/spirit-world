@@ -24,7 +24,7 @@ import {
     BossType, CrystalSwitchDefinition, FloorSwitchDefinition, KeyBlockDefinition,
     FrameDimensions, DecorationType, Direction, DrawPriority, EnemyType, GameState, LootObjectDefinition,
     LootType, MagicElement, NPCBehavior, NPCStyle, ObjectDefinition, ObjectStatus, ObjectType, PanelRows,
-    Rect, SpecialAreaBehavior, StaffTowerLocation,
+    Rect, SpecialAreaBehavior,
     Zone, ZoneLocation,
 } from 'app/types';
 
@@ -55,7 +55,7 @@ export function getLootTypes(): LootType[] {
 export const combinedObjectTypes: ObjectType[] = [
     'anode', 'cathode', 'airBubbles', 'ballGoal', 'beadCascade', 'beadGrate', 'bigChest', 'chest', 'crystalSwitch', 'decoration',
     'door', 'escalator', 'floorSwitch', 'keyBlock', 'loot','marker', 'narration', 'npc', 'pitEntrance',
-    'pushPull', 'rollingBall', 'sign', 'staffTowerPoint', 'teleporter', 'tippable', 'torch',
+    'pushPull', 'rollingBall', 'sign', 'teleporter', 'tippable', 'torch',
     'vineSprout', 'waterPot', 'spawnMarker',
 ];
 
@@ -277,12 +277,6 @@ export function createObjectDefinition(
                 style: definition.style || Object.keys(signStyles)[0],
                 type: definition.type,
                 message: definition.message || '',
-            };
-        case 'staffTowerPoint':
-            return {
-                ...commonProps,
-                type: definition.type,
-                location: definition.location,
             };
         case 'npc':
             return {
@@ -846,22 +840,6 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                 },
             });
             break;
-        case 'staffTowerPoint':
-            const locations: StaffTowerLocation[] = ['desert', 'forest', 'mountain'];
-            if (!locations.includes(object.location)) {
-                object.location = locations[0];
-            }
-            rows.push({
-                name: 'location',
-                value: object.location,
-                values: locations,
-                onChange(location: StaffTowerLocation) {
-                    object.location = location;
-                    updateObjectInstance(state, object);
-                },
-            });
-            break;
-
     }
     rows = [...rows, ...getStyleFields(state, editingState, object)];
     return rows;

@@ -14,8 +14,8 @@ const [tallSignSpirit] = createAnimation('gfx/tiles/signtallspirit.png', signGeo
 
 export const signStyles = {
     displayScreen: {
-        w: 32,
-        h: 32,
+        w: 16,
+        h: 16,
         render(context: CanvasRenderingContext2D, state: GameState, sign: Sign) {
             context.fillStyle = '#AAA';
             context.fillRect(sign.x, sign.y, 16, 14);
@@ -28,8 +28,8 @@ export const signStyles = {
         }
     },
     largeDisplayScreen: {
-        w: 16,
-        h: 16,
+        w: 32,
+        h: 32,
         render(context: CanvasRenderingContext2D, state: GameState, sign: Sign) {
             context.fillStyle = '#AAA';
             context.fillRect(sign.x, sign.y, 32, 28);

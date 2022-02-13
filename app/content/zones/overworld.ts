@@ -294,7 +294,7 @@ const f0_0x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "", x: 48, y: 448, style: "short", type: "staffTowerPoint", location: "mountain"},
+        {status: "normal", id: "towerTerminal:mountain", logicKey: "mountainTower", specialBehaviorKey: "towerExteriorTerminal", x: 48, y: 432, style: "displayScreen", type: "sign", message: ""},
         {status: "normal", id: "staffTowerEntrance", logicKey: "mountainTower", x: 64, y: 416, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerEntrance", d: "up"},
         {status: "normal", id: "overworldCliffPeachPiece", x: 208, y: 256, type: "chest", lootType: "peachOfImmortalityPiece", lootLevel: 1},
         {status: "normal", id: "caves-ascentEntrance", x: 240, y: 32, type: "door", style: "cavern", targetZone: "caves", targetObjectId: "caves-ascentEntrance", d: "up"},
@@ -2023,7 +2023,7 @@ const f0_1x2: AreaDefinition = {
     ],
     objects: [
         {status: "normal", id: "staffTowerEntrance", logicKey: "desertTower", x: 160, y: 352, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerEntrance", d: "up"},
-        {status: "normal", id: "", x: 144, y: 384, style: "short", type: "staffTowerPoint", location: "desert"},
+        {status: "normal", id: "towerTerminal:desert", logicKey: "desertTower", specialBehaviorKey: "towerExteriorTerminal", x: 144, y: 368, style: "displayScreen", type: "sign", message: ""},
         {status: "normal", id: "overworld:0:2x1-squirrel-0", x: 112, y: 416, type: "enemy", enemyType: "squirrel", d: "down", params: {}},
         {status: "normal", id: "overworld:0:2x1-squirrel-1", x: 384, y: 400, type: "enemy", enemyType: "squirrel", d: "down", params: {}},
         {status: "normal", id: "overworld:0:2x1-squirrel-2", x: 192, y: 128, type: "enemy", enemyType: "squirrel", d: "down", params: {}},
@@ -2550,7 +2550,7 @@ const f0_2x1: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "", x: 160, y: 128, style: "short", type: "staffTowerPoint", location: "forest"},
+        {status: "normal", id: "towerTerminal:forest", logicKey: "forestTower", specialBehaviorKey: "towerExteriorTerminal", x: 160, y: 112, style: "displayScreen", type: "sign", message: ""},
         {status: "normal", id: "staffTowerEntrance", logicKey: "forestTower", x: 176, y: 96, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerEntrance", d: "up"},
         {status: "normal", id: "fertilityTempleEntrance", x: 96, y: 320, type: "door", style: "wooden", d: "up", targetZone: "caves", targetObjectId: "fertilityTempleEntrance"},
         {status: "normal", id: "overworld:0:1x2-squirrel-0", x: 176, y: 176, type: "enemy", enemyType: "squirrel", d: "down", params: {}},
@@ -3014,6 +3014,7 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "overworld:s0:0x0-electricSquirrel-0", x: 272, y: 384, type: "enemy", enemyType: "electricSquirrel", d: "down", params: {}},
         {status: "normal", id: "overworld:s0:0x0-electricSquirrel-1", x: 272, y: 448, type: "enemy", enemyType: "electricSquirrel", d: "down", params: {}},
         {status: "closed", id: "staffTowerSpiritEntrance", logicKey: "mountainTower", x: 64, y: 416, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerSpiritEntrance", d: "up"},
+        {status: "normal", id: "towerTerminal:mountain", logicKey: "mountainTower", specialBehaviorKey: "towerExteriorTerminal", x: 48, y: 432, style: "displayScreen", type: "sign", message: ""},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16},
@@ -4713,6 +4714,7 @@ const sf0_1x2: AreaDefinition = {
         {status: "normal", id: "overworld:s0:2x1-electricSquirrel-3", x: 192, y: 128, type: "enemy", enemyType: "electricSquirrel", d: "down", params: {}},
         {status: "normal", id: "overworld:s0:2x1-ent-0", x: 208, y: 192, type: "enemy", enemyType: "ent", d: "down", params: {}},
         {status: "closed", id: "staffTowerSpiritEntrance", logicKey: "desertTower", x: 160, y: 352, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerSpiritEntrance", d: "up"},
+        {status: "normal", id: "towerTerminal:desert", logicKey: "desertTower", specialBehaviorKey: "towerExteriorTerminal", x: 144, y: 368, style: "displayScreen", type: "sign", message: ""},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16},
@@ -5256,6 +5258,7 @@ const sf0_2x1: AreaDefinition = {
         {status: "normal", id: "overworld:s0:1x2-electricSquirrel-3", x: 320, y: 176, type: "enemy", enemyType: "electricSquirrel", d: "down", params: {}},
         {status: "normal", id: "overworld:s0:1x2-ent-0", x: 112, y: 464, type: "enemy", enemyType: "ent", d: "down", params: {}},
         {status: "closed", id: "staffTowerSpiritEntrance", logicKey: "forestTower", x: 176, y: 96, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerSpiritEntrance", d: "up"},
+        {status: "normal", id: "towerTerminal:forest", logicKey: "forestTower", specialBehaviorKey: "towerExteriorTerminal", x: 160, y: 112, style: "displayScreen", type: "sign", message: ""},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},
