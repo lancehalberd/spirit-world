@@ -635,7 +635,7 @@ export function paceAndCharge(state: GameState, enemy: Enemy) {
             enemy.animationTime = 0;
             return;
         }
-        if (!moveEnemy(state, enemy, 3 * enemy.speed * directionMap[enemy.d][0], 3 * enemy.speed * directionMap[enemy.d][1], {canFall: true})) {
+        if (!moveEnemyFull(state, enemy, 3 * enemy.speed * directionMap[enemy.d][0], 3 * enemy.speed * directionMap[enemy.d][1], {canFall: true, canWiggle: false})) {
             enemy.setMode('stunned');
             enemy.canBeKnockedBack = true;
             enemy.knockBack(state, {
@@ -662,7 +662,7 @@ export function getVectorToTarget(state: GameState, source: EffectInstance | Obj
 export function getVectorToNearbyTarget(state: GameState,
     source: EffectInstance | ObjectInstance, radius: number,
     targets: (EffectInstance | ObjectInstance)[]
-): {x: number, y: number, mag: number} | null {
+): {x: number, y: number, mag: number, target: EffectInstance | ObjectInstance} | null {
     const hitbox = source.getHitbox(state);
     for (const target of targets) {
         if (!target || target.area !== source.area || !target.getHitbox) {
@@ -674,9 +674,9 @@ export function getVectorToNearbyTarget(state: GameState,
         const mag = Math.sqrt(dx * dx + dy * dy);
         if (mag <= radius) {
             if (mag) {
-                return {mag, x: dx / mag, y: dy / mag};
+                return {mag, x: dx / mag, y: dy / mag, target};
             }
-            return {mag, x: 0, y: 1};
+            return {mag, x: 0, y: 1, target};
         }
     }
     return null;
