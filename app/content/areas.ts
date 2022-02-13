@@ -326,7 +326,9 @@ export function linkObject(object: ObjectInstance): void {
     if (!object.definition?.linked) {
         return;
     }
-    const linkedObject = object.area.alternateArea.objects.find(o => o.x === object.x && o.y === object.y);
+    const linkedObject = object.area.alternateArea.objects.find(
+        o => o.definition.type === object.definition.type && o.x === object.x && o.y === object.y
+    );
     if (linkedObject) {
         linkedObject.linkedObject = object;
         object.linkedObject = linkedObject;

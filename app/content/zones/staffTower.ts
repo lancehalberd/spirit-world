@@ -3003,7 +3003,7 @@ const f3_0x0: AreaDefinition = {
     objects: [
         {status: "hidden", id: "stormBeast", x: 224, y: 80, type: "boss", enemyType: "stormBeast", lootType: "lightning", lootAmount: 1, lootLevel: 1, d: "down", params: {}},
         {status: "normal", id: "stormBeast", x: 240, y: 144, type: "boss", enemyType: "stormHeart", lootType: "lightning", lootAmount: 1, lootLevel: 1, d: "down", params: {}},
-        {status: "hidden", id: "stormBeast", x: 256, y: 304, targetObjectId: "stormBeast", type: "teleporter"},
+        {status: "hidden", id: "stormBeast", x: 256, y: 304, targetObjectId: "stormBeast", type: "teleporter", linked: true},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -3485,7 +3485,7 @@ const sf3_0x0: AreaDefinition = {
     ],
     objects: [
         {status: "normal", id: "staffTowerRoof", x: 240, y: 224, type: "door", style: "woodenDownstairs", targetZone: "staffTower", targetObjectId: "staffTowerRoof", d: "up", locationCue: "Tower Roof"},
-        {status: "normal", id: "", x: 256, y: 304, targetObjectId: "stormBeast", type: "teleporter"},
+        {status: "normal", id: "", x: 256, y: 304, targetObjectId: "stormBeast", type: "teleporter", linked: true},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},

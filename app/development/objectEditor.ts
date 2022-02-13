@@ -1027,7 +1027,7 @@ export function onMouseMoveSelect(state: GameState, editingState: EditingState, 
     if (!state.areaInstance.definition.objects.includes(editingState.selectedObject) || !editingState.dragOffset) {
         return;
     }
-    const linkedDefinition = getLinkedDefinition(state.alternateAreaInstance.definition, editingState.selectedObject);
+    const linkedDefinition = editingState.selectedObject.linked && getLinkedDefinition(state.alternateAreaInstance.definition, editingState.selectedObject);
     const oldX = editingState.selectedObject.x, oldY = editingState.selectedObject.y;
     editingState.selectedObject.x = Math.round(x + editingState.dragOffset.x);
     editingState.selectedObject.y = Math.round(y + editingState.dragOffset.y);
