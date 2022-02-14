@@ -7,6 +7,7 @@ import {
     brownSquirrelAnimations,
 } from 'app/content/enemyAnimations';
 import { lifeLootTable } from 'app/content/lootTables';
+import { getDirection } from 'app/utils/field';
 
 import { Enemy, GameState } from 'app/types';
 
@@ -26,10 +27,11 @@ enemyDefinitions.squirrel = {
                 enemy.setMode('chooseDirection');
             }
         } else if (enemy.mode === 'chooseDirection') {
-            enemy.changeToAnimation('idle');
             const theta = Math.floor(Math.random() * 4) * Math.PI / 2 + Math.PI / 4;
             enemy.vx = enemy.speed * Math.cos(theta);
             enemy.vy = enemy.speed * Math.sin(theta);
+            enemy.d = getDirection(enemy.vx, enemy.vy);
+            enemy.changeToAnimation('idle');
             enemy.setMode('run')
         } else if (enemy.mode === 'run') {
             enemy.changeToAnimation('move');
@@ -43,6 +45,8 @@ enemyDefinitions.squirrel = {
             if (!moveEnemyFull(state, enemy, 0, enemy.vy, {canWiggle: false})) {
                 enemy.vy = -enemy.vy;
             }
+            enemy.d = getDirection(enemy.vx, enemy.vy);
+            enemy.changeToAnimation('idle');
         }
     }
 };

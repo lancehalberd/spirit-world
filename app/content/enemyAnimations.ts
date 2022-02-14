@@ -146,8 +146,8 @@ type SquirrelObject = {
 function createSquirrelAnimation(squirrelType: string): SquirrelObject {
     const down: FrameAnimation = createAnimation(`gfx/enemies/${squirrelType}.png`, squirrelGeometry, { y: 0, cols: 4, duration: 10});
     const right: FrameAnimation = createAnimation(`gfx/enemies/${squirrelType}.png`, squirrelGeometry, { y: 1, cols: 4, duration: 10});
-    const up: FrameAnimation = createAnimation(`gfx/enemies/${squirrelType}.png`, squirrelGeometry, { y: 2, cols: 4, duration: 10});
-    const left: FrameAnimation = createAnimation(`gfx/enemies/${squirrelType}.png`, squirrelGeometry, { y: 4, cols: 4, duration: 10});
+    const up: FrameAnimation = createAnimation(`gfx/enemies/${squirrelType}.png`, squirrelGeometry, { y: 4, cols: 4, duration: 10});
+    const left: FrameAnimation = createAnimation(`gfx/enemies/${squirrelType}.png`, squirrelGeometry, { y: 2, cols: 4, duration: 10});
     const climb: FrameAnimation = createAnimation(`gfx/enemies/${squirrelType}.png`, squirrelGeometry, { y: 3, cols: 4, duration: 10});
     return {down, right, up, left, climb};
 }
@@ -156,9 +156,9 @@ const electricSquirrelAnimation = createSquirrelAnimation('electricsquirrel');
 export const electricSquirrelAnimations: ActorAnimations = {
     climbing: {
         up: electricSquirrelAnimation.climb,
-        down: electricSquirrelAnimation.down,
-        left: electricSquirrelAnimation.left,
-        right: electricSquirrelAnimation.right,
+        down: electricSquirrelAnimation.climb,
+        left: electricSquirrelAnimation.climb,
+        right: electricSquirrelAnimation.climb,
     },
     idle: {
         up: electricSquirrelAnimation.up,
@@ -172,9 +172,9 @@ const superElectricSquirrelAnimation = createSquirrelAnimation('superelectricsqu
 export const superElectricSquirrelAnimations: ActorAnimations = {
     climbing: {
         up: superElectricSquirrelAnimation.climb,
-        down: superElectricSquirrelAnimation.down,
-        left: superElectricSquirrelAnimation.left,
-        right: superElectricSquirrelAnimation.right,
+        down: superElectricSquirrelAnimation.climb,
+        left: superElectricSquirrelAnimation.climb,
+        right: superElectricSquirrelAnimation.climb,
     },
     idle: {
         up: superElectricSquirrelAnimation.up,
@@ -188,9 +188,9 @@ const brownSquirrelAnimation = createSquirrelAnimation('brownsquirrel');
 export const brownSquirrelAnimations: ActorAnimations = {
     climbing: {
         up: brownSquirrelAnimation.climb,
-        down: brownSquirrelAnimation.down,
-        left: brownSquirrelAnimation.left,
-        right: brownSquirrelAnimation.right,
+        down: brownSquirrelAnimation.climb,
+        left: brownSquirrelAnimation.climb,
+        right: brownSquirrelAnimation.climb,
     },
     idle: {
         up: brownSquirrelAnimation.up,
