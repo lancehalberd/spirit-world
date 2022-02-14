@@ -38,25 +38,14 @@ Graphics:
 
 
 Current tasks:
-    Staff Tower
-        - Add ability to setup tower again:
-            - First Pass
-                - When using the staff tower on screens with object with id `towerTerminal:desert` set tower position to desert.
-            - Maybe should create a staff tower object and use this instead of the current layer solution
-                - Then we can detect if you are facing the object and not standing inside it to deploy the tower.
-                - Would force the tower to look consistent and make it easy to update when we have better graphics
-                - Can also detect zone overworld vs sky to create the upper+lower parts correctly.
-                - Can render consistent ground graphics for when the tower is not present.
-
-
-        - All machine enemies have an offline state where they cannot be damaged, and possibly can be pushed around.
-            - Hitting offline machines with lightning will turn them on.
-            - Machines all default to offline except in the material world when the Storm Beast is active.
-        - Conveyer belts/escalators.
-            - Conveyer belts should also effect movable object/enemies on the ground touching them.
-            - Ice magic can freeze the conveyer belts which stops them but makes them slippery.
-            - Lightning magic will turn a conveyer belt on if it is off.
-        - Disabled conveyer belt with pots on it that needs to be turned on to move the pots out of the way.
+    - Add ability to setup tower again:
+        - First Pass
+            - When using the staff tower on screens with object with id `towerTerminal:desert` set tower position to desert.
+        - Maybe should create a staff tower object and use this instead of the current layer solution
+            - Then we can detect if you are facing the object and not standing inside it to deploy the tower.
+            - Would force the tower to look consistent and make it easy to update when we have better graphics
+            - Can also detect zone overworld vs sky to create the upper+lower parts correctly.
+            - Can render consistent ground graphics for when the tower is not present.
 
     - Flying enemies should not move over abyss tiles(make abyss tiles + ceiling tiles impassable to flying enemies).
 
@@ -291,6 +280,19 @@ River Temple Improvements:
     - Some underwater enemies
     - Some crab enemies with ice shells that require fire element to defeat
     - Maybe torches should stay lit during the boss fight once turned on.
+
+
+Staff Tower Improvements
+    - Add content to 4F Material world, probably some sort of gauntlet that is easier when the boss is defeated.
+        - Should have a short cut so it can by bypassed after completing once.
+    - All machine enemies have an offline state where they cannot be damaged, and possibly can be pushed around.
+        - Hitting offline machines with lightning will turn them on.
+        - Machines all default to offline except in the material world when the Storm Beast is active.
+    - Conveyer belts/escalators.
+        - Conveyer belts should also effect movable object/enemies on the ground touching them.
+        - Ice magic can freeze the conveyer belts which stops them but makes them slippery.
+        - Lightning magic will turn a conveyer belt on if it is off.
+    - Disabled conveyer belt with pots on it that needs to be turned on to move the pots out of the way.
 
 
 Crater Improvements
