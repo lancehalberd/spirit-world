@@ -1,4 +1,4 @@
-import { addObjectToArea, enterLocation, getAreaSize, playAreaSound } from 'app/content/areas';
+import { addObjectToArea, enterLocation, getAreaSize, playAreaSound, refreshAreaLogic } from 'app/content/areas';
 import { Door } from 'app/content/objects/door';
 import { Staff } from 'app/content/objects/staff';
 import { CANVAS_HEIGHT, FALLING_HEIGHT, FRAME_LENGTH } from 'app/gameConstants';
@@ -6,13 +6,14 @@ import { editingState } from 'app/development/tileEditor';
 import { getCloneMovementDeltas } from 'app/keyCommands';
 import { checkForFloorEffects, moveActor } from 'app/moveActor';
 import { fallAnimation, heroAnimations } from 'app/render/heroAnimations';
+import { saveGame } from 'app/state';
 import { isUnderwater } from 'app/utils/actor';
 import { directionMap, getDirection, getTileBehaviorsAndObstacles, hitTargets } from 'app/utils/field';
-import { boxesIntersect } from 'app/utils/index';
+import { boxesIntersect, isObjectInsideTarget, pad } from 'app/utils/index';
 
 
 import {
-    GameState, Hero, ObjectInstance,
+    GameState, Hero, ObjectInstance, StaffTowerLocation,
 } from 'app/types';
 
 const rollSpeed = [
@@ -311,6 +312,41 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             hero.vz = -4;
             hero.z = Math.max(hero.z + hero.vz, minZ);
         } else if (hero.animationTime === jumpDuration) {
+            // If the hero is facing up, check if we should set up the tower instead of using it as a tool.
+            if (hero.d === 'up') {
+                let towerLocation: StaffTowerLocation, onTowerMarker = false;
+                const hitbox = hero.getHitbox(state);
+                for (const object of hero.area.definition.objects) {
+                    if (object.id === 'towerTerminal:desert') {
+                        towerLocation = 'desert';
+                        break;
+                    }
+                    if (object.id === 'towerTerminal:mountain') {
+                        towerLocation = 'mountain';
+                        break;
+                    }
+                    if (object.id === 'towerTerminal:forest') {
+                        towerLocation = 'forest';
+                        break;
+                    }
+                }
+                for (const object of hero.area.objects) {
+                    if (object.definition?.id === 'towerMarker') {
+                        if (isObjectInsideTarget(hitbox, pad(object.getHitbox(state), 6))) {
+                            onTowerMarker = true;
+                            break;
+                        }
+                    }
+                }
+                console.log(towerLocation, onTowerMarker);
+                if (towerLocation && onTowerMarker) {
+                    state.savedState.staffTowerLocation = towerLocation as StaffTowerLocation;
+                    state.hero.activeTools.staff = 1;
+                    refreshAreaLogic(state, hero.area);
+                    saveGame();
+                    return;
+                }
+            }
             hero.z = Math.max(hero.z + hero.vz, minZ);
             const staffLevel = state.hero.activeTools.staff;
             const maxLength = staffLevel > 1 ? 64 : 4;
