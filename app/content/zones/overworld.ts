@@ -1316,7 +1316,7 @@ const f0_1x0: AreaDefinition = {
         {status: "normal", id: "overworld:0:0x1-squirrel-0", x: 304, y: 64, type: "enemy", enemyType: "squirrel", d: "down", params: {}},
         {status: "normal", id: "overworld:0:0x1-snake-0", x: 160, y: 336, type: "enemy", enemyType: "snake", d: "down", params: {}},
         {status: "normal", id: "overworld:0:0x1-snake-1", x: 304, y: 336, type: "enemy", enemyType: "snake", d: "down", params: {}},
-        {status: "normal", id: "sideArea:noToolEntrance", x: 256, y: 32, type: "door", style: "cave", d: "left", linked: false},
+        {status: "normal", id: "sideArea:noToolEntrance", x: 256, y: 32, type: "door", style: "cave", d: "left", linked: false, targetZone: "caves", targetObjectId: "caves:noToolSideArea"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},
