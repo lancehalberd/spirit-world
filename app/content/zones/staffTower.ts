@@ -666,6 +666,7 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "staffTower:s0:0x0-lightningDrone-3", x: 112, y: 416, type: "enemy", enemyType: "lightningDrone", d: "down", params: {}},
         {status: "closedSwitch", id: "staffTowerSpiritEntrance", x: 224, y: 496, type: "door", style: "wooden", targetZone: "overworld", targetObjectId: "staffTowerSpiritEntrance", d: "down", locationCue: "Tower 1F", saveStatus: "forever"},
         {status: "normal", id: "", x: 208, y: 480, targetObjectId: "staffTowerSpiritEntrance", type: "floorSwitch"},
+        {status: "normal", id: "", x: 336, y: 80, style: "displayScreen", type: "sign", message: "", specialBehaviorKey: "towerTeleporter"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -3729,7 +3730,7 @@ const sf3_1x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "closed", id: "elevatorDoor", x: 224, y: 448, type: "door", style: "wooden", targetZone: "staffTower", targetObjectId: "elevatorDoor4", d: "down", specialBehaviorKey: "elevatorDoor"},
+        {status: "closed", id: "elevatorDoor", x: 224, y: 448, type: "door", style: "wooden", targetZone: "staffTower", targetObjectId: "elevatorDoor1", d: "down", specialBehaviorKey: "elevatorDoor"},
         {status: "normal", id: "", specialBehaviorKey: "elevatorControls", x: 240, y: 352, style: "displayScreen", type: "sign", message: "\n            !WARNING![-]POWER FAILURE DETECTED\n            {|}EMERGENCY BREAK ACTIVATED\n            {choice:RELEASE BREAK?|Yes:elevator.releaseBreak|No}\n        "},
     ],
     sections: [

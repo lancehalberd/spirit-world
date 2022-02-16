@@ -193,6 +193,7 @@ function updateStormHeart(this: void, state: GameState, enemy: Enemy): void {
                     y: hitbox.y + hitbox.h / 2,
                     tellDuration: 3000,
                     radius: 96,
+                    source: enemy,
                 });
                 addEffectToArea(state, enemy.area, discharge);
             }

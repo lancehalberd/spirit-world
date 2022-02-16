@@ -31,7 +31,7 @@ function jumpTowardsPoint(state: GameState, enemy: Enemy, {x: tx, y: ty}, radius
         enemy.vy = maxJumpSpeed * enemy.vy / mag;
     }
     enemy.setMode('jumping');
-    enemy.params.discharge = new LightningDischarge({x, y, radius, damage: 4, tellDuration: 20 * duration});
+    enemy.params.discharge = new LightningDischarge({x, y, radius, damage: 4, source: enemy, tellDuration: 20 * duration});
     addEffectToArea(state, enemy.area, enemy.params.discharge);
 }
 
