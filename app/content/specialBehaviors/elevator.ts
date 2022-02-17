@@ -16,7 +16,7 @@ dialogueHash.elevator = {
         `,
         powerFailureDropped: `
             !WARNING![-]POWER FAILURE DETECTED
-            {|}ACTIVATE BACKUP GENERATOR IN BASEMENT.
+            {|}POSSIBLE SHORT DETECTED IN BASEMENT,
         `,
         releaseBreak: `
             {flag:elevatorFalling}
@@ -79,7 +79,18 @@ specialBehaviorsHash.elevatorControls = {
                 // Just play a confirm sound and do nothing if it is on this floor.
                 ? `{playSound:switch}`
                 // Do the move elevator sequence.
-                : `{playSound:switch}{flag:elevatorClosed}{wait:1500}{clearFlag:elevatorClosed}{flag:elevatorFloor=${i}}`;
+                : `
+                    {playSound:switch}
+                    {flag:elevatorClosed}
+                    {wait:200}
+                    {startScreenShake:1:0:elevator}
+                    {wait:1500}
+                    {stopScreenShake:elevator}
+                    {wait:200}
+                    {playSound:switch}
+                    {clearFlag:elevatorClosed}
+                    {flag:elevatorFloor=${i}}
+                `;
         }
     },
 };
@@ -112,7 +123,11 @@ specialBehaviorsHash.elevatorDoor = {
                 door.onGrab = (state: GameState) => {
                     setScript(state, !elevatorFixed
                         ? `The door won't open.`
-                        : `{playSound:switch}{wait:1500}{flag:elevatorFloor=${doorFloor}}`
+                        : `
+                        {playSound:switch}
+                        {wait:1500}
+                        {playSound:switch}
+                        {flag:elevatorFloor=${doorFloor}}`
                     );
                     state.hero.action = null;
                 };

@@ -25,7 +25,8 @@ export const signStyles = {
                 context.fillStyle = '#FFF';
                 context.fillRect(sign.x + 3, sign.y + 3, 1, 2);
             }
-        }
+        },
+        isSpiritReadable: false,
     },
     largeDisplayScreen: {
         w: 32,
@@ -39,19 +40,22 @@ export const signStyles = {
                 context.fillStyle = '#FFF';
                 context.fillRect(sign.x + 3, sign.y + 3, 1, 3);
             }
-        }
+        },
+        isSpiritReadable: false,
     },
     short: {
         w: 16,
         h: 16,
         normal: shortSign,
         spirit: shortSignSpirit,
+        isSpiritReadable: true,
     },
     tall: {
         w: 16,
         h: 16,
         normal: tallSign,
         spirit: tallSignSpirit,
+        isSpiritReadable: true,
     },
 };
 
@@ -80,7 +84,15 @@ export class Sign implements ObjectInstance {
         return { x: this.x, y: this.y, w: style.w, h: style.h };
     }
     onGrab(state: GameState, direction: Direction, hero: Hero) {
+        // Don't take actions that would start new scripts while running scripts.
+        if (state.scriptEvents.activeEvents.length || state.scriptEvents.queue.length) {
+            return
+        }
         if (direction !== 'up' || this.status !== 'normal') {
+            return;
+        }
+        const style = signStyles[this.definition.style] || signStyles.short;
+        if (hero.isAstralProjection && !style.isSpiritReadable) {
             return;
         }
         showMessage(state, this.message);

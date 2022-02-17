@@ -294,6 +294,7 @@ const f0_0x0: AreaDefinition = {
         },
     ],
     objects: [
+        {status: "normal", id: "towerTerminal:mountain", logicKey: "mountainTower", specialBehaviorKey: "towerExteriorTerminal", x: 48, y: 432, style: "displayScreen", type: "sign", message: "", linked: true},
         {status: "normal", id: "staffTowerEntrance", logicKey: "mountainTower", x: 64, y: 416, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerEntrance", d: "up"},
         {status: "normal", id: "overworldCliffPeachPiece", x: 208, y: 256, type: "chest", lootType: "peachOfImmortalityPiece", lootLevel: 1},
         {status: "normal", id: "caves-ascentEntrance", x: 240, y: 32, type: "door", style: "cavern", targetZone: "caves", targetObjectId: "caves-ascentEntrance", d: "up"},
@@ -304,8 +305,8 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "overworld:0:0x0-beetleWinged-2", x: 336, y: 48, type: "enemy", enemyType: "beetleWinged", d: "down", params: {}},
         {status: "normal", id: "overworld:0:0x0-beetle-0", x: 192, y: 176, type: "enemy", enemyType: "beetle", d: "down", params: {}},
         {status: "normal", id: "overworld:0:0x0-beetle-1", x: 384, y: 144, type: "enemy", enemyType: "beetle", d: "down", params: {}},
-        {status: "normal", id: "towerMarker", x: 80, y: 448, type: "marker"},
-        {status: "normal", id: "towerMarker", x: 64, y: 448, type: "marker"},
+        {status: "normal", id: "towerMarker", x: 80, y: 448, type: "marker", linked: true},
+        {status: "normal", id: "towerMarker", x: 64, y: 448, type: "marker", linked: true},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16},
@@ -2029,8 +2030,8 @@ const f0_1x2: AreaDefinition = {
         {status: "normal", id: "overworld:0:2x1-squirrel-1", x: 384, y: 400, type: "enemy", enemyType: "squirrel", d: "down", params: {}},
         {status: "normal", id: "overworld:0:2x1-squirrel-2", x: 192, y: 128, type: "enemy", enemyType: "squirrel", d: "down", params: {}},
         {status: "normal", id: "overworld:0:2x1-squirrel-3", x: 336, y: 160, type: "enemy", enemyType: "squirrel", d: "down", params: {}},
-        {status: "normal", id: "towerMarker", x: 176, y: 384, type: "marker"},
-        {status: "normal", id: "towerMarker", x: 160, y: 384, type: "marker"},
+        {status: "normal", id: "towerMarker", x: 176, y: 384, type: "marker", linked: true},
+        {status: "normal", id: "towerMarker", x: 160, y: 384, type: "marker", linked: true},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16},
@@ -2559,8 +2560,8 @@ const f0_2x1: AreaDefinition = {
         {status: "normal", id: "overworld:0:1x2-squirrel-1", x: 160, y: 368, type: "enemy", enemyType: "squirrel", d: "down", params: {}},
         {status: "normal", id: "overworld:0:1x2-squirrel-2", x: 320, y: 176, type: "enemy", enemyType: "squirrel", d: "down", params: {}},
         {status: "normal", id: "overworld:0:1x2-squirrel-3", x: 336, y: 256, type: "enemy", enemyType: "squirrel", d: "down", params: {}},
-        {status: "normal", id: "towerMarker", x: 176, y: 128, type: "marker"},
-        {status: "normal", id: "towerMarker", x: 192, y: 128, type: "marker"},
+        {status: "normal", id: "towerMarker", x: 176, y: 128, type: "marker", linked: true},
+        {status: "normal", id: "towerMarker", x: 192, y: 128, type: "marker", linked: true},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},
@@ -3018,6 +3019,9 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "overworld:s0:0x0-electricSquirrel-0", x: 272, y: 384, type: "enemy", enemyType: "electricSquirrel", d: "down", params: {}},
         {status: "normal", id: "overworld:s0:0x0-electricSquirrel-1", x: 272, y: 448, type: "enemy", enemyType: "electricSquirrel", d: "down", params: {}},
         {status: "closed", id: "staffTowerSpiritEntrance", logicKey: "mountainTower", x: 64, y: 416, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerSpiritEntrance", d: "up"},
+        {status: "normal", id: "towerTerminal:mountain", logicKey: "mountainTower", specialBehaviorKey: "towerExteriorTerminal", x: 48, y: 432, style: "displayScreen", type: "sign", message: "", linked: true},
+        {status: "normal", id: "towerMarker", x: 64, y: 448, type: "marker", linked: true, spirit: true},
+        {status: "normal", id: "towerMarker", x: 80, y: 448, type: "marker", linked: true, spirit: true},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16},
@@ -4718,6 +4722,9 @@ const sf0_1x2: AreaDefinition = {
         {status: "normal", id: "overworld:s0:2x1-electricSquirrel-3", x: 192, y: 128, type: "enemy", enemyType: "electricSquirrel", d: "down", params: {}},
         {status: "normal", id: "overworld:s0:2x1-ent-0", x: 208, y: 192, type: "enemy", enemyType: "ent", d: "down", params: {}},
         {status: "closed", id: "staffTowerSpiritEntrance", logicKey: "desertTower", x: 160, y: 352, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerSpiritEntrance", d: "up"},
+        {status: "normal", id: "towerTerminal:desert", logicKey: "desertTower", specialBehaviorKey: "towerExteriorTerminal", x: 144, y: 368, style: "displayScreen", type: "sign", message: ""},
+        {status: "normal", id: "towerMarker", x: 160, y: 384, type: "marker", linked: true, spirit: true},
+        {status: "normal", id: "towerMarker", x: 176, y: 384, type: "marker", linked: true, spirit: true},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16},
@@ -5261,6 +5268,9 @@ const sf0_2x1: AreaDefinition = {
         {status: "normal", id: "overworld:s0:1x2-electricSquirrel-3", x: 320, y: 176, type: "enemy", enemyType: "electricSquirrel", d: "down", params: {}},
         {status: "normal", id: "overworld:s0:1x2-ent-0", x: 112, y: 464, type: "enemy", enemyType: "ent", d: "down", params: {}},
         {status: "closed", id: "staffTowerSpiritEntrance", logicKey: "forestTower", x: 176, y: 96, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerSpiritEntrance", d: "up"},
+        {status: "normal", id: "towerTerminal:forest", logicKey: "forestTower", specialBehaviorKey: "towerExteriorTerminal", x: 160, y: 112, style: "displayScreen", type: "sign", message: ""},
+        {status: "normal", id: "towerMarker", x: 176, y: 128, type: "marker", linked: true, spirit: true},
+        {status: "normal", id: "towerMarker", x: 192, y: 128, type: "marker", linked: true, spirit: true},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},

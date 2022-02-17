@@ -7,6 +7,7 @@ import { GAME_KEY } from 'app/gameConstants';
 import { wasConfirmKeyPressed, wasGameKeyPressed } from 'app/keyCommands';
 import { parseMessage } from 'app/render/renderMessage';
 import { playSound } from 'app/musicController';
+import { saveGame } from 'app/state';
 
 import {
     ActiveScriptEvent, Frame, GameState, LootType, ScriptEvent,
@@ -320,11 +321,13 @@ export const updateScriptEvents = (state: GameState): void => {
                 delete state.savedState.objectFlags[event.flag];
                 refreshAreaLogic(state, state.areaInstance);
                 refreshAreaLogic(state, state.areaInstance.alternateArea);
+                saveGame();
                 break;
             case 'setFlag':
                 state.savedState.objectFlags[event.flag] = event.value;
                 refreshAreaLogic(state, state.areaInstance);
                 refreshAreaLogic(state, state.areaInstance.alternateArea);
+                saveGame();
                 break;
             case 'refreshAreaLogic':
                 refreshAreaLogic(state, state.areaInstance);

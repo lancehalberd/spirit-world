@@ -38,10 +38,25 @@ Graphics:
 
 
 Current tasks:
+    - Fix pause when taking down the tower (probably a transition running that is difficult to see)
+    - Add Sky Paths for Staff Tower
+        - Mountain path to reach Crater without cloud boots
+        - Mountain or Forest path to reach river temple roof (lightning only route)
+        - Mountain -> River Temple path that is blocked by defeating the flame beast
+        - Forest Path to Sky Palace entrance (Add Sky palace stub with roll 2 + nimbus cloud)
+            - Implement roll 2, just roll again while rolling, double speed / teleport then regular roll (with poof effects from staff)
+            - Implement nimbus cloud using spawn points + script events choice mechanic for now
+                - Allows returning to entrance inside areas
+                - Allows teleporting to specific places visited on the overworld, possibly between material/spirit worlds.
 
     - Add Staff Tower to randomizer logic.
 
     - Flying enemies should not move over abyss tiles(make abyss tiles + ceiling tiles impassable to flying enemies).
+
+    - Support logic checks inside script events
+        - Could just do `{logic:condition|trueAction|falseAction}`
+        - Maybe better to add some recursive syntax to script events so we can embed logic in other event types
+        - like {choice:REST?|Yes:{logic:isSpiritWorld|spiritRest|normalRest}|No}
 
     Peach Cave improvements
         - Add new graphics to 2F

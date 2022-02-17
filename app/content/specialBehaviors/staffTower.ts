@@ -56,6 +56,8 @@ specialBehaviorsHash.towerTeleporter = {
 dialogueHash.towerTeleporter = {
     key: 'towerTeleporter',
     mappedOptions: {
+        // Use this when we can enable terminal for the astral projection.
+        failToTeleport: `ERROR ACQUIRING TARGET FOR TRANSFER.`,
         teleport: `{teleport}`,
     },
     options: [],
@@ -94,10 +96,22 @@ dialogueHash.towerLargeTerminal = {
             UNABLE TO COMPLETE OPERATION.[-]
             NEW OPERATOR MUST BE PRESENT FOR SCANNING.
         `,
+        initializeFailure: `
+            CREATING NEW MANIFEST[-]
+            ARE YOU THE OPERATOR?
+            {choice:CONFIRM?|Yes:towerLargeTerminal.assignOperatorFailure|No:towerLargeTerminal.notOperator}
+        `,
         initialize: `
             CREATING NEW MANIFEST[-]
             ARE YOU THE OPERATOR?
             {choice:CONFIRM?|Yes:towerLargeTerminal.assignOperator|No:towerLargeTerminal.notOperator}
+        `,
+        // Use this when we can allow the astral projection to read the terminal.
+        assignOperatorFailure: `
+            INITIALIZING SCAN[-]
+            ...
+            {wait:500}
+            ERROR AQUIRING TARGET FOR SCANNING, ABORTING OPERATION.
         `,
         assignOperator: `
             INITIALIZING SCAN[-]

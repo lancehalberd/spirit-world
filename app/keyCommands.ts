@@ -176,6 +176,7 @@ export function addKeyCommands() {
                 editingState.hasChanges = false;
                 event.preventDefault();
             }
+            return;
         }
         if (keyCode === KEY.BACK_SLASH) {
             const state = getState();
@@ -187,16 +188,21 @@ export function addKeyCommands() {
             for (const enemy of allEnemies) {
                 enemy.showDeathAnimation(state);
             }
+            event.preventDefault();
+            return;
         }
         if (keyCode === KEY.V && commandIsDown) {
             if (editingState.clipboardObject) {
                 const state = getState();
                 updateObjectInstance(state, {...editingState.clipboardObject}, null, state.areaInstance, true);
             }
+            event.preventDefault();
+            return;
         }
         if (event.which === KEY.A && commandIsDown) {
             selectSection();
             event.preventDefault();
+            return;
         }
         if (keyCode === KEY.E) {
             toggleEditing();

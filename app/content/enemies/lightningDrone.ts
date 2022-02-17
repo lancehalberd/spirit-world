@@ -57,6 +57,7 @@ enemyDefinitions.lightningDrone = {
                         y: hitbox.y + hitbox.h / 2,
                         tellDuration: chargeTime,
                         radius: dischargeRadius,
+                        source: enemy,
                     });
                     addEffectToArea(state, enemy.area, discharge);
                 }
