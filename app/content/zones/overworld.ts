@@ -2032,6 +2032,7 @@ const f0_1x2: AreaDefinition = {
         {status: "normal", id: "overworld:0:2x1-squirrel-3", x: 336, y: 160, type: "enemy", enemyType: "squirrel", d: "down", params: {}},
         {status: "normal", id: "towerMarker", x: 176, y: 384, type: "marker", linked: true},
         {status: "normal", id: "towerMarker", x: 160, y: 384, type: "marker", linked: true},
+        {status: "normal", id: "towerTerminal:desert", logicKey: "desertTower", specialBehaviorKey: "towerExteriorTerminal", x: 144, y: 368, style: "displayScreen", type: "sign", message: "", linked: true},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16},
@@ -2562,6 +2563,7 @@ const f0_2x1: AreaDefinition = {
         {status: "normal", id: "overworld:0:1x2-squirrel-3", x: 336, y: 256, type: "enemy", enemyType: "squirrel", d: "down", params: {}},
         {status: "normal", id: "towerMarker", x: 176, y: 128, type: "marker", linked: true},
         {status: "normal", id: "towerMarker", x: 192, y: 128, type: "marker", linked: true},
+        {status: "normal", id: "towerTerminal:forest", logicKey: "forestTower", specialBehaviorKey: "towerExteriorTerminal", x: 160, y: 112, style: "displayScreen", type: "sign", message: "", linked: true},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},
@@ -4722,7 +4724,7 @@ const sf0_1x2: AreaDefinition = {
         {status: "normal", id: "overworld:s0:2x1-electricSquirrel-3", x: 192, y: 128, type: "enemy", enemyType: "electricSquirrel", d: "down", params: {}},
         {status: "normal", id: "overworld:s0:2x1-ent-0", x: 208, y: 192, type: "enemy", enemyType: "ent", d: "down", params: {}},
         {status: "closed", id: "staffTowerSpiritEntrance", logicKey: "desertTower", x: 160, y: 352, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerSpiritEntrance", d: "up"},
-        {status: "normal", id: "towerTerminal:desert", logicKey: "desertTower", specialBehaviorKey: "towerExteriorTerminal", x: 144, y: 368, style: "displayScreen", type: "sign", message: ""},
+        {status: "normal", id: "towerTerminal:desert", logicKey: "desertTower", specialBehaviorKey: "towerExteriorTerminal", x: 144, y: 368, style: "displayScreen", type: "sign", message: "", linked: true},
         {status: "normal", id: "towerMarker", x: 160, y: 384, type: "marker", linked: true, spirit: true},
         {status: "normal", id: "towerMarker", x: 176, y: 384, type: "marker", linked: true, spirit: true},
     ],
@@ -5268,7 +5270,7 @@ const sf0_2x1: AreaDefinition = {
         {status: "normal", id: "overworld:s0:1x2-electricSquirrel-3", x: 320, y: 176, type: "enemy", enemyType: "electricSquirrel", d: "down", params: {}},
         {status: "normal", id: "overworld:s0:1x2-ent-0", x: 112, y: 464, type: "enemy", enemyType: "ent", d: "down", params: {}},
         {status: "closed", id: "staffTowerSpiritEntrance", logicKey: "forestTower", x: 176, y: 96, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerSpiritEntrance", d: "up"},
-        {status: "normal", id: "towerTerminal:forest", logicKey: "forestTower", specialBehaviorKey: "towerExteriorTerminal", x: 160, y: 112, style: "displayScreen", type: "sign", message: ""},
+        {status: "normal", id: "towerTerminal:forest", logicKey: "forestTower", specialBehaviorKey: "towerExteriorTerminal", x: 160, y: 112, style: "displayScreen", type: "sign", message: "", linked: true},
         {status: "normal", id: "towerMarker", x: 176, y: 128, type: "marker", linked: true, spirit: true},
         {status: "normal", id: "towerMarker", x: 192, y: 128, type: "marker", linked: true, spirit: true},
     ],
