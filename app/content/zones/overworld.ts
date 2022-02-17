@@ -4021,7 +4021,6 @@ const sf0_1x0: AreaDefinition = {
         {status: "normal", id: "overworld:s0:0x1-ent-0", x: 192, y: 416, type: "enemy", enemyType: "ent", d: "down", params: {}},
         {status: "normal", id: "overworld:s0:0x1-ent-1", x: 288, y: 368, type: "enemy", enemyType: "ent", d: "down", params: {}},
         {status: "normal", id: "overworld:s0:0x1-ent-2", x: 32, y: 352, type: "enemy", enemyType: "ent", d: "down", params: {}},
-        {status: "normal", id: "sideArea:noTool", x: 256, y: 32, type: "door", style: "cave", d: "left", linked: false, spirit: true},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},
