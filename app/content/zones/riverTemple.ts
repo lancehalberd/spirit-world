@@ -717,8 +717,8 @@ const f1_0x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "riverTemplePitEntrance", x: 400, y: 384, type: "marker", locationCue: "Lake Temple 3F"},
         {status: "normal", id: "", x: 368, y: 480, type: "door", style: "cave", d: "down"},
+        {status: "normal", id: "riverTempleUpperEntrance", x: 368, y: 256, type: "door", style: "cavernUpstairs", targetZone: "overworld", targetObjectId: "riverTempleUpperEntrance", d: "up", locationCue: "Lake Temple 3F"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},

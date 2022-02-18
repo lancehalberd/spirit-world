@@ -727,7 +727,7 @@ export function getAreaSize(state: GameState): {w: number, h: number, section: R
     }
 }
 
-export function refreshAreaLogic(state: GameState, area: AreaInstance): void {
+export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefresh = false): void {
     if (!area) {
         return;
     }
@@ -793,13 +793,15 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance): void {
             }
         }*/
         state.fadeLevel = (state.areaInstance.dark || 0) / 100;
-        state.transitionState = {
-            callback: () => null,
-            nextLocation: state.location,
-            time: 0,
-            type: 'mutating',
-            nextAreaInstance: createAreaInstance(state, state.areaInstance.definition),
-        };
+        if (!fastRefresh) {
+            state.transitionState = {
+                callback: () => null,
+                nextLocation: state.location,
+                time: 0,
+                type: 'mutating',
+                nextAreaInstance: createAreaInstance(state, state.areaInstance.definition),
+            };
+        }
         state.hero.vx = state.hero.vy = 0;
     }
     for (const object of area.definition.objects) {

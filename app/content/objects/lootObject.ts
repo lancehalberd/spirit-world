@@ -385,9 +385,11 @@ export function getLoot(this: void, state: GameState, definition: LootObjectDefi
     onPickup(state, definition);
     addEffectToArea(state, hero.area, lootAnimation);
     hero.area.priorityObjects.push([lootAnimation]);
+    // Hack to prevent the game from looking like it is freezing when you obtain the tower staff.
+    const fastRefresh = definition.lootType === 'staff';
     // Refresh the area so that the guardian NPC moves to the correct location now that the boss is defeated.
-    refreshAreaLogic(state, state.areaInstance);
-    refreshAreaLogic(state, state.alternateAreaInstance);
+    refreshAreaLogic(state, state.areaInstance, fastRefresh);
+    refreshAreaLogic(state, state.alternateAreaInstance, fastRefresh);
     saveGame();
 }
 

@@ -38,9 +38,7 @@ Graphics:
 
 
 Current tasks:
-    - Fix pause when taking down the tower (probably a transition running that is difficult to see)
     - Add Sky Paths for Staff Tower
-        - Mountain path to reach Crater without cloud boots
         - Mountain or Forest path to reach river temple roof (lightning only route)
         - Mountain -> River Temple path that is blocked by defeating the flame beast
         - Forest Path to Sky Palace entrance (Add Sky palace stub with roll 2 + nimbus cloud)
@@ -50,6 +48,7 @@ Current tasks:
                 - Allows teleporting to specific places visited on the overworld, possibly between material/spirit worlds.
 
     - Add Staff Tower to randomizer logic.
+    - Add no tool cave to randomizer logic.
 
     - Flying enemies should not move over abyss tiles(make abyss tiles + ceiling tiles impassable to flying enemies).
 
