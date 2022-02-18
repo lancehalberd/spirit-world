@@ -338,7 +338,6 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                         }
                     }
                 }
-                console.log(towerLocation, onTowerMarker);
                 if (towerLocation && onTowerMarker) {
                     state.savedState.staffTowerLocation = towerLocation as StaffTowerLocation;
                     state.hero.activeTools.staff = 1;

@@ -780,20 +780,21 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
     }
     const shouldBeHot = evaluateLogicDefinition(state, area.definition.hotLogic, false);
     if (refreshBehavior || area.isHot !== shouldBeHot) {
-        /*for (const instance of [area, area.alternateArea]) {
-            instance.tilesDrawn = [];
-            instance.checkToRedrawTiles = true;
-            instance.behaviorGrid = [];
-            for (const layer of instance.layers) {
-                const definitionIndex = instance.definition.layers.indexOf(layer.definition);
-                applyLayerToBehaviorGrid(instance.behaviorGrid,
-                    instance.definition.layers[definitionIndex],
-                    instance.definition.parentDefinition?.layers[definitionIndex]
-                );
-            }
-        }*/
         state.fadeLevel = (state.areaInstance.dark || 0) / 100;
-        if (!fastRefresh) {
+        if (fastRefresh) {
+            for (const instance of [area, area.alternateArea]) {
+                instance.tilesDrawn = [];
+                instance.checkToRedrawTiles = true;
+                instance.behaviorGrid = [];
+                for (const layer of instance.layers) {
+                    const definitionIndex = instance.definition.layers.indexOf(layer.definition);
+                    applyLayerToBehaviorGrid(instance.behaviorGrid,
+                        instance.definition.layers[definitionIndex],
+                        instance.definition.parentDefinition?.layers[definitionIndex]
+                    );
+                }
+            }
+        } else {
             state.transitionState = {
                 callback: () => null,
                 nextLocation: state.location,

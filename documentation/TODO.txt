@@ -1,6 +1,8 @@
 Test at http://localhost:81/alttp/public/
 
 Known Bugs:
+    - Lightning bug knocked Leon into door and triggered loop in and out of door in war temple.
+        - This was the 2f - 3F stair case. I can get him to knock me through the door but I can't reproduce the loop.
     - Clone tool bugs
         - Mana regen is wrong when using clone tools (seems to multiply consumption/regen by number of clones)
         - Should destroy clones when the clone technique is unequipped.
@@ -38,8 +40,6 @@ Graphics:
 
 
 Current tasks:
-    - Lightning bug knocked Leon into door and triggered loop in and out of door in war temple.
-    - Tower didn't disappear on collecting staff
     - Getting frozen while jumping with staff makes you jump too high, should fall and stop instead.
     - Screen shake gets out of control while paused.
     - Add screen shake when landing from the sky.
