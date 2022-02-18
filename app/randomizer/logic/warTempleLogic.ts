@@ -94,7 +94,7 @@ export const warTempleNodes: LogicNode[] = [
         zoneId,
         nodeId: 'warTemple:0:1x0-smallKey-0',
         checks: [
-            {objectId: 'warTemple:0:1x0-smallKey-0', logic: hasGloves},
+            {objectId: 'warTemple:0:1x0-smallKey-0'},
             {objectId: 'warTemple:0:0x0-money-0', logic: hasWeapon},
             {objectId: 'warTemple:0:2x0-money-0', logic: hasWeapon},
         ],

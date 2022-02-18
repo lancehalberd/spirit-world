@@ -79,6 +79,17 @@ export const cavesNodes: LogicNode[] = [
     // It is filled with lava while the fire beast is active.
     {
         zoneId: 'caves',
+        nodeId: 'noToolCave',
+        checks: [
+            { objectId: 'caves:0:1x0-money-0'},
+        ],
+        entranceIds: ['caves:noToolSideArea'],
+        exits: [
+            { objectId: 'caves:noToolSideArea'},
+        ],
+    },
+    {
+        zoneId: 'caves',
         nodeId: 'ascentCaves',
         checks: [
             { objectId: 'caves-ascentPeachPiece', logic: canAscendToCrater},

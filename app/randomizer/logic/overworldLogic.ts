@@ -21,11 +21,12 @@ export const overworldNodes: LogicNode[] = [
             { nodeId: 'mainSpiritWorld', logic: hasTeleportation },
         ],
         entranceIds: [
-            'elderEntrance', 'tombTeleporter',
+            'sideArea:noToolEntrance', 'elderEntrance', 'tombTeleporter',
             'lakeTunnelEntrance', 'peachCaveTopEntrance', 'peachCaveWaterEntrance', 'staffTowerEntrance',
             'tombEntrance', 'waterfallCaveEntrance', 'templeCrackedDoor', 'templeDoor', 'overworld:holyCityFoodHouse',
         ],
         exits: [
+            { objectId: 'sideArea:noToolEntrance'},
             { objectId: 'elderEntrance' },
             { objectId: 'lakeTunnelEntrance', logic: hasGloves },
             { objectId: 'peachCaveTopEntrance' },
@@ -189,13 +190,23 @@ export const skyNodes: LogicNode[] = [
     },
     {
         zoneId,
-        // Note that this is in the spirit world.
-        nodeId: 'waterfallTowerSky',
+        nodeId: 'waterfallTowerSkySpirit',
         paths: [{ nodeId: 'spiritWorldMountain' }],
         entranceIds: ['waterfallTowerTopEntrance'],
         exits: [{ objectId: 'waterfallTowerTopEntrance' }],
-    }
+    },
+    {
+        zoneId,
+        nodeId: 'desertTowerSky',
+        // This door is closed from the inside in the material world.
+        entranceIds: ['staffTowerSkyEntrance'],
+    },
+    {
+        zoneId,
+        nodeId: 'desertTowerSkySpirit',
+        entranceIds: ['staffTowerSpiritSkyEntrance'],
+        exits: [{ objectId: 'staffTowerSpiritSkyEntrance' }],
+    },
     // Over river temple is not implemented yet
     // outside waterfall tower is not interesting in the material world currently.
-    // No tower connections in sky yet
 ];

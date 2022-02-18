@@ -33,7 +33,7 @@ import {
     AreaDefinition,
     BossObjectDefinition, DialogueLootDefinition, EntranceDefinition,
     GameState, LogicNode, LootObjectDefinition, LootType, NPCDefinition,
-    ObjectDefinition,
+    ObjectDefinition, ObjectType,
     Zone, ZoneLocation,
 } from 'app/types';
 
@@ -165,6 +165,13 @@ interface AssignmentState {
 }
 
 
+function findDoorById(zone: Zone, id: string, state: GameState = null): {object: ObjectDefinition, location: ZoneLocation}  {
+    return findObjectById(zone, id, state, ['door', 'keyBlock', 'pitEntrance', 'teleporter']);
+}
+function findLootById(zone: Zone, id: string, state: GameState = null): {object: ObjectDefinition, location: ZoneLocation}  {
+    return findObjectById(zone, id, state, ['bigChest', 'chest', 'loot', 'boss']);
+}
+
 const findObjectByIdCache: {[key: string]: {
     object: ObjectDefinition,
     location: ZoneLocation,
@@ -174,7 +181,7 @@ function findObjectById(
     zone: Zone,
     id: string,
     state: GameState = null,
-    skipObject: ObjectDefinition = null
+    typeFilter?: ObjectType[]
 ): {object: ObjectDefinition, location: ZoneLocation} {
     const cacheKey = zone.key + ':' + id;
     const cachedResult = findObjectByIdCache[cacheKey];
@@ -191,7 +198,10 @@ function findObjectById(
                     // All objects in 100% dark areas are considered out of logic unless you can see in the dark.
                     const needsEyes = areaGrid[y][x]?.dark >= 100;
                     for (const object of (areaGrid[y][x]?.objects || [])) {
-                        if (object.id === id && object !== skipObject) {
+                        if (object.id === id) {
+                            if (typeFilter && !typeFilter.includes(object.type)) {
+                                continue;
+                            }
                             const location = {
                                 zoneKey: zone.key,
                                 floor,
@@ -212,7 +222,7 @@ function findObjectById(
             }
         }
     }
-    warnOnce(missingObjectSet, zone.key + id, 'Missing object: ');
+    warnOnce(missingObjectSet, zone.key + '::' + id, 'Missing object: ');
     findObjectByIdCache[cacheKey] = {object: null, location: null, needsEyes: false};
     return findObjectByIdCache[cacheKey];
 }
@@ -229,7 +239,7 @@ function getLootObjects(nodes: LogicNode[], state: GameState = null): LootWithLo
             if (state && check.logic && !isLogicValid(state, check.logic)) {
                 continue;
             }
-            const {object, location} = findObjectById(zone, check.objectId, state);
+            const {object, location} = findLootById(zone, check.objectId, state);
             if (!object) {
                 continue;
             }
@@ -248,7 +258,7 @@ function getLootObjects(nodes: LogicNode[], state: GameState = null): LootWithLo
             if (state && npc.logic && !isLogicValid(state, npc.logic)) {
                 continue;
             }
-            const {object, location} = findObjectById(zone, npc.loot.id, state);
+            const {object, location} = findObjectById(zone, npc.loot.id, state, ['npc']);
             if (!object) {
                 continue;
             }
@@ -327,7 +337,7 @@ function findReachableNodes(allNodes: LogicNode[], startingNodes: LogicNode[], s
                 continue;
             }
             if (path.doorId) {
-                const { object } = findObjectById(zone, path.doorId);
+                const { object } = findDoorById(zone, path.doorId, state);
                 if (!canOpenDoor(zone, state, object as EntranceDefinition)) {
                     continue;
                 }
@@ -346,7 +356,7 @@ function findReachableNodes(allNodes: LogicNode[], startingNodes: LogicNode[], s
                 //console.log('Invalid logic', exit);
                 continue;
             }
-            const { object } = findObjectById(zone, exit.objectId, state);
+            const { object } = findDoorById(zone, exit.objectId, state);
             const exitObject = object as EntranceDefinition;
             // console.log(exit.objectId);
             if (!canOpenDoor(zone, state, exitObject)) {
@@ -360,7 +370,7 @@ function findReachableNodes(allNodes: LogicNode[], startingNodes: LogicNode[], s
                 && node.entranceIds?.includes(exitObject.targetObjectId)
             );
             if (!nextNode) {
-                warnOnce(missingExitNodeSet, exitObject.targetZone + exitObject.targetObjectId, 'Missing node for exit: ');
+                warnOnce(missingExitNodeSet, exitObject.targetZone + '::' + exitObject.targetObjectId, 'Missing node for exit: ');
                 continue;
             }
             if (!reachableNodes.includes(nextNode)) {
@@ -378,7 +388,7 @@ function calculateKeyLogic(allNodes: LogicNode[], startingNodes: LogicNode[]) {
             continue
         }
         function checkExit(objectId: string) {
-            const { object } = findObjectById(zone, objectId);
+            const { object } = findDoorById(zone, objectId);
             const exitObject = object as EntranceDefinition;
             if (!exitObject) {
                 return;
@@ -415,7 +425,7 @@ function countRequiredKeysForEntrance(allNodes: LogicNode[], startingNodes: Logi
         }
         for (const path of (currentNode.paths || [])) {
             if (path.doorId) {
-                const { object } = findObjectById(zone, path.doorId);
+                const { object } = findDoorById(zone, path.doorId);
                 const exitObject = object as EntranceDefinition;
                 if (!exitObject || exitObject === exitToUpdate) {
                     continue;
@@ -435,7 +445,7 @@ function countRequiredKeysForEntrance(allNodes: LogicNode[], startingNodes: Logi
             }
         }
         for (const exit of (currentNode.exits || [])) {
-            const { object } = findObjectById(zone, exit.objectId);
+            const { object } = findDoorById(zone, exit.objectId);
             const exitObject = object as EntranceDefinition;
             if (!exitObject || exitObject === exitToUpdate) {
                 continue;
@@ -450,7 +460,7 @@ function countRequiredKeysForEntrance(allNodes: LogicNode[], startingNodes: Logi
                 && node.entranceIds?.includes(exitObject.targetObjectId)
             );
             if (!nextNode) {
-                warnOnce(missingExitNodeSet, exitObject.targetZone + exitObject.targetObjectId, 'Missing node for exit: ');
+                warnOnce(missingExitNodeSet, exitObject.targetZone + '::' + exitObject.targetObjectId, 'Missing node for exit: ');
                 continue;
             }
             if (!reachableNodes.includes(nextNode)) {
@@ -519,7 +529,11 @@ function applyLootObjectToState(state: GameState, lootWithLocation: LootWithLoca
     const onPickup = lootEffects[lootWithLocation.lootObject.lootType] || lootEffects.unknown;
     // Loot is always progressive in the randomizer, so set lootLevel to 0.
     // onPickup(stateCopy, lootWithLocation.lootObject);
-    onPickup(stateCopy, {...lootWithLocation.lootObject, lootLevel: 0}, true);
+    try {
+        onPickup(stateCopy, {...lootWithLocation.lootObject, lootLevel: 0}, true);
+    } catch (e) {
+        debugger;
+    }
     if (!stateCopy.hero.passiveTools.catEyes && stateCopy.hero.maxLife > 4) {
         stateCopy.hero.passiveTools.catEyes = 1;
     }
@@ -639,7 +653,11 @@ function placeItem(random: typeof SRandom, allNodes: LogicNode[], startingNodes:
         throw new Error('Failed to place item')
     }
     //debugState(currentState);
-    //console.log('placing', loot.lootObject.lootType, ' at ', assignedLocation.location.zoneKey, assignedLocation.lootObject.id);
+    if (assignedLocation.location) {
+        // console.log('placing', loot.lootObject.lootType, ' at ', assignedLocation.location.zoneKey, assignedLocation.lootObject.id);
+    } else {
+        // console.log('placing', loot.lootObject.lootType, ' to dialogue ', assignedLocation.dialogueKey, assignedLocation.optionKey);
+    }
     assignmentsState.assignments.push({
         lootType: loot.lootObject.lootType,
         lootAmount: loot.lootObject.lootAmount,
@@ -738,7 +756,7 @@ export function applyLootAssignments(assignments: LootAssignment[]): void {
         if (assignment.target.dialogueKey) {
             const {dialogueKey, optionKey} = assignment.target;
             const script = dialogueHash[dialogueKey].mappedOptions[optionKey];
-            console.log('Changing ', script, 'to');
+            // console.log('Changing ', script, 'to');
             const [beginning, middle] = script.split('{item:');
             const end = middle.substring(middle.indexOf('}') + 1);
             const number = assignment.lootAmount || 0;//assignment.lootLevel;
@@ -754,13 +772,13 @@ export function applyLootAssignments(assignments: LootAssignment[]): void {
             } else {
                 newScript = `${beginning}${flagScript}{item:${assignment.lootType}}${end}`;
             }
-            console.log(newScript);
+            // console.log(newScript);
             dialogueHash[dialogueKey].mappedOptions[optionKey] = newScript;
         } else {
             const zoneKey = assignment.target.location.zoneKey;
             // console.log(assignment.source.lootObject.id, ' => ', assignment.target.lootObject.id);
             if (assignment.target.lootObject.type === 'dialogueLoot') {
-                const {object} = findObjectById(zones[zoneKey], assignment.target.lootObject.id);
+                const {object} = findLootById(zones[zoneKey], assignment.target.lootObject.id);
                 const npc = object as NPCDefinition;
                 const npcKey = `${zoneKey}-${assignment.target.lootObject.id}`;
                 addCheck(npcKey, zoneKey);

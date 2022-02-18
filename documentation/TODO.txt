@@ -38,6 +38,8 @@ Graphics:
 
 
 Current tasks:
+    - Test Randomizer Updates
+
     - Add Sky Paths for Staff Tower
         - Mountain or Forest path to reach river temple roof (lightning only route)
         - Mountain -> River Temple path that is blocked by defeating the flame beast
@@ -46,9 +48,6 @@ Current tasks:
             - Implement nimbus cloud using spawn points + script events choice mechanic for now
                 - Allows returning to entrance inside areas
                 - Allows teleporting to specific places visited on the overworld, possibly between material/spirit worlds.
-
-    - Add Staff Tower to randomizer logic.
-    - Add no tool cave to randomizer logic.
 
     - Flying enemies should not move over abyss tiles(make abyss tiles + ceiling tiles impassable to flying enemies).
 
@@ -107,6 +106,8 @@ Current tasks:
 
     - Randomizer improvements
         - Add configurable goal
+        - Support `entrances` instead of `entranceIds` on randomizer logic to include logic on entrances, for example, adding logic for whether entrances to sky areas is possible from the staff tower.
+            - For now we can add a path from the ground to the sky based on logic: canAquireTowerStaff.
 
     - Add target landing locations when falling from sky (also apply to the forest temple pits).
     - Add new hold+walk chakram animations

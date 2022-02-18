@@ -117,8 +117,13 @@ export const hasLightning: LogicCheck = andLogic(hasElementalWeapon, {requiredFl
 // teleportation can only be combined with the staff.
 export const canCross2Gaps: OrLogicCheck = orLogic(hasCloudBoots, hasRoll, hasStaff, hasTeleportation, hasClone);
 export const canCross4Gaps: OrLogicCheck = orLogic(andLogic(hasRoll, hasCloudBoots), hasStaff, hasClone);
-export const canCross6Gaps: AndLogicCheck = andLogic(orLogic(hasRoll, hasCloudBoots, hasTeleportation, hasClone), orLogic(hasStaff));
+export const canCross6Gaps: AndLogicCheck = andLogic(orLogic(hasRoll, hasCloudBoots, hasTeleportation, hasClone), hasStaff);
 export const canCross8Gaps: AndLogicCheck = andLogic(hasRoll, hasCloudBoots, hasStaff);
+
+export const canCrossDynamic2Gaps: OrLogicCheck = orLogic(hasCloudBoots, hasRoll, hasStaff, hasClone);
+export const canCrossDynamic4Gaps: OrLogicCheck = orLogic(andLogic(hasRoll, hasCloudBoots), hasStaff, hasClone);
+export const canCrossDynamic6Gaps: AndLogicCheck = andLogic(orLogic(hasRoll, hasCloudBoots, hasTeleportation, hasClone), hasStaff);
+export const canCrossDynamic8Gaps: AndLogicCheck = andLogic(hasRoll, hasCloudBoots, hasStaff);
 
 export const canTravelFarUnderWater = andLogic(hasIronBoots);
 

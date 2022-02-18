@@ -752,6 +752,7 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: Lo
             state.hero.money += (loot.lootAmount || 1);
         } else {
             console.error('Unhandled loot type:', loot.lootType);
+            // throw new Error('Unhandled loot type: ' + loot.lootType);
         }
         updateHeroMagicStats(state);
     },
