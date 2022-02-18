@@ -284,15 +284,15 @@ export const updateScriptEvents = (state: GameState): void => {
                 state.screenShakes.push({
                     dx: event.dx,
                     dy: event.dy,
-                    startTime: state.time,
-                    endTime: state.time + event.duration,
+                    startTime: state.fieldTime,
+                    endTime: state.fieldTime + event.duration,
                 });
                 return;
             case 'startScreenShake':
                 state.screenShakes.push({
                     dx: event.dx,
                     dy: event.dy,
-                    startTime: state.time,
+                    startTime: state.fieldTime,
                     id: event.id,
                 });
                 return;

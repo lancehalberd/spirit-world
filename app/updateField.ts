@@ -2,7 +2,7 @@ import { addEffectToArea, checkIfAllEnemiesAreDefeated, removeObjectFromArea } f
 import { AnimationEffect } from 'app/content/effects/animationEffect';
 import { Enemy } from 'app/content/enemy';
 import { editingState } from 'app/development/tileEditor';
-import { GAME_KEY } from 'app/gameConstants';
+import { FRAME_LENGTH, GAME_KEY } from 'app/gameConstants';
 import { wasGameKeyPressed } from 'app/keyCommands';
 import { updateAllHeroes } from 'app/updateActor';
 import { updateCamera } from 'app/updateCamera';
@@ -24,6 +24,7 @@ export function updateField(this: void, state: GameState) {
         updateCamera(state);
         return;
     }
+    state.fieldTime += FRAME_LENGTH;
     const targetFadeLevel = Math.max(state.areaInstance.dark || 0, state.nextAreaInstance?.dark || 0) / 100;
     if (state.fadeLevel < targetFadeLevel) {
         state.fadeLevel = Math.min(state.fadeLevel + 0.05, targetFadeLevel);
@@ -65,7 +66,7 @@ export function updateField(this: void, state: GameState) {
     // Remove completed screenshakes.
     for (let i = 0; i < state.screenShakes.length; i++) {
         const endTime = state.screenShakes[i].endTime;
-        if (endTime && state.time >= endTime) {
+        if (endTime && state.fieldTime >= endTime) {
             state.screenShakes.splice(i--, 1);
         }
     }

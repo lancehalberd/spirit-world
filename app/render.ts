@@ -72,7 +72,7 @@ export function updateSpiritCanvas(state: GameState, radius: number): void {
 export function applyScreenShakes(context: CanvasRenderingContext2D, state: GameState) {
     context.save();
     for (const screenShake of state.screenShakes) {
-        const t = state.time - screenShake.startTime;
+        const t = state.fieldTime - screenShake.startTime;
         // If endTime is falsey, p stays at 1 the entire time.
         const p = screenShake.endTime
             ? ( 1 - t / (screenShake.endTime - screenShake.startTime))

@@ -281,6 +281,9 @@ export function getDefaultState(): GameState {
         },
         hero: null,
         camera: { x: 0, y: 0 },
+        // This only advances when the field is updating.
+        fieldTime: 0,
+        // This always updates.
         time: 0,
         gameHasBeenInitialized: false,
         lastTimeRendered: 0,

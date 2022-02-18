@@ -60,6 +60,7 @@ export interface GameState {
     hero: Hero
     activeStaff?: Staff
     camera: { x: number, y: number }
+    fieldTime: number
     time: number
     gameHasBeenInitialized: boolean
     lastTimeRendered: number
