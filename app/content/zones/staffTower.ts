@@ -1125,7 +1125,7 @@ const f1_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 336, y: 272, speed: "fast", d: "up", w: 16, h: 48, style: "belt", type: "escalator"},
         {status: "normal", id: "", x: 304, y: 400, speed: "fast", d: "right", w: 96, h: 16, style: "belt", type: "escalator"},
         {status: "normal", id: "", x: 336, y: 240, speed: "fast", d: "right", w: 96, h: 32, style: "belt", type: "escalator"},
-        {status: "normal", id: "staffTower:1:0x0-peachOfImmortalityPiece-0", x: 240, y: 352, type: "chest", lootType: "peachOfImmortalityPiece", lootLevel: 1},
+        {status: "normal", id: "staffTowerPeachPiece", x: 240, y: 352, type: "chest", lootType: "peachOfImmortalityPiece", lootLevel: 1},
         {status: "normal", id: "", x: 416, y: 288, type: "anode"},
         {status: "normal", id: "", x: 416, y: 336, type: "cathode"},
         {status: "normal", id: "", x: 464, y: 272, type: "cathode"},
@@ -1588,13 +1588,13 @@ const sf1_0x0: AreaDefinition = {
     ],
     objects: [
         {status: "closed", id: "elevatorDoor3", x: 240, y: 416, type: "door", style: "wooden", targetZone: "staffTower", targetObjectId: "elevatorDoor", d: "up", locationCue: "Tower 3F", specialBehaviorKey: "elevatorDoor"},
-        {status: "normal", id: "", specialBehaviorKey: "towerTeleporter", x: 144, y: 448, targetZone: "staffTower", targetObjectId: "tower2FMarker", type: "pitEntrance"},
+        {status: "normal", id: "tower3FPit", specialBehaviorKey: "towerTeleporter", x: 144, y: 448, targetZone: "staffTower", targetObjectId: "tower2FMarker", type: "pitEntrance"},
         {status: "normal", id: "staffTower:s1:0x0-lightningDrone-0", x: 112, y: 192, type: "enemy", enemyType: "lightningDrone", d: "down", params: {}},
         {status: "normal", id: "staffTower:s1:0x0-lightningDrone-1", x: 64, y: 288, type: "enemy", enemyType: "lightningDrone", d: "down", params: {}},
         {status: "normal", id: "staffTower:s1:0x0-lightningDrone-2", x: 144, y: 384, type: "enemy", enemyType: "lightningDrone", d: "down", params: {}},
         {status: "normal", id: "staffTower3F4F", x: 288, y: 32, type: "door", style: "woodenUpstairs", targetZone: "staffTower", targetObjectId: "staffTower3F4F", d: "up", locationCue: "Tower 3F"},
         {status: "normal", id: "", specialBehaviorKey: "towerTeleporter", x: 336, y: 80, style: "displayScreen", type: "sign", message: ""},
-        {status: "normal", id: "staffTower:s1:0x0-money-0", x: 208, y: 448, type: "chest", lootType: "money", lootAmount: 100},
+        {status: "normal", id: "staffTowerBigMoney2", x: 208, y: 448, type: "chest", lootType: "money", lootAmount: 100},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -3730,7 +3730,7 @@ const sf3_1x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "closed", id: "elevatorDoor", x: 224, y: 448, type: "door", style: "wooden", targetZone: "staffTower", targetObjectId: "elevatorDoor1", d: "down", specialBehaviorKey: "elevatorDoor"},
+        {status: "closed", id: "elevatorDoor", x: 224, y: 448, type: "door", style: "wooden", targetZone: "staffTower", targetObjectId: "elevatorDoor0", d: "down", specialBehaviorKey: "elevatorDoor"},
         {status: "normal", id: "", specialBehaviorKey: "elevatorControls", x: 240, y: 352, style: "displayScreen", type: "sign", message: "\n            !WARNING![-]POWER FAILURE DETECTED\n            {|}EMERGENCY BREAK ACTIVATED\n            {choice:RELEASE BREAK?|Yes:elevator.releaseBreak|No}\n        "},
     ],
     sections: [
