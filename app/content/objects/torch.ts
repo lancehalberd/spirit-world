@@ -1,8 +1,11 @@
 //import { resetTileBehavior } from 'app/content/areas';
 //import { allTiles } from 'app/content/tiles';
 import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
+import { flameAnimation } from 'app/content/effects/flame';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { hitTargets } from 'app/utils/field';
+
+import { drawFrameAt, getFrame } from 'app/utils/animations';
 
 import {
     AreaInstance, GameState, HitProperties, HitResult, ObjectInstance,
@@ -107,18 +110,13 @@ export class Torch implements ObjectInstance {
         context.fill();
         context.stroke();
         if (this.status === 'active') {
-            context.fillStyle = 'red';
-            context.save();
-                context.globalAlpha *= 0.6;
-                context.fillRect(this.x, this.y, 16, 16);
-            context.restore();
-            context.beginPath();
-            context.arc(
-                this.x + 8,
-                this.y + 8 - 5 + 1 * Math.cos(this.animationTime / 120),
-                6, 0, 2 * Math.PI
-            );
-            context.fill();
+            const frame = getFrame(flameAnimation, this.animationTime);
+            drawFrameAt(context, frame, {
+                x: this.x,
+                y: this.y - 4,
+                w: frame.content.w,
+                h: frame.content.h,
+            });
         }
     }
 }
