@@ -130,7 +130,7 @@ export class Staff implements ObjectInstance {
             this.storedBehaviors[row] = []
             for (let column = this.leftColumn; column <= this.rightColumn; column++) {
                 this.storedBehaviors[row][column] = state.areaInstance.behaviorGrid[row][column];
-                state.areaInstance.behaviorGrid[row][column] = { groundHeight: 2 };
+                state.areaInstance.behaviorGrid[row][column] = { groundHeight: 2, covered: true };
             }
         }
     }

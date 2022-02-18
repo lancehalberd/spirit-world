@@ -39,15 +39,10 @@ Graphics:
 
 Current tasks:
     - Lightning bug knocked Leon into door and triggered loop in and out of door in war temple.
-    - Lake Temple exterior is missing tiles in spirit world.
-    - Make Treant's in cocoon stay defeated permanently
-    - Out of place tile near the top of the helix in spirit world.
-    - Some bead tiles not clearing during the crystal collector fight, possibly on the wrong layer?
     - Tower didn't disappear on collecting staff
     - Getting frozen while jumping with staff makes you jump too high, should fall and stop instead.
     - Screen shake gets out of control while paused.
     - Add screen shake when landing from the sky.
-    - Getting hit while in the falling animation can interrupt it.
 
     - Test Randomizer Updates
 

@@ -19,6 +19,9 @@ export interface TileBehaviors {
     climbable?: boolean
     // Indicates this is a cloud ground tile that the player can walk on if they have cloud walking boots equipped.
     cloudGround?: boolean
+    // Indicates this tile is already covered and cannot be covered by anything else. Added to prevent tile behavior
+    // from getting messed up while the staff is covering the ground.
+    covered?: boolean
     // Can be destroyed by weapon
     cuttable?: number
     // Hit applies to enemies/heroes on contact.

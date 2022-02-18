@@ -213,7 +213,7 @@ export class Hero implements Actor, SavedHeroData {
         if (this.life <= 0) {
             return {};
         }
-        if (this.action === 'getItem' || this.action === 'jumpingDown') {
+        if (this.action === 'getItem' || this.action === 'jumpingDown' || this.action === 'falling' || this.action === 'fallen') {
             return {};
         }
         // Most damage is ignored while the hero is using the dodge roll ability.
