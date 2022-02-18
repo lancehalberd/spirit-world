@@ -284,6 +284,9 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         }
         return true;
     }
+    if (hero.action === 'usingStaff' && hero.frozenDuration > 0) {
+        hero.action = null;
+    }
     if (hero.action === 'usingStaff') {
         const jumpDuration = heroAnimations.staffJump[hero.d].duration;
         const slamDuration = heroAnimations.staffSlam[hero.d].duration;

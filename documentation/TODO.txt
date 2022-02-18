@@ -40,7 +40,6 @@ Graphics:
 
 
 Current tasks:
-    - Getting frozen while jumping with staff makes you jump too high, should fall and stop instead.
     - Add screen shake when landing from the sky.
 
     - Test Randomizer Updates
