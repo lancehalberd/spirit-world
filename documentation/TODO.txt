@@ -38,6 +38,17 @@ Graphics:
 
 
 Current tasks:
+    - Lightning bug knocked Leon into door and triggered loop in and out of door in war temple.
+    - Lake Temple exterior is missing tiles in spirit world.
+    - Make Treant's in cocoon stay defeated permanently
+    - Out of place tile near the top of the helix in spirit world.
+    - Some bead tiles not clearing during the crystal collector fight, possibly on the wrong layer?
+    - Tower didn't disappear on collecting staff
+    - Getting frozen while jumping with staff makes you jump too high, should fall and stop instead.
+    - Screen shake gets out of control while paused.
+    - Add screen shake when landing from the sky.
+    - Getting hit while in the falling animation can interrupt it.
+
     - Test Randomizer Updates
 
     - Add Sky Paths for Staff Tower
@@ -114,6 +125,10 @@ Current tasks:
         - play last 2 frames of attack animation on release.
 
     - Add new waterfall graphics
+
+Staff Improvements:
+    - Charging staff 2 should show a preview of where it will hit and get wider in addition to longer
+    - Charging should stop once it is at maximum size for the given space.
 
 Throwing an object into a pit should make use the pit animation rather than breaking.
 

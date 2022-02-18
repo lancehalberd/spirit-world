@@ -1,5 +1,6 @@
 import { addEffectToArea, addObjectToArea, enterLocation, refreshAreaLogic, removeEffectFromArea, removeObjectFromArea } from 'app/content/areas';
 import { getObjectStatus } from 'app/content/objects';
+import { editingState } from 'app/development/tileEditor';
 import { createCanvasAndContext } from 'app/dom';
 import { CANVAS_WIDTH, CANVAS_HEIGHT, FRAME_LENGTH } from 'app/gameConstants';
 import { showMessage } from 'app/render/renderMessage';
@@ -360,12 +361,18 @@ export class LootObject implements ObjectInstance {
         ) {
             return;
         }
+        if (!editingState.isEditing && this.definition.lootType === 'empty') {
+            return;
+        }
         drawFrameAt(context, this.frame, { x: this.x, y: this.y });
     }
     renderShadow(context, state: GameState) {
         if (this.status === 'hidden' || this.status === 'hiddenEnemy'
             || this.status === 'hiddenSwitch' || this.status === 'gone'
         ) {
+            return;
+        }
+        if (this.definition.lootType === 'empty') {
             return;
         }
         const frame = getLootShadowFrame(this.definition);
