@@ -40,8 +40,6 @@ Graphics:
 
 
 Current tasks:
-    - Add screen shake when landing from the sky.
-
     - Test Randomizer Updates
 
     - Add Sky Paths for Staff Tower

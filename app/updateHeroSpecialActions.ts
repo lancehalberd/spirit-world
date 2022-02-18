@@ -278,6 +278,14 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         });
         // The astral projection stays 4px off the ground.
         if (hero.z <= minZ) {
+            if (hero.vz <= -8) {
+                const { tileBehavior } = getTileBehaviorsAndObstacles(state, hero.area, {x: hero.x, y: hero.y }, excludedObjects, state.nextAreaInstance);
+                if (!tileBehavior?.water && !tileBehavior?.pit) {
+                    state.screenShakes.push({
+                        dx: 0, dy: 2, startTime: state.fieldTime, endTime: state.fieldTime + 200
+                    });
+                }
+            }
             hero.z = minZ;
             hero.action = null;
             hero.vz = 0;
@@ -377,7 +385,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             });
             state.screenShakes.push({
                 dx: 0, dy: staffLevel > 1 ? 5 : 2, startTime: state.fieldTime, endTime: state.fieldTime + 200
-            })
+            });
         } else if (hero.animationTime < jumpDuration + slamDuration) {
              hero.z = Math.max(hero.z + hero.vz, minZ);
         } else if (hero.animationTime >= jumpDuration + slamDuration) {
