@@ -158,22 +158,21 @@ export const logicHash: {[key: string]: LogicCheck} = {
     },
     desertTower: {
         requiredFlags: [],
-        excludedFlags: [],
         staffTowerLocation: 'desert',
     },
     forestTower: {
         requiredFlags: [],
-        excludedFlags: [],
         staffTowerLocation: 'forest',
     },
     mountainTower: {
         requiredFlags: [],
-        excludedFlags: [],
         staffTowerLocation: 'mountain',
     },
     towerStaff: {
         requiredFlags: ['$staff:2'],
-        excludedFlags: [],
+    },
+    beastsDefeated: {
+        requiredFlags: ['flameBeast', 'frostBeast', 'stormBeast'],
     },
 };
 

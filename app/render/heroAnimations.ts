@@ -79,6 +79,11 @@ const attackShallowUpAnimation: FrameAnimation = createAnimation('gfx/mc/mcchakr
 const attackShallowDownAnimation: FrameAnimation = createAnimation('gfx/mc/mcchakramthrowshallow.png', attackingGeometry, { cols: 4, x: 1, y: 0, duration: 3}, {loop: false});
 const attackShallowLeftAnimation: FrameAnimation = createAnimation('gfx/mc/mcchakramthrowshallow.png', attackingGeometry, { cols: 4, x: 1, y: 3, duration: 3}, {loop: false});
 const attackShallowRightAnimation: FrameAnimation = createAnimation('gfx/mc/mcchakramthrowshallow.png', attackingGeometry, { cols: 4, x: 1, y: 1, duration: 3}, {loop: false});
+const mcCloakUpAnimation: FrameAnimation = createAnimation('gfx/mc/mcchakramthrow.png', attackingGeometry, { cols: 4, x: 1, y: 2, duration: 6, frameMap: [1, 3]}, {loop: false});
+const mcCloakDownAnimation: FrameAnimation = createAnimation('gfx/mc/mcchakramthrow.png', attackingGeometry, { cols: 4, x: 1, y: 0, duration: 6, frameMap: [1, 3]}, {loop: false});
+const mcCloakLeftAnimation: FrameAnimation = createAnimation('gfx/mc/mcchakramthrow.png', attackingGeometry, { cols: 4, x: 1, y: 3, duration: 6, frameMap: [1, 3]}, {loop: false});
+const mcCloakRightAnimation: FrameAnimation = createAnimation('gfx/mc/mcchakramthrow.png', attackingGeometry, { cols: 4, x: 1, y: 1, duration: 6, frameMap: [1, 3]}, {loop: false});
+
 
 const rollGeometry: FrameDimensions = {w: 20, h: 28, content: {x: 2, y: 16 + Y_OFF, w: 16, h: 16}};
 const rollUpAnimation: FrameAnimation = createAnimation('gfx/mc/mcroll.png', rollGeometry, { cols: 4, x: 1, y: 2, duration: 4}, {loop: false});
@@ -155,8 +160,6 @@ export const chargeIceFrontAnimation: FrameAnimation = createAnimation('gfx/mc/a
 export const chargeLightningBackAnimation: FrameAnimation = createAnimation('gfx/mc/aura_lightning.png', chargeGeometry, { cols: 4, y: 0, duration: 5});
 export const chargeLightningFrontAnimation: FrameAnimation = createAnimation('gfx/mc/aura_lightning.png', chargeGeometry, { cols: 4, y: 1, duration: 5});
 
-
-
 const bowGeometry: FrameDimensions = {w: 30, h: 28};
 const bowDownAnimation: FrameAnimation = createAnimation('gfx/mc/bow1.png', bowGeometry, { cols: 3, x: 1, duration: 4});
 const bowDownRightAnimation: FrameAnimation = createAnimation('gfx/mc/bow1.png', bowGeometry, { cols: 3, x: 5, duration: 4});
@@ -166,6 +169,14 @@ const bowUpAnimation: FrameAnimation = createAnimation('gfx/mc/bow1.png', bowGeo
 const bowUpLeftAnimation: FrameAnimation = createAnimation('gfx/mc/bow1.png', bowGeometry, { cols: 3, x: 18, duration: 4});
 const bowLeftAnimation: FrameAnimation = createAnimation('gfx/mc/bow1.png', bowGeometry, { cols: 3, x: 22, duration: 4});
 const bowDownLeftAnimation: FrameAnimation = createAnimation('gfx/mc/bow1.png', bowGeometry, { cols: 3, x: 26, duration: 4});
+
+const cloakGeometry: FrameDimensions = {w: 32, h: 32};
+const cloakFrameMap = [0, 0, 1, 2, 3, 4, 5, 6, 7];
+const cloakDownAnimation: FrameAnimation = createAnimation('gfx/effects/cloak_throw.png', cloakGeometry, { cols: 8, x: 0, duration: 2, frameMap: cloakFrameMap});
+const cloakRightAnimation: FrameAnimation = createAnimation('gfx/effects/cloak_throw.png', cloakGeometry, { cols: 8, x: 8, duration: 2, frameMap: cloakFrameMap});
+const cloakUpAnimation: FrameAnimation = createAnimation('gfx/effects/cloak_throw.png', cloakGeometry, { cols: 8, x: 16, duration: 2, frameMap: cloakFrameMap});
+const cloakLeftAnimation: FrameAnimation = createAnimation('gfx/effects/cloak_throw.png', cloakGeometry, { cols: 8, x: 24, duration: 2, frameMap: cloakFrameMap});
+
 
 const dlArrowAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 16, h: 16}, {cols: 1});
 const drArrowAnimation = createAnimation('gfx/effects/spiritarrow.png', {w: 16, h: 16}, {x: 2, cols: 1});
@@ -217,6 +228,12 @@ export const arrowAnimations: AnimationSet = {
     right: rightArrowAnimation,
 }
 
+export const cloakAnimations: AnimationSet = {
+    up: cloakUpAnimation,
+    down: cloakDownAnimation,
+    left: cloakLeftAnimation,
+    right: cloakRightAnimation,
+}
 
 export const staffAnimations: AnimationSet = {
     up: staffUpAnimation,
@@ -231,6 +248,12 @@ export const heroAnimations: ActorAnimations = {
         down: attackDownAnimation,
         left: attackLeftAnimation,
         right: attackRightAnimation,
+    },
+    cloak: {
+        up: mcCloakUpAnimation,
+        down: mcCloakDownAnimation,
+        left: mcCloakLeftAnimation,
+        right: mcCloakRightAnimation,
     },
     staffJump: {
         up: mcStaffJumpUpAnimation,

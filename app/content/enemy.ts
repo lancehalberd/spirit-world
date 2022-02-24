@@ -216,6 +216,17 @@ export class Enemy implements Actor, ObjectInstance {
             const multiplier = this.enemyDefinition.elementalMultipliers?.[hit.element] || 1;
             this.applyDamage(state, multiplier * hit.damage);
         }
+        if (hit.knockback) {
+            this.knockBack(state, hit.knockback);
+        } else if (hit.knockAwayFrom) {
+            const hitbox = this.getHitbox(state);
+            const dx = (hitbox.x + hitbox.w / 2) - hit.knockAwayFrom.x;
+            const dy = (hitbox.y + hitbox.h / 2) - hit.knockAwayFrom.y;
+            const mag = Math.sqrt(dx * dx + dy * dy);
+            if (mag) {
+                this.knockBack(state, {vx: 4 * dx / mag, vy: 4 * dy / mag, vz: 0});
+            }
+        }
         return {
             hit: true,
             knockback: hit.knockback ? {vx: -hit.knockback.vx, vy: -hit.knockback.vy, vz: 0 } : null
