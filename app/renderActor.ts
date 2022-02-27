@@ -23,8 +23,10 @@ export const wadingAnimation = createAnimation('gfx/shallowloop.png', shallowGeo
 const cloakGeometry: FrameDimensions = {w: 32, h: 32, content: {x: 3, y: 5, w: 26, h: 26}};
 export const spiritBarrierStartAnimation = createAnimation('gfx/effects/cloak.png', cloakGeometry, {x: 0, cols: 1, duration: 5});
 export const spiritBarrierAnimation = createAnimation('gfx/effects/cloak.png', cloakGeometry, {x: 1, cols: 6, duration: 5});
-export const spiritBarrierCrackedAnimation = createAnimation('gfx/effects/cloak.png', cloakGeometry, {x: 7, cols: 6, duration: 5});
-export const spiritBarrierBreakingAnimation = createAnimation('gfx/effects/cloak.png', cloakGeometry, {x: 13, cols: 4, duration: 5}, { loop: false });
+export const spiritBarrierSmallCracksAnimation = createAnimation('gfx/effects/cloak.png', cloakGeometry, {x: 7, cols: 6, duration: 5});
+export const spiritBarrierMediumCracksAnimation = createAnimation('gfx/effects/cloak.png', cloakGeometry, {x: 13, cols: 6, duration: 5});
+export const spiritBarrierLargeCracksAnimation = createAnimation('gfx/effects/cloak.png', cloakGeometry, {x: 19, cols: 6, duration: 5});
+export const spiritBarrierBreakingAnimation = createAnimation('gfx/effects/cloak.png', cloakGeometry, {x: 25, cols: 4, duration: 5}, { loop: false });
 
 let lastPullAnimation = null;
 export function getHeroFrame(state: GameState, hero: Hero): Frame {
@@ -152,8 +154,12 @@ export function renderHeroBarrier(context: CanvasRenderingContext2D, state: Game
     //if (hero.invulnerableFrames) {
     //    context.globalAlpha *= (0.7 + 0.3 * Math.cos(2 * Math.PI * hero.invulnerableFrames * 3 / 50));
     //}
-    if (state.hero.magic <= 10) {
-        frame = getFrame(spiritBarrierCrackedAnimation, state.fieldTime);
+    if (state.hero.magic < 10) {
+        frame = getFrame(spiritBarrierLargeCracksAnimation, state.fieldTime);
+    } else if (state.hero.magic < 15 || state.hero.magic < state.hero.maxMagic * 0.2) {
+        frame = getFrame(spiritBarrierMediumCracksAnimation, state.fieldTime);
+    } else if (state.hero.magic < 20 || state.hero.magic < state.hero.maxMagic * 0.4) {
+        frame = getFrame(spiritBarrierSmallCracksAnimation, state.fieldTime);
     }
     if (state.hero.toolOnCooldown === 'cloak') {
         // Render nothing while the hero is throwing the cape.
