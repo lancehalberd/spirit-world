@@ -1,4 +1,4 @@
-import { EXPLOSION_RADIUS, EXPLOSION_TIME } from 'app/gameConstants';
+import { EXPLOSION_RADIUS, EXPLOSION_TIME, FRAME_LENGTH } from 'app/gameConstants';
 import { getCloneMovementDeltas } from 'app/keyCommands';
 import { isHeroFloating, isHeroSinking } from 'app/utils/actor';
 import { createAnimation, drawFrame, drawFrameAt, getFrame } from 'app/utils/animations';
@@ -11,6 +11,7 @@ import {
     heroChargeBowAnimations,
     heroChargeChakramAnimations,
     heroShallowAnimations,
+    heroCarryAnimations,
     heroSwimAnimations,
     Y_OFF,
 } from 'app/render/heroAnimations';
@@ -38,6 +39,18 @@ export function getHeroFrame(state: GameState, hero: Hero): Frame {
     if (state.hero.toolOnCooldown === 'cloak') {
         animations = heroAnimations.cloak;
         return getFrame(animations[hero.d], hero.animationTime);
+    }
+    const holdingObject = hero.pickUpTile || hero.pickUpObject;
+    if (holdingObject) {
+        const grabAnimation = heroCarryAnimations.grab[hero.d];
+        const grabAnimationTime = hero.pickUpFrame * 20;
+        if (grabAnimationTime < grabAnimation.duration) {
+            return getFrame(grabAnimation, grabAnimationTime);
+        }
+        if (hero.action === 'walking') {
+            return getFrame(heroCarryAnimations.move[hero.d], hero.animationTime);
+        }
+        return getFrame(heroCarryAnimations.idle[hero.d], hero.animationTime);
     }
     switch (hero.action) {
         case 'usingStaff':
@@ -202,8 +215,18 @@ export function renderHeroEyes(context: CanvasRenderingContext2D, state: GameSta
 export function renderCarriedTile(context: CanvasRenderingContext2D, state: GameState, actor: Actor): void {
     const offset = carryMap[actor.d][Math.min(actor.pickUpFrame, carryMap[actor.d].length - 1)];
     const frame = actor.pickUpTile.frame;
+    let yBounce = 0;
+    const grabAnimation = heroCarryAnimations.grab[actor.d];
+    if (actor.pickUpFrame >= grabAnimation.frames.length * grabAnimation.frameDuration && actor.action === 'walking') {
+        // The arms of the MC are higher for 2 frames, then lower for 2 frames, etc.
+        const bounceDuration = 2 * heroCarryAnimations.move.up.frameDuration * FRAME_LENGTH;
+        const frameIndex = (actor.animationTime / bounceDuration) | 0;
+        if (frameIndex % 2 === 1) {
+            yBounce += 1;
+        }
+    }
     drawFrame(context, frame,
-        { x: actor.x + offset.x, y: actor.y + offset.y, w: frame.w, h: frame.h });
+        { x: actor.x + offset.x, y: actor.y + offset.y + yBounce, w: frame.w, h: frame.h });
 }
 
 
@@ -211,6 +234,7 @@ export function renderHeroShadow(context: CanvasRenderingContext2D, state: GameS
     if (hero.wading && !hero.swimming) {
         const frame = getFrame(wadingAnimation, hero.animationTime);
         drawFrameAt(context, frame, { x: hero.x, y: hero.y - hero.z });
+        return;
     }
 
     if (!forceDraw && (

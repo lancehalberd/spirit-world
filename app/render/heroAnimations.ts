@@ -118,6 +118,20 @@ const pushShallowDownAnimation: FrameAnimation = createAnimation('gfx/mc/mcpushp
 const pushShallowLeftAnimation: FrameAnimation = createAnimation('gfx/mc/mcpushpullshallow.png', pushGeometry, { cols: 3, x: 5, y: 3, duration: 8, frameMap:[0, 1, 0, 2]});
 const pushShallowRightAnimation: FrameAnimation = createAnimation('gfx/mc/mcpushpullshallow.png', pushGeometry, { cols: 3, x: 5, y: 1, duration: 8, frameMap:[0, 1, 0, 2]});
 
+// Animations for picking up and carraying objects
+let frameMap = [1, 2, 0];
+const pickupUpAnimation: FrameAnimation = createAnimation('gfx/mc/mccarrypushpull.png', pushGeometry, { cols: 3, x: 0, y: 2, duration: 3, frameMap});
+const pickupDownAnimation: FrameAnimation = createAnimation('gfx/mc/mccarrypushpull.png', pushGeometry, { cols: 3, x: 0, y: 0, duration: 3, frameMap});
+const pickupLeftAnimation: FrameAnimation = createAnimation('gfx/mc/mccarrypushpull.png', pushGeometry, { cols: 3, x: 0, y: 3, duration: 3, frameMap});
+const pickupRightAnimation: FrameAnimation = createAnimation('gfx/mc/mccarrypushpull.png', pushGeometry, { cols: 3, x: 0, y: 1, duration: 3, frameMap});
+const idleCarryUpAnimation: FrameAnimation = createAnimation('gfx/mc/mccarrypushpull.png', pushGeometry, { cols: 1, x: 0, y: 2, duration: 8});
+const idleCarryDownAnimation: FrameAnimation = createAnimation('gfx/mc/mccarrypushpull.png', pushGeometry, { cols: 1, x: 0, y: 0, duration: 8});
+const idleCarryLeftAnimation: FrameAnimation = createAnimation('gfx/mc/mccarrypushpull.png', pushGeometry, { cols: 1, x: 0, y: 3, duration: 8});
+const idleCarryRightAnimation: FrameAnimation = createAnimation('gfx/mc/mccarrypushpull.png', pushGeometry, { cols: 1, x: 0, y: 1, duration: 8});
+const walkCarryUpAnimation: FrameAnimation = createAnimation('gfx/mc/mc4directionliftwalk.png', walkingGeometry, { cols: 8, y: 2, duration: 4});
+const walkCarryDownAnimation: FrameAnimation = createAnimation('gfx/mc/mc4directionliftwalk.png', walkingGeometry, { cols: 8, y: 0, duration: 4});
+const walkCarryLeftAnimation: FrameAnimation = createAnimation('gfx/mc/mc4directionliftwalk.png', walkingGeometry, { cols: 8, y: 3, duration: 4});
+const walkCarryRightAnimation: FrameAnimation = createAnimation('gfx/mc/mc4directionliftwalk.png', walkingGeometry, { cols: 8, y: 1, duration: 4});
 
 const climbGeometry: FrameDimensions = {w: 20, h: 28, content: {x: 2, y: 16 + Y_OFF, w: 16, h: 16}};
 const climbUpAnimation: FrameAnimation = createAnimation('gfx/mc/mcclimb.png', climbGeometry, { cols: 9, duration: 6});
@@ -356,6 +370,27 @@ export const heroShallowAnimations: ActorAnimations = {
         down: pushShallowDownAnimation,
         left: pushShallowLeftAnimation,
         right: pushShallowRightAnimation,
+    },
+};
+
+export const heroCarryAnimations: ActorAnimations = {
+    grab: {
+        up: pickupUpAnimation,
+        down: pickupDownAnimation,
+        left: pickupLeftAnimation,
+        right: pickupRightAnimation,
+    },
+    idle: {
+        up: idleCarryUpAnimation,
+        down: idleCarryDownAnimation,
+        left: idleCarryLeftAnimation,
+        right: idleCarryRightAnimation,
+    },
+    move: {
+        up: walkCarryUpAnimation,
+        down: walkCarryDownAnimation,
+        left: walkCarryLeftAnimation,
+        right: walkCarryRightAnimation,
     },
 };
 
