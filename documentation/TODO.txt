@@ -41,6 +41,10 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    High Priority Bugs
+        - Disable knockback on most immobile enemies, treants and crystal guardians especially
+        - Fix tiles in no tools cave that let you walk through bushes because of overlap with guard rail tiles
+        - Get Loot effect should render on the HUD and not behind dark filters.
     Warship
         - Requires all elements to complete
         - Fight rival near the start to claim the last element
