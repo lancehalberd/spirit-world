@@ -52,6 +52,7 @@ export type AnimationSet = {
 }
 export interface ActorAnimations {
     attack?: AnimationSet
+    cloak?: AnimationSet
     climbing?: AnimationSet
     death?: AnimationSet
     falling?: AnimationSet

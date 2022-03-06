@@ -80,6 +80,16 @@ export const SPAWN_WAR_TEMPLE_ENTRANCE: ZoneLocation = {
     areaGridCoords: {x: 1, y: 1},
     isSpiritWorld: false,
 };
+export const SPAWN_WAR_TEMPLE_ENTRANCE_SPIRIT: ZoneLocation = {
+    zoneKey: 'warTemple',
+    floor: 0,
+    x: 248,
+    y: 440,
+    z: 0,
+    d: 'up',
+    areaGridCoords: {x: 1, y: 1},
+    isSpiritWorld: true,
+};
 export const SPAWN_WAR_TEMPLE_BOSS: ZoneLocation = {
     zoneKey: 'warTemple',
     floor: 2,
@@ -317,7 +327,7 @@ const riverTempleStartState = applyItems(helixEndState, {
     maxLife: 2,
     staff: 2, lightning: 1,
     fireBlessing: 1, fire: 1,
-});
+}, ['flameBeast', 'stormBeast']);
 const riverTempleBossState = applyItems(riverTempleStartState,
     {'riverTemple:bigKey': 1, 'fire': 1, 'lightning': 1},
     ['bossBubblesNorth','bossBubblesSouth', 'bossBubblesWest', 'bossBubblesEast']
@@ -329,7 +339,7 @@ const craterStartState = applyItems(helixEndState, {
     maxLife: 2,
     staff: 2, lightning: 1,
     waterBlessing: 1, ice: 1,
-});
+}, ['frostBeast', 'stormBeast']);
 const craterBossState = applyItems(craterStartState, {fireBlessing: 1},
     ['craterLava1', 'craterLava2', 'craterLava3', 'craterLava4', 'craterLava5']
 );
@@ -340,7 +350,7 @@ const staffStartState = applyItems(helixEndState, {
     maxLife: 2,
     fireBlessing: 1, fire: 1,
     waterBlessing: 1, ice: 1,
-});
+}, ['frostBeast', 'flameBeast']);
 const staffBossState = applyItems(staffStartState, {}, [
     'staffTowerSpiritEntrance', 'tower2FBarrier',
     'elevatorDropped', 'elevatorFixed',
@@ -350,6 +360,8 @@ const staffAquiredState = applyItems(staffBossState, {lightning: 1}, [
     'stormBeast',
     'staffTowerActivated'
 ]);
+
+const warshipStartState = applyItems(staffAquiredState, {staff: 2});
 
 interface SpawnLocationOptions {
     [key: string]: {location: ZoneLocation, savedState: SavedState},
@@ -449,6 +461,10 @@ const lateSpawnLocations: SpawnLocationOptions = {
     'Tower Aquired': {
         location: SPAWN_STAFF_LOWER_ENTRANCE,
         savedState: staffAquiredState,
+    },
+    'Warship Start': {
+        location: SPAWN_WAR_TEMPLE_ENTRANCE_SPIRIT,
+        savedState: warshipStartState,
     },
 };
 

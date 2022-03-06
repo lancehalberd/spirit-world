@@ -40,8 +40,9 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     const primaryClone = state.hero.activeClone || state.hero;
     const isPlayerControlled = (state.hero.action === 'meditating' && hero.isAstralProjection) || isCloneToolDown || hero === primaryClone;
     const minZ = hero.groundHeight + (hero.isAstralProjection ? 4 : 0);
+    const isThrowingCloak = state.hero.toolOnCooldown === 'cloak';
     const isMovementBlocked = hero.action === 'meditating'
-        || hero.action === 'throwing' || hero.action === 'grabbing';
+        || hero.action === 'throwing' || hero.action === 'grabbing' || isThrowingCloak;
     const maxCloudBootsZ = hero.groundHeight + MAX_FLOAT_HEIGHT;
     const isActionBlocked =
         isMovementBlocked || hero.swimming || hero.pickUpTile || hero.pickUpObject || hero.action === 'attack' ||

@@ -202,7 +202,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
         state.hero.magic = state.hero.maxMagic;
     }
     if (state.hero.magic < 0) {
-        state.hero.hasBarrier = false;
+        state.hero.shatterBarrier(state);
         state.hero.isInvisible = false;
         if (state.hero.clones.length) {
             state.hero.x = hero.x;
@@ -262,6 +262,7 @@ function checkForEnemyDamage(state: GameState, hero: Hero) {
                     vz: 2,
                 },
             });
+
             if (hitResult.returnHit) {
                 enemy.onHit(state, hitResult.returnHit);
             } else if (hitResult.knockback) {

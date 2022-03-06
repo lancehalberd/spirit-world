@@ -5284,11 +5284,11 @@ const sf0_2x2: AreaDefinition = {
     parentDefinition: f0_2x2,
     layers: null,
     objects: [
-        {status: "closedSwitch", id: "warTempleEntrance", x: 240, y: 320, type: "door", style: "lightCave", targetZone: "warTemple", targetObjectId: "warTempleMainEntrance", d: "up", linked: true, spirit: true},
+        {status: "closedSwitch", id: "warTempleEntranceSpirit", x: 240, y: 320, type: "door", style: "cavern", targetZone: "warTemple", targetObjectId: "warTempleEntranceSpirit", d: "up", linked: true, spirit: true, saveStatus: "forever"},
         {status: "normal", id: "overworld:s0:2x2-pushPull-0", linked: true, x: 224, y: 352, type: "pushPull", spirit: true},
         {status: "normal", id: "overworld:s0:2x2-pushPull-1", linked: true, x: 288, y: 352, type: "pushPull", spirit: true},
-        {status: "normal", id: "overworld:s0:2x2-floorSwitch-0", x: 208, y: 416, toggleOnRelease: true, type: "floorSwitch", targetObjectId: "warTempleEntrance"},
-        {status: "normal", id: "overworld:s0:2x2-floorSwitch-1", x: 288, y: 400, toggleOnRelease: true, type: "floorSwitch", targetObjectId: "warTempleEntrance"},
+        {status: "normal", id: "overworld:s0:2x2-floorSwitch-0", x: 208, y: 416, toggleOnRelease: true, type: "floorSwitch", targetObjectId: "warTempleEntranceSpirit"},
+        {status: "normal", id: "overworld:s0:2x2-floorSwitch-1", x: 288, y: 400, toggleOnRelease: true, type: "floorSwitch", targetObjectId: "warTempleEntranceSpirit"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},

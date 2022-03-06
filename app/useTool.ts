@@ -68,7 +68,7 @@ export function useTool(
             return;
         case 'cloak':
             if (state.hero.isInvisible || state.hero.hasBarrier) {
-                state.hero.hasBarrier = false;
+                state.hero.shatterBarrier(state);
                 state.hero.isInvisible = false;
                 state.hero.toolCooldown = 0;
                 hero.toolOnCooldown = null;
@@ -83,6 +83,8 @@ export function useTool(
             }
             state.hero.magic -= cost;
             hero.toolOnCooldown = 'cloak';
+            // This is based on the length of the animation for activating the cloak which is 20ms * 2 * 10
+            state.hero.toolCooldown = 400;
             state.hero.barrierLevel = chargeLevel;
             if (chargeLevel === 1) {
                 state.hero.barrierElement = element;

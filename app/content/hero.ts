@@ -1,8 +1,9 @@
 import { addEffectToArea } from 'app/content/areas';
+import { AnimationEffect } from 'app/content/effects/animationEffect';
 import { destroyClone } from 'app/content/objects/clone';
 import { getChargedArrowAnimation } from 'app/content/effects/arrow';
 import {
-    arrowAnimations, bowAnimations,
+    arrowAnimations, bowAnimations, cloakAnimations,
     chargeBackAnimation, chargeFrontAnimation,
     chargeFireBackAnimation, chargeFireFrontAnimation,
     chargeIceBackAnimation, chargeIceFrontAnimation,
@@ -10,7 +11,11 @@ import {
     heroAnimations,
     staffAnimations,
 } from 'app/render/heroAnimations';
-import { getHeroFrame, renderCarriedTile, renderExplosionRing, renderHeroBarrier } from 'app/renderActor';
+import {
+    getHeroFrame, renderCarriedTile,
+    renderExplosionRing, renderHeroBarrier,
+    spiritBarrierBreakingAnimation,
+} from 'app/renderActor';
 import { getChargeLevelAndElement } from 'app/useTool';
 import { drawFrameAt, getFrame } from 'app/utils/animations';
 import { directionMap, getDirection } from 'app/utils/field';
@@ -205,6 +210,10 @@ export class Hero implements Actor, SavedHeroData {
     }
 
     getHitbox(this: Hero, state: GameState): Rect {
+        if (this.hasBarrier) {
+            const p = 4;
+            return { x: this.x - p, y: this.y - p, w: 16 + 2 * p, h: 16 + 2 * p };
+        }
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
 
@@ -283,6 +292,22 @@ export class Hero implements Actor, SavedHeroData {
         return { hit: true };
     }
 
+    shatterBarrier(state: GameState) {
+        if (!this.hasBarrier) {
+            return;
+        }
+        this.hasBarrier = false;
+        const shatteredBarrier = new AnimationEffect({
+            animation: spiritBarrierBreakingAnimation,
+            x: this.x - 7,
+            y: this.y + 5,
+            // This is a hack to draw the bubble up higher while using the y value to force it in front of the hero.
+            z: 18,
+            drawPriority: 'sprites',
+        });
+        addEffectToArea(state, this.area, shatteredBarrier);
+    }
+
     knockBack(state: GameState, knockback: {vx: number; vy: number; vz: number}) {
         this.throwHeldObject(state);
         this.action = 'knocked';
@@ -350,6 +375,15 @@ export class Hero implements Actor, SavedHeroData {
 
                 drawFrameAt(context, chargeFrame, { x, y });
             }
+        }
+    }
+
+    renderCloak(this: Hero, context: CanvasRenderingContext2D, state: GameState) {
+        const cloakAnimationTime = 400 - state.hero.toolCooldown;
+        const animation = cloakAnimations[this.d];
+        if (cloakAnimationTime < animation.duration) {
+            const frame = getFrame(animation, cloakAnimationTime);
+            drawFrameAt(context, frame, { x: this.x - 8, y: this.y - 16});
         }
     }
 
@@ -424,6 +458,9 @@ export class Hero implements Actor, SavedHeroData {
             }
             drawFrameAt(context, frame, { x: hero.x, y: hero.y - hero.z });
         context.restore();
+        if (state.hero.toolOnCooldown === 'cloak') {
+            this.renderCloak(context, state);
+        }
         if (shouldDrawBow && !drawBowUnderHero) {
             this.renderBow(context, state, bowDirection);
         }

@@ -99,7 +99,7 @@ export class AnimationEffect implements EffectInstance {
         const frame = getFrame(this.animation, this.animationTime);
         if (this.rotation) {
             context.save();
-                context.translate(this.x + frame.w / 2, this.y + frame.h / 2);
+                context.translate(this.x + frame.w / 2, this.y - this.z + frame.h / 2);
                 context.rotate(this.rotation);
                 drawFrame(context, frame, { ...frame,
                     x: -frame.w / 2, y: -frame.h / 2,

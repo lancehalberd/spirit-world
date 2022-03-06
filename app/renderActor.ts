@@ -1,4 +1,4 @@
-import { EXPLOSION_RADIUS, EXPLOSION_TIME } from 'app/gameConstants';
+import { EXPLOSION_RADIUS, EXPLOSION_TIME, FRAME_LENGTH } from 'app/gameConstants';
 import { getCloneMovementDeltas } from 'app/keyCommands';
 import { isHeroFloating, isHeroSinking } from 'app/utils/actor';
 import { createAnimation, drawFrame, drawFrameAt, getFrame } from 'app/utils/animations';
@@ -11,6 +11,7 @@ import {
     heroChargeBowAnimations,
     heroChargeChakramAnimations,
     heroShallowAnimations,
+    heroCarryAnimations,
     heroSwimAnimations,
     Y_OFF,
 } from 'app/render/heroAnimations';
@@ -20,12 +21,36 @@ export const shadowFrame: Frame = createAnimation('gfx/shadow.png', { w: 16, h: 
 export const smallShadowFrame: Frame = createAnimation('gfx/smallshadow.png', { w: 16, h: 16 }).frames[0];
 export const wadingAnimation = createAnimation('gfx/shallowloop.png', shallowGeometry, {cols: 3, duration: 10});
 
+const cloakGeometry: FrameDimensions = {w: 32, h: 32, content: {x: 3, y: 5, w: 26, h: 26}};
+export const spiritBarrierStartAnimation = createAnimation('gfx/effects/cloak.png', cloakGeometry, {x: 0, cols: 1, duration: 5});
+export const spiritBarrierAnimation = createAnimation('gfx/effects/cloak.png', cloakGeometry, {x: 1, cols: 6, duration: 5});
+export const spiritBarrierSmallCracksAnimation = createAnimation('gfx/effects/cloak.png', cloakGeometry, {x: 7, cols: 6, duration: 5});
+export const spiritBarrierMediumCracksAnimation = createAnimation('gfx/effects/cloak.png', cloakGeometry, {x: 13, cols: 6, duration: 5});
+export const spiritBarrierLargeCracksAnimation = createAnimation('gfx/effects/cloak.png', cloakGeometry, {x: 19, cols: 6, duration: 5});
+export const spiritBarrierBreakingAnimation = createAnimation('gfx/effects/cloak.png', cloakGeometry, {x: 25, cols: 4, duration: 5}, { loop: false });
+
 let lastPullAnimation = null;
 export function getHeroFrame(state: GameState, hero: Hero): Frame {
     let animations: ActorAnimations['idle'];
     if (state.transitionState?.type === 'surfacing' || state.transitionState?.type === 'diving') {
         animations = heroSwimAnimations.idle;
         return getFrame(animations[hero.d], hero.animationTime);
+    }
+    if (state.hero.toolOnCooldown === 'cloak') {
+        animations = heroAnimations.cloak;
+        return getFrame(animations[hero.d], hero.animationTime);
+    }
+    const holdingObject = hero.pickUpTile || hero.pickUpObject;
+    if (holdingObject) {
+        const grabAnimation = heroCarryAnimations.grab[hero.d];
+        const grabAnimationTime = hero.pickUpFrame * 20;
+        if (grabAnimationTime < grabAnimation.duration) {
+            return getFrame(grabAnimation, grabAnimationTime);
+        }
+        if (hero.action === 'walking') {
+            return getFrame(heroCarryAnimations.move[hero.d], hero.animationTime);
+        }
+        return getFrame(heroCarryAnimations.idle[hero.d], hero.animationTime);
     }
     switch (hero.action) {
         case 'usingStaff':
@@ -138,20 +163,27 @@ export function renderHeroBarrier(context: CanvasRenderingContext2D, state: Game
     if (hero.action === 'falling' || hero.action === 'sinkingInLava') {
         return;
     }
-    context.save();
-        if (hero.invulnerableFrames) {
-            context.globalAlpha *= (0.7 + 0.3 * Math.cos(2 * Math.PI * hero.invulnerableFrames * 3 / 50));
+    let frame = getFrame(spiritBarrierAnimation, state.fieldTime);
+    //if (hero.invulnerableFrames) {
+    //    context.globalAlpha *= (0.7 + 0.3 * Math.cos(2 * Math.PI * hero.invulnerableFrames * 3 / 50));
+    //}
+    if (state.hero.magic < 10) {
+        frame = getFrame(spiritBarrierLargeCracksAnimation, state.fieldTime);
+    } else if (state.hero.magic < 15 || state.hero.magic < state.hero.maxMagic * 0.2) {
+        frame = getFrame(spiritBarrierMediumCracksAnimation, state.fieldTime);
+    } else if (state.hero.magic < 20 || state.hero.magic < state.hero.maxMagic * 0.4) {
+        frame = getFrame(spiritBarrierSmallCracksAnimation, state.fieldTime);
+    }
+    if (state.hero.toolOnCooldown === 'cloak') {
+        // Render nothing while the hero is throwing the cape.
+        if (state.hero.toolCooldown > 40) {
+            return;
         }
-        context.beginPath();
-        context.arc(hero.x + hero.w / 2, hero.y + hero.h / 2 - hero.z, 8, 0 , 2 * Math.PI);
-        context.save();
-            context.fillStyle = '#0088FF';
-            context.globalAlpha *= 0.4 + 0.1 * Math.sin(state.time / 200);
-            context.fill();
-        context.restore();
-        context.strokeStyle = '#00FFFF';
-        context.stroke();
-    context.restore();
+        // This is only a single frame currently, we would need to set the animation time correctly
+        // if we want to add multiple frames later.
+        frame = getFrame(spiritBarrierStartAnimation, 0);
+    }
+    drawFrameAt(context, frame, {x: hero.x - 5, y: hero.y - hero.z - 10});
 }
 
 export function renderHeroEyes(context: CanvasRenderingContext2D, state: GameState, hero: Hero) {
@@ -183,8 +215,18 @@ export function renderHeroEyes(context: CanvasRenderingContext2D, state: GameSta
 export function renderCarriedTile(context: CanvasRenderingContext2D, state: GameState, actor: Actor): void {
     const offset = carryMap[actor.d][Math.min(actor.pickUpFrame, carryMap[actor.d].length - 1)];
     const frame = actor.pickUpTile.frame;
+    let yBounce = 0;
+    const grabAnimation = heroCarryAnimations.grab[actor.d];
+    if (actor.pickUpFrame >= grabAnimation.frames.length * grabAnimation.frameDuration && actor.action === 'walking') {
+        // The arms of the MC are higher for 2 frames, then lower for 2 frames, etc.
+        const bounceDuration = 2 * heroCarryAnimations.move.up.frameDuration * FRAME_LENGTH;
+        const frameIndex = (actor.animationTime / bounceDuration) | 0;
+        if (frameIndex % 2 === 1) {
+            yBounce += 1;
+        }
+    }
     drawFrame(context, frame,
-        { x: actor.x + offset.x, y: actor.y + offset.y, w: frame.w, h: frame.h });
+        { x: actor.x + offset.x, y: actor.y + offset.y + yBounce, w: frame.w, h: frame.h });
 }
 
 
@@ -192,6 +234,7 @@ export function renderHeroShadow(context: CanvasRenderingContext2D, state: GameS
     if (hero.wading && !hero.swimming) {
         const frame = getFrame(wadingAnimation, hero.animationTime);
         drawFrameAt(context, frame, { x: hero.x, y: hero.y - hero.z });
+        return;
     }
 
     if (!forceDraw && (

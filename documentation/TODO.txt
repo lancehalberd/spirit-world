@@ -1,6 +1,8 @@
 Test at http://localhost:81/alttp/public/
 
 Known Bugs:
+    - Player is rendered behind ceiling when climbing ladders
+        - Possible solution: render player on foreground layer when climbing ladders.
     - Lightning bug knocked Leon into door and triggered loop in and out of door in war temple.
         - This was the 2f - 3F stair case. I can get him to knock me through the door but I can't reproduce the loop.
     - Clone tool bugs
@@ -38,9 +40,40 @@ Graphics:
     Add damage effects for hitting enemies?
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
-
 Current tasks:
-    - Test Randomizer Updates
+    High Priority Bugs
+        - Disable knockback on most immobile enemies, treants and crystal guardians especially
+        - Fix tiles in no tools cave that let you walk through bushes because of overlap with guard rail tiles
+        - Get Loot effect should render on the HUD and not behind dark filters.
+    Warship
+        - Requires all elements to complete
+        - Fight rival near the start to claim the last element
+        - Possibly flow:
+            Enter throne room of the War Temple in the Spirit World and fight rival, get last element and open tunnel entrance.
+                - This step is only completable after fighting the rival during the 3rd spirit beast battle.
+            Tunnel takes you to the Core(Seed?) of the Vanara Ship, which has the terraforming engine
+            The War God will use the engine to make a breeding ground for his drone soldiers, the MC might use it to synthesize the Vanara and Native life to coexist.
+            Sub goal is to gain the upgraded clone ability, then use it to combine all three elements to continue forward.
+            Sub goal where the seed is activated and grows into a giant tree that reaches into space
+                - Giant tree grows just to the north of the war temple and into the sky, occupying unused spaces in the SE corner of the map.
+                - Climb giant vines in the tree to reach the top
+                - Lower level parts may have parts where you go out and branches so you can see how high up you are getting
+                - Tree is a clone of the helix, but allowed to grow to completion this time.
+            Midboss
+                - All 3 elemental beasts at once with no hearts
+                - Maybe the hearts are present elsewhere so you have to find and destroy the hearts in isolation first then defeat the beasts
+            Tower is a series of 2x2 super tiles with a vine for climbing to the next section that is a tall column on each floor
+                - 1 heart is fond on each of the first 3 floors blocking access to the next floor
+                - 3 elemental beasts are on the 4th floor
+                - Spirit world dungeon only at least for the tower part
+                - Maybe a hybrid section at the top.
+                - Should redesign the helix to have similar structure.
+            Final boss has phases where specific elements are required to damage it.
+            Final boss has phases designed for each tool, but does not require them
+                - Tools can give extra opportunities to damage the boss
+                    - Barrier to reflect projectiles
+                    - Bow to shoot distant weak spots
+                - Tools can make it easier to avoid attacks
 
     - Add Sky Paths for Staff Tower
         - Mountain or Forest path to reach river temple roof (lightning only route)
@@ -80,20 +113,6 @@ Current tasks:
         - Storm Beast can turn into lightning and teleport as a beam sending shockwaves out at both ends.
         - Storm Beast can charge south to exit the battle field
 
-    Warship
-        - Requires all elements to complete
-        - Fight rival near the start to claim the last element
-        - Possibly flow:
-            Enter throne room of the War Temple in the Spirit World and fight rival, get last element and open tunnel entrance
-            Tunnel takes you to the Core(Seed?) of the Vanara Ship, which has the terraforming engine
-            The War God will use the engine to make a breeding ground for his drone soldiers, the MC might use it to synthesize the Vanara and Native life to coexist.
-            Sub goal is to gain the upgraded clone ability, then use it to combine all three elements to continue forward.
-            Final boss has phases where specific elements are required to damage it.
-            Final boss has phases designed for each tool, but does not require them
-                - Tools can give extra opportunities to damage the boss
-                    - Barrier to reflect projectiles
-                    - Bow to shoot distant weak spots
-                - Tools can make it easier to avoid attacks
 
     - Make the staff ground raised, use floorHeight tileBehavior to control minZ+raise the shadow so they don't look like they are floating.
     - Game occasionally plays small bits of music while muted.
