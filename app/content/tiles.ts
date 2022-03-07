@@ -1163,7 +1163,13 @@ addTiles([
     // This is the empty tile.
     singleTileSource('gfx/tiles/bush.png', {defaultLayer: 'field'}, -16),
     singleTileSource('gfx/tiles/bush.png', bushBehavior, 0),
-    singleTileSource('gfx/tiles/cactussheet.png', {...bushBehavior, touchHit: { damage: 1, spiritCloakDamage: 5, }}),
+    singleTileSource('gfx/tiles/cactussheet.png', {
+        ...bushBehavior, touchHit: { 
+            damage: 1, spiritCloakDamage: 5, 
+            hitAllies: true,
+            hitEnemies: true,
+        },
+    }),
     singleTileSource('gfx/tiles/pit.png', pitBehavior),
     singleTileSource('gfx/tiles/thorns.png', thornBehavior),
     singleTileSource('gfx/tiles/rocks.png', lightStoneBehavior),

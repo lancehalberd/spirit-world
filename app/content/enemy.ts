@@ -240,10 +240,22 @@ export class Enemy implements Actor, ObjectInstance {
         // This is actually the number of frames the enemy cannot damage the hero for.
         this.invulnerableFrames = 50;
         this.enemyInvulnerableFrames = 20;
+        let defeated = false;
         if (this.life <= 0 && !this.isImmortal) {
+            defeated = true;
             this.showDeathAnimation(state);
         } else {
             playSound('enemyHit');
+        }
+        if (this.area !== state.areaInstance) {
+            addEffectToArea(state, state.areaInstance, new AnimationEffect({
+                animation: defeated ? enemyDeathAnimation : this.currentAnimation || enemyDeathAnimation,
+                x: this.x,
+                y: this.y,
+                scale: this.scale,
+                alpha: 0.3,
+                ttl: 200,
+            }));
         }
         return true;
     }

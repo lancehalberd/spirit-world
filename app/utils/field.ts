@@ -383,6 +383,19 @@ function distanceToSegment({x, y}, {x1, y1, x2, y2}) {
     }
 }
 
+export function tileHitAppliesToTarget(this: void, state: GameState, hit: HitProperties, target: ObjectInstance | EffectInstance) {
+    // Hits from tiles only apply to enemies if `hitEnemies` is explicitly set to `true`.
+    if (target instanceof Enemy){
+        return hit?.hitEnemies === true;
+    }
+    // Hits from tiles always apply to heroes unless `hitAllies` is explicitly set to `false`.
+    if (target instanceof Hero) {
+        return hit?.hitAllies !== false;
+    }
+    // Hits from tiles only apply to objects if `hitObjects` is explicitly set to `true`.
+    return hit?.hitObjects === true;
+}
+
 export function hitTargets(this: void, state: GameState, area: AreaInstance, hit: HitProperties): HitResult {
     const combinedResult: HitResult = { pierced: true, hitTargets: new Set() };
     let targets: (EffectInstance | ObjectInstance)[] = [];

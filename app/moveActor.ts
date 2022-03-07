@@ -2,7 +2,12 @@ import { uniq } from 'lodash';
 
 import { destroyTile, getAreaSize } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { directionMap, getTileBehaviorsAndObstacles, isPointOpen } from 'app/utils/field';
+import {
+    directionMap,
+    getTileBehaviorsAndObstacles,
+    isPointOpen,
+    tileHitAppliesToTarget,
+} from 'app/utils/field';
 
 import { Actor, Direction, GameState, Hero, MovementProperties } from 'app/types';
 
@@ -158,7 +163,13 @@ function moveActorInDirection(
         const { tileBehavior, objects, tx, ty} = getTileBehaviorsAndObstacles(
             state, actor.area, point, excludedObjects, null, null, direction
         );
-        if (tileBehavior?.solid && (tileBehavior?.touchHit && !tileBehavior?.touchHit?.isGroundHit)) {
+        if (tileBehavior?.solid && (
+                tileBehavior?.touchHit
+                && !tileBehavior.touchHit?.isGroundHit
+                // tile touchHit always applies to
+                && tileHitAppliesToTarget(state, tileBehavior.touchHit, actor)
+            )
+        ) {
             const { returnHit } = actor.onHit?.(state, { ...tileBehavior.touchHit, knockback: {
                 vx: - 4 * (ax - actor.x),
                 vy: - 4 * (ay - actor.y),

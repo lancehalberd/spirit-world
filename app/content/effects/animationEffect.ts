@@ -11,6 +11,7 @@ import {
 interface AnimationProps {
     animation: FrameAnimation
     drawPriority?: DrawPriority
+    alpha?: number
     x?: number
     y?: number
     z?: number
@@ -26,6 +27,7 @@ interface AnimationProps {
 }
 
 export class AnimationEffect implements EffectInstance {
+    alpha = 1
     area: AreaInstance;
     delay: number = 0;
     done = false;
@@ -48,7 +50,7 @@ export class AnimationEffect implements EffectInstance {
     constructor({
         animation, drawPriority = 'background',
         x = 0, y = 0, z = 0, vx = 0, vy = 0, vz = 0, vstep = 0, az = 0,
-        rotation = 0, scale = 1,
+        rotation = 0, scale = 1, alpha = 1,
         ttl, delay = 0
      }: AnimationProps) {
         this.animation = animation;
@@ -64,6 +66,7 @@ export class AnimationEffect implements EffectInstance {
         this.az = az;
         this.rotation = rotation;
         this.scale = scale;
+        this.alpha = alpha;
         this.ttl = ttl;
         this.delay = delay;
         this.behaviors = {};
@@ -97,22 +100,29 @@ export class AnimationEffect implements EffectInstance {
             return;
         }
         const frame = getFrame(this.animation, this.animationTime);
-        if (this.rotation) {
+        if (this.rotation || this.alpha < 1) {
             context.save();
-                context.translate(this.x + frame.w / 2, this.y - this.z + frame.h / 2);
-                context.rotate(this.rotation);
-                drawFrame(context, frame, { ...frame,
-                    x: -frame.w / 2, y: -frame.h / 2,
-                    w: frame.w * this.scale,
-                    h: frame.h * this.scale,
-                });
-            context.restore();
+        }
+        if (this.alpha < 1) {
+            context.globalAlpha *= this.alpha;
+        }
+        if (this.rotation) {
+            context.translate(this.x + frame.w / 2, this.y - this.z + frame.h / 2);
+            context.rotate(this.rotation);
+            drawFrame(context, frame, { ...frame,
+                x: -frame.w / 2, y: -frame.h / 2,
+                w: frame.w * this.scale,
+                h: frame.h * this.scale,
+            });
         } else {
             drawFrame(context, frame, { ...frame,
                 x: this.x, y: this.y - this.z,
                 w: frame.w * this.scale,
                 h: frame.h * this.scale,
             });
+        }
+        if (this.rotation || this.alpha < 1) {
+            context.restore();
         }
     }
 }

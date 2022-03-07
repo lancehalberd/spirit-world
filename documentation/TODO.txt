@@ -3,6 +3,9 @@ Test at http://localhost:81/alttp/public/
 Known Bugs:
     - Player is rendered behind ceiling when climbing ladders
         - Possible solution: render player on foreground layer when climbing ladders.
+    - Enemies hit in the spirit world make noise when taking damage
+        - this might be nice to keep for the cocoon boss
+        - when players can actively hit enemies in the spirit world we should play a sound. For example, hitting an enemy with a linked bush shouldn't be silent.
     - Lightning bug knocked Leon into door and triggered loop in and out of door in war temple.
         - This was the 2f - 3F stair case. I can get him to knock me through the door but I can't reproduce the loop.
     - Clone tool bugs
@@ -41,8 +44,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    High Priority Bugs
-        - Bushes hit grown thorns in cocoon
     - Add text cues for indicators that should stay on the screen until a certain action is completed.
         - Show indicator for opening chest until the player has opened a chest
         - Or we could show indicator on chest when a player is facing the chest from the south on top of them.
