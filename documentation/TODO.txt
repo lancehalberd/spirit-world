@@ -42,8 +42,11 @@ Graphics:
 
 Current tasks:
     High Priority Bugs
-        - Disable knockback on most immobile enemies, treants and crystal guardians especially
-        - Get Loot effect should render on the HUD and not behind dark filters.
+        - Cannot delete saved file locally
+        - Bushes hit grown thorns in cocoon
+    - Add text cues for indicators that should stay on the screen until a certain action is completed.
+        - Show indicator for opening chest until the player has opened a chest
+        - Or we could show indicator on chest when a player is facing the chest from the south on top of them.
     Warship
         - Requires all elements to complete
         - Fight rival near the start to claim the last element

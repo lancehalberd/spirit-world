@@ -108,6 +108,7 @@ enemyDefinitions.climbingBeetle = {
     animations: climbingBeetleAnimations, acceleration: 0.05, life: 2, touchDamage: 1,
     lootTable: simpleLootTable,
     tileBehaviors: {touchHit: { damage: 1}, solid: true},
+    canBeKnockedBack: false,
 };
 enemyDefinitions.beetleHorned = {
     animations: beetleHornedAnimations, life: 3, touchDamage: 1, update: paceAndCharge,
@@ -157,6 +158,7 @@ enemyDefinitions.ent = {
     // The damage from tile behaviors will trigger when the player attempts to move into the same pixel,
     // which is more specific than touch damage on enemies which requires actually being in the same pixel.
     tileBehaviors: {touchHit: { damage: 2}, solid: true},
+    canBeKnockedBack: false,
 };
 
 enemyDefinitions.crystalGuardian = {
@@ -166,6 +168,7 @@ enemyDefinitions.crystalGuardian = {
     },
     animations: entAnimations, aggroRadius: 128,
     life: 8, touchDamage: 2,
+    canBeKnockedBack: false,
     onHit(state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
         // If the shield is up, only fire damage can hurt it.
         if (enemy.params.shieldLife > 0) {
@@ -262,6 +265,7 @@ enemyDefinitions.floorEye = {
     touchDamage: 0,
     life: 4, update: updateFloorEye,
     render: renderUnderTiles,
+    canBeKnockedBack: false,
 };
 function renderUnderTiles(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
     // Render normally while editing.
