@@ -115,10 +115,10 @@ enemyDefinitions.beetleHorned = {
     lootTable: moneyLootTable,
 };
 enemyDefinitions.beetleMini = {
-    animations: beetleMiniAnimations,
-    acceleration: 0.01,
+    animations: beetleMiniAnimations, aggroRadius: 32,
+    acceleration: 0.02,
     speed: 0.8,
-    hasShadow: false, life: 1, touchDamage: 1, update: scurryRandomly,
+    hasShadow: false, life: 1, touchDamage: 1, update: scurryAndChase,
     lootTable: lifeLootTable,
 };
 enemyDefinitions.beetleWinged = {

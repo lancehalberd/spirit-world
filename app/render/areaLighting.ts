@@ -2,8 +2,9 @@ import { Clone } from 'app/content/objects/clone';
 import { editingState } from 'app/development/tileEditor';
 import { createCanvasAndContext } from 'app/dom';
 import {
-    CANVAS_HEIGHT, CANVAS_WIDTH,
+    CANVAS_HEIGHT, CANVAS_WIDTH, FRAME_LENGTH,
 } from 'app/gameConstants';
+import { heroCarryAnimations } from 'app/render/heroAnimations';
 
 import { carryMap, directionMap } from 'app/utils/field';
 
@@ -190,10 +191,22 @@ export function renderAreaLighting(context: CanvasRenderingContext2D, state: Gam
         const behaviors = hero.pickUpTile.behaviors;
         if (behaviors?.brightness) {
             const offset = carryMap[hero.d][Math.min(hero.pickUpFrame, carryMap[hero.d].length - 1)];
+
+            let yBounce = 0;
+            const grabAnimation = heroCarryAnimations.grab[hero.d];
+            if (hero.pickUpFrame >= grabAnimation.frames.length * grabAnimation.frameDuration && hero.action === 'walking') {
+                // The arms of the MC are higher for 2 frames, then lower for 2 frames, etc.
+                const bounceDuration = 2 * heroCarryAnimations.move.up.frameDuration * FRAME_LENGTH;
+                const frameIndex = (hero.animationTime / bounceDuration) | 0;
+                if (frameIndex % 2 === 1) {
+                    yBounce += 1;
+                }
+            }
+
             drawLightGradient(lightingContext,
                 {
                     x: hero.x + offset.x + 8 - state.camera.x + area.cameraOffset.x,
-                    y: hero.y + offset.y + 8 - state.camera.y + area.cameraOffset.y,
+                    y: hero.y + offset.y + 8 - state.camera.y + area.cameraOffset.y + yBounce,
                 },
                 behaviors.brightness, behaviors.lightRadius
             );
