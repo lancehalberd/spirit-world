@@ -74,7 +74,7 @@ export function showMessage(
     setScript(state, message);
 }
 
-export function parseMessage(state: GameState, message: string): Frame[][][] {
+export function parseMessage(state: GameState, message: string, maxWidth = messageWidth): Frame[][][] {
     let pages: Frame[][][] = [];
     let currentPage: Frame[][] = [];
     let row: Frame[] = [];
@@ -104,7 +104,7 @@ export function parseMessage(state: GameState, message: string): Frame[][][] {
                 // Extra character is included here for the space before this word.
                 const addedWidth = stringToken.length * characterWidth + characterWidth;
                 // Wrap to the next line if this string is too long to add to the end of this row.
-                if (row.length && rowWidth + addedWidth > messageWidth) {
+                if (row.length && rowWidth + addedWidth > maxWidth) {
                     nextRow();
                 }
                 // Add a space before the next word if the row isn't empty.
@@ -137,7 +137,7 @@ export function parseMessage(state: GameState, message: string): Frame[][][] {
                 if (rowNeedsSpace) {
                     tokenWidth += characterWidth;
                 }
-                if (rowWidth + tokenWidth > messageWidth) {
+                if (rowWidth + tokenWidth > maxWidth) {
                     nextRow();
                 }
                 if (row.length && rowNeedsSpace) {

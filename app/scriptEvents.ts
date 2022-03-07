@@ -1,4 +1,10 @@
-import { enterLocation, refreshAreaLogic } from 'app/content/areas';
+import {
+    addEffectToArea,
+    enterLocation,
+    removeEffectFromArea,
+    refreshAreaLogic,
+} from 'app/content/areas';
+import { TextCue } from 'app/content/effects/textCue';
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 import { getLoot } from 'app/content/objects/lootObject';
 import { getLootTypes } from 'app/development/objectEditor';
@@ -107,6 +113,15 @@ export function parseEventScript(state: GameState, script: string): ScriptEvent[
         if (actionToken.startsWith('stopScreenShake:')) {
             const id = actionToken.substring('stopScreenShake:'.length);
             events.push({ type: 'stopScreenShake', id });
+            continue;
+        }
+        if (actionToken.startsWith('addCue:')) {
+            const text = actionToken.substring('addCue:'.length);
+            events.push({ type: 'addTextCue', text });
+            continue;
+        }
+        if (actionToken === 'removeCue') {
+            events.push({ type: 'removeTextCue' });
             continue;
         }
         if (actionToken.startsWith('choice:')) {
@@ -296,7 +311,7 @@ export const updateScriptEvents = (state: GameState): void => {
                     id: event.id,
                 });
                 return;
-            case 'stopScreenShake':
+            case 'stopScreenShake': {
                 const index = state.screenShakes.findIndex(screenShake => screenShake.id === event.id);
                 if (index >= 0) {
                     state.screenShakes.splice(index, 1);
@@ -304,6 +319,30 @@ export const updateScriptEvents = (state: GameState): void => {
                     console.error(`screenShake id not found: ${event.id}`, state.screenShakes);
                 }
                 return;
+            }
+            case 'addTextCue': {
+                // Remove any existing cues from the screen, the HUD only supports one at a time.
+                const effect = state.areaInstance.effects.find(
+                    effect => effect instanceof TextCue
+                );
+                if (effect) {
+                    removeEffectFromArea(state, effect);
+                }
+                addEffectToArea(state, state.areaInstance, new TextCue(state, {
+                    duration: 0,
+                    text: event.text,
+                }));
+                return;
+            }
+            case 'removeTextCue': {
+                const effect = state.areaInstance.effects.find(
+                    effect => effect instanceof TextCue
+                );
+                if (effect) {
+                    removeEffectFromArea(state, effect);
+                }
+                return;
+            }
             case 'showChoiceBox':
                 state.scriptEvents.activeEvents.push({
                     ...event,

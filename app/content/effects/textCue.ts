@@ -1,14 +1,15 @@
 import { removeEffectFromArea } from 'app/content/areas';
-import { CANVAS_HEIGHT, FRAME_LENGTH } from 'app/gameConstants';
+import { CANVAS_HEIGHT, CANVAS_WIDTH, FRAME_LENGTH } from 'app/gameConstants';
+import { parseMessage } from 'app/render/renderMessage';
 import { drawFrame } from 'app/utils/animations';
-import { characterMap } from 'app/utils/simpleWhiteFont';
 
 import {
-    AreaInstance, DrawPriority, EffectInstance, GameState, TileBehaviors,
+    AreaInstance, DrawPriority, EffectInstance, Frame, GameState, TileBehaviors,
 } from 'app/types';
 
 const characterWidth = 8;
 const fadeDuration = 400;
+const padding = 20;
 
 interface TextCueProps {
     text: string
@@ -23,16 +24,17 @@ export class TextCue implements EffectInstance {
     isEffect = <const>true;
     x: number;
     y: number;
-    text: string;
+    textFrames: Frame[][];
     time: number = 0;
     duration: number;
-    constructor({ duration = 3000, text }: TextCueProps) {
-        this.text = text;
+    constructor(state, { duration = 3000, text }: TextCueProps) {
+        // TextCue only supports a single page of messages.
+        this.textFrames = parseMessage(state, text, CANVAS_WIDTH - 2 * padding)[0];
         this.duration = duration;
     }
     update(state: GameState) {
         this.time += FRAME_LENGTH;
-        if (this.time >= this.duration) {
+        if (this.duration && this.time >= this.duration) {
             this.done = true;
             removeEffectFromArea(state, this);
         }
@@ -41,20 +43,23 @@ export class TextCue implements EffectInstance {
         context.save();
             if (this.time < fadeDuration) {
                 context.globalAlpha = Math.min(1, this.time / fadeDuration);
-            } else if (this.time > this.duration - fadeDuration) {
+            } else if (this.duration > 0 && this.time > this.duration - fadeDuration) {
                 context.globalAlpha = Math.max(0, (this.duration - this.time) / fadeDuration);
             }
-            let x = 20, y = CANVAS_HEIGHT - 24;
-            for (const c of this.text) {
-                const frame = characterMap[c];
-                if (!frame) {
-                    x += characterWidth;
-                    continue;
+            let x = padding, y = CANVAS_HEIGHT - 24 - (this.textFrames.length - 1) * 16;
+            for (const frameRow of this.textFrames) {
+                for (const frame of frameRow) {
+                    if (!frame) {
+                        x += characterWidth;
+                        continue;
+                    }
+                    drawFrame(context, frame, {
+                        x: x - (frame.content?.x || 0),
+                        y: y - (frame.content?.y || 0), w: frame.w, h: frame.h});
+                    x += frame.w;
                 }
-                drawFrame(context, frame, {
-                    x: x - (frame.content?.x || 0),
-                    y: y - (frame.content?.y || 0), w: frame.w, h: frame.h});
-                x += frame.w;
+                y += 16;
+                x = padding;
             }
         context.restore();
     }

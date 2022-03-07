@@ -12,7 +12,7 @@ import { rectanglesOverlap } from 'app/utils/index';
 import { playSound } from 'app/musicController';
 
 import {
-    ActiveTool, AreaInstance, BossObjectDefinition, DialogueLootDefinition, DrawPriority,
+    ActiveTool, AreaInstance, BossObjectDefinition, DialogueLootDefinition,
     DungeonInventory, EffectInstance, Frame, FrameDimensions, GameState, LootObjectDefinition,
     LootTable, LootType, ObjectInstance, ObjectStatus, Rect, TileBehaviors,
 } from 'app/types';
@@ -45,7 +45,11 @@ export function dropItemFromTable(state: GameState, area: AreaInstance, lootTabl
 
 export class LootGetAnimation implements EffectInstance {
     definition = null;
-    drawPriority: DrawPriority = 'hud';
+    behaviors = {
+        solid: true,
+        brightness: 1,
+        lightRadius: 16,
+    };
     frame: Frame;
     loot: LootObjectDefinition | BossObjectDefinition | DialogueLootDefinition;
     animationTime: number = 0;
@@ -70,6 +74,9 @@ export class LootGetAnimation implements EffectInstance {
             this.y = hero.y - 4;
         }
         this.z = 8;
+    }
+    getHitbox(state: GameState) {
+        return { x: this.x, y: this.y - this.z, w: 16, h: 16};
     }
     update(state: GameState) {
         if (this.z < 20) {

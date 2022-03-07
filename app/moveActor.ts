@@ -239,6 +239,7 @@ function moveActorInDirection(
             }
         }
     }
+    canJumpDown = canJumpDown && !blockedByObject;
     pushedObjects = uniq(pushedObjects);
     if (canPush && (blockedByTile || pushedObjects.length) && (!actor.action || actor.action === 'walking' || actor.action === 'pushing')) {
         if (!canJumpDown && actor.action !== 'pushing') {

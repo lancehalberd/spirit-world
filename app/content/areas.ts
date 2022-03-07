@@ -395,7 +395,7 @@ export function enterZoneByTarget(
                                 // Technically this could also be a MarkerDefinition.
                                 const definition = target.definition as EntranceDefinition;
                                 if (definition.locationCue) {
-                                    const textCue = new TextCue({ text: definition.locationCue});
+                                    const textCue = new TextCue(state, { text: definition.locationCue});
                                     addEffectToArea(state, state.areaInstance, textCue);
                                 }
                                 callback?.();

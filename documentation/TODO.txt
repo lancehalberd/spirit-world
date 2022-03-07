@@ -44,9 +44,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Add text cues for indicators that should stay on the screen until a certain action is completed.
-        - Show indicator for opening chest until the player has opened a chest
-        - Or we could show indicator on chest when a player is facing the chest from the south on top of them.
     Warship
         - Requires all elements to complete
         - Fight rival near the start to claim the last element

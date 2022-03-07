@@ -360,7 +360,7 @@ const f0_0x0: AreaDefinition = {
         {id: "", linked: false, spirit: false, status: "closedEnemy", x: 48, y: 240, type: "door", d: "down", style: "cavern"},
         {status: "normal", id: "peachCaveSprout1", x: 320, y: 128, type: "vineSprout", customLogic: "peachCave:boss", invertLogic: true},
         {status: "normal", id: "thornsInstructions", x: 112, y: 352, type: "narration", message: "", w: 32, h: 144},
-        {status: "normal", id: "chestInstructions", x: 64, y: 208, type: "narration", message: "Hey, a chest!\n{|}Maybe it has something in it that will help.\n{|}(Approach a chest from the south and press [B_PASSIVE] to open it)", w: 32, h: 32},
+        {status: "normal", id: "hideChestInstructions", x: 176, y: 96, type: "narration", message: "{removeCue}", w: 16, h: 16, logicKey: "hasWeapon"},
         {status: "normal", id: "exploreInstructions", x: 320, y: 320, type: "narration", message: "That bug on the vine doesn't look friendly.\n{|}I won't be able to climb with it in the way.\n{|}(Explore the cave to find something to remove the beetle.)", w: 48, h: 32, hasCustomLogic: true, customLogic: "$weapon", invertLogic: true},
         {status: "normal", id: "thornsInstructions", x: 224, y: 448, type: "narration", message: "I don't like the look of those thorns...\n{|}Maybe I can find another way?", w: 32, h: 48, delay: 500},
         {status: "normal", id: "cliffInstructions", x: 224, y: 368, type: "narration", message: "It looks like I could jump down over there.\n{|}(Hold [B_LEFT] against the ledge to jump down.)", w: 32, h: 48, delay: 500},
@@ -369,6 +369,7 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 448, y: 368, type: "spawnMarker"},
         {status: "normal", id: "", x: 432, y: 240, type: "spawnMarker"},
         {status: "normal", id: "peachCave-climber2", x: 464, y: 144, type: "enemy", enemyType: "climbingBeetle", d: "down", params: {}},
+        {status: "normal", id: "chestInstructions", x: 64, y: 208, type: "narration", message: "Hey, a chest!\n{|}Maybe it has something in it that will help.\n{addCue:Approach a chest from the south and press [B_PASSIVE] to open it}", w: 32, h: 32},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},

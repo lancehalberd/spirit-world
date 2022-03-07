@@ -88,14 +88,25 @@ export interface EnterLocationScriptEvent {
     location: ZoneLocation
 }
 
+export interface AddTextCueScriptEvent {
+    type: 'addTextCue'
+    text: string
+}
+
+export interface RemoveTextCueScriptEvent {
+    type: 'removeTextCue'
+}
+
 export type ScriptEvent
-    = AttemptPurchaseScriptEvent
+    = AddTextCueScriptEvent
+    | AttemptPurchaseScriptEvent
     | ClearFlagScriptEvent
     | ClearTextBoxScriptEvent
     | EnterLocationScriptEvent
     | GainLootScriptEvent
     | PlaySoundScriptEvent
     | RefreshAreaLogicScriptEvent
+    | RemoveTextCueScriptEvent
     | RestScriptEvent
     | RunDialogueScriptScriptEvent
     | ScreenShakeScriptEvent

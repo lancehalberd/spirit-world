@@ -628,7 +628,7 @@ const f0_1x1: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "warTempleMainEntrance", x: 240, y: 480, type: "door", style: "cave", targetZone: "overworld", targetObjectId: "warTempleEntrance", d: "down", linked: true},
+        {status: "normal", id: "warTempleMainEntrance", x: 240, y: 480, type: "door", style: "cave", targetZone: "overworld", targetObjectId: "warTempleEntrance", d: "down", linked: true, locationCue: "War Temple 1F"},
         {status: "normal", id: "warTemple:0:1x1-door-0", x: 480, y: 368, type: "door", style: "cave", d: "right"},
         {status: "normal", id: "warTemple:0:1x1-sign-0", x: 240, y: 320, style: "short", type: "sign", message: "Conquer or be conquered"},
         {status: "normal", id: "warTemple:0:1x1-sign-1", x: 128, y: 416, style: "short", type: "sign", message: "The Purifying Flame"},
