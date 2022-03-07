@@ -356,7 +356,7 @@ const f0_0x0: AreaDefinition = {
         {id: "peachCave-beetle1", linked: false, spirit: false, status: "normal", x: 448, y: 224, type: "enemy", enemyType: "beetle"},
         {id: "peachCave:0:0x0-money-0", linked: false, spirit: false, status: "normal", x: 464, y: 352, type: "chest", lootType: "money", lootLevel: 0, lootAmount: 50},
         {status: "normal", id: "peachCave-climber1", x: 336, y: 304, type: "enemy", enemyType: "climbingBeetle", d: "down", params: {}},
-        {status: "normal", id: "", x: 304, y: 192, type: "enemy", enemyType: "climbingBeetle", d: "down", params: {}},
+        {status: "normal", id: "peachCave-climber3", x: 304, y: 192, type: "enemy", enemyType: "climbingBeetle", d: "down", params: {}},
         {id: "", linked: false, spirit: false, status: "closedEnemy", x: 48, y: 240, type: "door", d: "down", style: "cavern"},
         {status: "normal", id: "peachCaveSprout1", x: 320, y: 128, type: "vineSprout", customLogic: "peachCave:boss", invertLogic: true},
         {status: "normal", id: "thornsInstructions", x: 112, y: 352, type: "narration", message: "", w: 32, h: 144},
