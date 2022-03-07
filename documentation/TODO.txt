@@ -42,7 +42,6 @@ Graphics:
 
 Current tasks:
     High Priority Bugs
-        - Cannot delete saved file locally
         - Bushes hit grown thorns in cocoon
     - Add text cues for indicators that should stay on the screen until a certain action is completed.
         - Show indicator for opening chest until the player has opened a chest

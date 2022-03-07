@@ -65,15 +65,17 @@ export function saveGame(): void {
     //    state.savedGames[state.savedGameIndex] = state.savedState;
     //}
     state.savedGames[state.savedGameIndex] = state.savedState;
-    const seed = state.randomizer?.seed || 0;
     // console.log(exportState(getState()));
+    saveGamesToLocalStorage();
+}
+export function saveGamesToLocalStorage(): void {
     try {
+        const seed = state.randomizer?.seed || 0;
         window.localStorage.setItem('savedGames' + (seed || ''), JSON.stringify(state.savedGames));
     } catch (e) {
         console.error(e);
         debugger;
     }
-
 }
 export function saveSettings(state: GameState) {
     window.localStorage.setItem('settings', JSON.stringify(state.settings));

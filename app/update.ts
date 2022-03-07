@@ -21,6 +21,7 @@ import {
     getTitleOptions,
     returnToSpawnLocation,
     saveGame,
+    saveGamesToLocalStorage,
     selectSaveFile,
     setSaveFileToState,
     showHint,
@@ -108,7 +109,7 @@ function updateTitle(state: GameState) {
             case 'deleteSavedGameConfirmation':
                 if (state.menuIndex === 1) {
                     state.savedGames[state.savedGameIndex] = null;
-                    saveGame();
+                    saveGamesToLocalStorage();
                 }
                 state.scene = 'title';
                 state.menuIndex = state.savedGameIndex;
