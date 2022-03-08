@@ -160,6 +160,8 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         return;
     }
     if (hero.action === 'grabbing') {
+        hero.z = minZ;
+        hero.slipping = false;
         hero.vx = 0;
         hero.vy = 0;
         if (hero.grabObject && hero.grabObject.area !== hero.area) {

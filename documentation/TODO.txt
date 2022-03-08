@@ -44,8 +44,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Pulling pots while wearing cloud walking boots is bugged
-        - Force the player to be at minZ level when pulling pot
     - Screen shakes too much when defeating a boss
         - probably because the get item has priority and doesn't run the screen shake removal code.
     - Fix respawn points in outside of forest temple
