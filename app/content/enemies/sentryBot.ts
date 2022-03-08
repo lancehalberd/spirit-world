@@ -55,6 +55,8 @@ function getEndOfLineOfSight(state: GameState, enemy: Enemy, tx: number, ty: num
     return {x: tx, y: ty, mag};
 }
 
+const chargeTime = 400;
+
 enemyDefinitions.sentryBot = {
     animations: sentryBotAnimations,
     flying: false, acceleration: 0.2, aggroRadius: 112, speed: 2,
@@ -83,7 +85,6 @@ enemyDefinitions.sentryBot = {
                     enemy.setMode('fireLaser');
             }
         } else if (enemy.mode === 'fireLaser') {
-            const chargeTime = enemy.params.lasersLeft === 3 ? 500 : 300;
             const hitbox = enemy.getHitbox(state);
             if (enemy.modeTime === chargeTime - 180) {
                 const cx = hitbox.x + hitbox.w / 2;
@@ -126,14 +127,13 @@ enemyDefinitions.sentryBot = {
         }
         if (enemy.mode === 'prepareLaser') {
             const {x, y} = getEndOfLineOfSight(state, enemy, enemy.params.targetX, enemy.params.targetY);
-            drawTargetingLine(context, state, enemy, x,  y);
+            drawTargetingLine(context, state, enemy, x,  y, 'yellow');
         } else if (enemy.mode === 'fireLaser') {
             const {x, y, mag} = getEndOfLineOfSight(state, enemy, enemy.params.targetX, enemy.params.targetY);
             const cx = (hitbox.x + hitbox.w / 2) | 0;
             const cy = (hitbox.y + hitbox.h / 2) | 0;
-            const chargeTime = enemy.params.lasersLeft === 3 ? 500 : 300;
             if (enemy.modeTime < chargeTime - 240) {
-                drawTargetingLine(context, state, enemy, x, y);
+                drawTargetingLine(context, state, enemy, x, y, 'red');
             } else {
                 context.save();
                     const laserFadeTime = enemy.modeTime - (chargeTime - 180);
@@ -171,14 +171,17 @@ enemyDefinitions.sentryBot = {
     },
 };
 
-function drawTargetingLine(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy, targetX: number, targetY: number): void {
+function drawTargetingLine(
+    context: CanvasRenderingContext2D, state: GameState,
+    enemy: Enemy, targetX: number, targetY: number, color: string
+): void {
     const hitbox = enemy.getHitbox(state);
     const cx = (hitbox.x + hitbox.w / 2) | 0;
     const cy = (hitbox.y + hitbox.h / 2) | 0;
     context.save();
         // Indicator of where the attack will hit.
         context.globalAlpha *= 0.7;
-        context.strokeStyle = 'red';
+        context.strokeStyle = color;
         context.beginPath();
         context.moveTo(cx, cy);
         context.lineTo(targetX, targetY);
