@@ -118,9 +118,16 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 isSpiritWorld: state.location.isSpiritWorld,
             }, false, () => {
                 hero.action = 'knocked';
+                const { section } = getAreaSize(state);
                 let best: ObjectInstance = null, bestDistance: number;
                 for (const object of state.areaInstance.objects) {
                     if (object.definition?.type !== 'spawnMarker') {
+                        continue;
+                    }
+                    // Only consider markers in the current section.
+                    if (object.x < section.x || object.x > section.x + section.w ||
+                        object.y < section.y || object.y > section.y + section.h
+                    ) {
                         continue;
                     }
                     const { mag } = getVectorToTarget(state, object, hero);
