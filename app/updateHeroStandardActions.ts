@@ -606,7 +606,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             hero.equipedGear.ironBoots = !hero.equipedGear.ironBoots;
         }
     } else if (wasGameKeyPressed(state, GAME_KEY.MEDITATE)
-        && !isActionBlocked && hero.passiveTools.spiritSight
+        && !isActionBlocked && (hero.passiveTools.spiritSight || hero.clones.length)
         && !heldChakram && !hero.chargingLeftTool && !hero.chargingRightTool
     ) {
         hero.action = 'meditating';

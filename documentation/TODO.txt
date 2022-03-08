@@ -44,6 +44,20 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Add target landing locations when falling from sky (also apply to the forest temple pits).
+    - Add door cues to the Vanara Tomb
+    - Bow takes extra mana with equipped element even while not charged
+    - Pulling pots while wearing cloud walking boots is bugged
+        - Force the player to be at minZ level when pulling pot
+    - Screen shakes too much when defeating a boss
+        - probably because the get item has priority and doesn't run the screen shake removal code.
+    - Fix respawn points in outside of forest temple
+    - Fix dying in first tower room does not revive you in the tower.
+    - Discharge should move with enemies if they move (such as knocking back robots).
+    - Prevent pausing when dialogue is open.
+    - Incorrect cue for 4f tower material/spirit entrance.
+    - Fix timing of robot sentry
+        - add yellow targeting laser for longer part of first laser.
     Warship
         - Requires all elements to complete
         - Fight rival near the start to claim the last element
@@ -76,7 +90,8 @@ Current tasks:
 
     - Add Sky Paths for Staff Tower
         - Mountain or Forest path to reach river temple roof (lightning only route)
-        - Mountain -> River Temple path that is blocked by defeating the flame beast
+        - Mountain -> River Temple
+            - Once we add landing points this will fix the bug with landing on top of the door
         - Forest Path to Sky Palace entrance (Add Sky palace stub with roll 2 + nimbus cloud)
             - Implement roll 2, just roll again while rolling, double speed / teleport then regular roll (with poof effects from staff)
             - Implement nimbus cloud using spawn points + script events choice mechanic for now
@@ -129,7 +144,6 @@ Current tasks:
         - Support `entrances` instead of `entranceIds` on randomizer logic to include logic on entrances, for example, adding logic for whether entrances to sky areas is possible from the staff tower.
             - For now we can add a path from the ground to the sky based on logic: canAquireTowerStaff.
 
-    - Add target landing locations when falling from sky (also apply to the forest temple pits).
     - Add new hold+walk chakram animations
         - play last 2 frames of attack animation on release.
 
