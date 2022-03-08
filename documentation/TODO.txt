@@ -44,10 +44,8 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Fix dying in first tower room does not revive you in the tower.
     - Discharge should move with enemies if they move (such as knocking back robots).
     - Prevent pausing when dialogue is open.
-    - Incorrect cue for 4f tower material/spirit entrance.
     - Fix timing of robot sentry
         - add yellow targeting laser for longer part of first laser.
     - Add target landing locations when falling from sky (also apply to the forest temple pits).
@@ -150,6 +148,10 @@ Staff Improvements:
 
 Throwing an object into a pit should make use the pit animation rather than breaking.
 
+Respawn improvements:
+    Only adjust respawn when in the same screen area as the spawn point.
+    Or possibly only adjust respawn when using specific doors.
+        Map dungeon entrances to respawn points?
 
 Tutorial Improvements:
     - chest instructions are lost if you exit without obtaining the chakram.

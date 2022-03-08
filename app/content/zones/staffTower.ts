@@ -2278,7 +2278,7 @@ const f2_1x0: AreaDefinition = {
     ],
     objects: [
         {status: "normal", id: "staffTower4F5F", x: 192, y: 32, type: "door", style: "woodenUpstairs", targetZone: "staffTower", targetObjectId: "staffTower4F5F", d: "up", locationCue: "Tower 4F"},
-        {status: "closedSwitch", id: "staffTowerSkyEntrance", x: 224, y: 496, type: "door", style: "wooden", targetZone: "sky", targetObjectId: "staffTowerSkyEntrance", d: "down", locationCue: "Tower 1F", saveStatus: "forever"},
+        {status: "closedSwitch", id: "staffTowerSkyEntrance", x: 224, y: 496, type: "door", style: "wooden", targetZone: "sky", targetObjectId: "staffTowerSkyEntrance", d: "down", locationCue: "Tower 4F", saveStatus: "forever"},
         {status: "normal", id: "", x: 208, y: 480, targetObjectId: "staffTowerSkyEntrance", type: "floorSwitch"},
         {status: "normal", id: "", specialBehaviorKey: "towerTeleporter", x: 160, y: 80, style: "displayScreen", type: "sign", message: ""},
     ],
@@ -2741,7 +2741,7 @@ const sf2_1x0: AreaDefinition = {
     objects: [
         {status: "closed", id: "elevatorDoor4", x: 240, y: 416, type: "door", style: "wooden", targetZone: "staffTower", targetObjectId: "elevatorDoor", d: "up", specialBehaviorKey: "elevatorDoor", locationCue: "Tower 4F"},
         {status: "normal", id: "staffTower3F4F", x: 288, y: 32, type: "door", style: "woodenDownstairs", targetZone: "staffTower", targetObjectId: "staffTower3F4F", d: "up", locationCue: "Tower 4F"},
-        {status: "normal", id: "staffTowerSpiritSkyEntrance", x: 224, y: 496, type: "door", style: "wooden", targetZone: "sky", targetObjectId: "staffTowerSpiritSkyEntrance", d: "down", locationCue: "Tower 1F", saveStatus: "forever"},
+        {status: "normal", id: "staffTowerSpiritSkyEntrance", x: 224, y: 496, type: "door", style: "wooden", targetZone: "sky", targetObjectId: "staffTowerSpiritSkyEntrance", d: "down", locationCue: "Tower 4F", saveStatus: "forever"},
         {status: "normal", id: "", specialBehaviorKey: "towerTeleporter", x: 336, y: 80, style: "displayScreen", type: "sign", message: ""},
         {status: "normal", id: "staffTower:s2:0x1-sentryBot-0", x: 240, y: 208, type: "enemy", enemyType: "sentryBot", d: "down", params: {}, saveStatus: "forever"},
     ],
