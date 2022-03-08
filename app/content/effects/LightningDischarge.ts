@@ -43,6 +43,11 @@ export class LightningDischarge implements EffectInstance {
                 return;
             }
         }
+        if (this.source) {
+            const enemyHitbox = this.source.getHitbox(state);
+            this.x = enemyHitbox.x + enemyHitbox.w / 2;
+            this.y = enemyHitbox.y + enemyHitbox.h / 2;
+        }
         if (this.animationTime >= this.tellDuration) {
             const sparkCount = this.radius / 8;
             for (let i = 0; i < sparkCount; i++) {

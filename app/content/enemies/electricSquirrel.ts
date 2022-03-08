@@ -31,8 +31,8 @@ function jumpTowardsPoint(state: GameState, enemy: Enemy, {x: tx, y: ty}, radius
         enemy.vy = maxJumpSpeed * enemy.vy / mag;
     }
     enemy.setMode('jumping');
-    enemy.params.discharge = new LightningDischarge({x, y, radius, damage: 4, source: enemy, tellDuration: 20 * duration});
-    addEffectToArea(state, enemy.area, enemy.params.discharge);
+    const discharge = new LightningDischarge({x, y, radius, damage: 4, source: enemy, tellDuration: 20 * duration});
+    addEffectToArea(state, enemy.area, discharge);
 }
 
 const touchHit: HitProperties = { damage: 4, element: 'lightning'};
@@ -128,15 +128,9 @@ enemyDefinitions.electricSquirrel = {
             }
             enemy.z += enemy.vz;
             enemy.vz = Math.max(-8, enemy.vz - 0.2);
-            if (enemy.params.discharge) {
-                const enemyHitbox = enemy.getHitbox(state);
-                enemy.params.discharge.x = enemyHitbox.x + enemyHitbox.w / 2;
-                enemy.params.discharge.y = enemyHitbox.y + enemyHitbox.h / 2;
-            }
             if (enemy.z <= 0) {
                 enemy.z = 0;
                 enemy.setMode('recover');
-                enemy.params.discharge = null;
             }
         } else if (enemy.mode === 'recover') {
             if (enemy.modeTime >= 500) {
@@ -229,15 +223,9 @@ enemyDefinitions.superSquirrel = {
             }
             enemy.z += enemy.vz;
             enemy.vz = Math.max(-8, enemy.vz - 0.2);
-            if (enemy.params.discharge) {
-                const enemyHitbox = enemy.getHitbox(state);
-                enemy.params.discharge.x = enemyHitbox.x + enemyHitbox.w / 2;
-                enemy.params.discharge.y = enemyHitbox.y + enemyHitbox.h / 2;
-            }
             if (enemy.z <= 0) {
                 enemy.z = 0;
                 enemy.setMode('recover');
-                enemy.params.discharge = null;
             }
         } else if (enemy.mode === 'recover') {
             if (enemy.modeTime >= 500) {

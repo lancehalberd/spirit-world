@@ -44,7 +44,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Discharge should move with enemies if they move (such as knocking back robots).
     - Prevent pausing when dialogue is open.
     - Fix timing of robot sentry
         - add yellow targeting laser for longer part of first laser.
