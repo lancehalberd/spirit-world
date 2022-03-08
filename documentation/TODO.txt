@@ -44,8 +44,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Add target landing locations when falling from sky (also apply to the forest temple pits).
-    - Add door cues to the Vanara Tomb
     - Bow takes extra mana with equipped element even while not charged
     - Pulling pots while wearing cloud walking boots is bugged
         - Force the player to be at minZ level when pulling pot
@@ -58,6 +56,8 @@ Current tasks:
     - Incorrect cue for 4f tower material/spirit entrance.
     - Fix timing of robot sentry
         - add yellow targeting laser for longer part of first laser.
+    - Add target landing locations when falling from sky (also apply to the forest temple pits).
+
     Warship
         - Requires all elements to complete
         - Fight rival near the start to claim the last element
