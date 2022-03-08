@@ -35,7 +35,7 @@ export class Marker implements ObjectInstance {
                 const { mag } = getVectorToTarget(state, this, primaryHero);
                 const dx = primaryHero.x - primaryHero.safeX;
                 const dy = primaryHero.y - primaryHero.safeY;
-                if (mag < 20 && dx * dx + dy * dy >= mag * mag) {
+                if (mag < 24 && dx * dx + dy * dy >= mag * mag) {
                     // This is simplified becuase marker+hero have the same size hitbox.
                     // Would have to adjust if that changes in the future.
                     primaryHero.safeX = this.x;
