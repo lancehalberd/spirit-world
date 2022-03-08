@@ -1,4 +1,5 @@
 import { addObjectToArea, enterLocation, getAreaSize, playAreaSound, refreshAreaLogic } from 'app/content/areas';
+import { getVectorToTarget } from 'app/content/enemies';
 import { Door } from 'app/content/objects/door';
 import { Staff } from 'app/content/objects/staff';
 import { CANVAS_HEIGHT, FALLING_HEIGHT, FRAME_LENGTH } from 'app/gameConstants';
@@ -7,6 +8,7 @@ import { getCloneMovementDeltas } from 'app/keyCommands';
 import { checkForFloorEffects, moveActor } from 'app/moveActor';
 import { fallAnimation, heroAnimations } from 'app/render/heroAnimations';
 import { saveGame } from 'app/state';
+import { updateCamera } from 'app/updateCamera';
 import { isUnderwater } from 'app/utils/actor';
 import { directionMap, getDirection, getTileBehaviorsAndObstacles, hitTargets } from 'app/utils/field';
 import { boxesIntersect, isObjectInsideTarget, pad } from 'app/utils/index';
@@ -116,6 +118,22 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 isSpiritWorld: state.location.isSpiritWorld,
             }, false, () => {
                 hero.action = 'knocked';
+                let best: ObjectInstance = null, bestDistance: number;
+                for (const object of state.areaInstance.objects) {
+                    if (object.definition?.type !== 'spawnMarker') {
+                        continue;
+                    }
+                    const { mag } = getVectorToTarget(state, object, hero);
+                    if (!best || mag < bestDistance) {
+                        best = object;
+                        bestDistance = mag;
+                    }
+                }
+                if (best) {
+                    hero.x = best.x;
+                    hero.y = best.y;
+                    updateCamera(state, 512);
+                }
             });
             return true;
         }
