@@ -44,7 +44,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Prevent pausing when dialogue is open.
     - Fix timing of robot sentry
         - add yellow targeting laser for longer part of first laser.
     - Add target landing locations when falling from sky (also apply to the forest temple pits).

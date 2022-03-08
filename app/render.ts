@@ -118,6 +118,9 @@ export function render() {
     if (state.transitionState && !state.areaInstance?.priorityObjects?.length) {
         renderTransition(context, state);
         renderHUD(context, state);
+        if (state.paused && !state.hideMenu) {
+            renderMenu(context, state);
+        }
         return;
     }
     if (state.scene === 'title' || state.scene === 'chooseGameMode' ||
