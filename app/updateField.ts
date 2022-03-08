@@ -25,6 +25,14 @@ export function updateField(this: void, state: GameState) {
         return;
     }
     state.fieldTime += FRAME_LENGTH;
+    // Remove completed screenshakes. If this is not checked each time the fieldTime is advanced
+    // then the shakes will appear to oscillate out of control when fieldTime exceeds their endTime.
+    for (let i = 0; i < state.screenShakes.length; i++) {
+        const endTime = state.screenShakes[i].endTime;
+        if (endTime && state.fieldTime >= endTime) {
+            state.screenShakes.splice(i--, 1);
+        }
+    }
     const targetFadeLevel = Math.max(state.areaInstance.dark || 0, state.nextAreaInstance?.dark || 0) / 100;
     if (state.fadeLevel < targetFadeLevel) {
         state.fadeLevel = Math.min(state.fadeLevel + 0.05, targetFadeLevel);
@@ -63,13 +71,6 @@ export function updateField(this: void, state: GameState) {
         updateAreaObjects(state, state.nextAreaInstance);
     }
     updateAreaObjects(state, state.alternateAreaInstance);
-    // Remove completed screenshakes.
-    for (let i = 0; i < state.screenShakes.length; i++) {
-        const endTime = state.screenShakes[i].endTime;
-        if (endTime && state.fieldTime >= endTime) {
-            state.screenShakes.splice(i--, 1);
-        }
-    }
 }
 export function updateAreaObjects(this: void, state: GameState, area: AreaInstance) {
     const isScreenTransitioning = state.nextAreaInstance || state.nextAreaSection;

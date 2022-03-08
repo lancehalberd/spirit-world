@@ -44,8 +44,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Screen shakes too much when defeating a boss
-        - probably because the get item has priority and doesn't run the screen shake removal code.
     - Fix respawn points in outside of forest temple
     - Fix dying in first tower room does not revive you in the tower.
     - Discharge should move with enemies if they move (such as knocking back robots).
