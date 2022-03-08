@@ -46,7 +46,7 @@ export function useTool(
                 speed = 6;
                 state.hero.magic -= 5;
             }
-            if (state.hero.element) {
+            if (state.hero.element && chargeLevel > 0) {
                 state.hero.magic -= 10;
             }
             hero.toolOnCooldown = 'bow';
