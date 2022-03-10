@@ -1,6 +1,8 @@
 Test at http://localhost:81/alttp/public/
 
 Known Bugs:
+    - Teleporting while grabbing a pot with astral projection can make you face south but still be grabbing the pot
+        - Probably stop grabbing with projection when teleporting.
     - Player is rendered behind ceiling when climbing ladders
         - Possible solution: render player on foreground layer when climbing ladders.
     - Enemies hit in the spirit world make noise when taking damage
@@ -44,8 +46,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Investigate cache busting strategies for the demo.
-
     Warship
         - Requires all elements to complete
         - Fight rival near the start to claim the last element

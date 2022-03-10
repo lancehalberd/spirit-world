@@ -1,10 +1,12 @@
 
 export const images: {[key: string]: HTMLImageElement & { originalSource?: string}} = {};
 
+const version = window.version;
+
 function loadImage(source, callback) {
     images[source] = new Image();
     images[source].onload = () => callback();
-    images[source].src = source;
+    images[source].src = `${source}?v=${version}`;
     // Used for serializing images.
     images[source].originalSource = source;
     return images[source];

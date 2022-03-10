@@ -7,6 +7,9 @@ export function unlockAudio() {
     audioUnlocked = true;
 }
 
+
+const version = window.version;
+
 export function requireSound(key, callback = null) {
     let source, loop, offset, volume, duration, limit, repeatFrom, nextTrack, type = 'default';
     if (typeof key === 'string') {
@@ -28,7 +31,7 @@ export function requireSound(key, callback = null) {
     let newSound: any = {};
     if (type === 'bgm') {
         const howlerProperties: any = {
-            src: [source],
+            src: [`${source}?v=${version}`],
             html5: true,
             loop: false,
             volume: volume / 50,
@@ -89,7 +92,7 @@ export function requireSound(key, callback = null) {
         }
     } else {
         const howlerProperties: any = {
-            src: [source],
+            src: [`${source}?v=${version}`],
             loop: loop || false,
             volume: (volume || 1) / 50,
             onplay: function () {
