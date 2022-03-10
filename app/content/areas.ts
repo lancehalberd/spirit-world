@@ -360,12 +360,13 @@ export function enterZoneByTarget(
         console.error(`Missing zone: ${zoneKey}`);
         return false;
     }
-    for (let floor = 0; floor < zone.floors.length; floor++) {
-        // Search the corresponding spirit/material world before checking in the alternate world.
-        const areaGrids = state.areaInstance.definition.isSpiritWorld
-            ? [zone.floors[floor].spiritGrid, zone.floors[floor].grid]
-            : [zone.floors[floor].grid, zone.floors[floor].spiritGrid];
-        for( const areaGrid of areaGrids){
+    for (let worldIndex = 0; worldIndex < 2; worldIndex++) {
+        for (let floor = 0; floor < zone.floors.length; floor++) {
+            // Search the corresponding spirit/material world before checking in the alternate world.
+            const areaGrids = state.areaInstance.definition.isSpiritWorld
+                ? [zone.floors[floor].spiritGrid, zone.floors[floor].grid]
+                : [zone.floors[floor].grid, zone.floors[floor].spiritGrid];
+            const areaGrid = areaGrids[worldIndex];
             const inSpiritWorld = areaGrid === zone.floors[floor].spiritGrid;
             for (let y = 0; y < areaGrid.length; y++) {
                 for (let x = 0; x < areaGrid[y].length; x++) {

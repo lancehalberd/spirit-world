@@ -988,7 +988,11 @@ export class Door implements ObjectInstance {
             hero.actionTarget = this;
             hero.actionDx = 0;
             hero.actionDy = 0;
-            if (this.definition.d === 'up' || this.definition.d === 'down') {
+            if (hero.isExitingDoor) {
+                // When exiting a door, always move in the opposite direction the door is facing.
+                hero.actionDx = -directionMap[this.definition.d][0];
+                hero.actionDy = -directionMap[this.definition.d][1];
+            } else if (this.definition.d === 'up' || this.definition.d === 'down') {
                 hero.actionDy = (hero.y + hero.h / 2 < this.y + 16) ? 1 : -1;
             } else {
                 hero.actionDx = (hero.x + hero.w / 2 < this.x + 16) ? 1 : -1;

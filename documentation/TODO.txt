@@ -46,7 +46,7 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    Warship
+    Tree
         - Requires all elements to complete
         - Fight rival near the start to claim the last element
         - Possibly flow:
