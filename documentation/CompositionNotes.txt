@@ -1,0 +1,230 @@
+
+Music Priorities
+1) Matches the mood it is used for
+2) Cohesive
+3) Includes narrative themes and assocations where possible
+
+Music Tracks are either location or event based, often both
+
+Types of locations include:
+	* overworld(land, underwater+ sky) + spirit world
+	* towns and villages + interiors(including shops)
+	* small caves + ruins
+	* large dungeons of various types
+
+Examples of events:
+	* Important character interactions/dialog
+	* Fighting a boss or strong enemy
+	* Various cut scenes, like spirit beasts attacking the holy city or a giant tree growing
+
+
+Narrative Primer:
+! Narrative is not complete so most of this is subject to change !
+
+Player perspective:
+! Many of the narrative elements in the game are optional, so this describes an "average" experience !
+[Rising action is mostly linear if player follows in game suggestions]
+The player controls a half human/monkey called a Vanara that discovers they have special powers and is encouraged to go on a journey to develop them and learn more about them. MC lives in an enclave of Humans+Vanara that are outcasts from both races which otherwise don't mix. MC is actually half-human half-Vanara, with a Vanara father and Human mother. MC is encouraged to visit the Vanara tribe to learn more about his "Spirit Powers" inherited from his father. The Vanara tribe are cold to MC and do not approve of the outcasts living with the humans, but the Vanara Elder that leads the tribe provides MC with a magic bow that the MC can use but the other Vanara cannot.
+Following the Elder's advice MC visits the Vanara Tomb to learn more, but must fight a Rival Vanara before entering. The rival assumes the MC stole the Spirit Bow because it would not be given to an outcast. MC may win or lose this fight but is able to enter either way. MC explores the Vanara Tomb and meets a Vanara there called the Guardian. The Guardian explains that there is another world called the Spirit World and teaches MC how to look into the Spirit World. Since MC is not a pure-blood Vanara he is unable to teach MC how to interact with the Spirit World and advises MC ask his (human) mother for advice. MCs human mother explains that among her ancestors there used to be people who could summon gods from the Spirit World. She suggests MC explore the ruins of the Summoner's Village to find out more.
+MC explores the ruins of a ziggurat dedicated to the ancient War God of the summoners. MC defeats magical idols representing three elemental spirit beasts that were servants of the War God. MC finds the Summoner's Circlet which allows the MC to project an astral body into the Spirit World and interact with it on a limited basis.
+With MCs new ability the Vanara Guardian invites him to explore the Vanara Cocoon hidden underneath the Tomb which contains hundreds of Vanara in suspended animation. The Vanara in the village all come from and return to this cocoon periodically but have no knowledge of it. MC is the only Vanara child for many generations. MC is tested by the Guardian and then given a new ability to help explore the Spirit World and enter another Vanara structure called the Helix.
+MC is confronted by his Vanara Rival again when trying to enter the Helix. The Rival has also learned more about the Vanara and is angry that these secrets are kept from the Vanara but told to the MC. The Rival also believes that the other Vanara intend to put him back to sleep and erase his memories. MC must defeat the Rival who now possesses his own spirit abilities before MC can enter the Helix.
+MC climbs the Helix and meets the Vanara Commander who confirms that the Vanara are foreign to this planet and the Cocoon and Helix are part of the Vanara Craft that brought them to this world. An accident stranded the Vanara on this world and caused a great conflict between the Vanara and the ancient summoners.
+The commander has to be brief though because he learns that the Vanara Rival has somehow brought the Spirit Beasts into the material world and they are attacking the Human capital. The Vanara crew avoids intervening directly when at all possible to avoid disturbing the balance of power in the world. The Commander asks MC to travel to the capital to help. MC is the only Vanara "native" to this planet and is allowed to interfere in ways the Vanara crew cannot.
+MC travels to the capital where he finds and helps a Human Champion who is fighting off the Spirit Beasts. The beasts eventually retreat. The Human Champion is the Guardian of the Spirit World and is angry that the MC has been meddling in the Spirit World and wants MC to meet the Spirit Emperor and face their justice. MC travels through the Spirit Gate with the Champion to the Jade City to meet the Spirit Emperor in the Jade Palace. The Spirit Emperor explains that the attack is not the MCs fault and that the MC should help the Human Champion stop the Spirit Beasts. The Spirit Beasts should only be able to survive in the Material World for a short time, but instead of retreating back to the Spirit World, they have stayed and hidden in the Material World. MC and the Champion need to find them and determine how the Spirit Beasts can survive in the Material world. If they need help, various gods in the Spirit World have been instructed to aid them.
+
+[Starting in this section of the game the player has a broader goal of find and defeat the 3 spirit beasts and is not expected to complete the game in any particular order. No specific locations are required outside of the 3 spirit beast dungeons and the final dungeons that are unlocked aftewards]
+
+MC explores the world in search of the Spirit Beasts and new abilities. MC is able to learn various things about the world and its history depending on where they go and what order they do things. Of particular note, MC learns that there is a joint lab where Vanara and Native scientists have been working on reconciling Vanara and Native life. Left unchecked, the Vanara ecosystem is expected to displace the native ecosystem. MC is actually a product of their experiments as a Vanara/Human hybrid would not normally be possible.
+When MC and Champion find the first beast they learn it is using a hybrid Vanara organ that allows it to draw energy from the Spirit World while in the Material World. They have to destroy the organ to force it out of the material world. The Champion is exhausted by banishing the Spirit Beast.
+Encountering the second beast, the MC must fight it alone so the Champion can save their energy for banishing the beast, however the Champion gets captured by the beast and must confront the final beast on his own.
+During the encounter with the final Spirit Beast, the Rival appears to support the Beast. Upon defeat, the Rival absorbs the beasts power and tells MC to meet them in the War God's Palace if he wants to save the Champion.
+When MC actually arrives at the Palace, the Rival's mood has changed. He feels that he has been tricked by the War God who told him that the Vanara's Spirit Powers meant they should be the rulers of this world. But after sneaking into the War God's hidden lab, he learned the War God was just using the Rival to help him create hybrid Vanara soldiers. The Rival thinks these soldiers are abominations that are even worse than the half-breed MC. The Rival requires the MC to defeat him in order to obtain the power of the last elemental beast which he will need to stop the War God.
+MC then enters the hidden lab and faces various creations of the War God's Scientist. The War God reveals that he helped the Rival release the beasts to distract the Vanara and other Spirit Gods from his plan to use Vanara biology to regain supremacy. They have engineered a new seed from the Vanara Craft (which are roughly tree-like) and use it to grow a giant tree like structure.
+MC climbs the Tree into low orbit overcoming various obstacles and faces a newly created Spirit Beast that is using the Champion for energy. MC has to free the Champion and then work together to defeat the Spirit Beast and stop the War God. The Tree has a terraforming function that the MC can no longer stop but can choose which ecology becomes dominant. Everything will survive either way, but the choice will either increase or reduce access to the Spirit World. There may be a secondary choice where MC and the Champion get to decide whether this change will apply to them since they are currently inside the Tree.
+There is an ending sequence that details some of the consequences of the MCs actions and decisions for the near future.
+
+
+
+Relating narrative to music/art:
+I would like to signify the distinction between various civilizations using music/art to suggest certain narrative truths without having to rely on just telling the player things.
+
+For example, the Vanara are an alien species that brought their own alien ecosystem with them hundreds of years ago. Vanara ecology should be behaviorally/visually distinct from native ecology so a player could get a sense that there are two distinct sets and even begin to identify their traits.
+
+The hallmark of Vanara ecology is that Vanara life evolved as hybrid spirit world+material world beings. All Vanara life is capable of interacting with both worlds in at least some capacity.
+
+The hallmark of Native ecology is that Native life evolved separately in the spirit world+material world. Most native life in the material world has no awareness or ability to interact with the spirit world. Interactions between the Spirit World and Material World historically needed to be mediated by special individuals in either world as well as technology to facilitate the interaction (as opposed to Vanaran life which relies on biology instead).
+
+The Spirit World and Material World are very different physically. The Material World appears mundane to us and maps closely to what we consider to be "the real world", and most magical seeming things in it are either the result of high technology/evolution or are caused by the Spirit World. In comparison to the Spirit World, the Material World is stable, energy poor, material rich and foundational/isolated. Naively, the Spirit World is undetectable from the Material World.
+The Spirit World a by-product of the Material world. If you imagine the Material World moving through time as boat moving through water, then the Spirit World is the wake left behind by that boat. Matter and energy from the Material World leave behind impressions in the Spirit World that often quickly decay into nothing as there is no preservation of matter+energy in the Spirit World. However, certain impressions build up and persist leading to various types of permanent or semi-permanent material in the Spirit World. The Spirit World is considered Material Poor because most naturally occuring material is of limited use, either too hard, too brittle or too ephemeral for specific applications. In addition to this, the Spirit World is very reactive to the Material World, so change in the Material World can have significant impacts on the Spirit World. The Spirit World is considered Energy Rich because in addition to energy being lost in the Spirit World it is also freely gained from the Material World. Spirit Life that is untethered from the Material World has to endure a much more chaotic environment and favors life forms that is amorphous and can quickly regrow and propogate itself. The spirit world has a kind of "depth" to it that is orthogonal to spatial dimensions in the Material World and can be thought of as a distance from the Material World. Going "deeper" into the spirit world is a strategy for avoiding the chaotic disturbances that changes on the Material World cause, but hybrid beings that rely on the Material World are limited in how far they can move away from the Material World. Where as the Spirit World can easily go unobserved from the Material World, the Material World and changes in it are constantly reflected in the Spirit World to the point where it cannot be ignored.
+
+
+As the Vanara are aliens, there are very few Vanara structures in the world, they are at most a few centuries old, and they are typically part of the Vanara craft that brought them to the planet. It would be nice if there were consistent Theme elements present between all the Vanara based locations, even the Vanara Village as well as the shared human/vanara village in the waterfall as well as the shared Vanara/Native Lab which is one of the optional later levels.
+
+The native ruins span a longer history and come from different civilizations including the pre-Vanara contact Summoner Civilization, but also even older ones than that.
+
+I think there should be thematic elements for the Native Summoner tribe which the War God ruled. These themes could be shared by:
+	Main character who has summoner ancestors (should be fairly subtle)
+	MCs mother who has summoner ancestors (more explicit)
+	The War God, The Spirit Beasts, and their battle themes
+	The War God temple music and final dungeons
+
+There should be thematic elements for the Spirit World vs the Material World:
+	A fun but expensive idea is to have the BGMs for different areas have complimentary Material+Spirit Themes that play. When you use spirit sight we would fade in the complimentary theme so for example from the material world you would here the material theme at 70% volume and the spirit them at 30% volume vice versa in the reverse situation. We could also build the material theme into the spirit them by default signifying the assymetry where the Material World is always exerting pressure on the Spirit World, but the Spirit World is not (normally)noticeable from the Material World.
+
+There should be thematic elements for the main characters that reflect their various associations:
+	MC theme should be related to the theme for the human/vanara enclave
+	Would be neat to have the MC theme be in part a combination of the father and mother's themes.
+	Rival theme should be related to the Vanara Village theme, but also the War God theme who is manipulating the Rival
+	Champion theme should be related to the theme for the native spirit life, like the Jade City/Jade Palace/Spirit Emperor
+	The Vanara Crew (the uniformed Vanara that maintain the ship and try to maintain the peace) should have there own theme.
+	A distinct theme for the Vanara Elder that has hints of the Vanara Crew theme (almost like foreshadowing) would be a nice touch and represent his role as a liason for the crew and the villagers. The Vanara Elder is the only Vanara outside of the crew allowed to know anything about the Spirit World or the origin of the Vanara.
+	It would be cool to have some subtle relationship between the MC and Champion. Current lore is that they are quasi brother and sister, created from the same parents using different methods and they represent different paths forward for combining Native and Vanara life. MC outwardly looks like a Vanara but is "genetically" Native while the Champion outwardly looks like a Human but is "genetically" Vanaran. The parents are not supposed to know that the Champion is their "child" but they might figure it out or suspect it anyway.
+	There are two "science labs" in the game as well as a few "scientist" characters, so having some "science" theme shared by these would be nice.
+
+
+
+Final tracks should typically be around 90 seconds long for the game, probably not shorter than 30 seconds, and mostly not longer than 180 seconds. It would be fine to start with longer "real" tracks that we edit down or split up for the practical tracks that are actually used in the game.
+
+BPM will be particular to the feel of each track
+
+No opinion yet on key, I assume this will also come down to either the feel of the track, or possibly thematically determined. For example, Vanara themes may use a different set of keys than Native themes.
+
+
+
+The following is a list of youtube links with music that I liked from existing games with some rough categories that might be relevant for tracks in Spirit Quest.
+
+Overworld field music:
+https://www.youtube.com/watch?v=kzcNV4cjvQM&list=PL72325BBD77D6DBE9&index=15
+https://www.youtube.com/watch?v=sOFCXailT7s&list=PLmoiw875IQwwCkO4WhoiJDGejEuvI5EC2&index=2
+https://www.youtube.com/watch?v=FON4uO9Qtx0&list=PLmoiw875IQwwCkO4WhoiJDGejEuvI5EC2&index=6
+https://www.youtube.com/watch?v=FeSNywiK6Zs&list=PL4649F0DBF0FC09E3&index=12
+https://www.youtube.com/watch?v=lX6W_6pqUDA&list=PL4649F0DBF0FC09E3&index=28
+
+Quiet Field Music:
+https://www.youtube.com/watch?v=0UVPz1Qz6go&list=PLmoiw875IQwwCkO4WhoiJDGejEuvI5EC2&index=22
+
+Title/Intro music:
+https://www.youtube.com/watch?v=-JGkPieR6nk&list=PL72325BBD77D6DBE9&index=47
+https://www.youtube.com/watch?v=JlkFJRWn_XI&list=PLmoiw875IQwwCkO4WhoiJDGejEuvI5EC2
+
+Quiet village music:
+https://www.youtube.com/watch?v=ZSRzijVlfeM&list=PL04067EB703ECEDD0&index=3
+https://www.youtube.com/watch?v=ufgFKng2bEc&list=PLqrlkIVyDLs_-JFy6LoGNq_XhO3K7Erzu&index=10
+https://www.youtube.com/watch?v=6_0gMhwMQn0&list=PLmoiw875IQwy3fIvlQr-j4t1teSKwPysM&index=5
+
+Solemn Music:
+https://www.youtube.com/watch?v=E_fsxI5q0RM&list=PLmoiw875IQwwCkO4WhoiJDGejEuvI5EC2&index=3
+
+City Music:
+https://www.youtube.com/watch?v=iJ6KIsXS7AE&t=577s
+https://www.youtube.com/watch?v=iJ6KIsXS7AE&t=2125s
+
+Monkey cave music:
+https://www.youtube.com/watch?v=7esIxzQjEaw&list=PL72325BBD77D6DBE9&index=26
+
+Exotic village music:
+https://www.youtube.com/watch?v=V75v9aUKzZU&list=PLmoiw875IQwy3fIvlQr-j4t1teSKwPysM&index=56
+https://www.youtube.com/watch?v=4HkSxQF-O9Q&list=PLmoiw875IQwy3fIvlQr-j4t1teSKwPysM&index=58
+
+
+Resting music:
+https://www.youtube.com/watch?v=dJB0oZ6lUHo&list=PLmoiw875IQwy3fIvlQr-j4t1teSKwPysM&index=11
+
+Desert ruins music:
+https://www.youtube.com/watch?v=rIFDYpBAuUs&list=PL04067EB703ECEDD0&index=15
+https://www.youtube.com/watch?v=OCC-fxMCKuM&list=PLqrlkIVyDLs_-JFy6LoGNq_XhO3K7Erzu&index=11
+https://www.youtube.com/watch?v=_3TprstdxXI&list=PLmoiw875IQwy3fIvlQr-j4t1teSKwPysM&index=25
+
+
+Intense dungeon music:
+https://www.youtube.com/watch?v=ffJ2Ye1PJOw&list=PLqrlkIVyDLs_-JFy6LoGNq_XhO3K7Erzu&index=12
+https://www.youtube.com/watch?v=utmjD3iOI0c&list=PLqrlkIVyDLs_-JFy6LoGNq_XhO3K7Erzu&index=25
+https://www.youtube.com/watch?v=IYj8GhRH8h0&list=PL_BhbJAAueZTNmtIHRDUtkEuV3HcNGPZn&index=41
+
+Medium intensity dungeon music:
+https://www.youtube.com/watch?v=vyyJNqFV3Ww&list=PLqrlkIVyDLs_-JFy6LoGNq_XhO3K7Erzu&index=21
+https://www.youtube.com/watch?v=5-kb_9kcP5A&list=PLmoiw875IQwy3fIvlQr-j4t1teSKwPysM&index=60
+
+Mechanical Dungeon music:
+https://www.youtube.com/watch?v=iAH-airdv3I&list=PLmoiw875IQwwCkO4WhoiJDGejEuvI5EC2&index=42
+
+Peaceful Dream music:
+https://www.youtube.com/watch?v=zX5eRgla1fE&list=PL72325BBD77D6DBE9&index=43
+https://www.youtube.com/watch?v=_R-EQy8x_WI&list=PL_BhbJAAueZTNmtIHRDUtkEuV3HcNGPZn&index=29
+https://www.youtube.com/watch?v=ZJp8pSFhK5s&list=PL_BhbJAAueZTNmtIHRDUtkEuV3HcNGPZn&index=39
+
+Moody boss music:
+https://www.youtube.com/watch?v=eAqwzfmuJZI&list=PLmoiw875IQwwCkO4WhoiJDGejEuvI5EC2&index=36
+https://www.youtube.com/watch?v=CEmKKLyhv6k&list=PL4649F0DBF0FC09E3&index=40
+https://www.youtube.com/watch?v=Phixh-rVPiY&list=PL4649F0DBF0FC09E3&index=44
+
+Intense boss music:
+https://www.youtube.com/watch?v=wzWi5EIeXxs&list=PLqrlkIVyDLs_-JFy6LoGNq_XhO3K7Erzu&index=14
+https://www.youtube.com/watch?v=PnCv0qhv4yY&list=PLqrlkIVyDLs_-JFy6LoGNq_XhO3K7Erzu&index=27
+https://www.youtube.com/watch?v=Ochqc56IsWo&list=PLmoiw875IQwy3fIvlQr-j4t1teSKwPysM&index=45
+https://www.youtube.com/watch?v=bu718nMTKbk&list=PLmoiw875IQwy3fIvlQr-j4t1teSKwPysM&index=52
+https://www.youtube.com/watch?v=iJ6KIsXS7AE&t=3743s
+https://www.youtube.com/watch?v=cxlu10mKr5w&list=PL_BhbJAAueZTNmtIHRDUtkEuV3HcNGPZn&index=7
+https://www.youtube.com/watch?v=qhYpMekSNms&list=PL_BhbJAAueZTNmtIHRDUtkEuV3HcNGPZn&index=43
+https://www.youtube.com/watch?v=b-C2YcxTSP4&list=PLmoiw875IQwwCkO4WhoiJDGejEuvI5EC2&index=45
+https://www.youtube.com/watch?v=iKa_ZvlkUzo&list=PL4649F0DBF0FC09E3&index=47
+
+Heroic music. This doesn't really suit the main character, but might suit an NPC that helps/saves the main character at times:
+https://www.youtube.com/watch?v=M8xjDbSafWg&list=PLmoiw875IQwy3fIvlQr-j4t1teSKwPysM&index=2
+https://www.youtube.com/watch?v=vuY4q4vRo3w&list=PLmoiw875IQwy3fIvlQr-j4t1teSKwPysM&index=47
+https://www.youtube.com/watch?v=gr6RAQsqdTI&list=PLmoiw875IQwy3fIvlQr-j4t1teSKwPysM&index=64
+https://www.youtube.com/watch?v=2HgKySsLjqI&list=PLmoiw875IQwy3fIvlQr-j4t1teSKwPysM&index=70
+https://www.youtube.com/watch?v=iJ6KIsXS7AE&t=99s
+https://www.youtube.com/watch?v=hH7kxC65Ydc&list=PL_BhbJAAueZTNmtIHRDUtkEuV3HcNGPZn&index=42
+
+
+Emotional music:
+https://www.youtube.com/watch?v=-JmT7ajNlwc&list=PLqrlkIVyDLs_-JFy6LoGNq_XhO3K7Erzu&index=16
+https://www.youtube.com/watch?v=isFNWQh5lwg&list=PLqrlkIVyDLs_-JFy6LoGNq_XhO3K7Erzu&index=20
+https://www.youtube.com/watch?v=Rng1gO2mAbk&list=PLmoiw875IQwy3fIvlQr-j4t1teSKwPysM&index=22
+https://www.youtube.com/watch?v=xzHtXCF_Uow&list=PLmoiw875IQwy3fIvlQr-j4t1teSKwPysM&index=33
+https://www.youtube.com/watch?v=Qd7IZLeh0TI&list=PLmoiw875IQwy3fIvlQr-j4t1teSKwPysM&index=53
+https://www.youtube.com/watch?v=YhQJ1if1yJ0&list=PLmoiw875IQwy3fIvlQr-j4t1teSKwPysM&index=55
+https://www.youtube.com/watch?v=mnap97Xj1wc&list=PLmoiw875IQwy3fIvlQr-j4t1teSKwPysM&index=61
+https://www.youtube.com/watch?v=W0597irgOsQ&list=PLmoiw875IQwy3fIvlQr-j4t1teSKwPysM&index=68
+https://www.youtube.com/watch?v=iJ6KIsXS7AE&t=355s
+https://www.youtube.com/watch?v=-c7lbgXmK98&list=PL_BhbJAAueZTNmtIHRDUtkEuV3HcNGPZn&index=5
+https://www.youtube.com/watch?v=2DBBBFFMJUY&list=PL_BhbJAAueZTNmtIHRDUtkEuV3HcNGPZn&index=25
+https://www.youtube.com/watch?v=AqdGqy4-WKg&list=PL_BhbJAAueZTNmtIHRDUtkEuV3HcNGPZn&index=31
+https://www.youtube.com/watch?v=oFDGL3M4dfI&list=PL_BhbJAAueZTNmtIHRDUtkEuV3HcNGPZn&index=32
+https://www.youtube.com/watch?v=41LbrtXdr6o&list=PL_BhbJAAueZTNmtIHRDUtkEuV3HcNGPZn&index=45
+https://www.youtube.com/watch?v=y3F4wwW-sc8&list=PLmoiw875IQwwCkO4WhoiJDGejEuvI5EC2&index=5
+https://www.youtube.com/watch?v=6KVU0hfUJ-w&list=PLmoiw875IQwwCkO4WhoiJDGejEuvI5EC2&index=23
+https://www.youtube.com/watch?v=6_epRiJD65U&list=PLmoiw875IQwwCkO4WhoiJDGejEuvI5EC2&index=47
+
+Mysterious music:
+https://www.youtube.com/watch?v=zTijDcgL44c&list=PLmoiw875IQwy3fIvlQr-j4t1teSKwPysM&index=59
+https://www.youtube.com/watch?v=mTSHVJrOyHM&list=PLmoiw875IQwwCkO4WhoiJDGejEuvI5EC2&index=46
+
+Scary Climax music:
+https://www.youtube.com/watch?v=RhwvzPsUEpk&list=PLmoiw875IQwy3fIvlQr-j4t1teSKwPysM&index=32
+https://www.youtube.com/watch?v=x0R7M9tYM0Q&list=PL_BhbJAAueZTNmtIHRDUtkEuV3HcNGPZn&index=16
+https://www.youtube.com/watch?v=I0gCAbQEpF0&list=PL_BhbJAAueZTNmtIHRDUtkEuV3HcNGPZn&index=37
+https://www.youtube.com/watch?v=JgbAdCyOAME&list=PL_BhbJAAueZTNmtIHRDUtkEuV3HcNGPZn&index=40
+
+Shrine music:
+https://www.youtube.com/watch?v=41K67tefg_4&list=PLmoiw875IQwy3fIvlQr-j4t1teSKwPysM&index=16
+
+Victory music/fanfare:
+https://www.youtube.com/watch?v=yWuJhXkEe9s&list=PLmoiw875IQwy3fIvlQr-j4t1teSKwPysM&index=20
+https://www.youtube.com/watch?v=9qw0P1ttkFA&list=PLmoiw875IQwy3fIvlQr-j4t1teSKwPysM&index=39
+
+Party Music:
+https://www.youtube.com/watch?v=_QDw3g4lTLo&list=PLmoiw875IQwy3fIvlQr-j4t1teSKwPysM&index=67
+
+War God Theme:
+https://www.youtube.com/watch?v=qblfNJfR5SE&list=PL4649F0DBF0FC09E3&index=26
+https://www.youtube.com/watch?v=RASow1amgts&list=PL4649F0DBF0FC09E3&index=37
+
+Other tracks I like:
+https://www.youtube.com/watch?v=amOnHEovxK8&list=PLmoiw875IQwwCkO4WhoiJDGejEuvI5EC2&index=35
+https://www.youtube.com/watch?v=Ewylw-M9ROs&list=PLmoiw875IQwwCkO4WhoiJDGejEuvI5EC2&index=48
+
+Most of the Secret of Evermore soundtrack is interesting for a more ambient style of music:
+https://www.youtube.com/watch?v=sSiqiIGsQOM

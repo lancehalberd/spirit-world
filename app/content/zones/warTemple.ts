@@ -491,6 +491,7 @@ const f0_1x0: AreaDefinition = {
         {status: "normal", id: "warTemple:0:0x1-door-1", x: 368, y: 0, type: "door", style: "cave", d: "up"},
         {status: "normal", id: "warTemple:0:0x1-flameSnake-0", x: 304, y: 160, type: "enemy", enemyType: "flameSnake", d: "down", params: {}},
         {status: "normal", id: "warTemple:0:0x1-flameSnake-1", x: 304, y: 80, type: "enemy", enemyType: "flameSnake", d: "down", params: {}},
+        {status: "normal", id: "labEntrance", x: 112, y: 32, type: "door", style: "cavern", d: "up", linked: true, spirit: true, targetZone: "lab", targetObjectId: "labEntrance", locationCue: "War Temple B1"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 32},
@@ -1141,8 +1142,8 @@ const sf0_1x0: AreaDefinition = {
     parentDefinition: f0_1x0,
     layers: null,
     objects: [
-        {status: "normal", id: "warTempleLadder", x: 368, y: 352, type: "door", style: "ladderUp", d: "up", targetZone: "warTemple", targetObjectId: "warTempleLadder"},
-        {status: "normal", id: "", x: 112, y: 32, type: "door", style: "cavern", d: "up"},
+        {status: "normal", id: "warTempleLadder", x: 368, y: 352, type: "door", style: "ladderUp", d: "up", targetZone: "warTemple", targetObjectId: "warTempleLadder", locationCue: "War Temple B1"},
+        {status: "normal", id: "labEntrance", x: 112, y: 32, type: "door", style: "cavern", d: "up", linked: true, targetZone: "lab", targetObjectId: "labEntrance", locationCue: "War Temple B1"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},
@@ -1285,8 +1286,8 @@ const sf0_1x1: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "warTempleLadder", x: 256, y: 240, type: "door", style: "ladderDown", d: "down", logicKey: "beastsDefeated", targetZone: "warTemple", targetObjectId: "warTempleLadder"},
-        {status: "normal", id: "warTempleEntranceSpirit", x: 240, y: 480, type: "door", style: "cave", targetZone: "overworld", targetObjectId: "warTempleEntranceSpirit", d: "down", linked: true, spirit: true},
+        {status: "normal", id: "warTempleLadder", x: 256, y: 240, type: "door", style: "ladderDown", d: "down", logicKey: "beastsDefeated", targetZone: "warTemple", targetObjectId: "warTempleLadder", locationCue: "War Temple 1F"},
+        {status: "normal", id: "warTempleEntranceSpirit", x: 240, y: 480, type: "door", style: "cave", targetZone: "overworld", targetObjectId: "warTempleEntranceSpirit", d: "down", linked: true, spirit: true, locationCue: "War Temple 1F"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},

@@ -5243,7 +5243,7 @@ const sf0_2x0: AreaDefinition = {
         },
     ],
     objects: [
-        {id: "elderSpiritEntrance", linked: false, spirit: false, status: "normal", x: 160, y: 368, type: "door", style: "tree", targetZone: "treeVillage", targetObjectId: "elderSpiritEntrance", d: "up"},
+        {id: "elderSpiritEntrance", linked: false, spirit: false, status: "normal", x: 160, y: 368, type: "door", style: "knobbyTree", targetZone: "treeVillage", targetObjectId: "elderSpiritEntrance", d: "up"},
         {status: "normal", id: "fertilityTempleExit", x: 400, y: 288, type: "door", style: "wooden", d: "up", targetZone: "caves", targetObjectId: "fertilityTempleExit"},
         {status: "normal", id: "forestTempleLadder1", x: 400, y: 352, type: "door", style: "ladderDown", targetZone: "forestTemple", targetObjectId: "forestTempleLadder1", d: "down"},
         {status: "normal", id: "forestTempleLadder2", x: 432, y: 128, type: "door", style: "ladderDown", targetZone: "forestTemple", targetObjectId: "forestTempleLadder2", d: "down"},

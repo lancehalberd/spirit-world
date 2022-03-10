@@ -76,6 +76,7 @@ const [
 
 
 const [ treeDoorOpen ] = createAnimation('gfx/tiles/treesheet.png', {w: 32, h: 32}, {left: 128, top: 96, cols: 1}).frames;
+const [ knobbyTreeDoorOpen ] = createAnimation('gfx/tiles/knobbytrees.png', {w: 32, h: 32}, {left: 128, top: 96, cols: 1}).frames;
 
 const [
     ladderTop, ladderMiddle, /*ladderMiddle*/, ladderBottom, ladderDown
@@ -634,6 +635,20 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
             cave: treeDoorOpen,
             locked: treeDoorOpen,
             bigKeyLocked: treeDoorOpen,
+        },
+    },
+    knobbyTree: {
+        w: 32,
+        h: 32,
+        up: {
+            doorFrame: knobbyTreeDoorOpen,
+            doorClosed: knobbyTreeDoorOpen,
+            cracked: knobbyTreeDoorOpen,
+            caveFrame: knobbyTreeDoorOpen,
+            caveCeiling: knobbyTreeDoorOpen,
+            cave: knobbyTreeDoorOpen,
+            locked: knobbyTreeDoorOpen,
+            bigKeyLocked: knobbyTreeDoorOpen,
         },
     },
     ladderUp: {
