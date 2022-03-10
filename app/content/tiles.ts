@@ -721,58 +721,117 @@ const treeStump: TileSource = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/treesheet.png'), x: 0, y: 128, w: 64, h: 48},
     behaviors: {
-        'all': { defaultLayer: 'field', solid: true },
+        'all': { defaultLayer: 'field', solid: true, linkedOffset: 401 },
     },
 };
 const treeLeavesTop: TileSource = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/treesheet.png'), x: 80, y: 0, w: 64, h: 16},
     behaviors: {
-        'all': { defaultLayer: 'foreground2' },
+        'all': { defaultLayer: 'foreground2', linkedOffset: 401 },
     },
 };
 const treeLeaves: TileSource = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/treesheet.png'), x: 64, y: 16, w: 96, h: 48},
     behaviors: {
-        'all': { defaultLayer: 'foreground' },
+        'all': { defaultLayer: 'foreground', linkedOffset: 401 },
     },
 };
 const treeLeavesBottom: TileSource = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/treesheet.png'), x: 96, y: 64, w: 32, h: 16},
     behaviors: {
-        'all': { defaultLayer: 'foreground' },
+        'all': { defaultLayer: 'foreground', linkedOffset: 401 },
     },
 };
 const treeLeavesDoor: TileSource = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/treesheet.png'), x: 16, y: 96, w: 32, h: 16},
     behaviors: {
-        'all': { defaultLayer: 'foreground' },
+        'all': { defaultLayer: 'foreground', linkedOffset: 401 },
     },
 };
 const treeLeavesMerged: TileSource = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/treesheet.png'), x: 160, y: 16, w: 32, h: 48},
     behaviors: {
-        'all': { defaultLayer: 'foreground' },
+        'all': { defaultLayer: 'foreground', linkedOffset: 401 },
     },
 };
 const treeLeavesCorridor: TileSource = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/treesheet.png'), x: 224, y: 16, w: 16, h: 48},
     behaviors: {
-        'all': { defaultLayer: 'foreground' },
+        'all': { defaultLayer: 'foreground', linkedOffset: 401 },
     },
 };
 const treeStumpDoor: TileSource = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/treesheet.png'), x: 64, y: 96, w: 64, h: 32},
     behaviors: {
+        'all': { defaultLayer: 'field', solid: true, linkedOffset: 401 },
+    },
+};
+
+
+const knobbyTreeStump: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/knobbytrees.png'), x: 0, y: 128, w: 64, h: 48},
+    behaviors: {
         'all': { defaultLayer: 'field', solid: true },
     },
 };
+const knobbyTreeLeavesTop: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/knobbytrees.png'), x: 80, y: 0, w: 64, h: 16},
+    behaviors: {
+        'all': { defaultLayer: 'foreground2' },
+    },
+};
+const knobbyTreeLeaves: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/knobbytrees.png'), x: 64, y: 16, w: 96, h: 48},
+    behaviors: {
+        'all': { defaultLayer: 'foreground' },
+    },
+};
+const knobbyTreeLeavesBottom: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/knobbytrees.png'), x: 96, y: 64, w: 32, h: 16},
+    behaviors: {
+        'all': { defaultLayer: 'foreground' },
+    },
+};
+const knobbyTreeLeavesDoor: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/knobbytrees.png'), x: 16, y: 96, w: 32, h: 16},
+    behaviors: {
+        'all': { defaultLayer: 'foreground' },
+    },
+};
+const knobbyTreeLeavesMerged: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/knobbytrees.png'), x: 160, y: 16, w: 32, h: 48},
+    behaviors: {
+        'all': { defaultLayer: 'foreground' },
+    },
+};
+const knobbyTreeLeavesCorridor: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/knobbytrees.png'), x: 224, y: 16, w: 16, h: 48},
+    behaviors: {
+        'all': { defaultLayer: 'foreground' },
+    },
+};
+const knobbyTreeStumpDoor: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/knobbytrees.png'), x: 64, y: 96, w: 64, h: 32},
+    behaviors: {
+        'all': { defaultLayer: 'field', solid: true },
+    },
+};
+
 
 const crackedFloor: TileSource = {
     w: 16, h: 16,
@@ -1280,6 +1339,14 @@ addTiles([
     caveStairs,
     caveCeilingTopAngles,
     lava,
+    knobbyTreeStump,
+    knobbyTreeLeavesTop,
+    knobbyTreeLeaves,
+    knobbyTreeLeavesBottom,
+    knobbyTreeLeavesDoor,
+    knobbyTreeLeavesMerged,
+    knobbyTreeLeavesCorridor,
+    knobbyTreeStumpDoor,
 ]);
 
 // This invalid is in the middle of a bunch of other tiles so it is easiest to just delete after adding it.
