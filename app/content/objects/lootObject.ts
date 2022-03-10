@@ -477,13 +477,22 @@ export class ChestObject implements ObjectInstance {
     onGrab(state: GameState) {
         // You can only open a chest from the bottom.
         const hero = state.hero.activeClone || state.hero;
-        if (this.definition.id && hero.d === 'up' && !this.isOpen(state)) {
-            state.savedState.objectFlags[this.definition.id] = true;
-            if (this.linkedObject?.definition?.id) {
-                state.savedState.objectFlags[this.linkedObject.definition.id] = true;
-            }
-            getLoot(state, this.definition);
+        if (!this.definition.id || hero.d !== 'up') {
+            return;
         }
+        if (this.isOpen(state)) {
+            if (state.savedState.objectFlags[this.definition.id] && this.definition.lootType !== 'empty') {
+                showMessage(state, 'You already opened this chest.');
+            } else {
+                showMessage(state, 'Looks like somebody already opened this chest.');
+            }
+            return;
+        }
+        state.savedState.objectFlags[this.definition.id] = true;
+        if (this.linkedObject?.definition?.id) {
+            state.savedState.objectFlags[this.linkedObject.definition.id] = true;
+        }
+        getLoot(state, this.definition);
     }
     update(state: GameState) {
         // Make sure empty chese are recorded as opened for the randomizer, since some logic
@@ -538,7 +547,15 @@ export class BigChest extends ChestObject implements ObjectInstance {
     onGrab(state: GameState) {
         // You can only open a chest from the bottom.
         const hero = state.hero.activeClone || state.hero;
-        if (hero.d !== 'up' || this.isOpen(state)) {
+        if (hero.d !== 'up') {
+            return;
+        }
+        if (this.isOpen(state)) {
+            if (state.savedState.objectFlags[this.definition.id] && this.definition.lootType !== 'empty') {
+                showMessage(state, 'You already opened this chest.');
+            } else {
+                showMessage(state, 'Looks like somebody already opened this chest.');
+            }
             return;
         }
         if (!state.savedState.dungeonInventories[state.location.zoneKey]?.bigKey) {
