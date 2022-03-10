@@ -294,11 +294,11 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     } else if (hero.action === 'charging') {
         hero.chargeTime += FRAME_LENGTH;
         movementSpeed *= 0.75;
-        if (!heldChakram) {
+        if (!heldChakram && !hero.toolOnCooldown) {
             hero.action = null;
             hero.actionDx = 0;
             hero.actionDy = 0;
-        } else if (!isGameKeyDown(state, GAME_KEY.WEAPON) || !canCharge) {
+        } else if (heldChakram && (!isGameKeyDown(state, GAME_KEY.WEAPON) || !canCharge)) {
             hero.action = 'attack';
             hero.animationTime = 0;
             hero.actionFrame = 0;
@@ -335,7 +335,9 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                     hero.actionDy = directionMap[direction][1];
                 }
             }
-            if (!hero.action && !hero.chargingLeftTool && !hero.chargingRightTool) {
+            if (!hero.action
+                && !hero.chargingLeftTool && !hero.chargingRightTool && !hero.toolOnCooldown
+            ) {
                 hero.action = 'walking';
                 hero.actionDx = 0;
                 hero.actionDy = 0;
@@ -344,7 +346,9 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         } else {
             // Reset jumping time if the actor stopped moving.
             hero.jumpingTime = 0;
-            if ((hero.action === 'walking' || hero.action === 'pushing') && !hero.chargingLeftTool && !hero.chargingRightTool) {
+            if ((hero.action === 'walking' || hero.action === 'pushing')
+                && !hero.chargingLeftTool && !hero.chargingRightTool && !hero.toolOnCooldown
+            ) {
                 hero.action = null;
                 hero.actionDx = 0;
                 hero.actionDy = 0;

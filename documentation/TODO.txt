@@ -44,8 +44,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Bow frame is wrong direction shortly after firing diagonally.
-    - Fix out of bounds in no tool cave.
     - Add new tree graphics to spirit world.
     - Investigate cache busting strategies for the demo.
 
