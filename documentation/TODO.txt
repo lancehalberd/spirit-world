@@ -46,35 +46,55 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    Tree
+    - Add Golem boss to Tomb
+        - Immune to damage except for weak spot in the center.
+        - Bow deals +3 damage, other weapons deal half damage.
+        - Has two hands it uses for guarding and attacking
+            - While both are up, one hand guards while the other attacks
+            - Sometimes does large attacks with both hands
+            - Tedious to kill without destroying one hand, faster to kill without destroying both hands
+        - Has a beam attack from its weak point
+    World Tree
+        Tower is a series of 2x2 super tiles with a vine for climbing to the next section that
+        Floor 1 is land level + underwater(in material world)
+            - Fight frost beast and destroy heart before advancing.
+        Floor 2 is sky level + has unlockable exit to sky (in material world only)
+            - Fight storm beast and destroy heart before advancing.
+        Floor 3 is atmosphere level + is hot
+            - Fight flame beast and destroy heart before advancing.
+        Floor 4 is lower orbit + material zones have low gravity
+            - Fith all elemental beasts together without hearts
+        Floor 5 has final boss
+        - Giant tree grows just to the north of the war temple and into the sky, occupying unused spaces in the SE corner of the map.
+        - Climb giant vines in the tree to reach the top
+        - Lower level parts may have parts where you go out and branches so you can see how high up you are getting
+        - Tree is a clone of the helix, but allowed to grow to completion this time.
+
+    World Tree Boss Void Beast
+        Must rescue Champion and work together to defeat the boss
+            - Mechanics where one of you creates an opening for the other to damage the boss.
+            - Mechanics where you protect each other from boss attacks.
+            - Failure to protect champion will:
+                - Require completing a rescue mechanic or waiting long enough for her to free herself
+                - Cannot benefit from champion mechanics for damage or protection while champion is out of comission
+        Phases where specific elements are required to damage it.
+        Phases designed for each tool, but does not require them
+            - Tools can give extra opportunities to damage the boss
+                - Barrier to reflect projectiles/protect champion while they attack.
+                    - Maybe a mechanic where you put up a barrier and reflect attacks while she prepares a strong attack against the boss
+                - Bow to shoot distant weak spots
+            - Tools can make it easier to avoid attacks
+
+    Lab + World Tree Notes:
         - Requires all elements to complete
         - Fight rival near the start to claim the last element
         - Possibly flow:
             Enter throne room of the War Temple in the Spirit World and fight rival, get last element and open tunnel entrance.
                 - This step is only completable after fighting the rival during the 3rd spirit beast battle.
-            Tunnel takes you to the Core(Seed?) of the Vanara Ship, which has the terraforming engine
+            Tunnel takes you to the lab where the War God's Scientists have been creating Hybrdid creatures and have made a modified World Tree Seed from the Helix.
+            Can(must?) find clone upgrade to complete the lab.
+            The seed is activated(possibly by combined proximity of champion+MC) and grows a giant tree that MC must climb to rescue the Champion and stop the War God.
             The War God will use the engine to make a breeding ground for his drone soldiers, the MC might use it to synthesize the Vanara and Native life to coexist.
-            Sub goal is to gain the upgraded clone ability, then use it to combine all three elements to continue forward.
-            Sub goal where the seed is activated and grows into a giant tree that reaches into space
-                - Giant tree grows just to the north of the war temple and into the sky, occupying unused spaces in the SE corner of the map.
-                - Climb giant vines in the tree to reach the top
-                - Lower level parts may have parts where you go out and branches so you can see how high up you are getting
-                - Tree is a clone of the helix, but allowed to grow to completion this time.
-            Midboss
-                - All 3 elemental beasts at once with no hearts
-                - Maybe the hearts are present elsewhere so you have to find and destroy the hearts in isolation first then defeat the beasts
-            Tower is a series of 2x2 super tiles with a vine for climbing to the next section that is a tall column on each floor
-                - 1 heart is fond on each of the first 3 floors blocking access to the next floor
-                - 3 elemental beasts are on the 4th floor
-                - Spirit world dungeon only at least for the tower part
-                - Maybe a hybrid section at the top.
-                - Should redesign the helix to have similar structure.
-            Final boss has phases where specific elements are required to damage it.
-            Final boss has phases designed for each tool, but does not require them
-                - Tools can give extra opportunities to damage the boss
-                    - Barrier to reflect projectiles
-                    - Bow to shoot distant weak spots
-                - Tools can make it easier to avoid attacks
 
     - Add Sky Paths for Staff Tower
         - Mountain or Forest path to reach river temple roof (lightning only route)
@@ -182,17 +202,15 @@ High level list of things left to do:
         Jade Palace
         Sky Temple
         Forge
-        Warship
     Areas missing significant content:
         Forest Temple
         River Temple
-        Staff Tower
     Missing Bosses for existing areas:
         Crater midboss
         Rival fight before Tomb
         Tomb Boss
         Rival fight before Helix
-        Cocoon Boss
+        Helix Boss
             - Instead of fighting this boss, you will see it, but then abort because of the beasts attacking the city
             - Then you will actually fight this boss at the end of the Grand Temple or Jade Palace or possibly as a mid boss on the Warship.
     Missing mechanics:
@@ -211,7 +229,6 @@ High level list of things left to do:
         Clone charge 1 + 2
         True Sight (Render certain enemies/objects flagged for true sight)
         Iron Skin (slowly regenerates health shield = 20% total health)
-        Gold Mail (reduce damage by 50%)
         Gloves charge 1 + 2
 
 Generic boss improvements

@@ -20,16 +20,16 @@ export * from 'app/content/zones/lakeTunnel';
 export * from 'app/content/zones/helix';
 export * from 'app/content/zones/forestTemple';
 export * from 'app/content/zones/waterfallTower';
-// jade palace
 // forge
 // cloud temple
 export * from 'app/content/zones/grandTemple';
+// jade palace
 export * from 'app/content/zones/riverTemple';
 export * from 'app/content/zones/riverTempleWater';
 export * from 'app/content/zones/crater';
 export * from 'app/content/zones/staffTower';
 export * from 'app/content/zones/lab';
-// tree
+export * from 'app/content/zones/tree';
 
 export function getZone(zoneKey: string): Zone {
     if (!zones[zoneKey]) {

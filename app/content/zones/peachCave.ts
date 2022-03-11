@@ -369,7 +369,7 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 448, y: 368, type: "spawnMarker"},
         {status: "normal", id: "", x: 432, y: 240, type: "spawnMarker"},
         {status: "normal", id: "peachCave-climber2", x: 464, y: 144, type: "enemy", enemyType: "climbingBeetle", d: "down", params: {}},
-        {status: "normal", id: "chestInstructions", x: 64, y: 208, type: "narration", message: "Hey, a chest!\n{|}Maybe it has something in it that will help.\n{addCue:Approach a chest from the south and press [B_PASSIVE] to open it}", w: 32, h: 32},
+        {status: "normal", id: "chestInstructions", x: 64, y: 208, type: "narration", message: "Hey, a chest!\n{|}Maybe it has something in it that will help.\n{addCue:Face a chest from the south and press [B_PASSIVE] to open it}", w: 32, h: 32},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},

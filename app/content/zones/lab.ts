@@ -373,7 +373,7 @@ const f0_0x0: AreaDefinition = {
     ],
     objects: [
         {status: "normal", id: "", linked: true, x: 224, y: 496, type: "door", style: "cavern", d: "down"},
-        {status: "normal", id: "", linked: true, spirit: true, x: 240, y: 336, type: "door", style: "knobbyTree", targetZone: "overworld", targetObjectId: "warTempleEntranceSpirit", d: "up", locationCue: "War Temple 1F"},
+        {status: "normal", id: "treeEntrance", linked: true, spirit: true, x: 240, y: 336, type: "door", style: "knobbyTree", targetZone: "tree", targetObjectId: "treeEntrance", d: "up", locationCue: "Lab B1"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -1171,7 +1171,7 @@ const sf0_0x0: AreaDefinition = {
     ],
     objects: [
         {status: "normal", id: "", linked: true, x: 224, y: 496, type: "door", style: "cavern", d: "down", spirit: true},
-        {status: "normal", id: "", linked: true, spirit: false, x: 240, y: 336, type: "door", style: "knobbyTree", targetZone: "overworld", targetObjectId: "warTempleEntranceSpirit", d: "up", locationCue: "War Temple 1F"},
+        {status: "normal", id: "treeEntrance", linked: true, spirit: false, x: 240, y: 336, type: "door", style: "knobbyTree", targetZone: "tree", targetObjectId: "treeEntrance", d: "up", locationCue: "Lab B1"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
