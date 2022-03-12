@@ -1,6 +1,6 @@
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
-import { addEffectToArea, removeEffectFromArea } from 'app/content/areas';
-import { Spark } from 'app/content/effects/spark';
+import { removeEffectFromArea } from 'app/content/areas';
+import { addRadialSparks } from 'app/content/effects/spark';
 import { allTiles } from 'app/content/tiles';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { drawFrameAt } from 'app/utils/animations';
@@ -61,8 +61,11 @@ export class LightningBolt implements EffectInstance, Props {
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;
         if (this.animationTime === this.delay + LIGHTNING_ANIMATION_DURATION) {
+            addRadialSparks(
+                state, this.area, [this.x, this.y], this.shockWaves, this.shockWaveTheta
+            );
             // Create shockwave here.
-            for (let i = 0; i < this.shockWaves; i++) {
+            /*for (let i = 0; i < this.shockWaves; i++) {
                 const theta = this.shockWaveTheta + i * 2 * Math.PI / this.shockWaves;
                 const dx = Math.cos(theta);
                 const dy = Math.sin(theta);
@@ -74,7 +77,7 @@ export class LightningBolt implements EffectInstance, Props {
                     ttl: 1000,
                 });
                 addEffectToArea(state, this.area, spark);
-            }
+            }*/
         }
         if (this.animationTime < this.delay) {
             if (this.animationTime % 40 === 0) {

@@ -232,7 +232,7 @@ export class Enemy implements Actor, ObjectInstance {
             knockback: hit.knockback ? {vx: -hit.knockback.vx, vy: -hit.knockback.vy, vz: 0 } : null
         };
     }
-    applyDamage(state: GameState, damage: number) {
+    applyDamage(state: GameState, damage: number, damageSound: string = 'enemyHit') {
         if (this.life <= 0) {
             return;
         }
@@ -245,7 +245,7 @@ export class Enemy implements Actor, ObjectInstance {
             defeated = true;
             this.showDeathAnimation(state);
         } else {
-            playSound('enemyHit');
+            playSound(damageSound);
         }
         if (this.area !== state.areaInstance) {
             addEffectToArea(state, state.areaInstance, new AnimationEffect({

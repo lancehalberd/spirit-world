@@ -48,6 +48,8 @@ export const enemyTypes = <const>[
     'electricSquirrel', 'ent',
     'flameSnake', 'frostBeetle',
     'floorEye',
+    // These are designed for the golem boss but can be use in isolation.
+    'golemHand',
     'lightningBug', 'lightningDrone',
     'sentryBot', 'snake', 'squirrel',
     'wallLaser',

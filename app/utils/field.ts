@@ -681,4 +681,8 @@ export function uncoverTile(
     }
 }
 
-
+export function addScreenShake(state: GameState, dx: number, dy: number, duration = 200): void {
+    state.screenShakes.push({
+        dx, dy, startTime: state.fieldTime, endTime: state.fieldTime + duration
+    });
+}

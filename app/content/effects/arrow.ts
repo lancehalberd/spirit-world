@@ -240,6 +240,7 @@ export class Arrow implements EffectInstance {
             hitEnemies: !this.reflected,
             hitObjects: true,
             hitTiles: this.animationTime >= this.ignoreWallsDuration,
+            isArrow: true,
         };
     }
     update(state: GameState) {
@@ -363,6 +364,7 @@ export class EnemyArrow extends Arrow {
             hitEnemies: this.reflected,
             hitObjects: true,
             hitTiles: this.animationTime >= this.ignoreWallsDuration,
+            isArrow: true,
         };
     }
     update(state: GameState) {

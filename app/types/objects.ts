@@ -133,6 +133,20 @@ export interface MovementProperties {
     needsFullTile?: boolean
 }
 
+
+export interface Ray {
+    x1: number
+    y1: number
+    x2: number
+    y2: number
+    r: number
+}
+export interface Circle {
+   x: number
+   y: number
+   r: number
+}
+
 export interface HitProperties {
     direction?: Direction
     damage?: number
@@ -140,8 +154,8 @@ export interface HitProperties {
     spiritCloakDamage?: number
     element?: MagicElement
     hitbox?: Rect
-    hitCircle?: {x: number, y: number, r: number}
-    hitRay?: {x1: number, y1: number, x2: number, y2: number, r: number}
+    hitCircle?: Circle
+    hitRay?: Ray
     source?: Actor
     // Whether this hit can break crystal shields on certain enemies like
     // the Crystal Guardians and Crystal Collector in the Waterfall Tower.
@@ -180,6 +194,8 @@ export interface HitProperties {
     ignoreTargets?: Set<EffectInstance | ObjectInstance>
     // If true this hit will only apply to objects touching the ground.
     isGroundHit?: boolean
+    // True if this is an arrow attack, targets may be strong/weak against arrows.
+    isArrow?: boolean
 }
 
 export interface HitResult {

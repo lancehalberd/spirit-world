@@ -24,8 +24,6 @@ export interface Renderable {
     render(context: CanvasRenderingContext2D, target: Rect): void
 }
 
-export type GameContext = 'cutscene' | 'enchant' | 'field' | 'item' | 'jewel' | 'jewelCrafting' | 'map';
-
 export interface FullRectangle {
     left: number,
     top: number,
@@ -88,16 +86,6 @@ export interface TextPopup {
     color: Color,
     duration?: number,
     gravity?: number,
-}
-
-export type PointsType = 'anima' | 'coins' | 'divinity' | 'fame';
-// Cost is an amount of coins or a map of points types to amounts.
-export type Cost = number | {[key in PointsType]?: number};
-
-export interface HUDElement extends Rect {
-    isPointOver: (x: number, y: number) => boolean,
-    helpMethod?: () => string,
-    onClick?: () => void,
 }
 
 export interface MenuOption {

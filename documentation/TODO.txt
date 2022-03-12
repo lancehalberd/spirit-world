@@ -46,14 +46,40 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+
     - Add Golem boss to Tomb
-        - Immune to damage except for weak spot in the center.
-        - Bow deals +3 damage, other weapons deal half damage.
         - Has two hands it uses for guarding and attacking
-            - While both are up, one hand guards while the other attacks
             - Sometimes does large attacks with both hands
             - Tedious to kill without destroying one hand, faster to kill without destroying both hands
-        - Has a beam attack from its weak point
+        Hand Attacks:
+            - Slams hand down creating shock waves
+                - Can do one hand at a time, both together, or alternate hands
+                - Shock waves should be in an arc of 4-5 projectiles towards the south
+            - Hand hovers over player tracking them then stops briefly and slams the ground
+                - Only one hand at a time and will only initiate this attack with a second hand to guard.
+                - Hand is vulnerable for ~1 second
+            - Hand moves slightly down the screen and tracks the players x position and then slams into the wall
+                - Only one hand at a time
+                - Hand is vulnerable for about ~1 second
+        - Enrage mode
+            - Strafes across the battle field from side to side once per enrage level.
+            - If hands are alive, rapidly slams hands during first strafe.
+            - Other strafes shoot a beam and get faster with each direction.
+                - Probably 1x, 1.5x, 2x speed.
+
+    - Fixes from Lana's stream:
+        - Either remove side area before boss or make it more obvious, perhaps add an intermediate ledge you have to climb to reach the right side
+        - Fix walking over pit.
+        - Add a point of no return before the first fork to prevent excessive backtracking
+            - Could be a cliff and add the cliff tutorial earlier.
+        - Fix the boss summons too many adds
+            - Boss cannot summon adds without taking another action first.
+    - Make staff destroy rolling balls on hit instead of ignoring them.
+    - Add visual effect for faux charge.
+        - Just a couple sparks
+        - Don't show when real charge is available to avoid timing confusion.
+
+
     World Tree
         Tower is a series of 2x2 super tiles with a vine for climbing to the next section that
         Floor 1 is land level + underwater(in material world)

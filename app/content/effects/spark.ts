@@ -1,10 +1,10 @@
-import { removeEffectFromArea } from 'app/content/areas';
+import { addEffectToArea, removeEffectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { hitTargets } from 'app/utils/field';
 
 import {
     AreaInstance, DrawPriority, EffectInstance,
-    Frame, GameState,
+    Frame, GameState, Point,
 } from 'app/types';
 
 interface Props {
@@ -79,5 +79,21 @@ export class Spark implements EffectInstance, Props {
         context.moveTo(this.x - 2 * this.vx, this.y - 2 * this.vy);
         context.lineTo(this.x + 2 * this.vx, this.y + 2 * this.vy);
         context.stroke();
+    }
+}
+
+export function addRadialSparks(this: void, state: GameState, area: AreaInstance, [x, y]: Point, count: number, thetaOffset = 0): void {
+    for (let i = 0; i < count; i++) {
+        const theta = thetaOffset + i * 2 * Math.PI / count;
+        const dx = Math.cos(theta);
+        const dy = Math.sin(theta);
+        const spark = new Spark({
+            x,
+            y,
+            vx: 4 * dx,
+            vy: 4 * dy,
+            ttl: 1000,
+        });
+        addEffectToArea(state, area, spark);
     }
 }
