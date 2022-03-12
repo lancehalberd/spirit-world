@@ -64,20 +64,6 @@ export class LightningBolt implements EffectInstance, Props {
             addRadialSparks(
                 state, this.area, [this.x, this.y], this.shockWaves, this.shockWaveTheta
             );
-            // Create shockwave here.
-            /*for (let i = 0; i < this.shockWaves; i++) {
-                const theta = this.shockWaveTheta + i * 2 * Math.PI / this.shockWaves;
-                const dx = Math.cos(theta);
-                const dy = Math.sin(theta);
-                const spark = new Spark({
-                    x: this.x,
-                    y: this.y,
-                    vx: 4 * dx,
-                    vy: 4 * dy,
-                    ttl: 1000,
-                });
-                addEffectToArea(state, this.area, spark);
-            }*/
         }
         if (this.animationTime < this.delay) {
             if (this.animationTime % 40 === 0) {

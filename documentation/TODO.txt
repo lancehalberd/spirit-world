@@ -74,10 +74,10 @@ Current tasks:
             - Could be a cliff and add the cliff tutorial earlier.
         - Fix the boss summons too many adds
             - Boss cannot summon adds without taking another action first.
-    - Make staff destroy rolling balls on hit instead of ignoring them.
     - Add visual effect for faux charge.
         - Just a couple sparks
         - Don't show when real charge is available to avoid timing confusion.
+    - Make staff destroy rolling balls on hit instead of ignoring them.
 
 
     World Tree
