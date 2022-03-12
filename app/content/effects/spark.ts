@@ -82,9 +82,33 @@ export class Spark implements EffectInstance, Props {
     }
 }
 
-export function addRadialSparks(this: void, state: GameState, area: AreaInstance, [x, y]: Point, count: number, thetaOffset = 0): void {
+export function addRadialSparks(this: void,
+    state: GameState, area: AreaInstance,
+    [x, y]: Point, count: number, thetaOffset = 0
+): void {
     for (let i = 0; i < count; i++) {
         const theta = thetaOffset + i * 2 * Math.PI / count;
+        const dx = Math.cos(theta);
+        const dy = Math.sin(theta);
+        const spark = new Spark({
+            x,
+            y,
+            vx: 4 * dx,
+            vy: 4 * dy,
+            ttl: 1000,
+        });
+        addEffectToArea(state, area, spark);
+    }
+}
+
+export function addArcOfSparks(this: void,
+    state: GameState, area: AreaInstance,
+    [x, y]: Point, count: number, centerTheta = 0, thetaRadius = Math.PI / 4
+): void {
+    for (let i = 0; i < count; i++) {
+        const theta = count === 1
+            ? centerTheta
+            : centerTheta - thetaRadius + i * 2 * thetaRadius / (count - 1);
         const dx = Math.cos(theta);
         const dy = Math.sin(theta);
         const spark = new Spark({

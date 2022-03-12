@@ -48,13 +48,7 @@ Graphics:
 Current tasks:
 
     - Add Golem boss to Tomb
-        - Has two hands it uses for guarding and attacking
-            - Sometimes does large attacks with both hands
-            - Tedious to kill without destroying one hand, faster to kill without destroying both hands
         Hand Attacks:
-            - Slams hand down creating shock waves
-                - Can do one hand at a time, both together, or alternate hands
-                - Shock waves should be in an arc of 4-5 projectiles towards the south
             - Hand hovers over player tracking them then stops briefly and slams the ground
                 - Only one hand at a time and will only initiate this attack with a second hand to guard.
                 - Hand is vulnerable for ~1 second
@@ -66,6 +60,18 @@ Current tasks:
             - If hands are alive, rapidly slams hands during first strafe.
             - Other strafes shoot a beam and get faster with each direction.
                 - Probably 1x, 1.5x, 2x speed.
+
+    - Extra Golem Behaviors
+        - Slam both hands together
+        - Quickly slam both hands in succession a single time.
+
+    Golem notes:
+        - Vulnerable to bow
+        - Invulnerable except for weak spot
+        - Has two hands for guarding adn attacking
+        - Sometimes does larger coordinated attacks depending on which parts are alive.
+        - Tedious to kill without destroying any hands
+        - Fastest to kill destroying only one hand
 
     - Fixes from Lana's stream:
         - Either remove side area before boss or make it more obvious, perhaps add an intermediate ledge you have to climb to reach the right side
