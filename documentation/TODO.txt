@@ -48,13 +48,6 @@ Graphics:
 Current tasks:
 
     - Add Golem boss to Tomb
-        Hand Attacks:
-            - Hand hovers over player tracking them then stops briefly and slams the ground
-                - Only one hand at a time and will only initiate this attack with a second hand to guard.
-                - Hand is vulnerable for ~1 second
-            - Hand moves slightly down the screen and tracks the players x position and then slams into the wall
-                - Only one hand at a time
-                - Hand is vulnerable for about ~1 second
         - Enrage mode
             - Strafes across the battle field from side to side once per enrage level.
             - If hands are alive, rapidly slams hands during first strafe.
