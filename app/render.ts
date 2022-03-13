@@ -135,8 +135,12 @@ export function render() {
 
     // Render any editor specific graphics if appropriate.
     renderEditor(context, state);
-    if (state.defeatState.defeated) {
+    // Don't draw the HUD while editing since it obscures some tiles.
+    if (!editingState.isEditing) {
+        // Draw the HUD onto the field.
         renderHUD(context, state);
+    }
+    if (state.defeatState.defeated) {
         context.save();
             context.globalAlpha *= 0.7 * Math.min(1, state.defeatState.time / 1000);
             context.fillStyle = '#888';
@@ -150,11 +154,6 @@ export function render() {
         if (!state.hideMenu) {
             renderMenu(context, state);
         }
-    }
-    // Don't draw the HUD while editing since it obscures some tiles.
-    if (!editingState.isEditing) {
-        // Draw the HUD onto the field.
-        renderHUD(context, state);
     }
 }
 

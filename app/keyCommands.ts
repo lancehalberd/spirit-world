@@ -134,7 +134,9 @@ function isGamepadGamekeyPressed(gameKey: number) {
                 value = gamepad.axes[axisIndex[0]] * axisIndex[1];
             }
             if (value) {
-                lastInput = 'gamepad';
+                if (value >= ANALOG_THRESHOLD) {
+                    lastInput = 'gamepad';
+                }
                 return value;
             }
         }

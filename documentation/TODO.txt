@@ -47,10 +47,7 @@ Graphics:
 
 Current tasks:
     - Fixes from Lana's stream:
-        - Either remove side area before boss or make it more obvious, perhaps add an intermediate ledge you have to climb to reach the right side
         - Fix walking over pit.
-        - Add a point of no return before the first fork to prevent excessive backtracking
-            - Could be a cliff and add the cliff tutorial earlier.
     - Add visual effect for faux charge.
         - Just a couple sparks
         - Don't show when real charge is available to avoid timing confusion.
