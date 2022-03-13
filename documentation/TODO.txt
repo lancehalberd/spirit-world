@@ -46,10 +46,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-
-    - Add Golem boss to Tomb
-        - Golem hands should not spawn in a room with a defeated golem
-
     - Fixes from Lana's stream:
         - Either remove side area before boss or make it more obvious, perhaps add an intermediate ledge you have to climb to reach the right side
         - Fix walking over pit.

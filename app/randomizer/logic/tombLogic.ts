@@ -95,7 +95,7 @@ export const tombNodes: LogicNode[] = [
         zoneId,
         nodeId: 'tombBoss',
         checks: [
-            {objectId: 'tomb:0:1x1-beetleBoss-0', logic: hasBossWeapon},
+            {objectId: 'tombBoss', logic: hasBossWeapon},
         ],
         paths: [{ nodeId: 'tombExit', logic: hasBossWeapon}],
     },
