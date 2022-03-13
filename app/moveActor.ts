@@ -127,27 +127,21 @@ function moveActorInDirection(
         }
     }
 
+    // Check the 1st + 7th pixel from the top/left, then the 1st + 7th pixel from the bottom/right
+    // if they are different.
     let checkPoints: {x: number, y: number}[];
     // When moving vertically, we only care about the row we are moving into.
-    if (direction === 'up') {
-        checkPoints = [{x: ax, y: ay}, {x: ax + 7, y: ay}];
+    if (direction === 'up' || direction === 'down') {
+        const y = direction === 'up' ? ay : ay + actor.h - 1;
+        checkPoints = [{x: ax, y}, {x: ax + 7, y}];
         if (actor.w > 8) {
-            checkPoints = [...checkPoints, {x: ax + 8, y: ay}, {x: ax + 15, y: ay}];
+            checkPoints = [...checkPoints, {x: ax + actor.w - 8, y}, {x: ax + actor.w - 1, y}];
         }
-    } else if (direction === 'down') {
-        checkPoints = [{x: ax, y: ay + actor.h - 1}, {x: ax + 7, y: ay + actor.h - 1}];
-        if (actor.w > 8) {
-            checkPoints = [...checkPoints, {x: ax + 8, y: ay + actor.h - 1}, {x: ax + 15, y: ay + actor.h - 1}];
-        }
-    } else if (direction === 'left') {
-        checkPoints = [{x: ax, y: ay}, {x: ax, y: ay + 7}];
+    } else {
+        const x = direction === 'left' ? ax : ax + actor.w - 1;
+        checkPoints = [{x, y: ay}, {x, y: ay + 7}];
         if (actor.h > 8) {
-            checkPoints = [...checkPoints, {x: ax, y: ay + 8}, {x: ax, y: ay + 15}];
-        }
-    } else if (direction === 'right') {
-        checkPoints = [{x: ax + actor.w - 1, y: ay}, {x: ax + actor.w - 1, y: ay + 7}];
-        if (actor.h > 8) {
-            checkPoints = [...checkPoints, {x: ax + actor.w - 1, y: ay + 8}, {x: ax + actor.w - 1, y: ay + 15}];
+            checkPoints = [...checkPoints, {x, y: ay + actor.h - 8}, {x, y: ay + actor.h - 1}];
         }
     }
     const excludedObjects = new Set<any>([...movementProperties.excludedObjects, actor]);

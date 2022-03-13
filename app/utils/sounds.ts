@@ -55,6 +55,9 @@ export function requireSound(key, callback = null) {
                     //console.log('newSound.howl.fade', newSound.targetVolume);
                     newSound.howl.mute(false);
                     newSound.howl.fade(0, newSound.targetVolume, 1000);
+                } else {
+                    newSound.howl.mute(false);
+                    newSound.howl.volume(newSound.targetVolume);
                 }
             },
             onplayerror: function (error) {

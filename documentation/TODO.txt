@@ -48,23 +48,7 @@ Graphics:
 Current tasks:
 
     - Add Golem boss to Tomb
-        - Enrage mode
-            - Strafes across the battle field from side to side once per enrage level.
-            - If hands are alive, rapidly slams hands during first strafe.
-            - Other strafes shoot a beam and get faster with each direction.
-                - Probably 1x, 1.5x, 2x speed.
-
-    - Extra Golem Behaviors
-        - Slam both hands together
-        - Quickly slam both hands in succession a single time.
-
-    Golem notes:
-        - Vulnerable to bow
-        - Invulnerable except for weak spot
-        - Has two hands for guarding adn attacking
-        - Sometimes does larger coordinated attacks depending on which parts are alive.
-        - Tedious to kill without destroying any hands
-        - Fastest to kill destroying only one hand
+        - Golem hands should not spawn in a room with a defeated golem
 
     - Fixes from Lana's stream:
         - Either remove side area before boss or make it more obvious, perhaps add an intermediate ledge you have to climb to reach the right side
@@ -353,6 +337,16 @@ Dungeon 1 Improvements:
     - Update wall laser graphics+behavior to actuall shoot lasers + be mounted on walls.
     - Update arrow turret graphics.
 
+Golem Boss Improvements:
+    - Tighten up timing when switching between attacks
+        - Cut short any hand actions that aren't close to completion when starting enrage modes.
+    - Slam both hands together
+    - Quickly slam both hands in succession a single time.
+    - Knocking bolders down from the ceiling (use rock riles + rock particles when they break)
+        - Could drop some down for certian fist slam attacks
+        - Could have the boss slam against the walls when strafing side to side or raise entire body and slam ground to drop stones.
+        - Could also drop additional permanent barries that reduce the safe zones on the sides.
+
 Dungeon 2 Improvements:
     - Add more uses of spirit sight:
         - See actual elemental beasts in the front room where the statues are located.
@@ -593,6 +587,13 @@ Dungeon 1: Vanara Tomb (fortress around the Cocoon)
     - A facade is built aroaund the structure to disguise it as a mundane structure
         - The Vanara village posts guards in addition to the traps to keep people out
     - MCs father refused to go back to sleep, having fallen in love with MCs mother and not wanting to forget about her.
+Dungeon 1 Boss Golem:
+    - Vulnerable to bow
+    - Invulnerable except for weak spot
+    - Has two hands for guarding adn attacking
+    - Sometimes does larger coordinated attacks depending on which parts are alive.
+    - Tedious to kill without destroying any hands
+    - Fastest to kill destroying only one hand
 
 
 Dungeon 2: Ruins of Summoner village and Temple of War

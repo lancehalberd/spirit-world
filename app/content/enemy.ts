@@ -87,8 +87,6 @@ export class Enemy implements Actor, ObjectInstance {
         this.spawnX = this.x = definition.x;
         this.spawnY = this.y = definition.y;
         const frame = this.getFrame();
-        this.w = frame.content?.w ?? frame.w;
-        this.h = frame.content?.h ?? frame.h;
         this.life = this.enemyDefinition.life ?? 1;
         this.speed = this.enemyDefinition.speed ?? 1;
         this.acceleration = this.enemyDefinition.acceleration ?? .1;
@@ -99,6 +97,8 @@ export class Enemy implements Actor, ObjectInstance {
         this.isImmortal = this.enemyDefinition.isImmortal;
         this.z = 0;//this.flying ? 12 : 0;
         this.scale = this.enemyDefinition.scale ?? 1;
+        this.w = (frame.content?.w ?? frame.w) * this.scale;
+        this.h = (frame.content?.h ?? frame.h) * this.scale;
         this.params = {
             ...(this.enemyDefinition.params || {}),
             ...(definition.params || {}),

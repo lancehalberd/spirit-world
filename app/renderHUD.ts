@@ -87,11 +87,12 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
     const bosses = [...state.areaInstance.enemies, ...state.alternateAreaInstance.enemies].filter(
         e => e.status !== 'gone' && e.definition.type === 'boss' && e.isFromCurrentSection(state)
     ) as Enemy[];
+    y = CANVAS_HEIGHT
     if (bosses.length) {
         const totalSpace = CANVAS_WIDTH - 32 - bosses.length * 4 + 4;
         const barHeight = 6;
         const barWidth = (totalSpace / bosses.length) | 0;
-        y = CANVAS_HEIGHT - 16;
+        y -= 16;
         x = 16;
         for (const boss of bosses) {
             const animatedWidth = barWidth * Math.min(1, boss.healthBarTime / 1000);
@@ -103,6 +104,34 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
                 context.fillRect(x, y, healthWidth, barHeight);
             }
             const shieldWidth = animatedWidth * boss.getShieldPercent(state) | 0;
+            if (shieldWidth > 0) {
+                context.fillStyle = 'white';
+                context.fillRect(x, y, shieldWidth, 2);
+                context.fillRect(x, y + barHeight - 2, shieldWidth, 2);
+            }
+            x += barWidth + 4;
+        }
+    }
+    const otherEnemiesWithHealthBars = [...state.areaInstance.enemies, ...state.alternateAreaInstance.enemies].filter(
+        e => e.status !== 'gone' && e.definition.type !== 'boss' && e.enemyDefinition.showHealthBar && e.isFromCurrentSection(state)
+    );
+    if (otherEnemiesWithHealthBars.length) {
+        const totalSpace = CANVAS_WIDTH - 32 - bosses.length * 4 + 4;
+        const barHeight = 4;
+        // This probably won't work when there are more than three such enemies.
+        const barWidth = (totalSpace / 3) | 0;
+        y -= barHeight;
+        x = 16;
+        for (const enemy of otherEnemiesWithHealthBars) {
+            const animatedWidth = barWidth * Math.min(1, enemy.healthBarTime / 1000);
+            context.fillStyle = 'black';
+            context.fillRect(x, y, animatedWidth, barHeight);
+            const healthWidth = animatedWidth * enemy.getHealthPercent(state) | 0;
+            if (healthWidth > 0) {
+                context.fillStyle = 'orange';
+                context.fillRect(x, y, healthWidth, barHeight);
+            }
+            const shieldWidth = animatedWidth * enemy.getShieldPercent(state) | 0;
             if (shieldWidth > 0) {
                 context.fillStyle = 'white';
                 context.fillRect(x, y, shieldWidth, 2);

@@ -79,6 +79,7 @@ export interface EnemyDefinition {
     speed?: number
     acceleration?: number
     scale?: number
+    showHealthBar?: boolean
     touchDamage?: number
     touchHit?: HitProperties
     update?: (state: GameState, enemy: Enemy) => void
