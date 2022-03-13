@@ -40,14 +40,17 @@ function updateBeetleBoss(state: GameState, enemy: Enemy): void {
         // This boss is meant to not be too challenging for new players,
         // so it summons minions that drop life rewards more frequently as the player loses life.
         const summonChance = 0.2 + Math.max(0, 0.6 * (4 - state.hero.life) / 2);
-        if (Math.random() < summonChance) {
+        if (Math.random() < summonChance && !enemy.params.summonedRecently) {
+            enemy.params.summonedRecently = true;
             enemy.setMode('retreat');
             enemy.params.summonTheta = Math.random() * 2 * Math.PI;
         } else if (Math.random() < 0.3) {
             enemy.setMode('circle');
+            enemy.params.summonedRecently = false;
         } else {
             const vector = getVectorToNearbyTarget(state, enemy, 32 * 32, enemy.area.allyTargets);
             if (vector) {
+                enemy.params.summonedRecently = false;
                 enemy.setMode('rush');
                 enemy.vx = vector.x;
                 enemy.vy = vector.y;
@@ -69,7 +72,7 @@ function updateBeetleBoss(state: GameState, enemy: Enemy): void {
             enemy.setMode('choose');
         }
     } else if (enemy.mode === 'retreat') {
-        if (moveEnemyToTargetLocation(state, enemy, section.x + section.w / 2, section.y - 32 + hitbox.h / 2) === 0) {
+        if (moveEnemyToTargetLocation(state, enemy, section.x + section.w / 2, section.y - 24 + hitbox.h / 2) === 0) {
             enemy.setMode('summon');
         }
     } else if (enemy.mode === 'summon') {
