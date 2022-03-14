@@ -46,8 +46,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Fixes from Lana's stream:
-        - Fix walking over pit.
     - Add visual effect for faux charge.
         - Just a couple sparks
         - Don't show when real charge is available to avoid timing confusion.

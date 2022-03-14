@@ -536,26 +536,30 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
             // like normal damaging ground rather than a pit. This was done because there were many instances
             // it was difficult to reset the player's position when transition screens over lava.
             if (behaviors.pit || behaviors.isLava || behaviors.cloudGround) {
-                if (hero.y - row * 16 > 4) {
-                    if (hero.x - column * 16 > 4) {
+                const tileIsUp = row < bottomRow;
+                const tileIsDown = row > topRow;
+                const tileIsLeft = column < rightColumn;
+                const tileIsRight = column > leftColumn;
+                if (tileIsUp) {
+                    if (tileIsLeft) {
                         fallingTopLeft = true;
-                    } else if (hero.x - column * 16 < -4) {
+                    } else if (tileIsRight) {
                         fallingTopRight = true;
                     } else {
                         fallingTopLeft = fallingTopRight = true;
                     }
-                } else if (hero.y - row * 16 < -4) {
-                    if (hero.x - column * 16 > 4) {
+                } else if (tileIsDown) {
+                    if (tileIsLeft) {
                         fallingBottomLeft = true;
-                    } else if (hero.x - column * 16 < -4) {
+                    } else if (tileIsRight) {
                         fallingBottomRight = true;
                     } else {
                         fallingBottomLeft = fallingBottomRight = true;
                     }
                 } else {
-                    if (hero.x - column * 16 > 4) {
+                    if (tileIsLeft) {
                         fallingTopLeft = fallingBottomLeft = true;
-                    } else if (hero.x - column * 16 < -4) {
+                    } else if (tileIsRight) {
                         fallingTopRight = fallingBottomRight = true;
                     } else {
                         fallingTopLeft = fallingTopRight = fallingBottomLeft = fallingBottomRight = true;

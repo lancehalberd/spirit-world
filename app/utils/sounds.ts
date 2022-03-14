@@ -248,10 +248,10 @@ export function playTrack(trackKey: TrackKey, timeOffset, muted = false, fadeOut
     }
     //console.log('play', sound.props.src, timeOffset, sound.howl.duration(), offset);
     //sound.howl.seek(offset);
-    sound.howl.seek(offset);
-    sound.howl.play();
     sound.targetVolume = volume;
     sound.muted = muted;
+    sound.howl.seek(offset);
+    sound.howl.play();
     sound.shouldPlay = true;
     // console.log({volume});
     // console.log('fade in new track', sound);
