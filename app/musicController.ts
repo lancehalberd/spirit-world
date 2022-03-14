@@ -26,7 +26,7 @@ export const updateMusic = (): void => {
         // Eventually it might be fun to add logic here to manipulate which sections play based on
         // how the fight is going, for example more intense music when the boss is enraged.
         if (!isTrackPlaying('bossIntro') && !isTrackPlaying('bossA') && !isTrackPlaying('bossB')) {
-            playTrack('bossIntro', 28000, muted);
+            playTrack('bossIntro', 0, muted);
         }
     } else if (state.location.zoneKey === 'overworld'
         || state.location.zoneKey === 'sky'
