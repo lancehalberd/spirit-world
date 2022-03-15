@@ -46,11 +46,7 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Add visual effect for faux charge.
-        - Just a couple sparks
-        - Don't show when real charge is available to avoid timing confusion.
     - Make staff destroy rolling balls on hit instead of ignoring them.
-
 
     World Tree
         Tower is a series of 2x2 super tiles with a vine for climbing to the next section that

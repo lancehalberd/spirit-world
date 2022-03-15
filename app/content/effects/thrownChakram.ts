@@ -255,6 +255,11 @@ export class HeldChakram implements EffectInstance {
         // Play a second sound when damage is doubled using the base charge (level 0).
         if (!state.hero.passiveTools.charge && this.animationTime === 600) {
             playSound('chakramCharge1');
+            const cx = this.w / 2, cy = this.h / 2;
+            this.sparkles.push(makeSparkleAnimation(state, {x: cx + 2, y: cy + 2, w: 1, h: 1}, { target: this, delay: 0 }));
+            this.sparkles.push(makeSparkleAnimation(state, {x: cx - 3, y: cy + 3, w: 1, h: 1}, { target: this, delay: 80 }));
+            this.sparkles.push(makeSparkleAnimation(state, {x: cx - 4, y: cy - 4, w: 1, h: 1}, { target: this, delay: 160 }));
+            this.sparkles.push(makeSparkleAnimation(state, {x: cx + 6, y: cy - 6, w: 1, h: 1}, { target: this, delay: 240 }));
         }
         // Held chakram is thrown if the hero no longer exists.
         if (this.hero !== state.hero && this.area.objects.indexOf(this.hero) < 0) {

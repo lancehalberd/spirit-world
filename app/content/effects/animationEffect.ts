@@ -4,7 +4,7 @@ import { createAnimation, drawFrame, frameAnimation, getFrame } from 'app/utils/
 
 import {
     AreaInstance, DrawPriority, EffectInstance, Frame, FrameAnimation,
-    GameState, MagicElement, Rect, TileBehaviors,
+    GameState, MagicElement, ObjectInstance, Rect, TileBehaviors,
 } from 'app/types';
 
 
@@ -24,6 +24,7 @@ interface AnimationProps {
     scale?: number
     ttl?: number
     delay?: number
+    target?: ObjectInstance | EffectInstance
 }
 
 export class AnimationEffect implements EffectInstance {
@@ -46,12 +47,13 @@ export class AnimationEffect implements EffectInstance {
     az: number;
     rotation: number;
     scale: number;
+    target?: ObjectInstance | EffectInstance;
     ttl: number;
     constructor({
         animation, drawPriority = 'background',
         x = 0, y = 0, z = 0, vx = 0, vy = 0, vz = 0, vstep = 0, az = 0,
         rotation = 0, scale = 1, alpha = 1,
-        ttl, delay = 0
+        target, ttl, delay = 0
      }: AnimationProps) {
         this.animation = animation;
         this.animationTime = 0;
@@ -70,10 +72,12 @@ export class AnimationEffect implements EffectInstance {
         this.ttl = ttl;
         this.delay = delay;
         this.behaviors = {};
+        this.target = target;
     }
     getHitbox(state: GameState) {
         const frame = getFrame(this.animation, this.animationTime);
-        return {x: this.x, y: this.y - this.z, w: frame.w, h: frame.h};
+        const originX = this.target?.x || 0, originY = (this.target?.y || 0) - (this.target?.z || 0);
+        return {x: originX + this.x, y: originY + this.y - this.z, w: frame.w, h: frame.h};
     }
     update(state: GameState) {
         if (this.delay > 0) {
@@ -106,8 +110,9 @@ export class AnimationEffect implements EffectInstance {
         if (this.alpha < 1) {
             context.globalAlpha *= this.alpha;
         }
+        const originX = this.target?.x || 0, originY = (this.target?.y || 0) - (this.target?.z || 0);
         if (this.rotation) {
-            context.translate(this.x + frame.w / 2, this.y - this.z + frame.h / 2);
+            context.translate(originX + this.x + frame.w / 2, originY + this.y - this.z + frame.h / 2);
             context.rotate(this.rotation);
             drawFrame(context, frame, { ...frame,
                 x: -frame.w / 2, y: -frame.h / 2,
@@ -116,7 +121,7 @@ export class AnimationEffect implements EffectInstance {
             });
         } else {
             drawFrame(context, frame, { ...frame,
-                x: this.x, y: this.y - this.z,
+                x: originX + this.x, y: originY + this.y - this.z,
                 w: frame.w * this.scale,
                 h: frame.h * this.scale,
             });
@@ -162,6 +167,7 @@ const lightningSparkleAnimation = createAnimation('gfx/effects/aura_particles.pn
 interface SparkleProps {
     delay?: number
     element?: MagicElement
+    target?: ObjectInstance | EffectInstance
     velocity?: {x: number, y: number}
     z?: number
 }
@@ -177,6 +183,7 @@ export function makeSparkleAnimation(
     {
         delay,
         element,
+        target,
         velocity,
         z,
     }: SparkleProps
@@ -191,6 +198,7 @@ export function makeSparkleAnimation(
         animation: animation,
         delay,
         drawPriority: 'foreground',
+        target,
         x: hitbox.x + Math.random() * hitbox.w - animation.frames[0].w / 2,
         y: hitbox.y + Math.random() * hitbox.h - animation.frames[0].h / 2,
         z: (hitbox.z || 0) + Math.random() * (hitbox.zd || 0)
