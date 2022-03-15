@@ -83,7 +83,7 @@ enemyDefinitions.golem = {
     },
 };
 enemyDefinitions.golemHand = {
-    animations: droneAnimations, life: 12, scale: 2, update: updateGolemHand,
+    animations: droneAnimations, life: 9, scale: 2, update: updateGolemHand,
     canBeKnockedBack: false, canBeKnockedDown: false,
     showHealthBar: true,
     acceleration: 0.3, speed: 4,
@@ -110,6 +110,13 @@ enemyDefinitions.golemHand = {
         }
         enemy.defaultOnHit(state, hit);
         return { hit: true, blocked: true, stopped: true };
+    },
+    renderOver(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
+        context.fillStyle = enemy.mode === 'stunned' ? 'red' : 'grey';
+        context.beginPath();
+        const hitbox = enemy.getHitbox(state);
+        context.arc(hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h - 6, 5, 0, 2 * Math.PI);
+        context.fill();
     },
 };
 
@@ -150,7 +157,7 @@ function updateGolem(this: void, state: GameState, enemy: Enemy): void {
     // Boss moves slower for each hand remaining.
     enemy.speed = Math.max(1, enemy.enemyDefinition.speed - hands.length);
     if (enemy.params.enragedAttacks > 0) {
-        if (enemy.params.slamHands) {
+        if (enemy.params.slamHands && hands.length) {
             enemy.speed = 1.5;
         } else {
             enemy.speed = Math.max(2, enemy.speed);
@@ -259,7 +266,7 @@ function updateGolem(this: void, state: GameState, enemy: Enemy): void {
         fireLaser(state, enemy, 900);
         enemy.setMode('cooldown')
     } else if (enemy.mode === 'cooldown') {
-        if (enemy.modeTime >= 2000) {
+        if (enemy.modeTime >= 2000 || enemy.params.enragedAttacks > 0) {
             enemy.setMode('choose');
         }
     } else if (enemy.mode === 'slamHands') {
@@ -267,17 +274,19 @@ function updateGolem(this: void, state: GameState, enemy: Enemy): void {
             enemy.setMode('choose');
         }
     }
-    // Enrage level increases for each missing hand below 2 and each 1/3 health missing.
-    let targetEnrageLevel = Math.max(0, 2 - hands.length);
+    // Enrage level increases for each 9 damage a hand has taken(up to 2 enrage levels)
+    // and each 1/3 health missing.
+    let targetEnrageLevel = Math.floor(Math.max(0, 2 - hands.reduce((sum, hand) => sum + hand.life / 9, 0)));
+    const healthIsCritical = enemy.life <= enemy.enemyDefinition.life * 1 / 3;
     if (enemy.life <= enemy.enemyDefinition.life * 2 / 3) {
         targetEnrageLevel++;
     }
-    if (enemy.life <= enemy.enemyDefinition.life * 1 / 3) {
+    if (healthIsCritical) {
         targetEnrageLevel++;
     }
     if (enemy.params.enrageLevel < targetEnrageLevel) {
         enemy.params.enrageLevel = targetEnrageLevel;
-        enemy.params.enragedAttacks = Math.min(2, targetEnrageLevel);
+        enemy.params.enragedAttacks = healthIsCritical ? 2 : 1;
         enemy.isInvulnerable = true;
         // If the hands are alive, add an additional initial enraged attack of slamming hands.
         if (hands.length) {
