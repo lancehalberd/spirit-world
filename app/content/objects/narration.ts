@@ -50,7 +50,7 @@ export class Narration implements ObjectInstance {
         }
         const hero = state.hero.activeClone || state.hero;
         // This 'knocked' check is a hack to prevent triggering narration while falling.
-        if (hero.action !== 'knocked' && rectanglesOverlap(this.getHitbox(state), hero.getHitbox(state))) {
+        if (hero.action !== 'knocked' && hero.action !== 'jumpingDown' && rectanglesOverlap(this.getHitbox(state), hero.getHitbox(state))) {
             setScript(state, this.definition.message);
             saveObjectStatus(state, this.definition);
             this.status = 'gone';
