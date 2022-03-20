@@ -26,7 +26,9 @@ export interface ObjectInstance {
     definition?: ObjectDefinition
     linkedObject?: ObjectInstance
     behaviors?: TileBehaviors
+    getBehaviors?: (state: GameState) => TileBehaviors
     drawPriority?: DrawPriority
+    getDrawPriority?: (state: GameState) => DrawPriority
     // Set this flag for objects that need to update during screen transitions, such as doorways.
     updateDuringTransition?: boolean
     changesAreas?: boolean
@@ -81,9 +83,11 @@ export interface EffectInstance {
     linkedObject?: EffectInstance
     // This is used for effects that create light around them.
     behaviors?: TileBehaviors
+    getBehaviors?: (state: GameState) => TileBehaviors
     // Only used by the held chakram at the moment.
     changesAreas?: boolean
     drawPriority?: DrawPriority
+    getDrawPriority?: (state: GameState) => DrawPriority
     // Set this flag for objects that need to update during screen transitions, such as doorways.
     updateDuringTransition?: boolean
     x?: number, y?: number, z?: number

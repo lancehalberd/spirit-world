@@ -530,12 +530,12 @@ export function renderAreaBackground(context: CanvasRenderingContext2D, state: G
             state.camera.x - area.cameraOffset.x, state.camera.y - area.cameraOffset.y, CANVAS_WIDTH, CANVAS_HEIGHT,
         );
         for (const object of area.objects) {
-            if (object.drawPriority === 'background') {
+            if (object.drawPriority === 'background' || object.getDrawPriority?.(state) === 'background') {
                 object.render?.(context, state);
             }
         }
         for (const effect of area.effects) {
-            if (effect.drawPriority === 'background') {
+            if (effect.drawPriority === 'background' || effect.getDrawPriority?.(state) === 'background') {
                 effect.render?.(context, state);
             }
         }
@@ -585,14 +585,18 @@ export function renderAreaObjectsBeforeHero(context: CanvasRenderingContext2D, s
         }
         const spriteObjects: (EffectInstance | ObjectInstance)[] = [];
         for (const object of area.objects) {
-            if (object.drawPriority === 'sprites' && object.y <= state.hero.y) {
+            if ((object.drawPriority === 'sprites' || object.getDrawPriority?.(state) === 'sprites')
+                && object.y <= state.hero.y
+            ) {
                 if (object.render) {
                     spriteObjects.push(object);
                 }
             }
         }
         for (const effect of area.effects) {
-            if (effect.drawPriority === 'sprites' && effect.y <= state.hero.y) {
+            if ((effect.drawPriority === 'sprites' || effect.getDrawPriority?.(state) === 'sprites')
+                && effect.y <= state.hero.y
+            ) {
                 if (effect.render) {
                     spriteObjects.push(effect);
                 }
@@ -613,14 +617,18 @@ export function renderAreaObjectsAfterHero(context: CanvasRenderingContext2D, st
         translateContextForAreaAndCamera(context, state, area);
         const spriteObjects: (EffectInstance | ObjectInstance)[] = [];
         for (const object of area.objects) {
-            if (object.drawPriority === 'sprites' && object.y > state.hero.y) {
+            if ((object.drawPriority === 'sprites' || object.getDrawPriority?.(state) === 'sprites')
+                && object.y > state.hero.y
+            ) {
                 if (object.render) {
                     spriteObjects.push(object);
                 }
             }
         }
         for (const effect of area.effects) {
-            if (effect.drawPriority === 'sprites' && effect.y > state.hero.y) {
+            if ((effect.drawPriority === 'sprites' || effect.getDrawPriority?.(state) === 'sprites')
+                && effect.y > state.hero.y
+            ) {
                 if (effect.render) {
                     spriteObjects.push(effect);
                 }
@@ -644,15 +652,21 @@ export function renderForegroundObjects(context: CanvasRenderingContext2D, state
         for (const object of area.objects) {
             if (object.renderForeground) {
                 foregroundObjects.push(object);
-            } else if (!object.drawPriority || object.drawPriority === 'foreground') {
-                foregroundObjects.push(object);
+            } else {
+                const drawPriority = object.drawPriority || object.getDrawPriority?.(state);
+                if (!drawPriority || drawPriority === 'foreground') {
+                    foregroundObjects.push(object);
+                }
             }
         }
         for (const effect of area.effects) {
             if (effect.renderForeground) {
                 foregroundObjects.push(effect);
-            } else if (!effect.drawPriority || effect.drawPriority === 'foreground') {
-                foregroundObjects.push(effect);
+            } else {
+                const drawPriority = effect.drawPriority || effect.getDrawPriority?.(state);
+                if (!drawPriority || drawPriority === 'foreground') {
+                    foregroundObjects.push(effect);
+                }
             }
         }
         for (const object of foregroundObjects) {

@@ -1,3 +1,4 @@
+import { getObjectBehaviors } from 'app/content/objects';
 import { Clone } from 'app/content/objects/clone';
 import { editingState } from 'app/development/tileEditor';
 import { createCanvasAndContext } from 'app/dom';
@@ -221,14 +222,15 @@ export function renderAreaLighting(context: CanvasRenderingContext2D, state: Gam
             if (object.status === 'gone' || object.status === 'hidden' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
                 continue;
             }
-            if (object.getHitbox && object.behaviors?.brightness) {
+            const behaviors = getObjectBehaviors(state, object);
+            if (object.getHitbox && behaviors?.brightness) {
                 const hitbox = object.getHitbox(state);
                 drawLightGradient(lightingContext,
                     {
                         x: hitbox.x + hitbox.w / 2,
                         y: hitbox.y + hitbox.h / 2,
                     },
-                    object.behaviors.brightness, object.behaviors.lightRadius
+                    behaviors.brightness, behaviors.lightRadius
                 );
             }
             if (object instanceof Clone) {
@@ -251,14 +253,15 @@ export function renderAreaLighting(context: CanvasRenderingContext2D, state: Gam
             if (effect.status === 'gone') {
                 continue;
             }
-            if (effect.getHitbox && effect.behaviors?.brightness) {
+            const behaviors = getObjectBehaviors(state, effect);
+            if (effect.getHitbox && behaviors?.brightness) {
                 const hitbox = effect.getHitbox(state);
                 drawLightGradient(lightingContext,
                     {
                         x: hitbox.x + hitbox.w / 2,
                         y: hitbox.y + hitbox.h / 2,
                     },
-                    effect.behaviors.brightness, effect.behaviors.lightRadius
+                    behaviors.brightness, behaviors.lightRadius
                 );
             }
         }
@@ -273,14 +276,15 @@ export function renderAreaLighting(context: CanvasRenderingContext2D, state: Gam
             if (object.status === 'hidden' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
                 continue;
             }
-            if (object.getHitbox && object.behaviors?.brightness) {
+            const behaviors = getObjectBehaviors(state, object);
+            if (object.getHitbox && behaviors?.brightness) {
                 const hitbox = object.getHitbox(state);
                 drawLightGradient(lightingContext,
                     {
                         x: hitbox.x + hitbox.w / 2,
                         y: hitbox.y + hitbox.h / 2,
                     },
-                    object.behaviors.brightness, object.behaviors.lightRadius
+                    behaviors.brightness, behaviors.lightRadius
                 );
             }
         }

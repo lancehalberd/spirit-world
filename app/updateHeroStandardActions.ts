@@ -4,6 +4,7 @@ import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import {
     addEffectToArea, addObjectToArea, destroyTile, enterLocation, removeEffectFromArea,
 } from 'app/content/areas';
+import { getObjectBehaviors } from 'app/content/objects';
 import { destroyClone } from 'app/content/objects/clone';
 import { CloneExplosionEffect } from 'app/content/effects/CloneExplosionEffect';
 import { AstralProjection } from 'app/content/objects/astralProjection';
@@ -510,7 +511,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     // Check to grab an object (also used for interacting with objects).
     if (isPlayerControlled && !isActionBlocked && wasPassiveButtonPressed) {
         const {objects, tiles} = getActorTargets(state, hero);
-        if (tiles.some(({x, y}) => hero.area.behaviorGrid?.[y]?.[x]?.solid) || objects.some(o => o.behaviors?.solid)) {
+        if (tiles.some(({x, y}) => hero.area.behaviorGrid?.[y]?.[x]?.solid) || objects.some(o => getObjectBehaviors(state, o)?.solid)) {
             let closestLiftableTileCoords: TileCoords = null,
                 closestObject: ObjectInstance = null,
                 closestDistance = 100;
@@ -536,7 +537,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 if (object === hero) {
                     continue;
                 }
-                const behavior = object.behaviors;
+                const behavior = getObjectBehaviors(state, object);
                 if (behavior?.solid) {
                     hero.action = 'grabbing';
                 }

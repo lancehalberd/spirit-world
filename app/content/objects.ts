@@ -30,7 +30,7 @@ import { playSound } from 'app/musicController';
 import { saveGame } from 'app/state';
 
 import {
-    AreaInstance, GameState, ObjectDefinition, ObjectInstance, ObjectStatus,
+    AreaInstance, EffectInstance, GameState, ObjectDefinition, ObjectInstance, ObjectStatus,
 } from 'app/types';
 
 export function createObjectInstance(state: GameState, object: ObjectDefinition): ObjectInstance {
@@ -239,4 +239,8 @@ export function getObjectStatus(this: void, state: GameState, definition: Object
         return false;
     }
     return !!state.savedState.zoneFlags[definition.id] || !!state.savedState.objectFlags[definition.id];
+}
+
+export function getObjectBehaviors(this: void, state: GameState, object: ObjectInstance | EffectInstance) {
+    return object.behaviors || object.getBehaviors?.(state);
 }

@@ -1,4 +1,5 @@
 import { destroyTile, removeEffectFromArea, removeObjectFromArea, resetTileBehavior } from 'app/content/areas';
+import { getObjectBehaviors } from 'app/content/objects';
 import { allTiles } from 'app/content/tiles';
 import { isPixelInShortRect, rectanglesOverlap } from 'app/utils/index';
 
@@ -143,11 +144,12 @@ export function isPointOpen(
         if (excludedObjects?.has(object)) {
             continue;
         }
-        if (object.getHitbox && object.behaviors?.solid) {
+        const behaviors = getObjectBehaviors(state, object);
+        if (object.getHitbox && behaviors?.solid) {
             if (isPixelInShortRect(x, y, object.getHitbox(state))) {
                 return false;
             }
-        } /*else if (object.getHitbox && object.behaviors?.solidMap) {
+        } /*else if (object.getHitbox && behaviors?.solidMap) {
             // Currently we don't support solidMap on objects. They can just apply this
             // to the tile map if necessary, otherwise, maybe we should add something like
             // getPixelBehavior(x: number, y: number): TileBehaviors to objects.
@@ -235,7 +237,8 @@ export function getTileBehaviorsAndObstacles(
         if (excludedObjects?.has(object)) {
             continue;
         }
-        if (object.getHitbox && (object.onPush || object.behaviors?.solid || objectTest)) {
+        const behaviors = getObjectBehaviors(state, object);
+        if (object.getHitbox && (object.onPush || behaviors?.solid || objectTest)) {
             const hitbox = object.getHitbox(state);
             if (isPixelInShortRect(x | 0, y | 0,
                 { x: hitbox.x | 0, y: hitbox.y | 0, w: hitbox.w | 0, h: hitbox.h | 0 }
@@ -248,13 +251,13 @@ export function getTileBehaviorsAndObstacles(
                     continue;
                 }
                 objects.push(object);
-                if (object.behaviors?.solid) {
+                if (behaviors?.solid) {
                     tileBehavior.solid = true;
                 }
-                if (object.behaviors?.touchHit) {
+                if (behaviors?.touchHit) {
                     // Don't apply touchHit from enemies during iframes when they shouldn't damage the hero.
                     if (!(object instanceof Enemy) || !(object.invulnerableFrames > 0)) {
-                        tileBehavior.touchHit = {...object.behaviors.touchHit};
+                        tileBehavior.touchHit = {...behaviors.touchHit};
                         if (object instanceof Enemy) {
                             tileBehavior.touchHit.source = object;
                         }
@@ -557,43 +560,12 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
     return combinedResult;
 }
 
-/*
-
-            // Destroy destructible tiles like bushes/thorns (calc min/max row, min/max col then test each tile)
-            const hitObjects: ObjectInstance[] = [];
-            for (const object of this.area.objects) {
-                if (!object.getHitbox) {
-                    continue;
-                }
-                const hitbox = object.getHitbox(state);
-                const r = (hitbox.w + hitbox.h) / 4;
-                const dx = this.x - hitbox.x - hitbox.w / 2;
-                const dy = this.y - hitbox.y - hitbox.h / 2;
-                const distance = Math.sqrt(dx*dx+dy*dy);
-                if (distance - r < EXPLOSION_RADIUS) {
-                    hitObjects.push(object);
-                }
-            }
-            for (const object of hitObjects) {
-                const hitbox = object.getHitbox(state);
-                const dx = this.x - hitbox.x - hitbox.w / 2;
-                const dy = this.y - hitbox.y - hitbox.h / 2;
-                if (object.onDestroy) {
-                    object.onDestroy(state, -dx, -dy);
-                } else if (object.behaviors?.destructible) {
-                    removeEffectFromArea(state, object);
-                } else if (object.onHit) {
-                    object.onHit(state, { damage: 4, direction: getDirection(-dx, -dy) });
-                }
-            }
-
-*/
-
 function isObject(object: ObjectInstance | EffectInstance): object is ObjectInstance {
     return !!(object as ObjectInstance).isObject;
 }
 
 function applyHitToObject(state: GameState, object: ObjectInstance | EffectInstance, hit: HitProperties, combinedResult: HitResult) {
+    const behaviors = getObjectBehaviors(state, object);
     if (object.onHit) {
         const result = object.onHit(state, hit);
         combinedResult.hit ||= result.hit;
@@ -606,9 +578,9 @@ function applyHitToObject(state: GameState, object: ObjectInstance | EffectInsta
         if (result.hit || result.blocked) {
             combinedResult.hitTargets.add(object);
         }
-    } else if (object.behaviors?.solid) {
+    } else if (behaviors?.solid) {
         combinedResult.hit = true;
-        if (!object.behaviors.low) {
+        if (!behaviors.low) {
             combinedResult.pierced = false;
         }
     }
@@ -617,11 +589,11 @@ function applyHitToObject(state: GameState, object: ObjectInstance | EffectInsta
             if ((object as ObjectInstance).onDestroy) {
                 const [dx, dy] = directionMap[hit.direction];
                 object.onDestroy(state, dx, dy);
-            } else if (object.behaviors?.destructible) {
+            } else if (behaviors?.destructible) {
                 removeObjectFromArea(state, object);
             }
         } else {
-            if (object.behaviors?.destructible) {
+            if (behaviors?.destructible) {
                 removeEffectFromArea(state, object);
             }
         }

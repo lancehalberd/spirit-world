@@ -154,7 +154,7 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
         });
     }
     for (const effects of (state.areaInstance?.effects || [])) {
-        if (effects.drawPriority === 'hud') {
+        if (effects.drawPriority === 'hud' || effects.getDrawPriority?.(state) === 'hud') {
             effects.render(context, state);
         }
     }

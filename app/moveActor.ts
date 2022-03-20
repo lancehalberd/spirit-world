@@ -227,8 +227,9 @@ function moveActorInDirection(
             canJumpDown = false;
         }
         for (const object of objects) {
-            blockedByObject = blockedByObject || object.behaviors?.solid;
-            if (canPush && object.behaviors?.solid) {
+            const objectBehaviors = object.behaviors || object.getBehaviors?.(state);
+            blockedByObject = blockedByObject || objectBehaviors?.solid;
+            if (canPush && objectBehaviors?.solid) {
                 pushedObjects.push(object);
             }
         }
