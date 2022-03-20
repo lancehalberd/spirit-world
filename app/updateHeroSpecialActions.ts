@@ -405,8 +405,18 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                     h: (staff.bottomRow - staff.topRow + 1) * 16 + 4,
                 },
                 hitEnemies: true,
-                hitObjects: true,
                 knockAwayFromHit: true,
+                isStaff: true,
+            });
+            hitTargets(state, state.areaInstance, {
+                hitbox: {
+                    x: staff.leftColumn * 16,
+                    y: staff.topRow * 16,
+                    w: (staff.rightColumn - staff.leftColumn + 1) * 16,
+                    h: (staff.bottomRow - staff.topRow + 1) * 16,
+                },
+                hitObjects: true,
+                isStaff: true,
             });
             state.screenShakes.push({
                 dx: 0, dy: staffLevel > 1 ? 5 : 2, startTime: state.fieldTime, endTime: state.fieldTime + 200

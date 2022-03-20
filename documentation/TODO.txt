@@ -153,7 +153,11 @@ Current tasks:
 
 Staff Improvements:
     - Charging staff 2 should show a preview of where it will hit and get wider in addition to longer
-    - Charging should stop once it is at maximum size for the given space.
+        - This should start at 4x1, 5x1 then 6x2->10x2, 11x3->15x3, 16x4->20x4
+        - Preview will only show the max size that will fit in the current space
+        - Ideally you could move around while charging and the preview will update appropriately
+        - Would be nice to have this preview behavior when holding down the staff button for staff 1.
+    - If the staff doesn't have enough area, maybe it should still swing and hit, but despawn or bounce off the terrain after landing.
 
 Throwing an object into a pit should make use the pit animation rather than breaking.
 

@@ -292,6 +292,7 @@ function fadeOutPlayingTracks(currentTracks = []) {
 export function setTrackMute(muted: boolean) {
     for (const playingTrack of playingTracks) {
         //console.log('Stopping from stopTrack ', playingTrack.props.src);
+        playingTrack.mute = muted;
         playingTrack.howl.mute(muted);
         // In case the last mute interrupted a fade in, set the track to its full volume on unmute.
         if (!muted) {

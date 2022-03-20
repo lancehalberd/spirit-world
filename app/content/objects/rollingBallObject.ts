@@ -1,4 +1,6 @@
 import { playAreaSound, removeObjectFromArea } from 'app/content/areas';
+import { addParticleAnimations } from 'app/content/effects/animationEffect';
+import { lightStoneParticles } from 'app/content/tiles';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { directionMap, getTileBehaviorsAndObstacles, hitTargets, isPointOpen } from 'app/utils/field';
@@ -43,7 +45,16 @@ export class RollingBallObject implements ObjectInstance {
     getHitbox(state: GameState): Rect {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
-    onHit(state: GameState, {canPush, direction}: HitProperties): HitResult {
+    onHit(state: GameState, {canPush, direction, isStaff}: HitProperties): HitResult {
+        // If the staff is allowed to hit rolling balls, it should shatter them instead of appear to
+        // go through them.
+        // Another option would be for it to bounce the staff back instead.
+        if (isStaff) {
+            playAreaSound(state, this.area, 'rockShatter');
+            addParticleAnimations(state, this.area, this.x, this.y, 0, lightStoneParticles);
+            removeObjectFromArea(state, this);
+            return {hit: true};
+        }
         if (!this.rollDirection) {
             if (canPush) {
                 this.rollInDirection(state, direction);

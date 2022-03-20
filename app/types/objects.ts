@@ -196,6 +196,8 @@ export interface HitProperties {
     isGroundHit?: boolean
     // True if this is an arrow attack, targets may be strong/weak against arrows.
     isArrow?: boolean
+    // True if this is a staff attack. Staff can activate/destroy certain objects.
+    isStaff?: boolean
 }
 
 export interface HitResult {
