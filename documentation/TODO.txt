@@ -46,7 +46,21 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Make staff destroy rolling balls on hit instead of ignoring them.
+    - Improvements
+        - Interacting with a regular locked door should display a message
+        - Add Spirit Sight puzzle for leaving the Tomb with "eye" tile indicator
+        - Arrow hits should have knockback as well as thrown tiles
+
+        - There should be a name indicator on the menu for the tool the cursor is over
+            - Including the "help" icon
+        - Passive tools should be selectable in the menu and show a tutorial on selection
+        - Make BGM quieter when the menu is open.
+
+        - Fix clone tool is breaking walk animation.
+
+        - Golem boss hands should not gain projectiles
+        - Squirrel velocity should reset when knocked back
+        - Add SFX when the MC is damaged
 
     World Tree
         Tower is a series of 2x2 super tiles with a vine for climbing to the next section that
