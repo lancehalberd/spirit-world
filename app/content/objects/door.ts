@@ -907,6 +907,9 @@ export class Door implements ObjectInstance {
             if (this.status === 'bigKeyLocked') {
                 showMessage(state, 'You need a special key to open this door.');
                 state.hero.action = null;
+            } else if (this.status === 'locked') {
+                showMessage(state, 'You need a small key to open this door.');
+                state.hero.action = null;
             }
         }
     }

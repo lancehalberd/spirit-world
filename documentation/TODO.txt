@@ -47,7 +47,6 @@ Graphics:
 
 Current tasks:
     - Improvements
-        - Interacting with a regular locked door should display a message
         - Add Spirit Sight puzzle for leaving the Tomb with "eye" tile indicator
         - Arrow hits should have knockback as well as thrown tiles
 
