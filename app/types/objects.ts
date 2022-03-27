@@ -50,6 +50,7 @@ export interface ObjectInstance {
     onActivate?: (state: GameState) => void
     onDeactivate?: (state: GameState) => void
     onDestroy?: (state: GameState, dx: number, dy: number) => void
+    onEnterArea?: (state: GameState) => void
     // When the hero tries to pick up the object with the passive skill button.
     // The direction is the direction the player is facing.
     onGrab?: (state: GameState, direction: Direction, hero: Hero) => void
@@ -94,6 +95,7 @@ export interface EffectInstance {
     cleanup?: (state: GameState) => void
     // This is called when a user grabs a solid tile
     getHitbox?: (state: GameState) => Rect
+    onEnterArea?: (state: GameState) => void
     // When the hero hits the effect with a weapon or tool.
     // This is used by certain enemy attacks, but it might be better to change those to objects.
     onHit?: (state: GameState, hit: HitProperties) => HitResult
@@ -345,6 +347,7 @@ export interface DecorationDefinition extends BaseObjectDefinition {
 export interface NarrationDefinition extends BaseObjectDefinition {
     type: 'narration'
     message: string
+    trigger?: 'touch' | 'activate' | 'enterSection'
     delay?: number
     w: number
     h: number

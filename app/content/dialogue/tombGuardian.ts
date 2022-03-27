@@ -68,21 +68,32 @@ dialogueHash.tombGuardian = {
                 {|}but you won't be able to interact with it.
                 {|}The summoners used special tools for their powers,
                 {|}maybe your mother could tell you more.
-                {flag:tombTeleporter}
                 {item:spiritSight}`,
             ],
         },
         {
             logicCheck: {
-                requiredFlags: ['$spiritSight'],
+                requiredFlags: [],
+                excludedFlags: ['tombTeleporter'],
+            },
+            isExclusive: true,
+            text: [
+                `You can use your Spirit Sight to exit this room.
+                {|} One of these pots is not like the other.
+                {addCue: One of the pots is special. Hold [B_MEDITATE] to gaze into the spirit world.}
+                `,
+            ],
+        },
+        {
+            logicCheck: {
+                requiredFlags: ['tombTeleporter'],
                 excludedFlags: [],
             },
             isExclusive: true,
             text: [
                 `I've tought you all I can for now.
                 {|}Step into this teleporter to return to the lake.
-                {|}Use the teleporter to return here once you can touch the Spirit World.
-                {flag:tombTeleporter}`,
+                {|}Use the teleporter to return here once you can touch the Spirit World.`,
                 `Talk to your mother to learn more about the summoners.
                 {|}Step into the teleporter to return to the lake.
                 {|}Use the teleporter to return here once you can touch the Spirit World.`,

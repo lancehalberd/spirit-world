@@ -47,7 +47,6 @@ Graphics:
 
 Current tasks:
     - Improvements
-        - Add Spirit Sight puzzle for leaving the Tomb with "eye" tile indicator
         - Arrow hits should have knockback as well as thrown tiles
 
         - There should be a name indicator on the menu for the tool the cursor is over

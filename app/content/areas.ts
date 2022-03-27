@@ -277,6 +277,11 @@ export function enterLocation(
     checkForFloorEffects(state, state.hero);
     setConnectedAreas(state, lastAreaInstance);
     checkIfAllEnemiesAreDefeated(state, state.areaInstance);
+    for (const object of [...state.areaInstance.objects, ...state.areaInstance.effects]) {
+        if (object.onEnterArea) {
+            object.onEnterArea(state);
+        }
+    }
 }
 
 export function setConnectedAreas(state: GameState, lastAreaInstance: AreaInstance) {

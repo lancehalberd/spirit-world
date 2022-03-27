@@ -321,13 +321,7 @@ export const updateScriptEvents = (state: GameState): void => {
                 return;
             }
             case 'addTextCue': {
-                // Remove any existing cues from the screen, the HUD only supports one at a time.
-                const effect = state.areaInstance.effects.find(
-                    effect => effect instanceof TextCue
-                );
-                if (effect) {
-                    removeEffectFromArea(state, effect);
-                }
+                removeTextCue(state);
                 addEffectToArea(state, state.areaInstance, new TextCue(state, {
                     duration: 0,
                     text: event.text,
@@ -335,15 +329,13 @@ export const updateScriptEvents = (state: GameState): void => {
                 return;
             }
             case 'removeTextCue': {
-                const effect = state.areaInstance.effects.find(
-                    effect => effect instanceof TextCue
-                );
-                if (effect) {
-                    removeEffectFromArea(state, effect);
-                }
+                console.log('removing text cue');
+                removeTextCue(state);
                 return;
             }
             case 'showChoiceBox':
+                // Text cues and text choice cannot be displayed together, so dismiss any text cues.
+                removeTextCue(state);
                 state.scriptEvents.activeEvents.push({
                     ...event,
                     choiceIndex: 0,
@@ -351,6 +343,8 @@ export const updateScriptEvents = (state: GameState): void => {
                 state.scriptEvents.blockFieldUpdates = true;
                 return;
             case 'showTextBox':
+                // Text cues and text box cannot be displayed together, so dismiss any text cues.
+                removeTextCue(state);
                 state.messagePage = event.textPage;
                 break;
             case 'clearTextBox':
@@ -411,6 +405,14 @@ export const updateScriptEvents = (state: GameState): void => {
                 enterLocation(state, event.location, false);
                 break;
         }
+    }
+}
+function removeTextCue(state: GameState) {
+    const effect = state.areaInstance.effects.find(
+        effect => effect instanceof TextCue
+    );
+    if (effect) {
+        removeEffectFromArea(state, effect);
     }
 }
 

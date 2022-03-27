@@ -23,7 +23,8 @@ import {
     AreaDefinition, AreaInstance, BallGoalDefinition,
     BossType, CrystalSwitchDefinition, FloorSwitchDefinition, KeyBlockDefinition,
     FrameDimensions, DecorationType, Direction, DrawPriority, EnemyType, GameState, LootObjectDefinition,
-    LootType, MagicElement, NPCBehavior, NPCStyle, ObjectDefinition, ObjectStatus, ObjectType, PanelRows,
+    LootType, MagicElement, NarrationDefinition, NPCBehavior, NPCStyle,
+    ObjectDefinition, ObjectStatus, ObjectType, PanelRows,
     Rect, SpecialAreaBehavior,
     Zone, ZoneLocation,
 } from 'app/types';
@@ -267,6 +268,7 @@ export function createObjectDefinition(
                 ...commonProps,
                 type: definition.type,
                 message: definition.message || '',
+                trigger: definition.trigger || 'touch',
                 delay: definition.delay || 0,
                 w: definition.w || 32,
                 h: definition.h || 32,
@@ -327,7 +329,11 @@ export function getSwitchTargetProperties(
     const objectIds = [
         'all',
         ...getTargetObjectIdsByTypesAndArea(state.areaInstance.definition,
-            ['door', 'chest', 'loot', 'airBubbles', 'beadGrate', 'beadCascade', 'torch', 'escalator', 'anode']
+            [
+                'door', 'chest', 'loot', 'airBubbles', 'beadGrate', 'beadCascade',
+                'narration',
+                'teleporter', 'torch', 'escalator', 'anode'
+            ]
         )
     ];
 
@@ -722,6 +728,16 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             });
             break;
         case 'narration':
+            rows.push({
+                name: 'trigger',
+                multiline: true,
+                value: object.trigger || 'touch',
+                values: ['touch', 'activate', 'enterArea'] as NarrationDefinition['trigger'][],
+                onChange(trigger: NarrationDefinition['trigger']) {
+                    object.trigger = trigger;
+                    updateObjectInstance(state, object);
+                },
+            });
             rows.push({
                 name: 'message',
                 multiline: true,
