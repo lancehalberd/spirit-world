@@ -526,6 +526,7 @@ const sf0_0x0: AreaDefinition = {
         },
     ],
     objects: [
+        {status: "bigKeyLocked", id: "WaterfallTowerBigKeyBlock", x: 416, y: 80, type: "keyBlock", targetObjectId: "waterfallTowerBeadCascade"},
         {status: "hidden", id: "waterfallTower-grateD", x: 128, y: 128, type: "beadGrate"},
         {status: "normal", id: "", x: 288, y: 240, type: "beadGrate"},
         {status: "bigKeyLocked", id: "waterfallTower-backEntrance", x: 240, y: 320, type: "door", style: "woodenUpstairs", d: "up", targetZone: "waterfallTower", targetObjectId: "waterfallTower-backEntrance"},
@@ -549,7 +550,6 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "waterfallTower:s0:0x0-snake-1", x: 176, y: 128, type: "enemy", enemyType: "snake", d: "down", params: {}},
         {status: "normal", id: "waterfallTower:s0:0x0-snake-2", x: 16, y: 400, type: "enemy", enemyType: "snake", d: "down", params: {}},
         {status: "normal", id: "waterfallTower:s0:0x0-snake-3", x: 80, y: 416, type: "enemy", enemyType: "snake", d: "down", params: {}},
-        {status: "bigKeyLocked", id: "WaterfallTowerBigKeyBlock", x: 416, y: 80, type: "keyBlock", targetObjectId: "waterfallTowerBeadCascade"},
         {status: "normal", id: "", x: 368, y: 96, type: "spawnMarker"},
         {status: "normal", id: "", x: 480, y: 96, type: "spawnMarker"},
         {status: "normal", id: "", x: 448, y: 192, type: "spawnMarker"},
