@@ -48,7 +48,6 @@ Graphics:
 Current tasks:
     - Improvements
         - Arrow hits should have knockback as well as thrown tiles
-        - Swimming frame shows briefly after being knocked out of bead flow.
 
         - There should be a name indicator on the menu for the tool the cursor is over
             - Including the "help" icon
