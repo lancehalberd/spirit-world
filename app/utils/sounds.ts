@@ -1,16 +1,18 @@
 import {Howl} from 'howler';
 
-const sounds = new Map();
+import { GameSound, GameState, HowlerProperties, SoundSettings } from 'app/types';
+
+const sounds = new Map<string, GameSound>();
 window['sounds'] = sounds;
 let audioUnlocked = false;
 export function unlockAudio() {
     audioUnlocked = true;
 }
 
-
 const version = window.version;
 
-export function requireSound(key, callback = null) {
+
+export function requireSound(key, callback = null): GameSound {
     let source, loop, offset, volume, duration, limit, repeatFrom, nextTrack, type = 'default';
     if (typeof key === 'string') {
         [source, offset, volume] = key.split('+');
@@ -28,9 +30,8 @@ export function requireSound(key, callback = null) {
     }
     if (sounds.has(key)) return sounds.get(key);
     if (offset) [offset, duration] = String(offset).split(':').map(Number);
-    let newSound: any = {};
     if (type === 'bgm') {
-        const howlerProperties: any = {
+        const howlerProperties: HowlerProperties = {
             src: [`${source}?v=${version}`],
             html5: true,
             loop: false,
@@ -49,15 +50,15 @@ export function requireSound(key, callback = null) {
             },
             onplay() {
                 //console.log('onplay', newSound.props.src, newSound.shouldFadeIn);
-                if (newSound.muted) {
+                if (newSound.soundSettings.muteTracks) {
                     newSound.howl.mute(true);
                 } else if (newSound.shouldFadeIn) {
-                    //console.log('newSound.howl.fade', newSound.targetVolume);
+                    //console.log('newSound.howl.fade', newSound.props.volume * newSound.soundSettings.globalVolume);
                     newSound.howl.mute(false);
-                    newSound.howl.fade(0, newSound.targetVolume, 1000);
+                    newSound.howl.fade(0, newSound.props.volume * newSound.soundSettings.globalVolume, 1000);
                 } else {
                     newSound.howl.mute(false);
-                    newSound.howl.volume(newSound.targetVolume);
+                    newSound.howl.volume(newSound.props.volume * newSound.soundSettings.globalVolume);
                 }
             },
             onplayerror: function (error) {
@@ -82,19 +83,20 @@ export function requireSound(key, callback = null) {
                 newSound.howl.stop();
                 playingTracks = [];
                 window['playingTracks'] = playingTracks;
-                playTrack(nextTrack, 0, this.mute(), false, false);
+                playTrack(nextTrack, 0, newSound.soundSettings, false, false);
             };
+            // Make sure the next track is preloaded.
+            requireSound(musicTracks[nextTrack]);
         }
-        newSound.howl = new Howl(howlerProperties);
-        newSound.props = howlerProperties;
-        newSound.nextTrack = nextTrack;
+        const newSound: GameSound = {
+            howl: new Howl(howlerProperties),
+            props: howlerProperties,
+            nextTrack,
+        }
         sounds.set(key, newSound);
-        // Make sure the next track is preloaded.
-        if (newSound.nextTrack) {
-            requireSound(musicTracks[newSound.nextTrack]);
-        }
+        return newSound;
     } else {
-        const howlerProperties: any = {
+        const howlerProperties: HowlerProperties = {
             src: [`${source}?v=${version}`],
             loop: loop || false,
             volume: (volume || 1) / 50,
@@ -126,6 +128,13 @@ export function requireSound(key, callback = null) {
                 }
             },
         };
+        const newSound: GameSound = {
+            howl: new Howl(howlerProperties),
+            activeInstances: 0,
+            instanceLimit: limit || 5,
+            props: howlerProperties,
+            nextTrack,
+        }
         if (offset || duration) {
             if (!duration) {
                 console.log('missing duration for sound sprite.', key, offset, duration);
@@ -136,16 +145,12 @@ export function requireSound(key, callback = null) {
             };
             newSound.spriteName = 'sprite';
         }
-        newSound.howl = new Howl(howlerProperties),
-        newSound.activeInstances = 0;
-        newSound.instanceLimit = limit || 5;
-        newSound.props = howlerProperties;
         sounds.set(key, newSound);
+        return newSound;
     }
-    return newSound;
 }
 
-const playingSounds = new Set<any>();
+const playingSounds = new Set<GameSound>();
 export function playSound(key, muted = false) {
     const sound = requireSound(key);
     if (sound.activeInstances >= sound.instanceLimit) {
@@ -180,7 +185,7 @@ export function playSound(key, muted = false) {
     }
     return sound;
 }
-export function stopSound(sound) {
+export function stopSound(sound: GameSound): void {
     if (sound.howl) {
         sound.howl.stop();
     } else {
@@ -190,7 +195,7 @@ export function stopSound(sound) {
 window['stopSound'] = stopSound;
 
 
-let playingTracks = [], trackIsPlaying = false;
+let playingTracks: GameSound[] = [], trackIsPlaying = false;
 window['playingTracks'] = playingTracks;
 
 
@@ -213,7 +218,7 @@ const musicTracks = {
     bossB: {key: 'bossB', type: 'bgm', source: 'bgm/SpookyThemeB.mp3', volume: 20, nextTrack: 'bossA' },
 };
 type TrackKey = keyof typeof musicTracks;
-export function playTrack(trackKey: TrackKey, timeOffset, muted = false, fadeOutOthers = true, crossFade = true) {
+export function playTrack(trackKey: TrackKey, timeOffset, soundSettings: SoundSettings, fadeOutOthers = true, crossFade = true) {
     if (!audioUnlocked) {
         return;
     }
@@ -241,15 +246,13 @@ export function playTrack(trackKey: TrackKey, timeOffset, muted = false, fadeOut
         else stopTrack();
     }
 
-    const volume = sound.props.volume;
     let offset = (timeOffset / 1000);
     if (sound.howl.duration()) {
         offset = offset % sound.howl.duration();
     }
     //console.log('play', sound.props.src, timeOffset, sound.howl.duration(), offset);
     //sound.howl.seek(offset);
-    sound.targetVolume = volume;
-    sound.muted = muted;
+    sound.soundSettings = soundSettings;
     sound.howl.seek(offset);
     sound.howl.play();
     sound.shouldPlay = true;
@@ -261,16 +264,16 @@ export function playTrack(trackKey: TrackKey, timeOffset, muted = false, fadeOut
         sound.shouldFadeIn = true;
     } else {
         //console.log('hard start', volume);
-        sound.howl.volume(volume);
+        sound.howl.volume(sound.props.volume * soundSettings.globalVolume);
         sound.shouldFadeIn = false;
     }
-    sound.howl.mute(muted);
+    sound.howl.mute(soundSettings.muteTracks);
     playingTracks.push(sound);
     return sound;
 }
 
-function fadeOutPlayingTracks(currentTracks = []) {
-    const keepPlayingTracks = [];
+function fadeOutPlayingTracks(currentTracks: GameSound[] = []) {
+    const keepPlayingTracks: GameSound[] = [];
     for (const trackToFadeOut of playingTracks) {
         if (currentTracks.includes(trackToFadeOut)) {
             keepPlayingTracks.push(trackToFadeOut);
@@ -289,16 +292,29 @@ function fadeOutPlayingTracks(currentTracks = []) {
     window['playingTracks'] = playingTracks;
 }
 
-export function setTrackMute(muted: boolean) {
+export function getSoundSettings(state: GameState): SoundSettings {
+    const muted = state.settings.muteAllSounds;
+    return {
+        muteTracks: muted,
+        muteSounds: muted,
+        globalVolume: state.paused ? 0.3 : 1,
+    };
+}
+
+export function setSoundSettings(soundSettings: SoundSettings) {
     for (const playingTrack of playingTracks) {
         //console.log('Stopping from stopTrack ', playingTrack.props.src);
-        playingTrack.muted = muted;
-        playingTrack.howl.mute(muted);
+        playingTrack.soundSettings = soundSettings;
+        playingTrack.howl.mute(soundSettings.muteTracks);
         // In case the last mute interrupted a fade in, set the track to its full volume on unmute.
-        if (!muted) {
-            playingTrack.howl.volume(playingTrack.targetVolume);
+        if (!soundSettings.muteTracks) {
+            playingTrack.howl.volume(playingTrack.props.volume * soundSettings.globalVolume);
         }
     }
+}
+
+export function updateSoundSettings(state: GameState) {
+    setSoundSettings(getSoundSettings(state));
 }
 
 export function stopTrack() {
@@ -361,23 +377,7 @@ const preloadSounds = () => {
 preloadSounds();
 
 
-/*export function muteSounds() {
-    for (const sound of playingSounds) sound.howl.mute(true);
-}
-export function unmuteSounds() {
-    for (const sound of playingSounds) sound.howl.mute(false);
-}
-export function muteTrack() {
-    for (const playingTrack of playingTracks) {
-        playingTrack.howl.mute(true);
-    }
-}
-export function unmuteTrack() {
-    for (const playingTrack of playingTracks) {
-        playingTrack.howl.mute(false);
-    }
-}
-
+/*
 export function getSoundDuration(key) {
     const sound = requireSound(key);
     if (sound.duration) {
@@ -462,5 +462,5 @@ sounds.set('wand', {
     play() {
         playBeeps([1200, 400], 0.01, .1, {smooth: true, taper: true, swell: true, distortion: true});
     }
-})
+});
 

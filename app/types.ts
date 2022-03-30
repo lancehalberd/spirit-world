@@ -5,6 +5,7 @@ export * from 'app/types/state';
 export * from 'app/types/tileMap';
 export * from 'app/types/objects';
 export * from 'app/types/scriptEvents';
+export * from 'app/types/sounds';
 
 export { AnimationEffect } from 'app/content/effects/animationEffect';
 export { BossType, MinionType } from 'app/content/bosses';

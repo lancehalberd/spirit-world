@@ -48,11 +48,16 @@ Graphics:
 Current tasks:
     - Improvements
         - Arrow hits should have knockback as well as thrown tiles
+        - Make Chakram pierce enemies if they are defeated.
+        - Add sound controls to context menu (mute BGM, mute SFX)
+        - Add gain 100 Jade context menu option
+        - Add refill health context menu option
+        - Add better path to the boss in War Temple on defeat
+        - Test using PASSIVE_TOOL button as a run button that consumes spirit energy, possibly makes you slip a bit.
 
         - There should be a name indicator on the menu for the tool the cursor is over
             - Including the "help" icon
         - Passive tools should be selectable in the menu and show a tutorial on selection
-        - Make BGM quieter when the menu is open.
 
         - Fix clone tool is breaking walk animation.
 

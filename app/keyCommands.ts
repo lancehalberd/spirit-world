@@ -6,7 +6,7 @@ import { selectSection, toggleEditing } from 'app/development/tileEditor';
 import { updateObjectInstance } from 'app/development/objectEditor';
 import { GAME_KEY } from 'app/gameConstants';
 import { getState, saveSettings } from 'app/state';
-import { setTrackMute, unlockAudio } from 'app/utils/sounds';
+import { getSoundSettings, setSoundSettings, unlockAudio } from 'app/utils/sounds';
 
 import { GameState, Hero } from 'app/types'
 
@@ -212,7 +212,7 @@ export function addKeyCommands() {
         if (keyCode === KEY.M) {
             const state = getState();
             state.settings.muteAllSounds = !state.settings.muteAllSounds;
-            setTrackMute(state.settings.muteAllSounds);
+            setSoundSettings(getSoundSettings(state));
             saveSettings(state);
         }
         if (keyCode === KEY.R) {

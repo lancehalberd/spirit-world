@@ -29,7 +29,7 @@ import {
 import { updateCamera } from 'app/updateCamera';
 import { updateField } from 'app/updateField';
 import { areAllImagesLoaded } from 'app/utils/images';
-import { playSound } from 'app/musicController';
+import { playSound, updateSoundSettings } from 'app/musicController';
 
 import { ActiveTool, Equipment, GameState, MagicElement } from 'app/types';
 
@@ -60,6 +60,7 @@ export function update() {
             ) {
                 state.paused = !state.paused;
                 state.menuIndex = 0;
+                updateSoundSettings(state);
             }
         }
         if (state.paused && !(state.hideMenu && wasGameKeyPressed(state, GAME_KEY.MEDITATE))) {
