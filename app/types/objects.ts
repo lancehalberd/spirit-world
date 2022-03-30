@@ -210,25 +210,28 @@ export interface HitResult {
     // Indicates the hit connected with something solid.
     // This is generally true unless the hit is invalidated by some special condition like
     // an enemies invulnerability frames.
-    hit?: boolean,
+    hit?: boolean
     // Indicates the hit was blocked, preventing damage + knockback.
     // For example, some enemies have shields that protect them from all or certain kinds of damage.
-    blocked?: boolean,
+    blocked?: boolean
+    // Indicates the object was destroyed by the hit.
+    // The chakram will not stop when hitting targets it destroyed unless stopped or reflected.
+    destroyed?: boolean
     // If this is set the hero will be knocked back when they hit while holding the chakram in their hand.
-    knockback?: {vx: number, vy: number, vz: number},
+    knockback?: {vx: number, vy: number, vz: number}
     // Indicates that a projectile should continue through this object even when it hit.
-    pierced?: boolean,
+    pierced?: boolean
     // Indicates that a projectile should be knocked back and swap hitAllies/hitEnemies.
-    reflected?: boolean,
-    returnHit?: HitProperties,
+    reflected?: boolean
+    returnHit?: HitProperties
     // Indicates that projectile should never pierce this object.
     // For example, projectiles hitting puzzle objects stop after hitting the first such object.
-    stopped?: boolean,
+    stopped?: boolean
     // Indicates this element should be applied as a consequence of the hit.
     // For example an arrow hitting a lit torch will gain the 'fire' element.
-    setElement?: MagicElement,
+    setElement?: MagicElement
     // Returns the set of targets hit.
-    hitTargets?: Set<EffectInstance | ObjectInstance>,
+    hitTargets?: Set<EffectInstance | ObjectInstance>
 }
 
 export interface BaseObjectDefinition {

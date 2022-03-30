@@ -131,7 +131,8 @@ export class ThrownChakram implements EffectInstance {
             hit.knockback = {vx: this.vx / 2, vy: this.vy / 2, vz: 0};
         }
         let hitResult = hitTargets(state, this.area, hit);
-        if (((hitResult.hit || hitResult.blocked) && !this.piercing && !hitResult.pierced) || hitResult.stopped) {
+        let didHit = hitResult.hit || hitResult.blocked;
+        if ((didHit && !this.piercing && !hitResult.pierced && !hitResult.destroyed) || hitResult.stopped) {
             this.outFrames = 0;
         }
         // A full hitbox check for hitting tiles.
@@ -154,7 +155,8 @@ export class ThrownChakram implements EffectInstance {
             hitTiles: true,
         };
         hitResult = hitTargets(state, this.area, hit);
-        if (((hitResult.hit || hitResult.blocked) && !this.piercing && !hitResult.pierced) || hitResult.stopped) {
+        didHit = hitResult.hit || hitResult.blocked;
+        if ((didHit && !this.piercing && !hitResult.pierced && !hitResult.destroyed) || hitResult.stopped) {
             this.outFrames = 0;
         }
     }

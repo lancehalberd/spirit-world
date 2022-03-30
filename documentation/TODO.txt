@@ -48,7 +48,6 @@ Graphics:
 Current tasks:
     - Improvements
         - Arrow hits should have knockback as well as thrown tiles
-        - Make Chakram pierce enemies if they are defeated.
         - Add sound controls to context menu (mute BGM, mute SFX)
         - Add gain 100 Jade context menu option
         - Add refill health context menu option

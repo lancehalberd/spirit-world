@@ -229,6 +229,7 @@ export class Enemy implements Actor, ObjectInstance {
         }
         return {
             hit: true,
+            destroyed: this.life <= 0 && !this.isImmortal,
             knockback: hit.knockback ? {vx: -hit.knockback.vx, vy: -hit.knockback.vy, vz: 0 } : null
         };
     }

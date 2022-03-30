@@ -568,6 +568,11 @@ function applyHitToObject(state: GameState, object: ObjectInstance | EffectInsta
     const behaviors = getObjectBehaviors(state, object);
     if (object.onHit) {
         const result = object.onHit(state, hit);
+        if (combinedResult.destroyed && result.hit && !result.destroyed && !result.pierced) {
+            combinedResult.destroyed = false;
+        } else if (combinedResult.destroyed !== false && result.destroyed) {
+            combinedResult.destroyed = true;
+        }
         combinedResult.hit ||= result.hit;
         combinedResult.blocked ||= result.blocked;
         combinedResult.pierced &&= ((!result.hit && !result.blocked) || result.pierced);
