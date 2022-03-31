@@ -47,7 +47,6 @@ Graphics:
 
 Current tasks:
     - Improvements
-        - Arrow hits should have knockback as well as thrown tiles
         - Add sound controls to context menu (mute BGM, mute SFX)
         - Add gain 100 Jade context menu option
         - Add refill health context menu option
@@ -461,9 +460,6 @@ Update collision detection and wiggle logic:
 Some puzzle ideas:
     - A puzzle where 4 switches need to be hit in 200ms, you can blow up the clone in the middle to activate all at once.
     - If we place a block on top of a switch that toggles on release, we can make a door that requires you to push the block off of the switch.
-
-Track the object an arrow is stuck in and move it with that target until it disappears
-    - Use a different 'stuck' frame for the arrow missing the head.
 
 Animate hearts refilling
 

@@ -58,6 +58,7 @@ export class ThrownObject implements EffectInstance {
             canPush: true,
             damage: this.damage,
             hitbox: this.getHitbox(state),
+            knockback: { vx: this.vx, vy: this.vy, vz: 0},
             vx: this.vx,
             vy: this.vy,
             hitEnemies: true,

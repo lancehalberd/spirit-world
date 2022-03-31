@@ -7,7 +7,7 @@ import { playSound } from 'app/musicController';
 
 import {
     AreaInstance, Direction, DrawPriority, EffectInstance, Frame, FrameAnimation,
-    GameState, HitProperties, MagicElement,
+    GameState, HitProperties, MagicElement, ObjectInstance,
 } from 'app/types';
 
 const upGeometry = {w: 16, h: 16, content: {x: 4, y: 0, w: 7, h: 5}};
@@ -196,9 +196,16 @@ export class Arrow implements EffectInstance {
     blocked = false;
     reflected: boolean = false;
     stuckFrames: number = 0;
+    stuckTo: {
+        dx: number
+        dy: number
+        object: ObjectInstance | EffectInstance
+    } = null;
     style: ArrowStyle = 'normal';
     isPlayerAttack = true;
-    constructor({x = 0, y = 0, vx = 0, vy = 0, chargeLevel = 0, damage = 1, spiritCloakDamage = 5, delay = 0, element = null, reflected = false, style = 'normal',
+    constructor({
+        x = 0, y = 0, vx = 0, vy = 0, chargeLevel = 0, damage = 1, 
+        spiritCloakDamage = 5, delay = 0, element = null, reflected = false, style = 'normal',
         ignoreWallsDuration = 0,
     }: Props) {
         this.x = x | 0;
@@ -226,6 +233,7 @@ export class Arrow implements EffectInstance {
             damage: this.damage,
             spiritCloakDamage: this.spiritCloakDamage,
             hitbox: this,
+            knockback: { vx: this.vx, vy: this.vy, vz: 0},
             tileHitbox: {
                 w: this.w,
                 h: this.h,
@@ -247,6 +255,10 @@ export class Arrow implements EffectInstance {
         if (this.delay > 0) {
             this.delay -= FRAME_LENGTH;
             return;
+        }
+        if (this.stuckTo) {
+            this.x = this.stuckTo.object.x + this.stuckTo.dx;
+            this.y = this.stuckTo.object.y + this.stuckTo.dy;
         }
         this.animationTime += FRAME_LENGTH;
         if (this.stuckFrames > 0) {
@@ -300,6 +312,14 @@ export class Arrow implements EffectInstance {
         if (hitResult.hit && !hitResult.pierced) {
             this.stuckFrames = 1;
             this.animationTime = 0;
+            if (hitResult.hitTargets.size) {
+                const object = [...hitResult.hitTargets.values()][0];
+                this.stuckTo = {
+                    object,
+                    dx: this.x - object.x,
+                    dy: this.y - object.y,
+                };
+            }
             return;
         }
         // This is used to make torches light arrows on fire.
@@ -351,6 +371,7 @@ export class EnemyArrow extends Arrow {
             spiritCloakDamage: this.spiritCloakDamage,
             direction: this.direction,
             hitbox: this,
+            knockback: { vx: this.vx, vy: this.vy, vz: 0},
             tileHitbox: {
                 w: this.w,
                 h: this.h,
@@ -392,6 +413,7 @@ export class CrystalSpike extends Arrow {
             canDamageCrystalShields: true,
             direction: this.direction,
             hitbox: this,
+            knockback: { vx: this.vx, vy: this.vy, vz: 0},
             tileHitbox: {
                 w: this.w,
                 h: this.h,
