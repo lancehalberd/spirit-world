@@ -1,8 +1,10 @@
 import { getSpawnLocationContextMenuOption, getTestStateContextMenuOption } from 'app/content/spawnLocations';
 import { mainCanvas, tagElement } from 'app/dom';
-import { KEY, isKeyboardKeyDown } from 'app/keyCommands';
+import { defeatAllEnemies, KEY, isKeyboardKeyDown } from 'app/keyCommands';
+import { getState } from 'app/state';
 import { getElementRectangle } from 'app/utils/index';
 import { getMousePosition } from 'app/utils/mouse';
+import { updateSoundSettings } from 'app/utils/sounds';
 
 import { MenuOption } from 'app/types';
 
@@ -102,15 +104,101 @@ class ContextMenu {
 
 export function getContextMenu(): MenuOption[] {
     return [
-        ...getExampleOption(),
+        getSpawnLocationContextMenuOption(),
+        getAssistanceMenuOption(),
+        getSettingsMenuOption(),
+        getTestStateContextMenuOption(),
     ];
 }
 
-function getExampleOption(): MenuOption[] {
-    return [
-        getSpawnLocationContextMenuOption(),
-        getTestStateContextMenuOption(),
-    ];
+function getAssistanceMenuOption(): MenuOption {
+    return {
+        getLabel() {
+            return 'Assistance...';
+        },
+        getChildren() {
+            return [
+                {
+                    label: 'Full Life',
+                    onSelect() {
+                        const state = getState();
+                        state.hero.life = state.hero.maxLife;
+                    }
+                },
+                {
+                    label: 'More Life',
+                    onSelect() {
+                        const state = getState();
+                        state.hero.maxLife++;
+                        state.hero.life = state.hero.maxLife;
+                    }
+                },
+                {
+                    label: '200 Jade',
+                    onSelect() {
+                        const state = getState();
+                        state.hero.money += 200;
+                    }
+                },
+                {
+                    label: 'Defeat Monsters',
+                    onSelect() {
+                        defeatAllEnemies();
+                    }
+                },
+            ];
+        }
+    }
+}
+
+function getSettingsMenuOption(): MenuOption {
+    const state = getState();
+    const isMusicMuted = (state.settings.muteAllSounds || state.settings.muteMusic);
+    const areSoundsMuted = (state.settings.muteAllSounds || state.settings.muteSounds);
+    return {
+        getLabel() {
+            return 'Settings...';
+        },
+        getChildren() {
+            return [
+                {
+                    label: state.settings.muteAllSounds ? 'Unmute All' : 'Mute All',
+                    onSelect() {
+                        state.settings.muteAllSounds = !state.settings.muteAllSounds;
+                        state.settings.muteMusic = false;
+                        state.settings.muteSounds = false;
+                        updateSoundSettings(state);
+                    }
+                },
+                {
+                    label: isMusicMuted ? 'Unmute Music' : 'Mute Music',
+                    onSelect() {
+                        if (isMusicMuted) {
+                            state.settings.muteAllSounds = false;
+                            state.settings.muteMusic = false;
+                            state.settings.muteSounds = areSoundsMuted;
+                        } else {
+                            state.settings.muteMusic = true;
+                        }
+                        updateSoundSettings(state);
+                    }
+                },
+                {
+                    label: areSoundsMuted ? 'Unmute Sounds' : 'Mute Sounds',
+                    onSelect() {
+                        if (areSoundsMuted) {
+                            state.settings.muteAllSounds = false;
+                            state.settings.muteSounds = false;
+                            state.settings.muteMusic = isMusicMuted;
+                        } else {
+                            state.settings.muteSounds = true;
+                        }
+                        updateSoundSettings(state);
+                    }
+                },
+            ];
+        }
+    }
 }
 
 export function showContextMenu(this: void, menu: MenuOption[], x: number, y: number): void {

@@ -47,9 +47,6 @@ Graphics:
 
 Current tasks:
     - Improvements
-        - Add sound controls to context menu (mute BGM, mute SFX)
-        - Add gain 100 Jade context menu option
-        - Add refill health context menu option
         - Add better path to the boss in War Temple on defeat
         - Test using PASSIVE_TOOL button as a run button that consumes spirit energy, possibly makes you slip a bit.
 
@@ -613,4 +610,4 @@ Dungeon 3: Cocoon (Vanara Regeneration Unit)
 
 
 River Temple:
-    - No NPCs here, this was the old Fertility Temple, but it was destroyed by the Varuna Ship crashing. The survivors all moved to the new Fertility Temple near the forest (Forest Temple).
+    - No NPCs here, this was the old Fertility Temple, but it was destroyed by the Vanara Ship crashing. The survivors all moved to the new Fertility Temple near the forest (Forest Temple).

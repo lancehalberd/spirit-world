@@ -151,11 +151,12 @@ export function requireSound(key, callback = null): GameSound {
 }
 
 const playingSounds = new Set<GameSound>();
-export function playSound(key, muted = false) {
+export function playSound(key, soundSettings: SoundSettings) {
     const sound = requireSound(key);
     if (sound.activeInstances >= sound.instanceLimit) {
         return;
     }
+    const muted = soundSettings.muteSounds;
     const now = Date.now();
     const customDelay = sound.customDelay || 40;
     if (sound.canPlayAfter && sound.canPlayAfter > now) {
@@ -163,7 +164,7 @@ export function playSound(key, muted = false) {
         // the future.
         const delay = sound.canPlayAfter - now;
         if (delay <= sound.instanceLimit * customDelay) {
-            setTimeout(() => playSound(key, muted), delay);
+            setTimeout(() => playSound(key, soundSettings), delay);
         }
         return sound;
     }
@@ -293,10 +294,11 @@ function fadeOutPlayingTracks(currentTracks: GameSound[] = []) {
 }
 
 export function getSoundSettings(state: GameState): SoundSettings {
-    const muted = state.settings.muteAllSounds;
+    const muteTracks = (state.settings.muteAllSounds || state.settings.muteMusic || false);
+    const muteSounds = (state.settings.muteAllSounds || state.settings.muteSounds || false);
     return {
-        muteTracks: muted,
-        muteSounds: muted,
+        muteTracks,
+        muteSounds,
         globalVolume: state.paused ? 0.3 : 1,
     };
 }

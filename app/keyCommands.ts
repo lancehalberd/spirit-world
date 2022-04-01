@@ -6,7 +6,7 @@ import { selectSection, toggleEditing } from 'app/development/tileEditor';
 import { updateObjectInstance } from 'app/development/objectEditor';
 import { GAME_KEY } from 'app/gameConstants';
 import { getState, saveSettings } from 'app/state';
-import { getSoundSettings, setSoundSettings, unlockAudio } from 'app/utils/sounds';
+import { updateSoundSettings, unlockAudio } from 'app/utils/sounds';
 
 import { GameState, Hero } from 'app/types'
 
@@ -185,12 +185,7 @@ export function addKeyCommands() {
             state.hideMenu = !state.hideMenu;
         }
         if (keyCode === KEY.K && commandIsDown) {
-            const state = getState();
-            const allEnemies = [...state.areaInstance?.enemies, ...state.alternateAreaInstance?.enemies];
-            for (const enemy of allEnemies) {
-                enemy.showDeathAnimation(state);
-            }
-            event.preventDefault();
+            defeatAllEnemies();
             return;
         }
         if (keyCode === KEY.V && commandIsDown) {
@@ -212,7 +207,7 @@ export function addKeyCommands() {
         if (keyCode === KEY.M) {
             const state = getState();
             state.settings.muteAllSounds = !state.settings.muteAllSounds;
-            setSoundSettings(getSoundSettings(state));
+            updateSoundSettings(state);
             saveSettings(state);
         }
         if (keyCode === KEY.R) {
@@ -239,6 +234,15 @@ export function addKeyCommands() {
             enterLocation(state, state.location);
         }
     });
+}
+
+export function defeatAllEnemies() {
+    const state = getState();
+    const allEnemies = [...state.areaInstance?.enemies, ...state.alternateAreaInstance?.enemies];
+    for (const enemy of allEnemies) {
+        enemy.showDeathAnimation(state);
+    }
+    event.preventDefault();
 }
 
 export function updateKeyboardState(state: GameState) {

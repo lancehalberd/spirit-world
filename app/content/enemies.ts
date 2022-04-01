@@ -26,7 +26,7 @@ import { FRAME_LENGTH } from 'app/gameConstants';
 import { moveActor } from 'app/moveActor';
 import { createAnimation } from 'app/utils/animations';
 import { directionMap, getDirection } from 'app/utils/field';
-import { playSound } from 'app/utils/sounds';
+import { playSound } from 'app/musicController';
 
 import {
     ActorAnimations, Direction, EffectInstance,

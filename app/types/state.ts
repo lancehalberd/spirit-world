@@ -22,7 +22,12 @@ export type SavedState = {
 
 // These settings are global and can be saved independent of saved state
 export interface Settings {
+    // Mute everything
     muteAllSounds?: boolean
+    // Mute background music
+    muteMusic?: boolean
+    // Mute sound effects
+    muteSounds?: boolean
 }
 
 export interface DungeonInventory {
