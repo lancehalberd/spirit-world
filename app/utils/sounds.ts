@@ -86,7 +86,9 @@ export function requireSound(key, callback = null): GameSound {
                 playTrack(nextTrack, 0, newSound.soundSettings, false, false);
             };
             // Make sure the next track is preloaded.
-            requireSound(musicTracks[nextTrack]);
+            if (!musicTracks[nextTrack]) {
+                requireSound(musicTracks[nextTrack]);
+            }
         }
         const newSound: GameSound = {
             howl: new Howl(howlerProperties),
@@ -128,13 +130,6 @@ export function requireSound(key, callback = null): GameSound {
                 }
             },
         };
-        const newSound: GameSound = {
-            howl: new Howl(howlerProperties),
-            activeInstances: 0,
-            instanceLimit: limit || 5,
-            props: howlerProperties,
-            nextTrack,
-        }
         if (offset || duration) {
             if (!duration) {
                 console.log('missing duration for sound sprite.', key, offset, duration);
@@ -143,6 +138,15 @@ export function requireSound(key, callback = null): GameSound {
             howlerProperties.sprite = {
                 sprite: [offset, duration],
             };
+        }
+        const newSound: GameSound = {
+            howl: new Howl(howlerProperties),
+            activeInstances: 0,
+            instanceLimit: limit || 5,
+            props: howlerProperties,
+            nextTrack,
+        }
+        if (howlerProperties.sprite) {
             newSound.spriteName = 'sprite';
         }
         sounds.set(key, newSound);
@@ -153,6 +157,7 @@ export function requireSound(key, callback = null): GameSound {
 const playingSounds = new Set<GameSound>();
 export function playSound(key, soundSettings: SoundSettings) {
     const sound = requireSound(key);
+
     if (sound.activeInstances >= sound.instanceLimit) {
         return;
     }

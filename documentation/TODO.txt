@@ -1,6 +1,8 @@
 Test at http://localhost:81/alttp/public/
 
 Known Bugs:
+    - Door closing sound plays while in the title screen
+        - Maybe just disable playAreaSound in the title scene or only play this sound if the player passes through the door and it closes behind them.
     - Teleporting while grabbing a pot with astral projection can make you face south but still be grabbing the pot
         - Probably stop grabbing with projection when teleporting.
     - Player is rendered behind ceiling when climbing ladders
@@ -53,8 +55,6 @@ Current tasks:
 
 
     - Improvements
-        - Fix no sound when getting chakram.
-        - Exception when starting beetle boss in cave.
         - Test using PASSIVE_TOOL button as a run button that consumes spirit energy, possibly makes you slip a bit.
 
         - There should be a name indicator on the menu for the tool the cursor is over
