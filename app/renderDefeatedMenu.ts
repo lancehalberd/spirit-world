@@ -24,8 +24,8 @@ export function renderDefeatedMenu(context: CanvasRenderingContext2D, state: Gam
     context.textBaseline = 'middle';
     context.textAlign = 'left';
     context.font = '16px Arial';
+    context.fillStyle = 'white';
     if (state.hero.hasRevive) {
-        context.fillStyle = 'white';
         context.fillText('HANG IN THERE!', x, y + 2);
         return;
     } else {
@@ -34,8 +34,6 @@ export function renderDefeatedMenu(context: CanvasRenderingContext2D, state: Gam
 
     y = r.y + r.h * 2 / 4;
     let selectedY = y;
-    context.fillStyle = state.hero.money >= 50 ? 'white' : '#666';
-    context.fillStyle = 'white';
     context.fillText('CONTINUE', x, y + 2);
 
     y = r.y + r.h * 3 / 4;

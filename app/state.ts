@@ -153,9 +153,19 @@ export function showHint(state: GameState): void {
     }
     const flags = state.savedState.objectFlags;
     if (!state.hero.weapon) {
-        setScript(state, 'I need to find a way out of this cave.');
+        if (state.location.zoneKey !== 'peachCave') {
+            setScript(state, `Maybe I should explore that cave I fell in more.
+                {|}The entrance was just east of the waterfall north of the lake.`);
+        } else {
+            setScript(state, 'I need to find a way out of this cave.');
+        }
     } else if (!state.hero.passiveTools.catEyes) {
-        setScript(state, 'With this Chakram I should be able to climb out of this cave.');
+        if (state.location.zoneKey !== 'peachCave') {
+            setScript(state, `I wonder if that glowing peach is still in that cave?
+                {|}The entrance was just east of the waterfall north of the lake.`);
+        } else {
+            setScript(state, 'With this Chakram I should be able to climb out of this cave.');
+        }
     } else if (!state.hero.activeTools.bow) {
         setScript(state, `I should talk to the Vanara Elder about my strange powers.
             {|}He lives in the woods to the southwest with the other Vanara. `);

@@ -59,8 +59,8 @@ export const updateMusic = (): void => {
         // Play a different track when the tower is activated later.
         playTrack('caveTheme', 0, soundSettings);
     } else if (state.location.zoneKey === 'caves') {
-        if (state.location.areaGridCoords[0] === 1 && state.location.areaGridCoords[1] === 0) {
-            // This is the fertility temple.
+        if (state.location.areaGridCoords.x === 1 && state.location.areaGridCoords.y === 0) {
+            // This is the fertility temple / no tools cave.
             playTrack('idleTheme', 0, soundSettings);
         } else {
             playTrack('caveTheme', 0, soundSettings);

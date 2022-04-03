@@ -666,8 +666,8 @@ export function checkToUpdateSpawnLocation(state: GameState): void {
     if (state.location.zoneKey === 'forestTemple' || (
         state.location.zoneKey === 'overworld'
         && state.location.isSpiritWorld
-        && state.location.areaGridCoords[0] === 0
-        && state.location.areaGridCoords[1] === 2
+        && state.location.areaGridCoords.x === 0
+        && state.location.areaGridCoords.y === 2
     )) {
         return setSpawnLocation(state, SPAWN_FOREST_ENTRANCE);
     }*/
@@ -676,8 +676,8 @@ export function checkToUpdateSpawnLocation(state: GameState): void {
             state.location.zoneKey === spawnPoint.zoneKey
             && state.location.floor === spawnPoint.floor
             && state.location.isSpiritWorld === spawnPoint.isSpiritWorld
-            && state.location.areaGridCoords[0] === spawnPoint.areaGridCoords[0]
-            && state.location.areaGridCoords[1] === spawnPoint.areaGridCoords[1]
+            && state.location.areaGridCoords.x === spawnPoint.areaGridCoords.x
+            && state.location.areaGridCoords.y === spawnPoint.areaGridCoords.y
         ) {
             return setSpawnLocation(state, spawnPoint);
         }

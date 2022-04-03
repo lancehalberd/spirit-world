@@ -1,3 +1,4 @@
+import { selectDialogueOption } from 'app/content/dialogue';
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
 import { setSpawnLocation } from 'app/content/spawnLocations';
@@ -54,12 +55,6 @@ export class SaveStatue implements ObjectInstance {
             y: this.y + 16,
         });
         state.hero.life = state.hero.maxLife;
-        if (!state.savedState.objectFlags.saveStatueIntroduction) {
-            showMessage(state, '{@saveStatue.introduction}');
-            state.savedState.objectFlags.saveStatueIntroduction = true;
-            saveObjectStatus(state, this.definition, true);
-            return;
-        }
         if (getObjectStatus(state, this.definition)) {
             if (!state.hero.hasRevive) {
                 showMessage(state, '{@saveStatue.reviveChoice}');
@@ -67,7 +62,10 @@ export class SaveStatue implements ObjectInstance {
                 showMessage(state, `You will return here if defeated.`);
             }
         } else {
-            showMessage(state, '{item:secondChance}');
+            // The save statue only shows one set of dialog per area and only
+            // the first time you interact with it.
+            const dialogueOption = selectDialogueOption(state, 'saveStatue');
+            showMessage(state, dialogueOption.text[0]);
             saveObjectStatus(state, this.definition, true);
         }
     }

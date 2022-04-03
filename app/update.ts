@@ -268,7 +268,10 @@ function updateMenu(state: GameState) {
 
 function updateDefeated(state: GameState) {
     state.defeatState.time += FRAME_LENGTH;
-    if (state.defeatState.time < 1000) {
+    // Add 0.5s pause afer showing menu before taking input so that players don't accidentally take action.
+    // This also gives them a bit to see the "Hang in there!" message before their life starts refilling
+    // when they have a revive available.
+    if (state.defeatState.time < 1500) {
         return;
     }
     if (state.hero.hasRevive) {
@@ -280,10 +283,6 @@ function updateDefeated(state: GameState) {
                 saveGame();
             }
         }
-        return;
-    }
-    // Add 0.5s pause afer showing menu before taking input so that players don't accidentally take action.
-    if (state.defeatState.time < 1500) {
         return;
     }
     if (wasGameKeyPressed(state, GAME_KEY.UP)) {

@@ -409,6 +409,7 @@ const sf1_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 368, y: 400, type: "pushPull"},
         {status: "normal", id: "", x: 368, y: 384, type: "pushPull"},
         {status: "hiddenEnemy", id: "cocoonBackTeleporter", x: 160, y: 336, type: "teleporter", saveStatus: "forever", linked: true, spirit: true},
+        {status: "normal", id: "cocoonSave", x: 128, y: 288, type: "saveStatue"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},

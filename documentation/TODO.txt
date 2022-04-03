@@ -48,10 +48,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-
-    Save Shrine:
-        - Add unique message to statues that play the first time you encounter them.
-
     - Improvements
         - Test using PASSIVE_TOOL button as a run button that consumes spirit energy, possibly makes you slip a bit.
 
@@ -64,6 +60,10 @@ Current tasks:
         - Golem boss hands should not gain projectiles
         - Squirrel velocity should reset when knocked back
         - Add SFX when the MC is damaged
+
+    - Add sleeping Vanara to the Cocoon.
+        - Can use a special NPC that doesn't face you when talking for now.
+        - Use a variety of colors.
 
     World Tree
         Tower is a series of 2x2 super tiles with a vine for climbing to the next section that

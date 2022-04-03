@@ -880,6 +880,7 @@ const f1_0x1: AreaDefinition = {
         {status: "normal", id: "", x: 256, y: 192, type: "spawnMarker"},
         {status: "normal", id: "", x: 240, y: 160, type: "spawnMarker"},
         {status: "normal", id: "", x: 256, y: 160, type: "spawnMarker"},
+        {status: "normal", id: "tombSave", x: 192, y: 32, type: "saveStatue"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
