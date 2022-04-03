@@ -42,6 +42,7 @@ export function getLootTypes(): LootType[] {
             'bigKey',
             'smallKey',
             'map',
+            'secondChance',
             // This is the special progressive spirit power loot used by the randomizer.
             'spiritPower',
             ...(Object.keys(state.hero.activeTools) as LootType[]),
@@ -56,8 +57,8 @@ export function getLootTypes(): LootType[] {
 export const combinedObjectTypes: ObjectType[] = [
     'anode', 'cathode', 'airBubbles', 'ballGoal', 'beadCascade', 'beadGrate', 'bigChest', 'chest', 'crystalSwitch', 'decoration',
     'door', 'escalator', 'floorSwitch', 'keyBlock', 'loot','marker', 'narration', 'npc', 'pitEntrance',
-    'pushPull', 'rollingBall', 'sign', 'teleporter', 'tippable', 'torch',
-    'vineSprout', 'waterPot', 'spawnMarker',
+    'pushPull', 'rollingBall', 'saveStatue', 'sign', 'spawnMarker', 'teleporter', 'tippable', 'torch',
+    'vineSprout', 'waterPot',
 ];
 
 export function createObjectDefinition(
@@ -253,6 +254,7 @@ export function createObjectDefinition(
         case 'cathode':
         case 'pushPull':
         case 'rollingBall':
+        case 'saveStatue':
         case 'tippable':
         case 'torch':
         case 'vineSprout':

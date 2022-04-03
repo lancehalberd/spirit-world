@@ -591,32 +591,40 @@ export function setSpawnLocation(state: GameState, spawnLocation: ZoneLocation):
     saveGame();
 }
 
+const prioritizedSpawnLocations = [
+    SPAWN_LOCATION_PEACH_CAVE_EXIT,
+    // Spirit world
+    SPAWN_LOCATION_TOMB_ENTRANCE,
+    SPAWN_WAR_TEMPLE_ENTRANCE,
+    SPAWN_COCOON_ENTRANCE,
+    SPAWN_HELIX_ENTRANCE,
+    SPAWN_FOREST_ENTRANCE,
+    SPAWN_WATERFALL_ENTRANCE,
+    // Forge
+    // Sky Palace
+    // Grand Temple
+    // Jade Palace
+    SPAWN_CRATER_ENTRANCE,
+    SPAWN_STAFF_UPPER_ENTRANCE,
+    SPAWN_STAFF_LOWER_ENTRANCE,
+    RIVER_TEMPLE_LOWER_ENTRANCE,
+    RIVER_TEMPLE_UPPER_ENTRANCE,
+    // Secret Lab
+    // World Tree
+];
+
 export function checkToUpdateSpawnLocation(state: GameState): void {
     // Only set the spawn location when in the game scene. This is to avoid accidentally setting
     // it from the title scene which can trigger unexpected saves.
     if (state.scene !== 'game') {
         return;
     }
-    if (state.location.zoneKey === 'overworld') {
-        return setSpawnLocation(state, SPAWN_LOCATION_PEACH_CAVE_EXIT);
-    }
-    if (state.location.zoneKey === 'tomb') {
-        return setSpawnLocation(state, SPAWN_LOCATION_TOMB_ENTRANCE);
-    }
-    if (state.location.zoneKey === 'warTemple' && state.savedState.objectFlags['warTempleEntrance']) {
-        return setSpawnLocation(state, SPAWN_WAR_TEMPLE_ENTRANCE);
-    }
-    if (state.location.zoneKey === 'cocoon') {
-        return setSpawnLocation(state, SPAWN_COCOON_ENTRANCE);
-    }
-    if (state.location.zoneKey === 'helix') {
-        return setSpawnLocation(state, SPAWN_HELIX_ENTRANCE);
-    }
-    if (state.location.zoneKey === 'waterfallTower') {
-        return setSpawnLocation(state, SPAWN_WATERFALL_ENTRANCE);
-    }
-    if (state.location.zoneKey === 'crater') {
-        return setSpawnLocation(state, SPAWN_CRATER_ENTRANCE);
+    // This spawn point cannot be used unless the war temple entrance is opened.
+    /*if (state.location.zoneKey === 'warTemple' && state.savedState.objectFlags['warTempleEntrance']) {
+        if (state.hero.spawnLocation.zoneKey !== 'warTemple') {
+            setSpawnLocation(state, SPAWN_WAR_TEMPLE_ENTRANCE);
+        }
+        return;
     }
     if (state.location.zoneKey === 'staffTower') {
         if (
@@ -659,8 +667,19 @@ export function checkToUpdateSpawnLocation(state: GameState): void {
         state.location.zoneKey === 'overworld'
         && state.location.isSpiritWorld
         && state.location.areaGridCoords[0] === 0
-        && state.location.areaGridCoords[0] === 1
+        && state.location.areaGridCoords[1] === 2
     )) {
         return setSpawnLocation(state, SPAWN_FOREST_ENTRANCE);
+    }*/
+    for (const spawnPoint of prioritizedSpawnLocations) {
+        if (
+            state.location.zoneKey === spawnPoint.zoneKey
+            && state.location.floor === spawnPoint.floor
+            && state.location.isSpiritWorld === spawnPoint.isSpiritWorld
+            && state.location.areaGridCoords[0] === spawnPoint.areaGridCoords[0]
+            && state.location.areaGridCoords[1] === spawnPoint.areaGridCoords[1]
+        ) {
+            return setSpawnLocation(state, spawnPoint);
+        }
     }
 }

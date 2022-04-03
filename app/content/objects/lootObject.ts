@@ -17,6 +17,7 @@ import {
     LootTable, LootType, ObjectInstance, ObjectStatus, Rect, TileBehaviors,
 } from 'app/types';
 
+type AnyLootDefinition = LootObjectDefinition | BossObjectDefinition | DialogueLootDefinition;
 
 function rollItem(table: LootTable) {
     const roll = Math.random() * table.totalWeight;
@@ -51,14 +52,14 @@ export class LootGetAnimation implements EffectInstance {
         lightRadius: 16,
     };
     frame: Frame;
-    loot: LootObjectDefinition | BossObjectDefinition | DialogueLootDefinition;
+    loot: AnyLootDefinition;
     animationTime: number = 0;
     isEffect = <const>true;
     x: number;
     y: number;
     z: number;
     status: ObjectStatus = 'normal';
-    constructor(loot: LootObjectDefinition | BossObjectDefinition | DialogueLootDefinition) {
+    constructor(loot: AnyLootDefinition) {
         this.loot = loot;
         const state = getState();
         this.frame = getLootFrame(state, loot);
@@ -136,17 +137,6 @@ function showLootMessage(state: GameState, lootType: LootType, lootLevel?: numbe
             return;
         }
         return;
-    }
-    if (lootType === 'spiritPower') {
-        // showLootMessage is run after the upgrade is already applied, so we check what the highest level
-        // spirit power the user has and show that message.
-        if (state.hero.passiveTools.teleportation) {
-            lootType = 'teleportation';
-        } else if (state.hero.passiveTools.astralProjection) {
-            lootType = 'astralProjection';
-        } else {
-            lootType = 'spiritSight';
-        }
     }
     switch (lootType) {
         case 'cloudBoots':
@@ -308,6 +298,13 @@ function showLootMessage(state: GameState, lootType: LootType, lootLevel?: numbe
             return;
         case 'money':
             return showMessage(state, `You found ${lootAmount || 1} Jade!`);
+        case 'secondChance':
+            if (!state.savedState.objectFlags.readSecondChanceMessage) {
+                state.savedState.objectFlags.readSecondChanceMessage = true;
+                return showMessage(state, 'You have been blessed with a Second Chance!'
+                    + '{|}If you are defeated you will be revived one time.');
+            }
+            return;
     }
 }
 
@@ -391,7 +388,36 @@ export class LootObject implements ObjectInstance {
     }
 }
 
-export function getLoot(this: void, state: GameState, definition: LootObjectDefinition | BossObjectDefinition | DialogueLootDefinition): void {
+function getActualLootDefinition(this: void, state: GameState, definition: AnyLootDefinition): AnyLootDefinition {
+    if (definition.lootType === 'spiritPower') {
+        if (!state.hero.passiveTools.spiritSight) {
+            return {
+                ...definition,
+                lootType: 'spiritSight',
+            };
+        } else if (!state.hero.passiveTools.astralProjection) {
+            return {
+                ...definition,
+                lootType: 'astralProjection',
+            };
+        }
+        return {
+            ...definition,
+            lootType: 'teleportation',
+        };
+    }
+    if (definition.lootType === 'secondChance' && state.hero.hasRevive) {
+        return {
+            ...definition,
+            lootType: 'money',
+            lootAmount: 50,
+        };
+    }
+    return definition;
+}
+
+export function getLoot(this: void, state: GameState, definition: AnyLootDefinition): void {
+    definition = getActualLootDefinition(state, definition);
     const onPickup = lootEffects[definition.lootType] || lootEffects.unknown;
     const hero = state.hero.activeClone || state.hero;
     hero.action = 'getItem';
@@ -659,6 +685,7 @@ const lootFrames: {[key in string]: Frame} = {
     fireBlessing: createLootFrame('red', 'Fir'),
     waterBlessing: createLootFrame('blue', 'Wat'),
     weapon: weaponFrame,
+    secondChance: createLootFrame('green', 'x2'),
 };
 
 const smallMoneyGeometry: FrameDimensions = {w: 16, h: 16, content:{ x: 4, y: 8, w: 8, h: 8}};
@@ -751,7 +778,7 @@ function updateDungeonInventory(state: GameState, inventory: DungeonInventory, s
     }
 }
 
-export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition | DialogueLootDefinition, simulate?: boolean) => void}> = {
+export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: AnyLootDefinition, simulate?: boolean) => void}> = {
     unknown: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
         if (loot.lootType === 'weapon') {
             state.hero.weapon = applyUpgrade(state.hero.weapon, loot);
@@ -819,6 +846,9 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: Lo
             }
             // You will gain the full peach from the dialogue effect.
         }
+    },
+    secondChance: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
+        state.hero.hasRevive = true;
     },
     spiritPower: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
         if (loot.lootType === 'spiritPower') {

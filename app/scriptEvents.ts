@@ -23,6 +23,7 @@ import {
 export function setScript(state: GameState, script: string): void {
     //console.log('setScript', script);
     state.scriptEvents.queue = parseEventScript(state, script);
+    console.log('setScript', [...state.scriptEvents.queue]);
     state.scriptEvents.activeEvents = [];
 }
 
@@ -32,6 +33,7 @@ export function prependScript(state: GameState, script: string): void {
         ...parseEventScript(state, script),
         ...state.scriptEvents.queue,
     ];
+    console.log('prependScript', [...state.scriptEvents.queue]);
 }
 
 export function parseScriptText(state: GameState, text: string, duration: number = 0, blockFieldUpdates = true): ScriptEvent[] {
@@ -368,7 +370,8 @@ export const updateScriptEvents = (state: GameState): void => {
                 break;
             case 'gainLoot':
                 getLoot(state, {type: 'dialogueLoot', ...event.lootDefinition});
-                break;
+                // Don't continue processing events until the loot gives up priority.
+                return;
             case 'playSound':
                 playSound(event.sound);
                 break;
@@ -379,7 +382,7 @@ export const updateScriptEvents = (state: GameState): void => {
                     return;
                 }
                 const script = dialogueSet.mappedOptions[event.scriptKey];
-                setScript(state, script);
+                prependScript(state, script);
                 // Since this overwrites remaining events, don't continue processing events this frame.
                 return;
             case 'attemptPurchase':
@@ -427,5 +430,5 @@ function followMessagePointer(state: GameState, pointer) {
         return;
     }
     const script = dialogueSet.mappedOptions[optionKey];
-    setScript(state, script);
+    prependScript(state, script);
 }

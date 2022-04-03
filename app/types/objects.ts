@@ -333,6 +333,7 @@ export interface NPCDefinition extends BaseObjectDefinition {
 }
 
 export type SimpleObjectType = 'airBubbles' | 'beadGrate' | 'cathode' | 'pushPull' | 'rollingBall'
+    | 'saveStatue'
     | 'tippable' | 'torch' | 'vineSprout' | 'waterPot';
 
 export interface SimpleObjectDefinition extends BaseObjectDefinition {

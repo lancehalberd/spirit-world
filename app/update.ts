@@ -268,34 +268,33 @@ function updateMenu(state: GameState) {
 
 function updateDefeated(state: GameState) {
     state.defeatState.time += FRAME_LENGTH;
-    if (state.menuIndex === 0 && state.hero.money < 50) {
-        state.menuIndex = 1;
+    if (state.defeatState.time < 1000) {
+        return;
+    }
+    if (state.hero.hasRevive) {
+        if (state.defeatState.time % 200 === 0) {
+            state.hero.life = Math.min(state.hero.maxLife, state.hero.life + 0.5);
+            if (state.hero.life === state.hero.maxLife) {
+                state.defeatState.defeated = false;
+                state.hero.hasRevive = false;
+                saveGame();
+            }
+        }
+        return;
     }
     // Add 0.5s pause afer showing menu before taking input so that players don't accidentally take action.
     if (state.defeatState.time < 1500) {
         return;
     }
     if (wasGameKeyPressed(state, GAME_KEY.UP)) {
-        state.menuIndex = (state.menuIndex + 2) % 3;
-        if (state.menuIndex === 0 && state.hero.money < 50) {
-            state.menuIndex = 2;
-        }
+        state.menuIndex = (state.menuIndex + 1) % 2;
     } else if (wasGameKeyPressed(state, GAME_KEY.DOWN)) {
-        state.menuIndex = (state.menuIndex + 1) % 3;
-        if (state.menuIndex === 0 && state.hero.money < 50) {
-            state.menuIndex = 1;
-        }
+        state.menuIndex = (state.menuIndex + 1) % 2;
     } else if (wasConfirmKeyPressed(state)) {
-        if (state.menuIndex === 0 && state.hero.money >= 50) {
-            state.hero.money -= 50;
-            state.hero.life = state.hero.maxLife;
-            state.defeatState.defeated = false;
-            saveGame();
-            state.paused = false;
-        } else if (state.menuIndex === 1) {
+        if (state.menuIndex === 0) {
             returnToSpawnLocation(state);
             state.paused = false;
-        } else if (state.menuIndex === 2) {
+        } else if (state.menuIndex === 1) {
             state.scene = 'title';
             state.menuIndex = state.savedGameIndex;
             setSaveFileToState(state.menuIndex);

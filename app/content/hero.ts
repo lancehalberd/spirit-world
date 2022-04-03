@@ -62,6 +62,7 @@ export class Hero implements Actor, SavedHeroData {
     bounce?: {vx: number; vy: number; frames: number};
     equipedGear?: {[key in Equipment]?: boolean};
     hasBarrier?: boolean = false;
+    hasRevive: boolean = false;
     isInvisible?: boolean = false;
     jumpingTime?: number;
     jumpDirection?: Direction;
@@ -174,6 +175,7 @@ export class Hero implements Actor, SavedHeroData {
     exportSavedHeroData(): SavedHeroData {
         return {
             maxLife: this.maxLife,
+            hasRevive: this.hasRevive,
             money: this.money,
             peachQuarters: this.peachQuarters,
             spiritTokens: this.spiritTokens,

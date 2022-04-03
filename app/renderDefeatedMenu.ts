@@ -20,23 +20,26 @@ export function renderDefeatedMenu(context: CanvasRenderingContext2D, state: Gam
 
     r = pad(r, -4);
 
-
     let x = r.x + 20, y = r.y + r.h / 4;
-    let selectedY = y;
     context.textBaseline = 'middle';
     context.textAlign = 'left';
     context.font = '16px Arial';
-    context.fillStyle = state.hero.money >= 50 ? 'white' : '#666';
-    context.fillText('REVIVE (-50 JADE)', x, y + 2);
-    y = r.y + r.h * 2 / 4;
-    if (state.menuIndex === 1) {
-        selectedY = y;
+    if (state.hero.hasRevive) {
+        context.fillStyle = 'white';
+        context.fillText('HANG IN THERE!', x, y + 2);
+        return;
+    } else {
+        context.fillText('TRY AGAIN?', x, y + 2);
     }
+
+    y = r.y + r.h * 2 / 4;
+    let selectedY = y;
+    context.fillStyle = state.hero.money >= 50 ? 'white' : '#666';
     context.fillStyle = 'white';
     context.fillText('CONTINUE', x, y + 2);
 
     y = r.y + r.h * 3 / 4;
-    if (state.menuIndex === 2) {
+    if (state.menuIndex === 1) {
         selectedY = y;
     }
     context.fillText('QUIT', x, y + 2);

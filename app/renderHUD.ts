@@ -29,6 +29,10 @@ const isRandomizer = !!readGetParameter('seed');
 export function renderHUD(context: CanvasRenderingContext2D, state: GameState): void {
     let x = 26;
     let y = 5;
+    if (state.hero.hasRevive) {
+        const frame = getLootFrame(state, { lootType: 'secondChance' });
+        drawFrame(context, frame, {...frame, x: x - 12, y: y - 4});
+    }
     for (let i = 0; i < state.hero.maxLife; i++) {
         if (i === 10) {
             y += 11;

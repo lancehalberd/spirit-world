@@ -233,6 +233,7 @@ export function getDefaultSavedState(): SavedState {
 function getDefaultSavedHeroData(): SavedHeroData {
     return {
         maxLife: 4,
+        hasRevive: false,
         money: 0,
         peachQuarters: 0,
         spiritTokens: 0,

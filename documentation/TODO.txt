@@ -46,8 +46,15 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+
+    Save Shrine:
+        - Add unique message to statues that play the first time you encounter them.
+        - Make sure we can gain loot in the middle of scripts, right now it shows all text before the loot object.
+
+
     - Improvements
-        - Add better path to the boss in War Temple on defeat
+        - Fix no sound when getting chakram.
+        - Exception when starting beetle boss in cave.
         - Test using PASSIVE_TOOL button as a run button that consumes spirit energy, possibly makes you slip a bit.
 
         - There should be a name indicator on the menu for the tool the cursor is over
@@ -171,6 +178,26 @@ Staff Improvements:
         - Would be nice to have this preview behavior when holding down the staff button for staff 1.
     - If the staff doesn't have enough area, maybe it should still swing and hit, but despawn or bounce off the terrain after landing.
 
+Difficulty shrine:
+    - Can apply changes to entire dungeon
+    - The shrine cannot be entered until at least one coin is found.
+    - Exists in its own dimension, can have multiple entrances to make shortcuts
+    - Has Save Statue inside.
+    - Dungeon bound Lucky Coin
+        - Maybe split into Silver Coins for dungeon and Gold Coins for boss
+    - Usually 1 coin can be found inside the shrine itself
+    - 1 point per coin
+    - points can be rearranged at no cost
+    - 1 point to make mechanics easier (usually a few options)
+    - Some points are already applied to make the game easier
+        - These can be removed and distributed elsewhere.
+    - Remove boss webs
+    - Reduce boss health
+    - Take 1/2 damage
+    - 1/2 boss life
+    - easier traps (disable conveyer belts, remove spikes)
+    - easier puzzles (required chests are made distinct from optional chests, positions of required items are moved to more easily accessible locations)
+
 Throwing an object into a pit should make use the pit animation rather than breaking.
 
 Respawn improvements:
@@ -279,18 +306,6 @@ Spirit Store(s)
         3 -> Spirit Key
         5 -> Quick Charge (40% reduction in time to charge)
 
-Difficulty shrine:
-    - 50 money per point
-    - move points around for free
-    - second chance = faerie
-        - 100/200/300/400 for a filled chance, 50 for a refill
-    - Or second chance is only for boss, and have a single refill tank that you can charge like in metroid?
-    - Remove boss webs
-    - Reduce boss health
-    - Take 1/2 damage
-    - 1/2 boss life
-    - easier traps (disable conveyer belts, remove spikes)
-    - easier puzzles (required chests are made distinct from optional chests, positions of required items are moved to more easily accessible locations)
 
 Spirit Cloak Improvements
     - Need a way to optionally enable invisibility

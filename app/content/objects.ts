@@ -8,6 +8,7 @@ import { FloorSwitch } from 'app/content/objects/floorSwitch';
 import { Anode, Cathode } from 'app/content/objects/lightningBarrier';
 import { PushPullObject } from 'app/content/objects/pushPullObject';
 import { RollingBallObject } from 'app/content/objects/rollingBallObject';
+import { SaveStatue } from 'app/content/objects/saveStatue';
 import { TippableObject } from 'app/content/objects/tippableObject';
 
 import { AirBubbles } from 'app/content/objects/airBubbles';
@@ -80,6 +81,8 @@ export function createObjectInstance(state: GameState, object: ObjectDefinition)
         return new Marker(object);
     } else if (object.type === 'narration') {
         return new Narration(state, object);
+    } else if (object.type === 'saveStatue') {
+        return new SaveStatue(object);
     } else if (object.type === 'sign') {
         return new Sign(object);
     } else if (object.type === 'teleporter') {
@@ -213,6 +216,8 @@ export function saveObjectStatus(this: void, state: GameState, definition: Objec
         } else if (definition.type === 'enemy') {
             treatment = 'zone';
         } else if (definition.type === 'narration') {
+            treatment = 'forever';
+        } else if (definition.type === 'saveStatue') {
             treatment = 'forever';
         }
     }

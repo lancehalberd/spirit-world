@@ -4,7 +4,7 @@ import { drawFrame } from 'app/utils/animations';
 import { characterMap, keyboardMap, xboxMap } from 'app/utils/simpleWhiteFont';
 import { fillRect, pad } from 'app/utils/index';
 
-import { setScript } from 'app/scriptEvents';
+import { prependScript } from 'app/scriptEvents';
 
 import { Frame, GameState, ShowChoiceBoxActiveScriptEvent } from 'app/types';
 
@@ -71,7 +71,7 @@ export function showMessage(
     if (!message){
         return;
     }
-    setScript(state, message);
+    prependScript(state, message);
 }
 
 export function parseMessage(state: GameState, message: string, maxWidth = messageWidth): Frame[][][] {
