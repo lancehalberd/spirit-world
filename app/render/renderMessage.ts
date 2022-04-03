@@ -71,7 +71,7 @@ export function showMessage(
     if (!message){
         return;
     }
-    prependScript(state, message);
+    prependScript(state, `${message}{clearTextBox}{wait:200}`);
 }
 
 export function parseMessage(state: GameState, message: string, maxWidth = messageWidth): Frame[][][] {

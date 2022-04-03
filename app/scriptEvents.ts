@@ -21,9 +21,9 @@ import {
 
 // Clears all current script events and queues up events parsed from the new script.
 export function setScript(state: GameState, script: string): void {
-    //console.log('setScript', script);
+    // console.log('setScript', script);
     state.scriptEvents.queue = parseEventScript(state, script);
-    console.log('setScript', [...state.scriptEvents.queue]);
+    // console.log('setScript', [...state.scriptEvents.queue]);
     state.scriptEvents.activeEvents = [];
 }
 
@@ -33,7 +33,7 @@ export function prependScript(state: GameState, script: string): void {
         ...parseEventScript(state, script),
         ...state.scriptEvents.queue,
     ];
-    console.log('prependScript', [...state.scriptEvents.queue]);
+    // console.log('prependScript', [...state.scriptEvents.queue]);
 }
 
 export function parseScriptText(state: GameState, text: string, duration: number = 0, blockFieldUpdates = true): ScriptEvent[] {
@@ -191,6 +191,7 @@ export function parseEventScript(state: GameState, script: string): ScriptEvent[
                 throw new Error('Unknown loot type: ' + lootType);
             }
             const number = parseInt(amountOrLevel, 10);
+            events.push({ type: 'clearTextBox' });
             events.push({
                 type: 'gainLoot',
                 lootDefinition: {
@@ -198,6 +199,12 @@ export function parseEventScript(state: GameState, script: string): ScriptEvent[
                     lootLevel: isNaN(number) ? 0 : number,
                     lootAmount: isNaN(number) ? 0 : number,
                 },
+            });
+            events.push({
+                type: 'wait',
+                // This must be long enough to let the get loot animation reach
+                // adding the loot message to the front of the script queue.
+                duration: 1000,
             });
             continue
         }

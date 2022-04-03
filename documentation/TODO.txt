@@ -51,8 +51,6 @@ Current tasks:
 
     Save Shrine:
         - Add unique message to statues that play the first time you encounter them.
-        - Make sure we can gain loot in the middle of scripts, right now it shows all text before the loot object.
-
 
     - Improvements
         - Test using PASSIVE_TOOL button as a run button that consumes spirit energy, possibly makes you slip a bit.
