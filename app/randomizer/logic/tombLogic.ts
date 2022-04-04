@@ -1,7 +1,7 @@
 import {
     andLogic, orLogic,
     canCross2Gaps,
-    hasAstralProjection, hasBossWeapon, hasGloves, hasMediumRange,
+    hasAstralProjection, hasSpiritSight, hasBossWeapon, hasGloves, hasMediumRange,
     hasRangedPush, hasWeapon,
 } from 'app/content/logic';
 
@@ -107,8 +107,8 @@ export const tombNodes: LogicNode[] = [
         ],
         entranceIds: ['tombExit', 'tombTeleporter'],
         exits: [
-            {objectId: 'tombExit', logic: hasAstralProjection},
-            {objectId: 'tombTeleporter', logic: hasAstralProjection},
+            {objectId: 'tombExit', logic: andLogic(hasAstralProjection, hasGloves)},
+            {objectId: 'tombTeleporter', logic: hasSpiritSight},
         ],
     },
 ];
