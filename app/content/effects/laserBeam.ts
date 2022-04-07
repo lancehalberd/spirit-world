@@ -117,16 +117,19 @@ export function drawLaser(context: CanvasRenderingContext2D, ray: Ray, alpha: nu
         );
 
         // Add color stops
-        gradient.addColorStop(0, "rgba(252,70,107,0)");
-        gradient.addColorStop(0.1, "rgba(252,70,107,0.2)");
-        gradient.addColorStop(0.2, "rgba(252,70,107,0.8)");
-        gradient.addColorStop(0.3, "rgba(251,63,215,1)");
-        gradient.addColorStop(0.4, "rgba(250,250,250,1)");
-        gradient.addColorStop(0.6, "rgba(250,250,250,1)");
-        gradient.addColorStop(0.7, "rgba(251,63,215,1)");
-        gradient.addColorStop(0.8, "rgba(252,70,107,0.8)");
-        gradient.addColorStop(0.9, "rgba(252,70,107,0.2)");
-        gradient.addColorStop(1, "rgba(252,70,107,0)");
+        // pink #f9c8c8 rgba(249,200,200,255)
+        // red #ef3b3b rgba(239,59,59,255)
+        // dark red #cf2340 rgba(207,35,64,255)
+        gradient.addColorStop(0, "rgba(207,35,64,0)");
+        gradient.addColorStop(0.1, "rgba(207,35,64,0.2)");
+        gradient.addColorStop(0.2, "rgba(207,35,64,0.8)");
+        gradient.addColorStop(0.3, "rgba(239,59,59,1)");
+        gradient.addColorStop(0.4, "rgba(249,200,200,1)");
+        gradient.addColorStop(0.6, "rgba(249,200,200,1)");
+        gradient.addColorStop(0.7, "rgba(239,59,59,1)");
+        gradient.addColorStop(0.8, "rgba(207,35,64,0.8)");
+        gradient.addColorStop(0.9, "rgba(207,35,64,0.2)");
+        gradient.addColorStop(1, "rgba(207,35,64,0)");
 
         // Set the fill style and draw a rectangle
         context.fillStyle = gradient;

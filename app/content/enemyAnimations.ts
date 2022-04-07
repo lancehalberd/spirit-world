@@ -5,6 +5,12 @@ import { ActorAnimations, FrameAnimation, FrameDimensions } from 'app/types';
 const enemyDeathGeometry: FrameDimensions = {w: 20, h: 20};
 export const enemyDeathAnimation: FrameAnimation = createAnimation('gfx/effects/enemydeath.png', enemyDeathGeometry, { cols: 9, duration: 4}, { loop: false });
 
+// 252x28
+const bossDeathExplosionGeometry: FrameDimensions = {w: 28, h: 28};
+export const bossDeathExplosionAnimation: FrameAnimation
+    = createAnimation('gfx/effects/powersource_explosion.png', bossDeathExplosionGeometry, { cols: 9, duration: 4}, { loop: false });
+
+
 const snakeGeometry: FrameDimensions = { w: 18, h: 18, content: { x: 2, y: 6, w: 14, h: 11} };
 const leftSnakeAnimation: FrameAnimation = createAnimation('gfx/enemies/snek.png', snakeGeometry, { x: 0});
 const downSnakeAnimation: FrameAnimation = createAnimation('gfx/enemies/snek.png', snakeGeometry, { x: 1});

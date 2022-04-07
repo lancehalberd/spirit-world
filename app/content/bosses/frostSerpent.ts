@@ -289,7 +289,7 @@ function updateFrostSerpent(this: void, state: GameState, enemy: Enemy): void {
         if (enemy.mode === 'guard') {
             enemy.d = getDirection(Math.cos(theta), Math.sin(theta));
             enemy.params.attackTheta = theta;
-            moveEnemyToTargetLocation(state, enemy, targetX, targetY);
+            moveEnemyToTargetLocation(state, enemy, targetX, targetY, 'idle');
             if (enemy.modeTime >= 2000) {
                 enemy.setMode('prepare');
             }

@@ -279,6 +279,10 @@ function applyItems(savedState: SavedState, items: {[key: string]: number}, obje
             newState.savedHeroData.maxLife += items[key];
             continue;
         }
+        if (key === 'secondChance') {
+            newState.savedHeroData.hasRevive = true;
+            continue;
+        }
         if (key === 'money') {
             newState.savedHeroData.money += items[key];
             continue;
@@ -317,7 +321,7 @@ function applyItems(savedState: SavedState, items: {[key: string]: number}, obje
 }
 
 const defaultSavedState = getDefaultSavedState();
-const peachBossState = applyItems(defaultSavedState, {weapon: 1, money: 50},
+const peachBossState = applyItems(defaultSavedState, {weapon: 1, money: 50, secondChance: 1},
     ['peachCave:0:0x0-weapon-0', 'peachCaveSprout1', 'peachCaveSprout2']
 );
 const peachCaveExitState = applyItems(peachBossState, {maxLife: 1, catEyes: 1},

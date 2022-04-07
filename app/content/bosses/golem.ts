@@ -1,5 +1,7 @@
 import {
     addEffectToArea,
+    addObjectToArea,
+    removeEffectFromArea,
     getAreaSize,
     playAreaSound,
 } from 'app/content/areas';
@@ -15,11 +17,14 @@ import {
     moveEnemyToTargetLocation,
     //paceRandomly,
 } from 'app/content/enemies';
-import { droneAnimations } from 'app/content/enemyAnimations';
+import { createAnimation, drawFrame } from 'app/utils/animations';
 import { rectanglesOverlap } from 'app/utils/index';
 import { addScreenShake } from 'app/utils/field';
 
-import { AreaInstance, Enemy, GameState, HitProperties, HitResult } from 'app/types';
+import {
+    ActorAnimations, AreaInstance, Enemy, FrameDimensions, FrameAnimation,
+    GameState, HitProperties, HitResult
+} from 'app/types';
 
 const LASER_CHARGE_TIME = 2000;
 const FAST_LASER_CHARGE_TIME = 1000;
@@ -27,40 +32,113 @@ const SLAM_HANDS_DURATION = 4000;
 // Period of time the golem pauses after using slam hands.
 const SLAM_HANDS_PAUSE_DURATION = 2500;
 
+
+const golemHeadGeometry: FrameDimensions = { w: 64, h: 64 };
+const golemHeadAsleepAnimation: FrameAnimation = createAnimation('gfx/enemies/boss_golem_body.png', golemHeadGeometry);
+const golemHeadWarmupAnimation: FrameAnimation = createAnimation('gfx/enemies/boss_golem_body.png', golemHeadGeometry, { y: 0, cols: 5}, {loop: false});
+const golemHeadIdleAnimation: FrameAnimation = createAnimation('gfx/enemies/boss_golem_body.png', golemHeadGeometry, { y: 1 });
+// Used for warming up+cooling down from eye lasers
+const golemHeadChargeEyesAnimation: FrameAnimation = createAnimation('gfx/enemies/boss_golem_body.png', golemHeadGeometry, { y: 1, x: 1, cols: 2});
+const golemHeadShootEyesAnimation: FrameAnimation = createAnimation('gfx/enemies/boss_golem_body.png', golemHeadGeometry, { y: 1, x: 3, cols: 2});
+const golemHeadChargeMouthAnimation: FrameAnimation = createAnimation('gfx/enemies/boss_golem_body.png', golemHeadGeometry, { y: 2, x: 1, cols: 2});
+const golemHeadShootMouthAnimation: FrameAnimation = createAnimation('gfx/enemies/boss_golem_body.png', golemHeadGeometry, { y: 2, x: 3, cols: 2});
+
+const golemHeadAngryIdleAnimation: FrameAnimation = createAnimation('gfx/enemies/boss_golem_body.png', golemHeadGeometry, { y: 3 });
+const golemHeadAngryChargeEyesAnimation: FrameAnimation = createAnimation('gfx/enemies/boss_golem_body.png', golemHeadGeometry, { y: 3, x: 1, cols: 2});
+const golemHeadAngryShootEyesAnimation: FrameAnimation = createAnimation('gfx/enemies/boss_golem_body.png', golemHeadGeometry, { y: 3, x: 3, cols: 2});
+const golemHeadAngryChargeMouthAnimation: FrameAnimation = createAnimation('gfx/enemies/boss_golem_body.png', golemHeadGeometry, { y: 4, x: 1, cols: 2});
+const golemHeadAngryShootMouthAnimation: FrameAnimation = createAnimation('gfx/enemies/boss_golem_body.png', golemHeadGeometry, { y: 4, x: 3, cols: 2});
+
+const golemHeadDeathAnimation: FrameAnimation = createAnimation('gfx/enemies/boss_golem_body.png', golemHeadGeometry, { y: 5 });
+
+const golemHeadAnimations: ActorAnimations = {
+    asleep: {
+        down: golemHeadAsleepAnimation,
+    },
+    warmup: {
+        down: golemHeadWarmupAnimation,
+    },
+    idle: {
+        down: golemHeadIdleAnimation,
+    },
+    chargeEyes: {
+        down: golemHeadChargeEyesAnimation,
+    },
+    shootEyes: {
+        down: golemHeadShootEyesAnimation,
+    },
+    chargeMouth: {
+        down: golemHeadChargeMouthAnimation,
+    },
+    shootMouth: {
+        down: golemHeadShootMouthAnimation,
+    },
+    angryIdle: {
+        down: golemHeadAngryIdleAnimation,
+    },
+    angryChargeEyes: {
+        down: golemHeadAngryChargeEyesAnimation,
+    },
+    angryShootEyes: {
+        down: golemHeadAngryShootEyesAnimation,
+    },
+    angryChargeMouth: {
+        down: golemHeadAngryChargeMouthAnimation,
+    },
+    angryShootMouth: {
+        down: golemHeadAngryShootMouthAnimation,
+    },
+    death: {
+        down:golemHeadDeathAnimation,
+    },
+};
+
 enemyDefinitions.golem = {
-    animations: droneAnimations, life: 32, scale: 4, touchHit: { damage: 2 },
+    animations: golemHeadAnimations, life: 12, touchHit: { damage: 2 },
     acceleration: 0.3, speed: 3,
+    hasShadow: false,
     update: updateGolem,
     params: {
         enrageLevel: 0,
     },
+    initialAnimation: 'warmup',
+    initialMode: 'warmup',
     immunities: ['fire', 'ice'],
     elementalMultipliers: {'lightning': 2},
     renderOver(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
-        let frameIndex = Math.floor(7 - enemy.params.cloudLife);
-        frameIndex = Math.min(7, Math.max(0, frameIndex));
-        context.fillStyle = enemy.isInvulnerable ? 'white' : 'red';
-        context.beginPath();
-        const hitbox = enemy.getHitbox(state);
-        context.arc(hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h - 10, 6, 0, 2 * Math.PI);
-        context.fill();
-        if (enemy.mode === 'chargeLaser' || enemy.mode === 'chargeStrafeLaser') {
-            const laserChargeTime = enemy.mode === 'chargeLaser'
-                ? LASER_CHARGE_TIME
-                : FAST_LASER_CHARGE_TIME;
+        if (enemy.mode === 'chargeLaser') {
             context.save();
-                const p = enemy.modeTime / laserChargeTime;
+                const p = enemy.modeTime / LASER_CHARGE_TIME;
                 context.globalAlpha *= 0.2 + 0.8 * p;
-                const r = 6 + 16 * (1 - p);
+                const r = 1 + 16 * (1 - p);
                 context.fillStyle = 'yellow';
                 context.beginPath();
-                const hitbox = enemy.getHitbox(state);
-                context.arc(hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h - 10, r, 0, 2 * Math.PI);
+                const [x, y] = getMouthLaserCoords(state, enemy);
+                context.arc(x, y, r, 0, 2 * Math.PI);
                 context.fill();
             context.restore();
+        } else if (enemy.mode === 'chargeStrafeLaser') {
+            context.save();
+                const p = enemy.modeTime / FAST_LASER_CHARGE_TIME;
+                context.globalAlpha *= 0.2 + 0.8 * p;
+                const r = 1 + 16 * (1 - p);
+                context.fillStyle = 'yellow';
+                context.beginPath();
+                let [x, y] = getLeftEyeLaserCoords(state, enemy);
+                context.arc(x, y, r, 0, 2 * Math.PI);
+                [x, y] = getRightEyeLaserCoords(state, enemy);
+                context.arc(x, y, r, 0, 2 * Math.PI);
+                context.fill();
+            context.restore();
+
         }
     },
     onHit(state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
+        // Cannot damage the golem head at all unless it is in a mode where its mouth is open.
+        if (!['chargeLaser', 'fireLaser', 'cooldown'].includes(enemy.mode)) {
+            playAreaSound(state, enemy.area, 'blockAttack');
+            return { hit: true, blocked: true, stopped: true };
+        }
         const hitbox = enemy.getHitbox(state);
         const hitInnerBox = hit.hitbox && rectanglesOverlap({
             x: hitbox.x + hitbox.w / 2 - 6,
@@ -83,14 +161,15 @@ enemyDefinitions.golem = {
     },
 };
 enemyDefinitions.golemHand = {
-    animations: droneAnimations, life: 9, scale: 2, update: updateGolemHand,
+    animations: golemHeadAnimations, life: 6, scale: 1/2, update: updateGolemHand,
     canBeKnockedBack: false, canBeKnockedDown: false,
     showHealthBar: true,
     acceleration: 0.3, speed: 4,
     touchHit: { damage: 2},
     immunities: ['fire', 'ice'],
     elementalMultipliers: {'lightning': 2},
-    initialMode: 'choose',
+    initialAnimation: 'asleep',
+    initialMode: 'return',
     params: {
         enrageLevel: 0,
         side: 'none',
@@ -111,13 +190,20 @@ enemyDefinitions.golemHand = {
         enemy.defaultOnHit(state, hit);
         return { hit: true, blocked: true, stopped: true };
     },
-    renderOver(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
-        context.fillStyle = enemy.mode === 'stunned' ? 'red' : 'grey';
-        context.beginPath();
-        const hitbox = enemy.getHitbox(state);
-        context.arc(hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h - 6, 5, 0, 2 * Math.PI);
-        context.fill();
-    },
+    render(this: void, context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) {
+        if (enemy.mode === 'appearing') {
+            const frame = enemy.getFrame();
+            const h = Math.floor(frame.h * enemy.modeTime / 1000);
+            drawFrame(context, {...frame, h}, { ...frame,
+                x: enemy.x - (frame?.content?.x || 0) * enemy.scale,
+                y: enemy.y - (frame?.content?.y || 0) * enemy.scale - enemy.z + (frame.h - h) * enemy.scale,
+                w: frame.w * enemy.scale,
+                h: h * enemy.scale,
+            });
+        } else {
+            enemy.defaultRender(context, state);
+        }
+    }
 };
 
 function getGolem(this: void, state: GameState, area: AreaInstance): Enemy {
@@ -136,27 +222,37 @@ function isEnemyDefeated(enemy: Enemy): boolean {
     return !enemy || (enemy.life <= 0 && !enemy.isImmortal) || enemy.status === 'gone';
 }
 
-
-function fireLaser(this: void, state: GameState, enemy: Enemy, duration: number): void {
+function getMouthLaserCoords(state: GameState, enemy: Enemy): number[] {
     const hitbox = enemy.getHitbox(state);
-    const sx = hitbox.x + hitbox.w / 2, sy = hitbox.y + hitbox.h - 10;
-    enemy.params.laser = new LaserBeam({
+    return [hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h - 10];
+}
+function getLeftEyeLaserCoords(state: GameState, enemy: Enemy): number[] {
+    const hitbox = enemy.getHitbox(state);
+    return [hitbox.x + hitbox.w / 2 - 14, hitbox.y + 38];
+}
+function getRightEyeLaserCoords(state: GameState, enemy: Enemy): number[] {
+    const hitbox = enemy.getHitbox(state);
+    return [hitbox.x + hitbox.w / 2 + 14, hitbox.y + 38];
+}
+
+function fireLaser(this: void, state: GameState, enemy: Enemy, duration: number, radius: number, coords: number[]): LaserBeam {
+    const [sx, sy] = coords;
+    const laser = new LaserBeam({
         sx: sx, sy, tx: sx, ty: sy + 512,
-        radius: 8, damage: 3, duration,
+        radius, damage: 3, duration,
     });
-    addEffectToArea(state, enemy.area, enemy.params.laser);
+    addEffectToArea(state, enemy.area, laser);
+    return laser;
 }
 
 function updateGolem(this: void, state: GameState, enemy: Enemy): void {
-    // Remove invulnerability from enrage once all enraged attacks have been completed.
-    if (enemy.isInvulnerable && enemy.params.enragedAttacks <= 0) {
-        enemy.isInvulnerable = false;
-    }
+    enemy.d = 'down';
     // This gets all hands since the golem is not a golemHand.
     const hands = getOtherHands(state, enemy);
     // Boss moves slower for each hand remaining.
     enemy.speed = Math.max(1, enemy.enemyDefinition.speed - hands.length);
-    if (enemy.params.enragedAttacks > 0) {
+    const isAngry = enemy.params.enragedAttacks > 0;
+    if (isAngry) {
         if (enemy.params.slamHands && hands.length) {
             enemy.speed = 1.5;
         } else {
@@ -169,7 +265,7 @@ function updateGolem(this: void, state: GameState, enemy: Enemy): void {
         (enemy.mode === 'choose' || enemy.mode === 'chargeLaser' ||  enemy.mode === 'slamHands')
         && ((enemy.mode === 'slamHands' && enemy.modeTime < SLAM_HANDS_DURATION) || !hands.some(hand => hand.mode !== 'choose'))
         && !(enemy.mode === 'chargeLaser' && enemy.modeTime > LASER_CHARGE_TIME - 400)
-        && (!enemy.params.laser || enemy.params.laser.done);
+        && (!enemy.params.mouthLaser || enemy.params.mouthLaser.done);
 
     const hitbox = enemy.getHitbox(state);
     const cx = hitbox.x + hitbox.w / 2;//, cy = hitbox.y + hitbox.h / 2;
@@ -177,22 +273,27 @@ function updateGolem(this: void, state: GameState, enemy: Enemy): void {
         const target = getNearbyTarget(state, enemy, 1000, enemy.area.allyTargets);
         const targetHitbox = target.getHitbox(state);
         // Track the player's x position when possible.
-        if (targetHitbox.x < hitbox.x ||
-            (enemy.mode === 'chargeLaser' && targetHitbox.x + targetHitbox.w / 2 < cx - 4)
-        ) {
+        if (targetHitbox.x + targetHitbox.w / 2 < cx - 4) {
             moveEnemy(state, enemy, -enemy.speed, 0, {});
-        } else if (targetHitbox.x + targetHitbox.w > hitbox.x + hitbox.w ||
-            (enemy.mode === 'chargeLaser' && targetHitbox.x + targetHitbox.w / 2 > cx + 4)
-        ) {
+        } else if (targetHitbox.x + targetHitbox.w / 2 > cx + 4) {
             moveEnemy(state, enemy, enemy.speed, 0, {});
         }
     }
-    if (enemy.mode === 'choose') {
+    if (enemy.mode === 'warmup') {
+        enemy.changeToAnimation('warmup');
+        if (enemy.modeTime <= 1000) {
+            enemy.animationTime = 0;
+        }
+        if (enemy.modeTime >= 2000) {
+            enemy.setMode('choose');
+        }
+    } else if (enemy.mode === 'choose') {
+        enemy.changeToAnimation(isAngry ? 'angryIdle' : 'idle');
         if (enemy.params.enragedAttacks > 0) {
             enemy.setMode('prepareStrafe');
             return;
         }
-        if (enemy.modeTime >= 2000 + 2000 * hands.length) {
+        if (enemy.modeTime >= 1000 + 3000 * hands.length) {
             enemy.setMode('prepareAttack');
         }
     } else if (enemy.mode === 'prepareStrafe') {
@@ -217,16 +318,23 @@ function updateGolem(this: void, state: GameState, enemy: Enemy): void {
             }
         }
     } else if (enemy.mode === 'chargeStrafeLaser') {
+        enemy.changeToAnimation(isAngry ? 'angryChargeEyes' : 'chargeEyes');
         if (enemy.modeTime >= FAST_LASER_CHARGE_TIME) {
-            fireLaser(state, enemy, 1500);
-            enemy.setMode('strafeLaser');
+            enemy.params.leftEyeLaser = fireLaser(state, enemy, 1500, 6, getLeftEyeLaserCoords(state, enemy));
+            enemy.params.rightEyeLaser = fireLaser(state, enemy, 1500, 6, getRightEyeLaserCoords(state, enemy));
+            enemy.setMode('fireStrafeLaser');
         }
-    } else if (enemy.mode === 'strafeLaser') {
+    } else if (enemy.mode === 'fireStrafeLaser') {
+        enemy.changeToAnimation(isAngry ? 'angryShootEyes' : 'shootEyes');
         if (moveEnemy(state, enemy, enemy.vx, 0, {})) {
             enemy.modeTime = 0;
         }
         if (enemy.modeTime >= 400) {
             enemy.params.enragedAttacks--;
+            removeEffectFromArea(state, enemy.params.leftEyeLaser);
+            removeEffectFromArea(state, enemy.params.rightEyeLaser);
+            delete enemy.params.leftEyeLaser;
+            delete enemy.params.rightEyeLaser;
             enemy.setMode('choose');
         }
     } else if (enemy.mode === 'strafeSlamHands') {
@@ -246,26 +354,29 @@ function updateGolem(this: void, state: GameState, enemy: Enemy): void {
         }
     } else if (enemy.mode === 'prepareAttack') {
         if (hands.every(hand => hand.mode === 'choose')) {
-            // Golem has a 25%-75% chance to use an enrage attack based on enrage level.
-            const enrageAttackChance = 0.25 + 0.1 * enemy.params.enrageLevel;
+            // Golem has a 30% chance to use an enrage attack at enrage level 2.
+            const enrageAttackChance = enemy.params.enrageLevel >= 2 ? 0.3 : 0;
             if (Math.random() <= enrageAttackChance) {
-                enemy.params.slamHands = true;
+                enemy.params.slamHands = Math.random() < hands.length / 3;
                 enemy.params.enragedAttacks = 1;
                 enemy.setMode('choose');
-            } else if (hands.length >= 2 && Math.random() <= 0.75) {
+            } else if (hands.length >= 2 && enemy.params.enrageLevel && Math.random() <= 0.75) {
                 enemy.setMode('slamHands');
             } else {
                 enemy.setMode('chargeLaser');
             }
         }
     } else if (enemy.mode === 'chargeLaser') {
+        enemy.changeToAnimation(isAngry ? 'angryChargeMouth' : 'chargeMouth');
         if (enemy.modeTime >= LASER_CHARGE_TIME) {
             enemy.setMode('fireLaser');
         }
     } else if (enemy.mode === 'fireLaser') {
-        fireLaser(state, enemy, 900);
+        enemy.changeToAnimation(isAngry ? 'angryShootMouth' : 'shootMouth');
+        enemy.params.mouthLaser = fireLaser(state, enemy, 900, 8, getMouthLaserCoords(state, enemy));
         enemy.setMode('cooldown')
     } else if (enemy.mode === 'cooldown') {
+        enemy.changeToAnimation(isAngry ? 'angryChargeMouth' : 'chargeMouth');
         if (enemy.modeTime >= 2000 || enemy.params.enragedAttacks > 0) {
             enemy.setMode('choose');
         }
@@ -274,9 +385,8 @@ function updateGolem(this: void, state: GameState, enemy: Enemy): void {
             enemy.setMode('choose');
         }
     }
-    // Enrage level increases for each 9 damage a hand has taken(up to 2 enrage levels)
-    // and each 1/3 health missing.
-    let targetEnrageLevel = Math.floor(Math.max(0, 2 - hands.reduce((sum, hand) => sum + hand.life / 9, 0)));
+    // Enrage level increase for every 1/3 health missing.
+    let targetEnrageLevel = 0;
     const healthIsCritical = enemy.life <= enemy.enemyDefinition.life * 1 / 3;
     if (enemy.life <= enemy.enemyDefinition.life * 2 / 3) {
         targetEnrageLevel++;
@@ -286,25 +396,68 @@ function updateGolem(this: void, state: GameState, enemy: Enemy): void {
     }
     if (enemy.params.enrageLevel < targetEnrageLevel) {
         enemy.params.enrageLevel = targetEnrageLevel;
-        enemy.params.enragedAttacks = healthIsCritical ? 2 : 1;
-        enemy.isInvulnerable = true;
-        // If the hands are alive, add an additional initial enraged attack of slamming hands.
-        if (hands.length) {
-            enemy.params.enragedAttacks++;
-            enemy.params.slamHands = true;
-            for (const hand of hands) {
-                hand.setMode('choose');
+        enemy.params.enragedAttacks = targetEnrageLevel;
+        // Immediately stop laser attack on becoming enraged to prevent further damage.
+        if (enemy.mode === 'chargeLaser' || enemy.mode === 'fireLaser' || enemy.mode === 'cooldown') {
+            if (enemy.params.mouthLaser) {
+                removeEffectFromArea(state, enemy.params.mouthLaser);
+                delete enemy.params.mouthLaser;
             }
+            enemy.setMode('choose');
+        }
+        // If the hands are alive, add an additional initial enraged attack of slamming hands.
+        enemy.params.slamHands = true;
+        for (const hand of hands) {
+            hand.setMode('choose');
+        }
+        // Create any missing hands when enraged.
+        if (!hands.find(hand => hand.params.side === 'left')) {
+            const leftHand = new Enemy(state, {
+                type: 'enemy',
+                id: '' + Math.random(),
+                status: 'normal',
+                enemyType: 'golemHand',
+                x: hitbox.x - 16,
+                y: hitbox.y + hitbox.h - 32,
+            });
+            leftHand.setMode('appearing');
+            leftHand.params.side = 'left';
+            addObjectToArea(state, enemy.area, leftHand);
+        }
+        if (!hands.find(hand => hand.params.side === 'right')) {
+            const rightHand = new Enemy(state, {
+                type: 'enemy',
+                id: '' + Math.random(),
+                status: 'normal',
+                enemyType: 'golemHand',
+                x: hitbox.x + hitbox.w - 16,
+                y: hitbox.y + hitbox.h - 32,
+            });
+            rightHand.setMode('appearing');
+            rightHand.params.side = 'right';
+            addObjectToArea(state, enemy.area, rightHand);
         }
     }
-    if (enemy.params.laser) {
-        // Make sure to get an updated hitbox if the golem moved this frame.
-        const hitbox = enemy.getHitbox(state);
-        const sx = hitbox.x + hitbox.w / 2, sy = hitbox.y + hitbox.h - 10;
-        enemy.params.laser.sx = sx;
-        enemy.params.laser.sy = sy;
-        enemy.params.laser.tx = sx;
-        enemy.params.laser.ty = sy + 512;
+    if (enemy.params.mouthLaser) {
+        const [sx, sy] = getMouthLaserCoords(state, enemy);
+        enemy.params.mouthLaser.sx = sx;
+        enemy.params.mouthLaser.sy = sy;
+        enemy.params.mouthLaser.tx = sx;
+        enemy.params.mouthLaser.ty = sy + 512;
+    }
+    if (enemy.params.leftEyeLaser) {
+        const [sx, sy] = getLeftEyeLaserCoords(state, enemy);
+        enemy.params.leftEyeLaser.sx = sx;
+        enemy.params.leftEyeLaser.sy = sy;
+        enemy.params.leftEyeLaser.tx = sx;
+        enemy.params.leftEyeLaser.ty = sy + 512;
+    }
+    if (enemy.params.rightEyeLaser) {
+        const [sx, sy] = getRightEyeLaserCoords(state, enemy);
+        enemy.params.rightEyeLaser.sx = sx;
+        enemy.params.rightEyeLaser.sy = sy;
+        enemy.params.rightEyeLaser.tx = sx;
+        enemy.params.rightEyeLaser.ty = sy + 512;
     }
 }
 
@@ -343,12 +496,14 @@ function updateGolemHand(this: void, state: GameState, enemy: Enemy): void {
     // For multiple golems we would need to associate hands with the golem closest to their spawn point.
     const golem = getGolem(state, enemy.area);
     // Currently hands without golems are not supported.
-    if (!golem) {
+    // Don't do anything until the golem finishes warming up.
+    if (!golem || golem.mode === 'warmup') {
         return;
     }
     // Prevent interacting with the hand when it is too high
     enemy.isInvulnerable = (enemy.z > 20);
-    enemy.touchHit = (enemy.z <= 20 && enemy.mode !== 'targetedSlam') ? enemy.enemyDefinition.touchHit : null;
+    enemy.touchHit = (enemy.z <= 20 && enemy.mode !== 'targetedSlam' && enemy.mode !== 'appearing')
+        ? enemy.enemyDefinition.touchHit : null;
     const otherHands = getOtherHands(state, enemy);
     const hitbox = enemy.getHitbox(state);
     const golemHitbox = golem?.getHitbox(state);
@@ -361,14 +516,24 @@ function updateGolemHand(this: void, state: GameState, enemy: Enemy): void {
         }
     }
     const isSlammingHands = golem.mode === 'slamHands' || golem.mode === 'strafeSlamHands';
-    if (enemy.mode === 'choose') {
+    if (enemy.mode === 'appearing') {
+        enemy.changeToAnimation('asleep');
+        if (enemy.z < 10) {
+            enemy.z++;
+        }
+        moveHandToPosition(state, enemy, otherHands);
+        if (enemy.modeTime >= 1000) {
+            enemy.setMode('choose');
+        }
+    } else if (enemy.mode === 'choose') {
+        enemy.changeToAnimation('asleep');
         if (enemy.z < 10) {
             enemy.z++;
         }
         // Hands should move apart and stay apart just before the laser fires.
         if ((golem.mode === 'chargeLaser' && golem.modeTime > LASER_CHARGE_TIME - 100)
             || golem.mode === 'fireLaser'
-            || (golem.params.laser && !golem.params.laser.done)
+            || (golem.params.mouthLaser && !golem.params.mouthLaser.done)
         ) {
             if (enemy.params.side === 'left') {
                 const x = golemHitbox.x + golemHitbox.w / 2 - hitbox.w;
@@ -383,7 +548,13 @@ function updateGolemHand(this: void, state: GameState, enemy: Enemy): void {
         }
         moveHandToPosition(state, enemy, otherHands);
         // Do not start attacking with hands while charging the laser.
-        if (golem.mode === 'prepareAttack' || golem.mode === 'chargeLaser' || golem.mode === 'prepareStrafe') {
+        if (golem.mode === 'prepareAttack'
+            || golem.mode === 'chargeLaser'
+            || golem.mode === 'fireLaser'
+            || golem.mode === 'prepareStrafe'
+            || golem.mode === 'chargeStrafeLaser'
+            || golem.mode === 'fireStrafeLaser'
+        ) {
             return;
         }
         if (isSlammingHands) {
@@ -403,6 +574,7 @@ function updateGolemHand(this: void, state: GameState, enemy: Enemy): void {
             }
         }
     } else if (enemy.mode === 'followTarget') {
+        enemy.changeToAnimation('angryIdle');
         if (enemy.z > 5) {
             enemy.z--;
         }
@@ -417,6 +589,7 @@ function updateGolemHand(this: void, state: GameState, enemy: Enemy): void {
             enemy.setMode('punch');
         }
     } else if (enemy.mode === 'hoverOverTarget') {
+        enemy.changeToAnimation('angryIdle');
         if (enemy.z < 40) {
             enemy.z++;
         }
@@ -431,6 +604,7 @@ function updateGolemHand(this: void, state: GameState, enemy: Enemy): void {
             enemy.setMode('targetedSlam');
         }
     } else if (enemy.mode === 'return') {
+        enemy.changeToAnimation('asleep');
         if (enemy.z < 10) {
             enemy.z++;
             moveHandToPosition(state, enemy, otherHands);
@@ -438,6 +612,7 @@ function updateGolemHand(this: void, state: GameState, enemy: Enemy): void {
             enemy.setMode('choose');
         }
     } else if (enemy.mode === 'raiseHand') {
+        enemy.changeToAnimation('angryIdle');
         moveHandToPosition(state, enemy, otherHands);
         if (enemy.z < 20) {
             enemy.z++;
@@ -464,6 +639,7 @@ function updateGolemHand(this: void, state: GameState, enemy: Enemy): void {
             }
         }
     } else if (enemy.mode === 'slamHand') {
+        enemy.changeToAnimation('angryIdle');
         enemy.z -= 2;
         if (enemy.z <= 0) {
             enemy.z = 0;
@@ -472,7 +648,8 @@ function updateGolemHand(this: void, state: GameState, enemy: Enemy): void {
             addArcOfSparks(
                 state, enemy.area,
                 [hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2],
-                3 + (golem?.params.enrageLevel || 0),
+                // We could increase the spark count for a more difficult version of the boss.
+                3, // + (golem?.params.enrageLevel || 0),
                 Math.PI / 2, Math.PI / 3
             );
             if (isSlammingHands) {
@@ -489,6 +666,7 @@ function updateGolemHand(this: void, state: GameState, enemy: Enemy): void {
             }
         }
     } else if (enemy.mode === 'targetedSlam') {
+        enemy.changeToAnimation('angryIdle');
         enemy.z -= 3;
         if (enemy.z <= 0) {
             enemy.z = 0;
@@ -503,6 +681,7 @@ function updateGolemHand(this: void, state: GameState, enemy: Enemy): void {
             enemy.setMode('stunned');
         }
     } else if (enemy.mode === 'punch') {
+        enemy.changeToAnimation('angryIdle');
         accelerateInDirection(state, enemy, {x: 0, y: 1});
         if (!moveEnemy(state, enemy, enemy.vx, enemy.vy, {})) {
             playAreaSound(state, enemy.area, 'bossDeath');
@@ -511,6 +690,7 @@ function updateGolemHand(this: void, state: GameState, enemy: Enemy): void {
             enemy.setMode('stunned');
         }
     } else if (enemy.mode === 'stunned') {
+        enemy.changeToAnimation('shootMouth');
         if (enemy.modeTime >= enemy.params.stunTime) {
             enemy.setMode('return');
         }

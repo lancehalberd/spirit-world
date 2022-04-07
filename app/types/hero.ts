@@ -67,6 +67,7 @@ export interface ActorAnimations {
     staffJump?: AnimationSet
     staffSlam?: AnimationSet
     still?: AnimationSet //displays a still frame
+    [key: string]: AnimationSet
 }
 
 export interface Actor extends ObjectInstance {
