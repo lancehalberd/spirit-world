@@ -10,9 +10,8 @@ import {
     ObjectInstance, ObjectStatus, Rect,
 } from 'app/types';
 
-const signGeometry = {w: 16, h: 19, content: {x: 0, y: 3, w: 16, h: 16}};
-const [tallSign] = createAnimation('gfx/tiles/signtall.png', signGeometry).frames;
-const [tallSignSpirit] = createAnimation('gfx/tiles/signtallspirit.png', signGeometry).frames;
+const geometry = {w: 32, h: 48};
+const [saveStatue] = createAnimation('gfx/tiles/savepoint.png', geometry).frames;
 
 
 export class SaveStatue implements ObjectInstance {
@@ -34,7 +33,7 @@ export class SaveStatue implements ObjectInstance {
         this.y = definition.y;
     }
     getHitbox(state: GameState): Rect {
-        return { x: this.x, y: this.y, w:32, h: 16 };
+        return { x: this.x + 4, y: this.y, w: 24, h: 16 };
     }
     onGrab(state: GameState, direction: Direction, hero: Hero) {
         // Don't take actions that would start new scripts while running scripts.
@@ -70,12 +69,13 @@ export class SaveStatue implements ObjectInstance {
         }
     }
     update(state: GameState) {
-        if (state.fieldTime % 100 === 0) {
+        // The statue sparkles if you haven't used it yet.
+        if (state.fieldTime % 100 === 0 && !getObjectStatus(state, this.definition)) {
             addSparkleAnimation(state, this.area, this.getHitbox(state), {});
         }
     }
     render(context, state: GameState) {
-        const frame = getObjectStatus(state, this.definition) ? tallSign : tallSignSpirit;
-        drawFrame(context, frame, { ...frame, x: this.x - frame.content.x + 8, y: this.y - frame.content.y });
+        const frame = saveStatue;
+        drawFrame(context, frame, { ...frame, x: this.x, y: this.y - 32 });
     }
 }
