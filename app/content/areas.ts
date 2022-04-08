@@ -787,6 +787,7 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
     const shouldBeHot = evaluateLogicDefinition(state, area.definition.hotLogic, false);
     if (refreshBehavior || area.isHot !== shouldBeHot) {
         state.fadeLevel = (state.areaInstance.dark || 0) / 100;
+        state.hero.vx = state.hero.vy = 0;
         if (fastRefresh) {
             for (const instance of [area, area.alternateArea]) {
                 instance.tilesDrawn = [];
@@ -808,8 +809,8 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
                 type: 'mutating',
                 nextAreaInstance: createAreaInstance(state, state.areaInstance.definition),
             };
+            return;
         }
-        state.hero.vx = state.hero.vy = 0;
     }
     for (const object of area.definition.objects) {
         if (!object.logicKey && !object.hasCustomLogic) {

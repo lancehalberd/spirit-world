@@ -5,7 +5,7 @@ import {
     getAreaSize,
     playAreaSound,
 } from 'app/content/areas';
-import { addArcOfSparks, addRadialSparks } from 'app/content/effects/spark';
+import { addArcOfShockWaves, addRadialShockWaves } from 'app/content/effects/shockWave';
 import { LaserBeam } from 'app/content/effects/laserBeam';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import {
@@ -645,7 +645,7 @@ function updateGolemHand(this: void, state: GameState, enemy: Enemy): void {
             enemy.z = 0;
             playAreaSound(state, enemy.area, 'bossDeath');
             addScreenShake(state, 0, 2);
-            addArcOfSparks(
+            addArcOfShockWaves(
                 state, enemy.area,
                 [hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2],
                 // We could increase the spark count for a more difficult version of the boss.
@@ -672,7 +672,7 @@ function updateGolemHand(this: void, state: GameState, enemy: Enemy): void {
             enemy.z = 0;
             playAreaSound(state, enemy.area, 'bossDeath');
             addScreenShake(state, 0, 3);
-            addRadialSparks(
+            addRadialShockWaves(
                 state, enemy.area,
                 [hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2],
                 6, Math.PI / 6

@@ -482,7 +482,7 @@ const f0_1x1: AreaDefinition = {
         {status: "bigKeyLocked", id: "tombBossDoor", x: 112, y: 256, type: "door", style: "cave", d: "up"},
         {status: "normal", id: "tomb:0:1x1-door-1", x: 0, y: 368, type: "door", style: "cave", d: "left"},
         {status: "closed", id: "tombBossDoorInterior", x: 112, y: 224, type: "door", style: "cave", d: "down"},
-        {status: "normal", id: "tombBoss", x: 96, y: 48, type: "boss", enemyType: "golem", lootType: "peachOfImmortality", lootLevel: 1, d: "down", params: {}},
+        {status: "normal", id: "tombBoss", x: 96, y: 32, type: "boss", enemyType: "golem", lootType: "peachOfImmortality", lootLevel: 1, d: "down", params: {}},
         {status: "normal", id: "tombBoss", x: 96, y: 96, type: "enemy", enemyType: "golemHand", d: "down", params: {}, saveStatus: "never"},
         {status: "normal", id: "tombBoss", x: 128, y: 96, type: "enemy", enemyType: "golemHand", d: "down", params: {}, saveStatus: "never"},
         {status: "closedEnemy", id: "tomb:0:1x1-door-0", x: 112, y: 0, type: "door", style: "cave", targetObjectId: "tombEntrance", d: "up"},

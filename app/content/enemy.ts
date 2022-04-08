@@ -174,7 +174,7 @@ export class Enemy implements Actor, ObjectInstance {
         this.vz = vz;
     }
     onHit(state: GameState, hit: HitProperties): HitResult {
-        if (this.status === 'gone' || this.status === 'hidden' || this.life <= 0) {
+        if (this.status === 'gone' || this.status === 'hidden' || this.isDefeated || this.life <= 0) {
             return {};
         }
         if (this.enemyDefinition.onHit) {
@@ -267,11 +267,11 @@ export class Enemy implements Actor, ObjectInstance {
         return true;
     }
     showDeathAnimation(state: GameState) {
-        this.isDefeated = true;
-        this.setMode('defeated');
-        if (this.status === 'gone') {
+        if (this.status === 'gone' || this.isDefeated) {
             return;
         }
+        this.isDefeated = true;
+        this.setMode('defeated');
         if (this.definition.type === 'boss') {
             if (this.enemyDefinition.onDeath) {
                 this.enemyDefinition.onDeath(state, this);
@@ -279,7 +279,9 @@ export class Enemy implements Actor, ObjectInstance {
             // Immediately kill other enemies and remove enemy attack effects when the boss is defeated.
             // Bosses in both material+spirit realms must be defeated before the battle is over.
             const allEnemies = [...this.area.enemies, ...this.area.alternateArea.enemies];
-            if (!allEnemies.some(object => object.definition.type === 'boss' && object.status !== 'gone')) {
+            if (!allEnemies.some(object => object.definition.type === 'boss'
+                    && object.status !== 'gone' && !object.isDefeated)
+            ) {
                 // Remove all enemy attacks from the screen when a boss is defeated.
                 this.area.effects = this.area.effects.filter(effect => !effect.isEnemyAttack);
                 allEnemies.forEach(object => object.showDeathAnimation(state));

@@ -1,96 +1,125 @@
-import { addSparkleAnimation } from 'app/content/effects/animationEffect';
-import { removeEffectFromArea } from 'app/content/areas';
+import { addEffectToArea, removeEffectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { createAnimation, drawFrameAt, getFrame } from 'app/utils/animations';
 import { hitTargets } from 'app/utils/field';
 
-import { AreaInstance, EffectInstance, Enemy, GameState } from 'app/types';
+import {
+    AreaInstance, EffectInstance, GameState,
+    DrawPriority, Frame, Point,
+} from 'app/types';
+
+
+const geometry = {w: 8, h: 16};
+const shockWaveAnimation = createAnimation('gfx/effects/shockwave.png', geometry, {cols: 4, duration: 2});
 
 interface Props {
-    x: number
+    x: number,
     y: number,
-    damage?: number
-    radius?: number
-    source?: Enemy
-    tellDuration?: number
+    z?: number,
+    damage?: number,
+    vx?: number,
+    vy?: number,
+    vz?: number,
+    az?: number,
+    ttl?: number,
 }
 
-export class ShockWave implements EffectInstance {
-    area: AreaInstance;
-    animationTime: number = 0;
+export class ShockWave implements EffectInstance, Props {
+    drawPriority: DrawPriority = 'sprites';
+    area: AreaInstance = null;
     isEffect = <const>true;
     isEnemyAttack = true;
+    frame: Frame;
+    damage: number;
     x: number;
     y: number;
-    damage: number;
-    radius: number;
-    source: Enemy;
-    tellDuration: number;
-    constructor({x = 0, y = 0, damage = 2, radius = 48, source, tellDuration = 1000}: Props) {
-        this.animationTime = 0;
+    z: number = 0;
+    vz: number = 0;
+    vx: number;
+    vy: number;
+    az: number;
+    radius: number = 3;
+    animationTime = 0;
+    speed = 0;
+    ttl: number;
+    constructor({x, y, z = 0, vx = 0, vy = 0, vz = 0, az = -0.3, damage = 1, ttl = 2000}: Props) {
+        this.damage = damage;
         this.x = x;
         this.y = y;
-        this.damage = damage;
-        this.radius = radius;
-        this.source = source;
-        this.tellDuration = tellDuration;
+        this.z = z;
+        this.vx = vx;
+        this.vy = vy;
+        this.vz = vz;
+        this.az = az;
+        this.ttl = ttl;
     }
     update(state: GameState) {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.z = Math.max(0, this.z + this.vz);
+        this.vz = Math.max(-8, this.vz + this.az);
         this.animationTime += FRAME_LENGTH;
-        // If this effect has an enemy as a source, remove it if the source disappears during the tell duration.
-        if (this.animationTime < this.tellDuration && this.source) {
-            if (this.area !== this.source.area || this.source.status === 'gone' || !this.area.objects.includes(this.source)) {
-                removeEffectFromArea(state, this);
-                return;
-            }
-        }
-        if (this.source) {
-            const enemyHitbox = this.source.getHitbox(state);
-            this.x = enemyHitbox.x + enemyHitbox.w / 2;
-            this.y = enemyHitbox.y + enemyHitbox.h / 2;
-        }
-        if (this.animationTime >= this.tellDuration) {
-            const sparkCount = this.radius / 8;
-            for (let i = 0; i < sparkCount; i++) {
-                const theta = i * 2 * Math.PI / sparkCount;
-                addSparkleAnimation(state, this.area, {
-                    x: this.x + (this.radius * 2 / 3) * Math.cos(theta) - 8,
-                    y: this.y + (this.radius * 2 / 3) * Math.sin(theta) - 8,
-                    w: 16,
-                    h: 16,
-                }, { element: 'lightning' });
-            }
+
+        if (this.animationTime >= this.ttl) {
+            removeEffectFromArea(state, this);
+        } else {
             hitTargets(state, this.area, {
-                damage: 4,
+                damage: this.damage,
+                hitCircle: {x: this.x, y: this.y, r: this.radius},
                 element: 'lightning',
-                hitCircle: {
-                    x: this.x,
-                    y: this.y,
-                    r: this.radius,
-                },
                 hitAllies: true,
-                hitObjects: true,
-                hitTiles: true,
-                hitEnemies: true,
                 knockAwayFrom: {x: this.x, y: this.y},
             });
-            removeEffectFromArea(state, this);
         }
     }
-    render(context, state: GameState) {
-        const p = Math.max(0, this.animationTime / this.tellDuration);
+    render(context: CanvasRenderingContext2D, state: GameState) {
+        const frame = getFrame(shockWaveAnimation, this.animationTime);
+        const theta = Math.atan2(this.vy, this.vx);
+        context.fillStyle = 'yellow';
         context.save();
-            // Darker yellow outline shows the full radius of the attack.
-            context.globalAlpha *= 0.3;
-            context.beginPath();
-            context.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
-            context.strokeStyle = 'yellow';
-            context.stroke();
-            // Lighter fill grows to indicate when the attack will hit.
-            context.globalAlpha *= 0.3;
-            context.beginPath();
-            context.arc(this.x, this.y, p * this.radius, 0, 2 * Math.PI);
-            context.fillStyle = 'yellow';
-            context.fill();
+            context.translate(this.x, this.y);
+            context.rotate(theta + Math.PI / 2);
+            drawFrameAt(context, frame, {x: -4, y: -8});
         context.restore();
+    }
+}
+
+export function addRadialShockWaves(this: void,
+    state: GameState, area: AreaInstance,
+    [x, y]: Point, count: number, thetaOffset = 0
+): void {
+    for (let i = 0; i < count; i++) {
+        const theta = thetaOffset + i * 2 * Math.PI / count;
+        const dx = Math.cos(theta);
+        const dy = Math.sin(theta);
+        const shockWave = new ShockWave({
+            x,
+            y,
+            vx: 4 * dx,
+            vy: 4 * dy,
+            ttl: 1000,
+        });
+        addEffectToArea(state, area, shockWave);
+    }
+}
+
+export function addArcOfShockWaves(this: void,
+    state: GameState, area: AreaInstance,
+    [x, y]: Point, count: number, centerTheta = 0, thetaRadius = Math.PI / 4
+): void {
+    for (let i = 0; i < count; i++) {
+        const theta = count === 1
+            ? centerTheta
+            : centerTheta - thetaRadius + i * 2 * thetaRadius / (count - 1);
+        const dx = Math.cos(theta);
+        const dy = Math.sin(theta);
+        const shockWave = new ShockWave({
+            x,
+            y,
+            vx: 4 * dx,
+            vy: 4 * dy,
+            ttl: 1000,
+        });
+        addEffectToArea(state, area, shockWave);
     }
 }

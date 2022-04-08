@@ -335,6 +335,10 @@ export class LootObject implements ObjectInstance {
         return getFrameHitBox(this.frame, this);
     }
     update(state: GameState) {
+        if (state.savedState.objectFlags[this.definition.id]) {
+            this.status = 'gone';
+            return;
+        }
         this.time += FRAME_LENGTH;
         this.behaviors.brightness = Math.min(1, this.time / 2000);
         this.behaviors.lightRadius = 24 * Math.min(1, this.time / 1000) + 2 * Math.sin(this.time / 500);
