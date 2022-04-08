@@ -20,10 +20,10 @@ dialogueHash.saveStatue = {
             text: [
                 `
                     Your life is about to get a lot more complicated.
-                    {|}But no matter how hard it gets, remember
-                    {|}there is someone out there rooting for you!
+                    {|}But no matter how hard it gets,
+                    {|}remember there is someone out there rooting for you!
                     {item:secondChance}
-                    Come back when you need another Chance.
+                    Come back if you ever need another Chance.
                     {flag:peachCave:stairsUp}
                 `
             ],
@@ -38,7 +38,7 @@ dialogueHash.saveStatue = {
                 `
                     This "Tomb" is just a facade.
                     {|}The Vanara have hidden something important under
-                    it where even the Spirit God's cannot reach.
+                    it where even the Spirit Gods cannot reach.
                     {item:secondChance}
                 `
             ],
@@ -53,7 +53,7 @@ dialogueHash.saveStatue = {
                 `
                     Long ago the God of the Summoners was the uncontested ruler of all realms.
                     {|}With the power of the "Three Calamaties" no nation could stand against the Summoners.
-                    {|}But the Summoner's search for greater power would be their undoing, or so the story goes.
+                    {|}But the Summoners' thirst for power would be their undoing, or so the story goes.
                     {item:secondChance}
                 `
             ],
