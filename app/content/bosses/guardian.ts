@@ -1,5 +1,4 @@
 import { sample } from 'lodash';
-import { refreshAreaLogic } from 'app/content/areas';
 import {
     accelerateInDirection,
     getVectorToNearbyTarget,
@@ -44,11 +43,9 @@ function updateProjection(this: void, state: GameState, enemy: Enemy): void {
         o.definition.type === 'boss' && o.definition.enemyType === 'guardian' && o.definition.id === enemy.definition.id
     );
     // The projection is defeated when the guardian is defeated.
-    if (!guardian || guardian.status === 'gone') {
+    if (!guardian || guardian.status === 'gone' || guardian.isDefeated) {
+        enemy.life = 0;
         enemy.showDeathAnimation(state);
-        // Refresh the area so that the guardian NPC moves to the correct location now that the boss is defeated.
-        refreshAreaLogic(state, state.areaInstance);
-        refreshAreaLogic(state, state.alternateAreaInstance);
         return;
     }
     if (enemy.life <= 0 || enemy.mode === 'regenerate') {

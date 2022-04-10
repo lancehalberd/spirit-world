@@ -109,9 +109,9 @@ enemyDefinitions.golem = {
         if (enemy.mode === 'chargeLaser') {
             context.save();
                 const p = enemy.modeTime / LASER_CHARGE_TIME;
-                context.globalAlpha *= 0.2 + 0.8 * p;
+                context.globalAlpha *= 0.3 + 0.7 * p;
                 const r = 1 + 16 * (1 - p);
-                context.fillStyle = 'yellow';
+                context.fillStyle = 'rgba(207,35,64,1)';
                 context.beginPath();
                 const [x, y] = getMouthLaserCoords(state, enemy);
                 context.arc(x, y, r, 0, 2 * Math.PI);
@@ -120,9 +120,9 @@ enemyDefinitions.golem = {
         } else if (enemy.mode === 'chargeStrafeLaser') {
             context.save();
                 const p = enemy.modeTime / FAST_LASER_CHARGE_TIME;
-                context.globalAlpha *= 0.2 + 0.8 * p;
+                context.globalAlpha *= 0.3 + 0.7 * p;
                 const r = 1 + 16 * (1 - p);
-                context.fillStyle = 'yellow';
+                context.fillStyle = 'rgba(207,35,64,1)';
                 context.beginPath();
                 let [x, y] = getLeftEyeLaserCoords(state, enemy);
                 context.arc(x, y, r, 0, 2 * Math.PI);
@@ -165,7 +165,7 @@ enemyDefinitions.golemHand = {
     canBeKnockedBack: false, canBeKnockedDown: false,
     showHealthBar: true,
     acceleration: 0.3, speed: 4,
-    touchHit: { damage: 2},
+    touchHit: { damage: 1},
     immunities: ['fire', 'ice'],
     elementalMultipliers: {'lightning': 2},
     initialAnimation: 'asleep',
@@ -239,7 +239,7 @@ function fireLaser(this: void, state: GameState, enemy: Enemy, duration: number,
     const [sx, sy] = coords;
     const laser = new LaserBeam({
         sx: sx, sy, tx: sx, ty: sy + 512,
-        radius, damage: 3, duration,
+        radius, damage: 2, duration,
     });
     addEffectToArea(state, enemy.area, laser);
     return laser;

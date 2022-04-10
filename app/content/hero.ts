@@ -342,7 +342,7 @@ export class Hero implements Actor, SavedHeroData {
 
     renderBow(this: Hero, context: CanvasRenderingContext2D, state: GameState, bowDirection: Direction): void {
         const isChargingBow = state.hero.toolOnCooldown !== 'bow';
-        const bowAnimationTime = isChargingBow ? 0 : (200 - state.hero.toolCooldown);
+        const bowAnimationTime = isChargingBow ? 0 : (200 - this.toolCooldown);
         let arrowXOffset = 8, arrowYOffset = 8;
         if (directionMap[bowDirection][0] < 0) {
             arrowXOffset -= directionMap[bowDirection][1] === 0 ? 8 : 4;
@@ -381,7 +381,7 @@ export class Hero implements Actor, SavedHeroData {
     }
 
     renderCloak(this: Hero, context: CanvasRenderingContext2D, state: GameState) {
-        const cloakAnimationTime = 400 - state.hero.toolCooldown;
+        const cloakAnimationTime = 400 - this.toolCooldown;
         const animation = cloakAnimations[this.d];
         if (cloakAnimationTime < animation.duration) {
             const frame = getFrame(animation, cloakAnimationTime);

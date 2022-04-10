@@ -1,5 +1,6 @@
 import {
     andLogic,
+    orLogic,
     hasAstralProjection,
     hasBossWeapon,
     hasGloves, hasRoll,
@@ -95,8 +96,10 @@ export const warTempleNodes: LogicNode[] = [
         nodeId: 'warTemple:0:1x0-smallKey-0',
         checks: [
             {objectId: 'warTemple:0:1x0-smallKey-0'},
-            {objectId: 'warTemple:0:0x0-money-0', logic: hasWeapon},
-            {objectId: 'warTemple:0:2x0-money-0', logic: hasWeapon},
+            // The player can defeat all these enemies using stones now that enemies stay
+            // defeated when leaving and returning to rooms.
+            {objectId: 'warTemple:0:0x0-money-0', logic: orLogic(hasWeapon, hasGloves)},
+            {objectId: 'warTemple:0:2x0-money-0', logic: orLogic(hasWeapon, hasGloves)},
         ],
         paths: [
             {nodeId: 'warTempleMainEntrance', logic: hasGloves},

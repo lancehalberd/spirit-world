@@ -49,6 +49,7 @@ export function useTool(
             if (state.hero.element && chargeLevel > 0) {
                 state.hero.magic -= 10;
             }
+            hero.toolCooldown = 200;
             hero.toolOnCooldown = 'bow';
             let direction = hero.d;
             if (dx || dy) {
@@ -70,7 +71,7 @@ export function useTool(
             if (state.hero.isInvisible || state.hero.hasBarrier) {
                 state.hero.shatterBarrier(state);
                 state.hero.isInvisible = false;
-                state.hero.toolCooldown = 0;
+                hero.toolCooldown = 0;
                 hero.toolOnCooldown = null;
                 return;
             }
@@ -84,7 +85,7 @@ export function useTool(
             state.hero.magic -= cost;
             hero.toolOnCooldown = 'cloak';
             // This is based on the length of the animation for activating the cloak which is 20ms * 2 * 10
-            state.hero.toolCooldown = 400;
+            hero.toolCooldown = 400;
             state.hero.barrierLevel = chargeLevel;
             if (chargeLevel === 1) {
                 state.hero.barrierElement = element;
@@ -100,6 +101,7 @@ export function useTool(
                     return;
                 }
                 state.hero.magic -= 10;
+                hero.toolCooldown = 100;
                 hero.toolOnCooldown = 'clone';
                 for (let i = 0; i < state.hero.activeTools.clone && i < state.hero.life - 1; i++) {
                     const clone = new Clone(state.hero);
@@ -112,7 +114,7 @@ export function useTool(
         case 'staff':
             if (state.activeStaff?.area && !state.activeStaff.recalling) {
                 state.activeStaff.recall(state);
-                state.hero.toolCooldown = 0;
+                hero.toolCooldown = 0;
                 hero.toolOnCooldown = null;
                 playAreaSound(state, state.areaInstance, 'menuTick');
                 return;
@@ -134,6 +136,7 @@ export function useTool(
                 return;
             }
             state.hero.magic -= 10;
+            hero.toolCooldown = 200;
             hero.toolOnCooldown = 'staff';
             hero.action = 'usingStaff';
             hero.animationTime = 0;

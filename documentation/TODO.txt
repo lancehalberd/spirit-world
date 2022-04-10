@@ -10,8 +10,6 @@ Known Bugs:
     - Enemies hit in the spirit world make noise when taking damage
         - this might be nice to keep for the cocoon boss
         - when players can actively hit enemies in the spirit world we should play a sound. For example, hitting an enemy with a linked bush shouldn't be silent.
-    - Lightning bug knocked Leon into door and triggered loop in and out of door in war temple.
-        - This was the 2f - 3F stair case. I can get him to knock me through the door but I can't reproduce the loop.
     - Clone tool bugs
         - Mana regen is wrong when using clone tools (seems to multiply consumption/regen by number of clones)
         - Should destroy clones when the clone technique is unequipped.
@@ -19,7 +17,7 @@ Known Bugs:
         - Unable to charge weapon while clones are active, multiple clones don't attack at the same time
         - Staff won't be placed when controlling multiple clones (one places, another retrieves?)
             - Should probably just have the primary clone place the staff
-        - Check if multiple clones can charge weapon + fire bow
+        - Bow renders on clone when another clone uses the bow.
     - Picked up items are invisible while using cloak
     - Piercing projectiles that can push things should be stopped by the first object they push
         or not be able to push additional objects, for example, the charged chakram.
@@ -160,6 +158,11 @@ Current tasks:
 
     - Randomizer improvements
         - Add configurable goal
+        - Fix can get permanently stuck in areas:
+            - Saving in Cocoon save point is a soft lock without teleportation.
+        - Fix can get stuck and require refreshing the browser:
+            - Falling in War Temple Big Key area without the Big Key
+            - Falling in Peach Cave without a weapon and killing the small bug.
         - Support `entrances` instead of `entranceIds` on randomizer logic to include logic on entrances, for example, adding logic for whether entrances to sky areas is possible from the staff tower.
             - For now we can add a path from the ground to the sky based on logic: canAquireTowerStaff.
 

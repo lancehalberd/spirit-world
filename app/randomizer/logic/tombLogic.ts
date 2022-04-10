@@ -2,7 +2,7 @@ import {
     andLogic, orLogic,
     canCross2Gaps,
     hasAstralProjection, hasSpiritSight, hasBossWeapon, hasGloves, hasMediumRange,
-    hasRangedPush, hasWeapon,
+    hasRangedPush, hasWeapon, hasRoll,
 } from 'app/content/logic';
 
 import {LogicNode } from 'app/types';
@@ -94,10 +94,11 @@ export const tombNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'tombBoss',
+        // Boss has attacks that require roll to dodge.
         checks: [
-            {objectId: 'tombBoss', logic: hasBossWeapon},
+            {objectId: 'tombBoss', logic: andLogic(hasBossWeapon, hasRoll)},
         ],
-        paths: [{ nodeId: 'tombExit', logic: hasBossWeapon}],
+        paths: [{ nodeId: 'tombExit', logic: andLogic(hasBossWeapon, hasRoll)}],
     },
     {
         zoneId,

@@ -455,6 +455,9 @@ function moveActorInDirection(
 }
 
 export function checkForFloorEffects(state: GameState, hero: Hero) {
+    if (!hero.area) {
+        return;
+    }
     const tileSize = 16;
 
     let leftColumn = Math.floor((hero.x + 4) / tileSize);

@@ -174,9 +174,9 @@ export function renderHeroBarrier(context: CanvasRenderingContext2D, state: Game
     } else if (state.hero.magic < 20 || state.hero.magic < state.hero.maxMagic * 0.4) {
         frame = getFrame(spiritBarrierSmallCracksAnimation, state.fieldTime);
     }
-    if (state.hero.toolOnCooldown === 'cloak') {
+    if (hero.toolOnCooldown === 'cloak') {
         // Render nothing while the hero is throwing the cape.
-        if (state.hero.toolCooldown > 40) {
+        if (hero.toolCooldown > 40) {
             return;
         }
         // This is only a single frame currently, we would need to set the animation time correctly

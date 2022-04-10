@@ -262,11 +262,9 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         hero.chargeTime += FRAME_LENGTH;
         hero.action = 'charging';
         if (hero.chargingLeftTool && (!isGameKeyDown(state, GAME_KEY.LEFT_TOOL) || !canCharge)) {
-            hero.toolCooldown = 200;
             useTool(state, hero, hero.leftTool, hero.actionDx, hero.actionDy);
             hero.chargingLeftTool = false;
         } else if (hero.chargingRightTool && (!isGameKeyDown(state, GAME_KEY.RIGHT_TOOL) || !canCharge)) {
-            hero.toolCooldown = 200;
             useTool(state, hero, hero.rightTool, hero.actionDx, hero.actionDy);
             hero.chargingRightTool = false;
         } else {
