@@ -1,11 +1,11 @@
 import { createCanvasAndContext } from 'app/dom';
-import { createAnimation, drawFrame } from 'app/utils/animations';
+import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 
 import { Frame, GameState } from 'app/types';
 
 
 const [
-    topCap, bottomCap,
+    /*topCap*/, bottomCap,
     // These are drawn on the top/bottom 5px of the bar itself.
     topBar, bottomBar,
     barBack,
@@ -21,6 +21,15 @@ const [
 ] =
     createAnimation('gfx/hud/magicbar.png', {w: 16, h: 16}, {cols: 9}).frames;
 
+const topCapHeight = 20;
+const reviveAnimation = createAnimation('gfx/hud/revive.png', {w: 32, h: 20},
+    {cols: 5, frameMap: [0, 1, 2, 3, 3, 4], duration: 5}, {loop: false}
+);
+const reviveGlowAnimation = createAnimation('gfx/hud/revive.png', {w: 32, h: 20},
+    {x: 5, cols: 5, duration: 5, frameMap: [4, 3, 2, 1]}, {loop: false});
+const reviveGlowAnimationLoop = createAnimation('gfx/hud/revive.png', {w: 32, h: 20},
+    {x: 5, cols: 5, duration: 25, frameMap: [0, 1]});
+
 export const [
     elementContainer , fireElement, iceElement, lightningElement, neutralElement, elementShine
 ] = createAnimation('gfx/hud/elementhud.png',
@@ -31,28 +40,39 @@ export const [
 spiritFill.y = 13;
 spiritFill.h = 1;
 
-const [spiritBarFrameCanvas, spiritBarFrameContext] = createCanvasAndContext(20, 100 + 32);
+const [spiritBarFrameCanvas, spiritBarFrameContext] = createCanvasAndContext(32, 100 + 32);
 const spiritFrame: Frame = {
     image: spiritBarFrameCanvas,
     x: 0, y: 0,
     w: spiritBarFrameCanvas.width, h: spiritBarFrameCanvas.height,
 };
-let lastFrameHeight: number;
+let lastFrameHeight: number, hadRevive: boolean = false;
 function updateSpiritBarFrame(state: GameState): void {
-    if (lastFrameHeight === state.hero.maxMagic) {
+    const reviveAnimationTime = state.fieldTime - state.reviveTime;
+    const hasRevive = state.hero.hasRevive && !state.defeatState.defeated;
+    if (lastFrameHeight === state.hero.maxMagic
+        && hadRevive === hasRevive
+        && reviveAnimationTime >= reviveAnimation.duration) {
         return;
     }
     const context = spiritBarFrameContext;
     lastFrameHeight = state.hero.maxMagic;
+    hadRevive = hasRevive;
     context.clearRect(0, 0, spiritFrame.w, spiritFrame.h);
-    drawFrame(context, barBack, {...barBack, x:2, y: topCap.h, h: lastFrameHeight});
-    drawFrame(context, topCap, {...topCap, x: 2, y: 0});
-    drawFrame(context, topBar, {...topBar, x: 2, y: topCap.h});
-    drawFrame(context, bottomBar, {...bottomBar, x: 2, y: topCap.h + lastFrameHeight - bottomBar.h});
-    if (state.hero.passiveTools.charge > 0) {
-        drawFrame(context, elementContainer, {...elementContainer, x: 0, y: topCap.h + lastFrameHeight});
+    drawFrame(context, barBack, {...barBack, x: 8, y: topCapHeight, h: lastFrameHeight});
+    if (hasRevive) {
+        const frame = getFrame(reviveAnimation, reviveAnimationTime);
+        drawFrame(context, frame, {...frame, x: 0, y: 0});
     } else {
-        drawFrame(context, bottomCap, {...bottomCap, x: 2, y: topCap.h + lastFrameHeight});
+        const frame = getFrame(reviveAnimation, Math.max(0, reviveAnimation.duration - reviveAnimationTime));
+        drawFrame(context, frame, {...frame, x: 0, y: 0});
+    }
+    drawFrame(context, topBar, {...topBar, x: 8, y: topCapHeight});
+    drawFrame(context, bottomBar, {...bottomBar, x: 8, y: topCapHeight + lastFrameHeight - bottomBar.h});
+    if (state.hero.passiveTools.charge > 0) {
+        drawFrame(context, elementContainer, {...elementContainer, x: 6, y: topCapHeight + lastFrameHeight});
+    } else {
+        drawFrame(context, bottomCap, {...bottomCap, x: 8, y: topCapHeight + lastFrameHeight});
     }
 }
 
@@ -60,19 +80,36 @@ export function renderSpiritBar(context: CanvasRenderingContext2D, state: GameSt
     context.fillStyle = 'black';
     updateSpiritBarFrame(state);
     const x = 5, y = 5;
-    drawFrame(context, spiritFrame, {...spiritFrame, x: x - 2, y});
+    drawFrame(context, spiritFrame, {...spiritFrame, x: x - 8, y});
+    // Draw the glow effect on top of the top cap if appropriate.
+    const reviveAnimationTime = state.fieldTime - state.reviveTime;
+    const hasRevive = state.hero.hasRevive && !state.defeatState.defeated;
+    if (hasRevive && reviveAnimationTime >= 400) {
+        let animationTime = reviveAnimationTime - 400;
+        // Start with the initial glow animation that plays with the top revive animation intro.
+        let frame = getFrame(reviveGlowAnimation, reviveAnimationTime - 400);
+        // Switch to the slow repeating animation after the intro is finished.
+        if (animationTime > reviveGlowAnimation.duration) {
+            frame = getFrame(reviveGlowAnimationLoop, animationTime - reviveGlowAnimation.duration);
+        }
+        drawFrame(context, frame, {...frame, x: x - 8, y});
+    } else if (!hasRevive && reviveAnimationTime < reviveGlowAnimation.duration) {
+        // This animation plays through once on revive ending in the glow disappearing.
+        const frame = getFrame(reviveGlowAnimation, reviveAnimationTime);
+        drawFrame(context, frame, {...frame, x: x - 8, y});
+    }
     const barHeight = state.hero.maxMagic;
     if (state.hero.magic > 0) {
-        drawFrame(context, spiritBottom, {...spiritBottom, x, y: y + topCap.h + barHeight - spiritBottom.h + 1});
+        drawFrame(context, spiritBottom, {...spiritBottom, x, y: y + topCapHeight + barHeight - spiritBottom.h + 1});
     }
     const fillHeight = Math.floor(state.hero.magic);
     if (fillHeight > 0) {
-        drawFrame(context, spiritFill, {...spiritFill, x, y: y + topCap.h + barHeight - fillHeight, h: fillHeight});
+        drawFrame(context, spiritFill, {...spiritFill, x, y: y + topCapHeight + barHeight - fillHeight, h: fillHeight});
         // Draw the top of the spirit bar at 100%, otherwise draw the indicator line at the top of the fill.
         if (fillHeight >= state.hero.maxMagic) {
-            drawFrame(context, spiritTop, {...spiritTop, x, y: y + topCap.h - 1});
+            drawFrame(context, spiritTop, {...spiritTop, x, y: y + topCapHeight - 1});
         } else if (fillHeight > 1) {
-            drawFrame(context, spiritLine, {...spiritLine, x, y: y + topCap.h + barHeight - fillHeight});
+            drawFrame(context, spiritLine, {...spiritLine, x, y: y + topCapHeight + barHeight - fillHeight});
         }
     }
     if (state.hero.passiveTools.charge) {
@@ -84,13 +121,13 @@ export function renderSpiritBar(context: CanvasRenderingContext2D, state: GameSt
         } else if (state.hero.element === 'lightning') {
             elementFrame = lightningElement;
         }
-        drawFrame(context, elementFrame, {...elementFrame, x: x - 2, y: y + topCap.h + barHeight});
-        drawFrame(context, elementShine, {...elementShine, x: x - 2, y: y + topCap.h + barHeight});
+        drawFrame(context, elementFrame, {...elementFrame, x: x - 2, y: y + topCapHeight + barHeight});
+        drawFrame(context, elementShine, {...elementShine, x: x - 2, y: y + topCapHeight + barHeight});
         /*context.save();
             context.globalAlpha = 0.6;
             context.fillStyle = (state.hero.action === 'charging' && state.time % 200 < 100) ? 'white' : elementColor;
             context.beginPath();
-            context.arc(x + 8, y + topCap.h + barHeight + 6, 10,0, 2 * Math.PI);
+            context.arc(x + 8, y + topCapHeight + barHeight + 6, 10,0, 2 * Math.PI);
             context.fill();
         context.restore();*/
 

@@ -136,6 +136,9 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
     if (hero.life <= 0) {
         state.defeatState.defeated = true;
         state.defeatState.time = 0;
+        if (state.hero.hasRevive) {
+            state.reviveTime = state.fieldTime;
+        }
         state.menuIndex = 0;
     }
     if (state.hero.isInvisible || state.hero.hasBarrier) {

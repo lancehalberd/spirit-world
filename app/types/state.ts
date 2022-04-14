@@ -67,6 +67,8 @@ export interface GameState {
     camera: { x: number, y: number }
     fieldTime: number
     time: number
+    // This marks when the last HUD revive animation started.
+    reviveTime: number
     gameHasBeenInitialized: boolean
     lastTimeRendered: number
     alternateAreaInstance?: AreaInstance

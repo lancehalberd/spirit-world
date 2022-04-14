@@ -275,6 +275,9 @@ function updateDefeated(state: GameState) {
         return;
     }
     if (state.hero.hasRevive) {
+        // This is a hack to make the reviveTime advance even though the fieldTime is paused while
+        // reviving.
+        state.reviveTime -= FRAME_LENGTH;
         if (state.defeatState.time % 200 === 0) {
             state.hero.life = Math.min(state.hero.maxLife, state.hero.life + 0.5);
             if (state.hero.life === state.hero.maxLife) {

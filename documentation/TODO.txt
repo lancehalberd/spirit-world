@@ -47,6 +47,8 @@ Graphics:
 
 Current tasks:
     - Improvements
+        - Add input buffering so you can arm a chakram attack more easily after catching the chakram.
+
         - Test using PASSIVE_TOOL button as a run button that consumes spirit energy, possibly makes you slip a bit.
 
         - There should be a name indicator on the menu for the tool the cursor is over
@@ -275,6 +277,11 @@ Generic boss improvements
 Lava improvments:
     - Temporarily create solid ground when hit by ice.
 
+Misc improvements
+    - double tap direction to roll?
+    - allow facing diagonals while not moving?
+    - allow rolling diagonally?
+
 Add toasts to development for undoing actions:
     - Deleting layers
     - Replacing > 100 tiles
@@ -322,6 +329,8 @@ Spirit Cloak Improvements
 Charge Chakram Attack:
     - Maybe change level 1 charge to spin around hero in a circle twice? Brief 0.5s invulnerability with attack animation.
     - Charge level 2 could have 2 chakrams spin at different radiuses and directions? 50 mana, lasts 4 seconds.
+Chakram Improvements:
+    - Add some damage or charge time bonus for timing your next attack within X frames of catching the Chakram?
 
 At some point I should write tests to validate certain things like:
     - All zone+object targets are defined.
@@ -371,6 +380,7 @@ Dungeon 2 Improvements:
 
 Dungeon 3 Improvements:
     - Add a required progress puzzle defeating enemies with rolling stones using spirit sight.
+    - Add new enemies.
     - Make the guardian's projection use more interesting attacks.
     - Animate the ents when they attack.
 

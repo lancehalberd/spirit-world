@@ -142,8 +142,8 @@ export function render() {
     }
     if (state.defeatState.defeated) {
         context.save();
-            context.globalAlpha *= 0.7 * Math.min(1, state.defeatState.time / 1000);
-            context.fillStyle = '#888';
+            context.globalAlpha *= (state.hero.hasRevive ? 0.5 : 0.7) * Math.min(1, state.defeatState.time / 1000);
+            context.fillStyle = '#000';
             context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
         context.restore();
         if (state.defeatState.time >= 1000) {

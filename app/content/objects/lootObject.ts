@@ -689,7 +689,8 @@ const lootFrames: {[key in string]: Frame} = {
     fireBlessing: createLootFrame('red', 'Fir'),
     waterBlessing: createLootFrame('blue', 'Wat'),
     weapon: weaponFrame,
-    secondChance: createLootFrame('green', 'x2'),
+    // This is invisible for now, an effect is applied to the HUD representing this.
+    secondChance: {image: createCanvasAndContext(16, 16)[0], x :0, y: 0, w: 16, h: 16},
 };
 
 const smallMoneyGeometry: FrameDimensions = {w: 16, h: 16, content:{ x: 4, y: 8, w: 8, h: 8}};
@@ -853,6 +854,7 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: An
     },
     secondChance: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
         state.hero.hasRevive = true;
+        state.reviveTime = state.fieldTime;
     },
     spiritPower: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
         if (loot.lootType === 'spiritPower') {
