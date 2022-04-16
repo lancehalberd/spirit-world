@@ -355,6 +355,17 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             }
         }
     }
+    // Make sure clones stop taking actions when not controlled.
+    if (!isPlayerControlled) {
+        if ((hero.action === 'walking' || hero.action === 'pushing')
+            && !hero.chargingLeftTool && !hero.chargingRightTool && !hero.toolOnCooldown
+        ) {
+            hero.action = null;
+            hero.actionDx = 0;
+            hero.actionDy = 0;
+            hero.animationTime = 0;
+        }
+    }
     if (heldChakram?.area === hero.area && heldChakram?.hero === hero && hero.action !== 'charging') {
         if ((!hero.action || hero.action === 'walking') && isGameKeyDown(state, GAME_KEY.WEAPON) && canCharge) {
             // resume charing if the weapon button is still down.

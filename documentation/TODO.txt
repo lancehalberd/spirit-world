@@ -53,9 +53,6 @@ Current tasks:
             - Including the "help" icon
         - Passive tools should be selectable in the menu and show a tutorial on selection
 
-        - Fix clone animates walking/pushing when not controlled.
-
-        - Golem boss hands should not gain projectiles
         - Squirrel velocity should reset when knocked back
         - Add SFX when the MC is damaged
 
