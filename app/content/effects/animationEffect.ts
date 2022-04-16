@@ -112,16 +112,23 @@ export class AnimationEffect implements EffectInstance {
         }
         const originX = this.target?.x || 0, originY = (this.target?.y || 0) - (this.target?.z || 0);
         if (this.rotation) {
-            context.translate(originX + this.x + frame.w / 2, originY + this.y - this.z + frame.h / 2);
+            const w = frame.content?.w || frame.w;
+            const h = frame.content?.h || frame.h;
+            context.translate(
+                originX + this.x + w / 2 * this.scale,
+                originY + this.y - this.z + h / 2 * this.scale
+            );
             context.rotate(this.rotation);
             drawFrame(context, frame, { ...frame,
-                x: -frame.w / 2, y: -frame.h / 2,
+                x: -(frame.w / 2 + (frame.content?.x || 0)) * this.scale,
+                y: -(frame.h / 2 + (frame.content?.y || 0)) * this.scale,
                 w: frame.w * this.scale,
                 h: frame.h * this.scale,
             });
         } else {
             drawFrame(context, frame, { ...frame,
-                x: originX + this.x, y: originY + this.y - this.z,
+                x: originX + this.x - (frame.content?.x || 0),
+                y: originY + this.y - (frame.content?.y || 0) - this.z,
                 w: frame.w * this.scale,
                 h: frame.h * this.scale,
             });

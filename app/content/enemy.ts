@@ -25,6 +25,9 @@ export class Enemy implements Actor, ObjectInstance {
     drawPriority: DrawPriority = 'sprites';
     definition: EnemyObjectDefinition | BossObjectDefinition;
     enemyDefinition: EnemyDefinition;
+    // Which key was read from enemyDefinition.animations to produce the current animation.
+    // Only valid if `currentAnimation` is set using standard methods.
+    currentAnimationKey: string;
     currentAnimation: FrameAnimation;
     hasShadow: boolean = true;
     animationTime: number;
@@ -137,8 +140,10 @@ export class Enemy implements Actor, ObjectInstance {
                 this.spawnY < section.y || this.spawnY > section.y + section.h)
     }
     changeToAnimation(type: string) {
+        this.currentAnimationKey = type;
         const animationSet = this.enemyDefinition.animations[type] || this.enemyDefinition.animations.idle;
-        const targetAnimation = animationSet[this.d];
+        // Fallback to the first defined direction if the current direction isn't defined.
+        const targetAnimation = animationSet[this.d] || Object.values(animationSet)[0];
         if (!targetAnimation) {
             console.error(`No animation found for ${type} ${this.d}`, this.enemyDefinition.animations);
             debugger;
@@ -149,8 +154,10 @@ export class Enemy implements Actor, ObjectInstance {
         }
     }
     setAnimation(type: string, d: Direction, time: number = 0) {
+        this.currentAnimationKey = type;
         const animationSet = this.enemyDefinition.animations[type] || this.enemyDefinition.animations.idle;
-        this.currentAnimation = animationSet[d];
+        // Fallback to the first defined direction if the current direction isn't defined.
+        this.currentAnimation = animationSet[d] || Object.values(animationSet)[0];
         if (!this.currentAnimation) {
             console.error(`No animation found for ${type} ${this.d}`, this.enemyDefinition.animations);
             debugger;
@@ -447,8 +454,11 @@ export class Enemy implements Actor, ObjectInstance {
             this.enemyDefinition.renderOver(context, state, this);
         }
     }
-    defaultRender(context: CanvasRenderingContext2D, state: GameState) {
-        const frame = this.getFrame();
+    defaultRender(context: CanvasRenderingContext2D, state: GameState, frame = this.getFrame()) {
+        if (!frame) {
+            console.error('Frame not found for enemy animation', this, this.currentAnimation);
+            return;
+        }
         context.save();
             if (this.invulnerableFrames) {
                 context.globalAlpha *= (0.7 + 0.3 * Math.cos(2 * Math.PI * this.time / 150));
@@ -457,21 +467,27 @@ export class Enemy implements Actor, ObjectInstance {
                 // Flip the frame when facing right. We may need an additional flag for this behavior
                 // if we don't do it for all enemies on the right frames.
                 const w = frame.content?.w ?? frame.w;
-                if (this.definition.enemyType === 'flameHeart') {
-                    console.log(frame, frame.content, w);
+                if (this.definition.enemyType === 'golemHand') {
+                    //console.log(frame, frame.content, w);
+                    //console.log(this.x, frame?.content?.x, w / 2, this.scale);
                 }
-                context.translate((this.x | 0) + ((frame?.content?.x || 0) + w / 2) * this.scale, 0);
+                context.translate((this.x | 0) + (w / 2) * this.scale, 0);
                 context.scale(-1, 1);
                 drawFrame(context, frame, { ...frame,
-                    x: - w / 2 - (frame?.content?.x || 0) * this.scale,
-                    y: this.y - (frame?.content?.y || 0) * this.scale - this.z,
+                    x: - (w / 2 + frame.content?.x || 0) * this.scale,
+                    y: this.y - (frame.content?.y || 0) * this.scale - this.z,
                     w: frame.w * this.scale,
                     h: frame.h * this.scale,
                 });
+                /*
+                // Draw a red dot where we are flipping
+                context.fillStyle = 'red';
+                context.fillRect( -1, this.y, 2, frame.content?.h || frame.h);
+                */
             } else {
                 drawFrame(context, frame, { ...frame,
-                    x: this.x - (frame?.content?.x || 0) * this.scale,
-                    y: this.y - (frame?.content?.y || 0) * this.scale - this.z,
+                    x: this.x - (frame.content?.x || 0) * this.scale,
+                    y: this.y - (frame.content?.y || 0) * this.scale - this.z,
                     w: frame.w * this.scale,
                     h: frame.h * this.scale,
                 });

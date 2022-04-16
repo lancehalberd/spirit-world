@@ -48,6 +48,7 @@ export class ThrownChakram implements EffectInstance {
     source: Hero;
     animationTime = 0;
     sparkles: AnimationEffect[];
+    hitCooldown: number = 0;
     isPlayerAttack = true;
     constructor({x = 0, y = 0, vx = 0, vy = 0, damage = 1, element = null, returnSpeed = 4, piercing = false, source}: Props) {
         this.x = x;
@@ -73,6 +74,9 @@ export class ThrownChakram implements EffectInstance {
         let spawnTime = 200;
         if (this.animationTime < 200) {
             spawnTime /= 5;
+        }
+        if (this.hitCooldown) {
+            this.hitCooldown -= FRAME_LENGTH;
         }
         //if (this.element === 'lightning') {
         //    spawnTime /= 2;
@@ -121,8 +125,8 @@ export class ThrownChakram implements EffectInstance {
             vx: this.vx,
             vy: this.vy,
             hitbox: this,
-            hitEnemies: true,
-            hitObjects: true,
+            hitEnemies: this.hitCooldown <= 0,
+            hitObjects: this.hitCooldown <= 0,
             source: this.source,
         }
         // Only push objects on the way out to prevent accidentally dragging objects towards the player.
@@ -132,6 +136,9 @@ export class ThrownChakram implements EffectInstance {
         }
         let hitResult = hitTargets(state, this.area, hit);
         let didHit = hitResult.hit || hitResult.blocked;
+        if (didHit) {
+            this.hitCooldown = 200;
+        }
         if ((didHit && !this.piercing && !hitResult.pierced && !hitResult.destroyed) || hitResult.stopped) {
             this.outFrames = 0;
         }
