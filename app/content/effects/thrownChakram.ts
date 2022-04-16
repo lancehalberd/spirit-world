@@ -136,7 +136,7 @@ export class ThrownChakram implements EffectInstance {
         }
         let hitResult = hitTargets(state, this.area, hit);
         let didHit = hitResult.hit || hitResult.blocked;
-        if (didHit) {
+        if (hitResult.blocked || hitResult.stopped) {
             this.hitCooldown = 200;
         }
         if ((didHit && !this.piercing && !hitResult.pierced && !hitResult.destroyed) || hitResult.stopped) {
