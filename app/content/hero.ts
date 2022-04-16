@@ -58,6 +58,7 @@ export class Hero implements Actor, SavedHeroData {
     actionFrame?: number = 0;
     actionTarget?: any;
     animationTime: number = 0;
+    attackBufferTime: number = 0;
     // like being knocked but doesn't stop MC charge or other actions.
     bounce?: {vx: number; vy: number; frames: number};
     equipedGear?: {[key in Equipment]?: boolean};

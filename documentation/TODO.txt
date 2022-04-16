@@ -47,15 +47,13 @@ Graphics:
 
 Current tasks:
     - Improvements
-        - Add input buffering so you can arm a chakram attack more easily after catching the chakram.
-
         - Test using PASSIVE_TOOL button as a run button that consumes spirit energy, possibly makes you slip a bit.
 
         - There should be a name indicator on the menu for the tool the cursor is over
             - Including the "help" icon
         - Passive tools should be selectable in the menu and show a tutorial on selection
 
-        - Fix clone tool is breaking walk animation.
+        - Fix clone animates walking/pushing when not controlled.
 
         - Golem boss hands should not gain projectiles
         - Squirrel velocity should reset when knocked back

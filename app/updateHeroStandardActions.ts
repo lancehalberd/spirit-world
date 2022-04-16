@@ -455,9 +455,12 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     }
 
     // Check to start charging the chakram
-    if (canAttack && wasGameKeyPressed(state, GAME_KEY.WEAPON)) {
+    if (canAttack
+        && (wasGameKeyPressed(state, GAME_KEY.WEAPON) || (hero.attackBufferTime > state.fieldTime - 200))
+    ) {
         const thrownChakrams = hero.area.effects.filter(o => o instanceof ThrownChakram);
-        if (state.hero.weapon - thrownChakrams.length > 0) {
+        const usedChakrams = thrownChakrams.length + (heldChakram ? 1 : 0);
+        if (state.hero.weapon - usedChakrams > 0) {
             hero.action = 'charging';
             hero.chargeTime = 0;
             hero.animationTime = 0;
@@ -472,6 +475,8 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             });
             addEffectToArea(state, hero.area, chakram);
             return;
+        } else if (wasGameKeyPressed(state, GAME_KEY.WEAPON) && state.hero.weapon) {
+            hero.attackBufferTime = state.fieldTime;
         }
     }
 

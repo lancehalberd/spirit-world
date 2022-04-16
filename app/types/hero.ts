@@ -83,6 +83,10 @@ export interface Actor extends ObjectInstance {
     actionFrame?: number
     actionTarget?: any
     animationTime: number
+    // This value is set if the player attempts to use the chakram while it is still in
+    // flight. If the player catches the chakram shortly after this time, the chakram
+    // will re-arm as if they pressed the button right when they caught it.
+    attackBufferTime?: number
     // like being knocked but doesn't stop MC charge or other actions.
     bounce?: {vx: number, vy: number, frames: number}
     equipedGear?: {[key in Equipment]?: boolean}
