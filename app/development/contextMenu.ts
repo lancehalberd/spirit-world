@@ -5,6 +5,7 @@ import { getState } from 'app/state';
 import { getElementRectangle } from 'app/utils/index';
 import { getMousePosition } from 'app/utils/mouse';
 import { updateSoundSettings } from 'app/utils/sounds';
+import { showMessage } from 'app/render/renderMessage';
 
 import { MenuOption } from 'app/types';
 
@@ -196,6 +197,23 @@ function getSettingsMenuOption(): MenuOption {
                         updateSoundSettings(state);
                     }
                 },
+                {
+                    label: 'Show Controls',
+                    onSelect() {
+                        showMessage(state, `
+                            [B_DPAD] Movement
+                            [-] [B_PASSIVE] Interact
+                            [-] [B_WEAPON] Weapon
+                            [-] [B_TOOL] Tools
+                            [-] [B_ROLL] Roll
+                            [-] [B_MEDITATE] Meditate
+                            [-] [B_MENU] Menu
+                            [-] [B_PREVIOUS_ELEMENT] Prev Element
+                            [-] [B_NEXT_ELEMENT] Next Element
+                        `);
+                    }
+
+                }
             ];
         }
     }
