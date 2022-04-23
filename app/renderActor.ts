@@ -32,6 +32,14 @@ export const spiritBarrierBreakingAnimation = createAnimation('gfx/effects/cloak
 let lastPullAnimation = null;
 export function getHeroFrame(state: GameState, hero: Hero): Frame {
     let animations: ActorAnimations['idle'];
+    if (state.defeatState.defeated) {
+        if (state.defeatState.reviving) {
+            animations = state.defeatState.time >= 3000 ? heroAnimations.kneel : heroAnimations.death;
+        } else {
+            animations = state.defeatState.time >= 1000 ? heroAnimations.death : heroAnimations.kneel;
+        }
+        return getFrame(animations[hero.d], hero.animationTime);
+    }
     if (state.transitionState?.type === 'surfacing' || state.transitionState?.type === 'diving') {
         animations = heroSwimAnimations.idle;
         return getFrame(animations[hero.d], hero.animationTime);

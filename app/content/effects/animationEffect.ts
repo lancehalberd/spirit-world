@@ -240,3 +240,45 @@ export function makeSparkleAnimation(
     }
     return effect;
 }
+
+export const dustParticleAnimation = createAnimation('gfx/effects/dust_particles.png', {w: 6, h: 6}, {cols: 3, duration: 6}, {loop: false});
+export const reviveParticleAnimation = createAnimation('gfx/effects/revive_particles.png', {w: 6, h: 6}, {cols: 7, duration: 6});
+
+export function addDustBurst(
+    state: GameState, area: AreaInstance, x: number, y: number, z: number
+): void {
+    for (let i = 0; i < 4; i++) {
+        const theta = i * Math.PI / 3;
+        const vx = Math.cos(theta) / 2;
+        const vy = Math.sin(theta);
+        const particle = new AnimationEffect({
+            animation: dustParticleAnimation,
+            drawPriority: 'background-special',
+            x: x + vx * 8 - 3, y: y + vy * 2, z,
+            vx, vy: 0, vz: 0, az: 0,
+        });
+        addEffectToArea(state, area, particle);
+    }
+}
+
+export function addReviveBurst(
+    state: GameState, area: AreaInstance, x: number, y: number, z: number
+): void {
+    let theta = Math.random() * 2 * Math.PI;
+    for (let i = 0; i < 8; i++) {
+        const vx = Math.cos(theta) / 2;
+        const vy = Math.sin(theta) / 2;
+        const particle = new AnimationEffect({
+            animation: reviveParticleAnimation,
+            drawPriority: 'foreground-special',
+            x: x + vx - 3, y: y + vy - 3, z,
+            vx, vy, vz: 0, az: 0.005,
+            ttl: 400,
+            delay: Math.random() * 400,
+        });
+        particle.behaviors.brightness = 1
+        particle.behaviors.lightRadius = 8;
+        addEffectToArea(state, area, particle);
+        theta += Math.PI * 2 / 8;
+    }
+}

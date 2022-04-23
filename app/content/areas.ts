@@ -514,7 +514,7 @@ export function applyLayerToBehaviorGrid(behaviorGrid: TileBehaviors[][], layer:
             // The behavior grid combines behaviors of all layers, with higher layers
             // overriding the behavior of lower layers.
             if (behaviors) {
-                applyTileBehaviorToGrid(behaviorGrid, {x, y}, behaviors, isForeground);
+                applyTileToBehaviorGrid(behaviorGrid, {x, y}, allTiles[tile], isForeground);
             }
         }
     }
@@ -530,19 +530,24 @@ export function resetTileBehavior(area: AreaInstance, {x, y}: Tile): void {
         if (!tile) {
             continue;
         }
-        const isForeground = layer.definition.drawPriority === 'foreground';
+        const isForeground = (layer.definition.drawPriority ?? layer.definition.key) === 'foreground';
         // The behavior grid combines behaviors of all layers, with higher layers
         // overriding the behavior of lower layers.
         if (tile.behaviors) {
             if (!area.behaviorGrid[y]) {
                 area.behaviorGrid[y] = [];
             }
-            applyTileBehaviorToGrid(area.behaviorGrid, {x, y}, tile.behaviors, isForeground);
+            applyTileToBehaviorGrid(area.behaviorGrid, {x, y}, tile, isForeground);
         }
     }
 }
 
-export function applyTileBehaviorToGrid(behaviorGrid: TileBehaviors[][], {x, y}: Tile, behaviors: TileBehaviors, isForeground: boolean): void {
+function applyTileToBehaviorGrid(behaviorGrid: TileBehaviors[][], {x, y}: Tile, tile: FullTile, isForeground: boolean): void {
+    const behaviors = tile.behaviors;
+    // Tiles 0/1 are the null and empty tile and should not impact the tile behavior.
+    if (!behaviors || tile.index < 2) {
+        return;
+    }
     // Lava + clouds erase the behaviors of tiles underneath them.
     if (behaviors.isLava || behaviors.cloudGround) {
         behaviorGrid[y][x] = {};
@@ -556,10 +561,10 @@ export function applyTileBehaviorToGrid(behaviorGrid: TileBehaviors[][], {x, y}:
     // If this causes issues with decorations like shadows we may need to explicitly set pit = false
     // on tiles that can cover up pits (like in the sky) and use that, or alternatively, make a separate
     // sky behavior that has this behavior instead of pits.
-    if (!isForeground && behaviorGrid[y]?.[x] && !behaviors.pit) {
+    if (!isForeground && behaviorGrid[y]?.[x]?.pit && !behaviors.pit) {
         delete behaviorGrid[y][x].pit;
     }
-    if (!isForeground && behaviorGrid[y]?.[x] && !behaviors.cloudGround) {
+    if (!isForeground && behaviorGrid[y]?.[x]?.cloudGround && !behaviors.cloudGround) {
         delete behaviorGrid[y][x].cloudGround;
     }
     const lightRadius = Math.max(behaviorGrid[y][x]?.lightRadius || 0, behaviors.lightRadius || 0);

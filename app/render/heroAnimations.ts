@@ -22,6 +22,18 @@ const hurtDownAnimation: FrameAnimation = createAnimation('gfx/mc/mchurt.png', h
 const hurtLeftAnimation: FrameAnimation = createAnimation('gfx/mc/mchurt.png', hurtGeometry, { x: 3});
 const hurtRightAnimation: FrameAnimation = createAnimation('gfx/mc/mchurt.png', hurtGeometry, { x: 1});
 
+const kneelGeometry: FrameDimensions = {w: 20, h: 28, content: {x: 2, y: 16 + Y_OFF, w: 16, h: 16}};
+const kneelUpAnimation: FrameAnimation = createAnimation('gfx/mc/mc_kneel.png', kneelGeometry, { x: 2});
+const kneelDownAnimation: FrameAnimation = createAnimation('gfx/mc/mc_kneel.png', kneelGeometry, { x: 0});
+const kneelLeftAnimation: FrameAnimation = createAnimation('gfx/mc/mc_kneel.png', kneelGeometry, { x: 3});
+const kneelRightAnimation: FrameAnimation = createAnimation('gfx/mc/mc_kneel.png', kneelGeometry, { x: 1});
+const deathGeometry: FrameDimensions = {w: 20, h: 28, content: {x: 2, y: 16 + Y_OFF, w: 16, h: 16}};
+const deathUpAnimation: FrameAnimation = createAnimation('gfx/mc/mc_death.png', deathGeometry, { x: 2});
+const deathDownAnimation: FrameAnimation = createAnimation('gfx/mc/mc_death.png', deathGeometry, { x: 0});
+const deathLeftAnimation: FrameAnimation = createAnimation('gfx/mc/mc_death.png', deathGeometry, { x: 3});
+const deathRightAnimation: FrameAnimation = createAnimation('gfx/mc/mc_death.png', deathGeometry, { x: 1});
+
+
 const walkingGeometry: FrameDimensions = {w: 20, h: 28, content: {x: 2, y: 16 + Y_OFF, w: 16, h: 16}};
 const walkUpAnimation: FrameAnimation = createAnimation('gfx/mc/mcwalking.png', walkingGeometry, { cols: 8, y: 2, duration: 4});
 const walkDownAnimation: FrameAnimation = createAnimation('gfx/mc/mcwalking.png', walkingGeometry, { cols: 8, y: 0, duration: 4});
@@ -301,6 +313,18 @@ export const heroAnimations: ActorAnimations = {
         down: hurtDownAnimation,
         left: hurtLeftAnimation,
         right: hurtRightAnimation,
+    },
+    kneel: {
+        up: kneelUpAnimation,
+        down: kneelDownAnimation,
+        left: kneelLeftAnimation,
+        right: kneelRightAnimation,
+    },
+    death: {
+        up: deathUpAnimation,
+        down: deathDownAnimation,
+        left: deathLeftAnimation,
+        right: deathRightAnimation,
     },
     idle: {
         up: upAnimation,

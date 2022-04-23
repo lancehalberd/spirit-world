@@ -1,4 +1,5 @@
 import { enterLocation } from 'app/content/areas';
+import { addDustBurst, addReviveBurst } from 'app/content/effects/animationEffect';
 import { Hero } from 'app/content/hero';
 import {
     SPAWN_LOCATION_DEMO,
@@ -12,7 +13,7 @@ import {
 } from 'app/gameConstants';
 import { updateKeyboardState } from 'app/keyCommands';
 import { initializeGame } from 'app/initialize';
-import { wasGameKeyPressed, wasConfirmKeyPressed } from 'app/keyCommands';
+import { isGameKeyDown, wasGameKeyPressed, wasConfirmKeyPressed } from 'app/keyCommands';
 import { updateHeroMagicStats } from 'app/render/spiritBar';
 import { updateScriptEvents } from 'app/scriptEvents'
 import {
@@ -267,14 +268,42 @@ function updateMenu(state: GameState) {
 }
 
 function updateDefeated(state: GameState) {
+    if (!isGameKeyDown(state, GAME_KEY.WEAPON)) {
+        // Uncomment to inspect the defeat animation.
+        //return;
+    }
     state.defeatState.time += FRAME_LENGTH;
+    for (const effect of state.areaInstance.effects) {
+        if (effect.drawPriority === 'background-special' || effect.drawPriority === 'foreground-special') {
+            effect.update?.(state);
+        }
+    }
+    if (state.defeatState.time === 1000) {
+        const hitbox = state.hero.getHitbox(state);
+        addDustBurst(state, state.areaInstance,
+            hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2, state.hero.z);
+    }
     // Add 0.5s pause afer showing menu before taking input so that players don't accidentally take action.
     // This also gives them a bit to see the "Hang in there!" message before their life starts refilling
     // when they have a revive available.
-    if (state.defeatState.time < 1500) {
+    if (state.defeatState.time < 2000) {
         return;
     }
     if (state.hero.hasRevive) {
+        state.defeatState.reviving = true;
+        state.hero.hasRevive = false;
+    }
+    if (state.defeatState.reviving) {
+        // Show a burst of particles right before the MC gets up
+        // and starts regaining life.
+        if (state.defeatState.time === 2400) {
+            const hitbox = state.hero.getHitbox(state);
+            addReviveBurst(state, state.areaInstance,
+                hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2, state.hero.z);
+        }
+        if (state.defeatState.time < 2500) {
+            return;
+        }
         // This is a hack to make the reviveTime advance even though the fieldTime is paused while
         // reviving.
         state.reviveTime -= FRAME_LENGTH;
@@ -282,7 +311,6 @@ function updateDefeated(state: GameState) {
             state.hero.life = Math.min(state.hero.maxLife, state.hero.life + 0.5);
             if (state.hero.life === state.hero.maxLife) {
                 state.defeatState.defeated = false;
-                state.hero.hasRevive = false;
                 saveGame();
             }
         }

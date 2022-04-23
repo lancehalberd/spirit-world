@@ -9,7 +9,9 @@ import {
     Rect, TileBehaviors,
 } from 'app/types';
 
-export type DrawPriority = 'background' | 'foreground' | 'sprites' | 'hud';
+export type DrawPriority = 'background' | 'foreground' | 'sprites' | 'hud'
+    // Currently just used for effects that should be rendered during defeat sequence.
+    | 'background-special' | 'foreground-special';
 
 export interface LootData {
     lootType: LootType

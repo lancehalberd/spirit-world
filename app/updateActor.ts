@@ -1,5 +1,5 @@
 import {
-    getAreaFromLocation, getAreaSize,
+    getAreaFromLocation, getAreaSize, removeEffectFromArea,
     removeAllClones, removeObjectFromArea, scrollToArea, setNextAreaSection,
     swapHeroStates,
 } from 'app/content/areas';
@@ -19,7 +19,7 @@ import {
 import { rectanglesOverlap } from 'app/utils/index';
 
 import {
-    GameState, Hero,
+    GameState, HeldChakram, Hero,
 } from 'app/types';
 
 export function updateAllHeroes(this: void, state: GameState) {
@@ -134,8 +134,17 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
         }
     }
     if (hero.life <= 0) {
-        state.defeatState.defeated = true;
-        state.defeatState.time = 0;
+        hero.life = 0;
+        hero.action = null;
+        hero.chargeTime = 0;
+        state.defeatState = {
+            defeated: true,
+            time: 0,
+        };
+        const heldChakram = hero.area.effects.find(o => o instanceof HeldChakram) as HeldChakram;
+        if (heldChakram) {
+            removeEffectFromArea(state, heldChakram);
+        }
         if (state.hero.hasRevive) {
             state.reviveTime = state.fieldTime;
         }

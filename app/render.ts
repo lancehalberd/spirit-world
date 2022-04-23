@@ -135,25 +135,48 @@ export function render() {
 
     // Render any editor specific graphics if appropriate.
     renderEditor(context, state);
+    if (state.defeatState.defeated) {
+        context.save();
+            if (state.defeatState.reviving) {
+                context.globalAlpha *= 0.7 * (1 - state.hero.life / state.hero.maxLife);
+            } else {
+                context.globalAlpha *= (state.hero.hasRevive ? 0.7 : 1) * Math.min(1, state.defeatState.time / 1000);
+            }
+            context.fillStyle = '#000';
+            context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        context.restore();
+        context.save();
+            // render the hero + special effects on top of the dark background.
+            translateContextForAreaAndCamera(context, state, state.areaInstance);
+            for (const effect of state.areaInstance.effects) {
+                if (effect.drawPriority === 'background-special') {
+                    effect.render?.(context, state);
+                }
+            }
+            state.hero.render(context, state);
+            for (const effect of state.areaInstance.effects) {
+                if (effect.drawPriority === 'foreground-special') {
+                    effect.render?.(context, state);
+                }
+            }
+        context.restore();
+        // Don't draw the HUD while editing since it obscures some tiles.
+        if (!editingState.isEditing) {
+            // Draw the HUD onto the field.
+            renderHUD(context, state);
+        }
+        if (state.defeatState.time >= 2000) {
+            renderDefeatedMenu(context, state);
+        }
+        return;
+    }
     // Don't draw the HUD while editing since it obscures some tiles.
     if (!editingState.isEditing) {
         // Draw the HUD onto the field.
         renderHUD(context, state);
     }
-    if (state.defeatState.defeated) {
-        context.save();
-            context.globalAlpha *= (state.hero.hasRevive ? 0.5 : 0.7) * Math.min(1, state.defeatState.time / 1000);
-            context.fillStyle = '#000';
-            context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-        context.restore();
-        if (state.defeatState.time >= 1000) {
-            renderDefeatedMenu(context, state);
-        }
-        return;
-    } else if (state.paused) {
-        if (!state.hideMenu) {
-            renderMenu(context, state);
-        }
+    if (state.paused && !state.hideMenu) {
+        renderMenu(context, state);
     }
 }
 
@@ -404,7 +427,11 @@ function checkToRedrawTiles(area: AreaInstance) {
     area.checkToRedrawTiles = false;
 }
 
-export function renderField(context: CanvasRenderingContext2D, state: GameState, renderHero: boolean = null): void {
+export function renderField(
+    context: CanvasRenderingContext2D,
+    state: GameState,
+    shouldRenderHero: boolean = null
+): void {
     if (editingState.isEditing) {
         context.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     }
@@ -432,14 +459,19 @@ export function renderField(context: CanvasRenderingContext2D, state: GameState,
     renderAreaBackground(context, state, state.nextAreaInstance);
     renderAreaObjectsBeforeHero(context, state, state.areaInstance);
     renderAreaObjectsBeforeHero(context, state, state.nextAreaInstance);
-    if (renderHero === true || (renderHero !== false && hero.area === state.areaInstance)) {
-        context.save();
-            translateContextForAreaAndCamera(context, state, state.areaInstance);
-            state.hero.render(context, state);
-        context.restore();
+    if (shouldRenderHero === true || (shouldRenderHero !== false && hero.area === state.areaInstance)) {
+        renderHero(context, state);
     }
+
     renderAreaObjectsAfterHero(context, state, state.areaInstance);
     renderAreaObjectsAfterHero(context, state, state.nextAreaInstance);
+}
+
+export function renderHero(context: CanvasRenderingContext2D, state: GameState) {
+    context.save();
+        translateContextForAreaAndCamera(context, state, state.areaInstance);
+        state.hero.render(context, state);
+    context.restore();
 }
 
 export function renderFieldForeground(context: CanvasRenderingContext2D, state: GameState) {

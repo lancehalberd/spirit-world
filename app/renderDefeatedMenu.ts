@@ -10,13 +10,15 @@ export function renderDefeatedMenu(context: CanvasRenderingContext2D, state: Gam
 
     let r = {
         x: (CANVAS_WIDTH - WIDTH) / 2,
-        y: CANVAS_HEIGHT - HEIGHT - 32,
+        y: CANVAS_HEIGHT - HEIGHT - 16,
         w: WIDTH,
         h: HEIGHT,
     };
 
-    fillRect(context, r, 'white');
-    fillRect(context, pad(r, -2), 'black');
+    if (!state.defeatState.reviving) {
+        fillRect(context, r, 'white');
+        fillRect(context, pad(r, -2), 'black');
+    }
 
     r = pad(r, -4);
 
@@ -25,8 +27,14 @@ export function renderDefeatedMenu(context: CanvasRenderingContext2D, state: Gam
     context.textAlign = 'left';
     context.font = '16px Arial';
     context.fillStyle = 'white';
-    if (state.hero.hasRevive) {
-        context.fillText('HANG IN THERE!', x, y + 2);
+    if (state.defeatState.reviving) {
+        context.save();
+            const missingLife = state.hero.maxLife - state.hero.life;
+            if (missingLife < 3) {
+                context.globalAlpha *= missingLife / 3;
+            }
+            context.fillText('HANG IN THERE!', x, CANVAS_HEIGHT - 32);
+        context.restore();
         return;
     } else {
         context.fillText('TRY AGAIN?', x, y + 2);

@@ -105,6 +105,7 @@ export interface GameState {
     hideMenu?: boolean
     defeatState: {
         defeated: boolean
+        reviving?: boolean
         time: number
     },
     scene: Scene
