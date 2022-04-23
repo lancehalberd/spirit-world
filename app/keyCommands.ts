@@ -31,34 +31,40 @@ export const KEY = {
     E: 'E'.charCodeAt(0),
     F: 'F'.charCodeAt(0),
     G: 'G'.charCodeAt(0),
+    H: 'H'.charCodeAt(0),
     I: 'I'.charCodeAt(0),
     J: 'J'.charCodeAt(0),
     K: 'K'.charCodeAt(0),
     L: 'L'.charCodeAt(0),
     M: 'M'.charCodeAt(0),
+    O: 'O'.charCodeAt(0),
     P: 'P'.charCodeAt(0),
     Q: 'Q'.charCodeAt(0),
     R: 'R'.charCodeAt(0),
     S: 'S'.charCodeAt(0),
     T: 'T'.charCodeAt(0),
+    U: 'U'.charCodeAt(0),
     V: 'V'.charCodeAt(0),
     W: 'W'.charCodeAt(0),
     X: 'X'.charCodeAt(0),
+    Y: 'Y'.charCodeAt(0),
     Z: 'Z'.charCodeAt(0),
 };
 
 const KEYBOARD_MAPPINGS = {
-    [GAME_KEY.WEAPON]: [KEY.SPACE], // A (bottom button)
-    [GAME_KEY.PASSIVE_TOOL]: [KEY.SHIFT, KEY.P, KEY.Q], // B (right button)
-    [GAME_KEY.LEFT_TOOL]: [KEY.C], // X (left button)
-    [GAME_KEY.RIGHT_TOOL]: [KEY.V], // Y (top button)
+    [GAME_KEY.WEAPON]: [KEY.H], // A (bottom button)
+    [GAME_KEY.PASSIVE_TOOL]: [KEY.SPACE], // B (right button)
+    [GAME_KEY.LEFT_TOOL]: [KEY.Y], // X (left button)
+    [GAME_KEY.RIGHT_TOOL]: [KEY.U], // Y (top button)
     [GAME_KEY.MENU]: [KEY.ENTER], // START
     [GAME_KEY.UP]: [KEY.UP, KEY.W],
     [GAME_KEY.DOWN]: [KEY.DOWN, KEY.S],
     [GAME_KEY.LEFT]: [KEY.LEFT, KEY.A],
     [GAME_KEY.RIGHT]: [KEY.RIGHT, KEY.D],
-    [GAME_KEY.ROLL]: [KEY.Z], // L Front Bumper
-    [GAME_KEY.MEDITATE]: [KEY.X],  // R Front bumper
+    [GAME_KEY.PREVIOUS_ELEMENT]: [KEY.I], // L Front Bumper
+    [GAME_KEY.NEXT_ELEMENT]: [KEY.O],  // R Front bumper
+    [GAME_KEY.ROLL]: [KEY.J], // L Front Bumper
+    [GAME_KEY.MEDITATE]: [KEY.K],  // R Front bumper
 }
 
 // Under this threshold, the analog buttons are considered "released" for the sake of
@@ -171,7 +177,7 @@ export function addKeyCommands() {
         }
         keysDown[keyCode] = 1;
         if (keyCode === KEY.C && commandIsDown) {
-            if (getState().areaInstance.definition.objects.includes(editingState.selectedObject)) {
+            if (editingState.isEditing && getState().areaInstance.definition.objects.includes(editingState.selectedObject)) {
                 editingState.clipboardObject = {...editingState.selectedObject};
             } else {
                 exportZoneToClipboard(getState().zone);
@@ -180,12 +186,13 @@ export function addKeyCommands() {
             }
             return;
         }
-        if (keyCode === KEY.BACK_SLASH) {
+        if (keysDown[KEY.SHIFT] && keyCode === KEY.BACK_SLASH) {
             const state = getState();
             state.hideMenu = !state.hideMenu;
         }
         if (keyCode === KEY.K && commandIsDown) {
             defeatAllEnemies();
+            event.preventDefault();
             return;
         }
         if (keyCode === KEY.V && commandIsDown) {
@@ -201,7 +208,7 @@ export function addKeyCommands() {
             event.preventDefault();
             return;
         }
-        if (keyCode === KEY.E) {
+        if (keysDown[KEY.SHIFT] && keyCode === KEY.E) {
             toggleEditing();
         }
         if (keyCode === KEY.M) {
@@ -210,24 +217,29 @@ export function addKeyCommands() {
             updateSoundSettings(state);
             saveSettings(state);
         }
-        if (keyCode === KEY.R) {
+        if (keyCode === KEY.R && commandIsDown) {
+            // Reset the entire zone if command is down.
             const state = getState();
-            // Reset the entire zone if SHIFT is held.
-            if (keysDown[KEY.SHIFT]) {
-                for (const floor of state.zone.floors) {
-                    for (const grid of [floor.grid, floor.spiritGrid]) {
-                        for (const row of grid) {
-                            for (const areaDefinition of row) {
-                                for (const object of areaDefinition?.objects ?? []) {
-                                    delete state.savedState.objectFlags[object.id];
-                                    delete state.savedState.zoneFlags[object.id];
-                                }
+            for (const floor of state.zone.floors) {
+                for (const grid of [floor.grid, floor.spiritGrid]) {
+                    for (const row of grid) {
+                        for (const areaDefinition of row) {
+                            for (const object of areaDefinition?.objects ?? []) {
+                                delete state.savedState.objectFlags[object.id];
+                                delete state.savedState.zoneFlags[object.id];
                             }
                         }
                     }
                 }
-                delete state.savedState.dungeonInventories[state.zone.key];
             }
+            delete state.savedState.dungeonInventories[state.zone.key];
+            state.location.x = state.hero.x;
+            state.location.y = state.hero.y;
+            // Calling this will instantiate the area again and place the player back in their current location.
+            enterLocation(state, state.location);
+        } else if (keysDown[KEY.SHIFT] && KEY.R) {
+            // Reset the current screen as if you left and returned to it.
+            const state = getState();
             state.location.x = state.hero.x;
             state.location.y = state.hero.y;
             // Calling this will instantiate the area again and place the player back in their current location.
@@ -341,3 +353,11 @@ export function wasConfirmKeyPressed(state: GameState): boolean {
         || wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL)
         || wasGameKeyPressed(state, GAME_KEY.MENU));
 }
+
+export function wasMenuConfirmKeyPressed(state: GameState): boolean {
+    return !!(wasGameKeyPressed(state, GAME_KEY.WEAPON)
+        || wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL)
+        || wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL)
+        || wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL));
+}
+

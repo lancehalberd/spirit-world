@@ -13,7 +13,12 @@ import {
 } from 'app/gameConstants';
 import { updateKeyboardState } from 'app/keyCommands';
 import { initializeGame } from 'app/initialize';
-import { isGameKeyDown, wasGameKeyPressed, wasConfirmKeyPressed } from 'app/keyCommands';
+import {
+    isGameKeyDown,
+    wasGameKeyPressed,
+    wasConfirmKeyPressed,
+    wasMenuConfirmKeyPressed,
+} from 'app/keyCommands';
 import { updateHeroMagicStats } from 'app/render/spiritBar';
 import { updateScriptEvents } from 'app/scriptEvents'
 import {
@@ -194,24 +199,29 @@ function updateMenu(state: GameState) {
             state.menuIndex = (state.menuIndex + numberOfOptions - 1) % numberOfOptions;
         } else if (wasGameKeyPressed(state, GAME_KEY.RIGHT)) {
             state.menuIndex = (state.menuIndex + 1) % numberOfOptions;
-        } else if (state.menuIndex === 0 && (
-            wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL)
-            || wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL)
-            || wasGameKeyPressed(state, GAME_KEY.WEAPON)
-        )) {
-            state.paused = false;
-            showHint(state);
-            return;
-        } else if (wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL)) {
-            if (state.hero.rightTool === selectedTool) {
-                state.hero.rightTool = state.hero.leftTool;
+        } else if (wasMenuConfirmKeyPressed(state)) {
+            if (state.menuIndex === 0) {
+                state.paused = false;
+                showHint(state);
+                return;
             }
-            state.hero.leftTool = selectedTool;
-        } else if (wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL)) {
-            if (state.hero.leftTool === selectedTool) {
-                state.hero.leftTool = state.hero.rightTool;
+            if (wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL)) {
+                if (state.hero.leftTool === selectedTool) {
+                    state.hero.leftTool = state.hero.rightTool;
+                }
+                state.hero.rightTool = selectedTool;
+            } else {
+                // Assign to left tool as default action.
+                // If a generic confirm key was pressed, cycle the current left tool
+                // over to the right tool slot.
+                if (!wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL) && state.hero.leftTool !== selectedTool) {
+                    state.hero.rightTool = state.hero.leftTool;
+                }
+                if (state.hero.rightTool === selectedTool) {
+                    state.hero.rightTool = state.hero.leftTool;
+                }
+                state.hero.leftTool = selectedTool;
             }
-            state.hero.rightTool = selectedTool;
         }
     } else if (state.menuRow === 1) {
         // The second row is for equipping boots.
@@ -226,10 +236,7 @@ function updateMenu(state: GameState) {
             state.menuIndex = (state.menuIndex + selectableEquipment.length - 1) % selectableEquipment.length;
         } else if (wasGameKeyPressed(state, GAME_KEY.RIGHT)) {
             state.menuIndex = (state.menuIndex + 1) % selectableEquipment.length;
-        } else if (wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL)
-            || wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL)
-            || wasGameKeyPressed(state, GAME_KEY.WEAPON)
-        ) {
+        } else if (wasMenuConfirmKeyPressed(state)) {
             const selectedEquipment = selectableEquipment[state.menuIndex];
             if (!selectableEquipment || state.hero.equipedGear[selectedEquipment]) {
                 state.hero.equipedGear = {};
@@ -254,10 +261,7 @@ function updateMenu(state: GameState) {
             state.menuIndex = (state.menuIndex + selectableElements.length - 1) % selectableElements.length;
         } else if (wasGameKeyPressed(state, GAME_KEY.RIGHT)) {
             state.menuIndex = (state.menuIndex + 1) % selectableElements.length;
-        } else if (wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL)
-            || wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL)
-            || wasGameKeyPressed(state, GAME_KEY.WEAPON)
-        ) {
+        } else if (wasMenuConfirmKeyPressed(state)) {
             if (state.hero.element === selectableElements[state.menuIndex]) {
                 state.hero.setElement(null);
             } else {

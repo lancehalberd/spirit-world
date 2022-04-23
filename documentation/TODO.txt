@@ -46,17 +46,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Verify new shoulder icons
-        - Add special message with all controls on it.
-            - Add to context menu
-
-    - Remap keyboard controls.
-        WASD main movement
-        SPACE to interact
-        SHIFT+E to edit
-        H attack, J roll, K spirit sight
-        Y left tool, U right tool, I/O next/prev elemnet
-
     Editor Improvements
         - New objects should be selected on creation.
         - pressing Escape should unselect the selected object.

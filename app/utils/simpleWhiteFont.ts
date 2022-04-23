@@ -35,10 +35,18 @@ const [
     /*keyboard_w*/, /*keyboard_d*/, /*keyboard_s*/, /*keyboard_a*/,
     keyboard_wasd,
     /*keyboard_left*/, /*keyboard_right*/, /*keyboard_up*/,  /*keyboard_down*/,
-    keyboard_uldr,
+    /*keyboard_uldr*/,
     keyboard_c, keyboard_v, keyboard_z, keyboard_x,
-    keyboard_space, keyboard_shift,
-] = createAnimation('gfx/hud/controllerbuttonswhite.png', {w: 26, h: 18, content: {x: 0, y: 1, w: 26, h: 16}}, {cols: 42}).frames;
+    keyboard_space, /*keyboard_shift*/,
+    keyboard_h,
+    keyboard_j,
+    keyboard_k,
+    keyboard_y,
+    /*keyboard_l*/,
+    keyboard_u,
+    keyboard_i,
+    keyboard_o,
+] = createAnimation('gfx/hud/controllerbuttonswhite.png', {w: 26, h: 18, content: {x: 0, y: 1, w: 26, h: 16}}, {cols: 49}).frames;
 
 const smallKeys = [
     xbox_y, xbox_b, xbox_a, xbox_x, xbox_start,
@@ -83,17 +91,19 @@ export const psMap = {
 };
 
 export const keyboardMap = {
-    [GAME_KEY.UP]: [keyboard_wasd, characterMap['/'], keyboard_uldr],
-    [GAME_KEY.DOWN]: [keyboard_wasd, characterMap['/'], keyboard_uldr],
-    [GAME_KEY.LEFT]: [keyboard_wasd, characterMap['/'], keyboard_uldr],
-    [GAME_KEY.RIGHT]: [keyboard_wasd, characterMap['/'], keyboard_uldr],
+    [GAME_KEY.UP]: [keyboard_wasd],
+    [GAME_KEY.DOWN]: [keyboard_wasd],
+    [GAME_KEY.LEFT]: [keyboard_wasd],
+    [GAME_KEY.RIGHT]: [keyboard_wasd],
     [GAME_KEY.MENU]: [keyboard_enter],
-    [GAME_KEY.WEAPON]: [keyboard_space],
-    [GAME_KEY.PASSIVE_TOOL]: [keyboard_shift],
-    [GAME_KEY.LEFT_TOOL]: [keyboard_c],
-    [GAME_KEY.RIGHT_TOOL]: [keyboard_v],
-    [GAME_KEY.ROLL]: [keyboard_z],
-    [GAME_KEY.MEDITATE]: [keyboard_x],
+    [GAME_KEY.WEAPON]: [keyboard_h],
+    [GAME_KEY.PASSIVE_TOOL]: [keyboard_space],
+    [GAME_KEY.LEFT_TOOL]: [keyboard_y],
+    [GAME_KEY.RIGHT_TOOL]: [keyboard_u],
+    [GAME_KEY.PREVIOUS_ELEMENT]: [keyboard_i],
+    [GAME_KEY.NEXT_ELEMENT]: [keyboard_o],
+    [GAME_KEY.ROLL]: [keyboard_j],
+    [GAME_KEY.MEDITATE]: [keyboard_k],
 };
 
 export function drawText(context: CanvasRenderingContext2D, text: string, x: number, y: number,
