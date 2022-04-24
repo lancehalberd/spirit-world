@@ -53,8 +53,10 @@ export function displayPropertyPanel(properties: PanelRows): void {
                 // If there is a validation error, onChange will return
                 // the value to set the input to.
                 const newValue = property.onChange(input.value.trim());
-                if (newValue) {
+                if (typeof newValue === 'string') {
                     input.value = newValue;
+                } else if (newValue) {
+                    input.value = newValue.value;
                 }
             } else if (isNumberProperty(property) && property.onChange) {
                 // If there is a validation error, onChange will return
@@ -129,7 +131,7 @@ function renderPropertyRow(row: PropertyRow): HTMLElement {
 function isStringArrayProperty(property: EditorProperty<any>): property is EditorArrayProperty<string> {
     return Array.isArray(property?.['value']);
 }
-function isStringProperty(property: EditorProperty<any>): property is EditorSingleProperty<string> {
+function isStringProperty(property: EditorProperty<any>): property is EditorSingleProperty<string | {value: string, label: string}> {
     return typeof(property?.['value']) === 'string';
 }
 function isNumberProperty(property: EditorProperty<any>): property is EditorSingleProperty<number> {
@@ -438,10 +440,19 @@ function renderProperty(property: EditorProperty<any> | HTMLElement | string): s
         if (isStringProperty(property)) {
             if (property.values) {
                 return `<span class="pp-property">${property.name} <select name="${property.id || property.name}">`
-                    + property.values.map(val => `
-                        <option ${val === property.value ? 'selected' : ''}>
-                            ${val}
-                        </option>`)
+                    + property.values.map(val => {
+                        let value: string, label: string;
+                        if (typeof val !== 'string') {
+                            value = val.value;
+                            label = val.label;
+                        } else {
+                            value = label = val;
+                        }
+                        return `
+                            <option ${value === property.value ? 'selected' : ''} value="${value}">
+                                ${label}
+                            </option>`
+                    })
                     + '</select></span>';
             }
             if (property.multiline) {

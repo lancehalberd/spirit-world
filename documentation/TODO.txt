@@ -46,13 +46,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    Editor Improvements
-        - New objects should be selected on creation.
-        - pressing Escape should unselect the selected object.
-        - rename delete tool to: Delete Tile
-        - fix import so that it imports to the corresponding zone instead of always overriding the current zone.
-
-
     - Spirit World Improvements
         - Sky is covered in cracked crystal ground that require cloud boots to walk on
             - Sky also drains spirit energy + cloud boots should require spirit energy to float

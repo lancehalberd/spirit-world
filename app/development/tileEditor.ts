@@ -496,7 +496,15 @@ function getFieldProperties(state: GameState, editingState: EditingState) {
     rows.push({
         name: 'tool',
         value: editingState.tool,
-        values: ['select', 'brush', 'delete', 'replace', 'object', 'enemy', 'boss'],
+        values: [
+            {value: 'select', label: 'Select Object'},
+            {value: 'brush', label: 'Tile Brush'},
+            {value: 'delete', label: 'Tile Eraser'},
+            {value: 'replace', label: 'Tile Replacer'},
+            {value: 'object', label: 'Object'},
+            {value: 'enemy', label: 'Enemy'},
+            {value: 'boss', label: 'Boss'}
+        ],
         onChange(tool: EditorToolType) {
             editingState.tool = tool;
             editingState.selectedObject = {
@@ -1292,6 +1300,9 @@ document.addEventListener('keydown', function(event: KeyboardEvent) {
             deleteObject(state, editingState.selectedObject);
             unselectObject(editingState);
         }
+    }
+    if (event.which === KEY.ESCAPE) {
+        delete editingState.selectedObject;
     }
 });
 

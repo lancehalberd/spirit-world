@@ -94,9 +94,10 @@ export function getZoneProperties(state: GameState, editingState: EditingState):
 
             navigator.clipboard.readText().then(contents => {
                 const state = getState();
-                state.location.zoneKey = importZone(contents);
+                state.location.zoneKey = importZone(contents, state.location.zoneKey);
                 state.location.floor = 0;
                 enterLocation(state, state.location);
+                displayTileEditorPropertyPanel();
             });
         },
     }, {
@@ -104,9 +105,10 @@ export function getZoneProperties(state: GameState, editingState: EditingState):
         onClick() {
             readFromFile().then(contents => {
                 const state = getState();
-                state.location.zoneKey = importZone(contents);
+                state.location.zoneKey = importZone(contents, state.location.zoneKey);
                 state.location.floor = 0;
                 enterLocation(state, state.location);
+                displayTileEditorPropertyPanel();
             });
         },
     }]);

@@ -173,10 +173,7 @@ window['serializeZone'] = serializeZone;
 
 
 // Importing a zone will override the zones hash entry for the zone.
-export function importZone(fileContents: string): string {
-    if (!window.confirm('Replace current area?')) {
-        return;
-    }
+export function importZone(fileContents: string, currentZoneKey: string): string {
     worldMap = null;
     // Remove all import lines.
     fileContents = fileContents.replace(/import.*\n/g, '');
@@ -186,6 +183,11 @@ export function importZone(fileContents: string): string {
     fileContents = fileContents.replace(/: [A-Z][a-zA-Z]+/g, '');
 
     const zoneKey = fileContents.match(/zones\.(\w+) = /)[1];
+    if (zoneKey === currentZoneKey) {
+        if (!window.confirm('Replace current area?')) {
+            return;
+        }
+    }
     // console.log(fileContents);
     fileContents = fileContents.replace(/zones\./, 'localZones.');
     const localZones = {};

@@ -16,6 +16,7 @@ import { signStyles } from 'app/content/objects/sign';
 import { getLootFrame } from 'app/content/objects/lootObject';
 import { zones } from 'app/content/zones';
 import { displayTileEditorPropertyPanel, editingState, EditingState } from 'app/development/tileEditor';
+import { isKeyboardKeyDown, KEY } from 'app/keyCommands';
 import { getState } from 'app/state';
 import { isPointInShortRect } from 'app/utils/index';
 
@@ -990,6 +991,11 @@ export function onMouseDownObject(state: GameState, editingState: EditingState, 
     newObject.y -= (frame.content?.h || frame.h) / 2;
     fixObjectPosition(state, newObject);
     updateObjectInstance(state, newObject, null, state.areaInstance, true);
+    if (!isKeyboardKeyDown(KEY.SHIFT)) {
+        editingState.selectedObject = newObject;
+        editingState.tool = 'select';
+        displayTileEditorPropertyPanel();
+    }
 }
 
 export function unselectObject(editingState: EditingState, refresh: boolean = true) {
