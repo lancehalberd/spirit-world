@@ -1,6 +1,12 @@
 import { flatten } from 'lodash';
 
-import { addObjectToArea, isObjectLogicValid, linkObject, removeObjectFromArea } from 'app/content/areas';
+import {
+    addObjectToArea,
+    findZoneTargets,
+    isObjectLogicValid,
+    linkObject,
+    removeObjectFromArea,
+} from 'app/content/areas';
 import { bossTypes } from 'app/content/bosses';
 import { dialogueHash } from 'app/content/dialogue';
 import { logicHash } from 'app/content/logic';
@@ -22,7 +28,8 @@ import { isPointInShortRect } from 'app/utils/index';
 
 import {
     AreaDefinition, AreaInstance, BallGoalDefinition,
-    BossType, CrystalSwitchDefinition, FloorSwitchDefinition, KeyBlockDefinition,
+    BossType, CrystalSwitchDefinition, EntranceDefinition,
+    FloorSwitchDefinition, KeyBlockDefinition,
     FrameDimensions, DecorationType, Direction, DrawPriority, EnemyType, GameState, LootObjectDefinition,
     LootType, MagicElement, NarrationDefinition, NPCBehavior, NPCStyle,
     ObjectDefinition, ObjectStatus, ObjectType, PanelRows,
@@ -611,6 +618,25 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                         updateObjectInstance(state, object);
                     },
                 });
+                if (object.id && object.targetObjectId && object.type !== 'pitEntrance') {
+                    rows.push({
+                        name: 'Link Back',
+                        onClick() {
+                            const objectTargets = findZoneTargets(
+                                state,
+                                object.targetZone,
+                                object.targetObjectId,
+                                object,
+                                false
+                            );
+                            for (const objectTarget of objectTargets) {
+                                const targetObject = objectTarget.object as EntranceDefinition;
+                                targetObject.targetZone = state.location.zoneKey;
+                                targetObject.targetObjectId = object.id;
+                            }
+                        },
+                    });
+                }
             } else {
                 rows.push(`No objects of type ${targetType}`);
             }

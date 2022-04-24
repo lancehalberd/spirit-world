@@ -46,8 +46,17 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Add button to link door target back to current target.
-        - Make sure this marks that zone as dirty.
+    Editor Improvements
+        - Split Panels up + add tabs
+            Zone top left
+            Progress/Inventory bottom left
+            Tool Palette top right (tiles, objects, enemies, bosses)
+                - Add graphical palette for objects/enemies/bosses
+            Context Properties bottom right (changes depending on editing state)
+        - Track which zones have been changed but not exported.
+        - Support undo/redo actions
+            - Include in context menu when editor is active
+
     - Spirit World Improvements
         - Sky is covered in cracked crystal ground that require cloud boots to walk on
             - Sky also drains spirit energy + cloud boots should require spirit energy to float

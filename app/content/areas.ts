@@ -352,6 +352,49 @@ export function findEntranceById(areaInstance: AreaInstance, id: string, skipped
     console.error('Missing target', id);
 }
 
+interface ObjectTarget {
+    object: ObjectDefinition
+    inSpiritWorld: boolean
+}
+
+export function findZoneTargets(
+    state: GameState,
+    zoneKey: string,
+    objectId: string,
+    skipObject: ObjectDefinition,
+    checkLogic: boolean
+): ObjectTarget[] {
+    const zone = zones[zoneKey];
+    if (!zone) {
+        console.error(`Missing zone: ${zoneKey}`);
+        return null;
+    }
+    const results: ObjectTarget[] = [];
+    for (let worldIndex = 0; worldIndex < 2; worldIndex++) {
+        for (let floor = 0; floor < zone.floors.length; floor++) {
+            // Search the corresponding spirit/material world before checking in the alternate world.
+            const areaGrids = state.areaInstance.definition.isSpiritWorld
+                ? [zone.floors[floor].spiritGrid, zone.floors[floor].grid]
+                : [zone.floors[floor].grid, zone.floors[floor].spiritGrid];
+            const areaGrid = areaGrids[worldIndex];
+            const inSpiritWorld = areaGrid === zone.floors[floor].spiritGrid;
+            for (let y = 0; y < areaGrid.length; y++) {
+                for (let x = 0; x < areaGrid[y].length; x++) {
+                    for (const object of (areaGrid[y][x]?.objects || [])) {
+                        if (object.id === objectId && object !== skipObject) {
+                            if (checkLogic && !isObjectLogicValid(state, object)) {
+                                continue;
+                            }
+                            results.push({ object, inSpiritWorld });
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return results;
+}
+
 export function enterZoneByTarget(
     state: GameState,
     zoneKey: string,
