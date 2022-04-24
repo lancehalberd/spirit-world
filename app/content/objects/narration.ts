@@ -1,16 +1,12 @@
 import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
-import { editingState } from 'app/development/tileEditor';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { setScript } from 'app/scriptEvents';
 import { readGetParameter, rectanglesOverlap } from 'app/utils/index';
-
 
 import {
     AreaInstance, GameState, NarrationDefinition,
     ObjectInstance, ObjectStatus, Rect,
 } from 'app/types';
-
-
 
 const seed = readGetParameter('seed');
 
@@ -25,6 +21,7 @@ export class Narration implements ObjectInstance {
     status: ObjectStatus = 'normal';
     trigger: NarrationDefinition['trigger'];
     time: number;
+    previewColor = 'yellow';
     constructor(state: GameState, definition: NarrationDefinition) {
         this.definition = definition;
         this.trigger = definition.trigger || 'touch';
@@ -77,13 +74,5 @@ export class Narration implements ObjectInstance {
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
-        if (editingState.isEditing) {
-            context.save();
-                context.globalAlpha *= 0.1;
-                context.fillStyle = 'yellow';
-                const hitbox = this.getHitbox(state);
-                context.fillRect(hitbox.x, hitbox.y, hitbox.w, hitbox.h);
-            context.restore();
-        }
     }
 }
