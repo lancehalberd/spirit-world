@@ -46,7 +46,7 @@ const [
     keyboard_u,
     keyboard_i,
     keyboard_o,
-] = createAnimation('gfx/hud/controllerbuttonswhite.png', {w: 26, h: 18, content: {x: 0, y: 1, w: 26, h: 16}}, {cols: 49}).frames;
+] = createAnimation('gfx/hud/controllerbuttonswhite.png', {w: 26, h: 18, content: {x: 0, y: 1, w: 26, h: 16}}, {cols: 50}).frames;
 
 const smallKeys = [
     xbox_y, xbox_b, xbox_a, xbox_x, xbox_start,
