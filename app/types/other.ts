@@ -133,15 +133,17 @@ export interface EditorButtonProperty {
 }
 
 export interface EditorSingleProperty<T> {
-    name: string,
-    id?: string,
-    multiline?: boolean,
+    name: string
+    id?: string
+    multiline?: boolean
+    // Will set the size attribute for any rendered select element.
+    selectSize?: number
     // A button property will have no value.
-    value?: T,
+    value?: T
     // If the property is an enum, you can set the list of all values.
-    values?: readonly T[],
+    values?: readonly T[]
     // If the property is editable, you can specify what happens when it is changed.
-    onChange?: (newValue: T) => (T | void),
+    onChange?: (newValue: T) => (T | void)
 }
 export type EditorProperty<T> = EditorArrayProperty<T>
     | EditorSingleProperty<T>

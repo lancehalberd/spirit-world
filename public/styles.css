@@ -31,11 +31,8 @@
     background-color: #EEE;
 }
 
-.left-container {
+.pp-container {
     position: absolute;
-    left: 0px;
-    top: 0;
-    bottom: 0px;
     width: 400px;
     padding: 4px;
     background-color: #EEE;
@@ -44,17 +41,19 @@
     overflow: auto;
 }
 
-.pp-container {
-    position: absolute;
-    right: 0px;
+.top-container {
     top: 0;
-    bottom: 0px;
-    width: 400px;
-    padding: 4px;
-    background-color: #EEE;
-    font-size: 16px;
-    font-family: arial;
-    overflow: auto;
+    height: 50vh;
+}
+.bottom-container {
+    bottom: 0;
+    height: 50vh;
+}
+.left-container {
+    left: 0px;
+}
+.right-container {
+    right: 0px;
 }
 
 .pp-row {
@@ -70,7 +69,8 @@
 }
 
 .pp-container select {
-    width: 120px;
+    min-width: 50px;
+    max-width: 120px;
 }
 .pp-container input[type="checkbox"] {
     margin: 0;
@@ -79,7 +79,7 @@
 .pp-container input[type="number"] {
     margin: 0;
     margin-left: 4px;
-    width: 4em;
+    width: 3em;
 }
 .pp-tag-container {
     border: 1px solid black;
@@ -102,4 +102,39 @@
 }
 .pp-tag:hover::after {
     color: red;
+}
+.tabContainer-content {
+    margin-top: -1px;
+    border-top: 1px solid black;
+    padding-top: 5px;
+}
+
+.tabContainer {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.tabContainer-tabs {
+    flex-grow: 0;
+    z-index: 1;
+}
+.tabContainer-content {
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.tabContainer-tab {
+    display: inline-block;
+    margin-right: 2px;
+    padding: 2px 4px;
+    border: 1px solid black;
+    background-color: #AAA;
+    cursor: pointer;
+}
+
+.tabContainer-tab.selected {
+    border-bottom-color: #EEE;
+    background-color: #EEE;
+    cursor: default;
 }

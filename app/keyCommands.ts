@@ -203,7 +203,7 @@ export function addKeyCommands() {
             event.preventDefault();
             return;
         }
-        if (event.which === KEY.A && commandIsDown) {
+        if (keyCode === KEY.A && commandIsDown) {
             selectSection();
             event.preventDefault();
             return;
@@ -217,7 +217,7 @@ export function addKeyCommands() {
             updateSoundSettings(state);
             saveSettings(state);
         }
-        if (keyCode === KEY.R && commandIsDown) {
+        if (keyCode === KEY.R && editingState.isEditing && keysDown[KEY.SHIFT]) {
             // Reset the entire zone if command is down.
             const state = getState();
             for (const floor of state.zone.floors) {
@@ -237,7 +237,7 @@ export function addKeyCommands() {
             state.location.y = state.hero.y;
             // Calling this will instantiate the area again and place the player back in their current location.
             enterLocation(state, state.location);
-        } else if (keysDown[KEY.SHIFT] && KEY.R) {
+        } else if ((keysDown[KEY.SHIFT] || editingState.isEditing) && keyCode === KEY.R) {
             // Reset the current screen as if you left and returned to it.
             const state = getState();
             state.location.x = state.hero.x;

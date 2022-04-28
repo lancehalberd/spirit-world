@@ -228,6 +228,7 @@ export function enterLocation(
         console.log('Invalid floor', state.location);
         return;
     }
+    state.floor = floor;
     state.areaGrid = location.isSpiritWorld ? floor.spiritGrid : floor.grid;
     state.location.areaGridCoords = {
         y: state.location.areaGridCoords.y % state.areaGrid.length,

@@ -12,38 +12,35 @@ import {
     PanelRows, PropertyRow, TileGridDefinition,
 } from 'app/types';
 
+const panelsByClass: {[key: string]: HTMLElement} = {};
+// We may need to split these by class and reset them when rendering properties again.
+const propertiesById: {[key: string]: EditorProperty<any>} = {};
 
-
-let leftPanelElement = null;
-export function displayLeftPanel(content: HTMLElement): void {
-    hideLeftPanel();
-    leftPanelElement = tagElement('div', 'left-container');
-    leftPanelElement.append(content);
-    document.body.append(leftPanelElement);
+export function displayPanel(h: 'left' | 'right', v: 'top' | 'bottom',content?: HTMLElement): HTMLElement {
+    const panelClass = `pp-container ${h}-container ${v}-container`;
+    hidePropertyPanel(panelClass);
+    const newPanel = tagElement('div', panelClass);
+    if (content) {
+        newPanel.append(content);
+    }
+    panelsByClass[panelClass] = newPanel;
+    document.body.append(newPanel);
+    return newPanel;
 }
-export function hideLeftPanel() {
-    if (!leftPanelElement) return;
-    const temp = leftPanelElement;
-    leftPanelElement = null;
-    temp.remove();
+
+export function displayPropertyPanel(properties: PanelRows, h: 'left' | 'right', v: 'top' | 'bottom'): void {
+    renderPropertyRows(displayPanel(h, v), properties);
 }
 
-let propertyPanelElement = null;
-let propertiesById: {[key: string]: EditorProperty<any>} = {};
-
-
-export function displayPropertyPanel(properties: PanelRows): void {
-    hidePropertyPanel();
-    propertiesById = {};
-    propertyPanelElement = tagElement('div', 'pp-container');
+export function renderPropertyRows(container: HTMLElement, properties: PanelRows): void {
     for (const property of properties) {
         if (Array.isArray(property)) {
-            propertyPanelElement.append(renderPropertyRow(property));
+            container.append(renderPropertyRow(property));
         } else {
-            propertyPanelElement.append(renderPropertyRow([property]));
+            container.append(renderPropertyRow([property]));
         }
     }
-    propertyPanelElement.addEventListener('change', (event: InputEvent) => {
+    container.addEventListener('change', (event: InputEvent) => {
         const input = (event.target as HTMLElement).closest('input')
             || (event.target as HTMLElement).closest('textarea')
             || (event.target as HTMLElement).closest('select');
@@ -78,7 +75,7 @@ export function displayPropertyPanel(properties: PanelRows): void {
         }
         input.blur();
     });
-    propertyPanelElement.addEventListener('click', (event: InputEvent) => {
+    container.addEventListener('click', (event: InputEvent) => {
         const button = (event.target as HTMLElement).closest('button');
         if (button) {
             const property = propertiesById[button.name];
@@ -100,17 +97,20 @@ export function displayPropertyPanel(properties: PanelRows): void {
             }
         }
     });
-    document.body.append(propertyPanelElement);
 }
 
-export function hidePropertyPanel() {
-    if (propertyPanelElement) {
-        const temp = propertyPanelElement;
-        // Set this to null before removing, otherwise if there is an on blur handle that also
-        // triggers hidePropertyPanel, it will try to remove the element twice.
-        propertyPanelElement = null;
-        temp.remove();
+export function hideAllPropertyPanels() {
+    Object.keys(panelsByClass).forEach(hidePropertyPanel);
+}
+export function hidePropertyPanel(panelClass: string) {
+    const panel = panelsByClass[panelClass];
+    if (!panel) {
+        return;
     }
+    // Set this to null before removing, otherwise if there is an on blur handle that also
+    // triggers hidePropertyPanel, it will try to remove the element twice.
+    delete panelsByClass[panelClass];
+    panel.remove();
 }
 
 function renderPropertyRow(row: PropertyRow): HTMLElement {
@@ -439,7 +439,8 @@ function renderProperty(property: EditorProperty<any> | HTMLElement | string): s
         propertiesById[property.id || property.name] = property;
         if (isStringProperty(property)) {
             if (property.values) {
-                return `<span class="pp-property">${property.name} <select name="${property.id || property.name}">`
+                return `<span class="pp-property">${property.name}
+                    <select name="${property.id || property.name}" size="${property.selectSize || 1}">`
                     + property.values.map(val => {
                         let value: string, label: string;
                         if (typeof val !== 'string') {
@@ -461,7 +462,8 @@ function renderProperty(property: EditorProperty<any> | HTMLElement | string): s
             return `<span class="pp-property">${property.name} <input value="${property.value}" name="${property.id || property.name}" /></span>`;
         } else if (isNumberProperty(property)) {
             if (property.values) {
-                return `<span class="pp-property">${property.name} <select name="${property.id || property.name}">`
+                return `<span class="pp-property">${property.name}
+                    <select name="${property.id || property.name}" size="${property.selectSize || 1}">`
                     + property.values.map(val => `
                         <option ${val === property.value ? 'selected' : ''}>
                             ${val}

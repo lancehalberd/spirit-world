@@ -5,7 +5,9 @@ import { logicHash } from 'app/content/logic';
 import { specialBehaviorsHash } from 'app/content/specialBehaviors';
 import { zones } from 'app/content/zones';
 import { exportZoneToClipboard, importZone, serializeZone } from 'app/development/exportZone';
-import { displayTileEditorPropertyPanel, EditingState } from 'app/development/tileEditor';
+import { TabContainer } from 'app/development/tabContainer';
+import { renderPropertyRows } from 'app/development/propertyPanel';
+import { displayTileEditorPropertyPanel, editingState, EditingState } from 'app/development/tileEditor';
 import { createCanvasAndContext } from 'app/dom';
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
 import { getState } from 'app/state';
@@ -37,6 +39,41 @@ const sectionLayouts = {
 
 const [mapCanvas, mapContext] = createCanvasAndContext(128, 128);
 
+const zoneTabContainer = new TabContainer('zone', [
+    {
+        key: 'zone',
+        render(container: HTMLElement) {
+            renderPropertyRows(container, getZoneProperties());
+        },
+        refresh(container: HTMLElement) {
+            this.render(container);
+        },
+    },
+    {
+        key: 'behaviors',
+        render(container: HTMLElement) {
+            renderPropertyRows(container, getBehaviorProperties());
+        },
+        refresh(container: HTMLElement) {
+            this.render(container);
+        },
+    },
+    {
+        key: 'import/export',
+        render(container: HTMLElement) {
+            renderPropertyRows(container, getImportExportProperties());
+        },
+        refresh(container: HTMLElement) {
+            this.render(container);
+        },
+    },
+]);
+
+export function renderZoneTabContainer(): HTMLElement {
+    zoneTabContainer.render();
+    return zoneTabContainer.element;
+}
+
 export function renderZoneEditor(context: CanvasRenderingContext2D, state: GameState, editingState: EditingState): void {
     const width = state.areaGrid[0].length * 32;
     const height = state.areaGrid.length * 32;
@@ -65,18 +102,8 @@ export function renderZoneEditor(context: CanvasRenderingContext2D, state: GameS
     mapContext.fillRect(cameraX, cameraY, CANVAS_WIDTH / 16, CANVAS_HEIGHT / 16);
 }
 
-export function getZoneProperties(state: GameState, editingState: EditingState): PanelRows {
+export function getImportExportProperties(): PanelRows {
     let rows: PanelRows = [];
-    rows.push({
-        name: editingState.showZoneProperties ? 'Zone -' : 'Zone +',
-        onClick() {
-            editingState.showZoneProperties = !editingState.showZoneProperties;
-            displayTileEditorPropertyPanel();
-        },
-    });
-    if (!editingState.showZoneProperties) {
-        return rows;
-    }
     rows.push([{
         name: 'Export to Clipboard',
         onClick() {
@@ -91,7 +118,6 @@ export function getZoneProperties(state: GameState, editingState: EditingState):
     rows.push([{
         name: 'Import from Clipboard',
         onClick() {
-
             navigator.clipboard.readText().then(contents => {
                 const state = getState();
                 state.location.zoneKey = importZone(contents, state.location.zoneKey);
@@ -112,153 +138,14 @@ export function getZoneProperties(state: GameState, editingState: EditingState):
             });
         },
     }]);
+    return rows;
+}
 
-    rows.push([{
-        name: 'zone',
-        value: state.location.zoneKey,
-        values: Object.keys(zones),
-        onChange(zoneKey: string) {
-            if (state.location.zoneKey !== zoneKey) {
-                state.location.zoneKey = zoneKey;
-                state.location.floor = 0;
-                enterLocation(state, state.location);
-                displayTileEditorPropertyPanel();
-            }
-        }
-    }, {
-        name: '+',
-        id: `add-new-zone`,
-        onClick() {
-            const newZoneKey = window.prompt('Enter the new zone key');
-            if (!newZoneKey || zones[newZoneKey]) {
-                return;
-            }
-            const zone: Zone = {
-                key: newZoneKey,
-                floors: [
-                    {
-                        grid: [[null]],
-                        spiritGrid: [[null]],
-                    },
-                ],
-            };
-            zones[newZoneKey] = zone;
-            state.location.zoneKey = zone.key;
-            state.location.floor = 0;
-            enterLocation(state, state.location);
-            displayTileEditorPropertyPanel();
-        },
-    }]);
 
-    const floor = state.location.floor;
-    rows.push([{
-        name: 'floor',
-        value: '' + (floor + 1),
-        values: ([...new Array(state.zone.floors.length)].map((v, i) => '' + (i + 1))),
-        onChange(floorString: string) {
-            const floorNumber = parseInt(floorString, 10) - 1;
-            if (state.location.floor !== floorNumber) {
-                state.location.floor = floorNumber;
-                enterLocation(state, state.location);
-                displayTileEditorPropertyPanel();
-            }
-        }
-    }, {
-        name: '+',
-        id: `add-zone-floor`,
-        onClick() {
-            const floor: Floor = {
-                grid: [],
-                spiritGrid: [],
-            };
-            for (let i = 0; i < state.areaGrid.length; i++) {
-                floor.grid[i] = [];
-                floor.spiritGrid[i] = [];
-                for (let j = 0; j < state.areaGrid[i].length; j++) {
-                    floor.grid[i][j] = null;
-                    floor.spiritGrid[i][j] = null;
-                }
-            }
-            state.zone.floors.push(floor);
-            state.location.floor = state.zone.floors.length - 1;
-            enterLocation(state, state.location);
-            displayTileEditorPropertyPanel();
-        },
-    }]);
-
+export function getBehaviorProperties(): PanelRows {
+    const state = getState();
+    let rows: PanelRows = [];
     rows.push(mapCanvas);
-
-    rows.push(['Size', {
-        name: '',
-        id: `floor-columns`,
-        value: state.areaGrid[0].length,
-        onChange(columns: number) {
-            if (columns < 1) {
-                return state.areaGrid[0].length;
-            }
-            if (columns !== state.areaGrid[0].length) {
-                for (let i = 0; i < state.areaGrid.length; i++) {
-                    while (state.areaGrid[i].length < columns) {
-                        state.areaGrid[i].push(null);
-                    }
-                    while (state.areaGrid[i].length > columns) {
-                        state.areaGrid[i].pop();
-                    }
-                }
-                enterLocation(state, state.location);
-                displayTileEditorPropertyPanel();
-            }
-        }
-    }, 'x', {
-        name: '',
-        id: `floor-rows`,
-        value: state.areaGrid.length,
-        onChange(rows: number) {
-            if (rows < 1) {
-                return state.areaGrid.length;
-            }
-            if (rows !== state.areaGrid.length) {
-                while (state.areaGrid.length < rows) {
-                    state.areaGrid.push([...new Array(state.areaGrid[0].length)].map(() => null));
-                }
-                while (state.areaGrid.length > rows) {
-                    state.areaGrid.pop();
-                }
-                enterLocation(state, state.location);
-                displayTileEditorPropertyPanel();
-            }
-        }
-    }]);
-
-
-    rows.push({
-        name: 'sections',
-        value: 'Change Layout',
-        values: ['Change Layout', ...Object.keys(sectionLayouts)],
-        onChange(sectionType: string) {
-            state.areaInstance.definition.sections = sectionLayouts[sectionType];
-            state.areaSection = null;
-            setAreaSection(state, state.hero.d);
-            return 'Change Layout';
-        }
-    });
-    rows.push({
-        name: 'Spirit World',
-        value: !!state.location.isSpiritWorld,
-        onChange(isSpiritWorld: boolean) {
-            if (state.location.isSpiritWorld != isSpiritWorld) {
-                state.location.isSpiritWorld = isSpiritWorld;
-                editingState.spirit = isSpiritWorld;
-                const tempInstance = state.areaInstance;
-                state.areaInstance = state.alternateAreaInstance;
-                state.alternateAreaInstance = tempInstance;
-                state.hero.area = state.areaInstance;
-                setConnectedAreas(state, tempInstance);
-                //enterLocation(state, state.location);
-                displayTileEditorPropertyPanel();
-            }
-        }
-    });
     const specialBehaviorKeys = Object.keys(specialBehaviorsHash).filter(
         key => specialBehaviorsHash[key].type === 'area'
     );
@@ -329,8 +216,7 @@ export function getZoneProperties(state: GameState, editingState: EditingState):
             }
         }
     });
-    rows.push('Is Hot?');
-    rows = [...rows, ...getLogicProperties(state, state.areaInstance.definition.hotLogic || {}, updatedLogic => {
+    rows = [...rows, ...getLogicProperties(state, 'Is Hot?', state.areaInstance.definition.hotLogic || {}, updatedLogic => {
         state.areaInstance.definition.hotLogic = updatedLogic;
         enterLocation(state, state.location);
         displayTileEditorPropertyPanel();
@@ -347,8 +233,172 @@ export function getZoneProperties(state: GameState, editingState: EditingState):
     return rows;
 }
 
+export function getZoneProperties(): PanelRows {
+    const state = getState();
+    let rows: PanelRows = [];
+    const floor = state.location.floor;
+    rows.push([{
+        name: 'zone',
+        value: state.location.zoneKey,
+        values: Object.keys(zones),
+        onChange(zoneKey: string) {
+            if (state.location.zoneKey !== zoneKey) {
+                state.location.zoneKey = zoneKey;
+                state.location.floor = 0;
+                enterLocation(state, state.location);
+                displayTileEditorPropertyPanel();
+            }
+        }
+    }, {
+        name: '+',
+        id: `add-new-zone`,
+        onClick() {
+            const newZoneKey = window.prompt('Enter the new zone key');
+            if (!newZoneKey || zones[newZoneKey]) {
+                return;
+            }
+            const zone: Zone = {
+                key: newZoneKey,
+                floors: [
+                    {
+                        grid: [[null]],
+                        spiritGrid: [[null]],
+                    },
+                ],
+            };
+            zones[newZoneKey] = zone;
+            state.location.zoneKey = zone.key;
+            state.location.floor = 0;
+            enterLocation(state, state.location);
+            displayTileEditorPropertyPanel();
+        },
+    },
+    {
+        name: 'floor',
+        value: '' + (floor + 1),
+        values: ([...new Array(state.zone.floors.length)].map((v, i) => '' + (i + 1))),
+        onChange(floorString: string) {
+            const floorNumber = parseInt(floorString, 10) - 1;
+            if (state.location.floor !== floorNumber) {
+                state.location.floor = floorNumber;
+                enterLocation(state, state.location);
+                displayTileEditorPropertyPanel();
+            }
+        }
+    }, {
+        name: '+',
+        id: `add-zone-floor`,
+        onClick() {
+            const floor: Floor = {
+                grid: [],
+                spiritGrid: [],
+            };
+            for (let i = 0; i < state.areaGrid.length; i++) {
+                floor.grid[i] = [];
+                floor.spiritGrid[i] = [];
+                for (let j = 0; j < state.areaGrid[i].length; j++) {
+                    floor.grid[i][j] = null;
+                    floor.spiritGrid[i][j] = null;
+                }
+            }
+            state.zone.floors.push(floor);
+            state.location.floor = state.zone.floors.length - 1;
+            enterLocation(state, state.location);
+            displayTileEditorPropertyPanel();
+        },
+    }]);
+    rows.push({
+        name: 'Spirit World',
+        value: !!state.location.isSpiritWorld,
+        onChange(isSpiritWorld: boolean) {
+            if (state.location.isSpiritWorld != isSpiritWorld) {
+                state.location.isSpiritWorld = isSpiritWorld;
+                editingState.spirit = isSpiritWorld;
+                const tempInstance = state.areaInstance;
+                state.areaInstance = state.alternateAreaInstance;
+                state.alternateAreaInstance = tempInstance;
+                state.hero.area = state.areaInstance;
+                setConnectedAreas(state, tempInstance);
+                //enterLocation(state, state.location);
+                displayTileEditorPropertyPanel();
+            }
+        }
+    });
+    rows.push(mapCanvas);
+
+    rows.push(['Size', {
+        name: '',
+        id: `floor-columns`,
+        value: state.areaGrid[0].length,
+        onChange(columns: number) {
+            if (columns < 1) {
+                return state.areaGrid[0].length;
+            }
+            if (columns !== state.areaGrid[0].length) {
+                for (const grid of [state.floor.grid, state.floor.spiritGrid]) {
+                    for (let i = 0; i < grid.length; i++) {
+                        while (grid[i].length < columns) {
+                            grid[i].push(null);
+                        }
+                        while (grid[i].length > columns) {
+                            grid[i].pop();
+                        }
+                    }
+                }
+                enterLocation(state, state.location);
+                displayTileEditorPropertyPanel();
+            }
+        }
+    }, 'x', {
+        name: '',
+        id: `floor-rows`,
+        value: state.areaGrid.length,
+        onChange(rows: number) {
+            if (rows < 1) {
+                return state.areaGrid.length;
+            }
+            if (rows !== state.areaGrid.length) {
+                for (const grid of [state.floor.grid, state.floor.spiritGrid]) {
+                    for (let i = 0; i < grid.length; i++) {
+                        while (grid.length < rows) {
+                            grid.push([...new Array(grid[0].length)].map(() => null));
+                        }
+                        while (grid.length > rows) {
+                            grid.pop();
+                        }
+                    }
+                }
+                enterLocation(state, state.location);
+                displayTileEditorPropertyPanel();
+            }
+        }
+    }]);
+    rows.push({
+        name: 'sections',
+        value: 'Change Layout',
+        values: ['Change Layout', ...Object.keys(sectionLayouts)],
+        onChange(sectionType: string) {
+            state.areaInstance.definition.sections = sectionLayouts[sectionType];
+            state.areaSection = null;
+            setAreaSection(state, state.hero.d);
+            return 'Change Layout';
+        }
+    });
+    rows.push({
+        name: 'Refresh Area',
+        onClick() {
+            state.location.x = state.hero.x;
+            state.location.y = state.hero.y;
+            // Calling this will instantiate the area again and place the player back in their current location.
+            enterLocation(state, state.location);
+        }
+    });
+    return rows;
+}
+
 export function getLogicProperties(
     state: GameState,
+    label: string,
     logic: LogicDefinition,
     updateLogic: (newLogic?: LogicDefinition) => void
 ): PanelRows {
@@ -387,6 +437,9 @@ export function getLogicProperties(
             }
         }
     }];
+    if (label) {
+        row.unshift(label);
+    }
     if (currentValue === 'custom') {
         row.push({
             name: 'Flag',

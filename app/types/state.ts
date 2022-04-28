@@ -2,7 +2,7 @@ import { Staff } from 'app/content/objects/staff';
 
 import {
     ActiveScriptEvent, AreaGrid, AreaInstance,
-    Frame, Hero, LootData, SavedHeroData, Rect, ScriptEvent,
+    Frame, Floor, Hero, LootData, SavedHeroData, Rect, ScriptEvent,
     Zone, ZoneLocation,
 } from 'app/types';
 
@@ -79,6 +79,7 @@ export interface GameState {
     nextAreaInstance?: AreaInstance
     nextAreaSection?: Rect
     zone: Zone
+    floor: Floor
     areaGrid: AreaGrid
     location: ZoneLocation
     transitionState?: {

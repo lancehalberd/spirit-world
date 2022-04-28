@@ -131,7 +131,7 @@ export function createObjectDefinition(
             return {
                 ...commonProps,
                 type: definition.type,
-                style: definition.style || Object.keys(doorStyles)[0],
+                style: definition.style || 'cave', //Object.keys(doorStyles)[0],
                 targetZone: definition.targetZone,
                 targetObjectId: definition.targetObjectId,
                 d: definition.d || 'up',
@@ -396,6 +396,57 @@ function getPossibleStatuses(type: ObjectType): ObjectStatus[] {
 
 }
 
+export function getObjectTypeProperties(): PanelRows {
+    const state = getState();
+    const object: ObjectDefinition = editingState.selectedObject;
+    if (editingState.tool === 'select') {
+        const selectedObject = state.areaInstance.definition.objects.includes(editingState.selectedObject)
+        if (!selectedObject) {
+            return ['Click an object to select it.'];
+        }
+    }
+    if (object.type === 'enemy') {
+        return [{
+            name: 'type',
+            value: object.enemyType,
+            values: enemyTypes,
+            selectSize: 10,
+            onChange(enemyType: EnemyType) {
+                object.enemyType = enemyType;
+                updateObjectInstance(state, object);
+                // We need to refresh the panel to get enemy specific properties.
+                displayTileEditorPropertyPanel();
+            },
+        }];
+    }
+    if (object.type === 'boss') {
+        return [{
+            name: 'type',
+            value: object.enemyType as BossType,
+            values: bossTypes,
+            selectSize: 10,
+            onChange(bossType: BossType) {
+                object.enemyType = bossType;
+                updateObjectInstance(state, object);
+                // We need to refresh the panel to get boss specific properties.
+                displayTileEditorPropertyPanel();
+            },
+        }];
+    }
+    return [{
+        name: 'type',
+        value: object.type,
+        values: combinedObjectTypes,
+        selectSize: 10,
+        onChange(objectType: ObjectType) {
+            object.type = objectType as any;
+            editingState.selectedObject = createObjectDefinition(state, editingState, object);
+            updateObjectInstance(state, editingState.selectedObject, object);
+            displayTileEditorPropertyPanel();
+        },
+    }];
+}
+
 export function getObjectProperties(state: GameState, editingState: EditingState): PanelRows {
     let rows: PanelRows = [];
 
@@ -415,19 +466,6 @@ export function getObjectProperties(state: GameState, editingState: EditingState
     }
     if (editingState.tool === 'select' && !selectedObject) {
         return rows;
-    }
-    if (object.type !== 'enemy' && object.type !== 'boss') {
-        rows.push({
-            name: 'type',
-            value: object.type,
-            values: combinedObjectTypes,
-            onChange(objectType: ObjectType) {
-                object.type = objectType as any;
-                editingState.selectedObject = createObjectDefinition(state, editingState, object);
-                updateObjectInstance(state, editingState.selectedObject, object);
-                displayTileEditorPropertyPanel();
-            },
-        });
     }
     rows.push([{
         name: 'spirit',
@@ -717,31 +755,9 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             rows = [...rows, ...getSwitchTargetProperties(state, editingState, object)];
             break;
         case 'enemy':
-            rows.push({
-                name: 'type',
-                value: object.enemyType,
-                values: enemyTypes,
-                onChange(enemyType: EnemyType) {
-                    object.enemyType = enemyType;
-                    updateObjectInstance(state, object);
-                    // We need to refresh the panel to get enemy specific properties.
-                    displayTileEditorPropertyPanel();
-                },
-            });
             rows = [...rows, ...getEnemyFields(state, editingState, object)];
             break;
         case 'boss':
-            rows.push({
-                name: 'type',
-                value: object.enemyType as BossType,
-                values: bossTypes,
-                onChange(bossType: BossType) {
-                    object.enemyType = bossType;
-                    updateObjectInstance(state, object);
-                    // We need to refresh the panel to get boss specific properties.
-                    displayTileEditorPropertyPanel();
-                },
-            });
             rows = [...rows, ...getEnemyFields(state, editingState, object)];
             rows = [...rows, ...getLootFields(state, editingState, object)];
             break;
@@ -941,7 +957,12 @@ function getStyleFields(state: GameState, editingState: EditingState, object: Ob
     }
 
     if (!styles[object.style]) {
-        object.style = Object.keys(styles)[0];
+        // Keep this default until we remove all the old cave doors.
+        if (object.type === 'door') {
+            object.style = 'cave';
+        } else {
+            object.style = Object.keys(styles)[0];
+        }
     }
     rows.push({
         name: 'style',

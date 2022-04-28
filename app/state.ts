@@ -306,6 +306,7 @@ export function getDefaultState(): GameState {
         location: SPAWN_LOCATION_FULL,
         zone: zones.peachCave,
         areaGrid: zones.peachCave.floors[0].grid,
+        floor: zones.peachCave.floors[0],
         paused: false,
         menuIndex: 0,
         menuRow: 0,
@@ -364,13 +365,6 @@ export function returnToSpawnLocation(state: GameState) {
     state.hero.vx = 0;
     state.hero.vy = 0;
     state.hero.vz = 0;
-    /*state.location = {
-        ...state.hero.spawnLocation,
-        areaGridCoords: {...state.hero.spawnLocation.areaGridCoords},
-        z: 0,
-    };
-    state.zone = zones[state.location.zoneKey];
-    state.areaGrid = state.zone.floors[state.location.floor].grid;*/
     state.hero.d = state.hero.spawnLocation.d;
     enterLocation(state, state.hero.spawnLocation, true, null, true);
     state.fadeLevel = (state.areaInstance.dark || 0) / 100;
