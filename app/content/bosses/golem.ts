@@ -338,12 +338,28 @@ enemyDefinitions.golemHand = {
         if (enemy.mode === 'appearing') {
             const frame = enemy.getFrame();
             const h = Math.floor(frame.h * enemy.modeTime / 1000);
-            drawFrame(context, {...frame, h}, { ...frame,
-                x: enemy.x - (frame?.content?.x || 0) * enemy.scale,
-                y: enemy.y - (frame?.content?.y || 0) * enemy.scale - enemy.z + (frame.h - h) * enemy.scale,
-                w: frame.w * enemy.scale,
-                h: h * enemy.scale,
-            });
+            if (enemy.d === 'right' && enemy.enemyDefinition.flipRight) {
+                // Flip the frame when facing right. We may need an additional flag for this behavior
+                // if we don't do it for all enemies on the right frames.
+                const w = frame.content?.w ?? frame.w;
+                context.save();
+                    context.translate((enemy.x | 0) + (w / 2) * enemy.scale, 0);
+                    context.scale(-1, 1);
+                    drawFrame(context, {...frame, h}, { ...frame,
+                        x: - (w / 2 + frame.content?.x || 0) * enemy.scale,
+                        y: enemy.y - (frame?.content?.y || 0) * enemy.scale - enemy.z + (frame.h - h) * enemy.scale,
+                        w: frame.w * enemy.scale,
+                        h: h * enemy.scale,
+                    });
+                context.restore();
+            } else {
+                drawFrame(context, {...frame, h}, { ...frame,
+                    x: enemy.x - (frame?.content?.x || 0) * enemy.scale,
+                    y: enemy.y - (frame?.content?.y || 0) * enemy.scale - enemy.z + (frame.h - h) * enemy.scale,
+                    w: frame.w * enemy.scale,
+                    h: h * enemy.scale,
+                });
+            }
         } else {
             enemy.defaultRender(context, state);
         }
@@ -671,7 +687,7 @@ function updateGolemHand(this: void, state: GameState, enemy: Enemy): void {
     }
     // The thumb is on the left and should face towards the middle so the hand on
     // the left side of the face (in global coordinates) needs to be reflected, which means
-    // we need it to face 'right' because the 'right' flame is reflected by the engine.
+    // we need it to face 'right' because the 'right' frame is reflected by the engine.
     enemy.d = enemy.params.side === 'left' ? 'right' : 'left';
     // Currently hands without golems are not supported.
     // Don't do anything until the golem finishes warming up.

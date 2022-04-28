@@ -46,9 +46,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    Bug Fix:
-        - Golems hands aren't set to left/right while reviving.
-
     Editor Improvements
         - Add graphical palettes
             - Objects

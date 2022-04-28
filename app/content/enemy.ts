@@ -467,10 +467,6 @@ export class Enemy implements Actor, ObjectInstance {
                 // Flip the frame when facing right. We may need an additional flag for this behavior
                 // if we don't do it for all enemies on the right frames.
                 const w = frame.content?.w ?? frame.w;
-                if (this.definition.enemyType === 'golemHand') {
-                    //console.log(frame, frame.content, w);
-                    //console.log(this.x, frame?.content?.x, w / 2, this.scale);
-                }
                 context.translate((this.x | 0) + (w / 2) * this.scale, 0);
                 context.scale(-1, 1);
                 drawFrame(context, frame, { ...frame,
