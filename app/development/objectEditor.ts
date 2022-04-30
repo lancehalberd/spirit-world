@@ -21,7 +21,10 @@ import { npcBehaviors, npcStyles } from 'app/content/objects/npc';
 import { signStyles } from 'app/content/objects/sign';
 import { getLootFrame } from 'app/content/objects/lootObject';
 import { zones } from 'app/content/zones';
-import { displayTileEditorPropertyPanel, editingState, EditingState } from 'app/development/tileEditor';
+import {
+    displayTileEditorPropertyPanel, editingState,
+    EditingState, setEditingTool,
+} from 'app/development/tileEditor';
 import { isKeyboardKeyDown, KEY } from 'app/keyCommands';
 import { getState } from 'app/state';
 import { isPointInShortRect } from 'app/utils/index';
@@ -36,6 +39,58 @@ import {
     Rect, SpecialAreaBehavior,
     Zone, ZoneLocation,
 } from 'app/types';
+
+export function getObjectTypeProperties(): PanelRows {
+    const state = getState();
+    const object: ObjectDefinition = editingState.selectedObject;
+    if (editingState.tool === 'select') {
+        const selectedObject = state.areaInstance.definition.objects.includes(editingState.selectedObject)
+        if (!selectedObject) {
+            return ['Click an object to select it.'];
+        }
+    }
+    if (object.type === 'enemy') {
+        return [{
+            name: 'type',
+            value: object.enemyType,
+            values: enemyTypes,
+            selectSize: 10,
+            onChange(enemyType: EnemyType) {
+                object.enemyType = enemyType;
+                updateObjectInstance(state, object);
+                // We need to refresh the panel to get enemy specific properties.
+                displayTileEditorPropertyPanel();
+            },
+        }];
+    }
+    if (object.type === 'boss') {
+        return [{
+            name: 'type',
+            value: object.enemyType as BossType,
+            values: bossTypes,
+            selectSize: 10,
+            onChange(bossType: BossType) {
+                object.enemyType = bossType;
+                updateObjectInstance(state, object);
+                // We need to refresh the panel to get boss specific properties.
+                displayTileEditorPropertyPanel();
+            },
+        }];
+    }
+    return [{
+        name: 'type',
+        value: object.type,
+        values: combinedObjectTypes,
+        selectSize: 10,
+        onChange(objectType: ObjectType) {
+            object.type = objectType as any;
+            editingState.selectedObject = createObjectDefinition(state, editingState, object);
+            updateObjectInstance(state, editingState.selectedObject, object);
+            displayTileEditorPropertyPanel();
+        },
+    }];
+}
+
 
 let allLootTypes: LootType[];
 export function getLootTypes(): LootType[] {
@@ -396,57 +451,6 @@ function getPossibleStatuses(type: ObjectType): ObjectStatus[] {
 
 }
 
-export function getObjectTypeProperties(): PanelRows {
-    const state = getState();
-    const object: ObjectDefinition = editingState.selectedObject;
-    if (editingState.tool === 'select') {
-        const selectedObject = state.areaInstance.definition.objects.includes(editingState.selectedObject)
-        if (!selectedObject) {
-            return ['Click an object to select it.'];
-        }
-    }
-    if (object.type === 'enemy') {
-        return [{
-            name: 'type',
-            value: object.enemyType,
-            values: enemyTypes,
-            selectSize: 10,
-            onChange(enemyType: EnemyType) {
-                object.enemyType = enemyType;
-                updateObjectInstance(state, object);
-                // We need to refresh the panel to get enemy specific properties.
-                displayTileEditorPropertyPanel();
-            },
-        }];
-    }
-    if (object.type === 'boss') {
-        return [{
-            name: 'type',
-            value: object.enemyType as BossType,
-            values: bossTypes,
-            selectSize: 10,
-            onChange(bossType: BossType) {
-                object.enemyType = bossType;
-                updateObjectInstance(state, object);
-                // We need to refresh the panel to get boss specific properties.
-                displayTileEditorPropertyPanel();
-            },
-        }];
-    }
-    return [{
-        name: 'type',
-        value: object.type,
-        values: combinedObjectTypes,
-        selectSize: 10,
-        onChange(objectType: ObjectType) {
-            object.type = objectType as any;
-            editingState.selectedObject = createObjectDefinition(state, editingState, object);
-            updateObjectInstance(state, editingState.selectedObject, object);
-            displayTileEditorPropertyPanel();
-        },
-    }];
-}
-
 export function getObjectProperties(state: GameState, editingState: EditingState): PanelRows {
     let rows: PanelRows = [];
 
@@ -704,6 +708,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             rows.push({
                 name: 'onInterval',
                 value: object.onInterval || 0,
+                inputClass: 'large',
                 onChange(onInterval: number) {
                     object.onInterval = onInterval;
                     updateObjectInstance(state, object);
@@ -712,6 +717,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             rows.push({
                 name: 'offInterval',
                 value: object.offInterval || 0,
+                inputClass: 'large',
                 onChange(offInterval: number) {
                     object.offInterval = offInterval;
                     updateObjectInstance(state, object);
@@ -811,6 +817,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             rows.push({
                 name: 'delay',
                 value: object.delay || 0,
+                inputClass: 'large',
                 onChange(delay: number) {
                     object.delay = delay;
                     updateObjectInstance(state, object);
@@ -1039,9 +1046,8 @@ export function onMouseDownObject(state: GameState, editingState: EditingState, 
     fixObjectPosition(state, newObject);
     updateObjectInstance(state, newObject, null, state.areaInstance, true);
     if (!isKeyboardKeyDown(KEY.SHIFT)) {
+        setEditingTool('select');
         editingState.selectedObject = newObject;
-        editingState.tool = 'select';
-        displayTileEditorPropertyPanel();
     }
 }
 

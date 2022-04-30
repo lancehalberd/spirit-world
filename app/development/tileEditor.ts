@@ -53,6 +53,7 @@ import {
 type EditorToolType = 'brush' | 'delete' | 'object' | 'enemy' | 'boss' | 'replace' | 'select';
 export interface EditingState {
     tool: EditorToolType
+    previousTool: EditorToolType
     hasChanges: boolean
     isEditing: boolean
     brush?: {[key: string]: TileGridDefinition}
@@ -68,6 +69,7 @@ export interface EditingState {
 
 export const editingState: EditingState = {
     tool: 'select',
+    previousTool: 'select',
     hasChanges: false,
     isEditing: false,
     paletteKey: Object.keys(palettes)[0],
@@ -157,6 +159,7 @@ const toolTabContainer = new TabContainer<EditorToolType>('select', [
         },
     }
 ], (selectedKey) => {
+    editingState.previousTool = editingState.tool;
     editingState.tool = selectedKey;
     editingState.selectedObject = {
         ...editingState.selectedObject,
@@ -168,6 +171,10 @@ const toolTabContainer = new TabContainer<EditorToolType>('select', [
     // Refresh the context panel when the selected tool changes.
     displayContextPanel(getState());
 });
+
+export function setEditingTool(toolType: EditorToolType) {
+    toolTabContainer.showTab(toolType);
+}
 
 export function renderToolTabContainer(): HTMLElement {
     toolTabContainer.render();
@@ -378,8 +385,7 @@ function getBrushPaletteProperties(): PanelRows {
                 editingState.brush = {'none': tiles};
                 updateBrushCanvas(editingState.brush);
                 if (editingState.tool !== 'brush' && editingState.tool !== 'replace') {
-                    editingState.tool = 'brush';
-                    displayTileEditorPropertyPanel();
+                    setEditingTool('brush');
                 }
             }
         });
@@ -392,8 +398,7 @@ function getBrushPaletteProperties(): PanelRows {
                 editingState.brush = {'none': tiles};
                 updateBrushCanvas(editingState.brush);
                 if (editingState.tool !== 'brush' && editingState.tool !== 'replace') {
-                    editingState.tool = 'brush';
-                    displayTileEditorPropertyPanel();
+                    setEditingTool('brush');
                 }
             }
         });
@@ -1238,7 +1243,12 @@ document.addEventListener('keydown', function(event: KeyboardEvent) {
         }
     }
     if (event.which === KEY.ESCAPE) {
-        delete editingState.selectedObject;
+        if (editingState.selectedObject) {
+            unselectObject(editingState);
+        }
+        if (editingState.tool === 'select') {
+            setEditingTool(editingState.previousTool);
+        }
     }
 });
 

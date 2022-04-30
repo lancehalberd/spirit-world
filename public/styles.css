@@ -79,7 +79,14 @@
 .pp-container input[type="number"] {
     margin: 0;
     margin-left: 4px;
+    font-size: 10px;
+    width: 4em;
+}
+.pp-container input[type="number"].small {
     width: 3em;
+}
+.pp-container input[type="number"].large {
+    width: 6em;
 }
 .pp-tag-container {
     border: 1px solid black;
@@ -118,6 +125,7 @@
 .tabContainer-tabs {
     flex-grow: 0;
     z-index: 1;
+    display: flex;
 }
 .tabContainer-content {
     flex-grow: 1;
@@ -131,6 +139,7 @@
     border: 1px solid black;
     background-color: #AAA;
     cursor: pointer;
+    flex-grow: 1;
 }
 
 .tabContainer-tab.selected {

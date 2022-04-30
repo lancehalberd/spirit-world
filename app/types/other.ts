@@ -136,6 +136,8 @@ export interface EditorSingleProperty<T> {
     name: string
     id?: string
     multiline?: boolean
+    // Can add classes like 'small' and 'wide' to inputs.
+    inputClass?: string
     // Will set the size attribute for any rendered select element.
     selectSize?: number
     // A button property will have no value.

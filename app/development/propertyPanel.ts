@@ -470,7 +470,13 @@ function renderProperty(property: EditorProperty<any> | HTMLElement | string): s
                         </option>`)
                     + '</select></span>';
             }
-            return `<span class="pp-property">${property.name} <input type="number" value="${property.value}" name="${property.id || property.name}" /></span>`;
+            return `<span class="pp-property">
+                ${property.name}
+                <input type="number"
+                    name="${property.id || property.name}"
+                    class="${property.inputClass || ''}"
+                    value="${property.value}"  />
+                </span>`;
         } else if (isBooleanProperty(property)) {
             return `<span class="pp-property">
                         ${property.name}
