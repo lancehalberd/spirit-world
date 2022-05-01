@@ -81,7 +81,8 @@ export function renderZoneEditor(context: CanvasRenderingContext2D, state: GameS
         mapCanvas.width = width;
         mapCanvas.height = height;
     }
-    mapContext.clearRect(0, 0, width, height);
+    mapContext.fillStyle = 'rgba(200, 200, 200, 1)';
+    mapContext.fillRect(0, 0, width, height);
 
     mapContext.fillStyle = 'rgba(50, 50, 50, 0.5)';
     for (let row = 0; row < state.areaGrid.length; row++) {
@@ -94,9 +95,12 @@ export function renderZoneEditor(context: CanvasRenderingContext2D, state: GameS
             }
         }
     }
-
-    mapContext.fillStyle = 'rgba(255, 255, 255, 0.8)';
     const area = state.nextAreaInstance || state.areaInstance;
+    mapContext.drawImage(area.canvas,
+        0, 0, 512, 512,
+        state.location.areaGridCoords.x * 32, state.location.areaGridCoords.y * 32, 32, 32
+    );
+    mapContext.fillStyle = 'rgba(255, 255, 255, 0.5)';
     let cameraX = Math.floor(state.location.areaGridCoords.x * 32 + state.camera.x / 16 - area.cameraOffset.x / 16);
     let cameraY = Math.floor(state.location.areaGridCoords.y * 32 + state.camera.y / 16 - area.cameraOffset.y / 16);
     mapContext.fillRect(cameraX, cameraY, CANVAS_WIDTH / 16, CANVAS_HEIGHT / 16);
