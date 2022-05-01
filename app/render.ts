@@ -401,7 +401,7 @@ export function translateContextForAreaAndCamera(context: CanvasRenderingContext
     context.translate(-state.camera.x + area.cameraOffset.x, -state.camera.y + area.cameraOffset.y);
 }
 
-function checkToRedrawTiles(area: AreaInstance) {
+export function checkToRedrawTiles(area: AreaInstance) {
     if (editingState.isEditing) {
         const w = 16, h = 16;
         for (let y = 0; y < area.h; y++) {

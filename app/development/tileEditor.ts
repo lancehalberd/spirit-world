@@ -31,7 +31,7 @@ import {
     displayPanel, displayPropertyPanel, hideAllPropertyPanels, renderPropertyRows, updateBrushCanvas,
 } from 'app/development/propertyPanel';
 import { TabContainer } from 'app/development/tabContainer';
-import { renderZoneTabContainer, renderZoneEditor } from 'app/development/zoneEditor';
+import { checkToRefreshMinimap, renderZoneTabContainer, renderZoneEditor } from 'app/development/zoneEditor';
 import { mainCanvas } from 'app/dom';
 import { CANVAS_SCALE } from 'app/gameConstants';
 import { KEY, isKeyboardKeyDown } from 'app/keyCommands';
@@ -60,9 +60,9 @@ export interface EditingState {
     clipboardObject?: ObjectDefinition
     paletteKey: string
     selectedLayerKey?: string
+    refreshMinimap?: boolean
     replacePercentage: number
     selectedObject?: ObjectDefinition
-    showFieldProperties: boolean
     spirit: boolean
     dragOffset?: {x: number, y: number}
 }
@@ -74,8 +74,8 @@ export const editingState: EditingState = {
     isEditing: false,
     paletteKey: Object.keys(palettes)[0],
     // Default editing the field, not the floor.
+    refreshMinimap: true,
     replacePercentage: 100,
-    showFieldProperties: true,
     spirit: false,
 };
 window['editingState'] = editingState;
@@ -309,6 +309,7 @@ export function displayTileEditorPropertyPanel() {
         delete editingState.selectedLayerKey;
     }
     applyToolToSelectedObject();
+    checkToRefreshMinimap(state);
     displayZonePanel(state);
     displayProgressPanel(state);
     displayToolPanel(state);
