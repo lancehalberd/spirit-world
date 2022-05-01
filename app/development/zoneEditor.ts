@@ -1,5 +1,5 @@
 import {
-    createAreaInstance, enterLocation, setAreaSection, setConnectedAreas,
+    enterLocation, getAreaInstanceFromLocation, setAreaSection, setConnectedAreas,
 } from 'app/content/areas';
 import { logicHash } from 'app/content/logic';
 import { specialBehaviorsHash } from 'app/content/specialBehaviors';
@@ -127,8 +127,10 @@ export function renderAreaToMinimap(state: GameState, area: AreaInstance, gridCo
 function fillMinimap(state: GameState): void {
     for (let y = 0; y < state.areaGrid.length; y++) {
         for (let x = 0; x < state.areaGrid[y].length; x++) {
-            const areaDefinition = state.areaGrid[y][x];
-            const areaInstance = createAreaInstance(state, areaDefinition);
+            const areaInstance = getAreaInstanceFromLocation(
+                state,
+                {...state.location, areaGridCoords: {x, y}}
+            );
             renderAreaToMinimap(state, areaInstance, {x, y});
         }
     }

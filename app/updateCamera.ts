@@ -1,6 +1,6 @@
 import {
     addEffectToArea, addObjectToArea, checkIfAllEnemiesAreDefeated,
-    createAreaInstance, getAreaFromLocation, getAreaSize, linkObjects,
+    getAreaInstanceFromLocation, getAreaSize, linkObjects,
     setAreaSection, setConnectedAreas, switchToNextAreaSection,
 } from 'app/content/areas';
 import { displayTileEditorPropertyPanel, editingState } from 'app/development/tileEditor';
@@ -60,8 +60,11 @@ export function updateCamera(state: GameState, speed = cameraSpeed): void {
             state.hero.safeY = state.hero.y;
             state.areaInstance.cameraOffset = {x: 0, y: 0};
             state.nextAreaInstance = null;
-            const alternateArea = getAreaFromLocation({...state.location, isSpiritWorld: !state.location.isSpiritWorld});
-            state.alternateAreaInstance = createAreaInstance(state, alternateArea);
+
+            state.alternateAreaInstance = getAreaInstanceFromLocation(
+                state,
+                {...state.location, isSpiritWorld: !state.location.isSpiritWorld}
+            );
             state.areaInstance.alternateArea = state.alternateAreaInstance;
             state.alternateAreaInstance.alternateArea = state.areaInstance;
             linkObjects(state);

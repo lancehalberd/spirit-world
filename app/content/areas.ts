@@ -117,6 +117,10 @@ export function getAreaFromLocation(location: ZoneLocation): AreaDefinition {
     return grid[y][x];
 }
 
+export function getAreaInstanceFromLocation(state: GameState, location: ZoneLocation): AreaInstance {
+    return createAreaInstance(state, getAreaFromLocation(location));
+}
+
 export function initializeAreaLayerTiles(layer: AreaLayerDefinition): AreaLayerDefinition {
     const tiles = layer.grid.tiles;
     for (let y = 0; y < layer.grid.h; y++) {
@@ -634,7 +638,7 @@ export function mapTileNumbersToFullTiles(tileNumbers: number[][]): FullTile[][]
     return fullTiles;
 }
 
-export function createAreaInstance(state: GameState, definition: AreaDefinition): AreaInstance {
+function createAreaInstance(state: GameState, definition: AreaDefinition): AreaInstance {
     const behaviorGrid: TileBehaviors[][] = [];
     const [canvas, context] = createCanvasAndContext(
         definition.layers[0].grid.w * 16,
