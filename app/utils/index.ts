@@ -95,6 +95,9 @@ export function d(w: number, h: number): FrameDimensions {
 export function pad({x, y, w, h}: Rect, m: number): Rect {
     return {x: x - m, w: w + 2 * m, y: y - m, h: h + 2 * m};
 }
+export function scaleRect({x, y, w, h}: Rect, scale: number): Rect {
+    return {x: x * scale, w: w * scale, y: y * scale, h: h * scale};
+}
 export function rectangleCenter(rectangle: FullRectangle): [number, number] {
     return [rectangle.left + rectangle.width / 2, rectangle.top + rectangle.height / 2];
 }

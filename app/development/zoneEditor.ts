@@ -11,7 +11,7 @@ import { displayTileEditorPropertyPanel, editingState, EditingState } from 'app/
 import { createCanvasAndContext } from 'app/dom';
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
 import { getState } from 'app/state';
-import { readFromFile, saveToFile } from 'app/utils/index';
+import { readFromFile, saveToFile, scaleRect } from 'app/utils/index';
 
 import {
     Floor, GameState, LogicDefinition, PanelRows, PropertyRow, Zone
@@ -75,35 +75,45 @@ export function renderZoneTabContainer(): HTMLElement {
 }
 
 export function renderZoneEditor(context: CanvasRenderingContext2D, state: GameState, editingState: EditingState): void {
-    const width = state.areaGrid[0].length * 32;
-    const height = state.areaGrid.length * 32;
+    const tileSize = 64;
+    const width = state.areaGrid[0].length * tileSize;
+    const height = state.areaGrid.length * tileSize;
     if (mapCanvas.width !== width || mapCanvas.height !== height) {
         mapCanvas.width = width;
         mapCanvas.height = height;
     }
-    mapContext.fillStyle = 'rgba(200, 200, 200, 1)';
+    mapContext.fillStyle = 'rgba(100, 100, 100, 1)';
     mapContext.fillRect(0, 0, width, height);
-
-    mapContext.fillStyle = 'rgba(50, 50, 50, 0.5)';
-    for (let row = 0; row < state.areaGrid.length; row++) {
-        for (let column = 0; column < state.areaGrid[row].length; column++) {
-            for( const section of (state.areaGrid[row][column]?.sections || [fullSection])) {
-                mapContext.fillRect(column * 32 + section.x, row * 32 + section.y, section.w, 1);
-                mapContext.fillRect(column * 32 + section.x, row * 32 + section.y + section.h - 1, section.w, 1);
-                mapContext.fillRect(column * 32 + section.x, row * 32 + section.y + 1, 1, section.h - 2);
-                mapContext.fillRect(column * 32 + section.x + section.w - 1, row * 32 + section.y + 1, 1, section.h - 2);
-            }
-        }
-    }
     const area = state.nextAreaInstance || state.areaInstance;
     mapContext.drawImage(area.canvas,
         0, 0, 512, 512,
-        state.location.areaGridCoords.x * 32, state.location.areaGridCoords.y * 32, 32, 32
+        state.location.areaGridCoords.x * tileSize, state.location.areaGridCoords.y * tileSize, tileSize, tileSize
     );
-    mapContext.fillStyle = 'rgba(255, 255, 255, 0.5)';
-    let cameraX = Math.floor(state.location.areaGridCoords.x * 32 + state.camera.x / 16 - area.cameraOffset.x / 16);
-    let cameraY = Math.floor(state.location.areaGridCoords.y * 32 + state.camera.y / 16 - area.cameraOffset.y / 16);
-    mapContext.fillRect(cameraX, cameraY, CANVAS_WIDTH / 16, CANVAS_HEIGHT / 16);
+    if (area.foregroundCanvas) {
+        mapContext.drawImage(area.foregroundCanvas,
+            0, 0, 512, 512,
+            state.location.areaGridCoords.x * tileSize, state.location.areaGridCoords.y * tileSize, tileSize, tileSize
+        );
+    }
+    const tileScale = tileSize / 32;
+
+    mapContext.fillStyle = 'rgba(255, 255, 255, 1)';
+    for (let row = 0; row < state.areaGrid.length; row++) {
+        for (let column = 0; column < state.areaGrid[row].length; column++) {
+            for( const section of (state.areaGrid[row][column]?.sections || [fullSection])) {
+                const {x, y, w, h} = scaleRect(section, tileScale);
+                mapContext.fillRect(column * tileSize + x, row * tileSize + y, w, 1);
+                mapContext.fillRect(column * tileSize + x, row * tileSize + y + h - 1, w, 1);
+                mapContext.fillRect(column * tileSize + x, row * tileSize + y + 1, 1, h - 2);
+                mapContext.fillRect(column * tileSize + x + w - 1, row * tileSize + y + 1, 1, h - 2);
+            }
+        }
+    }
+    mapContext.fillStyle = 'rgba(255, 255, 255, 0.3)';
+    const pixelScale = tileScale / 16;
+    let cameraX = Math.floor(state.location.areaGridCoords.x * tileSize + state.camera.x * pixelScale - area.cameraOffset.x * pixelScale);
+    let cameraY = Math.floor(state.location.areaGridCoords.y * tileSize + state.camera.y * pixelScale - area.cameraOffset.y * pixelScale);
+    mapContext.fillRect(cameraX, cameraY, CANVAS_WIDTH * pixelScale, CANVAS_HEIGHT * pixelScale);
 }
 
 export function getImportExportProperties(): PanelRows {
