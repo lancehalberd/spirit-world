@@ -50,7 +50,7 @@ import {
     PanelRows, PropertyRow, Rect, TileGridDefinition, TilePalette,
 } from 'app/types';
 
-type EditorToolType = 'brush' | 'delete' | 'object' | 'enemy' | 'boss' | 'replace' | 'select';
+type EditorToolType = 'brush' | 'object' | 'enemy' | 'boss' | 'replace' | 'select';
 export interface EditingState {
     tool: EditorToolType
     previousTool: EditorToolType
@@ -68,7 +68,7 @@ export interface EditingState {
 }
 
 export const editingState: EditingState = {
-    tool: 'select',
+    tool: 'brush',
     previousTool: 'select',
     hasChanges: false,
     isEditing: false,
@@ -111,16 +111,6 @@ const toolTabContainer = new TabContainer<EditorToolType>('select', [
     {
         key: 'replace',
         label: '▧',
-        render(container: HTMLElement) {
-            renderPropertyRows(container, getBrushPaletteProperties());
-        },
-        refresh(container: HTMLElement) {
-            this.render(container);
-        },
-    },
-    {
-        key: 'delete',
-        label: '⌫',
         render(container: HTMLElement) {
             renderPropertyRows(container, getBrushPaletteProperties());
         },
@@ -408,9 +398,7 @@ function getBrushPaletteProperties(): PanelRows {
 }
 
 function getContextProperties(): PanelRows {
-    if (editingState.tool === 'brush'
-        || editingState.tool === 'delete'
-        || editingState.tool === 'replace') {
+    if (editingState.tool === 'brush' || editingState.tool === 'replace') {
         return getBrushContextProperties();
     } else {
         return getObjectProperties(getState(), editingState);
@@ -665,9 +653,6 @@ mainCanvas.addEventListener('mousemove', function () {
                 drawBrush(x, y);
             }
             break;
-        case 'delete':
-            deleteTile(x, y);
-            break;
     }
 });
 mainCanvas.addEventListener('mousedown', function () {
@@ -692,9 +677,6 @@ mainCanvas.addEventListener('mousedown', function () {
             } else {
                 drawBrush(x, y);
             }
-            break;
-        case 'delete':
-            deleteTile(x, y);
             break;
         case 'replace':
             replaceTiles(x, y);
@@ -1043,9 +1025,13 @@ function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, a
                 const hitbox = instance?.getHitbox(state) || {x: instance.x, y: instance.y, w: 16, h: 16};
                 context.fillRect(hitbox.x, hitbox.y, hitbox.w, hitbox.h);
             context.restore();
-            instance.area = area;
-            instance.status = 'normal';
-            instance.render(context, state);
+            if (instance.renderPreview) {
+                instance.renderPreview(context, instance.getHitbox(state));
+            } else {
+                instance.area = area;
+                instance.status = 'normal';
+                instance.render(context, state);
+            }
             // drawFrame(context, frame, {...frame, x: object.x - (frame.content?.x || 0), y: object.y - (frame.content?.y || 0)});
             // While editing, draw the loot inside the chest/boss on top as well.
             if (object.type === 'bigChest' || object.type === 'chest' || object.type === 'boss') {
@@ -1238,7 +1224,10 @@ document.addEventListener('keydown', function(event: KeyboardEvent) {
     }
     if (event.which === KEY.BACK_SPACE) {
         const state = getState();
-        if (state.areaInstance.definition.objects.includes(editingState.selectedObject)) {
+        if (editingState.tool === 'brush') {
+            const [x, y] = getMousePosition(mainCanvas, CANVAS_SCALE);
+            deleteTile(x, y);
+        } else if (state.areaInstance.definition.objects.includes(editingState.selectedObject)) {
             deleteObject(state, editingState.selectedObject);
             unselectObject(editingState);
         }

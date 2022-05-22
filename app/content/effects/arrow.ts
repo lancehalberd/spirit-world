@@ -59,6 +59,8 @@ const fireArrowAnimation = createAnimation('gfx/effects/wukongbowcharging.png', 
 const chargedArrowAnimation = createAnimation('gfx/effects/wukongbowcharging.png', chargeGeometry, {x: 14, cols: 4, duration: 5});
 
 
+export const spiritArrowIcon = sdrAnimation.frames[0];
+
 
 interface ArrowAnimations {
     normal: FrameAnimation,

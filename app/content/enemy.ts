@@ -118,9 +118,9 @@ export class Enemy implements Actor, ObjectInstance {
     getFrame(): Frame {
         return getFrame(this.currentAnimation, this.animationTime);
     }
-    getHitbox(state: GameState): Rect {
+    getHitbox(state?: GameState): Rect {
         if (this.enemyDefinition.getHitbox) {
-            return this.enemyDefinition.getHitbox(state, this);
+            return this.enemyDefinition.getHitbox(this);
         }
         const frame = this.getFrame();
         return {
@@ -454,7 +454,7 @@ export class Enemy implements Actor, ObjectInstance {
             this.enemyDefinition.renderOver(context, state, this);
         }
     }
-    defaultRender(context: CanvasRenderingContext2D, state: GameState, frame = this.getFrame()) {
+    defaultRender(context: CanvasRenderingContext2D, state?: GameState, frame = this.getFrame()) {
         if (!frame) {
             console.error('Frame not found for enemy animation', this, this.currentAnimation);
             return;
@@ -492,6 +492,27 @@ export class Enemy implements Actor, ObjectInstance {
             context.globalAlpha = 0.5;
             context.fillStyle = 'red';
             context.fillRect(hitbox.x, hitbox.y, hitbox.w, hitbox.h);*/
+        context.restore();
+    }
+    renderPreview(context: CanvasRenderingContext2D, target: Rect): void {
+        if (this.enemyDefinition.renderPreview) {
+            this.enemyDefinition.renderPreview(context, this, target);
+        } else {
+            this.defaultRenderPreview(context, target);
+        }
+    }
+    defaultRenderPreview(context: CanvasRenderingContext2D, target: Rect, hitbox = this.getHitbox()): void {
+        context.save();
+            const scale = Math.min(1, Math.min(target.w / hitbox.w, target.h / hitbox.h));
+            context.translate(
+                target.x + (target.w - hitbox.w * scale) / 2,
+                target.y + (target.h - hitbox.h * scale) / 2,
+            );
+            if (scale < 1) {
+                context.scale(scale, scale);
+            }
+            this.x = this.y = 0;
+            this.defaultRender(context);
         context.restore();
     }
 }

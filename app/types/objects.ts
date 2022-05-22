@@ -67,6 +67,11 @@ export interface ObjectInstance {
     add?: (state: GameState, area: AreaInstance) => void
     remove?: (state: GameState) => void
     render: (context: CanvasRenderingContext2D, state: GameState) => void
+    // Optional render method for previewing the object in the editor palette or area.
+    // This method draws the object to a set target rectangle and should render the object
+    // unambiguously so that editors can distinguish between different objects that may normally
+    // look identical.
+    renderPreview?: (context: CanvasRenderingContext2D, target: Rect) => void
     renderShadow?: (context: CanvasRenderingContext2D, state: GameState) => void
     renderForeground?: (context: CanvasRenderingContext2D, state: GameState) => void
     alternateRender?: (context: CanvasRenderingContext2D, state: GameState) => void

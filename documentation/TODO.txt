@@ -46,17 +46,23 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    Change air bubbles graphics to show up on top of crystal ground
+        - Make air bubbles lose charge over time and represent it visually.
+
     Editor Improvements
         - Add graphical palettes
             - Objects
-            - Enemies
-            - Bosses
+            - (low priority) super tile layout selection
         - Paint tile grids starting from center of mouse instead of top right corner
             - This will balance the easy of using large groups toward any edge of the screen
             - Make sure this does not impact painting a single tile in any way.
+        - Clicking minimap should change location.
         - Track which zones have been changed but not exported.
         - Support undo/redo actions
             - Include in context menu when editor is active
+
+    Note: Make chest flash briefly in alternate world when it spawns in the alternate world.
+    - So if you hit a switch that makes a chest in the alternate world you have a sense of what it did.
 
     - Spirit World Improvements
         - Sky is covered in cracked crystal ground that require cloud boots to walk on

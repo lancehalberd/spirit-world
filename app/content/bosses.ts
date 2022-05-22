@@ -6,7 +6,7 @@ export * from 'app/content/bosses/crystalCollector';
 export * from 'app/content/bosses/idols';
 export * from 'app/content/bosses/guardian';
 export * from 'app/content/bosses/flameBeast';
-export * from 'app/content/bosses/frostSerpent';
+export * from 'app/content/bosses/frostBeast';
 export * from 'app/content/bosses/stormBeast';
 
 export const bossTypes = <const>[
@@ -16,7 +16,7 @@ export const bossTypes = <const>[
     'guardian', 'guardianProjection',
     'crystalCollector',
     'superSquirrel',
-    'frostHeart', 'frostSerpent',
+    'frostHeart', 'frostBeast',
     'flameHeart', 'flameBeast',
     'stormHeart', 'stormBeast',
 ];

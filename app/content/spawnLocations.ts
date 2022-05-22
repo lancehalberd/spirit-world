@@ -494,6 +494,46 @@ const lateSpawnLocations: SpawnLocationOptions = {
     },
 };
 
+
+// Minimizer states:
+export const LIGHT_1_START: ZoneLocation = {
+    zoneKey: 'light1',
+    floor: 0,
+    x: 396,
+    y: 432,
+    z: 0,
+    d: 'up',
+    areaGridCoords: {y: 0, x: 0},
+    isSpiritWorld: false,
+};
+export const LIGHT_1_BOSS: ZoneLocation = {
+    zoneKey: 'light1',
+    floor: 0,
+    x: 374,
+    y: 200,
+    z: 0,
+    d: 'up',
+    areaGridCoords: {y: 0, x: 0},
+    isSpiritWorld: false,
+};
+
+const light1Start = applyItems(defaultSavedState, {weapon: 1, catEyes: 1, maxLife: 1},
+    []
+);
+const light1Boss = applyItems(light1Start, {bow: 1, 'light1:bigKey': 1},
+    []
+);
+const minimizerSpawnLocations: SpawnLocationOptions = {
+    'Light 1': {
+        location: LIGHT_1_START,
+        savedState: light1Start,
+    },
+    'Light 1 Boss': {
+        location: LIGHT_1_BOSS,
+        savedState: light1Boss,
+    },
+};
+
 function getSpawnLocationOptions(spawnLocations: SpawnLocationOptions, useSavedState = false) {
     return Object.keys(spawnLocations).map(name => {
         return {
@@ -566,6 +606,12 @@ export function getTestStateContextMenuOption(): MenuOption {
                     label: 'Late',
                     getChildren() {
                         return getSpawnLocationOptions(lateSpawnLocations, true);
+                    }
+                },
+                {
+                    label: 'Mini',
+                    getChildren() {
+                        return getSpawnLocationOptions(minimizerSpawnLocations, true);
                     }
                 },
             ];

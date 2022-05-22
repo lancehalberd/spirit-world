@@ -30,6 +30,8 @@ export * from 'app/content/zones/crater';
 export * from 'app/content/zones/staffTower';
 export * from 'app/content/zones/lab';
 export * from 'app/content/zones/tree';
+// minimizer zones
+export * from 'app/content/zones/minimizer/light1';
 
 export function getZone(zoneKey: string): Zone {
     if (!zones[zoneKey]) {

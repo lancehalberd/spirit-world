@@ -21,6 +21,7 @@ import { npcBehaviors, npcStyles } from 'app/content/objects/npc';
 import { signStyles } from 'app/content/objects/sign';
 import { getLootFrame } from 'app/content/objects/lootObject';
 import { zones } from 'app/content/zones';
+import { ObjectPalette, ObjectPaletteItem } from 'app/development/objectPalette';
 import {
     displayTileEditorPropertyPanel, editingState,
     EditingState, setEditingTool,
@@ -31,14 +32,102 @@ import { isPointInShortRect } from 'app/utils/index';
 
 import {
     AreaDefinition, AreaInstance, BallGoalDefinition,
+    BossObjectDefinition,
     BossType, CrystalSwitchDefinition, EntranceDefinition,
+    EnemyObjectDefinition,
     FloorSwitchDefinition, KeyBlockDefinition,
     FrameDimensions, DecorationType, Direction, DrawPriority, EnemyType, GameState, LootObjectDefinition,
     LootType, MagicElement, NarrationDefinition, NPCBehavior, NPCStyle,
     ObjectDefinition, ObjectStatus, ObjectType, PanelRows,
-    Rect, SpecialAreaBehavior,
+    Rect, ObjectInstance, SpecialAreaBehavior,
     Zone, ZoneLocation,
 } from 'app/types';
+
+function createObjectPaletteItem<T extends string>(type: T, instance: ObjectInstance): ObjectPaletteItem<T> {
+    return {
+        key: type,
+        render(context: CanvasRenderingContext2D, target: Rect) {
+            if (instance.renderPreview) {
+                instance.renderPreview(context, target);
+                return;
+            }
+            const state = getState();
+            context.save();
+                const hitbox = instance.getHitbox(state);
+                const scale = Math.min(1, Math.min(target.w / hitbox.w, target.h / hitbox.h));
+                context.translate(
+                    target.x + (target.w - hitbox.w * scale) / 2,
+                    target.y + (target.h - hitbox.h * scale) / 2,
+                );
+                if (scale < 1) {
+                    context.scale(scale, scale);
+                }
+                instance.area = state.areaInstance;
+                instance.status = 'normal';
+                instance.render(context, state);
+            context.restore();
+        },
+    };
+}
+
+function getBossInstance(bossType: BossType): ObjectInstance {
+    const state = getState();
+    const definition: ObjectDefinition = createObjectDefinition(state, editingState, {
+        type: 'boss',
+        enemyType: bossType,
+        x: 0,
+        y: 0,
+    });
+    return createObjectInstance(state, definition);
+}
+function getEnemyInstance(enemyType: EnemyType): ObjectInstance {
+    const state = getState();
+    const definition: ObjectDefinition = createObjectDefinition(state, editingState, {
+        type: 'enemy',
+        enemyType,
+        x: 0,
+        y: 0,
+    });
+    return createObjectInstance(state, definition);
+}
+
+let enemyPalette: ObjectPalette<EnemyType>, bossPalette: ObjectPalette<BossType>;
+
+function getEnemyPalette() {
+    if (!enemyPalette) {
+        enemyPalette = new ObjectPalette<EnemyType>(enemyTypes[0],
+            enemyTypes.map(
+                type => createObjectPaletteItem(type, getEnemyInstance(type))
+            ),
+            (enemyType: EnemyType) => {
+                const object = editingState.selectedObject as EnemyObjectDefinition;
+                object.enemyType = enemyType;
+                updateObjectInstance(getState(), object);
+                // We need to refresh the panel to get enemy specific properties.
+                displayTileEditorPropertyPanel();
+            }
+        );
+    }
+    return enemyPalette;
+}
+
+function getBossPalette() {
+    if (!bossPalette) {
+        bossPalette = new ObjectPalette<BossType>(bossTypes[0],
+            bossTypes.map(
+                type => createObjectPaletteItem(type, getBossInstance(type))
+            ),
+            (enemyType: BossType) => {
+                const object = editingState.selectedObject as BossObjectDefinition;
+                object.enemyType = enemyType;
+                updateObjectInstance(getState(), object);
+                // We need to refresh the panel to get enemy specific properties.
+                displayTileEditorPropertyPanel();
+            }
+        );
+    }
+    return bossPalette;
+}
 
 export function getObjectTypeProperties(): PanelRows {
     const state = getState();
@@ -50,7 +139,11 @@ export function getObjectTypeProperties(): PanelRows {
         }
     }
     if (object.type === 'enemy') {
-        return [{
+        const palette = getEnemyPalette();
+        palette.selectedKey = object.enemyType as EnemyType;
+        palette.render();
+        return [palette.canvas];
+        /*return [{
             name: 'type',
             value: object.enemyType,
             values: enemyTypes,
@@ -61,10 +154,14 @@ export function getObjectTypeProperties(): PanelRows {
                 // We need to refresh the panel to get enemy specific properties.
                 displayTileEditorPropertyPanel();
             },
-        }];
+        }];*/
     }
     if (object.type === 'boss') {
-        return [{
+        const palette = getBossPalette();
+        palette.selectedKey = object.enemyType;
+        palette.render();
+        return [palette.canvas];
+        /*return [{
             name: 'type',
             value: object.enemyType as BossType,
             values: bossTypes,
@@ -75,7 +172,7 @@ export function getObjectTypeProperties(): PanelRows {
                 // We need to refresh the panel to get boss specific properties.
                 displayTileEditorPropertyPanel();
             },
-        }];
+        }];*/
     }
     return [{
         name: 'type',
@@ -1048,6 +1145,7 @@ export function onMouseDownObject(state: GameState, editingState: EditingState, 
     if (!isKeyboardKeyDown(KEY.SHIFT)) {
         setEditingTool('select');
         editingState.selectedObject = newObject;
+        displayTileEditorPropertyPanel();
     }
 }
 
@@ -1261,10 +1359,14 @@ export function renderObjectPreview(
     definition.y -= (frame.content?.h || frame.h) / 2;
     fixObjectPosition(state, definition);
     const object = createObjectInstance(state, definition);
-    object.area = state.areaInstance;
-    // This is set to 'normal' so we can see the preview during edit even if it would otherwise be hidden.
-    if (object.status === 'hidden' || object.status === 'gone' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
-        object.status = 'normal';
+    if (object.renderPreview) {
+        object.renderPreview(context, object.getHitbox(state));
+    } else {
+        object.area = state.areaInstance;
+        // This is set to 'normal' so we can see the preview during edit even if it would otherwise be hidden.
+        if (object.status === 'hidden' || object.status === 'gone' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
+            object.status = 'normal';
+        }
+        object.render(context, state);
     }
-    object.render(context, state);
 }

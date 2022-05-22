@@ -1,10 +1,11 @@
 import { sample } from 'lodash';
 
-import { addSparkleAnimation } from 'app/content/effects/animationEffect';
+import { addSparkleAnimation, iceSparkleAnimation } from 'app/content/effects/animationEffect';
 import { Clone } from 'app/content/objects/clone';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { AnimationEffect } from 'app/content/effects/animationEffect';
-import { EnemyArrow } from 'app/content/effects/arrow';
+import { flameAnimation } from 'app/content/effects/flame';
+import { EnemyArrow, spiritArrowIcon } from 'app/content/effects/arrow';
 import { Flame } from 'app/content/effects/flame';
 import { FrostGrenade } from 'app/content/effects/frostGrenade';
 import { GrowingThorn } from 'app/content/effects/growingThorn';
@@ -24,7 +25,7 @@ import { addEffectToArea, getAreaSize } from 'app/content/areas';
 import { editingState } from 'app/development/tileEditor';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { moveActor } from 'app/moveActor';
-import { createAnimation } from 'app/utils/animations';
+import { createAnimation, drawFrameCenteredAt } from 'app/utils/animations';
 import { directionMap, getDirection } from 'app/utils/field';
 import { playSound } from 'app/musicController';
 
@@ -90,15 +91,20 @@ export interface EnemyDefinition {
     render?: (context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) => void
     // Optional render function called after the standard render.
     renderOver?: (context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) => void
+    renderPreview?: (context: CanvasRenderingContext2D, enemy: Enemy, target: Rect) => void
     getHealthPercent?: (state: GameState, enemy: Enemy) => number
     getShieldPercent?: (state: GameState, enemy: Enemy) => number
-    getHitbox?: (state: GameState, enemy: Enemy) => Rect
+    getHitbox?: (enemy: Enemy) => Rect
 }
 
 enemyDefinitions.arrowTurret = {
     animations: beetleAnimations, life: 4, touchDamage: 1, update: spinAndShoot,
     lootTable: simpleLootTable,
     canBeKnockedBack: false,
+    renderPreview(context: CanvasRenderingContext2D, enemy: Enemy, target: Rect): void {
+        enemy.defaultRenderPreview(context, target);
+        drawFrameCenteredAt(context, spiritArrowIcon, target);
+    }
 };
 enemyDefinitions.snake = {
     animations: snakeAnimations, life: 2, touchDamage: 1, update: paceRandomly, flipRight: true,
@@ -134,24 +140,46 @@ enemyDefinitions.beetleWinged = {
 enemyDefinitions.wallLaser = {
     animations: snakeAnimations, life: 1, touchDamage: 1, update: updateWallLaser, flipRight: true,
     lootTable: simpleLootTable, params: { alwaysShoot: false },
+    renderPreview(context: CanvasRenderingContext2D, enemy: Enemy, target: Rect): void {
+        enemy.defaultRenderPreview(context, target);
+        drawFrameCenteredAt(context, spiritArrowIcon, target);
+    },
 };
 enemyDefinitions.flameSnake = {
     alwaysReset: true,
     animations: snakeAnimations, speed: 1.1,
     life: 3, touchDamage: 1, update: updateFlameSnake, flipRight: true,
     immunities: ['fire'],
+    renderPreview(context: CanvasRenderingContext2D, enemy: Enemy, target: Rect): void {
+        enemy.defaultRenderPreview(context, target);
+        drawFrameCenteredAt(context, flameAnimation.frames[0], target);
+    },
 };
 enemyDefinitions.frostBeetle = {
     alwaysReset: true,
     animations: beetleAnimations, speed: 0.7, aggroRadius: 112,
     life: 5, touchDamage: 1, update: updateFrostBeetle,
     immunities: ['ice'],
+    renderPreview(context: CanvasRenderingContext2D, enemy: Enemy, target: Rect): void {
+        enemy.defaultRenderPreview(context, target);
+        drawFrameCenteredAt(context, iceSparkleAnimation.frames[1], target);
+    },
 };
 enemyDefinitions.lightningBug = {
     alwaysReset: true,
     animations: beetleWingedAnimations, acceleration: 0.2, speed: 1, aggroRadius: 112, flying: true,
-    life: 3, touchDamage: 1, update: updateStormLightningBug, renderOver: renderLightningShield,
+    life: 3, touchDamage: 1, update: updateStormLightningBug,
+    params: {
+        shieldColor: 'yellow',
+    },
+    renderOver(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) {
+        renderLightningShield(context, enemy.getHitbox(), enemy.shielded, enemy.params.shieldColor);
+    } ,
     immunities: ['lightning'],
+    renderPreview(context: CanvasRenderingContext2D, enemy: Enemy, target: Rect): void {
+        enemy.defaultRenderPreview(context, target);
+        renderLightningShield(context, target, true, enemy.params.shieldColor);
+    },
 };
 
 enemyDefinitions.ent = {
@@ -211,7 +239,7 @@ enemyDefinitions.crystalGuardian = {
         if (enemy.params.shieldLife <= 0) {
             return;
         }
-        const hitbox = enemy.getHitbox(state);
+        const hitbox = enemy.getHitbox();
         context.save();
             context.globalAlpha *= (0.4 + 0.4 * enemy.params.shieldLife / defaultParams.shieldLife);
             context.fillStyle = 'white';
@@ -226,7 +254,16 @@ enemyDefinitions.crystalGuardian = {
             context.strokeStyle = 'red';
             context.stroke();
         }*/
-    }
+    },
+    renderPreview(context: CanvasRenderingContext2D, enemy: Enemy, target: Rect): void {
+        enemy.defaultRenderPreview(context, target);
+        renderLightningShield(context, target, true, enemy.params.shieldColor);
+        context.save();
+            context.globalAlpha *= 0.8;
+            context.fillStyle = 'white';
+            context.fillRect(target.x, target.y, target.w, target.h);
+        context.restore();
+    },
 };
 
 function updateEnt(state: GameState, enemy: Enemy): void {
@@ -259,7 +296,6 @@ function updateEnt(state: GameState, enemy: Enemy): void {
     }
 }
 
-
 enemyDefinitions.floorEye = {
     animations: climbingBeetleAnimations, aggroRadius: 96,
     hasShadow: false,
@@ -270,6 +306,18 @@ enemyDefinitions.floorEye = {
     life: 4, update: updateFloorEye,
     render: renderUnderTiles,
     canBeKnockedBack: false,
+    renderPreview(context: CanvasRenderingContext2D, enemy: Enemy, target: Rect): void {
+        enemy.defaultRenderPreview(context, target);
+        context.save();
+            context.globalAlpha *= 0.8;
+            context.fillStyle = 'white';
+            context.beginPath();
+            context.moveTo(target.x + target.w / 3, target.y + target.h);
+            context.lineTo(target.x + target.w / 2, target.y);
+            context.lineTo(target.x + 2 * target.w / 3, target.y + target.h);
+            context.fill();
+        context.restore();
+    },
 };
 function renderUnderTiles(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
     // Render normally while editing.
@@ -393,7 +441,6 @@ function updateFrostBeetle(state: GameState, enemy: Enemy): void {
     }
 }
 function updateStormLightningBug(state: GameState, enemy: Enemy): void {
-    enemy.params.shieldColor = 'yellow';
     scurryAndChase(state, enemy);
     enemy.params.shieldCooldown = enemy.params.shieldCooldown ?? 1000 + Math.random() * 1000;
     if (enemy.params.shieldCooldown > 0) {
@@ -437,10 +484,9 @@ function updateStormLightningBug(state: GameState, enemy: Enemy): void {
     }
 }
 
-function renderLightningShield(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
-    const hitbox = enemy.getHitbox(state);
-    context.strokeStyle = enemy.params.shieldColor ?? '#888';
-    if (enemy.shielded) {
+function renderLightningShield(context: CanvasRenderingContext2D, hitbox: Rect, shielded = true, color = '#888'): void {
+    context.strokeStyle = color; //enemy.params.shieldColor ?? '#888';
+    if (shielded) {
         context.save();
             context.globalAlpha *= (0.7 + 0.3 * Math.random());
             context.beginPath();

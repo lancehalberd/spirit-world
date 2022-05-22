@@ -110,7 +110,10 @@ enemyDefinitions.stormHeart = {
             context.fillRect(innerHitbox.x, innerHitbox.y, innerHitbox.w, innerHitbox.h);
         context.restore();*/
     },
-    getHitbox(state: GameState, enemy: Enemy): Rect {
+    renderPreview(context: CanvasRenderingContext2D, enemy: Enemy, target: Rect): void {
+        enemy.defaultRenderPreview(context, target, {x: 0, y: 0, w: 32, h: 32});
+    },
+    getHitbox(enemy: Enemy): Rect {
         return {
             x: enemy.x - 32,
             y: enemy.y - 32,
