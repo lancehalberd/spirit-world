@@ -1185,8 +1185,177 @@ const caveFloorEdges: TileSource = {
         [ 8, 7],[ 9, 7],[10, 7],[11, 7],
     ],
 };
+
+
+const crystalCaveCeiling: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/crystalcavesheet.png'), x: 0, y: 0, w: 48, h: 64},
+    behaviors: {
+        'all': { defaultLayer: 'foreground2' },
+        '0x12': bottomLeftCeiling, '1x12': bottomLeftCeiling,
+        '2x12': bottomRightCeiling, '3x12': bottomRightCeiling,
+    },
+    tileCoordinates: [
+                        [ 2, 7],[ 3, 7],[ 4, 7],[ 5, 7],
+                        [ 2, 8],[ 3, 8],[ 4, 8],[ 5, 8],
+                        [ 2, 9],[ 3, 9],
+        [ 0,10],[ 1,10],[ 2,10],[ 3,10],
+
+        [ 0,12],[ 1,12],[ 2,12],[ 3,12],
+    ],
+};
+
+const crystalCaveCeilingTopAngles: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/crystalcavesheet.png'), x: 0, y: 0, w: 48, h: 80},
+    behaviors: {
+        '8x2': bottomLeftCeiling, '9x2': bottomLeftCeiling,
+        '10x2': bottomRightCeiling, '11x2': bottomRightCeiling,
+    },
+    tileCoordinates: [
+        [ 8, 2],[ 9, 2],[10, 2],[11, 2],
+    ],
+};
+
+const crystalCaveWalls: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/crystalcavesheet.png'), x: 0, y: 0, w: 48, h: 80},
+    behaviors: {
+        'all': wallBehavior,
+        '12x3': topRightWall, '13x3': topRightWall,
+        '14x3': topLeftWall, '15x3': topLeftWall,
+    },
+    tileCoordinates: [
+    [ 7, 0],[ 8, 0],[ 9, 0],[10, 0],[11, 0],[12, 0],[13, 0],[14, 0],[15, 0],
+    [ 7, 1],[ 8, 1],[ 9, 1],[10, 1],[11, 1],[12, 1],[13, 1],[14, 1],
+                                            [12, 2],[13, 2],[14, 2],[15, 2],
+                                            [12, 3],[13, 3],[14, 3],[15, 3],
+    ],
+};
+
+const crystalCaveStairs: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/crystalcavesheet.png'), x: 0, y: 0, w: 48, h: 64},
+    behaviors: {
+        'all': { defaultLayer: 'field' },
+    },
+    tileCoordinates: [
+        [16, 0],[17, 0],[18, 0],
+        [16, 1],[17, 1],[18, 1],
+        [16, 2],[17, 2],[18, 2],
+        [16, 3],[17, 3],[18, 3],
+        [16, 4],[17, 4],[18, 4],
+    ],
+};
+
+const crystalCaveLedges: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/crystalcavesheet.png'), x: 0, y: 0, w: 48, h: 64},
+    behaviors: {
+        'all': { defaultLayer: 'floor2' },
+        '8x8': { defaultLayer: 'floor2', edges: { right: true } },
+        '9x8': { defaultLayer: 'floor2', edges: { right: true } },
+
+        '8x9': { defaultLayer: 'floor2', edges: { left: true } },
+        '9x9': { defaultLayer: 'floor2', edges: { left: true } },
+        '10x9': { defaultLayer: 'floor2', edges: { down: true } },
+        '11x9': { defaultLayer: 'floor2', edges: { down: true } },
+        '12x9': { defaultLayer: 'floor2', jumpDirection: 'up', solidMap: BITMAP_BOTTOM_6 },
+        '13x9': { defaultLayer: 'floor2', jumpDirection: 'up', solidMap: BITMAP_BOTTOM_6 },
+
+        '8x10': { defaultLayer: 'floor2', solidMap: BITMAP_RIGHT_6 },
+        '9x10': { defaultLayer: 'floor2', solidMap: BITMAP_RIGHT_6 },
+
+        '8x11': { defaultLayer: 'floor2', solidMap: BITMAP_LEFT_6 },
+        '9x11': { defaultLayer: 'floor2', solidMap: BITMAP_LEFT_6 },
+        '10x11': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_6 },
+        '11x11': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_6 },
+        '12x11': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_6 },
+        '13x11': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_6 },
+
+        '8x12': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_RIGHT, jumpDirection: 'downright' },
+        '9x12': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_LEFT, jumpDirection: 'downleft' },
+        '10x12': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_RIGHT, jumpDirection: 'downleft' },
+        '11x12': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_LEFT, jumpDirection: 'downright' },
+        '12x12': { defaultLayer: 'floor2'},
+        '13x12': { defaultLayer: 'floor2'},
+
+        '8x13': { defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_DOWN_RIGHT },
+        '9x13': { defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_UP_RIGHT },
+        '10x13': { defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_DOWN_RIGHT },
+        '11x13': { defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_UP_RIGHT},
+        '12x13': { defaultLayer: 'floor2'},
+        '13x13': { defaultLayer: 'floor2'},
+
+        '8x14': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_RIGHT },
+        '9x14': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_LEFT },
+        '10x14': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_RIGHT },
+        '11x14': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_LEFT},
+
+        '8x15': { defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_DOWN_RIGHT },
+        '9x15': { defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_UP_RIGHT },
+        '10x15': { defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_DOWN_RIGHT },
+        '11x15': { defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_UP_RIGHT},
+
+    },
+    tileCoordinates: [
+        [ 8, 8],[ 9, 8],
+        [ 8, 9],[ 9, 9],[10, 9],[11, 9],[12, 9],[13, 9],
+        [ 8,10],[ 9,10],
+        [ 8,11],[ 9,11],[10,11],[11,11],[12,11],[13,11],
+        [ 8,12],[ 9,12],[10,12],[11,12],[12,12],[13,12],
+        [ 8,13],[ 9,13],[10,13],[11,13],[12,13],[13,13],
+        [ 8,14],[ 9,14],[10,14],[11,14],[12,14],[13,14],
+        [ 8,15],[ 9,15],[10,15],[11,15],[12,15],[13,15],
+    ],
+};
+
+const crystalCaveFloorDecorations: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/crystalcavesheet.png'), x: 0, y: 0, w: 48, h: 64},
+    behaviors: {
+        'all': { defaultLayer: 'floor2' },
+    },
+    tileCoordinates: [
+        [15, 5],                [18, 5],
+        [15, 6],        [17, 6],[18, 6],
+        [15, 7],[16, 7],[17, 7],[18, 7],
+                        [17, 8],[18, 8],
+                [16, 9],[17, 9],[18, 9],
+                [16,10],        [18,10],
+                [16,11],[17,11],[18,11],
+                [16,12],[17,12],
+        [15,13],[16,13],[17,13],[18,13],
+        [15,14],[16,14],[17,14],[18,14],
+                [16,15],[17,15],
+    ],
+};
+
+const crystalCaveFloor: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/crystalcavesheet.png'), x: 0, y: 0, w: 48, h: 64},
+    behaviors: {
+        'all': { defaultLayer: 'floor' },
+        '13x5': { defaultLayer: 'field', underTile: 4, isBrittleGround: true},
+    },
+    tileCoordinates: [
+        [12, 4], [13, 4], [14, 4],
+        [12, 5], [13, 5], [14, 5],
+    ],
+};
+const crystalCaveFloorEdges: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/crystalcavesheet.png'), x: 0, y: 0, w: 48, h: 64},
+    behaviors: {
+        'all': { defaultLayer: 'floor2' },
+    },
+    tileCoordinates: [
+        [ 8, 4],[ 9, 4],[10, 4],[11, 4],
+        [ 8, 5],[ 9, 5],[10, 5],[11, 5],
+    ],
+};
 const newTiles: Frame = {
-    image: requireImage('gfx/tiles/cavearranged.png'),
+    image: requireImage('gfx/tiles/crystalcavesheet.png'),
     x: 128, y: 64,
     //w: 48, h: 48,
     w: 80, h: 64,
@@ -1347,6 +1516,14 @@ addTiles([
     knobbyTreeLeavesMerged,
     knobbyTreeLeavesCorridor,
     knobbyTreeStumpDoor,
+    crystalCaveCeiling,
+    crystalCaveWalls,
+    crystalCaveFloor,
+    crystalCaveFloorEdges,
+    crystalCaveFloorDecorations,
+    crystalCaveLedges,
+    crystalCaveStairs,
+    crystalCaveCeilingTopAngles,
 ]);
 
 // This invalid is in the middle of a bunch of other tiles so it is easiest to just delete after adding it.
