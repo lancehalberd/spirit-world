@@ -482,7 +482,9 @@ function getBrushContextProperties(): PanelRows {
                 id: `layer-${i}-delete`,
                 onClick() {
                     state.areaInstance.definition.layers.splice(i, 1);
-                    state.areaInstance.alternateArea.definition.layers.splice(i, 1);
+                    if (state.areaInstance.alternateArea.definition.layers) {
+                        state.areaInstance.alternateArea.definition.layers.splice(i, 1);
+                    }
                     enterLocation(state, state.location);
                     displayTileEditorPropertyPanel();
                 },
@@ -514,9 +516,11 @@ function getBrushContextProperties(): PanelRows {
                     }
                     state.areaInstance.definition.layers[i] = state.areaInstance.definition.layers[i - 1];
                     state.areaInstance.definition.layers[i - 1] = definition;
-                    state.areaInstance.alternateArea.definition.layers[i]
-                        = state.areaInstance.alternateArea.definition.layers[i - 1];
-                    state.areaInstance.alternateArea.definition.layers[i - 1] = alternateDefinition;
+                    if (state.areaInstance.alternateArea.definition.layers) {
+                        state.areaInstance.alternateArea.definition.layers[i]
+                            = state.areaInstance.alternateArea.definition.layers[i - 1];
+                        state.areaInstance.alternateArea.definition.layers[i - 1] = alternateDefinition;
+                    }
                     enterLocation(state, state.location);
                     displayTileEditorPropertyPanel();
                 },
@@ -530,8 +534,10 @@ function getBrushContextProperties(): PanelRows {
                     }
                     state.areaInstance.definition.layers[i] = state.areaInstance.definition.layers[i + 1];
                     state.areaInstance.definition.layers[i + 1] = definition;
-                    state.areaInstance.alternateArea.definition.layers[i] = state.areaInstance.alternateArea.definition.layers[i + 1];
-                    state.areaInstance.alternateArea.definition.layers[i + 1] = alternateDefinition;
+                    if (state.areaInstance.alternateArea.definition.layers) {
+                        state.areaInstance.alternateArea.definition.layers[i] = state.areaInstance.alternateArea.definition.layers[i + 1];
+                        state.areaInstance.alternateArea.definition.layers[i + 1] = alternateDefinition;
+                    }
                     enterLocation(state, state.location);
                     displayTileEditorPropertyPanel();
                 },
@@ -723,7 +729,7 @@ function deleteTileFromLayer(tx: number, ty: number, area: AreaInstance, layer: 
         // Clear the tile definition in the spirit world.
         tiles[ty][tx] = 0;
         // And set the instance to use the tile from the parent definition.
-        const parentLayer = definition.parentDefinition?.layers.find(layer => layer.key === editingState.selectedLayerKey);
+        const parentLayer = definition.parentDefinition?.layers?.find(layer => layer.key === editingState.selectedLayerKey);
         if (parentLayer) {
             layer.originalTiles[ty][tx] = layer.tiles[ty][tx] = allTiles[parentLayer.grid.tiles[ty][tx]];
         }
@@ -774,19 +780,21 @@ function addNewLayer(state: GameState, layerKey: string, layerIndex: number) {
             tiles: [],
         },
     };
-    const alternateLayerDefinition: AreaLayerDefinition = {
-        ...alternateTopLayerDefinition,
-        drawPriority: layerKey.startsWith('foreground') ? 'foreground' : 'background',
-        key: layerKey,
-        grid: {
-            ...alternateTopLayerDefinition.grid,
-            tiles: [],
-        },
-    };
     initializeAreaLayerTiles(layerDefinition);
-    initializeAreaLayerTiles(alternateLayerDefinition);
     definition.layers.splice(layerIndex, 0, layerDefinition);
-    alternateDefinition.layers.splice(layerIndex, 0, alternateLayerDefinition);
+    if (alternateDefinition.layers) {
+        const alternateLayerDefinition: AreaLayerDefinition = {
+            ...alternateTopLayerDefinition,
+            drawPriority: layerKey.startsWith('foreground') ? 'foreground' : 'background',
+            key: layerKey,
+            grid: {
+                ...alternateTopLayerDefinition.grid,
+                tiles: [],
+            },
+        };
+        initializeAreaLayerTiles(alternateLayerDefinition);
+        alternateDefinition.layers.splice(layerIndex, 0, alternateLayerDefinition);
+    }
 }
 function addMissingLayer(state: GameState, layerKey: string) {
     const layerIndex = layersInOrder.indexOf(layerKey);
@@ -939,7 +947,7 @@ function replaceTiles(x: number, y: number): void {
             state.areaInstance.layers.find(l => l.key === 'field')
             || state.areaInstance.layers[state.areaInstance.layers.length - 1]
         );
-    const parentLayer = state.areaInstance.definition.parentDefinition?.layers.find(l => l.key === layer.key)
+    const parentLayer = state.areaInstance.definition.parentDefinition?.layers?.find(l => l.key === layer.key)
     const w = 16, h = 16;
     const tile = layer.tiles[((state.camera.y + y) / h) | 0]?.[((state.camera.x + x) / w) | 0];
     const replacement: number = editingState.brush.none.tiles[0][0];
@@ -1089,7 +1097,7 @@ function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, a
                     for (const priorityToDraw of ['background', 'foreground']) {
                         for (const layerKey of allLayerKeys) {
                             const currentLayer = state.areaInstance.definition.layers.find(l => l.key === layerKey);
-                            const parentLayer = state.areaInstance.definition.parentDefinition?.layers.find(l => l.key === layerKey);
+                            const parentLayer = state.areaInstance.definition.parentDefinition?.layers?.find(l => l.key === layerKey);
                             let brush: TileGridDefinition = null, defaultBrush: TileGridDefinition = null;
                             if (currentLayer && currentLayer === selectedLayer) {
                                 brush = editingState.brush[layerKey] || editingState.brush.none;

@@ -65,27 +65,31 @@ export function getDefaultArea(): AreaDefinition {
     };
 }
 
+export function copyLayerTemplate(layer: AreaLayerDefinition): AreaLayerDefinition {
+    return {
+        ...layer,
+        drawPriority: layer.key.startsWith('foreground') ? 'foreground' : 'background',
+        grid: {
+            ...layer.grid,
+            // The matrix of tiles
+            tiles: [],
+        },
+        // Add the mask from the parent layer but only if it is defined.
+        ...(layer.mask ? { mask: {
+            ...layer.mask,
+            // The matrix of tiles
+            tiles: [],
+        }} : {}),
+    };
+}
+
 export function getDefaultSpiritArea(location: ZoneLocation): AreaDefinition {
     const parentDefinition = getAreaFromLocation({...location, isSpiritWorld: false});
     return {
         default: true,
         parentDefinition,
         isSpiritWorld: true,
-        layers: parentDefinition.layers.map(layer => ({
-            ...layer,
-            drawPriority: layer.key.startsWith('foreground') ? 'foreground' : 'background',
-            grid: {
-                ...layer.grid,
-                // The matrix of tiles
-                tiles: [],
-            },
-            // Add the mask from the parent layer but only if it is defined.
-            ...(layer.mask ? { mask: {
-                ...layer.mask,
-                // The matrix of tiles
-                tiles: [],
-            }} : {}),
-        })),
+        layers: parentDefinition.layers.map(copyLayerTemplate),
         objects: [],
         // Spirit world sections should match their parent definition, otherwise the
         // camera will not be aligned correctly when switching back and forth.
@@ -96,6 +100,7 @@ export function getDefaultSpiritArea(location: ZoneLocation): AreaDefinition {
 export function getAreaFromLocation(location: ZoneLocation): AreaDefinition {
     const floor = zones[location.zoneKey].floors[location.floor];
     const grid = location.isSpiritWorld ? floor.spiritGrid : floor.grid;
+    const alternateGrid = location.isSpiritWorld ? floor.grid : floor.spiritGrid;
 
     const {x, y} = location.areaGridCoords;
     if (!grid[y]) {
@@ -107,11 +112,19 @@ export function getAreaFromLocation(location: ZoneLocation): AreaDefinition {
         return grid[y][x] as AreaDefinition;
     } else if (!grid[y][x].layers) {
         const areaDefinition = grid[y][x];
-        const defaultLayers = (location.isSpiritWorld ? getDefaultSpiritArea(location) : getDefaultArea()).layers;
-        grid[y][x] = initializeAreaTiles({
-            ...areaDefinition,
-            layers: defaultLayers
-        });
+        const alternateAreaDefinition = alternateGrid[y][x];
+        if (alternateAreaDefinition.layers) {
+            grid[y][x] = initializeAreaTiles({
+                ...areaDefinition,
+                layers: alternateAreaDefinition.layers.map(copyLayerTemplate),
+            });
+        } else {
+            const defaultLayers = (location.isSpiritWorld ? getDefaultSpiritArea(location) : getDefaultArea()).layers;
+            grid[y][x] = initializeAreaTiles({
+                ...areaDefinition,
+                layers: defaultLayers
+            });
+        }
         return grid[y][x] as AreaDefinition;
     }
     return grid[y][x];
@@ -654,11 +667,11 @@ function createAreaInstance(state: GameState, definition: AreaDefinition): AreaI
         tilesDrawn: [],
         checkToRedrawTiles: true,
         layers: definition.layers.filter((layer) => {
-            // The selected layer is always visible.
             if (!layer) {
                 console.error('missing layer', definition);
                 debugger;
             }
+            // The selected layer is always visible.
             if (editingState.isEditing && editingState.selectedLayerKey === layer.key) {
                 return true;
             }
@@ -708,7 +721,9 @@ function createAreaInstance(state: GameState, definition: AreaDefinition): AreaI
         neutralTargets: [],
         enemies: [],
     };
-    if (definition.parentDefinition) {
+    // Don't attempt to inherit layers if they are not defined in the parent. This can
+    // happen in spirit areas that are not connected to the material world.
+    if (definition.parentDefinition?.layers) {
         for (const layer of instance.layers) {
             const definitionIndex = definition.layers.indexOf(layer.definition);
             const parentLayerDefinition = definition.parentDefinition.layers[definitionIndex];
@@ -742,7 +757,10 @@ function createAreaInstance(state: GameState, definition: AreaDefinition): AreaI
     }
     for (const layer of instance.layers) {
         const definitionIndex = definition.layers.indexOf(layer.definition);
-        applyLayerToBehaviorGrid(behaviorGrid, instance.definition.layers[definitionIndex], definition.parentDefinition?.layers[definitionIndex]);
+        applyLayerToBehaviorGrid(behaviorGrid,
+            instance.definition.layers[definitionIndex],
+            definition.parentDefinition?.layers?.[definitionIndex]
+        );
     }
     definition.objects.filter(
         object => isObjectLogicValid(state, object)
@@ -846,11 +864,11 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
                 instance.tilesDrawn = [];
                 instance.checkToRedrawTiles = true;
                 instance.behaviorGrid = [];
-                for (const layer of instance.layers) {
+                for (const layer of instance.layers || []) {
                     const definitionIndex = instance.definition.layers.indexOf(layer.definition);
                     applyLayerToBehaviorGrid(instance.behaviorGrid,
                         instance.definition.layers[definitionIndex],
-                        instance.definition.parentDefinition?.layers[definitionIndex]
+                        instance.definition.parentDefinition?.layers?.[definitionIndex]
                     );
                 }
             }

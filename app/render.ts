@@ -415,7 +415,7 @@ export function checkToRedrawTiles(area: AreaInstance) {
             }
         }
     }
-    area.layers.map((layer, index) => renderLayer(area, layer, area.definition.parentDefinition?.layers[index]));
+    area.layers.map((layer, index) => renderLayer(area, layer, area.definition.parentDefinition?.layers?.[index]));
     for (let y = 0; y < area.h; y++) {
         if (!area.tilesDrawn[y]) {
             area.tilesDrawn[y] = [];
