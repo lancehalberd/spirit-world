@@ -46,14 +46,12 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    Change air bubbles graphics to show up on top of crystal ground
-        - Make air bubbles lose charge over time and represent it visually.
     Fix missing ceiling edge tiles in waterfall tower
+    Add crystal spike tiles once I get the final version from Jon
+        - Replace pits near bead flows with spikes, the respawn logic on the bead flows can make
+        you start about to fall into nearby pits.
 
     Editor Improvements
-        - Make sure only left click applies editor actions.
-            - Right clicking to open context menu or interacting with context menu should not
-            cause updates to tiles/objects.
         - Add graphical palettes
             - Objects
             - (low priority) super tile layout selection
@@ -171,12 +169,7 @@ Current tasks:
         - Storm Beast can turn into lightning and teleport as a beam sending shockwaves out at both ends.
         - Storm Beast can charge south to exit the battle field
 
-
-    - Make the staff ground raised, use floorHeight tileBehavior to control minZ+raise the shadow so they don't look like they are floating.
     - Game occasionally plays small bits of music while muted.
-    - Game music occasionally doesn't pick up correctly
-        - At the end of tracks
-        - Transition between boss tracks
 
     Make mutation transition use the same area instance so contents don't reset
         - Will need to add special handling to remove extra ice tiles from frost beast+heat sink battles.

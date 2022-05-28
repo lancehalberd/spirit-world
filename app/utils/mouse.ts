@@ -26,10 +26,10 @@ function onMouseMove(event) {
     // console.log(mousePosition);
 }
 function onMouseDown(event) {
-    if (event.which == 1) mouseIsDown = true;
+    if (event.which === 1) mouseIsDown = true;
 }
 function onMouseUp(event) {
-    if (event.which == 1) mouseIsDown = false;
+    if (event.which === 1) mouseIsDown = false;
     unlockAudio();
 }
 

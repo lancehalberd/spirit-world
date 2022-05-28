@@ -661,7 +661,10 @@ mainCanvas.addEventListener('mousemove', function () {
             break;
     }
 });
-mainCanvas.addEventListener('mousedown', function () {
+mainCanvas.addEventListener('mousedown', function (event) {
+    if (event.which !== 1) {
+        return;
+    }
     if (!editingState.isEditing) {
         return;
     }

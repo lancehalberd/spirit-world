@@ -124,11 +124,11 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
             }
         }
     }
-    let isTouchingAirBubble = false;
+    let activeAirBubbles: AirBubbles = null;
     for (const object of hero.area.objects) {
         if (object instanceof AirBubbles) {
             if (rectanglesOverlap(hero, object.getHitbox(state))) {
-                isTouchingAirBubble = true;
+                activeAirBubbles = object;
                 break;
             }
         }
@@ -154,21 +154,28 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
         // state.hero.actualMagicRegen = Math.max(-10, state.hero.actualMagicRegen - 4 * FRAME_LENGTH / 1000);
         state.hero.actualMagicRegen = !state.hero.action ? 2 : 1;
     }
-    const isHoldingBreath = !isTouchingAirBubble && !state.hero.passiveTools.waterBlessing && state.zone.surfaceKey;
+    const isHoldingBreath = !state.hero.passiveTools.waterBlessing && state.zone.surfaceKey;
     // The waterfall tower area drains mana unless you have the water blessing.
     // Might make more sense to have this related to the water tiles in the material world or have
     // it be configurable on the area like `darkness` but for now just using the zone key is fine.
-    const isWaterDrainingMagic = !isTouchingAirBubble && !state.hero.passiveTools.waterBlessing && state.zone.key === 'waterfallTower';
-    if (isWaterDrainingMagic) {
+    const isWaterDrainingMagic = !state.hero.passiveTools.waterBlessing && state.zone.key === 'waterfallTower';
+    if (activeAirBubbles) {
+        // "airBubbles" are actually going to be "Spirit Recharge" points that regenerate mana quickly.
+        state.hero.magic = Math.max(0, state.hero.magic);
+        activeAirBubbles.charge = Math.max(activeAirBubbles.charge - 0.02, -0.3);
+        if (activeAirBubbles.charge > 0) {
+            state.hero.actualMagicRegen = Math.max(5, state.hero.actualMagicRegen);
+        } else if (isWaterDrainingMagic || isHoldingBreath) {
+            // Magic regen is 0 while magic is being drained but the hero is standing on
+            // a depleted spirit recharge point.
+            state.hero.actualMagicRegen = 0;
+        }
+    } else if (isWaterDrainingMagic) {
         state.hero.actualMagicRegen = Math.min(-20, state.hero.actualMagicRegen);
     } else if (isHoldingBreath) {
         state.hero.actualMagicRegen = Math.min(-1, state.hero.actualMagicRegen);
-    } else if (isTouchingAirBubble) {
-        // "airBubbles" are actually going to be "Spirit Recharge" points that regenerate mana quickly.
-        state.hero.magic = Math.max(0, state.hero.magic);
-        state.hero.actualMagicRegen = Math.max(5, state.hero.actualMagicRegen);
     }
-    if (!state.hero.isInvisible && !isHoldingBreath) {
+    if (!state.hero.isInvisible && (!isHoldingBreath || activeAirBubbles?.charge > 0)) {
         state.hero.actualMagicRegen = Math.min(
             !state.hero.action ? 2 * state.hero.magicRegen : state.hero.magicRegen,
             state.hero.actualMagicRegen + 4 * FRAME_LENGTH / 1000
