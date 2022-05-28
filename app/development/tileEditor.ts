@@ -87,7 +87,7 @@ window.onbeforeunload = () => {
 }
 
 
-const toolTabContainer = new TabContainer<EditorToolType>('select', [
+const toolTabContainer = new TabContainer<EditorToolType>('brush', [
     {
         key: 'select',
         label: '↖',

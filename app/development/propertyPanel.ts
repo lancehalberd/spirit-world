@@ -229,7 +229,7 @@ function renderProperty(property: EditorProperty<any> | HTMLElement | string): s
     }
     if (isPaletteProperty(property)) {
         propertiesById[property.id || property.name] = property;
-        const span = tagElement('span', 'pp-property');
+        const containerDiv = tagElement('div', 'pp-property');
         const palette = property.palette;
         paletteCanvas.width = palette[0].length * 16;
         paletteCanvas.height = palette.length * 16;
@@ -302,15 +302,25 @@ function renderProperty(property: EditorProperty<any> | HTMLElement | string): s
             }
         }
         paletteCanvas.style.transform = `scale(${scale})`;
-        span.style.display = 'flex';
-        span.style.flexDirection = 'column';
-        span.style.alignItems = 'center';
-        span.append(paletteCanvas);
-        span.append(brushCanvas);
-        return span;
+        // The scale transform interacts poorly directly inside a flex display, so we add
+        // a div with the correct width wrapping the palette.
+        const paletteDiv = tagElement('div');
+        paletteDiv.style.width = '400px';
+        paletteDiv.style.height = `${Math.min(200, 20 + paletteCanvas.height * scale)}px`;
+        paletteDiv.style.textAlign = 'center';
+        paletteDiv.style.marginBottom = '10px';
+        paletteDiv.style.overflowY = 'auto';
+        paletteDiv.append(paletteCanvas);
+
+        containerDiv.style.display = 'flex';
+        containerDiv.style.flexDirection = 'column';
+        containerDiv.style.alignItems = 'center';
+        containerDiv.append(paletteDiv);
+        containerDiv.append(brushCanvas);
+        return containerDiv;
     } else if (isSourcePaletteProperty(property)) {
         propertiesById[property.id || property.name] = property;
-        const span = tagElement('span', 'pp-property');
+        const containerDiv = tagElement('div', 'pp-property');
         const frame = {
             image: property.sourcePalette.source.image,
             x: 0,
@@ -417,21 +427,21 @@ function renderProperty(property: EditorProperty<any> | HTMLElement | string): s
             }
         }
         paletteCanvas.style.transform = `scale(${scale})`;
-        span.style.display = 'flex';
-        span.style.flexDirection = 'column';
-        span.style.alignItems = 'center';
+        containerDiv.style.display = 'flex';
+        containerDiv.style.flexDirection = 'column';
+        containerDiv.style.alignItems = 'center';
         // The scale transform interacts poorly directly inside a flex display, so we add
         // a div with the correct width wrapping the palette.
         const paletteDiv = tagElement('div');
         paletteDiv.style.width = '400px';
-        paletteDiv.style.height = `${paletteCanvas.height * scale}px`;
+        paletteDiv.style.height = `${Math.min(200, 20 + paletteCanvas.height * scale)}px`;
         paletteDiv.style.textAlign = 'center';
         paletteDiv.style.marginBottom = '10px';
-        paletteDiv.style.overflow = 'hidden';
+        paletteDiv.style.overflowY = 'auto';
         paletteDiv.append(paletteCanvas);
-        span.append(paletteDiv);
-        span.append(brushCanvas);
-        return span;
+        containerDiv.append(paletteDiv);
+        containerDiv.append(brushCanvas);
+        return containerDiv;
     } else if (isButtonProperty(property)) {
         propertiesById[property.id || property.name] = property;
         return `<span class="pp-property"><button name="${property.id || property.name}">${property.name}</button></span>`;

@@ -48,8 +48,12 @@ Graphics:
 Current tasks:
     Change air bubbles graphics to show up on top of crystal ground
         - Make air bubbles lose charge over time and represent it visually.
+    Fix missing ceiling edge tiles in waterfall tower
 
     Editor Improvements
+        - Make sure only left click applies editor actions.
+            - Right clicking to open context menu or interacting with context menu should not
+            cause updates to tiles/objects.
         - Add graphical palettes
             - Objects
             - (low priority) super tile layout selection
