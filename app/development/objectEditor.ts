@@ -43,6 +43,8 @@ import {
     Zone, ZoneLocation,
 } from 'app/types';
 
+type PartialObjectDefinitionWithType = Partial<ObjectDefinition> & {type: ObjectType};
+
 function createObjectPaletteItem<T extends string>(type: T, instance: ObjectInstance): ObjectPaletteItem<T> {
     return {
         key: type,
@@ -72,7 +74,7 @@ function createObjectPaletteItem<T extends string>(type: T, instance: ObjectInst
 
 function getBossInstance(bossType: BossType): ObjectInstance {
     const state = getState();
-    const definition: ObjectDefinition = createObjectDefinition(state, editingState, {
+    const definition: ObjectDefinition = createObjectDefinition(state, {
         type: 'boss',
         enemyType: bossType,
         x: 0,
@@ -82,7 +84,7 @@ function getBossInstance(bossType: BossType): ObjectInstance {
 }
 function getEnemyInstance(enemyType: EnemyType): ObjectInstance {
     const state = getState();
-    const definition: ObjectDefinition = createObjectDefinition(state, editingState, {
+    const definition: ObjectDefinition = createObjectDefinition(state, {
         type: 'enemy',
         enemyType,
         x: 0,
@@ -90,8 +92,35 @@ function getEnemyInstance(enemyType: EnemyType): ObjectInstance {
     });
     return createObjectInstance(state, definition);
 }
+function getObjectInstance(objectType: ObjectType): ObjectInstance {
+    const state = getState();
+    const partialDefinition = {type: objectType} as PartialObjectDefinitionWithType;
+    const definition = createObjectDefinition(state, partialDefinition);
+    return createObjectInstance(state, definition);
+}
 
-let enemyPalette: ObjectPalette<EnemyType>, bossPalette: ObjectPalette<BossType>;
+let objectPalette: ObjectPalette<ObjectType>;
+let enemyPalette: ObjectPalette<EnemyType>;
+let bossPalette: ObjectPalette<BossType>;
+
+function getObjectPalette() {
+    if (!objectPalette) {
+        objectPalette = new ObjectPalette<ObjectType>(combinedObjectTypes[0],
+            combinedObjectTypes.map(
+                type => createObjectPaletteItem(type, getObjectInstance(type))
+            ),
+            (objectType: ObjectType) => {
+                const state = getState();
+                const object: ObjectDefinition = editingState.selectedObject;
+                object.type = objectType as any;
+                editingState.selectedObject = createObjectDefinition(state, object);
+                updateObjectInstance(state, editingState.selectedObject, object);
+                displayTileEditorPropertyPanel();
+            }
+        );
+    }
+    return objectPalette;
+}
 
 function getEnemyPalette() {
     if (!enemyPalette) {
@@ -143,49 +172,17 @@ export function getObjectTypeProperties(): PanelRows {
         palette.selectedKey = object.enemyType as EnemyType;
         palette.render();
         return [palette.canvas];
-        /*return [{
-            name: 'type',
-            value: object.enemyType,
-            values: enemyTypes,
-            selectSize: 10,
-            onChange(enemyType: EnemyType) {
-                object.enemyType = enemyType;
-                updateObjectInstance(state, object);
-                // We need to refresh the panel to get enemy specific properties.
-                displayTileEditorPropertyPanel();
-            },
-        }];*/
     }
     if (object.type === 'boss') {
         const palette = getBossPalette();
         palette.selectedKey = object.enemyType;
         palette.render();
         return [palette.canvas];
-        /*return [{
-            name: 'type',
-            value: object.enemyType as BossType,
-            values: bossTypes,
-            selectSize: 10,
-            onChange(bossType: BossType) {
-                object.enemyType = bossType;
-                updateObjectInstance(state, object);
-                // We need to refresh the panel to get boss specific properties.
-                displayTileEditorPropertyPanel();
-            },
-        }];*/
     }
-    return [{
-        name: 'type',
-        value: object.type,
-        values: combinedObjectTypes,
-        selectSize: 10,
-        onChange(objectType: ObjectType) {
-            object.type = objectType as any;
-            editingState.selectedObject = createObjectDefinition(state, editingState, object);
-            updateObjectInstance(state, editingState.selectedObject, object);
-            displayTileEditorPropertyPanel();
-        },
-    }];
+    const palette = getObjectPalette();
+    palette.selectedKey = object.type;
+    palette.render();
+    return [palette.canvas];
 }
 
 
@@ -223,8 +220,7 @@ export const combinedObjectTypes: ObjectType[] = [
 
 export function createObjectDefinition(
     state: GameState,
-    editingState: EditingState,
-    definition: Partial<ObjectDefinition> & { type: ObjectType }
+    definition: PartialObjectDefinitionWithType
 ): ObjectDefinition {
     const x = definition.x || 0;
     const y = definition.y || 0;
@@ -672,10 +668,11 @@ export function getObjectProperties(state: GameState, editingState: EditingState
         });
     }
 
+    rows = [...rows, ...getStyleFields(state, editingState, object)];
     switch (object.type) {
         case 'decoration':
             rows.push({
-                name: 'style',
+                name: 'decoration type',
                 value: object.decorationType,
                 values: Object.keys(decorationTypes),
                 onChange(decorationType: DecorationType) {
@@ -1006,7 +1003,6 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             });
             break;
     }
-    rows = [...rows, ...getStyleFields(state, editingState, object)];
     return rows;
 }
 
@@ -1128,7 +1124,6 @@ function getLootFields(state: GameState, editingState: EditingState, object: Obj
 export function onMouseDownObject(state: GameState, editingState: EditingState, x: number, y: number): void {
     const newObject: ObjectDefinition = createObjectDefinition(
         state,
-        editingState,
         {
             ...editingState.selectedObject,
             x: Math.round(x + state.camera.x),
@@ -1348,7 +1343,7 @@ export function renderObjectPreview(
     x: number,
     y: number
 ): void {
-    const definition: ObjectDefinition = createObjectDefinition(state, editingState, {
+    const definition: ObjectDefinition = createObjectDefinition(state, {
         id: uniqueId(state, editingState.selectedObject.type),
         ...editingState.selectedObject,
         x: Math.round(x + state.camera.x),

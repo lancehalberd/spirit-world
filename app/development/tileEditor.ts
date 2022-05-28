@@ -188,7 +188,7 @@ export function startEditing(state: GameState) {
         editingState.brush = {'none': {w: 1,h: 1,tiles: [[0]]}};
     }
     if (!editingState.selectedObject) {
-        editingState.selectedObject = createObjectDefinition(state, editingState,
+        editingState.selectedObject = createObjectDefinition(state,
             {type: combinedObjectTypes[0]} as Partial<ObjectDefinition> & { type: ObjectType }
         );
     }
