@@ -52,9 +52,6 @@ Current tasks:
         you start about to fall into nearby pits.
 
     Editor Improvements
-        - Add graphical palettes
-            - Objects
-            - (low priority) super tile layout selection
         - Paint tile grids starting from center of mouse instead of top right corner
             - This will balance the easy of using large groups toward any edge of the screen
             - Make sure this does not impact painting a single tile in any way.
@@ -62,6 +59,8 @@ Current tasks:
         - Track which zones have been changed but not exported.
         - Support undo/redo actions
             - Include in context menu when editor is active
+        - Add graphical palettes
+            - (low priority) super tile layout selection
 
     Note: Make chest flash briefly in alternate world when it spawns in the alternate world.
     - So if you hit a switch that makes a chest in the alternate world you have a sense of what it did.
