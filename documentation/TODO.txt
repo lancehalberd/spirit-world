@@ -55,7 +55,6 @@ Current tasks:
         - Paint tile grids starting from center of mouse instead of top right corner
             - This will balance the easy of using large groups toward any edge of the screen
             - Make sure this does not impact painting a single tile in any way.
-        - Clicking minimap should change location.
         - Track which zones have been changed but not exported.
         - Support undo/redo actions
             - Include in context menu when editor is active

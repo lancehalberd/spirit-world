@@ -73,6 +73,9 @@ function jumpToMinimapLocation() {
   const pixelX = Math.round(x / pixelScale) % 512;
   const pixelY = Math.round(y / pixelScale) % 512;
   const state = getState();
+  if (gridRow >= state.areaGrid.length && gridColumn >= state.areaGrid[0].length) {
+      return;
+  }
   enterLocation(state, {
       zoneKey: state.location.zoneKey,
       floor: state.location.floor,
@@ -194,15 +197,54 @@ export function checkToRefreshMinimap(state: GameState): void {
 export function renderZoneEditor(context: CanvasRenderingContext2D, state: GameState, editingState: EditingState): void {
     mapOverlayContext.clearRect(0, 0, mapOverlayCanvas.width, mapOverlayCanvas.height);
     mapOverlayContext.fillStyle = 'rgba(255, 255, 255, 1)';
+    // Draw edges separating screens.
     for (let row = 0; row < state.areaGrid.length; row++) {
         for (let column = 0; column < state.areaGrid[row].length; column++) {
+            mapOverlayContext.save();
+            mapOverlayContext.translate(column * superTileSize, row * superTileSize);
             for( const section of (state.areaGrid[row][column]?.sections || [fullSection])) {
                 const {x, y, w, h} = scaleRect(section, tileScale);
-                mapOverlayContext.fillRect(column * superTileSize + x, row * superTileSize + y, w, 1);
-                mapOverlayContext.fillRect(column * superTileSize + x, row * superTileSize + y + h - 1, w, 1);
-                mapOverlayContext.fillRect(column * superTileSize + x, row * superTileSize + y + 1, 1, h - 2);
-                mapOverlayContext.fillRect(column * superTileSize + x + w - 1, row * superTileSize + y + 1, 1, h - 2);
+                mapOverlayContext.fillRect(x, y, w, 1);
+                mapOverlayContext.fillRect(x, y + h - 1, w, 1);
+                mapOverlayContext.fillRect(x, y + 1, 1, h - 2);
+                mapOverlayContext.fillRect(x + w - 1, y + 1, 1, h - 2);
             }
+            mapOverlayContext.restore();
+        }
+    }
+    // Draw door indicators
+    for (let row = 0; row < state.areaGrid.length; row++) {
+        for (let column = 0; column < state.areaGrid[row].length; column++) {
+            mapOverlayContext.save();
+            mapOverlayContext.translate(column * superTileSize, row * superTileSize);
+            for(const object of (state.areaGrid[row][column]?.objects || [])) {
+                if (object.type !== 'door') {
+                    continue;
+                }
+                let {x, y} = object;
+                let w = 16, h = 16;
+                if (object.targetZone) {
+                    mapOverlayContext.fillStyle = 'rgba(0, 255, 255, 1)';
+                    w = 32, h = 32;
+                } else {
+                    x += 8, y += 8;
+                    mapOverlayContext.fillStyle = 'rgba(255, 255, 255, 1)';
+                    if (object.d === 'up') {
+                        y -= 48; h += 48;
+                    }
+                    if (object.d === 'down') {
+                        h += 48;
+                    }
+                    if (object.d === 'left') {
+                        x -= 48; w += 48;
+                    }
+                    if (object.d === 'right') {
+                        w += 48;
+                    }
+                }
+                mapOverlayContext.fillRect(x * pixelScale, y * pixelScale, w * pixelScale, h * pixelScale);
+            }
+            mapOverlayContext.restore();
         }
     }
     mapOverlayContext.fillStyle = 'rgba(255, 255, 255, 0.3)';
