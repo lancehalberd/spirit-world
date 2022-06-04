@@ -13,6 +13,7 @@ import { CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
 import { checkToRedrawTiles } from 'app/render';
 import { getState } from 'app/state';
 import { readFromFile, saveToFile, scaleRect } from 'app/utils/index';
+import { getMousePosition, isMouseDown } from 'app/utils/mouse';
 
 import {
     AreaInstance, Floor, GameState, LogicDefinition, PanelRows, PropertyRow, Zone
@@ -38,6 +39,10 @@ const sectionLayouts = {
     bottomRow: [tlSection, trSection, bottomRow],
 }
 
+const superTileSize = 64;
+const tileScale = superTileSize / 32;
+const pixelScale = tileScale / 16;
+
 const [mapCanvas, mapContext] = createCanvasAndContext(128, 128);
 mapCanvas.style.position = 'absolute'
 mapCanvas.style.top = '0px';
@@ -46,6 +51,39 @@ const [mapOverlayCanvas, mapOverlayContext] = createCanvasAndContext(128, 128);
 mapOverlayCanvas.style.position = 'absolute'
 mapOverlayCanvas.style.top = '0px';
 mapOverlayCanvas.style.left = '0px';
+
+mapOverlayCanvas.onclick = function (e: MouseEvent) {
+  if (e.which !== 1) {
+      return;
+  }
+  jumpToMinimapLocation();
+}
+
+mapOverlayCanvas.onmousemove = function (e: MouseEvent) {
+  if (!isMouseDown()) {
+      return;
+  }
+  jumpToMinimapLocation();
+}
+
+function jumpToMinimapLocation() {
+  const [x, y] = getMousePosition(mapOverlayCanvas);
+  const gridRow = Math.floor(y / superTileSize);
+  const gridColumn = Math.floor(x / superTileSize);
+  const pixelX = Math.round(x / pixelScale) % 512;
+  const pixelY = Math.round(y / pixelScale) % 512;
+  const state = getState();
+  enterLocation(state, {
+      zoneKey: state.location.zoneKey,
+      floor: state.location.floor,
+      isSpiritWorld: state.location.isSpiritWorld,
+      d: state.location.d,
+      areaGridCoords: {x: gridColumn, y: gridRow},
+      x: pixelX,
+      y: pixelY,
+      z: 0,
+  });
+}
 
 const minimapContainer = tagElement('div');
 minimapContainer.style.position = 'relative';
@@ -87,11 +125,10 @@ export function renderZoneTabContainer(): HTMLElement {
     zoneTabContainer.render();
     return zoneTabContainer.element;
 }
-const tileSize = 64;
 export function getMinimapSize(state: GameState): {w: number, h: number} {
     return {
-        w: state.areaGrid[0].length * tileSize,
-        h: state.areaGrid.length * tileSize,
+        w: state.areaGrid[0].length * superTileSize,
+        h: state.areaGrid.length * superTileSize,
     }
 }
 export function updateMinimapSize(state: GameState): void {
@@ -115,12 +152,12 @@ export function renderAreaToMinimap(state: GameState, area: AreaInstance, gridCo
     }
     mapContext.drawImage(area.canvas,
         0, 0, 512, 512,
-        gridCoords.x * tileSize, gridCoords.y * tileSize, tileSize, tileSize
+        gridCoords.x * superTileSize, gridCoords.y * superTileSize, superTileSize, superTileSize
     );
     if (area.foregroundCanvas) {
         mapContext.drawImage(area.foregroundCanvas,
             0, 0, 512, 512,
-            gridCoords.x * tileSize, gridCoords.y * tileSize, tileSize, tileSize
+            gridCoords.x * superTileSize, gridCoords.y * superTileSize, superTileSize, superTileSize
         );
     }
 }
@@ -155,27 +192,24 @@ export function checkToRefreshMinimap(state: GameState): void {
 }
 
 export function renderZoneEditor(context: CanvasRenderingContext2D, state: GameState, editingState: EditingState): void {
-
-    const tileScale = tileSize / 32;
     mapOverlayContext.clearRect(0, 0, mapOverlayCanvas.width, mapOverlayCanvas.height);
     mapOverlayContext.fillStyle = 'rgba(255, 255, 255, 1)';
     for (let row = 0; row < state.areaGrid.length; row++) {
         for (let column = 0; column < state.areaGrid[row].length; column++) {
             for( const section of (state.areaGrid[row][column]?.sections || [fullSection])) {
                 const {x, y, w, h} = scaleRect(section, tileScale);
-                mapOverlayContext.fillRect(column * tileSize + x, row * tileSize + y, w, 1);
-                mapOverlayContext.fillRect(column * tileSize + x, row * tileSize + y + h - 1, w, 1);
-                mapOverlayContext.fillRect(column * tileSize + x, row * tileSize + y + 1, 1, h - 2);
-                mapOverlayContext.fillRect(column * tileSize + x + w - 1, row * tileSize + y + 1, 1, h - 2);
+                mapOverlayContext.fillRect(column * superTileSize + x, row * superTileSize + y, w, 1);
+                mapOverlayContext.fillRect(column * superTileSize + x, row * superTileSize + y + h - 1, w, 1);
+                mapOverlayContext.fillRect(column * superTileSize + x, row * superTileSize + y + 1, 1, h - 2);
+                mapOverlayContext.fillRect(column * superTileSize + x + w - 1, row * superTileSize + y + 1, 1, h - 2);
             }
         }
     }
     mapOverlayContext.fillStyle = 'rgba(255, 255, 255, 0.3)';
     const area = state.nextAreaInstance || state.areaInstance;
     renderAreaToMinimap(state, area, state.location.areaGridCoords);
-    const pixelScale = tileScale / 16;
-    const cameraX = Math.floor(state.location.areaGridCoords.x * tileSize + state.camera.x * pixelScale - area.cameraOffset.x * pixelScale);
-    const cameraY = Math.floor(state.location.areaGridCoords.y * tileSize + state.camera.y * pixelScale - area.cameraOffset.y * pixelScale);
+    const cameraX = Math.floor(state.location.areaGridCoords.x * superTileSize + state.camera.x * pixelScale - area.cameraOffset.x * pixelScale);
+    const cameraY = Math.floor(state.location.areaGridCoords.y * superTileSize + state.camera.y * pixelScale - area.cameraOffset.y * pixelScale);
     mapOverlayContext.fillRect(cameraX, cameraY, CANVAS_WIDTH * pixelScale, CANVAS_HEIGHT * pixelScale);
 }
 
