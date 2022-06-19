@@ -9,6 +9,7 @@ import {
 interface CreateAnimationOptions {
     x?: number, y?: number,
     xSpace?: number,
+    ySpace?: number,
     rows?: number, cols?: number,
     top?: number, left?: number,
     duration?: number,
@@ -34,7 +35,7 @@ export function framesAnimation(frames: Frame[], duration = 8, props: ExtraAnima
 export function createAnimation(
     source: string | HTMLImageElement | HTMLCanvasElement,
     dimensions: FrameDimensions,
-    {x = 0, y = 0, rows = 1, cols = 1, xSpace = 0, top = 0, left = 0, duration = 8, frameMap = null}: CreateAnimationOptions = {},
+    {x = 0, y = 0, rows = 1, cols = 1, xSpace = 0, ySpace = 0, top = 0, left = 0, duration = 8, frameMap = null}: CreateAnimationOptions = {},
     props: ExtraAnimationProperties = {},
 ): FrameAnimation {
     let frames: Frame[] = [];
@@ -49,7 +50,7 @@ export function createAnimation(
             frames[row * cols + col] = {
                 ...dimensions,
                 x: left + (dimensions.w + xSpace) * (x + col),
-                y: top + dimensions.h * (y + row),
+                y: top + (dimensions.h + ySpace) * (y + row),
                 image
             };
         }

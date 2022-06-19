@@ -809,11 +809,15 @@ function addMissingLayer(state: GameState, layerKey: string) {
     }
     return addNewLayer(state, layerKey, definition.layers.length);
 }
-function drawBrush(x: number, y: number): void {
+function drawBrush(targetX: number, targetY: number): void {
     const state = getState();
-    const sy = Math.floor((state.camera.y + y) / 16);
-    const sx = Math.floor((state.camera.x + x) / 16);
+    const sampleGrid = Object.values(editingState.brush)[0];
+    const sx = Math.floor((state.camera.x + targetX + 8) / 16 - sampleGrid.w / 2);
+    const sy = Math.floor((state.camera.y + targetY + 8) / 16 - sampleGrid.h / 2);
     let area = state.areaInstance;
+    // If no layer is currently selected, iterate over the brush contents
+    // and add any missing layers necessary to complete the draw operation
+    // before we attempt to draw.
     if (!editingState.selectedLayerKey) {
         let addedNewLayer = false;
         for (let layerKey in editingState.brush) {
@@ -1068,8 +1072,8 @@ function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, a
                     const firstBrushGrid = Object.values(editingState.brush)[0];
                     // Erase existing layers so we can draw an accurate preview.
                     const rectangle = {
-                        x: Math.floor((state.camera.x + x) / w),
-                        y: Math.floor((state.camera.y + y) / h),
+                        x: Math.floor((state.camera.x + x + 8) / w - firstBrushGrid.w / 2),
+                        y: Math.floor((state.camera.y + y + 8) / h - firstBrushGrid.h / 2),
                         w: firstBrushGrid.w,
                         h: firstBrushGrid.h,
                     };

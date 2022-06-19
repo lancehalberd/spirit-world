@@ -1354,6 +1354,14 @@ const crystalCaveFloorEdges: TileSource = {
         [ 8, 5],[ 9, 5],[10, 5],[11, 5],
     ],
 };
+
+const crystalGrates: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/crystalgrateplain.png'), x: 0, y: 0, w: 48, h: 32},
+    behaviors: {
+        'all': { defaultLayer: 'floor2' },
+    },
+};
 const newTiles: Frame = {
     image: requireImage('gfx/tiles/crystalcavesheet.png'),
     x: 128, y: 64,
@@ -1524,6 +1532,7 @@ addTiles([
     crystalCaveLedges,
     crystalCaveStairs,
     crystalCaveCeilingTopAngles,
+    crystalGrates,
 ]);
 
 // This invalid is in the middle of a bunch of other tiles so it is easiest to just delete after adding it.

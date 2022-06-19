@@ -6,7 +6,7 @@ import { directionMap } from 'app/utils/field';
 import { allImagesLoaded, requireImage } from 'app/utils/images';
 import { isObjectInsideTarget, pad } from 'app/utils/index';
 import {
-    AreaInstance, Direction, DrawPriority, Frame, GameState,
+    AreaInstance, Direction, DrawPriority, Frame, FrameWithPattern, GameState,
     ObjectInstance, ObjectStatus, EscalatorDefinition,
 } from 'app/types';
 
@@ -41,8 +41,6 @@ const createHorizontalBelt = async () => {
 }
 createHorizontalBelt();
 debugCanvas;//(beltCanvas);
-
-type FrameWithPattern = Frame & { pattern?: CanvasPattern};
 
 export const escalatorStyles: {[key: string]: {[key in Direction]?: FrameWithPattern}} = {
     escalator: {

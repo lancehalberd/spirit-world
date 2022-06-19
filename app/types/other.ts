@@ -69,6 +69,10 @@ export interface Frame extends FrameRectangle {
     flipped?: boolean,
 }
 
+export interface FrameWithPattern extends Frame {
+    pattern?: CanvasPattern
+};
+
 export interface TintedFrame extends Frame {
     color: string,
     // Can be used for partial tints.

@@ -52,9 +52,6 @@ Current tasks:
         you start about to fall into nearby pits.
 
     Editor Improvements
-        - Paint tile grids starting from center of mouse instead of top right corner
-            - This will balance the easy of using large groups toward any edge of the screen
-            - Make sure this does not impact painting a single tile in any way.
         - Track which zones have been changed but not exported.
         - Support undo/redo actions
             - Include in context menu when editor is active
@@ -69,7 +66,7 @@ Current tasks:
             - Sky also drains spirit energy + cloud boots should require spirit energy to float
         - Need to figure out path to the sky mountains in spirit world that doesn't require completing waterfall tower.
             - Maybe the forge has an entrance in the main spirit world and an entrance in the mountains, similar to waterfall tower
-            - Could have a gate from the spirit world sky mountains to the material world mountains for easier access to the forge. (Although mitts also give you easy access)
+            - Could have a gate from the spirit world sky mountains to the material world mountains for easier access to the crater. (Although mitts also give you easy access)
             - Probably simplest to just use the same connector cave from the material world, but it is easier to pass in the spirit world
 
     - Improvements

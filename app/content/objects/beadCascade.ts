@@ -1,13 +1,22 @@
+import { createCanvasAndContext } from 'app/dom';
 import { addObjectToArea, removeObjectFromArea } from 'app/content/areas';
 import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { createAnimation, drawFrame, drawFrameAt, getFrame } from 'app/utils/animations';
 import { coverTile, getTileBehaviorsAndObstacles } from 'app/utils/field';
 import { boxesIntersect } from 'app/utils/index';
 import {
-    AreaInstance, DrawPriority, GameState,
+    AreaInstance, DrawPriority, FrameWithPattern, GameState,
     ObjectInstance, ObjectStatus, BeadCascadeDefinition, SimpleObjectDefinition,
     Rect,
 } from 'app/types';
+
+const crystalBeadsBasePattern = createAnimation('gfx/effects/crystalbeads1.png', {w: 32, h: 16},
+    {ySpace: 16, rows: 8, duration: 5});
+const crystalBeadsBottomAnimation = createAnimation('gfx/effects/crystalbeads1.png', {w: 32, h: 16},
+    {top: 16, ySpace: 16, rows: 8, duration: 5});
+const crystalBeadsOverPattern = createAnimation('gfx/effects/crystalbeads2.png', {w: 32, h: 16},
+    {ySpace: 16, rows: 8, duration: 5});
 
 function findBeadCutoff(this: void, state: GameState, area: AreaInstance, x: number, sy: number): number {
     for (let y = Math.floor(sy / 16) * 16 + 8; y < 512; y += 16) {
@@ -272,7 +281,37 @@ export class BeadSection implements ObjectInstance {
 }
 
 function drawCascade(context: CanvasRenderingContext2D, r: Rect, time: number) {
-    context.save();
+    if (r.h > 16) {
+        const baseFrame: FrameWithPattern = getFrame(crystalBeadsBasePattern, time);
+        const overFrame: FrameWithPattern = getFrame(crystalBeadsBasePattern, time);
+        let offsetX = 0, offsetY = 0, alpha = 0;
+        for (const frame of [baseFrame, overFrame]) {
+            if (!frame) {
+                debugger;
+            }
+            if (!frame.pattern ) {
+                const [patternCanvas, patternContext] = createCanvasAndContext(frame.w, frame.h);
+                drawFrameAt(patternContext, frame, {x: 0, y: 0});
+                frame.pattern = context.createPattern(patternCanvas, 'repeat');
+            }
+            context.save();
+                context.globalAlpha *= Math.min(1, alpha);
+                context.translate(offsetX, offsetY);
+                context.fillStyle = frame.pattern;
+                context.fillRect(r.x, r.y - offsetY, r.w, r.h - 16);
+            context.restore();
+            offsetX += 0;
+            offsetY += 0;
+            alpha += 1;
+        }
+    }
+    const baseFrame: FrameWithPattern = getFrame(crystalBeadsBottomAnimation, time);
+    for (let x = r.x; r.x + r.w - x > 0; x += baseFrame.w) {
+        const w = Math.min(baseFrame.w, r.x + r.w - x);
+        drawFrame(context, {...baseFrame, w}, {x, y: r.y + r.h - 16, w, h: 16});
+    }
+
+    /*context.save();
         context.globalAlpha *= 0.6;
         context.fillStyle = '#2B68D5';
         context.fillRect(r.x, r.y, r.w, r.h);
@@ -317,5 +356,5 @@ function drawCascade(context: CanvasRenderingContext2D, r: Rect, time: number) {
                 }
             }
         }
-    context.restore();
+    context.restore();*/
 }
