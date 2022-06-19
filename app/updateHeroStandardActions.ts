@@ -47,13 +47,17 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     const maxCloudBootsZ = hero.groundHeight + MAX_FLOAT_HEIGHT;
     const isActionBlocked =
         isMovementBlocked || hero.swimming || hero.pickUpTile || hero.pickUpObject || hero.action === 'attack' ||
-        hero.z > Math.max(FALLING_HEIGHT, minZ);
+        hero.z > Math.max(FALLING_HEIGHT, minZ) || hero.action === 'climbing';
     const canCharge = !hero.isAstralProjection && isPlayerControlled && !isActionBlocked;
     const canAttack = canCharge && hero.weapon > 0 && !hero.chargingLeftTool && !hero.chargingRightTool;
     // console.log('move', !isMovementBlocked, 'act', !isActionBlocked, 'charge', canCharge, 'attack', canAttack);
+    hero.isRunning = canCharge && isPassiveButtonDown;
 
     let dx = 0, dy = 0;
     let movementSpeed = 2;
+    if (hero.isRunning && hero.magic >= 0) {
+        movementSpeed *= 1.3;
+    }
     if (hero.equipedGear?.ironBoots) {
         movementSpeed *= 0.6;
     } else if (hero.equipedGear?.cloudBoots) {

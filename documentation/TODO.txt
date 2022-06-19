@@ -70,8 +70,6 @@ Current tasks:
             - Probably simplest to just use the same connector cave from the material world, but it is easier to pass in the spirit world
 
     - Improvements
-        - Test using PASSIVE_TOOL button as a run button that consumes spirit energy, possibly makes you slip a bit.
-
         - There should be a name indicator on the menu for the tool the cursor is over
             - Including the "help" icon
         - Passive tools should be selectable in the menu and show a tutorial on selection

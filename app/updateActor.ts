@@ -87,6 +87,9 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
         hero.frozenDuration -= FRAME_LENGTH;
     } else {
         hero.animationTime += FRAME_LENGTH;
+        if (hero.action === 'walking' && hero.isRunning && hero.magic >= 0) {
+            hero.animationTime += FRAME_LENGTH / 2;
+        }
     }
     // Remove action targets from old areas.
     if (hero.actionTarget && hero.actionTarget.area !== hero.area) {
@@ -181,9 +184,16 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
             state.hero.actualMagicRegen + 4 * FRAME_LENGTH / 1000
         );
     }
-    state.hero.magic += state.hero.actualMagicRegen * FRAME_LENGTH / 1000;
-    // Spirit regenerates twice as quickly when idle.
     if (!state.hero.action && state.hero.actualMagicRegen > 0) {
+        // Double regeneration rate while idle.
+        state.hero.magic += 2 * state.hero.actualMagicRegen * FRAME_LENGTH / 1000;
+    } else if (state.hero.action === 'walking' && state.hero.isRunning) {
+        // Slowly expend spirit energy while running.
+        if (state.hero.magic >= 0) {
+            state.hero.magic -= 5 * FRAME_LENGTH / 1000;
+        }
+    } else {
+        // Normal regeneration rate.
         state.hero.magic += state.hero.actualMagicRegen * FRAME_LENGTH / 1000;
     }
     // Clones drain 2 magic per second.

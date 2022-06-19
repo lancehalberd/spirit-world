@@ -116,6 +116,7 @@ export interface Actor extends ObjectInstance {
     wading?: boolean
     slipping?: boolean
     swimming?: boolean
+    isRunning?: boolean
     floating?: boolean
     sinking?: boolean
     inAirBubbles?: boolean
