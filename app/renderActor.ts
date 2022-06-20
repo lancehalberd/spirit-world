@@ -175,11 +175,17 @@ export function renderHeroBarrier(context: CanvasRenderingContext2D, state: Game
     //if (hero.invulnerableFrames) {
     //    context.globalAlpha *= (0.7 + 0.3 * Math.cos(2 * Math.PI * hero.invulnerableFrames * 3 / 50));
     //}
-    if (state.hero.magic < 10) {
+    const isChargingBurst = (hero.chargingLeftTool && hero.leftTool === 'cloak')
+        || (hero.chargingRightTool && hero.rightTool === 'cloak');
+    if (state.hero.magic < 10 || (isChargingBurst && state.hero.chargeTime >= 300)) {
         frame = getFrame(spiritBarrierLargeCracksAnimation, state.fieldTime);
-    } else if (state.hero.magic < 15 || state.hero.magic < state.hero.maxMagic * 0.2) {
+    } else if (state.hero.magic < 15 || state.hero.magic < state.hero.maxMagic * 0.2
+        || (isChargingBurst && state.hero.chargeTime >= 100)
+    ) {
         frame = getFrame(spiritBarrierMediumCracksAnimation, state.fieldTime);
-    } else if (state.hero.magic < 20 || state.hero.magic < state.hero.maxMagic * 0.4) {
+    } else if (state.hero.magic < 20 || state.hero.magic < state.hero.maxMagic * 0.4
+        || isChargingBurst
+    ) {
         frame = getFrame(spiritBarrierSmallCracksAnimation, state.fieldTime);
     }
     if (hero.toolOnCooldown === 'cloak') {

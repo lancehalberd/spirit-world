@@ -38,6 +38,8 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     const heldChakram = hero.area.effects.find(o => o instanceof HeldChakram) as HeldChakram;
     const isCloneToolDown = (state.hero.leftTool === 'clone' && isGameKeyDown(state, GAME_KEY.LEFT_TOOL))
         || (state.hero.rightTool === 'clone' && isGameKeyDown(state, GAME_KEY.RIGHT_TOOL));
+    const isCloakToolDown = (state.hero.leftTool === 'cloak' && isGameKeyDown(state, GAME_KEY.LEFT_TOOL))
+        || (state.hero.rightTool === 'cloak' && isGameKeyDown(state, GAME_KEY.RIGHT_TOOL));
     const primaryClone = state.hero.activeClone || state.hero;
     const isPlayerControlled = (state.hero.action === 'meditating' && hero.isAstralProjection) || isCloneToolDown || hero === primaryClone;
     const minZ = hero.groundHeight + (hero.isAstralProjection ? 4 : 0);
@@ -265,7 +267,17 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         movementSpeed *= 0.75;
         hero.chargeTime += FRAME_LENGTH;
         hero.action = 'charging';
-        if (hero.chargingLeftTool && (!isGameKeyDown(state, GAME_KEY.LEFT_TOOL) || !canCharge)) {
+        if (isCloakToolDown && hero.hasBarrier) {
+            if (hero.chargeTime >= 400) {
+                hero.burstBarrier(state);
+                if (hero.activeTools.cloak >= 2) {
+                    hero.isInvisible = true;
+                }
+                hero.chargeTime = 0;
+                hero.action = null;
+                hero.chargingLeftTool = hero.chargingRightTool = false;
+            }
+        } else if (hero.chargingLeftTool && (!isGameKeyDown(state, GAME_KEY.LEFT_TOOL) || !canCharge)) {
             useTool(state, hero, hero.leftTool, hero.actionDx, hero.actionDy);
             hero.chargingLeftTool = false;
         } else if (hero.chargingRightTool && (!isGameKeyDown(state, GAME_KEY.RIGHT_TOOL) || !canCharge)) {
@@ -501,7 +513,10 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             && (state.hero.leftTool !== 'clone' || !state.hero.clones.length)
         ) {
             // Currently only the bow tool can be charged.
-            if (state.hero.leftTool === 'bow') {
+            if (state.hero.leftTool === 'bow'
+                // "charging" the cloak while it is active is used to activate barrier burst/invisibility
+                || (state.hero.hasBarrier && state.hero.leftTool === 'cloak')
+            ) {
                 hero.chargingLeftTool = true;
             } else {
                 const direction = getDirection((dx || dy) ? dx : directionMap[hero.d][0], (dx || dy) ? dy : directionMap[hero.d][1], true, hero.d);
@@ -511,7 +526,10 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             && (state.hero.rightTool !== 'clone' || !state.hero.clones.length)
         ) {
             // Currently only the bow tool can be charged.
-            if (state.hero.rightTool === 'bow') {
+            if (state.hero.rightTool === 'bow'
+                // "charging" the cloak while it is active is used to activate barrier burst/invisibility
+                || (state.hero.hasBarrier && state.hero.rightTool === 'cloak')
+            ) {
                 hero.chargingRightTool = true;
             } else {
                 const direction = getDirection((dx || dy) ? dx : directionMap[hero.d][0], (dx || dy) ? dy : directionMap[hero.d][1], true, hero.d);

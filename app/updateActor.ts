@@ -153,9 +153,17 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
         }
         state.menuIndex = 0;
     }
-    if (state.hero.isInvisible || state.hero.hasBarrier) {
-        // state.hero.actualMagicRegen = Math.max(-10, state.hero.actualMagicRegen - 4 * FRAME_LENGTH / 1000);
-        state.hero.actualMagicRegen = !state.hero.action ? 2 : 1;
+    if (state.hero.isInvisible) {
+        state.hero.actualMagicRegen = Math.max(-20, state.hero.actualMagicRegen - 4 * FRAME_LENGTH / 1000);
+    } else if (state.hero.hasBarrier) {
+        if (state.hero.invulnerableFrames > 0) {
+            // Regenerate no magic during iframes after the barrier is damaged.
+            state.hero.actualMagicRegen = 0;
+        } else {
+            state.hero.actualMagicRegen = !state.hero.action ? 2 : 1;
+        }
+    } else {
+        state.hero.actualMagicRegen
     }
     const isHoldingBreath = !state.hero.passiveTools.waterBlessing && state.zone.surfaceKey;
     // The waterfall tower area drains mana unless you have the water blessing.
@@ -168,7 +176,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
         activeAirBubbles.charge = Math.max(activeAirBubbles.charge - 0.02, -0.3);
         if (activeAirBubbles.charge > 0) {
             state.hero.actualMagicRegen = Math.max(5, state.hero.actualMagicRegen);
-        } else if (isWaterDrainingMagic || isHoldingBreath) {
+        } else if (isWaterDrainingMagic || isHoldingBreath || state.hero.isInvisible) {
             // Magic regen is 0 while magic is being drained but the hero is standing on
             // a depleted spirit recharge point.
             state.hero.actualMagicRegen = 0;
@@ -177,17 +185,17 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
         state.hero.actualMagicRegen = Math.min(-20, state.hero.actualMagicRegen);
     } else if (isHoldingBreath) {
         state.hero.actualMagicRegen = Math.min(-1, state.hero.actualMagicRegen);
-    }
-    if (!state.hero.isInvisible && (!isHoldingBreath || activeAirBubbles?.charge > 0)) {
-        state.hero.actualMagicRegen = Math.min(
-            !state.hero.action ? 2 * state.hero.magicRegen : state.hero.magicRegen,
-            state.hero.actualMagicRegen + 4 * FRAME_LENGTH / 1000
-        );
+    } else if (!state.hero.isInvisible && !state.hero.hasBarrier) {
+        state.hero.actualMagicRegen = !state.hero.action ? 2 * state.hero.magicRegen : state.hero.magicRegen;
     }
     if (!state.hero.action && state.hero.actualMagicRegen > 0) {
         // Double regeneration rate while idle.
         state.hero.magic += 2 * state.hero.actualMagicRegen * FRAME_LENGTH / 1000;
     } else if (state.hero.action === 'walking' && state.hero.isRunning) {
+        // Spirit regeneration does not apply while running, but depletion still takes effect.
+        if (state.hero.actualMagicRegen < 0) {
+            state.hero.magic += state.hero.actualMagicRegen * FRAME_LENGTH / 1000;
+        }
         // Slowly expend spirit energy while running.
         if (state.hero.magic >= 0) {
             state.hero.magic -= 5 * FRAME_LENGTH / 1000;

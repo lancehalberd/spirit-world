@@ -1,5 +1,6 @@
 import { addEffectToArea } from 'app/content/areas';
 import { AnimationEffect } from 'app/content/effects/animationEffect';
+import { BarrierBurstEffect } from 'app/content/effects/barrierBurstEffect';
 import { destroyClone } from 'app/content/objects/clone';
 import { getChargedArrowAnimation } from 'app/content/effects/arrow';
 import {
@@ -239,9 +240,11 @@ export class Hero implements Actor, SavedHeroData {
             if (hit.element && hit.element === this.barrierElement) {
                 spiritDamage /= 2;
             }
-            if (hit.damage && state.hero.invulnerableFrames <= 0) {
+            // This is a bit of a hack. When damaged with barrier, we set 50 iframes,
+            // during which magic regen is paused, but only the first 10 preven the barrier from taking damage.
+            if (hit.damage && state.hero.invulnerableFrames <= 40) {
                 state.hero.magic -= spiritDamage;
-                state.hero.invulnerableFrames = Math.max(state.hero.invulnerableFrames, 10);
+                state.hero.invulnerableFrames = Math.max(state.hero.invulnerableFrames, 50);
             }
             const hitbox = this.getHitbox(state);
             let reflectDamage = this.barrierLevel;
@@ -294,6 +297,18 @@ export class Hero implements Actor, SavedHeroData {
             this.frozenDuration = 1500;
         }
         return { hit: true };
+    }
+
+    burstBarrier(state: GameState) {
+        if (!this.hasBarrier) {
+            return;
+        }
+        this.hasBarrier = false;
+        const barrierBurst = new BarrierBurstEffect({
+            x: this.x + 8,
+            y: this.y + 8,
+        });
+        addEffectToArea(state, this.area, barrierBurst);
     }
 
     shatterBarrier(state: GameState) {

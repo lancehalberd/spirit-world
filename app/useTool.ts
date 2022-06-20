@@ -91,9 +91,6 @@ export function useTool(
                 state.hero.barrierElement = element;
             }
             state.hero.hasBarrier = true;
-            if (state.hero.activeTools.cloak >= 2) {
-                state.hero.isInvisible = true;
-            }
             return;
         case 'clone':
             if (!state.hero.clones.length) {

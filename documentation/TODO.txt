@@ -18,7 +18,7 @@ Known Bugs:
         - Staff won't be placed when controlling multiple clones (one places, another retrieves?)
             - Should probably just have the primary clone place the staff
         - Bow renders on clone when another clone uses the bow.
-    - Picked up items are invisible while using cloak
+    - Held rocks/bushes are invisible while using cloak
     - Piercing projectiles that can push things should be stopped by the first object they push
         or not be able to push additional objects, for example, the charged chakram.
     - Enemies can walk on stairs cases and over bead flows
@@ -325,17 +325,9 @@ Spirit Store(s)
         3 -> Spirit Key
         5 -> Quick Charge (40% reduction in time to charge)
 
-
 Spirit Cloak Improvements
-    - Need a way to optionally enable invisibility
-        - Invisibility should make you mostly invulnerable but drain mana over time.
-        - No barrier while invisible.
-        - Press once for a barrier, a second time to turn invisible, and a third time to disable both?
-        - Press twice quickly to turn invisible?
     - Enemies should not be able to target you while invisible.
-    - Make invisibility ignore certain ground effects+hazards: spikes, ice floor, fire barriers
-    - Can move through activatable crystals and some other obstacles.
-        * charge invisibility then dodge roll through a line of crystals to activate them quickly.
+    - Make invisibility ignore certain ground effects+hazards: spikes, ice floor, fire barriers, escalators, lightning barriers, and some obstacles
 
 Charge Chakram Attack:
     - Maybe change level 1 charge to spin around hero in a circle twice? Brief 0.5s invulnerability with attack animation.
@@ -449,6 +441,13 @@ Crater Improvements
         - On defeat it possesses the player giving them the "Cooling Spirit" ability (Fire Blessing).
         - The cave becomes hot again after the boss is defeated but they player is now immune to the effect.
 
+War Lab
+    - Praying Mantis-like bug soldiers
+        - Can emerge from tubes when security beams are triggered in certain rooms.
+        - Defensive stance with crossed arms that blocks most attacks
+        - Leap strike attack in any direction
+        - Possible dodge + Leap strike instead of blocking attack (like electric squirrel dodge)
+        - Spinning Scythe projectile attack
 
 Multi-area Boss ideas:
     - Plant-like boss that is growing in several chambers that you have to move between to defeat.
@@ -475,15 +474,11 @@ Improve Tool Selection:
     - Display a letter attached to the selection based on the button/keyboard key.
 
 Additional Staff Behavior:
-    Should damage enemies + knock them away
-    Eventually Lvl 2 staff can be used to create the Staff Tower.
     - The sides of the staff should function as a wall rather than open ground.
     Charging the staff does a very large spin attack that knocks enemies away.
         Lvl 2 charge is a screen wide attack the applies damage+element to all enemies.
     Top N pixels of character should be drawn on foreground as well so that it appears in front of staff when facing north.
         - Probably should disable staff when character is standing on any tiles marked with low ceiling just in case.
-
-
 
 Update collision detection and wiggle logic:
     - Create an array that is the width of the character(relative to movement direction) + 16

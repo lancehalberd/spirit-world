@@ -28,7 +28,7 @@ export class CloneExplosionEffect implements EffectInstance {
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;
         const r = EXPLOSION_RADIUS * Math.max(0.25, Math.min(1, 2 * this.animationTime / duration));
-        if (this.animationTime == duration) {
+        if (this.animationTime === duration) {
             hitTargets(state, this.area, {
                 damage: 4,
                 canPush: true,
@@ -36,6 +36,7 @@ export class CloneExplosionEffect implements EffectInstance {
                 destroysObjects: true,
                 knockAwayFromHit: true,
                 hitCircle: {x: this.x, y: this.y, r},
+                hitEnemies: true,
                 hitObjects: true,
                 hitTiles: true,
             });

@@ -12,6 +12,7 @@ interface AnimationProps {
     animation: FrameAnimation
     drawPriority?: DrawPriority
     alpha?: number
+    friction?: number
     x?: number
     y?: number
     z?: number
@@ -36,6 +37,7 @@ export class AnimationEffect implements EffectInstance {
     animation: FrameAnimation;
     animationTime: number;
     behaviors: TileBehaviors;
+    friction = 0;
     isEffect = <const>true;
     x: number;
     y: number;
@@ -53,11 +55,13 @@ export class AnimationEffect implements EffectInstance {
         animation, drawPriority = 'background',
         x = 0, y = 0, z = 0, vx = 0, vy = 0, vz = 0, vstep = 0, az = 0,
         rotation = 0, scale = 1, alpha = 1,
+        friction = 0,
         target, ttl, delay = 0
      }: AnimationProps) {
         this.animation = animation;
         this.animationTime = 0;
         this.drawPriority = drawPriority;
+        this.friction = friction;
         this.x = x;
         this.y = y;
         this.z = z;
@@ -91,6 +95,11 @@ export class AnimationEffect implements EffectInstance {
             this.z += this.vz;
         }
         this.vz += this.az;
+        if (this.friction) {
+            this.vx *= (1 - this.friction);
+            this.vy *= (1 - this.friction);
+            this.vz *= (1 - this.friction);
+        }
         if (this.behaviors.brightness > 0) {
             this.behaviors.brightness *= 0.9;
         }

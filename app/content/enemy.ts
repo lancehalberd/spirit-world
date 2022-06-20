@@ -227,10 +227,6 @@ export class Enemy implements Actor, ObjectInstance {
                 knockback: hit.knockback ? {vx: -hit.knockback.vx, vy: -hit.knockback.vy, vz: 0 } : null
             };
         }
-        if (hit.damage) {
-            const multiplier = this.enemyDefinition.elementalMultipliers?.[hit.element] || 1;
-            this.applyDamage(state, multiplier * hit.damage);
-        }
         if (hit.knockback) {
             this.knockBack(state, hit.knockback);
         } else if (hit.knockAwayFrom) {
@@ -241,6 +237,10 @@ export class Enemy implements Actor, ObjectInstance {
             if (mag) {
                 this.knockBack(state, {vx: 4 * dx / mag, vy: 4 * dy / mag, vz: 0});
             }
+        }
+        if (hit.damage) {
+            const multiplier = this.enemyDefinition.elementalMultipliers?.[hit.element] || 1;
+            this.applyDamage(state, multiplier * hit.damage);
         }
         return {
             hit: true,
@@ -305,6 +305,11 @@ export class Enemy implements Actor, ObjectInstance {
             y: hitbox.y + hitbox.h / 2 - enemyDeathAnimation.frames[0].h / 2 * this.scale + 1,
             scale: this.scale,
         });
+        if (this.action === 'knocked') {
+            deathAnimation.vx = this.vx;
+            deathAnimation.vy = this.vy;
+            deathAnimation.friction = 0.1;
+        }
         playSound('enemyDeath');
         if (this.enemyDefinition.lootTable) {
             dropItemFromTable(state, this.area, this.enemyDefinition.lootTable,

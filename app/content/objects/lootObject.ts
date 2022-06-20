@@ -218,12 +218,18 @@ function showLootMessage(state: GameState, lootType: LootType, lootLevel?: numbe
                     + '{|}The barrier will damage enemies and reflect projectiles at the cost of your Spirit Energy!'
                     + '{|}Your Spirit Energy will regenerate more slowly while the barrier is on,'
                     + '{|}and the barrier will fail if you run out of Spirit Energy.'
-                    + '{|}Press [B_TOOL] again to deactivate the barrier.');
+                    + '{|}Press [B_TOOL] again to deactivate the barrier.'
+                    + '{|}Barrier Burst: Press and hold [B_TOOL] to detonate the barrier.'
+                    );
             }
             if (state.hero.activeTools.cloak === 2) {
                 return showMessage(state, 'You have obtained the Invisibility Cloak!' + equipToolMessage
-                    + '{|}Now your Spirit Barrier will also make you invisible.'
-                    + '{|}Invisibility makes you undetectable and allows you to pass through traps!');
+                    + '{|}Use your Barrier Burst to become invisible.'
+                    + '{|}Press [B_TOOL] to create a Spirit Barrier.'
+                    + '{|}Hold [B_TOOL] to detonate your barrier and become invisible.'
+                    + '{|}Hold [B_TOOL] to remain invisible until your Spirit Energy runs out.'
+                    + '{|}Invisibility makes you undetectable and invulnerable to most damage.'
+                    + '{|}Your Spirit Energy will drain faster the longer you remain invisible.');
             }
             return;
         case 'staff':

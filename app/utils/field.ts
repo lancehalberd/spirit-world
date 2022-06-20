@@ -431,9 +431,10 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
             const dy = hitbox.y + hitbox.h / 2 - hit.hitCircle.y;
             if (dx * dx + dy * dy < r2) {
                 let knockback = hit.knockback;
-                if (!hit.knockback && hit.knockAwayFrom) {
-                    const dx = (hitbox.x + hitbox.w / 2) - hit.knockAwayFrom.x;
-                    const dy = (hitbox.y + hitbox.h / 2) - hit.knockAwayFrom.y;
+                let knockAwayFrom = hit.knockAwayFrom || (hit.knockAwayFromHit && hit.hitCircle);
+                if (!knockback && knockAwayFrom) {
+                    const dx = (hitbox.x + hitbox.w / 2) - knockAwayFrom.x;
+                    const dy = (hitbox.y + hitbox.h / 2) - knockAwayFrom.y;
                     const mag = Math.sqrt(dx * dx + dy * dy);
                     knockback = mag ? {vx: 4 * dx / mag, vy: 4 * dy / mag, vz: 0} : null;
                 }
