@@ -1164,23 +1164,34 @@ const caveFloor: TileSource = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/cavearranged.png'), x: 0, y: 0, w: 48, h: 64},
     behaviors: {
-        'all': { defaultLayer: 'floor' },
-        '12x5': { defaultLayer: 'floor', linkedOffset: -291 /* 775 -> 484 */}
+        '12x5': { defaultLayer: 'floor', linkedOffset: 339 /* 775 -> 1114 */},
+        '12x6': { defaultLayer: 'floor', linkedOffset: 338 /* 776 -> 1114 */},
     },
     tileCoordinates: [
         [12, 5],
         [12, 6],
     ],
 };
-const caveFloorEdges: TileSource = {
+const caveFloorEdgesGreen: TileSource = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/cavearranged.png'), x: 0, y: 0, w: 48, h: 64},
     behaviors: {
-        'all': { defaultLayer: 'floor2' },
+        'all': { defaultLayer: 'floor2', linkedOffset: 339 },
     },
     tileCoordinates: [
+        // Index 777 should map to 1116
         [ 8, 4],[ 9, 4],[10, 4],[11, 4],
         [ 8, 5],[ 9, 5],[10, 5],[11, 5],
+    ],
+};
+const caveFloorEdgesRed: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/cavearranged.png'), x: 0, y: 0, w: 48, h: 64},
+    behaviors: {
+        'all': { defaultLayer: 'floor2', linkedOffset: 331 },
+    },
+    tileCoordinates: [
+        // Index 785 should map to 1116
         [ 8, 6],[ 9, 6],[10, 6],[11, 6],
         [ 8, 7],[ 9, 7],[10, 7],[11, 7],
     ],
@@ -1390,6 +1401,25 @@ const lava: TileSource = {
     },
 };
 
+const spiritFloor: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/spiritfloor.png'), x: 0, y: 0, w: 80, h: 64},
+    behaviors: {
+        'all': { defaultLayer: 'floor' },
+    },
+    tileCoordinates: [
+        [4, 1],
+        [4, 3],
+    ],
+};
+const spiritFloorEdges: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/spiritfloor.png'), x: 0, y: 0, w: 64, h: 64},
+    behaviors: {
+        'all': { defaultLayer: 'floor2' },
+    },
+};
+
 const deletedTileSource: TileSource = solidColorTile('#FF0000', {deleted: true});
 function deletedTiles(n: number): TileSource[] {
     return [...new Array(n)].map(() => deletedTileSource);
@@ -1510,7 +1540,8 @@ addTiles([
     caveCeiling,
     caveWalls,
     caveFloor,
-    caveFloorEdges,
+    caveFloorEdgesGreen,
+    caveFloorEdgesRed,
     caveFloorDecorations,
     caveLedges,
     caveStairs,
@@ -1533,6 +1564,8 @@ addTiles([
     crystalCaveStairs,
     crystalCaveCeilingTopAngles,
     crystalGrates,
+    spiritFloor,
+    spiritFloorEdges,
 ]);
 
 // This invalid is in the middle of a bunch of other tiles so it is easiest to just delete after adding it.
