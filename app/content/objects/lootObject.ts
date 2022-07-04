@@ -362,7 +362,7 @@ export class LootObject implements ObjectInstance {
             return;
         }
         const hero = state.hero.activeClone || state.hero;
-        if (rectanglesOverlap(hero, getFrameHitBox(this.frame, this))) {
+        if (this.area === hero.area && rectanglesOverlap(hero, getFrameHitBox(this.frame, this))) {
             removeObjectFromArea(state, this);
             if (this.definition.id && this.definition.id !== 'drop') {
                 state.savedState.objectFlags[this.definition.id] = true;
