@@ -15,8 +15,8 @@ const crystalBeadsBasePattern = createAnimation('gfx/effects/crystalbeads1.png',
     {ySpace: 16, rows: 8, duration: 5});
 const crystalBeadsBottomAnimation = createAnimation('gfx/effects/crystalbeads1.png', {w: 32, h: 16},
     {top: 16, ySpace: 16, rows: 8, duration: 5});
-const crystalBeadsOverPattern = createAnimation('gfx/effects/crystalbeads2.png', {w: 32, h: 16},
-    {ySpace: 16, rows: 8, duration: 5});
+//const crystalBeadsOverPattern = createAnimation('gfx/effects/crystalbeads2.png', {w: 32, h: 16},
+//    {ySpace: 16, rows: 8, duration: 5});
 
 function findBeadCutoff(this: void, state: GameState, area: AreaInstance, x: number, sy: number): number {
     for (let y = Math.floor(sy / 16) * 16 + 8; y < 512; y += 16) {

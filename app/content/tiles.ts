@@ -335,11 +335,11 @@ const rockWallFrame: Frame = {
 const caveFloorPalette: TileSource = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/cavefloor.png'), x: 0, y: 0, w: 336, h: 16},
-    behaviors: {all: {linkedOffset: 448}},
+    behaviors: {all: {linkedOffset: 448}, '0x0': {linkedOffset: 1078}},
 };
 const caveFloorSpiritPalette: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/cavefloorspirit.png'), x: 0, y: 0, w: 336, h: 16},
+    source: {image: requireImage('gfx/tiles/cavefloorspirit.png'), x: 16, y: 0, w: 320, h: 16},
     behaviors: {},
 };
 
@@ -1520,6 +1520,7 @@ addTiles([
     shallowToDeepAngles,
     deepToShallow,
     deepToShallowAngles,
+    deletedTileSource,
     caveFloorSpiritPalette,
     treeStump,
     treeLeavesTop,
