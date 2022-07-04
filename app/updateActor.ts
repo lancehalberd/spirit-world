@@ -316,7 +316,7 @@ function checkToStartScreenTransition(state: GameState, hero: Hero) {
         && hero.actionTarget.definition.targetZone
         && hero.actionTarget.definition.targetObjectId
     // Do not trigger the scrolling transition when traveling through a zone door.
-    if (state.nextAreaSection || state.nextAreaInstance || isMovingThroughZoneDoor) {
+    if (state.nextAreaSection || state.nextAreaInstance || isMovingThroughZoneDoor || hero.isOverPit) {
         return;
     }
 
