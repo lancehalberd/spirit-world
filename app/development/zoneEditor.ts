@@ -367,6 +367,7 @@ export function getBehaviorProperties(): PanelRows {
             } else {
                 state.areaInstance.definition.dark = dark;
             }
+            enterLocation(state, state.location);
         }
     });
     rows = [...rows, ...getLogicProperties(state, 'Is Hot?', state.areaInstance.definition.hotLogic || {}, updatedLogic => {
