@@ -270,6 +270,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         if (isCloakToolDown && hero.hasBarrier) {
             if (hero.chargeTime >= 400) {
                 hero.burstBarrier(state);
+                state.hero.magic -= 10;
                 if (hero.activeTools.cloak >= 2) {
                     hero.isInvisible = true;
                 }

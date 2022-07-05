@@ -527,7 +527,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
                 hero.swimming = false;
             }
             if (behaviors.slippery && !hero.equipedGear?.ironBoots) {
-                hero.slipping = !hero.isAstralProjection;
+                hero.slipping = !hero.isAstralProjection && !hero.isInvisible;
             }
             // Clouds boots are not slippery when walking on clouds.
             if (behaviors.cloudGround && hero.equipedGear?.cloudBoots) {

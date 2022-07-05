@@ -41,7 +41,6 @@ export class BarrierBurstEffect implements EffectInstance {
                 damage: 2,
                 canPush: true,
                 cutsGround: true,
-                destroysObjects: true,
                 knockAwayFromHit: true,
                 hitEnemies: true,
                 hitCircle: {x: this.x, y: this.y, r},

@@ -708,6 +708,10 @@ export function paceAndCharge(state: GameState, enemy: Enemy) {
     }
 }
 
+export function isTargetVisible(state: GameState, source: EffectInstance | ObjectInstance, target: EffectInstance | ObjectInstance): boolean {
+    return !!target && target.area === source.area && !!target.getHitbox && !(target instanceof Hero && target.isInvisible);
+}
+
 export function getVectorToTarget(state: GameState, source: EffectInstance | ObjectInstance, target: EffectInstance | ObjectInstance):{x: number, y: number, mag: number} {
     const hitbox = source.getHitbox(state);
     const targetHitbox = target.getHitbox(state);
@@ -720,13 +724,15 @@ export function getVectorToTarget(state: GameState, source: EffectInstance | Obj
     return {mag, x: 0, y: 1};
 }
 
+
+
 export function getVectorToNearbyTarget(state: GameState,
     source: EffectInstance | ObjectInstance, radius: number,
     targets: (EffectInstance | ObjectInstance)[]
 ): {x: number, y: number, mag: number, target: EffectInstance | ObjectInstance} | null {
     const hitbox = source.getHitbox(state);
     for (const target of targets) {
-        if (!target || target.area !== source.area || !target.getHitbox) {
+        if (!isTargetVisible(state, source, target)) {
             continue;
         }
         const targetHitbox = target.getHitbox(state);
@@ -764,7 +770,7 @@ export function getNearbyTarget(state: GameState, enemy: Enemy, radius: number,
 ): EffectInstance | ObjectInstance {
     const hitbox = enemy.getHitbox(state);
     for (const target of targets) {
-        if (!target || target.area !== enemy.area || !target.getHitbox || ignoreTargets?.has(target)) {
+        if (!isTargetVisible(state, enemy, target) || ignoreTargets?.has(target)) {
             continue;
         }
         const targetHitbox = target.getHitbox(state);
@@ -781,7 +787,7 @@ export function getNearbyTarget(state: GameState, enemy: Enemy, radius: number,
 function getLineOfSightTargetAndDirection(state: GameState, enemy: Enemy, direction: Direction = null, projectile: boolean = false): {d: Direction, hero: Hero} {
     const hitbox = enemy.getHitbox(state);
     for (const hero of [state.hero, state.hero.astralProjection, ...state.hero.clones]) {
-        if (!hero || hero.area !== enemy.area) {
+        if (!isTargetVisible(state, enemy, hero)) {
             continue;
         }
         // Reduce dimensions of hitbox for these checks so that the hero is not in line of sight when they are most of a tile

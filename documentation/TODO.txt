@@ -115,7 +115,7 @@ Current tasks:
     Lab + World Tree Notes:
         - Requires all elements to complete
         - Fight rival near the start to claim the last element
-        - Possibly flow:
+        - Possible flow:
             Enter throne room of the War Temple in the Spirit World and fight rival, get last element and open tunnel entrance.
                 - This step is only completable after fighting the rival during the 3rd spirit beast battle.
             Tunnel takes you to the lab where the War God's Scientists have been creating Hybrdid creatures and have made a modified World Tree Seed from the Helix.
@@ -144,7 +144,6 @@ Current tasks:
         - Add new graphics to 2F
         - Fix spirit world tiles
             - Add 4 easy checks to top floor and bombable pit entrance to basement
-            - Use crystal floor graphics in place of water when it is ready.
             - Require Mitts for entering from the bottom floor.
             - Add harder beetle boss with a Peach piece on it
             - Add 3 checks behind different tool combinations
@@ -211,7 +210,7 @@ Difficulty shrine:
     - easier traps (disable conveyer belts, remove spikes)
     - easier puzzles (required chests are made distinct from optional chests, positions of required items are moved to more easily accessible locations)
 
-Throwing an object into a pit should make use the pit animation rather than breaking.
+Throwing an object into a pit should use the pit animation rather than breaking.
 
 Respawn improvements:
     Only adjust respawn when in the same screen area as the spawn point.
@@ -323,11 +322,6 @@ Spirit Store(s)
         2 -> Peach Piece
         3 -> Spirit Key
         5 -> Quick Charge (40% reduction in time to charge)
-
-Spirit Cloak Improvements
-    - Barrier burst should consume 10 spirit
-    - Enemies should not be able to target you while invisible.
-    - Make invisibility ignore certain ground effects+hazards: spikes, ice floor, fire barriers, escalators, lightning barriers, and some obstacles
 
 Charge Chakram Attack:
     - Maybe change level 1 charge to spin around hero in a circle twice? Brief 0.5s invulnerability with attack animation.
