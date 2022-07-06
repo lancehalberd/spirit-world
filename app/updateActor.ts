@@ -120,7 +120,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
     // Hero takes one damage every half second while in a hot room without the fire blessing.
     if (!editingState.isEditing && hero.area?.isHot && !hero.passiveTools.fireBlessing) {
         if (state.time % 500 === 0) {
-            hero.takeDamage(state, 1);
+            hero.onHit(state, {damage: 1, canDamageRollingHero: true, element: 'fire'});
             // Stop updating this hero if it was destroyed by taking damage,
             if (!hero.area) {
                 return;

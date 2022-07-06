@@ -246,8 +246,14 @@ function showLootMessage(state: GameState, lootType: LootType, lootLevel?: numbe
             }
             return;
         case 'gloves':
-            return showMessage(state, 'You found magical bracers! {|} Now you can lift heavier objects.'
-                + '{|}Face an object and use [B_PASSIVE] to try to lift it.');
+            if (state.hero.passiveTools.gloves === 2) {
+                return showMessage(state, 'You found spirit bracers! {|} Now you can lift even heavier objects.'
+                    + '{|}Face an object and use [B_PASSIVE] to try to lift it.');
+            }
+            if (state.hero.passiveTools.gloves === 1) {
+                return showMessage(state, 'You found magical bracers! {|} Now you can lift heavier objects.'
+                    + '{|}Face an object and use [B_PASSIVE] to try to lift it.');
+            }
         case 'roll':
             return showMessage(state, 'You learned the Mist Roll Technique!'
                 + '{|}Press [B_ROLL] to do a quick roll forward.'
@@ -302,6 +308,9 @@ function showLootMessage(state: GameState, lootType: LootType, lootLevel?: numbe
                     + '{|}Use the bow to hit distant enemies and objects.');
             }
             return;
+        case 'goldMail':
+            return showMessage(state, 'You have obtained Golden Mail!'
+                + '{|}This amazing armor reduces all damage you receive.');
         case 'money':
             return showMessage(state, `You found ${lootAmount || 1} Jade!`);
         case 'secondChance':
