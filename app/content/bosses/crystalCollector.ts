@@ -1,6 +1,6 @@
 import { addEffectToArea, addObjectToArea } from 'app/content/areas';
 import { CrystalSpike } from 'app/content/effects/arrow';
-import { GroundSpike } from 'app/content/effects/groundSpike';
+import { GroundSpike, addLineOfSpikes } from 'app/content/effects/groundSpike';
 import { SpikePod } from 'app/content/effects/spikePod';
 import { getNearbyTarget } from 'app/content/enemies';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
@@ -151,6 +151,20 @@ const summonShrinkingRingOfSpikes = (state: GameState, enemy: Enemy) => {
     }
 };
 
+const summonLineOfSpikes = (state: GameState, enemy: Enemy) => {
+    const target = getNearbyTarget(state, enemy, 512, enemy.area.allyTargets) as Hero;
+    if (!target) {
+        return;
+    }
+    const hitbox = enemy.getHitbox();
+    const targetHitbox = target.getHitbox(state);
+    addLineOfSpikes({
+        state, area: enemy.area,
+        source: [hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2],
+        target: [targetHitbox.x + targetHitbox.w / 2, targetHitbox.y + targetHitbox.h / 2],
+    });
+}
+
 const turnOnRandomCascade = (state: GameState, enemy: Enemy, count = 1) => {
     const beadCascades = enemy.area.objects.filter(o => o.definition?.type === 'beadCascade');
     let numberEnabled = 0;
@@ -254,8 +268,10 @@ function updateCrystalCollector(this: void, state: GameState, enemy: Enemy): voi
         } else {
             const spikeCount = enemy.area.effects.filter(o => o instanceof GroundSpike).length;
             if (enemy.params.enrageTime % 300 === 0 && spikeCount < 5) {
-                if (Math.random() < 0.5) {
+                if (Math.random() < 0.3) {
                     summonShrinkingRingOfSpikes(state, enemy);
+                } else if(Math.random() < 0.6) {
+                    summonLineOfSpikes(state, enemy);
                 } else if (Math.random() < 0.5) {
                     summonSpikeUnderPlayer(state, enemy);
                 } else {
@@ -343,8 +359,10 @@ function updateCrystalCollector(this: void, state: GameState, enemy: Enemy): voi
         const spikeCount = enemy.area.effects.filter(o => o instanceof GroundSpike).length;
         if (enemy.modeTime % 600 === 0 && spikeCount < 3) {
             // Don't do any complicated spike patterns while the floor eyes are still active.
-            if (enrageLevel > 0 && !getFloorEye(state, enemy.area) && Math.random() < 0.5) {
+            if (enrageLevel > 0 && !getFloorEye(state, enemy.area) && Math.random() < 0.3) {
                 summonShrinkingRingOfSpikes(state, enemy);
+            } else if (enrageLevel > 0 || Math.random() < 0.6) {
+                summonLineOfSpikes(state, enemy);
             } else if (enrageLevel === 0 || Math.random() < 0.5) {
                 summonSpikeUnderPlayer(state, enemy);
             } else {

@@ -50,6 +50,8 @@ Current tasks:
     Add crystal spike tiles once I get the final version from Jon
         - Replace pits near bead flows with spikes, the respawn logic on the bead flows can make
         you start about to fall into nearby pits.
+        - Alternatively, just remove the respawn logic from the bead flows and add extra respawn
+        points if necessary.
 
     Editor Improvements
         - Track which zones have been changed but not exported.

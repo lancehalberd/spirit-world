@@ -16,7 +16,7 @@ interface Props {
     delay?: number,
 }
 
-const growDuration = 1500;
+const growDuration = 2500;
 const fadeDuration = 200;
 
 export class SpikePod implements EffectInstance, Props {

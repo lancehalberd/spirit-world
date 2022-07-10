@@ -9,7 +9,7 @@ import { EnemyArrow, spiritArrowIcon } from 'app/content/effects/arrow';
 import { Flame } from 'app/content/effects/flame';
 import { FrostGrenade } from 'app/content/effects/frostGrenade';
 import { GrowingThorn } from 'app/content/effects/growingThorn';
-import { GroundSpike } from 'app/content/effects/groundSpike';
+import { GroundSpike, addLineOfSpikes } from 'app/content/effects/groundSpike';
 import { SpikePod } from 'app/content/effects/spikePod';
 import {
     beetleAnimations,
@@ -216,16 +216,26 @@ enemyDefinitions.crystalGuardian = {
     update(state: GameState, enemy: Enemy): void {
         enemy.shielded = enemy.params.shieldLife > 0;
         // Summon a pod once very 2 seconds if a target is nearby.
-        if (enemy.modeTime >= 2000) {
+        if (enemy.modeTime === 2000 || enemy.modeTime === 4000) {
             const v = getVectorToNearbyTarget(state, enemy, enemy.enemyDefinition.aggroRadius, enemy.area.allyTargets);
             if (v) {
                 const {x, y} = v;
-                // This should spawn in a ficed radius around the guardian in between it and the target.
+                // This should spawn in a fixed radius around the guardian in between it and the target.
                 addEffectToArea(state, enemy.area, new SpikePod({
                     x: enemy.x + enemy.w / 2 + 48 * x,
                     y: enemy.y + enemy.h / 2 + 48 * y,
                     damage: 2,
                 }));
+            }
+        }
+        if (enemy.modeTime >= 5000) {
+            const v = getVectorToNearbyTarget(state, enemy, enemy.enemyDefinition.aggroRadius, enemy.area.allyTargets);
+            if (v) {
+                addLineOfSpikes({
+                    state, area: enemy.area,
+                    source: [enemy.x + enemy.w / 2 + v.x * 8, enemy.y + enemy.h / 2 + v.y * 8],
+                    target: [enemy.x + enemy.w / 2 + v.x * 32, enemy.y + enemy.h / 2 + v.y * 32],
+                });
                 enemy.modeTime = 0;
             }
         }

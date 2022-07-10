@@ -1,10 +1,10 @@
-import { removeEffectFromArea } from 'app/content/areas';
+import { addEffectToArea, removeEffectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { hitTargets } from 'app/utils/field';
+import { getTileBehaviors, hitTargets } from 'app/utils/field';
 
 import {
     AreaInstance, DrawPriority, EffectInstance,
-    Frame, GameState,
+    Frame, GameState, Point
 } from 'app/types';
 
 interface Props {
@@ -37,10 +37,8 @@ export class GroundSpike implements EffectInstance, Props {
     tellDuration: number;
     animationTime = 0;
     constructor({x = 0, y = 0, damage = 2, delay = 0, tellDuration = 1000}: Props) {
-        this.x -= this.w / 2;
-        this.y -= this.h / 2;
-        this.x = ((x / 16) | 0) * 16;
-        this.y = ((y / 16) | 0) * 16;
+        this.x = x - this.w / 2;
+        this.y = y - this.h / 2;
         this.delay = delay;
         this.tellDuration = tellDuration;
         this.damage = damage;
@@ -116,5 +114,36 @@ export class GroundSpike implements EffectInstance, Props {
             context.arc(this.x + this.w / 2, this.y + this.h / 2, r, 0, 2 * Math.PI);
             context.fill();
         context.restore();
+    }
+}
+
+interface LineProps {
+    state: GameState
+    area: AreaInstance
+    source: Point
+    target: Point
+    spacing?: number
+    length?: number
+    spikeProps?: Props
+}
+export function addLineOfSpikes(this: void, {
+    state, area, source, target, spacing = 16, length = 256, spikeProps = {}
+}: LineProps): void {
+    const theta = Math.atan2(target[1] - source[1], target[0] - source[0]);
+    const dx = spacing * Math.cos(theta), dy = spacing * Math.sin(theta);
+    const count = Math.ceil(length / spacing);
+    for (let i = 1; i < count; i++) {
+        const x = source[0] + i * dx, y = source[1] + i * dy;
+        // Solid tiles/pits stop the line of spikes
+        const { tileBehavior } = getTileBehaviors(state, area, {x: x + 8, y: y + 8});
+        if (tileBehavior?.solid || tileBehavior?.pit) {
+            return;
+        }
+        const groundSpike = new GroundSpike({
+            ...spikeProps,
+            delay: (spikeProps.delay || 0) + i * 40,
+            x, y,
+        });
+        addEffectToArea(state, area, groundSpike);
     }
 }
