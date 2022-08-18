@@ -1,6 +1,7 @@
 import { addEffectToArea, removeEffectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { getTileBehaviors, hitTargets } from 'app/utils/field';
+import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 
 import {
     AreaInstance, DrawPriority, EffectInstance,
@@ -15,8 +16,15 @@ interface Props {
     tellDuration?: number
 }
 
-const animationDuration = 100;
-const fadeDuration = 200;
+const warningAnimation = createAnimation('gfx/effects/eyespike.png', {w: 24, h: 48},
+    {cols: 4, duration: 5}, {loop: false});
+const damageAnimation = createAnimation('gfx/effects/eyespike.png', {w: 24, h: 48},
+    {x: 4, cols: 3, duration: 5}, {loop: false});
+const fadeAnimation = createAnimation('gfx/effects/eyespike.png', {w: 24, h: 48},
+    {x: 7, cols: 3, duration: 5}, {loop: false});
+
+const animationDuration = damageAnimation.duration;
+const fadeDuration = fadeAnimation.duration;
 
 export class GroundSpike implements EffectInstance, Props {
     drawPriority: DrawPriority = 'sprites';
@@ -58,62 +66,54 @@ export class GroundSpike implements EffectInstance, Props {
                 hitTiles: true,
                 cutsGround: true,
             });
+        } else if (this.animationTime < this.tellDuration) {
+            hitTargets(state, this.area, {
+                damage: this.damage,
+                hitbox: this.getHitbox(state),
+                hitAllies: false,
+                hitTiles: true,
+                cutsGround: true,
+            });
         }
         if (this.animationTime >= this.tellDuration + animationDuration + fadeDuration) {
             removeEffectFromArea(state, this);
         }
     }
     getHitbox(state: GameState) {
-        const cx = this.x + this.w / 2, cy = this.y + this.h / 2;
-        const r = this.getRadius() * this.w / 2;
-        return {x: cx - r, y: cy - r, w: 2 * r, h: 2 * r};
+        // The animation for the ground crack is a bit shorter than a full tile
+        // so the hitbox is reduced to make it a bit easier to dodge.
+        return {x: this.x, y: this.y + 2, w: 16, h: 12};
     }
-    getRadius() {
-        const time = this.animationTime - this.tellDuration;
-        const p = Math.min(1, time / animationDuration);
-        return p * p;
+    getFrameTarget() {
+        return {x: this.x - 4, y: this.y - 32, w: 24, h: 48};
     }
+
     render(context: CanvasRenderingContext2D, state: GameState) {
-        const time = this.animationTime - this.tellDuration;
+        let time = this.animationTime - this.tellDuration;
         if (time <= 0) {
             return;
         }
-        context.save();
-            if (time > animationDuration) {
-                context.globalAlpha *= Math.max(0, 1 - (time - animationDuration) / fadeDuration);
-            }
-            context.beginPath();
-            const p = this.getRadius();
-            const height = 40 * p;
-            const cx = this.x + this.w / 2
-            context.moveTo(cx - this.w / 2 * p, this.y + this.h / 2);
-            context.lineTo(cx, this.y + this.h / 2 - height);
-            context.lineTo(cx + this.w / 2 * p, this.y + this.h / 2);
-            context.strokeStyle = '#FFF';
-            context.stroke();
-            context.fillStyle = '#DEF';
-            context.fill();
-        context.restore();
-        /*if (this.animationTime >= this.tellDuration + 60 && this.animationTime <= this.tellDuration + animationDuration) {
-            context.fillStyle = 'red';
-            const hitbox = this.getHitbox(state);
-            context.fillRect(hitbox.x, hitbox.y, hitbox.w, hitbox.h);
-        }*/
+        let animation = damageAnimation;
+        if (time > animationDuration) {
+            time -= animationDuration;
+            animation = fadeAnimation;
+        }
+        const frame = getFrame(animation, time);
+        drawFrame(context, frame, this.getFrameTarget());
     }
     renderShadow(context: CanvasRenderingContext2D, state: GameState) {
         // Since this has a tell, render nothing until the delay is over.
-        if (this.delay >= 0) {
+        if (this.delay >= 0 || this.animationTime > this.tellDuration) {
             return;
         }
-        // Animate a warning indicator on the ground.
-        context.save();
-            context.globalAlpha *= (0.5 + Math.min(0.3, 0.3 * this.animationTime / this.tellDuration));
-            context.fillStyle = 'black';
-            const r = 4 + 8 * Math.min(1, 1.25 * this.animationTime / this.tellDuration);
-            context.beginPath();
-            context.arc(this.x + this.w / 2, this.y + this.h / 2, r, 0, 2 * Math.PI);
-            context.fill();
-        context.restore();
+        // Uncomment this to see how the warningAnimation tracks with the hitbox.
+        // context.fillStyle = 'red';
+        // const hitbox = this.getHitbox(state);
+        // context.fillRect(hitbox.x, hitbox.y, hitbox.w, hitbox.h);
+        // This draws the ground cracking with a small spike protruding
+        // indicating where the spike will damage the player.
+        const frame = getFrame(warningAnimation, this.animationTime);
+        drawFrame(context, frame, this.getFrameTarget());
     }
 }
 
@@ -127,7 +127,7 @@ interface LineProps {
     spikeProps?: Props
 }
 export function addLineOfSpikes(this: void, {
-    state, area, source, target, spacing = 16, length = 256, spikeProps = {}
+    state, area, source, target, spacing = 20, length = 256, spikeProps = {}
 }: LineProps): void {
     const theta = Math.atan2(target[1] - source[1], target[0] - source[0]);
     const dx = spacing * Math.cos(theta), dy = spacing * Math.sin(theta);
@@ -142,8 +142,16 @@ export function addLineOfSpikes(this: void, {
         const groundSpike = new GroundSpike({
             ...spikeProps,
             delay: (spikeProps.delay || 0) + i * 40,
+            tellDuration: 1000 - i * 40,
             x, y,
         });
         addEffectToArea(state, area, groundSpike);
+        // Do an additional check for a barrier when spacing is greater than 16px to avoid skipping over barriers.
+        if (spacing > 16) {
+            const { tileBehavior } = getTileBehaviors(state, area, {x: x + 8 + spacing / 2, y: y + 8 + spacing / 2});
+            if (tileBehavior?.solid || tileBehavior?.pit) {
+                return;
+            }
+        }
     }
 }
