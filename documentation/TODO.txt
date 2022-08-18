@@ -184,6 +184,11 @@ Current tasks:
     - Work on new waterfall graphics
         - Email Jon about waterfall graphic updates.
 
+Combat Ideas:
+    - Concentric damaging rings that collapse into the player. Player must time it so that they are close enough together to dodge roll through in order to avoid damage.
+    - Rolling enemy that leaves a trail of ice/fire behind it and bounces off walls. Hitting it knocks it in different directions.
+    s
+
 Staff Improvements:
     - Charging staff 2 should show a preview of where it will hit and get wider in addition to longer
         - This should start at 4x1, 5x1 then 6x2->10x2, 11x3->15x3, 16x4->20x4
