@@ -18,6 +18,7 @@ import {
     beetleMiniAnimations,
     beetleWingedAnimations,
     entAnimations,
+    floorEyeAnimations,
     snakeAnimations,
 } from 'app/content/enemyAnimations';
 import { certainLifeLootTable, simpleLootTable, lifeLootTable, moneyLootTable } from 'app/content/lootTables';
@@ -25,12 +26,12 @@ import { addEffectToArea, getAreaSize } from 'app/content/areas';
 import { editingState } from 'app/development/tileEditor';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { moveActor } from 'app/moveActor';
-import { createAnimation, drawFrameCenteredAt } from 'app/utils/animations';
+import { createAnimation, drawFrameAt, drawFrameCenteredAt } from 'app/utils/animations';
 import { directionMap, getDirection } from 'app/utils/field';
 import { playSound } from 'app/musicController';
 
 import {
-    ActorAnimations, Direction, EffectInstance,
+    ActorAnimations, Direction, DrawPriority, EffectInstance,
     Enemy, FrameAnimation, FrameDimensions, GameState,
     Hero, HitProperties, HitResult, LootTable,
     MagicElement, MovementProperties, ObjectInstance, Rect,
@@ -62,6 +63,7 @@ export interface EnemyDefinition {
     alwaysReset?: boolean
     animations: ActorAnimations
     aggroRadius?: number
+    drawPriority?: DrawPriority
     tileBehaviors?: TileBehaviors
     canBeKnockedBack?: boolean
     canBeKnockedDown?: boolean
@@ -89,6 +91,8 @@ export interface EnemyDefinition {
     onHit?: (state: GameState, enemy: Enemy, hit: HitProperties) => HitResult
     // Optional render function called instead of the standard render logic.
     render?: (context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) => void
+    // Optional render function called instead of the standard renderShadow logic.
+    renderShadow?: (context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) => void
     // Optional render function called after the standard render.
     renderOver?: (context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) => void
     renderPreview?: (context: CanvasRenderingContext2D, enemy: Enemy, target: Rect) => void
@@ -306,62 +310,52 @@ function updateEnt(state: GameState, enemy: Enemy): void {
     }
 }
 
-enemyDefinitions.floorEye = {
-    animations: climbingBeetleAnimations, aggroRadius: 96,
-    hasShadow: false,
-    initialMode: 'closed',
-    lootTable: certainLifeLootTable,
-    // TODO: Set this to 2 and add a way to remove touch damage when the eye is not fully open.
-    touchDamage: 0,
-    life: 4, update: updateFloorEye,
-    render: renderUnderTiles,
-    canBeKnockedBack: false,
-    renderPreview(context: CanvasRenderingContext2D, enemy: Enemy, target: Rect): void {
-        enemy.defaultRenderPreview(context, target);
-        context.save();
-            context.globalAlpha *= 0.8;
-            context.fillStyle = 'white';
-            context.beginPath();
-            context.moveTo(target.x + target.w / 3, target.y + target.h);
-            context.lineTo(target.x + target.w / 2, target.y);
-            context.lineTo(target.x + 2 * target.w / 3, target.y + target.h);
-            context.fill();
-        context.restore();
-    },
-};
-function renderUnderTiles(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
-    // Render normally while editing.
-    if (editingState.isEditing) {
-        enemy.defaultRender(context, state);
-    }
+function isUnderTile(state: GameState, enemy: Enemy): boolean {
     const hitbox = enemy.getHitbox(state);
     const tx = Math.floor((hitbox.x + hitbox.w / 2) / 16);
     const ty = Math.floor((hitbox.y + hitbox.h / 2) / 16);
-    if (!enemy.area) {
-        return;
-    }
     const behavior = enemy.area.behaviorGrid?.[ty]?.[tx];
     // Hide the enemy as long as there is something on top of it.
-    if (behavior?.solid || behavior?.cuttable) {
-        return;
-    }
-    context.save();
-        if (enemy.mode === 'closing') {
-            context.globalAlpha *= Math.max(0.3, 1 - enemy.modeTime / 1000);
-        } else if (enemy.mode === 'opening') {
-            context.globalAlpha *= Math.min(1, 0.3 + enemy.modeTime / 1000);
-        } else if (enemy.mode === 'closed') {
-            context.globalAlpha = 0.3;
-        }
-        enemy.defaultRender(context, state);
-    context.restore();
+    return !!(behavior?.solid || behavior?.cuttable);
 }
-function updateFloorEye(state: GameState, enemy: Enemy): void {
-    if (enemy.mode === 'attack') {
-        enemy.isInvulnerable = false;
-        const target = getNearbyTarget(state, enemy, enemy.enemyDefinition.aggroRadius, enemy.area.allyTargets);
 
-        if (target && enemy.modeTime % 1000 === 0) {
+enemyDefinitions.floorEye = {
+    animations: floorEyeAnimations, aggroRadius: 96,
+    hasShadow: false,
+    initialMode: 'closed',
+    lootTable: certainLifeLootTable,
+    // This will get set to 2 when the eye is open.
+    touchDamage: 0,
+    life: 4, update: updateFloorEye,
+    render: (context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) => {
+        // Render normally while editing.
+        if (editingState.isEditing) {
+            enemy.defaultRender(context, state);
+        }
+    },
+    drawPriority: 'background',
+    canBeKnockedBack: false,
+    renderShadow(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
+        if (isUnderTile(state, enemy)) {
+            return;
+        }
+        // Draw the dead frame behind the enemy, so the background doesn't flash when
+        // the enemy is damaged.
+        const frame = floorEyeAnimations.defeated.down.frames[0];
+        drawFrameAt(context, frame, enemy);
+        enemy.defaultRender(context, state);
+    },
+};
+function updateFloorEye(state: GameState, enemy: Enemy): void {
+    if (enemy.mode === 'open') {
+        enemy.isInvulnerable = isUnderTile(state, enemy);
+        const target = getNearbyTarget(state, enemy, enemy.enemyDefinition.aggroRadius, enemy.area.allyTargets);
+        if (enemy.animationTime >= enemy.currentAnimation.duration) {
+            enemy.changeToAnimation('open');
+        }
+
+        if (target && enemy.modeTime > 1000 && enemy.modeTime % 1000 === 500) {
+            enemy.changeToAnimation('attack');
             const targetHitbox = target.getHitbox(state);
             const spike = new GroundSpike({
                 x: targetHitbox.x + targetHitbox.w / 2,
@@ -370,29 +364,33 @@ function updateFloorEye(state: GameState, enemy: Enemy): void {
             });
             addEffectToArea(state, enemy.area, spike);
         }
-        if (enemy.modeTime >= 2000) {
+        if (enemy.modeTime >= 4400) {
             enemy.setMode('closing')
         }
     } else if (enemy.mode === 'opening') {
+        enemy.changeToAnimation('opening');
         enemy.isInvulnerable = true;
-        if (enemy.modeTime >= 1000) {
-            enemy.setMode('attack')
+        if (enemy.modeTime >= enemy.currentAnimation.frameDuration * 2) {
+            enemy.setMode('open');
         }
     } else if (enemy.mode === 'closing') {
+        enemy.changeToAnimation('closing');
         enemy.isInvulnerable = true;
-        if (enemy.modeTime >= 1000) {
-            enemy.setMode('closed')
+        if (enemy.animationTime >= enemy.currentAnimation.duration) {
+            enemy.setMode('closed');
         }
     } else {
+        enemy.changeToAnimation('idle');
         enemy.isInvulnerable = true;
         enemy.mode = 'closed';
-        if (enemy.modeTime >= 1000) {
+        if (enemy.modeTime >= 2000) {
             const target = getNearbyTarget(state, enemy, enemy.enemyDefinition.aggroRadius, enemy.area.allyTargets);
             if (target) {
                 enemy.setMode('opening');
             }
         }
     }
+    enemy.touchHit = enemy.isInvulnerable ? null : { damage: 2 };
 }
 
 function updateFlameSnake(state: GameState, enemy: Enemy): void {

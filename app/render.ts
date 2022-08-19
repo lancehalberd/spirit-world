@@ -1,5 +1,4 @@
 import { Clone } from 'app/content/objects/clone';
-import { Enemy } from 'app/content/enemy';
 import { editingState, renderEditor } from 'app/development/tileEditor';
 import { createCanvasAndContext, mainContext } from 'app/dom';
 import {
@@ -8,7 +7,7 @@ import {
     CIRCLE_WIPE_IN_DURATION, CIRCLE_WIPE_OUT_DURATION, MUTATE_DURATION,
 } from 'app/gameConstants';
 import { renderAreaLighting, renderSurfaceLighting, updateLightingCanvas, updateWaterSurfaceCanvas } from 'app/render/areaLighting';
-import { renderHeroEyes, renderHeroShadow, renderEnemyShadow } from 'app/renderActor';
+import { renderHeroEyes, renderHeroShadow } from 'app/renderActor';
 import { renderDefeatedMenu } from 'app/renderDefeatedMenu';
 import { renderHUD } from 'app/renderHUD';
 import { renderMenu } from 'app/renderMenu';
@@ -606,8 +605,6 @@ export function renderAreaObjectsBeforeHero(context: CanvasRenderingContext2D, s
                 object.renderShadow(context, state);
             } else if (object instanceof Clone) {
                 renderHeroShadow(context, state, object);
-            } else if (object instanceof Enemy && object.hasShadow && object.status !== 'gone' && object.status !== 'hidden') {
-                renderEnemyShadow(context, state, object);
             }
         }
         for (const effect of area.effects) {

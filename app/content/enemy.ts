@@ -8,6 +8,7 @@ import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { drawFrame, getFrame } from 'app/utils/animations';
 import { playSound } from 'app/musicController';
+import { renderEnemyShadow } from 'app/renderActor';
 
 import {
     Action, Actor, AreaInstance, BossObjectDefinition, Direction, DrawPriority,
@@ -90,6 +91,9 @@ export class Enemy implements Actor, ObjectInstance {
         this.spawnX = this.x = definition.x;
         this.spawnY = this.y = definition.y;
         const frame = this.getFrame();
+        if (!frame) {
+            debugger;
+        }
         this.life = this.enemyDefinition.life ?? 1;
         this.speed = this.enemyDefinition.speed ?? 1;
         this.acceleration = this.enemyDefinition.acceleration ?? .1;
@@ -190,7 +194,7 @@ export class Enemy implements Actor, ObjectInstance {
         return this.defaultOnHit(state, hit);
     }
     updateDrawPriority() {
-        this.drawPriority = this.flying ? 'foreground' : 'sprites';
+        this.drawPriority = this.flying ? 'foreground' : (this.enemyDefinition.drawPriority || 'sprites');
     }
     defaultOnHit(state: GameState, hit: HitProperties): HitResult {
         if (this.status === 'off') {
@@ -498,6 +502,16 @@ export class Enemy implements Actor, ObjectInstance {
             context.fillStyle = 'red';
             context.fillRect(hitbox.x, hitbox.y, hitbox.w, hitbox.h);*/
         context.restore();
+    }
+    renderShadow(context: CanvasRenderingContext2D, state: GameState) {
+        if (this.enemyDefinition.renderShadow) {
+            this.enemyDefinition.renderShadow(context, state, this);
+        } else if (this.hasShadow && this.status !== 'gone' && this.status !== 'hidden') {
+            this.defaultRenderShadow(context, state);
+        }
+    }
+    defaultRenderShadow(context: CanvasRenderingContext2D, state: GameState) {
+        renderEnemyShadow(context, state, this);
     }
     renderPreview(context: CanvasRenderingContext2D, target: Rect): void {
         if (this.enemyDefinition.renderPreview) {

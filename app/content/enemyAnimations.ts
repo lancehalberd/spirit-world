@@ -205,3 +205,31 @@ export const brownSquirrelAnimations: ActorAnimations = {
         right: brownSquirrelAnimation.right,
     },
 };
+
+function omniAnimation(animation: FrameAnimation) {
+    return {
+        up: animation, down: animation, left: animation, right: animation,
+    };
+}
+
+const floorEyeGeometry: FrameDimensions = { w: 16, h: 16 };
+const floorEyeClosedAnimation: FrameAnimation = createAnimation('gfx/enemies/eyemonster.png', floorEyeGeometry, { cols: 1});
+const floorEyeOpeningAnimation: FrameAnimation = createAnimation('gfx/enemies/eyemonster.png', floorEyeGeometry,
+    { x: 1, cols: 10, duration: 5, frameMap: [0, 1, 2, 2, 2, 2, 2, 3, 4, 5, 6, 7, 8, 9]}, {loop: false});
+const floorEyeOpenAnimation: FrameAnimation = createAnimation('gfx/enemies/eyemonster.png', floorEyeGeometry, { x: 3, cols: 1, duration: 5});
+const floorEyeAttackAnimation: FrameAnimation = createAnimation('gfx/enemies/eyemonster.png', floorEyeGeometry,
+    { x: 9, cols: 4, duration: 3, frameMap: [0, 1, 2, 3, 2, 1]});
+const floorEyeClosingAnimation: FrameAnimation = createAnimation('gfx/enemies/eyemonster.png', floorEyeGeometry,
+    { x: 0, cols: 3, duration: 5, frameMap: [2, 1, 0]}, {loop: false});
+const floorEyeHurtAnimation: FrameAnimation = createAnimation('gfx/enemies/eyemonster.png', floorEyeGeometry, { x: 16, cols: 1, duration: 5});
+const floorEyeDefeatedAnimation: FrameAnimation = createAnimation('gfx/enemies/eyemonster.png', floorEyeGeometry, { x: 17, cols: 1, duration: 5});
+
+export const floorEyeAnimations: ActorAnimations = {
+    idle: omniAnimation(floorEyeClosedAnimation),
+    opening: omniAnimation(floorEyeOpeningAnimation),
+    open: omniAnimation(floorEyeOpenAnimation),
+    attack: omniAnimation(floorEyeAttackAnimation),
+    closing: omniAnimation(floorEyeClosingAnimation),
+    hurt: omniAnimation(floorEyeHurtAnimation),
+    defeated: omniAnimation(floorEyeDefeatedAnimation),
+};
