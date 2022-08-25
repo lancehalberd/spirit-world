@@ -11,10 +11,14 @@ import {
     Rect,
 } from 'app/types';
 
-const crystalBeadsBasePattern = createAnimation('gfx/effects/crystalbeads1.png', {w: 32, h: 16},
-    {ySpace: 16, rows: 8, duration: 5});
-const crystalBeadsBottomAnimation = createAnimation('gfx/effects/crystalbeads1.png', {w: 32, h: 16},
-    {top: 16, ySpace: 16, rows: 8, duration: 5});
+const crystalBeadsBasePattern = createAnimation('gfx/effects/beadcascadeunder.png', {w: 16, h: 16},
+    {cols: 8, duration: 5});
+const crystalBeadsBottomAnimation = createAnimation('gfx/effects/beadcascadeunder.png', {w: 16, h: 16},
+    {y: 1, cols: 8, duration: 5});
+const crystalBeadsBaseOverPattern = createAnimation('gfx/effects/beadcascadeover.png', {w: 16, h: 16},
+    {x: 1, cols: 7, duration: 5});
+const crystalBeadsBottomOverAnimation = createAnimation('gfx/effects/beadcascadeover.png', {w: 16, h: 16},
+    {x: 1, y: 1, cols: 7, duration: 5});
 //const crystalBeadsOverPattern = createAnimation('gfx/effects/crystalbeads2.png', {w: 32, h: 16},
 //    {ySpace: 16, rows: 8, duration: 5});
 
@@ -283,8 +287,8 @@ export class BeadSection implements ObjectInstance {
 function drawCascade(context: CanvasRenderingContext2D, r: Rect, time: number) {
     if (r.h > 16) {
         const baseFrame: FrameWithPattern = getFrame(crystalBeadsBasePattern, time);
-        const overFrame: FrameWithPattern = getFrame(crystalBeadsBasePattern, time);
-        let offsetX = 0, offsetY = 0, alpha = 0;
+        const overFrame: FrameWithPattern = getFrame(crystalBeadsBaseOverPattern, time * 1.2);
+        let offsetX = 0, offsetY = 0, alpha = 1, h = r.h + 4;
         for (const frame of [baseFrame, overFrame]) {
             if (!frame) {
                 debugger;
@@ -298,17 +302,20 @@ function drawCascade(context: CanvasRenderingContext2D, r: Rect, time: number) {
                 context.globalAlpha *= Math.min(1, alpha);
                 context.translate(offsetX, offsetY);
                 context.fillStyle = frame.pattern;
-                context.fillRect(r.x, r.y - offsetY, r.w, r.h - 16);
+                context.fillRect(r.x, r.y - offsetY, r.w, h - 16);
             context.restore();
-            offsetX += 0;
-            offsetY += 0;
-            alpha += 1;
+            h += 4;
         }
     }
     const baseFrame: FrameWithPattern = getFrame(crystalBeadsBottomAnimation, time);
-    for (let x = r.x; r.x + r.w - x > 0; x += baseFrame.w) {
-        const w = Math.min(baseFrame.w, r.x + r.w - x);
-        drawFrame(context, {...baseFrame, w}, {x, y: r.y + r.h - 16, w, h: 16});
+    const overFrame: FrameWithPattern = getFrame(crystalBeadsBottomOverAnimation, time);
+    let h = r.h + 4;
+    for (const frame of [baseFrame, overFrame]) {
+        for (let x = r.x; r.x + r.w - x > 0; x += frame.w) {
+            const w = Math.min(frame.w, r.x + r.w - x);
+            drawFrame(context, {...frame, w}, {x, y: r.y + h - 16, w, h: 16});
+        }
+        h += 4;
     }
 
     /*context.save();

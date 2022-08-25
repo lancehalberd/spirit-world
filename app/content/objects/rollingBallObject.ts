@@ -51,7 +51,7 @@ export class RollingBallObject implements ObjectInstance {
         // Another option would be for it to bounce the staff back instead.
         if (isStaff) {
             playAreaSound(state, this.area, 'rockShatter');
-            addParticleAnimations(state, this.area, this.x, this.y, 0, lightStoneParticles);
+            addParticleAnimations(state, this.area, this.x + 8, this.y + 8, 0, lightStoneParticles);
             removeObjectFromArea(state, this);
             return {hit: true};
         }

@@ -1092,7 +1092,7 @@ export function destroyTile(state: GameState, area: AreaInstance, target: TileCo
 
     resetTileBehavior(area, target);
     if (!noParticles && behavior.particles) {
-        addParticleAnimations(state, area, target.x * 16, target.y * 16, 4, behavior.particles, behavior);
+        addParticleAnimations(state, area, target.x * 16 + 8, target.y * 16 + 8, 4, behavior.particles, behavior);
     }
     if (behavior?.lootTable) {
         dropItemFromTable(state, area, behavior.lootTable,

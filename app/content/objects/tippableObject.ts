@@ -103,7 +103,7 @@ export class TippableObject implements ObjectInstance {
         }
     }
     onDestroy(state: GameState, dx: number, dy: number) {
-        addParticleAnimations(state, this.area, this.x, this.y, 2, particleFrames);
+        addParticleAnimations(state, this.area, this.x + 8, this.y + 8, 2, particleFrames);
         removeObjectFromArea(state, this);
     }
     update(state: GameState) {
@@ -134,7 +134,7 @@ export class TippableObject implements ObjectInstance {
             }
             // Not sure why I had this, with this, the pot is hidden behind floor switches sometimes.
             // this.drawPriority = 'background';
-            addParticleAnimations(state, this.area, this.x, this.y, 2, particleFrames);
+            addParticleAnimations(state, this.area, this.x + 8, this.y + 8, 2, particleFrames);
         }
         if (!this.pushedLastFrame) {
             this.pushCounter = 0;

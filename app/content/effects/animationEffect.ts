@@ -161,7 +161,7 @@ export function addParticleAnimations(
         const particle = new AnimationEffect({
             animation: frameAnimation(frame),
             drawPriority: 'foreground',
-            x: x + vx, y: y + vy, z,
+            x: x + vx - frame.w / 2, y: y + vy - frame.h / 2, z,
             vx, vy, vz: 1.5, az: -0.2,
         });
         if (behaviors?.brightness) {

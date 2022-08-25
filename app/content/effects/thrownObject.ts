@@ -72,7 +72,10 @@ export class ThrownObject implements EffectInstance {
         if (!this.broken) {
             this.broken = true;
             playAreaSound(state, this.area, this.behaviors.breakSound);
-            addParticleAnimations(state, this.area, this.x, this.y, this.z, this.behaviors.particles, this.behaviors);
+            addParticleAnimations(state, this.area,
+                this.x + this.frame.w / 2, 
+                this.y + this.frame.h / 2,
+                this.z, this.behaviors.particles, this.behaviors);
             if (this.linkedObject && !this.linkedObject.broken) {
                 this.linkedObject.breakOnImpact(state);
             }

@@ -1374,13 +1374,36 @@ const crystalGrates: TileSource = {
     },
 };
 const newTiles: Frame = {
-    image: requireImage('gfx/tiles/crystalcavesheet.png'),
-    x: 128, y: 64,
+    image: requireImage('gfx/tiles/crystalbeadpiles.png'),
+    x: 0, y: 0,
     //w: 48, h: 48,
-    w: 80, h: 64,
+    w: 256, h: 48,
 };
 //(async () => console.log((await findUniqueTiles(newTiles)).map(o => `[${o.x},${o.y}]`).join(',')));//();
 (() => logUniqueTiles(newTiles));//();
+
+
+export const crystalParticles: Frame[] = createAnimation('gfx/effects/particles_beads.png', {w: 3, h: 3}, {x: 0, cols: 10}).frames;
+
+const crystalBeadFloor: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/crystalbeadpiles.png'), x: 0, y: 0, w: 256, h: 48},
+    behaviors: {
+        'all': { defaultLayer: 'floor2' },
+        // We place the horizontal edges on field layer by default so it is easy to overlap
+        // the horizontal+vertical edges.
+        '1x0': { defaultLayer: 'field' },
+        '4x0': { defaultLayer: 'field' },
+        '1x2': { defaultLayer: 'field' },
+        '4x2': { defaultLayer: 'field' },
+        '1x1': { slippery: true, defaultLayer: 'field', cuttable: 1, low: true, underTile: 1138, particles: crystalParticles },
+    },
+    tileCoordinates: [
+                [ 1, 0],                [ 4, 0],
+        [ 0, 1],[ 1, 1],[ 2, 1],[ 3, 1],[ 4, 1],[ 5, 1],
+                [ 1, 2],                [ 4, 2],
+    ]
+};
 
 
 const [lavaCanvas, lavaContext] = createCanvasAndContext(64, 80);
@@ -1419,6 +1442,8 @@ const spiritFloorEdges: TileSource = {
         'all': { defaultLayer: 'floor2' },
     },
 };
+
+
 
 const deletedTileSource: TileSource = solidColorTile('#FF0000', {deleted: true});
 function deletedTiles(n: number): TileSource[] {
@@ -1567,6 +1592,7 @@ addTiles([
     crystalGrates,
     spiritFloor,
     spiritFloorEdges,
+    crystalBeadFloor,
 ]);
 
 // This invalid is in the middle of a bunch of other tiles so it is easiest to just delete after adding it.
