@@ -644,14 +644,6 @@ const clouds: TileSource = {
         //'3x4': { ...cloudBehavior, solidMap: BITMAP_TOP_LEFT, jumpDirection: 'upleft'},
     },
 };
-// This is being used in place of the crystal bead covered ground in the waterfall tower.
-const singleCloudTile: TileSource = {
-    w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/cloud.png'), x: 48, y: 32, w: 16, h: 16},
-    behaviors: {
-        'all': { slippery: true, defaultLayer: 'field', cuttable: 1, low: true },
-    },
-};
 const cloudAngles: TileSource = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/cloud.png'), x: 64, y: 0, w: 64, h: 64},
@@ -1383,6 +1375,15 @@ const newTiles: Frame = {
 (() => logUniqueTiles(newTiles));//();
 
 
+const floorEyeTile: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/eyemonsterbase.png'), x: 0, y: 0, w: 16, h: 16},
+    behaviors: {
+        'all': { defaultLayer: 'floor2' },
+    },
+};
+
+
 export const crystalParticles: Frame[] = createAnimation('gfx/effects/particles_beads.png', {w: 3, h: 3}, {x: 0, cols: 10}).frames;
 
 const crystalBeadFloor: TileSource = {
@@ -1497,7 +1498,7 @@ addTiles([
     caveCornersPalette,
     spiritPlantsPalette,
     brightGrass,
-    singleCloudTile,
+    floorEyeTile,
     shore,
     shoreAngles,
     cloudAngles,

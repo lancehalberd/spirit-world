@@ -12,13 +12,13 @@ import {
 } from 'app/types';
 
 const crystalBeadsBasePattern = createAnimation('gfx/effects/beadcascadeunder.png', {w: 16, h: 16},
-    {cols: 8, duration: 5});
+    {cols: 8, duration: 3});
 const crystalBeadsBottomAnimation = createAnimation('gfx/effects/beadcascadeunder.png', {w: 16, h: 16},
-    {y: 1, cols: 8, duration: 5});
+    {y: 1, cols: 8, duration: 3});
 const crystalBeadsBaseOverPattern = createAnimation('gfx/effects/beadcascadeover.png', {w: 16, h: 16},
-    {x: 1, cols: 7, duration: 5});
+    {x: 1, cols: 7, duration: 2});
 const crystalBeadsBottomOverAnimation = createAnimation('gfx/effects/beadcascadeover.png', {w: 16, h: 16},
-    {x: 1, y: 1, cols: 7, duration: 5});
+    {x: 1, y: 1, cols: 7, duration: 2});
 //const crystalBeadsOverPattern = createAnimation('gfx/effects/crystalbeads2.png', {w: 32, h: 16},
 //    {ySpace: 16, rows: 8, duration: 5});
 
@@ -35,7 +35,7 @@ function findBeadCutoff(this: void, state: GameState, area: AreaInstance, x: num
     return 512;
 }
 
-const beadTileIndex = 122;
+const beadTileIndex = 1135;
 
 export class BeadCascade implements ObjectInstance {
     area: AreaInstance;

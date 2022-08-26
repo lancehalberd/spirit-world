@@ -621,9 +621,15 @@ export function coverTile(
         }
         topLayer = layer;
     }
-    const currentIndex = topLayer.tiles[ty][tx]?.index || 0;
+    let currentIndex = topLayer.tiles[ty][tx]?.index || 0;
     if (currentIndex === coverTile) {
         return false;
+    }
+    // If the covered tile has its own under tile, apply it instead of the
+    // current tile provided the current tile is empty.
+    const newUnderTile = allTiles[coverTile].behaviors?.underTile;
+    if (newUnderTile && currentIndex <= 1) {
+        currentIndex = newUnderTile;
     }
     topLayer.tiles[ty][tx] = {
         ...allTiles[coverTile],
