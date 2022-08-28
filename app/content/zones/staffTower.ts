@@ -2517,6 +2517,7 @@ const sf2_0x0: AreaDefinition = {
         {status: "normal", id: "", linked: true, x: 160, y: 416, type: "spawnMarker"},
         {status: "normal", id: "", linked: true, x: 224, y: 464, type: "spawnMarker"},
         {status: "normal", id: "", linked: true, x: 272, y: 464, type: "spawnMarker"},
+        {status: "normal", id: "staffTowerSave", x: 240, y: 272, type: "saveStatue"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},

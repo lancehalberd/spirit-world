@@ -446,6 +446,7 @@ const f0_1x0: AreaDefinition = {
         {status: "frozen", id: "frozenDoorEast", x: 368, y: 256, type: "door", style: "cave", targetObjectId: "peachCaveTopEntrance", d: "up", saveStatus: "forever", logicKey: "frozenLake"},
         {status: "frozen", id: "frozenDoorSouth", x: 256, y: 368, type: "door", style: "cave", targetObjectId: "peachCaveTopEntrance", d: "left", saveStatus: "forever", logicKey: "frozenLake"},
         {status: "frozen", id: "frozenDoorSouth", x: 224, y: 368, type: "door", style: "cave", targetObjectId: "peachCaveTopEntrance", d: "right", saveStatus: "forever", logicKey: "frozenLake"},
+        {status: "normal", id: "riverTempleSave", x: 240, y: 112, type: "saveStatue"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16},
