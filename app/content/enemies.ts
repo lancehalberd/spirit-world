@@ -685,7 +685,7 @@ export function paceAndCharge(state: GameState, enemy: Enemy) {
         }
     } else if (enemy.mode === 'stunned') {
         enemy.animationTime = 0;
-        if (enemy.modeTime > 500) {
+        if (enemy.modeTime > 1000) {
             enemy.setMode('choose');
             enemy.setAnimation('idle', enemy.d);
         }

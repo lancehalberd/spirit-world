@@ -76,7 +76,7 @@ enemyDefinitions.sentryBot = {
         } else if (enemy.mode === 'walk' || enemy.mode === 'knocked' || enemy.mode === 'stunned' || enemy.mode === 'charge') {
             paceAndCharge(state, enemy);
         } else if (enemy.mode === 'prepareLaser') {
-            const aimingTime = enemy.params.lasersLeft === 3 ? 500 : 200;
+            const aimingTime = enemy.params.lasersLeft === 3 ? 500 : 400;
             if (!updateTarget(state, enemy, true)) {
                 enemy.setMode('choose');
             } else if (enemy.modeTime >= aimingTime) {
