@@ -8,6 +8,7 @@ import {
     isPointOpen,
     tileHitAppliesToTarget,
 } from 'app/utils/field';
+import { rectanglesOverlap } from 'app/utils/index';
 
 import { Actor, Direction, GameState, Hero, MovementProperties } from 'app/types';
 
@@ -459,6 +460,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
         return;
     }
     const tileSize = 16;
+    const hitbox = hero.getHitbox(state)
 
     let leftColumn = Math.floor((hero.x + 4) / tileSize);
     let rightColumn = Math.floor((hero.x + hero.w - 5) / tileSize);
@@ -474,6 +476,14 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
     let fallingTopLeft = false, fallingTopRight = false, fallingBottomLeft = false, fallingBottomRight = false;
     let startClimbing = false;
     hero.groundHeight = 0;
+    // Apply floor effects from objects/effects.
+    for (const entity of [...hero.area.objects, ...hero.area.effects]) {
+        if (entity.getHitbox && entity.behaviors?.groundHeight > hero.groundHeight) {
+            if (rectanglesOverlap(entity.getHitbox(state), hitbox)) {
+                hero.groundHeight = entity.behaviors.groundHeight;
+            }
+        }
+    }
     for (let row = topRow; row <= bottomRow; row++) {
         for (let column = leftColumn; column <= rightColumn; column++) {
             let behaviors = behaviorGrid[row]?.[column];

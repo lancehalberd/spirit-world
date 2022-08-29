@@ -5,7 +5,7 @@ import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 
 import {
     AreaInstance, DrawPriority, EffectInstance,
-    Frame, GameState, Point
+    Frame, GameState, Point, TileBehaviors
 } from 'app/types';
 
 interface Props {
@@ -31,6 +31,7 @@ export class GroundSpike implements EffectInstance, Props {
     area: AreaInstance = null;
     isEffect = <const>true;
     isEnemyAttack = true;
+    behaviors: TileBehaviors = {groundHeight: 3};
     frame: Frame;
     damage: number;
     x: number;
