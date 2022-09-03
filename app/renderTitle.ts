@@ -10,8 +10,11 @@ import { GameState } from 'app/types';
 const WIDTH = 144;
 const ROW_HEIGHT = 20;
 
-
-
+const textOptions = <const>{
+    textBaseline: 'middle',
+    textAlign: 'left',
+    size: 16,
+};
 
 export function renderTitle(context: CanvasRenderingContext2D, state: GameState): void {
     renderStandardFieldStack(context, state);
@@ -29,23 +32,11 @@ export function renderTitle(context: CanvasRenderingContext2D, state: GameState)
 
     r = pad(r, -4);
 
-    /*const textOptions = {
-        textBaseline: 'middle',
-        textAlign: 'left',
-        size: 10,
-        fillStyle: 'white',
-    };*/
-    const smallTextOptions = {
-        textBaseline: 'middle',
-        textAlign: 'left',
-        size: 16,
-        fillStyle: 'white',
-    };
     context.fillStyle = 'white';
     let x = r.x + 20, y = r.y + ROW_HEIGHT / 2;
     for (let i = 0; i < options.length; i++) {
         let text = options[i].slice(0, 13).toUpperCase();
-        drawText(context, text, x, y, smallTextOptions);
+        drawText(context, text, x, y, textOptions);
         if (state.menuIndex === i) {
             // Draw an arrow next to the selected option.
             context.beginPath();
@@ -56,5 +47,4 @@ export function renderTitle(context: CanvasRenderingContext2D, state: GameState)
         }
         y += 20;
     }
-
 }

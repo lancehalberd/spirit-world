@@ -106,8 +106,15 @@ export const keyboardMap = {
     [GAME_KEY.MEDITATE]: [keyboard_k],
 };
 
+interface TextOptions {
+    maxWidth: number
+    textAlign: 'left' | 'center' | 'right'
+    textBaseline: 'top' | 'middle' | 'bottom'
+    size: number
+}
+
 export function drawText(context: CanvasRenderingContext2D, text: string, x: number, y: number,
-    {maxWidth = 100, textAlign = 'left', textBaseline = 'bottom', size = baseHeight}
+    {maxWidth = 100, textAlign = 'left', textBaseline = 'bottom', size = baseHeight}: Partial<TextOptions>
 ) {
     text = `${text}`;
     x = x | 0;

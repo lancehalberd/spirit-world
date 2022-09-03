@@ -353,7 +353,6 @@ const f0_0x0: AreaDefinition = {
         {id: "peachCave:0:0x0-beetleMini-0", linked: false, spirit: false, status: "normal", x: 48, y: 320, type: "enemy", enemyType: "beetleMini"},
         {id: "peachCave:0:0x0-beetleMini-1", linked: false, spirit: false, status: "normal", x: 48, y: 400, type: "enemy", enemyType: "beetleMini"},
         {id: "peachCave-mini1", linked: false, spirit: false, status: "normal", x: 304, y: 240, type: "enemy", enemyType: "beetleMini"},
-        {id: "peachCave-beetle1", linked: false, spirit: false, status: "normal", x: 448, y: 224, type: "enemy", enemyType: "beetle"},
         {id: "peachCave:0:0x0-money-0", linked: false, spirit: false, status: "normal", x: 464, y: 352, type: "chest", lootType: "money", lootLevel: 0, lootAmount: 50},
         {status: "normal", id: "peachCave-climber1", x: 336, y: 304, type: "enemy", enemyType: "climbingBeetle", d: "down", params: {}},
         {status: "normal", id: "peachCave-climber3", x: 304, y: 192, type: "enemy", enemyType: "climbingBeetle", d: "down", params: {}},

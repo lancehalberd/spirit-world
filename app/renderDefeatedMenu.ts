@@ -1,10 +1,17 @@
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
 import { fillRect, pad } from 'app/utils/index';
+import { drawText } from 'app/utils/simpleWhiteFont';
 
 import { GameState } from 'app/types';
 
 const WIDTH = CANVAS_WIDTH * 3 / 4;
 const HEIGHT = 3 * CANVAS_HEIGHT / 8;
+
+const textOptions = <const>{
+    textBaseline: 'middle',
+    textAlign: 'left',
+    size: 16,
+};
 
 export function renderDefeatedMenu(context: CanvasRenderingContext2D, state: GameState): void {
 
@@ -22,38 +29,40 @@ export function renderDefeatedMenu(context: CanvasRenderingContext2D, state: Gam
 
     r = pad(r, -4);
 
-    let x = r.x + 20, y = r.y + r.h / 4;
-    context.textBaseline = 'middle';
-    context.textAlign = 'left';
-    context.font = '16px Arial';
-    context.fillStyle = 'white';
+    let x = r.x + 20, y = r.y + r.h / 4 - 2;
     if (state.defeatState.reviving) {
         context.save();
             const missingLife = state.hero.maxLife - state.hero.life;
             if (missingLife < 3) {
                 context.globalAlpha *= missingLife / 3;
             }
-            context.fillText('HANG IN THERE!', x, CANVAS_HEIGHT - 32);
+            drawText(context, 'HANG IN THERE!', CANVAS_WIDTH / 2, CANVAS_HEIGHT - 32, {
+                textBaseline: 'middle',
+                textAlign: 'center',
+                size: 16,
+            });
         context.restore();
         return;
     } else {
-        context.fillText('TRY AGAIN?', x, y + 2);
+        drawText(context, 'TRY AGAIN?', x, y + 2, textOptions);
     }
 
-    y = r.y + r.h * 2 / 4;
+    x += 16;
+    y = r.y + r.h * 2 / 4 + 2;
     let selectedY = y;
-    context.fillText('CONTINUE', x, y + 2);
+    drawText(context, 'CONTINUE', x, y + 2, textOptions);
 
-    y = r.y + r.h * 3 / 4;
+    y = r.y + r.h * 3 / 4 + 2;
     if (state.menuIndex === 1) {
         selectedY = y;
     }
-    context.fillText('QUIT', x, y + 2);
+    drawText(context, 'QUIT', x, y + 2, textOptions);
 
     // Draw an arrow next to the selected option.
+    context.fillStyle = 'white';
     context.beginPath();
-    context.moveTo(r.x + 8, selectedY - 8);
-    context.lineTo(r.x + 16, selectedY);
-    context.lineTo(r.x + 8, selectedY + 8);
+    context.moveTo(x - 12, selectedY - 8);
+    context.lineTo(x - 4, selectedY);
+    context.lineTo(x - 12, selectedY + 8);
     context.fill();
 }
