@@ -46,8 +46,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    Allow attacking with staff even when the position is invalid.
-    Fix missing ceiling edge tiles in waterfall tower
     Add crystal spike tiles once I get the final version from Jon
         - Replace pits near bead flows with spikes, the respawn logic on the bead flows can make
         you start about to fall into nearby pits.
