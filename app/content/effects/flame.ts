@@ -8,7 +8,7 @@ import { allImagesLoaded } from 'app/utils/images';
 
 import {
     AreaInstance, DrawPriority, EffectInstance,
-    Frame, GameState,
+    Frame, GameState, TileBehaviors,
 } from 'app/types';
 
 const flameGeometry = {w: 20, h: 20, content: {x: 2, y: 2, w: 16, h: 16}};
@@ -41,10 +41,15 @@ interface Props {
     az?: number
     scale?: number
     ttl?: number
+    isPreparing?: boolean
 }
 
 export class Flame implements EffectInstance, Props {
     drawPriority: DrawPriority = 'sprites';
+    behaviors: TileBehaviors = {
+        brightness: 0.5,
+        lightRadius: 24,
+    };
     isEffect = <const>true;
     isEnemyAttack = true;
     area: AreaInstance = null;
@@ -65,7 +70,8 @@ export class Flame implements EffectInstance, Props {
     time: number = 0;
     speed = 0;
     ttl: number;
-    constructor({x, y, z = 0, vx = 0, vy = 0, vz = 0, az = -0.3, damage = 1, scale = 1, ttl = 2000}: Props) {
+    isPreparing = false;
+    constructor({x, y, z = 0, vx = 0, vy = 0, vz = 0, az = -0.3, damage = 1, scale = 1, ttl = 2000, isPreparing = false}: Props) {
         this.damage = damage;
         this.x = x;
         this.y = y;
@@ -78,6 +84,7 @@ export class Flame implements EffectInstance, Props {
         this.scale = scale;
         this.w = 12 * scale;
         this.h = 12 * scale;
+        this.isPreparing = isPreparing
         this.animationTime = Math.floor(Math.random() * 10) * FRAME_LENGTH;
     }
     update(state: GameState) {
@@ -85,20 +92,24 @@ export class Flame implements EffectInstance, Props {
         this.y += this.vy;
         this.z = Math.max(0, this.z + this.vz);
         this.vz = Math.max(-8, this.vz + this.az);
+        this.w = 12 * this.scale;
+        this.h = 12 * this.scale;
         this.animationTime += FRAME_LENGTH;
         this.time += FRAME_LENGTH;
 
         if (this.time >= this.ttl) {
             removeEffectFromArea(state, this);
-        } else {
-            hitTargets(state, this.area, {
-                canPush: false,
-                damage: this.damage,
-                hitbox: this,
-                element: 'fire',
-                hitAllies: true,
-                hitTiles: true,
-            });
+        } else  {
+            if (!this.isPreparing && this.z <= 16) {
+                hitTargets(state, this.area, {
+                    canPush: false,
+                    damage: this.damage,
+                    hitbox: this,
+                    element: 'fire',
+                    hitAllies: true,
+                    hitTiles: true,
+                });
+            }
             // Create sparks less often when the flame is still.
             const rate = (this.vx || this.vy) ? 100 : 400;
             if (this.animationTime % rate === 0) {
@@ -110,9 +121,23 @@ export class Flame implements EffectInstance, Props {
         const frame = getFrame(flameAnimation, this.animationTime);
         drawFrameAt(context, frame, {
             x: this.x - 2,
-            y: this.y - 2 + 2 + 2 * Math.sin(this.animationTime / 150),
+            y: this.y - 4 + 2 * Math.sin(this.animationTime / 150) - this.z,
             w: fireElement.content.w * this.scale,
             h: fireElement.content.h * this.scale,
         });
+    }
+
+    renderShadow(context: CanvasRenderingContext2D) {
+        const actualZ = this.z + 4 - 2 * Math.sin(this.animationTime / 150);
+        const shadowRadius = Math.max(3, 6 - actualZ / 2);
+        context.save();
+        context.globalAlpha = 0.5;
+        context.fillStyle = 'red';
+        context.translate(this.x + this.w / 2, this.y + this.h / 2);
+        context.scale(this.w / 12, this.h / 18);
+        context.beginPath();
+        context.arc(0, 0, shadowRadius, 0, 2 * Math.PI);
+        context.fill();
+        context.restore();
     }
 }

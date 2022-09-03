@@ -394,7 +394,25 @@ function updateFloorEye(state: GameState, enemy: Enemy): void {
 }
 
 function updateFlameSnake(state: GameState, enemy: Enemy): void {
-    paceRandomly(state, enemy);
+    const fireball = enemy.params.fireball;
+    if (fireball) {
+        const [dx, dy] = directionMap[enemy.d];
+        fireball.animationTime = 0;
+        fireball.scale = Math.min(1, fireball.scale + 0.04);
+        if (fireball.scale === 1) {
+            fireball.vx = 3 * dx;
+            fireball.vy = 3 * dy;
+            fireball.isPreparing = false;
+            delete enemy.params.fireball;
+            enemy.params.flameCooldown = 800;
+            enemy.params.shotCooldown = 400;
+        } else {
+            const hitbox = enemy.getHitbox(state);
+            fireball.x = hitbox.x + hitbox.w / 2 + dx * hitbox.w / 2 - fireball.w / 2;
+            fireball.y = hitbox.y + hitbox.h / 2 - 1 + dy * hitbox.h / 2 - fireball.h / 2;
+        }
+        return;
+    }
     if (enemy.params.flameCooldown > 0) {
         enemy.params.flameCooldown -= FRAME_LENGTH;
     } else {
@@ -406,30 +424,33 @@ function updateFlameSnake(state: GameState, enemy: Enemy): void {
         flame.x -= flame.w / 2;
         flame.y -= flame.h / 2;
         addEffectToArea(state, enemy.area, flame);
-        enemy.params.flameCooldown = 400;
+        enemy.params.flameCooldown = 600;
     }
-    enemy.params.shootCooldown = enemy.params.shootCooldown ?? 1000 + Math.random() * 1000;
     if (enemy.params.shootCooldown > 0) {
         enemy.params.shootCooldown -= FRAME_LENGTH;
-    } else if (enemy.modeTime >= 200) {
+    } else {
+        paceRandomly(state, enemy);
         const {hero} = getLineOfSightTargetAndDirection(state, enemy, enemy.d);
-        if (!hero) {
+        if (!hero && Math.random() > 0.01) {
             return;
         }
-        enemy.params.shootCooldown = 2000;
         const hitbox = enemy.getHitbox(state);
         const [dx, dy] = directionMap[enemy.d];
         const flame = new Flame({
             x: hitbox.x + hitbox.w / 2 + dx * hitbox.w / 2,
             y: hitbox.y + hitbox.h / 2 - 1 + dy * hitbox.h / 2,
-            vx: 4 * dx,
-            vy: 4 * dy,
-            ttl: 1000,
+            isPreparing: true,
+            vx: 0,
+            vy: 0,
+            z: 4,
+            az: 0,
+            scale: 0.1,
+            ttl: 1400,
         });
         flame.x -= flame.w / 2;
         flame.y -= flame.h / 2;
         addEffectToArea(state, enemy.area, flame);
-        enemy.params.flameCooldown = 400;
+        enemy.params.fireball = flame;
     }
 }
 function updateFrostBeetle(state: GameState, enemy: Enemy): void {
