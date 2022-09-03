@@ -17,6 +17,7 @@ enemyDefinitions.beetleBoss = {
     alwaysReset: true,
     animations: beetleWingedAnimations, flying: true, scale: 4,
     acceleration: 0.5, speed: 2,
+    initialMode: 'hidden',
     life: 16, touchDamage: 1, update: updateBeetleBoss,
 };
 enemyDefinitions.beetleBossWingedMinionDefinition = {
@@ -31,7 +32,26 @@ enemyDefinitions.beetleBossWingedMinionDefinition = {
 function updateBeetleBoss(state: GameState, enemy: Enemy): void {
     const hitbox = enemy.getHitbox(state);
     const { section } = getAreaSize(state);
-    enemy.alwaysUpdate = true;
+    if (enemy.mode === 'hidden') {
+        enemy.healthBarTime = 0;
+        enemy.y = -64;
+        enemy.setMode('enter');
+        enemy.alwaysUpdate = true;
+        return;
+    }
+    if (enemy.mode === 'enter') {
+        // Don't show the healthbar immediately.
+        if (enemy.modeTime < 2000) {
+            enemy.healthBarTime = 0;
+        }
+        if (enemy.modeTime < 1500) {
+            return;
+        }
+        if (moveEnemyToTargetLocation(state, enemy, enemy.definition.x + hitbox.w / 2, enemy.definition.y + hitbox.h / 2) === 0) {
+            enemy.setMode('choose');
+        }
+        return;
+    }
     if (enemy.life <= 8) {
         enemy.speed = enemyDefinitions.beetleBoss.speed + 1;
     }

@@ -451,7 +451,7 @@ export class Enemy implements Actor, ObjectInstance {
         return this.shielded ? 1 : 0;
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
-        if (!this.area || this.status === 'gone' || this.status === 'hidden') {
+        if (!this.area || this.status === 'gone' || this.status === 'hidden' || this.mode === 'hidden') {
             return;
         }
         if (this.enemyDefinition.render) {
@@ -506,7 +506,7 @@ export class Enemy implements Actor, ObjectInstance {
     renderShadow(context: CanvasRenderingContext2D, state: GameState) {
         if (this.enemyDefinition.renderShadow) {
             this.enemyDefinition.renderShadow(context, state, this);
-        } else if (this.hasShadow && this.status !== 'gone' && this.status !== 'hidden') {
+        } else if (this.hasShadow && this.status !== 'gone' && this.status !== 'hidden' && this.mode !== 'hidden') {
             this.defaultRenderShadow(context, state);
         }
     }
