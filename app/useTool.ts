@@ -1,7 +1,6 @@
 import { addObjectToArea, addEffectToArea, playAreaSound } from 'app/content/areas';
 import { Arrow } from 'app/content/effects/arrow';
 import { Clone }  from 'app/content/objects/clone';
-import { Staff } from 'app/content/objects/staff';
 import { directionMap, getDirection } from 'app/utils/field';
 
 import { ActiveTool, GameState, Hero, MagicElement } from 'app/types'
@@ -117,19 +116,6 @@ export function useTool(
                 return;
             }
             if (state.activeStaff?.area || state.hero.magic <= 0) {
-                return;
-            }
-            const staffLevel = state.hero.activeTools.staff;
-            const maxLength = staffLevel > 1 ? 64 : 4;
-            const staff = new Staff(state, {
-                x: hero.x + 8 + 12 * directionMap[hero.d][0],
-                y: hero.y + 8 + 12 * directionMap[hero.d][1],
-                damage: 4 * staffLevel,
-                direction: hero.d,
-                element: hero.element,
-                maxLength,
-            });
-            if (staff.invalid) {
                 return;
             }
             state.hero.magic -= 10;

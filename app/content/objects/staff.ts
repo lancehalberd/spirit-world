@@ -167,9 +167,6 @@ export class Staff implements ObjectInstance {
         state.activeStaff = null;
     }
     render(context, state: GameState) {
-        // Nothing to render here, the staff is rendered to the background when it is placed.
-        // Eventually this might render the animation of the staff being placed, which would require
-        // updating the tiles at the end of the animation instead of on creation.
         if (this.direction === 'left' || this.direction === 'right') {
             let frame = getFrame(leftAnimation, this.animationTime);
             const y = this.topRow * 16 - 1;

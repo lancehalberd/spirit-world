@@ -393,8 +393,10 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 element: hero.element,
                 maxLength,
             });
-            state.activeStaff = staff;
-            addObjectToArea(state, state.areaInstance, staff);
+            if (!staff.invalid) {
+                state.activeStaff = staff;
+                addObjectToArea(state, state.areaInstance, staff);
+            }
             playAreaSound(state, state.areaInstance, 'bossDeath');
             hitTargets(state, state.areaInstance, {
                 damage: 4 * staffLevel,
