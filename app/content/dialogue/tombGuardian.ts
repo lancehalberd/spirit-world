@@ -51,8 +51,9 @@ dialogueHash.tombGuardian = {
             },
             isExclusive: true,
             text: [
-                `Now that you can touch the Spirit World you can open the door behind me.`,
-                `Press [B_PASSIVE] to gaze into the Spirit World and find a way to open the door.`,
+                `Now that you can touch the Spirit World you can open the door behind me.
+                {|}Be warned though, there is a reason this place is so hidden.`,
+                `Press [B_MEDITATE] to gaze into the Spirit World and find a way to open the door.`,
             ],
         },
         {
@@ -62,13 +63,19 @@ dialogueHash.tombGuardian = {
             },
             isExclusive: true,
             text: [
-                `You've come to learn more about your spirit powers?
+                `Well done young one, I am the Vanara Guardian.
+                {|}I protect the resting place of the Vanara.
+                {|}You've come to learn more about your spirit powers?
                 {|}I knew this day would come eventually...
                 {|}I can teach you to look into the spirit realm,
                 {|}but you won't be able to interact with it.
-                {|}The summoners used special tools for their powers,
-                {|}maybe your mother could tell you more.
-                {item:spiritSight}`,
+                {item:spiritSight}
+                There may be a way to enhance your powers further.
+                {|}Did you know your mother is a descendant of the summoner clan?
+                {|}They weren't supposed to pass their knowledge on but it still survives in certain families.
+                {|}The summoners used special tools to enhance their powers,
+                {|}perhaps your mother could tell you more.
+                `,
             ],
         },
         {
@@ -79,7 +86,7 @@ dialogueHash.tombGuardian = {
             isExclusive: true,
             text: [
                 `You can use your Spirit Sight to exit this room.
-                {|} One of these pots is not like the other.
+                {|}One of these pots is not like the other.
                 {addCue: One of the pots is special. Hold [B_MEDITATE] to gaze into the spirit world.}
                 `,
             ],

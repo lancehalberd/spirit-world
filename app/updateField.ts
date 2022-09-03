@@ -55,6 +55,7 @@ export function updateField(this: void, state: GameState) {
         if (priorityObjects.length) {
             state.areaInstance.priorityObjects.push(priorityObjects);
         }
+        updateObjectsToRender(state, state.areaInstance);
         return;
     }
     updateAllHeroes(state);
