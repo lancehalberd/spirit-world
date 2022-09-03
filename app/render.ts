@@ -147,13 +147,13 @@ export function render() {
         context.save();
             // render the hero + special effects on top of the dark background.
             translateContextForAreaAndCamera(context, state, state.areaInstance);
-            for (const effect of state.areaInstance.effects) {
+            for (const effect of state.areaInstance.objectsToRender) {
                 if (effect.drawPriority === 'background-special') {
                     effect.render?.(context, state);
                 }
             }
             state.hero.render(context, state);
-            for (const effect of state.areaInstance.effects) {
+            for (const effect of state.areaInstance.objectsToRender) {
                 if (effect.drawPriority === 'foreground-special') {
                     effect.render?.(context, state);
                 }
@@ -560,14 +560,9 @@ export function renderAreaBackground(context: CanvasRenderingContext2D, state: G
             state.camera.x - area.cameraOffset.x, state.camera.y - area.cameraOffset.y, CANVAS_WIDTH, CANVAS_HEIGHT,
             state.camera.x - area.cameraOffset.x, state.camera.y - area.cameraOffset.y, CANVAS_WIDTH, CANVAS_HEIGHT,
         );
-        for (const object of area.objects) {
+        for (const object of area.objectsToRender) {
             if (object.drawPriority === 'background' || object.getDrawPriority?.(state) === 'background') {
                 object.render?.(context, state);
-            }
-        }
-        for (const effect of area.effects) {
-            if (effect.drawPriority === 'background' || effect.getDrawPriority?.(state) === 'background') {
-                effect.render?.(context, state);
             }
         }
     context.restore();
@@ -600,34 +595,20 @@ export function renderAreaObjectsBeforeHero(context: CanvasRenderingContext2D, s
             renderHeroShadow(context, state, state.hero);
         }
         // Render shadows before anything else.
-        for (const object of area.objects) {
+        for (const object of area.objectsToRender) {
             if (object.renderShadow) {
                 object.renderShadow(context, state);
             } else if (object instanceof Clone) {
                 renderHeroShadow(context, state, object);
             }
         }
-        for (const effect of area.effects) {
-            if (effect.renderShadow) {
-                effect.renderShadow(context, state);
-            }
-        }
         const spriteObjects: (EffectInstance | ObjectInstance)[] = [];
-        for (const object of area.objects) {
+        for (const object of area.objectsToRender) {
             if ((object.drawPriority === 'sprites' || object.getDrawPriority?.(state) === 'sprites')
                 && object.y <= state.hero.y
             ) {
                 if (object.render) {
                     spriteObjects.push(object);
-                }
-            }
-        }
-        for (const effect of area.effects) {
-            if ((effect.drawPriority === 'sprites' || effect.getDrawPriority?.(state) === 'sprites')
-                && effect.y <= state.hero.y
-            ) {
-                if (effect.render) {
-                    spriteObjects.push(effect);
                 }
             }
         }
@@ -645,21 +626,12 @@ export function renderAreaObjectsAfterHero(context: CanvasRenderingContext2D, st
     context.save();
         translateContextForAreaAndCamera(context, state, area);
         const spriteObjects: (EffectInstance | ObjectInstance)[] = [];
-        for (const object of area.objects) {
+        for (const object of area.objectsToRender) {
             if ((object.drawPriority === 'sprites' || object.getDrawPriority?.(state) === 'sprites')
                 && object.y > state.hero.y
             ) {
                 if (object.render) {
                     spriteObjects.push(object);
-                }
-            }
-        }
-        for (const effect of area.effects) {
-            if ((effect.drawPriority === 'sprites' || effect.getDrawPriority?.(state) === 'sprites')
-                && effect.y > state.hero.y
-            ) {
-                if (effect.render) {
-                    spriteObjects.push(effect);
                 }
             }
         }
@@ -678,23 +650,13 @@ export function renderForegroundObjects(context: CanvasRenderingContext2D, state
     context.save();
         translateContextForAreaAndCamera(context, state, area);
         const foregroundObjects: (EffectInstance | ObjectInstance)[] = [];
-        for (const object of area.objects) {
+        for (const object of area.objectsToRender) {
             if (object.renderForeground) {
                 foregroundObjects.push(object);
             } else {
                 const drawPriority = object.drawPriority || object.getDrawPriority?.(state);
                 if (!drawPriority || drawPriority === 'foreground') {
                     foregroundObjects.push(object);
-                }
-            }
-        }
-        for (const effect of area.effects) {
-            if (effect.renderForeground) {
-                foregroundObjects.push(effect);
-            } else {
-                const drawPriority = effect.drawPriority || effect.getDrawPriority?.(state);
-                if (!drawPriority || drawPriority === 'foreground') {
-                    foregroundObjects.push(effect);
                 }
             }
         }

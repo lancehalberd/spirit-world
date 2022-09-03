@@ -84,6 +84,7 @@ export interface ObjectInstance {
     // which is used by switch toggling logic to determine whether to activate or deactivate next.
     isActive?: (state: GameState) => boolean
     previewColor?: string
+    getParts?: (state: GameState) => (ObjectInstance | EffectInstance)[]
 }
 
 export interface EffectInstance {
@@ -123,6 +124,8 @@ export interface EffectInstance {
     // The following are added for convenience when we have ambiguous type `EffectInstance | ObjectInstance`
     status?: ObjectStatus
     definition?: ObjectDefinition
+    getParts?: (state: GameState) => (ObjectInstance | EffectInstance)[]
+
 }
 
 export type ObjectStatus = 'active' | 'closed' | 'closedEnemy' | 'closedSwitch'

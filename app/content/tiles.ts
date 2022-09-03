@@ -1492,7 +1492,6 @@ addTiles([
     }),
     caveFloorPalette,
     // 'Abyss' between walls. This uses BITMAP_BOTTOM to be consistent with other ceiling tiles.
-    // Since this is still functionally a
     singleTileSource('gfx/tiles/cavearranged.png', { defaultLayer: 'foreground', solidMap: BITMAP_BOTTOM }, 0, 240),
     caveWallsPalette,
     caveCornersPalette,

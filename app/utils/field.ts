@@ -111,8 +111,10 @@ export function isPointOpen(
     const tileBehavior = area?.behaviorGrid[ty]?.[tx];
     const sy = (y | 0) % 16;
     const sx = (x | 0) % 16;
-    // If the behavior has a bitmap for solid pixels, read the exact pixel to see if it is blocked.
-    if (tileBehavior?.solidMap && !tileBehavior?.climbable) {
+    if (tileBehavior?.solid && (!tileBehavior?.climbable || !movementProperties.canClimb)) {
+        return false;
+    } else if (tileBehavior?.solidMap && !tileBehavior?.climbable) {
+        // If the behavior has a bitmap for solid pixels, read the exact pixel to see if it is blocked.
         if (movementProperties.needsFullTile) {
             return false;
         }
@@ -120,8 +122,6 @@ export function isPointOpen(
         if (tileBehavior.solidMap[sy] >> (15 - sx) & 1) {
             return false;
         }
-    } else if (tileBehavior?.solid && (!tileBehavior?.climbable || !movementProperties.canClimb)) {
-        return false;
     } else if (tileBehavior?.edges?.up && sy === 0 && movementProperties.direction !== 'up') {
         return false;
     } else if (tileBehavior?.edges?.down && sy === 15 && movementProperties.direction !== 'down') {
@@ -189,7 +189,7 @@ export function getTileBehaviors(
         tileBehavior.outOfBounds = true;
     }
     // If the behavior has a bitmap for solid pixels, read the exact pixel to see if it is blocked.
-    if (tileBehavior.solidMap) {
+    if (!tileBehavior.solid && tileBehavior.solidMap) {
         const sy = (y | 0) % 16;
         const sx = (x | 0) % 16;
         // console.log(tileBehavior.solidMap, y, x, sy, sx, tileBehavior.solidMap[sy] >> (15 - sx));
@@ -224,7 +224,7 @@ export function getTileBehaviorsAndObstacles(
     const sy = (y | 0) % 16;
     const sx = (x | 0) % 16;
     // If the behavior has a bitmap for solid pixels, read the exact pixel to see if it is blocked.
-    if (tileBehavior.solidMap) {
+    if (!tileBehavior.solid && tileBehavior.solidMap) {
         // console.log(tileBehavior.solidMap, y, x, sy, sx, tileBehavior.solidMap[sy] >> (15 - sx));
         tileBehavior.solid = !!(tileBehavior.solidMap[sy] >> (15 - sx) & 1);
     }

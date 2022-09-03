@@ -246,6 +246,9 @@ export interface AreaInstance {
     effects: EffectInstance[]
     objects: ObjectInstance[]
     priorityObjects: (EffectInstance | ObjectInstance)[][]
+    // List of objects to render that is updated each frame.
+    // This is all effects+objects as well as any parts of effects+objects.
+    objectsToRender: (EffectInstance | ObjectInstance)[]
     // Array of object ids that were created on this instance but have been removed.
     // This is used when refreshing area logic to only add objects that had not already been present.
     removedObjectIds: string[]
