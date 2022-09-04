@@ -19,14 +19,19 @@ const crystalBeadsBaseOverPattern = createAnimation('gfx/effects/beadcascadeover
     {x: 1, cols: 7, duration: 2});
 const crystalBeadsBottomOverAnimation = createAnimation('gfx/effects/beadcascadeover.png', {w: 16, h: 16},
     {x: 1, y: 1, cols: 7, duration: 2});
-//const crystalBeadsOverPattern = createAnimation('gfx/effects/crystalbeads2.png', {w: 32, h: 16},
-//    {ySpace: 16, rows: 8, duration: 5});
 
 function findBeadCutoff(this: void, state: GameState, area: AreaInstance, x: number, sy: number): number {
     for (let y = Math.floor(sy / 16) * 16 + 8; y < 512; y += 16) {
         const { objects } = getTileBehaviorsAndObstacles(
             state, area, {x: x + 8, y},
-            null, null, object => object.status === 'normal' && object.definition?.type === 'beadGrate'
+            null, null, object => {
+                if (object.definition?.type !== 'beadGrate') {
+                    return false;
+                }
+                const grate = object as BeadGrate;
+                return (grate.status === 'normal' && grate.animationTime >= grateOpenAnimation.duration / 2) ||
+                    (grate.status === 'closed' && grate.animationTime <= grateCloseAnimation.duration / 2);
+            }
         );
         if (objects.length) {
             return objects[0].y + 8;
@@ -104,6 +109,14 @@ export class BeadCascade implements ObjectInstance {
     }
 }
 
+
+const grateOpenAnimation = createAnimation('gfx/effects/crystalgrate.png', {w: 16, h: 16},
+    {cols: 7, duration: 6}, {loop: false});
+const grateCloseAnimation = createAnimation('gfx/effects/crystalgrate.png', {w: 16, h: 16},
+    {cols: 7, duration: 6, frameMap: [6, 5, 4, 3, 2, 1, 0]}, {loop: false});
+
+
+
 export class BeadGrate implements ObjectInstance {
     area: AreaInstance;
     definition: SimpleObjectDefinition;
@@ -113,6 +126,7 @@ export class BeadGrate implements ObjectInstance {
     y: number;
     w: number = 32;
     h: number = 16;
+    animationTime: number = 0;
     status: ObjectStatus = 'normal';
     constructor(state: GameState, definition: SimpleObjectDefinition) {
         this.definition = definition;
@@ -122,17 +136,25 @@ export class BeadGrate implements ObjectInstance {
         if (getObjectStatus(state, this.definition)) {
             this.status = 'normal';
         }
+        this.animationTime = 1000;
     }
     getHitbox(state: GameState) {
         return this;
     }
     onActivate(state: GameState) {
-        this.status = 'normal';
+        if (this.status !== 'normal') {
+            this.status = 'normal';
+            this.animationTime = 0;
+        }
     }
     onDeactivate(state: GameState) {
-        this.status = 'hidden';
+        if (this.status !== 'closed') {
+            this.status = 'closed';
+            this.animationTime = 0;
+        }
     }
     update(state: GameState) {
+        this.animationTime += FRAME_LENGTH;
         if (this.status === 'normal') {
             saveObjectStatus(state, this.definition, true);
         } else {
@@ -140,7 +162,11 @@ export class BeadGrate implements ObjectInstance {
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
-        context.beginPath();
+        const animation = this.status === 'normal' ? grateOpenAnimation : grateCloseAnimation;
+        let frame = getFrame(animation, this.animationTime);
+        drawFrame(context, frame, {...frame, x: this.x, y: this.y});
+        drawFrame(context, frame, {...frame, x: this.x + 16, y: this.y});
+        /*context.beginPath();
         context.moveTo(this.x + 4, this.y + 4);
         context.lineTo(this.x + this.w - 4, this.y + 4);
         context.moveTo(this.x + 4, this.y + 8);
@@ -149,7 +175,7 @@ export class BeadGrate implements ObjectInstance {
         context.lineTo(this.x + this.w - 4, this.y + this.h - 4);
         context.strokeStyle = this.status === 'hidden' ? 'grey' : 'black';
         context.lineWidth = 2;
-        context.stroke();
+        context.stroke();*/
     }
 }
 
@@ -317,51 +343,4 @@ function drawCascade(context: CanvasRenderingContext2D, r: Rect, time: number) {
         }
         h += 4;
     }
-
-    /*context.save();
-        context.globalAlpha *= 0.6;
-        context.fillStyle = '#2B68D5';
-        context.fillRect(r.x, r.y, r.w, r.h);
-    context.restore();
-    context.save();
-        context.globalAlpha *= 0.8;
-        context.fillStyle = 'white';
-        const baseValue = 128 * time / 1000 + (512 - r.y);
-        let y = baseValue % 64 - 128;
-        for (; y < r.h + 32; y += 32) {
-            let x = ((y - baseValue) % 5 + 5) % 5;
-            for (; x < r.w; x += 5) {
-                const targetTop = Math.sin((y - baseValue + y / 2 + x) / 20) * 32 + y;
-                const targetBottom = targetTop + 48;
-                const actualTop = Math.max(0, targetTop);
-                const actualBottom = Math.min(r.h, targetBottom);
-                if (actualBottom > actualTop) {
-                    context.fillRect(
-                        r.x + x, r.y + actualTop,
-                        1, actualBottom - actualTop
-                    );
-                }
-            }
-        }
-    context.restore();
-    context.save();
-        context.globalAlpha *= 0.7;
-        context.fillStyle = '#0034A0';
-        y = baseValue % 64 - 128;
-        for (; y < r.h + 32; y += 32) {
-            let x = ((y - baseValue) % 5 + 5) % 5;
-            for (; x < r.w - 1; x += 5) {
-                const targetTop = Math.cos((y - baseValue + y / 2 + x) / 20) * 32 + y;
-                const targetBottom = targetTop + 32;
-                const actualTop = Math.max(0, targetTop);
-                const actualBottom = Math.min(r.h, targetBottom);
-                if (actualBottom > actualTop) {
-                    context.fillRect(
-                        r.x + x, r.y + actualTop,
-                        2, actualBottom - actualTop
-                    );
-                }
-            }
-        }
-    context.restore();*/
 }

@@ -991,6 +991,9 @@ const f1_0x2: AreaDefinition = {
         {status: "normal", linked: false, spirit: false, x: 160, y: 416, type: "pushPull", id: "tomb:1:2x0-pushPull-1"},
         {status: "normal", linked: false, spirit: false, x: 368, y: 48, type: "crystalSwitch", timer: 500, id: "tombPracticeSwitch", targetObjectId: "tombPracticeDoor"},
         {status: "normal", id: "", x: 256, y: 416, type: "spawnMarker"},
+        {status: "normal", id: "", x: 208, y: 112, type: "pushPull"},
+        {status: "normal", id: "", x: 208, y: 128, type: "pushPull"},
+        {status: "normal", id: "", x: 96, y: 64, style: "short", type: "sign", message: "Face an object then press and hold [B_PASSIVE] to grab it. {|}You can push and drag some objects by moving while grabbing them."},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},
