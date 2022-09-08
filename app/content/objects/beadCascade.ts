@@ -110,9 +110,9 @@ export class BeadCascade implements ObjectInstance {
 }
 
 
-const grateOpenAnimation = createAnimation('gfx/effects/crystalgrate.png', {w: 16, h: 16},
+const grateOpenAnimation = createAnimation('gfx/tiles/crystalgrate.png', {w: 16, h: 16},
     {cols: 7, duration: 6}, {loop: false});
-const grateCloseAnimation = createAnimation('gfx/effects/crystalgrate.png', {w: 16, h: 16},
+const grateCloseAnimation = createAnimation('gfx/tiles/crystalgrate.png', {w: 16, h: 16},
     {cols: 7, duration: 6, frameMap: [6, 5, 4, 3, 2, 1, 0]}, {loop: false});
 
 
