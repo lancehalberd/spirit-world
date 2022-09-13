@@ -119,6 +119,13 @@ export class Staff implements ObjectInstance {
             this.invalid = true;
         }
     }
+    getHitbox(state: GameState) {
+        return {
+            x: this.leftColumn * 16, y: this.topRow * 16,
+            w: (this.rightColumn - this.leftColumn + 1) * 16,
+            h: (this.bottomRow - this.topRow + 1) * 16,
+        };
+    }
     add(state: GameState, area: AreaInstance) {
         this.area = area;
         area.objects.push(this);

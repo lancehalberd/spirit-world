@@ -1,6 +1,7 @@
 import { createCanvasAndContext } from 'app/dom';
 import { addObjectToArea, removeObjectFromArea } from 'app/content/areas';
 import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
+import { Staff } from 'app/content/objects/staff';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, drawFrameAt, getFrame } from 'app/utils/animations';
 import { coverTile, getTileBehaviorsAndObstacles } from 'app/utils/field';
@@ -261,7 +262,10 @@ export class BeadSection implements ObjectInstance {
                 && hero.action !== 'roll' && hero.z <= 4
                 && hero.y + hero.h < this.y + this.h + 4
                 && !hero.equipedGear?.ironBoots;
-            if (hero.actionTarget === this && !touchingHero) {
+            const shouldPullHero = touchingHero && !this.area.objects.some(object => {
+                return object instanceof Staff && boxesIntersect(hero, object.getHitbox(state));
+            });
+            if (hero.actionTarget === this && !shouldPullHero) {
                 hero.actionTarget = null;
                 hero.actionDx = 0;
                 hero.actionDy = 0;
@@ -276,7 +280,7 @@ export class BeadSection implements ObjectInstance {
                 hero.safeD = hero.d;
                 hero.safeX = hero.x;
                 hero.safeY = hero.y;
-            } else if (!hero.actionTarget && touchingHero) {
+            } else if (!hero.actionTarget && shouldPullHero) {
                 hero.throwHeldObject(state);
                 hero.actionTarget = this;
                 hero.action = null;

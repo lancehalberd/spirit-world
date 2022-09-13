@@ -217,9 +217,9 @@ export class Hero implements Actor, SavedHeroData {
     getHitbox(this: Hero, state: GameState): Rect {
         if (this.hasBarrier) {
             const p = 4;
-            return { x: this.x - p, y: this.y - p, w: 16 + 2 * p, h: 16 + 2 * p };
+            return { x: this.x - p, y: this.y - p, w: this.w + 2 * p, h: this.h + 2 * p };
         }
-        return { x: this.x, y: this.y, w: 16, h: 16 };
+        return { x: this.x, y: this.y, w: this.w, h: this.h };
     }
 
 
