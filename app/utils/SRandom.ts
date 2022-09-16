@@ -88,7 +88,7 @@ class SRandom {
         }
         if (collection.constructor == Array) {
             const array = collection as Array<any>;
-            return array.splice(Math.floor(this.random() * (array.length - 1)), 1)[0];
+            return array.splice(Math.floor(this.random() * array.length), 1)[0];
         }
         console.log("Warning @ Random.removeElement: "+ collection + " is neither Array or Object");
         return null;

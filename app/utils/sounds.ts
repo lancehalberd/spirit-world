@@ -210,10 +210,16 @@ const musicTracks = {
     // Used in various caves
     caveTheme: {key: 'caveTheme', type: 'bgm', source: 'bgm/Spirit 1.mp3', volume: 10 },
     // Used on the title screen and world map
-    mainTheme: {key: 'mainTheme', type: 'bgm', source: 'bgm/Spirit 4 Demo.mp3', volume: 5 },
-    tombTheme: {key: 'tombTheme', type: 'bgm', source: 'bgm/Spirit 5 Demo.mp3', volume: 5 },
+    mainTheme: {key: 'mainTheme', type: 'bgm', source: 'bgm/Spirit 4.2_demo.mp3', volume: 5 },
+    tombTheme: {key: 'tombTheme', type: 'bgm', source: 'bgm/Spirit 5.2_demo.mp3', volume: 5 },
     // Used for Vanara ship dungeons like cocoon, helix and forest temple.
     cocoonTheme: {key: 'cocoonTheme', type: 'bgm', source: 'bgm/Spirit 6 Demo.mp3', volume: 5 },
+    craterTheme: {key: 'craterTheme', type: 'bgm', source: 'bgm/Fatty Richness_demo.mp3', volume: 5 },
+    // Used for the tower after it is activated.
+    towerTheme: {key: 'towerTheme', type: 'bgm', source: 'bgm/Spirit 15_demo.mp3', volume: 5 },
+    skyTheme: {key: 'skyTheme', type: 'bgm', source: 'bgm/Spirit 14_demo.mp3', volume: 5 },
+    // Used for the lake temple
+    lakeTheme: {key: 'lakeTheme', type: 'bgm', source: 'bgm/Spirit 9 Demo.mp3', volume: 5 },
 
     // Tracks from Leon
     // For War Temple and other dungeons

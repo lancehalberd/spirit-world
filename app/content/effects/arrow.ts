@@ -165,7 +165,7 @@ interface Props {
     chargeLevel?: number;
     damage?: number
     spiritCloakDamage?: number
-    // Don't update until this many frames have passed
+    // Don't update for this many milliseconds.
     delay?: number
     // Don't collide with walls for this many milliseconds.
     ignoreWallsDuration?: number
@@ -400,6 +400,9 @@ export class EnemyArrow extends Arrow {
     }
 }
 
+const crystalDownAnimation = createAnimation('gfx/effects/shard1.png', {w: 9, h: 12});
+const crystalDownLeftAnimation = createAnimation('gfx/effects/shard2.png', {w: 9, h: 12});
+
 export class CrystalSpike extends Arrow {
     isPlayerAttack = false;
     isEnemyAttack = true;
@@ -430,6 +433,45 @@ export class CrystalSpike extends Arrow {
             hitObjects: true,
             hitTiles: this.animationTime >= this.ignoreWallsDuration,
         };
+    }
+    render(context: CanvasRenderingContext2D, state: GameState) {
+        context.save();
+            context.translate(this.x + this.w / 2, this.y - this.z + this.h / 2);
+            let frame: Frame;
+            switch(getDirection(this.vx, this.vy, true)) {
+                case 'down':
+                    frame = getFrame(crystalDownAnimation, this.animationTime);
+                    break;
+                case 'right':
+                    frame = getFrame(crystalDownAnimation, this.animationTime);
+                    context.rotate(-Math.PI / 2);
+                    break;
+                case 'left':
+                    frame = getFrame(crystalDownAnimation, this.animationTime);
+                    context.rotate(Math.PI / 2);
+                    break;
+                case 'up':
+                    frame = getFrame(crystalDownAnimation, this.animationTime);
+                    context.rotate(Math.PI);
+                    break;
+                case 'downleft':
+                    frame = getFrame(crystalDownLeftAnimation, this.animationTime);
+                    break;
+                case 'downright':
+                    frame = getFrame(crystalDownLeftAnimation, this.animationTime);
+                    context.rotate(-Math.PI / 2);
+                    break;
+                case 'upleft':
+                    frame = getFrame(crystalDownLeftAnimation, this.animationTime);
+                    context.rotate(Math.PI / 2);
+                    break;
+                case 'upright':
+                    frame = getFrame(crystalDownLeftAnimation, this.animationTime);
+                    context.rotate(Math.PI);
+                    break;
+            }
+            drawFrameAt(context, frame, { x: -frame.w / 2, y: -frame.h / 2});
+        context.restore();
     }
     update(state: GameState) {
         // Don't leave enemy arrows on the screen in case there are a lot of them.

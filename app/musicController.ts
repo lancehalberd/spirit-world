@@ -30,17 +30,20 @@ export const updateMusic = (): void => {
             playTrack('bossIntro', 0, soundSettings);
         }
     } else if (state.location.zoneKey === 'overworld'
-        || state.location.zoneKey === 'sky'
         || state.location.zoneKey === 'underwater'
     ) {
         playTrack('mainTheme', 0, soundSettings);
+    } else if (state.location.zoneKey === 'sky') {
+        playTrack('skyTheme', 0, soundSettings);
     } else if (state.location.zoneKey === 'peachCave'
         || state.location.zoneKey === 'peachCaveWater'
-        || state.location.zoneKey === 'riverTemple'
-        || state.location.zoneKey === 'riverTempleWater'
         || state.location.zoneKey === 'lakeTunnel'
     ) {
         playTrack('caveTheme', 0, soundSettings);
+    } else if (state.location.zoneKey === 'riverTemple'
+        || state.location.zoneKey === 'riverTempleWater'
+    ) {
+        playTrack('lakeTheme', 0, soundSettings);
     } else if (state.location.zoneKey === 'tomb' || state.location.zoneKey === 'waterfallTower') {
         playTrack('tombTheme', 0, soundSettings);
     } else if (state.location.zoneKey === 'waterfallCave'
@@ -52,12 +55,18 @@ export const updateMusic = (): void => {
         playTrack('dungeonTheme', 0, soundSettings);
     } else if (state.location.zoneKey === 'cocoon'
         || state.location.zoneKey === 'helix'
-        || state.location.zoneKey === 'crater'
     ) {
         playTrack('cocoonTheme', 0, soundSettings);
+    } else if (state.location.zoneKey === 'crater') {
+        playTrack('craterTheme', 0, soundSettings);
     } else if (state.location.zoneKey === 'staffTower') {
         // Play a different track when the tower is activated later.
-        playTrack('caveTheme', 0, soundSettings);
+        const towerIsOn = !!state.savedState.objectFlags.elementalBeastsEscaped;
+        if (towerIsOn) {
+            playTrack('towerTheme', 0, soundSettings);
+        } else {
+            playTrack('caveTheme', 0, soundSettings);
+        }
     } else if (state.location.zoneKey === 'caves') {
         if (state.location.areaGridCoords.x === 1 && state.location.areaGridCoords.y === 0) {
             // This is the fertility temple / no tools cave.

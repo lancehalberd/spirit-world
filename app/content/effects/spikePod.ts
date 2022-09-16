@@ -24,7 +24,7 @@ const growingAnimations = [
     createAnimation('gfx/effects/crystalpod.png', {w: 48, h: 48}, {x: 4, cols: 2, duration: 10}),
     createAnimation('gfx/effects/crystalpod.png', {w: 48, h: 48}, {x: 5, cols: 2, duration: 10}),
     createAnimation('gfx/effects/crystalpod.png', {w: 48, h: 48}, {x: 8, cols: 2, duration: 10}),
-    createAnimation('gfx/effects/crystalpod.png', {w: 48, h: 48}, {x: 8, cols: 2, duration: 5, frameMap: [0, 1, 0, 1, 0, 1]}),
+    createAnimation('gfx/effects/crystalpod.png', {w: 48, h: 48}, {x: 8, cols: 2, duration: 5, frameMap: [0, 1, 0, 1, 0, 1, 0, 1, 0, 1]}),
 ];
 const burstAnimation = createAnimation('gfx/effects/crystalpod.png', {w: 48, h: 48},
     {x: 12, cols: 5, duration: 5, frameMap: [0, 1, 2, 3, 4, 4, 5, 6]}, {loop: false});
@@ -64,9 +64,10 @@ export class SpikePod implements EffectInstance, Props {
             return;
         }
         for (let i = 0; i < 5; i++) {
-            const dx = Math.cos(theta + i * Math.PI / 4) * (reflected ? -1 : 1);
-            const dy = Math.sin(theta + i * Math.PI / 4) * (reflected ? -1 : 1);
+            const dx = Math.cos(theta + i * Math.PI / 6 - Math.PI / 3) * (reflected ? -1 : 1);
+            const dy = Math.sin(theta + i * Math.PI / 6 - Math.PI / 3) * (reflected ? -1 : 1);
             CrystalSpike.spawn(state, this.area, {
+                delay: 100,
                 x: this.x + this.w / 2 + this.w / 4 * dx,
                 y: this.y + this.h / 2 + this.h / 4 * dy,
                 damage: this.damage,
@@ -81,8 +82,7 @@ export class SpikePod implements EffectInstance, Props {
     }
     onHit(state: GameState, hit: HitProperties): HitResult {
         const {x, y} = getVectorToNearestTargetOrRandom(state, this, [hit.source]);
-        const theta = Math.round((Math.atan2(y, x) - Math.PI / 2) / (Math.PI / 4)) * Math.PI / 4;
-        this.burst(state, theta, true);
+        this.burst(state, Math.atan2(y, x), true);
         return {};
     }
     update(state: GameState) {
@@ -100,8 +100,7 @@ export class SpikePod implements EffectInstance, Props {
             }
             if (this.animationTime >= growDuration) {
                 const {x, y} = getVectorToNearestTargetOrRandom(state, this, this.area.allyTargets);
-                const theta = Math.round((Math.atan2(y, x) - Math.PI / 2) / (Math.PI / 4)) * Math.PI / 4;
-                this.burst(state, theta);
+                this.burst(state, Math.atan2(y, x));
             }
             return;
         } else if (this.animationTime >= fadeDuration) {
