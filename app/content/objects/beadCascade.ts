@@ -1,11 +1,14 @@
 import { createCanvasAndContext } from 'app/dom';
 import { addObjectToArea, removeObjectFromArea } from 'app/content/areas';
+import { addParticleSpray } from 'app/content/effects/animationEffect';
 import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
+import { crystalParticles } from 'app/content/tiles';
 import { Staff } from 'app/content/objects/staff';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, drawFrameAt, getFrame } from 'app/utils/animations';
 import { coverTile, getTileBehaviorsAndObstacles } from 'app/utils/field';
 import { boxesIntersect } from 'app/utils/index';
+import Random from 'app/utils/Random';
 import {
     AreaInstance, DrawPriority, FrameWithPattern, GameState,
     ObjectInstance, ObjectStatus, BeadCascadeDefinition, SimpleObjectDefinition,
@@ -223,6 +226,10 @@ export class BeadSection implements ObjectInstance {
             this.h += this.speed;
         } else {
             this.y += this.speed;
+            for (let x = this.x; x < this.x + this.w; x += 8) {
+            addParticleSpray(state, this.area, Random.element(crystalParticles),
+                x + Math.random() * 8, this.y, 0);
+            }
         }
         // Check for drains starting from near the top, but skip the first tile.
         const cutoff = findBeadCutoff(state, this.area, this.x, Math.max(this.y, this.spawnY + 16));
@@ -260,9 +267,13 @@ export class BeadSection implements ObjectInstance {
         if (hero.area === this.area) {
             const touchingHero = boxesIntersect(hero, this.getHitbox(state))
                 && hero.action !== 'roll' && hero.z <= 4
-                && hero.y + hero.h < this.y + this.h + 4
-                && !hero.equipedGear?.ironBoots;
-            const shouldPullHero = touchingHero && !this.area.objects.some(object => {
+                && hero.y + hero.h < this.y + this.h + 4;
+            if (touchingHero && hero.equipedGear?.ironBoots) {
+                const x = hero.x + hero.w / 4 + Math.random() * hero.w / 2;
+                addParticleSpray(state, this.area, Random.element(crystalParticles),
+                    Math.min(this.x + this.w, Math.max(this.x, x)), hero.y + hero.h, 0);
+            }
+            const shouldPullHero = touchingHero && !hero.equipedGear?.ironBoots && !this.area.objects.some(object => {
                 return object instanceof Staff && boxesIntersect(hero, object.getHitbox(state));
             });
             if (hero.actionTarget === this && !shouldPullHero) {

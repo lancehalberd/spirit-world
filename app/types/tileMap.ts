@@ -62,6 +62,8 @@ export interface TileBehaviors {
     maskFrame?: Frame
     // Array of frames to use for particles when this tile/object is destroyed.
     particles?: Frame[]
+    // Number of particles to generate on destruction.
+    numberParticles?: number
     // Key for the sound to play when this tile/object is destroyed.
     breakSound?: string
     // This ground is destroyed if the player walks on it or something lands on it.

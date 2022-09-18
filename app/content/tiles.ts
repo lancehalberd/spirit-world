@@ -1397,7 +1397,7 @@ const crystalBeadFloor: TileSource = {
         '4x0': { defaultLayer: 'field' },
         '1x2': { defaultLayer: 'field' },
         '4x2': { defaultLayer: 'field' },
-        '1x1': { slippery: true, defaultLayer: 'field', cuttable: 1, low: true, underTile: 1138, particles: crystalParticles },
+        '1x1': { slippery: true, defaultLayer: 'field', cuttable: 1, low: true, underTile: 1138, numberParticles: 6, particles: crystalParticles },
     },
     tileCoordinates: [
                 [ 1, 0],                [ 4, 0],

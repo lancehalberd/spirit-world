@@ -1,6 +1,7 @@
 import { addEffectToArea, removeEffectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, frameAnimation, getFrame } from 'app/utils/animations';
+import Random from 'app/utils/Random';
 
 import {
     AreaInstance, DrawPriority, EffectInstance, Frame, FrameAnimation,
@@ -163,8 +164,10 @@ export function addParticleAnimations(
     if (!particles) {
         return;
     }
+    const numParticles = behaviors?.numberParticles ?? 3;
     let theta = Math.random() * 2 * Math.PI;
-    for (const frame of particles) {
+    for (let i = 0; i < numParticles; i++) {
+        const frame = Random.element(particles);
         const vx = Math.cos(theta);
         const vy = Math.sin(theta);
         const particle = new AnimationEffect({
@@ -178,7 +181,7 @@ export function addParticleAnimations(
             particle.behaviors.lightRadius = (behaviors.lightRadius || 32) / 2;
         }
         addEffectToArea(state, area, particle);
-        theta += Math.PI * 2 / (particles.length);
+        theta += Math.PI * 2 / numParticles;
     }
 }
 
@@ -299,4 +302,32 @@ export function addReviveBurst(
         addEffectToArea(state, area, particle);
         theta += Math.PI * 2 / 8;
     }
+}
+
+
+export function addParticleSpray(
+    state: GameState, area: AreaInstance, frameOrAnimation: FrameAnimation | Frame, x: number, y: number, z: number
+): void {
+    const theta = Math.random() * 2 * Math.PI;
+    const vx = Math.cos(theta);
+    const vy = Math.sin(theta) / 2;
+    let animation: FrameAnimation;
+    if (!(frameOrAnimation as FrameAnimation).duration) {
+        animation = frameAnimation(frameOrAnimation as Frame);
+    } else {
+        animation = frameOrAnimation as FrameAnimation;
+    }
+    const particle = new AnimationEffect({
+        animation: animation as FrameAnimation,
+        drawPriority: 'sprites',
+        x: x + vx, y: y + vy, z,
+        vx, vy, vz: 2, az: -0.8,
+        ttl: 600,
+    });
+    // center the particle.
+    particle.x -= (animation.frames[0].content?.w || animation.frames[0].w) / 2;
+    particle.y -= (animation.frames[0].content?.h || animation.frames[0].h) / 2;
+    particle.behaviors.brightness = 1
+    particle.behaviors.lightRadius = 8;
+    addEffectToArea(state, area, particle);
 }
