@@ -20,6 +20,8 @@ interface AnimationProps {
     vy?: number
     vz?: number
     vstep?: number
+    ax?: number
+    ay?: number
     az?: number
     rotation?: number
     scale?: number
@@ -46,6 +48,8 @@ export class AnimationEffect implements EffectInstance {
     vy: number;
     vz: number;
     vstep: number;
+    ax: number;
+    ay: number;
     az: number;
     rotation: number;
     scale: number;
@@ -53,7 +57,8 @@ export class AnimationEffect implements EffectInstance {
     ttl: number;
     constructor({
         animation, drawPriority = 'background',
-        x = 0, y = 0, z = 0, vx = 0, vy = 0, vz = 0, vstep = 0, az = 0,
+        x = 0, y = 0, z = 0, vx = 0, vy = 0, vz = 0, vstep = 0,
+        ax = 0, ay = 0, az = 0,
         rotation = 0, scale = 1, alpha = 1,
         friction = 0,
         target, ttl, delay = 0
@@ -69,6 +74,8 @@ export class AnimationEffect implements EffectInstance {
         this.vy = vy;
         this.vz = vz;
         this.vstep = vstep;
+        this.ax = ax;
+        this.ay = ay;
         this.az = az;
         this.rotation = rotation;
         this.scale = scale;
@@ -94,6 +101,8 @@ export class AnimationEffect implements EffectInstance {
             this.y += this.vy;
             this.z += this.vz;
         }
+        this.vx += this.ax;
+        this.vy += this.ay;
         this.vz += this.az;
         if (this.friction) {
             this.vx *= (1 - this.friction);

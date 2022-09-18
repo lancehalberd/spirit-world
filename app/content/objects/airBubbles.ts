@@ -1,6 +1,9 @@
+import { addEffectToArea } from 'app/content/areas';
+import { AnimationEffect } from 'app/content/effects/animationEffect';
 import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
+import { createAnimation, drawFrame, frameAnimation, getFrame } from 'app/utils/animations';
+import Random from 'app/utils/Random';
 
 import {
     AreaInstance, FrameAnimation, GameState, ObjectInstance,
@@ -70,6 +73,13 @@ export class AirBubbles implements ObjectInstance {
         const frame = getFrame(floorAnimations[this.chargeStage], this.animationTime);
         drawFrame(context, frame, {...frame, x: this.x, y: this.y - 16});
     }
+    consumeCharge(state: GameState) {
+        this.charge = Math.max(this.charge - 0.02, -0.3);
+        const particleDelay = this.charge > 0 ? 100 : 500;
+        if (state.fieldTime % particleDelay === 0) {
+            addRegenerationParticle(state, this.area, this.x + 8, this.y + 8, 0);
+        }
+    }
 }
 
 export class AirBubbleBack implements ObjectInstance {
@@ -116,4 +126,27 @@ export class AirBubbleFront implements ObjectInstance {
         const frame = getFrame(frontAnimations[this.airBubble.chargeStage], this.airBubble.animationTime);
         drawFrame(context, frame, {...frame, x: this.airBubble.x, y: this.airBubble.y - 16});
     }
+}
+
+const regenerationParticles
+    = createAnimation('gfx/tiles/spiritparticlesregeneration.png', {w: 4, h: 4}, {left: 1, cols: 4, duration: 6}).frames;
+
+export function addRegenerationParticle(
+    state: GameState, area: AreaInstance, x: number, y: number, z: number
+): void {
+    const theta = 2 * Math.PI * Math.random();
+    const frame = Random.element(regenerationParticles);
+    const vx = Math.cos(theta) / 4;
+    const vy = Math.sin(theta) / 4;
+    const particle = new AnimationEffect({
+        animation: frameAnimation(frame),
+        drawPriority: 'foreground',
+        x: x - 2 + vx, y: y + vy, z,
+        vx, vy, vz: 0, az: 0.04,
+        //ax: vx / 10, ay: vy / 10,
+        ttl: 600,
+    });
+    particle.behaviors.brightness = 1
+    particle.behaviors.lightRadius = 2;
+    addEffectToArea(state, area, particle);
 }

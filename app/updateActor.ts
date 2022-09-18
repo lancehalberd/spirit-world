@@ -173,7 +173,8 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
     if (activeAirBubbles) {
         // "airBubbles" are actually going to be "Spirit Recharge" points that regenerate mana quickly.
         state.hero.magic = Math.max(0, state.hero.magic);
-        activeAirBubbles.charge = Math.max(activeAirBubbles.charge - 0.02, -0.3);
+        activeAirBubbles.consumeCharge(state);
+
         if (activeAirBubbles.charge > 0) {
             state.hero.actualMagicRegen = Math.max(5, state.hero.actualMagicRegen);
         } else if (isWaterDrainingMagic || isHoldingBreath || state.hero.isInvisible) {
