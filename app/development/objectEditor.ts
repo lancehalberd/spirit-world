@@ -20,6 +20,7 @@ import { enemyTypes } from 'app/content/enemies';
 import { npcBehaviors, npcStyles } from 'app/content/objects/npc';
 import { signStyles } from 'app/content/objects/sign';
 import { getLootFrame } from 'app/content/objects/lootObject';
+import { turretStyles } from 'app/content/objects/wallTurret';
 import { zones } from 'app/content/zones';
 import { ObjectPalette, ObjectPaletteItem } from 'app/development/objectPalette';
 import {
@@ -33,7 +34,7 @@ import { isPointInShortRect } from 'app/utils/index';
 import {
     AreaDefinition, AreaInstance, BallGoalDefinition,
     BossObjectDefinition,
-    BossType, CrystalSwitchDefinition, EntranceDefinition,
+    BossType, CrystalSwitchDefinition, EditorProperty, EntranceDefinition,
     EnemyObjectDefinition,
     FloorSwitchDefinition, KeyBlockDefinition,
     FrameDimensions, DecorationType, Direction, DrawPriority, EnemyType, GameState, LootObjectDefinition,
@@ -214,7 +215,7 @@ export function getLootTypes(): LootType[] {
 export const combinedObjectTypes: ObjectType[] = [
     'anode', 'cathode', 'airBubbles', 'ballGoal', 'beadCascade', 'beadGrate', 'bigChest', 'chest', 'crystalSwitch', 'decoration',
     'door', 'escalator', 'floorSwitch', 'keyBlock', 'loot','marker', 'narration', 'npc', 'pitEntrance',
-    'pushPull', 'rollingBall', 'saveStatue', 'sign', 'spawnMarker', 'teleporter', 'tippable', 'torch',
+    'pushPull', 'rollingBall', 'saveStatue', 'sign', 'spawnMarker', 'teleporter', 'tippable', 'torch', 'turret',
     'vineSprout', 'waterPot',
 ];
 
@@ -448,6 +449,16 @@ export function createObjectDefinition(
                 dialogueKey: definition.dialogueKey,
                 dialogue: definition.dialogue,
             };
+        case 'turret':
+            return {
+                ...commonProps,
+                type: definition.type,
+                style: definition.style || turretStyles[0],
+                d: definition.d || 'down',
+                status: definition.status || commonProps.status,
+                fireInterval: definition.fireInterval || 1000,
+                fireOffset: definition.fireOffset || 0,
+            };
         default:
             throw new Error('Unhandled object type, ' + definition['type']);
     }
@@ -538,6 +549,8 @@ function getPossibleStatuses(type: ObjectType): ObjectStatus[] {
         case 'anode':
         case 'escalator':
             return ['normal', 'off', 'frozen'];
+        case 'turret':
+            return ['normal', 'off'];
         default:
             return ['normal'];
     }
@@ -707,15 +720,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             });
             break;
         case 'door':
-            rows.push({
-                name: 'direction',
-                value: object.d,
-                values: ['up', 'down', 'left', 'right'],
-                onChange(direction: Direction) {
-                    object.d = direction;
-                    updateObjectInstance(state, object);
-                },
-            });
+            rows.push(getDirectionFields(state, object));
             // This intentionally continue on to the marker properties.
         case 'pitEntrance':
         case 'teleporter':
@@ -919,15 +924,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             });
             break;
         case 'escalator':
-            rows.push({
-                name: 'direction',
-                value: object.d,
-                values: ['up', 'down', 'left', 'right'],
-                onChange(direction: Direction) {
-                    object.d = direction;
-                    updateObjectInstance(state, object);
-                },
-            });
+            rows.push(getDirectionFields(state, object));
             rows.push({
                 name: 'speed',
                 value: object.speed || 'slow',
@@ -980,15 +977,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                     },
                 });
             }
-            rows.push({
-                name: 'direction',
-                value: object.d || 'up',
-                values: ['up', 'down', 'left', 'right'],
-                onChange(direction: Direction) {
-                    object.d = direction;
-                    updateObjectInstance(state, object);
-                },
-            });
+            rows.push(getDirectionFields(state, object));
             if (!npcBehaviors[object.behavior]) {
                 object.behavior = Object.keys(npcBehaviors)[0] as NPCBehavior;
             }
@@ -1002,8 +991,41 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                 },
             });
             break;
+        case 'turret':
+            rows.push(getDirectionFields(state, object));
+            rows.push({
+                name: 'fireInterval',
+                value: object.fireInterval ?? 1000,
+                inputClass: 'large',
+                onChange(fireInterval: number) {
+                    object.fireInterval = fireInterval;
+                    updateObjectInstance(state, object);
+                },
+            });
+            rows.push({
+                name: 'fireOffset',
+                value: object.fireOffset ?? 0,
+                inputClass: 'large',
+                onChange(fireOffset: number) {
+                    object.fireOffset = fireOffset;
+                    updateObjectInstance(state, object);
+                },
+            });
+            break;
     }
     return rows;
+}
+
+function getDirectionFields(state: GameState, object: ObjectDefinition, defaultDirection = 'down'): EditorProperty<any> {
+    return {
+        name: 'direction',
+        value: object.d || defaultDirection,
+        values: ['up', 'down', 'left', 'right'],
+        onChange(direction: Direction) {
+            object.d = direction;
+            updateObjectInstance(state, object);
+        },
+    };
 }
 
 function getEnemyFields(state: GameState, editingState: EditingState, object: ObjectDefinition) {
@@ -1011,15 +1033,7 @@ function getEnemyFields(state: GameState, editingState: EditingState, object: Ob
     if (object.type !== 'enemy' && object.type !== 'boss') {
         return;
     }
-    rows.push({
-        name: 'direction',
-        value: object.d || 'up',
-        values: ['up', 'down', 'left', 'right'],
-        onChange(direction: Direction) {
-            object.d = direction;
-            updateObjectInstance(state, object);
-        },
-    });
+    rows.push(getDirectionFields(state, object, 'up'));
     const enemyDefinition = enemyDefinitions[object.enemyType];
     for (let key in enemyDefinition?.params || {}) {
         rows.push({
@@ -1051,6 +1065,8 @@ function getStyleFields(state: GameState, editingState: EditingState, object: Ob
         styles = npcStyles;
     } else if (object.type === 'escalator') {
         styles = escalatorStyles;
+    } else if (object.type === 'turret') {
+        styles = turretStyles;
     }
     if (!styles) {
         return [];

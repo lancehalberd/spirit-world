@@ -14,6 +14,7 @@ import { checkForFloorEffects } from 'app/moveActor';
 import { isPointInShortRect } from 'app/utils/index';
 import { playSound } from 'app/musicController';
 import { updateCamera } from 'app/updateCamera';
+import { updateObjectsToRender } from 'app/updateField';
 import { specialBehaviorsHash } from 'app/content/specialBehaviors';
 
 import {
@@ -300,6 +301,7 @@ export function enterLocation(
             object.onEnterArea(state);
         }
     }
+    updateObjectsToRender(state, state.areaInstance);
 }
 
 export function setConnectedAreas(state: GameState, lastAreaInstance: AreaInstance) {

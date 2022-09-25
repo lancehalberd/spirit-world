@@ -1,12 +1,13 @@
 import { addEffectToArea, addObjectToArea } from 'app/content/areas';
-import { CrystalSpike } from 'app/content/effects/arrow';
 import { GroundSpike, addLineOfSpikes } from 'app/content/effects/groundSpike';
 import { SpikePod } from 'app/content/effects/spikePod';
 import { getNearbyTarget } from 'app/content/enemies';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { beetleAnimations } from 'app/content/enemyAnimations';
+import { WallTurret } from 'app/content/objects/wallTurret';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { playSound } from 'app/musicController';
+import { getTileBehaviors } from 'app/utils/field';
 import Random from 'app/utils/Random';
 
 
@@ -136,13 +137,20 @@ const summonShrinkingRingOfSpikes = (state: GameState, enemy: Enemy) => {
         [[0, -2], [2, 0], [0, 2], [-2, 0]],
         [],
         [],
+        [],
         [[0, -1], [-1, 0],[1, 0], [0, 1]],
     ];
     for (let i = 0; i < spikePattern.length; i++) {
         for (const coords of spikePattern[i]) {
+            const x = targetHitbox.x + targetHitbox.w / 2 + coords[0] * 16;
+            const y = targetHitbox.y + targetHitbox.h / 2 + coords[1] * 16;
+            const { tileBehavior } = getTileBehaviors(state, enemy.area, {x, y});
+            if (tileBehavior?.solid || tileBehavior?.pit) {
+                continue;
+            }
             const spike = new GroundSpike({
-                x: targetHitbox.x + targetHitbox.w / 2 + coords[0] * 16,
-                y: targetHitbox.y + targetHitbox.h / 2 + coords[1] * 16,
+                x,
+                y,
                 damage: 4,
                 delay: 260 * i,
             });
@@ -184,40 +192,38 @@ const summonProjectiles = (state: GameState, enemy: Enemy, target: EffectInstanc
     if (!target) {
         return;
     }
-    const targetHitbox = target.getHitbox(state);
-    const x = targetHitbox.x + targetHitbox.w / 2;
-    let left = Math.max(104, x - 48);
-    let right = Math.min(512 - 104, left + 96);
-    left = Math.min(left, right - 96);
-    let delay = 600;
-    // Arrows furthest towards the edges of the field start first, forcing the player
-    // to the center. This avoids the edges either being traps or always having to
-    // be safe from arrows.
-    if ((left + right) / 2 > 256) {
-        for (let x = right; x >= left; x -= 12) {
-            CrystalSpike.spawn(state, enemy.area, {
-                x,
-                y: 40,
-                damage: 2,
-                delay,
-                ignoreWallsDuration: 1000,
-                vx: 0,
-                vy: 4,
-            });
-            delay += 200;
+    const { enrageLevel = 0 } = enemy.params;
+    const arrowTurrets = enemy.area.objects.filter(o => o.definition?.type === 'turret') as WallTurret[];
+    if (enrageLevel >= 2 && Math.random() < 0.5) {
+        for (let i = arrowTurrets.length - 1; i >= 0; i--) {
+            arrowTurrets[i].fireAfter(600 + (i % 4) * 600);
+        }
+    } else if (enrageLevel >= 1 && Math.random() < 0.5) {
+        for (let i = 0; i < arrowTurrets.length; i++) {
+            arrowTurrets[i].fireAfter((i % 4 <= 1) ? 600 : 1200);
         }
     } else {
-        for (let x = left; x <= right; x += 12) {
-            CrystalSpike.spawn(state, enemy.area, {
-                x,
-                y: 40,
-                damage: 2,
-                delay,
-                ignoreWallsDuration: 1000,
-                vx: 0,
-                vy: 4,
-            });
-            delay += 200;
+        const targetHitbox = target.getHitbox(state);
+        const x = targetHitbox.x + targetHitbox.w / 2;
+        let delay = 600;
+        const radius = 32 + 16 * enrageLevel
+        let left = x - radius;
+        let right = x + radius;
+        // Arrows furthest towards the edges of the field start first, forcing the player
+        // to the center. This avoids the edges either being traps or always having to
+        // be safe from arrows.
+        if ((left + right) / 2 > 256) {
+            for (let i = arrowTurrets.length - 1; i >= 0; i--) {
+                if (arrowTurrets[i].x + 8 <= right && arrowTurrets[i].x + 8 >= left) {
+                    arrowTurrets[i].fireAfter(delay += 200);
+                }
+            }
+        } else {
+            for (let i = 0; i < arrowTurrets.length; i++) {
+                if (arrowTurrets[i].x + 8 <= right && arrowTurrets[i].x + 8 >= left) {
+                    arrowTurrets[i].fireAfter(delay += 200);
+                }
+            }
         }
     }
 };
@@ -326,7 +332,7 @@ function updateCrystalCollector(this: void, state: GameState, enemy: Enemy): voi
                 if (enemy.params.enrageLevel > 0 && Math.random() < 0.5) {
                     turnOnRandomCascade(state, enemy, enemy.params.enrageLevel);
                 }
-                if (Math.random() < 0.3) {
+                if (Math.random() < 0.4) {
                     enemy.setMode('summonProjectiles');
                 } else {
                     enemy.setMode('summonSpikes');

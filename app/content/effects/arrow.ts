@@ -348,6 +348,18 @@ export class Arrow implements EffectInstance {
     }
 }
 
+// This is for drawing a normal arrow of any of the arrow styles.
+export function drawArrow(this: void, context: CanvasRenderingContext2D, arrowStyle: ArrowStyle, animationTime: number, x: number, y: number, dx: number, dy: number) {
+    const direction = getDirection(dx, dy, true);
+    const animation = arrowStyles[arrowStyle][direction].normal;
+    let frame = getFrame(animation, animationTime);
+    context.save();
+        context.translate(x, y);
+        drawFrameAt(context, frame, { x: 4 * dx - 3, y: 4 * dy - 3});
+    context.restore();
+}
+
+
 export function getChargedArrowAnimation(this: void, chargeLevel: number, element: MagicElement): FrameAnimation {
     if (element === 'lightning') {
         return lightningArrowAnimation;
@@ -366,6 +378,10 @@ export function getChargedArrowAnimation(this: void, chargeLevel: number, elemen
 export class EnemyArrow extends Arrow {
     isPlayerAttack = false;
     isEnemyAttack = true;
+    static spawn(state: GameState, area: AreaInstance, arrowProps: Props) {
+        const enemyArrow = new EnemyArrow(arrowProps);
+        addEffectToArea(state, area, enemyArrow);
+    }
     getHitProperties(state: GameState): HitProperties {
         return {
             canPush: false,
@@ -435,43 +451,10 @@ export class CrystalSpike extends Arrow {
         };
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
-        context.save();
-            context.translate(this.x + this.w / 2, this.y - this.z + this.h / 2);
-            let frame: Frame;
-            switch(getDirection(this.vx, this.vy, true)) {
-                case 'down':
-                    frame = getFrame(crystalDownAnimation, this.animationTime);
-                    break;
-                case 'right':
-                    frame = getFrame(crystalDownAnimation, this.animationTime);
-                    context.rotate(-Math.PI / 2);
-                    break;
-                case 'left':
-                    frame = getFrame(crystalDownAnimation, this.animationTime);
-                    context.rotate(Math.PI / 2);
-                    break;
-                case 'up':
-                    frame = getFrame(crystalDownAnimation, this.animationTime);
-                    context.rotate(Math.PI);
-                    break;
-                case 'downleft':
-                    frame = getFrame(crystalDownLeftAnimation, this.animationTime);
-                    break;
-                case 'downright':
-                    frame = getFrame(crystalDownLeftAnimation, this.animationTime);
-                    context.rotate(-Math.PI / 2);
-                    break;
-                case 'upleft':
-                    frame = getFrame(crystalDownLeftAnimation, this.animationTime);
-                    context.rotate(Math.PI / 2);
-                    break;
-                case 'upright':
-                    frame = getFrame(crystalDownLeftAnimation, this.animationTime);
-                    context.rotate(Math.PI);
-                    break;
-            }
-            drawFrameAt(context, frame, { x: -frame.w / 2, y: -frame.h / 2});
-        context.restore();
+        drawCrystal(context, this.animationTime,
+            this.x + this.w / 2, this.y - this.z + this.h / 2,
+            this.vx, this.vy
+        );
     }
     update(state: GameState) {
         // Don't leave enemy arrows on the screen in case there are a lot of them.
@@ -481,4 +464,44 @@ export class CrystalSpike extends Arrow {
         }
         super.update(state);
     }
+}
+
+export function drawCrystal(this: void, context: CanvasRenderingContext2D, animationTime: number, x: number, y: number, dx: number, dy: number) {
+    context.save();
+        context.translate(x, y);
+        let frame: Frame;
+        switch(getDirection(dx, dy, true)) {
+            case 'down':
+                frame = getFrame(crystalDownAnimation, animationTime);
+                break;
+            case 'right':
+                frame = getFrame(crystalDownAnimation, animationTime);
+                context.rotate(-Math.PI / 2);
+                break;
+            case 'left':
+                frame = getFrame(crystalDownAnimation, animationTime);
+                context.rotate(Math.PI / 2);
+                break;
+            case 'up':
+                frame = getFrame(crystalDownAnimation, animationTime);
+                context.rotate(Math.PI);
+                break;
+            case 'downleft':
+                frame = getFrame(crystalDownLeftAnimation, animationTime);
+                break;
+            case 'downright':
+                frame = getFrame(crystalDownLeftAnimation, animationTime);
+                context.rotate(-Math.PI / 2);
+                break;
+            case 'upleft':
+                frame = getFrame(crystalDownLeftAnimation, animationTime);
+                context.rotate(Math.PI / 2);
+                break;
+            case 'upright':
+                frame = getFrame(crystalDownLeftAnimation, animationTime);
+                context.rotate(Math.PI);
+                break;
+        }
+        drawFrameAt(context, frame, { x: -frame.w / 2, y: -frame.h / 2});
+    context.restore();
 }

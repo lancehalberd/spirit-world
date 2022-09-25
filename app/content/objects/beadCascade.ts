@@ -170,16 +170,6 @@ export class BeadGrate implements ObjectInstance {
         let frame = getFrame(animation, this.animationTime);
         drawFrame(context, frame, {...frame, x: this.x, y: this.y});
         drawFrame(context, frame, {...frame, x: this.x + 16, y: this.y});
-        /*context.beginPath();
-        context.moveTo(this.x + 4, this.y + 4);
-        context.lineTo(this.x + this.w - 4, this.y + 4);
-        context.moveTo(this.x + 4, this.y + 8);
-        context.lineTo(this.x + this.w - 4, this.y + 8);
-        context.moveTo(this.x + 4, this.y + this.h - 4);
-        context.lineTo(this.x + this.w - 4, this.y + this.h - 4);
-        context.strokeStyle = this.status === 'hidden' ? 'grey' : 'black';
-        context.lineWidth = 2;
-        context.stroke();*/
     }
 }
 

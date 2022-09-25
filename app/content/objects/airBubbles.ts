@@ -129,7 +129,7 @@ export class AirBubbleFront implements ObjectInstance {
 }
 
 const regenerationParticles
-    = createAnimation('gfx/tiles/spiritparticlesregeneration.png', {w: 4, h: 4}, {left: 1, cols: 4, duration: 6}).frames;
+    = createAnimation('gfx/tiles/spiritparticlesregeneration.png', {w: 4, h: 4}, {cols: 4, duration: 6}).frames;
 
 export function addRegenerationParticle(
     state: GameState, area: AreaInstance, x: number, y: number, z: number

@@ -22,6 +22,7 @@ export function updateField(this: void, state: GameState) {
     if (editingState.isEditing) {
         updateAllHeroes(state);
         updateCamera(state);
+        updateObjectsToRender(state, state.areaInstance);
         return;
     }
     state.fieldTime += FRAME_LENGTH;
@@ -100,7 +101,8 @@ export function updateAreaObjects(this: void, state: GameState, area: AreaInstan
             area.enemies.push(object);
         }
     }
-    for (const object of area?.objects || []) {
+    // area.objects array may be mutated during updates, so make a copy of it before iterating over it.
+    for (const object of [...(area?.objects || [])]) {
         if (isScreenTransitioning && !object.updateDuringTransition) {
             continue;
         }
@@ -120,10 +122,7 @@ export function updateAreaObjects(this: void, state: GameState, area: AreaInstan
             const x = hitbox.x + hitbox.w / 2;
             const y = hitbox.y + hitbox.h / 2;
             const { tileBehavior } = getTileBehaviors(state, object.area, {x, y});
-            if (!tileBehavior) {
-                return;
-            }
-            if (tileBehavior.pit && !(object.z > 0)) {
+            if (tileBehavior?.pit && !(object.z > 0)) {
                 const pitAnimation = new AnimationEffect({
                     animation: objectFallAnimation,
                     x: ((x / 16) | 0) * 16 - 4, y: ((y / 16) | 0) * 16 - 4,
@@ -133,7 +132,8 @@ export function updateAreaObjects(this: void, state: GameState, area: AreaInstan
             }
         }
     }
-    for (const effect of area?.effects || []) {
+    // area.effects array may be mutated during updates, so make a copy of it before iterating over it.
+    for (const effect of [...(area?.effects || [])]) {
         if (isScreenTransitioning && !effect.updateDuringTransition) {
             continue;
         }

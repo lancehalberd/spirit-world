@@ -290,6 +290,16 @@ export interface AnodeDefinition extends BaseObjectDefinition {
     offInterval?: number
 }
 
+export type TurretStyles = 'crystal' | 'arrow';
+export interface TurretDefinition extends BaseObjectDefinition {
+    type: 'turret'
+    style?: TurretStyles
+    // Milliseconds between arrows
+    fireInterval?: number
+    // Setting different offsets on turrets will make them fire at different times
+    fireOffset?: number
+}
+
 export interface FloorSwitchDefinition extends BaseObjectDefinition {
     type: 'floorSwitch',
     toggleOnRelease?: boolean,
@@ -404,6 +414,7 @@ export type ObjectDefinition = SimpleObjectDefinition
     | NarrationDefinition
     | NPCDefinition
     | SignDefinition
+    | TurretDefinition
     ;
 
 export type ObjectType = ObjectDefinition['type'];

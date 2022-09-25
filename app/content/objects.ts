@@ -10,6 +10,7 @@ import { PushPullObject } from 'app/content/objects/pushPullObject';
 import { RollingBallObject } from 'app/content/objects/rollingBallObject';
 import { SaveStatue } from 'app/content/objects/saveStatue';
 import { TippableObject } from 'app/content/objects/tippableObject';
+import { WallTurret } from 'app/content/objects/wallTurret';
 
 import { AirBubbles } from 'app/content/objects/airBubbles';
 import { Decoration } from 'app/content/objects/decoration';
@@ -65,7 +66,7 @@ export function createObjectInstance(state: GameState, object: ObjectDefinition)
         return new FloorSwitch(state, object);
     } else if (object.type === 'keyBlock') {
         return new KeyBlock(state, object);
-    }  else if (object.type === 'npc') {
+    } else if (object.type === 'npc') {
         return new NPC(object);
     } else if (object.type === 'tippable') {
         return new TippableObject(object);
@@ -91,7 +92,9 @@ export function createObjectInstance(state: GameState, object: ObjectDefinition)
         return new Torch(state, object);
     } else if (object.type === 'vineSprout') {
         return new VineSprout(state, object);
-    } else if (object.type === 'waterPot') {
+    } else if (object.type === 'turret') {
+        return new WallTurret(state, object);
+    }  else if (object.type === 'waterPot') {
         return new WaterPot(state, object);
     }
 
