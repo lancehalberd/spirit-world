@@ -77,6 +77,7 @@ export const hasSpiritSight: LogicCheck = { requiredFlags: ['$spiritSight'] };
 export const hasAstralProjection: LogicCheck = { requiredFlags: ['$astralProjection', '$spiritSight'] };
 export const hasTeleportation: LogicCheck = { requiredFlags: ['$astralProjection', '$spiritSight', '$teleportation'] };
 export const hasSpiritBarrier: LogicCheck = { requiredFlags: ['$cloak'] };
+export const hasInvisibility: LogicCheck = { requiredFlags: ['$cloak:2'] };
 export const hasGloves: LogicCheck = { requiredFlags: ['$gloves'] };
 export const hasMitts: LogicCheck = { requiredFlags: ['$gloves:2'] };
 export const hasSmallKey: LogicCheck = { requiredFlags: ['$smallKey'] };

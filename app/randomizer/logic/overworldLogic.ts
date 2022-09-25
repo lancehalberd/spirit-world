@@ -99,6 +99,7 @@ export const overworldNodes: LogicNode[] = [
         nodeId: 'mainSpiritWorld',
         paths: [
             { nodeId: 'spiritWorldMountain', logic: hasGloves },
+            { nodeId: 'westSpiritWorld', logic: hasCloudBoots },
             { nodeId: 'overworldLakePiece' },
             // For door randomizer I would need to add the small fertility area in between here.
             // I will need to add it eventually when I add checks to the fertility temple.
@@ -107,10 +108,29 @@ export const overworldNodes: LogicNode[] = [
     },
     {
         zoneId,
+        nodeId: 'westSpiritWorld',
+        paths: [
+            // There is nothing in westSpiritWorld yet
+            { nodeId: 'mainSpiritWorld', logic: hasCloudBoots },
+        ],
+    },
+    {
+        zoneId,
         nodeId: 'spiritWorldMountain',
         paths: [
             { nodeId: 'mainSpiritWorld' },
+            { nodeId: 'westSpiritWorldMountain', logic: hasTeleportation },
         ],
+    },
+    {
+        zoneId,
+        nodeId: 'westSpiritWorldMountain',
+        paths: [
+            { nodeId: 'westSpiritWorld' },
+            { nodeId: 'spiritWorldMountain', logic: hasTeleportation },
+        ],
+        entranceIds: ['caves-ascentEntranceSpirit'],
+        exits: [{ objectId: 'caves-ascentEntranceSpirit' }],
     },
     {
         zoneId,
@@ -179,6 +199,18 @@ export const skyNodes: LogicNode[] = [
     },
     {
         zoneId,
+        nodeId: 'outsideForge',
+        paths: [
+            { nodeId: 'westSpiritWorldMountain' },
+            { nodeId: 'waterfallTowerSkySpirit'},
+        ],
+        entranceIds: ['caves-ascentExitSpirit', 'forgeEntrance'],
+        exits: [
+            { objectId: 'forgeEntrance' },
+        ],
+    },
+    {
+        zoneId,
         nodeId: 'outsideHelix',
         paths: [
             { nodeId: 'outsideCrater', logic: hasCloudBoots },
@@ -191,7 +223,10 @@ export const skyNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'waterfallTowerSkySpirit',
-        paths: [{ nodeId: 'spiritWorldMountain' }],
+        paths: [
+            { nodeId: 'outsideForge' },
+            { nodeId: 'spiritWorldMountain' }
+        ],
         entranceIds: ['waterfallTowerTopEntrance'],
         exits: [{ objectId: 'waterfallTowerTopEntrance' }],
     },

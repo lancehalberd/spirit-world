@@ -1767,7 +1767,7 @@ const sf0_0x0: AreaDefinition = {
     objects: [
         {status: "normal", id: "staffTowerSpiritSkyEntrance", logicKey: "mountainTower", x: 64, y: 416, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerSpiritSkyEntrance", d: "up"},
         {status: "normal", id: "forgeEntrance", x: 64, y: 16, type: "door", style: "cavern", targetZone: "forge", targetObjectId: "forgeEntrance", d: "up"},
-        {status: "normal", id: "caves-ascentExit", x: 208, y: 0, type: "door", style: "cavern", targetZone: "caves", targetObjectId: "caves-ascentExit", d: "up"},
+        {status: "normal", id: "caves-ascentExitSpirit", x: 208, y: 0, type: "door", style: "cavern", targetZone: "caves", targetObjectId: "caves-ascentExitSpirit", d: "up"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},

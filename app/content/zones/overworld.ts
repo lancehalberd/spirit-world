@@ -3192,7 +3192,7 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 336, y: 48, type: "spawnMarker", linked: true, spirit: true},
         {status: "normal", id: "", x: 416, y: 144, type: "spawnMarker", linked: true, spirit: true},
         {status: "normal", id: "", x: 448, y: 64, type: "spawnMarker", linked: true, spirit: true},
-        {status: "normal", id: "caves-ascentEntrance", x: 240, y: 32, type: "door", style: "cavern", targetZone: "caves", targetObjectId: "caves-ascentEntrance", d: "up"},
+        {status: "normal", id: "caves-ascentEntranceSpirit", x: 240, y: 32, type: "door", style: "cavern", targetZone: "caves", targetObjectId: "caves-ascentEntranceSpirit", d: "up"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16},

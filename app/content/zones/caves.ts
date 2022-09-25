@@ -958,8 +958,8 @@ const sf0_0x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "caves-ascentEntrance", x: 64, y: 496, type: "door", style: "cavern", targetZone: "overworld", targetObjectId: "caves-ascentEntrance", d: "down"},
-        {status: "normal", id: "caves-ascentExit", x: 96, y: 240, type: "door", style: "cavern", targetZone: "sky", targetObjectId: "caves-ascentExit", d: "down"},
+        {status: "normal", id: "caves-ascentEntranceSpirit", x: 64, y: 496, type: "door", style: "cavern", targetZone: "overworld", targetObjectId: "caves-ascentEntranceSpirit", d: "down"},
+        {status: "normal", id: "caves-ascentExitSpirit", x: 96, y: 240, type: "door", style: "cavern", targetZone: "sky", targetObjectId: "caves-ascentExitSpirit", d: "down"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},

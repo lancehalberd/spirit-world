@@ -19,6 +19,7 @@ import { cocoonNodes } from 'app/randomizer/logic/cocoonLogic';
 import { helixNodes } from 'app/randomizer/logic/helixLogic';
 import { forestTempleNodes } from 'app/randomizer/logic/forestTempleLogic';
 import { waterfallTowerNodes } from 'app/randomizer/logic/waterfallTower';
+import { forgeNodes } from 'app/randomizer/logic/forgeLogic';
 import { riverTempleNodes, riverTempleWaterNodes } from 'app/randomizer/logic/riverTempleLogic';
 import { craterNodes } from 'app/randomizer/logic/craterLogic';
 import { staffTowerNodes } from 'app/randomizer/logic/staffTower';
@@ -52,6 +53,7 @@ const allNodes = [
     ...helixNodes,
     ...forestTempleNodes,
     ...waterfallTowerNodes,
+    ...forgeNodes,
     ...riverTempleNodes,
     ...riverTempleWaterNodes,
     ...craterNodes,
