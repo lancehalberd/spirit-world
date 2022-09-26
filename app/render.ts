@@ -43,8 +43,8 @@ export function updateSpiritCanvas(state: GameState, radius: number): void {
         spiritContext.arc(x, y, radius, 0, 2 * Math.PI);
         spiritContext.fill();
         spiritContext.translate(
-            -(state.hero.x + state.hero.w / 2 - state.camera.x - spiritCanvas.width / 2),
-            -(state.hero.y - state.camera.y - spiritCanvas.height / 2)
+            -(state.hero.x + state.hero.w / 2 - state.camera.x - spiritCanvas.width / 2) | 0,
+            -(state.hero.y - state.camera.y - spiritCanvas.height / 2) | 0
         );
         spiritContext.globalAlpha = 1;
         spiritContext.globalCompositeOperation = 'source-atop';
@@ -397,7 +397,7 @@ function renderTransition(context: CanvasRenderingContext2D, state: GameState) {
 }
 
 export function translateContextForAreaAndCamera(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance): void {
-    context.translate(-state.camera.x + area.cameraOffset.x, -state.camera.y + area.cameraOffset.y);
+    context.translate((-state.camera.x + area.cameraOffset.x) | 0, (-state.camera.y + area.cameraOffset.y) | 0);
 }
 
 export function checkToRedrawTiles(area: AreaInstance) {
@@ -510,20 +510,12 @@ export function renderSpiritOverlay(context: CanvasRenderingContext2D, state: Ga
         updateSpiritCanvas(state, state.hero.spiritRadius);
         context.drawImage(spiritCanvas,
             0, 0, spiritCanvas.width, spiritCanvas.height,
-            hero.x + hero.w / 2 - spiritCanvas.width / 2
-            - state.camera.x + state.areaInstance.cameraOffset.x,
-            hero.y - spiritCanvas.height / 2
-             - state.camera.y + state.areaInstance.cameraOffset.y,
+            (hero.x + hero.w / 2 - spiritCanvas.width / 2
+            - state.camera.x + state.areaInstance.cameraOffset.x) | 0,
+            (hero.y - spiritCanvas.height / 2
+             - state.camera.y + state.areaInstance.cameraOffset.y) | 0,
             spiritCanvas.width, spiritCanvas.height
         );
-        /*context.drawImage(spiritForegroundCanvas,
-            0, 0, spiritForegroundCanvas.width, spiritForegroundCanvas.height,
-            hero.x + hero.w / 2 - spiritForegroundCanvas.width / 2
-            - state.camera.x + state.areaInstance.cameraOffset.x,
-            hero.y - spiritForegroundCanvas.height / 2
-             - state.camera.y + state.areaInstance.cameraOffset.y,
-            spiritForegroundCanvas.width, spiritForegroundCanvas.height
-        );*/
     }
 }
 
@@ -557,8 +549,8 @@ export function renderAreaBackground(context: CanvasRenderingContext2D, state: G
         translateContextForAreaAndCamera(context, state, area);
         context.drawImage(
             area.canvas,
-            state.camera.x - area.cameraOffset.x, state.camera.y - area.cameraOffset.y, CANVAS_WIDTH, CANVAS_HEIGHT,
-            state.camera.x - area.cameraOffset.x, state.camera.y - area.cameraOffset.y, CANVAS_WIDTH, CANVAS_HEIGHT,
+            (state.camera.x - area.cameraOffset.x) | 0, (state.camera.y - area.cameraOffset.y) | 0, CANVAS_WIDTH, CANVAS_HEIGHT,
+            (state.camera.x - area.cameraOffset.x) | 0, (state.camera.y - area.cameraOffset.y) | 0, CANVAS_WIDTH, CANVAS_HEIGHT,
         );
         for (const object of area.objectsToRender) {
             if (object.drawPriority === 'background' || object.getDrawPriority?.(state) === 'background') {
@@ -576,8 +568,8 @@ export function renderAreaForeground(context: CanvasRenderingContext2D, state: G
         translateContextForAreaAndCamera(context, state, area);
         context.drawImage(
             area.foregroundCanvas,
-            state.camera.x - area.cameraOffset.x, state.camera.y - area.cameraOffset.y, CANVAS_WIDTH, CANVAS_HEIGHT,
-            state.camera.x - area.cameraOffset.x, state.camera.y - area.cameraOffset.y, CANVAS_WIDTH, CANVAS_HEIGHT,
+            (state.camera.x - area.cameraOffset.x) | 0, (state.camera.y - area.cameraOffset.y) | 0, CANVAS_WIDTH, CANVAS_HEIGHT,
+            (state.camera.x - area.cameraOffset.x) | 0, (state.camera.y - area.cameraOffset.y) | 0, CANVAS_WIDTH, CANVAS_HEIGHT,
         );
     context.restore();
     renderForegroundObjects(context, state, area);
