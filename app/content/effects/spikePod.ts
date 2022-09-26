@@ -63,9 +63,9 @@ export class SpikePod implements EffectInstance, Props {
         if (this.hasBurst) {
             return;
         }
-        for (let i = 0; i < 5; i++) {
-            const dx = Math.cos(theta + i * Math.PI / 6 - Math.PI / 3) * (reflected ? -1 : 1);
-            const dy = Math.sin(theta + i * Math.PI / 6 - Math.PI / 3) * (reflected ? -1 : 1);
+        for (let i = 0; i < 4; i++) {
+            const dx = Math.cos(theta + i * Math.PI / 5 - 2 * Math.PI / 5) * (reflected ? -1 : 1);
+            const dy = Math.sin(theta + i * Math.PI / 5 - 2 * Math.PI / 5) * (reflected ? -1 : 1);
             CrystalSpike.spawn(state, this.area, {
                 delay: 100,
                 x: this.x + this.w / 2 + this.w / 4 * dx,

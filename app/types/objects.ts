@@ -281,6 +281,7 @@ export interface BallGoalDefinition extends BaseObjectDefinition {
 
 export interface BeadCascadeDefinition extends BaseObjectDefinition {
     type: 'beadCascade'
+    height?: number
     onInterval?: number
     offInterval?: number
 }

@@ -73,7 +73,10 @@ export class BeadCascade implements ObjectInstance {
         // Extend the flow to its cutoff point if the cascade is on when it is added to a screen.
         if (this.status === 'normal') {
             const cutoff = findBeadCutoff(state, this.area, this.x, this.y);
-            const newSection = new BeadSection({ w: this.w, x: this.x, y: this.y, h: cutoff - this.y });
+            const newSection = new BeadSection({
+                w: this.w, x: this.x, y: this.y, h: cutoff - this.y,
+                foregroundY: this.y + (this.definition.height ?? 40),
+            });
             addObjectToArea(state, this.area, newSection);
         }
     }
@@ -104,7 +107,10 @@ export class BeadCascade implements ObjectInstance {
             null, null, object => object instanceof BeadSection
         );
         if (!objects.length) {
-            const newSection = new BeadSection({ w: this.w, x: this.x, y: this.y, h: 4 });
+            const newSection = new BeadSection({
+                w: this.w, x: this.x, y: this.y, h: 4,
+                foregroundY: this.y + (this.definition.height ?? 40),
+            });
             addObjectToArea(state, this.area, newSection);
         }
     }
@@ -178,6 +184,8 @@ interface BeadSectionProps {
     y?: number
     w?: number
     h?: number
+    // Above this y value the beads are drawn in the foreground as if they are falling from the ceiling
+    foregroundY?: number
 }
 export class BeadSection implements ObjectInstance {
     area: AreaInstance;
@@ -189,18 +197,20 @@ export class BeadSection implements ObjectInstance {
     w: number = 32;
     x: number;
     y: number;
+    foregroundY: number;
     status: ObjectStatus = 'normal';
     hasHit = false;
     speed = 4;
     // The y value this section spawned at.
     spawnY
-    constructor({w = 32, h = 4, x = 0, y = 0 }: BeadSectionProps) {
+    constructor({w = 32, h = 4, x = 0, y = 0, foregroundY }: BeadSectionProps) {
         this.animationTime = 0;
         this.x = x;
         this.y = y;
         this.w = w;
         this.h = h;
         this.spawnY = y;
+        this.foregroundY = foregroundY ?? this.spawnY;
     }
     getHitbox(state: GameState) {
         return this;
@@ -308,6 +318,12 @@ export class BeadSection implements ObjectInstance {
                     hero.d = 'up';
                 }
             }
+        }
+    }
+    renderForeground(context, state: GameState) {
+        const hitbox = this.getHitbox(state);
+        if (hitbox.y < this.foregroundY) {
+            drawCascade(context, {...hitbox, h: this.foregroundY - hitbox.y}, this.animationTime);
         }
     }
     render(context, state: GameState) {

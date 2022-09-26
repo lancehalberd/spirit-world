@@ -263,6 +263,7 @@ export function createObjectDefinition(
                 ...commonProps,
                 saveStatus: definition.saveStatus,
                 type: definition.type,
+                height: definition.height ?? 40,
                 offInterval: definition.offInterval,
                 onInterval: definition.onInterval,
             };
@@ -802,8 +803,16 @@ export function getObjectProperties(state: GameState, editingState: EditingState
         case 'ballGoal':
             rows = [...rows, ...getSwitchTargetProperties(state, editingState, object)];
             break;
-        case 'anode':
         case 'beadCascade':
+            rows.push({
+                name: 'height',
+                value: object.height ?? 40,
+                onChange(height: number) {
+                    object.height = height;
+                    updateObjectInstance(state, object);
+                },
+            });
+        case 'anode':
             rows.push({
                 name: 'onInterval',
                 value: object.onInterval || 0,

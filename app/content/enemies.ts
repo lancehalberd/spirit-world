@@ -200,7 +200,7 @@ enemyDefinitions.ent = {
 enemyDefinitions.crystalGuardian = {
     alwaysReset: true,
     params: {
-        shieldLife: 4,
+        shieldLife: 8,
     },
     animations: entAnimations, aggroRadius: 128,
     life: 8, touchDamage: 2,
@@ -220,19 +220,19 @@ enemyDefinitions.crystalGuardian = {
     update(state: GameState, enemy: Enemy): void {
         enemy.shielded = enemy.params.shieldLife > 0;
         // Summon a pod once very 2 seconds if a target is nearby.
-        if (enemy.modeTime === 2000 || enemy.modeTime === 4000) {
+        if (enemy.modeTime % 3000 === 0) {
             const v = getVectorToNearbyTarget(state, enemy, enemy.enemyDefinition.aggroRadius, enemy.area.allyTargets);
             if (v) {
                 const {x, y} = v;
                 // This should spawn in a fixed radius around the guardian in between it and the target.
                 addEffectToArea(state, enemy.area, new SpikePod({
-                    x: enemy.x + enemy.w / 2 + 48 * x,
-                    y: enemy.y + enemy.h / 2 + 48 * y,
+                    x: enemy.x + enemy.w / 2 + 72 * x,
+                    y: enemy.y + enemy.h / 2 + 72 * y,
                     damage: 2,
                 }));
             }
         }
-        if (enemy.modeTime >= 5000) {
+        if (enemy.modeTime % 5000 === 0) {
             const v = getVectorToNearbyTarget(state, enemy, enemy.enemyDefinition.aggroRadius, enemy.area.allyTargets);
             if (v) {
                 addLineOfSpikes({
@@ -240,7 +240,6 @@ enemyDefinitions.crystalGuardian = {
                     source: [enemy.x + enemy.w / 2 + v.x * 8, enemy.y + enemy.h / 2 + v.y * 8],
                     target: [enemy.x + enemy.w / 2 + v.x * 32, enemy.y + enemy.h / 2 + v.y * 32],
                 });
-                enemy.modeTime = 0;
             }
         }
     },

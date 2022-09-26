@@ -277,6 +277,10 @@ function getLootObjects(nodes: LogicNode[], state: GameState = null): LootWithLo
             }
             const {dialogueKey, optionKey} = npc;
             const script = dialogueHash[dialogueKey].mappedOptions[optionKey];
+            // If this string isn't present than no item was assigned to this dialogue option.
+            if (script.indexOf('{item:') < 0 ) {
+                continue;
+            }
             const lootToken = script.split('{item:')[1].split('}')[0];
             const [lootType, amountOrLevel] = lootToken.split('=');
             lootObjects.push({
