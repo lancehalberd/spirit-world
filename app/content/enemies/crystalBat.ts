@@ -27,6 +27,7 @@ const spikeWaveAbility: EnemyAbility<SpikeWaveTargetType> = {
             const dy = Math.sin(theta + i * Math.PI / 5 - 2 * Math.PI / 5);
             const hitbox = enemy.getHitbox();
             CrystalSpike.spawn(state, enemy.area, {
+                ignoreWallsDuration: 200,
                 x: hitbox.x + hitbox.w / 2 + hitbox.w / 4 * dx,
                 y: hitbox.y + hitbox.h / 2 + hitbox.h / 4 * dy,
                 damage: 2,

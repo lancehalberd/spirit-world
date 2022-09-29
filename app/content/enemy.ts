@@ -478,6 +478,7 @@ export class Enemy implements Actor, ObjectInstance {
             this.animationTime += FRAME_LENGTH;
             if (this.animationTime >= 200 && (!this.canBeKnockedDown || this.z <= minZ)) {
                 this.action = null;
+                this.changeToAnimation('idle');
                 this.animationTime = 0;
             }
             return;
