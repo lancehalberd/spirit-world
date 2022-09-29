@@ -38,6 +38,7 @@ import {
     TileBehaviors,
 } from 'app/types';
 
+export * from 'app/content/enemies/crystalBat';
 export * from 'app/content/enemies/electricSquirrel';
 export * from 'app/content/enemies/lightningDrone';
 export * from 'app/content/enemies/sentryBot';
@@ -46,7 +47,7 @@ export * from 'app/content/enemies/squirrel';
 export const enemyTypes = <const>[
     'arrowTurret',
     'beetle', 'climbingBeetle', 'beetleHorned', 'beetleMini', 'beetleWinged',
-    'crystalGuardian',
+    'crystalBat', 'crystalGuardian',
     'electricSquirrel', 'ent',
     'flameSnake', 'frostBeetle',
     'floorEye',
@@ -59,16 +60,50 @@ export const enemyTypes = <const>[
 // Not intended for use in the editor.
 export type EnemyType = typeof enemyTypes[number];
 
+// An enemy ability as it is defined for a particular enemy.
+export interface EnemyAbility<T> {
+    getTarget: (this: EnemyAbility<T>, state: GameState, enemy: Enemy) => T
+    useAbility: (this: EnemyAbility<T>, state: GameState, enemy: Enemy, target: T) => void
+    // How long it takes for the enemy to generate a charge.
+    cooldown: number
+    // This can be set to parameterize the range for this ability.
+    range?: number
+    // How many charges the enemy starts with.
+    initialCharges: number
+    // The max number of charges the enemy can have.
+    charges: number
+    // Delay between the enemy choosing a target and activating the ability.
+    prepTime: number
+    // Delay after the enemy uses the ability before it can use a new ability.
+    recoverTime: number
+}
+
+// A particular instance of an enemy using an ability. This is stored
+// on the enemies activeAbility.
+export interface EnemyAbilityInstance<T> {
+    definition: EnemyAbility<T>
+    // The target that was returned from `getTarget` when the ability was activated.
+    target: T
+    // Time that has passed since the enemy activated this ability.
+    time: number
+    // Set to true once `useAbility` is called.
+    used?: boolean
+}
+
 export interface EnemyDefinition {
     alwaysReset?: boolean
+    abilities?: EnemyAbility<any>[],
     animations: ActorAnimations
     aggroRadius?: number
     drawPriority?: DrawPriority
     tileBehaviors?: TileBehaviors
     canBeKnockedBack?: boolean
     canBeKnockedDown?: boolean
+    flipLeft?: boolean
     flipRight?: boolean
     flying?: boolean
+    // This is used instead of standard code for flying enemies
+    updateFlyingZ?: (state: GameState, enemy: Enemy) => void
     hasShadow?: boolean
     ignorePits?: boolean
     life?: number
@@ -649,7 +684,7 @@ export function moveEnemyToTargetLocation(
 // The enemy slides a bit since it doesn't immediately move in the desired direction.
 const maxScurryTime = 4000;
 const minScurryTime = 1000;
-function scurryRandomly(state: GameState, enemy: Enemy) {
+export function scurryRandomly(state: GameState, enemy: Enemy) {
     if (enemy.mode === 'choose' && enemy.modeTime > 200) {
         enemy.params.theta = 2 * Math.PI * Math.random();
         enemy.setMode('scurry');

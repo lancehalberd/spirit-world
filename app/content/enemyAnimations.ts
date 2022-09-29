@@ -233,3 +233,21 @@ export const floorEyeAnimations: ActorAnimations = {
     hurt: omniAnimation(floorEyeHurtAnimation),
     defeated: omniAnimation(floorEyeDefeatedAnimation),
 };
+
+/*
+This is the Bat sheet. The Bat runs at 10 FPS
+The first 6 frames are for flying - it runs 1-2-3-4-5-6-1 at 10 FPS
+Frame 7 is when hurt (runs however long is appropriate)
+Frame 8-14 is for attacking. I imagine the icicles are spawned on frame 11 or 12.
+*/
+
+const crystalBatGeometry: FrameDimensions = { w: 36, h: 36, content: {x: 8, y: 8, w: 20, h: 20} };
+const crystalBatFlyingAnimation = createAnimation('gfx/enemies/bat1-Sheet.png', crystalBatGeometry, { cols: 6, duration: 5});
+const crystalBatHurtAnimation = createAnimation('gfx/enemies/bat1-Sheet.png', crystalBatGeometry, { x: 6, cols: 1});
+const crystalBatAttackAnimation = createAnimation('gfx/enemies/bat1-Sheet.png', crystalBatGeometry, { x: 7, cols: 7, duration: 5});
+
+export const crystalBatAnimations: ActorAnimations = {
+    idle: omniAnimation(crystalBatFlyingAnimation),
+    hurt: omniAnimation(crystalBatHurtAnimation),
+    attack: omniAnimation(crystalBatAttackAnimation),
+};

@@ -9,10 +9,11 @@ import { FRAME_LENGTH } from 'app/gameConstants';
 import { drawFrame, getFrame } from 'app/utils/animations';
 import { playSound } from 'app/musicController';
 import { renderEnemyShadow } from 'app/renderActor';
+import Random from 'app/utils/Random';
 
 import {
     Action, Actor, AreaInstance, BossObjectDefinition, Direction, DrawPriority,
-    EnemyDefinition, EnemyObjectDefinition,
+    EnemyAbility, EnemyAbilityInstance, EnemyDefinition, EnemyObjectDefinition,
     Frame, FrameAnimation, GameState, HitProperties, HitResult,
     ObjectInstance, ObjectStatus, Rect, TileBehaviors,
 } from 'app/types';
@@ -22,6 +23,12 @@ export class Enemy implements Actor, ObjectInstance {
     behaviors: TileBehaviors;
     isObject = <const>true;
     action: Action = null;
+    abilities: {
+        definition: EnemyAbility<any>
+        cooldown: number
+        charges: number
+    }[] = [];
+    activeAbility: EnemyAbilityInstance<any>;
     area: AreaInstance;
     drawPriority: DrawPriority = 'sprites';
     definition: EnemyObjectDefinition | BossObjectDefinition;
@@ -118,6 +125,13 @@ export class Enemy implements Actor, ObjectInstance {
         this.updateDrawPriority();
         this.mode = this.enemyDefinition.initialMode || 'choose';
         this.touchHit = this.enemyDefinition.touchHit;
+        for (const ability of this.enemyDefinition.abilities ?? []) {
+            this.abilities.push({
+                definition: ability,
+                charges: ability.initialCharges,
+                cooldown: ability.cooldown,
+            });
+        }
     }
     getFrame(): Frame {
         return getFrame(this.currentAnimation, this.animationTime);
@@ -178,6 +192,9 @@ export class Enemy implements Actor, ObjectInstance {
         if (!this.canBeKnockedBack) {
             return;
         }
+        // Interrupt any abilities underway.
+        this.activeAbility = null;
+        this.changeToAnimation('hurt');
         this.action = 'knocked';
         this.animationTime = 0;
         this.vx = vx;
@@ -358,6 +375,26 @@ export class Enemy implements Actor, ObjectInstance {
     shouldRespawn(state: GameState) {
         return this.alwaysReset;
     }
+    useRandomAbility(state: GameState) {
+        if (this.activeAbility) {
+            return;
+        }
+        // Randomize the list of abilities with charges and then use the first one that
+        // can find a valid target.
+        const chargedAbilities = Random.shuffle(this.abilities.filter(ability => ability.charges > 0));
+        for (const ability of chargedAbilities) {
+            const target = ability.definition.getTarget(state, this);
+            if (target) {
+                ability.charges--;
+                this.activeAbility = {
+                    definition: ability.definition,
+                    target,
+                    time: 0,
+                };
+                return;
+            }
+        }
+    }
     update(state: GameState) {
         if (this.status === 'gone') {
             return;
@@ -380,6 +417,27 @@ export class Enemy implements Actor, ObjectInstance {
         }
         this.modeTime += FRAME_LENGTH;
         this.animationTime += FRAME_LENGTH;
+        for (const ability of this.abilities) {
+            if (ability.charges < ability.definition.charges) {
+                ability.cooldown -= FRAME_LENGTH;
+                if (ability.cooldown <= 0) {
+                    ability.cooldown = ability.definition.cooldown
+                    ability.charges++;
+                }
+            }
+        }
+        if (this.activeAbility) {
+            this.activeAbility.time += FRAME_LENGTH;
+            // Actually use the ability once the prepTime has passed.
+            if (!this.activeAbility.used && this.activeAbility.time >= this.activeAbility.definition.prepTime) {
+                this.activeAbility.definition.useAbility(state, this, this.activeAbility.target);
+                this.activeAbility.used = true;
+            }
+            if (this.activeAbility.time >= this.activeAbility.definition.prepTime + this.activeAbility.definition.recoverTime) {
+                this.activeAbility = null;
+            }
+
+        }
         if (this.isDefeated) {
             if (this.animationTime <= 2800 &&
                 (this.animationTime % 300 === 0 || this.animationTime % 500 === 0)
@@ -424,11 +482,12 @@ export class Enemy implements Actor, ObjectInstance {
             }
             return;
         }
-        if (this.flying && this.z < 12) {
+        if (this.flying && this.enemyDefinition.updateFlyingZ) {
+            this.enemyDefinition.updateFlyingZ(state, this);
+        } else if (this.flying && this.z < 12) {
             this.z = Math.min(12, this.z + 2);
             return;
-        }
-        if (this.flying && this.z > 12) {
+        } else if (this.flying && this.z > 12) {
             this.z = Math.max(12, this.z - 2);
         }
         this.healthBarTime += FRAME_LENGTH;
@@ -472,14 +531,16 @@ export class Enemy implements Actor, ObjectInstance {
             if (this.invulnerableFrames) {
                 context.globalAlpha *= (0.7 + 0.3 * Math.cos(2 * Math.PI * this.time / 150));
             }
-            if (this.d === 'right' && this.enemyDefinition.flipRight) {
+            if ((this.d === 'right' && this.enemyDefinition.flipRight)
+                || (this.d === 'left' && this.enemyDefinition.flipLeft)
+            ) {
                 // Flip the frame when facing right. We may need an additional flag for this behavior
                 // if we don't do it for all enemies on the right frames.
                 const w = frame.content?.w ?? frame.w;
                 context.translate((this.x | 0) + (w / 2) * this.scale, 0);
                 context.scale(-1, 1);
                 drawFrame(context, frame, { ...frame,
-                    x: - (w / 2 + frame.content?.x || 0) * this.scale,
+                    x: - (w / 2 + (frame.content?.x || 0)) * this.scale,
                     y: this.y - (frame.content?.y || 0) * this.scale - this.z,
                     w: frame.w * this.scale,
                     h: frame.h * this.scale,

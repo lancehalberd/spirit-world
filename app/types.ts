@@ -9,7 +9,7 @@ export * from 'app/types/sounds';
 
 export { AnimationEffect } from 'app/content/effects/animationEffect';
 export { BossType, MinionType } from 'app/content/bosses';
-export { EnemyDefinition, EnemyType } from 'app/content/enemies';
+export { EnemyAbility, EnemyAbilityInstance, EnemyDefinition, EnemyType } from 'app/content/enemies';
 export { Enemy } from 'app/content/enemy';
 export { Hero } from 'app/content/hero';
 export { ChestObject, LootObject } from 'app/content/objects/lootObject';

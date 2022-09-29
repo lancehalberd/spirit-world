@@ -285,7 +285,7 @@ export function renderExplosionRing(context: CanvasRenderingContext2D, state: Ga
 export function renderEnemyShadow(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
     const frame = enemy.z >= 4 ? smallShadowFrame : shadowFrame;
     const hitbox = enemy.getHitbox(state);
-    const shadowScale = Math.round(hitbox.w / frame.w);
+    const shadowScale = Math.round(hitbox.w / shadowFrame.w);
     const target = {
         x: hitbox.x + (hitbox.w - frame.w * shadowScale) / 2,
         y: hitbox.y + hitbox.h - frame.h * shadowScale + enemy.z, // - 3 * enemy.scale,
