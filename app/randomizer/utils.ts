@@ -333,7 +333,7 @@ function findReachableNodes(allNodes: LogicNode[], startingNodes: LogicNode[], s
     const reachableNodes = [...startingNodes];
     for (let i = 0; i < reachableNodes.length; i++) {
         const currentNode = reachableNodes[i];
-        //console.log('node: ', currentNode.nodeId);
+        // console.log('node: ', currentNode.nodeId);
         const zone = getZone(currentNode.zoneId);
         if (!zone) {
             continue
@@ -645,6 +645,10 @@ function placeItem(random: typeof SRandom, allNodes: LogicNode[], startingNodes:
     const allReachableChecks: LootWithLocation[] = findReachableChecks(allNodes, startingNodes, currentState);
     const allAvailableChecks = allReachableChecks.filter(lootWithLocation => !assignmentsState.assignedLocations.includes(lootWithLocation.lootObject.id));
     let allAppropriateChecks = allAvailableChecks;
+    /*if (loot.lootObject.lootType === 'spiritSight') {
+        console.log('hasTeleportation', isLogicValid(currentState, hasTeleportation));
+        debugger;
+    }*/
     if (loot.lootObject.lootType === 'bigKey' || loot.lootObject.lootType === 'smallKey') {
         allAppropriateChecks = allAppropriateChecks.filter(lootWithLocation => {
             return lootWithLocation.location?.zoneKey === loot.location?.zoneKey

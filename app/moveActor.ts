@@ -549,7 +549,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
             // Lava is like a pit for the sake of cloud walking boots sinking over them, but it damages
             // like normal damaging ground rather than a pit. This was done because there were many instances
             // it was difficult to reset the player's position when transition screens over lava.
-            if (behaviors.pit || behaviors.isLava || behaviors.cloudGround) {
+            if (behaviors.pit || behaviors.isLava || (behaviors.cloudGround && !hero.equipedGear?.cloudBoots)) {
                 const tileIsUp = row < bottomRow;
                 const tileIsDown = row > topRow;
                 const tileIsLeft = column < rightColumn;

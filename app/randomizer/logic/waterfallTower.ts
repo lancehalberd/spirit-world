@@ -4,6 +4,7 @@ import {
     hasChakram,
     hasGloves, hasIronBoots,
     hasMediumRange, hasRoll,
+    hasStaff,
     hasWeapon,
     hasWaterBlessing,
     orLogic,
@@ -77,11 +78,23 @@ export const waterfallTowerNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'waterfallTowerBeforeRustySwitch',
-        // Technically water blessing+roll would also work, but if you active the waterfall you won't be able to get
-        // this chest without the iron boots.
-        checks: [{objectId: 'waterfallTower:s0:0x0-peachOfImmortalityPiece-0', logic: andLogic(hasIronBoots, hasRoll)}],
         // Just jump off the ledge to reach the nextarea.
-        paths: [{nodeId: 'waterfallTowerBeforeSecondGuardian'}],
+        paths: [
+            // Key blocks aren't technically doors, but they function the same way as far as the logic is concerned.
+            // There is a switch the hero must hit after the block to advance to the next section requiring medium range.
+            {
+                nodeId: 'waterfallTowerBehindBigKeyBlock',
+                // Either you need to walk across with iron boots or use roll/staff to cross the water with the water blessing.
+                logic: orLogic(hasIronBoots, andLogic(hasWaterBlessing, hasRoll), andLogic(hasWaterBlessing, hasStaff)),
+                doorId: 'waterfallTowerBigKeyBlock'
+            },
+            {nodeId: 'waterfallTowerBeforeSecondGuardian'},
+        ],
+    },
+    {
+        zoneId,
+        nodeId: 'waterfallTowerBehindBigKeyBlock',
+        checks: [{objectId: 'waterfallTower:s0:0x0-peachOfImmortalityPiece-0'}],
     },
     {
         zoneId,

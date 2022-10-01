@@ -56,7 +56,6 @@ export const helixNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'helixEntranceSpirit',
-        // Just jump off the ledge to reach the nextarea.
         paths: [{nodeId: 'helixEntrance', logic: canCross6Gaps}],
         entranceIds: ['helixSpiritDoor1'],
         exits: [
@@ -68,7 +67,7 @@ export const helixNodes: LogicNode[] = [
         nodeId: 'helix2Spirit',
         entranceIds: ['helixSpiritDoor1', 'helixSpiritDoor2'],
         exits: [
-            {objectId: 'helixSpiritDoor1'},
+            {objectId: 'helixSpiritDoor1', logic: canCross6Gaps},
             {objectId: 'helixSpiritDoor2', logic: canCross6Gaps},
         ],
     },
@@ -77,7 +76,7 @@ export const helixNodes: LogicNode[] = [
         nodeId: 'helix3Spirit',
         entranceIds: ['helixSpiritDoor2'],
         exits: [
-            {objectId: 'helixSpiritDoor2'},
+            {objectId: 'helixSpiritDoor2', logic: hasTeleportation},
         ],
         paths: [{nodeId: 'helix4Spirit', logic: hasTeleportation}],
     },
@@ -90,7 +89,7 @@ export const helixNodes: LogicNode[] = [
                 progressFlags: ['elementalBeastsEscaped']
             },
         ],
-        paths: [{nodeId: 'helix4'}, {nodeId: 'helix3Spirit'}],
+        paths: [{nodeId: 'helix4'}, {nodeId: 'helix3Spirit', logic: hasTeleportation}],
     },
     {
         zoneId,

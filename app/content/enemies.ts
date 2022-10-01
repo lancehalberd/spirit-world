@@ -188,6 +188,7 @@ enemyDefinitions.flameSnake = {
     alwaysReset: true,
     animations: snakeAnimations, speed: 1.1,
     life: 3, touchDamage: 1, update: updateFlameSnake, flipRight: true,
+    elementalMultipliers: {'ice': 2},
     immunities: ['fire'],
     renderPreview(context: CanvasRenderingContext2D, enemy: Enemy, target: Rect): void {
         enemy.defaultRenderPreview(context, target);
@@ -198,6 +199,7 @@ enemyDefinitions.frostBeetle = {
     alwaysReset: true,
     animations: beetleAnimations, speed: 0.7, aggroRadius: 112,
     life: 5, touchDamage: 1, update: updateFrostBeetle,
+    elementalMultipliers: {'fire': 2},
     immunities: ['ice'],
     renderPreview(context: CanvasRenderingContext2D, enemy: Enemy, target: Rect): void {
         enemy.defaultRenderPreview(context, target);
@@ -226,6 +228,7 @@ enemyDefinitions.ent = {
     animations: entAnimations, aggroRadius: 128,
     life: 8, touchDamage: 2, update: updateEnt,
     ignorePits: true,
+    elementalMultipliers: {'fire': 2},
     // The damage from tile behaviors will trigger when the player attempts to move into the same pixel,
     // which is more specific than touch damage on enemies which requires actually being in the same pixel.
     tileBehaviors: {touchHit: { damage: 2}, solid: true},

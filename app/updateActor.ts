@@ -129,7 +129,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
     }
     let activeAirBubbles: AirBubbles = null;
     for (const object of hero.area.objects) {
-        if (object instanceof AirBubbles) {
+        if (object instanceof AirBubbles && object.status === 'normal') {
             if (rectanglesOverlap(hero, object.getHitbox(state))) {
                 activeAirBubbles = object;
                 break;

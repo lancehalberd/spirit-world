@@ -46,18 +46,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    Enemy behavior improvement idea:
-        Give enemies a list of abilities with cooldowns.
-        Whenever an enemy needs to choose an ability it randomly selects an ability based on:
-            - Cooldown is up
-            - move is available (targeting requirements, enraged level, etc)
-        This may make the enemies vary their attacks more reliably and allow spacing out large attacks better
-        without making them completely predictable.
-        Maybe use Crystal Collector then Golem as pilots for this idea.
-        This might also be handy for defining abilities with durations because we could keep track of
-        independent timers for each ability and continue their update logic based on that time rather than the
-        mode time of the enemy itself.
-
     Add crystal spike tiles once I get the final version from Jon
         - Replace pits near bead flows with spikes, the respawn logic on the bead flows can make
         you start about to fall into nearby pits.
