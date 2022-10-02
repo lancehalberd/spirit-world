@@ -1027,8 +1027,8 @@ const caveCeilingTopAngles: TileSource = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/cavearranged.png'), x: 0, y: 0, w: 48, h: 80},
     behaviors: {
-        '8x2': bottomLeftCeiling, '9x2': bottomLeftCeiling,
-        '10x2': bottomRightCeiling, '11x2': bottomRightCeiling,
+        '8x2': ceilingBehavior, '9x2': ceilingBehavior,
+        '10x2': ceilingBehavior, '11x2': ceilingBehavior,
     },
     tileCoordinates: [
         [ 8, 2],[ 9, 2],[10, 2],[11, 2],
