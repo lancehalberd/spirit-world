@@ -1030,7 +1030,8 @@ const f0_2x2: AreaDefinition = {
         {status: "normal", id: "warTemple:0:2x2-bigKey-0", x: 160, y: 112, type: "chest", lootType: "bigKey", lootLevel: 1},
         {status: "normal", id: "warTemple:0:2x2-door-0", x: 112, y: 0, type: "door", style: "cave", d: "up"},
         {status: "normal", id: "warTemple:0:2x2-peachOfImmortalityPiece-0", x: 418, y: 65, type: "loot", lootType: "peachOfImmortalityPiece", lootLevel: 1},
-        {status: "bigKeyLocked", id: "warTempleKeyDoor", x: 144, y: 224, type: "door", style: "cave", targetZone: "overworld", targetObjectId: "warTempleKeyDoor", d: "down"},
+        {status: "closedSwitch", id: "warTempleKeyDoor", x: 144, y: 224, type: "door", style: "cave", targetZone: "overworld", targetObjectId: "warTempleKeyDoor", d: "down", saveStatus: "forever"},
+        {status: "normal", id: "warTempleKeyDoorSwitch", x: 160, y: 160, targetObjectId: "warTempleKeyDoor", type: "floorSwitch", saveStatus: "forever"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16},

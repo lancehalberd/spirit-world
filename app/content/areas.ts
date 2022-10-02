@@ -780,6 +780,7 @@ function createAreaInstance(state: GameState, definition: AreaDefinition): AreaI
         const specialBehavior = specialBehaviorsHash[definition.specialBehaviorKey] as SpecialAreaBehavior;
         specialBehavior?.apply(state, instance);
     }
+    updateObjectsToRender(state, instance);
     return instance;
 }
 
@@ -922,6 +923,7 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
         }
     }
     checkIfAllEnemiesAreDefeated(state, area);
+    updateObjectsToRender(state, area);
 }
 
 export function applyBehaviorToTile(area: AreaInstance, x: number, y: number, behavior: TileBehaviors): void {

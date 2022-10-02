@@ -46,6 +46,9 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    Look into calculating `objectsToRender` at the start of rendering an area rather than calculating it during update.
+    It seems to be error prone as if an object is removed from an area afters it is calculated it can throw exceptions when trying to render. Similarly, if the object is added after then it won't be visible which can look bad during transitions.
+
     Add crystal spike tiles once I get the final version from Jon
         - Replace pits near bead flows with spikes, the respawn logic on the bead flows can make
         you start about to fall into nearby pits.
@@ -172,7 +175,6 @@ Current tasks:
         - Fix can get permanently stuck in areas:
             - Saving in Cocoon save point is a soft lock without teleportation.
         - Fix can get stuck and require refreshing the browser:
-            - Falling in War Temple Big Key area without the Big Key
             - Falling in Peach Cave without a weapon and killing the small bug.
         - Support `entrances` instead of `entranceIds` on randomizer logic to include logic on entrances, for example, adding logic for whether entrances to sky areas is possible from the staff tower.
             - For now we can add a path from the ground to the sky based on logic: canAquireTowerStaff.
