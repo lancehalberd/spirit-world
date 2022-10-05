@@ -1,25 +1,27 @@
-import { removeEffectFromArea } from 'app/content/areas';
+import { addEffectToArea, removeEffectFromArea } from 'app/content/areas';
+import { AnimationEffect } from 'app/content/effects/animationEffect';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { spiritBarrierBreakingAnimation } from 'app/renderActor';
-import { getFrame, drawFrame } from 'app/utils/animations';
+import { createAnimation, frameAnimation, getFrame, drawFrameCenteredAt } from 'app/utils/animations';
 import { hitTargets } from 'app/utils/field';
+import Random from 'app/utils/Random';
 
 import { AreaInstance, DrawPriority, GameState, EffectInstance } from 'app/types';
 
+const burstAnimation = createAnimation('gfx/effects/45radiusburst.png', {w: 90, h: 90}, {cols: 9, duration: 2});
+
+const frameRadii = [15, 20, 28, 30, 35, 40, 45, 50];
 
 interface Props {
     x?: number
     y?: number,
 }
 
-const duration = 200;
-
-const minRadius = 15, maxRadius = 45;
+const duration = burstAnimation.duration;
 
 export class BarrierBurstEffect implements EffectInstance {
     area: AreaInstance;
     animationTime: number;
-    drawPriority: DrawPriority = 'sprites';
+    drawPriority: DrawPriority = 'foreground';
     destroyedObjects: boolean = false;
     isEffect = <const>true;
     x: number;
@@ -31,12 +33,13 @@ export class BarrierBurstEffect implements EffectInstance {
         this.y = y;
     }
     getRadius() {
-        return minRadius + (maxRadius - minRadius) * this.animationTime / duration;
+        const frameIndex = Math.floor(this.animationTime / burstAnimation.frameDuration / FRAME_LENGTH);
+        return frameRadii[frameIndex] ?? 0;
     }
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;
         const r = this.getRadius();
-        if (this.animationTime <= duration) {
+        if (r > 0) {
             hitTargets(state, this.area, {
                 damage: 2,
                 canPush: true,
@@ -47,30 +50,58 @@ export class BarrierBurstEffect implements EffectInstance {
                 hitObjects: true,
                 hitTiles: true,
             });
+            let theta = 2 * Math.PI * Math.random();
+            for (let i = 0; i < 4; i++) {
+                addWindParticle(state, this.area,
+                    this.x + r * Math.cos(theta),
+                    this.y + r * Math.sin(theta),
+                    i);
+                theta += 2 * Math.PI / 4;
+            }
         }
-        if (this.animationTime > duration) {
+        if (this.animationTime >= duration) {
             removeEffectFromArea(state, this);
         }
     }
     render(context, state: GameState) {
-        const r = this.getRadius();
-        const frame = getFrame(spiritBarrierBreakingAnimation, this.animationTime);
+        const frame = getFrame(burstAnimation, this.animationTime);
         // Debug code for viewing the hitCircle
-        /*context.save();
-            context.globalAlpha *= 0.5;
-            context.beginPath();
-            context.arc(this.x, this.y, r, 0, 2 * Math.PI);
-            context.fillStyle = 'red';
-            context.fill();
-        context.restore();*/
-        // This has been adjusted 2 pixels left and 5 pixels up by hand to look correct.
-        const scale = r / minRadius;
-        drawFrame(context, frame, {
-            x: this.x - r - 1 * scale,
-            y: this.y - r - 3 * scale,
-            w: frame.w * scale,
-            h: frame.w * scale
+        /*const r = this.getRadius();
+        if (r > 0) {
+            context.save();
+                context.globalAlpha *= 0.5;
+                context.beginPath();
+                context.arc(this.x, this.y, r, 0, 2 * Math.PI);
+                context.fillStyle = 'red';
+                context.fill();
+            context.restore();
+        }*/
+        drawFrameCenteredAt(context, frame, {
+            ...frame,
+            x: this.x - frame.w / 2,
+            y: this.y - frame.h / 2,
         });
     }
 }
 
+
+const regenerationParticles
+    = createAnimation('gfx/tiles/spiritparticlesregeneration.png', {w: 4, h: 4}, {cols: 4, duration: 6}).frames;
+
+export function addWindParticle(
+    state: GameState, area: AreaInstance, x: number, y: number, z: number
+): void {
+    const theta = 2 * Math.PI * Math.random();
+    const frame = Random.element(regenerationParticles);
+    const vx = 1.5 * Math.cos(theta);
+    const vy = 1.5 * Math.sin(theta);
+    const particle = new AnimationEffect({
+        animation: frameAnimation(frame),
+        drawPriority: 'foreground',
+        x: x + vx, y: y + vy, z,
+        vx, vy, vz: 1,
+        //ax: vx / 10, ay: vy / 10,
+        ttl: 160,
+    });
+    addEffectToArea(state, area, particle);
+}

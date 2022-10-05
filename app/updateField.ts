@@ -22,7 +22,6 @@ export function updateField(this: void, state: GameState) {
     if (editingState.isEditing) {
         updateAllHeroes(state);
         updateCamera(state);
-        updateObjectsToRender(state, state.areaInstance);
         return;
     }
     state.fieldTime += FRAME_LENGTH;
@@ -56,7 +55,6 @@ export function updateField(this: void, state: GameState) {
         if (priorityObjects.length) {
             state.areaInstance.priorityObjects.push(priorityObjects);
         }
-        updateObjectsToRender(state, state.areaInstance);
         return;
     }
     updateAllHeroes(state);
@@ -147,20 +145,7 @@ export function updateAreaObjects(this: void, state: GameState, area: AreaInstan
         }
         effect.update?.(state);
     }
-    updateObjectsToRender(state, area);
 }
-
-export function updateObjectsToRender(this: void, state: GameState, area: AreaInstance) {
-    area.objectsToRender = [];
-    for (const object of [...area?.objects || [], ...area?.effects || []]) {
-        for (const part of [object, ...(object.getParts?.(state) || [])]) {
-            if (part.render || part.renderShadow || part.renderForeground) {
-                area.objectsToRender.push(part);
-            }
-        }
-    }
-}
-
 
 function switchElement(state: GameState, delta: number): void {
     const allElements: MagicElement[] = [null];

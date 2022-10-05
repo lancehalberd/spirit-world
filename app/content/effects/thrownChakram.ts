@@ -81,7 +81,7 @@ export class ThrownChakram implements EffectInstance {
         //if (this.element === 'lightning') {
         //    spawnTime /= 2;
         //}
-        if (this.piercing && this.animationTime % spawnTime === 0) {
+        if ((this.piercing || this.element) && this.animationTime % spawnTime === 0) {
             this.sparkles.push(makeSparkleAnimation(state, this, {
                 element: this.element,
                 velocity: {x: this.vx, y: this.vy},
@@ -138,6 +138,10 @@ export class ThrownChakram implements EffectInstance {
         let didHit = hitResult.hit || hitResult.blocked;
         if (hitResult.blocked || hitResult.stopped) {
             this.hitCooldown = 200;
+        }
+        // This is used to make torches light th chakram on fire.
+        if (hitResult.setElement) {
+            this.element = hitResult.setElement;
         }
         if ((didHit && !this.piercing && !hitResult.pierced && !hitResult.destroyed) || hitResult.stopped) {
             this.outFrames = 0;

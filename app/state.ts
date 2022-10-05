@@ -8,7 +8,6 @@ import { zones } from 'app/content/zones';
 import { parseScriptText, setScript } from 'app/scriptEvents';
 import { updateHeroMagicStats } from 'app/render/spiritBar';
 import { readGetParameter } from 'app/utils/index';
-import { updateObjectsToRender } from 'app/updateField';
 
 import { GameState, Hero, SavedHeroData, SavedState } from 'app/types';
 
@@ -107,7 +106,6 @@ export function applySavedState(state: GameState, savedState: SavedState): void 
     fixSpawnLocationOnLoad(state);
     updateHeroMagicStats(state);
     returnToSpawnLocation(state);
-    updateObjectsToRender(state, state.areaInstance);
 }
 
 const isRandomizer = !!readGetParameter('seed');

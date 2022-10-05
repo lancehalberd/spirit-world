@@ -31,11 +31,11 @@ function jumpTowardsPoint(state: GameState, enemy: Enemy, {x: tx, y: ty}, radius
         enemy.vy = maxJumpSpeed * enemy.vy / mag;
     }
     enemy.setMode('jumping');
-    const discharge = new LightningDischarge({x, y, radius, damage: 4, source: enemy, tellDuration: 20 * duration});
+    const discharge = new LightningDischarge({x, y, radius, damage: 2, source: enemy, tellDuration: 20 * duration});
     addEffectToArea(state, enemy.area, discharge);
 }
 
-const touchHit: HitProperties = { damage: 4, element: 'lightning'};
+const touchHit: HitProperties = { damage: 2, element: 'lightning'};
 enemyDefinitions.electricSquirrel = {
     animations: electricSquirrelAnimations,
     acceleration: 0.2, aggroRadius: 112, speed: 3,

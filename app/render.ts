@@ -283,6 +283,7 @@ function renderTransition(context: CanvasRenderingContext2D, state: GameState) {
             const [underCanvas, underContext] = createCanvasAndContext(CANVAS_WIDTH, CANVAS_HEIGHT);
             state.transitionState.underCanvas = underCanvas;
             const area = state.transitionState.nextAreaInstance;
+            updateObjectsToRender(state, area);
             // Update any background tiles that have changed.
             if (area.checkToRedrawTiles) {
                 checkToRedrawTiles(area);
@@ -426,11 +427,29 @@ export function checkToRedrawTiles(area: AreaInstance) {
     area.checkToRedrawTiles = false;
 }
 
+
+function updateObjectsToRender(this: void, state: GameState, area: AreaInstance) {
+    if (!area) {
+        return;
+    }
+    area.objectsToRender = [];
+    for (const object of [...area?.objects || [], ...area?.effects || []]) {
+        for (const part of [object, ...(object.getParts?.(state) || [])]) {
+            if (part.render || part.renderShadow || part.renderForeground) {
+                area.objectsToRender.push(part);
+            }
+        }
+    }
+}
+
 export function renderField(
     context: CanvasRenderingContext2D,
     state: GameState,
     shouldRenderHero: boolean = null
 ): void {
+    updateObjectsToRender(state, state.areaInstance);
+    updateObjectsToRender(state, state.alternateAreaInstance);
+    updateObjectsToRender(state, state.nextAreaInstance);
     if (editingState.isEditing) {
         context.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
     }
@@ -522,6 +541,7 @@ export function renderSpiritOverlay(context: CanvasRenderingContext2D, state: Ga
 // Fully renders an area to a canvas, but with no state effects like spirit sight.
 // This is used during the transition to and from the spirit world.
 export function renderArea(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance, renderHero: boolean = null): void {
+    updateObjectsToRender(state, area);
     // Update any background tiles that have changed.
     if (area.checkToRedrawTiles) {
         checkToRedrawTiles(area);

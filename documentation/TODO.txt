@@ -29,7 +29,6 @@ Known Bugs:
     - nextAreaInstance is not rendered in Safari
     - Enemies with small hitboxes are checking pixels outside of their hitbox while moving.
         - For example snakes when moving left/right will be forced to move up if there is a wall to their south.
-    - Some water instead of ice west of the lake in the spirit world.
     - Can get to undefined area in city by sinking in the water.
     - Cliff Edge issues:
         - Would be nice if staff could go across edges.
@@ -46,14 +45,22 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    Look into calculating `objectsToRender` at the start of rendering an area rather than calculating it during update.
-    It seems to be error prone as if an object is removed from an area afters it is calculated it can throw exceptions when trying to render. Similarly, if the object is added after then it won't be visible which can look bad during transitions.
+    Support Cloud Somersault (roll 2)
+        - Activated by rolling again midroll
+        - Can be in a different direction from the roll (even backwards)
+        - Teleports 3-5 tiles and will succeed if the path is clear in either material or spirit world, so it can replace teleportation for straight lines. Should also apply wiggling logic for narrow gaps. Must end on open tiles in the current world.
+        - Create smoke praticles for both ends of the teleportation (maybe use a lesser effect for start of roll 1)
+        - Ends with the back half of the normal roll animation.
+    Add placeholder for sky temple with small cloud somerault tutorial that ends in a chest with the Nimbus cloud
+        - require using nimbus cloud to return to the entrance of the placeholder dungeon.
+        - on overworld material takes you to: Lake, City, Village, Peaks, Ruins
+        - in spirit world takes you to: Tomb shop, Fertility Temple, Sky City, Jade City
 
-    Add crystal spike tiles once I get the final version from Jon
-        - Replace pits near bead flows with spikes, the respawn logic on the bead flows can make
-        you start about to fall into nearby pits.
-        - Alternatively, just remove the respawn logic from the bead flows and add extra respawn
-        points if necessary.
+    Add save statues:
+        In waterfall tower across stream from big key
+        Outside Crater/Forge
+        In holy city/jade city
+        Outside waterfall cave
 
     Editor Improvements
         - Track which zones have been changed but not exported.
@@ -61,17 +68,6 @@ Current tasks:
             - Include in context menu when editor is active
         - Add graphical palettes
             - (low priority) super tile layout selection
-
-    Note: Make chest flash briefly in alternate world when it spawns in the alternate world.
-    - So if you hit a switch that makes a chest in the alternate world you have a sense of what it did.
-
-    - Spirit World Improvements
-        - Sky is covered in cracked crystal ground that require cloud boots to walk on
-            - Sky also drains spirit energy + cloud boots should require spirit energy to float
-        - Need to figure out path to the sky mountains in spirit world that doesn't require completing waterfall tower.
-            - Maybe the forge has an entrance in the main spirit world and an entrance in the mountains, similar to waterfall tower
-            - Could have a gate from the spirit world sky mountains to the material world mountains for easier access to the crater. (Although mitts also give you easy access)
-            - Probably simplest to just use the same connector cave from the material world, but it is easier to pass in the spirit world
 
     - Improvements
         - There should be a name indicator on the menu for the tool the cursor is over
@@ -94,7 +90,7 @@ Current tasks:
         Floor 3 is atmosphere level + is hot
             - Fight flame beast and destroy heart before advancing.
         Floor 4 is lower orbit + material zones have low gravity
-            - Fith all elemental beasts together without hearts
+            - Fight all elemental beasts together without hearts
         Floor 5 has final boss
         - Giant tree grows just to the north of the war temple and into the sky, occupying unused spaces in the SE corner of the map.
         - Climb giant vines in the tree to reach the top
@@ -158,9 +154,6 @@ Current tasks:
     - Add behavior that prevents non-flying enemies from crossing tiles/objects, use for cracked ground, escalators, bead cascades, etc.
         - Anything that doesn't handle enemies gracefully either needs to keep enemies out or add handling.
 
-
-    - Consider adding `isActive(state, area)` method on enemy that returns true if the enemy can attack in the given area. Use in logic for removing discharge from area if enemy source is invalid.
-
     Storm Beast
         - Storm Beast can turn into lightning and teleport as a beam sending shockwaves out at both ends.
         - Storm Beast can charge south to exit the battle field
@@ -188,7 +181,12 @@ Current tasks:
 Combat Ideas:
     - Concentric damaging rings that collapse into the player. Player must time it so that they are close enough together to dodge roll through in order to avoid damage.
     - Rolling enemy that leaves a trail of ice/fire behind it and bounces off walls. Hitting it knocks it in different directions.
-    s
+
+Minigame Ideas:
+    - Add Vanara dream world with mini games.
+        - Boss practice
+    - Could add something like an AR arcade to spirit city
+
 
 Staff Improvements:
     - Charging staff 2 should show a preview of where it will hit and get wider in addition to longer

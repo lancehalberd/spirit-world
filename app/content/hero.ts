@@ -240,6 +240,16 @@ export class Hero implements Actor, SavedHeroData {
             if (hit.element && hit.element === this.barrierElement) {
                 spiritDamage /= 2;
             }
+            let reflectDamage = this.barrierLevel;
+            if (!this.barrierElement) {
+                reflectDamage++;
+            }
+            // The cloak does increased extra damage and prevents all spirit damage while the cloak is being activated.
+            // This rewards players for using the cloak just in time to block attacks, but may be too generous.
+            if (this.toolOnCooldown === 'cloak') {
+                spiritDamage = 0;
+                reflectDamage++;
+            }
             // This is a bit of a hack. When damaged with barrier, we set 50 iframes,
             // during which magic regen is paused, but only the first 10 preven the barrier from taking damage.
             if (hit.damage && state.hero.invulnerableFrames <= 40) {
@@ -247,10 +257,6 @@ export class Hero implements Actor, SavedHeroData {
                 state.hero.invulnerableFrames = Math.max(state.hero.invulnerableFrames, 50);
             }
             const hitbox = this.getHitbox(state);
-            let reflectDamage = this.barrierLevel;
-            if (!this.barrierElement) {
-                reflectDamage++;
-            }
             if (hit.canAlwaysKnockback && hit.knockback) {
                 this.knockBack(state, hit.knockback);
             }

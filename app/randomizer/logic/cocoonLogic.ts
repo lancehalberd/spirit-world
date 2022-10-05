@@ -23,13 +23,15 @@ export const cocoonNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'cocoon4NW',
-        exits: [{objectId: 'cocoonPitNW', logic: hasBossWeapon}],
+        entranceIds: ['cocoonLadderNW'],
+        exits: [{objectId: 'cocoonLadderNW', logic: hasBossWeapon}],
     },
     {
         zoneId,
         nodeId: 'cocoon4NE',
+        entranceIds: ['cocoonLadderNE', 'cocoonBigLock'],
         exits: [
-            {objectId: 'cocoonPitNE', logic: hasBossWeapon},
+            {objectId: 'cocoonLadderNE', logic: hasBossWeapon},
             {objectId: 'cocoonBigLock'},
         ],
     },
@@ -60,27 +62,27 @@ export const cocoonNodes: LogicNode[] = [
         zoneId,
         nodeId: 'cocoon3NW',
         paths: [{nodeId: 'cocoon3'}],
-        entranceIds: ['cocoonMarkerNW'],
+        entranceIds: ['cocoonLadderNW'],
     },
     {
         zoneId,
         nodeId: 'cocoon3NE',
         checks: [{objectId: 'cocoonBigMoney', logic: andLogic(hasAstralProjection, hasGloves)}],
         paths: [{nodeId: 'cocoon3'}],
-        entranceIds: ['cocoonMarkerNE'],
+        entranceIds: ['cocoonLadderNE'],
     },
     {
         zoneId,
         nodeId: 'cocoonBigChest',
         checks: [{objectId: 'cocoonBigChest'}],
-        entranceIds: ['cocoonSealedDoor'],
-        exits: [{objectId: 'cocoonBackPit'}],
+        entranceIds: ['cocoonLadderBack', 'cocoonBigLock'],
+        exits: [{objectId: 'cocoonLadderBack'}, {objectId: 'cocoonBigLock'}],
     },
     {
         zoneId,
         nodeId: 'cocoon3SW',
         paths: [{nodeId: 'cocoon3'}],
-        entranceIds: ['cocoonMarkerNW', 'cocoonOpenDoor'],
+        entranceIds: ['cocoonOpenDoor'],
         exits: [{objectId: 'cocoonOpenDoor'}]
     },
     {
@@ -96,7 +98,8 @@ export const cocoonNodes: LogicNode[] = [
         paths: [
             {nodeId: 'cocoonBoss', logic: hasBossWeapon},
         ],
-        entranceIds: ['cocoonBackMarker'],
+        entranceIds: ['cocoonLadderBack'],
+        exits: [{objectId: 'cocoonLadderBack'}],
     },
     {
         zoneId,
