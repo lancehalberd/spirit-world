@@ -338,7 +338,6 @@ export const updateScriptEvents = (state: GameState): void => {
                 return;
             }
             case 'removeTextCue': {
-                console.log('removing text cue');
                 removeTextCue(state);
                 return;
             }
@@ -417,7 +416,10 @@ export const updateScriptEvents = (state: GameState): void => {
         }
     }
 }
-function removeTextCue(state: GameState) {
+export function removeTextCue(state: GameState) {
+    if (!state.areaInstance) {
+        return;
+    }
     const effect = state.areaInstance.effects.find(
         effect => effect instanceof TextCue
     );

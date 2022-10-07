@@ -255,10 +255,18 @@ function showLootMessage(state: GameState, lootType: LootType, lootLevel?: numbe
                     + '{|}Face an object and use [B_PASSIVE] to try to lift it.');
             }
         case 'roll':
-            return showMessage(state, 'You learned the Mist Roll Technique!'
-                + '{|}Press [B_ROLL] to do a quick roll forward.'
-                + '{|}You can avoid most damage while rolling and cross small gaps.'
-            );
+            if (state.hero.passiveTools.roll === 2) {
+                return showMessage(state, 'You learned the Cloud Somersault Technique!'
+                    + '{|}While rolling press [B_ROLL] again to teleport in any direction.'
+                    + '{|}You can even teleport through walls that your astral body can cross.'
+                );
+            }
+            if (state.hero.passiveTools.roll === 1) {
+                return showMessage(state, 'You learned the Mist Roll Technique!'
+                    + '{|}Press [B_ROLL] to do a quick roll forward.'
+                    + '{|}You can avoid most damage while rolling and cross small gaps.'
+                );
+            }
         case 'catEyes':
             return showMessage(state, 'You have been blessed with Cat Eyes!'
                 + '{|}This strange energy allows you to see much better in the dark.'
@@ -320,6 +328,14 @@ function showLootMessage(state: GameState, lootType: LootType, lootLevel?: numbe
                     + '{|}If you are defeated you will be revived one time.');
             }
             return;
+        case 'nimbusCloud':
+            return showMessage(state, 'You have obtained the Nimbus Cloud!'
+                + '{|}Use the Nimbus Cloud to quickly travel the world!'
+                + '{|}Press [B_MENU] to open your menu.'
+                + '{|}Select the Nimbus Cloud and press [B_WEAPON] to use it.'
+                + '{|}Use the Nimbus Cloud inside to return to the entrance.'
+                + '{|}Use the Nimbus Cloud outside to instantly travel the world.'
+            );
     }
 }
 
@@ -474,6 +490,7 @@ const [/*smallPeach*/, /*fullPeachFrame*/, /*threeQuartersPeach*/, /*halfPeach*/
     createAnimation('gfx/hud/peaches.png', {w: 18, h: 18}, {cols: 3, rows: 2}).frames;
 
 const [weaponFrame] = createAnimation('gfx/chakram1.png', {w: 16, h: 16}, {x: 9}).frames;
+const [cloudFrame] = createAnimation('gfx/tiles/cloud.png', {w: 16, h: 16}, {x: 3, y: 2}).frames;
 
 const smallPeachFrame = {image: requireImage('gfx/hud/peaches.png'), x: 4, y: 3, w: 12, h: 12 };
 
@@ -650,13 +667,14 @@ export const [
     catEyes,
     twoCloneFrame, threeCloneFrame, /* fourCloneFrame */,
     /*invisibilityFrame*/,
-    /* bracelet */, gloveFrame,
+    bracelet , gloveFrame,
     normalBoots, ironBoots, cloudBoots,
     circlet, phoenixCrown,
     teleportFrame, /* teleportFrame2 */,
     treeStaff, towerStaff,
+    /* recycle */, /* book */, /* scroll1 */, /* scroll2 */, scroll3
 ] = createAnimation('gfx/hud/icons.png',
-    {w: 18, h: 18, content: {x: 1, y: 1, w: 16, h: 16}}, {cols: 23}
+    {w: 18, h: 18, content: {x: 1, y: 1, w: 16, h: 16}}, {cols: 28}
 ).frames;
 export const [
     /* container */, fireElement, iceElement, lightningElement, neutralElement, /* elementShine */
@@ -672,7 +690,7 @@ const [invisibilityCloak] = createAnimation('gfx/hud/cloak2.png',
 ).frames;
 
 
-const lootFrames: {[key in string]: Frame} = {
+const lootFrames = {
     smallKey: keyOutlineFrame,
     fire: fireElement,
     ice: iceElement,
@@ -680,17 +698,23 @@ const lootFrames: {[key in string]: Frame} = {
     // Summoner's Circlet.
     astralProjection: circlet,
     phoenixCrown: phoenixCrown,
+    goldMail: createLootFrame('orange', 'Au'),
     bigKey: bigKeyOutlineFrame,
     bow: bowOutlineFrame,
     catEyes: catEyes,
     charge: neutralElement,
     clone: twoCloneFrame,
+    clone2: threeCloneFrame,
     invisibilityCloak,
+    nimbusCloud: cloudFrame,
     spiritCloak,
     trueSight: createLootFrame('blue', 'TS'),
     gloves: gloveFrame,
+    bracelet,
     roll: mistScrollFrame,
+    somersault: scroll3,
     staff: treeStaff,
+    towerStaff,
     peach: smallPeachFrame,
     peachOfImmortality: goldPeachFrame,
     peachOfImmortalityPiece: peachPieceFrame,
@@ -706,7 +730,7 @@ const lootFrames: {[key in string]: Frame} = {
     weapon: weaponFrame,
     // This is invisible for now, an effect is applied to the HUD representing this.
     secondChance: {image: createCanvasAndContext(16, 16)[0], x :0, y: 0, w: 16, h: 16},
-};
+} as const;
 
 const smallMoneyGeometry: FrameDimensions = {w: 16, h: 16, content:{ x: 4, y: 8, w: 8, h: 8}};
 const largeMoneyGeometry: FrameDimensions = {w: 16, h: 16, content:{ x: 2, y: 4, w: 12, h: 12}};
@@ -737,6 +761,36 @@ export function getLootFrame(state: GameState, {lootType, lootLevel, lootAmount}
         }
         return wholeCoin;
     }
+    if (lootType === 'cloak') {
+        if (lootLevel === 1 || (lootLevel === 0 && !state.hero.activeTools.cloak)){
+            return lootFrames.spiritCloak;
+        }
+        return lootFrames.invisibilityCloak;
+    }
+    if (lootType === 'staff') {
+        if (lootLevel === 1 || (lootLevel === 0 && !state.hero.activeTools.staff)){
+            return lootFrames.staff;
+        }
+        return lootFrames.towerStaff;
+    }
+    if (lootType === 'clone') {
+        if (lootLevel === 1 || (lootLevel === 0 && !state.hero.activeTools.clone)){
+            return lootFrames.clone;
+        }
+        return lootFrames.clone2;
+    }
+    if (lootType === 'roll') {
+        if (lootLevel === 1 || (lootLevel === 0 && !state.hero.passiveTools.roll)){
+            return lootFrames.roll;
+        }
+        return lootFrames.somersault;
+    }
+    if (lootType === 'gloves') {
+        if (lootLevel === 1 || (lootLevel === 0 && !state.hero.passiveTools.gloves)){
+            return lootFrames.gloves;
+        }
+        return lootFrames.bracelet;
+    }
     if (lootType === 'spiritPower') {
         if (!state.hero.passiveTools.spiritSight) {
             return lootFrames.spiritSight;
@@ -745,12 +799,6 @@ export function getLootFrame(state: GameState, {lootType, lootLevel, lootAmount}
             return lootFrames.astralProjection;
         }
         return lootFrames.teleportation;
-    }
-    if (lootType === 'cloak') {
-        if (lootLevel === 1 || (lootLevel === 0 && !state.hero.activeTools.cloak)){
-            return lootFrames.spiritCloak;
-        }
-        return lootFrames.invisibilityCloak;
     }
     return lootFrames[lootType] || lootFrames.unknown;
 }

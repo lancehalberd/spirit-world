@@ -1,17 +1,27 @@
-import { addObjectToArea, enterLocation, getAreaSize, playAreaSound, refreshAreaLogic } from 'app/content/areas';
+import { addEffectToArea, addObjectToArea, enterLocation, getAreaSize, playAreaSound, refreshAreaLogic } from 'app/content/areas';
+import { AnimationEffect } from 'app/content/effects/animationEffect';
 import { getVectorToTarget } from 'app/content/enemies';
 import { Door } from 'app/content/objects/door';
 import { Staff } from 'app/content/objects/staff';
-import { CANVAS_HEIGHT, FALLING_HEIGHT, FRAME_LENGTH } from 'app/gameConstants';
+import { CANVAS_HEIGHT, FALLING_HEIGHT, FRAME_LENGTH, GAME_KEY } from 'app/gameConstants';
 import { editingState } from 'app/development/tileEditor';
-import { getCloneMovementDeltas } from 'app/keyCommands';
+import { getCloneMovementDeltas, wasGameKeyPressed } from 'app/keyCommands';
 import { checkForFloorEffects, moveActor } from 'app/moveActor';
 import { fallAnimation, heroAnimations } from 'app/render/heroAnimations';
 import { saveGame } from 'app/state';
 import { updateCamera } from 'app/updateCamera';
 import { isUnderwater } from 'app/utils/actor';
-import { directionMap, getDirection, getTileBehaviorsAndObstacles, hitTargets } from 'app/utils/field';
+import { createAnimation, frameAnimation } from 'app/utils/animations';
+import {
+    canSomersaultToCoords,
+    directionMap,
+    getDirection,
+    getTileBehaviorsAndObstacles,
+    hitTargets,
+    rotateDirection,
+} from 'app/utils/field';
 import { boxesIntersect, isObjectInsideTarget, pad } from 'app/utils/index';
+import Random from 'app/utils/Random';
 
 
 import {
@@ -24,6 +34,10 @@ const rollSpeed = [
     3, 3, 3, 3,
     2, 2, 2, 2,
 ];
+
+const regenerationParticles
+    = createAnimation('gfx/tiles/spiritparticlesregeneration.png', {w: 4, h: 4}, {cols: 4, duration: 6}).frames;
+
 
 export function updateHeroSpecialActions(this: void, state: GameState, hero: Hero): boolean {
     const isPrimaryHero = hero === (state.hero.activeClone || state.hero);
@@ -448,6 +462,94 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         return true;
     }
     if (hero.action === 'roll') {
+        if (wasGameKeyPressed(state, GAME_KEY.ROLL)
+            && hero.passiveTools.roll > 1
+            && hero.actionFrame > 4
+            && state.hero.magic > 0
+        ) {
+            state.hero.magic -= 10;
+            // Cloud somersault roll activated by rolling again mid roll.
+            const [dx, dy] = getCloneMovementDeltas(state, hero);
+            hero.d = (dx || dy) ? getDirection(dx, dy) : hero.d;
+            const moveX = directionMap[hero.d][0] * 8, moveY = directionMap[hero.d][1] * 8;
+            const originalArea = hero.area, alternateArea = hero.area.alternateArea;
+            let hitbox = hero.getHitbox(state);
+            const leftD = rotateDirection(hero.d, 1);
+            const leftDx = directionMap[leftD][0], leftDy = directionMap[leftD][1];
+            const particleCount = 9;
+            for (let i = 0; i < particleCount; i++) {
+                const frame = Random.element(regenerationParticles);
+                // This makes a verticle ring around the axis the player is teleporting,
+                // with some variance, and also moving in the direction of movement.
+                const vx = 2 * leftDx * Math.cos(i * 2 * Math.PI / particleCount) - 0.5 + Math.random() - 2 * dx;
+                const vy = 2 * leftDy * Math.cos(i * 2 * Math.PI / particleCount) - 0.5 + Math.random() - 2 * dy;
+                const vz = 2 * Math.sin(i * 2 * Math.PI / particleCount);
+                const particle = new AnimationEffect({
+                    animation: frameAnimation(frame),
+                    drawPriority: 'sprites',
+                    // These values make the particles implod in a ring.
+                    x: hitbox.x + hitbox.w / 2 + 8 * vx, y: hitbox.y + hitbox.h / 2 + 8 * vy, z: 8 + 12 * vz,
+                    vx: -vx, vy: -vy, vz: -vz,
+                    ttl: 200,
+                });
+                addEffectToArea(state, hero.area, particle);
+            }
+            const lastOpenPosition = {x: hero.x, y: hero.y};
+            // Move 8px at a time 6 times in either area.
+            for (let i = 0; i < 6; i++) {
+                let result = moveActor(state, hero, moveX, moveY, {
+                    canFall: true,
+                    canSwim: true,
+                    direction: hero.d,
+                    boundToSection: true,
+                });
+                if (result.mx || result.my) {
+                    if (canSomersaultToCoords(state, hero, {x: hero.x, y: hero.y})) {
+                        lastOpenPosition.x = hero.x;
+                        lastOpenPosition.y = hero.y;
+                    }
+                    continue;
+                }
+                hero.area = alternateArea;
+                result = moveActor(state, hero, moveX, moveY, {
+                    canFall: true,
+                    canSwim: true,
+                    direction: hero.d,
+                    boundToSection: true,
+                });
+                hero.area = originalArea;
+                if (!result.mx && !result.my) {
+                    break;
+                }
+                if (canSomersaultToCoords(state, hero, {x: hero.x, y: hero.y})) {
+                    lastOpenPosition.x = hero.x;
+                    lastOpenPosition.y = hero.y;
+                }
+            }
+            hero.x = lastOpenPosition.x;
+            hero.y = lastOpenPosition.y;
+            hitbox = hero.getHitbox(state);
+            for (let i = 0; i < particleCount; i++) {
+                const frame = Random.element(regenerationParticles);
+                // This makes a verticle ring around the axis the player is teleporting,
+                // with some variance, and also moving in the direction of movement.
+                const vx = leftDx * Math.cos(i * 2 * Math.PI / particleCount) - 0.5 + Math.random() + 3 * dx;
+                const vy = leftDy * Math.cos(i * 2 * Math.PI / particleCount) - 0.5 + Math.random() + 3 * dy;
+                const vz = Math.sin(i * 2 * Math.PI / particleCount) * 0.7;
+                const particle = new AnimationEffect({
+                    animation: frameAnimation(frame),
+                    drawPriority: 'sprites',
+                    x: hitbox.x + hitbox.w / 2 + vx, y: hitbox.y + hitbox.h / 2 + vy, z: 8 + vz,
+                    vx, vy, vz,
+                    ttl: 400,
+                });
+                addEffectToArea(state, hero.area, particle);
+            }
+            // The fullroll action is 16 frames.
+            hero.actionFrame = 0;
+            hero.animationTime = 0 * FRAME_LENGTH;
+            return true;
+        }
         if (hero.actionFrame >= rollSpeed.length) {
             hero.action = null;
             hero.animationTime = 0;

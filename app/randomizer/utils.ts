@@ -20,6 +20,7 @@ import { helixNodes } from 'app/randomizer/logic/helixLogic';
 import { forestTempleNodes } from 'app/randomizer/logic/forestTempleLogic';
 import { waterfallTowerNodes } from 'app/randomizer/logic/waterfallTower';
 import { forgeNodes } from 'app/randomizer/logic/forgeLogic';
+import { skyPalaceNodes } from 'app/randomizer/logic/skyPalaceLogic';
 import { riverTempleNodes, riverTempleWaterNodes } from 'app/randomizer/logic/riverTempleLogic';
 import { craterNodes } from 'app/randomizer/logic/craterLogic';
 import { staffTowerNodes } from 'app/randomizer/logic/staffTower';
@@ -54,6 +55,7 @@ const allNodes = [
     ...forestTempleNodes,
     ...waterfallTowerNodes,
     ...forgeNodes,
+    ...skyPalaceNodes,
     ...riverTempleNodes,
     ...riverTempleWaterNodes,
     ...craterNodes,
@@ -699,6 +701,38 @@ window['showRandomizerSolution'] = function () {
     } while (currentState !== previousState);
 }
 
+function getLootName(lootType: LootType, state: GameState) {
+    if (lootType === 'spiritPower') {
+        if (state.hero.passiveTools.astralProjection) {
+            return 'Teleportation';
+        }
+        if (state.hero.passiveTools.astralProjection) {
+            return 'Astral Projection';
+        }
+        return 'Spirit Sight';
+    }
+    if (lootType === 'cloak') {
+        return state.hero.activeTools.cloak ? 'Spirit Cloak' : 'Invisibility Cloak';
+    }
+    if (lootType === 'staff') {
+        return state.hero.activeTools.staff ? 'Tree Staff' : 'Tower Staff';
+    }
+    if (lootType === 'gloves') {
+        return state.hero.passiveTools.gloves ? 'Magical Bracers' : 'Spirit Bracers';
+    }
+    if (lootType === 'roll') {
+        return state.hero.passiveTools.roll ? 'Mist Roll' : 'Cloud Somersault';
+    }
+    if (lootType === 'peachOfImmortality') {
+        return 'Golden Peach';
+    }
+    if (lootType === 'peachOfImmortalityPiece') {
+        return 'Peach Piece';
+    }
+
+    return lootType;
+}
+
 function collectAllLootForSolution(allNodes: LogicNode[], startingNodes: LogicNode[], state: GameState): GameState {
     const reachableChecks: LootWithLocation[] = findReachableChecks(allNodes, startingNodes, state);
     for (const check of reachableChecks) {
@@ -717,9 +751,9 @@ function collectAllLootForSolution(allNodes: LogicNode[], startingNodes: LogicNo
             )) {
                 // debugState(state);
                 if (check.location) {
-                    console.log(`Get ${check.lootObject.lootType} at ${check.location.zoneKey}:${check.lootObject.id}`);
+                    console.log(`Get ${getLootName(check.lootObject.lootType, state)} at ${check.location.zoneKey}:${check.lootObject.id}`);
                 } else {
-                    console.log(`Get ${check.lootObject.lootType} frome ${check.dialogueKey}:${check.optionKey}`);
+                    console.log(`Get ${getLootName(check.lootObject.lootType, state)} frome ${check.dialogueKey}:${check.optionKey}`);
                 }
             }
         }

@@ -58,6 +58,19 @@ dialogueHash.saveStatue = {
                 `
             ],
         },
+        {
+            logicCheck: {
+                requiredFlags: [],
+                excludedFlags: [],
+                zones: ['waterfallTower'],
+            },
+            text: [
+                `
+                    There is a hidden staircase behind one of the bead flows.
+                    {|}Find a way to wade through the beads without being swept away!
+                `
+            ],
+        },
         // This is the default text and probably won't be used in the long run.
         {
             logicCheck: {

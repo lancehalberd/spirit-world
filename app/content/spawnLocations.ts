@@ -174,6 +174,28 @@ export const SPAWN_WATERFALL_BOSS: ZoneLocation = {
     isSpiritWorld: true,
 };
 
+export const SPAWN_FORGE_ENTRANCE: ZoneLocation = {
+    zoneKey: 'forge',
+    floor: 0,
+    x: 124,
+    y: 448,
+    z: 0,
+    d: 'down',
+    areaGridCoords: {x: 0, y: 0},
+    isSpiritWorld: true,
+};
+
+export const SPAWN_SKY_PALACE_ENTRANCE: ZoneLocation = {
+    zoneKey: 'skyPalace',
+    floor: 0,
+    x: 124,
+    y: 448,
+    z: 0,
+    d: 'down',
+    areaGridCoords: {x: 0, y: 0},
+    isSpiritWorld: true,
+};
+
 export const RIVER_TEMPLE_LOWER_ENTRANCE: ZoneLocation = {
     zoneKey: 'riverTempleWater',
     floor: 0,
@@ -349,7 +371,7 @@ const waterfallBossState = applyItems(helixEndState, {ironBoots: 1});
 
 const riverTempleStartState = applyItems(helixEndState, {
     cloudBoots: 1, clone: 1,
-    ironBoots: 1, cloak: 2,
+    ironBoots: 1, cloak: 2, roll: 2,
     maxLife: 2,
     staff: 2, lightning: 1,
     fireBlessing: 1, fire: 1,
@@ -361,7 +383,7 @@ const riverTempleBossState = applyItems(riverTempleStartState,
 
 const craterStartState = applyItems(helixEndState, {
     cloudBoots: 1, clone: 1,
-    ironBoots: 1, cloak: 2,
+    ironBoots: 1, cloak: 2, roll: 2,
     maxLife: 2,
     staff: 2, lightning: 1,
     waterBlessing: 1, ice: 1,
@@ -372,7 +394,7 @@ const craterBossState = applyItems(craterStartState, {fireBlessing: 1},
 
 const staffStartState = applyItems(helixEndState, {
     cloudBoots: 1, clone: 1,
-    ironBoots: 1, cloak: 2,
+    ironBoots: 1, cloak: 2, roll: 2,
     maxLife: 2,
     fireBlessing: 1, fire: 1,
     waterBlessing: 1, ice: 1,
@@ -452,6 +474,14 @@ const middleSpawnLocations: SpawnLocationOptions = {
     'Waterfall Boss': {
         location: SPAWN_WATERFALL_BOSS,
         savedState: waterfallBossState,
+    },
+    'Forge Start': {
+        location: SPAWN_FORGE_ENTRANCE,
+        savedState: helixEndState,
+    },
+    'Sky Palace Start': {
+        location: SPAWN_SKY_PALACE_ENTRANCE,
+        savedState: helixEndState,
     },
 };
 
@@ -650,8 +680,8 @@ const prioritizedSpawnLocations = [
     SPAWN_HELIX_ENTRANCE,
     SPAWN_FOREST_ENTRANCE,
     SPAWN_WATERFALL_ENTRANCE,
-    // Forge
-    // Sky Palace
+    SPAWN_FORGE_ENTRANCE,
+    SPAWN_SKY_PALACE_ENTRANCE,
     // Grand Temple
     // Jade Palace
     SPAWN_CRATER_ENTRANCE,

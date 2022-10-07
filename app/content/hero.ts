@@ -96,6 +96,7 @@ export class Hero implements Actor, SavedHeroData {
     isControlledByObject?: boolean;
     isTouchingPit?: boolean;
     isOverPit?: boolean;
+    canFloat?: boolean;
     // stats
     magic: number = 0;
     // base: 20, max: 100, roll: 5, charge: 10, double-charge: 50

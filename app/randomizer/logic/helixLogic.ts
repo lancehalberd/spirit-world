@@ -1,6 +1,10 @@
 import {
+    andLogic,
     canCross6Gaps,
+    hasAstralProjection,
+    hasSomersault,
     hasTeleportation,
+    orLogic,
 } from 'app/content/logic';
 
 import { LogicNode } from 'app/types';
@@ -25,7 +29,11 @@ export const helixNodes: LogicNode[] = [
         entranceIds: ['helixStairs1', 'helixStairs2'],
         exits: [
             {objectId: 'helixStairs1'},
-            {objectId: 'helixStairs2', logic: hasTeleportation}
+            {objectId: 'helixStairs2', logic: orLogic(hasTeleportation,
+                // The pot puzzle can be passed by moving pots with astral projection
+                // then teleporting across with the somersault.
+                andLogic(hasAstralProjection, hasSomersault)
+            )}
         ],
     },
     {
@@ -35,7 +43,10 @@ export const helixNodes: LogicNode[] = [
         entranceIds: ['helixStairs2'],
         exits: [
             {objectId: 'helixStairs2'},
-            {objectId: 'helix:2:0x0-pitEntrance-0', logic: hasTeleportation}
+            {objectId: 'helix:2:0x0-pitEntrance-0', logic: orLogic(hasTeleportation,
+                // astral projection is required to lift bushes/move pots.
+                andLogic(hasAstralProjection, hasSomersault)
+            )}
         ],
     },
     {
@@ -67,8 +78,8 @@ export const helixNodes: LogicNode[] = [
         nodeId: 'helix2Spirit',
         entranceIds: ['helixSpiritDoor1', 'helixSpiritDoor2'],
         exits: [
-            {objectId: 'helixSpiritDoor1', logic: canCross6Gaps},
-            {objectId: 'helixSpiritDoor2', logic: canCross6Gaps},
+            {objectId: 'helixSpiritDoor1', logic: orLogic(hasTeleportation, hasSomersault)},
+            {objectId: 'helixSpiritDoor2', logic: orLogic(hasTeleportation, hasSomersault)},
         ],
     },
     {
@@ -76,9 +87,12 @@ export const helixNodes: LogicNode[] = [
         nodeId: 'helix3Spirit',
         entranceIds: ['helixSpiritDoor2'],
         exits: [
-            {objectId: 'helixSpiritDoor2', logic: hasTeleportation},
+            {objectId: 'helixSpiritDoor2', logic: orLogic(hasTeleportation,
+                // astral projection is required to lift bushes/move pots.
+                andLogic(hasAstralProjection, hasSomersault)
+            )},
         ],
-        paths: [{nodeId: 'helix4Spirit', logic: hasTeleportation}],
+        paths: [{nodeId: 'helix4Spirit', logic: orLogic(hasTeleportation, hasSomersault)}],
     },
     {
         zoneId,
@@ -89,7 +103,7 @@ export const helixNodes: LogicNode[] = [
                 progressFlags: ['elementalBeastsEscaped']
             },
         ],
-        paths: [{nodeId: 'helix4'}, {nodeId: 'helix3Spirit', logic: hasTeleportation}],
+        paths: [{nodeId: 'helix4'}, {nodeId: 'helix3Spirit'}],
     },
     {
         zoneId,

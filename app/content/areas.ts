@@ -13,6 +13,7 @@ import { createCanvasAndContext } from 'app/dom';
 import { checkForFloorEffects } from 'app/moveActor';
 import { isPointInShortRect } from 'app/utils/index';
 import { playSound } from 'app/musicController';
+import { removeTextCue } from 'app/scriptEvents';
 import { updateCamera } from 'app/updateCamera';
 import { specialBehaviorsHash } from 'app/content/specialBehaviors';
 
@@ -188,6 +189,7 @@ export function enterLocation(
         removeObjectFromArea(state, state.hero.astralProjection);
         state.hero.astralProjection = null;
     }
+    removeTextCue(state);
     if (state.hero.action === 'meditating') {
         state.hero.action = null;
     }

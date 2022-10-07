@@ -21,7 +21,7 @@ export * from 'app/content/zones/helix';
 export * from 'app/content/zones/forestTemple';
 export * from 'app/content/zones/waterfallTower';
 export * from 'app/content/zones/forge';
-// cloud temple
+export * from 'app/content/zones/skyPalace';
 export * from 'app/content/zones/grandTemple';
 // jade palace
 export * from 'app/content/zones/riverTemple';

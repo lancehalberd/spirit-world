@@ -2,8 +2,11 @@ import {
     andLogic,
     hasAstralProjection,
     hasBossWeapon,
+    hasSpiritBarrier,
     hasGloves,
+    hasSomersault,
     hasTeleportation,
+    orLogic,
 } from 'app/content/logic';
 
 import { LogicNode } from 'app/types';
@@ -96,7 +99,7 @@ export const cocoonNodes: LogicNode[] = [
         zoneId,
         nodeId: 'cocoonBack',
         paths: [
-            {nodeId: 'cocoonBoss', logic: hasBossWeapon},
+            {nodeId: 'cocoonBoss', logic: andLogic(hasBossWeapon, hasSpiritBarrier)},
         ],
         entranceIds: ['cocoonLadderBack'],
         exits: [{objectId: 'cocoonLadderBack'}],
@@ -106,7 +109,7 @@ export const cocoonNodes: LogicNode[] = [
         nodeId: 'cocoonBoss',
         checks: [
             {objectId: 'cocoonBoss', logic: hasAstralProjection},
-            {objectId: 'cocoonBossMoney', logic: hasTeleportation},
+            {objectId: 'cocoonBossMoney', logic: orLogic(hasSomersault, hasTeleportation)},
         ],
         npcs: [
             {loot: {type: 'dialogueLoot', id: 'cocoonGuardianPostBoss', lootType: 'teleportation'}},

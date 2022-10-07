@@ -43,21 +43,19 @@ Graphics:
     Add sparkles to peach loot + hud.
     Add damage effects for hitting enemies?
     Add damage effect for player hurt? (alttp doesn't have anything like this)
-
+{addCue: Equip the spirit cloak and press [B_TOOL] to activate it, then hold [B_TOOL] to detonate the barrier}
 Current tasks:
-    Support Cloud Somersault (roll 2)
-        - Activated by rolling again midroll
-        - Can be in a different direction from the roll (even backwards)
-        - Teleports 3-5 tiles and will succeed if the path is clear in either material or spirit world, so it can replace teleportation for straight lines. Should also apply wiggling logic for narrow gaps. Must end on open tiles in the current world.
-        - Create smoke praticles for both ends of the teleportation (maybe use a lesser effect for start of roll 1)
-        - Ends with the back half of the normal roll animation.
-    Add placeholder for sky temple with small cloud somerault tutorial that ends in a chest with the Nimbus cloud
-        - require using nimbus cloud to return to the entrance of the placeholder dungeon.
+    - There should be a name indicator on the menu for the tool the cursor is over
+        - Show name in bottom right corner, which should be empty
+        - Including the "help" icon
+    - passive tools should be selectable in the menu and show a tutorial on selection if nothing else.
+
+    Nimbus cloud
         - on overworld material takes you to: Lake, City, Village, Peaks, Ruins
         - in spirit world takes you to: Tomb shop, Fertility Temple, Sky City, Jade City
+        - once implemented, require using nimbus cloud to return to the entrance of the placeholder dungeon.
 
     Add save statues:
-        In waterfall tower across stream from big key
         Outside Crater/Forge
         In holy city/jade city
         Outside waterfall cave
@@ -69,10 +67,6 @@ Current tasks:
         - Add graphical palettes
             - (low priority) super tile layout selection
 
-    - Improvements
-        - There should be a name indicator on the menu for the tool the cursor is over
-            - Including the "help" icon
-        - Passive tools should be selectable in the menu and show a tutorial on selection
 
         - Squirrel velocity should reset when knocked back
         - Add SFX when the MC is damaged

@@ -1,7 +1,7 @@
 import {
     andLogic, canCross2Gaps,
     hasBossWeapon, hasCatEyes, hasFireBlessing, hasInvisibility,
-    hasMediumRange, hasMitts, hasTeleportation,
+    hasMediumRange, hasMitts, hasSomersault, hasTeleportation,
     orLogic,
 } from 'app/content/logic';
 
@@ -24,7 +24,8 @@ export const treeVillageNodes: LogicNode[] = [
         zoneId: 'treeVillage',
         nodeId: 'elderDownstairs',
         checks: [
-            { objectId: 'elderPeachPiece', logic: orLogic(hasMediumRange, hasTeleportation) },
+            { objectId: 'elderPeachPiece', logic: orLogic(hasMediumRange,
+                orLogic(hasSomersault, hasTeleportation)) },
             { objectId: 'treeVillage:1:0x0-bow-0', logic: hasCatEyes },
         ],
         entranceIds: [
@@ -114,7 +115,7 @@ export const cavesNodes: LogicNode[] = [
     {
         zoneId: 'lakeTunnel',
         nodeId: 'lakeTunnelFront',
-        paths: [{ nodeId: 'lakeTunnelBack', logic: andLogic(hasTeleportation, hasBossWeapon)}],
+        paths: [{ nodeId: 'lakeTunnelBack', logic: andLogic(orLogic(hasSomersault, hasTeleportation), hasBossWeapon)}],
         entranceIds: ['lakeTunnelEntrance'],
         exits: [
             { objectId: 'lakeTunnelEntrance' },
@@ -123,7 +124,7 @@ export const cavesNodes: LogicNode[] = [
     {
         zoneId: 'lakeTunnel',
         nodeId: 'lakeTunnelBack',
-        paths: [{ nodeId: 'lakeTunnelFront', logic: andLogic(hasTeleportation, hasBossWeapon)}],
+        paths: [{ nodeId: 'lakeTunnelFront', logic: andLogic(orLogic(hasSomersault, hasTeleportation), hasBossWeapon)}],
         entranceIds: ['helixEntrance'],
         exits: [
             { objectId: 'helixEntrance' },

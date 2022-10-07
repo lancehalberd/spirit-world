@@ -1,7 +1,8 @@
 import {
-    canReleaseBeasts, canTravelFarUnderWater,
-    hasCloudBoots, hasIronBoots, hasGloves, hasIce, hasMitts, hasTeleportation,
-    hasMediumRange, hasSpiritSight, orLogic,
+    andLogic,
+    canCross4Gaps, canReleaseBeasts, canTravelFarUnderWater,
+    hasCloudBoots, hasIronBoots, hasGloves, hasIce, hasMitts, hasSomersault, hasTeleportation,
+    hasMediumRange, hasSpiritSight, hasTowerStaff, orLogic,
 } from 'app/content/logic';
 
 import { LogicNode } from 'app/types';
@@ -18,7 +19,7 @@ export const overworldNodes: LogicNode[] = [
         paths: [
             { nodeId: 'overworldMountain', logic: hasGloves },
             { nodeId: 'warTempleArea' },
-            { nodeId: 'mainSpiritWorld', logic: hasTeleportation },
+            { nodeId: 'mainSpiritWorld', logic: orLogic(hasSomersault, hasTeleportation) },
         ],
         entranceIds: [
             'sideArea:noToolEntrance', 'elderEntrance', 'tombTeleporter',
@@ -73,7 +74,7 @@ export const overworldNodes: LogicNode[] = [
         ],
         paths: [
             { nodeId: 'overworldMain' },
-            { nodeId: 'overworldWaterfall', logic: orLogic(hasTeleportation, hasIronBoots, hasMitts) },
+            { nodeId: 'overworldWaterfall', logic: orLogic(hasSomersault, hasTeleportation, hasIronBoots, hasMitts) },
         ],
         entranceIds: ['caves-ascentEntrance'],
         exits: [{objectId: 'caves-ascentEntrance' }],
@@ -82,7 +83,7 @@ export const overworldNodes: LogicNode[] = [
         zoneId,
         nodeId: 'overworldWaterfall',
         paths: [
-            { nodeId: 'overworldMountain', logic: orLogic(hasTeleportation, hasIronBoots, hasMitts) },
+            { nodeId: 'overworldMountain', logic: orLogic(hasSomersault, hasTeleportation, hasIronBoots, hasMitts) },
         ],
         entranceIds: ['waterfallTowerEntrance'],
         exits: [{ objectId: 'waterfallTowerEntrance' }],
@@ -119,7 +120,7 @@ export const overworldNodes: LogicNode[] = [
         nodeId: 'spiritWorldMountain',
         paths: [
             { nodeId: 'mainSpiritWorld' },
-            { nodeId: 'westSpiritWorldMountain', logic: hasTeleportation },
+            { nodeId: 'westSpiritWorldMountain', logic: orLogic(hasSomersault, hasTeleportation) },
         ],
     },
     {
@@ -127,7 +128,7 @@ export const overworldNodes: LogicNode[] = [
         nodeId: 'westSpiritWorldMountain',
         paths: [
             { nodeId: 'westSpiritWorld' },
-            { nodeId: 'spiritWorldMountain', logic: hasTeleportation },
+            { nodeId: 'spiritWorldMountain', logic: orLogic(hasSomersault, hasTeleportation) },
         ],
         entranceIds: ['caves-ascentEntranceSpirit'],
         exits: [{ objectId: 'caves-ascentEntranceSpirit' }],
@@ -199,18 +200,6 @@ export const skyNodes: LogicNode[] = [
     },
     {
         zoneId,
-        nodeId: 'outsideForge',
-        paths: [
-            { nodeId: 'westSpiritWorldMountain' },
-            { nodeId: 'waterfallTowerSkySpirit'},
-        ],
-        entranceIds: ['caves-ascentExitSpirit', 'forgeEntrance'],
-        exits: [
-            { objectId: 'forgeEntrance' },
-        ],
-    },
-    {
-        zoneId,
         nodeId: 'outsideHelix',
         paths: [
             { nodeId: 'outsideCrater', logic: hasCloudBoots },
@@ -222,19 +211,58 @@ export const skyNodes: LogicNode[] = [
     },
     {
         zoneId,
-        nodeId: 'waterfallTowerSkySpirit',
+        nodeId: 'desertTowerSky',
+        // This door is closed from the inside in the material world.
+        entranceIds: ['staffTowerSkyEntrance'],
+    },
+    // Spirit sky nodes
+    {
+        zoneId,
+        nodeId: 'outsideForge',
+        paths: [
+            { nodeId: 'westSpiritWorldMountain' },
+            { nodeId: 'waterfallTowerSky'},
+        ],
+        entranceIds: ['caves-ascentExitSpirit', 'forgeEntrance'],
+        exits: [
+            { objectId: 'forgeEntrance' },
+        ],
+    },
+    {
+        zoneId,
+        nodeId: 'waterfallTowerSky',
         paths: [
             { nodeId: 'outsideForge' },
-            { nodeId: 'spiritWorldMountain' }
+            { nodeId: 'spiritWorldMountain' },
+            { nodeId: 'outsideSkyPalace', logic: orLogic(hasCloudBoots, canCross4Gaps) },
         ],
         entranceIds: ['waterfallTowerTopEntrance'],
         exits: [{ objectId: 'waterfallTowerTopEntrance' }],
     },
     {
         zoneId,
-        nodeId: 'desertTowerSky',
-        // This door is closed from the inside in the material world.
-        entranceIds: ['staffTowerSkyEntrance'],
+        nodeId: 'outsideSkyPalace',
+        paths: [
+            { nodeId: 'waterfallTowerSky', logic: orLogic(hasCloudBoots, canCross4Gaps) },
+        ],
+        entranceIds: ['skyPalaceEntrance'],
+        exits: [{ objectId: 'skyPalaceEntrance', logic:
+            // This logic is probably a good default
+            orLogic(hasMitts, andLogic(hasTeleportation, hasTowerStaff)),
+            // Could use this as advance logic
+            /*orLogic(
+                // Simple path, lift the stones to enter
+                hasMitts,
+                // Subtle path, somersault in from the right
+                hasSomersault,
+                // Hard path, use tower staff or cloud boots + tower staff to make
+                // solid ground right of the tower then teleport in.
+                andLogic(
+                    hasTeleportation,
+                    orLogic(hasTowerStaff, andLogic(hasCloudBoots, hasStaff))
+                )
+            )*/
+        }],
     },
     {
         zoneId,

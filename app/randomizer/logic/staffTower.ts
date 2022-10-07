@@ -6,6 +6,7 @@ import {
     hasCloudBoots,
     hasClone,
     hasIce,
+    hasSomersault,
     hasStaff,
     hasTeleportation,
     orLogic,
@@ -149,7 +150,7 @@ export const staffTowerNodes: LogicNode[] = [
         zoneId,
         nodeId: 'staffTowerF5SpiritElevator',
         exits: [
-            {objectId: 'staffTowerRoof', logic: andLogic(hasBossWeapon, hasStaff, hasTeleportation)},
+            {objectId: 'staffTowerRoof', logic: andLogic(hasBossWeapon, hasStaff, orLogic(hasSomersault, hasTeleportation))},
         ],
     },
     {

@@ -95,6 +95,14 @@ export function canTeleportToCoords(state: GameState, hero: Hero, {x, y}: Tile):
         isPointOpen(state, hero.area, {x: x + 14, y: y + 14}, {canSwim: true}, excludedObjects);
 }
 
+export function canSomersaultToCoords(state: GameState, hero: Hero, {x, y}: Tile): boolean {
+    const excludedObjects = new Set([hero]);
+    return isPointOpen(state, hero.area, {x: x + 2, y: y + 2}, {canSwim: true, canFall: true}, excludedObjects) &&
+        isPointOpen(state, hero.area, {x: x + 14, y: y + 2}, {canSwim: true, canFall: true}, excludedObjects) &&
+        isPointOpen(state, hero.area, {x: x + 2, y: y + 14}, {canSwim: true, canFall: true}, excludedObjects) &&
+        isPointOpen(state, hero.area, {x: x + 14, y: y + 14}, {canSwim: true, canFall: true}, excludedObjects);
+}
+
 export function isPointOpen(
     state: GameState,
     area: AreaInstance,

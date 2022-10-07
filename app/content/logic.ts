@@ -90,7 +90,9 @@ export const hasChakram: LogicCheck = {requiredFlags: ['$weapon']};
 //const hasEyes: LogicCheck = { requiredFlags: ['$catEyes:1'] };
 export const hasBow: LogicCheck = {requiredFlags: ['$bow']};
 export const hasRoll: LogicCheck = {requiredFlags: ['$roll']};
+export const hasSomersault: LogicCheck = {requiredFlags: ['$roll:2']};
 export const hasStaff: LogicCheck = {requiredFlags: ['$staff']};
+export const hasTowerStaff: LogicCheck = {requiredFlags: ['$staff:2']};
 // This check is for having a weapon that can be used to defeat most bosses.
 // Primarily we don't want having the Spirit Cloak to put any bosses in logic since
 // it is excessively tedious to defeat bosses with.
@@ -117,18 +119,36 @@ export const hasLightning: LogicCheck = andLogic(hasElementalWeapon, {requiredFl
 // staff = 4
 // teleportation can only be combined with the staff.
 export const canCross2Gaps: OrLogicCheck = orLogic(hasCloudBoots, hasRoll, hasStaff, hasTeleportation, hasClone);
-export const canCross4Gaps: OrLogicCheck = orLogic(andLogic(hasRoll, hasCloudBoots), hasStaff, hasClone);
-export const canCross6Gaps: AndLogicCheck = andLogic(orLogic(hasRoll, hasCloudBoots, hasTeleportation, hasClone), hasStaff);
-export const canCross8Gaps: AndLogicCheck = andLogic(hasRoll, hasCloudBoots, hasStaff);
+export const canCross4Gaps: OrLogicCheck = orLogic(andLogic(hasRoll, hasCloudBoots), hasStaff, hasSomersault, hasClone);
+export const canCross6Gaps: OrLogicCheck = orLogic(hasSomersault, hasTowerStaff, andLogic(orLogic(hasRoll, hasCloudBoots, hasTeleportation, hasClone), hasStaff));
+export const canCross8Gaps: OrLogicCheck = orLogic(hasSomersault, hasTowerStaff, andLogic(hasRoll, hasCloudBoots, hasStaff));
 
 export const canCrossDynamic2Gaps: OrLogicCheck = orLogic(hasCloudBoots, hasRoll, hasStaff, hasClone);
-export const canCrossDynamic4Gaps: OrLogicCheck = orLogic(andLogic(hasRoll, hasCloudBoots), hasStaff, hasClone);
-export const canCrossDynamic6Gaps: AndLogicCheck = andLogic(orLogic(hasRoll, hasCloudBoots, hasTeleportation, hasClone), hasStaff);
-export const canCrossDynamic8Gaps: AndLogicCheck = andLogic(hasRoll, hasCloudBoots, hasStaff);
+export const canCrossDynamic4Gaps: OrLogicCheck = orLogic(andLogic(hasRoll, hasCloudBoots), hasStaff, hasSomersault, hasClone);
+export const canCrossDynamic6Gaps: OrLogicCheck = orLogic(hasSomersault, hasTowerStaff, andLogic(orLogic(hasRoll, hasCloudBoots, hasTeleportation, hasClone), hasStaff));
+export const canCrossDynamic8Gaps: OrLogicCheck = orLogic(hasSomersault, hasTowerStaff, andLogic(hasRoll, hasCloudBoots, hasStaff));
 
 export const canTravelFarUnderWater = andLogic(hasIronBoots);
 
-export const canReleaseBeasts = andLogic(canCross6Gaps, hasTeleportation, hasBossWeapon);
+// Can enter the helix through the lake tunnel and climb to the top.
+export const canClimbHelix = andLogic(
+    // Needed to beat the boss in the lake tunnel.
+    hasBossWeapon,
+    // Need this to reach the teleporter on the bottom floor.
+    canCross6Gaps,
+    // Needed to cross barriers in the tower.
+    orLogic(hasTeleportation, hasSomersault)
+);
+export const canClimbMountain = orLogic(
+    // Left path just requires mitts.
+    hasMitts,
+    // Need gloves to reach the cave, and then something to get over the lava.
+    andLogic(hasGloves, orLogic(hasRoll, hasInvisibility, hasTeleportation))
+);
+
+// Update this if we add other ways to reach the sky in the material world.
+// We don't need to include the tower, because the tower can only be climbed once beasts are released.
+export const canReleaseBeasts = orLogic(canClimbHelix, andLogic(canClimbMountain, hasCloudBoots));
 
 export const logicHash: {[key: string]: LogicCheck} = {
     hasWeapon,

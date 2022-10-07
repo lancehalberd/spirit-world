@@ -128,7 +128,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 return;
             }
         }
-    } else if (hero.equipedGear.cloudBoots && hero.vx * hero.vx + hero.vy * hero.vy >= 4 && !hero.isOverPit) {
+    } else if (hero.equipedGear.cloudBoots && hero.canFloat && hero.vx * hero.vx + hero.vy * hero.vy >= 4) {
         hero.z = Math.min(hero.z + 0.1, maxCloudBootsZ);
     } else if (hero.z >= minZ) {
         hero.z = Math.max(minZ, hero.z - 0.2);
@@ -630,9 +630,10 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         && !isActionBlocked
         && !hero.isAstralProjection
         && hero.passiveTools.roll > 0
-        && hero.rollCooldown <= 0
         && state.hero.magic > 0
+        && hero.rollCooldown <= 0
     ) {
+        // Normal roll
         hero.chargeTime = 0;
         if (heldChakram) {
             removeEffectFromArea(state, heldChakram);

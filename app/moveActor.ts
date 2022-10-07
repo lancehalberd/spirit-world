@@ -484,6 +484,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
             }
         }
     }
+    hero.canFloat = true;
     for (let row = topRow; row <= bottomRow; row++) {
         for (let column = leftColumn; column <= rightColumn; column++) {
             let behaviors = behaviorGrid[row]?.[column];
@@ -546,10 +547,17 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
             if (!behaviors.shallowWater && !behaviors.water) {
                 hero.wading = false;
             }
+            // Cloud boots allow you to stand on, but not float over liquids.
+            if (behaviors.isLava || behaviors.cloudGround || behaviors.water || behaviors.shallowWater) {
+                hero.canFloat = false;
+            }
+            if (behaviors.isLava && hero.z <= 0) {
+                hero.onHit(state, { damage: 8, element: 'fire' });
+            }
             // Lava is like a pit for the sake of cloud walking boots sinking over them, but it damages
             // like normal damaging ground rather than a pit. This was done because there were many instances
             // it was difficult to reset the player's position when transition screens over lava.
-            if (behaviors.pit || behaviors.isLava || (behaviors.cloudGround && !hero.equipedGear?.cloudBoots)) {
+            if (behaviors.pit || (behaviors.cloudGround && !hero.equipedGear?.cloudBoots)) {
                 const tileIsUp = row < bottomRow;
                 const tileIsDown = row > topRow;
                 const tileIsLeft = column < rightColumn;
@@ -598,8 +606,6 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
             let behaviors = behaviorGrid[Math.round(hero.y / tileSize)]?.[Math.round(hero.x / tileSize)];
             if (behaviors?.cloudGround && hero.equipedGear.cloudBoots) {
                 // Do nothing.
-            } else if (behaviors?.isLava) {
-                hero.onHit(state, { damage: 8, element: 'fire' });
             } else {
                 hero.throwHeldObject(state);
                 hero.action = 'falling';
