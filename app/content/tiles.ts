@@ -882,10 +882,10 @@ const woodCeiling: TileSource = {
     ],
 };
 
-const topLeftWall: TileBehaviors = { ...wallBehavior, solidMap: BITMAP_TOP_LEFT};
-const topRightWall: TileBehaviors = { ...wallBehavior, solidMap: BITMAP_TOP_RIGHT};
-const bottomLeftWall: TileBehaviors = { ...wallBehavior, solidMap: BITMAP_BOTTOM_LEFT};
-const bottomRightWall: TileBehaviors = { ...wallBehavior, solidMap: BITMAP_BOTTOM_RIGHT};
+const topLeftWall: TileBehaviors = { defaultLayer: 'field', solidMap: BITMAP_TOP_LEFT};
+const topRightWall: TileBehaviors = { defaultLayer: 'field', solidMap: BITMAP_TOP_RIGHT};
+const bottomLeftWall: TileBehaviors = { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_LEFT};
+const bottomRightWall: TileBehaviors = { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_RIGHT};
 
 const woodWalls: TileSource = {
     w: 16, h: 16,
