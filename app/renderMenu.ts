@@ -1,10 +1,12 @@
-import { getLootFrame, normalBoots, neutralElement } from 'app/content/objects/lootObject';
+import { getMenuRows } from 'app/content/menu';
+import { getLootFrame, getLootName, neutralElement } from 'app/content/loot';
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
 import { characterMap } from 'app/utils/simpleWhiteFont';
 import { createAnimation, drawFrame, drawFrameCenteredAt } from 'app/utils/animations';
 import { fillRect, pad } from 'app/utils/index';
+import { drawText } from 'app/utils/simpleWhiteFont';
 
-import { ActiveTool, Equipment, GameState, LootType, MagicElement } from 'app/types';
+import { ActiveTool, PassiveTool, Equipment, GameState, LootType, MagicElement } from 'app/types';
 
 const MARGIN = 20;
 
@@ -48,7 +50,7 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
 
     let x = r.x, y = r.y;
 
-    const selectableItemFrames = [];
+
     function renderSelectableTool(tool: ActiveTool): void {
         const frame = getLootFrame(state, { lootType: tool, lootLevel: state.hero.activeTools[tool] });
         const target = {w: frameSize, h: frameSize, x, y};
@@ -59,79 +61,16 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
             drawFrame(context, yellowFrame, target);
         }
         drawFrameCenteredAt(context, frame, target);
-        if (state.menuRow === 0) {
-            selectableItemFrames.push(target);
-        }
     }
-    let target = {w: frameSize, h: frameSize, x, y};
-    let frame = characterMap['?'];
-    drawFrameCenteredAt(context, frame, target);
-    if (state.menuRow === 0) {
-        selectableItemFrames.push(target);
-    }
-    x += 30;
-    if (state.hero.activeTools.bow) {
-        renderSelectableTool('bow');
-    }
-    x += 30;
-    if (state.hero.activeTools.staff) {
-        renderSelectableTool('staff');
-    }
-    x += 30;
-    if (state.hero.activeTools.cloak) {
-        renderSelectableTool('cloak');
-    }
-    x += 30;
-    if (state.hero.activeTools.clone) {
-        renderSelectableTool('clone');
-    }
-    x += 35;
-
-    if (state.hero.weapon) {
-        const frame = getLootFrame(state, { lootType: 'weapon', lootLevel: state.hero.weapon });
-        drawFrameCenteredAt(context, frame, {x, y, w: frameSize, h: frameSize});
-    }
-
     function renderBoots(equipment: Equipment): void {
         const frame = getLootFrame(state, { lootType: equipment, lootLevel: state.hero.equipment[equipment] });
         const target = {w: frameSize, h: frameSize, x, y};
-        if (state.hero.equipedGear[equipment]) {
+        if (state.hero.equipedBoots === equipment) {
             fillRect(context, target, 'white');
             fillRect(context, pad(target, -2), 'black');
         }
         drawFrameCenteredAt(context, frame, target);
-        if (state.menuRow === 1) {
-            selectableItemFrames.push(target);
-        }
     }
-
-    x = r.x, y += frameSize + 2;
-    frame = normalBoots;
-    target = {x, y, w: frameSize, h: frameSize};
-    //fillRect(context, target, 'black');
-    if (!state.hero.equipedGear.ironBoots && !state.hero.equipedGear.cloudBoots) {
-        fillRect(context, target, 'white');
-        fillRect(context, pad(target, -2), 'black');
-    }
-    drawFrameCenteredAt(context, frame, target);
-    if (state.menuRow === 1) {
-        selectableItemFrames.push(target);
-    }
-    x += 30;
-    if (state.hero.equipment.ironBoots) {
-        renderBoots('ironBoots');
-    }
-    x += 30;
-    if (state.hero.equipment.cloudBoots) {
-        renderBoots('cloudBoots');
-    }
-
-    if (selectableItemFrames.length) {
-        state.menuIndex = state.menuIndex % selectableItemFrames.length;
-        const frame = selectableItemFrames[state.menuIndex];
-        drawFrame(context, cursor, frame);
-    }
-
     function renderElement(element: MagicElement): void {
         const frame = getLootFrame(state, { lootType: element, lootLevel: state.hero.elements[element] });
         const target = {w: frameSize, h: frameSize, x, y};
@@ -140,64 +79,58 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
             fillRect(context, pad(target, -2), 'black');
         }
         drawFrameCenteredAt(context, frame, target);
-        if (state.menuRow === 2) {
-            selectableItemFrames.push(target);
-        }
     }
-
-    x = r.x, y += frameSize + 2;
-    if (state.hero.passiveTools.charge > 0) {
-        frame = neutralElement;
-        target = {x, y, w: frameSize, h: frameSize};
-        //fillRect(context, target, 'black');
-        if (!state.hero.element) {
-            fillRect(context, target, 'white');
-            fillRect(context, pad(target, -2), 'black');
-        }
-        drawFrameCenteredAt(context, frame, target);
-    }
-    if (state.menuRow === 2) {
-        selectableItemFrames.push(target);
-    }
-    x += 30;
-    if (state.hero.elements.fire) {
-        renderElement('fire');
-    }
-    x += 30;
-    if (state.hero.elements.ice) {
-        renderElement('ice');
-    }
-    x += 30;
-    if (state.hero.elements.lightning) {
-        renderElement('lightning');
-    }
-
-    if (selectableItemFrames.length) {
-        state.menuIndex = state.menuIndex % selectableItemFrames.length;
-        const frame = selectableItemFrames[state.menuIndex];
-        drawFrame(context, cursor, frame);
-    }
-
-    x = r.x, y += 30;
     function renderLoot(lootType: LootType, lootLevel: number): void {
         const frame = getLootFrame(state, { lootType, lootLevel });
         drawFrameCenteredAt(context, frame, {x, y, w: frameSize, h: frameSize});
-        x += 30;
-        if (x + 30 >= r.x + r.w) {
-            y += 22;
-            x = r.x
-        }
     }
 
-
-    for (let key in state.hero.passiveTools) {
-        if (key === 'charge') {
-            continue;
+    const rowHeight = 25, rowWidth = 26;
+    const menuRows = getMenuRows(state);
+    for (const menuRow of menuRows) {
+        for (const menuItem of menuRow) {
+            if (menuItem === 'help') {
+                drawFrameCenteredAt(context, characterMap['?'], {w: frameSize, h: frameSize, x, y});
+            } else if (state.hero.activeTools[menuItem]) {
+                renderSelectableTool(menuItem as ActiveTool);
+            } else if (state.hero.equipment[menuItem]) {
+                renderBoots(menuItem as Equipment);
+            } else if (menuItem === 'charge') {
+                drawFrameCenteredAt(context, neutralElement, {x, y, w: frameSize, h: frameSize});
+            } else if (state.hero.elements[menuItem]) {
+                renderElement(menuItem as MagicElement);
+            } else if (state.hero.passiveTools[menuItem as PassiveTool]) {
+                renderLoot(menuItem as LootType, state.hero.passiveTools[menuItem]);
+            }
+            x += rowWidth;
         }
-        if (state.hero.passiveTools[key] > 0) {
-            renderLoot(key as LootType, state.hero.passiveTools[key]);
-        }
+        x = r.x;
+        y += rowHeight;
     }
+
+    // Draw the selection cursor.
+    drawFrame(context, cursor, {
+        ...cursor,
+        x: r.x + state.menuIndex * rowWidth,
+        y: r.y + state.menuRow * rowHeight,
+    });
+
+    const selectedItem = menuRows[state.menuRow]?.[state.menuIndex];
+    if (selectedItem) {
+        const lootName = getLootName(state, selectedItem);
+        drawText(context, lootName, r.x + r.w - 4, r.y + r.h - 4, {
+            textBaseline: 'bottom',
+            textAlign: 'right',
+            size: 16,
+        });
+    }
+
+    // Weapon isn't currently part of the selectable menu rows.
+    if (state.hero.weapon) {
+        const frame = getLootFrame(state, { lootType: 'weapon', lootLevel: state.hero.weapon });
+        drawFrameCenteredAt(context, frame, {x: r.x + 155, y: r.y, w: frameSize, h: frameSize});
+    }
+
     let peachFrame = fullPeach;
     const peachRect = { x: r.x + 4, y: r.y + r.h - 4 - peachFrame.h, w: peachFrame.w, h: peachFrame.h};
     context.save();

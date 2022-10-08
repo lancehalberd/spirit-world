@@ -62,7 +62,7 @@ export class Hero implements Actor, SavedHeroData {
     attackBufferTime: number = 0;
     // like being knocked but doesn't stop MC charge or other actions.
     bounce?: {vx: number; vy: number; frames: number};
-    equipedGear?: {[key in Equipment]?: boolean};
+    equipedBoots: Equipment = 'leatherBoots';
     hasBarrier?: boolean = false;
     hasRevive: boolean = false;
     isInvisible?: boolean = false;
@@ -146,7 +146,7 @@ export class Hero implements Actor, SavedHeroData {
     constructor() {
         this.life = this.maxLife;
         this.clones = [];
-        this.equipedGear = {};
+        this.equipedBoots = 'leatherBoots';
     }
 
     applySavedHeroData(defaultSavedHeroData: SavedHeroData, savedHeroData?: SavedHeroData) {
@@ -293,7 +293,7 @@ export class Hero implements Actor, SavedHeroData {
             }
             this.takeDamage(state, damage);
         }
-        if (hit.knockback && (hit.canAlwaysKnockback || !this.equipedGear?.ironBoots)) {
+        if (hit.knockback && (hit.canAlwaysKnockback || this.equipedBoots !== 'ironBoots')) {
             this.knockBack(state, hit.knockback);
         }
         // Getting hit while frozen unfreezes you.

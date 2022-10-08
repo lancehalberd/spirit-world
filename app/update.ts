@@ -1,6 +1,10 @@
 import { enterLocation } from 'app/content/areas';
 import { addDustBurst, addReviveBurst } from 'app/content/effects/animationEffect';
 import { Hero } from 'app/content/hero';
+import { showHint } from 'app/content/hints';
+import { getMenuRows } from 'app/content/menu';
+import { showMessage } from 'app/render/renderMessage';
+import { getLootHelpMessage } from 'app/content/loot';
 import {
     SPAWN_LOCATION_DEMO,
     SPAWN_LOCATION_FULL,
@@ -20,7 +24,7 @@ import {
     wasMenuConfirmKeyPressed,
 } from 'app/keyCommands';
 import { updateHeroMagicStats } from 'app/render/spiritBar';
-import { updateScriptEvents } from 'app/scriptEvents'
+import { parseScriptText, setScript, updateScriptEvents } from 'app/scriptEvents';
 import {
     getDefaultSavedState,
     getState,
@@ -28,16 +32,15 @@ import {
     returnToSpawnLocation,
     saveGame,
     saveGamesToLocalStorage,
-    selectSaveFile,
     setSaveFileToState,
-    showHint,
 } from 'app/state';
 import { updateCamera } from 'app/updateCamera';
 import { updateField } from 'app/updateField';
 import { areAllImagesLoaded } from 'app/utils/images';
 import { playSound, updateSoundSettings } from 'app/musicController';
+import { readGetParameter } from 'app/utils/index';
 
-import { ActiveTool, Equipment, GameState, MagicElement } from 'app/types';
+import { ActiveTool, PassiveTool, GameState, MagicElement } from 'app/types';
 
 let isGameInitialized = false;
 export function update() {
@@ -161,7 +164,7 @@ function updateTitle(state: GameState) {
                     state.scene = 'deleteSavedGame';
                     state.menuIndex = 0;
                 } else {
-                    selectSaveFile(state.menuIndex);
+                    selectSaveFile(state, state.menuIndex);
                 }
                 break;
         }
@@ -169,104 +172,68 @@ function updateTitle(state: GameState) {
 }
 
 function updateMenu(state: GameState) {
-    const selectableTools: ActiveTool[] = [];
-    if (state.hero.activeTools.bow) {
-        selectableTools.push('bow');
-    }
-    if (state.hero.activeTools.staff) {
-        selectableTools.push('staff');
-    }
-    if (state.hero.activeTools.cloak) {
-        selectableTools.push('cloak');
-    }
-    if (state.hero.activeTools.clone) {
-        selectableTools.push('clone');
-    }
+    const menuRows = getMenuRows(state);
+    // Cycle to the next row that isn't empty.
+    // There is always at least one row since the help tool is always there.
     if (wasGameKeyPressed(state, GAME_KEY.UP)) {
-        state.menuRow = (state.menuRow + 2) % 3;
+        do {
+            state.menuRow = (state.menuRow + menuRows.length - 1) % menuRows.length;
+        } while (!menuRows[state.menuRow].length)
     } else if (wasGameKeyPressed(state, GAME_KEY.DOWN)) {
-        state.menuRow = (state.menuRow + 1) % 3;
+        do {
+            state.menuRow = (state.menuRow + 1) % menuRows.length;
+        } while (!menuRows[state.menuRow].length)
     }
-    if(!state.hero.passiveTools.charge && state.menuRow === 2) {
-        state.menuRow = 1;
+    const menuRow = menuRows[state.menuRow];
+    state.menuIndex = Math.min(menuRow.length - 1, state.menuIndex);
+    if (wasGameKeyPressed(state, GAME_KEY.LEFT)) {
+        state.menuIndex = (state.menuIndex + menuRow.length - 1) % menuRow.length;
+    } else if (wasGameKeyPressed(state, GAME_KEY.RIGHT)) {
+        state.menuIndex = (state.menuIndex + 1) % menuRow.length;
     }
-    if (state.menuRow === 0) {
-        // The first row is for selecting tools.
-        const numberOfOptions = selectableTools.length + 1;
-        const toolIndex = state.menuIndex - 1;
-        const selectedTool = selectableTools[toolIndex];
-        if (wasGameKeyPressed(state, GAME_KEY.LEFT)) {
-            state.menuIndex = (state.menuIndex + numberOfOptions - 1) % numberOfOptions;
-        } else if (wasGameKeyPressed(state, GAME_KEY.RIGHT)) {
-            state.menuIndex = (state.menuIndex + 1) % numberOfOptions;
-        } else if (wasMenuConfirmKeyPressed(state)) {
-            if (state.menuIndex === 0) {
-                state.paused = false;
-                showHint(state);
-                return;
-            }
+
+    if (wasMenuConfirmKeyPressed(state)) {
+        const menuItem = menuRow[state.menuIndex];
+        if (menuItem === 'help') {
+            state.paused = false;
+            showHint(state);
+            return;
+        }
+        if (state.hero.activeTools[menuItem]) {
             if (wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL)) {
-                if (state.hero.leftTool === selectedTool) {
+                if (state.hero.leftTool === menuItem) {
                     state.hero.leftTool = state.hero.rightTool;
                 }
-                state.hero.rightTool = selectedTool;
+                state.hero.rightTool = menuItem as ActiveTool;
             } else {
                 // Assign to left tool as default action.
                 // If a generic confirm key was pressed, cycle the current left tool
                 // over to the right tool slot.
-                if (!wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL) && state.hero.leftTool !== selectedTool) {
+                if (!wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL) && state.hero.leftTool !== menuItem) {
                     state.hero.rightTool = state.hero.leftTool;
                 }
-                if (state.hero.rightTool === selectedTool) {
+                if (state.hero.rightTool === menuItem) {
                     state.hero.rightTool = state.hero.leftTool;
                 }
-                state.hero.leftTool = selectedTool;
+                state.hero.leftTool = menuItem as ActiveTool;
             }
+            return;
         }
-    } else if (state.menuRow === 1) {
-        // The second row is for equipping boots.
-        const selectableEquipment: Equipment[] = [null];
-        if (state.hero.equipment.ironBoots) {
-            selectableEquipment.push('ironBoots');
+        if (menuItem === 'leatherBoots' || menuItem === 'ironBoots' || menuItem === 'cloudBoots') {
+            state.hero.equipedBoots = menuItem;
+            return;
         }
-        if (state.hero.equipment.cloudBoots) {
-            selectableEquipment.push('cloudBoots');
+        if (menuItem === 'charge' || state.hero.element === menuItem) {
+            state.hero.setElement(null);
+            return;
+        } else if (state.hero.elements[menuItem]) {
+            state.hero.setElement(menuItem as MagicElement);
+            return;
         }
-        if (wasGameKeyPressed(state, GAME_KEY.LEFT)) {
-            state.menuIndex = (state.menuIndex + selectableEquipment.length - 1) % selectableEquipment.length;
-        } else if (wasGameKeyPressed(state, GAME_KEY.RIGHT)) {
-            state.menuIndex = (state.menuIndex + 1) % selectableEquipment.length;
-        } else if (wasMenuConfirmKeyPressed(state)) {
-            const selectedEquipment = selectableEquipment[state.menuIndex];
-            if (!selectableEquipment || state.hero.equipedGear[selectedEquipment]) {
-                state.hero.equipedGear = {};
-            } else {
-                state.hero.equipedGear = {};
-                state.hero.equipedGear[selectedEquipment] = true;
-            }
-        }
-    }  else if (state.menuRow === 2) {
-        // The second row is for equipping boots.
-        const selectableElements: MagicElement[] = [null];
-        if (state.hero.elements.fire) {
-            selectableElements.push('fire');
-        }
-        if (state.hero.elements.ice) {
-            selectableElements.push('ice');
-        }
-        if (state.hero.elements.lightning) {
-            selectableElements.push('lightning');
-        }
-        if (wasGameKeyPressed(state, GAME_KEY.LEFT)) {
-            state.menuIndex = (state.menuIndex + selectableElements.length - 1) % selectableElements.length;
-        } else if (wasGameKeyPressed(state, GAME_KEY.RIGHT)) {
-            state.menuIndex = (state.menuIndex + 1) % selectableElements.length;
-        } else if (wasMenuConfirmKeyPressed(state)) {
-            if (state.hero.element === selectableElements[state.menuIndex]) {
-                state.hero.setElement(null);
-            } else {
-                state.hero.setElement(selectableElements[state.menuIndex]);
-            }
+        if (state.hero.passiveTools[menuItem as PassiveTool]) {
+            state.paused = false;
+            const helpMessage = getLootHelpMessage(state, menuItem, state.hero.passiveTools[menuItem]);
+            showMessage(state, helpMessage);
         }
     }
 }
@@ -381,5 +348,44 @@ function updateTransition(state: GameState) {
         } else if (state.transitionState.time > CIRCLE_WIPE_OUT_DURATION + CIRCLE_WIPE_IN_DURATION) {
             state.transitionState = null;
         }
+    }
+}
+
+const isRandomizer = !!readGetParameter('seed');
+function selectSaveFile(state: GameState, savedGameIndex: number): void {
+    let savedGame = state.savedGames[state.savedGameIndex];
+    if (!savedGame) {
+        // For now go directly to starting the full game when selecting "New Game".
+        state.hero.spawnLocation = SPAWN_LOCATION_FULL;
+        state.scene = 'game';
+        updateHeroMagicStats(state);
+        returnToSpawnLocation(state);
+        if (!isRandomizer) {
+            state.scriptEvents.queue = parseScriptText(state, 'Waaaaah!', 1000, false);
+            state.scriptEvents.queue.push({type: 'clearTextBox'});
+        } else {
+            setScript(state, 'All the treasure in the world has been shuffled!');
+        }
+        return;
+        // Old code for showing the "Choose Game Mode" menu when selecting "New Game".
+        /*state.scene = 'chooseGameMode';
+        state.menuIndex = 0;
+        // Adjust the current state so we can show the correct background preview.
+        state.hero = new Hero();
+        state.hero.applySavedHeroData(getDefaultSavedState().savedHeroData);
+        state.hero.spawnLocation = SPAWN_LOCATION_FULL;
+        fixSpawnLocationOnLoad(state);
+        updateHeroMagicStats(state);
+        returnToSpawnLocation(state);
+        return;*/
+    }
+    setSaveFileToState(savedGameIndex);
+    state.scene = 'game';
+    // Hack to prevent showing the falling animation a second time on loading a game in the peach cave.
+    if (!state.hero.weapon) {
+        state.hero.z = 0;
+    }
+    if (!isRandomizer) {
+        showHint(state);
     }
 }

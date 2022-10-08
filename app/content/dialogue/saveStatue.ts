@@ -13,8 +13,6 @@ dialogueHash.saveStatue = {
     options: [
         {
             logicCheck: {
-                requiredFlags: [],
-                excludedFlags: [],
                 zones: ['peachCave'],
             },
             text: [
@@ -30,8 +28,6 @@ dialogueHash.saveStatue = {
         },
         {
             logicCheck: {
-                requiredFlags: [],
-                excludedFlags: [],
                 zones: ['tomb'],
             },
             text: [
@@ -45,8 +41,6 @@ dialogueHash.saveStatue = {
         },
         {
             logicCheck: {
-                requiredFlags: [],
-                excludedFlags: [],
                 zones: ['warTemple'],
             },
             text: [
@@ -60,8 +54,30 @@ dialogueHash.saveStatue = {
         },
         {
             logicCheck: {
-                requiredFlags: [],
-                excludedFlags: [],
+                zones: ['cocoon'],
+            },
+            text: [
+                `
+                    Hundreds of Vanara sleep in this Cocoon waiting for their time to walk these
+                    lands.
+                    {|}The Vanara village is far too small for them all.
+                `
+            ],
+        },
+        {
+            logicCheck: {
+                zones: ['helix'],
+            },
+            text: [
+                `
+                    A long time ago a star fell from the heavens and changed this land.
+                    {|}The crater it left filled with water and became a lake.
+                    {|}This "Helix" is all that remains from the fallen star.
+                `
+            ],
+        },
+        {
+            logicCheck: {
                 zones: ['waterfallTower'],
             },
             text: [
@@ -74,8 +90,6 @@ dialogueHash.saveStatue = {
         // This is the default text and probably won't be used in the long run.
         {
             logicCheck: {
-                requiredFlags: [],
-                excludedFlags: [],
             },
             text: [
                 `

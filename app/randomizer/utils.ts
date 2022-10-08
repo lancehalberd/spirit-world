@@ -2,7 +2,7 @@ import { cloneDeep } from 'lodash';
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 import { enemyTypes } from 'app/content/enemies';
 import { isLogicValid } from 'app/content/logic';
-import { lootEffects } from 'app/content/objects/lootObject';
+import { lootEffects } from 'app/content/loot';
 import { getZone, zones } from 'app/content/zones';
 import {
     SPAWN_LOCATION_DEMO,
@@ -28,6 +28,7 @@ import { addCheck } from 'app/randomizer/checks';
 
 import { readGetParameter } from 'app/utils/index';
 import SRandom from 'app/utils/SRandom';
+import Random from 'app/utils/Random';
 
 import { applySavedState, getDefaultState } from 'app/state';
 
@@ -306,7 +307,7 @@ function warnOnce(warningSet: Set<string>, objectId: string, message: string) {
     console.warn(message, objectId);
 }
 
-function findReachableChecks(allNodes: LogicNode[], startingNodes: LogicNode[], state: GameState): LootWithLocation[] {
+export function findReachableChecks(allNodes: LogicNode[], startingNodes: LogicNode[], state: GameState): LootWithLocation[] {
     const reachableNodes: LogicNode[] = findReachableNodes(allNodes, startingNodes, state);
     return getLootObjects(reachableNodes, state);
 }
@@ -701,27 +702,86 @@ window['showRandomizerSolution'] = function () {
     } while (currentState !== previousState);
 }
 
+export function getRandomizerHint(state: GameState): string {
+    const reachableChecks: LootWithLocation[] = findReachableChecks(allNodes, [overworldNodes[0]], state);
+    for (const check of Random.shuffle(reachableChecks)) {
+        if (check.location) {
+            const zoneKey = check.location.zoneKey;
+            if (check.lootObject.type === 'dialogueLoot') {
+                const npcKey = `${zoneKey}-${check.lootObject.id}`;
+                if (state.savedState.objectFlags[npcKey]) {
+                    continue;
+                }
+                return `Try talking to someone ${getZoneText(zoneKey, check.location.isSpiritWorld)}.`;
+            }
+            if (state.savedState.objectFlags[check.lootObject.id]) {
+                continue;
+            }
+            return `There is still something ${getZoneText(zoneKey, check.location.isSpiritWorld)}.`;
+        } else {
+            const {dialogueKey, optionKey} = check;
+            const flag = `${dialogueKey}-${optionKey}`;
+            if (state.savedState.objectFlags[flag]) {
+                continue;
+            }
+            return `The merchant has something for sale.`;
+        }
+    }
+    return 'Looks like BK Mode to me :)';
+}
+
+function getZoneText(zone: string, isSpiritWorld: boolean): string {
+    switch (zone) {
+        case 'sky': return 'in the sky';
+        case 'overworld': return isSpiritWorld ? 'out in the spirit world' : 'outside';
+        case 'underwater': return 'underwater';
+        case 'caves': return isSpiritWorld ? 'in a spirit world cave' : 'in a cave';
+        case 'holyCityInterior': return 'inside the city';
+        case 'waterfallCave': return 'in the Cave Village';
+        case 'treeVillage': return 'in the Vanara Village';
+        case 'peachCaveWater':
+        case 'peachCave': return isSpiritWorld ? 'in a spirit world cave' : 'in the dark cave by the lake';
+        case 'tomb': return 'in the Vanara Tomb';
+        case 'warTemple': return 'in the Summoner Ruins';
+        case 'cocoon': return 'in the Cocoon behind the Vanara Tomb';
+        case 'helix': return 'in the Helix';
+        case 'forestTemple': return 'in the Forest Temple';
+        case 'waterfallTower': return 'in the Waterfall Tower';
+        case 'forge': return 'in the Forge';
+        case 'grandTemple': return 'in the Grand Temple';
+        case 'skyPalace': return 'in the Sky Palace';
+        case 'jadePalace': return 'in the Jade Palace';
+        case 'riverTempleWater':
+        case 'riverTemple': return 'in the Lake Ruins';
+        case 'crater': return 'in the Volcano Crater';
+        case 'staffTower': return 'in the Staff Tower';
+        case 'lab': return 'in the Hidden Laboratory';
+        case 'tree': return 'in the World Tree';
+    }
+    return zone;
+}
+
 function getLootName(lootType: LootType, state: GameState) {
     if (lootType === 'spiritPower') {
         if (state.hero.passiveTools.astralProjection) {
             return 'Teleportation';
         }
-        if (state.hero.passiveTools.astralProjection) {
+        if (state.hero.passiveTools.spiritSight) {
             return 'Astral Projection';
         }
         return 'Spirit Sight';
     }
     if (lootType === 'cloak') {
-        return state.hero.activeTools.cloak ? 'Spirit Cloak' : 'Invisibility Cloak';
+        return state.hero.activeTools.cloak ? 'Invisibility Cloak' : 'Spirit Cloak';
     }
     if (lootType === 'staff') {
-        return state.hero.activeTools.staff ? 'Tree Staff' : 'Tower Staff';
+        return state.hero.activeTools.staff ? 'Tower Staff' : 'Tree Staff';
     }
     if (lootType === 'gloves') {
         return state.hero.passiveTools.gloves ? 'Magical Bracers' : 'Spirit Bracers';
     }
     if (lootType === 'roll') {
-        return state.hero.passiveTools.roll ? 'Mist Roll' : 'Cloud Somersault';
+        return state.hero.passiveTools.roll ? 'Cloud Somersault': 'Mist Roll';
     }
     if (lootType === 'peachOfImmortality') {
         return 'Golden Peach';

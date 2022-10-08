@@ -472,7 +472,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
     // any time all four corners are over pits.
     hero.wading = hero.z <= 0;
     hero.swimming = hero.action !== 'roll' && hero.z <= 0;
-    hero.slipping = !!hero.equipedGear?.cloudBoots;
+    hero.slipping = hero.equipedBoots === 'cloudBoots';
     let fallingTopLeft = false, fallingTopRight = false, fallingBottomLeft = false, fallingBottomRight = false;
     let startClimbing = false;
     hero.groundHeight = 0;
@@ -537,11 +537,11 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
             if (!behaviors.water) {
                 hero.swimming = false;
             }
-            if (behaviors.slippery && !hero.equipedGear?.ironBoots) {
+            if (behaviors.slippery && hero.equipedBoots !== 'ironBoots') {
                 hero.slipping = !hero.isAstralProjection && !hero.isInvisible;
             }
             // Clouds boots are not slippery when walking on clouds.
-            if (behaviors.cloudGround && hero.equipedGear?.cloudBoots) {
+            if (behaviors.cloudGround && hero.equipedBoots === 'cloudBoots') {
                 hero.slipping = false;
             }
             if (!behaviors.shallowWater && !behaviors.water) {
@@ -557,7 +557,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
             // Lava is like a pit for the sake of cloud walking boots sinking over them, but it damages
             // like normal damaging ground rather than a pit. This was done because there were many instances
             // it was difficult to reset the player's position when transition screens over lava.
-            if (behaviors.pit || (behaviors.cloudGround && !hero.equipedGear?.cloudBoots)) {
+            if (behaviors.pit || (behaviors.cloudGround && hero.equipedBoots !== 'cloudBoots')) {
                 const tileIsUp = row < bottomRow;
                 const tileIsDown = row > topRow;
                 const tileIsLeft = column < rightColumn;
@@ -590,7 +590,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
             }
         }
     }
-    if (hero.swimming && hero.equipedGear?.cloudBoots) {
+    if (hero.swimming && hero.equipedBoots === 'cloudBoots') {
         hero.swimming = false;
         hero.wading = true;
     }
@@ -604,7 +604,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
     if (hero.isOverPit && !state.nextAreaSection && !state.nextAreaInstance) {
         if (hero.z <= 0 && hero.action !== 'roll') {
             let behaviors = behaviorGrid[Math.round(hero.y / tileSize)]?.[Math.round(hero.x / tileSize)];
-            if (behaviors?.cloudGround && hero.equipedGear.cloudBoots) {
+            if (behaviors?.cloudGround && hero.equipedBoots === 'cloudBoots') {
                 // Do nothing.
             } else {
                 hero.throwHeldObject(state);

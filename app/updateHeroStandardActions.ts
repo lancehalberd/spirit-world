@@ -60,9 +60,9 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     if (hero.isRunning && hero.magic >= 0) {
         movementSpeed *= 1.3;
     }
-    if (hero.equipedGear?.ironBoots) {
+    if (hero.equipedBoots === 'ironBoots') {
         movementSpeed *= 0.6;
-    } else if (hero.equipedGear?.cloudBoots) {
+    } else if (hero.equipedBoots === 'cloudBoots') {
         movementSpeed *= 1.4;
     }
     if (hero.action === 'climbing') {
@@ -112,7 +112,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             testHero.z = 0;
             testHero.area = state.surfaceAreaInstance;
             // Remove equipment from test hero in case it prevents them from swimming (like cloud boots).
-            testHero.equipedGear = {};
+            testHero.equipedBoots = 'leatherBoots';
             checkForFloorEffects(state, testHero);
             // If the test hero is swimming, we can surface here.
             if (testHero.swimming) {
@@ -128,7 +128,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 return;
             }
         }
-    } else if (hero.equipedGear.cloudBoots && hero.canFloat && hero.vx * hero.vx + hero.vy * hero.vy >= 4) {
+    } else if (hero.equipedBoots === 'cloudBoots' && hero.canFloat && hero.vx * hero.vx + hero.vy * hero.vy >= 4) {
         hero.z = Math.min(hero.z + 0.1, maxCloudBootsZ);
     } else if (hero.z >= minZ) {
         hero.z = Math.max(minZ, hero.z - 0.2);
@@ -137,7 +137,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     // The astral projection uses the weapon tool as the passive tool button
     // since you have to hold the normal passive tool button down to meditate.
 
-    if (hero.swimming && hero.equipedGear?.ironBoots && state.underwaterAreaInstance &&
+    if (hero.swimming && hero.equipedBoots === 'ironBoots' && state.underwaterAreaInstance &&
         isPointOpen(state, state.underwaterAreaInstance, {x: hero.x + hero.w / 2, y: hero.y + hero.h / 2}, {canSwim: true})
     ) {
         const mx = hero.x % 16;
@@ -404,7 +404,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         }
     }
     if (hero.slipping) {
-        if (hero.equipedGear.cloudBoots) {
+        if (hero.equipedBoots === 'cloudBoots') {
             hero.vx = dx / 10 + hero.vx * 0.95;
             hero.vy = dy / 10 + hero.vy * 0.95;
         } else {
@@ -648,7 +648,11 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     if ((hero.swimming || isUnderwater(state, hero)) && wasGameKeyPressed(state, GAME_KEY.MEDITATE)) {
         // The meditate key can be used to quickly toggle iron boots in/under water.
         if (hero.equipment.ironBoots) {
-            hero.equipedGear.ironBoots = !hero.equipedGear.ironBoots;
+            if (hero.equipedBoots !== 'ironBoots') {
+                hero.equipedBoots = 'ironBoots';
+            } else {
+                hero.equipedBoots = 'leatherBoots';
+            }
         }
     } else if (wasGameKeyPressed(state, GAME_KEY.MEDITATE)
         && !isActionBlocked && (hero.passiveTools.spiritSight || hero.clones.length)

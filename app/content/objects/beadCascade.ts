@@ -268,12 +268,12 @@ export class BeadSection implements ObjectInstance {
             const touchingHero = boxesIntersect(hero, this.getHitbox(state))
                 && hero.action !== 'roll' && hero.z <= 4
                 && hero.y + hero.h < this.y + this.h + 4;
-            if (touchingHero && hero.equipedGear?.ironBoots) {
+            if (touchingHero && hero.equipedBoots === 'ironBoots') {
                 const x = hero.x + hero.w / 4 + Math.random() * hero.w / 2;
                 addParticleSpray(state, this.area, Random.element(crystalParticles),
                     Math.min(this.x + this.w, Math.max(this.x, x)), hero.y + hero.h, 0);
             }
-            const shouldPullHero = touchingHero && !hero.equipedGear?.ironBoots && !this.area.objects.some(object => {
+            const shouldPullHero = touchingHero && hero.equipedBoots !== 'ironBoots'&& !this.area.objects.some(object => {
                 return object instanceof Staff && boxesIntersect(hero, object.getHitbox(state));
             });
             if (hero.actionTarget === this && !shouldPullHero) {

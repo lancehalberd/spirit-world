@@ -20,7 +20,7 @@ export type Action =
     // based on the direction they jump down until they "land" on a walkable tile.
     | 'jumpingDown';
 export type ActiveTool = 'bow' | 'staff' | 'clone' | 'cloak';
-export type Equipment = 'cloudBoots' | 'ironBoots';
+export type Equipment = 'leatherBoots' | 'cloudBoots' | 'ironBoots';
 export type PassiveTool = 'gloves'
     | 'roll'
     | 'charge' | 'nimbusCloud'
@@ -33,7 +33,7 @@ export type Collectible = 'peachOfImmortality' | 'peachOfImmortalityPiece';
 export type CommonLoot = 'money' | 'peach';
 export type DungeonLoot = 'smallKey' | 'bigKey' | 'map';
 
-export type LootType = 'empty' | 'weapon'
+export type LootType = 'empty' | 'help' | 'weapon'
     // In the randomizer spiritSight, astralProjection + teleportation are changed to this progressive spirit power
     // ability so that you will always get the abilities in an order that they can be used immediately.
     | 'spiritPower'
@@ -89,7 +89,6 @@ export interface Actor extends ObjectInstance {
     attackBufferTime?: number
     // like being knocked but doesn't stop MC charge or other actions.
     bounce?: {vx: number, vy: number, frames: number}
-    equipedGear?: {[key in Equipment]?: boolean}
     groundHeight: number
     hasBarrier?: boolean
     isInvisible?: boolean

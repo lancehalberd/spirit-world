@@ -76,7 +76,7 @@ export const waterfallCaveNodes: LogicNode[] = [
 
 // The flameBeast flag is set correctly during simulation, so this logic works as expected.
 const canAscendToCrater = orLogic(hasMitts, hasInvisibility, {requiredFlags: ['flameBeast']});
-const canAscendToCraterSpirit = orLogic(hasMitts, hasFireBlessing, {requiredFlags: ['flameBeast']});
+const canAscendToCraterSpirit = orLogic(hasInvisibility, hasFireBlessing, {requiredFlags: ['flameBeast']});
 export const cavesNodes: LogicNode[] = [
     // This cave connects the NW corner of the overworld to the sky and is one way.
     // It is filled with lava while the fire beast is active.

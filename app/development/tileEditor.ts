@@ -8,7 +8,7 @@ import {
 import { bossTypes } from 'app/content/bosses';
 import { enemyTypes } from 'app/content/enemies';
 import { logicHash } from 'app/content/logic';
-import { getLootFrame } from 'app/content/objects/lootObject';
+import { getLootFrame } from 'app/content/loot';
 import { createObjectInstance } from 'app/content/objects';
 import { allTiles } from 'app/content/tiles';
 import { palettes, sourcePalettes } from 'app/content/palettes';
