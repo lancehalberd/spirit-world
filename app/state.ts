@@ -157,6 +157,7 @@ function getDefaultSavedHeroData(): SavedHeroData {
             phoenixCrown: 0,
             waterBlessing: 0,
             fireBlessing: 0,
+            lightningBlessing: 0,
         },
         spawnLocation: SPAWN_LOCATION_FULL,
     };

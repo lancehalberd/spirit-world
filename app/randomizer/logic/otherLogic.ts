@@ -154,6 +154,15 @@ export const holyCityNodes: LogicNode[] = [
     },
     {
         zoneId: 'holyCityInterior',
+        nodeId: 'moneyMaze',
+        checks: [
+            { objectId: 'moneyMazePeachPiece' },
+        ],
+        entranceIds: ['moneyMazeEntrance'],
+        exits: [{ objectId: 'moneyMazeEntrance' }],
+    },
+    {
+        zoneId: 'holyCityInterior',
         nodeId: 'kitchen',
         npcs: [
             {loot: {type: 'dialogueLoot', id: 'meanPerson', lootType: 'money', lootAmount: 1}},

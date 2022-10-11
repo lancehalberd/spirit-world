@@ -174,7 +174,7 @@ function findDoorById(zone: Zone, id: string, state: GameState = null): {object:
     return findObjectById(zone, id, state, ['door', 'keyBlock', 'pitEntrance', 'teleporter']);
 }
 function findLootById(zone: Zone, id: string, state: GameState = null): {object: ObjectDefinition, location: ZoneLocation}  {
-    return findObjectById(zone, id, state, ['bigChest', 'chest', 'loot', 'boss']);
+    return findObjectById(zone, id, state, ['bigChest', 'chest', 'loot', 'shopItem', 'boss']);
 }
 
 const findObjectByIdCache: {[key: string]: {

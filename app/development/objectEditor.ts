@@ -215,7 +215,7 @@ export function getLootTypes(): LootType[] {
 export const combinedObjectTypes: ObjectType[] = [
     'anode', 'cathode', 'airBubbles', 'ballGoal', 'beadCascade', 'beadGrate', 'bigChest', 'chest', 'crystalSwitch', 'decoration',
     'door', 'escalator', 'floorSwitch', 'keyBlock', 'loot','marker', 'narration', 'npc', 'pitEntrance',
-    'pushPull', 'rollingBall', 'saveStatue', 'sign', 'spawnMarker', 'teleporter', 'tippable', 'torch', 'turret',
+    'pushPull', 'rollingBall', 'saveStatue', 'shopItem', 'sign', 'spawnMarker', 'teleporter', 'tippable', 'torch', 'turret',
     'vineSprout', 'waterPot',
 ];
 
@@ -391,6 +391,7 @@ export function createObjectDefinition(
             };
         case 'chest':
         case 'bigChest':
+        case 'shopItem':
         case 'loot': {
             const lootType = definition.lootType || getLootTypes()[0];
             const lootDefinition: LootObjectDefinition = {
@@ -400,6 +401,9 @@ export function createObjectDefinition(
                 lootType,
                 status: definition.status || commonProps.status,
             };
+            if (definition.type === 'shopItem') {
+                lootDefinition.price = definition.price || 100;
+            }
             if (lootType === 'money') {
                 lootDefinition.lootAmount = definition.lootAmount || 1;
             } else {
@@ -722,6 +726,14 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             break;
         case 'door':
             rows.push(getDirectionFields(state, object));
+            rows.push({
+                name: 'price',
+                value: object.price ?? 0,
+                onChange(price: number) {
+                    object.price = price;
+                    updateObjectInstance(state, object);
+                },
+            });
             // This intentionally continue on to the marker properties.
         case 'pitEntrance':
         case 'teleporter':
@@ -796,8 +808,19 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             break;
         case 'bigChest':
         case 'chest':
-        case 'loot': {
+        case 'loot':
+        case 'shopItem': {
             rows = [...rows, ...getLootFields(state, editingState, object)];
+            if (object.type === 'shopItem') {
+                rows.push({
+                    name: 'price',
+                    value: object.price ?? 100,
+                    onChange(price: number) {
+                        object.price = price;
+                        updateObjectInstance(state, object);
+                    },
+                });
+            }
             break;
         }
         case 'ballGoal':
@@ -1102,7 +1125,10 @@ function getStyleFields(state: GameState, editingState: EditingState, object: Ob
 }
 
 function getLootFields(state: GameState, editingState: EditingState, object: ObjectDefinition) {
-    if (object.type !== 'bigChest' && object.type !== 'loot' && object.type !== 'chest' && object.type !== 'boss') {
+    if (object.type !== 'bigChest' && object.type !== 'loot'
+        && object.type !== 'chest' && object.type !== 'boss'
+        && object.type !== 'shopItem'
+    ) {
         return [];
     }
     const lootType = object.lootType || 'peachOfImmortalityPiece';

@@ -27,7 +27,7 @@ export type PassiveTool = 'gloves'
     | 'catEyes' | 'spiritSight' | 'trueSight'
     | 'astralProjection' | 'teleportation'
     | 'ironSkin' | 'goldMail' | 'phoenixCrown'
-    | 'waterBlessing' | 'fireBlessing';
+    | 'waterBlessing' | 'fireBlessing' | 'lightningBlessing';
 export type MagicElement = 'fire' | 'ice' | 'lightning';
 export type Collectible = 'peachOfImmortality' | 'peachOfImmortalityPiece';
 export type CommonLoot = 'money' | 'peach';

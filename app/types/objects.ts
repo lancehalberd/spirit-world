@@ -313,7 +313,8 @@ export interface KeyBlockDefinition extends BaseObjectDefinition {
 }
 
 export type LootObjectDefinition = BaseObjectDefinition & LootData & {
-    type: 'bigChest' | 'chest' | 'loot',
+    type: 'bigChest' | 'chest' | 'loot' | 'shopItem',
+    price?: number
 }
 
 export interface CrystalSwitchDefinition extends BaseObjectDefinition {
@@ -325,15 +326,18 @@ export interface CrystalSwitchDefinition extends BaseObjectDefinition {
 }
 
 export interface EntranceDefinition extends BaseObjectDefinition {
-    type: 'teleporter' | 'pitEntrance' | 'door' | 'stairs',
-    targetZone?: string,
-    targetObjectId?: string,
+    type: 'teleporter' | 'pitEntrance' | 'door' | 'stairs'
+    targetZone?: string
+    targetObjectId?: string
     // This is the number of keys that the player must have access to use this door in
     // the randomizer logic. This value is calculated by the randomizer logic if it is not
     // manually set.
-    requiredKeysForLogic?: number,
+    requiredKeysForLogic?: number
     // This message will be displayed as a location indicator when arriving at this entrance.
-    locationCue?: string,
+    locationCue?: string
+    // Southern facing doors can be locked with a price below them to require spending
+    // money to open them.
+    price?: number
 }
 export interface MarkerDefinition extends BaseObjectDefinition {
     type: 'marker' | 'spawnMarker',

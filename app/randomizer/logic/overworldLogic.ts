@@ -23,8 +23,10 @@ export const overworldNodes: LogicNode[] = [
         ],
         entranceIds: [
             'sideArea:noToolEntrance', 'elderEntrance', 'tombTeleporter',
-            'lakeTunnelEntrance', 'peachCaveTopEntrance', 'peachCaveWaterEntrance', 'staffTowerEntrance',
-            'tombEntrance', 'waterfallCaveEntrance', 'templeCrackedDoor', 'templeDoor', 'overworld:holyCityFoodHouse',
+            'lakeTunnelEntrance', 'peachCaveTopEntrance', 'peachCaveWaterEntrance',
+            'staffTowerEntrance',
+            'tombEntrance', 'waterfallCaveEntrance', 'templeCrackedDoor', 'templeDoor',
+            'moneyMazeEntrance', 'overworld:holyCityFoodHouse',
         ],
         exits: [
             { objectId: 'sideArea:noToolEntrance'},
@@ -37,6 +39,7 @@ export const overworldNodes: LogicNode[] = [
             { objectId: 'waterfallCaveEntrance' },
             { objectId: 'templeCrackedDoor' },
             { objectId: 'templeDoor' },
+            { objectId: 'moneyMazeEntrance' },
             { objectId: 'overworld:holyCityFoodHouse' },
         ],
     },
@@ -110,8 +113,11 @@ export const overworldNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'westSpiritWorld',
+        checks: [
+            { objectId: 'spiritShopPeach' },
+            { objectId: 'spiritShopLightningBlessing' },
+        ],
         paths: [
-            // There is nothing in westSpiritWorld yet
             { nodeId: 'mainSpiritWorld', logic: hasCloudBoots },
         ],
     },

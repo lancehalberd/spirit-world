@@ -95,6 +95,7 @@ export function getLootName(state: GameState, lootType: LootType, lootLevel?: nu
         case 'cloudBoots': return 'Cloud Boots';
         case 'fireBlessing': return 'Cooling Spirit';
         case 'waterBlessing': return 'Water Blessing';
+        case 'lightningBlessing': return 'Ancient Badge';
         case 'weapon': return 'Chakram';
     }
     return '?'+lootType;
@@ -137,6 +138,7 @@ export function getLootGetMessage(state: GameState, lootType: LootType, lootLeve
         case 'lightning': return 'You have received the Lightning Element!' + getEquipElementMessage(state);
         case 'fireBlessing': return 'You have absorbed a Cooling Spirit!';
         case 'waterBlessing': return 'You have received the Blessing of Water!';
+        case 'lightningBlessing': return `You have obtained the ${lootName}!`;
         case 'money': return `You found ${lootAmount || 1} Jade!`;
     }
     return defaultMessage;
@@ -240,6 +242,8 @@ export function getLootHelpMessage(state: GameState, lootType: LootType, lootLev
         case 'waterBlessing':
             return 'Being underwater will no longer drain your spirit energy or damage you.'
                 + '{|}You will also take half damage from ice.';
+        case 'lightningBlessing':
+            return 'This ancient artifact halves the damage from lightning effects.';
         case 'goldMail': return 'This amazing armor reduces all damage you receive.';
         case 'nimbusCloud':
             return 'Use the Nimbus Cloud to quickly travel the world!'
@@ -421,6 +425,7 @@ const lootFrames = {
     cloudBoots: cloudBoots,
     fireBlessing: createLootFrame('red', 'Fir'),
     waterBlessing: createLootFrame('blue', 'Wat'),
+    lightningBlessing: createLootFrame('green', 'Fr'),
     weapon: weaponFrame,
     // This is invisible for now, an effect is applied to the HUD representing this.
     secondChance: {image: createCanvasAndContext(16, 16)[0], x :0, y: 0, w: 16, h: 16},
@@ -549,7 +554,7 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: An
         } else if ([
             'gloves', 'roll', 'charge', 'nimbusCloud', 'catEyes', 'spiritSight',
             'trueSight', 'astralProjection', 'teleportation', 'ironSkin', 'goldMail', 'phoenixCrown',
-            'waterBlessing', 'fireBlessing'
+            'waterBlessing', 'fireBlessing', 'lightningBlessing',
         ].includes(loot.lootType)) {
             //console.log(loot.lootType, state.hero.passiveTools[loot.lootType]);
             state.hero.passiveTools[loot.lootType] = applyUpgrade(state.hero.passiveTools[loot.lootType], loot);

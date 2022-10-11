@@ -32,10 +32,15 @@ export class Marker implements ObjectInstance {
                 && (primaryHero.action === 'walking' || !primaryHero.action)
                 && primaryHero.rollCooldown <= 0
             ) {
+                const isMarkerActive = Math.abs(primaryHero.x - this.x) < 20
+                    && Math.abs(primaryHero.y - this.y) < 20;
+                if (!isMarkerActive) {
+                    return;
+                }
                 const { mag } = getVectorToTarget(state, this, primaryHero);
                 const dx = primaryHero.x - primaryHero.safeX;
                 const dy = primaryHero.y - primaryHero.safeY;
-                if (mag < 24 && dx * dx + dy * dy >= mag * mag) {
+                if (dx * dx + dy * dy >= mag * mag) {
                     // This is simplified becuase marker+hero have the same size hitbox.
                     // Would have to adjust if that changes in the future.
                     primaryHero.safeX = this.x;
@@ -45,7 +50,11 @@ export class Marker implements ObjectInstance {
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
-        if (editingState.isEditing) {
+        const primaryHero = state.hero.activeClone || state.hero;
+        // Remove `false &&` here to see marker when it is active.
+        const isMarkerActive = false && Math.abs(primaryHero.x - this.x) < 20
+            && Math.abs(primaryHero.y - this.y) < 20;
+        if (editingState.isEditing || isMarkerActive) {
             context.strokeStyle = 'red';
             context.beginPath();
             context.moveTo(this.x + 2, this.y + 2);

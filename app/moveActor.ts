@@ -601,6 +601,9 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
     }
     hero.isTouchingPit = fallingTopLeft || fallingTopRight || fallingBottomLeft || fallingBottomRight;
     hero.isOverPit = fallingTopLeft && fallingTopRight && fallingBottomLeft && fallingBottomRight;
+    if (hero.isOverPit) {
+        hero.canFloat = false;
+    }
     if (hero.isOverPit && !state.nextAreaSection && !state.nextAreaInstance) {
         if (hero.z <= 0 && hero.action !== 'roll') {
             let behaviors = behaviorGrid[Math.round(hero.y / tileSize)]?.[Math.round(hero.x / tileSize)];

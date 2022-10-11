@@ -10,6 +10,7 @@ import { createAnimation, drawFrame, drawFrameAt } from 'app/utils/animations';
 import { directionMap, getDirection } from 'app/utils/field';
 import { requireImage } from 'app/utils/images';
 import { boxesIntersect, isObjectInsideTarget, isPointInShortRect } from 'app/utils/index';
+import { drawText } from 'app/utils/simpleWhiteFont';
 
 import {
     AreaInstance, Direction, DrawPriority, Frame, GameState, HitProperties, HitResult, ObjectInstance,
@@ -704,6 +705,9 @@ export class Door implements ObjectInstance {
         this.x = definition.x;
         this.y = definition.y;
         this.status = definition.status || 'normal';
+        if (definition.d === 'up' && definition.price) {
+            this.status = 'closed';
+        }
         // 'closedEnemy' doors will start open and only close when we confirm there are enemies in the current
         // are section. This way we don't play the secret chime every time we enter a room with a closed enemy
         // door where the enemies are already defeated (or there are not yet enemies).
@@ -728,7 +732,7 @@ export class Door implements ObjectInstance {
     }
     renderOpen(state: GameState): boolean {
         const hero = state.hero.activeClone || state.hero;
-        const heroIsTouchingDoor = boxesIntersect(hero, this.getHitbox(state));
+        const heroIsTouchingDoor = boxesIntersect(hero, this.getHitbox(state)) && hero.action !== 'jumpingDown';
         return heroIsTouchingDoor || this.status === 'normal' || this.status === 'blownOpen' || this.status === 'frozen' || state.hero.actionTarget === this;
     }
     changeStatus(state: GameState, status: ObjectStatus): void {
@@ -758,7 +762,7 @@ export class Door implements ObjectInstance {
         const y = Math.floor(this.y / 16);
         const x = Math.floor(this.x / 16);
         const doorStyle = doorStyles[this.style];
-       if (this.style === 'wooden') {
+        if (this.style === 'wooden') {
             if (this.definition.d === 'down') {
                 applyBehaviorToTile(this.area, x, y, { solidMap: BITMAP_BOTTOM, solid: false, low: false, lowCeiling: true});
                 applyBehaviorToTile(this.area, x + 3, y, { solidMap: BITMAP_BOTTOM, solid: false, low: false});
@@ -903,6 +907,15 @@ export class Door implements ObjectInstance {
         return true;
     }
     onGrab(state: GameState) {
+        if (this.definition.d === 'up' && this.status === 'closed' && this.definition.price) {
+            state.hero.action = null;
+            if (this.definition.price > state.hero.money) {
+                showMessage(state, 'You need more Jade to open this door.');
+                return;
+            }
+            state.hero.money -= this.definition.price;
+            this.changeStatus(state, 'normal');
+        }
         if (!this.tryToUnlock(state)) {
             if (this.status === 'bigKeyLocked') {
                 showMessage(state, 'You need a special key to open this door.');
@@ -1082,6 +1095,15 @@ export class Door implements ObjectInstance {
     render(context: CanvasRenderingContext2D, state: GameState) {
         const doorStyle = doorStyles[this.style];
         context.fillStyle = '#888';
+        if (this.definition.d === 'up' && this.status === 'closed' && this.definition.price) {
+            const hitbox = this.getHitbox(state);
+            drawText(context, `${this.definition.price}`,
+                hitbox.x + hitbox. w / 2, hitbox.y + hitbox.h + 2, {
+                textBaseline: 'top',
+                textAlign: 'center',
+                size: 16,
+            });
+        }
         if (doorStyle.render) {
             doorStyle.render(context, state, this);
         } else if (doorStyle[this.definition.d]) {

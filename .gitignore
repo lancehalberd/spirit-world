@@ -67,8 +67,14 @@ tsc/
 public/app
 # Don't include old graphics.
 public/gfx/old
+# Don't include graphics that haven't been processed yet.
+public/gfx/staging
 # Don't include sfx that haven't been processed yet.
 public/sfx/staging
+# Don't include old bgm.
+public/bgm/old
+# Don't include bgm that haven't been processed yet.
+public/bgm/staging
 # Don't include rsync command.
 rsync.txt
 

@@ -288,6 +288,9 @@ export class Hero implements Actor, SavedHeroData {
             if (hit.element === 'ice' && state.hero.passiveTools.waterBlessing) {
                 damage /= 2;
             }
+            if (hit.element === 'lightning' && state.hero.passiveTools.lightningBlessing) {
+                damage /= 2;
+            }
             if (state.hero.passiveTools.goldMail) {
                 damage /= 2;
             }

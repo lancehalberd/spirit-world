@@ -45,11 +45,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 {addCue: Equip the spirit cloak and press [B_TOOL] to activate it, then hold [B_TOOL] to detonate the barrier}
 Current tasks:
-    - There should be a name indicator on the menu for the tool the cursor is over
-        - Show name in bottom right corner, which should be empty
-        - Including the "help" icon
-    - passive tools should be selectable in the menu and show a tutorial on selection if nothing else.
-
     Nimbus cloud
         - on overworld material takes you to: Lake, City, Village, Peaks, Ruins
         - in spirit world takes you to: Tomb shop, Fertility Temple, Sky City, Jade City
@@ -57,7 +52,7 @@ Current tasks:
 
     Add save statues:
         Outside Crater/Forge
-        In holy city/jade city
+        In jade city
         Outside waterfall cave
 
     Editor Improvements

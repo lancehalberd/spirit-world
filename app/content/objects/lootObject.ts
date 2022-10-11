@@ -8,12 +8,16 @@ import { getState, saveGame } from 'app/state';
 import { createAnimation, drawFrame, drawFrameAt, getFrameHitBox } from 'app/utils/animations';
 import { rectanglesOverlap } from 'app/utils/index';
 import { playSound } from 'app/musicController';
+import { drawText } from 'app/utils/simpleWhiteFont';
 
 import {
-    AreaInstance, BossObjectDefinition, DialogueLootDefinition,
-    EffectInstance, Frame, GameState, LootObjectDefinition,
+    AreaInstance, BossObjectDefinition, DialogueLootDefinition, Direction,
+    EffectInstance, Frame, GameState, Hero, LootObjectDefinition,
     LootTable, ObjectInstance, ObjectStatus, Rect, TileBehaviors,
 } from 'app/types';
+
+/*const [coin] =
+    createAnimation('gfx/hud/money.png', {w: 16, h: 16}, {x: 9}).frames;*/
 
 type AnyLootDefinition = LootObjectDefinition | BossObjectDefinition | DialogueLootDefinition;
 
@@ -124,7 +128,7 @@ export class LootObject implements ObjectInstance {
         this.x = definition.x;
         this.y = definition.y;
         this.status = definition.status || 'normal';
-        if (getObjectStatus(state, this.definition)) {
+        if (this.definition.id && getObjectStatus(state, this.definition)) {
             this.status = 'gone';
         }
         this.behaviors = { brightness: 0, lightRadius: 0 };
@@ -133,7 +137,7 @@ export class LootObject implements ObjectInstance {
         return getFrameHitBox(this.frame, this);
     }
     update(state: GameState) {
-        if (state.savedState.objectFlags[this.definition.id]) {
+        if (this.definition.id && state.savedState.objectFlags[this.definition.id]) {
             this.status = 'gone';
             return;
         }
@@ -158,8 +162,15 @@ export class LootObject implements ObjectInstance {
             removeObjectFromArea(state, this);
             if (this.definition.id && this.definition.id !== 'drop') {
                 state.savedState.objectFlags[this.definition.id] = true;
+                getLoot(state, this.definition);
+            } else {
+                const onPickup = lootEffects[this.definition.lootType] || lootEffects.unknown;
+                onPickup(state, this.definition);
+                if (this.definition.lootType === 'money') {
+                    playSound('getMoney');
+                }
+                removeObjectFromArea(state, this);
             }
-            getLoot(state, this.definition);
         }
     }
     render(context, state: GameState) {
@@ -299,9 +310,12 @@ export class ChestObject implements ObjectInstance {
     onGrab(state: GameState) {
         // You can only open a chest from the bottom.
         const hero = state.hero.activeClone || state.hero;
+        // Surpisingly, this prevents the Astral Projection from opening chests,
+        // because the hero always faces south when meditating.
         if (!this.definition.id || hero.d !== 'up') {
             return;
         }
+        state.hero.action = null;
         if (this.isOpen(state)) {
             if (state.savedState.objectFlags[this.definition.id] && this.definition.lootType !== 'empty') {
                 showMessage(state, 'You already opened this chest.');
@@ -372,6 +386,7 @@ export class BigChest extends ChestObject implements ObjectInstance {
         if (hero.d !== 'up') {
             return;
         }
+        state.hero.action = null;
         if (this.isOpen(state)) {
             if (state.savedState.objectFlags[this.definition.id] && this.definition.lootType !== 'empty') {
                 showMessage(state, 'You already opened this chest.');
@@ -407,3 +422,81 @@ export class BigChest extends ChestObject implements ObjectInstance {
     }
 }
 
+
+export class ShopObject extends LootObject implements ObjectInstance {
+    area: AreaInstance;
+    behaviors: TileBehaviors;
+    definition: LootObjectDefinition;
+    drawPriority: 'sprites' = 'sprites';
+    frame: Frame;
+    isObject = <const>true;
+    x: number;
+    y: number;
+    z: number;
+    status: ObjectStatus;
+    price: number;
+    time = 0;
+    constructor(state: GameState, definition: LootObjectDefinition) {
+        super(state, definition);
+        this.price = definition.price || 100;
+        this.behaviors.solid = true;
+    }
+    onGrab(state: GameState, d: Direction, hero: Hero) {
+        const mainHero = state.hero.activeClone || state.hero;
+        if (hero !== mainHero) {
+            return;
+        }
+        state.hero.action = null;
+        if (state.hero.money < this.price) {
+            showMessage(state, 'You need more Jade for this one.');
+            return;
+        }
+        state.hero.money -= this.price;
+        removeObjectFromArea(state, this);
+        state.savedState.objectFlags[this.definition.id] = true;
+        getLoot(state, this.definition);
+    }
+    update(state: GameState) {
+        if (state.savedState.objectFlags[this.definition.id]) {
+            this.status = 'gone';
+            return;
+        }
+        this.time += FRAME_LENGTH;
+        if (this.status === 'hidden' || this.status === 'hiddenEnemy'
+            || this.status === 'hiddenSwitch' || this.status === 'gone'
+        ) {
+            return;
+        }
+        if (this.x + 16 > state.camera.x && this.x < state.camera.x + CANVAS_WIDTH
+            && this.y + 16 > state.camera.y && this.y < state.camera.y + CANVAS_HEIGHT
+            && this.definition.lootType === 'empty'
+        ) {
+            state.savedState.objectFlags[this.definition.id] = true;
+            this.status = 'gone';
+            return;
+        }
+    }
+    render(context, state: GameState) {
+        if (this.status === 'hidden' || this.status === 'hiddenEnemy'
+            || this.status === 'hiddenSwitch' || this.status === 'gone'
+        ) {
+            return;
+        }
+        if (!editingState.isEditing && this.definition.lootType === 'empty') {
+            return;
+        }
+        drawFrameAt(context, this.frame, { x: this.x, y: this.y });
+        const hitbox = this.getHitbox(state);
+        /*drawFrameCenteredAt(context, coin, {
+            x: hitbox.x + hitbox.w / 2 - coin.w / 2,
+            y: hitbox.y + hitbox.h,
+            w: coin.w, h: 16
+        });*/
+        drawText(context, `${this.price}`,
+            hitbox.x + hitbox. w / 2, hitbox.y + hitbox.h + 2, {
+            textBaseline: 'top',
+            textAlign: 'center',
+            size: 16,
+        });
+    }
+}

@@ -1,7 +1,7 @@
 import { find } from 'lodash';
 
 import { Enemy } from 'app/content/enemy';
-import { BigChest, ChestObject, LootObject } from 'app/content/objects/lootObject';
+import { BigChest, ChestObject, LootObject, ShopObject } from 'app/content/objects/lootObject';
 import { CrystalSwitch } from 'app/content/objects/crystalSwitch';
 import { Door } from 'app/content/objects/door';
 import { FloorSwitch } from 'app/content/objects/floorSwitch';
@@ -56,6 +56,8 @@ export function createObjectInstance(state: GameState, object: ObjectDefinition)
         return new LootObject(state, object);
     } else if (object.type === 'bigChest') {
         return new BigChest(state, object);
+    } else if (object.type === 'shopItem') {
+        return new ShopObject(state, object);
     } else if (object.type === 'chest') {
         return new ChestObject(state, object);
     } else if (object.type === 'door' || object.type === 'stairs') {

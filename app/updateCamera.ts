@@ -5,6 +5,7 @@ import {
 } from 'app/content/areas';
 import { displayTileEditorPropertyPanel, editingState } from 'app/development/tileEditor';
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
+import { isObjectInsideTarget } from 'app/utils/index';
 
 import { GameState } from 'app/types';
 
@@ -97,22 +98,21 @@ export function updateCamera(state: GameState, speed = cameraSpeed): void {
         // This will center on the current section if it is smaller than the screen height.
         targetY = Math.round(section.y + section.h / 2 - CANVAS_HEIGHT / 2);
     }
-    let finished = !!state.nextAreaSection;
     if (state.camera.x < targetX) {
         state.camera.x = Math.min(state.camera.x + speed, targetX);
-        finished = false;
     } else if (state.camera.x > targetX) {
         state.camera.x = Math.max(state.camera.x - speed, targetX);
-        finished = false;
     }
     if (state.camera.y < targetY) {
         state.camera.y = Math.min(state.camera.y + speed, targetY);
-        finished = false;
     } else if (state.camera.y > targetY) {
         state.camera.y = Math.max(state.camera.y - speed, targetY);
-        finished = false;
     }
-    if (finished) {
+    // Switch to the next area as soon as the screen is displayed entirely in the new section.
+    // section is for the next area section, if one is present.
+    if (state.nextAreaSection && isObjectInsideTarget({
+        x: state.camera.x, y: state.camera.y, w: CANVAS_WIDTH, h: CANVAS_HEIGHT
+    }, section)) {
         switchToNextAreaSection(state);
     }
 }
