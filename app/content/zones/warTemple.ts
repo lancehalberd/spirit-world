@@ -638,6 +638,9 @@ const f0_1x1: AreaDefinition = {
         {status: "locked", id: "warTempleLock1", x: 240, y: 0, type: "door", style: "cavernUpstairs", targetZone: "warTemple", targetObjectId: "warTempleLock1", d: "up", locationCue: "War Temple 1F"},
         {status: "normal", id: "warTemple:0:1x1-door-2", x: 480, y: 112, type: "door", style: "cave", d: "right"},
         {status: "normal", id: "warTemple:0:1x1-door-3", x: 0, y: 112, type: "door", style: "cave", d: "left"},
+        {status: "normal", id: "", x: 98, y: 333, type: "decoration", w: 16, h: 16, decorationType: "fireBeastStatue"},
+        {status: "normal", id: "", x: 354, y: 336, type: "decoration", w: 16, h: 16, decorationType: "lightningBeastStatue"},
+        {status: "normal", id: "", x: 227, y: 79, type: "decoration", w: 16, h: 16, decorationType: "lightningBeastStatue"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
