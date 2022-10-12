@@ -1,6 +1,6 @@
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createCanvasAndContext } from 'app/dom';
-import { drawFrameAt } from 'app/utils/animations';
+import { createAnimation, drawFrame, drawFrameAt } from 'app/utils/animations';
 import { requireImage } from 'app/utils/images';
 import {
     AreaInstance, DrawPriority, Frame, FrameWithPattern, GameState,
@@ -67,6 +67,12 @@ function fillPattern(context: CanvasRenderingContext2D, frame: FrameWithPattern,
 
 const useWaterfallTiles = false;
 
+const [
+    iceBeastStatueImage,
+    lightningBeastStatueImage,
+    fireBeastStatueImage
+] = createAnimation('gfx/objects/spiritQuestStatue-draftSprites-58x60.png', {w: 58, h: 60}, {cols: 3}).frames;
+
 export const decorationTypes = {
     waterfall: {
         render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
@@ -123,7 +129,22 @@ export const decorationTypes = {
                 }
             context.restore();
         }
-    }
+    },
+    lightningBeastStatue: {
+        render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+            drawFrame(context, lightningBeastStatueImage, {...lightningBeastStatueImage, x: decoration.x, y: decoration.y});
+        }
+    },
+    fireBeastStatue: {
+        render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+            drawFrame(context, fireBeastStatueImage, {...fireBeastStatueImage, x: decoration.x, y: decoration.y});
+        }
+    },
+    iceBeastStatue: {
+        render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+            drawFrame(context, iceBeastStatueImage, {...iceBeastStatueImage, x: decoration.x, y: decoration.y});
+        }
+    },
 }
 
 function renderWaterfallTiles(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
