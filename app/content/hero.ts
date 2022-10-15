@@ -26,7 +26,8 @@ import {
     Direction, DrawPriority, EffectInstance, Equipment,
     FullTile, GameState, HitProperties, HitResult,
     MagicElement, ObjectInstance, ObjectStatus,
-    PassiveTool, Rect, SavedHeroData, ThrownObject, TileBehaviors, TileCoords, ZoneLocation
+    PassiveTool, Rect, SavedHeroData, ThrownObject, TileBehaviors, TileCoords,
+    WeaponUpgrades, ZoneLocation
 } from 'app/types';
 
 const throwSpeed = 6;
@@ -129,6 +130,8 @@ export class Hero implements Actor, SavedHeroData {
     // SavedHeroData fields
     maxLife: number = 4;
     money: number;
+    silverOre: number;
+    goldOre: number;
     peachQuarters: number;
     spiritTokens: number;
     activeTools: {[key in ActiveTool]: number};
@@ -136,6 +139,7 @@ export class Hero implements Actor, SavedHeroData {
     passiveTools: {[key in PassiveTool]: number};
     elements: {[key in MagicElement]: number};
     weapon: number;
+    weaponUpgrades: {[key in WeaponUpgrades]?: boolean} = {};
     leftTool?: ActiveTool;
     rightTool?: ActiveTool;
     element?: MagicElement;
@@ -174,6 +178,10 @@ export class Hero implements Actor, SavedHeroData {
             ...defaultSavedHeroData.equipment,
             ...savedHeroData?.equipment,
         };
+        this.weaponUpgrades = {
+            ...defaultSavedHeroData.weaponUpgrades,
+            ...savedHeroData?.weaponUpgrades,
+        };
     }
 
     exportSavedHeroData(): SavedHeroData {
@@ -181,9 +189,12 @@ export class Hero implements Actor, SavedHeroData {
             maxLife: this.maxLife,
             hasRevive: this.hasRevive,
             money: this.money,
+            silverOre: this.silverOre,
+            goldOre: this.goldOre,
             peachQuarters: this.peachQuarters,
             spiritTokens: this.spiritTokens,
             weapon: this.weapon,
+            weaponUpgrades: {...this.weaponUpgrades},
             leftTool: this.leftTool,
             rightTool: this.rightTool,
             element: this.element,

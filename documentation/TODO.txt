@@ -45,6 +45,22 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 {addCue: Equip the spirit cloak and press [B_TOOL] to activate it, then hold [B_TOOL] to detonate the barrier}
 Current tasks:
+    Spirit Chakram obtained in the Jade Temple after beasts are released.
+    Collectable ore that can be used at two Smiths to upgrade weapons.
+        3 silver to upgrade damage of normal Chakram
+        2 silver to upgrade range of normal Chakram
+        1 gold and 3 silver to upgrade damage of Spirit Chakram
+        1 gold and 2 silver to upgrade range of Spirit Chakram
+
+        If Spirit Chakram is fully upgraded and the player has golden mail they can use:
+        2 gold and 5 silver to double effectiveness of golden mail
+
+        This last upgrade is primarily intended to increase the total amount of gold/silver so a player can purchase all weapon upgrades without having to find all the ore in the game.
+
+        gold/silver ore is randomized, but none of these upgrades are added to the pool.
+
+
+
     Nimbus cloud
         - on overworld material takes you to: Lake, City, Village, Peaks, Ruins
         - in spirit world takes you to: Tomb shop, Fertility Temple, Sky City, Jade City
@@ -154,8 +170,6 @@ Current tasks:
 
     - Randomizer improvements
         - Add configurable goal
-        - Fix can get permanently stuck in areas:
-            - Saving in Cocoon save point is a soft lock without teleportation.
         - Fix can get stuck and require refreshing the browser:
             - Falling in Peach Cave without a weapon and killing the small bug.
         - Support `entrances` instead of `entranceIds` on randomizer logic to include logic on entrances, for example, adding logic for whether entrances to sky areas is possible from the staff tower.
@@ -166,6 +180,10 @@ Current tasks:
 
     - Work on new waterfall graphics
         - Email Jon about waterfall graphic updates.
+
+True sight Idea:
+    - Split the screen vertically and render the current world in the left half and the alternate world in the right half (or always material left + spirit right).
+    - Could be used for puzzles that involve killing enemies you can't see in the current world or puzzle elements that are too hard to figure out with spirit sight.
 
 Combat Ideas:
     - Concentric damaging rings that collapse into the player. Player must time it so that they are close enough together to dodge roll through in order to avoid damage.

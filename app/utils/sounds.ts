@@ -224,7 +224,7 @@ const musicTracks = {
     // Tracks from Leon
     // For War Temple and other dungeons
     dungeonTheme: {key: 'dungeonTheme', type: 'bgm', source: 'bgm/SpiritQuestSong_Leon1.mp3', volume: 10 },
-    idleTheme: {key: 'idleTheme', type: 'bgm', source: 'bgm/IdleMusic.mp3', volume: 5 },
+    idleTheme: {key: 'idleTheme', type: 'bgm', source: 'bgm/IdleMusic.mp3', volume: 20 },
     bossIntro: {key: 'bossIntro', type: 'bgm', source: 'bgm/SpookyThemeIntro.mp3', volume: 20, nextTrack: 'bossA' },
     bossA: {key: 'bossA', type: 'bgm', source: 'bgm/SpookyThemeA.mp3', volume: 20, nextTrack: 'bossB' },
     bossB: {key: 'bossB', type: 'bgm', source: 'bgm/SpookyThemeB.mp3', volume: 20, nextTrack: 'bossA' },

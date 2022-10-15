@@ -96,6 +96,9 @@ function getInventoryProperties() {
     for (let tool in state.hero.equipment) {
         addTool(state.hero.equipment, tool);
     }
+    for (let upgrade of ['normalDamage', 'normalRange', 'spiritDamage', 'spiritRange']) {
+        addTool(state.hero.weaponUpgrades, upgrade);
+    }
     if (row.length) {
         rows.push(row);
     }

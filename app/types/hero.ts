@@ -41,6 +41,7 @@ export type LootType = 'empty' | 'help' | 'weapon'
     | ActiveTool | Equipment | PassiveTool
     | MagicElement | Collectible | CommonLoot | DungeonLoot | 'unknown';
 
+export type WeaponUpgrades = 'normalDamage' | 'normalRange' | 'spiritDamage' | 'spiritRange';
 
 export interface LootTable {
     totalWeight: number
@@ -169,6 +170,8 @@ export interface SavedHeroData {
     maxLife: number
     hasRevive: boolean
     money: number
+    silverOre: number
+    goldOre: number
     peachQuarters: number
     spiritTokens: number
     activeTools: {[key in ActiveTool]: number}
@@ -176,6 +179,7 @@ export interface SavedHeroData {
     passiveTools: {[key in PassiveTool]: number}
     elements: {[key in MagicElement]: number}
     weapon: number
+    weaponUpgrades: {[key in WeaponUpgrades]?: boolean}
     leftTool?: ActiveTool
     rightTool?: ActiveTool
     element?: MagicElement

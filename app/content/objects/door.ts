@@ -13,7 +13,7 @@ import { boxesIntersect, isObjectInsideTarget, isPointInShortRect } from 'app/ut
 import { drawText } from 'app/utils/simpleWhiteFont';
 
 import {
-    AreaInstance, Direction, DrawPriority, Frame, GameState, HitProperties, HitResult, ObjectInstance,
+    AreaInstance, Direction, DrawPriority, Frame, GameState, Hero, HitProperties, HitResult, ObjectInstance,
     ObjectStatus, EntranceDefinition, Rect, TileBehaviors,
 } from 'app/types';
 
@@ -906,8 +906,11 @@ export class Door implements ObjectInstance {
         this.changeStatus(state, 'normal');
         return true;
     }
-    onGrab(state: GameState) {
-        if (this.definition.d === 'up' && this.status === 'closed' && this.definition.price) {
+    onGrab(state: GameState, d: Direction, hero: Hero) {
+        const primaryHero = state.hero.activeClone || state.hero;
+        if (hero.d === 'up' && hero === primaryHero &&
+            this.definition.d === 'up' && this.status === 'closed' && this.definition.price
+        ) {
             state.hero.action = null;
             if (this.definition.price > state.hero.money) {
                 showMessage(state, 'You need more Jade to open this door.');

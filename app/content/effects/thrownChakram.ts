@@ -16,14 +16,16 @@ const chakramAnimation = createAnimation('gfx/chakram1.png', chakramGeometry, {c
 
 interface Props {
     x?: number
-    y?: number,
-    vx?: number,
-    vy?: number,
-    damage?: number,
-    element?: MagicElement,
-    piercing?: boolean,
-    returnSpeed?: number,
-    source: Hero,
+    y?: number
+    vx?: number
+    vy?: number
+    // 1 = normal chakram, 2 = spirit chakram
+    level: number
+    damage?: number
+    element?: MagicElement
+    piercing?: boolean
+    returnSpeed?: number
+    source: Hero
 }
 
 export class ThrownChakram implements EffectInstance {
@@ -48,9 +50,11 @@ export class ThrownChakram implements EffectInstance {
     source: Hero;
     animationTime = 0;
     sparkles: AnimationEffect[];
+    relativeSparkles: AnimationEffect[];
     hitCooldown: number = 0;
     isPlayerAttack = true;
-    constructor({x = 0, y = 0, vx = 0, vy = 0, damage = 1, element = null, returnSpeed = 4, piercing = false, source}: Props) {
+    level: number;
+    constructor({x = 0, y = 0, vx = 0, vy = 0, damage = 1, element = null, returnSpeed = 4, piercing = false, level, source}: Props) {
         this.x = x;
         this.y = y;
         this.vx = vx;
@@ -63,8 +67,10 @@ export class ThrownChakram implements EffectInstance {
         this.h = chakramGeometry.content.h;
         this.outFrames = 12;
         this.source = source;
+        this.relativeSparkles = [];
         this.sparkles = [];
         this.element = element;
+        this.level = level;
     }
     update(state: GameState) {
         // Chakram returns to the hero if the clone it was thrown from no longer exists.
@@ -91,10 +97,28 @@ export class ThrownChakram implements EffectInstance {
         for (const sparkle of this.sparkles) {
             sparkle.update(state);
         }
+
+        if (this.level >= 2 && this.relativeSparkles.length < 3) {
+            this.relativeSparkles.push(makeSparkleAnimation(state, this, {
+                velocity: {x: 0, y: 0, z: 0.3},
+            }));
+        }
+        this.relativeSparkles = this.relativeSparkles.filter(s => !s.done);
+        for (const relativeSparkle of this.relativeSparkles) {
+            // double the speed these sparkles run at.
+            relativeSparkle.update(state);
+            relativeSparkle.update(state);
+        }
+
+
         this.animationTime += FRAME_LENGTH;
         if (this.outFrames > 0) {
             this.x += this.vx;
             this.y += this.vy;
+            for (const relativeSparkle of this.relativeSparkles) {
+                relativeSparkle.x += this.vx;
+                relativeSparkle.y += this.vy;
+            }
             this.outFrames--;
             const { section } = getAreaSize(state);
             if (this.x <= section.x || this.y <= section.y
@@ -110,6 +134,10 @@ export class ThrownChakram implements EffectInstance {
             this.vy = this.returnSpeed * dy / m;
             this.x += this.vx;
             this.y += this.vy;
+            for (const relativeSparkle of this.relativeSparkles) {
+                relativeSparkle.x += this.vx;
+                relativeSparkle.y += this.vy;
+            }
             if (isPointInShortRect(this.source.x + this.source.w / 2, this.source.y + this.source.h / 2, this)) {
                 removeEffectFromArea(state, this);
                 return;
@@ -177,6 +205,9 @@ export class ThrownChakram implements EffectInstance {
         for (const sparkle of this.sparkles) {
             sparkle.render(context, state);
         }
+        for (const sparkle of this.relativeSparkles) {
+            sparkle.render(context, state);
+        }
     }
 }
 
@@ -200,41 +231,71 @@ export class HeldChakram implements EffectInstance {
     updateDuringTransition = true;
     sparkles: AnimationEffect[];
     isPlayerAttack = true;
-    constructor({x = 0, y = 0, vx = 0, vy = 0, damage = 1, source}: Props) {
+    level: number;
+    constructor({x = 0, y = 0, vx = 0, vy = 0, source, level}: Props) {
         this.vx = vx;
         this.vy = vy;
-        this.damage = damage;
+        this.damage = 1;
         this.w = chakramGeometry.content.w;
         this.h = chakramGeometry.content.h;
         this.hero = source;
         this.updatePosition();
         this.sparkles = [];
+        this.level = level;
+        // The Spirit Chakram deals two damage when held if it has been upgraded.
+        if (this.level > 1 && this.hero.weaponUpgrades.spiritDamage) {
+            this.damage++;
+        }
     }
     throw(state: GameState) {
-        let speed = 3;
         const { chargeLevel, element } = getChargeLevelAndElement(state, this.hero);
+        let throwDamage = this.level;
+        let throwSpeed = 1 + 2 * this.level;
+        if (this.level === 1) {
+            if (this.hero.weaponUpgrades.normalDamage) {
+                throwDamage++;
+            }
+            if (this.hero.weaponUpgrades.normalRange) {
+                throwSpeed += 2;
+            }
+        } else {
+            if (this.hero.weaponUpgrades.spiritDamage) {
+                throwDamage += 2;
+            }
+            if (this.hero.weaponUpgrades.spiritRange) {
+                throwSpeed += 3;
+            }
+        }
         if (chargeLevel >= 1) {
-            speed = 12;
+            throwSpeed = 12;
+            throwDamage += 2;
             state.hero.magic -= 10;
             if (state.hero.element) {
                 state.hero.magic -= 10;
             }
         } else if (state.hero.passiveTools.charge >= 1) {
             // Chakram reaches max speed twice as fast once you have the charge tool.
-            speed = Math.min(6, speed + this.animationTime / 100);
+            if (this.animationTime >= 300) {
+                throwDamage += this.level;
+                throwSpeed += 3;
+            }
         } else {
-            speed = Math.min(6, speed + this.animationTime / 200);
+            if (this.animationTime >= 600) {
+                throwDamage += this.level;
+                throwSpeed += 3;
+            }
         }
         const chakram = new ThrownChakram({
             x: this.hero.x + 3,
             y: this.hero.y,
-            vx: speed * this.vx,
-            vy: speed * this.vy,
-            returnSpeed: 4,
-            damage: this.damage * Math.floor(1 + speed / 6),
+            vx: throwSpeed * this.vx,
+            vy: throwSpeed * this.vy,
+            returnSpeed: Math.max(4, 2 * throwSpeed / 3),
+            damage: throwDamage,
             element,
             source: this.hero,
-            piercing: speed === 12,
+            piercing: throwSpeed === 12,
+            level: this.level,
         });
         if (chakram.speed >= 12) {
             playSound('strongChakram');

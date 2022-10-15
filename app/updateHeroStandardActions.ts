@@ -48,7 +48,8 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         || hero.action === 'throwing' || hero.action === 'grabbing' || isThrowingCloak;
     const maxCloudBootsZ = hero.groundHeight + MAX_FLOAT_HEIGHT;
     const isActionBlocked =
-        isMovementBlocked || hero.swimming || hero.pickUpTile || hero.pickUpObject || hero.action === 'attack' ||
+        isMovementBlocked || hero.swimming || hero.pickUpTile || hero.pickUpObject ||
+        (hero.action === 'attack' && (hero.weapon < 2 || hero.actionFrame < 6)) ||
         hero.z > Math.max(FALLING_HEIGHT, minZ) || hero.action === 'climbing';
     const canCharge = !hero.isAstralProjection && isPlayerControlled && !isActionBlocked;
     const canAttack = canCharge && hero.weapon > 0 && !hero.chargingLeftTool && !hero.chargingRightTool;
@@ -486,7 +487,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     if (canAttack
         && (wasGameKeyPressed(state, GAME_KEY.WEAPON) || (hero.attackBufferTime > state.fieldTime - 200))
     ) {
-        const thrownChakrams = hero.area.effects.filter(o => o instanceof ThrownChakram);
+        const thrownChakrams = hero.area.effects.filter(o => o instanceof ThrownChakram) as ThrownChakram[];
         const usedChakrams = thrownChakrams.length + (heldChakram ? 1 : 0);
         if (state.hero.weapon - usedChakrams > 0) {
             hero.action = 'charging';
@@ -500,6 +501,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 vx: directionMap[direction][0],
                 vy: directionMap[direction][1],
                 source: hero,
+                level: Math.min(state.hero.weapon, thrownChakrams[0]?.level === 2 ? 1 : 2),
             });
             addEffectToArea(state, hero.area, chakram);
             return;

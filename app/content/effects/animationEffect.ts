@@ -196,7 +196,7 @@ interface SparkleProps {
     delay?: number
     element?: MagicElement
     target?: ObjectInstance | EffectInstance
-    velocity?: {x: number, y: number}
+    velocity?: {x: number, y: number, z?: number}
     z?: number
 }
 
@@ -230,6 +230,9 @@ export function makeSparkleAnimation(
         x: hitbox.x + Math.random() * hitbox.w - animation.frames[0].w / 2,
         y: hitbox.y + Math.random() * hitbox.h - animation.frames[0].h / 2,
         z: (hitbox.z || 0) + Math.random() * (hitbox.zd || 0)
+    }
+    if (velocity?.z) {
+        animationProps.vz = velocity.z;
     }
     if (element === 'fire') {
         animationProps.vz = 0.3 + Math.random() / 2;

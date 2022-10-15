@@ -122,9 +122,12 @@ function getDefaultSavedHeroData(): SavedHeroData {
         maxLife: 4,
         hasRevive: false,
         money: 0,
+        silverOre: 0,
+        goldOre: 0,
         peachQuarters: 0,
         spiritTokens: 0,
         weapon: 0,
+        weaponUpgrades: {},
         activeTools: {
             bow: 0,
             staff: 0,
