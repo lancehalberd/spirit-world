@@ -46,7 +46,7 @@ export const tombNodes: LogicNode[] = [
             {nodeId: 'tombMiddleHallway'},
             {nodeId: 'tombBeforeBigKey', doorId: 'tombLock2'},
             {nodeId: 'tombBigKey', doorId: 'tombBigLock3'},
-            {nodeId: 'tombPeachPiece', logic: andLogic(hasMediumRange, orLogic(canCross2Gaps, hasGloves))},
+            {nodeId: 'tombSilverRoom', logic: andLogic(hasMediumRange, orLogic(canCross2Gaps, hasGloves))},
         ],
         entranceIds: ['tombBasementEntrance'],
         exits: [{ objectId: 'tombBasementEntrance'}],
@@ -68,8 +68,8 @@ export const tombNodes: LogicNode[] = [
     },
     {
         zoneId,
-        nodeId: 'tombPeachPiece',
-        checks: [{objectId: 'tomb:1:0x0-peachOfImmortalityPiece-0', logic: hasWeapon}],
+        nodeId: 'tombSilverRoom',
+        checks: [{objectId: 'tombSilver', logic: hasWeapon}],
         paths: [
             {nodeId: 'tombBigChest', logic: orLogic(canCross2Gaps, hasGloves)},
         ],

@@ -15,6 +15,7 @@ export const overworldNodes: LogicNode[] = [
         nodeId: 'overworldMain',
         complexNpcs: [
             {dialogueKey: 'streetVendor', optionKey: 'purchase1'},
+            {dialogueKey: 'streetVendor', optionKey: 'purchase2', logic: { requiredFlags: ['$maxLife:7'] }},
         ],
         paths: [
             { nodeId: 'overworldMountain', logic: hasGloves },
@@ -101,6 +102,9 @@ export const overworldNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'mainSpiritWorld',
+        checks: [
+            { objectId: 'spiritChakram' },
+        ],
         paths: [
             { nodeId: 'spiritWorldMountain', logic: hasGloves },
             { nodeId: 'westSpiritWorld', logic: hasCloudBoots },
@@ -114,6 +118,7 @@ export const overworldNodes: LogicNode[] = [
         zoneId,
         nodeId: 'westSpiritWorld',
         checks: [
+            { objectId: 'spiritShopSilver' },
             { objectId: 'spiritShopPeach' },
             { objectId: 'spiritShopLightningBlessing' },
         ],

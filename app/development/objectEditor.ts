@@ -196,6 +196,8 @@ export function getLootTypes(): LootType[] {
             'peachOfImmortality',
             'peachOfImmortalityPiece',
             'money',
+            'silverOre',
+            'goldOre',
             'weapon',
             'bigKey',
             'smallKey',

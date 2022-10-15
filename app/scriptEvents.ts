@@ -11,7 +11,7 @@ import { getLootTypes } from 'app/development/objectEditor';
 import { GAME_KEY } from 'app/gameConstants';
 
 import { wasConfirmKeyPressed, wasGameKeyPressed } from 'app/keyCommands';
-import { parseMessage } from 'app/render/renderMessage';
+import { parseMessage, showMessage } from 'app/render/renderMessage';
 import { playSound } from 'app/musicController';
 import { saveGame } from 'app/state';
 
@@ -79,6 +79,96 @@ export function parseEventScript(state: GameState, script: string): ScriptEvent[
                 type: 'runDialogueScript',
                 npcKey, scriptKey,
             });
+            continue;
+        }
+        if (actionToken === 'craftNormalRange') {
+            if (state.hero.silverOre < 2) {
+                showMessage(state, `I'll need at least 2 Silver Ore to upgrade your range.`);
+                continue;
+            }
+            if (state.hero.money < 100) {
+                events.push({
+                    type: 'runDialogueScript',
+                    npcKey: 'citySmith',
+                    scriptKey:'fail'
+                });
+                continue;
+            }
+            state.hero.silverOre -= 2;
+            state.hero.money -= 100;
+            state.hero.weaponUpgrades.normalRange = true;
+            showMessage(state, `Excellent! Your Chakram is faster than ever!`);
+            saveGame();
+            continue;
+        }
+        if (actionToken === 'craftNormalDamage') {
+            if (state.hero.silverOre < 3) {
+                showMessage(state, `I'll need at least 3 Silver Ore to upgrade your damage.`);
+                continue;
+            }
+            if (state.hero.money < 100) {
+                events.push({
+                    type: 'runDialogueScript',
+                    npcKey: 'citySmith',
+                    scriptKey:'fail'
+                });
+                continue;
+            }
+            state.hero.silverOre -= 3;
+            state.hero.money -= 100;
+            state.hero.weaponUpgrades.normalDamage = true;
+            showMessage(state, `Excellent! Your Chakram is more powerful than ever!`);
+            saveGame();
+            continue;
+        }
+        if (actionToken === 'craftSpiritRange') {
+            if (state.hero.goldOre < 1) {
+                showMessage(state, `I'll need some Gold Ore to upgrade your range.`);
+                continue;
+            }
+            if (state.hero.silverOre < 2) {
+                showMessage(state, `I'll need at least 2 Silver Ore to upgrade your range.`);
+                continue;
+            }
+            if (state.hero.money < 200) {
+                events.push({
+                    type: 'runDialogueScript',
+                    npcKey: 'forgeSmith',
+                    scriptKey:'fail'
+                });
+                continue;
+            }
+            state.hero.goldOre -= 1;
+            state.hero.silverOre -= 2;
+            state.hero.money -= 200;
+            state.hero.weaponUpgrades.normalRange = true;
+            showMessage(state, `Excellent! Your Chakram is faster than ever!`);
+            saveGame();
+            continue;
+        }
+        if (actionToken === 'craftSpiritDamage') {
+            if (state.hero.goldOre < 1) {
+                showMessage(state, `I'll need some Gold Ore to upgrade your range.`);
+                continue;
+            }
+            if (state.hero.silverOre < 3) {
+                showMessage(state, `I'll need at least 3 Silver Ore to upgrade your damage.`);
+                continue;
+            }
+            if (state.hero.money < 200) {
+                events.push({
+                    type: 'runDialogueScript',
+                    npcKey: 'forgeSmith',
+                    scriptKey:'fail'
+                });
+                continue;
+            }
+            state.hero.goldOre -= 1;
+            state.hero.silverOre -= 3;
+            state.hero.money -= 200;
+            state.hero.weaponUpgrades.normalDamage = true;
+            showMessage(state, `Excellent! Your Chakram is more powerful than ever!`);
+            saveGame();
             continue;
         }
         if (actionToken === 'rest') {

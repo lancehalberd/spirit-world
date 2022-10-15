@@ -126,9 +126,33 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
     }
 
     // Weapon isn't currently part of the selectable menu rows.
-    if (state.hero.weapon) {
+    if (state.hero.weapon === 1) {
         const frame = getLootFrame(state, { lootType: 'weapon', lootLevel: state.hero.weapon });
         drawFrameCenteredAt(context, frame, {x: r.x + 155, y: r.y, w: frameSize, h: frameSize});
+    } else if (state.hero.weapon >= 2) {
+        const frame = getLootFrame(state, { lootType: 'weapon', lootLevel: state.hero.weapon });
+        drawFrameCenteredAt(context, frame, {x: r.x + 150, y: r.y, w: frameSize, h: frameSize});
+        drawFrameCenteredAt(context, frame, {x: r.x + 155, y: r.y, w: frameSize, h: frameSize});
+    }
+    if (state.hero.silverOre) {
+        const frame = getLootFrame(state, {lootType: 'silverOre'});
+        const x = r.x + 140, y = r.y + 26;
+        drawFrame(context, frame, {x, y, w: frameSize, h: frameSize});
+        drawText(context, `${state.hero.silverOre}`, x + 24, y + frameSize / 2, {
+            textBaseline: 'middle',
+            textAlign: 'left',
+            size: 16,
+        });
+    }
+    if (state.hero.goldOre) {
+        const frame = getLootFrame(state, {lootType: 'goldOre'});
+        const x = r.x + 140, y = r.y + 50;
+        drawFrame(context, frame, {x, y, w: frameSize, h: frameSize});
+        drawText(context, `${state.hero.goldOre}`, x + 24, y + frameSize / 2, {
+            textBaseline: 'middle',
+            textAlign: 'left',
+            size: 16,
+        });
     }
 
     let peachFrame = fullPeach;

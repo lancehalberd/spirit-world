@@ -2219,7 +2219,7 @@ const f1_1x0: AreaDefinition = {
         {id: "peachCave:1:0x1-door-3", linked: false, spirit: false, status: "normal", x: 112, y: 256, type: "door", targetObjectId: "peachCave:0:0x0-door-0", d: "up"},
         {id: "peachCaveUpperCrackedDoor", linked: false, spirit: false, status: "cracked", x: 224, y: 96, type: "door", targetObjectId: "peachCave:0:0x0-door-0", d: "right", style: "cave"},
         {status: "normal", id: "pitInstructions", x: 336, y: 384, type: "narration", message: "It looks like jumping down this hole is my only option.\n{|}Here we go again...\n{|}(Walk into the large hole to drop down to somewhere new)", delay: 0, w: 80, h: 80},
-        {status: "normal", id: "peachCaveUpperPeachPiece", x: 342, y: 74, type: "loot", lootType: "peachOfImmortalityPiece", lootLevel: 1},
+        {status: "normal", id: "peachCaveSilver", x: 342, y: 74, type: "loot", lootType: "silverOre", lootLevel: 1},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},

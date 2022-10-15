@@ -120,7 +120,7 @@ export const warTempleNodes: LogicNode[] = [
         zoneId,
         nodeId: 'warTempleMoneyMarker',
         checks: [
-            {objectId: 'warTemple:1:0x0-money-0'}
+            {objectId: 'warTempleSilver'}
         ],
         paths: [
             {nodeId: 'warTempleLock1'},

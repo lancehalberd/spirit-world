@@ -23,8 +23,18 @@ export function isItemLogicTrue(state: GameState, itemFlag: string): boolean {
     if (itemFlag === 'weapon') {
         return state.hero.weapon >= level;
     }
+    if (itemFlag === 'maxLife') {
+        return state.hero.maxLife >= level;
+    }
+    if (itemFlag === 'silverOre') {
+        return state.hero.silverOre >= level;
+    }
+    if (itemFlag === 'goldOre') {
+        return state.hero.goldOre >= level;
+    }
     return state.hero.activeTools[itemFlag] >= level || state.hero.passiveTools[itemFlag] >= level
-        || state.hero.elements[itemFlag] >= level || state.hero.equipment[itemFlag] >= level;
+        || state.hero.elements[itemFlag] >= level || state.hero.equipment[itemFlag] >= level
+        || state.hero.weaponUpgrades[itemFlag];
 }
 
 export function isLogicValid(state: GameState, logic: LogicCheck, invertLogic = false): boolean {

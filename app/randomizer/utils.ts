@@ -287,7 +287,12 @@ function getLootObjects(nodes: LogicNode[], state: GameState = null): LootWithLo
             const lootToken = script.split('{item:')[1].split('}')[0];
             const [lootType, amountOrLevel] = lootToken.split('=');
             lootObjects.push({
-                lootObject: {type: 'dialogueLoot', lootType: lootType, amount: parseInt(amountOrLevel, 10) || 0} as AnyLootDefinition,
+                lootObject: {
+                    id: `${dialogueKey}:${optionKey}`,
+                    type: 'dialogueLoot',
+                    lootType: lootType,
+                    amount: parseInt(amountOrLevel, 10) || 0
+                } as AnyLootDefinition,
                 dialogueKey,
                 optionKey
             });
@@ -771,6 +776,12 @@ function getLootName(lootType: LootType, state: GameState) {
         }
         return 'Spirit Sight';
     }
+    if (lootType === 'weapon') {
+        if (state.hero.weapon) {
+            return 'Spirit Chakram';
+        }
+        return 'Chakram';
+    }
     if (lootType === 'cloak') {
         return state.hero.activeTools.cloak ? 'Invisibility Cloak' : 'Spirit Cloak';
     }
@@ -805,7 +816,7 @@ function collectAllLootForSolution(allNodes: LogicNode[], startingNodes: LogicNo
             continue;
         }
         if (check.lootObject.lootType !== 'money' && check.lootObject.lootType !== 'empty') {
-            if (!state.hero.passiveTools.catEyes || (
+            if (state.hero.maxLife < 7 || (
                 check.lootObject.lootType !== 'peachOfImmortality'
                 && check.lootObject.lootType !== 'peachOfImmortalityPiece'
             )) {
@@ -813,7 +824,7 @@ function collectAllLootForSolution(allNodes: LogicNode[], startingNodes: LogicNo
                 if (check.location) {
                     console.log(`Get ${getLootName(check.lootObject.lootType, state)} at ${check.location.zoneKey}:${check.lootObject.id}`);
                 } else {
-                    console.log(`Get ${getLootName(check.lootObject.lootType, state)} frome ${check.dialogueKey}:${check.optionKey}`);
+                    console.log(`Get ${getLootName(check.lootObject.lootType, state)} from ${check.dialogueKey}:${check.optionKey}`);
                 }
             }
         }
@@ -860,7 +871,7 @@ export function applyLootAssignments(assignments: LootAssignment[]): void {
         if (assignment.target.dialogueKey) {
             const {dialogueKey, optionKey} = assignment.target;
             const script = dialogueHash[dialogueKey].mappedOptions[optionKey];
-            // console.log('Changing ', script, 'to');
+            //console.log('Changing ', script, 'to');
             const [beginning, middle] = script.split('{item:');
             const end = middle.substring(middle.indexOf('}') + 1);
             const number = assignment.lootAmount || 0;//assignment.lootLevel;
@@ -876,11 +887,11 @@ export function applyLootAssignments(assignments: LootAssignment[]): void {
             } else {
                 newScript = `${beginning}${flagScript}{item:${assignment.lootType}}${end}`;
             }
-            // console.log(newScript);
+            //console.log(newScript);
             dialogueHash[dialogueKey].mappedOptions[optionKey] = newScript;
         } else {
             const zoneKey = assignment.target.location.zoneKey;
-            // console.log(assignment.source.lootObject.id, ' => ', assignment.target.lootObject.id);
+            //console.log(assignment.source.lootObject.id, ' => ', assignment.target.lootObject.id);
             if (assignment.target.lootObject.type === 'dialogueLoot') {
                 const {object} = findLootById(zones[zoneKey], assignment.target.lootObject.id);
                 const npc = object as NPCDefinition;

@@ -53,7 +53,7 @@ export const peachCaveNodes: LogicNode[] = [
         nodeId: 'peachCave:pitB',
         paths: [
             // Need mitts to lift rocks at the top of the stairs.
-            { nodeId: 'peachCave:upperPeachPiece', logic: hasGloves },
+            { nodeId: 'peachCave:upperSilver', logic: hasGloves },
             { nodeId: 'peachCave:boss' },
         ],
         exits: [{ objectId: 'peachCave:pitB' }],
@@ -82,14 +82,14 @@ export const peachCaveNodes: LogicNode[] = [
         nodeId: 'peachCave:pitA',
         paths: [
             { nodeId: 'peachCaveTopEntrance', logic: hasCatEyes },
-            { nodeId: 'peachCave:upperPeachPiece', logic: hasClone },
+            { nodeId: 'peachCave:upperSilver', logic: hasClone },
         ],
         exits: [{ objectId: 'peachCave:pitA' }],
     },
     {
         zoneId,
-        nodeId: 'peachCave:upperPeachPiece',
-        checks: [{ objectId: 'peachCaveUpperPeachPiece' }],
+        nodeId: 'peachCave:upperSilver',
+        checks: [{ objectId: 'peachCaveSilver' }],
         paths: [
             // Blow up the crack to the west to reach pitA
             { nodeId: 'peachCave:pitA', logic: hasClone },

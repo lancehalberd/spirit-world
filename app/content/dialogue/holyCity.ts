@@ -58,10 +58,23 @@ dialogueHash.streetVendor = {
     mappedOptions: {
         attempt1: `{buy:100:streetVendor.purchase1:streetVendor.fail`,
         purchase1: `You won't regret this. {item:peachOfImmortalityPiece} {flag:vendor1}`,
+        attempt2: `{buy:150:streetVendor.purchase2:streetVendor.fail`,
+        purchase2: `You're getting a great deal. {item:silverOre} {flag:vendor2}`,
         fail: 'Come back with more Jade.',
         no: 'Your loss friend.'
     },
     options: [
+        {
+            logicCheck: {
+                requiredFlags: ['vendor1', '$maxLife:7'],
+                excludedFlags: ['vendor2'],
+            },
+            text: [
+                `I found something rare while exploring, only 150 Jade...
+                {choice:Buy for 150 Jade?|Yes:streetVendor.attempt2|No:streetVendor.no}`
+            ],
+
+        },
         {
             logicCheck: {
                 requiredFlags: [],

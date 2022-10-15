@@ -76,6 +76,11 @@ export function getLootName(state: GameState, lootType: LootType, lootLevel?: nu
                 return 'Astral Projection';
             }
             return 'Teleportation';
+        case 'weapon':
+            if (lootLevel === 1) {
+                return 'Chakram';
+            }
+            return 'Spirit Chakram';
         case 'help': return 'Hint';
         case 'spiritSight': return 'Spirit Sight';
         case 'astralProjection': return 'Summoner\'s Circlet';
@@ -96,7 +101,8 @@ export function getLootName(state: GameState, lootType: LootType, lootLevel?: nu
         case 'fireBlessing': return 'Cooling Spirit';
         case 'waterBlessing': return 'Water Blessing';
         case 'lightningBlessing': return 'Ancient Badge';
-        case 'weapon': return 'Chakram';
+        case 'silverOre': return 'Silver Ore';
+        case 'goldOre': return 'Gold Ore';
     }
     return '?'+lootType;
 }
@@ -140,6 +146,8 @@ export function getLootGetMessage(state: GameState, lootType: LootType, lootLeve
         case 'waterBlessing': return 'You have received the Blessing of Water!';
         case 'lightningBlessing': return `You have obtained the ${lootName}!`;
         case 'money': return `You found ${lootAmount || 1} Jade!`;
+        case 'silverOre':
+        case 'goldOre': return `You found some ${lootName}`;
     }
     return defaultMessage;
 }
@@ -166,7 +174,10 @@ export function getLootHelpMessage(state: GameState, lootType: LootType, lootLev
                 return `Press [B_WEAPON] to throw the Chakram.
                     {|}Use it to defeat enemies or destroy some obstacles.`;
             }
-            return;
+            return `The Spirit Chakram has improved range and damage.
+                {|}But don't throw away your old Chakram just yet!
+                {|}After throwing the Spirit Chakram, quickly press [B_WEAPON] again
+                to throw your normal Chakram at the same time!`;
         case 'bow':
             if (state.hero.activeTools.bow === 1) {
                 return 'Press [B_TOOL] to shoot a magic arrow.'
@@ -251,6 +262,10 @@ export function getLootHelpMessage(state: GameState, lootType: LootType, lootLev
                 + '{|}Select the Nimbus Cloud and press [B_WEAPON] to use it.'
                 + '{|}Use the Nimbus Cloud inside to return to the entrance.'
                 + '{|}Use the Nimbus Cloud outside to instantly travel the world.';
+        case 'silverOre':
+            return 'Maybe someone in the city can use this to make something.';
+        case 'goldOre':
+            return 'There must be someone in the world who can use this ore.';
     }
     return '';
 }
@@ -341,6 +356,16 @@ function createLootFrame(color: string, letter: string): Frame {
     return {image: toolCanvas, x: 0, y: 0, w: toolCanvas.width, h: toolCanvas.height};
 }
 
+// BizmasterStudios
+// https://opengameart.org/users/bizmasterstudios
+// https://opengameart.org/content/rpg-crafting-material-icons
+// https://creativecommons.org/licenses/by/4.0/
+export const [
+    silverOre, goldOre
+] = createAnimation('gfx/hud/nails.png',
+    {w: 32, h: 32, content: {x: 8, y: 8, w: 16, h: 16}}, {x:2, y: 2, cols: 2}
+).frames;
+
 export const [
     /*fullPeachFrame*/, goldPeachFrame,
     keyOutlineFrame, bigKeyOutlineFrame,
@@ -389,6 +414,8 @@ const [
 
 const lootFrames = {
     smallKey: keyOutlineFrame,
+    silverOre,
+    goldOre,
     fire: fireElement,
     ice: iceElement,
     lightning: lightningElement,
@@ -569,6 +596,10 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: An
             state.hero.equipment[loot.lootType] = applyUpgrade(state.hero.equipment[loot.lootType], loot);
         } else if (loot.lootType === 'money') {
             state.hero.money += (loot.lootAmount || 1);
+        } else if (loot.lootType === 'silverOre') {
+            state.hero.silverOre++;
+        } else if (loot.lootType === 'goldOre') {
+            state.hero.goldOre++;
         } else {
             console.error('Unhandled loot type:', loot.lootType);
             // throw new Error('Unhandled loot type: ' + loot.lootType);

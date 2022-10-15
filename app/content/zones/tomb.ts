@@ -828,7 +828,7 @@ const f1_0x0: AreaDefinition = {
         {id: "tombKey2", linked: false, spirit: false, status: "hiddenSwitch", x: 336, y: 80, type: "chest", lootType: "smallKey", lootLevel: 0, lootAmount: 1},
         {status: "normal", linked: false, spirit: false, x: 48, y: 144, type: "enemy", style: "cave", d: "down", enemyType: "beetleHorned", id: "tomb:1:0x0-beetleHorned-0"},
         {status: "normal", linked: false, spirit: false, x: 192, y: 144, type: "enemy", style: "cave", d: "down", enemyType: "beetleHorned", id: "tomb:1:0x0-beetleHorned-1"},
-        {status: "hiddenEnemy", linked: false, spirit: false, x: 112, y: 64, type: "chest", style: "cave", d: "down", lootType: "peachOfImmortalityPiece", id: "tomb:1:0x0-peachOfImmortalityPiece-0"},
+        {status: "hiddenEnemy", linked: false, spirit: false, x: 112, y: 64, type: "chest", style: "cave", d: "down", lootType: "silverOre", id: "tombSilver"},
         {status: "normal", linked: false, spirit: false, x: 400, y: 48, type: "floorSwitch", style: "cave", d: "down", id: "", targetObjectId: "tombSwitchDoor", toggleOnRelease: true},
         {status: "normal", linked: false, spirit: false, x: 352, y: 176, type: "pushPull", style: "cave", d: "down", id: "tomb:1:0x0-pushPull-0"},
         {status: "normal", linked: false, spirit: false, x: 432, y: 48, type: "pushPull", style: "cave", d: "down", id: "tomb:1:0x0-pushPull-1"},

@@ -45,22 +45,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 {addCue: Equip the spirit cloak and press [B_TOOL] to activate it, then hold [B_TOOL] to detonate the barrier}
 Current tasks:
-    Spirit Chakram obtained in the Jade Temple after beasts are released.
-    Collectable ore that can be used at two Smiths to upgrade weapons.
-        3 silver to upgrade damage of normal Chakram
-        2 silver to upgrade range of normal Chakram
-        1 gold and 3 silver to upgrade damage of Spirit Chakram
-        1 gold and 2 silver to upgrade range of Spirit Chakram
-
-        If Spirit Chakram is fully upgraded and the player has golden mail they can use:
-        2 gold and 5 silver to double effectiveness of golden mail
-
-        This last upgrade is primarily intended to increase the total amount of gold/silver so a player can purchase all weapon upgrades without having to find all the ore in the game.
-
-        gold/silver ore is randomized, but none of these upgrades are added to the pool.
-
-
-
     Nimbus cloud
         - on overworld material takes you to: Lake, City, Village, Peaks, Ruins
         - in spirit world takes you to: Tomb shop, Fertility Temple, Sky City, Jade City
@@ -68,8 +52,12 @@ Current tasks:
 
     Add save statues:
         Outside Crater/Forge
-        In jade city
         Outside waterfall cave
+
+
+    Gold Armor Upgrade
+        If Spirit Chakram is fully upgraded and the player has golden mail they can use:
+        500 Jade + 2 gold and 5 silver to double effectiveness of golden mail
 
     Editor Improvements
         - Track which zones have been changed but not exported.

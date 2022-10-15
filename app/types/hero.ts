@@ -29,7 +29,7 @@ export type PassiveTool = 'gloves'
     | 'ironSkin' | 'goldMail' | 'phoenixCrown'
     | 'waterBlessing' | 'fireBlessing' | 'lightningBlessing';
 export type MagicElement = 'fire' | 'ice' | 'lightning';
-export type Collectible = 'peachOfImmortality' | 'peachOfImmortalityPiece';
+export type Collectible = 'peachOfImmortality' | 'peachOfImmortalityPiece' | 'silverOre' | 'goldOre';
 export type CommonLoot = 'money' | 'peach';
 export type DungeonLoot = 'smallKey' | 'bigKey' | 'map';
 

@@ -67,6 +67,28 @@ function getInventoryProperties() {
             return state.hero.magicRegen;
         },
     }]);
+    rows.push([{
+        name: 'money',
+        value: state.hero.money || 0,
+        onChange(money: number) {
+            state.hero.money = money >= 0 ? money : 0;
+            return state.hero.money;
+        },
+    }, {
+        name: 'silver',
+        value: state.hero.silverOre || 0,
+        onChange(silverOre: number) {
+            state.hero.silverOre = silverOre >= 0 ? silverOre : 0;
+            return state.hero.silverOre;
+        },
+    }, {
+        name: 'gold',
+        value: state.hero.goldOre || 0,
+        onChange(goldOre: number) {
+            state.hero.goldOre = goldOre >= 0 ? goldOre : 0;
+            return state.hero.goldOre;
+        },
+    }]);
     let row: PropertyRow = [];
     function addTool(object, key) {
         row.push({
@@ -97,7 +119,17 @@ function getInventoryProperties() {
         addTool(state.hero.equipment, tool);
     }
     for (let upgrade of ['normalDamage', 'normalRange', 'spiritDamage', 'spiritRange']) {
-        addTool(state.hero.weaponUpgrades, upgrade);
+        row.push({
+            name: upgrade,
+            value: state.hero.weaponUpgrades[upgrade] || false,
+            onChange(value: boolean) {
+                state.hero.weaponUpgrades[upgrade] = value;
+            },
+        });
+        if (row.length === 2) {
+            rows.push(row);
+            row = [];
+        }
     }
     if (row.length) {
         rows.push(row);
