@@ -11,16 +11,16 @@ import { getLootTypes } from 'app/development/objectEditor';
 import { GAME_KEY } from 'app/gameConstants';
 
 import { wasConfirmKeyPressed, wasGameKeyPressed } from 'app/keyCommands';
-import { parseMessage, showMessage } from 'app/render/renderMessage';
+import { parseMessage, textScriptToString } from 'app/render/renderMessage';
 import { playSound } from 'app/musicController';
 import { saveGame } from 'app/state';
 
 import {
-    ActiveScriptEvent, Frame, GameState, LootType, ScriptEvent,
+    ActiveScriptEvent, Frame, GameState, LootType, ScriptEvent, TextScript
 } from 'app/types';
 
 // Clears all current script events and queues up events parsed from the new script.
-export function setScript(state: GameState, script: string): void {
+export function setScript(state: GameState, script: TextScript): void {
     // console.log('setScript', script);
     state.scriptEvents.queue = parseEventScript(state, script);
     // console.log('setScript', [...state.scriptEvents.queue]);
@@ -28,7 +28,7 @@ export function setScript(state: GameState, script: string): void {
 }
 
 // Adds events parsed from the script to the front of the event queue.
-export function prependScript(state: GameState, script: string): void {
+export function prependScript(state: GameState, script: TextScript): void {
     state.scriptEvents.queue = [
         ...parseEventScript(state, script),
         ...state.scriptEvents.queue,
@@ -36,7 +36,7 @@ export function prependScript(state: GameState, script: string): void {
     // console.log('prependScript', [...state.scriptEvents.queue]);
 }
 
-export function parseScriptText(state: GameState, text: string, duration: number = 0, blockFieldUpdates = true): ScriptEvent[] {
+export function parseScriptText(state: GameState, text: TextScript, duration: number = 0, blockFieldUpdates = true): ScriptEvent[] {
     const events: ScriptEvent[] = [];
     const pages = parseMessage(state, text) as Frame[][][];
     for (const page of pages) {
@@ -54,10 +54,10 @@ export function parseScriptText(state: GameState, text: string, duration: number
     return events;
 }
 
-export function parseEventScript(state: GameState, script: string): ScriptEvent[] {
+export function parseEventScript(state: GameState, script: TextScript): ScriptEvent[] {
     let events: ScriptEvent[] = [];
     // Script is a bunch of text broken up by actions marked by brackets like `{weapon}`
-    const textAndActions = script.split(/[{}]/);
+    const textAndActions = textScriptToString(state, script).split(/[{}]/);
     while (textAndActions.length) {
         const text = textAndActions.shift();
         if (text) {
@@ -79,96 +79,6 @@ export function parseEventScript(state: GameState, script: string): ScriptEvent[
                 type: 'runDialogueScript',
                 npcKey, scriptKey,
             });
-            continue;
-        }
-        if (actionToken === 'craftNormalRange') {
-            if (state.hero.silverOre < 2) {
-                showMessage(state, `I'll need at least 2 Silver Ore to upgrade your range.`);
-                continue;
-            }
-            if (state.hero.money < 100) {
-                events.push({
-                    type: 'runDialogueScript',
-                    npcKey: 'citySmith',
-                    scriptKey:'fail'
-                });
-                continue;
-            }
-            state.hero.silverOre -= 2;
-            state.hero.money -= 100;
-            state.hero.weaponUpgrades.normalRange = true;
-            showMessage(state, `Excellent! Your Chakram is faster than ever!`);
-            saveGame();
-            continue;
-        }
-        if (actionToken === 'craftNormalDamage') {
-            if (state.hero.silverOre < 3) {
-                showMessage(state, `I'll need at least 3 Silver Ore to upgrade your damage.`);
-                continue;
-            }
-            if (state.hero.money < 100) {
-                events.push({
-                    type: 'runDialogueScript',
-                    npcKey: 'citySmith',
-                    scriptKey:'fail'
-                });
-                continue;
-            }
-            state.hero.silverOre -= 3;
-            state.hero.money -= 100;
-            state.hero.weaponUpgrades.normalDamage = true;
-            showMessage(state, `Excellent! Your Chakram is more powerful than ever!`);
-            saveGame();
-            continue;
-        }
-        if (actionToken === 'craftSpiritRange') {
-            if (state.hero.goldOre < 1) {
-                showMessage(state, `I'll need some Gold Ore to upgrade your range.`);
-                continue;
-            }
-            if (state.hero.silverOre < 2) {
-                showMessage(state, `I'll need at least 2 Silver Ore to upgrade your range.`);
-                continue;
-            }
-            if (state.hero.money < 200) {
-                events.push({
-                    type: 'runDialogueScript',
-                    npcKey: 'forgeSmith',
-                    scriptKey:'fail'
-                });
-                continue;
-            }
-            state.hero.goldOre -= 1;
-            state.hero.silverOre -= 2;
-            state.hero.money -= 200;
-            state.hero.weaponUpgrades.normalRange = true;
-            showMessage(state, `Excellent! Your Chakram is faster than ever!`);
-            saveGame();
-            continue;
-        }
-        if (actionToken === 'craftSpiritDamage') {
-            if (state.hero.goldOre < 1) {
-                showMessage(state, `I'll need some Gold Ore to upgrade your range.`);
-                continue;
-            }
-            if (state.hero.silverOre < 3) {
-                showMessage(state, `I'll need at least 3 Silver Ore to upgrade your damage.`);
-                continue;
-            }
-            if (state.hero.money < 200) {
-                events.push({
-                    type: 'runDialogueScript',
-                    npcKey: 'forgeSmith',
-                    scriptKey:'fail'
-                });
-                continue;
-            }
-            state.hero.goldOre -= 1;
-            state.hero.silverOre -= 3;
-            state.hero.money -= 200;
-            state.hero.weaponUpgrades.normalDamage = true;
-            showMessage(state, `Excellent! Your Chakram is more powerful than ever!`);
-            saveGame();
             continue;
         }
         if (actionToken === 'rest') {

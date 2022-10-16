@@ -309,8 +309,20 @@ function applyItems(savedState: SavedState, items: {[key: string]: number}, obje
             newState.savedHeroData.money += items[key];
             continue;
         }
+        if (key === 'silverOre') {
+            newState.savedHeroData.silverOre += items[key];
+            continue;
+        }
+        if (key === 'goldOre') {
+            newState.savedHeroData.goldOre += items[key];
+            continue;
+        }
         if (key === 'weapon') {
             newState.savedHeroData.weapon = items[key];
+            continue;
+        }
+        if (['normalDamage', 'normalRange', 'spiritDamage', 'spiritRange'].includes(key)) {
+            newState.savedHeroData.weaponUpgrades[key] = true;
             continue;
         }
         if (key.indexOf(':') >= 0) {
@@ -353,18 +365,19 @@ const tombStartState = applyItems(peachCaveExitState, {bow: 1},
     ['treeVillage:1:0x0-bow-0', 'closedBowDoor', 'elderTomb', 'tombEntrance']
 );
 tombStartState.savedHeroData.leftTool = 'bow';
-const tombBossState = applyItems(tombStartState, {roll: 1, 'tomb:bigKey': 1},
+const tombBossState = applyItems(tombStartState, {roll: 1, 'tomb:bigKey': 1, silverOre: 1},
     ['tombKey1', 'tombKey2', 'tombBigKey', 'tomb:1:1x0-roll-0']
 );
 const warTempleStart = applyItems(tombBossState, {maxLife: 1, spiritSight: 1},
     ['tombBoss', 'warTempleEntrance', 'tombTeleporter']);
 const warTempleBoss = applyItems(warTempleStart, {gloves: 1, 'warTemple:bigKey': 1});
-const cocoonStartState = applyItems(warTempleBoss, {maxLife: 1, astralProjection: 1}, ['warTempleBoss', 'tombExit']);
+const cocoonStartState = applyItems(warTempleBoss, {maxLife: 1, astralProjection: 1, normalRange: 1},
+    ['warTempleBoss', 'tombExit']);
 const cocoonBossState = applyItems(cocoonStartState, {'cocoon:bigKey': 1, 'cloak': 1}, []);
 cocoonBossState.savedHeroData.rightTool = 'cloak';
 const helixStartState = applyItems(cocoonBossState, {maxLife: 1, teleportation: 1},
     ['cocoonTeleporter', 'lakeTunneBoss']);
-const helixEndState = applyItems(helixStartState, {charge: 1, staff: 1},
+const helixEndState = applyItems(helixStartState, {charge: 1, staff: 1, normalDamage: 1, weapon: 2},
     ['elementalBeastsEscaped']);
 const forestBackState = applyItems(helixEndState, {cloudBoots: 1, 'forestTemple:bigKey': 1});
 const waterfallBossState = applyItems(helixEndState, {ironBoots: 1});
@@ -375,7 +388,7 @@ const riverTempleStartState = applyItems(helixEndState, {
     maxLife: 2,
     staff: 2, lightning: 1,
     fireBlessing: 1, fire: 1,
-    lightningBlessing: 1,
+    lightningBlessing: 1, goldOre: 2,
 }, ['flameBeast', 'stormBeast']);
 const riverTempleBossState = applyItems(riverTempleStartState,
     {'riverTemple:bigKey': 1, 'fire': 1, 'lightning': 1},
@@ -388,7 +401,7 @@ const craterStartState = applyItems(helixEndState, {
     maxLife: 2,
     staff: 2, lightning: 1,
     waterBlessing: 1, ice: 1,
-    lightningBlessing: 1,
+    lightningBlessing: 1, goldOre: 2,
 }, ['frostBeast', 'stormBeast']);
 const craterBossState = applyItems(craterStartState, {fireBlessing: 1},
     ['craterLava1', 'craterLava2', 'craterLava3', 'craterLava4', 'craterLava5']
@@ -400,7 +413,7 @@ const staffStartState = applyItems(helixEndState, {
     maxLife: 2,
     fireBlessing: 1, fire: 1,
     waterBlessing: 1, ice: 1,
-    lightningBlessing: 1,
+    lightningBlessing: 1, goldOre: 2,
 }, ['frostBeast', 'flameBeast']);
 const staffBossState = applyItems(staffStartState, {}, [
     'staffTowerSpiritEntrance', 'tower2FBarrier',

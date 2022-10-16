@@ -1,4 +1,4 @@
-import { DialogueLootDefinition, StaffTowerLocation } from 'app/types';
+import { DialogueLootDefinition, GameState, StaffTowerLocation } from 'app/types';
 
 export interface SimpleLogicCheck {
     operation?: 'isTrue' | 'isFalse'
@@ -48,7 +48,7 @@ export interface DialogueOption {
     // If this flag is set, this dialogue will be shown if it is the first valid option found with this flag set.
     isExclusive?: boolean,
     // The set of dialogues that can occur when this option is chosen.
-    text: string[],
+    text: TextScript[],
     // If set, dialogue will return to this index after exhausting all options.
     repeatIndex?: number
     // Notes for development purposes.
@@ -63,13 +63,15 @@ export interface DialogueChoiceDefinition {
     }[]
 }
 
+export type TextScript = ((state: GameState) => string) | string
+
 export interface DialogueSet {
     // The identifier for this dialogue set, used to attach it to a particular NPC.
     key: string,
     // Mapped dialogue options are trigged through {@key} indicators in text.
     // This can be used to create dialogue trees or to map to the same dialogue from multiple places.
     mappedOptions?: {
-        [key: string]: string
+        [key: string]: TextScript
     }
     // The dialogue options in priority order.
     options: DialogueOption[],

@@ -60,6 +60,9 @@ export function getHeroFrame(state: GameState, hero: Hero): Frame {
         }
         return getFrame(heroCarryAnimations.idle[hero.d], hero.animationTime);
     }
+    if (hero.explosionTime > 0) {
+        return getFrame(heroAnimations.kneel.down, hero.animationTime);
+    }
     switch (hero.action) {
         case 'usingStaff':
             const jumpAnimation = heroAnimations.staffJump[hero.d];

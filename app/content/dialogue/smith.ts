@@ -1,18 +1,53 @@
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
+import { saveGame } from 'app/state';
+
+import { GameState } from 'app/types';
 
 dialogueHash.citySmith = {
     key: 'citySmith',
     mappedOptions: {
-        upgrade: `I can upgrade your weapon if you bring me the materials and 100 Jade.
-                {choice:Upgrade Chakram?|Range:citySmith.range|Damage:citySmith.damage|No:citySmith.no}`,
-        range: `I can improve the range of your Chakram if you bring me 2 Silver Ore
-            {choice:Upgrade Range?|Yes:citySmith.craftRange|No:citySmith.upgrade}
+        upgrade: (state: GameState) => {
+            if (state.hero.weaponUpgrades.normalRange) {
+                return `{@citySmith.damage}`;
+            }
+            if (state.hero.weaponUpgrades.normalDamage) {
+                return `{@citySmith.range}`;
+            }
+            return `I can upgrade your weapon with the right materials.
+                {choice:Upgrade Chakram?|Range:citySmith.range|Damage:citySmith.damage|No:citySmith.no}`;
+        },
+        range: `I need 100 Jade and 2 Silver Ore to upgrade your range.
+            {choice:Upgrade Range?|Yes:citySmith.craftRange|No:citySmith.no}
         `,
-        damage: `I can improve the damage of your Chakram if you bring me 3 Silver Ore
-            {choice:Upgrade Damage?|Yes:citySmith.craftDamage|No:citySmith.upgrade}
+        damage: `I need 100 Jade and 3 Silver Ore to upgrade your damage.
+            {choice:Upgrade Damage?|Yes:citySmith.craftDamage|No:citySmith.no}
         `,
-        craftRange: `{craftNormalRange}`,
-        craftDamage: `{craftNormalDamage}`,
+        craftRange: (state: GameState) => {
+            if (state.hero.silverOre < 2) {
+                return `I'll need at least 2 Silver Ore to upgrade your damage.`;
+            }
+            if (state.hero.money < 100) {
+                return `{@citySmith.fail}`;
+            }
+            state.hero.silverOre -= 2;
+            state.hero.money -= 100;
+            state.hero.weaponUpgrades.normalRange = true;
+            saveGame();
+            return `Excellent! Your Chakram is faster than ever!`;
+        },
+        craftDamage: (state: GameState) => {
+            if (state.hero.silverOre < 3) {
+                return `I'll need at least 3 Silver Ore to upgrade your damage.`;
+            }
+            if (state.hero.money < 100) {
+                return `{@citySmith.fail}`;
+            }
+            state.hero.silverOre -= 3;
+            state.hero.money -= 100;
+            state.hero.weaponUpgrades.normalDamage = true;
+            saveGame();
+            return `Excellent! Your Chakram is more powerful than ever!`;
+        },
         fail: 'This work doesn\'t come cheap, you need to bring more Jade.',
         no: 'Another time then.'
     },
@@ -20,7 +55,7 @@ dialogueHash.citySmith = {
         // Once all upgrades are purchased the smith gives hints for the Forge.
         {
             logicCheck: {
-                requiredFlags: ['$weapon', '$normalDamage', '$normalRange'],
+                requiredFlags: ['$normalDamage', '$normalRange'],
             },
             text: [
                 `They tell stories of smiths in the Spirit World with skills
@@ -46,20 +81,59 @@ dialogueHash.citySmith = {
     ],
 };
 
-
 dialogueHash.forgeSmith = {
     key: 'forgeSmith',
     mappedOptions: {
-        upgrade: `I can upgrade your Spirit Chakram if you bring me the materials and 200 Jade.
-                {choice:Upgrade Chakram?|Range:forgeSmith.range|Damage:forgeSmith.damage|No:citySmith.no}`,
-        range: `I need 1 Gold Ore and 2 Silver Ore to upgrade your range.
-            {choice:Upgrade Range?|Yes:forgeSmith.craftRange|No:forgeSmith.upgrade}
+        upgrade: (state: GameState) => {
+            if (state.hero.weaponUpgrades.spiritRange) {
+                return `{@forgeSmith.damage}`;
+            }
+            if (state.hero.weaponUpgrades.spiritDamage) {
+                return `{@forgeSmith.range}`;
+            }
+            return `I can upgrade your Spirit Chakram if you can find Gold Ore.
+                {choice:Upgrade Chakram?|Range:forgeSmith.range|Damage:forgeSmith.damage|No:forgeSmith.no}`;
+        },
+        range: `I need 200 Jade, 1 Gold Ore and 2 Silver Ore to upgrade your range.
+            {choice:Upgrade Range?|Yes:forgeSmith.craftRange|No:forgeSmith.no}
         `,
-        damage: `I need 1 Gold Ore and 3 Silver Ore to upgrade your damage
-            {choice:Upgrade Damage?|Yes:forgeSmith.craftDamage|No:forgeSmith.upgrade}
+        damage: `I need 200 Jade, 1 Gold Ore and 3 Silver Ore to upgrade your damage
+            {choice:Upgrade Damage?|Yes:forgeSmith.craftDamage|No:forgeSmith.no}
         `,
-        craftRange: `{craftSpiritRange}`,
-        craftDamage: `{craftSpiritDamage}`,
+        craftRange: (state: GameState) => {
+            if (state.hero.goldOre < 1) {
+                return `I'll need some Gold Ore to upgrade your range.`;
+            }
+            if (state.hero.silverOre < 2) {
+                return `I'll need at least 2 Silver Ore to upgrade your damage.`;
+            }
+            if (state.hero.money < 200) {
+                return `{@forgeSmith.fail}`;
+            }
+            state.hero.goldOre -= 1;
+            state.hero.silverOre -= 2;
+            state.hero.money -= 200;
+            state.hero.weaponUpgrades.spiritRange = true;
+            saveGame();
+            return `Excellent! Your Chakram is faster than ever!`;
+        },
+        craftDamage: (state: GameState) => {
+            if (state.hero.goldOre < 1) {
+                return `I'll need some Gold Ore to upgrade your range.`;
+            }
+            if (state.hero.silverOre < 3) {
+                return `I'll need at least 3 Silver Ore to upgrade your damage.`;
+            }
+            if (state.hero.money < 200) {
+                return `{@forgeSmith.fail}`;
+            }
+            state.hero.goldOre -= 1;
+            state.hero.silverOre -= 3;
+            state.hero.money -= 200;
+            state.hero.weaponUpgrades.spiritDamage = true;
+            saveGame();
+            return `Excellent! Your Chakram is more powerful than ever!`;
+        },
         fail: 'You still need Jade even in the Spirit World.',
         no: 'Another time then.'
     },
@@ -71,6 +145,14 @@ dialogueHash.forgeSmith = {
             },
             text: [
                 'Someday I will craft you a real masterpiece'
+            ],
+        },
+        {
+            logicCheck: {
+                requiredFlags: ['$spiritDamage', '$spiritRange'],
+            },
+            text: [
+                'You\'ll need to find a more conventional smith for your other weapon.'
             ],
         },
         {

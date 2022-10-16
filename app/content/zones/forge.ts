@@ -190,7 +190,7 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "forgeGloves", x: 80, y: 384, type: "chest", lootType: "gloves", lootLevel: 2},
         {status: "normal", id: "forgeArmor", x: 160, y: 384, type: "chest", lootType: "goldMail", lootLevel: 1},
         {status: "normal", id: "", x: 112, y: 416, style: "short", type: "sign", message: "Under construction.[-]\nEnjoy some free items."},
-        {status: "normal", id: "forgeSmith", x: 112, y: 336, d: "down", behavior: "none", style: "zoro", type: "npc"},
+        {status: "normal", id: "forgeSmith", x: 112, y: 336, d: "down", behavior: "none", style: "zoro", type: "npc", dialogueKey: "forgeSmith"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},

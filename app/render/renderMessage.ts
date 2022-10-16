@@ -6,7 +6,7 @@ import { fillRect, pad } from 'app/utils/index';
 
 import { prependScript } from 'app/scriptEvents';
 
-import { Frame, GameState, ShowChoiceBoxActiveScriptEvent } from 'app/types';
+import { Frame, GameState, ShowChoiceBoxActiveScriptEvent, TextScript } from 'app/types';
 
 const characterWidth = 8;
 const messageWidth = 160;
@@ -64,17 +64,24 @@ function getEscapedFrames(state: GameState, escapedToken: string): Frame[] {
     return [];
 }
 
+export function textScriptToString(state: GameState, textScript: TextScript): string {
+    if (typeof textScript === 'string') {
+        return textScript;
+    }
+    return textScript(state)
+}
+
 export function showMessage(
     state: GameState,
-    message: string
+    message: TextScript
 ): void {
     if (!message){
         return;
     }
-    prependScript(state, `${message}{clearTextBox}{wait:200}`);
+    prependScript(state, `${textScriptToString(state, message)}{clearTextBox}{wait:200}`);
 }
 
-export function parseMessage(state: GameState, message: string, maxWidth = messageWidth): Frame[][][] {
+export function parseMessage(state: GameState, message: TextScript, maxWidth = messageWidth): Frame[][][] {
     let pages: Frame[][][] = [];
     let currentPage: Frame[][] = [];
     let row: Frame[] = [];
@@ -92,7 +99,7 @@ export function parseMessage(state: GameState, message: string, maxWidth = messa
         }
         rowNeedsSpace = false;
     };
-    const spacedChunks = message.split(/[ \n]+/);
+    const spacedChunks = textScriptToString(state, message).split(/[ \n]+/);
     for (const spacedChunk of spacedChunks) {
         // This will split the spaced chunk into a sequence of elements like:
         // ['string', 'escapedToken', 'string', ...].

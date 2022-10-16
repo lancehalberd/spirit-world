@@ -3,6 +3,7 @@ import { Sign } from 'app/content/objects/sign';
 import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 import { setScript } from 'app/scriptEvents';
+import { textScriptToString } from 'app/render/renderMessage';
 
 import { GameState } from 'app/types';
 
@@ -65,13 +66,13 @@ specialBehaviorsHash.elevatorControls = {
         const elevatorFixed = !!state.savedState.objectFlags.elevatorFixed;
         const elevatorDropped = !!state.savedState.objectFlags.elevatorDropped;
         if (!elevatorFixed) {
-            sign.message = elevatorDropped
+            sign.message = textScriptToString(state, elevatorDropped
                 ? dialogueHash.elevator.mappedOptions.powerFailureDropped
-                : dialogueHash.elevator.mappedOptions.powerFailure;
+                : dialogueHash.elevator.mappedOptions.powerFailure);
             return;
         }
         // After the elevator is fixed, it functions normally.
-        sign.message = dialogueHash.elevator.mappedOptions.chooseFloor;
+        sign.message = textScriptToString(state, dialogueHash.elevator.mappedOptions.chooseFloor);
         const elevatorFloor = getElevatorFloor(state);
         // Set the results of choosing a floor based on the current floor the elevator is on:
         for (let i = 0; i < 6; i++) {

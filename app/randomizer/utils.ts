@@ -280,6 +280,10 @@ function getLootObjects(nodes: LogicNode[], state: GameState = null): LootWithLo
             }
             const {dialogueKey, optionKey} = npc;
             const script = dialogueHash[dialogueKey].mappedOptions[optionKey];
+            if (typeof script !== 'string') {
+                console.error('Cannot place items in dialogue methods', {dialogueKey, optionKey});
+                continue;
+            }
             // If this string isn't present than no item was assigned to this dialogue option.
             if (script.indexOf('{item:') < 0 ) {
                 continue;
@@ -872,6 +876,10 @@ export function applyLootAssignments(assignments: LootAssignment[]): void {
             const {dialogueKey, optionKey} = assignment.target;
             const script = dialogueHash[dialogueKey].mappedOptions[optionKey];
             //console.log('Changing ', script, 'to');
+            if (typeof script !== 'string') {
+                console.error('Cannot replace method script options', {dialogueKey, optionKey});
+                continue;
+            }
             const [beginning, middle] = script.split('{item:');
             const end = middle.substring(middle.indexOf('}') + 1);
             const number = assignment.lootAmount || 0;//assignment.lootLevel;

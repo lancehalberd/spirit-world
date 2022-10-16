@@ -223,6 +223,9 @@ export class Hero implements Actor, SavedHeroData {
         copy.equipment = {
             ...this.equipment,
         };
+        copy.weaponUpgrades = {
+            ...this.weaponUpgrades,
+        };
         return copy;
     }
 
@@ -460,7 +463,9 @@ export class Hero implements Actor, SavedHeroData {
         if (hero.action === 'fallen' || hero.action === 'sankInLava') {
             return;
         }
-        if (state.hero.magic > 0 && hero.passiveTools.charge && hero.action === 'charging') {
+        const renderCharging = state.hero.magic > 0 && hero.passiveTools.charge
+            && hero.action === 'charging' && hero.chargeTime >= 60
+        if (renderCharging) {
             const { chargeLevel } = getChargeLevelAndElement(state, hero);
             if (chargeLevel) {
                 const animation = !hero.element
@@ -527,7 +532,7 @@ export class Hero implements Actor, SavedHeroData {
             context.restore();
         }
         renderExplosionRing(context, state, hero);
-        if (state.hero.magic > 0 && hero.passiveTools.charge && hero.action === 'charging') {
+        if (renderCharging) {
             const animation = !hero.element
                 ? chargeFrontAnimation
                 : {
