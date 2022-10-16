@@ -23,6 +23,49 @@ export const snakeAnimations: ActorAnimations = {
         right: leftSnakeAnimation,
     },
 };
+// ice snake animations
+// gfx/enemies/miniStatueBoss-ice-32x40
+const iceIdolGeometry: FrameDimensions = { w: 32, h: 40, content: { x: 0, y: 4, w: 32, h: 36} };
+const iceIdolStillAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-ice-32x40.png', iceIdolGeometry, { y: 0, cols: 1});
+const iceIdolIdleAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-ice-32x40.png', iceIdolGeometry, { y: 1, cols: 5});
+const iceIdolAttackAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-ice-32x40.png', iceIdolGeometry, { y: 2, cols: 5});
+const iceIdolAttackBallAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-ice-32x40.png', iceIdolGeometry, { y: 3, cols: 5});
+const iceIdolWarningAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-ice-32x40.png', iceIdolGeometry, { y: 4, cols: 5});
+
+export const iceIdolAnimations: ActorAnimations = {
+    idle: {
+        up: iceIdolIdleAnimation,
+        down: iceIdolIdleAnimation,
+        left: iceIdolIdleAnimation,
+        right: iceIdolIdleAnimation,
+    },
+    attack: {
+        up: iceIdolAttackAnimation,
+        down: iceIdolAttackAnimation,
+        left: iceIdolAttackAnimation,
+        right: iceIdolAttackAnimation,
+    },
+    attackBall: {
+        up: iceIdolAttackBallAnimation,
+        down: iceIdolAttackBallAnimation,
+        left: iceIdolAttackBallAnimation,
+        right: iceIdolAttackBallAnimation,
+    },
+    still: {
+        up: iceIdolStillAnimation,
+        down: iceIdolStillAnimation,
+        left: iceIdolStillAnimation,
+        right: iceIdolStillAnimation,
+    },
+    warning: {
+        up: iceIdolWarningAnimation,
+        down: iceIdolWarningAnimation,
+        left: iceIdolWarningAnimation,
+        right: iceIdolWarningAnimation,
+    }
+};
+
+
 const beetleGeometry: FrameDimensions = { w: 18, h: 17, content: { x: 2, y: 4, w: 14, h: 12} };
 const beetleDownAnimation: FrameAnimation = createAnimation('gfx/enemies/genericbeetle.png', beetleGeometry, { y: 0, cols: 4});
 const beetleRightAnimation: FrameAnimation = createAnimation('gfx/enemies/genericbeetle.png', beetleGeometry, { y: 1, cols: 4});

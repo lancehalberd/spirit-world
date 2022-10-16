@@ -5,7 +5,7 @@ import {
     throwIceGrenadeAtLocation,
 } from 'app/content/enemies';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
-import { beetleAnimations, beetleWingedAnimations, snakeAnimations } from 'app/content/enemyAnimations';
+import { beetleWingedAnimations, iceIdolAnimations, snakeAnimations } from 'app/content/enemyAnimations';
 import { rotateDirection } from 'app/utils/field';
 
 
@@ -27,7 +27,7 @@ enemyDefinitions.flameIdol = {
 };
 enemyDefinitions.frostIdol = {
     alwaysReset: true,
-    animations: beetleAnimations, scale: 2,
+    animations: iceIdolAnimations, scale: 1,
     isImmortal: true,
     life: 8, touchDamage: 1, update: updateFrostIdol, renderOver: renderIdolShield,
     immunities: ['ice'],
@@ -112,8 +112,12 @@ function updateElementalIdol(state: GameState, enemy: Enemy, attack: () => void)
     if (!enemy.area.objects.some(object => object instanceof Enemy && object.params.priority < enemy.params.priority)) {
         if (enemy.mode === 'attack') {
             if (!enemy.params.pinchMode) {
+                if (enemy.modeTime === 200) {
+                    enemy.changeToAnimation('attackBall');
+                }
                 if (enemy.modeTime === 1000) {
                     attack();
+                    enemy.changeToAnimation('idle');
                 }
             } else {
                 if (enemy.modeTime === 500 || enemy.modeTime === 1000) {
@@ -123,14 +127,20 @@ function updateElementalIdol(state: GameState, enemy: Enemy, attack: () => void)
             if (enemy.modeTime >= 2000) {
                 enemy.params.priority = Math.ceil(enemy.params.priority) + Math.random();
                 enemy.setMode('shielded');
+                enemy.changeToAnimation('still');
                 enemy.shielded = true;
             }
-        } else if (enemy.modeTime > 1000) {
-            enemy.setMode('attack');
-            enemy.shielded = false;
+        } else {
+            enemy.changeToAnimation('warning');
+            if (enemy.modeTime > 1000) {
+                enemy.changeToAnimation('idle');
+                enemy.setMode('attack');
+                enemy.shielded = false;
+            }
         }
     } else {
         enemy.setMode('shielded');
+        enemy.changeToAnimation('still');
         enemy.shielded = true;
     }
 }
