@@ -25,8 +25,9 @@ export const snakeAnimations: ActorAnimations = {
 };
 // ice snake animations
 // gfx/enemies/miniStatueBoss-ice-32x40
-const iceIdolGeometry: FrameDimensions = { w: 32, h: 40, content: { x: 0, y: 4, w: 32, h: 36} };
-const iceIdolStillAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-ice-32x40.png', iceIdolGeometry, { y: 0, cols: 1});
+const iceIdolGeometry: FrameDimensions = { w: 32, h: 40, content: { x: 2, y: 20, w: 28, h: 20} };
+const iceIdolStillAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-ice-32x40.png', iceIdolGeometry, { x: 0, y: 0, cols: 1});
+const iceIdolBrokenAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-ice-32x40.png', iceIdolGeometry, { x: 2, y: 0, cols: 1});
 const iceIdolIdleAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-ice-32x40.png', iceIdolGeometry, { y: 1, cols: 5});
 const iceIdolAttackAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-ice-32x40.png', iceIdolGeometry, { y: 2, cols: 5});
 const iceIdolAttackBallAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-ice-32x40.png', iceIdolGeometry, { y: 3, cols: 5});
@@ -62,13 +63,20 @@ export const iceIdolAnimations: ActorAnimations = {
         down: iceIdolWarningAnimation,
         left: iceIdolWarningAnimation,
         right: iceIdolWarningAnimation,
+    },
+    broken: {
+        up: iceIdolBrokenAnimation,
+        down: iceIdolBrokenAnimation,
+        left: iceIdolBrokenAnimation,
+        right: iceIdolBrokenAnimation,
     }
 };
 
 // lightning bird animations
 // gfx/enemies/miniStatueBoss-lightning-32x40
-const lightningIdolGeometry: FrameDimensions = { w: 32, h: 40, content: { x: 0, y: 4, w: 32, h: 36} };
+const lightningIdolGeometry: FrameDimensions = { w: 32, h: 40, content: { x: 2, y: 20, w: 28, h: 20} };
 const lightningIdolStillAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-lightning-32x40.png', lightningIdolGeometry, { y: 0, cols: 1});
+const lightningIdolBrokenAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-lightning-32x40.png', lightningIdolGeometry, { x: 2, y: 0, cols: 1});
 const lightningIdolIdleAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-lightning-32x40.png', lightningIdolGeometry, { y: 1, cols: 5});
 const lightningIdolAttackAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-lightning-32x40.png', lightningIdolGeometry, { y: 2, cols: 5});
 const lightningIdolAttackBallAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-lightning-32x40.png', lightningIdolGeometry, { y: 3, cols: 5});
@@ -104,13 +112,20 @@ export const lightningIdolAnimations: ActorAnimations = {
         down: lightningIdolWarningAnimation,
         left: lightningIdolWarningAnimation,
         right: lightningIdolWarningAnimation,
+    },
+    broken: {
+        up: lightningIdolBrokenAnimation,
+        down: lightningIdolBrokenAnimation,
+        left: lightningIdolBrokenAnimation,
+        right: lightningIdolBrokenAnimation,
     }
 };
 
 // fire badger animations
 // gfx/enemies/miniStatueBoss-fire-32x40
-const fireIdolGeometry: FrameDimensions = { w: 32, h: 40, content: { x: 0, y: 4, w: 32, h: 36} };
+const fireIdolGeometry: FrameDimensions = { w: 32, h: 40, content: { x: 2, y: 20, w: 28, h: 20} };
 const fireIdolStillAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-fire-32x40.png', fireIdolGeometry, { y: 0, cols: 1});
+const fireIdolBrokenAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-fire-32x40.png', fireIdolGeometry, { x: 2, y: 0, cols: 1});
 const fireIdolIdleAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-fire-32x40.png', fireIdolGeometry, { y: 1, cols: 5});
 const fireIdolAttackAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-fire-32x40.png', fireIdolGeometry, { y: 2, cols: 5});
 const fireIdolAttackBallAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-fire-32x40.png', fireIdolGeometry, { y: 3, cols: 5});
@@ -146,6 +161,12 @@ export const fireIdolAnimations: ActorAnimations = {
         down: fireIdolWarningAnimation,
         left: fireIdolWarningAnimation,
         right: fireIdolWarningAnimation,
+    },
+    broken: {
+        up: fireIdolBrokenAnimation,
+        down: fireIdolBrokenAnimation,
+        left: fireIdolBrokenAnimation,
+        right: fireIdolBrokenAnimation,
     }
 };
 

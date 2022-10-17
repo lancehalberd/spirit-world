@@ -15,27 +15,26 @@ enemyDefinitions.stormIdol = {
     alwaysReset: true,
     animations: lightningIdolAnimations, scale: 1,
     isImmortal: true,
-    life: 8, touchDamage: 1, update: updateStormIdol, renderOver: renderIdolShield,
+    life: 8, touchDamage: 1, update: updateStormIdol,
     immunities: ['lightning'],
 };
 enemyDefinitions.flameIdol = {
     alwaysReset: true,
     animations: fireIdolAnimations, scale: 1,
     isImmortal: true,
-    life: 8, touchDamage: 1, update: updateFlameIdol, renderOver: renderIdolShield,
+    life: 8, touchDamage: 1, update: updateFlameIdol,
     immunities: ['fire'],
 };
 enemyDefinitions.frostIdol = {
     alwaysReset: true,
     animations: iceIdolAnimations, scale: 1,
     isImmortal: true,
-    life: 8, touchDamage: 1, update: updateFrostIdol, renderOver: renderIdolShield,
+    life: 8, touchDamage: 1, update: updateFrostIdol,
     immunities: ['ice'],
 };
 
 
 function updateStormIdol(state: GameState, enemy: Enemy): void {
-    enemy.params.shieldColor = 'yellow';
     updateElementalIdol(state, enemy, () => {
         enemy.params.theta = (enemy.params.theta || 0) + Math.PI / 4;
         const lightningBolt = new LightningBolt({
@@ -47,7 +46,6 @@ function updateStormIdol(state: GameState, enemy: Enemy): void {
     })
 }
 function updateFlameIdol(state: GameState, enemy: Enemy): void {
-    enemy.params.shieldColor = 'red';
     updateElementalIdol(state, enemy, () => {
         enemy.params.rotations = (enemy.params.rotations ?? Math.floor(Math.random() * 3)) + 1;
         const flameWall = new FlameWall({
@@ -57,7 +55,6 @@ function updateFlameIdol(state: GameState, enemy: Enemy): void {
     });
 }
 function updateFrostIdol(state: GameState, enemy: Enemy): void {
-    enemy.params.shieldColor = '#08F';
     updateElementalIdol(state, enemy, () => {
         enemy.params.theta = 2 * Math.PI * Math.random();
         throwIceGrenadeAtLocation(state, enemy, {
@@ -77,6 +74,7 @@ function updateElementalIdol(state: GameState, enemy: Enemy, attack: () => void)
             object instanceof Enemy && object.definition.type === 'boss' && object.life > 0
         )) {
             enemy.showDeathAnimation(state);
+            enemy.changeToAnimation('broken');
             return;
         }
         enemy.shielded = true;
@@ -142,16 +140,5 @@ function updateElementalIdol(state: GameState, enemy: Enemy, attack: () => void)
         enemy.setMode('shielded');
         enemy.changeToAnimation('still');
         enemy.shielded = true;
-    }
-}
-
-function renderIdolShield(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
-    if (enemy.shielded) {
-        const hitbox = enemy.getHitbox(state);
-        context.save();
-            context.globalAlpha *= 0.5;
-            context.fillStyle = enemy.params.shieldColor ?? '#888';
-            context.fillRect(hitbox.x, hitbox.y, hitbox.w, hitbox.h);
-        context.restore();
     }
 }
