@@ -1,3 +1,5 @@
+import { readGetParameter } from 'app/utils/index';
+
 // Update duration in milliseconds.
 export const FRAME_LENGTH = 20;
 
@@ -47,3 +49,6 @@ export const MAX_FLOAT_HEIGHT = 3;
 export const MAX_FLOOR_HEIGHT = 3;
 // Anything higher than the max floor height plus the max floating height causes the player to be falling.
 export const FALLING_HEIGHT = MAX_FLOAT_HEIGHT + MAX_FLOOR_HEIGHT + 1;
+
+export const randomizerSeed = readGetParameter('seed');
+export const isRandomizer = !!randomizerSeed;

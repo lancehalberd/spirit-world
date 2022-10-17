@@ -1628,7 +1628,7 @@ const f2_0x0: AreaDefinition = {
     ],
     objects: [
         {status: "closed", id: "warTemple:2:0x0-door-0", x: 112, y: 224, type: "door", style: "cave", d: "down"},
-        {status: "closedSwitch", id: "warTempleExit", x: 112, y: 0, type: "door", style: "cave", targetZone: "overworld", targetObjectId: "warTempleEntrance", d: "up", linked: true},
+        {status: "closedEnemy", id: "", x: 160, y: 0, type: "door", style: "cavernDownstairs", targetZone: "overworld", targetObjectId: "warTempleEntrance", d: "up", linked: true, logicKey: "isRandomizer"},
         {status: "hiddenEnemy", id: "warTemple:2:0x0-astralProjection-0", spirit: true, x: 64, y: 64, type: "chest", lootType: "astralProjection", lootLevel: 1},
         {status: "normal", id: "warTempleBoss", spirit: true, x: 48, y: 144, type: "boss", enemyType: "flameIdol", lootType: "peachOfImmortality", lootLevel: 1, d: "down", params: {}},
         {status: "normal", id: "warTempleBoss", spirit: true, x: 112, y: 48, type: "boss", enemyType: "stormIdol", lootType: "peachOfImmortality", lootLevel: 1, d: "down", params: {}},
@@ -1645,6 +1645,7 @@ const f2_0x0: AreaDefinition = {
         {status: "normal", id: "warTemple:2:0x0-lightningBug-0", x: 400, y: 144, type: "enemy", enemyType: "lightningBug", d: "down", params: {}},
         {status: "normal", id: "warTempleSave", x: 64, y: 336, type: "saveStatue"},
         {status: "normal", id: "warTemple:2:0x0-flameSnake-0", x: 448, y: 416, type: "enemy", enemyType: "flameSnake", d: "down", params: {}},
+        {status: "closed", id: "warTempleExit", x: 112, y: 0, type: "door", style: "cavernDownstairs", targetZone: "overworld", targetObjectId: "warTempleEntrance", d: "up", linked: true},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},
@@ -1658,9 +1659,9 @@ const sf2_0x0: AreaDefinition = {
     parentDefinition: f2_0x0,
     layers: null,
     objects: [
-        {status: "closedSwitch", id: "warTempleExit", x: 112, y: 0, type: "door", style: "cave", targetZone: "overworld", targetObjectId: "warTempleEntrance", d: "up", linked: true, spirit: true, saveStatus: "zone"},
         {status: "normal", id: "warTemple:s2:0x0-floorSwitch-0", spirit: true, x: 176, y: 64, type: "floorSwitch", toggleOnRelease: true},
         {status: "normal", id: "warTemple:s2:0x0-pushPull-0", spirit: true, x: 160, y: 64, type: "pushPull"},
+        {status: "closedSwitch", id: "warTempleExit", x: 112, y: 0, type: "door", style: "cavernDownstairs", targetZone: "overworld", targetObjectId: "warTempleEntrance", d: "up", linked: true, spirit: true},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},
@@ -1669,11 +1670,6 @@ const sf2_0x0: AreaDefinition = {
         {x: 16, y: 16, w: 16, h: 16},
     ],
 };
-const sf2_0x1: AreaDefinition = null;
-const sf2_0x2: AreaDefinition = null;
-const sf2_1x0: AreaDefinition = null;
-const sf2_1x1: AreaDefinition = null;
-const sf2_1x2: AreaDefinition = null;
 zones.warTemple = {
     key: 'warTemple',
     floors: [
@@ -1704,8 +1700,7 @@ zones.warTemple = {
                 [f2_0x0,],
             ],
             spiritGrid: [
-                [sf2_0x0,sf2_0x1,sf2_0x2,],
-                [sf2_1x0,sf2_1x1,sf2_1x2,],
+                [sf2_0x0,],
             ],
         },
     ],

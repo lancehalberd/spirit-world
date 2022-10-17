@@ -194,6 +194,7 @@ function moveActorInDirection(
         // !canSwim is a hack to keep enemies/astralProjection out of low ceiling doorways.
         if (tileBehavior?.lowCeiling && (actor.z > 3 || !canSwim)) {
             blockedByTile = true;
+            canJumpDown = false;
         }
         if (tileBehavior?.water && !canSwim) {
             blockedByTile = true;
@@ -351,11 +352,12 @@ function moveActorInDirection(
             return false;
         }
         const maxWiggle = 8;
+        const z = actor.z || 0;
         function wiggleLeft(y: number) {
             for (let l = ax - 1; l >= ax - maxWiggle; l--) {
                 let open = true;
                 for (const x of [l, l + Math.floor(actor.w / 2), l + actor.w - 1]) {
-                    if (!isPointOpen(state, actor.area, {x, y}, movementProperties, excludedObjects)) {
+                    if (!isPointOpen(state, actor.area, {x, y, z}, movementProperties, excludedObjects)) {
                         open = false;
                         break;
                     }
@@ -372,7 +374,7 @@ function moveActorInDirection(
             for (let l = ax + 1; l <= ax + maxWiggle; l++) {
                 let open = true;
                 for (const x of [l, l + Math.floor(actor.w / 2), l + actor.w - 1]) {
-                    if (!isPointOpen(state, actor.area, {x, y}, movementProperties, excludedObjects)) {
+                    if (!isPointOpen(state, actor.area, {x, y, z}, movementProperties, excludedObjects)) {
                         open = false;
                         break;
                     }
@@ -389,7 +391,7 @@ function moveActorInDirection(
             for (let t = ay - 1; t >= ay - maxWiggle; t--) {
                 let open = true;
                 for (const y of [t, t + Math.floor(actor.h / 2), t + actor.h - 1]) {
-                    if (!isPointOpen(state, actor.area, {x, y}, movementProperties, excludedObjects)) {
+                    if (!isPointOpen(state, actor.area, {x, y, z}, movementProperties, excludedObjects)) {
                         open = false;
                         break;
                     }
@@ -406,7 +408,7 @@ function moveActorInDirection(
             for (let t = ay + 1; t <= ay + maxWiggle; t++) {
                 let open = true;
                 for (const y of [t, t + Math.floor(actor.h / 2), t + actor.h - 1]) {
-                    if (!isPointOpen(state, actor.area, {x, y}, movementProperties, excludedObjects)) {
+                    if (!isPointOpen(state, actor.area, {x, y, z}, movementProperties, excludedObjects)) {
                         open = false;
                         break;
                     }

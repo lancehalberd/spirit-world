@@ -106,7 +106,7 @@ export function canSomersaultToCoords(state: GameState, hero: Hero, {x, y}: Tile
 export function isPointOpen(
     state: GameState,
     area: AreaInstance,
-    {x, y}: {x: number, y: number},
+    {x, y, z}: {x: number, y: number, z?: number},
     movementProperties: MovementProperties,
     excludedObjects: Set<any> = null
 ): boolean {
@@ -120,6 +120,8 @@ export function isPointOpen(
     const sy = (y | 0) % 16;
     const sx = (x | 0) % 16;
     if (tileBehavior?.solid && (!tileBehavior?.climbable || !movementProperties.canClimb)) {
+        return false;
+    } else if (tileBehavior?.lowCeiling && z >= 3) {
         return false;
     } else if (tileBehavior?.solidMap && !tileBehavior?.climbable) {
         // If the behavior has a bitmap for solid pixels, read the exact pixel to see if it is blocked.

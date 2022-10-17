@@ -1,3 +1,5 @@
+import { isRandomizer } from 'app/gameConstants';
+
 import { AndLogicCheck, GameState, LogicCheck, OrLogicCheck } from 'app/types';
 
 export function andLogic(...logicChecks: LogicCheck[]): AndLogicCheck {
@@ -19,6 +21,9 @@ export function isItemLogicTrue(state: GameState, itemFlag: string): boolean {
             // assume levelString is item string, itemFlag is zone key
             return !!state.savedState.dungeonInventories[itemFlag]?.[levelString];
         }
+    }
+    if (itemFlag === 'randomizer') {
+        return isRandomizer;
     }
     if (itemFlag === 'weapon') {
         return state.hero.weapon >= level;
@@ -163,6 +168,9 @@ export const canReleaseBeasts = orLogic(canClimbHelix, andLogic(canClimbMountain
 export const logicHash: {[key: string]: LogicCheck} = {
     hasWeapon,
     hasMediumRange,
+    isRandomizer: {
+        requiredFlags: ['$randomizer'],
+    },
     cocoonBossStarted: {
         requiredFlags: ['cocoonBossStarted'],
     },

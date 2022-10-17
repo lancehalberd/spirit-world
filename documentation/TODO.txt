@@ -21,8 +21,6 @@ Known Bugs:
     - Held rocks/bushes are invisible while using cloak
     - Piercing projectiles that can push things should be stopped by the first object they push
         or not be able to push additional objects, for example, the charged chakram.
-    - Enemies can walk on stairs cases and over bead flows
-        - Add an invisible enemy wall object?
     - Astral Projection appears in front of waterfall graphics only when south of main body in waterfall tower.
     - Pushing on a solid object sitting on thorny ground shouldn't hurt you:
         -return tileBehaviors and objectBehaviors separately, only damage if tile is solid+damaging.
@@ -43,8 +41,11 @@ Graphics:
     Add sparkles to peach loot + hud.
     Add damage effects for hitting enemies?
     Add damage effect for player hurt? (alttp doesn't have anything like this)
-{addCue: Equip the spirit cloak and press [B_TOOL] to activate it, then hold [B_TOOL] to detonate the barrier}
+
 Current tasks:
+    Randomizer improvements
+        - Add configurable goal
+
     Nimbus cloud
         - on overworld material takes you to: Lake, City, Village, Peaks, Ruins
         - in spirit world takes you to: Tomb shop, Fertility Temple, Sky City, Jade City
@@ -53,7 +54,6 @@ Current tasks:
     Add save statues:
         Outside Crater/Forge
         Outside waterfall cave
-
 
     Gold Armor Upgrade
         If Spirit Chakram is fully upgraded and the player has golden mail they can use:
@@ -67,8 +67,8 @@ Current tasks:
             - (low priority) super tile layout selection
 
 
-        - Squirrel velocity should reset when knocked back
-        - Add SFX when the MC is damaged
+    - Squirrel velocity should reset when knocked back
+    - Add SFX when the MC is damaged
 
     - Add sleeping Vanara to the Cocoon.
         - Can use a special NPC that doesn't face you when talking for now.
@@ -128,11 +128,6 @@ Current tasks:
 
     - Flying enemies should not move over abyss tiles(make abyss tiles + ceiling tiles impassable to flying enemies).
 
-    - Support logic checks inside script events
-        - Could just do `{logic:condition|trueAction|falseAction}`
-        - Maybe better to add some recursive syntax to script events so we can embed logic in other event types
-        - like {choice:REST?|Yes:{logic:isSpiritWorld|spiritRest|normalRest}|No}
-
     Peach Cave improvements
         - Add new graphics to 2F
         - Fix spirit world tiles
@@ -155,13 +150,6 @@ Current tasks:
 
     Make mutation transition use the same area instance so contents don't reset
         - Will need to add special handling to remove extra ice tiles from frost beast+heat sink battles.
-
-    - Randomizer improvements
-        - Add configurable goal
-        - Fix can get stuck and require refreshing the browser:
-            - Falling in Peach Cave without a weapon and killing the small bug.
-        - Support `entrances` instead of `entranceIds` on randomizer logic to include logic on entrances, for example, adding logic for whether entrances to sky areas is possible from the staff tower.
-            - For now we can add a path from the ground to the sky based on logic: canAquireTowerStaff.
 
     - Add new hold+walk chakram animations
         - play last 2 frames of attack animation on release.

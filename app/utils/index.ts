@@ -1,5 +1,3 @@
-import * as _ from 'lodash';
-
 import { FrameDimensions, FullRectangle, Rect } from 'app/types';
 
 export function isPointInRect(x: number, y: number, l: number, t: number, w: number, h: number): boolean {
