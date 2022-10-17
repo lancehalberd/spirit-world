@@ -5,7 +5,7 @@ import {
     throwIceGrenadeAtLocation,
 } from 'app/content/enemies';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
-import { iceIdolAnimations, lightningIdolAnimations, snakeAnimations } from 'app/content/enemyAnimations';
+import { fireIdolAnimations, iceIdolAnimations, lightningIdolAnimations } from 'app/content/enemyAnimations';
 import { rotateDirection } from 'app/utils/field';
 
 
@@ -20,7 +20,7 @@ enemyDefinitions.stormIdol = {
 };
 enemyDefinitions.flameIdol = {
     alwaysReset: true,
-    animations: snakeAnimations, scale: 2,
+    animations: fireIdolAnimations, scale: 1,
     isImmortal: true,
     life: 8, touchDamage: 1, update: updateFlameIdol, renderOver: renderIdolShield,
     immunities: ['fire'],

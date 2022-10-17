@@ -107,6 +107,47 @@ export const lightningIdolAnimations: ActorAnimations = {
     }
 };
 
+// fire badger animations
+// gfx/enemies/miniStatueBoss-fire-32x40
+const fireIdolGeometry: FrameDimensions = { w: 32, h: 40, content: { x: 0, y: 4, w: 32, h: 36} };
+const fireIdolStillAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-fire-32x40.png', fireIdolGeometry, { y: 0, cols: 1});
+const fireIdolIdleAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-fire-32x40.png', fireIdolGeometry, { y: 1, cols: 5});
+const fireIdolAttackAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-fire-32x40.png', fireIdolGeometry, { y: 2, cols: 5});
+const fireIdolAttackBallAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-fire-32x40.png', fireIdolGeometry, { y: 3, cols: 5});
+const fireIdolWarningAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-fire-32x40.png', fireIdolGeometry, { y: 4, cols: 5});
+
+export const fireIdolAnimations: ActorAnimations = {
+    idle: {
+        up: fireIdolIdleAnimation,
+        down: fireIdolIdleAnimation,
+        left: fireIdolIdleAnimation,
+        right: fireIdolIdleAnimation,
+    },
+    attack: {
+        up: fireIdolAttackAnimation,
+        down: fireIdolAttackAnimation,
+        left: fireIdolAttackAnimation,
+        right: fireIdolAttackAnimation,
+    },
+    attackBall: {
+        up: fireIdolAttackBallAnimation,
+        down: fireIdolAttackBallAnimation,
+        left: fireIdolAttackBallAnimation,
+        right: fireIdolAttackBallAnimation,
+    },
+    still: {
+        up: fireIdolStillAnimation,
+        down: fireIdolStillAnimation,
+        left: fireIdolStillAnimation,
+        right: fireIdolStillAnimation,
+    },
+    warning: {
+        up: fireIdolWarningAnimation,
+        down: fireIdolWarningAnimation,
+        left: fireIdolWarningAnimation,
+        right: fireIdolWarningAnimation,
+    }
+};
 
 const beetleGeometry: FrameDimensions = { w: 18, h: 17, content: { x: 2, y: 4, w: 14, h: 12} };
 const beetleDownAnimation: FrameAnimation = createAnimation('gfx/enemies/genericbeetle.png', beetleGeometry, { y: 0, cols: 4});
