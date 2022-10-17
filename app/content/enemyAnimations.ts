@@ -65,6 +65,48 @@ export const iceIdolAnimations: ActorAnimations = {
     }
 };
 
+// lightning bird animations
+// gfx/enemies/miniStatueBoss-lightning-32x40
+const lightningIdolGeometry: FrameDimensions = { w: 32, h: 40, content: { x: 0, y: 4, w: 32, h: 36} };
+const lightningIdolStillAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-lightning-32x40.png', lightningIdolGeometry, { y: 0, cols: 1});
+const lightningIdolIdleAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-lightning-32x40.png', lightningIdolGeometry, { y: 1, cols: 5});
+const lightningIdolAttackAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-lightning-32x40.png', lightningIdolGeometry, { y: 2, cols: 5});
+const lightningIdolAttackBallAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-lightning-32x40.png', lightningIdolGeometry, { y: 3, cols: 5});
+const lightningIdolWarningAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-lightning-32x40.png', lightningIdolGeometry, { y: 4, cols: 5});
+
+export const lightningIdolAnimations: ActorAnimations = {
+    idle: {
+        up: lightningIdolIdleAnimation,
+        down: lightningIdolIdleAnimation,
+        left: lightningIdolIdleAnimation,
+        right: lightningIdolIdleAnimation,
+    },
+    attack: {
+        up: lightningIdolAttackAnimation,
+        down: lightningIdolAttackAnimation,
+        left: lightningIdolAttackAnimation,
+        right: lightningIdolAttackAnimation,
+    },
+    attackBall: {
+        up: lightningIdolAttackBallAnimation,
+        down: lightningIdolAttackBallAnimation,
+        left: lightningIdolAttackBallAnimation,
+        right: lightningIdolAttackBallAnimation,
+    },
+    still: {
+        up: lightningIdolStillAnimation,
+        down: lightningIdolStillAnimation,
+        left: lightningIdolStillAnimation,
+        right: lightningIdolStillAnimation,
+    },
+    warning: {
+        up: lightningIdolWarningAnimation,
+        down: lightningIdolWarningAnimation,
+        left: lightningIdolWarningAnimation,
+        right: lightningIdolWarningAnimation,
+    }
+};
+
 
 const beetleGeometry: FrameDimensions = { w: 18, h: 17, content: { x: 2, y: 4, w: 14, h: 12} };
 const beetleDownAnimation: FrameAnimation = createAnimation('gfx/enemies/genericbeetle.png', beetleGeometry, { y: 0, cols: 4});
