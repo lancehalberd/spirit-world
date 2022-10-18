@@ -29,7 +29,11 @@ export type PassiveTool = 'gloves'
     | 'ironSkin' | 'goldMail' | 'phoenixCrown'
     | 'waterBlessing' | 'fireBlessing' | 'lightningBlessing';
 export type MagicElement = 'fire' | 'ice' | 'lightning';
-export type Collectible = 'peachOfImmortality' | 'peachOfImmortalityPiece' | 'silverOre' | 'goldOre';
+export type Collectible = 'peachOfImmortality'
+    | 'peachOfImmortalityPiece'
+    | 'silverOre'
+    | 'goldOre'
+    | 'victoryPoint';
 export type CommonLoot = 'money' | 'peach';
 export type DungeonLoot = 'smallKey' | 'bigKey' | 'map';
 
@@ -174,6 +178,7 @@ export interface SavedHeroData {
     goldOre: number
     peachQuarters: number
     spiritTokens: number
+    victoryPoints: number
     activeTools: {[key in ActiveTool]: number}
     equipment: {[key in Equipment]: number}
     passiveTools: {[key in PassiveTool]: number}
@@ -184,4 +189,8 @@ export interface SavedHeroData {
     rightTool?: ActiveTool
     element?: MagicElement
     spawnLocation: ZoneLocation
+    // How long the player has been playing
+    playTime: number
+    // How long the player had been playing when they "won" the game.
+    winTime: number
 }

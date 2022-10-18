@@ -122,6 +122,7 @@ export interface GameState {
     messagePage?: Frame[][]
     randomizer?: {
         seed: number
+        goal: number
     },
     scriptEvents: {
         activeEvents: ActiveScriptEvent[]

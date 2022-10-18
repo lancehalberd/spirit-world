@@ -203,6 +203,8 @@ export function getLootTypes(): LootType[] {
             'smallKey',
             'map',
             'secondChance',
+            // This is used for the basic goal in randomizer.
+            'victoryPoint',
             // This is the special progressive spirit power loot used by the randomizer.
             'spiritPower',
             ...(Object.keys(state.hero.activeTools) as LootType[]),

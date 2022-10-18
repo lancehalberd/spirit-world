@@ -6,10 +6,9 @@ import {
 } from 'app/content/spawnLocations';
 import { zones } from 'app/content/zones';
 import { updateHeroMagicStats } from 'app/render/spiritBar';
-import { readGetParameter } from 'app/utils/index';
+import { randomizerSeed, randomizerGoal } from 'app/gameConstants';
 
 import { GameState, Hero, SavedHeroData, SavedState } from 'app/types';
-
 
 export function loadSavedData(): boolean {
     //return false;
@@ -25,13 +24,13 @@ export function loadSavedData(): boolean {
         };
     }
 
-    const seed = parseInt(readGetParameter('seed'), 10) || 0;
-    if (seed) {
+    if (randomizerSeed) {
         state.randomizer = {
-            seed,
+            seed: randomizerSeed,
+            goal: randomizerGoal,
         };
     }
-    const importedSaveData = window.localStorage.getItem('savedGames' + (seed || ''));
+    const importedSaveData = window.localStorage.getItem('savedGames' + (randomizerSeed || ''));
     if (importedSaveData) {
         const rawSavedGames = JSON.parse(importedSaveData);
         // Migrate hero => savedHeroData for older save files.
@@ -43,12 +42,12 @@ export function loadSavedData(): boolean {
         }
         state.savedGames = rawSavedGames.slice(0, 3);
         // Only show a single save file when using seeds.
-        if (seed) {
+        if (randomizerSeed) {
            state.savedGames = rawSavedGames.slice(0, 1);
         }
         return true;
     } else {
-        if (seed) {
+        if (randomizerSeed) {
             state.savedGames = [null];
         }
     }
@@ -119,6 +118,8 @@ export function getDefaultSavedState(): SavedState {
 
 function getDefaultSavedHeroData(): SavedHeroData {
     return {
+        playTime: 0,
+        winTime: 0,
         maxLife: 4,
         hasRevive: false,
         money: 0,
@@ -126,6 +127,7 @@ function getDefaultSavedHeroData(): SavedHeroData {
         goldOre: 0,
         peachQuarters: 0,
         spiritTokens: 0,
+        victoryPoints: 0,
         weapon: 0,
         weaponUpgrades: {},
         activeTools: {
@@ -179,7 +181,7 @@ export function getDefaultState(): GameState {
         // This always updates.
         time: 0,
         // This only advances when the field is updating.
-        fieldTime: 10000,
+        fieldTime: 0,
         // This is set when the player gains or uses a revive
         // and reviveAnimationTime = fieldTime - reviveTime
         reviveTime: 0,

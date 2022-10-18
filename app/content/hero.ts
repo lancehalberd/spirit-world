@@ -134,6 +134,9 @@ export class Hero implements Actor, SavedHeroData {
     goldOre: number;
     peachQuarters: number;
     spiritTokens: number;
+    victoryPoints: number;
+    playTime: number;
+    winTime: number;
     activeTools: {[key in ActiveTool]: number};
     equipment: {[key in Equipment]: number};
     passiveTools: {[key in PassiveTool]: number};
@@ -186,6 +189,8 @@ export class Hero implements Actor, SavedHeroData {
 
     exportSavedHeroData(): SavedHeroData {
         return {
+            playTime: this.playTime,
+            winTime: this.winTime,
             maxLife: this.maxLife,
             hasRevive: this.hasRevive,
             money: this.money,
@@ -193,6 +198,7 @@ export class Hero implements Actor, SavedHeroData {
             goldOre: this.goldOre,
             peachQuarters: this.peachQuarters,
             spiritTokens: this.spiritTokens,
+            victoryPoints: this.victoryPoints,
             weapon: this.weapon,
             weaponUpgrades: {...this.weaponUpgrades},
             leftTool: this.leftTool,

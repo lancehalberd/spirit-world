@@ -141,7 +141,25 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
         }
     }
     if (isRandomizer) {
+        // Freeze on the display of the win time once the game is completed.
+        let seconds = (state.hero.winTime || state.hero.playTime) / 1000;
+        const hours = (seconds / 3600) | 0;
+        const minutes = ((seconds - hours * 3600) / 60) | 0;
+        seconds = seconds % 60;
+        const minutesString = `${minutes}`.padStart(2, '0');
+        const secondsString = seconds.toFixed(1).padStart(4, '0');
+        const timeString = `${hours}:${minutesString}:${secondsString}`;
         const info = getCheckInfo(state);
+        drawText(context, `${Math.max(0, state.randomizer.goal - state.hero.victoryPoints)}`, 2, CANVAS_HEIGHT - 8 - 16, {
+            textBaseline: 'middle',
+            textAlign: 'left',
+            size: 16,
+        });
+        drawText(context, timeString, 2, CANVAS_HEIGHT - 8, {
+            textBaseline: 'middle',
+            textAlign: 'left',
+            size: 16,
+        });
         drawText(context, `${info.zoneChecksCompleted}/${info.totalZoneChecks}`, CANVAS_WIDTH - 2, CANVAS_HEIGHT - 8 - 16, {
             textBaseline: 'middle',
             textAlign: 'right',

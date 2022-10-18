@@ -364,7 +364,7 @@ function selectSaveFile(state: GameState, savedGameIndex: number): void {
             state.scriptEvents.queue = parseScriptText(state, 'Waaaaah!', 1000, false);
             state.scriptEvents.queue.push({type: 'clearTextBox'});
         } else {
-            setScript(state, 'All the treasure in the world has been shuffled!');
+            setScript(state, '{@mom.randomizer}');
         }
         return;
         // Old code for showing the "Choose Game Mode" menu when selecting "New Game".
@@ -387,5 +387,7 @@ function selectSaveFile(state: GameState, savedGameIndex: number): void {
     }
     if (!isRandomizer) {
         showHint(state);
+    } else {
+        setScript(state, '{@mom.randomizer}');
     }
 }

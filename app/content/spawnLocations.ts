@@ -27,6 +27,17 @@ export const SPAWN_LOCATION_DEMO: ZoneLocation = {
     isSpiritWorld: false,
 };
 
+export const SPAWN_LOCATION_WATERFALL_VILLAGE: ZoneLocation = {
+    zoneKey: 'overworld',
+    floor: 0,
+    x: 168,
+    y: 290,
+    z: 0,
+    d: 'down',
+    areaGridCoords: {x: 1, y: 0},
+    isSpiritWorld: false,
+};
+
 export const SPAWN_LOCATION_PEACH_CAVE_BOSS: ZoneLocation = {
     zoneKey: 'peachCave',
     floor: 1,
@@ -688,6 +699,7 @@ export function setSpawnLocation(state: GameState, spawnLocation: ZoneLocation):
 }
 
 const prioritizedSpawnLocations = [
+    SPAWN_LOCATION_WATERFALL_VILLAGE,
     SPAWN_LOCATION_PEACH_CAVE_EXIT,
     // Spirit world
     SPAWN_LOCATION_TOMB_ENTRANCE,

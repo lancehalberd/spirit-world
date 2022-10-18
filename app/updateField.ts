@@ -25,6 +25,7 @@ export function updateField(this: void, state: GameState) {
         return;
     }
     state.fieldTime += FRAME_LENGTH;
+    state.hero.playTime += FRAME_LENGTH;
     // Remove completed screenshakes. If this is not checked each time the fieldTime is advanced
     // then the shakes will appear to oscillate out of control when fieldTime exceeds their endTime.
     for (let i = 0; i < state.screenShakes.length; i++) {

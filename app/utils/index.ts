@@ -218,3 +218,8 @@ export function readGetParameter(parameterName: string): string {
         }
     }
 }
+
+export function readGetParameterAsInt(parameterName: string): number {
+    const number = parseInt(readGetParameter(parameterName), 10);
+    return isNaN(number) ? 0 : number;
+}

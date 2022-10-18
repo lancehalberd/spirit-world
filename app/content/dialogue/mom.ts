@@ -1,5 +1,8 @@
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
+import { randomizerSeed, randomizerTotal } from 'app/gameConstants';
+import { saveGame } from 'app/state';
 
+import { GameState } from 'app/types';
 
 dialogueHash.mom = {
     key: 'mom',
@@ -7,8 +10,25 @@ dialogueHash.mom = {
         rest: `{choice:Do you want to rest?|Yes:mom.yesRest|No:mom.noRest}`,
         yesRest: 'Sweet dreams! {rest}',
         noRest: 'Be careful out there!',
+        randomizer:(state: GameState) => {
+            if (state.hero.winTime) {
+                return 'You did great!{|}Feel free to keep exploring if you like!';
+            }
+            if (state.hero.victoryPoints >= state.randomizer.goal) {
+                state.hero.winTime = state.hero.playTime;
+                saveGame();
+                return 'Finished!'
+            }
+            return `I've hidden ${randomizerTotal} Victory Points around the world.
+                {|}Find ${state.randomizer.goal} total and talk to me to win!
+                {|}You have found ${state.hero.victoryPoints} so far.`;
+        },
     },
     options: [
+        ...(randomizerSeed ? [{
+            logicCheck: {},
+            text: [`{@mom.randomizer}`],
+        }] : []),
         {
             logicCheck: {
                 requiredFlags: ['$astralProjection'],

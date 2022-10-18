@@ -7,8 +7,10 @@ import { getZone, zones } from 'app/content/zones';
 import {
     SPAWN_LOCATION_DEMO,
     SPAWN_LOCATION_FULL,
-    SPAWN_LOCATION_PEACH_CAVE_EXIT,
+    SPAWN_LOCATION_WATERFALL_VILLAGE,
 } from 'app/content/spawnLocations';
+
+import { randomizerSeed, randomizerGoal, randomizerTotal } from 'app/gameConstants';
 
 import { peachCaveNodes } from 'app/randomizer/logic/peachCaveLogic';
 import { cavesNodes, holyCityNodes, treeVillageNodes, waterfallCaveNodes } from 'app/randomizer/logic/otherLogic'
@@ -294,9 +296,9 @@ function getLootObjects(nodes: LogicNode[], state: GameState = null): LootWithLo
                 lootObject: {
                     id: `${dialogueKey}:${optionKey}`,
                     type: 'dialogueLoot',
-                    lootType: lootType,
-                    amount: parseInt(amountOrLevel, 10) || 0
-                } as AnyLootDefinition,
+                    lootType: lootType as LootType,
+                    lootAmount: parseInt(amountOrLevel, 10) || 0
+                },
                 dialogueKey,
                 optionKey
             });
@@ -563,6 +565,63 @@ export function reverseFill(random: typeof SRandom, allNodes: LogicNode[], start
     calculateKeyLogic(allNodes, startingNodes);
     //console.log({ allNodes, startingNodes });
     const allLootObjects = getLootObjects(allNodes);
+    // Try to replace as many unimportant checks with victory points as we can
+    // until we either run out of checks or hit the victory point target.
+    let victoryPointsHidden = 0, replaceGoodChecks = false;
+    const shuffledLoot = random.shuffle(allLootObjects);
+    while (victoryPointsHidden < randomizerTotal) {
+        let remainingPeachPiecesNeeded = 12;
+        for (const lootWithLocation of shuffledLoot) {
+            switch (lootWithLocation.lootObject.lootType) {
+                case 'victoryPoint':
+                    lootWithLocation.lootObject.lootAmount++;
+                    victoryPointsHidden++;
+                    break;
+                case 'silverOre':
+                case 'goldOre':
+                    if (!replaceGoodChecks) {
+                        break;
+                    }
+                case 'empty':
+                case 'money':
+                case 'peach':
+                    lootWithLocation.lootObject.lootType = 'victoryPoint';
+                    lootWithLocation.lootObject.lootAmount = 1;
+                    victoryPointsHidden++;
+                    break;
+                case 'peachOfImmortality':
+                    if (!replaceGoodChecks) {
+                        break;
+                    }
+                    if (remainingPeachPiecesNeeded > 0) {
+                        remainingPeachPiecesNeeded -= 4;
+                    } else {
+                        lootWithLocation.lootObject.lootType = 'victoryPoint';
+                        lootWithLocation.lootObject.lootAmount = 1;
+                        victoryPointsHidden++;
+                    }
+                    break;
+                case 'peachOfImmortalityPiece':
+                    if (!replaceGoodChecks) {
+                        break;
+                    }
+                    if (remainingPeachPiecesNeeded > 0) {
+                        remainingPeachPiecesNeeded--;
+                    } else {
+                        lootWithLocation.lootObject.lootType = 'victoryPoint';
+                        lootWithLocation.lootObject.lootAmount = 1;
+                        victoryPointsHidden++;
+                    }
+                    break;
+            }
+            if (victoryPointsHidden >= randomizerTotal) {
+                break;
+            }
+        }
+        replaceGoodChecks = true;
+    }
+
+
     //console.log(allLootObjects.map(object => object.lootObject.lootType + ':' + object.location.zoneKey));
     let initialState = getDefaultState();
     applySavedState(initialState, initialState.savedState);
@@ -693,12 +752,14 @@ function placeItem(random: typeof SRandom, allNodes: LogicNode[], startingNodes:
     assignmentsState.assignedLocations.push(assignedLocation.lootObject.id);
 }
 
+let finishedRandomizerSolution = false;
 window['showRandomizerSolution'] = function () {
     let currentState = getDefaultState();
     applySavedState(currentState, currentState.savedState);
     let previousState = currentState;
     let counter = 0;
     const startingNodes = [overworldNodes[0]];
+    finishedRandomizerSolution = false;
     do {
         if (counter++ > 200) {
             console.error('infinite loop');
@@ -770,7 +831,7 @@ function getZoneText(zone: string, isSpiritWorld: boolean): string {
     return zone;
 }
 
-function getLootName(lootType: LootType, state: GameState) {
+function getLootName({lootType, lootAmount}: AnyLootDefinition, state: GameState) {
     if (lootType === 'spiritPower') {
         if (state.hero.passiveTools.astralProjection) {
             return 'Teleportation';
@@ -804,6 +865,9 @@ function getLootName(lootType: LootType, state: GameState) {
     if (lootType === 'peachOfImmortalityPiece') {
         return 'Peach Piece';
     }
+    if (lootType === 'victoryPoint') {
+        return `${lootAmount}x VP(${state.hero.victoryPoints + lootAmount})`;
+    }
 
     return lootType;
 }
@@ -826,15 +890,23 @@ function collectAllLootForSolution(allNodes: LogicNode[], startingNodes: LogicNo
             )) {
                 // debugState(state);
                 if (check.location) {
-                    console.log(`Get ${getLootName(check.lootObject.lootType, state)} at ${check.location.zoneKey}:${check.lootObject.id}`);
+                    console.log(`Get ${getLootName(check.lootObject, state)} at ${check.location.zoneKey}:${check.lootObject.id}`);
                 } else {
-                    console.log(`Get ${getLootName(check.lootObject.lootType, state)} from ${check.dialogueKey}:${check.optionKey}`);
+                    console.log(`Get ${getLootName(check.lootObject, state)} from ${check.dialogueKey}:${check.optionKey}`);
                 }
             }
         }
         state = applyLootObjectToState(state, check);
         // Indicate this check has already been opened.
         state.savedState.objectFlags[check.lootObject.id] = true;
+        if (!finishedRandomizerSolution && state.hero.victoryPoints >= randomizerGoal) {
+            console.log('');
+            console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+            console.log('Talk to mom to win.');
+            console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+            console.log('');
+            finishedRandomizerSolution = true;
+        }
     }
     return state;
 }
@@ -960,20 +1032,18 @@ function findAllTargetObjects(lootWithLocation: LootWithLocation): (LootObjectDe
     return results;
 }
 
-const seed = readGetParameter('seed');
-const enemySeed = readGetParameter('enemySeed');
-
-if (seed) {
-    const assignmentsState = reverseFill(SRandom.seed(Number(seed)), allNodes, [overworldNodes[0]]);
+if (randomizerSeed) {
+    const assignmentsState = reverseFill(SRandom.seed(Number(randomizerSeed)), allNodes, [overworldNodes[0]]);
     applyLootAssignments(assignmentsState.assignments);
-    for (let key in SPAWN_LOCATION_PEACH_CAVE_EXIT) {
-        SPAWN_LOCATION_DEMO[key] = SPAWN_LOCATION_PEACH_CAVE_EXIT[key];
-        SPAWN_LOCATION_FULL[key] = SPAWN_LOCATION_PEACH_CAVE_EXIT[key];
+    for (let key in SPAWN_LOCATION_WATERFALL_VILLAGE) {
+        SPAWN_LOCATION_DEMO[key] = SPAWN_LOCATION_WATERFALL_VILLAGE[key];
+        SPAWN_LOCATION_FULL[key] = SPAWN_LOCATION_WATERFALL_VILLAGE[key];
     }
 
 }
+const enemySeed = readGetParameter('enemySeed');
 if (enemySeed) {
-    let enemyRandom = SRandom.seed(Number(seed))
+    let enemyRandom = SRandom.seed(Number(enemySeed))
     everyObject((location, zone, area, object) => {
         if (object.type === 'enemy') {
             object.enemyType = enemyRandom.element([...enemyTypes]);

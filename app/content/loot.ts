@@ -456,6 +456,7 @@ const lootFrames = {
     weapon: weaponFrame,
     // This is invisible for now, an effect is applied to the HUD representing this.
     secondChance: {image: createCanvasAndContext(16, 16)[0], x :0, y: 0, w: 16, h: 16},
+    victoryPoint: createLootFrame('green', 'VP'),
 } as const;
 
 const [
@@ -600,7 +601,9 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: An
             state.hero.silverOre++;
         } else if (loot.lootType === 'goldOre') {
             state.hero.goldOre++;
-        } else {
+        } else if (loot.lootType === 'victoryPoint') {
+            state.hero.victoryPoints += (loot.lootAmount || 1);
+        }  else {
             console.error('Unhandled loot type:', loot.lootType);
             // throw new Error('Unhandled loot type: ' + loot.lootType);
         }
