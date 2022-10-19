@@ -504,6 +504,9 @@ function organizeLootObjects(lootObjects: LootWithLocation[]) {
             case 'money':
             case 'peach':
             case 'empty':
+            case 'victoryPoint':
+            case 'silverOre':
+            case 'goldOre':
                 trashLoot.push(lootWithLocation);
                 break;
             case 'bigKey':
