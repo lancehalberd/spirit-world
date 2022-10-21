@@ -23,151 +23,86 @@ export const snakeAnimations: ActorAnimations = {
         right: leftSnakeAnimation,
     },
 };
+// all idols share the same layout and dimensions
+// row 0: still frames; row 1: float;
+// row 2: float attack; row 3: dead float attack;
+// row 4: projectile float attack; row 5: dead projectile float attack;
+// row 6: warning eye glow
+const idolGeometry: FrameDimensions = { w: 32, h: 40, content: { x: 2, y: 20, w: 28, h: 20} };
+const iceImage = 'gfx/enemies/miniStatueBoss-ice-32x40.png';
+const fireImage = 'gfx/enemies/miniStatueBoss-fire-32x40.png';
+const lightningImage = 'gfx/enemies/miniStatueBoss-lightning-32x40.png';
+
 // ice snake animations
 // gfx/enemies/miniStatueBoss-ice-32x40
-const iceIdolGeometry: FrameDimensions = { w: 32, h: 40, content: { x: 2, y: 20, w: 28, h: 20} };
-const iceIdolStillAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-ice-32x40.png', iceIdolGeometry, { x: 0, y: 0, cols: 1});
-const iceIdolBrokenAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-ice-32x40.png', iceIdolGeometry, { x: 2, y: 0, cols: 1});
-const iceIdolIdleAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-ice-32x40.png', iceIdolGeometry, { y: 1, cols: 5});
-const iceIdolAttackAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-ice-32x40.png', iceIdolGeometry, { y: 2, cols: 5});
-const iceIdolAttackBallAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-ice-32x40.png', iceIdolGeometry, { y: 3, cols: 5});
-const iceIdolWarningAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-ice-32x40.png', iceIdolGeometry, { y: 4, cols: 5});
+const iceIdolAttackAnimation: FrameAnimation = createAnimation(iceImage, idolGeometry, { y: 2, cols: 5});
+const iceIdolAttackDeadAnimation: FrameAnimation = createAnimation(iceImage, idolGeometry, { y: 3, cols: 5});
+const iceIdolAttackBallAnimation: FrameAnimation = createAnimation(iceImage, idolGeometry, { y: 4, cols: 5});
+const iceIdolAttackBallDeadAnimation: FrameAnimation = createAnimation(iceImage, idolGeometry, { y: 5, cols: 5});
+const iceIdolBrokenAnimation: FrameAnimation = createAnimation(iceImage, idolGeometry, { x: 3, y: 0, cols: 1});
+const iceIdolIdleAnimation: FrameAnimation = createAnimation(iceImage, idolGeometry, { y: 1, cols: 5});
+const iceIdolStillAnimation: FrameAnimation = createAnimation(iceImage, idolGeometry, { x: 0, y: 0, cols: 1});
+const iceIdolWakeAnimation: FrameAnimation = createAnimation(iceImage, idolGeometry, { x: 0, y: 0, cols: 2}, {loop: false});
+const iceIdolWarningAnimation: FrameAnimation = createAnimation(iceImage, idolGeometry, { y: 6, cols: 5});
 
 export const iceIdolAnimations: ActorAnimations = {
-    idle: {
-        up: iceIdolIdleAnimation,
-        down: iceIdolIdleAnimation,
-        left: iceIdolIdleAnimation,
-        right: iceIdolIdleAnimation,
-    },
-    attack: {
-        up: iceIdolAttackAnimation,
-        down: iceIdolAttackAnimation,
-        left: iceIdolAttackAnimation,
-        right: iceIdolAttackAnimation,
-    },
-    attackBall: {
-        up: iceIdolAttackBallAnimation,
-        down: iceIdolAttackBallAnimation,
-        left: iceIdolAttackBallAnimation,
-        right: iceIdolAttackBallAnimation,
-    },
-    still: {
-        up: iceIdolStillAnimation,
-        down: iceIdolStillAnimation,
-        left: iceIdolStillAnimation,
-        right: iceIdolStillAnimation,
-    },
-    warning: {
-        up: iceIdolWarningAnimation,
-        down: iceIdolWarningAnimation,
-        left: iceIdolWarningAnimation,
-        right: iceIdolWarningAnimation,
-    },
-    broken: {
-        up: iceIdolBrokenAnimation,
-        down: iceIdolBrokenAnimation,
-        left: iceIdolBrokenAnimation,
-        right: iceIdolBrokenAnimation,
-    }
+    attack: omniAnimation(iceIdolAttackAnimation),
+    attackDead: omniAnimation(iceIdolAttackDeadAnimation),
+    attackBall: omniAnimation(iceIdolAttackBallAnimation),
+    attackBallDead: omniAnimation(iceIdolAttackBallDeadAnimation),
+    broken: omniAnimation(iceIdolBrokenAnimation),
+    idle: omniAnimation(iceIdolIdleAnimation),
+    still: omniAnimation(iceIdolStillAnimation),
+    wake: omniAnimation(iceIdolWakeAnimation),
+    warning: omniAnimation(iceIdolWarningAnimation),
 };
 
 // lightning bird animations
 // gfx/enemies/miniStatueBoss-lightning-32x40
-const lightningIdolGeometry: FrameDimensions = { w: 32, h: 40, content: { x: 2, y: 20, w: 28, h: 20} };
-const lightningIdolStillAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-lightning-32x40.png', lightningIdolGeometry, { y: 0, cols: 1});
-const lightningIdolBrokenAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-lightning-32x40.png', lightningIdolGeometry, { x: 2, y: 0, cols: 1});
-const lightningIdolIdleAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-lightning-32x40.png', lightningIdolGeometry, { y: 1, cols: 5});
-const lightningIdolAttackAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-lightning-32x40.png', lightningIdolGeometry, { y: 2, cols: 5});
-const lightningIdolAttackBallAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-lightning-32x40.png', lightningIdolGeometry, { y: 3, cols: 5});
-const lightningIdolWarningAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-lightning-32x40.png', lightningIdolGeometry, { y: 4, cols: 5});
+const lightningIdolAttackAnimation: FrameAnimation = createAnimation(lightningImage, idolGeometry, { y: 2, cols: 5});
+const lightningIdolAttackDeadAnimation: FrameAnimation = createAnimation(lightningImage, idolGeometry, { y: 3, cols: 5});
+const lightningIdolAttackBallAnimation: FrameAnimation = createAnimation(lightningImage, idolGeometry, { y: 4, cols: 5});
+const lightningIdolAttackBallDeadAnimation: FrameAnimation = createAnimation(lightningImage, idolGeometry, { y: 5, cols: 5});
+const lightningIdolBrokenAnimation: FrameAnimation = createAnimation(lightningImage, idolGeometry, { x: 3, y: 0, cols: 1});
+const lightningIdolIdleAnimation: FrameAnimation = createAnimation(lightningImage, idolGeometry, { y: 1, cols: 5});
+const lightningIdolStillAnimation: FrameAnimation = createAnimation(lightningImage, idolGeometry, { y: 0, cols: 1});
+const lightningIdolWakeAnimation: FrameAnimation = createAnimation(lightningImage, idolGeometry, { x: 0, y: 0, cols: 2}, {loop: false});
+const lightningIdolWarningAnimation: FrameAnimation = createAnimation(lightningImage, idolGeometry, { y: 6, cols: 5});
 
 export const lightningIdolAnimations: ActorAnimations = {
-    idle: {
-        up: lightningIdolIdleAnimation,
-        down: lightningIdolIdleAnimation,
-        left: lightningIdolIdleAnimation,
-        right: lightningIdolIdleAnimation,
-    },
-    attack: {
-        up: lightningIdolAttackAnimation,
-        down: lightningIdolAttackAnimation,
-        left: lightningIdolAttackAnimation,
-        right: lightningIdolAttackAnimation,
-    },
-    attackBall: {
-        up: lightningIdolAttackBallAnimation,
-        down: lightningIdolAttackBallAnimation,
-        left: lightningIdolAttackBallAnimation,
-        right: lightningIdolAttackBallAnimation,
-    },
-    still: {
-        up: lightningIdolStillAnimation,
-        down: lightningIdolStillAnimation,
-        left: lightningIdolStillAnimation,
-        right: lightningIdolStillAnimation,
-    },
-    warning: {
-        up: lightningIdolWarningAnimation,
-        down: lightningIdolWarningAnimation,
-        left: lightningIdolWarningAnimation,
-        right: lightningIdolWarningAnimation,
-    },
-    broken: {
-        up: lightningIdolBrokenAnimation,
-        down: lightningIdolBrokenAnimation,
-        left: lightningIdolBrokenAnimation,
-        right: lightningIdolBrokenAnimation,
-    }
+    attack: omniAnimation(lightningIdolAttackAnimation),
+    attackDead: omniAnimation(lightningIdolAttackDeadAnimation),
+    attackBall: omniAnimation(lightningIdolAttackBallAnimation),
+    attackBallDead: omniAnimation(lightningIdolAttackBallDeadAnimation),
+    broken: omniAnimation(lightningIdolBrokenAnimation),
+    idle: omniAnimation(lightningIdolIdleAnimation),
+    still: omniAnimation(lightningIdolStillAnimation),
+    wake: omniAnimation(lightningIdolWakeAnimation),
+    warning: omniAnimation(lightningIdolWarningAnimation),
 };
 
 // fire badger animations
 // gfx/enemies/miniStatueBoss-fire-32x40
-const fireIdolGeometry: FrameDimensions = { w: 32, h: 40, content: { x: 2, y: 20, w: 28, h: 20} };
-const fireIdolStillAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-fire-32x40.png', fireIdolGeometry, { y: 0, cols: 1});
-const fireIdolBrokenAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-fire-32x40.png', fireIdolGeometry, { x: 2, y: 0, cols: 1});
-const fireIdolIdleAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-fire-32x40.png', fireIdolGeometry, { y: 1, cols: 5});
-const fireIdolAttackAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-fire-32x40.png', fireIdolGeometry, { y: 2, cols: 5});
-const fireIdolAttackBallAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-fire-32x40.png', fireIdolGeometry, { y: 3, cols: 5});
-const fireIdolWarningAnimation: FrameAnimation = createAnimation('gfx/enemies/miniStatueBoss-fire-32x40.png', fireIdolGeometry, { y: 4, cols: 5});
+const fireIdolAttackAnimation: FrameAnimation = createAnimation(fireImage, idolGeometry, { y: 2, cols: 5});
+const fireIdolAttackDeadAnimation: FrameAnimation = createAnimation(fireImage, idolGeometry, { y: 3, cols: 5});
+const fireIdolAttackBallAnimation: FrameAnimation = createAnimation(fireImage, idolGeometry, { y: 4, cols: 5});
+const fireIdolAttackBallDeadAnimation: FrameAnimation = createAnimation(fireImage, idolGeometry, { y: 5, cols: 5});
+const fireIdolBrokenAnimation: FrameAnimation = createAnimation(fireImage, idolGeometry, { x: 3, y: 0, cols: 1});
+const fireIdolIdleAnimation: FrameAnimation = createAnimation(fireImage, idolGeometry, { y: 1, cols: 5});
+const fireIdolStillAnimation: FrameAnimation = createAnimation(fireImage, idolGeometry, { y: 0, cols: 1});
+const fireIdolWakeAnimation: FrameAnimation = createAnimation(fireImage, idolGeometry, { x: 0, y: 0, cols: 2}, {loop: false});
+const fireIdolWarningAnimation: FrameAnimation = createAnimation(fireImage, idolGeometry, { y: 6, cols: 5});
 
 export const fireIdolAnimations: ActorAnimations = {
-    idle: {
-        up: fireIdolIdleAnimation,
-        down: fireIdolIdleAnimation,
-        left: fireIdolIdleAnimation,
-        right: fireIdolIdleAnimation,
-    },
-    attack: {
-        up: fireIdolAttackAnimation,
-        down: fireIdolAttackAnimation,
-        left: fireIdolAttackAnimation,
-        right: fireIdolAttackAnimation,
-    },
-    attackBall: {
-        up: fireIdolAttackBallAnimation,
-        down: fireIdolAttackBallAnimation,
-        left: fireIdolAttackBallAnimation,
-        right: fireIdolAttackBallAnimation,
-    },
-    still: {
-        up: fireIdolStillAnimation,
-        down: fireIdolStillAnimation,
-        left: fireIdolStillAnimation,
-        right: fireIdolStillAnimation,
-    },
-    warning: {
-        up: fireIdolWarningAnimation,
-        down: fireIdolWarningAnimation,
-        left: fireIdolWarningAnimation,
-        right: fireIdolWarningAnimation,
-    },
-    broken: {
-        up: fireIdolBrokenAnimation,
-        down: fireIdolBrokenAnimation,
-        left: fireIdolBrokenAnimation,
-        right: fireIdolBrokenAnimation,
-    }
+    attack: omniAnimation(fireIdolAttackAnimation),
+    attackDead: omniAnimation(fireIdolAttackDeadAnimation),
+    attackBall: omniAnimation(fireIdolAttackBallAnimation),
+    attackBallDead: omniAnimation(fireIdolAttackBallDeadAnimation),
+    broken: omniAnimation(fireIdolBrokenAnimation),
+    idle: omniAnimation(fireIdolIdleAnimation),
+    still: omniAnimation(fireIdolStillAnimation),
+    wake: omniAnimation(fireIdolWakeAnimation),
+    warning: omniAnimation(fireIdolWarningAnimation),
 };
 
 const beetleGeometry: FrameDimensions = { w: 18, h: 17, content: { x: 2, y: 4, w: 14, h: 12} };

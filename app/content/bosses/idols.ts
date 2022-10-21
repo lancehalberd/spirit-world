@@ -33,7 +33,6 @@ enemyDefinitions.frostIdol = {
     immunities: ['ice'],
 };
 
-
 function updateStormIdol(state: GameState, enemy: Enemy): void {
     updateElementalIdol(state, enemy, () => {
         enemy.params.theta = (enemy.params.theta || 0) + Math.PI / 4;
@@ -64,6 +63,9 @@ function updateFrostIdol(state: GameState, enemy: Enemy): void {
     })
 }
 
+// attackBall: primary attack; attackBallDead: attack when idol is defeated
+// use "wake" animation when transitioning to "living" animations, but not
+// "defeated" or "dead" animations
 function updateElementalIdol(state: GameState, enemy: Enemy, attack: () => void) {
     // The statue is "destroyed" at 1 life, it will stay shielded and use its attack every 4 seconds
     // until all statues are "destroyed".
@@ -74,13 +76,19 @@ function updateElementalIdol(state: GameState, enemy: Enemy, attack: () => void)
             object instanceof Enemy && object.definition.type === 'boss' && object.life > 0
         )) {
             enemy.showDeathAnimation(state);
-            enemy.changeToAnimation('broken');
             return;
         }
         enemy.shielded = true;
+        if (enemy.modeTime < 3300) {
+            enemy.changeToAnimation('broken');
+        }
+        if (enemy.modeTime > 3300 && enemy.modeTime < 4000) {
+            enemy.changeToAnimation('attackBallDead');
+        }
         if (enemy.modeTime >= 4000) {
             attack();
             enemy.setMode('attack');
+            enemy.changeToAnimation('broken');
         }
         return;
     }
@@ -110,7 +118,7 @@ function updateElementalIdol(state: GameState, enemy: Enemy, attack: () => void)
     if (!enemy.area.objects.some(object => object instanceof Enemy && object.params.priority < enemy.params.priority)) {
         if (enemy.mode === 'attack') {
             if (!enemy.params.pinchMode) {
-                if (enemy.modeTime === 200) {
+                if (enemy.modeTime > 200 && enemy.modeTime < 1000) {
                     enemy.changeToAnimation('attackBall');
                 }
                 if (enemy.modeTime === 1000) {
@@ -118,8 +126,13 @@ function updateElementalIdol(state: GameState, enemy: Enemy, attack: () => void)
                     enemy.changeToAnimation('idle');
                 }
             } else {
+                if (enemy.modeTime > 50 && enemy.modeTime < 500
+                        || enemy.modeTime > 550 && enemy.modeTime < 1000) {
+                    enemy.changeToAnimation('attackBall');
+                }
                 if (enemy.modeTime === 500 || enemy.modeTime === 1000) {
                     attack();
+                    enemy.changeToAnimation('idle');
                 }
             }
             if (enemy.modeTime >= 2000) {
@@ -130,6 +143,9 @@ function updateElementalIdol(state: GameState, enemy: Enemy, attack: () => void)
             }
         } else {
             enemy.changeToAnimation('warning');
+            if (enemy.modeTime > 800 && enemy.modeTime <= 1000) {
+                enemy.changeToAnimation('wake');
+            }
             if (enemy.modeTime > 1000) {
                 enemy.changeToAnimation('idle');
                 enemy.setMode('attack');
