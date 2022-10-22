@@ -47,7 +47,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             || isCloneToolDown || hero === primaryClone
         );
     const minZ = hero.groundHeight + (hero.isAstralProjection ? 4 : 0);
-    const isThrowingCloak = state.hero.toolOnCooldown === 'cloak';
+    const isThrowingCloak = hero.toolOnCooldown === 'cloak';
     const isMovementBlocked = hero.action === 'meditating'
         || hero.action === 'throwing' || hero.action === 'grabbing' || isThrowingCloak;
     const maxCloudBootsZ = hero.groundHeight + MAX_FLOAT_HEIGHT;

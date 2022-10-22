@@ -14,10 +14,8 @@ Known Bugs:
         - Mana regen is wrong when using clone tools (seems to multiply consumption/regen by number of clones)
         - Should destroy clones when the clone technique is unequipped.
         - Clones should all share the same tools (store tools on state instead of hero)
-        - Unable to charge weapon while clones are active, multiple clones don't attack at the same time
         - Staff won't be placed when controlling multiple clones (one places, another retrieves?)
-            - Should probably just have the primary clone place the staff
-        - Bow renders on clone when another clone uses the bow.
+            - Let's allow one staff per clone, similar to chakrams.
     - Held rocks/bushes are invisible while using cloak
     - Piercing projectiles that can push things should be stopped by the first object they push
         or not be able to push additional objects, for example, the charged chakram.
@@ -46,6 +44,7 @@ Current tasks:
     Clone throw
         Hold B_PASSIVE + press B_TOOL to throw a clone that will blow up immediately.
         Hold B_PASSIVE + hold B_TOOL to throw yourself leaving behind a clone that blows up.
+        Clone can pass over solid tiles while z > 16 or so.
 
     Nimbus cloud
         - on overworld material takes you to: Lake, City, Village, Peaks, Ruins

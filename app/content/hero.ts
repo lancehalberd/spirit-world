@@ -392,7 +392,7 @@ export class Hero implements Actor, SavedHeroData {
     }
 
     renderBow(this: Hero, context: CanvasRenderingContext2D, state: GameState, bowDirection: Direction): void {
-        const isChargingBow = state.hero.toolOnCooldown !== 'bow';
+        const isChargingBow = this.toolOnCooldown !== 'bow';
         const bowAnimationTime = isChargingBow ? 0 : (200 - this.toolCooldown);
         let arrowXOffset = 8, arrowYOffset = 8;
         if (directionMap[bowDirection][0] < 0) {
@@ -494,7 +494,7 @@ export class Hero implements Actor, SavedHeroData {
         }
         const isChargingBow = (hero.chargingRightTool && hero.rightTool === 'bow')
                 || (hero.chargingLeftTool && hero.leftTool === 'bow');
-        const shouldDrawBow = isChargingBow || state.hero.toolOnCooldown === 'bow';
+        const shouldDrawBow = isChargingBow || hero.toolOnCooldown === 'bow';
         const bowDirection = getDirection(hero.actionDx, hero.actionDy, true, hero.d);
         const drawBowUnderHero = bowDirection === 'up' || bowDirection === 'upleft' || bowDirection === 'upright';
         if (shouldDrawBow && drawBowUnderHero) {
@@ -513,7 +513,7 @@ export class Hero implements Actor, SavedHeroData {
             }
             drawFrameAt(context, frame, { x: hero.x, y: hero.y - hero.z });
         context.restore();
-        if (state.hero.toolOnCooldown === 'cloak') {
+        if (this.toolOnCooldown === 'cloak') {
             this.renderCloak(context, state);
         }
         if (shouldDrawBow && !drawBowUnderHero) {

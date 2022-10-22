@@ -44,7 +44,7 @@ export function getHeroFrame(state: GameState, hero: Hero): Frame {
         animations = heroSwimAnimations.idle;
         return getFrame(animations[hero.d], hero.animationTime);
     }
-    if (state.hero.toolOnCooldown === 'cloak') {
+    if (hero.toolOnCooldown === 'cloak') {
         animations = heroAnimations.cloak;
         return getFrame(animations[hero.d], hero.animationTime);
     }
