@@ -92,6 +92,7 @@ export function useTool(
             state.hero.hasBarrier = true;
             return;
         case 'clone':
+            // The normal clone tool functionality only works when no clones currently exist.
             if (!state.hero.clones.length) {
                 if (state.hero.magic <= 0 || state.hero.life < 2) {
                     return;

@@ -345,6 +345,8 @@ export class HeldChakram implements EffectInstance {
         // Remove a chakram if it is not in the are with the hero.
         if (!state.transitionState && this.hero.area !== this.area) {
             removeEffectFromArea(state, this);
+            delete this.hero.heldChakram;
+            return;
         }
         if (state.hero.magic > 0 && this.animationTime >= 1000 && state.hero.passiveTools.charge >= 1 && this.animationTime % 200 === 0) {
             this.sparkles.push(makeSparkleAnimation(state, this, { element: this.hero.element }));
@@ -370,6 +372,7 @@ export class HeldChakram implements EffectInstance {
         if (hitResult.hit && !hitResult.pierced) {
             this.hero.action = null;
             removeEffectFromArea(state, this);
+            delete this.hero.heldChakram;
             // console.log(hitResult.knockback);
             if (hitResult.knockback) {
                 this.hero.bounce = {vx: hitResult.knockback.vx, vy: hitResult.knockback.vy, frames: 10};

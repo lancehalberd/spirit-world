@@ -34,6 +34,9 @@ import {
 
 export function updateHeroStandardActions(this: void, state: GameState, hero: Hero) {
     hero.thrownChakrams = hero.thrownChakrams.filter(chakram => chakram.area === hero.area);
+    if (hero.heldChakram && hero.heldChakram.area !== hero.area) {
+        delete hero.heldChakram;
+    }
     const wasPassiveButtonPressed = wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL);
     const isPassiveButtonDown = isGameKeyDown(state, GAME_KEY.PASSIVE_TOOL);
     const isCloneToolDown = (state.hero.leftTool === 'clone' && isGameKeyDown(state, GAME_KEY.LEFT_TOOL))
