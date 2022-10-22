@@ -645,6 +645,11 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         hero.action = 'roll';
         hero.actionFrame = 0;
         hero.animationTime = 0;
+        const direction = getDirection(
+            (dx || dy) ? dx : directionMap[hero.d][0],
+            (dx || dy) ? dy : directionMap[hero.d][1], true, hero.d);
+        hero.actionDx = directionMap[direction][0];
+        hero.actionDy = directionMap[direction][1];
         return;
     }
     if ((hero.swimming || isUnderwater(state, hero)) && wasGameKeyPressed(state, GAME_KEY.MEDITATE)) {

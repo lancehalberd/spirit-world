@@ -557,8 +557,9 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             // This helps keep players from rolling over pits.
             hero.rollCooldown = 40;
         } else {
-            hero.vx = directionMap[hero.d][0] * rollSpeed[hero.actionFrame];
-            hero.vy = directionMap[hero.d][1] * rollSpeed[hero.actionFrame];
+            const direction = getDirection(hero.actionDx, hero.actionDy, true, hero.d);
+            hero.vx = directionMap[direction][0] * rollSpeed[hero.actionFrame];
+            hero.vy = directionMap[direction][1] * rollSpeed[hero.actionFrame];
             hero.actionFrame++;
             if (hero.z >= minZ) {
                 hero.z = Math.max(minZ, hero.z - 0.4);

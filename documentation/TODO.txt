@@ -43,8 +43,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    Diagonal dodge roll
-
     Clone throw
         Hold B_PASSIVE + press B_TOOL to throw a clone that will blow up immediately.
         Hold B_PASSIVE + hold B_TOOL to throw yourself leaving behind a clone that blows up.
