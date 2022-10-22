@@ -231,8 +231,14 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     }
     // Uncontrollable clones automatically run the explosion sequence.
     if (hero.action === 'meditating' || hero.isUncontrollable) {
-        if (hero.isUncontrollable || isPlayerControlled && isGameKeyDown(state, GAME_KEY.MEDITATE) && hero.magic > 0) {
-            if (state.hero.clones.length) {
+        if (hero.isUncontrollable
+            || (isPlayerControlled && isGameKeyDown(state, GAME_KEY.MEDITATE))
+        ) {
+            // You can use the clone explosion ability only if a controllable clone exists
+            // to either explode or switch to.
+            if (hero.isUncontrollable
+                || state.hero.clones.filter(clone => !clone.isUncontrollable).length
+            ) {
                 // Meditating as a clone will either blow up the current clone, or all clones
                 // except the current if the clone tool is being pressed.
                 if (!isCloneToolDown || hero !== primaryClone) {
@@ -519,8 +525,9 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
 
     // Check to start charging/preparing a tool for use.
     if (canCharge && hero.toolCooldown <= 0 && !hero.chargingRightTool && !hero.chargingLeftTool) {
+        const controllableClones = state.hero.clones.filter(clone => !clone.isUncontrollable);
         if (state.hero.leftTool && wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL)
-            && (state.hero.leftTool !== 'clone' || !state.hero.clones.length)
+            && (state.hero.leftTool !== 'clone' || !controllableClones.length)
         ) {
             // Currently only the bow tool can be charged.
             if (state.hero.leftTool === 'bow'
@@ -533,7 +540,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 useTool(state, hero, state.hero.leftTool, directionMap[direction][0], directionMap[direction][1]);
             }
         } else if (state.hero.rightTool && wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL)
-            && (state.hero.rightTool !== 'clone' || !state.hero.clones.length)
+            && (state.hero.rightTool !== 'clone' || !controllableClones.length)
         ) {
             // Currently only the bow tool can be charged.
             if (state.hero.rightTool === 'bow'

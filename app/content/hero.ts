@@ -114,6 +114,7 @@ export class Hero implements Actor, SavedHeroData {
     // inventory
     astralProjection?: Hero;
     clones: Hero[];
+    cloneToolReleased?: boolean
     activeClone?: Hero;
     barrierElement?: MagicElement;
     barrierLevel?: number;
@@ -149,7 +150,10 @@ export class Hero implements Actor, SavedHeroData {
     spawnLocation: ZoneLocation;
     // Heroes have special handling for pits and shouldn't use the object pit logic.
     ignorePits = true;
+    // Clones that are automatically blowing up are marked with this flag.
     isUncontrollable = false;
+    // Clone that you can no longer swap to is marked with this flag.layers
+    cannotSwapTo = false;
 
     heldChakram?: HeldChakram;
     thrownChakrams: ThrownChakram[] = [];

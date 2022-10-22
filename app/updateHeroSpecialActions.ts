@@ -302,6 +302,9 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         return true;
     }
     if (hero.action === 'knocked' || hero.action === 'knockedHard' || hero.action === 'thrown') {
+        if (hero.isUncontrollable) {
+            hero.explosionTime += FRAME_LENGTH;
+        }
         hero.z += hero.vz;
         hero.vz = Math.max(-8, hero.vz - 0.5);
         // Clones ignore collisions with heroes/other clones when being thrown or knocked.

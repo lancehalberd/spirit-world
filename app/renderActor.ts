@@ -60,7 +60,10 @@ export function getHeroFrame(state: GameState, hero: Hero): Frame {
         }
         return getFrame(heroCarryAnimations.idle[hero.d], hero.animationTime);
     }
-    if (hero.explosionTime > 0) {
+    if (hero.action !== 'thrown' && hero.explosionTime > 0) {
+        if (hero.isUncontrollable) {
+            return getFrame(heroAnimations.kneel[hero.d], hero.animationTime);
+        }
         return getFrame(heroAnimations.kneel.down, hero.animationTime);
     }
     switch (hero.action) {

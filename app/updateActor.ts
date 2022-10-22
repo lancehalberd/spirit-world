@@ -1,6 +1,6 @@
 import {
     getAreaFromLocation, getAreaSize, removeEffectFromArea,
-    removeAllClones, removeObjectFromArea, scrollToArea, setNextAreaSection,
+    removeObjectFromArea, scrollToArea, setNextAreaSection,
     swapHeroStates,
 } from 'app/content/areas';
 import { AirBubbles } from 'app/content/objects/airBubbles';
@@ -8,7 +8,7 @@ import { Enemy } from 'app/content/enemy';
 import { editingState } from 'app/development/tileEditor';
 import { FRAME_LENGTH, GAME_KEY } from 'app/gameConstants';
 import {
-    wasGameKeyPressedAndReleased,
+    wasGameKeyPressedAndReleased, wasGameKeyPressed
 } from 'app/keyCommands';
 import { checkForFloorEffects } from 'app/moveActor';
 import { updateHeroSpecialActions } from 'app/updateHeroSpecialActions';
@@ -24,22 +24,45 @@ import {
 
 export function updateAllHeroes(this: void, state: GameState) {
     // Switching clones is done outside of updateHero, otherwise the switch gets processed by each clone.
-    if (state.hero.clones.length && !state.hero.pickUpObject && (
+    if (state.hero.clones.length
+        && !state.hero.pickUpObject && (
             (state.hero.leftTool === 'clone' && wasGameKeyPressedAndReleased(state, GAME_KEY.LEFT_TOOL))
             || (state.hero.rightTool === 'clone' && wasGameKeyPressedAndReleased(state, GAME_KEY.RIGHT_TOOL))
     )) {
-        //const currentIndex = state.hero.clones.indexOf(state.hero.activeClone);
-        //state.hero.activeClone = state.hero.clones[currentIndex + 1];
-
-        // Rotate clone array until we find one we can switch to.
-        for (let i = 0; i < state.hero.clones.length; i++) {
-            if (!state.hero.clones[0].isUncontrollable) {
-                swapHeroStates(state.hero, state.hero.clones[0]);
-                break;
+        if (!state.hero.cloneToolReleased){
+            state.hero.cloneToolReleased = true;
+        } else {
+            for (let i = 0; i < state.hero.clones.length; i++) {
+                if (!state.hero.clones[0].isUncontrollable) {
+                    swapHeroStates(state.hero, state.hero.clones[0]);
+                    state.hero.cloneToolReleased = true;
+                    state.hero.clones[0].cloneToolReleased = true;
+                    break;
+                }
+                state.hero.clones.push(state.hero.clones.shift());
             }
             state.hero.clones.push(state.hero.clones.shift());
         }
-        state.hero.clones.push(state.hero.clones.shift());
+    }
+    // This is for switching to thrown clone as you throw it.
+    if (state.hero.clones.length && state.hero.cloneToolReleased && (
+        (state.hero.leftTool === 'clone' && wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL))
+            || (state.hero.rightTool === 'clone' && wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL))
+    )) {
+        for (let i = 0; i < state.hero.clones.length; i++) {
+            if (state.hero.clones[i].isUncontrollable
+                && !state.hero.clones[i].cannotSwapTo
+                && state.hero.clones[i].explosionTime < 300
+            ) {
+                swapHeroStates(state.hero, state.hero.clones[i]);
+                state.hero.cloneToolReleased = false;
+                state.hero.isUncontrollable = false;
+                state.hero.clones[i].cannotSwapTo = true;
+                state.hero.clones[i].isUncontrollable = true;
+                state.hero.clones[i].explosionTime = state.hero.explosionTime;
+                break;
+            }
+        }
     }
     for (let i = 0; i < state.hero.clones.length; i++) {
         const clone = state.hero.clones[i];
@@ -114,7 +137,9 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
     }
     if (hero.action !== 'meditating') {
         hero.spiritRadius = 0;
-        hero.explosionTime = 0;
+        if (!hero.isUncontrollable) {
+            hero.explosionTime = 0;
+        }
     }
     if (hero.toolCooldown > 0) {
         hero.toolCooldown -= FRAME_LENGTH;
@@ -250,11 +275,11 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
     if (state.hero.magic < 0) {
         state.hero.shatterBarrier(state);
         state.hero.isInvisible = false;
-        if (state.hero.clones.length) {
+        /*if (state.hero.clones.length) {
             state.hero.x = hero.x;
             state.hero.y = hero.y;
             removeAllClones(state);
-        }
+        }*/
         if (isHoldingBreath) {
             hero.onHit(state, {damage: 1});
         }

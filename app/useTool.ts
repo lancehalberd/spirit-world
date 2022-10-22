@@ -1,6 +1,10 @@
 import { addObjectToArea, addEffectToArea, playAreaSound } from 'app/content/areas';
+import {
+    isGameKeyDown,
+} from 'app/keyCommands';
 import { Arrow } from 'app/content/effects/arrow';
 import { Clone }  from 'app/content/objects/clone';
+import { GAME_KEY } from 'app/gameConstants';
 import { directionMap, getDirection } from 'app/utils/field';
 
 import { ActiveTool, GameState, Hero, MagicElement } from 'app/types'
@@ -92,14 +96,36 @@ export function useTool(
             state.hero.hasBarrier = true;
             return;
         case 'clone':
-            // The normal clone tool functionality only works when no clones currently exist.
-            if (!state.hero.clones.length) {
-                if (state.hero.magic <= 0 || state.hero.life < 2) {
-                    return;
-                }
+            if (state.hero.magic <= 0 || state.hero.life <= 1) {
+                return;
+            }
+            if (isGameKeyDown(state, GAME_KEY.PASSIVE_TOOL)
+                && state.hero.clones.length < state.hero.activeTools.clone
+            ) {
                 state.hero.magic -= 10;
                 hero.toolCooldown = 100;
                 hero.toolOnCooldown = 'clone';
+                hero.cloneToolReleased = false;
+                const clone = new Clone(state.hero);
+                //state.hero.activeClone = clone;
+                state.hero.clones.push(clone);
+                addObjectToArea(state, state.areaInstance, clone);
+                clone.isUncontrollable = true;
+                clone.explosionTime = 0;
+                clone.onGrab(state, hero.d, hero);
+                hero.grabObject = clone;
+                // Set this to the end of the pickup animation so we can throw immediately.
+                hero.pickUpFrame = 10;
+                clone.updateCoords(state);
+                hero.throwHeldObject(state);
+                return;
+            }
+            // The normal clone tool functionality only works when no clones currently exist.
+            if (!state.hero.clones.length) {
+                state.hero.magic -= 10;
+                hero.toolCooldown = 100;
+                hero.toolOnCooldown = 'clone';
+                hero.cloneToolReleased = false;
                 for (let i = 0; i < state.hero.activeTools.clone && i < state.hero.life - 1; i++) {
                     const clone = new Clone(state.hero);
                     //state.hero.activeClone = clone;
