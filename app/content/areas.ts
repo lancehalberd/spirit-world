@@ -20,7 +20,7 @@ import { specialBehaviorsHash } from 'app/content/specialBehaviors';
 import {
     AreaDefinition, AreaInstance, AreaLayerDefinition,
     Direction, EffectInstance, Enemy, EntranceDefinition,
-    FullTile, GameState, HeldChakram, Hero, TileCoords,
+    FullTile, GameState, Hero, TileCoords,
     LogicDefinition,
     ObjectDefinition,
     ObjectInstance,
@@ -163,6 +163,15 @@ export function swapHeroStates(heroA: Hero, heroB: Hero) {
         heroA[key] = heroB[key];
         heroB[key] = temp;
     }
+    // Update chakrams to match their correct owner.
+    for (const hero of [heroA, heroB]) {
+        if (hero.heldChakram) {
+            hero.heldChakram.hero = hero;
+        }
+        for (const chakram of hero.thrownChakrams) {
+            chakram.source = hero;
+        }
+    }
 }
 
 export function removeAllClones(state: GameState): void {
@@ -220,11 +229,10 @@ export function enterLocation(
             state.transitionState.nextAlternateAreaInstance = state.areaInstance;
 
             const primaryHero = state.hero.activeClone || state.hero;
-            const heldChakram = primaryHero.area.effects.find(o => o instanceof HeldChakram) as HeldChakram;
             // Bring the held chakram with you.
-            if (heldChakram) {
-                removeEffectFromArea(state, heldChakram);
-                addEffectToArea(state, state.transitionState.nextAreaInstance, heldChakram);
+            if (primaryHero.heldChakram) {
+                removeEffectFromArea(state, primaryHero.heldChakram);
+                addEffectToArea(state, state.transitionState.nextAreaInstance, primaryHero.heldChakram);
             }
         }
         return;

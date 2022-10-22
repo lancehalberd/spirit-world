@@ -308,6 +308,8 @@ export class HeldChakram implements EffectInstance {
         this.hero.vy -= chakram.vy / 4;
         addEffectToArea(state, this.area, chakram);
         removeEffectFromArea(state, this);
+        this.hero.thrownChakrams.push(chakram);
+        delete this.hero.heldChakram;
     }
     updatePosition() {
         //if (this.vx && this.vy) {

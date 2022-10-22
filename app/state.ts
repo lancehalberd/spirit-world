@@ -181,7 +181,10 @@ export function getDefaultState(): GameState {
         // This always updates.
         time: 0,
         // This only advances when the field is updating.
-        fieldTime: 0,
+        // Set this positive because some initial times set to 0
+        // such as the attack buffer time will trigger if this
+        // is near 0.
+        fieldTime: 10000,
         // This is set when the player gains or uses a revive
         // and reviveAnimationTime = fieldTime - reviveTime
         reviveTime: 0,

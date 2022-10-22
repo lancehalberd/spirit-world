@@ -29,19 +29,23 @@ import { playSound } from 'app/musicController';
 
 import {
     FullTile, GameState, HeldChakram, Hero,
-    ObjectInstance, ThrownChakram, TileCoords,
+    ObjectInstance, TileCoords,
 } from 'app/types';
 
 export function updateHeroStandardActions(this: void, state: GameState, hero: Hero) {
+    hero.thrownChakrams = hero.thrownChakrams.filter(chakram => chakram.area === hero.area);
     const wasPassiveButtonPressed = wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL);
     const isPassiveButtonDown = isGameKeyDown(state, GAME_KEY.PASSIVE_TOOL);
-    const heldChakram = hero.area.effects.find(o => o instanceof HeldChakram) as HeldChakram;
     const isCloneToolDown = (state.hero.leftTool === 'clone' && isGameKeyDown(state, GAME_KEY.LEFT_TOOL))
         || (state.hero.rightTool === 'clone' && isGameKeyDown(state, GAME_KEY.RIGHT_TOOL));
     const isCloakToolDown = (state.hero.leftTool === 'cloak' && isGameKeyDown(state, GAME_KEY.LEFT_TOOL))
         || (state.hero.rightTool === 'cloak' && isGameKeyDown(state, GAME_KEY.RIGHT_TOOL));
     const primaryClone = state.hero.activeClone || state.hero;
-    const isPlayerControlled = (state.hero.action === 'meditating' && hero.isAstralProjection) || isCloneToolDown || hero === primaryClone;
+    const isPlayerControlled = !hero.isUncontrollable
+        && (
+            (state.hero.action === 'meditating' && hero.isAstralProjection)
+            || isCloneToolDown || hero === primaryClone
+        );
     const minZ = hero.groundHeight + (hero.isAstralProjection ? 4 : 0);
     const isThrowingCloak = state.hero.toolOnCooldown === 'cloak';
     const isMovementBlocked = hero.action === 'meditating'
@@ -222,8 +226,9 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             hero.action = null;
         }
     }
-    if (hero.action === 'meditating') {
-        if (isPlayerControlled && isGameKeyDown(state, GAME_KEY.MEDITATE) && hero.magic > 0) {
+    // Uncontrollable clones automatically run the explosion sequence.
+    if (hero.action === 'meditating' || hero.isUncontrollable) {
+        if (hero.isUncontrollable || isPlayerControlled && isGameKeyDown(state, GAME_KEY.MEDITATE) && hero.magic > 0) {
             if (state.hero.clones.length) {
                 // Meditating as a clone will either blow up the current clone, or all clones
                 // except the current if the clone tool is being pressed.
@@ -311,15 +316,15 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     } else if (hero.action === 'charging') {
         hero.chargeTime += FRAME_LENGTH;
         movementSpeed *= 0.75;
-        if (!heldChakram && !hero.toolOnCooldown) {
+        if (!hero.heldChakram && !hero.toolOnCooldown) {
             hero.action = null;
             hero.actionDx = 0;
             hero.actionDy = 0;
-        } else if (heldChakram && (!isGameKeyDown(state, GAME_KEY.WEAPON) || !canCharge)) {
+        } else if (hero.heldChakram && (!isGameKeyDown(state, GAME_KEY.WEAPON) || !canCharge)) {
             hero.action = 'attack';
             hero.animationTime = 0;
             hero.actionFrame = 0;
-            heldChakram.throw(state);
+            hero.heldChakram.throw(state);
         }
     }
     if (isPlayerControlled && !isMovementBlocked) {
@@ -341,9 +346,9 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 }
                 const direction = getDirection(dx, dy, true, hero.d);
                 // Don't change direction while charging when the button for the action is no longer pressed.
-                if (heldChakram && isGameKeyDown(state, GAME_KEY.WEAPON)) {
-                    heldChakram.vx = directionMap[direction][0];
-                    heldChakram.vy = directionMap[direction][1];
+                if (hero.heldChakram && isGameKeyDown(state, GAME_KEY.WEAPON)) {
+                    hero.heldChakram.vx = directionMap[direction][0];
+                    hero.heldChakram.vy = directionMap[direction][1];
                 }
                 if ((hero.chargingLeftTool && isGameKeyDown(state, GAME_KEY.LEFT_TOOL))
                     || (hero.chargingRightTool && isGameKeyDown(state, GAME_KEY.RIGHT_TOOL))
@@ -384,14 +389,14 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             hero.animationTime = 0;
         }
     }
-    if (heldChakram?.area === hero.area && heldChakram?.hero === hero && hero.action !== 'charging') {
+    if (hero.heldChakram?.area === hero.area && hero.action !== 'charging') {
         if ((!hero.action || hero.action === 'walking') && isGameKeyDown(state, GAME_KEY.WEAPON) && canCharge) {
             // resume charing if the weapon button is still down.
             hero.action = 'charging';
-            hero.actionDx = heldChakram.vx;
-            hero.actionDy = heldChakram.vy;
+            hero.actionDx = hero.heldChakram.vx;
+            hero.actionDy = hero.heldChakram.vy;
         } else {
-            heldChakram.throw(state);
+            hero.heldChakram.throw(state);
         }
     }
     if (hero.bounce) {
@@ -487,8 +492,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     if (canAttack
         && (wasGameKeyPressed(state, GAME_KEY.WEAPON) || (hero.attackBufferTime > state.fieldTime - 200))
     ) {
-        const thrownChakrams = hero.area.effects.filter(o => o instanceof ThrownChakram) as ThrownChakram[];
-        const usedChakrams = thrownChakrams.length + (heldChakram ? 1 : 0);
+        const usedChakrams = hero.thrownChakrams.length + (hero.heldChakram ? 1 : 0);
         if (state.hero.weapon - usedChakrams > 0) {
             hero.action = 'charging';
             hero.chargeTime = 0;
@@ -497,13 +501,13 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             hero.actionDy = (dx || dy) ? dy : directionMap[hero.d][1];
             hero.actionFrame = 0;
             const direction = getDirection(hero.actionDx, hero.actionDy, true, hero.d);
-            const chakram = new HeldChakram({
+            hero.heldChakram = new HeldChakram({
                 vx: directionMap[direction][0],
                 vy: directionMap[direction][1],
                 source: hero,
-                level: Math.min(state.hero.weapon, thrownChakrams[0]?.level === 2 ? 1 : 2),
+                level: Math.min(state.hero.weapon, hero.thrownChakrams[0]?.level === 2 ? 1 : 2),
             });
-            addEffectToArea(state, hero.area, chakram);
+            addEffectToArea(state, hero.area, hero.heldChakram);
             return;
         } else if (wasGameKeyPressed(state, GAME_KEY.WEAPON) && state.hero.weapon) {
             hero.attackBufferTime = state.fieldTime;
@@ -637,8 +641,9 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     ) {
         // Normal roll
         hero.chargeTime = 0;
-        if (heldChakram) {
-            removeEffectFromArea(state, heldChakram);
+        if (hero.heldChakram) {
+            removeEffectFromArea(state, hero.heldChakram);
+            delete hero.heldChakram;
         }
         hero.chargingLeftTool = hero.chargingRightTool = false;
         state.hero.magic -= 5;
@@ -663,7 +668,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         }
     } else if (wasGameKeyPressed(state, GAME_KEY.MEDITATE)
         && !isActionBlocked && (hero.passiveTools.spiritSight || hero.clones.length)
-        && !heldChakram && !hero.chargingLeftTool && !hero.chargingRightTool
+        && !hero.heldChakram && !hero.chargingLeftTool && !hero.chargingRightTool
     ) {
         hero.action = 'meditating';
         hero.d = 'down';

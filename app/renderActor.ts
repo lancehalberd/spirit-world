@@ -4,7 +4,7 @@ import { isHeroFloating, isHeroSinking } from 'app/utils/actor';
 import { createAnimation, drawFrame, drawFrameAt, getFrame } from 'app/utils/animations';
 import { carryMap, directionMap, getDirection } from 'app/utils/field';
 
-import { Actor, ActorAnimations, Enemy, Frame, FrameDimensions, GameState, HeldChakram, Hero } from 'app/types';
+import { Actor, ActorAnimations, Enemy, Frame, FrameDimensions, GameState, Hero } from 'app/types';
 
 import {
     heroAnimations,
@@ -138,9 +138,8 @@ export function getHeroFrame(state: GameState, hero: Hero): Frame {
             const animationSet = isChargingBow ? heroChargeBowAnimations : heroChargeChakramAnimations;
             let direction = hero.d;
             if (!isChargingBow) {
-                const heldChakram = hero.area.effects.find(o => o instanceof HeldChakram) as HeldChakram;
-                if (heldChakram) {
-                    direction = getDirection(heldChakram.vx, heldChakram.vy, true, hero.d);
+                if (hero.heldChakram) {
+                    direction = getDirection(hero.heldChakram.vx, hero.heldChakram.vy, true, hero.d);
                 }
             } else {
                 direction = getDirection(hero.actionDx, hero.actionDy, true, hero.d);

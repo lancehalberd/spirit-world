@@ -19,7 +19,7 @@ import {
 import { rectanglesOverlap } from 'app/utils/index';
 
 import {
-    GameState, HeldChakram, Hero,
+    GameState, Hero,
 } from 'app/types';
 
 export function updateAllHeroes(this: void, state: GameState) {
@@ -30,7 +30,15 @@ export function updateAllHeroes(this: void, state: GameState) {
     )) {
         //const currentIndex = state.hero.clones.indexOf(state.hero.activeClone);
         //state.hero.activeClone = state.hero.clones[currentIndex + 1];
-        swapHeroStates(state.hero, state.hero.clones[0]);
+
+        // Rotate clone array until we find one we can switch to.
+        for (let i = 0; i < state.hero.clones.length; i++) {
+            if (!state.hero.clones[0].isUncontrollable) {
+                swapHeroStates(state.hero, state.hero.clones[0]);
+                break;
+            }
+            state.hero.clones.push(state.hero.clones.shift());
+        }
         state.hero.clones.push(state.hero.clones.shift());
     }
     for (let i = 0; i < state.hero.clones.length; i++) {
@@ -144,9 +152,9 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
             defeated: true,
             time: 0,
         };
-        const heldChakram = hero.area.effects.find(o => o instanceof HeldChakram) as HeldChakram;
-        if (heldChakram) {
-            removeEffectFromArea(state, heldChakram);
+        if (hero.heldChakram) {
+            removeEffectFromArea(state, hero.heldChakram);
+            delete hero.heldChakram;
         }
         if (state.hero.hasRevive) {
             state.reviveTime = state.fieldTime;

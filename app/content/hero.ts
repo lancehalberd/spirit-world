@@ -24,9 +24,9 @@ import { directionMap, getDirection } from 'app/utils/field';
 import {
     Action, ActiveTool, Actor, AreaInstance,
     Direction, DrawPriority, EffectInstance, Equipment,
-    FullTile, GameState, HitProperties, HitResult,
+    FullTile, GameState, HeldChakram, HitProperties, HitResult,
     MagicElement, ObjectInstance, ObjectStatus,
-    PassiveTool, Rect, SavedHeroData, ThrownObject, TileBehaviors, TileCoords,
+    PassiveTool, Rect, SavedHeroData, ThrownChakram, ThrownObject, TileBehaviors, TileCoords,
     WeaponUpgrades, ZoneLocation
 } from 'app/types';
 
@@ -149,6 +149,10 @@ export class Hero implements Actor, SavedHeroData {
     spawnLocation: ZoneLocation;
     // Heroes have special handling for pits and shouldn't use the object pit logic.
     ignorePits = true;
+    isUncontrollable = false;
+
+    heldChakram?: HeldChakram;
+    thrownChakrams: ThrownChakram[] = [];
 
     constructor() {
         this.life = this.maxLife;
@@ -503,7 +507,7 @@ export class Hero implements Actor, SavedHeroData {
         const activeClone = state.hero.activeClone || state.hero;
         context.save();
             if (hero !== activeClone) {
-                context.globalAlpha *= 0.8;
+                context.globalAlpha *= 0.5;
             } else if (hero.invulnerableFrames) {
                 context.globalAlpha *= (0.7 + 0.3 * Math.cos(2 * Math.PI * hero.invulnerableFrames * 3 / 50));
             }
