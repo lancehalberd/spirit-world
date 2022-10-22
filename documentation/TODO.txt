@@ -43,17 +43,38 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    Randomizer improvements
-        - Add configurable goal
+    Diagonal dodge roll
+
+    Clone throw
+        Hold B_PASSIVE + press B_TOOL to throw a clone that will blow up immediately.
+        Hold B_PASSIVE + hold B_TOOL to throw yourself leaving behind a clone that blows up.
 
     Nimbus cloud
         - on overworld material takes you to: Lake, City, Village, Peaks, Ruins
         - in spirit world takes you to: Tomb shop, Fertility Temple, Sky City, Jade City
-        - once implemented, require using nimbus cloud to return to the entrance of the placeholder dungeon.
+
+    True sight
+        For now try just rendering all spirit world objects at 50% opacity.
+        Probably allow toggling it off in the menu, possibly a quick command like B_MEDITATE + B_ROLL
+
+    Puzzle ideas
+        - Send a clone into the spirit world for "temporary" true sight. Might be annoying to switch between.
+        - Some kind of hazards in the spirit world that move slowly and knock you back, where you need true sight to navigate successfully because spirit sight is too slow.
 
     Add save statues:
         Outside Crater/Forge
         Outside waterfall cave
+
+    Add Sky Paths for Staff Tower + improve sky paths
+        - Make sure jumping from tower to clouds is supported and vice versa
+        - Mountain or Forest path to reach river temple roof (lightning only route)
+        - Mountain -> River Temple
+            - Once we add landing points this will fix the bug with landing on top of the door
+        - Forest Path to Sky Palace entrance (Add Sky palace stub with roll 2 + nimbus cloud)
+            - Implement roll 2, just roll again while rolling, double speed / teleport then regular roll (with poof effects from staff)
+            - Implement nimbus cloud using spawn points + script events choice mechanic for now
+                - Allows returning to entrance inside areas
+                - Allows teleporting to specific places visited on the overworld, possibly between material/spirit worlds.
 
     Gold Armor Upgrade
         If Spirit Chakram is fully upgraded and the player has golden mail they can use:
@@ -115,16 +136,6 @@ Current tasks:
             Can(must?) find clone upgrade to complete the lab.
             The seed is activated(possibly by combined proximity of champion+MC) and grows a giant tree that MC must climb to rescue the Champion and stop the War God.
             The War God will use the engine to make a breeding ground for his drone soldiers, the MC might use it to synthesize the Vanara and Native life to coexist.
-
-    - Add Sky Paths for Staff Tower
-        - Mountain or Forest path to reach river temple roof (lightning only route)
-        - Mountain -> River Temple
-            - Once we add landing points this will fix the bug with landing on top of the door
-        - Forest Path to Sky Palace entrance (Add Sky palace stub with roll 2 + nimbus cloud)
-            - Implement roll 2, just roll again while rolling, double speed / teleport then regular roll (with poof effects from staff)
-            - Implement nimbus cloud using spawn points + script events choice mechanic for now
-                - Allows returning to entrance inside areas
-                - Allows teleporting to specific places visited on the overworld, possibly between material/spirit worlds.
 
     - Flying enemies should not move over abyss tiles(make abyss tiles + ceiling tiles impassable to flying enemies).
 
