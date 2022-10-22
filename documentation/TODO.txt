@@ -45,8 +45,6 @@ Current tasks:
         Sometimes extra chakram hangs out on the player.
 
     Clone throw
-        Hold B_PASSIVE + press B_TOOL to throw a clone that will blow up immediately.
-        Hold B_PASSIVE + hold B_TOOL to throw yourself leaving behind a clone that blows up.
         Clone can pass over solid tiles while z > 16 or so.
 
     Nimbus cloud

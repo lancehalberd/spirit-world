@@ -2,6 +2,7 @@ import { addEffectToArea, addObjectToArea, enterLocation, getAreaSize, playAreaS
 import { AnimationEffect } from 'app/content/effects/animationEffect';
 import { getVectorToTarget } from 'app/content/enemies';
 import { Door } from 'app/content/objects/door';
+import { destroyClone } from 'app/content/objects/clone';
 import { Staff } from 'app/content/objects/staff';
 import { CANVAS_HEIGHT, FALLING_HEIGHT, FRAME_LENGTH, GAME_KEY } from 'app/gameConstants';
 import { editingState } from 'app/development/tileEditor';
@@ -314,6 +315,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         moveActor(state, hero, hero.vx, hero.vy, {
             canFall: true,
             canSwim: true,
+            // canPassLowWalls: hero.action === 'thrown',
             direction: hero.d,
             boundToSection: hero.action !== 'knockedHard',
             excludedObjects
@@ -326,6 +328,13 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                     state.screenShakes.push({
                         dx: 0, dy: 2, startTime: state.fieldTime, endTime: state.fieldTime + 200
                     });
+                }
+            }
+            // If a thrown clone lands in a wall, destroy it.
+            if (hero.action === 'thrown' && hero !== (state.hero.activeClone || state.hero)) {
+                if (!canSomersaultToCoords(state, hero, hero)) {
+                    destroyClone(state, hero);
+                    return;
                 }
             }
             hero.z = minZ;

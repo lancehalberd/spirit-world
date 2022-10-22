@@ -21,6 +21,7 @@ export function moveActor(state: GameState, actor: Actor, dx: number, dy: number
     canSwim = false,
     canClimb = false,
     canWiggle = true,
+    canPassLowWalls = false,
     direction,
     excludedObjects = new Set(),
 }: MovementProperties): {mx: number, my: number} {
@@ -47,6 +48,7 @@ export function moveActor(state: GameState, actor: Actor, dx: number, dy: number
                 canSwim,
                 canFall,
                 canClimb,
+                canPassLowWalls,
                 direction,
                 excludedObjects
             });
@@ -73,6 +75,7 @@ export function moveActor(state: GameState, actor: Actor, dx: number, dy: number
                 canSwim,
                 canFall,
                 canClimb,
+                canPassLowWalls,
                 direction,
                 excludedObjects
             });
@@ -111,6 +114,7 @@ function moveActorInDirection(
         canClimb = false,
         canJump = false,
         canWiggle = true,
+        canPassLowWalls = false,
     } = movementProperties;
     let ax = actor.x, ay = actor.y;
     if (direction === 'up' || direction === 'down') {
@@ -158,7 +162,7 @@ function moveActorInDirection(
         const { tileBehavior, objects, tx, ty} = getTileBehaviorsAndObstacles(
             state, actor.area, point, excludedObjects, null, null, direction
         );
-        if (tileBehavior?.solid && (
+        if (!canPassLowWalls && tileBehavior?.solid && (
                 tileBehavior?.touchHit
                 && !tileBehavior.touchHit?.isGroundHit
                 // tile touchHit always applies to
@@ -186,7 +190,7 @@ function moveActorInDirection(
         }
         // Climbable overrides solid tile behavior. This allows use to place tiles marked climbable on top
         // of solid tiles to make them passable.
-        const isTilePassable = (!tileBehavior?.solid || tileBehavior.climbable);
+        const isTilePassable = (canPassLowWalls || !tileBehavior?.solid || tileBehavior.climbable);
         // The second condition is a hack to prevent enemies from walking over pits.
         if (!isTilePassable || ((tileBehavior?.pit || tileBehavior?.isLava || tileBehavior?.isBrittleGround) && !canFall)) {
             blockedByTile = true;
@@ -554,6 +558,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
                 hero.canFloat = false;
             }
             if (behaviors.isLava && hero.z <= 0) {
+                //console.log('Hit hero', hero);
                 hero.onHit(state, { damage: 8, element: 'fire' });
             }
             // Lava is like a pit for the sake of cloud walking boots sinking over them, but it damages

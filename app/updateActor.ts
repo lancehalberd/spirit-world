@@ -33,7 +33,7 @@ export function updateAllHeroes(this: void, state: GameState) {
             state.hero.cloneToolReleased = true;
         } else {
             for (let i = 0; i < state.hero.clones.length; i++) {
-                if (!state.hero.clones[0].isUncontrollable) {
+                if (!state.hero.clones[0].isUncontrollable && state.hero.clones[0].action !== 'thrown') {
                     swapHeroStates(state.hero, state.hero.clones[0]);
                     state.hero.cloneToolReleased = true;
                     state.hero.clones[0].cloneToolReleased = true;
