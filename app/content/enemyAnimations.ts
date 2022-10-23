@@ -23,6 +23,91 @@ export const snakeAnimations: ActorAnimations = {
         right: leftSnakeAnimation,
     },
 };
+// all idols share the same layout and dimensions
+// row 0: still frames; row 1: float;
+// row 2: float attack; row 3: dead float attack;
+// row 4: projectile float attack; row 5: dead projectile float attack;
+// row 6: warning eye glow
+const idolGeometry: FrameDimensions = { w: 32, h: 40, content: { x: 2, y: 20, w: 28, h: 20} };
+const iceImage = 'gfx/enemies/miniStatueBoss-ice-32x40.png';
+const fireImage = 'gfx/enemies/miniStatueBoss-fire-32x40.png';
+const lightningImage = 'gfx/enemies/miniStatueBoss-lightning-32x40.png';
+
+// ice snake animations
+// gfx/enemies/miniStatueBoss-ice-32x40
+const iceIdolAttackAnimation: FrameAnimation = createAnimation(iceImage, idolGeometry, { y: 2, cols: 5});
+const iceIdolAttackDeadAnimation: FrameAnimation = createAnimation(iceImage, idolGeometry, { y: 3, cols: 5});
+const iceIdolAttackBallAnimation: FrameAnimation = createAnimation(iceImage, idolGeometry, { y: 4, cols: 5});
+const iceIdolAttackBallDeadAnimation: FrameAnimation = createAnimation(iceImage, idolGeometry, { y: 5, cols: 5});
+const iceIdolBrokenAnimation: FrameAnimation = createAnimation(iceImage, idolGeometry, { x: 3, y: 0, cols: 1});
+const iceIdolIdleAnimation: FrameAnimation = createAnimation(iceImage, idolGeometry, { y: 1, cols: 5});
+const iceIdolStillAnimation: FrameAnimation = createAnimation(iceImage, idolGeometry, { x: 0, y: 0, cols: 1});
+const iceIdolWakeAnimation: FrameAnimation = createAnimation(iceImage, idolGeometry, { x: 0, y: 0, cols: 2}, {loop: false});
+const iceIdolWarningAnimation: FrameAnimation = createAnimation(iceImage, idolGeometry, { y: 6, cols: 5});
+
+export const iceIdolAnimations: ActorAnimations = {
+    attack: omniAnimation(iceIdolAttackAnimation),
+    attackDead: omniAnimation(iceIdolAttackDeadAnimation),
+    attackBall: omniAnimation(iceIdolAttackBallAnimation),
+    attackBallDead: omniAnimation(iceIdolAttackBallDeadAnimation),
+    broken: omniAnimation(iceIdolBrokenAnimation),
+    death: omniAnimation(iceIdolBrokenAnimation),
+    idle: omniAnimation(iceIdolIdleAnimation),
+    still: omniAnimation(iceIdolStillAnimation),
+    wake: omniAnimation(iceIdolWakeAnimation),
+    warning: omniAnimation(iceIdolWarningAnimation),
+};
+
+// lightning bird animations
+// gfx/enemies/miniStatueBoss-lightning-32x40
+const lightningIdolAttackAnimation: FrameAnimation = createAnimation(lightningImage, idolGeometry, { y: 2, cols: 5});
+const lightningIdolAttackDeadAnimation: FrameAnimation = createAnimation(lightningImage, idolGeometry, { y: 3, cols: 5});
+const lightningIdolAttackBallAnimation: FrameAnimation = createAnimation(lightningImage, idolGeometry, { y: 4, cols: 5});
+const lightningIdolAttackBallDeadAnimation: FrameAnimation = createAnimation(lightningImage, idolGeometry, { y: 5, cols: 5});
+const lightningIdolBrokenAnimation: FrameAnimation = createAnimation(lightningImage, idolGeometry, { x: 3, y: 0, cols: 1});
+const lightningIdolIdleAnimation: FrameAnimation = createAnimation(lightningImage, idolGeometry, { y: 1, cols: 5});
+const lightningIdolStillAnimation: FrameAnimation = createAnimation(lightningImage, idolGeometry, { y: 0, cols: 1});
+const lightningIdolWakeAnimation: FrameAnimation = createAnimation(lightningImage, idolGeometry, { x: 0, y: 0, cols: 2}, {loop: false});
+const lightningIdolWarningAnimation: FrameAnimation = createAnimation(lightningImage, idolGeometry, { y: 6, cols: 5});
+
+export const lightningIdolAnimations: ActorAnimations = {
+    attack: omniAnimation(lightningIdolAttackAnimation),
+    attackDead: omniAnimation(lightningIdolAttackDeadAnimation),
+    attackBall: omniAnimation(lightningIdolAttackBallAnimation),
+    attackBallDead: omniAnimation(lightningIdolAttackBallDeadAnimation),
+    broken: omniAnimation(lightningIdolBrokenAnimation),
+    death: omniAnimation(lightningIdolBrokenAnimation),
+    idle: omniAnimation(lightningIdolIdleAnimation),
+    still: omniAnimation(lightningIdolStillAnimation),
+    wake: omniAnimation(lightningIdolWakeAnimation),
+    warning: omniAnimation(lightningIdolWarningAnimation),
+};
+
+// fire badger animations
+// gfx/enemies/miniStatueBoss-fire-32x40
+const fireIdolAttackAnimation: FrameAnimation = createAnimation(fireImage, idolGeometry, { y: 2, cols: 5});
+const fireIdolAttackDeadAnimation: FrameAnimation = createAnimation(fireImage, idolGeometry, { y: 3, cols: 5});
+const fireIdolAttackBallAnimation: FrameAnimation = createAnimation(fireImage, idolGeometry, { y: 4, cols: 5});
+const fireIdolAttackBallDeadAnimation: FrameAnimation = createAnimation(fireImage, idolGeometry, { y: 5, cols: 5});
+const fireIdolBrokenAnimation: FrameAnimation = createAnimation(fireImage, idolGeometry, { x: 3, y: 0, cols: 1});
+const fireIdolIdleAnimation: FrameAnimation = createAnimation(fireImage, idolGeometry, { y: 1, cols: 5});
+const fireIdolStillAnimation: FrameAnimation = createAnimation(fireImage, idolGeometry, { y: 0, cols: 1});
+const fireIdolWakeAnimation: FrameAnimation = createAnimation(fireImage, idolGeometry, { x: 0, y: 0, cols: 2}, {loop: false});
+const fireIdolWarningAnimation: FrameAnimation = createAnimation(fireImage, idolGeometry, { y: 6, cols: 5});
+
+export const fireIdolAnimations: ActorAnimations = {
+    attack: omniAnimation(fireIdolAttackAnimation),
+    attackDead: omniAnimation(fireIdolAttackDeadAnimation),
+    attackBall: omniAnimation(fireIdolAttackBallAnimation),
+    attackBallDead: omniAnimation(fireIdolAttackBallDeadAnimation),
+    broken: omniAnimation(fireIdolBrokenAnimation),
+    death: omniAnimation(fireIdolBrokenAnimation),
+    idle: omniAnimation(fireIdolIdleAnimation),
+    still: omniAnimation(fireIdolStillAnimation),
+    wake: omniAnimation(fireIdolWakeAnimation),
+    warning: omniAnimation(fireIdolWarningAnimation),
+};
+
 const beetleGeometry: FrameDimensions = { w: 18, h: 17, content: { x: 2, y: 4, w: 14, h: 12} };
 const beetleDownAnimation: FrameAnimation = createAnimation('gfx/enemies/genericbeetle.png', beetleGeometry, { y: 0, cols: 4});
 const beetleRightAnimation: FrameAnimation = createAnimation('gfx/enemies/genericbeetle.png', beetleGeometry, { y: 1, cols: 4});
