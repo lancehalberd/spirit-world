@@ -111,7 +111,9 @@ function updateTitle(state: GameState) {
     }
     if (changedOption) {
         if (state.scene === 'title' || state.scene === 'deleteSavedGame') {
-            setSaveFileToState(state.menuIndex, 0);
+            if (state.menuIndex < state.savedGames.length) {
+                setSaveFileToState(state.menuIndex, 0);
+            }
         } else if (state.scene === 'chooseGameMode') {
             setSaveFileToState(state.savedGameIndex, state.menuIndex);
         }
@@ -132,6 +134,7 @@ function updateTitle(state: GameState) {
                 if (state.menuIndex >= state.savedGames.length) {
                     state.scene = 'title';
                     state.menuIndex = 0;
+                    setSaveFileToState(state.menuIndex, 0);
                 } else {
                     state.savedGameIndex = state.menuIndex;
                     state.scene = 'deleteSavedGameConfirmation';
@@ -164,6 +167,7 @@ function updateTitle(state: GameState) {
                 if (state.menuIndex >= state.savedGames.length) {
                     state.scene = 'deleteSavedGame';
                     state.menuIndex = 0;
+                    setSaveFileToState(state.menuIndex, 0);
                 } else {
                     selectSaveFile(state, state.menuIndex);
                 }

@@ -24,15 +24,21 @@ export const directionMap = {
 
 export const directionToLeftRotationsFromRight = {
     right: 0,
-    up: 1,
-    left: 2,
-    down: 3,
+    upright: 1,
+    up: 2,
+    upleft: 3,
+    left: 4,
+    downleft: 5,
+    down: 6,
+    downright: 7,
 }
 export const leftRotationsFromRightToDirection = Object.keys(directionToLeftRotationsFromRight) as Direction[];
 
+// leftRotations is in 90 degree rotations to the left and can accept half rotations for 45 degrees.
 export function rotateDirection(d: Direction, leftRotations: number): Direction {
-    // Calculates a new rotation in the range of 0-3.
-    const newRotation = ((directionToLeftRotationsFromRight[d] + leftRotations) % 4 + 4) % 4;
+    leftRotations = Math.round(leftRotations * 2);
+    // Calculates a new rotation in the range of 0-7.
+    const newRotation = ((directionToLeftRotationsFromRight[d] + leftRotations) % 8 + 8) % 8;
     return leftRotationsFromRightToDirection[newRotation];
 }
 

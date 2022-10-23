@@ -44,7 +44,6 @@ Current tasks:
     Bug:
         Throwing clone on lava causes you to take double damage
         Sometimes extra chakram hangs out on the player.
-        cloud sommersault seems broken when using it diagonally or at least in conveyer belt room
 
     Change prep animation for explosion
         charge particles form randomly in a circle around the hero shooting into them,

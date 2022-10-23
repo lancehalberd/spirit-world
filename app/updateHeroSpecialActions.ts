@@ -483,10 +483,14 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             // Cloud somersault roll activated by rolling again mid roll.
             const [dx, dy] = getCloneMovementDeltas(state, hero);
             hero.d = (dx || dy) ? getDirection(dx, dy) : hero.d;
-            const moveX = directionMap[hero.d][0] * 8, moveY = directionMap[hero.d][1] * 8;
+            // Default direction is the direction the current roll uses.
+            const defaultDirection = getDirection(hero.actionDx, hero.actionDy, true, hero.d);
+            const direction = getDirection(dx, dy, true, defaultDirection);
+            const moveX = directionMap[direction][0] * 8, moveY = directionMap[direction][1] * 8;
+            console.log(direction, moveX, moveY);
             const originalArea = hero.area, alternateArea = hero.area.alternateArea;
             let hitbox = hero.getHitbox(state);
-            const leftD = rotateDirection(hero.d, 1);
+            const leftD = rotateDirection(direction, 1);
             const leftDx = directionMap[leftD][0], leftDy = directionMap[leftD][1];
             const particleCount = 9;
             for (let i = 0; i < particleCount; i++) {
@@ -560,6 +564,8 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             // The fullroll action is 16 frames.
             hero.actionFrame = 0;
             hero.animationTime = 0 * FRAME_LENGTH;
+            hero.actionDx = directionMap[direction][0];
+            hero.actionDy = directionMap[direction][1];
             return true;
         }
         if (hero.actionFrame >= rollSpeed.length) {
