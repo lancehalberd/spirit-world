@@ -38,6 +38,7 @@ const thornParticles: Frame[] = createAnimation('gfx/tiles/thorns.png', {w: 16, 
 const bushBehavior: TileBehaviors = {
     defaultLayer: 'field',
     solid: true, pickupWeight: 0, cuttable: 1, lootTable: lifeLootTable,
+    midHeight: true,
     underTile: 22,
     particles: bushParticles,
     breakSound: 'bushShatter',

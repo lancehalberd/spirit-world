@@ -9,7 +9,18 @@ import { fireIdolAnimations, iceIdolAnimations, lightningIdolAnimations } from '
 import { rotateDirection } from 'app/utils/field';
 
 
-import { Enemy, GameState } from 'app/types';
+import { Enemy, GameState, HitProperties, HitResult } from 'app/types';
+
+function onHitIdol(state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
+    // Idols take much less damage during their enraged phase.
+    if (enemy.mode === 'enraged') {
+        hit = {
+            ...hit,
+            damage: hit.damage / 4,
+        }
+    }
+    return enemy.defaultOnHit(state, hit);
+}
 
 enemyDefinitions.stormIdol = {
     alwaysReset: true,
@@ -17,6 +28,7 @@ enemyDefinitions.stormIdol = {
     isImmortal: true,
     life: 8, touchDamage: 1, update: updateStormIdol,
     immunities: ['lightning'],
+    onHit: onHitIdol,
 };
 enemyDefinitions.flameIdol = {
     alwaysReset: true,
@@ -24,6 +36,7 @@ enemyDefinitions.flameIdol = {
     isImmortal: true,
     life: 8, touchDamage: 1, update: updateFlameIdol,
     immunities: ['fire'],
+    onHit: onHitIdol,
 };
 enemyDefinitions.frostIdol = {
     alwaysReset: true,
@@ -31,6 +44,7 @@ enemyDefinitions.frostIdol = {
     isImmortal: true,
     life: 8, touchDamage: 1, update: updateFrostIdol,
     immunities: ['ice'],
+    onHit: onHitIdol,
 };
 
 function updateStormIdol(state: GameState, enemy: Enemy): void {
@@ -109,7 +123,6 @@ function updateElementalIdol(state: GameState, enemy: Enemy, attack: () => void)
     if (!enemy.params.pinchMode && enemy.life <= 4) {
         enemy.params.pinchMode = true;
         enemy.setMode('enraged');
-        enemy.shielded = true;
         return;
     }
     // The idol does a single quick string of 4 attacks when enraged.
@@ -117,12 +130,13 @@ function updateElementalIdol(state: GameState, enemy: Enemy, attack: () => void)
         if (enemy.modeTime % 1000 === 20) {
             enemy.changeToAnimation('attackBall');
         }
-        if (enemy.modeTime % 1000 === 500) {
+        if (enemy.modeTime % 1000 === 600) {
             attack();
         }
         if (enemy.modeTime >= 4000) {
             enemy.params.priority = Math.ceil(enemy.params.priority) + Math.random();
             enemy.setMode('shielded');
+            enemy.shielded = true;
         }
         return;
     }

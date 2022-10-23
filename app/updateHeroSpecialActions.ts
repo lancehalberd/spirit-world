@@ -315,7 +315,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         moveActor(state, hero, hero.vx, hero.vy, {
             canFall: true,
             canSwim: true,
-            // canPassLowWalls: hero.action === 'thrown',
+            canPassMediumWalls: hero.action === 'thrown',
             direction: hero.d,
             boundToSection: hero.action !== 'knockedHard',
             excludedObjects
