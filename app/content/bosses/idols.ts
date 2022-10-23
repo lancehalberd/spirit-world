@@ -5,7 +5,7 @@ import {
     throwIceGrenadeAtLocation,
 } from 'app/content/enemies';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
-import { beetleAnimations, beetleWingedAnimations, snakeAnimations } from 'app/content/enemyAnimations';
+import { fireIdolAnimations, iceIdolAnimations, lightningIdolAnimations } from 'app/content/enemyAnimations';
 import { rotateDirection } from 'app/utils/field';
 
 
@@ -13,29 +13,27 @@ import { Enemy, GameState } from 'app/types';
 
 enemyDefinitions.stormIdol = {
     alwaysReset: true,
-    animations: beetleWingedAnimations, scale: 2,
+    animations: lightningIdolAnimations, scale: 1,
     isImmortal: true,
-    life: 8, touchDamage: 1, update: updateStormIdol, renderOver: renderIdolShield,
+    life: 8, touchDamage: 1, update: updateStormIdol,
     immunities: ['lightning'],
 };
 enemyDefinitions.flameIdol = {
     alwaysReset: true,
-    animations: snakeAnimations, scale: 2,
+    animations: fireIdolAnimations, scale: 1,
     isImmortal: true,
-    life: 8, touchDamage: 1, update: updateFlameIdol, renderOver: renderIdolShield,
+    life: 8, touchDamage: 1, update: updateFlameIdol,
     immunities: ['fire'],
 };
 enemyDefinitions.frostIdol = {
     alwaysReset: true,
-    animations: beetleAnimations, scale: 2,
+    animations: iceIdolAnimations, scale: 1,
     isImmortal: true,
-    life: 8, touchDamage: 1, update: updateFrostIdol, renderOver: renderIdolShield,
+    life: 8, touchDamage: 1, update: updateFrostIdol,
     immunities: ['ice'],
 };
 
-
 function updateStormIdol(state: GameState, enemy: Enemy): void {
-    enemy.params.shieldColor = 'yellow';
     updateElementalIdol(state, enemy, () => {
         enemy.params.theta = (enemy.params.theta || 0) + Math.PI / 4;
         const lightningBolt = new LightningBolt({
@@ -47,7 +45,6 @@ function updateStormIdol(state: GameState, enemy: Enemy): void {
     })
 }
 function updateFlameIdol(state: GameState, enemy: Enemy): void {
-    enemy.params.shieldColor = 'red';
     updateElementalIdol(state, enemy, () => {
         enemy.params.rotations = (enemy.params.rotations ?? Math.floor(Math.random() * 3)) + 1;
         const flameWall = new FlameWall({
@@ -57,7 +54,6 @@ function updateFlameIdol(state: GameState, enemy: Enemy): void {
     });
 }
 function updateFrostIdol(state: GameState, enemy: Enemy): void {
-    enemy.params.shieldColor = '#08F';
     updateElementalIdol(state, enemy, () => {
         enemy.params.theta = 2 * Math.PI * Math.random();
         throwIceGrenadeAtLocation(state, enemy, {
@@ -67,7 +63,21 @@ function updateFrostIdol(state: GameState, enemy: Enemy): void {
     })
 }
 
+// attackBall: primary attack; attackBallDead: attack when idol is defeated
+// use "wake" animation when transitioning to "living" animations, but not
+// "defeated" or "dead" animations
 function updateElementalIdol(state: GameState, enemy: Enemy, attack: () => void) {
+    // Attack animations should revert to there "idle" state when completed.
+    if (enemy.currentAnimationKey === 'attackBall') {
+        if (enemy.animationTime >= enemy.currentAnimation.duration) {
+            enemy.changeToAnimation('idle');
+        }
+    }
+    if (enemy.currentAnimationKey === 'attackBallDead') {
+        if (enemy.animationTime >= enemy.currentAnimation.duration) {
+            enemy.changeToAnimation('broken');
+        }
+    }
     // The statue is "destroyed" at 1 life, it will stay shielded and use its attack every 4 seconds
     // until all statues are "destroyed".
     if (enemy.life <= 0) {
@@ -80,7 +90,11 @@ function updateElementalIdol(state: GameState, enemy: Enemy, attack: () => void)
             return;
         }
         enemy.shielded = true;
-        if (enemy.modeTime >= 4000) {
+        if (enemy.modeTime < 3300) {
+            enemy.changeToAnimation('broken');
+        } else if (enemy.modeTime < 4000) {
+            enemy.changeToAnimation('attackBallDead');
+        } else {
             attack();
             enemy.setMode('attack');
         }
@@ -100,6 +114,9 @@ function updateElementalIdol(state: GameState, enemy: Enemy, attack: () => void)
     }
     // The idol does a single quick string of 4 attacks when enraged.
     if (enemy.mode === 'enraged') {
+        if (enemy.modeTime % 1000 === 20) {
+            enemy.changeToAnimation('attackBall');
+        }
         if (enemy.modeTime % 1000 === 500) {
             attack();
         }
@@ -112,36 +129,40 @@ function updateElementalIdol(state: GameState, enemy: Enemy, attack: () => void)
     if (!enemy.area.objects.some(object => object instanceof Enemy && object.params.priority < enemy.params.priority)) {
         if (enemy.mode === 'attack') {
             if (!enemy.params.pinchMode) {
+                if (enemy.modeTime === 400) {
+                    enemy.changeToAnimation('attackBall');
+                }
                 if (enemy.modeTime === 1000) {
                     attack();
                 }
             } else {
-                if (enemy.modeTime === 500 || enemy.modeTime === 1000) {
+                if (enemy.modeTime === 100 || enemy.modeTime === 1000) {
+                    enemy.changeToAnimation('attackBall');
+                }
+                if (enemy.modeTime === 700 || enemy.modeTime === 1600) {
                     attack();
                 }
             }
             if (enemy.modeTime >= 2000) {
                 enemy.params.priority = Math.ceil(enemy.params.priority) + Math.random();
                 enemy.setMode('shielded');
+                enemy.changeToAnimation('still');
                 enemy.shielded = true;
             }
-        } else if (enemy.modeTime > 1000) {
-            enemy.setMode('attack');
-            enemy.shielded = false;
+        } else {
+            enemy.changeToAnimation('warning');
+            if (enemy.modeTime === 800) {
+                enemy.changeToAnimation('wake');
+            }
+            if (enemy.modeTime >= 1000) {
+                enemy.changeToAnimation('idle');
+                enemy.setMode('attack');
+                enemy.shielded = false;
+            }
         }
     } else {
         enemy.setMode('shielded');
+        enemy.changeToAnimation('still');
         enemy.shielded = true;
-    }
-}
-
-function renderIdolShield(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
-    if (enemy.shielded) {
-        const hitbox = enemy.getHitbox(state);
-        context.save();
-            context.globalAlpha *= 0.5;
-            context.fillStyle = enemy.params.shieldColor ?? '#888';
-            context.fillRect(hitbox.x, hitbox.y, hitbox.w, hitbox.h);
-        context.restore();
     }
 }
