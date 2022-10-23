@@ -8,6 +8,7 @@ import { getLootHelpMessage } from 'app/content/loot';
 import {
     SPAWN_LOCATION_DEMO,
     SPAWN_LOCATION_FULL,
+    fixSpawnLocationOnLoad,
 } from 'app/content/spawnLocations';
 import {
     FRAME_LENGTH, GAME_KEY,
@@ -293,6 +294,7 @@ function updateDefeated(state: GameState) {
         state.menuIndex = (state.menuIndex + 1) % 2;
     } else if (wasConfirmKeyPressed(state)) {
         if (state.menuIndex === 0) {
+            fixSpawnLocationOnLoad(state);
             returnToSpawnLocation(state);
             state.paused = false;
         } else if (state.menuIndex === 1) {

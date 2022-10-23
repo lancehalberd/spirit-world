@@ -6,6 +6,7 @@ import {
     hasCloudBoots,
     hasClone,
     hasIce,
+    hasRoll,
     hasSomersault,
     hasStaff,
     hasTeleportation,
@@ -95,7 +96,7 @@ export const staffTowerNodes: LogicNode[] = [
         zoneId,
         nodeId: 'staffTowerB1Spirit',
         checks: [
-            { objectId: 'elevatorFixed', logic: hasBossWeapon },
+            { objectId: 'elevatorFixed', logic: andLogic(hasBossWeapon, hasRoll) },
         ],
         paths: [
             {nodeId: 'staffTowerF1Spirit', logic: hasBossWeapon},

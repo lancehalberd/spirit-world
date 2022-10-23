@@ -61,6 +61,7 @@ dialogueHash.saveStatue = {
                     Hundreds of Vanara sleep in this Cocoon waiting for their time to walk these
                     lands.
                     {|}The Vanara village is far too small for them all.
+                    {item:secondChance}
                 `
             ],
         },
@@ -73,6 +74,7 @@ dialogueHash.saveStatue = {
                     A long time ago a star fell from the heavens and changed this land.
                     {|}The crater it left filled with water and became a lake.
                     {|}This "Helix" is all that remains from the fallen star.
+                    {item:secondChance}
                 `
             ],
         },
@@ -84,6 +86,7 @@ dialogueHash.saveStatue = {
                 `
                     There is a hidden staircase behind one of the bead flows.
                     {|}Find a way to wade through the beads without being swept away!
+                    {item:secondChance}
                 `
             ],
         },

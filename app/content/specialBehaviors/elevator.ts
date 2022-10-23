@@ -17,7 +17,8 @@ dialogueHash.elevator = {
         `,
         powerFailureDropped: `
             !WARNING![-]POWER FAILURE DETECTED
-            {|}POSSIBLE SHORT DETECTED IN BASEMENT,
+            {|}POSSIBLE SHORT DETECTED IN BASEMENT.
+            EMERGENCY ESCAPE HATCH OPENED IN BASEMENT.
         `,
         releaseBreak: `
             {flag:elevatorFalling}
