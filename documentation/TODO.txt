@@ -42,8 +42,10 @@ Graphics:
 
 Current tasks:
     Bug:
-        Throwing clone on lava causes you to take double damage
         Sometimes extra chakram hangs out on the player.
+
+    Refactor:
+        It looks like "hero.activeClone" is unused and making the game logic unnecessarily complex so we should remove it.
 
     Change prep animation for explosion
         charge particles form randomly in a circle around the hero shooting into them,

@@ -487,7 +487,6 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             const defaultDirection = getDirection(hero.actionDx, hero.actionDy, true, hero.d);
             const direction = getDirection(dx, dy, true, defaultDirection);
             const moveX = directionMap[direction][0] * 8, moveY = directionMap[direction][1] * 8;
-            console.log(direction, moveX, moveY);
             const originalArea = hero.area, alternateArea = hero.area.alternateArea;
             let hitbox = hero.getHitbox(state);
             const leftD = rotateDirection(direction, 1);

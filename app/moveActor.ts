@@ -559,7 +559,6 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
                 hero.canFloat = false;
             }
             if (behaviors.isLava && hero.z <= 0) {
-                //console.log('Hit hero', hero);
                 hero.onHit(state, { damage: 8, element: 'fire' });
             }
             // Lava is like a pit for the sake of cloud walking boots sinking over them, but it damages

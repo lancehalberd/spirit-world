@@ -390,8 +390,12 @@ export class Hero implements Actor, SavedHeroData {
         // Taking damage resets radius for spirit sight meditation.
         state.hero.spiritRadius = 0;
         // If any controllable clones are in use,
-        // any damage one takes destroys it until only one clone remains.
-        if (state.hero.clones.filter(clone => !clone.isUncontrollable).length) {
+        // any damage the hero or any clone take destroys it.
+        // If there are no controllable clones, damage will only kill the
+        // uncontrollably ones, never the primary clone the player is controlling.
+        if (state.hero.clones.filter(clone => !clone.isUncontrollable).length
+            || this !== (state.hero.activeClone || state.hero)
+        ) {
             destroyClone(state, this);
         }
     }
