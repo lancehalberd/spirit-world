@@ -315,7 +315,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         moveActor(state, hero, hero.vx, hero.vy, {
             canFall: true,
             canSwim: true,
-            canPassMediumWalls: hero.action === 'thrown',
+            canPassMediumWalls: hero.action === 'thrown' && hero.z >= 12,
             direction: hero.d,
             boundToSection: hero.action !== 'knockedHard',
             excludedObjects
@@ -330,8 +330,11 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                     });
                 }
             }
-            // If a thrown clone lands in a wall, destroy it.
-            if (hero.action === 'thrown' && hero !== state.hero) {
+            // If a thrown hero lands in a wall, destroy it.
+            // If this is the last hero, they will just go back to
+            // their last safe point. This typically happens when
+            // trying to throw clones over obstacles.
+            if (hero.action === 'thrown') {
                 if (!canSomersaultToCoords(state, hero, hero)) {
                     destroyClone(state, hero);
                     return;

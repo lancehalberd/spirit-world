@@ -272,10 +272,11 @@ export class ChestObject implements ObjectInstance {
     area: AreaInstance;
     definition: LootObjectDefinition;
     drawPriority: 'sprites' = 'sprites';
-    behaviors = {
+    behaviors: TileBehaviors = {
         solid: true,
         brightness: 0.5,
         lightRadius: 12,
+        midHeight: true,
     };
     frame: Frame;
     isObject = <const>true;

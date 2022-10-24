@@ -235,8 +235,10 @@ function moveActorInDirection(
         }
         for (const object of objects) {
             const objectBehaviors = object.behaviors || object.getBehaviors?.(state);
-            blockedByObject = blockedByObject || objectBehaviors?.solid;
-            if (canPush && objectBehaviors?.solid) {
+            const isBlockedByThisObject = objectBehaviors?.solid
+                && (!canPassMediumWalls || !(tileBehavior?.low || tileBehavior?.midHeight))
+            blockedByObject = blockedByObject || isBlockedByThisObject;
+            if (canPush && isBlockedByThisObject) {
                 pushedObjects.push(object);
             }
         }

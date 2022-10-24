@@ -268,7 +268,24 @@ export function getTileBehaviorsAndObstacles(
                 }
                 objects.push(object);
                 if (behaviors?.solid) {
-                    tileBehavior.solid = true;
+                    if (!tileBehavior.solid) {
+                        // Set solid height behaviors if this is thirst solid object.
+                        if (behaviors.low) {
+                            tileBehavior.low = true;
+                        } else if (behaviors.midHeight) {
+                            tileBehavior.midHeight = true;
+                        }
+                        tileBehavior.solid = true;
+                    } else {
+                        // Increase the height of solid tiles as necessary.
+                        if (tileBehavior.low && !behaviors.low) {
+                            tileBehavior.low = false;
+                            tileBehavior.midHeight = true;
+                        }
+                        if (tileBehavior.midHeight && !behaviors.midHeight) {
+                            tileBehavior.midHeight = false;
+                        }
+                    }
                 }
                 if (behaviors?.touchHit) {
                     // Don't apply touchHit from enemies during iframes when they shouldn't damage the hero.

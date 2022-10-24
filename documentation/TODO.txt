@@ -43,15 +43,8 @@ Graphics:
 
 Current tasks:
     Bug:
-        Swapping to clone while throwing let's you land in a wall
-            - Just call destroy clone and if we ever run out of clones just respawn the player as if they fell in a pit.
-        Bead cascades don't pull clones.
-        Escalators don't pull clones.
-        Crash when clone falls into a pit entrance.
-        Check if clone/astral projection releases tipped pots
         Soft lock if you fall in the west spirit world without the ability to pass over cracked ground.
             - Just add an extra portal to the material world under a bush.
-        Bow renders while falling into a pit. Check cloak too maybe?
 
     Refactor:
         Add hero.overlaps(Rectangle&{getHitbox?: ()}) and use this for simple hit detection on hero

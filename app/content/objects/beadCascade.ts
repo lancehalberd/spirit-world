@@ -263,59 +263,60 @@ export class BeadSection implements ObjectInstance {
             removeObjectFromArea(state, this);
         }
         // If touching center of player, pull player in and push them south.
-        const hero = state.hero;
-        if (hero.area === this.area) {
-            const touchingHero = boxesIntersect(hero, this.getHitbox(state))
-                && hero.action !== 'roll' && hero.z <= 4
-                && hero.y + hero.h < this.y + this.h + 4;
-            if (touchingHero && hero.equipedBoots === 'ironBoots') {
-                const x = hero.x + hero.w / 4 + Math.random() * hero.w / 2;
-                addParticleSpray(state, this.area, Random.element(crystalParticles),
-                    Math.min(this.x + this.w, Math.max(this.x, x)), hero.y + hero.h, 0);
-            }
-            const shouldPullHero = touchingHero && hero.equipedBoots !== 'ironBoots'&& !this.area.objects.some(object => {
-                return object instanceof Staff && boxesIntersect(hero, object.getHitbox(state));
-            });
-            if (hero.actionTarget === this && !shouldPullHero) {
-                hero.actionTarget = null;
-                hero.actionDx = 0;
-                hero.actionDy = 0;
-                // Make the hero lose controll briefly on exiting the flow.
-                hero.vx = 0;
-                hero.vy = 1;
-                hero.vz = 2;
-                // Use 'knockedHard` so that the player can transition to the next screen if necessary.
-                hero.action = 'knockedHard';
-                hero.swimming = false;
-                hero.isControlledByObject = false;
-                hero.safeD = hero.d;
-                hero.safeX = hero.x;
-                hero.safeY = hero.y;
-            } else if (!hero.actionTarget && shouldPullHero) {
-                hero.throwHeldObject(state);
-                hero.actionTarget = this;
-                hero.action = null;
-                hero.actionDx = 0;
-                hero.actionDy = 0;
-            }
-            if (hero.actionTarget === this) {
-                hero.isControlledByObject = true;
-                hero.swimming = true;
-                if (hero.x < this.x) {
-                    hero.x++;
-                    hero.y += 0.75;
-                    hero.actionDy = 0.75;
-                    hero.d = 'left';
-                } else if (hero.x + hero.w > this.x + this.w) {
-                    hero.x--;
-                    hero.y += 0.75;
-                    hero.actionDy = 0.75;
-                    hero.d = 'right';
-                } else {
-                    const speed = state.nextAreaInstance ? 0.75 : 4;
-                    hero.y += speed;
-                    hero.actionDy = speed;
-                    hero.d = 'up';
+        for (const hero of [state.hero, ...state.hero.clones]) {
+            if (hero.area === this.area) {
+                const touchingHero = boxesIntersect(hero, this.getHitbox(state))
+                    && hero.action !== 'roll' && hero.z <= 4
+                    && hero.y + hero.h < this.y + this.h + 4;
+                if (touchingHero && hero.equipedBoots === 'ironBoots') {
+                    const x = hero.x + hero.w / 4 + Math.random() * hero.w / 2;
+                    addParticleSpray(state, this.area, Random.element(crystalParticles),
+                        Math.min(this.x + this.w, Math.max(this.x, x)), hero.y + hero.h, 0);
+                }
+                const shouldPullHero = touchingHero && hero.equipedBoots !== 'ironBoots'&& !this.area.objects.some(object => {
+                    return object instanceof Staff && boxesIntersect(hero, object.getHitbox(state));
+                });
+                if (hero.actionTarget === this && !shouldPullHero) {
+                    hero.actionTarget = null;
+                    hero.actionDx = 0;
+                    hero.actionDy = 0;
+                    // Make the hero lose controll briefly on exiting the flow.
+                    hero.vx = 0;
+                    hero.vy = 1;
+                    hero.vz = 2;
+                    // Use 'knockedHard` so that the player can transition to the next screen if necessary.
+                    hero.action = 'knockedHard';
+                    hero.swimming = false;
+                    hero.isControlledByObject = false;
+                    hero.safeD = hero.d;
+                    hero.safeX = hero.x;
+                    hero.safeY = hero.y;
+                } else if (!hero.actionTarget && shouldPullHero) {
+                    hero.throwHeldObject(state);
+                    hero.actionTarget = this;
+                    hero.action = null;
+                    hero.actionDx = 0;
+                    hero.actionDy = 0;
+                }
+                if (hero.actionTarget === this) {
+                    hero.isControlledByObject = true;
+                    hero.swimming = true;
+                    if (hero.x < this.x) {
+                        hero.x++;
+                        hero.y += 0.75;
+                        hero.actionDy = 0.75;
+                        hero.d = 'left';
+                    } else if (hero.x + hero.w > this.x + this.w) {
+                        hero.x--;
+                        hero.y += 0.75;
+                        hero.actionDy = 0.75;
+                        hero.d = 'right';
+                    } else {
+                        const speed = state.nextAreaInstance ? 0.75 : 4;
+                        hero.y += speed;
+                        hero.actionDy = speed;
+                        hero.d = 'up';
+                    }
                 }
             }
         }

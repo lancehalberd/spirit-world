@@ -18,6 +18,7 @@ export class WaterPot implements ObjectInstance {
     alwaysReset = true;
     behaviors = {
         solid: true,
+        midHeight: true,
     };
     drawPriority: DrawPriority = 'sprites';
     definition: SimpleObjectDefinition = null;

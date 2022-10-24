@@ -167,8 +167,8 @@ export const SPAWN_FOREST_BACK: ZoneLocation = {
 export const SPAWN_WATERFALL_ENTRANCE: ZoneLocation = {
     zoneKey: 'waterfallTower',
     floor: 0,
-    x: 448,
-    y: 448,
+    x: 424,
+    y: 424,
     z: 0,
     d: 'up',
     areaGridCoords: {x: 0, y: 1},

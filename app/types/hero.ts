@@ -13,6 +13,7 @@ export type Action =
     | 'beingCarried'
     | 'falling' | 'fallen'
     | 'sinkingInLava' | 'sankInLava'
+    | 'chargingCloneExplosion'
     | 'meditating'
     // Used for climbing vines on walls or ladders. The player moves more slowly and cannot use abilities while climbing.
     | 'climbing'

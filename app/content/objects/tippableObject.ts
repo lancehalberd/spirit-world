@@ -23,6 +23,7 @@ export class TippableObject implements ObjectInstance {
     behaviors = {
         destructible: true,
         solid: true,
+        midHeight: true,
     };
     isNeutralTarget = true;
     isObject = <const>true;
@@ -106,15 +107,19 @@ export class TippableObject implements ObjectInstance {
         addParticleAnimations(state, this.area, this.x + 8, this.y + 8, 2, particleFrames);
         removeObjectFromArea(state, this);
     }
+    releaseBrokenPot(state: GameState) {
+        for (const hero of [state.hero, state.hero.astralProjection, ...state.hero.clones]) {
+            if (hero?.grabObject === this) {
+                hero.grabObject = null;
+                hero.action = null;
+            }
+        }
+    }
     update(state: GameState) {
         if (this.fallingInPlace) {
             this.animationTime += FRAME_LENGTH;
             if (this.animationTime === 200) {
-                const hero = state.hero;
-                if (hero.grabObject === this) {
-                    hero.grabObject = null;
-                    hero.action = null;
-                }
+                this.releaseBrokenPot(state);
             }
         } if (this.fallDirection) {
             this.animationTime += FRAME_LENGTH;
@@ -127,11 +132,7 @@ export class TippableObject implements ObjectInstance {
         if (!this.shattered && this.animationTime >= (fallingAnimation.frames.length - 1) * FRAME_LENGTH * fallingAnimation.frameDuration) {
             this.shattered = true;
             this.pullingHeroDirection = null;
-            const hero = state.hero;
-            if (hero.grabObject === this) {
-                hero.grabObject = null;
-                hero.action = null;
-            }
+            this.releaseBrokenPot(state);
             // Not sure why I had this, with this, the pot is hidden behind floor switches sometimes.
             // this.drawPriority = 'background';
             addParticleAnimations(state, this.area, this.x + 8, this.y + 8, 2, particleFrames);

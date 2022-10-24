@@ -61,6 +61,11 @@ export class Clone extends Hero {
 export function destroyClone(state: GameState, clone: Hero): void {
     // Cannot destroy a clone if none remain.
     if (!state.hero.clones.length) {
+        // Return clone to there last safe location in case they
+        // were destroyed for landing in walls.
+        clone.d = clone.safeD;
+        clone.x = clone.safeX;
+        clone.y = clone.safeY;
         return;
     }
     if (clone === state.hero) {

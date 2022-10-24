@@ -50,7 +50,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         );
     const minZ = hero.groundHeight + (hero.isAstralProjection ? 4 : 0);
     const isThrowingCloak = hero.toolOnCooldown === 'cloak';
-    const isMovementBlocked = hero.action === 'meditating'
+    const isMovementBlocked = hero.action === 'meditating' || hero.action === 'chargingCloneExplosion'
         || hero.action === 'throwing' || hero.action === 'grabbing' || isThrowingCloak;
     const maxCloudBootsZ = hero.groundHeight + MAX_FLOAT_HEIGHT;
     const isActionBlocked =
@@ -228,35 +228,44 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             hero.action = null;
         }
     }
+    if (hero.action === 'chargingCloneExplosion' && !hero.clones.length) {
+        hero.action = null;
+        hero.explosionTime = 0;
+    }
     // Uncontrollable clones automatically run the explosion sequence.
-    if (hero.action === 'meditating' || hero.isUncontrollable) {
-        if (hero.isUncontrollable
-            || (isPlayerControlled && isGameKeyDown(state, GAME_KEY.MEDITATE))
-        ) {
+    if (hero.action === 'chargingCloneExplosion' || hero.isUncontrollable) {
+        if (hero.isUncontrollable || (isPlayerControlled && isGameKeyDown(state, GAME_KEY.MEDITATE))) {
+            // Meditating as a clone will either blow up the current clone, or all clones
+            // except the current if the clone tool is being pressed.
+            if (!isCloneToolDown || hero !== state.hero) {
+                hero.explosionTime += FRAME_LENGTH;
+                if (hero.explosionTime >= EXPLOSION_TIME) {
+                    hero.action = null;
+                    hero.explosionTime = 0;
+                    playSound('cloneExplosion');
+                    addEffectToArea(state, hero.area, new CloneExplosionEffect({
+                        x: hero.x + hero.w / 2,
+                        y: hero.y + hero.h / 2,
+                    }));
+                    destroyClone(state, hero);
+                    return;
+                }
+            } else {
+                hero.action = null;
+                hero.explosionTime = 0;
+            }
+        } else {
+            hero.action = null;
+            hero.explosionTime = 0;
+        }
+    }
+    if (hero.action === 'meditating') {
+        if (isPlayerControlled && isGameKeyDown(state, GAME_KEY.MEDITATE)) {
             // You can use the clone explosion ability only if a controllable clone exists
             // to either explode or switch to.
             if (hero.isUncontrollable
                 || state.hero.clones.filter(clone => !clone.isUncontrollable).length
             ) {
-                // Meditating as a clone will either blow up the current clone, or all clones
-                // except the current if the clone tool is being pressed.
-                if (!isCloneToolDown || hero !== state.hero) {
-                    hero.explosionTime += FRAME_LENGTH;
-                    if (hero.explosionTime >= EXPLOSION_TIME) {
-                        hero.action = null;
-                        hero.explosionTime = 0;
-                        playSound('cloneExplosion');
-                        addEffectToArea(state, hero.area, new CloneExplosionEffect({
-                            x: hero.x + hero.w / 2,
-                            y: hero.y + hero.h / 2,
-                        }));
-                        destroyClone(state, hero);
-                        return;
-                    }
-                } else {
-                    // You cannot meditate while you have clones spawned.
-                    hero.action = null;
-                }
             } else if (hero.passiveTools.spiritSight) {
                 hero.spiritRadius = Math.min(hero.spiritRadius + 4, MAX_SPIRIT_RADIUS);
                 if (hero.passiveTools.astralProjection && hero.area.alternateArea) {
@@ -267,7 +276,6 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 }
             }
         } else {
-            hero.explosionTime = 0;
             hero.spiritRadius = Math.max(hero.spiritRadius - 8, 0);
             if (hero.astralProjection) {
                 hero.astralProjection.d = hero.d;
@@ -679,10 +687,19 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         && !isActionBlocked && (hero.passiveTools.spiritSight || hero.clones.length)
         && !hero.heldChakram && !hero.chargingLeftTool && !hero.chargingRightTool
     ) {
-        hero.action = 'meditating';
-        hero.d = 'down';
+        if (!hero.clones.length) {
+            // You can only meditate with no clones up.
+            hero.action = 'meditating';
+            hero.spiritRadius = 0;
+        } else if (hero.clones.filter(clone => !clone.isUncontrollable).length) {
+            // You can only charge clone explosion with at least one controllable clone.
+            hero.action = 'chargingCloneExplosion';
+            hero.explosionTime = 0;
+        } else {
+            return;
+        }
         hero.actionFrame = 0;
-        hero.spiritRadius = 0;
+        hero.d = 'down';
         if (hero.astralProjection) {
             hero.astralProjection.d = hero.d;
             hero.astralProjection.x = hero.x;

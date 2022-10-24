@@ -65,6 +65,7 @@ export class Sign implements ObjectInstance {
     drawPriority: 'sprites' = 'sprites';
     behaviors = {
         solid: true,
+        midHeight: true,
     };
     isObject = <const>true;
     linkedObject: Sign;

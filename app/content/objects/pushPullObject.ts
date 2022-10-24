@@ -13,6 +13,7 @@ export class PushPullObject implements ObjectInstance {
     alwaysReset = true;
     behaviors = {
         solid: true,
+        midHeight: true,
     };
     isNeutralTarget = true;
     drawPriority: 'sprites' = 'sprites';

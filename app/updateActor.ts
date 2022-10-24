@@ -56,10 +56,7 @@ export function updateAllHeroes(this: void, state: GameState) {
             ) {
                 swapHeroStates(state.hero, state.hero.clones[i]);
                 state.hero.cloneToolReleased = false;
-                state.hero.isUncontrollable = false;
                 state.hero.clones[i].cannotSwapTo = true;
-                state.hero.clones[i].isUncontrollable = true;
-                state.hero.clones[i].explosionTime = state.hero.explosionTime;
                 break;
             }
         }
@@ -135,11 +132,11 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
     if (hero.action === 'pushing') {
         hero.animationTime -= 3 * FRAME_LENGTH / 4;
     }
+    if (hero.action !== 'chargingCloneExplosion' && !hero.isUncontrollable) {
+        hero.explosionTime = 0;
+    }
     if (hero.action !== 'meditating') {
         hero.spiritRadius = 0;
-        if (!hero.isUncontrollable) {
-            hero.explosionTime = 0;
-        }
     }
     if (hero.toolCooldown > 0) {
         hero.toolCooldown -= FRAME_LENGTH;
