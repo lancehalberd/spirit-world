@@ -2,7 +2,7 @@ import { removeEffectFromArea } from 'app/content/areas';
 import { EXPLOSION_RADIUS, FRAME_LENGTH } from 'app/gameConstants';
 import { hitTargets } from 'app/utils/field';
 
-import { AreaInstance, GameState, EffectInstance } from 'app/types';
+import { AreaInstance, GameState, EffectInstance, ObjectInstance } from 'app/types';
 
 
 interface Props {
@@ -20,15 +20,17 @@ export class CloneExplosionEffect implements EffectInstance {
     x: number;
     y: number;
     isPlayerAttack = true;
+    hitTargets: Set<EffectInstance | ObjectInstance>;
     constructor({x = 0, y = 0 }: Props) {
         this.animationTime = 0;
         this.x = x;
         this.y = y;
+        this.hitTargets = new Set();
     }
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;
         const r = EXPLOSION_RADIUS * Math.max(0.25, Math.min(1, 2 * this.animationTime / duration));
-        hitTargets(state, this.area, {
+        const hitResult = hitTargets(state, this.area, {
             damage: 4,
             canPush: true,
             cutsGround: true,
@@ -38,7 +40,11 @@ export class CloneExplosionEffect implements EffectInstance {
             hitEnemies: true,
             hitObjects: true,
             hitTiles: true,
+            ignoreTargets: this.hitTargets,
         });
+        if (hitResult.hitTargets.size) {
+            this.hitTargets = new Set([...this.hitTargets, ...hitResult.hitTargets]);
+        }
         if (this.animationTime > duration) {
             removeEffectFromArea(state, this);
         }

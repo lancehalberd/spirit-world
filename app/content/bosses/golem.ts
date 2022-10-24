@@ -283,7 +283,7 @@ enemyDefinitions.golemHand = {
             if (enemy.d === 'right') {
                 jewelHitbox.x = hitbox.x + (32 - jewelX - jewelHitbox.w);
             }
-            hitJewel = rectanglesOverlap(jewelHitbox, hit.hitbox);
+            hitJewel = hit.hitbox && rectanglesOverlap(jewelHitbox, hit.hitbox);
         } else if (enemy.currentAnimationKey === 'returning') {
             // The hand cannot be hit during the returning animation.
             const jewelX = 14;
@@ -296,7 +296,7 @@ enemyDefinitions.golemHand = {
             if (enemy.d === 'right') {
                 jewelHitbox.x = hitbox.x + (32 - jewelX - jewelHitbox.w);
             }
-            hitJewel = rectanglesOverlap(jewelHitbox, hit.hitbox);
+            hitJewel = hit.hitbox && rectanglesOverlap(jewelHitbox, hit.hitbox);
         } else if (enemy.currentAnimationKey === 'punching') {
             const fistX = 1;
             const fistHitbox = {
@@ -308,7 +308,7 @@ enemyDefinitions.golemHand = {
             if (enemy.d === 'right') {
                 fistHitbox.x = hitbox.x + (32 - fistX - fistHitbox.w);
             }
-            hitHand = rectanglesOverlap(fistHitbox, hit.hitbox);
+            hitHand = hit.hitbox && rectanglesOverlap(fistHitbox, hit.hitbox);
             const jewelX = 28;
             const jewelHitbox = {
                 x: hitbox.x + jewelX,
@@ -319,7 +319,7 @@ enemyDefinitions.golemHand = {
             if (enemy.d === 'right') {
                 jewelHitbox.x = hitbox.x + (32 - jewelX - jewelHitbox.w);
             }
-            hitJewel = rectanglesOverlap(jewelHitbox, hit.hitbox);
+            hitJewel = hit.hitbox && rectanglesOverlap(jewelHitbox, hit.hitbox);
         } else {
             hitHand = true;
         }

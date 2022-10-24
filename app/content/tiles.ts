@@ -360,6 +360,7 @@ const spiritPlantParticles = createAnimation('gfx/tiles/spiritplants.png', {w: 1
 const spiritPlantBehavior: TileBehaviors = {
     defaultLayer: 'field',
     solid: true, pickupWeight: 0, cuttable: 1, lootTable: lifeLootTable,
+    midHeight: true,
     underTile: 110,
     particles: spiritPlantParticles,
     breakSound: 'bushShatter',

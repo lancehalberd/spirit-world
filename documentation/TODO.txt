@@ -42,13 +42,12 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Update logic to account for clone throw over obstacles?
+        - Wait on this until we have adjusted any obstacles we don't want to allow this for.
+
     - Cocoon boss
         - Make astral projection spawn from the boss small, grow, then approach the player to attack
         before becoming small again and returning to the boss.
-
-    Nimbus cloud
-        - on overworld material takes you to: Lake, City, Village, Peaks, Ruins
-        - in spirit world takes you to: Tomb shop, Fertility Temple, Sky City, Jade City
 
     True sight
         For now try just rendering all spirit world objects at 50% opacity.
