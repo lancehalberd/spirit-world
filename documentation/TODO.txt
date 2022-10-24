@@ -42,13 +42,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    Bug:
-        Soft lock if you fall in the west spirit world without the ability to pass over cracked ground.
-            - Just add an extra portal to the material world under a bush.
-
-    Refactor:
-        Add hero.overlaps(Rectangle&{getHitbox?: ()}) and use this for simple hit detection on hero
-
     - Cocoon boss
         - Make astral projection spawn from the boss small, grow, then approach the player to attack
         before becoming small again and returning to the boss.

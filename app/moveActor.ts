@@ -8,7 +8,7 @@ import {
     isPointOpen,
     tileHitAppliesToTarget,
 } from 'app/utils/field';
-import { rectanglesOverlap } from 'app/utils/index';
+import { boxesIntersect } from 'app/utils/index';
 
 import { Actor, Direction, GameState, Hero, MovementProperties } from 'app/types';
 
@@ -488,7 +488,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
     // Apply floor effects from objects/effects.
     for (const entity of [...hero.area.objects, ...hero.area.effects]) {
         if (entity.getHitbox && entity.behaviors?.groundHeight > hero.groundHeight) {
-            if (rectanglesOverlap(entity.getHitbox(state), hitbox)) {
+            if (boxesIntersect(entity.getHitbox(state), hitbox)) {
                 hero.groundHeight = entity.behaviors.groundHeight;
             }
         }

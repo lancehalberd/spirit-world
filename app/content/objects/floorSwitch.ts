@@ -39,7 +39,7 @@ export class FloorSwitch implements ObjectInstance {
     }
     isDepressed(state: GameState): boolean {
         const hitbox = this.getHitbox(state);
-        if (state.hero.z <= 0 && state.hero.area === this.area && rectanglesOverlap(state.hero, hitbox)) {
+        if (state.hero.z <= 0 && state.hero.area === this.area && state.hero.overlaps(hitbox)) {
             return true;
         }
         for (const object of this.area.objects) {

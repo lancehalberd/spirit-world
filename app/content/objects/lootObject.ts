@@ -6,7 +6,6 @@ import { CANVAS_WIDTH, CANVAS_HEIGHT, FRAME_LENGTH } from 'app/gameConstants';
 import { showMessage } from 'app/render/renderMessage';
 import { getState, saveGame } from 'app/state';
 import { createAnimation, drawFrame, drawFrameAt, getFrameHitBox } from 'app/utils/animations';
-import { rectanglesOverlap } from 'app/utils/index';
 import { playSound } from 'app/musicController';
 import { drawText } from 'app/utils/simpleWhiteFont';
 
@@ -132,7 +131,7 @@ export class LootObject implements ObjectInstance {
         }
         this.behaviors = { brightness: 0, lightRadius: 0 };
     }
-    getHitbox(state: GameState) {
+    getHitbox(state?: GameState) {
         return getFrameHitBox(this.frame, this);
     }
     update(state: GameState) {
@@ -156,9 +155,7 @@ export class LootObject implements ObjectInstance {
             this.status = 'gone';
             return;
         }
-        if (this.area === state.hero.area
-            && rectanglesOverlap(state.hero, getFrameHitBox(this.frame, this))
-        ) {
+        if (this.area === state.hero.area && state.hero.overlaps(this)) {
             removeObjectFromArea(state, this);
             if (this.definition.id && this.definition.id !== 'drop') {
                 state.savedState.objectFlags[this.definition.id] = true;
@@ -251,7 +248,7 @@ export class LootDropObject extends LootObject {
     alwaysReset = true;
     isObject = <const>true;
     update(state: GameState) {
-        if (this.area === state.areaInstance && rectanglesOverlap(state.hero, getFrameHitBox(this.frame, this))) {
+        if (this.area === state.hero.area && state.hero.overlaps(this)) {
             const onPickup = lootEffects[this.definition.lootType] || lootEffects.unknown;
             onPickup(state, this.definition);
             if (this.definition.lootType === 'money') {

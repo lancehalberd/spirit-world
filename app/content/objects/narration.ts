@@ -1,7 +1,7 @@
 import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { setScript } from 'app/scriptEvents';
-import { readGetParameter, rectanglesOverlap } from 'app/utils/index';
+import { readGetParameter } from 'app/utils/index';
 
 import {
     AreaInstance, GameState, NarrationDefinition,
@@ -45,7 +45,7 @@ export class Narration implements ObjectInstance {
             this.runScript(state);
         }
     }
-    getHitbox(state: GameState): Rect {
+    getHitbox(state?: GameState): Rect {
         return { x: this.x, y: this.y, w: this.definition.w, h: this.definition.h };
     }
     runScript(state: GameState): void {
@@ -68,7 +68,7 @@ export class Narration implements ObjectInstance {
         if (this.trigger === 'touch') {
             // This 'knocked' check is a hack to prevent triggering narration while falling.
             if (state.hero.action !== 'knocked' && state.hero.action !== 'jumpingDown'
-                && rectanglesOverlap(this.getHitbox(state), state.hero.getHitbox(state))
+                && state.hero.overlaps(this)
             ) {
                 this.runScript(state);
             }

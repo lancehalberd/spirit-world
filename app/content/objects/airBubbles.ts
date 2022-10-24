@@ -50,7 +50,7 @@ export class AirBubbles implements ObjectInstance {
     getParts(state: GameState) {
         return [this.backPart, this.frontPart];
     }
-    getHitbox(state: GameState): Rect {
+    getHitbox(state?: GameState): Rect {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
     update(state: GameState) {

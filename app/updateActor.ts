@@ -16,7 +16,7 @@ import { updateHeroStandardActions } from 'app/updateHeroStandardActions';
 import {
     directionMap,
 } from 'app/utils/field';
-import { rectanglesOverlap } from 'app/utils/index';
+import { boxesIntersect } from 'app/utils/index';
 
 import {
     GameState, Hero,
@@ -160,7 +160,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
     let activeAirBubbles: AirBubbles = null;
     for (const object of hero.area.objects) {
         if (object instanceof AirBubbles && object.status === 'normal') {
-            if (rectanglesOverlap(hero, object.getHitbox(state))) {
+            if (hero.overlaps(object)) {
                 activeAirBubbles = object;
                 break;
             }
@@ -310,7 +310,7 @@ function checkForEnemyDamage(state: GameState, hero: Hero) {
             continue;
         }
         const enemyHitbox = enemy.getHitbox(state);
-        if (rectanglesOverlap(heroHitbox, enemyHitbox)) {
+        if (boxesIntersect(heroHitbox, enemyHitbox)) {
             let dx = (heroHitbox.x + heroHitbox.w / 2) - (enemyHitbox.x + enemyHitbox.w / 2);
             let dy = (heroHitbox.y + heroHitbox.h / 2) - (enemyHitbox.y + enemyHitbox.h / 2);
             if (!dx && !dy) {

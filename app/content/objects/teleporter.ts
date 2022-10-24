@@ -3,7 +3,7 @@ import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
 import { findObjectInstanceById } from 'app/content/objects';
 import { editingState } from 'app/development/tileEditor';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { directionMap } from 'app/utils/field';
+import { directionMap, getTileBehaviors } from 'app/utils/field';
 import { isObjectInsideTarget, pad } from 'app/utils/index';
 
 import {
@@ -41,11 +41,21 @@ export class Teleporter implements ObjectInstance {
     getHitbox(state: GameState): Rect {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
+    isUnderObject(state: GameState): boolean {
+        if (!this.area) {
+            return false;
+        }
+        const {tileBehavior} = getTileBehaviors(state, this.area, {x: this.x + 8, y: this.y + 8});
+        return tileBehavior.solid;
+    }
     update(state: GameState) {
         if (this.status !== 'normal' && state.hero.actionTarget !== this) {
             if (state.savedState.objectFlags[this.definition.id]) {
                 this.changeStatus(state, 'normal');
             }
+            return;
+        }
+        if (this.isUnderObject(state)) {
             return;
         }
         this.animationTime += FRAME_LENGTH;
@@ -95,6 +105,9 @@ export class Teleporter implements ObjectInstance {
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
         if (this.status !== 'normal' && !editingState.isEditing) {
+            return;
+        }
+        if (this.isUnderObject(state) && !editingState.isEditing) {
             return;
         }
         const gradient = context.createLinearGradient(0, 0, 0, 16);

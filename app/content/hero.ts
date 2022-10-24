@@ -20,6 +20,7 @@ import {
 import { getChargeLevelAndElement } from 'app/useTool';
 import { drawFrameAt, getFrame } from 'app/utils/animations';
 import { directionMap, getDirection } from 'app/utils/field';
+import { boxesIntersect } from 'app/utils/index';
 
 import {
     Action, ActiveTool, Actor, AreaInstance,
@@ -242,7 +243,7 @@ export class Hero implements Actor, SavedHeroData {
         return copy;
     }
 
-    getHitbox(this: Hero, state: GameState): Rect {
+    getHitbox(this: Hero, state?: GameState): Rect {
         if (this.hasBarrier) {
             const p = 4;
             return { x: this.x - p, y: this.y - p, w: this.w + 2 * p, h: this.h + 2 * p };
@@ -250,6 +251,12 @@ export class Hero implements Actor, SavedHeroData {
         return { x: this.x, y: this.y, w: this.w, h: this.h };
     }
 
+    overlaps(this: Hero, target: Rect | {getHitbox: () => Rect}) {
+        if ((target as any).getHitbox) {
+            return boxesIntersect((target as any).getHitbox(), this.getHitbox());
+        }
+        return boxesIntersect(target as Rect, this.getHitbox());
+    }
 
     onHit(this: Hero, state: GameState, hit: HitProperties): HitResult {
         if (this.life <= 0) {
