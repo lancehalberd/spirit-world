@@ -154,7 +154,9 @@ export const canClimbHelix = andLogic(
     // Needed to cross barriers in the tower.
     orLogic(hasTeleportation, hasSomersault)
 );
-export const canClimbMountain = orLogic(
+// This logic only applies for releasing the beast since it doesn't take into account
+// getting around the extra lava when the fire beast is released.
+const canClimbForHelixMountain = orLogic(
     // Left path just requires mitts.
     hasMitts,
     // Need gloves to reach the cave, and then something to get over the lava.
@@ -163,7 +165,7 @@ export const canClimbMountain = orLogic(
 
 // Update this if we add other ways to reach the sky in the material world.
 // We don't need to include the tower, because the tower can only be climbed once beasts are released.
-export const canReleaseBeasts = orLogic(canClimbHelix, andLogic(canClimbMountain, hasCloudBoots));
+export const canReleaseBeasts = orLogic(canClimbHelix, andLogic(canClimbForHelixMountain, hasCloudBoots));
 
 export const logicHash: {[key: string]: LogicCheck} = {
     hasWeapon,

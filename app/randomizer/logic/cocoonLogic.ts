@@ -1,9 +1,11 @@
 import {
     andLogic,
+    orLogic,
     hasAstralProjection,
     hasBossWeapon,
     hasSpiritBarrier,
     hasGloves,
+    hasSomersault,
     hasTeleportation,
 } from 'app/content/logic';
 
@@ -107,7 +109,7 @@ export const cocoonNodes: LogicNode[] = [
         nodeId: 'cocoonBoss',
         checks: [
             {objectId: 'cocoonBoss', logic: hasAstralProjection},
-            {objectId: 'cocoonSilver', logic: hasTeleportation},
+            {objectId: 'cocoonSilver', logic: orLogic(hasTeleportation, hasSomersault) },
         ],
         npcs: [
             {loot: {type: 'dialogueLoot', id: 'cocoonGuardianPostBoss', lootType: 'teleportation'}},

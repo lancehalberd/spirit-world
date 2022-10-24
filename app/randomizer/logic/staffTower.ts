@@ -75,7 +75,7 @@ export const staffTowerNodes: LogicNode[] = [
             { objectId: 'staffTowerBigMoney1', logic: canCrossDynamic4Gaps },
         ],
         paths: [
-            {nodeId: 'staffTowerF3SpiritWest'},
+            {nodeId: 'staffTowerF3SpiritWest', logic: canReleaseBeasts},
         ],
         entranceIds: ['staffTower2F3F'],
     },
@@ -88,7 +88,7 @@ export const staffTowerNodes: LogicNode[] = [
         zoneId,
         nodeId: 'staffTowerF2SpiritElevator',
         paths: [
-            {nodeId: 'staffTowerB1Spirit'},
+            {nodeId: 'staffTowerB1Spirit', logic: canReleaseBeasts},
         ],
         entranceIds: ['tower2FMarker'],
     },

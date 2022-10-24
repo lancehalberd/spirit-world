@@ -42,6 +42,7 @@ Graphics:
 
 Current tasks:
     Bug:
+        Bow renders while falling into a pit. Check cloak too maybe?
         Sometimes extra chakram hangs out on the player.
 
     Refactor:
