@@ -5,6 +5,7 @@ import { TextCue } from 'app/content/effects/textCue';
 import { changeObjectStatus, createObjectInstance, findObjectInstanceById } from 'app/content/objects';
 import { allTiles } from 'app/content/tiles';
 import { logicHash, isLogicValid } from 'app/content/logic';
+import { enterZoneByDoorCallback } from 'app/content/objects/door';
 import { dropItemFromTable } from 'app/content/objects/lootObject';
 import { checkToUpdateSpawnLocation } from 'app/content/spawnLocations';
 import { zones } from 'app/content/zones';
@@ -469,6 +470,11 @@ export function enterZoneByTarget(
                                 if (definition.locationCue) {
                                     const textCue = new TextCue(state, { text: definition.locationCue});
                                     addEffectToArea(state, state.areaInstance, textCue);
+                                }
+                                // Entering via a door requires some special logic to orient the
+                                // character to the door properly.
+                                if (definition.type === 'door') {
+                                    enterZoneByDoorCallback(state, targetObjectId, skipObject);
                                 }
                                 callback?.();
                             });

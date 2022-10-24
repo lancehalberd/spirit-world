@@ -346,6 +346,7 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "caves-ascentExit", x: 208, y: 0, type: "door", style: "cavern", targetZone: "caves", targetObjectId: "caves-ascentExit", d: "up"},
         {status: "normal", id: "craterEntrance", x: 64, y: 0, type: "door", style: "wideEntrance", targetZone: "crater", targetObjectId: "craterEntrance", d: "up"},
         {status: "closed", id: "staffTowerSkyEntrance", logicKey: "mountainTower", x: 64, y: 416, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerSkyEntrance", d: "up"},
+        {status: "normal", id: "craterMarker", x: 208, y: 32, type: "marker"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -2044,6 +2045,8 @@ const sf0_0x2: AreaDefinition = {
         },
     ],
     objects: [
+        {status: "normal", id: "skyCityMarker", x: 256, y: 240, type: "marker"},
+        {status: "normal", id: "", x: 256, y: 208, style: "short", type: "sign", message: "Future site of Sky City!"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},

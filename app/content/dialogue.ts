@@ -9,6 +9,7 @@ export * from 'app/content/dialogue/elder';
 export * from 'app/content/dialogue/mom';
 export * from 'app/content/dialogue/npc';
 export * from 'app/content/dialogue/holyCity';
+export * from 'app/content/dialogue/nimbusCloud';
 export * from 'app/content/dialogue/saveStatue';
 export * from 'app/content/dialogue/smith';
 export * from 'app/content/dialogue/tombGuardian';

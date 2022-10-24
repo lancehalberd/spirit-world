@@ -995,7 +995,7 @@ const f0_0x2: AreaDefinition = {
                     [758,758,773,1,772,758,769,617,601,602,601,602,601,602,601,602,601,602,601,602,601,602,601,602,601,602,601,602,601,602,617,768],
                     [758,757,1,1,1,758,773,17,1,1,1,1,1,17,1,1,1,1,53,53,1,1,1,1,1,1,12,1,1,1,1,771],
                     [758,766,1,1,758,766,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,376,377,377,377,377,378,1,417],
-                    [758,769,1,1,758,769,1,1,1,1,1,1,1,1,1,51,1,53,53,53,53,1,51,21,379,20,20,20,20,381,1,416],
+                    [758,769,1,1,758,769,1,1,1,1,1,1,1,1,1,51,1,53,0,53,53,1,51,21,379,20,20,20,20,381,1,416],
                     [758,774,1,1,758,773,1,1,1,1,1,1,1,1,16,1,53,1,1,0,1,53,1,1,0,20,20,20,20,381,1,416],
                     [769,1,1,1,757,1,21,1,1,1,1,1,1,1,1,53,1,0,10,10,0,1,53,1,382,383,383,383,383,384,1,416],
                     [774,1,21,1,766,1,1,1,1,1,0,1,1,1,1,53,0,10,53,53,10,1,53,1,1,0,1,1,1,1,1,416],
@@ -1180,6 +1180,7 @@ const f0_0x2: AreaDefinition = {
         {status: "normal", id: "moneyMazeEntrance", x: 112, y: 272, type: "door", style: "wooden", targetZone: "holyCityInterior", targetObjectId: "moneyMazeEntrance", d: "up", price: 25},
         {status: "normal", id: "citySaveStatue", x: 240, y: 32, type: "saveStatue"},
         {status: "normal", id: "", x: 144, y: 304, style: "short", type: "sign", message: "Wager your fortune in the Arrow Maze, only 25 Jade!"},
+        {status: "normal", id: "holyCityMarker", x: 272, y: 160, type: "marker"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -1890,6 +1891,7 @@ const f0_1x1: AreaDefinition = {
         {status: "normal", id: "", x: 176, y: 64, type: "spawnMarker", linked: true},
         {status: "normal", id: "", x: 48, y: 192, type: "spawnMarker", linked: true},
         {status: "normal", id: "", x: 256, y: 32, type: "spawnMarker", linked: true},
+        {status: "normal", id: "lakeMarker", x: 256, y: 208, type: "marker"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -2462,6 +2464,7 @@ const f0_2x0: AreaDefinition = {
         {status: "normal", id: "", linked: false, x: 240, y: 384, type: "spawnMarker"},
         {status: "normal", id: "", linked: false, x: 256, y: 128, type: "spawnMarker"},
         {status: "normal", id: "forestSave", linked: true, spirit: false, x: 416, y: 64, type: "saveStatue"},
+        {status: "normal", id: "vanaraVillageMarker", x: 176, y: 400, type: "marker"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -2911,6 +2914,7 @@ const f0_2x2: AreaDefinition = {
         {status: "normal", id: "", linked: true, x: 64, y: 320, type: "spawnMarker"},
         {status: "normal", id: "", linked: true, x: 176, y: 320, type: "spawnMarker"},
         {status: "normal", id: "", linked: true, x: 144, y: 208, type: "spawnMarker"},
+        {status: "normal", id: "summonerRuinsMarker", x: 240, y: 432, type: "marker"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -4084,6 +4088,7 @@ const sf0_0x2: AreaDefinition = {
         {status: "normal", id: "", x: 64, y: 320, type: "spawnMarker", linked: true, spirit: true},
         {status: "normal", id: "spiritChakram", x: 288, y: 48, type: "chest", lootType: "weapon", lootLevel: 2},
         {status: "normal", id: "jadeCitySaveStatue", x: 336, y: 32, type: "saveStatue"},
+        {status: "normal", id: "jadeCityMarker", x: 272, y: 160, type: "marker"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -4383,6 +4388,7 @@ const sf0_1x0: AreaDefinition = {
         {status: "normal", id: "spiritShopLightningBlessing", x: 176, y: 144, type: "shopItem", lootType: "lightningBlessing", price: 500, lootLevel: 1},
         {status: "normal", id: "", x: 112, y: 112, d: "down", behavior: "none", style: "zoro", type: "npc", dialogue: "Welcome to my humble shop."},
         {status: "normal", id: "spiritShopPeach", x: 128, y: 144, type: "shopItem", lootType: "peachOfImmortality", price: 300, lootLevel: 1},
+        {status: "normal", id: "spiritShopMarker", x: 112, y: 208, type: "marker"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},
@@ -5658,6 +5664,7 @@ const sf0_2x1: AreaDefinition = {
         {status: "normal", id: "", linked: true, x: 432, y: 64, type: "spawnMarker", spirit: true},
         {status: "normal", id: "", linked: true, x: 336, y: 48, type: "spawnMarker", spirit: true},
         {status: "normal", id: "", linked: true, x: 432, y: 176, type: "spawnMarker", spirit: true},
+        {status: "normal", id: "forestTempleMarker", x: 112, y: 368, type: "marker"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},

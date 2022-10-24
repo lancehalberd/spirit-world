@@ -77,8 +77,9 @@ export const riverTempleNodes: LogicNode[] = [
         nodeId: 'riverTempleUpperEntrance',
         checks: [{objectId: 'riverTempleBigChest'}],
         paths: [
-            {nodeId: 'riverTempleAcrossFromChest',logic: canMeltIce},
+            {nodeId: 'riverTempleAcrossFromChest', logic: canMeltIce},
         ],
+        entranceIds: ['riverTempleUpperEntrance'],
     },
     {
         zoneId,

@@ -2,7 +2,7 @@ import {
     andLogic,
     canCross4Gaps, canReleaseBeasts, canTravelFarUnderWater,
     hasCloudBoots, hasIronBoots, hasGloves, hasIce, hasMitts, hasSomersault, hasTeleportation,
-    hasMediumRange, hasSpiritSight, hasTowerStaff, orLogic,
+    hasMediumRange, hasNimbusCloud, hasSpiritSight, hasTowerStaff, orLogic,
 } from 'app/content/logic';
 
 import { LogicNode } from 'app/types';
@@ -21,6 +21,7 @@ export const overworldNodes: LogicNode[] = [
             { nodeId: 'overworldMountain', logic: hasGloves },
             { nodeId: 'warTempleArea' },
             { nodeId: 'mainSpiritWorld', logic: orLogic(hasSomersault, hasTeleportation) },
+            { nodeId: 'nimbusCloud', logic: hasNimbusCloud},
         ],
         entranceIds: [
             'sideArea:noToolEntrance', 'elderEntrance', 'tombTeleporter',
@@ -42,6 +43,36 @@ export const overworldNodes: LogicNode[] = [
             { objectId: 'templeDoor' },
             { objectId: 'moneyMazeEntrance' },
             { objectId: 'overworld:holyCityFoodHouse' },
+        ],
+    },
+    {
+        zoneId,
+        nodeId: 'nimbusCloud',
+        paths: [
+            { nodeId: 'riverTempleRoof' },
+            { nodeId: 'mountainAscentExit' },
+            // Holy city, Vanara village and summoner ruins
+            // are all accessible without the cloud, so don't bother with them here.
+        ],
+    },
+    {
+        zoneId,
+        nodeId: 'nimbusCloudSpirit',
+        paths: [
+            // holy city entrance or forest temple entrance.
+            { nodeId: 'mainSpiritWorld' },
+            // spirit shop entrance.
+            { nodeId: 'westSpiritWorld' },
+            // sky city entrance (really just the main spirit sky section).
+            { nodeId: 'waterfallTowerSky' },
+        ],
+    },
+    {
+        zoneId,
+        nodeId: 'riverTempleRoof',
+        entranceIds: ['riverTempleUpperEntrance'],
+        exits: [
+            { objectId: 'riverTempleUpperEntrance'}
         ],
     },
     {
@@ -112,6 +143,7 @@ export const overworldNodes: LogicNode[] = [
             // For door randomizer I would need to add the small fertility area in between here.
             // I will need to add it eventually when I add checks to the fertility temple.
             { nodeId: 'forestTempleSEArea' },
+            { nodeId: 'nimbusCloudSpirit', logic: hasNimbusCloud},
         ],
     },
     {
@@ -124,6 +156,7 @@ export const overworldNodes: LogicNode[] = [
         ],
         paths: [
             { nodeId: 'mainSpiritWorld', logic: hasCloudBoots },
+            { nodeId: 'nimbusCloudSpirit', logic: hasNimbusCloud},
         ],
     },
     {
@@ -132,6 +165,7 @@ export const overworldNodes: LogicNode[] = [
         paths: [
             { nodeId: 'mainSpiritWorld' },
             { nodeId: 'westSpiritWorldMountain', logic: orLogic(hasSomersault, hasTeleportation) },
+            { nodeId: 'nimbusCloudSpirit', logic: hasNimbusCloud},
         ],
     },
     {
@@ -140,6 +174,7 @@ export const overworldNodes: LogicNode[] = [
         paths: [
             { nodeId: 'westSpiritWorld' },
             { nodeId: 'spiritWorldMountain', logic: orLogic(hasSomersault, hasTeleportation) },
+            { nodeId: 'nimbusCloudSpirit', logic: hasNimbusCloud},
         ],
         entranceIds: ['caves-ascentEntranceSpirit'],
         exits: [{ objectId: 'caves-ascentEntranceSpirit' }],
@@ -199,12 +234,23 @@ zoneId = 'sky';
 export const skyNodes: LogicNode[] = [
     {
         zoneId,
+        nodeId: 'mountainAscentExit',
+        paths: [
+            { nodeId: 'outsideCrater' },
+        ],
+        entranceIds: ['caves-ascentExit'],
+        exits: [
+            { objectId: 'caves-ascentExit'}
+        ],
+    },
+    {
+        zoneId,
         nodeId: 'outsideCrater',
         paths: [
             { nodeId: 'overworldMountain' },
             { nodeId: 'outsideHelix', logic: hasCloudBoots },
         ],
-        entranceIds: ['caves-ascentExit', 'craterEntrance'],
+        entranceIds: ['craterEntrance'],
         exits: [
             { objectId: 'craterEntrance', logic: canReleaseBeasts },
         ],
@@ -246,6 +292,7 @@ export const skyNodes: LogicNode[] = [
             { nodeId: 'outsideForge' },
             { nodeId: 'spiritWorldMountain' },
             { nodeId: 'outsideSkyPalace', logic: orLogic(hasCloudBoots, canCross4Gaps) },
+            { nodeId: 'nimbusCloudSpirit', logic: hasNimbusCloud},
         ],
         entranceIds: ['waterfallTowerTopEntrance'],
         exits: [{ objectId: 'waterfallTowerTopEntrance' }],
@@ -255,6 +302,7 @@ export const skyNodes: LogicNode[] = [
         nodeId: 'outsideSkyPalace',
         paths: [
             { nodeId: 'waterfallTowerSky', logic: orLogic(hasCloudBoots, canCross4Gaps) },
+            { nodeId: 'nimbusCloudSpirit', logic: hasNimbusCloud},
         ],
         entranceIds: ['skyPalaceEntrance'],
         exits: [{ objectId: 'skyPalaceEntrance', logic:

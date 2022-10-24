@@ -93,14 +93,27 @@ export const cavesNodes: LogicNode[] = [
     },
     {
         zoneId: 'caves',
-        nodeId: 'ascentCaves',
-        checks: [
-            { objectId: 'caves-ascentPeachPiece', logic: canAscendToCrater},
+        nodeId: 'ascentCaveBottom',
+        paths: [
+            {nodeId: 'ascentCaveTop', logic: canAscendToCrater },
         ],
         entranceIds: ['caves-ascentEntrance'],
         exits: [
-            { objectId: 'caves-ascentExit', logic:canAscendToCrater },
             { objectId: 'caves-ascentEntrance'}
+        ],
+    },
+    {
+        zoneId: 'caves',
+        nodeId: 'ascentCaveTop',
+        paths: [
+            {nodeId: 'ascentCaveBottom', logic: canAscendToCrater },
+        ],
+        checks: [
+            { objectId: 'caves-ascentPeachPiece', logic: canCross2Gaps},
+        ],
+        entranceIds: ['caves-ascentExit'],
+        exits: [
+            { objectId: 'caves-ascentExit' },
         ],
     },
     {

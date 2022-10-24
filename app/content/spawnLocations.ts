@@ -399,7 +399,7 @@ const riverTempleStartState = applyItems(helixEndState, {
     maxLife: 2,
     staff: 2, lightning: 1,
     fireBlessing: 1, fire: 1,
-    lightningBlessing: 1, goldOre: 2,
+    lightningBlessing: 1, goldOre: 2, nimbusCloud: 1,
 }, ['flameBeast', 'stormBeast']);
 const riverTempleBossState = applyItems(riverTempleStartState,
     {'riverTemple:bigKey': 1, 'fire': 1, 'lightning': 1},
@@ -412,7 +412,7 @@ const craterStartState = applyItems(helixEndState, {
     maxLife: 2,
     staff: 2, lightning: 1,
     waterBlessing: 1, ice: 1,
-    lightningBlessing: 1, goldOre: 2,
+    lightningBlessing: 1, goldOre: 2, nimbusCloud: 1,
 }, ['frostBeast', 'stormBeast']);
 const craterBossState = applyItems(craterStartState, {fireBlessing: 1},
     ['craterLava1', 'craterLava2', 'craterLava3', 'craterLava4', 'craterLava5']
@@ -424,7 +424,7 @@ const staffStartState = applyItems(helixEndState, {
     maxLife: 2,
     fireBlessing: 1, fire: 1,
     waterBlessing: 1, ice: 1,
-    lightningBlessing: 1, goldOre: 2,
+    lightningBlessing: 1, goldOre: 2, nimbusCloud: 1,
 }, ['frostBeast', 'flameBeast']);
 const staffBossState = applyItems(staffStartState, {}, [
     'staffTowerSpiritEntrance', 'tower2FBarrier',

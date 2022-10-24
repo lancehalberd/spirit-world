@@ -100,6 +100,7 @@ export const hasBigKey: LogicCheck = { requiredFlags: ['$bigKey'] };
 export const hasFireBlessing: LogicCheck = {requiredFlags: ['$fireBlessing']};
 export const hasWaterBlessing: LogicCheck = {requiredFlags: ['$waterBlessing']};
 export const hasChakram: LogicCheck = {requiredFlags: ['$weapon']};
+export const hasNimbusCloud: LogicCheck = {requiredFlags: ['$nimbusCloud']};
 
 // This check will be added automatically to any tiles that have 100% darkness effect.
 //const hasEyes: LogicCheck = { requiredFlags: ['$catEyes:1'] };

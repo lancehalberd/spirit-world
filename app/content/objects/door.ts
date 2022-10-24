@@ -14,7 +14,7 @@ import { drawText } from 'app/utils/simpleWhiteFont';
 
 import {
     AreaInstance, Direction, DrawPriority, Frame, GameState, Hero, HitProperties, HitResult, ObjectInstance,
-    ObjectStatus, EntranceDefinition, Rect, TileBehaviors,
+    ObjectDefinition, ObjectStatus, EntranceDefinition, Rect, TileBehaviors,
 } from 'app/types';
 
 
@@ -730,8 +730,17 @@ export class Door implements ObjectInstance {
     isOpen(): boolean {
         return this.status === 'normal' || this.status === 'blownOpen';
     }
+    renderBehindHero(state: GameState): boolean {
+        if (state.hero.action === 'jumpingDown') {
+            return true;
+        }
+        if (state.hero.z > 8) {
+            return true;
+        }
+        return false;
+    }
     renderOpen(state: GameState): boolean {
-        const heroIsTouchingDoor = boxesIntersect(state.hero, this.getHitbox(state)) && state.hero.action !== 'jumpingDown';
+        const heroIsTouchingDoor = boxesIntersect(state.hero, this.getHitbox(state)) && !this.renderBehindHero(state);
         return heroIsTouchingDoor || this.status === 'normal' || this.status === 'blownOpen' || this.status === 'frozen' || state.hero.actionTarget === this;
     }
     changeStatus(state: GameState, status: ObjectStatus): void {
@@ -986,8 +995,8 @@ export class Door implements ObjectInstance {
         }
         let hero = state.hero;
         // Nothing to update if the hero isn't in the same world as this door.
-        // Also, heroes cannot enter doors while they are jumping down.
-        if (hero.area !== this.area || hero.action === 'jumpingDown') {
+        // Also, heroes cannot enter doors while they are jumping down/falling in front of a door.
+        if (hero.area !== this.area || this.renderBehindHero(state)) {
             return;
         }
         const heroIsTouchingDoor = boxesIntersect(hero, this.getHitbox(state));
@@ -1052,46 +1061,7 @@ export class Door implements ObjectInstance {
         if (hero.isExitingDoor || !this.definition.targetZone || !this.definition.targetObjectId) {
             return false;
         }
-        return enterZoneByTarget(state, this.definition.targetZone, this.definition.targetObjectId, this.definition, false, () => {
-            // We need to reassign hero after calling `enterZoneByTarget` because the active hero may change
-            // from one clone to another when changing zones.
-            hero = state.hero;
-            hero.isUsingDoor = true;
-            hero.isExitingDoor = true;
-            const target = findEntranceById(state.areaInstance, this.definition.targetObjectId, [this.definition]) as Door;
-            if (!target){
-                console.error(state.areaInstance.objects);
-                console.error(this.definition.targetObjectId);
-                debugger;
-            }
-            // When passing horizontally through narrow doors, we need to start 3px lower than usual.
-            if (target.definition.type === 'door') {
-                const style = doorStyles[target.style];
-                // When exiting new style doors, the MCs head appears above the frame, so start them lower.
-                if (style.w === 64 && target.definition.d === 'up') {
-                    hero.y += 6;
-                }
-                // This is for old 32x32 side doors.
-                if (style.h === 32 && target.definition.d !== 'down') {
-                    hero.y += 3;
-                }
-                // This is for new side doors.
-                if (style.w === 64 && (target.definition.d === 'left' || target.definition.d === 'right')) {
-                    hero.y += 8;
-                }
-            }
-            hero.actionTarget = target;
-            if (target.style === 'ladderUp' || target.style === 'ladderDown') {
-                hero.action = 'climbing';
-            }
-            // Make sure the hero is coming *out* of the target door.
-            hero.actionDx = -directionMap[target.definition.d][0];
-            hero.actionDy = -directionMap[target.definition.d][1];
-            hero.vx = 0;
-            hero.vy = 0;
-            // This will be the opposite direction of the door they are coming out of.
-            hero.d = getDirection(hero.actionDx, hero.actionDy);
-        });
+        return enterZoneByTarget(state, this.definition.targetZone, this.definition.targetObjectId, this.definition, false);
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
         const doorStyle = doorStyles[this.style];
@@ -1166,7 +1136,7 @@ export class Door implements ObjectInstance {
                 context.fillRect(this.x, this.y, 32, 32);
             }
         }
-        if (state.hero.action === 'jumpingDown') {
+        if (this.renderBehindHero(state)) {
             this.renderForeground(context, state, true);
         }
     }
@@ -1181,7 +1151,7 @@ export class Door implements ObjectInstance {
         const doorStyle = doorStyles[this.style];
         // Foreground is rendered as part of the background when a player is jumping
         // in case they jump over the top of the door.
-        if (!force && state.hero.action === 'jumpingDown') {
+        if (!force && this.renderBehindHero(state)) {
             return;
         }
         if (doorStyle.renderForeground) {
@@ -1223,4 +1193,45 @@ export class Door implements ObjectInstance {
             }
         }
     }
+}
+
+export function enterZoneByDoorCallback(this: void, state: GameState, targetObjectId: string, skipObject: ObjectDefinition) {
+    // We need to reassign hero after calling `enterZoneByTarget` because the active hero may change
+    // from one clone to another when changing zones.
+    const hero = state.hero;
+    hero.isUsingDoor = true;
+    hero.isExitingDoor = true;
+    const target = findEntranceById(state.areaInstance, targetObjectId, [skipObject]) as Door;
+    if (!target){
+        console.error(state.areaInstance.objects);
+        console.error(targetObjectId);
+        debugger;
+    }
+    // When passing horizontally through narrow doors, we need to start 3px lower than usual.
+    if (target.definition.type === 'door') {
+        const style = doorStyles[target.style];
+        // When exiting new style doors, the MCs head appears above the frame, so start them lower.
+        if (style.w === 64 && target.definition.d === 'up') {
+            hero.y += 6;
+        }
+        // This is for old 32x32 side doors.
+        if (style.h === 32 && target.definition.d !== 'down') {
+            hero.y += 3;
+        }
+        // This is for new side doors.
+        if (style.w === 64 && (target.definition.d === 'left' || target.definition.d === 'right')) {
+            hero.y += 8;
+        }
+    }
+    hero.actionTarget = target;
+    if (target.style === 'ladderUp' || target.style === 'ladderDown') {
+        hero.action = 'climbing';
+    }
+    // Make sure the hero is coming *out* of the target door.
+    hero.actionDx = -directionMap[target.definition.d][0];
+    hero.actionDy = -directionMap[target.definition.d][1];
+    hero.vx = 0;
+    hero.vy = 0;
+    // This will be the opposite direction of the door they are coming out of.
+    hero.d = getDirection(hero.actionDx, hero.actionDy);
 }

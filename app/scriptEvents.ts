@@ -130,7 +130,7 @@ export function parseEventScript(state: GameState, script: TextScript): ScriptEv
             //console.log(choiceToken);
             const [prompt, ...optionStrings] = choiceToken.split('|');
             const choices = optionStrings.map(o => {
-                const [text, key] = o.split(':');
+                const [text, key] = o.trim().split(':');
                 return { text, key };
             })
             //console.log(prompt, choices);

@@ -235,6 +235,11 @@ function updateMenu(state: GameState) {
             state.hero.setElement(menuItem as MagicElement);
             return;
         }
+        if (menuItem === 'nimbusCloud') {
+            state.paused = false;
+            showMessage(state, '{@nimbusCloud.chooseDestination}');
+            return;
+        }
         if (state.hero.passiveTools[menuItem as PassiveTool]) {
             state.paused = false;
             const helpMessage = getLootHelpMessage(state, menuItem, state.hero.passiveTools[menuItem]);
