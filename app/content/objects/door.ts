@@ -731,8 +731,7 @@ export class Door implements ObjectInstance {
         return this.status === 'normal' || this.status === 'blownOpen';
     }
     renderOpen(state: GameState): boolean {
-        const hero = state.hero.activeClone || state.hero;
-        const heroIsTouchingDoor = boxesIntersect(hero, this.getHitbox(state)) && hero.action !== 'jumpingDown';
+        const heroIsTouchingDoor = boxesIntersect(state.hero, this.getHitbox(state)) && state.hero.action !== 'jumpingDown';
         return heroIsTouchingDoor || this.status === 'normal' || this.status === 'blownOpen' || this.status === 'frozen' || state.hero.actionTarget === this;
     }
     changeStatus(state: GameState, status: ObjectStatus): void {
@@ -907,8 +906,7 @@ export class Door implements ObjectInstance {
         return true;
     }
     onGrab(state: GameState, d: Direction, hero: Hero) {
-        const primaryHero = state.hero.activeClone || state.hero;
-        if (hero.d === 'up' && hero === primaryHero &&
+        if (hero.d === 'up' && hero === state.hero &&
             this.definition.d === 'up' && this.status === 'closed' && this.definition.price
         ) {
             state.hero.action = null;
@@ -986,7 +984,7 @@ export class Door implements ObjectInstance {
         if (this.status !== 'normal' && getObjectStatus(state, this.definition)) {
             this.changeStatus(state, 'normal');
         }
-        let hero = state.hero.activeClone || state.hero;
+        let hero = state.hero;
         // Nothing to update if the hero isn't in the same world as this door.
         // Also, heroes cannot enter doors while they are jumping down.
         if (hero.area !== this.area || hero.action === 'jumpingDown') {
@@ -1050,14 +1048,14 @@ export class Door implements ObjectInstance {
         }
     }
     travelToZone(state: GameState) {
-        let hero = state.hero.activeClone || state.hero;
+        let hero = state.hero;
         if (hero.isExitingDoor || !this.definition.targetZone || !this.definition.targetObjectId) {
             return false;
         }
         return enterZoneByTarget(state, this.definition.targetZone, this.definition.targetObjectId, this.definition, false, () => {
             // We need to reassign hero after calling `enterZoneByTarget` because the active hero may change
             // from one clone to another when changing zones.
-            hero = state.hero.activeClone || state.hero;
+            hero = state.hero;
             hero.isUsingDoor = true;
             hero.isExitingDoor = true;
             const target = findEntranceById(state.areaInstance, this.definition.targetObjectId, [this.definition]) as Door;

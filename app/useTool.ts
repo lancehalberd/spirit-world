@@ -107,7 +107,6 @@ export function useTool(
                 hero.toolOnCooldown = 'clone';
                 hero.cloneToolReleased = false;
                 const clone = new Clone(state.hero);
-                //state.hero.activeClone = clone;
                 state.hero.clones.push(clone);
                 addObjectToArea(state, state.areaInstance, clone);
                 clone.isUncontrollable = true;
@@ -128,7 +127,6 @@ export function useTool(
                 hero.cloneToolReleased = false;
                 for (let i = 0; i < state.hero.activeTools.clone && i < state.hero.life - 1; i++) {
                     const clone = new Clone(state.hero);
-                    //state.hero.activeClone = clone;
                     state.hero.clones.push(clone);
                     addObjectToArea(state, state.areaInstance, clone);
                 }

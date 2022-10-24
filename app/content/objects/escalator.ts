@@ -108,7 +108,7 @@ export class Escalator implements ObjectInstance {
             this.offsetY += dy * speed;
         }
         // If touching center of player, pull player in and push them south.
-        const hero = state.hero.activeClone || state.hero;
+        const hero = state.hero;
         if (hero.area === this.area && !hero.isInvisible && this.status === 'normal') {
             const heroHitbox = hero.getHitbox(state);
             const touchingHero = isObjectInsideTarget(heroHitbox, this.getHitbox(state))

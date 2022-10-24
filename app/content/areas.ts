@@ -175,15 +175,10 @@ export function swapHeroStates(heroA: Hero, heroB: Hero) {
 }
 
 export function removeAllClones(state: GameState): void {
-    // Modify the hero to match the state of the active clone before it is removed.
-    if (state.hero.activeClone) {
-        swapHeroStates(state.hero, state.hero.activeClone);
-    }
     for (const clone of state.hero.clones) {
         removeObjectFromArea(state, clone);
     }
     state.hero.clones = []
-    state.hero.activeClone = null;
 }
 
 export function enterLocation(
@@ -227,12 +222,10 @@ export function enterLocation(
         if (state.alternateAreaInstance.definition === targetAreaDefinition) {
             state.transitionState.nextAreaInstance = state.alternateAreaInstance;
             state.transitionState.nextAlternateAreaInstance = state.areaInstance;
-
-            const primaryHero = state.hero.activeClone || state.hero;
             // Bring the held chakram with you.
-            if (primaryHero.heldChakram) {
-                removeEffectFromArea(state, primaryHero.heldChakram);
-                addEffectToArea(state, state.transitionState.nextAreaInstance, primaryHero.heldChakram);
+            if (state.hero.heldChakram) {
+                removeEffectFromArea(state, state.hero.heldChakram);
+                addEffectToArea(state, state.transitionState.nextAreaInstance, state.hero.heldChakram);
             }
         }
         return;

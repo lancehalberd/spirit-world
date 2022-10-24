@@ -23,7 +23,7 @@ import { directionMap, getDirection } from 'app/utils/field';
 
 import {
     Action, ActiveTool, Actor, AreaInstance,
-    Direction, DrawPriority, EffectInstance, Equipment,
+    Direction, DrawPriority, EffectInstance, Equipment, Frame,
     FullTile, GameState, HeldChakram, HitProperties, HitResult,
     MagicElement, ObjectInstance, ObjectStatus,
     PassiveTool, Rect, SavedHeroData, ThrownChakram, ThrownObject, TileBehaviors, TileCoords,
@@ -115,7 +115,6 @@ export class Hero implements Actor, SavedHeroData {
     astralProjection?: Hero;
     clones: Hero[];
     cloneToolReleased?: boolean
-    activeClone?: Hero;
     barrierElement?: MagicElement;
     barrierLevel?: number;
     safeD: Direction;
@@ -394,7 +393,7 @@ export class Hero implements Actor, SavedHeroData {
         // If there are no controllable clones, damage will only kill the
         // uncontrollably ones, never the primary clone the player is controlling.
         if (state.hero.clones.filter(clone => !clone.isUncontrollable).length
-            || this !== (state.hero.activeClone || state.hero)
+            || this !== state.hero
         ) {
             destroyClone(state, this);
         }
@@ -470,16 +469,27 @@ export class Hero implements Actor, SavedHeroData {
         }
     }
 
+    renderHeroFrame(this: Hero, context: CanvasRenderingContext2D, state: GameState): Frame {
+        const frame = getHeroFrame(state, this);
+        context.save();
+            if (this !== state.hero) {
+                context.globalAlpha *= 0.5;
+            } else if (this.invulnerableFrames) {
+                context.globalAlpha *= (0.7 + 0.3 * Math.cos(2 * Math.PI * this.invulnerableFrames * 3 / 50));
+            }
+            drawFrameAt(context, frame, { x: this.x, y: this.y - this.z });
+        context.restore();
+        return frame;
+    }
+
     render(this: Hero, context: CanvasRenderingContext2D, state: GameState): void {
         const hero = this;
-        // Currently the hero always has the barrier when invisible, but this could change.
-        if (state.hero.isInvisible) {
-            if (hero.hasBarrier) {
-                renderHeroBarrier(context, state, hero);
-            }
+        // 'sinkingInLava' action is currently unused, lava ground just does a lot of damage instead.
+        if (hero.action === 'falling' || hero.action === 'sinkingInLava') {
+            this.renderHeroFrame(context, state);
             return;
         }
-        if (hero.action === 'fallen' || hero.action === 'sankInLava') {
+        if (state.hero.isInvisible || hero.action === 'fallen' || hero.action === 'sankInLava') {
             return;
         }
         const renderCharging = state.hero.magic > 0 && hero.passiveTools.charge
@@ -512,16 +522,7 @@ export class Hero implements Actor, SavedHeroData {
         if (hero.action === 'usingStaff' && hero.d === 'up') {
             this.renderStaff(context, state, hero.d);
         }
-        const frame = getHeroFrame(state, hero);
-        const activeClone = state.hero.activeClone || state.hero;
-        context.save();
-            if (hero !== activeClone) {
-                context.globalAlpha *= 0.5;
-            } else if (hero.invulnerableFrames) {
-                context.globalAlpha *= (0.7 + 0.3 * Math.cos(2 * Math.PI * hero.invulnerableFrames * 3 / 50));
-            }
-            drawFrameAt(context, frame, { x: hero.x, y: hero.y - hero.z });
-        context.restore();
+        const frame = this.renderHeroFrame(context, state);
         if (this.toolOnCooldown === 'cloak') {
             this.renderCloak(context, state);
         }

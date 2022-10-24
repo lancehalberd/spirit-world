@@ -66,9 +66,10 @@ export class Narration implements ObjectInstance {
             return;
         }
         if (this.trigger === 'touch') {
-            const hero = state.hero.activeClone || state.hero;
             // This 'knocked' check is a hack to prevent triggering narration while falling.
-            if (hero.action !== 'knocked' && hero.action !== 'jumpingDown' && rectanglesOverlap(this.getHitbox(state), hero.getHitbox(state))) {
+            if (state.hero.action !== 'knocked' && state.hero.action !== 'jumpingDown'
+                && rectanglesOverlap(this.getHitbox(state), state.hero.getHitbox(state))
+            ) {
                 this.runScript(state);
             }
         }

@@ -1,6 +1,7 @@
 Test at http://localhost:81/alttp/public/
 
 Known Bugs:
+    - Sometimes extra chakram hangs out on the player.
     - Door closing sound plays while in the title screen
         - Maybe just disable playAreaSound in the title scene or only play this sound if the player passes through the door and it closes behind them.
     - Teleporting while grabbing a pot with astral projection can make you face south but still be grabbing the pot
@@ -42,15 +43,22 @@ Graphics:
 
 Current tasks:
     Bug:
+        Swapping to clone while throwing let's you land in a wall
+            - Just call destroy clone and if we ever run out of clones just respawn the player as if they fell in a pit.
+        Bead cascades don't pull clones.
+        Escalators don't pull clones.
+        Crash when clone falls into a pit entrance.
+        Check if clone/astral projection releases tipped pots
+        Soft lock if you fall in the west spirit world without the ability to pass over cracked ground.
+            - Just add an extra portal to the material world under a bush.
         Bow renders while falling into a pit. Check cloak too maybe?
-        Sometimes extra chakram hangs out on the player.
 
     Refactor:
-        It looks like "hero.activeClone" is unused and making the game logic unnecessarily complex so we should remove it.
+        Add hero.overlaps(Rectangle&{getHitbox?: ()}) and use this for simple hit detection on hero
 
-    Change prep animation for explosion
-        charge particles form randomly in a circle around the hero shooting into them,
-        with shorter radius and more density as time passes.
+    - Cocoon boss
+        - Make astral projection spawn from the boss small, grow, then approach the player to attack
+        before becoming small again and returning to the boss.
 
     Nimbus cloud
         - on overworld material takes you to: Lake, City, Village, Peaks, Ruins
@@ -79,12 +87,18 @@ Current tasks:
                 - Allows returning to entrance inside areas
                 - Allows teleporting to specific places visited on the overworld, possibly between material/spirit worlds.
 
+    Change prep animation for explosion
+        charge particles form randomly in a circle around the hero shooting into them,
+        with shorter radius and more density as time passes.
+
     Gold Armor Upgrade
         If Spirit Chakram is fully upgraded and the player has golden mail they can use:
         500 Jade + 2 gold and 5 silver to double effectiveness of golden mail
 
     Editor Improvements
-        - Track which zones have been changed but not exported.
+        - Track which zones have been changes since the last time they were exported
+            - Show indicator that zone has "unexported" changes.
+        - Save changes to zones to local storage and prompt to apply them when starting the editor.
         - Support undo/redo actions
             - Include in context menu when editor is active
         - Add graphical palettes
@@ -94,9 +108,6 @@ Current tasks:
     - Squirrel velocity should reset when knocked back
     - Add SFX when the MC is damaged
 
-    - Cocoon boss
-        - Make astral projection spawn from the boss small, grow, then approach the player to attack
-        before becoming small again and returning to the boss.
     - Add sleeping Vanara to the Cocoon.
         - Can use a special NPC that doesn't face you when talking for now.
         - Use a variety of colors.

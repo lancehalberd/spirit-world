@@ -65,7 +65,6 @@ export class LootGetAnimation implements EffectInstance {
         this.loot = loot;
         const state = getState();
         this.frame = getLootFrame(state, loot);
-        const hero = state.hero.activeClone || state.hero;
         if (loot.type === 'bigChest') {
             this.x = loot.x + chestOpenedFrame.w - this.frame.w / 2;
             this.y = loot.y + 16;
@@ -73,8 +72,8 @@ export class LootGetAnimation implements EffectInstance {
             this.x = loot.x + chestOpenedFrame.w / 2 - this.frame.w / 2;
             this.y = loot.y + 8;
         } else {
-            this.x = hero.x + hero.w / 2 - this.frame.w / 2;
-            this.y = hero.y - 4;
+            this.x = state.hero.x + state.hero.w / 2 - this.frame.w / 2;
+            this.y = state.hero.y - 4;
         }
         this.z = 8;
     }
@@ -157,8 +156,9 @@ export class LootObject implements ObjectInstance {
             this.status = 'gone';
             return;
         }
-        const hero = state.hero.activeClone || state.hero;
-        if (this.area === hero.area && rectanglesOverlap(hero, getFrameHitBox(this.frame, this))) {
+        if (this.area === state.hero.area
+            && rectanglesOverlap(state.hero, getFrameHitBox(this.frame, this))
+        ) {
             removeObjectFromArea(state, this);
             if (this.definition.id && this.definition.id !== 'drop') {
                 state.savedState.objectFlags[this.definition.id] = true;
@@ -232,13 +232,12 @@ function getActualLootDefinition(this: void, state: GameState, definition: AnyLo
 export function getLoot(this: void, state: GameState, definition: AnyLootDefinition): void {
     definition = getActualLootDefinition(state, definition);
     const onPickup = lootEffects[definition.lootType] || lootEffects.unknown;
-    const hero = state.hero.activeClone || state.hero;
-    hero.action = 'getItem';
+    state.hero.action = 'getItem';
     const lootAnimation = new LootGetAnimation(definition);
     // Apply the pickup after creating the loot animation so that it uses the correct graphic for progressive items.
     onPickup(state, definition);
-    addEffectToArea(state, hero.area, lootAnimation);
-    hero.area.priorityObjects.push([lootAnimation]);
+    addEffectToArea(state, state.hero.area, lootAnimation);
+    state.hero.area.priorityObjects.push([lootAnimation]);
     // Hack to prevent the game from looking like it is freezing when you obtain the tower staff.
     const fastRefresh = definition.lootType === 'staff';
     // Refresh the area so that the guardian NPC moves to the correct location now that the boss is defeated.
@@ -252,7 +251,7 @@ export class LootDropObject extends LootObject {
     alwaysReset = true;
     isObject = <const>true;
     update(state: GameState) {
-        if (this.area === state.areaInstance && rectanglesOverlap(state.hero.activeClone || state.hero, getFrameHitBox(this.frame, this))) {
+        if (this.area === state.areaInstance && rectanglesOverlap(state.hero, getFrameHitBox(this.frame, this))) {
             const onPickup = lootEffects[this.definition.lootType] || lootEffects.unknown;
             onPickup(state, this.definition);
             if (this.definition.lootType === 'money') {
@@ -309,10 +308,9 @@ export class ChestObject implements ObjectInstance {
     }
     onGrab(state: GameState) {
         // You can only open a chest from the bottom.
-        const hero = state.hero.activeClone || state.hero;
         // Surpisingly, this prevents the Astral Projection from opening chests,
         // because the hero always faces south when meditating.
-        if (!this.definition.id || hero.d !== 'up') {
+        if (!this.definition.id || state.hero.d !== 'up') {
             return;
         }
         state.hero.action = null;
@@ -382,8 +380,7 @@ export class BigChest extends ChestObject implements ObjectInstance {
     }
     onGrab(state: GameState) {
         // You can only open a chest from the bottom.
-        const hero = state.hero.activeClone || state.hero;
-        if (hero.d !== 'up') {
+        if (state.hero.d !== 'up') {
             return;
         }
         state.hero.action = null;
@@ -442,8 +439,7 @@ export class ShopObject extends LootObject implements ObjectInstance {
         this.behaviors.solid = true;
     }
     onGrab(state: GameState, d: Direction, hero: Hero) {
-        const mainHero = state.hero.activeClone || state.hero;
-        if (hero !== mainHero) {
+        if (hero !== state.hero) {
             return;
         }
         state.hero.action = null;

@@ -43,11 +43,10 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         || (state.hero.rightTool === 'clone' && isGameKeyDown(state, GAME_KEY.RIGHT_TOOL));
     const isCloakToolDown = (state.hero.leftTool === 'cloak' && isGameKeyDown(state, GAME_KEY.LEFT_TOOL))
         || (state.hero.rightTool === 'cloak' && isGameKeyDown(state, GAME_KEY.RIGHT_TOOL));
-    const primaryClone = state.hero.activeClone || state.hero;
     const isPlayerControlled = !hero.isUncontrollable
         && (
             (state.hero.action === 'meditating' && hero.isAstralProjection)
-            || isCloneToolDown || hero === primaryClone
+            || isCloneToolDown || hero === state.hero
         );
     const minZ = hero.groundHeight + (hero.isAstralProjection ? 4 : 0);
     const isThrowingCloak = hero.toolOnCooldown === 'cloak';
@@ -241,7 +240,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             ) {
                 // Meditating as a clone will either blow up the current clone, or all clones
                 // except the current if the clone tool is being pressed.
-                if (!isCloneToolDown || hero !== primaryClone) {
+                if (!isCloneToolDown || hero !== state.hero) {
                     hero.explosionTime += FRAME_LENGTH;
                     if (hero.explosionTime >= EXPLOSION_TIME) {
                         hero.action = null;

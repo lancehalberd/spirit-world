@@ -52,7 +52,7 @@ export function updateSpiritCanvas(state: GameState, radius: number): void {
         renderAreaObjectsBeforeHero(spiritContext, state, area);
         spiritContext.save();
             translateContextForAreaAndCamera(spiritContext, state, area);
-            renderHeroEyes(spiritContext, state, state.hero.activeClone || state.hero);
+            renderHeroEyes(spiritContext, state, state.hero);
         spiritContext.restore();
         renderAreaObjectsAfterHero(spiritContext, state, area);
         renderAreaForeground(spiritContext, state, area);
@@ -292,13 +292,12 @@ function renderTransition(context: CanvasRenderingContext2D, state: GameState) {
                     updateWaterSurfaceCanvas(state);
                 }
             }
-            const hero = state.hero.activeClone || state.hero;
             // Draw the field, enemies, objects and hero.
             renderAreaBackground(underContext, state, area);
             renderAreaObjectsBeforeHero(underContext, state, area);
             underContext.save();
                 translateContextForAreaAndCamera(underContext, state, area);
-                hero.render(underContext, state);
+                state.hero.render(underContext, state);
             underContext.restore();
             renderAreaObjectsAfterHero(underContext, state, area);
             renderSurfaceLighting(underContext, state, area);
@@ -470,14 +469,12 @@ export function renderField(
         updateLightingCanvas(state.nextAreaInstance);
     }
 
-    const hero = state.hero.activeClone || state.hero;
-
     // Draw the field, enemies, objects and hero.
     renderAreaBackground(context, state, state.areaInstance);
     renderAreaBackground(context, state, state.nextAreaInstance);
     renderAreaObjectsBeforeHero(context, state, state.areaInstance);
     renderAreaObjectsBeforeHero(context, state, state.nextAreaInstance);
-    if (shouldRenderHero === true || (shouldRenderHero !== false && hero.area === state.areaInstance)) {
+    if (shouldRenderHero === true || (shouldRenderHero !== false && state.hero.area === state.areaInstance)) {
         renderHero(context, state);
     }
 
@@ -519,7 +516,6 @@ export function renderHeatOverlay(context: CanvasRenderingContext2D, state: Game
 }
 
 export function renderSpiritOverlay(context: CanvasRenderingContext2D, state: GameState) {
-    const hero = state.hero.activeClone || state.hero;
     if (state.hero.spiritRadius > 0) {
         context.save();
         context.globalAlpha = 0.6 * state.hero.spiritRadius / MAX_SPIRIT_RADIUS;
@@ -529,9 +525,9 @@ export function renderSpiritOverlay(context: CanvasRenderingContext2D, state: Ga
         updateSpiritCanvas(state, state.hero.spiritRadius);
         context.drawImage(spiritCanvas,
             0, 0, spiritCanvas.width, spiritCanvas.height,
-            (hero.x + hero.w / 2 - spiritCanvas.width / 2
+            (state.hero.x + state.hero.w / 2 - spiritCanvas.width / 2
             - state.camera.x + state.areaInstance.cameraOffset.x) | 0,
-            (hero.y - spiritCanvas.height / 2
+            (state.hero.y - spiritCanvas.height / 2
              - state.camera.y + state.areaInstance.cameraOffset.y) | 0,
             spiritCanvas.width, spiritCanvas.height
         );
@@ -547,11 +543,10 @@ export function renderArea(context: CanvasRenderingContext2D, state: GameState, 
         checkToRedrawTiles(area);
         updateLightingCanvas(area);
     }
-    const hero = state.hero.activeClone || state.hero;
     // Draw the field, enemies, objects and hero.
     renderAreaBackground(context, state, area);
     renderAreaObjectsBeforeHero(context, state, area);
-    if (renderHero === true || (renderHero !== false && hero.area === area)) {
+    if (renderHero === true || (renderHero !== false && state.hero.area === area)) {
         context.save();
             translateContextForAreaAndCamera(context, state, area);
             state.hero.render(context, state);
@@ -679,8 +674,7 @@ export function renderForegroundObjects(context: CanvasRenderingContext2D, state
                 object.render?.(context, state);
             }
         }
-        const hero = state.hero.activeClone || state.hero;
-        hero.renderForeground?.(context, state);
+        state.hero.renderForeground?.(context, state);
     context.restore();
 }
 

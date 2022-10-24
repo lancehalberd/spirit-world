@@ -110,7 +110,7 @@ export class TippableObject implements ObjectInstance {
         if (this.fallingInPlace) {
             this.animationTime += FRAME_LENGTH;
             if (this.animationTime === 200) {
-                const hero = state.hero.activeClone || state.hero;
+                const hero = state.hero;
                 if (hero.grabObject === this) {
                     hero.grabObject = null;
                     hero.action = null;
@@ -127,7 +127,7 @@ export class TippableObject implements ObjectInstance {
         if (!this.shattered && this.animationTime >= (fallingAnimation.frames.length - 1) * FRAME_LENGTH * fallingAnimation.frameDuration) {
             this.shattered = true;
             this.pullingHeroDirection = null;
-            const hero = state.hero.activeClone || state.hero;
+            const hero = state.hero;
             if (hero.grabObject === this) {
                 hero.grabObject = null;
                 hero.action = null;

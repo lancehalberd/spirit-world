@@ -77,8 +77,4 @@ export function destroyClone(state: GameState, clone: Hero): void {
         }
         removeObjectFromArea(state, clone);
     }
-    // If the active clone is destroyed, we return control to the main hero.
-    if (state.hero.activeClone === clone) {
-        state.hero.activeClone = null;
-    }
 }

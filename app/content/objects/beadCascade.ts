@@ -263,7 +263,7 @@ export class BeadSection implements ObjectInstance {
             removeObjectFromArea(state, this);
         }
         // If touching center of player, pull player in and push them south.
-        const hero = state.hero.activeClone || state.hero;
+        const hero = state.hero;
         if (hero.area === this.area) {
             const touchingHero = boxesIntersect(hero, this.getHitbox(state))
                 && hero.action !== 'roll' && hero.z <= 4

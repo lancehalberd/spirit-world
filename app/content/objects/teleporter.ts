@@ -49,7 +49,7 @@ export class Teleporter implements ObjectInstance {
             return;
         }
         this.animationTime += FRAME_LENGTH;
-        let hero = state.hero.activeClone || state.hero;
+        const hero = state.hero;
         if (this.disabledTime > 0) {
             this.disabledTime -= FRAME_LENGTH;
             return;
@@ -79,9 +79,6 @@ export class Teleporter implements ObjectInstance {
             });
         } else {
             enterZoneByTarget(state, this.definition.targetZone, this.definition.targetObjectId, this.definition, false, () => {
-                // We need to reassign hero after calling `enterZoneByTarget` because the active hero may change
-                // from one clone to another when changing zones.
-                hero = state.hero.activeClone || state.hero;
                 hero.isUsingDoor = true;
                 const target = findObjectInstanceById(state.areaInstance, this.definition.targetObjectId) as Teleporter;
                 if (!target){

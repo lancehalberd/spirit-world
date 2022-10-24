@@ -86,14 +86,13 @@ export function parseEventScript(state: GameState, script: TextScript): ScriptEv
             continue;
         }
         if (actionToken === 'teleport') {
-            const hero = state.hero.activeClone || state.hero;
             events.push({
                 type: 'enterLocation',
                 location: {
                     ...state.location,
-                    x: hero.x,
-                    y: hero.y,
-                    d: hero.d,
+                    x: state.hero.x,
+                    y: state.hero.y,
+                    d: state.hero.d,
                     isSpiritWorld: !state.location.isSpiritWorld,
                 },
             });

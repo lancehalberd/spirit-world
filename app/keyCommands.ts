@@ -333,16 +333,16 @@ export function getMovementDeltas(state: GameState): [number, number] {
 
 export function getCloneMovementDeltas(state: GameState, hero: Hero): [number, number] {
     const [dx, dy] = getMovementDeltas(state);
-    const activeClone = (state.hero.action === 'meditating' && state.hero.astralProjection) || state.hero.activeClone || state.hero;
-    if (activeClone.d === hero.d) {
+    const controlledHero = (state.hero.action === 'meditating' && state.hero.astralProjection) || state.hero;
+    if (controlledHero.d === hero.d) {
         return [dx, dy];
     }
-    if ((activeClone.d === 'left' && hero.d === 'up') || (activeClone.d === 'up' && hero.d === 'right') ||
-        (activeClone.d === 'right' && hero.d === 'down') || (activeClone.d === 'down' && hero.d === 'left')) {
+    if ((controlledHero.d === 'left' && hero.d === 'up') || (controlledHero.d === 'up' && hero.d === 'right') ||
+        (controlledHero.d === 'right' && hero.d === 'down') || (controlledHero.d === 'down' && hero.d === 'left')) {
         return [-dy, dx];
     }
-    if ((activeClone.d === 'left' && hero.d === 'down') || (activeClone.d === 'up' && hero.d === 'left') ||
-        (activeClone.d === 'right' && hero.d === 'up') || (activeClone.d === 'down' && hero.d === 'right')) {
+    if ((controlledHero.d === 'left' && hero.d === 'down') || (controlledHero.d === 'up' && hero.d === 'left') ||
+        (controlledHero.d === 'right' && hero.d === 'up') || (controlledHero.d === 'down' && hero.d === 'right')) {
         return [dy, -dx];
     }
     return [-dx, -dy];

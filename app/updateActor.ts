@@ -82,8 +82,8 @@ export function updateAllHeroes(this: void, state: GameState) {
         }
     }
     updateHero(state, state.hero);
-    updatePrimaryHeroState(state, state.hero.activeClone || state.hero);
-    checkToStartScreenTransition(state, state.hero.activeClone || state.hero);
+    updatePrimaryHeroState(state, state.hero);
+    checkToStartScreenTransition(state, state.hero);
 }
 
 export function updateHero(this: void, state: GameState, hero: Hero) {

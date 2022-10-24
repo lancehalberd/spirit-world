@@ -41,7 +41,7 @@ const regenerationParticles
 
 
 export function updateHeroSpecialActions(this: void, state: GameState, hero: Hero): boolean {
-    const isPrimaryHero = hero === (state.hero.activeClone || state.hero);
+    const isPrimaryHero = hero === state.hero;
     const minZ = hero.groundHeight + (hero.isAstralProjection ? 4 : 0);
     // Handle super tile transitions.
     if (isPrimaryHero && state.nextAreaInstance) {
@@ -331,7 +331,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 }
             }
             // If a thrown clone lands in a wall, destroy it.
-            if (hero.action === 'thrown' && hero !== (state.hero.activeClone || state.hero)) {
+            if (hero.action === 'thrown' && hero !== state.hero) {
                 if (!canSomersaultToCoords(state, hero, hero)) {
                     destroyClone(state, hero);
                     return;

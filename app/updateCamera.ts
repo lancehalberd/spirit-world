@@ -82,7 +82,7 @@ export function updateCamera(state: GameState, speed = cameraSpeed): void {
         }
         return;
     }
-    const hero = (state.hero.spiritRadius > 0 && state.hero.astralProjection) || state.hero.activeClone || state.hero;
+    const hero = (state.hero.spiritRadius > 0 && state.hero.astralProjection) || state.hero;
     let targetX = Math.floor(hero.x - CANVAS_WIDTH / 2 + 16 / 2);
     // Constrain the camera to display only/center the current section.
     if (section.w >= CANVAS_WIDTH) {

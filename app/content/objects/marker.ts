@@ -26,34 +26,32 @@ export class Marker implements ObjectInstance {
     }
     update(state: GameState) {
         if (this.definition.type === 'spawnMarker') {
-            const primaryHero = state.hero.activeClone || state.hero;
-            if (this.area === primaryHero.area
-                && !primaryHero.isOverPit
-                && (primaryHero.action === 'walking' || !primaryHero.action)
-                && primaryHero.rollCooldown <= 0
+            if (this.area === state.hero.area
+                && !state.hero.isOverPit
+                && (state.hero.action === 'walking' || !state.hero.action)
+                && state.hero.rollCooldown <= 0
             ) {
-                const isMarkerActive = Math.abs(primaryHero.x - this.x) < 20
-                    && Math.abs(primaryHero.y - this.y) < 20;
+                const isMarkerActive = Math.abs(state.hero.x - this.x) < 20
+                    && Math.abs(state.hero.y - this.y) < 20;
                 if (!isMarkerActive) {
                     return;
                 }
-                const { mag } = getVectorToTarget(state, this, primaryHero);
-                const dx = primaryHero.x - primaryHero.safeX;
-                const dy = primaryHero.y - primaryHero.safeY;
+                const { mag } = getVectorToTarget(state, this, state.hero);
+                const dx = state.hero.x - state.hero.safeX;
+                const dy = state.hero.y - state.hero.safeY;
                 if (dx * dx + dy * dy >= mag * mag) {
                     // This is simplified becuase marker+hero have the same size hitbox.
                     // Would have to adjust if that changes in the future.
-                    primaryHero.safeX = this.x;
-                    primaryHero.safeY = this.y;
+                    state.hero.safeX = this.x;
+                    state.hero.safeY = this.y;
                 }
             }
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
-        const primaryHero = state.hero.activeClone || state.hero;
         // Remove `false &&` here to see marker when it is active.
-        const isMarkerActive = false && Math.abs(primaryHero.x - this.x) < 20
-            && Math.abs(primaryHero.y - this.y) < 20;
+        const isMarkerActive = false && Math.abs(state.hero.x - this.x) < 20
+            && Math.abs(state.hero.y - this.y) < 20;
         if (editingState.isEditing || isMarkerActive) {
             context.strokeStyle = 'red';
             context.beginPath();
