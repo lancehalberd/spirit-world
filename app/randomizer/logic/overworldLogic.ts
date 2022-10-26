@@ -22,6 +22,9 @@ export const overworldNodes: LogicNode[] = [
             { nodeId: 'warTempleArea' },
             { nodeId: 'mainSpiritWorld', logic: orLogic(hasSomersault, hasTeleportation) },
             { nodeId: 'nimbusCloud', logic: hasNimbusCloud},
+            // This represents moving the tower to the forest position and using cloud boots to
+            // fall on the river temple roof.
+            { nodeId: 'riverTempleRoof', logic: andLogic({requiredFlags: ['stormBeast']}, hasCloudBoots)}
         ],
         entranceIds: [
             'sideArea:noToolEntrance', 'elderEntrance', 'tombTeleporter',
@@ -249,6 +252,7 @@ export const skyNodes: LogicNode[] = [
         paths: [
             { nodeId: 'overworldMountain' },
             { nodeId: 'outsideHelix', logic: hasCloudBoots },
+            { nodeId: 'skyTreasure', logic: hasCloudBoots },
         ],
         entranceIds: ['craterEntrance'],
         exits: [
@@ -257,9 +261,15 @@ export const skyNodes: LogicNode[] = [
     },
     {
         zoneId,
+        nodeId: 'skyTreasure',
+        checks: [{ objectId: 'skyMoney'}],
+    },
+    {
+        zoneId,
         nodeId: 'outsideHelix',
         paths: [
             { nodeId: 'outsideCrater', logic: hasCloudBoots },
+            { nodeId: 'skyTreasure', logic: hasCloudBoots },
         ],
         entranceIds: ['helixSkyEntrance'],
         exits: [

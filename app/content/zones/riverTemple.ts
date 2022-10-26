@@ -720,6 +720,7 @@ const f1_0x0: AreaDefinition = {
     objects: [
         {status: "normal", id: "", x: 368, y: 480, type: "door", style: "cave", d: "down"},
         {status: "normal", id: "riverTempleUpperEntrance", x: 368, y: 256, type: "door", style: "cavernUpstairs", targetZone: "overworld", targetObjectId: "riverTempleUpperEntrance", d: "up", locationCue: "Lake Temple 3F"},
+        {status: "normal", id: "riverTempleMoney", x: 320, y: 320, type: "chest", lootType: "money", lootAmount: 100},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},

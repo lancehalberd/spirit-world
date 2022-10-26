@@ -57,21 +57,6 @@ Current tasks:
         - Send a clone into the spirit world for "temporary" true sight. Might be annoying to switch between.
         - Some kind of hazards in the spirit world that move slowly and knock you back, where you need true sight to navigate successfully because spirit sight is too slow.
 
-    Add save statues:
-        Outside Crater/Forge
-        Outside waterfall cave
-
-    Add Sky Paths for Staff Tower + improve sky paths
-        - Make sure jumping from tower to clouds is supported and vice versa
-        - Mountain or Forest path to reach river temple roof (lightning only route)
-        - Mountain -> River Temple
-            - Once we add landing points this will fix the bug with landing on top of the door
-        - Forest Path to Sky Palace entrance (Add Sky palace stub with roll 2 + nimbus cloud)
-            - Implement roll 2, just roll again while rolling, double speed / teleport then regular roll (with poof effects from staff)
-            - Implement nimbus cloud using spawn points + script events choice mechanic for now
-                - Allows returning to entrance inside areas
-                - Allows teleporting to specific places visited on the overworld, possibly between material/spirit worlds.
-
     Change prep animation for explosion
         charge particles form randomly in a circle around the hero shooting into them,
         with shorter radius and more density as time passes.

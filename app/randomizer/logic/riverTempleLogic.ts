@@ -15,7 +15,10 @@ export const riverTempleWaterNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'riverTempleWaterEntrance',
-        checks: [{objectId: 'riverTempleSmallKey', logic: canTravelFarUnderWater}],
+        checks: [
+            {objectId: 'riverTempleSmallKey', logic: canTravelFarUnderWater},
+            {objectId:'riverTemplePeachPiece', logic: canTravelFarUnderWater},
+        ],
         entranceIds: ['riverTempleWaterEntrance',  'riverTempleWaterStairs'],
         exits: [
             {objectId: 'riverTempleWaterEntrance', logic: canTravelFarUnderWater},
@@ -42,6 +45,7 @@ export const riverTempleWaterNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'riverTempleWaterMaze2',
+        checks: [{objectId: 'riverTempleSilver', logic: canTravelFarUnderWater}],
         paths: [
             {nodeId: 'riverTempleSEArea', logic: canTravelFarUnderWater},
             {nodeId: 'riverTempleSWArea', logic: canTravelFarUnderWater},
@@ -75,7 +79,10 @@ export const riverTempleNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'riverTempleUpperEntrance',
-        checks: [{objectId: 'riverTempleBigChest'}],
+        checks: [
+            {objectId: 'riverTempleBigChest'},
+            {objectId: 'riverTempleMoney'},
+        ],
         paths: [
             {nodeId: 'riverTempleAcrossFromChest', logic: canMeltIce},
         ],

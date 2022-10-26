@@ -774,6 +774,7 @@ const f0_0x1: AreaDefinition = {
         {status: "normal", id: "", x: 176, y: 432, type: "spawnMarker", linked: true},
         {status: "normal", id: "", x: 32, y: 272, type: "spawnMarker", linked: true},
         {status: "normal", id: "", x: 176, y: 304, type: "spawnMarker", linked: true},
+        {status: "normal", id: "waterfallCaveSave", x: 32, y: 256, type: "saveStatue"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
