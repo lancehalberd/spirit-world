@@ -42,6 +42,25 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Fix astral projection can astral project if you press the meditate button while the spirit sight radius is collapsing.
+
+    - Investigate Crosscode map editor a bit.
+
+    - Fix ledges so that:
+        - You can shoot arrows down ledges but not up them
+        - Shooting an arrow down a ledge allows it to go over solid tiles unless they
+            are marked as "veryTall".
+        - Special exception for southern edges+wall tiles
+            - Southern edges do not
+        - Shooting an arrow down N ledges allows it to go up N ledges
+            - Let's just assume all ledges are 32px tall
+        - New behaviors:
+            isSouthernWall - Indicates 16px z-grade over the tile
+                ? Special treatment for southwest/southeast walls?
+                    z-grade is the same except that the wall height is decreased by 1 px for each pixel in the x direction. So for a SE wall, the top-left pixel in the bottom tile has height 16px, but the top-right pixel in the same tile only has height 0
+                    These heights only apply when moving from another southern tile, if coming from a
+            tileHeight - Indicates how high up a wall is in z pixels. This can be used for tiles in tall objects like trees
+
     - Update logic to account for clone throw over obstacles?
         - Wait on this until we have adjusted any obstacles we don't want to allow this for.
 
@@ -244,7 +263,6 @@ High level list of things left to do:
     Missing Bosses for existing areas:
         Crater midboss
         Rival fight before Tomb
-        Tomb Boss
         Rival fight before Helix
         Helix Boss
             - Instead of fighting this boss, you will see it, but then abort because of the beasts attacking the city
@@ -254,7 +272,6 @@ High level list of things left to do:
         Hero helping during first elemental beast fight
         Rival during last elemental beast fight
         Spirit Gates + Spirit Keys
-        Normal shops
         Spirit shop + Jade Idols
         Treasure Hunter Shop
         Fertility shrine donations
@@ -276,7 +293,6 @@ Lava improvments:
 Misc improvements
     - double tap direction to roll?
     - allow facing diagonals while not moving?
-    - allow rolling diagonally?
 
 Add toasts to development for undoing actions:
     - Deleting layers
@@ -347,7 +363,6 @@ Dungeon 1 Improvements:
         - Rival guards the tomb
         - Rival is angered you have the Spirit Bow when you hit one of the switches.
         - If you are defeated, the elder may save you, otherwise it is game over.
-    - Update wall laser graphics+behavior to actuall shoot lasers + be mounted on walls.
     - Update arrow turret graphics.
 
 Golem Boss Improvements:
@@ -370,12 +385,6 @@ Dungeon 3 Improvements:
     - Add new enemies.
     - Make the guardian's projection use more interesting attacks.
     - Animate the ents when they attack.
-
-Waterfall Tower Improvments:
-    - Make bead flows act like shallow water for when you are walking in them?
-        - This might not be the right animation for beads though.
-    - Missing mechanics
-        Rusty floor switch that only activates if you fall on it wearing iron boots.
 
 River Temple Improvements:
     - Some underwater enemies

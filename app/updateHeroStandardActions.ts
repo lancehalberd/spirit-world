@@ -684,6 +684,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             }
         }
     } else if (wasGameKeyPressed(state, GAME_KEY.MEDITATE)
+        && !hero.isAstralProjection
         && !isActionBlocked && (hero.passiveTools.spiritSight || hero.clones.length)
         && !hero.heldChakram && !hero.chargingLeftTool && !hero.chargingRightTool
     ) {
