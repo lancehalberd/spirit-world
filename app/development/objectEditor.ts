@@ -750,6 +750,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                 onChange(targetZone: string) {
                     if (targetZone === 'none') {
                         targetZone = null;
+                        object.targetObjectId = null;
                     }
                     object.targetZone = targetZone;
                     updateObjectInstance(state, object);

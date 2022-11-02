@@ -522,7 +522,7 @@ const f0_1x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "treeEntrance", x: 368, y: 496, type: "door", style: "wooden", targetZone: "lab", targetObjectId: "treeEntrance", d: "down", locationCue: "World Tree 1F", linked: true},
+        {status: "normal", id: "", x: 368, y: 496, type: "door", style: "wooden", targetObjectId: "treeEntrance", d: "down", locationCue: "World Tree 1F", linked: true},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},

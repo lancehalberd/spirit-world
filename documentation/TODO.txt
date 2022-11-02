@@ -42,9 +42,7 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Fix astral projection can astral project if you press the meditate button while the spirit sight radius is collapsing.
-
-    - Investigate Crosscode map editor a bit.
+    - Test Entrance Randomizer
 
     - Fix ledges so that:
         - You can shoot arrows down ledges but not up them
@@ -183,7 +181,7 @@ Combat Ideas:
     - Rolling enemy that leaves a trail of ice/fire behind it and bounces off walls. Hitting it knocks it in different directions.
 
 Minigame Ideas:
-    - Add Vanara dream world with mini games.
+    - Add Vanara VR dream world with mini games.
         - Boss practice
     - Could add something like an AR arcade to spirit city
 
@@ -195,26 +193,6 @@ Staff Improvements:
         - Ideally you could move around while charging and the preview will update appropriately
         - Would be nice to have this preview behavior when holding down the staff button for staff 1.
     - If the staff doesn't have enough area, maybe it should still swing and hit, but despawn or bounce off the terrain after landing.
-
-Difficulty shrine:
-    - Can apply changes to entire dungeon
-    - The shrine cannot be entered until at least one coin is found.
-    - Exists in its own dimension, can have multiple entrances to make shortcuts
-    - Has Save Statue inside.
-    - Dungeon bound Lucky Coin
-        - Maybe split into Silver Coins for dungeon and Gold Coins for boss
-    - Usually 1 coin can be found inside the shrine itself
-    - 1 point per coin
-    - points can be rearranged at no cost
-    - 1 point to make mechanics easier (usually a few options)
-    - Some points are already applied to make the game easier
-        - These can be removed and distributed elsewhere.
-    - Remove boss webs
-    - Reduce boss health
-    - Take 1/2 damage
-    - 1/2 boss life
-    - easier traps (disable conveyer belts, remove spikes)
-    - easier puzzles (required chests are made distinct from optional chests, positions of required items are moved to more easily accessible locations)
 
 Throwing an object into a pit should use the pit animation rather than breaking.
 
@@ -269,6 +247,7 @@ High level list of things left to do:
             - Then you will actually fight this boss at the end of the Grand Temple or Jade Palace or possibly as a mid boss on the Warship.
     Missing mechanics:
         Difficulty shrines for dungeons/bosses
+            - Probably just roll this into VR minigame where you can fight old bosses.
         Hero helping during first elemental beast fight
         Rival during last elemental beast fight
         Spirit Gates + Spirit Keys
@@ -397,7 +376,6 @@ Staff Tower Improvements
         - Should have a short cut so it can by bypassed after completing once.
     - All machine enemies have an offline state where they cannot be damaged, and possibly can be pushed around.
         - Hitting offline machines with lightning will turn them on.
-        - Machines all default to offline except in the material world when the Storm Beast is active.
     - Conveyer belts/escalators.
         - Conveyer belts should also effect movable object/enemies on the ground touching them.
         - Ice magic can freeze the conveyer belts which stops them but makes them slippery.
@@ -451,7 +429,7 @@ Add Small Loot to editor that creates LootDrop
     - if on destructable tile (cuttable, pickup), not rendered/updated until the tile is destroyed.
         - This should actually be done for any loot, this will make it easy to hide keys under objects.
         - We can support progress items under tiles, but probably shouldn't actually use this in practice in order to avoid players searching under every tile. On the other hand, if we clearly telegraph when this happens, maybe we can void this problem and encourage players to use smart ways to check for things (like spirit sight to search under many objects for a key).
-    - keep a hash of picked up objects in dungeons so these only replenish on leaving the dungeon.
+    - Default save status to dungeon
     - Add an editor option to clear the history of picked up small loots.
 
 
@@ -496,9 +474,7 @@ Include some random dungeon design in the base game:
     - Something like peg cave, but only a single peg needs to be pressed to open it (spirit sight reveals which?).
     - Something like Eastern Palace Foyer except the correct door isn't always the center door.
 
-Keep in mind significance of design elements for future racing/randomizer.
-
-Support 64x64 super tiles for world map. Or maybe just 48x48. Probably add this after Spirit World mechanics to make sure they perform okay together.
+Support 64x64 super tiles for world map. Or maybe just 48x48.
 
 Possible tool: Leather gloves protect you from thorn bushes.
 Possible tool: Leather boots let you walk on thorny ground without taking damage.

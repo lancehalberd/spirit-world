@@ -1,10 +1,9 @@
 import { getRandomizerHint } from 'app/randomizer/utils';
-import { readGetParameter } from 'app/utils/index';
+import { isRandomizer } from 'app/gameConstants';
 import { setScript } from 'app/scriptEvents';
 
 import { GameState } from 'app/types';
 
-const isRandomizer = !!readGetParameter('seed');
 
 export function showHint(state: GameState): void {
     if (isRandomizer) {

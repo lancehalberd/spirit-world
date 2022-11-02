@@ -1,5 +1,5 @@
 import { zones } from 'app/content/zones';
-import { readGetParameter } from 'app/utils/index';
+import { randomizerSeed, enemySeed, entranceSeed } from 'app/gameConstants';
 
 import { AreaGrid, Zone } from 'app/types';
 
@@ -9,8 +9,7 @@ export function exportZoneToClipboard(zone: Zone): void {
 }
 
 export function serializeZone(zone: Zone) {
-    const seed = readGetParameter('seed');
-    if (seed) {
+    if (randomizerSeed || enemySeed || entranceSeed) {
         throw new Error('Cannot export zone while randomizer is active, item placements will be changed.');
     }
     const emptyAreas = [];

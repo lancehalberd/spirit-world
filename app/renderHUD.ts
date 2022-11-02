@@ -1,10 +1,9 @@
 import { getLootFrame } from 'app/content/loot';
-import { CANVAS_HEIGHT, CANVAS_WIDTH } from 'app/gameConstants';
+import { CANVAS_HEIGHT, CANVAS_WIDTH, isRandomizer } from 'app/gameConstants';
 import { getCheckInfo } from 'app/randomizer/checks';
 import { renderTextRow } from 'app/render/renderMessage';
 import { renderSpiritBar } from 'app/render/spiritBar';
 import { createAnimation, drawFrame, drawFrameAt, drawFrameCenteredAt } from 'app/utils/animations';
-import { readGetParameter } from 'app/utils/index';
 import { drawText } from 'app/utils/simpleWhiteFont';
 
 import { Enemy, GameState } from 'app/types';
@@ -23,8 +22,6 @@ const frameSize = 24;
 
 const yellowFrame = createAnimation('gfx/hud/toprighttemp1.png', {w: frameSize, h: frameSize}).frames[0];
 const blueFrame = createAnimation('gfx/hud/toprighttemp2.png', {w: frameSize, h: frameSize}).frames[0];
-
-const isRandomizer = !!readGetParameter('seed');
 
 export function renderHUD(context: CanvasRenderingContext2D, state: GameState): void {
     let x = 26;

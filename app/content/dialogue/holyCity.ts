@@ -66,7 +66,7 @@ dialogueHash.streetVendor = {
     options: [
         {
             logicCheck: {
-                requiredFlags: ['vendor1', '$maxLife:7'],
+                requiredFlags: ['vendor1', 'elementalBeastsEscaped'],
                 excludedFlags: ['vendor2'],
             },
             text: [

@@ -15,6 +15,7 @@ import {
     FADE_IN_DURATION, FADE_OUT_DURATION,
     CIRCLE_WIPE_IN_DURATION, CIRCLE_WIPE_OUT_DURATION,
     MUTATE_DURATION,
+    isRandomizer,
 } from 'app/gameConstants';
 import { updateKeyboardState } from 'app/keyCommands';
 import { initializeGame } from 'app/initialize';
@@ -39,7 +40,6 @@ import { updateCamera } from 'app/updateCamera';
 import { updateField } from 'app/updateField';
 import { areAllImagesLoaded } from 'app/utils/images';
 import { playSound, updateSoundSettings } from 'app/musicController';
-import { readGetParameter } from 'app/utils/index';
 
 import { ActiveTool, PassiveTool, GameState, MagicElement } from 'app/types';
 
@@ -362,7 +362,6 @@ function updateTransition(state: GameState) {
     }
 }
 
-const isRandomizer = !!readGetParameter('seed');
 function selectSaveFile(state: GameState, savedGameIndex: number): void {
     let savedGame = state.savedGames[state.savedGameIndex];
     if (!savedGame) {

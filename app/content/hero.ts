@@ -390,11 +390,6 @@ export class Hero implements Actor, SavedHeroData {
     }
 
     takeDamage(this: Hero, state: GameState, damage: number): void {
-        // Damage applies to the hero, not the clone.
-        state.hero.life -= damage / 2;
-        state.hero.invulnerableFrames = 50;
-        // Taking damage resets radius for spirit sight meditation.
-        state.hero.spiritRadius = 0;
         // If any controllable clones are in use,
         // any damage the hero or any clone take destroys it.
         // If there are no controllable clones, damage will only kill the
@@ -402,7 +397,25 @@ export class Hero implements Actor, SavedHeroData {
         if (state.hero.clones.filter(clone => !clone.isUncontrollable).length
             || this !== state.hero
         ) {
+            if (this !== state.hero) {
+                // Clones that are not currently controlled take minimal damage.
+                state.hero.life -= Math.min(damage / 2, 0.5);
+                // Set iframes because a clone can take multiple tile hits in
+                // a single frame otherwise.
+                this.invulnerableFrames = 1;
+            } else {
+                state.hero.life -= damage / 2;
+                state.hero.invulnerableFrames = 50;
+                // Taking damage resets radius for spirit sight meditation.
+                state.hero.spiritRadius = 0;
+            }
             destroyClone(state, this);
+        } else {
+            // Damage applies to the hero, not the clone.
+            state.hero.life -= damage / 2;
+            state.hero.invulnerableFrames = 50;
+            // Taking damage resets radius for spirit sight meditation.
+            state.hero.spiritRadius = 0;
         }
     }
 

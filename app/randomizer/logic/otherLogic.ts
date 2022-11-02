@@ -119,12 +119,33 @@ export const cavesNodes: LogicNode[] = [
     {
         zoneId: 'caves',
         nodeId: 'ascentCavesSpirit',
-        entranceIds: ['caves-ascentEntranceSpirit'],
+        entranceIds: ['caves-ascentEntranceSpirit', 'caves-ascentExitSpirit'],
         exits: [
             { objectId: 'caves-ascentExitSpirit', logic:canAscendToCraterSpirit },
             { objectId: 'caves-ascentEntranceSpirit'}
         ],
     },
+
+    // Fertility Temple
+    {
+        zoneId: 'caves',
+        nodeId: 'normalFertilityTemple',
+        entranceIds: ['fertilityTempleEntrance'],
+        exits: [
+            { objectId: 'fertilityTempleEntrance' },
+        ],
+    },
+    {
+        zoneId: 'caves',
+        nodeId: 'spiritFertilityTemple',
+        entranceIds: ['fertilityTempleSpiritEntrance', 'fertilityTempleExit'],
+        exits: [
+            { objectId: 'fertilityTempleSpiritEntrance' },
+            { objectId: 'fertilityTempleExit' },
+        ],
+    },
+
+    // Lake Tunnel
     {
         zoneId: 'lakeTunnel',
         nodeId: 'lakeTunnelFront',
@@ -183,5 +204,25 @@ export const holyCityNodes: LogicNode[] = [
         entranceIds: ['foodHouse'],
         exits: [{ objectId: 'foodHouse' }],
     },
+    {
+        zoneId: 'holyCityInterior',
+        nodeId: 'bridgeHouse',
+        entranceIds: ['bridgeHouse'],
+        exits: [{ objectId: 'bridgeHouse'}],
+    },
+    {
+        zoneId: 'holyCityInterior',
+        nodeId: 'gardenHouse',
+        entranceIds: ['gardenHouse'],
+        exits: [{ objectId: 'gardenHouse'}],
+    },
+    {
+        zoneId: 'holyCityInterior',
+        nodeId: 'holyCityClothesHouse',
+        entranceIds: ['clothesHouse'],
+        exits: [{ objectId: 'clothesHouse'}],
+    },
+
+
 ];
 

@@ -1154,7 +1154,7 @@ const f0_0x2: AreaDefinition = {
     ],
     objects: [
         {status: "normal", id: "overworld:holyCityClothesHouse", x: 48, y: 400, type: "door", style: "lightCave", targetZone: "holyCityInterior", targetObjectId: "clothesHouse", d: "up"},
-        {status: "closed", id: "moneyMazeExit", x: 112, y: 208, type: "door", style: "woodenDownstairs", targetZone: "holyCityInterior", targetObjectId: "moneyMazeEntrance", d: "up"},
+        {status: "closed", id: "moneyMazeExit", x: 112, y: 208, type: "door", style: "woodenDownstairs", targetZone: "holyCityInterior", targetObjectId: "moneyMazeExit", d: "up"},
         {status: "normal", id: "overworld:holyCityFoodHouse", x: 144, y: 112, type: "door", style: "lightCave", targetZone: "holyCityInterior", targetObjectId: "foodHouse", d: "up"},
         {status: "normal", id: "overworld:holyCityBridgeHouse", x: 432, y: 384, type: "door", style: "lightCave", targetZone: "holyCityInterior", targetObjectId: "bridgeHouse", d: "up"},
         {status: "normal", id: "overworld:holyCityGardenHouse", x: 416, y: 160, type: "door", style: "lightCave", targetZone: "holyCityInterior", targetObjectId: "gardenHouse", d: "up"},
@@ -4767,7 +4767,7 @@ const sf0_1x1: AreaDefinition = {
         },
     ],
     objects: [
-        {id: "peachCaveWaterEntrance", linked: true, spirit: true, status: "normal", x: 256, y: 80, type: "door", style: "lightCave", targetZone: "peachCave", targetObjectId: "peachCave:waterEntrance", d: "up"},
+        {id: "", linked: true, spirit: true, status: "normal", x: 256, y: 80, type: "door", style: "lightCave", d: "up"},
         {status: "normal", id: "overworld:s0:1x1-teleporter-0", x: 400, y: 64, type: "teleporter", linked: true},
         {status: "normal", id: "overworld:s0:1x1-frostBeetle-0", x: 64, y: 240, type: "enemy", enemyType: "frostBeetle", d: "down", params: {}},
         {status: "normal", id: "overworld:s0:1x1-frostBeetle-1", x: 128, y: 432, type: "enemy", enemyType: "frostBeetle", d: "down", params: {}},
@@ -5642,7 +5642,7 @@ const sf0_2x1: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "fertilityTempleEntrance", x: 96, y: 320, type: "door", style: "wooden", d: "up", targetZone: "caves", targetObjectId: "fertilityTempleEntrance"},
+        {status: "normal", id: "fertilityTempleSpiritEntrance", x: 96, y: 320, type: "door", style: "wooden", d: "up", targetZone: "caves", targetObjectId: "fertilityTempleSpiritEntrance"},
         {status: "normal", id: "overworld:s0:1x2-electricSquirrel-0", x: 176, y: 176, type: "enemy", enemyType: "electricSquirrel", d: "down", params: {}},
         {status: "normal", id: "overworld:s0:1x2-electricSquirrel-1", x: 160, y: 368, type: "enemy", enemyType: "electricSquirrel", d: "down", params: {}},
         {status: "normal", id: "overworld:s0:1x2-electricSquirrel-2", x: 336, y: 256, type: "enemy", enemyType: "electricSquirrel", d: "down", params: {}},

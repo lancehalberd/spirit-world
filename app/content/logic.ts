@@ -44,6 +44,18 @@ export function isItemLogicTrue(state: GameState, itemFlag: string): boolean {
 
 export function isLogicValid(state: GameState, logic: LogicCheck, invertLogic = false): boolean {
     const trueResult = !invertLogic, falseResult = !!invertLogic;
+    if  (logic === false) {
+        return falseResult;
+    }
+    if  (logic === true) {
+        return trueResult;
+    }
+    if (typeof logic === 'function') {
+        if (logic(state)) {
+            return trueResult;
+        }
+        return falseResult;
+    }
     if (logic.operation === 'and') {
         return logic.logicChecks.some(logicCheck => !isLogicValid(state, logicCheck)) ? falseResult : trueResult;
     }
@@ -74,11 +86,6 @@ export function isLogicValid(state: GameState, logic: LogicCheck, invertLogic = 
     }
     if (logic.zones?.length && !logic.zones.includes(state.location.zoneKey)) {
         return falseResult;
-    }
-    if (logic.staffTowerLocation) {
-        if (state.hero.activeTools.staff >= 2 || logic.staffTowerLocation !== state.savedState.staffTowerLocation) {
-            return falseResult;
-        }
     }
     return trueResult;
 }
@@ -146,27 +153,7 @@ export const canCrossDynamic8Gaps: OrLogicCheck = orLogic(hasSomersault, hasTowe
 
 export const canTravelFarUnderWater = andLogic(hasIronBoots);
 
-// Can enter the helix through the lake tunnel and climb to the top.
-export const canClimbHelix = andLogic(
-    // Needed to beat the boss in the lake tunnel.
-    hasBossWeapon,
-    // Need this to reach the teleporter on the bottom floor.
-    canCross6Gaps,
-    // Needed to cross barriers in the tower.
-    orLogic(hasTeleportation, hasSomersault)
-);
-// This logic only applies for releasing the beast since it doesn't take into account
-// getting around the extra lava when the fire beast is released.
-const canClimbForHelixMountain = orLogic(
-    // Left path just requires mitts.
-    hasMitts,
-    // Need gloves to reach the cave, and then something to get over the lava.
-    andLogic(hasGloves, orLogic(hasRoll, hasInvisibility, hasTeleportation))
-);
-
-// Update this if we add other ways to reach the sky in the material world.
-// We don't need to include the tower, because the tower can only be climbed once beasts are released.
-export const canReleaseBeasts = orLogic(canClimbHelix, andLogic(canClimbForHelixMountain, hasCloudBoots));
+export const hasReleasedBeasts: LogicCheck = {requiredFlags: ['elementalBeastsEscaped']};
 
 export const logicHash: {[key: string]: LogicCheck} = {
     hasWeapon,
@@ -198,17 +185,14 @@ export const logicHash: {[key: string]: LogicCheck} = {
         // Storm is gone after the storm beast is gone.
         excludedFlags: ['stormBeast'],
     },
-    desertTower: {
-        requiredFlags: [],
-        staffTowerLocation: 'desert',
+    desertTower: (state: GameState) => {
+        return state.hero.activeTools.staff < 2 && state.savedState.staffTowerLocation === 'desert';
     },
-    forestTower: {
-        requiredFlags: [],
-        staffTowerLocation: 'forest',
+    forestTower: (state: GameState) => {
+        return state.hero.activeTools.staff < 2 && state.savedState.staffTowerLocation === 'forest';
     },
-    mountainTower: {
-        requiredFlags: [],
-        staffTowerLocation: 'mountain',
+    mountainTower: (state: GameState) => {
+        return state.hero.activeTools.staff < 2 && state.savedState.staffTowerLocation === 'mountain';
     },
     towerStaff: {
         requiredFlags: ['$staff:2'],

@@ -1,7 +1,7 @@
 import {
     andLogic,
     canCrossDynamic4Gaps,
-    canReleaseBeasts,
+    hasReleasedBeasts,
     hasBossWeapon,
     hasCloudBoots,
     hasClone,
@@ -32,21 +32,22 @@ export const staffTowerNodes: LogicNode[] = [
         paths: [
             {nodeId: 'staffTowerF1Downstairs'},
             // Power is only on after the storm beast is released.
-            {nodeId: 'staffTowerF1Spirit', logic: canReleaseBeasts},
+            {nodeId: 'staffTowerF1Spirit', logic: hasReleasedBeasts},
         ],
     },
     {
         zoneId,
         nodeId: 'staffTowerF1Spirit',
+        flags: [{flag: 'staffTowerSpiritEntrance'}],
         paths: [
             // Power is only on after the storm beast is released.
-            {nodeId: 'staffTowerF1Upstairs', logic: canReleaseBeasts},
+            {nodeId: 'staffTowerF1Upstairs', logic: hasReleasedBeasts},
             // Always in logic since this is the default tower location
             {nodeId: 'mainSpiritWorld'},
             // Other exits don't need logic since they have to already be in logic to move the tower to them.
         ],
-        entranceIds: ['staffTower1F2F'],
-        exits: [{objectId: 'staffTower1F2F'}],
+        entranceIds: ['staffTower1F2F', 'staffTowerSpiritEntrance'],
+        exits: [{objectId: 'staffTower1F2F'}, {objectId: 'staffTowerSpiritEntrance'}],
     },
     {
         zoneId,
@@ -75,7 +76,7 @@ export const staffTowerNodes: LogicNode[] = [
             { objectId: 'staffTowerBigMoney1', logic: canCrossDynamic4Gaps },
         ],
         paths: [
-            {nodeId: 'staffTowerF3SpiritWest', logic: canReleaseBeasts},
+            {nodeId: 'staffTowerF3SpiritWest', logic: hasReleasedBeasts},
         ],
         entranceIds: ['staffTower2F3F'],
     },
@@ -88,7 +89,7 @@ export const staffTowerNodes: LogicNode[] = [
         zoneId,
         nodeId: 'staffTowerF2SpiritElevator',
         paths: [
-            {nodeId: 'staffTowerB1Spirit', logic: canReleaseBeasts},
+            {nodeId: 'staffTowerB1Spirit', logic: hasReleasedBeasts},
         ],
         entranceIds: ['tower2FMarker'],
     },
@@ -116,7 +117,7 @@ export const staffTowerNodes: LogicNode[] = [
         zoneId,
         nodeId: 'staffTowerF4Spirit',
         paths: [
-            {nodeId: 'staffTowerF4', logic: canReleaseBeasts},
+            {nodeId: 'staffTowerF4', logic: hasReleasedBeasts},
         ],
         entranceIds: [
             'staffTowerSpiritSkyEntrance',
@@ -131,7 +132,7 @@ export const staffTowerNodes: LogicNode[] = [
         zoneId,
         nodeId: 'staffTowerF3SpiritEast',
         paths: [
-            {nodeId: 'staffTowerF3East', logic: canReleaseBeasts},
+            {nodeId: 'staffTowerF3East', logic: hasReleasedBeasts},
         ],
         entranceIds: ['staffTower3F4F'],
         exits: [{objectId: 'staffTower3F4F'}],
@@ -167,6 +168,8 @@ export const staffTowerNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'staffTowerF4',
+        flags: [{flag: 'staffTowerSkyEntrance'}],
+        entranceIds: ['staffTowerSkyEntrance'],
         exits: [
             {objectId: 'staffTowerSkyEntrance'},
         ],

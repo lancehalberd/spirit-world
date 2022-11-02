@@ -1,4 +1,4 @@
-import { DialogueLootDefinition, GameState, StaffTowerLocation } from 'app/types';
+import { DialogueLootDefinition, GameState } from 'app/types';
 
 export interface SimpleLogicCheck {
     operation?: 'isTrue' | 'isFalse'
@@ -6,9 +6,6 @@ export interface SimpleLogicCheck {
     requiredFlags?: string[]
     // This logic check is false if any excluded flag is set.
     excludedFlags?: string[]
-    // If this is set, this logic is false if the staff tower is in the player's inventory or if it's location
-    // does not match the specified location.
-    staffTowerLocation?: StaffTowerLocation
     // If this set is populated, this check is false if the current zone is not among the defined zones.
     // This is useful for restricting an NPCs dialogue to a particular area or set of areas.
     zones?: string[]
@@ -36,7 +33,8 @@ export interface OrLogicCheck {
     logicChecks: LogicCheck[]
 }
 
-export type LogicCheck = SimpleLogicCheck | AndLogicCheck | OrLogicCheck;
+export type LogicCheck = SimpleLogicCheck | AndLogicCheck | OrLogicCheck |
+    ((state: GameState) => boolean) | true | false;
 
 export interface DialogueOption {
     // The logic that determines if this dialogue option is valid for the current game state.
@@ -85,13 +83,20 @@ export interface LogicNode {
     nodeId: string
     // The ids of any loot checks in this node.
     checks?: {
-        // The id of the object that grants loot, could be a boss, chest, loot (eventually NPC).
+        // The id of the object that grants loot, could be a boss, chest or loot.
         objectId: string
         logic?: LogicCheck
     }[]
     complexNpcs?: {
         dialogueKey: string
         optionKey: string
+        logic?: LogicCheck
+    }[]
+    // During randomizer simulation, this flag will be set when on this node if it is in logic.
+    // Flags associated with checks, bosses and NPCs are already handled, but additional flags
+    // get set through various other interactions and can be modeled in logic with this.
+    flags?: {
+        flag: string
         logic?: LogicCheck
     }[]
     npcs?: {

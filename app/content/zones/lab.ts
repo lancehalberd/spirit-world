@@ -373,7 +373,7 @@ const f0_0x0: AreaDefinition = {
     ],
     objects: [
         {status: "normal", id: "", linked: true, x: 224, y: 496, type: "door", style: "cavern", d: "down"},
-        {status: "normal", id: "treeEntrance", linked: true, spirit: true, x: 240, y: 336, type: "door", style: "knobbyTree", targetZone: "tree", targetObjectId: "treeEntrance", d: "up", locationCue: "Lab B1"},
+        {status: "normal", id: "", linked: true, spirit: true, x: 240, y: 336, type: "door", style: "knobbyTree", targetObjectId: "treeEntrance", d: "up", locationCue: "Lab B1"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -814,13 +814,13 @@ const f0_2x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "labEntrance", x: 224, y: 496, type: "door", style: "cavern", d: "down", linked: true, targetZone: "warTemple", targetObjectId: "labEntrance", locationCue: "Lab B1"},
         {status: "normal", id: "", x: 368, y: 272, type: "door", style: "cavern", d: "up", linked: true},
         {status: "normal", id: "", x: 64, y: 16, type: "door", style: "cavern", d: "up", linked: true},
         {status: "normal", id: "labStairs", x: 368, y: 16, type: "door", style: "cavernUpstairs", d: "up", linked: true, targetZone: "lab", targetObjectId: "labStairs", locationCue: "Lab B1"},
         {status: "normal", id: "", x: 352, y: 240, type: "door", style: "cavern", d: "down", linked: true},
         {status: "normal", id: "", x: 96, y: 240, type: "door", style: "cavern", d: "down", linked: true},
         {status: "normal", id: "", x: 112, y: 272, type: "door", style: "cavern", d: "up", linked: true},
+        {status: "normal", id: "", x: 224, y: 496, type: "door", style: "cavern", d: "down", linked: true, spirit: true, targetObjectId: "labEntrance", locationCue: "Lab B1"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},

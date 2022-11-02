@@ -1142,7 +1142,7 @@ const sf0_0x1: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "fertilityTempleEntrance", linked: true, x: 352, y: 496, type: "door", style: "wooden", targetZone: "overworld", targetObjectId: "fertilityTempleEntrance", d: "down", spirit: true},
+        {status: "normal", id: "fertilityTempleSpiritEntrance", linked: true, x: 352, y: 496, type: "door", style: "wooden", targetZone: "overworld", targetObjectId: "fertilityTempleSpiritEntrance", d: "down", spirit: true},
         {status: "normal", id: "", spirit: true, x: 256, y: 352, type: "door", style: "wooden", d: "left"},
         {status: "normal", id: "", spirit: true, x: 240, y: 352, type: "door", style: "wooden", d: "right"},
         {status: "normal", id: "fertilityTempleExit", spirit: true, x: 96, y: 496, type: "door", style: "wooden", targetZone: "overworld", targetObjectId: "fertilityTempleExit", d: "down"},

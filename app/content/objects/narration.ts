@@ -1,14 +1,11 @@
 import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
-import { FRAME_LENGTH } from 'app/gameConstants';
+import { FRAME_LENGTH, isRandomizer } from 'app/gameConstants';
 import { setScript } from 'app/scriptEvents';
-import { readGetParameter } from 'app/utils/index';
 
 import {
     AreaInstance, GameState, NarrationDefinition,
     ObjectInstance, ObjectStatus, Rect,
 } from 'app/types';
-
-const seed = readGetParameter('seed');
 
 export class Narration implements ObjectInstance {
     area: AreaInstance;
@@ -27,7 +24,7 @@ export class Narration implements ObjectInstance {
         this.trigger = definition.trigger || 'touch';
         this.x = definition.x;
         this.y = definition.y;
-        if (seed || getObjectStatus(state, this.definition)) {
+        if (isRandomizer || getObjectStatus(state, this.definition)) {
             this.status = 'gone';
         }
         this.time = 0;

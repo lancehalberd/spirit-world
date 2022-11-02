@@ -1,10 +1,10 @@
 import {
     andLogic,
     orLogic,
-    hasAstralProjection,
     hasBossWeapon,
     hasGloves, hasRoll,
     hasSpiritSight, hasWeapon,
+    logicHash
 } from 'app/content/logic';
 
 import {LogicNode } from 'app/types';
@@ -66,6 +66,7 @@ export const warTempleNodes: LogicNode[] = [
         zoneId,
         nodeId: 'warTempleKeyDoor',
         checks: [{objectId: 'warTemple:0:2x2-bigKey-0'}],
+        flags: [{flag: 'warTempleKeyDoor'}],
         entranceIds: ['warTempleKeyDoor'],
         exits: [{objectId: 'warTempleKeyDoor'}],
     },
@@ -175,8 +176,15 @@ export const warTempleNodes: LogicNode[] = [
             {objectId: 'warTempleBoss', logic: andLogic(hasBossWeapon, hasRoll)},
             {objectId: 'warTemple:2:0x0-astralProjection-0', logic: andLogic(hasBossWeapon, hasRoll)},
         ],
-        exits: [
-            {objectId: 'warTempleExit', logic: hasAstralProjection},
-        ],
     },
+    // Spirit world is only accessible from outside
+    {
+        zoneId,
+        nodeId: 'warTempleThroneRoom',
+        entranceIds: ['warTempleEntranceSpirit', 'labEntrance'],
+        exits: [
+            {objectId: 'warTempleEntranceSpirit'},
+            {objectId: 'labEntrance', logic: logicHash.beastsDefeated},
+        ],
+    }
 ];

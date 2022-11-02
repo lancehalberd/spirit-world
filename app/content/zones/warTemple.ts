@@ -491,7 +491,6 @@ const f0_1x0: AreaDefinition = {
         {status: "normal", id: "warTemple:0:0x1-door-1", x: 368, y: 0, type: "door", style: "cave", d: "up"},
         {status: "normal", id: "warTemple:0:0x1-flameSnake-0", x: 304, y: 160, type: "enemy", enemyType: "flameSnake", d: "down", params: {}},
         {status: "normal", id: "warTemple:0:0x1-flameSnake-1", x: 304, y: 80, type: "enemy", enemyType: "flameSnake", d: "down", params: {}},
-        {status: "normal", id: "labEntrance", x: 112, y: 32, type: "door", style: "cavern", d: "up", linked: true, spirit: true, targetZone: "lab", targetObjectId: "labEntrance", locationCue: "War Temple B1"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 32},
@@ -578,7 +577,7 @@ const f0_1x1: AreaDefinition = {
                     [1,1,1,1,1,1,1,1,1,1,8,7,6,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
                     [1,1,1,1,1,1,1,1,1,1,1,9,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
                     [1,1,1,1,1,1,1,1,1,1,1,8,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-                    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
                     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
                 ],
             },
@@ -1630,7 +1629,7 @@ const f2_0x0: AreaDefinition = {
     ],
     objects: [
         {status: "closed", id: "warTemple:2:0x0-door-0", x: 112, y: 224, type: "door", style: "cave", d: "down"},
-        {status: "closedEnemy", id: "", x: 160, y: 0, type: "door", style: "cavernDownstairs", targetZone: "overworld", targetObjectId: "warTempleEntrance", d: "up", linked: true, logicKey: "isRandomizer"},
+        {status: "closedEnemy", id: "warTempleRandomizerExit", x: 160, y: 0, type: "door", style: "cavernDownstairs", targetZone: "overworld", targetObjectId: "warTempleEntrance", d: "up", linked: true, logicKey: "isRandomizer"},
         {status: "hiddenEnemy", id: "warTemple:2:0x0-astralProjection-0", spirit: true, x: 64, y: 64, type: "chest", lootType: "astralProjection", lootLevel: 1},
         {status: "normal", id: "warTempleBoss", spirit: true, x: 48, y: 144, type: "boss", enemyType: "flameIdol", lootType: "peachOfImmortality", lootLevel: 1, d: "down", params: {}},
         {status: "normal", id: "warTempleBoss", spirit: true, x: 112, y: 48, type: "boss", enemyType: "stormIdol", lootType: "peachOfImmortality", lootLevel: 1, d: "down", params: {}},
@@ -1663,7 +1662,7 @@ const sf2_0x0: AreaDefinition = {
     objects: [
         {status: "normal", id: "warTemple:s2:0x0-floorSwitch-0", spirit: true, x: 176, y: 64, type: "floorSwitch", toggleOnRelease: true},
         {status: "normal", id: "warTemple:s2:0x0-pushPull-0", spirit: true, x: 160, y: 64, type: "pushPull"},
-        {status: "closedSwitch", id: "warTempleExit", x: 112, y: 0, type: "door", style: "cavernDownstairs", targetZone: "overworld", targetObjectId: "warTempleEntrance", d: "up", linked: true, spirit: true},
+        {status: "closedSwitch", id: "warTempleSpiritExit", x: 112, y: 0, type: "door", style: "cavernDownstairs", d: "up", linked: true, spirit: true},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},

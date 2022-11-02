@@ -1,5 +1,5 @@
 import {
-    andLogic, orLogic, canReleaseBeasts, canTravelFarUnderWater,
+    andLogic, orLogic, hasReleasedBeasts, canTravelFarUnderWater,
     hasBossWeapon, hasIronBoots,  hasMediumRange,
     hasFire, hasLightning,
 } from 'app/content/logic';
@@ -111,6 +111,6 @@ export const riverTempleNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'riverTempleBoss',
-        checks: [{objectId: 'frostBeast', logic: andLogic(canReleaseBeasts, orLogic(hasIronBoots, canMeltIce), hasBossWeapon) }],
+        checks: [{objectId: 'frostBeast', logic: andLogic(hasReleasedBeasts, orLogic(hasIronBoots, canMeltIce), hasBossWeapon) }],
     },
 ];

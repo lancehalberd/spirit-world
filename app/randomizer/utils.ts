@@ -1,16 +1,10 @@
 import { cloneDeep } from 'lodash';
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
-import { enemyTypes } from 'app/content/enemies';
 import { isLogicValid } from 'app/content/logic';
 import { lootEffects } from 'app/content/loot';
 import { getZone, zones } from 'app/content/zones';
-import {
-    SPAWN_LOCATION_DEMO,
-    SPAWN_LOCATION_FULL,
-    SPAWN_LOCATION_WATERFALL_VILLAGE,
-} from 'app/content/spawnLocations';
 
-import { randomizerSeed, randomizerGoal, randomizerTotal } from 'app/gameConstants';
+import { randomizerGoal, randomizerTotal } from 'app/gameConstants';
 
 import { peachCaveNodes } from 'app/randomizer/logic/peachCaveLogic';
 import { cavesNodes, holyCityNodes, treeVillageNodes, waterfallCaveNodes } from 'app/randomizer/logic/otherLogic'
@@ -26,9 +20,10 @@ import { skyPalaceNodes } from 'app/randomizer/logic/skyPalaceLogic';
 import { riverTempleNodes, riverTempleWaterNodes } from 'app/randomizer/logic/riverTempleLogic';
 import { craterNodes } from 'app/randomizer/logic/craterLogic';
 import { staffTowerNodes } from 'app/randomizer/logic/staffTower';
+import { labNodes } from 'app/randomizer/logic/labLogic';
+import { treeNodes } from 'app/randomizer/logic/treeLogic';
 import { addCheck } from 'app/randomizer/checks';
 
-import { readGetParameter } from 'app/utils/index';
 import SRandom from 'app/utils/SRandom';
 import Random from 'app/utils/Random';
 
@@ -42,7 +37,7 @@ import {
     Zone, ZoneLocation,
 } from 'app/types';
 
-const allNodes = [
+export const allNodes = [
     ...overworldNodes,
     ...cavesNodes,
     ...underwaterNodes,
@@ -63,6 +58,8 @@ const allNodes = [
     ...riverTempleWaterNodes,
     ...craterNodes,
     ...staffTowerNodes,
+    ...labNodes,
+    ...treeNodes,
 ];
 
 interface LootData {
@@ -172,10 +169,10 @@ interface AssignmentState {
 }
 
 
-function findDoorById(zone: Zone, id: string, state: GameState = null): {object: ObjectDefinition, location: ZoneLocation}  {
+export function findDoorById(zone: Zone, id: string, state: GameState = null): {object: ObjectDefinition, location: ZoneLocation}  {
     return findObjectById(zone, id, state, ['door', 'keyBlock', 'pitEntrance', 'teleporter']);
 }
-function findLootById(zone: Zone, id: string, state: GameState = null): {object: ObjectDefinition, location: ZoneLocation}  {
+export function findLootById(zone: Zone, id: string, state: GameState = null): {object: ObjectDefinition, location: ZoneLocation}  {
     return findObjectById(zone, id, state, ['bigChest', 'chest', 'loot', 'shopItem', 'boss']);
 }
 
@@ -184,7 +181,7 @@ const findObjectByIdCache: {[key: string]: {
     location: ZoneLocation,
     needsEyes: boolean,
 }} = {};
-function findObjectById(
+export function findObjectById(
     zone: Zone,
     id: string,
     state: GameState = null,
@@ -385,12 +382,15 @@ function findReachableNodes(allNodes: LogicNode[], startingNodes: LogicNode[], s
             }
             //console.log('->', exitObject.targetZone + ':' + exitObject.targetObjectId);
             const nextNode = allNodes.find(node =>
-                node !== currentNode
+                (node !== currentNode || exitObject.targetObjectId !== exit.objectId)
                 && node.zoneId === exitObject.targetZone
                 && node.entranceIds?.includes(exitObject.targetObjectId)
             );
             if (!nextNode) {
-                warnOnce(missingExitNodeSet, exitObject.targetZone + '::' + exitObject.targetObjectId, 'Missing node for exit: ');
+                warnOnce(missingExitNodeSet,
+                    zone.key + '::' + exitObject.id + ' => '
+                    + exitObject.targetZone + '::' + exitObject.targetObjectId,
+                    'Missing node for exit: ');
                 continue;
             }
             if (!reachableNodes.includes(nextNode)) {
@@ -475,12 +475,16 @@ function countRequiredKeysForEntrance(allNodes: LogicNode[], startingNodes: Logi
                 exitToUpdate.requiredKeysForLogic++;
             }
             const nextNode = allNodes.find(node =>
-                node !== currentNode
+                (node !== currentNode || exitObject.targetObjectId !== exit.objectId)
                 && node.zoneId === exitObject.targetZone
                 && node.entranceIds?.includes(exitObject.targetObjectId)
             );
             if (!nextNode) {
-                warnOnce(missingExitNodeSet, exitObject.targetZone + '::' + exitObject.targetObjectId, 'Missing node for exit: ');
+                warnOnce(missingExitNodeSet,
+                    zone.key + '::' + exitObject.id + ' => '
+                    + exitObject.targetZone + '::' + exitObject.targetObjectId,
+                    'Missing node for exit: '
+                );
                 continue;
             }
             if (!reachableNodes.includes(nextNode)) {
@@ -563,6 +567,31 @@ function applyLootObjectToState(state: GameState, lootWithLocation: LootWithLoca
     return stateCopy;
 }
 
+function setAllFlagsInLogic(state: GameState, allNodes: LogicNode[], startingNodes: LogicNode[]): GameState {
+    let changed, updatedState = state;
+    do {
+        startingNodes = findReachableNodes(allNodes, startingNodes, state);
+        for (const node of startingNodes) {
+            for (const flag of (node.flags || [])) {
+                if (flag.logic && !isLogicValid(state, flag.logic)) {
+                    //console.log('Invalid logic', exit);
+                    continue;
+                }
+                if (!updatedState.savedState.objectFlags[flag.flag]) {
+                    if (updatedState === state) {
+                        updatedState = copyState(state);
+                    }
+                    updatedState.savedState.objectFlags[flag.flag] = true;
+                    // console.log('    Setting flag', flag.flag);
+                    changed = true;
+                }
+            }
+        }
+        changed = false;
+    } while (changed);
+    return updatedState;
+}
+
 
 export function reverseFill(random: typeof SRandom, allNodes: LogicNode[], startingNodes: LogicNode[]): AssignmentState {
     calculateKeyLogic(allNodes, startingNodes);
@@ -632,7 +661,12 @@ export function reverseFill(random: typeof SRandom, allNodes: LogicNode[], start
     let finalState = copyState(initialState);
     for (const lootWithLocation of allLootObjects) {
         finalState = applyLootObjectToState(finalState, lootWithLocation);
+        finalState.savedState.objectFlags[lootWithLocation.lootObject.id] = true;
+        for (const flag of (lootWithLocation.progressFlags || [])) {
+            finalState.savedState.objectFlags[flag] = true;
+        }
     }
+    finalState = setAllFlagsInLogic(finalState, allNodes, startingNodes);
     //const initialCheckIds = findReachableChecks(allNodes, startingNodes, initialState).map(l => l.lootObject.id);
     //console.log(initialCheckIds);
     //debugState(finalState);
@@ -649,6 +683,12 @@ export function reverseFill(random: typeof SRandom, allNodes: LogicNode[], start
         assignedLocations: [],
         assignedContents: [],
     }
+
+    const initialReachableChecks = findReachableChecks(allNodes, startingNodes, initialState);
+    console.log('sphere 0 checks: ', initialReachableChecks.length);
+    let placeFullPeachFirst = initialReachableChecks.length < 13;
+
+
     let { bigKeys, smallKeys, peachLoot, progressLoot, trashLoot } = organizeLootObjects(allLootObjects);
     progressLoot = random.shuffle(progressLoot);
     random.generateAndMutate();
@@ -656,6 +696,22 @@ export function reverseFill(random: typeof SRandom, allNodes: LogicNode[], start
     random.generateAndMutate();
     trashLoot = random.shuffle(trashLoot);
     random.generateAndMutate();
+    // This is a bit of a hack to prevent generation from failing when there are too few
+    // checks in sphere 0. Typically the error occurs if we generate to the point that cat eyes
+    // are required for all remaining checks outside of sphere 0, and there are fewer than 4 unused
+    // checks in sphere 0 when we go to place peaches. Then on the 2nd-4th peach piece all checks
+    // can be used up without opening up additional checks.
+    // Forcing a full peach among the sphere 0 checks solves this particular issue, although a
+    // similar thing could in theory happen with any progress item when all sphere 0 checks are
+    // used, it is just more likely with peaches since it can require 4 checks to unlock cat eyes.
+    if (placeFullPeachFirst) {
+        console.log(`Sphere 0 only contains ${initialReachableChecks.length}, prioritizing a full peach`);
+        const fullPeach = peachLoot.find(l => l.lootObject.lootType === 'peachOfImmortality');
+        peachLoot.splice(peachLoot.indexOf(fullPeach), 1);
+        const location = random.element(initialReachableChecks);
+        console.log('Placing', fullPeach, 'at', location)
+        assignItemToLocation(assignmentsState, fullPeach, location);
+    }
     let remainingLoot = [...bigKeys, ...smallKeys, ...progressLoot, ...peachLoot];
     for (let itemSet of [bigKeys, smallKeys, progressLoot, peachLoot]) {
         while (itemSet.length) {
@@ -715,6 +771,7 @@ function placeItem(random: typeof SRandom, allNodes: LogicNode[], startingNodes:
         }
         previousState = currentState;
         currentState = collectAllLoot(allNodes, startingNodes, previousState, assignmentsState);
+        currentState = setAllFlagsInLogic(currentState, allNodes, startingNodes);
     } while (currentState !== previousState);
     const allReachableChecks: LootWithLocation[] = findReachableChecks(allNodes, startingNodes, currentState);
     const allAvailableChecks = allReachableChecks.filter(lootWithLocation => !assignmentsState.assignedLocations.includes(lootWithLocation.lootObject.id));
@@ -733,15 +790,36 @@ function placeItem(random: typeof SRandom, allNodes: LogicNode[], startingNodes:
     if (!assignedLocation) {
         console.error('Failed to place item', { assignmentsState, originalState, currentState, loot});
         console.error({ allReachableChecks, allAvailableChecks, allAppropriateChecks });
+        console.error(debugLocations(allReachableChecks));
+        //const withLootState = applyLootObjectToState(currentState, loot);
+        //console.error('reachable with item:')
+        //console.error(findReachableChecks(allNodes, startingNodes, withLootState).map(debugLocation))
         debugger;
         throw new Error('Failed to place item')
     }
-    //debugState(currentState);
-    if (assignedLocation.location) {
-        // console.log('placing', loot.lootObject.lootType, ' at ', assignedLocation.location.zoneKey, assignedLocation.lootObject.id);
+    assignItemToLocation(assignmentsState, loot, assignedLocation);
+}
+
+
+function debugLocations(loot: LootWithLocation[]) {
+    return loot.map(debugLocation).join(',');
+}
+
+function debugLocation(loot: LootWithLocation) {
+    if (loot.location) {
+        return loot.location.zoneKey + '::' + loot.lootObject.id;
     } else {
-        // console.log('placing', loot.lootObject.lootType, ' to dialogue ', assignedLocation.dialogueKey, assignedLocation.optionKey);
+        return loot.dialogueKey + '::' + loot.optionKey;
     }
+}
+
+function assignItemToLocation(assignmentsState: AssignmentState, loot: LootWithLocation, assignedLocation: LootWithLocation): void {
+    //debugState(currentState);
+    /*if (assignedLocation.location) {
+        console.log('placing', loot.lootObject.lootType, ' at ', assignedLocation.location.zoneKey, assignedLocation.lootObject.id);
+    } else {
+        console.log('placing', loot.lootObject.lootType, ' to dialogue ', assignedLocation.dialogueKey, assignedLocation.optionKey);
+    }*/
     assignmentsState.assignments.push({
         lootType: loot.lootObject.lootType,
         lootAmount: loot.lootObject.lootAmount,
@@ -772,6 +850,7 @@ window['showRandomizerSolution'] = function () {
         previousState = currentState;
         console.log(`Sphere ${counter}`);
         currentState = collectAllLootForSolution(allNodes, startingNodes, previousState);
+        currentState = setAllFlagsInLogic(currentState, allNodes, startingNodes);
     } while (currentState !== previousState);
 }
 
@@ -902,6 +981,9 @@ function collectAllLootForSolution(allNodes: LogicNode[], startingNodes: LogicNo
         state = applyLootObjectToState(state, check);
         // Indicate this check has already been opened.
         state.savedState.objectFlags[check.lootObject.id] = true;
+        for (const flag of (check.progressFlags || [])) {
+            state.savedState.objectFlags[flag] = true;
+        }
         if (!finishedRandomizerSolution && state.hero.victoryPoints >= randomizerGoal) {
             console.log('');
             console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
@@ -916,22 +998,29 @@ function collectAllLootForSolution(allNodes: LogicNode[], startingNodes: LogicNo
 
 function collectAllLoot(allNodes: LogicNode[], startingNodes: LogicNode[], state: GameState, assignmentsState: AssignmentState): GameState {
     const reachableChecks: LootWithLocation[] = findReachableChecks(allNodes, startingNodes, state);
+    // console.log(debugLocations(reachableChecks));
     for (const check of reachableChecks) {
-        // We can only open checks that have been assigned, contents of other checks are not yet determined.
-        //if (!assignmentsState.assignedLocations.includes(check.lootObject.id)) {
-        //    continue;
-        //}
-        // Don't open a check that has already been opened.
+        // Ignore checks that have already been made.
         if (state.savedState.objectFlags[check.lootObject.id]) {
             continue;
         }
         const assignment = assignmentsState.assignments.find(assignment => assignment.target.lootObject.id === check.lootObject.id);
-        if (!assignment) {
-            continue;
+        // Only gain the loot if it has already been assigned. Otherwise we pretend the check is still empty.
+        if (assignment) {
+            state = applyLootObjectToState(state, assignment.source);
+            /*if (assignment.target.location) {
+                console.log(`    Get ${getLootName(assignment.source.lootObject, state)} at ${assignment.target.location.zoneKey}:${assignment.target.lootObject.id}`);
+            } else {
+                console.log(`    Get ${getLootName(assignment.source.lootObject, state)} from ${assignment.target.dialogueKey}:${assignment.target.optionKey}`);
+            }*/
         }
-        state = applyLootObjectToState(state, assignment.source);
-        // Indicate this check has already been opened.
+        // Set progress flags related to the check even if it has not been assigned, for example,
+        // Talking to the Vanara Commander should still release elemental beasts even if a check is
+        // not assigned to him yet.
         state.savedState.objectFlags[check.lootObject.id] = true;
+        for (const flag of (check.progressFlags || [])) {
+            state.savedState.objectFlags[flag] = true;
+        }
     }
     return state;
 }
@@ -1035,25 +1124,6 @@ function findAllTargetObjects(lootWithLocation: LootWithLocation): (LootObjectDe
     return results;
 }
 
-if (randomizerSeed) {
-    const assignmentsState = reverseFill(SRandom.seed(Number(randomizerSeed)), allNodes, [overworldNodes[0]]);
-    applyLootAssignments(assignmentsState.assignments);
-    for (let key in SPAWN_LOCATION_WATERFALL_VILLAGE) {
-        SPAWN_LOCATION_DEMO[key] = SPAWN_LOCATION_WATERFALL_VILLAGE[key];
-        SPAWN_LOCATION_FULL[key] = SPAWN_LOCATION_WATERFALL_VILLAGE[key];
-    }
-
-}
-const enemySeed = readGetParameter('enemySeed');
-if (enemySeed) {
-    let enemyRandom = SRandom.seed(Number(enemySeed))
-    everyObject((location, zone, area, object) => {
-        if (object.type === 'enemy') {
-            object.enemyType = enemyRandom.element([...enemyTypes]);
-            enemyRandom.generateAndMutate();
-        }
-    });
-}
 
 
 function everyZone(callback: (location: Partial<ZoneLocation>, zone: Zone) => void ) {
@@ -1087,10 +1157,45 @@ function everyArea(callback: (location: ZoneLocation, zone: Zone, area: AreaDefi
         }
     });
 }
-function everyObject(callback: (location: ZoneLocation, zone: Zone, area: AreaDefinition, objectDefinition: ObjectDefinition) => void) {
+export function everyObject(callback: (location: ZoneLocation, zone: Zone, area: AreaDefinition, objectDefinition: ObjectDefinition) => void) {
     everyArea((location, zone, area) => {
         for (let i = 0; i < area.objects.length; i++) {
             callback(location, zone, area, area.objects[i]);
         }
     });
+}
+
+export function verifyNodeConnections() {
+    for (const currentNode of allNodes) {
+        // console.log('node: ', currentNode.nodeId);
+        const zone = getZone(currentNode.zoneId);
+        if (!zone) {
+            debugger;
+            continue;
+        }
+        for (const path of (currentNode.paths || [])) {
+            const nextNode = allNodes.find(node => node.nodeId === path.nodeId);
+            if (!nextNode) {
+                warnOnce(missingNodeSet, path.nodeId, 'Missing node: ');
+                continue;
+            }
+        }
+        for (const exit of (currentNode.exits || [])) {
+            const { object } = findDoorById(zone, exit.objectId);
+            const exitObject = object as EntranceDefinition;
+            //console.log('->', exitObject.targetZone + ':' + exitObject.targetObjectId);
+            const nextNode = allNodes.find(node =>
+                (node !== currentNode || exitObject.targetObjectId !== exit.objectId)
+                && node.zoneId === exitObject.targetZone
+                && node.entranceIds?.includes(exitObject.targetObjectId)
+            );
+            if (!nextNode) {
+                warnOnce(missingExitNodeSet,
+                    zone.key + '::' + exitObject.id + ' => '
+                    + exitObject.targetZone + '::' + exitObject.targetObjectId,
+                    'Missing node for exit: ');
+                continue;
+            }
+        }
+    }
 }
