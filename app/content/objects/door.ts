@@ -143,7 +143,7 @@ function renderWoodenDoor(this: void, context: CanvasRenderingContext2D, state: 
     if (door.definition.d === 'up') {
         let frame = woodenNorthDoorway, overFrame: Frame = null;
         if (door.renderOpen(state)) {
-            if (door.definition.status === 'cracked') {
+            if (door.definition.status === 'cracked' || door.definition.status === 'blownOpen') {
                 context.fillStyle = 'black';
                 context.fillRect(door.x, door.y, 32, 32);
                 frame = woodenNorthBlownup;
@@ -744,8 +744,8 @@ export class Door implements ObjectInstance {
         return heroIsTouchingDoor || this.status === 'normal' || this.status === 'blownOpen' || this.status === 'frozen' || state.hero.actionTarget === this;
     }
     changeStatus(state: GameState, status: ObjectStatus): void {
-        const wasClosed = this.status === 'closed' || this.status === 'closedSwitch' || this.status === 'closedEnemy';
-        const isClosed = status === 'closed' || status === 'closedSwitch' || status === 'closedEnemy';
+        const wasClosed = this.status === 'closed' || this.status === 'closedSwitch' || this.status === 'closedEnemy' || this.status === 'cracked';
+        const isClosed = status === 'closed' || status === 'closedSwitch' || status === 'closedEnemy' || status === 'cracked';
         if (wasClosed && status === 'normal') {
             playAreaSound(state, this.area, 'doorOpen');
         } else if (isClosed && this.status === 'normal') {
@@ -841,7 +841,7 @@ export class Door implements ObjectInstance {
         } else if (doorStyle.w === 32) {
             this.applySquareDoorBehavior();
         }
-        if (this.status === 'normal') {
+        if (this.status === 'normal' || this.status === 'blownOpen') {
             delete this.behaviors.solid;
             if (this.definition.status === 'closed'
                 || this.definition.status === 'closedSwitch'
@@ -938,7 +938,7 @@ export class Door implements ObjectInstance {
     }
     onDestroy(state: GameState) {
         if (this.status === 'cracked') {
-            this.changeStatus(state, 'normal');
+            this.changeStatus(state, 'blownOpen');
         }
     }
     onHit(state: GameState, hit: HitProperties): HitResult {
@@ -990,8 +990,12 @@ export class Door implements ObjectInstance {
             || this.style === 'woodenUpstairs' || this.style === 'woodenDownstairs';
     }
     update(state: GameState) {
-        if (this.status !== 'normal' && getObjectStatus(state, this.definition)) {
-            this.changeStatus(state, 'normal');
+        if (this.status !== 'normal' && this.status !== 'blownOpen' && getObjectStatus(state, this.definition)) {
+            if (this.definition.status === 'cracked') {
+                this.changeStatus(state, 'blownOpen');
+            } else {
+                this.changeStatus(state, 'normal');
+            }
         }
         let hero = state.hero;
         // Nothing to update if the hero isn't in the same world as this door.
