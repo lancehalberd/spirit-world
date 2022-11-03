@@ -1,3 +1,4 @@
+import { zoneEntranceMap } from 'app/content/dialogue/nimbusCloud';
 import SRandom from 'app/utils/SRandom';
 
 import {
@@ -102,6 +103,7 @@ export function randomizeEntrances(random: typeof SRandom) {
     const spiritExits = new Set<string>();
     const targetIdMap: {[key in string]: DoorLocation[]} = {};
     const allTargetedKeys = new Set<string>();
+    const fixedNimbusCloudZones = new Set<string>();
     everyObject((location, zone: Zone, area: AreaDefinition, object) => {
         if (object.type !== 'door') {
             return;
@@ -200,9 +202,11 @@ export function randomizeEntrances(random: typeof SRandom) {
         connectedSpiritEntrances.add(loopableEntrancePair.innerTarget);
     }
 
-
     function assignEntranceExitPair(targetIdOfEntrance: string, targetIdOfExit: string) {
         let entranceZone: string, entranceTarget: string, exitZone: string, exitTarget: string;
+        if (!targetIdMap[targetIdOfEntrance]) {
+            debugger;
+        }
         for (const entrance of targetIdMap[targetIdOfEntrance]) {
             if (allTargetedKeys.has(entrance.location.zoneKey + ':' + entrance.definition.id)) {
                 entranceZone = entrance.location.zoneKey;
@@ -213,6 +217,7 @@ export function randomizeEntrances(random: typeof SRandom) {
             console.error('Could not find a targeted entrance that targets', targetIdOfEntrance);
             return;
         }
+
         if (!targetIdMap[targetIdOfExit]) {
             debugger;
         }
@@ -226,9 +231,20 @@ export function randomizeEntrances(random: typeof SRandom) {
             console.error('Could not find a targeted entrance that targets', targetIdOfEntrance);
             return;
         }
+
+        for (const zone in zoneEntranceMap) {
+            if (fixedNimbusCloudZones.has(zone)) {
+                continue;
+            }
+            if (zoneEntranceMap[zone] === targetIdOfEntrance) {
+                zoneEntranceMap[zone] = `${exitZone}:${exitTarget}`;
+                fixedNimbusCloudZones.add(zone);
+            }
+        }
         if (!targetIdMap[targetIdOfEntrance]) {
             debugger;
         }
+
         for (const entrance of targetIdMap[targetIdOfEntrance]) {
             /*console.log(
                 `${entrance.location.zoneKey}::${entrance.definition.id}`, '=>',
