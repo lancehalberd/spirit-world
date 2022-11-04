@@ -19,6 +19,7 @@ import {
 } from 'app/renderActor';
 import { getChargeLevelAndElement } from 'app/useTool';
 import { drawFrameAt, getFrame } from 'app/utils/animations';
+import { isUnderwater } from 'app/utils/actor';
 import { directionMap, getDirection } from 'app/utils/field';
 import { boxesIntersect } from 'app/utils/index';
 
@@ -515,15 +516,15 @@ export class Hero implements Actor, SavedHeroData {
         const renderCharging = state.hero.magic > 0 && hero.passiveTools.charge
             && hero.action === 'charging' && hero.chargeTime >= 60
         if (renderCharging) {
-            const { chargeLevel } = getChargeLevelAndElement(state, hero);
+            const { chargeLevel, element } = getChargeLevelAndElement(state, hero);
             if (chargeLevel) {
-                const animation = !hero.element
+                const animation = !element
                     ? chargeBackAnimation
                     : {
                         fire: chargeFireBackAnimation,
                         ice: chargeIceBackAnimation,
                         lightning: chargeLightningBackAnimation
-                    }[hero.element];
+                    }[element];
                 context.save();
                     context.globalAlpha *= 0.8;
                     const frame = getFrame(animation, hero.chargeTime);
@@ -573,13 +574,14 @@ export class Hero implements Actor, SavedHeroData {
         }
         renderExplosionRing(context, state, hero);
         if (renderCharging) {
-            const animation = !hero.element
+            const element = isUnderwater(state, hero) ? null : hero.element;
+            const animation = !element
                 ? chargeFrontAnimation
                 : {
                     fire: chargeFireFrontAnimation,
                     ice: chargeIceFrontAnimation,
                     lightning: chargeLightningFrontAnimation
-                }[hero.element];
+                }[element];
             context.save();
                 context.globalAlpha *= 0.8;
                 const frame = getFrame(animation, hero.chargeTime);

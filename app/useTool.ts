@@ -6,6 +6,7 @@ import { Arrow } from 'app/content/effects/arrow';
 import { Clone }  from 'app/content/objects/clone';
 import { GAME_KEY } from 'app/gameConstants';
 import { directionMap, getDirection } from 'app/utils/field';
+import { isUnderwater } from 'app/utils/actor';
 
 import { ActiveTool, GameState, Hero, MagicElement } from 'app/types'
 
@@ -24,7 +25,8 @@ export function getChargeLevelAndElement(state: GameState, hero: Hero, tool: Act
     } else if (state.hero.passiveTools.charge >= 1 && hero.chargeTime >= 800) {
         chargeLevel = 1;
     }
-    if (chargeLevel >= 1) {
+    // Elemental magic does not work under water.
+    if (chargeLevel >= 1 && !isUnderwater(state, hero)) {
         element = state.hero.element;
     }
     return { chargeLevel, element};

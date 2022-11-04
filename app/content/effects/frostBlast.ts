@@ -16,8 +16,9 @@ interface Props {
     radius?: number,
 }
 
-const EXPANSION_TIME = 200;
-const PERSIST_TIME = 400;
+const EXPANSION_TIME = 140;
+const PERSIST_TIME = 60;
+const minRadius = 4;
 
 export class FrostBlast implements EffectInstance, Props {
     area: AreaInstance = null;
@@ -38,7 +39,7 @@ export class FrostBlast implements EffectInstance, Props {
     speed = 0;
     hitTargets: Set<EffectInstance | ObjectInstance>;
     constructor({x, y, damage = 2, radius = 32}: Props) {
-        this.radius = radius
+        this.radius = radius - minRadius;
         this.damage = damage;
         this.x = x;
         this.y = y;
@@ -49,7 +50,7 @@ export class FrostBlast implements EffectInstance, Props {
         if (this.animationTime >= EXPANSION_TIME + PERSIST_TIME) {
             removeEffectFromArea(state, this);
         } else {
-            const r = this.radius * Math.min(1, this.animationTime / EXPANSION_TIME);
+            const r = minRadius + this.radius * Math.min(1, this.animationTime / EXPANSION_TIME);
             const hitResult = hitTargets(state, this.area, {
                 damage: this.damage,
                 element: 'ice',
@@ -65,15 +66,15 @@ export class FrostBlast implements EffectInstance, Props {
                 ignoreTargets: this.hitTargets,
             });
             this.hitTargets = new Set([...this.hitTargets, ...hitResult.hitTargets]);
-            if (this.animationTime === 40 || this.animationTime === 80 || this.animationTime === 140 || this.animationTime === 200) {
+            if (this.animationTime === 20 || this.animationTime === 40 || this.animationTime === 80 || this.animationTime === 120) {
                 let theta = Math.random() * 2 * Math.PI;
-                let count = 2 + (3 * Math.random()) | 0;
+                let count = 4 + (4 * Math.random()) | 0;
                 for (let i = 0; i < count; i++) {
                     addSparkleAnimation(state, this.area, {
-                        x: this.x + (r - 3) * Math.cos(theta + i * 2 * Math.PI / count),
-                        y: this.y + (r - 3) * Math.sin(theta + i * 2 * Math.PI / count),
-                        w: 6,
-                        h: 6,
+                        x: this.x + (r - 1) * Math.cos(theta + i * 2 * Math.PI / count) - 2,
+                        y: this.y + (r - 1) * Math.sin(theta + i * 2 * Math.PI / count) - 2,
+                        w: 4,
+                        h: 4,
                     }, { element: 'ice' });
                 }
             }
@@ -85,8 +86,8 @@ export class FrostBlast implements EffectInstance, Props {
             context.globalAlpha *= 0.6;
             context.beginPath();
             context.fillStyle = 'white'
-            const r = this.radius * Math.min(1, this.animationTime / EXPANSION_TIME);
-            context.arc(this.x + this.w / 2, this.y + this.h / 2 - this.z, r, 0, 2 * Math.PI);
+            const r = minRadius + this.radius * Math.min(1, this.animationTime / EXPANSION_TIME);
+            context.arc(this.x, this.y - this.z, r, 0, 2 * Math.PI);
             context.fill();
         context.restore();
     }

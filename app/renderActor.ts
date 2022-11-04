@@ -206,15 +206,7 @@ export function renderHeroBarrier(context: CanvasRenderingContext2D, state: Game
 }
 
 export function renderHeroEyes(context: CanvasRenderingContext2D, state: GameState, hero: Hero) {
-    const frame = getHeroFrame(state, hero);
-    // This only works since we force this to be the idle down frame.
-    /*const eyesFrame = {...frame, x: 3, y: 10, w: 12, h: 3};
-    drawFrame(context, eyesFrame, {
-        x: hero.x - eyesFrame.content.x + eyesFrame.x,
-        y: hero.y - eyesFrame.content.y + eyesFrame.y - hero.z,
-        w: eyesFrame.w,
-        h: eyesFrame.h,
-    });*/
+    const frame = heroAnimations.idle.down.frames[0];
     let eyeFrame = {...frame, x: 4, y: 11, w: 3, h: 2};
     drawFrame(context, eyeFrame, {
         x: hero.x - eyeFrame.content.x + eyeFrame.x,

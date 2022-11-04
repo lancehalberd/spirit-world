@@ -73,7 +73,7 @@ export function update() {
                 updateSoundSettings(state);
             }
         }
-        if (state.paused && !(state.hideMenu && wasGameKeyPressed(state, GAME_KEY.MEDITATE))) {
+        if (state.paused && !(state.hideMenu && wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL))) {
             if (!state.hideMenu) {
                 updateMenu(state);
             }
