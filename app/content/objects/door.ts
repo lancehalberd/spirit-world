@@ -711,12 +711,12 @@ export class Door implements ObjectInstance {
         // 'closedEnemy' doors will start open and only close when we confirm there are enemies in the current
         // are section. This way we don't play the secret chime every time we enter a room with a closed enemy
         // door where the enemies are already defeated (or there are not yet enemies).
-        if (this.status === 'closedEnemy') {
+        if (this.definition.status === 'closedEnemy') {
             this.status = 'normal';
         }
         // If the player already opened this door, set it to the appropriate open status.
         if (getObjectStatus(state, this.definition)) {
-            if (this.status === 'cracked') {
+            if (this.definition.status === 'cracked' || this.definition.status === 'blownOpen') {
                 this.status = 'blownOpen';
             } else {
                 this.status = 'normal';
@@ -755,14 +755,14 @@ export class Door implements ObjectInstance {
         if (this.linkedObject && this.linkedObject.status !== status) {
             this.linkedObject.changeStatus(state, status);
         }
-        if (this.definition.id && this.status === 'normal') {
+        if (this.definition.id && (this.status === 'normal' || this.status === 'blownOpen')) {
             // Update the other half of this door if it is in the same super tile.
             for (const object of this.area.objects) {
                 if (object?.definition?.type === 'door' &&
                     object?.definition.id === this.definition.id &&
-                    object.status !== 'normal'
+                    object.status !== this.status
                 ) {
-                    object.changeStatus(state, 'normal');
+                    object.changeStatus(state, this.status);
                 }
             }
             saveObjectStatus(state, this.definition, true);
@@ -1085,7 +1085,7 @@ export class Door implements ObjectInstance {
             let frame: Frame;
             if (this.status !== 'cracked') {
                 if (this.status === 'blownOpen') {
-                    frame = doorStyle[this.definition.d].caveFrame;
+                    frame = doorStyle[this.definition.d].cave;
                 } else {
                     frame = doorStyle[this.definition.d].doorFrame;
                 }
@@ -1099,7 +1099,7 @@ export class Door implements ObjectInstance {
                 context.restore();
                 return;
             }
-            if (this.status === 'normal' || state.hero.actionTarget === this) {
+            if (this.renderOpen(state)) {
                 return;
             }
             switch (this.status) {

@@ -44,6 +44,9 @@ Graphics:
 Current tasks:
     - Test Entrance Randomizer
 
+    - Simplify door rendering for southern facing doors:
+        - Add door foreground as a separate "part" that renders with "sprite" sorting and set its y value to the bottom of the door so it appears in front as long as the player's y position is less than it.
+
     - Fix ledges so that:
         - You can shoot arrows down ledges but not up them
         - Shooting an arrow down a ledge allows it to go over solid tiles unless they
