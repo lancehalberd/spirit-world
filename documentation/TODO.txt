@@ -94,8 +94,6 @@ Current tasks:
         - Add graphical palettes
             - (low priority) super tile layout selection
 
-
-    - Squirrel velocity should reset when knocked back
     - Add SFX when the MC is damaged
 
     - Add sleeping Vanara to the Cocoon.

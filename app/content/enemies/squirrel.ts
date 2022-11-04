@@ -34,6 +34,11 @@ enemyDefinitions.squirrel = {
             enemy.changeToAnimation('idle');
             enemy.setMode('run')
         } else if (enemy.mode === 'run') {
+            // Revert theta back to 45 degree angle if it gets messed up from being knocked by a hit.
+            const theta = (Math.round(Math.atan2(enemy.vy, enemy.vx) * 4 / 2 / Math.PI - 0.5) + 0.5) * Math.PI / 2;
+            enemy.vx = enemy.speed * Math.cos(theta);
+            enemy.vy = enemy.speed * Math.sin(theta);
+            enemy.d = getDirection(enemy.vx, enemy.vy);
             enemy.changeToAnimation('move');
             // Pause sometime after moving for 4 seconds. Max time is theoretically 12s, but is likely much sooner.
             if (enemy.modeTime % 500 === 0 && Math.random() < (enemy.modeTime - 4000) / 8000) {
