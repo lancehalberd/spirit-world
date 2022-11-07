@@ -1025,6 +1025,13 @@ function collectAllLoot(allNodes: LogicNode[], startingNodes: LogicNode[], state
     return state;
 }
 
+function getLootAmount(loot: LootAssignment): number {
+    if (loot.lootType === 'money' || loot.lootType === 'victoryPoint') {
+        return loot.lootAmount || 1;
+    }
+    return 0;
+}
+
 export function applyLootAssignments(assignments: LootAssignment[]): void {
     // console.log('applying assignments:');
     // console.log(assignments);
@@ -1046,7 +1053,7 @@ export function applyLootAssignments(assignments: LootAssignment[]): void {
             }
             const [beginning, middle] = script.split('{item:');
             const end = middle.substring(middle.indexOf('}') + 1);
-            const number = assignment.lootAmount || 0;//assignment.lootLevel;
+            const lootAmount = getLootAmount(assignment);
             const flag = `${dialogueKey}-${optionKey}`;
             const flagScript = `{flag:${flag}}`;
             addCheck(flag, 'overworld');
@@ -1054,8 +1061,8 @@ export function applyLootAssignments(assignments: LootAssignment[]): void {
             if (assignment.lootType === 'empty') {
                 // Include the flag so that we can still count the check for the check counter.
                 newScript = `${beginning}{|}${flagScript}Haha, scammed you!{|}${end}`;
-            } else if (number) {
-                newScript = `${beginning}${flagScript}{item:${assignment.lootType}=${number}}${end}`;
+            } else if (lootAmount) {
+                newScript = `${beginning}${flagScript}{item:${assignment.lootType}=${lootAmount}}${end}`;
             } else {
                 newScript = `${beginning}${flagScript}{item:${assignment.lootType}}${end}`;
             }
@@ -1069,18 +1076,19 @@ export function applyLootAssignments(assignments: LootAssignment[]): void {
                 const npc = object as NPCDefinition;
                 const npcKey = `${zoneKey}-${assignment.target.lootObject.id}`;
                 addCheck(npcKey, zoneKey);
-                const number = assignment.lootAmount || 0;//assignment.lootLevel;
+                const lootAmount = getLootAmount(assignment);
                 let text: string;
                 if (assignment.lootType === 'empty') {
                     // Include the flag so that we can still count the check for the check counter.
                     text = `I'm sorry you came all this way for nothing. {flag:${npcKey}}`;
-                } else if (number) {
-                    text = `Here you go! {flag:${npcKey}}{item:${assignment.lootType}=${number}}`;
+                } else if (lootAmount) {
+                    text = `Here you go! {flag:${npcKey}}{item:${assignment.lootType}=${lootAmount}}`;
                 } else {
                     text = `Here you go! {flag:${npcKey}}{item:${assignment.lootType}}`;
                 }
                 npc.dialogueKey = npcKey;
                 text += (assignment.target.progressFlags || []).map(flag => `{flag:${flag}}`).join(' ');
+                // console.log(text);
                 dialogueHash[npcKey] = {
                     key: npcKey,
                     options: [
@@ -1102,7 +1110,7 @@ export function applyLootAssignments(assignments: LootAssignment[]): void {
                 for (const target of findAllTargetObjects(assignment.target)) {
                     target.lootType = assignment.lootType;
                     target.lootAmount = assignment.lootAmount;
-                    target.lootLevel = 0;//assignment.lootLevel;
+                    target.lootLevel = 0;
                 }
             }
         }

@@ -3027,8 +3027,8 @@ const f3_0x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "hidden", id: "stormBeast", x: 224, y: 80, type: "boss", enemyType: "stormBeast", lootType: "lightning", lootAmount: 1, lootLevel: 1, d: "down", params: {}},
-        {status: "normal", id: "stormBeast", x: 240, y: 144, type: "boss", enemyType: "stormHeart", lootType: "lightning", lootAmount: 1, lootLevel: 1, d: "down", params: {}},
+        {status: "hidden", id: "stormBeast", x: 224, y: 80, type: "boss", enemyType: "stormBeast", lootType: "lightning", lootLevel: 0, d: "down", params: {}},
+        {status: "normal", id: "stormBeast", x: 240, y: 144, type: "boss", enemyType: "stormHeart", lootType: "lightning", lootLevel: 0, d: "down", params: {}},
         {status: "hidden", id: "stormBeast", x: 256, y: 304, targetObjectId: "stormBeast", type: "teleporter", linked: true},
     ],
     sections: [

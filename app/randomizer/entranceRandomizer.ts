@@ -238,6 +238,7 @@ export function randomizeEntrances(random: typeof SRandom) {
             }
             if (zoneEntranceMap[zone] === targetIdOfEntrance) {
                 zoneEntranceMap[zone] = `${exitZone}:${exitTarget}`;
+                // console.log(zone + ' => ' + zoneEntranceMap[zone]);
                 fixedNimbusCloudZones.add(zone);
             }
         }

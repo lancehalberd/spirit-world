@@ -412,6 +412,7 @@ export function createObjectDefinition(
                 lootDefinition.lootAmount = definition.lootAmount || 1;
             } else {
                 lootDefinition.lootLevel = definition.lootLevel || 1;
+                delete lootDefinition.lootAmount;
             }
             return lootDefinition;
         }

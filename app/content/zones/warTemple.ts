@@ -1388,7 +1388,7 @@ const f1_0x0: AreaDefinition = {
     ],
     objects: [
         {status: "locked", id: "warTempleLock1", x: 368, y: 256, type: "door", style: "cavernDownstairs", targetZone: "warTemple", targetObjectId: "warTempleLock1", d: "up", locationCue: "War Temple 2F"},
-        {status: "normal", id: "warTempleSilver", x: 448, y: 288, type: "chest", lootType: "silverOre", lootAmount: 100, lootLevel: 1},
+        {status: "normal", id: "warTempleSilver", x: 448, y: 288, type: "chest", lootType: "silverOre", lootAmount: 100},
         {status: "normal", id: "warTemple:1:0x0-door-0", x: 256, y: 368, type: "door", style: "cave", d: "left"},
         {status: "normal", id: "warTemple:1:0x0-door-1", x: 480, y: 112, type: "door", style: "cave", d: "right"},
         {status: "normal", id: "warTemple:1:0x0-door-2", x: 224, y: 368, type: "door", style: "cave", d: "right"},
