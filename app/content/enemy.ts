@@ -395,6 +395,26 @@ export class Enemy implements Actor, ObjectInstance {
             }
         }
     }
+    useAbility(state: GameState, definition: EnemyAbility<any>): boolean {
+        if (this.activeAbility) {
+            return false;
+        }
+        const ability = this.abilities.find(a => a.definition === definition);
+        if (!ability) {
+            return false;
+        }
+        const target = ability.definition.getTarget(state, this);
+        if (!target) {
+            return false;
+        }
+        ability.charges--;
+        this.activeAbility = {
+            definition: ability.definition,
+            target,
+            time: 0,
+        };
+        return true;
+    }
     update(state: GameState) {
         if (this.status === 'gone') {
             return;

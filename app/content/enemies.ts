@@ -63,19 +63,24 @@ export type EnemyType = typeof enemyTypes[number];
 // An enemy ability as it is defined for a particular enemy.
 export interface EnemyAbility<T> {
     getTarget: (this: EnemyAbility<T>, state: GameState, enemy: Enemy) => T
-    useAbility: (this: EnemyAbility<T>, state: GameState, enemy: Enemy, target: T) => void
-    // How long it takes for the enemy to generate a charge.
-    cooldown: number
-    // This can be set to parameterize the range for this ability.
+    // Called when the ability becomes active at the start of its prep time.
+    prepareAbility?: (this: EnemyAbility<T>, state: GameState, enemy: Enemy, target: T) => void
+    // Called when the ability is used, at the end of its prep time.
+    useAbility?: (this: EnemyAbility<T>, state: GameState, enemy: Enemy, target: T) => void
+    // How long it takes for the enemy to generate a charge. Defaults to 0.
+    cooldown?: number
+    // Number of charges recovered per cooldown, Defaults to 1.
+    chargesRecovered?: number
+    // This can be set to parameterize the range for this ability. Defaults to enemy aggro range.
     range?: number
-    // How many charges the enemy starts with.
-    initialCharges: number
-    // The max number of charges the enemy can have.
-    charges: number
-    // Delay between the enemy choosing a target and activating the ability.
-    prepTime: number
-    // Delay after the enemy uses the ability before it can use a new ability.
-    recoverTime: number
+    // How many charges the enemy starts with. Defaults to 1.
+    initialCharges?: number
+    // The max number of charges the enemy can have, defaults to 1.
+    charges?: number
+    // Delay between the enemy choosing a target and activating the ability. Defaults to 0.
+    prepTime?: number
+    // Delay after the enemy uses the ability before it can use a new ability. Defaults to 0.
+    recoverTime?: number
 }
 
 // A particular instance of an enemy using an ability. This is stored
@@ -850,7 +855,7 @@ export function getNearbyTarget(state: GameState, enemy: Enemy, radius: number,
     return null;
 }
 
-function getLineOfSightTargetAndDirection(state: GameState, enemy: Enemy, direction: Direction = null, projectile: boolean = false): {d: Direction, hero: Hero} {
+export function getLineOfSightTargetAndDirection(state: GameState, enemy: Enemy, direction: Direction = null, projectile: boolean = false): {d: Direction, hero: Hero} {
     const hitbox = enemy.getHitbox(state);
     for (const hero of [state.hero, state.hero.astralProjection, ...state.hero.clones]) {
         if (!isTargetVisible(state, enemy, hero)) {

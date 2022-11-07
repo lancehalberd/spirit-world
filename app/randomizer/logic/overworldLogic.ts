@@ -20,7 +20,6 @@ export const mainOverworldNode: LogicNode = {
         { nodeId: 'warTempleArea' },
         { nodeId: 'mainSpiritWorld', logic: orLogic(hasSomersault, hasTeleportation) },
         { nodeId: 'nimbusCloud', logic: hasNimbusCloud},
-        // holy city entrance or forest temple entrance.
         { nodeId: 'overworldLakeTunnel', logic: orLogic(hasGloves, hasTeleportation) },
         // This represents moving the tower to the forest position and using cloud boots to
         // fall on the river temple roof.
@@ -83,8 +82,7 @@ export const overworldNodes: LogicNode[] = [
         nodeId: 'overworldLakeTunnel',
         entranceIds: ['lakeTunnelEntrance'],
         paths: [
-            // holy city entrance or forest temple entrance.
-            { nodeId: 'mainSpiritWorld', logic: orLogic(hasGloves, hasTeleportation) },
+            { nodeId: 'overworldMain', logic: orLogic(hasGloves, hasTeleportation) },
         ],
         exits: [
             { objectId: 'lakeTunnelEntrance'}

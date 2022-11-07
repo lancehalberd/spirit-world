@@ -42,7 +42,14 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Test Entrance Randomizer
+    - Add initial rival fight
+        - Rival guards the tomb
+        - Rival is angered when you hit one of the switches.
+            - Will also be mad about you stealing the bow if you have it.
+        - If you are defeated, the elder may save you if you didn't steal the bow, otherwise it is game over.
+        - Fights with a bo staff
+        - Rolls from place to place
+        - Maybe has a defensive position where he dodges and counter attacks if you attack him
 
     - Simplify door rendering for southern facing doors:
         - Add door foreground as a separate "part" that renders with "sprite" sorting and set its y value to the bottom of the door so it appears in front as long as the player's y position is less than it.
@@ -339,10 +346,6 @@ Peach Cave Improvements:
         - Drains light and regains a bit of health for every 25% lost
 
 Dungeon 1 Improvements:
-    - Add rival fight when you open the door:
-        - Rival guards the tomb
-        - Rival is angered you have the Spirit Bow when you hit one of the switches.
-        - If you are defeated, the elder may save you, otherwise it is game over.
     - Update arrow turret graphics.
 
 Golem Boss Improvements:

@@ -181,9 +181,22 @@ export const warTempleNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'warTempleThroneRoom',
-        entranceIds: ['warTempleEntranceSpirit', 'labEntrance'],
+        paths: [
+            {nodeId: 'warTempleLabPath', logic: logicHash.beastsDefeated},
+        ],
+        entranceIds: ['warTempleEntranceSpirit'],
         exits: [
             {objectId: 'warTempleEntranceSpirit'},
+        ],
+    },
+    {
+        zoneId,
+        nodeId: 'warTempleLabPath',
+        paths: [
+            {nodeId: 'warTempleThroneRoom', logic: logicHash.beastsDefeated},
+        ],
+        entranceIds: ['labEntrance'],
+        exits: [
             {objectId: 'labEntrance', logic: logicHash.beastsDefeated},
         ],
     }
