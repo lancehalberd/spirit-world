@@ -685,6 +685,60 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
 };
 type DoorStyle = keyof typeof doorStyles;
 
+export class DoorTop implements ObjectInstance {
+    area: AreaInstance;
+    drawPriority: 'sprites' = 'sprites';
+    status: ObjectStatus;
+    x: number;
+    y: number;
+    ignorePits = true;
+    isObject = <const>true;
+    door: Door;
+    constructor(door: Door) {
+        this.door = door;
+        this.x = this.door.x;
+        // The top of the door frame is 20px from the ground.
+        this.y = this.door.y + 20;
+    }
+    getHitbox(state: GameState): Rect {
+        return this.door.getHitbox(state);
+    }
+    render(context: CanvasRenderingContext2D, state: GameState) {
+        const definition = this.door.definition;
+        const doorStyle = doorStyles[this.door.style];
+        if (doorStyle.renderForeground) {
+            doorStyle.renderForeground(context, state, this.door);
+            return;
+        }
+        if (doorStyle[definition.d] && this.door.status !== 'cracked') {
+            let frame: Frame;
+            if (this.door.status === 'blownOpen') {
+                frame = doorStyle[definition.d].caveCeiling;
+            } else {
+                frame = doorStyle[definition.d].doorCeiling;
+            }
+            if (frame) {
+                drawFrame(context, frame, { ...frame, x: this.door.x, y: this.door.y });
+            }
+        }
+        if (this.door.status === 'frozen') {
+            context.save();
+                context.globalAlpha = 0.5;
+                context.fillStyle = 'white';
+                if (definition.d === 'up') {
+                    context.fillRect(this.door.x, this.door.y, 32, 12);
+                } else if (definition.d === 'down') {
+                    context.fillRect(this.door.x, this.door.y + 20, 32, 12);
+                } else if (definition.d === 'left') {
+                    context.fillRect(this.door.x, this.door.y, 12, 32);
+                } else if (definition.d === 'right') {
+                    context.fillRect(this.door.x + 20, this.door.y, 12, 32);
+                }
+            context.restore();
+        }
+    }
+}
+
 export class Door implements ObjectInstance {
     behaviors: TileBehaviors = { };
     ignorePits = true;
@@ -700,6 +754,7 @@ export class Door implements ObjectInstance {
     y: number;
     status: ObjectStatus = 'normal';
     style: DoorStyle = 'cave';
+    doorTop: DoorTop;
     constructor(state: GameState, definition: EntranceDefinition) {
         this.definition = definition;
         this.x = definition.x;
@@ -726,21 +781,20 @@ export class Door implements ObjectInstance {
         if (!doorStyles[this.style]) {
             this.style = 'cave';
         }
+        this.doorTop = new DoorTop(this);
+    }
+    getParts(state: GameState) {
+        return [this.doorTop];
     }
     isOpen(): boolean {
         return this.status === 'normal' || this.status === 'blownOpen';
     }
-    renderBehindHero(state: GameState): boolean {
-        if (state.hero.action === 'jumpingDown') {
-            return true;
-        }
-        if (state.hero.z > 8) {
-            return true;
-        }
-        return false;
+    // Hero cannot enter doors while they are jumping down/falling in front of a door.
+    heroCanEnter(state: GameState): boolean {
+        return state.hero.area === this.area && state.hero.action !== 'jumpingDown' && state.hero.z <= 8;
     }
     renderOpen(state: GameState): boolean {
-        const heroIsTouchingDoor = boxesIntersect(state.hero, this.getHitbox(state)) && !this.renderBehindHero(state);
+        const heroIsTouchingDoor = boxesIntersect(state.hero, this.getHitbox(state)) && this.heroCanEnter(state);
         return heroIsTouchingDoor || this.status === 'normal' || this.status === 'blownOpen' || this.status === 'frozen' || state.hero.actionTarget === this;
     }
     changeStatus(state: GameState, status: ObjectStatus): void {
@@ -998,9 +1052,8 @@ export class Door implements ObjectInstance {
             }
         }
         let hero = state.hero;
-        // Nothing to update if the hero isn't in the same world as this door.
-        // Also, heroes cannot enter doors while they are jumping down/falling in front of a door.
-        if (hero.area !== this.area || this.renderBehindHero(state)) {
+        // Nothing to update if the hero cannot enter the door.
+        if (!this.heroCanEnter(state)) {
             return;
         }
         const heroIsTouchingDoor = boxesIntersect(hero, this.getHitbox(state));
@@ -1138,62 +1191,6 @@ export class Door implements ObjectInstance {
                 }
             } else {
                 context.fillRect(this.x, this.y, 32, 32);
-            }
-        }
-        if (this.renderBehindHero(state)) {
-            this.renderForeground(context, state, true);
-        }
-    }
-    renderForeground(context: CanvasRenderingContext2D, state: GameState, force = false) {
-        //if (this.area !== state.areaInstance) {
-        //    return;
-        //}
-        // Hack to prevent the top of this specific door from rendering on top of the waterfall.
-        if (this.definition.id === 'waterfallCaveEntrance') {
-            return;
-        }
-        const doorStyle = doorStyles[this.style];
-        // Foreground is rendered as part of the background when a player is jumping
-        // in case they jump over the top of the door.
-        if (!force && this.renderBehindHero(state)) {
-            return;
-        }
-        if (doorStyle.renderForeground) {
-            doorStyle.renderForeground(context, state, this);
-            return;
-        }
-        const hitbox = this.getHitbox(state);
-        // No need to render this unless the player is actually behind this.
-        // This is a hack to keep this from rendering in front of the waterfall
-        // for the entrance to the Waterfall Cave.
-        // There is also probably an issue with this rendering in front of flying enemies.
-        if (this.definition.d !== 'up' || hitbox.y + 24 + this.area.cameraOffset.y >= state.hero.y) {
-            const doorStyle = doorStyles[this.style];
-            if (doorStyle[this.definition.d] && this.status !== 'cracked') {
-                let frame: Frame;
-                if (this.status === 'blownOpen') {
-                    frame = doorStyle[this.definition.d].caveCeiling;
-                } else {
-                    frame = doorStyle[this.definition.d].doorCeiling;
-                }
-                if (frame) {
-                    drawFrame(context, frame, { ...frame, x: this.x, y: this.y });
-                }
-            }
-            if (this.status === 'frozen') {
-                context.save();
-                    context.globalAlpha = 0.5;
-                    context.fillStyle = 'white';
-                    if (this.definition.d === 'up') {
-                        context.fillRect(this.x, this.y, 32, 12);
-                    } else if (this.definition.d === 'down') {
-                        context.fillRect(this.x, this.y + 20, 32, 12);
-                    } else if (this.definition.d === 'left') {
-                        context.fillRect(this.x, this.y, 12, 32);
-                    } else if (this.definition.d === 'right') {
-                        context.fillRect(this.x + 20, this.y, 12, 32);
-                    }
-                context.restore();
             }
         }
     }

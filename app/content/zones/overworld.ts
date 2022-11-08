@@ -1472,6 +1472,7 @@ const f0_1x0: AreaDefinition = {
         {status: "normal", id: "", linked: true, x: 64, y: 176, type: "spawnMarker"},
         {status: "normal", id: "", linked: true, x: 176, y: 176, type: "spawnMarker"},
         {status: "normal", id: "", linked: true, x: 112, y: 128, type: "spawnMarker"},
+        {status: "normal", id: "tombRival", x: 128, y: 128, type: "boss", enemyType: "rival", lootType: "empty", lootAmount: 1, lootLevel: 1, d: "down", params: {}, hasCustomLogic: true, customLogic: "testTombRival"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},

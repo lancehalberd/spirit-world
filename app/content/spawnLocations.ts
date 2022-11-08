@@ -60,6 +60,17 @@ export const SPAWN_LOCATION_PEACH_CAVE_EXIT: ZoneLocation = {
     isSpiritWorld: false,
 };
 
+export const SPAWN_LOCATION_TOMB_RIVAL: ZoneLocation = {
+    zoneKey: 'overworld',
+    floor: 0,
+    x: 130,
+    y: 200,
+    z: 0,
+    d: 'up',
+    areaGridCoords: {x: 0, y: 1},
+    isSpiritWorld: false,
+};
+
 export const SPAWN_LOCATION_TOMB_ENTRANCE: ZoneLocation = {
     zoneKey: 'tomb',
     floor: 1,
@@ -376,6 +387,9 @@ const tombStartState = applyItems(peachCaveExitState, {bow: 1},
     ['treeVillage:1:0x0-bow-0', 'closedBowDoor', 'elderTomb', 'tombEntrance']
 );
 tombStartState.savedHeroData.leftTool = 'bow';
+const tombRivalState = applyItems(tombStartState, {bow: 1},
+    ['testTombRival']
+);
 const tombBossState = applyItems(tombStartState, {roll: 1, 'tomb:bigKey': 1, silverOre: 1},
     ['tombKey1', 'tombKey2', 'tombBigKey', 'tomb:1:1x0-roll-0']
 );
@@ -454,6 +468,10 @@ const earlySpawnLocations: SpawnLocationOptions = {
     'Peach Cave Exit': {
         location: SPAWN_LOCATION_PEACH_CAVE_EXIT,
         savedState: peachCaveExitState,
+    },
+    'Rival Fight': {
+        location: SPAWN_LOCATION_TOMB_RIVAL,
+        savedState: tombRivalState,
     },
     'Tomb Start': {
         location: SPAWN_LOCATION_TOMB_ENTRANCE,

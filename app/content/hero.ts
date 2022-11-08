@@ -469,25 +469,18 @@ export class Hero implements Actor, SavedHeroData {
         }
     }
 
-    renderStaff(this: Hero, context: CanvasRenderingContext2D, state: GameState, staffDirection: Direction, foreground = false): void {
+    renderStaff(this: Hero, context: CanvasRenderingContext2D, state: GameState, staffDirection: Direction): void {
         if (this.animationTime < staffAnimations[staffDirection].duration) {
             const frame = getFrame(staffAnimations[staffDirection], this.animationTime);
             let x = this.x - 61 + 7, y = this.y - 32 - 90 + 6;
             if (this.animationTime < heroAnimations.staffJump[staffDirection].duration) {
                 y -= this.z;
             }
-            if (foreground) {
-                drawFrameAt(context, {...frame, h: 120}, { x, y });
-            } else {
-                drawFrameAt(context, frame, { x, y });
-            }
+            drawFrameAt(context, frame, { x, y });
         }
     }
 
     renderForeground(this: Hero, context: CanvasRenderingContext2D, state: GameState) {
-        if (this.action === 'usingStaff') {
-            this.renderStaff(context, state, this.d, true);
-        }
     }
 
     renderHeroFrame(this: Hero, context: CanvasRenderingContext2D, state: GameState): Frame {

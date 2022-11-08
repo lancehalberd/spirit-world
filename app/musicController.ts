@@ -29,12 +29,23 @@ export const updateMusic = (): void => {
         if (!isTrackPlaying('bossIntro') && !isTrackPlaying('bossA') && !isTrackPlaying('bossB')) {
             playTrack('bossIntro', 0, soundSettings);
         }
-    } else if (state.location.zoneKey === 'overworld'
-        || state.location.zoneKey === 'underwater'
-    ) {
+    } else if (state.location.zoneKey === 'overworld') {
+        if (!state.location.isSpiritWorld
+            && state.location.areaGridCoords.x === 0 && state.location.areaGridCoords.y === 2) {
+            playTrack('vanaraForestTheme', 0, soundSettings);
+        } else {
+            playTrack('mainTheme', 0, soundSettings);
+        }
+    } else if (state.location.zoneKey === 'underwater') {
         playTrack('mainTheme', 0, soundSettings);
+    }  else if (state.location.zoneKey === 'treeVillage') {
+        playTrack('vanaraForestTheme', 0, soundSettings);
     } else if (state.location.zoneKey === 'sky') {
-        playTrack('skyTheme', 0, soundSettings);
+        if (state.location.isSpiritWorld) {
+            playTrack('vanaraDreamTheme', 0, soundSettings);
+        } else {
+            playTrack('skyTheme', 0, soundSettings);
+        }
     } else if (state.location.zoneKey === 'peachCave'
         || state.location.zoneKey === 'peachCaveWater'
         || state.location.zoneKey === 'lakeTunnel'
@@ -44,19 +55,22 @@ export const updateMusic = (): void => {
         || state.location.zoneKey === 'riverTempleWater'
     ) {
         playTrack('lakeTheme', 0, soundSettings);
-    } else if (state.location.zoneKey === 'tomb' || state.location.zoneKey === 'waterfallTower') {
+    } else if (state.location.zoneKey === 'tomb') {
         playTrack('tombTheme', 0, soundSettings);
     } else if (state.location.zoneKey === 'waterfallCave'
         || state.location.zoneKey === 'holyCityInterior'
-        || state.location.zoneKey === 'treeVillage'
     ) {
         playTrack('idleTheme', 0, soundSettings);
     } else if (state.location.zoneKey === 'warTemple' || state.location.zoneKey === 'forestTemple') {
         playTrack('dungeonTheme', 0, soundSettings);
-    } else if (state.location.zoneKey === 'cocoon'
-        || state.location.zoneKey === 'helix'
-    ) {
+    } else if (state.location.zoneKey === 'cocoon') {
         playTrack('cocoonTheme', 0, soundSettings);
+    } else if (state.location.zoneKey === 'helix') {
+        playTrack('helixTheme', 0, soundSettings);
+    } else if (state.location.zoneKey === 'waterfallTower') {
+        playTrack('waterfallTowerTheme', 0, soundSettings);
+    } else if (state.location.zoneKey === 'forge') {
+        playTrack('forgeTheme', 0, soundSettings);
     } else if (state.location.zoneKey === 'crater') {
         playTrack('craterTheme', 0, soundSettings);
     } else if (state.location.zoneKey === 'staffTower') {

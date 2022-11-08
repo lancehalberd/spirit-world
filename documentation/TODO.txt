@@ -51,8 +51,9 @@ Current tasks:
         - Rolls from place to place
         - Maybe has a defensive position where he dodges and counter attacks if you attack him
 
-    - Simplify door rendering for southern facing doors:
-        - Add door foreground as a separate "part" that renders with "sprite" sorting and set its y value to the bottom of the door so it appears in front as long as the player's y position is less than it.
+    - Add "openLogic" field to doors
+        - When set and logic is true, door overrides as being open.
+        - Use this to protect from soft locks so doors won't trap you in areas if you cannot logically complete them. Simplify existing logic by using these, such as the elder's basement.
 
     - Fix ledges so that:
         - You can shoot arrows down ledges but not up them

@@ -1,13 +1,16 @@
+import { playAreaSound } from 'app/content/areas';
 import {
     getVectorToNearbyTarget,
 } from 'app/content/enemies';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { vanaraBlackAnimations } from 'app/render/npcAnimations';
-import { heroAnimations } from 'app/render/heroAnimations';
+import { heroAnimations, staffAnimations } from 'app/render/heroAnimations';
+import { drawFrameAt, getFrame } from 'app/utils/animations';
+import { hitTargets } from 'app/utils/field';
 
 
-import { Direction, Enemy, EnemyAbility, GameState, HitProperties, HitResult } from 'app/types';
+import { Direction, Enemy, EnemyAbility, GameState, HitProperties, HitResult, Rect } from 'app/types';
 
 const rivalAnimations = {
     ...vanaraBlackAnimations,
@@ -40,6 +43,20 @@ const rollAbility: EnemyAbility<RollTargetType> = {
     recoverTime: rollSpeed.length * FRAME_LENGTH,
 };
 
+function getStaffHitbox(enemy: Enemy, d: Direction): Rect {
+    const enemyHitbox = enemy.getHitbox();
+    if (d === 'left') {
+        return {...enemyHitbox, x: enemyHitbox.x - 64, w: 64};
+    }
+    if (d === 'right') {
+        return {...enemyHitbox, x: enemyHitbox.x + enemyHitbox.w, w: 64};
+    }
+    if (d === 'up') {
+        return {...enemyHitbox, y: enemyHitbox.y - 64, h: 64};
+    }
+    return {...enemyHitbox, y: enemyHitbox.y + enemyHitbox.h, h: 64};
+}
+
 const staffAbility: EnemyAbility<Direction> = {
     getTarget(this: void, state: GameState, enemy: Enemy): Direction|null {
         const enemyHitbox = enemy.getHitbox();
@@ -68,10 +85,22 @@ const staffAbility: EnemyAbility<Direction> = {
     },
     useAbility(this: void, state: GameState, enemy: Enemy, target: Direction): void {
         enemy.changeToAnimation('staffSlam');
+        enemy.z = Math.max(enemy.z + enemy.vz, 0);
+        playAreaSound(state, state.areaInstance, 'bossDeath');
+        hitTargets(state, state.areaInstance, {
+            damage: 1,
+            hitbox: getStaffHitbox(enemy, enemy.d),
+            hitAllies: true,
+            knockAwayFromHit: true,
+            isStaff: true,
+        });
+        state.screenShakes.push({
+            dx: 0, dy: 2, startTime: state.fieldTime, endTime: state.fieldTime + 200
+        });
     },
     cooldown: 4000,
     prepTime: rivalAnimations.staffJump.down.duration,
-    recoverTime: rivalAnimations.staffSlam.down.duration + 2000,
+    recoverTime: rivalAnimations.staffSlam.down.duration + 1000,
 };
 
 
@@ -88,19 +117,54 @@ enemyDefinitions.rival = {
         }
         return enemy.defaultOnHit(state, hit);
     },
-    /*render(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
-
-    },*/
+    render(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
+        enemy.defaultRender(context, state);
+        if (enemy.activeAbility?.definition === staffAbility) {
+            renderStaff(context, state, enemy);
+        }
+    },
     acceleration: 0.3, speed: 2,
     params: {
     },
 };
 
+function renderStaff(this: void, context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
+    let animationTime = enemy.animationTime;
+    if (enemy.activeAbility.used) {
+        animationTime += enemy.activeAbility.definition.prepTime;
+    }
+    if (animationTime < staffAnimations[enemy.d].duration) {
+        const frame = getFrame(staffAnimations[enemy.d], animationTime);
+        let x = enemy.x - 61 + 7, y = enemy.y - 32 - 90 + 6;
+        if (enemy.animationTime < heroAnimations.staffJump[enemy.d].duration) {
+            y -= enemy.z;
+        }
+        drawFrameAt(context, frame, { x, y });
+    }
+}
 
 function updateRival(this: void, state: GameState, enemy: Enemy): void {
     if (!enemy.activeAbility) {
-        if (!enemy.useAbility(state, staffAbility)) {
-            enemy.useAbility(state, rollAbility);
+        enemy.changeToAnimation('idle');
+        if (!enemy.tryUsingAbility(state, staffAbility)) {
+            enemy.tryUsingAbility(state, rollAbility);
+        }
+    }
+    if (enemy.activeAbility?.definition === staffAbility) {
+        const jumpDuration = enemy.activeAbility.definition.prepTime;
+        if (!enemy.activeAbility.used) {
+            // Jumping up
+           // console.log(hero.animationTime, jumpDuration, slamDuration);
+            if (enemy.animationTime < jumpDuration - FRAME_LENGTH) {
+                enemy.vz = 1 - 1 * enemy.animationTime / jumpDuration;
+                enemy.z += enemy.vz;
+            } else if (enemy.animationTime === jumpDuration - FRAME_LENGTH) {
+                enemy.vz = -4;
+                enemy.z = Math.max(enemy.z + enemy.vz, 0);
+            }
+        } else {
+            // Slamming down.
+            enemy.z = Math.max(enemy.z + enemy.vz, 0);
         }
     }
 }

@@ -610,9 +610,15 @@ export function renderAreaObjectsBeforeHero(context: CanvasRenderingContext2D, s
             }
         }
         const spriteObjects: (EffectInstance | ObjectInstance)[] = [];
+        // Currently the jumping down logic uses hero y value to simulate a z value.
+        // Because of this, to render the hero in the correct order we need to pretend the
+        // y value is greater than it actually is. Otherwise they will be rendered behind
+        // things like door frames that they should be jumping in front of.
+        const heroY = (state.hero.action === 'jumpingDown' && state.hero.d === 'down')
+            ? state.hero.y + 32 : state.hero.y;
         for (const object of area.objectsToRender) {
             if ((object.drawPriority === 'sprites' || object.getDrawPriority?.(state) === 'sprites')
-                && object.y <= state.hero.y
+                && object.y <= heroY
             ) {
                 if (object.render) {
                     spriteObjects.push(object);
@@ -633,9 +639,15 @@ export function renderAreaObjectsAfterHero(context: CanvasRenderingContext2D, st
     context.save();
         translateContextForAreaAndCamera(context, state, area);
         const spriteObjects: (EffectInstance | ObjectInstance)[] = [];
+        // Currently the jumping down logic uses hero y value to simulate a z value.
+        // Because of this, to render the hero in the correct order we need to pretend the
+        // y value is greater than it actually is. Otherwise they will be rendered behind
+        // things like door frames that they should be jumping in front of.
+        const heroY = (state.hero.action === 'jumpingDown' && state.hero.d === 'down')
+            ? state.hero.y + 32 : state.hero.y;
         for (const object of area.objectsToRender) {
             if ((object.drawPriority === 'sprites' || object.getDrawPriority?.(state) === 'sprites')
-                && object.y > state.hero.y
+                && object.y > heroY
             ) {
                 if (object.render) {
                     spriteObjects.push(object);

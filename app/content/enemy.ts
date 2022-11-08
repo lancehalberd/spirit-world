@@ -18,16 +18,18 @@ import {
     ObjectInstance, ObjectStatus, Rect, TileBehaviors,
 } from 'app/types';
 
+interface EnemyAbilityWithCharges {
+    definition: EnemyAbility<any>
+    cooldown: number
+    charges: number
+}
+
 export class Enemy implements Actor, ObjectInstance {
     type = 'enemy' as 'enemy';
     behaviors: TileBehaviors;
     isObject = <const>true;
     action: Action = null;
-    abilities: {
-        definition: EnemyAbility<any>
-        cooldown: number
-        charges: number
-    }[] = [];
+    abilities: EnemyAbilityWithCharges[] = [];
     activeAbility: EnemyAbilityInstance<any>;
     area: AreaInstance;
     drawPriority: DrawPriority = 'sprites';
@@ -128,8 +130,8 @@ export class Enemy implements Actor, ObjectInstance {
         for (const ability of this.enemyDefinition.abilities ?? []) {
             this.abilities.push({
                 definition: ability,
-                charges: ability.initialCharges,
-                cooldown: ability.cooldown,
+                charges: ability.initialCharges || 1,
+                cooldown: ability.cooldown || 0,
             });
         }
     }
@@ -385,35 +387,34 @@ export class Enemy implements Actor, ObjectInstance {
         for (const ability of chargedAbilities) {
             const target = ability.definition.getTarget(state, this);
             if (target) {
-                ability.charges--;
-                this.activeAbility = {
-                    definition: ability.definition,
-                    target,
-                    time: 0,
-                };
+                this.useAbility(state, ability, target);
                 return;
             }
         }
     }
-    useAbility(state: GameState, definition: EnemyAbility<any>): boolean {
+    tryUsingAbility(state: GameState, definition: EnemyAbility<any>): boolean {
         if (this.activeAbility) {
             return false;
         }
         const ability = this.abilities.find(a => a.definition === definition);
-        if (!ability) {
+        if (!ability || !(ability.charges > 0)) {
             return false;
         }
         const target = ability.definition.getTarget(state, this);
         if (!target) {
             return false;
         }
+        this.useAbility(state, ability, target);
+        return true;
+    }
+    useAbility(state: GameState, ability: EnemyAbilityWithCharges, target: any) {
         ability.charges--;
         this.activeAbility = {
             definition: ability.definition,
             target,
             time: 0,
         };
-        return true;
+        ability.definition.prepareAbility?.(state, this, target);
     }
     update(state: GameState) {
         if (this.status === 'gone') {
@@ -438,10 +439,10 @@ export class Enemy implements Actor, ObjectInstance {
         this.modeTime += FRAME_LENGTH;
         this.animationTime += FRAME_LENGTH;
         for (const ability of this.abilities) {
-            if (ability.charges < ability.definition.charges) {
+            if (ability.charges < (ability.definition.charges || 1)) {
                 ability.cooldown -= FRAME_LENGTH;
                 if (ability.cooldown <= 0) {
-                    ability.cooldown = ability.definition.cooldown
+                    ability.cooldown = (ability.definition.cooldown || 0)
                     ability.charges++;
                 }
             }
