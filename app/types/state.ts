@@ -2,7 +2,7 @@ import { Staff } from 'app/content/objects/staff';
 
 import {
     ActiveScriptEvent, AreaGrid, AreaInstance,
-    Frame, Floor, Hero, LootData, SavedHeroData, Rect, ScriptEvent,
+    Floor, Hero, LootData, SavedHeroData, Rect, ScriptEvent, TextPage,
     Zone, ZoneLocation,
 } from 'app/types';
 
@@ -119,7 +119,7 @@ export interface GameState {
         mostRecentKeysPressed: Set<number>
         gameKeysReleased: Set<number>
     },
-    messagePage?: Frame[][]
+    messagePage?: TextPage
     randomizer?: {
         seed: number
         goal: number

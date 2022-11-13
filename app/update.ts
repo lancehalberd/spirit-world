@@ -66,7 +66,7 @@ export function update() {
         if (wasGameKeyPressed(state, GAME_KEY.MENU)) {
             // Don't allow pausing while dialogue is displayed.
             if (state.paused ||
-                !(state.messagePage?.length || state.defeatState.defeated || state.scriptEvents.blockFieldUpdates)
+                !(state.messagePage?.frames?.length || state.defeatState.defeated || state.scriptEvents.blockFieldUpdates)
             ) {
                 state.paused = !state.paused;
                 state.menuIndex = 0;

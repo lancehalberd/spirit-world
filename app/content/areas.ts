@@ -907,7 +907,7 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
             if (object.specialBehaviorKey) {
                 const instance = area.objects.find(o => o.definition === object);
                 if (instance) {
-                    specialBehaviorsHash[instance.definition.specialBehaviorKey].apply(state, instance as any);
+                    specialBehaviorsHash[instance.definition.specialBehaviorKey].apply?.(state, instance as any);
                 }
             }
             continue;
@@ -920,7 +920,7 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
                 addObjectToArea(state, area, instance);
             } else if (instance) {
                 if (instance.definition.specialBehaviorKey) {
-                    specialBehaviorsHash[instance.definition.specialBehaviorKey].apply(state, instance as any);
+                    specialBehaviorsHash[instance.definition.specialBehaviorKey].apply?.(state, instance as any);
                 }
             }
         } else {
@@ -1034,7 +1034,7 @@ export function addObjectToArea(state: GameState, area: AreaInstance, object: Ob
 
     if (object.definition?.specialBehaviorKey) {
         try {
-            specialBehaviorsHash[object.definition.specialBehaviorKey].apply(state, object as any);
+            specialBehaviorsHash[object.definition.specialBehaviorKey].apply?.(state, object as any);
         } catch (error) {
             console.error(object.definition.specialBehaviorKey);
         }

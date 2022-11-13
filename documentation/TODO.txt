@@ -42,14 +42,16 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Add initial rival fight
-        - Rival guards the tomb
-        - Rival is angered when you hit one of the switches.
-            - Will also be mad about you stealing the bow if you have it.
-        - If you are defeated, the elder may save you if you didn't steal the bow, otherwise it is game over.
-        - Fights with a bo staff
-        - Rolls from place to place
-        - Maybe has a defensive position where he dodges and counter attacks if you attack him
+    - Smooth transition to cutscene
+        - Add ability to disable player input+actions without stopping all field updates
+            - Use this to run the field for ~1 second on player defeat to let actions clear up like:
+                screen shake, player knocked, attack effects
+            - Confirm rival does not start new attacks during this time.
+                - Eventually maybe script the rival preparing an attack during this time that the elder interrupts.
+    - Clear script events/messages/screen shakes when moving to a new state from context menu.
+
+    - Add some speaker name so it is clear who is talking in cut scenes with multiple characters.
+        - Add this to cut scene with Elder+Rival
 
     - Add "openLogic" field to doors
         - When set and logic is true, door overrides as being open.

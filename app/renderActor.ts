@@ -165,7 +165,11 @@ export function getHeroFrame(state: GameState, hero: Hero): Frame {
             if (hero.swimming) {
                 animations = heroSwimAnimations.idle;
             } else {
-                animations = hero.wading ? heroShallowAnimations.idle : heroAnimations.idle;
+                if (hero.life < 1) {
+                    animations = heroAnimations.kneel;
+                } else {
+                    animations = hero.wading ? heroShallowAnimations.idle : heroAnimations.idle;
+                }
             }
     }
     return getFrame(animations[hero.d], hero.animationTime);

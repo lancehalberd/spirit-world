@@ -172,6 +172,8 @@ export interface Hero extends Actor, SavedHeroData {
 
 export interface SavedHeroData {
     maxLife: number
+    // If this isn't set, the hero will start with maxLife.
+    life?: number
     hasRevive: boolean
     money: number
     silverOre: number

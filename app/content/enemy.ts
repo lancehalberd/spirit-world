@@ -7,15 +7,16 @@ import { bossDeathExplosionAnimation, enemyDeathAnimation } from 'app/content/en
 import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { drawFrame, getFrame } from 'app/utils/animations';
+import { getDirection } from 'app/utils/field';
 import { playSound } from 'app/musicController';
 import { renderEnemyShadow } from 'app/renderActor';
 import Random from 'app/utils/Random';
 
 import {
-    Action, Actor, AreaInstance, BossObjectDefinition, Direction, DrawPriority,
+    Action, Actor, AreaInstance, BossObjectDefinition, Direction, DrawPriority, EffectInstance,
     EnemyAbility, EnemyAbilityInstance, EnemyDefinition, EnemyObjectDefinition,
     Frame, FrameAnimation, GameState, HitProperties, HitResult,
-    ObjectInstance, ObjectStatus, Rect, TileBehaviors,
+    ObjectInstance, ObjectStatus, Point, Rect, TileBehaviors,
 } from 'app/types';
 
 interface EnemyAbilityWithCharges {
@@ -78,6 +79,7 @@ export class Enemy implements Actor, ObjectInstance {
     // Used to control animation of the healthBar for bosses.
     // This will be incremented each frame, but a boss can reset it to 0 on update to hide the
     // healthbar.
+    // There is a 100ms grace period before the bar is displayed at all.
     healthBarTime = 0;
     params: any;
     enemyInvulnerableFrames = 0;
@@ -149,6 +151,22 @@ export class Enemy implements Actor, ObjectInstance {
             w: (frame.content?.w ?? frame.w) * this.scale,
             h: (frame.content?.h ?? frame.h) * this.scale,
         };
+    }
+    distanceToPoint(p: Point): number {
+        const hitbox = this.getHitbox();
+        const dx = hitbox.x + hitbox.w / 2 - p[0];
+        const dy = hitbox.y + hitbox.h / 2 - p[1];
+        return Math.sqrt(dx * dx + dy *dy);
+    }
+    faceTarget(target?: ObjectInstance | EffectInstance): void {
+        if (!target) {
+            return;
+        }
+        const hitbox = this.getHitbox();
+        const targetHitbox = target.getHitbox();
+        const dx = targetHitbox.x + targetHitbox.w / 2 - (hitbox.x + hitbox.w / 2);
+        const dy = targetHitbox.y + targetHitbox.h / 2 - (hitbox.y + hitbox.h / 2);
+        this.d = getDirection(dx, dy);
     }
     isInCurrentSection(state: GameState): boolean {
         const { section } = getAreaSize(state);
@@ -392,9 +410,14 @@ export class Enemy implements Actor, ObjectInstance {
             }
         }
     }
+    getAbility(definition: EnemyAbility<any>): EnemyAbilityWithCharges {
+        return this.abilities.find(a => a.definition === definition);
+    }
     tryUsingAbility(state: GameState, definition: EnemyAbility<any>): boolean {
         if (this.activeAbility) {
-            return false;
+            if (this.activeAbility.definition.cannotBeCanceled || !definition.cancelsOtherAbilities) {
+                return false;
+            }
         }
         const ability = this.abilities.find(a => a.definition === definition);
         if (!ability || !(ability.charges > 0)) {
@@ -439,11 +462,16 @@ export class Enemy implements Actor, ObjectInstance {
         this.modeTime += FRAME_LENGTH;
         this.animationTime += FRAME_LENGTH;
         for (const ability of this.abilities) {
+            // Abilities don't gain charges while in use.
+            if (this.activeAbility?.definition === ability.definition) {
+                continue;
+            }
             if (ability.charges < (ability.definition.charges || 1)) {
                 ability.cooldown -= FRAME_LENGTH;
                 if (ability.cooldown <= 0) {
                     ability.cooldown = (ability.definition.cooldown || 0)
-                    ability.charges++;
+                    ability.charges += (ability.definition.chargesRecovered || 1);
+                    ability.charges = Math.min(ability.charges, ability.definition.charges || 1);
                 }
             }
         }

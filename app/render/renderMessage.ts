@@ -6,7 +6,7 @@ import { fillRect, pad } from 'app/utils/index';
 
 import { prependScript } from 'app/scriptEvents';
 
-import { Frame, GameState, ShowChoiceBoxActiveScriptEvent, TextScript } from 'app/types';
+import { Frame, GameState, ShowChoiceBoxActiveScriptEvent, TextPage, TextScript } from 'app/types';
 
 const characterWidth = 8;
 const messageWidth = 160;
@@ -81,20 +81,29 @@ export function showMessage(
     prependScript(state, `${textScriptToString(state, message)}{clearTextBox}{wait:200}`);
 }
 
-export function parseMessage(state: GameState, message: TextScript, maxWidth = messageWidth): Frame[][][] {
-    let pages: Frame[][][] = [];
-    let currentPage: Frame[][] = [];
-    let row: Frame[] = [];
+export function parseMessage(state: GameState, message: TextScript, maxWidth = messageWidth): TextPage[] {
+    let pages: TextPage[] = [];
+    let currentPage: TextPage = {
+        textRows: [],
+        frames: [],
+    };
+    let rowText: string = ''
+    let rowFrames: Frame[] = [];
     let rowWidth = 0;
     let rowNeedsSpace = false;
     const nextRow = () => {
-        if (row.length) {
-            currentPage.push(row);
-            if (currentPage.length >= messageRows) {
+        if (rowText.length) {
+            currentPage.textRows.push(rowText);
+            currentPage.frames.push(rowFrames);
+            if (currentPage.frames.length >= messageRows) {
                 pages.push(currentPage);
-                currentPage = [];
+                currentPage = {
+                    textRows: [],
+                    frames: [],
+                };
             }
-            row = [];
+            rowFrames = [];
+            rowText = '';
             rowWidth = 0;
         }
         rowNeedsSpace = false;
@@ -111,16 +120,18 @@ export function parseMessage(state: GameState, message: TextScript, maxWidth = m
                 // Extra character is included here for the space before this word.
                 const addedWidth = stringToken.length * characterWidth + characterWidth;
                 // Wrap to the next line if this string is too long to add to the end of this row.
-                if (row.length && rowWidth + addedWidth > maxWidth) {
+                if (rowFrames.length && rowWidth + addedWidth > maxWidth) {
                     nextRow();
                 }
                 // Add a space before the next word if the row isn't empty.
-                if (row.length) {
-                    row.push(null);
+                if (rowFrames.length) {
+                    rowFrames.push(null);
+                    rowText += ' ';
                     rowWidth += characterWidth;
                 }
                 for (const c of stringToken) {
-                    row.push(characterMap[c]);
+                    rowFrames.push(characterMap[c]);
+                    rowText += c;
                     rowWidth += characterMap[c].w;
                 }
                 rowNeedsSpace = true;
@@ -147,13 +158,15 @@ export function parseMessage(state: GameState, message: TextScript, maxWidth = m
                 if (rowWidth + tokenWidth > maxWidth) {
                     nextRow();
                 }
-                if (row.length && rowNeedsSpace) {
+                if (rowFrames.length && rowNeedsSpace) {
                     // Add a space before the next word if the row isn't empty.
-                    row.push(null);
+                    rowFrames.push(null);
+                    rowText += ' ';
                     rowWidth += characterWidth;
                 }
                 for (const frame of tokenFrames) {
-                    row.push(frame);
+                    rowFrames.push(frame);
+                    rowText += iconToken;
                     rowWidth += frame.w;
                 }
                 // We don't need a space between icons.
@@ -162,7 +175,7 @@ export function parseMessage(state: GameState, message: TextScript, maxWidth = m
         }
     }
     nextRow();
-    if (currentPage.length) {
+    if (currentPage.frames.length) {
         pages.push(currentPage);
     }
     return pages;
@@ -191,6 +204,9 @@ export function renderMessage(context: CanvasRenderingContext2D, state: GameStat
         w,
         h,
     };
+    if (state.hero.y - state.areaInstance.cameraOffset.y >= 128) {
+        r.y = 32;
+    }
     if (state.messagePage) {
         fillRect(context, pad(r, 2), 'white');
         fillRect(context, r, 'black');
@@ -198,7 +214,7 @@ export function renderMessage(context: CanvasRenderingContext2D, state: GameStat
         let x = r.x, y = r.y;
         // pages[pageIndex] can also be DialogueLootDefinition, but `pageIndex` should never
         // stop on a loot definition.
-        for (const row of state.messagePage) {
+        for (const row of state.messagePage.frames) {
             for (const frame of row) {
                 if (!frame) {
                     x += characterWidth;

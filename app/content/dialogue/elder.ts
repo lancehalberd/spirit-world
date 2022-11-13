@@ -1,7 +1,236 @@
+import { addObjectToArea, removeObjectFromArea } from 'app/content/areas';
+import { moveNPCToTargetLocation, NPC } from 'app/content/objects/npc';
+import { moveEnemyToTargetLocation } from 'app/content/enemies';
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
+import { FRAME_LENGTH } from 'app/gameConstants';
+import { appendCallback, appendScript, wait } from 'app/scriptEvents';
+
+import { saveGame } from 'app/state';
+
+import { Enemy, GameState } from 'app/types';
+
+function getElderNPC(state: GameState): NPC {
+    const elder = state.areaInstance.objects.find(t => t.definition?.id === 'elder') as NPC;
+    if (!elder) {
+        console.error('Could not find elder');
+    }
+    return elder;
+}
+
+
+function getRivalBoss(state: GameState): Enemy {
+    const rival = state.areaInstance.enemies.find(t => t.definition?.id === 'tombRivalBoss') as Enemy;
+    if (!rival) {
+        console.error('Could not find tombRivalBoss');
+    }
+    return rival;
+}
 
 dialogueHash.elder = {
     key: 'elder',
+    mappedOptions: {
+        tombRescue: (state: GameState) => {
+            const elderNpc = new NPC({
+                id: 'elder',
+                status: 'normal',
+                x: 64,
+                y: 256,
+                type: 'npc',
+                behavior: 'none',
+                style: 'vanaraGray',
+                d: 'up',
+            });
+            elderNpc.speed = 1.5;
+            addObjectToArea(state, state.hero.area, elderNpc);
+            state.savedState.objectFlags.tombRivalRescued = true;
+            state.hero.action = null;
+            state.scriptEvents.blockFieldUpdates = true;
+            state.scriptEvents.handledInput = true;
+            state.hero.invulnerableFrames = 0;
+            state.hero.z = 0;
+            state.hero.vx = state.hero.vy = state.hero.vz = 0;
+            state.screenShakes = [];
+            const rival = getRivalBoss(state);
+            if (rival) {
+                rival.activeAbility = null;
+                rival.z = 0;
+                rival.healthBarTime = -10000;
+                rival.invulnerableFrames = 0;
+                // Remove any attack effects on defeat.
+                rival.area.effects = rival.area.effects.filter(effect => !effect.isEnemyAttack);
+                rival.changeToAnimation('idle');
+            }
+            saveGame();
+            appendCallback(state, (state: GameState) => {
+                state.scriptEvents.activeEvents.push({
+                    type: 'update',
+                    update(state: GameState): boolean {
+                        const elder = getElderNPC(state);
+                        if (!elder) {
+                            return false;
+                        }
+                        elder.animationTime += FRAME_LENGTH;
+                        if (moveNPCToTargetLocation(state, elder, 64, 208, 'move')) {
+                            return true;
+                        }
+                        elder.changeToAnimation('idle');
+                    },
+                });
+                state.scriptEvents.activeEvents.push({
+                    type: 'update',
+                    update(state: GameState): boolean {
+                        const rival = getRivalBoss(state);
+                        if (!rival) {
+                            return false;
+                        }
+                        rival.animationTime += FRAME_LENGTH;
+                        if (moveEnemyToTargetLocation(state, rival, 64, 176, 'move')) {
+                            return true;
+                        }
+                        rival.d = 'down';
+                        rival.changeToAnimation('idle');
+                        return false;
+                    },
+                });
+                state.scriptEvents.activeEvents.push({
+                    type: 'update',
+                    update(state: GameState): boolean {
+                        state.hero.animationTime += FRAME_LENGTH;
+                        if (state.hero.x < 96) {
+                            state.hero.action = 'walking';
+                            state.hero.d = 'right';
+                            state.hero.x += 2;
+                            if (state.hero.y >= 200) {
+                                state.hero.y--;
+                            }
+                            return true;
+                        }
+                        if (state.hero.y >= 200) {
+                            state.hero.action = 'walking';
+                            state.hero.d = 'up';
+                            state.hero.y -= 2;
+                            return true;
+                        }
+                        state.hero.d = 'left';
+                        state.hero.action = null;
+                        return false;
+                    },
+                });
+                state.scriptEvents.activeEvents.push({
+                    type: 'wait',
+                    time: 0,
+                    waitingOnActiveEvents: true,
+                    // Make sure the fight doesn't continue during this cutscene.
+                    blockFieldUpdates: true,
+                });
+                appendScript(state, `Elder, they were trying to break into our sacred burial grounds!`);
+                state.scriptEvents.queue.push({
+                    type: 'callback',
+                    callback(state: GameState) {
+                        const elder = getElderNPC(state);
+                        if (!elder) {
+                            return false;
+                        }
+                        elder.d = (elder.x < state.hero.x) ? 'right' : 'left';
+                        elder.changeToAnimation('idle');
+                    }
+                });
+                for (let i = 0; i < 3; i++) {
+                    wait(state, 500);
+                    state.scriptEvents.queue.push({
+                        type: 'callback',
+                        callback(state: GameState) {
+                            state.hero.life++;
+                            state.scriptEvents.blockFieldUpdates = true;
+                        }
+                    });
+                }
+                wait(state, 500);
+                state.scriptEvents.queue.push({
+                    type: 'callback',
+                    callback(state: GameState) {
+                        const elder = getElderNPC(state);
+                        if (!elder) {
+                            return false;
+                        }
+                        elder.d = 'up';
+                        elder.changeToAnimation('idle');
+                    }
+                });
+                // We probably
+                appendScript(state, `Saru, you know you aren't supposed to use lethal force.
+                    {|}You should have come to me instead of fighting.`);
+                appendScript(state, `But...!`);
+                appendScript(state, `If you asked me you would know that they came with my blessing.`);
+                wait(state, 500);
+                state.scriptEvents.queue.push({
+                    type: 'callback',
+                    callback(state: GameState) {
+                        const elder = getElderNPC(state);
+                        if (!elder) {
+                            return false;
+                        }
+                        elder.d = (elder.x < state.hero.x) ? 'right' : 'left';
+                        elder.changeToAnimation('idle');
+                    }
+                });
+                appendScript(state, `Child, I appologize, I should have told Saru you would be coming.`);
+                state.scriptEvents.queue.push({
+                    type: 'callback',
+                    callback(state: GameState) {
+                        const elder = getElderNPC(state);
+                        if (!elder) {
+                            return false;
+                        }
+                        elder.d = 'up';
+                        elder.changeToAnimation('idle');
+                    }
+                });
+                appendScript(state, `Saru, come with me back to the village and I will explain everything.`);
+
+                appendCallback(state, (state: GameState) => {
+                    state.scriptEvents.activeEvents.push({
+                        type: 'update',
+                        update(state: GameState): boolean {
+                            const elder = getElderNPC(state);
+                            if (!elder) {
+                                return false;
+                            }
+                            elder.animationTime += FRAME_LENGTH;
+                            if (moveNPCToTargetLocation(state, elder, 64, 300, 'move')) {
+                                return true;
+                            }
+                            removeObjectFromArea(state, elder);
+                            return false;
+                        },
+                    });
+                    state.scriptEvents.activeEvents.push({
+                        type: 'update',
+                        update(state: GameState): boolean {
+                            const rival = getRivalBoss(state);
+                            if (!rival) {
+                                return false;
+                            }
+                            rival.animationTime += FRAME_LENGTH;
+                            if (moveEnemyToTargetLocation(state, rival, 64, 288, 'move')) {
+                                return true;
+                            }
+                            removeObjectFromArea(state, rival);
+                            return false;
+                        },
+                    });
+                    state.scriptEvents.activeEvents.push({
+                        type: 'wait',
+                        time: 0,
+                        waitingOnActiveEvents: true,
+                        // Make sure the fight doesn't continue during this cutscene.
+                        blockFieldUpdates: true,
+                    });
+                });
+            });
+            return `That's enough!`;
+        },
+    },
     options: [
         {
             logicCheck: {
@@ -27,9 +256,10 @@ dialogueHash.elder = {
             isExclusive: true,
             text: [
                 `I see you decided to help yourself to my family heirloom.`,
-                `You can use the Spirit Bow to enter the Vanara Tomb to the north.`,
+                `You can use the Spirit Bow to enter the Vanara Tomb to the north.{flag:elderTomb}`,
             ],
-            notes: `If you take the bow without asking, he won't help you during the rival fight.`
+            notes: `The elder won't help you with the rival fight until you listen to the line where they tell you
+                    to visit the tomb`,
         },
         {
             logicCheck: {

@@ -11,6 +11,7 @@ import {
     wasGameKeyPressedAndReleased, wasGameKeyPressed
 } from 'app/keyCommands';
 import { checkForFloorEffects } from 'app/moveActor';
+import { prependScript } from 'app/scriptEvents';
 import { updateHeroSpecialActions } from 'app/updateHeroSpecialActions';
 import { updateHeroStandardActions } from 'app/updateHeroStandardActions';
 import {
@@ -167,21 +168,29 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
         }
     }
     if (hero.life <= 0) {
-        hero.life = 0;
-        hero.action = null;
-        hero.chargeTime = 0;
-        state.defeatState = {
-            defeated: true,
-            time: 0,
-        };
-        if (hero.heldChakram) {
-            removeEffectFromArea(state, hero.heldChakram);
-            delete hero.heldChakram;
+        if (hero.area.enemies.find(enemy => enemy.definition.id === 'tombRivalBoss')
+            && state.savedState.objectFlags.elderTomb
+        ) {
+            hero.life = 0.01;
+            // The elder rescues you from defeat by the rival if certain conditions are met.
+            prependScript(state, '{@elder.tombRescue}');
+        } else {
+            hero.life = 0;
+            hero.action = null;
+            hero.chargeTime = 0;
+            state.defeatState = {
+                defeated: true,
+                time: 0,
+            };
+            if (hero.heldChakram) {
+                removeEffectFromArea(state, hero.heldChakram);
+                delete hero.heldChakram;
+            }
+            if (state.hero.hasRevive) {
+                state.reviveTime = state.fieldTime;
+            }
+            state.menuIndex = 0;
         }
-        if (state.hero.hasRevive) {
-            state.reviveTime = state.fieldTime;
-        }
-        state.menuIndex = 0;
     }
     if (state.hero.isInvisible) {
         state.hero.actualMagicRegen = Math.max(-20, state.hero.actualMagicRegen - 4 * FRAME_LENGTH / 1000);

@@ -135,6 +135,13 @@ function getAssistanceMenuOption(): MenuOption {
                     }
                 },
                 {
+                    label: 'Low Life',
+                    onSelect() {
+                        const state = getState();
+                        state.hero.life = 0.25;
+                    }
+                },
+                {
                     label: '200 Jade',
                     onSelect() {
                         const state = getState();

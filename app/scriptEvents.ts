@@ -16,8 +16,24 @@ import { playSound } from 'app/musicController';
 import { saveGame } from 'app/state';
 
 import {
-    ActiveScriptEvent, Frame, GameState, LootType, ScriptEvent, TextScript
+    ActiveScriptEvent, GameState, LootType, ScriptEvent, TextScript
 } from 'app/types';
+
+export function wait(state: GameState, duration: number) {
+    state.scriptEvents.queue.push({
+        type: 'wait',
+        duration: 500,
+        blockFieldUpdates: true,
+    });
+}
+
+
+export function appendCallback(state: GameState, callback: (state: GameState) => void) {
+    state.scriptEvents.queue.push({
+        type: 'callback',
+        callback,
+    });
+}
 
 // Clears all current script events and queues up events parsed from the new script.
 export function setScript(state: GameState, script: TextScript): void {
@@ -36,9 +52,17 @@ export function prependScript(state: GameState, script: TextScript): void {
     // console.log('prependScript', [...state.scriptEvents.queue]);
 }
 
+export function appendScript(state: GameState, script: TextScript): void {
+    state.scriptEvents.queue = [
+        ...state.scriptEvents.queue,
+        ...parseEventScript(state, script),
+    ];
+    // console.log('prependScript', [...state.scriptEvents.queue]);
+}
+
 export function parseScriptText(state: GameState, text: TextScript, duration: number = 0, blockFieldUpdates = true): ScriptEvent[] {
     const events: ScriptEvent[] = [];
-    const pages = parseMessage(state, text) as Frame[][][];
+    const pages = parseMessage(state, text);
     for (const page of pages) {
         events.push({
             type: 'showTextBox',
@@ -241,10 +265,21 @@ export const updateScriptEvents = (state: GameState): void => {
     state.scriptEvents.blockFieldUpdates = false;
     state.scriptEvents.handledInput = false;
     const activeEvents: ActiveScriptEvent[] = [];
+    let activeEventCountSinceLastWaitEvent = 0;
     for (const event of state.scriptEvents.activeEvents) {
         switch (event.type) {
+            case 'update': {
+                // This event will continue running until the update returns false.
+                if (event.update(state)) {
+                    activeEvents.push(event);
+                }
+                break;
+            }
             case 'wait': {
                 if (event.duration && state.time - event.time >= event.duration) {
+                    break;
+                }
+                if (event.waitingOnActiveEvents && !activeEventCountSinceLastWaitEvent) {
                     break;
                 }
                 let finished = false;
@@ -284,6 +319,11 @@ export const updateScriptEvents = (state: GameState): void => {
                 activeEvents.push(event);
                 break;
         }
+        if (event.type !== 'wait') {
+            activeEventCountSinceLastWaitEvent++;
+        } else {
+            activeEventCountSinceLastWaitEvent = 0;
+        }
     }
     state.scriptEvents.activeEvents = activeEvents;
     // Do not process the event queue if there is an active blocking event.
@@ -294,6 +334,9 @@ export const updateScriptEvents = (state: GameState): void => {
         const event = state.scriptEvents.queue.shift();
         //console.log('Running event', event.type, event);
         switch (event.type) {
+            case 'callback':
+                event.callback(state);
+                return;
             case 'wait':
                 state.scriptEvents.activeEvents.push({
                     ...event,

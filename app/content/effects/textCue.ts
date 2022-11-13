@@ -29,7 +29,7 @@ export class TextCue implements EffectInstance {
     duration: number;
     constructor(state, { duration = 3000, text }: TextCueProps) {
         // TextCue only supports a single page of messages.
-        this.textFrames = parseMessage(state, text, CANVAS_WIDTH - 2 * padding)[0];
+        this.textFrames = parseMessage(state, text, CANVAS_WIDTH - 2 * padding)[0].frames;
         this.duration = duration;
     }
     update(state: GameState) {

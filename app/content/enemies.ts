@@ -81,6 +81,10 @@ export interface EnemyAbility<T> {
     prepTime?: number
     // Delay after the enemy uses the ability before it can use a new ability. Defaults to 0.
     recoverTime?: number
+    // If true this ability can be used in the middle of other abilities, canceling them.
+    cancelsOtherAbilities?: boolean
+    // If true thisa bility cannot be canceled by other abilities.
+    cannotBeCanceled?: boolean
 }
 
 // A particular instance of an enemy using an ability. This is stored
@@ -983,6 +987,10 @@ export const enemyFallAnimation: FrameAnimation = createAnimation('gfx/effects/e
 
 
 export function checkForFloorEffects(state: GameState, enemy: Enemy) {
+    // If the enemy is removed from the area during custom update logic, this check no longer applies.
+    if (!enemy.area) {
+        return;
+    }
     const behaviorGrid = enemy.area.behaviorGrid;
     const tileSize = 16;
 

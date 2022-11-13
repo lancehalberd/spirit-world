@@ -4,12 +4,13 @@ import {
     getObjectStatus,
     saveObjectStatus,
 } from 'app/content/objects';
+import { specialBehaviorsHash } from 'app/content/specialBehaviors';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 
 import {
     AreaInstance, CrystalSwitchDefinition, DrawPriority, GameState,
-    HitProperties, HitResult, ObjectInstance, ObjectStatus, Rect,
+    HitProperties, HitResult, ObjectInstance, ObjectStatus, Rect, SpecialSwitchBehavior,
 } from 'app/types';
 
 const crystalGeometry = {w: 16, h: 20, content: {x: 0, y: 4, w: 16, h: 16, }};
@@ -61,6 +62,10 @@ export class CrystalSwitch implements ObjectInstance {
         this.behaviors.brightness = 1;
         this.behaviors.lightRadius = 32;
         checkIfAllSwitchesAreActivated(state, this.area, this);
+        if (this.definition.specialBehaviorKey) {
+            const specialBehavior = specialBehaviorsHash[this.definition.specialBehaviorKey] as SpecialSwitchBehavior;
+            specialBehavior?.onActivate(state, this);
+        }
         if (this.linkedObject) {
             this.linkedObject.status = 'active';
             this.linkedObject.animationTime = 0;

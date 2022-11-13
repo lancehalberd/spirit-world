@@ -875,6 +875,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             rows.push({
                 name: 'timer',
                 value: object.timer,
+                inputClass: 'large',
                 onChange(timer: number) {
                     object.timer = timer;
                     updateObjectInstance(state, object);
@@ -1242,10 +1243,10 @@ export function fixObjectPosition(state: GameState, object: ObjectDefinition): v
         //object.y = Math.round(object.y / 8) * 8;
         return;
     }
-    // Default behavior is to snap to grid.
+    // Default behavior is to snap to half grid.
     if (object.type !== 'loot') {
-        object.x = Math.round(object.x / 16) * 16;
-        object.y = Math.round(object.y / 16) * 16;
+        object.x = Math.round(object.x / 8) * 8;
+        object.y = Math.round(object.y / 8) * 8;
     }
 
 }

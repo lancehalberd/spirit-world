@@ -383,12 +383,14 @@ const peachBossState = applyItems(defaultSavedState, {weapon: 1, money: 50, seco
 const peachCaveExitState = applyItems(peachBossState, {maxLife: 1, catEyes: 1},
     ['peachCave:boss', 'peachCave:fullPeach', 'homeInstructions']
 );
-const tombStartState = applyItems(peachCaveExitState, {bow: 1},
-    ['treeVillage:1:0x0-bow-0', 'closedBowDoor', 'elderTomb', 'tombEntrance']
+const tombRivalState = applyItems(peachCaveExitState, {bow: 1},
+    ['treeVillage:1:0x0-bow-0', 'closedBowDoor', 'elderTomb']
 );
-tombStartState.savedHeroData.leftTool = 'bow';
-const tombRivalState = applyItems(tombStartState, {bow: 1},
-    ['testTombRival']
+tombRivalState.savedHeroData.leftTool = 'bow';
+const tombRivalDefeatState = applyItems(tombRivalState, {}, ['tombRivalEnraged']);
+tombRivalDefeatState.savedHeroData.life = 0.25;
+const tombStartState = applyItems(tombRivalState, {},
+    ['tombEntrance', 'enteredTomb']
 );
 const tombBossState = applyItems(tombStartState, {roll: 1, 'tomb:bigKey': 1, silverOre: 1},
     ['tombKey1', 'tombKey2', 'tombBigKey', 'tomb:1:1x0-roll-0']
@@ -472,6 +474,10 @@ const earlySpawnLocations: SpawnLocationOptions = {
     'Rival Fight': {
         location: SPAWN_LOCATION_TOMB_RIVAL,
         savedState: tombRivalState,
+    },
+    'Rival Defeat': {
+        location: SPAWN_LOCATION_TOMB_RIVAL,
+        savedState: tombRivalDefeatState,
     },
     'Tomb Start': {
         location: SPAWN_LOCATION_TOMB_ENTRANCE,
@@ -620,6 +626,9 @@ function getSpawnLocationOptions(spawnLocations: SpawnLocationOptions, useSavedS
                 }
                 setSpawnLocation(state, spawnLocations[name].location);
                 returnToSpawnLocation(state);
+                if (spawnLocations[name].savedState.savedHeroData.life) {
+                    state.hero.life = spawnLocations[name].savedState.savedHeroData.life;
+                }
                 state.scene = 'game';
             }
         }

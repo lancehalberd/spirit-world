@@ -19,7 +19,7 @@ import {
 import { shadowFrame, smallShadowFrame } from 'app/renderActor';
 import { showMessage } from 'app/render/renderMessage';
 import { drawFrame, getFrame } from 'app/utils/animations';
-import { directionMap, rotateDirection } from 'app/utils/field';
+import { directionMap, getDirection, rotateDirection } from 'app/utils/field';
 
 import {
     Actor, ActorAnimations, AreaInstance, GameState, DialogueOption, Direction,
@@ -59,6 +59,10 @@ export const npcStyles = {
     } as NPCStyleDefinition,
     mom: {
         animations: momAnimations,
+        shadowOffset: 1,
+    } as NPCStyleDefinition,
+    rival: {
+        animations: vanaraBlackAnimations,
         shadowOffset: 1,
     } as NPCStyleDefinition,
     paleMonk: {
@@ -112,7 +116,10 @@ export const npcStyles = {
 };
 
 export const npcBehaviors = {
-    none(state: GameState, npc: NPC) {
+    none() {
+        // Do nothing for this behavior.
+    },
+    face(state: GameState, npc: NPC) {
         // Always update to face original direction.
         npc.d = npc.definition.d || 'down';
         npc.changeToAnimation('still');
@@ -174,13 +181,15 @@ export const npcBehaviors = {
 
 function moveNPC(state, npc: NPC, dx, dy, movementProperties: MovementProperties): boolean {
     const { section } = getAreaSize(state);
-    // Don't allow the enemy to move towards the outer edges of the screen.
-    if ((dx < 0 && npc.x + dx < section.x + 16)
-        || (dx > 0 && npc.x + dx + npc.w > section.x + section.w - 16)
-        || (dy < 0 && npc.y < section.y + 16)
-        || (dy > 0 && npc.y + npc.h > section.y + section.h - 16)
-    ) {
-        return false;
+    // By default, don't allow the enemy to move towards the outer edges of the screen.
+    if (movementProperties.boundToSection ?? true) {
+        if ((dx < 0 && npc.x + dx < section.x + 16)
+            || (dx > 0 && npc.x + dx + npc.w > section.x + section.w - 16)
+            || (dy < 0 && npc.y < section.y + 16)
+            || (dy > 0 && npc.y + npc.h > section.y + section.h - 16)
+        ) {
+            return false;
+        }
     }
     if (npc.flying) {
         npc.x += dx;
@@ -189,6 +198,30 @@ function moveNPC(state, npc: NPC, dx, dy, movementProperties: MovementProperties
     }
     const { mx, my } = moveActor(state, npc, dx, dy, movementProperties);
     return mx !== 0 || my !== 0;
+}
+
+export function moveNPCToTargetLocation(
+    state: GameState,
+    npc: NPC, tx: number, ty: number,
+    animationStyle?: string
+): number {
+    const hitbox = npc.getHitbox(state);
+    const dx = tx - (hitbox.x + hitbox.w / 2), dy = ty - (hitbox.y + hitbox.h / 2);
+    if (animationStyle) {
+        npc.d = getDirection(dx, dy);
+        npc.changeToAnimation(animationStyle)
+    }
+    //enemy.currentAnimation = enemy.enemyDefinition.animations.idle[enemy.d];
+    const mag = Math.sqrt(dx * dx + dy * dy);
+    if (mag > npc.speed) {
+        moveNPC(state, npc, npc.speed * dx / mag, npc.speed * dy / mag, {
+            boundToSection: false,
+            boundToSectionPadding: 0,
+        });
+        return mag - npc.speed;
+    }
+    moveNPC(state, npc, dx, dy, {});
+    return 0;
 }
 
 export type NPCStyle = keyof typeof npcStyles;

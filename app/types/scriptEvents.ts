@@ -1,17 +1,37 @@
-import { Frame, LootData, ZoneLocation } from 'app/types';
+import { Frame, GameState, LootData, ZoneLocation } from 'app/types';
+
+
+export interface TextPage {
+    textRows: string[]
+    frames: Frame[][]
+}
 
 export interface ShowTextBoxScriptEvent {
     type: 'showTextBox'
-    textPage: Frame[][]
+    textPage: TextPage
 }
 export interface ClearTextBoxScriptEvent {
     type: 'clearTextBox'
 }
+// This event will cause a corresponding WaitActiveScriptEvent to be added to the active events.
+// It is used to stop other events from happening until certain conditions are met.
+// For example, to play a sequence of sound effects, simple wait events with short durations
+// can be added between each PlaySoundScriptEvent to spread them out.
+// In a tutorial event, the game can be frozen until the player presses a button indicated by
+// the tutorial instructions.
+// During a cut scene, active events can be run to perform simultaneous animations or other effects
+// and a wait event can be added to delay the next script until all existing animations complete
 export interface WaitScriptEvent {
     type: 'wait'
+    // Whether or not to block field updates while this event is active.
     blockFieldUpdates?: boolean
+    // If this is set the event is cleared after duration milliseconds.
     duration?: number
+    // Any game keys set here will clear this event.
     keys?: number[]
+    // If this is true, this wait will be cleared once there are no active script events
+    // between it and any other 'wait' events.
+    waitingOnActiveEvents?: boolean
 }
 export type WaitActiveScriptEvent = WaitScriptEvent & {
     time: number
@@ -31,6 +51,10 @@ export interface SetFlagScriptEvent {
     type: 'setFlag'
     flag: string
     value?: boolean | number | string
+}
+export interface CallbackScriptEvent {
+    type: 'callback'
+    callback: (state: GameState) => void
 }
 export interface ClearFlagScriptEvent {
     type: 'clearFlag'
@@ -97,9 +121,15 @@ export interface RemoveTextCueScriptEvent {
     type: 'removeTextCue'
 }
 
+export interface UpdateActiveScriptEvent {
+    type: 'update'
+    update: (state: GameState) => boolean
+}
+
 export type ScriptEvent
     = AddTextCueScriptEvent
     | AttemptPurchaseScriptEvent
+    | CallbackScriptEvent
     | ClearFlagScriptEvent
     | ClearTextBoxScriptEvent
     | EnterLocationScriptEvent
@@ -119,6 +149,7 @@ export type ScriptEvent
     ;
 
 export type ActiveScriptEvent
-    = ShowChoiceBoxActiveScriptEvent
+    = UpdateActiveScriptEvent
+    | ShowChoiceBoxActiveScriptEvent
     | WaitActiveScriptEvent
     ;

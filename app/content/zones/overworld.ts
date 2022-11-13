@@ -1451,8 +1451,8 @@ const f0_1x0: AreaDefinition = {
     ],
     objects: [
         {id: "tombEntrance", linked: false, spirit: false, status: "closedSwitch", x: 112, y: 80, type: "door", style: "cavern", targetZone: "tomb", targetObjectId: "tombEntrance", d: "up", saveStatus: "forever"},
-        {id: "overworld:0:0x1-crystalSwitch-0", linked: false, spirit: false, status: "normal", x: 192, y: 48, type: "crystalSwitch", targetObjectId: "tombEntrance", timer: 0, saveStatus: "forever"},
-        {id: "overworld:0:0x1-crystalSwitch-1", linked: false, spirit: false, status: "normal", x: 48, y: 48, type: "crystalSwitch", targetObjectId: "tombEntrance", timer: 0, saveStatus: "forever"},
+        {id: "tombSwitchB", linked: false, spirit: false, status: "normal", x: 192, y: 48, type: "crystalSwitch", targetObjectId: "tombEntrance", timer: 3000, saveStatus: "never", specialBehaviorKey: "tombEntranceSwitch"},
+        {id: "tombSwitchA", linked: false, spirit: false, status: "normal", x: 48, y: 48, type: "crystalSwitch", targetObjectId: "tombEntrance", timer: 3000, saveStatus: "never", specialBehaviorKey: "tombEntranceSwitch"},
         {status: "normal", id: "overworld:0:0x1-squirrel-0", x: 304, y: 64, type: "enemy", enemyType: "squirrel", d: "down", params: {}},
         {status: "normal", id: "overworld:0:0x1-snake-0", x: 160, y: 336, type: "enemy", enemyType: "snake", d: "down", params: {}},
         {status: "normal", id: "overworld:0:0x1-snake-1", x: 304, y: 336, type: "enemy", enemyType: "snake", d: "down", params: {}},
@@ -1472,7 +1472,8 @@ const f0_1x0: AreaDefinition = {
         {status: "normal", id: "", linked: true, x: 64, y: 176, type: "spawnMarker"},
         {status: "normal", id: "", linked: true, x: 176, y: 176, type: "spawnMarker"},
         {status: "normal", id: "", linked: true, x: 112, y: 128, type: "spawnMarker"},
-        {status: "normal", id: "tombRival", x: 128, y: 128, type: "boss", enemyType: "rival", lootType: "empty", lootAmount: 1, lootLevel: 1, d: "down", params: {}, hasCustomLogic: true, customLogic: "testTombRival"},
+        {status: "normal", id: "tombRivalBoss", x: 120, y: 112, type: "boss", enemyType: "rival", lootType: "empty", lootAmount: 1, lootLevel: 1, d: "down", params: {}, customLogic: "testTombRival", logicKey: "tombRivalBoss"},
+        {status: "normal", id: "tombRivalNpc", logicKey: "tombRivalNpc", x: 120, y: 112, d: "down", behavior: "none", style: "rival", type: "npc", dialogueKey: "rival"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},

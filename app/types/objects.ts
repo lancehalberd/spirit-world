@@ -46,7 +46,7 @@ export interface ObjectInstance {
     changeStatus?: (state: GameState, status: ObjectStatus) => void
     cleanup?: (state: GameState) => void,
     // This is called when a user grabs a solid tile
-    getHitbox?: (state: GameState) => Rect
+    getHitbox?: (state?: GameState) => Rect
     // This will be used for the hitbox for the editor only if it is defined.
     getEditorHitbox?: (state: GameState) => Rect
     onActivate?: (state: GameState) => void
@@ -103,7 +103,7 @@ export interface EffectInstance {
     x?: number, y?: number, z?: number
     cleanup?: (state: GameState) => void
     // This is called when a user grabs a solid tile
-    getHitbox?: (state: GameState) => Rect
+    getHitbox?: (state?: GameState) => Rect
     onEnterArea?: (state: GameState) => void
     // When the hero hits the effect with a weapon or tool.
     // This is used by certain enemy attacks, but it might be better to change those to objects.
@@ -442,6 +442,13 @@ export interface SpecialSignBehavior {
     apply: (state: GameState, object: Sign) => void
 }
 
+export interface SpecialSwitchBehavior {
+    // This could be extended for floor switches and other switches.
+    type: 'crystalSwitch'
+    apply?: (state: GameState, object: ObjectInstance) => void
+    onActivate?: (state: GameState, object: ObjectInstance) => void
+}
+
 
 export interface SpecialAreaBehavior {
     type: 'area'
@@ -450,5 +457,6 @@ export interface SpecialAreaBehavior {
 
 export type SpecialBehavior
     = SpecialDoorBehavior
+    | SpecialSwitchBehavior
     | SpecialSignBehavior
     | SpecialAreaBehavior;

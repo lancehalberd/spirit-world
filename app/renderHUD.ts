@@ -92,7 +92,7 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
         y -= 16;
         x = 16;
         for (const boss of bosses) {
-            const animatedWidth = barWidth * Math.min(1, boss.healthBarTime / 1000);
+            const animatedWidth = barWidth * Math.max(0, Math.min(1, (boss.healthBarTime - 100) / 1000));
             context.fillStyle = 'black';
             context.fillRect(x, y, animatedWidth, barHeight);
             const healthWidth = animatedWidth * boss.getHealthPercent(state) | 0;

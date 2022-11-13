@@ -1,19 +1,26 @@
-import { playAreaSound } from 'app/content/areas';
+import { playAreaSound, removeObjectFromArea } from 'app/content/areas';
 import {
     getVectorToNearbyTarget,
+    isTargetVisible,
+    moveEnemy,
+    moveEnemyToTargetLocation,
 } from 'app/content/enemies';
+import { CrystalSpike } from 'app/content/effects/arrow';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { vanaraBlackAnimations } from 'app/render/npcAnimations';
 import { heroAnimations, staffAnimations } from 'app/render/heroAnimations';
+import { prependScript } from 'app/scriptEvents';
+import { saveGame } from 'app/state';
 import { drawFrameAt, getFrame } from 'app/utils/animations';
-import { hitTargets } from 'app/utils/field';
+import { directionMap, getDirection, hitTargets } from 'app/utils/field';
 
 
-import { Direction, Enemy, EnemyAbility, GameState, HitProperties, HitResult, Rect } from 'app/types';
+import { Direction, Enemy, EnemyAbility, GameState, HitProperties, HitResult, Point, Rect } from 'app/types';
 
 const rivalAnimations = {
     ...vanaraBlackAnimations,
+    kneel: heroAnimations.kneel,
     roll: heroAnimations.roll,
     staffJump: heroAnimations.staffJump,
     staffSlam: heroAnimations.staffSlam,
@@ -33,12 +40,17 @@ const rollAbility: EnemyAbility<RollTargetType> = {
         return getVectorToNearbyTarget(state, enemy, enemy.aggroRadius, enemy.area.allyTargets);
     },
     useAbility(this: void, state: GameState, enemy: Enemy, target: RollTargetType): void {
+        let theta = Math.atan2(target.y, target.x);
+        theta += (Math.random() < 0.5 ? 1 : -1) * Math.PI / 2;
+        enemy.d = getDirection(Math.cos(theta), Math.sin(theta), true);
         enemy.changeToAnimation('roll');
     },
-    cooldown: 2000,
-    initialCharges: 3,
-    charges: 3,
-    chargesRecovered: 3,
+    cooldown: 4000,
+    initialCharges: 2,
+    cancelsOtherAbilities: true,
+    cannotBeCanceled: true,
+    charges: 2,
+    chargesRecovered: 2,
     prepTime: 0,
     recoverTime: rollSpeed.length * FRAME_LENGTH,
 };
@@ -46,35 +58,57 @@ const rollAbility: EnemyAbility<RollTargetType> = {
 function getStaffHitbox(enemy: Enemy, d: Direction): Rect {
     const enemyHitbox = enemy.getHitbox();
     if (d === 'left') {
-        return {...enemyHitbox, x: enemyHitbox.x - 64, w: 64};
+        return {...enemyHitbox, x: enemyHitbox.x - 48, w: 48};
     }
     if (d === 'right') {
-        return {...enemyHitbox, x: enemyHitbox.x + enemyHitbox.w, w: 64};
+        return {...enemyHitbox, x: enemyHitbox.x + enemyHitbox.w, w: 48};
     }
     if (d === 'up') {
-        return {...enemyHitbox, y: enemyHitbox.y - 64, h: 64};
+        return {...enemyHitbox, y: enemyHitbox.y - 48, h: 48};
     }
-    return {...enemyHitbox, y: enemyHitbox.y + enemyHitbox.h, h: 64};
+    return {...enemyHitbox, y: enemyHitbox.y + enemyHitbox.h, h: 48};
 }
+
+type ThrowTargetType = ReturnType<typeof getVectorToNearbyTarget>;
+
+const throwAbility: EnemyAbility<ThrowTargetType> = {
+    getTarget(this: void, state: GameState, enemy: Enemy): ThrowTargetType|null {
+        return getVectorToNearbyTarget(state, enemy, enemy.aggroRadius, enemy.area.allyTargets);
+    },
+    prepareAbility(this: void, state: GameState, enemy: Enemy, target: ThrowTargetType): void {
+        enemy.d = getDirection(target.x, target.y);
+        enemy.changeToAnimation('kneel');
+    },
+    useAbility(this: void, state: GameState, enemy: Enemy, target: ThrowTargetType): void {
+        enemy.changeToAnimation('roll');
+        const dx = target.x, dy = target.y;
+        CrystalSpike.spawn(state, enemy.area, {
+            delay: 100,
+            x: enemy.x + enemy.w / 2 + enemy.w / 4 * dx,
+            y: enemy.y + enemy.h / 2 + enemy.h / 4 * dy,
+            damage: 1,
+            vx: 4 * dx,
+            vy: 4 * dy,
+        });
+    },
+    cooldown: 1000,
+    initialCharges: 3,
+    charges: 3,
+    chargesRecovered: 3,
+    prepTime: 300,
+    recoverTime: 300,
+};
 
 const staffAbility: EnemyAbility<Direction> = {
     getTarget(this: void, state: GameState, enemy: Enemy): Direction|null {
-        const enemyHitbox = enemy.getHitbox();
         for (const hero of [state.hero, state.hero.astralProjection, ...state.hero.clones]) {
             if (!hero) {
                 continue;
             }
-            if (hero.overlaps({...enemyHitbox, x: enemyHitbox.x - 64, w: 64})) {
-                return 'left';
-            }
-            if (hero.overlaps({...enemyHitbox, x: enemyHitbox.x + enemyHitbox.w, w: 64})) {
-                return 'right';
-            }
-            if (hero.overlaps({...enemyHitbox, y: enemyHitbox.y - 64, h: 64})) {
-                return 'up';
-            }
-            if (hero.overlaps({...enemyHitbox, y: enemyHitbox.y + enemyHitbox.h, h: 64})) {
-                return 'down';
+            for (const d of <const>['left', 'right', 'up', 'down']) {
+                if (hero.overlaps(getStaffHitbox(enemy, d))) {
+                    return d;
+                }
             }
         }
         return null;
@@ -88,7 +122,7 @@ const staffAbility: EnemyAbility<Direction> = {
         enemy.z = Math.max(enemy.z + enemy.vz, 0);
         playAreaSound(state, state.areaInstance, 'bossDeath');
         hitTargets(state, state.areaInstance, {
-            damage: 1,
+            damage: 2,
             hitbox: getStaffHitbox(enemy, enemy.d),
             hitAllies: true,
             knockAwayFromHit: true,
@@ -98,22 +132,61 @@ const staffAbility: EnemyAbility<Direction> = {
             dx: 0, dy: 2, startTime: state.fieldTime, endTime: state.fieldTime + 200
         });
     },
+    cancelsOtherAbilities: true,
+    cannotBeCanceled: true,
     cooldown: 4000,
     prepTime: rivalAnimations.staffJump.down.duration,
-    recoverTime: rivalAnimations.staffSlam.down.duration + 1000,
+    recoverTime: rivalAnimations.staffSlam.down.duration + 500,
 };
 
-
+// This is hardcoded for the area outside of the tomb.
+const midPoint: Point = [128, 176];
+function getTargetLocation(state: GameState, enemy: Enemy): Point {
+    for (const target of enemy.area.allyTargets) {
+        if (!isTargetVisible(state, enemy, target)) {
+            continue;
+        }
+        const enemyHitbox = enemy.getHitbox();
+        const targetHitbox = target.getHitbox(state);
+        const cx = targetHitbox.x + targetHitbox.w / 2;
+        const cy = targetHitbox.y + targetHitbox.h / 2;
+        // Vector from the target to the mid point.
+        const v = [midPoint[0] - cx, midPoint[1] - cy];
+        const mag = Math.sqrt(v[0] * v[0] + v[1] * v[1]);
+        if (mag <= 36) {
+            // Target is close to the center, try to be directly left/right
+            // while staying on the same side of the target.
+            if (cx > enemyHitbox.x + enemyHitbox.w / 2) {
+                return [cx - 48, cy];
+            }
+            return [cx + 48, cy];
+        }
+        return [cx + v[0] * 48 / mag, cy + v[1] * 48 / mag];
+    }
+    return midPoint;
+}
 
 enemyDefinitions.rival = {
     // This should match the NPC style of the Rival.
     animations: rivalAnimations,
-    abilities: [rollAbility, staffAbility],
-    life: 12, touchDamage: 0, update: updateRival,
+    abilities: [rollAbility, staffAbility, throwAbility],
+    isImmortal: true,
+    life: 7, touchDamage: 0, update: updateRival,
     onHit(this: void, state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
-        // Invulnerable while rolling.
-        if (enemy.mode === 'roll') {
+        if (enemy.invulnerableFrames) {
             return {};
+        }
+        // Invulnerable while rolling.
+        if (enemy.activeAbility?.definition === rollAbility) {
+            return {};
+        }
+        if (enemy.tryUsingAbility(state, rollAbility)) {
+            return {};
+        }
+        // Gain a use of the roll ability on taking damage in order to avoid followup attacks.
+        const abilityWithCharges = enemy.getAbility(rollAbility);
+        if (abilityWithCharges.charges < (rollAbility.charges || 1)) {
+            abilityWithCharges.charges++;
         }
         return enemy.defaultOnHit(state, hit);
     },
@@ -123,7 +196,7 @@ enemyDefinitions.rival = {
             renderStaff(context, state, enemy);
         }
     },
-    acceleration: 0.3, speed: 2,
+    acceleration: 0.3, speed: 1.5,
     params: {
     },
 };
@@ -133,7 +206,7 @@ function renderStaff(this: void, context: CanvasRenderingContext2D, state: GameS
     if (enemy.activeAbility.used) {
         animationTime += enemy.activeAbility.definition.prepTime;
     }
-    if (animationTime < staffAnimations[enemy.d].duration) {
+    if (animationTime < staffAnimations[enemy.d].duration + 20) {
         const frame = getFrame(staffAnimations[enemy.d], animationTime);
         let x = enemy.x - 61 + 7, y = enemy.y - 32 - 90 + 6;
         if (enemy.animationTime < heroAnimations.staffJump[enemy.d].duration) {
@@ -144,11 +217,67 @@ function renderStaff(this: void, context: CanvasRenderingContext2D, state: GameS
 }
 
 function updateRival(this: void, state: GameState, enemy: Enemy): void {
-    if (!enemy.activeAbility) {
-        enemy.changeToAnimation('idle');
-        if (!enemy.tryUsingAbility(state, staffAbility)) {
-            enemy.tryUsingAbility(state, rollAbility);
+    if (!enemy.params.introduced) {
+        enemy.params.introduced = true;
+        prependScript(state, '{@rival.startFirstFight}');
+    }
+    // Don't run any update logic while cutscenes are playing.
+    if (state.scriptEvents.queue.length || state.scriptEvents.activeEvents.length) {
+        return;
+    }
+    if (enemy.life <= 0) {
+        if (enemy.mode !== 'escaping') {
+            enemy.activeAbility = null;
+            enemy.z = 0;
+            enemy.healthBarTime = -10000;
+            enemy.invulnerableFrames = 0;
+            // Remove any attack effects on defeat.
+            enemy.area.effects = enemy.area.effects.filter(effect => !effect.isEnemyAttack);
+            enemy.changeToAnimation('idle');
+            prependScript(state, '{@rival.lostFirstFight}');
+            enemy.setMode('escaping');
+            state.savedState.objectFlags[enemy.definition.id] = true;
+            saveGame();
+            return;
         }
+    }
+    if (enemy.mode === 'escaping') {
+        const hitbox = enemy.getHitbox();
+        if (enemy.x > 64) {
+            moveEnemyToTargetLocation(state, enemy, 64, hitbox.y + hitbox.h / 2, 'move');
+        } else {
+            moveEnemyToTargetLocation(state, enemy, hitbox.x + hitbox.w / 2, 300, 'move');
+            if (enemy.y >= 280) {
+                removeObjectFromArea(state, enemy);
+            }
+        }
+        return;
+    }
+
+    // When the tomb is opened for the first time, the Rival warns he will go to the elder.
+    if (!state.savedState.objectFlags.tombEntrance) {
+        enemy.params.speakWhenTombOpens = true;
+    }
+    if (enemy.params.speakWhenTombOpens && state.savedState.objectFlags.tombEntrance) {
+        prependScript(state, '{@rival.tombOpened}');
+        enemy.params.speakWhenTombOpens = false;
+    }
+
+    // Short grace period before the boss takes any actions at all.
+    if (enemy.time < 200) {
+        return;
+    }
+    // Use the staff attack whenever possible. This actually makes the
+    // fight a bit easier since this is when the rival is most vulnerable.
+    enemy.tryUsingAbility(state, staffAbility);
+    if (!enemy.activeAbility) {
+        enemy.tryUsingAbility(state, throwAbility);
+    }
+    if (enemy.activeAbility?.definition === rollAbility) {
+        const [x, y] = directionMap[enemy.d];
+        const frame = enemy.animationTime / FRAME_LENGTH;
+        const speed = rollSpeed[frame] || 0;
+        moveEnemy(state, enemy, speed * x, speed * y, {});
     }
     if (enemy.activeAbility?.definition === staffAbility) {
         const jumpDuration = enemy.activeAbility.definition.prepTime;
@@ -165,6 +294,17 @@ function updateRival(this: void, state: GameState, enemy: Enemy): void {
         } else {
             // Slamming down.
             enemy.z = Math.max(enemy.z + enemy.vz, 0);
+        }
+    }
+    if (!enemy.activeAbility) {
+        const targetLocation = getTargetLocation(state, enemy);
+        const distance = enemy.distanceToPoint(targetLocation);
+        if ((distance > 1 && enemy.currentAnimationKey === 'move') || distance > 12) {
+            moveEnemyToTargetLocation(state, enemy, targetLocation[0], targetLocation[1]);
+            enemy.faceTarget(enemy.area.allyTargets.find(t => isTargetVisible(state, enemy, t)));
+            enemy.changeToAnimation('move');
+        } else {
+            enemy.changeToAnimation('idle');
         }
     }
 }

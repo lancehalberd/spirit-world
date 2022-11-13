@@ -1337,6 +1337,7 @@ const f1_1x1: AreaDefinition = {
         {status: "normal", id: "", x: 128, y: 16, type: "turret", d: "down", fireInterval: 1200, fireOffset: 0},
         {status: "normal", id: "", x: 384, y: 16, type: "turret", d: "down", fireInterval: 1500, fireOffset: 0},
         {status: "normal", id: "", x: 112, y: 16, type: "turret", d: "down", fireInterval: 1200, fireOffset: 200},
+        {status: "normal", id: "tombEntered", x: 240, y: 448, type: "narration", message: "", trigger: "touch", delay: 0, w: 32, h: 32, saveStatus: "forever"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16},

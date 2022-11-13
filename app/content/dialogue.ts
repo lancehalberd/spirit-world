@@ -7,6 +7,7 @@ import { DialogueOption, DialogueSet, GameState } from 'app/types';
 export * from 'app/content/dialogue/dialogueHash';
 export * from 'app/content/dialogue/elder';
 export * from 'app/content/dialogue/mom';
+export * from 'app/content/dialogue/rival';
 export * from 'app/content/dialogue/npc';
 export * from 'app/content/dialogue/holyCity';
 export * from 'app/content/dialogue/nimbusCloud';
