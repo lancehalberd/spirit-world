@@ -823,7 +823,7 @@ const f1_0x0: AreaDefinition = {
         {id: "tomb:1:0x0-door-0", linked: false, spirit: false, status: "normal", x: 368, y: 480, type: "door", style: "cave", d: "down"},
         {id: "tomb:1:0x0-door-1", linked: false, spirit: false, status: "normal", x: 112, y: 224, type: "door", style: "cave", d: "down"},
         {status: "closedSwitch", id: "tombSecretDoor", linked: false, spirit: false, x: 112, y: 256, type: "door", style: "cave", d: "up"},
-        {id: "tombSwitchDoor", linked: false, spirit: false, status: "closedSwitch", x: 480, y: 112, type: "door", style: "cave", d: "right"},
+        {id: "tombSwitchDoor", linked: false, spirit: false, status: "closedSwitch", x: 480, y: 112, type: "door", style: "cave", d: "right", openLogic: {"logicKey":"hasRangedPush","isInverted":true}},
         {id: "tomb:1:0x0-door-4", linked: false, spirit: false, status: "normal", x: 480, y: 368, type: "door", style: "cave", d: "right"},
         {id: "tombKey2", linked: false, spirit: false, status: "hiddenSwitch", x: 336, y: 80, type: "chest", lootType: "smallKey"},
         {status: "normal", linked: false, spirit: false, x: 48, y: 144, type: "enemy", style: "cave", d: "down", enemyType: "beetleHorned", id: "tomb:1:0x0-beetleHorned-0"},
@@ -1101,7 +1101,7 @@ const f1_0x2: AreaDefinition = {
     ],
     objects: [
         {id: "tombLock2", linked: false, spirit: false, status: "locked", x: 0, y: 112, type: "door", style: "cave", d: "left"},
-        {id: "", linked: false, spirit: false, status: "closed", x: 256, y: 112, type: "door", style: "cave", d: "left"},
+        {id: "", linked: false, spirit: false, status: "closed", x: 256, y: 112, type: "door", style: "cave", d: "left", openLogic: {"logicKey":"hasMediumRange","isInverted":true}},
         {id: "tombPracticeDoor", linked: false, spirit: false, status: "closedSwitch", x: 368, y: 224, type: "door", style: "cave", d: "down"},
         {id: "tomb:1:2x0-door-3", linked: false, spirit: false, status: "closed", x: 368, y: 256, type: "door", style: "cave", d: "up"},
         {id: "", linked: false, spirit: false, status: "normal", x: 224, y: 112, type: "door", style: "cave", d: "right"},
@@ -1216,7 +1216,7 @@ const f1_1x0: AreaDefinition = {
     ],
     objects: [
         {id: "tomb:1:0x1-door-0", linked: false, spirit: false, status: "normal", x: 480, y: 400, type: "door", style: "cave", d: "right"},
-        {id: "tomb:1:0x1-door-1", linked: false, spirit: false, status: "closedEnemy", x: 112, y: 224, type: "door", style: "cave", d: "down"},
+        {id: "tomb:1:0x1-door-1", linked: false, spirit: false, status: "closedEnemy", x: 112, y: 224, type: "door", style: "cave", d: "down", openLogic: {"logicKey":"hasWeapon","isInverted":true}},
         {id: "tomb:1:0x1-door-2", linked: false, spirit: false, status: "normal", x: 112, y: 256, type: "door", style: "cave", d: "up"},
         {id: "tomb:1:0x1-door-3", linked: false, spirit: false, status: "normal", x: 480, y: 112, type: "door", style: "cave", d: "right"},
         {id: "tomb:1:0x1-door-4", linked: false, spirit: false, status: "closedEnemy", x: 368, y: 0, type: "door", style: "cave", d: "up"},

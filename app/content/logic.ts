@@ -158,6 +158,7 @@ export const hasReleasedBeasts: LogicCheck = {requiredFlags: ['elementalBeastsEs
 export const logicHash: {[key: string]: LogicCheck} = {
     hasWeapon,
     hasMediumRange,
+    hasRangedPush,
     isRandomizer: {
         requiredFlags: ['$randomizer'],
     },

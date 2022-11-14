@@ -584,6 +584,7 @@ export function getLogicProperties(
     }
     const row: PropertyRow = [{
         name: 'Logic',
+        id: `${label} Logic`,
         value: currentValue,
         values: ['none', 'true', 'custom', ...Object.keys(logicHash)],
         onChange(logicType: string) {

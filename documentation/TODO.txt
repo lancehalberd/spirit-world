@@ -42,9 +42,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Add some speaker name so it is clear who is talking in cut scenes with multiple characters.
-        - Add this to cut scene with Elder+Rival
-
     - Add "openLogic" field to doors
         - When set and logic is true, door overrides as being open.
         - Use this to protect from soft locks so doors won't trap you in areas if you cannot logically complete them. Simplify existing logic by using these, such as the elder's basement.
@@ -63,6 +60,9 @@ Current tasks:
                     z-grade is the same except that the wall height is decreased by 1 px for each pixel in the x direction. So for a SE wall, the top-left pixel in the bottom tile has height 16px, but the top-right pixel in the same tile only has height 0
                     These heights only apply when moving from another southern tile, if coming from a
             tileHeight - Indicates how high up a wall is in z pixels. This can be used for tiles in tall objects like trees
+
+    - Add some speaker name so it is clear who is talking in cut scenes with multiple characters.
+        - Add this to cut scene with Elder+Rival
 
     - Update logic to account for clone throw over obstacles?
         - Wait on this until we have adjusted any obstacles we don't want to allow this for.

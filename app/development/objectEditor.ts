@@ -27,6 +27,7 @@ import {
     displayTileEditorPropertyPanel, editingState,
     EditingState, setEditingTool,
 } from 'app/development/tileEditor';
+import { getLogicProperties } from 'app/development/zoneEditor';
 import { isKeyboardKeyDown, KEY } from 'app/keyCommands';
 import { getState } from 'app/state';
 import { isPointInShortRect } from 'app/utils/index';
@@ -286,6 +287,7 @@ export function createObjectDefinition(
                 ...commonProps,
                 type: definition.type,
                 style: definition.style || 'cave', //Object.keys(doorStyles)[0],
+                openLogic: definition.openLogic,
                 targetZone: definition.targetZone,
                 targetObjectId: definition.targetObjectId,
                 d: definition.d || 'up',
@@ -739,6 +741,14 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                     updateObjectInstance(state, object);
                 },
             });
+            rows = [
+                ...rows,
+                ...getLogicProperties(state, 'Force Open?', object.openLogic || {}, updatedLogic => {
+                    object.openLogic = updatedLogic;
+                    updateObjectInstance(state, object);
+                    displayTileEditorPropertyPanel();
+                })
+            ];
             // This intentionally continue on to the marker properties.
         case 'pitEntrance':
         case 'teleporter':

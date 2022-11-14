@@ -1,4 +1,7 @@
-import { applyBehaviorToTile, enterZoneByTarget, findEntranceById, playAreaSound, resetTileBehavior } from 'app/content/areas';
+import {
+    applyBehaviorToTile, enterZoneByTarget, evaluateLogicDefinition,
+    findEntranceById, playAreaSound, resetTileBehavior
+} from 'app/content/areas';
 import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
 import {
     BITMAP_LEFT, BITMAP_RIGHT,
@@ -760,28 +763,36 @@ export class Door implements ObjectInstance {
         this.x = definition.x;
         this.y = definition.y;
         this.status = definition.status || 'normal';
-        if (definition.d === 'up' && definition.price) {
+        if (this.definition.d === 'up' && this.definition.price) {
             this.status = 'closed';
         }
-        // 'closedEnemy' doors will start open and only close when we confirm there are enemies in the current
-        // are section. This way we don't play the secret chime every time we enter a room with a closed enemy
-        // door where the enemies are already defeated (or there are not yet enemies).
-        if (this.definition.status === 'closedEnemy') {
-            this.status = 'normal';
-        }
-        // If the player already opened this door, set it to the appropriate open status.
-        if (getObjectStatus(state, this.definition)) {
-            if (this.definition.status === 'cracked' || this.definition.status === 'blownOpen') {
-                this.status = 'blownOpen';
-            } else {
-                this.status = 'normal';
-            }
-        }
+        this.refreshLogic(state);
         this.style = definition.style as DoorStyle;
         if (!doorStyles[this.style]) {
             this.style = 'cave';
         }
         this.doorTop = new DoorTop(this);
+    }
+    refreshLogic(state: GameState) {
+        // If the player already opened this door, or logic opens the door by default,
+        // set it to the appropriate open status.
+        if (evaluateLogicDefinition(state, this.definition.openLogic, false)
+            || getObjectStatus(state, this.definition)
+        ) {
+            if (this.definition.status === 'cracked' || this.definition.status === 'blownOpen') {
+                this.changeStatus(state, 'blownOpen');
+            } else {
+                this.changeStatus(state, 'normal');
+            }
+        } else {
+            this.changeStatus(state, this.definition.status);
+        }
+        // 'closedEnemy' doors will start open and only close when we confirm there are enemies in the current
+        // are section. This way we don't play the secret chime every time we enter a room with a closed enemy
+        // door where the enemies are already defeated (or there are not yet enemies).
+        if (this.definition.status === 'closedEnemy' && !this.area?.enemies.length) {
+            this.changeStatus(state, 'normal');
+        }
     }
     getParts(state: GameState) {
         return [this.doorTop];
@@ -798,20 +809,19 @@ export class Door implements ObjectInstance {
         return heroIsTouchingDoor || this.status === 'normal' || this.status === 'blownOpen' || this.status === 'frozen' || state.hero.actionTarget === this;
     }
     changeStatus(state: GameState, status: ObjectStatus): void {
-        const wasClosed = this.status === 'closed' || this.status === 'closedSwitch' || this.status === 'closedEnemy' || this.status === 'cracked';
-        const isClosed = status === 'closed' || status === 'closedSwitch' || status === 'closedEnemy' || status === 'cracked';
-        if (wasClosed && status === 'normal') {
-            playAreaSound(state, this.area, 'doorOpen');
-        } else if (isClosed && this.status === 'normal') {
-            playAreaSound(state, this.area, 'doorClose');
+        const forceOpen = evaluateLogicDefinition(state, this.definition.openLogic, false);
+        let isClosed = status === 'closed' || status === 'closedSwitch' || status === 'closedEnemy' || status === 'cracked';
+        if (isClosed && forceOpen) {
+            status = (status === 'cracked') ? 'blownOpen' : 'normal';
         }
+        const wasClosed = this.status === 'closed' || this.status === 'closedSwitch' || this.status === 'closedEnemy' || this.status === 'cracked';
         this.status = status;
         if (this.linkedObject && this.linkedObject.status !== status) {
             this.linkedObject.changeStatus(state, status);
         }
         if (this.definition.id && (this.status === 'normal' || this.status === 'blownOpen')) {
             // Update the other half of this door if it is in the same super tile.
-            for (const object of this.area.objects) {
+            for (const object of (this.area?.objects || [])) {
                 if (object?.definition?.type === 'door' &&
                     object?.definition.id === this.definition.id &&
                     object.status !== this.status
@@ -819,7 +829,18 @@ export class Door implements ObjectInstance {
                     object.changeStatus(state, this.status);
                 }
             }
-            saveObjectStatus(state, this.definition, true);
+            // Only save the status when the door isn't being forced open.
+            if (!forceOpen) {
+                saveObjectStatus(state, this.definition, true);
+            }
+        }
+        if (!this.area) {
+            return;
+        }
+        if (wasClosed && status === 'normal') {
+            playAreaSound(state, this.area, 'doorOpen');
+        } else if (isClosed && this.status === 'normal') {
+            playAreaSound(state, this.area, 'doorClose');
         }
         const y = Math.floor(this.y / 16);
         const x = Math.floor(this.x / 16);

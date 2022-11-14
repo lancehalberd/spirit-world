@@ -930,6 +930,9 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
             }
         }
     }
+    for (const object of area.objects) {
+        object.refreshLogic?.(state);
+    }
     checkIfAllEnemiesAreDefeated(state, area);
 }
 

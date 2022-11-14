@@ -3,7 +3,7 @@ import { Sign } from 'app/content/objects/sign';
 import {
     Actor, AreaInstance, BossType,
     DecorationType, Direction, Enemy, EnemyType,
-    GameState, Hero, LootType,
+    GameState, Hero, LogicDefinition, LootType,
     MagicElement, MinionType,
     NPCBehavior, NPCStyle,
     Rect, TileBehaviors,
@@ -37,6 +37,9 @@ export interface ObjectInstance {
     // Setting this true is the same as returning true always for shouldReset+shouldRespawn.
     alwaysReset?: boolean
     ignorePits?: boolean
+    // Called when area logic is refreshed. Use this if logic can change internal state of this object,
+    // for example, whether a door is open or not.
+    refreshLogic?: (state: GameState) => void
     // Should revert to its original state if still present
     shouldReset?: (state: GameState) => boolean
     // Should revert to its original state if missing (Defeated enemy, ball that fell in a pit)
@@ -332,6 +335,8 @@ export interface EntranceDefinition extends BaseObjectDefinition {
     type: 'teleporter' | 'pitEntrance' | 'door' | 'stairs'
     targetZone?: string
     targetObjectId?: string
+    // This can be set to force a door to be open if the logic is true.
+    openLogic?: LogicDefinition
     // This is the number of keys that the player must have access to use this door in
     // the randomizer logic. This value is calculated by the randomizer logic if it is not
     // manually set.
