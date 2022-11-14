@@ -42,8 +42,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Clear script events/messages/screen shakes when moving to a new state from context menu.
-
     - Add some speaker name so it is clear who is talking in cut scenes with multiple characters.
         - Add this to cut scene with Elder+Rival
 

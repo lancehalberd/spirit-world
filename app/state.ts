@@ -223,6 +223,16 @@ export function getDefaultState(): GameState {
     return state;
 }
 
+export function cleanState(state: GameState) {
+    const defaultState = getDefaultState();
+    state.scriptEvents = defaultState.scriptEvents;
+    state.screenShakes = defaultState.screenShakes;
+    state.defeatState = defaultState.defeatState;
+    state.paused = false;
+    delete state.transitionState;
+    delete state.messagePage;
+}
+
 let state: GameState;
 export function initializeState() {
     state = getDefaultState();

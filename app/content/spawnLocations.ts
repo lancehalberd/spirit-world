@@ -1,7 +1,7 @@
 import { cloneDeep } from 'lodash';
 
 import { CANVAS_HEIGHT } from 'app/gameConstants';
-import { applySavedState, getDefaultSavedState, getState, returnToSpawnLocation, saveGame } from 'app/state';
+import { applySavedState, cleanState, getDefaultSavedState, getState, returnToSpawnLocation, saveGame } from 'app/state';
 import { MenuOption } from 'app/types';
 
 import { GameState, SavedState, ZoneLocation } from 'app/types';
@@ -624,6 +624,7 @@ function getSpawnLocationOptions(spawnLocations: SpawnLocationOptions, useSavedS
                 if (useSavedState) {
                     applySavedState(state, cloneDeep(spawnLocations[name].savedState));
                 }
+                cleanState(state);
                 setSpawnLocation(state, spawnLocations[name].location);
                 returnToSpawnLocation(state);
                 if (spawnLocations[name].savedState.savedHeroData.life) {
