@@ -13,6 +13,10 @@ export const updateMusic = (): void => {
         return;
     }
     const soundSettings = getSoundSettings(state);
+    if (state.scriptEvents.overrideMusic) {
+        playTrack(state.scriptEvents.overrideMusic, 0, soundSettings);
+        return;
+    }
     if (state.scene !== 'game') {
         playTrack('mainTheme', 0, soundSettings);
         return;

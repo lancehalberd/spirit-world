@@ -10,7 +10,7 @@ import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { vanaraBlackAnimations } from 'app/render/npcAnimations';
 import { heroAnimations, staffAnimations } from 'app/render/heroAnimations';
-import { prependScript } from 'app/scriptEvents';
+import { appendScript } from 'app/scriptEvents';
 import { saveGame } from 'app/state';
 import { drawFrameAt, getFrame } from 'app/utils/animations';
 import { directionMap, getDirection, hitTargets } from 'app/utils/field';
@@ -219,7 +219,7 @@ function renderStaff(this: void, context: CanvasRenderingContext2D, state: GameS
 function updateRival(this: void, state: GameState, enemy: Enemy): void {
     if (!enemy.params.introduced) {
         enemy.params.introduced = true;
-        prependScript(state, '{@rival.startFirstFight}');
+        appendScript(state, '{@rival.startFirstFight}');
     }
     // Don't run any update logic while cutscenes are playing.
     if (state.scriptEvents.queue.length || state.scriptEvents.activeEvents.length) {
@@ -227,14 +227,20 @@ function updateRival(this: void, state: GameState, enemy: Enemy): void {
     }
     if (enemy.life <= 0) {
         if (enemy.mode !== 'escaping') {
+            // Remove any attack effects on defeat.
+            enemy.area.effects = enemy.area.effects.filter(effect => !effect.isEnemyAttack);
             enemy.activeAbility = null;
+            enemy.faceTarget(state);
+            enemy.changeToAnimation('kneel');
             enemy.z = 0;
             enemy.healthBarTime = -10000;
             enemy.invulnerableFrames = 0;
-            // Remove any attack effects on defeat.
-            enemy.area.effects = enemy.area.effects.filter(effect => !effect.isEnemyAttack);
-            enemy.changeToAnimation('idle');
-            prependScript(state, '{@rival.lostFirstFight}');
+            state.scriptEvents.queue.push({
+                type: 'wait',
+                blockPlayerInput: true,
+                duration: 1000,
+            });
+            appendScript(state, '{@rival.lostFirstFight}');
             enemy.setMode('escaping');
             state.savedState.objectFlags[enemy.definition.id] = true;
             saveGame();
@@ -244,7 +250,8 @@ function updateRival(this: void, state: GameState, enemy: Enemy): void {
     if (enemy.mode === 'escaping') {
         const hitbox = enemy.getHitbox();
         if (enemy.x > 64) {
-            moveEnemyToTargetLocation(state, enemy, 64, hitbox.y + hitbox.h / 2, 'move');
+            const yTarget = Math.max(hitbox.y + hitbox.h / 2, midPoint[1]);
+            moveEnemyToTargetLocation(state, enemy, 64, yTarget, 'move');
         } else {
             moveEnemyToTargetLocation(state, enemy, hitbox.x + hitbox.w / 2, 300, 'move');
             if (enemy.y >= 280) {
@@ -259,7 +266,7 @@ function updateRival(this: void, state: GameState, enemy: Enemy): void {
         enemy.params.speakWhenTombOpens = true;
     }
     if (enemy.params.speakWhenTombOpens && state.savedState.objectFlags.tombEntrance) {
-        prependScript(state, '{@rival.tombOpened}');
+        appendScript(state, '{@rival.tombOpened}');
         enemy.params.speakWhenTombOpens = false;
     }
 
@@ -301,7 +308,7 @@ function updateRival(this: void, state: GameState, enemy: Enemy): void {
         const distance = enemy.distanceToPoint(targetLocation);
         if ((distance > 1 && enemy.currentAnimationKey === 'move') || distance > 12) {
             moveEnemyToTargetLocation(state, enemy, targetLocation[0], targetLocation[1]);
-            enemy.faceTarget(enemy.area.allyTargets.find(t => isTargetVisible(state, enemy, t)));
+            enemy.faceTarget(state);
             enemy.changeToAnimation('move');
         } else {
             enemy.changeToAnimation('idle');

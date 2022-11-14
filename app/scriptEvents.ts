@@ -263,6 +263,7 @@ export function parseEventScript(state: GameState, script: TextScript): ScriptEv
 export const updateScriptEvents = (state: GameState): void => {
     state.scriptEvents.blockEventQueue = false;
     state.scriptEvents.blockFieldUpdates = false;
+    state.scriptEvents.blockPlayerInput = false;
     state.scriptEvents.handledInput = false;
     const activeEvents: ActiveScriptEvent[] = [];
     let activeEventCountSinceLastWaitEvent = 0;
@@ -282,6 +283,9 @@ export const updateScriptEvents = (state: GameState): void => {
                 if (event.waitingOnActiveEvents && !activeEventCountSinceLastWaitEvent) {
                     break;
                 }
+                if (event.callback && !event.callback(state)) {
+                    break;
+                }
                 let finished = false;
                 for (const gameKey of (event.keys || [])) {
                     if (wasGameKeyPressed(state, gameKey)) {
@@ -294,6 +298,9 @@ export const updateScriptEvents = (state: GameState): void => {
                     state.scriptEvents.blockEventQueue = true;
                     if (event.blockFieldUpdates) {
                         state.scriptEvents.blockFieldUpdates = true;
+                    }
+                    if (event.blockPlayerInput) {
+                        state.scriptEvents.blockPlayerInput = true;
                     }
                     activeEvents.push(event);
                 }

@@ -25,6 +25,10 @@ export interface WaitScriptEvent {
     type: 'wait'
     // Whether or not to block field updates while this event is active.
     blockFieldUpdates?: boolean
+    // If this is true player input will be blocked while this event is active.
+    blockPlayerInput?: boolean
+    // If defined, wait will end once this callback returns false.
+    callback?: (state: GameState) => boolean
     // If this is set the event is cleared after duration milliseconds.
     duration?: number
     // Any game keys set here will clear this event.

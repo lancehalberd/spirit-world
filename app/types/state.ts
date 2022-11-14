@@ -2,7 +2,7 @@ import { Staff } from 'app/content/objects/staff';
 
 import {
     ActiveScriptEvent, AreaGrid, AreaInstance,
-    Floor, Hero, LootData, SavedHeroData, Rect, ScriptEvent, TextPage,
+    Floor, Hero, LootData, SavedHeroData, Rect, ScriptEvent, TextPage, TrackKey,
     Zone, ZoneLocation,
 } from 'app/types';
 
@@ -128,7 +128,9 @@ export interface GameState {
         activeEvents: ActiveScriptEvent[]
         blockEventQueue: boolean
         blockFieldUpdates: boolean
+        blockPlayerInput: boolean
         handledInput: boolean
+        overrideMusic?: TrackKey
         queue: ScriptEvent[]
     }
     isUsingKeyboard?: boolean

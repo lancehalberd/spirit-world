@@ -1,5 +1,5 @@
 import { AnimationEffect } from 'app/content/effects/animationEffect';
-import { checkForFloorEffects, moveEnemy } from 'app/content/enemies';
+import { checkForFloorEffects, isTargetVisible, moveEnemy } from 'app/content/enemies';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { dropItemFromTable, getLoot } from 'app/content/objects/lootObject';
 import { addEffectToArea, getAreaSize, refreshAreaLogic } from 'app/content/areas';
@@ -158,7 +158,13 @@ export class Enemy implements Actor, ObjectInstance {
         const dy = hitbox.y + hitbox.h / 2 - p[1];
         return Math.sqrt(dx * dx + dy *dy);
     }
-    faceTarget(target?: ObjectInstance | EffectInstance): void {
+    faceTarget(state: GameState, target?: ObjectInstance | EffectInstance): void {
+        if (!this.area) {
+            return;
+        }
+        if (!target) {
+            target = this.area.allyTargets.find(t => isTargetVisible(state, this, t))
+        }
         if (!target) {
             return;
         }
@@ -484,6 +490,7 @@ export class Enemy implements Actor, ObjectInstance {
             }
             if (this.activeAbility.time >= this.activeAbility.definition.prepTime + this.activeAbility.definition.recoverTime) {
                 this.activeAbility = null;
+                this.changeToAnimation('idle');
             }
 
         }
@@ -507,6 +514,7 @@ export class Enemy implements Actor, ObjectInstance {
             }
             return;
         }
+        this.healthBarTime += FRAME_LENGTH;
         if (this.invulnerableFrames > 0) {
             this.invulnerableFrames--;
         }
@@ -516,11 +524,11 @@ export class Enemy implements Actor, ObjectInstance {
         if (this.blockInvulnerableFrames > 0) {
             this.blockInvulnerableFrames--;
         }
-        if (this.action === 'knocked') {
-            this.z += this.vz;
+        const minZ = this.canBeKnockedDown ? 0 : (this.flying ? 12 : 0);
+        if (this.action === 'knocked' || (this.z > minZ && !this.flying && !this.activeAbility)) {
             this.vz = Math.max(-8, this.vz - 0.5);
+            this.z += this.vz;
             moveEnemy(state, this, this.vx, this.vy, {canFall: true});
-            const minZ = this.canBeKnockedDown ? 0 : (this.flying ? 12 : 0);
             if (this.z <= minZ) {
                 this.z = minZ;
             }
@@ -540,7 +548,6 @@ export class Enemy implements Actor, ObjectInstance {
         } else if (this.flying && this.z > 12) {
             this.z = Math.max(12, this.z - 2);
         }
-        this.healthBarTime += FRAME_LENGTH;
         if (this.enemyDefinition.update) {
             this.enemyDefinition.update(state, this);
         }

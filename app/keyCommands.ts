@@ -306,6 +306,17 @@ export function updateKeyboardState(state: GameState) {
     }
 }
 
+
+export function clearKeyboardState(state: GameState) {
+    state.keyboard = {
+        gameKeyValues: [],
+        gameKeysDown: new Set(),
+        gameKeysPressed: new Set(),
+        gameKeysReleased: new Set(),
+        mostRecentKeysPressed: new Set(),
+    };
+}
+
 export function wasGameKeyPressed(state: GameState, keyCode: number): boolean {
     return state.keyboard.gameKeysPressed.has(keyCode);
 }

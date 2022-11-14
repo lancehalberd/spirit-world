@@ -42,12 +42,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Smooth transition to cutscene
-        - Add ability to disable player input+actions without stopping all field updates
-            - Use this to run the field for ~1 second on player defeat to let actions clear up like:
-                screen shake, player knocked, attack effects
-            - Confirm rival does not start new attacks during this time.
-                - Eventually maybe script the rival preparing an attack during this time that the elder interrupts.
     - Clear script events/messages/screen shakes when moving to a new state from context menu.
 
     - Add some speaker name so it is clear who is talking in cut scenes with multiple characters.

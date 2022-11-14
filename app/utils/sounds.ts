@@ -234,7 +234,7 @@ const musicTracks = {
     bossA: {key: 'bossA', type: 'bgm', source: 'bgm/SpookyThemeA.mp3', volume: 20, nextTrack: 'bossB' },
     bossB: {key: 'bossB', type: 'bgm', source: 'bgm/SpookyThemeB.mp3', volume: 20, nextTrack: 'bossA' },
 };
-type TrackKey = keyof typeof musicTracks;
+export type TrackKey = keyof typeof musicTracks;
 export function playTrack(trackKey: TrackKey, timeOffset, soundSettings: SoundSettings, fadeOutOthers = true, crossFade = true) {
     if (!audioUnlocked) {
         return;

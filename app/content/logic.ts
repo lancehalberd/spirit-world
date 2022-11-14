@@ -162,11 +162,11 @@ export const logicHash: {[key: string]: LogicCheck} = {
         requiredFlags: ['$randomizer'],
     },
     tombRivalNpc: {
-        excludedFlags: ['tombRivalEnraged', 'tombEntered'],
+        excludedFlags: ['tombRivalEnraged', 'tombRivalRescued', 'tombEntered', 'tombRivalAvoided'],
     },
     tombRivalBoss: {
         requiredFlags: ['tombRivalEnraged'],
-        excludedFlags: ['tombEntered', 'tombRivalRescued'],
+        excludedFlags: ['tombEntered', 'tombRivalRescued', 'tombRivalAvoided'],
     },
     cocoonBossStarted: {
         requiredFlags: ['cocoonBossStarted'],

@@ -110,15 +110,14 @@ enemyDefinitions.crystalBat = {
                         const goalX = targetX - 32 * Math.cos(theta);
                         const goalY = targetY - 32 * Math.sin(theta);
                         moveEnemyToTargetLocation(state, enemy, goalX, goalY);
+                        boundEnemyPosition(enemy);
                     } else {
                         scurryRandomly(state, enemy);
-                        enemy.x = Math.max(enemy.definition.x - 48, Math.min(enemy.definition.x + 48, enemy.x));
-                        enemy.y = Math.max(enemy.definition.y - 48, Math.min(enemy.definition.y + 48, enemy.y));
+                        boundEnemyPosition(enemy);
                     }
                 } else {
                     scurryRandomly(state, enemy);
-                    enemy.x = Math.max(enemy.definition.x - 48, Math.min(enemy.definition.x + 48, enemy.x));
-                    enemy.y = Math.max(enemy.definition.y - 48, Math.min(enemy.definition.y + 48, enemy.y));
+                    boundEnemyPosition(enemy);
                 }
             } else {
                 // Face the target when choosing an ability.
@@ -132,3 +131,8 @@ enemyDefinitions.crystalBat = {
         }
     }
 };
+
+function boundEnemyPosition(enemy: Enemy) {
+    enemy.x = Math.max(enemy.definition.x - 48, Math.min(enemy.definition.x + 48, enemy.x));
+    enemy.y = Math.max(enemy.definition.y - 48, Math.min(enemy.definition.y + 48, enemy.y));
+}
