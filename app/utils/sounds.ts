@@ -221,7 +221,7 @@ const musicTracks = {
     forgeTheme: {key: 'forgeTheme', type: 'bgm', source: 'bgm/Public Surface.b_concept.mp3', volume: 5 },
     craterTheme: {key: 'craterTheme', type: 'bgm', source: 'bgm/Fatty Richness_demo.mp3', volume: 5 },
     // Used for the tower after it is activated.
-    towerTheme: {key: 'towerTheme', type: 'bgm', source: 'bgm/Spirit 15.3.b.mp3', volume: 5 },
+    towerTheme: {key: 'towerTheme', type: 'bgm', source: 'bgm/Spirit 15.4.mp3', volume: 5 },
     skyTheme: {key: 'skyTheme', type: 'bgm', source: 'bgm/Spirit 14_demo.mp3', volume: 5 },
     // Used for the lake temple
     lakeTheme: {key: 'lakeTheme', type: 'bgm', source: 'bgm/Spirit 9 Demo.mp3', volume: 5 },
