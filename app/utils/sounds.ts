@@ -217,7 +217,7 @@ const musicTracks = {
     cocoonTheme: {key: 'cocoonTheme', type: 'bgm', source: 'bgm/Spirit 6 Demo.mp3', volume: 5 },
     vanaraDreamTheme: {key: 'vanaraDreamTheme', type: 'bgm', source: 'bgm/Spirit 18_concept.mp3', volume: 5 },
     helixTheme: {key: 'helixTheme', type: 'bgm', source: 'bgm/Spirit 13.2_demo.mp3', volume: 5 },
-    waterfallTowerTheme: {key: 'helixTheme', type: 'bgm', source: 'bgm/Public Surface_concept.mp3', volume: 5 },
+    waterfallTowerTheme: {key: 'waterfallTowerTheme', type: 'bgm', source: 'bgm/Public Surface_concept.mp3', volume: 5 },
     forgeTheme: {key: 'forgeTheme', type: 'bgm', source: 'bgm/Public Surface.b_concept.mp3', volume: 5 },
     craterTheme: {key: 'craterTheme', type: 'bgm', source: 'bgm/Fatty Richness_demo.mp3', volume: 5 },
     // Used for the tower after it is activated.
