@@ -35,6 +35,7 @@ import {
     Enemy, FrameAnimation, FrameDimensions, GameState,
     Hero, HitProperties, HitResult, LootTable,
     MagicElement, MovementProperties, ObjectInstance, Rect,
+    TextCueTaunt,
     TileBehaviors,
 } from 'app/types';
 
@@ -101,7 +102,8 @@ export interface EnemyAbilityInstance<T> {
 
 export interface EnemyDefinition {
     alwaysReset?: boolean
-    abilities?: EnemyAbility<any>[],
+    abilities?: EnemyAbility<any>[]
+    taunts?: {[key in string]: TextCueTaunt}
     animations: ActorAnimations
     aggroRadius?: number
     drawPriority?: DrawPriority

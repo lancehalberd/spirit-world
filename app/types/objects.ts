@@ -228,6 +228,9 @@ export interface HitResult {
     // This is generally true unless the hit is invalidated by some special condition like
     // an enemies invulnerability frames.
     hit?: boolean
+    // Indicates amount of damage that was dealt by the hit, if any. Only calculated for
+    // default hits to enemies currently.
+    damageDealt?: number
     // Indicates the hit was blocked, preventing damage + knockback.
     // For example, some enemies have shields that protect them from all or certain kinds of damage.
     blocked?: boolean

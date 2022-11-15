@@ -62,6 +62,7 @@ dialogueHash.elder = {
                     return this.time > 1000;
                 }
             });
+            appendScript(state, '{removeCue}');
             appendScript(state, `That's enough!`);
             appendCallback(state, (state: GameState) => {
                 const elder = new NPC({

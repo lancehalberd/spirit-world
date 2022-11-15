@@ -6,6 +6,7 @@ import { addEffectToArea, getAreaSize, refreshAreaLogic } from 'app/content/area
 import { bossDeathExplosionAnimation, enemyDeathAnimation } from 'app/content/enemyAnimations';
 import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { addTextCue } from 'app/scriptEvents';
 import { drawFrame, getFrame } from 'app/utils/animations';
 import { getDirection } from 'app/utils/field';
 import { playSound } from 'app/musicController';
@@ -16,7 +17,7 @@ import {
     Action, Actor, AreaInstance, BossObjectDefinition, Direction, DrawPriority, EffectInstance,
     EnemyAbility, EnemyAbilityInstance, EnemyDefinition, EnemyObjectDefinition,
     Frame, FrameAnimation, GameState, HitProperties, HitResult,
-    ObjectInstance, ObjectStatus, Point, Rect, TileBehaviors,
+    ObjectInstance, ObjectStatus, Point, Rect, TileBehaviors, TextCueTauntInstance,
 } from 'app/types';
 
 interface EnemyAbilityWithCharges {
@@ -31,6 +32,7 @@ export class Enemy implements Actor, ObjectInstance {
     isObject = <const>true;
     action: Action = null;
     abilities: EnemyAbilityWithCharges[] = [];
+    taunts?: {[key in string]: TextCueTauntInstance} ={}
     activeAbility: EnemyAbilityInstance<any>;
     area: AreaInstance;
     drawPriority: DrawPriority = 'sprites';
@@ -135,6 +137,13 @@ export class Enemy implements Actor, ObjectInstance {
                 charges: ability.initialCharges || 1,
                 cooldown: ability.cooldown || 0,
             });
+        }
+        for (const tauntKey in this.enemyDefinition.taunts ?? []) {
+            this.taunts[tauntKey] = {
+                definition: this.enemyDefinition.taunts[tauntKey],
+                cooldown: 0,
+                timesUsed: 0,
+            };
         }
     }
     getFrame(): Frame {
@@ -285,11 +294,14 @@ export class Enemy implements Actor, ObjectInstance {
                 this.knockBack(state, {vx: 4 * dx / mag, vy: 4 * dy / mag, vz: 0});
             }
         }
+        let damageDealt = 0;
         if (hit.damage) {
             const multiplier = this.enemyDefinition.elementalMultipliers?.[hit.element] || 1;
-            this.applyDamage(state, multiplier * hit.damage);
+            damageDealt = multiplier * hit.damage;
+            this.applyDamage(state, damageDealt);
         }
         return {
+            damageDealt,
             hit: true,
             destroyed: this.life <= 0 && !this.isImmortal,
             knockback: hit.knockback ? {vx: -hit.knockback.vx, vy: -hit.knockback.vy, vz: 0 } : null
@@ -445,12 +457,33 @@ export class Enemy implements Actor, ObjectInstance {
         };
         ability.definition.prepareAbility?.(state, this, target);
     }
+    useTaunt(state: GameState, tauntKey: string) {
+        const tauntInstance = this.taunts[tauntKey];
+        if (!tauntInstance) {
+            console.error('Missing taunt ', tauntKey);
+            return;
+        }
+        const definition = tauntInstance.definition;
+        if (tauntInstance.cooldown || tauntInstance.timesUsed >= definition.limit) {
+            return;
+        }
+        if (addTextCue(state, definition.text, definition.duration, definition.priority)) {
+            tauntInstance.cooldown = definition.cooldown || 3000;
+            tauntInstance.timesUsed++;
+        }
+    }
     update(state: GameState) {
         if (this.status === 'gone') {
             return;
         }
         if (!this.alwaysUpdate && !this.isFromCurrentSection(state)) {
             return;
+        }
+        for (const tauntKey in this.taunts ?? []) {
+            const tauntInstance = this.taunts[tauntKey];
+            if (tauntInstance.cooldown > 0) {
+                tauntInstance.cooldown -= FRAME_LENGTH;
+            }
         }
         this.time += FRAME_LENGTH;
         // Only time counter advances for enemies that are off.

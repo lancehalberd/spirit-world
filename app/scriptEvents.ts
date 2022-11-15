@@ -379,11 +379,7 @@ export const updateScriptEvents = (state: GameState): void => {
                 return;
             }
             case 'addTextCue': {
-                removeTextCue(state);
-                addEffectToArea(state, state.areaInstance, new TextCue(state, {
-                    duration: 0,
-                    text: event.text,
-                }));
+                addTextCue(state, event.text, 0, 0);
                 return;
             }
             case 'removeTextCue': {
@@ -465,16 +461,31 @@ export const updateScriptEvents = (state: GameState): void => {
         }
     }
 }
-export function removeTextCue(state: GameState) {
+export function removeTextCue(state: GameState, priority: number = 10000): boolean {
     if (!state.areaInstance) {
-        return;
+        return false;
     }
     const effect = state.areaInstance.effects.find(
         effect => effect instanceof TextCue
-    );
-    if (effect) {
+    ) as TextCue;
+    if (effect && effect.priority <= priority) {
         removeEffectFromArea(state, effect);
+        return true;
     }
+    return !effect;
+}
+
+export function addTextCue(state: GameState, text: string, duration = 3000, priority = 0): boolean {
+    // Only add the new cue if it can override the previous one.
+    if (removeTextCue(state)) {
+        addEffectToArea(state, state.areaInstance, new TextCue(state, {
+            duration,
+            priority,
+            text,
+        }));
+        return true;
+    }
+    return false;
 }
 
 function followMessagePointer(state: GameState, pointer) {

@@ -10,13 +10,15 @@ import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { vanaraBlackAnimations } from 'app/render/npcAnimations';
 import { heroAnimations, staffAnimations } from 'app/render/heroAnimations';
-import { appendScript } from 'app/scriptEvents';
+import { appendScript, removeTextCue } from 'app/scriptEvents';
 import { saveGame } from 'app/state';
 import { drawFrameAt, getFrame } from 'app/utils/animations';
 import { directionMap, getDirection, hitTargets } from 'app/utils/field';
 
 
-import { Direction, Enemy, EnemyAbility, GameState, HitProperties, HitResult, Point, Rect } from 'app/types';
+import {
+    Direction, Enemy, EnemyAbility, GameState, HitProperties, HitResult, Point, Rect
+} from 'app/types';
 
 const rivalAnimations = {
     ...vanaraBlackAnimations,
@@ -76,6 +78,7 @@ const throwAbility: EnemyAbility<ThrowTargetType> = {
         return getVectorToNearbyTarget(state, enemy, enemy.aggroRadius, enemy.area.allyTargets);
     },
     prepareAbility(this: void, state: GameState, enemy: Enemy, target: ThrowTargetType): void {
+        enemy.useTaunt(state, 'throw');
         enemy.d = getDirection(target.x, target.y);
         enemy.changeToAnimation('kneel');
     },
@@ -114,6 +117,7 @@ const staffAbility: EnemyAbility<Direction> = {
         return null;
     },
     prepareAbility(this: void, state: GameState, enemy: Enemy, target: Direction): void {
+        enemy.useTaunt(state, 'staff');
         enemy.d = target;
         enemy.changeToAnimation('staffJump');
     },
@@ -170,6 +174,13 @@ enemyDefinitions.rival = {
     // This should match the NPC style of the Rival.
     animations: rivalAnimations,
     abilities: [rollAbility, staffAbility, throwAbility],
+    taunts: {
+        throw: { text: 'Get out of here!', priority: 1},
+        dodge: { text: 'Nice try!', priority: 2},
+        smallDamage: { text: 'Ugh!', priority: 3},
+        bigDamage: { text: `You'll pay for that`, priority: 3},
+        staff: { text: 'Dodge this!', priority: 4},
+    },
     isImmortal: true,
     life: 7, touchDamage: 0, update: updateRival,
     onHit(this: void, state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
@@ -181,6 +192,7 @@ enemyDefinitions.rival = {
             return {};
         }
         if (enemy.tryUsingAbility(state, rollAbility)) {
+            enemy.useTaunt(state, 'dodge');
             return {};
         }
         // Gain a use of the roll ability on taking damage in order to avoid followup attacks.
@@ -188,7 +200,12 @@ enemyDefinitions.rival = {
         if (abilityWithCharges.charges < (rollAbility.charges || 1)) {
             abilityWithCharges.charges++;
         }
-        return enemy.defaultOnHit(state, hit);
+        const hitResult = enemy.defaultOnHit(state, hit);
+        if (hitResult.damageDealt) {
+            if (hitResult.damageDealt <= 1) enemy.useTaunt(state, 'smallDamage');
+            else enemy.useTaunt(state, 'bigDamage');
+        }
+        return hitResult;
     },
     render(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
         enemy.defaultRender(context, state);
@@ -229,6 +246,7 @@ function updateRival(this: void, state: GameState, enemy: Enemy): void {
         if (enemy.mode !== 'escaping') {
             // Remove any attack effects on defeat.
             enemy.area.effects = enemy.area.effects.filter(effect => !effect.isEnemyAttack);
+            removeTextCue(state);
             enemy.activeAbility = null;
             enemy.faceTarget(state);
             enemy.changeToAnimation('kneel');

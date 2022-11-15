@@ -14,6 +14,8 @@ const padding = 20;
 interface TextCueProps {
     text: string
     duration?: number
+    priority?: number
+
 }
 
 export class TextCue implements EffectInstance {
@@ -26,11 +28,13 @@ export class TextCue implements EffectInstance {
     y: number;
     textFrames: Frame[][];
     time: number = 0;
+    priority: number = 0;
     duration: number;
-    constructor(state, { duration = 3000, text }: TextCueProps) {
+    constructor(state, { duration = 3000, priority = 0, text }: TextCueProps) {
         // TextCue only supports a single page of messages.
         this.textFrames = parseMessage(state, text, CANVAS_WIDTH - 2 * padding)[0].frames;
         this.duration = duration;
+        this.priority = priority;
     }
     update(state: GameState) {
         this.time += FRAME_LENGTH;
@@ -46,8 +50,13 @@ export class TextCue implements EffectInstance {
             } else if (this.duration > 0 && this.time > this.duration - fadeDuration) {
                 context.globalAlpha = Math.max(0, (this.duration - this.time) / fadeDuration);
             }
-            let x = padding, y = CANVAS_HEIGHT - 24 - (this.textFrames.length - 1) * 16;
+            let x = padding, y = CANVAS_HEIGHT - 36 - (this.textFrames.length - 1) * 16;
             for (const frameRow of this.textFrames) {
+                let rowWidth = 0;
+                for (const frame of frameRow) {
+                    rowWidth += frame?.w ?? characterWidth;
+                }
+                x = (CANVAS_WIDTH - rowWidth) / 2;
                 for (const frame of frameRow) {
                     if (!frame) {
                         x += characterWidth;
@@ -59,7 +68,6 @@ export class TextCue implements EffectInstance {
                     x += frame.w;
                 }
                 y += 16;
-                x = padding;
             }
         context.restore();
     }

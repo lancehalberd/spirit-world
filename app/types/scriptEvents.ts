@@ -1,6 +1,28 @@
 import { Frame, GameState, LootData, ZoneLocation } from 'app/types';
 
 
+// Defines a taunt an enemy can make as a text cue with parameters to control
+// how often and when it can override other text cues.
+export interface TextCueTaunt {
+    text: string
+    // Higher priority taunts can override lower priority text cues
+    priority?: number
+    // How long this cue should display.
+    duration?: number
+    // Can only be used once every this many milliseconds, defaults to 3000
+    cooldown?: number
+    // Can only be used this many times per encounter.
+    limit?: number
+}
+
+export interface TextCueTauntInstance {
+    definition: TextCueTaunt
+    // Time until this taunt can be used again.
+    cooldown: number
+    // Number of times this was used
+    timesUsed: number
+}
+
 export interface TextPage {
     textRows: string[]
     frames: Frame[][]
