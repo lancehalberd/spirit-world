@@ -48,6 +48,7 @@ const bushBehavior: TileBehaviors = {
 const lightStoneBehavior: TileBehaviors = {
     defaultLayer: 'field',
     low: true, solid: true, pickupWeight: 1, lootTable: simpleLootTable,
+    throwDamage: 2,
     particles: lightStoneParticles,
     breakSound: 'rockShatter',
     linkableTiles: [185, 186],
@@ -57,6 +58,7 @@ const lightStoneBehavior: TileBehaviors = {
 const heavyStoneBehavior: TileBehaviors = {
     defaultLayer: 'field',
     low: true, solid: true, pickupWeight: 2, lootTable: moneyLootTable,
+    throwDamage: 4,
     particles: heavyStoneParticles,
     breakSound: 'rockShatter',
     linkableTiles: [187, 188],
@@ -1458,7 +1460,9 @@ addTiles([
     singleTileSource('gfx/tiles/bush.png', {defaultLayer: 'field'}, -16),
     singleTileSource('gfx/tiles/bush.png', bushBehavior, 0),
     singleTileSource('gfx/tiles/cactussheet.png', {
-        ...bushBehavior, touchHit: { 
+        ...bushBehavior,
+        throwDamage: 4,
+        touchHit: { 
             damage: 1, spiritCloakDamage: 5, 
             hitAllies: true,
             hitEnemies: true,

@@ -41,8 +41,8 @@ export class ThrownObject implements EffectInstance {
         this.vx = vx;
         this.vy = vy;
         this.vz = vz;
-        this.damage = damage;
         this.behaviors = behaviors ?? {};
+        this.damage = this.behaviors.throwDamage ?? damage;
     }
     getHitbox(state: GameState) {
         // Technically it is unrealistic to use the z-component in the hitbox, but practically
@@ -57,6 +57,7 @@ export class ThrownObject implements EffectInstance {
         const hitResult = hitTargets(state, this.area, {
             canPush: true,
             damage: this.damage,
+            isThrownObject: true,
             hitbox: this.getHitbox(state),
             knockback: { vx: this.vx, vy: this.vy, vz: 0},
             vx: this.vx,

@@ -113,6 +113,8 @@ export interface EnemyDefinition {
     flipLeft?: boolean
     flipRight?: boolean
     flying?: boolean
+    // If true, default z updates will be ignored.
+    floating?: boolean
     // This is used instead of standard code for flying enemies
     updateFlyingZ?: (state: GameState, enemy: Enemy) => void
     hasShadow?: boolean

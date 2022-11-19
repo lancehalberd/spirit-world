@@ -558,7 +558,7 @@ export class Enemy implements Actor, ObjectInstance {
             this.blockInvulnerableFrames--;
         }
         const minZ = this.canBeKnockedDown ? 0 : (this.flying ? 12 : 0);
-        if (this.action === 'knocked' || (this.z > minZ && !this.flying && !this.activeAbility)) {
+        if (this.action === 'knocked' || (this.z > minZ && !this.flying && !this.enemyDefinition.floating && !this.activeAbility)) {
             this.vz = Math.max(-8, this.vz - 0.5);
             this.z += this.vz;
             moveEnemy(state, this, this.vx, this.vy, {canFall: true});
@@ -573,13 +573,15 @@ export class Enemy implements Actor, ObjectInstance {
             }
             return;
         }
-        if (this.flying && this.enemyDefinition.updateFlyingZ) {
-            this.enemyDefinition.updateFlyingZ(state, this);
-        } else if (this.flying && this.z < 12) {
-            this.z = Math.min(12, this.z + 2);
-            return;
-        } else if (this.flying && this.z > 12) {
-            this.z = Math.max(12, this.z - 2);
+        if (this.flying) {
+            if (this.enemyDefinition.updateFlyingZ) {
+                this.enemyDefinition.updateFlyingZ(state, this);
+            } else if (this.z < 12) {
+                this.z = Math.min(12, this.z + 2);
+                return;
+            } else if (this.z > 12) {
+                this.z = Math.max(12, this.z - 2);
+            }
         }
         if (this.enemyDefinition.update) {
             this.enemyDefinition.update(state, this);

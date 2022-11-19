@@ -90,6 +90,8 @@ export interface TileBehaviors {
     shallowWater?: boolean
     slippery?: boolean
     water?: boolean
+    // How much damage this tile does if thrown.
+    throwDamage?: number
     // Sets a standard transparency for this tile type when the editor is open.
     // This was added for lava tiles since I want to see what is underneath lava as I edit it.
     editorTransparency?: number

@@ -248,6 +248,7 @@ enemyDefinitions.golem = {
 };
 enemyDefinitions.golemHand = {
     animations: golemHandAnimations, life: 6, scale: 1, update: updateGolemHand,
+    floating: true,
     flipRight: true,
     canBeKnockedBack: false, canBeKnockedDown: false,
     showHealthBar: true,
@@ -265,10 +266,10 @@ enemyDefinitions.golemHand = {
         if (enemy.isInvulnerable || enemy.enemyInvulnerableFrames) {
             return {};
         }
-        // Should block attackes even during iframes so it can still protect the golem.
-        //if (enemy.enemyInvulnerableFrames) {
-        //    return { hit: true, blocked: true, stopped: true };
-        //}
+        // Thrown objects can hurt the hands as if they were ordinary enemies.
+        if (hit.isThrownObject) {
+            return enemy.defaultOnHit(state, hit);
+        }
         let hitJewel = false, hitHand = false;
         const hitbox = enemy.getHitbox(state);
         if (enemy.currentAnimationKey === 'slamming') {
