@@ -758,6 +758,9 @@ export class Door implements ObjectInstance {
     status: ObjectStatus = 'normal';
     style: DoorStyle = 'cave';
     doorTop: DoorTop;
+    // This gets set to true if this instance has been opened and is used to prevent the door
+    // from closing automatically when logic is refreshed.
+    wasOpened: boolean = false;
     constructor(state: GameState, definition: EntranceDefinition) {
         this.definition = definition;
         this.x = definition.x;
@@ -774,11 +777,8 @@ export class Door implements ObjectInstance {
         this.doorTop = new DoorTop(this);
     }
     refreshLogic(state: GameState) {
-        // If the player already opened this door, or logic opens the door by default,
-        // set it to the appropriate open status.
-        if (evaluateLogicDefinition(state, this.definition.openLogic, false)
-            || getObjectStatus(state, this.definition)
-        ) {
+        // If the player already opened this door, set it to the appropriate open status.
+        if (getObjectStatus(state, this.definition) || this.wasOpened) {
             if (this.definition.status === 'cracked' || this.definition.status === 'blownOpen') {
                 this.changeStatus(state, 'blownOpen');
             } else {
@@ -811,8 +811,14 @@ export class Door implements ObjectInstance {
     changeStatus(state: GameState, status: ObjectStatus): void {
         const forceOpen = evaluateLogicDefinition(state, this.definition.openLogic, false);
         let isClosed = status === 'closed' || status === 'closedSwitch' || status === 'closedEnemy' || status === 'cracked';
+        if (!isClosed) {
+            this.wasOpened = true;
+        }
         if (isClosed && forceOpen) {
             status = (status === 'cracked') ? 'blownOpen' : 'normal';
+        }
+        if (isClosed) {
+            this.wasOpened = false;
         }
         const wasClosed = this.status === 'closed' || this.status === 'closedSwitch' || this.status === 'closedEnemy' || this.status === 'cracked';
         this.status = status;
@@ -842,6 +848,9 @@ export class Door implements ObjectInstance {
         } else if (isClosed && this.status === 'normal') {
             playAreaSound(state, this.area, 'doorClose');
         }
+        this.applyDoorBehaviorsToArea();
+    }
+    applyDoorBehaviorsToArea() {
         const y = Math.floor(this.y / 16);
         const x = Math.floor(this.x / 16);
         const doorStyle = doorStyles[this.style];
@@ -958,7 +967,7 @@ export class Door implements ObjectInstance {
     add(state: GameState, area: AreaInstance) {
         this.area = area;
         area.objects.push(this);
-        this.changeStatus(state, this.status);
+        this.applyDoorBehaviorsToArea();
     }
     getHitbox(state: GameState): Rect {
         const doorStyle = doorStyles[this.style];
