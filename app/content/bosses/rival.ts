@@ -124,8 +124,8 @@ const staffAbility: EnemyAbility<Direction> = {
     useAbility(this: void, state: GameState, enemy: Enemy, target: Direction): void {
         enemy.changeToAnimation('staffSlam');
         enemy.z = Math.max(enemy.z + enemy.vz, 0);
-        playAreaSound(state, state.areaInstance, 'bossDeath');
-        hitTargets(state, state.areaInstance, {
+        playAreaSound(state, enemy.area, 'bossDeath');
+        hitTargets(state, enemy.area, {
             damage: 2,
             hitbox: getStaffHitbox(enemy, enemy.d),
             hitAllies: true,
@@ -234,6 +234,9 @@ function renderStaff(this: void, context: CanvasRenderingContext2D, state: GameS
 }
 
 function updateRival(this: void, state: GameState, enemy: Enemy): void {
+    if (enemy.area !== state.hero.area) {
+        return;
+    }
     if (!enemy.params.introduced) {
         enemy.params.introduced = true;
         appendScript(state, '{@rival.startFirstFight}');

@@ -18,7 +18,7 @@ import { createAnimation, drawFrame } from 'app/utils/animations';
 import { getDirection } from 'app/utils/field';
 import { allImagesLoaded } from 'app/utils/images';
 
-import { AreaInstance, EffectInstance, Enemy, GameState, ObjectInstance } from 'app/types';
+import { AreaInstance, Enemy, EnemyAbility, GameState } from 'app/types';
 
 const flameGeometry = {w: 20, h: 20, content: {x: 2, y: 2, w: 16, h: 16}};
 export const [
@@ -57,6 +57,37 @@ const flameHeartAnimations = {
     },
 };
 
+
+type LeakStrikeTargetType = ReturnType<typeof getVectorToNearbyTarget>;
+
+const leapStrikeAbility: EnemyAbility<LeakStrikeTargetType> = {
+    getTarget(this: void, state: GameState, enemy: Enemy): LeakStrikeTargetType {
+        return getVectorToNearbyTarget(state, enemy, 2000, enemy.area.allyTargets);
+    },
+    useAbility(this: void, state: GameState, enemy: Enemy, target: LeakStrikeTargetType): void {
+        const enemyHitbox = enemy.getHitbox();
+        const targetHitbox = target.target.getHitbox();
+        const x = enemyHitbox.x + enemyHitbox.w / 2;
+        const y = enemyHitbox.y + enemyHitbox.h / 2;
+        const tx = targetHitbox.x + targetHitbox.w / 2;
+        const ty = targetHitbox.y + targetHitbox.h / 2;
+        const abilityWithCharges = enemy.getAbility(leapStrikeAbility);
+        enemy.vz = (abilityWithCharges.charges > 0) ? 3 : 4;
+        enemy.az = -0.2;
+        const duration = -2 * enemy.vz / enemy.az;
+        enemy.vx = (tx - x) / duration;
+        enemy.vy = (ty - y) / duration;
+        enemy.setAnimation('attack', enemy.d);
+        enemy.setMode('leapStrike');
+        spawnGiantFlame(state, enemy);
+    },
+    cooldown: 2000,
+    initialCharges: 2,
+    charges: 2,
+    prepTime: 200,
+    recoverTime: 100,
+};
+
 enemyDefinitions.flameHeart = {
     animations: flameHeartAnimations, life: 24, scale: 2, touchHit: { damage: 4, element: 'fire'}, update: updateFireHeart, params: {
         enrageLevel: 0,
@@ -66,6 +97,7 @@ enemyDefinitions.flameHeart = {
     elementalMultipliers: {'ice': 2},
 };
 enemyDefinitions.flameBeast = {
+    abilities: [leapStrikeAbility],
     animations: beetleHornedAnimations, life: 36, scale: 4, update: updateFireBeast,
     initialMode: 'hidden',
     acceleration: 0.3, speed: 2,
@@ -155,23 +187,6 @@ function updateFireHeart(this: void, state: GameState, enemy: Enemy): void {
     }
 }
 
-const flameBeastLeapStrike = (state: GameState, enemy: Enemy, target: EffectInstance | ObjectInstance): void => {
-    const enemyHitbox = enemy.getHitbox(state);
-    const targetHitbox = target.getHitbox(state);
-    const x = enemyHitbox.x + enemyHitbox.w / 2;
-    const y = enemyHitbox.y + enemyHitbox.h / 2;
-    const tx = targetHitbox.x + targetHitbox.w / 2;
-    const ty = targetHitbox.y + targetHitbox.h / 2;
-    enemy.vz = enemy.params.strikes ? 3 : 4;
-    enemy.az = -0.2;
-    const duration = -2 * enemy.vz / enemy.az;
-    enemy.vx = (tx - x) / duration;
-    enemy.vy = (ty - y) / duration;
-    enemy.params.strikes++;
-    enemy.setAnimation('attack', enemy.d);
-    enemy.setMode('leapStrike');
-    spawnGiantFlame(state, enemy);
-};
 
 const spawnGiantFlame = (state: GameState, enemy: Enemy): void => {
     const enemyHitbox = enemy.getHitbox(state);
@@ -180,7 +195,7 @@ const spawnGiantFlame = (state: GameState, enemy: Enemy): void => {
     const flame = new Flame({
         x,
         y,
-        ttl: 2000 + enemy.params.enrageLevel * 500,
+        ttl: 2000 + getFlameBeastEnrageLevel(state, enemy) * 500,
         scale: 4,
         damage: 4,
     });
@@ -189,15 +204,33 @@ const spawnGiantFlame = (state: GameState, enemy: Enemy): void => {
     addEffectToArea(state, enemy.area, flame);
 };
 
+function getFlameBeastEnrageLevel(state: GameState, enemy: Enemy) {
+    let enrageLevel = 0;
+    const flameHeart = getFlameHeart(state, enemy.area);
+    if (!flameHeart) {
+        enrageLevel++;
+    }
+    if (enemy.life <= enemy.enemyDefinition.life / 3) {
+        enrageLevel++;
+    }
+    if (enemy.life <= 2 * enemy.enemyDefinition.life / 3) {
+        enrageLevel++;
+    }
+    return enrageLevel;
+}
+
 function updateFireBeast(this: void, state: GameState, enemy: Enemy): void {
     const flameHeart = getFlameHeart(state, enemy.area);
     if (flameHeart && flameHeart.life >= flameHeart.enemyDefinition.life) {
+        if (enemy.mode === 'hidden') {
+            enemy.healthBarTime = 0;
+        }
         return;
     }
     if (enemy.mode === 'hidden') {
         enemy.z = 300;
         enemy.status = 'normal';
-        enemy.setMode('leapStrike');
+        enemy.setMode('choose');
     }
     // This enemy in particular should not deal contact damage while it is in the air
     // since our heuristic of using the actual sprite overlap doesn't make sense this high in the air and
@@ -207,8 +240,6 @@ function updateFireBeast(this: void, state: GameState, enemy: Enemy): void {
     if (enemy.mode === 'regenerate') {
         // Fall to the ground if we start regeneration mid leap.
         if (enemy.z > 0) {
-            enemy.vz = Math.max(-6, Math.min(0, enemy.vz - 0.2));
-            enemy.z = Math.max(0, enemy.z + enemy.vz);
             return;
         }
         if (isEnemyDefeated(flameHeart)) {
@@ -238,28 +269,26 @@ function updateFireBeast(this: void, state: GameState, enemy: Enemy): void {
         return;
     }
     const targetVector = getVectorToTarget(state, enemy, target);
-    if (enemy.mode === 'choose') {
-        enemy.d = getDirection(targetVector.x, targetVector.y);
-        enemy.setAnimation('idle', enemy.d);
-        if (enemy.modeTime >= 1000) {
-            enemy.params.strikes = 0;
-            flameBeastLeapStrike(state, enemy, target);
-        }
-    } else if (enemy.mode === 'leapStrike') {
-        if (enemy.modeTime >= 200) {
+    if (enemy.mode === 'leapStrike') {
+        if (enemy.z > 0) {
             enemy.x += enemy.vx;
             enemy.y += enemy.vy;
-            enemy.z += enemy.vz;
-            enemy.vz = Math.max(-8, enemy.vz - 0.2);
-            if (enemy.z <= 0) {
-                enemy.z = 0;
-                if (Math.random() < (2 + enemy.params.enrageLevel - enemy.params.strikes) / (2 + enemy.params.enrageLevel)) {
-                    flameBeastLeapStrike(state, enemy, target);
-                } else {
-                    enemy.setMode('choose');
+        }
+        if (enemy.z <= 0 && enemy.vz <= 0) {
+            enemy.z = 0;
+            // Has a chance to generate a new leapstrike charge depending on enrage level.
+            const abilityWithCharges = enemy.getAbility(leapStrikeAbility);
+            if (Math.random() < getFlameBeastEnrageLevel(state, enemy) / 4) {
+                if (abilityWithCharges.charges < (leapStrikeAbility.charges || 1)) {
+                    abilityWithCharges.charges++;
                 }
             }
+            enemy.setMode('choose');
         }
+    } else if (enemy.mode === 'choose' && enemy.z <= 0) {
+        enemy.d = getDirection(targetVector.x, targetVector.y);
+        enemy.setAnimation('idle', enemy.d);
+        enemy.tryUsingAbility(state, leapStrikeAbility);
     }
 }
 

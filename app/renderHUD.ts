@@ -82,17 +82,18 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
     });
 
     // Show boss health bars from both realms.
-    const bosses = [...state.areaInstance.enemies, ...state.alternateAreaInstance.enemies].filter(
-        e => e.status !== 'gone' && e.definition.type === 'boss' && e.isFromCurrentSection(state)
+    const bossesWithHealthBars = [...state.areaInstance.enemies, ...state.alternateAreaInstance.enemies].filter(
+        e => e.status !== 'gone' && e.definition.type === 'boss'
+            && e.isFromCurrentSection(state) && e.healthBarTime >= 100
     ) as Enemy[];
     y = CANVAS_HEIGHT
-    if (bosses.length) {
-        const totalSpace = CANVAS_WIDTH - 32 - bosses.length * 4 + 4;
+    if (bossesWithHealthBars.length) {
+        const totalSpace = CANVAS_WIDTH - 32 - bossesWithHealthBars.length * 4 + 4;
         const barHeight = 6;
-        const barWidth = (totalSpace / bosses.length) | 0;
+        const barWidth = (totalSpace / bossesWithHealthBars.length) | 0;
         y -= 16;
         x = 16;
-        for (const boss of bosses) {
+        for (const boss of bossesWithHealthBars) {
             const animatedWidth = barWidth * Math.max(0, Math.min(1, (boss.healthBarTime - 100) / 1000));
             context.fillStyle = 'black';
             context.fillRect(x, y, animatedWidth, barHeight);
@@ -111,17 +112,18 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
         }
     }
     const otherEnemiesWithHealthBars = [...state.areaInstance.enemies, ...state.alternateAreaInstance.enemies].filter(
-        e => e.status !== 'gone' && e.definition.type !== 'boss' && e.enemyDefinition.showHealthBar && e.isFromCurrentSection(state)
+        e => e.status !== 'gone' && e.definition.type !== 'boss' && e.enemyDefinition.showHealthBar
+            && e.isFromCurrentSection(state) && e.healthBarTime >= 100
     );
     if (otherEnemiesWithHealthBars.length) {
-        const totalSpace = CANVAS_WIDTH - 32 - bosses.length * 4 + 4;
+        const totalSpace = CANVAS_WIDTH - 32 - otherEnemiesWithHealthBars.length * 4 + 4;
         const barHeight = 4;
         // This probably won't work when there are more than three such enemies.
         const barWidth = (totalSpace / 3) | 0;
         y -= barHeight;
         x = 16;
         for (const enemy of otherEnemiesWithHealthBars) {
-            const animatedWidth = barWidth * Math.min(1, enemy.healthBarTime / 1000);
+            const animatedWidth = barWidth * Math.max(0, Math.min(1, (enemy.healthBarTime - 100) / 1000));
             context.fillStyle = 'black';
             context.fillRect(x, y, animatedWidth, barHeight);
             const healthWidth = animatedWidth * enemy.getHealthPercent(state) | 0;

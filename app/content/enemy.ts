@@ -58,7 +58,7 @@ export class Enemy implements Actor, ObjectInstance {
     vx: number = 0;
     vy: number = 0;
     vz: number = 0;
-    az: number = 0;
+    az: number = -0.5;
     w: number;
     h: number;
     groundHeight = 0;
@@ -237,7 +237,7 @@ export class Enemy implements Actor, ObjectInstance {
         this.vz = vz;
     }
     onHit(state: GameState, hit: HitProperties): HitResult {
-        if (this.status === 'gone' || this.status === 'hidden' || this.isDefeated || this.life <= 0) {
+        if (this.status === 'gone' || this.status === 'hidden' || this.mode === 'hidden' || this.isDefeated || this.life <= 0) {
             return {};
         }
         if (this.enemyDefinition.onHit) {
@@ -494,7 +494,7 @@ export class Enemy implements Actor, ObjectInstance {
             this.updateDrawPriority();
             if (this.z > 0) {
                 this.z = Math.max(0, this.z + this.vz);
-                this.vz = Math.max(-8, this.vz - 0.5);
+                this.vz = Math.max(-8, this.vz + this.az);
             }
             return;
         }
@@ -558,20 +558,30 @@ export class Enemy implements Actor, ObjectInstance {
             this.blockInvulnerableFrames--;
         }
         const minZ = this.canBeKnockedDown ? 0 : (this.flying ? 12 : 0);
-        if (this.action === 'knocked' || (this.z > minZ && !this.flying && !this.enemyDefinition.floating && !this.activeAbility)) {
-            this.vz = Math.max(-8, this.vz - 0.5);
+        if (this.action === 'knocked') {
+            this.vz = Math.max(-8, this.vz + this.az);
             this.z += this.vz;
             moveEnemy(state, this, this.vx, this.vy, {canFall: true});
             if (this.z <= minZ) {
                 this.z = minZ;
             }
             this.animationTime += FRAME_LENGTH;
-            if (this.animationTime >= 200 && (!this.canBeKnockedDown || this.z <= minZ)) {
+            if (this.animationTime >= 200 && this.z <= minZ) {
                 this.action = null;
                 this.changeToAnimation('idle');
                 this.animationTime = 0;
             }
             return;
+        } else if (
+            (this.az > 0 || this.vz > 0 || this.z > minZ)
+            && !this.flying && !this.enemyDefinition.floating && !this.activeAbility
+        ) {
+            this.vz = Math.max(-8, this.vz + this.az);
+            this.z += this.vz;
+            if (this.z <= minZ) {
+                this.z = minZ;
+            }
+            this.animationTime += FRAME_LENGTH;
         }
         if (this.flying) {
             if (this.enemyDefinition.updateFlyingZ) {

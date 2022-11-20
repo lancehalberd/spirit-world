@@ -126,8 +126,6 @@ enemyDefinitions.electricSquirrel = {
             if (!moveEnemyFull(state, enemy, 0, enemy.vy, {})) {
                 enemy.vy = -enemy.vy;
             }
-            enemy.z += enemy.vz;
-            enemy.vz = Math.max(-8, enemy.vz - 0.2);
             if (enemy.z <= 0) {
                 enemy.z = 0;
                 enemy.setMode('recover');
@@ -221,10 +219,9 @@ enemyDefinitions.superSquirrel = {
             if (!moveEnemyFull(state, enemy, 0, enemy.vy, {})) {
                 enemy.vy = -enemy.vy;
             }
-            enemy.z += enemy.vz;
-            enemy.vz = Math.max(-8, enemy.vz - 0.2);
             if (enemy.z <= 0) {
                 enemy.z = 0;
+                enemy.az = -0.5;
                 enemy.setMode('recover');
             }
         } else if (enemy.mode === 'recover') {
