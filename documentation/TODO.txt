@@ -42,7 +42,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Fix money door doesn't work
     - Door closes opening second key chest in tomb.
     - Rival battle triggers when in spirit world.
         - Rival battle isn't cleared by entering tomb (dialog object is disabled in randomizer).

@@ -762,10 +762,10 @@ export class Door implements ObjectInstance {
         this.definition = definition;
         this.x = definition.x;
         this.y = definition.y;
-        this.status = definition.status || 'normal';
         if (this.definition.d === 'up' && this.definition.price) {
-            this.status = 'closed';
+            this.definition.status = 'closed';
         }
+        this.status = definition.status || 'normal';
         this.refreshLogic(state);
         this.style = definition.style as DoorStyle;
         if (!doorStyles[this.style]) {
