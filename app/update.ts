@@ -207,6 +207,7 @@ function updateMenu(state: GameState) {
         const menuItem = menuRow[state.menuIndex];
         if (menuItem === 'help') {
             state.paused = false;
+            updateSoundSettings(state);
             showHint(state);
             return;
         }
@@ -243,11 +244,13 @@ function updateMenu(state: GameState) {
         }
         if (menuItem === 'nimbusCloud') {
             state.paused = false;
+            updateSoundSettings(state);
             showMessage(state, '{@nimbusCloud.chooseDestination}');
             return;
         }
         if (state.hero.passiveTools[menuItem as PassiveTool]) {
             state.paused = false;
+            updateSoundSettings(state);
             const helpMessage = getLootHelpMessage(state, menuItem, state.hero.passiveTools[menuItem]);
             showMessage(state, helpMessage);
         }
@@ -404,6 +407,6 @@ function selectSaveFile(state: GameState, savedGameIndex: number): void {
     if (!isRandomizer) {
         showHint(state);
     } else {
-        setScript(state, '{@mom.randomizer}');
+        // setScript(state, '{@mom.randomizer}');
     }
 }

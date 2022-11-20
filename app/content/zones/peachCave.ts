@@ -888,7 +888,7 @@ const f0_1x0: AreaDefinition = {
         {status: "normal", id: "", x: 224, y: 112, type: "narration", message: "{flag:movementInstructions}\n{removeCue}", w: 32, h: 64, delay: 2000, saveStatus: "never"},
         {status: "normal", id: "hideJumpInstructions1", x: 320, y: 128, type: "narration", message: "{removeCue}", w: 32, h: 64, delay: 500},
         {status: "normal", id: "movementInstructions", x: 112, y: 160, type: "narration", message: "This cave is so dark I didn't see that hole until it was too late...\n{|}Huh, there is a strange glow over there.\n{addCue:Use [B_DPAD] to investigate the light to the east}", w: 32, h: 32, delay: 2000},
-        {status: "normal", id: "peachCaveFinalNarration", x: 368, y: 416, type: "narration", message: "Hey I know this place...\n{|}This is the cave by the lake, I can swim out over there!", delay: 500, w: 32, h: 32},
+        {status: "normal", id: "peachCaveFinalNarration", x: 368, y: 416, type: "narration", message: "Hey I know this place...\n{|}This is the cave by the lake, I can swim out over there!", delay: 1200, w: 32, h: 32},
         {status: "normal", id: "jumpInstructions1", x: 256, y: 112, type: "narration", message: "Wow, the cave is full of glowing plants!\n{|}If I jump down I could use that vine to climb up over there.\n{addCue: Hold [B_RIGHT] against the ledge to jump down}", w: 48, h: 64, delay: 500},
     ],
     sections: [
