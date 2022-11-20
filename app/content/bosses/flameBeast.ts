@@ -67,6 +67,7 @@ enemyDefinitions.flameHeart = {
 };
 enemyDefinitions.flameBeast = {
     animations: beetleHornedAnimations, life: 36, scale: 4, update: updateFireBeast,
+    initialMode: 'hidden',
     acceleration: 0.3, speed: 2,
     immunities: ['fire'],
     elementalMultipliers: {'ice': 2},
@@ -191,10 +192,9 @@ const spawnGiantFlame = (state: GameState, enemy: Enemy): void => {
 function updateFireBeast(this: void, state: GameState, enemy: Enemy): void {
     const flameHeart = getFlameHeart(state, enemy.area);
     if (flameHeart && flameHeart.life >= flameHeart.enemyDefinition.life) {
-        enemy.status = 'hidden';
         return;
     }
-    if (enemy.status === 'hidden') {
+    if (enemy.mode === 'hidden') {
         enemy.z = 300;
         enemy.status = 'normal';
         enemy.setMode('leapStrike');

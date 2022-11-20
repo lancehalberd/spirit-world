@@ -42,6 +42,16 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Fix money door doesn't work
+    - Door closes opening second key chest in tomb.
+    - Rival battle triggers when in spirit world.
+        - Rival battle isn't cleared by entering tomb (dialog object is disabled in randomizer).
+    - Entered door on peaks when using cloud boots (think vy was still set after using cloud).
+    - Fix jumping enemies broken:
+        - Flame beast, electric squirrels
+    - Mana regens too fast when meditating.
+    - Refreshing browser shouldn't end randomizer.
+
     - Fix ledges so that:
         - You can shoot arrows down ledges but not up them
         - Shooting an arrow down a ledge allows it to go over solid tiles unless they

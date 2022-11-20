@@ -932,6 +932,13 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
     }
     for (const object of area.objects) {
         object.refreshLogic?.(state);
+        if (object.definition?.specialBehaviorKey) {
+            try {
+                specialBehaviorsHash[object.definition.specialBehaviorKey].apply?.(state, object as any);
+            } catch (error) {
+                console.error(object.definition.specialBehaviorKey);
+            }
+        }
     }
     checkIfAllEnemiesAreDefeated(state, area);
 }
