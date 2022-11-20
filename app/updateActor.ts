@@ -80,7 +80,10 @@ export function updateAllHeroes(this: void, state: GameState) {
         }
     }
     updateHero(state, state.hero);
-    updatePrimaryHeroState(state, state.hero);
+    const skipFrame = state.hero.action === 'meditating' && (state.hero.animationTime % 100) !== 0;
+    if (!skipFrame) {
+        updatePrimaryHeroState(state, state.hero);
+    }
     checkToStartScreenTransition(state, state.hero);
 }
 
@@ -246,9 +249,9 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
     }
     // Clones drain 2 magic per second.
     state.hero.magic -= 2 * state.hero.clones.length * FRAME_LENGTH / 1000;
-    // Meditation grants 1 additional spirit energy per second.
+    // Meditation grants 3 additional spirit energy per second.
     if (hero.action === 'meditating') {
-        state.hero.magic += FRAME_LENGTH / 1000;
+        state.hero.magic += 3 * FRAME_LENGTH / 1000;
     }
     //if (hero.action !== 'knocked' && hero.action !== 'thrown') {
         // At base mana regen, using cat eyes reduces your mana very slowly unless you are stationary.

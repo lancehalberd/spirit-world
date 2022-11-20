@@ -42,7 +42,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Mana regens too fast when meditating.
     - Refreshing browser shouldn't end randomizer.
 
     - Fix ledges so that:
