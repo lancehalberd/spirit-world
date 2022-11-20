@@ -290,3 +290,9 @@ export function getTitleOptions(state: GameState): string[] {
     }
     return [...gameFiles, 'DELETE'];
 }
+
+export function shouldHideMenu(state: GameState): boolean {
+    return !!state.alwaysHideMenu || state.hero.isExitingDoor || state.hero.isControlledByObject
+        || state.scriptEvents.queue.length > 0 || state.scriptEvents.activeEvents.length > 0
+        || !!state.messagePage || !!state.transitionState;
+}

@@ -103,7 +103,8 @@ export interface GameState {
     paused: boolean
     menuIndex: number
     menuRow: number
-    hideMenu?: boolean
+    // This is mostly used for debugging animations.
+    alwaysHideMenu?: boolean
     defeatState: {
         defeated: boolean
         reviving?: boolean

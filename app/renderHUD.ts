@@ -3,6 +3,7 @@ import { CANVAS_HEIGHT, CANVAS_WIDTH, isRandomizer } from 'app/gameConstants';
 import { getCheckInfo } from 'app/randomizer/checks';
 import { renderTextRow } from 'app/render/renderMessage';
 import { renderSpiritBar } from 'app/render/spiritBar';
+import { shouldHideMenu } from 'app/state';
 import { createAnimation, drawFrame, drawFrameAt, drawFrameCenteredAt } from 'app/utils/animations';
 import { drawText } from 'app/utils/simpleWhiteFont';
 
@@ -173,7 +174,7 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
             effects.render(context, state);
         }
     }
-    if (state.paused && state.hideMenu) {
+    if (state.paused && shouldHideMenu(state)) {
         renderTextRow(context, 'PAUSED', {x: 8, y: CANVAS_HEIGHT - 22});
     }
 }

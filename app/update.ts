@@ -36,6 +36,7 @@ import {
     saveGame,
     saveGamesToLocalStorage,
     setSaveFileToState,
+    shouldHideMenu,
 } from 'app/state';
 import { updateCamera } from 'app/updateCamera';
 import { updateField } from 'app/updateField';
@@ -74,8 +75,9 @@ export function update() {
                 updateSoundSettings(state);
             }
         }
-        if (state.paused && !(state.hideMenu && wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL))) {
-            if (!state.hideMenu) {
+        const hideMenu = shouldHideMenu(state);
+        if (state.paused && !(hideMenu && wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL))) {
+            if (!hideMenu) {
                 updateMenu(state);
             }
         } else if (state.transitionState && !state.areaInstance.priorityObjects?.length) {

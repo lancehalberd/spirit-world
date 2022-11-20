@@ -13,7 +13,7 @@ import { renderHUD } from 'app/renderHUD';
 import { renderMenu } from 'app/renderMenu';
 import { renderMessage } from 'app/render/renderMessage';
 import { renderTitle } from 'app/renderTitle';
-import { getState } from 'app/state';
+import { getState, shouldHideMenu } from 'app/state';
 import { drawFrame } from 'app/utils/animations';
 
 import { AreaInstance, AreaLayer, AreaLayerDefinition, EffectInstance, ObjectInstance, GameState } from 'app/types';
@@ -117,7 +117,7 @@ export function render() {
     if (state.transitionState && !state.areaInstance?.priorityObjects?.length) {
         renderTransition(context, state);
         renderHUD(context, state);
-        if (state.paused && !state.hideMenu) {
+        if (state.paused && !shouldHideMenu(state)) {
             renderMenu(context, state);
         }
         return;
@@ -174,7 +174,7 @@ export function render() {
         // Draw the HUD onto the field.
         renderHUD(context, state);
     }
-    if (state.paused && !state.hideMenu) {
+    if (state.paused && !shouldHideMenu(state)) {
         renderMenu(context, state);
     }
 }

@@ -188,7 +188,7 @@ export function addKeyCommands() {
         }
         if (keysDown[KEY.SHIFT] && keyCode === KEY.BACK_SLASH) {
             const state = getState();
-            state.hideMenu = !state.hideMenu;
+            state.alwaysHideMenu = !state.alwaysHideMenu;
         }
         if (keyCode === KEY.K && commandIsDown) {
             defeatAllEnemies();
