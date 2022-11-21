@@ -810,22 +810,19 @@ export class Door implements ObjectInstance {
     }
     changeStatus(state: GameState, status: ObjectStatus): void {
         const forceOpen = evaluateLogicDefinition(state, this.definition.openLogic, false);
-        let isClosed = status === 'closed' || status === 'closedSwitch' || status === 'closedEnemy' || status === 'cracked';
-        if (!isClosed) {
-            this.wasOpened = true;
-        }
-        if (isClosed && forceOpen) {
+        let isOpen = status === 'normal' || status === 'blownOpen';
+        const wasOpen = this.status === 'normal' || this.status === 'blownOpen';
+        this.wasOpened = isOpen;
+
+        if (forceOpen) {
             status = (status === 'cracked') ? 'blownOpen' : 'normal';
+            isOpen = true;
         }
-        if (isClosed) {
-            this.wasOpened = false;
-        }
-        const wasClosed = this.status === 'closed' || this.status === 'closedSwitch' || this.status === 'closedEnemy' || this.status === 'cracked';
         this.status = status;
         if (this.linkedObject && this.linkedObject.status !== status) {
             this.linkedObject.changeStatus(state, status);
         }
-        if (this.definition.id && (this.status === 'normal' || this.status === 'blownOpen')) {
+        if (this.definition.id && isOpen && !forceOpen) {
             // Update the other half of this door if it is in the same super tile.
             for (const object of (this.area?.objects || [])) {
                 if (object?.definition?.type === 'door' &&
@@ -836,16 +833,14 @@ export class Door implements ObjectInstance {
                 }
             }
             // Only save the status when the door isn't being forced open.
-            if (!forceOpen) {
-                saveObjectStatus(state, this.definition, true);
-            }
+            saveObjectStatus(state, this.definition, true);
         }
         if (!this.area) {
             return;
         }
-        if (wasClosed && status === 'normal') {
+        if (!wasOpen && isOpen) {
             playAreaSound(state, this.area, 'doorOpen');
-        } else if (isClosed && this.status === 'normal') {
+        } else if (wasOpen && !isOpen) {
             playAreaSound(state, this.area, 'doorClose');
         }
         this.applyDoorBehaviorsToArea();
