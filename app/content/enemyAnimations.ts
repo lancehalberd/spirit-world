@@ -377,7 +377,7 @@ export const crystalCollectorEnragedAnimations: ActorAnimations = {
     death: omniAnimation(crystalCollectorEnragedConfusedAnimation),
 };
 
-const crystalBarrierGeometry: FrameDimensions = { w: 96, h: 94, content: {x: 24, y: 14, w: 48, h: 70} };
+const crystalBarrierGeometry: FrameDimensions = { w: 96, h: 94, content: {x: 16, y: 40, w: 64, h: 44} };
 export const crystalBarrierSummonAnimation = createAnimation('gfx/effects/monstershield.png', crystalBarrierGeometry,
     { x: 0, cols: 4, duration: 6, frameMap: [0,0,0,0,1,2,3,2,3]});
 export const crystalBarrierNormalAnimation = createAnimation('gfx/effects/monstershield.png', crystalBarrierGeometry, { x: 3, cols: 1, duration: 5});

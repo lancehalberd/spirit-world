@@ -50,6 +50,8 @@ export interface ObjectInstance {
     cleanup?: (state: GameState) => void,
     // This is called when a user grabs a solid tile
     getHitbox?: (state?: GameState) => Rect
+    // Used instead of the literal y value for depth sorting if defined.
+    getYDepth?: () => number
     // This will be used for the hitbox for the editor only if it is defined.
     getEditorHitbox?: (state: GameState) => Rect
     onActivate?: (state: GameState) => void
@@ -107,6 +109,8 @@ export interface EffectInstance {
     cleanup?: (state: GameState) => void
     // This is called when a user grabs a solid tile
     getHitbox?: (state?: GameState) => Rect
+    // Used instead of the literal y value for depth sorting if defined.
+    getYDepth?: () => number
     onEnterArea?: (state: GameState) => void
     // When the hero hits the effect with a weapon or tool.
     // This is used by certain enemy attacks, but it might be better to change those to objects.

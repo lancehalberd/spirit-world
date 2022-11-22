@@ -9,8 +9,8 @@ import { EnemyArrow, spiritArrowIcon } from 'app/content/effects/arrow';
 import { Flame } from 'app/content/effects/flame';
 import { FrostGrenade } from 'app/content/effects/frostGrenade';
 import { GrowingThorn } from 'app/content/effects/growingThorn';
-import { GroundSpike, addLineOfSpikes } from 'app/content/effects/groundSpike';
-import { SpikePod } from 'app/content/effects/spikePod';
+import { GroundSpike } from 'app/content/effects/groundSpike';
+
 import {
     beetleAnimations,
     climbingBeetleAnimations,
@@ -28,7 +28,6 @@ import { FRAME_LENGTH } from 'app/gameConstants';
 import { moveActor } from 'app/moveActor';
 import { createAnimation, drawFrameAt, drawFrameCenteredAt } from 'app/utils/animations';
 import { directionMap, getDirection } from 'app/utils/field';
-import { playSound } from 'app/musicController';
 
 import {
     ActorAnimations, Direction, DrawPriority, EffectInstance,
@@ -40,6 +39,7 @@ import {
 } from 'app/types';
 
 export * from 'app/content/enemies/crystalBat';
+export * from 'app/content/enemies/crystalGuardian';
 export * from 'app/content/enemies/electricSquirrel';
 export * from 'app/content/enemies/lightningDrone';
 export * from 'app/content/enemies/sentryBot';
@@ -149,6 +149,7 @@ export interface EnemyDefinition {
     getHealthPercent?: (state: GameState, enemy: Enemy) => number
     getShieldPercent?: (state: GameState, enemy: Enemy) => number
     getHitbox?: (enemy: Enemy) => Rect
+    getYDepth?: (enemy: Enemy) => number
 }
 
 enemyDefinitions.arrowTurret = {
@@ -248,88 +249,6 @@ enemyDefinitions.ent = {
     // which is more specific than touch damage on enemies which requires actually being in the same pixel.
     tileBehaviors: {touchHit: { damage: 2}, solid: true},
     canBeKnockedBack: false,
-};
-
-enemyDefinitions.crystalGuardian = {
-    alwaysReset: true,
-    params: {
-        shieldLife: 8,
-    },
-    animations: entAnimations, aggroRadius: 128,
-    life: 8, touchDamage: 2,
-    canBeKnockedBack: false,
-    onHit(state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
-        // If the shield is up, only fire damage can hurt it.
-        if (enemy.params.shieldLife > 0) {
-            if (hit.canDamageCrystalShields) {
-                enemy.params.shieldLife = Math.max(0, enemy.params.shieldLife - hit.damage);
-                playSound('enemyHit');
-                return { hit: true };
-            }
-        }
-        // Use the default hit behavior, the attack will be blocked if the shield is still up.
-        return enemy.defaultOnHit(state, hit);
-    },
-    update(state: GameState, enemy: Enemy): void {
-        enemy.shielded = enemy.params.shieldLife > 0;
-        // Summon a pod once very 2 seconds if a target is nearby.
-        if (enemy.modeTime % 3000 === 0) {
-            const v = getVectorToNearbyTarget(state, enemy, enemy.enemyDefinition.aggroRadius, enemy.area.allyTargets);
-            if (v) {
-                const {x, y} = v;
-                // This should spawn in a fixed radius around the guardian in between it and the target.
-                addEffectToArea(state, enemy.area, new SpikePod({
-                    x: enemy.x + enemy.w / 2 + 72 * x,
-                    y: enemy.y + enemy.h / 2 + 72 * y,
-                    damage: 2,
-                }));
-            }
-        }
-        if (enemy.modeTime % 5000 === 0) {
-            const v = getVectorToNearbyTarget(state, enemy, enemy.enemyDefinition.aggroRadius, enemy.area.allyTargets);
-            if (v) {
-                addLineOfSpikes({
-                    state, area: enemy.area,
-                    source: [enemy.x + enemy.w / 2 + v.x * 8, enemy.y + enemy.h / 2 + v.y * 8],
-                    target: [enemy.x + enemy.w / 2 + v.x * 32, enemy.y + enemy.h / 2 + v.y * 32],
-                });
-            }
-        }
-    },
-    ignorePits: true,
-    // The damage from tile behaviors will trigger when the player attempts to move into the same pixel,
-    // which is more specific than touch damage on enemies which requires actually being in the same pixel.
-    tileBehaviors: {touchHit: {damage: 2 }, solid: true},
-    renderOver(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
-        const defaultParams = enemyDefinitions.crystalGuardian.params;
-        if (enemy.params.shieldLife <= 0) {
-            return;
-        }
-        const hitbox = enemy.getHitbox();
-        context.save();
-            context.globalAlpha *= (0.4 + 0.4 * enemy.params.shieldLife / defaultParams.shieldLife);
-            context.fillStyle = 'white';
-            context.fillRect(hitbox.x, hitbox.y, hitbox.w, hitbox.h);
-        context.restore();
-        // Debug the vector to where the pod will by created.
-        /*const v = getVectorToNearbyTarget(state, enemy, enemy.enemyDefinition.aggroRadius, enemy.area.allyTargets);
-        if (v) {
-            context.beginPath();
-            context.moveTo(enemy.x + enemy.w / 2, enemy.y + enemy.h / 2);
-            context.lineTo(enemy.x + enemy.w / 2 + v.x * 48, enemy.y + enemy.h / 2 + v.y * 48);
-            context.strokeStyle = 'red';
-            context.stroke();
-        }*/
-    },
-    renderPreview(context: CanvasRenderingContext2D, enemy: Enemy, target: Rect): void {
-        enemy.defaultRenderPreview(context, target);
-        renderLightningShield(context, target, true, enemy.params.shieldColor);
-        context.save();
-            context.globalAlpha *= 0.8;
-            context.fillStyle = 'white';
-            context.fillRect(target.x, target.y, target.w, target.h);
-        context.restore();
-    },
 };
 
 function updateEnt(state: GameState, enemy: Enemy): void {

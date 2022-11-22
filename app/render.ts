@@ -618,7 +618,7 @@ export function renderAreaObjectsBeforeHero(context: CanvasRenderingContext2D, s
             ? state.hero.y + 32 : state.hero.y;
         for (const object of area.objectsToRender) {
             if ((object.drawPriority === 'sprites' || object.getDrawPriority?.(state) === 'sprites')
-                && object.y <= heroY
+                && (object.getYDepth?.() ?? object.y) <= heroY
             ) {
                 if (object.render) {
                     spriteObjects.push(object);
@@ -647,7 +647,7 @@ export function renderAreaObjectsAfterHero(context: CanvasRenderingContext2D, st
             ? state.hero.y + 32 : state.hero.y;
         for (const object of area.objectsToRender) {
             if ((object.drawPriority === 'sprites' || object.getDrawPriority?.(state) === 'sprites')
-                && object.y > heroY
+                && (object.getYDepth?.() ?? object.y) > heroY
             ) {
                 if (object.render) {
                     spriteObjects.push(object);
