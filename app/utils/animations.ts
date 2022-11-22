@@ -6,7 +6,7 @@ import {
     Rect, TintedFrame,
 } from 'app/types';
 
-interface CreateAnimationOptions {
+export interface CreateAnimationOptions {
     x?: number, y?: number,
     xSpace?: number,
     ySpace?: number,

@@ -124,6 +124,8 @@ export interface EnemyDefinition {
     // This enemy won't be destroyed when reaching 0 life.
     isImmortal?: boolean
     immunities?: MagicElement[]
+    // Override number of iframes the enemy cannot damage the player when damaged.
+    invulnerableFrames?: number
     elementalMultipliers?: {[key in MagicElement]?: number}
     initialAnimation?: string
     initialMode?: string

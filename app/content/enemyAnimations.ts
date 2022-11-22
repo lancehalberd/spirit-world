@@ -1,6 +1,9 @@
 import { createAnimation } from 'app/utils/animations';
 
-import { ActorAnimations, FrameAnimation, FrameDimensions } from 'app/types';
+import {
+    ActorAnimations, CreateAnimationOptions,
+    ExtraAnimationProperties, FrameAnimation, FrameDimensions,
+} from 'app/types';
 
 const enemyDeathGeometry: FrameDimensions = {w: 20, h: 20};
 export const enemyDeathAnimation: FrameAnimation = createAnimation('gfx/effects/enemydeath.png', enemyDeathGeometry, { cols: 9, duration: 4}, { loop: false });
@@ -336,3 +339,50 @@ export const crystalBatAnimations: ActorAnimations = {
     hurt: omniAnimation(crystalBatHurtAnimation),
     attack: omniAnimation(crystalBatAttackAnimation),
 };
+
+const crystalCollectorGeometry: FrameDimensions = { w: 50, h: 39, content: {x: 7, y: 9, w: 36, h: 30} };
+const crystalBossAnimation = (props: CreateAnimationOptions, extra?: ExtraAnimationProperties) =>
+    createAnimation('gfx/enemies/eyeboss1.png', crystalCollectorGeometry, props, extra);
+
+
+const crystalCollectorOpenAnimation = crystalBossAnimation({ cols: 5, duration: 10}, {loop: false});
+const crystalCollectorEnragedOpenAnimation = crystalBossAnimation({ y: 1, cols: 5, duration: 10}, {loop: false});
+
+const crystalCollectorIdleAnimation = crystalBossAnimation({ x: 4, cols: 1, duration: 5});
+const crystalCollectorEnragedIdleAnimation = crystalBossAnimation({ y: 1, x: 4, cols: 1, duration: 5});
+
+const crystalCollectorHurtAnimation = crystalBossAnimation({ x: 5, cols: 1});
+const crystalCollectorEnragedHurtAnimation = crystalBossAnimation({ y: 1, x: 5, cols: 1});
+
+const crystalCollectorConfusedAnimation = crystalBossAnimation({ x: 6, cols: 2}, {loop: false});
+const crystalCollectorEnragedConfusedAnimation = crystalBossAnimation({ y: 1, x: 6, cols: 2}, {loop: false});
+
+const crystalCollectorAttackAnimation = crystalBossAnimation({ x: 8, cols: 3, duration: 5});
+const crystalCollectorEnragedAttackAnimation = crystalBossAnimation({ y: 1, x: 8, cols: 3, duration: 5});
+
+export const crystalCollectorAnimations: ActorAnimations = {
+    open: omniAnimation(crystalCollectorOpenAnimation),
+    idle: omniAnimation(crystalCollectorIdleAnimation),
+    hurt: omniAnimation(crystalCollectorHurtAnimation),
+    confused: omniAnimation(crystalCollectorConfusedAnimation),
+    attack: omniAnimation(crystalCollectorAttackAnimation),
+    death: omniAnimation(crystalCollectorConfusedAnimation),
+};
+export const crystalCollectorEnragedAnimations: ActorAnimations = {
+    open: omniAnimation(crystalCollectorEnragedOpenAnimation),
+    idle: omniAnimation(crystalCollectorEnragedIdleAnimation),
+    hurt: omniAnimation(crystalCollectorEnragedHurtAnimation),
+    confused: omniAnimation(crystalCollectorEnragedConfusedAnimation),
+    attack: omniAnimation(crystalCollectorEnragedAttackAnimation),
+    death: omniAnimation(crystalCollectorEnragedConfusedAnimation),
+};
+
+const crystalBarrierGeometry: FrameDimensions = { w: 96, h: 94, content: {x: 24, y: 14, w: 48, h: 70} };
+export const crystalBarrierSummonAnimation = createAnimation('gfx/effects/monstershield.png', crystalBarrierGeometry,
+    { x: 0, cols: 4, duration: 6, frameMap: [0,0,0,0,1,2,3,2,3]});
+export const crystalBarrierNormalAnimation = createAnimation('gfx/effects/monstershield.png', crystalBarrierGeometry, { x: 3, cols: 1, duration: 5});
+export const crystalBarrierDamagedAnimation = createAnimation('gfx/effects/monstershield.png', crystalBarrierGeometry, { x: 4, cols: 1, duration: 5});
+export const crystalBarrierVeryDamagedAnimation = createAnimation('gfx/effects/monstershield.png', crystalBarrierGeometry, { x: 5, cols: 1, duration: 5});
+
+export const crystalBarrierSmallParticles = createAnimation('gfx/effects/crystalwallparticles.png', {w: 8, h: 8}, { cols: 3}).frames;
+export const crystalBarrierLargeParticles = createAnimation('gfx/effects/crystalwallparticles2.png', {w: 16, h: 28}, { cols: 4}).frames;

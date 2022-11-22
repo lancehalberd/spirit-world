@@ -1,8 +1,15 @@
-import { GameState, LootType } from 'app/types';
+import { getLootHelpMessage, getLootName } from 'app/content/loot';
+import { isRandomizer } from 'app/gameConstants';
 
-export function getMenuRows(state: GameState): LootType[][] {
-    const menuRows: LootType[][] = [];
-    const activeTools: LootType[] = ['help'];
+import { GameState, MenuOptionType } from 'app/types';
+
+
+export function getMenuRows(state: GameState): MenuOptionType[][] {
+    const menuRows: MenuOptionType[][] = [];
+    const activeTools: MenuOptionType[] = ['help'];
+    if (isRandomizer) {
+        activeTools.push('return');
+    }
     // Active tools
     if (state.hero.activeTools.bow) {
         activeTools.push('bow');
@@ -18,7 +25,7 @@ export function getMenuRows(state: GameState): LootType[][] {
     }
     menuRows.push(activeTools);
 
-    const equipment: LootType[] = ['leatherBoots'];
+    const equipment: MenuOptionType[] = ['leatherBoots'];
     if (state.hero.equipment.ironBoots) {
         equipment.push('ironBoots');
     }
@@ -27,7 +34,7 @@ export function getMenuRows(state: GameState): LootType[][] {
     }
     menuRows.push(equipment);
 
-    const elements: LootType[] = [];
+    const elements: MenuOptionType[] = [];
     if (state.hero.passiveTools.charge) {
         elements.push('charge');
     }
@@ -42,11 +49,11 @@ export function getMenuRows(state: GameState): LootType[][] {
     }
     menuRows.push(elements);
 
-    let passiveToolRow: LootType[] = [];
+    let passiveToolRow: MenuOptionType[] = [];
     for (let key in state.hero.passiveTools) {
         // This is included among the elements.
         if (key === 'charge' || !state.hero.passiveTools[key]) continue;
-        passiveToolRow.push(key as LootType);
+        passiveToolRow.push(key as MenuOptionType);
         if (passiveToolRow.length >= 7) {
             menuRows.push(passiveToolRow);
             passiveToolRow = [];
@@ -57,4 +64,24 @@ export function getMenuRows(state: GameState): LootType[][] {
     }
 
     return menuRows;
+}
+
+export function getMenuName(state: GameState, type: MenuOptionType): string {
+    if (type === 'help') {
+        return 'Hint';
+    }
+    if (type === 'return') {
+        return 'Return Home';
+    }
+    return getLootName(state, type);
+}
+
+export function getMenuHelpMessage(state: GameState, type: MenuOptionType): string {
+    if (type === 'help') {
+        return 'Hint';
+    }
+    if (type === 'return') {
+        return 'Return Home';
+    }
+    return getLootHelpMessage(state, type);
 }

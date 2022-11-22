@@ -14,7 +14,7 @@ import { renderEnemyShadow } from 'app/renderActor';
 import Random from 'app/utils/Random';
 
 import {
-    Action, Actor, AreaInstance, BossObjectDefinition, Direction, DrawPriority, EffectInstance,
+    Action, Actor, ActorAnimations, AreaInstance, BossObjectDefinition, Direction, DrawPriority, EffectInstance,
     EnemyAbility, EnemyAbilityInstance, EnemyDefinition, EnemyObjectDefinition,
     Frame, FrameAnimation, GameState, HitProperties, HitResult,
     ObjectInstance, ObjectStatus, Point, Rect, TileBehaviors, TextCueTauntInstance,
@@ -38,12 +38,13 @@ export class Enemy implements Actor, ObjectInstance {
     drawPriority: DrawPriority = 'sprites';
     definition: EnemyObjectDefinition | BossObjectDefinition;
     enemyDefinition: EnemyDefinition;
-    // Which key was read from enemyDefinition.animations to produce the current animation.
+    // Which key was read from this.animations to produce the current animation.
     // Only valid if `currentAnimation` is set using standard methods.
     currentAnimationKey: string;
     currentAnimation: FrameAnimation;
     hasShadow: boolean = true;
     animationTime: number;
+    animations: ActorAnimations;
     alwaysReset: boolean = false;
     alwaysUpdate: boolean = false;
     // This ignores the default pit logic in favor of the ground effects
@@ -95,6 +96,7 @@ export class Enemy implements Actor, ObjectInstance {
     constructor(state: GameState, definition: EnemyObjectDefinition | BossObjectDefinition) {
         this.definition = definition;
         this.enemyDefinition = enemyDefinitions[this.definition.enemyType] || enemyDefinitions.snake;
+        this.animations = this.enemyDefinition.animations;
         this.behaviors = {
             ...(this.enemyDefinition.tileBehaviors || {}),
         };
@@ -153,6 +155,9 @@ export class Enemy implements Actor, ObjectInstance {
         if (this.enemyDefinition.getHitbox) {
             return this.enemyDefinition.getHitbox(this);
         }
+        return this.getDefaultHitbox();
+    }
+    getDefaultHitbox(): Rect {
         const frame = this.getFrame();
         return {
             x: this.x,
@@ -193,12 +198,15 @@ export class Enemy implements Actor, ObjectInstance {
                 this.spawnY < section.y || this.spawnY > section.y + section.h)
     }
     changeToAnimation(type: string) {
+        if (!this.animations) {
+            debugger;
+        }
         this.currentAnimationKey = type;
-        const animationSet = this.enemyDefinition.animations[type] || this.enemyDefinition.animations.idle;
+        const animationSet = this.animations[type] || this.animations.idle;
         // Fallback to the first defined direction if the current direction isn't defined.
         const targetAnimation = animationSet[this.d] || Object.values(animationSet)[0];
         if (!targetAnimation) {
-            console.error(`No animation found for ${type} ${this.d}`, this.enemyDefinition.animations);
+            console.error(`No animation found for ${type} ${this.d}`, this.animations);
             debugger;
         }
         if (this.currentAnimation !== targetAnimation) {
@@ -208,11 +216,11 @@ export class Enemy implements Actor, ObjectInstance {
     }
     setAnimation(type: string, d: Direction, time: number = 0) {
         this.currentAnimationKey = type;
-        const animationSet = this.enemyDefinition.animations[type] || this.enemyDefinition.animations.idle;
+        const animationSet = this.animations[type] || this.animations.idle;
         // Fallback to the first defined direction if the current direction isn't defined.
         this.currentAnimation = animationSet[d] || Object.values(animationSet)[0];
         if (!this.currentAnimation) {
-            console.error(`No animation found for ${type} ${this.d}`, this.enemyDefinition.animations);
+            console.error(`No animation found for ${type} ${this.d}`, this.animations);
             debugger;
         }
         this.animationTime = time;
@@ -232,6 +240,7 @@ export class Enemy implements Actor, ObjectInstance {
         this.changeToAnimation('hurt');
         this.action = 'knocked';
         this.animationTime = 0;
+        this.az = Math.min(-0.2, this.az);
         this.vx = vx;
         this.vy = vy;
         this.vz = vz;
@@ -313,7 +322,7 @@ export class Enemy implements Actor, ObjectInstance {
         }
         this.life -= damage;
         // This is actually the number of frames the enemy cannot damage the hero for.
-        this.invulnerableFrames = 50;
+        this.invulnerableFrames = this.enemyDefinition.invulnerableFrames ?? 50;
         this.enemyInvulnerableFrames = 20;
         if (this.life <= 0 && !this.isImmortal) {
             this.showDeathAnimation(state);

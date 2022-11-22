@@ -21,4 +21,5 @@ export { KeyBlock } from 'app/content/objects/keyBlock';
 export { NPCBehavior, NPCStyle, NPC } from 'app/content/objects/npc';
 export { DecorationType } from 'app/content/objects/decoration';
 export { VineSprout } from 'app/content/objects/vineSprout';
+export { CreateAnimationOptions } from 'app/utils/animations';
 export { TrackKey } from 'app/utils/sounds';

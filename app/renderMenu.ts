@@ -1,5 +1,5 @@
-import { getMenuRows } from 'app/content/menu';
-import { getLootFrame, getLootName, neutralElement } from 'app/content/loot';
+import { getMenuName, getMenuRows } from 'app/content/menu';
+import { getLootFrame, neutralElement } from 'app/content/loot';
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
 import { characterMap } from 'app/utils/simpleWhiteFont';
 import { createAnimation, drawFrame, drawFrameCenteredAt } from 'app/utils/animations';
@@ -91,6 +91,8 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
         for (const menuItem of menuRow) {
             if (menuItem === 'help') {
                 drawFrameCenteredAt(context, characterMap['?'], {w: frameSize, h: frameSize, x, y});
+            } else if (menuItem === 'return') {
+                renderLoot('nimbusCloud', 1);
             } else if (state.hero.activeTools[menuItem]) {
                 renderSelectableTool(menuItem as ActiveTool);
             } else if (state.hero.equipment[menuItem]) {
@@ -117,7 +119,7 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
 
     const selectedItem = menuRows[state.menuRow]?.[state.menuIndex];
     if (selectedItem) {
-        const lootName = getLootName(state, selectedItem);
+        const lootName = getMenuName(state, selectedItem);
         drawText(context, lootName, r.x + r.w - 4, r.y + r.h - 4, {
             textBaseline: 'bottom',
             textAlign: 'right',

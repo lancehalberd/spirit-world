@@ -22,7 +22,8 @@ export const updateMusic = (): void => {
         return;
     }
     const bosses = [...state.areaInstance.enemies, ...state.alternateAreaInstance.enemies].filter(
-        e => e.status !== 'gone' && e.healthBarTime > 0 && e.definition.type === 'boss' && e.isFromCurrentSection(state)
+        e => e.status !== 'gone' && e.healthBarTime > 100 && e.definition.type === 'boss'
+        && e.isFromCurrentSection(state)
     ) as Enemy[];
     if (bosses.length) {
         // The boss track is several different pieces, so we want to make sure not to restart the intro

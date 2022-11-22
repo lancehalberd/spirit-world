@@ -235,6 +235,8 @@ function renderStaff(this: void, context: CanvasRenderingContext2D, state: GameS
 
 function updateRival(this: void, state: GameState, enemy: Enemy): void {
     if (enemy.area !== state.hero.area) {
+        enemy.healthBarTime = 0;
+        enemy.setMode('hidden');
         return;
     }
     if (!enemy.params.introduced) {

@@ -59,6 +59,8 @@ function travelToLocation(state: GameState, zoneKey: string, markerId: string): 
 dialogueHash.nimbusCloud = {
     key: 'nimbusCloud',
     mappedOptions: {
+        returnHomeChoice: `{choice:Return home?|Yes:nimbusCloud.returnToHome|No:nimbusCloud.no}`,
+        returnToHome: (state: GameState) => travelToLocation(state, 'overworld', 'waterfallMarker'),
         chooseDestination: (state: GameState) => {
             if (zoneEntranceMap[state.zone.key]) {
                 return `

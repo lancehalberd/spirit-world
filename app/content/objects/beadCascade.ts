@@ -227,8 +227,8 @@ export class BeadSection implements ObjectInstance {
         } else {
             this.y += this.speed;
             for (let x = this.x; x < this.x + this.w; x += 8) {
-            addParticleSpray(state, this.area, Random.element(crystalParticles),
-                x + Math.random() * 8, this.y, 0);
+                addParticleSpray(state, this.area, Random.element(crystalParticles),
+                    x + Math.random() * 8, this.y, 0);
             }
         }
         // Check for drains starting from near the top, but skip the first tile.

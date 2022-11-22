@@ -65,7 +65,7 @@ export class SpikePod implements EffectInstance, Props {
         }
         let r = Math.PI / 5;
         if (reflected) {
-            theta = -theta;
+            theta += Math.PI;
             r = Math.PI / 6;
         }
         for (let i = 0; i < 5; i++) {
@@ -86,7 +86,7 @@ export class SpikePod implements EffectInstance, Props {
         this.animationTime = 0;
     }
     onHit(state: GameState, hit: HitProperties): HitResult {
-        const {x, y} = getVectorToNearestTargetOrRandom(state, this, [hit.source]);
+        const {x, y} = getVectorToNearestTargetOrRandom(state, this, [state.hero]);
         this.burst(state, Math.atan2(y, x), true);
         return {};
     }

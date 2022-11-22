@@ -775,6 +775,7 @@ const f0_0x1: AreaDefinition = {
         {status: "normal", id: "", x: 32, y: 272, type: "spawnMarker", linked: true},
         {status: "normal", id: "", x: 176, y: 304, type: "spawnMarker", linked: true},
         {status: "normal", id: "waterfallCaveSave", x: 32, y: 256, type: "saveStatue"},
+        {status: "normal", id: "waterfallMarker", x: 160, y: 288, type: "marker"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -1178,7 +1179,7 @@ const f0_0x2: AreaDefinition = {
         {status: "normal", id: "", x: 288, y: 432, type: "spawnMarker", linked: true},
         {status: "normal", id: "", x: 432, y: 304, type: "spawnMarker", linked: true},
         {status: "normal", id: "", x: 272, y: 256, type: "spawnMarker", linked: true},
-        {status: "normal", id: "moneyMazeEntrance", x: 112, y: 272, type: "door", style: "wooden", targetZone: "holyCityInterior", targetObjectId: "moneyMazeEntrance", d: "up", price: 25},
+        {status: "closed", id: "moneyMazeEntrance", x: 112, y: 272, type: "door", style: "wooden", targetZone: "holyCityInterior", targetObjectId: "moneyMazeEntrance", d: "up", price: 25},
         {status: "normal", id: "citySaveStatue", x: 240, y: 32, type: "saveStatue"},
         {status: "normal", id: "", x: 144, y: 304, style: "short", type: "sign", message: "Wager your fortune in the Arrow Maze, only 25 Jade!"},
         {status: "normal", id: "holyCityMarker", x: 272, y: 160, type: "marker"},

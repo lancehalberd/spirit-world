@@ -42,8 +42,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Refreshing browser shouldn't end randomizer.
-
     - Fix ledges so that:
         - You can shoot arrows down ledges but not up them
         - Shooting an arrow down a ledge allows it to go over solid tiles unless they

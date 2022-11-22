@@ -54,6 +54,10 @@ enemyDefinitions.crystalBat = {
     lootTable: moneyLootTable,
     initialMode: 'chooseDirection',
     updateFlyingZ(this: void, state: GameState, enemy: Enemy) {
+        if (enemy.action === 'knocked') {
+            enemy.az = -0.2;
+            return;
+        }
         if (enemy.activeAbility) {
             if (enemy.activeAbility.time < enemy.activeAbility.definition.prepTime) {
                 enemy.z = Math.min(32, enemy.z + 0.4);

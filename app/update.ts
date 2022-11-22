@@ -2,9 +2,9 @@ import { enterLocation } from 'app/content/areas';
 import { addDustBurst, addReviveBurst } from 'app/content/effects/animationEffect';
 import { Hero } from 'app/content/hero';
 import { showHint } from 'app/content/hints';
+import { getLootHelpMessage } from 'app/content/loot';
 import { getMenuRows } from 'app/content/menu';
 import { showMessage } from 'app/render/renderMessage';
-import { getLootHelpMessage } from 'app/content/loot';
 import {
     SPAWN_LOCATION_DEMO,
     SPAWN_LOCATION_FULL,
@@ -209,6 +209,12 @@ function updateMenu(state: GameState) {
             state.paused = false;
             updateSoundSettings(state);
             showHint(state);
+            return;
+        }
+        if (menuItem === 'return') {
+            state.paused = false;
+            updateSoundSettings(state);
+            showMessage(state, '{@nimbusCloud.returnHomeChoice}');
             return;
         }
         if (state.hero.activeTools[menuItem]) {

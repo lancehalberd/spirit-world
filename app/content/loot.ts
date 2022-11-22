@@ -81,7 +81,6 @@ export function getLootName(state: GameState, lootType: LootType, lootLevel?: nu
                 return 'Chakram';
             }
             return 'Spirit Chakram';
-        case 'help': return 'Hint';
         case 'spiritSight': return 'Spirit Sight';
         case 'astralProjection': return 'Summoner\'s Circlet';
         case 'teleportation': return 'Teleportation';
