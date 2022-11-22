@@ -638,14 +638,6 @@ const clouds: TileSource = {
         '1x3': { ...cloudBehavior, edges: {up: true, right: true}},
         '0x4': { ...cloudBehavior, edges: {down: true, left: true}},
         '1x4': { ...cloudBehavior, edges: {down: true, right: true}},
-        //'0x3': { ...cloudBehavior, solidMap: BITMAP_TOP_LEFT, jumpDirection: 'upleft'},
-        //'1x3': { ...cloudBehavior, solidMap: BITMAP_TOP_RIGHT, jumpDirection: 'upright'},
-        //'2x3': { ...cloudBehavior, solidMap: BITMAP_BOTTOM_RIGHT, jumpDirection: 'downright'},
-        //'3x3': { ...cloudBehavior, solidMap: BITMAP_BOTTOM_LEFT, jumpDirection: 'downleft'},
-        //'0x4': { ...cloudBehavior, solidMap: BITMAP_BOTTOM_LEFT, jumpDirection: 'downleft'},
-        //'1x4': { ...cloudBehavior, solidMap: BITMAP_BOTTOM_RIGHT, jumpDirection: 'downright'},
-        //'2x4': { ...cloudBehavior, solidMap: BITMAP_TOP_RIGHT, jumpDirection: 'upright'},
-        //'3x4': { ...cloudBehavior, solidMap: BITMAP_TOP_LEFT, jumpDirection: 'upleft'},
     },
 };
 const cloudAngles: TileSource = {

@@ -43,19 +43,21 @@ Graphics:
 
 Current tasks:
     - Fix ledges so that:
-        - You can shoot arrows down ledges but not up them
+        - You can shoot arrows down ledges but not up them. Applies to projectiles in general.
+        - You can throw a clone down a ledge but not up a ledge.
+        - solidMap behavior can block projectiles.
         - Shooting an arrow down a ledge allows it to go over solid tiles unless they
             are marked as "veryTall".
         - Special exception for southern edges+wall tiles
-            - Southern edges do not
+            - All Southern edges(SW/S/SE) do not block movement/projectiles in any southern direction.
         - Shooting an arrow down N ledges allows it to go up N ledges
             - Let's just assume all ledges are 32px tall
+        - Nice to have: actors can be partially off of ledges and just walk off them to jump down instead of pushing
+            against a barrier.
         - New behaviors:
-            isSouthernWall - Indicates 16px z-grade over the tile
-                ? Special treatment for southwest/southeast walls?
-                    z-grade is the same except that the wall height is decreased by 1 px for each pixel in the x direction. So for a SE wall, the top-left pixel in the bottom tile has height 16px, but the top-right pixel in the same tile only has height 0
-                    These heights only apply when moving from another southern tile, if coming from a
-            tileHeight - Indicates how high up a wall is in z pixels. This can be used for tiles in tall objects like trees
+            isSouthernWall - solid pixels only block movement/projectiles that are not down, downleft or downright
+            isVeryTall - solid pixels apply to movement/projectiles that have crossed ledges.
+                (Alternatively, this could be tileHeight, and tileHeight > 32 would have this effect if ledges assume 32px height)
 
     - Add some speaker name so it is clear who is talking in cut scenes with multiple characters.
         - Add this to cut scene with Elder+Rival
@@ -248,6 +250,11 @@ High level list of things left to do:
         Difficulty shrines for dungeons/bosses
             - Probably just roll this into VR minigame where you can fight old bosses.
         Hero helping during first elemental beast fight
+            Hero wears monk fighting attire
+            Creates a spirit barrier during rage phase that MC can hide in to prevent all damage
+            Attacks or distracts the beats while fighting the heart
+            Adds dialog cues for guiding the MC to destroy the heart
+            Heals MC or restores MC spirit energy periodically
         Rival during last elemental beast fight
         Spirit Gates + Spirit Keys
         Spirit shop + Jade Idols
@@ -364,6 +371,7 @@ River Temple Improvements:
     - Some underwater enemies
     - Some crab enemies with ice shells that require fire element to defeat
     - Maybe torches should stay lit during the boss fight once turned on.
+    - Add special behavior for frozen doors instead of having two door objects.
 
 
 Staff Tower Improvements
