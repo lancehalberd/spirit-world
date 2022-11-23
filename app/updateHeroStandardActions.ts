@@ -58,7 +58,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         (hero.action === 'attack' && (hero.weapon < 2 || hero.actionFrame < 6)) ||
         hero.z > Math.max(FALLING_HEIGHT, minZ) || hero.action === 'climbing';
     const canCharge = !hero.isAstralProjection && isPlayerControlled && !isActionBlocked;
-    const canAttack = canCharge && hero.weapon > 0 && !hero.chargingLeftTool && !hero.chargingRightTool;
+    const canAttack = canCharge && hero.weapon > 0 && !hero.chargingLeftTool && !hero.chargingRightTool && !hero.heldChakram;
     // console.log('move', !isMovementBlocked, 'act', !isActionBlocked, 'charge', canCharge, 'attack', canAttack);
     hero.isRunning = canCharge && isPassiveButtonDown;
 
@@ -531,7 +531,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     }
 
     // Check to start charging/preparing a tool for use.
-    if (canCharge && hero.toolCooldown <= 0 && !hero.chargingRightTool && !hero.chargingLeftTool) {
+    if (canCharge && hero.toolCooldown <= 0 && !hero.chargingRightTool && !hero.chargingLeftTool && !hero.heldChakram) {
         const controllableClones = state.hero.clones.filter(clone => !clone.isUncontrollable);
         if (state.hero.leftTool && wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL)
             && (state.hero.leftTool !== 'clone' || !controllableClones.length)

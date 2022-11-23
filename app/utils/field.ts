@@ -224,12 +224,12 @@ export function getTileBehaviorsAndObstacles(
     direction?: Direction,
 ): {tileBehavior: TileBehaviors, tx: number, ty: number, objects: ObjectInstance[]} {
     const objects: ObjectInstance[] = [];
-    let tx = Math.floor(x / 16);
-    let ty = Math.floor(y / 16);
+    let tx = (x / 16) | 0;
+    let ty = (y / 16) | 0;
     let definedBehavior = area?.behaviorGrid[ty]?.[tx];
     if (!definedBehavior && nextArea) {
-        tx = Math.floor((x - nextArea.cameraOffset.x) / 16);
-        ty = Math.floor((y - nextArea.cameraOffset.y) / 16);
+        tx = ((x - nextArea.cameraOffset.x) / 16) | 0;
+        ty = ((y - nextArea.cameraOffset.y) / 16) | 0;
         definedBehavior = nextArea?.behaviorGrid[ty]?.[tx];
     }
     const tileBehavior = {...(definedBehavior || {})};

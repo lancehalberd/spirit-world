@@ -59,6 +59,41 @@ Current tasks:
             isVeryTall - solid pixels apply to movement/projectiles that have crossed ledges.
                 (Alternatively, this could be tileHeight, and tileHeight > 32 would have this effect if ledges assume 32px height)
 
+    Update collision detection and wiggle logic:
+        - Create an array that is the width of the character(relative to movement direction) + 16
+        - Assuming entry 8 = [ax, ay] and length - 9 = [ax + width - 1, ay] (for moving up or down) check pairs of 0 and 3 pixels every 4 pixels, so for w = 16, check 8+11,12+15,16+19,20+23. If any are blocked, movement is blocked, remember the blocked pixel index.
+        - If movement is blocked if blocked index <= length / 2 then scan right starting at blocked index + 1. If w open pixels are found, wiggle right. If a blocked pixel is found at index >= length - w, then abort, wiggling is not possible.
+        - If blocked index > length / 2, repeat the above except scanning left to check for left wiggle.
+
+    More simply (assuming moving north):
+        Scan the row of pixels the character is moving into. If any of the left half are blocked, flag that they cannot wiggle to the left. If any of the right half are blocked, flag that they cannot wiggle right.
+        If can wiggle left+right, just move forward. If cannot wiggle left or right, movement is stopped.
+        If can wiggle to the left, then scan for W open pixels left of the left most blocked pixel and wiggle left if so. Similarly for wiggling to the right.
+
+    canMovePixel(
+        x: x coord of current pixel
+        y: y coord of current pixel
+        d: direction (up/down/left/right) moving the pixel
+        movementProperties:
+            (existing movement properties, canFall/canSwim/canClimb/etc)
+            isHigh - set when this pixel is sticking out past a ledge and therefor on top of many obstacles like regular walls. In theory this gets set any time there is a ledge that a character can leap down in between
+            the center of the character and the point being tested.
+
+    Calculating isHigh before calling canMovePixel
+        Probably simplify things by assuming this is only done for 16x16 characters or smaller. When characters get
+        very large, they can cover multiple tiles and it becomes unclear what it means if multiple ledges are crossed
+        between the center of the character and the pixel tested.
+        Maybe approach this by using 1 direction for a 16x16 character and try to iterate through every possible case and then either see if it can be generalized or see how hard it is to just handle every case and then apply to all directions.
+        For initial mocks, use 4x4 character instead
+
+    Jumping south logic
+        Set vz positive and negative az for normal ballistic jump, land when z <= minZ, vy is positive 1 or 2.
+        If passing over tile with isSouthernWall=true, increase vy 2x and increase vz 1x the same amount. This
+        will appear to move at the same rate as normal, but the characters y will increase faster and give them
+        additional z height to allow them to potentially jump over more tiles the further up they are. This will also cause the shadow to move ahead of the player to suggest height to the jump.
+
+
+
     - Add some speaker name so it is clear who is talking in cut scenes with multiple characters.
         - Add this to cut scene with Elder+Rival
 
@@ -76,6 +111,8 @@ Current tasks:
     Puzzle ideas
         - Send a clone into the spirit world for "temporary" true sight. Might be annoying to switch between.
         - Some kind of hazards in the spirit world that move slowly and knock you back, where you need true sight to navigate successfully because spirit sight is too slow.
+        - Use a clone to stand on a switch to hold a door open.
+        - Use a clone to jump off a cliff to press one switch, then destroy it and make another clone to jump down another cliff to press another switch to open a door at the top of the cliff.
 
     Change prep animation for explosion
         charge particles form randomly in a circle around the hero shooting into them,
@@ -453,12 +490,6 @@ Additional Staff Behavior:
         Lvl 2 charge is a screen wide attack the applies damage+element to all enemies.
     Top N pixels of character should be drawn on foreground as well so that it appears in front of staff when facing north.
         - Probably should disable staff when character is standing on any tiles marked with low ceiling just in case.
-
-Update collision detection and wiggle logic:
-    - Create an array that is the width of the character(relative to movement direction) + 16
-    - Assuming entry 8 = [ax, ay] and length - 9 = [ax + width - 1, ay] (for moving up or down) check pairs of 0 and 3 pixels every 4 pixels, so for w = 16, check 8+11,12+15,16+19,20+23. If any are blocked, movement is blocked, remember the blocked pixel index.
-    - If movement is blocked if blocked index <= length / 2 then scan right starting at blocked index + 1. If w open pixels are found, wiggle right. If a blocked pixel is found at index >= length - w, then abort, wiggling is not possible.
-    - If blocked index > length / 2, repeat the above except scanning left to check for left wiggle.
 
 Some puzzle ideas:
     - A puzzle where 4 switches need to be hit in 200ms, you can blow up the clone in the middle to activate all at once.

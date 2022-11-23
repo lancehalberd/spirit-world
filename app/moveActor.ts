@@ -26,12 +26,16 @@ export function moveActor(state: GameState, actor: Actor, dx: number, dy: number
     excludedObjects = new Set(),
 }: MovementProperties): {mx: number, my: number} {
     let sx = dx;
-    if (sx < -1 || sx > 1) {
-        sx /= Math.abs(sx);
+    if (sx < -1){
+        sx = -1;
+    } else if(sx > 1) {
+        sx = 1;
     }
     let sy = dy;
-    if (sy < -1 || sy > 1) {
-        sy /= Math.abs(sy);
+    if (sy < -1){
+        sy = -1;
+    } else if(sy > 1) {
+        sy = 1;
     }
     let mx = 0, my = 0;
     let s = 0;
