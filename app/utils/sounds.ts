@@ -225,6 +225,10 @@ const musicTracks = {
     skyTheme: {key: 'skyTheme', type: 'bgm', source: 'bgm/Spirit 14_demo.mp3', volume: 5 },
     // Used for the lake temple
     lakeTheme: {key: 'lakeTheme', type: 'bgm', source: 'bgm/Spirit 9 Demo.mp3', volume: 5 },
+    // Used for holy city, but a bit to relaxed for that.
+    village: {key : 'village', type: 'bgm', source: 'bgm/Spirit 21_demo.mp3', volume: 5},
+    // Used for summoner ruins.
+    ruins: {key : 'ruins', type: 'bgm', source: 'bgm/Spirit 22_concept.mp3', volume: 5},
 
     // Tracks from Leon
     // For War Temple and other dungeons

@@ -38,6 +38,12 @@ export const updateMusic = (): void => {
         if (!state.location.isSpiritWorld
             && state.location.areaGridCoords.x === 0 && state.location.areaGridCoords.y === 2) {
             playTrack('vanaraForestTheme', 0, soundSettings);
+        } else if (!state.location.isSpiritWorld
+            && state.location.areaGridCoords.x === 2 && state.location.areaGridCoords.y === 2) {
+            playTrack('ruins', 0, soundSettings);
+        } else if (!state.location.isSpiritWorld
+            && state.location.areaGridCoords.x === 2 && state.location.areaGridCoords.y === 0) {
+            playTrack('village', 0, soundSettings);
         } else {
             playTrack('mainTheme', 0, soundSettings);
         }
@@ -62,11 +68,30 @@ export const updateMusic = (): void => {
         playTrack('lakeTheme', 0, soundSettings);
     } else if (state.location.zoneKey === 'tomb') {
         playTrack('tombTheme', 0, soundSettings);
-    } else if (state.location.zoneKey === 'waterfallCave'
-        || state.location.zoneKey === 'holyCityInterior'
-    ) {
+    } else if (state.location.zoneKey === 'holyCityInterior') {
+        playTrack('village', 0, soundSettings);
+    } else if (state.location.zoneKey === 'waterfallCave' ) {
         playTrack('idleTheme', 0, soundSettings);
-    } else if (state.location.zoneKey === 'warTemple' || state.location.zoneKey === 'forestTemple') {
+    } else if (state.location.zoneKey === 'warTemple') {
+        // War Temple technically includes a lot of areas in the ruins around it, but I only
+        // want to use the dungeon theme for the dungeon areas proper.
+        if (!state.location.isSpiritWorld && state.location.floor === 0 &&
+            (
+                // Top row
+                (state.location.areaGridCoords.y === 0 && state.location.y < 256)
+                // Bottom tiles
+                || state.location.areaGridCoords.y === 2
+                // Right edge
+                || (state.location.areaGridCoords.x === 2 && state.location.x > 256)
+                // Bottom section of middle right tile
+                || (state.location.y > 256 && state.location.areaGridCoords.x === 2 && state.location.areaGridCoords.y === 1)
+            )
+        ) {
+            playTrack('ruins', 0, soundSettings);
+        } else {
+            playTrack('dungeonTheme', 0, soundSettings);
+        }
+    } else if (state.location.zoneKey === 'forestTemple') {
         playTrack('dungeonTheme', 0, soundSettings);
     } else if (state.location.zoneKey === 'cocoon') {
         playTrack('cocoonTheme', 0, soundSettings);
