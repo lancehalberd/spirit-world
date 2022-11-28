@@ -1,7 +1,6 @@
 Test at http://localhost:81/alttp/public/
 
 Known Bugs:
-    - Sometimes extra chakram hangs out on the player.
     - Door closing sound plays while in the title screen
         - Maybe just disable playAreaSound in the title scene or only play this sound if the player passes through the door and it closes behind them.
     - Teleporting while grabbing a pot with astral projection can make you face south but still be grabbing the pot
@@ -29,8 +28,8 @@ Known Bugs:
     - Can get to undefined area in city by sinking in the water.
     - Cliff Edge issues:
         - Would be nice if staff could go across edges.
-        - Bow can fire up thin cliffs
-        - Bow cannot fire down southern cliffs.
+        - Bow/chakram can fire up thin cliffs
+        - Bow/chakram cannot fire down southern cliffs.
     - Projectiles can fire in between black abyss tiles, for example, shooting a bow at an east or west wall it may go through instead of stopping.
 
 Graphics:

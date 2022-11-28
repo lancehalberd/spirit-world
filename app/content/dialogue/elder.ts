@@ -162,20 +162,14 @@ dialogueHash.elder = {
                 appendScript(state, `But...!`);
                 appendScript(state, `If you asked me you would know that they came with my blessing.`);
                 wait(state, 500);
-                state.scriptEvents.queue.push({
-                    type: 'callback',
-                    callback(state: GameState) {
-                        elder.d = (elder.x < state.hero.x) ? 'right' : 'left';
-                        elder.changeToAnimation('idle');
-                    }
+                appendCallback(state, (state: GameState) => {
+                    elder.d = (elder.x < state.hero.x) ? 'right' : 'left';
+                    elder.changeToAnimation('idle');
                 });
                 appendScript(state, `Child, I appologize, I should have told ${RIVAL_NAME} you would be coming.`);
-                state.scriptEvents.queue.push({
-                    type: 'callback',
-                    callback(state: GameState) {
-                        elder.d = 'up';
-                        elder.changeToAnimation('idle');
-                    }
+                appendCallback(state, (state: GameState) => {
+                    elder.d = 'up';
+                    elder.changeToAnimation('idle');
                 });
                 appendScript(state, `${RIVAL_NAME}, come with me back to the village and I will explain everything.`);
 
