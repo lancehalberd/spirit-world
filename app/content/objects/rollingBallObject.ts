@@ -68,7 +68,7 @@ export class RollingBallObject implements ObjectInstance {
         if (!this.rollDirection) {
             this.pushCounter++;
             this.pushedThisFrame = true;
-            if (this.pushCounter >= 25) {
+            if (this.pushCounter >= 20) {
                 this.rollInDirection(state, direction);
             }
         }

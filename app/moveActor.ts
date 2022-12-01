@@ -2,15 +2,18 @@ import { uniq } from 'lodash';
 
 import { destroyTile, getAreaSize } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { getJumpVector } from 'app/movement/getJumpVector';
+import { moveDown, moveLeft, moveRight, moveUp } from 'app/movement/move';
 import {
     directionMap,
+    getDirection,
     getTileBehaviorsAndObstacles,
     isPointOpen,
     tileHitAppliesToTarget,
 } from 'app/utils/field';
 import { boxesIntersect } from 'app/utils/index';
 
-import { Actor, Direction, GameState, Hero, MovementProperties } from 'app/types';
+import { Actor, Direction, GameState, Hero, MovementProperties, ObjectInstance, EffectInstance } from 'app/types';
 
 export function moveActor(state: GameState, actor: Actor, dx: number, dy: number, {
     boundToSection,
@@ -39,22 +42,24 @@ export function moveActor(state: GameState, actor: Actor, dx: number, dy: number
     }
     let mx = 0, my = 0;
     let s = 0;
+    const fullDirection = getDirection(dx, dy, true);
     while (s < 100) {
         let movedX = false, movedY = false;
         if (sx) {
             // You can't push when moving diagonally.
-            movedX = moveActorInDirection(state, actor, sx, (sx < 0) ? 'left' : 'right', {
+            const d = (sx < 0) ? 'left' : 'right';
+            movedX = moveActorInDirection(state, actor, sx, d, {
                 boundToSection,
                 boundToSectionPadding,
                 canJump,
-                canPush: canPush && !dy,
+                canPush: canPush && d === fullDirection,
                 canWiggle: canWiggle && !dy,
                 canSwim,
                 canFall,
                 canClimb,
                 canPassMediumWalls,
                 direction,
-                excludedObjects
+                excludedObjects,
             });
             if (movedX) {
                 mx += sx;
@@ -70,18 +75,19 @@ export function moveActor(state: GameState, actor: Actor, dx: number, dy: number
         }
         if (sy) {
             // You can't push when moving diagonally.
-            movedY = moveActorInDirection(state, actor, sy, (sy < 0) ? 'up' : 'down', {
+            const d = (sy < 0) ? 'up' : 'down';
+            movedY = moveActorInDirection(state, actor, sy, d, {
                 boundToSection,
                 boundToSectionPadding,
                 canJump,
-                canPush: canPush && !dx,
+                canPush: canPush && d === fullDirection,
                 canWiggle: canWiggle && !dx,
                 canSwim,
                 canFall,
                 canClimb,
                 canPassMediumWalls,
                 direction,
-                excludedObjects
+                excludedObjects,
             });
             if (movedY) {
                 my += sy;
@@ -212,29 +218,29 @@ function moveActorInDirection(
         if (tileBehavior?.climbable && !canClimb) {
             blockedByTile = true;
         }
-        if (tileBehavior.edges?.up
-            || tileBehavior.edges?.down
-            || tileBehavior.edges?.left
-            || tileBehavior.edges?.right
+        if (tileBehavior.ledges?.up
+            || tileBehavior.ledges?.down
+            || tileBehavior.ledges?.left
+            || tileBehavior.ledges?.right
         ) {
-            //console.log(tileBehavior.edges);
-            /*if (tileBehavior.edges?.up && direction !== 'up') {
+            //console.log(tileBehavior.ledges);
+            /*if (tileBehavior.ledges?.up && direction !== 'up') {
                 blockedByTile = true;
             }
-            if (tileBehavior.edges?.down && direction !== 'down') {
+            if (tileBehavior.ledges?.down && direction !== 'down') {
                 blockedByTile = true;
             }
-            if (tileBehavior.edges?.left && direction !== 'left') {
+            if (tileBehavior.ledges?.left && direction !== 'left') {
                 blockedByTile = true;
             }
-            if (tileBehavior.edges?.right && direction !== 'right') {
+            if (tileBehavior.ledges?.right && direction !== 'right') {
                 blockedByTile = true;
             }*/
             if (tileBehavior.cloudGround) {
                 quickJump = true;
             }
             blockedByTile = true;
-            canJumpDown = canJumpDown && !!tileBehavior.edges[direction];
+            canJumpDown = canJumpDown && !!tileBehavior.ledges[direction];
         } else if (!isTilePassable && tileBehavior?.jumpDirection !== direction) {
             canJumpDown = false;
         }
@@ -337,26 +343,7 @@ function moveActorInDirection(
     }
 
     //if (!blockedByTile && pushedObjects.length === 1) {
-    if (pushedObjects.length === 1) {
-        if (pushedObjects[0].onPush) {
-            pushedObjects[0].onPush(state, direction);
-            actor.lastTouchedObject = pushedObjects[0];
-        }
-    } else if (pushedObjects.length >= 1) {
-        for (const object of pushedObjects) {
-            const hitbox = object.getHitbox(state);
-            if (Math.abs(ax - hitbox.x) < 8
-                || Math.abs(ax + actor.w - hitbox.x - hitbox.w) < 8
-                || Math.abs(ay - hitbox.y) < 8
-                || Math.abs(ay + actor.h - hitbox.y - hitbox.h) < 8
-            ) {
-                if (object.onPush) {
-                    object.onPush(state, direction);
-                    actor.lastTouchedObject = pushedObjects[0];
-                }
-            }
-        }
-    }
+    checkToPushObject(state, actor, pushedObjects, direction);
     if (blockedByTile || blockedByObject) {
         // If this is true, wiggle the character up to Npx to get around corners.
         // This makes it much smoother to try and get into pixel perfect gaps.
@@ -476,243 +463,59 @@ function moveActorInDirection2(
     direction: Direction,
     movementProperties: MovementProperties
 ): boolean {
-    const {
-        canPush = false,
-        canFall = false,
-        canSwim = false,
-        canClimb = false,
-        canJump = false,
-        canWiggle = true,
-        canPassMediumWalls = false,
-    } = movementProperties;
-    let ax = actor.x, ay = actor.y;
-    if (direction === 'up' || direction === 'down') {
-        ay += amount;
-    } else {
-        ax += amount;
-    }
-    if (movementProperties.boundToSection) {
-        const p = movementProperties.boundToSectionPadding ?? 0;
-        const { section } = getAreaSize(state);
-        if (ax < section.x + p || ax + actor.w > section.x + section.w - p
-            || ay < section.y + p || ay + actor.h > section.y + section.h - p
-        ) {
-            return false;
-        }
-    }
-
-    // Check the 1st + 7th pixel from the top/left, then the 1st + 7th pixel from the bottom/right
-    // if they are different.
-    let checkPoints: {x: number, y: number}[];
-    // When moving vertically, we only care about the row we are moving into.
-    if (direction === 'up' || direction === 'down') {
-        const y = direction === 'up' ? ay : ay + actor.h - 1;
-        checkPoints = [{x: ax, y}, {x: ax + 7, y}];
-        if (actor.w > 8) {
-            checkPoints = [...checkPoints, {x: ax + actor.w - 8, y}, {x: ax + actor.w - 1, y}];
-        }
-    } else {
-        const x = direction === 'left' ? ax : ax + actor.w - 1;
-        checkPoints = [{x, y: ay}, {x, y: ay + 7}];
-        if (actor.h > 8) {
-            checkPoints = [...checkPoints, {x, y: ay + actor.h - 8}, {x, y: ay + actor.h - 1}];
-        }
+    if (actor.action === 'jumpingDown') {
+        return false;
     }
     const excludedObjects = new Set<any>([...movementProperties.excludedObjects, actor]);
     if (actor.pickUpObject) {
         excludedObjects.add(actor.pickUpObject);
     }
+    const canWiggle = movementProperties.canWiggle ?? true;
+    movementProperties = {
+        ...movementProperties,
+        canWiggle,
+        excludedObjects,
+    }
+    let result = false;
+    if (direction === 'up') {
+        result = moveUp(state, actor, movementProperties, -amount);
+    }
+    if (direction === 'left') {
+        result = moveLeft(state, actor, movementProperties, -amount);
+    }
+    if (direction === 'down') {
+        result = moveDown(state, actor, movementProperties, amount);
+    }
+    if (direction === 'right') {
+        result = moveRight(state, actor, movementProperties, amount);
+    }
+    const jv = getJumpVector(state, actor.area, actor.getHitbox());
+    if (jv[0] !== 0 || jv[1] !== 0) {
+        actor.action = 'jumpingDown';
+        actor.jumpDirection = getDirection(jv[0], jv[1]);
+        actor.jumpingVx = 2 * jv[0];
+        actor.jumpingVy = 2 * jv[1];
+        actor.jumpingVz = 3;
+        actor.jumpingDownY = actor.y;
+        actor.animationTime = 0;
+    }
+    return result;
+}
 
-    let blockedByTile = false, canJumpDown = canJump;
-    let blockedByObject = false;
-    let pushedObjects = [];
-    let quickJump = false;
-    for (const point of checkPoints) {
-        const { tileBehavior, objects, tx, ty} = getTileBehaviorsAndObstacles(
-            state, actor.area, point, excludedObjects, null, null, direction
-        );
-        if ((!canPassMediumWalls || !(tileBehavior?.low || tileBehavior?.midHeight)) && tileBehavior?.solid && (
-                tileBehavior?.touchHit
-                && !tileBehavior.touchHit?.isGroundHit
-                // tile touchHit always applies to
-                && tileHitAppliesToTarget(state, tileBehavior.touchHit, actor)
-            )
-        ) {
-            const { returnHit } = actor.onHit?.(state, { ...tileBehavior.touchHit, knockback: {
-                vx: - 4 * (ax - actor.x),
-                vy: - 4 * (ay - actor.y),
-                vz: 2,
-            }});
-            // Apply reflected damage to enemies if they were the source of the `touchHit`.
-            if (returnHit && tileBehavior.touchHit.source?.onHit) {
-                tileBehavior.touchHit.source.onHit(state, returnHit);
-            }
-            if (tileBehavior.cuttable && tileBehavior.cuttable <= returnHit?.damage) {
-                for (const layer of actor.area.layers) {
-                    const tile = layer.tiles[ty]?.[tx];
-                    if (tile?.behaviors?.cuttable <= returnHit.damage) {
-                        destroyTile(state, actor.area, { x: tx, y: ty, layerKey: layer.key });
-                    }
-                }
-            }
-            return false;
-        }
-        // Climbable overrides solid tile behavior. This allows use to place tiles marked climbable on top
-        // of solid tiles to make them passable.
-        const isTilePassable = (canPassMediumWalls && (tileBehavior?.low || tileBehavior?.midHeight))
-            || !tileBehavior?.solid || tileBehavior.climbable;
-        // The second condition is a hack to prevent enemies from walking over pits.
-        if (!isTilePassable || ((tileBehavior?.pit || tileBehavior?.isLava || tileBehavior?.isBrittleGround) && !canFall)) {
-            blockedByTile = true;
-        }
-        // !canSwim is a hack to keep enemies/astralProjection out of low ceiling doorways.
-        if (tileBehavior?.lowCeiling && (actor.z > 3 || !canSwim)) {
-            blockedByTile = true;
-            canJumpDown = false;
-        }
-        if (tileBehavior?.water && !canSwim) {
-            blockedByTile = true;
-        }
-        if (tileBehavior?.climbable && !canClimb) {
-            blockedByTile = true;
-        }
-        if (tileBehavior.edges?.up
-            || tileBehavior.edges?.down
-            || tileBehavior.edges?.left
-            || tileBehavior.edges?.right
-        ) {
-            //console.log(tileBehavior.edges);
-            /*if (tileBehavior.edges?.up && direction !== 'up') {
-                blockedByTile = true;
-            }
-            if (tileBehavior.edges?.down && direction !== 'down') {
-                blockedByTile = true;
-            }
-            if (tileBehavior.edges?.left && direction !== 'left') {
-                blockedByTile = true;
-            }
-            if (tileBehavior.edges?.right && direction !== 'right') {
-                blockedByTile = true;
-            }*/
-            if (tileBehavior.cloudGround) {
-                quickJump = true;
-            }
-            blockedByTile = true;
-            canJumpDown = canJumpDown && !!tileBehavior.edges[direction];
-        } else if (!isTilePassable && tileBehavior?.jumpDirection !== direction) {
-            canJumpDown = false;
-        }
-        for (const object of objects) {
-            const objectBehaviors = object.behaviors || object.getBehaviors?.(state);
-            const isBlockedByThisObject = objectBehaviors?.solid
-                && (!canPassMediumWalls || !(tileBehavior?.low || tileBehavior?.midHeight))
-            blockedByObject = blockedByObject || isBlockedByThisObject;
-            if (canPush && isBlockedByThisObject) {
-                pushedObjects.push(object);
-            }
-        }
-    }
-    canJumpDown = canJumpDown && !blockedByObject;
-    pushedObjects = uniq(pushedObjects);
-    if (canPush && (blockedByTile || pushedObjects.length) && (!actor.action || actor.action === 'walking' || actor.action === 'pushing')) {
-        if (!canJumpDown && actor.action !== 'pushing') {
-            actor.action = 'pushing';
-            actor.animationTime = 0;
-        }
-        if (canJumpDown) {
-            actor.jumpingTime = (actor.jumpingTime || 0) + FRAME_LENGTH;
-            if (actor.jumpingTime >= 250 || (quickJump && actor.jumpingTime > 50)) {
-                const [dx, dy] = directionMap[direction];
-                if (direction === 'down') {
-                    actor.action = 'jumpingDown';
-                    actor.jumpDirection = direction;
-                    actor.jumpingVx = 2 * dx;
-                    actor.jumpingVy = 2 * dy;
-                    actor.jumpingVz = 4;
-                    actor.jumpingDownY = actor.y;
-                } else if (direction === 'up') {
-                    let targetY: number = null
-                    for (let i = 2; i <= 6; i++) {
-                        const y = Math.round(actor.y / 16 + i * dy) * 16;
-                        const { tileBehavior: b1 } = getTileBehaviorsAndObstacles(state, actor.area, {x: actor.x, y});
-                        const { tileBehavior: b2 } = getTileBehaviorsAndObstacles(state, actor.area, {x: actor.x + actor.w - 1, y});
-                        if (!b1.solid && !b2.solid && !b1.cannotLand && !b2.cannotLand) {
-                            targetY = y;
-                            break;
-                        }
-                    }
-                    //console.log(actor.x, targetY);
-                    if (targetY !== null) {
-                        const distance = actor.y - targetY;
-                        actor.action = 'jumpingDown';
-                        actor.jumpDirection = direction;
-                        //const speed = distance > 54 ? 4 : 2;
-                        const speed = Math.min(4, Math.round(distance / 15));
-                        const frames = Math.round(distance / speed);
-                        actor.jumpingVy = dy * distance / frames;
-                        actor.jumpingVx = 0;
-                        const az = -0.5;
-                        actor.jumpingVz = -(frames - 1) * az / 2;
-                    } else {
-                        actor.jumpingTime = 0;
-                    }
-                } else {
-                    let targetX: number = null
-                    for (let i = 2; i <= 6; i++) {
-                        const x = Math.round(actor.x / 16 + i * dx) * 16;
-                        const { tileBehavior: b1 } = getTileBehaviorsAndObstacles(state, actor.area, {x, y: actor.y});
-                        const { tileBehavior: b2 } = getTileBehaviorsAndObstacles(state, actor.area, {x, y: actor.y + actor.h - 1});
-                        //console.log(x, actor.y, b1.solid, b1.cannotLand, b2.solid, b2.cannotLand);
-                        if (!b1.solid && !b2.solid && !b1.cannotLand && !b2.cannotLand) {
-                            targetX = x;
-                            break;
-                        }
-                    }
-                    //console.log(targetX, actor.y);
-                    if (targetX !== null) {
-                        actor.action = 'jumpingDown';
-                        actor.jumpDirection = direction;
-                        const distance = Math.abs(actor.x - targetX);
-                        //const speed = distance > 54 ? 4 : 2;
-                        const speed = Math.min(4, Math.round(distance / 15));
-                        const frames = Math.round(distance / speed);
-                        actor.jumpingVx = dx * distance / frames;
-                        actor.jumpingVy = 0;
-                        const az = -0.5;
-                        actor.jumpingVz = -(frames - 1) * az / 2;
-                        //console.log(distance, frames, actor.jumpingVx, actor.jumpingVz);
-                    } else {
-                        actor.jumpingTime = 0;
-                    }
-                }
-                actor.animationTime = 0;
-            }
-        } else {
-            actor.jumpingTime = 0;
-        }
-    } else if ((!blockedByTile && !pushedObjects.length) && actor.action === 'pushing') {
-        actor.action = null;
-        actor.jumpingTime = 0;
-    } else {
-        actor.jumpingTime = 0;
-    }
-    if (actor.action === 'pushing' && !canPush) {
-        actor.action = null;
-    }
-
-    //if (!blockedByTile && pushedObjects.length === 1) {
+export function checkToPushObject(state: GameState, actor: Actor, pushedObjects: (ObjectInstance | EffectInstance)[], direction: Direction,) {
     if (pushedObjects.length === 1) {
         if (pushedObjects[0].onPush) {
             pushedObjects[0].onPush(state, direction);
             actor.lastTouchedObject = pushedObjects[0];
         }
     } else if (pushedObjects.length >= 1) {
+        const actorHitbox = actor.getHitbox();
         for (const object of pushedObjects) {
             const hitbox = object.getHitbox(state);
-            if (Math.abs(ax - hitbox.x) < 8
-                || Math.abs(ax + actor.w - hitbox.x - hitbox.w) < 8
-                || Math.abs(ay - hitbox.y) < 8
-                || Math.abs(ay + actor.h - hitbox.y - hitbox.h) < 8
+            if (Math.abs(actorHitbox.x - hitbox.x) < 8
+                || Math.abs(actorHitbox.x + actorHitbox.w - hitbox.x - hitbox.w) < 8
+                || Math.abs(actorHitbox.y - hitbox.y) < 8
+                || Math.abs(actorHitbox.y + actorHitbox.h - hitbox.y - hitbox.h) < 8
             ) {
                 if (object.onPush) {
                     object.onPush(state, direction);
@@ -721,116 +524,6 @@ function moveActorInDirection2(
             }
         }
     }
-    if (blockedByTile || blockedByObject) {
-        // If this is true, wiggle the character up to Npx to get around corners.
-        // This makes it much smoother to try and get into pixel perfect gaps.
-        if (!canWiggle || canJumpDown) {
-            return false;
-        }
-        const maxWiggle = 8;
-        const z = actor.z || 0;
-        function wiggleLeft(y: number) {
-            for (let l = ax - 1; l >= ax - maxWiggle; l--) {
-                let open = true;
-                for (const x of [l, l + Math.floor(actor.w / 2), l + actor.w - 1]) {
-                    if (!isPointOpen(state, actor.area, {x, y, z}, movementProperties, excludedObjects)) {
-                        open = false;
-                        break;
-                    }
-                }
-                if (open) {
-                    return moveActorInDirection(state, actor, -0.5, 'left', {
-                        ...movementProperties,
-                        canWiggle: false,
-                    });
-                }
-            }
-        }
-        function wiggleRight(y: number) {
-            for (let l = ax + 1; l <= ax + maxWiggle; l++) {
-                let open = true;
-                for (const x of [l, l + Math.floor(actor.w / 2), l + actor.w - 1]) {
-                    if (!isPointOpen(state, actor.area, {x, y, z}, movementProperties, excludedObjects)) {
-                        open = false;
-                        break;
-                    }
-                }
-                if (open) {
-                    return moveActorInDirection(state, actor, 0.5, 'right', {
-                        ...movementProperties,
-                        canWiggle: false,
-                    });
-                }
-            }
-        }
-        function wiggleUp(x: number) {
-            for (let t = ay - 1; t >= ay - maxWiggle; t--) {
-                let open = true;
-                for (const y of [t, t + Math.floor(actor.h / 2), t + actor.h - 1]) {
-                    if (!isPointOpen(state, actor.area, {x, y, z}, movementProperties, excludedObjects)) {
-                        open = false;
-                        break;
-                    }
-                }
-                if (open) {
-                    return moveActorInDirection(state, actor, -0.5, 'up', {
-                        ...movementProperties,
-                        canWiggle: false,
-                    });
-                }
-            }
-        }
-        function wiggleDown(x: number) {
-            for (let t = ay + 1; t <= ay + maxWiggle; t++) {
-                let open = true;
-                for (const y of [t, t + Math.floor(actor.h / 2), t + actor.h - 1]) {
-                    if (!isPointOpen(state, actor.area, {x, y, z}, movementProperties, excludedObjects)) {
-                        open = false;
-                        break;
-                    }
-                }
-                if (open) {
-                    return moveActorInDirection(state, actor, 0.5, 'down', {
-                        ...movementProperties,
-                        canWiggle: false,
-                    });
-                }
-            }
-        }
-        if (direction === 'up') {
-            if (wiggleLeft(ay)) {
-                return true;
-            }
-            if (wiggleRight(ay)) {
-                return true;
-            }
-        } else if (direction === 'down') {
-            if (wiggleLeft(ay + actor.h - 1)) {
-                return true;
-            }
-            if (wiggleRight(ay + actor.h - 1)) {
-                return true;
-            }
-        } else if (direction === 'left') {
-            if (wiggleUp(ax)) {
-                return true;
-            }
-            if (wiggleDown(ax)) {
-                return true;
-            }
-        } else if (direction === 'right') {
-            if (wiggleUp(ax + actor.w - 1)) {
-                return true;
-            }
-            if (wiggleDown(ax + actor.w - 1)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    actor.x = ax;
-    actor.y = ay;
-    return true;
 }
 
 export function checkForFloorEffects(state: GameState, hero: Hero) {

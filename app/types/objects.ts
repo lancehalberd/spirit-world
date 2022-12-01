@@ -115,6 +115,8 @@ export interface EffectInstance {
     // When the hero hits the effect with a weapon or tool.
     // This is used by certain enemy attacks, but it might be better to change those to objects.
     onHit?: (state: GameState, hit: HitProperties) => HitResult
+    // When the hero walks into an object
+    onPush?: (state: GameState, direction: Direction) => void
     update?: (state: GameState) => void
     add?: (state: GameState, area: AreaInstance) => void
     remove?: (state: GameState) => void

@@ -238,7 +238,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         hero.animationTime = Math.min(hero.animationTime, 100);
         const groundZ = 0;
         // Once the hero is over their landing tile, they fall straight down until they hit the ground.
-        if (!hero.jumpingVy && !hero.jumpingVx) {
+        /*if (!hero.jumpingVy && !hero.jumpingVx) {
             hero.z += hero.jumpingVz;
             hero.jumpingVz = Math.max(-2, hero.jumpingVz - 0.5);
             if (hero.z <= hero.groundHeight) {
@@ -248,8 +248,49 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 checkForFloorEffects(state, hero);
             }
             return true;
+        }*/
+        // When jumping any direction but down, the jump is precomputed so we just
+        // move the character along the arc until they reach the ground.
+        hero.x += hero.jumpingVx;
+        hero.y += hero.jumpingVy;
+        hero.z += hero.jumpingVz;
+        hero.jumpingVz = Math.max(-4, hero.jumpingVz - 0.5);
+        if (hero.jumpingVy >= 0 && hero.jumpingVz < 0) {
+            let i = 0;
+            while (
+                (i < 4 && isHeroOnSouthernWallTile(state, hero))
+                || (i < 2 && hero.jumpingVy > 0 && !canSomersaultToCoords(state, hero, hero) && hero.z < 48)
+            ) {
+                hero.y++;
+                hero.z++;
+                i++;
+                // Reduce this to close to 0 so that the hero doesn't jump further south than necessary
+                // but leave it slightly positive so that screen transitions still trigger.
+                hero.jumpingVy = 0.1;
+            }
         }
-        if (hero.jumpDirection === 'down') {
+        // console.log([hero.x, hero.y, hero.z], ' -> ', [hero.jumpingVx, hero.jumpingVy, hero.jumpingVz]);
+        if (hero.z <= groundZ) {
+            hero.z = groundZ
+            hero.action = null;
+            hero.animationTime = 0;
+            // If the hero lands somewhere invalid, damage them and return them to there last safe location,
+            // similar to if they had fallen into a pit.
+            // TODO: destroy any easy to destroy tiles under the player before running this check,
+            // so players can land on and destroy bushes when jumping down.
+            if (!canSomersaultToCoords(state, hero, hero)) {
+                hero.vx = 0;
+                hero.vy = 0;
+                hero.d = hero.safeD;
+                hero.x = hero.safeX;
+                hero.y = hero.safeY;
+                hero.takeDamage(state, 1);
+                hero.action = null;
+                return;
+            }
+            checkForFloorEffects(state, hero);
+        }
+        /*if (hero.jumpDirection === 'down') {
             // After the hero has jumped a bit, we stop the jump when they hit a position they can successfully move to.
             let shouldLand = false;
             // As the hero approaches each new row of tiles, check if they should land on this row of tiles.
@@ -296,7 +337,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 hero.animationTime = 0;
                 checkForFloorEffects(state, hero);
             }
-        }
+        }*/
         // Make sure vx/vy are updated for screen transition/slipping logic on landing.
         hero.vx = hero.jumpingVx;
         hero.vy = hero.jumpingVy;
@@ -606,7 +647,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
     return false;
 }
 
-function isHeroOnOpenTile(this: void, state: GameState, hero: Hero) {
+function isHeroOnOpenTile(this: void, state: GameState, hero: Hero): boolean {
     const L = hero.x + 3, R = hero.x + hero.w - 4, T = hero.y + 3, B = hero.y + hero.h - 4;
     const points = [{x: L, y: T}, {x: R, y: T}, {x: L, y: B}, {x: R, y: B}];
     const excludedObjects = new Set([hero]);
@@ -617,5 +658,19 @@ function isHeroOnOpenTile(this: void, state: GameState, hero: Hero) {
         }
     }
     return true;
+}
+
+
+function isHeroOnSouthernWallTile(this: void, state: GameState, hero: Hero): boolean {
+    const L = hero.x, R = hero.x + hero.w - 1, T = hero.y, B = hero.y + hero.h - 1;
+    const points = [{x: L, y: T}, {x: R, y: T}, {x: L, y: B}, {x: R, y: B}];
+    const excludedObjects = new Set([hero]);
+    for (const point of points) {
+        const { tileBehavior } = getTileBehaviorsAndObstacles(state, hero.area, point, excludedObjects, state.nextAreaInstance);
+        if (tileBehavior.isSouthernWall) {
+            return true
+        }
+    }
+    return false;
 }
 

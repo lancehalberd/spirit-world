@@ -65,10 +65,10 @@ export const carryMap = {
 };
 
 export function getDirection(dx: number, dy: number, includeDiagonals = false, defaultDirection: Direction = null): Direction {
-    if (Math.abs(dy) < 0.3) {
+    if (Math.abs(dy) < 0.2) {
         dy = 0;
     }
-    if (Math.abs(dx) < 0.3) {
+    if (Math.abs(dx) < 0.2) {
         dx = 0;
     }
     if (defaultDirection && !dy && !dx) {
@@ -96,17 +96,17 @@ export function getDirection(dx: number, dy: number, includeDiagonals = false, d
 export function canTeleportToCoords(state: GameState, hero: Hero, {x, y}: Tile): boolean {
     const excludedObjects = new Set([hero]);
     return isPointOpen(state, hero.area, {x: x + 2, y: y + 2}, {canSwim: true}, excludedObjects) &&
-        isPointOpen(state, hero.area, {x: x + 14, y: y + 2}, {canSwim: true}, excludedObjects) &&
-        isPointOpen(state, hero.area, {x: x + 2, y: y + 14}, {canSwim: true}, excludedObjects) &&
-        isPointOpen(state, hero.area, {x: x + 14, y: y + 14}, {canSwim: true}, excludedObjects);
+        isPointOpen(state, hero.area, {x: x + 13, y: y + 2}, {canSwim: true}, excludedObjects) &&
+        isPointOpen(state, hero.area, {x: x + 2, y: y + 13}, {canSwim: true}, excludedObjects) &&
+        isPointOpen(state, hero.area, {x: x + 13, y: y + 13}, {canSwim: true}, excludedObjects);
 }
 
 export function canSomersaultToCoords(state: GameState, hero: Hero, {x, y}: Tile): boolean {
     const excludedObjects = new Set([hero]);
     return isPointOpen(state, hero.area, {x: x + 2, y: y + 2}, {canSwim: true, canFall: true}, excludedObjects) &&
-        isPointOpen(state, hero.area, {x: x + 14, y: y + 2}, {canSwim: true, canFall: true}, excludedObjects) &&
-        isPointOpen(state, hero.area, {x: x + 2, y: y + 14}, {canSwim: true, canFall: true}, excludedObjects) &&
-        isPointOpen(state, hero.area, {x: x + 14, y: y + 14}, {canSwim: true, canFall: true}, excludedObjects);
+        isPointOpen(state, hero.area, {x: x + 13, y: y + 2}, {canSwim: true, canFall: true}, excludedObjects) &&
+        isPointOpen(state, hero.area, {x: x + 2, y: y + 13}, {canSwim: true, canFall: true}, excludedObjects) &&
+        isPointOpen(state, hero.area, {x: x + 13, y: y + 13}, {canSwim: true, canFall: true}, excludedObjects);
 }
 
 export function isPointOpen(
@@ -118,7 +118,7 @@ export function isPointOpen(
 ): boolean {
     const tx = Math.floor(x / 16);
     const ty = Math.floor(y / 16);
-    if (!state.areaSection ||tx < state.areaSection.x || tx >= state.areaSection.x + state.areaSection.w
+    if (!state.areaSection || tx < state.areaSection.x || tx >= state.areaSection.x + state.areaSection.w
         || ty < state.areaSection.y || ty >= state.areaSection.y + state.areaSection.h) {
         return false;
     }
@@ -138,13 +138,13 @@ export function isPointOpen(
         if (tileBehavior.solidMap[sy] >> (15 - sx) & 1) {
             return false;
         }
-    } else if (tileBehavior?.edges?.up && sy === 0 && movementProperties.direction !== 'up') {
+    } else if (tileBehavior?.ledges?.up && sy === 0 && movementProperties.direction !== 'up') {
         return false;
-    } else if (tileBehavior?.edges?.down && sy === 15 && movementProperties.direction !== 'down') {
+    } else if (tileBehavior?.ledges?.down && sy === 15 && movementProperties.direction !== 'down') {
         return false;
-    } else if (tileBehavior?.edges?.left && sx === 0 && movementProperties.direction !== 'left') {
+    } else if (tileBehavior?.ledges?.left && sx === 0 && movementProperties.direction !== 'left') {
         return false;
-    } else if (tileBehavior?.edges?.right && sx === 15 && movementProperties.direction !== 'right') {
+    } else if (tileBehavior?.ledges?.right && sx === 15 && movementProperties.direction !== 'right') {
         return false;
     }
     if (tileBehavior?.water && !movementProperties.canSwim) {
@@ -310,46 +310,46 @@ export function getTileBehaviorsAndObstacles(
         }
     }
     // Edge behaviors only apply to specific lines in the tiles.
-    if (tileBehavior.edges) {
+    if (tileBehavior.ledges) {
         // Copy this so we don't edit the source behavior.
-        tileBehavior.edges = {...tileBehavior.edges};
-        if (tileBehavior.edges?.up && sy !== 0) {
-            delete tileBehavior.edges.up;
+        tileBehavior.ledges = {...tileBehavior.ledges};
+        if (tileBehavior.ledges?.up && sy !== 0) {
+            delete tileBehavior.ledges.up;
         }
-        if (tileBehavior.edges?.down && sy !== 15) {
-            delete tileBehavior.edges.down;
+        if (tileBehavior.ledges?.down && sy !== 15) {
+            delete tileBehavior.ledges.down;
         }
-        if (tileBehavior.edges?.left && sx !== 0) {
-            delete tileBehavior.edges.left;
+        if (tileBehavior.ledges?.left && sx !== 0) {
+            delete tileBehavior.ledges.left;
         }
-        if (tileBehavior.edges?.right && sx !== 15) {
-            delete tileBehavior.edges.right;
+        if (tileBehavior.ledges?.right && sx !== 15) {
+            delete tileBehavior.ledges.right;
         }
     }
     // If the actor is at the edge of a tile moving into the next tile,
     // Check if the tile they are currently moving out of has an edge in the direction of the movement.
     if (sy === 15 && direction === 'up') {
-        if (area?.behaviorGrid[ty + 1]?.[tx]?.edges?.up) {
-            tileBehavior.edges = tileBehavior.edges || {};
-            tileBehavior.edges.up = true;
+        if (area?.behaviorGrid[ty + 1]?.[tx]?.ledges?.up) {
+            tileBehavior.ledges = tileBehavior.ledges || {};
+            tileBehavior.ledges.up = true;
         }
     }
     if (sy === 0 && direction === 'down') {
-        if (area?.behaviorGrid[ty - 1]?.[tx]?.edges?.down) {
-            tileBehavior.edges = tileBehavior.edges || {};
-            tileBehavior.edges.down = true;
+        if (area?.behaviorGrid[ty - 1]?.[tx]?.ledges?.down) {
+            tileBehavior.ledges = tileBehavior.ledges || {};
+            tileBehavior.ledges.down = true;
         }
     }
     if (sx === 15 && direction === 'left') {
-        if (area?.behaviorGrid[ty]?.[tx + 1]?.edges?.left) {
-            tileBehavior.edges = tileBehavior.edges || {};
-            tileBehavior.edges.left = true;
+        if (area?.behaviorGrid[ty]?.[tx + 1]?.ledges?.left) {
+            tileBehavior.ledges = tileBehavior.ledges || {};
+            tileBehavior.ledges.left = true;
         }
     }
     if (sx === 0 && direction === 'right') {
-        if (area?.behaviorGrid[ty]?.[tx - 1]?.edges?.right) {
-            tileBehavior.edges = tileBehavior.edges || {};
-            tileBehavior.edges.right = true;
+        if (area?.behaviorGrid[ty]?.[tx - 1]?.ledges?.right) {
+            tileBehavior.ledges = tileBehavior.ledges || {};
+            tileBehavior.ledges.right = true;
         }
     }
     return { tileBehavior, tx, ty, objects };
@@ -529,7 +529,7 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
             // Cannot freeze ground in hot areas.
             && !area.isHot
             && !behavior?.solid && !behavior?.solidMap && !behavior?.covered
-            && !behavior?.pit && !behavior?.edges
+            && !behavior?.pit && !behavior?.ledges
             && !behavior?.isLava && !behavior?.isLavaMap
         ) {
             let topLayer: AreaLayer = area.layers[0];

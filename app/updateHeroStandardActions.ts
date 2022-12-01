@@ -443,13 +443,14 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         hero.vx = dx;
         hero.vy = dy;
     }
-    if (Math.abs(hero.vx) > 0.3 || Math.abs(hero.vy) > 0.3) {
+    // This threshold needs to be small enough that it is reached when moving with cloud boots from a stand still.
+    if (Math.abs(hero.vx) > 0.2 || Math.abs(hero.vy) > 0.2) {
         const isCharging = hero.action === 'charging';
         const encumbered = hero.pickUpObject || hero.pickUpTile || hero.grabObject || hero.grabTile;
         // Only move if the hero is trying to move in the current direction or if
         // their velocity is sufficiently large enough from slipping to keep them moving.
-        const moveX = (Math.abs(hero.vx) > 0.3 || dx * hero.vx > 0) ? hero.vx : 0;
-        const moveY = (Math.abs(hero.vy) > 0.3 || dy * hero.vy > 0) ? hero.vy : 0;
+        const moveX = (Math.abs(hero.vx) > 0.2 || dx * hero.vx > 0) ? hero.vx : 0;
+        const moveY = (Math.abs(hero.vy) > 0.2 || dy * hero.vy > 0) ? hero.vy : 0;
         if (moveX || moveY) {
             const {mx, my} = moveActor(state, hero, moveX, moveY, {
                 canPush: !encumbered && !hero.swimming && !hero.bounce && !isCharging

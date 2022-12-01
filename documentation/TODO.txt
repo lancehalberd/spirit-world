@@ -41,6 +41,30 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Finish updating movement algorithm
+        - Fix going in doors when walking above them
+            - Don't activate a door until all anchor pixels are touching?
+        - Fix cannot move smoothly around concave sections:
+            - moving right when over the edge of a down ledge up a left ledge or a downleft ledge
+            - for move right, try checking if there is a down/up ledge between the anchor and the test point, but in the anchor column
+        - Prevent grabbing tiles/objects across ledges
+            - on grab, check if the player can move into the object by running the movement algorithm with a special mode that ignores all normal collisions and prevents crossing ledges in any direction. Prevent the grab if this movement check fails.
+        - Add isVeryTall properties to any tiles that need them.
+        - Very tall tiles should still block movement when jumpingDown left/right.
+        - Add and test many more ledges
+        - Update wiggle logic to allow wiggling more than 7px, probably 12-15px
+            - Make sure to increase allowed iterations to allow for this.
+
+    - Fix chakram lingers when falling into pits while charging.
+
+    - Allow destroying bushes when landing on them.
+
+    - Change trajectory of jumps when using iron boots
+        - Allow destroying light stones when landing with iron boots.
+
+    - Change trajectory of jumps when using cloud boots?
+
+
     - Fix ledges so that:
         - You can shoot arrows down ledges but not up them. Applies to projectiles in general.
         - You can throw a clone down a ledge but not up a ledge.
@@ -57,33 +81,6 @@ Current tasks:
             isSouthernWall - solid pixels only block movement/projectiles that are not down, downleft or downright
             isVeryTall - solid pixels apply to movement/projectiles that have crossed ledges.
                 (Alternatively, this could be tileHeight, and tileHeight > 32 would have this effect if ledges assume 32px height)
-
-    Update collision detection and wiggle logic:
-        - Create an array that is the width of the character(relative to movement direction) + 16
-        - Assuming entry 8 = [ax, ay] and length - 9 = [ax + width - 1, ay] (for moving up or down) check pairs of 0 and 3 pixels every 4 pixels, so for w = 16, check 8+11,12+15,16+19,20+23. If any are blocked, movement is blocked, remember the blocked pixel index.
-        - If movement is blocked if blocked index <= length / 2 then scan right starting at blocked index + 1. If w open pixels are found, wiggle right. If a blocked pixel is found at index >= length - w, then abort, wiggling is not possible.
-        - If blocked index > length / 2, repeat the above except scanning left to check for left wiggle.
-
-    More simply (assuming moving north):
-        Scan the row of pixels the character is moving into. If any of the left half are blocked, flag that they cannot wiggle to the left. If any of the right half are blocked, flag that they cannot wiggle right.
-        If can wiggle left+right, just move forward. If cannot wiggle left or right, movement is stopped.
-        If can wiggle to the left, then scan for W open pixels left of the left most blocked pixel and wiggle left if so. Similarly for wiggling to the right.
-
-    canMovePixel(
-        x: x coord of current pixel
-        y: y coord of current pixel
-        d: direction (up/down/left/right) moving the pixel
-        movementProperties:
-            (existing movement properties, canFall/canSwim/canClimb/etc)
-            isHigh - set when this pixel is sticking out past a ledge and therefor on top of many obstacles like regular walls. In theory this gets set any time there is a ledge that a character can leap down in between
-            the center of the character and the point being tested.
-
-    Calculating isHigh before calling canMovePixel
-        Probably simplify things by assuming this is only done for 16x16 characters or smaller. When characters get
-        very large, they can cover multiple tiles and it becomes unclear what it means if multiple ledges are crossed
-        between the center of the character and the pixel tested.
-        Maybe approach this by using 1 direction for a 16x16 character and try to iterate through every possible case and then either see if it can be generalized or see how hard it is to just handle every case and then apply to all directions.
-        For initial mocks, use 4x4 character instead
 
     Jumping south logic
         Set vz positive and negative az for normal ballistic jump, land when z <= minZ, vy is positive 1 or 2.
@@ -423,6 +420,9 @@ Staff Tower Improvements
 
 
 Crater Improvements
+    - Add animation for draining lava
+        - Add a layer for each frame of the animation, but only on the screen lava can be drained on
+        - Run a script that switches to each frame with a fairly quick fade transition.
     - Add platforms floating on lava.
     - Add peg switches that require hitting with the staff to activate, replace all regular switches with these.
     - Add Flame Guardian enemies

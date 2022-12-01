@@ -10,7 +10,14 @@ import { isObjectInsideTarget } from 'app/utils/index';
 import { GameState } from 'app/types';
 
 const cameraSpeed = 10;
-export function updateCamera(state: GameState, speed = cameraSpeed): void {
+export function updateCamera(state: GameState, speed?: number): void {
+    if (!speed) {
+        if (state.hero.action === 'jumpingDown' && !state.nextAreaSection && !state.nextAreaInstance) {
+            speed = 4;
+        } else {
+            speed = cameraSpeed;
+        }
+    }
     const { w, h, section } = getAreaSize(state);
     // Quickly move the character to the desired initial position for displaying the next area.
     if (state.nextAreaInstance) {

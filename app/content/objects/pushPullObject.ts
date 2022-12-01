@@ -53,7 +53,7 @@ export class PushPullObject implements ObjectInstance {
         if (!this.pushDirection) {
             this.pushCounter++;
             this.pushedLastFrame = true;
-            if (this.pushCounter > 30) {
+            if (this.pushCounter > 20) {
                 this.pushInDirection(state, direction);
             }
         }

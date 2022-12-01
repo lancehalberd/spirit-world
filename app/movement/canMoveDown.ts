@@ -2,25 +2,17 @@ import { isMovementBlocked } from 'app/movement/isMovementBlocked';
 
 import { AreaInstance, EffectInstance, GameState, MovementProperties, ObjectInstance, Rect } from 'app/types';
 
-export function canMoveUp(
+export function canMoveDown(
     state: GameState,
     area: AreaInstance,
     hitbox: Rect,
     movementProperties: MovementProperties
 ): true | {wiggle?: 'left' | 'right', pushedObjects: (ObjectInstance | EffectInstance)[]} {
     const pushedObjects = new Set <(ObjectInstance | EffectInstance)>();
-   /* const {
-        canPush = false,
-        canFall = false,
-        canSwim = false,
-        canClimb = false,
-        canJump = false,
-        canPassMediumWalls = false,
-    } = movementProperties;*/
 
     // pixel aligned edges of the hitbox
     const T = hitbox.y | 0, L = hitbox.x | 0;
-    // const B = T + hitbox.h | 0;
+    const B = T + hitbox.h | 0;
     const R = L + hitbox.w | 0;
 
     // coordinates of the bottom right anchor pixel.
@@ -32,13 +24,12 @@ export function canMoveUp(
     const anchorTileBehaviors = area?.behaviorGrid[aty]?.[atx];
 
     // Y value of the pixel we are attempting to move into.
-    const y = T - 1;
+    const y = B;
     const ty = (y / 16) | 0;
 
     let leftBlock: number, rightBlock: number;
     let leftCheck: number = L + ((hitbox.w / 2) | 0) - 1;
     let rightCheck: number = leftCheck + 1;
-
 
     // This limit is here for safety, only ~23 iterations should ever actually run.
     for (let i = 0; i <= 32; i++) {
@@ -112,78 +103,82 @@ export function canMoveUp(
                     break DETERMINE_FLAGS;
                 }
             }
-            // Anchor is in the row below the pixel and the ledge is directly down of the pixel.
-            if (aty === ty + 1) {
-                const downOfPixelBehaviors = area?.behaviorGrid[ty + 1]?.[tx];
+            // Anchor is in the row above the pixel and the ledge is directly above the pixel.
+            if (aty === ty - 1) {
+                const upOfPixelBehaviors = area?.behaviorGrid[ty - 1]?.[tx];
                 // anchor and tile are aligned in the same column.
-                if (pixelTileBehaviors?.ledges?.down === false || downOfPixelBehaviors?.ledges?.up === true) {
+                if (pixelTileBehaviors?.ledges?.up === false || upOfPixelBehaviors?.ledges?.down === true) {
                     isAbove = true;
                     break DETERMINE_FLAGS;
                 }
             }
-            // Anchor is in the tile down left of the pixel.
-            if (aty === ty + 1 && atx === tx - 1) {
+            // Anchor is in the tile up left of the pixel.
+            if (aty === ty - 1 && atx === tx - 1) {
                 const rightOfAnchorBehaviors = area?.behaviorGrid[aty]?.[atx + 1];
-                const upOfAnchorBehaviors = area?.behaviorGrid[aty - 1]?.[atx];
+                const downOfAnchorBehaviors = area?.behaviorGrid[aty + 1]?.[atx];
                 if ((rightOfAnchorBehaviors?.ledges?.left === false || anchorTileBehaviors?.ledges?.right === true)
-                    && (upOfAnchorBehaviors?.ledges?.down === false || anchorTileBehaviors?.ledges?.up === true)
+                    && (downOfAnchorBehaviors?.ledges?.up === false || anchorTileBehaviors?.ledges?.down === true)
                 ) {
-                    //console.log('Is above a top right corner.');
+                    //console.log('Is above a bottom right corner.');
                     isAbove = true;
                     break DETERMINE_FLAGS;
                 }
             }
-            // Anchor is in the tile down right of the pixel.
-            if (aty === ty + 1 && atx === tx + 1) {
+            // Anchor is in the tile up right of the pixel.
+            if (aty === ty - 1 && atx === tx + 1) {
                 const leftOfAnchorBehaviors = area?.behaviorGrid[aty]?.[atx - 1];
-                const upOfAnchorBehaviors = area?.behaviorGrid[aty - 1]?.[atx];
+                const downOfAnchorBehaviors = area?.behaviorGrid[aty + 1]?.[atx];
                 if ((leftOfAnchorBehaviors?.ledges?.right === false || anchorTileBehaviors?.ledges?.left === true)
-                    && (upOfAnchorBehaviors?.ledges?.down === false || anchorTileBehaviors?.ledges?.up === true)
+                    && (downOfAnchorBehaviors?.ledges?.up === false || anchorTileBehaviors?.ledges?.down === true)
                 ) {
-                    //console.log('Is above a top left corner.');
+                    //console.log('Is above a bottom left corner.');
                     isAbove = true;
                     break DETERMINE_FLAGS;
                 }
             }
-            // There is a diagonal upright in the pixel tile.
-            if (pixelTileBehaviors?.diagonalLedge === 'upright') {
-                // The ledge boundary is y - x = N.
-                const N = 16 * (ty - tx);
-                // If the anchor is downleft of the boundary, and the pixel is upright.
-                if (ay - ax > N && y - x < N) {
-                    isAbove = true;
-                    break DETERMINE_FLAGS;
-                }
-            }
-            // There is a diagonal upright in either the tile left or down from the pixel tile.
-            const leftOfPixelBehaviors = area?.behaviorGrid[ty]?.[tx - 1];
-            const downOfPixelBehaviors = area?.behaviorGrid[ty + 1]?.[tx];
-            if (leftOfPixelBehaviors?.diagonalLedge === 'upright' || downOfPixelBehaviors?.diagonalLedge === 'upright') {
-                // The ledge boundary is y - x = N.
-                const N = 16 * (ty + 1 - tx);
-                // If the anchor is downleft of the boundary, and the pixel is upright.
-                if (ay - ax > N && y - x < N) {
-                    isAbove = true;
-                    break DETERMINE_FLAGS;
-                }
-            }
-            // There is a diagonal upleft in the pixel tile.
-            if (pixelTileBehaviors?.diagonalLedge === 'upleft') {
+            // There is a diagonal downright in the pixel tile.
+            if (pixelTileBehaviors?.diagonalLedge === 'downright') {
                 // The ledge boundary is y + x = N.
                 const N = 15 + 16 * (ty + tx);
-                // If the anchor is downright of the boundary, and the pixel is upleft.
-                if (ay + ax > N && y + x < N) {
+                // If the anchor is upleft of the boundary, and the pixel is downright.
+                if (ay + ax < N && y + x > N) {
+                    //console.log('above downright in tile');
                     isAbove = true;
                     break DETERMINE_FLAGS;
                 }
             }
-            // There is a diagonal upright in either the tile left or down from the pixel tile.
-            const rightOfPixelBehaviors = area?.behaviorGrid[ty]?.[tx + 1];
-            if (rightOfPixelBehaviors?.diagonalLedge === 'upleft' || downOfPixelBehaviors?.diagonalLedge === 'upleft') {
+            // There is a diagonal downright in either the tile left or above from the pixel tile.
+            const leftOfPixelBehaviors = area?.behaviorGrid[ty]?.[tx - 1];
+            const upOfPixelBehaviors = area?.behaviorGrid[ty - 1]?.[tx];
+            if (leftOfPixelBehaviors?.diagonalLedge === 'downright' || upOfPixelBehaviors?.diagonalLedge === 'downright') {
                 // The ledge boundary is y + x = N.
-                const N = 15 + 16 * (ty + 1 + tx);
-                // If the anchor is downright of the boundary, and the pixel is upleft.
-                if (ay + ax > N && y + x < N) {
+                const N = 15 + 16 * (ty - 1 + tx);
+                // If the anchor is upleft of the boundary, and the pixel is downright.
+                if (ay + ax < N && y + x > N) {
+                    //console.log('above downright next to tile');
+                    isAbove = true;
+                    break DETERMINE_FLAGS;
+                }
+            }
+            // There is a diagonal downleft in the pixel tile.
+            if (pixelTileBehaviors?.diagonalLedge === 'downleft') {
+                // The ledge boundary is y - x = N.
+                const N = 16 * (ty - tx);
+                // If the anchor is upright of the boundary, and the pixel is downleft.
+                if (ay - ax < N && y - x > N) {
+                    //console.log('above downleft in tile');
+                    isAbove = true;
+                    break DETERMINE_FLAGS;
+                }
+            }
+            // There is a diagonal downleft in either the tile left or above from the pixel tile.
+            const rightOfPixelBehaviors = area?.behaviorGrid[ty]?.[tx + 1];
+            if (rightOfPixelBehaviors?.diagonalLedge === 'downleft' || upOfPixelBehaviors?.diagonalLedge === 'downleft') {
+                // The ledge boundary is y - x = N.
+                const N = 16 * (ty - 1 - tx);
+                // If the anchor is upright of the boundary, and the pixel is downleft.
+                if (ay - ax < N && y - x > N) {
+                    //console.log('above downleft next to tile');
                     isAbove = true;
                     break DETERMINE_FLAGS;
                 }
@@ -208,79 +203,79 @@ export function canMoveUp(
                     break DETERMINE_FLAGS;
                 }
             }
-            // Anchor is in the row below the pixel and the ledge is directly down of the pixel.
-            if (aty === ty + 1) {
-                const downOfPixelBehaviors = area?.behaviorGrid[ty + 1]?.[tx];
+            // Anchor is in the row above the pixel and the ledge is directly down of the pixel.
+            if (aty === ty - 1) {
+                const upOfPixelBehaviors = area?.behaviorGrid[ty - 1]?.[tx];
                 // anchor and tile are aligned in the same column.
-                if (pixelTileBehaviors?.ledges?.down === true || downOfPixelBehaviors?.ledges?.up === false) {
+                if (pixelTileBehaviors?.ledges?.up === true || upOfPixelBehaviors?.ledges?.down === false) {
                     isUnder = true;
                     break DETERMINE_FLAGS;
                 }
             }
-            // Anchor is in the tile down left of the pixel.
-            if (aty === ty + 1 && atx === tx - 1) {
+            // Anchor is in the tile up left of the pixel.
+            if (aty === ty - 1 && atx === tx - 1) {
                 const rightOfAnchorBehaviors = area?.behaviorGrid[aty]?.[atx + 1];
-                const upOfAnchorBehaviors = area?.behaviorGrid[aty - 1]?.[atx];
+                const downOfAnchorBehaviors = area?.behaviorGrid[aty + 1]?.[atx];
                 if ((rightOfAnchorBehaviors?.ledges?.left === true || anchorTileBehaviors?.ledges?.right === false)
-                    && (upOfAnchorBehaviors?.ledges?.down === true || anchorTileBehaviors?.ledges?.up === false)
+                    && (downOfAnchorBehaviors?.ledges?.up === true || anchorTileBehaviors?.ledges?.down === false)
                 ) {
                     isUnder = true;
                     break DETERMINE_FLAGS;
                 }
             }
-            // Anchor is in the tile down right of the pixel.
-            if (aty === ty + 1 && atx === tx + 1) {
+            // Anchor is in the tile up right of the pixel.
+            if (aty === ty - 1 && atx === tx + 1) {
                 const leftOfAnchorBehaviors = area?.behaviorGrid[aty]?.[atx + 1];
-                const upOfAnchorBehaviors = area?.behaviorGrid[aty - 1]?.[atx];
+                const downOfAnchorBehaviors = area?.behaviorGrid[aty + 1]?.[atx];
                 if ((leftOfAnchorBehaviors?.ledges?.right === true || anchorTileBehaviors?.ledges?.left === false)
-                    && (upOfAnchorBehaviors?.ledges?.down === true || anchorTileBehaviors?.ledges?.up === false)
+                    && (downOfAnchorBehaviors?.ledges?.up === true || anchorTileBehaviors?.ledges?.down === false)
                 ) {
-                    isUnder = true;
-                    break DETERMINE_FLAGS;
-                }
-            }
-            // There is a diagonal downleft in the pixel tile.
-            if (pixelTileBehaviors?.diagonalLedge === 'downleft') {
-                // The ledge boundary is y - x = N.
-                const N = 16 * (ty - tx);
-                // If the anchor is downleft of the boundary, and the pixel is upright.
-                if (ay - ax > N && y - x < N) {
-                    isUnder = true;
-                    break DETERMINE_FLAGS;
-                }
-            }
-            // There is a diagonal downleft in either the tile left or down from the pixel tile.
-            if (leftOfPixelBehaviors?.diagonalLedge === 'downleft' || downOfPixelBehaviors?.diagonalLedge === 'downleft') {
-                // The ledge boundary is y - x = N.
-                const N = 16 * (ty + 1 - tx);
-                // If the anchor is downleft of the boundary, and the pixel is upright.
-                if (ay - ax > N && y - x < N) {
                     isUnder = true;
                     break DETERMINE_FLAGS;
                 }
             }
             // There is a diagonal downright in the pixel tile.
-            if (pixelTileBehaviors?.diagonalLedge === 'downright') {
+            if (pixelTileBehaviors?.diagonalLedge === 'upleft') {
                 // The ledge boundary is y + x = N.
                 const N = 15 + 16 * (ty + tx);
-                // If the anchor is downright of the boundary, and the pixel is upleft.
-                if (ay + ax > N && y + x < N) {
+                // If the anchor is upleft of the boundary, and the pixel is downright.
+                if (ay + ax < N && y + x > N) {
                     isUnder = true;
                     break DETERMINE_FLAGS;
                 }
             }
-            // There is a diagonal upright in either the tile left or down from the pixel tile.
-            if (rightOfPixelBehaviors?.diagonalLedge === 'downright' || downOfPixelBehaviors?.diagonalLedge === 'downright') {
+            // There is a diagonal downright in either the tile left or above from the pixel tile.
+            if (leftOfPixelBehaviors?.diagonalLedge === 'upleft' || upOfPixelBehaviors?.diagonalLedge === 'upleft') {
                 // The ledge boundary is y + x = N.
-                const N = 15 + 16 * (ty + 1 + tx);
-                // If the anchor is downright of the boundary, and the pixel is upleft.
-                if (ay + ax > N && y + x < N) {
+                const N = 15 + 16 * (ty - 1 + tx);
+                // If the anchor is upleft of the boundary, and the pixel is downright.
+                if (ay + ax < N && y + x > N) {
+                    isUnder = true;
+                    break DETERMINE_FLAGS;
+                }
+            }
+            // There is a diagonal upright in the pixel tile.
+            if (pixelTileBehaviors?.diagonalLedge === 'upright') {
+                // The ledge boundary is y - x = N.
+                const N = 16 * (ty - tx);
+                // If the anchor is upright of the boundary, and the pixel is downleft.
+                if (ay - ax < N && y - x > N) {
+                    isUnder = true;
+                    break DETERMINE_FLAGS;
+                }
+            }
+            // There is a diagonal upright in either the tile left or above from the pixel tile.
+            if (rightOfPixelBehaviors?.diagonalLedge === 'upright' || upOfPixelBehaviors?.diagonalLedge === 'upright') {
+                // The ledge boundary is y - x = N.
+                const N = 16 * (ty - 1 - tx);
+                // If the anchor is upright of the boundary, and the pixel is downleft.
+                if (ay - ax < N && y - x > N) {
                     isUnder = true;
                     break DETERMINE_FLAGS;
                 }
             }
         }
-
+        //console.log(x, isAbove, isUnder);
         let blocked = isUnder || (isAbove && !movementProperties.canJump);
         if (!blocked) {
             const result = isMovementBlocked(state, area, pixelTileBehaviors, x, y, isAbove, movementProperties);
@@ -298,7 +293,6 @@ export function canMoveUp(
                 rightBlock = x;
             }
         }
-        //console.log(x, isAbove, isUnder);
     }
 
     return true;
