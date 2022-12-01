@@ -15,19 +15,7 @@ import { boxesIntersect } from 'app/utils/index';
 
 import { Actor, Direction, GameState, Hero, MovementProperties, ObjectInstance, EffectInstance } from 'app/types';
 
-export function moveActor(state: GameState, actor: Actor, dx: number, dy: number, {
-    boundToSection,
-    boundToSectionPadding,
-    canPush = false,
-    canFall = false,
-    canJump = false,
-    canSwim = false,
-    canClimb = false,
-    canWiggle = true,
-    canPassMediumWalls = false,
-    direction,
-    excludedObjects = new Set(),
-}: MovementProperties): {mx: number, my: number} {
+export function moveActor(state: GameState, actor: Actor, dx: number, dy: number, movementProperties: MovementProperties): {mx: number, my: number} {
     let sx = dx;
     if (sx < -1){
         sx = -1;
@@ -49,17 +37,10 @@ export function moveActor(state: GameState, actor: Actor, dx: number, dy: number
             // You can't push when moving diagonally.
             const d = (sx < 0) ? 'left' : 'right';
             movedX = moveActorInDirection(state, actor, sx, d, {
-                boundToSection,
-                boundToSectionPadding,
-                canJump,
-                canPush: canPush && d === fullDirection,
-                canWiggle: canWiggle && !dy,
-                canSwim,
-                canFall,
-                canClimb,
-                canPassMediumWalls,
-                direction,
-                excludedObjects,
+                ...movementProperties,
+                canPush: movementProperties.canPush && d === fullDirection,
+                canWiggle: (movementProperties.canWiggle ?? true) && !dy,
+                excludedObjects: movementProperties.excludedObjects || new Set()
             });
             if (movedX) {
                 mx += sx;
@@ -77,17 +58,10 @@ export function moveActor(state: GameState, actor: Actor, dx: number, dy: number
             // You can't push when moving diagonally.
             const d = (sy < 0) ? 'up' : 'down';
             movedY = moveActorInDirection(state, actor, sy, d, {
-                boundToSection,
-                boundToSectionPadding,
-                canJump,
-                canPush: canPush && d === fullDirection,
-                canWiggle: canWiggle && !dx,
-                canSwim,
-                canFall,
-                canClimb,
-                canPassMediumWalls,
-                direction,
-                excludedObjects,
+                ...movementProperties,
+                canPush: movementProperties.canPush && d === fullDirection,
+                canWiggle: (movementProperties.canWiggle ?? true) && !dx,
+                excludedObjects: movementProperties.excludedObjects || new Set()
             });
             if (movedY) {
                 my += sy;

@@ -148,6 +148,8 @@ export interface MovementProperties {
     canFall?: boolean
     canSwim?: boolean
     canClimb?: boolean
+    // True when climbing.
+    canCrossLedges?: boolean
     canJump?: boolean
     // Whether the mover should wiggle to fit into tight spaces.
     canWiggle?: boolean

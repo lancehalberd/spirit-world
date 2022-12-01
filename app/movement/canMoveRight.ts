@@ -277,7 +277,7 @@ export function canMoveRight(
                 }
             }
         }
-        let blocked = isUnder || (isAbove && !movementProperties.canJump);
+        let blocked = (isUnder && !movementProperties.canCrossLedges) || (isAbove && !movementProperties.canJump);
         if (!blocked) {
             const result = isMovementBlocked(state, area, pixelTileBehaviors, x, y, isAbove, movementProperties);
             if (result) {

@@ -44,9 +44,6 @@ Current tasks:
     - Finish updating movement algorithm
         - Fix going in doors when walking above them
             - Don't activate a door until all anchor pixels are touching?
-        - Fix cannot move smoothly around concave sections:
-            - moving right when over the edge of a down ledge up a left ledge or a downleft ledge
-            - for move right, try checking if there is a down/up ledge between the anchor and the test point, but in the anchor column
         - Prevent grabbing tiles/objects across ledges
             - on grab, check if the player can move into the object by running the movement algorithm with a special mode that ignores all normal collisions and prevents crossing ledges in any direction. Prevent the grab if this movement check fails.
         - Add isVeryTall properties to any tiles that need them.

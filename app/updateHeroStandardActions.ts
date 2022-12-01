@@ -457,6 +457,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                     // You can only push if you are moving the direction you are trying to move.
                     && hero.vx * dx >= 0 && hero.vy * dy >= 0,
                 canClimb: !encumbered && !hero.bounce && !isCharging && !hero.isAstralProjection,
+                canCrossLedges: hero.action === 'climbing',
                 // This doesn't mean the player will fall, just that they can move into tiles/objects marked as pits.
                 canFall: true,
                 canJump: !hero.isAstralProjection,
