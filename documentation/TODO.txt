@@ -43,7 +43,6 @@ Graphics:
 
 Current tasks:
     - Finish updating movement algorithm
-        - boundToSection is preventing moving into the screen.
         - Prevent grabbing tiles/objects across ledges
             - on grab, check if the player can move into the object by running the movement algorithm with a special mode that ignores all normal collisions and prevents crossing ledges in any direction. Prevent the grab if this movement check fails.
         - Add and test many more ledges

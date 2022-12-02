@@ -95,6 +95,8 @@ function moveActorInDirection(
         canWiggle,
         excludedObjects,
     }
+    // If this movement would move outside of the bounding rectangle, do not allow
+    // it if it moves them further outside the rectangle, but do allow it otherwise.
     if (movementProperties.boundToSection) {
         const hitbox = actor.getHitbox();
         const v = directionMap[direction];
@@ -102,8 +104,10 @@ function moveActorInDirection(
         hitbox.y += v[1] * amount;
         const p = movementProperties.boundToSectionPadding ?? 0;
         const { section } = getAreaSize(state);
-        if (hitbox.x < section.x + p || hitbox.x + hitbox.w > section.x + section.w - p
-            || hitbox.y < section.y + p || hitbox.y + hitbox.h > section.y + section.h - p
+        if ((hitbox.x < section.x + p && direction === 'left')
+            || (hitbox.x + hitbox.w > section.x + section.w - p && direction === 'right')
+            || (hitbox.y < section.y + p && direction === 'up')
+            || (hitbox.y + hitbox.h > section.y + section.h - p && direction === 'down')
         ) {
             return false;
         }
