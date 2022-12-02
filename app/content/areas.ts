@@ -11,7 +11,7 @@ import { checkToUpdateSpawnLocation } from 'app/content/spawnLocations';
 import { zones } from 'app/content/zones';
 import { editingState } from 'app/development/tileEditor';
 import { createCanvasAndContext } from 'app/dom';
-import { checkForFloorEffects } from 'app/moveActor';
+import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
 import { isPointInShortRect } from 'app/utils/index';
 import { playSound } from 'app/musicController';
 import { removeTextCue } from 'app/scriptEvents';

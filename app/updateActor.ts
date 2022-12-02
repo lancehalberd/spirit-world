@@ -10,7 +10,7 @@ import { FRAME_LENGTH, GAME_KEY } from 'app/gameConstants';
 import {
     wasGameKeyPressedAndReleased, wasGameKeyPressed
 } from 'app/keyCommands';
-import { checkForFloorEffects } from 'app/moveActor';
+import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
 import { prependScript } from 'app/scriptEvents';
 import { updateHeroSpecialActions } from 'app/updateHeroSpecialActions';
 import { updateHeroStandardActions } from 'app/updateHeroStandardActions';

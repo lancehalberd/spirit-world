@@ -1,4 +1,6 @@
+import { destroyTile, } from 'app/content/areas';
 import { getObjectBehaviors } from 'app/content/objects';
+import { tileHitAppliesToTarget } from 'app/utils/field';
 import { isPixelInShortRect } from 'app/utils/index';
 
 import { AreaInstance, EffectInstance, GameState, MovementProperties, ObjectInstance, TileBehaviors } from 'app/types';
@@ -15,8 +17,51 @@ export function isMovementBlocked(
     if (isAbove && !behaviors?.isVeryTall) {
         return false;
     }
-    if (isAbove) {
-        console.log('very tall?', behaviors);
+    const actor = movementProperties.actor;
+
+    if (actor
+        && (!movementProperties.canPassMediumWalls || !(behaviors?.low || behaviors?.midHeight))
+        && behaviors?.solid
+        && (
+            behaviors?.touchHit
+            && !behaviors.touchHit?.isGroundHit
+            // tile touchHit always applies to
+            && tileHitAppliesToTarget(state, behaviors.touchHit, movementProperties.actor)
+        )
+    ) {
+        const mag = Math.sqrt(movementProperties.dx * movementProperties.dx + movementProperties.dy * movementProperties.dy)
+        const { returnHit } = actor.onHit?.(state, { ...behaviors.touchHit, knockback: {
+            vx: - 4 * movementProperties.dx / mag,
+            vy: - 4 * movementProperties.dy / mag,
+            vz: 2,
+        }});
+        // Apply reflected damage to enemies if they were the source of the `touchHit`.
+        if (returnHit && behaviors.touchHit.source?.onHit) {
+            behaviors.touchHit.source.onHit(state, returnHit);
+        }
+        if (behaviors.cuttable && behaviors.cuttable <= returnHit?.damage) {
+            const tx = (x / 16) | 0, ty = (x / 16) | 0;
+            for (const layer of actor.area.layers) {
+                const tile = layer.tiles[ty]?.[tx];
+                if (tile?.behaviors?.cuttable <= returnHit.damage) {
+                    destroyTile(state, actor.area, { x: tx, y: ty, layerKey: layer.key });
+                }
+            }
+        }
+        return {};
+    }
+
+    const isTilePassable = (movementProperties.canPassMediumWalls && (behaviors?.low || behaviors?.midHeight))
+        || !behaviors?.solid || behaviors.climbable;
+    // The second condition is a hack to prevent enemies from walking over pits.
+    if (!isTilePassable
+        || ((behaviors?.pit || behaviors?.isLava || behaviors?.isBrittleGround) && !movementProperties.canFall)
+    ) {
+        return {};
+    }
+    // !canSwim is a hack to keep enemies/astralProjection out of low ceiling doorways.
+    if (behaviors?.lowCeiling && (movementProperties.z > 3 || !movementProperties.canSwim)) {
+        return {};
     }
     const canClimbTile = behaviors?.climbable && movementProperties.canClimb;
     if (behaviors?.solid && !canClimbTile) {

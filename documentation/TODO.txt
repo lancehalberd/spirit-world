@@ -31,6 +31,7 @@ Known Bugs:
         - Bow/chakram can fire up thin cliffs
         - Bow/chakram cannot fire down southern cliffs.
     - Projectiles can fire in between black abyss tiles, for example, shooting a bow at an east or west wall it may go through instead of stopping.
+    - Shadow renders behind door tops when jumping down ledges.
 
 Graphics:
     Add slam effects for the staff.
@@ -42,15 +43,11 @@ Graphics:
 
 Current tasks:
     - Finish updating movement algorithm
-        - Fix going in doors when walking above them
-            - Don't activate a door until all anchor pixels are touching?
+        - boundToSection is preventing moving into the screen.
         - Prevent grabbing tiles/objects across ledges
             - on grab, check if the player can move into the object by running the movement algorithm with a special mode that ignores all normal collisions and prevents crossing ledges in any direction. Prevent the grab if this movement check fails.
-        - Add isVeryTall properties to any tiles that need them.
-        - Very tall tiles should still block movement when jumpingDown left/right.
         - Add and test many more ledges
-        - Update wiggle logic to allow wiggling more than 7px, probably 12-15px
-            - Make sure to increase allowed iterations to allow for this.
+        - Perhaps southern facing tiles should block left/right movement if not currently over SF tile.
 
     - Fix chakram lingers when falling into pits while charging.
 

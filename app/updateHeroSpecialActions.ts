@@ -7,7 +7,8 @@ import { Staff } from 'app/content/objects/staff';
 import { CANVAS_HEIGHT, FALLING_HEIGHT, FRAME_LENGTH, GAME_KEY } from 'app/gameConstants';
 import { editingState } from 'app/development/tileEditor';
 import { getCloneMovementDeltas, wasGameKeyPressed } from 'app/keyCommands';
-import { checkForFloorEffects, moveActor } from 'app/moveActor';
+import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
+import { moveActor } from 'app/moveActor';
 import { fallAnimation, heroAnimations } from 'app/render/heroAnimations';
 import { saveGame } from 'app/state';
 import { updateCamera } from 'app/updateCamera';
@@ -237,22 +238,16 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         // Freeze at the leaping frame, the flip looks bad if the jump isn't the right length.
         hero.animationTime = Math.min(hero.animationTime, 100);
         const groundZ = 0;
-        // Once the hero is over their landing tile, they fall straight down until they hit the ground.
-        /*if (!hero.jumpingVy && !hero.jumpingVx) {
-            hero.z += hero.jumpingVz;
-            hero.jumpingVz = Math.max(-2, hero.jumpingVz - 0.5);
-            if (hero.z <= hero.groundHeight) {
-                hero.z = hero.groundHeight;
-                hero.action = null;
-                hero.animationTime = 0;
-                checkForFloorEffects(state, hero);
-            }
-            return true;
-        }*/
         // When jumping any direction but down, the jump is precomputed so we just
         // move the character along the arc until they reach the ground.
         hero.x += hero.jumpingVx;
+        if (isHeroOnVeryTallWall(state, hero)) {
+            hero.x -= hero.jumpingVx;
+        }
         hero.y += hero.jumpingVy;
+        if (isHeroOnVeryTallWall(state, hero)) {
+            hero.y -= hero.jumpingVy;
+        }
         hero.z += hero.jumpingVz;
         hero.jumpingVz = Math.max(-4, hero.jumpingVz - 0.5);
         if (hero.jumpingVy >= 0 && hero.jumpingVz < 0) {
@@ -290,54 +285,6 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             }
             checkForFloorEffects(state, hero);
         }
-        /*if (hero.jumpDirection === 'down') {
-            // After the hero has jumped a bit, we stop the jump when they hit a position they can successfully move to.
-            let shouldLand = false;
-            // As the hero approaches each new row of tiles, check if they should land on this row of tiles.
-            // The player can fall as many as 4 pixels per frame, so we check when the user is in the last 4 pixels
-            // of the previous row.
-            if (hero.y >= hero.jumpingDownY + 24 && (hero.y % 16 > 12 || hero.y % 16 === 0)) {
-                const y = (((hero.y - 1) / 16) | 0) * 16 + 16;
-                const excludedObjects = new Set([hero]);
-                const { tileBehavior: b1 } = getTileBehaviorsAndObstacles(state, hero.area, {x: hero.x, y }, excludedObjects, state.nextAreaInstance);
-                const { tileBehavior: b2 } = getTileBehaviorsAndObstacles(state, hero.area, {x: hero.x + hero.w - 1, y}, excludedObjects, state.nextAreaInstance);
-                // console.log(hero.x, y, b1.solid, b1.cannotLand, b2.solid, b2.cannotLand);
-                shouldLand = !b1.solid && !b2.solid && !b1.cannotLand && !b2.cannotLand;
-            }
-            if (shouldLand) {
-                hero.y = (((hero.y - 1) / 16) | 0) * 16 + 16;
-                hero.jumpingVy = 0;
-                hero.jumpingVx = 0;
-                hero.vz = hero.jumpingVz;
-                return true;
-            } else {
-                hero.x += hero.jumpingVx;
-                hero.y += hero.jumpingVy;
-                hero.z += hero.jumpingVz;
-                // Don't allow z to fall below 4 until landing so the shadow stays small while falling.
-                if (hero.z <= 4) {
-                    hero.y += (4 - hero.z);
-                    hero.z = 4;
-                }
-                // Since the player can fall arbitrarily far when jumping in the 'down' direction,
-                // we limit them with a terminal velocity of -2 (so net -4 vy when hitting min z value)
-                hero.jumpingVz = Math.max(-2, hero.jumpingVz - 0.5);
-            }
-        } else {
-            // When jumping any direction but down, the jump is precomputed so we just
-            // move the character along the arc until they reach the ground.
-            hero.x += hero.jumpingVx;
-            hero.y += hero.jumpingVy;
-            hero.z += hero.jumpingVz;
-            hero.jumpingVz -= 0.5;
-            // console.log([hero.x, hero.y, hero.z], ' -> ', [hero.jumpingVx, hero.jumpingVy, hero.jumpingVz]);
-            if (hero.z <= groundZ) {
-                hero.z = groundZ
-                hero.action = null;
-                hero.animationTime = 0;
-                checkForFloorEffects(state, hero);
-            }
-        }*/
         // Make sure vx/vy are updated for screen transition/slipping logic on landing.
         hero.vx = hero.jumpingVx;
         hero.vy = hero.jumpingVy;
@@ -356,6 +303,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         moveActor(state, hero, hero.vx, hero.vy, {
             canFall: true,
             canSwim: true,
+            canJump: hero.action === 'thrown' && hero.z >= 12,
             canPassMediumWalls: hero.action === 'thrown' && hero.z >= 12,
             direction: hero.d,
             boundToSection: hero.action !== 'knockedHard',
@@ -668,6 +616,19 @@ function isHeroOnSouthernWallTile(this: void, state: GameState, hero: Hero): boo
     for (const point of points) {
         const { tileBehavior } = getTileBehaviorsAndObstacles(state, hero.area, point, excludedObjects, state.nextAreaInstance);
         if (tileBehavior.isSouthernWall) {
+            return true
+        }
+    }
+    return false;
+}
+
+function isHeroOnVeryTallWall(this: void, state: GameState, hero: Hero): boolean {
+    const L = hero.x, R = hero.x + hero.w - 1, T = hero.y, B = hero.y + hero.h - 1;
+    const points = [{x: L, y: T}, {x: R, y: T}, {x: L, y: B}, {x: R, y: B}];
+    const excludedObjects = new Set([hero]);
+    for (const point of points) {
+        const { tileBehavior } = getTileBehaviorsAndObstacles(state, hero.area, point, excludedObjects, state.nextAreaInstance);
+        if (tileBehavior.isVeryTall && tileBehavior.solid) {
             return true
         }
     }

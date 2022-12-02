@@ -88,7 +88,6 @@ const deepWaterBehavior: TileBehaviors = {
     water: true,
 };
 const southCliffBehavior: TileBehaviors = {
-    jumpDirection: 'down',
     ledges: {up: false},
     isSouthernWall: true,
     solid: true,
@@ -853,10 +852,10 @@ const stairs: TileSource = {
 // use `foreground2` as default so that it can appear on top of walls that might be on `foreground`
 // All of these solid maps are set so that only the bottom half of the ceiling graphics are solid.
 const ceilingBehavior: TileBehaviors = { defaultLayer: 'foreground2', isVeryTall: true, solidMap: BITMAP_BOTTOM};
-const topLeftCeiling: TileBehaviors = { ...ceilingBehavior, solidMap: BITMAP_TOP_LEFT_8_STRIP};
-const topRightCeiling: TileBehaviors = { ...ceilingBehavior, solidMap: BITMAP_TOP_RIGHT_8_STRIP};
-const bottomLeftCeiling: TileBehaviors = { ...ceilingBehavior, solidMap: BITMAP_BOTTOM_LEFT_8};
-const bottomRightCeiling: TileBehaviors = { ...ceilingBehavior, solidMap: BITMAP_BOTTOM_RIGHT_8};
+const topLeftCeiling: TileBehaviors = { ...ceilingBehavior, isVeryTall: true, solidMap: BITMAP_TOP_LEFT_8_STRIP};
+const topRightCeiling: TileBehaviors = { ...ceilingBehavior, isVeryTall: true, solidMap: BITMAP_TOP_RIGHT_8_STRIP};
+const bottomLeftCeiling: TileBehaviors = { ...ceilingBehavior, isVeryTall: true, solidMap: BITMAP_BOTTOM_LEFT_8};
+const bottomRightCeiling: TileBehaviors = { ...ceilingBehavior, isVeryTall: true, solidMap: BITMAP_BOTTOM_RIGHT_8};
 
 
 const woodCeiling: TileSource = {
@@ -1082,8 +1081,8 @@ const caveLedges: TileSource = {
         '9x9': { defaultLayer: 'floor2', ledges: { left: true } },
         '10x9': { defaultLayer: 'floor2', ledges: { down: true } },
         '11x9': { defaultLayer: 'floor2', ledges: { down: true } },
-        '12x9': { defaultLayer: 'floor2', jumpDirection: 'up', ledges: {down: false}, solidMap: BITMAP_BOTTOM_6 },
-        '13x9': { defaultLayer: 'floor2', jumpDirection: 'up', ledges: {down: false}, solidMap: BITMAP_BOTTOM_6 },
+        '12x9': { defaultLayer: 'floor2', ledges: {down: false}, solidMap: BITMAP_BOTTOM_6 },
+        '13x9': { defaultLayer: 'floor2', ledges: {down: false}, solidMap: BITMAP_BOTTOM_6 },
 
         '8x10': { defaultLayer: 'floor2', solidMap: BITMAP_RIGHT_6 },
         '9x10': { defaultLayer: 'floor2', solidMap: BITMAP_RIGHT_6 },
@@ -1267,8 +1266,8 @@ const crystalCaveLedges: TileSource = {
         '9x9': { defaultLayer: 'floor2', ledges: { left: true } },
         '10x9': { defaultLayer: 'floor2', ledges: { down: true } },
         '11x9': { defaultLayer: 'floor2', ledges: { down: true } },
-        '12x9': { defaultLayer: 'floor2', jumpDirection: 'up', ledges: {down: false}, solidMap: BITMAP_BOTTOM_6 },
-        '13x9': { defaultLayer: 'floor2', jumpDirection: 'up', ledges: {down: false}, solidMap: BITMAP_BOTTOM_6 },
+        '12x9': { defaultLayer: 'floor2', ledges: {down: false}, solidMap: BITMAP_BOTTOM_6 },
+        '13x9': { defaultLayer: 'floor2', ledges: {down: false}, solidMap: BITMAP_BOTTOM_6 },
 
         '8x10': { defaultLayer: 'floor2', solidMap: BITMAP_RIGHT_6 },
         '9x10': { defaultLayer: 'floor2', solidMap: BITMAP_RIGHT_6 },
@@ -1491,14 +1490,17 @@ addTiles([
     breakableFloor,
     gradientColorTile(['#A08000', '#806000'], 0, 0, 0, 16, southCliffBehavior), // southCliffTop
     solidColorTile('#806000', southernWallBehavior), // cliffBottom
-    ...deletedTiles(2),
+    // This is the 'Abyss' tile for the southern edge of walls, it uses bitmap bottom so the player can
+    // go behind it a bit.
+    singleTileSource('gfx/tiles/cavearranged.png', { defaultLayer: 'foreground', isVeryTall: true, solidMap: BITMAP_BOTTOM }, 0, 240),
+    ...deletedTiles(1),
     stampTileSource(rockWallFrame, {
         '0x0': southernWallBehavior, '1x0': southernWallBehavior, '2x0': southernWallBehavior,
         '0x1': southernWallBehavior, '1x1': southernWallBehavior, '2x1': southernWallBehavior,
     }),
     caveFloorPalette,
-    // 'Abyss' between walls. This uses BITMAP_BOTTOM to be consistent with other ceiling tiles.
-    singleTileSource('gfx/tiles/cavearranged.png', { defaultLayer: 'foreground', solidMap: BITMAP_BOTTOM }, 0, 240),
+    // 'Abyss' between walls.
+    singleTileSource('gfx/tiles/cavearranged.png', { defaultLayer: 'foreground', isVeryTall: true, solid: true }, 0, 240),
     caveWallsPalette,
     caveCornersPalette,
     spiritPlantsPalette,

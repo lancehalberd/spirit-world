@@ -69,8 +69,6 @@ export class Hero implements Actor, SavedHeroData {
     hasBarrier?: boolean = false;
     hasRevive: boolean = false;
     isInvisible?: boolean = false;
-    jumpingTime?: number;
-    jumpDirection?: Direction;
     jumpingVx?: number;
     jumpingVy?: number;
     jumpingVz?: number;

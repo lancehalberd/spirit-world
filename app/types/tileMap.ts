@@ -83,12 +83,6 @@ export interface TileBehaviors {
     // This was added for lava tiles since I want to see what is underneath lava as I edit it.
     editorTransparency?: number
 
-    // CURRENT SUPPORTED LEDGE PROPERTIES
-
-    // This tile can be jumped over in this direction but is otherwise impassable.
-    jumpDirection?: Direction
-    // NEW PENDING LEDGE PROPERTIES
-
     // Indicates ledges that can be jumped down.
     // True values indicate that you can jump out of the tile in the indicated direction.
     // False values indicate that you can jump into the tile from the opposite direction

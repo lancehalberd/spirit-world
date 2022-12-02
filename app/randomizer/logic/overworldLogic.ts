@@ -126,6 +126,7 @@ export const overworldNodes: LogicNode[] = [
         nodeId: 'overworldMountain',
         checks: [
             { objectId: 'overworldCliffPeachPiece' },
+            { objectId: 'cityCliffMoney' },
         ],
         paths: [
             { nodeId: 'overworldMain' },

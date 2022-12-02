@@ -162,6 +162,13 @@ export interface MovementProperties {
     // Objects to ignore for hit detection.
     excludedObjects?: Set<any>
     needsFullTile?: boolean
+    // current z value for the movement, needed to check for lowCeiling tiles.
+    z?: number
+    // The actor moving, if an actor. This will be used for hitting damaging tiles
+    actor?: Actor
+    // The delta for the complete movement.
+    dx?: number
+    dy?: number
 }
 
 

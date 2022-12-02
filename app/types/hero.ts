@@ -100,8 +100,6 @@ export interface Actor extends ObjectInstance {
     groundHeight: number
     hasBarrier?: boolean
     isInvisible?: boolean
-    jumpingTime?: number
-    jumpDirection?: Direction
     jumpingVx?: number
     jumpingVy?: number
     jumpingVz?: number

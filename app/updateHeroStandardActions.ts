@@ -16,7 +16,8 @@ import {
     isGameKeyDown,
     wasGameKeyPressed,
 } from 'app/keyCommands';
-import { checkForFloorEffects, moveActor } from 'app/moveActor';
+import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
+import { moveActor } from 'app/moveActor';
 import { getChargeLevelAndElement, useTool } from 'app/useTool';
 import { isHeroFloating, isHeroSinking, isUnderwater } from 'app/utils/actor';
 import {
@@ -382,8 +383,6 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 hero.animationTime = 0;
             }
         } else {
-            // Reset jumping time if the actor stopped moving.
-            hero.jumpingTime = 0;
             if ((hero.action === 'walking' || hero.action === 'pushing')
                 && !hero.chargingLeftTool && !hero.chargingRightTool && !hero.toolOnCooldown
             ) {
@@ -464,12 +463,16 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 canSwim: !encumbered,
                 direction: hero.d,
                 boundToSection: hero.isAstralProjection || !!hero.bounce,
+                actor: hero,
+                dx: moveX, dy: moveY,
             });
-            if (moveX) {
-                hero.vx = mx;
-            }
-            if (moveY) {
-                hero.vy = my;
+            if (hero.action !== 'knocked' && hero.action !== 'knockedHard') {
+                if (moveX) {
+                    hero.vx = mx;
+                }
+                if (moveY) {
+                    hero.vy = my;
+                }
             }
         }
     }

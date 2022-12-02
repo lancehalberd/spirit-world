@@ -173,11 +173,11 @@ export function checkToPushObject(
     if (!(actorObject instanceof Hero) || !movementProperties.canPush) {
         return;
     }
-    if (actorObject.action !== 'pushing') {
+    if (!actorObject.action || actorObject.action === 'walking') {
         actorObject.action = 'pushing';
         actorObject.animationTime = 0;
     }
-    if (!pushedObjects) {
+    if (!pushedObjects || actorObject.action !== 'pushing') {
         return;
     }
     if (pushedObjects.length === 1) {
