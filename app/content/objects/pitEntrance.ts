@@ -49,6 +49,7 @@ export class PitEntrance implements ObjectInstance {
                 }
             } else if (hero.action !== 'falling') {
                 hero.throwHeldObject(state);
+                hero.heldChakram?.throw(state);
                 hero.action = 'falling';
                 hero.animationTime = 0;
             }

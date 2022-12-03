@@ -3,7 +3,7 @@ import { getJumpVector } from 'app/movement/getJumpVector';
 import { moveDown, moveLeft, moveRight, moveUp } from 'app/movement/move';
 import { directionMap, getDirection } from 'app/utils/field';
 
-import { Actor, Direction, GameState, MovementProperties, ObjectInstance, EffectInstance } from 'app/types';
+import { Actor, Direction, GameState, Hero, MovementProperties, ObjectInstance, EffectInstance } from 'app/types';
 
 export function moveActor(state: GameState, actor: Actor, dx: number, dy: number, movementProperties: MovementProperties): {mx: number, my: number} {
     let sx = dx;
@@ -133,9 +133,17 @@ function moveActorInDirection(
             actor.jumpingVy = actor.vy;
             actor.jumpingVz = actor.vz;
         } else {
+            let speed = 2;
+            if (actor instanceof Hero) {
+                if (actor.equipedBoots === 'cloudBoots') {
+                    speed = 2.2;
+                } else if (actor.equipedBoots === 'ironBoots') {
+                    speed = 1.5;
+                }
+            }
             actor.action = 'jumpingDown';
-            actor.jumpingVx = 2 * jv[0];
-            actor.jumpingVy = 2 * jv[1];
+            actor.jumpingVx = speed * jv[0];
+            actor.jumpingVy = speed * jv[1];
             actor.jumpingVz = 3;
             actor.animationTime = 0;
         }

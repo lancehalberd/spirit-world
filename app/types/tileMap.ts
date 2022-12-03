@@ -63,6 +63,8 @@ export interface TileBehaviors {
     pit?: boolean
     isLava?: Boolean
     isLavaMap?: Uint16Array
+    // If this is set to false, then a tile won't override pit/lava behavior underneath it.
+    isGround?: false
     // number of pixels to raise the player when on this tile. Created for the staff ground.
     groundHeight?: number
     // Assign this to skip tiles in source images.

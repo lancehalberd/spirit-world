@@ -572,6 +572,7 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
             area.checkToRedrawTiles = true;
             resetTileBehavior(area, target);
         }
+        const direction = (hit.vx || hit.vy) ? getDirection(hit.vx, hit.vy, true) : null;
         if (behavior?.cuttable <= hit.damage && (!behavior?.low || hit.cutsGround)) {
             // We need to find the specific cuttable layers that can be destroyed.
             for (const layer of area.layers) {
@@ -581,7 +582,21 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
                 }
             }
             combinedResult.hit = true;
-        } else if ((behavior?.cuttable > hit.damage || behavior?.solid) && (!behavior?.low || hit.cutsGround)) {
+        } else if (
+            (
+                (behavior?.cuttable > hit.damage || behavior?.solid)
+                && (!behavior?.low || hit.cutsGround)
+                && (!behavior?.isSouthernWall || (direction !== 'down' && direction !== 'downleft' && direction !== 'downright'))
+            )
+            || (direction === 'upleft' && (behavior?.ledges?.down || behavior?.ledges?.right || behavior?.diagonalLedge === 'downright'))
+            || (direction === 'up' && (behavior?.ledges?.down || behavior?.diagonalLedge === 'downleft' || behavior?.diagonalLedge === 'downright'))
+            || (direction === 'upright' && (behavior?.ledges?.down || behavior?.diagonalLedge === 'downleft' || behavior?.ledges?.right))
+            || (direction === 'downleft' && (behavior?.ledges?.up || behavior?.ledges?.right || behavior?.diagonalLedge === 'upright'))
+            || (direction === 'down' && (behavior?.ledges?.up || behavior?.diagonalLedge === 'upleft' || behavior?.diagonalLedge === 'upright'))
+            || (direction === 'downright' && (behavior?.ledges?.up || behavior?.diagonalLedge === 'upleft' || behavior?.ledges?.left))
+            || (direction === 'left' && (behavior?.ledges?.right || behavior?.diagonalLedge === 'downright' || behavior?.diagonalLedge === 'upright'))
+            || (direction === 'right' && (behavior?.ledges?.left || behavior?.diagonalLedge === 'downleft' || behavior?.diagonalLedge === 'upleft'))
+        ) {
             combinedResult.hit = true;
             combinedResult.pierced = false;
             combinedResult.stopped = true;

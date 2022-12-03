@@ -625,7 +625,9 @@ function applyTileToBehaviorGrid(behaviorGrid: TileBehaviors[][], {x, y}: Tile, 
         behaviorGrid[y][x] = {};
     }
     // Any background tile rendered on top of lava removes the lava behavior from it.
-    if (!isForeground && behaviorGrid[y]?.[x] && !behaviors.isLava && !behaviors.isLavaMap) {
+    if (!isForeground && behaviorGrid[y]?.[x]
+        && !behaviors.isLava && !behaviors.isLavaMap && behaviors.isGround !== false
+    ) {
         delete behaviorGrid[y][x].isLava;
         delete behaviorGrid[y][x].isLavaMap;
     }
@@ -633,7 +635,7 @@ function applyTileToBehaviorGrid(behaviorGrid: TileBehaviors[][], {x, y}: Tile, 
     // If this causes issues with decorations like shadows we may need to explicitly set pit = false
     // on tiles that can cover up pits (like in the sky) and use that, or alternatively, make a separate
     // sky behavior that has this behavior instead of pits.
-    if (!isForeground && behaviorGrid[y]?.[x]?.pit && !behaviors.pit) {
+    if (!isForeground && behaviorGrid[y]?.[x]?.pit && !behaviors.pit && behaviors.isGround !== false) {
         delete behaviorGrid[y][x].pit;
     }
     if (!isForeground && behaviorGrid[y]?.[x]?.cloudGround && !behaviors.cloudGround) {

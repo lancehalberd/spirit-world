@@ -27,7 +27,7 @@ import Random from 'app/utils/Random';
 
 
 import {
-    GameState, Hero, ObjectInstance, StaffTowerLocation,
+    GameState, Hero, HitProperties, ObjectInstance, StaffTowerLocation,
 } from 'app/types';
 
 const rollSpeed = [
@@ -252,16 +252,20 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         hero.jumpingVz = Math.max(-4, hero.jumpingVz - 0.5);
         if (hero.jumpingVy >= 0 && hero.jumpingVz < 0) {
             let i = 0;
-            while (
-                (i < 4 && isHeroOnSouthernWallTile(state, hero))
-                || (i < 2 && hero.jumpingVy > 0 && !canSomersaultToCoords(state, hero, hero) && hero.z < 48)
-            ) {
+            while (i < 4 && isHeroOnSouthernWallTile(state, hero)) {
+                hero.y++;
+                hero.z++;
+                i++;
+                // Uncomment and possibly reduce this if hero is jumping too far south from tall cliffs.
+                //hero.jumpingVy = Math.min(hero.jumpingVy, 1);
+            }
+            while (i < 2 && hero.jumpingVy > 0 && !canSomersaultToCoords(state, hero, hero) && hero.z < 48) {
                 hero.y++;
                 hero.z++;
                 i++;
                 // Reduce this to close to 0 so that the hero doesn't jump further south than necessary
                 // but leave it slightly positive so that screen transitions still trigger.
-                hero.jumpingVy = 0.1;
+                hero.jumpingVy = Math.min(hero.jumpingVy, 0.1);
             }
         }
         // console.log([hero.x, hero.y, hero.z], ' -> ', [hero.jumpingVx, hero.jumpingVy, hero.jumpingVz]);
@@ -269,10 +273,14 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             hero.z = groundZ
             hero.action = null;
             hero.animationTime = 0;
+            const landingHit: HitProperties = {
+                damage: 1,
+                hitbox: hero.getHitbox(),
+                hitTiles: true,
+            };
+            hitTargets(state, hero.area, landingHit);
             // If the hero lands somewhere invalid, damage them and return them to there last safe location,
             // similar to if they had fallen into a pit.
-            // TODO: destroy any easy to destroy tiles under the player before running this check,
-            // so players can land on and destroy bushes when jumping down.
             if (!canSomersaultToCoords(state, hero, hero)) {
                 hero.vx = 0;
                 hero.vy = 0;

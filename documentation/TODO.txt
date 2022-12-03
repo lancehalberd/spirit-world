@@ -42,22 +42,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Finish updating movement algorithm
-        - Prevent grabbing tiles/objects across ledges
-            - on grab, check if the player can move into the object by running the movement algorithm with a special mode that ignores all normal collisions and prevents crossing ledges in any direction. Prevent the grab if this movement check fails.
-        - Add and test many more ledges
-        - Perhaps southern facing tiles should block left/right movement if not currently over SF tile.
-
-    - Fix chakram lingers when falling into pits while charging.
-
-    - Allow destroying bushes when landing on them.
-
-    - Change trajectory of jumps when using iron boots
-        - Allow destroying light stones when landing with iron boots.
-
-    - Change trajectory of jumps when using cloud boots?
-
-
     - Fix ledges so that:
         - You can shoot arrows down ledges but not up them. Applies to projectiles in general.
         - You can throw a clone down a ledge but not up a ledge.
@@ -75,12 +59,16 @@ Current tasks:
             isVeryTall - solid pixels apply to movement/projectiles that have crossed ledges.
                 (Alternatively, this could be tileHeight, and tileHeight > 32 would have this effect if ledges assume 32px height)
 
-    Jumping south logic
-        Set vz positive and negative az for normal ballistic jump, land when z <= minZ, vy is positive 1 or 2.
-        If passing over tile with isSouthernWall=true, increase vy 2x and increase vz 1x the same amount. This
-        will appear to move at the same rate as normal, but the characters y will increase faster and give them
-        additional z height to allow them to potentially jump over more tiles the further up they are. This will also cause the shadow to move ahead of the player to suggest height to the jump.
+    - Add and test many more ledges
 
+    - Prevent grabbing tiles/objects across ledges
+        - on grab, check if the player can move into the object by running the movement algorithm with a special mode that ignores all normal collisions and prevents crossing ledges in any direction. Prevent the grab if this movement check fails.
+
+    - Perhaps southern facing tiles should block left/right movement if not currently over SF tile.
+
+    - Cloud jumping near the edges can sometimes result in landing poorly either taking damage or underground in a ledge. Would be nice to find a way to clean up jumping from ledge to ledge.
+
+    - Allow destroying light stones when landing with iron boots.
 
 
     - Add some speaker name so it is clear who is talking in cut scenes with multiple characters.

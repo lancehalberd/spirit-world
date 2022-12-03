@@ -159,13 +159,22 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
                 // Do nothing.
             } else {
                 hero.throwHeldObject(state);
+                hero.heldChakram?.throw(state);
                 hero.action = 'falling';
                 hero.x = Math.round(hero.x / tileSize) * tileSize;
                 hero.y = Math.round(hero.y / tileSize) * tileSize;
                 hero.animationTime = 0;
             }
         }
-    } else if (hero.z <= 0 && hero.action !== 'roll') {
+    }
+    // This code used to make players slip into pits they were standing near, but it has some
+    // technical issues with slipping through ledges, and it is kind of annoying anyway, so it
+    // is just disabled now. If we want to add it back either:
+    // reduce the threshold for this behavior so that it cannot apply across ledges (because you would)
+    // have to go over the ledge to trigger it)
+    // or actually check if there is a ledge between the pit and the anchor and ignore it if so (this is a bit hard).
+    // Either way, this should actually run the movement logic so this can't drag a player through walls/ledges.
+    /* else if (hero.z <= 0 && hero.action !== 'roll') {
         if (fallingTopLeft && fallingTopRight) {
             hero.y -= 0.1;
         }
@@ -178,5 +187,5 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
         if (fallingBottomRight && fallingTopRight) {
             hero.x += 0.1;
         }
-    }
+    }*/
 }
