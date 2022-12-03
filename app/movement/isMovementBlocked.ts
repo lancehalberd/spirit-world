@@ -51,39 +51,7 @@ export function isMovementBlocked(
         return {};
     }
 
-    const isTilePassable = (movementProperties.canPassMediumWalls && (behaviors?.low || behaviors?.midHeight))
-        || !behaviors?.solid || behaviors.climbable;
-    // The second condition is a hack to prevent enemies from walking over pits.
-    if (!isTilePassable
-        || ((behaviors?.pit || behaviors?.isLava || behaviors?.isBrittleGround) && !movementProperties.canFall)
-    ) {
-        return {};
-    }
-    // !canSwim is a hack to keep enemies/astralProjection out of low ceiling doorways.
-    if (behaviors?.lowCeiling && (movementProperties.z > 3 || !movementProperties.canSwim)) {
-        return {};
-    }
-    const canClimbTile = behaviors?.climbable && movementProperties.canClimb;
-    if (behaviors?.solid && !canClimbTile) {
-        return {};
-    }
-    if (behaviors?.solidMap && !canClimbTile) {
-        // If the behavior has a bitmap for solid pixels, read the exact pixel to see if it is blocked.
-        if (movementProperties.needsFullTile) {
-            return {};
-        }
-        // console.log(tileBehavior.solidMap, y, x, sy, sx, tileBehavior.solidMap[sy] >> (15 - sx));
-        if (behaviors.solidMap[y % 16] >> (15 - (x % 16)) & 1) {
-            return {};
-        }
-    }
-    if (behaviors?.water && !movementProperties.canSwim) {
-        return {};
-    }
-    if (behaviors?.pit && !movementProperties.canFall) {
-        return {};
-    }
-
+    // Check for this before tiles so that objects on top of solid tiles can be pushed, such as doors.
     for (const object of area.objects) {
         if (object.status === 'hidden' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
             continue;
@@ -108,4 +76,41 @@ export function isMovementBlocked(
             }
         }*/
     }
+    if (behaviors?.water && !movementProperties.canSwim) {
+        return {};
+    }
+    if (behaviors?.pit && !movementProperties.canFall) {
+        return {};
+    }
+    // !canSwim is a hack to keep enemies/astralProjection out of low ceiling doorways.
+    if (behaviors?.lowCeiling && (movementProperties.actor?.z > 3 || !movementProperties.canSwim)) {
+        return {};
+    }
+    // The second condition is a hack to prevent enemies from walking over pits.
+    if ((behaviors?.pit || behaviors?.isLava || behaviors?.isBrittleGround) && !movementProperties.canFall) {
+        return {};
+    }
+
+    // Climbing a tile allows you to ignore solid pixels on the tile.
+    const canClimbTile = behaviors?.climbable && movementProperties.canClimb;
+    // Moving over a tile when thrown allows you to ignore solid pixels on low to mid height tiles.
+    const moveOverTile = movementProperties.canPassMediumWalls && (behaviors?.low || behaviors?.midHeight);
+    const ignoreSolidPixels = moveOverTile || canClimbTile;
+    if (ignoreSolidPixels) {
+        return false;
+    }
+    if (behaviors?.solid) {
+        return {};
+    }
+    if (behaviors?.solidMap) {
+        // If the behavior has a bitmap for solid pixels, read the exact pixel to see if it is blocked.
+        if (movementProperties.needsFullTile) {
+            return {};
+        }
+        // console.log(tileBehavior.solidMap, y, x, sy, sx, tileBehavior.solidMap[sy] >> (15 - sx));
+        if (behaviors.solidMap[y % 16] >> (15 - (x % 16)) & 1) {
+            return {};
+        }
+    }
+    return false;
 }

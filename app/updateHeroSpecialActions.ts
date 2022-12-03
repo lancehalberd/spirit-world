@@ -248,6 +248,8 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         if (isHeroOnVeryTallWall(state, hero)) {
             hero.y -= hero.jumpingVy;
         }
+        hero.jumpingVx *= 0.98;
+        hero.jumpingVy *= 0.98;
         hero.z += hero.jumpingVz;
         hero.jumpingVz = Math.max(-4, hero.jumpingVz - 0.5);
         if (hero.jumpingVy >= 0 && hero.jumpingVz < 0) {
