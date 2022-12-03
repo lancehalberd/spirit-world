@@ -249,6 +249,9 @@ export class Hero implements Actor, SavedHeroData {
         }
         return { x: this.x, y: this.y, w: this.w, h: this.h };
     }
+    getMovementHitbox(this: Hero, state?: GameState): Rect {
+        return { x: this.x, y: this.y, w: this.w, h: this.h };
+    }
 
     overlaps(this: Hero, target: Rect | {getHitbox: () => Rect}) {
         if ((target as any).getHitbox) {

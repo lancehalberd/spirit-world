@@ -42,7 +42,14 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Locked doors don't open when walking into them.
+    - Jun got knocked back through the 100 jade door in the treasure room
+        - And Tomb boss
+    - Put tomb boss and back in logic if you have gloves+invisibility for dodging.
+    - Clouds in spirit sky area
+
     - Fix ledges so that:
+        - Right now ledges block attacks anywhere in the tile rather than just when they are on the ledge, additionally only true values apply instead of both true+false values.
         - You can shoot arrows down ledges but not up them. Applies to projectiles in general.
         - You can throw a clone down a ledge but not up a ledge.
         - solidMap behavior can block projectiles.

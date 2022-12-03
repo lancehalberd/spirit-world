@@ -11,7 +11,7 @@ export function moveUp(
     movementProperties: MovementProperties,
     amount: number
 ): boolean {
-    const hitbox = object.getHitbox();
+    const hitbox = object.getMovementHitbox?.()  || object.getHitbox();
     // Moving within the same subpixel is always allowed.
     if ((hitbox.y | 0) === ((hitbox.y - amount) | 0)) {
         object.y -= amount;
@@ -48,7 +48,7 @@ export function moveLeft(
     movementProperties: MovementProperties,
     amount: number
 ): boolean {
-    const hitbox = object.getHitbox();
+    const hitbox = object.getMovementHitbox?.()  || object.getHitbox();
     // Moving within the same subpixel is always allowed.
     if ((hitbox.x | 0) === ((hitbox.x - amount) | 0)) {
         object.x -= amount;
@@ -85,7 +85,7 @@ export function moveDown(
     movementProperties: MovementProperties,
     amount: number
 ): boolean {
-    const hitbox = object.getHitbox();
+    const hitbox = object.getMovementHitbox?.()  || object.getHitbox();
     // Moving within the same subpixel is always allowed.
     if ((hitbox.y | 0) === ((hitbox.y - amount) | 0)) {
         object.y += amount;
@@ -122,7 +122,7 @@ export function moveRight(
     movementProperties: MovementProperties,
     amount: number
 ): boolean {
-    const hitbox = object.getHitbox();
+    const hitbox = object.getMovementHitbox?.()  || object.getHitbox();
     // Moving within the same subpixel is always allowed.
     if ((hitbox.x | 0) === ((hitbox.x + amount) | 0)) {
         object.x += amount;
@@ -186,7 +186,7 @@ export function checkToPushObject(
             actorObject.lastTouchedObject = pushedObjects[0];
         }
     } else if (pushedObjects.length >= 1) {
-        const actorHitbox = actorObject.getHitbox();
+        const actorHitbox = actorObject.getMovementHitbox?.()  || actorObject.getHitbox();
         for (const object of pushedObjects) {
             const hitbox = object.getHitbox(state);
             if (Math.abs(actorHitbox.x - hitbox.x) < 8
