@@ -1,7 +1,7 @@
 import {
     andLogic,
     hasBossWeapon,
-    hasRoll,
+    canAvoidBossAttacks,
 } from 'app/content/logic';
 
 import { LogicNode } from 'app/types';
@@ -67,6 +67,6 @@ export const forestTempleNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'forestTempleBoss',
-        checks: [{objectId: 'forestTempleBoss', logic: andLogic(hasBossWeapon, hasRoll)}],
+        checks: [{objectId: 'forestTempleBoss', logic: andLogic(hasBossWeapon, canAvoidBossAttacks)}],
     },
 ];

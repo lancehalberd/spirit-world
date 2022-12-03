@@ -2,7 +2,7 @@ import {
     andLogic, orLogic,
     canCross2Gaps,
     hasAstralProjection, hasSpiritSight, hasBossWeapon, hasGloves, hasMediumRange,
-    hasRangedPush, hasWeapon, hasRoll,
+    hasRangedPush, hasWeapon, canAvoidBossAttacks,
 } from 'app/content/logic';
 
 import {LogicNode} from 'app/types';
@@ -97,9 +97,9 @@ export const tombNodes: LogicNode[] = [
         // Boss has attacks that require roll to dodge.
         // For harder logic clone throw or teleportation would also work.
         checks: [
-            {objectId: 'tombBoss', logic: andLogic(hasBossWeapon, hasRoll)},
+            {objectId: 'tombBoss', logic: andLogic(hasBossWeapon, canAvoidBossAttacks)},
         ],
-        paths: [{ nodeId: 'tombGuardian', logic: andLogic(hasBossWeapon, hasRoll)}],
+        paths: [{ nodeId: 'tombGuardian', logic: andLogic(hasBossWeapon, canAvoidBossAttacks)}],
     },
     {
         zoneId,

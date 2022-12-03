@@ -128,6 +128,10 @@ export const hasElementalWeapon: OrLogicCheck = orLogic(hasChakram, hasBow);
 // This check is used for weapons that have the range of the charged chakram or greater.
 export const hasMediumRange: OrLogicCheck = orLogic({requiredFlags: ['$weapon', '$charge']}, hasBow);
 
+// Attacks that you are expected to roll to avoid can also reasonably be dealt with by absorbing the hit
+// with spirit barrier or even invisibility.
+export const canAvoidBossAttacks: OrLogicCheck = orLogic(hasRoll, hasSpiritBarrier);
+
 export const hasFire: LogicCheck = andLogic(hasElementalWeapon, {requiredFlags: ['$fire', '$charge']});
 export const hasIce: LogicCheck = andLogic(hasElementalWeapon, {requiredFlags: ['$ice', '$charge']});
 export const hasLightning: LogicCheck = andLogic(hasElementalWeapon, {requiredFlags: ['$lightning', '$charge']});
