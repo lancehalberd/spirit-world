@@ -6,6 +6,7 @@ import { changeObjectStatus, createObjectInstance, findObjectInstanceById } from
 import { allTiles } from 'app/content/tiles';
 import { logicHash, isLogicValid } from 'app/content/logic';
 import { enterZoneByDoorCallback } from 'app/content/objects/door';
+import { enterZoneByTeleporterCallback } from 'app/content/objects/teleporter';
 import { dropItemFromTable } from 'app/content/objects/lootObject';
 import { checkToUpdateSpawnLocation } from 'app/content/spawnLocations';
 import { zones } from 'app/content/zones';
@@ -475,6 +476,8 @@ export function enterZoneByTarget(
                                 // character to the door properly.
                                 if (definition.type === 'door') {
                                     enterZoneByDoorCallback(state, targetObjectId, skipObject);
+                                } else if (definition.type === 'teleporter') {
+                                    enterZoneByTeleporterCallback(state, targetObjectId);
                                 }
                                 callback?.();
                             });

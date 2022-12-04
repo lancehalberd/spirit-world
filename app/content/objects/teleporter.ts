@@ -88,19 +88,7 @@ export class Teleporter implements ObjectInstance {
                 }
             });
         } else {
-            enterZoneByTarget(state, this.definition.targetZone, this.definition.targetObjectId, this.definition, false, () => {
-                hero.isUsingDoor = true;
-                const target = findObjectInstanceById(state.areaInstance, this.definition.targetObjectId) as Teleporter;
-                if (!target){
-                    console.error(state.areaInstance.objects);
-                    console.error(this.definition.targetObjectId);
-                    debugger;
-                }
-                hero.actionTarget = target;
-                target.disabledTime = 500;
-                hero.actionDx = directionMap[hero.d][0];
-                hero.actionDy = directionMap[hero.d][1];
-            });
+            enterZoneByTarget(state, this.definition.targetZone, this.definition.targetObjectId, this.definition, false);
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
@@ -119,4 +107,19 @@ export class Teleporter implements ObjectInstance {
         context.fillRect(0, 0, 16, 16);
         context.restore();
     }
+}
+
+export function enterZoneByTeleporterCallback(this: void, state: GameState, targetObjectId: string) {
+    const hero = state.hero;
+    hero.isUsingDoor = true;
+    const target = findObjectInstanceById(state.areaInstance, targetObjectId) as Teleporter;
+    if (!target){
+        console.error(state.areaInstance.objects);
+        console.error(targetObjectId);
+        debugger;
+    }
+    hero.actionTarget = target;
+    target.disabledTime = 500;
+    hero.actionDx = directionMap[hero.d][0];
+    hero.actionDy = directionMap[hero.d][1];
 }
