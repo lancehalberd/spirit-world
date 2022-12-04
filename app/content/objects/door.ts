@@ -1120,8 +1120,12 @@ export class Door implements ObjectInstance {
                     // 'ladderUp' is only for changing zones so make the hero climb back down if changing zones fails.
                     if (!changedZones) {
                         hero.isExitingDoor = true;
-                        hero.actionDx = -directionMap[this.definition.d][0];
-                        hero.actionDy = -directionMap[this.definition.d][1];
+                        // Go back down the ladder if this was a missing target object.
+                        // Otherwise keep going up so the ladder can be used to climb short walls.
+                        if (this.definition.targetZone && this.definition.targetObjectId) {
+                            hero.actionDx = -directionMap[this.definition.d][0];
+                            hero.actionDy = -directionMap[this.definition.d][1];
+                        }
                     }
                 }
             } else if (this.style === 'ladderDown') {

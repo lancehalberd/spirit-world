@@ -654,7 +654,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             }
         }
     }
-    if (wasGameKeyPressed(state, GAME_KEY.ROLL)
+    if (isPlayerControlled && wasGameKeyPressed(state, GAME_KEY.ROLL)
         && !isActionBlocked
         && !hero.isAstralProjection
         && hero.passiveTools.roll > 0

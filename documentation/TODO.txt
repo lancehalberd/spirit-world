@@ -42,23 +42,18 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Clone should no longer block movement.
+    - Soft lock falling onto cracked ground in forest.
+    - Able to leave elevator when crashing.
+
+
     - Fix ledges so that:
         - Right now ledges block attacks anywhere in the tile rather than just when they are on the ledge, additionally only true values apply instead of both true+false values.
-        - You can shoot arrows down ledges but not up them. Applies to projectiles in general.
-        - You can throw a clone down a ledge but not up a ledge.
         - solidMap behavior can block projectiles.
-        - Shooting an arrow down a ledge allows it to go over solid tiles unless they
-            are marked as "veryTall".
-        - Special exception for southern edges+wall tiles
-            - All Southern edges(SW/S/SE) do not block movement/projectiles in any southern direction.
         - Shooting an arrow down N ledges allows it to go up N ledges
-            - Let's just assume all ledges are 32px tall
-        - Nice to have: actors can be partially off of ledges and just walk off them to jump down instead of pushing
-            against a barrier.
-        - New behaviors:
-            isSouthernWall - solid pixels only block movement/projectiles that are not down, downleft or downright
-            isVeryTall - solid pixels apply to movement/projectiles that have crossed ledges.
-                (Alternatively, this could be tileHeight, and tileHeight > 32 would have this effect if ledges assume 32px height)
+            - For now, have a property increments for every frame it is over a ledge in the correct direction.
+            - If the property is positive, instead of hitting ledges/southernwalls in the wrong direction, decrement the property.
+            - veryTall tiles will still block the projectile even when the property is set.
 
     - Add and test many more ledges
 
@@ -70,6 +65,8 @@ Current tasks:
     - Cloud jumping near the edges can sometimes result in landing poorly either taking damage or underground in a ledge. Would be nice to find a way to clean up jumping from ledge to ledge.
 
     - Allow destroying light stones when landing with iron boots.
+
+    - Mine cart mechanic with switchable tracks.
 
 
     - Add some speaker name so it is clear who is talking in cut scenes with multiple characters.
