@@ -87,7 +87,7 @@ export function moveDown(
 ): boolean {
     const hitbox = object.getMovementHitbox?.()  || object.getHitbox();
     // Moving within the same subpixel is always allowed.
-    if ((hitbox.y | 0) === ((hitbox.y - amount) | 0)) {
+    if ((hitbox.y | 0) === ((hitbox.y + amount) | 0)) {
         object.y += amount;
         return true;
     }

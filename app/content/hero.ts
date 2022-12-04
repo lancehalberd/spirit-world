@@ -28,7 +28,7 @@ import {
     Direction, DrawPriority, EffectInstance, Equipment, Frame,
     FullTile, GameState, HeldChakram, HitProperties, HitResult,
     MagicElement, ObjectInstance, ObjectStatus,
-    PassiveTool, Rect, SavedHeroData, ThrownChakram, ThrownObject, TileBehaviors, TileCoords,
+    PassiveTool, Rect, SavedHeroData, ThrownChakram, ThrownObject, TileCoords,
     WeaponUpgrades, ZoneLocation
 } from 'app/types';
 
@@ -42,9 +42,6 @@ export class Hero implements Actor, SavedHeroData {
     // These aren't used by the Hero itself since it has special handling,
     // but these are used on objects that inherit from hero: AstralProjection and Clone.
     drawPriority: DrawPriority = 'sprites';
-    behaviors: TileBehaviors = {
-        solid: true,
-    };
     x: number = 0;
     y: number = 0;
     z: number = 0;

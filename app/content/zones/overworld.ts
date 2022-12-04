@@ -5296,7 +5296,6 @@ const sf0_2x0: AreaDefinition = {
         {status: "normal", id: "", linked: true, x: 416, y: 336, type: "spawnMarker", spirit: true},
         {status: "normal", id: "", linked: true, x: 368, y: 272, type: "spawnMarker", spirit: true},
         {status: "normal", id: "", linked: true, x: 80, y: 416, type: "spawnMarker", spirit: true},
-        {status: "normal", id: "", linked: true, x: 96, y: 256, type: "spawnMarker", spirit: true},
         {status: "normal", id: "spiritForestSave", linked: true, spirit: true, x: 416, y: 64, type: "saveStatue"},
     ],
     sections: [

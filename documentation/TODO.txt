@@ -42,11 +42,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Clone should no longer block movement.
-    - Soft lock falling onto cracked ground in forest.
-    - Able to leave elevator when crashing.
-
-
     - Fix ledges so that:
         - Right now ledges block attacks anywhere in the tile rather than just when they are on the ledge, additionally only true values apply instead of both true+false values.
         - solidMap behavior can block projectiles.

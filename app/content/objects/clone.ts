@@ -4,13 +4,10 @@ import { Hero } from 'app/content/hero';
 import { carryMap, directionMap, directionToLeftRotationsFromRight, rotateDirection } from 'app/utils/field';
 
 import {
-    Direction, GameState, Rect, TileBehaviors,
+    Direction, GameState, Rect,
 } from 'app/types';
 
 export class Clone extends Hero {
-    behaviors: TileBehaviors = {
-        solid: true,
-    };
     carryRotationOffset: number;
     ignorePits = true;
     uncontrollable = false;

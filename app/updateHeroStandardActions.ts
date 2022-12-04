@@ -576,82 +576,80 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     // Check to grab an object (also used for interacting with objects).
     if (isPlayerControlled && !isActionBlocked && wasPassiveButtonPressed) {
         const {objects, tiles} = getActorTargets(state, hero);
-        if (tiles.some(({x, y}) => hero.area.behaviorGrid?.[y]?.[x]?.solid) || objects.some(o => getObjectBehaviors(state, o)?.solid)) {
-            let closestLiftableTileCoords: TileCoords = null,
-                closestObject: ObjectInstance = null,
-                closestDistance = 100;
-            for (const target of tiles) {
-                const behavior = hero.area.behaviorGrid?.[target.y]?.[target.x];
-                if (behavior?.solid) {
-                    hero.action = 'grabbing';
-                    hero.grabTile = target;
-                }
-                if (hero.passiveTools.gloves >= behavior?.pickupWeight || behavior?.pickupWeight === 0) {
-                    // This is an unusual distance, but should do what we want still.
-                    const distance = (
-                        Math.abs(target.x * 16 - hero.x) +
-                        Math.abs(target.y * 16 - hero.y)
-                    );
-                    if (distance < closestDistance) {
-                        closestDistance = distance;
-                        closestLiftableTileCoords = target;
-                    }
+        let closestLiftableTileCoords: TileCoords = null,
+            closestObject: ObjectInstance = null,
+            closestDistance = 100;
+        for (const target of tiles) {
+            const behavior = hero.area.behaviorGrid?.[target.y]?.[target.x];
+            if (behavior?.solid) {
+                hero.action = 'grabbing';
+                hero.grabTile = target;
+            }
+            if (hero.passiveTools.gloves >= behavior?.pickupWeight || behavior?.pickupWeight === 0) {
+                // This is an unusual distance, but should do what we want still.
+                const distance = (
+                    Math.abs(target.x * 16 - hero.x) +
+                    Math.abs(target.y * 16 - hero.y)
+                );
+                if (distance < closestDistance) {
+                    closestDistance = distance;
+                    closestLiftableTileCoords = target;
                 }
             }
-            for (const object of objects) {
-                if (object === hero) {
-                    continue;
-                }
-                const behavior = getObjectBehaviors(state, object);
-                if (behavior?.solid) {
-                    hero.action = 'grabbing';
-                }
-                if (object.onGrab) {
-                    const frame = object.getHitbox(state);
-                    // This is an unusual distance, but should do what we want still.
-                    const distance = (
-                        Math.abs(frame.x + frame.w / 2 - hero.x - hero.w / 2) +
-                        Math.abs(frame.y + frame.h / 2 - hero.y - hero.h / 2)
-                    );
-                    if (distance < closestDistance) {
-                        closestDistance = distance;
-                        closestObject = object;
-                        closestLiftableTileCoords = null;
-                    }
+        }
+        for (const object of objects) {
+            if (object === hero) {
+                continue;
+            }
+            const behavior = getObjectBehaviors(state, object);
+            if (behavior?.solid) {
+                hero.action = 'grabbing';
+            }
+            if (object.onGrab) {
+                const frame = object.getHitbox(state);
+                // This is an unusual distance, but should do what we want still.
+                const distance = (
+                    Math.abs(frame.x + frame.w / 2 - hero.x - hero.w / 2) +
+                    Math.abs(frame.y + frame.h / 2 - hero.y - hero.h / 2)
+                );
+                if (distance < closestDistance) {
+                    closestDistance = distance;
+                    closestObject = object;
+                    closestLiftableTileCoords = null;
                 }
             }
-            hero.pickUpFrame = 0;
-            if (closestLiftableTileCoords) {
-                for (const layer of hero.area.layers) {
-                    const tile: FullTile = layer.tiles[closestLiftableTileCoords.y][closestLiftableTileCoords.x];
-                    const behavior = tile?.behaviors;
-                    if (behavior?.pickupWeight <= state.hero.passiveTools.gloves) {
-                        hero.pickUpTile = tile;
-                        playSound('pickUpObject');
-                        destroyTile(state, hero.area, {...closestLiftableTileCoords, layerKey: layer.key}, true);
-                        if (behavior.linkableTiles) {
-                            const alternateLayer = find(state.alternateAreaInstance.layers, {key: layer.key});
-                            if(alternateLayer) {
-                                const linkedTile: FullTile = alternateLayer.tiles[closestLiftableTileCoords.y][closestLiftableTileCoords.x];
-                                if (linkedTile && behavior.linkableTiles.includes(linkedTile.index)) {
-                                    hero.pickUpTile = {
-                                        ...hero.pickUpTile,
-                                        linkedTile,
-                                    };
-                                    destroyTile(state, hero.area.alternateArea, {...closestLiftableTileCoords, layerKey: layer.key}, true);
-                                }
+        }
+        hero.pickUpFrame = 0;
+        if (closestLiftableTileCoords) {
+            for (const layer of hero.area.layers) {
+                const tile: FullTile = layer.tiles[closestLiftableTileCoords.y][closestLiftableTileCoords.x];
+                const behavior = tile?.behaviors;
+                if (behavior?.pickupWeight <= state.hero.passiveTools.gloves) {
+                    hero.pickUpTile = tile;
+                    playSound('pickUpObject');
+                    destroyTile(state, hero.area, {...closestLiftableTileCoords, layerKey: layer.key}, true);
+                    if (behavior.linkableTiles) {
+                        const alternateLayer = find(state.alternateAreaInstance.layers, {key: layer.key});
+                        if(alternateLayer) {
+                            const linkedTile: FullTile = alternateLayer.tiles[closestLiftableTileCoords.y][closestLiftableTileCoords.x];
+                            if (linkedTile && behavior.linkableTiles.includes(linkedTile.index)) {
+                                hero.pickUpTile = {
+                                    ...hero.pickUpTile,
+                                    linkedTile,
+                                };
+                                destroyTile(state, hero.area.alternateArea, {...closestLiftableTileCoords, layerKey: layer.key}, true);
                             }
                         }
                     }
                 }
-                hero.grabTile = null;
-            } else if (closestObject) {
-                if (closestObject.onGrab) {
-                    closestObject.onGrab(state, hero.d, hero);
-                }
-                hero.grabObject = closestObject;
-                hero.lastTouchedObject = closestObject;
             }
+            hero.grabTile = null;
+        } else if (closestObject) {
+            if (closestObject.onGrab) {
+                closestObject.onGrab(state, hero.d, hero);
+            }
+            hero.grabObject = closestObject;
+            hero.lastTouchedObject = closestObject;
         }
     }
     if (isPlayerControlled && wasGameKeyPressed(state, GAME_KEY.ROLL)

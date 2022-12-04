@@ -805,7 +805,7 @@ export class Door implements ObjectInstance {
         return state.hero.area === this.area && state.hero.action !== 'jumpingDown' && state.hero.z <= 8;
     }
     renderOpen(state: GameState): boolean {
-        const heroIsTouchingDoor = boxesIntersect(pad(state.hero.getMovementHitbox(), -1), this.getHitbox()) && this.heroCanEnter(state);
+        const heroIsTouchingDoor = boxesIntersect(pad(state.hero.getMovementHitbox(), 0), this.getHitbox()) && this.heroCanEnter(state);
         return heroIsTouchingDoor || this.status === 'normal' || this.status === 'blownOpen' || this.status === 'frozen' || state.hero.actionTarget === this;
     }
     changeStatus(state: GameState, status: ObjectStatus): void {
@@ -1083,7 +1083,7 @@ export class Door implements ObjectInstance {
         }
         // For some reason this can trigger when the door is closed after recent movement changes
         // so we reduce the
-        const heroIsTouchingDoor = boxesIntersect(pad(hero.getMovementHitbox(), -1), this.getHitbox());
+        const heroIsTouchingDoor = boxesIntersect(pad(hero.getMovementHitbox(), 0), this.getHitbox());
         if (heroIsTouchingDoor &&
             // If the hero has no action target, have the door control them as soon as they touch it
             (!hero.actionTarget || (hero.actionTarget !== this && !hero.isExitingDoor))
