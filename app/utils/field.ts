@@ -177,11 +177,12 @@ export function isPointOpen(
             }
         }*/
     }
-    if (state.hero.area === area && !excludedObjects?.has(state.hero)) {
+    // Not sure why we have a special check for the hero here.
+    /*if (state.hero.area === area && !excludedObjects?.has(state.hero)) {
         if (isPixelInShortRect(x, y, state.hero)) {
             return false;
         }
-    }
+    }*/
     return true;
 }
 

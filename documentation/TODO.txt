@@ -42,6 +42,25 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Grand Temple
+        - Complete basic flow
+        - Allow pressing switches with the staff
+            - Should stop pressing them when recalled.
+        - Bow level 2 always uses equipped element
+            - Charge level 1 shoots 3 arrows in 90 degree arc -45, 0, 45
+            - Charge level 2 shoots 5 arrows in 120 degree arc -60, -30, 0, 30, 60
+        - Add a gold ore + 100 jade check to the dungeon
+        - Add iron skin to the NPC behind the main stairs.
+
+    - Add `getLogicalZone` function that returns a logical zone for a given state location wich can differ from the actual zone key, use this for randomizer locations and dungeon item associations.
+        - Move underwater areas into the same logical zone so that keys can be shared above and below water
+        - Split different caves into distinct logical zones like 'bushCave', 'fertilityTemple', and 'ascentCave'
+        - These logical zones should be added to randomizer logic nodes when they don't match the zone for the node.
+        - This will also allow using the same tile in material vs spirit world in distinct dungeons, for example, tiles could be shared inside the Grand Palace and Jade Palace but be treated as distinct dungones wrt keys and checks.
+        - We could probably then use this for simplifying logic to determine what music to play.
+        - Should probably also use this for Nimbus Cloud entrance behavior in some cases.
+        - Make sure to update Hint location names to be more specific by using the logical zones instead.
+
     - Fix ledges so that:
         - Right now ledges block attacks anywhere in the tile rather than just when they are on the ledge, additionally only true values apply instead of both true+false values.
         - solidMap behavior can block projectiles.
@@ -51,6 +70,8 @@ Current tasks:
             - veryTall tiles will still block the projectile even when the property is set.
 
     - Add and test many more ledges
+
+    - test staff interactions with ledges.
 
     - Prevent grabbing tiles/objects across ledges
         - on grab, check if the player can move into the object by running the movement algorithm with a special mode that ignores all normal collisions and prevents crossing ledges in any direction. Prevent the grab if this movement check fails.
@@ -62,6 +83,13 @@ Current tasks:
     - Allow destroying light stones when landing with iron boots.
 
     - Mine cart mechanic with switchable tracks.
+
+    - Dungeon with super tile that is just the vertical face of a cliff/tower/tree that you can climb up/jump down to change floors.
+
+    - Add mountain edges to the sky connecting all the way to just west of the city.
+        - Add bombable entrance to the crater that takes you to an area in the dungeon that is not connected to the dungeon interior.
+            - Has a peach piece check that is under the first layer of lava
+        - Drain all lava in the crater when the fire beast isn't spawned yet?
 
 
     - Add some speaker name so it is clear who is talking in cut scenes with multiple characters.
@@ -377,6 +405,8 @@ Dungeon 3 Improvements:
 River Temple Improvements:
     - Some underwater enemies
     - Some crab enemies with ice shells that require fire element to defeat
+    - Floating ice spike obstacles that hurt you when floating into them and prevent passing through.
+        - Allow swimming over stones and then use these to prevent swimming movement where it makes sense.
     - Maybe torches should stay lit during the boss fight once turned on.
     - Add special behavior for frozen doors instead of having two door objects.
 

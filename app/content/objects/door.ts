@@ -6,6 +6,7 @@ import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
 import {
     BITMAP_LEFT, BITMAP_RIGHT,
     BITMAP_BOTTOM, BITMAP_BOTTOM_LEFT_QUARTER, BITMAP_BOTTOM_RIGHT_QUARTER,
+    BITMAP_TOP,
 } from 'app/content/bitMasks';
 import { debugCanvas } from 'app/dom';
 import { showMessage } from 'app/render/renderMessage';
@@ -905,13 +906,23 @@ export class Door implements ObjectInstance {
             applyBehaviorToTile(this.area, x, y, behaviors);
             applyBehaviorToTile(this.area, x, y + 1, behaviors);
         } else if (doorStyle.w === 64) {
-            const behaviors: TileBehaviors = this.isOpen() ? { cannotLand: true, solid: false, lowCeiling: true  } : { solid: true, low: false};
+            const behaviors: TileBehaviors = this.isOpen() ? { cannotLand: true, solid: false, low: true, lowCeiling: true  } : { solid: true, low: false};
             if (this.definition.d === 'up' || this.definition.d === 'down') {
+                if (this.definition.d === 'up') {
+                    behaviors.solidMap = BITMAP_TOP;
+                } else {
+                    behaviors.solidMap = BITMAP_BOTTOM;
+                }
                 applyBehaviorToTile(this.area, x, y, behaviors);
                 applyBehaviorToTile(this.area, x + 1, y, behaviors);
                 applyBehaviorToTile(this.area, x + 2, y, behaviors);
                 applyBehaviorToTile(this.area, x + 3, y, behaviors);
             } else {
+                if (this.definition.d === 'left') {
+                    behaviors.solidMap = BITMAP_LEFT;
+                } else {
+                    behaviors.solidMap = BITMAP_RIGHT;
+                }
                 applyBehaviorToTile(this.area, x, y, behaviors);
                 applyBehaviorToTile(this.area, x, y + 1, behaviors);
                 applyBehaviorToTile(this.area, x, y + 2, behaviors);
