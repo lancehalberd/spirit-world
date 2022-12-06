@@ -22,6 +22,9 @@ export interface TileBehaviors {
     // Indicates this tile is already covered and cannot be covered by anything else. Added to prevent tile behavior
     // from getting messed up while the staff is covering the ground.
     covered?: boolean
+    // Similar behavior to covered but only applied when the staff covers the ground.
+    // Used to prevents staffs from overlapping.
+    staffCovered?: boolean
     // Can be destroyed by weapon
     cuttable?: number
     // Hit applies to enemies/heroes on contact.

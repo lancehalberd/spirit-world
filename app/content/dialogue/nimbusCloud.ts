@@ -32,6 +32,7 @@ export const zoneEntranceMap = {
     'waterfallTower': 'overworld:waterfallTowerEntrance',
      // waterfallTowerTopEntrance
     'forge': 'sky:forgeEntrance',
+    'grandTemple': 'overworld:templeDoor',
     'skyPalace': 'sky:skyPalaceEntrance',
     'riverTemple': 'overworld:riverTempleUpperEntrance',
     // underwater:riverTempleWaterEntrance

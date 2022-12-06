@@ -2,7 +2,7 @@ import {
     andLogic,
     canCross4Gaps, hasReleasedBeasts, canTravelFarUnderWater,
     hasCloudBoots, hasIronBoots, hasGloves, hasIce, hasMitts, hasSomersault, hasTeleportation,
-    hasMediumRange, hasNimbusCloud, hasSpiritSight, hasTowerStaff, orLogic,
+    hasMediumRange, hasNimbusCloud, hasSpiritSight, orLogic,
 } from 'app/content/logic';
 
 import { LogicNode } from 'app/types';
@@ -308,6 +308,8 @@ export const skyNodes: LogicNode[] = [
             { nodeId: 'mainCloudPath', logic: hasCloudBoots },
         ],
         checks: [{ objectId: 'skyMoney'}],
+        entranceIds: ['craterSecretEntrance'],
+        exits: [{ objectId: 'craterSecretEntrance' }],
     },
     {
         zoneId,
@@ -385,8 +387,7 @@ export const skyNodes: LogicNode[] = [
         ],
         entranceIds: ['skyPalaceEntrance'],
         exits: [{ objectId: 'skyPalaceEntrance', logic:
-            // This logic is probably a good default
-            orLogic(hasMitts, andLogic(hasTeleportation, hasTowerStaff)),
+            hasMitts,
             // Could use this as advance logic
             /*orLogic(
                 // Simple path, lift the stones to enter

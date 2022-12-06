@@ -7,10 +7,13 @@ import { shouldHideMenu } from 'app/state';
 import { createAnimation, drawFrame, drawFrameAt, drawFrameCenteredAt } from 'app/utils/animations';
 import { drawText } from 'app/utils/simpleWhiteFont';
 
-import { Enemy, GameState } from 'app/types';
+import { Enemy, Frame, GameState } from 'app/types';
 
 const [emptyHeart, fullHeart, threeQuarters, halfHeart, quarterHeart] =
     createAnimation('gfx/hud/hearts.png', {w: 10, h: 10}, {cols: 5}).frames;
+
+const [, fullGreyHeart, threeGreyQuarters, halfGreyHeart, quarterGreyHeart] =
+    createAnimation('gfx/hud/greyhearts.png', {w: 10, h: 10}, {cols: 5}).frames;
 
 const [coin] =
     createAnimation('gfx/hud/money.png', {w: 16, h: 16}, {x: 9}).frames;
@@ -25,6 +28,7 @@ const yellowFrame = createAnimation('gfx/hud/toprighttemp1.png', {w: frameSize, 
 const blueFrame = createAnimation('gfx/hud/toprighttemp2.png', {w: frameSize, h: frameSize}).frames[0];
 
 export function renderHUD(context: CanvasRenderingContext2D, state: GameState): void {
+    // Draw heart backs, and fillings
     let x = 26;
     let y = 5;
     for (let i = 0; i < state.hero.maxLife; i++) {
@@ -42,6 +46,25 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
             frame = halfHeart;
         } else if (i >= state.hero.life - 0.75) {
             frame = threeQuarters;
+        }
+        drawFrame(context, frame, {...frame, x, y});
+        x += 11;
+    }
+    // Draw iron skin hearts on top of regular hearts
+    x = 26;
+    y = 5;
+    for (let i = 0; i < state.hero.ironSkinLife; i++) {
+        if (i === 10) {
+            y += 11;
+            x = 26;
+        }
+        let frame: Frame = fullGreyHeart;
+        if (i >= state.hero.ironSkinLife - 0.25) {
+            frame = quarterGreyHeart;
+        } else if (i >= state.hero.ironSkinLife - 0.5) {
+            frame = halfGreyHeart;
+        } else if (i >= state.hero.ironSkinLife - 0.75) {
+            frame = threeGreyQuarters;
         }
         drawFrame(context, frame, {...frame, x, y});
         x += 11;

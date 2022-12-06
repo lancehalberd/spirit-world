@@ -1,5 +1,3 @@
-import { Staff } from 'app/content/objects/staff';
-
 import {
     ActiveScriptEvent, AreaGrid, AreaInstance,
     Floor, Hero, LootData, SavedHeroData, Rect, ScriptEvent, TextPage, TrackKey,
@@ -63,7 +61,6 @@ export interface GameState {
     savedGames: SavedState[]
     savedGameIndex: number
     hero: Hero
-    activeStaff?: Staff
     camera: { x: number, y: number }
     fieldTime: number
     time: number

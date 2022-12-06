@@ -14,8 +14,6 @@ Known Bugs:
         - Mana regen is wrong when using clone tools (seems to multiply consumption/regen by number of clones)
         - Should destroy clones when the clone technique is unequipped.
         - Clones should all share the same tools (store tools on state instead of hero)
-        - Staff won't be placed when controlling multiple clones (one places, another retrieves?)
-            - Let's allow one staff per clone, similar to chakrams.
     - Held rocks/bushes are invisible while using cloak
     - Piercing projectiles that can push things should be stopped by the first object they push
         or not be able to push additional objects, for example, the charged chakram.
@@ -42,21 +40,12 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Grand Temple
-        - Complete basic flow
-        - Allow pressing switches with the staff
-            - Should stop pressing them when recalled.
-        - Bow level 2 always uses equipped element
-            - Charge level 1 shoots 3 arrows in 90 degree arc -45, 0, 45
-            - Charge level 2 shoots 5 arrows in 120 degree arc -60, -30, 0, 30, 60
-        - Add a gold ore + 100 jade check to the dungeon
-        - Add iron skin to the NPC behind the main stairs.
 
     - Add `getLogicalZone` function that returns a logical zone for a given state location wich can differ from the actual zone key, use this for randomizer locations and dungeon item associations.
         - Move underwater areas into the same logical zone so that keys can be shared above and below water
         - Split different caves into distinct logical zones like 'bushCave', 'fertilityTemple', and 'ascentCave'
         - These logical zones should be added to randomizer logic nodes when they don't match the zone for the node.
-        - This will also allow using the same tile in material vs spirit world in distinct dungeons, for example, tiles could be shared inside the Grand Palace and Jade Palace but be treated as distinct dungones wrt keys and checks.
+        - This will also allow using the same tile in material vs spirit world in distinct dungeons, for example, tiles could be shared inside the Grand Temple and Jade Palace but be treated as distinct dungones wrt keys and checks.
         - We could probably then use this for simplifying logic to determine what music to play.
         - Should probably also use this for Nimbus Cloud entrance behavior in some cases.
         - Make sure to update Hint location names to be more specific by using the logical zones instead.
@@ -80,17 +69,18 @@ Current tasks:
 
     - Cloud jumping near the edges can sometimes result in landing poorly either taking damage or underground in a ledge. Would be nice to find a way to clean up jumping from ledge to ledge.
 
-    - Allow destroying light stones when landing with iron boots.
+    - Allow destroying light stones when landing with iron boots?
+
+    - Drain all lava in the crater when the fire beast isn't spawned yet?
+
+    - Allow walking on clouds/cracked ground while invisible?
+        - Would have to be careful in sky not to run out of spirit energy
+        - Might be difficult to tell if checks are in logic based on mana bar
+            - Could add special logic check against specific max spirit amounts to simplify this.
 
     - Mine cart mechanic with switchable tracks.
 
     - Dungeon with super tile that is just the vertical face of a cliff/tower/tree that you can climb up/jump down to change floors.
-
-    - Add mountain edges to the sky connecting all the way to just west of the city.
-        - Add bombable entrance to the crater that takes you to an area in the dungeon that is not connected to the dungeon interior.
-            - Has a peach piece check that is under the first layer of lava
-        - Drain all lava in the crater when the fire beast isn't spawned yet?
-
 
     - Add some speaker name so it is clear who is talking in cut scenes with multiple characters.
         - Add this to cut scene with Elder+Rival
@@ -267,16 +257,15 @@ Improve Staff Tower Setup:
 
 High level list of things left to do:
     New dungeons(need enemies, mechanics, bosses, entrances):
-        Grand Temple
         Jade Palace
-        Sky Temple
+        Sky Palace
         Forge
     Areas missing significant content:
+        Grand Temple
         Forest Temple
         River Temple
     Missing Bosses for existing areas:
         Crater midboss
-        Rival fight before Tomb
         Rival fight before Helix
         Helix Boss
             - Instead of fighting this boss, you will see it, but then abort because of the beasts attacking the city
@@ -297,11 +286,9 @@ High level list of things left to do:
         Fertility shrine donations
     Items missing implementation:
         Charge level 2
-        Bow level 2
-        Bow charge 2
+            Bow charge 2 shoots 5 arrows in 120 degree arc -60, -30, 0, 30, 60
         Clone charge 1 + 2
         True Sight (Render certain enemies/objects flagged for true sight)
-        Iron Skin (slowly regenerates health shield = 20% total health)
         Gloves charge 1 + 2
 
 Generic boss improvements

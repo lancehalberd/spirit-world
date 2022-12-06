@@ -14,6 +14,15 @@ const zoneId = 'crater';
 export const craterNodes: LogicNode[] = [
     {
         zoneId,
+        nodeId: 'craterSecretEntrance',
+        checks: [
+            { objectId: 'craterSecret' },
+        ],
+        entranceIds: ['craterSecretEntrance'],
+        exits: [{ objectId: 'craterSecretEntrance' }],
+    },
+    {
+        zoneId,
         nodeId: 'craterEntrance',
         paths: [
             // Eventually this will also require the staff.

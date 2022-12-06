@@ -308,8 +308,12 @@ export function updateKeyboardState(state: GameState) {
 
 
 export function clearKeyboardState(state: GameState) {
+    const gameKeyValues = [];
+    for (let gameKey of Object.values(GAME_KEY)) {
+        gameKeyValues[gameKey] = 0;
+    }
     state.keyboard = {
-        gameKeyValues: [],
+        gameKeyValues,
         gameKeysDown: new Set(),
         gameKeysPressed: new Set(),
         gameKeysReleased: new Set(),
@@ -339,6 +343,9 @@ export function getMovementDeltas(state: GameState): [number, number] {
     if (Math.abs(dy) < ANALOG_THRESHOLD) dy = 0;
     let dx = gameKeyValues[GAME_KEY.RIGHT] - gameKeyValues[GAME_KEY.LEFT];
     if (Math.abs(dx) < ANALOG_THRESHOLD) dx = 0;
+    if (isNaN(dx) || isNaN(dy)) {
+        debugger;
+    }
     return [dx, dy];
 }
 

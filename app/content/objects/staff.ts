@@ -70,7 +70,7 @@ export class Staff implements ObjectInstance {
             for (let i = 1; i < maxLength; i++) {
                 column = this.rightColumn - i;
                 const tileBehavior = this.area?.behaviorGrid[row]?.[column];
-                if (column * 16 < section.x || tileBehavior?.solid || tileBehavior?.solidMap || tileBehavior?.ledges) {
+                if (column * 16 < section.x || tileBehavior?.solid || tileBehavior?.solidMap || tileBehavior?.ledges || tileBehavior?.staffCovered) {
                     break;
                 }
                 if (!isPointOpen(state, this.area, {x: column * 16 + 8, y: row * 16 + 8 }, movementProps,  excludedObjects)) {
@@ -82,7 +82,7 @@ export class Staff implements ObjectInstance {
             for (let i = 1; i < maxLength; i++) {
                 column = this.leftColumn + i;
                 const tileBehavior = this.area?.behaviorGrid[row]?.[column];
-                if (column * 16 >= section.x + section.w || tileBehavior?.solid || tileBehavior?.solidMap || tileBehavior?.ledges) {
+                if (column * 16 >= section.x + section.w || tileBehavior?.solid || tileBehavior?.solidMap || tileBehavior?.ledges || tileBehavior?.staffCovered) {
                     break;
                 }
                 if (!isPointOpen(state, this.area, {x: column * 16 + 8, y: row * 16 + 8 }, movementProps,  excludedObjects)) {
@@ -94,7 +94,7 @@ export class Staff implements ObjectInstance {
             for (let i = 1; i < maxLength; i++) {
                 row = this.bottomRow - i;
                 const tileBehavior = this.area?.behaviorGrid[row]?.[column];
-                if (row * 16 < section.y || tileBehavior?.solid || tileBehavior?.solidMap || tileBehavior?.ledges) {
+                if (row * 16 < section.y || tileBehavior?.solid || tileBehavior?.solidMap || tileBehavior?.ledges || tileBehavior?.staffCovered) {
                     break;
                 }
                 if (!isPointOpen(state, this.area, {x: column * 16 + 8, y: row * 16 + 8 }, movementProps,  excludedObjects)) {
@@ -106,7 +106,7 @@ export class Staff implements ObjectInstance {
             for (let i = 1; i < maxLength; i++) {
                 row = this.topRow + i;
                 const tileBehavior = this.area?.behaviorGrid[row]?.[column];
-                if (row * 16 >= section.y + section.h || tileBehavior?.solid || tileBehavior?.solidMap || tileBehavior?.ledges) {
+                if (row * 16 >= section.y + section.h || tileBehavior?.solid || tileBehavior?.solidMap || tileBehavior?.ledges || tileBehavior?.staffCovered) {
                     break;
                 }
                 if (!isPointOpen(state, this.area, {x: column * 16 + 8, y: row * 16 + 8 }, movementProps,  excludedObjects)) {
@@ -136,7 +136,7 @@ export class Staff implements ObjectInstance {
             this.storedBehaviors[row] = []
             for (let column = this.leftColumn; column <= this.rightColumn; column++) {
                 this.storedBehaviors[row][column] = state.areaInstance.behaviorGrid[row][column];
-                state.areaInstance.behaviorGrid[row][column] = { groundHeight: 2, covered: true };
+                state.areaInstance.behaviorGrid[row][column] = { groundHeight: 2, staffCovered: true };
             }
         }
     }
@@ -171,7 +171,11 @@ export class Staff implements ObjectInstance {
             }
         }
         this.area.checkToRedrawTiles = true;
-        state.activeStaff = null;
+        for (const hero of [state.hero, ...state.hero.clones]) {
+            if (hero.activeStaff === this) {
+                delete hero.activeStaff;
+            }
+        }
     }
     render(context, state: GameState) {
         if (this.direction === 'left' || this.direction === 'right') {

@@ -5,7 +5,7 @@ import {
 import { Arrow } from 'app/content/effects/arrow';
 import { Clone }  from 'app/content/objects/clone';
 import { GAME_KEY } from 'app/gameConstants';
-import { directionMap, getDirection } from 'app/utils/field';
+import { directionMap, getDirection, rotateDirection } from 'app/utils/field';
 import { isUnderwater } from 'app/utils/actor';
 
 import { ActiveTool, GameState, Hero, MagicElement } from 'app/types'
@@ -39,7 +39,7 @@ export function useTool(
     dx: number,
     dy: number,
 ): void {
-    const { chargeLevel, element } = getChargeLevelAndElement(state, hero, tool);
+    let { chargeLevel, element } = getChargeLevelAndElement(state, hero, tool);
     switch (tool) {
         case 'bow':
             if (state.hero.magic <= 0) {
@@ -48,10 +48,19 @@ export function useTool(
             let speed = 4;
             state.hero.magic -= 5;
             if (chargeLevel === 1) {
-                speed = 6;
+                speed += 2;
                 state.hero.magic -= 5;
             }
-            if (state.hero.element && chargeLevel > 0) {
+            const isUpgradedBow = state.hero.activeTools.bow >= 2;
+            if (isUpgradedBow) {
+                speed += 2;
+            }
+            if (state.hero.element && isUpgradedBow) {
+                // Upgraded bow always uses the equiped element
+                // and uses less magic to do so.
+                element = state.hero.element;
+                state.hero.magic -= 5;
+            } else if (state.hero.element && chargeLevel > 0) {
                 state.hero.magic -= 10;
             }
             hero.toolCooldown = 200;
@@ -60,9 +69,13 @@ export function useTool(
             if (dx || dy) {
                 direction = getDirection(dx, dy, true);
             }
-            const arrow = new Arrow({
+            let damage = 2 ** chargeLevel;
+            if (isUpgradedBow) {
+                damage *= 3;
+            }
+            let arrow = new Arrow({
                 chargeLevel,
-                damage: 2 ** chargeLevel,
+                damage,
                 element,
                 x: hero.x + 8 + 8 * directionMap[direction][0],
                 y: hero.y + 8 * directionMap[direction][1] + 6,
@@ -71,6 +84,32 @@ export function useTool(
                 style: 'spirit',
             });
             addEffectToArea(state, state.areaInstance, arrow);
+            if (isUpgradedBow && chargeLevel === 1) {
+                direction = rotateDirection(direction, -1/2);
+                arrow = new Arrow({
+                    chargeLevel,
+                    damage: 2 ** chargeLevel,
+                    element,
+                    x: hero.x + 8 + 8 * directionMap[direction][0],
+                    y: hero.y + 8 * directionMap[direction][1] + 6,
+                    vx: speed * directionMap[direction][0],
+                    vy: speed * directionMap[direction][1],
+                    style: 'spirit',
+                });
+                addEffectToArea(state, state.areaInstance, arrow);
+                direction = rotateDirection(direction, 1);
+                arrow = new Arrow({
+                    chargeLevel,
+                    damage: 2 ** chargeLevel,
+                    element,
+                    x: hero.x + 8 + 8 * directionMap[direction][0],
+                    y: hero.y + 8 * directionMap[direction][1] + 6,
+                    vx: speed * directionMap[direction][0],
+                    vy: speed * directionMap[direction][1],
+                    style: 'spirit',
+                });
+                addEffectToArea(state, state.areaInstance, arrow);
+            }
             return;
         case 'cloak':
             if (state.hero.isInvisible || state.hero.hasBarrier) {
@@ -135,14 +174,14 @@ export function useTool(
             }
             return;
         case 'staff':
-            if (state.activeStaff?.area && !state.activeStaff.recalling) {
-                state.activeStaff.recall(state);
+            if (hero.activeStaff?.area && !hero.activeStaff.recalling) {
+                hero.activeStaff.recall(state);
                 hero.toolCooldown = 0;
                 hero.toolOnCooldown = null;
                 playAreaSound(state, state.areaInstance, 'menuTick');
                 return;
             }
-            if (state.activeStaff?.area || state.hero.magic <= 0) {
+            if (hero.activeStaff?.area || state.hero.magic <= 0) {
                 return;
             }
             state.hero.magic -= 10;

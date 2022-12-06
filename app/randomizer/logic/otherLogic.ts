@@ -170,24 +170,6 @@ export const cavesNodes: LogicNode[] = [
 export const holyCityNodes: LogicNode[] = [
     {
         zoneId: 'holyCityInterior',
-        nodeId: 'templePeachPiece',
-        checks: [
-            { objectId: 'templePeachPiece' },
-        ],
-        entranceIds: ['templeCrackedDoor'],
-        exits: [{ objectId: 'templeCrackedDoor' }],
-    },
-    {
-        zoneId: 'holyCityInterior',
-        nodeId: 'templeMain',
-        npcs: [
-            {loot: {type: 'dialogueLoot', id: 'generousPriest', lootType: 'money', lootAmount: 10}},
-        ],
-        entranceIds: ['templeDoor'],
-        exits: [{ objectId: 'templeDoor' }],
-    },
-    {
-        zoneId: 'holyCityInterior',
         nodeId: 'moneyMaze',
         checks: [
             { objectId: 'moneyMazePeachPiece' },
@@ -222,7 +204,5 @@ export const holyCityNodes: LogicNode[] = [
         entranceIds: ['clothesHouse'],
         exits: [{ objectId: 'clothesHouse'}],
     },
-
-
 ];
 

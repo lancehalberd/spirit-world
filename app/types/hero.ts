@@ -157,7 +157,6 @@ export interface Hero extends Actor, SavedHeroData {
     toolCooldown: number
     astralProjection?: Hero
     clones: Hero[]
-    activeStaff?: Staff
     barrierElement?: MagicElement
     barrierLevel?: number
     safeD: Direction

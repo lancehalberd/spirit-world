@@ -16,6 +16,7 @@ import { helixNodes } from 'app/randomizer/logic/helixLogic';
 import { forestTempleNodes } from 'app/randomizer/logic/forestTempleLogic';
 import { waterfallTowerNodes } from 'app/randomizer/logic/waterfallTower';
 import { forgeNodes } from 'app/randomizer/logic/forgeLogic';
+import { grandTempleNodes } from 'app/randomizer/logic/grandTempleLogic';
 import { skyPalaceNodes } from 'app/randomizer/logic/skyPalaceLogic';
 import { riverTempleNodes, riverTempleWaterNodes } from 'app/randomizer/logic/riverTempleLogic';
 import { craterNodes } from 'app/randomizer/logic/craterLogic';
@@ -53,6 +54,7 @@ export const allNodes = [
     ...forestTempleNodes,
     ...waterfallTowerNodes,
     ...forgeNodes,
+    ...grandTempleNodes,
     ...skyPalaceNodes,
     ...riverTempleNodes,
     ...riverTempleWaterNodes,

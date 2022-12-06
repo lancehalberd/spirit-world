@@ -93,6 +93,7 @@ window['isLogicValid'] = isLogicValid;
 
 export const hasCatEyes: LogicCheck = { requiredFlags: ['$catEyes'] };
 export const hasClone: LogicCheck = { requiredFlags: ['$clone'] };
+export const hasDoubleClone: LogicCheck = { requiredFlags: ['$clone:2'] };
 export const hasIronBoots: LogicCheck = { requiredFlags: ['$ironBoots'] };
 export const hasCloudBoots: LogicCheck = { requiredFlags: ['$cloudBoots'] };
 export const hasSpiritSight: LogicCheck = { requiredFlags: ['$spiritSight'] };
@@ -112,10 +113,12 @@ export const hasNimbusCloud: LogicCheck = {requiredFlags: ['$nimbusCloud']};
 // This check will be added automatically to any tiles that have 100% darkness effect.
 //const hasEyes: LogicCheck = { requiredFlags: ['$catEyes:1'] };
 export const hasBow: LogicCheck = {requiredFlags: ['$bow']};
+export const hasUpgradedBow: LogicCheck = {requiredFlags: ['$bow:2']};
 export const hasRoll: LogicCheck = {requiredFlags: ['$roll']};
 export const hasSomersault: LogicCheck = {requiredFlags: ['$roll:2']};
 export const hasStaff: LogicCheck = {requiredFlags: ['$staff']};
 export const hasTowerStaff: LogicCheck = {requiredFlags: ['$staff:2']};
+export const canHasTowerStaff: LogicCheck = {requiredFlags: ['stormBeast']};
 // This check is for having a weapon that can be used to defeat most bosses.
 // Primarily we don't want having the Spirit Cloak to put any bosses in logic since
 // it is excessively tedious to defeat bosses with.
@@ -127,6 +130,8 @@ export const hasWeapon: OrLogicCheck = orLogic(hasChakram, hasBow, hasSpiritBarr
 export const hasElementalWeapon: OrLogicCheck = orLogic(hasChakram, hasBow);
 // This check is used for weapons that have the range of the charged chakram or greater.
 export const hasMediumRange: OrLogicCheck = orLogic({requiredFlags: ['$weapon', '$charge']}, hasBow);
+
+export const hasTripleShot: AndLogicCheck = andLogic(hasUpgradedBow, {requiredFlags: ['$charge']});
 
 // Attacks that you are expected to roll to avoid can also reasonably be dealt with by absorbing the hit
 // with spirit barrier or even invisibility.
@@ -147,15 +152,17 @@ export const hasLightning: LogicCheck = andLogic(hasElementalWeapon, {requiredFl
 // teleportation can only be combined with the staff.
 export const canCross2Gaps: OrLogicCheck = orLogic(hasCloudBoots, hasRoll, hasStaff, hasTeleportation, hasClone);
 export const canCross4Gaps: OrLogicCheck = orLogic(andLogic(hasRoll, hasCloudBoots), hasStaff, hasSomersault, hasClone);
-export const canCross6Gaps: OrLogicCheck = orLogic(hasSomersault, hasTowerStaff, andLogic(orLogic(hasRoll, hasCloudBoots, hasTeleportation, hasClone), hasStaff));
-export const canCross8Gaps: OrLogicCheck = orLogic(hasSomersault, hasTowerStaff, andLogic(hasRoll, hasCloudBoots, hasStaff));
+export const canCross6Gaps: OrLogicCheck = orLogic(hasSomersault, canHasTowerStaff, andLogic(orLogic(hasRoll, hasCloudBoots, hasTeleportation, hasClone), hasStaff));
+export const canCross8Gaps: OrLogicCheck = orLogic(hasSomersault, canHasTowerStaff, andLogic(hasRoll, hasCloudBoots, hasStaff));
 
 export const canCrossDynamic2Gaps: OrLogicCheck = orLogic(hasCloudBoots, hasRoll, hasStaff, hasClone);
 export const canCrossDynamic4Gaps: OrLogicCheck = orLogic(andLogic(hasRoll, hasCloudBoots), hasStaff, hasSomersault, hasClone);
-export const canCrossDynamic6Gaps: OrLogicCheck = orLogic(hasSomersault, hasTowerStaff, andLogic(orLogic(hasRoll, hasCloudBoots, hasTeleportation, hasClone), hasStaff));
-export const canCrossDynamic8Gaps: OrLogicCheck = orLogic(hasSomersault, hasTowerStaff, andLogic(hasRoll, hasCloudBoots, hasStaff));
+export const canCrossDynamic6Gaps: OrLogicCheck = orLogic(hasSomersault, canHasTowerStaff, andLogic(orLogic(hasRoll, hasCloudBoots, hasTeleportation, hasClone), hasStaff));
+export const canCrossDynamic8Gaps: OrLogicCheck = orLogic(hasSomersault, canHasTowerStaff, andLogic(hasRoll, hasCloudBoots, hasStaff));
 
 export const canTravelFarUnderWater = andLogic(hasIronBoots);
+
+export const canHitCrystalSwitches = orLogic(hasChakram, hasBow, hasSpiritBarrier);
 
 export const hasReleasedBeasts: LogicCheck = {requiredFlags: ['elementalBeastsEscaped']};
 

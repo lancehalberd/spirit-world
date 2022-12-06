@@ -122,6 +122,17 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
         if (hero.action === 'walking' && hero.isRunning && hero.magic >= 0) {
             hero.animationTime += FRAME_LENGTH / 2;
         }
+        if (hero.passiveTools.ironSkin) {
+            hero.ironSkinCooldown -= FRAME_LENGTH;
+            // Iron skin restored twice as quickly when still.
+            if (!hero.action || hero.action === 'meditating') {
+                hero.ironSkinCooldown -= FRAME_LENGTH;
+            }
+            if (hero.ironSkinCooldown <= 0) {
+                hero.ironSkinCooldown = 1000;
+                hero.ironSkinLife = Math.min(hero.ironSkinLife + 0.25, hero.maxLife / 4);
+            }
+        }
     }
     // Remove action targets from old areas.
     if (hero.actionTarget && hero.actionTarget.area !== hero.area) {

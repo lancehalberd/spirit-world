@@ -422,7 +422,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 maxLength,
             });
             if (!staff.invalid) {
-                state.activeStaff = staff;
+                hero.activeStaff = staff;
                 addObjectToArea(state, state.areaInstance, staff);
             }
             playAreaSound(state, state.areaInstance, 'bossDeath');

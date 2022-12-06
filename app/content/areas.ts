@@ -262,8 +262,7 @@ export function enterLocation(
     const alternateArea = getAreaFromLocation({...state.location, isSpiritWorld: !state.location.isSpiritWorld});
 
     // Remove all clones on changing areas.
-    removeAllClones(state);
-    state.activeStaff?.remove(state);
+    cleanupHeroFromArea(state);
     const lastAreaInstance = state.areaInstance;
     // Use the existing area instances on the transition state if any are present.
     state.areaInstance = state.transitionState?.nextAreaInstance
@@ -522,8 +521,7 @@ export function switchToNextAreaSection(state: GameState): void {
     refreshSection(state, state.alternateAreaInstance, state.areaSection);
     linkObjects(state);
     state.areaSection = state.nextAreaSection;
-    removeAllClones(state);
-    state.activeStaff?.remove(state);
+    cleanupHeroFromArea(state);
     state.hero.safeD = state.hero.d;
     state.hero.safeX = state.hero.x;
     state.hero.safeY = state.hero.y;
@@ -544,12 +542,18 @@ export function setAreaSection(state: GameState, d: Direction, newArea: boolean 
         }
     }
     if (newArea || lastAreaSection !== state.areaSection) {
-        removeAllClones(state);
-        state.activeStaff?.remove(state);
+        cleanupHeroFromArea(state);
         state.hero.safeD = state.hero.d;
         state.hero.safeX = state.hero.x;
         state.hero.safeY = state.hero.y;
     }
+}
+
+export function cleanupHeroFromArea(state: GameState): void {
+    for (const hero of [state.hero, ...state.hero.clones]) {
+        hero.activeStaff?.remove(state);
+    }
+    removeAllClones(state);
 }
 
 export function scrollToArea(state: GameState, area: AreaDefinition, direction: Direction): void {
