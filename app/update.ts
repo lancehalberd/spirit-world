@@ -221,7 +221,7 @@ function updateMenu(state: GameState) {
         if (menuItem === 'return') {
             state.paused = false;
             updateSoundSettings(state);
-            showMessage(state, '{@nimbusCloud.returnHomeChoice}');
+            showMessage(state, '{@nimbusCloud.returnMenu}');
             return;
         }
         if (state.hero.activeTools[menuItem]) {

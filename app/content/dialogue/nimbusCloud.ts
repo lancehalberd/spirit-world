@@ -1,6 +1,7 @@
 import { enterZoneByTarget } from 'app/content/areas';
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 import { CANVAS_HEIGHT } from 'app/gameConstants';
+import { returnToSpawnLocation } from 'app/state';
 
 import { GameState } from 'app/types';
 
@@ -45,23 +46,31 @@ export const zoneEntranceMap = {
 
 function travelToLocation(state: GameState, zoneKey: string, markerId: string): string {
     if (enterZoneByTarget(state, zoneKey, markerId, null, false)) {
-        state.hero.action = 'knocked';
-        state.hero.animationTime = 0;
-        state.hero.z = CANVAS_HEIGHT;
-        state.hero.vx = state.hero.vy = 0;
-        state.hero.vz = -1;
-        state.hero.safeD = state.hero.d;
-        state.hero.safeX = state.hero.x;
-        state.hero.safeY = state.hero.y;
+        fallIntoLocation(state);
     }
     return '';
+}
+function fallIntoLocation(state: GameState) {
+    state.hero.action = 'knocked';
+    state.hero.animationTime = 0;
+    state.hero.z = CANVAS_HEIGHT;
+    state.hero.vx = state.hero.vy = 0;
+    state.hero.vz = -1;
+    state.hero.safeD = state.hero.d;
+    state.hero.safeX = state.hero.x;
+    state.hero.safeY = state.hero.y;
 }
 
 dialogueHash.nimbusCloud = {
     key: 'nimbusCloud',
     mappedOptions: {
-        returnHomeChoice: `{choice:Return home?|Yes:nimbusCloud.returnToHome|No:nimbusCloud.no}`,
+        returnMenu: `{choice:Return?|No:nimbusCloud.no|Home:nimbusCloud.returnToHome|Last Save:nimbusCloud.returnToLastSave}`,
         returnToHome: (state: GameState) => travelToLocation(state, 'overworld', 'waterfallMarker'),
+        returnToLastSave: (state: GameState) => {
+            returnToSpawnLocation(state);
+            fallIntoLocation(state);
+            return '';
+        },
         chooseDestination: (state: GameState) => {
             if (zoneEntranceMap[state.zone.key]) {
                 return `
