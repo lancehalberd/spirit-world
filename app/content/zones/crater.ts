@@ -3368,6 +3368,7 @@ const f0_2x2: AreaDefinition = {
         {status: "normal", id: "crater:0:2x0-flameSnake-8", x: 240, y: 128, type: "enemy", enemyType: "flameSnake", d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava1"},
         {status: "normal", id: "craterSecretEntrance", x: 408, y: 496, type: "door", style: "wideEntrance", targetZone: "sky", targetObjectId: "craterSecretEntrance", d: "down"},
         {status: "normal", id: "craterSecret", x: 432, y: 448, type: "chest", lootType: "goldOre", lootLevel: 1},
+        {status: "normal", id: "crater:0:2x2-luckyBeetle-0", x: 264, y: 304, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},

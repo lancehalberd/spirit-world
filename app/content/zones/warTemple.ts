@@ -748,6 +748,7 @@ const f0_1x2: AreaDefinition = {
         {status: "normal", id: "warTemple:0:2x1-door-6", x: 112, y: 0, type: "door", style: "cave", d: "up"},
         {status: "normal", id: "warTemple:0:2x1-frostBeetle-0", x: 160, y: 160, type: "enemy", enemyType: "frostBeetle", d: "down", params: {}},
         {status: "normal", id: "warTempleEscapeMarker", x: 64, y: 64, type: "marker"},
+        {status: "normal", id: "warTemple:0:2x1-luckyBeetle-0", x: 120, y: 384, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},
@@ -1031,7 +1032,7 @@ const f0_2x2: AreaDefinition = {
     objects: [
         {status: "normal", id: "warTemplePitEntrance", x: 384, y: 112, type: "marker"},
         {status: "normal", id: "warTemple:0:2x2-bigKey-0", x: 160, y: 112, type: "chest", lootType: "bigKey", lootLevel: 1},
-        {status: "closed", id: "warTemple:0:2x2-door-0", x: 112, y: 0, type: "door", style: "cave", d: "up"},
+        {status: "normal", id: "warTemple:0:2x2-door-0", x: 112, y: 0, type: "door", style: "cave", d: "up"},
         {status: "normal", id: "warTemple:0:2x2-peachOfImmortalityPiece-0", x: 418, y: 65, type: "loot", lootType: "peachOfImmortalityPiece", lootLevel: 1},
         {status: "closedSwitch", id: "warTempleKeyDoor", x: 144, y: 224, type: "door", style: "cave", targetZone: "overworld", targetObjectId: "warTempleKeyDoor", d: "down", saveStatus: "forever"},
         {status: "normal", id: "warTempleKeyDoorSwitch", x: 160, y: 160, targetObjectId: "warTempleKeyDoor", type: "floorSwitch", saveStatus: "forever"},

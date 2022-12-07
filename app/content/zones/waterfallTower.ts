@@ -1203,6 +1203,7 @@ const sf1_1x0: AreaDefinition = {
         {status: "off", id: "", x: 352, y: 48, type: "turret", d: "down", fireInterval: 1000, fireOffset: 0, style: "crystal"},
         {status: "off", id: "", x: 368, y: 40, type: "turret", d: "down", fireInterval: 1000, fireOffset: 0, style: "crystal"},
         {status: "off", id: "", x: 384, y: 40, type: "turret", d: "down", fireInterval: 1000, fireOffset: 0, style: "crystal"},
+        {status: "normal", id: "waterfallTower:s1:0x1-luckyBeetle-0", x: 328, y: 384, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16},

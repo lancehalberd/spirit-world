@@ -16,6 +16,8 @@ export type SavedState = {
         [key: string]: DungeonInventory
     }
     staffTowerLocation: StaffTowerLocation
+    // Stores the last N lucky beetle ids defeated, which will not respawn.
+    luckyBeetles: string[]
 }
 
 // These settings are global and can be saved independent of saved state

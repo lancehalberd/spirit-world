@@ -823,6 +823,8 @@ const f1_0x0: AreaDefinition = {
         {status: "normal", id: "grandTempleRightKey", x: 288, y: 96, type: "chest", lootType: "smallKey", lootLevel: 1},
         {status: "normal", id: "", x: 288, y: 208, type: "ballGoal", targetObjectId: "grandTempleGold"},
         {status: "normal", id: "", x: 464, y: 208, type: "rollingBall"},
+        {status: "normal", id: "grandTemple:1:0x0-luckyBeetle-1", x: 392, y: 416, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
+        {status: "normal", id: "grandTemple:1:0x0-luckyBeetle-0", x: 112, y: 416, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},

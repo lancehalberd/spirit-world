@@ -1067,7 +1067,7 @@ const f1_0x2: AreaDefinition = {
                     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
                     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
                     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-                    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                    [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1],
                     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
                     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
                     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
@@ -1120,8 +1120,7 @@ const f1_0x2: AreaDefinition = {
         {status: "normal", id: "", x: 208, y: 112, type: "pushPull"},
         {status: "normal", id: "", x: 208, y: 128, type: "pushPull"},
         {status: "normal", id: "", x: 96, y: 64, style: "short", type: "sign", message: "Face an object then press and hold [B_PASSIVE] to grab it. {|}You can push and drag some objects by moving while grabbing them."},
-        {status: "normal", id: "", x: 480, y: 64, type: "turret", d: "left", fireInterval: 1000, fireOffset: 0},
-        {status: "normal", id: "", x: 480, y: 176, type: "turret", d: "left", fireInterval: 1000, fireOffset: 500},
+        {status: "normal", id: "tomb:1:2x0-luckyBeetle-0", x: 376, y: 120, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},

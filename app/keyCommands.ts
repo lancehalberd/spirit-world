@@ -232,6 +232,7 @@ export function addKeyCommands() {
                     }
                 }
             }
+            state.savedState.luckyBeetles = [];
             delete state.savedState.dungeonInventories[state.zone.key];
             state.location.x = state.hero.x;
             state.location.y = state.hero.y;

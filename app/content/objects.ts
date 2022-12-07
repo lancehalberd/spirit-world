@@ -245,6 +245,14 @@ export function saveObjectStatus(this: void, state: GameState, definition: Objec
 }
 
 export function getObjectStatus(this: void, state: GameState, definition: ObjectDefinition): boolean {
+    // Lucky beetles have special logic to prevent farming the same few over and over again.
+    if (definition.type === 'enemy' && definition.enemyType === 'luckyBeetle') {
+        // Lucky Beetle must have an id in order to appear.
+        if (!definition.id) {
+            return true;
+        }
+        return state.savedState.luckyBeetles.includes(definition.id);
+    }
     if (!definition.id) {
         return false;
     }

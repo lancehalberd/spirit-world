@@ -298,8 +298,6 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "staffTowerEntrance", logicKey: "mountainTower", x: 64, y: 416, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerEntrance", d: "up"},
         {status: "normal", id: "overworldCliffPeachPiece", x: 208, y: 256, type: "chest", lootType: "peachOfImmortalityPiece", lootLevel: 1},
         {status: "normal", id: "caves-ascentEntrance", x: 240, y: 32, type: "door", style: "cavern", targetZone: "caves", targetObjectId: "caves-ascentEntrance", d: "up"},
-        {status: "normal", id: "overworld:0:0x0-squirrel-0", x: 272, y: 384, type: "enemy", enemyType: "squirrel", d: "down", params: {}},
-        {status: "normal", id: "overworld:0:0x0-squirrel-1", x: 272, y: 448, type: "enemy", enemyType: "squirrel", d: "down", params: {}},
         {status: "normal", id: "overworld:0:0x0-beetleWinged-0", x: 64, y: 96, type: "enemy", enemyType: "beetleWinged", d: "down", params: {}},
         {status: "normal", id: "overworld:0:0x0-beetleWinged-1", x: 144, y: 32, type: "enemy", enemyType: "beetleWinged", d: "down", params: {}},
         {status: "normal", id: "overworld:0:0x0-beetleWinged-2", x: 384, y: 48, type: "enemy", enemyType: "beetleWinged", d: "down", params: {}},
@@ -324,6 +322,7 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 416, y: 144, type: "spawnMarker", linked: true},
         {status: "normal", id: "", x: 320, y: 160, type: "spawnMarker", linked: true},
         {status: "normal", id: "", x: 336, y: 48, type: "spawnMarker", linked: true},
+        {status: "normal", id: "overworld:0:0x0-luckyBeetle-0", x: 232, y: 408, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16},
@@ -776,6 +775,7 @@ const f0_0x1: AreaDefinition = {
         {status: "normal", id: "", x: 176, y: 304, type: "spawnMarker", linked: true},
         {status: "normal", id: "waterfallCaveSave", x: 32, y: 256, type: "saveStatue"},
         {status: "normal", id: "waterfallMarker", x: 160, y: 288, type: "marker"},
+        {status: "normal", id: "overworld:0:1x0-luckyBeetle-0", x: 360, y: 120, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -2165,7 +2165,6 @@ const f0_1x2: AreaDefinition = {
     objects: [
         {status: "normal", id: "staffTowerEntrance", logicKey: "desertTower", x: 160, y: 352, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerEntrance", d: "up"},
         {status: "normal", id: "overworld:0:2x1-squirrel-0", x: 112, y: 416, type: "enemy", enemyType: "squirrel", d: "down", params: {}},
-        {status: "normal", id: "overworld:0:2x1-squirrel-1", x: 384, y: 400, type: "enemy", enemyType: "squirrel", d: "down", params: {}},
         {status: "normal", id: "overworld:0:2x1-squirrel-2", x: 192, y: 128, type: "enemy", enemyType: "squirrel", d: "down", params: {}},
         {status: "normal", id: "overworld:0:2x1-squirrel-3", x: 336, y: 160, type: "enemy", enemyType: "squirrel", d: "down", params: {}},
         {status: "normal", id: "towerMarker", x: 176, y: 384, type: "marker", linked: true},
@@ -2187,6 +2186,7 @@ const f0_1x2: AreaDefinition = {
         {status: "normal", id: "", x: 128, y: 368, type: "spawnMarker", linked: true},
         {status: "normal", id: "", x: 64, y: 352, type: "spawnMarker", linked: true},
         {status: "normal", id: "", x: 64, y: 432, type: "spawnMarker", linked: true},
+        {status: "normal", id: "overworld:0:2x1-luckyBeetle-0", x: 304, y: 392, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16},
@@ -2689,7 +2689,6 @@ const f0_2x1: AreaDefinition = {
     objects: [
         {status: "normal", id: "staffTowerEntrance", logicKey: "forestTower", x: 176, y: 96, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerEntrance", d: "up"},
         {status: "normal", id: "fertilityTempleEntrance", x: 96, y: 320, type: "door", style: "wooden", d: "up", targetZone: "caves", targetObjectId: "fertilityTempleEntrance"},
-        {status: "normal", id: "overworld:0:1x2-squirrel-0", x: 176, y: 176, type: "enemy", enemyType: "squirrel", d: "down", params: {}},
         {status: "normal", id: "overworld:0:1x2-squirrel-1", x: 160, y: 368, type: "enemy", enemyType: "squirrel", d: "down", params: {}},
         {status: "normal", id: "overworld:0:1x2-squirrel-2", x: 320, y: 176, type: "enemy", enemyType: "squirrel", d: "down", params: {}},
         {status: "normal", id: "overworld:0:1x2-squirrel-3", x: 336, y: 256, type: "enemy", enemyType: "squirrel", d: "down", params: {}},
@@ -2710,6 +2709,7 @@ const f0_2x1: AreaDefinition = {
         {status: "normal", id: "", linked: true, x: 336, y: 48, type: "spawnMarker"},
         {status: "normal", id: "", linked: true, x: 432, y: 176, type: "spawnMarker"},
         {status: "normal", id: "", linked: true, x: 320, y: 176, type: "spawnMarker"},
+        {status: "normal", id: "overworld:0:1x2-luckyBeetle-0", x: 176, y: 176, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},
@@ -3631,8 +3631,6 @@ const sf0_0x1: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "overworld:s0:1x0-arrowTurret-0", x: 400, y: 352, type: "enemy", enemyType: "arrowTurret", d: "down", params: {}},
-        {status: "normal", id: "overworld:s0:1x0-ent-0", x: 352, y: 320, type: "enemy", enemyType: "ent", d: "down", params: {}},
         {status: "normal", id: "overworld:s0:1x0-ent-1", x: 192, y: 368, type: "enemy", enemyType: "ent", d: "down", params: {}},
         {status: "normal", id: "overworld:s0:1x0-arrowTurret-1", x: 368, y: 48, type: "enemy", enemyType: "arrowTurret", d: "down", params: {}},
         {status: "normal", id: "overworld:s0:1x0-frostBeetle-0", x: 368, y: 176, type: "enemy", enemyType: "frostBeetle", d: "down", params: {}},
@@ -3653,6 +3651,7 @@ const sf0_0x1: AreaDefinition = {
         {status: "normal", id: "", x: 304, y: 64, type: "spawnMarker", linked: true, spirit: true},
         {status: "normal", id: "", x: 432, y: 192, type: "spawnMarker", linked: true, spirit: true},
         {status: "normal", id: "", x: 304, y: 192, type: "spawnMarker", linked: true, spirit: true},
+        {status: "normal", id: "overworld:s0:1x0-luckyBeetle-0", x: 392, y: 408, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -4285,11 +4284,8 @@ const sf0_1x0: AreaDefinition = {
     ],
     objects: [
         {status: "normal", id: "overworld:s0:0x1-flameSnake-0", x: 304, y: 336, type: "enemy", enemyType: "flameSnake", d: "down", params: {}},
-        {status: "normal", id: "overworld:s0:0x1-flameSnake-1", x: 160, y: 336, type: "enemy", enemyType: "flameSnake", d: "down", params: {}},
         {status: "normal", id: "overworld:s0:0x1-electricSquirrel-0", x: 304, y: 64, type: "enemy", enemyType: "electricSquirrel", d: "down", params: {}},
-        {status: "normal", id: "overworld:s0:0x1-ent-0", x: 192, y: 416, type: "enemy", enemyType: "ent", d: "down", params: {}},
         {status: "normal", id: "overworld:s0:0x1-ent-1", x: 288, y: 368, type: "enemy", enemyType: "ent", d: "down", params: {}},
-        {status: "normal", id: "overworld:s0:0x1-ent-2", x: 32, y: 352, type: "enemy", enemyType: "ent", d: "down", params: {}},
         {status: "normal", id: "", linked: true, x: 432, y: 64, type: "spawnMarker", spirit: true},
         {status: "normal", id: "", linked: true, x: 320, y: 64, type: "spawnMarker", spirit: true},
         {status: "normal", id: "", linked: true, x: 432, y: 176, type: "spawnMarker", spirit: true},
@@ -4310,6 +4306,7 @@ const sf0_1x0: AreaDefinition = {
         {status: "normal", id: "", x: 112, y: 112, d: "down", behavior: "none", style: "zoro", type: "npc", dialogue: "Welcome to my humble shop."},
         {status: "normal", id: "spiritShopPeach", x: 128, y: 144, type: "shopItem", lootType: "peachOfImmortality", price: 300, lootLevel: 1},
         {status: "normal", id: "spiritShopMarker", x: 112, y: 208, type: "marker"},
+        {status: "normal", id: "overworld:s0:0x1-luckyBeetle-0", x: 144, y: 320, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},
@@ -5746,6 +5743,7 @@ const sf0_2x2: AreaDefinition = {
         {status: "normal", id: "", linked: true, x: 64, y: 320, type: "spawnMarker", spirit: true},
         {status: "normal", id: "", linked: true, x: 176, y: 320, type: "spawnMarker", spirit: true},
         {status: "normal", id: "", linked: true, x: 144, y: 208, type: "spawnMarker", spirit: true},
+        {status: "normal", id: "overworld:s0:2x2-luckyBeetle-0", x: 280, y: 64, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},

@@ -2073,6 +2073,7 @@ const f1_0x0: AreaDefinition = {
         {id: "peachCave:boss", linked: false, spirit: false, status: "normal", x: 96, y: 32, type: "boss", enemyType: "beetleBoss", lootType: "empty"},
         {status: "normal", id: "peachCaveSprout2", x: 48, y: 304, type: "vineSprout", customLogic: "peachCave:boss", invertLogic: true},
         {status: "normal", id: "peachCave:fullPeach", x: 120, y: 99, type: "loot", lootType: "peachOfImmortality", lootLevel: 1, hasCustomLogic: true, customLogic: "peachCave:boss"},
+        {status: "normal", id: "peachCave:1:0x0-luckyBeetle-0", x: 384, y: 144, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},

@@ -42,6 +42,7 @@ export * from 'app/content/enemies/crystalBat';
 export * from 'app/content/enemies/crystalGuardian';
 export * from 'app/content/enemies/electricSquirrel';
 export * from 'app/content/enemies/lightningDrone';
+export * from 'app/content/enemies/luckyBeetle';
 export * from 'app/content/enemies/sentryBot';
 export * from 'app/content/enemies/squirrel';
 
@@ -55,6 +56,7 @@ export const enemyTypes = <const>[
     // These are designed for the golem boss but can be use in isolation.
     'golemHand',
     'lightningBug', 'lightningDrone',
+    'luckyBeetle',
     'sentryBot', 'snake', 'squirrel',
     'wallLaser',
 ];

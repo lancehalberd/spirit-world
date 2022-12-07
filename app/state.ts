@@ -111,6 +111,7 @@ export function getDefaultSavedState(): SavedState {
         dungeonInventories: {},
         objectFlags: {},
         zoneFlags: {},
+        luckyBeetles: [],
         savedHeroData: getDefaultSavedHeroData(),
         staffTowerLocation: 'desert',
     };

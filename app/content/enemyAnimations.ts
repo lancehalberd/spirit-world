@@ -112,19 +112,16 @@ export const fireIdolAnimations: ActorAnimations = {
 };
 
 const beetleGeometry: FrameDimensions = { w: 18, h: 17, content: { x: 2, y: 4, w: 14, h: 12} };
-const beetleDownAnimation: FrameAnimation = createAnimation('gfx/enemies/genericbeetle.png', beetleGeometry, { y: 0, cols: 4});
-const beetleRightAnimation: FrameAnimation = createAnimation('gfx/enemies/genericbeetle.png', beetleGeometry, { y: 1, cols: 4});
-const beetleUpAnimation: FrameAnimation = createAnimation('gfx/enemies/genericbeetle.png', beetleGeometry, { y: 2, cols: 4});
-const beetleLeftAnimation: FrameAnimation = createAnimation('gfx/enemies/genericbeetle.png', beetleGeometry, { y: 4, cols: 4});
-const beetleClimbAnimation: FrameAnimation = createAnimation('gfx/enemies/genericbeetle.png', beetleGeometry, { y: 3, cols: 4});
-
+function genericBeetleAnimation(props: CreateAnimationOptions, extra?: ExtraAnimationProperties) {
+    return createAnimation('gfx/enemies/genericbeetle.png', beetleGeometry, props, extra);
+}
+const beetleDownAnimation: FrameAnimation = genericBeetleAnimation({ y: 0, cols: 4});
+const beetleRightAnimation: FrameAnimation = genericBeetleAnimation({ y: 1, cols: 4});
+const beetleUpAnimation: FrameAnimation = genericBeetleAnimation({ y: 2, cols: 4});
+const beetleLeftAnimation: FrameAnimation = genericBeetleAnimation({ y: 4, cols: 4});
+const beetleClimbAnimation: FrameAnimation = genericBeetleAnimation({ y: 3, cols: 4});
 export const beetleAnimations: ActorAnimations = {
-    climbing: {
-        up: beetleClimbAnimation,
-        down: beetleClimbAnimation,
-        left: beetleClimbAnimation,
-        right: beetleClimbAnimation,
-    },
+    climbing: omniAnimation(beetleClimbAnimation),
     idle: {
         up: beetleUpAnimation,
         down: beetleDownAnimation,
@@ -132,13 +129,24 @@ export const beetleAnimations: ActorAnimations = {
         right: beetleRightAnimation,
     },
 };
-
 export const climbingBeetleAnimations: ActorAnimations = {
+    idle: omniAnimation(beetleClimbAnimation),
+};
+
+
+function goldenBeetleAnimation(props: CreateAnimationOptions, extra?: ExtraAnimationProperties) {
+    return createAnimation('gfx/enemies/goldenbeetle.png', beetleGeometry, props, extra);
+}
+const goldenBeetleDownAnimation: FrameAnimation = goldenBeetleAnimation({ y: 0, cols: 4});
+const goldenBeetleRightAnimation: FrameAnimation = goldenBeetleAnimation({ y: 1, cols: 4});
+const goldenBeetleUpAnimation: FrameAnimation = goldenBeetleAnimation({ y: 2, cols: 4});
+const goldenBeetleLeftAnimation: FrameAnimation = goldenBeetleAnimation({ y: 4, cols: 4});
+export const goldenBeetleAnimations: ActorAnimations = {
     idle: {
-        up: beetleClimbAnimation,
-        down: beetleClimbAnimation,
-        left: beetleClimbAnimation,
-        right: beetleClimbAnimation,
+        up: goldenBeetleUpAnimation,
+        down: goldenBeetleDownAnimation,
+        left: goldenBeetleLeftAnimation,
+        right: goldenBeetleRightAnimation,
     },
 };
 

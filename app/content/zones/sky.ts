@@ -433,6 +433,7 @@ const f0_0x0: AreaDefinition = {
         {status: "closed", id: "staffTowerSkyEntrance", logicKey: "mountainTower", x: 64, y: 416, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerSkyEntrance", d: "up"},
         {status: "normal", id: "craterMarker", x: 208, y: 32, type: "marker"},
         {status: "normal", id: "craterSave", x: 128, y: 48, type: "saveStatue"},
+        {status: "normal", id: "sky:0:0x0-luckyBeetle-0", x: 128, y: 112, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -3907,6 +3908,7 @@ const sf0_0x2: AreaDefinition = {
     objects: [
         {status: "normal", id: "skyCityMarker", x: 256, y: 240, type: "marker"},
         {status: "normal", id: "", x: 256, y: 208, style: "short", type: "sign", message: "Future site of Sky City!"},
+        {status: "normal", id: "sky:s0:2x0-luckyBeetle-0", x: 344, y: 128, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -4878,6 +4880,7 @@ const sf0_2x0: AreaDefinition = {
         },
     ],
     objects: [
+        {status: "normal", id: "sky:s0:0x2-luckyBeetle-0", x: 264, y: 232, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -5241,6 +5244,7 @@ const sf0_2x2: AreaDefinition = {
         },
     ],
     objects: [
+        {status: "normal", id: "sky:s0:2x2-luckyBeetle-0", x: 232, y: 240, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},

@@ -2283,6 +2283,7 @@ const f2_1x0: AreaDefinition = {
         {status: "closedSwitch", id: "staffTowerSkyEntrance", x: 224, y: 496, type: "door", style: "wooden", targetZone: "sky", targetObjectId: "staffTowerSkyEntrance", d: "down", locationCue: "Tower 4F", saveStatus: "forever"},
         {status: "normal", id: "", x: 208, y: 480, targetObjectId: "staffTowerSkyEntrance", type: "floorSwitch"},
         {status: "normal", id: "", specialBehaviorKey: "towerTeleporter", x: 160, y: 80, style: "displayScreen", type: "sign", message: ""},
+        {status: "normal", id: "staffTower:2:0x1-luckyBeetle-0", x: 256, y: 272, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},

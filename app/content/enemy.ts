@@ -26,7 +26,7 @@ interface EnemyAbilityWithCharges {
     charges: number
 }
 
-export class Enemy implements Actor, ObjectInstance {
+export class Enemy<Params=any> implements Actor, ObjectInstance {
     type = 'enemy' as 'enemy';
     behaviors: TileBehaviors;
     isObject = <const>true;
@@ -84,7 +84,7 @@ export class Enemy implements Actor, ObjectInstance {
     // healthbar.
     // There is a 100ms grace period before the bar is displayed at all.
     healthBarTime = 0;
-    params: any;
+    params: Params;
     enemyInvulnerableFrames = 0;
     // This is used to prevent the block effect from happening too frequently
     blockInvulnerableFrames = 0;
