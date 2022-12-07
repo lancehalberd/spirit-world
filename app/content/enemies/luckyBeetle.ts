@@ -115,9 +115,6 @@ enemyDefinitions.luckyBeetle = {
             // with more time if you hit it less.
             enemy.params.duration -= 1000;
             spawnMoney(state, enemy, enemy.params.hits);
-            if (enemy.params.hits >= 10) {
-                enemy.showDeathAnimation(state);
-            }
         }
         return result;
     }

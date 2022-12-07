@@ -181,7 +181,10 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
             }
         }
     }
-    if (hero.life <= 0) {
+    if (hero.life <= 0
+        && hero.action !== 'thrown' && hero.action !== 'knocked' && hero.action !== 'knockedHard'
+        && hero.action !== 'jumpingDown' && hero.action !== 'falling' && hero.action !== 'fallen'
+    ) {
         if (hero.area.enemies.find(enemy => enemy.definition.id === 'tombRivalBoss')
             && state.savedState.objectFlags.elderTomb
         ) {
@@ -192,6 +195,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
             hero.life = 0;
             hero.action = null;
             hero.chargeTime = 0;
+            hero.frozenDuration = 0;
             state.defeatState = {
                 defeated: true,
                 time: 0,

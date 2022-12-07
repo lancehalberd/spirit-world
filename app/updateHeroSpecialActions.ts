@@ -179,12 +179,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             if (!hero.area) {
                 return;
             }
-            // For now leave the hero in the 'fallen' state if they died, otherwise they reappear
-            // just fine when the continue/quit option shows up.
-            // Once the death animation is added we can probably remove this check if we want.
-            if (hero.life > 0) {
-                hero.action = null;
-            }
+            hero.action = null;
         }
         return true;
     }
@@ -342,6 +337,10 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             hero.z = minZ;
             hero.action = null;
             hero.vz = 0;
+            // If the hero is at 0 life, they will show the death sequence on top of pits,
+            // so we immediately apply floor effects so that they will apply pits before
+            // starting the death sequence.
+            checkForFloorEffects(state, hero);
         }
         return true;
     }
