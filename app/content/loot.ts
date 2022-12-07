@@ -429,7 +429,7 @@ const lootFrames = {
     astralProjection: circlet,
     phoenixCrown,
     goldMail: createLootFrame('orange', 'Au'),
-    ironMail: createLootFrame('grey', 'Fe'),
+    ironSkin: createLootFrame('grey', 'Fe'),
     bigKey: bigKeyOutlineFrame,
     bow: bowOutlineFrame,
     catEyes: catEyes,
