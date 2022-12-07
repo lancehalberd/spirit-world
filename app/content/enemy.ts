@@ -363,7 +363,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             ) {
                 // Remove all enemy attacks from the screen when a boss is defeated.
                 this.area.effects = this.area.effects.filter(effect => !effect.isEnemyAttack);
-                allEnemies.forEach(object => object.showDeathAnimation(state));
+                allEnemies.filter(e => e.isFromCurrentSection(state)).forEach(object => object.showDeathAnimation(state));
 
                 // Freeze player from taking any action for ~3 seconds during the explosion
                 state.scriptEvents.queue.push({
