@@ -40,20 +40,20 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - lost chakram in tomb with charge attack and then teleporting across to the north door
-
     - Add return to last save location to the fake nimbus cloud.
     - Remove statue dialog from randomizer.
-    - Prevent pausing during transitions unless the suppress inventory flag is set.
-
-    - Fix music restarts and healthbar briefly shows when entering beetle boss screen.
-
     - Randomize war temple switches using a special behavior.
 
-    - Remove version param from audio files, add version params to each file individually.
+    - Test all scripted events work
+        - NPC dialogs
+        - Rival right outcomes
+        - Elevator
 
     - Add full buildings to Summoner ruins in Spirit World.
         - Populate with War God Alcolytes and the Progenitor Spirit
+
+    - Add some additional requirement for completing crater to put the boss out of logic with few items.
+        - Switches that can only be hit with staff or clone throw + iron boots
 
     - Add `getLogicalZone` function that returns a logical zone for a given state location wich can differ from the actual zone key, use this for randomizer locations and dungeon item associations.
         - Move underwater areas into the same logical zone so that keys can be shared above and below water

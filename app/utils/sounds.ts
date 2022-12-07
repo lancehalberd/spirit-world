@@ -9,9 +9,6 @@ export function unlockAudio() {
     audioUnlocked = true;
 }
 
-const version = window.version;
-
-
 export function requireSound(key, callback = null): GameSound {
     let source, loop, offset, volume, duration, limit, repeatFrom, nextTrack, type = 'default';
     if (typeof key === 'string') {
@@ -32,7 +29,7 @@ export function requireSound(key, callback = null): GameSound {
     if (offset) [offset, duration] = String(offset).split(':').map(Number);
     if (type === 'bgm') {
         const howlerProperties: HowlerProperties = {
-            src: [`${source}?v=${version}`],
+            src: [`${source}`],
             html5: true,
             loop: false,
             volume: volume / 50,
@@ -99,7 +96,7 @@ export function requireSound(key, callback = null): GameSound {
         return newSound;
     } else {
         const howlerProperties: HowlerProperties = {
-            src: [`${source}?v=${version}`],
+            src: [`${source}`],
             loop: loop || false,
             volume: (volume || 1) / 50,
             onplay: function () {

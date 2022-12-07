@@ -34,7 +34,9 @@ import {
 } from 'app/types';
 
 export function updateHeroStandardActions(this: void, state: GameState, hero: Hero) {
-    hero.thrownChakrams = hero.thrownChakrams.filter(chakram => chakram.area === hero.area);
+    hero.thrownChakrams = hero.thrownChakrams.filter(
+        chakram => chakram.area === hero.area
+    );
     if (hero.heldChakram && hero.heldChakram.area !== hero.area) {
         delete hero.heldChakram;
     }
@@ -466,6 +468,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 actor: hero,
                 dx: moveX, dy: moveY,
             });
+            // console.log([...state.scriptEvents.activeEvents], [...state.scriptEvents.queue]);
             if (hero.action !== 'knocked' && hero.action !== 'knockedHard') {
                 if (moveX) {
                     hero.vx = mx;

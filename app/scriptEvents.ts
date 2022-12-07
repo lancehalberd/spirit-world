@@ -225,6 +225,7 @@ export function parseEventScript(state: GameState, script: TextScript): ScriptEv
             });
             events.push({
                 type: 'wait',
+                blockPlayerInput: true,
                 // This must be long enough to let the get loot animation reach
                 // adding the loot message to the front of the script queue.
                 duration: 1000,
@@ -250,6 +251,7 @@ export function parseEventScript(state: GameState, script: TextScript): ScriptEv
             }
             events.push({
                 type: 'wait',
+                blockPlayerInput: true,
                 duration,
             });
             continue
@@ -334,16 +336,13 @@ export const updateScriptEvents = (state: GameState): void => {
     }
     state.scriptEvents.activeEvents = activeEvents;
     // Do not process the event queue if there is an active blocking event.
-    if (state.scriptEvents.blockEventQueue) {
-        return;
-    }
-    while (state.scriptEvents.queue.length) {
+    while (!state.scriptEvents.blockEventQueue && state.scriptEvents.queue.length) {
         const event = state.scriptEvents.queue.shift();
         //console.log('Running event', event.type, event);
         switch (event.type) {
             case 'callback':
                 event.callback(state);
-                return;
+                break;
             case 'wait':
                 state.scriptEvents.activeEvents.push({
                     ...event,
@@ -352,7 +351,11 @@ export const updateScriptEvents = (state: GameState): void => {
                 if (event.blockFieldUpdates) {
                     state.scriptEvents.blockFieldUpdates = true;
                 }
-                return;
+                if (event.blockPlayerInput) {
+                    state.scriptEvents.blockPlayerInput = true;
+                }
+                state.scriptEvents.blockEventQueue = true;
+                break;
             case 'screenShake':
                 state.screenShakes.push({
                     dx: event.dx,
@@ -360,7 +363,7 @@ export const updateScriptEvents = (state: GameState): void => {
                     startTime: state.fieldTime,
                     endTime: state.fieldTime + event.duration,
                 });
-                return;
+                break;
             case 'startScreenShake':
                 state.screenShakes.push({
                     dx: event.dx,
@@ -368,7 +371,7 @@ export const updateScriptEvents = (state: GameState): void => {
                     startTime: state.fieldTime,
                     id: event.id,
                 });
-                return;
+                break;
             case 'stopScreenShake': {
                 const index = state.screenShakes.findIndex(screenShake => screenShake.id === event.id);
                 if (index >= 0) {
@@ -376,15 +379,15 @@ export const updateScriptEvents = (state: GameState): void => {
                 } else {
                     console.error(`screenShake id not found: ${event.id}`, state.screenShakes);
                 }
-                return;
+                break;
             }
             case 'addTextCue': {
                 addTextCue(state, event.text, 0, 0);
-                return;
+                break;
             }
             case 'removeTextCue': {
                 removeTextCue(state);
-                return;
+                break;
             }
             case 'showChoiceBox':
                 // Text cues and text choice cannot be displayed together, so dismiss any text cues.
@@ -394,7 +397,8 @@ export const updateScriptEvents = (state: GameState): void => {
                     choiceIndex: 0,
                 });
                 state.scriptEvents.blockFieldUpdates = true;
-                return;
+                state.scriptEvents.blockEventQueue = true;
+                break;
             case 'showTextBox':
                 // Text cues and text box cannot be displayed together, so dismiss any text cues.
                 removeTextCue(state);
@@ -422,7 +426,8 @@ export const updateScriptEvents = (state: GameState): void => {
             case 'gainLoot':
                 getLoot(state, {type: 'dialogueLoot', ...event.lootDefinition});
                 // Don't continue processing events until the loot gives up priority.
-                return;
+                state.scriptEvents.blockEventQueue = true;
+                break;
             case 'playSound':
                 playSound(event.sound);
                 break;
@@ -435,7 +440,8 @@ export const updateScriptEvents = (state: GameState): void => {
                 const script = dialogueSet.mappedOptions[event.scriptKey];
                 prependScript(state, script);
                 // Since this overwrites remaining events, don't continue processing events this frame.
-                return;
+                state.scriptEvents.blockEventQueue = true;
+                break;
             case 'attemptPurchase':
                 if (event.cost <= state.hero.money) {
                     state.hero.money -= event.cost;
@@ -444,7 +450,8 @@ export const updateScriptEvents = (state: GameState): void => {
                     followMessagePointer(state, event.failScript);
                 }
                 // Since this overwrites remaining events, don't continue processing events this frame.
-                return;
+                state.scriptEvents.blockEventQueue = true;
+                break;
             case 'rest':
                 state.transitionState = {
                     callback() {
@@ -454,9 +461,12 @@ export const updateScriptEvents = (state: GameState): void => {
                     time: 0,
                     type: 'fade',
                 };
-                return;
+                state.scriptEvents.blockEventQueue = true;
+                break;
             case 'enterLocation':
                 enterLocation(state, event.location, false);
+                state.scriptEvents.blockPlayerInput = true;
+                state.scriptEvents.blockEventQueue = true;
                 break;
         }
     }

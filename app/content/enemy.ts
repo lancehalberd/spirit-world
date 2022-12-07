@@ -560,7 +560,6 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             }
             return;
         }
-        this.healthBarTime += FRAME_LENGTH;
         if (this.invulnerableFrames > 0) {
             this.invulnerableFrames--;
         }
@@ -606,6 +605,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
                 this.z = Math.max(12, this.z - 2);
             }
         }
+        this.healthBarTime += FRAME_LENGTH;
         if (this.enemyDefinition.update) {
             this.enemyDefinition.update(state, this);
         }

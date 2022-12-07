@@ -293,7 +293,15 @@ export function getTitleOptions(state: GameState): string[] {
 }
 
 export function shouldHideMenu(state: GameState): boolean {
-    return !!state.alwaysHideMenu || state.hero.isExitingDoor || state.hero.isControlledByObject
-        || state.scriptEvents.queue.length > 0 || state.scriptEvents.activeEvents.length > 0
-        || !!state.messagePage || !!state.transitionState;
+    return !!(
+        state.alwaysHideMenu || state.hero.isExitingDoor || state.hero.isControlledByObject
+        || state.scriptEvents.queue.length || state.scriptEvents.activeEvents.length
+        || state.messagePage || state.transitionState || state.defeatState.defeated
+        || state.nextAreaSection || state.nextAreaInstance
+        || state.areaInstance.priorityObjects?.length
+    );
+}
+
+export function canPauseGame(state: GameState): boolean {
+    return state.alwaysHideMenu || !shouldHideMenu(state);
 }
