@@ -473,9 +473,14 @@ export interface SpecialSignBehavior {
 
 export interface SpecialSwitchBehavior {
     // This could be extended for floor switches and other switches.
-    type: 'crystalSwitch'
+    type: 'crystalSwitch' | 'floorSwitch'
     apply?: (state: GameState, object: ObjectInstance) => void
     onActivate?: (state: GameState, object: ObjectInstance) => void
+}
+
+export interface SpecialPushPullBehavior {
+    type: 'pushPull',
+    apply?: (state: GameState, object: ObjectInstance) => void
 }
 
 
@@ -486,6 +491,7 @@ export interface SpecialAreaBehavior {
 
 export type SpecialBehavior
     = SpecialDoorBehavior
+    | SpecialPushPullBehavior
     | SpecialSwitchBehavior
     | SpecialSignBehavior
     | SpecialAreaBehavior;

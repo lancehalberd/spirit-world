@@ -40,9 +40,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Remove statue dialog from randomizer.
-    - Randomize war temple switches using a special behavior.
-
     - Test all scripted events work
         - NPC dialogs
         - Rival right outcomes

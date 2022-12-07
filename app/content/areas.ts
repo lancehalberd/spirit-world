@@ -347,7 +347,7 @@ export function setConnectedAreas(state: GameState, lastAreaInstance: AreaInstan
 }
 
 export function linkObjects(state: GameState): void {
-    for (const object of state.areaInstance.objects) {
+    for (const object of [...state.areaInstance.objects, ...state.alternateAreaInstance.objects]) {
         linkObject(object);
     }
 }
