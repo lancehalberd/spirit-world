@@ -997,7 +997,11 @@ export function refreshSection(state: GameState, area: AreaInstance, section: Re
     }
     area.checkToRedrawTiles = true;
     // Remove effects unless they update during the transition, like the held chakram.
-    area.effects = area.effects.filter(effect => effect.updateDuringTransition);
+    for (const effect of [...area.effects]) {
+        if (!effect.updateDuringTransition) {
+            removeEffectFromArea(state, effect);
+        }
+    }
     const l = section.x * 16;
     const t = section.y * 16;
     // Remove any objects from that area that should be reset.
