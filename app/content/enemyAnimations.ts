@@ -342,7 +342,7 @@ export const crystalBatAnimations: ActorAnimations = {
 
 const crystalCollectorGeometry: FrameDimensions = { w: 50, h: 39, content: {x: 7, y: 9, w: 36, h: 30} };
 const crystalBossAnimation = (props: CreateAnimationOptions, extra?: ExtraAnimationProperties) =>
-    createAnimation('gfx/enemies/eyeboss1.png', crystalCollectorGeometry, props, extra);
+    createAnimation('gfx/enemies/eyeboss2.png', crystalCollectorGeometry, props, extra);
 
 
 const crystalCollectorOpenAnimation = crystalBossAnimation({ cols: 5, duration: 10}, {loop: false});
@@ -359,6 +359,8 @@ const crystalCollectorEnragedConfusedAnimation = crystalBossAnimation({ y: 1, x:
 
 const crystalCollectorAttackAnimation = crystalBossAnimation({ x: 8, cols: 3, duration: 5});
 const crystalCollectorEnragedAttackAnimation = crystalBossAnimation({ y: 1, x: 8, cols: 3, duration: 5});
+
+export const crystalCollecterBackFrame = crystalBossAnimation({x: 11}).frames[0];
 
 export const crystalCollectorAnimations: ActorAnimations = {
     open: omniAnimation(crystalCollectorOpenAnimation),

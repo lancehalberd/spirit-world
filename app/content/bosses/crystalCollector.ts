@@ -6,6 +6,7 @@ import { getNearbyTarget } from 'app/content/enemies';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import {
     crystalCollectorAnimations,
+    crystalCollecterBackFrame,
     crystalCollectorEnragedAnimations,
     crystalBarrierSummonAnimation,
     crystalBarrierNormalAnimation,
@@ -17,7 +18,7 @@ import {
 import { WallTurret } from 'app/content/objects/wallTurret';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { playSound } from 'app/musicController';
-import { getFrame, drawFrameCenteredAt } from 'app/utils/animations';
+import { drawFrame, getFrame, drawFrameCenteredAt } from 'app/utils/animations';
 import { getTileBehaviors } from 'app/utils/field';
 import Random from 'app/utils/Random';
 
@@ -37,7 +38,7 @@ enemyDefinitions.crystalCollector = {
         enrageLevel: 0,
         enrageTime: 0,
     },
-    invulnerableFrames: 0,
+    invulnerableFrames: 20,
     hasShadow: false,
     initialAnimation: 'open',
     initialMode: 'initialMode',
@@ -83,12 +84,18 @@ enemyDefinitions.crystalCollector = {
             context.fillRect(hitbox.x, hitbox.y, hitbox.w, hitbox.h);
         context.restore();*/
     },
-    /*render(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
-        context.save();
-
-            enemy.defaultRender(context, state);
-        context.restore();
-    },*/
+    render(this: void, context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
+        if (enemy.currentAnimationKey === 'hurt') {
+            const frame = crystalCollecterBackFrame;
+            drawFrame(context, frame, { ...frame,
+                x: enemy.x - (frame.content?.x || 0) * enemy.scale,
+                y: enemy.y - (frame.content?.y || 0) * enemy.scale - enemy.z,
+                w: frame.w * enemy.scale,
+                h: frame.h * enemy.scale,
+            });
+        }
+        enemy.defaultRender(context, state);
+    },
     onHit(state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
         // Ignore hits while hidden.
         if (enemy.mode === 'initialMode' || enemy.mode === 'sleeping' || enemy.mode === 'opening') {
@@ -100,7 +107,9 @@ enemyDefinitions.crystalCollector = {
                 // Right now shield takes a flat 2 damage no matter the source.
                 if (enemy.params.shieldInvulnerableTime <= 0) {
                     enemy.params.shieldLife = Math.max(0, enemy.params.shieldLife - 2);
-                    enemy.params.shieldInvulnerableTime = 100;
+                    enemy.params.shieldInvulnerableTime = 200;
+                } else {
+                    return { hit: true };
                 }
                 playSound('enemyHit');
                 const hitbox = enemy.getHitbox();

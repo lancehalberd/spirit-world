@@ -63,9 +63,9 @@ dialogueHash.grandPriest = {
             },
             text: [
                 `You've done well to make it this far.
-                 [-]To be honest many were skeptical about asking you for help.
-                 [-]You may need some tougher skin yet to finish this quest.
-                 [-]Thank you for your service, and take this blessing with you.
+                 {|}To be honest many were skeptical about asking you for help.
+                 {|}You may need some tougher skin yet to finish this quest.
+                 {|}Thank you for your service, and take this blessing with you.
                  {flag:grandPriest} {item:ironSkin=1}`
             ],
         },
