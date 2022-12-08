@@ -40,6 +40,8 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Side doors not rendering above MC.
+
     - Test all scripted events work
         - NPC dialogs
         - Rival right outcomes
