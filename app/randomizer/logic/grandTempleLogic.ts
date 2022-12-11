@@ -1,7 +1,8 @@
 import { LogicNode } from 'app/types';
 
 import {
-    andLogic, orLogic, canHasTowerStaff,  canHitCrystalSwitches, hasDoubleClone, hasTripleShot,
+    andLogic, orLogic, canHasTowerStaff,  canHitCrystalSwitches, canTravelFarUnderWater,
+    hasDoubleClone, hasTripleShot,
     hasInvisibility, hasCloudBoots, hasMitts, hasClone, hasStaff, hasSomersault, hasTeleportation,
 } from 'app/content/logic';
 
@@ -9,9 +10,12 @@ const zoneId = 'grandTemple';
 export const grandTempleNodes: LogicNode[] = [
     {
         zoneId,
-        nodeId: 'secretEntrance',
+        nodeId: 'grandTempleSecretEntrance',
         checks: [
             { objectId: 'templePeachPiece' },
+        ],
+        paths: [
+            {nodeId: 'grandTempleWaterEntrance', logic: canTravelFarUnderWater},
         ],
         entranceIds: ['grandTempleSecretEntrance'],
         exits: [{ objectId: 'grandTempleSecretEntrance' }],
@@ -22,7 +26,10 @@ export const grandTempleNodes: LogicNode[] = [
         npcs: [
             {loot: {type: 'dialogueLoot', id: 'generousPriest', lootType: 'money', lootAmount: 10}},
         ],
-        paths: [{nodeId: 'grandTempleBigChest', logic: orLogic(hasClone, hasStaff)}],
+        paths: [
+            {nodeId: 'grandTempleBigChest', logic: orLogic(hasClone, hasStaff)},
+            {nodeId: 'grandTempleWaterEntrance', logic: canTravelFarUnderWater},
+        ],
         entranceIds: ['grandTempleEntrance'],
         exits: [
             {objectId: 'grandTempleEntrance'},
@@ -89,5 +96,19 @@ export const grandTempleNodes: LogicNode[] = [
         ],
         entranceIds: ['grandTempleStairs'],
         exits: [{ objectId: 'grandTempleStairs' }],
+    },
+    {
+        zoneId: 'grandTempleWater',
+        nodeId: 'grandTempleWaterEntrance',
+        paths: [
+            {nodeId: 'grandTempleEntrance', logic: canTravelFarUnderWater},
+            {nodeId: 'grandTempleSecretEntrance', logic: canTravelFarUnderWater},
+        ],
+        entranceIds: [
+            'grandTempleWaterEntrance',
+        ],
+        exits: [
+            { objectId: 'grandTempleWaterEntrance', logic: canTravelFarUnderWater },
+        ],
     },
 ];

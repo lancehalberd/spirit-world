@@ -932,15 +932,8 @@ export function checkForFloorEffects(state: GameState, enemy: Enemy) {
             const behaviors = behaviorGrid?.[row]?.[column];
             // This will happen when the player moves off the edge of the screen.
             if (!behaviors) {
-                //startSwimming = false;
                 continue;
             }
-            /*if (behaviors.climbable) {
-                startClimbing = true;
-            }
-            if (!behaviors.water) {
-                startSwimming = false;
-            }*/
             if (behaviors.pit && enemy.z <= 0
                 && !enemy.flying
                 // Bosses don't fall in pits.

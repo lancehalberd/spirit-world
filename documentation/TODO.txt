@@ -42,6 +42,9 @@ Graphics:
 Current tasks:
     - Add 'only' visibility option to layers that hides everything else when selected.
 
+    - Pit inside mountain river should empty into the top waterfall in a seris of inside waterfalls in the waterfall cave
+        - Redesign waterfall cave to include more vertical elements, including terraces waterfalls that drain to the entrance
+
     - Fix bead flow depth by using sprite ordering for the ordered part instead of foreground, use the y value based on where it hits the floor but only draw it start 16px up from that point so it gradually covers while moving behind it.
 
     - Test all scripted events work

@@ -82,7 +82,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
                     }
                 }
             }
-            if (!behaviors.water) {
+            if (!behaviors.water || behaviors.solid) {
                 hero.swimming = false;
             }
             if (behaviors.slippery && hero.equipedBoots !== 'ironBoots') {

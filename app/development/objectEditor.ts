@@ -1313,9 +1313,12 @@ export function getObjectFrame(object: ObjectDefinition): FrameDimensions {
     return getLootFrame(state, {lootType: 'unknown'});
 }
 
-export function getObjectHitBox(object: ObjectDefinition): Rect {
+function getObjectHitBox(object: ObjectDefinition): Rect {
     const state = getState();
     const instance = createObjectInstance(state, object);
+    if (instance.getEditorHitbox) {
+        return instance.getEditorHitbox(state);
+    }
     if (instance.getHitbox) {
         return instance.getHitbox(state);
     }
@@ -1421,6 +1424,12 @@ export function renderObjectPreview(
     definition.x -= (frame.content?.w || frame.w) / 2;
     definition.y -= (frame.content?.h || frame.h) / 2;
     fixObjectPosition(state, definition);
+    const hitbox = getObjectHitBox(definition);
+    context.save();
+        context.globalAlpha *= 0.3;
+        context.fillStyle = 'white';
+        context.fillRect(hitbox.x, hitbox.y, hitbox.w, hitbox.h);
+    context.restore();
     const object = createObjectInstance(state, definition);
     if (object.renderPreview) {
         object.renderPreview(context, object.getHitbox(state));

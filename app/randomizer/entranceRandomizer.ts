@@ -99,8 +99,10 @@ export function randomizeEntrances(random: typeof SRandom) {
     const connectedSpiritEntrances = new Set<string>();
     const normalEntrances = new Set<string>();
     const spiritEntrances = new Set<string>();
+    const waterEntrances = new Set<string>();
     const normalExits = new Set<string>();
     const spiritExits = new Set<string>();
+    const waterExits = new Set<string>();
     const targetIdMap: {[key in string]: DoorLocation[]} = {};
     const allTargetedKeys = new Set<string>();
     const fixedNimbusCloudZones = new Set<string>();
@@ -119,14 +121,17 @@ export function randomizeEntrances(random: typeof SRandom) {
         if (disabledDoors.includes(key) || disabledDoors.includes(targetKey)) {
             return;
         }
-        // Ignore underwater doors for now, they will take extra logic,
-        // and there are not enough of them to be interesting yet.
-        if (zone.surfaceKey) {
-            return;
-        }
         targetIdMap[targetKey] = targetIdMap[targetKey] || [];
         targetIdMap[targetKey].push({ definition: object, location });
         allTargetedKeys.add(targetKey);
+        if (zone.surfaceKey) {
+            if (zone.key === 'underwater') {
+                waterExits.add(targetKey);
+            } else {
+                waterEntrances.add(targetKey);
+            }
+            return;
+        }
         if (outsideZones.includes(zone.key)
             // There are a few special "entrances" inside other zones
             || zone.key === 'tomb' && object.targetZone === 'cocoon'
@@ -287,9 +292,19 @@ export function randomizeEntrances(random: typeof SRandom) {
         console.error([...spiritExits]);
         return;
     }
+    if (waterEntrances.size !== waterExits.size) {
+        console.error(`water entrances/exits: ${waterEntrances.size}/${waterExits.size}`);
+        console.error([...waterEntrances]);
+        console.error([...waterExits]);
+        return;
+    }
 
     //console.log('GENERAL ASSIGNMENTS:');
-    for (const entrancePairing of [[normalEntrances, normalExits], [spiritEntrances, spiritExits]]) {
+    for (const entrancePairing of [
+        [normalEntrances, normalExits],
+        [spiritEntrances, spiritExits],
+        [waterEntrances, waterExits],
+    ]) {
         const [entrances, exits] = entrancePairing;
         const exitIds = [...exits];
         for (const entranceId of random.shuffle([...entrances])) {

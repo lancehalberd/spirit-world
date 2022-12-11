@@ -1,7 +1,7 @@
 import {
     andLogic,
     canCross4Gaps, hasReleasedBeasts, canTravelFarUnderWater,
-    hasCloudBoots, hasIronBoots, hasGloves, hasIce, hasMitts, hasSomersault, hasTeleportation,
+    hasCloudBoots, hasIronBoots, hasFire, hasGloves, hasIce, hasMitts, hasSomersault, hasTeleportation,
     hasMediumRange, hasNimbusCloud, hasSpiritSight, orLogic,
 } from 'app/content/logic';
 
@@ -23,7 +23,11 @@ export const mainOverworldNode: LogicNode = {
         { nodeId: 'overworldLakeTunnel', logic: orLogic(hasGloves, hasTeleportation) },
         // This represents moving the tower to the forest position and using cloud boots to
         // fall on the river temple roof.
-        { nodeId: 'riverTempleRoof', logic: andLogic({requiredFlags: ['stormBeast']}, hasCloudBoots)}
+        { nodeId: 'riverTempleRoof', logic: andLogic({requiredFlags: ['stormBeast']}, hasCloudBoots)},
+        { nodeId: 'underLake', logic: andLogic(canTravelFarUnderWater,
+            orLogic({requiredFlags: ['frostBeast']}, hasFire)
+        )},
+        { nodeId: 'underCity', logic: canTravelFarUnderWater},
     ],
     entranceIds: [
         'sideArea:noToolEntrance', 'elderEntrance', 'tombTeleporter',
@@ -253,7 +257,6 @@ export const underwaterNodes: LogicNode[] = [
         zoneId,
         nodeId: 'underLake',
         paths: [
-            // This logic doesn't work since the randomizer doesn't currently set flags when simulating.
             {nodeId: 'overworldMain', logic: {requiredFlags: ['frostBeast']}},
         ],
         entranceIds: [
@@ -262,6 +265,18 @@ export const underwaterNodes: LogicNode[] = [
         exits: [
             { objectId: 'peachCaveUnderwaterEntrance', logic: canTravelFarUnderWater  },
             { objectId: 'riverTempleWaterEntrance', logic: canTravelFarUnderWater  },
+        ],
+    },
+    {
+        zoneId,
+        nodeId: 'underCity',
+        checks: [{objectId: 'underwaterMoney'}],
+        paths: [{nodeId: 'overworldMain'}],
+        entranceIds: [
+            'grandTempleWaterEntrance',
+        ],
+        exits: [
+            { objectId: 'grandTempleWaterEntrance', logic: canTravelFarUnderWater  },
         ],
     },
 ];

@@ -989,6 +989,10 @@ export class Door implements ObjectInstance {
         area.objects.push(this);
         this.applyDoorBehaviorsToArea();
     }
+    getEditorHitbox(): Rect {
+        const hitbox = this.getHitbox();
+        return {x: this.x, y: this.y, w: Math.max(16, hitbox.w), h: Math.max(16, hitbox.h)};
+    }
     getHitbox(): Rect {
         const doorStyle = doorStyles[this.style];
         if (doorStyle.getHitbox) {
