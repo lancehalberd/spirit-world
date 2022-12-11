@@ -701,11 +701,25 @@ export class DoorTop implements ObjectInstance {
     constructor(door: Door) {
         this.door = door;
         this.x = this.door.x;
-        // The top of the door frame is 20px from the ground.
-        this.y = this.door.y + 20;
+        this.y = this.door.y;
     }
     getHitbox(): Rect {
         return this.door.getHitbox();
+    }
+    getYDepth(): number {
+        // These legacy door styles should eventually be removed, but for now make sure they
+        // render correctly.
+        if (this.door.style === 'cave' || this.door.style === 'lightCave') {
+            if (this.door.definition.d === 'down') {
+                return this.y + 48;
+            }
+        }
+        if (this.door.definition.d === 'up' || this.door.definition.d === 'down') {
+            // The top of the door frame is 20px from the ground.
+            return this.y + 20;
+        }
+        // This left/right door frames are very tall because of the perspective.
+        return this.y + 48;
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
         const definition = this.door.definition;

@@ -25,9 +25,9 @@ export const zoneEntranceMap = {
     // warTempleEastEntrance
     // warTempleKeyDoor
     // warTemplePeachEntrance(pit) -> warTempleKeyDoor
-    'cocoon': 'overworld:tombTeleporter',
+    'cocoon': 'tomb:tombExit',
     // tombEntrance
-    'helix': 'overworld:lakeTunnelEntrance',
+    'helix': 'lakeTunnel:helixEntrance',
     // helixSkyEntrance
     'forestTemple': 'overworld:forestTempleLadder1',
     'waterfallTower': 'overworld:waterfallTowerEntrance',
