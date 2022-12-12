@@ -255,7 +255,7 @@ export function getTileBehaviorsAndObstacles(
             continue;
         }
         const behaviors = getObjectBehaviors(state, object);
-        if (object.getHitbox && (object.onPush || behaviors?.solid || objectTest)) {
+        if (object.getHitbox && (object.onPush || behaviors?.solid || behaviors?.pit || objectTest)) {
             const hitbox = object.getHitbox(state);
             if (isPixelInShortRect(x | 0, y | 0,
                 { x: hitbox.x | 0, y: hitbox.y | 0, w: hitbox.w | 0, h: hitbox.h | 0 }
@@ -268,6 +268,9 @@ export function getTileBehaviorsAndObstacles(
                     continue;
                 }
                 objects.push(object);
+                if (behaviors?.pit) {
+                    tileBehavior.pit = true;
+                }
                 if (behaviors?.solid) {
                     if (!tileBehavior.solid) {
                         // Set solid height behaviors if this is thirst solid object.

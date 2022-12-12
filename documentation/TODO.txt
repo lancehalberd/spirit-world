@@ -40,6 +40,14 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+
+    - Add hidden small pit entrance and new Vanara Village house with beetles in the basement. The basement can only be accessed by falling in. Has a few chests inside and the NPC will give you 50 Jade if you defeat all the beetles. Eventually change this to a Jade Idol.
+        - Unlock the basement door if the quest is complete for narrative consistency as the NPC will say they locked the basement to keep people safe.
+
+    - Randomize pit entrances
+
+    - Improve unconnected teleporter graphics to show other world instead of just random light
+
     - Add 'only' visibility option to layers that hides everything else when selected.
 
     - Pit inside mountain river should empty into the top waterfall in a seris of inside waterfalls in the waterfall cave

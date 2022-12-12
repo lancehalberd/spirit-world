@@ -27,7 +27,7 @@ import { editingState } from 'app/development/tileEditor';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { moveActor } from 'app/moveActor';
 import { createAnimation, drawFrameAt, drawFrameCenteredAt } from 'app/utils/animations';
-import { directionMap, getDirection } from 'app/utils/field';
+import { directionMap, getDirection, getTileBehaviorsAndObstacles } from 'app/utils/field';
 
 import {
     ActorAnimations, Direction, DrawPriority, EffectInstance,
@@ -918,39 +918,55 @@ export function checkForFloorEffects(state: GameState, enemy: Enemy) {
     if (!enemy.area) {
         return;
     }
-    const behaviorGrid = enemy.area.behaviorGrid;
-    const tileSize = 16;
+    //const behaviorGrid = enemy.area.behaviorGrid;
+    //const tileSize = 16;
 
     const hitbox = enemy.getHitbox(state);
-    let leftColumn = Math.floor((hitbox.x + 6) / tileSize);
+    /*let leftColumn = Math.floor((hitbox.x + 6) / tileSize);
     let rightColumn = Math.floor((hitbox.x + hitbox.w - 7) / tileSize);
     let topRow = Math.floor((hitbox.y + 6) / tileSize);
-    let bottomRow = Math.floor((hitbox.y + hitbox.h - 7) / tileSize);
+    let bottomRow = Math.floor((hitbox.y + hitbox.h - 7) / tileSize);*/
 
-    for (let row = topRow; row <= bottomRow; row++) {
+    const checkForPits = enemy.z <= 0
+        && !enemy.flying
+        // Bosses don't fall in pits.
+        && enemy.definition?.type !== 'boss'
+        // Specific enemies can be set to ignore pits.
+        && !enemy.enemyDefinition.ignorePits;
+
+    /*for (let row = topRow; row <= bottomRow; row++) {
         for (let column = leftColumn; column <= rightColumn; column++) {
             const behaviors = behaviorGrid?.[row]?.[column];
             // This will happen when the player moves off the edge of the screen.
             if (!behaviors) {
                 continue;
             }
-            if (behaviors.pit && enemy.z <= 0
-                && !enemy.flying
-                // Bosses don't fall in pits.
-                && enemy.definition?.type !== 'boss'
-                // Specific enemies can be set to ignore pits.
-                && !enemy.enemyDefinition.ignorePits
-            ) {
-                const pitAnimation = new AnimationEffect({
-                    animation: enemyFallAnimation,
-                    x: column * 16 - 4, y: row * 16 - 4,
-                });
-                addEffectToArea(state, enemy.area, pitAnimation);
-                enemy.status = 'gone';
+            if (behaviors.pit && checkForPits) {
+                makeEnemyFallIntoPit(state, enemy);
                 return;
             }
         }
+    }*/
+
+    if (checkForPits) {
+        const x = hitbox.x + hitbox.w / 2;
+        const y = hitbox.y + hitbox.h / 2;
+        const { tileBehavior } = getTileBehaviorsAndObstacles(state, enemy.area, {x, y});
+        if (tileBehavior?.pit) {
+            makeEnemyFallIntoPit(state, enemy);
+            return;
+        }
     }
+}
+
+function makeEnemyFallIntoPit(state: GameState, enemy: Enemy) {
+    const hitbox = enemy.getHitbox(state);
+    const pitAnimation = new AnimationEffect({
+        animation: enemyFallAnimation,
+        x: Math.round(hitbox.x / 16) * 16 - 4, y: Math.round(hitbox.y / 16) * 16 - 4,
+    });
+    addEffectToArea(state, enemy.area, pitAnimation);
+    enemy.status = 'gone';
 }
 
 export function hasEnemyLeftSection(state: GameState, enemy: Enemy): boolean {

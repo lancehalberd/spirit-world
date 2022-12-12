@@ -20,6 +20,7 @@ import { enemyTypes } from 'app/content/enemies';
 import { npcBehaviors, npcStyles } from 'app/content/objects/npc';
 import { signStyles } from 'app/content/objects/sign';
 import { getLootFrame } from 'app/content/loot';
+import { pitStyles } from 'app/content/objects/pitEntrance';
 import { turretStyles } from 'app/content/objects/wallTurret';
 import { zones } from 'app/content/zones';
 import { ObjectPalette, ObjectPaletteItem } from 'app/development/objectPalette';
@@ -382,6 +383,7 @@ export function createObjectDefinition(
         case 'pitEntrance':
             return {
                 ...commonProps,
+                style: definition.style || Object.keys(pitStyles)[0],
                 targetZone: definition.targetZone,
                 targetObjectId: definition.targetObjectId,
                 type: definition.type,
@@ -1116,6 +1118,8 @@ function getStyleFields(state: GameState, editingState: EditingState, object: Ob
         styles = escalatorStyles;
     } else if (object.type === 'turret') {
         styles = turretStyles;
+    } else if (object.type === 'pitEntrance') {
+        styles = pitStyles;
     }
     if (!styles) {
         return [];

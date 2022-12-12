@@ -1,4 +1,4 @@
-import { enterLocation, enterZoneByTarget } from 'app/content/areas';
+import { enterLocation, enterZoneByTarget, playAreaSound } from 'app/content/areas';
 import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
 import { findObjectInstanceById } from 'app/content/objects';
 import { editingState } from 'app/development/tileEditor';
@@ -23,6 +23,7 @@ export class Teleporter implements ObjectInstance {
     disabledTime = 0;
     isObject = <const>true;
     linkedObject: Teleporter;
+    wasUnderObject: boolean;
     constructor(state: GameState, definition: EntranceDefinition) {
         this.definition = definition;
         this.x = definition.x;
@@ -56,7 +57,11 @@ export class Teleporter implements ObjectInstance {
             return;
         }
         if (this.isUnderObject(state)) {
+            this.wasUnderObject = true;
             return;
+        } else if (this.wasUnderObject) {
+            this.wasUnderObject = false;
+            playAreaSound(state, this.area, 'secretChime');
         }
         this.animationTime += FRAME_LENGTH;
         const hero = state.hero;

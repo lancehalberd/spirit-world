@@ -75,6 +75,12 @@ export function isMovementBlocked(
                 return false;
             }
         }*/
+        if (object.getHitbox && behaviors?.pit && !movementProperties.canFall) {
+            if (isPixelInShortRect(x, y, object.getHitbox(state))) {
+                return { object };
+            }
+        }
+        // Would need additional checks here for objects with water/lava/brittle behaviors.
     }
     if (behaviors?.water && !movementProperties.canSwim) {
         return {};
