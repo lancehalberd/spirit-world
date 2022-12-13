@@ -15,6 +15,7 @@ export class Marker implements ObjectInstance {
     isObject = <const>true;
     x: number;
     y: number;
+    ignorePits = true;
     status: ObjectStatus = 'normal';
     constructor(definition: MarkerDefinition) {
         this.definition = definition;

@@ -625,7 +625,7 @@ export function renderAreaObjectsBeforeHero(context: CanvasRenderingContext2D, s
                 }
             }
         }
-        spriteObjects.sort((A, B) => A.y - B.y);
+        spriteObjects.sort((A, B) => (A.getYDepth?.() ?? A.y) - (B.getYDepth?.() ?? B.y));
         for (const objectOrEffect of spriteObjects) {
             objectOrEffect.render(context, state);
         }
@@ -655,7 +655,7 @@ export function renderAreaObjectsAfterHero(context: CanvasRenderingContext2D, st
             }
         }
         // Sprite objects are rendered in order of their y positions.
-        spriteObjects.sort((A, B) => A.y - B.y);
+        spriteObjects.sort((A, B) => (A.getYDepth?.() ?? A.y) - (B.getYDepth?.() ?? B.y));
         for (const objectOrEffect of spriteObjects) {
             objectOrEffect.render(context, state);
         }
