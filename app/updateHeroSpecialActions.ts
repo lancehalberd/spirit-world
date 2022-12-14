@@ -272,7 +272,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             hero.animationTime = 0;
             const landingHit: HitProperties = {
                 damage: 1,
-                hitbox: hero.getHitbox(),
+                hitbox: pad(hero.getHitbox(), 4),
                 hitTiles: true,
             };
             hitTargets(state, hero.area, landingHit);
@@ -317,6 +317,12 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         // The astral projection stays 4px off the ground.
         if (hero.z <= minZ) {
             if (hero.vz <= -8) {
+                const landingHit: HitProperties = {
+                    damage: 1,
+                    hitbox: pad(hero.getHitbox(), 4),
+                    hitTiles: true,
+                };
+                hitTargets(state, hero.area, landingHit);
                 const { tileBehavior } = getTileBehaviorsAndObstacles(state, hero.area, {x: hero.x, y: hero.y }, excludedObjects, state.nextAreaInstance);
                 if (!tileBehavior?.water && !tileBehavior?.pit) {
                     state.screenShakes.push({

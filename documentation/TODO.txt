@@ -40,9 +40,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Allow falling on and destroying bushes when falling from the sky
-        - Put nearest fall markers over special bushes for extra chance someone falls from the sky straight into secret pits. Bonus if the secret chime plays as they fall.
-
     - Add 4 new checks, 3 entrances and 1 pit to randomizer logic
 
     - Randomize pit entrances
