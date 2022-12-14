@@ -103,10 +103,21 @@ export function randomizeEntrances(random: typeof SRandom) {
     const normalExits = new Set<string>();
     const spiritExits = new Set<string>();
     const waterExits = new Set<string>();
+    const pitEntrances = [];
+    const pitTargets = new Set<string>();
     const targetIdMap: {[key in string]: DoorLocation[]} = {};
     const allTargetedKeys = new Set<string>();
     const fixedNimbusCloudZones = new Set<string>();
     everyObject((location, zone: Zone, area: AreaDefinition, object) => {
+        if (object.type === 'pitEntrance') {
+            if (!object.targetZone || object.targetZone === zone.key) {
+                return;
+            }
+            const targetKey = `${object.targetZone}:${object.targetObjectId}`;
+            pitTargets.add(targetKey);
+            pitEntrances.push(object);
+            return;
+        }
         if (object.type !== 'door') {
             return;
         }
@@ -139,14 +150,14 @@ export function randomizeEntrances(random: typeof SRandom) {
             || zone.key === 'lakeTunnel' && object.targetZone === 'helix'
             || zone.key === 'warTemple' && object.targetZone === 'lab'
             || zone.key === 'lab' && object.targetZone === 'tree'
-           ) {
-               if (outsideZones.includes(zone.key)) {
+        ) {
+           if (outsideZones.includes(zone.key)) {
                 if (area.isSpiritWorld) {
-                       connectedSpiritEntrances.add(targetKey);
-                   } else {
-                       connectedNormalEntrances.add(targetKey);
-                   }
+                   connectedSpiritEntrances.add(targetKey);
+                } else {
+                   connectedNormalEntrances.add(targetKey);
                }
+           }
             if (area.isSpiritWorld) {
                 spiritExits.add(targetKey);
             } else {
@@ -222,7 +233,6 @@ export function randomizeEntrances(random: typeof SRandom) {
             console.error('Could not find a targeted entrance that targets', targetIdOfEntrance);
             return;
         }
-
         if (!targetIdMap[targetIdOfExit]) {
             debugger;
         }
@@ -232,8 +242,9 @@ export function randomizeEntrances(random: typeof SRandom) {
                 exitTarget = entrance.definition.id;
             }
         }
+
         if (!exitZone) {
-            console.error('Could not find a targeted entrance that targets', targetIdOfEntrance);
+            console.error('Could not find a targeted exit that targets', targetIdOfExit);
             return;
         }
 
@@ -247,6 +258,7 @@ export function randomizeEntrances(random: typeof SRandom) {
                 fixedNimbusCloudZones.add(zone);
             }
         }
+
         if (!targetIdMap[targetIdOfEntrance]) {
             debugger;
         }
@@ -311,6 +323,13 @@ export function randomizeEntrances(random: typeof SRandom) {
             const exitId = exitIds.pop();
             assignEntranceExitPair(entranceId, exitId);
         }
+    }
+    const targetIds = [...pitTargets];
+    for (const pitEntrance of random.shuffle(pitEntrances)) {
+        const exitId = targetIds.pop();
+        const [zone, objectId] = exitId.split(':');
+        pitEntrance.targetZone = zone;
+        pitEntrance.targetObjectId = objectId;
     }
     verifyNodeConnections();
 }

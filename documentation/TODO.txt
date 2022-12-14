@@ -40,8 +40,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Randomize pit entrances
-
     - Improve unconnected teleporter graphics to show other world instead of just random light
 
     - Add 'only' visibility option to layers that hides everything else when selected.
