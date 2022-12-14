@@ -1,6 +1,6 @@
 import {
     andLogic, canCross2Gaps,
-    hasBossWeapon, hasCatEyes, hasFireBlessing, hasInvisibility,
+    hasBossWeapon, hasWeapon, hasCatEyes, hasFireBlessing, hasInvisibility,
     hasMediumRange, hasMitts, hasSomersault, hasTeleportation,
     orLogic,
 } from 'app/content/logic';
@@ -33,6 +33,54 @@ export const treeVillageNodes: LogicNode[] = [
         ],
         exits: [
             { objectId: 'elderUpstairs' },
+        ],
+    },
+    {
+        zoneId: 'treeVillage',
+        nodeId: 'northwestTree',
+        entranceIds: [
+            'northwestTreeEntrance',
+        ],
+        exits: [
+            { objectId: 'northwestTreeEntrance' },
+        ],
+    },
+    {
+        zoneId: 'treeVillage',
+        nodeId: 'northeastTreeEntrance',
+        entranceIds: [
+            'northeastTreeEntrance',
+        ],
+        exits: [
+            { objectId: 'northeastTreeEntrance' },
+        ],
+    },
+    {
+        zoneId: 'treeVillage',
+        nodeId: 'southeastTree',
+        complexNpcs: [{dialogueKey: 'storageVanara', optionKey: 'peachReward'},],
+        entranceIds: [
+            'southeastTreeEntrance',
+            'vanaraStorageStairs',
+        ],
+        exits: [
+            { objectId: 'southeastTreeEntrance' },
+        ],
+    },
+    {
+        zoneId: 'treeVillage',
+        nodeId: 'treeVillageStorageRoom',
+        checks: [
+            {objectId: 'treeVillageMoneyA'},
+            {objectId: 'treeVillageMoneyB'},
+            {objectId: 'treeVillageEmptyChest'},
+        ],
+        flags: [{flag: 'clearedTreeVillageStorageRoom', logic: hasWeapon }],
+        entranceIds: [
+            'treeVillageStorageMarker',
+        ],
+        exits: [
+            { objectId: 'vanaraStorageStairs' },
         ],
     },
     {

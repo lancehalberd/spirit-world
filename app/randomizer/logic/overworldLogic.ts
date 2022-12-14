@@ -17,6 +17,7 @@ export const mainOverworldNode: LogicNode = {
     ],
     paths: [
         { nodeId: 'overworldMountain', logic: hasGloves },
+        { nodeId: 'forestArea' },
         { nodeId: 'warTempleArea' },
         { nodeId: 'mainSpiritWorld', logic: orLogic(hasSomersault, hasTeleportation) },
         { nodeId: 'nimbusCloud', logic: hasNimbusCloud},
@@ -30,7 +31,7 @@ export const mainOverworldNode: LogicNode = {
         { nodeId: 'underCity', logic: canTravelFarUnderWater},
     ],
     entranceIds: [
-        'sideArea:noToolEntrance', 'elderEntrance', 'tombTeleporter',
+        'sideArea:noToolEntrance', 'tombTeleporter',
         'lakeTunnelEntrance', 'peachCaveTopEntrance', 'peachCaveWaterEntrance',
         'staffTowerEntrance',
         'tombEntrance', 'waterfallCaveEntrance', 'templeCrackedDoor', 'templeDoor',
@@ -98,6 +99,26 @@ export const overworldNodes: LogicNode[] = [
         entranceIds: ['riverTempleUpperEntrance'],
         exits: [
             { objectId: 'riverTempleUpperEntrance'}
+        ],
+    },
+    {
+        zoneId,
+        nodeId: 'forestArea',
+        paths: [
+            { nodeId: 'overworldMain' },
+        ],
+        entranceIds: [
+            'elderEntrance',
+            'northwestTreeEntrance',
+            'northeastTreeEntrance',
+            'southeastTreeEntrance',
+        ],
+        exits: [
+            { objectId: 'elderEntrance' },
+            { objectId: 'northwestTreeEntrance' },
+            { objectId: 'northeastTreeEntrance' },
+            { objectId: 'southeastTreeEntrance' },
+            { objectId: 'treeVillageStoragePit' },
         ],
     },
     {

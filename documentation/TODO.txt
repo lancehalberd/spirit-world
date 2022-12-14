@@ -40,8 +40,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Add 4 new checks, 3 entrances and 1 pit to randomizer logic
-
     - Randomize pit entrances
 
     - Improve unconnected teleporter graphics to show other world instead of just random light

@@ -33,6 +33,9 @@ dialogueHash.vanaraVillager = {
 
 dialogueHash.storageVanara = {
     key: 'storageVanara',
+    mappedOptions: {
+        peachReward: `{item:peachOfImmortalityPiece}{flag:vanaraStoragePeachPiece}`,
+    },
     options: [
         {
             logicCheck: {
@@ -59,8 +62,7 @@ dialogueHash.storageVanara = {
                 {|}When did you get so helpful?
                 {|}Nevermind, go ahead and take this, I found it in
                 one of the storage chests, it seemed to be attracting those things.
-                {item:peachOfImmortalityPiece}
-                {flag:vanaraStoragePeachPiece}`,
+                {@storageVanara.peachReward}`,
             ],
             repeatIndex: 0,
         },
