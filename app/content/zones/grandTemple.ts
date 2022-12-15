@@ -531,7 +531,7 @@ const f0_1x0: AreaDefinition = {
     objects: [
         {status: "closedSwitch", id: "grandTempleSwitchDoor", x: 240, y: 272, type: "door", style: "wooden", d: "up", saveStatus: "forever"},
         {status: "normal", id: "", x: 224, y: 240, type: "door", style: "wooden", d: "down"},
-        {status: "cracked", id: "grandTempleSecretEntrance", x: 416, y: 496, type: "door", style: "wooden", targetZone: "overworld", targetObjectId: "templeCrackedDoor", d: "down"},
+        {status: "cracked", id: "grandTempleSecretEntrance", x: 416, y: 496, type: "door", style: "wooden", targetZone: "overworld", targetObjectId: "grandTempleSecretEntrance", d: "down"},
         {status: "normal", id: "grandTempleEntrance", x: 224, y: 496, type: "door", style: "wooden", targetZone: "overworld", targetObjectId: "templeDoor", d: "down", locationCue: "Grand Temple 1F"},
         {status: "normal", id: "generousPriest", x: 48, y: 320, d: "down", behavior: "idle", style: "midMonk", type: "npc", dialogue: "Ommmmmmm...", dialogueKey: "generousPriest"},
         {status: "normal", id: "holyCityInterior:0:0x0-npc-0", x: 304, y: 400, d: "down", behavior: "idle", style: "paleMonk", type: "npc", dialogue: "Ommmmmmm..."},

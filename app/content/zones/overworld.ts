@@ -1117,7 +1117,7 @@ const f0_0x2: AreaDefinition = {
         {status: "normal", id: "overworld:holyCityFoodHouse", x: 144, y: 112, type: "door", style: "wooden", targetZone: "holyCityInterior", targetObjectId: "foodHouse", d: "up"},
         {status: "normal", id: "overworld:holyCityBridgeHouse", x: 432, y: 384, type: "door", style: "wooden", targetZone: "holyCityInterior", targetObjectId: "bridgeHouse", d: "up"},
         {status: "normal", id: "overworld:holyCityGardenHouse", x: 416, y: 160, type: "door", style: "wooden", targetZone: "holyCityInterior", targetObjectId: "gardenHouse", d: "up"},
-        {status: "cracked", id: "templeCrackedDoor", x: 416, y: 0, type: "door", style: "wooden", targetZone: "grandTemple", targetObjectId: "grandTempleSecretEntrance", d: "up"},
+        {status: "cracked", id: "grandTempleSecretEntrance", x: 416, y: 0, type: "door", style: "wooden", targetZone: "grandTemple", targetObjectId: "grandTempleSecretEntrance", d: "up"},
         {status: "normal", id: "", x: 288, y: 112, type: "teleporter", linked: true},
         {status: "normal", id: "templeDoor", x: 288, y: 0, type: "door", style: "wooden", targetZone: "grandTemple", targetObjectId: "grandTempleEntrance", d: "up"},
         {status: "normal", id: "streetVendor", x: 224, y: 192, d: "down", behavior: "idle", style: "guy2", type: "npc", dialogueKey: "streetVendor"},
