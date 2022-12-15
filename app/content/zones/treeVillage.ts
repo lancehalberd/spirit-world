@@ -211,8 +211,8 @@ const sf0_0x0: AreaDefinition = {
     parentDefinition: f0_0x0,
     layers: null,
     objects: [
-        {status: "normal", id: "elderSpiritEntrance", x: 112, y: 480, type: "door", style: "cave", targetZone: "overworld", targetObjectId: "elderSpiritEntrance", d: "down"},
-        {status: "normal", id: "elderSpiritStairs", x: 64, y: 256, type: "door", style: "cave", targetZone: "treeVillage", targetObjectId: "elderSpiritStairs", d: "up"},
+        {status: "normal", id: "elderSpiritEntrance", x: 96, y: 480, type: "door", style: "wooden", targetZone: "overworld", targetObjectId: "elderSpiritEntrance", d: "down"},
+        {status: "normal", id: "elderSpiritStairs", x: 96, y: 304, type: "door", style: "woodenDownstairs", targetZone: "treeVillage", targetObjectId: "elderSpiritStairs", d: "up"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},

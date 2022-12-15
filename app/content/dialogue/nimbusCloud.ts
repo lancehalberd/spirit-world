@@ -45,7 +45,7 @@ export const zoneEntranceMap = {
 };
 
 function travelToLocation(state: GameState, zoneKey: string, markerId: string): string {
-    if (enterZoneByTarget(state, zoneKey, markerId, null, false)) {
+    if (enterZoneByTarget(state, zoneKey, markerId, null, true)) {
         fallIntoLocation(state);
     }
     return '';
