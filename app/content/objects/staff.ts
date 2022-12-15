@@ -115,7 +115,7 @@ export class Staff implements ObjectInstance {
                 this.bottomRow = row;
             }
         }
-        if (this.leftColumn === this.rightColumn && this.topRow === this.bottomRow) {
+        if (this.rightColumn - this.leftColumn < 2 && this.bottomRow - this.topRow < 2) {
             this.invalid = true;
         }
     }

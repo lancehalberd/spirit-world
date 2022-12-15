@@ -38,10 +38,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Clone Explosion doesn't work on Crystal Collector
-
-    - Staff should always hit the full 4 tiles for now.
-
     - Staff should either not cover the ball goals, or prevent them from being used when covered
 
     - Improve unconnected teleporter graphics to show other world instead of just random light

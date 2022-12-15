@@ -426,30 +426,35 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 element: hero.element,
                 maxLength,
             });
+            let baseTarget = {
+                x: staff.leftColumn * 16,
+                y: staff.topRow * 16,
+                w: (staff.rightColumn - staff.leftColumn + 1) * 16,
+                h: (staff.bottomRow - staff.topRow + 1) * 16,
+            }
             if (!staff.invalid) {
                 hero.activeStaff = staff;
                 addObjectToArea(state, state.areaInstance, staff);
+            } else {
+                // Staff hits at least a 3 tile area even if it doesn't get placed.
+                const isVertical = staff.direction === 'up' || staff.direction === 'down';
+                baseTarget = {
+                    x: staff.leftColumn * 16 - (staff.direction === 'left' ? 32 : 0),
+                    y: staff.topRow * 16 - (staff.direction === 'up' ? 32 : 0),
+                    w: isVertical ? 16 : 48,
+                    h: isVertical ? 48 : 16,
+                };
             }
             playAreaSound(state, state.areaInstance, 'bossDeath');
             hitTargets(state, state.areaInstance, {
                 damage: 4 * staffLevel,
-                hitbox: {
-                    x: staff.leftColumn * 16 - 2,
-                    y: staff.topRow * 16 - 2,
-                    w: (staff.rightColumn - staff.leftColumn + 1) * 16 + 4,
-                    h: (staff.bottomRow - staff.topRow + 1) * 16 + 4,
-                },
+                hitbox: pad(baseTarget, 2),
                 hitEnemies: true,
                 knockAwayFromHit: true,
                 isStaff: true,
             });
             hitTargets(state, state.areaInstance, {
-                hitbox: {
-                    x: staff.leftColumn * 16,
-                    y: staff.topRow * 16,
-                    w: (staff.rightColumn - staff.leftColumn + 1) * 16,
-                    h: (staff.bottomRow - staff.topRow + 1) * 16,
-                },
+                hitbox: baseTarget,
                 hitObjects: true,
                 isStaff: true,
             });
