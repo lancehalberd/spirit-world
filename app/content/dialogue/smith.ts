@@ -13,7 +13,11 @@ dialogueHash.citySmith = {
             if (state.hero.weaponUpgrades.normalDamage) {
                 return `{@citySmith.range}`;
             }
-            return `I can upgrade your weapon with the right materials.
+            if (state.hero.weapon > 1) {
+                return `I can upgrade your old Chakram with the right materials.
+                    {choice:Upgrade Chakram?|Range:citySmith.range|Damage:citySmith.damage|No:citySmith.no}`;
+            }
+            return `I can upgrade your Chakram with the right materials.
                 {choice:Upgrade Chakram?|Range:citySmith.range|Damage:citySmith.damage|No:citySmith.no}`;
         },
         range: `I need 100 Jade and 2 Silver Ore to upgrade your range.
