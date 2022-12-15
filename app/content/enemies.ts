@@ -19,6 +19,8 @@ import {
     beetleWingedAnimations,
     entAnimations,
     floorEyeAnimations,
+    blueSnakeAnimations,
+    redSnakeAnimations,
     snakeAnimations,
 } from 'app/content/enemyAnimations';
 import { certainLifeLootTable, simpleLootTable, lifeLootTable, moneyLootTable } from 'app/content/lootTables';
@@ -195,7 +197,7 @@ enemyDefinitions.beetleWinged = {
     lootTable: simpleLootTable,
 };
 enemyDefinitions.wallLaser = {
-    animations: snakeAnimations, life: 1, touchDamage: 1, update: updateWallLaser, flipRight: true,
+    animations: blueSnakeAnimations, life: 1, touchDamage: 1, update: updateWallLaser, flipRight: true,
     lootTable: simpleLootTable, params: { alwaysShoot: false },
     renderPreview(context: CanvasRenderingContext2D, enemy: Enemy, target: Rect): void {
         enemy.defaultRenderPreview(context, target);
@@ -204,7 +206,7 @@ enemyDefinitions.wallLaser = {
 };
 enemyDefinitions.flameSnake = {
     alwaysReset: true,
-    animations: snakeAnimations, speed: 1.1,
+    animations: redSnakeAnimations, speed: 1.1,
     life: 3, touchDamage: 1, update: updateFlameSnake, flipRight: true,
     elementalMultipliers: {'ice': 2},
     immunities: ['fire'],

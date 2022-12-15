@@ -26,9 +26,7 @@ Known Bugs:
     - Can get to undefined area in city by sinking in the water.
     - Cliff Edge issues:
         - Would be nice if staff could go across edges.
-        - Bow/chakram can fire up thin cliffs
-        - Bow/chakram cannot fire down southern cliffs.
-    - Projectiles can fire in between black abyss tiles, for example, shooting a bow at an east or west wall it may go through instead of stopping.
+        - Bow/chakram can fire up thin cliffs from the north.
     - Shadow renders behind door tops when jumping down ledges.
 
 Graphics:
@@ -40,8 +38,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Use red snake for flame snake.
-
     - Clone Explosion doesn't work on Crystal Collector
 
     - Staff should always hit the full 4 tiles for now.

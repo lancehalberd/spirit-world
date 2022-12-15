@@ -26,6 +26,28 @@ export const snakeAnimations: ActorAnimations = {
         right: leftSnakeAnimation,
     },
 };
+const leftRedSnakeAnimation: FrameAnimation = createAnimation('gfx/enemies/snekred.png', snakeGeometry, { x: 0});
+const downRedSnakeAnimation: FrameAnimation = createAnimation('gfx/enemies/snekred.png', snakeGeometry, { x: 1});
+const upRedSnakeAnimation: FrameAnimation = createAnimation('gfx/enemies/snekred.png', snakeGeometry, { x: 2});
+export const redSnakeAnimations: ActorAnimations = {
+    idle: {
+        up: upRedSnakeAnimation,
+        down: downRedSnakeAnimation,
+        left: leftRedSnakeAnimation,
+        right: leftRedSnakeAnimation,
+    },
+};
+const leftBlueSnakeAnimation: FrameAnimation = createAnimation('gfx/enemies/snekblue.png', snakeGeometry, { x: 0});
+const downBlueSnakeAnimation: FrameAnimation = createAnimation('gfx/enemies/snekblue.png', snakeGeometry, { x: 1});
+const upBlueSnakeAnimation: FrameAnimation = createAnimation('gfx/enemies/snekblue.png', snakeGeometry, { x: 2});
+export const blueSnakeAnimations: ActorAnimations = {
+    idle: {
+        up: upBlueSnakeAnimation,
+        down: downBlueSnakeAnimation,
+        left: leftBlueSnakeAnimation,
+        right: leftBlueSnakeAnimation,
+    },
+};
 // all idols share the same layout and dimensions
 // row 0: still frames; row 1: float;
 // row 2: float attack; row 3: dead float attack;

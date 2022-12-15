@@ -71,6 +71,7 @@ export class Flame implements EffectInstance, Props {
     speed = 0;
     ttl: number;
     isPreparing = false;
+    reflected = false;
     constructor({x, y, z = 0, vx = 0, vy = 0, vz = 0, az = -0.3, damage = 1, scale = 1, ttl = 2000, isPreparing = false}: Props) {
         this.damage = damage;
         this.x = x;
@@ -101,14 +102,21 @@ export class Flame implements EffectInstance, Props {
             removeEffectFromArea(state, this);
         } else  {
             if (!this.isPreparing && this.z <= 16) {
-                hitTargets(state, this.area, {
+                const hitResult = hitTargets(state, this.area, {
                     canPush: false,
                     damage: this.damage,
                     hitbox: this,
                     element: 'fire',
-                    hitAllies: true,
+                    hitAllies: !this.reflected,
+                    hitEnemies: this.reflected,
                     hitTiles: true,
                 });
+                if (hitResult.reflected) {
+                    this.reflected = true;
+                    this.vx = -this.vx;
+                    this.vy = -this.vy;
+                    this.time = 0;
+                }
             }
             // Create sparks less often when the flame is still.
             const rate = (this.vx || this.vy) ? 100 : 400;
