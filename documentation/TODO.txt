@@ -38,7 +38,14 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Staff should either not cover the ball goals, or prevent them from being used when covered
+    - You can get trapped just west of the peach cave exit in the spirit world.
+
+    - Prevent falling during peach cave boss fight.
+
+    - Sometimes arrow can hit the wall before it hits the crystal collect boss.
+        - Make sure arrow can go at least 12px into the wall.
+
+    - Hint for village npc
 
     - Improve unconnected teleporter graphics to show other world instead of just random light
 

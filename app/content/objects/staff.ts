@@ -70,7 +70,7 @@ export class Staff implements ObjectInstance {
             for (let i = 1; i < maxLength; i++) {
                 column = this.rightColumn - i;
                 const tileBehavior = this.area?.behaviorGrid[row]?.[column];
-                if (column * 16 < section.x || tileBehavior?.solid || tileBehavior?.solidMap || tileBehavior?.ledges || tileBehavior?.staffCovered) {
+                if (column * 16 < section.x || tileBehavior?.solid || tileBehavior?.solidMap || tileBehavior?.ledges || tileBehavior?.blocksStaff) {
                     break;
                 }
                 if (!isPointOpen(state, this.area, {x: column * 16 + 8, y: row * 16 + 8 }, movementProps,  excludedObjects)) {
@@ -82,7 +82,7 @@ export class Staff implements ObjectInstance {
             for (let i = 1; i < maxLength; i++) {
                 column = this.leftColumn + i;
                 const tileBehavior = this.area?.behaviorGrid[row]?.[column];
-                if (column * 16 >= section.x + section.w || tileBehavior?.solid || tileBehavior?.solidMap || tileBehavior?.ledges || tileBehavior?.staffCovered) {
+                if (column * 16 >= section.x + section.w || tileBehavior?.solid || tileBehavior?.solidMap || tileBehavior?.ledges || tileBehavior?.blocksStaff) {
                     break;
                 }
                 if (!isPointOpen(state, this.area, {x: column * 16 + 8, y: row * 16 + 8 }, movementProps,  excludedObjects)) {
@@ -94,7 +94,7 @@ export class Staff implements ObjectInstance {
             for (let i = 1; i < maxLength; i++) {
                 row = this.bottomRow - i;
                 const tileBehavior = this.area?.behaviorGrid[row]?.[column];
-                if (row * 16 < section.y || tileBehavior?.solid || tileBehavior?.solidMap || tileBehavior?.ledges || tileBehavior?.staffCovered) {
+                if (row * 16 < section.y || tileBehavior?.solid || tileBehavior?.solidMap || tileBehavior?.ledges || tileBehavior?.blocksStaff) {
                     break;
                 }
                 if (!isPointOpen(state, this.area, {x: column * 16 + 8, y: row * 16 + 8 }, movementProps,  excludedObjects)) {
@@ -106,7 +106,7 @@ export class Staff implements ObjectInstance {
             for (let i = 1; i < maxLength; i++) {
                 row = this.topRow + i;
                 const tileBehavior = this.area?.behaviorGrid[row]?.[column];
-                if (row * 16 >= section.y + section.h || tileBehavior?.solid || tileBehavior?.solidMap || tileBehavior?.ledges || tileBehavior?.staffCovered) {
+                if (row * 16 >= section.y + section.h || tileBehavior?.solid || tileBehavior?.solidMap || tileBehavior?.ledges || tileBehavior?.blocksStaff) {
                     break;
                 }
                 if (!isPointOpen(state, this.area, {x: column * 16 + 8, y: row * 16 + 8 }, movementProps,  excludedObjects)) {
@@ -136,7 +136,7 @@ export class Staff implements ObjectInstance {
             this.storedBehaviors[row] = []
             for (let column = this.leftColumn; column <= this.rightColumn; column++) {
                 this.storedBehaviors[row][column] = state.areaInstance.behaviorGrid[row][column];
-                state.areaInstance.behaviorGrid[row][column] = { groundHeight: 2, staffCovered: true };
+                state.areaInstance.behaviorGrid[row][column] = { groundHeight: 2, blocksStaff: true };
             }
         }
     }
@@ -165,12 +165,9 @@ export class Staff implements ObjectInstance {
         // Restore the original tiles under the staff.
         for (let row = this.topRow; row <= this.bottomRow; row++) {
             for (let column = this.leftColumn; column <= this.rightColumn; column++) {
-                // Indicate that the tiles need to be redrawn now that the staff is gone.
-                this.area.tilesDrawn[row][column] = false;
                 this.area.behaviorGrid[row][column] = this.storedBehaviors[row][column];
             }
         }
-        this.area.checkToRedrawTiles = true;
         for (const hero of [state.hero, ...state.hero.clones]) {
             if (hero.activeStaff === this) {
                 delete hero.activeStaff;

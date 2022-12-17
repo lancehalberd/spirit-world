@@ -255,6 +255,9 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 i++;
                 // Uncomment and possibly reduce this if hero is jumping too far south from tall cliffs.
                 //hero.jumpingVy = Math.min(hero.jumpingVy, 1);
+                // Without this, the hero will not be able to transition south while jumping east/west
+                // and moving down across a southern facing wall.
+                hero.actionDy = 1;
             }
             while (i < 2 && hero.jumpingVy > 0 && !canSomersaultToCoords(state, hero, hero) && hero.z < 48) {
                 hero.y++;
@@ -263,12 +266,16 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 // Reduce this to close to 0 so that the hero doesn't jump further south than necessary
                 // but leave it slightly positive so that screen transitions still trigger.
                 hero.jumpingVy = Math.min(hero.jumpingVy, 0.1);
+                // Without this, the hero will not be able to transition south while jumping east/west
+                // and moving down across an obstacle.
+                hero.actionDy = 1;
             }
         }
         // console.log([hero.x, hero.y, hero.z], ' -> ', [hero.jumpingVx, hero.jumpingVy, hero.jumpingVz]);
         if (hero.z <= groundZ) {
             hero.z = groundZ
             hero.action = null;
+            hero.actionDy = 0;
             hero.animationTime = 0;
             const landingHit: HitProperties = {
                 damage: 1,

@@ -1257,6 +1257,13 @@ export function fixObjectPosition(state: GameState, object: ObjectDefinition): v
         //object.y = Math.round(object.y / 8) * 8;
         return;
     }
+    const instance = createObjectInstance(state, object);
+    // Objects that apply their behaviors to the grid must be tile aligned.
+    if (instance.applyBehaviorsToGrid) {
+        object.x = Math.round(object.x / 16) * 16;
+        object.y = Math.round(object.y / 16) * 16;
+        return
+    }
     // Default behavior is to snap to half grid.
     if (object.type !== 'loot') {
         object.x = Math.round(object.x / 8) * 8;

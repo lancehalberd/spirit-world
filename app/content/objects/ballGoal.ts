@@ -3,7 +3,7 @@ import { createAnimation, drawFrame } from 'app/utils/animations';
 
 import {
     AreaInstance, BallGoalDefinition, DrawPriority, GameState,
-    ObjectInstance, ObjectStatus, Rect,
+    ObjectInstance, ObjectStatus, Rect, TileBehaviors,
 } from 'app/types';
 
 const [emptyFrame, filledFrame] = createAnimation('gfx/tiles/circulardepression.png', {w: 16, h: 16}, {cols: 2}).frames;
@@ -11,9 +11,11 @@ const [emptyFrame, filledFrame] = createAnimation('gfx/tiles/circulardepression.
 export class BallGoal implements ObjectInstance {
     area: AreaInstance;
     alwaysReset = true;
-    behaviors = {
+    behaviors: TileBehaviors = {
+        blocksStaff: true,
         solid: false,
     };
+    applyBehaviorsToGrid = true;
     drawPriority: DrawPriority = 'background';
     definition: BallGoalDefinition = null;
     x: number;

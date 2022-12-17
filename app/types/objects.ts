@@ -28,6 +28,9 @@ export interface ObjectInstance {
     definition?: ObjectDefinition
     linkedObject?: ObjectInstance
     behaviors?: TileBehaviors
+    // If this is true behaviors will be applied to the behavior grid when this
+    // object gets added.
+    applyBehaviorsToGrid?: boolean
     getBehaviors?: (state: GameState) => TileBehaviors
     drawPriority?: DrawPriority
     getDrawPriority?: (state: GameState) => DrawPriority

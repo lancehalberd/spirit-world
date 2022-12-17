@@ -1044,6 +1044,13 @@ export function refreshSection(state: GameState, area: AreaInstance, section: Re
         }
     }
 }
+function hitboxToGrid(hitbox: Rect): Rect {
+    const x = (hitbox.x / 16) | 0;
+    const w = (hitbox.w / 16) | 0;
+    const y = (hitbox.y / 16) | 0;
+    const h = (hitbox.h / 16) | 0;
+    return {x, y, w, h};
+}
 export function addObjectToArea(state: GameState, area: AreaInstance, object: ObjectInstance): void {
     if (object.area && object.area !== area) {
         removeObjectFromArea(state, object);
@@ -1060,6 +1067,15 @@ export function addObjectToArea(state: GameState, area: AreaInstance, object: Ob
             specialBehaviorsHash[object.definition.specialBehaviorKey].apply?.(state, object as any);
         } catch (error) {
             console.error(object.definition.specialBehaviorKey);
+        }
+    }
+
+    if (object.applyBehaviorsToGrid && object.behaviors) {
+        const gridRect = hitboxToGrid(object.getHitbox());
+        for (let x = gridRect.x; x < gridRect.x + gridRect.w; x++) {
+            for (let y = gridRect.y; y < gridRect.y + gridRect.h; y++) {
+                applyBehaviorToTile(area, x, y, object.behaviors);
+            }
         }
     }
 }

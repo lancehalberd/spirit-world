@@ -24,7 +24,7 @@ export interface TileBehaviors {
     covered?: boolean
     // Similar behavior to covered but only applied when the staff covers the ground.
     // Used to prevents staffs from overlapping.
-    staffCovered?: boolean
+    blocksStaff?: boolean
     // Can be destroyed by weapon
     cuttable?: number
     // Hit applies to enemies/heroes on contact.
