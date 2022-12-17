@@ -850,7 +850,8 @@ const stairs: TileSource = {
 
 // use `foreground2` as default so that it can appear on top of walls that might be on `foreground`
 // All of these solid maps are set so that only the bottom half of the ceiling graphics are solid.
-const ceilingBehavior: TileBehaviors = { defaultLayer: 'foreground2', isVeryTall: true, solidMap: BITMAP_BOTTOM};
+const ceilingBehavior: TileBehaviors = { defaultLayer: 'foreground2', isVeryTall: true, solid: true};
+const bottomCeilingBehavior: TileBehaviors = { defaultLayer: 'foreground2', isVeryTall: true, solidMap: BITMAP_BOTTOM};
 const topLeftCeiling: TileBehaviors = { ...ceilingBehavior, isVeryTall: true, solidMap: BITMAP_TOP_LEFT_8_STRIP};
 const topRightCeiling: TileBehaviors = { ...ceilingBehavior, isVeryTall: true, solidMap: BITMAP_TOP_RIGHT_8_STRIP};
 const bottomLeftCeiling: TileBehaviors = { ...ceilingBehavior, isVeryTall: true, solidMap: BITMAP_BOTTOM_LEFT_8};
@@ -862,6 +863,10 @@ const woodCeiling: TileSource = {
     source: {image: requireImage('gfx/tiles/woodhousetilesarranged.png'), x: 0, y: 0, w: 48, h: 64},
     behaviors: {
         'all': ceilingBehavior,
+        '3x0': bottomCeilingBehavior,
+        '1x1': bottomCeilingBehavior,
+        '2x2': bottomCeilingBehavior, '3x2': bottomCeilingBehavior, '4x2': bottomCeilingBehavior,
+        '0x3': bottomCeilingBehavior, '1x3': bottomCeilingBehavior, '3x3': bottomCeilingBehavior,
         '0x4': topLeftCeiling, '4x4': topLeftCeiling, '1x7': topLeftCeiling,
         '1x4': topRightCeiling, '5x4': topRightCeiling, '0x7': topRightCeiling,
         '5x3': bottomLeftCeiling, '0x5': bottomLeftCeiling, '1x6': bottomLeftCeiling,

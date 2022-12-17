@@ -878,7 +878,13 @@ export function getRandomizerHint(state: GameState): string {
             if (state.savedState.objectFlags[flag]) {
                 continue;
             }
-            return `The merchant has something for sale.`;
+            if (dialogueKey === 'streetVendor') {
+                return `The merchant has something for sale.`;
+            }
+            if (dialogueKey === 'storageVanara') {
+                return `A vanara would be grateful for an exterminator.`;
+            }
+            return `Try talking to someone called ${dialogueKey}.`;
         }
     }
     return 'Looks like BK Mode to me :)';

@@ -607,6 +607,23 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
             if (behavior?.cuttable > hit.damage) {
                 combinedResult.blocked = true;
             }
+        } else if (!combinedResult.stopped && hit.hitbox && behavior?.solidMap && (!behavior?.low || hit.cutsGround)) {
+            const checkPoints = [
+                {x: hit.hitbox.x, y: hit.hitbox.y}, {x: hit.hitbox.x + hit.hitbox.w, y: hit.hitbox.y},
+                {x: hit.hitbox.x, y: hit.hitbox.y + hit.hitbox.h}, {x: hit.hitbox.x + hit.hitbox.w, y: hit.hitbox.y + hit.hitbox.h},
+            ];
+            for (const {x, y} of checkPoints) {
+                const sx = (x - target.x * 16) | 0, sy = (y - target.y * 16) | 0;
+                if (sx < 0 || sx > 15 || sy < 0 || sy >= 15) {
+                    continue;
+                }
+                if (behavior.solidMap[sy] >> (15 - sx) & 1) {
+                    combinedResult.hit = true;
+                    combinedResult.pierced = false;
+                    combinedResult.stopped = true;
+                    break;
+                }
+            }
         }
     }
 

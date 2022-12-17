@@ -38,16 +38,9 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - You can get trapped just west of the peach cave exit in the spirit world.
-
-    - Prevent falling during peach cave boss fight.
-
-    - Sometimes arrow can hit the wall before it hits the crystal collect boss.
-        - Make sure arrow can go at least 12px into the wall.
-
-    - Hint for village npc
-
-    - Improve unconnected teleporter graphics to show other world instead of just random light
+    - Add a world map function
+        - Start with the existing minimap, blow it up to the full screen ~200x200.
+        - Add it to select or some keyboard key, maybe an item in the menu?
 
     - Add 'only' visibility option to layers that hides everything else when selected.
 
