@@ -196,6 +196,7 @@ export function getDefaultState(): GameState {
         areaGrid: zones.peachCave.floors[0].grid,
         floor: zones.peachCave.floors[0],
         paused: false,
+        showMap: false,
         menuIndex: 0,
         menuRow: 0,
         defeatState: {

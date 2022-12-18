@@ -11,6 +11,7 @@ import { renderHeroEyes, renderHeroShadow } from 'app/renderActor';
 import { renderDefeatedMenu } from 'app/renderDefeatedMenu';
 import { renderHUD } from 'app/renderHUD';
 import { renderMenu } from 'app/renderMenu';
+import { renderMap } from 'app/render/renderMap';
 import { renderMessage } from 'app/render/renderMessage';
 import { renderTitle } from 'app/renderTitle';
 import { getState, shouldHideMenu } from 'app/state';
@@ -118,7 +119,11 @@ export function render() {
         renderTransition(context, state);
         renderHUD(context, state);
         if (state.paused && !shouldHideMenu(state)) {
-            renderMenu(context, state);
+            if (state.showMap) {
+                renderMap(context, state);
+            } else {
+                renderMenu(context, state);
+            }
         }
         return;
     }
@@ -175,7 +180,11 @@ export function render() {
         renderHUD(context, state);
     }
     if (state.paused && !shouldHideMenu(state)) {
-        renderMenu(context, state);
+        if (state.showMap) {
+            renderMap(context, state);
+        } else {
+            renderMenu(context, state);
+        }
     }
 }
 

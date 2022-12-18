@@ -65,6 +65,7 @@ const KEYBOARD_MAPPINGS = {
     [GAME_KEY.NEXT_ELEMENT]: [KEY.O],  // R Front bumper
     [GAME_KEY.ROLL]: [KEY.J], // L Front Bumper
     [GAME_KEY.MEDITATE]: [KEY.K],  // R Front bumper
+    [GAME_KEY.MAP]: [KEY.M],
 }
 
 // Under this threshold, the analog buttons are considered "released" for the sake of
@@ -91,6 +92,7 @@ const GAME_PAD_MAPPINGS = {
     [GAME_KEY.NEXT_ELEMENT]: 5,  // R Front bumper
     [GAME_KEY.ROLL]: 6, // L Front Bumper
     [GAME_KEY.MEDITATE]: 7,  // R Front bumper
+    [GAME_KEY.MAP]: 8, // BACK
 };
 
 const LEFT_ANALOG_Y_AXIS = 1;
@@ -211,7 +213,7 @@ export function addKeyCommands() {
         if (keysDown[KEY.SHIFT] && keyCode === KEY.E) {
             toggleEditing();
         }
-        if (keyCode === KEY.M) {
+        if (keysDown[KEY.SHIFT] && keyCode === KEY.M) {
             const state = getState();
             state.settings.muteAllSounds = !state.settings.muteAllSounds;
             updateSoundSettings(state);

@@ -88,3 +88,36 @@ export function showHint(state: GameState): void {
             {|}Try adding ?seed=20 to the url to play the randomizer).`);
     }
 }
+
+export function getMapTarget(state: GameState): {x: number, y: number} | null {
+    if (isRandomizer) {
+        return null;
+    }
+    const flags = state.savedState.objectFlags;
+    if (!state.hero.weapon) {
+        return null;
+    } else if (!state.hero.passiveTools.catEyes) {
+        return null;
+    } else if (!state.hero.activeTools.bow) {
+        return {x: 24, y: 174};
+    } else if (!state.hero.passiveTools.roll) {
+        return {x: 16, y: 76};
+    } else if (!state.hero.passiveTools.spiritSight) {
+        return {x: 16, y: 76};
+    } else if (!flags.warTempleEntrance) {
+        return {x: 160, y: 170};
+    } else if (!state.hero.passiveTools.gloves) {
+        return {x: 160, y: 170};
+    } else if (!state.hero.passiveTools.astralProjection) {
+        return {x: 160, y: 170};
+    } else if (!flags.tombExit) {
+        return {x: 80, y: 118};
+    } else if (!state.hero.passiveTools.teleportation) {
+        return {x: 80, y: 118};
+    } else if (!state.hero.activeTools.staff) {
+        return {x: 80, y: 108};
+    } else if (!state.hero.passiveTools.charge) {
+        return {x: 80, y: 108};
+    }
+    return null;
+}

@@ -1,9 +1,13 @@
 import { createAnimation } from 'app/utils/animations';
 import { debugCanvas } from 'app/dom';
 
-import { ActorAnimations, AnimationSet, FrameAnimation, FrameDimensions } from 'app/types';
+import { ActorAnimations, AnimationSet, Frame, FrameAnimation, FrameDimensions } from 'app/types';
 
 export const Y_OFF = -4;
+
+
+const heroIconGeometry: FrameDimensions = {w: 17, h: 16};
+export const heroIcon: Frame = createAnimation('gfx/hud/mcIcon.png', heroIconGeometry).frames[0];
 
 const heroGeometry: FrameDimensions = {w: 18, h: 26, content: {x: 1, y: 15 + Y_OFF, w: 16, h: 16}};
 const upAnimation: FrameAnimation = createAnimation('gfx/mc/facing.png', heroGeometry, { x: 2});

@@ -100,6 +100,7 @@ export interface GameState {
         targetZ?: number
     }
     paused: boolean
+    showMap: boolean
     menuIndex: number
     menuRow: number
     // This is mostly used for debugging animations.

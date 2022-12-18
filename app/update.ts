@@ -78,7 +78,24 @@ export function update() {
                 )
             ) {
                 state.paused = !state.paused;
+                state.showMap = false;
                 state.menuIndex = 0;
+                updateSoundSettings(state);
+            }
+        }
+        if (wasGameKeyPressed(state, GAME_KEY.MAP)) {
+            // Don't allow pausing while dialogue is displayed.
+            if (state.showMap
+                || (canPauseGame(state)
+                    && !(
+                        state.messagePage?.frames?.length
+                        || state.defeatState.defeated
+                        || state.scriptEvents.blockFieldUpdates
+                    )
+                )
+            ) {
+                state.showMap = !state.showMap;
+                state.paused = state.showMap;
                 updateSoundSettings(state);
             }
         }
