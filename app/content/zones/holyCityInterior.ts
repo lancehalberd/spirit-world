@@ -130,7 +130,6 @@ const f0_0x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "cracked", id: "templeCrackedDoor", x: 416, y: 496, type: "door", style: "wooden", targetZone: "overworld", targetObjectId: "templeCrackedDoor", d: "down"},
         {status: "normal", id: "gardenHouse", x: 112, y: 224, type: "door", style: "cave", targetZone: "overworld", targetObjectId: "overworld:holyCityGardenHouse", d: "down"},
         {status: "normal", id: "bridgeHouse", x: 368, y: 224, type: "door", style: "cave", targetZone: "overworld", targetObjectId: "overworld:holyCityBridgeHouse", d: "down"},
         {status: "normal", id: "holyCityInterior:0:0x0-npc-1", x: 400, y: 176, d: "left", behavior: "idle", style: "darkMonk", type: "npc", dialogue: "I love being a little outside of town. The hustle and bustle stresses me out."},
