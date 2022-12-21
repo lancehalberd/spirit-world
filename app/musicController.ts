@@ -71,7 +71,7 @@ export const updateMusic = (): void => {
     } else if (state.location.zoneKey === 'holyCityInterior') {
         playTrack('village', 0, soundSettings);
     } else if (state.location.zoneKey === 'waterfallCave' ) {
-        playTrack('idleTheme', 0, soundSettings);
+        playTrack('waterfallVillageTheme', 0, soundSettings);
     } else if (state.location.zoneKey === 'warTemple') {
         // Don't change music during transitions since the logic below that depends on x/y locations
         // may be invalid during transitions.

@@ -155,7 +155,8 @@ export const overworldNodes: LogicNode[] = [
         ],
         paths: [
             { nodeId: 'overworldMain' },
-            { nodeId: 'overworldWaterfall', logic: orLogic(hasSomersault, hasTeleportation, hasIronBoots, hasMitts) },
+            { nodeId: 'overworldWaterfall', logic: orLogic(hasSomersault, hasTeleportation, hasMitts) },
+            { nodeId: 'overworldMountainWater', logic: hasIronBoots },
         ],
         entranceIds: ['caves-ascentEntrance'],
         exits: [{objectId: 'caves-ascentEntrance' }],
@@ -286,6 +287,17 @@ export const underwaterNodes: LogicNode[] = [
         exits: [
             { objectId: 'peachCaveUnderwaterEntrance', logic: canTravelFarUnderWater  },
             { objectId: 'riverTempleWaterEntrance', logic: canTravelFarUnderWater  },
+        ],
+    },
+    {
+        zoneId,
+        nodeId: 'overworldMountainWater',
+        paths: [
+            {nodeId: 'overworldMain', logic: hasIronBoots},
+            {nodeId: 'overworldWaterfall', logic: hasIronBoots},
+        ],
+        exits: [
+            { objectId: 'waterfallCavePitEntrance', logic: hasIronBoots  },
         ],
     },
     {

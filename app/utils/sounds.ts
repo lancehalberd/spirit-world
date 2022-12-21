@@ -208,6 +208,8 @@ const musicTracks = {
     caveTheme: {key: 'caveTheme', type: 'bgm', source: 'bgm/Spirit 1.mp3', volume: 10 },
     // Used on the title screen and world map
     mainTheme: {key: 'mainTheme', type: 'bgm', source: 'bgm/Spirit 4.2_demo.mp3', volume: 5 },
+    // Used for holy city, but a bit to relaxed for that.
+    waterfallVillageTheme: {key : 'waterfallVillage', type: 'bgm', source: 'bgm/Spirit 21.A_demo.mp3', volume: 5},
     vanaraForestTheme: {key: 'vanaraForestTheme', type: 'bgm', source: 'bgm/Spirit 16_concept.mp3', volume: 5 },
     tombTheme: {key: 'tombTheme', type: 'bgm', source: 'bgm/Spirit 5.2_demo.mp3', volume: 5 },
     // Used for Vanara ship dungeons like cocoon, helix and forest temple.

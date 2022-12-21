@@ -29,3 +29,24 @@ The things that look like waterfalls inside the dungeon are actually large flows
 A lot of the specific elements of the story are not nailed down, but in the current iteration, the tower is overseen by a being called the River Dragon which used to be the Fertility God worshiped in the Fertility Temple on the river. This temple was destroyed when the Vanara ship crashed and the crater from the crash became a lake as the river filled it. The River Dragon,having an affinity for water in the Spirit World, took over the management of the Waterfall tower(the atmosphere of the tower is damaging to many spirit beings) after the River Temple was destroyed and a new Fertility Temple was constructed in the woods of the Vanara settlement.
 
 Among other things, the materials from the Waterfall Tower are being used to construct a new Sky Palace in the Spirit World that the River Dragon plans to move into.
+
+
+From https://en.wikipedia.org/wiki/Monkey_King
+"After several failed attempts at execution, Sun Wukong is locked into Laozi's eight-way trigram crucible for 49 days in order to be distilled into an elixir by samadhi fires; this will allow Laozi to regain his pills of longevity. The fire of the crucible is hot enough to burn beings of so much unspeakable power, they rival Buddha himself.
+
+However, when the cauldron is opened 49 days later, the Monkey King jumps out, having survived by hiding in a corner marked by the wind trigram, where there was less fire. In fact, the heat from the samadhi fires have reinforced his bodily frame, making him stronger than ever before and impervious to greater damage. The heat also gives him a new ability; the Monkey King can now recognize evil with his new huǒyǎn-jīnjīng (火眼金睛, lit. 'fiery eyes and golden pupils'). Sun Wukong then proceeds to destroy the crucible and makes his way to Heaven's main chamber to confront the Jade Emperor and his senior advisors."
+
+These eight trigrams are:
+    Heaven, Earth, Water, Fire, Wind, Thunder, Mountain and Lake.
+
+Order is:
+    Earth - Navigate obstacles and rocks
+    Mountain - Climb
+    Water - Timed Bead flows (50 Jade check)
+    Wind - Pits
+    Thunder - Lightning barriers
+    Fire - Fire turrets (Silver Ore check)
+    Lake - Lava pools
+    Heaven - NPC with "Iron Skin" reward
+
+Spiral clockwise starting in southwest ending in the center

@@ -25,9 +25,20 @@ export function showHint(state: GameState): void {
         } else {
             setScript(state, 'With this Chakram I should be able to climb out of this cave.');
         }
-    } else if (!state.hero.activeTools.bow) {
+    } else if (!state.savedState.objectFlags.momElder && !state.savedState.objectFlags.elderTomb) {
+        if (state.location.zoneKey !== 'waterfallCave') {
+            setScript(state, `I've been out for a long time, I should head home to the cave behind the waterfall.
+                {|}The waterfall is just north of the lake.`);
+        } else {
+            setScript(state, `I should tell my mom about what happened in the cave.
+                {|}I think I saw her by the pool at the entrance.`);
+        }
+    } else if (!state.savedState.objectFlags.elderTomb) {
         setScript(state, `I should talk to the Vanara Elder about my strange powers.
             {|}He lives in the woods to the southwest with the other Vanara. `);
+    } else  if (!state.hero.activeTools.bow) {
+        setScript(state, `The Vanara Elder said there was something I needed in his basement.
+            {|}He lived in the southwest tree in the forest.`);
     } else if (!state.hero.passiveTools.roll) {
         if (state.location.zoneKey !== 'tomb') {
             setScript(state, `The elder said I could learn more about my powers if I explore the Vanara Tomb.
@@ -42,6 +53,10 @@ export function showHint(state: GameState): void {
         } else {
             setScript(state, `I need to finish exploring this Tomb to learn about my powers.`);
         }
+    } else if (!state.savedState.objectFlags.momRuins && !flags.warTempleEntrance) {
+        setScript(state, `I should go ask my mom if she knows anything about what the Vanara Guardian
+            was talking about.
+            {|}He said she might know a way for me to "touch the spirit world".`);
     } else if (!flags.warTempleEntrance) {
         setScript(state, `There must be some way to open the Temple in the southeastern ruins.
             {|}Maybe my new spirit sight will show the way.`);
@@ -94,16 +109,21 @@ export function getMapTarget(state: GameState): {x: number, y: number} | null {
         return null;
     }
     const flags = state.savedState.objectFlags;
-    if (!state.hero.weapon) {
-        return null;
-    } else if (!state.hero.passiveTools.catEyes) {
-        return null;
+    if (!state.hero.weapon || !state.hero.passiveTools.catEyes) {
+        // Mark the Peach Cave until they have both the Chakram and Cat Eyes.
+        return {x: 96, y: 50};
+    } else if (!state.savedState.objectFlags.momElder && !state.savedState.objectFlags.elderTomb) {
+        // Talk to mom to get advice to see the Vanara Elder.
+        return {x: 76, y: 32};
     } else if (!state.hero.activeTools.bow) {
+        // Mark the Elder until the player picks up the bow.
         return {x: 24, y: 174};
-    } else if (!state.hero.passiveTools.roll) {
-        return {x: 16, y: 76};
     } else if (!state.hero.passiveTools.spiritSight) {
+        // Mark the Tomb until the player has spirit sight.
         return {x: 16, y: 76};
+    } else  if (!state.savedState.objectFlags.momRuins && !flags.warTempleEntrance) {
+        // Talk to mom to get advice to explore the Summoner Ruins.
+        return {x: 76, y: 32};
     } else if (!flags.warTempleEntrance) {
         return {x: 160, y: 170};
     } else if (!state.hero.passiveTools.gloves) {

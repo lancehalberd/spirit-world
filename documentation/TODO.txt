@@ -38,27 +38,11 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Add a world map function
-        - Start with the existing minimap, blow it up to the full screen ~200x200.
-        - Add it to select or some keyboard key, maybe an item in the menu?
+    = Fix depth sorting of waterfall
+        - Make 2 layers, both sprite sorted, one shorter and a bit further forward
+        - Make the bottom of each layer uneven
 
-    - Add 'only' visibility option to layers that hides everything else when selected.
-
-    - Pit inside mountain river should empty into the top waterfall in a seris of inside waterfalls in the waterfall cave
-        - Redesign waterfall cave to include more vertical elements, including terraces waterfalls that drain to the entrance
-
-    - Fix bead flow depth by using sprite ordering for the ordered part instead of foreground, use the y value based on where it hits the floor but only draw it start 16px up from that point so it gradually covers while moving behind it.
-
-    - Test all scripted events work
-        - NPC dialogs
-        - Rival right outcomes
-        - Elevator
-
-    - Add full buildings to Summoner ruins in Spirit World.
-        - Populate with War God Alcolytes and the Progenitor Spirit
-
-    - Add some additional requirement for completing crater to put the boss out of logic with few items.
-        - Switches that can only be hit with staff or clone throw + iron boots
+    - Add crucible to the end of the Grand Temple
 
     - Add `getLogicalZone` function that returns a logical zone for a given state location wich can differ from the actual zone key, use this for randomizer locations and dungeon item associations.
         - Move underwater areas into the same logical zone so that keys can be shared above and below water
@@ -68,6 +52,22 @@ Current tasks:
         - We could probably then use this for simplifying logic to determine what music to play.
         - Should probably also use this for Nimbus Cloud entrance behavior in some cases.
         - Make sure to update Hint location names to be more specific by using the logical zones instead.
+
+    - Add 'only' visibility option to layers that hides everything else when selected.
+
+    - Fix bead flow depth by using sprite ordering for the ordered part instead of foreground, use the y value based on where it hits the floor but only draw it start 16px up from that point so it gradually covers while moving behind it.
+
+    - Test all scripted events work
+        - NPC dialogs
+        - Rival right outcomes
+        - Elevator
+
+    - Add full buildings to Summoner ruins in Spirit World.
+        - Wait for new building tiles before doing this.
+        - Populate with War God Alcolytes and the Progenitor Spirit
+
+    - Add some additional requirement for completing crater to put the boss out of logic with few items.
+        - Switches that can only be hit with staff or clone throw + iron boots
 
     - Fix ledges so that:
         - Right now ledges block attacks anywhere in the tile rather than just when they are on the ledge, additionally only true values apply instead of both true+false values.
@@ -162,6 +162,15 @@ Current tasks:
         - Tree is a clone of the helix, but allowed to grow to completion this time.
 
     World Tree Boss Void Beast
+        - Fight takes place on most of a full super tile, but each section of the fight is on a smaller platform in the material world where the player damages the boss and avoids various attack mechanics.
+            - Maybe the battlefield is even taller than a regular super tile and the player must keep advancing tiers sort of like the final battle with the statues in ff6.
+            - Each tier could focus on a different pair of combat mechanics like staff + iron boots, and each travel section could focus on different movement mechanics
+        - After a certain amount of time/damage, the boss phases and requires the player reach another platform to damage it, which becomes more difficult as the phases progress, eventually requiring the player to use portals to the spirit realm to cross platforms provided by NPC helpers to reach the next platform.
+        - Elemental weak spots that must each be hit to briefly expose the main weak spot.
+            - Start with a single spot + 1 element, and advance to up to 5 across all 3 elements.
+            - Can arrange them differently to benefit different tools.
+        - Aided by Champion initially and then Vanara Rival during the last phase.
+
         Must rescue Champion and work together to defeat the boss
             - Mechanics where one of you creates an opening for the other to damage the boss.
             - Mechanics where you protect each other from boss attacks.

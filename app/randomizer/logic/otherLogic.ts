@@ -58,7 +58,11 @@ export const treeVillageNodes: LogicNode[] = [
     {
         zoneId: 'treeVillage',
         nodeId: 'southeastTree',
-        complexNpcs: [{dialogueKey: 'storageVanara', optionKey: 'peachReward'},],
+        complexNpcs: [{
+            dialogueKey: 'storageVanara',
+            optionKey: 'peachReward',
+            logic: {requiredFlags: ['clearedTreeVillageStorageRoom']},
+        }],
         entranceIds: [
             'southeastTreeEntrance',
             'vanaraStorageStairs',
@@ -112,14 +116,67 @@ export const treeVillageNodes: LogicNode[] = [
 export const waterfallCaveNodes: LogicNode[] = [
     {
         zoneId: 'waterfallCave',
-        nodeId: 'elderEntrance',
+        nodeId: 'waterfallCaveEntrance',
+        entranceIds: [
+            'waterfallCaveEntrance',
+            'waterfallCaveLeftMain', 'waterfallCaveRightMain',
+            'waterfallCaveLeft', 'waterfallCaveRight',
+            'waterfallCaveBackLeft', 'waterfallCaveBackRight',
+        ],
+        exits: [
+            { objectId: 'waterfallCaveEntrance' },
+            { objectId: 'waterfallCaveLeftMain' },
+            { objectId: 'waterfallCaveRightMain' },
+            { objectId: 'waterfallCaveBackLeft' },
+            { objectId: 'waterfallCaveBackRight' },
+            { objectId: 'waterfallCaveLeft' },
+            { objectId: 'waterfallCaveRight' },
+
+        ],
+    },
+    {
+        zoneId: 'waterfallCave',
+        nodeId: 'waterfallCaveBackLeft',
         checks: [
             { objectId: 'waterfallCaveBigMoney' },
             { objectId: 'waterfallCaveLittleMoney'} ,
         ],
-        entranceIds: ['waterfallCaveEntrance'],
-        exits: [{ objectId: 'waterfallCaveEntrance' }],
+        entranceIds: ['waterfallCaveBackLeft'],
+        exits: [{ objectId: 'waterfallCaveBackLeft' }],
     },
+    {
+        zoneId: 'waterfallCave',
+        nodeId: 'waterfallCaveBackRight',
+        entranceIds: ['waterfallCaveBackRight'],
+        exits: [{ objectId: 'waterfallCaveBackRight' }],
+    },
+    {
+        zoneId: 'waterfallCave',
+        nodeId: 'waterfallCaveLeft',
+        checks: [{ objectId: 'waterfallCaveEmptyChest' }],
+        entranceIds: ['waterfallCaveLeft'],
+        exits: [{ objectId: 'waterfallCaveLeft' }],
+    },
+    {
+        zoneId: 'waterfallCave',
+        nodeId: 'waterfallCaveRight',
+        checks: [{ objectId: 'waterfallCaveBiggerMoney' }],
+        entranceIds: ['waterfallCaveRight'],
+        exits: [{ objectId: 'waterfallCaveRight' }],
+    },
+    {
+        zoneId: 'waterfallCave',
+        nodeId: 'waterfallCaveMain',
+        entranceIds: ['waterfallCaveLeftMain', 'waterfallCaveRightMain'],
+        exits: [{ objectId: 'waterfallCaveLeftMain' }, { objectId: 'waterfallCaveRightMain' }],
+    },
+    {
+        zoneId: 'waterfallCave',
+        nodeId: 'waterfallCaveTop',
+        checks: [{ objectId: 'waterfallCavePeachPiece' }],
+        paths: [{ nodeId:'waterfallCaveEntrance' }],
+        entranceIds: ['waterfallCaveMarker'],
+    }
 ];
 
 // The flameBeast flag is set correctly during simulation, so this logic works as expected.
