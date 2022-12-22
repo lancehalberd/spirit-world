@@ -38,7 +38,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Add golem graphics.
     - Fix depth sorting of waterfall
         - Make 2 layers, both sprite sorted, one shorter and a bit further forward
         - Make the bottom of each layer uneven

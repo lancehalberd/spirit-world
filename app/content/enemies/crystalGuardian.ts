@@ -20,7 +20,7 @@ import { playSound } from 'app/musicController';
 
 import { Enemy, EnemyAbility, Frame, GameState, HitProperties, HitResult, Rect } from 'app/types';
 
-const maxShieldLife = 1;//8;
+const maxShieldLife = 6;
 
 type NearbyTargetType = ReturnType<typeof getVectorToNearbyTarget>;
 
