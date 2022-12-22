@@ -418,3 +418,26 @@ export const crystalBarrierVeryDamagedAnimation = createAnimation('gfx/effects/m
 
 export const crystalBarrierSmallParticles = createAnimation('gfx/effects/crystalwallparticles.png', {w: 8, h: 8}, { cols: 3}).frames;
 export const crystalBarrierLargeParticles = createAnimation('gfx/effects/crystalwallparticles2.png', {w: 16, h: 28}, { cols: 4}).frames;
+
+const crystalGuardianGeometry: FrameDimensions = { w: 40, h: 48, content: {x: 4, y: 16, w: 32, h: 32} };
+export const crystalGuardianIdleAnimation = createAnimation('gfx/enemies/golem.png', crystalGuardianGeometry,
+    { x: 0, cols: 1});
+export const crystalGuardianAttackAnimation = createAnimation('gfx/enemies/golem.png', crystalGuardianGeometry,
+    { x: 1, cols: 2}, {loop: false});
+export const crystalGuardianSpellAnimation = createAnimation('gfx/enemies/golem.png', crystalGuardianGeometry,
+    { x: 3, cols: 4}, {loopFrame: 1});
+export const crystalGuardianHurtAnimation = createAnimation('gfx/enemies/golem.png', crystalGuardianGeometry,
+    { x: 7, cols: 1}, {loop: false});
+export const crystalGuardianAnimations: ActorAnimations = {
+    idle: omniAnimation(crystalGuardianIdleAnimation),
+    hurt: omniAnimation(crystalGuardianHurtAnimation),
+    attack: omniAnimation(crystalGuardianAttackAnimation),
+    spell: omniAnimation(crystalGuardianSpellAnimation),
+    death: omniAnimation(crystalGuardianHurtAnimation),
+};
+/*
+//
+Frame 1 - this is the idle standing frame
+Frame 2-3 - this is the hammering frame. I imagine you should keep the golem on frame 3 for longer just to help show that the attack came from the hammer
+Frame 4-7 - this is the golem preparing and then casting a spell. Loop frames 5-7 for however long the casting is.
+Frame 8 - hurt frame*/

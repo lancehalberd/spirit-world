@@ -7,7 +7,7 @@ import {
 } from 'app/content/enemies';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import {
-    entAnimations,
+    crystalGuardianAnimations,
     crystalBarrierNormalAnimation,
     crystalBarrierDamagedAnimation,
     crystalBarrierVeryDamagedAnimation,
@@ -18,17 +18,68 @@ import { FRAME_LENGTH } from 'app/gameConstants';
 import { getFrame, drawFrameCenteredAt } from 'app/utils/animations';
 import { playSound } from 'app/musicController';
 
-import { Enemy, Frame, GameState, HitProperties, HitResult, Rect } from 'app/types';
+import { Enemy, EnemyAbility, Frame, GameState, HitProperties, HitResult, Rect } from 'app/types';
 
 const maxShieldLife = 8;
 
+type SpikeLineTargetType = ReturnType<typeof getVectorToNearbyTarget>;
+
+const spikeLineAbility: EnemyAbility<SpikeLineTargetType> = {
+    getTarget(this: void, state: GameState, enemy: Enemy): SpikeLineTargetType {
+        return getVectorToNearbyTarget(state, enemy, enemy.aggroRadius, enemy.area.allyTargets);
+    },
+    prepareAbility(this: void, state: GameState, enemy: Enemy, target: SpikeLineTargetType) {
+        enemy.changeToAnimation('attack');
+    },
+    useAbility(this: void, state: GameState, enemy: Enemy, target: SpikeLineTargetType): void {
+        addLineOfSpikes({
+            state, area: enemy.area,
+            source: [enemy.x + enemy.w / 2 + target.x * 8, enemy.y + enemy.h / 2 + target.y * 8],
+            target: [enemy.x + enemy.w / 2 + target.x * 32, enemy.y + enemy.h / 2 + target.y * 32],
+        });
+    },
+    cooldown: 5000,
+    initialCharges: 0,
+    charges: 1,
+    // During the prep time the bat will fly higher in the air.
+    prepTime: crystalGuardianAnimations.attack.down.duration,
+    // The bat will fall down during the recover time.
+    recoverTime: 1000,
+};
+
+const spikePodAbility: EnemyAbility<SpikeLineTargetType> = {
+    getTarget(this: void, state: GameState, enemy: Enemy): SpikeLineTargetType {
+        return getVectorToNearbyTarget(state, enemy, enemy.aggroRadius, enemy.area.allyTargets);
+    },
+    prepareAbility(this: void, state: GameState, enemy: Enemy, target: SpikeLineTargetType) {
+        enemy.changeToAnimation('attack');
+    },
+    useAbility(this: void, state: GameState, enemy: Enemy, target: SpikeLineTargetType): void {
+        addLineOfSpikes({
+            state, area: enemy.area,
+            source: [enemy.x + enemy.w / 2 + target.x * 8, enemy.y + enemy.h / 2 + target.y * 8],
+            target: [enemy.x + enemy.w / 2 + target.x * 32, enemy.y + enemy.h / 2 + target.y * 32],
+        });
+    },
+    cooldown: 5000,
+    initialCharges: 0,
+    charges: 1,
+    // During the prep time the bat will fly higher in the air.
+    prepTime: crystalGuardianAnimations.attack.down.duration,
+    // The bat will fall down during the recover time.
+    recoverTime: 1000,
+};
+
 enemyDefinitions.crystalGuardian = {
     alwaysReset: true,
+    abilities: [spikeLineAbility, spikePodAbility],
     params: {
         shieldLife: maxShieldLife,
         shieldInvulnerableTime: 0,
+        podCooldown: 0,
+        spikesCooldown: 4000,
     },
-    animations: entAnimations, aggroRadius: 128,
+    animations: crystalGuardianAnimations, aggroRadius: 128,
     life: 8, touchDamage: 2,
     canBeKnockedBack: false,
     // The damage from tile behaviors will trigger when the player attempts to move into the same pixel,
@@ -92,8 +143,18 @@ enemyDefinitions.crystalGuardian = {
         if (enemy.params.shieldInvulnerableTime  > 0) {
             enemy.params.shieldInvulnerableTime -= FRAME_LENGTH;
         }
+        if (enemy.params.podCooldown > 0) {
+            enemy.params.podCooldown -= FRAME_LENGTH;
+        }
+        if (enemy.params.spikesCooldown > 0) {
+            enemy.params.spikesCooldown -= FRAME_LENGTH;
+        }
+        if (enemy.currentAnimationKey === 'spell' && enemy.animationTime > 600) {
+            enemy.changeToAnimation('idle');
+        }
         // Summon a pod once very 2 seconds if a target is nearby.
         if (enemy.modeTime % 3000 === 0) {
+            enemy.changeToAnimation('spell');
             const v = getVectorToNearbyTarget(state, enemy, enemy.enemyDefinition.aggroRadius, enemy.area.allyTargets);
             if (v) {
                 const {x, y} = v;
@@ -103,16 +164,6 @@ enemyDefinitions.crystalGuardian = {
                     y: enemy.y + enemy.h / 2 + 72 * y,
                     damage: 2,
                 }));
-            }
-        }
-        if (enemy.modeTime % 5000 === 0) {
-            const v = getVectorToNearbyTarget(state, enemy, enemy.enemyDefinition.aggroRadius, enemy.area.allyTargets);
-            if (v) {
-                addLineOfSpikes({
-                    state, area: enemy.area,
-                    source: [enemy.x + enemy.w / 2 + v.x * 8, enemy.y + enemy.h / 2 + v.y * 8],
-                    target: [enemy.x + enemy.w / 2 + v.x * 32, enemy.y + enemy.h / 2 + v.y * 32],
-                });
             }
         }
     },

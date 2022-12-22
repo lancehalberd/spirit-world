@@ -38,9 +38,11 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    = Fix depth sorting of waterfall
+    - Add golem graphics.
+    - Fix depth sorting of waterfall
         - Make 2 layers, both sprite sorted, one shorter and a bit further forward
         - Make the bottom of each layer uneven
+        - Add tiles to allow jumping down the waterfalls in the overworld.
 
     - Add crucible to the end of the Grand Temple
 
