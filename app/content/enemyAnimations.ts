@@ -421,13 +421,13 @@ export const crystalBarrierLargeParticles = createAnimation('gfx/effects/crystal
 
 const crystalGuardianGeometry: FrameDimensions = { w: 40, h: 48, content: {x: 4, y: 16, w: 32, h: 32} };
 export const crystalGuardianIdleAnimation = createAnimation('gfx/enemies/golem.png', crystalGuardianGeometry,
-    { x: 0, cols: 1});
+    { x: 0, cols: 1, duration: 10});
 export const crystalGuardianAttackAnimation = createAnimation('gfx/enemies/golem.png', crystalGuardianGeometry,
-    { x: 1, cols: 2}, {loop: false});
+    { x: 1, cols: 2, duration: 10, frameMap: [0, 0, 1]}, {loop: false});
 export const crystalGuardianSpellAnimation = createAnimation('gfx/enemies/golem.png', crystalGuardianGeometry,
-    { x: 3, cols: 4}, {loopFrame: 1});
+    { x: 3, cols: 4, duration: 10}, {loopFrame: 1});
 export const crystalGuardianHurtAnimation = createAnimation('gfx/enemies/golem.png', crystalGuardianGeometry,
-    { x: 7, cols: 1}, {loop: false});
+    { x: 7, cols: 1, duration: 10}, {loop: false});
 export const crystalGuardianAnimations: ActorAnimations = {
     idle: omniAnimation(crystalGuardianIdleAnimation),
     hurt: omniAnimation(crystalGuardianHurtAnimation),

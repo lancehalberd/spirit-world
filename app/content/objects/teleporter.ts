@@ -86,7 +86,7 @@ export class Teleporter implements ObjectInstance {
             }
             return;
         }
-        if (!state.hero.passiveTools.spiritSight) {
+        if (!(this.definition.targetZone && this.definition.targetZone) && !state.hero.passiveTools.spiritSight) {
             return;
         }
         if (this.isUnderObject(state)) {
@@ -142,9 +142,6 @@ export class Teleporter implements ObjectInstance {
         if (this.isUnderObject(state) && !editingState.isEditing) {
             return;
         }
-        if (!state.hero.passiveTools.spiritSight) {
-            return;
-        }
         if (!this.definition.targetZone || !this.definition.targetObjectId) {
             return;
         }
@@ -164,24 +161,24 @@ export class Teleporter implements ObjectInstance {
         if (this.isUnderObject(state) && !editingState.isEditing) {
             return;
         }
+        if (this.definition.targetZone && this.definition.targetObjectId) {
+            return;
+        }
         if (!state.hero.passiveTools.spiritSight) {
             return;
         }
-        if (!this.definition.targetZone || !this.definition.targetObjectId) {
-            const hitbox = this.getRenderBox(state);
-            updateSpiritCanvas(state, hitbox);
-            context.drawImage(spiritCanvas,
-                0, 0, hitbox.w, hitbox.h,
-                hitbox.x, hitbox.y, hitbox.w, hitbox.h
-            );
+        const hitbox = this.getRenderBox(state);
+        updateSpiritCanvas(state, hitbox);
+        context.drawImage(spiritCanvas,
+            0, 0, hitbox.w, hitbox.h,
+            hitbox.x, hitbox.y, hitbox.w, hitbox.h
+        );
 
-            context.save();
-            context.globalAlpha *= 0.7;
-                const frame = getFrame(floorAnimation, this.animationTime);
-                drawFrame(context, frame, {...frame, x: this.x, y: this.y - 16});
-            context.restore();
-            return;
-        }
+        context.save();
+        context.globalAlpha *= 0.7;
+            const frame = getFrame(floorAnimation, this.animationTime);
+            drawFrame(context, frame, {...frame, x: this.x, y: this.y - 16});
+        context.restore();
     }
 }
 

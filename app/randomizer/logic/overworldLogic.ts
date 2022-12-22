@@ -19,7 +19,7 @@ export const mainOverworldNode: LogicNode = {
         { nodeId: 'overworldMountain', logic: hasGloves },
         { nodeId: 'forestArea' },
         { nodeId: 'warTempleArea' },
-        { nodeId: 'mainSpiritWorld', logic: orLogic(hasSomersault, hasTeleportation) },
+        { nodeId: 'mainSpiritWorld', logic: andLogic(hasSpiritSight, orLogic(hasSomersault, hasTeleportation)) },
         { nodeId: 'nimbusCloud', logic: hasNimbusCloud},
         { nodeId: 'overworldLakeTunnel', logic: orLogic(hasGloves, hasTeleportation) },
         // This represents moving the tower to the forest position and using cloud boots to
@@ -173,6 +173,7 @@ export const overworldNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'overworldLakePiece',
+        paths: [{nodeId: 'mainSpiritWorld', logic: hasSpiritSight}],
         checks: [
             { objectId: 'overworldLakePiece' },
         ],
@@ -184,9 +185,10 @@ export const overworldNodes: LogicNode[] = [
             { objectId: 'spiritChakram' },
         ],
         paths: [
+            { nodeId: 'overworldMain', logic: hasSpiritSight },
             { nodeId: 'spiritWorldMountain', logic: hasGloves },
             { nodeId: 'westSpiritWorld', logic: hasCloudBoots },
-            { nodeId: 'overworldLakePiece' },
+            { nodeId: 'overworldLakePiece', logic: hasSpiritSight },
             { nodeId: 'nimbusCloudSpirit', logic: hasNimbusCloud},
             { nodeId: 'warTempleSpiritArea', logic: hasMitts },
         ],
@@ -205,6 +207,7 @@ export const overworldNodes: LogicNode[] = [
             { objectId: 'spiritShopLightningBlessing' },
         ],
         paths: [
+            { nodeId: 'overworldMain', logic: hasSpiritSight },
             { nodeId: 'mainSpiritWorld', logic: hasCloudBoots },
             { nodeId: 'nimbusCloudSpirit', logic: hasNimbusCloud},
         ],

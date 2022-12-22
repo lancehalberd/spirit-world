@@ -20,18 +20,18 @@ import { playSound } from 'app/musicController';
 
 import { Enemy, EnemyAbility, Frame, GameState, HitProperties, HitResult, Rect } from 'app/types';
 
-const maxShieldLife = 8;
+const maxShieldLife = 1;//8;
 
-type SpikeLineTargetType = ReturnType<typeof getVectorToNearbyTarget>;
+type NearbyTargetType = ReturnType<typeof getVectorToNearbyTarget>;
 
-const spikeLineAbility: EnemyAbility<SpikeLineTargetType> = {
-    getTarget(this: void, state: GameState, enemy: Enemy): SpikeLineTargetType {
+const spikeLineAbility: EnemyAbility<NearbyTargetType> = {
+    getTarget(this: void, state: GameState, enemy: Enemy): NearbyTargetType {
         return getVectorToNearbyTarget(state, enemy, enemy.aggroRadius, enemy.area.allyTargets);
     },
-    prepareAbility(this: void, state: GameState, enemy: Enemy, target: SpikeLineTargetType) {
+    prepareAbility(this: void, state: GameState, enemy: Enemy, target: NearbyTargetType) {
         enemy.changeToAnimation('attack');
     },
-    useAbility(this: void, state: GameState, enemy: Enemy, target: SpikeLineTargetType): void {
+    useAbility(this: void, state: GameState, enemy: Enemy, target: NearbyTargetType): void {
         addLineOfSpikes({
             state, area: enemy.area,
             source: [enemy.x + enemy.w / 2 + target.x * 8, enemy.y + enemy.h / 2 + target.y * 8],
@@ -41,32 +41,30 @@ const spikeLineAbility: EnemyAbility<SpikeLineTargetType> = {
     cooldown: 5000,
     initialCharges: 0,
     charges: 1,
-    // During the prep time the bat will fly higher in the air.
-    prepTime: crystalGuardianAnimations.attack.down.duration,
-    // The bat will fall down during the recover time.
-    recoverTime: 1000,
+    prepTime: crystalGuardianAnimations.attack.down.duration - 200,
+    recoverTime: 400,
 };
 
-const spikePodAbility: EnemyAbility<SpikeLineTargetType> = {
-    getTarget(this: void, state: GameState, enemy: Enemy): SpikeLineTargetType {
+const spikePodAbility: EnemyAbility<NearbyTargetType> = {
+    getTarget(this: void, state: GameState, enemy: Enemy): NearbyTargetType {
         return getVectorToNearbyTarget(state, enemy, enemy.aggroRadius, enemy.area.allyTargets);
     },
-    prepareAbility(this: void, state: GameState, enemy: Enemy, target: SpikeLineTargetType) {
-        enemy.changeToAnimation('attack');
+    prepareAbility(this: void, state: GameState, enemy: Enemy, target: NearbyTargetType) {
+        enemy.changeToAnimation('spell');
     },
-    useAbility(this: void, state: GameState, enemy: Enemy, target: SpikeLineTargetType): void {
-        addLineOfSpikes({
-            state, area: enemy.area,
-            source: [enemy.x + enemy.w / 2 + target.x * 8, enemy.y + enemy.h / 2 + target.y * 8],
-            target: [enemy.x + enemy.w / 2 + target.x * 32, enemy.y + enemy.h / 2 + target.y * 32],
-        });
+    useAbility(this: void, state: GameState, enemy: Enemy, target: NearbyTargetType): void {
+        const {x, y} = target;
+        // This should spawn in a fixed radius around the guardian in between it and the target.
+        addEffectToArea(state, enemy.area, new SpikePod({
+            x: enemy.x + enemy.w / 2 + 72 * x,
+            y: enemy.y + enemy.h / 2 + 72 * y,
+            damage: 2,
+        }));
     },
-    cooldown: 5000,
-    initialCharges: 0,
+    cooldown: 3000,
+    initialCharges: 1,
     charges: 1,
-    // During the prep time the bat will fly higher in the air.
-    prepTime: crystalGuardianAnimations.attack.down.duration,
-    // The bat will fall down during the recover time.
+    prepTime: 200,
     recoverTime: 1000,
 };
 
@@ -76,8 +74,6 @@ enemyDefinitions.crystalGuardian = {
     params: {
         shieldLife: maxShieldLife,
         shieldInvulnerableTime: 0,
-        podCooldown: 0,
-        spikesCooldown: 4000,
     },
     animations: crystalGuardianAnimations, aggroRadius: 128,
     life: 8, touchDamage: 2,
@@ -143,27 +139,14 @@ enemyDefinitions.crystalGuardian = {
         if (enemy.params.shieldInvulnerableTime  > 0) {
             enemy.params.shieldInvulnerableTime -= FRAME_LENGTH;
         }
-        if (enemy.params.podCooldown > 0) {
-            enemy.params.podCooldown -= FRAME_LENGTH;
-        }
-        if (enemy.params.spikesCooldown > 0) {
-            enemy.params.spikesCooldown -= FRAME_LENGTH;
-        }
-        if (enemy.currentAnimationKey === 'spell' && enemy.animationTime > 600) {
-            enemy.changeToAnimation('idle');
-        }
-        // Summon a pod once very 2 seconds if a target is nearby.
-        if (enemy.modeTime % 3000 === 0) {
-            enemy.changeToAnimation('spell');
-            const v = getVectorToNearbyTarget(state, enemy, enemy.enemyDefinition.aggroRadius, enemy.area.allyTargets);
-            if (v) {
-                const {x, y} = v;
-                // This should spawn in a fixed radius around the guardian in between it and the target.
-                addEffectToArea(state, enemy.area, new SpikePod({
-                    x: enemy.x + enemy.w / 2 + 72 * x,
-                    y: enemy.y + enemy.h / 2 + 72 * y,
-                    damage: 2,
-                }));
+        if (!enemy.activeAbility) {
+            if (enemy.invulnerableFrames > 0) {
+                enemy.changeToAnimation('hurt');
+            } else {
+                enemy.changeToAnimation('idle');
+            }
+            if (enemy.enemyInvulnerableFrames <= 0) {
+                enemy.useRandomAbility(state);
             }
         }
     },
