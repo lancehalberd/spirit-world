@@ -26,6 +26,7 @@ import { Sign } from 'app/content/objects/sign';
 import { Teleporter } from 'app/content/objects/teleporter';
 import { Torch } from 'app/content/objects/torch';
 import { VineSprout } from 'app/content/objects/vineSprout';
+import { Waterfall } from 'app/content/objects/waterfall';
 import { WaterPot } from 'app/content/objects/waterPot';
 import { playSound } from 'app/musicController';
 
@@ -50,7 +51,9 @@ export function createObjectInstance(state: GameState, object: ObjectDefinition)
         return new BeadCascade(state, object);
     } else  if (object.type === 'decoration') {
         return new Decoration(object);
-    } else if (object.type === 'enemy' || object.type === 'boss') {
+    } else  if (object.type === 'waterfall') {
+        return new Waterfall(object);
+    }  else if (object.type === 'enemy' || object.type === 'boss') {
         return new Enemy(state, object);
     } else if (object.type === 'loot') {
         return new LootObject(state, object);

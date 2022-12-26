@@ -5,7 +5,7 @@ import { AreaDefinition } from 'app/types';
 const f0_0x0: AreaDefinition = {
     layers: null,
     objects: [
-        {status: "normal", id: "waterfallTower:0:0x0-decoration-0", x: 0, y: 512, type: "decoration", w: 512, h: 512, decorationType: "waterfall"},
+        {status: "normal", id: "waterfallTower:0:0x0-decoration-0", x: 0, y: 512, type: "waterfall", w: 512, h: 512},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -14,7 +14,7 @@ const f0_0x0: AreaDefinition = {
 const f0_1x0: AreaDefinition = {
     layers: null,
     objects: [
-        {status: "normal", id: "waterfallTower:0:0x0-decoration-0", x: 0, y: 512, type: "decoration", w: 512, h: 512, decorationType: "waterfall"},
+        {status: "normal", id: "waterfallTower:0:0x0-decoration-0", x: 0, y: 512, type: "waterfall", w: 512, h: 512},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -601,7 +601,7 @@ const sf0_1x0: AreaDefinition = {
 const f1_0x0: AreaDefinition = {
     layers: null,
     objects: [
-        {status: "normal", id: "waterfallTower:0:0x0-decoration-0", x: 0, y: 512, type: "decoration", w: 512, h: 512, decorationType: "waterfall"},
+        {status: "normal", id: "waterfallTower:0:0x0-decoration-0", x: 0, y: 512, type: "waterfall", w: 512, h: 512},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16},
@@ -611,7 +611,7 @@ const f1_0x0: AreaDefinition = {
 const f1_1x0: AreaDefinition = {
     layers: null,
     objects: [
-        {status: "normal", id: "waterfallTower:0:0x0-decoration-0", x: 0, y: 512, type: "decoration", w: 512, h: 512, decorationType: "waterfall"},
+        {status: "normal", id: "waterfallTower:0:0x0-decoration-0", x: 0, y: 512, type: "waterfall", w: 512, h: 512},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16},

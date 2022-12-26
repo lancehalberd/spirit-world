@@ -402,9 +402,15 @@ export interface SimpleObjectDefinition extends BaseObjectDefinition {
 }
 
 export interface DecorationDefinition extends BaseObjectDefinition {
-    type: 'decoration',
-    decorationType: DecorationType,
-    drawPriority?: DrawPriority,
+    type: 'decoration'
+    decorationType: DecorationType
+    drawPriority?: DrawPriority
+    w: number,
+    h: number,
+}
+
+export interface WaterfallDefinition extends BaseObjectDefinition {
+    type: 'waterfall'
     w: number,
     h: number,
 }
@@ -455,6 +461,7 @@ export type ObjectDefinition = SimpleObjectDefinition
     | NPCDefinition
     | SignDefinition
     | TurretDefinition
+    | WaterfallDefinition
     ;
 
 export type ObjectType = ObjectDefinition['type'];

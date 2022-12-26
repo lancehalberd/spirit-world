@@ -17,16 +17,14 @@ Known Bugs:
     - Held rocks/bushes are invisible while using cloak
     - Piercing projectiles that can push things should be stopped by the first object they push
         or not be able to push additional objects, for example, the charged chakram.
-    - Astral Projection appears in front of waterfall graphics only when south of main body in waterfall tower.
     - Pushing on a solid object sitting on thorny ground shouldn't hurt you:
         -return tileBehaviors and objectBehaviors separately, only damage if tile is solid+damaging.
-    - nextAreaInstance is not rendered in Safari
-    - Enemies with small hitboxes are checking pixels outside of their hitbox while moving.
-        - For example snakes when moving left/right will be forced to move up if there is a wall to their south.
-    - Can get to undefined area in city by sinking in the water.
     - Cliff Edge issues:
         - Would be nice if staff could go across edges.
-        - Bow/chakram can fire up thin cliffs from the north.
+        - Sometimes bow/chakram get stopped when firing down cliff edges
+            - This is because these tiles are not marked low.
+            - Marking these tiles as low would allow shooting up them as they don't have actual cliff ledges
+            - Marking these tiles as cliff ledges will probably allow jumping down them in some cases which will need to be fixed.
     - Shadow renders behind door tops when jumping down ledges.
 
 Graphics:
@@ -38,10 +36,8 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Fix depth sorting of waterfall
-        - Make 2 layers, both sprite sorted, one shorter and a bit further forward
-        - Make the bottom of each layer uneven
-        - Add tiles to allow jumping down the waterfalls in the overworld.
+    - nextAreaInstance is not rendered in Safari
+    - Add tiles to allow jumping down the waterfalls in the overworld.
 
     - Add crucible to the end of the Grand Temple
 

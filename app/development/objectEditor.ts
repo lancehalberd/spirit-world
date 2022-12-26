@@ -222,7 +222,7 @@ export const combinedObjectTypes: ObjectType[] = [
     'anode', 'cathode', 'airBubbles', 'ballGoal', 'beadCascade', 'beadGrate', 'bigChest', 'chest', 'crystalSwitch', 'decoration',
     'door', 'escalator', 'floorSwitch', 'keyBlock', 'loot','marker', 'narration', 'npc', 'pitEntrance',
     'pushPull', 'rollingBall', 'saveStatue', 'shopItem', 'sign', 'spawnMarker', 'teleporter', 'tippable', 'torch', 'turret',
-    'vineSprout', 'waterPot',
+    'vineSprout', 'waterfall', 'waterPot',
 ];
 
 export function createObjectDefinition(
@@ -335,6 +335,13 @@ export function createObjectDefinition(
                 w: definition.w || 16,
                 h: definition.h || 16,
                 decorationType: definition.decorationType || Object.keys(decorationTypes)[0] as DecorationType,
+            };
+        case 'waterfall':
+            return {
+                ...commonProps,
+                type: definition.type,
+                w: definition.w || 16,
+                h: definition.h || 16,
             };
         case 'enemy': {
             const enemyType = definition.enemyType;
@@ -716,6 +723,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                     updateObjectInstance(state, object);
                 },
             });
+        case 'waterfall':
             rows.push({
                 name: 'w',
                 value: object.w,
@@ -1252,7 +1260,7 @@ export function onMouseDownSelect(state: GameState, editingState: EditingState, 
 }
 
 export function fixObjectPosition(state: GameState, object: ObjectDefinition): void {
-    if (object.type === 'escalator' || object.type === 'decoration') {
+    if (object.type === 'escalator' || object.type === 'decoration' || object.type === 'waterfall') {
         //object.x = Math.round(object.x / 8) * 8;
         //object.y = Math.round(object.y / 8) * 8;
         return;
