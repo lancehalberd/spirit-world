@@ -36,8 +36,12 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Add new shield graphics for crystal guardian.
+
+    - Fix bead flow depth by using sprite ordering for the ordered part instead of foreground, use the y value based on where it hits the floor but only draw it start 16px up from that point so it gradually covers while moving behind it.
+
     - nextAreaInstance is not rendered in Safari
-    - Add tiles to allow jumping down the waterfalls in the overworld.
+        - Fix this from Hillary's machine
 
     - Add crucible to the end of the Grand Temple
 
@@ -51,13 +55,6 @@ Current tasks:
         - Make sure to update Hint location names to be more specific by using the logical zones instead.
 
     - Add 'only' visibility option to layers that hides everything else when selected.
-
-    - Fix bead flow depth by using sprite ordering for the ordered part instead of foreground, use the y value based on where it hits the floor but only draw it start 16px up from that point so it gradually covers while moving behind it.
-
-    - Test all scripted events work
-        - NPC dialogs
-        - Rival right outcomes
-        - Elevator
 
     - Add full buildings to Summoner ruins in Spirit World.
         - Wait for new building tiles before doing this.
