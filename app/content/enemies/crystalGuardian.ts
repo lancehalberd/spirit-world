@@ -8,14 +8,15 @@ import {
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import {
     crystalGuardianAnimations,
-    crystalBarrierNormalAnimation,
-    crystalBarrierDamagedAnimation,
-    crystalBarrierVeryDamagedAnimation,
+    // smallCrystalBarrierFlashFrame,
+    smallCrystalBarrierNormalFrame,
+    smallCrystalBarrierDamagedFrame,
+    smallCrystalBarrierVeryDamagedFrame,
     crystalBarrierSmallParticles,
     crystalBarrierLargeParticles,
 } from 'app/content/enemyAnimations';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { getFrame, drawFrameCenteredAt } from 'app/utils/animations';
+import { drawFrameCenteredAt } from 'app/utils/animations';
 import { playSound } from 'app/musicController';
 
 import { Enemy, EnemyAbility, Frame, GameState, HitProperties, HitResult, Rect } from 'app/types';
@@ -85,7 +86,7 @@ enemyDefinitions.crystalGuardian = {
     getHitbox(enemy: Enemy): Rect {
         const hitbox = enemy.getDefaultHitbox();
         if (enemy.params.shieldLife) {
-            const frame = crystalBarrierNormalAnimation.frames[0];
+            const frame = smallCrystalBarrierNormalFrame;
             const w = (frame.content?.w ?? frame.w) * enemy.scale;
             const h = (frame.content?.h ?? frame.h) * enemy.scale;
             return {
@@ -157,11 +158,11 @@ enemyDefinitions.crystalGuardian = {
         }
         let frame: Frame;
         if (enemy.params.shieldLife === maxShieldLife) {
-            frame = getFrame(crystalBarrierNormalAnimation, enemy.animationTime);
+            frame = smallCrystalBarrierNormalFrame;
         } else if (enemy.params.shieldLife > maxShieldLife / 3) {
-            frame = getFrame(crystalBarrierDamagedAnimation, enemy.animationTime);
+            frame = smallCrystalBarrierDamagedFrame;
         } else {
-            frame = getFrame(crystalBarrierVeryDamagedAnimation, enemy.animationTime);
+            frame = smallCrystalBarrierVeryDamagedFrame;
         }
         const hitbox = enemy.getHitbox(state);
         drawFrameCenteredAt(context, frame, hitbox);

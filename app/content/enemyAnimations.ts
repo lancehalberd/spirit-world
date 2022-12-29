@@ -416,6 +416,14 @@ export const crystalBarrierNormalAnimation = createAnimation('gfx/effects/monste
 export const crystalBarrierDamagedAnimation = createAnimation('gfx/effects/monstershield.png', crystalBarrierGeometry, { x: 4, cols: 1, duration: 5});
 export const crystalBarrierVeryDamagedAnimation = createAnimation('gfx/effects/monstershield.png', crystalBarrierGeometry, { x: 5, cols: 1, duration: 5});
 
+const smallCrystalBarrierGeometry: FrameDimensions = { w: 68, h: 72, content: {x: 2, y: 20, w: 64, h: 44} };
+export const [
+    smallCrystalBarrierFlashFrame,
+    smallCrystalBarrierNormalFrame,
+    smallCrystalBarrierDamagedFrame,
+    smallCrystalBarrierVeryDamagedFrame,
+] = createAnimation('gfx/effects/golemshield.png', smallCrystalBarrierGeometry, { x: 0, cols: 4}).frames;
+
 export const crystalBarrierSmallParticles = createAnimation('gfx/effects/crystalwallparticles.png', {w: 8, h: 8}, { cols: 3}).frames;
 export const crystalBarrierLargeParticles = createAnimation('gfx/effects/crystalwallparticles2.png', {w: 16, h: 28}, { cols: 4}).frames;
 
