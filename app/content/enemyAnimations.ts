@@ -13,7 +13,6 @@ const bossDeathExplosionGeometry: FrameDimensions = {w: 28, h: 28};
 export const bossDeathExplosionAnimation: FrameAnimation
     = createAnimation('gfx/effects/powersource_explosion.png', bossDeathExplosionGeometry, { cols: 9, duration: 4}, { loop: false });
 
-
 const snakeGeometry: FrameDimensions = { w: 18, h: 18, content: { x: 2, y: 6, w: 14, h: 11} };
 const leftSnakeAnimation: FrameAnimation = createAnimation('gfx/enemies/snek.png', snakeGeometry, { x: 0});
 const downSnakeAnimation: FrameAnimation = createAnimation('gfx/enemies/snek.png', snakeGeometry, { x: 1});
@@ -386,3 +385,76 @@ export const crystalBarrierVeryDamagedAnimation = createAnimation('gfx/effects/m
 
 export const crystalBarrierSmallParticles = createAnimation('gfx/effects/crystalwallparticles.png', {w: 8, h: 8}, { cols: 3}).frames;
 export const crystalBarrierLargeParticles = createAnimation('gfx/effects/crystalwallparticles2.png', {w: 16, h: 28}, { cols: 4}).frames;
+
+/* RIVAL */
+// image layout
+// row 0: still; row 1: walk-down;
+// row 2: walk-right; row 3: walk-up;
+// row 4: walk-left; row 5: roll-down;
+// row 6: roll-right; row 7: roll-up;
+// row 8: roll-left; row 9: attack-down;
+// row 10: attack-right; row 11: attack-up;
+// row 12: attack-left; row 13: staff-down;
+// row 14: staff-right; row 15: staff-up;
+// row 16: staff-left; row 17: kneel;
+const rivalGeometry: FrameDimensions = { w: 30, h: 28, content: { x: 11, y: 10, w: 18, h: 18} };
+const rivalImg = 'gfx/enemies/rival.png';
+
+// rival animations
+const rivalStillDownAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 0, y: 0, cols: 1});
+const rivalStillRightAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 1, y: 0, cols: 1});
+const rivalStillUpAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 2, y: 0, cols: 1});
+const rivalStillLeftAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 3, y: 0, cols: 1});
+
+const rivalWalkDownAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 0, y: 1, cols: 8});
+const rivalWalkRightAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 0, y: 2, cols: 8});
+const rivalWalkUpAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 0, y: 3, cols: 8});
+const rivalWalkLeftAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 0, y: 4, cols: 8});
+
+const rivalRollDownAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 4, x: 1, y: 5, duration: 4}, {loop: false});
+const rivalRollRightAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 4, x: 1, y: 6, duration: 4}, {loop: false});
+const rivalRollUpAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 4, x: 1, y: 7, duration: 4}, {loop: false});
+const rivalRollLeftAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 4, x: 1, y: 8, duration: 4}, {loop: false});
+
+const rivalAttackDownAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 0, y: 9, cols: 5});
+const rivalAttackRightAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 0, y: 10, cols: 5});
+const rivalAttackUpAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 0, y: 11, cols: 5});
+const rivalAttackLeftAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 0, y: 12, cols: 5});
+
+const rivalKneelDownAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 0, y: 17, cols: 1});
+const rivalKneelRightAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 1, y: 17, cols: 1});
+const rivalKneelUpAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 2, y: 17, cols: 1});
+const rivalKneelLeftAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 3, y: 17, cols: 1});
+
+export const rivalAnimations: ActorAnimations = {
+    idle: {
+        down: rivalStillDownAnimation,
+        right: rivalStillRightAnimation,
+        up: rivalStillUpAnimation,
+        left: rivalStillLeftAnimation,
+    },
+    move: {
+        down: rivalWalkDownAnimation,
+        right: rivalWalkRightAnimation,
+        up: rivalWalkUpAnimation,
+        left: rivalWalkLeftAnimation,
+    },
+    roll: {
+        down: rivalRollDownAnimation,
+        right: rivalRollRightAnimation,
+        up: rivalRollUpAnimation,
+        left: rivalRollLeftAnimation,
+    },
+    attack: {
+        down: rivalAttackDownAnimation,
+        right: rivalAttackRightAnimation,
+        up: rivalAttackUpAnimation,
+        left: rivalAttackLeftAnimation,
+    },
+    kneel: {
+        down: rivalKneelDownAnimation,
+        right: rivalKneelRightAnimation,
+        up: rivalKneelUpAnimation,
+        left: rivalKneelLeftAnimation,
+    },
+};

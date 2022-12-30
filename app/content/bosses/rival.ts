@@ -8,7 +8,7 @@ import {
 import { CrystalSpike } from 'app/content/effects/arrow';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { vanaraBlackAnimations } from 'app/render/npcAnimations';
+import { rivalAnimations } from 'app/content/enemyAnimations';
 import { heroAnimations, staffAnimations } from 'app/render/heroAnimations';
 import { appendScript, removeTextCue } from 'app/scriptEvents';
 import { saveGame } from 'app/state';
@@ -20,10 +20,8 @@ import {
     Direction, Enemy, EnemyAbility, GameState, HitProperties, HitResult, Point, Rect
 } from 'app/types';
 
-const rivalAnimations = {
-    ...vanaraBlackAnimations,
-    kneel: heroAnimations.kneel,
-    roll: heroAnimations.roll,
+const rivalMergedAnimations = {
+    ...rivalAnimations,
     staffJump: heroAnimations.staffJump,
     staffSlam: heroAnimations.staffSlam,
 }
@@ -139,8 +137,8 @@ const staffAbility: EnemyAbility<Direction> = {
     cancelsOtherAbilities: true,
     cannotBeCanceled: true,
     cooldown: 4000,
-    prepTime: rivalAnimations.staffJump.down.duration,
-    recoverTime: rivalAnimations.staffSlam.down.duration + 500,
+    prepTime: rivalMergedAnimations.staffJump.down.duration,
+    recoverTime: rivalMergedAnimations.staffSlam.down.duration + 500,
 };
 
 // This is hardcoded for the area outside of the tomb.
@@ -172,7 +170,7 @@ function getTargetLocation(state: GameState, enemy: Enemy): Point {
 
 enemyDefinitions.rival = {
     // This should match the NPC style of the Rival.
-    animations: rivalAnimations,
+    animations: rivalMergedAnimations,
     abilities: [rollAbility, staffAbility, throwAbility],
     taunts: {
         throw: { text: 'Get out of here!', priority: 1},
