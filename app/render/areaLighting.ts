@@ -1,7 +1,7 @@
 import { getObjectBehaviors } from 'app/content/objects';
 import { Clone } from 'app/content/objects/clone';
 import { editingState } from 'app/development/tileEditor';
-import { createCanvasAndContext } from 'app/dom';
+import { createCanvasAndContext, drawCanvas } from 'app/dom';
 import {
     CANVAS_HEIGHT, CANVAS_WIDTH, FRAME_LENGTH,
 } from 'app/gameConstants';
@@ -161,20 +161,34 @@ export function renderAreaLighting(context: CanvasRenderingContext2D, state: Gam
     // Next add lighting effects from the background.
     lightingContext.globalCompositeOperation = 'destination-out';
     if (area?.lightingCanvas) {
-        lightingContext.drawImage(area.lightingCanvas,
-            Math.floor((state.camera.x - area.cameraOffset.x) / lightingGranularity),
-            Math.floor((state.camera.y - area.cameraOffset.y) / lightingGranularity),
-            lightingCanvas.width, lightingCanvas.height,
-            0, 0, lightingCanvas.width, lightingCanvas.height,
-        );
+        const source = {
+            x: Math.floor((state.camera.x - area.cameraOffset.x) / lightingGranularity),
+            y: Math.floor((state.camera.y - area.cameraOffset.y) / lightingGranularity),
+            w: lightingCanvas.width,
+            h: lightingCanvas.height,
+        }
+        const target = {
+            x: 0,
+            y: 0,
+            w: lightingCanvas.width,
+            h: lightingCanvas.height,
+        }
+        drawCanvas(context, area.lightingCanvas, source, target);
     }
     if (nextArea?.lightingCanvas) {
-        lightingContext.drawImage(nextArea.lightingCanvas,
-            Math.floor((state.camera.x - nextArea.cameraOffset.x) / lightingGranularity),
-            Math.floor((state.camera.y - nextArea.cameraOffset.y) / lightingGranularity),
-            lightingCanvas.width, lightingCanvas.height,
-            0, 0, lightingCanvas.width, lightingCanvas.height,
-        );
+        const source = {
+            x: Math.floor((state.camera.x - nextArea.cameraOffset.x) / lightingGranularity),
+            y: Math.floor((state.camera.y - nextArea.cameraOffset.y) / lightingGranularity),
+            w: lightingCanvas.width,
+            h: lightingCanvas.height,
+        }
+        const target = {
+            x: 0,
+            y: 0,
+            w: lightingCanvas.width,
+            h: lightingCanvas.height,
+        }
+        drawCanvas(context, nextArea.lightingCanvas, source, target);
     }
     // Next add light from the player's light radius.
     const hero = state.hero;

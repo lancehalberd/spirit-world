@@ -1,6 +1,6 @@
 import { Clone } from 'app/content/objects/clone';
 import { editingState, renderEditor } from 'app/development/tileEditor';
-import { createCanvasAndContext, mainContext } from 'app/dom';
+import { createCanvasAndContext, drawCanvas, mainContext } from 'app/dom';
 import {
     CANVAS_HEIGHT, CANVAS_WIDTH, MAX_SPIRIT_RADIUS,
     FADE_IN_DURATION, FADE_OUT_DURATION,
@@ -571,11 +571,19 @@ export function renderAreaBackground(context: CanvasRenderingContext2D, state: G
     }
     context.save();
         translateContextForAreaAndCamera(context, state, area);
-        context.drawImage(
-            area.canvas,
-            (state.camera.x - area.cameraOffset.x) | 0, (state.camera.y - area.cameraOffset.y) | 0, CANVAS_WIDTH, CANVAS_HEIGHT,
-            (state.camera.x - area.cameraOffset.x) | 0, (state.camera.y - area.cameraOffset.y) | 0, CANVAS_WIDTH, CANVAS_HEIGHT,
-        );
+        const source = {
+            x: (state.camera.x - area.cameraOffset.x) | 0,
+            y: (state.camera.y - area.cameraOffset.y) | 0,
+            w: CANVAS_WIDTH,
+            h: CANVAS_HEIGHT,
+        }
+        const target = {
+            x: 0,
+            y: 0,
+            w: CANVAS_WIDTH,
+            h: CANVAS_HEIGHT,
+        }
+        drawCanvas(context, area.canvas, source, target);
         for (const object of area.objectsToRender) {
             if (object.drawPriority === 'background' || object.getDrawPriority?.(state) === 'background') {
                 object.render?.(context, state);
@@ -590,11 +598,19 @@ export function renderAreaForeground(context: CanvasRenderingContext2D, state: G
     }
     context.save();
         translateContextForAreaAndCamera(context, state, area);
-        context.drawImage(
-            area.foregroundCanvas,
-            (state.camera.x - area.cameraOffset.x) | 0, (state.camera.y - area.cameraOffset.y) | 0, CANVAS_WIDTH, CANVAS_HEIGHT,
-            (state.camera.x - area.cameraOffset.x) | 0, (state.camera.y - area.cameraOffset.y) | 0, CANVAS_WIDTH, CANVAS_HEIGHT,
-        );
+        const source = {
+            x: (state.camera.x - area.cameraOffset.x) | 0,
+            y: (state.camera.y - area.cameraOffset.y) | 0,
+            w: CANVAS_WIDTH,
+            h: CANVAS_HEIGHT,
+        }
+        const target = {
+            x: 0,
+            y: 0,
+            w: CANVAS_WIDTH,
+            h: CANVAS_HEIGHT,
+        }
+        drawCanvas(context, area.foregroundCanvas, source, target);
     context.restore();
     renderForegroundObjects(context, state, area);
 }

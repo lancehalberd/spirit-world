@@ -1,7 +1,7 @@
 import { drawFrame } from 'app/utils/animations';
 import { rectangleCenter } from 'app/utils/index';
 
-import { Frame } from 'app/types';
+import { Frame, Rect } from 'app/types';
 
 export function query(className): HTMLElement {
     return document.querySelector(className);
@@ -137,4 +137,37 @@ export function handleChildEvent(
 
 export function getElementIndex(element: HTMLElement) {
     return [...element.parentElement.children].indexOf(element);
+}
+
+/**
+ * Safari (and possibly other browsers) will not draw canvases if the source
+ * rectangle has any parts outside the dimensions of the actual canvas, so this
+ * method takes arbitrary rectangles and then modifies them to only draw the
+ * part that overlaps with the canvas.
+ *
+ */
+export function drawCanvas(
+    context: CanvasRenderingContext2D,
+    canvas: HTMLCanvasElement,
+    {x, y, w, h}: Rect,
+    target: Rect
+): void {
+    w = Math.min(w, canvas.width - x);
+    h = Math.min(h, canvas.height - y);
+    if (x < 0) {
+        w += x;
+        x = 0;
+    }
+    if (y < 0) {
+        h += y;
+        y = 0;
+    }
+    if (w > 0 && h > 0){
+        context.drawImage(
+            canvas,
+            x, y,
+            w, h,
+            x, y, w, h,
+        );
+    }
 }
