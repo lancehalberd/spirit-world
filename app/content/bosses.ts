@@ -9,6 +9,7 @@ export * from 'app/content/bosses/guardian';
 export * from 'app/content/bosses/flameBeast';
 export * from 'app/content/bosses/frostBeast';
 export * from 'app/content/bosses/stormBeast';
+export * from 'app/content/bosses/voidTree';
 
 export const bossTypes = <const>[
     'beetleBoss',
@@ -21,6 +22,7 @@ export const bossTypes = <const>[
     'frostHeart', 'frostBeast',
     'flameHeart', 'flameBeast',
     'stormHeart', 'stormBeast',
+    'voidTree',
 ];
 export type BossType = typeof bossTypes[number];
 

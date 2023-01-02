@@ -145,6 +145,9 @@ export function getElementIndex(element: HTMLElement) {
  * method takes arbitrary rectangles and then modifies them to only draw the
  * part that overlaps with the canvas.
  *
+ * Note that this ad hoc implementation probably only works when the source rect
+ * and target rect match, but should be easy to update to work in the general case.
+ *
  */
 export function drawCanvas(
     context: CanvasRenderingContext2D,

@@ -38,9 +38,6 @@ Graphics:
 Current tasks:
     - Fix bead flow depth by using sprite ordering for the ordered part instead of foreground, use the y value based on where it hits the floor but only draw it start 16px up from that point so it gradually covers while moving behind it.
 
-    - nextAreaInstance is not rendered in Safari
-        - Fix this from Hillary's machine
-
     - Add crucible to the end of the Grand Temple
 
     - Add `getLogicalZone` function that returns a logical zone for a given state location wich can differ from the actual zone key, use this for randomizer locations and dungeon item associations.
@@ -154,6 +151,23 @@ Current tasks:
         - Tree is a clone of the helix, but allowed to grow to completion this time.
 
     World Tree Boss Void Beast
+        - Possible 3 phase approach
+            - Void tree, Outer shell, defeat to open up a pit to reach the heart
+                - Takes place on most of a super tile
+                - Has four sub targets that can be destroyed to temporarily disable some of its attacks/defenses
+                    - Possibly starts with 2 and spawns 3 during second phase and all 4 for final phase.
+                    - Which ones spawned are random, but deterministic for each seed.
+                    - Targets are neutral, fire, ice, lightning, and enable different defense/offense mechanics.
+                - Lots of large attacks to dodge while you navigate the arena
+                    - (neutral) golem hands, Laser beams
+                    - Fire walls, lava ground
+                    - Lightning strikes, lightning barriers
+                    - Frost grenades, ice walls
+            - Void heart, defeat to relase the final boss
+            - Void beast
+                - maybe looks like a carnivorous plant with a giant mouth full of teeth and a bunch of tendrils like scorpion tails.
+                    - Could use this boss design for the forest temple if not here.
+
         - Fight takes place on most of a full super tile, but each section of the fight is on a smaller platform in the material world where the player damages the boss and avoids various attack mechanics.
             - Maybe the battlefield is even taller than a regular super tile and the player must keep advancing tiers sort of like the final battle with the statues in ff6.
             - Each tier could focus on a different pair of combat mechanics like staff + iron boots, and each travel section could focus on different movement mechanics
@@ -218,6 +232,11 @@ Current tasks:
 
     - Work on new waterfall graphics
         - Email Jon about waterfall graphic updates.
+
+Mechanic: Windstream
+    - Pushes player back unless they are using iron boots or holding on to a solid object. Player can push pots to move through wind streams.
+    - Player can be pushed across wide pits by equipping cloud boots and entering a wind stream.
+    - There may be light objects that players can push into windstreams to move them, perhaps to solve switch puzzles
 
 True sight Idea:
     - Split the screen vertically and render the current world in the left half and the alternate world in the right half (or always material left + spirit right).

@@ -158,7 +158,11 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         return this.getDefaultHitbox();
     }
     getYDepth(): number {
-        return this.enemyDefinition.getYDepth?.(this) ?? this.y;
+        if (this.enemyDefinition.getYDepth) {
+            return this.enemyDefinition.getYDepth(this);
+        }
+        const hitbox = this.getHitbox();
+        return hitbox.y + hitbox.h;
     }
     getDefaultHitbox(): Rect {
         const frame = this.getFrame();
