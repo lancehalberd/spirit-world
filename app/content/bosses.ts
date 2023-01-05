@@ -22,7 +22,7 @@ export const bossTypes = <const>[
     'frostHeart', 'frostBeast',
     'flameHeart', 'flameBeast',
     'stormHeart', 'stormBeast',
-    'voidTree',
+    'voidTree', 'voidStone', 'voidFlame', 'voidFrost', 'voidStorm',
 ];
 export type BossType = typeof bossTypes[number];
 

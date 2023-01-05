@@ -324,6 +324,18 @@ export const SPAWN_STAFF_BOSS: ZoneLocation = {
     isSpiritWorld: false,
 };
 
+export const SPAWN_FINAL_BOSS_1: ZoneLocation = {
+    zoneKey: 'void',
+    floor: 0,
+    x: 248,
+    y: 448,
+    z: 0,
+    d: 'up',
+    areaGridCoords: {y: 0, x: 0},
+    isSpiritWorld: false,
+};
+
+
 function applyItems(savedState: SavedState, items: {[key: string]: number}, objectFlags: string[] = []): SavedState {
     const newState: SavedState = cloneDeep(savedState);
     for (const flag of objectFlags) {
@@ -424,38 +436,36 @@ const grandTempleStartState = applyItems(helixEndState, {
     clone: 1, cloudBoots: 1, gloves: 2, cloak: 2, nimbusCloud: 1, roll: 2},
     []);
 
-const riverTempleStartState = applyItems(helixEndState, {
+const beastState = applyItems(helixEndState, {
     cloudBoots: 1, clone: 1,
     ironBoots: 1, cloak: 2, roll: 2,
     maxLife: 2,
+    staff: 2,
+    lightningBlessing: 1, goldOre: 2, nimbusCloud: 1,
+    ironSkin: 1, bow: 2, gloves: 2, goldMail: 1,
+    spiritDamage: 1, spiritRange: 1,
+});
+
+const riverTempleStartState = applyItems(beastState, {
     staff: 2, lightning: 1,
     fireBlessing: 1, fire: 1,
-    lightningBlessing: 1, goldOre: 2, nimbusCloud: 1,
 }, ['flameBeast', 'stormBeast']);
 const riverTempleBossState = applyItems(riverTempleStartState,
     {'riverTemple:bigKey': 1, 'fire': 1, 'lightning': 1},
     ['bossBubblesNorth','bossBubblesSouth', 'bossBubblesWest', 'bossBubblesEast']
 );
 
-const craterStartState = applyItems(helixEndState, {
-    cloudBoots: 1, clone: 1,
-    ironBoots: 1, cloak: 2, roll: 2,
-    maxLife: 2,
+const craterStartState = applyItems(beastState, {
     staff: 2, lightning: 1,
-    waterBlessing: 1, ice: 1,
-    lightningBlessing: 1, goldOre: 2, nimbusCloud: 1,
+    waterBlessing: 1, ice: 1
 }, ['frostBeast', 'stormBeast']);
 const craterBossState = applyItems(craterStartState, {fireBlessing: 1},
     ['craterLava1', 'craterLava2', 'craterLava3', 'craterLava4', 'craterLava5']
 );
 
-const staffStartState = applyItems(helixEndState, {
-    cloudBoots: 1, clone: 1,
-    ironBoots: 1, cloak: 2, roll: 2,
-    maxLife: 2,
+const staffStartState = applyItems(beastState, {
     fireBlessing: 1, fire: 1,
-    waterBlessing: 1, ice: 1,
-    lightningBlessing: 1, goldOre: 2, nimbusCloud: 1,
+    waterBlessing: 1, ice: 1
 }, ['frostBeast', 'flameBeast']);
 const staffBossState = applyItems(staffStartState, {}, [
     'staffTowerSpiritEntrance', 'tower2FBarrier',
@@ -468,6 +478,9 @@ const staffAquiredState = applyItems(staffBossState, {lightning: 1}, [
 ]);
 
 const warshipStartState = applyItems(staffAquiredState, {staff: 2});
+
+const finalBoss1State = applyItems(warshipStartState, {clone: 2});
+
 
 interface SpawnLocationOptions {
     [key: string]: {location: ZoneLocation, savedState: SavedState},
@@ -588,9 +601,17 @@ const lateSpawnLocations: SpawnLocationOptions = {
         location: SPAWN_STAFF_LOWER_ENTRANCE,
         savedState: staffAquiredState,
     },
-    'Warship Start': {
+};
+
+
+const finalSpawnLocations: SpawnLocationOptions = {
+    'Rival 3': {
         location: SPAWN_WAR_TEMPLE_ENTRANCE_SPIRIT,
         savedState: warshipStartState,
+    },
+    'Void Tree': {
+        location: SPAWN_FINAL_BOSS_1,
+        savedState: finalBoss1State,
     },
 };
 
@@ -681,6 +702,12 @@ export function getSpawnLocationContextMenuOption(): MenuOption {
                         return getSpawnLocationOptions(lateSpawnLocations);
                     }
                 },
+                {
+                    label: 'Final',
+                    getChildren() {
+                        return getSpawnLocationOptions(finalSpawnLocations);
+                    }
+                },
             ];
         }
     }
@@ -710,6 +737,12 @@ export function getTestStateContextMenuOption(): MenuOption {
                     label: 'Late',
                     getChildren() {
                         return getSpawnLocationOptions(lateSpawnLocations, true);
+                    }
+                },
+                {
+                    label: 'Final',
+                    getChildren() {
+                        return getSpawnLocationOptions(finalSpawnLocations, true);
                     }
                 },
                 {

@@ -17,24 +17,44 @@ import {
     //paceRandomly,
 } from 'app/content/enemies';
 import { beetleWingedAnimations } from 'app/content/enemyAnimations';
+import { createCanvasAndContext } from 'app/dom';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { createAnimation, drawFrameAt } from 'app/utils/animations';
+import { createAnimation, drawFrame, drawFrameAt } from 'app/utils/animations';
 import { pad, rectanglesOverlap } from 'app/utils/index';
 import { getDirection } from 'app/utils/field';
 import { playSound } from 'app/musicController';
 import Random from 'app/utils/Random';
+import { allImagesLoaded } from 'app/utils/images';
 
 import { AreaInstance, Enemy, GameState, HitProperties, HitResult, Rect } from 'app/types';
 
 // This is just the spirit sight frame.
-export const stormHeartAnimation = createAnimation('gfx/hud/icons.png',
-    {w: 18, h: 18, content: {x: 1, y: 1, w: 16, h: 16}}, {x: 6, cols: 1}
-);
 
+const stormGeometry = {w: 20, h: 20, content: {x: 4, y: 10, w: 12, h: 8}};
+export const [lightningElement] = createAnimation('gfx/hud/elementhud.png', stormGeometry, {x: 3}).frames;
+const [stormHeartCanvas, stormHeartContext] = createCanvasAndContext(lightningElement.w * 4, lightningElement.h * 2);
+const createFlameAnimation = async () => {
+    await allImagesLoaded();
+    drawFrame(stormHeartContext, lightningElement, {x: 0, y: 0, w: lightningElement.w * 2, h: lightningElement.h * 2});
+    stormHeartContext.save();
+        stormHeartContext.translate((lightningElement.w + lightningElement.content.x + lightningElement.content.w / 2) * 2, 0);
+        stormHeartContext.scale(-1, 1);
+        drawFrame(stormHeartContext, lightningElement, {
+            x: 2* (-lightningElement.content.w / 2 - lightningElement.content.x), y: 0,
+            w: lightningElement.w * 2, h: lightningElement.h * 2
+        });
+    stormHeartContext.restore();
+    drawFrame(stormHeartContext, lightningElement, {...lightningElement, x: 0, y: 2});
+    drawFrame(stormHeartContext, lightningElement, {...lightningElement, x: lightningElement.w, y: 0});
+    drawFrame(stormHeartContext, lightningElement, {...lightningElement, x: 2 * lightningElement.w, y: 0});
+    drawFrame(stormHeartContext, lightningElement, {...lightningElement, x: 3 * lightningElement.w, y: 2});
+}
+createFlameAnimation();
+const stormHeartAnimation = createAnimation(stormHeartCanvas, {w: 40, h: 40, content: {x: 8, y: 20, w: 24, h: 16}}, {cols: 2});
 
 debugCanvas;//(stormHeartCanvas);
 
-const stormHeartAnimations = {
+export const stormHeartAnimations = {
     idle: {
         up: stormHeartAnimation,
         down: stormHeartAnimation,
@@ -89,6 +109,7 @@ enemyDefinitions.stormHeart = {
         cloudRegenerateTimer: 0,
     },
     immunities: ['lightning'],
+    elementalMultipliers: {'ice': 1.5, 'fire': 1.5},
     initialMode: 'hidden',
     renderOver(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
         let frameIndex = Math.floor(7 - enemy.params.cloudLife);
@@ -157,6 +178,7 @@ enemyDefinitions.stormBeast = {
     acceleration: 0.3, speed: 4,
     touchHit: { damage: 4, element: 'lightning'},
     immunities: ['lightning'],
+    elementalMultipliers: {'ice': 1.5, 'fire': 1.5},
     initialMode: 'hidden',
     params: {
         enrageLevel: 0,

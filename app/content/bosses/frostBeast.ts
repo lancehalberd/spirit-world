@@ -11,32 +11,55 @@ import {
     throwIceGrenadeAtLocation,
 } from 'app/content/enemies';
 import { enemyDeathAnimation, snakeAnimations } from 'app/content/enemyAnimations';
+import { createCanvasAndContext } from 'app/dom';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { createAnimation } from 'app/utils/animations';
+import { createAnimation, drawFrame } from 'app/utils/animations';
 import { playSound } from 'app/musicController';
 import { getDirection, hitTargets } from 'app/utils/field';
+import { allImagesLoaded } from 'app/utils/images';
 
 
 import { AreaInstance, Enemy, GameState, HitProperties, HitResult } from 'app/types';
 
+const frostGeometry = {w: 20, h: 20, content: {x: 2, y: 2, w: 16, h: 16}};
+export const [iceElement] = createAnimation('gfx/hud/elementhud.png', frostGeometry, {x: 2}).frames;
+const [frostHeartCanvas, frostHeartContext] = createCanvasAndContext(iceElement.w * 4, iceElement.h * 2);
+const createFlameAnimation = async () => {
+    await allImagesLoaded();
+    drawFrame(frostHeartContext, iceElement, {x: 0, y: 0, w: iceElement.w * 2, h: iceElement.h * 2});
+    frostHeartContext.save();
+        frostHeartContext.translate((iceElement.w + iceElement.content.x + iceElement.content.w / 2) * 2, 0);
+        frostHeartContext.scale(-1, 1);
+        drawFrame(frostHeartContext, iceElement, {
+            x: 2* (-iceElement.content.w / 2 - iceElement.content.x), y: 0,
+            w: iceElement.w * 2, h: iceElement.h * 2
+        });
+    frostHeartContext.restore();
+    drawFrame(frostHeartContext, iceElement, {...iceElement, x: 0, y: 2});
+    drawFrame(frostHeartContext, iceElement, {...iceElement, x: iceElement.w, y: 0});
+    drawFrame(frostHeartContext, iceElement, {...iceElement, x: 2 * iceElement.w, y: 0});
+    drawFrame(frostHeartContext, iceElement, {...iceElement, x: 3 * iceElement.w, y: 2});
+}
+createFlameAnimation();
+const frostHeartAnimation = createAnimation(frostHeartCanvas, {w: 40, h: 40, content: {x: 4, y: 4, w: 32, h: 32}}, {cols: 2});
 
-const peachAnimation = createAnimation('gfx/hud/icons.png', {w: 18, h: 18, content: {x: 1, y: 1, w: 16, h: 16}}, {x: 0});
-const peachAnimations = {
+export const frostHeartAnimations = {
     idle: {
-        up: peachAnimation,
-        down: peachAnimation,
-        left: peachAnimation,
-        right: peachAnimation,
+        up: frostHeartAnimation,
+        down: frostHeartAnimation,
+        left: frostHeartAnimation,
+        right: frostHeartAnimation,
     },
 };
 
 enemyDefinitions.frostHeart = {
-    animations: peachAnimations, life: 16, scale: 3, touchDamage: 1, update: updateFrostHeart, params: {
+    animations: frostHeartAnimations, life: 16, scale: 2, touchDamage: 1, update: updateFrostHeart, params: {
         chargeLevel: 0,
         enrageLevel: 0,
         shieldLife: 8,
     },
     immunities: ['ice'],
+    elementalMultipliers: {'fire': 2, 'lightning': 1.5},
     renderOver: renderIceShield,
     onHit(state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
         // If the shield is up, only fire damage can hurt it.
@@ -77,6 +100,7 @@ enemyDefinitions.frostBeast = {
     animations: snakeAnimations, life: 36, scale: 3, touchDamage: 2, update: updateFrostSerpent, flipRight: true,
     acceleration: 0.3, speed: 2,
     immunities: ['ice'],
+    elementalMultipliers: {'fire': 2, 'lightning': 1.5},
     params: {
         submerged: true,
     },

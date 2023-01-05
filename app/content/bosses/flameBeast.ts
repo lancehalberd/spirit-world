@@ -21,11 +21,7 @@ import { allImagesLoaded } from 'app/utils/images';
 import { AreaInstance, Enemy, EnemyAbility, GameState } from 'app/types';
 
 const flameGeometry = {w: 20, h: 20, content: {x: 2, y: 2, w: 16, h: 16}};
-export const [
-    /* container */, fireElement, /* elementShine */
-] = createAnimation('gfx/hud/elementhud.png',
-    flameGeometry, {cols: 2}
-).frames;
+export const [fireElement] = createAnimation('gfx/hud/elementhud.png', flameGeometry, {x: 1}).frames;
 const [flameHeartCanvas, flameHeartContext] = createCanvasAndContext(fireElement.w * 4, fireElement.h * 2);
 const createFlameAnimation = async () => {
     await allImagesLoaded();
@@ -48,7 +44,7 @@ createFlameAnimation();
 const flameHeartAnimation = createAnimation(flameHeartCanvas, {w: 40, h: 40, content: {x: 4, y: 4, w: 32, h: 32}}, {cols: 2});
 
 
-const flameHeartAnimations = {
+export const flameHeartAnimations = {
     idle: {
         up: flameHeartAnimation,
         down: flameHeartAnimation,
@@ -94,7 +90,7 @@ enemyDefinitions.flameHeart = {
     },
     initialMode: 'choose',
     immunities: ['fire'],
-    elementalMultipliers: {'ice': 2},
+    elementalMultipliers: {'ice': 2, 'lightning': 1.5},
 };
 enemyDefinitions.flameBeast = {
     abilities: [leapStrikeAbility],
@@ -102,7 +98,7 @@ enemyDefinitions.flameBeast = {
     initialMode: 'hidden',
     acceleration: 0.3, speed: 2,
     immunities: ['fire'],
-    elementalMultipliers: {'ice': 2},
+    elementalMultipliers: {'ice': 2, 'lightning': 1.5},
     params: {
         enrageLevel: 0,
     },
