@@ -13,7 +13,7 @@ function truncateRay(state: GameState, area: AreaInstance, ray: Ray): Ray {
     for (let i = 20; i < mag; i += 4) {
         const x = ray.x1 + i * dx / mag, y = ray.y1 + i * dy / mag;
         const { tileBehavior } = getTileBehaviors(state, area, {x, y});
-        if (!tileBehavior?.low && tileBehavior?.solid) {
+        if (!tileBehavior?.low && tileBehavior?.solid && !(tileBehavior?.isSouthernWall && dy > 0)) {
             return {...ray, x2: x, y2: y};
         }
     }
@@ -27,6 +27,8 @@ interface Props {
     ty: number
     radius?: number
     duration?: number
+    tellDuration?: number
+    ignoreWalls?: boolean
     damage?: number
     delay?: number
 }
@@ -50,11 +52,13 @@ export class LaserBeam implements EffectInstance, Props {
     radius: number;
     delay: number;
     duration: number;
+    ignoreWalls: boolean;
+    tellDuration: number;
     shockWaves: number;
     shockWaveTheta: number;
     animationTime = 0;
     done = false;
-    constructor({sx, sy, tx, ty, damage = 2, delay = 0, duration = 200, radius = 6}: Props) {
+    constructor({sx, sy, tx, ty, damage = 2, delay = 0, duration = 200, ignoreWalls = false, tellDuration = 0, radius = 6}: Props) {
         this.sx = sx | 0;
         this.sy = sy | 0;
         this.tx = tx | 0;
@@ -62,18 +66,28 @@ export class LaserBeam implements EffectInstance, Props {
         this.delay = delay;
         this.radius = radius;
         this.duration = duration;
+        this.tellDuration = tellDuration;
+        this.ignoreWalls = ignoreWalls;
         this.damage = damage;
     }
     getHitRay(state: GameState): Ray {
-        return truncateRay(state, this.area, {
+        const baseRay = {
             x1: this.sx, y1: this.sy,
             x2: this.tx, y2: this.ty,
             r: this.radius,
-        });
+        };
+        if (this.ignoreWalls) {
+            return baseRay
+        }
+        return truncateRay(state, this.area, baseRay);
     }
     update(state: GameState) {
         if (this.delay > 0) {
             this.delay -= FRAME_LENGTH;
+            return;
+        }
+        if (this.tellDuration > 0) {
+            this.tellDuration -= FRAME_LENGTH;
             return;
         }
         this.animationTime += FRAME_LENGTH;
@@ -94,9 +108,38 @@ export class LaserBeam implements EffectInstance, Props {
        if (this.delay > 0) {
            return;
        }
+       if (this.tellDuration > 0) {
+            return;
+       }
        const p = (this.animationTime - this.duration) / FADE_DURATION;
        const alpha = 1 - Math.max(0, Math.min(1, p));
        drawLaser(context, this.getHitRay(state), alpha);
+    }
+    renderShadow(context: CanvasRenderingContext2D, state: GameState) {
+       if (this.delay > 0) {
+           return;
+       }
+       if (this.tellDuration > 0) {
+            const ray = this.getHitRay(state);
+            context.save();
+                context.translate(ray.x1, ray.y1);
+                const dx = ray.x2 - ray.x1;
+                const dy = ray.y2 - ray.y1;
+                const mag = Math.sqrt(dx * dx + dy *dy);
+                const theta = Math.atan2(dy, dx);
+                context.rotate(theta);
+                context.fillStyle = 'red';
+                context.globalAlpha *= 0.5;
+                context.fillRect(0, -ray.r, mag, 1);
+                context.fillRect(0, ray.r - 1, mag, 1);
+                const r = this.radius - this.tellDuration / 50;
+                if (r > 0) {
+                    context.fillRect(0, -r | 0, mag, 2 * r | 0);
+                }
+            context.restore();
+            //drawLaser(context, this.getHitRay(state), 0.1);
+            return;
+       }
     }
 }
 

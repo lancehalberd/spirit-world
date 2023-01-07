@@ -142,7 +142,7 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
         const totalSpace = CANVAS_WIDTH - 32 - otherEnemiesWithHealthBars.length * 4 + 4;
         const barHeight = 4;
         // This probably won't work when there are more than three such enemies.
-        const barWidth = (totalSpace / 3) | 0;
+        const barWidth = (totalSpace / Math.max(3, otherEnemiesWithHealthBars.length)) | 0;
         y -= barHeight;
         x = 16;
         for (const enemy of otherEnemiesWithHealthBars) {

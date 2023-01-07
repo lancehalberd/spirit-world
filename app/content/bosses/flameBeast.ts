@@ -20,7 +20,7 @@ import { allImagesLoaded } from 'app/utils/images';
 
 import { AreaInstance, Enemy, EnemyAbility, GameState } from 'app/types';
 
-const flameGeometry = {w: 20, h: 20, content: {x: 2, y: 2, w: 16, h: 16}};
+const flameGeometry = {w: 20, h: 20, content: {x: 4, y: 10, w: 12, h: 8}};
 export const [fireElement] = createAnimation('gfx/hud/elementhud.png', flameGeometry, {x: 1}).frames;
 const [flameHeartCanvas, flameHeartContext] = createCanvasAndContext(fireElement.w * 4, fireElement.h * 2);
 const createFlameAnimation = async () => {
@@ -41,7 +41,7 @@ const createFlameAnimation = async () => {
 }
 debugCanvas;//(flameHeartCanvas);
 createFlameAnimation();
-const flameHeartAnimation = createAnimation(flameHeartCanvas, {w: 40, h: 40, content: {x: 4, y: 4, w: 32, h: 32}}, {cols: 2});
+const flameHeartAnimation = createAnimation(flameHeartCanvas, {w: 40, h: 40, content: {x: 8, y: 20, w: 24, h: 16}}, {cols: 2});
 
 
 export const flameHeartAnimations = {

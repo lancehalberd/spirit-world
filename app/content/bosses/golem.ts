@@ -120,7 +120,7 @@ const golemHandSlamming: FrameAnimation = createAnimation('gfx/enemies/golem_han
 const golemHandReturning: FrameAnimation = createAnimation('gfx/enemies/golem_hand_base.png', golemHandGeometry, {x: 3});
 const golemHandPunch: FrameAnimation = createAnimation('gfx/enemies/golem_hand_base.png', golemHandGeometry, {x: 4, cols: 2}, {loop: false});
 
-const golemHandAnimations: ActorAnimations = {
+export const golemHandAnimations: ActorAnimations = {
     idle: {
         left: golemHandIdle,
         right: golemHandIdle,
@@ -153,7 +153,7 @@ const golemHandHurtSlamming: FrameAnimation = createAnimation('gfx/enemies/golem
 const golemHandHurtReturning: FrameAnimation = createAnimation('gfx/enemies/golem_hand_crack.png', golemHandGeometry, {x: 3});
 const golemHandHurtPunch: FrameAnimation = createAnimation('gfx/enemies/golem_hand_crack.png', golemHandGeometry, {x: 4, cols: 2}, {loop: false});
 
-const golemHandHurtAnimations: ActorAnimations = {
+export const golemHandHurtAnimations: ActorAnimations = {
     idle: {
         left: golemHandHurtIdle,
         right: golemHandHurtIdle,
@@ -664,7 +664,7 @@ function moveHandToPosition(this: void, state: GameState, enemy: Enemy, otherHan
     }
 }
 
-function addSlamEffect(this: void, state: GameState, enemy: Enemy): void {
+export function addSlamEffect(this: void, state: GameState, enemy: Enemy): void {
     const slamAnimation = new AnimationEffect({
         drawPriority: 'background',
         animation: golemSlamEffectAnimation,

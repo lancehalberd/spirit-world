@@ -832,7 +832,7 @@ export function getAreaSize(state: GameState): {w: number, h: number, section: R
     }
 }
 
-export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefresh = false): void {
+export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefresh = false, resetObjects = false): void {
     if (!area) {
         return;
     }
@@ -901,14 +901,52 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
                 }
             }
         } else {
+            const nextAreaInstance = createAreaInstance(state, state.areaInstance.definition);
+            nextAreaInstance.alternateArea = area.alternateArea;
+            nextAreaInstance.alternateArea.alternateArea = nextAreaInstance;
             state.transitionState = {
                 callback: () => null,
                 nextLocation: state.location,
                 time: 0,
                 type: 'mutating',
-                nextAreaInstance: createAreaInstance(state, state.areaInstance.definition),
+                nextAreaInstance,
             };
-            return;
+            if (resetObjects) {
+                // Just keep the objects as they are in the newly created instance
+                return;
+            } else {
+                // Otherwise copy the objects from the current area and then apply the
+                // object logic update code that follows below.
+                nextAreaInstance.objects = [...area.objects];
+                for (const object of nextAreaInstance.objects) {
+                    object.area = nextAreaInstance;
+                }
+                nextAreaInstance.effects = [...area.effects];
+                for (const effect of nextAreaInstance.effects) {
+                    effect.area = nextAreaInstance;
+                }
+                nextAreaInstance.layers = [...area.layers];
+                // Since objects are on the next area now, we must also move the priority object queue to the next area.
+                nextAreaInstance.priorityObjects = area.priorityObjects;
+                area.priorityObjects = []
+                /*nextAreaInstance.alternateArea.objects = [...area.alternateArea.objects];
+                nextAreaInstance.alternateArea.effects = [...area.alternateArea.effects];
+                nextAreaInstance.alternateArea.layers = [...area.alternateArea.layers];*/
+                for (const instance of [nextAreaInstance, nextAreaInstance.alternateArea]) {
+                    instance.tilesDrawn = [];
+                    instance.checkToRedrawTiles = true;
+                    instance.behaviorGrid = [];
+                    for (const layer of instance.layers || []) {
+                        const definitionIndex = instance.definition.layers.indexOf(layer.definition);
+                        applyLayerToBehaviorGrid(instance.behaviorGrid,
+                            instance.definition.layers[definitionIndex],
+                            instance.definition.parentDefinition?.layers?.[definitionIndex]
+                        );
+                    }
+                }
+                area = nextAreaInstance;
+            }
+
         }
     }
     for (const object of area.definition.objects) {

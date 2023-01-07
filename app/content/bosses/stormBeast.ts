@@ -33,7 +33,7 @@ import { AreaInstance, Enemy, GameState, HitProperties, HitResult, Rect } from '
 const stormGeometry = {w: 20, h: 20, content: {x: 4, y: 10, w: 12, h: 8}};
 export const [lightningElement] = createAnimation('gfx/hud/elementhud.png', stormGeometry, {x: 3}).frames;
 const [stormHeartCanvas, stormHeartContext] = createCanvasAndContext(lightningElement.w * 4, lightningElement.h * 2);
-const createFlameAnimation = async () => {
+const createStormAnimation = async () => {
     await allImagesLoaded();
     drawFrame(stormHeartContext, lightningElement, {x: 0, y: 0, w: lightningElement.w * 2, h: lightningElement.h * 2});
     stormHeartContext.save();
@@ -49,7 +49,7 @@ const createFlameAnimation = async () => {
     drawFrame(stormHeartContext, lightningElement, {...lightningElement, x: 2 * lightningElement.w, y: 0});
     drawFrame(stormHeartContext, lightningElement, {...lightningElement, x: 3 * lightningElement.w, y: 2});
 }
-createFlameAnimation();
+createStormAnimation();
 const stormHeartAnimation = createAnimation(stormHeartCanvas, {w: 40, h: 40, content: {x: 8, y: 20, w: 24, h: 16}}, {cols: 2});
 
 debugCanvas;//(stormHeartCanvas);
@@ -88,8 +88,8 @@ const drawCloudFormation = (context: CanvasRenderingContext2D, state: GameState,
             const tile = allTiles[cloudFormations[ty][tx]];
             if (tile) {
                 drawFrameAt(context, tile.frame, {
-                    x: enemy.x - 32 + 16 * column,
-                    y: enemy.y - 32 + 16 * row,
+                    x: enemy.x - 24 + 16 * column,
+                    y: enemy.y - 48 + 16 * row,
                 });
             }
         }
@@ -136,8 +136,8 @@ enemyDefinitions.stormHeart = {
     },
     getHitbox(enemy: Enemy): Rect {
         return {
-            x: enemy.x - 32,
-            y: enemy.y - 32,
+            x: enemy.x - 24,
+            y: enemy.y - 48,
             w: 96,
             h: 48 + Math.max(16, Math.ceil((enemy.params.cloudLife + 1) / 2) * 16),
         };

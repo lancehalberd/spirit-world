@@ -578,8 +578,8 @@ export function renderAreaBackground(context: CanvasRenderingContext2D, state: G
             h: CANVAS_HEIGHT,
         }
         const target = {
-            x: 0,
-            y: 0,
+            x: (state.camera.x - area.cameraOffset.x) | 0,
+            y: (state.camera.y - area.cameraOffset.y) | 0,
             w: CANVAS_WIDTH,
             h: CANVAS_HEIGHT,
         }
@@ -605,8 +605,8 @@ export function renderAreaForeground(context: CanvasRenderingContext2D, state: G
             h: CANVAS_HEIGHT,
         }
         const target = {
-            x: 0,
-            y: 0,
+            x: (state.camera.x - area.cameraOffset.x) | 0,
+            y: (state.camera.y - area.cameraOffset.y) | 0,
             w: CANVAS_WIDTH,
             h: CANVAS_HEIGHT,
         }

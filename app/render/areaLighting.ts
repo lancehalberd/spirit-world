@@ -173,7 +173,7 @@ export function renderAreaLighting(context: CanvasRenderingContext2D, state: Gam
             w: lightingCanvas.width,
             h: lightingCanvas.height,
         }
-        drawCanvas(context, area.lightingCanvas, source, target);
+        drawCanvas(lightingContext, area.lightingCanvas, source, target);
     }
     if (nextArea?.lightingCanvas) {
         const source = {
@@ -188,7 +188,7 @@ export function renderAreaLighting(context: CanvasRenderingContext2D, state: Gam
             w: lightingCanvas.width,
             h: lightingCanvas.height,
         }
-        drawCanvas(context, nextArea.lightingCanvas, source, target);
+        drawCanvas(lightingContext, nextArea.lightingCanvas, source, target);
     }
     // Next add light from the player's light radius.
     const hero = state.hero;

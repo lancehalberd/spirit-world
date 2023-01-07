@@ -22,10 +22,13 @@ export const bossTypes = <const>[
     'frostHeart', 'frostBeast',
     'flameHeart', 'flameBeast',
     'stormHeart', 'stormBeast',
-    'voidTree', 'voidStone', 'voidFlame', 'voidFrost', 'voidStorm',
+    'voidTree',
 ];
 export type BossType = typeof bossTypes[number];
 
-const minionTypes = <const>['beetleBossWingedMinionDefinition', 'golemHand'];
+const minionTypes = <const>[
+    'beetleBossWingedMinionDefinition', 'golemHand',
+    'voidStone', 'voidFlame', 'voidFrost', 'voidStorm', 'voidHand',
+];
 
 export type MinionType = typeof minionTypes[number];

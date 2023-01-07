@@ -144,24 +144,32 @@ export function getElementIndex(element: HTMLElement) {
  * rectangle has any parts outside the dimensions of the actual canvas, so this
  * method takes arbitrary rectangles and then modifies them to only draw the
  * part that overlaps with the canvas.
- *
- * Note that this ad hoc implementation probably only works when the source rect
- * and target rect match, but should be easy to update to work in the general case.
- *
  */
 export function drawCanvas(
     context: CanvasRenderingContext2D,
     canvas: HTMLCanvasElement,
     {x, y, w, h}: Rect,
-    target: Rect
+    {x: tx, y: ty, w: tw, h: th}:Rect
 ): void {
-    w = Math.min(w, canvas.width - x);
-    h = Math.min(h, canvas.height - y);
+    if (w > canvas.width - x) {
+        const dx = w - (canvas.width - x);
+        w += dx;
+        tw += dx;
+    }
+    if (h > canvas.height - y) {
+        const dy = h - (canvas.height - y);
+        h += dy;
+        th += dy;
+    }
     if (x < 0) {
+        tx -= x;
+        tw += x
         w += x;
         x = 0;
     }
     if (y < 0) {
+        ty -= y;
+        th += y;
         h += y;
         y = 0;
     }
@@ -170,7 +178,7 @@ export function drawCanvas(
             canvas,
             x, y,
             w, h,
-            x, y, w, h,
+            tx, ty, tw, th,
         );
     }
 }

@@ -713,7 +713,10 @@ export function paceAndCharge(state: GameState, enemy: Enemy) {
 }
 
 export function isTargetVisible(state: GameState, source: EffectInstance | ObjectInstance, target: EffectInstance | ObjectInstance): boolean {
-    return !!target && target.area === source.area && !!target.getHitbox && !(target instanceof Hero && target.isInvisible);
+    return !!target && !!target.getHitbox && !(target instanceof Hero && target.isInvisible);
+    // We were checking area, but in some cases we want enemies to see target in the alternate area.
+    // If we need this, we could add a flag to enemies indicating they can see into the alternate area to ignore this check.
+    // target.area === source.area
 }
 
 export function getVectorToTarget(state: GameState, source: EffectInstance | ObjectInstance, target: EffectInstance | ObjectInstance):{x: number, y: number, mag: number} {

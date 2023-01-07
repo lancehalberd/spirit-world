@@ -1636,7 +1636,7 @@ const f0_1x1: AreaDefinition = {
     objects: [
         {status: "normal", id: "craterLava5", x: 352, y: 240, type: "floorSwitch", saveStatus: "forever", hasCustomLogic: true, customLogic: "craterLava4"},
         {status: "normal", id: "craterLava4", x: 256, y: 432, type: "floorSwitch", saveStatus: "forever", hasCustomLogic: true, customLogic: "craterLava3"},
-        {status: "normal", id: "flameBeast", x: 224, y: 240, type: "boss", enemyType: "flameHeart", lootType: "fire", lootLevel: 1, d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava5"},
+        {status: "normal", id: "flameBeast", x: 232, y: 256, type: "boss", enemyType: "flameHeart", lootType: "fire", lootLevel: 1, d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava5"},
         {status: "normal", id: "flameBeast", x: 224, y: 144, type: "boss", enemyType: "flameBeast", lootType: "fire", lootLevel: 1, d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava5"},
         {status: "normal", id: "craterBossPortal", x: 256, y: 272, targetZone: "crater", targetObjectId: "craterBossPortal", type: "teleporter", hasCustomLogic: true, customLogic: "flameBeast"},
     ],

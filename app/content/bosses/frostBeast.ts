@@ -21,10 +21,10 @@ import { allImagesLoaded } from 'app/utils/images';
 
 import { AreaInstance, Enemy, GameState, HitProperties, HitResult } from 'app/types';
 
-const frostGeometry = {w: 20, h: 20, content: {x: 2, y: 2, w: 16, h: 16}};
+const frostGeometry = {w: 20, h: 20, content: {x: 4, y: 10, w: 12, h: 8}};
 export const [iceElement] = createAnimation('gfx/hud/elementhud.png', frostGeometry, {x: 2}).frames;
 const [frostHeartCanvas, frostHeartContext] = createCanvasAndContext(iceElement.w * 4, iceElement.h * 2);
-const createFlameAnimation = async () => {
+const createFrostAnimation = async () => {
     await allImagesLoaded();
     drawFrame(frostHeartContext, iceElement, {x: 0, y: 0, w: iceElement.w * 2, h: iceElement.h * 2});
     frostHeartContext.save();
@@ -40,8 +40,8 @@ const createFlameAnimation = async () => {
     drawFrame(frostHeartContext, iceElement, {...iceElement, x: 2 * iceElement.w, y: 0});
     drawFrame(frostHeartContext, iceElement, {...iceElement, x: 3 * iceElement.w, y: 2});
 }
-createFlameAnimation();
-const frostHeartAnimation = createAnimation(frostHeartCanvas, {w: 40, h: 40, content: {x: 4, y: 4, w: 32, h: 32}}, {cols: 2});
+createFrostAnimation();
+const frostHeartAnimation = createAnimation(frostHeartCanvas, {w: 40, h: 40, content: {x: 8, y: 20, w: 24, h: 16}}, {cols: 2});
 
 export const frostHeartAnimations = {
     idle: {
