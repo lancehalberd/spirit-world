@@ -693,6 +693,7 @@ const f0_1x0: AreaDefinition = {
     ],
     objects: [
         {status: "normal", id: "", x: 368, y: 496, type: "door", style: "wooden", targetObjectId: "treeEntrance", d: "down", locationCue: "World Tree 1F", linked: true},
+        {status: "normal", id: "", linked: true, spirit: false, x: 392, y: 368, type: "teleporter"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -881,6 +882,7 @@ const sf0_1x0: AreaDefinition = {
     layers: null,
     objects: [
         {status: "normal", id: "treeEntrance", x: 368, y: 496, type: "door", style: "wooden", targetZone: "lab", targetObjectId: "treeEntrance", d: "down", locationCue: "World Tree 1F", linked: true, spirit: true},
+        {status: "normal", id: "", linked: true, spirit: true, x: 392, y: 368, type: "teleporter"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
