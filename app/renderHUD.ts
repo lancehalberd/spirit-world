@@ -1,5 +1,5 @@
 import { getLootFrame } from 'app/content/loot';
-import { CANVAS_HEIGHT, CANVAS_WIDTH, isRandomizer } from 'app/gameConstants';
+import { CANVAS_HEIGHT, CANVAS_WIDTH, isRandomizer, randomizerGoalType } from 'app/gameConstants';
 import { getCheckInfo } from 'app/randomizer/checks';
 import { renderTextRow } from 'app/render/renderMessage';
 import { renderSpiritBar } from 'app/render/spiritBar';
@@ -173,11 +173,13 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
         const secondsString = seconds.toFixed(1).padStart(4, '0');
         const timeString = `${hours}:${minutesString}:${secondsString}`;
         const info = getCheckInfo(state);
-        drawText(context, `${Math.max(0, state.randomizer.goal - state.hero.victoryPoints)}`, 2, CANVAS_HEIGHT - 8 - 16, {
-            textBaseline: 'middle',
-            textAlign: 'left',
-            size: 16,
-        });
+        if (randomizerGoalType === 'victoryPoints') {
+            drawText(context, `${Math.max(0, state.randomizer.goal - state.hero.victoryPoints)}`, 2, CANVAS_HEIGHT - 8 - 16, {
+                textBaseline: 'middle',
+                textAlign: 'left',
+                size: 16,
+            });
+        }
         drawText(context, timeString, 2, CANVAS_HEIGHT - 8, {
             textBaseline: 'middle',
             textAlign: 'left',

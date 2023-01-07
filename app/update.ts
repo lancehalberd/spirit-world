@@ -15,7 +15,7 @@ import {
     FADE_IN_DURATION, FADE_OUT_DURATION,
     CIRCLE_WIPE_IN_DURATION, CIRCLE_WIPE_OUT_DURATION,
     MUTATE_DURATION,
-    isRandomizer,
+    isRandomizer, randomizerGoal, randomizerTotal, randomizerGoalType,
 } from 'app/gameConstants';
 import { initializeGame } from 'app/initialize';
 import {
@@ -413,7 +413,12 @@ function selectSaveFile(state: GameState, savedGameIndex: number): void {
             state.scriptEvents.queue = parseScriptText(state, 'Waaaaah!', 1000, false);
             state.scriptEvents.queue.push({type: 'clearTextBox'});
         } else {
-            setScript(state, '{@mom.randomizer}');
+            if (randomizerGoalType === 'finalBoss') {
+                setScript(state, `Defeat the final boss then talk to your mom to win!`);
+            } else if (randomizerGoalType === 'victoryPoints') {
+                setScript(state, `Find ${randomizerGoal} of ${randomizerTotal} Victory Points then talk to your mom to win!`);
+            }
+
         }
         return;
         // Old code for showing the "Choose Game Mode" menu when selecting "New Game".

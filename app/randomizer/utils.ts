@@ -4,7 +4,7 @@ import { isLogicValid } from 'app/content/logic';
 import { lootEffects } from 'app/content/loot';
 import { getZone, zones } from 'app/content/zones';
 
-import { randomizerGoal, randomizerTotal } from 'app/gameConstants';
+import { randomizerGoal, randomizerGoalType, randomizerTotal } from 'app/gameConstants';
 
 import { peachCaveNodes } from 'app/randomizer/logic/peachCaveLogic';
 import { cavesNodes, holyCityNodes, treeVillageNodes, waterfallCaveNodes } from 'app/randomizer/logic/otherLogic'
@@ -22,7 +22,7 @@ import { riverTempleNodes, riverTempleWaterNodes } from 'app/randomizer/logic/ri
 import { craterNodes } from 'app/randomizer/logic/craterLogic';
 import { staffTowerNodes } from 'app/randomizer/logic/staffTower';
 import { labNodes } from 'app/randomizer/logic/labLogic';
-import { treeNodes } from 'app/randomizer/logic/treeLogic';
+import { treeNodes, voidNodes } from 'app/randomizer/logic/treeLogic';
 import { addCheck } from 'app/randomizer/checks';
 
 import SRandom from 'app/utils/SRandom';
@@ -62,6 +62,7 @@ export const allNodes = [
     ...staffTowerNodes,
     ...labNodes,
     ...treeNodes,
+    ...voidNodes,
 ];
 
 interface LootData {
@@ -603,7 +604,7 @@ export function reverseFill(random: typeof SRandom, allNodes: LogicNode[], start
     // until we either run out of checks or hit the victory point target.
     let victoryPointsHidden = 0, replaceGoodChecks = false;
     const shuffledLoot = random.shuffle(allLootObjects);
-    while (victoryPointsHidden < randomizerTotal) {
+    while (randomizerGoalType === 'victoryPoints' && victoryPointsHidden < randomizerTotal) {
         let remainingPeachPiecesNeeded = 12;
         for (const lootWithLocation of shuffledLoot) {
             switch (lootWithLocation.lootObject.lootType) {
@@ -853,6 +854,15 @@ window['showRandomizerSolution'] = function () {
         console.log(`Sphere ${counter}`);
         currentState = collectAllLootForSolution(allNodes, startingNodes, previousState);
         currentState = setAllFlagsInLogic(currentState, allNodes, startingNodes);
+
+        if (!finishedRandomizerSolution && randomizerGoalType === 'finalBoss' && currentState.savedState.objectFlags.voidTree) {
+            console.log('');
+            console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+            console.log('Defeat final boss and talk to mom to win.');
+            console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+            console.log('');
+            finishedRandomizerSolution = true;
+        }
     } while (currentState !== previousState);
 }
 
@@ -992,7 +1002,7 @@ function collectAllLootForSolution(allNodes: LogicNode[], startingNodes: LogicNo
         for (const flag of (check.progressFlags || [])) {
             state.savedState.objectFlags[flag] = true;
         }
-        if (!finishedRandomizerSolution && state.hero.victoryPoints >= randomizerGoal) {
+        if (!finishedRandomizerSolution && randomizerGoalType === 'victoryPoints' && state.hero.victoryPoints >= randomizerGoal) {
             console.log('');
             console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
             console.log('Talk to mom to win.');

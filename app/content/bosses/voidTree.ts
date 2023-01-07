@@ -3,6 +3,7 @@ import { flameHeartAnimations } from 'app/content/bosses/flameBeast';
 import { frostHeartAnimations } from 'app/content/bosses/frostBeast';
 import { addSlamEffect, golemHandAnimations, golemHandHurtAnimations } from 'app/content/bosses/golem';
 import { stormHeartAnimations } from 'app/content/bosses/stormBeast';
+import { FlameWall } from 'app/content/effects/flameWall';
 import { LaserBeam } from 'app/content/effects/laserBeam';
 import { LightningBolt } from 'app/content/effects/lightningBolt';
 import { LightningDischarge } from 'app/content/effects/lightningDischarge';
@@ -21,7 +22,7 @@ import { certainLifeLootTable } from 'app/content/lootTables';
 import { saveObjectStatus } from 'app/content/objects';
 import { createCanvasAndContext } from 'app/dom';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
-import { addScreenShake } from 'app/utils/field';
+import { addScreenShake, rotateDirection } from 'app/utils/field';
 import { allImagesLoaded } from 'app/utils/images';
 import { rectanglesOverlap } from 'app/utils/index';
 
@@ -115,6 +116,28 @@ const iceGrenadeAbility: EnemyAbility<NearbyTargetType> = {
     chargesRecovered: 3,
     prepTime: 400,
     recoverTime: 400,
+};
+
+const flameWallAbility: EnemyAbility<NearbyTargetType> = {
+    getTarget(this: void, state: GameState, enemy: Enemy): NearbyTargetType {
+        return getVectorToNearbyTarget(state, enemy, enemy.aggroRadius, enemy.area.allyTargets);
+    },
+    prepareAbility(this: void, state: GameState, enemy: Enemy, target: NearbyTargetType) {
+        enemy.changeToAnimation('attack');
+    },
+    useAbility(this: void, state: GameState, enemy: Enemy, target: NearbyTargetType): void {
+        enemy.params.flameWallRotation = (enemy.params.flameWallRotation ?? Math.floor(Math.random() * 3)) + 1;
+        const flameWall = new FlameWall({
+            direction: rotateDirection('down', enemy.params.flameWallRotation),
+        });
+        addEffectToArea(state, enemy.area, flameWall);
+    },
+    cooldown: 5000,
+    initialCharges: 0,
+    charges: 2,
+    chargesRecovered: 2,
+    prepTime: 0,
+    recoverTime: 1000,
 };
 
 const lightningBoltAbility: EnemyAbility<NearbyTargetType> = {
@@ -224,7 +247,7 @@ enemyDefinitions.voidFlame = {
     showHealthBar: true,
     canBeKnockedBack: false,
     aggroRadius: 144,
-    abilities: [],
+    abilities: [flameWallAbility],
     immunities: ['fire'],
     elementalMultipliers: {'ice': 2, 'lightning': 1.5},
 };
@@ -256,7 +279,7 @@ function updateVoidHeart(this: void, state: GameState, enemy: Enemy): void {
 enemyDefinitions.voidTree = {
     animations: treeAnimations, life: 128, scale: 2, touchDamage: 4, update: updateVoidTree,
     aggroRadius: 256,
-    abilities: [dischargeAbility, giantLaserAbility, iceGrenadeAbility],
+    abilities: [dischargeAbility, flameWallAbility, giantLaserAbility, iceGrenadeAbility],
     // void tree is immune to all damage types until one of the hearts is destroyed.
     immunities: ['ice', 'fire', 'lightning', null],
 };
@@ -269,7 +292,7 @@ function updateVoidTree(this: void, state: GameState, enemy: Enemy): void {
     // so the tree explicitly watches if any of the void hearts are defeated and refreshes
     // the area when their death animation completes.
     for (const object of enemy.area.alternateArea.objects) {
-        if (object.definition.type === 'enemy') {
+        if (object.definition?.type === 'enemy') {
             const otherEnemy = object as Enemy;
             if (otherEnemy.isDefeated && otherEnemy.animationTime > 2800) {
                 otherEnemy.status = 'gone';
@@ -301,6 +324,7 @@ function updateVoidTree(this: void, state: GameState, enemy: Enemy): void {
     if (hasFlame) {
         enemy.enemyDefinition.immunities.push('fire');
     } else {
+        enemy.getAbility(flameWallAbility).charges = 0;
     }
     if (hasFrost) {
         enemy.enemyDefinition.immunities.push('ice');
@@ -309,8 +333,8 @@ function updateVoidTree(this: void, state: GameState, enemy: Enemy): void {
     }
     if (hasStorm) {
         enemy.enemyDefinition.immunities.push('lightning');
-        if (enemy.modeTime % 200 === 0) {
-            enemy.params.sparkTheta = (enemy.params.sparkTheta || 0) + Math.PI / 32;
+        if (enemy.modeTime % 400 === 0) {
+            enemy.params.sparkTheta = (enemy.params.sparkTheta || 0) + Math.PI / 24;
             const hitbox = enemy.getHitbox();
             addRadialSparks(state, enemy.area, [hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2], 3, enemy.params.sparkTheta, 3, 4);
         }

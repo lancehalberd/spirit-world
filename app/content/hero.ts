@@ -265,6 +265,9 @@ export class Hero implements Actor, SavedHeroData {
         if (this.life <= 0) {
             return {};
         }
+        if (state.scriptEvents.blockPlayerInput) {
+            return {};
+        }
         if (this.action === 'getItem' || this.action === 'jumpingDown' || this.action === 'falling' || this.action === 'fallen') {
             return {};
         }
@@ -394,6 +397,9 @@ export class Hero implements Actor, SavedHeroData {
     }
 
     takeDamage(this: Hero, state: GameState, damage: number): void {
+        if (state.scriptEvents.blockPlayerInput) {
+            return;
+        }
         if (this.ironSkinLife) {
             this.ironSkinCooldown = 3000;
             if (this.ironSkinLife > damage) {

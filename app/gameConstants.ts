@@ -1,4 +1,4 @@
-import { readGetParameterAsInt } from 'app/utils/index';
+import { readGetParameter, readGetParameterAsInt } from 'app/utils/index';
 
 // Update duration in milliseconds.
 export const FRAME_LENGTH = 20;
@@ -60,5 +60,7 @@ export const randomizerSeed = readGetParameterAsInt('seed') || entranceSeed;
 export const isRandomizer = !!randomizerSeed;
 // Limit randomizer total to 999 to avoid having the victory point display get too large.
 export const randomizerTotal = Math.min(readGetParameterAsInt('total') || 20, 999);
+const isBossGoal = readGetParameter('goal') === 'boss';
+export const randomizerGoalType: 'victoryPoints' | 'finalBoss' = isBossGoal ? 'finalBoss' : 'victoryPoints';
 export const randomizerGoal = Math.min(randomizerTotal, readGetParameterAsInt('goal') || 10);
 export const enemySeed = readGetParameterAsInt('enemySeed');

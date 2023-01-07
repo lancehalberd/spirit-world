@@ -91,6 +91,18 @@ dialogueHash.saveStatue = {
                 `
             ],
         },
+        {
+            logicCheck: {
+                zones: ['tree'],
+            },
+            text: [
+                `
+                    The final battle is ahead.
+                    {|}It isn't finished yet, but hopefully it will still be a fun challenge.
+                    {item:secondChance}
+                `
+            ],
+        },
         // This is the default text and probably won't be used in the long run.
         {
             logicCheck: {

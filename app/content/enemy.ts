@@ -136,7 +136,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         for (const ability of this.enemyDefinition.abilities ?? []) {
             this.abilities.push({
                 definition: ability,
-                charges: ability.initialCharges || 1,
+                charges: ability.initialCharges ?? 1,
                 cooldown: ability.cooldown || 0,
             });
         }
