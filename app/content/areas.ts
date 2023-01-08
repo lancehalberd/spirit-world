@@ -832,7 +832,7 @@ export function getAreaSize(state: GameState): {w: number, h: number, section: R
     }
 }
 
-export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefresh = false, resetObjects = false): void {
+export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefresh = false): void {
     if (!area) {
         return;
     }
@@ -883,108 +883,127 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
             specialBehavior?.apply(state, instance);
         }
     }
-    const shouldBeHot = evaluateLogicDefinition(state, area.definition.hotLogic, false);
-    if (refreshBehavior || area.isHot !== shouldBeHot) {
-        state.fadeLevel = (state.areaInstance.dark || 0) / 100;
-        state.hero.vx = state.hero.vy = 0;
-        if (fastRefresh) {
-            for (const instance of [area, area.alternateArea]) {
-                instance.tilesDrawn = [];
-                instance.checkToRedrawTiles = true;
-                instance.behaviorGrid = [];
-                for (const layer of instance.layers || []) {
-                    const definitionIndex = instance.definition.layers.indexOf(layer.definition);
-                    applyLayerToBehaviorGrid(instance.behaviorGrid,
-                        instance.definition.layers[definitionIndex],
-                        instance.definition.parentDefinition?.layers?.[definitionIndex]
-                    );
-                }
-            }
-        } else {
-            const nextAreaInstance = createAreaInstance(state, state.areaInstance.definition);
-            nextAreaInstance.alternateArea = area.alternateArea;
+    for (let instance of [area, area.alternateArea]) {
+        const shouldBeHot = evaluateLogicDefinition(state, instance.definition.hotLogic, false);
+        if (refreshBehavior || instance.isHot !== shouldBeHot) {
+            state.fadeLevel = (state.areaInstance.dark || 0) / 100;
+            state.hero.vx = state.hero.vy = 0;
+            const nextAreaInstance = createAreaInstance(state, instance.definition);
+            nextAreaInstance.alternateArea = instance.alternateArea;
             nextAreaInstance.alternateArea.alternateArea = nextAreaInstance;
-            state.transitionState = {
-                callback: () => null,
-                nextLocation: state.location,
-                time: 0,
-                type: 'mutating',
-                nextAreaInstance,
-            };
-            if (resetObjects) {
-                // Just keep the objects as they are in the newly created instance
-                return;
-            } else {
-                // Otherwise copy the objects from the current area and then apply the
-                // object logic update code that follows below.
-                nextAreaInstance.objects = [...area.objects];
-                for (const object of nextAreaInstance.objects) {
-                    object.area = nextAreaInstance;
-                }
-                nextAreaInstance.effects = [...area.effects];
-                for (const effect of nextAreaInstance.effects) {
-                    effect.area = nextAreaInstance;
-                }
-                nextAreaInstance.layers = [...area.layers];
-                // Since objects are on the next area now, we must also move the priority object queue to the next area.
-                nextAreaInstance.priorityObjects = area.priorityObjects;
-                area.priorityObjects = []
-                /*nextAreaInstance.alternateArea.objects = [...area.alternateArea.objects];
-                nextAreaInstance.alternateArea.effects = [...area.alternateArea.effects];
-                nextAreaInstance.alternateArea.layers = [...area.alternateArea.layers];*/
-                for (const instance of [nextAreaInstance, nextAreaInstance.alternateArea]) {
-                    instance.tilesDrawn = [];
-                    instance.checkToRedrawTiles = true;
-                    instance.behaviorGrid = [];
-                    for (const layer of instance.layers || []) {
-                        const definitionIndex = instance.definition.layers.indexOf(layer.definition);
-                        applyLayerToBehaviorGrid(instance.behaviorGrid,
-                            instance.definition.layers[definitionIndex],
-                            instance.definition.parentDefinition?.layers?.[definitionIndex]
-                        );
+            // Refresh tile behaviors+canvases.
+            nextAreaInstance.tilesDrawn = [];
+            nextAreaInstance.checkToRedrawTiles = true;
+            nextAreaInstance.behaviorGrid = [];
+            nextAreaInstance.layers = [...instance.layers];
+            /*for (const layer of nextAreaInstance.layers || []) {
+                const definitionIndex = nextAreaInstance.definition.layers.indexOf(layer.definition);
+                applyLayerToBehaviorGrid(nextAreaInstance.behaviorGrid,
+                    nextAreaInstance.definition.layers[definitionIndex],
+                    nextAreaInstance.definition.parentDefinition?.layers?.[definitionIndex]
+                );
+            }*/
+            // Update any tile behaviors that may have changed as layers were added/removed.
+            for (let y = 0; y < 32; y++) {
+                for (let x = 0; x < 32; x++) {
+                    for (const layer of nextAreaInstance.layers) {
+                        layer.tiles[y][x] = layer.originalTiles[y][x];
                     }
+                    resetTileBehavior(nextAreaInstance, {x, y});
                 }
-                area = nextAreaInstance;
             }
 
-        }
-    }
-    for (const object of area.definition.objects) {
-        if (!object.logicKey && !object.hasCustomLogic) {
-            if (object.specialBehaviorKey) {
-                const instance = area.objects.find(o => o.definition === object);
-                if (instance) {
-                    specialBehaviorsHash[instance.definition.specialBehaviorKey].apply?.(state, instance as any);
+            // If this is the transition currently being viewed, then apply either fash or normal transition logic.
+            if (state.areaInstance === instance) {
+                if (fastRefresh) {
+                    state.areaInstance = nextAreaInstance;
+                    state.hero.area = state.areaInstance;
+                } else {
+                    state.transitionState = {
+                        callback: () => null,
+                        nextLocation: state.location,
+                        time: 0,
+                        type: 'mutating',
+                        nextAreaInstance,
+                    };
+                }
+            } else if (state.alternateAreaInstance === instance) {
+                if (fastRefresh) {
+                    state.alternateAreaInstance = nextAreaInstance;
+                } else {
+                    if (!state.transitionState) {
+                        debugger;
+                    }
+                    state.transitionState.nextAlternateAreaInstance = nextAreaInstance;
                 }
             }
-            continue;
+
+            // Copy the objects from the current area and then apply the object logic update code that follows below.
+            nextAreaInstance.objects = [];
+            for (const object of [...instance.objects]) {
+                addObjectToArea(state, nextAreaInstance, object);
+            }
+            nextAreaInstance.effects = [];
+            for (const effect of [...instance.effects]) {
+                addEffectToArea(state, nextAreaInstance, effect);
+            }
+            // Since objects are on the next area now, we must also move the priority object queue to the next area.
+            nextAreaInstance.priorityObjects = instance.priorityObjects;
+            instance.priorityObjects = []
+            instance = nextAreaInstance;
+            if (nextAreaInstance.objects.find(o => o.definition?.id === 'voidTree' && o instanceof Enemy && !o.params.allHearts)) {
+                debugger;
+            }
         }
-        let instance = area.objects.find(o => o.definition === object);
-        if (isObjectLogicValid(state, object)) {
-            // If the object is valid but was never added to the area, add it now.
-            if (!instance && object.id && !area.removedObjectIds.includes(object.id)) {
-                instance = createObjectInstance(state, object);
-                addObjectToArea(state, area, instance);
-            } else if (instance) {
-                if (instance.definition.specialBehaviorKey) {
-                    specialBehaviorsHash[instance.definition.specialBehaviorKey].apply?.(state, instance as any);
+        for (const object of instance.definition.objects) {
+            /*if (object.id.includes('void')
+                && !object.id.includes('-')
+                && !object.id.includes('Entrance')
+                && !object.id.includes('Exit')
+                && object.id !== 'voidTree' && !state.savedState.objectFlags[object.id]) {
+                debugger;
+            }*/
+            if (!object.logicKey && !object.hasCustomLogic) {
+                if (object.specialBehaviorKey) {
+                    const objectInstance = instance.objects.find(o => o.definition === object);
+                    if (objectInstance) {
+                        specialBehaviorsHash[objectInstance.definition.specialBehaviorKey].apply?.(state, objectInstance as any);
+                    }
+                }
+                continue;
+            }
+            let objectInstance = instance.objects.find(o => o.definition === object);
+            if (isObjectLogicValid(state, object)) {
+                // If the object is valid but was never added to the area, add it now.
+                if (!objectInstance && object.id && !instance.removedObjectIds.includes(object.id)) {
+                    objectInstance = createObjectInstance(state, object);
+                    addObjectToArea(state, instance, objectInstance);
+                } else if (objectInstance) {
+                    if (objectInstance.definition.specialBehaviorKey) {
+                        specialBehaviorsHash[objectInstance.definition.specialBehaviorKey].apply?.(state, objectInstance as any);
+                    }
+                }
+            } else {
+                // If the object is invalid but present, remove it from the area, but don't track it as removed by gameplay
+                // so that logical changes can bring it back.
+                if (objectInstance) {
+                    removeObjectFromArea(state, objectInstance, false);
                 }
             }
-        } else {
-            // If the object is invalid but present, remove it from the area.
-            if (instance) {
-                removeObjectFromArea(state, instance);
+        }
+        for (const object of area.objects) {
+            object.refreshLogic?.(state);
+            if (object.definition?.specialBehaviorKey) {
+                try {
+                    specialBehaviorsHash[object.definition.specialBehaviorKey].apply?.(state, object as any);
+                } catch (error) {
+                    console.error(object.definition.specialBehaviorKey);
+                }
             }
         }
-    }
-    for (const object of area.objects) {
-        object.refreshLogic?.(state);
-        if (object.definition?.specialBehaviorKey) {
-            try {
-                specialBehaviorsHash[object.definition.specialBehaviorKey].apply?.(state, object as any);
-            } catch (error) {
-                console.error(object.definition.specialBehaviorKey);
-            }
+        //console.log('new instance', instance.objects.map( o => o.definition?.id ));
+        if (instance.objects.find(o => o.definition?.id === 'voidTree' && o instanceof Enemy && !o.params.allHearts)) {
+            debugger;
         }
     }
     checkIfAllEnemiesAreDefeated(state, area);

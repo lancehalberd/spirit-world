@@ -21,12 +21,14 @@ import {
 import { certainLifeLootTable } from 'app/content/lootTables';
 import { saveObjectStatus } from 'app/content/objects';
 import { createCanvasAndContext } from 'app/dom';
+import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { addScreenShake, rotateDirection } from 'app/utils/field';
 import { allImagesLoaded } from 'app/utils/images';
 import { rectanglesOverlap } from 'app/utils/index';
+import Random from 'app/utils/Random';
 
-import { Enemy, EnemyAbility, GameState, HitProperties, HitResult } from 'app/types';
+import { AreaInstance, Enemy, EnemyAbility, GameState, HitProperties, HitResult } from 'app/types';
 
 
 const stoneGeometry = {w: 20, h: 20, content: {x: 4, y: 10, w: 12, h: 8}};
@@ -82,14 +84,7 @@ const giantLaserAbility: EnemyAbility<NearbyTargetType> = {
     },
     useAbility(this: void, state: GameState, enemy: Enemy, target: NearbyTargetType): void {
         const hitbox = target.target.getHitbox();
-        const laser = new LaserBeam({
-            sx: hitbox.x + hitbox.w / 2, sy: 0, tx: hitbox.x + hitbox.w / 2, ty: 512,
-            radius: 20, damage: 8,
-            ignoreWalls: true,
-            tellDuration: 1500,
-            duration: 2000,
-        });
-        addEffectToArea(state, enemy.area, laser);
+        addLaser(state, enemy.area, hitbox.x + hitbox.w / 2);
     },
     cooldown: 8000,
     initialCharges: 0,
@@ -98,6 +93,37 @@ const giantLaserAbility: EnemyAbility<NearbyTargetType> = {
     prepTime: 400,
     recoverTime: 400,
 };
+
+function addLaser(state: GameState, area: AreaInstance, x: number, tellDuration: number = 1500, duration: number = 2000, delay: number = 0): void {
+    const laser = new LaserBeam({
+        sx: x, sy: 0, tx:x, ty: 512,
+        radius: 20, damage: 8,
+        ignoreWalls: true,
+        tellDuration,
+        duration,
+        delay,
+    });
+    addEffectToArea(state, area, laser);
+}
+
+function addLaserBarrageToArea(state: GameState, count: number) {
+    let sx = (Math.random() * 3) | 0;
+    for (let i = 0; i < count; i++) {
+        for (let x = 20; x <= 512; x += 120) {
+            addLaser(state, state.hero.area, x + 40 * sx, 600, 1000, 1000 * i);
+        }
+        if (Math.random() < 0.5 ) {
+            sx++;
+        }
+        sx = (sx + 1) % 3;
+    }
+}
+
+function addLaserWarningToArea(state: GameState) {
+    for (let x = 20; x <= 512; x += 40) {
+        addLaser(state, state.hero.area, x, 300, 0, x);
+    }
+}
 
 const iceGrenadeAbility: EnemyAbility<NearbyTargetType> = {
     getTarget(this: void, state: GameState, enemy: Enemy): NearbyTargetType {
@@ -282,12 +308,67 @@ enemyDefinitions.voidTree = {
     abilities: [dischargeAbility, flameWallAbility, giantLaserAbility, iceGrenadeAbility],
     // void tree is immune to all damage types until one of the hearts is destroyed.
     immunities: ['ice', 'fire', 'lightning', null],
+    params: {
+        enrageLevel: 0,
+        enrageTime: 0,
+    },
 };
 
+function chooseNewHeart(state: GameState, enemy: Enemy, fastRefresh = false) {
+    if (!enemy.params.allHearts) {
+        enemy.params.allHearts = ['voidStone', 'voidFlame', 'voidFrost', 'voidStorm'];
+        enemy.params.chosenHearts = [];
+    }
+    if (!enemy.params.allHearts.length) {
+        return;
+    }
+    enemy.params.chosenHearts.push(Random.removeElement(enemy.params.allHearts));
+    for (const missingHeart of enemy.params.allHearts) {
+        state.savedState.objectFlags[missingHeart] = true;
+    }
+    for (const activeHeart of enemy.params.chosenHearts) {
+        delete state.savedState.objectFlags[activeHeart];
+    }
+    refreshAreaLogic(state, state.areaInstance, fastRefresh);
+}
 
 function updateVoidTree(this: void, state: GameState, enemy: Enemy): void {
+    if (!enemy.params.allHearts) {
+        // console.log('void tree resetting');
+        chooseNewHeart(state, enemy, true);
+    }
+    if (enemy.params.enrageTime > 0) {
+        if (enemy.modeTime === 2000) {
+            addLaserBarrageToArea(state, enemy.params.enrageLevel * 5);
+        }
+        enemy.params.enrageTime -= FRAME_LENGTH;
+        enemy.enemyInvulnerableFrames = 20;
+        enemy.invulnerableFrames = 20;
+        // Choose a new heart at the end of each enrage phase.
+        if (enemy.params.enrageTime <= 0) {
+            chooseNewHeart(state, enemy, true);
+        }
+        return;
+    }
+    const maxLife = enemy.enemyDefinition.life;
+    if (enemy.life <= 0.75 * maxLife && enemy.params.enrageLevel === 0) {
+        enemy.params.enrageLevel = 1;
+        enemy.params.enrageTime = 9000;
+        enemy.modeTime = 0;
+        addLaserWarningToArea(state);
+    } else if (enemy.life <= 0.5 * maxLife && enemy.params.enrageLevel === 1) {
+        enemy.params.enrageLevel = 2;
+        enemy.params.enrageTime = 14000;
+        enemy.modeTime = 0;
+        addLaserWarningToArea(state);
+    } else if (enemy.life <= 0.25 * maxLife && enemy.params.enrageLevel === 2) {
+        enemy.params.enrageLevel = 3;
+        enemy.params.enrageTime = 19000;
+        enemy.modeTime = 0;
+        addLaserWarningToArea(state);
+    }
     enemy.enemyDefinition.immunities = [];
-    let hasFlame = false, hasFrost = false, hasStone = false, hasStorm = false;
+    let hasFlame = false, hasFrost = false, hasStone = false, hasStorm = false, heartCount = 0;
     // The area is not automatically updated when one of multiple bosses are defeated,
     // so the tree explicitly watches if any of the void hearts are defeated and refreshes
     // the area when their death animation completes.
@@ -298,21 +379,30 @@ function updateVoidTree(this: void, state: GameState, enemy: Enemy): void {
                 otherEnemy.status = 'gone';
                 saveObjectStatus(state, otherEnemy.definition);
                 refreshAreaLogic(state, state.areaInstance);
-                refreshAreaLogic(state, state.alternateAreaInstance);
             } else {
                 if (otherEnemy.definition.enemyType === 'voidStone') {
                     hasStone = true;
+                    heartCount++;
                 }
                 if (otherEnemy.definition.enemyType === 'voidFlame') {
                     hasFlame = true;
+                    heartCount++;
                 }
                 if (otherEnemy.definition.enemyType === 'voidFrost') {
                     hasFrost = true;
+                    heartCount++;
                 }
                 if (otherEnemy.definition.enemyType === 'voidStorm') {
                     hasStorm = true;
+                    heartCount++;
                 }
             }
+        }
+    }
+    // Teleporters are removed to prevent accessing the final heart.
+    for (const object of enemy.area.objects) {
+        if (object.definition?.type === 'teleporter') {
+            object.status = (heartCount <= 1) ? 'hidden' : 'normal';
         }
     }
     // Disable abilities associated with each void heart by overriding the stored charges on them.

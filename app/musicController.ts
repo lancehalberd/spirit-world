@@ -112,7 +112,7 @@ export const updateMusic = (): void => {
         playTrack('forgeTheme', 0, soundSettings);
     } else if (state.location.zoneKey === 'grandTemple') {
         playTrack('helixTheme', 0, soundSettings);
-    }  else if (state.location.zoneKey === 'crater') {
+    } else if (state.location.zoneKey === 'crater') {
         playTrack('craterTheme', 0, soundSettings);
     } else if (state.location.zoneKey === 'staffTower') {
         // Play a different track when the tower is activated later.
@@ -129,6 +129,12 @@ export const updateMusic = (): void => {
         } else {
             playTrack('caveTheme', 0, soundSettings);
         }
+    } else if (state.location.zoneKey === 'lab') {
+        playTrack('forgeTheme', 0, soundSettings);
+    } else if (state.location.zoneKey === 'tree') {
+        playTrack('helixTheme', 0, soundSettings);
+    } else if (state.location.zoneKey === 'void') {
+        playTrack('vanaraDreamTheme', 0, soundSettings);
     }
 }
 

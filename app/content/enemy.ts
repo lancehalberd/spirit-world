@@ -392,7 +392,6 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
                         getLoot(state, bossDefinition);
                     } else {
                         refreshAreaLogic(state, state.areaInstance);
-                        refreshAreaLogic(state, state.alternateAreaInstance);
                     }
                 });
             }

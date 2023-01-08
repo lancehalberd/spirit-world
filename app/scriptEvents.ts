@@ -410,18 +410,15 @@ export const updateScriptEvents = (state: GameState): void => {
             case 'clearFlag':
                 delete state.savedState.objectFlags[event.flag];
                 refreshAreaLogic(state, state.areaInstance);
-                refreshAreaLogic(state, state.areaInstance.alternateArea);
                 saveGame();
                 break;
             case 'setFlag':
                 state.savedState.objectFlags[event.flag] = event.value;
                 refreshAreaLogic(state, state.areaInstance);
-                refreshAreaLogic(state, state.areaInstance.alternateArea);
                 saveGame();
                 break;
             case 'refreshAreaLogic':
                 refreshAreaLogic(state, state.areaInstance);
-                refreshAreaLogic(state, state.areaInstance.alternateArea);
                 break;
             case 'gainLoot':
                 getLoot(state, {type: 'dialogueLoot', ...event.lootDefinition});

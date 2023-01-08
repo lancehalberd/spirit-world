@@ -245,7 +245,6 @@ export function getLoot(this: void, state: GameState, definition: AnyLootDefinit
     const fastRefresh = definition.lootType === 'staff';
     // Refresh the area so that the guardian NPC moves to the correct location now that the boss is defeated.
     refreshAreaLogic(state, state.areaInstance, fastRefresh);
-    refreshAreaLogic(state, state.alternateAreaInstance, fastRefresh);
     saveGame();
 }
 
@@ -377,7 +376,6 @@ export class ChestObject implements ObjectInstance {
                 state.savedState.objectFlags[this.definition.id] = true;
                 // Refresh the area so that the guardian NPC moves to the correct location now that the boss is defeated.
                 refreshAreaLogic(state, state.areaInstance);
-                refreshAreaLogic(state, state.alternateAreaInstance);
                 saveGame();
             }
         }

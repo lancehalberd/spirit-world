@@ -105,15 +105,16 @@ export class LaserBeam implements EffectInstance, Props {
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
-       if (this.delay > 0) {
-           return;
-       }
-       if (this.tellDuration > 0) {
+        // never draw the laser if the duration is 0.
+        if (this.delay > 0 || this.duration === 0) {
             return;
-       }
-       const p = (this.animationTime - this.duration) / FADE_DURATION;
-       const alpha = 1 - Math.max(0, Math.min(1, p));
-       drawLaser(context, this.getHitRay(state), alpha);
+        }
+        if (this.tellDuration > 0) {
+            return;
+        }
+        const p = (this.animationTime - this.duration) / FADE_DURATION;
+        const alpha = 1 - Math.max(0, Math.min(1, p));
+        drawLaser(context, this.getHitRay(state), alpha);
     }
     renderShadow(context: CanvasRenderingContext2D, state: GameState) {
        if (this.delay > 0) {

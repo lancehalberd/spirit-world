@@ -61,7 +61,6 @@ export class FloorSwitch implements ObjectInstance {
             if (this.definition.id && (this.definition.saveStatus === 'forever' || this.definition.saveStatus === 'zone')) {
                 // Refresh the area to update layer logic, for example drainging lava in the crater.
                 refreshAreaLogic(state, state.areaInstance);
-                refreshAreaLogic(state, state.alternateAreaInstance);
             }
         }
         if (this.definition.toggleOnRelease && this.definition.targetObjectId) {
