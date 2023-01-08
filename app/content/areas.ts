@@ -943,10 +943,14 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
             for (const object of [...instance.objects]) {
                 addObjectToArea(state, nextAreaInstance, object);
             }
+            // The objects will be removed from the current instance, so add them back so they will render during the transition.
+            instance.objects = nextAreaInstance.objects;
             nextAreaInstance.effects = [];
             for (const effect of [...instance.effects]) {
                 addEffectToArea(state, nextAreaInstance, effect);
             }
+            // The effects will be removed from the current instance, so add them back so they will render during the transition.
+            instance.effects = nextAreaInstance.effects;
             // Since objects are on the next area now, we must also move the priority object queue to the next area.
             nextAreaInstance.priorityObjects = instance.priorityObjects;
             instance.priorityObjects = []

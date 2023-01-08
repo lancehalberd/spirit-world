@@ -440,7 +440,7 @@ const beastState = applyItems(helixEndState, {
     cloudBoots: 1, clone: 1,
     ironBoots: 1, cloak: 2, roll: 2,
     maxLife: 2,
-    staff: 2,
+    staff: 1,
     lightningBlessing: 1, goldOre: 2, nimbusCloud: 1,
     ironSkin: 1, bow: 2, gloves: 2, goldMail: 1,
     spiritDamage: 1, spiritRange: 1,
