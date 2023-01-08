@@ -507,8 +507,8 @@ function atan3(y, x) {
     return (Math.atan2(y, x) + 2 * Math.PI) % (2 * Math.PI);
 }
 
-function shootFrostInCone(state: GameState, enemy: Enemy, theta: number, damage = 1, speed = 4): void {
-    const hitbox = enemy.getHitbox(state);
+export function shootFrostInCone(state: GameState, enemy: Enemy, theta: number, damage = 1, speed = 4, hitEnemies = true): void {
+    const hitbox = enemy.getHitbox();
     const x = hitbox.x + hitbox.w / 2 + Math.cos(theta) * hitbox.w / 2;
     const y = hitbox.y + hitbox.h / 2 + Math.sin(theta) * hitbox.h / 2;
     const attackTheta = theta - Math.PI / 10 + Math.random() * Math.PI / 5;
@@ -518,6 +518,7 @@ function shootFrostInCone(state: GameState, enemy: Enemy, theta: number, damage 
         y,
         vx: speed * Math.cos(attackTheta),
         vy: speed * Math.sin(attackTheta),
+        hitEnemies,
         ignoreTargets: new Set([enemy]),
     });
     addEffectToArea(state, enemy.area, frost);

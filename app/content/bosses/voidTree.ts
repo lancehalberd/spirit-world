@@ -1,6 +1,6 @@
 import { addEffectToArea, addObjectToArea, playAreaSound, refreshAreaLogic } from 'app/content/areas';
 import { flameHeartAnimations } from 'app/content/bosses/flameBeast';
-import { frostHeartAnimations } from 'app/content/bosses/frostBeast';
+import { frostHeartAnimations, shootFrostInCone } from 'app/content/bosses/frostBeast';
 import { addSlamEffect, golemHandAnimations, golemHandHurtAnimations } from 'app/content/bosses/golem';
 import { stormHeartAnimations } from 'app/content/bosses/stormBeast';
 import { FlameWall } from 'app/content/effects/flameWall';
@@ -28,7 +28,7 @@ import { allImagesLoaded } from 'app/utils/images';
 import { rectanglesOverlap } from 'app/utils/index';
 import Random from 'app/utils/Random';
 
-import { AreaInstance, Enemy, EnemyAbility, GameState, HitProperties, HitResult } from 'app/types';
+import { Enemy, EnemyAbility, GameState, HitProperties, HitResult } from 'app/types';
 
 
 const stoneGeometry = {w: 20, h: 20, content: {x: 4, y: 10, w: 12, h: 8}};
@@ -84,7 +84,15 @@ const giantLaserAbility: EnemyAbility<NearbyTargetType> = {
     },
     useAbility(this: void, state: GameState, enemy: Enemy, target: NearbyTargetType): void {
         const hitbox = target.target.getHitbox();
-        addLaser(state, enemy.area, hitbox.x + hitbox.w / 2);
+        const x = hitbox.x + hitbox.w / 2;
+        const laser = new LaserBeam({
+            sx: x, sy: 0, tx:x, ty: 512,
+            radius: 20, damage: 8,
+            ignoreWalls: true,
+            tellDuration: 1500,
+            duration: 2000,
+        });
+        addEffectToArea(state, enemy.area, laser);
     },
     cooldown: 8000,
     initialCharges: 0,
@@ -94,34 +102,42 @@ const giantLaserAbility: EnemyAbility<NearbyTargetType> = {
     recoverTime: 400,
 };
 
-function addLaser(state: GameState, area: AreaInstance, x: number, tellDuration: number = 1500, duration: number = 2000, delay: number = 0): void {
-    const laser = new LaserBeam({
-        sx: x, sy: 0, tx:x, ty: 512,
-        radius: 20, damage: 8,
-        ignoreWalls: true,
-        tellDuration,
-        duration,
-        delay,
-    });
-    addEffectToArea(state, area, laser);
-}
+const LASER_BARRAGE_RADIUS = 16;
+const LASER_SPOTS = [0, 1, 2, 3]
 
 function addLaserBarrageToArea(state: GameState, count: number) {
-    let sx = (Math.random() * 3) | 0;
+    let spots = [];
     for (let i = 0; i < count; i++) {
-        for (let x = 20; x <= 512; x += 120) {
-            addLaser(state, state.hero.area, x + 40 * sx, 600, 1000, 1000 * i);
+        if (!spots.length) {
+            spots = Random.shuffle(LASER_SPOTS);
         }
-        if (Math.random() < 0.5 ) {
-            sx++;
+        const subX = 2 * LASER_BARRAGE_RADIUS * spots.pop();
+        for (let x = LASER_BARRAGE_RADIUS; x <= 512; x += 2 * LASER_BARRAGE_RADIUS * LASER_SPOTS.length) {
+            const sx = x + subX;
+            const laser = new LaserBeam({
+                sx, sy: 0, tx: sx, ty: 512,
+                radius: LASER_BARRAGE_RADIUS, damage: 4,
+                ignoreWalls: true,
+                tellDuration: 600,
+                duration: 600,
+                delay: 500 * i,
+            });
+            addEffectToArea(state, state.hero.area, laser);
         }
-        sx = (sx + 1) % 3;
     }
 }
 
 function addLaserWarningToArea(state: GameState) {
-    for (let x = 20; x <= 512; x += 40) {
-        addLaser(state, state.hero.area, x, 300, 0, x);
+    for (let x = LASER_BARRAGE_RADIUS; x <= 512; x += 2 * LASER_BARRAGE_RADIUS) {
+        const laser = new LaserBeam({
+            sx: x, sy: 0, tx:x, ty: 512,
+            radius: LASER_BARRAGE_RADIUS, damage: 0,
+            ignoreWalls: true,
+            tellDuration: 300,
+            duration: 0,
+            delay: x,
+        });
+        addEffectToArea(state, state.hero.area, laser);
     }
 }
 
@@ -168,9 +184,6 @@ const flameWallAbility: EnemyAbility<NearbyTargetType> = {
 
 const lightningBoltAbility: EnemyAbility<NearbyTargetType> = {
     getTarget(this: void, state: GameState, enemy: Enemy): NearbyTargetType {
-        if (state.hero.area === enemy.area.alternateArea) {
-            return getVectorToNearbyTarget(state, enemy, 2000, enemy.area.alternateArea.allyTargets);
-        }
         return getVectorToNearbyTarget(state, enemy, enemy.aggroRadius, enemy.area.allyTargets);
     },
     prepareAbility(this: void, state: GameState, enemy: Enemy, target: NearbyTargetType) {
@@ -185,7 +198,7 @@ const lightningBoltAbility: EnemyAbility<NearbyTargetType> = {
             y: hitbox.y + hitbox.h / 2,
             shockWaveTheta: enemy.params.theta,
         });
-        addEffectToArea(state, target.target.area || enemy.area, lightningBolt);
+        addEffectToArea(state, enemy.area, lightningBolt);
     },
     cooldown: 4000,
     initialCharges: 0,
@@ -197,12 +210,6 @@ const lightningBoltAbility: EnemyAbility<NearbyTargetType> = {
 
 const summonVoidHandAbility: EnemyAbility<NearbyTargetType> = {
     getTarget(this: void, state: GameState, enemy: Enemy): NearbyTargetType {
-        if (state.hero.area === enemy.area.alternateArea) {
-            if (enemy.area.alternateArea.enemies.filter(enemy => enemy.definition.enemyType === 'voidHand').length >= 2) {
-                return null;
-            }
-            return getVectorToNearbyTarget(state, enemy, 2000, enemy.area.alternateArea.allyTargets);
-        }
         if (enemy.area.enemies.filter(enemy => enemy.definition.enemyType === 'voidHand').length >= 2) {
             return null;
         }
@@ -223,7 +230,7 @@ const summonVoidHandAbility: EnemyAbility<NearbyTargetType> = {
         });
         hand.setMode('appearing');
         hand.params.side = 'none';
-        addObjectToArea(state, target.target.area || enemy.area, hand);
+        addObjectToArea(state, enemy.area, hand);
     },
     cooldown: 15000,
     initialCharges: 0,
@@ -245,7 +252,7 @@ const dischargeAbility: EnemyAbility<NearbyTargetType> = {
         const discharge = new LightningDischarge({
             x: hitbox.x + hitbox.w / 2,
             y: hitbox.y + hitbox.h / 2,
-            damage: 8,
+            damage: 4,
             tellDuration: 3000,
             radius: 128,
             source: enemy,
@@ -258,6 +265,25 @@ const dischargeAbility: EnemyAbility<NearbyTargetType> = {
     chargesRecovered: 1,
     prepTime: 0,
     recoverTime: 1000,
+}
+
+function useSpinningSparkAttack(state: GameState, enemy: Enemy): void {
+    if (enemy.modeTime % 400 === 0) {
+        enemy.params.sparkTheta = (enemy.params.sparkTheta || 0) + Math.PI / 24;
+        const hitbox = enemy.getHitbox();
+        addRadialSparks(state, enemy.area, [hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2], 3, enemy.params.sparkTheta, 3, 4);
+    }
+}
+
+function useSpinningFrostAttack(state: GameState, enemy: Enemy): void {
+    const frostTime = enemy.modeTime % 10000;
+    if (frostTime < 6000) {
+        if (frostTime % 40 === 0) {
+            enemy.params.frostTheta = (enemy.params.frostTheta || 0) + Math.PI / 64;
+            // Track a nearby target when using the frostBreathArc attack, otherwise attack in the same direction.
+            shootFrostInCone(state, enemy, enemy.params.frostTheta, 2, Math.min(4, frostTime / 500), false);
+        }
+    }
 }
 
 enemyDefinitions.voidStone = {
@@ -300,12 +326,23 @@ enemyDefinitions.voidStorm = {
 
 function updateVoidHeart(this: void, state: GameState, enemy: Enemy): void {
     enemy.useRandomAbility(state);
+    if (enemy.definition.enemyType === 'voidStorm') {
+        useSpinningSparkAttack(state, enemy);
+    }
+    if (enemy.definition.enemyType === 'voidFrost') {
+        useSpinningFrostAttack(state, enemy);
+    }
 }
 
 enemyDefinitions.voidTree = {
     animations: treeAnimations, life: 128, scale: 2, touchDamage: 4, update: updateVoidTree,
     aggroRadius: 256,
-    abilities: [dischargeAbility, flameWallAbility, giantLaserAbility, iceGrenadeAbility],
+    abilities: [
+        summonVoidHandAbility, giantLaserAbility,
+        flameWallAbility,
+        iceGrenadeAbility,
+        dischargeAbility, lightningBoltAbility,
+    ],
     // void tree is immune to all damage types until one of the hearts is destroyed.
     immunities: ['ice', 'fire', 'lightning', null],
     params: {
@@ -339,7 +376,7 @@ function updateVoidTree(this: void, state: GameState, enemy: Enemy): void {
     }
     if (enemy.params.enrageTime > 0) {
         if (enemy.modeTime === 2000) {
-            addLaserBarrageToArea(state, enemy.params.enrageLevel * 5);
+            addLaserBarrageToArea(state, enemy.params.enrageLevel * 10);
         }
         enemy.params.enrageTime -= FRAME_LENGTH;
         enemy.enemyInvulnerableFrames = 20;
@@ -348,22 +385,29 @@ function updateVoidTree(this: void, state: GameState, enemy: Enemy): void {
         if (enemy.params.enrageTime <= 0) {
             chooseNewHeart(state, enemy, true);
         }
+        // Teleporters are hidden during rage phase, otherwise the player can
+        // just hide in the spirit world.
+        for (const object of enemy.area.objects) {
+            if (object.definition?.type === 'teleporter') {
+                object.status = 'hidden';
+            }
+        }
         return;
     }
     const maxLife = enemy.enemyDefinition.life;
     if (enemy.life <= 0.75 * maxLife && enemy.params.enrageLevel === 0) {
         enemy.params.enrageLevel = 1;
-        enemy.params.enrageTime = 9000;
+        enemy.params.enrageTime = 7000;
         enemy.modeTime = 0;
         addLaserWarningToArea(state);
     } else if (enemy.life <= 0.5 * maxLife && enemy.params.enrageLevel === 1) {
         enemy.params.enrageLevel = 2;
-        enemy.params.enrageTime = 14000;
+        enemy.params.enrageTime = 12000;
         enemy.modeTime = 0;
         addLaserWarningToArea(state);
     } else if (enemy.life <= 0.25 * maxLife && enemy.params.enrageLevel === 2) {
         enemy.params.enrageLevel = 3;
-        enemy.params.enrageTime = 19000;
+        enemy.params.enrageTime = 17000;
         enemy.modeTime = 0;
         addLaserWarningToArea(state);
     }
@@ -410,6 +454,7 @@ function updateVoidTree(this: void, state: GameState, enemy: Enemy): void {
         enemy.enemyDefinition.immunities.push(null);
     } else {
         enemy.getAbility(giantLaserAbility).charges = 0;
+        enemy.getAbility(summonVoidHandAbility).charges = 0;
     }
     if (hasFlame) {
         enemy.enemyDefinition.immunities.push('fire');
@@ -418,17 +463,15 @@ function updateVoidTree(this: void, state: GameState, enemy: Enemy): void {
     }
     if (hasFrost) {
         enemy.enemyDefinition.immunities.push('ice');
+        useSpinningFrostAttack(state, enemy);
     } else {
         enemy.getAbility(iceGrenadeAbility).charges = 0;
     }
     if (hasStorm) {
         enemy.enemyDefinition.immunities.push('lightning');
-        if (enemy.modeTime % 400 === 0) {
-            enemy.params.sparkTheta = (enemy.params.sparkTheta || 0) + Math.PI / 24;
-            const hitbox = enemy.getHitbox();
-            addRadialSparks(state, enemy.area, [hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2], 3, enemy.params.sparkTheta, 3, 4);
-        }
+        useSpinningSparkAttack(state, enemy);
     } else {
+        enemy.getAbility(lightningBoltAbility).charges = 0;
         enemy.getAbility(dischargeAbility).charges = 0;
     }
 
@@ -667,7 +710,9 @@ function updateVoidHand(this: void, state: GameState, enemy: Enemy): void {
         if (enemy.z <= 0) {
             enemy.z = 0;
             playAreaSound(state, enemy.area, 'bossDeath');
-            addScreenShake(state, 0, 2);
+            if (enemy.area === state.areaInstance) {
+                addScreenShake(state, 0, 2);
+            }
             addSlamEffect(state, enemy);
             addArcOfShockWaves(
                 state, enemy.area,
@@ -685,7 +730,9 @@ function updateVoidHand(this: void, state: GameState, enemy: Enemy): void {
         if (enemy.z <= 0) {
             enemy.z = 0;
             playAreaSound(state, enemy.area, 'bossDeath');
-            addScreenShake(state, 0, 3);
+            if (enemy.area === state.areaInstance) {
+                addScreenShake(state, 0, 3);
+            }
             addSlamEffect(state, enemy);
             addRadialShockWaves(
                 state, enemy.area,
@@ -700,7 +747,9 @@ function updateVoidHand(this: void, state: GameState, enemy: Enemy): void {
         accelerateInDirection(state, enemy, {x: 0, y: 1});
         if (!moveEnemy(state, enemy, enemy.vx, enemy.vy, {})) {
             playAreaSound(state, enemy.area, 'bossDeath');
-            addScreenShake(state, 0, 3);
+            if (enemy.area === state.areaInstance) {
+                addScreenShake(state, 0, 3);
+            }
             enemy.params.stunTime = 1500;
             enemy.setMode('stunned');
         }

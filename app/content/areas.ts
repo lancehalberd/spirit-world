@@ -953,6 +953,9 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
             instance.effects = nextAreaInstance.effects;
             // Since objects are on the next area now, we must also move the priority object queue to the next area.
             nextAreaInstance.priorityObjects = instance.priorityObjects;
+            // Without this the HUD/music logic will briefly be unable to detect bosses in the area which can cause boss music
+            // to restart during logic refreshes.
+            nextAreaInstance.enemies = [...instance.enemies];
             instance.priorityObjects = []
             instance = nextAreaInstance;
             if (nextAreaInstance.objects.find(o => o.definition?.id === 'voidTree' && o instanceof Enemy && !o.params.allHearts)) {

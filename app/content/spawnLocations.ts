@@ -437,9 +437,9 @@ const grandTempleStartState = applyItems(helixEndState, {
     []);
 
 const beastState = applyItems(helixEndState, {
+    maxLife: 7,
     cloudBoots: 1, clone: 1,
     ironBoots: 1, cloak: 2, roll: 2,
-    maxLife: 2,
     staff: 1,
     lightningBlessing: 1, goldOre: 2, nimbusCloud: 1,
     ironSkin: 1, bow: 2, gloves: 2, goldMail: 1,
@@ -479,7 +479,7 @@ const staffAquiredState = applyItems(staffBossState, {lightning: 1}, [
 
 const warshipStartState = applyItems(staffAquiredState, {staff: 2});
 
-const finalBoss1State = applyItems(warshipStartState, {clone: 2});
+const finalBoss1State = applyItems(warshipStartState, {clone: 2, maxLife: 5});
 
 
 interface SpawnLocationOptions {
