@@ -173,7 +173,7 @@ export function updateHeroMagicStats(state: GameState) {
     }
     if (state.hero.passiveTools.phoenixCrown) {
         state.hero.maxMagic += 20;
-        state.hero.magicRegen += 5;
+        state.hero.magicRegen += 6;
     }
 }
 

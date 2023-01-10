@@ -288,7 +288,7 @@ function useSpinningFrostAttack(state: GameState, enemy: Enemy): void {
 
 enemyDefinitions.voidStone = {
     animations: stoneHeartAnimations, life: 64, scale: 2, touchDamage: 4, update: updateVoidHeart,
-    showHealthBar: true,
+    showHealthBar: true, isImmortal: true,
     canBeKnockedBack: false,
     aggroRadius: 144,
     abilities: [giantLaserAbility, summonVoidHandAbility],
@@ -296,7 +296,7 @@ enemyDefinitions.voidStone = {
 
 enemyDefinitions.voidFlame = {
     animations: flameHeartAnimations, life: 64, scale: 2, touchDamage: 4, update: updateVoidHeart,
-    showHealthBar: true,
+    showHealthBar: true, isImmortal: true,
     canBeKnockedBack: false,
     aggroRadius: 144,
     abilities: [flameWallAbility],
@@ -306,7 +306,7 @@ enemyDefinitions.voidFlame = {
 
 enemyDefinitions.voidFrost = {
     animations: frostHeartAnimations, life: 64, scale: 2, touchDamage: 4, update: updateVoidHeart,
-    showHealthBar: true,
+    showHealthBar: true, isImmortal: true,
     canBeKnockedBack: false,
     aggroRadius: 144,
     abilities: [iceGrenadeAbility],
@@ -316,7 +316,7 @@ enemyDefinitions.voidFrost = {
 
 enemyDefinitions.voidStorm = {
     animations: stormHeartAnimations, life: 64, scale: 2, touchDamage: 4, update: updateVoidHeart,
-    showHealthBar: true,
+    showHealthBar: true, isImmortal: true,
     canBeKnockedBack: false,
     aggroRadius: 144,
     abilities: [lightningBoltAbility],
@@ -413,14 +413,16 @@ function updateVoidTree(this: void, state: GameState, enemy: Enemy): void {
     }
     enemy.enemyDefinition.immunities = [];
     let hasFlame = false, hasFrost = false, hasStone = false, hasStorm = false, heartCount = 0;
-    // The area is not automatically updated when one of multiple bosses are defeated,
+    // The area is not automatically updated when non-bosses are defeated,
     // so the tree explicitly watches if any of the void hearts are defeated and refreshes
     // the area when their death animation completes.
+    // To make sure the hearts are not removed before this can happen, they are marked as immortal
+    // and rely on the tree to trigger their death animations when they reach 0 life.
     for (const object of enemy.area.alternateArea.objects) {
         if (object.definition?.type === 'enemy') {
             const otherEnemy = object as Enemy;
-            if (otherEnemy.isDefeated && otherEnemy.animationTime > 2800) {
-                otherEnemy.status = 'gone';
+            if (otherEnemy.life <= 0 && !otherEnemy.isDefeated) {
+                otherEnemy.showDeathAnimation(state);
                 saveObjectStatus(state, otherEnemy.definition);
                 refreshAreaLogic(state, state.areaInstance);
             } else {

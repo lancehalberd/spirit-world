@@ -210,8 +210,10 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
             state.menuIndex = 0;
         }
     }
+    // This value starts at 1 and decreases to 1 / 4 once the max of 16 magicRegen is reached.
+    const drainCoefficient = state.hero.magicRegen ? 4 / state.hero.magicRegen : 0;
     if (state.hero.isInvisible) {
-        state.hero.actualMagicRegen = Math.max(-20, state.hero.actualMagicRegen - 4 * FRAME_LENGTH / 1000);
+        state.hero.actualMagicRegen = Math.max(-20, state.hero.actualMagicRegen - drainCoefficient * 4 * FRAME_LENGTH / 1000);
     } else if (state.hero.hasBarrier) {
         if (state.hero.invulnerableFrames > 0) {
             // Regenerate no magic during iframes after the barrier is damaged.
@@ -219,8 +221,6 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
         } else {
             state.hero.actualMagicRegen = !state.hero.action ? 2 : 1;
         }
-    } else {
-        state.hero.actualMagicRegen
     }
     const isHoldingBreath = !state.hero.passiveTools.waterBlessing && state.zone.surfaceKey;
     // The waterfall tower area drains mana unless you have the water blessing.
@@ -256,14 +256,14 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
         }
         // Slowly expend spirit energy while running.
         if (state.hero.magic >= 0) {
-            state.hero.magic -= 5 * FRAME_LENGTH / 1000;
+            state.hero.magic -= drainCoefficient * 5 * FRAME_LENGTH / 1000;
         }
     } else {
         // Normal regeneration rate.
         state.hero.magic += state.hero.actualMagicRegen * FRAME_LENGTH / 1000;
     }
     // Clones drain 2 magic per second.
-    state.hero.magic -= 2 * state.hero.clones.length * FRAME_LENGTH / 1000;
+    state.hero.magic -= 2 * drainCoefficient * state.hero.clones.length * FRAME_LENGTH / 1000;
     // Meditation grants 3 additional spirit energy per second.
     if (hero.action === 'meditating') {
         state.hero.magic += 3 * FRAME_LENGTH / 1000;
@@ -275,11 +275,12 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
             const coefficient = 100 / hero.area.dark;
             minLightRadius *= coefficient;
             if (state.hero.passiveTools.trueSight > 0) {
-                state.hero.magic -= 10 * FRAME_LENGTH / 1000 / coefficient;
+                // True sight gives better vision and consumes less spirit energy.
+                state.hero.magic -= drainCoefficient * 2 * FRAME_LENGTH / 1000 / coefficient;
                 targetLightRadius = 320 * coefficient;
                 minLightRadius += 20 * coefficient;
             } else if (state.hero.passiveTools.catEyes > 0) {
-                state.hero.magic -= 5 * FRAME_LENGTH / 1000 / coefficient;
+                state.hero.magic -= drainCoefficient * 4 * FRAME_LENGTH / 1000 / coefficient;
                 targetLightRadius = 80 * coefficient;
                 minLightRadius += 10 * coefficient;
             }

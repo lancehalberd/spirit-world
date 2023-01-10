@@ -16,13 +16,15 @@ export function getChargeLevelAndElement(state: GameState, hero: Hero, tool: Act
     }
     let chargeLevel = 0;
     let element: MagicElement = null;
+    // The Phoenix Crown reduces charge time by 25%.
+    const durationMultiplier = hero.passiveTools.phoenixCrown ? 0.75 : 1;
     if (state.hero.passiveTools.charge >= 2) {
-        if (hero.chargeTime >= 1200) {
+        if (hero.chargeTime >= durationMultiplier * 1200) {
             chargeLevel = 2;
-        } else if (hero.chargeTime >= 600) {
+        } else if (hero.chargeTime >= durationMultiplier * 600) {
             chargeLevel = 1;
         }
-    } else if (state.hero.passiveTools.charge >= 1 && hero.chargeTime >= 800) {
+    } else if (state.hero.passiveTools.charge >= 1 && hero.chargeTime >= durationMultiplier * 800) {
         chargeLevel = 1;
     }
     // Elemental magic does not work under water.
