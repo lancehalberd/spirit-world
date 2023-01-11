@@ -47,15 +47,6 @@ Current tasks:
             - Alternatively, some tells only render if you have true sight?
             - Possibly renders (certain) objects from the alternate world at 50%
                 - Might be especially good for monsters that render in both worlds like Staff Tower drones.
-    - Add magic regen cooldown
-        - Max value of 2 seconds initially, reduced to 1 or 0.5s with all equipment
-        - Actions that consume spirit energy will add to the cooldown
-            - 1 second of invisibility = 0.5 seconds cooldown
-            - 1 second of running adds 0.1 seconds of cooldown
-            - Using 10 spirit energy adds 0.1 seconds of cooldown
-        - Spirit energy will not regenerate until the cooldown is finished
-        - Standing still doubles how fast the cooldown expires
-        - Try representing the cooldown as an orange fill from the top of the spirit bar that only covers the left pixel.
 
     - Add meteor attacks that leave behind rocks to void tree fight
         - Give to tree + voidFlame
@@ -68,6 +59,9 @@ Current tasks:
     - Add punching fist attack to void tree rage phase if voidStone is active
 
     - Restrict laser barrage to if voidStone is active. Change it to be single bursts of 4 that can occur multiple times per phase. Slightly increase delay.
+
+    - Add void pit tiles and use them in the void area, add solid cliff edges to prevent jumping into the void.
+        - This will allow the astral projection to move freely over the void.
 
     - Mysteries
         - Lava appears under floor 2 in the middle of void tree fight

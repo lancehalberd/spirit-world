@@ -43,37 +43,35 @@ export function useTool(
 ): void {
     let { chargeLevel, element } = getChargeLevelAndElement(state, hero, tool);
     switch (tool) {
-        case 'bow':
+        case 'bow': {
             if (state.hero.magic <= 0) {
                 return;
             }
-            let speed = 4;
-            state.hero.magic -= 5;
+            const isUpgradedBow = state.hero.activeTools.bow >= 2;
+            let speed = isUpgradedBow ? 6 : 4;
+            let damage = isUpgradedBow ? 4 : 2;
+            damage *= (2 ** chargeLevel);
+            let magicCost = 5;
             if (chargeLevel === 1) {
                 speed += 2;
-                state.hero.magic -= 5;
+                magicCost += 5;
             }
-            const isUpgradedBow = state.hero.activeTools.bow >= 2;
-            if (isUpgradedBow) {
-                speed += 2;
-            }
-            if (state.hero.element && isUpgradedBow) {
+            if (state.hero.element && isUpgradedBow && chargeLevel === 0) {
                 // Upgraded bow always uses the equiped element
                 // and uses less magic to do so.
                 element = state.hero.element;
-                state.hero.magic -= 5;
+                magicCost += 5;
             } else if (state.hero.element && chargeLevel > 0) {
-                state.hero.magic -= 10;
+                // Adding an element to a charged attack costs 10 spirit energy.
+                magicCost += 10;
             }
+            state.hero.magic -= magicCost;
+            state.hero.increasedMagicRegenCooldown(1000 * magicCost / 10);
             hero.toolCooldown = 200;
             hero.toolOnCooldown = 'bow';
             let direction = hero.d;
             if (dx || dy) {
                 direction = getDirection(dx, dy, true);
-            }
-            let damage = 2 ** chargeLevel;
-            if (isUpgradedBow) {
-                damage *= 3;
             }
             let arrow = new Arrow({
                 chargeLevel,
@@ -90,7 +88,7 @@ export function useTool(
                 direction = rotateDirection(direction, -1/2);
                 arrow = new Arrow({
                     chargeLevel,
-                    damage: 2 ** chargeLevel,
+                    damage,
                     element,
                     x: hero.x + 8 + 8 * directionMap[direction][0],
                     y: hero.y + 8 * directionMap[direction][1] + 6,
@@ -102,7 +100,7 @@ export function useTool(
                 direction = rotateDirection(direction, 1);
                 arrow = new Arrow({
                     chargeLevel,
-                    damage: 2 ** chargeLevel,
+                    damage,
                     element,
                     x: hero.x + 8 + 8 * directionMap[direction][0],
                     y: hero.y + 8 * directionMap[direction][1] + 6,
@@ -113,7 +111,8 @@ export function useTool(
                 addEffectToArea(state, state.areaInstance, arrow);
             }
             return;
-        case 'cloak':
+        }
+        case 'cloak': {
             if (state.hero.isInvisible || state.hero.hasBarrier) {
                 state.hero.shatterBarrier(state);
                 state.hero.isInvisible = false;
@@ -121,14 +120,15 @@ export function useTool(
                 hero.toolOnCooldown = null;
                 return;
             }
-            let cost = 5;
+            let magicCost = 5;
             if (chargeLevel === 1) {
-                cost += 5;
+                magicCost += 5;
             }
-            if (state.hero.magic < cost) {
+            if (state.hero.magic < magicCost) {
                 return;
             }
-            state.hero.magic -= cost;
+            state.hero.magic -= magicCost;
+            state.hero.increasedMagicRegenCooldown(1000 * magicCost / 10);
             hero.toolOnCooldown = 'cloak';
             // This is based on the length of the animation for activating the cloak which is 20ms * 2 * 10
             hero.toolCooldown = 400;
@@ -138,7 +138,8 @@ export function useTool(
             }
             state.hero.hasBarrier = true;
             return;
-        case 'clone':
+        }
+        case 'clone': {
             if (state.hero.magic <= 0 || state.hero.life <= 1) {
                 return;
             }
@@ -146,6 +147,7 @@ export function useTool(
                 && state.hero.clones.length < state.hero.activeTools.clone
             ) {
                 state.hero.magic -= 10;
+                state.hero.increasedMagicRegenCooldown(1000 * 10 / 10);
                 hero.toolCooldown = 100;
                 hero.toolOnCooldown = 'clone';
                 hero.cloneToolReleased = false;
@@ -165,6 +167,7 @@ export function useTool(
             // The normal clone tool functionality only works when no clones currently exist.
             if (!state.hero.clones.length) {
                 state.hero.magic -= 10;
+                state.hero.increasedMagicRegenCooldown(1000 * 10 / 10);
                 hero.toolCooldown = 100;
                 hero.toolOnCooldown = 'clone';
                 hero.cloneToolReleased = false;
@@ -175,7 +178,8 @@ export function useTool(
                 }
             }
             return;
-        case 'staff':
+        }
+        case 'staff': {
             if (hero.activeStaff?.area && !hero.activeStaff.recalling) {
                 hero.activeStaff.recall(state);
                 hero.toolCooldown = 0;
@@ -187,10 +191,12 @@ export function useTool(
                 return;
             }
             state.hero.magic -= 10;
+            state.hero.increasedMagicRegenCooldown(1000 * 10 / 50);
             hero.toolCooldown = 200;
             hero.toolOnCooldown = 'staff';
             hero.action = 'usingStaff';
             hero.animationTime = 0;
             return;
+        }
     }
 }

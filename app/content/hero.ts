@@ -106,6 +106,10 @@ export class Hero implements Actor, SavedHeroData {
     magicRegen: number = 0;
     // This is the actual mana regen rate, which changes depending on circumstances and can even become negative.
     actualMagicRegen: number = 0;
+    // Until this reaches zero, magic will not regenerate.
+    magicRegenCooldown: number = 0;
+    // This is the maximum value magic regen cooldown can reach. It is reduced by certain items.
+    magicRegenCooldownLimit: number = 4000;
     lightRadius: number = 20;
     rollCooldown: number = 0;
     toolCooldown: number = 0;
@@ -291,11 +295,10 @@ export class Hero implements Actor, SavedHeroData {
                 spiritDamage = 0;
                 reflectDamage++;
             }
-            // This is a bit of a hack. When damaged with barrier, we set 50 iframes,
-            // during which magic regen is paused, but only the first 10 preven the barrier from taking damage.
-            if (hit.damage && state.hero.invulnerableFrames <= 40) {
+            if (hit.damage && state.hero.invulnerableFrames <= 0) {
                 state.hero.magic -= spiritDamage;
-                state.hero.invulnerableFrames = Math.max(state.hero.invulnerableFrames, 50);
+                state.hero.invulnerableFrames = Math.max(state.hero.invulnerableFrames, 10);
+                state.hero.increasedMagicRegenCooldown(1000 * spiritDamage / 20);
             }
             const hitbox = this.getHitbox(state);
             if (hit.canAlwaysKnockback && hit.knockback) {
@@ -653,5 +656,9 @@ export class Hero implements Actor, SavedHeroData {
             addEffectToArea(state, state.alternateAreaInstance, alternateThrownObject);
         }
         hero.pickUpTile = null;
+    }
+
+    increasedMagicRegenCooldown(amount: number): void {
+        this.magicRegenCooldown = Math.min(Math.max(100, this.magicRegenCooldown + amount), this.magicRegenCooldownLimit);
     }
 }

@@ -292,7 +292,7 @@ export class Arrow implements EffectInstance {
             removeEffectFromArea(state, this);
             return;
         }
-        if (!this.stuckFrames && this.damage > 1 && this.animationTime % 60 === 0) {
+        if (!this.stuckFrames && this.damage > 2 && this.animationTime % 60 === 0) {
             addSparkleAnimation(state, this.area, this, { element: this.element });
         }
         const hitResult = hitTargets(state, this.area, this.getHitProperties(state));

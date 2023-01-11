@@ -119,7 +119,7 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
         hero.frozenDuration -= FRAME_LENGTH;
     } else {
         hero.animationTime += FRAME_LENGTH;
-        if (hero.action === 'walking' && hero.isRunning && hero.magic >= 0) {
+        if (hero.action === 'walking' && hero.isRunning && hero.magic > 0) {
             hero.animationTime += FRAME_LENGTH / 2;
         }
         if (hero.passiveTools.ironSkin) {
@@ -213,7 +213,8 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
     // This value starts at 1 and decreases to 1 / 4 once the max of 16 magicRegen is reached.
     const drainCoefficient = state.hero.magicRegen ? 4 / state.hero.magicRegen : 0;
     if (state.hero.isInvisible) {
-        state.hero.actualMagicRegen = Math.max(-20, state.hero.actualMagicRegen - drainCoefficient * 4 * FRAME_LENGTH / 1000);
+        state.hero.actualMagicRegen = Math.max(-20, Math.min(0, state.hero.actualMagicRegen) - drainCoefficient * 4 * FRAME_LENGTH / 1000);
+        state.hero.increasedMagicRegenCooldown(drainCoefficient * FRAME_LENGTH / 2);
     } else if (state.hero.hasBarrier) {
         if (state.hero.invulnerableFrames > 0) {
             // Regenerate no magic during iframes after the barrier is damaged.
@@ -246,21 +247,33 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
     } else if (!state.hero.isInvisible && !state.hero.hasBarrier) {
         state.hero.actualMagicRegen = !state.hero.action ? 2 * state.hero.magicRegen : state.hero.magicRegen;
     }
-    if (!state.hero.action && state.hero.actualMagicRegen > 0) {
+    const isActuallyRunning = state.hero.action === 'walking' && state.hero.isRunning && state.hero.magic > 0;
+    const preventRegeneration = state.hero.actualMagicRegen < 0
+        || state.hero.toolCooldown > 0 || state.hero.action === 'roll' || isActuallyRunning;
+    if (state.hero.magicRegenCooldown > 0 && !preventRegeneration) {
+        state.hero.magicRegenCooldown -= FRAME_LENGTH;
+    }
+    if (!state.hero.action && state.hero.actualMagicRegen >= 0) {
         // Double regeneration rate while idle.
-        state.hero.magic += 2 * state.hero.actualMagicRegen * FRAME_LENGTH / 1000;
-    } else if (state.hero.action === 'walking' && state.hero.isRunning) {
+        if (state.hero.magicRegenCooldown <= 0) {
+            state.hero.magic += 2 * state.hero.actualMagicRegen * FRAME_LENGTH / 1000;
+        }
+    } else if (isActuallyRunning) {
         // Spirit regeneration does not apply while running, but depletion still takes effect.
         if (state.hero.actualMagicRegen < 0) {
             state.hero.magic += state.hero.actualMagicRegen * FRAME_LENGTH / 1000;
         }
         // Slowly expend spirit energy while running.
-        if (state.hero.magic >= 0) {
-            state.hero.magic -= drainCoefficient * 5 * FRAME_LENGTH / 1000;
-        }
+        state.hero.magic -= drainCoefficient * 5 * FRAME_LENGTH / 1000;
+        state.hero.increasedMagicRegenCooldown(drainCoefficient * FRAME_LENGTH / 5);
+    } else if (state.hero.actualMagicRegen < 0) {
+        // Magic is being drained for some reason
+        state.hero.magic += state.hero.actualMagicRegen * FRAME_LENGTH / 1000;
     } else {
         // Normal regeneration rate.
-        state.hero.magic += state.hero.actualMagicRegen * FRAME_LENGTH / 1000;
+        if (state.hero.magicRegenCooldown <= 0) {
+            state.hero.magic += state.hero.actualMagicRegen * FRAME_LENGTH / 1000;
+        }
     }
     // Clones drain 2 magic per second.
     state.hero.magic -= 2 * drainCoefficient * state.hero.clones.length * FRAME_LENGTH / 1000;

@@ -67,7 +67,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
 
     let dx = 0, dy = 0;
     let movementSpeed = 2;
-    if (hero.isRunning && hero.magic >= 0) {
+    if (hero.isRunning && hero.magic > 0) {
         movementSpeed *= 1.3;
     }
     if (hero.equipedBoots === 'ironBoots') {
@@ -296,6 +296,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             if (hero.chargeTime >= 400) {
                 hero.burstBarrier(state);
                 state.hero.magic -= 10;
+                state.hero.increasedMagicRegenCooldown(500);
                 if (hero.activeTools.cloak >= 2) {
                     hero.isInvisible = true;
                 }
@@ -503,6 +504,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 && canTeleportToCoords(state, state.hero, {x: hero.x, y: hero.y})
             ) {
                 state.hero.magic -= 10;
+                state.hero.increasedMagicRegenCooldown(500);
                 state.hero.x = hero.x;
                 state.hero.y = hero.y;
                 // match the projection to the hero eyes.
@@ -670,6 +672,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         }
         hero.chargingLeftTool = hero.chargingRightTool = false;
         state.hero.magic -= 5;
+        state.hero.increasedMagicRegenCooldown(200);
         hero.action = 'roll';
         hero.actionFrame = 0;
         hero.animationTime = 0;

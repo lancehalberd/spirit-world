@@ -503,6 +503,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             && state.hero.magic > 0
         ) {
             state.hero.magic -= 10;
+            state.hero.increasedMagicRegenCooldown(500);
             // Cloud somersault roll activated by rolling again mid roll.
             const [dx, dy] = getCloneMovementDeltas(state, hero);
             hero.d = (dx || dy) ? getDirection(dx, dy) : hero.d;

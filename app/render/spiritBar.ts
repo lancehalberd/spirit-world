@@ -99,7 +99,7 @@ export function renderSpiritBar(context: CanvasRenderingContext2D, state: GameSt
         drawFrame(context, frame, {...frame, x: x - 8, y});
     }
     const barHeight = state.hero.maxMagic;
-    if (state.hero.magic > 0) {
+    if (state.hero.magic >= 1) {
         drawFrame(context, spiritBottom, {...spiritBottom, x, y: y + topCapHeight + barHeight - spiritBottom.h + 1});
     }
     const fillHeight = Math.floor(state.hero.magic);
@@ -111,6 +111,11 @@ export function renderSpiritBar(context: CanvasRenderingContext2D, state: GameSt
         } else if (fillHeight > 1) {
             drawFrame(context, spiritLine, {...spiritLine, x, y: y + topCapHeight + barHeight - fillHeight});
         }
+    }
+    const cooldownHeight = Math.floor(state.hero.magicRegenCooldown / 100);
+    if (cooldownHeight > 0) {
+        context.fillStyle = 'purple';
+        context.fillRect(x + 6, y + topCapHeight + barHeight - cooldownHeight, 2, cooldownHeight);
     }
     if (state.hero.passiveTools.charge) {
         let elementFrame = neutralElement;
@@ -136,6 +141,7 @@ export function renderSpiritBar(context: CanvasRenderingContext2D, state: GameSt
 }
 
 export function updateHeroMagicStats(state: GameState) {
+    state.hero.magicRegenCooldownLimit = 2000;
     // Normally, Hero has no spirit energy until they have eaten a golden peach,
     // which automatically gives them magic + catEyes.
     // During randomizer seeds, Hero always has access to spirit energy.
@@ -154,26 +160,32 @@ export function updateHeroMagicStats(state: GameState) {
     if (state.hero.passiveTools.charge >= 1) {
         state.hero.maxMagic += 10;
         state.hero.magicRegen += 1;
+        state.hero.magicRegenCooldownLimit -= 200;
     }
     if (state.hero.passiveTools.charge >= 2) {
         state.hero.maxMagic += 10;
         state.hero.magicRegen += 2;
+        state.hero.magicRegenCooldownLimit -= 200;
     }
     if (state.hero.elements.fire) {
         state.hero.maxMagic += 10;
         state.hero.magicRegen += 1;
+        state.hero.magicRegenCooldownLimit -= 200;
     }
     if (state.hero.elements.ice) {
         state.hero.maxMagic += 10;
         state.hero.magicRegen += 1;
+        state.hero.magicRegenCooldownLimit -= 200;
     }
     if (state.hero.elements.lightning) {
         state.hero.maxMagic += 10;
         state.hero.magicRegen += 1;
+        state.hero.magicRegenCooldownLimit -= 200;
     }
     if (state.hero.passiveTools.phoenixCrown) {
         state.hero.maxMagic += 20;
         state.hero.magicRegen += 6;
+        state.hero.magicRegenCooldownLimit /= 2;
     }
 }
 
