@@ -4012,6 +4012,7 @@ const sf0_0x2: AreaDefinition = {
         {status: "normal", id: "spiritChakram", x: 288, y: 48, type: "chest", lootType: "weapon", lootLevel: 2},
         {status: "normal", id: "jadeCitySaveStatue", x: 336, y: 32, type: "saveStatue"},
         {status: "normal", id: "jadeCityMarker", x: 272, y: 160, type: "marker"},
+        {status: "normal", id: "jadePalaceEntrance", x: 288, y: 0, type: "door", style: "wooden", targetZone: "grandTemple", targetObjectId: "jadePalaceEntrance", d: "up"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
