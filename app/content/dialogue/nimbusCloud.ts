@@ -34,6 +34,7 @@ export const zoneEntranceMap = {
      // waterfallTowerTopEntrance
     'forge': 'sky:forgeEntrance',
     'grandTemple': 'overworld:templeDoor',
+    'jadePalace': 'overworld:jadePalaceEntrance',
     'skyPalace': 'sky:skyPalaceEntrance',
     'riverTemple': 'overworld:riverTempleUpperEntrance',
     // underwater:riverTempleWaterEntrance
@@ -42,6 +43,10 @@ export const zoneEntranceMap = {
     // overworld:staffTowerSpiritEntrance
     // sky:staffTowerSpiritSkyEntrance
     'crater': 'sky:craterEntrance',
+    'warPalace': 'overworld:warTempleEntranceSpirit',
+    'lab': 'warTemple:labEntrance',
+    'tree': 'lab:treeEntrance',
+    'void': 'lab:treeEntrance',
 };
 
 function travelToLocation(state: GameState, zoneKey: string, markerId: string): string {
@@ -72,7 +77,7 @@ dialogueHash.nimbusCloud = {
             return '';
         },
         chooseDestination: (state: GameState) => {
-            if (zoneEntranceMap[state.zone.key]) {
+            if (zoneEntranceMap[state.location.logicalZoneKey]) {
                 return `
                 {choice:Return to entrance?|Yes:nimbusCloud.returnToEntrance|No:nimbusCloud.no}`;
             }
@@ -99,7 +104,7 @@ dialogueHash.nimbusCloud = {
             // return `For some reason, the Nimbus Cloud doesn't appear.`;
         },
         returnToEntrance: (state: GameState) => {
-            const [zoneKey, ...rest] = zoneEntranceMap[state.location.zoneKey].split(':', );
+            const [zoneKey, ...rest] = zoneEntranceMap[state.location.logicalZoneKey].split(':', );
             enterZoneByTarget(state, zoneKey, rest.join(':'), null, false);
             return '';
         },

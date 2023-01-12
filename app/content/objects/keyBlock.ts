@@ -59,7 +59,7 @@ export class KeyBlock implements ObjectInstance {
         if (this.isOpen) {
             return false;
         }
-        const dungeonInventory = state.savedState.dungeonInventories[state.location.zoneKey];
+        const dungeonInventory = state.savedState.dungeonInventories[state.location.logicalZoneKey];
         if (this.status === 'locked' && dungeonInventory?.smallKeys) {
             dungeonInventory.smallKeys--;
             this.isOpen = true;

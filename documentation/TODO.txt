@@ -36,6 +36,8 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Don't allow surfacing during another transition (just wait until nextSection/Area is unset).
+
     - Add placeholder for Jade Palace
         - Add phoenix crown
             - Uses a feather from a legender spirit beast that could survive on its own in the material world and once threatened to destroy the world.
@@ -71,15 +73,6 @@ Current tasks:
     - Fix bead flow depth by using sprite ordering for the ordered part instead of foreground, use the y value based on where it hits the floor but only draw it start 16px up from that point so it gradually covers while moving behind it.
 
     - Add crucible to the end of the Grand Temple
-
-    - Add `getLogicalZone` function that returns a logical zone for a given state location wich can differ from the actual zone key, use this for randomizer locations and dungeon item associations.
-        - Move underwater areas into the same logical zone so that keys can be shared above and below water
-        - Split different caves into distinct logical zones like 'bushCave', 'fertilityTemple', and 'ascentCave'
-        - These logical zones should be added to randomizer logic nodes when they don't match the zone for the node.
-        - This will also allow using the same tile in material vs spirit world in distinct dungeons, for example, tiles could be shared inside the Grand Temple and Jade Palace but be treated as distinct dungones wrt keys and checks.
-        - We could probably then use this for simplifying logic to determine what music to play.
-        - Should probably also use this for Nimbus Cloud entrance behavior in some cases.
-        - Make sure to update Hint location names to be more specific by using the logical zones instead.
 
     - Add 'only' visibility option to layers that hides everything else when selected.
 

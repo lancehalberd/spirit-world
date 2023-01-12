@@ -28,12 +28,12 @@ import { addCheck } from 'app/randomizer/checks';
 import SRandom from 'app/utils/SRandom';
 import Random from 'app/utils/Random';
 
-import { applySavedState, getDefaultState } from 'app/state';
+import { applySavedState, getFullZoneLocation, getDefaultState } from 'app/state';
 
 import {
     AreaDefinition,
-    BossObjectDefinition, DialogueLootDefinition, EntranceDefinition,
-    GameState, LogicNode, LootObjectDefinition, LootType, NPCDefinition,
+    BossObjectDefinition, DialogueLootDefinition, EntranceDefinition, FullZoneLocation,
+    GameState, LogicalZoneKey, LogicNode, LootObjectDefinition, LootType, NPCDefinition,
     ObjectDefinition, ObjectType,
     Zone, ZoneLocation,
 } from 'app/types';
@@ -67,7 +67,7 @@ export const allNodes = [
 
 interface LootData {
     loot: {
-        location: ZoneLocation
+        location: FullZoneLocation
         object: LootObjectDefinition
     }[]
 }
@@ -92,7 +92,7 @@ function getAllLootDrops(): LootData {
                             continue;
                         }
                         lootDrops.loot.push({
-                            location: {
+                            location: getFullZoneLocation({
                                 zoneKey,
                                 floor: floorIndex,
                                 areaGridCoords: {x: column, y: row},
@@ -100,7 +100,7 @@ function getAllLootDrops(): LootData {
                                 x: object.x,
                                 y: object.y,
                                 d: null,
-                            },
+                            }),
                             object,
                         });
                     }
@@ -110,7 +110,7 @@ function getAllLootDrops(): LootData {
                             continue;
                         }
                         lootDrops.loot.push({
-                            location: {
+                            location: getFullZoneLocation({
                                 zoneKey,
                                 floor: floorIndex,
                                 areaGridCoords: {x: column, y: row},
@@ -118,7 +118,7 @@ function getAllLootDrops(): LootData {
                                 x: object.x,
                                 y: object.y,
                                 d: null,
-                            },
+                            }),
                             object,
                         });
                     }
@@ -147,7 +147,7 @@ export type AnyLootDefinition = BossObjectDefinition | DialogueLootDefinition | 
 
 interface LootWithLocation {
     // Either location will be set or dialogueKey+optionKey will be set
-    location?: ZoneLocation
+    location?: FullZoneLocation
     dialogueKey?: string
     optionKey?: string
     lootObject: AnyLootDefinition
@@ -172,16 +172,16 @@ interface AssignmentState {
 }
 
 
-export function findDoorById(zone: Zone, id: string, state: GameState = null): {object: ObjectDefinition, location: ZoneLocation}  {
+export function findDoorById(zone: Zone, id: string, state: GameState = null): {object: ObjectDefinition, location: FullZoneLocation}  {
     return findObjectById(zone, id, state, ['door', 'keyBlock', 'pitEntrance', 'teleporter']);
 }
-export function findLootById(zone: Zone, id: string, state: GameState = null): {object: ObjectDefinition, location: ZoneLocation}  {
+export function findLootById(zone: Zone, id: string, state: GameState = null): {object: ObjectDefinition, location: FullZoneLocation}  {
     return findObjectById(zone, id, state, ['bigChest', 'chest', 'loot', 'shopItem', 'boss']);
 }
 
 const findObjectByIdCache: {[key: string]: {
     object: ObjectDefinition,
-    location: ZoneLocation,
+    location: FullZoneLocation,
     needsEyes: boolean,
 }} = {};
 export function findObjectById(
@@ -189,7 +189,7 @@ export function findObjectById(
     id: string,
     state: GameState = null,
     typeFilter?: ObjectType[]
-): {object: ObjectDefinition, location: ZoneLocation} {
+): {object: ObjectDefinition, location: FullZoneLocation} {
     const cacheKey = zone.key + ':' + id;
     const cachedResult = findObjectByIdCache[cacheKey];
     if (cachedResult) {
@@ -209,7 +209,7 @@ export function findObjectById(
                             if (typeFilter && !typeFilter.includes(object.type)) {
                                 continue;
                             }
-                            const location = {
+                            const location = getFullZoneLocation({
                                 zoneKey: zone.key,
                                 floor,
                                 areaGridCoords: {x, y},
@@ -217,7 +217,7 @@ export function findObjectById(
                                 x: object.x,
                                 y: object.y,
                                 d: null,
-                            };
+                            });
                             findObjectByIdCache[cacheKey] = {object, location, needsEyes};
                             if (state && !state.hero.passiveTools.catEyes && needsEyes) {
                                 return {object: null, location: null};
@@ -251,7 +251,7 @@ function getLootObjects(nodes: LogicNode[], state: GameState = null): LootWithLo
                 continue;
             }
             if (object.type === 'bigChest') {
-                if (state && !state.savedState.dungeonInventories[zone.key]?.bigKey) {
+                if (state && !state.savedState.dungeonInventories[location.logicalZoneKey]?.bigKey) {
                     continue;
                 }
             }
@@ -323,17 +323,17 @@ export function findReachableChecks(allNodes: LogicNode[], startingNodes: LogicN
     return getLootObjects(reachableNodes, state);
 }
 
-function canOpenDoor(zone: Zone, state: GameState, door: EntranceDefinition): boolean {
+function canOpenDoor(location: FullZoneLocation, state: GameState, door: EntranceDefinition): boolean {
     if (!door) {
         return false;
     }
     // Only pass through
     if (door.status === 'locked') {
-        const dungeonInventory = state.savedState.dungeonInventories[zone.key];
+        const dungeonInventory = state.savedState.dungeonInventories[location.logicalZoneKey];
         return dungeonInventory?.smallKeys >= door.requiredKeysForLogic;
     }
     if (door.status === 'bigKeyLocked') {
-        const dungeonInventory = state.savedState.dungeonInventories[zone.key];
+        const dungeonInventory = state.savedState.dungeonInventories[location.logicalZoneKey];
         return dungeonInventory?.bigKey;
     }
     if (door.status === 'cracked') {
@@ -357,8 +357,8 @@ function findReachableNodes(allNodes: LogicNode[], startingNodes: LogicNode[], s
                 continue;
             }
             if (path.doorId) {
-                const { object } = findDoorById(zone, path.doorId, state);
-                if (!canOpenDoor(zone, state, object as EntranceDefinition)) {
+                const { object, location } = findDoorById(zone, path.doorId, state);
+                if (!canOpenDoor(location, state, object as EntranceDefinition)) {
                     continue;
                 }
             }
@@ -376,10 +376,10 @@ function findReachableNodes(allNodes: LogicNode[], startingNodes: LogicNode[], s
                 //console.log('Invalid logic', exit);
                 continue;
             }
-            const { object } = findDoorById(zone, exit.objectId, state);
+            const { object, location } = findDoorById(zone, exit.objectId, state);
             const exitObject = object as EntranceDefinition;
             // console.log(exit.objectId);
-            if (!canOpenDoor(zone, state, exitObject)) {
+            if (!canOpenDoor(location, state, exitObject)) {
                 //console.log('cannot open', exitObject);
                 continue;
             }
@@ -411,7 +411,7 @@ function calculateKeyLogic(allNodes: LogicNode[], startingNodes: LogicNode[]) {
             continue
         }
         function checkExit(objectId: string) {
-            const { object } = findDoorById(zone, objectId);
+            const { object, location } = findDoorById(zone, objectId);
             const exitObject = object as EntranceDefinition;
             if (!exitObject) {
                 return;
@@ -420,7 +420,7 @@ function calculateKeyLogic(allNodes: LogicNode[], startingNodes: LogicNode[]) {
                 return;
             }
             if (exitObject.status === 'locked' && !exitObject.requiredKeysForLogic) {
-                countRequiredKeysForEntrance(allNodes, startingNodes, zone.key, exitObject);
+                countRequiredKeysForEntrance(allNodes, startingNodes, location.logicalZoneKey, exitObject);
             } else if (exitObject.requiredKeysForLogic) {
                 console.log(exitObject.id, 'manually set to', exitObject.requiredKeysForLogic, 'keys');
             }
@@ -436,7 +436,7 @@ function calculateKeyLogic(allNodes: LogicNode[], startingNodes: LogicNode[]) {
         }
     }
 }
-function countRequiredKeysForEntrance(allNodes: LogicNode[], startingNodes: LogicNode[], zoneKey: string, exitToUpdate: EntranceDefinition) {
+function countRequiredKeysForEntrance(allNodes: LogicNode[], startingNodes: LogicNode[], logicalZoneKey: LogicalZoneKey, exitToUpdate: EntranceDefinition) {
     const countedDoorIds = new Set<string>();
     exitToUpdate.requiredKeysForLogic = 1;
     const reachableNodes = [...startingNodes];
@@ -448,12 +448,12 @@ function countRequiredKeysForEntrance(allNodes: LogicNode[], startingNodes: Logi
         }
         for (const path of (currentNode.paths || [])) {
             if (path.doorId) {
-                const { object } = findDoorById(zone, path.doorId);
+                const { object, location } = findDoorById(zone, path.doorId);
                 const exitObject = object as EntranceDefinition;
                 if (!exitObject || exitObject === exitToUpdate) {
                     continue;
                 }
-                if (zone.key === zoneKey && exitObject.status === 'locked' && !countedDoorIds.has(exitObject.id)) {
+                if (location.logicalZoneKey === logicalZoneKey && exitObject.status === 'locked' && !countedDoorIds.has(exitObject.id)) {
                     countedDoorIds.add(exitObject.id);
                     exitToUpdate.requiredKeysForLogic++;
                 }
@@ -468,12 +468,12 @@ function countRequiredKeysForEntrance(allNodes: LogicNode[], startingNodes: Logi
             }
         }
         for (const exit of (currentNode.exits || [])) {
-            const { object } = findDoorById(zone, exit.objectId);
+            const { object, location } = findDoorById(zone, exit.objectId);
             const exitObject = object as EntranceDefinition;
             if (!exitObject || exitObject === exitToUpdate) {
                 continue;
             }
-            if (zone.key === zoneKey && exitObject.status === 'locked' && !countedDoorIds.has(exitObject.id)) {
+            if (location.logicalZoneKey === logicalZoneKey && exitObject.status === 'locked' && !countedDoorIds.has(exitObject.id)) {
                 countedDoorIds.add(exitObject.id);
                 exitToUpdate.requiredKeysForLogic++;
             }
@@ -785,7 +785,7 @@ function placeItem(random: typeof SRandom, allNodes: LogicNode[], startingNodes:
     }*/
     if (loot.lootObject.lootType === 'bigKey' || loot.lootObject.lootType === 'smallKey') {
         allAppropriateChecks = allAppropriateChecks.filter(lootWithLocation => {
-            return lootWithLocation.location?.zoneKey === loot.location?.zoneKey
+            return lootWithLocation.location?.logicalZoneKey === loot.location?.logicalZoneKey
         });
     }
     const assignedLocation = random.element(allAppropriateChecks);
@@ -870,18 +870,18 @@ export function getRandomizerHint(state: GameState): string {
     const reachableChecks: LootWithLocation[] = findReachableChecks(allNodes, [overworldNodes[0]], state);
     for (const check of Random.shuffle(reachableChecks)) {
         if (check.location) {
-            const zoneKey = check.location.zoneKey;
+            const logicalZoneKey = check.location.logicalZoneKey;
             if (check.lootObject.type === 'dialogueLoot') {
-                const npcKey = `${zoneKey}-${check.lootObject.id}`;
+                const npcKey = `${check.location.zoneKey}-${check.lootObject.id}`;
                 if (state.savedState.objectFlags[npcKey]) {
                     continue;
                 }
-                return `Try talking to someone ${getZoneText(zoneKey, check.location.isSpiritWorld)}.`;
+                return `Try talking to someone ${getZoneText(logicalZoneKey)}.`;
             }
             if (state.savedState.objectFlags[check.lootObject.id]) {
                 continue;
             }
-            return `There is still something ${getZoneText(zoneKey, check.location.isSpiritWorld)}.`;
+            return `There is still something ${getZoneText(logicalZoneKey)}.`;
         } else {
             const {dialogueKey, optionKey} = check;
             const flag = `${dialogueKey}-${optionKey}`;
@@ -900,17 +900,22 @@ export function getRandomizerHint(state: GameState): string {
     return 'Looks like BK Mode to me :)';
 }
 
-function getZoneText(zone: string, isSpiritWorld: boolean): string {
+function getZoneText(zone: LogicalZoneKey): string {
     switch (zone) {
         case 'sky': return 'in the sky';
-        case 'overworld': return isSpiritWorld ? 'out in the spirit world' : 'outside';
-        case 'underwater': return 'underwater';
-        case 'caves': return isSpiritWorld ? 'in a spirit world cave' : 'in a cave';
+        case 'spiritSky': return 'in the spirit world sky';
+        case 'overworld': return 'outside';
+        case 'spiritWorld': return 'out in the spirit world';
+        case 'bushCave': return 'in a cave full of bushes';
+        case 'ascentCave': return  'in a cave on the mountain';
+        case 'ascentCaveSpirit': return  'in the spirit world in a cave on the mountain';
+        case 'fertilityShrine': return 'in the shrine by the forest village';
+        case 'fertilityShrineSpirit': return 'in the shrine by the Forest Temple';
         case 'holyCityInterior': return 'inside the city';
         case 'waterfallCave': return 'in the Cave Village';
         case 'treeVillage': return 'in the Vanara Village';
-        case 'peachCaveWater':
-        case 'peachCave': return isSpiritWorld ? 'in a spirit world cave' : 'in the dark cave by the lake';
+        case 'peachCave': return 'in the dark cave by the lake';
+        case 'peachCaveSpirit': return 'in a cave in the spirit world';
         case 'tomb': return 'in the Vanara Tomb';
         case 'warTemple': return 'in the Summoner Ruins';
         case 'cocoon': return 'in the Cocoon behind the Vanara Tomb';
@@ -921,13 +926,15 @@ function getZoneText(zone: string, isSpiritWorld: boolean): string {
         case 'grandTemple': return 'in the Grand Temple';
         case 'skyPalace': return 'in the Sky Palace';
         case 'jadePalace': return 'in the Jade Palace';
-        case 'riverTempleWater':
         case 'riverTemple': return 'in the Lake Ruins';
         case 'crater': return 'in the Volcano Crater';
         case 'staffTower': return 'in the Staff Tower';
+        case 'warPalace': return 'in the Palace of War';
         case 'lab': return 'in the Hidden Laboratory';
         case 'tree': return 'in the World Tree';
+        case 'void': return 'in the abyss of space';
     }
+    // The type of this should just be `void` if all zones are handled.
     return zone;
 }
 
@@ -990,7 +997,7 @@ function collectAllLootForSolution(allNodes: LogicNode[], startingNodes: LogicNo
             )) {
                 // debugState(state);
                 if (check.location) {
-                    console.log(`Get ${getLootName(check.lootObject, state)} at ${check.location.zoneKey}:${check.lootObject.id}`);
+                    console.log(`Get ${getLootName(check.lootObject, state)} at ${getZoneText(check.location.logicalZoneKey)}:${check.lootObject.id}`);
                 } else {
                     console.log(`Get ${getLootName(check.lootObject, state)} from ${check.dialogueKey}:${check.optionKey}`);
                 }
@@ -1074,11 +1081,21 @@ export function applyLootAssignments(assignments: LootAssignment[]): void {
             const lootAmount = getLootAmount(assignment);
             const flag = `${dialogueKey}-${optionKey}`;
             const flagScript = `{flag:${flag}}`;
-            addCheck(flag, 'overworld');
+            if (dialogueKey === 'streetVendor') {
+                addCheck(flag, 'overworld');
+            } else if (dialogueKey === 'storageVanara') {
+                addCheck(flag, 'treeVillage');
+            } else {
+                console.error('Unhandled dialogue key', dialogueKey);
+            }
             let newScript;
             if (assignment.lootType === 'empty') {
                 // Include the flag so that we can still count the check for the check counter.
-                newScript = `${beginning}{|}${flagScript}Haha, scammed you!{|}${end}`;
+                if (dialogueKey === 'streetVendor') {
+                    newScript = `${beginning}{|}${flagScript}Haha, scammed you!{|}${end}`;
+                } else {
+                    newScript = `${beginning}{|}${flagScript}I'm sorry but I don't have anything for you today.{|}${end}`;
+                }
             } else if (lootAmount) {
                 newScript = `${beginning}${flagScript}{item:${assignment.lootType}=${lootAmount}}${end}`;
             } else {
@@ -1093,7 +1110,7 @@ export function applyLootAssignments(assignments: LootAssignment[]): void {
                 const {object} = findLootById(zones[zoneKey], assignment.target.lootObject.id);
                 const npc = object as NPCDefinition;
                 const npcKey = `${zoneKey}-${assignment.target.lootObject.id}`;
-                addCheck(npcKey, zoneKey);
+                addCheck(npcKey,  assignment.target.location.logicalZoneKey);
                 const lootAmount = getLootAmount(assignment);
                 let text: string;
                 if (assignment.lootType === 'empty') {
@@ -1124,7 +1141,7 @@ export function applyLootAssignments(assignments: LootAssignment[]): void {
                 assignment.target.lootObject.lootAmount = assignment.lootAmount;
                 assignment.target.lootObject.lootLevel = 0;
             } else {
-                addCheck(assignment.target.lootObject.id, zoneKey);
+                addCheck(assignment.target.lootObject.id,  assignment.target.location.logicalZoneKey);
                 for (const target of findAllTargetObjects(assignment.target)) {
                     target.lootType = assignment.lootType;
                     target.lootAmount = assignment.lootAmount;
@@ -1157,7 +1174,7 @@ function everyZone(callback: (location: Partial<ZoneLocation>, zone: Zone) => vo
         callback({zoneKey}, zones[zoneKey]);
     }
 }
-function everyArea(callback: (location: ZoneLocation, zone: Zone, area: AreaDefinition) => void ) {
+function everyArea(callback: (location: FullZoneLocation, zone: Zone, area: AreaDefinition) => void ) {
     everyZone((location, zone) => {
         for (let floor = 0; floor < zone.floors.length; floor++) {
             for (const grid of [zone.floors[floor].grid, zone.floors[floor].spiritGrid]) {
@@ -1170,20 +1187,20 @@ function everyArea(callback: (location: ZoneLocation, zone: Zone, area: AreaDefi
                         if (!grid[y][x]) {
                             continue;
                         }
-                        callback({
+                        callback(getFullZoneLocation({
                             zoneKey: location.zoneKey,
                             floor,
                             isSpiritWorld,
                             areaGridCoords: {x, y},
                             x: 0, y: 0, d: 'up',
-                        }, zone, grid[y][x]);
+                        }), zone, grid[y][x]);
                     }
                 }
             }
         }
     });
 }
-export function everyObject(callback: (location: ZoneLocation, zone: Zone, area: AreaDefinition, objectDefinition: ObjectDefinition) => void) {
+export function everyObject(callback: (location: FullZoneLocation, zone: Zone, area: AreaDefinition, objectDefinition: ObjectDefinition) => void) {
     everyArea((location, zone, area) => {
         for (let i = 0; i < area.objects.length; i++) {
             callback(location, zone, area, area.objects[i]);

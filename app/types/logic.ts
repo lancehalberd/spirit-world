@@ -75,6 +75,8 @@ export interface DialogueSet {
     options: DialogueOption[],
 }
 
+export type DialogueKey = 'streetVendor' | 'storageVanara';
+
 // Node used for building the logical graph of the game used for randomization.
 export interface LogicNode {
     // The id of the zone this node is in
@@ -88,7 +90,7 @@ export interface LogicNode {
         logic?: LogicCheck
     }[]
     complexNpcs?: {
-        dialogueKey: string
+        dialogueKey: DialogueKey
         optionKey: string
         logic?: LogicCheck
     }[]

@@ -111,4 +111,19 @@ export const grandTempleNodes: LogicNode[] = [
             { objectId: 'grandTempleWaterEntrance', logic: canTravelFarUnderWater },
         ],
     },
+
+    // Jade Palace is a separate logical zone in the spirit world of the Grand Temple.
+
+    {
+        zoneId,
+        nodeId: 'jadePalaceEntrance',
+        npcs: [
+        ],
+        paths: [
+        ],
+        entranceIds: ['jadePalaceEntrance'],
+        exits: [
+            {objectId: 'jadePalaceEntrance'},
+        ],
+    },
 ];

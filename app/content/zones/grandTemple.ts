@@ -1071,7 +1071,7 @@ const sf0_1x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "jadePalaceEntrance", x: 224, y: 496, type: "door", style: "wooden", targetZone: "overworld", targetObjectId: "jadePalaceEntrance", d: "down", locationCue: "Grand Temple 1F"},
+        {status: "normal", id: "jadePalaceEntrance", x: 224, y: 496, type: "door", style: "wooden", targetZone: "overworld", targetObjectId: "jadePalaceEntrance", d: "down", locationCue: "Jade Palace 1F"},
         {status: "normal", id: "", x: 224, y: 240, type: "door", style: "wooden", d: "down"},
         {status: "normal", id: "", x: 240, y: 272, type: "door", style: "wooden", d: "up", saveStatus: "forever"},
         {status: "normal", id: "", x: 240, y: 48, type: "door", style: "wooden", d: "up"},

@@ -69,7 +69,7 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
         drawFrame(context, frame, {...frame, x, y});
         x += 11;
     }
-    const dungeonInventory = state.savedState.dungeonInventories[state.location.zoneKey];
+    const dungeonInventory = state.savedState.dungeonInventories[state.location.logicalZoneKey];
     if (dungeonInventory?.bigKey) {
         drawFrameAt(context, bigKeyFrame, {x: CANVAS_WIDTH - 21, y: 28});
     }

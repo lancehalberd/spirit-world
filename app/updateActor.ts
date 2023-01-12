@@ -12,6 +12,7 @@ import {
 } from 'app/keyCommands';
 import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
 import { prependScript } from 'app/scriptEvents';
+import { getFullZoneLocation } from 'app/state';
 import { updateHeroSpecialActions } from 'app/updateHeroSpecialActions';
 import { updateHeroStandardActions } from 'app/updateHeroStandardActions';
 import {
@@ -278,7 +279,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
     // Clones drain 2 magic per second.
     state.hero.magic -= 2 * drainCoefficient * state.hero.clones.length * FRAME_LENGTH / 1000;
     // Meditation grants 3 additional spirit energy per second.
-    if (hero.action === 'meditating') {
+    if (hero.action === 'meditating' && state.hero.magicRegenCooldown <= 0) {
         state.hero.magic += 3 * FRAME_LENGTH / 1000;
     }
     //if (hero.action !== 'knocked' && hero.action !== 'thrown') {
@@ -310,7 +311,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
     if (editingState.isEditing && state.hero.magicRegen) {
         state.hero.magic = state.hero.maxMagic;
     }
-    if (state.hero.magic < 0) {
+    if (state.hero.magic <= 0) {
         state.hero.shatterBarrier(state);
         state.hero.isInvisible = false;
         /*if (state.hero.clones.length) {
@@ -405,12 +406,14 @@ function checkToStartScreenTransition(state: GameState, hero: Hero) {
             y: state.location.areaGridCoords.y,
         };
         scrollToArea(state, getAreaFromLocation(state.location), 'left');
+        state.location = getFullZoneLocation(state.location);
     } else if (hero.x + hero.w > w && (hero.vx > 0 || hero.actionDx > 0)) {
         state.location.areaGridCoords = {
             x: (state.location.areaGridCoords.x + 1) % state.areaGrid[0].length,
             y: state.location.areaGridCoords.y,
         };
         scrollToArea(state, getAreaFromLocation(state.location), 'right');
+        state.location = getFullZoneLocation(state.location);
     } else if (hero.x < section.x && (hero.vx < 0 || hero.actionDx < 0)) {
         setNextAreaSection(state, 'left');
     } else if (hero.x + hero.w > section.x + section.w && (hero.vx > 0 || hero.actionDx > 0)) {
@@ -424,12 +427,14 @@ function checkToStartScreenTransition(state: GameState, hero: Hero) {
             y: (state.location.areaGridCoords.y + state.areaGrid.length - 1) % state.areaGrid.length,
         };
         scrollToArea(state, getAreaFromLocation(state.location), 'up');
+        state.location = getFullZoneLocation(state.location);
     } else if (hero.y + hero.h > h && isHeroMovingDown) {
         state.location.areaGridCoords = {
             x: state.location.areaGridCoords.x,
             y: (state.location.areaGridCoords.y + 1) % state.areaGrid.length,
         };
         scrollToArea(state, getAreaFromLocation(state.location), 'down');
+        state.location = getFullZoneLocation(state.location);
     } else if (hero.y < section.y && (hero.vy < 0 || hero.actionDy < 0)) {
         setNextAreaSection(state, 'up');
     } else if (hero.y + hero.h > section.y + section.h && isHeroMovingDown) {

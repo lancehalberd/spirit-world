@@ -235,7 +235,7 @@ export function addKeyCommands() {
                 }
             }
             state.savedState.luckyBeetles = [];
-            delete state.savedState.dungeonInventories[state.zone.key];
+            delete state.savedState.dungeonInventories[state.location.logicalZoneKey];
             state.location.x = state.hero.x;
             state.location.y = state.hero.y;
             // Calling this will instantiate the area again and place the player back in their current location.

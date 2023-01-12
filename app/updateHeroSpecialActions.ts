@@ -122,7 +122,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         return true;
     }
     if (hero.action === 'fallen' || hero.action === 'sankInLava') {
-        if (hero.action === 'fallen' && state.location.zoneKey === 'sky') {
+        if (hero === state.hero && hero.action === 'fallen' && state.location.zoneKey === 'sky') {
             enterLocation(state, {
                 zoneKey: 'overworld',
                 floor: 0,

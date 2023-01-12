@@ -124,6 +124,10 @@ export function randomizeEntrances(random: typeof SRandom) {
         if (!object.targetZone || object.targetZone === zone.key) {
             return;
         }
+        // The void cannot be left so do not randomize it for now.
+        if (object.targetZone === 'void' || zone.key === 'void') {
+            return;
+        }
         const key = `${zone.key}:${object.id}`;
         const targetKey = `${object.targetZone}:${object.targetObjectId}`;
         if (!object.id) {

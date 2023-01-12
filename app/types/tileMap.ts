@@ -179,15 +179,44 @@ export interface AreaTileGrid extends TileGrid {
 }
 
 export interface ZoneLocation {
-    zoneKey: string,
-    floor: number,
-    areaGridCoords: {x: number, y: number},
-    isSpiritWorld: boolean,
-    x: number,
-    y: number,
+    zoneKey: string
+    floor: number
+    areaGridCoords: {x: number, y: number}
+    isSpiritWorld: boolean
+    x: number
+    y: number
     // This can be set to have the player falling when they spawn.
-    z?: number,
-    d: Direction,
+    z?: number
+    d: Direction
+}
+
+export type LogicalZoneKey =
+    'overworld' | 'sky'
+    // Material world towns
+    | 'waterfallCave' | 'treeVillage' | 'holyCityInterior'
+    // Material world sub areas
+    | 'ascentCave' | 'fertilityShrine'
+    | 'peachCave' | 'bushCave'
+    // Spirit world+ sub areas
+    | 'spiritWorld' | 'spiritSky'
+    | 'ascentCaveSpirit' | 'fertilityShrineSpirit'
+    | 'peachCaveSpirit'
+    // Early dungeons
+    | 'tomb' | 'warTemple' | 'cocoon' | 'helix'
+    // Mid dungeons
+    | 'forestTemple'
+    | 'waterfallTower'
+    | 'forge'
+    | 'grandTemple'
+    | 'skyPalace'
+    | 'jadePalace'
+    // Beast dungeons
+    | 'riverTemple' | 'crater' | 'staffTower'
+    // Final dungeons
+    | 'warPalace' | 'lab' | 'tree' | 'void';
+
+export interface FullZoneLocation extends ZoneLocation {
+    logicalZoneKey: LogicalZoneKey
 }
 
 

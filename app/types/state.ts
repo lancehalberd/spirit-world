@@ -1,6 +1,6 @@
 import {
     ActiveScriptEvent, AreaGrid, AreaInstance,
-    Floor, Hero, LootData, SavedHeroData, Rect, ScriptEvent, TextPage, TrackKey,
+    Floor, FullZoneLocation, Hero, LootData, SavedHeroData, Rect, ScriptEvent, TextPage, TrackKey,
     Zone, ZoneLocation,
 } from 'app/types';
 
@@ -80,7 +80,7 @@ export interface GameState {
     zone: Zone
     floor: Floor
     areaGrid: AreaGrid
-    location: ZoneLocation
+    location: FullZoneLocation
     transitionState?: {
         // The location to switch to after the current screen wipe transition.
         nextLocation: ZoneLocation

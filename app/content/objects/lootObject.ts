@@ -426,7 +426,7 @@ export class BigChest extends ChestObject implements ObjectInstance {
             }
             return;
         }
-        if (!state.savedState.dungeonInventories[state.location.zoneKey]?.bigKey) {
+        if (!state.savedState.dungeonInventories[state.location.logicalZoneKey]?.bigKey) {
             showMessage(state, 'You need a special key to open this chest.');
             return;
         }

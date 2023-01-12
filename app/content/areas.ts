@@ -15,6 +15,7 @@ import { createCanvasAndContext } from 'app/dom';
 import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
 import { isPointInShortRect } from 'app/utils/index';
 import { playSound } from 'app/musicController';
+import { getFullZoneLocation } from 'app/state';
 import { removeTextCue } from 'app/scriptEvents';
 import { updateCamera } from 'app/updateCamera';
 import { specialBehaviorsHash } from 'app/content/specialBehaviors';
@@ -219,7 +220,7 @@ export function enterLocation(
             state.hero.vx = state.hero.vy = 0;
         } else if (!!state.location.isSpiritWorld !== !!location.isSpiritWorld && state.location.zoneKey === location.zoneKey) {
             state.transitionState.type = 'portal';
-        } else if (state.location.zoneKey !== location.zoneKey) {
+        } else if (state.location.logicalZoneKey !== getFullZoneLocation(location).logicalZoneKey) {
             state.transitionState.type = 'circle';
         }
         const targetAreaDefinition = getAreaFromLocation(location);
@@ -235,14 +236,14 @@ export function enterLocation(
         return;
     }
     // Clear zone flags when changing zones.
-    if (!preserveZoneFlags && state.location.zoneKey !== location.zoneKey) {
+    if (!preserveZoneFlags && state.location.logicalZoneKey !== getFullZoneLocation(location).logicalZoneKey) {
         state.savedState.zoneFlags = {};
     }
-    state.location = {
+    state.location = getFullZoneLocation({
         ...location,
         areaGridCoords: {...location.areaGridCoords},
         z: 0,
-    };
+    });
     state.zone = zones[location.zoneKey];
     state.hero.x = location.x;
     state.hero.y = location.y;
@@ -258,6 +259,7 @@ export function enterLocation(
         y: state.location.areaGridCoords.y % state.areaGrid.length,
         x: state.location.areaGridCoords.x % state.areaGrid[state.location.areaGridCoords.y % state.areaGrid.length].length,
     };
+    state.location = getFullZoneLocation(state.location);
     const area = getAreaFromLocation(state.location);
     const alternateArea = getAreaFromLocation({...state.location, isSpiritWorld: !state.location.isSpiritWorld});
 

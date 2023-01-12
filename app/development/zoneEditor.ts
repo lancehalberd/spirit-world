@@ -11,7 +11,7 @@ import { displayTileEditorPropertyPanel, editingState, EditingState } from 'app/
 import { createCanvasAndContext, tagElement } from 'app/dom';
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
 import { checkToRedrawTiles } from 'app/render';
-import { getState } from 'app/state';
+import { getFullZoneLocation, getState } from 'app/state';
 import { readFromFile, saveToFile, scaleRect } from 'app/utils/index';
 import { getMousePosition, isMouseDown } from 'app/utils/mouse';
 
@@ -467,6 +467,7 @@ export function getZoneProperties(): PanelRows {
         onChange(isSpiritWorld: boolean) {
             if (state.location.isSpiritWorld != isSpiritWorld) {
                 state.location.isSpiritWorld = isSpiritWorld;
+                state.location = getFullZoneLocation(state.location);
                 editingState.spirit = isSpiritWorld;
                 const tempInstance = state.areaInstance;
                 state.areaGrid = isSpiritWorld ? state.floor.spiritGrid : state.floor.grid;

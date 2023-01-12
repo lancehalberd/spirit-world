@@ -8,7 +8,7 @@ import { zones } from 'app/content/zones';
 import { updateHeroMagicStats } from 'app/render/spiritBar';
 import { randomizerSeed, randomizerGoal } from 'app/gameConstants';
 
-import { GameState, Hero, SavedHeroData, SavedState } from 'app/types';
+import { FullZoneLocation, GameState, Hero, LogicalZoneKey, SavedHeroData, SavedState, ZoneLocation } from 'app/types';
 
 export function loadSavedData(): boolean {
     //return false;
@@ -191,7 +191,7 @@ export function getDefaultState(): GameState {
         reviveTime: 0,
         gameHasBeenInitialized: false,
         lastTimeRendered: 0,
-        location: SPAWN_LOCATION_FULL,
+        location: getFullZoneLocation(SPAWN_LOCATION_FULL),
         zone: zones.peachCave,
         areaGrid: zones.peachCave.floors[0].grid,
         floor: zones.peachCave.floors[0],
@@ -305,4 +305,42 @@ export function shouldHideMenu(state: GameState): boolean {
 
 export function canPauseGame(state: GameState): boolean {
     return state.alwaysHideMenu || !shouldHideMenu(state);
+}
+
+export function getFullZoneLocation(location: ZoneLocation): FullZoneLocation {
+    const { zoneKey, isSpiritWorld, areaGridCoords } = location;
+    // There is one frame after the transition finishes where the coordinates can be out
+    // of range, but work correctly if taken mod 512.
+    // const x = (location.x + 512) % 512; // This isn't needed so far.
+    const y = (location.y + 512) % 512;
+    let logicalZoneKey: LogicalZoneKey = location.zoneKey as LogicalZoneKey;
+    if (zoneKey === 'caves') {
+        if (areaGridCoords.x === 0) {
+            logicalZoneKey = isSpiritWorld ? 'ascentCaveSpirit' : 'ascentCave';
+        } else {
+            if (y < 256) {
+                logicalZoneKey = 'bushCave';
+            } else {
+                logicalZoneKey = isSpiritWorld ? 'fertilityShrineSpirit' : 'fertilityShrine';
+            }
+        }
+    } else if (zoneKey === 'grandTemple' || zoneKey === 'grandTempleWater') {
+        logicalZoneKey = isSpiritWorld ? 'jadePalace' : 'grandTemple';
+    } else if (zoneKey === 'overworld' || zoneKey === 'underwater') {
+        logicalZoneKey = isSpiritWorld ? 'spiritWorld' : 'overworld';
+    } else if (zoneKey === 'peachCave' || zoneKey === 'peachCaveWater') {
+        logicalZoneKey = isSpiritWorld ? 'peachCaveSpirit' : 'peachCave';
+    } else if (zoneKey === 'riverTemple' || zoneKey === 'riverTempleWater') {
+        logicalZoneKey = 'riverTemple';
+    } else if (zoneKey === 'sky') {
+        logicalZoneKey = isSpiritWorld ? 'spiritSky' : 'sky';
+    } else if (zoneKey === 'treeVillage') {
+        logicalZoneKey = isSpiritWorld ? 'forestTemple' : 'treeVillage';
+    } else if (zoneKey === 'warTemple') {
+        logicalZoneKey = isSpiritWorld ? 'warPalace' : 'warTemple';
+    }
+    return {
+        ...location,
+        logicalZoneKey,
+    }
 }

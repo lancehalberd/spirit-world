@@ -1012,7 +1012,7 @@ export class Door implements ObjectInstance {
         }
     }
     tryToUnlock(state: GameState): boolean {
-        const dungeonInventory = state.savedState.dungeonInventories[state.location.zoneKey];
+        const dungeonInventory = state.savedState.dungeonInventories[state.location.logicalZoneKey];
         if (this.status === 'locked' && dungeonInventory?.smallKeys) {
             dungeonInventory.smallKeys--;
         } else if (this.status === 'bigKeyLocked' && dungeonInventory?.bigKey) {

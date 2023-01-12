@@ -192,8 +192,9 @@ export const overworldNodes: LogicNode[] = [
             { nodeId: 'nimbusCloudSpirit', logic: hasNimbusCloud},
             { nodeId: 'warTempleSpiritArea', logic: hasMitts },
         ],
-        entranceIds: ['fertilityTempleSpiritEntrance', 'staffTowerSpiritEntrance'],
+        entranceIds: ['fertilityTempleSpiritEntrance', 'staffTowerSpiritEntrance', 'jadePalaceEntrance'],
         exits: [
+            { objectId: 'jadePalaceEntrance' },
             { objectId: 'fertilityTempleSpiritEntrance' },
             { objectId: 'staffTowerSpiritEntrance', logic: {requiredFlags: ['staffTowerSpiritEntrance']} },
         ],

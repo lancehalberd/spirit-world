@@ -560,14 +560,14 @@ export function applyUpgrade(currentLevel: number, loot: LootObjectDefinition | 
 }
 
 function getDungeonInventory(state: GameState): DungeonInventory {
-    return state.savedState.dungeonInventories[state.location.zoneKey] || {
+    return state.savedState.dungeonInventories[state.location.logicalZoneKey] || {
         bigKey: false,
         map: false,
         smallKeys: 0,
     };
 }
 function updateDungeonInventory(state: GameState, inventory: DungeonInventory, save: boolean = true): void {
-    state.savedState.dungeonInventories[state.location.zoneKey] = inventory;
+    state.savedState.dungeonInventories[state.location.logicalZoneKey] = inventory;
     if (save) {
         saveGame();
     }
