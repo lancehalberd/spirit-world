@@ -36,8 +36,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Don't allow surfacing during another transition (just wait until nextSection/Area is unset).
-
     - Add placeholder for Jade Palace
         - Add phoenix crown
             - Uses a feather from a legender spirit beast that could survive on its own in the material world and once threatened to destroy the world.

@@ -116,7 +116,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         hero.z = Math.max(hero.z - 2, minZ);
     } else if (isHeroFloating(state, hero)) {
         hero.z = Math.min(24, hero.z + 1);
-        if (hero.z >= 24 && state.surfaceAreaInstance) {
+        if (hero.z >= 24 && state.surfaceAreaInstance && !state.nextAreaInstance && !state.nextAreaSection) {
             // You can only surface in areas of deep water, that is, where you would be swimming.
             const testHero = hero.getCopy();
             testHero.z = 0;
