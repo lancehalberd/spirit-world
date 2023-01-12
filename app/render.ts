@@ -443,6 +443,10 @@ function updateObjectsToRender(this: void, state: GameState, area: AreaInstance)
     area.objectsToRender = [];
     for (const object of [...area?.objects || [], ...area?.effects || []]) {
         for (const part of [object, ...(object.getParts?.(state) || [])]) {
+            // Invisible objects are not rendered unless the hero has true sight.
+            if (!editingState.isEditing && !state.hero.passiveTools.trueSight && object.definition?.isInvisible) {
+                continue;
+            }
             if (part.render || part.renderShadow || part.renderForeground) {
                 area.objectsToRender.push(part);
             }

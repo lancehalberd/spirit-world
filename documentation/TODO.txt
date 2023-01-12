@@ -12,8 +12,6 @@ Known Bugs:
         - when players can actively hit enemies in the spirit world we should play a sound. For example, hitting an enemy with a linked bush shouldn't be silent.
     - Clone tool bugs
         - Mana regen is wrong when using clone tools (seems to multiply consumption/regen by number of clones)
-        - Should destroy clones when the clone technique is unequipped.
-        - Clones should all share the same tools (store tools on state instead of hero)
     - Held rocks/bushes are invisible while using cloak
     - Piercing projectiles that can push things should be stopped by the first object they push
         or not be able to push additional objects, for example, the charged chakram.
@@ -27,6 +25,11 @@ Known Bugs:
             - Marking these tiles as cliff ledges will probably allow jumping down them in some cases which will need to be fixed.
     - Shadow renders behind door tops when jumping down ledges.
 
+Possible issues in the future:
+    - Refresh area logic application of special behavior doesn't quite work as intended
+        - Objects that change position based on location will get reset on area logic refresh, which might be strange if they had been moved beforehand.
+            - Currently this doesn't actually happen anywhere, but it could cause unexpected issues if we add a case that runs into this issue.
+
 Graphics:
     Add slam effects for the staff.
     Sweat animation when pulling on something you cannot move.
@@ -38,15 +41,40 @@ Graphics:
 Current tasks:
     - Add placeholder for Jade Palace
         - Add phoenix crown
+            - Add help text
             - Uses a feather from a legender spirit beast that could survive on its own in the material world and once threatened to destroy the world.
                 The War God wants to combine science and Vanara biology to make a new "Void Phoenix" to replicate the old beast.
                 An ancestor of the MC+Hero defeated the original Phoenix
                 The feather is kept in the Jade palace, too dangerous to use but too precious to destroy
         - Add true sight
-            - Possibly increases tell durations for attacks by 50%?
-            - Alternatively, some tells only render if you have true sight?
-            - Possibly renders (certain) objects from the alternate world at 50%
-                - Might be especially good for monsters that render in both worlds like Staff Tower drones.
+            - Add help text
+
+    - Add additional uses for true sight
+        - Invisible path tiles over pit that are revealed with true sight
+            - Requires a new 'invisible' tile behavior
+        - Rolling ball puzzles that can be solved by moving an invisible pot
+        - Invisible cracked doorway to a new cave in spirit world.
+            - This would be easy to memorize the location of but is technically out of logic without true sight.
+                - We could add some randomization to this to make it harder to find, perhaps there are 10 different locations for the door? It would still be cheap to check any locations a player happens to come by if they have the clone tool.
+
+    - End invisibility when the player releases the tool button
+
+    - Allow player to prevent staff placement if they double tap the tool button. This makes it easier to attack rapidly when they are in combat.
+
+    - Turn of tools when unequipped
+        - End cloak+invisibility effect when cloak is unequipped.
+        - Remove clones when clone tool is unequipped
+        - Dismiss staff when staff tool is unequipped
+
+    - Set all clones to use the same loadout
+        - Boots apply to all clones
+        - Elements apply to all clones
+        - Tools apply to all clones
+
+    - Possible additional true sight behavior
+        - Render specific objects from the spirit world at 50% opacity.
+            - Maybe especially useful for monsters that render+act in both worlds
+        - Possibly increases tell durations for certain/all attacks with tellDuration by 50%?
 
     - Add meteor attacks that leave behind rocks to void tree fight
         - Give to tree + voidFlame

@@ -3,7 +3,7 @@ import { LogicNode } from 'app/types';
 import {
     andLogic, orLogic, canHasTowerStaff,  canHitCrystalSwitches, canTravelFarUnderWater,
     hasDoubleClone, hasTripleShot,
-    hasInvisibility, hasCloudBoots, hasMitts, hasClone, hasStaff, hasSomersault, hasTeleportation,
+    hasInvisibility, hasCloudBoots, hasMitts, hasClone, hasStaff, hasSomersault, hasTeleportation, hasTrueSight,
 } from 'app/content/logic';
 
 const zoneId = 'grandTemple';
@@ -117,13 +117,26 @@ export const grandTempleNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'jadePalaceEntrance',
-        npcs: [
+        checks: [
+            {objectId: 'jadePalacePeach'},
+            {objectId: 'jadePalaceTrueSight'},
         ],
         paths: [
+            {nodeId: 'jadePalaceHallway', logic: hasTrueSight}
         ],
         entranceIds: ['jadePalaceEntrance'],
         exits: [
             {objectId: 'jadePalaceEntrance'},
+        ],
+    },
+    {
+        zoneId,
+        nodeId: 'jadePalaceHallway',
+        checks: [
+            {objectId: 'jadePalacePhoenixCrown'},
+        ],
+        paths: [
+            {nodeId: 'jadePalaceEntrance'}
         ],
     },
 ];

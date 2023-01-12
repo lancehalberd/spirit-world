@@ -682,6 +682,14 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             },
         });
     }
+    rows.push({
+        name: 'invisible',
+        value: !!object.isInvisible,
+        onChange(isInvisible: boolean) {
+            object.isInvisible = isInvisible;
+            updateObjectInstance(state, object);
+        },
+    });
     const specialBehaviorKeys = Object.keys(specialBehaviorsHash).filter(
         key => specialBehaviorsHash[key].type === object.type
     );

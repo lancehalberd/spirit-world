@@ -302,6 +302,8 @@ export interface BaseObjectDefinition {
     style?: string
     status: ObjectStatus
     isFrozen?: boolean
+    // Invisible objects are only rendered if the hero has true sight.
+    isInvisible?: boolean
     x: number
     y: number
     d?: Direction

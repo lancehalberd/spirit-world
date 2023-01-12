@@ -92,6 +92,7 @@ export function isLogicValid(state: GameState, logic: LogicCheck, invertLogic = 
 window['isLogicValid'] = isLogicValid;
 
 export const hasCatEyes: LogicCheck = { requiredFlags: ['$catEyes'] };
+export const hasTrueSight: LogicCheck = { requiredFlags: ['$trueSight'] };
 export const hasClone: LogicCheck = { requiredFlags: ['$clone'] };
 export const hasDoubleClone: LogicCheck = { requiredFlags: ['$clone:2'] };
 export const hasIronBoots: LogicCheck = { requiredFlags: ['$ironBoots'] };

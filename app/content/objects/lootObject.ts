@@ -348,6 +348,10 @@ export class ChestObject implements ObjectInstance {
         if (!this.definition.id || state.hero.d !== 'up') {
             return;
         }
+        // The hero cannot open chests that they cannot see.
+        if (this.definition.isInvisible && !state.hero.passiveTools.trueSight) {
+            return;
+        }
         state.hero.action = null;
         if (this.isOpen(state)) {
             if (state.savedState.objectFlags[this.definition.id] && this.definition.lootType !== 'empty') {
@@ -417,6 +421,10 @@ export class BigChest extends ChestObject implements ObjectInstance {
         if (state.hero.d !== 'up') {
             return;
         }
+        // The hero cannot open chests that they cannot see.
+        if (this.definition.isInvisible && !state.hero.passiveTools.trueSight) {
+            return;
+        }
         state.hero.action = null;
         if (this.isOpen(state)) {
             if (state.savedState.objectFlags[this.definition.id] && this.definition.lootType !== 'empty') {
@@ -474,6 +482,10 @@ export class ShopObject extends LootObject implements ObjectInstance {
     }
     onGrab(state: GameState, d: Direction, hero: Hero) {
         if (hero !== state.hero) {
+            return;
+        }
+        // The hero cannot purchase items that they cannot see.
+        if (this.definition.isInvisible && !state.hero.passiveTools.trueSight) {
             return;
         }
         state.hero.action = null;
