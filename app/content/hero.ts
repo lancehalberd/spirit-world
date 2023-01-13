@@ -161,6 +161,9 @@ export class Hero implements Actor, SavedHeroData {
     heldChakram?: HeldChakram;
     thrownChakrams: ThrownChakram[] = [];
     activeStaff?: Staff
+    // This is set if the player attempts to use the staff tool while it is in use
+    // and prevents it from being placed. This is useful for attacking quickly.
+    canceledStaffPlacement?: boolean;
 
     constructor() {
         this.life = this.maxLife;

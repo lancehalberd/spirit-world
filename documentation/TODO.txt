@@ -47,8 +47,6 @@ Current tasks:
             - This would be easy to memorize the location of but is technically out of logic without true sight.
                 - We could add some randomization to this to make it harder to find, perhaps there are 10 different locations for the door? It would still be cheap to check any locations a player happens to come by if they have the clone tool.
 
-    - Allow player to prevent staff placement if they double tap the tool button. This makes it easier to attack rapidly when they are in combat.
-
     - Turn of tools when unequipped
         - End cloak+invisibility effect when cloak is unequipped.
         - End invisibility when the player releases the tool button

@@ -361,6 +361,10 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         hero.action = null;
     }
     if (hero.action === 'usingStaff') {
+        // Pressing either tool button while using the staff will cancel placing it.
+        if (wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL) || wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL)) {
+            hero.canceledStaffPlacement = true;
+        }
         const jumpDuration = heroAnimations.staffJump[hero.d].duration;
         const slamDuration = heroAnimations.staffSlam[hero.d].duration;
        // console.log(hero.animationTime, jumpDuration, slamDuration);
@@ -443,7 +447,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 w: (staff.rightColumn - staff.leftColumn + 1) * 16,
                 h: (staff.bottomRow - staff.topRow + 1) * 16,
             }
-            if (!staff.invalid) {
+            if (!staff.invalid && !hero.canceledStaffPlacement) {
                 hero.activeStaff = staff;
                 addObjectToArea(state, state.areaInstance, staff);
             } else {

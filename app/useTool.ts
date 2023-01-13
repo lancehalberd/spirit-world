@@ -194,6 +194,7 @@ export function useTool(
             state.hero.increasedMagicRegenCooldown(1000 * 10 / 50);
             hero.toolCooldown = 200;
             hero.toolOnCooldown = 'staff';
+            hero.canceledStaffPlacement = false;
             hero.action = 'usingStaff';
             hero.animationTime = 0;
             return;
