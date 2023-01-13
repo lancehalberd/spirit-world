@@ -39,16 +39,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Add placeholder for Jade Palace
-        - Add phoenix crown
-            - Add help text
-            - Uses a feather from a legender spirit beast that could survive on its own in the material world and once threatened to destroy the world.
-                The War God wants to combine science and Vanara biology to make a new "Void Phoenix" to replicate the old beast.
-                An ancestor of the MC+Hero defeated the original Phoenix
-                The feather is kept in the Jade palace, too dangerous to use but too precious to destroy
-        - Add true sight
-            - Add help text
-
     - Add additional uses for true sight
         - Invisible path tiles over pit that are revealed with true sight
             - Requires a new 'invisible' tile behavior
@@ -57,12 +47,11 @@ Current tasks:
             - This would be easy to memorize the location of but is technically out of logic without true sight.
                 - We could add some randomization to this to make it harder to find, perhaps there are 10 different locations for the door? It would still be cheap to check any locations a player happens to come by if they have the clone tool.
 
-    - End invisibility when the player releases the tool button
-
     - Allow player to prevent staff placement if they double tap the tool button. This makes it easier to attack rapidly when they are in combat.
 
     - Turn of tools when unequipped
         - End cloak+invisibility effect when cloak is unequipped.
+        - End invisibility when the player releases the tool button
         - Remove clones when clone tool is unequipped
         - Dismiss staff when staff tool is unequipped
 
@@ -70,11 +59,6 @@ Current tasks:
         - Boots apply to all clones
         - Elements apply to all clones
         - Tools apply to all clones
-
-    - Possible additional true sight behavior
-        - Render specific objects from the spirit world at 50% opacity.
-            - Maybe especially useful for monsters that render+act in both worlds
-        - Possibly increases tell durations for certain/all attacks with tellDuration by 50%?
 
     - Add meteor attacks that leave behind rocks to void tree fight
         - Give to tree + voidFlame
@@ -90,6 +74,11 @@ Current tasks:
 
     - Add void pit tiles and use them in the void area, add solid cliff edges to prevent jumping into the void.
         - This will allow the astral projection to move freely over the void.
+
+    - Possible additional true sight behavior
+        - Render specific objects from the spirit world at 50% opacity.
+            - Maybe especially useful for monsters that render+act in both worlds
+        - Possibly increases tell durations for certain/all attacks with tellDuration by 50%?
 
     - Mysteries
         - Lava appears under floor 2 in the middle of void tree fight
@@ -724,6 +713,13 @@ Dungeon 3: Cocoon (Vanara Regeneration Unit)
     - Boss:
     - Boss Reward: Teleportation (body moves to astral projection when pressing either tool button)
 
+
+Jade Palace:
+    - Boss Reward: Phoenix Feather
+        Uses a feather from a legender spirit beast that could survive on its own in the material world and once threatened to destroy the world.
+        The War God wants to combine science and Vanara biology to make a new "Void Phoenix" to replicate the old beast.
+        An ancestor of the MC+Hero defeated the original Phoenix
+        The feather is kept in the Jade palace, too dangerous to use but too precious to destroy
 
 River Temple:
     - No NPCs here, this was the old Fertility Temple, but it was destroyed by the Vanara Ship crashing. The survivors all moved to the new Fertility Temple near the forest (Forest Temple).

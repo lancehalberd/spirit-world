@@ -108,7 +108,6 @@ export function getLootName(state: GameState, lootType: LootType, lootLevel?: nu
 
 export function getLootGetMessage(state: GameState, lootType: LootType, lootLevel?: number, lootAmount?: number): string {
     const lootName = getLootName(state, lootType, lootLevel);
-    const defaultMessage = `You found the ${lootName}!`;
     switch (lootType) {
         case 'cloudBoots':
         case 'ironBoots': return `You found the ${lootName}!` + equipBootsMessage;
@@ -135,9 +134,10 @@ export function getLootGetMessage(state: GameState, lootType: LootType, lootLeve
                 return 'You learned the Mist Roll Technique!';
             }
             return 'You learned the Cloud Somersault Technique!';
-        case 'catEyes': return 'You have been blessed with Cat Eyes!';
+        case 'catEyes': return `You have been blessed with ${lootName}!`;
         case 'ironSkin': return `You have been blessed with ${lootName}!`;
-        case 'spiritSight': return 'You have been blessed with Spirit Sight!';
+        case 'spiritSight': return `You have been blessed with ${lootName}!`;
+        case 'trueSight': return `You have been blessed with ${lootName}!`;
         case 'teleportation': return 'You have learned Teleportation!';
         case 'fire': return 'You have received the Fire Element!' + getEquipElementMessage(state);
         case 'ice': return 'You have received the Ice Element!' + getEquipElementMessage(state);
@@ -149,7 +149,7 @@ export function getLootGetMessage(state: GameState, lootType: LootType, lootLeve
         case 'silverOre':
         case 'goldOre': return `You found some ${lootName}`;
     }
-    return defaultMessage;
+    return `You found the ${lootName}!`;
 }
 
 export function getLootHelpMessage(state: GameState, lootType: LootType, lootLevel?: number, lootAmount?: number): string {
@@ -236,6 +236,8 @@ export function getLootHelpMessage(state: GameState, lootType: LootType, lootLev
             return 'Hold [B_MEDITATE] to gaze into the Spirit World.'
                 + '{|}If an object is in both the Material World and Spirit World,'
                 + '{|}see what happens if you change it in the Material World!';
+        case 'trueSight':
+            return 'Now you can see objects that have been hidden between worlds.';
         case 'astralProjection':
             return 'Hold [B_MEDITATE] to gaze into the Spirit World.'
                 + '{|}While looking into the Spirit World, use [B_UP] to move your Astral Body.'
@@ -258,6 +260,7 @@ export function getLootHelpMessage(state: GameState, lootType: LootType, lootLev
         case 'lightningBlessing':
             return 'This ancient artifact halves the damage from lightning effects.';
         case 'goldMail': return 'This amazing armor reduces all damage you receive.';
+        case 'phoenixCrown': return `The feather in this crown absorbs almost limitless energy from the spirit world.`;
         case 'ironSkin': return `The Iron Skin technique allows you to coat your skin
             with layers of Spirit Energy until it is as hard as iron!
             {|}Iron Skin will build up slowly over time as long as you take no damage.
