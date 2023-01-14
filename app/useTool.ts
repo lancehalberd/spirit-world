@@ -201,11 +201,14 @@ export function useTool(
 }
 
 export function wasToolButtonPressed(state: GameState, tool: ActiveTool): boolean {
-    return (state.hero.leftTool === tool && wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL));
+    return (state.hero.leftTool === tool && wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL))
+        || (state.hero.rightTool === tool && wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL));
 }
 export function wasToolButtonPressedAndReleased(state: GameState, tool: ActiveTool): boolean {
-    return (state.hero.leftTool === tool && wasGameKeyPressedAndReleased(state, GAME_KEY.LEFT_TOOL));
+    return (state.hero.leftTool === tool && wasGameKeyPressedAndReleased(state, GAME_KEY.LEFT_TOOL))
+        || (state.hero.rightTool === tool && wasGameKeyPressedAndReleased(state, GAME_KEY.RIGHT_TOOL));
 }
 export function isToolButtonPressed(state: GameState, tool: ActiveTool): boolean {
-    return (state.hero.leftTool === tool && isGameKeyDown(state, GAME_KEY.LEFT_TOOL));
+    return (state.hero.leftTool === tool && isGameKeyDown(state, GAME_KEY.LEFT_TOOL))
+        || (state.hero.rightTool === tool && isGameKeyDown(state, GAME_KEY.RIGHT_TOOL));
 }

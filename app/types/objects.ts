@@ -40,6 +40,8 @@ export interface ObjectInstance {
     // Setting this true is the same as returning true always for shouldReset+shouldRespawn.
     alwaysReset?: boolean
     ignorePits?: boolean
+    // Setting this to true allows this object to press floor switches even if it isn't solid.
+    canPressSwitches?: boolean
     // Called when area logic is refreshed. Use this if logic can change internal state of this object,
     // for example, whether a door is open or not.
     refreshLogic?: (state: GameState) => void

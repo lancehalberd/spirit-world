@@ -44,7 +44,7 @@ export class FloorSwitch implements ObjectInstance {
         }
         for (const object of this.area.objects) {
             // Only solid objects with hitboxes can press switches.
-            if (object === this || !object.getHitbox || !object.behaviors?.solid) {
+            if (object === this || !object.getHitbox || !(object.behaviors?.solid || object.canPressSwitches)) {
                 continue;
             }
             if (!(object.z > 0) && rectanglesOverlap(object.getHitbox(state), hitbox)) {

@@ -4,10 +4,11 @@ import { Hero } from 'app/content/hero';
 import { carryMap, directionMap, directionToLeftRotationsFromRight, rotateDirection } from 'app/utils/field';
 
 import {
-    Direction, GameState, Rect,
+    Direction, GameState, Rect
 } from 'app/types';
 
 export class Clone extends Hero {
+    canPressSwitches = true;
     carryRotationOffset: number;
     ignorePits = true;
     uncontrollable = false;
