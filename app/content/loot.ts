@@ -1,4 +1,5 @@
 import { enterLocation } from 'app/content/areas';
+import { setLeftTool, setRightTool } from 'app/content/menu';
 import { createCanvasAndContext } from 'app/dom';
 import { showMessage } from 'app/render/renderMessage';
 import { updateHeroMagicStats } from 'app/render/spiritBar';
@@ -582,9 +583,9 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: An
             state.hero.weapon = applyUpgrade(state.hero.weapon, loot);
         } else if (['bow', 'staff', 'clone', 'cloak'].includes(loot.lootType)) {
             if (!state.hero.leftTool && state.hero.rightTool !== loot.lootType) {
-                state.hero.leftTool = loot.lootType as ActiveTool;
+                setLeftTool(state, loot.lootType as ActiveTool);
             } else if (!state.hero.rightTool && state.hero.leftTool !== loot.lootType) {
-                state.hero.rightTool = loot.lootType as ActiveTool;
+                setRightTool(state, loot.lootType as ActiveTool);
             }
             //console.log(loot.lootType, state.hero.activeTools[loot.lootType]);
             state.hero.activeTools[loot.lootType] = applyUpgrade(state.hero.activeTools[loot.lootType], loot);

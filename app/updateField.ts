@@ -1,6 +1,7 @@
 import { addEffectToArea, checkIfAllEnemiesAreDefeated, removeObjectFromArea } from 'app/content/areas';
 import { AnimationEffect } from 'app/content/effects/animationEffect';
 import { Enemy } from 'app/content/enemy';
+import { setEquippedElement } from 'app/content/menu';
 import { editingState } from 'app/development/tileEditor';
 import { FRAME_LENGTH, GAME_KEY } from 'app/gameConstants';
 import { wasGameKeyPressed } from 'app/keyCommands';
@@ -156,7 +157,7 @@ function switchElement(state: GameState, delta: number): void {
         }
     }
     const index = allElements.indexOf(state.hero.element);
-    state.hero.setElement(allElements[(index + delta + allElements.length) % allElements.length])
+    setEquippedElement(state, allElements[(index + delta + allElements.length) % allElements.length]);
 }
 
 function removeDefeatedEnemies(state: GameState, area: AreaInstance): void {

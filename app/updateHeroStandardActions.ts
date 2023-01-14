@@ -4,6 +4,7 @@ import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import {
     addEffectToArea, addObjectToArea, destroyTile, enterLocation, removeEffectFromArea,
 } from 'app/content/areas';
+import { setEquippedBoots } from 'app/content/menu';
 import { getObjectBehaviors } from 'app/content/objects';
 import { destroyClone } from 'app/content/objects/clone';
 import { CloneExplosionEffect } from 'app/content/effects/CloneExplosionEffect';
@@ -18,7 +19,7 @@ import {
 } from 'app/keyCommands';
 import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
 import { moveActor } from 'app/moveActor';
-import { getChargeLevelAndElement, useTool } from 'app/useTool';
+import { getChargeLevelAndElement, isToolButtonPressed, useTool } from 'app/useTool';
 import { isHeroFloating, isHeroSinking, isUnderwater } from 'app/utils/actor';
 import {
     canTeleportToCoords,
@@ -42,10 +43,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     }
     const wasPassiveButtonPressed = wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL);
     const isPassiveButtonDown = isGameKeyDown(state, GAME_KEY.PASSIVE_TOOL);
-    const isCloneToolDown = (state.hero.leftTool === 'clone' && isGameKeyDown(state, GAME_KEY.LEFT_TOOL))
-        || (state.hero.rightTool === 'clone' && isGameKeyDown(state, GAME_KEY.RIGHT_TOOL));
-    const isCloakToolDown = (state.hero.leftTool === 'cloak' && isGameKeyDown(state, GAME_KEY.LEFT_TOOL))
-        || (state.hero.rightTool === 'cloak' && isGameKeyDown(state, GAME_KEY.RIGHT_TOOL));
+    const isCloneToolDown = isToolButtonPressed(state, 'clone');
     const isPlayerControlled = !hero.isUncontrollable
         && (
             (state.hero.action === 'meditating' && hero.isAstralProjection)
@@ -70,9 +68,9 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     if (hero.isRunning && hero.magic > 0) {
         movementSpeed *= 1.3;
     }
-    if (hero.equipedBoots === 'ironBoots') {
+    if (hero.equippedBoots === 'ironBoots') {
         movementSpeed *= 0.6;
-    } else if (hero.equipedBoots === 'cloudBoots') {
+    } else if (hero.equippedBoots === 'cloudBoots') {
         movementSpeed *= 1.4;
     }
     if (hero.action === 'climbing') {
@@ -122,7 +120,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             testHero.z = 0;
             testHero.area = state.surfaceAreaInstance;
             // Remove equipment from test hero in case it prevents them from swimming (like cloud boots).
-            testHero.equipedBoots = 'leatherBoots';
+            testHero.equippedBoots = 'leatherBoots';
             checkForFloorEffects(state, testHero);
             // If the test hero is swimming, we can surface here.
             if (testHero.swimming) {
@@ -138,7 +136,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 return;
             }
         }
-    } else if (hero.equipedBoots === 'cloudBoots' && hero.canFloat && hero.vx * hero.vx + hero.vy * hero.vy >= 4) {
+    } else if (hero.equippedBoots === 'cloudBoots' && hero.canFloat && hero.vx * hero.vx + hero.vy * hero.vy >= 4) {
         hero.z = Math.min(hero.z + 0.1, maxCloudBootsZ);
     } else if (hero.z >= minZ) {
         hero.z = Math.max(minZ, hero.z - 0.2);
@@ -147,7 +145,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     // The astral projection uses the weapon tool as the passive tool button
     // since you have to hold the normal passive tool button down to meditate.
 
-    if (hero.swimming && hero.equipedBoots === 'ironBoots' && state.underwaterAreaInstance &&
+    if (hero.swimming && hero.equippedBoots === 'ironBoots' && state.underwaterAreaInstance &&
         isPointOpen(state, state.underwaterAreaInstance, {x: hero.x + hero.w / 2, y: hero.y + hero.h / 2}, {canSwim: true})
     ) {
         const mx = hero.x % 16;
@@ -292,7 +290,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         movementSpeed *= 0.75;
         hero.chargeTime += FRAME_LENGTH;
         hero.action = 'charging';
-        if (isCloakToolDown && hero.hasBarrier) {
+        if (isToolButtonPressed(state, 'cloak') && hero.hasBarrier) {
             if (hero.chargeTime >= 400) {
                 hero.burstBarrier(state);
                 state.hero.magic -= 10;
@@ -428,7 +426,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         }
     }
     if (hero.slipping) {
-        if (hero.equipedBoots === 'cloudBoots') {
+        if (hero.equippedBoots === 'cloudBoots') {
             hero.vx = dx / 10 + hero.vx * 0.95;
             hero.vy = dy / 10 + hero.vy * 0.95;
         } else {
@@ -549,7 +547,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             // Currently only the bow tool can be charged.
             if (state.hero.leftTool === 'bow'
                 // "charging" the cloak while it is active is used to activate barrier burst/invisibility
-                || (state.hero.hasBarrier && state.hero.leftTool === 'cloak')
+                || (hero.hasBarrier && state.hero.leftTool === 'cloak')
             ) {
                 hero.chargingLeftTool = true;
             } else {
@@ -562,7 +560,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             // Currently only the bow tool can be charged.
             if (state.hero.rightTool === 'bow'
                 // "charging" the cloak while it is active is used to activate barrier burst/invisibility
-                || (state.hero.hasBarrier && state.hero.rightTool === 'cloak')
+                || (hero.hasBarrier && state.hero.rightTool === 'cloak')
             ) {
                 hero.chargingRightTool = true;
             } else {
@@ -686,10 +684,10 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     if ((hero.swimming || isUnderwater(state, hero)) && wasGameKeyPressed(state, GAME_KEY.MEDITATE)) {
         // The meditate key can be used to quickly toggle iron boots in/under water.
         if (hero.equipment.ironBoots) {
-            if (hero.equipedBoots !== 'ironBoots') {
-                hero.equipedBoots = 'ironBoots';
+            if (hero.equippedBoots !== 'ironBoots') {
+                setEquippedBoots(state, 'ironBoots');
             } else {
-                hero.equipedBoots = 'leatherBoots';
+                setEquippedBoots(state, 'leatherBoots');
             }
         }
     } else if (wasGameKeyPressed(state, GAME_KEY.MEDITATE)

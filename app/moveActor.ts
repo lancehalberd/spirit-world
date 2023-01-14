@@ -135,9 +135,9 @@ function moveActorInDirection(
         } else {
             let speed = 2;
             if (actor instanceof Hero) {
-                if (actor.equipedBoots === 'cloudBoots') {
+                if (actor.equippedBoots === 'cloudBoots') {
                     speed = 2.2;
-                } else if (actor.equipedBoots === 'ironBoots') {
+                } else if (actor.equippedBoots === 'ironBoots') {
                     speed = 1.5;
                 }
             }

@@ -776,6 +776,7 @@ const f0_0x1: AreaDefinition = {
         {status: "normal", id: "waterfallCaveSave", x: 32, y: 256, type: "saveStatue"},
         {status: "normal", id: "waterfallMarker", x: 160, y: 288, type: "marker"},
         {status: "normal", id: "overworld:0:1x0-luckyBeetle-0", x: 360, y: 120, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
+        {status: "normal", id: "", x: 80, y: 32, type: "indicator"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -2881,6 +2882,10 @@ const f0_2x2: AreaDefinition = {
         {status: "normal", id: "", linked: true, x: 176, y: 320, type: "spawnMarker"},
         {status: "normal", id: "", linked: true, x: 144, y: 208, type: "spawnMarker"},
         {status: "normal", id: "summonerRuinsMarker", x: 240, y: 432, type: "marker"},
+        {status: "normal", id: "", x: 272, y: 368, targetObjectId: "overworldWarTemplePotB", type: "indicator"},
+        {status: "normal", id: "", x: 224, y: 400, targetObjectId: "overworldWarTempleSwitchA", type: "indicator"},
+        {status: "normal", id: "", x: 272, y: 400, targetObjectId: "overworldWarTempleSwitchB", type: "indicator"},
+        {status: "normal", id: "", x: 224, y: 368, targetObjectId: "overworldWarTemplePotA", type: "indicator"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},

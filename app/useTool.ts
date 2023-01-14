@@ -1,7 +1,5 @@
 import { addObjectToArea, addEffectToArea, playAreaSound } from 'app/content/areas';
-import {
-    isGameKeyDown,
-} from 'app/keyCommands';
+import { isGameKeyDown, wasGameKeyPressed, wasGameKeyPressedAndReleased } from 'app/keyCommands';
 import { Arrow } from 'app/content/effects/arrow';
 import { Clone }  from 'app/content/objects/clone';
 import { GAME_KEY } from 'app/gameConstants';
@@ -113,9 +111,9 @@ export function useTool(
             return;
         }
         case 'cloak': {
-            if (state.hero.isInvisible || state.hero.hasBarrier) {
-                state.hero.shatterBarrier(state);
-                state.hero.isInvisible = false;
+            if (hero.isInvisible || hero.hasBarrier) {
+                hero.shatterBarrier(state);
+                hero.isInvisible = false;
                 hero.toolCooldown = 0;
                 hero.toolOnCooldown = null;
                 return;
@@ -132,11 +130,11 @@ export function useTool(
             hero.toolOnCooldown = 'cloak';
             // This is based on the length of the animation for activating the cloak which is 20ms * 2 * 10
             hero.toolCooldown = 400;
-            state.hero.barrierLevel = chargeLevel;
+            hero.barrierLevel = chargeLevel;
             if (chargeLevel === 1) {
-                state.hero.barrierElement = element;
+                hero.barrierElement = element;
             }
-            state.hero.hasBarrier = true;
+            hero.hasBarrier = true;
             return;
         }
         case 'clone': {
@@ -200,4 +198,14 @@ export function useTool(
             return;
         }
     }
+}
+
+export function wasToolButtonPressed(state: GameState, tool: ActiveTool): boolean {
+    return (state.hero.leftTool === tool && wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL));
+}
+export function wasToolButtonPressedAndReleased(state: GameState, tool: ActiveTool): boolean {
+    return (state.hero.leftTool === tool && wasGameKeyPressedAndReleased(state, GAME_KEY.LEFT_TOOL));
+}
+export function isToolButtonPressed(state: GameState, tool: ActiveTool): boolean {
+    return (state.hero.leftTool === tool && isGameKeyDown(state, GAME_KEY.LEFT_TOOL));
 }

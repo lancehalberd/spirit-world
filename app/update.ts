@@ -3,7 +3,13 @@ import { addDustBurst, addReviveBurst } from 'app/content/effects/animationEffec
 import { Hero } from 'app/content/hero';
 import { showHint } from 'app/content/hints';
 import { getLootHelpMessage } from 'app/content/loot';
-import { getMenuRows } from 'app/content/menu';
+import {
+    getMenuRows,
+    setEquippedBoots,
+    setEquippedElement,
+    setLeftTool,
+    setRightTool,
+} from 'app/content/menu';
 import { showMessage } from 'app/render/renderMessage';
 import {
     SPAWN_LOCATION_DEMO,
@@ -244,32 +250,32 @@ function updateMenu(state: GameState) {
         if (state.hero.activeTools[menuItem]) {
             if (wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL)) {
                 if (state.hero.leftTool === menuItem) {
-                    state.hero.leftTool = state.hero.rightTool;
+                    setLeftTool(state, state.hero.rightTool);
                 }
-                state.hero.rightTool = menuItem as ActiveTool;
+                setRightTool(state, menuItem as ActiveTool);
             } else {
                 // Assign to left tool as default action.
                 // If a generic confirm key was pressed, cycle the current left tool
                 // over to the right tool slot.
                 if (!wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL) && state.hero.leftTool !== menuItem) {
-                    state.hero.rightTool = state.hero.leftTool;
+                    setRightTool(state, state.hero.leftTool);
                 }
                 if (state.hero.rightTool === menuItem) {
-                    state.hero.rightTool = state.hero.leftTool;
+                    setRightTool(state, state.hero.leftTool);
                 }
-                state.hero.leftTool = menuItem as ActiveTool;
+                setLeftTool(state, menuItem as ActiveTool);
             }
             return;
         }
         if (menuItem === 'leatherBoots' || menuItem === 'ironBoots' || menuItem === 'cloudBoots') {
-            state.hero.equipedBoots = menuItem;
+            setEquippedBoots(state, menuItem);
             return;
         }
         if (menuItem === 'charge' || state.hero.element === menuItem) {
-            state.hero.setElement(null);
+            setEquippedElement(state, null);
             return;
         } else if (state.hero.elements[menuItem]) {
-            state.hero.setElement(menuItem as MagicElement);
+            setEquippedElement(state, menuItem as MagicElement);
             return;
         }
         if (menuItem === 'nimbusCloud') {

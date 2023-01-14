@@ -1,4 +1,5 @@
 import { sample } from 'lodash';
+import { addObjectToArea } from 'app/content/areas';
 import {
     accelerateInDirection,
     getVectorToNearbyTarget,
@@ -6,6 +7,7 @@ import {
     moveEnemy,
 } from 'app/content/enemies';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
+import { Indicator } from 'app/content/objects/indicator';
 import { heroSpiritAnimations } from 'app/render/heroAnimations';
 import { vanaraBlueAnimations } from 'app/render/npcAnimations';
 import { directionMap, getDirection } from 'app/utils/field';
@@ -136,6 +138,12 @@ function teleportToNextMarker(this: void, state: GameState, guardian: Enemy): vo
     }
 }
 function updateGuardian(this: void, state: GameState, enemy: Enemy): void {
+    // For players that happen to have true sight, add an indicator that follows the guardians position in the other world.
+    if (!enemy.params.indicator) {
+        enemy.params.indicator = new Indicator(state, {type: 'indicator', id: 'guardianIndiactor', status: 'normal', x: enemy.x, y: enemy.y});
+        addObjectToArea(state, enemy.area.alternateArea, enemy.params.indicator);
+        enemy.params.indicator.target = enemy;
+    }
     if (!enemy.params.usedMarkers?.size) {
         enemy.params.usedMarkers = new Set();
         // Don't teleport until the hero is in the material world (otherwise they might appear next to them).

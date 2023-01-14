@@ -484,7 +484,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         return true;
     }
     const isFallingToGround = !isUnderwater(state, hero)
-        && hero.z > minZ && (hero.equipedBoots !== 'cloudBoots' || hero.z > FALLING_HEIGHT);
+        && hero.z > minZ && (hero.equippedBoots !== 'cloudBoots' || hero.z > FALLING_HEIGHT);
     if (isFallingToGround) {
         hero.action = null;
         hero.z += hero.vz;

@@ -44,19 +44,13 @@ Current tasks:
             - Requires a new 'invisible' tile behavior
         - Rolling ball puzzles that can be solved by moving an invisible pot
         - Invisible cracked doorway to a new cave in spirit world.
-            - This would be easy to memorize the location of but is technically out of logic without true sight.
-                - We could add some randomization to this to make it harder to find, perhaps there are 10 different locations for the door? It would still be cheap to check any locations a player happens to come by if they have the clone tool.
+            - To prevent memorizing this in randomizer, we could randomly place the door in four different places that are inconvient to check
+                - For example, they might require you to jump down a cliff to check if the door is there.
 
     - Turn of tools when unequipped
         - End cloak+invisibility effect when cloak is unequipped.
-        - End invisibility when the player releases the tool button
         - Remove clones when clone tool is unequipped
         - Dismiss staff when staff tool is unequipped
-
-    - Set all clones to use the same loadout
-        - Boots apply to all clones
-        - Elements apply to all clones
-        - Tools apply to all clones
 
     - Add meteor attacks that leave behind rocks to void tree fight
         - Give to tree + voidFlame
@@ -74,8 +68,6 @@ Current tasks:
         - This will allow the astral projection to move freely over the void.
 
     - Possible additional true sight behavior
-        - Render specific objects from the spirit world at 50% opacity.
-            - Maybe especially useful for monsters that render+act in both worlds
         - Possibly increases tell durations for certain/all attacks with tellDuration by 50%?
 
     - Mysteries

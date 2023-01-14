@@ -65,7 +65,7 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
     function renderBoots(equipment: Equipment): void {
         const frame = getLootFrame(state, { lootType: equipment, lootLevel: state.hero.equipment[equipment] });
         const target = {w: frameSize, h: frameSize, x, y};
-        if (state.hero.equipedBoots === equipment) {
+        if (state.hero.equippedBoots === equipment) {
             fillRect(context, target, 'white');
             fillRect(context, pad(target, -2), 'black');
         }

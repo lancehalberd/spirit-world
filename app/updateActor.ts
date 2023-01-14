@@ -6,15 +6,13 @@ import {
 import { AirBubbles } from 'app/content/objects/airBubbles';
 import { Enemy } from 'app/content/enemy';
 import { editingState } from 'app/development/tileEditor';
-import { FRAME_LENGTH, GAME_KEY } from 'app/gameConstants';
-import {
-    wasGameKeyPressedAndReleased, wasGameKeyPressed
-} from 'app/keyCommands';
+import { FRAME_LENGTH } from 'app/gameConstants';
 import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
 import { prependScript } from 'app/scriptEvents';
 import { getFullZoneLocation } from 'app/state';
 import { updateHeroSpecialActions } from 'app/updateHeroSpecialActions';
 import { updateHeroStandardActions } from 'app/updateHeroStandardActions';
+import { isToolButtonPressed, wasToolButtonPressed, wasToolButtonPressedAndReleased, } from 'app/useTool';
 import {
     directionMap,
 } from 'app/utils/field';
@@ -26,11 +24,7 @@ import {
 
 export function updateAllHeroes(this: void, state: GameState) {
     // Switching clones is done outside of updateHero, otherwise the switch gets processed by each clone.
-    if (state.hero.clones.length
-        && !state.hero.pickUpObject && (
-            (state.hero.leftTool === 'clone' && wasGameKeyPressedAndReleased(state, GAME_KEY.LEFT_TOOL))
-            || (state.hero.rightTool === 'clone' && wasGameKeyPressedAndReleased(state, GAME_KEY.RIGHT_TOOL))
-    )) {
+    if (state.hero.clones.length && !state.hero.pickUpObject && wasToolButtonPressedAndReleased(state, 'clone')) {
         if (!state.hero.cloneToolReleased){
             state.hero.cloneToolReleased = true;
         } else {
@@ -47,10 +41,7 @@ export function updateAllHeroes(this: void, state: GameState) {
         }
     }
     // This is for switching to thrown clone as you throw it.
-    if (state.hero.clones.length && state.hero.cloneToolReleased && (
-        (state.hero.leftTool === 'clone' && wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL))
-            || (state.hero.rightTool === 'clone' && wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL))
-    )) {
+    if (state.hero.clones.length && state.hero.cloneToolReleased && wasToolButtonPressed(state, 'clone')) {
         for (let i = 0; i < state.hero.clones.length; i++) {
             if (state.hero.clones[i].isUncontrollable
                 && !state.hero.clones[i].cannotSwapTo
@@ -160,6 +151,9 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
             hero.toolOnCooldown = null;
         }
     }
+    if (hero.isInvisible && !isToolButtonPressed(state, 'cloak')) {
+
+    }
 }
 
 export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero) {
@@ -213,10 +207,13 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
     }
     // This value starts at 1 and decreases to 1 / 4 once the max of 16 magicRegen is reached.
     const drainCoefficient = state.hero.magicRegen ? 4 / state.hero.magicRegen : 0;
-    if (state.hero.isInvisible) {
+    const isInvisible = !![state.hero, ...state.hero.clones].find(hero => hero.isInvisible);
+    const hasBarrier = !![state.hero, ...state.hero.clones].find(hero => hero.hasBarrier);
+
+    if (isInvisible) {
         state.hero.actualMagicRegen = Math.max(-20, Math.min(0, state.hero.actualMagicRegen) - drainCoefficient * 4 * FRAME_LENGTH / 1000);
         state.hero.increasedMagicRegenCooldown(drainCoefficient * FRAME_LENGTH / 2);
-    } else if (state.hero.hasBarrier) {
+    } else if (hasBarrier) {
         if (state.hero.invulnerableFrames > 0) {
             // Regenerate no magic during iframes after the barrier is damaged.
             state.hero.actualMagicRegen = 0;
@@ -236,7 +233,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
 
         if (activeAirBubbles.charge > 0) {
             state.hero.actualMagicRegen = Math.max(5, state.hero.actualMagicRegen);
-        } else if (isWaterDrainingMagic || isHoldingBreath || state.hero.isInvisible) {
+        } else if (isWaterDrainingMagic || isHoldingBreath || isInvisible) {
             // Magic regen is 0 while magic is being drained but the hero is standing on
             // a depleted spirit recharge point.
             state.hero.actualMagicRegen = 0;
@@ -245,7 +242,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
         state.hero.actualMagicRegen = Math.min(-20, state.hero.actualMagicRegen);
     } else if (isHoldingBreath) {
         state.hero.actualMagicRegen = Math.min(-1, state.hero.actualMagicRegen);
-    } else if (!state.hero.isInvisible && !state.hero.hasBarrier) {
+    } else if (!isInvisible && !hasBarrier) {
         state.hero.actualMagicRegen = !state.hero.action ? 2 * state.hero.magicRegen : state.hero.magicRegen;
     }
     const isActuallyRunning = state.hero.action === 'walking' && state.hero.isRunning && state.hero.magic > 0;
@@ -312,8 +309,10 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
         state.hero.magic = state.hero.maxMagic;
     }
     if (state.hero.magic <= 0) {
-        state.hero.shatterBarrier(state);
-        state.hero.isInvisible = false;
+        for (const hero of [state.hero, ...state.hero.clones]) {
+            hero.shatterBarrier(state);
+            hero.isInvisible = false;
+        }
         /*if (state.hero.clones.length) {
             state.hero.x = hero.x;
             state.hero.y = hero.y;

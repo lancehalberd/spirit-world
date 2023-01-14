@@ -63,7 +63,7 @@ export class Hero implements Actor, SavedHeroData {
     attackBufferTime: number = 0;
     // like being knocked but doesn't stop MC charge or other actions.
     bounce?: {vx: number; vy: number; frames: number};
-    equipedBoots: Equipment = 'leatherBoots';
+    equippedBoots: Equipment = 'leatherBoots';
     hasBarrier?: boolean = false;
     hasRevive: boolean = false;
     isInvisible?: boolean = false;
@@ -168,7 +168,7 @@ export class Hero implements Actor, SavedHeroData {
     constructor() {
         this.life = this.maxLife;
         this.clones = [];
-        this.equipedBoots = 'leatherBoots';
+        this.equippedBoots = 'leatherBoots';
     }
 
     applySavedHeroData(defaultSavedHeroData: SavedHeroData, savedHeroData?: SavedHeroData) {
@@ -326,7 +326,7 @@ export class Hero implements Actor, SavedHeroData {
             }
             return {};
         }
-        const preventKnockback = this.equipedBoots === 'ironBoots' || this.ironSkinLife > 0;
+        const preventKnockback = this.equippedBoots === 'ironBoots' || this.ironSkinLife > 0;
         if (hit.damage) {
             let damage = hit.damage;
             if (hit.element === 'fire' && state.hero.passiveTools.fireBlessing) {
@@ -529,7 +529,7 @@ export class Hero implements Actor, SavedHeroData {
             this.renderHeroFrame(context, state);
             return;
         }
-        if (state.hero.isInvisible || hero.action === 'fallen' || hero.action === 'sankInLava') {
+        if (hero.isInvisible || hero.action === 'fallen' || hero.action === 'sankInLava') {
             return;
         }
         const renderCharging = state.hero.magic > 0 && hero.passiveTools.charge

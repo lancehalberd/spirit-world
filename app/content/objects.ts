@@ -17,6 +17,7 @@ import { Decoration } from 'app/content/objects/decoration';
 import { Escalator } from 'app/content/objects/escalator';
 import { BallGoal } from 'app/content/objects/ballGoal';
 import { BeadCascade, BeadGrate } from 'app/content/objects/beadCascade';
+import { Indicator } from 'app/content/objects/indicator';
 import { KeyBlock } from 'app/content/objects/keyBlock';
 import { Marker } from 'app/content/objects/marker';
 import { Narration } from 'app/content/objects/narration';
@@ -51,6 +52,8 @@ export function createObjectInstance(state: GameState, object: ObjectDefinition)
         return new BeadCascade(state, object);
     } else  if (object.type === 'decoration') {
         return new Decoration(object);
+    } else if (object.type === 'indicator') {
+        return new Indicator(state, object);
     } else  if (object.type === 'waterfall') {
         return new Waterfall(object);
     }  else if (object.type === 'enemy' || object.type === 'boss') {

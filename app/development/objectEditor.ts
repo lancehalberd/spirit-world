@@ -220,7 +220,7 @@ export function getLootTypes(): LootType[] {
 
 export const combinedObjectTypes: ObjectType[] = [
     'anode', 'cathode', 'airBubbles', 'ballGoal', 'beadCascade', 'beadGrate', 'bigChest', 'chest', 'crystalSwitch', 'decoration',
-    'door', 'escalator', 'floorSwitch', 'keyBlock', 'loot','marker', 'narration', 'npc', 'pitEntrance',
+    'door', 'escalator', 'floorSwitch', 'indicator', 'keyBlock', 'loot','marker', 'narration', 'npc', 'pitEntrance',
     'pushPull', 'rollingBall', 'saveStatue', 'shopItem', 'sign', 'spawnMarker', 'teleporter', 'tippable', 'torch', 'turret',
     'vineSprout', 'waterfall', 'waterPot',
 ];
@@ -231,17 +231,25 @@ export function createObjectDefinition(
 ): ObjectDefinition {
     const x = definition.x || 0;
     const y = definition.y || 0;
+
+    const specialBehaviorKeys = Object.keys(specialBehaviorsHash).filter(
+        key => specialBehaviorsHash[key].type === definition.type
+    );
     const commonProps = {
         // Assign defaults for any props the definitions might require.
         status: getPossibleStatuses(definition.type)[0],
         id: definition.id || '',
         linked: definition.linked,
         logicKey: definition.logicKey,
-        specialBehaviorKey: definition.specialBehaviorKey,
         spirit: definition.spirit,
+        specialBehaviorKey: definition.specialBehaviorKey,
         x,
         y,
     };
+    // Clear the special behavior if it doesn't apply to the new type selected.
+    if (!specialBehaviorKeys.includes(commonProps.specialBehaviorKey)) {
+        delete commonProps.specialBehaviorKey;
+    }
     // Omit spirit/linked if they are false.
     if (!commonProps.linked) {
         delete commonProps.linked;
@@ -378,6 +386,12 @@ export function createObjectDefinition(
                 ...commonProps,
                 targetObjectId: definition.targetObjectId,
                 toggleOnRelease: definition.toggleOnRelease,
+                type: definition.type,
+            };
+        case 'indicator':
+            return {
+                ...commonProps,
+                targetObjectId: definition.targetObjectId,
                 type: definition.type,
             };
         case 'keyBlock':
@@ -540,6 +554,16 @@ export function getSwitchTargetProperties(
         },
     });
     return rows;
+}
+
+function getUniqueObjectIdsForBothAreas(state: GameState, editingState: EditingState): string[] {
+    const ids = [];
+    for (const object of [...state.areaInstance.definition.objects, ...state.alternateAreaInstance.definition.objects]) {
+        if (object.id) {
+            ids.push(object.id);
+        }
+    }
+    return [...new Set(ids)];
 }
 
 function getPossibleStatuses(type: ObjectType): ObjectStatus[] {
@@ -922,6 +946,22 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                 },
             });
             rows = [...rows, ...getSwitchTargetProperties(state, editingState, object)];
+            break;
+        case 'indicator':object
+            const ids = getUniqueObjectIdsForBothAreas(state, editingState);
+            rows.push({
+                name: 'target',
+                value: object.targetObjectId ?? 'none',
+                values: ['none', ...ids],
+                onChange(targetObjectId: string) {
+                    if (targetObjectId === 'none') {
+                        delete object.targetObjectId;
+                    } else {
+                        object.targetObjectId = targetObjectId;
+                    }
+                    updateObjectInstance(state, object);
+                },
+            });
             break;
         case 'keyBlock':
             rows = [...rows, ...getSwitchTargetProperties(state, editingState, object)];

@@ -1,7 +1,7 @@
 import { getLootHelpMessage, getLootName } from 'app/content/loot';
 import { isRandomizer } from 'app/gameConstants';
 
-import { GameState, MenuOptionType } from 'app/types';
+import { ActiveTool, Equipment, GameState, MagicElement, MenuOptionType } from 'app/types';
 
 
 export function getMenuRows(state: GameState): MenuOptionType[][] {
@@ -84,4 +84,32 @@ export function getMenuHelpMessage(state: GameState, type: MenuOptionType): stri
         return 'Return Home';
     }
     return getLootHelpMessage(state, type);
+}
+
+// Function to set the left tool on all copies of the hero.
+export function setLeftTool(state: GameState, tool: ActiveTool): void {
+    for (const hero of [state.hero, ...state.hero.clones]) {
+        hero.leftTool = tool;
+    }
+}
+
+// Function to set the right tool on all copies of the hero.
+export function setRightTool(state: GameState, tool: ActiveTool): void {
+    for (const hero of [state.hero, ...state.hero.clones]) {
+        hero.rightTool = tool;
+    }
+}
+
+// Function to set the equipped boots on all copies of the hero.
+export function setEquippedBoots(state: GameState, boots: Equipment): void {
+    for (const hero of [state.hero, ...state.hero.clones]) {
+        hero.equippedBoots = boots;
+    }
+}
+
+// Function to set the equipped element on all copies of the hero.
+export function setEquippedElement(state: GameState, element: MagicElement): void {
+    for (const hero of [state.hero, ...state.hero.clones]) {
+        hero.setElement(element);
+    }
 }

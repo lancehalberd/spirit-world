@@ -347,6 +347,11 @@ export interface KeyBlockDefinition extends BaseObjectDefinition {
     targetObjectId?: string,
 }
 
+export interface IndicatorDefinition extends BaseObjectDefinition {
+    type: 'indicator',
+    targetObjectId?: string,
+}
+
 export type LootObjectDefinition = BaseObjectDefinition & LootData & {
     type: 'bigChest' | 'chest' | 'loot' | 'shopItem',
     price?: number
@@ -395,8 +400,8 @@ export interface NPCDefinition extends BaseObjectDefinition {
     dialogue?: string,
 }
 
-export type SimpleObjectType = 'airBubbles' | 'beadGrate' | 'cathode' | 'pushPull' | 'rollingBall'
-    | 'saveStatue'
+export type SimpleObjectType = 'airBubbles' | 'beadGrate' | 'cathode'
+    | 'pushPull' | 'rollingBall' | 'saveStatue'
     | 'tippable' | 'torch' | 'vineSprout' | 'waterPot';
 
 export interface SimpleObjectDefinition extends BaseObjectDefinition {
@@ -456,6 +461,7 @@ export type ObjectDefinition = SimpleObjectDefinition
     | EnemyObjectDefinition
     | EscalatorDefinition
     | FloorSwitchDefinition
+    | IndicatorDefinition
     | KeyBlockDefinition
     | LootObjectDefinition
     | MarkerDefinition

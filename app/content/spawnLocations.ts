@@ -229,6 +229,17 @@ export const SPAWN_SKY_PALACE_ENTRANCE: ZoneLocation = {
     isSpiritWorld: true,
 };
 
+export const SPAWN_JADE_PALACE_ENTRANCE: ZoneLocation = {
+    zoneKey: 'grandTemple',
+    floor: 0,
+    x: 248,
+    y: 448,
+    z: 0,
+    d: 'up',
+    areaGridCoords: {x: 0, y: 1},
+    isSpiritWorld: true,
+};
+
 export const RIVER_TEMPLE_LOWER_ENTRANCE: ZoneLocation = {
     zoneKey: 'riverTempleWater',
     floor: 0,
@@ -436,13 +447,19 @@ const grandTempleStartState = applyItems(helixEndState, {
     clone: 1, cloudBoots: 1, gloves: 2, cloak: 2, nimbusCloud: 1, roll: 2},
     []);
 
+const jadePalaceStartState = applyItems(helixEndState, {
+    clone: 1, cloudBoots: 1, gloves: 2, cloak: 2, nimbusCloud: 1, roll: 2, bow: 2, ironSkin: 1
+}, []);
+
 const beastState = applyItems(helixEndState, {
     maxLife: 7,
+    lightningBlessing: 1, goldOre: 2,
     cloudBoots: 1, clone: 1,
-    ironBoots: 1, cloak: 2, roll: 2,
-    staff: 1,
-    lightningBlessing: 1, goldOre: 2, nimbusCloud: 1,
-    ironSkin: 1, bow: 2, gloves: 2, goldMail: 1,
+    ironBoots: 1, cloak: 2,
+    ironSkin: 1, bow: 2,
+    gloves: 2, goldMail: 1,
+    roll: 2, nimbusCloud: 1,
+    trueSight: 1, phoenixCrown: 1,
     spiritDamage: 1, spiritRange: 1,
 });
 
@@ -565,6 +582,10 @@ const middleSpawnLocations: SpawnLocationOptions = {
     'Sky Palace Start': {
         location: SPAWN_SKY_PALACE_ENTRANCE,
         savedState: helixEndState,
+    },
+    'Jade Palace Start': {
+        location: SPAWN_JADE_PALACE_ENTRANCE,
+        savedState: jadePalaceStartState,
     },
 };
 
