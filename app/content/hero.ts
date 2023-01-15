@@ -40,6 +40,7 @@ export class Hero implements Actor, SavedHeroData {
     isClone = false;
     isAllyTarget = true;
     isObject = <const>true;
+    canPressSwitches = true;
     // These aren't used by the Hero itself since it has special handling,
     // but these are used on objects that inherit from hero: AstralProjection and Clone.
     drawPriority: DrawPriority = 'sprites';
