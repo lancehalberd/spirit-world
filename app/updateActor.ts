@@ -1,6 +1,7 @@
 import {
-    getAreaFromLocation, getAreaSize, removeEffectFromArea,
-    removeObjectFromArea, scrollToArea, setNextAreaSection,
+    getAreaFromLocation, getAreaSize, removeAllClones,
+    removeEffectFromArea, removeObjectFromArea,
+    scrollToArea, setNextAreaSection,
     swapHeroStates,
 } from 'app/content/areas';
 import { AirBubbles } from 'app/content/objects/airBubbles';
@@ -110,6 +111,21 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
     }
     if (hero.invulnerableFrames > 0) {
         hero.invulnerableFrames--;
+    }
+    // Remove barrier/invisibility if the hero does not have the cloak equipped.
+    if ((hero.hasBarrier || hero.isInvisible) && hero.leftTool !== 'cloak' && hero.rightTool !== 'cloak') {
+        hero.shatterBarrier(state);
+        hero.isInvisible = false;
+    }
+    // End invisibility once the player lets go of the cloak tool.
+    if (hero.isInvisible && !isToolButtonPressed(state, 'cloak')) {
+        hero.isInvisible = false;
+    }
+    if (hero.activeStaff && hero.leftTool !== 'staff' && hero.rightTool !== 'staff') {
+        hero.activeStaff.recall(state);
+    }
+    if (hero.clones?.length && hero.leftTool !== 'clone' && hero.rightTool !== 'clone') {
+        removeAllClones(state);
     }
     if (hero.frozenDuration > 0) {
         hero.frozenDuration -= FRAME_LENGTH;

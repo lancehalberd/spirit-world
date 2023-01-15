@@ -291,6 +291,7 @@ enemyDefinitions.voidStone = {
     showHealthBar: true, isImmortal: true,
     canBeKnockedBack: false,
     aggroRadius: 144,
+    immunities: [null],
     abilities: [giantLaserAbility, summonVoidHandAbility],
 };
 

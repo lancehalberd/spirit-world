@@ -51,11 +51,6 @@ Current tasks:
             - To prevent memorizing this in randomizer, we could randomly place the door in four different places that are inconvient to check
                 - For example, they might require you to jump down a cliff to check if the door is there.
 
-    - Turn of tools when unequipped
-        - End cloak+invisibility effect when cloak is unequipped.
-        - Remove clones when clone tool is unequipped
-        - Dismiss staff when staff tool is unequipped
-
     - Add meteor attacks that leave behind rocks to void tree fight
         - Give to tree + voidFlame
         - Use smaller versions for enrage mode when voidFlame is active

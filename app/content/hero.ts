@@ -530,27 +530,13 @@ export class Hero implements Actor, SavedHeroData {
             this.renderHeroFrame(context, state);
             return;
         }
-        if (hero.isInvisible || hero.action === 'fallen' || hero.action === 'sankInLava') {
+        if (hero.action === 'fallen' || hero.action === 'sankInLava') {
             return;
         }
-        const renderCharging = state.hero.magic > 0 && hero.passiveTools.charge
-            && hero.action === 'charging' && hero.chargeTime >= 60
-        if (renderCharging) {
-            const { chargeLevel, element } = getChargeLevelAndElement(state, hero);
-            if (chargeLevel) {
-                const animation = !element
-                    ? chargeBackAnimation
-                    : {
-                        fire: chargeFireBackAnimation,
-                        ice: chargeIceBackAnimation,
-                        lightning: chargeLightningBackAnimation
-                    }[element];
-                context.save();
-                    context.globalAlpha *= 0.8;
-                    const frame = getFrame(animation, hero.chargeTime);
-                    drawFrameAt(context, frame, { x: hero.x, y: hero.y - hero.z });
-                context.restore();
-            }
+        this.renderChargingBehind(context, state);
+        if (this.isInvisible) {
+            this.renderChargingFront(context, state);
+            return;
         }
         const isChargingBow = (hero.chargingRightTool && hero.rightTool === 'bow')
                 || (hero.chargingLeftTool && hero.leftTool === 'bow');
@@ -593,8 +579,36 @@ export class Hero implements Actor, SavedHeroData {
             context.restore();
         }
         renderExplosionRing(context, state, hero);
+        this.renderChargingFront(context, state);
+    }
+
+    renderChargingBehind(this: Hero, context: CanvasRenderingContext2D, state: GameState) {
+        const renderCharging = state.hero.magic > 0 && this.passiveTools.charge
+            && this.action === 'charging' && this.chargeTime >= 60
         if (renderCharging) {
-            const element = isUnderwater(state, hero) ? null : hero.element;
+            const { chargeLevel, element } = getChargeLevelAndElement(state, this);
+            if (chargeLevel) {
+                const animation = !element
+                    ? chargeBackAnimation
+                    : {
+                        fire: chargeFireBackAnimation,
+                        ice: chargeIceBackAnimation,
+                        lightning: chargeLightningBackAnimation
+                    }[element];
+                context.save();
+                    context.globalAlpha *= 0.8;
+                    const frame = getFrame(animation, this.chargeTime);
+                    drawFrameAt(context, frame, { x: this.x, y: this.y - this.z });
+                context.restore();
+            }
+        }
+    }
+
+    renderChargingFront(this: Hero, context: CanvasRenderingContext2D, state: GameState) {
+        const renderCharging = state.hero.magic > 0 && this.passiveTools.charge
+            && this.action === 'charging' && this.chargeTime >= 60
+        if (renderCharging) {
+            const element = isUnderwater(state, this) ? null : this.element;
             const animation = !element
                 ? chargeFrontAnimation
                 : {
@@ -604,8 +618,8 @@ export class Hero implements Actor, SavedHeroData {
                 }[element];
             context.save();
                 context.globalAlpha *= 0.8;
-                const frame = getFrame(animation, hero.chargeTime);
-                drawFrameAt(context, frame, { x: hero.x, y: hero.y - hero.z });
+                const frame = getFrame(animation, this.chargeTime);
+                drawFrameAt(context, frame, { x: this.x, y: this.y - this.z });
             context.restore();
         }
     }
