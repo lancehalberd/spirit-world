@@ -27,6 +27,7 @@ interface Props {
 export class Staff implements ObjectInstance {
     area: AreaInstance;
     definition = null;
+    canPressSwitches = true;
     drawPriority: DrawPriority = 'background';
     x: number;
     y: number;
