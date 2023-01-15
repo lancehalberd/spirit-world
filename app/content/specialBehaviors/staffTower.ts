@@ -38,6 +38,7 @@ specialBehaviorsHash.staffTower = {
                         object.speed = 'slow';
                     } else if (object instanceof Anode) {
                         object.status = 'off';
+                        object.disabled = true;
                     }
                 }
             }

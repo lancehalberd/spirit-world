@@ -26,6 +26,7 @@ export class Anode implements ObjectInstance {
     animationTime = 0;
     cathodes: Cathode[] = [];
     cathodeIndex: number = 0;
+    disabled = false;
     constructor(state: GameState, definition: AnodeDefinition) {
         this.definition = definition;
         this.status = this.definition.status || 'normal';
@@ -37,6 +38,9 @@ export class Anode implements ObjectInstance {
         }
     }
     onActivate(state: GameState) {
+        if (this.disabled) {
+            return;
+        }
         this.status = 'normal';
         this.animationTime = 0;
         this.cathodeIndex++;
