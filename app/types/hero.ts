@@ -5,7 +5,7 @@ import {
 } from 'app/types';
 
 export type Action =
-    'attack' | 'charging' | 'roll' | 'usingStaff'
+    'attack' | 'charging' | 'roll' | 'preparingSomersault' | 'usingStaff'
     // Hero can be forced into screen transitions when knockedHard.
     | 'knocked' | 'knockedHard'
     | 'hurt' | 'dead' | 'walking'

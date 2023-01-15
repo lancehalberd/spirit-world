@@ -191,7 +191,8 @@ export function enterLocation(
     location: ZoneLocation,
     instant: boolean = true,
     callback: () => void = null,
-    preserveZoneFlags = false
+    preserveZoneFlags = false,
+    isMutation = false,
 ): void {
     // Remve astral projection when switching areas.
     if (state.hero.astralProjection) {
@@ -264,7 +265,9 @@ export function enterLocation(
     const alternateArea = getAreaFromLocation({...state.location, isSpiritWorld: !state.location.isSpiritWorld});
 
     // Remove all clones on changing areas.
-    cleanupHeroFromArea(state);
+    if (!isMutation) {
+        cleanupHeroFromArea(state);
+    }
     const lastAreaInstance = state.areaInstance;
     // Use the existing area instances on the transition state if any are present.
     state.areaInstance = state.transitionState?.nextAreaInstance
@@ -293,10 +296,12 @@ export function enterLocation(
     // We could also set magic to at least 0 during any zone transition instead of this.
     state.hero.magic = Math.max(state.hero.magic, 0);
     state.hero.actualMagicRegen = Math.max(state.hero.actualMagicRegen, 0);
-    state.hero.safeD = state.hero.d;
-    state.hero.safeX = location.x;
-    state.hero.safeY = location.y;
-    setAreaSection(state, state.hero.d, true);
+    if (!isMutation) {
+        state.hero.safeD = state.hero.d;
+        state.hero.safeX = location.x;
+        state.hero.safeY = location.y;
+    }
+    setAreaSection(state, state.hero.d, !isMutation);
     updateCamera(state, 512);
     checkToUpdateSpawnLocation(state);
     // Make sure the actor is shown as swimming/wading during the transition frames.

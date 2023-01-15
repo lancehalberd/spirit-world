@@ -42,6 +42,10 @@ Current tasks:
     - Add additional uses for true sight
         - Invisible path tiles over pit that are revealed with true sight
             - Requires a new 'invisible' tile behavior
+        - Platforms that can move or be stationary and turn left right or reverse when hitting walls
+            - Can be made invisible
+            - Can be placed over pits or cracked ground
+            - Could add more pits to the spirit sky and use these for conveyence
         - Rolling ball puzzles that can be solved by moving an invisible pot
         - Invisible cracked doorway to a new cave in spirit world.
             - To prevent memorizing this in randomizer, we could randomly place the door in four different places that are inconvient to check

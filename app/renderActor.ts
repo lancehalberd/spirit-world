@@ -130,6 +130,7 @@ export function getHeroFrame(state: GameState, hero: Hero): Frame {
         case 'beingCarried':
         case 'thrown':
         case 'jumpingDown':
+        case 'preparingSomersault':
         case 'roll':
             animations = heroAnimations.roll;
             break;

@@ -23,6 +23,10 @@ import {
 } from 'app/types';
 
 export function updateAllHeroes(this: void, state: GameState) {
+    if (state.hero.action === 'preparingSomersault' && state.fieldTime % 200 !== 0) {
+        updateHeroSpecialActions(state, state.hero);
+        return;
+    }
     // Switching clones is done outside of updateHero, otherwise the switch gets processed by each clone.
     if (state.hero.clones.length && !state.hero.pickUpObject && wasToolButtonPressedAndReleased(state, 'clone')) {
         if (!state.hero.cloneToolReleased){

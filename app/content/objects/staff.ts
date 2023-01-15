@@ -4,7 +4,7 @@ import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { isPointOpen } from 'app/utils/field';
 
-import { AreaInstance, Direction, DrawPriority, MagicElement, GameState, ObjectInstance, ObjectStatus, TileBehaviors } from 'app/types';
+import { AreaInstance, Direction, DrawPriority, Hero, MagicElement, GameState, ObjectInstance, ObjectStatus, TileBehaviors } from 'app/types';
 
 const staffPartGeometry = {w: 20, h: 17};
 const leftAnimation = createAnimation('gfx/effects/wukong_staff_parts.png', staffPartGeometry, {x: 0, y: 3, rows: 3, frameMap: [2, 1,0], duration: 3}, {loop: false});
@@ -45,6 +45,8 @@ export class Staff implements ObjectInstance {
     storedBehaviors: TileBehaviors[][];
     animationTime: number = 0;
     recalling: boolean = false;
+    // Used to track which hero to assign this staff to if it is switched to a new area.
+    hero: Hero;
     constructor(state: GameState, { x = 0, y = 0, damage = 1, direction, element, maxLength = 4 }: Props) {
         // Note this assumes the staff is always added to the area the hero is in.
         this.area = state.areaInstance;
@@ -140,6 +142,11 @@ export class Staff implements ObjectInstance {
                 state.areaInstance.behaviorGrid[row][column] = { groundHeight: 2, blocksStaff: true };
             }
         }
+        // Restore this staff to the hero if it was moved from one area to another, for example
+        // when refreshing logic for the current area.
+        if (this.hero) {
+            this.hero.activeStaff = this;
+        }
     }
     recall(state: GameState) {
         this.recalling = true;
@@ -171,6 +178,7 @@ export class Staff implements ObjectInstance {
         }
         for (const hero of [state.hero, ...state.hero.clones]) {
             if (hero.activeStaff === this) {
+                this.hero = hero;
                 delete hero.activeStaff;
             }
         }

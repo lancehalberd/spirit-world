@@ -228,8 +228,10 @@ export function getLootHelpMessage(state: GameState, lootType: LootType, lootLev
                 return 'Press [B_ROLL] to do a quick roll forward.'
                     + '{|}You can avoid most damage while rolling and cross small gaps.'
             }
-            return 'While rolling press [B_ROLL] again to teleport in any direction.'
-                + '{|}You can even teleport through walls that your astral body can cross.'
+            return `Press and hold [B_ROLL] to slow down time while rolling.
+                {|}While time is slowed, press [B_DPAD] to teleport in any direction, damaging enemies in the way.
+                {|}Continue holding [B_ROLL] to teleport more as long as you have spirit energy.
+                `
         case 'catEyes':
             return 'This strange energy allows you to see much better in the dark.'
                 + '{|}Using cat eyes consumes spirit energy, stand still to recover.'

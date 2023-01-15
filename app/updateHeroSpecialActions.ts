@@ -6,7 +6,7 @@ import { destroyClone } from 'app/content/objects/clone';
 import { Staff } from 'app/content/objects/staff';
 import { CANVAS_HEIGHT, FALLING_HEIGHT, FRAME_LENGTH, GAME_KEY } from 'app/gameConstants';
 import { editingState } from 'app/development/tileEditor';
-import { getCloneMovementDeltas, wasGameKeyPressed } from 'app/keyCommands';
+import { getCloneMovementDeltas, isGameKeyDown, wasGameKeyPressed } from 'app/keyCommands';
 import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
 import { moveActor } from 'app/moveActor';
 import { fallAnimation, heroAnimations } from 'app/render/heroAnimations';
@@ -33,6 +33,8 @@ const rollSpeed = [
     3, 3, 3, 3,
     2, 2, 2, 2,
 ];
+
+let sommersaultCount = 0;
 
 export function updateHeroSpecialActions(this: void, state: GameState, hero: Hero): boolean {
     const isPrimaryHero = hero === state.hero;
@@ -446,9 +448,10 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             } else {
                 // Staff hits at least a 3 tile area even if it doesn't get placed.
                 const isVertical = staff.direction === 'up' || staff.direction === 'down';
+                const column = (staff.x / 16) | 0, row = (staff.y / 16) | 0;
                 baseTarget = {
-                    x: staff.leftColumn * 16 - (staff.direction === 'left' ? 32 : 0),
-                    y: staff.topRow * 16 - (staff.direction === 'up' ? 32 : 0),
+                    x: column * 16 - (staff.direction === 'left' ? 32 : 0),
+                    y: row * 16 - (staff.direction === 'up' ? 32 : 0),
                     w: isVertical ? 16 : 48,
                     h: isVertical ? 48 : 16,
                 };
@@ -494,15 +497,58 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         return true;
     }
     if (hero.action === 'roll') {
-        if (wasGameKeyPressed(state, GAME_KEY.ROLL)
+        if (isGameKeyDown(state, GAME_KEY.ROLL)
             && hero.passiveTools.roll > 1
-            && hero.actionFrame > 4
+            && hero.actionFrame === 11
             && state.hero.magic > 0
         ) {
-            state.hero.magic -= 10;
-            state.hero.increasedMagicRegenCooldown(500);
+            hero.action = 'preparingSomersault';
+            sommersaultCount = 0;
+            return true;
+        }
+        if (hero.actionFrame >= rollSpeed.length) {
+            hero.action = null;
+            hero.animationTime = 0;
+            // Don't allow rolling for two frames after completing a roll.
+            // This helps keep players from rolling over pits.
+            hero.rollCooldown = 40;
+        } else {
+            const direction = getDirection(hero.actionDx, hero.actionDy, true, hero.d);
+            hero.vx = directionMap[direction][0] * rollSpeed[hero.actionFrame];
+            hero.vy = directionMap[direction][1] * rollSpeed[hero.actionFrame];
+            hero.actionFrame++;
+            if (hero.z >= minZ) {
+                hero.z = Math.max(minZ, hero.z - 0.4);
+            }
+            moveActor(state, hero, hero.vx, hero.vy, {
+                canFall: true,
+                canSwim: true,
+                direction: hero.d,
+            });
+        }
+        return true;
+    }
+    if (hero.action === 'preparingSomersault') {
+        if (!isGameKeyDown(state, GAME_KEY.ROLL)) {
+            hero.action = 'roll';
+            hero.actionFrame = 12;
+            hero.animationTime = 12 * FRAME_LENGTH;
+            return true;
+        }
+        if (sommersaultCount
+            || wasGameKeyPressed(state, GAME_KEY.UP)
+            || wasGameKeyPressed(state, GAME_KEY.DOWN)
+            || wasGameKeyPressed(state, GAME_KEY.LEFT)
+            || wasGameKeyPressed(state, GAME_KEY.RIGHT)
+        ) {
+            sommersaultCount++;
+            if (sommersaultCount < 2) {
+                return true;
+            }
             // Cloud somersault roll activated by rolling again mid roll.
             const [dx, dy] = getCloneMovementDeltas(state, hero);
+            state.hero.magic -= 10;
+            state.hero.increasedMagicRegenCooldown(500);
             hero.d = (dx || dy) ? getDirection(dx, dy) : hero.d;
             // Default direction is the direction the current roll uses.
             const defaultDirection = getDirection(hero.actionDx, hero.actionDy, true, hero.d);
@@ -569,42 +615,34 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 hitTiles: true,
                 hitEnemies: true,
             };
+            for (let i = 0; i < 8; i++) {
+                const theta = 2 * Math.PI * i / 8;
+                addSparkleAnimation(state, hero.area,
+                    {
+                        x: endPosition.x + 19 * Math.cos(theta) - 3,
+                        y: endPosition.y + 19 * Math.sin(theta) - 3,
+                        w: 6, h: 6,
+                    },
+                    { element: hero.element }
+                );
+            }
             hitTargets(state, hero.area, landingHit);
             hero.x = lastOpenPosition.x;
             hero.y = lastOpenPosition.y;
             hitbox = hero.getHitbox(state);
 
             // The fullroll action is 16 frames.
+            hero.action = 'roll';
             hero.actionFrame = 0;
             hero.animationTime = 0 * FRAME_LENGTH;
             hero.actionDx = directionMap[direction][0];
             hero.actionDy = directionMap[direction][1];
             return true;
         }
-        if (hero.actionFrame >= rollSpeed.length) {
-            hero.action = null;
-            hero.animationTime = 0;
-            // Don't allow rolling for two frames after completing a roll.
-            // This helps keep players from rolling over pits.
-            hero.rollCooldown = 40;
-        } else {
-            const direction = getDirection(hero.actionDx, hero.actionDy, true, hero.d);
-            hero.vx = directionMap[direction][0] * rollSpeed[hero.actionFrame];
-            hero.vy = directionMap[direction][1] * rollSpeed[hero.actionFrame];
-            hero.actionFrame++;
-            if (hero.z >= minZ) {
-                hero.z = Math.max(minZ, hero.z - 0.4);
-            }
-            moveActor(state, hero, hero.vx, hero.vy, {
-                canFall: true,
-                canSwim: true,
-                direction: hero.d,
-            });
-        }
         return true;
     }
     if (hero.frozenDuration > 0) {
-        hero.frozenDuration--;
+        hero.frozenDuration -= FRAME_LENGTH;
         hero.vx *= 0.99;
         hero.vy *= 0.99;
         moveActor(state, hero, hero.vx, hero.vy, {

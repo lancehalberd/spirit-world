@@ -75,6 +75,9 @@ export function updateField(this: void, state: GameState) {
     updateAreaObjects(state, state.alternateAreaInstance);
 }
 export function updateAreaObjects(this: void, state: GameState, area: AreaInstance) {
+    if (state.hero.action === 'preparingSomersault' && state.fieldTime % 200 !== 0) {
+        return;
+    }
     const isScreenTransitioning = state.nextAreaInstance || state.nextAreaSection;
     // Time passes slowly for everything but the astral projection while meditating.
     const skipFrame = state.hero.action === 'meditating' && (state.hero.animationTime % 100) !== 0;
