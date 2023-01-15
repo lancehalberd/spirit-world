@@ -58,6 +58,11 @@ export class Narration implements ObjectInstance {
         if (getObjectStatus(state, this.definition)) {
             this.status = 'gone';
         }
+        // Narration competes with other scripts, so don't run it until other scripts are completed.
+        // Revive this code if it seems necessary
+        /*if (state.scriptEvents.queue.length || state.scriptEvents.activeEvents.length || state.messagePage) {
+            return;
+        }*/
         this.time += FRAME_LENGTH;
         if (this.time < this.definition.delay) {
             return;
