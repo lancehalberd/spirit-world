@@ -39,7 +39,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - speed up crystal collector summon pod attack.
     - Add back the ability to double tap roll for cloud sommersault in addition to the new controls
     - Remove charge skill and base max charge level off of elements
         - 1 element = level 1 charge, 3 elements = level 2 charge
