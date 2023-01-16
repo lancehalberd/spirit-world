@@ -111,10 +111,14 @@ export const hasWaterBlessing: LogicCheck = {requiredFlags: ['$waterBlessing']};
 export const hasChakram: LogicCheck = {requiredFlags: ['$weapon']};
 export const hasNimbusCloud: LogicCheck = {requiredFlags: ['$nimbusCloud']};
 
-// This check will be added automatically to any tiles that have 100% darkness effect.
-//const hasEyes: LogicCheck = { requiredFlags: ['$catEyes:1'] };
 export const hasBow: LogicCheck = {requiredFlags: ['$bow']};
 export const hasUpgradedBow: LogicCheck = {requiredFlags: ['$bow:2']};
+export const hasElementalWeapon: OrLogicCheck = orLogic(hasChakram, hasBow);
+export const hasFire: LogicCheck = andLogic(hasElementalWeapon, {requiredFlags: ['$fire']});
+export const hasIce: LogicCheck = andLogic(hasElementalWeapon, {requiredFlags: ['$ice']});
+export const hasLightning: LogicCheck = andLogic(hasElementalWeapon, {requiredFlags: ['$lightning']});
+export const hasCharge: OrLogicCheck = orLogic(hasFire, hasIce, hasLightning);
+
 export const hasRoll: LogicCheck = {requiredFlags: ['$roll']};
 export const hasSomersault: LogicCheck = {requiredFlags: ['$roll:2']};
 export const hasStaff: LogicCheck = {requiredFlags: ['$staff']};
@@ -127,20 +131,16 @@ export const hasBossWeapon: OrLogicCheck = orLogic(hasChakram, hasBow, hasStaff)
 // This check is for being able to push objects at the range of the chakram like pots.
 export const hasRangedPush: OrLogicCheck = orLogic(hasChakram, hasBow);
 // This check is used for being able to defeat enemies at all.
-export const hasWeapon: OrLogicCheck = orLogic(hasChakram, hasBow, hasSpiritBarrier, hasStaff);
-export const hasElementalWeapon: OrLogicCheck = orLogic(hasChakram, hasBow);
+export const hasWeapon: OrLogicCheck = orLogic(hasChakram, hasBow, hasSpiritBarrier, hasStaff, hasSomersault);
 // This check is used for weapons that have the range of the charged chakram or greater.
-export const hasMediumRange: OrLogicCheck = orLogic({requiredFlags: ['$weapon', '$charge']}, hasBow);
+export const hasMediumRange: OrLogicCheck = orLogic(andLogic(hasChakram, hasCharge), hasBow);
 
-export const hasTripleShot: AndLogicCheck = andLogic(hasUpgradedBow, {requiredFlags: ['$charge']});
+export const hasTripleShot: AndLogicCheck = andLogic(hasUpgradedBow, hasCharge);
 
-// Attacks that you are expected to roll to avoid can also reasonably be dealt with by absorbing the hit
+// Attacks that you are expected to roll to avoid can also reasonably be dealt with by ab$sorbing the hit
 // with spirit barrier or even invisibility.
 export const canAvoidBossAttacks: OrLogicCheck = orLogic(hasRoll, hasSpiritBarrier);
 
-export const hasFire: LogicCheck = andLogic(hasElementalWeapon, {requiredFlags: ['$fire', '$charge']});
-export const hasIce: LogicCheck = andLogic(hasElementalWeapon, {requiredFlags: ['$ice', '$charge']});
-export const hasLightning: LogicCheck = andLogic(hasElementalWeapon, {requiredFlags: ['$lightning', '$charge']});
 
 
 // Note that in some areas teleportation may not be possible contextually, for example if the player cannot

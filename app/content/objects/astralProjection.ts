@@ -70,7 +70,6 @@ export class AstralProjection extends Hero {
             ...hero.passiveTools,
             gloves: 0,
             roll: 0,
-            charge: 0,
         };
     }
     render(this: Hero, context: CanvasRenderingContext2D, state: GameState): void {

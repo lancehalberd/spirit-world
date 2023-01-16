@@ -108,7 +108,7 @@ export const helixNodes: LogicNode[] = [
         nodeId: 'helix4Spirit',
         npcs: [
             {
-                loot: {type: 'dialogueLoot', id: 'helix:s3:0x0-npc-0', lootType: 'charge'},
+                loot: {type: 'dialogueLoot', id: 'helix:s3:0x0-npc-0', lootType: 'weapon'},
                 progressFlags: ['elementalBeastsEscaped']
             },
         ],

@@ -151,7 +151,6 @@ function getDefaultSavedHeroData(): SavedHeroData {
         passiveTools: {
             gloves: 0,
             roll: 0,
-            charge: 0,
             nimbusCloud: 0,
             catEyes: 0,
             spiritSight: 0,
@@ -336,7 +335,9 @@ export function getFullZoneLocation(location: ZoneLocation): FullZoneLocation {
         logicalZoneKey = isSpiritWorld ? 'spiritSky' : 'sky';
     } else if (zoneKey === 'treeVillage') {
         logicalZoneKey = isSpiritWorld ? 'forestTemple' : 'treeVillage';
-    } else if (zoneKey === 'warTemple') {
+    } else if (zoneKey === 'holyCityInterior') {
+        logicalZoneKey = isSpiritWorld ? 'jadeCityInterior' : 'holyCityInterior';
+    }  else if (zoneKey === 'warTemple') {
         logicalZoneKey = isSpiritWorld ? 'warPalace' : 'warTemple';
     }
     return {

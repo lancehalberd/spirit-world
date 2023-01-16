@@ -97,7 +97,7 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
                 renderSelectableTool(menuItem as ActiveTool);
             } else if (state.hero.equipment[menuItem]) {
                 renderBoots(menuItem as Equipment);
-            } else if (menuItem === 'charge') {
+            } else if (menuItem === 'neutral') {
                 drawFrameCenteredAt(context, neutralElement, {x, y, w: frameSize, h: frameSize});
             } else if (state.hero.elements[menuItem]) {
                 renderElement(menuItem as MagicElement);

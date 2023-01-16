@@ -181,9 +181,7 @@ export const overworldNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'mainSpiritWorld',
-        checks: [
-            { objectId: 'spiritChakram' },
-        ],
+        checks: [],
         paths: [
             { nodeId: 'overworldMain', logic: hasSpiritSight },
             { nodeId: 'spiritWorldMountain', logic: hasGloves },
@@ -192,9 +190,10 @@ export const overworldNodes: LogicNode[] = [
             { nodeId: 'nimbusCloudSpirit', logic: hasNimbusCloud},
             { nodeId: 'warTempleSpiritArea', logic: hasMitts },
         ],
-        entranceIds: ['fertilityTempleSpiritEntrance', 'staffTowerSpiritEntrance', 'jadePalaceEntrance'],
+        entranceIds: ['fertilityTempleSpiritEntrance', 'staffTowerSpiritEntrance', 'jadePalaceEntrance', 'jadeCitySoutheastDoor'],
         exits: [
             { objectId: 'jadePalaceEntrance' },
+            { objectId: 'jadeCitySoutheastDoor' },
             { objectId: 'fertilityTempleSpiritEntrance' },
             { objectId: 'staffTowerSpiritEntrance', logic: {requiredFlags: ['staffTowerSpiritEntrance']} },
         ],

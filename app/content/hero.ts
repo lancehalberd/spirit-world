@@ -582,8 +582,18 @@ export class Hero implements Actor, SavedHeroData {
         this.renderChargingFront(context, state);
     }
 
+    getMaxChargeLevel(this: Hero, state: GameState): number {
+        if (state.hero.elements.fire && state.hero.elements.ice && state.hero.elements.lightning) {
+            return 2;
+        }
+        if (state.hero.elements.fire || state.hero.elements.ice || state.hero.elements.lightning) {
+            return 1;
+        }
+        return 0;
+    }
+
     renderChargingBehind(this: Hero, context: CanvasRenderingContext2D, state: GameState) {
-        const renderCharging = state.hero.magic > 0 && this.passiveTools.charge
+        const renderCharging = state.hero.magic > 0 && this.getMaxChargeLevel(state)
             && this.action === 'charging' && this.chargeTime >= 60
         if (renderCharging) {
             const { chargeLevel, element } = getChargeLevelAndElement(state, this);
@@ -598,6 +608,9 @@ export class Hero implements Actor, SavedHeroData {
                 context.save();
                     context.globalAlpha *= 0.8;
                     const frame = getFrame(animation, this.chargeTime);
+                    if (chargeLevel >= 2) {
+                        drawFrameAt(context, frame, { x: this.x, y: this.y - this.z - 9 });
+                    }
                     drawFrameAt(context, frame, { x: this.x, y: this.y - this.z });
                 context.restore();
             }
@@ -605,7 +618,7 @@ export class Hero implements Actor, SavedHeroData {
     }
 
     renderChargingFront(this: Hero, context: CanvasRenderingContext2D, state: GameState) {
-        const renderCharging = state.hero.magic > 0 && this.passiveTools.charge
+        const renderCharging = state.hero.magic > 0 && this.getMaxChargeLevel(state)
             && this.action === 'charging' && this.chargeTime >= 60
         if (renderCharging) {
             const element = isUnderwater(state, this) ? null : this.element;
@@ -616,9 +629,16 @@ export class Hero implements Actor, SavedHeroData {
                     ice: chargeIceFrontAnimation,
                     lightning: chargeLightningFrontAnimation
                 }[element];
+            const { chargeLevel } = getChargeLevelAndElement(state, this);
             context.save();
                 context.globalAlpha *= 0.8;
                 const frame = getFrame(animation, this.chargeTime);
+                if (chargeLevel >= 2) {
+                    let frame = getFrame(animation, this.chargeTime + 100);
+                    drawFrameAt(context, frame, { x: this.x, y: this.y - this.z - 6 });
+                    frame = getFrame(animation, this.chargeTime + 200);
+                    drawFrameAt(context, frame, { x: this.x, y: this.y - this.z - 12 });
+                }
                 drawFrameAt(context, frame, { x: this.x, y: this.y - this.z });
             context.restore();
         }

@@ -24,7 +24,7 @@ export type ActiveTool = 'bow' | 'staff' | 'clone' | 'cloak';
 export type Equipment = 'leatherBoots' | 'cloudBoots' | 'ironBoots';
 export type PassiveTool = 'gloves'
     | 'roll'
-    | 'charge' | 'nimbusCloud'
+    | 'nimbusCloud'
     | 'catEyes' | 'spiritSight' | 'trueSight'
     | 'astralProjection' | 'teleportation'
     | 'ironSkin' | 'goldMail' | 'phoenixCrown'
@@ -44,7 +44,9 @@ export type LootType = 'empty' | 'weapon'
     | 'spiritPower'
     | 'secondChance'
     | ActiveTool | Equipment | PassiveTool
-    | MagicElement | Collectible | CommonLoot | DungeonLoot | 'unknown';
+    // Neutral element is used to unequip elements in the menu
+    | 'neutral' | MagicElement
+    | Collectible | CommonLoot | DungeonLoot | 'unknown';
 
 export type MenuOptionType = LootType | 'help' | 'return';
 

@@ -39,12 +39,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Remove charge skill and base max charge level off of elements
-        - 1 element = level 1 charge, 3 elements = level 2 charge
-
-    - Increase world map super tile size to at least 48x48 bu try 64x64
-        - Change crater to single 64x64 tile if it is supported
-
     - Add underwater mechanics
         - allow swimming over low/medium barriers (set floorHeight to 16px on these)
         - floating ice spikes that damage you and knock back like thorn bushes if you are too high in the water
@@ -93,6 +87,9 @@ Current tasks:
         - Enemies reset when collecting the staff tower.
 
     - Fix bead flow depth by using sprite ordering for the ordered part instead of foreground, use the y value based on where it hits the floor but only draw it start 16px up from that point so it gradually covers while moving behind it.
+
+    - Increase world map super tile size to at least 48x48 bu try 64x64
+        - Change crater to single 64x64 tile if it is supported
 
     - Add crucible to the end of the Grand Temple
 

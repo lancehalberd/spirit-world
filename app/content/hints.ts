@@ -83,7 +83,7 @@ export function showHint(state: GameState): void {
         } else {
             setScript(state, `The Guardian said I should seek answers at the top of this 'Helix'.`);
         }
-    } else if (!state.hero.passiveTools.charge) {
+    } else if (state.hero.weapon < 2) {
         if (state.location.zoneKey === 'helix') {
             setScript(state, `Someone at the top of this Helix has the answers I'm looking for.`);
         } else {
@@ -136,7 +136,7 @@ export function getMapTarget(state: GameState): {x: number, y: number} | null {
         return {x: 80, y: 118};
     } else if (!state.hero.activeTools.staff) {
         return {x: 80, y: 108};
-    } else if (!state.hero.passiveTools.charge) {
+    } else if (state.hero.weapon < 2) {
         return {x: 80, y: 108};
     }
     return null;

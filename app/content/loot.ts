@@ -30,8 +30,19 @@ function getEquipElementMessage(state: GameState) {
             + '{|}Press [B_WEAPON] again to unequip the element.'
             + '{|}The equipped element will be applied any time you charge an attack.';
     }
-    return '{|}Press [B_PREVIOUS_ELEMENT]/[B_NEXT_ELEMENT] to switch elements.'
-        + '{|}The equipped element will be applied any time you charge an attack.';
+    return '{|}Press [B_PREVIOUS_ELEMENT]/[B_NEXT_ELEMENT] to switch elements.';
+}
+
+function getChargeMessage(state: GameState) {
+    return `{|}Press and hold [B_WEAPON] to channel your Spirit Energy into the Chakram,
+        then release it to unleash a powerful attack!
+        {|}Press and hold [B_TOOL] to channel your Spirit Energy into your Bow to make it more powerful.
+        {|}Charged attacks will apply your currently selected element.
+    `;
+    // Only bow can be charged currently
+    // {|}Press and hold [B_TOOL] to channel your Spirit Energy into your Tools to make them more powerful.
+    // Not implemented yet.
+    // {|}You can even hold [B_PASSIVE] when picking up an object to channel Spirit Energy into them!
 }
 
 export function getLootName(state: GameState, lootType: LootType, lootLevel?: number): string {
@@ -85,6 +96,7 @@ export function getLootName(state: GameState, lootType: LootType, lootLevel?: nu
         case 'spiritSight': return 'Spirit Sight';
         case 'astralProjection': return 'Summoner\'s Circlet';
         case 'teleportation': return 'Teleportation';
+        case 'neutral': return 'Neutral Element';
         case 'fire': return 'Fire Element';
         case 'ice': return 'Ice Element';
         case 'lightning': return 'Lightning Element';
@@ -92,7 +104,6 @@ export function getLootName(state: GameState, lootType: LootType, lootLevel?: nu
         case 'goldMail': return 'Golden Mail';
         case 'ironSkin': return 'Iron Skin';
         case 'catEyes': return 'Cat Eyes';
-        case 'charge': return 'Channel Spirit';
         case 'nimbusCloud': return 'Nimbus Cloud';
         case 'trueSight': return 'True Sight';
         case 'leatherBoots': return 'Leather Boots';
@@ -116,11 +127,6 @@ export function getLootGetMessage(state: GameState, lootType: LootType, lootLeve
         case 'smallKey': return 'You found a small key!';
         case 'peachOfImmortality': return 'You ate a Golden Peach!';
         case 'peachOfImmortalityPiece': return 'You found a Golden Peach Slice!';
-        case 'charge':
-            if (state.hero.passiveTools.charge === 1) {
-                return 'You have learned to Channel Spirit Energy!';
-            }
-            return 'You have learned to Overcharge objects!'
         case 'clone':
             if (state.hero.activeTools.clone === 1) {
                 return 'You learned the Clone Techique!' + equipToolMessage;
@@ -140,9 +146,9 @@ export function getLootGetMessage(state: GameState, lootType: LootType, lootLeve
         case 'spiritSight': return `You have been blessed with ${lootName}!`;
         case 'trueSight': return `You have been blessed with ${lootName}!`;
         case 'teleportation': return 'You have learned Teleportation!';
-        case 'fire': return 'You have received the Fire Element!' + getEquipElementMessage(state);
-        case 'ice': return 'You have received the Ice Element!' + getEquipElementMessage(state);
-        case 'lightning': return 'You have received the Lightning Element!' + getEquipElementMessage(state);
+        case 'fire': return 'You have received the Fire Element!' + getEquipElementMessage(state) + getChargeMessage(state);
+        case 'ice': return 'You have received the Ice Element!' + getEquipElementMessage(state) + getChargeMessage(state);
+        case 'lightning': return 'You have received the Lightning Element!' + getEquipElementMessage(state) + getChargeMessage(state);
         case 'fireBlessing': return 'You have absorbed a Cooling Spirit!';
         case 'waterBlessing': return 'You have received the Blessing of Water!';
         case 'lightningBlessing': return `You have obtained the ${lootName}!`;
@@ -161,15 +167,6 @@ export function getLootHelpMessage(state: GameState, lootType: LootType, lootLev
         case 'ironBoots':
             return 'Use the Iron Boots to explore under water but watch your breath!'
                 + '{|}Iron boots slow you down but keep you from slipping and being knocked back.';
-        case 'charge':
-            if (state.hero.passiveTools.charge === 1) {
-                return `Press and hold [B_WEAPON] to channel your Spirit Energy into the Chakram,
-                    then release it to unleash a powerful attack!
-                    {|}Press and hold [B_TOOL] to channel your Spirit Energy into your Tools to make them more powerful.
-                    {|}You can even hold [B_PASSIVE] when picking up an object to channel Spirit Energy into them!
-                `;
-            }
-            return 'Unleash even more powerful attacks by charging your Chakram and Tools further.';
         case 'weapon':
             if (state.hero.weapon === 1) {
                 return `Press [B_WEAPON] to throw the Chakram.
@@ -251,6 +248,7 @@ export function getLootHelpMessage(state: GameState, lootType: LootType, lootLev
                 + '{|}Press [B_TOOL] to teleport your Real Body to your Astral Body.'
                 + '{|}Teleportation consumes spirit energy, stand still to recover'
                 + '{|}Use teleportation to move past obstacles in the Real World.';
+        case 'neutral': return 'Neutral element uses less spirit energy with charged attacks.'
         case 'fire': return 'Fire can be used to light torches and melt ice.';
         case 'ice': return 'Ice can be used to freeze objects and enemies.';
         case 'lightning': return 'Lightning stuns enemies and activates some objects.';
@@ -593,7 +591,7 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: An
             state.hero.activeTools[loot.lootType] = applyUpgrade(state.hero.activeTools[loot.lootType], loot);
             //console.log('->', loot.lootType, state.hero.activeTools[loot.lootType]);
         } else if ([
-            'gloves', 'roll', 'charge', 'nimbusCloud', 'catEyes', 'spiritSight',
+            'gloves', 'roll', 'nimbusCloud', 'catEyes', 'spiritSight',
             'trueSight', 'astralProjection', 'teleportation', 'ironSkin', 'goldMail', 'phoenixCrown',
             'waterBlessing', 'fireBlessing', 'lightningBlessing',
         ].includes(loot.lootType)) {

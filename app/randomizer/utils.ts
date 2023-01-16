@@ -182,7 +182,8 @@ export function findLootById(zone: Zone, id: string, state: GameState = null): {
 const findObjectByIdCache: {[key: string]: {
     object: ObjectDefinition,
     location: FullZoneLocation,
-    needsEyes: boolean,
+    needsCatEyes: boolean,
+    needsTrueSight: boolean,
 }} = {};
 export function findObjectById(
     zone: Zone,
@@ -193,7 +194,10 @@ export function findObjectById(
     const cacheKey = zone.key + ':' + id;
     const cachedResult = findObjectByIdCache[cacheKey];
     if (cachedResult) {
-        if (state && !state.hero.passiveTools.catEyes && cachedResult.needsEyes) {
+        if (state && !state.hero.passiveTools.trueSight && cachedResult.needsTrueSight) {
+            return {object: null, location: null};
+        }
+        if (state && !(state.hero.passiveTools.catEyes || state.hero.passiveTools.trueSight) && cachedResult.needsCatEyes) {
             return {object: null, location: null};
         }
         return {object: cachedResult.object, location: cachedResult.location};
@@ -203,7 +207,7 @@ export function findObjectById(
             for (let y = 0; y < areaGrid.length; y++) {
                 for (let x = 0; x < areaGrid[y].length; x++) {
                     // All objects in 100% dark areas are considered out of logic unless you can see in the dark.
-                    const needsEyes = areaGrid[y][x]?.dark >= 100;
+                    const needsCatEyes = areaGrid[y][x]?.dark >= 100;
                     for (const object of (areaGrid[y][x]?.objects || [])) {
                         if (object.id === id) {
                             if (typeFilter && !typeFilter.includes(object.type)) {
@@ -218,8 +222,11 @@ export function findObjectById(
                                 y: object.y,
                                 d: null,
                             });
-                            findObjectByIdCache[cacheKey] = {object, location, needsEyes};
-                            if (state && !state.hero.passiveTools.catEyes && needsEyes) {
+                            findObjectByIdCache[cacheKey] = {object, location, needsCatEyes, needsTrueSight: object.isInvisible};
+                            if (state && !state.hero.passiveTools.trueSight && findObjectByIdCache[cacheKey].needsTrueSight) {
+                                return {object: null, location: null};
+                            }
+                            if (state && !(state.hero.passiveTools.catEyes || state.hero.passiveTools.trueSight) && findObjectByIdCache[cacheKey].needsCatEyes) {
                                 return {object: null, location: null};
                             }
                             return findObjectByIdCache[cacheKey];
@@ -230,7 +237,7 @@ export function findObjectById(
         }
     }
     warnOnce(missingObjectSet, zone.key + '::' + id, 'Missing object: ');
-    findObjectByIdCache[cacheKey] = {object: null, location: null, needsEyes: false};
+    findObjectByIdCache[cacheKey] = {object: null, location: null, needsCatEyes: false, needsTrueSight: false};
     return findObjectByIdCache[cacheKey];
 }
 
@@ -337,8 +344,7 @@ function canOpenDoor(location: FullZoneLocation, state: GameState, door: Entranc
         return dungeonInventory?.bigKey;
     }
     if (door.status === 'cracked') {
-        // console.log(door.id, state.hero.activeTools.clone > 0 && state.hero.passiveTools.catEyes > 0);
-        return state.hero.activeTools.clone > 0 && state.hero.passiveTools.catEyes > 0;
+        return state.hero.activeTools.clone > 0;
     }
     return true;
 }

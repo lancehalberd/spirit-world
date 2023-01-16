@@ -438,7 +438,7 @@ const cocoonBossState = applyItems(cocoonStartState, {'cocoon:bigKey': 1, 'cloak
 cocoonBossState.savedHeroData.rightTool = 'cloak';
 const helixStartState = applyItems(cocoonBossState, {maxLife: 1, teleportation: 1},
     ['cocoonTeleporter', 'lakeTunneBoss']);
-const helixEndState = applyItems(helixStartState, {charge: 1, staff: 1, normalDamage: 1, weapon: 2},
+const helixEndState = applyItems(helixStartState, {staff: 1, normalDamage: 1, weapon: 2},
     ['elementalBeastsEscaped']);
 const forestBackState = applyItems(helixEndState, {cloudBoots: 1, 'forestTemple:bigKey': 1});
 const waterfallBossState = applyItems(helixEndState, {ironBoots: 1});

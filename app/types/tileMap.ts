@@ -193,12 +193,16 @@ export interface ZoneLocation {
 export type LogicalZoneKey =
     'overworld' | 'sky'
     // Material world towns
-    | 'waterfallCave' | 'treeVillage' | 'holyCityInterior'
+    | 'waterfallCave' | 'treeVillage'
+    | 'holyCityInterior'
     // Material world sub areas
     | 'ascentCave' | 'fertilityShrine'
     | 'peachCave' | 'bushCave'
-    // Spirit world+ sub areas
+    // Spirit world
     | 'spiritWorld' | 'spiritSky'
+    // Spirit world towns
+    | 'jadeCityInterior'
+    // Spirit world sub areas
     | 'ascentCaveSpirit' | 'fertilityShrineSpirit'
     | 'peachCaveSpirit'
     // Early dungeons

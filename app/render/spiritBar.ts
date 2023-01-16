@@ -40,7 +40,7 @@ export const [
 spiritFill.y = 13;
 spiritFill.h = 1;
 
-const [spiritBarFrameCanvas, spiritBarFrameContext] = createCanvasAndContext(32, 100 + 32);
+const [spiritBarFrameCanvas, spiritBarFrameContext] = createCanvasAndContext(32, 100 + 42);
 const spiritFrame: Frame = {
     image: spiritBarFrameCanvas,
     x: 0, y: 0,
@@ -69,7 +69,7 @@ function updateSpiritBarFrame(state: GameState): void {
     }
     drawFrame(context, topBar, {...topBar, x: 8, y: topCapHeight});
     drawFrame(context, bottomBar, {...bottomBar, x: 8, y: topCapHeight + lastFrameHeight - bottomBar.h});
-    if (state.hero.passiveTools.charge > 0) {
+    if (state.hero.getMaxChargeLevel(state)) {
         drawFrame(context, elementContainer, {...elementContainer, x: 6, y: topCapHeight + lastFrameHeight});
     } else {
         drawFrame(context, bottomCap, {...bottomCap, x: 8, y: topCapHeight + lastFrameHeight});
@@ -119,7 +119,7 @@ export function renderSpiritBar(context: CanvasRenderingContext2D, state: GameSt
             context.fillRect(x + 6, y + topCapHeight + barHeight - cooldownHeight, 2, cooldownHeight);
         }
     }
-    if (state.hero.passiveTools.charge) {
+    if (state.hero.getMaxChargeLevel(state)) {
         let elementFrame = neutralElement;
         if (state.hero.element === 'fire') {
             elementFrame = fireElement;
@@ -157,32 +157,23 @@ export function updateHeroMagicStats(state: GameState) {
     state.hero.magicRegen = 4;
     // Cloak increases max magic but not magic regen.
     if (state.hero.activeTools.cloak) {
-        state.hero.maxMagic += 10;
-    }
-    if (state.hero.passiveTools.charge >= 1) {
-        state.hero.maxMagic += 10;
-        state.hero.magicRegen += 1;
-        state.hero.magicRegenCooldownLimit -= 200;
-    }
-    if (state.hero.passiveTools.charge >= 2) {
-        state.hero.maxMagic += 10;
-        state.hero.magicRegen += 2;
-        state.hero.magicRegenCooldownLimit -= 200;
+        state.hero.maxMagic += 15;
+        state.hero.magicRegenCooldownLimit -= 100;
     }
     if (state.hero.elements.fire) {
-        state.hero.maxMagic += 10;
-        state.hero.magicRegen += 1;
-        state.hero.magicRegenCooldownLimit -= 200;
+        state.hero.maxMagic += 15;
+        state.hero.magicRegen += 2;
+        state.hero.magicRegenCooldownLimit -= 300;
     }
     if (state.hero.elements.ice) {
-        state.hero.maxMagic += 10;
-        state.hero.magicRegen += 1;
-        state.hero.magicRegenCooldownLimit -= 200;
+        state.hero.maxMagic += 15;
+        state.hero.magicRegen += 2;
+        state.hero.magicRegenCooldownLimit -= 300;
     }
     if (state.hero.elements.lightning) {
-        state.hero.maxMagic += 10;
-        state.hero.magicRegen += 1;
-        state.hero.magicRegenCooldownLimit -= 200;
+        state.hero.maxMagic += 15;
+        state.hero.magicRegen += 2;
+        state.hero.magicRegenCooldownLimit -= 300;
     }
     if (state.hero.passiveTools.phoenixCrown) {
         state.hero.maxMagic += 20;

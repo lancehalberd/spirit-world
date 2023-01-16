@@ -12,17 +12,18 @@ export function getChargeLevelAndElement(state: GameState, hero: Hero, tool: Act
     if (state.hero.magic <= 0) {
         return { chargeLevel: 0, element: null };
     }
+    const maxChargeLevel = hero.getMaxChargeLevel(state);
     let chargeLevel = 0;
     let element: MagicElement = null;
     // The Phoenix Crown reduces charge time by 25%.
     const durationMultiplier = hero.passiveTools.phoenixCrown ? 0.75 : 1;
-    if (state.hero.passiveTools.charge >= 2) {
-        if (hero.chargeTime >= durationMultiplier * 1200) {
+    if (maxChargeLevel >= 2) {
+        if (hero.chargeTime >= durationMultiplier * 2000) {
             chargeLevel = 2;
         } else if (hero.chargeTime >= durationMultiplier * 600) {
             chargeLevel = 1;
         }
-    } else if (state.hero.passiveTools.charge >= 1 && hero.chargeTime >= durationMultiplier * 800) {
+    } else if (maxChargeLevel >= 1 && hero.chargeTime >= durationMultiplier * 800) {
         chargeLevel = 1;
     }
     // Elemental magic does not work under water.
@@ -53,6 +54,9 @@ export function useTool(
             if (chargeLevel === 1) {
                 speed += 2;
                 magicCost += 5;
+            } else if (chargeLevel >= 2) {
+                speed += 4;
+                magicCost += 25;
             }
             if (state.hero.element && isUpgradedBow && chargeLevel === 0) {
                 // Upgraded bow always uses the equiped element
@@ -82,7 +86,7 @@ export function useTool(
                 style: 'spirit',
             });
             addEffectToArea(state, state.areaInstance, arrow);
-            if (isUpgradedBow && chargeLevel === 1) {
+            if (isUpgradedBow && chargeLevel >= 1) {
                 direction = rotateDirection(direction, -1/2);
                 arrow = new Arrow({
                     chargeLevel,
@@ -107,6 +111,53 @@ export function useTool(
                     style: 'spirit',
                 });
                 addEffectToArea(state, state.areaInstance, arrow);
+            }
+            if (chargeLevel >= 2) {
+                direction = hero.d;
+                if (dx || dy) {
+                    direction = getDirection(dx, dy, true);
+                }
+                // For now level 2 charge follows up with a second slower arrow
+                arrow = new Arrow({
+                    chargeLevel,
+                    damage,
+                    element,
+                    x: hero.x + 8 + 8 * directionMap[direction][0],
+                    y: hero.y + 8 * directionMap[direction][1] + 6,
+                    vx: 3 * directionMap[direction][0],
+                    vy: 3 * directionMap[direction][1],
+                    delay: 100,
+                    style: 'spirit',
+                });
+                addEffectToArea(state, state.areaInstance, arrow);
+                if (isUpgradedBow) {
+                    direction = rotateDirection(direction, -1/2);
+                    arrow = new Arrow({
+                        chargeLevel,
+                        damage,
+                        element,
+                        x: hero.x + 8 + 8 * directionMap[direction][0],
+                        y: hero.y + 8 * directionMap[direction][1] + 6,
+                        vx: 3 * directionMap[direction][0],
+                        vy: 3 * directionMap[direction][1],
+                        delay: 100,
+                        style: 'spirit',
+                    });
+                    addEffectToArea(state, state.areaInstance, arrow);
+                    direction = rotateDirection(direction, 1);
+                    arrow = new Arrow({
+                        chargeLevel,
+                        damage,
+                        element,
+                        x: hero.x + 8 + 8 * directionMap[direction][0],
+                        y: hero.y + 8 * directionMap[direction][1] + 6,
+                        vx: 3 * directionMap[direction][0],
+                        vy: 3 * directionMap[direction][1],
+                        delay: 100,
+                        style: 'spirit',
+                    });
+                    addEffectToArea(state, state.areaInstance, arrow);
+                }
             }
             return;
         }

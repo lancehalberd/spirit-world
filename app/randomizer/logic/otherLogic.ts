@@ -309,5 +309,14 @@ export const holyCityNodes: LogicNode[] = [
         entranceIds: ['clothesHouse'],
         exits: [{ objectId: 'clothesHouse'}],
     },
+
+    // Jade city
+    {
+        zoneId: 'holyCityInterior',
+        nodeId: 'jadeCitySoutheastHouse',
+        checks: [{objectId: 'jadeCityPeachPiece'}],
+        entranceIds: ['jadeCitySoutheastDoor'],
+        exits: [{ objectId: 'jadeCitySoutheastDoor'}],
+    },
 ];
 

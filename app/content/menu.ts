@@ -35,8 +35,8 @@ export function getMenuRows(state: GameState): MenuOptionType[][] {
     menuRows.push(equipment);
 
     const elements: MenuOptionType[] = [];
-    if (state.hero.passiveTools.charge) {
-        elements.push('charge');
+    if (state.hero.elements.fire || state.hero.elements.ice || state.hero.elements.lightning) {
+        elements.push('neutral');
     }
     if (state.hero.elements.fire) {
         elements.push('fire');
@@ -51,8 +51,9 @@ export function getMenuRows(state: GameState): MenuOptionType[][] {
 
     let passiveToolRow: MenuOptionType[] = [];
     for (let key in state.hero.passiveTools) {
-        // This is included among the elements.
-        if (key === 'charge' || !state.hero.passiveTools[key]) continue;
+        if (!state.hero.passiveTools[key]) continue;
+        // Don't show cat eyes once true sight is obtained.
+        if (key === 'catEyes' && state.hero.passiveTools.trueSight) continue;
         passiveToolRow.push(key as MenuOptionType);
         if (passiveToolRow.length >= 7) {
             menuRows.push(passiveToolRow);

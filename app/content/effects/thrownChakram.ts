@@ -273,7 +273,7 @@ export class HeldChakram implements EffectInstance {
             if (state.hero.element) {
                 state.hero.magic -= 10;
             }
-        } else if (state.hero.passiveTools.charge >= 1) {
+        } else if (state.hero.getMaxChargeLevel(state) >= 1) {
             // Chakram reaches max speed twice as fast once you have the charge tool.
             if (this.animationTime >= 300) {
                 throwDamage += this.level;
@@ -323,13 +323,14 @@ export class HeldChakram implements EffectInstance {
         //}
     }
     update(state: GameState) {
+        const maxChargeLevel = state.hero.getMaxChargeLevel(state);
         // Only play the held sound if they actually hold the chakram for a moment.
         // This also happens to be the exact time that damage is doubled with level one charge.
-        if (state.hero.passiveTools.charge >= 1 && this.animationTime === 300) {
+        if (maxChargeLevel && this.animationTime === 300) {
             playSound('chakramCharge1');
         }
         // Play a second sound when damage is doubled using the base charge (level 0).
-        if (!state.hero.passiveTools.charge && this.animationTime === 600) {
+        if (!maxChargeLevel && this.animationTime === 600) {
             playSound('chakramCharge1');
             const cx = this.w / 2, cy = this.h / 2;
             this.sparkles.push(makeSparkleAnimation(state, {x: cx + 2, y: cy + 2, w: 1, h: 1}, { target: this, delay: 0 }));
@@ -348,7 +349,7 @@ export class HeldChakram implements EffectInstance {
             delete this.hero.heldChakram;
             return;
         }
-        if (state.hero.magic > 0 && this.animationTime >= 1000 && state.hero.passiveTools.charge >= 1 && this.animationTime % 200 === 0) {
+        if (state.hero.magic > 0 && this.animationTime >= 1000 && maxChargeLevel && this.animationTime % 200 === 0) {
             this.sparkles.push(makeSparkleAnimation(state, this, { element: this.hero.element }));
         }
         this.sparkles = this.sparkles.filter(s => !s.done);
@@ -390,7 +391,7 @@ export class HeldChakram implements EffectInstance {
             return;
         }
         let animationTime = 0;
-        if (state.hero.passiveTools.charge >= 1 && state.hero.magic > 0) {
+        if (state.hero.getMaxChargeLevel(state) && state.hero.magic > 0) {
             const { chargeLevel } = getChargeLevelAndElement(state, this.hero);
             if (chargeLevel >= 1) {
                 animationTime = this.animationTime;

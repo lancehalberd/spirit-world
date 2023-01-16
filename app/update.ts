@@ -271,7 +271,7 @@ function updateMenu(state: GameState) {
             setEquippedBoots(state, menuItem);
             return;
         }
-        if (menuItem === 'charge' || state.hero.element === menuItem) {
+        if (menuItem === 'neutral' || state.hero.element === menuItem) {
             setEquippedElement(state, null);
             return;
         } else if (state.hero.elements[menuItem]) {
