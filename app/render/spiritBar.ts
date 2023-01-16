@@ -112,10 +112,12 @@ export function renderSpiritBar(context: CanvasRenderingContext2D, state: GameSt
             drawFrame(context, spiritLine, {...spiritLine, x, y: y + topCapHeight + barHeight - fillHeight});
         }
     }
-    const cooldownHeight = Math.floor(state.hero.magicRegenCooldown / 100);
-    if (cooldownHeight > 0) {
-        context.fillStyle = 'purple';
-        context.fillRect(x + 6, y + topCapHeight + barHeight - cooldownHeight, 2, cooldownHeight);
+    if (state.renderMagicCooldown) {
+        const cooldownHeight = Math.floor(state.hero.magicRegenCooldown / 100);
+        if (cooldownHeight > 0) {
+            context.fillStyle = 'purple';
+            context.fillRect(x + 6, y + topCapHeight + barHeight - cooldownHeight, 2, cooldownHeight);
+        }
     }
     if (state.hero.passiveTools.charge) {
         let elementFrame = neutralElement;

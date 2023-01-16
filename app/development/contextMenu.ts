@@ -1,4 +1,5 @@
 import { getSpawnLocationContextMenuOption, getTestStateContextMenuOption } from 'app/content/spawnLocations';
+import { editingState, toggleEditing } from 'app/development/tileEditor';
 import { mainCanvas, tagElement } from 'app/dom';
 import { defeatAllEnemies, KEY, isKeyboardKeyDown } from 'app/keyCommands';
 import { getState } from 'app/state';
@@ -109,6 +110,12 @@ export function getContextMenu(): MenuOption[] {
         getAssistanceMenuOption(),
         getSettingsMenuOption(),
         getTestStateContextMenuOption(),
+        {
+            label: editingState.isEditing ? 'Stop Map Editor' : 'Start Map Editor',
+            onSelect() {
+                toggleEditing();
+            }
+        },
     ];
 }
 
@@ -219,7 +226,12 @@ function getSettingsMenuOption(): MenuOption {
                             [-] [B_NEXT_ELEMENT] Next Element
                         `);
                     }
-
+                },
+                {
+                    label: state.renderMagicCooldown ? 'Hide Cooldown Bar' : 'Show Cooldown Bar',
+                    onSelect() {
+                        state.renderMagicCooldown = !state.renderMagicCooldown;
+                    }
                 }
             ];
         }

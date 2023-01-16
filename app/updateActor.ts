@@ -344,6 +344,8 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
     }
     if (state.hero.magic > state.hero.maxMagic) {
         state.hero.magic = state.hero.maxMagic;
+    } else if (state.hero.magic < -10) {
+        state.hero.magic = -10;
     }
     state.location.x = state.hero.x;
     state.location.y = state.hero.y;

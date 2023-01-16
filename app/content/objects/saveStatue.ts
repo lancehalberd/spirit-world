@@ -55,6 +55,10 @@ export class SaveStatue implements ObjectInstance {
             y: this.y + 16,
         });
         state.hero.life = state.hero.maxLife;
+        if (state.location.zoneKey !== 'waterfallTower' || state.hero.passiveTools.waterBlessing) {
+            state.hero.magic = state.hero.maxMagic;
+            state.hero.magicRegenCooldown = 0;
+        }
         if (getObjectStatus(state, this.definition)) {
             if (!state.hero.hasRevive) {
                 showMessage(state, '{@saveStatue.reviveChoice}');

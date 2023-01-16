@@ -39,6 +39,29 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - speed up crystal collector summon pod attack.
+    - make more ledges jumpable in crater
+    - Add back the ability to double tap roll for cloud sommersault in addition to the new controls
+    - Remove charge skill and base max charge level off of elements
+        - 1 element = level 1 charge, 3 elements = level 2 charge
+
+    - Make ancient badge provide lightning trap immunity
+
+    - Increase world map super tile size to at least 48x48 bu try 64x64
+        - Change crater to single 64x64 tile if it is supported
+
+    - Add underwater mechanics
+        - allow swimming over low/medium barriers (set floorHeight to 16px on these)
+        - floating ice spikes that damage you and knock back like thorn bushes if you are too high in the water
+            - Possibly give these movement definition similar to platforms (direction, and turn angle)
+        - Swarms of fish that are composed of fish shaped particles that chase the player
+            - Hitting them destroys a couple of particles and slows the fish down but does not destroy them
+        - large turtle monster
+            - spawns up to 2-3 small swimming turtles that chase and attack you with 3-4 hp a piece
+            - does a 2s spinning aoe bubble attack (like void frost) on 6s cooldown
+        - simple medium fish monster that just wander around like snakes.
+        - medium sword fish that moves back and forth and speeds up if you are lined up with it
+
     - Add additional uses for true sight
         - Invisible path tiles over pit that are revealed with true sight
             - Requires a new 'invisible' tile behavior
@@ -95,14 +118,10 @@ Current tasks:
             - If the property is positive, instead of hitting ledges/southernwalls in the wrong direction, decrement the property.
             - veryTall tiles will still block the projectile even when the property is set.
 
-    - Add and test many more ledges
-
     - test staff interactions with ledges.
 
     - Prevent grabbing tiles/objects across ledges
         - on grab, check if the player can move into the object by running the movement algorithm with a special mode that ignores all normal collisions and prevents crossing ledges in any direction. Prevent the grab if this movement check fails.
-
-    - Perhaps southern facing tiles should block left/right movement if not currently over SF tile.
 
     - Cloud jumping near the edges can sometimes result in landing poorly either taking damage or underground in a ledge. Would be nice to find a way to clean up jumping from ledge to ledge.
 
@@ -253,8 +272,7 @@ Current tasks:
 
     - Game occasionally plays small bits of music while muted.
 
-    Make mutation transition use the same area instance so contents don't reset
-        - Will need to add special handling to remove extra ice tiles from frost beast+heat sink battles.
+    - Make sure ice tiles are removed from frost beast+heat sink battles after they are defeated.
 
     - Add new hold+walk chakram animations
         - play last 2 frames of attack animation on release.
@@ -266,10 +284,6 @@ Mechanic: Windstream
     - Pushes player back unless they are using iron boots or holding on to a solid object. Player can push pots to move through wind streams.
     - Player can be pushed across wide pits by equipping cloud boots and entering a wind stream.
     - There may be light objects that players can push into windstreams to move them, perhaps to solve switch puzzles
-
-True sight Idea:
-    - Split the screen vertically and render the current world in the left half and the alternate world in the right half (or always material left + spirit right).
-    - Could be used for puzzles that involve killing enemies you can't see in the current world or puzzle elements that are too hard to figure out with spirit sight.
 
 Combat Ideas:
     - Concentric damaging rings that collapse into the player. Player must time it so that they are close enough together to dodge roll through in order to avoid damage.
@@ -287,7 +301,6 @@ Staff Improvements:
         - Preview will only show the max size that will fit in the current space
         - Ideally you could move around while charging and the preview will update appropriately
         - Would be nice to have this preview behavior when holding down the staff button for staff 1.
-    - If the staff doesn't have enough area, maybe it should still swing and hit, but despawn or bounce off the terrain after landing.
 
 Throwing an object into a pit should use the pit animation rather than breaking.
 
@@ -340,8 +353,7 @@ High level list of things left to do:
             - Instead of fighting this boss, you will see it, but then abort because of the beasts attacking the city
             - Then you will actually fight this boss at the end of the Grand Temple or Jade Palace or possibly as a mid boss on the Warship.
     Missing mechanics:
-        Difficulty shrines for dungeons/bosses
-            - Probably just roll this into VR minigame where you can fight old bosses.
+        - Vanara dreamland boss simulator with difficulty modifiers
         Hero helping during first elemental beast fight
             Hero wears monk fighting attire
             Creates a spirit barrier during rage phase that MC can hide in to prevent all damage
@@ -357,17 +369,15 @@ High level list of things left to do:
         Charge level 2
             Bow charge 2 shoots 5 arrows in 120 degree arc -60, -30, 0, 30, 60
         Clone charge 1 + 2
-        True Sight (Render certain enemies/objects flagged for true sight)
         Gloves charge 1 + 2
 
 Generic boss improvements
     - Add vulnerable phases for bosses where they take ~5x damage, increase boss health by ~2x
 
-Lava improvments:
+Lava improvements:
     - Temporarily create solid ground when hit by ice.
 
 Misc improvements
-    - double tap direction to roll?
     - allow facing diagonals while not moving?
 
 Add toasts to development for undoing actions:
@@ -405,8 +415,6 @@ Spirit Store(s)
 Charge Chakram Attack:
     - Maybe change level 1 charge to spin around hero in a circle twice? Brief 0.5s invulnerability with attack animation.
     - Charge level 2 could have 2 chakrams spin at different radiuses and directions? 50 mana, lasts 4 seconds.
-Chakram Improvements:
-    - Add some damage or charge time bonus for timing your next attack within X frames of catching the Chakram?
 
 At some point I should write tests to validate certain things like:
     - All zone+object targets are defined.
