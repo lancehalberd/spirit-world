@@ -497,6 +497,16 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         return true;
     }
     if (hero.action === 'roll') {
+        // Double pressing roll performs a quick somersault.
+        if (wasGameKeyPressed(state, GAME_KEY.ROLL)
+            && hero.passiveTools.roll > 1
+            && hero.actionFrame > 4
+            && state.hero.magic > 0
+        ) {
+            performSomersault(state, hero);
+            return true;
+        }
+        // Holding roll performs a normal somersaul with preparation.
         if (isGameKeyDown(state, GAME_KEY.ROLL)
             && hero.passiveTools.roll > 1
             && hero.actionFrame === 11
@@ -545,98 +555,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             if (sommersaultCount < 2) {
                 return true;
             }
-            // Cloud somersault roll activated by rolling again mid roll.
-            const [dx, dy] = getCloneMovementDeltas(state, hero);
-            state.hero.magic -= 10;
-            state.hero.increasedMagicRegenCooldown(500);
-            hero.d = (dx || dy) ? getDirection(dx, dy) : hero.d;
-            // Default direction is the direction the current roll uses.
-            const defaultDirection = getDirection(hero.actionDx, hero.actionDy, true, hero.d);
-            const direction = getDirection(dx, dy, true, defaultDirection);
-            const moveX = directionMap[direction][0] * 8, moveY = directionMap[direction][1] * 8;
-            const originalArea = hero.area, alternateArea = hero.area.alternateArea;
-            let hitbox = hero.getHitbox();
-            const startPosition = {x: hitbox.x + hitbox.w / 2, y: hitbox.y + hitbox.h / 2};
-            const lastOpenPosition = {x: hero.x, y: hero.y};
-            // Move 8px at a time 6 times in either area.
-            for (let i = 0; i < 6; i++) {
-                let result = moveActor(state, hero, moveX, moveY, {
-                    canFall: true,
-                    canSwim: true,
-                    direction: hero.d,
-                    boundToSection: true,
-                });
-                if (result.mx || result.my) {
-                    if (canSomersaultToCoords(state, hero, {x: hero.x, y: hero.y})) {
-                        lastOpenPosition.x = hero.x;
-                        lastOpenPosition.y = hero.y;
-                    }
-                    addSparkleAnimation(state, hero.area, pad(hero.getHitbox(), -4), { element: hero.element });
-                    continue;
-                }
-                hero.area = alternateArea;
-                result = moveActor(state, hero, moveX, moveY, {
-                    canFall: true,
-                    canSwim: true,
-                    direction: hero.d,
-                    boundToSection: true,
-                });
-                hero.area = originalArea;
-                if (!result.mx && !result.my) {
-                    break;
-                }
-                if (canSomersaultToCoords(state, hero, {x: hero.x, y: hero.y})) {
-                    lastOpenPosition.x = hero.x;
-                    lastOpenPosition.y = hero.y;
-                }
-                addSparkleAnimation(state, hero.area, pad(hero.getHitbox(), -4), { element: hero.element });
-            }
-            hitbox = hero.getHitbox();
-            const endPosition = {x: hitbox.x + hitbox.w / 2, y: hitbox.y + hitbox.h / 2};
-            const teleportHit: HitProperties = {
-                damage: 5,
-                element: hero.element,
-                hitRay: {
-                    x1: startPosition.x, y1: startPosition.y,
-                    x2: endPosition.x, y2: endPosition.y,
-                    r: 6,
-                },
-                hitTiles: true,
-                hitEnemies: true,
-            };
-            hitTargets(state, hero.area, teleportHit);
-            const landingHit: HitProperties = {
-                damage: 5,
-                element: hero.element,
-                hitCircle: {
-                    x: endPosition.x, y: endPosition.y,
-                    r: 24,
-                },
-                hitTiles: true,
-                hitEnemies: true,
-            };
-            for (let i = 0; i < 8; i++) {
-                const theta = 2 * Math.PI * i / 8;
-                addSparkleAnimation(state, hero.area,
-                    {
-                        x: endPosition.x + 19 * Math.cos(theta) - 3,
-                        y: endPosition.y + 19 * Math.sin(theta) - 3,
-                        w: 6, h: 6,
-                    },
-                    { element: hero.element }
-                );
-            }
-            hitTargets(state, hero.area, landingHit);
-            hero.x = lastOpenPosition.x;
-            hero.y = lastOpenPosition.y;
-            hitbox = hero.getHitbox(state);
-
-            // The fullroll action is 16 frames.
-            hero.action = 'roll';
-            hero.actionFrame = 0;
-            hero.animationTime = 0 * FRAME_LENGTH;
-            hero.actionDx = directionMap[direction][0];
-            hero.actionDy = directionMap[direction][1];
+            performSomersault(state, hero);
             return true;
         }
         return true;
@@ -653,6 +572,101 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         return true;
     }
     return false;
+}
+
+function performSomersault(state: GameState, hero: Hero) {
+    // Cloud somersault roll activated by rolling again mid roll.
+    const [dx, dy] = getCloneMovementDeltas(state, hero);
+    state.hero.magic -= 10;
+    state.hero.increasedMagicRegenCooldown(500);
+    hero.d = (dx || dy) ? getDirection(dx, dy) : hero.d;
+    // Default direction is the direction the current roll uses.
+    const defaultDirection = getDirection(hero.actionDx, hero.actionDy, true, hero.d);
+    const direction = getDirection(dx, dy, true, defaultDirection);
+    const moveX = directionMap[direction][0] * 8, moveY = directionMap[direction][1] * 8;
+    const originalArea = hero.area, alternateArea = hero.area.alternateArea;
+    let hitbox = hero.getHitbox();
+    const startPosition = {x: hitbox.x + hitbox.w / 2, y: hitbox.y + hitbox.h / 2};
+    const lastOpenPosition = {x: hero.x, y: hero.y};
+    // Move 8px at a time 6 times in either area.
+    for (let i = 0; i < 6; i++) {
+        let result = moveActor(state, hero, moveX, moveY, {
+            canFall: true,
+            canSwim: true,
+            direction: hero.d,
+            boundToSection: true,
+        });
+        if (result.mx || result.my) {
+            if (canSomersaultToCoords(state, hero, {x: hero.x, y: hero.y})) {
+                lastOpenPosition.x = hero.x;
+                lastOpenPosition.y = hero.y;
+            }
+            addSparkleAnimation(state, hero.area, pad(hero.getHitbox(), -4), { element: hero.element });
+            continue;
+        }
+        hero.area = alternateArea;
+        result = moveActor(state, hero, moveX, moveY, {
+            canFall: true,
+            canSwim: true,
+            direction: hero.d,
+            boundToSection: true,
+        });
+        hero.area = originalArea;
+        if (!result.mx && !result.my) {
+            break;
+        }
+        if (canSomersaultToCoords(state, hero, {x: hero.x, y: hero.y})) {
+            lastOpenPosition.x = hero.x;
+            lastOpenPosition.y = hero.y;
+        }
+        addSparkleAnimation(state, hero.area, pad(hero.getHitbox(), -4), { element: hero.element });
+    }
+    hitbox = hero.getHitbox();
+    const endPosition = {x: hitbox.x + hitbox.w / 2, y: hitbox.y + hitbox.h / 2};
+    const teleportHit: HitProperties = {
+        damage: 5,
+        element: hero.element,
+        hitRay: {
+            x1: startPosition.x, y1: startPosition.y,
+            x2: endPosition.x, y2: endPosition.y,
+            r: 6,
+        },
+        hitTiles: true,
+        hitEnemies: true,
+    };
+    hitTargets(state, hero.area, teleportHit);
+    const landingHit: HitProperties = {
+        damage: 5,
+        element: hero.element,
+        hitCircle: {
+            x: endPosition.x, y: endPosition.y,
+            r: 24,
+        },
+        hitTiles: true,
+        hitEnemies: true,
+    };
+    for (let i = 0; i < 8; i++) {
+        const theta = 2 * Math.PI * i / 8;
+        addSparkleAnimation(state, hero.area,
+            {
+                x: endPosition.x + 19 * Math.cos(theta) - 3,
+                y: endPosition.y + 19 * Math.sin(theta) - 3,
+                w: 6, h: 6,
+            },
+            { element: hero.element }
+        );
+    }
+    hitTargets(state, hero.area, landingHit);
+    hero.x = lastOpenPosition.x;
+    hero.y = lastOpenPosition.y;
+    hitbox = hero.getHitbox(state);
+
+    // The fullroll action is 16 frames.
+    hero.action = 'roll';
+    hero.actionFrame = 0;
+    hero.animationTime = 0 * FRAME_LENGTH;
+    hero.actionDx = directionMap[direction][0];
+    hero.actionDy = directionMap[direction][1];
 }
 
 function isHeroOnOpenTile(this: void, state: GameState, hero: Hero): boolean {
