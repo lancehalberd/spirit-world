@@ -92,7 +92,8 @@ export class Anode implements ObjectInstance {
                 this.cathodeIndex = this.cathodeIndex % this.cathodes.length;
                 const cathode = this.cathodes[this.cathodeIndex];
                 // The barrier doesn't damage until it has warmed up for a few frames.
-                if (this.animationTime > 100) {
+                // The lightning blessing make the hero immune to lightning barrier effects.
+                if (!state.hero.passiveTools.lightningBlessing && this.animationTime > 100) {
                     hitTargets(state, this.area, {
                         canAlwaysKnockback: true,
                         canDamageRollingHero: true,

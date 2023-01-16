@@ -115,7 +115,7 @@ export class Escalator implements ObjectInstance {
             }
             const heroHitbox = hero.getHitbox(state);
             const touchingHero = isObjectInsideTarget(heroHitbox, this.getHitbox(state))
-                && hero.action !== 'roll' && hero.z <= 0;
+                && hero.action !== 'roll' && hero.action !== 'preparingSomersault' && hero.z <= 0;
             if (this.speed === 'slow' && touchingHero) {
                 moveActor(state, hero, speed * dx, speed * dy, {
                     canFall: true,

@@ -68,7 +68,7 @@ export class PitEntrance implements ObjectInstance {
             }
         }
         const hero = state.hero;
-        if (this.area === hero.area && hero.z <= 0  && hero.action !== 'roll'
+        if (this.area === hero.area && hero.z <= 0 && hero.action !== 'roll' && hero.action !== 'preparingSomersault'
             && isObjectInsideTarget(hero.getHitbox(), pad(this.getHitbox(), 2))
         ) {
             if (hero.action === 'fallen') {

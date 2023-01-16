@@ -44,8 +44,6 @@ Current tasks:
     - Remove charge skill and base max charge level off of elements
         - 1 element = level 1 charge, 3 elements = level 2 charge
 
-    - Make ancient badge provide lightning trap immunity
-
     - Increase world map super tile size to at least 48x48 bu try 64x64
         - Change crater to single 64x64 tile if it is supported
 

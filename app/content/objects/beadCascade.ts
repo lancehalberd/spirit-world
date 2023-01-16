@@ -266,7 +266,7 @@ export class BeadSection implements ObjectInstance {
         for (const hero of [state.hero, ...state.hero.clones]) {
             if (hero.area === this.area) {
                 const touchingHero = boxesIntersect(hero, this.getHitbox(state))
-                    && hero.action !== 'roll' && hero.z <= 4
+                    && hero.action !== 'roll' && hero.action !== 'preparingSomersault' && hero.z <= 4
                     && hero.y + hero.h < this.y + this.h + 4;
                 if (touchingHero && hero.equippedBoots === 'ironBoots') {
                     const x = hero.x + hero.w / 4 + Math.random() * hero.w / 2;
