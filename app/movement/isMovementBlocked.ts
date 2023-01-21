@@ -82,7 +82,10 @@ export function isMovementBlocked(
         }
         // Would need additional checks here for objects with water/lava/brittle behaviors.
     }
-    if (behaviors?.water && !movementProperties.canSwim) {
+    if (behaviors?.water && !(movementProperties.canSwim || movementProperties.mustSwim)) {
+        return {};
+    }
+    if (!behaviors?.water && movementProperties.mustSwim) {
         return {};
     }
     if (behaviors?.pit && !movementProperties.canFall) {

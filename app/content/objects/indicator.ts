@@ -53,6 +53,10 @@ export class Indicator implements ObjectInstance {
         this.animationTime += FRAME_LENGTH;
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
+        // Indicators will be wrong the first frame they appear for certain randomized target objects, so wait 1 frame before rendering them.
+        if (this.definition.targetObjectId && this.animationTime <= 20) {
+            return;
+        }
         if (this.status !== 'normal' || !(state.hero.passiveTools.trueSight || editingState.isEditing)) {
             return;
         }

@@ -185,9 +185,10 @@ export function getSectionBoundingBox(state: GameState, object: ObjectInstance, 
 }
 
 export function getEnemyBoundingBox(state: GameState, object: ObjectInstance, w: number, h: number = w): Rect {
+    const hitbox = object.getHitbox();
     return {
-        x: object.definition.x - w / 2,
-        y: object.definition.y - h / 2,
+        x: object.definition.x + hitbox.w / 2 - w / 2,
+        y: object.definition.y + hitbox.h / 2 - h / 2,
         w,
         h,
     };

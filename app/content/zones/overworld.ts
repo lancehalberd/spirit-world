@@ -1856,6 +1856,7 @@ const f0_1x1: AreaDefinition = {
         {status: "normal", id: "", x: 48, y: 192, type: "spawnMarker", linked: true},
         {status: "normal", id: "", x: 256, y: 32, type: "spawnMarker", linked: true},
         {status: "normal", id: "lakeMarker", x: 256, y: 208, type: "marker"},
+        {status: "normal", id: "lakeVortex", x: 344, y: 296, type: "enemy", enemyType: "vortex", d: "down", params: {}, hasCustomLogic: true, customLogic: "frostBeast"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},

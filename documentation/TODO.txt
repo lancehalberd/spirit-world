@@ -39,13 +39,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Finish vortex enemy
-        - Allow only moving in water when not under water, apply effect only to swimming actors
-        - Regular movement when underwater apply effect to all actors
-
-    - True sight indicators can appear in the wrong place initially
-        - Just hide them before they update, display after animationTime > 0
-
     - Clones should still be destroyed when protected by iron skin, or be consistently protected.
         - Right now they are destroyed if not controlled.
 

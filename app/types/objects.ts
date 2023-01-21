@@ -155,6 +155,8 @@ export interface MovementProperties {
     canPush?: boolean
     canFall?: boolean
     canSwim?: boolean
+    // Enemies with this prop can only move in deep water.
+    mustSwim?: boolean
     canClimb?: boolean
     // True when climbing.
     canCrossLedges?: boolean
