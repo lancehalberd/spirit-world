@@ -19,6 +19,7 @@ import {
     beetleWingedAnimations,
     entAnimations,
     floorEyeAnimations,
+    icePlantAnimations,
     blueSnakeAnimations,
     redSnakeAnimations,
     snakeAnimations,
@@ -215,9 +216,29 @@ enemyDefinitions.flameSnake = {
         drawFrameCenteredAt(context, flameAnimation.frames[0], target);
     },
 };
+type NearbyTargetType = ReturnType<typeof getVectorToNearbyTarget>;
+const iceGrenadeAbility: EnemyAbility<NearbyTargetType> = {
+    getTarget(this: void, state: GameState, enemy: Enemy): NearbyTargetType {
+        return getVectorToNearbyTarget(state, enemy, enemy.aggroRadius, enemy.area.allyTargets);
+    },
+    prepareAbility(this: void, state: GameState, enemy: Enemy, target: NearbyTargetType) {
+        enemy.changeToAnimation('prepare');
+    },
+    useAbility(this: void, state: GameState, enemy: Enemy, target: NearbyTargetType): void {
+        enemy.changeToAnimation('attack');
+        const hitbox = target.target.getHitbox();
+        throwIceGrenadeAtLocation(state, enemy, {tx: hitbox.x + hitbox.w / 2, ty: hitbox.y + hitbox.h / 2});
+    },
+    cooldown: 3000,
+    initialCharges: 0,
+    charges: 1,
+    prepTime: icePlantAnimations.prepare.down.duration,
+    recoverTime:icePlantAnimations.attack.down.duration,
+};
 enemyDefinitions.frostBeetle = {
     alwaysReset: true,
-    animations: beetleAnimations, speed: 0.7, aggroRadius: 112,
+    abilities: [iceGrenadeAbility],
+    animations: icePlantAnimations, speed: 0.7, aggroRadius: 112,
     life: 5, touchDamage: 1, update: updateFrostBeetle,
     elementalMultipliers: {'fire': 2},
     immunities: ['ice'],
@@ -225,6 +246,7 @@ enemyDefinitions.frostBeetle = {
         enemy.defaultRenderPreview(context, target);
         drawFrameCenteredAt(context, iceSparkleAnimation.frames[1], target);
     },
+    canBeKnockedBack: false,
 };
 enemyDefinitions.lightningBug = {
     alwaysReset: true,
@@ -429,19 +451,9 @@ function updateFlameSnake(state: GameState, enemy: Enemy): void {
     }
 }
 function updateFrostBeetle(state: GameState, enemy: Enemy): void {
-    if (enemy.params.shootCooldown > 0) {
-        enemy.params.shootCooldown -= FRAME_LENGTH;
-    } else {
-        const attackVector = getVectorToNearbyTarget(state, enemy, enemy.aggroRadius / 2, enemy.area.allyTargets);
-        if (attackVector) {
-            throwIceGrenadeAtLocation(state, enemy, {
-                tx: state.hero.x + state.hero.w / 2,
-                ty: state.hero.y + state.hero.h / 2,
-            });
-            enemy.params.shootCooldown = 3000;
-        } else {
-            scurryAndChase(state, enemy);
-        }
+    if (!enemy.activeAbility) {
+        enemy.changeToAnimation('idle');
+        enemy.useRandomAbility(state);
     }
 }
 function updateStormLightningBug(state: GameState, enemy: Enemy): void {

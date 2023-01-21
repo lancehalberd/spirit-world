@@ -449,3 +449,17 @@ Frame 1 - this is the idle standing frame
 Frame 2-3 - this is the hammering frame. I imagine you should keep the golem on frame 3 for longer just to help show that the attack came from the hammer
 Frame 4-7 - this is the golem preparing and then casting a spell. Loop frames 5-7 for however long the casting is.
 Frame 8 - hurt frame*/
+
+const icePlantGeometry: FrameDimensions = { w: 48, h: 32, content: {x: 12, y: 16, w: 24, h: 16} };
+export const icePlantIdleAnimation = createAnimation('gfx/enemies/icePlant.png', icePlantGeometry,
+    { x: 0, cols: 1, duration: 10});
+export const icePlantPrepareAnimation = createAnimation('gfx/enemies/icePlant.png', icePlantGeometry,
+    { x: 1, cols: 1, duration: 20});
+export const icePlantAttackAnimation = createAnimation('gfx/enemies/icePlant.png', icePlantGeometry,
+    { x: 2, cols: 1, duration: 15});
+export const icePlantAnimations: ActorAnimations = {
+    idle: omniAnimation(icePlantIdleAnimation),
+    prepare: omniAnimation(icePlantPrepareAnimation),
+    attack: omniAnimation(icePlantAttackAnimation),
+};
+
