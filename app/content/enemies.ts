@@ -27,7 +27,7 @@ import { certainLifeLootTable, simpleLootTable, lifeLootTable, moneyLootTable } 
 import { addEffectToArea, getAreaSize } from 'app/content/areas';
 import { editingState } from 'app/development/tileEditor';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { moveActor } from 'app/moveActor';
+import { getSectionBoundingBox, moveActor } from 'app/moveActor';
 import { createAnimation, drawFrameAt, drawFrameCenteredAt } from 'app/utils/animations';
 import { directionMap, getDirection, getTileBehaviorsAndObstacles } from 'app/utils/field';
 
@@ -47,6 +47,7 @@ export * from 'app/content/enemies/lightningDrone';
 export * from 'app/content/enemies/luckyBeetle';
 export * from 'app/content/enemies/sentryBot';
 export * from 'app/content/enemies/squirrel';
+export * from 'app/content/enemies/vortex';
 
 export const enemyTypes = <const>[
     'arrowTurret',
@@ -60,7 +61,7 @@ export const enemyTypes = <const>[
     'lightningBug', 'lightningDrone',
     'luckyBeetle',
     'sentryBot', 'snake', 'squirrel',
-    'wallLaser',
+    'vortex', 'wallLaser',
 ];
 // Not intended for use in the editor.
 export type EnemyType = typeof enemyTypes[number];
@@ -612,8 +613,7 @@ export function moveEnemyToTargetLocation(
     const mag = Math.sqrt(dx * dx + dy * dy);
     if (mag > enemy.speed) {
         moveEnemy(state, enemy, enemy.speed * dx / mag, enemy.speed * dy / mag, {
-            boundToSection: false,
-            boundToSectionPadding: 0,
+            boundingBox: null,
         });
         return mag - enemy.speed;
     }
@@ -889,8 +889,7 @@ export function moveEnemyProper(state: GameState, enemy: Enemy, dx: number, dy: 
     }
     movementProperties.excludedObjects.add(state.hero);
     movementProperties.excludedObjects.add(state.hero.astralProjection);
-    movementProperties.boundToSectionPadding = movementProperties.boundToSectionPadding ?? 16;
-    movementProperties.boundToSection = movementProperties.boundToSection ?? true;
+    movementProperties.boundingBox = movementProperties.boundingBox ?? getSectionBoundingBox(state, enemy, 16);
     for (const clone of enemy.area.objects.filter(object => object instanceof Clone)) {
         movementProperties.excludedObjects.add(clone);
     }
@@ -898,11 +897,10 @@ export function moveEnemyProper(state: GameState, enemy: Enemy, dx: number, dy: 
         const hitbox = enemy.getHitbox(state);
         const ax = enemy.x + dx;
         const ay = enemy.y + dy;
-        if (movementProperties.boundToSection) {
-            const p = movementProperties.boundToSectionPadding ?? 0;
-            const { section } = getAreaSize(state);
-            if (ax < section.x + p || ax + hitbox.w > section.x + section.w - p
-                || ay < section.y + p || ay + hitbox.h > section.y + section.h - p
+        const { boundingBox } = movementProperties;
+        if (boundingBox) {
+            if (ax < boundingBox.x || ax + hitbox.w > boundingBox.x + boundingBox.w
+                || ay < boundingBox.y || ay + hitbox.h > boundingBox.y + boundingBox.h
             ) {
                 return {mx: 0, my: 0};
             }

@@ -1,10 +1,9 @@
 import { sample } from 'lodash';
 
-import { getAreaSize } from 'app/content/areas';
 import { selectDialogueOption } from 'app/content/dialogue';
 import { snakeAnimations } from 'app/content/enemyAnimations';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { moveActor } from 'app/moveActor';
+import { getSectionBoundingBox, moveActor } from 'app/moveActor';
 import { heroAnimations } from 'app/render/heroAnimations';
 import {
     galAnimations, gal2Animations,
@@ -180,17 +179,8 @@ export const npcBehaviors = {
 }
 
 function moveNPC(state, npc: NPC, dx, dy, movementProperties: MovementProperties): boolean {
-    const { section } = getAreaSize(state);
+    movementProperties.boundingBox = movementProperties.boundingBox ?? getSectionBoundingBox(state, npc, 16);
     // By default, don't allow the enemy to move towards the outer edges of the screen.
-    if (movementProperties.boundToSection ?? true) {
-        if ((dx < 0 && npc.x + dx < section.x + 16)
-            || (dx > 0 && npc.x + dx + npc.w > section.x + section.w - 16)
-            || (dy < 0 && npc.y < section.y + 16)
-            || (dy > 0 && npc.y + npc.h > section.y + section.h - 16)
-        ) {
-            return false;
-        }
-    }
     if (npc.flying) {
         npc.x += dx;
         npc.y += dy;
@@ -214,10 +204,7 @@ export function moveNPCToTargetLocation(
     //enemy.currentAnimation = enemy.enemyDefinition.animations.idle[enemy.d];
     const mag = Math.sqrt(dx * dx + dy * dy);
     if (mag > npc.speed) {
-        moveNPC(state, npc, npc.speed * dx / mag, npc.speed * dy / mag, {
-            boundToSection: false,
-            boundToSectionPadding: 0,
-        });
+        moveNPC(state, npc, npc.speed * dx / mag, npc.speed * dy / mag, {});
         return mag - npc.speed;
     }
     moveNPC(state, npc, dx, dy, {});

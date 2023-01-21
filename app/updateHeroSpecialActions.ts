@@ -8,7 +8,7 @@ import { CANVAS_HEIGHT, FALLING_HEIGHT, FRAME_LENGTH, GAME_KEY } from 'app/gameC
 import { editingState } from 'app/development/tileEditor';
 import { getCloneMovementDeltas, isGameKeyDown, wasGameKeyPressed } from 'app/keyCommands';
 import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
-import { moveActor } from 'app/moveActor';
+import { getSectionBoundingBox, moveActor } from 'app/moveActor';
 import { fallAnimation, heroAnimations } from 'app/render/heroAnimations';
 import { saveGame } from 'app/state';
 import { updateCamera } from 'app/updateCamera';
@@ -313,7 +313,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             canJump: hero.action === 'thrown' && hero.z >= 12,
             canPassMediumWalls: hero.action === 'thrown' && hero.z >= 12,
             direction: hero.d,
-            boundToSection: hero.action !== 'knockedHard',
+            boundingBox: hero.action !== 'knockedHard' ? getSectionBoundingBox(state, hero) : undefined,
             excludedObjects
         });
         // The astral projection stays 4px off the ground.
@@ -594,7 +594,7 @@ function performSomersault(state: GameState, hero: Hero) {
             canFall: true,
             canSwim: true,
             direction: hero.d,
-            boundToSection: true,
+            boundingBox: getSectionBoundingBox(state, hero),
         });
         if (result.mx || result.my) {
             if (canSomersaultToCoords(state, hero, {x: hero.x, y: hero.y})) {
@@ -609,7 +609,7 @@ function performSomersault(state: GameState, hero: Hero) {
             canFall: true,
             canSwim: true,
             direction: hero.d,
-            boundToSection: true,
+            boundingBox: getSectionBoundingBox(state, hero),
         });
         hero.area = originalArea;
         if (!result.mx && !result.my) {
