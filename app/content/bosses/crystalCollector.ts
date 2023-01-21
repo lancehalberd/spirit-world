@@ -374,9 +374,9 @@ function updateCrystalCollector(this: void, state: GameState, enemy: Enemy): voi
         if (enemy.params.enrageTime <= 0) {
             enemy.changeToAnimation('idle');
             // Summon new floor eyes, once the enrage mode is over
-            let [tx, ty] = Random.removeElement(enemy.params.eyeLocations);
+            let [tx, ty] = Random.removeElement(enemy.params.eyeLocations as number[][]);
             addFloorEye(state, enemy.area, tx, ty);
-            [tx, ty] = Random.removeElement(enemy.params.eyeLocations);
+            [tx, ty] = Random.removeElement(enemy.params.eyeLocations as number[][]);
             addFloorEye(state, enemy.area, tx, ty);
         } else if (enemy.params.enrageTime <= 3000) {
             enemy.changeToAnimation('confused');
@@ -428,7 +428,7 @@ function updateCrystalCollector(this: void, state: GameState, enemy: Enemy): voi
             [14, 8],  [17, 8],
             [9, 12], [22, 12]
         ];
-        const [tx, ty] = Random.removeElement(enemy.params.eyeLocations);
+        const [tx, ty] = Random.removeElement(enemy.params.eyeLocations as number[][]);
         addFloorEye(state, enemy.area, tx, ty);
         enemy.setMode('sleeping');
     } else if (enemy.mode === 'sleeping') {
