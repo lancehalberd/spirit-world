@@ -590,9 +590,9 @@ const f0_1x1: AreaDefinition = {
                     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
                     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
                     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-                    [1,1,1,1,10,10,10,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-                    [1,1,1,10,10,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-                    [1,1,1,1,10,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                    [1,1,1,1,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                    [1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+                    [1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
                     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
                     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
                     [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
@@ -625,6 +625,7 @@ const f0_1x1: AreaDefinition = {
     objects: [
         {status: "normal", id: "peachCaveUnderwaterEntrance", x: 256, y: 96, type: "door", style: "cave", targetZone: "peachCaveWater", targetObjectId: "peachCaveUnderwaterEntrance", d: "up"},
         {status: "normal", id: "riverTempleWaterEntrance", x: 240, y: 272, type: "door", style: "cave", targetZone: "riverTempleWater", targetObjectId: "riverTempleWaterEntrance", d: "up"},
+        {status: "normal", id: "underwater:0:1x1-vortex-0", x: 112, y: 120, type: "enemy", enemyType: "vortex", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -805,6 +806,9 @@ const f0_1x2: AreaDefinition = {
         {x: 0, y: 0, w: 32, h: 32},
     ],
 };
+const f0_2x0: AreaDefinition = null;
+const f0_2x1: AreaDefinition = null;
+const f0_2x2: AreaDefinition = null;
 const sf0_0x0: AreaDefinition = null;
 const sf0_0x1: AreaDefinition = null;
 const sf0_0x2: AreaDefinition = null;
@@ -819,6 +823,7 @@ zones.underwater = {
             grid: [
                 [f0_0x0,f0_0x1,f0_0x2,],
                 [f0_1x0,f0_1x1,f0_1x2,],
+                [f0_2x0,f0_2x1,f0_2x2,],
             ],
             spiritGrid: [
                 [sf0_0x0,sf0_0x1,sf0_0x2,],

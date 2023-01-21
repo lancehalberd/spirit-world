@@ -1,7 +1,7 @@
-import { GameState, Hero } from 'app/types';
+import { GameState, Hero, ObjectInstance } from 'app/types';
 
-export function isUnderwater(state: GameState, hero: Hero): boolean {
-    return state.zone.surfaceKey && !hero.area.definition.isSpiritWorld;
+export function isUnderwater(state: GameState, actor: ObjectInstance): boolean {
+    return state.zone.surfaceKey && !actor.area.definition.isSpiritWorld;
 }
 
 export function isHeroSinking(state: GameState, hero: Hero): boolean {

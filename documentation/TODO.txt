@@ -39,6 +39,9 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Clones should still be destroyed when protected by iron skin, or be consistently protected.
+        - Right now they are destroyed if not controlled.
+
     - Add underwater mechanics
         - allow swimming over low/medium barriers (set floorHeight to 16px on these)
         - floating ice spikes that damage you and knock back like thorn bushes if you are too high in the water
@@ -66,6 +69,7 @@ Current tasks:
     - Add meteor attacks that leave behind rocks to void tree fight
         - Give to tree + voidFlame
         - Use smaller versions for enrage mode when voidFlame is active
+        - Reduce number of rocks in the golem fight and add this attack to it
 
     - Make sure bow can fire down cliffs in all directions.
 

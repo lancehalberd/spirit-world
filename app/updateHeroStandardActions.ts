@@ -18,7 +18,7 @@ import {
     wasGameKeyPressed,
 } from 'app/keyCommands';
 import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
-import { moveActor } from 'app/moveActor';
+import { getSectionBoundingBox, moveActor } from 'app/moveActor';
 import { getChargeLevelAndElement, isToolButtonPressed, useTool } from 'app/useTool';
 import { isHeroFloating, isHeroSinking, isUnderwater } from 'app/utils/actor';
 import {
@@ -463,7 +463,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 canJump: !hero.isAstralProjection,
                 canSwim: !encumbered,
                 direction: hero.d,
-                boundToSection: hero.isAstralProjection || !!hero.bounce,
+                boundingBox: (hero.isAstralProjection || !!hero.bounce) ? getSectionBoundingBox(state, hero) : undefined,
                 actor: hero,
                 dx: moveX, dy: moveY,
             });

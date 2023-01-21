@@ -151,11 +151,12 @@ export type ObjectStatus = 'active' | 'closed' | 'closedEnemy' | 'closedSwitch'
     | 'locked' | 'bigKeyLocked' | 'cracked' | 'blownOpen' | 'frozen' | 'off';
 
 export interface MovementProperties {
-    boundToSection?: boolean
-    boundToSectionPadding?: number
+    boundingBox?: Rect
     canPush?: boolean
     canFall?: boolean
     canSwim?: boolean
+    // Enemies with this prop can only move in deep water.
+    mustSwim?: boolean
     canClimb?: boolean
     // True when climbing.
     canCrossLedges?: boolean

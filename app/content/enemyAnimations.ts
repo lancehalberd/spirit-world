@@ -324,7 +324,7 @@ export const brownSquirrelAnimations: ActorAnimations = {
     },
 };
 
-function omniAnimation(animation: FrameAnimation) {
+export function omniAnimation(animation: FrameAnimation) {
     return {
         up: animation, down: animation, left: animation, right: animation,
     };
