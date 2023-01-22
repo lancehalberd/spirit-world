@@ -623,11 +623,11 @@ export function moveEnemyToTargetLocation(
     const mag = Math.sqrt(dx * dx + dy * dy);
     if (mag > enemy.speed) {
         moveEnemy(state, enemy, enemy.speed * dx / mag, enemy.speed * dy / mag, {
-            boundingBox: null,
+            boundingBox: false,
         });
         return mag - enemy.speed;
     }
-    moveEnemy(state, enemy, dx, dy, {});
+    moveEnemy(state, enemy, dx, dy, {boundingBox: false});
     return 0;
 }
 

@@ -151,7 +151,7 @@ export type ObjectStatus = 'active' | 'closed' | 'closedEnemy' | 'closedSwitch'
     | 'locked' | 'bigKeyLocked' | 'cracked' | 'blownOpen' | 'frozen' | 'off';
 
 export interface MovementProperties {
-    boundingBox?: Rect
+    boundingBox?: false | Rect
     canPush?: boolean
     canFall?: boolean
     canSwim?: boolean
