@@ -73,12 +73,13 @@ export class FrostGrenade implements EffectInstance, Props {
         context.save();
             context.globalAlpha *= 0.3;
             context.beginPath();
-            const r = 3 * this.w / 4 + Math.cos(this.animationTime / 500) * this.w / 4;
+            let r = this.w / 2 + Math.sin(this.animationTime / 60) * this.w / 8;
             context.arc(this.x, this.y - this.z, r, 0, 2 * Math.PI);
             context.fill();
         context.restore();
         context.beginPath();
-        context.arc(this.x, this.y - this.z, this.w / 2, 0, 2 * Math.PI);
+        r = this.w / 4 + Math.sin(this.animationTime / 60) * this.w / 8;
+        context.arc(this.x, this.y - this.z, r, 0, 2 * Math.PI);
         context.fill();
     }
 }

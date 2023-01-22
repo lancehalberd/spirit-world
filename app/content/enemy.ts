@@ -137,7 +137,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             this.abilities.push({
                 definition: ability,
                 charges: ability.initialCharges ?? 1,
-                cooldown: ability.cooldown || 0,
+                cooldown: ability.initialCooldown || ability.cooldown || 0,
             });
         }
         for (const tauntKey in this.enemyDefinition.taunts ?? []) {

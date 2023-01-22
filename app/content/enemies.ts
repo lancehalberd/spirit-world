@@ -1,6 +1,6 @@
 import { sample } from 'lodash';
 
-import { addSparkleAnimation, iceSparkleAnimation } from 'app/content/effects/animationEffect';
+import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { Clone } from 'app/content/objects/clone';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { AnimationEffect } from 'app/content/effects/animationEffect';
@@ -76,6 +76,8 @@ export interface EnemyAbility<T> {
     useAbility?: (this: EnemyAbility<T>, state: GameState, enemy: Enemy, target: T) => void
     // How long it takes for the enemy to generate a charge. Defaults to 0.
     cooldown?: number
+    // How long it takes to generate a charge for this ability the very first time.
+    initialCooldown?: number
     // Number of charges recovered per cooldown, Defaults to 1.
     chargesRecovered?: number
     // This can be set to parameterize the range for this ability. Defaults to enemy aggro range.
@@ -228,9 +230,10 @@ const iceGrenadeAbility: EnemyAbility<NearbyTargetType> = {
     useAbility(this: void, state: GameState, enemy: Enemy, target: NearbyTargetType): void {
         enemy.changeToAnimation('attack');
         const hitbox = target.target.getHitbox();
-        throwIceGrenadeAtLocation(state, enemy, {tx: hitbox.x + hitbox.w / 2, ty: hitbox.y + hitbox.h / 2});
+        throwIceGrenadeAtLocation(state, enemy, {tx: hitbox.x + hitbox.w / 2, ty: hitbox.y + hitbox.h / 2}, 1, 20);
     },
     cooldown: 3000,
+    initialCooldown: 1000,
     initialCharges: 0,
     charges: 1,
     prepTime: icePlantAnimations.prepare.down.duration,
@@ -240,13 +243,15 @@ enemyDefinitions.frostBeetle = {
     alwaysReset: true,
     abilities: [iceGrenadeAbility],
     animations: icePlantAnimations, speed: 0.7, aggroRadius: 112,
-    life: 5, touchDamage: 1, update: updateFrostBeetle,
+    life: 5, touchDamage: 1,
+    update(state: GameState, enemy: Enemy): void {
+        if (!enemy.activeAbility) {
+            enemy.changeToAnimation('idle');
+            enemy.useRandomAbility(state);
+        }
+    },
     elementalMultipliers: {'fire': 2},
     immunities: ['ice'],
-    renderPreview(context: CanvasRenderingContext2D, enemy: Enemy, target: Rect): void {
-        enemy.defaultRenderPreview(context, target);
-        drawFrameCenteredAt(context, iceSparkleAnimation.frames[1], target);
-    },
     canBeKnockedBack: false,
 };
 enemyDefinitions.lightningBug = {
@@ -451,12 +456,6 @@ function updateFlameSnake(state: GameState, enemy: Enemy): void {
         enemy.params.fireball = flame;
     }
 }
-function updateFrostBeetle(state: GameState, enemy: Enemy): void {
-    if (!enemy.activeAbility) {
-        enemy.changeToAnimation('idle');
-        enemy.useRandomAbility(state);
-    }
-}
 function updateStormLightningBug(state: GameState, enemy: Enemy): void {
     scurryAndChase(state, enemy);
     enemy.params.shieldCooldown = enemy.params.shieldCooldown ?? 1000 + Math.random() * 1000;
@@ -520,11 +519,10 @@ function renderLightningShield(context: CanvasRenderingContext2D, hitbox: Rect, 
         }
     }
 }
-export function throwIceGrenadeAtLocation(state: GameState, enemy: Enemy, {tx, ty}: {tx: number, ty: number}, damage = 1): void {
+export function throwIceGrenadeAtLocation(state: GameState, enemy: Enemy, {tx, ty}: {tx: number, ty: number}, damage = 1, z = 8): void {
     const hitbox = enemy.getHitbox(state);
     const x = hitbox.x + hitbox.w / 2;
     const y = hitbox.y + hitbox.h / 2;
-    const z = 8;
     const vz = 4;
     const az = -0.2;
     const duration = -2 * vz / az;

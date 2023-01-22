@@ -535,7 +535,7 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
             // Cannot freeze ground in hot areas.
             && !area.isHot
             && !behavior?.solid && !behavior?.solidMap && !(behavior?.covered || behavior?.blocksStaff)
-            && !behavior?.pit && !behavior?.ledges
+            && !behavior?.pit && !behavior?.ledges && !behavior?.diagonalLedge
             && !behavior?.isLava && !behavior?.isLavaMap
         ) {
             let topLayer: AreaLayer = area.layers[0];
@@ -682,7 +682,10 @@ export function coverTile(
 ): boolean {
     const behavior = area.behaviorGrid?.[ty]?.[tx];
     // For now solid tiles and pits cannot be covered
-    if (behavior?.solid || behavior?.pit || behavior?.covered || behavior?.blocksStaff) {
+    if (behavior?.solid || behavior?.pit || behavior?.covered
+        || behavior?.blocksStaff || behavior?.solidMap
+        || behavior?.diagonalLedge
+    ) {
         return false;
     }
     let topLayer: AreaLayer = area.layers[0];
