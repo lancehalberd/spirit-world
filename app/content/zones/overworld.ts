@@ -1827,7 +1827,7 @@ const f0_1x1: AreaDefinition = {
         {status: "normal", id: "riverTempleUpperEntrance", x: 240, y: 176, type: "door", style: "woodenDownstairs", targetZone: "riverTemple", targetObjectId: "riverTempleUpperEntrance", d: "up"},
         {status: "normal", id: "overworld:s0:1x1-teleporter-0", x: 400, y: 64, type: "teleporter", linked: true, spirit: true},
         {status: "normal", id: "overworldLakePiece", linked: false, spirit: false, x: 399, y: 35, type: "loot", lootType: "peachOfImmortalityPiece", lootLevel: 1},
-        {status: "normal", id: "homeInstructions", x: 256, y: 112, type: "narration", message: "Well that was fun!\n{|}But I was gone a lot longer than I expected. Maybe I should head back to the waterfall.\n{|}I hope I didn't miss dinner!\n{|}(Follow the river home north to the waterfall.)", delay: 500, w: 32, h: 32},
+        {status: "normal", id: "homeInstructions", x: 256, y: 112, type: "narration", message: "Well that was fun!\n{|}But I was gone a lot longer than I expected. Maybe I should head back to the waterfall.\n{|}I hope I didn't miss dinner!\n{addCue: Press [B_MAP] to view the map}", delay: 500, w: 32, h: 32},
         {status: "normal", id: "overworld:0:1x1-snake-0", x: 336, y: 96, type: "enemy", enemyType: "snake", d: "down", params: {}},
         {status: "normal", id: "overworld:0:1x1-snake-1", x: 64, y: 240, type: "enemy", enemyType: "snake", d: "down", params: {}},
         {status: "normal", id: "overworld:0:1x1-snake-2", x: 192, y: 80, type: "enemy", enemyType: "snake", d: "down", params: {}},

@@ -917,7 +917,9 @@ function getZoneText(zone: LogicalZoneKey): string {
         case 'ascentCaveSpirit': return  'in the spirit world in a cave on the mountain';
         case 'fertilityShrine': return 'in the shrine by the forest village';
         case 'fertilityShrineSpirit': return 'in the shrine by the Forest Temple';
-        case 'holyCityInterior': return 'inside the city';
+        case 'holyCityInterior': return 'inside the Holy City';
+        case 'jadeCityInterior': return 'inside the Jade City';
+        case 'fertilityShrineSpirit': return 'in the shrine by the Forest Temple';
         case 'waterfallCave': return 'in the Cave Village';
         case 'treeVillage': return 'in the Vanara Village';
         case 'peachCave': return 'in the dark cave by the lake';

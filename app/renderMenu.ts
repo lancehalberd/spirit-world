@@ -139,7 +139,7 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
     if (state.hero.silverOre) {
         const frame = getLootFrame(state, {lootType: 'silverOre'});
         const x = r.x + 140, y = r.y + 26;
-        drawFrame(context, frame, {x, y, w: frameSize, h: frameSize});
+        drawFrameCenteredAt(context, frame, {x, y, w: frameSize, h: frameSize});
         drawText(context, `${state.hero.silverOre}`, x + 24, y + frameSize / 2, {
             textBaseline: 'middle',
             textAlign: 'left',
@@ -149,7 +149,7 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
     if (state.hero.goldOre) {
         const frame = getLootFrame(state, {lootType: 'goldOre'});
         const x = r.x + 140, y = r.y + 50;
-        drawFrame(context, frame, {x, y, w: frameSize, h: frameSize});
+        drawFrameCenteredAt(context, frame, {x, y, w: frameSize, h: frameSize});
         drawText(context, `${state.hero.goldOre}`, x + 24, y + frameSize / 2, {
             textBaseline: 'middle',
             textAlign: 'left',

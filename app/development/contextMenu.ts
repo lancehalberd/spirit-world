@@ -222,6 +222,7 @@ function getSettingsMenuOption(): MenuOption {
                             [-] [B_ROLL] Roll
                             [-] [B_MEDITATE] Meditate
                             [-] [B_MENU] Menu
+                            [-] [B_MAP] Map
                             [-] [B_PREVIOUS_ELEMENT] Prev Element
                             [-] [B_NEXT_ELEMENT] Next Element
                         `);

@@ -54,6 +54,8 @@ function getEscapedFrames(state: GameState, escapedToken: string): Frame[] {
             return getGameKeyFrames(GAME_KEY.MEDITATE);
         case 'B_MENU':
             return getGameKeyFrames(GAME_KEY.MENU);
+        case 'B_MAP':
+            return getGameKeyFrames(GAME_KEY.MAP);
         case 'B_PREVIOUS_ELEMENT':
             return getGameKeyFrames(GAME_KEY.PREVIOUS_ELEMENT);
         case 'B_NEXT_ELEMENT':

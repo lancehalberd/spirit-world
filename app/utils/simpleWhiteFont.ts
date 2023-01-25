@@ -24,7 +24,7 @@ for (let i = 1; i < simpleFontString.length; i++) {
 
 const [
     xbox_y, xbox_b, xbox_a, xbox_x,
-    xbox_start, /*xbox_select*/, xbox_dpad,
+    xbox_start, xbox_select, xbox_dpad,
     /*xbox_rightStick*/, xbox_leftStick,
     xbox_r1, xbox_l1, xbox_r2, xbox_l2,
     ps_dpad, ps_start,
@@ -46,7 +46,8 @@ const [
     keyboard_u,
     keyboard_i,
     keyboard_o,
-] = createAnimation('gfx/hud/controllerbuttonswhite.png', {w: 26, h: 18, content: {x: 0, y: 1, w: 26, h: 16}}, {cols: 50}).frames;
+    keyboard_m,
+] = createAnimation('gfx/hud/controllerbuttonswhite.png', {w: 26, h: 18, content: {x: 0, y: 1, w: 26, h: 16}}, {cols: 51}).frames;
 
 const smallKeys = [
     xbox_y, xbox_b, xbox_a, xbox_x, xbox_start,
@@ -64,6 +65,7 @@ export const xboxMap = {
     [GAME_KEY.LEFT]: [xbox_dpad, characterMap['/'], xbox_leftStick],
     [GAME_KEY.RIGHT]: [xbox_dpad, characterMap['/'], xbox_leftStick],
     [GAME_KEY.MENU]: [xbox_start],
+    [GAME_KEY.MAP]: [xbox_select],
     [GAME_KEY.WEAPON]: [xbox_a],
     [GAME_KEY.PASSIVE_TOOL]: [xbox_b],
     [GAME_KEY.LEFT_TOOL]: [xbox_y],
@@ -80,6 +82,7 @@ export const psMap = {
     [GAME_KEY.LEFT]: [ps_dpad, characterMap['/'], ps_leftStick],
     [GAME_KEY.RIGHT]: [ps_dpad, characterMap['/'], ps_leftStick],
     [GAME_KEY.MENU]: [ps_start],
+    [GAME_KEY.MAP]: [ps_start],
     [GAME_KEY.WEAPON]: [ps_x],
     [GAME_KEY.PASSIVE_TOOL]: [ps_circle],
     [GAME_KEY.LEFT_TOOL]: [ps_square],
@@ -96,6 +99,7 @@ export const keyboardMap = {
     [GAME_KEY.LEFT]: [keyboard_wasd],
     [GAME_KEY.RIGHT]: [keyboard_wasd],
     [GAME_KEY.MENU]: [keyboard_enter],
+    [GAME_KEY.MAP]: [keyboard_m],
     [GAME_KEY.WEAPON]: [keyboard_h],
     [GAME_KEY.PASSIVE_TOOL]: [keyboard_space],
     [GAME_KEY.LEFT_TOOL]: [keyboard_y],

@@ -366,16 +366,6 @@ function createLootFrame(color: string, letter: string): Frame {
     return {image: toolCanvas, x: 0, y: 0, w: toolCanvas.width, h: toolCanvas.height};
 }
 
-// BizmasterStudios
-// https://opengameart.org/users/bizmasterstudios
-// https://opengameart.org/content/rpg-crafting-material-icons
-// https://creativecommons.org/licenses/by/4.0/
-export const [
-    silverOre, goldOre
-] = createAnimation('gfx/hud/nails.png',
-    {w: 32, h: 32, content: {x: 8, y: 8, w: 16, h: 16}}, {x:2, y: 2, cols: 2}
-).frames;
-
 export const [
     /*fullPeachFrame*/, goldPeachFrame,
     keyOutlineFrame, bigKeyOutlineFrame,
@@ -389,9 +379,10 @@ export const [
     circlet, phoenixCrown,
     teleportFrame, /* teleportFrame2 */,
     treeStaff, towerStaff,
-    /* recycle */, /* book */, /* scroll1 */, /* scroll2 */, scroll3
+    /* recycle */, /* book */, /* scroll1 */, /* scroll2 */, scroll3,
+    nimbusCloud, /* nimbusCloudTile */, trueSight, goldOre, silverOre,
 ] = createAnimation('gfx/hud/icons.png',
-    {w: 18, h: 18, content: {x: 1, y: 1, w: 16, h: 16}}, {cols: 28}
+    {w: 18, h: 18, content: {x: 1, y: 1, w: 16, h: 16}}, {cols: 33}
 ).frames;
 export const [
     /* container */, fireElement, iceElement, lightningElement, neutralElement, /* elementShine */
@@ -410,7 +401,6 @@ const [/*smallPeach*/, /*fullPeachFrame*/, /*threeQuartersPeach*/, /*halfPeach*/
     createAnimation('gfx/hud/peaches.png', {w: 18, h: 18}, {cols: 3, rows: 2}).frames;
 
 const [weaponFrame] = createAnimation('gfx/chakram1.png', {w: 16, h: 16}, {x: 9}).frames;
-const [cloudFrame] = createAnimation('gfx/tiles/cloud.png', {w: 16, h: 16}, {x: 3, y: 2}).frames;
 
 const smallPeachFrame = {image: requireImage('gfx/hud/peaches.png'), x: 4, y: 3, w: 12, h: 12 };
 const smallMoneyGeometry: FrameDimensions = {w: 16, h: 16, content:{ x: 4, y: 8, w: 8, h: 8}};
@@ -441,9 +431,9 @@ const lootFrames = {
     clone: twoCloneFrame,
     clone2: threeCloneFrame,
     invisibilityCloak,
-    nimbusCloud: cloudFrame,
+    nimbusCloud,
     spiritCloak,
-    trueSight: createLootFrame('blue', 'TS'),
+    trueSight,
     gloves: gloveFrame,
     bracelet,
     roll: mistScrollFrame,
