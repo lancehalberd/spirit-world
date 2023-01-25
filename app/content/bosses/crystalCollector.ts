@@ -19,7 +19,7 @@ import { WallTurret } from 'app/content/objects/wallTurret';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { playSound } from 'app/musicController';
 import { drawFrame, getFrame, drawFrameCenteredAt } from 'app/utils/animations';
-import { getTileBehaviors } from 'app/utils/field';
+import { getTileBehaviors, hitTargets } from 'app/utils/field';
 import Random from 'app/utils/Random';
 
 
@@ -91,6 +91,20 @@ function summonProjectiles(state: GameState, enemy: Enemy, target: EffectInstanc
     }
 }
 
+function getShieldHitbox(enemy: Enemy): Rect {
+    const hitbox = enemy.getDefaultHitbox();
+    const frame = crystalBarrierNormalAnimation.frames[0];
+    const w = (frame.content?.w ?? frame.w) * enemy.scale;
+    const h = (frame.content?.h ?? frame.h) * enemy.scale;
+    return {
+        // Shield is horizontally centered over the eye.
+        x: hitbox.x + (hitbox.w - w) / 2,
+        // Shield hitbox is 16px below the bottom of the eye hitbox.
+        y: hitbox.y + (hitbox.h - h) + 16,
+        w, h,
+    };
+}
+
 enemyDefinitions.crystalCollector = {
     animations: crystalCollectorAnimations, life: 24, touchDamage: 0, update: updateCrystalCollector, params: {
         shieldLife: maxShieldLife,
@@ -105,21 +119,19 @@ enemyDefinitions.crystalCollector = {
     initialAnimation: 'open',
     initialMode: 'initialMode',
     tileBehaviors: {solid: true},
+    // Technically this should probably be rendered as part of the background layer, but we can do something similar
+    // by setting the y depth very low.
+    getYDepth(enemy: Enemy): number {
+        return enemy.y - 16;
+    },
     getHitbox(enemy: Enemy): Rect {
-        const hitbox = enemy.getDefaultHitbox();
-        if (enemy.params.shieldLife) {
-            const frame = crystalBarrierNormalAnimation.frames[0];
-            const w = (frame.content?.w ?? frame.w) * enemy.scale;
-            const h = (frame.content?.h ?? frame.h) * enemy.scale;
-            return {
-                // Shield is horizontally centered over the eye.
-                x: hitbox.x + (hitbox.w - w) / 2,
-                // Shield hitbox is 16px below the bottom of the eye hitbox.
-                y: hitbox.y + (hitbox.h - h) + 16,
-                w, h,
-            };
+        if (enemy.mode === 'initialMode' || enemy.mode === 'sleeping') {
+            return enemy.getDefaultHitbox();
         }
-        return hitbox;
+        if (enemy.params.shieldLife && enemy.params.shieldTime > 0) {
+            return getShieldHitbox(enemy);
+        }
+        return enemy.getDefaultHitbox();
     },
     renderOver(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
         if (enemy.mode === 'initialMode' || enemy.mode === 'sleeping') {
@@ -163,8 +175,12 @@ enemyDefinitions.crystalCollector = {
         if (enemy.mode === 'initialMode' || enemy.mode === 'sleeping' || enemy.mode === 'opening') {
             return {};
         }
+
+        const isPartiallyShielded = enemy.params.enrageTime > 0
+            || enemy.params.shieldTime < crystalBarrierSummonAnimation.duration;
+
         // If the shield is up, only fire damage can hurt it.
-        if (enemy.params.shieldLife > 0) {
+        if (!isPartiallyShielded && enemy.params.shieldLife > 0) {
             if (hit.canDamageCrystalShields) {
                 // Right now shield takes a flat 2 damage no matter the source.
                 if (enemy.params.shieldInvulnerableTime <= 0) {
@@ -191,11 +207,21 @@ enemyDefinitions.crystalCollector = {
                 return { hit: true };
             }
         }
+        // Boss can be damaged when enraged, but takes much less damage
+        if (isPartiallyShielded) {
+            hit = {
+                ...hit,
+                damage: hit.damage / 5,
+            }
+        }
         // Use the default hit behavior, the attack will be blocked if the shield is still up.
         return enemy.defaultOnHit(state, hit);
     },
     getShieldPercent(state: GameState, enemy: Enemy) {
-        return enemy.params.shieldLife / maxShieldLife;
+        // Don't render the shield graphic until it
+        return (enemy.params.shieldTime < crystalBarrierSummonAnimation.duration)
+            ? 0
+            : enemy.params.shieldLife / maxShieldLife;
     }
 };
 function getFloorEye(this: void, state: GameState, area: AreaInstance): Enemy {
@@ -318,7 +344,6 @@ const turnOnRandomCascade = (state: GameState, enemy: Enemy, count = 1) => {
 };
 
 function updateCrystalCollector(this: void, state: GameState, enemy: Enemy): void {
-    // enemy.params.shieldLife = 0;
     const { enrageLevel } = enemy.params;
     if (enemy.params.shieldInvulnerableTime  > 0) {
         enemy.params.shieldInvulnerableTime -= FRAME_LENGTH;
@@ -339,15 +364,11 @@ function updateCrystalCollector(this: void, state: GameState, enemy: Enemy): voi
         enemy.currentAnimation = enemy.animations[enemy.currentAnimationKey][enemy.d];
         enemy.params.enrageTime = 12000;
         enemy.params.enrageLevel = 2;
-        enemy.params.shieldLife = maxShieldLife;
-        enemy.params.shieldTime = 0;
     } else if (enemy.life <= 16 && enrageLevel === 0) {
         enemy.animations = crystalCollectorEnragedAnimations;
         enemy.currentAnimation = enemy.animations[enemy.currentAnimationKey][enemy.d];
         enemy.params.enrageTime = 8000;
         enemy.params.enrageLevel = 1;
-        enemy.params.shieldLife = maxShieldLife;
-        enemy.params.shieldTime = 0;
     }
 
     // Boss doesn't update for half of their iframes to make sure the damage animation isn't
@@ -361,15 +382,39 @@ function updateCrystalCollector(this: void, state: GameState, enemy: Enemy): voi
     if (enemy.currentAnimationKey === 'attack' && enemy.animationTime > 1000 && !(enemy.params.enrageTime > 0)) {
         enemy.changeToAnimation('idle');
     }
-    enemy.useRandomAbility(state);
+    // The crystal ability can be used at any point once the eye is open.
+    if (enemy.mode !== 'initialMode' && enemy.mode !== 'sleeping') {
+        enemy.useRandomAbility(state);
+    }
     // The boss can only use one ability at a time unless it is enraged.
     if (enemy.activeAbility && !(enemy.params.enrageTime > 0)) {
         return;
     }
 
+    if (enemy.params.shieldTime === 200) {
+        hitTargets(state, enemy.area, {
+            canAlwaysKnockback: true,
+            canDamageRollingHero: true,
+            damage: 1,
+            hitAllies: true,
+            hitTiles:true,
+            cutsGround: true,
+            hitbox: getShieldHitbox(enemy),
+            knockback: {
+                vx: 0, vy: 4, vz: 2
+            }
+        });
+    }
+
     enemy.shielded = enemy.params.shieldLife > 0;
     // Enraged behavior
     if (enemy.params.enrageTime > 0) {
+        // Start summoning the shield so it will finish activating at the end of the current rage phase.
+        if (enemy.params.shieldLife <= 0 && enemy.params.enrageTime <= crystalBarrierSummonAnimation.duration) {
+            enemy.params.shieldLife = maxShieldLife;
+            enemy.params.shieldTime = 0;
+        }
+        enemy.params.shieldTime += FRAME_LENGTH;
         enemy.params.enrageTime -= FRAME_LENGTH;
         if (enemy.params.enrageTime <= 0) {
             enemy.changeToAnimation('idle');
@@ -402,7 +447,6 @@ function updateCrystalCollector(this: void, state: GameState, enemy: Enemy): voi
                     summonSpikeAheadOfPlayer(state, enemy);
                 }
             }
-            // Randomly choose "easier" patterns until they are all used, then randomly choose "hard" patterns.
         }
         return;
     } else {

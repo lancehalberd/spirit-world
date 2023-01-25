@@ -39,8 +39,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Waterfall tower boss should take reduced damage instead of having a shield during enrage phase
-
     - Empty shop items shouldn't be solid
 
     - Clones should still be destroyed when protected by iron skin, or be consistently protected.

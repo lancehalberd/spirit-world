@@ -288,8 +288,9 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             return {};
         }
         if (this.shielded) {
+            // When the shield is invulnerable, it still blocks the attacks but it doesn't play the sound.
             if (this.blockInvulnerableFrames) {
-                return {};
+                return { hit: true, blocked: true };
             }
             playSound('blockAttack');
             this.blockInvulnerableFrames = 30;
