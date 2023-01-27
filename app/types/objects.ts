@@ -49,7 +49,10 @@ export interface ObjectInstance {
     shouldReset?: (state: GameState) => boolean
     // Should revert to its original state if missing (Defeated enemy, ball that fell in a pit)
     shouldRespawn?: (state: GameState) => boolean
-    x: number, y: number, z?: number
+    x: number
+    y: number
+    z?: number
+    height?: number
     status: ObjectStatus
     changeStatus?: (state: GameState, status: ObjectStatus) => void
     cleanup?: (state: GameState) => void,
@@ -112,7 +115,10 @@ export interface EffectInstance {
     getDrawPriority?: (state: GameState) => DrawPriority
     // Set this flag for objects that need to update during screen transitions, such as doorways.
     updateDuringTransition?: boolean
-    x?: number, y?: number, z?: number
+    x?: number
+    y?: number
+    z?: number
+    height?: number
     cleanup?: (state: GameState) => void
     // This is called when a user grabs a solid tile
     getHitbox?: (state?: GameState) => Rect
@@ -226,6 +232,7 @@ export interface HitProperties {
     // For example, if the hit is slightly to one side, but the velocity is vertical, the verical direction would be favored.
     vx?: number
     vy?: number
+    zRange?: number[]
     // Hits enemies/bosses.
     hitEnemies?: boolean
     // Hits hero, clones, astral projection
@@ -441,6 +448,24 @@ export interface EscalatorDefinition extends BaseObjectDefinition {
     h: number
 }
 
+export interface SimpleMovementDefinition {
+    d?: Direction
+    speed: number
+    turn: 'left' | 'right' | 'bounce'
+}
+
+export interface SpikeBallDefinition extends BaseObjectDefinition, SimpleMovementDefinition{
+    type: 'spikeBall'
+}
+
+
+export interface EscalatorDefinition extends BaseObjectDefinition {
+    type: 'escalator'
+    speed: 'slow' | 'fast'
+    w: number
+    h: number
+}
+
 export interface EnemyObjectDefinition extends BaseObjectDefinition {
     type: 'enemy',
     enemyType: EnemyType | MinionType,
@@ -471,6 +496,7 @@ export type ObjectDefinition = SimpleObjectDefinition
     | NarrationDefinition
     | NPCDefinition
     | SignDefinition
+    | SpikeBallDefinition
     | TurretDefinition
     | WaterfallDefinition
     ;

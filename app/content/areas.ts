@@ -10,7 +10,7 @@ import { enterZoneByTeleporterCallback } from 'app/content/objects/teleporter';
 import { dropItemFromTable } from 'app/content/objects/lootObject';
 import { checkToUpdateSpawnLocation } from 'app/content/spawnLocations';
 import { zones } from 'app/content/zones';
-import { editingState } from 'app/development/tileEditor';
+import { editingState, refreshEditor } from 'app/development/tileEditor';
 import { createCanvasAndContext } from 'app/dom';
 import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
 import { isPointInShortRect } from 'app/utils/index';
@@ -312,6 +312,9 @@ export function enterLocation(
         if (object.onEnterArea) {
             object.onEnterArea(state);
         }
+    }
+    if (editingState.isEditing) {
+        refreshEditor();
     }
 }
 

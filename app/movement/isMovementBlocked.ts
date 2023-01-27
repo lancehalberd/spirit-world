@@ -53,7 +53,7 @@ export function isMovementBlocked(
 
     // Check for this before tiles so that objects on top of solid tiles can be pushed, such as doors.
     for (const object of area.objects) {
-        if (object.status === 'hidden' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
+        if (object.status === 'gone' || object.status === 'hidden' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
             continue;
         }
         if (movementProperties.excludedObjects?.has(object)) {

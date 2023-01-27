@@ -409,12 +409,15 @@ export class Hero implements Actor, SavedHeroData {
         }
         if (this.ironSkinLife) {
             this.ironSkinCooldown = 3000;
-            if (this.ironSkinLife > damage) {
-                this.ironSkinLife -= damage;
+            if (this.ironSkinLife > damage / 2) {
+                this.ironSkinLife -= damage / 2;
                 state.hero.invulnerableFrames = 50;
+                if (state.hero.clones.filter(clone => !clone.isUncontrollable).length || this !== state.hero) {
+                    destroyClone(state, this);
+                }
                 return;
             } else {
-                damage -= this.ironSkinLife;
+                damage -= 2 * this.ironSkinLife;
                 this.ironSkinLife = 0;
             }
         }

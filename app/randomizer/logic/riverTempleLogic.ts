@@ -45,7 +45,7 @@ export const riverTempleWaterNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'riverTempleWaterMaze2',
-        checks: [{objectId: 'riverTempleSilver', logic: canTravelFarUnderWater}],
+        checks: [{objectId: 'riverTempleSilver', logic: andLogic(canTravelFarUnderWater, {requiredFlags: ['frostBeast']})}],
         paths: [
             {nodeId: 'riverTempleSEArea', logic: canTravelFarUnderWater},
             {nodeId: 'riverTempleSWArea', logic: canTravelFarUnderWater},

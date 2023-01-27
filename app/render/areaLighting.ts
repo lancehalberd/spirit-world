@@ -287,7 +287,7 @@ export function renderAreaLighting(context: CanvasRenderingContext2D, state: Gam
             Math.floor((nextArea.cameraOffset.y - state.camera.y) / lightingGranularity)
         )
         for (const object of nextArea.objects || []) {
-            if (object.status === 'hidden' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
+            if (object.status === 'gone' || object.status === 'hidden' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
                 continue;
             }
             const behaviors = getObjectBehaviors(state, object);

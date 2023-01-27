@@ -221,7 +221,7 @@ export function getLootTypes(): LootType[] {
 export const combinedObjectTypes: ObjectType[] = [
     'anode', 'cathode', 'airBubbles', 'ballGoal', 'beadCascade', 'beadGrate', 'bigChest', 'chest', 'crystalSwitch', 'decoration',
     'door', 'escalator', 'floorSwitch', 'indicator', 'keyBlock', 'loot','marker', 'narration', 'npc', 'pitEntrance',
-    'pushPull', 'rollingBall', 'saveStatue', 'shopItem', 'sign', 'spawnMarker', 'teleporter', 'tippable', 'torch', 'turret',
+    'pushPull', 'rollingBall', 'saveStatue', 'shopItem', 'sign', 'spawnMarker', 'spikeBall', 'teleporter', 'tippable', 'torch', 'turret',
     'vineSprout', 'waterfall', 'waterPot',
 ];
 
@@ -456,6 +456,14 @@ export function createObjectDefinition(
                 saveStatus: definition.saveStatus,
                 status: definition.status || commonProps.status,
                 type: definition.type,
+            };
+        case 'spikeBall':
+            return {
+                ...commonProps,
+                type: definition.type,
+                d: definition.d || 'up',
+                speed: definition.speed || 1,
+                turn: definition.turn || 'bounce',
             };
         case 'narration':
             return {
@@ -769,6 +777,37 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                 value: object.h,
                 onChange(h: number) {
                     object.h = h;
+                    updateObjectInstance(state, object);
+                },
+            });
+            break;
+        case 'spikeBall':
+            rows.push({
+                name: 'direction',
+                value: object.d || 'up',
+                values: ['up', 'down', 'left', 'right'],
+                onChange(d: Direction) {
+                    object.d = d;
+                    updateObjectInstance(state, object);
+                },
+            });
+            rows.push({
+                name: 'speed',
+                value: object.speed,
+                onChange(speed: number) {
+                    if (speed < 0) {
+                        return 0;
+                    }
+                    object.speed = speed;
+                    updateObjectInstance(state, object);
+                },
+            });
+            rows.push({
+                name: 'turn',
+                value: object.turn || 'bounce',
+                values: ['bounce', 'left', 'right'],
+                onChange(turn: 'bounce' | 'left' | 'right') {
+                    object.turn = turn;
                     updateObjectInstance(state, object);
                 },
             });

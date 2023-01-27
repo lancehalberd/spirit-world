@@ -463,7 +463,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 canJump: !hero.isAstralProjection,
                 canSwim: !encumbered,
                 direction: hero.d,
-                boundingBox: (hero.isAstralProjection || !!hero.bounce) ? getSectionBoundingBox(state, hero) : undefined,
+                boundingBox: (hero.isAstralProjection || hero.bounce) ? getSectionBoundingBox(state, hero) : undefined,
                 actor: hero,
                 dx: moveX, dy: moveY,
             });

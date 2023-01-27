@@ -154,7 +154,7 @@ export function isPointOpen(
         return false;
     }
     for (const object of area.objects) {
-        if (object.status === 'hidden' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
+        if (object.status === 'gone' || object.status === 'hidden' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
             continue;
         }
         if (excludedObjects?.has(object)) {
@@ -460,6 +460,14 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
         if (hit.ignoreTargets?.has(object)) {
             continue;
         }
+        // If the hit specifies a z range, skip objects outside of the range.
+        if (hit.zRange) {
+            const z = object.z || 0;
+            const height = object.height || 20;
+            if (z + height < hit.zRange[0] || z > hit.zRange[1]) {
+                continue;
+            }
+        }
         const hitbox = object.getHitbox(state);
         if (hit.hitCircle) {
             const r = hit.hitCircle.r;
@@ -511,9 +519,15 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
                 hitbox.y - hit.hitbox.y + 8 * (hit.vy || 0)
             );
             let knockback = hit.knockback;
-            if (!hit.knockback && hit.knockAwayFrom) {
+            if (!knockback && hit.knockAwayFrom) {
                 const dx = (hitbox.x + hitbox.w / 2) - hit.knockAwayFrom.x;
                 const dy = (hitbox.y + hitbox.h / 2) - hit.knockAwayFrom.y;
+                const mag = Math.sqrt(dx * dx + dy * dy);
+                knockback = mag ? {vx: 4 * dx / mag, vy: 4 * dy / mag, vz: 0} : null;
+            }
+            if (!knockback && hit.knockAwayFromHit) {
+                const dx = (hitbox.x + hitbox.w / 2) - (hit.hitbox.x + hit.hitbox.w / 2);
+                const dy = (hitbox.y + hitbox.h / 2) - (hit.hitbox.y + hit.hitbox.h / 2);
                 const mag = Math.sqrt(dx * dx + dy * dy);
                 knockback = mag ? {vx: 4 * dx / mag, vy: 4 * dy / mag, vz: 0} : null;
             }

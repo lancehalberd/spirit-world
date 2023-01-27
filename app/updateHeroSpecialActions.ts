@@ -301,8 +301,26 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         if (hero.isUncontrollable) {
             hero.explosionTime += FRAME_LENGTH;
         }
-        hero.z += hero.vz;
-        hero.vz = Math.max(-8, hero.vz - 0.5);
+        const isFloating = isUnderwater && hero.equippedBoots !== 'ironBoots';
+        if (isFloating) {
+            hero.vz *= 0.9;
+            hero.vx *= 0.9;
+            hero.vy *= 0.9;
+            hero.z = Math.min(24, hero.z + hero.vz);
+            if (hero.vz < 0.2) {
+                if (hero.action === 'thrown') {
+                    if (!canSomersaultToCoords(state, hero, hero)) {
+                        destroyClone(state, hero);
+                        return;
+                    }
+                }
+                hero.action = null;
+                hero.vz = 0;
+            }
+        } else {
+            hero.z += hero.vz;
+            hero.vz = Math.max(-8, hero.vz - 0.5);
+        }
         // Clones ignore collisions with heroes/other clones when being thrown or knocked.
         const excludedObjects = new Set<ObjectInstance>([state.hero, ...state.hero.clones]);
         // The hero obeys normal collision detection when being knocked around, but they won't trigger effects
@@ -317,7 +335,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             excludedObjects
         });
         // The astral projection stays 4px off the ground.
-        if (hero.z <= minZ) {
+        if (!isFloating && hero.z <= minZ) {
             if (hero.vz <= -8) {
                 const landingHit: HitProperties = {
                     damage: 1,

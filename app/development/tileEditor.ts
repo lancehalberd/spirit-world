@@ -183,6 +183,13 @@ export function toggleEditing() {
         stopEditing(state);
     }
 }
+export function refreshEditor() {
+    if (editingState.isEditing) {
+        const state = getState();
+        stopEditing(state);
+        startEditing(state);
+    }
+}
 export function startEditing(state: GameState) {
     if (!editingState.brush) {
         editingState.brush = {'none': {w: 1,h: 1,tiles: [[0]]}};
