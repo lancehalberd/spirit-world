@@ -129,11 +129,12 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
 
     // Weapon isn't currently part of the selectable menu rows.
     if (state.hero.weapon === 1) {
-        const frame = getLootFrame(state, { lootType: 'weapon', lootLevel: state.hero.weapon });
+        const frame = getLootFrame(state, { lootType: 'weapon', lootLevel: 1 });
         drawFrameCenteredAt(context, frame, {x: r.x + 155, y: r.y, w: frameSize, h: frameSize});
     } else if (state.hero.weapon >= 2) {
-        const frame = getLootFrame(state, { lootType: 'weapon', lootLevel: state.hero.weapon });
+        let frame = getLootFrame(state, { lootType: 'weapon', lootLevel: 1 });
         drawFrameCenteredAt(context, frame, {x: r.x + 150, y: r.y, w: frameSize, h: frameSize});
+        frame = getLootFrame(state, { lootType: 'weapon', lootLevel: state.hero.weapon });
         drawFrameCenteredAt(context, frame, {x: r.x + 155, y: r.y, w: frameSize, h: frameSize});
     }
     if (state.hero.silverOre) {

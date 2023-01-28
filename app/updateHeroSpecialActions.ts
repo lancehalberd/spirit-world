@@ -301,7 +301,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         if (hero.isUncontrollable) {
             hero.explosionTime += FRAME_LENGTH;
         }
-        const isFloating = isUnderwater && hero.equippedBoots !== 'ironBoots';
+        const isFloating = isUnderwater(state, hero) && hero.equippedBoots !== 'ironBoots';
         if (isFloating) {
             hero.vz *= 0.9;
             hero.vx *= 0.9;

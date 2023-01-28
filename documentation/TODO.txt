@@ -39,6 +39,17 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Improve projectile interactions
+        - Set stopX/Y when stopping a projectile which will prevent them from appearing to go through cliffs.
+        - Set raised/lowered on hitResult that indicate the projectile went up or down a ledge.
+
+    - Projectiles should be able to shoot down over solid ledges, but not up them
+        - Make solid ledges actually ledges but prevent jumping over them
+        - Might have to implement this as a one way ledge to prevent the down ledge from causing the player to ignore walls.
+            - Does not allow jumping down
+            - Blocks moving into as if going up a ledge
+            - Could implement with solidLedges+solidDiagonalLedge
+
     - Add underwater mechanics
         - allow swimming over low/medium barriers (set floorHeight to 16px on these)
         - Swarms of fish that are composed of fish shaped particles that chase the player
@@ -65,8 +76,6 @@ Current tasks:
         - Give to tree + voidFlame
         - Use smaller versions for enrage mode when voidFlame is active
         - Reduce number of rocks in the golem fight and add this attack to it
-
-    - Make sure bow can fire down cliffs in all directions.
 
     - Spawn up to 2 Lightning Drones in void tree fight
 

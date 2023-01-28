@@ -54,7 +54,7 @@ export function getLootName(state: GameState, lootType: LootType, lootLevel?: nu
             if (lootLevel === 1) {
                 return 'Spirit Bow';
             }
-            return 'Magical Bow';
+            return 'Golden Bow';
         case 'cloak':
             if (lootLevel === 1) {
                 return 'Spirit Cloak';
@@ -67,7 +67,7 @@ export function getLootName(state: GameState, lootType: LootType, lootLevel?: nu
             return 'Tower Staff';
         case 'clone':
             if (lootLevel === 1) {
-                return 'Clone Techique';
+                return 'Clone';
             }
             return 'Double Clone';
         case 'roll':
@@ -92,7 +92,7 @@ export function getLootName(state: GameState, lootType: LootType, lootLevel?: nu
             if (lootLevel === 1) {
                 return 'Chakram';
             }
-            return 'Spirit Chakram';
+            return 'Golden Chakram';
         case 'spiritSight': return 'Spirit Sight';
         case 'astralProjection': return 'Summoner\'s Circlet';
         case 'teleportation': return 'Teleportation';
@@ -109,7 +109,7 @@ export function getLootName(state: GameState, lootType: LootType, lootLevel?: nu
         case 'leatherBoots': return 'Leather Boots';
         case 'ironBoots': return 'Iron Boots';
         case 'cloudBoots': return 'Cloud Boots';
-        case 'fireBlessing': return 'Cooling Spirit';
+        case 'fireBlessing': return 'Fire Blessing';
         case 'waterBlessing': return 'Water Blessing';
         case 'lightningBlessing': return 'Ancient Badge';
         case 'silverOre': return 'Silver Ore';
@@ -127,29 +127,28 @@ export function getLootGetMessage(state: GameState, lootType: LootType, lootLeve
         case 'smallKey': return 'You found a small key!';
         case 'peachOfImmortality': return 'You ate a Golden Peach!';
         case 'peachOfImmortalityPiece': return 'You found a Golden Peach Slice!';
+        // Learned techniques
+        case 'roll':
         case 'clone':
-            if (state.hero.activeTools.clone === 1) {
-                return 'You learned the Clone Techique!' + equipToolMessage;
-            }
-            return 'You learned the Double Clone Techique!' + equipToolMessage;
+        case 'teleportation':
+            return `You learned the ${lootName} Techique!` + equipToolMessage;
+        // obtained tools
         case 'bow':
         case 'cloak':
         case 'staff':
             return `You have obtained the ${lootName}!` + equipToolMessage;
-        case 'roll':
-            if (state.hero.passiveTools.roll === 1) {
-                return 'You learned the Mist Roll Technique!';
-            }
-            return 'You learned the Cloud Somersault Technique!';
-        case 'catEyes': return `You have been blessed with ${lootName}!`;
-        case 'ironSkin': return `You have been blessed with ${lootName}!`;
-        case 'spiritSight': return `You have been blessed with ${lootName}!`;
-        case 'trueSight': return `You have been blessed with ${lootName}!`;
-        case 'teleportation': return 'You have learned Teleportation!';
-        case 'fire': return 'You have received the Fire Element!' + getEquipElementMessage(state) + getChargeMessage(state);
-        case 'ice': return 'You have received the Ice Element!' + getEquipElementMessage(state) + getChargeMessage(state);
-        case 'lightning': return 'You have received the Lightning Element!' + getEquipElementMessage(state) + getChargeMessage(state);
-        case 'fireBlessing': return 'You have absorbed a Cooling Spirit!';
+        // blessed with passives
+        case 'catEyes':
+        case 'ironSkin':
+        case 'spiritSight':
+        case 'trueSight':
+            return `You have been blessed with ${lootName}!`;
+        // received elements
+        case 'fire':
+        case 'ice':
+        case 'lightning':
+            return `You have received the ${lootName}!` + getEquipElementMessage(state) + getChargeMessage(state);
+        case 'fireBlessing': return 'You have received the Blessing of Fire!';
         case 'waterBlessing': return 'You have received the Blessing of Water!';
         case 'lightningBlessing': return `You have obtained the ${lootName}!`;
         case 'money': return `You found ${lootAmount || 1} Jade!`;
@@ -369,7 +368,7 @@ function createLootFrame(color: string, letter: string): Frame {
 export const [
     /*fullPeachFrame*/, goldPeachFrame,
     keyOutlineFrame, bigKeyOutlineFrame,
-    bowOutlineFrame, mistScrollFrame,
+    bow, mistScrollFrame,
     spiritSightFrame,
     catEyes,
     twoCloneFrame, threeCloneFrame, /* fourCloneFrame */,
@@ -380,9 +379,14 @@ export const [
     teleportFrame, /* teleportFrame2 */,
     treeStaff, towerStaff,
     /* recycle */, /* book */, /* scroll1 */, /* scroll2 */, scroll3,
-    nimbusCloud, /* nimbusCloudTile */, trueSight, goldOre, silverOre,
+    nimbusCloud, trueSight,
+    goldOre, silverOre,
+    goldMedal, silverMedal, bronzeMedal,
+    waterBlessing, fireBlessing, lightningBlessing,
+    goldBow,
+    silverChakram, goldChakram,
 ] = createAnimation('gfx/hud/icons.png',
-    {w: 18, h: 18, content: {x: 1, y: 1, w: 16, h: 16}}, {cols: 33}
+    {w: 18, h: 18, content: {x: 1, y: 1, w: 16, h: 16}}, {cols: 41}
 ).frames;
 export const [
     /* container */, fireElement, iceElement, lightningElement, neutralElement, /* elementShine */
@@ -399,8 +403,6 @@ const [invisibilityCloak] = createAnimation('gfx/hud/cloak2.png',
 
 const [/*smallPeach*/, /*fullPeachFrame*/, /*threeQuartersPeach*/, /*halfPeach*/, /*quarterPeach*/, peachPieceFrame] =
     createAnimation('gfx/hud/peaches.png', {w: 18, h: 18}, {cols: 3, rows: 2}).frames;
-
-const [weaponFrame] = createAnimation('gfx/chakram1.png', {w: 16, h: 16}, {x: 9}).frames;
 
 const smallPeachFrame = {image: requireImage('gfx/hud/peaches.png'), x: 4, y: 3, w: 12, h: 12 };
 const smallMoneyGeometry: FrameDimensions = {w: 16, h: 16, content:{ x: 4, y: 8, w: 8, h: 8}};
@@ -425,7 +427,6 @@ const lootFrames = {
     goldMail: createLootFrame('orange', 'Au'),
     ironSkin: createLootFrame('grey', 'Fe'),
     bigKey: bigKeyOutlineFrame,
-    bow: bowOutlineFrame,
     catEyes: catEyes,
     charge: neutralElement,
     clone: twoCloneFrame,
@@ -451,13 +452,11 @@ const lootFrames = {
     leatherBoots: normalBoots,
     ironBoots: ironBoots,
     cloudBoots: cloudBoots,
-    fireBlessing: createLootFrame('red', 'Fir'),
-    waterBlessing: createLootFrame('blue', 'Wat'),
-    lightningBlessing: createLootFrame('green', 'Fr'),
-    weapon: weaponFrame,
+    fireBlessing,
+    waterBlessing,
+    lightningBlessing,
     // This is invisible for now, an effect is applied to the HUD representing this.
     secondChance: {image: createCanvasAndContext(16, 16)[0], x :0, y: 0, w: 16, h: 16},
-    victoryPoint: createLootFrame('green', 'VP'),
 } as const;
 
 const [
@@ -480,6 +479,18 @@ export function getLootFrame(state: GameState, {lootType, lootLevel, lootAmount}
             return darkHalf;
         }
         return wholeCoin;
+    }
+    if (lootType === 'weapon') {
+        if (lootLevel === 1 || (lootLevel === 0 && !state.hero.weapon)){
+            return silverChakram;
+        }
+        return goldChakram;
+    }
+    if (lootType === 'bow') {
+        if (lootLevel === 1 || (lootLevel === 0 && !state.hero.activeTools.bow)){
+            return bow;
+        }
+        return goldBow;
     }
     if (lootType === 'cloak') {
         if (lootLevel === 1 || (lootLevel === 0 && !state.hero.activeTools.cloak)){
@@ -519,6 +530,15 @@ export function getLootFrame(state: GameState, {lootType, lootLevel, lootAmount}
             return lootFrames.astralProjection;
         }
         return lootFrames.teleportation;
+    }
+    if (lootType === 'victoryPoint') {
+        if (lootAmount >= 5) {
+            return goldMedal;
+        }
+        if (lootAmount > 1) {
+            return silverMedal;
+        }
+        return bronzeMedal;
     }
     return lootFrames[lootType] || lootFrames.unknown;
 }

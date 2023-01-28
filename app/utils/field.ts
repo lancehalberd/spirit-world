@@ -592,7 +592,10 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
             area.checkToRedrawTiles = true;
             resetTileBehavior(area, target);
         }
+        // Determine if this hit a solid wall that would stop a projectile:
         const direction = (hit.vx || hit.vy) ? getDirection(hit.vx, hit.vy, true) : null;
+
+        // This hit a tile that could be cut so we ignore
         if (behavior?.cuttable <= hit.damage && (!behavior?.low || hit.cutsGround)) {
             // We need to find the specific cuttable layers that can be destroyed.
             for (const layer of area.layers) {
@@ -602,7 +605,9 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
                 }
             }
             combinedResult.hit = true;
-        } else if (
+            continue;
+        }
+        if (
             (
                 (behavior?.cuttable > hit.damage || behavior?.solid)
                 && (!behavior?.low || hit.cutsGround)
@@ -610,7 +615,7 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
             )
             || (direction === 'upleft' && (behavior?.ledges?.down || behavior?.ledges?.right || behavior?.diagonalLedge === 'downright'))
             || (direction === 'up' && (behavior?.ledges?.down || behavior?.diagonalLedge === 'downleft' || behavior?.diagonalLedge === 'downright'))
-            || (direction === 'upright' && (behavior?.ledges?.down || behavior?.diagonalLedge === 'downleft' || behavior?.ledges?.right))
+            || (direction === 'upright' && (behavior?.ledges?.down || behavior?.diagonalLedge === 'downleft' || behavior?.ledges?.left))
             || (direction === 'downleft' && (behavior?.ledges?.up || behavior?.ledges?.right || behavior?.diagonalLedge === 'upright'))
             || (direction === 'down' && (behavior?.ledges?.up || behavior?.diagonalLedge === 'upleft' || behavior?.diagonalLedge === 'upright'))
             || (direction === 'downright' && (behavior?.ledges?.up || behavior?.diagonalLedge === 'upleft' || behavior?.ledges?.left))
