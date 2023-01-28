@@ -1,6 +1,6 @@
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { createCanvasAndContext } from 'app/dom';
 import { drawFrameAt } from 'app/utils/animations';
+import { createCanvasAndContext } from 'app/utils/canvas';
 import { requireImage } from 'app/utils/images';
 import {
     AreaInstance, DrawPriority, Frame, FrameWithPattern, GameState,

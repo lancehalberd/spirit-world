@@ -1,7 +1,6 @@
-import { mainCanvas } from 'app/dom';
 import { CANVAS_SCALE } from 'app/gameConstants';
-
 import { getContextMenu, hideContextMenu, showContextMenu } from 'app/development/contextMenu';
+import { mainCanvas } from 'app/utils/canvas';
 import { getMousePosition, } from 'app/utils/mouse';
 
 

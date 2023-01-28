@@ -1,5 +1,5 @@
 import { hideTooltip, showTooltip } from 'app/development/tooltip';
-import { createCanvasAndContext } from 'app/dom';
+import { createCanvasAndContext } from 'app/utils/canvas';
 import { getMousePosition } from 'app/utils/mouse';
 
 import { Rect } from 'app/types';

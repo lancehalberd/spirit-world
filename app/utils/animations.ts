@@ -1,5 +1,5 @@
-import { createCanvasAndContext, debugCanvas } from 'app/dom';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { createCanvas, createCanvasAndContext, debugCanvas } from 'app/utils/canvas';
 import { requireImage } from 'app/utils/images';
 import {
     ExtraAnimationProperties, Frame, FrameAnimation, FrameDimensions, FrameRectangle,
@@ -183,3 +183,13 @@ debugCanvas;
     context.drawImage(image, x | 0, y | 0, w | 0, h | 0, tx | 0, ty | 0, w | 0, h | 0);
 }*/
 
+export function createFrameCanvas(frame: Frame, scale: number = 1): HTMLCanvasElement {
+    const canvas = createCanvas(frame.w, frame.h);
+    if (scale !== 1) {
+        canvas.style.transform = `scale(${scale})`;
+    }
+    const context = canvas.getContext('2d');
+    context.imageSmoothingEnabled = false;
+    drawFrame(context, frame, {x: 0, y: 0, w: frame.w, h: frame.h});
+    return canvas;
+}

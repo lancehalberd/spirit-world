@@ -1,7 +1,7 @@
 import { getAreaSize } from 'app/content/areas';
-import { debugCanvas } from 'app/dom';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
+import { debugCanvas } from 'app/utils/canvas';
 import { isPointOpen } from 'app/utils/field';
 
 import { AreaInstance, Direction, DrawPriority, Hero, MagicElement, GameState, ObjectInstance, ObjectStatus, TileBehaviors } from 'app/types';

@@ -11,9 +11,9 @@ import {
     throwIceGrenadeAtLocation,
 } from 'app/content/enemies';
 import { enemyDeathAnimation, snakeAnimations } from 'app/content/enemyAnimations';
-import { createCanvasAndContext } from 'app/dom';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame } from 'app/utils/animations';
+import { createCanvasAndContext } from 'app/utils/canvas';
 import { playSound } from 'app/musicController';
 import { getDirection, hitTargets } from 'app/utils/field';
 import { allImagesLoaded } from 'app/utils/images';

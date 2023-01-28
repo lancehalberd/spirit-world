@@ -2,7 +2,6 @@ import { enterLocation, enterZoneByTarget, playAreaSound } from 'app/content/are
 import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
 import { findObjectInstanceById } from 'app/content/objects';
 import { editingState } from 'app/development/tileEditor';
-import { createCanvasAndContext } from 'app/dom';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { getVectorToTarget } from 'app/content/enemies';
 import {
@@ -11,6 +10,7 @@ import {
     renderForegroundObjects,
 } from 'app/render';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
+import { createCanvasAndContext } from 'app/utils/canvas';
 import { directionMap, getTileBehaviors } from 'app/utils/field';
 import { isObjectInsideTarget, pad } from 'app/utils/index';
 

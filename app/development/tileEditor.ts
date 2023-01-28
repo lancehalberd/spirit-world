@@ -32,12 +32,12 @@ import {
 } from 'app/development/propertyPanel';
 import { TabContainer } from 'app/development/tabContainer';
 import { checkToRefreshMinimap, renderZoneTabContainer, renderZoneEditor } from 'app/development/zoneEditor';
-import { mainCanvas } from 'app/dom';
 import { CANVAS_SCALE } from 'app/gameConstants';
 import { KEY, isKeyboardKeyDown } from 'app/keyCommands';
 import { translateContextForAreaAndCamera } from 'app/render';
 import { getState } from 'app/state';
 import { drawFrame } from 'app/utils/animations';
+import { mainCanvas } from 'app/utils/canvas';
 import { readImageFromFile } from 'app/utils/index';
 import { getMousePosition, isMouseDown, /*isMouseOverElement*/ } from 'app/utils/mouse';
 
@@ -279,6 +279,10 @@ export function stopEditing(state: GameState) {
     state.areaInstance.checkToRedrawTiles = true;
 }
 
+export function refreshArea(state: GameState) {
+    enterLocation(state, state.location, true, undefined, true, false, true);
+}
+
 function applyToolToSelectedObject() {
     if (editingState.tool === 'enemy') {
         editingState.selectedObject.type = 'enemy';
@@ -445,7 +449,7 @@ function getBrushContextProperties(): PanelRows {
                 id: `layer-${i}-select`,
                 onClick() {
                     editingState.selectedLayerKey = definition.key;
-                    enterLocation(state, state.location);
+                    refreshArea(state);
                     displayTileEditorPropertyPanel();
                 }
             })
@@ -455,7 +459,7 @@ function getBrushContextProperties(): PanelRows {
                 id: `layer-${i}-unselect`,
                 onClick() {
                     delete editingState.selectedLayerKey;
-                    enterLocation(state, state.location);
+                    refreshArea(state);
                     displayTileEditorPropertyPanel();
                 }
             })
@@ -478,7 +482,7 @@ function getBrushContextProperties(): PanelRows {
                     }
                 }
                 // Calling this will instantiate the area again and place the player back in their current location.
-                enterLocation(state, state.location);
+                refreshArea(state);
                 displayTileEditorPropertyPanel();
             },
         });
@@ -492,7 +496,7 @@ function getBrushContextProperties(): PanelRows {
                     if (state.areaInstance.alternateArea.definition.layers) {
                         state.areaInstance.alternateArea.definition.layers.splice(i, 1);
                     }
-                    enterLocation(state, state.location);
+                    refreshArea(state);
                     displayTileEditorPropertyPanel();
                 },
             });
@@ -511,7 +515,7 @@ function getBrushContextProperties(): PanelRows {
                     if (alternateDefinition) {
                         alternateDefinition.drawPriority = drawPriority;
                     }
-                    enterLocation(state, state.location);
+                    refreshArea(state);
                 },
             }];
             row.push({
@@ -528,7 +532,7 @@ function getBrushContextProperties(): PanelRows {
                             = state.areaInstance.alternateArea.definition.layers[i - 1];
                         state.areaInstance.alternateArea.definition.layers[i - 1] = alternateDefinition;
                     }
-                    enterLocation(state, state.location);
+                    refreshArea(state);
                     displayTileEditorPropertyPanel();
                 },
             });
@@ -545,7 +549,7 @@ function getBrushContextProperties(): PanelRows {
                         state.areaInstance.alternateArea.definition.layers[i] = state.areaInstance.alternateArea.definition.layers[i + 1];
                         state.areaInstance.alternateArea.definition.layers[i + 1] = alternateDefinition;
                     }
-                    enterLocation(state, state.location);
+                    refreshArea(state);
                     displayTileEditorPropertyPanel();
                 },
             });
@@ -578,8 +582,7 @@ function getBrushContextProperties(): PanelRows {
                             delete alternateDefinition.hasCustomLogic;
                         }
                     }
-                    // Calling this will instantiate the area again and place the player back in their current location.
-                    enterLocation(state, state.location);
+                    refreshArea(state);
                     displayTileEditorPropertyPanel();
                 },
             });
@@ -592,8 +595,7 @@ function getBrushContextProperties(): PanelRows {
                         if (alternateDefinition) {
                             alternateDefinition.customLogic = customLogic;
                         }
-                        // Calling this will instantiate the area again and place the player back in their current location.
-                        enterLocation(state, state.location);
+                        refreshArea(state);
                         displayTileEditorPropertyPanel();
                     },
                 });
@@ -613,8 +615,7 @@ function getBrushContextProperties(): PanelRows {
                             delete alternateDefinition.invertLogic;
                         }
                     }
-                    // Calling this will instantiate the area again and place the player back in their current location.
-                    enterLocation(state, state.location);
+                    refreshArea(state);
                     displayTileEditorPropertyPanel();
                 },
             });
@@ -642,7 +643,7 @@ function getBrushContextProperties(): PanelRows {
             if (editingState.selectedLayerKey) {
                 editingState.selectedLayerKey = key;
             }
-            enterLocation(state, state.location);
+            refreshArea(state);
             displayTileEditorPropertyPanel();
         }
     });
@@ -849,8 +850,7 @@ function drawBrush(targetX: number, targetY: number): void {
             }
         }
         if (addedNewLayer) {
-            // Calling this will instantiate the area again and place the player back in their current location.
-            enterLocation(state, state.location);
+            refreshArea(state);
             area = state.areaInstance;
             displayTileEditorPropertyPanel();
         }
@@ -1303,7 +1303,7 @@ function performGlobalTileReplacement(oldPalette: TilePalette, newPalette: TileP
             if (state.location.zoneKey !== zoneKey) {
                 state.location.zoneKey = zoneKey;
                 state.location.floor = 0;
-                enterLocation(state, state.location);
+                refreshArea(state);
                 displayTileEditorPropertyPanel();
             }
             return;
@@ -1349,7 +1349,7 @@ function fixMismatchedLayers(): void {
             if (state.location.zoneKey !== zoneKey) {
                 state.location.zoneKey = zoneKey;
                 state.location.floor = 0;
-                enterLocation(state, state.location);
+                refreshArea(state);
                 displayTileEditorPropertyPanel();
             }
             return;

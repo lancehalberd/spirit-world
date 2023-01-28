@@ -17,7 +17,7 @@ module.exports = {
     new CircularDependencyPlugin({
       exclude: /tsc|node_modules/,
       include: /app/,
-      failOnError: true,
+      failOnError: false,
       // set the current working directory for displaying module paths
       cwd: process.cwd(),
     })

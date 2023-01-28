@@ -1,8 +1,7 @@
-import { createCanvasAndContext } from 'app/dom';
 import { CrystalSpike, drawArrow, drawCrystal, EnemyArrow } from 'app/content/effects/arrow';
-
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame } from 'app/utils/animations';
+import { createCanvasAndContext } from 'app/utils/canvas';
 import { directionMap } from 'app/utils/field';
 import {
     AreaInstance, DrawPriority, GameState, ObjectInstance, ObjectStatus, TurretDefinition,

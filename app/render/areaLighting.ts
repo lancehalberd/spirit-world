@@ -1,12 +1,12 @@
 import { getObjectBehaviors } from 'app/content/objects';
 import { Clone } from 'app/content/objects/clone';
 import { editingState } from 'app/development/tileEditor';
-import { createCanvasAndContext, drawCanvas } from 'app/dom';
 import {
     CANVAS_HEIGHT, CANVAS_WIDTH, FRAME_LENGTH,
 } from 'app/gameConstants';
 import { heroCarryAnimations } from 'app/render/heroAnimations';
 
+import { createCanvasAndContext, drawCanvas } from 'app/utils/canvas';
 import { carryMap, directionMap } from 'app/utils/field';
 
 import { AreaInstance, GameState } from 'app/types';

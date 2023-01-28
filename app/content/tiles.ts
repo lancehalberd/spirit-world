@@ -9,8 +9,8 @@ import {
     BITMAP_RIGHT_6, BITMAP_RIGHT_6_BOTTOM_9, BITMAP_RIGHT_6_TOP_5,
 } from 'app/content/bitMasks';
 import { simpleLootTable, lifeLootTable, moneyLootTable } from 'app/content/lootTables';
-import { createCanvasAndContext, debugCanvas } from 'app/dom';
 import { createAnimation, drawFrame, drawTintedImage } from 'app/utils/animations';
+import { createCanvasAndContext, debugCanvas } from 'app/utils/canvas';
 import { allImagesLoaded, requireImage } from 'app/utils/images';
 
 import { Frame, FullTile, TileBehaviors, TileHashMap } from 'app/types';

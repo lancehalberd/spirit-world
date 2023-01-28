@@ -20,9 +20,9 @@ import {
 } from 'app/content/enemies';
 import { certainLifeLootTable } from 'app/content/lootTables';
 import { saveObjectStatus } from 'app/content/objects';
-import { createCanvasAndContext } from 'app/dom';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
+import { createCanvasAndContext } from 'app/utils/canvas';
 import { addScreenShake, rotateDirection } from 'app/utils/field';
 import { allImagesLoaded } from 'app/utils/images';
 import { rectanglesOverlap } from 'app/utils/index';

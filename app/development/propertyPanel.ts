@@ -1,8 +1,9 @@
 import { palettes } from 'app/content/palettes';
 import { addNewTile, allTiles, generateTileHash, generateTileHashMap } from 'app/content/tiles';
-import { createCanvas, tagElement } from 'app/dom';
+import { tagElement } from 'app/dom';
 import { KEY, isKeyboardKeyDown } from 'app/keyCommands';
 import { drawFrame } from 'app/utils/animations';
+import { createCanvas } from 'app/utils/canvas';
 import { getMousePosition, isMouseDown } from 'app/utils/mouse';
 
 import {

@@ -1,8 +1,8 @@
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { removeEffectFromArea } from 'app/content/areas';
-import { createCanvasAndContext } from 'app/dom';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, drawFrameAt, getFrame } from 'app/utils/animations';
+import { createCanvasAndContext } from 'app/utils/canvas';
 import { hitTargets } from 'app/utils/field';
 import { allImagesLoaded } from 'app/utils/images';
 

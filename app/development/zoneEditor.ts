@@ -8,10 +8,11 @@ import { exportZoneToClipboard, importZone, serializeZone } from 'app/developmen
 import { TabContainer } from 'app/development/tabContainer';
 import { renderPropertyRows } from 'app/development/propertyPanel';
 import { displayTileEditorPropertyPanel, editingState, EditingState } from 'app/development/tileEditor';
-import { createCanvasAndContext, tagElement } from 'app/dom';
+import { tagElement } from 'app/dom';
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
 import { checkToRedrawTiles } from 'app/render';
 import { getFullZoneLocation, getState } from 'app/state';
+import { createCanvasAndContext } from 'app/utils/canvas';
 import { readFromFile, saveToFile, scaleRect } from 'app/utils/index';
 import { getMousePosition, isMouseDown } from 'app/utils/mouse';
 
@@ -64,6 +65,10 @@ mapOverlayCanvas.onmousemove = function (e: MouseEvent) {
       return;
   }
   jumpToMinimapLocation();
+}
+
+function refreshArea(state: GameState) {
+    enterLocation(state, state.location, true, undefined, true, false, true);
 }
 
 function jumpToMinimapLocation() {
@@ -275,7 +280,7 @@ export function getImportExportProperties(): PanelRows {
                 const state = getState();
                 state.location.zoneKey = importZone(contents, state.location.zoneKey);
                 state.location.floor = 0;
-                enterLocation(state, state.location);
+                refreshArea(state);
                 displayTileEditorPropertyPanel();
             });
         },
@@ -286,7 +291,7 @@ export function getImportExportProperties(): PanelRows {
                 const state = getState();
                 state.location.zoneKey = importZone(contents, state.location.zoneKey);
                 state.location.floor = 0;
-                enterLocation(state, state.location);
+                refreshArea(state);
                 displayTileEditorPropertyPanel();
             });
         },
@@ -313,7 +318,7 @@ export function getBehaviorProperties(): PanelRows {
                 } else {
                     state.areaInstance.definition.specialBehaviorKey = specialBehaviorKey;
                 }
-                enterLocation(state, state.location);
+                refreshArea(state);
                 displayTileEditorPropertyPanel();
             },
         });
@@ -367,12 +372,12 @@ export function getBehaviorProperties(): PanelRows {
             } else {
                 state.areaInstance.definition.dark = dark;
             }
-            enterLocation(state, state.location);
+            refreshArea(state);
         }
     });
     rows = [...rows, ...getLogicProperties(state, 'Is Hot?', state.areaInstance.definition.hotLogic || {}, updatedLogic => {
         state.areaInstance.definition.hotLogic = updatedLogic;
-        enterLocation(state, state.location);
+        refreshArea(state);
         displayTileEditorPropertyPanel();
     })];
     rows.push({
@@ -380,8 +385,7 @@ export function getBehaviorProperties(): PanelRows {
         onClick() {
             state.location.x = state.hero.x;
             state.location.y = state.hero.y;
-            // Calling this will instantiate the area again and place the player back in their current location.
-            enterLocation(state, state.location);
+            refreshArea(state);
         }
     });
     return rows;
@@ -399,7 +403,7 @@ export function getZoneProperties(): PanelRows {
             if (state.location.zoneKey !== zoneKey) {
                 state.location.zoneKey = zoneKey;
                 state.location.floor = 0;
-                enterLocation(state, state.location);
+                refreshArea(state);
                 displayTileEditorPropertyPanel();
             }
         }
@@ -423,7 +427,7 @@ export function getZoneProperties(): PanelRows {
             zones[newZoneKey] = zone;
             state.location.zoneKey = zone.key;
             state.location.floor = 0;
-            enterLocation(state, state.location);
+            refreshArea(state);
             displayTileEditorPropertyPanel();
         },
     },
@@ -435,7 +439,7 @@ export function getZoneProperties(): PanelRows {
             const floorNumber = parseInt(floorString, 10) - 1;
             if (state.location.floor !== floorNumber) {
                 state.location.floor = floorNumber;
-                enterLocation(state, state.location);
+                refreshArea(state);
                 displayTileEditorPropertyPanel();
             }
         }
@@ -457,7 +461,7 @@ export function getZoneProperties(): PanelRows {
             }
             state.zone.floors.push(floor);
             state.location.floor = state.zone.floors.length - 1;
-            enterLocation(state, state.location);
+            refreshArea(state);
             displayTileEditorPropertyPanel();
         },
     }]);
@@ -500,7 +504,7 @@ export function getZoneProperties(): PanelRows {
                         }
                     }
                 }
-                enterLocation(state, state.location);
+                refreshArea(state);
                 displayTileEditorPropertyPanel();
             }
         }
@@ -523,7 +527,7 @@ export function getZoneProperties(): PanelRows {
                         }
                     }
                 }
-                enterLocation(state, state.location);
+                refreshArea(state);
                 displayTileEditorPropertyPanel();
             }
         }
@@ -544,8 +548,7 @@ export function getZoneProperties(): PanelRows {
         onClick() {
             state.location.x = state.hero.x;
             state.location.y = state.hero.y;
-            // Calling this will instantiate the area again and place the player back in their current location.
-            enterLocation(state, state.location);
+            refreshArea(state);
         }
     });
     return rows;

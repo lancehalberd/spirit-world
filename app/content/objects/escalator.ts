@@ -1,8 +1,8 @@
-import { createCanvasAndContext, debugCanvas } from 'app/dom';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { moveActor } from 'app/moveActor';
 import { drawFrameAt } from 'app/utils/animations';
 import { directionMap } from 'app/utils/field';
+import { createCanvasAndContext, debugCanvas } from 'app/utils/canvas';
 import { allImagesLoaded, requireImage } from 'app/utils/images';
 import { isObjectInsideTarget, pad } from 'app/utils/index';
 import {

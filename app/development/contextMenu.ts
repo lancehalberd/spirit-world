@@ -1,8 +1,9 @@
 import { getSpawnLocationContextMenuOption, getTestStateContextMenuOption } from 'app/content/spawnLocations';
 import { editingState, toggleEditing } from 'app/development/tileEditor';
-import { mainCanvas, tagElement } from 'app/dom';
+import { tagElement } from 'app/dom';
 import { defeatAllEnemies, KEY, isKeyboardKeyDown } from 'app/keyCommands';
 import { getState } from 'app/state';
+import { mainCanvas } from 'app/utils/canvas';
 import { getElementRectangle } from 'app/utils/index';
 import { getMousePosition } from 'app/utils/mouse';
 import { updateSoundSettings } from 'app/utils/sounds';

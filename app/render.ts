@@ -1,6 +1,5 @@
 import { Clone } from 'app/content/objects/clone';
 import { editingState, renderEditor } from 'app/development/tileEditor';
-import { createCanvasAndContext, drawCanvas, mainContext } from 'app/dom';
 import {
     CANVAS_HEIGHT, CANVAS_WIDTH, MAX_SPIRIT_RADIUS,
     FADE_IN_DURATION, FADE_OUT_DURATION,
@@ -16,6 +15,7 @@ import { renderMessage } from 'app/render/renderMessage';
 import { renderTitle } from 'app/renderTitle';
 import { getState, shouldHideMenu } from 'app/state';
 import { drawFrame } from 'app/utils/animations';
+import { createCanvasAndContext, drawCanvas, mainContext } from 'app/utils/canvas';
 
 import { AreaInstance, AreaLayer, AreaLayerDefinition, EffectInstance, ObjectInstance, GameState } from 'app/types';
 

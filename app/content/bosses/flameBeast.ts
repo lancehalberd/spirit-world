@@ -2,7 +2,7 @@ import { addEffectToArea } from 'app/content/areas';
 import { Flame } from 'app/content/effects/flame';
 import { FlameWall } from 'app/content/effects/flameWall';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
-import { createCanvasAndContext, debugCanvas } from 'app/dom';
+import { createCanvasAndContext, debugCanvas } from 'app/utils/canvas';
 import {
     //accelerateInDirection,
     getNearbyTarget,

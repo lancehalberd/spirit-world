@@ -11,7 +11,6 @@ import { dropItemFromTable } from 'app/content/objects/lootObject';
 import { checkToUpdateSpawnLocation } from 'app/content/spawnLocations';
 import { zones } from 'app/content/zones';
 import { editingState, refreshEditor } from 'app/development/tileEditor';
-import { createCanvasAndContext } from 'app/dom';
 import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
 import { isPointInShortRect } from 'app/utils/index';
 import { playSound } from 'app/musicController';
@@ -19,6 +18,7 @@ import { getFullZoneLocation } from 'app/state';
 import { removeTextCue } from 'app/scriptEvents';
 import { updateCamera } from 'app/updateCamera';
 import { specialBehaviorsHash } from 'app/content/specialBehaviors';
+import { createCanvasAndContext } from 'app/utils/canvas';
 
 import {
     AreaDefinition, AreaInstance, AreaLayerDefinition,
@@ -193,6 +193,7 @@ export function enterLocation(
     callback: () => void = null,
     preserveZoneFlags = false,
     isMutation = false,
+    doNotRefreshEditor = false,
 ): void {
     // Remve astral projection when switching areas.
     if (state.hero.astralProjection) {
@@ -313,7 +314,7 @@ export function enterLocation(
             object.onEnterArea(state);
         }
     }
-    if (editingState.isEditing) {
+    if (editingState.isEditing && !doNotRefreshEditor) {
         refreshEditor();
     }
 }

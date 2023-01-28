@@ -8,9 +8,9 @@ import {
     BITMAP_BOTTOM, BITMAP_BOTTOM_LEFT_QUARTER, BITMAP_BOTTOM_RIGHT_QUARTER,
     BITMAP_TOP,
 } from 'app/content/bitMasks';
-import { debugCanvas } from 'app/dom';
 import { showMessage } from 'app/render/renderMessage';
 import { createAnimation, drawFrame, drawFrameAt } from 'app/utils/animations';
+import { debugCanvas } from 'app/utils/canvas';
 import { directionMap, getDirection } from 'app/utils/field';
 import { requireImage } from 'app/utils/images';
 import { boxesIntersect, isObjectInsideTarget, isPointInShortRect, pad } from 'app/utils/index';

@@ -5,7 +5,6 @@ import { LightningDischarge } from 'app/content/effects/lightningDischarge';
 import { Spark } from 'app/content/effects/spark';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { allTiles } from 'app/content/tiles';
-import { debugCanvas } from 'app/dom';
 import {
     accelerateInDirection,
     getNearbyTarget,
@@ -17,9 +16,9 @@ import {
     //paceRandomly,
 } from 'app/content/enemies';
 import { beetleWingedAnimations } from 'app/content/enemyAnimations';
-import { createCanvasAndContext } from 'app/dom';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, drawFrameAt } from 'app/utils/animations';
+import { createCanvasAndContext, debugCanvas } from 'app/utils/canvas';
 import { pad, rectanglesOverlap } from 'app/utils/index';
 import { getDirection } from 'app/utils/field';
 import { playSound } from 'app/musicController';
