@@ -1,8 +1,9 @@
 import { AnimationEffect } from 'app/content/effects/animationEffect';
-import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
+import { objectHash } from 'app/content/objects/objectHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, frameAnimation, getFrame } from 'app/utils/animations';
 import { addEffectToArea } from 'app/utils/effects';
+import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
 import Random from 'app/utils/Random';
 
 import {
@@ -81,6 +82,7 @@ export class AirBubbles implements ObjectInstance {
         }
     }
 }
+objectHash.airBubbles = AirBubbles;
 
 export class AirBubbleBack implements ObjectInstance {
     area: AreaInstance;

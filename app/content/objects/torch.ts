@@ -1,9 +1,9 @@
 //import { resetTileBehavior } from 'app/content/areas';
 //import { allTiles } from 'app/content/tiles';
-import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
 import { flameAnimation } from 'app/content/effects/flame';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { hitTargets } from 'app/utils/field';
+import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
 
 import { drawFrameAt, getFrame } from 'app/utils/animations';
 

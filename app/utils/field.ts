@@ -1,10 +1,9 @@
-import { getObjectBehaviors } from 'app/content/objects';
 import { allTiles } from 'app/content/tiles';
 import { destroyTile } from 'app/utils/destroyTile';
 import { directionMap, getDirection } from 'app/utils/direction';
 import { removeEffectFromArea } from 'app/utils/effects';
 import { isPixelInShortRect, rectanglesOverlap } from 'app/utils/index';
-import { removeObjectFromArea } from 'app/utils/objects';
+import { getObjectBehaviors, removeObjectFromArea } from 'app/utils/objects';
 import { resetTileBehavior } from 'app/utils/tileBehavior';
 
 import {

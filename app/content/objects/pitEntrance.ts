@@ -1,3 +1,4 @@
+import { objectHash } from 'app/content/objects/objectHash';
 import { playAreaSound } from 'app/musicController';
 import { CANVAS_HEIGHT } from 'app/gameConstants';
 import { createAnimation, drawFrame } from 'app/utils/animations';
@@ -38,7 +39,7 @@ export class PitEntrance implements ObjectInstance {
     status: ObjectStatus = 'normal';
     style: string;
     wasUnderObject: boolean;
-    constructor(definition: EntranceDefinition) {
+    constructor(state: GameState, definition: EntranceDefinition) {
         this.definition = definition;
         this.x = definition.x;
         this.y = definition.y;
@@ -134,3 +135,4 @@ export class PitEntrance implements ObjectInstance {
         drawFrame(context, pitFrame, this.getHitbox());
     }
 }
+objectHash.pitEntrance = PitEntrance;

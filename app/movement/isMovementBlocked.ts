@@ -1,7 +1,7 @@
 import { destroyTile } from 'app/utils/destroyTile';
-import { getObjectBehaviors } from 'app/content/objects';
 import { tileHitAppliesToTarget } from 'app/utils/field';
 import { isPixelInShortRect } from 'app/utils/index';
+import { getObjectBehaviors } from 'app/utils/objects';
 
 import { AreaInstance, EffectInstance, GameState, MovementProperties, ObjectInstance, TileBehaviors } from 'app/types';
 

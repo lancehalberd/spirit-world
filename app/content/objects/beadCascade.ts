@@ -1,5 +1,4 @@
 import { addParticleSpray } from 'app/content/effects/animationEffect';
-import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
 import { crystalParticles } from 'app/content/tiles';
 import { Staff } from 'app/content/objects/staff';
 import { FRAME_LENGTH } from 'app/gameConstants';
@@ -7,7 +6,7 @@ import { createAnimation, drawFrame, drawFrameAt, getFrame } from 'app/utils/ani
 import { createCanvasAndContext } from 'app/utils/canvas';
 import { coverTile, getTileBehaviorsAndObstacles } from 'app/utils/field';
 import { boxesIntersect } from 'app/utils/index';
-import { addObjectToArea, removeObjectFromArea } from 'app/utils/objects';
+import { addObjectToArea, getObjectStatus, removeObjectFromArea, saveObjectStatus  } from 'app/utils/objects';
 import Random from 'app/utils/Random';
 import {
     AreaInstance, DrawPriority, FrameWithPattern, GameState,

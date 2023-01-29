@@ -2,8 +2,8 @@ import { AnimationEffect } from 'app/content/effects/animationEffect';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { addTextCue } from 'app/content/effects/textCue';
 import { dropItemFromTable, getLoot } from 'app/content/objects/lootObject';
+import { objectHash } from 'app/content/objects/objectHash';
 import { bossDeathExplosionAnimation, enemyDeathAnimation } from 'app/content/enemyAnimations';
-import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { playAreaSound } from 'app/musicController';
 import { appendCallback } from 'app/scriptEvents';
@@ -13,6 +13,7 @@ import { renderEnemyShadow } from 'app/renderActor';
 import { addEffectToArea } from 'app/utils/effects';
 import { checkForFloorEffects, moveEnemy } from 'app/utils/enemies';
 import { getAreaSize } from 'app/utils/getAreaSize';
+import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
 import Random from 'app/utils/Random';
 import { isTargetVisible } from 'app/utils/target';
 
@@ -721,3 +722,5 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         playAreaSound(state, this.area, soundKey);
     }
 }
+objectHash.enemy = Enemy;
+objectHash.boss = Enemy;

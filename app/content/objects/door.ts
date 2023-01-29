@@ -1,6 +1,6 @@
-import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
 import { evaluateLogicDefinition } from 'app/content/logic';
 import { doorStyles, DoorStyle } from 'app/content/objects/doorStyles';
+import { objectHash } from 'app/content/objects/objectHash';
 import {
     BITMAP_LEFT, BITMAP_RIGHT,
     BITMAP_BOTTOM, BITMAP_BOTTOM_LEFT_QUARTER, BITMAP_BOTTOM_RIGHT_QUARTER,
@@ -12,6 +12,7 @@ import { drawFrame } from 'app/utils/animations';
 import { enterZoneByTarget } from 'app/utils/enterZoneByTarget';
 import { directionMap } from 'app/utils/field';
 import { boxesIntersect, isObjectInsideTarget, isPointInShortRect, pad } from 'app/utils/index';
+import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
 import { drawText } from 'app/utils/simpleWhiteFont';
 import { applyBehaviorToTile, resetTileBehavior } from 'app/utils/tileBehavior';
 
@@ -596,3 +597,5 @@ export class Door implements ObjectInstance {
         }
     }
 }
+objectHash.door = Door;
+objectHash.stairs = Door;

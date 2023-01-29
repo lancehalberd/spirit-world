@@ -1,7 +1,7 @@
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
-import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { hitTargets } from 'app/utils/field';
+import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
 import { getVectorToTarget } from 'app/utils/target';
 
 import {

@@ -12,7 +12,6 @@ import { addRadialSparks } from 'app/content/effects/spark';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { Enemy } from 'app/content/enemy';
 import { certainLifeLootTable } from 'app/content/lootTables';
-import { saveObjectStatus } from 'app/content/objects';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { createCanvasAndContext } from 'app/utils/canvas';
@@ -26,7 +25,7 @@ import {
 import { addScreenShake } from 'app/utils/field';
 import { allImagesLoaded } from 'app/utils/images';
 import { rectanglesOverlap } from 'app/utils/index';
-import { addObjectToArea } from 'app/utils/objects'
+import { addObjectToArea, saveObjectStatus } from 'app/utils/objects'
 import Random from 'app/utils/Random';
 import {
     getNearbyTarget,

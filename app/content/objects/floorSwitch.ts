@@ -1,14 +1,9 @@
-import {
-    toggleTarget,
-    checkIfAllSwitchesAreActivated,
-    deactivateTargets,
-    getObjectStatus,
-    saveObjectStatus,
-} from 'app/content/objects';
 import { playAreaSound } from 'app/musicController';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { findObjectInstanceById } from 'app/utils/findObjectInstanceById';
 import { rectanglesOverlap } from 'app/utils/index';
+import { toggleTarget, deactivateTargets, getObjectStatus, saveObjectStatus} from 'app/utils/objects';
+import { checkIfAllSwitchesAreActivated } from 'app/utils/switches';
 
 import {
     AreaInstance, DrawPriority, FloorSwitchDefinition, GameState,

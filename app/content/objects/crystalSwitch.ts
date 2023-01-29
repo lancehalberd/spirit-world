@@ -1,12 +1,8 @@
-import {
-    checkIfAllSwitchesAreActivated,
-    deactivateTargets,
-    getObjectStatus,
-    saveObjectStatus,
-} from 'app/content/objects';
 import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame } from 'app/utils/animations';
+import { deactivateTargets, getObjectStatus, saveObjectStatus } from 'app/utils/objects';
+import { checkIfAllSwitchesAreActivated } from 'app/utils/switches';
 
 import {
     AreaInstance, CrystalSwitchDefinition, DrawPriority, GameState,

@@ -1,6 +1,6 @@
-import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
 import { FRAME_LENGTH, isRandomizer } from 'app/gameConstants';
 import { setScript } from 'app/scriptEvents';
+import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
 
 import {
     AreaInstance, GameState, NarrationDefinition,

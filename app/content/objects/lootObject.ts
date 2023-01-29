@@ -1,6 +1,5 @@
 import { getLootFrame, getLootShadowFrame, showLootMessage } from 'app/content/loot';
 import { lootEffects } from 'app/content/lootEffects';
-import { getObjectStatus } from 'app/content/objects';
 import { editingState } from 'app/development/editingState';
 import { CANVAS_WIDTH, CANVAS_HEIGHT, FRAME_LENGTH } from 'app/gameConstants';
 import { playSound } from 'app/musicController';
@@ -9,7 +8,7 @@ import { createAnimation, drawFrame, drawFrameAt, getFrameHitBox } from 'app/uti
 import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import { pad, boxesIntersect } from 'app/utils/index';
 import { setObjectFlag } from 'app/utils/objectFlags';
-import { addObjectToArea,  removeObjectFromArea } from 'app/utils/objects';
+import { addObjectToArea, getObjectStatus, removeObjectFromArea } from 'app/utils/objects';
 import { drawText } from 'app/utils/simpleWhiteFont';
 import { saveGame } from 'app/utils/saveGame';
 

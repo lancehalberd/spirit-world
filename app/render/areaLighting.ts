@@ -1,13 +1,12 @@
-import { getObjectBehaviors } from 'app/content/objects';
 import { Hero } from 'app/content/hero';
 import { editingState } from 'app/development/editingState';
 import {
     CANVAS_HEIGHT, CANVAS_WIDTH, FRAME_LENGTH,
 } from 'app/gameConstants';
 import { heroCarryAnimations } from 'app/render/heroAnimations';
-
 import { createCanvasAndContext, drawCanvas } from 'app/utils/canvas';
 import { carryMap, directionMap } from 'app/utils/direction';
+import { getObjectBehaviors } from 'app/utils/objects';
 
 import { AreaInstance, GameState } from 'app/types';
 

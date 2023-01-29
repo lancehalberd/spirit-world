@@ -1,8 +1,8 @@
-import { activateTarget, getObjectStatus } from 'app/content/objects';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { showMessage } from 'app/scriptEvents';
 import { createAnimation, drawFrameAt, getFrame } from 'app/utils/animations';
 import { findObjectInstanceById } from 'app/utils/findObjectInstanceById';
+import { activateTarget, getObjectStatus } from 'app/utils/objects';
 import { saveGame } from 'app/utils/saveGame';
 
 import {

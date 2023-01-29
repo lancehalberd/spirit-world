@@ -1,6 +1,6 @@
-import { changeObjectStatus } from 'app/content/objects';
 import { playSound } from 'app/musicController';
 import { getAreaSize } from 'app/utils/getAreaSize';
+import { changeObjectStatus } from 'app/utils/objects';
 
 import { AreaInstance, Enemy, GameState } from 'app/types'
 export function checkIfAllEnemiesAreDefeated(state: GameState, area: AreaInstance): void {

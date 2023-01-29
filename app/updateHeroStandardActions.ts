@@ -3,7 +3,6 @@ import { find } from 'lodash';
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { HeldChakram } from 'app/content/effects/thrownChakram';
 import { setEquippedBoots } from 'app/content/menu';
-import { getObjectBehaviors } from 'app/content/objects';
 import { CloneExplosionEffect } from 'app/content/effects/CloneExplosionEffect';
 import { AstralProjection } from 'app/content/objects/astralProjection';
 import { zones } from 'app/content/zones';
@@ -30,7 +29,7 @@ import {
     isPointOpen,
 } from 'app/utils/field';
 import { getChargeLevelAndElement } from 'app/utils/getChargeLevelAndElement';
-import { addObjectToArea } from 'app/utils/objects';
+import { addObjectToArea, getObjectBehaviors } from 'app/utils/objects';
 
 import {
     FullTile, GameState, Hero,

@@ -1,4 +1,4 @@
-import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
+import { objectHash } from 'app/content/objects/objectHash';
 import { editingState } from 'app/development/editingState';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { playAreaSound } from 'app/musicController';
@@ -13,6 +13,7 @@ import { enterLocation } from 'app/utils/enterLocation';
 import { enterZoneByTarget } from 'app/utils/enterZoneByTarget';
 import { directionMap, getTileBehaviors } from 'app/utils/field';
 import { isObjectInsideTarget, pad } from 'app/utils/index';
+import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
 import { getVectorToTarget } from 'app/utils/target';
 
 import {
@@ -248,3 +249,4 @@ function updateSpiritCanvas(state: GameState, hitbox: Rect): void {
     }
     isRenderingSpiritCanvas = false;
 }
+objectHash.teleporter = Teleporter;

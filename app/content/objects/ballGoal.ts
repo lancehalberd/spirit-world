@@ -1,5 +1,5 @@
-import { checkIfAllSwitchesAreActivated } from 'app/content/objects';
 import { createAnimation, drawFrame } from 'app/utils/animations';
+import { checkIfAllSwitchesAreActivated } from 'app/utils/switches';
 
 import {
     AreaInstance, BallGoalDefinition, DrawPriority, GameState,
