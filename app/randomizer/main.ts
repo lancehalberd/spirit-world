@@ -7,8 +7,9 @@ import {
 } from 'app/content/spawnLocations';
 
 import { mainOverworldNode } from 'app/randomizer/logic/overworldLogic';
+import { allNodes } from 'app/randomizer/allNodes';
 import {
-    allNodes, applyLootAssignments, everyObject,
+    applyLootAssignments, everyObject,
     reverseFill
 } from 'app/randomizer/utils';
 import { randomizeEntrances } from 'app/randomizer/entranceRandomizer';

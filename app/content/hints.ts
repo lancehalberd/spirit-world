@@ -1,8 +1,9 @@
-import { getRandomizerHint } from 'app/randomizer/utils';
 import { isRandomizer } from 'app/gameConstants';
+import { findReachableChecksFromStart } from 'app/randomizer/find';
 import { setScript } from 'app/scriptEvents';
+import Random from 'app/utils/Random';
 
-import { GameState } from 'app/types';
+import { GameState, LogicalZoneKey, LootWithLocation } from 'app/types';
 
 
 export function showHint(state: GameState): void {
@@ -140,4 +141,79 @@ export function getMapTarget(state: GameState): {x: number, y: number} | null {
         return {x: 80, y: 108};
     }
     return null;
+}
+
+
+export function getRandomizerZoneDescription(zone: LogicalZoneKey): string {
+    switch (zone) {
+        case 'sky': return 'in the sky';
+        case 'spiritSky': return 'in the spirit world sky';
+        case 'overworld': return 'outside';
+        case 'spiritWorld': return 'out in the spirit world';
+        case 'bushCave': return 'in a cave full of bushes';
+        case 'ascentCave': return  'in a cave on the mountain';
+        case 'ascentCaveSpirit': return  'in the spirit world in a cave on the mountain';
+        case 'fertilityShrine': return 'in the shrine by the forest village';
+        case 'fertilityShrineSpirit': return 'in the shrine by the Forest Temple';
+        case 'holyCityInterior': return 'inside the Holy City';
+        case 'jadeCityInterior': return 'inside the Jade City';
+        case 'fertilityShrineSpirit': return 'in the shrine by the Forest Temple';
+        case 'waterfallCave': return 'in the Cave Village';
+        case 'treeVillage': return 'in the Vanara Village';
+        case 'peachCave': return 'in the dark cave by the lake';
+        case 'peachCaveSpirit': return 'in a cave in the spirit world';
+        case 'tomb': return 'in the Vanara Tomb';
+        case 'warTemple': return 'in the Summoner Ruins';
+        case 'cocoon': return 'in the Cocoon behind the Vanara Tomb';
+        case 'helix': return 'in the Helix';
+        case 'forestTemple': return 'in the Forest Temple';
+        case 'waterfallTower': return 'in the Waterfall Tower';
+        case 'forge': return 'in the Forge';
+        case 'grandTemple': return 'in the Grand Temple';
+        case 'skyPalace': return 'in the Sky Palace';
+        case 'jadePalace': return 'in the Jade Palace';
+        case 'riverTemple': return 'in the Lake Ruins';
+        case 'crater': return 'in the Volcano Crater';
+        case 'staffTower': return 'in the Staff Tower';
+        case 'warPalace': return 'in the Palace of War';
+        case 'lab': return 'in the Hidden Laboratory';
+        case 'tree': return 'in the World Tree';
+        case 'void': return 'in the abyss of space';
+    }
+    // The type of this should just be `void` if all zones are handled.
+    return zone;
+}
+
+export function getRandomizerHint(state: GameState): string {
+    const reachableChecks: LootWithLocation[] = findReachableChecksFromStart(state);
+    for (const check of Random.shuffle(reachableChecks)) {
+        if (check.location) {
+            const logicalZoneKey = check.location.logicalZoneKey;
+            if (check.lootObject.type === 'dialogueLoot') {
+                const npcKey = `${check.location.zoneKey}-${check.lootObject.id}`;
+                if (state.savedState.objectFlags[npcKey]) {
+                    continue;
+                }
+                return `Try talking to someone ${getRandomizerZoneDescription(logicalZoneKey)}.`;
+            }
+            if (state.savedState.objectFlags[check.lootObject.id]) {
+                continue;
+            }
+            return `There is still something ${getRandomizerZoneDescription(logicalZoneKey)}.`;
+        } else {
+            const {dialogueKey, optionKey} = check;
+            const flag = `${dialogueKey}-${optionKey}`;
+            if (state.savedState.objectFlags[flag]) {
+                continue;
+            }
+            if (dialogueKey === 'streetVendor') {
+                return `The merchant has something for sale.`;
+            }
+            if (dialogueKey === 'storageVanara') {
+                return `A vanara would be grateful for an exterminator.`;
+            }
+            return `Try talking to someone called ${dialogueKey}.`;
+        }
+    }
+    return 'Looks like BK Mode to me :)';
 }

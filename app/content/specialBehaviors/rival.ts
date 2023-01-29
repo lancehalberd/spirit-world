@@ -1,4 +1,3 @@
-import { refreshAreaLogic } from 'app/content/areas';
 import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
 import { saveGame } from 'app/utils/saveGame';
 
@@ -11,7 +10,7 @@ specialBehaviorsHash.tombEntranceSwitch = {
         // who is guarding the tomb, becomes enraged triggering a small boss fight.
         if (!state.savedState.objectFlags.tombRivalEnraged) {
             state.savedState.objectFlags.tombRivalEnraged = true;
-            refreshAreaLogic(state, object.area);
+            object.area.needsLogicRefresh = true;
             saveGame(state);
         }
     },

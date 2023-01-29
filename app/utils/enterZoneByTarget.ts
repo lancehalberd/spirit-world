@@ -1,4 +1,3 @@
-import { setAreaSection } from 'app/content/areas';
 import { TextCue } from 'app/content/effects/textCue';
 import { isObjectLogicValid } from 'app/content/logic';
 import { Door } from 'app/content/objects/door';
@@ -6,6 +5,7 @@ import { doorStyles } from 'app/content/objects/doorStyles';
 import { Teleporter } from 'app/content/objects/teleporter';
 import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
 import { zones } from 'app/content/zones';
+import { setAreaSection } from 'app/utils/area';
 import { addEffectToArea } from 'app/utils/effects';
 import { directionMap, getDirection } from 'app/utils/field';
 import { enterLocation } from 'app/utils/enterLocation';

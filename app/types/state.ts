@@ -1,6 +1,6 @@
 import {
     ActiveScriptEvent, AreaGrid, AreaInstance,
-    Floor, FullZoneLocation, Hero, LootData, SavedHeroData, Rect, ScriptEvent, TextPage, TrackKey,
+    Floor, FullZoneLocation, Hero, SavedHeroData, Rect, ScriptEvent, TextPage, TrackKey,
     Zone, ZoneLocation,
 } from 'app/types';
 
@@ -39,14 +39,6 @@ export interface DungeonInventory {
 export type Scene = 'title'
     | 'chooseGameMode' | 'deleteSavedGame' | 'deleteSavedGameConfirmation'
     | 'game' | 'credits' | 'options';
-
-export type DialogueLootDefinition = LootData & {
-    type: 'dialogueLoot'
-    // The id of the object associated with this dialogue (used during randomization).
-    id?: string
-    // This can be set for shop loot.
-    cost?: number
-}
 
 export interface ScreenShake {
     dx: number

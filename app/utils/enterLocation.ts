@@ -1,13 +1,12 @@
 import {
-    cleanupHeroFromArea, createAreaInstance,
-    getAreaFromLocation, linkObjects,
-    setAreaSection, setConnectedAreas,
+    createAreaInstance, getAreaFromLocation, linkObjects, setConnectedAreas,
 } from 'app/content/areas';
 import { checkToUpdateSpawnLocation } from 'app/content/spawnLocations';
 import { zones } from 'app/content/zones';
 import { editingState } from 'app/development/editingState';
 import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
 import { removeTextCue } from 'app/content/effects/textCue';
+import { cleanupHeroFromArea, setAreaSection } from 'app/utils/area'
 import { checkIfAllEnemiesAreDefeated } from 'app/utils/checkIfAllEnemiesAreDefeated';
 import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import { fixCamera } from 'app/utils/fixCamera';

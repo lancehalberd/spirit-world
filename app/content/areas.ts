@@ -2,6 +2,7 @@ import { evaluateLogicDefinition, logicHash, isLogicValid, isObjectLogicValid } 
 import { allTiles } from 'app/content/tiles';
 import { zones } from 'app/content/zones';
 import { editingState } from 'app/development/editingState';
+import { cleanupHeroFromArea, removeAllClones } from 'app/utils/area';
 import { isPointInShortRect } from 'app/utils/index';
 import { specialBehaviorsHash } from 'app/content/specialBehaviors';
 import { createCanvasAndContext } from 'app/utils/canvas';
@@ -162,13 +163,6 @@ export function swapHeroStates(heroA: Hero, heroB: Hero) {
     }
 }
 
-export function removeAllClones(state: GameState): void {
-    for (const clone of state.hero.clones) {
-        removeObjectFromArea(state, clone);
-    }
-    state.hero.clones = []
-}
-
 export function setConnectedAreas(state: GameState, lastAreaInstance: AreaInstance) {
     state.underwaterAreaInstance = null;
     if (state.zone.underwaterKey && state.location.floor === 0) {
@@ -268,6 +262,26 @@ export function findZoneTargets(
     return results;
 }
 
+
+export function scrollToArea(state: GameState, area: AreaDefinition, direction: Direction): void {
+    //console.log('scrollToArea', direction);
+    removeAllClones(state);
+    state.nextAreaInstance = createAreaInstance(state, area);
+    if (direction === 'up') {
+        state.nextAreaInstance.cameraOffset.y = -state.nextAreaInstance.canvas.height;
+    }
+    if (direction === 'down') {
+        state.nextAreaInstance.cameraOffset.y = state.areaInstance.canvas.height;
+    }
+    if (direction === 'left') {
+        state.nextAreaInstance.cameraOffset.x = -state.nextAreaInstance.canvas.width;
+    }
+    if (direction === 'right') {
+        state.nextAreaInstance.cameraOffset.x = state.areaInstance.canvas.width;
+    }
+}
+
+
 export function setNextAreaSection(state: GameState, d: Direction): void {
     //console.log('setNextAreaSection', d);
     removeAllClones(state);
@@ -304,51 +318,6 @@ export function switchToNextAreaSection(state: GameState): void {
     state.hero.safeY = state.hero.y;
     checkIfAllEnemiesAreDefeated(state, state.areaInstance);
     checkIfAllEnemiesAreDefeated(state, state.alternateAreaInstance);
-}
-
-export function setAreaSection(state: GameState, d: Direction, newArea: boolean = false): void {
-    //console.log('setAreaSection', state.hero.x, state.hero.y, d);
-    const lastAreaSection = state.areaSection;
-    state.areaSection = state.areaInstance.definition.sections[0];
-    let x = Math.min(32, Math.max(0, (state.hero.x + 8) / 16));
-    let y = Math.min(32, Math.max(0, (state.hero.y + 8) / 16));
-    for (const section of state.areaInstance.definition.sections) {
-        if (isPointInShortRect(x, y, section)) {
-            state.areaSection = section;
-            break;
-        }
-    }
-    if (newArea || lastAreaSection !== state.areaSection) {
-        cleanupHeroFromArea(state);
-        state.hero.safeD = state.hero.d;
-        state.hero.safeX = state.hero.x;
-        state.hero.safeY = state.hero.y;
-    }
-}
-
-export function cleanupHeroFromArea(state: GameState): void {
-    for (const hero of [state.hero, ...state.hero.clones]) {
-        hero.activeStaff?.remove(state);
-    }
-    removeAllClones(state);
-}
-
-export function scrollToArea(state: GameState, area: AreaDefinition, direction: Direction): void {
-    //console.log('scrollToArea', direction);
-    removeAllClones(state);
-    state.nextAreaInstance = createAreaInstance(state, area);
-    if (direction === 'up') {
-        state.nextAreaInstance.cameraOffset.y = -state.nextAreaInstance.canvas.height;
-    }
-    if (direction === 'down') {
-        state.nextAreaInstance.cameraOffset.y = state.areaInstance.canvas.height;
-    }
-    if (direction === 'left') {
-        state.nextAreaInstance.cameraOffset.x = -state.nextAreaInstance.canvas.width;
-    }
-    if (direction === 'right') {
-        state.nextAreaInstance.cameraOffset.x = state.areaInstance.canvas.width;
-    }
 }
 
 export function applyLayerToBehaviorGrid(behaviorGrid: TileBehaviors[][], layer: AreaLayerDefinition, parentLayer: AreaLayerDefinition): void {

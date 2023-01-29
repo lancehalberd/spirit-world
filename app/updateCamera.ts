@@ -1,9 +1,10 @@
 import {
     getAreaInstanceFromLocation, linkObjects,
-    setAreaSection, setConnectedAreas, switchToNextAreaSection,
+    setConnectedAreas, switchToNextAreaSection,
 } from 'app/content/areas';
 import { editingState } from 'app/development/editingState';
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
+import { setAreaSection } from 'app/utils/area';
 import { checkIfAllEnemiesAreDefeated } from 'app/utils/checkIfAllEnemiesAreDefeated';
 import { getAreaSize } from 'app/utils/getAreaSize';
 import { addEffectToArea } from 'app/utils/effects';

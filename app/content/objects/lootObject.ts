@@ -1,4 +1,5 @@
-import { lootEffects, getLootFrame, getLootShadowFrame, showLootMessage } from 'app/content/loot';
+import { getLootFrame, getLootShadowFrame, showLootMessage } from 'app/content/loot';
+import { lootEffects } from 'app/content/lootEffects';
 import { getObjectStatus } from 'app/content/objects';
 import { editingState } from 'app/development/editingState';
 import { CANVAS_WIDTH, CANVAS_HEIGHT, FRAME_LENGTH } from 'app/gameConstants';

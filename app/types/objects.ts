@@ -2,7 +2,7 @@ import { Door } from 'app/content/objects/door';
 import { Sign } from 'app/content/objects/sign';
 import {
     Actor, AreaInstance, BossType,
-    DecorationType, Direction, Enemy, EnemyType,
+    DecorationType, Direction, Enemy, EnemyType, FullZoneLocation,
     GameState, Hero, LogicDefinition, LootType,
     MagicElement, MinionType,
     NPCBehavior, NPCStyle,
@@ -20,6 +20,43 @@ export interface LootData {
     // Only matters for certain active tools, chakram, and some passive tools like charge.
     // If this is 0/unset it means it is progressive.
     lootLevel?: number
+}
+
+
+export type DialogueLootDefinition = LootData & {
+    type: 'dialogueLoot'
+    // The id of the object associated with this dialogue (used during randomization).
+    id?: string
+    // This can be set for shop loot.
+    cost?: number
+}
+
+export type AnyLootDefinition = BossObjectDefinition | DialogueLootDefinition | LootObjectDefinition;
+
+export interface LootWithLocation {
+    // Either location will be set or dialogueKey+optionKey will be set
+    location?: FullZoneLocation
+    dialogueKey?: string
+    optionKey?: string
+    lootObject: AnyLootDefinition
+    progressFlags?: string[]
+}
+
+export interface LootAssignment {
+    source: LootWithLocation
+    lootType: LootType
+    lootLevel: number
+    lootAmount: number
+    target: LootWithLocation
+}
+
+export interface AssignmentState {
+    // The array of loot assignments that can be used to apply this assignment state to the game.
+    assignments: LootAssignment[]
+    // The ids of all the checks that have contents assigned to them already.
+    assignedLocations: string[]
+    // The ids of all the check contents that have been assigned to some location.
+    assignedContents: string[]
 }
 
 export interface ObjectInstance {

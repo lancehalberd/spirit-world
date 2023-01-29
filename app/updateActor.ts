@@ -1,5 +1,5 @@
 import {
-    getAreaFromLocation, removeAllClones,
+    getAreaFromLocation,
     scrollToArea, setNextAreaSection,
     swapHeroStates,
 } from 'app/content/areas';
@@ -12,6 +12,7 @@ import { prependScript } from 'app/scriptEvents';
 import { updateHeroSpecialActions } from 'app/updateHeroSpecialActions';
 import { updateHeroStandardActions } from 'app/updateHeroStandardActions';
 import { isToolButtonPressed, wasToolButtonPressed, wasToolButtonPressedAndReleased, } from 'app/useTool';
+import { removeAllClones } from 'app/utils/area';
 import { removeEffectFromArea } from 'app/utils/effects';
 import {
     directionMap,

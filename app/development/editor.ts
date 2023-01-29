@@ -1,10 +1,20 @@
+import { bossTypes } from 'app/content/bosses';
+import { enemyTypes } from 'app/content/enemies';
 import { editingState } from 'app/development/editingState';
-import { displayTileEditorPropertyPanel } from 'app/development/tileEditor';
-import { hideAllPropertyPanels } from 'app/development/propertyPanel';
+import { getBrushContextProperties } from 'app/development/getBrushContextProperties';
+import { getObjectProperties } from 'app/development/objectEditor';
+import { renderProgressTabContainer } from 'app/development/progressEditor';
+import { displayPanel } from 'app/development/propertyPanel';
+import { renderToolTabContainer } from 'app/development/toolTab';
+import { checkToRefreshMinimap, renderZoneTabContainer } from 'app/development/zoneEditor';
+import { displayPropertyPanel, hideAllPropertyPanels } from 'app/development/propertyPanel';
 import { createObjectDefinition, combinedObjectTypes } from 'app/development/objectEditor';
 import { enterLocation } from 'app/utils/enterLocation';
 
-import { GameState, ObjectDefinition, ObjectType } from 'app/types';
+import {
+    BossObjectDefinition, EnemyObjectDefinition, EnemyType,
+    GameState, ObjectDefinition, ObjectType, PanelRows,
+} from 'app/types';
 
 export function toggleEditing(state: GameState) {
     state.scene = 'game';
@@ -17,14 +27,9 @@ export function toggleEditing(state: GameState) {
         stopEditing(state);
     }
 }
-export function refreshEditor(state: GameState) {
-    if (editingState.isEditing) {
-        stopEditing(state);
-        startEditing(state);
-    }
-}
+
+
 function startEditing(state: GameState) {
-    editingState.needsRefresh = false;
     if (!editingState.brush) {
         editingState.brush = {'none': {w: 1,h: 1,tiles: [[0]]}};
     }
@@ -33,7 +38,7 @@ function startEditing(state: GameState) {
             {type: combinedObjectTypes[0]} as Partial<ObjectDefinition> & { type: ObjectType }
         );
     }
-    displayTileEditorPropertyPanel();
+    refreshEditor(state);
     state.areaInstance.tilesDrawn = [];
     state.areaInstance.checkToRedrawTiles = true;
     // This was a drag+drop experiment for dialogue editing, but I'm not adding this to
@@ -111,4 +116,63 @@ function stopEditing(state: GameState) {
     }
     state.areaInstance.tilesDrawn = [];
     state.areaInstance.checkToRedrawTiles = true;
+}
+
+export function refreshEditor(state: GameState) {
+    if (!editingState.isEditing) {
+        return editingState;
+    }
+    editingState.needsRefresh = false;
+    if (!state.areaInstance.definition.layers.find(layer => layer.key === editingState.selectedLayerKey)) {
+        delete editingState.selectedLayerKey;
+    }
+    applyToolToSelectedObject();
+    checkToRefreshMinimap(state);
+    displayZonePanel(state);
+    displayProgressPanel(state);
+    displayToolPanel(state);
+    displayContextPanel(state);
+}
+
+function applyToolToSelectedObject() {
+    if (editingState.tool === 'enemy') {
+        editingState.selectedObject.type = 'enemy';
+        const enemyDefinition = editingState.selectedObject as EnemyObjectDefinition;
+        // TS incorrectly requires search element type to be a subset of the array.
+        if (!enemyTypes.includes(enemyDefinition.enemyType as EnemyType)) {
+            enemyDefinition.enemyType = enemyTypes[0];
+        }
+    } else if (editingState.tool === 'boss') {
+        editingState.selectedObject.type = 'boss';
+        const bossDefinition = editingState.selectedObject as BossObjectDefinition;
+        if (!bossTypes.includes(bossDefinition.enemyType)) {
+            bossDefinition.enemyType = bossTypes[0];
+        }
+    } else if (editingState.tool === 'object') {
+        if (editingState.selectedObject.type === 'enemy' || editingState.selectedObject.type === 'boss') {
+            editingState.selectedObject.type = combinedObjectTypes[0] as any;
+        }
+    }
+}
+
+function displayZonePanel(state: GameState): void {
+    displayPanel('left', 'top', renderZoneTabContainer());
+}
+function displayProgressPanel(state: GameState): void {
+    displayPanel('left', 'bottom', renderProgressTabContainer());
+}
+function displayToolPanel(state: GameState): void {
+    displayPanel('right', 'top', renderToolTabContainer());
+}
+
+function displayContextPanel(state: GameState): void {
+    displayPropertyPanel(getContextProperties(state), 'right', 'bottom');
+}
+
+function getContextProperties(state: GameState): PanelRows {
+    if (editingState.tool === 'brush' || editingState.tool === 'replace') {
+        return getBrushContextProperties(state);
+    } else {
+        return getObjectProperties(state, editingState);
+    }
 }

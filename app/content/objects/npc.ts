@@ -1,6 +1,5 @@
 import { sample } from 'lodash';
 
-import { selectDialogueOption } from 'app/content/dialogue';
 import { snakeAnimations } from 'app/content/enemyAnimations';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { getSectionBoundingBox, moveActor } from 'app/moveActor';
@@ -18,6 +17,7 @@ import {
 import { shadowFrame, smallShadowFrame } from 'app/renderActor';
 import { showMessage } from 'app/scriptEvents';
 import { drawFrame, getFrame } from 'app/utils/animations';
+import { selectDialogueOption } from 'app/utils/dialogue';
 import { directionMap, getDirection, rotateDirection } from 'app/utils/direction';
 
 import {

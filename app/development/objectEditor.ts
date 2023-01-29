@@ -5,7 +5,7 @@ import {
     linkObject,
 } from 'app/content/areas';
 import { bossTypes } from 'app/content/bosses';
-import { dialogueHash } from 'app/content/dialogue';
+import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 import { logicHash, isObjectLogicValid } from 'app/content/logic';
 import { decorationTypes } from 'app/content/objects/decoration';
 import { escalatorStyles } from 'app/content/objects/escalator';
@@ -21,12 +21,8 @@ import { turretStyles } from 'app/content/objects/wallTurret';
 import { zones } from 'app/content/zones';
 import { ObjectPalette, ObjectPaletteItem } from 'app/development/objectPalette';
 import { editingState } from 'app/development/editingState';
-import {
-    displayTileEditorPropertyPanel, setEditingTool,
-} from 'app/development/tileEditor';
 import { getLogicProperties } from 'app/development/zoneEditor';
 import { allLootTypes } from 'app/gameConstants';
-import { isKeyboardKeyDown, KEY } from 'app/userInput';
 import { getState } from 'app/state';
 import { createObjectInstance } from 'app/utils/createObjectInstance';
 import { isPointInShortRect } from 'app/utils/index';
@@ -117,7 +113,7 @@ function getObjectPalette() {
                 object.type = objectType as any;
                 editingState.selectedObject = createObjectDefinition(state, object);
                 updateObjectInstance(state, editingState.selectedObject, object);
-                displayTileEditorPropertyPanel();
+                editingState.needsRefresh = true;
             }
         );
     }
@@ -134,8 +130,7 @@ function getEnemyPalette() {
                 const object = editingState.selectedObject as EnemyObjectDefinition;
                 object.enemyType = enemyType;
                 updateObjectInstance(getState(), object);
-                // We need to refresh the panel to get enemy specific properties.
-                displayTileEditorPropertyPanel();
+                editingState.needsRefresh = true;
             }
         );
     }
@@ -152,8 +147,7 @@ function getBossPalette() {
                 const object = editingState.selectedObject as BossObjectDefinition;
                 object.enemyType = enemyType;
                 updateObjectInstance(getState(), object);
-                // We need to refresh the panel to get enemy specific properties.
-                displayTileEditorPropertyPanel();
+                editingState.needsRefresh = true;
             }
         );
     }
@@ -643,7 +637,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                 delete object.hasCustomLogic;
             }
             updateObjectInstance(state, object);
-            displayTileEditorPropertyPanel();
+                    editingState.needsRefresh = true;
         },
     });
     if (object.hasCustomLogic) {
@@ -796,7 +790,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                 ...getLogicProperties(state, 'Force Open?', object.openLogic || {}, updatedLogic => {
                     object.openLogic = updatedLogic;
                     updateObjectInstance(state, object);
-                    displayTileEditorPropertyPanel();
+                    editingState.needsRefresh = true;
                 })
             ];
             // This intentionally continue on to the marker properties.
@@ -815,8 +809,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                     }
                     object.targetZone = targetZone;
                     updateObjectInstance(state, object);
-                    // We need to refresh the panel to get the new marker ids for the selected zone.
-                    displayTileEditorPropertyPanel();
+                    editingState.needsRefresh = true;
                 },
             });
             const zone = zones[zoneKey];
@@ -1078,7 +1071,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                     }
                     object.dialogueKey = dialogueKey;
                     updateObjectInstance(state, object);
-                    displayTileEditorPropertyPanel();
+                    editingState.needsRefresh = true;
                 },
             });
             if (!object.dialogueKey) {
@@ -1225,7 +1218,7 @@ function getLootFields(state: GameState, editingState: EditingState, object: Obj
         onChange(lootType: LootType) {
             object.lootType = lootType;
             updateObjectInstance(state, object);
-            displayTileEditorPropertyPanel();
+            editingState.needsRefresh = true;
         },
     });
     if (lootType === 'money') {
@@ -1257,33 +1250,10 @@ function getLootFields(state: GameState, editingState: EditingState, object: Obj
     return rows;
 }
 
-export function onMouseDownObject(state: GameState, editingState: EditingState, x: number, y: number): void {
-    const newObject: ObjectDefinition = createObjectDefinition(
-        state,
-        {
-            ...editingState.selectedObject,
-            x: Math.round(x + state.camera.x),
-            y: Math.round(y + state.camera.y),
-        }
-    );
-    // type: editingState.tool === 'object' ? editingState.objectType : editingState.tool as 'enemy' | 'boss',
-
-    const frame = getObjectFrame(newObject);
-    newObject.x -= (frame.content?.w || frame.w) / 2;
-    newObject.y -= (frame.content?.h || frame.h) / 2;
-    fixObjectPosition(state, newObject);
-    updateObjectInstance(state, newObject, null, state.areaInstance, true);
-    if (!isKeyboardKeyDown(KEY.SHIFT)) {
-        setEditingTool('select');
-        editingState.selectedObject = newObject;
-        displayTileEditorPropertyPanel();
-    }
-}
-
 export function unselectObject(editingState: EditingState, refresh: boolean = true) {
     editingState.selectedObject = {...editingState.selectedObject};
     delete editingState.selectedObject.id;
-    displayTileEditorPropertyPanel();
+    editingState.needsRefresh = true;
 }
 
 export function onMouseDownSelect(state: GameState, editingState: EditingState, x: number, y: number): void {
@@ -1304,7 +1274,7 @@ export function onMouseDownSelect(state: GameState, editingState: EditingState, 
         }
     }
     if (changedSelection) {
-        displayTileEditorPropertyPanel();
+        editingState.needsRefresh = true;
     }
     // If selectedObject is still set, then we are dragging it, so indicate the drag offset.
     if (state.areaInstance.definition.objects.includes(editingState.selectedObject)) {

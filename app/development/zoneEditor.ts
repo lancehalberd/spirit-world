@@ -1,5 +1,5 @@
 import {
-    getAreaInstanceFromLocation, setAreaSection, setConnectedAreas,
+    getAreaInstanceFromLocation, setConnectedAreas,
 } from 'app/content/areas';
 import { logicHash } from 'app/content/logic';
 import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
@@ -8,11 +8,11 @@ import { exportZoneToClipboard, importZone, serializeZone } from 'app/developmen
 import { TabContainer } from 'app/development/tabContainer';
 import { renderPropertyRows } from 'app/development/propertyPanel';
 import { editingState } from 'app/development/editingState';
-import { displayTileEditorPropertyPanel } from 'app/development/tileEditor';
 import { tagElement } from 'app/dom';
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
-import { checkToRedrawTiles } from 'app/render';
+import { checkToRedrawTiles } from 'app/render/renderField';
 import { getState } from 'app/state';
+import { setAreaSection } from 'app/utils/area';
 import { createCanvasAndContext } from 'app/utils/canvas';
 import { enterLocation } from 'app/utils/enterLocation';
 import { getFullZoneLocation } from 'app/utils/getFullZoneLocation';
@@ -71,7 +71,7 @@ mapOverlayCanvas.onmousemove = function (e: MouseEvent) {
 }
 
 function refreshArea(state: GameState) {
-    enterLocation(state, state.location, true, undefined, true, false, true);
+    enterLocation(state, state.location, true);
 }
 
 function jumpToMinimapLocation() {
@@ -284,7 +284,6 @@ export function getImportExportProperties(): PanelRows {
                 state.location.zoneKey = importZone(contents, state.location.zoneKey);
                 state.location.floor = 0;
                 refreshArea(state);
-                displayTileEditorPropertyPanel();
             });
         },
     }, {
@@ -295,7 +294,6 @@ export function getImportExportProperties(): PanelRows {
                 state.location.zoneKey = importZone(contents, state.location.zoneKey);
                 state.location.floor = 0;
                 refreshArea(state);
-                displayTileEditorPropertyPanel();
             });
         },
     }]);
@@ -322,7 +320,6 @@ export function getBehaviorProperties(): PanelRows {
                     state.areaInstance.definition.specialBehaviorKey = specialBehaviorKey;
                 }
                 refreshArea(state);
-                displayTileEditorPropertyPanel();
             },
         });
     }
@@ -343,7 +340,7 @@ export function getBehaviorProperties(): PanelRows {
                     delete state.zone.underwaterKey;
                 }
             }
-            displayTileEditorPropertyPanel();
+            editingState.needsRefresh = true;
         }
     }, {
         name: 'Underwater Key',
@@ -362,7 +359,7 @@ export function getBehaviorProperties(): PanelRows {
                     delete state.zone.surfaceKey;
                 }
             }
-            displayTileEditorPropertyPanel();
+            editingState.needsRefresh = true;
         }
     });
     rows.push({
@@ -381,7 +378,6 @@ export function getBehaviorProperties(): PanelRows {
     rows = [...rows, ...getLogicProperties(state, 'Is Hot?', state.areaInstance.definition.hotLogic || {}, updatedLogic => {
         state.areaInstance.definition.hotLogic = updatedLogic;
         refreshArea(state);
-        displayTileEditorPropertyPanel();
     })];
     rows.push({
         name: 'Refresh Area',
@@ -407,7 +403,6 @@ export function getZoneProperties(): PanelRows {
                 state.location.zoneKey = zoneKey;
                 state.location.floor = 0;
                 refreshArea(state);
-                displayTileEditorPropertyPanel();
             }
         }
     }, {
@@ -431,7 +426,6 @@ export function getZoneProperties(): PanelRows {
             state.location.zoneKey = zone.key;
             state.location.floor = 0;
             refreshArea(state);
-            displayTileEditorPropertyPanel();
         },
     },
     {
@@ -443,7 +437,6 @@ export function getZoneProperties(): PanelRows {
             if (state.location.floor !== floorNumber) {
                 state.location.floor = floorNumber;
                 refreshArea(state);
-                displayTileEditorPropertyPanel();
             }
         }
     }, {
@@ -465,7 +458,6 @@ export function getZoneProperties(): PanelRows {
             state.zone.floors.push(floor);
             state.location.floor = state.zone.floors.length - 1;
             refreshArea(state);
-            displayTileEditorPropertyPanel();
         },
     }]);
     rows.push({
@@ -483,7 +475,7 @@ export function getZoneProperties(): PanelRows {
                 state.hero.area = state.areaInstance;
                 setConnectedAreas(state, tempInstance);
                 //enterLocation(state, state.location);
-                displayTileEditorPropertyPanel();
+                editingState.needsRefresh = true;
             }
         }
     });
@@ -508,7 +500,6 @@ export function getZoneProperties(): PanelRows {
                     }
                 }
                 refreshArea(state);
-                displayTileEditorPropertyPanel();
             }
         }
     }, 'x', {
@@ -531,7 +522,6 @@ export function getZoneProperties(): PanelRows {
                     }
                 }
                 refreshArea(state);
-                displayTileEditorPropertyPanel();
             }
         }
     }]);

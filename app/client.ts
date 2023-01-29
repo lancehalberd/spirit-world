@@ -7,6 +7,7 @@ import { render } from 'app/render';
 import { getState } from 'app/state';
 import { updateMusic } from 'app/musicController';
 
+export * from 'app/content/dialogue';
 export * from 'app/content/specialBehaviors';
 export * from 'app/development/tests';
 export * from 'app/randomizer/main';

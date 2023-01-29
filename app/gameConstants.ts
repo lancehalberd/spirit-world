@@ -94,3 +94,5 @@ export const allLootTypes: LootType[] = [
     'ironBoots', 'cloudBoots',
     'fire', 'ice', 'lightning'
 ];
+
+export const layersInOrder = ['floor', 'floor2', 'field', 'field2', 'foreground', 'foreground2'];
