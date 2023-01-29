@@ -1,4 +1,3 @@
-import { addObjectToArea } from 'app/content/areas';
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { goldenBeetleAnimations } from 'app/content/enemyAnimations';
@@ -6,6 +5,7 @@ import { LootDropObject } from 'app/content/objects/lootObject';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { moveEnemyFull } from 'app/utils/enemies';
 import { getDirection } from 'app/utils/field';
+import { addObjectToArea } from 'app/utils/objects';
 import { saveGame } from 'app/utils/saveGame';
 import { getVectorToTarget } from 'app/utils/target';
 

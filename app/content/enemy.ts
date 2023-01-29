@@ -2,10 +2,10 @@ import { AnimationEffect } from 'app/content/effects/animationEffect';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { addTextCue } from 'app/content/effects/textCue';
 import { dropItemFromTable, getLoot } from 'app/content/objects/lootObject';
-import { playAreaSound, refreshAreaLogic } from 'app/content/areas';
 import { bossDeathExplosionAnimation, enemyDeathAnimation } from 'app/content/enemyAnimations';
 import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { playAreaSound } from 'app/musicController';
 import { appendCallback } from 'app/scriptEvents';
 import { drawFrame, getFrame } from 'app/utils/animations';
 import { getDirection } from 'app/utils/field';
@@ -395,7 +395,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
                     if (bossDefinition.lootType && bossDefinition.lootType !== 'empty') {
                         getLoot(state, bossDefinition);
                     } else {
-                        refreshAreaLogic(state, state.areaInstance);
+                        state.areaInstance.needsLogicRefresh = true;
                     }
                 });
             }

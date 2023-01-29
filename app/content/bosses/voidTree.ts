@@ -1,4 +1,3 @@
-import { addEffectToArea, addObjectToArea, playAreaSound, refreshAreaLogic } from 'app/content/areas';
 import { flameHeartAnimations } from 'app/content/bosses/flameBeast';
 import { frostHeartAnimations, shootFrostInCone } from 'app/content/bosses/frostBeast';
 import { addSlamEffect, golemHandAnimations, golemHandHurtAnimations } from 'app/content/bosses/golem';
@@ -18,6 +17,7 @@ import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { createCanvasAndContext } from 'app/utils/canvas';
 import { rotateDirection } from 'app/utils/direction';
+import { addEffectToArea } from 'app/utils/effects'
 import {
     accelerateInDirection,
     moveEnemy,
@@ -26,6 +26,7 @@ import {
 import { addScreenShake } from 'app/utils/field';
 import { allImagesLoaded } from 'app/utils/images';
 import { rectanglesOverlap } from 'app/utils/index';
+import { addObjectToArea } from 'app/utils/objects'
 import Random from 'app/utils/Random';
 import {
     getNearbyTarget,
@@ -371,7 +372,7 @@ function chooseNewHeart(state: GameState, enemy: Enemy, fastRefresh = false) {
     for (const activeHeart of enemy.params.chosenHearts) {
         delete state.savedState.objectFlags[activeHeart];
     }
-    refreshAreaLogic(state, state.areaInstance, fastRefresh);
+    state.areaInstance.needsLogicRefresh = true;
 }
 
 function updateVoidTree(this: void, state: GameState, enemy: Enemy): void {
@@ -429,7 +430,7 @@ function updateVoidTree(this: void, state: GameState, enemy: Enemy): void {
             if (otherEnemy.life <= 0 && !otherEnemy.isDefeated) {
                 otherEnemy.showDeathAnimation(state);
                 saveObjectStatus(state, otherEnemy.definition);
-                refreshAreaLogic(state, state.areaInstance);
+                state.areaInstance.needsLogicRefresh = true;
             } else {
                 if (otherEnemy.definition.enemyType === 'voidStone') {
                     hasStone = true;
@@ -568,7 +569,7 @@ enemyDefinitions.voidHand = {
             return enemy.defaultOnHit(state, hit);
         }
         if (hitHand) {
-            playAreaSound(state, enemy.area, 'blockAttack');
+            enemy.makeSound(state, 'blockAttack');
             return { hit: true, blocked: true, stopped: true };
         }
         // This is the case if the hand is too high for the hit to effect in the current frame.
@@ -716,7 +717,7 @@ function updateVoidHand(this: void, state: GameState, enemy: Enemy): void {
         enemy.z -= 2;
         if (enemy.z <= 0) {
             enemy.z = 0;
-            playAreaSound(state, enemy.area, 'bossDeath');
+            enemy.makeSound(state, 'bossDeath');
             if (enemy.area === state.areaInstance) {
                 addScreenShake(state, 0, 2);
             }
@@ -736,7 +737,7 @@ function updateVoidHand(this: void, state: GameState, enemy: Enemy): void {
         enemy.z -= 3;
         if (enemy.z <= 0) {
             enemy.z = 0;
-            playAreaSound(state, enemy.area, 'bossDeath');
+            enemy.makeSound(state, 'bossDeath');
             if (enemy.area === state.areaInstance) {
                 addScreenShake(state, 0, 3);
             }
@@ -753,7 +754,7 @@ function updateVoidHand(this: void, state: GameState, enemy: Enemy): void {
         enemy.changeToAnimation('punching');
         accelerateInDirection(state, enemy, {x: 0, y: 1});
         if (!moveEnemy(state, enemy, enemy.vx, enemy.vy, {})) {
-            playAreaSound(state, enemy.area, 'bossDeath');
+            enemy.makeSound(state, 'bossDeath');
             if (enemy.area === state.areaInstance) {
                 addScreenShake(state, 0, 3);
             }

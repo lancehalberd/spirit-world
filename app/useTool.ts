@@ -1,4 +1,4 @@
-import { playAreaSound } from 'app/content/areas';
+import { playAreaSound } from 'app/musicController';
 import { isGameKeyDown, wasGameKeyPressed, wasGameKeyPressedAndReleased } from 'app/userInput';
 import { Arrow } from 'app/content/effects/arrow';
 import { Clone }  from 'app/content/objects/clone';

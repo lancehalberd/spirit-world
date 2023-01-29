@@ -1,6 +1,5 @@
 import { sample } from 'lodash';
 import { AnimationEffect } from 'app/content/effects/animationEffect';
-import { addEffectToArea, playAreaSound } from 'app/content/areas';
 import { Frost } from 'app/content/effects/frost';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { throwIceGrenadeAtLocation } from 'app/content/effects/frostGrenade';
@@ -9,6 +8,7 @@ import { enemyDeathAnimation, snakeAnimations } from 'app/content/enemyAnimation
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { createCanvasAndContext } from 'app/utils/canvas';
+import { addEffectToArea } from 'app/utils/effects';
 import {
     accelerateInDirection,
     moveEnemy,
@@ -70,7 +70,7 @@ enemyDefinitions.frostHeart = {
                 }
                 enemy.params.shieldLife = Math.max(0, enemy.params.shieldLife - hit.damage);
                 enemy.enemyInvulnerableFrames = 20;
-                playAreaSound(state, enemy.area, 'enemyHit');
+                enemy.makeSound(state, 'enemyHit');
                 return { hit: true };
             }
         }
@@ -83,7 +83,7 @@ enemyDefinitions.frostHeart = {
             enemy.params.shieldLife = Math.min(8, enemy.params.shieldLife + hit.damage);
             //console.log('healed shield', enemy.params.shieldLife);
             enemy.blockInvulnerableFrames = 50;
-            playAreaSound(state, enemy.area, 'blocked');
+            enemy.makeSound(state, 'blocked');
             return { hit: true };
         }
         if (enemy.area.underwater) {

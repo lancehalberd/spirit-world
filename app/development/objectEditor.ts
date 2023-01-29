@@ -1,10 +1,8 @@
 import { flatten } from 'lodash';
 
 import {
-    addObjectToArea,
     findZoneTargets,
     linkObject,
-    removeObjectFromArea,
 } from 'app/content/areas';
 import { bossTypes } from 'app/content/bosses';
 import { dialogueHash } from 'app/content/dialogue';
@@ -32,6 +30,7 @@ import { isKeyboardKeyDown, KEY } from 'app/userInput';
 import { getState } from 'app/state';
 import { createObjectInstance } from 'app/utils/createObjectInstance';
 import { isPointInShortRect } from 'app/utils/index';
+import { addObjectToArea, removeObjectFromArea } from 'app/utils/objects';
 
 import {
     AreaDefinition, AreaInstance, BallGoalDefinition,

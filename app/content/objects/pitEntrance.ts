@@ -1,4 +1,4 @@
-import { playAreaSound } from 'app/content/areas';
+import { playAreaSound } from 'app/musicController';
 import { CANVAS_HEIGHT } from 'app/gameConstants';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { enterZoneByTarget } from 'app/utils/enterZoneByTarget';

@@ -1,7 +1,7 @@
-import { playAreaSound } from 'app/content/areas';
 import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
 import { editingState } from 'app/development/editingState';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { playAreaSound } from 'app/musicController';
 import {
     renderAreaObjectsBeforeHero,
     renderAreaObjectsAfterHero,

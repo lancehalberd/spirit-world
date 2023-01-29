@@ -1,9 +1,3 @@
-import {
-    addEffectToArea,
-    addObjectToArea,
-    removeEffectFromArea,
-    playAreaSound,
-} from 'app/content/areas';
 import { AnimationEffect } from 'app/content/effects/animationEffect';
 import { addArcOfShockWaves, addRadialShockWaves } from 'app/content/effects/shockWave';
 import { LaserBeam } from 'app/content/effects/laserBeam';
@@ -13,14 +7,13 @@ import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { rectanglesOverlap } from 'app/utils/index';
 import {
     accelerateInDirection,
-    //getVectorToNearbyTarget,
-    //getVectorToTarget,
     moveEnemy,
     moveEnemyToTargetLocation,
-    //paceRandomly,
 } from 'app/utils/enemies';
+import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import { addScreenShake } from 'app/utils/field';
 import { getAreaSize } from 'app/utils/getAreaSize';
+import { addObjectToArea } from 'app/utils/objects';
 import { getNearbyTarget} from 'app/utils/target';
 
 import {
@@ -223,7 +216,7 @@ enemyDefinitions.golem = {
     onHit(state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
         // Cannot damage the golem head at all unless it is in a mode where its mouth is open.
         if (!['chargeLaser', 'fireLaser', 'cooldown'].includes(enemy.mode)) {
-            playAreaSound(state, enemy.area, 'blockAttack');
+            enemy.makeSound(state, 'blockAttack');
             return { hit: true, blocked: true, stopped: true };
         }
         const hitbox = enemy.getHitbox(state);
@@ -235,7 +228,7 @@ enemyDefinitions.golem = {
         }, hit.hitbox);
         // Only striking the vulnerable point will deal damage.
         if (!hitInnerBox) {
-            playAreaSound(state, enemy.area, 'blockAttack');
+            enemy.makeSound(state, 'blockAttack');
             return { hit: true, blocked: true, stopped: true };
         }
         if (hit.damage) {
@@ -330,7 +323,7 @@ enemyDefinitions.golemHand = {
             return enemy.defaultOnHit(state, hit);
         }
         if (hitHand) {
-            playAreaSound(state, enemy.area, 'blockAttack');
+            enemy.makeSound(state, 'blockAttack');
             return { hit: true, blocked: true, stopped: true };
         }
         // This is the case if the hand is too high for the hit to effect in the current frame.
@@ -830,7 +823,7 @@ function updateGolemHand(this: void, state: GameState, enemy: Enemy): void {
         enemy.z -= 2;
         if (enemy.z <= 0) {
             enemy.z = 0;
-            playAreaSound(state, enemy.area, 'bossDeath');
+            enemy.makeSound(state, 'bossDeath');
             addScreenShake(state, 0, 2);
             addSlamEffect(state, enemy);
             addArcOfShockWaves(
@@ -858,7 +851,7 @@ function updateGolemHand(this: void, state: GameState, enemy: Enemy): void {
         enemy.z -= 3;
         if (enemy.z <= 0) {
             enemy.z = 0;
-            playAreaSound(state, enemy.area, 'bossDeath');
+            enemy.makeSound(state, 'bossDeath');
             addScreenShake(state, 0, 3);
             addSlamEffect(state, enemy);
             addRadialShockWaves(
@@ -873,7 +866,7 @@ function updateGolemHand(this: void, state: GameState, enemy: Enemy): void {
         enemy.changeToAnimation('punching');
         accelerateInDirection(state, enemy, {x: 0, y: 1});
         if (!moveEnemy(state, enemy, enemy.vx, enemy.vy, {})) {
-            playAreaSound(state, enemy.area, 'bossDeath');
+            enemy.makeSound(state, 'bossDeath');
             addScreenShake(state, 0, 3);
             enemy.params.stunTime = 1500;
             enemy.setMode('stunned');

@@ -22,11 +22,6 @@ import {
     ZoneLocation,
 } from 'app/types';
 
-
-export { playAreaSound } from 'app/musicController';
-export { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
-export { addObjectToArea, removeObjectFromArea } from 'app/utils/objects';
-
 export function getDefaultArea(): AreaDefinition {
     return {
         default: true,

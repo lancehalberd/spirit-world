@@ -1,4 +1,3 @@
-import { addEffectToArea } from 'app/content/areas';
 import { LaserBeam } from 'app/content/effects/laserBeam';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import {
@@ -6,6 +5,7 @@ import {
 } from 'app/content/enemyAnimations';
 import { lifeLootTable } from 'app/content/lootTables';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { addEffectToArea } from 'app/utils/effects';
 import {
     paceAndCharge,
 } from 'app/utils/enemies';

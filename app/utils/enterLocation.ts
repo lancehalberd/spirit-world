@@ -1,7 +1,6 @@
 import {
-    addEffectToArea, cleanupHeroFromArea, createAreaInstance,
+    cleanupHeroFromArea, createAreaInstance,
     getAreaFromLocation, linkObjects,
-    removeEffectFromArea, removeObjectFromArea, 
     setAreaSection, setConnectedAreas,
 } from 'app/content/areas';
 import { checkToUpdateSpawnLocation } from 'app/content/spawnLocations';
@@ -10,8 +9,10 @@ import { editingState } from 'app/development/editingState';
 import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
 import { removeTextCue } from 'app/content/effects/textCue';
 import { checkIfAllEnemiesAreDefeated } from 'app/utils/checkIfAllEnemiesAreDefeated';
+import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import { fixCamera } from 'app/utils/fixCamera';
 import { getFullZoneLocation } from 'app/utils/getFullZoneLocation';
+import { removeObjectFromArea } from 'app/utils/objects';
 
 import { GameState, ZoneLocation } from 'app/types';
 

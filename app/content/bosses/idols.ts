@@ -1,4 +1,3 @@
-import { addEffectToArea } from 'app/content/areas';
 import { LightningBolt } from 'app/content/effects/lightningBolt';
 import { FlameWall } from 'app/content/effects/flameWall';
 import { throwIceGrenadeAtLocation } from 'app/content/effects/frostGrenade';
@@ -6,6 +5,7 @@ import { Enemy } from 'app/content/enemy';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { fireIdolAnimations, iceIdolAnimations, lightningIdolAnimations } from 'app/content/enemyAnimations';
 import { rotateDirection } from 'app/utils/direction';
+import { addEffectToArea } from 'app/utils/effects';
 
 
 import { GameState, HitProperties, HitResult } from 'app/types';

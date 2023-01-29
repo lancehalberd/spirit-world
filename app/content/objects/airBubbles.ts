@@ -1,8 +1,8 @@
-import { addEffectToArea } from 'app/content/areas';
 import { AnimationEffect } from 'app/content/effects/animationEffect';
 import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, frameAnimation, getFrame } from 'app/utils/animations';
+import { addEffectToArea } from 'app/utils/effects';
 import Random from 'app/utils/Random';
 
 import {

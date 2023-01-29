@@ -1,8 +1,8 @@
 import { addParticleAnimations } from 'app/content/effects/animationEffect';
-import { removeObjectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { directionMap, isPointOpen } from 'app/utils/field';
+import { removeObjectFromArea } from 'app/utils/objects';
 
 import {
     AreaInstance, Direction, DrawPriority, Frame, FrameAnimation, GameState, HitProperties, HitResult,

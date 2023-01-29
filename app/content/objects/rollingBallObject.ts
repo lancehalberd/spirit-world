@@ -1,10 +1,10 @@
-import { playAreaSound, removeObjectFromArea } from 'app/content/areas';
 import { addParticleAnimations } from 'app/content/effects/animationEffect';
 import { lightStoneParticles } from 'app/content/tiles';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { playAreaSound, stopSound } from 'app/musicController';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { directionMap, getTileBehaviorsAndObstacles, hitTargets, isPointOpen } from 'app/utils/field';
-import { stopSound } from 'app/musicController';
+import { removeObjectFromArea } from 'app/utils/objects';
 
 import {
     AreaInstance, BallGoal, Direction, GameState, HitProperties, HitResult,

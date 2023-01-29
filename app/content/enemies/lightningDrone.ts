@@ -1,11 +1,11 @@
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
-import { addEffectToArea } from 'app/content/areas';
 import { LightningDischarge } from 'app/content/effects/lightningDischarge';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import {
     droneAnimations,
 } from 'app/content/enemyAnimations';
 import { lifeLootTable } from 'app/content/lootTables';
+import { addEffectToArea } from 'app/utils/effects';
 import {
     moveEnemyToTargetLocation,
     paceRandomly,

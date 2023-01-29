@@ -1,4 +1,3 @@
-import { addObjectToArea, removeObjectFromArea } from 'app/content/areas';
 import { moveNPCToTargetLocation, NPC } from 'app/content/objects/npc';
 import { logicHash } from 'app/content/logic';
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
@@ -6,6 +5,7 @@ import { FRAME_LENGTH, RIVAL_NAME } from 'app/gameConstants';
 import { appendCallback, appendScript, wait } from 'app/scriptEvents';
 import { saveGame } from 'app/utils/saveGame';
 import { moveEnemyToTargetLocation } from 'app/utils/enemies';
+import { addObjectToArea, removeObjectFromArea } from 'app/utils/objects';
 
 import { Enemy, GameState } from 'app/types';
 

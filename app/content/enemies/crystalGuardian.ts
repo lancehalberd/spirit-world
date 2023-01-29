@@ -1,4 +1,3 @@
-import { addEffectToArea } from 'app/content/areas';
 import { addParticleAnimations } from 'app/content/effects/animationEffect';
 import { addLineOfSpikes } from 'app/content/effects/groundSpike';
 import { SpikePod } from 'app/content/effects/spikePod';
@@ -14,6 +13,7 @@ import {
 } from 'app/content/enemyAnimations';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { drawFrameCenteredAt } from 'app/utils/animations';
+import { addEffectToArea } from 'app/utils/effects';
 import { getVectorToNearbyTarget } from 'app/utils/target';
 
 import { Enemy, EnemyAbility, Frame, GameState, HitProperties, HitResult, Rect } from 'app/types';

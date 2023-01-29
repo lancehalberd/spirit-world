@@ -1,4 +1,3 @@
-import { playAreaSound, refreshAreaLogic } from 'app/content/areas';
 import {
     toggleTarget,
     checkIfAllSwitchesAreActivated,
@@ -6,6 +5,7 @@ import {
     getObjectStatus,
     saveObjectStatus,
 } from 'app/content/objects';
+import { playAreaSound } from 'app/musicController';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { findObjectInstanceById } from 'app/utils/findObjectInstanceById';
 import { rectanglesOverlap } from 'app/utils/index';
@@ -61,7 +61,7 @@ export class FloorSwitch implements ObjectInstance {
             saveObjectStatus(state, this.definition, true);
             if (this.definition.id && (this.definition.saveStatus === 'forever' || this.definition.saveStatus === 'zone')) {
                 // Refresh the area to update layer logic, for example drainging lava in the crater.
-                refreshAreaLogic(state, state.areaInstance);
+                state.areaInstance.needsLogicRefresh = true;
             }
         }
         if (this.definition.toggleOnRelease && this.definition.targetObjectId) {

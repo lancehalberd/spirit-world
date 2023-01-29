@@ -1,7 +1,7 @@
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { addEffectToArea } from 'app/content/areas';
 import { PouredWaterEffect } from 'app/content/effects/PouredWaterEffect';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
+import { addEffectToArea } from 'app/utils/effects';
 
 import {
     AreaInstance, Direction, DrawPriority, GameState, HitProperties, HitResult,

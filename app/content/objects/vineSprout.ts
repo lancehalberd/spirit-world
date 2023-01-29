@@ -1,8 +1,8 @@
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { removeObjectFromArea } from 'app/content/areas';
 import { allTiles } from 'app/content/tiles';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
-import { playSound } from 'app/musicController';
+import { playAreaSound } from 'app/musicController';
+import { removeObjectFromArea } from 'app/utils/objects';
 import { resetTileBehavior } from 'app/utils/tileBehavior';
 import { saveGame } from 'app/utils/saveGame';
 
@@ -96,7 +96,7 @@ export class VineSprout implements ObjectInstance {
     }
     grow(state: GameState) {
         state.savedState.objectFlags[this.definition.id] = true;
-        playSound(state, 'secretChime');
+        playAreaSound(state, this.area, 'secretChime');
         saveGame(state);
         this.sprouting = true;
         this.animationTime = 0;

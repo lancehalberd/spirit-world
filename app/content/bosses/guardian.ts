@@ -1,11 +1,11 @@
 import { sample } from 'lodash';
-import { addObjectToArea } from 'app/content/areas';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { Indicator } from 'app/content/objects/indicator';
 import { heroSpiritAnimations } from 'app/render/heroAnimations';
 import { vanaraBlueAnimations } from 'app/render/npcAnimations';
 import { accelerateInDirection, moveEnemy } from 'app/utils/enemies';
 import { directionMap, getDirection } from 'app/utils/field';
+import { addObjectToArea } from 'app/utils/objects';
 import { getVectorToNearbyTarget, getVectorToTarget } from 'app/utils/target';
 
 

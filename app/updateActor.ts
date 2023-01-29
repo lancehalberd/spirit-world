@@ -1,6 +1,5 @@
 import {
     getAreaFromLocation, removeAllClones,
-    removeEffectFromArea, removeObjectFromArea,
     scrollToArea, setNextAreaSection,
     swapHeroStates,
 } from 'app/content/areas';
@@ -13,12 +12,14 @@ import { prependScript } from 'app/scriptEvents';
 import { updateHeroSpecialActions } from 'app/updateHeroSpecialActions';
 import { updateHeroStandardActions } from 'app/updateHeroStandardActions';
 import { isToolButtonPressed, wasToolButtonPressed, wasToolButtonPressedAndReleased, } from 'app/useTool';
+import { removeEffectFromArea } from 'app/utils/effects';
 import {
     directionMap,
 } from 'app/utils/field';
 import { getAreaSize } from 'app/utils/getAreaSize';
 import { getFullZoneLocation } from 'app/utils/getFullZoneLocation';
 import { boxesIntersect } from 'app/utils/index';
+import { removeObjectFromArea } from 'app/utils/objects';
 
 import {
     GameState, Hero,

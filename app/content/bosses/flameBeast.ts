@@ -1,4 +1,3 @@
-import { addEffectToArea } from 'app/content/areas';
 import { Flame } from 'app/content/effects/flame';
 import { FlameWall } from 'app/content/effects/flameWall';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
@@ -7,6 +6,7 @@ import { Enemy } from 'app/content/enemy';
 import { beetleHornedAnimations } from 'app/content/enemyAnimations';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame } from 'app/utils/animations';
+import { addEffectToArea } from 'app/utils/effects';
 import { paceRandomly } from 'app/utils/enemies';
 import { getDirection } from 'app/utils/field';
 import { allImagesLoaded } from 'app/utils/images';

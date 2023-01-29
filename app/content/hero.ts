@@ -1,4 +1,3 @@
-import { addEffectToArea } from 'app/content/areas';
 import { AnimationEffect } from 'app/content/effects/animationEffect';
 import { BarrierBurstEffect } from 'app/content/effects/barrierBurstEffect';
 import { Staff } from 'app/content/objects/staff';
@@ -21,6 +20,7 @@ import {
 import { drawFrameAt, getFrame } from 'app/utils/animations';
 import { isUnderwater } from 'app/utils/actor';
 import { destroyClone } from 'app/utils/destroyClone';
+import { addEffectToArea } from 'app/utils/effects';
 import { directionMap, getDirection } from 'app/utils/field';
 import { getChargeLevelAndElement } from 'app/utils/getChargeLevelAndElement';
 import { boxesIntersect } from 'app/utils/index';

@@ -1,4 +1,4 @@
-import { addObjectToArea, playAreaSound, refreshAreaLogic } from 'app/content/areas';
+import { refreshAreaLogic } from 'app/content/areas';
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { Door } from 'app/content/objects/door';
 import { Staff } from 'app/content/objects/staff';
@@ -7,6 +7,7 @@ import { editingState } from 'app/development/editingState';
 import { getCloneMovementDeltas, isGameKeyDown, wasGameKeyPressed } from 'app/userInput';
 import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
 import { getSectionBoundingBox, moveActor } from 'app/moveActor';
+import { playAreaSound } from 'app/musicController';
 import { fallAnimation, heroAnimations } from 'app/render/heroAnimations';
 import { isUnderwater } from 'app/utils/actor';
 import { destroyClone } from 'app/utils/destroyClone';
@@ -21,6 +22,7 @@ import {
 import { fixCamera } from 'app/utils/fixCamera';
 import { getAreaSize } from 'app/utils/getAreaSize';
 import { boxesIntersect, isObjectInsideTarget, pad } from 'app/utils/index';
+import { addObjectToArea } from 'app/utils/objects';
 import { saveGame } from 'app/utils/saveGame';
 import { getVectorToTarget } from 'app/utils/target';
 

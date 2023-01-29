@@ -2,7 +2,6 @@ import { find } from 'lodash';
 
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { HeldChakram } from 'app/content/effects/thrownChakram';
-import { playAreaSound } from 'app/content/areas';
 import { setEquippedBoots } from 'app/content/menu';
 import { getObjectBehaviors } from 'app/content/objects';
 import { CloneExplosionEffect } from 'app/content/effects/CloneExplosionEffect';
@@ -10,13 +9,14 @@ import { AstralProjection } from 'app/content/objects/astralProjection';
 import { zones } from 'app/content/zones';
 import { EXPLOSION_TIME, FALLING_HEIGHT, MAX_FLOAT_HEIGHT, FRAME_LENGTH, GAME_KEY, MAX_SPIRIT_RADIUS } from 'app/gameConstants';
 import { getActorTargets } from 'app/getActorTargets';
+import { playAreaSound } from 'app/musicController';
+import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
+import { getSectionBoundingBox, moveActor } from 'app/moveActor';
 import {
     getCloneMovementDeltas,
     isGameKeyDown,
     wasGameKeyPressed,
 } from 'app/userInput';
-import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
-import { getSectionBoundingBox, moveActor } from 'app/moveActor';
 import { isToolButtonPressed, useTool } from 'app/useTool';
 import { isHeroFloating, isHeroSinking, isUnderwater } from 'app/utils/actor';
 import { destroyClone } from 'app/utils/destroyClone';

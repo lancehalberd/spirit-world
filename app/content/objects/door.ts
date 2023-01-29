@@ -1,4 +1,3 @@
-import { playAreaSound } from 'app/content/areas';
 import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
 import { evaluateLogicDefinition } from 'app/content/logic';
 import { doorStyles, DoorStyle } from 'app/content/objects/doorStyles';
@@ -7,6 +6,7 @@ import {
     BITMAP_BOTTOM, BITMAP_BOTTOM_LEFT_QUARTER, BITMAP_BOTTOM_RIGHT_QUARTER,
     BITMAP_TOP,
 } from 'app/content/bitMasks';
+import { playAreaSound } from 'app/musicController';
 import { showMessage } from 'app/scriptEvents';
 import { drawFrame } from 'app/utils/animations';
 import { enterZoneByTarget } from 'app/utils/enterZoneByTarget';

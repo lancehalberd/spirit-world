@@ -1,5 +1,4 @@
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
-import { addEffectToArea } from 'app/content/areas';
 import { LightningBolt } from 'app/content/effects/lightningBolt';
 import { LightningDischarge } from 'app/content/effects/lightningDischarge';
 import { Spark } from 'app/content/effects/spark';
@@ -10,6 +9,7 @@ import { beetleWingedAnimations } from 'app/content/enemyAnimations';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, drawFrameAt } from 'app/utils/animations';
 import { createCanvasAndContext, debugCanvas } from 'app/utils/canvas';
+import { addEffectToArea } from 'app/utils/effects';
 import {
     accelerateInDirection,
     hasEnemyLeftSection,
