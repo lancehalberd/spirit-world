@@ -3,7 +3,7 @@ import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
 import { setSpawnLocation } from 'app/content/spawnLocations';
 import { isRandomizer } from 'app/gameConstants';
-import { showMessage } from 'app/render/renderMessage';
+import { showMessage } from 'app/scriptEvents';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 
 import {

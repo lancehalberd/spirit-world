@@ -3,8 +3,8 @@ import { isGameKeyDown, wasGameKeyPressed, wasGameKeyPressedAndReleased } from '
 import { Arrow } from 'app/content/effects/arrow';
 import { Clone }  from 'app/content/objects/clone';
 import { GAME_KEY } from 'app/gameConstants';
+import { directionMap, getDirection, rotateDirection } from 'app/utils/direction';
 import { addEffectToArea } from 'app/utils/effects';
-import { directionMap, getDirection, rotateDirection } from 'app/utils/field';
 import { getChargeLevelAndElement } from 'app/utils/getChargeLevelAndElement';
 import { addObjectToArea } from 'app/utils/objects';
 

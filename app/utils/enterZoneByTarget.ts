@@ -1,16 +1,18 @@
-import { addEffectToArea, findEntranceById, isObjectLogicValid, setAreaSection } from 'app/content/areas';
+import { setAreaSection } from 'app/content/areas';
 import { TextCue } from 'app/content/effects/textCue';
+import { isObjectLogicValid } from 'app/content/logic';
 import { Door } from 'app/content/objects/door';
 import { doorStyles } from 'app/content/objects/doorStyles';
 import { Teleporter } from 'app/content/objects/teleporter';
 import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
 import { zones } from 'app/content/zones';
-import { updateCamera } from 'app/updateCamera';
+import { addEffectToArea } from 'app/utils/effects';
 import { directionMap, getDirection } from 'app/utils/field';
 import { enterLocation } from 'app/utils/enterLocation';
 import { findObjectInstanceById } from 'app/utils/findObjectInstanceById';
+import { fixCamera } from 'app/utils/fixCamera';
 
-import { EntranceDefinition, GameState, ObjectDefinition } from 'app/types';
+import { AreaInstance, EntranceDefinition, GameState, ObjectDefinition, ObjectInstance } from 'app/types';
 
 export function enterZoneByTarget(
     state: GameState,
@@ -56,7 +58,7 @@ export function enterZoneByTarget(
                                     state.hero.y = hitbox.y + hitbox.h / 2 - state.hero.h / 2;
                                     setAreaSection(state, state.hero.d, true);
                                     checkForFloorEffects(state, state.hero);
-                                    updateCamera(state, 512);
+                                    fixCamera(state);
                                 }
                                 // Technically this could also be a MarkerDefinition.
                                 const definition = target.definition as EntranceDefinition;
@@ -138,4 +140,16 @@ function enterZoneByTeleporterCallback(this: void, state: GameState, targetObjec
     target.disabledTime = 500;
     hero.actionDx = directionMap[hero.d][0];
     hero.actionDy = directionMap[hero.d][1];
+}
+
+function findEntranceById(areaInstance: AreaInstance, id: string, skippedDefinitions: ObjectDefinition[]): ObjectInstance {
+    for (const object of areaInstance.objects) {
+        if (!object.definition || skippedDefinitions?.includes(object.definition)) {
+            continue;
+        }
+        if (object.definition.type !== 'enemy' && object.definition.type !== 'boss' && object.definition.id === id) {
+            return object;
+        }
+    }
+    console.error('Missing target', id);
 }

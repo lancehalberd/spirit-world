@@ -13,7 +13,6 @@ export function wait(state: GameState, duration: number) {
     });
 }
 
-
 export function appendCallback(state: GameState, callback: (state: GameState) => void) {
     state.scriptEvents.queue.push({
         type: 'callback',
@@ -62,6 +61,16 @@ export function parseScriptText(state: GameState, text: TextScript, duration: nu
         });
     }
     return events;
+}
+
+export function showMessage(
+    state: GameState,
+    message: TextScript
+): void {
+    if (!message){
+        return;
+    }
+    prependScript(state, `${textScriptToString(state, message)}{clearTextBox}{wait:200}`);
 }
 
 export function parseEventScript(state: GameState, script: TextScript): ScriptEvent[] {

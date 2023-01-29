@@ -1,6 +1,6 @@
 import { setLeftTool, setRightTool } from 'app/content/menu';
-import { showMessage } from 'app/render/renderMessage';
 import { updateHeroMagicStats } from 'app/render/spiritBar';
+import { showMessage } from 'app/scriptEvents';
 import { createAnimation } from 'app/utils/animations';
 import { createCanvasAndContext } from 'app/utils/canvas';
 import { requireImage } from 'app/utils/images';

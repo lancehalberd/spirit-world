@@ -1,7 +1,7 @@
 import { Hero } from 'app/content/hero';
 
 import { renderHeroShadow } from 'app/renderActor';
-import { carryMap, directionMap, directionToLeftRotationsFromRight, rotateDirection } from 'app/utils/field';
+import { carryMap, directionMap, directionToLeftRotationsFromRight, rotateDirection } from 'app/utils/direction';
 
 import {
     Direction, GameState, Rect

@@ -9,8 +9,8 @@ import { zones } from 'app/content/zones';
 import { editingState } from 'app/development/editingState';
 import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
 import { removeTextCue } from 'app/content/effects/textCue';
-import { updateCamera } from 'app/updateCamera';
 import { checkIfAllEnemiesAreDefeated } from 'app/utils/checkIfAllEnemiesAreDefeated';
+import { fixCamera } from 'app/utils/fixCamera';
 import { getFullZoneLocation } from 'app/utils/getFullZoneLocation';
 
 import { GameState, ZoneLocation } from 'app/types';
@@ -132,7 +132,7 @@ export function enterLocation(
         state.hero.safeY = location.y;
     }
     setAreaSection(state, state.hero.d, !isMutation);
-    updateCamera(state, 512);
+    fixCamera(state);
     checkToUpdateSpawnLocation(state);
     // Make sure the actor is shown as swimming/wading during the transition frames.
     checkForFloorEffects(state, state.hero);

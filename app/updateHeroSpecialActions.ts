@@ -8,7 +8,6 @@ import { getCloneMovementDeltas, isGameKeyDown, wasGameKeyPressed } from 'app/us
 import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
 import { getSectionBoundingBox, moveActor } from 'app/moveActor';
 import { fallAnimation, heroAnimations } from 'app/render/heroAnimations';
-import { updateCamera } from 'app/updateCamera';
 import { isUnderwater } from 'app/utils/actor';
 import { destroyClone } from 'app/utils/destroyClone';
 import { enterLocation } from 'app/utils/enterLocation';
@@ -19,6 +18,7 @@ import {
     getTileBehaviorsAndObstacles,
     hitTargets,
 } from 'app/utils/field';
+import { fixCamera } from 'app/utils/fixCamera';
 import { getAreaSize } from 'app/utils/getAreaSize';
 import { boxesIntersect, isObjectInsideTarget, pad } from 'app/utils/index';
 import { saveGame } from 'app/utils/saveGame';
@@ -152,7 +152,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 if (best) {
                     hero.x = best.x;
                     hero.y = best.y;
-                    updateCamera(state, 512);
+                    fixCamera(state);
                 }
             });
             return true;

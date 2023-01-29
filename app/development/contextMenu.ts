@@ -3,13 +3,13 @@ import { editingState } from 'app/development/editingState';
 import { toggleEditing } from 'app/development/editor';
 import { tagElement } from 'app/dom';
 import { KEY, isKeyboardKeyDown } from 'app/userInput';
+import { showMessage } from 'app/scriptEvents';
 import { getState } from 'app/state';
 import { mainCanvas } from 'app/utils/canvas';
 import { defeatAllEnemies } from 'app/utils/addKeyboardShortcuts';
 import { getElementRectangle } from 'app/utils/index';
 import { getMousePosition } from 'app/utils/mouse';
 import { updateSoundSettings } from 'app/utils/sounds';
-import { showMessage } from 'app/render/renderMessage';
 
 import { MenuOption } from 'app/types';
 

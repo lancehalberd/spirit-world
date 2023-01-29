@@ -3,13 +3,12 @@ import { flatten } from 'lodash';
 import {
     addObjectToArea,
     findZoneTargets,
-    isObjectLogicValid,
     linkObject,
     removeObjectFromArea,
 } from 'app/content/areas';
 import { bossTypes } from 'app/content/bosses';
 import { dialogueHash } from 'app/content/dialogue';
-import { logicHash } from 'app/content/logic';
+import { logicHash, isObjectLogicValid } from 'app/content/logic';
 import { decorationTypes } from 'app/content/objects/decoration';
 import { escalatorStyles } from 'app/content/objects/escalator';
 import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';

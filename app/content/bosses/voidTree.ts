@@ -17,12 +17,13 @@ import { saveObjectStatus } from 'app/content/objects';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { createCanvasAndContext } from 'app/utils/canvas';
+import { rotateDirection } from 'app/utils/direction';
 import {
     accelerateInDirection,
     moveEnemy,
     moveEnemyToTargetLocation,
 } from 'app/utils/enemies';
-import { addScreenShake, rotateDirection } from 'app/utils/field';
+import { addScreenShake } from 'app/utils/field';
 import { allImagesLoaded } from 'app/utils/images';
 import { rectanglesOverlap } from 'app/utils/index';
 import Random from 'app/utils/Random';

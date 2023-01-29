@@ -1,5 +1,5 @@
-import { removeEffectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { removeEffectFromArea } from 'app/utils/effects';
 import { coverTile, hitTargets } from 'app/utils/field';
 
 import {

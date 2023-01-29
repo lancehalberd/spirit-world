@@ -1,4 +1,4 @@
-import { evaluateLogicDefinition, logicHash, isLogicValid } from 'app/content/logic';
+import { evaluateLogicDefinition, logicHash, isLogicValid, isObjectLogicValid } from 'app/content/logic';
 import { allTiles } from 'app/content/tiles';
 import { zones } from 'app/content/zones';
 import { editingState } from 'app/development/editingState';
@@ -228,18 +228,6 @@ export function linkObject(object: ObjectInstance): void {
         linkedObject.linkedObject = object;
         object.linkedObject = linkedObject;
     }
-}
-
-export function findEntranceById(areaInstance: AreaInstance, id: string, skippedDefinitions: ObjectDefinition[]): ObjectInstance {
-    for (const object of areaInstance.objects) {
-        if (!object.definition || skippedDefinitions?.includes(object.definition)) {
-            continue;
-        }
-        if (object.definition.type !== 'enemy' && object.definition.type !== 'boss' && object.definition.id === id) {
-            return object;
-        }
-    }
-    console.error('Missing target', id);
 }
 
 interface ObjectTarget {
@@ -711,23 +699,6 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
         //console.log('new instance', instance.objects.map( o => o.definition?.id ));
     }
     checkIfAllEnemiesAreDefeated(state, area);
-}
-
-export function isObjectLogicValid(state: GameState, definition: ObjectDefinition): boolean {
-    if (definition.hasCustomLogic && definition.customLogic) {
-        return isLogicValid(state, {requiredFlags: [definition.customLogic]}, definition.invertLogic);
-    }
-    if (!definition.logicKey) {
-        return true;
-    }
-    const logic = logicHash[definition.logicKey];
-    // Logic should never be missing, so surface an error and hide the layer.
-    if (!logic) {
-        console.error('Missing logic!', definition.logicKey);
-        debugger;
-        return false;
-    }
-    return isLogicValid(state, logic, definition.invertLogic);
 }
 
 export function refreshSection(state: GameState, area: AreaInstance, section: Rect): void {

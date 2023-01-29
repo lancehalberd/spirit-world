@@ -1,9 +1,10 @@
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
-import { addEffectToArea, playAreaSound, removeEffectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { playAreaSound } from 'app/musicController';
 import { createAnimation, drawFrameAt, getFrame } from 'app/utils/animations';
 import { getDirection, hitTargets } from 'app/utils/field';
 import { getAreaSize } from 'app/utils/getAreaSize';
+import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 
 import {
     AreaInstance, Direction, DrawPriority, EffectInstance, Frame, FrameAnimation,

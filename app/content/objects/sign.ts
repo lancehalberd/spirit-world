@@ -1,4 +1,4 @@
-import { showMessage } from 'app/render/renderMessage';
+import { showMessage } from 'app/scriptEvents';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 
 import {

@@ -3,7 +3,7 @@ import { getObjectStatus } from 'app/content/objects';
 import { editingState } from 'app/development/editingState';
 import { CANVAS_WIDTH, CANVAS_HEIGHT, FRAME_LENGTH } from 'app/gameConstants';
 import { playSound } from 'app/musicController';
-import { showMessage } from 'app/render/renderMessage';
+import { showMessage } from 'app/scriptEvents';
 import { createAnimation, drawFrame, drawFrameAt, getFrameHitBox } from 'app/utils/animations';
 import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import { pad, boxesIntersect } from 'app/utils/index';

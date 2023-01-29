@@ -7,7 +7,7 @@ import {
 import { heroCarryAnimations } from 'app/render/heroAnimations';
 
 import { createCanvasAndContext, drawCanvas } from 'app/utils/canvas';
-import { carryMap, directionMap } from 'app/utils/field';
+import { carryMap, directionMap } from 'app/utils/direction';
 
 import { AreaInstance, GameState } from 'app/types';
 

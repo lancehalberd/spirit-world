@@ -1,5 +1,5 @@
-import { addEffectToArea, removeEffectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import { getTileBehaviors, hitTargets } from 'app/utils/field';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 

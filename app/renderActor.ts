@@ -2,7 +2,7 @@ import { EXPLOSION_RADIUS, EXPLOSION_TIME, FRAME_LENGTH } from 'app/gameConstant
 import { getCloneMovementDeltas } from 'app/userInput';
 import { isHeroFloating, isHeroSinking } from 'app/utils/actor';
 import { createAnimation, drawFrame, drawFrameAt, getFrame } from 'app/utils/animations';
-import { carryMap, directionMap, getDirection } from 'app/utils/field';
+import { carryMap, directionMap, getDirection } from 'app/utils/direction';
 
 import { Actor, ActorAnimations, Enemy, Frame, FrameDimensions, GameState, Hero } from 'app/types';
 

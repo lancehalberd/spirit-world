@@ -1,7 +1,7 @@
-import { addEffectToArea, removeEffectFromArea } from 'app/content/areas';
 import { AnimationEffect } from 'app/content/effects/animationEffect';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, frameAnimation, getFrame, drawFrameCenteredAt } from 'app/utils/animations';
+import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import { hitTargets } from 'app/utils/field';
 import Random from 'app/utils/Random';
 

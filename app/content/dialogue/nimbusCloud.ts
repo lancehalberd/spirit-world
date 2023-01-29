@@ -1,7 +1,7 @@
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 import { CANVAS_HEIGHT } from 'app/gameConstants';
-import { returnToSpawnLocation } from 'app/state';
 import { enterZoneByTarget } from 'app/utils/enterZoneByTarget';
+import { returnToSpawnLocation } from 'app/utils/returnToSpawnLocation';
 
 import { GameState } from 'app/types';
 

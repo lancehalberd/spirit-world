@@ -1,6 +1,6 @@
 import { isRandomizer } from 'app/gameConstants';
 
-import { AndLogicCheck, GameState, LogicCheck, LogicDefinition, OrLogicCheck } from 'app/types';
+import { AndLogicCheck, GameState, LogicCheck, LogicDefinition, ObjectDefinition, OrLogicCheck } from 'app/types';
 
 export function andLogic(...logicChecks: LogicCheck[]): AndLogicCheck {
     return { operation: 'and', logicChecks};
@@ -88,6 +88,23 @@ export function isLogicValid(state: GameState, logic: LogicCheck, invertLogic = 
         return falseResult;
     }
     return trueResult;
+}
+
+export function isObjectLogicValid(state: GameState, definition: ObjectDefinition): boolean {
+    if (definition.hasCustomLogic && definition.customLogic) {
+        return isLogicValid(state, {requiredFlags: [definition.customLogic]}, definition.invertLogic);
+    }
+    if (!definition.logicKey) {
+        return true;
+    }
+    const logic = logicHash[definition.logicKey];
+    // Logic should never be missing, so surface an error and hide the layer.
+    if (!logic) {
+        console.error('Missing logic!', definition.logicKey);
+        debugger;
+        return false;
+    }
+    return isLogicValid(state, logic, definition.invertLogic);
 }
 
 export function evaluateLogicDefinition(state: GameState, logicDefinition?: LogicDefinition, defaultValue: boolean = true): boolean {

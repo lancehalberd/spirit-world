@@ -1,13 +1,12 @@
-import { Enemy } from 'app/content/enemy';
 import { changeObjectStatus } from 'app/content/objects';
 import { playSound } from 'app/musicController';
 import { getAreaSize } from 'app/utils/getAreaSize';
 
-import { AreaInstance, GameState } from 'app/types'
+import { AreaInstance, Enemy, GameState } from 'app/types'
 export function checkIfAllEnemiesAreDefeated(state: GameState, area: AreaInstance): void {
     // Don't use `enemyTargets` here since this runs before it is populated sometimes.
     const enemiesAreDefeated = !area.objects.some(e =>
-        (e instanceof Enemy) && e.status !== 'gone' && e.isFromCurrentSection(state)
+        e.isEnemyTarget && e.status !== 'gone' && (e as Enemy).isFromCurrentSection?.(state)
     );
     const { section } = getAreaSize(state);
     let playChime = false;

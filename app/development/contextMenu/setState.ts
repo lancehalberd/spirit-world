@@ -1,6 +1,6 @@
 import { cloneDeep } from 'lodash';
 
-import { applySavedState, cleanState, getState, returnToSpawnLocation } from 'app/state';
+import { applySavedState, cleanState, getState } from 'app/state';
 import { setSpawnLocation } from 'app/content/spawnLocations';
 import {
     earlySpawnLocations,
@@ -10,6 +10,7 @@ import {
     minimizerSpawnLocations,
     SpawnLocationOptions,
 } from 'app/content/spawnStates';
+import { returnToSpawnLocation } from 'app/utils/returnToSpawnLocation';
 
 import { MenuOption } from 'app/types';
 

@@ -1,7 +1,8 @@
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { moveObject } from 'app/movement/moveObject';
 import { createAnimation, drawFrameCenteredAt, drawFrameAt, getFrame } from 'app/utils/animations';
-import { directionMap, getDirection, hitTargets, rotateDirection } from 'app/utils/field';
+import { directionMap, getDirection, rotateDirection } from 'app/utils/direction';
+import { hitTargets } from 'app/utils/field';
 
 import {
     AreaInstance, GameState, Frame, SpikeBallDefinition,

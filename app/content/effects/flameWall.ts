@@ -1,9 +1,10 @@
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
-import { addEffectToArea, removeEffectFromArea } from 'app/content/areas';
 import { flameAnimation } from 'app/content/effects/flame';
 import { CANVAS_HEIGHT, CANVAS_WIDTH, FRAME_LENGTH } from 'app/gameConstants';
 import { drawFrame, getFrame } from 'app/utils/animations';
-import { directionMap, hitTargets, rotateDirection } from 'app/utils/field';
+import { directionMap, rotateDirection } from 'app/utils/direction';
+import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
+import { hitTargets } from 'app/utils/field';
 import { getAreaSize } from 'app/utils/getAreaSize';
 
 import {

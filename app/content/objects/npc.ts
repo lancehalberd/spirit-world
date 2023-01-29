@@ -16,9 +16,9 @@ import {
     vanaraRedAnimations, zoroAnimations,
 } from 'app/render/npcAnimations';
 import { shadowFrame, smallShadowFrame } from 'app/renderActor';
-import { showMessage } from 'app/render/renderMessage';
+import { showMessage } from 'app/scriptEvents';
 import { drawFrame, getFrame } from 'app/utils/animations';
-import { directionMap, getDirection, rotateDirection } from 'app/utils/field';
+import { directionMap, getDirection, rotateDirection } from 'app/utils/direction';
 
 import {
     Actor, ActorAnimations, AreaInstance, GameState, DialogueOption, Direction,

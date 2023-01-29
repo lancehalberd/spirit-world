@@ -1,7 +1,7 @@
-import { addEffectToArea, removeEffectFromArea } from 'app/content/areas';
 import { CANVAS_HEIGHT, CANVAS_WIDTH, FRAME_LENGTH } from 'app/gameConstants';
 import { parseMessage } from 'app/render/renderMessage';
 import { drawFrame } from 'app/utils/animations';
+import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 
 import {
     AreaInstance, DrawPriority, EffectInstance, Frame, GameState, TileBehaviors,

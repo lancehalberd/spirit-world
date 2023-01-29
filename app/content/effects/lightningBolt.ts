@@ -1,9 +1,9 @@
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
-import { removeEffectFromArea } from 'app/content/areas';
 import { addRadialSparks } from 'app/content/effects/spark';
 import { allTiles } from 'app/content/tiles';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { drawFrameAt } from 'app/utils/animations';
+import { removeEffectFromArea } from 'app/utils/effects';
 import { hitTargets } from 'app/utils/field';
 
 import {

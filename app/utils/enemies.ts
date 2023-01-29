@@ -1,9 +1,8 @@
 import { sample } from 'lodash';
 
 import { AnimationEffect } from 'app/content/effects/animationEffect';
-import { addEffectToArea } from 'app/content/areas';
-
-import { createAnimation, } from 'app/utils/animations';
+import { createAnimation } from 'app/utils/animations';
+import { addEffectToArea } from 'app/utils/effects';
 import { directionMap, getDirection, getTileBehaviorsAndObstacles } from 'app/utils/field';
 import { getAreaSize } from 'app/utils/getAreaSize';
 import { getLineOfSightTargetAndDirection, getVectorToNearbyTarget } from 'app/utils/target';

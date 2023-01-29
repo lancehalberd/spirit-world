@@ -5,7 +5,7 @@ import { throwIceGrenadeAtLocation } from 'app/content/effects/frostGrenade';
 import { Enemy } from 'app/content/enemy';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { fireIdolAnimations, iceIdolAnimations, lightningIdolAnimations } from 'app/content/enemyAnimations';
-import { rotateDirection } from 'app/utils/field';
+import { rotateDirection } from 'app/utils/direction';
 
 
 import { GameState, HitProperties, HitResult } from 'app/types';

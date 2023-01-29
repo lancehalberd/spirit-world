@@ -1,6 +1,6 @@
-import { removeEffectFromArea,  } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
+import { removeEffectFromArea } from 'app/utils/effects';
 import { getTileBehaviorsAndObstacles } from 'app/utils/field';
 
 import { AreaInstance, EffectInstance, GameState, VineSprout } from 'app/types';

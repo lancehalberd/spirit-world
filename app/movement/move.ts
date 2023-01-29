@@ -1,10 +1,9 @@
-import { Hero } from 'app/content/hero';
 import { canMoveDown } from 'app/movement/canMoveDown';
 import { canMoveLeft } from 'app/movement/canMoveLeft';
 import { canMoveRight } from 'app/movement/canMoveRight';
 import { canMoveUp } from 'app/movement/canMoveUp';
 
-import { Direction, EffectInstance, GameState, MovementProperties, ObjectInstance } from 'app/types';
+import { Direction, EffectInstance, GameState, Hero, MovementProperties, ObjectInstance } from 'app/types';
 
 export function moveUp(
     state: GameState,
@@ -25,7 +24,7 @@ export function moveUp(
         return true;
     }
     if (!result.wiggle || !movementProperties.canWiggle) {
-        checkToPushObject(state, object, result.pushedObjects, 'up', movementProperties);
+        checkToPushObject(state, object as Hero, result.pushedObjects, 'up', movementProperties);
         return false;
     }
     if (result.wiggle === 'right') {
@@ -62,7 +61,7 @@ export function moveLeft(
         return true;
     }
     if (!result.wiggle || !movementProperties.canWiggle) {
-        checkToPushObject(state, object, result.pushedObjects, 'left', movementProperties);
+        checkToPushObject(state, object as Hero, result.pushedObjects, 'left', movementProperties);
         return false;
     }
     if (result.wiggle === 'down') {
@@ -99,7 +98,7 @@ export function moveDown(
         return true;
     }
     if (!result.wiggle || !movementProperties.canWiggle) {
-        checkToPushObject(state, object, result.pushedObjects, 'down', movementProperties);
+        checkToPushObject(state, object as Hero, result.pushedObjects, 'down', movementProperties);
         return false;
     }
     if (result.wiggle === 'right') {
@@ -136,7 +135,7 @@ export function moveRight(
         return true;
     }
     if (!result.wiggle || !movementProperties.canWiggle) {
-        checkToPushObject(state, object, result.pushedObjects, 'right', movementProperties);
+        checkToPushObject(state, object as Hero, result.pushedObjects, 'right', movementProperties);
         return false;
     }
     if (result.wiggle === 'down') {
@@ -154,24 +153,23 @@ export function moveRight(
     return false;
 }
 
-export function checkToStopPushing(
+function checkToStopPushing(
     state: GameState,
     actorObject: ObjectInstance | EffectInstance,
 ) {
-    if (actorObject instanceof Hero && actorObject.action === 'pushing') {
-        actorObject.action = 'walking';
+    if ((actorObject as Hero).action === 'pushing') {
+        (actorObject as Hero).action = 'walking';
     }
 }
 
-
-export function checkToPushObject(
+function checkToPushObject(
     state: GameState,
-    actorObject: ObjectInstance | EffectInstance,
+    actorObject: Hero,
     pushedObjects: (ObjectInstance | EffectInstance)[],
     direction: Direction,
     movementProperties: MovementProperties
 ) {
-    if (!(actorObject instanceof Hero) || !movementProperties.canPush) {
+    if (!movementProperties.canPush) {
         return;
     }
     if (!actorObject.action || actorObject.action === 'walking') {

@@ -4,8 +4,6 @@ import { drawFrame } from 'app/utils/animations';
 import { characterMap, keyboardMap, xboxMap } from 'app/utils/simpleWhiteFont';
 import { fillRect, pad } from 'app/utils/index';
 
-import { prependScript } from 'app/scriptEvents';
-
 import { Frame, GameState, ShowChoiceBoxActiveScriptEvent, TextPage, TextScript } from 'app/types';
 
 const characterWidth = 8;
@@ -71,16 +69,6 @@ export function textScriptToString(state: GameState, textScript: TextScript): st
         return textScript;
     }
     return textScript(state)
-}
-
-export function showMessage(
-    state: GameState,
-    message: TextScript
-): void {
-    if (!message){
-        return;
-    }
-    prependScript(state, `${textScriptToString(state, message)}{clearTextBox}{wait:200}`);
 }
 
 export function parseMessage(state: GameState, message: TextScript, maxWidth = messageWidth): TextPage[] {

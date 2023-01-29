@@ -1,4 +1,4 @@
-import { removeObjectFromArea } from 'app/content/areas';
+import { removeObjectFromArea } from 'app/utils/objects';
 
 import { GameState, Hero } from 'app/types';
 

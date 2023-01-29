@@ -10,7 +10,6 @@ import {
     setLeftTool,
     setRightTool,
 } from 'app/content/menu';
-import { showMessage } from 'app/render/renderMessage';
 import {
     SPAWN_LOCATION_DEMO,
     SPAWN_LOCATION_FULL,
@@ -35,12 +34,11 @@ import {
 import { playSound, updateSoundSettings } from 'app/musicController';
 import { updateHeroMagicStats } from 'app/render/spiritBar';
 import { getDefaultSavedState } from 'app/savedState'
-import { parseScriptText, setScript } from 'app/scriptEvents';
+import { parseScriptText, setScript, showMessage } from 'app/scriptEvents';
 import {
     canPauseGame,
     getState,
     getTitleOptions,
-    returnToSpawnLocation,
     setSaveFileToState,
     shouldHideMenu,
 } from 'app/state';
@@ -49,6 +47,7 @@ import { updateField } from 'app/updateField';
 import { updateScriptEvents } from 'app/updateScriptEvents';
 import { enterLocation } from 'app/utils/enterLocation';
 import { areAllImagesLoaded } from 'app/utils/images';
+import { returnToSpawnLocation } from 'app/utils/returnToSpawnLocation'
 import { saveGame, saveGamesToLocalStorage, } from 'app/utils/saveGame';
 
 import { ActiveTool, PassiveTool, GameState, MagicElement } from 'app/types';

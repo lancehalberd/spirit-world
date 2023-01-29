@@ -1,11 +1,10 @@
-import { Hero } from 'app/content/hero';
 import { getJumpVector } from 'app/movement/getJumpVector';
 import { moveDown, moveLeft, moveRight, moveUp } from 'app/movement/move';
 import { directionMap, getDirection } from 'app/utils/field';
 import { getAreaSize } from 'app/utils/getAreaSize';
 import { pad } from 'app/utils/index';
 
-import { Actor, Direction, GameState, MovementProperties, ObjectInstance, EffectInstance, Rect } from 'app/types';
+import { Actor, Direction, GameState, Hero, MovementProperties, ObjectInstance, Rect } from 'app/types';
 
 export function moveActor(state: GameState, actor: Actor, dx: number, dy: number, movementProperties: MovementProperties): {mx: number, my: number} {
     let sx = dx;
@@ -136,12 +135,10 @@ function moveActorInDirection(
             actor.jumpingVz = actor.vz;
         } else {
             let speed = 2;
-            if (actor instanceof Hero) {
-                if (actor.equippedBoots === 'cloudBoots') {
-                    speed = 2.2;
-                } else if (actor.equippedBoots === 'ironBoots') {
-                    speed = 1.5;
-                }
+            if ((actor as Hero).equippedBoots === 'cloudBoots') {
+                speed = 2.2;
+            } else if ((actor as Hero).equippedBoots === 'ironBoots') {
+                speed = 1.5;
             }
             actor.action = 'jumpingDown';
             actor.jumpingVx = speed * jv[0];
@@ -151,30 +148,6 @@ function moveActorInDirection(
         }
     }
     return result;
-}
-
-export function checkToPushObject(state: GameState, actor: Actor, pushedObjects: (ObjectInstance | EffectInstance)[], direction: Direction,) {
-    if (pushedObjects.length === 1) {
-        if (pushedObjects[0].onPush) {
-            pushedObjects[0].onPush(state, direction);
-            actor.lastTouchedObject = pushedObjects[0];
-        }
-    } else if (pushedObjects.length >= 1) {
-        const actorHitbox = actor.getHitbox();
-        for (const object of pushedObjects) {
-            const hitbox = object.getHitbox(state);
-            if (Math.abs(actorHitbox.x - hitbox.x) < 8
-                || Math.abs(actorHitbox.x + actorHitbox.w - hitbox.x - hitbox.w) < 8
-                || Math.abs(actorHitbox.y - hitbox.y) < 8
-                || Math.abs(actorHitbox.y + actorHitbox.h - hitbox.y - hitbox.h) < 8
-            ) {
-                if (object.onPush) {
-                    object.onPush(state, direction);
-                    actor.lastTouchedObject = pushedObjects[0];
-                }
-            }
-        }
-    }
 }
 
 export function getSectionBoundingBox(state: GameState, object: ObjectInstance, padding = 0): Rect {

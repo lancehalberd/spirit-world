@@ -1,7 +1,7 @@
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
-import { addEffectToArea, removeEffectFromArea } from 'app/content/areas';
 import { FrostBlast } from 'app/content/effects/frostBlast';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 
 import { AreaInstance, EffectInstance, Enemy, Frame, GameState } from 'app/types';
 

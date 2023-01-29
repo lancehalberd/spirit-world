@@ -1,6 +1,6 @@
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
-import { removeEffectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { removeEffectFromArea } from 'app/utils/effects';
 import { hitTargets } from 'app/utils/field';
 
 import { AreaInstance, EffectInstance, Enemy, GameState } from 'app/types';

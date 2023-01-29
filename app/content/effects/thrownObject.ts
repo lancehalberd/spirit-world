@@ -1,6 +1,7 @@
 import { addParticleAnimations } from 'app/content/effects/animationEffect';
-import { playAreaSound, removeEffectFromArea } from 'app/content/areas';
+import { playAreaSound } from 'app/musicController';
 import { drawFrame } from 'app/utils/animations';
+import { removeEffectFromArea } from 'app/utils/effects';
 import { hitTargets } from 'app/utils/field';
 
 import { AreaInstance, Frame, GameState, EffectInstance, TileBehaviors } from 'app/types';

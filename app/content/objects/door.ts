@@ -7,7 +7,7 @@ import {
     BITMAP_BOTTOM, BITMAP_BOTTOM_LEFT_QUARTER, BITMAP_BOTTOM_RIGHT_QUARTER,
     BITMAP_TOP,
 } from 'app/content/bitMasks';
-import { showMessage } from 'app/render/renderMessage';
+import { showMessage } from 'app/scriptEvents';
 import { drawFrame } from 'app/utils/animations';
 import { enterZoneByTarget } from 'app/utils/enterZoneByTarget';
 import { directionMap } from 'app/utils/field';
