@@ -1,19 +1,18 @@
 import {
     addEffectToArea,
-    enterLocation,
     removeEffectFromArea,
     refreshAreaLogic,
 } from 'app/content/areas';
 import { TextCue } from 'app/content/effects/textCue';
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 import { getLoot } from 'app/content/objects/lootObject';
-import { getLootTypes } from 'app/development/objectEditor';
-import { GAME_KEY } from 'app/gameConstants';
+import { allLootTypes, GAME_KEY } from 'app/gameConstants';
 
-import { wasConfirmKeyPressed, wasGameKeyPressed } from 'app/keyCommands';
+import { wasConfirmKeyPressed, wasGameKeyPressed } from 'app/userInput';
 import { parseMessage, textScriptToString } from 'app/render/renderMessage';
 import { playSound } from 'app/musicController';
-import { saveGame } from 'app/state';
+import { enterLocation } from 'app/utils/enterLocation';
+import { saveGame } from 'app/utils/saveGame';
 
 import {
     ActiveScriptEvent, GameState, LootType, ScriptEvent, TextScript
@@ -210,7 +209,7 @@ export function parseEventScript(state: GameState, script: TextScript): ScriptEv
         if (actionToken.startsWith('item:')) {
             const valueToken = actionToken.substring('item:'.length);
             const [lootType, amountOrLevel] = valueToken.split('=');
-            if (!getLootTypes().includes(lootType as LootType)) {
+            if (!allLootTypes.includes(lootType as LootType)) {
                 throw new Error('Unknown loot type: ' + lootType);
             }
             const number = parseInt(amountOrLevel, 10);
@@ -410,12 +409,12 @@ export const updateScriptEvents = (state: GameState): void => {
             case 'clearFlag':
                 delete state.savedState.objectFlags[event.flag];
                 refreshAreaLogic(state, state.areaInstance);
-                saveGame();
+                saveGame(state);
                 break;
             case 'setFlag':
                 state.savedState.objectFlags[event.flag] = event.value;
                 refreshAreaLogic(state, state.areaInstance);
-                saveGame();
+                saveGame(state);
                 break;
             case 'refreshAreaLogic':
                 refreshAreaLogic(state, state.areaInstance);
@@ -426,7 +425,7 @@ export const updateScriptEvents = (state: GameState): void => {
                 state.scriptEvents.blockEventQueue = true;
                 break;
             case 'playSound':
-                playSound(event.sound);
+                playSound(state, event.sound);
                 break;
             case 'runDialogueScript':
                 const dialogueSet = dialogueHash[event.npcKey];

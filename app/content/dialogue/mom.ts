@@ -1,6 +1,6 @@
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 import { isRandomizer, randomizerGoalType } from 'app/gameConstants';
-import { saveGame } from 'app/state';
+import { saveGame } from 'app/utils/saveGame';
 
 import { GameState } from 'app/types';
 
@@ -17,7 +17,7 @@ dialogueHash.mom = {
             if (randomizerGoalType === 'finalBoss') {
                 if (state.location.zoneKey === 'void') {
                     state.hero.winTime = state.hero.playTime;
-                    saveGame();
+                    saveGame(state);
                     return 'Finished!'
                 }
                 return `You must talk to me after defeating the final boss to finish.`;
@@ -25,7 +25,7 @@ dialogueHash.mom = {
             if (randomizerGoalType === 'victoryPoints') {
                 if (state.hero.victoryPoints >= state.randomizer.goal) {
                     state.hero.winTime = state.hero.playTime;
-                    saveGame();
+                    saveGame(state);
                     return 'Finished!'
                 }
                 return `You must find ${state.randomizer.goal} victory points and talk to me to finish!`;

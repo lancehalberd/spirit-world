@@ -1,4 +1,4 @@
-import { editingState } from 'app/development/tileEditor';
+import { editingState } from 'app/development/editingState';
 import { FRAME_LENGTH } from 'app/gameConstants';
 
 import {

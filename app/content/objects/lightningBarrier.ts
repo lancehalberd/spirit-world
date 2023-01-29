@@ -1,8 +1,8 @@
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
-import { getVectorToTarget } from 'app/content/enemies';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { hitTargets } from 'app/utils/field';
+import { getVectorToTarget } from 'app/utils/target';
 
 import {
     AreaInstance, AnodeDefinition, GameState, ObjectInstance,

@@ -1,20 +1,17 @@
 import {
     //applyLayerToBehaviorGrid,
-    enterLocation,
     initializeAreaLayerTiles,
     //mapTileNumbersToFullTiles,
-    resetTileBehavior,
 } from 'app/content/areas';
 import { bossTypes } from 'app/content/bosses';
 import { enemyTypes } from 'app/content/enemies';
 import { logicHash } from 'app/content/logic';
 import { getLootFrame } from 'app/content/loot';
-import { createObjectInstance } from 'app/content/objects';
 import { allTiles } from 'app/content/tiles';
 import { palettes, sourcePalettes } from 'app/content/palettes';
 import { zones } from 'app/content/zones';
+import { editingState } from 'app/development/editingState';
 import {
-    createObjectDefinition,
     deleteObject,
     getObjectFrame,
     getObjectProperties,
@@ -28,63 +25,29 @@ import {
 } from 'app/development/objectEditor';
 import { renderProgressTabContainer } from 'app/development/progressEditor';
 import {
-    displayPanel, displayPropertyPanel, hideAllPropertyPanels, renderPropertyRows, updateBrushCanvas,
+    displayPanel, displayPropertyPanel, renderPropertyRows, updateBrushCanvas,
 } from 'app/development/propertyPanel';
 import { TabContainer } from 'app/development/tabContainer';
 import { checkToRefreshMinimap, renderZoneTabContainer, renderZoneEditor } from 'app/development/zoneEditor';
 import { CANVAS_SCALE } from 'app/gameConstants';
-import { KEY, isKeyboardKeyDown } from 'app/keyCommands';
+import { KEY, isKeyboardKeyDown } from 'app/userInput';
 import { translateContextForAreaAndCamera } from 'app/render';
 import { getState } from 'app/state';
 import { drawFrame } from 'app/utils/animations';
 import { mainCanvas } from 'app/utils/canvas';
+import { createObjectInstance } from 'app/utils/createObjectInstance';
+import { enterLocation } from 'app/utils/enterLocation';
 import { readImageFromFile } from 'app/utils/index';
 import { getMousePosition, isMouseDown, /*isMouseOverElement*/ } from 'app/utils/mouse';
+import { resetTileBehavior } from 'app/utils/tileBehavior';
 
 import {
     AreaInstance, AreaLayer, AreaLayerDefinition, BossObjectDefinition,
     DrawPriority,
-    EnemyObjectDefinition, EnemyType,
+    EditorToolType, EnemyObjectDefinition, EnemyType,
     FullTile, GameState,
-    ObjectDefinition, ObjectType,
     PanelRows, PropertyRow, Rect, TileGridDefinition, TilePalette,
 } from 'app/types';
-
-type EditorToolType = 'brush' | 'object' | 'enemy' | 'boss' | 'replace' | 'select';
-export interface EditingState {
-    tool: EditorToolType
-    previousTool: EditorToolType
-    hasChanges: boolean
-    isEditing: boolean
-    brush?: {[key: string]: TileGridDefinition}
-    clipboardObject?: ObjectDefinition
-    paletteKey: string
-    selectedLayerKey?: string
-    refreshMinimap?: boolean
-    replacePercentage: number
-    selectedObject?: ObjectDefinition
-    spirit: boolean
-    dragOffset?: {x: number, y: number}
-}
-
-export const editingState: EditingState = {
-    tool: 'brush',
-    previousTool: 'select',
-    hasChanges: false,
-    isEditing: false,
-    paletteKey: Object.keys(palettes)[0],
-    // Default editing the field, not the floor.
-    refreshMinimap: true,
-    replacePercentage: 100,
-    spirit: false,
-};
-window['editingState'] = editingState;
-window.onbeforeunload = () => {
-    if (editingState.hasChanges) {
-        // Chrome ignores this message but displays an appropriate message.
-        return 'You have may unsaved changes.';
-    }
-}
 
 
 const toolTabContainer = new TabContainer<EditorToolType>('brush', [
@@ -171,113 +134,6 @@ export function renderToolTabContainer(): HTMLElement {
     return toolTabContainer.element;
 }
 
-export function toggleEditing() {
-    const state = getState();
-    state.scene = 'game';
-    state.hero.z = 0;
-    state.hero.actionTarget = null;
-    editingState.isEditing = !editingState.isEditing;
-    if (editingState.isEditing) {
-        startEditing(state);
-    } else {
-        stopEditing(state);
-    }
-}
-export function refreshEditor() {
-    if (editingState.isEditing) {
-        const state = getState();
-        stopEditing(state);
-        startEditing(state);
-    }
-}
-export function startEditing(state: GameState) {
-    if (!editingState.brush) {
-        editingState.brush = {'none': {w: 1,h: 1,tiles: [[0]]}};
-    }
-    if (!editingState.selectedObject) {
-        editingState.selectedObject = createObjectDefinition(state,
-            {type: combinedObjectTypes[0]} as Partial<ObjectDefinition> & { type: ObjectType }
-        );
-    }
-    displayTileEditorPropertyPanel();
-    state.areaInstance.tilesDrawn = [];
-    state.areaInstance.checkToRedrawTiles = true;
-    // This was a drag+drop experiment for dialogue editing, but I'm not adding this to
-    // the editor for now, it works better to just edit directly in the code for now.
-    /*const div = document.createElement('div');
-    div.innerHTML = 'DIALOGUE'
-    const dragContainer = document.createElement('div');
-    for (let i = 0; i < 5; i++) {
-        const dragElement = document.createElement('div');
-        dragElement.style.border = '1px solid #888';
-        dragElement.style.padding = '2px';
-        dragElement.style.marginBottom = '2px';
-        dragElement.style.display = 'flex';
-        const dragHandle = document.createElement('div');
-        dragHandle.style.minHeight = '20px';
-        dragHandle.style.width = '5px';
-        dragHandle.style.borderLeft = '5px double #666';
-        dragHandle.style.cursor = 'move';
-        const dragContent = document.createElement('div');
-        dragContent.style.flexGrow = '1';
-        dragContent.innerHTML = `Element ${i}`;
-        dragElement.appendChild(dragHandle);
-        dragElement.appendChild(dragContent);
-        dragContainer.appendChild(dragElement);
-        let dragHelper: HTMLElement;
-        let mouseOffset: number[];
-        function onDrag(event: MouseEvent) {
-            const [x, y] = getMousePosition();
-            dragHelper.style.left = `${x - mouseOffset[0]}px`;
-            dragHelper.style.top = `${y - mouseOffset[1]}px`;
-            let after = false;
-            for (const otherElement of dragContainer.children) {
-                if (otherElement === dragElement) {
-                    after = true;
-                    continue;
-                }
-                if (isMouseOverElement(otherElement as HTMLElement)) {
-                    after
-                        ? otherElement.after(dragElement)
-                        : otherElement.before(dragElement);
-                    break;
-                }
-            }
-        }
-        function stopDrag(event: MouseEvent) {
-            dragHandle.onmousemove = null;
-            document.removeEventListener('mousemove', onDrag);
-            document.removeEventListener('mouseup', stopDrag);
-            dragHelper.remove();
-            dragHelper = null;
-            dragElement.style.opacity = '1';
-        }
-        dragHandle.onmousedown = (event: MouseEvent) => {
-            event.preventDefault();
-            document.addEventListener('mousemove', onDrag);
-            document.addEventListener('mouseup', stopDrag);
-            mouseOffset = getMousePosition(dragElement);
-            dragHelper = dragElement.cloneNode(true) as HTMLElement;
-            dragHelper.style.position = 'absolute';
-            dragHelper.style.width = `${dragElement.clientWidth}px`;
-            onDrag(event);
-            document.body.append(dragHelper);
-            dragElement.style.opacity = '0.5';
-        }
-    }
-    div.appendChild(dragContainer);
-    displayLeftPanel(div);*/
-}
-
-export function stopEditing(state: GameState) {
-    hideAllPropertyPanels();
-    if (editingState.selectedLayerKey) {
-        delete editingState.selectedLayerKey;
-        enterLocation(state, state.location);
-    }
-    state.areaInstance.tilesDrawn = [];
-    state.areaInstance.checkToRedrawTiles = true;
-}
 
 export function refreshArea(state: GameState) {
     enterLocation(state, state.location, true, undefined, true, false, true);

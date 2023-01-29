@@ -1,12 +1,12 @@
 import { find } from 'lodash';
 
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
+import { HeldChakram } from 'app/content/effects/thrownChakram';
 import {
-    addEffectToArea, addObjectToArea, destroyTile, enterLocation, removeEffectFromArea,
+    addEffectToArea, addObjectToArea, playAreaSound, removeEffectFromArea,
 } from 'app/content/areas';
 import { setEquippedBoots } from 'app/content/menu';
 import { getObjectBehaviors } from 'app/content/objects';
-import { destroyClone } from 'app/content/objects/clone';
 import { CloneExplosionEffect } from 'app/content/effects/CloneExplosionEffect';
 import { AstralProjection } from 'app/content/objects/astralProjection';
 import { zones } from 'app/content/zones';
@@ -16,21 +16,24 @@ import {
     getCloneMovementDeltas,
     isGameKeyDown,
     wasGameKeyPressed,
-} from 'app/keyCommands';
+} from 'app/userInput';
 import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
 import { getSectionBoundingBox, moveActor } from 'app/moveActor';
-import { getChargeLevelAndElement, isToolButtonPressed, useTool } from 'app/useTool';
+import { isToolButtonPressed, useTool } from 'app/useTool';
 import { isHeroFloating, isHeroSinking, isUnderwater } from 'app/utils/actor';
+import { destroyClone } from 'app/utils/destroyClone';
+import { destroyTile } from 'app/utils/destroyTile';
+import { enterLocation } from 'app/utils/enterLocation';
 import {
     canTeleportToCoords,
     directionMap,
     getDirection,
     isPointOpen,
 } from 'app/utils/field';
-import { playSound } from 'app/musicController';
+import { getChargeLevelAndElement } from 'app/utils/getChargeLevelAndElement';
 
 import {
-    FullTile, GameState, HeldChakram, Hero,
+    FullTile, GameState, Hero,
     ObjectInstance, TileCoords,
 } from 'app/types';
 
@@ -243,7 +246,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 if (hero.explosionTime >= EXPLOSION_TIME) {
                     hero.action = null;
                     hero.explosionTime = 0;
-                    playSound('cloneExplosion');
+                    playAreaSound(state, hero.area, 'cloneExplosion');
                     addEffectToArea(state, hero.area, new CloneExplosionEffect({
                         x: hero.x + hero.w / 2,
                         y: hero.y + hero.h / 2,
@@ -629,7 +632,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 const behavior = tile?.behaviors;
                 if (behavior?.pickupWeight <= state.hero.passiveTools.gloves) {
                     hero.pickUpTile = tile;
-                    playSound('pickUpObject');
+                    playAreaSound(state, hero.area, 'pickUpObject');
                     destroyTile(state, hero.area, {...closestLiftableTileCoords, layerKey: layer.key}, true);
                     if (behavior.linkableTiles) {
                         const alternateLayer = find(state.alternateAreaInstance.layers, {key: layer.key});

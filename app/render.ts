@@ -1,5 +1,5 @@
-import { Clone } from 'app/content/objects/clone';
-import { editingState, renderEditor } from 'app/development/tileEditor';
+import { editingState } from 'app/development/editingState';
+import { renderEditor } from 'app/development/tileEditor';
 import {
     CANVAS_HEIGHT, CANVAS_WIDTH, MAX_SPIRIT_RADIUS,
     FADE_IN_DURATION, FADE_OUT_DURATION,
@@ -641,8 +641,6 @@ export function renderAreaObjectsBeforeHero(
         for (const object of area.objectsToRender) {
             if (object.renderShadow) {
                 object.renderShadow(context, state);
-            } else if (object instanceof Clone) {
-                renderHeroShadow(context, state, object);
             }
         }
         const spriteObjects: (EffectInstance | ObjectInstance)[] = [];

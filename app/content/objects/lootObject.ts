@@ -1,14 +1,14 @@
 import { addEffectToArea, addObjectToArea, refreshAreaLogic, removeEffectFromArea, removeObjectFromArea } from 'app/content/areas';
 import { lootEffects, getLootFrame, getLootShadowFrame, showLootMessage } from 'app/content/loot';
 import { getObjectStatus } from 'app/content/objects';
-import { editingState } from 'app/development/tileEditor';
+import { editingState } from 'app/development/editingState';
 import { CANVAS_WIDTH, CANVAS_HEIGHT, FRAME_LENGTH } from 'app/gameConstants';
 import { showMessage } from 'app/render/renderMessage';
-import { getState, saveGame } from 'app/state';
 import { createAnimation, drawFrame, drawFrameAt, getFrameHitBox } from 'app/utils/animations';
 import { playSound } from 'app/musicController';
 import { pad, boxesIntersect } from 'app/utils/index';
 import { drawText } from 'app/utils/simpleWhiteFont';
+import { saveGame } from 'app/utils/saveGame';
 
 import {
     AreaInstance, BossObjectDefinition, DialogueLootDefinition, Direction,
@@ -66,9 +66,8 @@ export class LootGetAnimation implements EffectInstance {
     y: number;
     z: number;
     status: ObjectStatus = 'normal';
-    constructor(loot: AnyLootDefinition) {
+    constructor(state: GameState, loot: AnyLootDefinition) {
         this.loot = loot;
-        const state = getState();
         this.frame = getLootFrame(state, loot);
         if (loot.type === 'bigChest') {
             this.x = loot.x + chestOpenedFrame.w - this.frame.w / 2;
@@ -96,9 +95,9 @@ export class LootGetAnimation implements EffectInstance {
             } else if (this.loot.lootType === 'peachOfImmortalityPiece' || this.loot.lootType === 'money'
                 || this.loot.lootType === 'smallKey' || this.loot.lootType === 'map' || this.loot.lootType === 'peach'
             ) {
-                playSound('smallSuccessChime');
+                playSound(state, 'smallSuccessChime');
             } else {
-                playSound('bigSuccessChime');
+                playSound(state, 'bigSuccessChime');
             }
         }
         if (this.animationTime === 1000) {
@@ -170,7 +169,7 @@ export class LootObject implements ObjectInstance {
                 const onPickup = lootEffects[this.definition.lootType] || lootEffects.unknown;
                 onPickup(state, this.definition);
                 if (this.definition.lootType === 'money') {
-                    playSound('getMoney');
+                    playSound(state, 'getMoney');
                 }
                 removeObjectFromArea(state, this);
             }
@@ -236,14 +235,14 @@ export function getLoot(this: void, state: GameState, definition: AnyLootDefinit
     definition = getActualLootDefinition(state, definition);
     const onPickup = lootEffects[definition.lootType] || lootEffects.unknown;
     state.hero.action = 'getItem';
-    const lootAnimation = new LootGetAnimation(definition);
+    const lootAnimation = new LootGetAnimation(state, definition);
     // Apply the pickup after creating the loot animation so that it uses the correct graphic for progressive items.
     onPickup(state, definition);
     addEffectToArea(state, state.hero.area, lootAnimation);
     state.hero.area.priorityObjects.push([lootAnimation]);
     // Refresh the area in case acquiring the item has change the logic of the area.
     refreshAreaLogic(state, state.areaInstance);
-    saveGame();
+    saveGame(state);
 }
 
 // Simple loot drop doesn't show the loot animation when collected.
@@ -286,7 +285,7 @@ export class LootDropObject extends LootObject {
                     const onPickup = lootEffects[this.definition.lootType] || lootEffects.unknown;
                     onPickup(state, this.definition);
                     if (this.definition.lootType === 'money') {
-                        playSound('getMoney');
+                        playSound(state, 'getMoney');
                     }
                     removeObjectFromArea(state, this);
                     break;
@@ -378,7 +377,7 @@ export class ChestObject implements ObjectInstance {
                 state.savedState.objectFlags[this.definition.id] = true;
                 // Refresh the area so that the guardian NPC moves to the correct location now that the boss is defeated.
                 refreshAreaLogic(state, state.areaInstance);
-                saveGame();
+                saveGame(state);
             }
         }
     }

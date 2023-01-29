@@ -1,14 +1,14 @@
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { addEffectToArea } from 'app/content/areas';
 import { LightningDischarge } from 'app/content/effects/lightningDischarge';
-import {
-    moveEnemyFull,
-} from 'app/content/enemies';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import {
     electricSquirrelAnimations, superElectricSquirrelAnimations,
 } from 'app/content/enemyAnimations';
 import { lifeLootTable } from 'app/content/lootTables';
+import {
+    moveEnemyFull,
+} from 'app/utils/enemies';
 import { getDirection } from 'app/utils/field';
 
 import { Enemy, GameState, HitProperties, HitResult } from 'app/types';

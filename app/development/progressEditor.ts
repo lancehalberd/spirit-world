@@ -1,9 +1,9 @@
-import { enterLocation } from 'app/content/areas';
 import { renderPropertyRows } from 'app/development/propertyPanel';
 import { TabContainer } from 'app/development/tabContainer';
 import { displayTileEditorPropertyPanel } from 'app/development/tileEditor';
 import { updateHeroMagicStats } from 'app/render/spiritBar';
 import { getState } from 'app/state';
+import { enterLocation } from 'app/utils/enterLocation';
 
 import {
     PanelRows, PropertyRow,

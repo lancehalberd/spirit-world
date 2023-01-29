@@ -1,25 +1,25 @@
 import { sample } from 'lodash';
 import { AnimationEffect } from 'app/content/effects/animationEffect';
-import { addEffectToArea } from 'app/content/areas';
+import { addEffectToArea, playAreaSound } from 'app/content/areas';
 import { Frost } from 'app/content/effects/frost';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
-import {
-    accelerateInDirection,
-    getVectorToNearbyTarget,
-    moveEnemy,
-    moveEnemyToTargetLocation,
-    throwIceGrenadeAtLocation,
-} from 'app/content/enemies';
+import { throwIceGrenadeAtLocation } from 'app/content/effects/frostGrenade';
+import { Enemy } from 'app/content/enemy';
 import { enemyDeathAnimation, snakeAnimations } from 'app/content/enemyAnimations';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { createCanvasAndContext } from 'app/utils/canvas';
-import { playSound } from 'app/musicController';
+import {
+    accelerateInDirection,
+    moveEnemy,
+    moveEnemyToTargetLocation,
+} from 'app/utils/enemies';
 import { getDirection, hitTargets } from 'app/utils/field';
 import { allImagesLoaded } from 'app/utils/images';
+import { getVectorToNearbyTarget } from 'app/utils/target';
 
 
-import { AreaInstance, Enemy, GameState, HitProperties, HitResult } from 'app/types';
+import { AreaInstance, GameState, HitProperties, HitResult } from 'app/types';
 
 const frostGeometry = {w: 20, h: 20, content: {x: 4, y: 10, w: 12, h: 8}};
 export const [iceElement] = createAnimation('gfx/hud/elementhud.png', frostGeometry, {x: 2}).frames;
@@ -70,7 +70,7 @@ enemyDefinitions.frostHeart = {
                 }
                 enemy.params.shieldLife = Math.max(0, enemy.params.shieldLife - hit.damage);
                 enemy.enemyInvulnerableFrames = 20;
-                playSound('enemyHit');
+                playAreaSound(state, enemy.area, 'enemyHit');
                 return { hit: true };
             }
         }
@@ -83,7 +83,7 @@ enemyDefinitions.frostHeart = {
             enemy.params.shieldLife = Math.min(8, enemy.params.shieldLife + hit.damage);
             //console.log('healed shield', enemy.params.shieldLife);
             enemy.blockInvulnerableFrames = 50;
-            playSound('blocked');
+            playAreaSound(state, enemy.area, 'blocked');
             return { hit: true };
         }
         if (enemy.area.underwater) {

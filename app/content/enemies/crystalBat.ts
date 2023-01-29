@@ -1,16 +1,16 @@
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { CrystalSpike } from 'app/content/effects/arrow';
-import {
-    getVectorToNearbyTarget,
-    moveEnemyToTargetLocation,
-    scurryRandomly,
-} from 'app/content/enemies';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import {
     crystalBatAnimations,
 } from 'app/content/enemyAnimations';
 import { moneyLootTable } from 'app/content/lootTables';
+import {
+    moveEnemyToTargetLocation,
+    scurryRandomly,
+} from 'app/utils/enemies';
 import { pad } from 'app/utils/index';
+import {  getVectorToNearbyTarget } from 'app/utils/target';
 
 import { EnemyAbility, Enemy, GameState } from 'app/types';
 

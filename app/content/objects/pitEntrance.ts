@@ -1,8 +1,10 @@
-import { enterZoneByTarget, playAreaSound, resetTileBehavior } from 'app/content/areas';
+import { playAreaSound } from 'app/content/areas';
 import { CANVAS_HEIGHT } from 'app/gameConstants';
 import { createAnimation, drawFrame } from 'app/utils/animations';
+import { enterZoneByTarget } from 'app/utils/enterZoneByTarget';
 import { getTileBehaviors } from 'app/utils/field';
 import { isObjectInsideTarget, pad } from 'app/utils/index';
+import { resetTileBehavior } from 'app/utils/tileBehavior';
 
 import {
     AreaInstance, DrawPriority, GameState, ObjectInstance,

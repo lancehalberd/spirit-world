@@ -1,9 +1,10 @@
+import { Hero } from 'app/content/hero';
 import { canMoveDown } from 'app/movement/canMoveDown';
 import { canMoveLeft } from 'app/movement/canMoveLeft';
 import { canMoveRight } from 'app/movement/canMoveRight';
 import { canMoveUp } from 'app/movement/canMoveUp';
 
-import { Direction, EffectInstance, GameState, Hero, MovementProperties, ObjectInstance } from 'app/types';
+import { Direction, EffectInstance, GameState, MovementProperties, ObjectInstance } from 'app/types';
 
 export function moveUp(
     state: GameState,

@@ -1,4 +1,4 @@
-import { enterLocation } from 'app/content/areas';
+import { Hero } from 'app/content/hero';
 import {
     SPAWN_LOCATION_DEMO,
     SPAWN_LOCATION_FULL,
@@ -7,8 +7,11 @@ import {
 import { zones } from 'app/content/zones';
 import { updateHeroMagicStats } from 'app/render/spiritBar';
 import { randomizerSeed, randomizerGoal } from 'app/gameConstants';
+import { getDefaultSavedState } from 'app/savedState'
+import { enterLocation } from 'app/utils/enterLocation';
+import { getFullZoneLocation } from 'app/utils/getFullZoneLocation';
 
-import { FullZoneLocation, GameState, Hero, LogicalZoneKey, SavedHeroData, SavedState, ZoneLocation } from 'app/types';
+import { GameState, SavedState } from 'app/types';
 
 export function loadSavedData(): boolean {
     //return false;
@@ -54,27 +57,6 @@ export function loadSavedData(): boolean {
     return false;
 }
 
-export function saveGame(): void {
-    state.savedState.savedHeroData = state.hero.exportSavedHeroData();
-    // There is a bug where selecting the delete option in randomizer triggers the `saveGame`
-    // function and saves a new file to the delete index which keeps creating more save files.
-    // This is a hack to prevent this from happening.
-    //if (state.savedGameIndex < state.savedGames.length) {
-    //    state.savedGames[state.savedGameIndex] = state.savedState;
-    //}
-    state.savedGames[state.savedGameIndex] = state.savedState;
-    // console.log(exportState(getState()));
-    saveGamesToLocalStorage();
-}
-export function saveGamesToLocalStorage(): void {
-    try {
-        const seed = state.randomizer?.seed || 0;
-        window.localStorage.setItem('savedGames' + (seed || ''), JSON.stringify(state.savedGames));
-    } catch (e) {
-        console.error(e);
-        debugger;
-    }
-}
 export function saveSettings(state: GameState) {
     window.localStorage.setItem('settings', JSON.stringify(state.settings));
 }
@@ -104,68 +86,6 @@ export function applySavedState(state: GameState, savedState: SavedState): void 
     fixSpawnLocationOnLoad(state);
     updateHeroMagicStats(state);
     returnToSpawnLocation(state);
-}
-
-export function getDefaultSavedState(): SavedState {
-    return {
-        dungeonInventories: {},
-        objectFlags: {},
-        zoneFlags: {},
-        luckyBeetles: [],
-        savedHeroData: getDefaultSavedHeroData(),
-        staffTowerLocation: 'desert',
-    };
-}
-
-function getDefaultSavedHeroData(): SavedHeroData {
-    return {
-        playTime: 0,
-        winTime: 0,
-        maxLife: 4,
-        hasRevive: false,
-        money: 0,
-        silverOre: 0,
-        goldOre: 0,
-        peachQuarters: 0,
-        spiritTokens: 0,
-        victoryPoints: 0,
-        weapon: 0,
-        weaponUpgrades: {},
-        activeTools: {
-            bow: 0,
-            staff: 0,
-            clone: 0,
-            cloak: 0,
-        },
-        element: null,
-        elements: {
-            fire: 0,
-            ice: 0,
-            lightning: 0,
-        },
-        equipment: {
-            leatherBoots: 1,
-            cloudBoots: 0,
-            ironBoots: 0,
-        },
-        passiveTools: {
-            gloves: 0,
-            roll: 0,
-            nimbusCloud: 0,
-            catEyes: 0,
-            spiritSight: 0,
-            trueSight: 0,
-            astralProjection: 0,
-            teleportation: 0,
-            ironSkin: 0,
-            goldMail: 0,
-            phoenixCrown: 0,
-            waterBlessing: 0,
-            fireBlessing: 0,
-            lightningBlessing: 0,
-        },
-        spawnLocation: SPAWN_LOCATION_FULL,
-    };
 }
 
 export function getDefaultState(): GameState {
@@ -306,42 +226,3 @@ export function canPauseGame(state: GameState): boolean {
     return state.alwaysHideMenu || !shouldHideMenu(state);
 }
 
-export function getFullZoneLocation(location: ZoneLocation): FullZoneLocation {
-    const { zoneKey, isSpiritWorld, areaGridCoords } = location;
-    // There is one frame after the transition finishes where the coordinates can be out
-    // of range, but work correctly if taken mod 512.
-    // const x = (location.x + 512) % 512; // This isn't needed so far.
-    const y = (location.y + 512) % 512;
-    let logicalZoneKey: LogicalZoneKey = location.zoneKey as LogicalZoneKey;
-    if (zoneKey === 'caves') {
-        if (areaGridCoords.x === 0) {
-            logicalZoneKey = isSpiritWorld ? 'ascentCaveSpirit' : 'ascentCave';
-        } else {
-            if (y < 256) {
-                logicalZoneKey = 'bushCave';
-            } else {
-                logicalZoneKey = isSpiritWorld ? 'fertilityShrineSpirit' : 'fertilityShrine';
-            }
-        }
-    } else if (zoneKey === 'grandTemple' || zoneKey === 'grandTempleWater') {
-        logicalZoneKey = isSpiritWorld ? 'jadePalace' : 'grandTemple';
-    } else if (zoneKey === 'overworld' || zoneKey === 'underwater') {
-        logicalZoneKey = isSpiritWorld ? 'spiritWorld' : 'overworld';
-    } else if (zoneKey === 'peachCave' || zoneKey === 'peachCaveWater') {
-        logicalZoneKey = isSpiritWorld ? 'peachCaveSpirit' : 'peachCave';
-    } else if (zoneKey === 'riverTemple' || zoneKey === 'riverTempleWater') {
-        logicalZoneKey = 'riverTemple';
-    } else if (zoneKey === 'sky') {
-        logicalZoneKey = isSpiritWorld ? 'spiritSky' : 'sky';
-    } else if (zoneKey === 'treeVillage') {
-        logicalZoneKey = isSpiritWorld ? 'forestTemple' : 'treeVillage';
-    } else if (zoneKey === 'holyCityInterior') {
-        logicalZoneKey = isSpiritWorld ? 'jadeCityInterior' : 'holyCityInterior';
-    }  else if (zoneKey === 'warTemple') {
-        logicalZoneKey = isSpiritWorld ? 'warPalace' : 'warTemple';
-    }
-    return {
-        ...location,
-        logicalZoneKey,
-    }
-}

@@ -1,8 +1,4 @@
 import { addEffectToArea } from 'app/content/areas';
-import {
-    getVectorToNearbyTarget,
-    paceAndCharge,
-} from 'app/content/enemies';
 import { LaserBeam } from 'app/content/effects/laserBeam';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import {
@@ -10,7 +6,11 @@ import {
 } from 'app/content/enemyAnimations';
 import { lifeLootTable } from 'app/content/lootTables';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import {
+    paceAndCharge,
+} from 'app/utils/enemies';
 import { getTileBehaviors } from 'app/utils/field';
+import { getVectorToNearbyTarget } from 'app/utils/target';
 
 import { Enemy, GameState } from 'app/types';
 

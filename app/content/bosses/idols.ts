@@ -1,15 +1,14 @@
 import { addEffectToArea } from 'app/content/areas';
 import { LightningBolt } from 'app/content/effects/lightningBolt';
 import { FlameWall } from 'app/content/effects/flameWall';
-import {
-    throwIceGrenadeAtLocation,
-} from 'app/content/enemies';
+import { throwIceGrenadeAtLocation } from 'app/content/effects/frostGrenade';
+import { Enemy } from 'app/content/enemy';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { fireIdolAnimations, iceIdolAnimations, lightningIdolAnimations } from 'app/content/enemyAnimations';
 import { rotateDirection } from 'app/utils/field';
 
 
-import { Enemy, GameState, HitProperties, HitResult } from 'app/types';
+import { GameState, HitProperties, HitResult } from 'app/types';
 
 function onHitIdol(state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
     // Idols take much less damage during their enraged phase.

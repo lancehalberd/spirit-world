@@ -1,14 +1,10 @@
-import { getState } from 'app/state';
-import { isTrackPlaying, playSound as playSoundProper, playTrack } from 'app/utils/sounds';
+import { getSoundSettings, isTrackPlaying, playSound as playSoundProper, playTrack } from 'app/utils/sounds';
 
-import { Enemy } from 'app/types';
-
-import { getSoundSettings } from 'app/utils/sounds';
+import { Enemy, GameState } from 'app/types';
 
 export { stopSound, updateSoundSettings } from 'app/utils/sounds';
 
-export const updateMusic = (): void => {
-    const state = getState();
+export const updateMusic = (state: GameState): void => {
     if (!state?.gameHasBeenInitialized) {
         return;
     }
@@ -138,7 +134,6 @@ export const updateMusic = (): void => {
     }
 }
 
-export function playSound(key: string) {
-    const state = getState();
+export function playSound(state: GameState, key: string) {
     return playSoundProper(key, getSoundSettings(state));
 }

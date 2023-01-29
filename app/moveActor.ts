@@ -1,10 +1,11 @@
-import { getAreaSize } from 'app/content/areas';
+import { Hero } from 'app/content/hero';
 import { getJumpVector } from 'app/movement/getJumpVector';
 import { moveDown, moveLeft, moveRight, moveUp } from 'app/movement/move';
 import { directionMap, getDirection } from 'app/utils/field';
+import { getAreaSize } from 'app/utils/getAreaSize';
 import { pad } from 'app/utils/index';
 
-import { Actor, Direction, GameState, Hero, MovementProperties, ObjectInstance, EffectInstance, Rect } from 'app/types';
+import { Actor, Direction, GameState, MovementProperties, ObjectInstance, EffectInstance, Rect } from 'app/types';
 
 export function moveActor(state: GameState, actor: Actor, dx: number, dy: number, movementProperties: MovementProperties): {mx: number, my: number} {
     let sx = dx;

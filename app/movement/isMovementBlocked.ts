@@ -1,4 +1,4 @@
-import { destroyTile, } from 'app/content/areas';
+import { destroyTile } from 'app/utils/destroyTile';
 import { getObjectBehaviors } from 'app/content/objects';
 import { tileHitAppliesToTarget } from 'app/utils/field';
 import { isPixelInShortRect } from 'app/utils/index';

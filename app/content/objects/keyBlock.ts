@@ -1,8 +1,9 @@
-import { activateTarget, findObjectInstanceById, getObjectStatus } from 'app/content/objects';
+import { activateTarget, getObjectStatus } from 'app/content/objects';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { showMessage } from 'app/render/renderMessage';
-import { saveGame } from 'app/state';
 import { createAnimation, drawFrameAt, getFrame } from 'app/utils/animations';
+import { findObjectInstanceById } from 'app/utils/findObjectInstanceById';
+import { saveGame } from 'app/utils/saveGame';
 
 import {
     AreaInstance, GameState, Frame, FrameAnimation, KeyBlockDefinition,
@@ -81,7 +82,7 @@ export class KeyBlock implements ObjectInstance {
             console.error('Keyblock was missing an id', this);
             debugger;
         }
-        saveGame();
+        saveGame(state);
         return true;
     }
     onGrab(state: GameState) {

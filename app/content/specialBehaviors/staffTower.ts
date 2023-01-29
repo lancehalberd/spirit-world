@@ -1,10 +1,11 @@
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
+import { Enemy } from 'app/content/enemy';
 import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
 import { Escalator } from 'app/content/objects/escalator';
 import { Anode } from 'app/content/objects/lightningBarrier';
 import { Sign } from 'app/content/objects/sign';
 
-import { AreaInstance, Enemy, GameState } from 'app/types';
+import { AreaInstance, GameState } from 'app/types';
 
 specialBehaviorsHash.staffTower = {
     type: 'area',

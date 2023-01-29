@@ -1,17 +1,19 @@
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { addEffectToArea } from 'app/content/areas';
 import { LightningDischarge } from 'app/content/effects/lightningDischarge';
-import {
-    getVectorToNearbyTarget,
-    moveEnemyToTargetLocation,
-    paceRandomly,
-} from 'app/content/enemies';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import {
     droneAnimations,
 } from 'app/content/enemyAnimations';
 import { lifeLootTable } from 'app/content/lootTables';
+import {
+    moveEnemyToTargetLocation,
+    paceRandomly,
+} from 'app/utils/enemies';
 import { hitTargets } from 'app/utils/field';
+import {
+    getVectorToNearbyTarget,
+} from 'app/utils/target';
 
 import { Enemy, GameState } from 'app/types';
 

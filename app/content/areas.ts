@@ -1,33 +1,24 @@
-import { find } from 'lodash';
-
-import { addParticleAnimations } from 'app/content/effects/animationEffect';
-import { TextCue } from 'app/content/effects/textCue';
-import { changeObjectStatus, createObjectInstance, findObjectInstanceById } from 'app/content/objects';
-import { allTiles } from 'app/content/tiles';
 import { logicHash, isLogicValid } from 'app/content/logic';
-import { enterZoneByDoorCallback } from 'app/content/objects/door';
-import { enterZoneByTeleporterCallback } from 'app/content/objects/teleporter';
-import { dropItemFromTable } from 'app/content/objects/lootObject';
-import { checkToUpdateSpawnLocation } from 'app/content/spawnLocations';
+import { allTiles } from 'app/content/tiles';
 import { zones } from 'app/content/zones';
-import { editingState, refreshEditor } from 'app/development/tileEditor';
-import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
+import { editingState } from 'app/development/editingState';
 import { isPointInShortRect } from 'app/utils/index';
 import { playSound } from 'app/musicController';
-import { getFullZoneLocation } from 'app/state';
-import { removeTextCue } from 'app/scriptEvents';
-import { updateCamera } from 'app/updateCamera';
 import { specialBehaviorsHash } from 'app/content/specialBehaviors';
 import { createCanvasAndContext } from 'app/utils/canvas';
+import { createObjectInstance } from 'app/utils/createObjectInstance';
+import { checkIfAllEnemiesAreDefeated } from 'app/utils/checkIfAllEnemiesAreDefeated';
+import { findObjectInstanceById } from 'app/utils/findObjectInstanceById';
+import { applyTileToBehaviorGrid, resetTileBehavior } from 'app/utils/tileBehavior';
 
 import {
     AreaDefinition, AreaInstance, AreaLayerDefinition,
-    Direction, EffectInstance, Enemy, EntranceDefinition,
-    FullTile, GameState, Hero, TileCoords,
+    Direction, EffectInstance,
+    FullTile, GameState, Hero,
     LogicDefinition,
     ObjectDefinition,
     ObjectInstance,
-    Rect, SpecialAreaBehavior, Tile, TileBehaviors,
+    Rect, SpecialAreaBehavior, TileBehaviors,
     ZoneLocation,
 } from 'app/types';
 
@@ -36,7 +27,7 @@ export function playAreaSound(state: GameState, area: AreaInstance, key: string)
     if (!key || state.areaInstance !== area) {
         return;
     }
-    return playSound(key);
+    return playSound(state, key);
 }
 
 export function getDefaultArea(): AreaDefinition {
@@ -186,139 +177,6 @@ export function removeAllClones(state: GameState): void {
     state.hero.clones = []
 }
 
-export function enterLocation(
-    state: GameState,
-    location: ZoneLocation,
-    instant: boolean = true,
-    callback: () => void = null,
-    preserveZoneFlags = false,
-    isMutation = false,
-    doNotRefreshEditor = false,
-): void {
-    // Remve astral projection when switching areas.
-    if (state.hero.astralProjection) {
-        removeObjectFromArea(state, state.hero.astralProjection);
-        state.hero.astralProjection = null;
-    }
-    removeTextCue(state);
-    if (state.hero.action === 'meditating') {
-        state.hero.action = null;
-    }
-    state.hero.spiritRadius = 0;
-    if (!instant) {
-        state.transitionState = {
-            callback,
-            nextLocation: location,
-            time: 0,
-            type: 'fade',
-        };
-        if (state.underwaterAreaInstance && state.zone.underwaterKey === location.zoneKey) {
-            state.transitionState.type = 'diving';
-            state.transitionState.nextAreaInstance = state.underwaterAreaInstance;
-            state.hero.vx = state.hero.vy = 0;
-        } else if (state.zone.surfaceKey === location.zoneKey) {
-            state.transitionState.type = 'surfacing';
-            state.transitionState.nextAreaInstance = state.surfaceAreaInstance;
-            state.hero.vx = state.hero.vy = 0;
-        } else if (!!state.location.isSpiritWorld !== !!location.isSpiritWorld && state.location.zoneKey === location.zoneKey) {
-            state.transitionState.type = 'portal';
-        } else if (state.location.logicalZoneKey !== getFullZoneLocation(location).logicalZoneKey) {
-            state.transitionState.type = 'circle';
-        }
-        const targetAreaDefinition = getAreaFromLocation(location);
-        if (state.alternateAreaInstance.definition === targetAreaDefinition) {
-            state.transitionState.nextAreaInstance = state.alternateAreaInstance;
-            state.transitionState.nextAlternateAreaInstance = state.areaInstance;
-            // Bring the held chakram with you.
-            if (state.hero.heldChakram) {
-                removeEffectFromArea(state, state.hero.heldChakram);
-                addEffectToArea(state, state.transitionState.nextAreaInstance, state.hero.heldChakram);
-            }
-        }
-        return;
-    }
-    // Clear zone flags when changing zones.
-    if (!preserveZoneFlags && state.location.logicalZoneKey !== getFullZoneLocation(location).logicalZoneKey) {
-        state.savedState.zoneFlags = {};
-    }
-    state.location = getFullZoneLocation({
-        ...location,
-        areaGridCoords: {...location.areaGridCoords},
-        z: 0,
-    });
-    state.zone = zones[location.zoneKey];
-    state.hero.x = location.x;
-    state.hero.y = location.y;
-
-    const floor = state.zone.floors[location.floor];
-    if (!floor) {
-        console.log('Invalid floor', state.location);
-        return;
-    }
-    state.floor = floor;
-    state.areaGrid = location.isSpiritWorld ? floor.spiritGrid : floor.grid;
-    state.location.areaGridCoords = {
-        y: state.location.areaGridCoords.y % state.areaGrid.length,
-        x: state.location.areaGridCoords.x % state.areaGrid[state.location.areaGridCoords.y % state.areaGrid.length].length,
-    };
-    state.location = getFullZoneLocation(state.location);
-    const area = getAreaFromLocation(state.location);
-    const alternateArea = getAreaFromLocation({...state.location, isSpiritWorld: !state.location.isSpiritWorld});
-
-    // Remove all clones on changing areas.
-    if (!isMutation) {
-        cleanupHeroFromArea(state);
-    }
-    const lastAreaInstance = state.areaInstance;
-    // Use the existing area instances on the transition state if any are present.
-    state.areaInstance = state.transitionState?.nextAreaInstance
-        || createAreaInstance(state, area);
-    state.alternateAreaInstance = state.transitionState?.nextAlternateAreaInstance
-        || createAreaInstance(state, alternateArea);
-    state.areaInstance.alternateArea = state.alternateAreaInstance;
-    state.alternateAreaInstance.alternateArea = state.areaInstance;
-    state.fadeLevel = (state.areaInstance.dark || 0) / 100;
-    linkObjects(state);
-    state.hero.area = state.areaInstance;
-    state.hero.x = location.x;
-    state.hero.y = location.y;
-    if (location.z >= 0) {
-        state.hero.z = location.z;
-        /*if (location.z > 0) {
-            state.hero.action = 'knocked';
-            // Make sure the character falls straight down.
-            state.hero.vx = 0;
-            state.hero.vy = 0;
-        }*/
-    }
-    state.hero.vx = 0;
-    state.hero.vy = 0;
-    // Don't let magic become infinitely negative while being drained.
-    // We could also set magic to at least 0 during any zone transition instead of this.
-    state.hero.magic = Math.max(state.hero.magic, 0);
-    state.hero.actualMagicRegen = Math.max(state.hero.actualMagicRegen, 0);
-    if (!isMutation) {
-        state.hero.safeD = state.hero.d;
-        state.hero.safeX = location.x;
-        state.hero.safeY = location.y;
-    }
-    setAreaSection(state, state.hero.d, !isMutation);
-    updateCamera(state, 512);
-    checkToUpdateSpawnLocation(state);
-    // Make sure the actor is shown as swimming/wading during the transition frames.
-    checkForFloorEffects(state, state.hero);
-    setConnectedAreas(state, lastAreaInstance);
-    checkIfAllEnemiesAreDefeated(state, state.areaInstance);
-    for (const object of [...state.areaInstance.objects, ...state.areaInstance.effects]) {
-        if (object.onEnterArea) {
-            object.onEnterArea(state);
-        }
-    }
-    if (editingState.isEditing && !doNotRefreshEditor) {
-        refreshEditor();
-    }
-}
-
 export function setConnectedAreas(state: GameState, lastAreaInstance: AreaInstance) {
     state.underwaterAreaInstance = null;
     if (state.zone.underwaterKey && state.location.floor === 0) {
@@ -430,78 +288,6 @@ export function findZoneTargets(
     return results;
 }
 
-export function enterZoneByTarget(
-    state: GameState,
-    zoneKey: string,
-    targetObjectId: string,
-    skipObject: ObjectDefinition,
-    instant: boolean = true,
-    callback: () => void = null
-): boolean {
-    const zone = zones[zoneKey];
-    if (!zone) {
-        console.error(`Missing zone: ${zoneKey}`);
-        return false;
-    }
-    for (let worldIndex = 0; worldIndex < 2; worldIndex++) {
-        for (let floor = 0; floor < zone.floors.length; floor++) {
-            // Search the corresponding spirit/material world before checking in the alternate world.
-            const areaGrids = state.areaInstance.definition.isSpiritWorld
-                ? [zone.floors[floor].spiritGrid, zone.floors[floor].grid]
-                : [zone.floors[floor].grid, zone.floors[floor].spiritGrid];
-            const areaGrid = areaGrids[worldIndex];
-            const inSpiritWorld = areaGrid === zone.floors[floor].spiritGrid;
-            for (let y = 0; y < areaGrid.length; y++) {
-                for (let x = 0; x < areaGrid[y].length; x++) {
-                    for (const object of (areaGrid[y][x]?.objects || [])) {
-                        if (object.id === targetObjectId && object !== skipObject) {
-                            if (!isObjectLogicValid(state, object)) {
-                                continue;
-                            }
-                            enterLocation(state, {
-                                zoneKey,
-                                floor,
-                                areaGridCoords: {x, y},
-                                x: object.x,
-                                y: object.y,
-                                d: state.hero.d,
-                                isSpiritWorld: inSpiritWorld,
-                            }, instant, () => {
-                                const target = findEntranceById(state.areaInstance, targetObjectId, [skipObject]);
-                                if (target?.getHitbox) {
-                                    const hitbox = target.getHitbox(state);
-                                    state.hero.x = hitbox.x + hitbox.w / 2 - state.hero.w / 2;
-                                    state.hero.y = hitbox.y + hitbox.h / 2 - state.hero.h / 2;
-                                    setAreaSection(state, state.hero.d, true);
-                                    checkForFloorEffects(state, state.hero);
-                                    updateCamera(state, 512);
-                                }
-                                // Technically this could also be a MarkerDefinition.
-                                const definition = target.definition as EntranceDefinition;
-                                if (definition.locationCue) {
-                                    const textCue = new TextCue(state, { text: definition.locationCue});
-                                    addEffectToArea(state, state.areaInstance, textCue);
-                                }
-                                // Entering via a door requires some special logic to orient the
-                                // character to the door properly.
-                                if (definition.type === 'door') {
-                                    enterZoneByDoorCallback(state, targetObjectId, skipObject);
-                                } else if (definition.type === 'teleporter') {
-                                    enterZoneByTeleporterCallback(state, targetObjectId);
-                                }
-                                callback?.();
-                            });
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-    }
-    console.error('Could not find', targetObjectId, 'in', zoneKey);
-    return false;
-}
-
 export function setNextAreaSection(state: GameState, d: Direction): void {
     //console.log('setNextAreaSection', d);
     removeAllClones(state);
@@ -610,67 +396,6 @@ export function applyLayerToBehaviorGrid(behaviorGrid: TileBehaviors[][], layer:
     }
 }
 
-// This resets the tile behavior for a specific tile to whatever the combined behavior of the layers are.
-// This is useful when an object in a tile was overriding the tile behavior beneath it and we need to
-// reconstruct the original behavior after the object is removed.
-export function resetTileBehavior(area: AreaInstance, {x, y}: Tile): void {
-    delete area.behaviorGrid?.[y]?.[x];
-    for (const layer of area.layers) {
-        const tile = layer.tiles[y]?.[x];
-        if (!tile) {
-            continue;
-        }
-        const isForeground = (layer.definition.drawPriority ?? layer.definition.key) === 'foreground';
-        // The behavior grid combines behaviors of all layers, with higher layers
-        // overriding the behavior of lower layers.
-        if (tile.behaviors) {
-            if (!area.behaviorGrid[y]) {
-                area.behaviorGrid[y] = [];
-            }
-            applyTileToBehaviorGrid(area.behaviorGrid, {x, y}, tile, isForeground);
-        }
-    }
-}
-
-function applyTileToBehaviorGrid(behaviorGrid: TileBehaviors[][], {x, y}: Tile, tile: FullTile, isForeground: boolean): void {
-    const behaviors = tile.behaviors;
-    // Tiles 0/1 are the null and empty tile and should not impact the tile behavior.
-    if (!behaviors || tile.index < 2) {
-        return;
-    }
-    // Lava + clouds erase the behaviors of tiles underneath them.
-    if (behaviors.isLava || behaviors.cloudGround) {
-        behaviorGrid[y][x] = {};
-    }
-    // Any background tile rendered on top of lava removes the lava behavior from it.
-    if (!isForeground && behaviorGrid[y]?.[x]
-        && !behaviors.isLava && !behaviors.isLavaMap && behaviors.isGround !== false
-    ) {
-        delete behaviorGrid[y][x].isLava;
-        delete behaviorGrid[y][x].isLavaMap;
-    }
-    // Any background tile rendered on top of a pit removes the pit behavior.
-    // If this causes issues with decorations like shadows we may need to explicitly set pit = false
-    // on tiles that can cover up pits (like in the sky) and use that, or alternatively, make a separate
-    // sky behavior that has this behavior instead of pits.
-    if (!isForeground && behaviorGrid[y]?.[x]?.pit && !behaviors.pit && behaviors.isGround !== false) {
-        delete behaviorGrid[y][x].pit;
-    }
-    if (!isForeground && behaviorGrid[y]?.[x]?.cloudGround && !behaviors.cloudGround) {
-        delete behaviorGrid[y][x].cloudGround;
-    }
-    const lightRadius = Math.max(behaviorGrid[y][x]?.lightRadius || 0, behaviors.lightRadius || 0);
-    const brightness = Math.max(behaviorGrid[y][x]?.brightness || 0, behaviors.brightness || 0);
-    const baseSolidMap = behaviorGrid[y][x]?.solidMap;
-    behaviorGrid[y][x] = {...(behaviorGrid[y][x] || {}), ...behaviors, lightRadius, brightness};
-    if (baseSolidMap && behaviors.solidMap) {
-        behaviorGrid[y][x].solidMap = new Uint16Array([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
-        for (let row = 0; row < 16; row++) {
-            behaviorGrid[y][x].solidMap[row] = baseSolidMap[row] | behaviors.solidMap[row];
-        }
-    }
-}
-
 export function mapTileNumbersToFullTiles(tileNumbers: number[][]): FullTile[][] {
     if (!tileNumbers) {
         return null;
@@ -689,7 +414,7 @@ export function mapTileNumbersToFullTiles(tileNumbers: number[][]): FullTile[][]
     return fullTiles;
 }
 
-function createAreaInstance(state: GameState, definition: AreaDefinition): AreaInstance {
+export function createAreaInstance(state: GameState, definition: AreaDefinition): AreaInstance {
     const behaviorGrid: TileBehaviors[][] = [];
     const [canvas, context] = createCanvasAndContext(
         definition.layers[0].grid.w * 16,
@@ -828,21 +553,6 @@ export function evaluateLogicDefinition(state: GameState, logicDefinition?: Logi
     return defaultValue;
 }
 
-export function getAreaSize(state: GameState): {w: number, h: number, section: Rect} {
-    const area = state.areaInstance;
-    const areaSection = state.nextAreaSection || state.areaSection;
-    return {
-        w: 16 * area.w,
-        h: 16 * area.h,
-        section: {
-            x: areaSection.x * 16,
-            y: areaSection.y * 16,
-            w: areaSection.w * 16,
-            h: areaSection.h * 16,
-        },
-    }
-}
-
 export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefresh = false): void {
     if (!area) {
         return;
@@ -969,9 +679,6 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
             nextAreaInstance.enemies = [...instance.enemies];
             instance.priorityObjects = []
             instance = nextAreaInstance;
-            if (nextAreaInstance.objects.find(o => o.definition?.id === 'voidTree' && o instanceof Enemy && !o.params.allHearts)) {
-                debugger;
-            }
         }
         for (const object of instance.definition.objects) {
             /*if (object.id.includes('void')
@@ -1020,9 +727,6 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
             }
         }
         //console.log('new instance', instance.objects.map( o => o.definition?.id ));
-        if (instance.objects.find(o => o.definition?.id === 'voidTree' && o instanceof Enemy && !o.params.allHearts)) {
-            debugger;
-        }
     }
     checkIfAllEnemiesAreDefeated(state, area);
 }
@@ -1203,75 +907,5 @@ export function removeEffectFromArea(state: GameState, effect: EffectInstance): 
             effect.area.effects.splice(index, 1);
         }
         effect.area = null;
-    }
-}
-
-export function destroyTile(state: GameState, area: AreaInstance, target: TileCoords, noParticles: boolean = false): void {
-    const layer = find(area.layers, { key: target.layerKey });
-    if (!layer) {
-        console.error(`Missing target layer: ${target.layerKey}`);
-        return;
-    }
-    const behavior = area.behaviorGrid?.[target.y]?.[target.x];
-    if (area.tilesDrawn[target.y]?.[target.x]) {
-        area.tilesDrawn[target.y][target.x] = false;
-    }
-    area.checkToRedrawTiles = true;
-    const underTile = behavior?.underTile || 0;
-    layer.tiles[target.y][target.x] = allTiles[underTile];
-    if (behavior.breakSound) {
-        playAreaSound(state, area, behavior.breakSound);
-    }
-
-    resetTileBehavior(area, target);
-    if (!noParticles && behavior.particles) {
-        addParticleAnimations(state, area, target.x * 16 + 8, target.y * 16 + 8, 4, behavior.particles, behavior);
-    }
-    if (behavior?.lootTable) {
-        dropItemFromTable(state, area, behavior.lootTable,
-            (target.x + 0.5) * 16,
-            (target.y + 0.5) * 16
-        );
-    }
-}
-
-
-export function checkIfAllEnemiesAreDefeated(state: GameState, area: AreaInstance): void {
-    // Don't use `enemyTargets` here since this runs before it is populated sometimes.
-    const enemiesAreDefeated = !area.objects.some(e =>
-        (e instanceof Enemy) && e.status !== 'gone' && e.isFromCurrentSection(state)
-    );
-    const { section } = getAreaSize(state);
-    let playChime = false;
-    for (const object of area.objects) {
-        if (!object.getHitbox) {
-            continue;
-        }
-        const hitbox = object.getHitbox(state);
-        if (hitbox.x < section.x ||
-            hitbox.x >= section.x + section.w ||
-            hitbox.y < section.y ||
-            hitbox.y >= section.y + section.h
-        ) {
-            continue;
-        }
-        if (enemiesAreDefeated) {
-            if (object.status === 'hiddenEnemy') {
-                changeObjectStatus(state, object, 'normal');
-                playChime = true;
-            }
-            if (object.status === 'closedEnemy') {
-                changeObjectStatus(state, object, 'normal');
-                playChime = true;
-            }
-        } else {
-            // Close doors if new enemies appear.
-            if (object.definition?.status === 'closedEnemy') {
-                changeObjectStatus(state, object, 'closedEnemy');
-            }
-        }
-    }
-    if (playChime) {
-        playSound('secretChime');
     }
 }

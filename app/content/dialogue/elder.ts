@@ -1,12 +1,11 @@
 import { addObjectToArea, removeObjectFromArea } from 'app/content/areas';
 import { moveNPCToTargetLocation, NPC } from 'app/content/objects/npc';
-import { moveEnemyToTargetLocation } from 'app/content/enemies';
 import { logicHash } from 'app/content/logic';
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 import { FRAME_LENGTH, RIVAL_NAME } from 'app/gameConstants';
 import { appendCallback, appendScript, wait } from 'app/scriptEvents';
-
-import { saveGame } from 'app/state';
+import { saveGame } from 'app/utils/saveGame';
+import { moveEnemyToTargetLocation } from 'app/utils/enemies';
 
 import { Enemy, GameState } from 'app/types';
 
@@ -42,7 +41,7 @@ dialogueHash.elder = {
             // Remove any attack effects on defeat.
             // rival.area.effects = rival.area.effects.filter(effect => !effect.isEnemyAttack);
             //rival.changeToAnimation('idle');
-            saveGame();
+            saveGame(state);
             // Wait a moment for the battle to calm down.
             state.scriptEvents.activeEvents.push({
                 type: 'wait',

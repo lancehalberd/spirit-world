@@ -1,9 +1,9 @@
 import { removeEffectFromArea } from 'app/content/areas';
-import { getVectorToNearestTargetOrRandom } from 'app/content/enemies';
 import { CrystalSpike } from 'app/content/effects/arrow';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { rectanglesOverlap } from 'app/utils/index';
+import { getVectorToNearestTargetOrRandom } from 'app/utils/target';
 
 import {
     AreaInstance, EffectInstance,

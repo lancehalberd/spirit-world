@@ -1,6 +1,5 @@
-import { getVectorToTarget } from 'app/content/enemies';
-import { editingState } from 'app/development/tileEditor';
-
+import { editingState } from 'app/development/editingState';
+import { getVectorToTarget } from 'app/utils/target';
 
 import {
     AreaInstance, DrawPriority, GameState, ObjectInstance,

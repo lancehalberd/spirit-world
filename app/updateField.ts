@@ -1,13 +1,14 @@
-import { addEffectToArea, checkIfAllEnemiesAreDefeated, removeObjectFromArea } from 'app/content/areas';
+import { addEffectToArea, removeObjectFromArea } from 'app/content/areas';
 import { AnimationEffect } from 'app/content/effects/animationEffect';
 import { Enemy } from 'app/content/enemy';
 import { setEquippedElement } from 'app/content/menu';
-import { editingState } from 'app/development/tileEditor';
+import { editingState } from 'app/development/editingState';
 import { FRAME_LENGTH, GAME_KEY } from 'app/gameConstants';
-import { wasGameKeyPressed } from 'app/keyCommands';
+import { wasGameKeyPressed } from 'app/userInput';
 import { updateAllHeroes } from 'app/updateActor';
 import { updateCamera } from 'app/updateCamera';
 import { createAnimation } from 'app/utils/animations';
+import { checkIfAllEnemiesAreDefeated } from 'app/utils/checkIfAllEnemiesAreDefeated';
 import { getTileBehaviorsAndObstacles } from 'app/utils/field';
 
 import {

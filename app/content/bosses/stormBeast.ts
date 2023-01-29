@@ -4,28 +4,29 @@ import { LightningBolt } from 'app/content/effects/lightningBolt';
 import { LightningDischarge } from 'app/content/effects/lightningDischarge';
 import { Spark } from 'app/content/effects/spark';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
+import { Enemy } from 'app/content/enemy';
 import { allTiles } from 'app/content/tiles';
-import {
-    accelerateInDirection,
-    getNearbyTarget,
-    //getVectorToNearbyTarget,
-    getVectorToTarget,
-    hasEnemyLeftSection,
-    // moveEnemy,
-    moveEnemyToTargetLocation,
-    //paceRandomly,
-} from 'app/content/enemies';
 import { beetleWingedAnimations } from 'app/content/enemyAnimations';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, drawFrameAt } from 'app/utils/animations';
 import { createCanvasAndContext, debugCanvas } from 'app/utils/canvas';
-import { pad, rectanglesOverlap } from 'app/utils/index';
+import {
+    accelerateInDirection,
+    hasEnemyLeftSection,
+    // moveEnemy,
+    moveEnemyToTargetLocation,
+    //paceRandomly,
+} from 'app/utils/enemies';
 import { getDirection } from 'app/utils/field';
-import { playSound } from 'app/musicController';
-import Random from 'app/utils/Random';
+import { pad, rectanglesOverlap } from 'app/utils/index';
 import { allImagesLoaded } from 'app/utils/images';
+import Random from 'app/utils/Random';
+import {
+    getNearbyTarget,
+    getVectorToTarget,
+} from 'app/utils/target';
 
-import { AreaInstance, Enemy, GameState, HitProperties, HitResult, Rect } from 'app/types';
+import { AreaInstance, GameState, HitProperties, HitResult, Rect } from 'app/types';
 
 // This is just the spirit sight frame.
 
@@ -160,7 +161,7 @@ enemyDefinitions.stormHeart = {
                 }
             }
             enemy.params.cloudRegenerateTimer = 1500;
-            playSound('enemyHit');
+            enemy.makeSound(state, 'enemyHit');
             return { hit: true, stopped: true };
         }
         if (!(enemy.params.counterAttackTimer > 0)) {

@@ -2,8 +2,8 @@ import { addEffectToArea, addObjectToArea } from 'app/content/areas';
 import { addParticleAnimations } from 'app/content/effects/animationEffect';
 import { GroundSpike, addLineOfSpikes } from 'app/content/effects/groundSpike';
 import { SpikePod } from 'app/content/effects/spikePod';
-import { getNearbyTarget } from 'app/content/enemies';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
+import { Enemy } from 'app/content/enemy';
 import {
     crystalCollectorAnimations,
     crystalCollecterBackFrame,
@@ -17,14 +17,14 @@ import {
 } from 'app/content/enemyAnimations';
 import { WallTurret } from 'app/content/objects/wallTurret';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { playSound } from 'app/musicController';
 import { drawFrame, getFrame, drawFrameCenteredAt } from 'app/utils/animations';
 import { getTileBehaviors, hitTargets } from 'app/utils/field';
 import Random from 'app/utils/Random';
+import { getNearbyTarget } from 'app/utils/target';
 
 
 import {
-    AreaInstance, EffectInstance, Enemy, EnemyAbility, Frame,
+    AreaInstance, EffectInstance, EnemyAbility, Frame,
     GameState, Hero, HitProperties, HitResult, ObjectInstance, Rect,
 } from 'app/types';
 
@@ -189,7 +189,7 @@ enemyDefinitions.crystalCollector = {
                 } else {
                     return { hit: true };
                 }
-                playSound('enemyHit');
+                enemy.makeSound(state, 'enemyHit');
                 const hitbox = enemy.getHitbox();
                 addParticleAnimations(state, enemy.area,
                     hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2, 16, crystalBarrierSmallParticles,

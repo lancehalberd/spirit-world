@@ -3,7 +3,7 @@ import { addEffectToArea, removeEffectFromArea } from 'app/content/areas';
 import { FrostBlast } from 'app/content/effects/frostBlast';
 import { FRAME_LENGTH } from 'app/gameConstants';
 
-import { AreaInstance, EffectInstance, Frame, GameState } from 'app/types';
+import { AreaInstance, EffectInstance, Enemy, Frame, GameState } from 'app/types';
 
 interface Props {
     x: number,
@@ -82,4 +82,24 @@ export class FrostGrenade implements EffectInstance, Props {
         context.arc(this.x, this.y - this.z, r, 0, 2 * Math.PI);
         context.fill();
     }
+}
+
+export function throwIceGrenadeAtLocation(state: GameState, enemy: Enemy, {tx, ty}: {tx: number, ty: number}, damage = 1, z = 8): void {
+    const hitbox = enemy.getHitbox(state);
+    const x = hitbox.x + hitbox.w / 2;
+    const y = hitbox.y + hitbox.h / 2;
+    const vz = 4;
+    const az = -0.2;
+    const duration = -2 * vz / az;
+    const frostGrenade = new FrostGrenade({
+        damage,
+        x,
+        y,
+        z,
+        vx: (tx - x) / duration,
+        vy: (ty - y) / duration,
+        vz,
+        az,
+    });
+    addEffectToArea(state, enemy.area, frostGrenade);
 }

@@ -1,19 +1,21 @@
 import { playAreaSound, removeObjectFromArea } from 'app/content/areas';
-import {
-    getVectorToNearbyTarget,
-    isTargetVisible,
-    moveEnemy,
-    moveEnemyToTargetLocation,
-} from 'app/content/enemies';
 import { CrystalSpike } from 'app/content/effects/arrow';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { vanaraBlackAnimations } from 'app/render/npcAnimations';
 import { heroAnimations, staffAnimations } from 'app/render/heroAnimations';
 import { appendScript, removeTextCue } from 'app/scriptEvents';
-import { saveGame } from 'app/state';
 import { drawFrameAt, getFrame } from 'app/utils/animations';
+import {
+    moveEnemy,
+    moveEnemyToTargetLocation,
+} from 'app/utils/enemies';
 import { directionMap, getDirection, hitTargets } from 'app/utils/field';
+import { saveGame } from 'app/utils/saveGame';
+import {
+    getVectorToNearbyTarget,
+    isTargetVisible,
+} from 'app/utils/target';
 
 
 import {
@@ -266,7 +268,7 @@ function updateRival(this: void, state: GameState, enemy: Enemy): void {
             appendScript(state, '{@rival.lostFirstFight}');
             enemy.setMode('escaping');
             state.savedState.objectFlags[enemy.definition.id] = true;
-            saveGame();
+            saveGame(state);
             return;
         }
     }

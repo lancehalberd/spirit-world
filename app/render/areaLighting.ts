@@ -1,6 +1,6 @@
 import { getObjectBehaviors } from 'app/content/objects';
-import { Clone } from 'app/content/objects/clone';
-import { editingState } from 'app/development/tileEditor';
+import { Hero } from 'app/content/hero';
+import { editingState } from 'app/development/editingState';
 import {
     CANVAS_HEIGHT, CANVAS_WIDTH, FRAME_LENGTH,
 } from 'app/gameConstants';
@@ -247,7 +247,7 @@ export function renderAreaLighting(context: CanvasRenderingContext2D, state: Gam
                     behaviors.brightness, behaviors.lightRadius
                 );
             }
-            if (object instanceof Clone) {
+            if (object instanceof Hero) {
                 if (object.pickUpTile) {
                     const behaviors = object.pickUpTile.behaviors;
                     if (behaviors?.brightness) {

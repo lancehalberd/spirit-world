@@ -1,12 +1,6 @@
 /* global navigator */
-import { enterLocation } from 'app/content/areas';
-import { editingState } from 'app/development/tileEditor';
-import { exportZoneToClipboard } from 'app/development/exportZone';
-import { selectSection, toggleEditing } from 'app/development/tileEditor';
-import { updateObjectInstance } from 'app/development/objectEditor';
 import { GAME_KEY } from 'app/gameConstants';
-import { getState, saveSettings } from 'app/state';
-import { updateSoundSettings, unlockAudio } from 'app/utils/sounds';
+import { unlockAudio } from 'app/utils/sounds';
 
 import { GameState, Hero } from 'app/types'
 
@@ -152,7 +146,7 @@ function isGamepadGamekeyPressed(gameKey: number) {
     return 0;
 }
 
-export function addKeyCommands() {
+export function addKeyboardListeners() {
     document.addEventListener('keyup', function(event) {
         const keyCode: number = event.which;
         keysDown[keyCode] = null;
@@ -178,86 +172,7 @@ export function addKeyCommands() {
             return;
         }
         keysDown[keyCode] = 1;
-        if (keyCode === KEY.C && commandIsDown) {
-            if (editingState.isEditing && getState().areaInstance.definition.objects.includes(editingState.selectedObject)) {
-                editingState.clipboardObject = {...editingState.selectedObject};
-            } else {
-                exportZoneToClipboard(getState().zone);
-                editingState.hasChanges = false;
-                event.preventDefault();
-            }
-            return;
-        }
-        if (keysDown[KEY.SHIFT] && keyCode === KEY.BACK_SLASH) {
-            const state = getState();
-            state.alwaysHideMenu = !state.alwaysHideMenu;
-        }
-        if (keyCode === KEY.K && commandIsDown) {
-            defeatAllEnemies();
-            event.preventDefault();
-            return;
-        }
-        if (keyCode === KEY.V && commandIsDown) {
-            if (editingState.clipboardObject) {
-                const state = getState();
-                updateObjectInstance(state, {...editingState.clipboardObject}, null, state.areaInstance, true);
-            }
-            event.preventDefault();
-            return;
-        }
-        if (keyCode === KEY.A && commandIsDown) {
-            selectSection();
-            event.preventDefault();
-            return;
-        }
-        if (keysDown[KEY.SHIFT] && keyCode === KEY.E) {
-            toggleEditing();
-        }
-        if (keysDown[KEY.SHIFT] && keyCode === KEY.M) {
-            const state = getState();
-            state.settings.muteAllSounds = !state.settings.muteAllSounds;
-            updateSoundSettings(state);
-            saveSettings(state);
-        }
-        if (keyCode === KEY.R && editingState.isEditing && keysDown[KEY.SHIFT]) {
-            // Reset the entire zone if command is down.
-            const state = getState();
-            for (const floor of state.zone.floors) {
-                for (const grid of [floor.grid, floor.spiritGrid]) {
-                    for (const row of grid) {
-                        for (const areaDefinition of row) {
-                            for (const object of areaDefinition?.objects ?? []) {
-                                delete state.savedState.objectFlags[object.id];
-                                delete state.savedState.zoneFlags[object.id];
-                            }
-                        }
-                    }
-                }
-            }
-            state.savedState.luckyBeetles = [];
-            delete state.savedState.dungeonInventories[state.location.logicalZoneKey];
-            state.location.x = state.hero.x;
-            state.location.y = state.hero.y;
-            // Calling this will instantiate the area again and place the player back in their current location.
-            enterLocation(state, state.location);
-        } else if ((keysDown[KEY.SHIFT] || editingState.isEditing) && keyCode === KEY.R) {
-            // Reset the current screen as if you left and returned to it.
-            const state = getState();
-            state.location.x = state.hero.x;
-            state.location.y = state.hero.y;
-            // Calling this will instantiate the area again and place the player back in their current location.
-            enterLocation(state, state.location);
-        }
     });
-}
-
-export function defeatAllEnemies() {
-    const state = getState();
-    const allEnemies = [...state.areaInstance?.enemies, ...state.alternateAreaInstance?.enemies];
-    for (const enemy of allEnemies) {
-        enemy.showDeathAnimation(state);
-    }
-    event.preventDefault();
 }
 
 export function updateKeyboardState(state: GameState) {

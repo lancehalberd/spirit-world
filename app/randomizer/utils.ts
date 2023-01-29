@@ -25,10 +25,11 @@ import { labNodes } from 'app/randomizer/logic/labLogic';
 import { treeNodes, voidNodes } from 'app/randomizer/logic/treeLogic';
 import { addCheck } from 'app/randomizer/checks';
 
+import { applySavedState, getDefaultState } from 'app/state';
+import { getFullZoneLocation } from 'app/utils/getFullZoneLocation';
 import SRandom from 'app/utils/SRandom';
 import Random from 'app/utils/Random';
 
-import { applySavedState, getFullZoneLocation, getDefaultState } from 'app/state';
 
 import {
     AreaDefinition,

@@ -1,14 +1,13 @@
 import { addObjectToArea } from 'app/content/areas';
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
-import {
-    getVectorToTarget, moveEnemyFull,
-} from 'app/content/enemies';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { goldenBeetleAnimations } from 'app/content/enemyAnimations';
 import { LootDropObject } from 'app/content/objects/lootObject';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { saveGame } from 'app/state';
+import { moveEnemyFull } from 'app/utils/enemies';
 import { getDirection } from 'app/utils/field';
+import { saveGame } from 'app/utils/saveGame';
+import { getVectorToTarget } from 'app/utils/target';
 
 import { Enemy, GameState, HitProperties, HitResult } from 'app/types';
 
@@ -97,7 +96,7 @@ enemyDefinitions.luckyBeetle = {
         if (state.savedState.luckyBeetles.length > 3) {
             state.savedState.luckyBeetles.pop();
         }
-        saveGame();
+        saveGame(state);
     },
     onHit(this: void, state: GameState, enemy: Enemy<LuckyBeetleParams>, hit: HitProperties): HitResult {
         const result = enemy.defaultOnHit(state, hit);

@@ -1,7 +1,7 @@
 import { palettes } from 'app/content/palettes';
 import { addNewTile, allTiles, generateTileHash, generateTileHashMap } from 'app/content/tiles';
 import { tagElement } from 'app/dom';
-import { KEY, isKeyboardKeyDown } from 'app/keyCommands';
+import { KEY, isKeyboardKeyDown } from 'app/userInput';
 import { drawFrame } from 'app/utils/animations';
 import { createCanvas } from 'app/utils/canvas';
 import { getMousePosition, isMouseDown } from 'app/utils/mouse';

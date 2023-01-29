@@ -1,11 +1,11 @@
 import { makeSparkleAnimation } from 'app/content/effects/animationEffect';
-import { addEffectToArea, getAreaSize, removeEffectFromArea } from 'app/content/areas';
+import { addEffectToArea, playAreaSound, removeEffectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { getChargeLevelAndElement } from 'app/useTool';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { hitTargets } from 'app/utils/field';
+import { getAreaSize } from 'app/utils/getAreaSize';
+import { getChargeLevelAndElement } from 'app/utils/getChargeLevelAndElement';
 import { isPointInShortRect, pad } from 'app/utils/index';
-import { playSound } from 'app/musicController';
 
 import {
     AnimationEffect, AreaInstance, DrawPriority, EffectInstance, Frame, GameState, Hero, HitProperties, MagicElement,
@@ -298,11 +298,11 @@ export class HeldChakram implements EffectInstance {
             level: this.level,
         });
         if (chakram.speed >= 12) {
-            playSound('strongChakram');
+            playAreaSound(state, this.area, 'strongChakram');
         } else if (chakram.speed >= 6) {
-            playSound('normalChakram');
+            playAreaSound(state, this.area, 'normalChakram');
         } else {
-            playSound('weakChakram');
+            playAreaSound(state, this.area, 'weakChakram');
         }
         this.hero.vx -= chakram.vx / 4;
         this.hero.vy -= chakram.vy / 4;
@@ -327,11 +327,11 @@ export class HeldChakram implements EffectInstance {
         // Only play the held sound if they actually hold the chakram for a moment.
         // This also happens to be the exact time that damage is doubled with level one charge.
         if (maxChargeLevel && this.animationTime === 300) {
-            playSound('chakramCharge1');
+            playAreaSound(state, this.area, 'chakramCharge1');
         }
         // Play a second sound when damage is doubled using the base charge (level 0).
         if (!maxChargeLevel && this.animationTime === 600) {
-            playSound('chakramCharge1');
+            playAreaSound(state, this.area, 'chakramCharge1');
             const cx = this.w / 2, cy = this.h / 2;
             this.sparkles.push(makeSparkleAnimation(state, {x: cx + 2, y: cy + 2, w: 1, h: 1}, { target: this, delay: 0 }));
             this.sparkles.push(makeSparkleAnimation(state, {x: cx - 3, y: cy + 3, w: 1, h: 1}, { target: this, delay: 80 }));

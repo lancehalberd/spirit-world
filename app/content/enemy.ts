@@ -1,17 +1,18 @@
 import { AnimationEffect } from 'app/content/effects/animationEffect';
-import { checkForFloorEffects, isTargetVisible, moveEnemy } from 'app/content/enemies';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { dropItemFromTable, getLoot } from 'app/content/objects/lootObject';
-import { addEffectToArea, getAreaSize, refreshAreaLogic } from 'app/content/areas';
+import { addEffectToArea, playAreaSound, refreshAreaLogic } from 'app/content/areas';
 import { bossDeathExplosionAnimation, enemyDeathAnimation } from 'app/content/enemyAnimations';
 import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { appendCallback, addTextCue } from 'app/scriptEvents';
 import { drawFrame, getFrame } from 'app/utils/animations';
 import { getDirection } from 'app/utils/field';
-import { playSound } from 'app/musicController';
 import { renderEnemyShadow } from 'app/renderActor';
+import { checkForFloorEffects, moveEnemy } from 'app/utils/enemies';
+import { getAreaSize } from 'app/utils/getAreaSize';
 import Random from 'app/utils/Random';
+import { isTargetVisible } from 'app/utils/target';
 
 import {
     Action, Actor, ActorAnimations, AreaInstance, BossObjectDefinition, Direction, DrawPriority, EffectInstance,
@@ -292,7 +293,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             if (this.blockInvulnerableFrames) {
                 return { hit: true, blocked: true };
             }
-            playSound('blockAttack');
+            playAreaSound(state, this.area, 'blockAttack');
             this.blockInvulnerableFrames = 30;
             return {
                 hit: true,
@@ -335,7 +336,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         if (this.life <= 0 && !this.isImmortal) {
             this.showDeathAnimation(state);
         } else {
-            playSound(damageSound);
+            playAreaSound(state, this.area, damageSound);
         }
         if (this.area !== state.areaInstance) {
             addEffectToArea(state, state.areaInstance, new AnimationEffect({
@@ -413,7 +414,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             deathAnimation.vy = this.vy;
             deathAnimation.friction = 0.1;
         }
-        playSound('enemyDeath');
+        playAreaSound(state, this.area, 'enemyDeath');
         if (this.enemyDefinition.lootTable) {
             dropItemFromTable(state, this.area, this.enemyDefinition.lootTable,
                 hitbox.x + hitbox.w / 2,
@@ -560,7 +561,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
                     y: hitbox.y + Math.random() * hitbox.h - animation.frames[0].h / 2,
                 });
                 addEffectToArea(state, this.area, explosionAnimation);
-                playSound('enemyDeath');
+                playAreaSound(state, this.area, 'enemyDeath');
             }
             return;
         }
@@ -713,5 +714,8 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             this.x = this.y = 0;
             this.defaultRender(context);
         context.restore();
+    }
+    makeSound(state: GameState, soundKey: string) {
+        playAreaSound(state, this.area, soundKey);
     }
 }

@@ -10,11 +10,10 @@ import {
 import { bossTypes } from 'app/content/bosses';
 import { dialogueHash } from 'app/content/dialogue';
 import { logicHash } from 'app/content/logic';
-import { createObjectInstance } from 'app/content/objects';
 import { decorationTypes } from 'app/content/objects/decoration';
 import { escalatorStyles } from 'app/content/objects/escalator';
 import { specialBehaviorsHash } from 'app/content/specialBehaviors';
-import { doorStyles } from 'app/content/objects/door';
+import { doorStyles } from 'app/content/objects/doorStyles';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { enemyTypes } from 'app/content/enemies';
 import { npcBehaviors, npcStyles } from 'app/content/objects/npc';
@@ -24,19 +23,21 @@ import { pitStyles } from 'app/content/objects/pitEntrance';
 import { turretStyles } from 'app/content/objects/wallTurret';
 import { zones } from 'app/content/zones';
 import { ObjectPalette, ObjectPaletteItem } from 'app/development/objectPalette';
+import { editingState } from 'app/development/editingState';
 import {
-    displayTileEditorPropertyPanel, editingState,
-    EditingState, setEditingTool,
+    displayTileEditorPropertyPanel, setEditingTool,
 } from 'app/development/tileEditor';
 import { getLogicProperties } from 'app/development/zoneEditor';
-import { isKeyboardKeyDown, KEY } from 'app/keyCommands';
+import { allLootTypes } from 'app/gameConstants';
+import { isKeyboardKeyDown, KEY } from 'app/userInput';
 import { getState } from 'app/state';
+import { createObjectInstance } from 'app/utils/createObjectInstance';
 import { isPointInShortRect } from 'app/utils/index';
 
 import {
     AreaDefinition, AreaInstance, BallGoalDefinition,
     BossObjectDefinition,
-    BossType, CrystalSwitchDefinition, EditorProperty, EntranceDefinition,
+    BossType, CrystalSwitchDefinition, EditingState, EditorProperty, EntranceDefinition,
     EnemyObjectDefinition,
     FloorSwitchDefinition, KeyBlockDefinition,
     FrameDimensions, DecorationType, Direction, DrawPriority, EnemyType, GameState, LootObjectDefinition,
@@ -188,36 +189,6 @@ export function getObjectTypeProperties(): PanelRows {
     return [palette.canvas];
 }
 
-
-let allLootTypes: LootType[];
-export function getLootTypes(): LootType[] {
-    if (!allLootTypes) {
-        const state = getState();
-        allLootTypes = [
-            'empty',
-            'peachOfImmortality',
-            'peachOfImmortalityPiece',
-            'money',
-            'silverOre',
-            'goldOre',
-            'weapon',
-            'bigKey',
-            'smallKey',
-            'map',
-            'secondChance',
-            // This is used for the basic goal in randomizer.
-            'victoryPoint',
-            // This is the special progressive spirit power loot used by the randomizer.
-            'spiritPower',
-            ...(Object.keys(state.hero.activeTools) as LootType[]),
-            ...(Object.keys(state.hero.passiveTools) as LootType[]),
-            ...(Object.keys(state.hero.equipment) as LootType[]),
-            ...(Object.keys(state.hero.elements) as LootType[]),
-        ];
-    }
-    return allLootTypes;
-}
-
 export const combinedObjectTypes: ObjectType[] = [
     'anode', 'cathode', 'airBubbles', 'ballGoal', 'beadCascade', 'beadGrate', 'bigChest', 'chest', 'crystalSwitch', 'decoration',
     'door', 'escalator', 'floorSwitch', 'indicator', 'keyBlock', 'loot','marker', 'narration', 'npc', 'pitEntrance',
@@ -315,7 +286,7 @@ export function createObjectDefinition(
             };
         case 'boss': {
             const bossType = definition.enemyType;
-            const lootType = definition.lootType || getLootTypes()[0];
+            const lootType = definition.lootType || allLootTypes[0];
             const enemyDefinition = enemyDefinitions[bossType];
             const params = {};
             for (let key in enemyDefinition?.params || {}) {
@@ -422,7 +393,7 @@ export function createObjectDefinition(
         case 'bigChest':
         case 'shopItem':
         case 'loot': {
-            const lootType = definition.lootType || getLootTypes()[0];
+            const lootType = definition.lootType || allLootTypes[0];
             const lootDefinition: LootObjectDefinition = {
                 ...commonProps,
                 type: definition.type,
@@ -1252,7 +1223,7 @@ function getLootFields(state: GameState, editingState: EditingState, object: Obj
     rows.push({
         name: 'lootType',
         value: lootType,
-        values: getLootTypes(),
+        values: allLootTypes,
         onChange(lootType: LootType) {
             object.lootType = lootType;
             updateObjectInstance(state, object);

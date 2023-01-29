@@ -1,9 +1,9 @@
 import { addEffectToArea } from 'app/content/areas';
 import { AnimationEffect } from 'app/content/effects/animationEffect';
 import { BarrierBurstEffect } from 'app/content/effects/barrierBurstEffect';
-import { destroyClone } from 'app/content/objects/clone';
 import { Staff } from 'app/content/objects/staff';
 import { getChargedArrowAnimation } from 'app/content/effects/arrow';
+import { ThrownObject } from 'app/content/effects/thrownObject';
 import {
     arrowAnimations, bowAnimations, cloakAnimations,
     chargeBackAnimation, chargeFrontAnimation,
@@ -18,10 +18,11 @@ import {
     renderExplosionRing, renderHeroBarrier,
     spiritBarrierBreakingAnimation,
 } from 'app/renderActor';
-import { getChargeLevelAndElement } from 'app/useTool';
 import { drawFrameAt, getFrame } from 'app/utils/animations';
 import { isUnderwater } from 'app/utils/actor';
+import { destroyClone } from 'app/utils/destroyClone';
 import { directionMap, getDirection } from 'app/utils/field';
+import { getChargeLevelAndElement } from 'app/utils/getChargeLevelAndElement';
 import { boxesIntersect } from 'app/utils/index';
 
 import {
@@ -29,7 +30,7 @@ import {
     Direction, DrawPriority, EffectInstance, Equipment, Frame,
     FullTile, GameState, HeldChakram, HitProperties, HitResult,
     MagicElement, ObjectInstance, ObjectStatus,
-    PassiveTool, Rect, SavedHeroData, ThrownChakram, ThrownObject, TileCoords,
+    PassiveTool, Rect, SavedHeroData, ThrownChakram, TileCoords,
     WeaponUpgrades, ZoneLocation
 } from 'app/types';
 

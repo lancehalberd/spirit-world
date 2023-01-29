@@ -1,9 +1,7 @@
-import { enterLocation, enterZoneByTarget, playAreaSound } from 'app/content/areas';
+import { playAreaSound } from 'app/content/areas';
 import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
-import { findObjectInstanceById } from 'app/content/objects';
-import { editingState } from 'app/development/tileEditor';
+import { editingState } from 'app/development/editingState';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { getVectorToTarget } from 'app/content/enemies';
 import {
     renderAreaObjectsBeforeHero,
     renderAreaObjectsAfterHero,
@@ -11,8 +9,11 @@ import {
 } from 'app/render';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { createCanvasAndContext } from 'app/utils/canvas';
+import { enterLocation } from 'app/utils/enterLocation';
+import { enterZoneByTarget } from 'app/utils/enterZoneByTarget';
 import { directionMap, getTileBehaviors } from 'app/utils/field';
 import { isObjectInsideTarget, pad } from 'app/utils/index';
+import { getVectorToTarget } from 'app/utils/target';
 
 import {
     AreaInstance, DrawPriority, GameState, ObjectInstance,
@@ -246,19 +247,4 @@ function updateSpiritCanvas(state: GameState, hitbox: Rect): void {
         spiritContext.restore();
     }
     isRenderingSpiritCanvas = false;
-}
-
-export function enterZoneByTeleporterCallback(this: void, state: GameState, targetObjectId: string) {
-    const hero = state.hero;
-    hero.isUsingDoor = true;
-    const target = findObjectInstanceById(state.areaInstance, targetObjectId) as Teleporter;
-    if (!target){
-        console.error(state.areaInstance.objects);
-        console.error(targetObjectId);
-        debugger;
-    }
-    hero.actionTarget = target;
-    target.disabledTime = 500;
-    hero.actionDx = directionMap[hero.d][0];
-    hero.actionDy = directionMap[hero.d][1];
 }

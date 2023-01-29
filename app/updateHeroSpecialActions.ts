@@ -1,18 +1,17 @@
-import { addObjectToArea, enterLocation, getAreaSize, playAreaSound, refreshAreaLogic } from 'app/content/areas';
+import { addObjectToArea, playAreaSound, refreshAreaLogic } from 'app/content/areas';
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
-import { getVectorToTarget } from 'app/content/enemies';
 import { Door } from 'app/content/objects/door';
-import { destroyClone } from 'app/content/objects/clone';
 import { Staff } from 'app/content/objects/staff';
 import { CANVAS_HEIGHT, FALLING_HEIGHT, FRAME_LENGTH, GAME_KEY } from 'app/gameConstants';
-import { editingState } from 'app/development/tileEditor';
-import { getCloneMovementDeltas, isGameKeyDown, wasGameKeyPressed } from 'app/keyCommands';
+import { editingState } from 'app/development/editingState';
+import { getCloneMovementDeltas, isGameKeyDown, wasGameKeyPressed } from 'app/userInput';
 import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
 import { getSectionBoundingBox, moveActor } from 'app/moveActor';
 import { fallAnimation, heroAnimations } from 'app/render/heroAnimations';
-import { saveGame } from 'app/state';
 import { updateCamera } from 'app/updateCamera';
 import { isUnderwater } from 'app/utils/actor';
+import { destroyClone } from 'app/utils/destroyClone';
+import { enterLocation } from 'app/utils/enterLocation';
 import {
     canSomersaultToCoords,
     directionMap,
@@ -20,7 +19,10 @@ import {
     getTileBehaviorsAndObstacles,
     hitTargets,
 } from 'app/utils/field';
+import { getAreaSize } from 'app/utils/getAreaSize';
 import { boxesIntersect, isObjectInsideTarget, pad } from 'app/utils/index';
+import { saveGame } from 'app/utils/saveGame';
+import { getVectorToTarget } from 'app/utils/target';
 
 
 import {
@@ -439,7 +441,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                     state.savedState.staffTowerLocation = towerLocation as StaffTowerLocation;
                     state.hero.activeTools.staff = 1;
                     refreshAreaLogic(state, hero.area);
-                    saveGame();
+                    saveGame(state);
                     return;
                 }
             }

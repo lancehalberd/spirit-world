@@ -2,28 +2,29 @@ import {
     addEffectToArea,
     addObjectToArea,
     removeEffectFromArea,
-    getAreaSize,
     playAreaSound,
 } from 'app/content/areas';
 import { AnimationEffect } from 'app/content/effects/animationEffect';
 import { addArcOfShockWaves, addRadialShockWaves } from 'app/content/effects/shockWave';
 import { LaserBeam } from 'app/content/effects/laserBeam';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
+import { Enemy } from 'app/content/enemy';
+import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
+import { rectanglesOverlap } from 'app/utils/index';
 import {
     accelerateInDirection,
-    getNearbyTarget,
     //getVectorToNearbyTarget,
     //getVectorToTarget,
     moveEnemy,
     moveEnemyToTargetLocation,
     //paceRandomly,
-} from 'app/content/enemies';
-import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
-import { rectanglesOverlap } from 'app/utils/index';
+} from 'app/utils/enemies';
 import { addScreenShake } from 'app/utils/field';
+import { getAreaSize } from 'app/utils/getAreaSize';
+import { getNearbyTarget} from 'app/utils/target';
 
 import {
-    ActorAnimations, AreaInstance, Enemy, FrameDimensions, FrameAnimation,
+    ActorAnimations, AreaInstance, FrameDimensions, FrameAnimation,
     GameState, HitProperties, HitResult
 } from 'app/types';
 

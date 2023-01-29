@@ -3,22 +3,16 @@ import { Flame } from 'app/content/effects/flame';
 import { FlameWall } from 'app/content/effects/flameWall';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { createCanvasAndContext, debugCanvas } from 'app/utils/canvas';
-import {
-    //accelerateInDirection,
-    getNearbyTarget,
-    getVectorToNearbyTarget,
-    getVectorToTarget,
-    //moveEnemy,
-    //moveEnemyToTargetLocation,
-    paceRandomly,
-} from 'app/content/enemies';
+import { Enemy } from 'app/content/enemy';
 import { beetleHornedAnimations } from 'app/content/enemyAnimations';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame } from 'app/utils/animations';
+import { paceRandomly } from 'app/utils/enemies';
 import { getDirection } from 'app/utils/field';
 import { allImagesLoaded } from 'app/utils/images';
+import { getNearbyTarget, getVectorToTarget, getVectorToNearbyTarget } from 'app/utils/target';
 
-import { AreaInstance, Enemy, EnemyAbility, GameState } from 'app/types';
+import { AreaInstance, EnemyAbility, GameState } from 'app/types';
 
 const flameGeometry = {w: 20, h: 20, content: {x: 4, y: 10, w: 12, h: 8}};
 export const [fireElement] = createAnimation('gfx/hud/elementhud.png', flameGeometry, {x: 1}).frames;

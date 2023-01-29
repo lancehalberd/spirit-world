@@ -95,6 +95,7 @@ export interface ObjectInstance {
     isAllyTarget?: boolean
     isEnemyTarget?: boolean
     isNeutralTarget?: boolean
+    isInvisible?: boolean
     // This function can be defined to override the default logic for checking if an object is active,
     // which is used by switch toggling logic to determine whether to activate or deactivate next.
     isActive?: (state: GameState) => boolean
@@ -145,6 +146,7 @@ export interface EffectInstance {
     isEnemyAttack?: boolean
     // Some enemies respond to player attacks.
     isPlayerAttack?: boolean
+    isInvisible?: boolean
     // The following are added for convenience when we have ambiguous type `EffectInstance | ObjectInstance`
     status?: ObjectStatus
     definition?: ObjectDefinition

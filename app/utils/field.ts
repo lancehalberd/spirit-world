@@ -1,10 +1,14 @@
-import { destroyTile, removeEffectFromArea, removeObjectFromArea, resetTileBehavior } from 'app/content/areas';
+import { removeEffectFromArea, removeObjectFromArea } from 'app/content/areas';
+import { Enemy } from 'app/content/enemy';
+import { Hero } from 'app/content/hero';
 import { getObjectBehaviors } from 'app/content/objects';
 import { allTiles } from 'app/content/tiles';
+import { destroyTile } from 'app/utils/destroyTile';
 import { isPixelInShortRect, rectanglesOverlap } from 'app/utils/index';
+import { resetTileBehavior } from 'app/utils/tileBehavior';
 
 import {
-    AreaInstance, AreaLayer, Direction, EffectInstance, Enemy, GameState, Hero,
+    AreaInstance, AreaLayer, Direction, EffectInstance, GameState,
     HitProperties, HitResult, MovementProperties,
     ObjectInstance, Rect, Tile, TileCoords, TileBehaviors,
 } from 'app/types';

@@ -1,6 +1,7 @@
+import { Hero } from 'app/content/hero';
 import { isPointInShortRect } from 'app/utils/index';
 
-import { Actor, GameState, Hero, ObjectInstance, TileCoords } from 'app/types';
+import { Actor, GameState, ObjectInstance, TileCoords } from 'app/types';
 
 export function getActorTargets(state: GameState, actor: Actor): {tiles: TileCoords[], objects: ObjectInstance[]} {
     const tileSize = 16;

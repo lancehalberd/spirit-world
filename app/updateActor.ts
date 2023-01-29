@@ -1,22 +1,23 @@
 import {
-    getAreaFromLocation, getAreaSize, removeAllClones,
+    getAreaFromLocation, removeAllClones,
     removeEffectFromArea, removeObjectFromArea,
     scrollToArea, setNextAreaSection,
     swapHeroStates,
 } from 'app/content/areas';
 import { AirBubbles } from 'app/content/objects/airBubbles';
 import { Enemy } from 'app/content/enemy';
-import { editingState } from 'app/development/tileEditor';
+import { editingState } from 'app/development/editingState';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
 import { prependScript } from 'app/scriptEvents';
-import { getFullZoneLocation } from 'app/state';
 import { updateHeroSpecialActions } from 'app/updateHeroSpecialActions';
 import { updateHeroStandardActions } from 'app/updateHeroStandardActions';
 import { isToolButtonPressed, wasToolButtonPressed, wasToolButtonPressedAndReleased, } from 'app/useTool';
 import {
     directionMap,
 } from 'app/utils/field';
+import { getAreaSize } from 'app/utils/getAreaSize';
+import { getFullZoneLocation } from 'app/utils/getFullZoneLocation';
 import { boxesIntersect } from 'app/utils/index';
 
 import {

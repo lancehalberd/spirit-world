@@ -1,4 +1,3 @@
-import { enterLocation } from 'app/content/areas';
 import { addDustBurst, addReviveBurst } from 'app/content/effects/animationEffect';
 import { Hero } from 'app/content/hero';
 import { showHint } from 'app/content/hints';
@@ -31,24 +30,24 @@ import {
     wasGameKeyPressed,
     wasConfirmKeyPressed,
     wasMenuConfirmKeyPressed,
-} from 'app/keyCommands';
+} from 'app/userInput';
+import { playSound, updateSoundSettings } from 'app/musicController';
 import { updateHeroMagicStats } from 'app/render/spiritBar';
+import { getDefaultSavedState } from 'app/savedState'
 import { parseScriptText, setScript, updateScriptEvents } from 'app/scriptEvents';
 import {
     canPauseGame,
-    getDefaultSavedState,
     getState,
     getTitleOptions,
     returnToSpawnLocation,
-    saveGame,
-    saveGamesToLocalStorage,
     setSaveFileToState,
     shouldHideMenu,
 } from 'app/state';
 import { updateCamera } from 'app/updateCamera';
 import { updateField } from 'app/updateField';
+import { enterLocation } from 'app/utils/enterLocation';
 import { areAllImagesLoaded } from 'app/utils/images';
-import { playSound, updateSoundSettings } from 'app/musicController';
+import { saveGame, saveGamesToLocalStorage, } from 'app/utils/saveGame';
 
 import { ActiveTool, PassiveTool, GameState, MagicElement } from 'app/types';
 
@@ -139,11 +138,11 @@ function updateTitle(state: GameState) {
     if (wasGameKeyPressed(state, GAME_KEY.UP)) {
         state.menuIndex = (state.menuIndex - 1 + options.length) % options.length;
         changedOption = true;
-        playSound('menuTick');
+        playSound(state, 'menuTick');
     } else if (wasGameKeyPressed(state, GAME_KEY.DOWN)) {
         state.menuIndex = (state.menuIndex + 1) % options.length;
         changedOption = true;
-        playSound('menuTick');
+        playSound(state, 'menuTick');
     }
     if (changedOption) {
         if (state.scene === 'title' || state.scene === 'deleteSavedGame') {
@@ -155,12 +154,12 @@ function updateTitle(state: GameState) {
         }
     }
     if (wasConfirmKeyPressed(state)) {
-        playSound('menuTick');
+        playSound(state, 'menuTick');
         switch (state.scene) {
             case 'deleteSavedGameConfirmation':
                 if (state.menuIndex === 1) {
                     state.savedGames[state.savedGameIndex] = null;
-                    saveGamesToLocalStorage();
+                    saveGamesToLocalStorage(state);
                 }
                 state.scene = 'title';
                 state.menuIndex = state.savedGameIndex;
@@ -337,7 +336,7 @@ function updateDefeated(state: GameState) {
             state.hero.life = Math.min(state.hero.maxLife, state.hero.life + 0.5);
             if (state.hero.life === state.hero.maxLife) {
                 state.defeatState.defeated = false;
-                saveGame();
+                saveGame(state);
             }
         }
         return;

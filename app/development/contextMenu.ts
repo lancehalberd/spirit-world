@@ -1,9 +1,11 @@
-import { getSpawnLocationContextMenuOption, getTestStateContextMenuOption } from 'app/content/spawnLocations';
-import { editingState, toggleEditing } from 'app/development/tileEditor';
+import { getSpawnLocationContextMenuOption, getTestStateContextMenuOption } from 'app/development/contextMenu/setState';
+import { editingState } from 'app/development/editingState';
+import { toggleEditing } from 'app/development/editor';
 import { tagElement } from 'app/dom';
-import { defeatAllEnemies, KEY, isKeyboardKeyDown } from 'app/keyCommands';
+import { KEY, isKeyboardKeyDown } from 'app/userInput';
 import { getState } from 'app/state';
 import { mainCanvas } from 'app/utils/canvas';
+import { defeatAllEnemies } from 'app/utils/addKeyboardShortcuts';
 import { getElementRectangle } from 'app/utils/index';
 import { getMousePosition } from 'app/utils/mouse';
 import { updateSoundSettings } from 'app/utils/sounds';
@@ -114,7 +116,7 @@ export function getContextMenu(): MenuOption[] {
         {
             label: editingState.isEditing ? 'Stop Map Editor' : 'Start Map Editor',
             onSelect() {
-                toggleEditing();
+                toggleEditing(getState());
             }
         },
     ];

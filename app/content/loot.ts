@@ -1,12 +1,11 @@
-import { enterLocation } from 'app/content/areas';
 import { setLeftTool, setRightTool } from 'app/content/menu';
-import { setSpawnLocation, SPAWN_LOCATION_PEACH_CAVE_EXIT } from 'app/content/spawnLocations';
 import { showMessage } from 'app/render/renderMessage';
 import { updateHeroMagicStats } from 'app/render/spiritBar';
-import { saveGame } from 'app/state';
 import { createAnimation } from 'app/utils/animations';
 import { createCanvasAndContext } from 'app/utils/canvas';
+import { enterLocation } from 'app/utils/enterLocation';
 import { requireImage } from 'app/utils/images';
+import { saveGame } from 'app/utils/saveGame';
 
 import {
     ActiveTool, BossObjectDefinition, DialogueLootDefinition,
@@ -327,9 +326,6 @@ export function showLootMessage(state: GameState, lootType: LootType, lootLevel?
         
         case 'staff':
             if (state.hero.activeTools.staff === 2) {
-                // Reset the spawn location so that you don't respawn in the tower
-                // when it is not active.
-                setSpawnLocation(state, SPAWN_LOCATION_PEACH_CAVE_EXIT);
                 // Refresh the location to hide the tower.
                 enterLocation(state, state.location);
             }
@@ -583,7 +579,7 @@ function getDungeonInventory(state: GameState): DungeonInventory {
 function updateDungeonInventory(state: GameState, inventory: DungeonInventory, save: boolean = true): void {
     state.savedState.dungeonInventories[state.location.logicalZoneKey] = inventory;
     if (save) {
-        saveGame();
+        saveGame(state);
     }
 }
 

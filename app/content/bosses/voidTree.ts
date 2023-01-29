@@ -4,31 +4,34 @@ import { frostHeartAnimations, shootFrostInCone } from 'app/content/bosses/frost
 import { addSlamEffect, golemHandAnimations, golemHandHurtAnimations } from 'app/content/bosses/golem';
 import { stormHeartAnimations } from 'app/content/bosses/stormBeast';
 import { FlameWall } from 'app/content/effects/flameWall';
+import { throwIceGrenadeAtLocation } from 'app/content/effects/frostGrenade';
 import { LaserBeam } from 'app/content/effects/laserBeam';
 import { LightningBolt } from 'app/content/effects/lightningBolt';
 import { LightningDischarge } from 'app/content/effects/lightningDischarge';
 import { addArcOfShockWaves, addRadialShockWaves } from 'app/content/effects/shockWave';
 import { addRadialSparks } from 'app/content/effects/spark';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
-import {
-    accelerateInDirection,
-    getNearbyTarget,
-    getVectorToNearbyTarget,
-    moveEnemy,
-    moveEnemyToTargetLocation,
-    throwIceGrenadeAtLocation,
-} from 'app/content/enemies';
+import { Enemy } from 'app/content/enemy';
 import { certainLifeLootTable } from 'app/content/lootTables';
 import { saveObjectStatus } from 'app/content/objects';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { createCanvasAndContext } from 'app/utils/canvas';
+import {
+    accelerateInDirection,
+    moveEnemy,
+    moveEnemyToTargetLocation,
+} from 'app/utils/enemies';
 import { addScreenShake, rotateDirection } from 'app/utils/field';
 import { allImagesLoaded } from 'app/utils/images';
 import { rectanglesOverlap } from 'app/utils/index';
 import Random from 'app/utils/Random';
+import {
+    getNearbyTarget,
+    getVectorToNearbyTarget,
+} from 'app/utils/target';
 
-import { Enemy, EnemyAbility, GameState, HitProperties, HitResult } from 'app/types';
+import { EnemyAbility, GameState, HitProperties, HitResult } from 'app/types';
 
 
 const stoneGeometry = {w: 20, h: 20, content: {x: 4, y: 10, w: 12, h: 8}};

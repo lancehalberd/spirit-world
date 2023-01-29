@@ -1,4 +1,4 @@
-import { destroyTile, } from 'app/content/areas';
+import { destroyTile } from 'app/utils/destroyTile';
 import { boxesIntersect } from 'app/utils/index';
 
 import { GameState, Hero } from 'app/types';

@@ -3,11 +3,11 @@ import {
     toggleTarget,
     checkIfAllSwitchesAreActivated,
     deactivateTargets,
-    findObjectInstanceById,
     getObjectStatus,
     saveObjectStatus,
 } from 'app/content/objects';
 import { createAnimation, drawFrame } from 'app/utils/animations';
+import { findObjectInstanceById } from 'app/utils/findObjectInstanceById';
 import { rectanglesOverlap } from 'app/utils/index';
 
 import {

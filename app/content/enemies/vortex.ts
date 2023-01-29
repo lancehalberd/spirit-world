@@ -1,17 +1,20 @@
-import {
-    getVectorToNearbyTarget,
-    getVectorToTarget,
-    accelerateInDirection,
-    moveEnemy,
-} from 'app/content/enemies';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { omniAnimation } from 'app/content/enemyAnimations';
+import { Hero } from 'app/content/hero';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { getEnemyBoundingBox, getSectionBoundingBox, intersectRectangles, moveActor } from 'app/moveActor';
 import { isUnderwater } from 'app/utils/actor';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
+import {
+    accelerateInDirection,
+    moveEnemy,
+} from 'app/utils/enemies';
+import {
+    getVectorToNearbyTarget,
+    getVectorToTarget,
+} from 'app/utils/target';
 
-import { Enemy, GameState, Hero } from 'app/types';
+import { Enemy, GameState } from 'app/types';
 
 const poolAnimation = createAnimation('gfx/tiles/deeptoshallowwater.png', {w: 16, h: 16}, {x: 3, y: 0});
 

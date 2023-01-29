@@ -1,10 +1,12 @@
 import {
-    addEffectToArea, addObjectToArea, checkIfAllEnemiesAreDefeated,
-    getAreaInstanceFromLocation, getAreaSize, linkObjects,
+    addEffectToArea, addObjectToArea,
+    getAreaInstanceFromLocation, linkObjects,
     setAreaSection, setConnectedAreas, switchToNextAreaSection,
 } from 'app/content/areas';
-import { displayTileEditorPropertyPanel, editingState } from 'app/development/tileEditor';
+import { editingState } from 'app/development/editingState';
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
+import { checkIfAllEnemiesAreDefeated } from 'app/utils/checkIfAllEnemiesAreDefeated';
+import { getAreaSize } from 'app/utils/getAreaSize';
 import { isObjectInsideTarget } from 'app/utils/index';
 
 import { GameState } from 'app/types';
@@ -80,7 +82,7 @@ export function updateCamera(state: GameState, speed?: number): void {
             setConnectedAreas(state, lastAreaInstance);
             state.hero.area = state.areaInstance;
             if (editingState.isEditing) {
-                displayTileEditorPropertyPanel();
+                editingState.needsRefresh = true;
                 state.areaInstance.tilesDrawn = [];
                 state.areaInstance.checkToRedrawTiles = true;
             }

@@ -1,5 +1,5 @@
 import {
-    enterLocation, getAreaInstanceFromLocation, setAreaSection, setConnectedAreas,
+    getAreaInstanceFromLocation, setAreaSection, setConnectedAreas,
 } from 'app/content/areas';
 import { logicHash } from 'app/content/logic';
 import { specialBehaviorsHash } from 'app/content/specialBehaviors';
@@ -7,17 +7,20 @@ import { zones } from 'app/content/zones';
 import { exportZoneToClipboard, importZone, serializeZone } from 'app/development/exportZone';
 import { TabContainer } from 'app/development/tabContainer';
 import { renderPropertyRows } from 'app/development/propertyPanel';
-import { displayTileEditorPropertyPanel, editingState, EditingState } from 'app/development/tileEditor';
+import { editingState } from 'app/development/editingState';
+import { displayTileEditorPropertyPanel } from 'app/development/tileEditor';
 import { tagElement } from 'app/dom';
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
 import { checkToRedrawTiles } from 'app/render';
-import { getFullZoneLocation, getState } from 'app/state';
+import { getState } from 'app/state';
 import { createCanvasAndContext } from 'app/utils/canvas';
+import { enterLocation } from 'app/utils/enterLocation';
+import { getFullZoneLocation } from 'app/utils/getFullZoneLocation';
 import { readFromFile, saveToFile, scaleRect } from 'app/utils/index';
 import { getMousePosition, isMouseDown } from 'app/utils/mouse';
 
 import {
-    AreaInstance, Floor, GameState, LogicDefinition, PanelRows, PropertyRow, Zone
+    AreaInstance, EditingState, Floor, GameState, LogicDefinition, PanelRows, PropertyRow, Zone
 } from 'app/types';
 
 const fullSection = {x: 0, y: 0, w: 32, h: 32};

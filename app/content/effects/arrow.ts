@@ -1,9 +1,9 @@
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
-import { addEffectToArea, getAreaSize, removeEffectFromArea } from 'app/content/areas';
+import { addEffectToArea, playAreaSound, removeEffectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrameAt, getFrame } from 'app/utils/animations';
 import { getDirection, hitTargets } from 'app/utils/field';
-import { playSound } from 'app/musicController';
+import { getAreaSize } from 'app/utils/getAreaSize';
 
 import {
     AreaInstance, Direction, DrawPriority, EffectInstance, Frame, FrameAnimation,
@@ -300,7 +300,7 @@ export class Arrow implements EffectInstance {
             this.vx = -this.vx;
             this.vy = -this.vy;
             this.reflected = !this.reflected;
-            playSound('blockAttack');
+            playAreaSound(state, this.area, 'blockAttack');
             this.direction = getDirection(this.vx, this.vy, true);
             return;
         }

@@ -1,6 +1,6 @@
 import { refreshAreaLogic } from 'app/content/areas';
 import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
-import { saveGame } from 'app/state';
+import { saveGame } from 'app/utils/saveGame';
 
 import { GameState, ObjectInstance } from 'app/types';
 
@@ -12,7 +12,7 @@ specialBehaviorsHash.tombEntranceSwitch = {
         if (!state.savedState.objectFlags.tombRivalEnraged) {
             state.savedState.objectFlags.tombRivalEnraged = true;
             refreshAreaLogic(state, object.area);
-            saveGame();
+            saveGame(state);
         }
     },
 };
