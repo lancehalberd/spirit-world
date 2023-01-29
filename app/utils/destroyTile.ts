@@ -1,9 +1,9 @@
 import { find } from 'lodash';
 
-import { playAreaSound } from 'app/content/areas';
 import { addParticleAnimations } from 'app/content/effects/animationEffect';
 import { dropItemFromTable } from 'app/content/objects/lootObject';
 import { allTiles } from 'app/content/tiles';
+import { playAreaSound } from 'app/musicController';
 import { resetTileBehavior } from 'app/utils/tileBehavior';
 
 import { AreaInstance,  GameState, TileCoords } from 'app/types';

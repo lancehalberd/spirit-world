@@ -1,4 +1,4 @@
-import { removeEffectFromArea } from 'app/content/areas';
+import { addEffectToArea, removeEffectFromArea } from 'app/content/areas';
 import { CANVAS_HEIGHT, CANVAS_WIDTH, FRAME_LENGTH } from 'app/gameConstants';
 import { parseMessage } from 'app/render/renderMessage';
 import { drawFrame } from 'app/utils/animations';
@@ -71,4 +71,31 @@ export class TextCue implements EffectInstance {
             }
         context.restore();
     }
+}
+
+export function removeTextCue(state: GameState, priority: number = 10000): boolean {
+    if (!state.areaInstance) {
+        return false;
+    }
+    const effect = state.areaInstance.effects.find(
+        effect => effect instanceof TextCue
+    ) as TextCue;
+    if (effect && effect.priority <= priority) {
+        removeEffectFromArea(state, effect);
+        return true;
+    }
+    return !effect;
+}
+
+export function addTextCue(state: GameState, text: string, duration = 3000, priority = 0): boolean {
+    // Only add the new cue if it can override the previous one.
+    if (removeTextCue(state)) {
+        addEffectToArea(state, state.areaInstance, new TextCue(state, {
+            duration,
+            priority,
+            text,
+        }));
+        return true;
+    }
+    return false;
 }

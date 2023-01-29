@@ -21,7 +21,6 @@ import {
     snakeAnimations,
 } from 'app/content/enemyAnimations';
 import { certainLifeLootTable, simpleLootTable, lifeLootTable, moneyLootTable } from 'app/content/lootTables';
-import { addEffectToArea } from 'app/content/areas';
 import { editingState } from 'app/development/editingState';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { drawFrameAt, drawFrameCenteredAt } from 'app/utils/animations';
@@ -29,6 +28,7 @@ import {
     paceAndCharge, paceRandomly, scurryAndChase,
 } from 'app/utils/enemies';
 import { getLineOfSightTargetAndDirection, getNearbyTarget, getVectorToNearbyTarget } from 'app/utils/target';
+import { addEffectToArea } from 'app/utils/effects';
 import { directionMap } from 'app/utils/field';
 
 

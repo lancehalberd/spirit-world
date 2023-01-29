@@ -2,9 +2,7 @@ import { find } from 'lodash';
 
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { HeldChakram } from 'app/content/effects/thrownChakram';
-import {
-    addEffectToArea, addObjectToArea, playAreaSound, removeEffectFromArea,
-} from 'app/content/areas';
+import { playAreaSound } from 'app/content/areas';
 import { setEquippedBoots } from 'app/content/menu';
 import { getObjectBehaviors } from 'app/content/objects';
 import { CloneExplosionEffect } from 'app/content/effects/CloneExplosionEffect';
@@ -23,6 +21,7 @@ import { isToolButtonPressed, useTool } from 'app/useTool';
 import { isHeroFloating, isHeroSinking, isUnderwater } from 'app/utils/actor';
 import { destroyClone } from 'app/utils/destroyClone';
 import { destroyTile } from 'app/utils/destroyTile';
+import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import { enterLocation } from 'app/utils/enterLocation';
 import {
     canTeleportToCoords,
@@ -31,6 +30,7 @@ import {
     isPointOpen,
 } from 'app/utils/field';
 import { getChargeLevelAndElement } from 'app/utils/getChargeLevelAndElement';
+import { addObjectToArea } from 'app/utils/objects';
 
 import {
     FullTile, GameState, Hero,

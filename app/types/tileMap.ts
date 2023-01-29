@@ -328,6 +328,7 @@ export interface AreaInstance {
     enemyTargets: (EffectInstance | ObjectInstance)[]
     neutralTargets: (EffectInstance | ObjectInstance)[]
     isHot?: boolean
+    needsLogicRefresh?: boolean
 }
 
 

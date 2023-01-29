@@ -12,7 +12,7 @@ import { dialogueHash } from 'app/content/dialogue';
 import { logicHash } from 'app/content/logic';
 import { decorationTypes } from 'app/content/objects/decoration';
 import { escalatorStyles } from 'app/content/objects/escalator';
-import { specialBehaviorsHash } from 'app/content/specialBehaviors';
+import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
 import { doorStyles } from 'app/content/objects/doorStyles';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { enemyTypes } from 'app/content/enemies';

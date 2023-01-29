@@ -1,4 +1,3 @@
-import { addObjectToArea } from 'app/content/areas';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { Enemy } from 'app/content/enemy';
 import { beetleWingedAnimations } from 'app/content/enemyAnimations';
@@ -9,6 +8,7 @@ import {
     moveEnemyToTargetLocation,
 } from 'app/utils/enemies';
 import { getAreaSize } from 'app/utils/getAreaSize';
+import { addObjectToArea } from 'app/utils/objects';
 import { getVectorToNearbyTarget } from 'app/utils/target';
 
 

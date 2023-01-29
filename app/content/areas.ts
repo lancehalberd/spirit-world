@@ -1,21 +1,21 @@
-import { logicHash, isLogicValid } from 'app/content/logic';
+import { evaluateLogicDefinition, logicHash, isLogicValid } from 'app/content/logic';
 import { allTiles } from 'app/content/tiles';
 import { zones } from 'app/content/zones';
 import { editingState } from 'app/development/editingState';
 import { isPointInShortRect } from 'app/utils/index';
-import { playSound } from 'app/musicController';
 import { specialBehaviorsHash } from 'app/content/specialBehaviors';
 import { createCanvasAndContext } from 'app/utils/canvas';
-import { createObjectInstance } from 'app/utils/createObjectInstance';
+import { createObjectInstance, } from 'app/utils/createObjectInstance';
 import { checkIfAllEnemiesAreDefeated } from 'app/utils/checkIfAllEnemiesAreDefeated';
+import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import { findObjectInstanceById } from 'app/utils/findObjectInstanceById';
+import { addObjectToArea, removeObjectFromArea } from 'app/utils/objects';
 import { applyTileToBehaviorGrid, resetTileBehavior } from 'app/utils/tileBehavior';
 
 import {
     AreaDefinition, AreaInstance, AreaLayerDefinition,
-    Direction, EffectInstance,
+    Direction,
     FullTile, GameState, Hero,
-    LogicDefinition,
     ObjectDefinition,
     ObjectInstance,
     Rect, SpecialAreaBehavior, TileBehaviors,
@@ -23,12 +23,9 @@ import {
 } from 'app/types';
 
 
-export function playAreaSound(state: GameState, area: AreaInstance, key: string): any {
-    if (!key || state.areaInstance !== area) {
-        return;
-    }
-    return playSound(state, key);
-}
+export { playAreaSound } from 'app/musicController';
+export { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
+export { addObjectToArea, removeObjectFromArea } from 'app/utils/objects';
 
 export function getDefaultArea(): AreaDefinition {
     return {
@@ -537,26 +534,11 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
     return instance;
 }
 
-export function evaluateLogicDefinition(state: GameState, logicDefinition?: LogicDefinition, defaultValue: boolean = true): boolean {
-    if (!logicDefinition) {
-        return defaultValue;
-    }
-    if (logicDefinition.isTrue) {
-        return !logicDefinition.isInverted;
-    }
-    if (logicDefinition.hasCustomLogic) {
-        return isLogicValid(state, { requiredFlags: [logicDefinition.customLogic] }, logicDefinition.isInverted);
-    }
-    if (logicDefinition.logicKey) {
-        return isLogicValid(state, logicHash[logicDefinition.logicKey], logicDefinition.isInverted);
-    }
-    return defaultValue;
-}
-
 export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefresh = false): void {
     if (!area) {
         return;
     }
+    area.needsLogicRefresh = false;
     let lastLayerIndex = -1, refreshBehavior = false;
     for (let i = 0; i < area.definition.layers.length; i++) {
         const layerDefinition = area.definition.layers[i];
@@ -731,16 +713,6 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
     checkIfAllEnemiesAreDefeated(state, area);
 }
 
-export function applyBehaviorToTile(area: AreaInstance, x: number, y: number, behavior: TileBehaviors): void {
-    if (!area.behaviorGrid[y]) {
-        area.behaviorGrid[y] = [];
-    }
-    if (!area.behaviorGrid[y][x]) {
-        area.behaviorGrid[y][x] = {};
-    }
-    area.behaviorGrid[y][x] = {...area.behaviorGrid[y][x], ...behavior};
-}
-
 export function isObjectLogicValid(state: GameState, definition: ObjectDefinition): boolean {
     if (definition.hasCustomLogic && definition.customLogic) {
         return isLogicValid(state, {requiredFlags: [definition.customLogic]}, definition.invertLogic);
@@ -823,89 +795,4 @@ export function refreshSection(state: GameState, area: AreaInstance, section: Re
         }
     }
 }
-function hitboxToGrid(hitbox: Rect): Rect {
-    const x = (hitbox.x / 16) | 0;
-    const w = (hitbox.w / 16) | 0;
-    const y = (hitbox.y / 16) | 0;
-    const h = (hitbox.h / 16) | 0;
-    return {x, y, w, h};
-}
-export function addObjectToArea(state: GameState, area: AreaInstance, object: ObjectInstance): void {
-    if (object.area && object.area !== area) {
-        removeObjectFromArea(state, object);
-    }
-    object.area = area;
-    if (object.add) {
-        object.add(state, area);
-    } else {
-        area.objects.push(object);
-    }
 
-    if (object.definition?.specialBehaviorKey) {
-        try {
-            specialBehaviorsHash[object.definition.specialBehaviorKey].apply?.(state, object as any);
-        } catch (error) {
-            console.error(object.definition.specialBehaviorKey);
-        }
-    }
-
-    if (object.applyBehaviorsToGrid && object.behaviors) {
-        const gridRect = hitboxToGrid(object.getHitbox());
-        for (let x = gridRect.x; x < gridRect.x + gridRect.w; x++) {
-            for (let y = gridRect.y; y < gridRect.y + gridRect.h; y++) {
-                applyBehaviorToTile(area, x, y, object.behaviors);
-            }
-        }
-    }
-}
-export function removeObjectFromArea(state: GameState, object: ObjectInstance, trackId: boolean = true): void {
-    if (!object.area) {
-        return;
-    }
-    if (object.definition?.id && trackId) {
-        object.area.removedObjectIds.push(object.definition.id);
-    }
-    if (object.remove) {
-        object.remove(state);
-        object.area = null;
-    } else {
-        if (object.cleanup) {
-            object.cleanup(state);
-        }
-        const index = object.area.objects.indexOf(object);
-        if (index >= 0) {
-            object.area.objects.splice(index, 1);
-        }
-        object.area = null;
-    }
-}
-
-export function addEffectToArea(state: GameState, area: AreaInstance, effect: EffectInstance): void {
-    if (effect.area && effect.area !== area) {
-        removeEffectFromArea(state, effect);
-    }
-    effect.area = area;
-    if (effect.add) {
-        effect.add(state, area);
-    } else {
-        area.effects.push(effect);
-    }
-}
-export function removeEffectFromArea(state: GameState, effect: EffectInstance): void {
-    if (!effect.area) {
-        return;
-    }
-    if (effect.remove) {
-        effect.remove(state);
-        effect.area = null;
-    } else {
-        if (effect.cleanup) {
-            effect.cleanup(state);
-        }
-        const index = effect.area.effects.indexOf(effect);
-        if (index >= 0) {
-            effect.area.effects.splice(index, 1);
-        }
-        effect.area = null;
-    }
-}

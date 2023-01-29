@@ -1,15 +1,14 @@
-import { removeEffectFromArea, removeObjectFromArea } from 'app/content/areas';
-import { Enemy } from 'app/content/enemy';
-import { Hero } from 'app/content/hero';
 import { getObjectBehaviors } from 'app/content/objects';
 import { allTiles } from 'app/content/tiles';
 import { destroyTile } from 'app/utils/destroyTile';
+import { removeEffectFromArea } from 'app/utils/effects';
 import { isPixelInShortRect, rectanglesOverlap } from 'app/utils/index';
+import { removeObjectFromArea } from 'app/utils/objects';
 import { resetTileBehavior } from 'app/utils/tileBehavior';
 
 import {
-    AreaInstance, AreaLayer, Direction, EffectInstance, GameState,
-    HitProperties, HitResult, MovementProperties,
+    AreaInstance, AreaLayer, Direction, EffectInstance, Enemy, GameState,
+    Hero, HitProperties, HitResult, MovementProperties,
     ObjectInstance, Rect, Tile, TileCoords, TileBehaviors,
 } from 'app/types';
 
@@ -297,10 +296,10 @@ export function getTileBehaviorsAndObstacles(
                 }
                 if (behaviors?.touchHit) {
                     // Don't apply touchHit from enemies during iframes when they shouldn't damage the hero.
-                    if (!(object instanceof Enemy) || !(object.invulnerableFrames > 0)) {
+                    if (!(object.isEnemyTarget) || !((object as Enemy).invulnerableFrames > 0)) {
                         tileBehavior.touchHit = {...behaviors.touchHit};
-                        if (object instanceof Enemy) {
-                            tileBehavior.touchHit.source = object;
+                        if (object.isEnemyTarget) {
+                            tileBehavior.touchHit.source = (object as Enemy);
                         }
                     }
                 }
@@ -429,11 +428,11 @@ function distanceToSegment({x, y}, {x1, y1, x2, y2}) {
 
 export function tileHitAppliesToTarget(this: void, state: GameState, hit: HitProperties, target: ObjectInstance | EffectInstance) {
     // Hits from tiles only apply to enemies if `hitEnemies` is explicitly set to `true`.
-    if (target instanceof Enemy){
+    if (target.isEnemyTarget){
         return hit?.hitEnemies === true;
     }
     // Hits from tiles always apply to heroes unless `hitAllies` is explicitly set to `false`.
-    if (target instanceof Hero) {
+    if (target.isAllyTarget) {
         return hit?.hitAllies !== false;
     }
     // Hits from tiles only apply to objects if `hitObjects` is explicitly set to `true`.

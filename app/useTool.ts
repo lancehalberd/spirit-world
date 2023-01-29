@@ -1,10 +1,12 @@
-import { addObjectToArea, addEffectToArea, playAreaSound } from 'app/content/areas';
+import { playAreaSound } from 'app/content/areas';
 import { isGameKeyDown, wasGameKeyPressed, wasGameKeyPressedAndReleased } from 'app/userInput';
 import { Arrow } from 'app/content/effects/arrow';
 import { Clone }  from 'app/content/objects/clone';
 import { GAME_KEY } from 'app/gameConstants';
+import { addEffectToArea } from 'app/utils/effects';
 import { directionMap, getDirection, rotateDirection } from 'app/utils/field';
 import { getChargeLevelAndElement } from 'app/utils/getChargeLevelAndElement';
+import { addObjectToArea } from 'app/utils/objects';
 
 import { ActiveTool, GameState, Hero } from 'app/types'
 

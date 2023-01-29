@@ -2,7 +2,7 @@ import {
     getAreaInstanceFromLocation, setAreaSection, setConnectedAreas,
 } from 'app/content/areas';
 import { logicHash } from 'app/content/logic';
-import { specialBehaviorsHash } from 'app/content/specialBehaviors';
+import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
 import { zones } from 'app/content/zones';
 import { exportZoneToClipboard, importZone, serializeZone } from 'app/development/exportZone';
 import { TabContainer } from 'app/development/tabContainer';

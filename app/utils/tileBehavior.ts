@@ -24,6 +24,16 @@ export function resetTileBehavior(area: AreaInstance, {x, y}: Tile): void {
     }
 }
 
+export function applyBehaviorToTile(area: AreaInstance, x: number, y: number, behavior: TileBehaviors): void {
+    if (!area.behaviorGrid[y]) {
+        area.behaviorGrid[y] = [];
+    }
+    if (!area.behaviorGrid[y][x]) {
+        area.behaviorGrid[y][x] = {};
+    }
+    area.behaviorGrid[y][x] = {...area.behaviorGrid[y][x], ...behavior};
+}
+
 export function applyTileToBehaviorGrid(behaviorGrid: TileBehaviors[][], {x, y}: Tile, tile: FullTile, isForeground: boolean): void {
     const behaviors = tile.behaviors;
     // Tiles 0/1 are the null and empty tile and should not impact the tile behavior.

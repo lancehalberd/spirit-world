@@ -3,7 +3,6 @@ import { showMessage } from 'app/render/renderMessage';
 import { updateHeroMagicStats } from 'app/render/spiritBar';
 import { createAnimation } from 'app/utils/animations';
 import { createCanvasAndContext } from 'app/utils/canvas';
-import { enterLocation } from 'app/utils/enterLocation';
 import { requireImage } from 'app/utils/images';
 import { saveGame } from 'app/utils/saveGame';
 
@@ -327,7 +326,8 @@ export function showLootMessage(state: GameState, lootType: LootType, lootLevel?
         case 'staff':
             if (state.hero.activeTools.staff === 2) {
                 // Refresh the location to hide the tower.
-                enterLocation(state, state.location);
+                //enterLocation(state, state.location);
+                state.areaInstance.needsLogicRefresh = true;
             }
             // Use default handling for first staff.
             break;

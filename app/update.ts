@@ -1,3 +1,4 @@
+import { refreshAreaLogic } from 'app/content/areas';
 import { addDustBurst, addReviveBurst } from 'app/content/effects/animationEffect';
 import { Hero } from 'app/content/hero';
 import { showHint } from 'app/content/hints';
@@ -34,7 +35,7 @@ import {
 import { playSound, updateSoundSettings } from 'app/musicController';
 import { updateHeroMagicStats } from 'app/render/spiritBar';
 import { getDefaultSavedState } from 'app/savedState'
-import { parseScriptText, setScript, updateScriptEvents } from 'app/scriptEvents';
+import { parseScriptText, setScript } from 'app/scriptEvents';
 import {
     canPauseGame,
     getState,
@@ -45,6 +46,7 @@ import {
 } from 'app/state';
 import { updateCamera } from 'app/updateCamera';
 import { updateField } from 'app/updateField';
+import { updateScriptEvents } from 'app/updateScriptEvents';
 import { enterLocation } from 'app/utils/enterLocation';
 import { areAllImagesLoaded } from 'app/utils/images';
 import { saveGame, saveGamesToLocalStorage, } from 'app/utils/saveGame';
@@ -103,6 +105,11 @@ export function update() {
                 state.paused = state.showMap;
                 updateSoundSettings(state);
             }
+        }
+        if (state.areaInstance?.needsLogicRefresh) {
+            refreshAreaLogic(state, state.areaInstance);
+        } else if (state.alternateAreaInstance?.needsLogicRefresh) {
+            refreshAreaLogic(state, state.alternateAreaInstance);
         }
         const hideMenu = shouldHideMenu(state);
         if (state.paused && !(hideMenu && wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL))) {

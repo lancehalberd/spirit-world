@@ -4,7 +4,7 @@ import {
     getObjectStatus,
     saveObjectStatus,
 } from 'app/content/objects';
-import { specialBehaviorsHash } from 'app/content/specialBehaviors';
+import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 

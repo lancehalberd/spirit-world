@@ -1,4 +1,3 @@
-import { addEffectToArea, removeObjectFromArea } from 'app/content/areas';
 import { AnimationEffect } from 'app/content/effects/animationEffect';
 import { Enemy } from 'app/content/enemy';
 import { setEquippedElement } from 'app/content/menu';
@@ -9,7 +8,9 @@ import { updateAllHeroes } from 'app/updateActor';
 import { updateCamera } from 'app/updateCamera';
 import { createAnimation } from 'app/utils/animations';
 import { checkIfAllEnemiesAreDefeated } from 'app/utils/checkIfAllEnemiesAreDefeated';
+import { addEffectToArea } from 'app/utils/effects';
 import { getTileBehaviorsAndObstacles } from 'app/utils/field';
+import { removeObjectFromArea } from 'app/utils/objects';
 
 import {
     AreaInstance, EffectInstance, FrameAnimation, FrameDimensions,

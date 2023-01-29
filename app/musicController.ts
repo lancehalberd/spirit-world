@@ -1,6 +1,6 @@
 import { getSoundSettings, isTrackPlaying, playSound as playSoundProper, playTrack } from 'app/utils/sounds';
 
-import { Enemy, GameState } from 'app/types';
+import { AreaInstance, Enemy, GameState } from 'app/types';
 
 export { stopSound, updateSoundSettings } from 'app/utils/sounds';
 
@@ -136,4 +136,11 @@ export const updateMusic = (state: GameState): void => {
 
 export function playSound(state: GameState, key: string) {
     return playSoundProper(key, getSoundSettings(state));
+}
+
+export function playAreaSound(state: GameState, area: AreaInstance, key: string): any {
+    if (!key || state.areaInstance !== area) {
+        return;
+    }
+    return playSound(state, key);
 }

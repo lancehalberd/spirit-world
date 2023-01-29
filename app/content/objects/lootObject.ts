@@ -1,12 +1,14 @@
-import { addEffectToArea, addObjectToArea, refreshAreaLogic, removeEffectFromArea, removeObjectFromArea } from 'app/content/areas';
 import { lootEffects, getLootFrame, getLootShadowFrame, showLootMessage } from 'app/content/loot';
 import { getObjectStatus } from 'app/content/objects';
 import { editingState } from 'app/development/editingState';
 import { CANVAS_WIDTH, CANVAS_HEIGHT, FRAME_LENGTH } from 'app/gameConstants';
+import { playSound } from 'app/musicController';
 import { showMessage } from 'app/render/renderMessage';
 import { createAnimation, drawFrame, drawFrameAt, getFrameHitBox } from 'app/utils/animations';
-import { playSound } from 'app/musicController';
+import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import { pad, boxesIntersect } from 'app/utils/index';
+import { setObjectFlag } from 'app/utils/objectFlags';
+import { addObjectToArea,  removeObjectFromArea } from 'app/utils/objects';
 import { drawText } from 'app/utils/simpleWhiteFont';
 import { saveGame } from 'app/utils/saveGame';
 
@@ -241,7 +243,7 @@ export function getLoot(this: void, state: GameState, definition: AnyLootDefinit
     addEffectToArea(state, state.hero.area, lootAnimation);
     state.hero.area.priorityObjects.push([lootAnimation]);
     // Refresh the area in case acquiring the item has change the logic of the area.
-    refreshAreaLogic(state, state.areaInstance);
+    state.areaInstance.needsLogicRefresh = true;
     saveGame(state);
 }
 
@@ -367,16 +369,14 @@ export class ChestObject implements ObjectInstance {
         getLoot(state, this.definition);
     }
     update(state: GameState) {
-        // Make sure empty chese are recorded as opened for the randomizer, since some logic
+        // Make sure empty chests are recorded as opened for the randomizer, since some logic
         // depends on whether a chest was opened yet (cocoon small key chest, for example).
         if (this.definition.id && !state.savedState.objectFlags[this.definition.id] && this.isOpen(state)) {
             if (this.x + 16 > state.camera.x && this.x < state.camera.x + CANVAS_WIDTH
                 && this.y + 16 > state.camera.y && this.y < state.camera.y + CANVAS_HEIGHT
                 && this.definition.lootType === 'empty'
             ) {
-                state.savedState.objectFlags[this.definition.id] = true;
-                // Refresh the area so that the guardian NPC moves to the correct location now that the boss is defeated.
-                refreshAreaLogic(state, state.areaInstance);
+                setObjectFlag(state, this.definition.id);
                 saveGame(state);
             }
         }

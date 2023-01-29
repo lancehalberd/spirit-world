@@ -8,7 +8,7 @@ import { checkToUpdateSpawnLocation } from 'app/content/spawnLocations';
 import { zones } from 'app/content/zones';
 import { editingState } from 'app/development/editingState';
 import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
-import { removeTextCue } from 'app/scriptEvents';
+import { removeTextCue } from 'app/content/effects/textCue';
 import { updateCamera } from 'app/updateCamera';
 import { checkIfAllEnemiesAreDefeated } from 'app/utils/checkIfAllEnemiesAreDefeated';
 import { getFullZoneLocation } from 'app/utils/getFullZoneLocation';

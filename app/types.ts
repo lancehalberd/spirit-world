@@ -13,6 +13,8 @@ export type { BossType, MinionType } from 'app/content/bosses';
 export type { EnemyAbility, EnemyAbilityInstance, EnemyDefinition, EnemyType } from 'app/content/enemies';
 export type { Enemy } from 'app/content/enemy';
 export type { Hero } from 'app/content/hero';
+export type { Escalator } from 'app/content/objects/escalator';
+export type { Anode } from 'app/content/objects/lightningBarrier';
 export type { ChestObject, LootObject } from 'app/content/objects/lootObject';
 export type { HeldChakram, ThrownChakram } from 'app/content/effects/thrownChakram';
 export type { ThrownObject } from 'app/content/effects/thrownObject';

@@ -1,16 +1,17 @@
-import { playAreaSound, removeObjectFromArea } from 'app/content/areas';
 import { CrystalSpike } from 'app/content/effects/arrow';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { vanaraBlackAnimations } from 'app/render/npcAnimations';
 import { heroAnimations, staffAnimations } from 'app/render/heroAnimations';
-import { appendScript, removeTextCue } from 'app/scriptEvents';
+import { appendScript } from 'app/scriptEvents';
+import { removeTextCue } from 'app/content/effects/textCue';
 import { drawFrameAt, getFrame } from 'app/utils/animations';
 import {
     moveEnemy,
     moveEnemyToTargetLocation,
 } from 'app/utils/enemies';
 import { directionMap, getDirection, hitTargets } from 'app/utils/field';
+import { removeObjectFromArea } from 'app/utils/objects';
 import { saveGame } from 'app/utils/saveGame';
 import {
     getVectorToNearbyTarget,
@@ -126,7 +127,7 @@ const staffAbility: EnemyAbility<Direction> = {
     useAbility(this: void, state: GameState, enemy: Enemy, target: Direction): void {
         enemy.changeToAnimation('staffSlam');
         enemy.z = Math.max(enemy.z + enemy.vz, 0);
-        playAreaSound(state, enemy.area, 'bossDeath');
+        enemy.makeSound(state, 'bossDeath');
         hitTargets(state, enemy.area, {
             damage: 2,
             hitbox: getStaffHitbox(enemy, enemy.d),

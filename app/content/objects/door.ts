@@ -1,7 +1,6 @@
-import {
-    applyBehaviorToTile, evaluateLogicDefinition, playAreaSound,
-} from 'app/content/areas';
+import { playAreaSound } from 'app/content/areas';
 import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
+import { evaluateLogicDefinition } from 'app/content/logic';
 import { doorStyles, DoorStyle } from 'app/content/objects/doorStyles';
 import {
     BITMAP_LEFT, BITMAP_RIGHT,
@@ -14,7 +13,7 @@ import { enterZoneByTarget } from 'app/utils/enterZoneByTarget';
 import { directionMap } from 'app/utils/field';
 import { boxesIntersect, isObjectInsideTarget, isPointInShortRect, pad } from 'app/utils/index';
 import { drawText } from 'app/utils/simpleWhiteFont';
-import { resetTileBehavior } from 'app/utils/tileBehavior';
+import { applyBehaviorToTile, resetTileBehavior } from 'app/utils/tileBehavior';
 
 import {
     AreaInstance, Direction, DrawPriority, Frame, GameState, Hero, HitProperties, HitResult, ObjectInstance,

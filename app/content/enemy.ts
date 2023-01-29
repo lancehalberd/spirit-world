@@ -1,14 +1,16 @@
 import { AnimationEffect } from 'app/content/effects/animationEffect';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
+import { addTextCue } from 'app/content/effects/textCue';
 import { dropItemFromTable, getLoot } from 'app/content/objects/lootObject';
-import { addEffectToArea, playAreaSound, refreshAreaLogic } from 'app/content/areas';
+import { playAreaSound, refreshAreaLogic } from 'app/content/areas';
 import { bossDeathExplosionAnimation, enemyDeathAnimation } from 'app/content/enemyAnimations';
 import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { appendCallback, addTextCue } from 'app/scriptEvents';
+import { appendCallback } from 'app/scriptEvents';
 import { drawFrame, getFrame } from 'app/utils/animations';
 import { getDirection } from 'app/utils/field';
 import { renderEnemyShadow } from 'app/renderActor';
+import { addEffectToArea } from 'app/utils/effects';
 import { checkForFloorEffects, moveEnemy } from 'app/utils/enemies';
 import { getAreaSize } from 'app/utils/getAreaSize';
 import Random from 'app/utils/Random';

@@ -1,4 +1,3 @@
-import { addEffectToArea, addObjectToArea } from 'app/content/areas';
 import { addParticleAnimations } from 'app/content/effects/animationEffect';
 import { GroundSpike, addLineOfSpikes } from 'app/content/effects/groundSpike';
 import { SpikePod } from 'app/content/effects/spikePod';
@@ -18,7 +17,9 @@ import {
 import { WallTurret } from 'app/content/objects/wallTurret';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { drawFrame, getFrame, drawFrameCenteredAt } from 'app/utils/animations';
+import { addEffectToArea } from 'app/utils/effects';
 import { getTileBehaviors, hitTargets } from 'app/utils/field';
+import { addObjectToArea } from 'app/utils/objects';
 import Random from 'app/utils/Random';
 import { getNearbyTarget } from 'app/utils/target';
 

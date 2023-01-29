@@ -1,6 +1,6 @@
 import { isRandomizer } from 'app/gameConstants';
 
-import { AndLogicCheck, GameState, LogicCheck, OrLogicCheck } from 'app/types';
+import { AndLogicCheck, GameState, LogicCheck, LogicDefinition, OrLogicCheck } from 'app/types';
 
 export function andLogic(...logicChecks: LogicCheck[]): AndLogicCheck {
     return { operation: 'and', logicChecks};
@@ -88,6 +88,22 @@ export function isLogicValid(state: GameState, logic: LogicCheck, invertLogic = 
         return falseResult;
     }
     return trueResult;
+}
+
+export function evaluateLogicDefinition(state: GameState, logicDefinition?: LogicDefinition, defaultValue: boolean = true): boolean {
+    if (!logicDefinition) {
+        return defaultValue;
+    }
+    if (logicDefinition.isTrue) {
+        return !logicDefinition.isInverted;
+    }
+    if (logicDefinition.hasCustomLogic) {
+        return isLogicValid(state, { requiredFlags: [logicDefinition.customLogic] }, logicDefinition.isInverted);
+    }
+    if (logicDefinition.logicKey) {
+        return isLogicValid(state, logicHash[logicDefinition.logicKey], logicDefinition.isInverted);
+    }
+    return defaultValue;
 }
 window['isLogicValid'] = isLogicValid;
 
