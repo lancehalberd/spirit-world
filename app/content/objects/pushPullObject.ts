@@ -1,3 +1,4 @@
+import { objectHash } from 'app/content/objects/objectHash';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { directionMap, isPointOpen } from 'app/utils/field';
 
@@ -29,7 +30,7 @@ export class PushPullObject implements ObjectInstance {
     pushCounter: number = 0;
     pushedLastFrame: boolean = false;
     status: ObjectStatus = 'normal';
-    constructor(definition: SimpleObjectDefinition) {
+    constructor(state: GameState, definition: SimpleObjectDefinition) {
         this.definition = definition;
         this.x = definition.x;
         this.y = definition.y;
@@ -102,3 +103,4 @@ export class PushPullObject implements ObjectInstance {
         drawFrame(context, potFrame, { ...potFrame, x: this.x, y: this.y - 2});
     }
 }
+objectHash.pushPull = PushPullObject;

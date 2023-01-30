@@ -1,4 +1,5 @@
 import { CrystalSpike, drawArrow, drawCrystal, EnemyArrow } from 'app/content/effects/arrow';
+import { objectHash } from 'app/content/objects/objectHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { createCanvasAndContext } from 'app/utils/canvas';
@@ -148,4 +149,4 @@ export class WallTurret implements ObjectInstance {
 
     }
 }
-
+objectHash.turret = WallTurret;

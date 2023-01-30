@@ -1,3 +1,4 @@
+import { objectHash } from 'app/content/objects/objectHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { moveActor } from 'app/moveActor';
 import { drawFrameAt } from 'app/utils/animations';
@@ -172,4 +173,4 @@ export class Escalator implements ObjectInstance {
         context.restore();
     }
 }
-
+objectHash.escalator = Escalator;

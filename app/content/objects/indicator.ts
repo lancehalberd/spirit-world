@@ -1,3 +1,4 @@
+import { objectHash } from 'app/content/objects/objectHash';
 import { editingState } from 'app/development/editingState';
 import { FRAME_LENGTH } from 'app/gameConstants';
 
@@ -76,3 +77,4 @@ export class Indicator implements ObjectInstance {
         }
     }
 }
+objectHash.indicator = Indicator;

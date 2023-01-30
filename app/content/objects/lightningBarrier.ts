@@ -1,3 +1,4 @@
+import { objectHash } from 'app/content/objects/objectHash';
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { hitTargets } from 'app/utils/field';
@@ -165,7 +166,7 @@ export class Cathode implements ObjectInstance {
     x: number;
     y: number;
     status: ObjectStatus = 'normal';
-    constructor(definition: SimpleObjectDefinition) {
+    constructor(state: GameState, definition: SimpleObjectDefinition) {
         this.definition = definition;
         this.status = this.definition.status || 'normal';
         this.x = definition.x;
@@ -181,3 +182,5 @@ export class Cathode implements ObjectInstance {
         renderTransmitter(context, state, this);
     }
 }
+objectHash.anode = Anode;
+objectHash.cathode = Cathode;

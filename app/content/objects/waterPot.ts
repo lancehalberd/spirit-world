@@ -1,5 +1,6 @@
-import { FRAME_LENGTH } from 'app/gameConstants';
 import { PouredWaterEffect } from 'app/content/effects/PouredWaterEffect';
+import { objectHash } from 'app/content/objects/objectHash';
+import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { addEffectToArea } from 'app/utils/effects';
 
@@ -104,3 +105,4 @@ export class WaterPot implements ObjectInstance {
         drawFrame(context, frame, { ...frame, x: this.x, y: this.y });
     }
 }
+objectHash.waterPot = WaterPot;

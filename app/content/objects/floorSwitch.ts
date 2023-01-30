@@ -1,3 +1,4 @@
+import { objectHash } from 'app/content/objects/objectHash';
 import { playAreaSound } from 'app/musicController';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { findObjectInstanceById } from 'app/utils/findObjectInstanceById';
@@ -104,3 +105,4 @@ export class FloorSwitch implements ObjectInstance {
         }
     }
 }
+objectHash.floorSwitch = FloorSwitch;

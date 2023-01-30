@@ -1,3 +1,4 @@
+import { objectHash } from 'app/content/objects/objectHash';
 import { showMessage } from 'app/scriptEvents';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 
@@ -74,7 +75,7 @@ export class Sign implements ObjectInstance {
     status: ObjectStatus = 'normal';
     isNeutralTarget = true;
     message: string;
-    constructor(definition: SignDefinition) {
+    constructor(state: GameState, definition: SignDefinition) {
         this.definition = definition;
         this.x = definition.x;
         this.y = definition.y;
@@ -110,3 +111,4 @@ export class Sign implements ObjectInstance {
         drawFrame(context, frame, { ...frame, x: this.x - frame.content.x, y: this.y - frame.content.y });
     }
 }
+objectHash.sign = Sign;

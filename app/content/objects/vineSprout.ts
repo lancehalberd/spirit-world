@@ -1,10 +1,11 @@
-import { FRAME_LENGTH } from 'app/gameConstants';
+import { objectHash } from 'app/content/objects/objectHash';
 import { allTiles } from 'app/content/tiles';
-import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
+import { FRAME_LENGTH } from 'app/gameConstants';
 import { playAreaSound } from 'app/musicController';
+import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { removeObjectFromArea } from 'app/utils/objects';
-import { resetTileBehavior } from 'app/utils/tileBehavior';
 import { saveGame } from 'app/utils/saveGame';
+import { resetTileBehavior } from 'app/utils/tileBehavior';
 
 import {
     AreaInstance, AreaLayer, DrawPriority, FrameAnimation, GameState,
@@ -196,3 +197,4 @@ export class VineSprout implements ObjectInstance {
         }
     }
 }
+objectHash.vineSprout = VineSprout;

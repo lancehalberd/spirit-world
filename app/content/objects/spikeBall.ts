@@ -1,3 +1,4 @@
+import { objectHash } from 'app/content/objects/objectHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { moveObject } from 'app/movement/moveObject';
 import { createAnimation, drawFrameCenteredAt, drawFrameAt, getFrame } from 'app/utils/animations';
@@ -94,3 +95,4 @@ export class SpikeBall implements ObjectInstance {
         drawFrameAt(context, smallShadowFrame, {x: this.x, y: this.y});
     }
 }
+objectHash.spikeBall = SpikeBall;

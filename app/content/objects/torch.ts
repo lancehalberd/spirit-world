@@ -1,6 +1,7 @@
 //import { resetTileBehavior } from 'app/content/areas';
 //import { allTiles } from 'app/content/tiles';
 import { flameAnimation } from 'app/content/effects/flame';
+import { objectHash } from 'app/content/objects/objectHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { hitTargets } from 'app/utils/field';
 import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
@@ -120,3 +121,4 @@ export class Torch implements ObjectInstance {
         }
     }
 }
+objectHash.torch = Torch;

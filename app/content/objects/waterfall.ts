@@ -1,3 +1,4 @@
+import { objectHash } from 'app/content/objects/objectHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { drawFrameAt } from 'app/utils/animations';
 import { createCanvasAndContext } from 'app/utils/canvas';
@@ -20,7 +21,7 @@ export class Waterfall implements ObjectInstance {
     status: ObjectStatus = 'normal';
     animationTime = 0;
     back: WaterfallBack;
-    constructor(definition: WaterfallDefinition) {
+    constructor(state: GameState, definition: WaterfallDefinition) {
         this.definition = definition;
         this.x = definition.x;
         this.y = definition.y;
@@ -208,3 +209,4 @@ function renderWaterfallTiles(context: CanvasRenderingContext2D, state: GameStat
         ...waterfallBR, x: waterfall.x + waterfall.w - 8, y,
     });
 }
+objectHash.waterfall = Waterfall;

@@ -1,3 +1,4 @@
+import { objectHash } from 'app/content/objects/objectHash';
 import { FRAME_LENGTH, isRandomizer } from 'app/gameConstants';
 import { setScript } from 'app/scriptEvents';
 import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
@@ -79,3 +80,4 @@ export class Narration implements ObjectInstance {
     render(context: CanvasRenderingContext2D, state: GameState) {
     }
 }
+objectHash.narration = Narration;

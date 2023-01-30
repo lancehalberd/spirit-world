@@ -1,8 +1,8 @@
 import { sample } from 'lodash';
 
+import { objectHash } from 'app/content/objects/objectHash';
 import { snakeAnimations } from 'app/content/enemyAnimations';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { getSectionBoundingBox, moveActor } from 'app/moveActor';
 import { heroAnimations } from 'app/render/heroAnimations';
 import {
     galAnimations, gal2Animations,
@@ -18,11 +18,12 @@ import { shadowFrame, smallShadowFrame } from 'app/renderActor';
 import { showMessage } from 'app/scriptEvents';
 import { drawFrame, getFrame } from 'app/utils/animations';
 import { selectDialogueOption } from 'app/utils/dialogue';
-import { directionMap, getDirection, rotateDirection } from 'app/utils/direction';
+import { moveNPC } from 'app/utils/npc';
+import { directionMap, rotateDirection } from 'app/utils/direction';
 
 import {
     Actor, ActorAnimations, AreaInstance, GameState, DialogueOption, Direction,
-    Frame, FrameAnimation, Hero, MovementProperties, NPCDefinition,
+    Frame, FrameAnimation, Hero, NPCDefinition,
     ObjectInstance, ObjectStatus, Rect,
 } from 'app/types';
 
@@ -178,38 +179,6 @@ export const npcBehaviors = {
     }
 }
 
-function moveNPC(state, npc: NPC, dx, dy, movementProperties: MovementProperties): boolean {
-    movementProperties.boundingBox = movementProperties.boundingBox ?? getSectionBoundingBox(state, npc, 16);
-    // By default, don't allow the enemy to move towards the outer edges of the screen.
-    if (npc.flying) {
-        npc.x += dx;
-        npc.y += dy;
-        return true;
-    }
-    const { mx, my } = moveActor(state, npc, dx, dy, movementProperties);
-    return mx !== 0 || my !== 0;
-}
-
-export function moveNPCToTargetLocation(
-    state: GameState,
-    npc: NPC, tx: number, ty: number,
-    animationStyle?: string
-): number {
-    const hitbox = npc.getHitbox(state);
-    const dx = tx - (hitbox.x + hitbox.w / 2), dy = ty - (hitbox.y + hitbox.h / 2);
-    if (animationStyle) {
-        npc.d = getDirection(dx, dy);
-        npc.changeToAnimation(animationStyle)
-    }
-    //enemy.currentAnimation = enemy.enemyDefinition.animations.idle[enemy.d];
-    const mag = Math.sqrt(dx * dx + dy * dy);
-    if (mag > npc.speed) {
-        moveNPC(state, npc, npc.speed * dx / mag, npc.speed * dy / mag, {});
-        return mag - npc.speed;
-    }
-    moveNPC(state, npc, dx, dy, {});
-    return 0;
-}
 
 export type NPCStyle = keyof typeof npcStyles;
 export type NPCBehavior = keyof typeof npcBehaviors;
@@ -244,7 +213,7 @@ export class NPC implements Actor, ObjectInstance  {
     showMessage = false;
     dialogueIndex = 0;
     lastDialogueOption: DialogueOption;
-    constructor(definition: NPCDefinition) {
+    constructor(state: GameState, definition: NPCDefinition) {
         this.definition = definition;
         this.d = definition.d || 'down';
         this.x = definition.x;
@@ -364,3 +333,4 @@ export class NPC implements Actor, ObjectInstance  {
         });
     }
 }
+objectHash.npc = NPC;

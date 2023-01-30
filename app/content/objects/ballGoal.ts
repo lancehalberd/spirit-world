@@ -1,3 +1,4 @@
+import { objectHash } from 'app/content/objects/objectHash';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { checkIfAllSwitchesAreActivated } from 'app/utils/switches';
 
@@ -23,7 +24,7 @@ export class BallGoal implements ObjectInstance {
     isObject = <const>true;
     linkedObject: BallGoal;
     status: ObjectStatus = 'normal';
-    constructor(definition: BallGoalDefinition) {
+    constructor(state: GameState, definition: BallGoalDefinition) {
         this.definition = definition;
         this.x = definition.x;
         this.y = definition.y;
@@ -46,3 +47,4 @@ export class BallGoal implements ObjectInstance {
         }
     }
 }
+objectHash.ballGoal = BallGoal;

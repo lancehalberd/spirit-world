@@ -1,3 +1,4 @@
+import { objectHash } from 'app/content/objects/objectHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { showMessage } from 'app/scriptEvents';
 import { createAnimation, drawFrameAt, getFrame } from 'app/utils/animations';
@@ -116,3 +117,4 @@ export class KeyBlock implements ObjectInstance {
         drawFrameAt(context, frame, { x: this.x, y: this.y });
     }
 }
+objectHash.keyBlock = KeyBlock;

@@ -1,4 +1,5 @@
 import { addParticleSpray } from 'app/content/effects/animationEffect';
+import { objectHash } from 'app/content/objects/objectHash';
 import { crystalParticles } from 'app/content/tiles';
 import { Staff } from 'app/content/objects/staff';
 import { FRAME_LENGTH } from 'app/gameConstants';
@@ -365,3 +366,6 @@ function drawCascade(context: CanvasRenderingContext2D, r: Rect, time: number) {
         h += 4;
     }
 }
+
+objectHash.beadCascade = BeadCascade;
+objectHash.beadGrate = BeadGrate;

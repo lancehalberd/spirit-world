@@ -1,4 +1,5 @@
 import { addParticleAnimations } from 'app/content/effects/animationEffect';
+import { objectHash } from 'app/content/objects/objectHash';
 import { lightStoneParticles } from 'app/content/tiles';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { playAreaSound, stopSound } from 'app/musicController';
@@ -35,7 +36,7 @@ export class RollingBallObject implements ObjectInstance {
     animationTime = 0;
     stuck: boolean = false;
     soundReference;
-    constructor(definition: BaseObjectDefinition) {
+    constructor(state: GameState, definition: BaseObjectDefinition) {
         this.definition = definition;
         this.x = definition.x;
         this.y = definition.y;
@@ -195,3 +196,4 @@ export class RollingBallObject implements ObjectInstance {
         drawFrame(context, frame, { ...frame, x: this.x, y: this.y });
     }
 }
+objectHash.rollingBall = RollingBallObject;

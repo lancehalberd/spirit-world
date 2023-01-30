@@ -1,3 +1,4 @@
+import { objectHash } from 'app/content/objects/objectHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import {
@@ -16,7 +17,7 @@ export class Decoration implements ObjectInstance {
     h: number;
     status: ObjectStatus = 'normal';
     animationTime = 0;
-    constructor(definition: DecorationDefinition) {
+    constructor(state: GameState, definition: DecorationDefinition) {
         this.definition = definition;
         this.drawPriority = definition.drawPriority || 'foreground';
         this.x = definition.x;
@@ -61,3 +62,4 @@ export const decorationTypes = {
 }
 
 export type DecorationType = keyof typeof decorationTypes;
+objectHash.decoration = Decoration;

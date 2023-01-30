@@ -1,4 +1,5 @@
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
+import { objectHash } from 'app/content/objects/objectHash';
 import { setSpawnLocation } from 'app/content/spawnLocations';
 import { isRandomizer } from 'app/gameConstants';
 import { showMessage } from 'app/scriptEvents';
@@ -28,7 +29,7 @@ export class SaveStatue implements ObjectInstance {
     y: number;
     status: ObjectStatus = 'normal';
     isNeutralTarget = true;
-    constructor(definition: SimpleObjectDefinition) {
+    constructor(state: GameState, definition: SimpleObjectDefinition) {
         this.definition = definition;
         this.x = definition.x;
         this.y = definition.y;
@@ -87,3 +88,4 @@ export class SaveStatue implements ObjectInstance {
         drawFrame(context, frame, { ...frame, x: this.x, y: this.y - 32 });
     }
 }
+objectHash.saveStatue = SaveStatue;

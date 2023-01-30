@@ -1,3 +1,4 @@
+import { objectHash } from 'app/content/objects/objectHash';
 import { getLootFrame, getLootShadowFrame, showLootMessage } from 'app/content/loot';
 import { lootEffects } from 'app/content/lootEffects';
 import { editingState } from 'app/development/editingState';
@@ -541,3 +542,8 @@ export class ShopObject extends LootObject implements ObjectInstance {
         });
     }
 }
+
+objectHash.bigChest = BigChest;
+objectHash.chest = ChestObject;
+objectHash.loot = LootObject
+objectHash.shopItem = ShopObject;

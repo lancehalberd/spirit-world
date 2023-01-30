@@ -1,4 +1,5 @@
 import { addParticleAnimations } from 'app/content/effects/animationEffect';
+import { objectHash } from 'app/content/objects/objectHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { directionMap, isPointOpen } from 'app/utils/field';
@@ -42,7 +43,7 @@ export class TippableObject implements ObjectInstance {
     status: ObjectStatus = 'normal';
     animationTime = 0;
     shattered = false;
-    constructor(definition: BaseObjectDefinition) {
+    constructor(state: GameState, definition: BaseObjectDefinition) {
         this.definition = definition;
         this.x = definition.x;
         this.y = definition.y;
@@ -148,3 +149,4 @@ export class TippableObject implements ObjectInstance {
         drawFrame(context, frame, { ...frame, x: this.x, y: this.y - 2 });
     }
 }
+objectHash.tippable = TippableObject;
