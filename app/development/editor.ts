@@ -126,6 +126,9 @@ export function refreshEditor(state: GameState) {
     if (!state.areaInstance.definition.layers.find(layer => layer.key === editingState.selectedLayerKey)) {
         delete editingState.selectedLayerKey;
     }
+    if (editingState.tool === 'replace') {
+        editingState.selectedLayerKey = state.areaInstance.definition.layers[0].key;
+    }
     applyToolToSelectedObject();
     checkToRefreshMinimap(state);
     displayZonePanel(state);

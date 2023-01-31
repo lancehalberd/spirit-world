@@ -55,10 +55,14 @@ export function getBrushContextProperties(state: GameState): PanelRows {
                 name: '**',
                 id: `layer-${i}-unselect`,
                 onClick() {
+                    // Cannot unselect layers while using the replace tool.
+                    if (editingState.tool === 'replace') {
+                        return;
+                    }
                     delete editingState.selectedLayerKey;
                     refreshArea(state);
                 }
-            })
+            });
         }
         row.push({
             name: '',

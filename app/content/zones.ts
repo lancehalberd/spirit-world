@@ -24,6 +24,7 @@ export * from 'app/content/zones/forge';
 export * from 'app/content/zones/skyPalace';
 export * from 'app/content/zones/grandTemple';
 export * from 'app/content/zones/grandTempleWater';
+export * from 'app/content/zones/grandTemple2';
 // jade palace
 export * from 'app/content/zones/riverTemple';
 export * from 'app/content/zones/riverTempleWater';

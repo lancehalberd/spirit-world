@@ -84,7 +84,7 @@ mainCanvas.addEventListener('mousedown', function (event) {
             }
             break;
         case 'replace':
-            replaceTiles(x, y);
+            replaceTiles(state, x, y);
             break;
     }
 });
@@ -309,23 +309,23 @@ function paintSingleTile(area: AreaInstance, layer: AreaLayer, parentDefinition:
     area.checkToRedrawTiles = true;
     resetTileBehavior(area, {x, y});
 }
-function replaceTiles(x: number, y: number): void {
-    const state = getState();
-    const layer = editingState.selectedLayerKey
-        ? state.areaInstance.layers.find(layer => layer.key === editingState.selectedLayerKey)
-        : (
-            state.areaInstance.layers.find(l => l.key === 'field')
-            || state.areaInstance.layers[state.areaInstance.layers.length - 1]
-        );
+function replaceTiles(state: GameState, x: number, y: number): void {
+    // Tile replacement is only valid on a single layer, otherwise it is ambiguous what is being replaced.
+    if (!editingState.selectedLayerKey) {
+        return;
+    }
+    const brushTiles = editingState.brush.none.tiles;
+    const layer = state.areaInstance.layers.find(l => l.key === editingState.selectedLayerKey);
     const parentLayer = state.areaInstance.definition.parentDefinition?.layers?.find(l => l.key === layer.key)
     const w = 16, h = 16;
     const tile = layer.tiles[((state.camera.y + y) / h) | 0]?.[((state.camera.x + x) / w) | 0];
-    const replacement: number = editingState.brush.none.tiles[0][0];
-    for (let y = 0; y < layer.tiles.length; y++) {
-        for (let x = 0; x < layer.tiles[y].length; x++) {
+    const r = state.areaSection;
+    for (let y = r.y; y < r.y + r.h; y++) {
+        for (let x = r.x; x < r.x + r.w; x++) {
             const t = layer.tiles[y][x];
             if (t === tile && Math.random() <= editingState.replacePercentage / 100) {
-                paintSingleTile(state.areaInstance, layer, parentLayer, x, y, replacement);
+                const paintTile = brushTiles[y % brushTiles.length][x % brushTiles[0].length];
+                paintSingleTile(state.areaInstance, layer, parentLayer, x, y, paintTile);
             }
         }
     }

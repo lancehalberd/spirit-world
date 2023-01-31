@@ -1485,7 +1485,8 @@ addTiles([
         w: 16, h: 16,
         source: {image: requireImage('gfx/tiles/grass.png'), x: 0, y: 0, w: 11 * 16, h: 16},
         behaviors: {
-            'all': { linkedOffset: 179}
+            'all': { linkedOffset: 179, defaultLayer: 'floor2'},
+            '0x0': { linkedOffset: 179, defaultLayer: 'floor'},
         }
     },
     singleTileSource('gfx/tiles/bush.png', null, 16),
