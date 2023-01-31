@@ -428,6 +428,169 @@ function renderCavernDoorForeground(context: CanvasRenderingContext2D, state: Ga
     }
 }
 
+
+const crystalImage = requireImage('gfx/tiles/crystalcavesheet.png');
+const crystalCrackedBackground: Frame = {image: crystalImage, x: 0, y: 240, w: 16, h: 16};
+const crystalEastCrackedWall: Frame = {image: crystalImage, x: 304, y: 64, w: 16, h: 16};
+const crystalWestCrackedWall: Frame = {image: crystalImage, x: 320, y: 64, w: 16, h: 16};
+//const crystalNorthCrackedWall: Frame = {image: crystalImage, x: 304, y: 80, w: 16, h: 16};
+const crystalSouthCrackedWall: Frame = {image: crystalImage, x: 320, y: 80, w: 16, h: 16};
+const [
+    crystalSouthDoorClosed, crystalSouthDoorOpen, crystalSouthDoorEmpty
+] = createAnimation('gfx/tiles/crystalcavesheet.png', {w: 64, h: 16},
+    {left: 432, y: 9, cols: 1, rows: 3}).frames;
+const [
+    crystalWestDoorClosed, crystalEastDoorClosed, crystalWestDoorOpen, crystalEastDoorOpen,
+    /* */, /* */, crystalWestDoorEmpty, crystalEastDoorEmpty,
+] = createAnimation('gfx/tiles/crystalcavesheet.png', {w: 16, h: 64},
+    {left: 432, y: 0, cols: 4, rows: 2}).frames;
+const [
+    crystalWestDoorOpenForeground, crystalEastDoorOpenForeground,
+    crystalWestDoorEmptyForeground, crystalEastDoorEmptyForeground,
+] = createAnimation('gfx/tiles/crystalcavesheet.png', {w: 16, h: 64},
+    {left: 432, top: 192, cols: 4, rows: 1}).frames;
+const [
+    crystalStairsUp, crystalStairsDown, crystalNorthDoorway, crystalNorthBlownup,
+    /*crystalStairs*/, crystalNorthCrack,
+] = createAnimation('gfx/tiles/crystalcavesheet.png', {w: 32, h: 32},
+    {left: 304, y: 0, cols: 4, rows: 2}).frames;
+const [
+    blockedCrystalDoorCover, lockedCrystalDoorCover, bigLockedCrystalDoorCover,
+] = createAnimation('gfx/tiles/crystalcavesheet.png', {w: 32, h: 32},
+    {left: 304, top: 192, cols: 3, rows: 1}).frames;
+
+debugCanvas;//(blockedDoorCover);
+
+function renderCrystalDoor(this: void, context: CanvasRenderingContext2D, state: GameState, door: Door) {
+    if (door.definition.d === 'up') {
+        let frame = crystalNorthDoorway, overFrame: Frame = null;
+        if (door.renderOpen(state)) {
+            if (door.definition.status === 'cracked') {
+                context.fillStyle = 'black';
+                context.fillRect(door.x, door.y, 32, 32);
+                frame = crystalNorthBlownup;
+            }
+        } else if (door.status === 'locked') {
+            overFrame = lockedCrystalDoorCover;
+        } else if (door.status === 'bigKeyLocked' ) {
+            overFrame = bigLockedCrystalDoorCover;
+        } else if (door.status === 'cracked') {
+            frame = crystalNorthCrack;
+        } else if (door.definition.status !== 'frozen') {
+            // This covers closed, closedEnemy + closedSwitch
+            overFrame = blockedCrystalDoorCover;
+        }
+        drawFrame(context, frame, {...frame, x: door.x, y: door.y});
+        if (overFrame) {
+            drawFrame(context, overFrame, {...overFrame, x: door.x, y: door.y});
+        }
+        if (door.status === 'frozen') {
+            context.save();
+                context.globalAlpha = 0.5;
+                context.fillStyle = 'white';
+                context.fillRect(door.x, door.y, 32, 32);
+            context.restore();
+        }
+    } else if (door.definition.d === 'left') {
+        if (door.status === 'cracked') {
+            return;
+        }
+        let frame = crystalWestDoorEmpty;
+        if (door.definition.status !== 'normal'
+            && door.definition.status !== 'cracked'
+            && door.definition.status !== 'blownOpen'
+        ) {
+            frame = door.renderOpen(state) ? crystalWestDoorOpen : crystalWestDoorClosed;
+        }
+        drawFrame(context, frame, {...frame, x: door.x, y: door.y});
+    } else if (door.definition.d === 'right') {
+        if (door.status === 'cracked') {
+            return;
+        }
+        let frame = crystalEastDoorEmpty;
+        if (door.definition.status !== 'normal'
+            && door.definition.status !== 'cracked'
+            && door.definition.status !== 'blownOpen'
+        ) {
+            frame = door.renderOpen(state) ? crystalEastDoorOpen : crystalEastDoorClosed;
+        }
+        drawFrame(context, frame, {...frame, x: door.x, y: door.y});
+    }
+    // There is no background frame for southern doors.
+}
+
+function renderCrystalDoorForeground(context: CanvasRenderingContext2D, state: GameState, door: Door) {
+    if (door.definition.d === 'down') {
+        let frame = crystalSouthDoorEmpty;
+        // This frame is used if the doorway can have a door in it (closed or locked).
+        if (door.definition.status !== 'normal'
+            && door.definition.status !== 'cracked'
+            && door.definition.status !== 'blownOpen'
+        ) {
+            frame = door.renderOpen(state) ? crystalSouthDoorOpen : crystalSouthDoorClosed;
+        }
+        // Draw cracked tiles instead of the door.
+        if (door.status === 'cracked') {
+            drawFrame(context, crystalCrackedBackground, {x: door.x, y: door.y, w: 16, h: 16});
+            drawFrame(context, crystalCrackedBackground, {x: door.x + 16, y: door.y, w: 16, h: 16});
+            drawFrame(context, crystalCrackedBackground, {x: door.x + 32, y: door.y, w: 16, h: 16});
+            drawFrame(context, crystalCrackedBackground, {x: door.x + 48, y: door.y, w: 16, h: 16});
+            drawFrame(context, crystalSouthCrackedWall, {x: door.x + 16, y: door.y, w: 16, h: 16});
+            drawFrame(context, crystalSouthCrackedWall, {x: door.x + 32, y: door.y, w: 16, h: 16});
+        } else {
+            drawFrame(context, frame, {...frame, x: door.x, y: door.y});
+        }
+    } else if (door.definition.d === 'up') {
+        let frame = crystalNorthDoorway;
+        if (door.definition.status === 'cracked'
+            || door.definition.status === 'blownOpen'
+            || door.definition.status === 'frozen'
+        ) {
+            frame = door.renderOpen(state) ? crystalNorthBlownup : null;
+        }
+        // Only draw the top 12 pixels of southern facing doors over the player.
+        if (frame) {
+            drawFrame(context, {...frame, h: 12}, {...frame, x: door.x, y: door.y, h: 12});
+        }
+    } else if (door.definition.d === 'left') {
+        let frame = crystalWestDoorEmptyForeground;
+        if (door.definition.status !== 'normal'
+            && door.definition.status !== 'cracked'
+            && door.definition.status !== 'blownOpen'
+        ) {
+            frame = door.renderOpen(state) ? crystalWestDoorOpenForeground : null;
+        }
+        // Draw cracked tiles on top fo the door frame graphic.
+        if (door.status === 'cracked') {
+            drawFrame(context, crystalCrackedBackground, {x: door.x, y: door.y, w: 16, h: 16});
+            drawFrame(context, crystalCrackedBackground, {x: door.x, y: door.y + 16, w: 16, h: 16});
+            drawFrame(context, crystalCrackedBackground, {x: door.x, y: door.y + 32, w: 16, h: 16});
+            drawFrame(context, crystalWestCrackedWall, {x: door.x, y: door.y + 16, w: 16, h: 16});
+            drawFrame(context, crystalWestCrackedWall, {x: door.x, y: door.y + 32, w: 16, h: 16});
+        } else if (frame) {
+            drawFrame(context, frame, {...frame, x: door.x, y: door.y});
+        }
+    } else if (door.definition.d === 'right') {
+        let frame = crystalEastDoorEmptyForeground;
+        if (door.definition.status !== 'normal'
+            && door.definition.status !== 'cracked'
+            && door.definition.status !== 'blownOpen'
+        ) {
+            frame = door.renderOpen(state) ? crystalEastDoorOpenForeground : null;
+        }
+        // Draw cracked tiles on top fo the door frame graphic.
+        if (door.status === 'cracked') {
+            drawFrame(context, crystalCrackedBackground, {x: door.x, y: door.y, w: 16, h: 16});
+            drawFrame(context, crystalCrackedBackground, {x: door.x, y: door.y + 16, w: 16, h: 16});
+            drawFrame(context, crystalCrackedBackground, {x: door.x, y: door.y + 32, w: 16, h: 16});
+            drawFrame(context, crystalEastCrackedWall, {x: door.x, y: door.y + 16, w: 16, h: 16});
+            drawFrame(context, crystalEastCrackedWall, {x: door.x, y: door.y + 32, w: 16, h: 16});
+        } else if (frame) {
+            drawFrame(context, frame, {...frame, x: door.x, y: door.y});
+        }
+    }
+}
+
 export const doorStyles: {[key: string]: DoorStyleDefinition} = {
     cavernDownstairs: {
         w: 32,
@@ -475,6 +638,53 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
         },
         render: renderCavernDoor,
         renderForeground: renderCavernDoorForeground
+    },
+    crystalDownstairs: {
+        w: 32,
+        h: 32,
+        render(context: CanvasRenderingContext2D, state: GameState, door: Door) {
+            if (door.status !== 'normal') {
+                doorStyles.crystal.render(context, state, door);
+                return;
+            }
+            const frame = crystalStairsDown;
+            drawFrameAt(context, frame, {x: door.x, y: door.y});
+        },
+        renderForeground(context: CanvasRenderingContext2D, state: GameState, door: Door) {
+            const frame = crystalStairsDown;
+            drawFrame(context, {...frame, h: 12}, {...frame, x: door.x, y: door.y, h: 12});
+        }
+    },
+    crystalUpstairs: {
+        w: 32,
+        h: 32,
+        render(context: CanvasRenderingContext2D, state: GameState, door: Door) {
+            if (door.status !== 'normal') {
+                doorStyles.crystal.render(context, state, door);
+                return;
+            }
+            const frame = crystalStairsUp;
+            drawFrameAt(context, frame, {x: door.x, y: door.y});
+        },
+        renderForeground(context: CanvasRenderingContext2D, state: GameState, door: Door) {
+            const frame = crystalStairsUp;
+            drawFrame(context, {...frame, h: 12}, {...frame, x: door.x, y: door.y, h: 12});
+        }
+    },
+    crystal: {
+        w: 64,
+        h: 16,
+        getHitbox(door: Door) {
+            if (door.definition.d === 'up') {
+                return {x: door.x, y: door.y, w: 32, h: 32};
+            }
+            if (door.definition.d === 'down') {
+                return {x: door.x, y: door.y + 8, w: 64, h: 8};
+            }
+            return {x: door.x, y: door.y, w: 16, h: 64};
+        },
+        render: renderCrystalDoor,
+        renderForeground: renderCrystalDoorForeground
     },
     woodenDownstairs: {
         w: 32,
