@@ -85,9 +85,6 @@ export class GroundSpike implements EffectInstance, Props {
         // so the hitbox is reduced to make it a bit easier to dodge.
         return {x: this.x, y: this.y + 2, w: 16, h: 12};
     }
-    /*getYDepth(): number {
-        return this.y + 16;
-    }*/
     getFrameTarget() {
         return {x: this.x - 4, y: this.y - 32, w: 24, h: 48};
     }

@@ -77,6 +77,7 @@ interface DoorStyleDefinition {
     w: number,
     h: number,
     getHitbox?: (door: Door) => Rect
+    isStairs?: boolean
     render?: (context: CanvasRenderingContext2D, state: GameState, door: Door) => void
     renderForeground?: (context: CanvasRenderingContext2D, state: GameState, door: Door) => void
     down?: DoorStyleFrames,
@@ -595,6 +596,7 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
     cavernDownstairs: {
         w: 32,
         h: 32,
+        isStairs: true,
         render(context: CanvasRenderingContext2D, state: GameState, door: Door) {
             if (door.status !== 'normal') {
                 doorStyles.cavern.render(context, state, door);
@@ -611,6 +613,7 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
     cavernUpstairs: {
         w: 32,
         h: 32,
+        isStairs: true,
         render(context: CanvasRenderingContext2D, state: GameState, door: Door) {
             if (door.status !== 'normal') {
                 doorStyles.cavern.render(context, state, door);
@@ -642,6 +645,7 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
     crystalDownstairs: {
         w: 32,
         h: 32,
+        isStairs: true,
         render(context: CanvasRenderingContext2D, state: GameState, door: Door) {
             if (door.status !== 'normal') {
                 doorStyles.crystal.render(context, state, door);
@@ -658,6 +662,7 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
     crystalUpstairs: {
         w: 32,
         h: 32,
+        isStairs: true,
         render(context: CanvasRenderingContext2D, state: GameState, door: Door) {
             if (door.status !== 'normal') {
                 doorStyles.crystal.render(context, state, door);
@@ -689,6 +694,7 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
     woodenDownstairs: {
         w: 32,
         h: 32,
+        isStairs: true,
         render(context: CanvasRenderingContext2D, state: GameState, door: Door) {
             if (door.status !== 'normal') {
                 doorStyles.wooden.render(context, state, door);
@@ -705,6 +711,7 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
     woodenUpstairs: {
         w: 32,
         h: 32,
+        isStairs: true,
         render(context: CanvasRenderingContext2D, state: GameState, door: Door) {
             if (door.status !== 'normal') {
                 doorStyles.wooden.render(context, state, door);

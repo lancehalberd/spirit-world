@@ -59,6 +59,9 @@ export class Frost implements EffectInstance, Props {
         this.hitEnemies = hitEnemies;
         this.animationOffset = ((Math.random() * 10) | 0) * 20;
     }
+    getHitbox() {
+        return this;
+    }
     update(state: GameState) {
         this.x += this.vx;
         this.y += this.vy;

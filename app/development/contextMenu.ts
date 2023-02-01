@@ -1,3 +1,4 @@
+import { setSpawnLocation } from 'app/content/spawnLocations';
 import { getSpawnLocationContextMenuOption, getTestStateContextMenuOption } from 'app/development/contextMenu/setState';
 import { editingState } from 'app/development/editingState';
 import { toggleEditing } from 'app/development/editor';
@@ -113,6 +114,13 @@ export function getContextMenu(): MenuOption[] {
         getAssistanceMenuOption(),
         getSettingsMenuOption(),
         getTestStateContextMenuOption(),
+        {
+            label: 'Save Location',
+            onSelect() {
+                const state = getState();
+                setSpawnLocation(state, state.location);
+            }
+        },
         {
             label: editingState.isEditing ? 'Stop Map Editor' : 'Start Map Editor',
             onSelect() {

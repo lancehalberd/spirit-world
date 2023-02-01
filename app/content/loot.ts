@@ -373,8 +373,9 @@ export const [
     waterBlessing, fireBlessing, lightningBlessing,
     goldBow,
     silverChakram, goldChakram,
+    goldMail, /* otherGoldMail */, ironSkin,
 ] = createAnimation('gfx/hud/icons.png',
-    {w: 18, h: 18, content: {x: 1, y: 1, w: 16, h: 16}}, {cols: 41}
+    {w: 18, h: 18, content: {x: 1, y: 1, w: 16, h: 16}}, {cols: 44}
 ).frames;
 export const [
     /* container */, fireElement, iceElement, lightningElement, neutralElement, /* elementShine */
@@ -412,8 +413,8 @@ const lootFrames = {
     // Summoner's Circlet.
     astralProjection: circlet,
     phoenixCrown,
-    goldMail: createLootFrame('orange', 'Au'),
-    ironSkin: createLootFrame('grey', 'Fe'),
+    goldMail,
+    ironSkin,
     bigKey: bigKeyOutlineFrame,
     catEyes: catEyes,
     charge: neutralElement,

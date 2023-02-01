@@ -229,6 +229,9 @@ export class Arrow implements EffectInstance {
         this.style = style;
         this.reflected = reflected;
     }
+    getHitbox() {
+        return this;
+    }
     getHitProperties(state: GameState): HitProperties {
         return {
             canPush: true,

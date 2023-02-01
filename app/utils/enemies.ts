@@ -231,7 +231,10 @@ export function moveEnemyFull(state: GameState, enemy: Enemy, dx: number, dy: nu
     return Math.abs(mx - dx) < 0.01 && Math.abs(my - dy) < 0.01;
 }
 
-export function moveEnemyProper(state: GameState, enemy: Enemy, dx: number, dy: number, movementProperties: MovementProperties): {mx: number, my: number} {
+function moveEnemyProper(state: GameState, enemy: Enemy, dx: number, dy: number, movementProperties: MovementProperties): {mx: number, my: number} {
+    if (enemy.enemyDefinition.baseMovementProperties) {
+        movementProperties = {...enemy.enemyDefinition.baseMovementProperties, ...movementProperties};
+    }
     if (!movementProperties.excludedObjects) {
         movementProperties.excludedObjects = new Set();
     }

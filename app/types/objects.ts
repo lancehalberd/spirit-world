@@ -97,8 +97,10 @@ export interface ObjectInstance {
     getHitbox?: (state?: GameState) => Rect
     // This hitbox will be used for movement instead of getHitbox if defined.
     getMovementHitbox?: () => Rect
-    // Used instead of the literal y value for depth sorting if defined.
+    // This can be set to override the default yDepth calculation for an object.
     getYDepth?: () => number
+    // The calculated yDepth for the object. This is update once per frame before rendering.
+    yDepth?: number
     // This will be used for the hitbox for the editor only if it is defined.
     getEditorHitbox?: (state: GameState) => Rect
     onActivate?: (state: GameState) => void
@@ -162,8 +164,10 @@ export interface EffectInstance {
     getHitbox?: (state?: GameState) => Rect
     // This hitbox will be used for movement instead of getHitbox if defined.
     getMovementHitbox?: () => Rect
-    // Used instead of the literal y value for depth sorting if defined.
+    // This can be set to override the default yDepth calculation for an object.
     getYDepth?: () => number
+    // The calculated yDepth for the object. This is update once per frame before rendering.
+    yDepth?: number
     onEnterArea?: (state: GameState) => void
     // When the hero hits the effect with a weapon or tool.
     // This is used by certain enemy attacks, but it might be better to change those to objects.
@@ -200,6 +204,7 @@ export interface MovementProperties {
     canPush?: boolean
     canFall?: boolean
     canSwim?: boolean
+    canMoveInLava?: boolean
     // Enemies with this prop can only move in deep water.
     mustSwim?: boolean
     canClimb?: boolean
@@ -450,6 +455,7 @@ export interface NPCDefinition extends BaseObjectDefinition {
 }
 
 export type SimpleObjectType = 'airBubbles' | 'beadGrate' | 'cathode'
+    | 'flameTurret'
     | 'pushPull' | 'rollingBall' | 'saveStatue'
     | 'tippable' | 'torch' | 'vineSprout' | 'waterPot';
 

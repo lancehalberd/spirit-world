@@ -96,7 +96,10 @@ export function isMovementBlocked(
         return {};
     }
     // The second condition is a hack to prevent enemies from walking over pits.
-    if ((behaviors?.pit || behaviors?.isLava || behaviors?.isBrittleGround) && !movementProperties.canFall) {
+    if ((behaviors?.pit || behaviors?.isBrittleGround) && !movementProperties.canFall) {
+        return {};
+    }
+    if (behaviors?.isLava && !(movementProperties.canFall || movementProperties.canMoveInLava)) {
         return {};
     }
 

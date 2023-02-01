@@ -53,15 +53,15 @@ export class DoorTop implements ObjectInstance {
         // render correctly.
         if (this.door.style === 'cave' || this.door.style === 'lightCave') {
             if (this.door.definition.d === 'down') {
-                return this.y + 48;
+                return this.y + 64;
             }
         }
         if (this.door.definition.d === 'up' || this.door.definition.d === 'down') {
             // The top of the door frame is 20px from the ground.
-            return this.y + 20;
+            return this.y + 36;
         }
         // This left/right door frames are very tall because of the perspective.
-        return this.y + 48;
+        return this.y + 64;
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
         const definition = this.door.definition;
@@ -202,21 +202,27 @@ export class Door implements ObjectInstance {
         }
         this.applyDoorBehaviorsToArea();
     }
+    applyWideSouthernDoorBehaviorToArea() {
+        const y = Math.floor(this.y / 16);
+        const x = Math.floor(this.x / 16);
+        applyBehaviorToTile(this.area, x, y, { solidMap: BITMAP_BOTTOM, solid: false, low: false, lowCeiling: true});
+        applyBehaviorToTile(this.area, x + 3, y, { solidMap: BITMAP_BOTTOM, solid: false, low: false, lowCeiling: true});
+        if (this.isOpen()) {
+            applyBehaviorToTile(this.area, x + 1, y, { solidMap: BITMAP_BOTTOM_LEFT_QUARTER, solid: false, low: false, lowCeiling: true });
+            applyBehaviorToTile(this.area, x + 2, y, { solidMap: BITMAP_BOTTOM_RIGHT_QUARTER, solid: false, low: false, lowCeiling: true });
+        } else {
+            applyBehaviorToTile(this.area, x + 1, y, { solidMap: BITMAP_BOTTOM, solid: false, low: false, lowCeiling: true});
+            applyBehaviorToTile(this.area, x + 2, y, { solidMap: BITMAP_BOTTOM, solid: false, low: false, lowCeiling: true});
+        }
+    }
     applyDoorBehaviorsToArea() {
         const y = Math.floor(this.y / 16);
         const x = Math.floor(this.x / 16);
         const doorStyle = doorStyles[this.style];
+        // The wooden door behavior is slightly different because the graphic is 3 tiles tall instead of 4.
         if (this.style === 'wooden') {
             if (this.definition.d === 'down') {
-                applyBehaviorToTile(this.area, x, y, { solidMap: BITMAP_BOTTOM, solid: false, low: false, lowCeiling: true});
-                applyBehaviorToTile(this.area, x + 3, y, { solidMap: BITMAP_BOTTOM, solid: false, low: false});
-                if (this.isOpen()) {
-                    applyBehaviorToTile(this.area, x + 1, y, { solidMap: BITMAP_BOTTOM_LEFT_QUARTER, solid: false, low: false, lowCeiling: true });
-                    applyBehaviorToTile(this.area, x + 2, y, { solidMap: BITMAP_BOTTOM_RIGHT_QUARTER, solid: false, low: false, lowCeiling: true });
-                } else {
-                    applyBehaviorToTile(this.area, x + 1, y, { solidMap: BITMAP_BOTTOM, solid: false, low: false, lowCeiling: true});
-                    applyBehaviorToTile(this.area, x + 2, y, { solidMap: BITMAP_BOTTOM, solid: false, low: false, lowCeiling: true});
-                }
+                this.applyWideSouthernDoorBehaviorToArea();
             } else if (this.definition.d === 'up') {
                 this.applySquareDoorBehavior();
             } else { // left + right are the same
@@ -231,17 +237,9 @@ export class Door implements ObjectInstance {
                     applyBehaviorToTile(this.area, x, y + 2, { solid: true, low: false });
                 }
             }
-        } else  if (this.style === 'cavern') {
+        } else if (this.style === 'cavern' || this.style === 'crystal') {
             if (this.definition.d === 'down') {
-                applyBehaviorToTile(this.area, x, y, { solidMap: BITMAP_BOTTOM, solid: false, low: false, lowCeiling: true});
-                applyBehaviorToTile(this.area, x + 3, y, { solidMap: BITMAP_BOTTOM, solid: false, low: false, lowCeiling: true});
-                if (this.isOpen()) {
-                    applyBehaviorToTile(this.area, x + 1, y, { solidMap: BITMAP_BOTTOM_LEFT_QUARTER, solid: false, low: false, lowCeiling: true });
-                    applyBehaviorToTile(this.area, x + 2, y, { solidMap: BITMAP_BOTTOM_RIGHT_QUARTER, solid: false, low: false, lowCeiling: true });
-                } else {
-                    applyBehaviorToTile(this.area, x + 1, y, { solidMap: BITMAP_BOTTOM, solid: false, low: false, lowCeiling: true});
-                    applyBehaviorToTile(this.area, x + 2, y, { solidMap: BITMAP_BOTTOM, solid: false, low: false, lowCeiling: true});
-                }
+                this.applyWideSouthernDoorBehaviorToArea();
             } else if (this.definition.d === 'up') {
                 this.applySquareDoorBehavior();
             } else { // left + right are the same
@@ -435,9 +433,8 @@ export class Door implements ObjectInstance {
         }
         this.area = null;
     }
-    isStairs(state: GameState) {
-        return this.style === 'cavernUpstairs' || this.style === 'cavernDownstairs'
-            || this.style === 'woodenUpstairs' || this.style === 'woodenDownstairs';
+    isStairs(state: GameState): boolean {
+        return !!doorStyles[this.style].isStairs;
     }
     update(state: GameState) {
         if (this.status !== 'normal' && this.status !== 'blownOpen' && getObjectStatus(state, this.definition)) {

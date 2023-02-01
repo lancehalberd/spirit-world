@@ -88,6 +88,9 @@ export class Flame implements EffectInstance, Props {
         this.isPreparing = isPreparing
         this.animationTime = Math.floor(Math.random() * 10) * FRAME_LENGTH;
     }
+    getHitbox() {
+        return this;
+    }
     update(state: GameState) {
         this.x += this.vx;
         this.y += this.vy;
@@ -105,7 +108,7 @@ export class Flame implements EffectInstance, Props {
                 const hitResult = hitTargets(state, this.area, {
                     canPush: false,
                     damage: this.damage,
-                    hitbox: this,
+                    hitbox: this.getHitbox(),
                     element: 'fire',
                     hitAllies: !this.reflected,
                     hitEnemies: this.reflected,

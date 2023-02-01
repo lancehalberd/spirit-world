@@ -141,6 +141,14 @@ function updateObjectsToRender(this: void, state: GameState, area: AreaInstance)
             }
             if (part.render || part.renderShadow || part.renderForeground) {
                 area.objectsToRender.push(part);
+                if (part.getYDepth) {
+                    part.yDepth = part.getYDepth();
+                } else if (part.getHitbox) {
+                    const hitbox = part.getHitbox();
+                    part.yDepth = hitbox.y + hitbox.h;
+                } else {
+                    part.yDepth = part.y;
+                }
             }
         }
     }
@@ -340,18 +348,18 @@ export function renderAreaObjectsBeforeHero(
         // Because of this, to render the hero in the correct order we need to pretend the
         // y value is greater than it actually is. Otherwise they will be rendered behind
         // things like door frames that they should be jumping in front of.
-        const heroY = (state.hero.action === 'jumpingDown' && state.hero.d === 'down')
-            ? state.hero.y + 32 : state.hero.y;
+        const heroYDepth = (state.hero.action === 'jumpingDown' && state.hero.d === 'down')
+            ? state.hero.y + 48 : state.hero.y + 16;
         for (const object of area.objectsToRender) {
             if ((object.drawPriority === 'sprites' || object.getDrawPriority?.(state) === 'sprites')
-                && (object.getYDepth?.() ?? object.y) <= heroY
+                && object.yDepth <= heroYDepth
             ) {
                 if (object.render) {
                     spriteObjects.push(object);
                 }
             }
         }
-        spriteObjects.sort((A, B) => (A.getYDepth?.() ?? A.y) - (B.getYDepth?.() ?? B.y));
+        spriteObjects.sort((A, B) => A.yDepth - B.yDepth);
         for (const objectOrEffect of spriteObjects) {
             objectOrEffect.render(context, state);
         }
@@ -376,11 +384,11 @@ export function renderAreaObjectsAfterHero(
         // Because of this, to render the hero in the correct order we need to pretend the
         // y value is greater than it actually is. Otherwise they will be rendered behind
         // things like door frames that they should be jumping in front of.
-        const heroY = (state.hero.action === 'jumpingDown' && state.hero.d === 'down')
-            ? state.hero.y + 32 : state.hero.y;
+        const heroYDepth = (state.hero.action === 'jumpingDown' && state.hero.d === 'down')
+            ? state.hero.y + 48 : state.hero.y + 16;
         for (const object of area.objectsToRender) {
             if ((object.drawPriority === 'sprites' || object.getDrawPriority?.(state) === 'sprites')
-                && (object.getYDepth?.() ?? object.y) > heroY
+                && (object.yDepth) > heroYDepth
             ) {
                 if (object.render) {
                     spriteObjects.push(object);
@@ -388,7 +396,7 @@ export function renderAreaObjectsAfterHero(
             }
         }
         // Sprite objects are rendered in order of their y positions.
-        spriteObjects.sort((A, B) => (A.getYDepth?.() ?? A.y) - (B.getYDepth?.() ?? B.y));
+        spriteObjects.sort((A, B) => A.yDepth - B.yDepth);
         for (const objectOrEffect of spriteObjects) {
             objectOrEffect.render(context, state);
         }

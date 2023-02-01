@@ -1,9 +1,7 @@
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { iceGrenadeAbility } from 'app/content/enemyAbilities/iceGrenade';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
-import { flameAnimation } from 'app/content/effects/flame';
 import { EnemyArrow, spiritArrowIcon } from 'app/content/effects/arrow';
-import { Flame } from 'app/content/effects/flame';
 import { GrowingThorn } from 'app/content/effects/growingThorn';
 import { GroundSpike } from 'app/content/effects/groundSpike';
 
@@ -17,7 +15,6 @@ import {
     floorEyeAnimations,
     icePlantAnimations,
     blueSnakeAnimations,
-    redSnakeAnimations,
     snakeAnimations,
 } from 'app/content/enemyAnimations';
 import { certainLifeLootTable, simpleLootTable, lifeLootTable, moneyLootTable } from 'app/content/lootTables';
@@ -36,7 +33,7 @@ import {
     ActorAnimations, DrawPriority,
     Enemy, GameState,
     HitProperties, HitResult, LootTable,
-    MagicElement, Rect,
+    MagicElement, MovementProperties, Rect,
     TextCueTaunt,
     TileBehaviors,
 } from 'app/types';
@@ -44,6 +41,7 @@ import {
 export * from 'app/content/enemies/crystalBat';
 export * from 'app/content/enemies/crystalGuardian';
 export * from 'app/content/enemies/electricSquirrel';
+export * from 'app/content/enemies/flameSnake';
 export * from 'app/content/enemies/lightningDrone';
 export * from 'app/content/enemies/luckyBeetle';
 export * from 'app/content/enemies/sentryBot';
@@ -72,6 +70,8 @@ export interface EnemyAbility<T> {
     getTarget: (this: EnemyAbility<T>, state: GameState, enemy: Enemy) => T
     // Called when the ability becomes active at the start of its prep time.
     prepareAbility?: (this: EnemyAbility<T>, state: GameState, enemy: Enemy, target: T) => void
+    // Called every frame during the ability prep time.
+    updateAbility?: (this: EnemyAbility<T>, state: GameState, enemy: Enemy, target: T) => void
     // Called when the ability is used, at the end of its prep time.
     useAbility?: (this: EnemyAbility<T>, state: GameState, enemy: Enemy, target: T) => void
     // How long it takes for the enemy to generate a charge. Defaults to 0.
@@ -114,6 +114,7 @@ export interface EnemyDefinition {
     taunts?: {[key in string]: TextCueTaunt}
     animations: ActorAnimations
     aggroRadius?: number
+    baseMovementProperties?: Partial<MovementProperties>
     drawPriority?: DrawPriority
     tileBehaviors?: TileBehaviors
     canBeKnockedBack?: boolean
@@ -208,18 +209,6 @@ enemyDefinitions.wallLaser = {
         drawFrameCenteredAt(context, spiritArrowIcon, target);
     },
 };
-enemyDefinitions.flameSnake = {
-    alwaysReset: true,
-    animations: redSnakeAnimations, speed: 1.1,
-    life: 3, touchDamage: 1, update: updateFlameSnake, flipRight: true,
-    elementalMultipliers: {'ice': 2},
-    immunities: ['fire'],
-    renderPreview(context: CanvasRenderingContext2D, enemy: Enemy, target: Rect): void {
-        enemy.defaultRenderPreview(context, target);
-        drawFrameCenteredAt(context, flameAnimation.frames[0], target);
-    },
-};
-
 
 const icePlantIceGrenadeAbility = {
     ...iceGrenadeAbility,
@@ -384,66 +373,6 @@ function updateFloorEye(state: GameState, enemy: Enemy): void {
     enemy.touchHit = enemy.isInvulnerable ? null : { damage: 2 };
 }
 
-function updateFlameSnake(state: GameState, enemy: Enemy): void {
-    const fireball = enemy.params.fireball;
-    if (fireball) {
-        const [dx, dy] = directionMap[enemy.d];
-        fireball.animationTime = 0;
-        fireball.scale = Math.min(1, fireball.scale + 0.04);
-        if (fireball.scale === 1) {
-            fireball.vx = 3 * dx;
-            fireball.vy = 3 * dy;
-            fireball.isPreparing = false;
-            delete enemy.params.fireball;
-            enemy.params.flameCooldown = 800;
-            enemy.params.shotCooldown = 400;
-        } else {
-            const hitbox = enemy.getHitbox(state);
-            fireball.x = hitbox.x + hitbox.w / 2 + dx * hitbox.w / 2 - fireball.w / 2;
-            fireball.y = hitbox.y + hitbox.h / 2 - 1 + dy * hitbox.h / 2 - fireball.h / 2;
-        }
-        return;
-    }
-    if (enemy.params.flameCooldown > 0) {
-        enemy.params.flameCooldown -= FRAME_LENGTH;
-    } else {
-        const hitbox = enemy.getHitbox(state);
-        const flame = new Flame({
-            x: hitbox.x + hitbox.w / 2,
-            y: hitbox.y + hitbox.h / 2 - 1,
-        });
-        flame.x -= flame.w / 2;
-        flame.y -= flame.h / 2;
-        addEffectToArea(state, enemy.area, flame);
-        enemy.params.flameCooldown = 600;
-    }
-    if (enemy.params.shootCooldown > 0) {
-        enemy.params.shootCooldown -= FRAME_LENGTH;
-    } else {
-        paceRandomly(state, enemy);
-        const {hero} = getLineOfSightTargetAndDirection(state, enemy, enemy.d);
-        if (!hero && Math.random() > 0.01) {
-            return;
-        }
-        const hitbox = enemy.getHitbox(state);
-        const [dx, dy] = directionMap[enemy.d];
-        const flame = new Flame({
-            x: hitbox.x + hitbox.w / 2 + dx * hitbox.w / 2,
-            y: hitbox.y + hitbox.h / 2 - 1 + dy * hitbox.h / 2,
-            isPreparing: true,
-            vx: 0,
-            vy: 0,
-            z: 4,
-            az: 0,
-            scale: 0.1,
-            ttl: 1400,
-        });
-        flame.x -= flame.w / 2;
-        flame.y -= flame.h / 2;
-        addEffectToArea(state, enemy.area, flame);
-        enemy.params.fireball = flame;
-    }
-}
 function updateStormLightningBug(state: GameState, enemy: Enemy): void {
     scurryAndChase(state, enemy);
     enemy.params.shieldCooldown = enemy.params.shieldCooldown ?? 1000 + Math.random() * 1000;

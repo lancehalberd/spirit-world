@@ -12,8 +12,9 @@ import {
     AnimationEffect, AreaInstance, DrawPriority, EffectInstance, Frame, GameState, Hero, HitProperties, MagicElement,
 } from 'app/types';
 
-const chakramGeometry = {w: 16, h: 16, content: {x: 2, y: 2, w: 12, h: 12}};
+const chakramGeometry = {w: 16, h: 16, content: {x: 1, y: 1, w: 14, h: 14}};
 const chakramAnimation = createAnimation('gfx/chakram1.png', chakramGeometry, {cols: 9, x: 0, duration: 2}, {loopFrame: 1});
+const goldChakramAnimation = createAnimation('gfx/chakram2.png', chakramGeometry, {cols: 9, x: 0, duration: 2}, {loopFrame: 1});
 
 interface Props {
     x?: number
@@ -72,6 +73,9 @@ export class ThrownChakram implements EffectInstance {
         this.sparkles = [];
         this.element = element;
         this.level = level;
+    }
+    getHitbox() {
+        return this;
     }
     update(state: GameState) {
         // Chakram returns to the hero if the clone it was thrown from no longer exists.
@@ -201,7 +205,8 @@ export class ThrownChakram implements EffectInstance {
         }
     }
     render(context, state: GameState) {
-        const frame = getFrame(chakramAnimation, this.animationTime);
+        const animation = this.level >= 2 ? goldChakramAnimation : chakramAnimation;
+        const frame = getFrame(animation, this.animationTime);
         drawFrame(context, frame, { ...frame, x: this.x - frame.content.x, y: this.y - frame.content.y });
         for (const sparkle of this.sparkles) {
             sparkle.render(context, state);
@@ -247,6 +252,9 @@ export class HeldChakram implements EffectInstance {
         if (this.level > 1 && this.hero.weaponUpgrades.spiritDamage) {
             this.damage++;
         }
+    }
+    getHitbox() {
+        return this;
     }
     throw(state: GameState) {
         const { chargeLevel, element } = getChargeLevelAndElement(state, this.hero);
@@ -400,7 +408,8 @@ export class HeldChakram implements EffectInstance {
                 animationTime = this.animationTime / 10;
             }
         }
-        const frame = getFrame(chakramAnimation, animationTime);
+        const animation = this.level >= 2 ? goldChakramAnimation : chakramAnimation;
+        const frame = getFrame(animation, animationTime);
         drawFrame(context, frame, { ...frame, x: this.x - frame.content.x, y: this.y - frame.content.y });
         for (const sparkle of this.sparkles) {
             sparkle.render(context, state);

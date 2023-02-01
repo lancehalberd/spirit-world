@@ -852,10 +852,10 @@ const stairs: TileSource = {
 // All of these solid maps are set so that only the bottom half of the ceiling graphics are solid.
 const ceilingBehavior: TileBehaviors = { defaultLayer: 'foreground2', isVeryTall: true, solid: true};
 const bottomCeilingBehavior: TileBehaviors = { defaultLayer: 'foreground2', isVeryTall: true, solidMap: BITMAP_BOTTOM};
-const topLeftCeiling: TileBehaviors = { ...ceilingBehavior, isVeryTall: true, solidMap: BITMAP_TOP_LEFT_8_STRIP};
-const topRightCeiling: TileBehaviors = { ...ceilingBehavior, isVeryTall: true, solidMap: BITMAP_TOP_RIGHT_8_STRIP};
-const bottomLeftCeiling: TileBehaviors = { ...ceilingBehavior, isVeryTall: true, solidMap: BITMAP_BOTTOM_LEFT_8};
-const bottomRightCeiling: TileBehaviors = { ...ceilingBehavior, isVeryTall: true, solidMap: BITMAP_BOTTOM_RIGHT_8};
+const topLeftCeiling: TileBehaviors = { ...ceilingBehavior, isVeryTall: true, solid: false, solidMap: BITMAP_TOP_LEFT_8_STRIP};
+const topRightCeiling: TileBehaviors = { ...ceilingBehavior, isVeryTall: true, solid: false,  solidMap: BITMAP_TOP_RIGHT_8_STRIP};
+const bottomLeftCeiling: TileBehaviors = { ...ceilingBehavior, isVeryTall: true, solid: false,  solidMap: BITMAP_BOTTOM_LEFT_8};
+const bottomRightCeiling: TileBehaviors = { ...ceilingBehavior, isVeryTall: true, solid: false,  solidMap: BITMAP_BOTTOM_RIGHT_8};
 
 
 const woodCeiling: TileSource = {

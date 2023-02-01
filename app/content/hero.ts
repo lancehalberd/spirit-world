@@ -9,6 +9,7 @@ import {
     chargeFireBackAnimation, chargeFireFrontAnimation,
     chargeIceBackAnimation, chargeIceFrontAnimation,
     chargeLightningBackAnimation, chargeLightningFrontAnimation,
+    goldBowAnimations,
     heroAnimations,
     staffAnimations,
 } from 'app/render/heroAnimations';
@@ -465,7 +466,8 @@ export class Hero implements Actor, SavedHeroData {
         } else if (directionMap[bowDirection][1] > 0) {
             arrowYOffset += directionMap[bowDirection][0] === 0 ? 8 : 4;
         }
-        const frame = getFrame(bowAnimations[bowDirection], bowAnimationTime);
+        const animations = this.activeTools.bow >= 2 ? goldBowAnimations : bowAnimations;
+        const frame = getFrame(animations[bowDirection], bowAnimationTime);
         drawFrameAt(context, frame, { x: this.x - 6, y: this.y - this.z - 11 });
         if (isChargingBow && state.hero.magic > 0) {
             const arrowFrame = getFrame(arrowAnimations[bowDirection], bowAnimationTime);

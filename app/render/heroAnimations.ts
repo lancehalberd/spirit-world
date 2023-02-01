@@ -200,6 +200,15 @@ const bowUpLeftAnimation: FrameAnimation = createAnimation('gfx/mc/bow1.png', bo
 const bowLeftAnimation: FrameAnimation = createAnimation('gfx/mc/bow1.png', bowGeometry, { cols: 3, x: 22, duration: 4});
 const bowDownLeftAnimation: FrameAnimation = createAnimation('gfx/mc/bow1.png', bowGeometry, { cols: 3, x: 26, duration: 4});
 
+const goldBowDownAnimation: FrameAnimation = createAnimation('gfx/mc/bow2.png', bowGeometry, { cols: 3, x: 1, duration: 4});
+const goldBowDownRightAnimation: FrameAnimation = createAnimation('gfx/mc/bow2.png', bowGeometry, { cols: 3, x: 5, duration: 4});
+const goldBowRightAnimation: FrameAnimation = createAnimation('gfx/mc/bow2.png', bowGeometry, { cols: 3, x: 9, duration: 4});
+const goldBowUpRightAnimation: FrameAnimation = createAnimation('gfx/mc/bow2.png', bowGeometry, { cols: 3, x: 13, duration: 4});
+const goldBowUpAnimation: FrameAnimation = createAnimation('gfx/mc/bow2.png', bowGeometry, { cols: 1, x: 16, duration: 4});
+const goldBowUpLeftAnimation: FrameAnimation = createAnimation('gfx/mc/bow2.png', bowGeometry, { cols: 3, x: 18, duration: 4});
+const goldBowLeftAnimation: FrameAnimation = createAnimation('gfx/mc/bow2.png', bowGeometry, { cols: 3, x: 22, duration: 4});
+const goldBowDownLeftAnimation: FrameAnimation = createAnimation('gfx/mc/bow2.png', bowGeometry, { cols: 3, x: 26, duration: 4});
+
 const cloakGeometry: FrameDimensions = {w: 32, h: 32};
 const cloakFrameMap = [0, 0, 1, 2, 3, 4, 5, 6, 7];
 const cloakDownAnimation: FrameAnimation = createAnimation('gfx/effects/cloak_throw.png', cloakGeometry, { cols: 8, x: 0, duration: 2, frameMap: cloakFrameMap});
@@ -245,6 +254,17 @@ export const bowAnimations: AnimationSet = {
     downright: bowDownRightAnimation,
     left: bowLeftAnimation,
     right: bowRightAnimation,
+}
+
+export const goldBowAnimations: AnimationSet = {
+    up: goldBowUpAnimation,
+    upleft: goldBowUpLeftAnimation,
+    upright: goldBowUpRightAnimation,
+    down: goldBowDownAnimation,
+    downleft: goldBowDownLeftAnimation,
+    downright: goldBowDownRightAnimation,
+    left: goldBowLeftAnimation,
+    right: goldBowRightAnimation,
 }
 
 export const arrowAnimations: AnimationSet = {

@@ -183,7 +183,7 @@ export function getObjectTypeProperties(): PanelRows {
 
 export const combinedObjectTypes: ObjectType[] = [
     'anode', 'cathode', 'airBubbles', 'ballGoal', 'beadCascade', 'beadGrate', 'bigChest', 'chest', 'crystalSwitch', 'decoration',
-    'door', 'escalator', 'floorSwitch', 'indicator', 'keyBlock', 'loot','marker', 'narration', 'npc', 'pitEntrance',
+    'door', 'escalator', 'flameTurret', 'floorSwitch', 'indicator', 'keyBlock', 'loot','marker', 'narration', 'npc', 'pitEntrance',
     'pushPull', 'rollingBall', 'saveStatue', 'shopItem', 'sign', 'spawnMarker', 'spikeBall', 'teleporter', 'tippable', 'torch', 'turret',
     'vineSprout', 'waterfall', 'waterPot',
 ];
@@ -407,6 +407,7 @@ export function createObjectDefinition(
         case 'airBubbles':
         case 'beadGrate':
         case 'cathode':
+        case 'flameTurret':
         case 'pushPull':
         case 'rollingBall':
         case 'saveStatue':
