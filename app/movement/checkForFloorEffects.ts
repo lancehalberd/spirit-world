@@ -19,6 +19,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
             hero.groundHeight = entity.behaviors?.groundHeight;
         }
     }
+    hero.z = Math.max(hero.z, hero.groundHeight);
     const tileSize = 16;
 
     let leftColumn = Math.floor((hero.x + 4) / tileSize);
