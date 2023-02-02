@@ -1002,7 +1002,7 @@ const shadows: TileSource = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/shadowtiles.png'), x: 0, y: 0, w: 48, h: 64},
     behaviors: {
-        'all': { defaultLayer: 'field2' },
+        'all': { defaultLayer: 'field2', isGround: false },
     },
     tileCoordinates: [
         [0,0],[1,0],[2,0],[3,0],[4,0],[6,0],[7,0],[8,0],[9,0],[0,1],[2,1],[3,1],[4,1],[6,1],[7,1],[8,1],[9,1],
@@ -1290,10 +1290,10 @@ const crystalCaveLedges: TileSource = {
         '12x12': { defaultLayer: 'floor2'},
         '13x12': { defaultLayer: 'floor2'},
 
-        '8x13': { defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_DOWN_RIGHT },
-        '9x13': { defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_UP_RIGHT },
-        '10x13': { defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_DOWN_RIGHT },
-        '11x13': { defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_UP_RIGHT},
+        '8x13': { defaultLayer: 'floor2', diagonalLedge: 'upright' },
+        '9x13': { defaultLayer: 'floor2', diagonalLedge: 'upleft' },
+        '10x13': { defaultLayer: 'floor2', diagonalLedge: 'upright' },
+        '11x13': { defaultLayer: 'floor2', diagonalLedge: 'upleft' },
         '12x13': { defaultLayer: 'floor2'},
         '13x13': { defaultLayer: 'floor2'},
 
@@ -1457,6 +1457,10 @@ const deletedTileSource: TileSource = solidColorTile('#FF0000', {deleted: true})
 function deletedTiles(n: number): TileSource[] {
     return [...new Array(n)].map(() => deletedTileSource);
 }
+// Add this to ignore if deletedTiles isn't called
+deletedTiles;
+
+const solidPitSource: TileSource = solidColorTile('#111111', {pit: true});
 
 addTiles([
     // This is the empty tile.
@@ -1498,7 +1502,7 @@ addTiles([
     // This is the 'Abyss' tile for the southern edge of walls, it uses bitmap bottom so the player can
     // go behind it a bit.
     singleTileSource('gfx/tiles/cavearranged.png', { defaultLayer: 'foreground', isVeryTall: true, solidMap: BITMAP_BOTTOM }, 0, 240),
-    ...deletedTiles(1),
+    solidPitSource,
     stampTileSource(rockWallFrame, {
         '0x0': southernWallBehavior, '1x0': southernWallBehavior, '2x0': southernWallBehavior,
         '0x1': southernWallBehavior, '1x1': southernWallBehavior, '2x1': southernWallBehavior,

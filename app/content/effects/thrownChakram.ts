@@ -56,6 +56,7 @@ export class ThrownChakram implements EffectInstance {
     hitCooldown: number = 0;
     isPlayerAttack = true;
     level: number;
+    isHigh: boolean = false;
     constructor({x = 0, y = 0, vx = 0, vy = 0, damage = 1, element = null, returnSpeed = 4, piercing = false, level, source}: Props) {
         this.x = x;
         this.y = y;
@@ -76,6 +77,12 @@ export class ThrownChakram implements EffectInstance {
     }
     getHitbox() {
         return this;
+    }
+    getYDepth() {
+        if (this.isHigh) {
+            return this.y + this.h + 32;
+        }
+        return this.y + this.h;
     }
     update(state: GameState) {
         // Chakram returns to the hero if the clone it was thrown from no longer exists.
@@ -161,6 +168,7 @@ export class ThrownChakram implements EffectInstance {
             hitEnemies: this.hitCooldown <= 0,
             hitObjects: this.hitCooldown <= 0,
             source: this.source,
+            projectile: this,
         }
         // Only push objects on the way out to prevent accidentally dragging objects towards the player.
         if (this.outFrames > 0) {
@@ -188,6 +196,7 @@ export class ThrownChakram implements EffectInstance {
             vy: this.vy,
             hitbox: this,
             hitTiles: true,
+            projectile: this,
         };
         hitResult = hitTargets(state, this.area, hit);
         // A small hitbox check for hitting tiles that stops on any impact, this allows the chakram to go partially
@@ -197,6 +206,7 @@ export class ThrownChakram implements EffectInstance {
             vy: this.vy,
             hitbox: pad(this, -4),
             hitTiles: true,
+            projectile: this,
         };
         hitResult = hitTargets(state, this.area, hit);
         didHit = hitResult.hit || hitResult.blocked;
@@ -228,6 +238,7 @@ export class HeldChakram implements EffectInstance {
     isEffect = <const>true;
     x: number;
     y: number;
+    z: number = 0;
     w: number;
     h: number;
     vx: number;
@@ -329,6 +340,7 @@ export class HeldChakram implements EffectInstance {
             // When aiming cardinally, place the chakram in the right hand.
             this.x = this.hero.x + 3 - this.vy * 5 + this.vx * 5;
             this.y = this.hero.y + this.vx * 5 + this.vy * 4;
+            this.z = this.hero.z;
         //}
     }
     update(state: GameState) {
@@ -410,7 +422,7 @@ export class HeldChakram implements EffectInstance {
         }
         const animation = this.level >= 2 ? goldChakramAnimation : chakramAnimation;
         const frame = getFrame(animation, animationTime);
-        drawFrame(context, frame, { ...frame, x: this.x - frame.content.x, y: this.y - frame.content.y });
+        drawFrame(context, frame, { ...frame, x: this.x - frame.content.x, y: this.y - frame.content.y - this.z });
         for (const sparkle of this.sparkles) {
             sparkle.render(context, state);
         }

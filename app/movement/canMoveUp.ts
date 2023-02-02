@@ -285,6 +285,9 @@ export function canMoveUp(
             }
         }
         if (blocked) {
+            if (!movementProperties.canWiggle) {
+                return { pushedObjects: [...pushedObjects] };
+            }
             if (checkingLeft) {
                 leftBlock = x;
             } else {

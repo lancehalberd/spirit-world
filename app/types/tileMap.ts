@@ -66,8 +66,9 @@ export interface TileBehaviors {
     pit?: boolean
     isLava?: Boolean
     isLavaMap?: Uint16Array
-    // If this is set to false, then a tile won't override pit/lava behavior underneath it.
-    isGround?: false
+    // If this is set to false, then a tile shouldn't override pit/lava behavior underneath it.
+    // If this is set to true on an object then it should override ground behavior underneath it.
+    isGround?: boolean
     // number of pixels to raise the player when on this tile. Created for the staff ground.
     groundHeight?: number
     // Assign this to skip tiles in source images.
@@ -194,26 +195,26 @@ export type LogicalZoneKey =
     'overworld' | 'sky'
     // Material world towns
     | 'waterfallCave' | 'treeVillage'
-    | 'holyCityInterior'
+    | 'holyCityInterior' | 'grandTemple'
     // Material world sub areas
     | 'ascentCave' | 'fertilityShrine'
     | 'peachCave' | 'bushCave'
     // Spirit world
     | 'spiritWorld' | 'spiritSky'
     // Spirit world towns
-    | 'jadeCityInterior'
+    | 'jadeCityInterior' | 'jadePalace'
     // Spirit world sub areas
     | 'ascentCaveSpirit' | 'fertilityShrineSpirit'
     | 'peachCaveSpirit'
     // Early dungeons
     | 'tomb' | 'warTemple' | 'cocoon' | 'helix'
     // Mid dungeons
+    | 'gauntlet'
     | 'forestTemple'
     | 'waterfallTower'
     | 'forge'
-    | 'grandTemple'
     | 'skyPalace'
-    | 'jadePalace'
+    | 'holySanctum'
     // Beast dungeons
     | 'riverTemple' | 'crater' | 'staffTower'
     // Final dungeons

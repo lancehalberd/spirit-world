@@ -183,7 +183,7 @@ export function getObjectTypeProperties(): PanelRows {
 
 export const combinedObjectTypes: ObjectType[] = [
     'anode', 'cathode', 'airBubbles', 'ballGoal', 'beadCascade', 'beadGrate', 'bigChest', 'chest', 'crystalSwitch', 'decoration',
-    'door', 'escalator', 'flameTurret', 'floorSwitch', 'indicator', 'keyBlock', 'loot','marker', 'narration', 'npc', 'pitEntrance',
+    'door', 'escalator', 'flameTurret', 'floorSwitch', 'indicator', 'keyBlock', 'loot','marker', 'movingPlatform', 'narration', 'npc', 'pitEntrance',
     'pushPull', 'rollingBall', 'saveStatue', 'shopItem', 'sign', 'spawnMarker', 'spikeBall', 'teleporter', 'tippable', 'torch', 'turret',
     'vineSprout', 'waterfall', 'waterPot',
 ];
@@ -404,6 +404,16 @@ export function createObjectDefinition(
             }
             return lootDefinition;
         }
+        case 'movingPlatform':
+            return {
+                ...commonProps,
+                type: definition.type,
+                d: definition.d || 'up',
+                w: definition.w || 32,
+                h: definition.h || 32,
+                speed: definition.speed || 1,
+                turn: definition.turn || 'bounce',
+            };
         case 'airBubbles':
         case 'beadGrate':
         case 'cathode':
@@ -745,6 +755,24 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                 },
             });
             break;
+        case 'movingPlatform':
+            rows.push({
+                name: 'w',
+                value: object.w,
+                onChange(w: number) {
+                    object.w = w;
+                    updateObjectInstance(state, object);
+                },
+            });
+            rows.push({
+                name: 'h',
+                value: object.h,
+                onChange(h: number) {
+                    object.h = h;
+                    updateObjectInstance(state, object);
+                },
+            });
+            // This should fall through to use the same movement properties as the spike ball.
         case 'spikeBall':
             rows.push({
                 name: 'direction',

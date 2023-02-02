@@ -287,6 +287,9 @@ export function canMoveLeft(
             }
         }
         if (blocked) {
+            if (!movementProperties.canWiggle) {
+                return { pushedObjects: [...pushedObjects] };
+            }
             if (checkingLeft) {
                 minBlock = y;
             } else {

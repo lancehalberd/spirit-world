@@ -1,11 +1,12 @@
 import { zones } from 'app/content/zones';
+import { showToast } from 'app/development/toast';
 import { randomizerSeed, enemySeed, entranceSeed } from 'app/gameConstants';
 
 import { AreaGrid, Zone } from 'app/types';
 
 export function exportZoneToClipboard(zone: Zone): void {
     navigator.clipboard.writeText(serializeZone(zone));
-    console.log('Exported Zone', zone.key);
+    showToast(`Exported Zone  ${zone.key}`);
 }
 
 export function serializeZone(zone: Zone) {
@@ -51,13 +52,13 @@ export function serializeZone(zone: Zone) {
                 for (let column = 0; column < areaGrid[row].length; column++) {
                     const area = areaGrid[row][column];
                     if (!area || (emptyAreas.includes(area) && !area.objects.length)) {
-                        lines.push(`const ${key}${floorIndex}_${row}x${column}: AreaDefinition = null;`);
+                        lines.push(`const ${key}${floorIndex}_${column}x${row}: AreaDefinition = null;`);
                         continue;
                     }
-                    lines.push(`const ${key}${floorIndex}_${row}x${column}: AreaDefinition = {`);
+                    lines.push(`const ${key}${floorIndex}_${column}x${row}: AreaDefinition = {`);
                     if (key === 'sf') {
                         lines.push(`    isSpiritWorld: true,`);
-                        lines.push(`    parentDefinition: f${floorIndex}_${row}x${column},`);
+                        lines.push(`    parentDefinition: f${floorIndex}_${column}x${row},`);
                     }
                     if (!area.layers || emptyAreas.includes(area)) {
                         // Setting the layers to null will initialize this to the
@@ -144,7 +145,7 @@ export function serializeZone(zone: Zone) {
         for (let row = 0; row < areaGrid.length; row++) {
             let rowLine = '                [';
             for (let column = 0; column < areaGrid[row].length; column++) {
-                rowLine += `${key}${floorIndex}_${row}x${column},`;
+                rowLine += `${key}${floorIndex}_${column}x${row},`;
             }
             lines.push(rowLine + '],');
         }
@@ -155,7 +156,7 @@ export function serializeZone(zone: Zone) {
         for (let row = 0; row < areaGrid.length; row++) {
             let rowLine = '                [';
             for (let column = 0; column < areaGrid[row].length; column++) {
-                rowLine += `${key}${floorIndex}_${row}x${column},`;
+                rowLine += `${key}${floorIndex}_${column}x${row},`;
             }
             lines.push(rowLine + '],');
         }

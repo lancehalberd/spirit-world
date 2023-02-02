@@ -25,10 +25,10 @@ export * from 'app/content/zones/skyPalace';
 export * from 'app/content/zones/grandTemple';
 export * from 'app/content/zones/grandTempleWater';
 export * from 'app/content/zones/grandTemple2';
+export * from 'app/content/zones/holySanctum';
 export * from 'app/content/zones/fireSanctum';
 export * from 'app/content/zones/lightningSanctum';
 export * from 'app/content/zones/iceSanctum';
-export * from 'app/content/zones/iceSanctumWater';
 // jade palace
 export * from 'app/content/zones/riverTemple';
 export * from 'app/content/zones/riverTempleWater';

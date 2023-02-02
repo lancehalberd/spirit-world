@@ -8,7 +8,7 @@ import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 
 import {
     AreaInstance, Direction, DrawPriority, EffectInstance, Frame, FrameAnimation,
-    GameState, HitProperties, MagicElement, ObjectInstance,
+    GameState, HitProperties, MagicElement, ObjectInstance, Projectile
 } from 'app/types';
 
 const upGeometry = {w: 16, h: 16, content: {x: 4, y: 0, w: 7, h: 5}};
@@ -175,7 +175,7 @@ interface Props {
     style?: ArrowStyle
 }
 
-export class Arrow implements EffectInstance {
+export class Arrow implements EffectInstance, Projectile {
     area: AreaInstance;
     drawPriority: DrawPriority = 'sprites';
     frame: Frame;
@@ -206,6 +206,7 @@ export class Arrow implements EffectInstance {
     } = null;
     style: ArrowStyle = 'normal';
     isPlayerAttack = true;
+    isHigh = false;
     constructor({
         x = 0, y = 0, vx = 0, vy = 0, chargeLevel = 0, damage = 1, 
         spiritCloakDamage = 5, delay = 0, element = null, reflected = false, style = 'normal',
@@ -232,6 +233,12 @@ export class Arrow implements EffectInstance {
     getHitbox() {
         return this;
     }
+    getYDepth() {
+        if (this.isHigh) {
+            return this.y + this.h + 32;
+        }
+        return this.y + this.h;
+    }
     getHitProperties(state: GameState): HitProperties {
         return {
             canPush: true,
@@ -255,6 +262,7 @@ export class Arrow implements EffectInstance {
             hitObjects: true,
             hitTiles: this.animationTime >= this.ignoreWallsDuration,
             isArrow: true,
+            projectile: this,
         };
     }
     update(state: GameState) {
@@ -308,7 +316,7 @@ export class Arrow implements EffectInstance {
             this.direction = getDirection(this.vx, this.vy, true);
             return;
         }
-        if (hitResult.blocked) {
+        if (hitResult.blocked || hitResult.stopped) {
             this.stuckFrames = 1;
             this.blocked = true;
             this.vz = 1;
@@ -408,6 +416,7 @@ export class EnemyArrow extends Arrow {
             hitObjects: true,
             hitTiles: this.animationTime >= this.ignoreWallsDuration,
             isArrow: true,
+            projectile: this,
         };
     }
     update(state: GameState) {
@@ -452,6 +461,7 @@ export class CrystalSpike extends Arrow {
             hitEnemies: this.reflected,
             hitObjects: true,
             hitTiles: this.animationTime >= this.ignoreWallsDuration,
+            projectile: this,
         };
     }
     render(context: CanvasRenderingContext2D, state: GameState) {

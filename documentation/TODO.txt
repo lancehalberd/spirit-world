@@ -39,9 +39,37 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Finish Holy Sanctum
+        - Add lightning sanctum
+            - lightning barriers
+            - turn on conveyer belts with lightning?
+            - lightning crystal switches
+            - peach piece behind challenging platform puzzle similar to tower puzzle (easier with roll 2 or staff + lightning badge)
+                - probably moving platforms as I don't want to require cloud boots for this
+        - Add ice sanctum
+            - Add spirit draining effect from waterfall tower + make dark (true sight helps)
+            - freeze water to push a ball over (no skipping with staff/clones)
+            - freeze water to avoid vortex monsters
+            - slippery ice maze with spikes and pits (use fire or iron boots to prevent slipping)
+        - Add back of sanctum with big key
+            - Include hybrid material/spirt world puzzles
+        - Add sanctum tower with bow in big chest
+            - Include hybrid material/spirt world puzzles
+        - Add paths to back of sanctum that require small keys and level 2 bow, and double back to the main area with switches to open the back door
+        - Add final sanctum areas + boss + phoenix crown
+            - Include hybrid material/spirt world puzzles
+        - Add peach piece to fire sanctum
+            - true sight makes the piece obvious
+            - requires using spirit sight to solve a puzzle in the alternate world, probably a hidden ball goal in the final room.
+
+    - Add true sight indicators to buried eyes in the waterfall tower, including during the boss fight.
+
     - Improve projectile interactions
-        - Set stopX/Y when stopping a projectile which will prevent them from appearing to go through cliffs.
-        - Set raised/lowered on hitResult that indicate the projectile went up or down a ledge.
+        - Set stopX/Y when stopping a projectile which will prevent them from appearing to into cliffs/walls that they hit.
+            - if stopX > hitbox.x and direction is left, adjust x by the difference, similarly for other directions.
+        - Creating a projectile while standing over a ledge won't register it is high because it never hits the ledge.
+            - Maybe add a function that runs hits for 8px before the projectiles starting position that we run when it is
+            created to set isHigh, then clear passedLedgeTiles in case that was set to avoid accidentally throwing up ledges.
 
     - Projectiles should be able to shoot down over solid ledges, but not up them
         - Make solid ledges actually ledges but prevent jumping over them

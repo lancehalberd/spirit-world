@@ -296,6 +296,9 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
             if (hero.chargeTime >= 400) {
                 hero.burstBarrier(state);
                 state.hero.magic -= 10;
+                if (state.hero.element) {
+                    state.hero.magic -= 10;
+                }
                 state.hero.increasedMagicRegenCooldown(500);
                 if (hero.activeTools.cloak >= 2) {
                     hero.isInvisible = true;

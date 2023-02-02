@@ -381,6 +381,10 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
         if (hit.ignoreTargets?.has(object)) {
             continue;
         }
+        // Projectiles from high attacks ignore anything that isn't very tall.
+        if (hit.projectile?.isHigh && !object.behaviors?.isVeryTall) {
+            continue;
+        }
         // If the hit specifies a z range, skip objects outside of the range.
         if (hit.zRange) {
             const z = object.z || 0;
@@ -462,9 +466,48 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
     if (hit.hitTiles && hit.hitCircle) {
         hitTiles = [...hitTiles, ...getTilesInCircle(area, hit.hitCircle)];
     }
+    let setProjectileHigh = false, setProjectileLow = false;
+    if (hit.projectile?.isHigh) {
+        hit.projectile.passedLedgeTiles = [];
+    }
     // TODO: Get tiles hit by ray
     for (const target of hitTiles) {
         const behavior = area.behaviorGrid?.[target.y]?.[target.x];
+        // Projectiles from high attacks ignore anything that isn't very tall or a ledge.
+        if (hit.projectile?.isHigh) {
+            const direction = (hit.vx || hit.vy) ? getDirection(hit.vx, hit.vy, true) : null;
+            hit.projectile.passedLedgeTiles.push(target);
+            if (!setProjectileLow && (
+                (direction === 'upleft' && (behavior?.ledges?.down || behavior?.ledges?.right || behavior?.diagonalLedge === 'downright'))
+                || (direction === 'up' && (behavior?.ledges?.down || behavior?.diagonalLedge === 'downleft' || behavior?.diagonalLedge === 'downright'))
+                || (direction === 'upright' && (behavior?.ledges?.down || behavior?.diagonalLedge === 'downleft' || behavior?.ledges?.left))
+                || (direction === 'downleft' && (behavior?.ledges?.up || behavior?.ledges?.right || behavior?.diagonalLedge === 'upright'))
+                || (direction === 'down' && (behavior?.ledges?.up || behavior?.diagonalLedge === 'upleft' || behavior?.diagonalLedge === 'upright'))
+                || (direction === 'downright' && (behavior?.ledges?.up || behavior?.diagonalLedge === 'upleft' || behavior?.ledges?.left))
+                || (direction === 'left' && (behavior?.ledges?.right || behavior?.diagonalLedge === 'downright' || behavior?.diagonalLedge === 'upright'))
+                || (direction === 'right' && (behavior?.ledges?.left || behavior?.diagonalLedge === 'downleft' || behavior?.diagonalLedge === 'upleft'))
+            )) {
+                setProjectileLow = true;
+            }
+            // Ignore tiles that are not very tall.
+            if (!behavior?.isVeryTall) {
+                continue;
+            }
+        } else if (hit.projectile && !setProjectileHigh) {
+            // Check if this projectile is going down over a cliff and set isHigh to true if so.
+            const direction = (hit.vx || hit.vy) ? getDirection(hit.vx, hit.vy, true) : null;
+            if ((direction === 'downright' && (behavior?.ledges?.down || behavior?.ledges?.right || behavior?.diagonalLedge === 'downright'))
+                || (direction === 'down' && (behavior?.ledges?.down || behavior?.diagonalLedge === 'downleft' || behavior?.diagonalLedge === 'downright'))
+                || (direction === 'downleft' && (behavior?.ledges?.down || behavior?.diagonalLedge === 'downleft' || behavior?.ledges?.left))
+                || (direction === 'upright' && (behavior?.ledges?.up || behavior?.ledges?.right || behavior?.diagonalLedge === 'upright'))
+                || (direction === 'up' && (behavior?.ledges?.up || behavior?.diagonalLedge === 'upleft' || behavior?.diagonalLedge === 'upright'))
+                || (direction === 'upleft' && (behavior?.ledges?.up || behavior?.diagonalLedge === 'upleft' || behavior?.ledges?.left))
+                || (direction === 'right' && (behavior?.ledges?.right || behavior?.diagonalLedge === 'downright' || behavior?.diagonalLedge === 'upright'))
+                || (direction === 'left' && (behavior?.ledges?.left || behavior?.diagonalLedge === 'downleft' || behavior?.diagonalLedge === 'upleft'))
+            ) {
+                setProjectileHigh = true;
+            }
+        }
         // Ice hits that effect tiles cover them in ice as long as they aren't pits or walls.
         if (hit.element === 'ice' && typeof behavior?.elementTiles?.fire === 'undefined'
             // Cannot freeze ground in hot areas.
@@ -534,14 +577,16 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
                 && (!behavior?.low || hit.cutsGround)
                 && (!behavior?.isSouthernWall || (direction !== 'down' && direction !== 'downleft' && direction !== 'downright'))
             )
-            || (direction === 'upleft' && (behavior?.ledges?.down || behavior?.ledges?.right || behavior?.diagonalLedge === 'downright'))
-            || (direction === 'up' && (behavior?.ledges?.down || behavior?.diagonalLedge === 'downleft' || behavior?.diagonalLedge === 'downright'))
-            || (direction === 'upright' && (behavior?.ledges?.down || behavior?.diagonalLedge === 'downleft' || behavior?.ledges?.left))
-            || (direction === 'downleft' && (behavior?.ledges?.up || behavior?.ledges?.right || behavior?.diagonalLedge === 'upright'))
-            || (direction === 'down' && (behavior?.ledges?.up || behavior?.diagonalLedge === 'upleft' || behavior?.diagonalLedge === 'upright'))
-            || (direction === 'downright' && (behavior?.ledges?.up || behavior?.diagonalLedge === 'upleft' || behavior?.ledges?.left))
-            || (direction === 'left' && (behavior?.ledges?.right || behavior?.diagonalLedge === 'downright' || behavior?.diagonalLedge === 'upright'))
-            || (direction === 'right' && (behavior?.ledges?.left || behavior?.diagonalLedge === 'downleft' || behavior?.diagonalLedge === 'upleft'))
+            || (!hit.projectile?.passedLedgeTiles?.find(t => t.x === target.x && t.y === target.y) && (
+                (direction === 'upleft' && (behavior?.ledges?.down || behavior?.ledges?.right || behavior?.diagonalLedge === 'downright'))
+                || (direction === 'up' && (behavior?.ledges?.down || behavior?.diagonalLedge === 'downleft' || behavior?.diagonalLedge === 'downright'))
+                || (direction === 'upright' && (behavior?.ledges?.down || behavior?.diagonalLedge === 'downleft' || behavior?.ledges?.left))
+                || (direction === 'downleft' && (behavior?.ledges?.up || behavior?.ledges?.right || behavior?.diagonalLedge === 'upright'))
+                || (direction === 'down' && (behavior?.ledges?.up || behavior?.diagonalLedge === 'upleft' || behavior?.diagonalLedge === 'upright'))
+                || (direction === 'downright' && (behavior?.ledges?.up || behavior?.diagonalLedge === 'upleft' || behavior?.ledges?.left))
+                || (direction === 'left' && (behavior?.ledges?.right || behavior?.diagonalLedge === 'downright' || behavior?.diagonalLedge === 'upright'))
+                || (direction === 'right' && (behavior?.ledges?.left || behavior?.diagonalLedge === 'downleft' || behavior?.diagonalLedge === 'upleft'))
+            ))
         ) {
             combinedResult.hit = true;
             combinedResult.pierced = false;
@@ -567,6 +612,11 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
                 }
             }
         }
+    }
+    if (setProjectileLow) {
+        hit.projectile.isHigh = false;
+    } else if (setProjectileHigh) {
+        hit.projectile.isHigh = true;
     }
 
     return combinedResult;

@@ -1,5 +1,5 @@
 import { destroyTile } from 'app/utils/destroyTile';
-import { boxesIntersect } from 'app/utils/index';
+import { boxesIntersect, pad } from 'app/utils/index';
 
 import { GameState, Hero } from 'app/types';
 
@@ -7,8 +7,19 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
     if (!hero.area) {
         return;
     }
+    hero.groundHeight = 0;
+    const hitbox = hero.getHitbox(state);
+    for (const entity of [...hero.area.objects, ...hero.area.effects]) {
+        if (!(entity.behaviors?.groundHeight > hero.groundHeight)) {
+            continue;
+        }
+        // The padding here needs to match any used for other interactions with this object,
+        // in particular, movingPlatform padding should match this.
+        if (boxesIntersect(pad(entity.getHitbox(state), 4), hitbox)) {
+            hero.groundHeight = entity.behaviors?.groundHeight;
+        }
+    }
     const tileSize = 16;
-    const hitbox = hero.getHitbox(state)
 
     let leftColumn = Math.floor((hero.x + 4) / tileSize);
     let rightColumn = Math.floor((hero.x + hero.w - 5) / tileSize);
@@ -23,7 +34,6 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
     hero.slipping = hero.equippedBoots === 'cloudBoots';
     let fallingTopLeft = false, fallingTopRight = false, fallingBottomLeft = false, fallingBottomRight = false;
     let startClimbing = false;
-    hero.groundHeight = 0;
     // Apply floor effects from objects/effects.
     for (const entity of [...hero.area.objects, ...hero.area.effects]) {
         if (entity.getHitbox && entity.behaviors?.groundHeight > hero.groundHeight) {

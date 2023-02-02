@@ -14,6 +14,12 @@ export function isMovementBlocked(
     isAbove: boolean,
     movementProperties: MovementProperties
 ): false | {object?: ObjectInstance | EffectInstance} {
+    // This is not currently used.
+    /*for (const box of (movementProperties.blockedBoxes || [])) {
+        if (isPixelInShortRect(x, y, box)) {
+            return {};
+        }
+    }*/
     if (isAbove && !behaviors?.isVeryTall) {
         return false;
     }
@@ -60,7 +66,7 @@ export function isMovementBlocked(
             continue;
         }
         const behaviors = getObjectBehaviors(state, object);
-        if (object.getHitbox && behaviors?.solid) {
+        if (object.getHitbox && (behaviors?.solid || behaviors?.groundHeight > movementProperties.maxHeight)) {
             if (isPixelInShortRect(x, y, object.getHitbox(state))) {
                 return { object };
             }
@@ -81,6 +87,9 @@ export function isMovementBlocked(
             }
         }
         // Would need additional checks here for objects with water/lava/brittle behaviors.
+    }
+    if (behaviors?.groundHeight > movementProperties.maxHeight) {
+        return {};
     }
     if (behaviors?.water && !(movementProperties.canSwim || movementProperties.mustSwim)) {
         return {};

@@ -367,6 +367,7 @@ export class Hero implements Actor, SavedHeroData {
         const barrierBurst = new BarrierBurstEffect({
             x: this.x + 8,
             y: this.y + 8,
+            element: this.element,
         });
         addEffectToArea(state, this.area, barrierBurst);
     }

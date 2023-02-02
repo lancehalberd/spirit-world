@@ -33,6 +33,11 @@ export function getFullZoneLocation(location: ZoneLocation): FullZoneLocation {
         logicalZoneKey = isSpiritWorld ? 'jadeCityInterior' : 'holyCityInterior';
     }  else if (zoneKey === 'warTemple') {
         logicalZoneKey = isSpiritWorld ? 'warPalace' : 'warTemple';
+    } else if (
+        zoneKey === 'holySanctum'
+        || zoneKey === 'fireSanctum' || zoneKey === 'lightningSanctum' || zoneKey === 'iceSanctum'
+    ) {
+        logicalZoneKey = 'holySanctum';
     }
     return {
         ...location,

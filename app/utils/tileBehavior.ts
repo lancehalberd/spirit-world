@@ -34,6 +34,20 @@ export function applyBehaviorToTile(area: AreaInstance, x: number, y: number, be
     area.behaviorGrid[y][x] = {...area.behaviorGrid[y][x], ...behavior};
 }
 
+export function applyLedgesToBehaviorGridTile(behaviorGrid: TileBehaviors[][], x: number, y: number, ledges: TileBehaviors['ledges']): void {
+    if (!behaviorGrid[y]) {
+        behaviorGrid[y] = [];
+    }
+    if (!behaviorGrid[y][x]) {
+        behaviorGrid[y][x] = {};
+    }
+    if (!behaviorGrid[y][x].ledges) {
+        behaviorGrid[y][x].ledges = ledges
+    } else {
+        behaviorGrid[y][x].ledges = {...behaviorGrid[y][x].ledges, ...ledges};
+    }
+}
+
 export function applyTileToBehaviorGrid(behaviorGrid: TileBehaviors[][], {x, y}: Tile, tile: FullTile, isForeground: boolean): void {
     const behaviors = tile.behaviors;
     // Tiles 0/1 are the null and empty tile and should not impact the tile behavior.
@@ -70,5 +84,20 @@ export function applyTileToBehaviorGrid(behaviorGrid: TileBehaviors[][], {x, y}:
         for (let row = 0; row < 16; row++) {
             behaviorGrid[y][x].solidMap[row] = baseSolidMap[row] | behaviors.solidMap[row];
         }
+    }
+    // It is convenient for the projectile hit detection system to assume that ledges are always defined as going down
+    // from the current tile into the adjacent tile, so we conver all false ledges (which are used to specify the reverse direction)
+    // to setting true ledges on the tile they are next to.
+    if (behaviors.ledges?.up === false && y > 0) {
+        applyLedgesToBehaviorGridTile(behaviorGrid, x, y - 1, {down: true});
+    }
+    if (behaviors.ledges?.down === false && y < behaviorGrid.length - 1) {
+        applyLedgesToBehaviorGridTile(behaviorGrid, x, y + 1, {up: true});
+    }
+    if (behaviors.ledges?.left === false && x > 0) {
+        applyLedgesToBehaviorGridTile(behaviorGrid, x - 1, y, {right: true});
+    }
+    if (behaviors.ledges?.right === false && x < behaviorGrid[0].length - 1) {
+        applyLedgesToBehaviorGridTile(behaviorGrid, x + 1, y, {left: true});
     }
 }

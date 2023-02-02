@@ -851,6 +851,12 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
     ladderUp: {
         w: 16,
         h: 32,
+        getHitbox(door: Door) {
+            // Making this ladder narrow prevents climbing down it from the sides, but
+            // has little impact climbing up since the tiles force the hero to the
+            // center of the ladder.
+            return {x: door.x + 6, y: door.y, w: 4, h: 32};
+        },
         render(this: void, context, state, door) {
             if (door.status !== 'normal') {
                 return;

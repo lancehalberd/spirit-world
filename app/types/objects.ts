@@ -201,10 +201,14 @@ export type ObjectStatus = 'active' | 'closed' | 'closedEnemy' | 'closedSwitch'
 
 export interface MovementProperties {
     boundingBox?: false | Rect
+    // Can set an arbitrary array of rectangles that block this movement.
+    blockedBoxes?: Rect[]
     canPush?: boolean
     canFall?: boolean
     canSwim?: boolean
     canMoveInLava?: boolean
+    // If this is set this object cannot cross ground greater than this height.
+    maxHeight?: number
     // Enemies with this prop can only move in deep water.
     mustSwim?: boolean
     canClimb?: boolean
@@ -229,6 +233,26 @@ export interface MovementProperties {
     dy?: number
 }
 
+export interface Projectile {
+    // Set when the projectile passes over a ledge from high to low.
+    // Once this is set the projectile can only hit objects marked very tall
+    // and it can pass up ledges from low to high, which unsets the flag.
+    isHigh?: boolean
+    // This array of tile coordinates gets set to have their ledges ignored when a high
+    // projectile passes up a ledge. This is done to prevent the same ledges from blocking
+    // the projectile a frame later if it is still on the same tile.
+    passedLedgeTiles?: {x: number, y: number}[]
+    // Method for getting the hitbox of the projectile and used for adjusting
+    // the coordinates of the projectile if it becomes stopped by hitting something.
+    getHitbox: () => Rect
+    // The coordinates of the projectile, which may be set during hit detection to
+    // stop the projectile at a solid boundary since projectiles may move multiple
+    // pixels a frame and run hit detection inside of solid objects.
+    x: number
+    y: number
+    // Set if the projectile has been stopped by a barrier
+    stopped?: boolean
+}
 
 export interface Ray {
     x1: number
@@ -299,6 +323,10 @@ export interface HitProperties {
     // We may need to make this more specific in the future, perhaps record the
     // tile index here, and then enemies can check for certain sets of indeces.
     isThrownObject?: boolean
+    // If defined this hit will apply special projectile only logic like only checking very tall objects/tile
+    // if the project is flagged with `isHigh`, and the hit logic may set certain properties like
+    // `isHigh` or `stopX`/`stopY` on the projectile directly.
+    projectile?: Projectile
 }
 
 export interface HitResult {
@@ -499,7 +527,14 @@ export interface SimpleMovementDefinition {
     turn: 'left' | 'right' | 'bounce'
 }
 
-export interface SpikeBallDefinition extends BaseObjectDefinition, SimpleMovementDefinition{
+
+export interface MovingPlatformDefinition extends BaseObjectDefinition, SimpleMovementDefinition {
+    type: 'movingPlatform'
+    w: number
+    h: number
+}
+
+export interface SpikeBallDefinition extends BaseObjectDefinition, SimpleMovementDefinition {
     type: 'spikeBall'
 }
 
@@ -538,6 +573,7 @@ export type ObjectDefinition = SimpleObjectDefinition
     | KeyBlockDefinition
     | LootObjectDefinition
     | MarkerDefinition
+    | MovingPlatformDefinition
     | NarrationDefinition
     | NPCDefinition
     | SignDefinition

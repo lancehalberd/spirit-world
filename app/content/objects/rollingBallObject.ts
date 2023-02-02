@@ -106,8 +106,8 @@ export class RollingBallObject implements ObjectInstance {
             this.animationTime += FRAME_LENGTH;
             const dx = 2 * directionMap[this.rollDirection][0];
             const dy = 2 * directionMap[this.rollDirection][1];
-            const x = this.x + dx + (this.rollDirection === 'right' ? 15 : 0);
-            const y = this.y + dy + (this.rollDirection === 'down' ? 15 : 0);
+            const x = this.x + dx + (this.rollDirection === 'right' ? 15 : 1);
+            const y = this.y + dy + (this.rollDirection === 'down' ? 15 : 1);
             for (const object of this.area.objects) {
                 if (object.definition?.type !== 'ballGoal') {
                     continue;
@@ -139,11 +139,11 @@ export class RollingBallObject implements ObjectInstance {
             const bigHitbox = { x: this.x, y: this.y, w: 16, h: 16 };
             if (dx) {
                 bigHitbox.w += 2;
-                bigHitbox.x -= dx / 2;
+                bigHitbox.x--;
             }
             if (dy) {
                 bigHitbox.h += 2;
-                bigHitbox.y -= dy / 2;
+                bigHitbox.y--;
             }
             hitTargets(state, this.area, {
                 canPush: true,

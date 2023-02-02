@@ -12,6 +12,7 @@ export * from 'app/content/objects/indicator';
 export * from 'app/content/objects/keyBlock';
 export * from 'app/content/objects/lightningBarrier';
 export * from 'app/content/objects/marker';
+export * from 'app/content/objects/movingPlatform';
 export * from 'app/content/objects/narration';
 export * from 'app/content/objects/npc';
 export * from 'app/content/objects/pitEntrance';
