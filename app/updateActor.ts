@@ -245,10 +245,8 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
         }
     }
     const isHoldingBreath = !state.hero.passiveTools.waterBlessing && state.zone.surfaceKey;
-    // The waterfall tower area drains mana unless you have the water blessing.
-    // Might make more sense to have this related to the water tiles in the material world or have
-    // it be configurable on the area like `darkness` but for now just using the zone key is fine.
-    const isWaterDrainingMagic = !state.hero.passiveTools.waterBlessing && state.zone.key === 'waterfallTower';
+    // Corrosive areas drain mana unless you have the water blessing.
+    const isWaterDrainingMagic = !state.hero.passiveTools.waterBlessing && hero.area.isCorrosive;
     if (activeAirBubbles) {
         // "airBubbles" are actually going to be "Spirit Recharge" points that regenerate mana quickly.
         state.hero.magic = Math.max(0, state.hero.magic);

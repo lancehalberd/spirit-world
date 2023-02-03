@@ -48,7 +48,7 @@ export class SaveStatue implements ObjectInstance {
         if (hero.isAstralProjection) {
             return;
         }
-        // Remove the grab action since the hero is reading the sign, not grabbing it.
+        // Remove the grab action since the hero is interacting with the statue, not grabbing it.
         hero.action = null;
         setSpawnLocation(state, {
             ...state.location,
@@ -56,7 +56,7 @@ export class SaveStatue implements ObjectInstance {
             y: this.y + 16,
         });
         state.hero.life = state.hero.maxLife;
-        if (state.location.zoneKey !== 'waterfallTower' || state.hero.passiveTools.waterBlessing) {
+        if (!this.area.isCorrosive || state.hero.passiveTools.waterBlessing) {
             state.hero.magic = state.hero.maxMagic;
             state.hero.magicRegenCooldown = 0;
         }

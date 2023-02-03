@@ -9,12 +9,13 @@ import {
     accelerateInDirection,
     moveEnemy,
 } from 'app/utils/enemies';
+import { removeObjectFromArea } from 'app/utils/objects';
 import {
     getVectorToNearbyTarget,
     getVectorToTarget,
 } from 'app/utils/target';
 
-import { Enemy, GameState } from 'app/types';
+import { Enemy, GameState, HitProperties } from 'app/types';
 
 const poolAnimation = createAnimation('gfx/tiles/deeptoshallowwater.png', {w: 16, h: 16}, {x: 3, y: 0});
 
@@ -49,7 +50,7 @@ enemyDefinitions.vortex = {
                 return;
             }
             // Vortexes on the surface only suck heroes towards them that are swimming.
-            if (!vortexIsUnderwater && !hero.swimming) {
+            if (!vortexIsUnderwater && !(hero.swimming || hero.wading)) {
                 continue
             }
             const { mag, x, y } = getVectorToTarget(state, enemy, hero);
@@ -86,7 +87,10 @@ enemyDefinitions.vortex = {
             }
         }
     },
-    onHit() {
+    onHit(state: GameState, enemy: Enemy, hit: HitProperties) {
+        if (hit.element === 'ice') {
+            removeObjectFromArea(state, enemy);
+        }
         return {};
     },
     getHitbox(enemy: Enemy) {

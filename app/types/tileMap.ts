@@ -260,6 +260,7 @@ export interface AreaDefinition {
     // 0/undefined = fully lit, 100 = pitch black.
     dark?: number
     hotLogic?: LogicDefinition
+    corrosiveLogic?: LogicDefinition
     // Spirit world areas with real counterparts have this reference set
     // to make it more convenient to translate real tiles/objects to the spirit world.
     parentDefinition?: AreaDefinition
@@ -329,6 +330,9 @@ export interface AreaInstance {
     enemyTargets: (EffectInstance | ObjectInstance)[]
     neutralTargets: (EffectInstance | ObjectInstance)[]
     isHot?: boolean
+    // This flag causes the hero to lose spirit energy over time unless they have the water blessing.
+    // It is mainly used in waterfall tower, but is also used in the Ice portion of the Holy Sanctum.
+    isCorrosive?: boolean
     needsLogicRefresh?: boolean
 }
 

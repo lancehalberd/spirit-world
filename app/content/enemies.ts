@@ -4,7 +4,6 @@ import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { EnemyArrow, spiritArrowIcon } from 'app/content/effects/arrow';
 import { GrowingThorn } from 'app/content/effects/growingThorn';
 import { GroundSpike } from 'app/content/effects/groundSpike';
-
 import {
     beetleAnimations,
     climbingBeetleAnimations,
@@ -18,6 +17,7 @@ import {
     snakeAnimations,
 } from 'app/content/enemyAnimations';
 import { certainLifeLootTable, simpleLootTable, lifeLootTable, moneyLootTable } from 'app/content/lootTables';
+import { renderIndicator } from 'app/content/objects/indicator';
 import { editingState } from 'app/development/editingState';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { drawFrameAt, drawFrameCenteredAt } from 'app/utils/animations';
@@ -317,6 +317,9 @@ enemyDefinitions.floorEye = {
     canBeKnockedBack: false,
     renderShadow(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
         if (isUnderTile(state, enemy)) {
+            if (state.hero.passiveTools.trueSight) {
+                renderIndicator(context, enemy.getHitbox(), enemy.animationTime);
+            }
             return;
         }
         // Draw the dead frame behind the enemy, so the background doesn't flash when

@@ -40,17 +40,8 @@ Graphics:
 
 Current tasks:
     - Finish Holy Sanctum
-        - Add lightning sanctum
-            - lightning barriers
-            - turn on conveyer belts with lightning?
-            - lightning crystal switches
-            - peach piece behind challenging platform puzzle similar to tower puzzle (easier with roll 2 or staff + lightning badge)
-                - probably moving platforms as I don't want to require cloud boots for this
         - Add ice sanctum
-            - Add spirit draining effect from waterfall tower + make dark (true sight helps)
             - freeze water to push a ball over (no skipping with staff/clones)
-            - freeze water to avoid vortex monsters
-            - slippery ice maze with spikes and pits (use fire or iron boots to prevent slipping)
         - Add back of sanctum with big key
             - Include hybrid material/spirt world puzzles
         - Add sanctum tower with bow in big chest
@@ -61,8 +52,10 @@ Current tasks:
         - Add peach piece to fire sanctum
             - true sight makes the piece obvious
             - requires using spirit sight to solve a puzzle in the alternate world, probably a hidden ball goal in the final room.
-
-    - Add true sight indicators to buried eyes in the waterfall tower, including during the boss fight.
+        - Add peach piece to lightning sanctum
+            - behind challenging platform puzzle similar to tower puzzle (easier with roll 2 or staff + lightning badge)
+                - probably moving platforms as I don't want to require cloud boots for this
+        - Add peach piece to ice sanctum
 
     - Improve projectile interactions
         - Set stopX/Y when stopping a projectile which will prevent them from appearing to into cliffs/walls that they hit.

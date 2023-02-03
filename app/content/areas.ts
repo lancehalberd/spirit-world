@@ -338,7 +338,9 @@ export function applyLayerToBehaviorGrid(behaviorGrid: TileBehaviors[][], layer:
             const behaviors = allTiles[tile]?.behaviors;
             // The behavior grid combines behaviors of all layers, with higher layers
             // overriding the behavior of lower layers.
-            if (behaviors) {
+            // Masked tiles are assumed to set no behaviors as they mostly just show the tiles
+            // underneath them.
+            if (behaviors && !layer.mask?.tiles?.[y]?.[x]) {
                 applyTileToBehaviorGrid(behaviorGrid, {x, y}, allTiles[tile], isForeground);
             }
         }
@@ -479,6 +481,7 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
         object => isObjectLogicValid(state, object)
     ).map(o => addObjectToArea(state, instance, createObjectInstance(state, o)));
     instance.isHot = evaluateLogicDefinition(state, instance.definition.hotLogic, false);
+    instance.isCorrosive = evaluateLogicDefinition(state, instance.definition.corrosiveLogic, false);
     if (definition.specialBehaviorKey) {
         const specialBehavior = specialBehaviorsHash[definition.specialBehaviorKey] as SpecialAreaBehavior;
         specialBehavior?.apply(state, instance);

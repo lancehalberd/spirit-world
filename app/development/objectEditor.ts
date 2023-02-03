@@ -816,7 +816,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             });
             rows = [
                 ...rows,
-                ...getLogicProperties(state, 'Force Open?', object.openLogic || {}, updatedLogic => {
+                ...getLogicProperties(state, 'Force Open?', object.openLogic, updatedLogic => {
                     object.openLogic = updatedLogic;
                     updateObjectInstance(state, object);
                     editingState.needsRefresh = true;

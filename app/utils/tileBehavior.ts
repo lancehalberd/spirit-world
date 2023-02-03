@@ -13,6 +13,10 @@ export function resetTileBehavior(area: AreaInstance, {x, y}: Tile): void {
             continue;
         }
         const isForeground = (layer.definition.drawPriority ?? layer.definition.key) === 'foreground';
+        // Masked tiles are assumed not to set any behaviors as they are mostly hidden by the mask.
+        if (layer.definition.mask?.tiles?.[y]?.[x]) {
+            continue;
+        }
         // The behavior grid combines behaviors of all layers, with higher layers
         // overriding the behavior of lower layers.
         if (tile.behaviors) {
@@ -48,7 +52,12 @@ export function applyLedgesToBehaviorGridTile(behaviorGrid: TileBehaviors[][], x
     }
 }
 
-export function applyTileToBehaviorGrid(behaviorGrid: TileBehaviors[][], {x, y}: Tile, tile: FullTile, isForeground: boolean): void {
+export function applyTileToBehaviorGrid(
+    behaviorGrid: TileBehaviors[][],
+    {x, y}: Tile,
+    tile: FullTile,
+    isForeground: boolean,
+): void {
     const behaviors = tile.behaviors;
     // Tiles 0/1 are the null and empty tile and should not impact the tile behavior.
     if (!behaviors || tile.index < 2) {
@@ -71,6 +80,15 @@ export function applyTileToBehaviorGrid(behaviorGrid: TileBehaviors[][], {x, y}:
     // sky behavior that has this behavior instead of pits.
     if (!isForeground && behaviorGrid[y]?.[x]?.pit && !behaviors.pit && behaviors.isGround !== false) {
         delete behaviorGrid[y][x].pit;
+    }
+    if (!isForeground && behaviorGrid[y]?.[x]?.shallowWater && !behaviors.shallowWater && behaviors.isGround !== false) {
+        delete behaviorGrid[y][x].shallowWater;
+    }
+    if (!isForeground && behaviorGrid[y]?.[x]?.water && !behaviors.water && behaviors.isGround !== false) {
+        delete behaviorGrid[y][x].water;
+    }
+    if (!isForeground && behaviorGrid[y]?.[x]?.slippery && !behaviors.slippery && behaviors.isGround !== false) {
+        delete behaviorGrid[y][x].slippery;
     }
     if (!isForeground && behaviorGrid[y]?.[x]?.cloudGround && !behaviors.cloudGround) {
         delete behaviorGrid[y][x].cloudGround;

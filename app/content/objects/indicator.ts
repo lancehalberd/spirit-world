@@ -61,20 +61,23 @@ export class Indicator implements ObjectInstance {
         if (this.status !== 'normal' || !(state.hero.passiveTools.trueSight || editingState.isEditing)) {
             return;
         }
-        const hitbox = this.getHitbox();
-        const pBase = 1 - (this.animationTime % 2000) / 2000;
-        //const pBase = 0.5 + 0.3 * Math.cos(this.animationTime / 1000);
-        for (let i = 0; i < 3; i++) {
-            const p = (pBase + i * 0.25) % 1;
-            const r = 16 - 16 * p;
-            context.fillStyle = '#d838ff';
-            context.save();
-                context.globalAlpha *= 0.6 * p;
-                context.beginPath();
-                context.arc(hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2, r, 0, 2 * Math.PI);
-                context.fill();
-            context.restore();
-        }
+        renderIndicator(context, this.getHitbox(), this.animationTime);
     }
 }
 objectHash.indicator = Indicator;
+
+export function renderIndicator(context: CanvasRenderingContext2D, target: Rect, animationTime: number): void {
+    const pBase = 1 - (animationTime % 2000) / 2000;
+    //const pBase = 0.5 + 0.3 * Math.cos(this.animationTime / 1000);
+    for (let i = 0; i < 3; i++) {
+        const p = (pBase + i * 0.25) % 1;
+        const r = 16 - 16 * p;
+        context.fillStyle = '#d838ff';
+        context.save();
+            context.globalAlpha *= 0.6 * p;
+            context.beginPath();
+            context.arc(target.x + target.w / 2, target.y + target.h / 2, r, 0, 2 * Math.PI);
+            context.fill();
+        context.restore();
+    }
+}
