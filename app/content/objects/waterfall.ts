@@ -32,6 +32,9 @@ export class Waterfall implements ObjectInstance {
     getHitbox(): Rect {
         return {x: this.x, y: this.y - this.h, w: this.w, h: this.h - 8};
     }
+    getYDepth() {
+        return this.y + 8;
+    }
     getParts() {
         return [this.back];
     }
@@ -63,7 +66,7 @@ class WaterfallBack implements ObjectInstance {
         return {x: this.waterfall.x, y: this.waterfall.y - this.waterfall.h, w: this.waterfall.w, h: this.waterfall.h};
     }
     getYDepth(): number {
-        return this.waterfall.y - 16;
+        return this.waterfall.y;
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
         const target = this.getHitbox();
