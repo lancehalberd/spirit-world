@@ -11,6 +11,7 @@ export * from 'app/content/zones/caves';
 export * from 'app/content/zones/holyCityInterior';
 export * from 'app/content/zones/waterfallCave';
 export * from 'app/content/zones/treeVillage';
+export * from 'app/content/zones/cloneCave';
 export * from 'app/content/zones/peachCave';
 export * from 'app/content/zones/peachCaveWater';
 export * from 'app/content/zones/tomb';

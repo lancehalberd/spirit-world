@@ -1,7 +1,6 @@
 import { objectHash } from 'app/content/objects/objectHash';
 import { playAreaSound } from 'app/musicController';
 import { createAnimation, drawFrame } from 'app/utils/animations';
-import { findObjectInstanceById } from 'app/utils/findObjectInstanceById';
 import { rectanglesOverlap } from 'app/utils/index';
 import { toggleTarget, deactivateTargets, getObjectStatus, saveObjectStatus} from 'app/utils/objects';
 import { checkIfAllSwitchesAreActivated } from 'app/utils/switches';
@@ -77,8 +76,7 @@ export class FloorSwitch implements ObjectInstance {
         }
         playAreaSound(state, this.area, 'switch');
         if (this.definition.targetObjectId) {
-            const object = findObjectInstanceById(this.area, this.definition.targetObjectId);
-            toggleTarget(state, object);
+            checkIfAllSwitchesAreActivated(state, this.area, this);
         } else {
             for (const object of this.area.objects) {
                 toggleTarget(state, object);
