@@ -7,6 +7,15 @@ import {
 
 import { AreaDefinition, EntranceDefinition, Zone, ZoneLocation } from 'app/types';
 
+const ignoredZones = [
+    // Leon is working on adding this.
+    'hypeCave',
+    // These zones are in progress.
+    'holySanctum', 'fireSanctum', 'iceSanctum', 'lightningSanctum', 'grandTemple2',
+    // The void cannot be left so do not randomize it for now.
+    'void',
+];
+
 const outsideZones = ['overworld', 'sky', 'underwater'];
 
 // Money maze isn't designed to allow entering from the exit, so just disable this door.
@@ -109,6 +118,9 @@ export function randomizeEntrances(random: typeof SRandom) {
     const allTargetedKeys = new Set<string>();
     const fixedNimbusCloudZones = new Set<string>();
     everyObject((location, zone: Zone, area: AreaDefinition, object) => {
+        if (ignoredZones.includes(zone.key)) {
+            return;
+        }
         if (object.type === 'pitEntrance') {
             if (!object.targetZone || object.targetZone === zone.key) {
                 return;
@@ -124,8 +136,7 @@ export function randomizeEntrances(random: typeof SRandom) {
         if (!object.targetZone || object.targetZone === zone.key) {
             return;
         }
-        // The void cannot be left so do not randomize it for now.
-        if (object.targetZone === 'void' || zone.key === 'void') {
+        if (ignoredZones.includes(object.targetZone)) {
             return;
         }
         const key = `${zone.key}:${object.id}`;
