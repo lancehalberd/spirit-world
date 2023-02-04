@@ -80,9 +80,9 @@ export class RollingBallObject implements ObjectInstance {
         }
         const x = this.x + 8 + 16 * directionMap[direction][0];
         const y = this.y + 8 + 16 * directionMap[direction][1];
-        const excludedObjects = new Set([this, state.hero, state.hero.astralProjection, ...state.hero.clones]);
-        if (isPointOpen(state, this.area, {x, y}, {canFall: true}, excludedObjects)
-            && (!this.linkedObject || isPointOpen(state, this.linkedObject.area, {x, y}, {canFall: true}, excludedObjects))
+        const movementProperties = {canFall: true, canSwim: true, needsFullTile: true};
+        if (isPointOpen(state, this.area, {x, y}, movementProperties)
+            && (!this.linkedObject || isPointOpen(state, this.linkedObject.area, {x, y}, movementProperties))
         ) {
             this.rollDirection = direction;
             this.startRollingSound(state);
@@ -169,7 +169,7 @@ export class RollingBallObject implements ObjectInstance {
             // MC + clones do not obstruct rolling balls.
             const excludedObjects = new Set([this, state.hero, state.hero.astralProjection, ...state.hero.clones]);
             const { tileBehavior } = getTileBehaviorsAndObstacles(state, this.area, {x, y}, excludedObjects);
-            if (!tileBehavior.solid && !tileBehavior.outOfBounds) {
+            if (!tileBehavior.solid && !tileBehavior.solidMap && !tileBehavior.outOfBounds) {
                 this.x += dx;
                 this.y += dy;
             } else {

@@ -517,7 +517,7 @@ export function getSwitchTargetProperties(
         ...getTargetObjectIdsByTypesAndArea(state.areaInstance.definition,
             [
                 'door', 'chest', 'loot', 'airBubbles', 'beadGrate', 'beadCascade',
-                'narration',
+                'narration', 'pitEntrance',
                 'teleporter', 'torch', 'escalator', 'anode'
             ]
         )
@@ -816,7 +816,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             });
             rows = [
                 ...rows,
-                ...getLogicProperties(state, 'Force Open?', object.openLogic || {}, updatedLogic => {
+                ...getLogicProperties(state, 'Force Open?', object.openLogic, updatedLogic => {
                     object.openLogic = updatedLogic;
                     updateObjectInstance(state, object);
                     editingState.needsRefresh = true;

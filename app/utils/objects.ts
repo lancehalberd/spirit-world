@@ -155,12 +155,13 @@ export function activateTarget(state: GameState, target: ObjectInstance, playChi
     }
     if (target.status === 'hiddenSwitch') {
         changeObjectStatus(state, target, 'normal');
+        saveObjectStatus(state, target.definition, true);
         if (playChime) {
             playSound(state, 'secretChime');
         }
-    }
-    if (target.status === 'closedSwitch') {
+    } else if (target.status === 'closedSwitch') {
         changeObjectStatus(state, target, 'normal');
+        saveObjectStatus(state, target.definition, true);
         if (playChime) {
             playSound(state, 'secretChime');
         }

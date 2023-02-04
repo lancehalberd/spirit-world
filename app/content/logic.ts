@@ -220,6 +220,7 @@ export const logicHash: {[key: string]: LogicCheck} = {
     cocoonBossDefeated: {
         requiredFlags: ['cocoonBoss'],
     },
+    hasReleasedBeasts,
     frozenLake: {
         // Frozen lake is only displayed after beasts escaped.
         requiredFlags: ['elementalBeastsEscaped'],

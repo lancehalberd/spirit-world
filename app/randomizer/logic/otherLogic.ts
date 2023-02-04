@@ -1,5 +1,5 @@
 import {
-    andLogic, canCross2Gaps,
+    andLogic, canCross2Gaps, hasClone,
     hasBossWeapon, hasWeapon, hasCatEyes, hasFireBlessing, hasInvisibility,
     hasMediumRange, hasMitts, hasSomersault, hasTeleportation,
     orLogic,
@@ -269,6 +269,26 @@ export const cavesNodes: LogicNode[] = [
             { objectId: 'helixEntrance' },
         ],
     },
+
+    // Clone Cave
+    {
+        zoneId: 'cloneCave',
+        nodeId: 'cloneCaveEntrance',
+        checks: [{objectId: 'cloneCaveMoney', logic: hasClone}],
+        paths: [{ nodeId: 'cloneCaveExit'}],
+        entranceIds: ['cloneCaveEntrance'],
+        exits: [
+            { objectId: 'cloneCaveEntrance' },
+        ],
+    },
+    {
+        zoneId: 'cloneCave',
+        nodeId: 'cloneCaveExit',
+        entranceIds: ['cloneCaveExit'],
+        exits: [
+            { objectId: 'cloneCaveExit' },
+        ],
+    },
 ];
 
 
@@ -319,4 +339,3 @@ export const holyCityNodes: LogicNode[] = [
         exits: [{ objectId: 'jadeCitySoutheastDoor'}],
     },
 ];
-

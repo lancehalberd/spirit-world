@@ -7,6 +7,15 @@ import {
 
 import { AreaDefinition, EntranceDefinition, Zone, ZoneLocation } from 'app/types';
 
+const ignoredZones = [
+    // Add in progress zones here so that they don't break the entrance randomizer.
+    'hypeCave',
+    // These zones are part of the 'Holy Sanctum' and should not be randomized.
+    'fireSanctum', 'iceSanctum', 'lightningSanctum',
+    // The void is part of the 'Tree' zone and should not be randomized.
+    'void',
+];
+
 const outsideZones = ['overworld', 'sky', 'underwater'];
 
 // Money maze isn't designed to allow entering from the exit, so just disable this door.
@@ -74,6 +83,9 @@ const connectedExitGroups: ConnectedExitGroup[] = [
     {
         spiritEntranceTargets: ['overworld:forestTempleLadder3', 'overworld:forestTempleLadder4'],
     },
+    {
+        spiritEntranceTargets: ['overworld:cloneCaveEntrance', 'overworld:cloneCaveExit'],
+    },
 ];
 
 // Loopable entrance pairs occur when a zone contains both an entrance and an exit.
@@ -109,6 +121,9 @@ export function randomizeEntrances(random: typeof SRandom) {
     const allTargetedKeys = new Set<string>();
     const fixedNimbusCloudZones = new Set<string>();
     everyObject((location, zone: Zone, area: AreaDefinition, object) => {
+        if (ignoredZones.includes(zone.key)) {
+            return;
+        }
         if (object.type === 'pitEntrance') {
             if (!object.targetZone || object.targetZone === zone.key) {
                 return;
@@ -124,8 +139,7 @@ export function randomizeEntrances(random: typeof SRandom) {
         if (!object.targetZone || object.targetZone === zone.key) {
             return;
         }
-        // The void cannot be left so do not randomize it for now.
-        if (object.targetZone === 'void' || zone.key === 'void') {
+        if (ignoredZones.includes(object.targetZone)) {
             return;
         }
         const key = `${zone.key}:${object.id}`;
@@ -154,14 +168,16 @@ export function randomizeEntrances(random: typeof SRandom) {
             || zone.key === 'lakeTunnel' && object.targetZone === 'helix'
             || zone.key === 'warTemple' && object.targetZone === 'lab'
             || zone.key === 'lab' && object.targetZone === 'tree'
+            || zone.key === 'grandTemple' && object.targetZone === 'gauntlet'
+            || zone.key === 'grandTemple' && object.targetZone === 'holySanctum'
         ) {
-           if (outsideZones.includes(zone.key)) {
+            if (outsideZones.includes(zone.key)) {
                 if (area.isSpiritWorld) {
                    connectedSpiritEntrances.add(targetKey);
                 } else {
                    connectedNormalEntrances.add(targetKey);
-               }
-           }
+                }
+            }
             if (area.isSpiritWorld) {
                 spiritExits.add(targetKey);
             } else {

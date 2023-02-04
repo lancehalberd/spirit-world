@@ -214,7 +214,7 @@ const f0_0x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "fireSanctumEntrance", x: 432, y: 272, type: "door", style: "crystalDownstairs", d: "up", targetZone: "holySanctum", targetObjectId: "fireSanctumEntrance"},
+        {status: "normal", id: "fireSanctumEntrance", x: 432, y: 272, type: "door", style: "crystalDownstairs", d: "up", targetZone: "holySanctum", targetObjectId: "fireSanctumEntrance", locationCue: "Holy Sanctum 2F"},
         {status: "normal", id: "fireSanctum:0:0x0-flameSnake-0", x: 388, y: 460, type: "enemy", enemyType: "flameSnake", d: "down", params: {}},
         {status: "normal", id: "fireSanctum:0:0x0-flameSnake-1", x: 392, y: 364, type: "enemy", enemyType: "flameSnake", d: "down", params: {}},
         {status: "closedSwitch", id: "fireSanctumTorchDoor", x: 112, y: 272, type: "door", style: "crystal", d: "up", saveStatus: "zone"},
@@ -238,7 +238,7 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 352, y: 224, type: "tippable"},
         {status: "normal", id: "", x: 448, y: 208, type: "tippable"},
         {status: "hiddenSwitch", id: "fireSanctumKey", x: 400, y: 112, type: "chest", lootType: "smallKey", lootLevel: 1},
-        {status: "closed", id: "fireSanctumExit", x: 368, y: 16, type: "door", style: "crystalDownstairs", openLogic: {"hasCustomLogic":true,"customLogic":"fireSanctumKey","isInverted":false}, d: "up", targetZone: "holySanctum", targetObjectId: "fireSanctumExit"},
+        {status: "closed", id: "fireSanctumExit", x: 368, y: 16, type: "door", style: "crystalDownstairs", openLogic: {"hasCustomLogic":true,"customLogic":"fireSanctumKey","isInverted":false}, d: "up", targetZone: "holySanctum", targetObjectId: "fireSanctumExit", locationCue: "Holy Sanctum 2F"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},

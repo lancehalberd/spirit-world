@@ -134,7 +134,6 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "bridgeHouse", x: 352, y: 240, type: "door", style: "wooden", targetZone: "overworld", targetObjectId: "overworld:holyCityBridgeHouse", d: "down"},
         {status: "normal", id: "holyCityInterior:0:0x0-npc-1", x: 400, y: 176, d: "left", behavior: "idle", style: "darkMonk", type: "npc", dialogue: "I love being a little outside of town. The hustle and bustle stresses me out."},
         {status: "normal", id: "citySmith", x: 144, y: 64, d: "down", behavior: "idle", style: "zoro", type: "npc", dialogue: "I can upgrade that Chakram!", dialogueKey: "citySmith"},
-        {status: "normal", id: "templeDoor", x: 224, y: 496, type: "door", style: "wooden", targetZone: "overworld", targetObjectId: "templeDoor", d: "down"},
         {status: "normal", id: "holyCityInterior:0:0x0-npc-2", x: 96, y: 160, d: "right", behavior: "idle", style: "midMonk", type: "npc", dialogue: "Tending my flowers makes feel closer to the spirits."},
     ],
     sections: [
@@ -143,7 +142,7 @@ const f0_0x0: AreaDefinition = {
         {x: 0, y: 16, w: 32, h: 16},
     ],
 };
-const f0_0x1: AreaDefinition = {
+const f0_1x0: AreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -285,7 +284,7 @@ const f0_0x1: AreaDefinition = {
         {x: 16, y: 16, w: 16, h: 16},
     ],
 };
-const f0_1x0: AreaDefinition = null;
+const f0_0x1: AreaDefinition = null;
 const f0_1x1: AreaDefinition = {
     layers: [
         {
@@ -659,20 +658,20 @@ const sf0_0x0: AreaDefinition = {
         {x: 0, y: 16, w: 32, h: 16},
     ],
 };
-const sf0_0x1: AreaDefinition = null;
 const sf0_1x0: AreaDefinition = null;
+const sf0_0x1: AreaDefinition = null;
 const sf0_1x1: AreaDefinition = null;
 zones.holyCityInterior = {
     key: 'holyCityInterior',
     floors: [
         {
             grid: [
-                [f0_0x0,f0_0x1,],
-                [f0_1x0,f0_1x1,],
+                [f0_0x0,f0_1x0,],
+                [f0_0x1,f0_1x1,],
             ],
             spiritGrid: [
-                [sf0_0x0,sf0_0x1,],
-                [sf0_1x0,sf0_1x1,],
+                [sf0_0x0,sf0_1x0,],
+                [sf0_0x1,sf0_1x1,],
             ],
         },
     ],

@@ -3,6 +3,7 @@ import { getSpawnLocationContextMenuOption, getTestStateContextMenuOption } from
 import { editingState } from 'app/development/editingState';
 import { toggleEditing } from 'app/development/editor';
 import { tagElement } from 'app/dom';
+import { CANVAS_SCALE } from 'app/gameConstants';
 import { KEY, isKeyboardKeyDown } from 'app/userInput';
 import { showMessage } from 'app/scriptEvents';
 import { getState } from 'app/state';
@@ -109,7 +110,7 @@ class ContextMenu {
 }
 
 export function getContextMenu(): MenuOption[] {
-    return [
+    const options = [
         getSpawnLocationContextMenuOption(),
         getAssistanceMenuOption(),
         getSettingsMenuOption(),
@@ -128,6 +129,22 @@ export function getContextMenu(): MenuOption[] {
             }
         },
     ];
+    if (editingState.isEditing) {
+        options.push({
+            label: 'Log Tile Behaviors',
+            onSelect() {
+                const state = getState();
+                console.log(lastContextClick);
+                const sx = Math.floor((state.camera.x + lastContextClick[0]) / 16);
+                const sy = Math.floor((state.camera.y + lastContextClick[1]) / 16);
+                console.log(sx, sy);
+                console.log(state.areaInstance.behaviorGrid);
+                console.log(state.areaInstance.behaviorGrid?.[sy]?.[sx]);
+            }
+        });
+    }
+
+    return options;
 }
 
 function getAssistanceMenuOption(): MenuOption {
@@ -276,6 +293,8 @@ export function hideContextMenu(): void {
     }
 }
 
+let lastContextClick: number[];
+
 export function addContextMenuListeners(): void {
     document.addEventListener('mouseup', function (event) {
         if (event.which !== 1) {
@@ -292,6 +311,7 @@ export function addContextMenuListeners(): void {
         }
         event.preventDefault();
         const [x, y] = getMousePosition();
+        lastContextClick = getMousePosition(mainCanvas, CANVAS_SCALE);
         const menu = getContextMenu();
         showContextMenu(menu, x, y);
     });

@@ -116,6 +116,9 @@ export function serializeZone(zone: Zone) {
                     if (area.dark) {
                         lines.push(`    dark: ${area.dark},`);
                     }
+                    if (area.corrosiveLogic) {
+                        lines.push(`    corrosiveLogic: ${JSON.stringify(area.corrosiveLogic)},`);
+                    }
                     if (area.hotLogic) {
                         lines.push(`    hotLogic: ${JSON.stringify(area.hotLogic)},`);
                     }

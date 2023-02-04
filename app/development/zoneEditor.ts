@@ -375,7 +375,11 @@ export function getBehaviorProperties(): PanelRows {
             refreshArea(state);
         }
     });
-    rows = [...rows, ...getLogicProperties(state, 'Is Hot?', state.areaInstance.definition.hotLogic || {}, updatedLogic => {
+    rows = [...rows, ...getLogicProperties(state, 'Drains Spirit?', state.areaInstance.definition.corrosiveLogic, updatedLogic => {
+        state.areaInstance.definition.corrosiveLogic = updatedLogic;
+        refreshArea(state);
+    })];
+    rows = [...rows, ...getLogicProperties(state, 'Is Hot?', state.areaInstance.definition.hotLogic, updatedLogic => {
         state.areaInstance.definition.hotLogic = updatedLogic;
         refreshArea(state);
     })];
@@ -567,16 +571,16 @@ export function getMinimapProperties(): PanelRows {
 export function getLogicProperties(
     state: GameState,
     label: string,
-    logic: LogicDefinition,
+    logic: LogicDefinition | undefined,
     updateLogic: (newLogic?: LogicDefinition) => void
 ): PanelRows {
     const rows: PanelRows = [];
     let currentValue = 'none';
-    if (logic.isTrue) {
+    if (logic?.isTrue) {
         currentValue = 'true';
-    } else if (logic.hasCustomLogic) {
+    } else if (logic?.hasCustomLogic) {
         currentValue = 'custom';
-    } else if (logic.logicKey) {
+    } else if (logic?.logicKey) {
         currentValue = logic.logicKey;
     }
     const row: PropertyRow = [{
@@ -590,18 +594,18 @@ export function getLogicProperties(
             } else if (logicType === 'true') {
                 updateLogic({
                     isTrue: true,
-                    isInverted: !!logic.isInverted,
+                    isInverted: !!logic?.isInverted,
                 });
             } else if (logicType === 'custom') {
                 updateLogic({
                     hasCustomLogic: true,
                     customLogic: logic.customLogic || '',
-                    isInverted: !!logic.isInverted,
+                    isInverted: !!logic?.isInverted,
                 });
             } else {
                 updateLogic({
                     logicKey: logicType,
-                    isInverted: !!logic.isInverted,
+                    isInverted: !!logic?.isInverted,
                 });
             }
         }
@@ -612,9 +616,9 @@ export function getLogicProperties(
     if (currentValue === 'custom') {
         row.push({
             name: 'Flag',
-            value: logic.customLogic || '',
+            value: logic?.customLogic || '',
             onChange(customLogic: string) {
-                const updatedLogic = {...logic};
+                const updatedLogic = {...(logic || {})};
                 updatedLogic.customLogic = customLogic;
                 updateLogic(updatedLogic);
             },
@@ -624,9 +628,9 @@ export function getLogicProperties(
     if (currentValue !== 'none' && currentValue !== 'true') {
         rows.push({
             name: 'Invert',
-            value: !!logic.isInverted,
+            value: !!logic?.isInverted,
             onChange(isInverted: boolean) {
-                const updatedLogic = {...logic};
+                const updatedLogic = {...(logic || {})};
                 if (!isInverted) {
                     delete updatedLogic.isInverted;
                 } else {

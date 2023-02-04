@@ -329,7 +329,7 @@ const f0_0x0: AreaDefinition = {
         {x: 0, y: 16, w: 32, h: 16},
     ],
 };
-const f0_0x1: AreaDefinition = {
+const f0_1x0: AreaDefinition = {
     layers: [
         {
             key: 'water',
@@ -553,15 +553,15 @@ const f0_0x1: AreaDefinition = {
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,827,0,0,0],
                     [831,832,831,0,0,0,0,0,0,831,832,831,832,0,831,832,0,0,0,0,0,0,0,0,0,0,0,0,828,0,0,0],
                     [0,0,0,846,831,832,831,832,845,0,0,0,0,0,0,0,844,848,0,0,0,0,0,0,0,0,0,0,827,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,830,0,0,0,0,0,0,0,0,0,0,828,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,829,0,0,0,0,0,0,0,0,0,0,827,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,829,0,0,0,0,0,0,0,830,0,0,0,0,0,0,0,0,0,0,828,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,846,0,0,832,831,832,0,0,846,831,832,831,832,831,832,831,832,831,832,845,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,844,860,0],
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,829,0,0,0,827,0,0,0,0,0,0,0,0,0,0,830,0],
-                    [0,859,832,832,831,832,831,831,832,860,0,0,0,0,0,846,831,831,831,845,0,0,0,0,0,0,0,0,0,0,846,839],
-                    [0,843,0,0,0,0,0,0,0,846,832,831,832,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,829,0,830,0,0,0,0,0,0,0,0,0,0,828,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,829,0,829,0,0,0,0,0,0,0,0,0,0,827,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,829,0,0,0,0,0,829,0,830,0,0,0,0,0,0,0,0,0,0,828,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,846,0,0,832,831,860,846,831,846,831,832,831,832,831,832,831,832,831,832,845,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,844,860,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,829,0,0,0,0,0,0,0,0,0,0,0,0,0,844,860,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,829,0,0,0,0,0,0,0,0,0,0,0,0,0,0,830,0],
+                    [0,859,832,832,831,832,831,831,832,860,0,0,0,0,0,829,0,0,0,827,0,0,0,0,0,0,0,0,0,0,846,839],
+                    [0,843,0,0,0,0,0,0,0,846,832,831,832,0,0,846,831,831,831,845,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,844,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -593,16 +593,16 @@ const f0_0x1: AreaDefinition = {
                     [1,1,1,1,0,0,0,0,1,1,1,1,12,13,1,1,19,1,1,1,1,1,1,1,1,1,19,1,1,1,770,762],
                     [1,1,1,1,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,20,1,1,1,1,1,1,19,1,1,770,773,0],
                     [1,1,1,1,0,0,0,0,1,1,1,15,13,168,14,10,0,1,1,1,1,1,18,1,13,1,1,1,1,773,0,0],
-                    [758,753,754,0,0,0,0,0,1,753,754,753,754,753,754,755,0,18,21,1,1,21,1,1,1,1,1,1,1,0,0,0],
-                    [758,753,754,755,753,754,753,754,758,753,754,753,754,753,754,755,755,1,1,12,1,1,1,1,1,1,1,1,1,0,0,0],
-                    [758,753,754,755,753,754,753,754,758,762,763,762,763,762,763,755,764,1,1,1,1,1,1,1,1,1,13,1,1,0,0,0],
-                    [758,753,754,755,753,754,753,754,758,1,1,1,1,165,1,765,755,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0],
-                    [758,753,754,764,753,754,753,754,758,1,867,869,1,1,1,768,764,0,1,10,1,1,1,0,0,1,21,1,0,0,0,0],
-                    [758,762,763,764,753,754,753,754,753,753,870,872,754,753,754,755,764,764,753,754,753,754,753,754,753,754,753,754,757,0,0,0],
-                    [757,1,1,772,762,763,762,763,762,753,873,875,754,753,754,762,762,763,762,763,753,758,753,754,753,754,754,753,755,0,0,0],
-                    [757,1,1,1,0,0,0,0,1,771,876,878,763,762,763,-16,1,1,1,1,753,758,753,754,753,754,754,753,755,753,1,0],
-                    [758,1,1,1,0,0,0,0,0,1,879,881,15,1,15,-16,1,1,1,-16,753,758,753,754,753,754,754,753,755,753,0,0],
-                    [758,0,754,754,754,753,754,753,754,1,1,1,0,168,1,755,753,758,753,758,753,758,762,763,762,763,763,762,764,753,755,754],
+                    [758,753,754,0,0,0,0,0,1,753,754,753,754,753,754,762,0,18,21,1,1,21,1,1,1,1,1,1,1,0,0,0],
+                    [758,753,754,755,753,754,753,754,758,753,754,753,754,753,754,-16,772,1,1,12,1,1,1,1,1,1,1,1,1,0,0,0],
+                    [758,753,754,755,753,754,753,754,758,762,763,762,763,762,763,-16,1,1,1,1,1,1,1,1,1,1,13,1,1,0,0,0],
+                    [758,753,754,755,753,754,753,754,758,1,1,1,1,165,1,-16,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0],
+                    [758,753,754,764,753,754,753,754,758,1,867,869,1,1,1,-16,1,0,1,10,1,1,1,0,0,1,21,1,0,0,0,0],
+                    [758,762,763,764,753,754,753,754,753,753,870,872,754,753,0,771,753,764,753,754,753,754,753,754,753,754,753,754,757,0,0,0],
+                    [757,1,1,772,762,763,762,763,762,753,873,875,754,753,754,-16,772,764,753,754,753,758,753,754,753,754,754,753,755,0,0,0],
+                    [757,1,1,1,0,0,0,0,1,771,876,878,763,762,763,-16,1,771,762,763,753,758,753,754,753,754,754,753,755,753,1,0],
+                    [758,1,1,1,0,0,0,0,0,1,879,881,15,1,15,-16,1,1,1,1,753,758,753,754,753,754,754,753,755,753,0,0],
+                    [758,0,754,754,754,753,754,753,754,1,1,1,0,168,1,-16,1,1,1,-16,753,758,762,763,762,763,763,762,764,753,755,754],
                     [758,770,763,764,754,753,754,753,754,753,754,753,754,753,0,755,753,754,753,758,753,769,1,1,1,1,1,1,768,753,755,754],
                     [758,773,1,772,763,762,763,762,763,753,754,753,754,753,764,755,753,754,753,758,762,774,1,1,1,16,1,1,771,762,764,754],
                     [769,1,1,1,0,0,0,0,0,772,763,762,763,762,764,755,753,754,753,766,1,1,1,1,1,1,1,1,1,1,768,754],
@@ -782,7 +782,7 @@ const f0_0x1: AreaDefinition = {
         {x: 0, y: 0, w: 32, h: 32},
     ],
 };
-const f0_0x2: AreaDefinition = {
+const f0_2x0: AreaDefinition = {
     layers: [
         {
             key: 'water',
@@ -958,10 +958,10 @@ const f0_0x2: AreaDefinition = {
                     [758,766,1,1,758,773,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,376,377,377,377,377,378,1,417],
                     [758,769,1,1,766,1,1,1,0,0,0,0,1,1,1,51,1,53,0,53,53,1,51,21,379,20,20,20,20,381,1,416],
                     [758,774,1,758,766,1,1,1,0,0,0,0,1,1,16,1,53,1,1,0,1,53,1,1,0,20,20,20,20,381,1,416],
-                    [769,1,1,758,766,1,21,1,1,1,1,1,1,1,1,53,1,0,10,10,0,1,53,1,382,383,383,383,383,384,1,416],
-                    [774,1,1,758,773,1,1,607,589,590,589,590,607,1,1,53,0,10,53,53,10,1,53,1,1,0,0,0,0,1,1,416],
-                    [1,1,758,766,1,1,19,617,601,602,601,602,617,1,1,53,1,10,53,53,10,1,53,1,1,0,0,0,0,1,1,416],
-                    [1,1,758,773,1,1,1,330,330,1,1,331,21,1,17,53,0,0,10,10,0,1,53,1,1,1,1,1,1,1,1,416],
+                    [769,1,1,758,766,1,21,1,1,1,1,1,1,1,1,53,1,0,0,0,0,1,53,1,382,383,383,383,383,384,1,416],
+                    [774,1,1,758,773,1,1,607,589,590,589,590,607,1,1,53,0,0,0,0,0,1,53,1,1,0,0,0,0,1,1,416],
+                    [1,1,758,766,1,1,19,617,601,602,601,602,617,1,1,53,1,0,0,0,0,1,53,1,1,0,0,0,0,1,1,416],
+                    [1,1,758,773,1,1,1,330,330,1,1,331,21,1,17,53,0,0,0,0,0,1,53,1,1,1,1,1,1,1,1,416],
                     [1,1,766,1,1,1,1,1,1,1,1,1,1,1,1,1,53,1,1,0,1,53,1,1,607,589,590,589,590,607,18,416],
                     [1,758,766,1,1,17,12,1,1,1,1,1,1,1,17,51,1,53,53,53,53,1,51,12,617,601,602,601,602,617,1,416],
                     [1,758,773,1,1,1,12,1,12,12,1,17,0,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,416],
@@ -1118,9 +1118,7 @@ const f0_0x2: AreaDefinition = {
         {status: "normal", id: "overworld:holyCityFoodHouse", x: 144, y: 112, type: "door", style: "wooden", targetZone: "holyCityInterior", targetObjectId: "foodHouse", d: "up"},
         {status: "normal", id: "overworld:holyCityBridgeHouse", x: 432, y: 384, type: "door", style: "wooden", targetZone: "holyCityInterior", targetObjectId: "bridgeHouse", d: "up"},
         {status: "normal", id: "overworld:holyCityGardenHouse", x: 416, y: 160, type: "door", style: "wooden", targetZone: "holyCityInterior", targetObjectId: "gardenHouse", d: "up"},
-        {status: "cracked", id: "grandTempleSecretEntrance", x: 416, y: 0, type: "door", style: "wooden", targetZone: "grandTemple", targetObjectId: "grandTempleSecretEntrance", d: "up"},
-        {status: "normal", id: "", x: 288, y: 112, type: "teleporter", linked: true},
-        {status: "normal", id: "templeDoor", x: 288, y: 0, type: "door", style: "wooden", targetZone: "grandTemple", targetObjectId: "grandTempleEntrance", d: "up"},
+        {status: "normal", id: "grandTempleEntrance", x: 288, y: 0, type: "door", style: "wooden", targetZone: "grandTemple", targetObjectId: "grandTempleEntrance", d: "up"},
         {status: "normal", id: "streetVendor", x: 224, y: 192, d: "down", behavior: "idle", style: "guy2", type: "npc", dialogueKey: "streetVendor"},
         {status: "normal", id: "", x: 80, y: 432, type: "spawnMarker", linked: true},
         {status: "normal", id: "", x: 160, y: 432, type: "spawnMarker", linked: true},
@@ -1141,14 +1139,14 @@ const f0_0x2: AreaDefinition = {
         {status: "closed", id: "moneyMazeEntrance", x: 112, y: 288, type: "door", style: "wooden", targetZone: "holyCityInterior", targetObjectId: "moneyMazeEntrance", d: "up", price: 25},
         {status: "normal", id: "citySaveStatue", x: 240, y: 32, type: "saveStatue"},
         {status: "normal", id: "", x: 144, y: 320, style: "short", type: "sign", message: "Wager your fortune in the Arrow Maze, only 25 Jade!"},
-        {status: "normal", id: "holyCityMarker", x: 272, y: 160, type: "marker"},
+        {status: "normal", id: "holyCityMarker", x: 272, y: 112, type: "marker"},
         {status: "normal", id: "cityCliffMoney", x: 48, y: 16, type: "chest", lootType: "money", lootAmount: 100},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
     ],
 };
-const f0_1x0: AreaDefinition = {
+const f0_0x1: AreaDefinition = {
     layers: [
         {
             key: 'water',
@@ -1825,7 +1823,6 @@ const f0_1x1: AreaDefinition = {
         {status: "hidden", id: "tombTeleporter", x: 128, y: 432, targetZone: "tomb", targetObjectId: "tombTeleporter", type: "teleporter"},
         {status: "normal", id: "lakeTunnelEntrance", x: 112, y: 336, type: "door", style: "cavern", targetZone: "lakeTunnel", targetObjectId: "lakeTunnelEntrance", d: "up"},
         {status: "normal", id: "riverTempleUpperEntrance", x: 240, y: 176, type: "door", style: "woodenDownstairs", targetZone: "riverTemple", targetObjectId: "riverTempleUpperEntrance", d: "up"},
-        {status: "normal", id: "overworld:s0:1x1-teleporter-0", x: 400, y: 64, type: "teleporter", linked: true, spirit: true},
         {status: "normal", id: "overworldLakePiece", linked: false, spirit: false, x: 399, y: 35, type: "loot", lootType: "peachOfImmortalityPiece", lootLevel: 1},
         {status: "normal", id: "homeInstructions", x: 256, y: 112, type: "narration", message: "Well that was fun!\n{|}But I was gone a lot longer than I expected. Maybe I should head back to the waterfall.\n{|}I hope I didn't miss dinner!\n{addCue: Press [B_MAP] to view the map}", delay: 500, w: 32, h: 32},
         {status: "normal", id: "overworld:0:1x1-snake-0", x: 336, y: 96, type: "enemy", enemyType: "snake", d: "down", params: {}},
@@ -1862,7 +1859,7 @@ const f0_1x1: AreaDefinition = {
         {x: 0, y: 0, w: 32, h: 32},
     ],
 };
-const f0_1x2: AreaDefinition = {
+const f0_2x1: AreaDefinition = {
     layers: [
         {
             key: 'water',
@@ -2196,7 +2193,7 @@ const f0_1x2: AreaDefinition = {
         {x: 16, y: 16, w: 16, h: 16},
     ],
 };
-const f0_2x0: AreaDefinition = {
+const f0_0x2: AreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -2439,7 +2436,7 @@ const f0_2x0: AreaDefinition = {
     ],
     dark: 50,
 };
-const f0_2x1: AreaDefinition = {
+const f0_1x2: AreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -3221,9 +3218,9 @@ const sf0_0x0: AreaDefinition = {
         {x: 0, y: 16, w: 32, h: 16},
     ],
 };
-const sf0_0x1: AreaDefinition = {
+const sf0_1x0: AreaDefinition = {
     isSpiritWorld: true,
-    parentDefinition: f0_0x1,
+    parentDefinition: f0_1x0,
     layers: [
         {
             key: 'water',
@@ -3661,14 +3658,16 @@ const sf0_0x1: AreaDefinition = {
         {status: "normal", id: "", x: 432, y: 192, type: "spawnMarker", linked: true, spirit: true},
         {status: "normal", id: "", x: 304, y: 192, type: "spawnMarker", linked: true, spirit: true},
         {status: "normal", id: "overworld:s0:1x0-luckyBeetle-0", x: 392, y: 408, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
+        {status: "cracked", id: "cloneCaveExit", x: 192, y: 256, type: "door", style: "cavern", targetZone: "cloneCave", targetObjectId: "cloneCaveExit", d: "up"},
+        {status: "cracked", id: "cloneCaveEntrance", x: 288, y: 256, type: "door", style: "cavern", targetZone: "cloneCave", targetObjectId: "cloneCaveEntrance", d: "up"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
     ],
 };
-const sf0_0x2: AreaDefinition = {
+const sf0_2x0: AreaDefinition = {
     isSpiritWorld: true,
-    parentDefinition: f0_0x2,
+    parentDefinition: f0_2x0,
     layers: [
         {
             key: 'water',
@@ -3999,7 +3998,6 @@ const sf0_0x2: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "", x: 288, y: 112, type: "teleporter", linked: true, spirit: true},
         {status: "normal", id: "", x: 176, y: 48, type: "spawnMarker", linked: true, spirit: true},
         {status: "normal", id: "", x: 96, y: 96, type: "spawnMarker", linked: true, spirit: true},
         {status: "normal", id: "", x: 192, y: 176, type: "spawnMarker", linked: true, spirit: true},
@@ -4016,7 +4014,7 @@ const sf0_0x2: AreaDefinition = {
         {status: "normal", id: "", x: 176, y: 320, type: "spawnMarker", linked: true, spirit: true},
         {status: "normal", id: "", x: 64, y: 320, type: "spawnMarker", linked: true, spirit: true},
         {status: "normal", id: "jadeCitySaveStatue", x: 336, y: 32, type: "saveStatue"},
-        {status: "normal", id: "jadeCityMarker", x: 272, y: 160, type: "marker"},
+        {status: "normal", id: "jadeCityMarker", x: 272, y: 112, type: "marker"},
         {status: "normal", id: "jadePalaceEntrance", x: 288, y: 0, type: "door", style: "wooden", targetZone: "grandTemple", targetObjectId: "jadePalaceEntrance", d: "up"},
         {status: "normal", id: "jadeCitySoutheastDoor", x: 432, y: 384, type: "door", style: "wooden", targetZone: "holyCityInterior", targetObjectId: "jadeCitySoutheastDoor", d: "up"},
     ],
@@ -4024,9 +4022,9 @@ const sf0_0x2: AreaDefinition = {
         {x: 0, y: 0, w: 32, h: 32},
     ],
 };
-const sf0_1x0: AreaDefinition = {
+const sf0_0x1: AreaDefinition = {
     isSpiritWorld: true,
-    parentDefinition: f0_1x0,
+    parentDefinition: f0_0x1,
     layers: [
         {
             key: 'water',
@@ -4721,9 +4719,9 @@ const sf0_1x1: AreaDefinition = {
     ],
     hotLogic: {},
 };
-const sf0_1x2: AreaDefinition = {
+const sf0_2x1: AreaDefinition = {
     isSpiritWorld: true,
-    parentDefinition: f0_1x2,
+    parentDefinition: f0_2x1,
     layers: [
         {
             key: 'water',
@@ -5058,9 +5056,9 @@ const sf0_1x2: AreaDefinition = {
         {x: 16, y: 16, w: 16, h: 16},
     ],
 };
-const sf0_2x0: AreaDefinition = {
+const sf0_0x2: AreaDefinition = {
     isSpiritWorld: true,
-    parentDefinition: f0_2x0,
+    parentDefinition: f0_0x2,
     layers: [
         {
             key: 'floor',
@@ -5309,9 +5307,9 @@ const sf0_2x0: AreaDefinition = {
         {x: 0, y: 0, w: 32, h: 32},
     ],
 };
-const sf0_2x1: AreaDefinition = {
+const sf0_1x2: AreaDefinition = {
     isSpiritWorld: true,
-    parentDefinition: f0_2x1,
+    parentDefinition: f0_1x2,
     layers: [
         {
             key: 'floor',
@@ -5764,14 +5762,14 @@ zones.overworld = {
     floors: [
         {
             grid: [
-                [f0_0x0,f0_0x1,f0_0x2,],
-                [f0_1x0,f0_1x1,f0_1x2,],
-                [f0_2x0,f0_2x1,f0_2x2,],
+                [f0_0x0,f0_1x0,f0_2x0,],
+                [f0_0x1,f0_1x1,f0_2x1,],
+                [f0_0x2,f0_1x2,f0_2x2,],
             ],
             spiritGrid: [
-                [sf0_0x0,sf0_0x1,sf0_0x2,],
-                [sf0_1x0,sf0_1x1,sf0_1x2,],
-                [sf0_2x0,sf0_2x1,sf0_2x2,],
+                [sf0_0x0,sf0_1x0,sf0_2x0,],
+                [sf0_0x1,sf0_1x1,sf0_2x1,],
+                [sf0_0x2,sf0_1x2,sf0_2x2,],
             ],
         },
     ],
