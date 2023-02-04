@@ -19,7 +19,6 @@ export const mainOverworldNode: LogicNode = {
         { nodeId: 'overworldMountain', logic: hasGloves },
         { nodeId: 'forestArea' },
         { nodeId: 'warTempleArea' },
-        { nodeId: 'mainSpiritWorld', logic: andLogic(hasSpiritSight, orLogic(hasSomersault, hasTeleportation)) },
         { nodeId: 'nimbusCloud', logic: hasNimbusCloud},
         { nodeId: 'overworldLakeTunnel', logic: orLogic(hasGloves, hasTeleportation) },
         // This represents moving the tower to the forest position and using cloud boots to
@@ -34,7 +33,7 @@ export const mainOverworldNode: LogicNode = {
         'sideArea:noToolEntrance', 'tombTeleporter',
         'lakeTunnelEntrance', 'peachCaveTopEntrance', 'peachCaveWaterEntrance',
         'staffTowerEntrance',
-        'tombEntrance', 'waterfallCaveEntrance', 'grandTempleSecretEntrance', 'templeDoor',
+        'tombEntrance', 'waterfallCaveEntrance', 'grandTempleEntrance',
         'moneyMazeEntrance',
         'overworld:holyCityFoodHouse', 'overworld:holyCityBridgeHouse',
         'overworld:holyCityGardenHouse', 'overworld:holyCityClothesHouse',
@@ -48,8 +47,7 @@ export const mainOverworldNode: LogicNode = {
         { objectId: 'staffTowerEntrance' },
         { objectId: 'tombEntrance', logic: hasMediumRange },
         { objectId: 'waterfallCaveEntrance' },
-        { objectId: 'grandTempleSecretEntrance' },
-        { objectId: 'templeDoor' },
+        { objectId: 'grandTempleEntrance', logic: hasReleasedBeasts },
         { objectId: 'moneyMazeEntrance' },
         { objectId: 'overworld:holyCityFoodHouse' },
         { objectId: 'overworld:holyCityBridgeHouse'},
@@ -173,7 +171,6 @@ export const overworldNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'overworldLakePiece',
-        paths: [{nodeId: 'mainSpiritWorld', logic: hasSpiritSight}],
         checks: [
             { objectId: 'overworldLakePiece' },
         ],
@@ -190,12 +187,16 @@ export const overworldNodes: LogicNode[] = [
             { nodeId: 'nimbusCloudSpirit', logic: hasNimbusCloud},
             { nodeId: 'warTempleSpiritArea', logic: hasMitts },
         ],
-        entranceIds: ['fertilityTempleSpiritEntrance', 'staffTowerSpiritEntrance', 'jadePalaceEntrance', 'jadeCitySoutheastDoor'],
+        entranceIds: [
+            'fertilityTempleSpiritEntrance', 'staffTowerSpiritEntrance', 'jadePalaceEntrance', 'jadeCitySoutheastDoor',
+            'cloneCaveEntrance', 'cloneCaveExit',
+            ],
         exits: [
             { objectId: 'jadePalaceEntrance' },
             { objectId: 'jadeCitySoutheastDoor' },
             { objectId: 'fertilityTempleSpiritEntrance' },
             { objectId: 'staffTowerSpiritEntrance', logic: {requiredFlags: ['staffTowerSpiritEntrance']} },
+            { objectId: 'cloneCaveExit' },
         ],
     },
     {
@@ -215,6 +216,7 @@ export const overworldNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'spiritWorldMountain',
+        exits: [{ objectId: 'cloneCaveEntrance' }],
         paths: [
             { nodeId: 'mainSpiritWorld' },
             { nodeId: 'westSpiritWorldMountain', logic: orLogic(hasSomersault, hasTeleportation) },
@@ -309,10 +311,10 @@ export const underwaterNodes: LogicNode[] = [
         checks: [{objectId: 'underwaterMoney'}],
         paths: [{nodeId: 'overworldMain'}],
         entranceIds: [
-            'grandTempleWaterEntrance',
+            'gauntletWaterEntrance',
         ],
         exits: [
-            { objectId: 'grandTempleWaterEntrance', logic: canTravelFarUnderWater  },
+            { objectId: 'gauntletWaterEntrance', logic: canTravelFarUnderWater  },
         ],
     },
 ];

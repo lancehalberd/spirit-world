@@ -8,11 +8,11 @@ import {
 import { AreaDefinition, EntranceDefinition, Zone, ZoneLocation } from 'app/types';
 
 const ignoredZones = [
-    // Leon is working on adding this.
+    // Add in progress zones here so that they don't break the entrance randomizer.
     'hypeCave',
-    // These zones are in progress.
-    'holySanctum', 'fireSanctum', 'iceSanctum', 'lightningSanctum', 'grandTemple2',
-    // The void cannot be left so do not randomize it for now.
+    // These zones are part of the 'Holy Sanctum' and should not be randomized.
+    'fireSanctum', 'iceSanctum', 'lightningSanctum',
+    // The void is part of the 'Tree' zone and should not be randomized.
     'void',
 ];
 
@@ -82,6 +82,9 @@ const connectedExitGroups: ConnectedExitGroup[] = [
     },
     {
         spiritEntranceTargets: ['overworld:forestTempleLadder3', 'overworld:forestTempleLadder4'],
+    },
+    {
+        spiritEntranceTargets: ['overworld:cloneCaveEntrance', 'overworld:cloneCaveExit'],
     },
 ];
 
@@ -165,14 +168,16 @@ export function randomizeEntrances(random: typeof SRandom) {
             || zone.key === 'lakeTunnel' && object.targetZone === 'helix'
             || zone.key === 'warTemple' && object.targetZone === 'lab'
             || zone.key === 'lab' && object.targetZone === 'tree'
+            || zone.key === 'grandTemple' && object.targetZone === 'gauntlet'
+            || zone.key === 'grandTemple' && object.targetZone === 'holySanctum'
         ) {
-           if (outsideZones.includes(zone.key)) {
+            if (outsideZones.includes(zone.key)) {
                 if (area.isSpiritWorld) {
                    connectedSpiritEntrances.add(targetKey);
                 } else {
                    connectedNormalEntrances.add(targetKey);
-               }
-           }
+                }
+            }
             if (area.isSpiritWorld) {
                 spiritExits.add(targetKey);
             } else {

@@ -1,3 +1,4 @@
+import { renderIndicator } from 'app/content/objects/indicator';
 import { objectHash } from 'app/content/objects/objectHash';
 import { getLootFrame, getLootShadowFrame, showLootMessage } from 'app/content/loot';
 import { lootEffects } from 'app/content/lootEffects';
@@ -337,7 +338,7 @@ export class ChestObject implements ObjectInstance {
             }*/
         }
     }
-    getHitbox(state: GameState): Rect {
+    getHitbox(): Rect {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
     isOpen(state: GameState): boolean {
@@ -384,6 +385,9 @@ export class ChestObject implements ObjectInstance {
     }
     render(context, state: GameState) {
         if (this.status === 'hidden' || this.status === 'hiddenEnemy' || this.status === 'hiddenSwitch') {
+            if (state.hero.passiveTools.trueSight) {
+                renderIndicator(context, this.getHitbox(), state.fieldTime);
+            }
             return;
         }
         if (this.isOpen(state)) {
@@ -394,6 +398,9 @@ export class ChestObject implements ObjectInstance {
             drawFrame(context, chestClosedFrame, {
                 ...chestClosedFrame, x: this.x - chestClosedFrame.content.x, y: this.y - chestClosedFrame.content.y
             });
+        }
+        if (this.definition.isInvisible && state.hero.passiveTools.trueSight) {
+            renderIndicator(context, this.getHitbox(), state.fieldTime);
         }
     }
 }
@@ -413,7 +420,7 @@ export class BigChest extends ChestObject implements ObjectInstance {
     y: number;
     z: number;
     status: ObjectStatus;
-    getHitbox(state: GameState): Rect {
+    getHitbox(): Rect {
         return { x: this.x, y: this.y, w: 32, h: 32 };
     }
     onGrab(state: GameState) {

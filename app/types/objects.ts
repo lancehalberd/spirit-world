@@ -91,6 +91,14 @@ export interface ObjectInstance {
     z?: number
     height?: number
     status: ObjectStatus
+    // This status can be set on certain switch types to make them not count towards required
+    // switches for activating a target. This was added to make dummy switches for randomization
+    // to prevent memorization of certain puzzles, such as the ball goals in the Gauntlet zone.
+    disabled?: boolean
+    // This can be set on certain objects to render a true sight indicator over them if the player
+    // has true sight. This can be used to make certain objects stand out to the player, such as
+    // the correct ball goals in the Gauntlet zone.
+    showTrueSightIndicator?: boolean
     changeStatus?: (state: GameState, status: ObjectStatus) => void
     cleanup?: (state: GameState) => void,
     // This is called when a user grabs a solid tile
@@ -601,7 +609,7 @@ export interface SpecialSignBehavior {
 
 export interface SpecialSwitchBehavior {
     // This could be extended for floor switches and other switches.
-    type: 'crystalSwitch' | 'floorSwitch'
+    type: 'crystalSwitch' | 'floorSwitch' | 'ballGoal'
     apply?: (state: GameState, object: ObjectInstance) => void
     onActivate?: (state: GameState, object: ObjectInstance) => void
 }

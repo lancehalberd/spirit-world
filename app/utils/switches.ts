@@ -7,7 +7,7 @@ export function checkIfAllSwitchesAreActivated(state: GameState, area: AreaInsta
     if (area.objects.some(o =>
         (o.definition?.type === 'ballGoal' || o.definition?.type === 'crystalSwitch' || o.definition?.type === 'floorSwitch') &&
         o.definition?.targetObjectId === switchInstance.definition.targetObjectId &&
-        o.status !== 'active'
+        o.status !== 'active' && o.disabled !== true
     )) {
         return;
     }

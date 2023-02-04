@@ -127,7 +127,15 @@ export function updateAreaObjects(this: void, state: GameState, area: AreaInstan
             const x = hitbox.x + hitbox.w / 2;
             const y = hitbox.y + hitbox.h / 2;
             const { tileBehavior } = getTileBehaviorsAndObstacles(state, object.area, {x, y});
-            if (tileBehavior?.pit && !(object.z > 0)) {
+            if (tileBehavior?.pit  && !(object.z > 0)) {
+                const pitAnimation = new AnimationEffect({
+                    animation: objectFallAnimation,
+                    x: ((x / 16) | 0) * 16 - 4, y: ((y / 16) | 0) * 16 - 4,
+                });
+                addEffectToArea(state, object.area, pitAnimation);
+                removeObjectFromArea(state, object);
+            } else if (tileBehavior?.water  && !(object.z > 0)) {
+                // This should be a splashing animation eventually.
                 const pitAnimation = new AnimationEffect({
                     animation: objectFallAnimation,
                     x: ((x / 16) | 0) * 16 - 4, y: ((y / 16) | 0) * 16 - 4,

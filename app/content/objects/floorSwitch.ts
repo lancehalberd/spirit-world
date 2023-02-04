@@ -1,3 +1,4 @@
+import { renderIndicator } from 'app/content/objects/indicator';
 import { objectHash } from 'app/content/objects/objectHash';
 import { playAreaSound } from 'app/musicController';
 import { createAnimation, drawFrame } from 'app/utils/animations';
@@ -29,11 +30,11 @@ export class FloorSwitch implements ObjectInstance {
             this.status = 'active';
         }
     }
-    getHitbox(state: GameState): Rect {
+    getHitbox(): Rect {
         return { x: this.x + 2, y: this.y + 2, w: 12, h: 12 };
     }
     isDepressed(state: GameState): boolean {
-        const hitbox = this.getHitbox(state);
+        const hitbox = this.getHitbox();
         if (state.hero.z <= 0 && state.hero.area === this.area && state.hero.overlaps(hitbox)) {
             return true;
         }
@@ -100,6 +101,9 @@ export class FloorSwitch implements ObjectInstance {
             drawFrame(context, downFrame, {...downFrame, x: this.x, y: this.y});
         } else {
             drawFrame(context, upFrame, {...upFrame, x: this.x, y: this.y});
+        }
+        if (this.definition.isInvisible && state.hero.passiveTools.trueSight) {
+            renderIndicator(context, this.getHitbox(), state.fieldTime);
         }
     }
 }

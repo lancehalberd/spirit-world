@@ -517,7 +517,7 @@ export function getSwitchTargetProperties(
         ...getTargetObjectIdsByTypesAndArea(state.areaInstance.definition,
             [
                 'door', 'chest', 'loot', 'airBubbles', 'beadGrate', 'beadCascade',
-                'narration',
+                'narration', 'pitEntrance',
                 'teleporter', 'torch', 'escalator', 'anode'
             ]
         )
