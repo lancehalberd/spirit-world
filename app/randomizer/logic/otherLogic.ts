@@ -1,5 +1,5 @@
 import {
-    andLogic, canCross2Gaps, hasClone,
+    andLogic, canCross2Gaps, canHasTowerStaff, hasClone,
     hasBossWeapon, hasWeapon, hasCatEyes, hasFireBlessing, hasInvisibility,
     hasMediumRange, hasMitts, hasSomersault, hasTeleportation,
     orLogic,
@@ -287,6 +287,23 @@ export const cavesNodes: LogicNode[] = [
         entranceIds: ['cloneCaveExit'],
         exits: [
             { objectId: 'cloneCaveExit' },
+        ],
+    },
+
+    // Hype Cave
+    {
+        zoneId: 'hypeCave',
+        nodeId: 'hypeCave',
+        checks: [
+            {objectId: 'hypeCave:s0:0x0-money-1'},
+            {objectId: 'hypeCave:s0:0x0-money-2'},
+            {objectId: 'hypeCave:s0:0x0-money-3'},
+            {objectId: 'hypeCave:s0:0x0-money-4'},
+            {objectId: 'hypeCave:s0:0x0-money-0', logic: orLogic(hasSomersault, canHasTowerStaff)},
+        ],
+        entranceIds: ['hypeCaveEntrance'],
+        exits: [
+            { objectId: 'hypeCaveEntrance' },
         ],
     },
 ];

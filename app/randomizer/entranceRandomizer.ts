@@ -18,8 +18,14 @@ const ignoredZones = [
 
 const outsideZones = ['overworld', 'sky', 'underwater'];
 
-// Money maze isn't designed to allow entering from the exit, so just disable this door.
-const disabledDoors = ['overworld:moneyMazeExit'];
+
+const disabledDoors = [
+    // Money maze isn't designed to allow entering from the exit, so just disable this door.
+    'overworld:moneyMazeExit',
+    // Neither this door or its target are reachable in the game.
+    // This door just exists as a reason for there to be corresponding cave in the spirit world.
+    'sky:hypeCaveEntrance',
+];
 
 interface DoorLocation {
     location: ZoneLocation
