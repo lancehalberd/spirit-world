@@ -301,9 +301,9 @@ export const cavesNodes: LogicNode[] = [
             {objectId: 'hypeCave:s0:0x0-money-4'},
             {objectId: 'hypeCave:s0:0x0-money-0', logic: orLogic(hasSomersault, canHasTowerStaff)},
         ],
-        entranceIds: ['hypeCaveEntrance'],
+        entranceIds: ['hypeCaveEntranceSpirit'],
         exits: [
-            { objectId: 'hypeCaveEntrance' },
+            { objectId: 'hypeCaveEntranceSpirit' },
         ],
     },
 ];

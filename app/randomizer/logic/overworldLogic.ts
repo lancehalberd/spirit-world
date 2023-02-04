@@ -462,10 +462,10 @@ export const skyNodes: LogicNode[] = [
         paths: [
             { nodeId: 'waterfallTowerSky' },
         ],
-        entranceIds: ['staffTowerSpiritSkyEntrance', 'hypeCaveEntrance'],
+        entranceIds: ['staffTowerSpiritSkyEntrance', 'hypeCaveEntranceSpirit'],
         exits: [
             { objectId: 'staffTowerSpiritSkyEntrance' },
-            { objectId: 'hypeCaveEntrance' },
+            { objectId: 'hypeCaveEntranceSpirit' },
         ],
     },
 ];

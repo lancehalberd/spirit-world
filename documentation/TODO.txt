@@ -39,6 +39,10 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Only regenerate iron skin when spirit energy is full.
+
+    - Holy sanctum key requirements appear broken, `entranceSeed=2` currently places a key after the 3 locks.
+
     - Allow teleporting over pits so we can teleport to moving platforms.
 
     - Finish Holy Sanctum
@@ -56,6 +60,9 @@ Current tasks:
             - behind challenging platform puzzle similar to tower puzzle (easier with roll 2 or staff + lightning badge)
                 - probably moving platforms as I don't want to require cloud boots for this
         - Add peach piece to ice sanctum
+
+    - Upgrade entrance randomizer to support complex connected exit graphs.
+        - Currently it only supports connected exits that can be traveled in all directions.
 
     - Improve projectile interactions
         - Set stopX/Y when stopping a projectile which will prevent them from appearing to into cliffs/walls that they hit.

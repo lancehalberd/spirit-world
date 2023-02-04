@@ -8,8 +8,6 @@ import {
 import { AreaDefinition, EntranceDefinition, Zone, ZoneLocation } from 'app/types';
 
 const ignoredZones = [
-    // Add in progress zones here so that they don't break the entrance randomizer.
-    'hypeCave',
     // These zones are part of the 'Holy Sanctum' and should not be randomized.
     'fireSanctum', 'iceSanctum', 'lightningSanctum',
     // The void is part of the 'Tree' zone and should not be randomized.
@@ -89,9 +87,13 @@ const connectedExitGroups: ConnectedExitGroup[] = [
     {
         spiritEntranceTargets: ['overworld:forestTempleLadder3', 'overworld:forestTempleLadder4'],
     },
+    /* Although this could form a tunnel from entrance -> exit, the randomizer logic doesn't currently
+    have support for a one way tunnel, so this cannot currently function as a connected exit group.
     {
-        spiritEntranceTargets: ['overworld:cloneCaveEntrance', 'overworld:cloneCaveExit'],
-    },
+        spiritEntranceTargets: ['overworld:cloneCaveExit'],
+        // It is not possible to reach the entrance door when entering from the exit door.
+        immutableEntranceTargets: ['overworld:cloneCaveEntrance'],
+    },*/
 ];
 
 // Loopable entrance pairs occur when a zone contains both an entrance and an exit.
