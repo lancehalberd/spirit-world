@@ -204,13 +204,13 @@ export const SPAWN_FORGE_ENTRANCE: ZoneLocation = {
     isSpiritWorld: true,
 };
 
-export const SPAWN_GRAND_TEMPLE_ENTRANCE: ZoneLocation = {
-    zoneKey: 'grandTemple',
+export const SPAWN_GAUNTLET_ENTRANCE: ZoneLocation = {
+    zoneKey: 'gauntlet',
     floor: 0,
-    x: 248,
-    y: 448,
+    x: 56,
+    y: 328,
     z: 0,
-    d: 'up',
+    d: 'down',
     areaGridCoords: {x: 0, y: 1},
     isSpiritWorld: false,
 };
@@ -226,11 +226,11 @@ export const SPAWN_SKY_PALACE_ENTRANCE: ZoneLocation = {
     isSpiritWorld: true,
 };
 
-export const SPAWN_JADE_PALACE_ENTRANCE: ZoneLocation = {
-    zoneKey: 'grandTemple',
+export const SPAWN_HOLY_SANCTUM_ENTRANCE: ZoneLocation = {
+    zoneKey: 'holySanctum',
     floor: 0,
     x: 248,
-    y: 448,
+    y: 368,
     z: 0,
     d: 'up',
     areaGridCoords: {x: 0, y: 1},
@@ -377,12 +377,12 @@ const prioritizedSpawnLocations = [
     SPAWN_WAR_TEMPLE_ENTRANCE,
     SPAWN_COCOON_ENTRANCE,
     SPAWN_HELIX_ENTRANCE,
+    SPAWN_GAUNTLET_ENTRANCE,
     SPAWN_FOREST_ENTRANCE,
     SPAWN_WATERFALL_ENTRANCE,
     SPAWN_FORGE_ENTRANCE,
     SPAWN_SKY_PALACE_ENTRANCE,
-    // Grand Temple
-    // Jade Palace
+    SPAWN_HOLY_SANCTUM_ENTRANCE,
     SPAWN_CRATER_ENTRANCE,
     SPAWN_STAFF_UPPER_ENTRANCE,
     SPAWN_STAFF_LOWER_ENTRANCE,

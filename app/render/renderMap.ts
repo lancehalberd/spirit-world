@@ -77,18 +77,19 @@ export function renderMap(context: CanvasRenderingContext2D, state: GameState): 
                 x: r.x + (state.location.areaGridCoords.x * 64 + state.location.x / 8 - heroIcon.w / 2) | 0,
                 y: r.y + (state.location.areaGridCoords.y * 64 + state.location.y / 8 - heroIcon.h / 2) | 0,
             });
-
-            const target = getMapTarget(state);
-            if (target) {
-                context.strokeStyle = 'red';
-                context.beginPath();
-                const x = r.x + target.x, y = r.y + target.y;
-                context.moveTo(x - 6, y - 6);
-                context.lineTo(x + 6, y + 6);
-                context.moveTo(x + 6, y - 6);
-                context.lineTo(x - 6, y + 6);
-                context.stroke();
-            }
+        }
+    }
+    if (state.time % 1000 <= 600) {
+        const target = getMapTarget(state);
+        if (target) {
+            context.strokeStyle = 'red';
+            context.beginPath();
+            const x = r.x + target.x, y = r.y + target.y;
+            context.moveTo(x - 6, y - 6);
+            context.lineTo(x + 6, y + 6);
+            context.moveTo(x + 6, y - 6);
+            context.lineTo(x - 6, y + 6);
+            context.stroke();
         }
     }
 }

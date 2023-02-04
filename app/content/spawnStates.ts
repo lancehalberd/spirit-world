@@ -213,6 +213,10 @@ export const earlySpawnLocations: SpawnLocationOptions = {
 };
 
 export const middleSpawnLocations: SpawnLocationOptions = {
+    'Gauntlet Start': {
+        location: spawnLocations.SPAWN_GAUNTLET_ENTRANCE,
+        savedState: grandTempleStartState,
+    },
     'Forest Start': {
         location: spawnLocations.SPAWN_FOREST_ENTRANCE,
         savedState: helixEndState,
@@ -233,16 +237,12 @@ export const middleSpawnLocations: SpawnLocationOptions = {
         location: spawnLocations.SPAWN_FORGE_ENTRANCE,
         savedState: helixEndState,
     },
-    'Grand Temple Start': {
-        location: spawnLocations.SPAWN_GRAND_TEMPLE_ENTRANCE,
-        savedState: grandTempleStartState,
-    },
     'Sky Palace Start': {
         location: spawnLocations.SPAWN_SKY_PALACE_ENTRANCE,
         savedState: helixEndState,
     },
-    'Jade Palace Start': {
-        location: spawnLocations.SPAWN_JADE_PALACE_ENTRANCE,
+    'Holy Sanctum Start': {
+        location: spawnLocations.SPAWN_HOLY_SANCTUM_ENTRANCE,
         savedState: jadePalaceStartState,
     },
 };

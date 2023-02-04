@@ -39,11 +39,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Bug fix
-        - Elder/Rival cannot get out of the cut scene
-
-    - Show Hint marker when you aren't on the overworld.
-
     - Allow teleporting over pits so we can teleport to moving platforms.
 
     - Finish Holy Sanctum

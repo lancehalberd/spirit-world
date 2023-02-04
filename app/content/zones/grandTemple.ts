@@ -1184,6 +1184,7 @@ const f0_1x1: AreaDefinition = {
     ],
     objects: [
         {status: "normal", id: "", x: 248, y: 280, type: "teleporter", linked: true, locationCue: "Grand Temple"},
+        {status: "normal", id: "portalMarker", x: 248, y: 320, type: "spawnMarker", linked: true},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -3431,6 +3432,7 @@ const sf0_1x1: AreaDefinition = {
     ],
     objects: [
         {status: "normal", id: "", x: 248, y: 280, type: "teleporter", linked: true, locationCue: "Jade Palace"},
+        {status: "normal", id: "spiritPortalMarker", x: 248, y: 320, type: "spawnMarker", linked: true, spirit: true},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},

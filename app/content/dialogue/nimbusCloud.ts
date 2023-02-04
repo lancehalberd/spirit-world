@@ -33,9 +33,12 @@ export const zoneEntranceMap = {
     'waterfallTower': 'overworld:waterfallTowerEntrance',
      // waterfallTowerTopEntrance
     'forge': 'sky:forgeEntrance',
-    'grandTemple': 'overworld:templeDoor',
-    'jadePalace': 'overworld:jadePalaceEntrance',
+    // These are both considered part of the overworld now.
+    //'grandTemple': 'overworld:grandTempleEntrance',
+    //'jadePalace': 'overworld:jadePalaceEntrance',
+    'gauntlet': 'grandTemple:gauntletEntrance',
     'skyPalace': 'sky:skyPalaceEntrance',
+    'holySanctum': 'grandTemple:holySanctumEntrance',
     'riverTemple': 'overworld:riverTempleUpperEntrance',
     // underwater:riverTempleWaterEntrance
     'staffTower': 'overworld:staffTowerEntrance',
@@ -69,7 +72,7 @@ function fallIntoLocation(state: GameState) {
 dialogueHash.nimbusCloud = {
     key: 'nimbusCloud',
     mappedOptions: {
-        returnMenu: `{choice:Return?|No:nimbusCloud.no|Home:nimbusCloud.returnToHome|Last Save:nimbusCloud.returnToLastSave}`,
+        returnMenu: `{choice:Return?|No:nimbusCloud.no|Last Save:nimbusCloud.returnToLastSave|Home:nimbusCloud.returnToHome}`,
         returnToHome: (state: GameState) => travelToLocation(state, 'overworld', 'waterfallMarker'),
         returnToLastSave: (state: GameState) => {
             returnToSpawnLocation(state);
@@ -83,8 +86,9 @@ dialogueHash.nimbusCloud = {
             }
             if (state.location.isSpiritWorld) {
                 return `{choice:Where to?
+                        |Jade Palace:nimbusCloud.jadePalace
                         |Shop:nimbusCloud.spiritShop
-                        |Temple:nimbusCloud.forestTemple
+                        |Forest Temple:nimbusCloud.forestTemple
                         |Sky:nimbusCloud.skyCity
                         |City:nimbusCloud.jadeCity
                         |Nevermind:nimbusCloud.no
@@ -94,6 +98,7 @@ dialogueHash.nimbusCloud = {
                 return `The Nimbus Cloud won't appear underwater.`;
             }
             return `{choice:Where to?
+                    |Grand Temple:nimbusCloud.grandTemple
                     |Lake:nimbusCloud.lake
                     |City:nimbusCloud.holyCity
                     |Forest:nimbusCloud.vanaraVillage
@@ -109,12 +114,14 @@ dialogueHash.nimbusCloud = {
             return '';
         },
         // Material world destinations
+        grandTemple: (state: GameState) => travelToLocation(state, 'grandTemple', 'portalMarker'),
         lake: (state: GameState) => travelToLocation(state, 'overworld', 'lakeMarker'),
         holyCity: (state: GameState) => travelToLocation(state, 'overworld', 'holyCityMarker'),
         vanaraVillage: (state: GameState) => travelToLocation(state, 'overworld', 'vanaraVillageMarker'),
         crater: (state: GameState) => travelToLocation(state, 'sky', 'craterMarker'),
         summonerRuins: (state: GameState) => travelToLocation(state, 'overworld', 'summonerRuinsMarker'),
         // Spirit world destinations
+        jadePalace: (state: GameState) => travelToLocation(state, 'grandTemple', 'spiritPortalMarker'),
         spiritShop: (state: GameState) => travelToLocation(state, 'overworld', 'spiritShopMarker'),
         forestTemple: (state: GameState) => travelToLocation(state, 'overworld', 'forestTempleMarker'),
         skyCity: (state: GameState) => travelToLocation(state, 'sky', 'skyCityMarker'),
