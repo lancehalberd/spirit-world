@@ -39,9 +39,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-
-    - Holy sanctum key requirements appear broken, `entranceSeed=2` currently places a key after the 3 locks.
-
     - Allow teleporting over pits so we can teleport to moving platforms.
 
     - Brain storm ideas to make lightning element more interesting

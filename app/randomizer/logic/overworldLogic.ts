@@ -62,10 +62,11 @@ export const overworldNodes: LogicNode[] = [
         zoneId,
         nodeId: 'nimbusCloud',
         paths: [
+            // Holy city, Vanara village and summoner ruins are all in this node.
+            { nodeId: 'overworldMain' },
             { nodeId: 'riverTempleRoof' },
             { nodeId: 'mountainAscentExit' },
-            // Holy city, Vanara village and summoner ruins
-            // are all accessible without the cloud, so don't bother with them here.
+            { nodeId: 'grandTemple' },
         ],
     },
     {
@@ -78,6 +79,7 @@ export const overworldNodes: LogicNode[] = [
             { nodeId: 'westSpiritWorld' },
             // sky city entrance (really just the main spirit sky section).
             { nodeId: 'waterfallTowerSky' },
+            { nodeId: 'jadePalace' },
         ],
     },
     {

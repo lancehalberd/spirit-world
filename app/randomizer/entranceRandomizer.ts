@@ -104,6 +104,8 @@ const normalLoopableEntrancePairs = [
     {outerTarget: 'overworld:tombEntrance', innerTarget: 'cocoon:cocoonEntrance'},
     // Lake Tunnel -> Helix
     {outerTarget: 'overworld:lakeTunnelEntrance', innerTarget: 'helix:helixEntrance'},
+    // Grand temple -> Gauntlet
+    {outerTarget: 'overworld:grandTempleEntrance', innerTarget: 'gauntlet:gauntletEntrance'},
 ];
 const spiritLoopableEntrancePairs = [
     // Elder Spirit -> Forest Temple Back
@@ -112,6 +114,8 @@ const spiritLoopableEntrancePairs = [
     {outerTarget: 'overworld:warTempleEntranceSpirit', innerTarget: 'lab:labEntrance'},
     // Lab -> Tre
     {outerTarget: 'warTemple:labEntrance', innerTarget: 'tree:treeEntrance'},
+    // Jade Palace -> Holy Sanctum
+    {outerTarget: 'overworld:jadePalaceEntrance', innerTarget: 'holySanctum:holySanctumEntrance'},
 ];
 
 export function randomizeEntrances(random: typeof SRandom) {

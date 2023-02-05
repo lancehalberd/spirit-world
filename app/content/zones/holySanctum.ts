@@ -654,10 +654,10 @@ const sf0_0x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "holySanctumBackDoor", x: 224, y: 496, type: "door", style: "crystal", d: "down", targetZone: "holySanctum", targetObjectId: "holySanctumBackDoor"},
+        {status: "locked", id: "holySanctumBackDoor", x: 224, y: 496, type: "door", style: "crystal", d: "down", targetZone: "holySanctum", targetObjectId: "holySanctumBackDoor"},
         {status: "normal", id: "holySanctumBigKey", x: 248, y: 408, type: "chest", lootType: "bigKey", lootLevel: 1},
         {status: "locked", id: "holySanctumKeyBlock", x: 240, y: 352, type: "keyBlock", spirit: false},
-        {status: "normal", id: "holySanctumBackStairs", x: 112, y: 16, type: "door", style: "crystalDownstairs", targetZone: "holySanctum", targetObjectId: "holySanctumBackStairs", d: "up", locationCue: "Holy Sanctum 2F"},
+        {status: "locked", id: "holySanctumBackStairs", x: 112, y: 16, type: "door", style: "crystalDownstairs", targetZone: "holySanctum", targetObjectId: "holySanctumBackStairs", d: "up", locationCue: "Holy Sanctum 2F"},
         {status: "locked", id: "holySanctumBackStairs", x: 240, y: 304, type: "door", style: "crystalUpstairs", targetZone: "holySanctum", targetObjectId: "holySanctumBackStairs", d: "up", locationCue: "Holy Sanctum 1F"},
         {status: "normal", id: "holySanctumBow", x: 368, y: 72, type: "bigChest", lootType: "bow", lootLevel: 2},
         {status: "normal", id: "holySanctumTowerStairs", x: 368, y: 16, type: "door", style: "crystalDownstairs", targetZone: "holySanctum", targetObjectId: "holySanctumTowerStairs", d: "up", locationCue: "Holy Sanctum 2F"},
