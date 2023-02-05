@@ -39,7 +39,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - key block issues in holy sanctum.
     - make sure rolling balls respawn when leaving rooms.
     - Shouldn't be able to enter grand temple until beasts are released
         - Ultimately this should be a narration box that causes the guard to say Vanara cannot enter the temple.
