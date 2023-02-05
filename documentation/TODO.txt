@@ -39,6 +39,10 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Add object splash graphic
+    - Update icons
+    - Add enemy fall graphic
+
     - Staff covers right half of off centered chests.
 
     - Holy sanctum key requirements appear broken, `entranceSeed=2` currently places a key after the 3 locks.

@@ -227,7 +227,7 @@ const f0_0x0: AreaDefinition = {
     ],
     specialBehaviorKey: 'staffTower',
 };
-const f0_1x0: AreaDefinition = {
+const f0_0x1: AreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -674,9 +674,9 @@ const sf0_0x0: AreaDefinition = {
     ],
     specialBehaviorKey: 'staffTower',
 };
-const sf0_1x0: AreaDefinition = {
+const sf0_0x1: AreaDefinition = {
     isSpiritWorld: true,
-    parentDefinition: f0_1x0,
+    parentDefinition: f0_0x1,
     layers: [
         {
             key: 'floor',
@@ -1142,7 +1142,7 @@ const f1_0x0: AreaDefinition = {
     ],
     specialBehaviorKey: 'staffTower',
 };
-const f1_1x0: AreaDefinition = {
+const f1_0x1: AreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -1357,7 +1357,7 @@ const f1_1x0: AreaDefinition = {
         {status: "normal", id: "staffTower2F3F", x: 192, y: 32, type: "door", style: "woodenUpstairs", targetZone: "staffTower", targetObjectId: "staffTower2F3F", d: "up", locationCue: "Tower 2F"},
         {status: "normal", id: "tower2FBarrier", specialBehaviorKey: "towerTeleporter", x: 304, y: 160, type: "anode", saveStatus: "forever"},
         {status: "normal", id: "", specialBehaviorKey: "towerTeleporter", x: 192, y: 160, type: "cathode"},
-        {status: "normal", id: "", specialBehaviorKey: "towerTeleporter", x: 320, y: 160, type: "floorSwitch", targetObjectId: "tower2FBarrier", saveStatus: "forever"},
+        {status: "normal", id: "staffTower2FSwitch", specialBehaviorKey: "towerTeleporter", x: 320, y: 160, type: "floorSwitch", targetObjectId: "tower2FBarrier", saveStatus: "forever"},
         {status: "normal", id: "", x: 208, y: 384, speed: "fast", d: "left", w: 160, h: 32, style: "belt", type: "escalator"},
         {status: "normal", id: "", x: 176, y: 288, speed: "slow", d: "left", w: 160, h: 32, style: "belt", type: "escalator"},
         {status: "normal", id: "", x: 176, y: 320, speed: "slow", d: "up", w: 32, h: 96, style: "belt", type: "escalator"},
@@ -1603,9 +1603,9 @@ const sf1_0x0: AreaDefinition = {
     ],
     specialBehaviorKey: 'staffTower',
 };
-const sf1_1x0: AreaDefinition = {
+const sf1_0x1: AreaDefinition = {
     isSpiritWorld: true,
-    parentDefinition: f1_1x0,
+    parentDefinition: f1_0x1,
     layers: [
         {
             key: 'floor',
@@ -2067,7 +2067,7 @@ const f2_0x0: AreaDefinition = {
     ],
     specialBehaviorKey: 'staffTower',
 };
-const f2_1x0: AreaDefinition = {
+const f2_0x1: AreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -2527,9 +2527,9 @@ const sf2_0x0: AreaDefinition = {
     ],
     specialBehaviorKey: 'staffTower',
 };
-const sf2_1x0: AreaDefinition = {
+const sf2_0x1: AreaDefinition = {
     isSpiritWorld: true,
-    parentDefinition: f2_1x0,
+    parentDefinition: f2_0x1,
     layers: [
         {
             key: 'floor',
@@ -3036,7 +3036,7 @@ const f3_0x0: AreaDefinition = {
         {x: 0, y: 0, w: 32, h: 32},
     ],
 };
-const f3_1x0: AreaDefinition = {
+const f3_0x1: AreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -3518,9 +3518,9 @@ const sf3_0x0: AreaDefinition = {
         {x: 0, y: 0, w: 32, h: 32},
     ],
 };
-const sf3_1x0: AreaDefinition = {
+const sf3_0x1: AreaDefinition = {
     isSpiritWorld: true,
-    parentDefinition: f3_1x0,
+    parentDefinition: f3_0x1,
     layers: [
         {
             key: 'floor',
@@ -3748,41 +3748,41 @@ zones.staffTower = {
         {
             grid: [
                 [f0_0x0,],
-                [f0_1x0,],
+                [f0_0x1,],
             ],
             spiritGrid: [
                 [sf0_0x0,],
-                [sf0_1x0,],
+                [sf0_0x1,],
             ],
         },
         {
             grid: [
                 [f1_0x0,],
-                [f1_1x0,],
+                [f1_0x1,],
             ],
             spiritGrid: [
                 [sf1_0x0,],
-                [sf1_1x0,],
+                [sf1_0x1,],
             ],
         },
         {
             grid: [
                 [f2_0x0,],
-                [f2_1x0,],
+                [f2_0x1,],
             ],
             spiritGrid: [
                 [sf2_0x0,],
-                [sf2_1x0,],
+                [sf2_0x1,],
             ],
         },
         {
             grid: [
                 [f3_0x0,],
-                [f3_1x0,],
+                [f3_0x1,],
             ],
             spiritGrid: [
                 [sf3_0x0,],
-                [sf3_1x0,],
+                [sf3_0x1,],
             ],
         },
     ],
