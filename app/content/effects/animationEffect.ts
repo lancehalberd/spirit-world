@@ -4,7 +4,7 @@ import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import Random from 'app/utils/Random';
 
 import {
-    AreaInstance, DrawPriority, EffectInstance, Frame, FrameAnimation,
+    AreaInstance, DrawPriority, EffectInstance, Frame, FrameAnimation, FrameDimensions,
     GameState, MagicElement, ObjectInstance, Rect, TileBehaviors,
 } from 'app/types';
 
@@ -333,3 +333,10 @@ export function addParticleSpray(
     particle.y -= (animation.frames[0].content?.h || animation.frames[0].h) / 2;
     addEffectToArea(state, area, particle);
 }
+
+const fallGeometry: FrameDimensions = {w: 24, h: 24, content: {x: 4, w: 16, y: 4, h: 16}};
+export const objectFallAnimation: FrameAnimation = createAnimation('gfx/effects/enemyfall.png', fallGeometry, { cols: 10, duration: 4}, { loop: false });
+const splashGeometry: FrameDimensions = {w: 22, h: 20, content: {x: 3, w: 16, y: 2, h: 16}};
+export const splashAnimation: FrameAnimation = createAnimation('gfx/effects/watersplash.png', splashGeometry, { cols: 8, duration: 5}, { loop: false });
+const enemyFallGeometry: FrameDimensions = {w: 20, h: 22, content: {x: 2, w: 16, y: 3, h: 16}};
+export const enemyFallAnimation: FrameAnimation = createAnimation('gfx/effects/enemyfall2.png', enemyFallGeometry, { cols: 13, duration: 5}, { loop: false });

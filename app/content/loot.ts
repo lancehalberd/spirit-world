@@ -373,9 +373,9 @@ export const [
     waterBlessing, fireBlessing, lightningBlessing,
     goldBow,
     silverChakram, goldChakram,
-    /* otherGoldMail */, goldMail, ironSkin,
+    goldMail, ironSkin,
 ] = createAnimation('gfx/hud/icons.png',
-    {w: 18, h: 18, content: {x: 1, y: 1, w: 16, h: 16}}, {cols: 44}
+    {w: 18, h: 18, content: {x: 1, y: 1, w: 16, h: 16}}, {cols: 43}
 ).frames;
 export const [
     /* container */, fireElement, iceElement, lightningElement, neutralElement, /* elementShine */

@@ -1,7 +1,6 @@
 import { sample } from 'lodash';
 
-import { AnimationEffect } from 'app/content/effects/animationEffect';
-import { createAnimation } from 'app/utils/animations';
+import { AnimationEffect, enemyFallAnimation } from 'app/content/effects/animationEffect';
 import { addEffectToArea } from 'app/utils/effects';
 import { directionMap, getDirection, getTileBehaviorsAndObstacles } from 'app/utils/field';
 import { getAreaSize } from 'app/utils/getAreaSize';
@@ -9,7 +8,7 @@ import { getLineOfSightTargetAndDirection, getVectorToNearbyTarget } from 'app/u
 import { getSectionBoundingBox, moveActor } from 'app/moveActor';
 
 import {
-    Enemy, FrameAnimation, FrameDimensions, GameState,
+    Enemy, GameState,
     MovementProperties,
 } from 'app/types';
 
@@ -149,11 +148,6 @@ export function paceRandomly(state: GameState, enemy: Enemy) {
     }
 }
 
-
-const fallGeometry: FrameDimensions = {w: 24, h: 24};
-export const enemyFallAnimation: FrameAnimation = createAnimation('gfx/effects/enemyfall.png', fallGeometry, { cols: 10, duration: 4}, { loop: false });
-
-
 export function checkForFloorEffects(state: GameState, enemy: Enemy) {
     // If the enemy is removed from the area during custom update logic, this check no longer applies.
     if (!enemy.area) {
@@ -204,7 +198,7 @@ function makeEnemyFallIntoPit(state: GameState, enemy: Enemy) {
     const hitbox = enemy.getHitbox(state);
     const pitAnimation = new AnimationEffect({
         animation: enemyFallAnimation,
-        x: Math.round(hitbox.x / 16) * 16 - 4, y: Math.round(hitbox.y / 16) * 16 - 4,
+        x: Math.floor(hitbox.x / 16) * 16, y: Math.floor(hitbox.y / 16) * 16,
     });
     addEffectToArea(state, enemy.area, pitAnimation);
     enemy.status = 'gone';

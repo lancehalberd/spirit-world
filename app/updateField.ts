@@ -1,4 +1,4 @@
-import { AnimationEffect } from 'app/content/effects/animationEffect';
+import { AnimationEffect, objectFallAnimation, enemyFallAnimation, splashAnimation } from 'app/content/effects/animationEffect';
 import { Enemy } from 'app/content/enemy';
 import { setEquippedElement } from 'app/content/menu';
 import { editingState } from 'app/development/editingState';
@@ -6,20 +6,15 @@ import { FRAME_LENGTH, GAME_KEY } from 'app/gameConstants';
 import { wasGameKeyPressed } from 'app/userInput';
 import { updateAllHeroes } from 'app/updateActor';
 import { updateCamera } from 'app/updateCamera';
-import { createAnimation } from 'app/utils/animations';
 import { checkIfAllEnemiesAreDefeated } from 'app/utils/checkIfAllEnemiesAreDefeated';
 import { addEffectToArea } from 'app/utils/effects';
 import { getTileBehaviorsAndObstacles } from 'app/utils/field';
 import { removeObjectFromArea } from 'app/utils/objects';
 
 import {
-    AreaInstance, EffectInstance, FrameAnimation, FrameDimensions,
+    AreaInstance, EffectInstance,
     GameState, MagicElement, ObjectInstance
 } from 'app/types';
-
-const fallGeometry: FrameDimensions = {w: 24, h: 24};
-export const objectFallAnimation: FrameAnimation = createAnimation('gfx/effects/enemyfall.png', fallGeometry, { cols: 10, duration: 4}, { loop: false });
-
 
 export function updateField(this: void, state: GameState) {
     if (editingState.isEditing) {
@@ -128,19 +123,18 @@ export function updateAreaObjects(this: void, state: GameState, area: AreaInstan
             const y = hitbox.y + hitbox.h / 2;
             const { tileBehavior } = getTileBehaviorsAndObstacles(state, object.area, {x, y});
             if (tileBehavior?.pit  && !(object.z > 0)) {
-                const pitAnimation = new AnimationEffect({
-                    animation: objectFallAnimation,
-                    x: ((x / 16) | 0) * 16 - 4, y: ((y / 16) | 0) * 16 - 4,
+                const animation = new AnimationEffect({
+                    animation: object.definition?.type === 'enemy' ? enemyFallAnimation : objectFallAnimation,
+                    x: ((x / 16) | 0) * 16, y: ((y / 16) | 0) * 16,
                 });
-                addEffectToArea(state, object.area, pitAnimation);
+                addEffectToArea(state, object.area, animation);
                 removeObjectFromArea(state, object);
             } else if (tileBehavior?.water  && !(object.z > 0)) {
-                // This should be a splashing animation eventually.
-                const pitAnimation = new AnimationEffect({
-                    animation: objectFallAnimation,
-                    x: ((x / 16) | 0) * 16 - 4, y: ((y / 16) | 0) * 16 - 4,
+                const animation = new AnimationEffect({
+                    animation: splashAnimation,
+                    x: ((x / 16) | 0) * 16, y: ((y / 16) | 0) * 16,
                 });
-                addEffectToArea(state, object.area, pitAnimation);
+                addEffectToArea(state, object.area, animation);
                 removeObjectFromArea(state, object);
             }
         }

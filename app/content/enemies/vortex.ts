@@ -1,3 +1,4 @@
+import { AnimationEffect, splashAnimation } from 'app/content/effects/animationEffect';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { omniAnimation } from 'app/content/enemyAnimations';
 import { Hero } from 'app/content/hero';
@@ -5,6 +6,7 @@ import { FRAME_LENGTH } from 'app/gameConstants';
 import { getEnemyBoundingBox, getSectionBoundingBox, intersectRectangles, moveActor } from 'app/moveActor';
 import { isUnderwater } from 'app/utils/actor';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
+import { addEffectToArea } from 'app/utils/effects';
 import {
     accelerateInDirection,
     moveEnemy,
@@ -69,6 +71,13 @@ enemyDefinitions.vortex = {
                     hero.x = enemy.x + 4;
                     hero.y = enemy.y + 4;
                     enemy.params.chaseCooldown = 1500;
+                    const animation = new AnimationEffect({
+                        animation: splashAnimation,
+                        drawPriority: 'sprites',
+                        // increase y+z by 4 to make this draw in front of the hero fall animation.
+                        x: hero.x, y: hero.y + 4, z: 4
+                    });
+                    addEffectToArea(state, hero.area, animation);
                 }
             } else if (mag < 40) {
                 if (hero.z > 0) {
