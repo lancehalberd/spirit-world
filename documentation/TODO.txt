@@ -39,7 +39,14 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Only regenerate iron skin when spirit energy is full.
+    - key block issues in holy sanctum.
+    - make sure rolling balls respawn when leaving rooms.
+    - Shouldn't be able to enter grand temple until beasts are released
+        - Ultimately this should be a narration box that causes the guard to say Vanara cannot enter the temple.
+        - Invisibility allows you to bypass the narration
+        - Rolling shouldn't let you past
+    - Staff covers right half of off centered chests.
+
 
     - Holy sanctum key requirements appear broken, `entranceSeed=2` currently places a key after the 3 locks.
 

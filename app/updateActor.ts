@@ -137,7 +137,7 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
         if (hero.action === 'walking' && hero.isRunning && hero.magic > 0) {
             hero.animationTime += FRAME_LENGTH / 2;
         }
-        if (hero.passiveTools.ironSkin) {
+        if (hero.passiveTools.ironSkin && hero.magic >= hero.maxMagic) {
             hero.ironSkinCooldown -= FRAME_LENGTH;
             // Iron skin restored twice as quickly when still.
             if (!hero.action || hero.action === 'meditating') {
