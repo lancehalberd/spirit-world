@@ -39,17 +39,19 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - make sure rolling balls respawn when leaving rooms.
-    - Shouldn't be able to enter grand temple until beasts are released
-        - Ultimately this should be a narration box that causes the guard to say Vanara cannot enter the temple.
-        - Invisibility allows you to bypass the narration
-        - Rolling shouldn't let you past
     - Staff covers right half of off centered chests.
-
 
     - Holy sanctum key requirements appear broken, `entranceSeed=2` currently places a key after the 3 locks.
 
     - Allow teleporting over pits so we can teleport to moving platforms.
+
+    - Brain storm ideas to make lightning element more interesting
+        - For puzzles
+        - For combat
+
+    - Allow sneaking into grand temple with invisibility
+        - Ultimately this should be a narration box that causes the guard to say Vanara cannot enter the temple.
+        - Make sure rolling doesn't let you pass
 
     - Finish Holy Sanctum
         - Add back of sanctum with big key
@@ -66,6 +68,8 @@ Current tasks:
             - behind challenging platform puzzle similar to tower puzzle (easier with roll 2 or staff + lightning badge)
                 - probably moving platforms as I don't want to require cloud boots for this
         - Add peach piece to ice sanctum
+
+    - Replace pit in waterfall tower with a ladder that can only be opened from the top but can be used in both directions after.
 
     - Upgrade entrance randomizer to support complex connected exit graphs.
         - Currently it only supports connected exits that can be traveled in all directions.
