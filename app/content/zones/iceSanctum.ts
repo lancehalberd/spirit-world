@@ -287,7 +287,7 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 32, y: 240, type: "door", style: "crystal", d: "down"},
         {status: "normal", id: "iceSanctum:0:0x0-vortex-0", x: 52, y: 384, type: "enemy", enemyType: "vortex", d: "down", params: {}},
         {status: "normal", id: "iceSanctum:0:0x0-vortex-1", x: 288, y: 348, type: "enemy", enemyType: "vortex", d: "down", params: {}},
-        {status: "normal", id: "", x: 64, y: 80, type: "rollingBall"},
+        {status: "normal", id: "iceSanctumRollingBall", x: 64, y: 80, type: "rollingBall"},
         {status: "normal", id: "", x: 352, y: 48, type: "ballGoal", targetObjectId: "iceSanctumTeleporter"},
         {status: "normal", id: "iceSanctum:0:0x0-vortex-2", x: 420, y: 448, type: "enemy", enemyType: "vortex", d: "down", params: {}},
         {status: "normal", id: "iceSanctum:0:0x0-vortex-3", x: 172, y: 416, type: "enemy", enemyType: "vortex", d: "down", params: {}},
