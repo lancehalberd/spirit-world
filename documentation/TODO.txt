@@ -39,8 +39,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Allow teleporting over pits so we can teleport to moving platforms.
-
     - Brain storm ideas to make lightning element more interesting
         - For puzzles
             - More lightning switches that turn on things

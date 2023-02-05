@@ -15,19 +15,17 @@ import {
 export { directionMap, getDirection } from 'app/utils/direction';
 
 export function canTeleportToCoords(state: GameState, hero: Hero, {x, y}: Tile): boolean {
-    const excludedObjects = new Set([hero]);
-    return isPointOpen(state, hero.area, {x: x + 2, y: y + 2}, {canSwim: true}, excludedObjects) &&
-        isPointOpen(state, hero.area, {x: x + 13, y: y + 2}, {canSwim: true}, excludedObjects) &&
-        isPointOpen(state, hero.area, {x: x + 2, y: y + 13}, {canSwim: true}, excludedObjects) &&
-        isPointOpen(state, hero.area, {x: x + 13, y: y + 13}, {canSwim: true}, excludedObjects);
+    return isPointOpen(state, hero.area, {x: x + 2, y: y + 2}, {canSwim: true, canFall: true}) &&
+        isPointOpen(state, hero.area, {x: x + 13, y: y + 2}, {canSwim: true, canFall: true}) &&
+        isPointOpen(state, hero.area, {x: x + 2, y: y + 13}, {canSwim: true, canFall: true}) &&
+        isPointOpen(state, hero.area, {x: x + 13, y: y + 13}, {canSwim: true, canFall: true});
 }
 
 export function canSomersaultToCoords(state: GameState, hero: Hero, {x, y}: Tile): boolean {
-    const excludedObjects = new Set([hero]);
-    return isPointOpen(state, hero.area, {x: x + 2, y: y + 2}, {canSwim: true, canFall: true}, excludedObjects) &&
-        isPointOpen(state, hero.area, {x: x + 13, y: y + 2}, {canSwim: true, canFall: true}, excludedObjects) &&
-        isPointOpen(state, hero.area, {x: x + 2, y: y + 13}, {canSwim: true, canFall: true}, excludedObjects) &&
-        isPointOpen(state, hero.area, {x: x + 13, y: y + 13}, {canSwim: true, canFall: true}, excludedObjects);
+    return isPointOpen(state, hero.area, {x: x + 2, y: y + 2}, {canSwim: true, canFall: true}) &&
+        isPointOpen(state, hero.area, {x: x + 13, y: y + 2}, {canSwim: true, canFall: true}) &&
+        isPointOpen(state, hero.area, {x: x + 2, y: y + 13}, {canSwim: true, canFall: true}) &&
+        isPointOpen(state, hero.area, {x: x + 13, y: y + 13}, {canSwim: true, canFall: true});
 }
 
 export function isPointOpen(
