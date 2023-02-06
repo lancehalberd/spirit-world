@@ -39,6 +39,8 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - change staff to no longer be tile aligned, and allow it to be any length that is 40px + 4*Npx
+
     - Brain storm ideas to make lightning element more interesting
         - For puzzles
             - More lightning switches that turn on things
@@ -53,9 +55,6 @@ Current tasks:
             - Add aoe to lightning attacks, 24px radius normally and 40px radius for charge level 2
             - More enemies weak against lightning
             - Faster attack speed
-
-    - Staff covers right half of off centered chests.
-        - check 4 points per tile instead of 1 probably
 
     - Finish Holy Sanctum
         - Add back of sanctum with big key

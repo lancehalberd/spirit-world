@@ -1944,7 +1944,6 @@ const f0_2x1: AreaDefinition = {
         {
             key: 'floor2',
             drawPriority: 'background',
-            logicKey: 'desertTower',
             grid: {
                 w: 32,
                 h: 32,
@@ -4529,7 +4528,6 @@ const sf0_2x1: AreaDefinition = {
         {
             key: 'floor2',
             drawPriority: 'background',
-            logicKey: 'desertTower',
             grid: {
                 w: 32,
                 h: 32,
