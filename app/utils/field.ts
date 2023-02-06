@@ -15,17 +15,18 @@ import {
 export { directionMap, getDirection } from 'app/utils/direction';
 
 export function canTeleportToCoords(state: GameState, hero: Hero, {x, y}: Tile): boolean {
-    return isPointOpen(state, hero.area, {x: x + 2, y: y + 2}, {canSwim: true, canFall: true}) &&
-        isPointOpen(state, hero.area, {x: x + 13, y: y + 2}, {canSwim: true, canFall: true}) &&
-        isPointOpen(state, hero.area, {x: x + 2, y: y + 13}, {canSwim: true, canFall: true}) &&
-        isPointOpen(state, hero.area, {x: x + 13, y: y + 13}, {canSwim: true, canFall: true});
+    return isTileOpen(state, hero.area, {x, y}, {canSwim: true, canFall: true});
 }
 
 export function canSomersaultToCoords(state: GameState, hero: Hero, {x, y}: Tile): boolean {
-    return isPointOpen(state, hero.area, {x: x + 2, y: y + 2}, {canSwim: true, canFall: true}) &&
-        isPointOpen(state, hero.area, {x: x + 13, y: y + 2}, {canSwim: true, canFall: true}) &&
-        isPointOpen(state, hero.area, {x: x + 2, y: y + 13}, {canSwim: true, canFall: true}) &&
-        isPointOpen(state, hero.area, {x: x + 13, y: y + 13}, {canSwim: true, canFall: true});
+    return isTileOpen(state, hero.area, {x, y}, {canSwim: true, canFall: true});
+}
+
+export function isTileOpen(state: GameState, area: AreaInstance, {x, y}: Tile, movementProperties: MovementProperties): boolean {
+    return isPointOpen(state, area, {x: x + 2, y: y + 2}, movementProperties) &&
+        isPointOpen(state, area, {x: x + 13, y: y + 2}, movementProperties) &&
+        isPointOpen(state, area, {x: x + 2, y: y + 13}, movementProperties) &&
+        isPointOpen(state, area, {x: x + 13, y: y + 13}, movementProperties);
 }
 
 export function isPointOpen(
@@ -33,7 +34,6 @@ export function isPointOpen(
     area: AreaInstance,
     {x, y, z}: {x: number, y: number, z?: number},
     movementProperties: MovementProperties,
-    excludedObjects: Set<any> = null
 ): boolean {
     const tx = Math.floor(x / 16);
     const ty = Math.floor(y / 16);
@@ -76,7 +76,7 @@ export function isPointOpen(
         if (object.status === 'gone' || object.status === 'hidden' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
             continue;
         }
-        if (excludedObjects?.has(object)) {
+        if (movementProperties.excludedObjects?.has(object)) {
             continue;
         }
         const behaviors = getObjectBehaviors(state, object);

@@ -11,7 +11,7 @@ const f0_0x0: AreaDefinition = {
         {x: 0, y: 0, w: 32, h: 32},
     ],
 };
-const f0_1x0: AreaDefinition = {
+const f0_0x1: AreaDefinition = {
     layers: null,
     objects: [
         {status: "normal", id: "waterfallTower:0:0x0-decoration-0", x: 0, y: 512, type: "waterfall", w: 512, h: 512},
@@ -307,10 +307,11 @@ const sf0_0x0: AreaDefinition = {
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
     ],
+    corrosiveLogic: {"isTrue":true,"isInverted":false},
 };
-const sf0_1x0: AreaDefinition = {
+const sf0_0x1: AreaDefinition = {
     isSpiritWorld: true,
-    parentDefinition: f0_1x0,
+    parentDefinition: f0_0x1,
     layers: [
         {
             key: 'floor',
@@ -597,6 +598,7 @@ const sf0_1x0: AreaDefinition = {
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
     ],
+    corrosiveLogic: {"isTrue":true,"isInverted":false},
 };
 const f1_0x0: AreaDefinition = {
     layers: null,
@@ -608,7 +610,7 @@ const f1_0x0: AreaDefinition = {
         {x: 0, y: 16, w: 32, h: 16},
     ],
 };
-const f1_1x0: AreaDefinition = {
+const f1_0x1: AreaDefinition = {
     layers: null,
     objects: [
         {status: "normal", id: "waterfallTower:0:0x0-decoration-0", x: 0, y: 512, type: "waterfall", w: 512, h: 512},
@@ -855,10 +857,11 @@ const sf1_0x0: AreaDefinition = {
         {x: 0, y: 0, w: 32, h: 16},
         {x: 0, y: 16, w: 32, h: 16},
     ],
+    corrosiveLogic: {"isTrue":true,"isInverted":false},
 };
-const sf1_1x0: AreaDefinition = {
+const sf1_0x1: AreaDefinition = {
     isSpiritWorld: true,
-    parentDefinition: f1_1x0,
+    parentDefinition: f1_0x1,
     layers: [
         {
             key: 'floor',
@@ -1210,6 +1213,7 @@ const sf1_1x0: AreaDefinition = {
         {x: 0, y: 16, w: 16, h: 16},
         {x: 16, y: 16, w: 16, h: 16},
     ],
+    corrosiveLogic: {"isTrue":true,"isInverted":false},
 };
 zones.waterfallTower = {
     key: 'waterfallTower',
@@ -1217,21 +1221,21 @@ zones.waterfallTower = {
         {
             grid: [
                 [f0_0x0,],
-                [f0_1x0,],
+                [f0_0x1,],
             ],
             spiritGrid: [
                 [sf0_0x0,],
-                [sf0_1x0,],
+                [sf0_0x1,],
             ],
         },
         {
             grid: [
                 [f1_0x0,],
-                [f1_1x0,],
+                [f1_0x1,],
             ],
             spiritGrid: [
                 [sf1_0x0,],
-                [sf1_1x0,],
+                [sf1_0x1,],
             ],
         },
     ],

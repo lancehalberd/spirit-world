@@ -1,6 +1,6 @@
 import { objectHash } from 'app/content/objects/objectHash';
 import { createAnimation, drawFrame } from 'app/utils/animations';
-import { directionMap, isPointOpen } from 'app/utils/field';
+import { directionMap, isTileOpen } from 'app/utils/field';
 
 import {
     AreaInstance, Direction, Frame, GameState, Hero, HitProperties, HitResult, ObjectInstance,
@@ -66,12 +66,12 @@ export class PushPullObject implements ObjectInstance {
         if (this.pushDirection) {
             return;
         }
-        const x = this.x + 8 + 16 * directionMap[direction][0];
-        const y = this.y + 8 + 16 * directionMap[direction][1];
-        const excludedObjects = new Set([hero, this, this.linkedObject]);
-        const movementProperties = {canFall: true, needsFullTile: true};
-        if (isPointOpen(state, this.area, {x, y}, movementProperties, excludedObjects)
-            && (!this.linkedObject || isPointOpen(state, this.linkedObject.area, {x, y}, movementProperties, excludedObjects))
+        const x = this.x + 16 * directionMap[direction][0];
+        const y = this.y + 16 * directionMap[direction][1];
+        const excludedObjects = new Set([this, this.linkedObject]);
+        const movementProperties = {canFall: true, canSwim: true, needsFullTile: true, excludedObjects};
+        if (isTileOpen(state, this.area, {x, y}, movementProperties)
+            && (!this.linkedObject || isTileOpen(state, this.linkedObject.area, {x, y}, movementProperties))
         ) {
             this.pushDirection = direction;
             this.pullingHeroDirection = direction;

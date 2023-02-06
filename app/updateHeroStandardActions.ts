@@ -198,12 +198,11 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 const points = [0, 5, 10, 15];
                 // There is special logic for pushing in the direction the hero is facing since we expect that
                 // direction to be blocked by the object they are grabbing.
-                const excludedObjects = new Set([hero, hero.grabObject]);
+                const excludedObjects = new Set([hero.grabObject]);
                 if ((direction === hero.d && (hero.x === hero.grabObject.x || hero.y === hero.grabObject.y))
                     || points.every(x => points.every(y => isPointOpen(state, hero.area,
                         {x: hero.x + x + 16 * directionMap[direction][0], y: hero.y + y + 16 * directionMap[direction][1] },
-                        { canFall: true, canSwim: true },
-                        excludedObjects
+                        { canFall: true, canSwim: true, excludedObjects },
                     )))
                 ) {
                     hero.grabObject.onPull(state, direction, hero);
