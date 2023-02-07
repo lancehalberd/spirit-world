@@ -259,6 +259,14 @@ export class Door implements ObjectInstance {
             const behaviors: TileBehaviors = this.isOpen() ? { cannotLand: true, climbable: true } : { solid: true, low: false};
             applyBehaviorToTile(this.area, x, y, behaviors);
             applyBehaviorToTile(this.area, x, y + 1, behaviors);
+        } else if (this.style === 'ladderUpTall') {
+            const behaviors: TileBehaviors = this.isOpen() ? { cannotLand: true, climbable: true } : { solid: true, low: false};
+            applyBehaviorToTile(this.area, x, y, behaviors);
+            applyBehaviorToTile(this.area, x, y + 1, behaviors);
+            applyBehaviorToTile(this.area, x, y + 2, behaviors);
+            applyBehaviorToTile(this.area, x, y + 3, behaviors);
+            applyBehaviorToTile(this.area, x, y + 4, behaviors);
+            applyBehaviorToTile(this.area, x, y + 5, behaviors);
         } else if (doorStyle.w === 64) {
             const behaviors: TileBehaviors = this.isOpen() ? { cannotLand: true, solid: false, low: true, lowCeiling: true  } : { solid: true, low: false};
             if (this.definition.d === 'up' || this.definition.d === 'down') {

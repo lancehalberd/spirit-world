@@ -43,8 +43,7 @@ Current tasks:
         - For puzzles
             - More lightning switches that turn on things
                 - Add to holy sanctum back
-                - Probably use in forge as well
-                - Allow activating waterfall tower ladder from the bottom
+                - Probably use in forge + sky palace as well
             - Lightning switch to open material world basement in staff tower
                 - 3 sentry bots that are off if boss is defeated, must be activated to defeat and get peach piece
                 - Can be done in randomizer without defeating boss but all 3 will be active at once
@@ -73,10 +72,13 @@ Current tasks:
         - Add peach piece to ice sanctum
             - Hidden randomized floor switches under ice plants
 
-    - Replace pit in waterfall tower with a ladder that can only be opened from the top but can be used in both directions after.
-        - Add lightning switch to the bottom for opening this in advance.
-
     - Brainstorm ideas for Sky Palace
+        - Wind streams that can push the player.
+            - With cloud boots they can push the player over long gaps or up to the next fllor
+            - Iron boots prevent being pushed at all
+        - Lightning switches toggle mechanisms like platforms and wind turbines.
+        - Heavy 2x2 blocks that can only be pushed if the player has mitts
+        - Big key in a chest that you have to fall to.
 
     - Allow sneaking into grand temple with invisibility
         - Ultimately this should be a narration box that causes the guard to say Vanara cannot enter the temple.

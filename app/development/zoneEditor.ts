@@ -599,7 +599,7 @@ export function getLogicProperties(
             } else if (logicType === 'custom') {
                 updateLogic({
                     hasCustomLogic: true,
-                    customLogic: logic.customLogic || '',
+                    customLogic: logic?.customLogic || '',
                     isInverted: !!logic?.isInverted,
                 });
             } else {

@@ -865,6 +865,27 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
             drawFrame(context, ladderBottom, {x: door.x, y: door.y + 16, w: 16, h: 16});
         }
     },
+    ladderUpTall: {
+        w: 16,
+        h: 96,
+        getHitbox(door: Door) {
+            // Making this ladder narrow prevents climbing down it from the sides, but
+            // has little impact climbing up since the tiles force the hero to the
+            // center of the ladder.
+            return {x: door.x + 6, y: door.y, w: 4, h: 96};
+        },
+        render(this: void, context, state, door) {
+            if (door.status !== 'normal') {
+                return;
+            }
+            drawFrame(context, ladderMiddle, {x: door.x, y: door.y, w: 16, h: 16});
+            drawFrame(context, ladderMiddle, {x: door.x, y: door.y + 16, w: 16, h: 16});
+            drawFrame(context, ladderMiddle, {x: door.x, y: door.y + 32, w: 16, h: 16});
+            drawFrame(context, ladderMiddle, {x: door.x, y: door.y + 48, w: 16, h: 16});
+            drawFrame(context, ladderMiddle, {x: door.x, y: door.y + 64, w: 16, h: 16});
+            drawFrame(context, ladderBottom, {x: door.x, y: door.y + 80, w: 16, h: 16});
+        }
+    },
     ladderDown: {
         w: 16,
         h: 16,
