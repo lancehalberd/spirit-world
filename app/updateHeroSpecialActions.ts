@@ -28,7 +28,7 @@ import { getVectorToTarget } from 'app/utils/target';
 
 
 import {
-    GameState, Hero, HitProperties, ObjectInstance, StaffTowerLocation,
+    GameState, Hero, HitProperties, ObjectInstance, Rect, StaffTowerLocation,
 } from 'app/types';
 
 const rollSpeed = [
@@ -388,23 +388,6 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         if (hero.animationTime < jumpDuration - FRAME_LENGTH) {
             hero.vz = 1 - 1 * hero.animationTime / jumpDuration;
             hero.z += hero.vz;
-            const mx = hero.x % 16;
-            const my = hero.y % 16;
-            if (hero.d === 'up' || hero.d === 'down') {
-                if (mx >= 8 && mx < 14) {
-                    hero.x++;
-                }
-                if (mx < 8 && mx > 2) {
-                    hero.x--;
-                }
-            } else {
-                if (my >= 8 && my < 14) {
-                    hero.y++;
-                }
-                if (my < 8 && my > 2) {
-                    hero.y--;
-                }
-            }
         } else if (hero.animationTime === jumpDuration - FRAME_LENGTH) {
             hero.vz = -4;
             hero.z = Math.max(hero.z + hero.vz, minZ);
@@ -451,29 +434,23 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             const staffLevel = state.hero.activeTools.staff;
             const maxLength = staffLevel > 1 ? 64 : 4;
             const staff = new Staff(state, {
-                x: hero.x + 8 + 12 * directionMap[hero.d][0],
-                y: hero.y + 8 + 12 * directionMap[hero.d][1],
+                x: hero.x,
+                y: hero.y,
                 damage: 4 * staffLevel,
                 direction: hero.d,
                 element: hero.element,
                 maxLength,
             });
-            let baseTarget = {
-                x: staff.leftColumn * 16,
-                y: staff.topRow * 16,
-                w: (staff.rightColumn - staff.leftColumn + 1) * 16,
-                h: (staff.bottomRow - staff.topRow + 1) * 16,
-            }
-            if (!staff.invalid && !hero.canceledStaffPlacement) {
+            let baseTarget: Rect = staff.getHitbox();
+            if (!staff.isInvalid && !hero.canceledStaffPlacement) {
                 hero.activeStaff = staff;
                 addObjectToArea(state, state.areaInstance, staff);
             } else {
                 // Staff hits at least a 3 tile area even if it doesn't get placed.
                 const isVertical = staff.direction === 'up' || staff.direction === 'down';
-                const column = (staff.x / 16) | 0, row = (staff.y / 16) | 0;
                 baseTarget = {
-                    x: column * 16 - (staff.direction === 'left' ? 32 : 0),
-                    y: row * 16 - (staff.direction === 'up' ? 32 : 0),
+                    x: staff.x + (staff.direction === 'left' ? 0 : 16),
+                    y: staff.y + (staff.direction === 'up' ? 0 : 16),
                     w: isVertical ? 16 : 48,
                     h: isVertical ? 48 : 16,
                 };

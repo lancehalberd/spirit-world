@@ -1,10 +1,13 @@
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { debugCanvas } from 'app/utils/canvas';
-import { isTileOpen } from 'app/utils/field';
-import { getAreaSize } from 'app/utils/getAreaSize';
+import { directionMap } from 'app/utils/direction';
+import { moveObject } from 'app/movement/moveObject';
 
-import { AreaInstance, Direction, DrawPriority, Hero, MagicElement, GameState, ObjectInstance, ObjectStatus, TileBehaviors } from 'app/types';
+import {
+    AreaInstance, Direction, DrawPriority, Hero, MagicElement, MovementProperties,
+    GameState, ObjectInstance, ObjectStatus, TileBehaviors,
+} from 'app/types';
 
 const staffPartGeometry = {w: 20, h: 17};
 const leftAnimation = createAnimation('gfx/effects/wukong_staff_parts.png', staffPartGeometry, {x: 0, y: 3, rows: 3, frameMap: [2, 1,0], duration: 3}, {loop: false});
@@ -25,19 +28,20 @@ interface Props {
 }
 
 export class Staff implements ObjectInstance {
+    behaviors: TileBehaviors = {
+        groundHeight: 2,
+    };
     area: AreaInstance;
     definition = null;
     canPressSwitches = true;
     drawPriority: DrawPriority = 'background';
     x: number;
     y: number;
+    w: number = 16;
+    h: number = 16;
     ignorePits = true;
-    invalid: boolean;
+    isInvalid: boolean;
     isObject = <const>true;
-    topRow: number;
-    bottomRow: number;
-    leftColumn: number;
-    rightColumn: number;
     damage;
     status: ObjectStatus = 'normal';
     direction: Direction;
@@ -50,97 +54,71 @@ export class Staff implements ObjectInstance {
     constructor(state: GameState, { x = 0, y = 0, damage = 1, direction, element, maxLength = 4 }: Props) {
         // Note this assumes the staff is always added to the area the hero is in.
         this.area = state.areaInstance;
+        x = x | 0;
+        y = y | 0;
+        this.direction = direction;
+        this.w = 16;
+        this.h = 16;
+        // Slight adjustments are made to the dimensions of the staff depending on the direction in order
+        // for the graphic to match its hitbox.
+        if (direction === 'left' || direction === 'right') {
+            y += 5;
+            this.h = 8;
+        } else {
+            x += 4;
+            this.w = 8;
+        }
         this.x = x;
         this.y = y;
-        this.direction = direction;
         this.element = element;
         this.damage = damage;
-        let row = this.topRow = this.bottomRow = Math.floor(y / 16);
-        let column = this.leftColumn = this.rightColumn = Math.floor(x / 16);
-        const movementProps = {canFall: true, canSwim: true};
-        const tileBehavior = this.area?.behaviorGrid[row]?.[column];
-        if (tileBehavior?.solid || tileBehavior?.solidMap || tileBehavior?.ledges) {
-            this.invalid = true;
-            return;
-        }
-        if (!isTileOpen(state, this.area, {x: column * 16, y: row * 16 }, movementProps)) {
-            this.invalid = true;
-            return;
-        }
-        const { section } = getAreaSize(state);
-        if (direction === 'left') {
-            for (let i = 1; i < maxLength; i++) {
-                column = this.rightColumn - i;
-                const tileBehavior = this.area?.behaviorGrid[row]?.[column];
-                if (column * 16 < section.x || tileBehavior?.solid || tileBehavior?.solidMap || tileBehavior?.diagonalLedge || tileBehavior?.blocksStaff) {
-                    break;
-                }
-                if (!isTileOpen(state, this.area, {x: column * 16, y: row * 16 }, movementProps)) {
-                    break;
-                }
-                this.leftColumn = column;
+        const dx = 4 * directionMap[direction][0];
+        const dy = 4 * directionMap[direction][1];
+        const movementProperties: MovementProperties = {canFall: true, canSwim: true, canWiggle: true, dx, dy};
+        for (let i = 0; i < maxLength * 4; i++) {
+            const {mx, my} = moveObject(state, this, dx, dy, movementProperties);
+            if (!mx && !my) {
+                break;
             }
-        }else if (direction === 'right') {
-            for (let i = 1; i < maxLength; i++) {
-                column = this.leftColumn + i;
-                const tileBehavior = this.area?.behaviorGrid[row]?.[column];
-                if (column * 16 >= section.x + section.w || tileBehavior?.solid || tileBehavior?.solidMap || tileBehavior?.diagonalLedge || tileBehavior?.blocksStaff) {
-                    break;
+            // If the staff is more than 4 pixels off in both dimensions it means it has wiggled more than 4px
+            // which is the max we allow, so we remove all wiggles.
+            if (Math.abs(this.x - x) > 4 && Math.abs(this.y - y) > 4) {
+                if (this.direction === 'left' || this.direction === 'right') {
+                    this.y = y;
+                } else {
+                    this.x = x;
                 }
-                if (!isTileOpen(state, this.area, {x: column * 16, y: row * 16 }, movementProps)) {
-                    break;
-                }
-                this.rightColumn = column;
-            }
-        } else if (direction === 'up') {
-            for (let i = 1; i < maxLength; i++) {
-                row = this.bottomRow - i;
-                const tileBehavior = this.area?.behaviorGrid[row]?.[column];
-                if (row * 16 < section.y || tileBehavior?.solid || tileBehavior?.solidMap || tileBehavior?.diagonalLedge || tileBehavior?.blocksStaff) {
-                    break;
-                }
-                if (!isTileOpen(state, this.area, {x: column * 16, y: row * 16 }, movementProps)) {
-                    break;
-                }
-                this.topRow = row;
-            }
-        } else if (direction === 'down') {
-            for (let i = 1; i < maxLength; i++) {
-                row = this.topRow + i;
-                const tileBehavior = this.area?.behaviorGrid[row]?.[column];
-                if (row * 16 >= section.y + section.h || tileBehavior?.solid || tileBehavior?.solidMap || tileBehavior?.diagonalLedge || tileBehavior?.blocksStaff) {
-                    break;
-                }
-                if (!isTileOpen(state, this.area, {x: column * 16, y: row * 16 }, movementProps)) {
-                    break;
-                }
-                this.bottomRow = row;
+                break;
             }
         }
-        if (this.rightColumn - this.leftColumn < 2 && this.bottomRow - this.topRow < 2) {
-            this.invalid = true;
+        if (direction === 'left' && x - this.x >= 40) {
+            this.w = x - this.x
+        } else if (direction === 'right' && this.x - x >= 40) {
+            this.w = this.x - x;
+            this.x = x + 16;
+        } else if (direction === 'up' && y - this.y >= 40) {
+            this.h = y - this.y
+        } else if (direction === 'down' && this.y - y >= 40) {
+            this.h = this.y - y;
+            this.y = y + 16;
+        } else {
+            this.x = x;
+            this.y = y;
+            this.isInvalid = true;
+        }
+        // Make the hitbox even shorter when horizontal because the player's vertical hitbox is so large
+        // it isn't intuitive otherwise. We don't do this earlier because otherwise the staff can appear
+        // to lay on top of tiles since the graphics are so much larger than its hitbox.
+        if (direction === 'left' || direction === 'right') {
+            this.h = 6;
         }
     }
-    getHitbox(state: GameState) {
-        return {
-            x: this.leftColumn * 16, y: this.topRow * 16,
-            w: (this.rightColumn - this.leftColumn + 1) * 16,
-            h: (this.bottomRow - this.topRow + 1) * 16,
-        };
+    getHitbox() {
+        return this;
     }
     add(state: GameState, area: AreaInstance) {
         this.area = area;
         area.objects.push(this);
-        // Store the behaviors on the staff as we delete them, the staff turns all covered tiles
-        // into open ground.
-        this.storedBehaviors = [];
-        for (let row = this.topRow; row <= this.bottomRow; row++) {
-            this.storedBehaviors[row] = []
-            for (let column = this.leftColumn; column <= this.rightColumn; column++) {
-                this.storedBehaviors[row][column] = state.areaInstance.behaviorGrid[row][column];
-                state.areaInstance.behaviorGrid[row][column] = { groundHeight: 2, blocksStaff: true };
-            }
-        }
         // Restore this staff to the hero if it was moved from one area to another, for example
         // when refreshing logic for the current area.
         if (this.hero) {
@@ -160,7 +138,7 @@ export class Staff implements ObjectInstance {
             return;
         }
         this.animationTime += FRAME_LENGTH;
-        if (this.invalid && this.animationTime > 100) {
+        if (this.isInvalid && this.animationTime > 100) {
             this.remove(state);
         }
     }
@@ -169,12 +147,6 @@ export class Staff implements ObjectInstance {
         if (index >= 0){
             this.area.objects.splice(index, 1);
         }
-        // Restore the original tiles under the staff.
-        for (let row = this.topRow; row <= this.bottomRow; row++) {
-            for (let column = this.leftColumn; column <= this.rightColumn; column++) {
-                this.area.behaviorGrid[row][column] = this.storedBehaviors[row][column];
-            }
-        }
         for (const hero of [state.hero, ...state.hero.clones]) {
             if (hero.activeStaff === this) {
                 this.hero = hero;
@@ -182,31 +154,36 @@ export class Staff implements ObjectInstance {
             }
         }
     }
-    render(context, state: GameState) {
+    render(context: CanvasRenderingContext2D, state: GameState) {
+        let x = this.x | 0, y = this.y | 0;
         if (this.direction === 'left' || this.direction === 'right') {
+            x -= 3;
             let frame = getFrame(leftAnimation, this.animationTime);
-            const y = this.topRow * 16 - 1;
-            drawFrame(context, frame, {...frame, x: this.leftColumn * 16 - 2, y});
-            const length = this.rightColumn - this.leftColumn - 1;
-            if (length > 0) {
+            y -= 5;
+            drawFrame(context, frame, {...frame, x: x - 2, y});
+            const w = this.w - 16;
+            if (w > 0) {
                 frame = getFrame(horizontalAnimation, this.animationTime);
                 // This frame is 16px center in 20px space, but we need the exact rectangle to stretch it correctly.
-                drawFrame(context, {...frame, x: frame.x + 2, w: 16}, {...frame, x: this.leftColumn * 16 + 16, y, w: length * 16});
+                drawFrame(context, {...frame, x: frame.x, w: 16}, {...frame, x: x + 8, y, w});
             }
             frame = getFrame(rightAnimation, this.animationTime);
-            drawFrame(context, frame, {...frame, x: this.rightColumn * 16 - 2, y});
+            drawFrame(context, frame, {...frame, x: x + this.w - 12, y});
         } else {
+            y -= 4;
             let frame = getFrame(topAnimation, this.animationTime);
-            const x = this.leftColumn * 16 - 2;
-            drawFrame(context, frame, {...frame, x, y: this.topRow * 16 - 1});
-            const length = this.bottomRow - this.topRow - 1;
-            if (length > 0) {
+            x -= 6;
+            drawFrame(context, frame, {...frame, x, y: y});
+            const h = this.h - 25;
+            if (h > 0) {
                 frame = getFrame(verticalAnimation, this.animationTime);
                 // This frame is 16px offset by 1px in 17px space, but we need the exact rectangle to stretch it correctly.
-                drawFrame(context, {...frame, y: frame.y + 1, h: 16}, {...frame, x, y: this.topRow * 16 + 16, h: length * 16});
+                drawFrame(context, {...frame, y: frame.y + 1, h: 16}, {...frame, x, y: y + 16, h});
             }
             frame = getFrame(bottomAnimation, this.animationTime);
-            drawFrame(context, frame, {...frame, x, y: this.bottomRow * 16 - 1});
+            drawFrame(context, frame, {...frame, x, y: y + this.h - 11});
         }
+        //context.fillStyle = 'blue';
+        //context.fillRect(this.x, this.y, this.w, this.h);
     }
 }

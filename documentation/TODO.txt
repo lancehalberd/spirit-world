@@ -39,8 +39,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - change staff to no longer be tile aligned, and allow it to be any length that is 40px + 4*Npx
-
     - Brain storm ideas to make lightning element more interesting
         - For puzzles
             - More lightning switches that turn on things

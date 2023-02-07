@@ -274,7 +274,7 @@ export class BeadSection implements ObjectInstance {
                         Math.min(this.x + this.w, Math.max(this.x, x)), hero.y + hero.h, 0);
                 }
                 const shouldPullHero = touchingHero && hero.equippedBoots !== 'ironBoots'&& !this.area.objects.some(object => {
-                    return object instanceof Staff && boxesIntersect(hero, object.getHitbox(state));
+                    return object instanceof Staff && boxesIntersect(hero, object.getHitbox());
                 });
                 if (hero.actionTarget === this && !shouldPullHero) {
                     hero.actionTarget = null;
