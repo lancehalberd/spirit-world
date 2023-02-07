@@ -92,7 +92,7 @@ function moveObjectInDirection(
     // If this movement would move outside of the bounding rectangle, do not allow
     // it if it moves them further outside the rectangle, but do allow it otherwise.
     if (movementProperties.boundingBox) {
-        const hitbox = object.getHitbox();
+        const hitbox = {...object.getHitbox()};
         const v = directionMap[direction];
         hitbox.x += v[0] * amount;
         hitbox.y += v[1] * amount;

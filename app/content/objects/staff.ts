@@ -1,4 +1,5 @@
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { getSectionBoundingBox } from 'app/moveActor';
 import { moveObject } from 'app/movement/moveObject';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { debugCanvas } from 'app/utils/canvas';
@@ -42,8 +43,9 @@ export class Staff implements ObjectInstance {
     h: number = 16;
     ignorePits = true;
     isInvalid: boolean;
+    staffBonked: boolean;
     isObject = <const>true;
-    damage;
+    damage: number;
     status: ObjectStatus = 'normal';
     direction: Direction;
     element: MagicElement;
@@ -75,7 +77,10 @@ export class Staff implements ObjectInstance {
         this.damage = damage;
         const dx = 4 * directionMap[direction][0];
         const dy = 4 * directionMap[direction][1];
-        const movementProperties: MovementProperties = {canFall: true, canSwim: true, canWiggle: true, dx, dy};
+        const movementProperties: MovementProperties = {
+            boundingBox: getSectionBoundingBox(state, this),
+            canFall: true, canSwim: true, canWiggle: true, dx, dy,
+        };
         for (let i = 0; i < maxLength * 4; i++) {
             const {mx, my} = moveObject(state, this, dx, dy, movementProperties);
             if (!mx && !my) {
@@ -103,8 +108,7 @@ export class Staff implements ObjectInstance {
             this.h = this.y - y;
             this.y = y + 16;
         } else {
-            this.x = x;
-            this.y = y;
+            this.staffBonked = Math.abs(this.y - y) >= 32 || Math.abs(this.x - x) >= 32;
             this.isInvalid = true;
         }
         // Make the hitbox even shorter when horizontal because the player's vertical hitbox is so large
@@ -172,7 +176,7 @@ export class Staff implements ObjectInstance {
             if (w > 0) {
                 frame = getFrame(horizontalAnimation, this.animationTime);
                 // This frame is 16px center in 20px space, but we need the exact rectangle to stretch it correctly.
-                drawFrame(context, {...frame, x: frame.x, w: 16}, {...frame, x: x + 8, y, w});
+                drawFrame(context, {...frame, x: frame.x + 2, w: 16}, {...frame, x: x + 10, y, w});
             }
             frame = getFrame(rightAnimation, this.animationTime);
             drawFrame(context, frame, {...frame, x: x + this.w - 12, y});

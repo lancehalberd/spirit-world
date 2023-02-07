@@ -64,7 +64,7 @@ export class BeadCascade implements ObjectInstance {
         this.y = definition.y;
         this.status = this.definition.status;
         if (getObjectStatus(state, this.definition)) {
-            this.status = 'normal';
+            this.onActivate(state);
         }
     }
     add(state: GameState, area: AreaInstance) {
@@ -86,10 +86,16 @@ export class BeadCascade implements ObjectInstance {
     onActivate(state: GameState) {
         this.status = 'normal';
         this.animationTime = 0;
+        if (this.definition.saveStatus === 'zone' || this.definition.saveStatus === 'forever') {
+            saveObjectStatus(state, this.definition, this.definition.status !== this.status);
+        }
     }
     onDeactivate(state: GameState) {
         this.status = 'hidden';
         this.animationTime = 0;
+        if (this.definition.saveStatus === 'zone' || this.definition.saveStatus === 'forever') {
+            saveObjectStatus(state, this.definition, this.definition.status !== this.status);
+        }
     }
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;

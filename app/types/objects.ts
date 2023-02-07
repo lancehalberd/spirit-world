@@ -102,7 +102,7 @@ export interface ObjectInstance {
     changeStatus?: (state: GameState, status: ObjectStatus) => void
     cleanup?: (state: GameState) => void,
     // This is called when a user grabs a solid tile
-    getHitbox?: (state?: GameState) => Rect
+    getHitbox?: (state?: GameState) => Readonly<Rect>
     // This hitbox will be used for movement instead of getHitbox if defined.
     getMovementHitbox?: () => Rect
     // This can be set to override the default yDepth calculation for an object.
@@ -169,7 +169,7 @@ export interface EffectInstance {
     height?: number
     cleanup?: (state: GameState) => void
     // This is called when a user grabs a solid tile
-    getHitbox?: (state?: GameState) => Rect
+    getHitbox?: (state?: GameState) => Readonly<Rect>
     // This hitbox will be used for movement instead of getHitbox if defined.
     getMovementHitbox?: () => Rect
     // This can be set to override the default yDepth calculation for an object.
@@ -211,17 +211,23 @@ export interface MovementProperties {
     boundingBox?: false | Rect
     // Can set an arbitrary array of rectangles that block this movement.
     blockedBoxes?: Rect[]
+    // Can push objects
     canPush?: boolean
+    // Can go over tiles with pits
     canFall?: boolean
+    // Can go over tiles with deep water
     canSwim?: boolean
+    // Can go over tiles with lava
     canMoveInLava?: boolean
     // If this is set this object cannot cross ground greater than this height.
     maxHeight?: number
     // Enemies with this prop can only move in deep water.
     mustSwim?: boolean
+    // Can go on tiles marked as climbable
     canClimb?: boolean
-    // True when climbing.
+    // Can go up ledges True when climbing.
     canCrossLedges?: boolean
+    // Can go down ledges
     canJump?: boolean
     // Whether the mover should wiggle to fit into tight spaces.
     canWiggle?: boolean
@@ -233,6 +239,7 @@ export interface MovementProperties {
     direction?: Direction
     // Objects to ignore for hit detection.
     excludedObjects?: Set<any>
+    // Movement will fill if any pixels in the tile are blocked.
     needsFullTile?: boolean
     // The actor moving, if an actor. This will be used for hitting damaging tiles
     actor?: Actor
