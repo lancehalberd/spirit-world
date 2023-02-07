@@ -1,8 +1,9 @@
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { moveObject } from 'app/movement/moveObject';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { debugCanvas } from 'app/utils/canvas';
 import { directionMap } from 'app/utils/direction';
-import { moveObject } from 'app/movement/moveObject';
+import { pad } from 'app/utils/index';
 
 import {
     AreaInstance, Direction, DrawPriority, Hero, MagicElement, MovementProperties,
@@ -116,6 +117,9 @@ export class Staff implements ObjectInstance {
     getHitbox() {
         return this;
     }
+    getAttackHitbox() {
+        return pad(this, 4);
+    }
     add(state: GameState, area: AreaInstance) {
         this.area = area;
         area.objects.push(this);
@@ -155,6 +159,9 @@ export class Staff implements ObjectInstance {
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
+        //context.fillStyle = 'red';
+        //const attackHitbox = this.getAttackHitbox();
+        //context.fillRect(attackHitbox.x, attackHitbox.y, attackHitbox.w, attackHitbox.h);
         let x = this.x | 0, y = this.y | 0;
         if (this.direction === 'left' || this.direction === 'right') {
             x -= 3;

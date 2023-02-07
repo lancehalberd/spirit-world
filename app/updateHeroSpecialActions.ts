@@ -441,19 +441,21 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 element: hero.element,
                 maxLength,
             });
-            let baseTarget: Rect = staff.getHitbox();
+            let baseTarget: Rect = staff.getAttackHitbox();
             if (!staff.isInvalid && !hero.canceledStaffPlacement) {
                 hero.activeStaff = staff;
                 addObjectToArea(state, state.areaInstance, staff);
-            } else {
+            } else if (staff.isInvalid) {
                 // Staff hits at least a 3 tile area even if it doesn't get placed.
-                const isVertical = staff.direction === 'up' || staff.direction === 'down';
-                baseTarget = {
-                    x: staff.x + (staff.direction === 'left' ? 0 : 16),
-                    y: staff.y + (staff.direction === 'up' ? 0 : 16),
-                    w: isVertical ? 16 : 48,
-                    h: isVertical ? 48 : 16,
-                };
+                if (staff.direction === 'up') {
+                    baseTarget = {x: hero.x, y: hero.y - 48, w: 16, h: 48};
+                } else if (staff.direction === 'down') {
+                    baseTarget = {x: hero.x, y: hero.y + 16, w: 16, h: 48};
+                } else if (staff.direction === 'left') {
+                    baseTarget = {x: hero.x - 48, y: hero.y, w: 48, h: 16};
+                } else if (staff.direction === 'right') {
+                    baseTarget = {x: hero.x + 16, y: hero.y, w: 48, h: 16};
+                }
             }
             playAreaSound(state, state.areaInstance, 'bossDeath');
             hitTargets(state, state.areaInstance, {
