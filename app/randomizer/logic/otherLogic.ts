@@ -295,11 +295,11 @@ export const cavesNodes: LogicNode[] = [
         zoneId: 'hypeCave',
         nodeId: 'hypeCave',
         checks: [
-            {objectId: 'hypeCave:s0:0x0-money-1'},
-            {objectId: 'hypeCave:s0:0x0-money-2'},
-            {objectId: 'hypeCave:s0:0x0-money-3'},
-            {objectId: 'hypeCave:s0:0x0-money-4'},
-            {objectId: 'hypeCave:s0:0x0-money-0', logic: orLogic(hasSomersault, canHasTowerStaff)},
+            {objectId: 'hypeCave:money-0'},
+            {objectId: 'hypeCave:money-1'},
+            {objectId: 'hypeCave:money-2'},
+            {objectId: 'hypeCave:money-3'},
+            {objectId: 'hypeCave:peachOfImmortalityPiece-0', logic: orLogic(hasSomersault, canHasTowerStaff)},
         ],
         entranceIds: ['hypeCaveEntranceSpirit'],
         exits: [
