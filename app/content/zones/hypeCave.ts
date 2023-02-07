@@ -522,11 +522,11 @@ const sf0_0x0: AreaDefinition = {
     ],
     objects: [
         {status: "normal", id: "hypeCaveEntranceSpirit", x: 64, y: 496, type: "door", style: "cavern", targetZone: "sky", targetObjectId: "hypeCaveEntranceSpirit", d: "down"},
-        {status: "normal", id: "hypeCave:peachOfImmortalityPiece-0", x: 120, y: 48, type: "chest", lootType: "peachOfImmortalityPiece", lootAmount: 1},
-        {status: "normal", id: "hypeCave:money-1", x: 40, y: 400, type: "chest", lootType: "money", lootAmount: 50},
-        {status: "normal", id: "hypeCave:money-2", x: 184, y: 368, type: "chest", lootType: "money", lootAmount: 20},
-        {status: "normal", id: "hypeCave:money-3", x: 16, y: 432, type: "chest", lootType: "money", lootAmount: 100},
-        {status: "normal", id: "hypeCave:money-0", x: 208, y: 384, type: "chest", lootType: "money", lootAmount: 50},
+        {status: "normal", id: "hypeCaveMoney1", x: 16, y: 432, type: "chest", lootType: "money", lootAmount: 100},
+        {status: "normal", id: "hypeCaveMoney2", x: 40, y: 400, type: "chest", lootType: "money", lootAmount: 50},
+        {status: "normal", id: "hypeCaveMoney3", x: 184, y: 368, type: "chest", lootType: "money", lootAmount: 20},
+        {status: "normal", id: "hypeCaveMoney4", x: 208, y: 384, type: "chest", lootType: "money", lootAmount: 50},
+        {status: "normal", id: "hypeCavePeachPiece", x: 120, y: 48, type: "chest", lootType: "peachOfImmortalityPiece", lootAmount: 1},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 32},
