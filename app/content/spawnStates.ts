@@ -101,12 +101,19 @@ const helixEndState = applyItems(helixStartState, {staff: 1, normalDamage: 1, we
 const forestBackState = applyItems(helixEndState, {cloudBoots: 1, 'forestTemple:bigKey': 1});
 const waterfallBossState = applyItems(helixEndState, {ironBoots: 1});
 
-const grandTempleStartState = applyItems(helixEndState, {
+const gauntletStartState = applyItems(helixEndState, {
     clone: 1, cloudBoots: 1, gloves: 2, cloak: 2, nimbusCloud: 1, roll: 2},
     []);
 
-const jadePalaceStartState = applyItems(helixEndState, {
-    clone: 1, cloudBoots: 1, gloves: 2, cloak: 2, nimbusCloud: 1, roll: 2, bow: 2, ironSkin: 1
+const holySanctumStartState = applyItems(helixEndState, {
+    clone: 1, cloudBoots: 1,
+    gloves: 2, cloak: 2,
+    nimbusCloud: 1, roll: 2,
+    bow: 1,
+    trueSight: 1, ironSkin: 1,
+    staff: 2, lightning: 1,
+    fireBlessing: 1, fire: 1,
+    waterBlessing: 1, ice: 1,
 }, []);
 
 const beastState = applyItems(helixEndState, {
@@ -114,10 +121,10 @@ const beastState = applyItems(helixEndState, {
     lightningBlessing: 1, goldOre: 2,
     cloudBoots: 1, clone: 1,
     ironBoots: 1, cloak: 2,
-    ironSkin: 1, bow: 2,
+    trueSight: 1, ironSkin: 1,
     gloves: 2, goldMail: 1,
     roll: 2, nimbusCloud: 1,
-    trueSight: 1, phoenixCrown: 1,
+    bow: 2, phoenixCrown: 1,
     spiritDamage: 1, spiritRange: 1,
 });
 
@@ -213,10 +220,6 @@ export const earlySpawnLocations: SpawnLocationOptions = {
 };
 
 export const middleSpawnLocations: SpawnLocationOptions = {
-    'Gauntlet Start': {
-        location: spawnLocations.SPAWN_GAUNTLET_ENTRANCE,
-        savedState: grandTempleStartState,
-    },
     'Forest Start': {
         location: spawnLocations.SPAWN_FOREST_ENTRANCE,
         savedState: helixEndState,
@@ -224,6 +227,10 @@ export const middleSpawnLocations: SpawnLocationOptions = {
     'Forest Back': {
         location: spawnLocations.SPAWN_FOREST_BACK,
         savedState: forestBackState,
+    },
+    'Gauntlet Start': {
+        location: spawnLocations.SPAWN_GAUNTLET_ENTRANCE,
+        savedState: gauntletStartState,
     },
     'Waterfall Start': {
         location: spawnLocations.SPAWN_WATERFALL_ENTRANCE,
@@ -243,7 +250,7 @@ export const middleSpawnLocations: SpawnLocationOptions = {
     },
     'Holy Sanctum Start': {
         location: spawnLocations.SPAWN_HOLY_SANCTUM_ENTRANCE,
-        savedState: jadePalaceStartState,
+        savedState: holySanctumStartState,
     },
 };
 

@@ -21,6 +21,7 @@ export class PushPullObject implements ObjectInstance {
     definition: SimpleObjectDefinition = null;
     x: number;
     y: number;
+    z = 0;
     grabDirection: Direction;
     isObject = <const>true;
     linkedObject: PushPullObject;
@@ -100,7 +101,7 @@ export class PushPullObject implements ObjectInstance {
         }
     }
     render(context, state: GameState) {
-        drawFrame(context, potFrame, { ...potFrame, x: this.x, y: this.y - 2});
+        drawFrame(context, potFrame, { ...potFrame, x: this.x, y: this.y - 2 - this.z});
     }
 }
 objectHash.pushPull = PushPullObject;

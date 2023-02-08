@@ -32,6 +32,7 @@ export class TippableObject implements ObjectInstance {
     definition = null;
     x: number;
     y: number;
+    z: number;
     fallFrame = 0;
     fallingInPlace: boolean = false;
     fallDirection: Direction;
@@ -146,7 +147,7 @@ export class TippableObject implements ObjectInstance {
     }
     render(context, state: GameState) {
         const frame = getFrame(fallingAnimation, this.animationTime);
-        drawFrame(context, frame, { ...frame, x: this.x, y: this.y - 2 });
+        drawFrame(context, frame, { ...frame, x: this.x, y: this.y - 2 - this.z });
     }
 }
 objectHash.tippable = TippableObject;

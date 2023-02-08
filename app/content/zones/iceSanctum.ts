@@ -604,11 +604,12 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 128, y: 384, type: "turret", style: "crystal", d: "right", fireInterval: 1000, fireOffset: 0},
         {status: "normal", id: "", x: 240, y: 384, type: "turret", style: "crystal", d: "right", fireInterval: 1000, fireOffset: 0},
         {status: "normal", id: "", x: 352, y: 384, type: "turret", style: "crystal", d: "right", fireInterval: 1000, fireOffset: 0},
-        {status: "normal", id: "iceSanctumKey", x: 32, y: 64, type: "chest", lootType: "smallKey", lootLevel: 1},
+        {status: "hiddenEnemy", id: "iceSanctumPeachPiece", x: 80, y: 64, type: "chest", lootType: "peachOfImmortalityPiece", lootLevel: 1},
         {status: "normal", id: "iceSanctum:s0:0x0-frostBeetle-0", x: 252, y: 88, type: "enemy", enemyType: "frostBeetle", d: "down", params: {}},
         {status: "normal", id: "iceSanctum:s0:0x0-frostBeetle-1", x: 420, y: 104, type: "enemy", enemyType: "frostBeetle", d: "down", params: {}},
         {status: "normal", id: "iceSanctum:s0:0x0-frostBeetle-2", x: 244, y: 168, type: "enemy", enemyType: "frostBeetle", d: "down", params: {}},
         {status: "normal", id: "iceSanctum:s0:0x0-frostBeetle-3", x: 100, y: 120, type: "enemy", enemyType: "frostBeetle", d: "down", params: {}},
+        {status: "normal", id: "iceSanctumKey", x: 32, y: 64, type: "chest", lootType: "smallKey", lootLevel: 1},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16},

@@ -97,7 +97,7 @@ export function applyTileToBehaviorGrid(
     const brightness = Math.max(behaviorGrid[y][x]?.brightness || 0, behaviors.brightness || 0);
     const baseSolidMap = behaviorGrid[y][x]?.solidMap;
     behaviorGrid[y][x] = {...(behaviorGrid[y][x] || {}), ...behaviors, lightRadius, brightness};
-    if (baseSolidMap && behaviors.solidMap) {
+    if (!behaviorGrid[y]?.[x]?.solid && baseSolidMap && behaviors.solidMap) {
         behaviorGrid[y][x].solidMap = new Uint16Array([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]);
         for (let row = 0; row < 16; row++) {
             behaviorGrid[y][x].solidMap[row] = baseSolidMap[row] | behaviors.solidMap[row];

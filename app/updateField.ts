@@ -9,6 +9,7 @@ import { updateCamera } from 'app/updateCamera';
 import { checkIfAllEnemiesAreDefeated } from 'app/utils/checkIfAllEnemiesAreDefeated';
 import { addEffectToArea } from 'app/utils/effects';
 import { getTileBehaviorsAndObstacles } from 'app/utils/field';
+import { rectanglesOverlap } from 'app/utils/index';
 import { removeObjectFromArea } from 'app/utils/objects';
 
 import {
@@ -118,9 +119,23 @@ export function updateAreaObjects(this: void, state: GameState, area: AreaInstan
         }
         object.update?.(state);
         if (object.area && !object.ignorePits && object.getHitbox) {
+            // Objects that can fall in pits are assumed to fall to the ground when not supported.
+            if (object.z > 0) {
+                object.z = Math.max(0, object.z - 1);
+            }
             const hitbox = object.getHitbox(state);
             const x = hitbox.x + hitbox.w / 2;
             const y = hitbox.y + hitbox.h / 2;
+            for (const otherObject of area.objects) {
+                if (otherObject === object) {
+                    continue;
+                }
+                if (otherObject.behaviors?.groundHeight > 0 && rectanglesOverlap(hitbox, otherObject.getHitbox())) {
+                    object.z = Math.max(object.z, otherObject.behaviors?.groundHeight);
+                } else if (otherObject.behaviors?.groundHeight > 0) {
+                    //console.log(hitbox, otherObject.getHitbox());
+                }
+            }
             const { tileBehavior } = getTileBehaviorsAndObstacles(state, object.area, {x, y});
             if (tileBehavior?.pit  && !(object.z > 0)) {
                 const animation = new AnimationEffect({

@@ -27,6 +27,7 @@ export class RollingBallObject implements ObjectInstance {
     definition = null;
     x: number;
     y: number;
+    z: number = 0;
     isObject = <const>true;
     linkedObject: RollingBallObject;
     rollDirection: Direction;
@@ -102,14 +103,9 @@ export class RollingBallObject implements ObjectInstance {
         }
     }
     update(state: GameState) {
-        if (this.rollDirection) {
-            this.animationTime += FRAME_LENGTH;
-            const dx = 2 * directionMap[this.rollDirection][0];
-            const dy = 2 * directionMap[this.rollDirection][1];
-            const x = this.x + dx + (this.rollDirection === 'right' ? 15 : 1);
-            const y = this.y + dy + (this.rollDirection === 'down' ? 15 : 1);
+        if (this.z <= 0) {
             for (const object of this.area.objects) {
-                if (object.definition?.type !== 'ballGoal') {
+                if (object.definition?.type !== 'ballGoal' || object.status === 'active') {
                     continue;
                 }
                 if (Math.abs(this.x - object.x) <= 2 && Math.abs(this.y - object.y) <= 2) {
@@ -134,6 +130,13 @@ export class RollingBallObject implements ObjectInstance {
                     return;
                 }
             }
+        }
+        if (this.rollDirection) {
+            this.animationTime += FRAME_LENGTH;
+            const dx = 2 * directionMap[this.rollDirection][0];
+            const dy = 2 * directionMap[this.rollDirection][1];
+            const x = this.x + dx + (this.rollDirection === 'right' ? 15 : 1);
+            const y = this.y + dy + (this.rollDirection === 'down' ? 15 : 1);
             // Rolling balls hurt actors and push on other objects.
             // Use a slightly larger hitbox so we trigger hitting objects before stopping.
             const bigHitbox = { x: this.x, y: this.y, w: 16, h: 16 };
@@ -193,7 +196,7 @@ export class RollingBallObject implements ObjectInstance {
     }
     render(context, state: GameState) {
         const frame = getFrame(this.definition.spirit ? rollingAnimationSpirit : rollingAnimation, this.animationTime);
-        drawFrame(context, frame, { ...frame, x: this.x, y: this.y });
+        drawFrame(context, frame, { ...frame, x: this.x, y: this.y - this.z });
     }
 }
 objectHash.rollingBall = RollingBallObject;

@@ -63,14 +63,8 @@ Current tasks:
             - Include hybrid material/spirt world puzzles
         - Add peach piece to fire sanctum
             - true sight makes the piece obvious
-            - requires using spirit sight to solve a puzzle in the alternate world, probably a hidden ball goal in the final room.
-                - Allow switches to target objects in the alternate world.
-        - Add peach piece to lightning sanctum
-            - portal opens after getting key to material world
-            - 2 part platforming puzzle requires using staff to change path of floating platforms
-            - Escape portal at the halfway point so players can escape if they cannot complete second half
-        - Add peach piece to ice sanctum
-            - Hidden randomized floor switches under ice plants
+            - requires using astral projection to solve a puzzle in the alternate world.
+                - Opens a linked portal where they can find the chest in the material world.
 
     - Brainstorm ideas for Sky Palace
         - Wind streams that can push the player.
