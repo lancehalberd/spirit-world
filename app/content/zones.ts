@@ -31,6 +31,7 @@ export * from 'app/content/zones/holySanctum';
 export * from 'app/content/zones/fireSanctum';
 export * from 'app/content/zones/lightningSanctum';
 export * from 'app/content/zones/iceSanctum';
+export * from 'app/content/zones/holySanctumBack';
 // jade palace
 export * from 'app/content/zones/riverTemple';
 export * from 'app/content/zones/riverTempleWater';

@@ -34,7 +34,7 @@ export function getFullZoneLocation(location: ZoneLocation): FullZoneLocation {
     }  else if (zoneKey === 'warTemple') {
         logicalZoneKey = isSpiritWorld ? 'warPalace' : 'warTemple';
     } else if (
-        zoneKey === 'holySanctum'
+        zoneKey === 'holySanctum' || zoneKey === 'holySanctumBack'
         || zoneKey === 'fireSanctum' || zoneKey === 'lightningSanctum' || zoneKey === 'iceSanctum'
     ) {
         logicalZoneKey = 'holySanctum';
@@ -43,4 +43,48 @@ export function getFullZoneLocation(location: ZoneLocation): FullZoneLocation {
         ...location,
         logicalZoneKey,
     }
+}
+
+// Returns a name for the location that is at most 12 characters to fit in the save select screen.
+export function getShortZoneName(location: ZoneLocation): string {
+    const {logicalZoneKey} = getFullZoneLocation(location);
+    switch (logicalZoneKey) {
+        case 'ascentCaveSpirit': return 'Spirit Cave'
+        case 'ascentCave': return 'Cave'
+        case 'bushCave': return 'Cave'
+        case 'fertilityShrineSpirit': return 'SpiritShrine'
+        case 'fertilityShrine': return 'Shrine'
+        case 'jadePalace': return 'Jade Palace'
+        case 'grandTemple': return 'Grand Temple'
+        case 'peachCave': return 'Peach Cave'
+        case 'peachCaveSpirit': return 'Spirit Cave';
+        case 'riverTemple': return 'Lake Ruins'
+        case 'sky': return 'Sky'
+        case 'spiritSky': return 'Spirit Sky'
+        case 'sky': return 'in the sky';
+        case 'overworld': return 'Outside';
+        case 'spiritWorld': return 'Spirit World';
+        case 'holyCityInterior': return 'Holy City';
+        case 'jadeCityInterior': return 'Jade City';
+        case 'waterfallCave': return 'Home';
+        case 'treeVillage': return 'Village';
+        case 'tomb': return 'Vanara Tomb';
+        case 'warTemple': return 'War Temple';
+        case 'cocoon': return 'Cocoon';
+        case 'helix': return 'Helix';
+        case 'forestTemple': return 'F. Temple';
+        case 'waterfallTower': return 'W. Tower';
+        case 'forge': return 'Forge';
+        case 'skyPalace': return 'Sky Palace';
+        case 'crater': return 'Crater';
+        case 'staffTower': return 'Staff Tower';
+        case 'warPalace': return 'War Palace';
+        case 'lab': return 'Hidden Lab';
+        case 'tree': return 'World Tree';
+        case 'void': return 'Abyss';
+        case 'gauntlet': return 'Gauntlet';
+        case 'holySanctum': return 'Holy Sanctum';
+    }
+    // This should be typed as `never` by the compiler.
+    logicalZoneKey;
 }

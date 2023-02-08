@@ -367,7 +367,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             // Immediately kill other enemies and remove enemy attack effects when the boss is defeated.
             // Bosses in both material+spirit realms must be defeated before the battle is over.
             const allEnemies = [...this.area.enemies, ...this.area.alternateArea.enemies];
-            if (!allEnemies.some(object => object.definition.type === 'boss'
+            if (!allEnemies.some(object => object.definition.type === 'boss' && object.isFromCurrentSection(state)
                     && object.status !== 'gone' && !object.isDefeated)
             ) {
                 // Remove all enemy attacks from the screen when a boss is defeated.

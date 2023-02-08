@@ -9,7 +9,7 @@ import { updateHeroMagicStats } from 'app/render/spiritBar';
 import { randomizerSeed, randomizerGoal } from 'app/gameConstants';
 import { getDefaultSavedState } from 'app/savedState'
 import { returnToSpawnLocation } from 'app/utils/returnToSpawnLocation';
-import { getFullZoneLocation } from 'app/utils/getFullZoneLocation';
+import { getFullZoneLocation, getShortZoneName } from 'app/utils/getFullZoneLocation';
 
 import { GameState, SavedState } from 'app/types';
 
@@ -178,7 +178,7 @@ export function getTitleOptions(state: GameState): string[] {
         if (!savedGame) {
             return 'New Game';
         }
-        return savedGame.savedHeroData.spawnLocation.zoneKey;// + ' ' + 'V'.repeat(savedGame.hero.maxLife) + ' life';
+        return getShortZoneName(savedGame.savedHeroData.spawnLocation);
     });
     if (state.scene === 'deleteSavedGame') {
         return [...gameFiles, 'CANCEL'];

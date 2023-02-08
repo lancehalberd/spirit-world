@@ -26,6 +26,7 @@ enemyDefinitions.stormIdol = {
     animations: lightningIdolAnimations, scale: 1,
     isImmortal: true,
     life: 8, touchDamage: 1, update: updateStormIdol,
+    elementalMultipliers: {'fire': 1.5, 'ice': 1.5},
     immunities: ['lightning'],
     onHit: onHitIdol,
 };
@@ -34,6 +35,7 @@ enemyDefinitions.flameIdol = {
     animations: fireIdolAnimations, scale: 1,
     isImmortal: true,
     life: 8, touchDamage: 1, update: updateFlameIdol,
+    elementalMultipliers: {'lightning': 1.5, 'ice': 2},
     immunities: ['fire'],
     onHit: onHitIdol,
 };
@@ -42,6 +44,7 @@ enemyDefinitions.frostIdol = {
     animations: iceIdolAnimations, scale: 1,
     isImmortal: true,
     life: 8, touchDamage: 1, update: updateFrostIdol,
+    elementalMultipliers: {'lightning': 1.5, 'fire': 2},
     immunities: ['ice'],
     onHit: onHitIdol,
 };
