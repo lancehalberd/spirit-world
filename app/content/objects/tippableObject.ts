@@ -32,7 +32,7 @@ export class TippableObject implements ObjectInstance {
     definition = null;
     x: number;
     y: number;
-    z: number;
+    z: number = 0;
     fallFrame = 0;
     fallingInPlace: boolean = false;
     fallDirection: Direction;

@@ -106,11 +106,12 @@ const gauntletStartState = applyItems(helixEndState, {
     []);
 
 const holySanctumStartState = applyItems(helixEndState, {
-    clone: 1, cloudBoots: 1,
-    gloves: 2, cloak: 2,
-    nimbusCloud: 1, roll: 2,
-    bow: 1,
+    maxLife: 5,
+    gloves: 2, goldMail: 1,
+    cloudBoots: 1, clone: 1,
     trueSight: 1, ironSkin: 1,
+    ironBoots:1, cloak: 2,
+    nimbusCloud: 1, roll: 2,
     staff: 2, lightning: 1,
     fireBlessing: 1, fire: 1,
     waterBlessing: 1, ice: 1,

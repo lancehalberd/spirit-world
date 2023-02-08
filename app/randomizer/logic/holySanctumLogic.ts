@@ -2,7 +2,7 @@ import { LogicNode } from 'app/types';
 
 import {
     andLogic, canCross2Gaps,
-    hasCatEyes, hasWaterBlessing, hasSpiritSight, hasFireBlessing,
+    hasAstralProjection, hasCatEyes, hasWaterBlessing, hasSpiritSight, hasFireBlessing,
     hasLightning, hasMediumRange, hasFire, hasSpiritBarrier, hasIce,
     hasClone, hasStaff, hasWeapon,
 } from 'app/content/logic';
@@ -75,7 +75,10 @@ export const holySanctumNodes: LogicNode[] = [
     {
         zoneId: 'fireSanctum',
         nodeId: 'fireSanctumBack',
-        checks: [{objectId: 'fireSanctumKey', logic: hasFireBlessing}],
+        checks: [
+            {objectId: 'fireSanctumKey', logic: hasFireBlessing},
+            {objectId: 'fireSanctumPeachPiece', logic: andLogic(hasFireBlessing, hasAstralProjection)},
+        ],
         exits: [
             {objectId: 'fireSanctumExit'},
         ],

@@ -141,12 +141,10 @@ export class RollingBallObject implements ObjectInstance {
             // Use a slightly larger hitbox so we trigger hitting objects before stopping.
             const bigHitbox = { x: this.x, y: this.y, w: 16, h: 16 };
             if (dx) {
-                bigHitbox.w += 2;
-                bigHitbox.x--;
+                bigHitbox.x += dx;
             }
             if (dy) {
-                bigHitbox.h += 2;
-                bigHitbox.y--;
+                bigHitbox.y += dy;
             }
             hitTargets(state, this.area, {
                 canPush: true,

@@ -4,6 +4,8 @@ import { objectHash } from 'app/content/objects/objectHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { drawFrame,getFrame } from 'app/utils/animations';
 import { addEffectToArea } from 'app/utils/effects';
+import { getAreaSize } from 'app/utils/getAreaSize';
+import { rectanglesOverlap } from 'app/utils/index';
 import {
     AreaInstance, DrawPriority, GameState, ObjectInstance, ObjectStatus,
     SimpleObjectDefinition, TileBehaviors,
@@ -44,7 +46,16 @@ export class FlameTurret implements ObjectInstance {
             this.status = 'off';
         }
     }
+    isFromCurrentSection(state: GameState): boolean {
+        return rectanglesOverlap(getAreaSize(state).section, this.getHitbox());
+    }
     update(state: GameState) {
+        if (!this.isFromCurrentSection(state)) {
+            // Reset this so that the turret has to warm up again any time
+            // the player leaves and returns to the section it is in.
+            this.animationTime = 0;
+            return;
+        }
         this.animationTime += FRAME_LENGTH;
         if (this.animationTime % 200 === 0) {
             const hitbox = this.getHitbox();
