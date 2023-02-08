@@ -174,6 +174,9 @@ export const hasTripleShot: AndLogicCheck = andLogic(hasUpgradedBow, hasCharge);
 // with spirit barrier or even invisibility.
 export const canAvoidBossAttacks: OrLogicCheck = orLogic(hasRoll, hasSpiritBarrier);
 
+// Although these are the same now, they might be made different in the future.
+export const canBeatGolem = andLogic(hasBossWeapon, canAvoidBossAttacks);
+export const canBeatIdols = andLogic(hasBossWeapon, canAvoidBossAttacks);
 
 
 // Note that in some areas teleportation may not be possible contextually, for example if the player cannot

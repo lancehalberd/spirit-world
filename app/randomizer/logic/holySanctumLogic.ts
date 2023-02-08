@@ -1,10 +1,10 @@
 import { LogicNode } from 'app/types';
 
 import {
-    andLogic, canCross2Gaps,
+    andLogic, canCross2Gaps, hasCharge, hasUpgradedBow,
     hasAstralProjection, hasCatEyes, hasWaterBlessing, hasSpiritSight, hasFireBlessing,
     hasLightning, hasMediumRange, hasFire, hasSpiritBarrier, hasIce,
-    hasClone, hasStaff, hasWeapon,
+    hasClone, hasStaff, hasWeapon, canBeatGolem, canBeatIdols,
 } from 'app/content/logic';
 
 const zoneId = 'holySanctum';
@@ -44,15 +44,43 @@ export const holySanctumNodes: LogicNode[] = [
         paths: [
             {nodeId: 'holySanctumBack', doorId: 'holySanctumKeyBlock'}
         ],
-        entranceIds: ['holySanctumBackStairs'],
-        exits: [{ objectId: 'holySanctumBackStairs'}],
+        entranceIds: ['holySanctumBackEntrance'],
+        exits: [{ objectId: 'holySanctumBackEntrance'}],
     },
     {
-        zoneId,
-        nodeId: 'holySanctumUpstairs',
+        zoneId: 'holySanctumBack',
+        nodeId: 'holySanctumArrowPuzzle',
+        paths: [
+            {nodeId: 'holySanctumGolem', logic: andLogic(hasCharge, hasUpgradedBow)}
+        ],
+        entranceIds: ['holySanctumBackEntrance'],
+        exits: [{ objectId: 'holySanctumBackEntrance'}],
+    },
+    {
+        zoneId: 'holySanctumBack',
+        nodeId: 'holySanctumGolem',
+        checks: [{objectId: 'holySanctumGolem', logic: canBeatGolem}],
+        paths: [
+            {nodeId: 'holySanctumArrowPuzzle', logic: canBeatGolem}
+        ],
+        entranceIds: ['holySanctumBackStairsA'],
+        exits: [{ objectId: 'holySanctumBackStairsA', logic: canBeatGolem}],
+    },
+    {
+        zoneId: 'holySanctumBack',
+        nodeId: 'holySanctumIdols',
+        checks: [{objectId: 'holySanctumIdols', logic: canBeatIdols}],
+        entranceIds: ['holySanctumBackStairsA', 'holySanctumBackStairsB'],
+        exits: [
+            { objectId: 'holySanctumBackStairsA', logic: canBeatIdols},
+            { objectId: 'holySanctumBackStairsB', logic: canBeatIdols}],
+    },
+    {
+        zoneId: 'holySanctumBack',
+        nodeId: 'holySanctumPhoenixCrown',
         checks: [{objectId: 'holySanctumPhoenixCrown'}],
-        entranceIds: ['holySanctumBackStairs'],
-        exits: [{ objectId: 'holySanctumBackStairs'}],
+        entranceIds: ['holySanctumBackStairsB'],
+        exits: [{ objectId: 'holySanctumBackStairsB'}],
     },
     {
         zoneId,
