@@ -1,3 +1,4 @@
+import { renderIndicator } from 'app/content/objects/indicator';
 import { objectHash } from 'app/content/objects/objectHash';
 import { playAreaSound } from 'app/musicController';
 import { CANVAS_HEIGHT } from 'app/gameConstants';
@@ -98,6 +99,9 @@ export class PitEntrance implements ObjectInstance {
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
         if (this.status !== 'normal' || this.isUnderObject(state)) {
+            if (state.hero.passiveTools.trueSight) {
+                renderIndicator(context, this.getHitbox(), state.fieldTime);
+            }
             return;
         }
         drawFrame(context, pitFrame, this.getHitbox());

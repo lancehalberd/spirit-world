@@ -1120,7 +1120,7 @@ const f1_0x0: AreaDefinition = {
         {status: "normal", id: "", specialBehaviorKey: "towerTeleporter", x: 160, y: 80, style: "displayScreen", type: "sign", message: ""},
         {status: "normal", id: "tower3FBarrier", specialBehaviorKey: "towerTeleporter", x: 240, y: 144, saveStatus: "forever", type: "anode"},
         {status: "normal", id: "", specialBehaviorKey: "towerTeleporter", x: 240, y: 96, type: "cathode"},
-        {status: "normal", id: "", specialBehaviorKey: "towerTeleporter", x: 272, y: 112, targetObjectId: "tower3FBarrier", type: "floorSwitch", saveStatus: "forever"},
+        {status: "normal", id: "staffTower3FSwitch", specialBehaviorKey: "towerTeleporter", x: 272, y: 112, targetObjectId: "tower3FBarrier", type: "floorSwitch", saveStatus: "forever"},
         {status: "normal", id: "", x: 145, y: 144, speed: "slow", d: "left", w: 32, h: 96, style: "belt", type: "escalator"},
         {status: "normal", id: "", x: 432, y: 192, speed: "fast", d: "up", w: 32, h: 80, style: "belt", type: "escalator"},
         {status: "normal", id: "", x: 400, y: 320, speed: "fast", d: "up", w: 16, h: 96, style: "belt", type: "escalator"},

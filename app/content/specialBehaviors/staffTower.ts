@@ -2,7 +2,7 @@ import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
 import { Sign } from 'app/content/objects/sign';
 
-import { AreaInstance, Anode, Enemy, Escalator, GameState } from 'app/types';
+import { AreaInstance, Enemy, Escalator, GameState } from 'app/types';
 
 specialBehaviorsHash.staffTower = {
     type: 'area',
@@ -37,7 +37,6 @@ specialBehaviorsHash.staffTower = {
                         (object as Escalator).speed = 'slow';
                     } else if (object?.definition.type === 'anode') {
                         object.status = 'off';
-                        (object as Anode).disabled = true;
                     }
                 }
             }

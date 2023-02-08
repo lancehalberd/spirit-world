@@ -513,7 +513,7 @@ export function getSwitchTargetProperties(
 ): PanelRows {
     const rows: PanelRows = [];
     const objectIds = [
-        'all',
+        'none',
         ...getTargetObjectIdsByTypesAndArea(state.areaInstance.definition,
             [
                 'door', 'chest', 'loot', 'airBubbles', 'beadGrate', 'beadCascade',
@@ -528,10 +528,14 @@ export function getSwitchTargetProperties(
     }
     rows.push({
         name: 'target object',
-        value: object.targetObjectId ?? 'all',
+        value: object.targetObjectId ?? 'none',
         values: objectIds,
         onChange(targetObjectId: string) {
-            object.targetObjectId = targetObjectId;
+            if (targetObjectId === 'none' || targetObjectId === 'all') {
+                delete object.targetObjectId;
+            } else {
+                object.targetObjectId = targetObjectId;
+            }
             updateObjectInstance(state, object);
         },
     });

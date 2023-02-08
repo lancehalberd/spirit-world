@@ -11,14 +11,16 @@ export function areAllSwitchesActivated(state: GameState, area: AreaInstance, sw
 }
 
 export function checkIfAllSwitchesAreActivated(state: GameState, area: AreaInstance, switchInstance: BallGoal | CrystalSwitch | FloorSwitch): void {
+    if (!switchInstance.definition.targetObjectId) {
+        return;
+    }
     if (!areAllSwitchesActivated(state, area, switchInstance)) {
         return;
     }
     for (const object of area.objects) {
-        if (switchInstance.definition.targetObjectId && object.definition?.id !== switchInstance.definition.targetObjectId) {
-            continue;
+        if (object.definition?.id === switchInstance.definition.targetObjectId) {
+            activateTarget(state, object, true);
         }
-        activateTarget(state, object, true);
     }
 }
 

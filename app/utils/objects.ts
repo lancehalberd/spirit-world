@@ -150,7 +150,9 @@ export function deactivateTargets(state: GameState, area: AreaInstance, targetOb
 
 export function activateTarget(state: GameState, target: ObjectInstance, playChime = false): void {
     if (target.onActivate) {
-        target.onActivate(state);
+        if (target.onActivate(state)) {
+            playSound(state, 'secretChime');
+        }
         return;
     }
     if (target.status === 'hiddenSwitch') {
@@ -170,31 +172,12 @@ export function activateTarget(state: GameState, target: ObjectInstance, playChi
 
 export function deactivateTarget(state: GameState, target: ObjectInstance): void {
     if (target.onDeactivate) {
-        target.onDeactivate(state);
+        if (target.onDeactivate(state)) {
+            playSound(state, 'secretChime');
+        }
         return;
     }
     if (target.definition?.status === 'closedSwitch' && !target.definition.saveStatus) {
         changeObjectStatus(state, target, 'closedSwitch');
-    }
-}
-
-export function toggleTarget(state: GameState, target: ObjectInstance): void {
-    const isActive = target.isActive
-        ? target.isActive(state)
-        : target.status !== 'hidden' && target.status !== 'hiddenSwitch' && target.status !== 'closedSwitch'
-            && target.status !== 'off';
-    // Consider moving these to properties on `ObjectInstance` instead.
-    const playChimeOnActivation = target.definition?.type !== 'anode';
-    const playChimeOnDeactivation = target.definition?.type === 'anode';
-    if (isActive) {
-        deactivateTarget(state, target);
-        if (playChimeOnDeactivation) {
-            playSound(state, 'secretChime');
-        }
-    } else {
-        activateTarget(state, target);
-        if (playChimeOnActivation) {
-            playSound(state, 'secretChime');
-        }
     }
 }

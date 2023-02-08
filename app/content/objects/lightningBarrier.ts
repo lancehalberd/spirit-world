@@ -24,10 +24,10 @@ export class Anode implements ObjectInstance {
     x: number;
     y: number;
     status: ObjectStatus = 'normal';
+    isOn = true;
     animationTime = 0;
     cathodes: Cathode[] = [];
     cathodeIndex: number = 0;
-    disabled = false;
     constructor(state: GameState, definition: AnodeDefinition) {
         this.definition = definition;
         this.status = this.definition.status || 'normal';
@@ -39,16 +39,30 @@ export class Anode implements ObjectInstance {
         }
     }
     onActivate(state: GameState) {
-        if (this.disabled) {
-            return;
+        if (this.definition.status === 'normal') {
+            this.status = 'off'
+        } else {
+            this.status = 'normal';
         }
-        this.status = 'normal';
+        this.animationTime = 0;
+        saveObjectStatus(state, this.definition, this.definition.status !== this.status);
+    }
+    onDeactivate(state: GameState) {
+        this.status = this.definition.status;
+        this.animationTime = 0;
+        saveObjectStatus(state, this.definition, this.definition.status !== this.status);
+    }
+    turnOn(state: GameState) {
+        this.isOn = true;
         this.animationTime = 0;
         this.cathodeIndex++;
     }
-    onDeactivate(state: GameState) {
-        this.status = 'off';
+    turnOff(state: GameState) {
+        this.isOn = false;
         this.animationTime = 0;
+    }
+    isRunning(state: GameState): boolean {
+        return this.status === 'normal' && this.isOn;
     }
     updateCathodes(state: GameState) {
         let closest = 512 * 4;
@@ -73,54 +87,48 @@ export class Anode implements ObjectInstance {
     }
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;
-        if (this.status !== this.definition.status && !getObjectStatus(state, this.definition)) {
-            saveObjectStatus(state, this.definition);
-        } else if (this.status === this.definition.status && getObjectStatus(state, this.definition)) {
-            saveObjectStatus(state, this.definition, false);
-        }
-        if (this.status === 'off') {
+        if (!this.isRunning(state)) {
             if (this.definition.offInterval && this.animationTime >= this.definition.offInterval) {
-                this.onActivate(state);
+                this.turnOn(state);
             }
-        } else {
-            if (this.definition.onInterval && this.animationTime >= this.definition.onInterval) {
-                this.onDeactivate(state);
-            }
+            return
         }
-        if (this.status === 'normal') {
-            this.updateCathodes(state);
-            if (this.cathodes.length) {
-                this.cathodeIndex = this.cathodeIndex % this.cathodes.length;
-                const cathode = this.cathodes[this.cathodeIndex];
-                // The barrier doesn't damage until it has warmed up for a few frames.
-                // The lightning blessing make the hero immune to lightning barrier effects.
-                if (!state.hero.passiveTools.lightningBlessing && this.animationTime > 100) {
-                    hitTargets(state, this.area, {
-                        canAlwaysKnockback: true,
-                        canDamageRollingHero: true,
-                        damage: 4,
-                        hitRay: {
-                            x1: this.x + 8,
-                            y1: this.y + 8,
-                            x2: cathode.x + 8,
-                            y2: cathode.y + 8,
-                            r: 5,
-                        },
-                        hitAllies: true,
-                        knockAwayFromHit: true,
-                    });
-                }
-                if (this.animationTime % 40 === 0) {
-                    const { mag, x: dx, y: dy } = getVectorToTarget(state, this, cathode);
-                    // 20n % 32 = 0, 20, 8, 28, 16, 4, 24, 12
-                    for (let i = 4 + (this.animationTime / 2) % 32; i <= mag - 4; i += 32) {
-                        const x = this.x + 8 + dx * i - 1;
-                        const y = this.y + dy * i - 1;
-                        addSparkleAnimation(state, this.area, {
-                            x, y, w: 2, h: 2
-                        }, { element: 'lightning'})
-                    }
-                }
+        if (this.definition.onInterval && this.animationTime >= this.definition.onInterval) {
+            this.turnOff(state);
+        }
+        this.updateCathodes(state);
+        if (!this.cathodes.length) {
+            return;
+        }
+        this.cathodeIndex = this.cathodeIndex % this.cathodes.length;
+        const cathode = this.cathodes[this.cathodeIndex];
+        // The barrier doesn't damage until it has warmed up for a few frames.
+        // The lightning blessing make the hero immune to lightning barrier effects.
+        if (!state.hero.passiveTools.lightningBlessing && this.animationTime > 100) {
+            hitTargets(state, this.area, {
+                canAlwaysKnockback: true,
+                canDamageRollingHero: true,
+                damage: 4,
+                hitRay: {
+                    x1: this.x + 8,
+                    y1: this.y + 8,
+                    x2: cathode.x + 8,
+                    y2: cathode.y + 8,
+                    r: 5,
+                },
+                hitAllies: true,
+                knockAwayFromHit: true,
+            });
+        }
+        if (this.animationTime % 40 === 0) {
+            const { mag, x: dx, y: dy } = getVectorToTarget(state, this, cathode);
+            // 20n % 32 = 0, 20, 8, 28, 16, 4, 24, 12
+            for (let i = 4 + (this.animationTime / 2) % 32; i <= mag - 4; i += 32) {
+                const x = this.x + 8 + dx * i - 1;
+                const y = this.y + dy * i - 1;
+                addSparkleAnimation(state, this.area, {
+                    x, y, w: 2, h: 2
+                }, { element: 'lightning'})
             }
         }
     }

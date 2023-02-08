@@ -111,8 +111,8 @@ export interface ObjectInstance {
     yDepth?: number
     // This will be used for the hitbox for the editor only if it is defined.
     getEditorHitbox?: (state: GameState) => Rect
-    onActivate?: (state: GameState) => void
-    onDeactivate?: (state: GameState) => void
+    onActivate?: (state: GameState) => boolean | void
+    onDeactivate?: (state: GameState) => boolean | void
     onDestroy?: (state: GameState, dx: number, dy: number) => void
     onEnterArea?: (state: GameState) => void
     // When the hero tries to pick up the object with the passive skill button.

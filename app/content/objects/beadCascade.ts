@@ -5,7 +5,7 @@ import { Staff } from 'app/content/objects/staff';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, drawFrameAt, getFrame } from 'app/utils/animations';
 import { createCanvasAndContext } from 'app/utils/canvas';
-import { coverTile, getTileBehaviorsAndObstacles } from 'app/utils/field';
+import { coverTile, getTileBehaviors, getTileBehaviorsAndObstacles } from 'app/utils/field';
 import { boxesIntersect } from 'app/utils/index';
 import { addObjectToArea, getObjectStatus, removeObjectFromArea, saveObjectStatus  } from 'app/utils/objects';
 import Random from 'app/utils/Random';
@@ -57,6 +57,7 @@ export class BeadCascade implements ObjectInstance {
     h: number = 16;
     isObject = <const>true;
     status: ObjectStatus = 'normal';
+    isOn: boolean = true;
     animationTime = 0;
     constructor(state: GameState, definition: BeadCascadeDefinition) {
         this.definition = definition;
@@ -64,7 +65,7 @@ export class BeadCascade implements ObjectInstance {
         this.y = definition.y;
         this.status = this.definition.status;
         if (getObjectStatus(state, this.definition)) {
-            this.onActivate(state);
+            this.status = (this.definition.status === 'normal') ? 'hidden' : 'normal';
         }
     }
     add(state: GameState, area: AreaInstance) {
@@ -83,30 +84,41 @@ export class BeadCascade implements ObjectInstance {
     getHitbox(state: GameState) {
         return this;
     }
-    onActivate(state: GameState) {
-        this.status = 'normal';
-        this.animationTime = 0;
-        if (this.definition.saveStatus === 'zone' || this.definition.saveStatus === 'forever') {
-            saveObjectStatus(state, this.definition, this.definition.status !== this.status);
-        }
+    isRunning(state: GameState): boolean {
+        return this.status === 'normal' && this.isOn;
     }
-    onDeactivate(state: GameState) {
-        this.status = 'hidden';
-        this.animationTime = 0;
-        if (this.definition.saveStatus === 'zone' || this.definition.saveStatus === 'forever') {
-            saveObjectStatus(state, this.definition, this.definition.status !== this.status);
+    onActivate(state: GameState): boolean {
+        if (this.definition.status !== 'normal') {
+            this.status = 'normal';
+        } else {
+            this.status = 'hidden';
         }
+        saveObjectStatus(state, this.definition, this.definition.status !== this.status);
+        return true;
+    }
+    onDeactivate(state: GameState): boolean {
+        this.status = this.definition.status;
+        saveObjectStatus(state, this.definition, this.definition.status !== this.status);
+        return false;
+    }
+    turnOn(state: GameState) {
+        this.isOn = true;
+        this.animationTime = 0;
+    }
+    turnOff(state: GameState) {
+        this.isOn = false;
+        this.animationTime = 0;
     }
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;
-        if (this.status !== 'normal') {
+        if (!this.isRunning(state)) {
             if (this.definition.offInterval && this.animationTime >= this.definition.offInterval) {
-                this.onActivate(state);
+                this.turnOn(state);
             }
             return;
         }
         if (this.definition.onInterval && this.animationTime >= this.definition.onInterval) {
-            this.onDeactivate(state);
+            this.turnOff(state);
         }
         const { objects } = getTileBehaviorsAndObstacles(
             state, this.area, {x: this.x + 8, y: this.y + 2},
@@ -154,6 +166,13 @@ export class BeadGrate implements ObjectInstance {
         }
         this.animationTime = 1000;
     }
+    isUnderObject(state: GameState): boolean {
+        if (!this.area) {
+            return false;
+        }
+        const {tileBehavior} = getTileBehaviors(state, this.area, {x: this.x + 8, y: this.y + 8});
+        return tileBehavior.solid || tileBehavior.covered;
+    }
     getHitbox(state: GameState) {
         return this;
     }
@@ -178,6 +197,9 @@ export class BeadGrate implements ObjectInstance {
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
+        if (this.isUnderObject(state)) {
+            return;
+        }
         const animation = this.status === 'normal' ? grateOpenAnimation : grateCloseAnimation;
         let frame = getFrame(animation, this.animationTime);
         drawFrame(context, frame, {...frame, x: this.x, y: this.y});
@@ -225,7 +247,7 @@ export class BeadSection implements ObjectInstance {
         this.animationTime += FRAME_LENGTH;
         const { objects } = getTileBehaviorsAndObstacles(
             state, this.area, {x: this.x + 8, y: this.y},
-            null, null, object => object.definition?.type === 'beadCascade' && object.status === 'normal'
+            null, null, object => object.definition?.type === 'beadCascade' && (object as BeadCascade).isRunning(state)
         );
         const isGrowing = (objects.length > 0);
         if (isGrowing) {

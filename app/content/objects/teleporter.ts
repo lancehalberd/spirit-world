@@ -1,3 +1,4 @@
+import { renderIndicator } from 'app/content/objects/indicator';
 import { objectHash } from 'app/content/objects/objectHash';
 import { editingState } from 'app/development/editingState';
 import { FRAME_LENGTH } from 'app/gameConstants';
@@ -139,9 +140,15 @@ export class Teleporter implements ObjectInstance {
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
         if (this.status !== 'normal' && !editingState.isEditing) {
+            if (state.hero.passiveTools.trueSight) {
+                renderIndicator(context, this.getHitbox(), state.fieldTime);
+            }
             return;
         }
         if (this.isUnderObject(state) && !editingState.isEditing) {
+            if (state.hero.passiveTools.trueSight) {
+                renderIndicator(context, this.getHitbox(), state.fieldTime);
+            }
             return;
         }
         if (!this.definition.targetZone || !this.definition.targetObjectId) {
