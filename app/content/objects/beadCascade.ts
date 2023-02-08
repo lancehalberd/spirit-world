@@ -57,6 +57,10 @@ export class BeadCascade implements ObjectInstance {
     h: number = 16;
     isObject = <const>true;
     status: ObjectStatus = 'normal';
+    // This flag is used to toggle between on and off states when the cascade is timed
+    // to turn off/on after a certain duration.
+    // In comparision, when status === 'off', the object is off permanently unless an
+    // external event updates its status.
     isOn: boolean = true;
     animationTime = 0;
     constructor(state: GameState, definition: BeadCascadeDefinition) {

@@ -25,7 +25,7 @@ import { getNearbyTarget } from 'app/utils/target';
 
 
 import {
-    AreaInstance, EffectInstance, EnemyAbility, Frame,
+    AreaInstance, BeadCascade, EffectInstance, EnemyAbility, Frame,
     GameState, Hero, HitProperties, HitResult, ObjectInstance, Rect,
 } from 'app/types';
 
@@ -330,12 +330,21 @@ const summonLineOfSpikes = (state: GameState, enemy: Enemy) => {
 }
 
 const turnOnRandomCascade = (state: GameState, enemy: Enemy, count = 1) => {
-    const beadCascades = enemy.area.objects.filter(o => o.definition?.type === 'beadCascade');
+    const beadCascades = enemy.area.objects.filter(o => o.definition?.type === 'beadCascade') as BeadCascade[];
     let numberEnabled = 0;
     while (beadCascades.length) {
         const cascade = Random.removeElement(beadCascades);
+        // Initially the cascades are turned off by being hidden,
+        // But after being turned on once they will be turned off
+        // by having the `isOn` flag set to false.
         if (cascade.status !== 'normal') {
             cascade.onActivate(state);
+            numberEnabled++;
+            if (numberEnabled >= count) {
+                return;
+            }
+        } else if (!cascade.isOn) {
+            cascade.turnOn(state);
             numberEnabled++;
             if (numberEnabled >= count) {
                 return;
