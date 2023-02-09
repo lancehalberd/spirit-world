@@ -163,7 +163,8 @@ export class Hero implements Actor, SavedHeroData {
 
     heldChakram?: HeldChakram;
     thrownChakrams: ThrownChakram[] = [];
-    activeStaff?: Staff
+    activeStaff?: Staff;
+    activeBarrierBurst?: BarrierBurstEffect;
     // This is set if the player attempts to use the staff tool while it is in use
     // and prevents it from being placed. This is useful for attacking quickly.
     canceledStaffPlacement?: boolean;
@@ -332,6 +333,7 @@ export class Hero implements Actor, SavedHeroData {
         const preventKnockback = this.equippedBoots === 'ironBoots' || this.ironSkinLife > 0;
         if (hit.damage) {
             let damage = hit.damage;
+            let iframeMultiplier = 1;
             if (hit.element === 'fire' && state.hero.passiveTools.fireBlessing) {
                 damage /= 2;
             }
@@ -340,11 +342,13 @@ export class Hero implements Actor, SavedHeroData {
             }
             if (hit.element === 'lightning' && state.hero.passiveTools.lightningBlessing) {
                 damage /= 2;
+                iframeMultiplier *= 0.5;
             }
             if (state.hero.passiveTools.goldMail) {
                 damage /= 2;
+                iframeMultiplier *= 1.2;
             }
-            this.takeDamage(state, damage);
+            this.takeDamage(state, damage, iframeMultiplier);
         }
         if (hit.knockback && (hit.canAlwaysKnockback || !preventKnockback)) {
             this.knockBack(state, hit.knockback);
@@ -354,7 +358,11 @@ export class Hero implements Actor, SavedHeroData {
             this.frozenDuration = 0;
         } else if (hit.element === 'ice' && !(this.ironSkinLife > 0)) {
             // Getting hit by ice freezes you unless you have iron skin up.
-            this.frozenDuration = 1500;
+            if (this.passiveTools.waterBlessing) {
+                this.frozenDuration = 1000;
+            } else {
+                this.frozenDuration = 1500;
+            }
         }
         return { hit: true };
     }
@@ -364,12 +372,12 @@ export class Hero implements Actor, SavedHeroData {
             return;
         }
         this.hasBarrier = false;
-        const barrierBurst = new BarrierBurstEffect({
-            x: this.x + 8,
-            y: this.y + 8,
+        this.activeBarrierBurst = new BarrierBurstEffect({
             element: this.element,
+            level: this.activeTools.cloak,
+            source: this,
         });
-        addEffectToArea(state, this.area, barrierBurst);
+        addEffectToArea(state, this.area, this.activeBarrierBurst);
     }
 
     shatterBarrier(state: GameState) {
@@ -406,7 +414,7 @@ export class Hero implements Actor, SavedHeroData {
         }
     }
 
-    takeDamage(this: Hero, state: GameState, damage: number): void {
+    takeDamage(this: Hero, state: GameState, damage: number, iframeMultiplier = 1): void {
         if (state.scriptEvents.blockPlayerInput) {
             return;
         }
@@ -414,7 +422,7 @@ export class Hero implements Actor, SavedHeroData {
             this.ironSkinCooldown = 3000;
             if (this.ironSkinLife > damage / 2) {
                 this.ironSkinLife -= damage / 2;
-                state.hero.invulnerableFrames = 50;
+                state.hero.invulnerableFrames = 50 * iframeMultiplier;
                 if (state.hero.clones.filter(clone => !clone.isUncontrollable).length || this !== state.hero) {
                     destroyClone(state, this);
                 }
@@ -439,7 +447,7 @@ export class Hero implements Actor, SavedHeroData {
                 this.invulnerableFrames = 1;
             } else {
                 state.hero.life -= damage / 2;
-                state.hero.invulnerableFrames = 50;
+                state.hero.invulnerableFrames = 50 * iframeMultiplier;
                 // Taking damage resets radius for spirit sight meditation.
                 state.hero.spiritRadius = 0;
             }
@@ -447,7 +455,7 @@ export class Hero implements Actor, SavedHeroData {
         } else {
             // Damage applies to the hero, not the clone.
             state.hero.life -= damage / 2;
-            state.hero.invulnerableFrames = 50;
+            state.hero.invulnerableFrames = 50 * iframeMultiplier;
             // Taking damage resets radius for spirit sight meditation.
             state.hero.spiritRadius = 0;
         }

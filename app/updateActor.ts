@@ -222,6 +222,10 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
                 removeEffectFromArea(state, hero.heldChakram);
                 delete hero.heldChakram;
             }
+            if (hero.activeBarrierBurst) {
+                removeEffectFromArea(state, hero.activeBarrierBurst);
+                delete hero.activeBarrierBurst;
+            }
             if (state.hero.hasRevive) {
                 state.reviveTime = state.fieldTime;
             }
@@ -234,7 +238,11 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
     const hasBarrier = !![state.hero, ...state.hero.clones].find(hero => hero.hasBarrier);
 
     if (isInvisible) {
-        state.hero.actualMagicRegen = Math.max(-20, Math.min(0, state.hero.actualMagicRegen) - drainCoefficient * 4 * FRAME_LENGTH / 1000);
+        let drainAmount = drainCoefficient * 4 * FRAME_LENGTH / 1000;
+        if (state.hero.activeBarrierBurst?.element) {
+            drainAmount *= 2;
+        }
+        state.hero.actualMagicRegen = Math.max(-20, Math.min(0, state.hero.actualMagicRegen) - drainAmount);
         state.hero.increasedMagicRegenCooldown(drainCoefficient * FRAME_LENGTH / 2);
     } else if (hasBarrier) {
         if (state.hero.invulnerableFrames > 0) {

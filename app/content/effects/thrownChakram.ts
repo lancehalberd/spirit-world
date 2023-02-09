@@ -1,6 +1,7 @@
 import { makeSparkleAnimation } from 'app/content/effects/animationEffect';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { playAreaSound } from 'app/musicController';
+import { renderLightningCircle } from 'app/render/renderLightning';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import { hitTargets } from 'app/utils/field';
@@ -23,6 +24,7 @@ interface Props {
     vy?: number
     // 1 = normal chakram, 2 = spirit chakram
     level: number
+    chargeLevel?: number
     damage?: number
     element?: MagicElement
     piercing?: boolean
@@ -55,9 +57,12 @@ export class ThrownChakram implements EffectInstance {
     relativeSparkles: AnimationEffect[];
     hitCooldown: number = 0;
     isPlayerAttack = true;
+    // The level of the chakram weapon item.
     level: number;
+    // How charged the chakram was when thrown.
+    chargeLevel: number;
     isHigh: boolean = false;
-    constructor({x = 0, y = 0, vx = 0, vy = 0, damage = 1, element = null, returnSpeed = 4, piercing = false, level, source}: Props) {
+    constructor({x = 0, y = 0, vx = 0, vy = 0, damage = 1, element = null, returnSpeed = 4, piercing = false, level, chargeLevel, source}: Props) {
         this.x = x;
         this.y = y;
         this.vx = vx;
@@ -68,12 +73,13 @@ export class ThrownChakram implements EffectInstance {
         this.returnSpeed = returnSpeed;
         this.w = chakramGeometry.content.w;
         this.h = chakramGeometry.content.h;
-        this.outFrames = 12;
+        this.outFrames = element === 'lightning' ? 10 : 12;
         this.source = source;
         this.relativeSparkles = [];
         this.sparkles = [];
         this.element = element;
         this.level = level;
+        this.chargeLevel= chargeLevel;
     }
     getHitbox() {
         return this;
@@ -156,9 +162,31 @@ export class ThrownChakram implements EffectInstance {
             }
         }
 
+        let hit: HitProperties;
+        // The lightning element adds a large hit ring around the chakram that cannot
+        // push targets or knock them back and also won't stop the projectile.
+        if (this.element === 'lightning') {
+            const r = this.chargeLevel > 1 ? 40 : 28;
+            hit = {
+                damage: this.damage,
+                element: this.element,
+                vx: this.vx,
+                vy: this.vy,
+                hitCircle: { r, x: this.x + this.w / 2, y: this.y + this.h / 2},
+                hitEnemies: this.hitCooldown <= 0,
+                hitObjects: this.hitCooldown <= 0,
+                source: this.source,
+                // Since projectile isn't specified here, this will be able to hit
+                // objects even when the chakram is marked "isHigh" for going over a cliff,
+                // but this might be okay since the electric field could be seen as wide
+                // enough to hit enemies below the chakram.
+            };
+            hitTargets(state, this.area, hit);
+        }
+
         // We do three collision checks
         // A full hitbox check for hitting objects/enemies:
-        let hit: HitProperties = {
+        hit = {
             damage: this.damage,
             element: this.element,
             cutsGround: true,
@@ -214,7 +242,7 @@ export class ThrownChakram implements EffectInstance {
             this.outFrames = 0;
         }
     }
-    render(context, state: GameState) {
+    render(context: CanvasRenderingContext2D, state: GameState) {
         const animation = this.level >= 2 ? goldChakramAnimation : chakramAnimation;
         const frame = getFrame(animation, this.animationTime);
         drawFrame(context, frame, { ...frame, x: this.x - frame.content.x, y: this.y - frame.content.y });
@@ -223,6 +251,18 @@ export class ThrownChakram implements EffectInstance {
         }
         for (const sparkle of this.relativeSparkles) {
             sparkle.render(context, state);
+        }
+        if (this.element === 'lightning') {
+            const x = this.x + this.w / 2, y = this.y + this.h / 2;
+            const r = this.chargeLevel > 1 ? 40 : 28;
+            context.beginPath();
+            context.arc(x, y, r, 0, 2 * Math.PI);
+            context.save();
+                context.globalAlpha *= 0.1;
+                context.fillStyle = 'yellow'
+                context.fill();
+            context.restore();
+            renderLightningCircle(context, {x, y, r});
         }
     }
 }
@@ -305,17 +345,23 @@ export class HeldChakram implements EffectInstance {
                 throwSpeed += 3;
             }
         }
+        let returnSpeed = Math.max(4, 2 * throwSpeed / 3);
+        if (element === 'lightning') {
+            returnSpeed = throwSpeed;
+            throwSpeed += 2;
+        }
         const chakram = new ThrownChakram({
             x: this.hero.x + 3,
             y: this.hero.y,
             vx: throwSpeed * this.vx,
             vy: throwSpeed * this.vy,
-            returnSpeed: Math.max(4, 2 * throwSpeed / 3),
+            returnSpeed,
             damage: throwDamage,
             element,
             source: this.hero,
             piercing: throwSpeed === 12,
             level: this.level,
+            chargeLevel,
         });
         if (chakram.speed >= 12) {
             playAreaSound(state, this.area, 'strongChakram');
@@ -364,7 +410,7 @@ export class HeldChakram implements EffectInstance {
             this.throw(state);
             return;
         }
-        // Remove a chakram if it is not in the are with the hero.
+        // Remove a chakram if it is not in the area with the hero.
         if (!state.transitionState && this.hero.area !== this.area) {
             removeEffectFromArea(state, this);
             delete this.hero.heldChakram;

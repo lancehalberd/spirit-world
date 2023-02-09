@@ -45,6 +45,9 @@ export function useTool(
                 // Adding an element to a charged attack costs 10 spirit energy.
                 magicCost += 10;
             }
+            if (element === 'lightning') {
+                speed += 2;
+            }
             state.hero.magic -= magicCost;
             state.hero.increasedMagicRegenCooldown(1000 * magicCost / 10);
             hero.toolCooldown = 200;

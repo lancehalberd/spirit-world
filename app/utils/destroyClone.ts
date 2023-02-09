@@ -12,12 +12,14 @@ export function destroyClone(state: GameState, clone: Hero): void {
         clone.y = clone.safeY;
         return;
     }
+    clone.isInvisible = false;
     // Clone staff gets recalled when it is destroyed.
     clone.activeStaff?.recall(state);
     if (clone === state.hero) {
         // If the "clone" destroyed was the hero, then pop the last clone and move the hero to it.
         const lastClone = state.hero.clones.pop();
         state.hero.activeStaff = lastClone.activeStaff;
+        state.hero.activeBarrierBurst = lastClone.activeBarrierBurst;
         state.hero.x = lastClone.x;
         state.hero.y = lastClone.y;
         removeObjectFromArea(state, lastClone);

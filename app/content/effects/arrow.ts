@@ -1,6 +1,7 @@
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { playAreaSound } from 'app/musicController';
+import { renderLightningCircle } from 'app/render/renderLightning';
 import { createAnimation, drawFrameAt, getFrame } from 'app/utils/animations';
 import { getDirection, hitTargets } from 'app/utils/field';
 import { getAreaSize } from 'app/utils/getAreaSize';
@@ -307,6 +308,26 @@ export class Arrow implements EffectInstance, Projectile {
         if (!this.stuckFrames && this.damage > 2 && this.animationTime % 60 === 0) {
             addSparkleAnimation(state, this.area, this, { element: this.element });
         }
+        if (this.element === 'lightning') {
+            const r = this.chargeLevel > 1 ? 24 : 16;
+            hitTargets(state, this.area, {
+                direction: this.direction,
+                damage: this.damage,
+                spiritCloakDamage: this.spiritCloakDamage,
+                hitCircle: {x: this.x + this.w / 2, y: this.y + this.h / 2, r},
+                vx: this.vx,
+                vy: this.vy,
+                element: this.element,
+                hitAllies: this.reflected,
+                hitEnemies: !this.reflected,
+                hitObjects: true,
+                // Technically this might not be the arrow, but if we set this to false
+                // then the bubble will hit first leaving the enemy immune to the actual
+                // arrow itself, which would disable arrow weakness on enemies if using
+                // lightning element, which seems undesirable.
+                isArrow: true,
+            });
+        }
         const hitResult = hitTargets(state, this.area, this.getHitProperties(state));
         if (hitResult.reflected) {
             this.vx = -this.vx;
@@ -356,6 +377,18 @@ export class Arrow implements EffectInstance, Projectile {
         if (chargeAnimation) {
             frame = getFrame(chargeAnimation, this.animationTime);
             drawFrameAt(context, frame, { x: this.x, y: this.y - this.z });
+        }
+        if (!this.blocked && !this.stuckFrames && this.element === 'lightning') {
+            const x = this.x + this.w / 2, y = this.y + this.h / 2;
+            const r = this.chargeLevel > 1 ? 24 : 16;
+            context.beginPath();
+            context.arc(x, y, r, 0, 2 * Math.PI);
+            context.save();
+                context.globalAlpha *= 0.1;
+                context.fillStyle = 'yellow'
+                context.fill();
+            context.restore();
+            renderLightningCircle(context, {x, y, r});
         }
     }
 }

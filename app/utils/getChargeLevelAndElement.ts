@@ -10,7 +10,11 @@ export function getChargeLevelAndElement(state: GameState, hero: Hero, tool: Act
     let chargeLevel = 0;
     let element: MagicElement = null;
     // The Phoenix Crown reduces charge time by 25%.
-    const durationMultiplier = hero.passiveTools.phoenixCrown ? 0.75 : 1;
+    let durationMultiplier = hero.passiveTools.phoenixCrown ? 0.75 : 1;
+    // Lightning charges faster than other elements.
+    if (state.hero.element === 'lightning') {
+        durationMultiplier *= 2 / 3;
+    }
     if (maxChargeLevel >= 2) {
         if (hero.chargeTime >= durationMultiplier * 2000) {
             chargeLevel = 2;

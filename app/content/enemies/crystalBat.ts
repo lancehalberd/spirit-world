@@ -53,6 +53,7 @@ enemyDefinitions.crystalBat = {
     life: 4, touchHit: { damage: 1},
     lootTable: moneyLootTable,
     initialMode: 'chooseDirection',
+    elementalMultipliers: {'lightning': 2},
     updateFlyingZ(this: void, state: GameState, enemy: Enemy) {
         if (enemy.action === 'knocked') {
             enemy.az = -0.2;

@@ -55,7 +55,7 @@ export const enemyTypes = <const>[
     'electricSquirrel', 'ent',
     'flameSnake', 'frostBeetle',
     'floorEye',
-    // These are designed for the golem boss but can be use in isolation.
+    // These are designed for the golem boss but could be use in isolation with some adjustments.
     'golemHand',
     'lightningBug', 'lightningDrone',
     'luckyBeetle',
@@ -165,6 +165,7 @@ enemyDefinitions.arrowTurret = {
     animations: beetleAnimations, life: 4, touchDamage: 1, update: spinAndShoot,
     lootTable: simpleLootTable,
     canBeKnockedBack: false,
+    elementalMultipliers: {'lightning': 2},
     renderPreview(context: CanvasRenderingContext2D, enemy: Enemy, target: Rect): void {
         enemy.defaultRenderPreview(context, target);
         drawFrameCenteredAt(context, spiritArrowIcon, target);
@@ -200,6 +201,7 @@ enemyDefinitions.beetleWinged = {
     flying: true, acceleration: 0.1, aggroRadius: 112,
     life: 1, touchDamage: 1, update: scurryAndChase,
     lootTable: simpleLootTable,
+    elementalMultipliers: {'lightning': 2},
 };
 enemyDefinitions.wallLaser = {
     animations: blueSnakeAnimations, life: 1, touchDamage: 1, update: updateWallLaser, flipRight: true,
@@ -307,6 +309,7 @@ enemyDefinitions.floorEye = {
     // This will get set to 2 when the eye is open.
     touchDamage: 0,
     life: 4, update: updateFloorEye,
+    elementalMultipliers: {'lightning': 2},
     render: (context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) => {
         // Render normally while editing.
         if (editingState.isEditing) {

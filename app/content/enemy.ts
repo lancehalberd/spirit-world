@@ -319,7 +319,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         if (hit.damage) {
             const multiplier = this.enemyDefinition.elementalMultipliers?.[hit.element] || 1;
             damageDealt = multiplier * hit.damage;
-            this.applyDamage(state, damageDealt);
+            this.applyDamage(state, damageDealt, 'enemyHit', hit.element === 'lightning' ? 0.5 : 1);
         }
         return {
             damageDealt,
@@ -328,14 +328,14 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             knockback: hit.knockback ? {vx: -hit.knockback.vx, vy: -hit.knockback.vy, vz: 0 } : null
         };
     }
-    applyDamage(state: GameState, damage: number, damageSound: string = 'enemyHit') {
+    applyDamage(state: GameState, damage: number, damageSound: string = 'enemyHit', iframeMultiplier = 1) {
         if (this.life <= 0) {
             return;
         }
         this.life -= damage;
         // This is actually the number of frames the enemy cannot damage the hero for.
         this.invulnerableFrames = this.enemyDefinition.invulnerableFrames ?? 50;
-        this.enemyInvulnerableFrames = 20;
+        this.enemyInvulnerableFrames = (iframeMultiplier * 20) | 0;
         if (this.life <= 0 && !this.isImmortal) {
             this.showDeathAnimation(state);
         } else {

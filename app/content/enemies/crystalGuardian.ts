@@ -80,6 +80,7 @@ enemyDefinitions.crystalGuardian = {
     // which is more specific than touch damage on enemies which requires actually being in the same pixel.
     // Touch damage gets added to this enemy when the shield goes down.
     tileBehaviors: {solid: true},
+    elementalMultipliers: {'lightning': 1.5},
     getHitbox(enemy: Enemy): Rect {
         const hitbox = enemy.getDefaultHitbox();
         if (enemy.params.shieldLife) {

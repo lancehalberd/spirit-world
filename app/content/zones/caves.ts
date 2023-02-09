@@ -605,7 +605,7 @@ const f0_1x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "", x: 96, y: 480, type: "door", style: "wooden", targetZone: "overworld", targetObjectId: "fertilityTempleEntrance", d: "down"},
+        {status: "normal", id: "", x: 96, y: 480, type: "door", style: "wooden", d: "down"},
         {status: "normal", id: "caves:noToolSideArea", x: 432, y: 144, type: "door", style: "cavern", targetZone: "overworld", targetObjectId: "sideArea:noToolEntrance", d: "down"},
         {status: "normal", id: "caves:0:1x0-money-0", x: 16, y: 176, type: "chest", lootType: "money", lootAmount: 50},
         {status: "normal", id: "fertilityTempleEntrance", linked: false, x: 352, y: 480, type: "door", style: "wooden", targetZone: "overworld", targetObjectId: "fertilityTempleEntrance", d: "down"},

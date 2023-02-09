@@ -63,6 +63,11 @@ export function enterLocation(
                 removeEffectFromArea(state, state.hero.heldChakram);
                 addEffectToArea(state, state.transitionState.nextAreaInstance, state.hero.heldChakram);
             }
+            if (state.hero.activeBarrierBurst) {
+                console.log('transferring barrier burst to new area');
+                removeEffectFromArea(state, state.hero.activeBarrierBurst);
+                addEffectToArea(state, state.transitionState.nextAreaInstance, state.hero.activeBarrierBurst);
+            }
         }
         return;
     }

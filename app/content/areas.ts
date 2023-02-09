@@ -157,6 +157,9 @@ export function swapHeroStates(heroA: Hero, heroB: Hero) {
         if (hero.heldChakram) {
             hero.heldChakram.hero = hero;
         }
+        if (hero.activeBarrierBurst) {
+            hero.activeBarrierBurst.source = hero;
+        }
         for (const chakram of hero.thrownChakrams) {
             chakram.source = hero;
         }

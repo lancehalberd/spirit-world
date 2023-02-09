@@ -43,6 +43,9 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     if (hero.heldChakram && hero.heldChakram.area !== hero.area) {
         delete hero.heldChakram;
     }
+    if (hero.activeBarrierBurst && hero.activeBarrierBurst.area !== hero.area) {
+        delete hero.activeBarrierBurst;
+    }
     const wasPassiveButtonPressed = wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL);
     const isPassiveButtonDown = isGameKeyDown(state, GAME_KEY.PASSIVE_TOOL);
     const isCloneToolDown = isToolButtonPressed(state, 'clone');
@@ -309,9 +312,11 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         } else if (hero.chargingLeftTool && (!isGameKeyDown(state, GAME_KEY.LEFT_TOOL) || !canCharge)) {
             useTool(state, hero, hero.leftTool, hero.actionDx, hero.actionDy);
             hero.chargingLeftTool = false;
+            hero.action = null;
         } else if (hero.chargingRightTool && (!isGameKeyDown(state, GAME_KEY.RIGHT_TOOL) || !canCharge)) {
             useTool(state, hero, hero.rightTool, hero.actionDx, hero.actionDy);
             hero.chargingRightTool = false;
+            hero.action = null;
         } else {
             const tool = hero.chargingLeftTool ? hero.leftTool : hero.rightTool;
             const { chargeLevel, element } = getChargeLevelAndElement(state, hero, tool);

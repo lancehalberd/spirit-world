@@ -9,7 +9,7 @@ import { AreaDefinition, EntranceDefinition, Zone, ZoneLocation } from 'app/type
 
 const ignoredZones = [
     // These zones are part of the 'Holy Sanctum' and should not be randomized.
-    'fireSanctum', 'iceSanctum', 'lightningSanctum',
+    'fireSanctum', 'iceSanctum', 'lightningSanctum', 'holySanctumBack',
     // The void is part of the 'Tree' zone and should not be randomized.
     'void',
 ];

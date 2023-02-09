@@ -40,31 +40,46 @@ Graphics:
 
 Current tasks:
     - Brain storm ideas to make lightning element more interesting
-        - For puzzles
-            - More lightning switches that turn on things
-                - Add to holy sanctum back
-                - Probably use in forge + sky palace as well
-            - Lightning switch to open material world basement in staff tower
-                - 3 sentry bots that are off if boss is defeated, must be activated to defeat and get gold ore
-                - Can be done in randomizer without defeating boss but all 3 will be active at once
-                - Same switch exists in spirit world can let you shortcut to basement in randomizer
-        - For combat
-            - Add aoe to lightning attacks, 24px radius normally and 40px radius for charge level 2
-            - More enemies weak against lightning
-            - Faster attack speed
-            - 1/2 iframes from lightning damage for both hero/enemies.
+        - Lightning switch to open material world basement in staff tower
+            - 3 sentry bots that are off if boss is defeated, must be activated to defeat and get gold ore
+            - Can be done in randomizer without defeating boss but all 3 will be active at once
+            - Same switch exists in spirit world can let you shortcut to basement in randomizer
 
     - Brainstorm ideas for Sky Palace
-        - Wind streams that can push the player.
-            - With cloud boots they can push the player over long gaps or up to the next fllor
-            - Iron boots prevent being pushed at all
         - Lightning switches toggle mechanisms like platforms and wind turbines.
+            - Lightning is not required to complete any of the dungeon, but may make sections quicker/easier.
         - Heavy 2x2 blocks that can only be pushed if the player has mitts
         - Big key in a chest that you have to fall to.
+        Mechanic: Windstream
+            - Pushes player back unless they are using iron boots or holding on to a solid object.
+            - Player can push pots to move through wind streams.
+            - Player can be pushed across wide pits by equipping cloud boots and entering a wind stream or up to the next floor
+            - There may be light objects that players can push into windstreams to move them, perhaps to solve switch puzzles
+
+    - Player ice damage should only freeze ground that has certain properties:
+        - shallow and deep water
+        - lava
+        - any damage ground that doesn't prevent being frozen
+        - cracked ground
+
+    - Fire damage burns players/enemies
+        - Only one burn effect tracked, new ones replace old ones if they would do more damage than what remains
+        - Burn does damage over 2 seconds
+        - If the hero has spirit energy, half of burning damage is instead taken from spirit energy at 10 spirit per 1 point of damage,
+        modified by spirit loss coefficient
+        - If the hero has iron skin, burning damage applies to spirit energy, and the health portion is ignored.
+        - If the hero has cloak up, they cannot be burned but fire attacks deal 50% more upfront damage to cloak.
+        - Fire blessing reduces burns on player to half damage over 1 second.
+        - Burning damage does not cause and is not prevented by iframes
 
     - Allow sneaking into grand temple with invisibility
         - Ultimately this should be a narration box that causes the guard to say Vanara cannot enter the temple.
         - Make sure rolling doesn't let you pass
+
+    - Idea to fix small hit immunity from preventing larger damage:
+        - When setting iframes, record the damage that caused it.
+        - When something takes a hit and has iframes, if the damage is greater than the previous iframe hit,
+            take damage equal to the difference, extend iframes, and record the greater damage amount.
 
     - Upgrade entrance randomizer to support complex connected exit graphs.
         - Currently it only supports connected exits that can be traveled in all directions.
@@ -75,6 +90,8 @@ Current tasks:
         - Creating a projectile while standing over a ledge won't register it is high because it never hits the ledge.
             - Maybe add a function that runs hits for 8px before the projectiles starting position that we run when it is
             created to set isHigh, then clear passedLedgeTiles in case that was set to avoid accidentally throwing up ledges.
+        - Right now ledges block attacks anywhere in the tile rather than just when they are on the ledge, additionally only true values apply instead of both true+false values.
+            - You can observe this by standing halfway off a cliff then turning away from the cliff and attacking with chakram/bow
 
     - Projectiles should be able to shoot down over solid ledges, but not up them
         - Make solid ledges actually ledges but prevent jumping over them
@@ -116,7 +133,6 @@ Current tasks:
     - Add void pit tiles and use them in the void area, add solid cliff edges to prevent jumping into the void.
         - This will allow the astral projection to move freely over the void.
 
-
     - Holy Sanctum Improvements
         - Add phoenix boss before phoenix crown prize
         - Add sanctum tower with bow in big chest
@@ -140,14 +156,6 @@ Current tasks:
 
     - Add some additional requirement for completing crater to put the boss out of logic with few items.
         - Switches that can only be hit with staff or clone throw + iron boots
-
-    - Fix ledges so that:
-        - Right now ledges block attacks anywhere in the tile rather than just when they are on the ledge, additionally only true values apply instead of both true+false values.
-        - solidMap behavior can block projectiles.
-        - Shooting an arrow down N ledges allows it to go up N ledges
-            - For now, have a property increments for every frame it is over a ledge in the correct direction.
-            - If the property is positive, instead of hitting ledges/southernwalls in the wrong direction, decrement the property.
-            - veryTall tiles will still block the projectile even when the property is set.
 
     - test staff interactions with ledges.
 
@@ -311,10 +319,6 @@ Current tasks:
     - Work on new waterfall graphics
         - Email Jon about waterfall graphic updates.
 
-Mechanic: Windstream
-    - Pushes player back unless they are using iron boots or holding on to a solid object. Player can push pots to move through wind streams.
-    - Player can be pushed across wide pits by equipping cloud boots and entering a wind stream.
-    - There may be light objects that players can push into windstreams to move them, perhaps to solve switch puzzles
 
 Combat Ideas:
     - Concentric damaging rings that collapse into the player. Player must time it so that they are close enough together to dodge roll through in order to avoid damage.
@@ -370,14 +374,14 @@ Improve Staff Tower Setup:
 
 High level list of things left to do:
     New dungeons(need enemies, mechanics, bosses, entrances):
-        Jade Palace
         Sky Palace
         Forge
     Areas missing significant content:
-        Grand Temple
         Forest Temple
         River Temple
     Missing Bosses for existing areas:
+        Phoenix boss in Holy Sanctum
+        Eight Trigram Furnace at the end of the Gauntlet
         Crater midboss
         Rival fight before Helix
         Helix Boss
@@ -414,6 +418,15 @@ Misc improvements
 Add toasts to development for undoing actions:
     - Deleting layers
     - Replacing > 100 tiles
+
+
+Simple randomization ideas:
+    - Randomize tippable pot in war temple 2F
+        - Make sure true sight reveals this.
+    - Allow floor switches under covered tiles, randomizer the location of a floor switch to open a door.
+        - Make sure true sight reveals this.
+    - Place a key under a random pot
+        - Make sure spirit sight reveals this.
 
 Treasure Hunter Store
     - Initially can only carry 200 coins
@@ -601,11 +614,6 @@ Idea:
     Objects you can bounce off of when jumping
         - Just make them solid and knock the player back a bit if the player's y velocity is >= some value?
 
-Include some random dungeon design in the base game:
-    - Location of key under object might change (there should be some clue where it is or use spirit sight).
-    - Something like peg cave, but only a single peg needs to be pressed to open it (spirit sight reveals which?).
-    - Something like Eastern Palace Foyer except the correct door isn't always the center door.
-
 Support 64x64 super tiles for world map. Or maybe just 48x48.
 
 Possible tool: Leather gloves protect you from thorn bushes.
@@ -654,17 +662,17 @@ Ability Locations:
     clone               Forest Temple Boss
     ironBoots           Waterfall Tower Chest
     spiritCloak 2       Waterfall Tower Boss
+    True Sight          Gauntlet Chest
+    ironSkin            Gauntlet Boss
     gloves 2            Forge Chest
     goldMail            Forge Boss
     roll 2              Cloud Temple Chest
     nimbusCloud         Cloud Temple Boss
-    bow 2               Grand Temple Chest
-    ironSkin            Grand Temple Boss
-    trueSight           Jade Palace Chest
-    phoenixCrown        Jade Palace Boss
+    bow 2               Holy Sanctum Chest
+    phoenixCrown        Holy Sanctum Boss
 # First Quest Dungeon
     staff               Helix Chest
-    charge              Helix Boss
+    weapon 2            Helix Boss
 # Middle Quest Dungeons
     fireBlessing        Crater Big Chest
     fire                Crater Boss Flame Beast
@@ -672,38 +680,10 @@ Ability Locations:
     ice                 River Temple Boss Frost Beast
     lightning           Staff Tower Boss Storm Beast
     staff 2             Staff Tower "Chest" (after boss)
-    weapon 2            Acquired with first Element
-    charge 2            Acquired with second Element
+    charge 1            Acquired with first Element
+    charge 2            Acquired with third Element
 # Final Quest Dungeon
-    clone 2             Warship Chest
-
-Ability order:
-
-Early Dungeons:
-    Peach Cave: Completing the cave awakens MCs spirit abilities giving them their spirit bar + cat eyes.
-(Head home, mother indicates you should head to Vanara Village to speak with the elder.)
-(Vanara Village: Get the bow from the elder.)
-    Vanara Tomb: Dodge Roll in big chest, Spirit Sight from the Vanara Guardian.
-(mother indicates you should head to Summoner Ruins.)
-    Summoner Ruins: Bracers in big chest, Astral Projection after defeating the boss.
-    Cocoon: spiritCloak in big chest, Teleportation from Vanara Guardian.
-    Helix: Tree Staff in big chest, charge from Vanara Captain.
-
-Elemental Beasts: (triggered by Helix or entering the Spirit World)
-    River Temple(Old Fertility Temple: Water Blessing Big Chest, Frost Beast(ice element)
-    Mountain Crater: Fire Blessing Big Chest, Flame Beast(fire element)
-    Staff Tower: Storm Beast(lightning element) + Tower Staff in Big Chest after boss
-
-Late Dungeons:
-    Forest Temple(New Fertility Temple): Cloud Boots in chest, Clone after boss
-    Waterfall Tower: Iron Boots in chest, spiritCloak 2 after boss
-    The Forge: Gloves 2 in chest, gold mail after boss
-    Grand Temple: Bow 2 chest, iron Skin after boss
-    Jade Palace: True Sight in chest, Phoenix Crown after boss
-    Cloud Temple: Roll 2 in chest, Nimbus Cloud after boss.
-
-Final Dungeon:
-    Warship: Clone 2 in big chest
+    clone 2             Hidden Lab
 
 Dungeon 1: Vanara Tomb (fortress around the Cocoon)
     - Traps+locks to keep intruders away. Need to use bow to enter
@@ -718,29 +698,6 @@ Dungeon 1: Vanara Tomb (fortress around the Cocoon)
     - A facade is built aroaund the structure to disguise it as a mundane structure
         - The Vanara village posts guards in addition to the traps to keep people out
     - MCs father refused to go back to sleep, having fallen in love with MCs mother and not wanting to forget about her.
-Dungeon 1 Boss Golem:
-    - Vulnerable to bow
-    - Invulnerable except for weak spot
-    - Has two hands for guarding adn attacking
-    - Sometimes does larger coordinated attacks depending on which parts are alive.
-    - Tedious to kill without destroying any hands
-    - Fastest to kill destroying only one hand
-
-
-Dungeon 2: Ruins of Summoner village and Temple of War
-    - Expected loadout: Cat Eyes, 6 hearts, Dodge, Bow, Spirit Sight
-    - Enemies: Flame/Frost/Storm mobs
-    - Big Chest: Gloves 1
-    - Boss: Elemental idols
-    - Boss Reward: Astral Projection
-
-Dungeon 3: Cocoon (Vanara Regeneration Unit)
-    - Expected loadout: Cat Eyes, 7 hearts, Dodge, Bow, Spirit Sight, Gloves, Astral Projection
-    - Enemies
-    - Big Chest: Invisibility Technique
-    - Boss:
-    - Boss Reward: Teleportation (body moves to astral projection when pressing either tool button)
-
 
 Jade Palace:
     - Boss Reward: Phoenix Feather
