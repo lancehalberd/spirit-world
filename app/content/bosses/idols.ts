@@ -100,7 +100,8 @@ function updateElementalIdol(state: GameState, enemy: Enemy, attack: () => void)
         enemy.params.priority = undefined;
         // When all bosses are at 1 life or lower, all the statues get destroyed.
         if (!enemy.area.objects.some(object =>
-            object instanceof Enemy && object.definition.type === 'boss' && object.life > 0
+            object instanceof Enemy && object.definition?.type === 'boss' && object.life > 0
+            && object.isFromCurrentSection(state)
         )) {
             enemy.showDeathAnimation(state);
             return;

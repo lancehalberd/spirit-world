@@ -106,7 +106,7 @@ export class BarrierBurstEffect implements EffectInstance {
                 r = 36;
             }
             hitTargets(state, this.area, {
-                damage,
+                damage: damage / 2,
                 hitEnemies: true,
                 hitCircle: {x: this.x, y: this.y, r},
                 hitObjects: true,
@@ -154,14 +154,7 @@ export class BarrierBurstEffect implements EffectInstance {
             });
         }
         if (this.element === 'lightning') {
-            const r = (this.animationTime >= duration) ? 36 : 72;
-            context.beginPath();
-            context.arc(this.x, y, r, 0, 2 * Math.PI);
-            context.save();
-                context.globalAlpha *= 0.1;
-                context.fillStyle = 'yellow'
-                context.fill();
-            context.restore();
+            const r = (this.animationTime > 100) ? 36 : 72;
             if (r > 50) {
                 // For such a large circle the algorithm requires more and larger branches
                 // to fill the space.

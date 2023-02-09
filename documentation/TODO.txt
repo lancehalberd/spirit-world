@@ -39,11 +39,10 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Brain storm ideas to make lightning element more interesting
-        - Lightning switch to open material world basement in staff tower
-            - 3 sentry bots that are off if boss is defeated, must be activated to defeat and get gold ore
-            - Can be done in randomizer without defeating boss but all 3 will be active at once
-            - Same switch exists in spirit world can let you shortcut to basement in randomizer
+    - Lightning switch to open material world basement in staff tower
+        - 3 sentry bots that are off if boss is defeated, must be activated to defeat and get gold ore
+        - Can be done in randomizer without defeating boss but all 3 will be active at once
+        - Same switch exists in spirit world can let you shortcut to basement in randomizer
 
     - Brainstorm ideas for Sky Palace
         - Lightning switches toggle mechanisms like platforms and wind turbines.
@@ -68,6 +67,7 @@ Current tasks:
         - If the hero has spirit energy, half of burning damage is instead taken from spirit energy at 10 spirit per 1 point of damage,
         modified by spirit loss coefficient
         - If the hero has iron skin, burning damage applies to spirit energy, and the health portion is ignored.
+            - Burning damage applies to iron skin life if player is out of spirit energy
         - If the hero has cloak up, they cannot be burned but fire attacks deal 50% more upfront damage to cloak.
         - Fire blessing reduces burns on player to half damage over 1 second.
         - Burning damage does not cause and is not prevented by iframes

@@ -381,13 +381,13 @@ export class Arrow implements EffectInstance, Projectile {
         if (!this.blocked && !this.stuckFrames && this.element === 'lightning') {
             const x = this.x + this.w / 2, y = this.y + this.h / 2;
             const r = this.chargeLevel > 1 ? 24 : 16;
-            context.beginPath();
+            /*context.beginPath();
             context.arc(x, y, r, 0, 2 * Math.PI);
             context.save();
                 context.globalAlpha *= 0.1;
                 context.fillStyle = 'yellow'
                 context.fill();
-            context.restore();
+            context.restore();*/
             renderLightningCircle(context, {x, y, r});
         }
     }
