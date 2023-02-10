@@ -49,18 +49,19 @@ export function getFullZoneLocation(location: ZoneLocation): FullZoneLocation {
 export function getShortZoneName(location: ZoneLocation): string {
     const {logicalZoneKey} = getFullZoneLocation(location);
     switch (logicalZoneKey) {
-        case 'ascentCaveSpirit': return 'Spirit Cave'
-        case 'ascentCave': return 'Cave'
-        case 'bushCave': return 'Cave'
-        case 'fertilityShrineSpirit': return 'SpiritShrine'
-        case 'fertilityShrine': return 'Shrine'
-        case 'jadePalace': return 'Jade Palace'
-        case 'grandTemple': return 'Grand Temple'
-        case 'peachCave': return 'Peach Cave'
+        case 'ascentCaveSpirit': return 'Spirit Cave';
+        case 'ascentCave': return 'Cave';
+        case 'bushCave': return 'Cave';
+        case 'fertilityShrineSpirit': return 'SpiritShrine';
+        case 'fertilityShrine': return 'Shrine';
+        case 'jadePalace': return 'Jade Palace';
+        case 'grandTemple': return 'Grand Temple';
+        case 'peachCave': return 'Peach Cave';
         case 'peachCaveSpirit': return 'Spirit Cave';
-        case 'riverTemple': return 'Lake Ruins'
-        case 'sky': return 'Sky'
-        case 'spiritSky': return 'Spirit Sky'
+        case 'hypeCave': return 'Spirit Cave';
+        case 'riverTemple': return 'Lake Ruins';
+        case 'sky': return 'Sky';
+        case 'spiritSky': return 'Spirit Sky';
         case 'sky': return 'in the sky';
         case 'overworld': return 'Outside';
         case 'spiritWorld': return 'Spirit World';
@@ -87,4 +88,5 @@ export function getShortZoneName(location: ZoneLocation): string {
     }
     // This should be typed as `never` by the compiler.
     logicalZoneKey;
+    return '???';
 }
