@@ -1,6 +1,6 @@
 import { objectHash } from 'app/content/objects/objectHash';
-import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { renderLightningRay } from 'app/render/renderLightning'
 import { hitTargets } from 'app/utils/field';
 import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
 import { getVectorToTarget } from 'app/utils/target';
@@ -69,7 +69,7 @@ export class Anode implements ObjectInstance {
         return this.status === 'normal' && this.isOn;
     }
     updateCathodes(state: GameState) {
-        let closest = 512 * 4;
+        let closest = 16 * 7;
         for (const object of this.area.objects) {
             if (object.definition?.type !== 'cathode') {
                 continue;
@@ -124,23 +124,23 @@ export class Anode implements ObjectInstance {
                 knockAwayFromHit: true,
             });
         }
-        if (this.animationTime % 40 === 0) {
-            const { mag, x: dx, y: dy } = getVectorToTarget(state, this, cathode);
-            // 20n % 32 = 0, 20, 8, 28, 16, 4, 24, 12
-            for (let i = 4 + (this.animationTime / 2) % 32; i <= mag - 4; i += 32) {
-                const x = this.x + 8 + dx * i - 1;
-                const y = this.y + dy * i - 1;
-                addSparkleAnimation(state, this.area, {
-                    x, y, w: 2, h: 2
-                }, { element: 'lightning'})
-            }
-        }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
         if (this.status !== 'normal' && this.status !== 'off' ) {
             return;
         }
         renderTransmitter(context, state, this);
+        if (!this.isRunning(state)) {
+            return;
+        }
+        const cathode = this.cathodes?.[this.cathodeIndex % this.cathodes?.length];
+        if (cathode) {
+            renderLightningRay(context, {
+                x1: this.x + 8, y1: this.y,
+                x2: cathode.x + 8, y2: cathode.y,
+                r: 8,
+            });
+        }
         /*if (this.status === 'normal' && this.cathodes.length) {
             const cathode = this.cathodes[this.cathodeIndex];
             context.strokeStyle = 'yellow';
