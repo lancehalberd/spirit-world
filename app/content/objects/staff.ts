@@ -108,7 +108,7 @@ export class Staff implements ObjectInstance {
             this.h = this.y - y;
             this.y = y + 16;
         } else {
-            this.staffBonked = Math.abs(this.y - y) >= 32 || Math.abs(this.x - x) >= 32;
+            this.staffBonked = Math.abs(this.y - y) <= 24 && Math.abs(this.x - x) <= 24;
             this.isInvalid = true;
         }
         // Make the hitbox even shorter when horizontal because the player's vertical hitbox is so large

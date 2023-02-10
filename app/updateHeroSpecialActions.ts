@@ -445,6 +445,16 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             if (!staff.isInvalid && !hero.canceledStaffPlacement) {
                 hero.activeStaff = staff;
                 addObjectToArea(state, state.areaInstance, staff);
+            } else if (staff.staffBonked) {
+                // Staff does no damage, hero is knocked back.
+                const [dx, dy] = directionMap[staff.direction];
+                hero.knockBack(state, {vx: -2.5*dx, vy: -2.5*dy, vz: 2});
+                state.screenShakes.push({
+                    dx: staffLevel > 1 ? 5 : 2,
+                    dy: staffLevel > 1 ? 5 : 2,
+                    startTime: state.fieldTime,
+                    endTime: state.fieldTime + 350,
+                });
             } else if (staff.isInvalid) {
                 // Staff hits at least a 3 tile area even if it doesn't get placed.
                 if (staff.direction === 'up') {
@@ -470,9 +480,11 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 hitObjects: true,
                 isStaff: true,
             });
-            state.screenShakes.push({
-                dx: 0, dy: staffLevel > 1 ? 5 : 2, startTime: state.fieldTime, endTime: state.fieldTime + 200
-            });
+            if (!staff.staffBonked) {
+                state.screenShakes.push({
+                    dx: 0, dy: staffLevel > 1 ? 5 : 2, startTime: state.fieldTime, endTime: state.fieldTime + 200
+                });
+            }
         } else if (hero.animationTime < jumpDuration + slamDuration) {
              hero.z = Math.max(hero.z + hero.vz, minZ);
         } else if (hero.animationTime >= jumpDuration + slamDuration) {
