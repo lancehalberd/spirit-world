@@ -5,6 +5,7 @@ interface RRTNode {
     x: number
     y: number
     strength: number
+    parent?: RRTNode
     children: RRTNode[]
 }
 
@@ -61,6 +62,7 @@ export function renderLightningRay(context: CanvasRenderingContext2D, {x1, y1, x
     // This angle is orthogonal to the ray.
     const theta = Math.atan2(rdy, rdx) + Math.PI / 2;
     const nodes: RRTNode[] = [{x: x1, y: y1, strength, children: []}];
+    let finalNode: RRTNode, finalDistanceSquared: number;
     // Generate the tree.
     for (let i = 0; i < treeSize; i++) {
         // Sample random point from the far side of the ray
@@ -86,23 +88,39 @@ export function renderLightningRay(context: CanvasRenderingContext2D, {x1, y1, x
         const dx = target.x - closestNode.x, dy = target.y - closestNode.y;
         const mag = Math.sqrt(dx * dx + dy * dy);
         const strengthRoll = 0.1 * Math.random();
-        const extendDistance = Math.min(mag, 3 + 2 * closestNode.strength * (2 * strengthRoll + 0.8));
+        const extendDistance = Math.min(mag, 5);
         const newNode: RRTNode = {
             x: closestNode.x + dx * extendDistance / mag,
             y: closestNode.y + dy * extendDistance / mag,
             strength: (0.9 + strengthRoll) * closestNode.strength,
             children: [],
+            parent: closestNode,
         }
         closestNode.children.push(newNode);
         closestNode.strength *= (1 - strengthRoll);
         nodes.push(newNode);
+
+        {
+            const dx = x2 - newNode.x, dy = y2 - newNode.y;
+            const distanceSquared = dx * dx + dy * dy;
+            if (!finalNode || distanceSquared < finalDistanceSquared) {
+                finalNode = newNode;
+                finalDistanceSquared = distanceSquared;
+            }
+        }
+    }
+    // Strengthen the path to the final node.
+    let node = finalNode;
+    while (node) {
+        node.strength = Math.min(2, node.strength + 0.5);
+        node = node.parent;
     }
     // Draw the tree
     context.strokeStyle = 'yellow';
     for (const node of nodes) {
         for (const child of node.children) {
             context.beginPath();
-            context.lineWidth = 1; // child.strength;
+            context.lineWidth = child.strength;
             context.moveTo(node.x, node.y);
             context.lineTo(child.x, child.y);
             context.stroke();
