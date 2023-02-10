@@ -44,6 +44,8 @@ Current tasks:
         - Can be done in randomizer without defeating boss but all 3 will be active at once
         - Same switch exists in spirit world can let you shortcut to basement in randomizer
 
+    - Stretch goal: allow changing lightning AOE attacks to use a ray instead of a circle if the player is too close to a conductive object.
+
     - Brainstorm ideas for Sky Palace
         - Lightning switches toggle mechanisms like platforms and wind turbines.
             - Lightning is not required to complete any of the dungeon, but may make sections quicker/easier.
