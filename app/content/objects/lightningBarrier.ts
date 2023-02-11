@@ -138,7 +138,7 @@ export class Anode implements ObjectInstance {
             renderLightningRay(context, {
                 x1: this.x + 8, y1: this.y,
                 x2: cathode.x + 8, y2: cathode.y,
-                r: 8,
+                r: 4,
             });
         }
         /*if (this.status === 'normal' && this.cathodes.length) {

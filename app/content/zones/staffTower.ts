@@ -57,7 +57,7 @@ const f0_0x0: AreaDefinition = {
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,636,638,635,0,0,0,0,0,0,0,0,636,638,635,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,636,638,635,0,0,798,0,0,0,0,0,636,638,635,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,634,0,633,0,0,0,0,0,0,0,0,634,0,633,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,632,629,631,0,0,0,0,0,0,0,0,632,629,631,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -98,8 +98,8 @@ const f0_0x0: AreaDefinition = {
                     [0,0,0,0,0,0,0,594,600,595,596,595,596,595,596,595,596,595,596,595,596,596,596,597,591,0,0,0,0,0,0,0],
                     [0,0,0,0,0,593,593,599,610,601,607,601,602,601,602,601,602,601,602,601,602,607,602,609,597,592,0,0,0,0,0,0],
                     [0,0,0,0,0,593,599,610,616,0,612,0,0,0,0,0,0,0,0,0,0,612,0,613,609,597,591,0,0,0,0,0],
-                    [0,0,0,0,594,600,610,616,0,0,617,0,0,0,0,0,0,0,0,0,0,617,0,0,613,609,597,592,0,0,0,0],
-                    [0,0,0,593,599,610,616,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,613,609,597,592,0,0,0],
+                    [0,0,0,0,594,600,610,616,0,0,617,0,0,10,0,10,0,0,0,0,0,617,0,0,613,609,597,592,0,0,0,0],
+                    [0,0,0,593,599,610,616,0,0,0,0,0,0,10,10,10,0,0,0,0,0,0,0,0,0,613,609,597,592,0,0,0],
                     [0,0,594,600,610,616,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,613,609,597,591,0,0],
                     [0,593,599,610,616,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,613,609,597,591,0],
                     [0,599,610,616,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,613,609,597,0],
@@ -221,6 +221,8 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "towerEscalatorUpOn", x: 231, y: 209, speed: "slow", d: "up", w: 18, h: 96, style: "escalator", type: "escalator"},
         {status: "normal", id: "towerEscalatorDownOn", x: 263, y: 209, speed: "fast", d: "down", w: 18, h: 96, style: "escalator", type: "escalator"},
         {status: "normal", id: "", x: 160, y: 80, style: "displayScreen", type: "sign", message: "", specialBehaviorKey: "towerTeleporter"},
+        {status: "closedSwitch", id: "staffTowerBasementLadder", x: 224, y: 80, type: "door", style: "ladderDown", targetZone: "staffTower", targetObjectId: "staffTowerBasementLadder", d: "down", customLogic: "elevatorDropped", linked: true, saveStatus: "forever", openLogic: {"hasCustomLogic":true,"customLogic":"elevatorDropped","isInverted":false}},
+        {status: "normal", id: "", x: 240, y: 64, type: "crystalSwitch", element: "lightning", timer: 0, targetObjectId: "staffTowerBasementLadder"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -439,6 +441,11 @@ const f0_0x1: AreaDefinition = {
         },
     ],
     objects: [
+        {status: "closed", id: "staffTowerBasementLadder", x: 224, y: 16, type: "door", style: "ladderUp", targetZone: "staffTower", targetObjectId: "staffTowerBasementLadder", d: "up", customLogic: "elevatorDropped", openLogic: {"hasCustomLogic":true,"customLogic":"elevatorDropped","isInverted":false}},
+        {status: "hiddenEnemy", id: "staffTowerGold", x: 248, y: 392, type: "chest", lootType: "goldOre", lootLevel: 1},
+        {status: "normal", id: "staffTower:0:0x1-sentryBot-0", x: 240, y: 352, type: "enemy", enemyType: "sentryBot", d: "down", params: {}},
+        {status: "normal", id: "staffTower:0:0x1-sentryBot-1", x: 212, y: 412, type: "enemy", enemyType: "sentryBot", d: "down", params: {}},
+        {status: "normal", id: "staffTower:0:0x1-sentryBot-2", x: 268, y: 412, type: "enemy", enemyType: "sentryBot", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -667,7 +674,8 @@ const sf0_0x0: AreaDefinition = {
         {status: "closedSwitch", id: "staffTowerSpiritEntrance", x: 224, y: 496, type: "door", style: "wooden", targetZone: "overworld", targetObjectId: "staffTowerSpiritEntrance", d: "down", locationCue: "Tower 1F", saveStatus: "forever"},
         {status: "normal", id: "", x: 208, y: 480, targetObjectId: "staffTowerSpiritEntrance", type: "floorSwitch"},
         {status: "normal", id: "", x: 336, y: 80, style: "displayScreen", type: "sign", message: "", specialBehaviorKey: "towerTeleporter"},
-        {status: "normal", id: "staffTowerBasementLadder", x: 224, y: 80, type: "door", style: "ladderDown", targetZone: "staffTower", targetObjectId: "staffTowerBasementLadder", d: "down", hasCustomLogic: true, customLogic: "elevatorDropped"},
+        {status: "closedSwitch", id: "staffTowerSpiritBasementLadder", x: 224, y: 80, type: "door", style: "ladderDown", targetZone: "staffTower", targetObjectId: "staffTowerSpiritBasementLadder", d: "down", customLogic: "elevatorDropped", linked: true, spirit: true},
+        {status: "closedSwitch", id: "staffTowerBasementLadder", x: 224, y: 80, type: "door", style: "ladderDown", targetZone: "staffTower", targetObjectId: "staffTowerBasementLadder", d: "down", customLogic: "elevatorDropped", linked: true, saveStatus: "forever", spirit: true},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
@@ -892,7 +900,7 @@ const sf0_0x1: AreaDefinition = {
     objects: [
         {status: "closed", id: "elevatorDoor0", x: 240, y: 416, type: "door", style: "wooden", targetZone: "staffTower", targetObjectId: "elevatorDoor", d: "up", specialBehaviorKey: "elevatorDoor", locationCue: "Tower B1"},
         {status: "normal", id: "elevatorFixed", x: 256, y: 144, type: "boss", enemyType: "superSquirrel", lootType: "empty", lootAmount: 1, lootLevel: 1, d: "down", params: {}},
-        {status: "normal", id: "staffTowerBasementLadder", x: 224, y: 16, type: "door", style: "ladderUp", targetZone: "staffTower", targetObjectId: "staffTowerBasementLadder", d: "up", hasCustomLogic: true, customLogic: "elevatorDropped"},
+        {status: "closed", id: "staffTowerSpiritBasementLadder", x: 224, y: 16, type: "door", style: "ladderUp", targetZone: "staffTower", targetObjectId: "staffTowerSpiritBasementLadder", d: "up", customLogic: "elevatorDropped", openLogic: {"hasCustomLogic":true,"customLogic":"elevatorDropped","isInverted":false}},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
