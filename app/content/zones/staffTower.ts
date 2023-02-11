@@ -675,7 +675,6 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 208, y: 480, targetObjectId: "staffTowerSpiritEntrance", type: "floorSwitch"},
         {status: "normal", id: "", x: 336, y: 80, style: "displayScreen", type: "sign", message: "", specialBehaviorKey: "towerTeleporter"},
         {status: "closedSwitch", id: "staffTowerSpiritBasementLadder", x: 224, y: 80, type: "door", style: "ladderDown", targetZone: "staffTower", targetObjectId: "staffTowerSpiritBasementLadder", d: "down", customLogic: "elevatorDropped", linked: true, spirit: true},
-        {status: "closedSwitch", id: "staffTowerBasementLadder", x: 224, y: 80, type: "door", style: "ladderDown", targetZone: "staffTower", targetObjectId: "staffTowerBasementLadder", d: "down", customLogic: "elevatorDropped", linked: true, saveStatus: "forever", spirit: true},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},

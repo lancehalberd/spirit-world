@@ -39,13 +39,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Lightning switch to open material world basement in staff tower
-        - 3 sentry bots that are off if boss is defeated, must be activated to defeat and get gold ore
-        - Can be done in randomizer without defeating boss but all 3 will be active at once
-        - Same switch exists in spirit world can let you shortcut to basement in randomizer
-
-    - Stretch goal: allow changing lightning AOE attacks to use a ray instead of a circle if the player is too close to a conductive object.
-
     - Brainstorm ideas for Sky Palace
         - Lightning switches toggle mechanisms like platforms and wind turbines.
             - Lightning is not required to complete any of the dungeon, but may make sections quicker/easier.
@@ -160,6 +153,8 @@ Current tasks:
         - Switches that can only be hit with staff or clone throw + iron boots
 
     - test staff interactions with ledges.
+
+    - Stretch goal: allow changing lightning AOE attacks to use a ray instead of a circle if the player is too close to a conductive object.
 
     - Prevent grabbing tiles/objects across ledges
         - on grab, check if the player can move into the object by running the movement algorithm with a special mode that ignores all normal collisions and prevents crossing ledges in any direction. Prevent the grab if this movement check fails.
