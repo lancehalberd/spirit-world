@@ -32,7 +32,7 @@ export function renderLightningCircle(context: CanvasRenderingContext2D, {x, y, 
         const dx = target.x - closestNode.x, dy = target.y - closestNode.y;
         const mag = Math.sqrt(dx * dx + dy * dy);
         const strengthRoll = 0.1 * Math.random();
-        const extendDistance = Math.min(mag, 3 * closestNode.strength * (2 * strengthRoll + 0.8));
+        const extendDistance = Math.min(mag, Math.max(5, r / 15));
         const newNode: RRTNode = {
             x: closestNode.x + dx * extendDistance / mag,
             y: closestNode.y + dy * extendDistance / mag,
@@ -48,7 +48,7 @@ export function renderLightningCircle(context: CanvasRenderingContext2D, {x, y, 
     for (const node of nodes) {
         for (const child of node.children) {
             context.beginPath();
-            context.lineWidth = child.strength;
+            context.lineWidth = Math.min(4, Math.max(0.2, child.strength));
             context.moveTo(node.x, node.y);
             context.lineTo(child.x, child.y);
             context.stroke();
@@ -120,7 +120,7 @@ export function renderLightningRay(context: CanvasRenderingContext2D, {x1, y1, x
     for (const node of nodes) {
         for (const child of node.children) {
             context.beginPath();
-            context.lineWidth = child.strength;
+            context.lineWidth = Math.min(4, Math.max(0.2, child.strength));
             context.moveTo(node.x, node.y);
             context.lineTo(child.x, child.y);
             context.stroke();

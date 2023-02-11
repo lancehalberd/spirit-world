@@ -2,6 +2,7 @@ import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { addRadialSparks } from 'app/content/effects/spark';
 import { allTiles } from 'app/content/tiles';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { renderLightningRay } from 'app/render/renderLightning';
 import { drawFrameAt } from 'app/utils/animations';
 import { removeEffectFromArea } from 'app/utils/effects';
 import { hitTargets } from 'app/utils/field';
@@ -74,14 +75,6 @@ export class LightningBolt implements EffectInstance, Props {
                     h: 24,
                 }, { element: 'lightning' });
             }
-        } else if (this.animationTime < this.delay + LIGHTNING_ANIMATION_DURATION) {
-            const h = BOLT_HEIGHT * Math.min(1, (this.animationTime - this.delay) / LIGHTNING_ANIMATION_DURATION);
-            addSparkleAnimation(state, this.area, {
-                x: this.x - 2,
-                y: this.y - BOLT_HEIGHT + h,
-                w: 4,
-                h: 4,
-            }, { element: 'lightning' });
         } else if (this.animationTime >= this.delay + LIGHTNING_ANIMATION_DURATION) {
             addSparkleAnimation(state, this.area, {
                 x: this.x - 2,
@@ -106,11 +99,6 @@ export class LightningBolt implements EffectInstance, Props {
         if (this.animationTime < this.delay + 100) {
             context.save();
                 context.globalAlpha *= (0.4 + Math.min(0.4, 0.4 * this.animationTime / this.delay));
-                /*context.fillStyle = 'yellow';
-                const r = 10 * Math.min(1, this.animationTime / this.delay);
-                context.beginPath();
-                context.arc(this.x + this.w / 2, this.y + this.h / 2 - 48, r, 0, 2 * Math.PI);
-                context.fill();*/
                 for (let ty = 0; ty < 2; ty++) {
                     for (let tx = 0; tx < 2; tx++) {
                         const tile = allTiles[cloudFrames[ty][tx]];
@@ -127,18 +115,7 @@ export class LightningBolt implements EffectInstance, Props {
         if (this.animationTime < this.delay) {
             return;
         }
-        // Animate the bolt coming down
-        /*const h = BOLT_HEIGHT * Math.min(1, (this.animationTime - this.delay) / LIGHTNING_ANIMATION_DURATION);
-        context.fillStyle = 'yellow';
-        context.fillRect(this.x - 1, this.y - BOLT_HEIGHT, 2, h);
-        if (this.animationTime < this.delay + LIGHTNING_ANIMATION_DURATION) {
-            return;
-        }*/
-        // Animate the strike point
-        /*context.beginPath();
-        context.fillStyle = 'yellow';
-        context.arc(this.x, this.y, 6, 0, 2 * Math.PI);
-        context.fill();*/
+        renderLightningRay(context, {x1: this.x, y1: this.y - BOLT_HEIGHT, x2: this.x, y2: this.y, r: 4});
     }
     renderShadow(context: CanvasRenderingContext2D, state: GameState) {
         if (this.animationTime <= this.delay) {
