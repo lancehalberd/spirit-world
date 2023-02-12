@@ -450,7 +450,13 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             } else if (staff.staffBonked) {
                 // Staff does no damage, hero is knocked back.
                 const [dx, dy] = directionMap[staff.direction];
-                hero.knockBack(state, {vx: -2.5*dx, vy: -2.5*dy, vz: 2});
+                let vz = 2;
+                if (hero.equippedBoots === 'cloudBoots') {
+                    vz = 3;
+                } else if (hero.equippedBoots === 'ironBoots') {
+                    vz = 1;
+                }
+                hero.knockBack(state, {vx: -2.5*dx, vy: -2.5*dy, vz});
                 state.screenShakes.push({
                     dx: staffLevel > 1 ? 5 : 2,
                     dy: staffLevel > 1 ? 5 : 2,
