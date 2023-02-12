@@ -4474,6 +4474,7 @@ const sf0_1x1: AreaDefinition = {
         },
     ],
     objects: [
+        {status: "cracked", id: "helixSkySpiritEntrance", x: 352, y: 96, type: "door", style: "cavern", targetZone: "helix", targetObjectId: "helixSkySpiritEntrance", d: "up"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},

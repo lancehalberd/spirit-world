@@ -50,6 +50,19 @@ Current tasks:
             - Player can be pushed across wide pits by equipping cloud boots and entering a wind stream or up to the next floor
             - There may be light objects that players can push into windstreams to move them, perhaps to solve switch puzzles
 
+        - High level breakdown:
+            - takes up most of the central super tile in the spirit sky
+            - main entrance is in a courtyard, can be reached from
+                - invisibility to bypass guard on the south
+                - use clone tool to bomb out of the helix in the spirit world (the exit is in the middle of the courtyard)
+                - secret entrance on the right under a heavy stone has a short passage to the courtyard + 2 checks
+            - dungeon should be completable with any of the following combinations (+cloud sommersault found in the dungeon):
+                - cloud boots + clone tool
+                - iron boots + invisibility
+                - mitts
+            - main dungeon area has a branch to get big key, another branch for boss blocked by cloud sommersault obstacles
+            - tower of the dungeon is unlockably with big key and leads to cloud sommesault
+
     - Player ice damage should only freeze ground that has certain properties:
         - shallow and deep water
         - lava

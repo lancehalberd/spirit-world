@@ -406,10 +406,22 @@ export const skyNodes: LogicNode[] = [
         paths: [
             { nodeId: 'westSpiritWorldMountain' },
             { nodeId: 'waterfallTowerSky'},
+            { nodeId: 'skyPalaceCourtyard'},
         ],
         entranceIds: ['caves-ascentExitSpirit', 'forgeEntrance'],
         exits: [
             { objectId: 'forgeEntrance' },
+        ],
+    },
+    {
+        zoneId,
+        nodeId: 'skyPalaceCourtyard',
+        paths: [
+            { nodeId: 'outsideForge' },
+        ],
+        entranceIds: ['helixSkySpiritEntrance'],
+        exits: [
+            { objectId: 'helixSkySpiritEntrance' },
         ],
     },
     {
