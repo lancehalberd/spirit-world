@@ -38,6 +38,12 @@ specialBehaviorsHash.staffTower = {
                     } else if (object?.definition.type === 'anode') {
                         object.status = 'off';
                     }
+                    if (object.isEnemyTarget) {
+                        const enemy = object as Enemy;
+                        if (enemy.definition.enemyType === 'lightningDrone' || enemy.definition.enemyType === 'sentryBot') {
+                            object.status = 'off';
+                        }
+                    }
                 }
             }
         }

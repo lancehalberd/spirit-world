@@ -146,7 +146,7 @@ export const hasNimbusCloud: LogicCheck = {requiredFlags: ['$nimbusCloud']};
 
 export const hasBow: LogicCheck = {requiredFlags: ['$bow']};
 export const hasUpgradedBow: LogicCheck = {requiredFlags: ['$bow:2']};
-export const hasElementalWeapon: OrLogicCheck = orLogic(hasChakram, hasBow);
+export const hasElementalWeapon: OrLogicCheck = orLogic(hasChakram, hasBow, hasSpiritBarrier);
 export const hasFire: LogicCheck = andLogic(hasElementalWeapon, {requiredFlags: ['$fire']});
 export const hasIce: LogicCheck = andLogic(hasElementalWeapon, {requiredFlags: ['$ice']});
 export const hasLightning: LogicCheck = andLogic(hasElementalWeapon, {requiredFlags: ['$lightning']});

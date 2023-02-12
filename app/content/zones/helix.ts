@@ -1010,6 +1010,7 @@ const sf3_0x0: AreaDefinition = {
         {status: "normal", id: "helixTopTeleporter", x: 256, y: 256, targetZone: "helix", targetObjectId: "helixTopTeleporter", type: "teleporter", locationCue: "Helix Bridge"},
         {status: "normal", id: "helix:s3:0x0-npc-0", x: 256, y: 144, d: "down", behavior: "none", style: "vanaraPurple", type: "npc", dialogueKey: "vanaraCommander"},
         {status: "normal", id: "helix:s3:0x0-teleporter-0", x: 208, y: 96, type: "teleporter"},
+        {status: "cracked", id: "helixSkySpiritEntrance", x: 240, y: 400, type: "door", style: "cave", targetZone: "sky", targetObjectId: "helixSkySpiritEntrance", d: "down", locationCue: "Helix Bridge"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},

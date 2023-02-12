@@ -1,5 +1,6 @@
 import { refreshAreaLogic } from 'app/content/areas';
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
+import { LightningAnimationEffect } from 'app/content/effects/lightningAnimationEffect';
 import { Door } from 'app/content/objects/door';
 import { Staff } from 'app/content/objects/staff';
 import { CANVAS_HEIGHT, FALLING_HEIGHT, FRAME_LENGTH, GAME_KEY } from 'app/gameConstants';
@@ -11,6 +12,7 @@ import { playAreaSound } from 'app/musicController';
 import { fallAnimation, heroAnimations } from 'app/render/heroAnimations';
 import { isUnderwater } from 'app/utils/actor';
 import { destroyClone } from 'app/utils/destroyClone';
+import { addEffectToArea } from 'app/utils/effects';
 import { enterLocation } from 'app/utils/enterLocation';
 import {
     canSomersaultToCoords,
@@ -593,7 +595,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
     return false;
 }
 
-function performSomersault(state: GameState, hero: Hero) {
+function performSomersault(this: void, state: GameState, hero: Hero) {
     // Cloud somersault roll activated by rolling again mid roll.
     const [dx, dy] = getCloneMovementDeltas(state, hero);
     state.hero.magic -= 10;
@@ -654,6 +656,12 @@ function performSomersault(state: GameState, hero: Hero) {
         hitEnemies: true,
     };
     hitTargets(state, hero.area, teleportHit);
+    if (hero.element === 'lightning') {
+        addEffectToArea(state, hero.area, new LightningAnimationEffect({
+            ray: teleportHit.hitRay,
+            duration: 100,
+        }));
+    }
     const landingHit: HitProperties = {
         damage: 5,
         element: hero.element,
@@ -676,6 +684,12 @@ function performSomersault(state: GameState, hero: Hero) {
         );
     }
     hitTargets(state, hero.area, landingHit);
+    if (hero.element === 'lightning') {
+        addEffectToArea(state, hero.area, new LightningAnimationEffect({
+            circle: landingHit.hitCircle,
+            duration: 200,
+        }));
+    }
     hero.x = lastOpenPosition.x;
     hero.y = lastOpenPosition.y;
     hitbox = hero.getHitbox(state);

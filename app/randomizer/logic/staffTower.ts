@@ -6,6 +6,7 @@ import {
     hasCloudBoots,
     hasClone,
     hasIce,
+    hasLightning,
     hasRoll,
     hasSomersault,
     hasStaff,
@@ -14,6 +15,8 @@ import {
 } from 'app/content/logic';
 
 import {LogicNode } from 'app/types';
+
+const hasDroppedElevator = {requiredFlags: ['elevatorDropped']};
 
 const zoneId = 'staffTower';
 export const staffTowerNodes: LogicNode[] = [
@@ -34,6 +37,17 @@ export const staffTowerNodes: LogicNode[] = [
             // Power is only on after the storm beast is released.
             {nodeId: 'staffTowerF1Spirit', logic: hasReleasedBeasts},
         ],
+        entranceIds: ['staffTowerBasementLadder'],
+        exits: [{objectId: 'staffTowerBasementLadder', logic: orLogic(hasLightning, hasDroppedElevator)}],
+    },
+    {
+        zoneId,
+        nodeId: 'staffTowerB1',
+        checks: [
+            { objectId: 'staffTowerGold', logic: andLogic(hasLightning, hasBossWeapon) },
+        ],
+        entranceIds: ['staffTowerBasementLadder'],
+        exits: [{objectId: 'staffTowerBasementLadder', logic: hasDroppedElevator}],
     },
     {
         zoneId,

@@ -177,6 +177,11 @@ enemyDefinitions.superSquirrel = {
         return enemy.defaultOnHit(state, hit);
     },
     update(this: void, state: GameState, enemy: Enemy) {
+        if (enemy.area !== state.hero.area) {
+            enemy.healthBarTime = 0;
+            enemy.setMode('hidden');
+            return;
+        }
         enemy.isInvulnerable = (enemy.z > 4);
         enemy.touchHit = (enemy.z <= 0) ? touchHit : null;
         if (enemy.mode === 'pause') {
