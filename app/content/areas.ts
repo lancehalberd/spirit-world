@@ -9,7 +9,7 @@ import { createCanvasAndContext } from 'app/utils/canvas';
 import { createObjectInstance, } from 'app/utils/createObjectInstance';
 import { checkIfAllEnemiesAreDefeated } from 'app/utils/checkIfAllEnemiesAreDefeated';
 import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
-import { findObjectInstanceById } from 'app/utils/findObjectInstanceById';
+import { findObjectInstanceByDefinition } from 'app/utils/findObjectInstanceById';
 import { addObjectToArea, removeObjectFromArea } from 'app/utils/objects';
 import { applyTileToBehaviorGrid, resetTileBehavior } from 'app/utils/tileBehavior';
 
@@ -727,7 +727,7 @@ export function refreshSection(state: GameState, area: AreaInstance, section: Re
         if (!isObjectLogicValid(state, definition)) {
             continue;
         }
-        let object = findObjectInstanceById(area, definition.id, true);
+        let object = findObjectInstanceByDefinition(area, definition, true);
         if (!object) {
             object = createObjectInstance(state, definition);
             if (object.alwaysReset || object.shouldRespawn && object.shouldRespawn(state)) {

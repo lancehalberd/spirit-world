@@ -39,6 +39,18 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Improve ice element:
+        - Player ice damage should only freeze ground that has certain properties:
+            - shallow and deep water
+            - lava (just permanently becomes stone floor for now)
+            - any damage ground that doesn't prevent being frozen
+            - cracked ground
+        - Add freeze effect to enemies
+        - Destroy flame effects
+        - Add freeze effect to certain objects
+            - Escalators
+            - Frozen cracked pots behave like regular push pots
+
     - Brainstorm ideas for Sky Palace
         - Lightning switches toggle mechanisms like platforms and wind turbines.
             - Lightning is not required to complete any of the dungeon, but may make sections quicker/easier.
@@ -63,11 +75,6 @@ Current tasks:
             - main dungeon area has a branch to get big key, another branch for boss blocked by cloud sommersault obstacles
             - tower of the dungeon is unlockably with big key and leads to cloud sommesault
 
-    - Player ice damage should only freeze ground that has certain properties:
-        - shallow and deep water
-        - lava
-        - any damage ground that doesn't prevent being frozen
-        - cracked ground
 
     - Fire damage burns players/enemies
         - Only one burn effect tracked, new ones replace old ones if they would do more damage than what remains
