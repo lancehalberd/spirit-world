@@ -381,6 +381,8 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
     }
     if (hero.action === 'usingStaff') {
         // Pressing either tool button while using the staff will cancel placing it.
+        hero.vx = 0;
+        hero.vy = 0;
         if (wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL) || wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL)) {
             hero.canceledStaffPlacement = true;
         }
