@@ -205,7 +205,7 @@ export type LogicalZoneKey =
     | 'jadeCityInterior' | 'jadePalace'
     // Spirit world sub areas
     | 'ascentCaveSpirit' | 'fertilityShrineSpirit'
-    | 'peachCaveSpirit' | 'hypeCave'
+    | 'peachCaveSpirit' | 'hypeCave' | 'bellCave'
     // Early dungeons
     | 'tomb' | 'warTemple' | 'cocoon' | 'helix'
     // Mid dungeons

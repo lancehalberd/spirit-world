@@ -3660,6 +3660,7 @@ const sf0_1x0: AreaDefinition = {
         {status: "normal", id: "overworld:s0:1x0-luckyBeetle-0", x: 392, y: 408, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
         {status: "cracked", id: "cloneCaveExit", x: 192, y: 256, type: "door", style: "cavern", targetZone: "cloneCave", targetObjectId: "cloneCaveExit", d: "up"},
         {status: "cracked", id: "cloneCaveEntrance", x: 288, y: 256, type: "door", style: "cavern", targetZone: "cloneCave", targetObjectId: "cloneCaveEntrance", d: "up"},
+        {status: "cracked", id: "bellCaveEntrance", x: 384, y: 0, type: "door", style: "cavern", targetZone: "bellCave", targetObjectId: "bellCaveEntrance", d: "up"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
