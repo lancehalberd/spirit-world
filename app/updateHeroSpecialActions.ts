@@ -484,11 +484,13 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 hitEnemies: true,
                 knockAwayFromHit: true,
                 isStaff: true,
+                isBonk: staff.staffBonked,
             });
             hitTargets(state, state.areaInstance, {
                 hitbox: baseTarget,
                 hitObjects: true,
                 isStaff: true,
+                isBonk: staff.staffBonked,
             });
             if (!staff.staffBonked) {
                 state.screenShakes.push({

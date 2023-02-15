@@ -436,11 +436,11 @@ const sf0_0x0: AreaDefinition = {
     ],
     objects: [
         {status: "cracked", id: "bellCaveEntrance", x: 400, y: 496, type: "door", style: "cavern", targetZone: "overworld", targetObjectId: "bellCaveEntrance", d: "down"},
-        {status: "normal", id: "bellCaveBell1", x: 184, y: 104, type: "crystalSwitch", timer: 1000},
-        {status: "normal", id: "bellCaveBell2", x: 224, y: 80, type: "crystalSwitch", timer: 1000},
-        {status: "normal", id: "bellCaveBell3", x: 272, y: 96, type: "crystalSwitch", timer: 1000},
-        {status: "normal", id: "bellCaveBell4", x: 320, y: 80, type: "crystalSwitch", timer: 1000},
-        {status: "normal", id: "bellCaveBell5", x: 360, y: 104, type: "crystalSwitch", timer: 1000},
+        {status: "normal", id: "bellCaveBell1", x: 184, y: 104, style: "bellA", type: "bell"},
+        {status: "normal", id: "bellCaveBell2", x: 224, y: 80, style: "bellA", type: "bell"},
+        {status: "normal", id: "bellCaveBell3", x: 272, y: 96, style: "bellA", type: "bell"},
+        {status: "normal", id: "bellCaveBell4", x: 320, y: 80, style: "bellA", type: "bell"},
+        {status: "normal", id: "bellCaveBell5", x: 360, y: 104, style: "bellA", type: "bell"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},

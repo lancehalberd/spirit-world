@@ -7,6 +7,7 @@ import {
 import { bossTypes } from 'app/content/bosses';
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 import { logicHash, isObjectLogicValid } from 'app/content/logic';
+import { bellStyles } from 'app/content/objects/bell';
 import { decorationTypes } from 'app/content/objects/decoration';
 import { escalatorStyles } from 'app/content/objects/escalator';
 import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
@@ -182,7 +183,7 @@ export function getObjectTypeProperties(): PanelRows {
 }
 
 export const combinedObjectTypes: ObjectType[] = [
-    'anode', 'cathode', 'airBubbles', 'ballGoal', 'beadCascade', 'beadGrate', 'bigChest', 'chest', 'crystalSwitch', 'decoration',
+    'anode', 'cathode', 'airBubbles', 'ballGoal', 'beadCascade', 'beadGrate', 'bell', 'bigChest', 'chest', 'crystalSwitch', 'decoration',
     'door', 'escalator', 'flameTurret', 'floorSwitch', 'indicator', 'keyBlock', 'loot','marker', 'movingPlatform', 'narration', 'npc', 'pitEntrance',
     'pushPull', 'rollingBall', 'saveStatue', 'shopItem', 'sign', 'spawnMarker', 'spikeBall', 'teleporter', 'tippable', 'torch', 'turret',
     'vineSprout', 'waterfall', 'waterPot',
@@ -448,6 +449,12 @@ export function createObjectDefinition(
                 delay: definition.delay || 0,
                 w: definition.w || 32,
                 h: definition.h || 32,
+            };
+        case 'bell':
+            return {
+                ...commonProps,
+                style: definition.style || Object.keys(bellStyles)[0],
+                type: definition.type,
             };
         case 'sign':
             return {
@@ -1210,6 +1217,8 @@ function getStyleFields(state: GameState, editingState: EditingState, object: Ob
         styles = turretStyles;
     } else if (object.type === 'pitEntrance') {
         styles = pitStyles;
+    } else if (object.type === 'bell') {
+        styles = bellStyles;
     }
     if (!styles) {
         return [];
