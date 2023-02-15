@@ -39,7 +39,39 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - New enemy: Balloon Centipede
+        - 5 circular segments
+        - Floats 8px off the ground moving in slow winding pattern
+        - Fires a small aimed projectile infrequently
+        - Destroying the head causes the body elements to disconnect and drift apart.
+        - Destroying a body element causes it to burst into 8 radial projectiles.
+            - If the body element is connected to the head, the tail elements drift apart but the rest connect to the head
+        - The main body moves faster and shoots more frequently the fewer body elements are attached
+        - The main body can pick up additional drifting body elements
+
+    - New enemy: Crusher
+        - medium sized enemy floats 24px high out of player's range (maybe could be hit by staff)
+        - will attempt to fall on the player to crush them with its spikey underside
+        - leaves permanent spike ground where it crushes player
+        - can be damaged briefly after it lands
+        - has 8 life and is difficult to single cycle unless you freeze or burn it
+
+    - New boss: Balloon Megapede
+        - Larger version of balloon centipede
+        - Is invulnerable except for the middle body joint
+        - 11 Segments initially, breaks into two complete 5 segment versions, then 4 two segment versions.
+        - The head shoots and the tail leaves behind time AoE bombs
+        - The head of the two segment versions is vulnerable. When defeated the head turns into a regular balloon centipede and the tail blows up and leaves permanent spike ground.
+        - Supports any length.
+            First segment is always head
+            Last segment is always tail
+            Any remaining segments are body, the middle (rounded up) is vulnerable.
+
+    - Make sure all teleporters are blocked by spirit sight and that randomizer logic respects this
+        - In particular waterfall tower entrance should require spirit sight.
+
     - Improve ice element:
+        - Add new transparent ice tile
         - Player ice damage should only freeze ground that has certain properties:
             - shallow and deep water
             - lava (just permanently becomes stone floor for now)
@@ -52,29 +84,12 @@ Current tasks:
             - Frozen cracked pots behave like regular push pots
 
     - Brainstorm ideas for Sky Palace
-        - Lightning switches toggle mechanisms like platforms and wind turbines.
-            - Lightning is not required to complete any of the dungeon, but may make sections quicker/easier.
         - Heavy 2x2 blocks that can only be pushed if the player has mitts
-        - Big key in a chest that you have to fall to.
         Mechanic: Windstream
             - Pushes player back unless they are using iron boots or holding on to a solid object.
             - Player can push pots to move through wind streams.
             - Player can be pushed across wide pits by equipping cloud boots and entering a wind stream or up to the next floor
             - There may be light objects that players can push into windstreams to move them, perhaps to solve switch puzzles
-
-        - High level breakdown:
-            - takes up most of the central super tile in the spirit sky
-            - main entrance is in a courtyard, can be reached from
-                - invisibility to bypass guard on the south
-                - use clone tool to bomb out of the helix in the spirit world (the exit is in the middle of the courtyard)
-                - secret entrance on the right under a heavy stone has a short passage to the courtyard + 2 checks
-            - dungeon should be completable with any of the following combinations (+cloud sommersault found in the dungeon):
-                - cloud boots + clone tool
-                - iron boots + invisibility
-                - mitts
-            - main dungeon area has a branch to get big key, another branch for boss blocked by cloud sommersault obstacles
-            - tower of the dungeon is unlockably with big key and leads to cloud sommesault
-
 
     - Fire damage burns players/enemies
         - Only one burn effect tracked, new ones replace old ones if they would do more damage than what remains

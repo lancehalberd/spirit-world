@@ -26,7 +26,11 @@ export function getFullZoneLocation(location: ZoneLocation): FullZoneLocation {
     } else if (zoneKey === 'riverTemple' || zoneKey === 'riverTempleWater') {
         logicalZoneKey = 'riverTemple';
     } else if (zoneKey === 'sky') {
-        logicalZoneKey = isSpiritWorld ? 'spiritSky' : 'sky';
+        if (isSpiritWorld && areaGridCoords.x === 1 && areaGridCoords.y === 1) {
+            logicalZoneKey = 'skyPalace';
+        } else {
+            logicalZoneKey = isSpiritWorld ? 'spiritSky' : 'sky';
+        }
     } else if (zoneKey === 'treeVillage') {
         logicalZoneKey = isSpiritWorld ? 'forestTemple' : 'treeVillage';
     } else if (zoneKey === 'holyCityInterior') {
