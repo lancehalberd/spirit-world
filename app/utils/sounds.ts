@@ -474,35 +474,30 @@ function playBeeps(frequencies, volume, duration, {smooth=false, swell=false, ta
     oscillator.stop(audioContext.currentTime + duration);
 }
 
-function playBellSound(frequencies, volume, duration, {swell=false, taper=false}) {
+function playBellSound(frequencies, volume, duration) {
     const combinedGainedNode = audioContext.createGain();
-    if (swell) {
-        combinedGainedNode.gain.setValueAtTime(0, audioContext.currentTime);
-        combinedGainedNode.gain.linearRampToValueAtTime(volume, audioContext.currentTime + duration * .1);
-    } else {
-        combinedGainedNode.gain.setValueAtTime(volume, audioContext.currentTime);
-    }
-    if (taper) {
-        combinedGainedNode.gain.setValueAtTime(volume, audioContext.currentTime + duration * .1);
-        // combinedGainedNode.gain.setTargetAtTime(0, audioContext.currentTime, duration / 10);
-        combinedGainedNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + duration);
-    }
-    // combinedGainedNode.gain.value = 1 / frequencies.length;
     combinedGainedNode.connect(audioContext.destination);
+    combinedGainedNode.gain.value = volume;
 
     const currentTime = audioContext.currentTime;
     frequencies = Float32Array.from(frequencies);
+    const attackTime = 0.003;
     let frequencyVolume = 0.5;
+    let fadeDuration = duration - attackTime;
     for (const frequency of frequencies) {
         const gainNode = audioContext.createGain();
-        gainNode.gain.value = frequencyVolume;
+        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+        gainNode.gain.linearRampToValueAtTime(frequencyVolume, audioContext.currentTime + attackTime);
+        gainNode.gain.setValueAtTime(frequencyVolume, audioContext.currentTime + attackTime);
+        gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + attackTime + fadeDuration);
         const oscillator = audioContext.createOscillator();
         oscillator.frequency.value = frequency;
-        oscillator.type = 'square';
+        oscillator.type = 'sine';
         oscillator.connect(gainNode);
         oscillator.start(currentTime);
         oscillator.stop(currentTime + duration);
         frequencyVolume *= 0.5;
+        fadeDuration *= 0.75;
         gainNode.connect(combinedGainedNode);
     }
 }
@@ -527,13 +522,13 @@ function getBellFrequencies(baseFrequency: number): number[] {
 
 sounds.set('bellA', {
     play() {
-        playBellSound(getBellFrequencies(440), 0.1, 2, {swell: true, taper: true});
+        playBellSound(getBellFrequencies(440), 0.2, 2);
     }
 });
 
 sounds.set('bellB', {
     play() {
-        playBellSound(getBellFrequencies(493.88), 0.1, 2, {swell: true, taper: true});
+        playBellSound(getBellFrequencies(493.88), 0.2, 2);
     }
 });
 
