@@ -417,7 +417,7 @@ window['stopTrack'] = stopTrack;
 window['requireSound'] = requireSound;
 
 // Safari uses webkitAudioContext instead of AudioContext.
-var audioContext = new (window.AudioContext || window['webkitAudioContext'])();
+const audioContext: AudioContext = new (window.AudioContext || window['webkitAudioContext'])();
 
 function makeDistortionCurve(amount) {
   var k = typeof amount === 'number' ? amount : 50,
@@ -474,6 +474,39 @@ function playBeeps(frequencies, volume, duration, {smooth=false, swell=false, ta
     oscillator.stop(audioContext.currentTime + duration);
 }
 
+function playBellSound(frequencies, volume, duration, {swell=false, taper=false}) {
+    const combinedGainedNode = audioContext.createGain();
+    if (swell) {
+        combinedGainedNode.gain.setValueAtTime(0, audioContext.currentTime);
+        combinedGainedNode.gain.linearRampToValueAtTime(volume, audioContext.currentTime + duration * .1);
+    } else {
+        combinedGainedNode.gain.setValueAtTime(volume, audioContext.currentTime);
+    }
+    if (taper) {
+        combinedGainedNode.gain.setValueAtTime(volume, audioContext.currentTime + duration * .1);
+        // combinedGainedNode.gain.setTargetAtTime(0, audioContext.currentTime, duration / 10);
+        combinedGainedNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + duration);
+    }
+    // combinedGainedNode.gain.value = 1 / frequencies.length;
+    combinedGainedNode.connect(audioContext.destination);
+
+    const currentTime = audioContext.currentTime;
+    frequencies = Float32Array.from(frequencies);
+    let frequencyVolume = 0.5;
+    for (const frequency of frequencies) {
+        const gainNode = audioContext.createGain();
+        gainNode.gain.value = frequencyVolume;
+        const oscillator = audioContext.createOscillator();
+        oscillator.frequency.value = frequency;
+        oscillator.type = 'square';
+        oscillator.connect(gainNode);
+        oscillator.start(currentTime);
+        oscillator.stop(currentTime + duration);
+        frequencyVolume *= 0.5;
+        gainNode.connect(combinedGainedNode);
+    }
+}
+
 sounds.set('reflect', {
     play() {
         playBeeps([2000, 8000, 4000], .01, .1, {});
@@ -482,6 +515,25 @@ sounds.set('reflect', {
 sounds.set('wand', {
     play() {
         playBeeps([1200, 400], 0.01, .1, {smooth: true, taper: true, swell: true, distortion: true});
+    }
+});
+
+// Frequencies from https://www.computermusicresource.com/Simple.bell.tutorial.html
+const bellFrequencies = [0.56, 0.92, 1.19, 1.71, 2, 2.74, 3, 3.76, 4.07];
+
+function getBellFrequencies(baseFrequency: number): number[] {
+    return bellFrequencies.map(n => baseFrequency * n);
+}
+
+sounds.set('bellA', {
+    play() {
+        playBellSound(getBellFrequencies(440), 0.1, 2, {swell: true, taper: true});
+    }
+});
+
+sounds.set('bellB', {
+    play() {
+        playBellSound(getBellFrequencies(493.88), 0.1, 2, {swell: true, taper: true});
     }
 });
 

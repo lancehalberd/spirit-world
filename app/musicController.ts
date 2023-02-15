@@ -131,6 +131,10 @@ export const updateMusic = (state: GameState): void => {
         playTrack('helixTheme', 0, soundSettings);
     } else if (state.location.zoneKey === 'void') {
         playTrack('vanaraDreamTheme', 0, soundSettings);
+    } else if (state.location.zoneKey === 'bellCave' ) {
+        playTrack('caveTheme', 0, soundSettings);
+    } else {
+        playTrack('idleTheme', 0, soundSettings);
     }
 }
 

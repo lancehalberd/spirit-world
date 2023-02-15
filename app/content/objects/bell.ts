@@ -12,7 +12,12 @@ const potFrame: Frame = createAnimation('gfx/tiles/movablepot.png', {w: 16, h: 1
 export const bellStyles = {
     bellA: {
         playSound(state: GameState, bell: Bell) {
-            playAreaSound(state, bell.area, 'blockAttack');
+            playAreaSound(state, bell.area, 'bellA');
+        }
+    },
+    bellB: {
+        playSound(state: GameState, bell: Bell) {
+            playAreaSound(state, bell.area, 'bellB');
         }
     }
 }
