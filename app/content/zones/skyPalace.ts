@@ -1973,6 +1973,7 @@ const sf0_1x0: AreaDefinition = {
         {status: "normal", id: "", x: 16, y: 64, type: "door", style: "crystal", d: "left"},
         {status: "normal", id: "skyPalaceBigKey", x: 248, y: 56, type: "chest", lootType: "bigKey", lootLevel: 1},
         {status: "normal", id: "skyPalaceSmallKey", x: 424, y: 424, type: "chest", lootType: "smallKey", lootLevel: 1},
+        {status: "normal", id: "skyPalace:s0:1x0-balloonCentipede-0", x: 240, y: 92, type: "enemy", enemyType: "balloonCentipede", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16},

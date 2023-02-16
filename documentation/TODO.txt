@@ -39,23 +39,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - New enemy: Balloon Centipede
-        - 5 circular segments
-        - Floats 8px off the ground moving in slow winding pattern
-        - Fires a small aimed projectile infrequently
-        - Destroying the head causes the body elements to disconnect and drift apart.
-        - Destroying a body element causes it to burst into 8 radial projectiles.
-            - If the body element is connected to the head, the tail elements drift apart but the rest connect to the head
-        - The main body moves faster and shoots more frequently the fewer body elements are attached
-        - The main body can pick up additional drifting body elements
-
-    - New enemy: Crusher
-        - medium sized enemy floats 24px high out of player's range (maybe could be hit by staff)
-        - will attempt to fall on the player to crush them with its spikey underside
-        - leaves permanent spike ground where it crushes player
-        - can be damaged briefly after it lands
-        - has 8 life and is difficult to single cycle unless you freeze or burn it
-
     - New boss: Balloon Megapede
         - Larger version of balloon centipede
         - Is invulnerable except for the middle body joint
@@ -66,6 +49,13 @@ Current tasks:
             First segment is always head
             Last segment is always tail
             Any remaining segments are body, the middle (rounded up) is vulnerable.
+
+    - New enemy: Crusher
+        - medium sized enemy floats 24px high out of player's range (maybe could be hit by staff)
+        - will attempt to fall on the player to crush them with its spikey underside
+        - leaves permanent spike ground where it crushes player
+        - can be damaged briefly after it lands
+        - has 8 life and is difficult to single cycle unless you freeze or burn it
 
     - Make sure all teleporters are blocked by spirit sight and that randomizer logic respects this
         - In particular waterfall tower entrance should require spirit sight.

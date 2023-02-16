@@ -130,7 +130,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             ...(definition.params || {}),
         };
         this.status = definition.status;
-        if (getObjectStatus(state, this.definition)) {
+        if (this.definition.id && getObjectStatus(state, this.definition)) {
             this.status = 'gone';
         }
         this.alwaysReset = this.enemyDefinition.alwaysReset;
@@ -429,7 +429,9 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             this.enemyDefinition.onDeath(state, this);
         }
         this.status = 'gone';
-        saveObjectStatus(state, this.definition);
+        if (this.definition.id) {
+            saveObjectStatus(state, this.definition);
+        }
     }
     shouldReset(state: GameState) {
         return true;

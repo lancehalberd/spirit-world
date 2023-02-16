@@ -18,6 +18,7 @@ export const bossTypes = <const>[
     'stormIdol', 'flameIdol', 'frostIdol',
     'guardian', 'guardianProjection',
     'crystalCollector',
+    'balloonMegapede',
     'superSquirrel',
     'frostHeart', 'frostBeast',
     'flameHeart', 'flameBeast',

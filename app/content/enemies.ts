@@ -38,6 +38,7 @@ import {
     TileBehaviors,
 } from 'app/types';
 
+export * from 'app/content/enemies/balloonCentipede';
 export * from 'app/content/enemies/crystalBat';
 export * from 'app/content/enemies/crystalGuardian';
 export * from 'app/content/enemies/electricSquirrel';
@@ -50,8 +51,9 @@ export * from 'app/content/enemies/vortex';
 
 export const enemyTypes = <const>[
     'arrowTurret',
+    'balloonCentipede',
     'beetle', 'climbingBeetle', 'beetleHorned', 'beetleMini', 'beetleWinged',
-    'crystalBat', 'crystalGuardian',
+    'crusher', 'crystalBat', 'crystalGuardian',
     'electricSquirrel', 'ent',
     'flameSnake', 'frostBeetle',
     'floorEye',
