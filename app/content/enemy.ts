@@ -577,6 +577,9 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
                 addEffectToArea(state, this.area, explosionAnimation);
                 playAreaSound(state, this.area, 'enemyDeath');
             }
+            if (this.animationTime >= 2800) {
+                this.status = 'gone';
+            }
             return;
         }
         if (this.invulnerableFrames > 0) {

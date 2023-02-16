@@ -39,27 +39,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - New boss: Balloon Megapede
-        - Larger version of balloon centipede
-        - Is invulnerable except for the middle body joint
-        - 11 Segments initially, breaks into two complete 5 segment versions, then 4 two segment versions.
-        - The head shoots and the tail leaves behind time AoE bombs
-        - The head of the two segment versions is vulnerable. When defeated the head turns into a regular balloon centipede and the tail blows up and leaves permanent spike ground.
-        - Supports any length.
-            First segment is always head
-            Last segment is always tail
-            Any remaining segments are body, the middle (rounded up) is vulnerable.
-
-    - New enemy: Crusher
-        - medium sized enemy floats 24px high out of player's range (maybe could be hit by staff)
-        - will attempt to fall on the player to crush them with its spikey underside
-        - leaves permanent spike ground where it crushes player
-        - can be damaged briefly after it lands
-        - has 8 life and is difficult to single cycle unless you freeze or burn it
-
-    - Make sure all teleporters are blocked by spirit sight and that randomizer logic respects this
-        - In particular waterfall tower entrance should require spirit sight.
-
     - Improve ice element:
         - Add new transparent ice tile
         - Player ice damage should only freeze ground that has certain properties:
@@ -73,13 +52,27 @@ Current tasks:
             - Escalators
             - Frozen cracked pots behave like regular push pots
 
-    - Brainstorm ideas for Sky Palace
-        - Heavy 2x2 blocks that can only be pushed if the player has mitts
-        Mechanic: Windstream
-            - Pushes player back unless they are using iron boots or holding on to a solid object.
-            - Player can push pots to move through wind streams.
-            - Player can be pushed across wide pits by equipping cloud boots and entering a wind stream or up to the next floor
-            - There may be light objects that players can push into windstreams to move them, perhaps to solve switch puzzles
+    - Balloon Megapede Improvements
+        - Tail leaves behind time AoE bombs
+
+    - New enemy: Crusher
+        - medium sized enemy floats 24px high out of player's range (maybe could be hit by staff)
+        - will attempt to fall on the player to crush them with its spikey underside
+        - leaves permanent spike ground where it crushes player
+        - can be damaged briefly after it lands
+        - has 8 life and is difficult to single cycle unless you freeze or burn it
+
+    - Populate Sky Palace rooms with additional enemies and obstacles.
+
+    - Make sure all teleporters are blocked by spirit sight and that randomizer logic respects this
+        - In particular waterfall tower entrance should require spirit sight.
+
+    - Heavy 2x2 blocks that can only be pushed if the player has mitts
+    - Mechanic: Windstream
+        - Pushes player back unless they are using iron boots or holding on to a solid object.
+        - Player can push pots to move through wind streams.
+        - Player can be pushed across wide pits by equipping cloud boots and entering a wind stream or up to the next floor
+        - There may be light objects that players can push into windstreams to move them, perhaps to solve switch puzzles
 
     - Fire damage burns players/enemies
         - Only one burn effect tracked, new ones replace old ones if they would do more damage than what remains

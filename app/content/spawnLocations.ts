@@ -218,11 +218,11 @@ export const SPAWN_GAUNTLET_ENTRANCE: ZoneLocation = {
 export const SPAWN_SKY_PALACE_ENTRANCE: ZoneLocation = {
     zoneKey: 'skyPalace',
     floor: 0,
-    x: 124,
-    y: 448,
+    x: 250,
+    y: 460,
     z: 0,
     d: 'down',
-    areaGridCoords: {x: 0, y: 0},
+    areaGridCoords: {x: 1, y: 1},
     isSpiritWorld: true,
 };
 

@@ -102,8 +102,15 @@ const forestBackState = applyItems(helixEndState, {cloudBoots: 1, 'forestTemple:
 const waterfallBossState = applyItems(helixEndState, {ironBoots: 1});
 
 const gauntletStartState = applyItems(helixEndState, {
-    clone: 1, cloudBoots: 1, gloves: 2, cloak: 2, nimbusCloud: 1, roll: 2},
-    []);
+    clone: 1, cloudBoots: 1, gloves: 2, cloak: 2, nimbusCloud: 1, roll: 2
+}, []);
+
+const skyPalaceStartState = applyItems(helixEndState, {
+    maxLife: 3,
+    clone: 1, cloudBoots: 1,
+    ironBoots: 1, cloak: 2,
+    gloves: 2, goldenMail: 1,
+}, []);
 
 const holySanctumStartState = applyItems(helixEndState, {
     maxLife: 5,
@@ -247,7 +254,7 @@ export const middleSpawnLocations: SpawnLocationOptions = {
     },
     'Sky Palace Start': {
         location: spawnLocations.SPAWN_SKY_PALACE_ENTRANCE,
-        savedState: helixEndState,
+        savedState: skyPalaceStartState,
     },
     'Holy Sanctum Start': {
         location: spawnLocations.SPAWN_HOLY_SANCTUM_ENTRANCE,
