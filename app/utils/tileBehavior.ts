@@ -52,6 +52,16 @@ export function applyLedgesToBehaviorGridTile(behaviorGrid: TileBehaviors[][], x
     }
 }
 
+export function removeLedgeFromBehaviorTileGrid(behaviorGrid: TileBehaviors[][], x: number, y: number, key: 'up' | 'down' | 'left' | 'right'): void {
+    if (!behaviorGrid[y]?.[x]?.ledges) {
+        return;
+    }
+    delete behaviorGrid[y][x].ledges[key];
+    if (!Object.keys(behaviorGrid[y][x].ledges).length) {
+        delete behaviorGrid[y][x].ledges;
+    }
+}
+
 export function applyTileToBehaviorGrid(
     behaviorGrid: TileBehaviors[][],
     {x, y}: Tile,
@@ -64,7 +74,20 @@ export function applyTileToBehaviorGrid(
         return;
     }
     // Lava + clouds erase the behaviors of tiles underneath them.
-    if (behaviors.isLava || behaviors.cloudGround) {
+    if (behaviors.isLava || behaviors.cloudGround || behaviors.isGround === true) {
+        // Undo ledges that might have been set by this tile to adjacent tiles when we clear false ledges.
+        if (behaviorGrid[y][x]?.ledges?.up === false && y > 0) {
+            removeLedgeFromBehaviorTileGrid(behaviorGrid, x, y - 1, 'down');
+        }
+        if (behaviorGrid[y][x]?.ledges?.down === false && y < behaviorGrid.length - 1) {
+            removeLedgeFromBehaviorTileGrid(behaviorGrid, x, y + 1, 'up');
+        }
+        if (behaviorGrid[y][x]?.ledges?.left === false && x > 0) {
+            removeLedgeFromBehaviorTileGrid(behaviorGrid, x - 1, y, 'right');
+        }
+        if (behaviorGrid[y][x]?.ledges?.right === false && x < behaviorGrid[0].length - 1) {
+            removeLedgeFromBehaviorTileGrid(behaviorGrid, x + 1, y, 'left');
+        }
         behaviorGrid[y][x] = {};
     }
     // Any background tile rendered on top of lava removes the lava behavior from it.

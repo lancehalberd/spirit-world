@@ -430,7 +430,7 @@ const furniturePlantTiles: TileSource = {
 const furnitureRugTiles: TileSource = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/temp_furniture.png'), x: 688, y: 0, w: 4 * 16, h: 4 * 16},
-    behaviors: {'all': {water: false, shallowWater: false, slippery: true, elementTiles: {fire: 0}, solid: false, solidMap: null}},
+    behaviors: {'all': {isGround: true, slippery: true, elementTiles: {fire: 0}}},
 };
 
 const furnitureLampTiles: TileSource = {

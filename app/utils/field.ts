@@ -512,7 +512,12 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
             && !area.isHot
             && !behavior?.solid && !behavior?.solidMap && !(behavior?.covered || behavior?.blocksStaff)
             && !behavior?.pit && !behavior?.ledges && !behavior?.diagonalLedge
-            && !behavior?.isLava && !behavior?.isLavaMap
+            // Only attackes that hit allies freeze most ground tiles. Attacks from the player should only freeze water tiles
+            // and any ground tiles that are useful to freeze.
+            && (hit.hitAllies
+                || behavior?.isBrittleGround || behavior?.isLava || behavior?.isLavaMap || behavior?.touchHit
+                || behavior?.shallowWater || behavior?.water
+            )
         ) {
             let topLayer: AreaLayer = area.layers[0];
             for (const layer of area.layers) {
@@ -525,15 +530,27 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
             }
             // Fabricate a frozen tile that has the original tile "underneath it", so it will
             // return to the original state if exposed to fire.
-            topLayer.tiles[target.y][target.x] = {
-                ...allTiles[294],
-                behaviors: {
-                    ...allTiles[294].behaviors,
-                    elementTiles: {
-                        fire: topLayer.tiles[target.y][target.x]?.index || 0,
+            if (behavior?.isLava || behavior?.isLavaMap) {
+                // For now lava tiles just become permanent ground when frozen.
+                topLayer.tiles[target.y][target.x] = {
+                    ...allTiles[776],
+                    behaviors: {
+                        ...allTiles[776].behaviors,
+                        // In case lava was covering ledges or other behaviors, mark this tile as isGround.
+                        isGround: true,
                     },
-                },
-            };
+                };
+            } else {
+                topLayer.tiles[target.y][target.x] = {
+                    ...allTiles[294],
+                    behaviors: {
+                        ...allTiles[294].behaviors,
+                        elementTiles: {
+                            fire: topLayer.tiles[target.y][target.x]?.index || 0,
+                        },
+                    },
+                };
+            }
             if (area.tilesDrawn[target.y]?.[target.x]) {
                 area.tilesDrawn[target.y][target.x] = false;
             }

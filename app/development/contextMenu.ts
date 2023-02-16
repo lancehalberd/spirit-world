@@ -134,11 +134,8 @@ export function getContextMenu(): MenuOption[] {
             label: 'Log Tile Behaviors',
             onSelect() {
                 const state = getState();
-                console.log(lastContextClick);
                 const sx = Math.floor((state.camera.x + lastContextClick[0]) / 16);
                 const sy = Math.floor((state.camera.y + lastContextClick[1]) / 16);
-                console.log(sx, sy);
-                console.log(state.areaInstance.behaviorGrid);
                 console.log(state.areaInstance.behaviorGrid?.[sy]?.[sx]);
             }
         });

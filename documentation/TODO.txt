@@ -41,11 +41,6 @@ Graphics:
 Current tasks:
     - Improve ice element:
         - Add new transparent ice tile
-        - Player ice damage should only freeze ground that has certain properties:
-            - shallow and deep water
-            - lava (just permanently becomes stone floor for now)
-            - any damage ground that doesn't prevent being frozen
-            - cracked ground
         - Add freeze effect to enemies
         - Destroy flame effects
         - Add freeze effect to certain objects
@@ -66,6 +61,9 @@ Current tasks:
 
     - Make sure all teleporters are blocked by spirit sight and that randomizer logic respects this
         - In particular waterfall tower entrance should require spirit sight.
+
+    - Make sure hitRay/hitCircle apply to enemies with special hit detection.
+        - Add function for testing any hit properties for intersection against a hit box and use that in onHit logic.
 
     - Heavy 2x2 blocks that can only be pushed if the player has mitts
     - Mechanic: Windstream
