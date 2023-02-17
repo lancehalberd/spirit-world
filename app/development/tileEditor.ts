@@ -427,7 +427,7 @@ function performGlobalTileReplacement(oldPalette: TilePalette, newPalette: TileP
                         for (const layer of area.layers) {
                             for (const tileRow of layer.grid.tiles) {
                                 for (let x = 0; x < tileRow.length; x++) {
-                                    if (map[tileRow[x]]) {
+                                    if (map[tileRow[x]] !== undefined) {
                                         console.log(tileRow[x] + ' => ' + map[tileRow[x]]);
                                         tileRow[x] = map[tileRow[x]];
                                         changed = true;

@@ -427,9 +427,9 @@ const furniturePlantTiles: TileSource = {
     },
 };
 
-const furnitureRugTiles: TileSource = {
+const iceTiles: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/temp_furniture.png'), x: 688, y: 0, w: 4 * 16, h: 4 * 16},
+    source: {image: requireImage('gfx/tiles/iceTile.png'), x: 0, y: 0, w: 16, h: 16},
     behaviors: {'all': {isGround: true, slippery: true, elementTiles: {fire: 0}}},
 };
 
@@ -1542,7 +1542,9 @@ addTiles([
     furnitureWoodTiles,
     furnitureLampTiles,
     furniturePlantTiles,
-    furnitureRugTiles,
+    ...deletedTiles(5),
+    iceTiles,
+    ...deletedTiles(10),
     laundryTiles,
     fireTiles,
     logChoppingTiles,

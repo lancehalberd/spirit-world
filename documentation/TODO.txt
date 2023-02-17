@@ -40,7 +40,6 @@ Graphics:
 
 Current tasks:
     - Improve ice element:
-        - Add new transparent ice tile
         - Add freeze effect to enemies
         - Destroy flame effects
         - Add freeze effect to certain objects
