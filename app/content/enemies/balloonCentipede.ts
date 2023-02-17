@@ -77,6 +77,14 @@ enemyDefinitions.balloonCentipede = {
         }
     },
     update(state: GameState, enemy: Enemy<BalloonCentipedeParams>): void {
+        if (enemy.params.isHead || !enemy.params.parent?.params.isControlled) {
+            enemy.z = Math.max(Math.min(enemy.z + 1, 6), enemy.z + enemy.vz);
+            // Oscillate towards z = 8
+            enemy.az = enemy.speed * (8 - enemy.z) / 50;
+            enemy.vz = enemy.vz + enemy.az;
+        }
+
+        // Put this after the z code so that nothing spawns at z = 0 and falls into pits.
         if (enemy.params.length > 1) {
             const tail = new Enemy(state, {
                 id: '',
@@ -95,13 +103,6 @@ enemyDefinitions.balloonCentipede = {
             addObjectToArea(state, enemy.area, tail);
             enemy.params.length = 0;
             enemy.params.tail = tail;
-        }
-
-        if (enemy.params.isHead || !enemy.params.parent?.params.isControlled) {
-            enemy.z = Math.max(Math.min(enemy.z + 1, 6), enemy.z + enemy.vz);
-            // Oscillate towards z = 8
-            enemy.az = enemy.speed * (8 - enemy.z) / 50;
-            enemy.vz = enemy.vz + enemy.az;
         }
 
         const parent = enemy.params.parent;

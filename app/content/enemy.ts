@@ -167,7 +167,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             return this.enemyDefinition.getYDepth(this);
         }
         const hitbox = this.getHitbox();
-        return hitbox.y + hitbox.h;
+        return hitbox.y + hitbox.h + this.z;
     }
     getDefaultHitbox(): Rect {
         const frame = this.getFrame();
@@ -531,9 +531,9 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         }
         if (this.frozenDuration > 0) {
             this.frozenDuration -= FRAME_LENGTH;
-            if (this.vx > 0.1 || this.vy > 0.1) {
+            /*if (this.vx > 0.1 || this.vy > 0.1) {
                 moveEnemy(state, this, this.vx, this.vy, {canFall: true});
-            }
+            }*/
             if (this.z > 0) {
                 this.z = Math.max(0, this.z + this.vz);
                 this.vz = Math.max(-8, this.vz + this.az);
@@ -544,8 +544,8 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
                 }
             }
             // Slowly slide to a stop
-            this.vx *= 0.95;
-            this.vy *= 0.95;
+            //this.vx *= 0.95;
+            //this.vy *= 0.95;
             return;
         }
         for (const tauntKey in this.taunts ?? []) {

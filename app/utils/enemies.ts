@@ -44,7 +44,7 @@ export function scurryRandomly(state: GameState, enemy: Enemy) {
     if (enemy.mode === 'choose' && enemy.modeTime > 200) {
         enemy.params.theta = 2 * Math.PI * Math.random();
         enemy.setMode('scurry');
-        enemy.currentAnimation = enemy.enemyDefinition.animations.idle[enemy.d];
+        enemy.changeToAnimation('idle')
     }
     let tvx = 0, tvy = 0;
     if (enemy.mode === 'scurry') {

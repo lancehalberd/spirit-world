@@ -39,6 +39,8 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Update sky palace logic in randomizer.
+
     - When hero/clone is falling, draw it behind all other sprites (on top of the background).
         - Try using getDrawPriority to apply this to clone, we may need a new priority 'afterBackground' to force it to draw on top of all background elements (for example, it should be drawn on top of pit entrance objects).
         - The hero itself will probably need special handling to render it immediately after the background in renderField since it always has special handling.
@@ -48,15 +50,6 @@ Current tasks:
 
     - Flame wall improvement
         - Refactor as individual flames so that each flame can hit individually or be destroyed by ice.
-
-    - New enemy: Crusher
-        - medium sized enemy floats 24px high out of player's range (maybe could be hit by staff)
-        - will attempt to fall on the player to crush them with its spikey underside
-        - leaves permanent spike ground where it crushes player
-        - can be damaged briefly after it lands
-        - has 8 life and is difficult to single cycle unless you freeze or burn it
-
-    - Populate Sky Palace rooms with additional enemies and obstacles.
 
     - Make sure all teleporters are blocked by spirit sight and that randomizer logic respects this
         - In particular waterfall tower entrance should require spirit sight.

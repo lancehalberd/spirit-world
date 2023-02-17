@@ -39,6 +39,7 @@ import {
 } from 'app/types';
 
 export * from 'app/content/enemies/balloonCentipede';
+export * from 'app/content/enemies/crusher';
 export * from 'app/content/enemies/crystalBat';
 export * from 'app/content/enemies/crystalGuardian';
 export * from 'app/content/enemies/electricSquirrel';
