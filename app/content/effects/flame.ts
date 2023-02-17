@@ -8,7 +8,7 @@ import { allImagesLoaded } from 'app/utils/images';
 
 import {
     AreaInstance, DrawPriority, EffectInstance,
-    Frame, GameState, TileBehaviors,
+    Frame, GameState, HitProperties, HitResult, TileBehaviors,
 } from 'app/types';
 
 const flameGeometry = {w: 20, h: 20, content: {x: 2, y: 2, w: 16, h: 16}};
@@ -72,6 +72,7 @@ export class Flame implements EffectInstance, Props {
     ttl: number;
     isPreparing = false;
     reflected = false;
+    isEnemyTarget: boolean = true;
     constructor({x, y, z = 0, vx = 0, vy = 0, vz = 0, az = -0.3, damage = 1, scale = 1, ttl = 2000, isPreparing = false}: Props) {
         this.damage = damage;
         this.x = x;
@@ -90,6 +91,12 @@ export class Flame implements EffectInstance, Props {
     }
     getHitbox() {
         return this;
+    }
+    onHit(state: GameState, hit: HitProperties): HitResult {
+        if (hit.element === 'ice') {
+            removeEffectFromArea(state, this);
+        }
+        return {};
     }
     update(state: GameState) {
         this.x += this.vx;

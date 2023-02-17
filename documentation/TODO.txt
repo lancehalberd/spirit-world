@@ -41,12 +41,14 @@ Graphics:
 Current tasks:
     - Improve ice element:
         - Add freeze effect to enemies
-        - Destroy flame effects
         - Add freeze effect to certain objects
             - Escalators
 
     - Balloon Megapede Improvements
         - Tail leaves behind time AoE bombs
+
+    - Flame wall improvement
+        - Refactor as individual flames so that each flame can hit individually or be destroyed by ice.
 
     - New enemy: Crusher
         - medium sized enemy floats 24px high out of player's range (maybe could be hit by staff)
