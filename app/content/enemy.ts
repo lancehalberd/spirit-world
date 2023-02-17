@@ -51,6 +51,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
     animations: ActorAnimations;
     alwaysReset: boolean = false;
     alwaysUpdate: boolean = false;
+    frozenDuration = 0;
     // This ignores the default pit logic in favor of the ground effects
     // code used internally.
     ignorePits = true;
@@ -321,6 +322,12 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             damageDealt = multiplier * hit.damage;
             this.applyDamage(state, damageDealt, 'enemyHit', hit.element === 'lightning' ? 0.5 : 1);
         }
+        // Hitting frozen enemies unfreezes them.
+        if (this.frozenDuration > 0) {
+            this.frozenDuration = 0;
+        } else if (hit.element === 'ice' && this.definition.type !== 'boss') {
+            this.frozenDuration = 1500;
+        }
         return {
             damageDealt,
             hit: true,
@@ -512,13 +519,41 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         if (!this.alwaysUpdate && !this.isFromCurrentSection(state)) {
             return;
         }
+        this.time += FRAME_LENGTH;
+        if (this.invulnerableFrames > 0) {
+            this.invulnerableFrames--;
+        }
+        if (this.enemyInvulnerableFrames > 0) {
+            this.enemyInvulnerableFrames--;
+        }
+        if (this.blockInvulnerableFrames > 0) {
+            this.blockInvulnerableFrames--;
+        }
+        if (this.frozenDuration > 0) {
+            this.frozenDuration -= FRAME_LENGTH;
+            if (this.vx > 0.1 || this.vy > 0.1) {
+                moveEnemy(state, this, this.vx, this.vy, {canFall: true});
+            }
+            if (this.z > 0) {
+                this.z = Math.max(0, this.z + this.vz);
+                this.vz = Math.max(-8, this.vz + this.az);
+                // Enemy can take 1-2 fall damage while frozen if it lands hard enough.
+                if (this.z === 0 && this.vz <= -4) {
+                    this.applyDamage(state, (this.vz / -4) | 0);
+                    this.frozenDuration = 0;
+                }
+            }
+            // Slowly slide to a stop
+            this.vx *= 0.95;
+            this.vy *= 0.95;
+            return;
+        }
         for (const tauntKey in this.taunts ?? []) {
             const tauntInstance = this.taunts[tauntKey];
             if (tauntInstance.cooldown > 0) {
                 tauntInstance.cooldown -= FRAME_LENGTH;
             }
         }
-        this.time += FRAME_LENGTH;
         // Only time counter advances for enemies that are off.
         // This status is only meant to apply to machines.
         if (this.status === 'off') {
@@ -581,15 +616,6 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
                 this.status = 'gone';
             }
             return;
-        }
-        if (this.invulnerableFrames > 0) {
-            this.invulnerableFrames--;
-        }
-        if (this.enemyInvulnerableFrames > 0) {
-            this.enemyInvulnerableFrames--;
-        }
-        if (this.blockInvulnerableFrames > 0) {
-            this.blockInvulnerableFrames--;
         }
         const minZ = this.canBeKnockedDown ? 0 : (this.flying ? 12 : 0);
         if (this.action === 'knocked') {
@@ -657,6 +683,21 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         }
         if (this.enemyDefinition.renderOver) {
             this.enemyDefinition.renderOver(context, state, this);
+        }
+        if (this.frozenDuration > 0) {
+            context.save();
+                context.fillStyle = 'white';
+                const p = Math.round(Math.min(3, this.frozenDuration / 200));
+                context.globalAlpha *= (0.3 + 0.15 * p);
+                // Note enemy hitbox already incorporates the z value into the y value of the hitbox.
+                const hitbox = this.getHitbox(state);
+                context.fillRect(
+                    Math.round(hitbox.x - p),
+                    Math.round(hitbox.y - p),
+                    Math.round(hitbox.w + 2 * p),
+                    Math.round(hitbox.h + 2 * p)
+                );
+            context.restore();
         }
     }
     defaultRender(context: CanvasRenderingContext2D, state?: GameState, frame = this.getFrame()) {

@@ -584,7 +584,7 @@ export class Hero implements Actor, SavedHeroData {
             context.save();
                 context.fillStyle = 'white';
                 const p = Math.round(Math.min(3, hero.frozenDuration / 200));
-                context.globalAlpha *= (0.3 + 0.2 * p);
+                context.globalAlpha *= (0.3 + 0.15 * p);
                 context.fillRect(
                     Math.round(hero.x - frame.content.x - p),
                     Math.round(hero.y - hero.z - frame.content.y - p),
