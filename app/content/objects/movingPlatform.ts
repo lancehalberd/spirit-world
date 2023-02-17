@@ -4,7 +4,7 @@ import { moveActor } from 'app/moveActor';
 import { moveObject } from 'app/movement/moveObject';
 import { createAnimation, drawFrameAt, getFrame } from 'app/utils/animations';
 import { directionMap, getDirection, rotateDirection } from 'app/utils/direction';
-import { boxesIntersect, pad } from 'app/utils/index';
+import { boxesIntersect } from 'app/utils/index';
 
 import {
     AreaInstance, DrawPriority, GameState, Frame, MovingPlatformDefinition,
@@ -74,7 +74,7 @@ export class MovingPlatform implements ObjectInstance {
                 continue;
             }
             const heroHitbox = hero.getHitbox(state);
-            const isHeroOnPlatform = boxesIntersect(heroHitbox, pad(this.getHitbox(), 4))
+            const isHeroOnPlatform = boxesIntersect(heroHitbox, this.getHitbox())
                 && hero.action !== 'roll' && hero.action !== 'preparingSomersault' && hero.z <= this.behaviors.groundHeight
                 && hero.action !== 'falling' && hero.action !== 'fallen';
             if (isHeroOnPlatform) {

@@ -41,8 +41,10 @@ Graphics:
 Current tasks:
     - Improve ice element:
         - Add freeze effect to enemies
-        - Add freeze effect to certain objects
-            - Escalators
+
+    - When hero/clone is falling, draw it behind all other sprites (on top of the background).
+        - Try using getDrawPriority to apply this to clone, we may need a new priority 'afterBackground' to force it to draw on top of all background elements (for example, it should be drawn on top of pit entrance objects).
+        - The hero itself will probably need special handling to render it immediately after the background in renderField since it always has special handling.
 
     - Balloon Megapede Improvements
         - Tail leaves behind time AoE bombs

@@ -1,5 +1,5 @@
 import { destroyTile } from 'app/utils/destroyTile';
-import { boxesIntersect, pad } from 'app/utils/index';
+import { boxesIntersect } from 'app/utils/index';
 
 import { GameState, Hero } from 'app/types';
 
@@ -15,7 +15,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
         }
         // The padding here needs to match any used for other interactions with this object,
         // in particular, movingPlatform padding should match this.
-        if (boxesIntersect(pad(entity.getHitbox(state), 4), hitbox)) {
+        if (boxesIntersect(entity.getHitbox(state), hitbox)) {
             hero.groundHeight = entity.behaviors?.groundHeight;
         }
     }
@@ -37,9 +37,9 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
     let startClimbing = false;
     // Apply floor effects from objects/effects.
     for (const entity of [...hero.area.objects, ...hero.area.effects]) {
-        if (entity.getHitbox && entity.behaviors?.groundHeight > hero.groundHeight) {
-            if (boxesIntersect(entity.getHitbox(state), hitbox)) {
-                hero.groundHeight = entity.behaviors.groundHeight;
+        if (entity.getHitbox && (entity.behaviors?.groundHeight || 0) >= hero.z) {
+            if (entity.behaviors?.slippery && boxesIntersect(entity.getHitbox(state), hitbox)) {
+                hero.slipping = hero.slipping || (!hero.isAstralProjection && !hero.isInvisible && hero.equippedBoots !== 'ironBoots');
             }
         }
     }
@@ -97,7 +97,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
                 hero.swimming = false;
             }
             if (behaviors.slippery && hero.equippedBoots !== 'ironBoots') {
-                hero.slipping = !hero.isAstralProjection && !hero.isInvisible;
+                hero.slipping = hero.slipping || (!hero.isAstralProjection && !hero.isInvisible);
             }
             // Clouds boots are not slippery when walking on clouds.
             if (behaviors.cloudGround && hero.equippedBoots === 'cloudBoots') {

@@ -8,7 +8,7 @@ import { allImagesLoaded, requireImage } from 'app/utils/images';
 import { isObjectInsideTarget, pad } from 'app/utils/index';
 import {
     AreaInstance, Direction, DrawPriority, Frame, FrameWithPattern, GameState,
-    ObjectInstance, ObjectStatus, EscalatorDefinition,
+    ObjectInstance, ObjectStatus, EscalatorDefinition, HitProperties, HitResult, TileBehaviors,
 } from 'app/types';
 
 
@@ -61,11 +61,13 @@ export const escalatorStyles: {[key: string]: {[key in Direction]?: FrameWithPat
 export class Escalator implements ObjectInstance {
     area: AreaInstance;
     animationTime: number = 0;
+    behaviors: TileBehaviors;
     offsetX: number = 0;
     offsetY: number = 0;
     definition: EscalatorDefinition;
     drawPriority: DrawPriority = 'background';
     isObject = <const>true;
+    isNeutralTarget = true;
     x: number;
     y: number;
     pattern: CanvasPattern;
@@ -85,10 +87,22 @@ export class Escalator implements ObjectInstance {
     onDeactivate(state: GameState) {
         this.status = 'off';
     }
-    getEditorHitbox(state: GameState) {
-        return this.definition;
+    onHit(state: GameState, hit: HitProperties): HitResult {
+        if (this.status === 'frozen' && hit.element === 'fire') {
+            this.status = 'normal';
+            delete this.behaviors;
+        } else if (hit.element === 'ice') {
+            this.status = 'frozen';
+            this.behaviors = {
+                slippery: true
+            };
+        }
+        return {};
     }
     getHitbox(state: GameState) {
+        return this.definition;
+    }
+    getHitboxForMovingObjects(state: GameState) {
         const hitbox = pad(this.definition, 8);
         if (this.definition.d === 'down' || this.definition.d === 'up') {
             hitbox.y -= 6;
@@ -115,7 +129,7 @@ export class Escalator implements ObjectInstance {
                 continue;
             }
             const heroHitbox = hero.getHitbox(state);
-            const touchingHero = isObjectInsideTarget(heroHitbox, this.getHitbox(state))
+            const touchingHero = isObjectInsideTarget(heroHitbox, this.getHitboxForMovingObjects(state))
                 && hero.action !== 'roll' && hero.action !== 'preparingSomersault' && hero.z <= 0;
             if (this.speed === 'slow' && touchingHero) {
                 moveActor(state, hero, speed * dx, speed * dy, {
@@ -171,6 +185,13 @@ export class Escalator implements ObjectInstance {
             context.fillStyle = frame.pattern;
             context.fillRect(this.x - this.offsetX, this.y - this.offsetY, this.definition.w, this.definition.h);
         context.restore();
+        if (this.status === 'frozen') {
+            context.save();
+                context.globalAlpha *= 0.5;
+                context.fillStyle = 'white';
+                context.fillRect(this.x, this.y, this.definition.w, this.definition.h);
+            context.restore();
+        }
     }
 }
 objectHash.escalator = Escalator;

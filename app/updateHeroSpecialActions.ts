@@ -658,6 +658,7 @@ function performSomersault(this: void, state: GameState, hero: Hero) {
         },
         hitTiles: true,
         hitEnemies: true,
+        hitObjects: true,
     };
     hitTargets(state, hero.area, teleportHit);
     if (hero.element === 'lightning') {
@@ -675,6 +676,7 @@ function performSomersault(this: void, state: GameState, hero: Hero) {
         },
         hitTiles: true,
         hitEnemies: true,
+        hitObjects: true,
     };
     for (let i = 0; i < 8; i++) {
         const theta = 2 * Math.PI * i / 8;

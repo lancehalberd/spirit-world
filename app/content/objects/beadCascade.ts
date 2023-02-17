@@ -247,6 +247,9 @@ export class BeadSection implements ObjectInstance {
     getHitbox(state: GameState) {
         return this;
     }
+    getHitboxForMovingObjects(state: GameState) {
+        return {x: this.x + 10, y: this.y, w: this.w - 20, h: this.h};
+    }
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;
         const { objects } = getTileBehaviorsAndObstacles(
@@ -297,7 +300,7 @@ export class BeadSection implements ObjectInstance {
         // If touching center of player, pull player in and push them south.
         for (const hero of [state.hero, ...state.hero.clones]) {
             if (hero.area === this.area) {
-                const touchingHero = boxesIntersect(hero, this.getHitbox(state))
+                const touchingHero = boxesIntersect(hero, this.getHitboxForMovingObjects(state))
                     && hero.action !== 'roll' && hero.action !== 'preparingSomersault' && hero.z <= 4
                     && hero.y + hero.h < this.y + this.h + 4;
                 if (touchingHero && hero.equippedBoots === 'ironBoots') {
@@ -306,7 +309,7 @@ export class BeadSection implements ObjectInstance {
                         Math.min(this.x + this.w, Math.max(this.x, x)), hero.y + hero.h, 0);
                 }
                 const shouldPullHero = touchingHero && hero.equippedBoots !== 'ironBoots'&& !this.area.objects.some(object => {
-                    return object instanceof Staff && boxesIntersect(hero, object.getHitbox());
+                    return object instanceof Staff && boxesIntersect(hero.getHitbox(state), object.getHitbox());
                 });
                 if (hero.actionTarget === this && !shouldPullHero) {
                     hero.actionTarget = null;
@@ -333,12 +336,12 @@ export class BeadSection implements ObjectInstance {
                 if (hero.actionTarget === this) {
                     hero.isControlledByObject = true;
                     hero.swimming = true;
-                    if (hero.x < this.x) {
+                    if (hero.x < this.x - 4) {
                         hero.x++;
                         hero.y += 0.75;
                         hero.actionDy = 0.75;
                         hero.d = 'left';
-                    } else if (hero.x + hero.w > this.x + this.w) {
+                    } else if (hero.x + hero.w > this.x + this.w + 4) {
                         hero.x--;
                         hero.y += 0.75;
                         hero.actionDy = 0.75;
