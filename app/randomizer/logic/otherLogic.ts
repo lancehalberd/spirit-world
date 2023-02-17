@@ -306,6 +306,12 @@ export const cavesNodes: LogicNode[] = [
             { objectId: 'hypeCaveEntranceSpirit' },
         ],
     },
+    {
+        zoneId: 'bellCave',
+        nodeId: 'bellCave',
+        exits: [{ objectId: 'bellCaveEntrance' }],
+        entranceIds: ['bellCaveEntrance'],
+    },
 ];
 
 

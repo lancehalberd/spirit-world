@@ -218,7 +218,8 @@ export const overworldNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'spiritWorldMountain',
-        exits: [{ objectId: 'cloneCaveEntrance' }],
+        exits: [{ objectId: 'cloneCaveEntrance' }, { objectId: 'bellCaveEntrance' }],
+        entranceIds: ['bellCaveEntrance'],
         paths: [
             { nodeId: 'mainSpiritWorld' },
             { nodeId: 'westSpiritWorldMountain', logic: orLogic(hasSomersault, hasTeleportation) },
