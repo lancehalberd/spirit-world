@@ -1,13 +1,14 @@
 import { addParticleAnimations } from 'app/content/effects/animationEffect';
 import { objectHash } from 'app/content/objects/objectHash';
+import { PushPullObject } from 'app/content/objects/pushPullObject'
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { directionMap, isPointOpen } from 'app/utils/field';
-import { removeObjectFromArea } from 'app/utils/objects';
+import { addObjectToArea, removeObjectFromArea } from 'app/utils/objects';
 
 import {
     AreaInstance, Direction, DrawPriority, Frame, FrameAnimation, GameState, HitProperties, HitResult,
-    BaseObjectDefinition, ObjectInstance, ObjectStatus, Rect,
+    SimpleObjectDefinition, ObjectInstance, ObjectStatus, Rect,
 } from 'app/types';
 
 
@@ -17,6 +18,8 @@ const particleFrames: Frame[] = createAnimation('gfx/tiles/tippablepot.png', {w:
 const fallingAnimation: FrameAnimation = createAnimation('gfx/tiles/tippablepot.png', {w: 16, h: 18},
     {cols: 6, duration: 4}, {loop: false}
 );
+
+const frozenPotFrame: Frame = createAnimation('gfx/objects/frozenPot.png', {w: 16, h: 18}).frames[0];
 
 export class TippableObject implements ObjectInstance {
     area: AreaInstance;
@@ -44,7 +47,7 @@ export class TippableObject implements ObjectInstance {
     status: ObjectStatus = 'normal';
     animationTime = 0;
     shattered = false;
-    constructor(state: GameState, definition: BaseObjectDefinition) {
+    constructor(state: GameState, definition: SimpleObjectDefinition) {
         this.definition = definition;
         this.x = definition.x;
         this.y = definition.y;
@@ -56,6 +59,20 @@ export class TippableObject implements ObjectInstance {
         this.grabDirection = direction;
     }
     onHit(state: GameState, hit: HitProperties): HitResult {
+        if (hit.element === 'ice') {
+            addObjectToArea(state, this.area, new FrozenPotObject(
+                state,
+                {
+                    id: this.definition.id,
+                    type: 'pushPull',
+                    status: 'normal',
+                    x: this.x,
+                    y: this.y,
+                }
+            ));
+            removeObjectFromArea(state, this);
+            return {hit: true};
+        }
         if (!this.fallDirection) {
             if (hit.canPush) {
                 this.fallInDirection(state, hit.direction);
@@ -151,3 +168,26 @@ export class TippableObject implements ObjectInstance {
     }
 }
 objectHash.tippable = TippableObject;
+
+class FrozenPotObject extends PushPullObject  {
+    onHit(state: GameState, hit: HitProperties): HitResult {
+        if (hit.element === 'fire') {
+            addObjectToArea(state, this.area, new TippableObject(
+                state,
+                {
+                    id: this.definition.id,
+                    type: 'tippable',
+                    status: 'normal',
+                    x: this.x,
+                    y: this.y,
+                }
+            ));
+            removeObjectFromArea(state, this);
+            return {hit: true};
+        }
+        return super.onHit(state, hit);
+    }
+    render(context, state: GameState) {
+        drawFrame(context, frozenPotFrame, { ...frozenPotFrame, x: this.x, y: this.y - 2 - this.z});
+    }
+}

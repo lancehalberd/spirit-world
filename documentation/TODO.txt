@@ -44,7 +44,6 @@ Current tasks:
         - Destroy flame effects
         - Add freeze effect to certain objects
             - Escalators
-            - Frozen cracked pots behave like regular push pots
 
     - Balloon Megapede Improvements
         - Tail leaves behind time AoE bombs
