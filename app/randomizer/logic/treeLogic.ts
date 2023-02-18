@@ -2,7 +2,7 @@ import {
     andLogic,
     canAvoidBossAttacks,
     hasBossWeapon,
-    hasSpiritSight,
+    canUseTeleporters,
 } from 'app/content/logic';
 
 import { LogicNode } from 'app/types';
@@ -12,7 +12,7 @@ export const treeNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'treeSpirit',
-        paths: [{nodeId: 'tree', logic: hasSpiritSight}],
+        paths: [{nodeId: 'tree', logic: canUseTeleporters}],
         entranceIds: ['treeEntrance'],
         exits: [
             {objectId: 'treeEntrance'},
@@ -21,7 +21,7 @@ export const treeNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'tree',
-        paths: [{nodeId: 'treeSpirit', logic: hasSpiritSight}],
+        paths: [{nodeId: 'treeSpirit', logic: canUseTeleporters}],
         exits: [
             {objectId: 'voidEntrance'},
         ],

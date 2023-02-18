@@ -107,7 +107,7 @@ const f0_0x0: AreaDefinition = {
         {x: 16, y: 16, w: 16, h: 16},
     ],
 };
-const f0_0x1: AreaDefinition = {
+const f0_1x0: AreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -206,7 +206,7 @@ const f0_0x1: AreaDefinition = {
         {x: 0, y: 16, w: 32, h: 16},
     ],
 };
-const f0_0x2: AreaDefinition = {
+const f0_2x0: AreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -317,7 +317,7 @@ const f0_0x2: AreaDefinition = {
         {x: 16, y: 16, w: 16, h: 16},
     ],
 };
-const f0_1x0: AreaDefinition = {
+const f0_0x1: AreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -645,7 +645,7 @@ const f0_1x1: AreaDefinition = {
         {x: 0, y: 0, w: 32, h: 32},
     ],
 };
-const f0_1x2: AreaDefinition = {
+const f0_2x1: AreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -756,7 +756,7 @@ const f0_1x2: AreaDefinition = {
         {x: 16, y: 0, w: 16, h: 32},
     ],
 };
-const f0_2x0: AreaDefinition = {
+const f0_0x2: AreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -853,7 +853,7 @@ const f0_2x0: AreaDefinition = {
         {x: 0, y: 16, w: 32, h: 16},
     ],
 };
-const f0_2x1: AreaDefinition = {
+const f0_1x2: AreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -1043,9 +1043,9 @@ const f0_2x2: AreaDefinition = {
     ],
 };
 const sf0_0x0: AreaDefinition = null;
-const sf0_0x1: AreaDefinition = {
+const sf0_1x0: AreaDefinition = {
     isSpiritWorld: true,
-    parentDefinition: f0_0x1,
+    parentDefinition: f0_1x0,
     layers: [
         {
             key: 'floor',
@@ -1141,10 +1141,10 @@ const sf0_0x1: AreaDefinition = {
         {x: 0, y: 16, w: 32, h: 16},
     ],
 };
-const sf0_0x2: AreaDefinition = null;
-const sf0_1x0: AreaDefinition = {
+const sf0_2x0: AreaDefinition = null;
+const sf0_0x1: AreaDefinition = {
     isSpiritWorld: true,
-    parentDefinition: f0_1x0,
+    parentDefinition: f0_0x1,
     layers: null,
     objects: [
         {status: "normal", id: "warTempleLadder", x: 368, y: 352, type: "door", style: "ladderUp", d: "up", targetZone: "warTemple", targetObjectId: "warTempleLadder", locationCue: "War Temple B1"},
@@ -1298,9 +1298,9 @@ const sf0_1x1: AreaDefinition = {
         {x: 0, y: 0, w: 32, h: 32},
     ],
 };
-const sf0_1x2: AreaDefinition = null;
-const sf0_2x0: AreaDefinition = null;
 const sf0_2x1: AreaDefinition = null;
+const sf0_0x2: AreaDefinition = null;
+const sf0_1x2: AreaDefinition = null;
 const sf0_2x2: AreaDefinition = null;
 const f1_0x0: AreaDefinition = {
     layers: [
@@ -1441,12 +1441,16 @@ const f1_0x0: AreaDefinition = {
         {status: "normal", id: "warTemple:1:0x0-tippable-0", linked: true, x: 96, y: 384, type: "tippable"},
         {status: "normal", id: "warTemple:1:0x0-tippable-1", x: 112, y: 368, type: "tippable"},
         {status: "normal", id: "warTemple:1:0x0-tippable-2", x: 128, y: 384, type: "tippable"},
-        {status: "normal", id: "warTemple:1:0x0-tippable-3", x: 112, y: 400, type: "tippable"},
+        {status: "normal", id: "warTemple:1:0x0-tippable-3", x: 112, y: 400, type: "tippable", linked: true},
         {status: "normal", id: "warTemple:1:0x0-frostBeetle-0", spirit: true, x: 64, y: 320, type: "enemy", enemyType: "frostBeetle", d: "down", params: {}},
         {status: "normal", id: "warTemple:1:0x0-flameSnake-0", spirit: true, x: 64, y: 448, type: "enemy", enemyType: "flameSnake", d: "down", params: {}},
         {status: "normal", id: "warTemple:1:0x0-frostBeetle-1", spirit: true, x: 180, y: 128, type: "enemy", enemyType: "frostBeetle", d: "down", params: {}},
         {status: "normal", id: "warTemple:1:0x0-frostBeetle-2", spirit: true, x: 340, y: 128, type: "enemy", enemyType: "frostBeetle", d: "down", params: {}},
         {status: "normal", id: "warTemple:1:0x0-frostBeetle-3", spirit: true, x: 260, y: 24, type: "enemy", enemyType: "frostBeetle", d: "down", params: {}},
+        {status: "normal", id: "", linked: true, spirit: true, x: 96, y: 368, targetObjectId: "warTempleCrackedPot", type: "indicator"},
+        {status: "normal", id: "", linked: true, spirit: true, x: 112, y: 384, type: "indicator"},
+        {status: "hiddenSwitch", id: "warTempleHugeMoney", linked: true, spirit: false, x: 192, y: 304, type: "chest", lootType: "money", lootAmount: 300},
+        {status: "normal", id: "", linked: true, x: 192, y: 448, type: "indicator"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16},
@@ -1454,7 +1458,7 @@ const f1_0x0: AreaDefinition = {
         {x: 16, y: 16, w: 16, h: 16},
     ],
 };
-const f1_0x1: AreaDefinition = {
+const f1_1x0: AreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -1562,14 +1566,24 @@ const f1_0x1: AreaDefinition = {
         {x: 0, y: 16, w: 32, h: 16},
     ],
 };
+const f1_2x0: AreaDefinition = null;
+const f1_0x1: AreaDefinition = null;
+const f1_1x1: AreaDefinition = null;
+const f1_2x1: AreaDefinition = null;
+const f1_0x2: AreaDefinition = null;
+const f1_1x2: AreaDefinition = null;
+const f1_2x2: AreaDefinition = null;
 const sf1_0x0: AreaDefinition = {
     isSpiritWorld: true,
     parentDefinition: f1_0x0,
     layers: null,
     objects: [
         {status: "closedSwitch", id: "spiritDoor", x: 112, y: 256, type: "door", style: "cave", d: "up", linked: true, spirit: true},
-        {status: "normal", id: "warTemple:s1:0x0-tippable-0", linked: true, x: 96, y: 384, type: "tippable", spirit: true},
-        {status: "normal", id: "warTemple:s1:0x0-floorSwitch-0", spirit: true, x: 112, y: 384, targetObjectId: "spiritDoor", type: "floorSwitch"},
+        {status: "normal", id: "warTempleCrackedPot", linked: true, x: 96, y: 384, type: "tippable", spirit: true, specialBehaviorKey: "warTempleCrackedPot"},
+        {status: "normal", id: "warTempleHugeMoneySwitch", spirit: true, x: 192, y: 448, type: "floorSwitch", linked: true, targetObjectId: "warTempleHugeMoney"},
+        {status: "normal", id: "", linked: true, spirit: false, x: 96, y: 368, type: "indicator"},
+        {status: "normal", id: "warTemple:s1:0x0-floorSwitch-0", spirit: true, x: 112, y: 384, targetObjectId: "spiritDoor", type: "floorSwitch", linked: true},
+        {status: "hiddenSwitch", id: "warTempleHugeMoney", linked: true, spirit: true, x: 192, y: 304, type: "chest", lootType: "money", lootAmount: 300},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16},
@@ -1577,13 +1591,13 @@ const sf1_0x0: AreaDefinition = {
         {x: 16, y: 16, w: 16, h: 16},
     ],
 };
-const sf1_0x1: AreaDefinition = null;
-const sf1_0x2: AreaDefinition = null;
 const sf1_1x0: AreaDefinition = null;
-const sf1_1x1: AreaDefinition = null;
-const sf1_1x2: AreaDefinition = null;
 const sf1_2x0: AreaDefinition = null;
+const sf1_0x1: AreaDefinition = null;
+const sf1_1x1: AreaDefinition = null;
 const sf1_2x1: AreaDefinition = null;
+const sf1_0x2: AreaDefinition = null;
+const sf1_1x2: AreaDefinition = null;
 const sf1_2x2: AreaDefinition = null;
 const f2_0x0: AreaDefinition = {
     layers: [
@@ -1719,24 +1733,26 @@ zones.warTemple = {
     floors: [
         {
             grid: [
-                [f0_0x0,f0_0x1,f0_0x2,],
-                [f0_1x0,f0_1x1,f0_1x2,],
-                [f0_2x0,f0_2x1,f0_2x2,],
+                [f0_0x0,f0_1x0,f0_2x0,],
+                [f0_0x1,f0_1x1,f0_2x1,],
+                [f0_0x2,f0_1x2,f0_2x2,],
             ],
             spiritGrid: [
-                [sf0_0x0,sf0_0x1,sf0_0x2,],
-                [sf0_1x0,sf0_1x1,sf0_1x2,],
-                [sf0_2x0,sf0_2x1,sf0_2x2,],
+                [sf0_0x0,sf0_1x0,sf0_2x0,],
+                [sf0_0x1,sf0_1x1,sf0_2x1,],
+                [sf0_0x2,sf0_1x2,sf0_2x2,],
             ],
         },
         {
             grid: [
-                [f1_0x0,f1_0x1,],
+                [f1_0x0,f1_1x0,f1_2x0,],
+                [f1_0x1,f1_1x1,f1_2x1,],
+                [f1_0x2,f1_1x2,f1_2x2,],
             ],
             spiritGrid: [
-                [sf1_0x0,sf1_0x1,sf1_0x2,],
-                [sf1_1x0,sf1_1x1,sf1_1x2,],
-                [sf1_2x0,sf1_2x1,sf1_2x2,],
+                [sf1_0x0,sf1_1x0,sf1_2x0,],
+                [sf1_0x1,sf1_1x1,sf1_2x1,],
+                [sf1_0x2,sf1_1x2,sf1_2x2,],
             ],
         },
         {

@@ -31,3 +31,13 @@ specialBehaviorsHash.warTempleEntrancePot = {
         }
     }
 };
+
+specialBehaviorsHash.warTempleCrackedPot = {
+    type: 'tippable',
+    apply(state: GameState, object: ObjectInstance) {
+        const offsets = [[0, 0], [16, -16], [16, 16], [32, 0]];
+        const [x, y] = warTempleRandom.addSeed(3).element(offsets);
+        object.x = object.definition.x + x;
+        object.y = object.definition.y + y;
+    }
+};

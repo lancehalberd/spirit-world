@@ -39,6 +39,9 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Make sure hitRay/hitCircle apply to enemies with special hit detection.
+        - Add function for testing any hit properties for intersection against a hit box and use that in onHit logic.
+
     - When hero/clone is falling, draw it behind all other sprites (on top of the background).
         - Try using getDrawPriority to apply this to clone, we may need a new priority 'afterBackground' to force it to draw on top of all background elements (for example, it should be drawn on top of pit entrance objects).
         - The hero itself will probably need special handling to render it immediately after the background in renderField since it always has special handling.
@@ -48,12 +51,6 @@ Current tasks:
 
     - Flame wall improvement
         - Refactor as individual flames so that each flame can hit individually or be destroyed by ice.
-
-    - Make sure all teleporters are blocked by spirit sight and that randomizer logic respects this
-        - In particular waterfall tower entrance should require spirit sight.
-
-    - Make sure hitRay/hitCircle apply to enemies with special hit detection.
-        - Add function for testing any hit properties for intersection against a hit box and use that in onHit logic.
 
     - Heavy 2x2 blocks that can only be pushed if the player has mitts
     - Mechanic: Windstream
@@ -112,9 +109,6 @@ Current tasks:
         - medium sword fish that moves back and forth and speeds up if you are lined up with it
 
     - Add additional uses for true sight
-        - Invisible path tiles over pit that are revealed with true sight
-            - Requires a new 'invisible' tile behavior
-        - Invisible moving platform puzzle, possibly in spirit sky, or hype cave
         - Rolling ball puzzles that can be solved by moving an invisible pot
         - Invisible cracked doorway to a new cave in spirit world.
             - To prevent memorizing this in randomizer, we could randomly place the door in four different places that are inconvient to check
@@ -142,7 +136,6 @@ Current tasks:
     - Mysteries
         - Lava appears under floor 2 in the middle of void tree fight
         - Certain tiles can be frozen in lava on voidFlame
-        - Enemies reset when collecting the staff tower.
 
     - Increase world map super tile size to at least 48x48 bu try 64x64
         - Change crater to single 64x64 tile if it is supported
@@ -169,7 +162,7 @@ Current tasks:
 
     - Allow destroying light stones when landing with iron boots?
 
-    - Drain all lava in the crater when the fire beast isn't spawned yet?
+    - Drain all lava in the crater when the fire beast isn't spawned yet? (only matters for entrance randomizer)
 
     - Allow walking on clouds/cracked ground while invisible?
         - Would have to be careful in sky not to run out of spirit energy
@@ -190,10 +183,6 @@ Current tasks:
     - Cocoon boss
         - Make astral projection spawn from the boss small, grow, then approach the player to attack
         before becoming small again and returning to the boss.
-
-    True sight
-        For now try just rendering all spirit world objects at 50% opacity.
-        Probably allow toggling it off in the menu, possibly a quick command like B_MEDITATE + B_ROLL
 
     Puzzle ideas
         - Send a clone into the spirit world for "temporary" true sight. Might be annoying to switch between.
@@ -377,7 +366,6 @@ Improve Staff Tower Setup:
 
 High level list of things left to do:
     New dungeons(need enemies, mechanics, bosses, entrances):
-        Sky Palace
         Forge
     Areas missing significant content:
         Forest Temple
@@ -404,16 +392,14 @@ High level list of things left to do:
         Treasure Hunter Shop
         Fertility shrine donations
     Items missing implementation:
-        Charge level 2
-            Bow charge 2 shoots 5 arrows in 120 degree arc -60, -30, 0, 30, 60
-        Clone charge 1 + 2
         Gloves charge 1 + 2
 
 Generic boss improvements
     - Add vulnerable phases for bosses where they take ~5x damage, increase boss health by ~2x
 
 Lava improvements:
-    - Temporarily create solid ground when hit by ice.
+    - Add new graphic for solidifed lava
+    - Eventually we might want to make this temporary.
 
 Misc improvements
     - allow facing diagonals while not moving?
@@ -424,8 +410,6 @@ Add toasts to development for undoing actions:
 
 
 Simple randomization ideas:
-    - Randomize tippable pot in war temple 2F
-        - Make sure true sight reveals this.
     - Allow floor switches under covered tiles, randomizer the location of a floor switch to open a door.
         - Make sure true sight reveals this.
     - Place a key under a random pot

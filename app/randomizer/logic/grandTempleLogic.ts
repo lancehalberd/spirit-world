@@ -1,5 +1,5 @@
 import {
-    hasSpiritSight,
+    canUseTeleporters,
 } from 'app/content/logic';
 
 import { LogicNode } from 'app/types';
@@ -13,7 +13,7 @@ export const grandTempleNodes: LogicNode[] = [
             {loot: {type: 'dialogueLoot', id: 'generousPriest', lootType: 'money', lootAmount: 10}},
         ],
         paths: [
-            { nodeId: 'jadePalace', logic: hasSpiritSight }
+            { nodeId: 'jadePalace', logic: canUseTeleporters }
         ],
         entranceIds: [
             'grandTempleEntrance',
@@ -28,7 +28,7 @@ export const grandTempleNodes: LogicNode[] = [
         zoneId,
         nodeId: 'jadePalace',
         paths: [
-            { nodeId: 'grandTemple', logic: hasSpiritSight }
+            { nodeId: 'grandTemple', logic: canUseTeleporters }
         ],
         entranceIds: [
             'jadePalaceEntrance',

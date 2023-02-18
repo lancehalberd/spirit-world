@@ -2,7 +2,7 @@ import { LogicNode } from 'app/types';
 
 import {
     andLogic, canCross2Gaps, hasCharge, hasUpgradedBow,
-    hasAstralProjection, hasCatEyes, hasWaterBlessing, hasSpiritSight, hasFireBlessing,
+    hasAstralProjection, hasCatEyes, hasWaterBlessing, canUseTeleporters, hasFireBlessing,
     hasLightning, hasMediumRange, hasFire, hasSpiritBarrier, hasIce,
     hasClone, hasStaff, hasWeapon, canBeatGolem, canBeatIdols,
 } from 'app/content/logic';
@@ -105,7 +105,7 @@ export const holySanctumNodes: LogicNode[] = [
         nodeId: 'fireSanctumBack',
         checks: [
             {objectId: 'fireSanctumKey', logic: hasFireBlessing},
-            {objectId: 'fireSanctumPeachPiece', logic: andLogic(hasFireBlessing, hasAstralProjection)},
+            {objectId: 'fireSanctumPeachPiece', logic: andLogic(canUseTeleporters, hasFireBlessing, hasAstralProjection)},
         ],
         exits: [
             {objectId: 'fireSanctumExit'},
@@ -126,7 +126,7 @@ export const holySanctumNodes: LogicNode[] = [
         nodeId: 'lightningSanctumBack',
         checks: [
             {objectId: 'lightningSanctumKey', logic: canCross2Gaps},
-            {objectId: 'lightningSanctumPeachPiece', logic: hasStaff},
+            {objectId: 'lightningSanctumPeachPiece', logic: andLogic(hasStaff, canUseTeleporters)},
         ],
         exits: [
             {objectId: 'lightningSanctumExit', logic: canCross2Gaps},
@@ -135,7 +135,7 @@ export const holySanctumNodes: LogicNode[] = [
     {
         zoneId: 'iceSanctum',
         nodeId: 'iceSanctumEntrance',
-        paths: [{nodeId: 'iceSanctumWaterArea', logic: andLogic(hasCatEyes, hasWaterBlessing, hasSpiritSight)}],
+        paths: [{nodeId: 'iceSanctumWaterArea', logic: andLogic(hasCatEyes, hasWaterBlessing, canUseTeleporters)}],
         entranceIds: ['iceSanctumEntrance'],
         exits: [
             {objectId: 'iceSanctumEntrance'},
@@ -144,7 +144,7 @@ export const holySanctumNodes: LogicNode[] = [
     {
         zoneId: 'iceSanctum',
         nodeId: 'iceSanctumWaterArea',
-        paths: [{nodeId: 'iceSanctumBack', logic: andLogic(hasIce, hasMediumRange)}],
+        paths: [{nodeId: 'iceSanctumBack', logic: andLogic(hasIce, hasMediumRange, canUseTeleporters)}],
     },
     {
         zoneId: 'iceSanctum',

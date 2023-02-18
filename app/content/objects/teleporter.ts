@@ -89,7 +89,7 @@ export class Teleporter implements ObjectInstance {
             }
             return;
         }
-        if (!(this.definition.targetZone && this.definition.targetZone) && !state.hero.passiveTools.spiritSight) {
+        if (!state.hero.passiveTools.spiritSight && !state.hero.passiveTools.trueSight) {
             return;
         }
         if (this.isUnderObject(state)) {
@@ -154,6 +154,9 @@ export class Teleporter implements ObjectInstance {
         if (!this.definition.targetZone || !this.definition.targetObjectId) {
             return;
         }
+        if (!state.hero.passiveTools.spiritSight && !state.hero.passiveTools.trueSight) {
+            return;
+        }
         const gradient = context.createLinearGradient(0, 0, 0, 16);
         gradient.addColorStop(0.2 + 0.1 * Math.cos(this.animationTime / 400), 'rgba(255, 255, 255, 0)');
         gradient.addColorStop(0.8 + 0.1 * Math.cos(this.animationTime / 400), 'rgba(255, 255, 255, 0.7)');
@@ -173,7 +176,7 @@ export class Teleporter implements ObjectInstance {
         if (this.definition.targetZone && this.definition.targetObjectId) {
             return;
         }
-        if (!state.hero.passiveTools.spiritSight) {
+        if (!state.hero.passiveTools.spiritSight && !state.hero.passiveTools.trueSight) {
             return;
         }
         const hitbox = this.getRenderBox(state);

@@ -1,7 +1,7 @@
 import {
     andLogic, orLogic,
-    canCross2Gaps,
-    hasAstralProjection, hasClone, hasSpiritSight, canBeatGolem, hasGloves, hasMediumRange,
+    canCross2Gaps, hasSpiritSight, hasTrueSight,
+    hasAstralProjection, hasClone, canBeatGolem, hasGloves, hasMediumRange,
     hasRangedPush, hasWeapon,
 } from 'app/content/logic';
 
@@ -108,7 +108,7 @@ export const tombNodes: LogicNode[] = [
         paths: [{ nodeId: 'tombCocoonEntrance', logic: hasGloves}],
         entranceIds: ['tombTeleporter'],
         exits: [
-            {objectId: 'tombTeleporter', logic: hasSpiritSight},
+            {objectId: 'tombTeleporter', logic: orLogic(hasSpiritSight, hasTrueSight)},
         ],
     },
     {

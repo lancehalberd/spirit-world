@@ -1,8 +1,8 @@
 import {
     andLogic,
-    canCross4Gaps, hasReleasedBeasts, canTravelFarUnderWater,
+    canCross4Gaps, canUseTeleporters, hasReleasedBeasts, canTravelFarUnderWater,
     hasCloudBoots, hasIronBoots, hasFire, hasGloves, hasIce, hasMitts, hasSomersault, hasTeleportation,
-    hasMediumRange, hasNimbusCloud, hasSpiritSight, orLogic,
+    hasMediumRange, hasNimbusCloud, hasSpiritSight, hasTrueSight, orLogic,
     hasInvisibility, hasLightningBlessing, hasLightning,
 } from 'app/content/logic';
 
@@ -140,7 +140,7 @@ export const overworldNodes: LogicNode[] = [
         exits: [
             { objectId: 'warTempleChestEntrance' },
             { objectId: 'warTempleEastEntrance', logic: hasGloves },
-            { objectId: 'warTempleEntrance', logic: hasSpiritSight },
+            { objectId: 'warTempleEntrance', logic: orLogic(hasSpiritSight, hasTrueSight) },
             { objectId: 'warTempleNortheastEntrance' },
             { objectId: 'warTempleNorthEntrance' },
             { objectId: 'warTemplePeachEntrance', logic: hasGloves },
@@ -174,6 +174,7 @@ export const overworldNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'overworldLakePiece',
+        paths: [{nodeId: 'overworldMain'}],
         checks: [
             { objectId: 'overworldLakePiece' },
         ],
@@ -183,10 +184,9 @@ export const overworldNodes: LogicNode[] = [
         nodeId: 'mainSpiritWorld',
         checks: [],
         paths: [
-            { nodeId: 'overworldMain', logic: hasSpiritSight },
             { nodeId: 'spiritWorldMountain', logic: hasGloves },
             { nodeId: 'westSpiritWorld', logic: hasCloudBoots },
-            { nodeId: 'overworldLakePiece', logic: hasSpiritSight },
+            { nodeId: 'overworldLakePiece', logic: canUseTeleporters },
             { nodeId: 'nimbusCloudSpirit', logic: hasNimbusCloud},
             { nodeId: 'warTempleSpiritArea', logic: hasMitts },
         ],
@@ -211,7 +211,7 @@ export const overworldNodes: LogicNode[] = [
             { objectId: 'spiritShopLightningBlessing' },
         ],
         paths: [
-            { nodeId: 'overworldMain', logic: hasSpiritSight },
+            { nodeId: 'overworldMain', logic: canUseTeleporters },
             { nodeId: 'mainSpiritWorld', logic: hasCloudBoots },
             { nodeId: 'nimbusCloudSpirit', logic: hasNimbusCloud},
         ],
@@ -465,7 +465,7 @@ export const skyNodes: LogicNode[] = [
         nodeId: 'skyPalaceCourtyard',
         paths: [
             { nodeId: 'waterfallTowerSky', logic: orLogic(hasInvisibility, hasLightningBlessing, hasLightning) },
-            { nodeId: 'skyOverLakeTemple', logic: hasSpiritSight }
+            { nodeId: 'skyOverLakeTemple', logic: canUseTeleporters }
         ],
         exits: [{ objectId: 'skyPalaceSecretEntrance'}, { objectId: 'skyPalaceEntrance'}, {objectId: 'helixSkySpiritEntrance'}],
         entranceIds: ['skyPalaceSecretEntrance', 'skyPalaceEntrance', 'helixSkySpiritEntrance']

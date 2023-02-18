@@ -1,8 +1,8 @@
 import { LogicNode } from 'app/types';
 
 import {
-    andLogic, orLogic, canHasTowerStaff, canTravelFarUnderWater,
-    hasAstralProjection, hasBossWeapon, hasSpiritSight,
+    andLogic, canUseTeleporters, orLogic, canHasTowerStaff, canTravelFarUnderWater,
+    hasAstralProjection, hasBossWeapon,
     hasInvisibility, hasCloudBoots, hasMitts, hasClone, hasStaff, hasSomersault, hasTeleportation, hasTrueSight,
 } from 'app/content/logic';
 
@@ -23,7 +23,7 @@ export const gauntletNodes: LogicNode[] = [
         nodeId: 'gauntletEntrance',
         paths: [
             // Player must hit two switches to reveal the teleporter to the spirit world here.
-            {nodeId: 'gauntletSpiritEntrance', logic: orLogic(hasClone, hasStaff)},
+            {nodeId: 'gauntletSpiritEntrance', logic: andLogic(canUseTeleporters, orLogic(hasClone, hasStaff))},
             // This door is locked in standard, the key is in the spirit world entrance.
             {nodeId: 'gauntletBigChest', doorId: 'gauntletFirstLock'},
             {nodeId: 'gauntletWaterEntrance', logic: canTravelFarUnderWater},
@@ -121,8 +121,7 @@ export const gauntletNodes: LogicNode[] = [
             {objectId: 'gauntletFirstKey'},
         ],
         paths: [
-            // The portal back to the material world just requires spirit sight to use.
-            {nodeId: 'gauntletEntrance', logic: hasSpiritSight},
+            {nodeId: 'gauntletEntrance', logic: canUseTeleporters},
             // True sight is needed to open the door north to the hallway
             {nodeId: 'gauntletSpiritHallway', logic: hasTrueSight},
         ],

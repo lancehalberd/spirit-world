@@ -1,7 +1,7 @@
 import {
     orLogic,
     hasGloves, canBeatIdols,
-    hasSpiritSight, hasWeapon,
+    hasSpiritSight, hasTrueSight, hasWeapon,
     logicHash
 } from 'app/content/logic';
 
@@ -107,8 +107,9 @@ export const warTempleNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'warTempleLock1',
+        checks: [{objectId: 'warTempleHugeMoney', logic: orLogic(hasSpiritSight, hasTrueSight)}],
         paths: [
-            {nodeId: 'warTempleStairs2', logic: hasSpiritSight},
+            {nodeId: 'warTempleStairs2', logic: orLogic(hasSpiritSight, hasTrueSight)},
         ],
         entranceIds: ['warTempleLock1'],
         exits: [

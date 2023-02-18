@@ -60,17 +60,7 @@ export class TippableObject implements ObjectInstance {
     }
     onHit(state: GameState, hit: HitProperties): HitResult {
         if (hit.element === 'ice') {
-            addObjectToArea(state, this.area, new FrozenPotObject(
-                state,
-                {
-                    id: this.definition.id,
-                    type: 'pushPull',
-                    status: 'normal',
-                    x: this.x,
-                    y: this.y,
-                }
-            ));
-            removeObjectFromArea(state, this);
+            this.freezePot(state);
             return {hit: true};
         }
         if (!this.fallDirection) {
@@ -80,6 +70,30 @@ export class TippableObject implements ObjectInstance {
             return { hit: true };
         }
         return { hit: true, blocked: true };
+    }
+    freezePot(state: GameState, link = true): FrozenPotObject {
+        // Pot can only be frozen before it is tipped over.
+        if (this.fallingInPlace || this.fallDirection || this.shattered) {
+            return;
+        }
+        const frozenPot = new FrozenPotObject(
+            state,
+            {
+                id: this.definition.id,
+                type: 'pushPull',
+                status: 'normal',
+                x: this.x,
+                y: this.y,
+            }
+        );
+        addObjectToArea(state, this.area, frozenPot);
+        removeObjectFromArea(state, this);
+        if (link && this.linkedObject?.freezePot) {
+            const linkedPot = this.linkedObject.freezePot(state, false);
+            frozenPot.linkedObject = linkedPot;
+            linkedPot.linkedObject = frozenPot;
+        }
+        return frozenPot
     }
     onPull(state: GameState, direction: Direction): void {
         if (!this.fallDirection && !this.fallingInPlace && this.grabDirection === direction) {
@@ -170,22 +184,33 @@ export class TippableObject implements ObjectInstance {
 objectHash.tippable = TippableObject;
 
 class FrozenPotObject extends PushPullObject  {
+    linkedObject: FrozenPotObject;
     onHit(state: GameState, hit: HitProperties): HitResult {
         if (hit.element === 'fire') {
-            addObjectToArea(state, this.area, new TippableObject(
-                state,
-                {
-                    id: this.definition.id,
-                    type: 'tippable',
-                    status: 'normal',
-                    x: this.x,
-                    y: this.y,
-                }
-            ));
-            removeObjectFromArea(state, this);
+            this.thawPot(state);
             return {hit: true};
         }
         return super.onHit(state, hit);
+    }
+    thawPot(state: GameState, link = true): TippableObject {
+        const crackedPot = new TippableObject(
+            state,
+            {
+                id: this.definition.id,
+                type: 'tippable',
+                status: 'normal',
+                x: this.x,
+                y: this.y,
+            }
+        );
+        addObjectToArea(state, this.area, crackedPot);
+        removeObjectFromArea(state, this);
+        if (link && this.linkedObject?.thawPot) {
+            const linkedPot = this.linkedObject.thawPot(state, false);
+            crackedPot.linkedObject = linkedPot;
+            linkedPot.linkedObject = crackedPot;
+        }
+        return crackedPot
     }
     render(context, state: GameState) {
         drawFrame(context, frozenPotFrame, { ...frozenPotFrame, x: this.x, y: this.y - 2 - this.z});

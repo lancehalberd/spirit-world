@@ -627,6 +627,10 @@ export interface SpecialPushPullBehavior {
     apply?: (state: GameState, object: ObjectInstance) => void
 }
 
+export interface SpecialTippableBehavior {
+    type: 'tippable',
+    apply?: (state: GameState, object: ObjectInstance) => void
+}
 
 export interface SpecialAreaBehavior {
     type: 'area'
@@ -638,4 +642,5 @@ export type SpecialBehavior
     | SpecialPushPullBehavior
     | SpecialSwitchBehavior
     | SpecialSignBehavior
+    | SpecialTippableBehavior
     | SpecialAreaBehavior;

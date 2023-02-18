@@ -227,6 +227,9 @@ function canOpenDoor(location: FullZoneLocation, state: GameState, door: Entranc
     if (!door) {
         return false;
     }
+    if (door.type === 'teleporter') {
+        return state.hero.passiveTools.spiritSight > 0 || state.hero.passiveTools.trueSight > 0;
+    }
     // Only pass through
     if (door.status === 'locked') {
         const dungeonInventory = state.savedState.dungeonInventories[location.logicalZoneKey];
