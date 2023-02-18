@@ -3,6 +3,7 @@ import {
     canCross4Gaps, hasReleasedBeasts, canTravelFarUnderWater,
     hasCloudBoots, hasIronBoots, hasFire, hasGloves, hasIce, hasMitts, hasSomersault, hasTeleportation,
     hasMediumRange, hasNimbusCloud, hasSpiritSight, orLogic,
+    hasInvisibility, hasLightningBlessing, hasLightning,
 } from 'app/content/logic';
 
 import { LogicNode } from 'app/types';
@@ -23,7 +24,7 @@ export const mainOverworldNode: LogicNode = {
         { nodeId: 'overworldLakeTunnel', logic: orLogic(hasGloves, hasTeleportation) },
         // This represents moving the tower to the forest position and using cloud boots to
         // fall on the river temple roof.
-        { nodeId: 'riverTempleRoof', logic: andLogic({requiredFlags: ['stormBeast']}, hasCloudBoots)},
+        { nodeId: 'forestTowerSky', logic: andLogic({requiredFlags: ['stormBeast']})},
         { nodeId: 'underLake', logic: andLogic(canTravelFarUnderWater,
             orLogic({requiredFlags: ['frostBeast']}, hasFire)
         )},
@@ -389,6 +390,21 @@ export const skyNodes: LogicNode[] = [
             { objectId: 'staffTowerSkyEntrance', logic: {requiredFlags: ['staffTowerSkyEntrance']} },
         ],
     },
+    {
+        zoneId,
+        nodeId: 'forestTowerSky',
+        // This is the tower node in the sky over the forest. You can walk over a cloud to reach the small
+        // section above the lake temple.
+        paths: [{ nodeId: 'skyOverLakeTemple', logic: andLogic({requiredFlags: ['stormBeast']}, hasCloudBoots)}],
+    },
+    {
+        zoneId,
+        nodeId: 'skyOverLakeTemple',
+        paths: [
+            { nodeId: 'riverTempleRoof' },
+            { nodeId: 'forestTowerSky', logic: andLogic({requiredFlags: ['stormBeast']}, hasCloudBoots) },
+        ],
+    },
     // Spirit sky nodes
     {
         zoneId,
@@ -416,22 +432,11 @@ export const skyNodes: LogicNode[] = [
     },
     {
         zoneId,
-        nodeId: 'skyPalaceCourtyard',
-        paths: [
-            { nodeId: 'outsideForge' },
-        ],
-        entranceIds: ['helixSkySpiritEntrance'],
-        exits: [
-            { objectId: 'helixSkySpiritEntrance' },
-        ],
-    },
-    {
-        zoneId,
         nodeId: 'waterfallTowerSky',
         paths: [
             { nodeId: 'outsideForge' },
             { nodeId: 'spiritWorldMountain' },
-            { nodeId: 'outsideSkyPalace', logic: orLogic(hasCloudBoots, canCross4Gaps) },
+            { nodeId: 'outsideSkyPalaceHole', logic: orLogic(hasCloudBoots, canCross4Gaps) },
             { nodeId: 'nimbusCloudSpirit', logic: hasNimbusCloud},
             // Most of the forest temple areas can be accessed by falling in the right place
             { nodeId: 'forestTempleNEArea'},
@@ -442,34 +447,35 @@ export const skyNodes: LogicNode[] = [
             { nodeId: 'westSpiritWorldMountain' },
             { nodeId: 'spiritWorldMountain' },
             { nodeId: 'desertTowerSkySpirit' },
+            { nodeId: 'skyPalaceCourtyard', logic: orLogic(hasInvisibility, hasLightningBlessing, hasLightning)}
         ],
         entranceIds: ['waterfallTowerTopEntrance'],
         exits: [{ objectId: 'waterfallTowerTopEntrance' }],
     },
     {
         zoneId,
-        nodeId: 'outsideSkyPalace',
+        nodeId: 'outsideSkyPalaceHole',
         paths: [
             { nodeId: 'waterfallTowerSky', logic: orLogic(hasCloudBoots, canCross4Gaps) },
-            { nodeId: 'nimbusCloudSpirit', logic: hasNimbusCloud},
         ],
-        entranceIds: ['skyPalaceEntrance'],
-        exits: [{ objectId: 'skyPalaceEntrance', logic:
-            hasMitts,
-            // Could use this as advance logic
-            /*orLogic(
-                // Simple path, lift the stones to enter
-                hasMitts,
-                // Subtle path, somersault in from the right
-                hasSomersault,
-                // Hard path, use tower staff or cloud boots + tower staff to make
-                // solid ground right of the tower then teleport in.
-                andLogic(
-                    hasTeleportation,
-                    orLogic(hasTowerStaff, andLogic(hasCloudBoots, hasStaff))
-                )
-            )*/
-        }],
+        exits: [{ objectId: 'skyPalacePitEntrance', logic: hasMitts}],
+    },
+    {
+        zoneId,
+        nodeId: 'skyPalaceCourtyard',
+        paths: [
+            { nodeId: 'waterfallTowerSky', logic: orLogic(hasInvisibility, hasLightningBlessing, hasLightning) },
+            { nodeId: 'skyOverLakeTemple', logic: hasSpiritSight }
+        ],
+        exits: [{ objectId: 'skyPalaceSecretEntrance'}, { objectId: 'skyPalaceEntrance'}, {objectId: 'helixSkySpiritEntrance'}],
+        entranceIds: ['skyPalaceSecretEntrance', 'skyPalaceEntrance', 'helixSkySpiritEntrance']
+    },
+    {
+        zoneId,
+        nodeId: 'skyPalaceWalkway',
+        paths: [{ nodeId: 'skyPalaceCourtyard'}],
+        exits: [{ objectId: 'skyPalaceWestEntrance'}, { objectId: 'skyPalaceTowerEntrance'}, { objectId: 'skyPalaceEastEntrance'}],
+        entranceIds: ['skyPalaceWestEntrance', 'skyPalaceTowerEntrance', 'skyPalaceEastEntrance'],
     },
     {
         zoneId,

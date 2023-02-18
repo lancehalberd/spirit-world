@@ -109,7 +109,7 @@ const skyPalaceStartState = applyItems(helixEndState, {
     maxLife: 3,
     clone: 1, cloudBoots: 1,
     ironBoots: 1, cloak: 2,
-    gloves: 2, goldenMail: 1,
+    gloves: 2, goldMail: 1,
 }, []);
 
 const holySanctumStartState = applyItems(helixEndState, {

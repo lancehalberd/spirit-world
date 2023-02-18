@@ -141,6 +141,7 @@ export const hasSmallKey: LogicCheck = { requiredFlags: ['$smallKey'] };
 export const hasBigKey: LogicCheck = { requiredFlags: ['$bigKey'] };
 export const hasFireBlessing: LogicCheck = {requiredFlags: ['$fireBlessing']};
 export const hasWaterBlessing: LogicCheck = {requiredFlags: ['$waterBlessing']};
+export const hasLightningBlessing: LogicCheck = {requiredFlags: ['$lightningBlessing']};
 export const hasChakram: LogicCheck = {requiredFlags: ['$weapon']};
 export const hasNimbusCloud: LogicCheck = {requiredFlags: ['$nimbusCloud']};
 
@@ -177,6 +178,7 @@ export const canAvoidBossAttacks: OrLogicCheck = orLogic(hasRoll, hasSpiritBarri
 // Although these are the same now, they might be made different in the future.
 export const canBeatGolem = andLogic(hasBossWeapon, canAvoidBossAttacks);
 export const canBeatIdols = andLogic(hasBossWeapon, canAvoidBossAttacks);
+export const canDefeatBalloonMegapede = andLogic(hasBossWeapon, canAvoidBossAttacks);
 
 
 // Note that in some areas teleportation may not be possible contextually, for example if the player cannot

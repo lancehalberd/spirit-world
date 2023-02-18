@@ -1745,6 +1745,7 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 304, y: 496, type: "door", style: "crystal", d: "down"},
         {status: "normal", id: "skyPalace:s0:0x0-frostBeetle-0", x: 420, y: 168, type: "enemy", enemyType: "frostBeetle", d: "down", params: {}},
         {status: "normal", id: "skyPalace:s0:0x0-frostBeetle-1", x: 420, y: 312, type: "enemy", enemyType: "frostBeetle", d: "down", params: {}},
+        {status: "normal", id: "skyPalace:s0:0x0-crusher-0", x: 320, y: 224, type: "enemy", enemyType: "crusher", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 32},
@@ -2538,6 +2539,7 @@ const sf0_0x1: AreaDefinition = {
         {status: "normal", id: "", spirit: true, x: 320, y: 256, type: "tippable"},
         {status: "normal", id: "", spirit: true, x: 336, y: 256, type: "tippable"},
         {status: "normal", id: "skyPalace:s0:0x1-crystalGuardian-0", x: 424, y: 96, type: "enemy", enemyType: "crystalGuardian", d: "down", params: {}},
+        {status: "normal", id: "skyPalace:s0:0x1-balloonCentipede-0", x: 420, y: 424, type: "enemy", enemyType: "balloonCentipede", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},
