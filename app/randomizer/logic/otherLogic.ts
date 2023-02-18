@@ -1,6 +1,6 @@
 import {
     andLogic, canCross2Gaps, canHasTowerStaff, hasClone,
-    hasBossWeapon, hasWeapon, hasCatEyes, hasFireBlessing, hasInvisibility,
+    hasBossWeapon, hasWeapon, hasCatEyes, hasFireBlessing, hasIce, hasInvisibility,
     hasMediumRange, hasMitts, hasSomersault, hasTeleportation,
     orLogic,
 } from 'app/content/logic';
@@ -180,7 +180,7 @@ export const waterfallCaveNodes: LogicNode[] = [
 ];
 
 // The flameBeast flag is set correctly during simulation, so this logic works as expected.
-const canAscendToCrater = orLogic(hasMitts, hasInvisibility, {requiredFlags: ['flameBeast']});
+const canAscendToCrater = orLogic(hasMitts, hasIce, hasInvisibility, {requiredFlags: ['flameBeast']});
 const canAscendToCraterSpirit = orLogic(hasInvisibility, hasFireBlessing, {requiredFlags: ['flameBeast']});
 export const cavesNodes: LogicNode[] = [
     // This cave connects the NW corner of the overworld to the sky and is one way.
