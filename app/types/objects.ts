@@ -500,7 +500,7 @@ export interface NPCDefinition extends BaseObjectDefinition {
 
 export type SimpleObjectType = 'airBubbles' | 'beadGrate' | 'bell' | 'cathode'
     | 'flameTurret'
-    | 'pushPull' | 'rollingBall' | 'saveStatue'
+    | 'pushPull' | 'rollingBall' | 'saveStatue' | 'shieldingUnit'
     | 'tippable' | 'torch' | 'vineSprout' | 'waterPot';
 
 export interface SimpleObjectDefinition extends BaseObjectDefinition {

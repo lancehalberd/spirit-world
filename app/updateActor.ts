@@ -145,7 +145,9 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
             }
             if (hero.ironSkinCooldown <= 0) {
                 hero.ironSkinCooldown = 1000;
-                hero.ironSkinLife = Math.min(hero.ironSkinLife + 0.25, hero.maxLife / 4);
+                // Iron skin life can be increased over the normal max using shielding units, so don't reduce
+                // iron skin life here it is over the max.
+                hero.ironSkinLife = Math.max(hero.ironSkinLife, Math.min(hero.ironSkinLife + 0.25, hero.maxLife / 4));
             }
         }
     }
@@ -197,6 +199,9 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
                 activeAirBubbles = object;
                 break;
             }
+        }
+        if (object.definition?.type === 'shieldingUnit' && hero.overlaps(object.getHitbox())) {
+            hero.ironSkinLife = Math.min(hero.maxLife, hero.ironSkinLife + 2 * FRAME_LENGTH / 1000);
         }
     }
     if (hero.life <= 0

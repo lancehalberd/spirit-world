@@ -26,7 +26,7 @@ export function showHint(state: GameState): void {
         } else {
             setScript(state, 'With this Chakram I should be able to climb out of this cave.');
         }
-    } else if (!state.savedState.objectFlags.momElder && !state.savedState.objectFlags.elderTomb) {
+    } else if (!state.savedState.objectFlags.momElder && !state.savedState.objectFlags.elderTomb && !state.hero.activeTools.bow) {
         if (state.location.zoneKey !== 'waterfallCave') {
             setScript(state, `I've been out for a long time, I should head home to the cave behind the waterfall.
                 {|}The waterfall is just north of the lake.`);
@@ -34,10 +34,10 @@ export function showHint(state: GameState): void {
             setScript(state, `I should tell my mom about what happened in the cave.
                 {|}I think I saw her by the pool at the entrance.`);
         }
-    } else if (!state.savedState.objectFlags.elderTomb) {
+    } else if (!state.savedState.objectFlags.elderTomb && !state.hero.passiveTools.spiritSight) {
         setScript(state, `I should talk to the Vanara Elder about my strange powers.
             {|}He lives in the woods to the southwest with the other Vanara. `);
-    } else  if (!state.hero.activeTools.bow) {
+    } else  if (!state.hero.activeTools.bow && !state.hero.passiveTools.spiritSight) {
         setScript(state, `The Vanara Elder said there was something I needed in his basement.
             {|}He lived in the southwest tree in the forest.`);
     } else if (!state.hero.passiveTools.roll) {
@@ -91,17 +91,32 @@ export function showHint(state: GameState): void {
             setScript(state, `Someone at the top of the Helix has the answers I'm looking for.
                 {|}I should head back to that tunnel near the lake.`);
         }
-    } else if (!flags.flameBeast || !flags.frostBeast) {
-        setScript(state, `I need to explore the world and hunt down the escaped Spirit Beasts.
-            {|}There is a portal to the spirit world in the Holy City to the northeast.`);
-    } else if (state.hero.activeTools.cloak < 2) {
-        setScript(state, `There is still something to find behind the waterfall at the top of the mountain.`);
     } else if (!state.hero.activeTools.clone) {
-        setScript(state, `There is still something to find in the spirit world.`);
+        if (!state.location.isSpiritWorld) {
+            setScript(state, `There is a portal to the spirit world in the middle of the Grand Temple, north of the Holy City.`);
+        } else {
+            setScript(state, `There must be something in the strange forest to the southwest.`);
+        }
+    } else if (!state.hero.passiveTools.trueSight) {
+        setScript(state, `I might find something useful in the training gauntlet under the Grand Temple.
+            {|}There is a staircase to the Gauntlet at the back of the temple.`);
+    } else if (state.hero.activeTools.cloak < 2) {
+        setScript(state, `There is something hidden behind the waterfall at the top of the mountain.`);
+    } else if (state.hero.passiveTools.gloves < 2) {
+        setScript(state, `There is a cave at the top of the mountains in the spirit world that has something I'll need.`);
+    } else if (!state.hero.passiveTools.nimbusCloud) {
+        setScript(state, `There is a large palace in the sky in the spirit world, but I need to find a way to get in.`);
+    } else if (!flags.flameBeast || !flags.frostBeast || !flags.stormBeast) {
+        setScript(state, `I need to explore the world and hunt down the escaped Spirit Beasts.`);
+    } else if (!state.hero.passiveTools.phoenixCrown) {
+        setScript(state, `There is still a powerful relic hidden in the Holy Sanctum.
+            {|}There is a door to the Sanctum at the back of the Jade Palace in the Spirit World.`);
+    } else if (!flags.voidTree) {
+        setScript(state, `Something evil is growing under the War Palace.
+            {|}The War Palace is to the southeast in the Spirit World.`);
     } else {
         setScript(state, `Isn't there anywhere else interesting to go?
-            {|}(The Storm Beast is coming soon. Want to play more now?
-            {|}Try adding ?seed=20 to the url to play the randomizer).`);
+            {|}Try adding ?seed=20 to the url to play the randomizer.`);
     }
 }
 

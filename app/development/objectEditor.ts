@@ -185,7 +185,7 @@ export function getObjectTypeProperties(): PanelRows {
 export const combinedObjectTypes: ObjectType[] = [
     'anode', 'cathode', 'airBubbles', 'ballGoal', 'beadCascade', 'beadGrate', 'bell', 'bigChest', 'chest', 'crystalSwitch', 'decoration',
     'door', 'escalator', 'flameTurret', 'floorSwitch', 'indicator', 'keyBlock', 'loot','marker', 'movingPlatform', 'narration', 'npc', 'pitEntrance',
-    'pushPull', 'rollingBall', 'saveStatue', 'shopItem', 'sign', 'spawnMarker', 'spikeBall', 'teleporter', 'tippable', 'torch', 'turret',
+    'pushPull', 'rollingBall', 'saveStatue', 'shieldingUnit', 'shopItem', 'sign', 'spawnMarker', 'spikeBall', 'teleporter', 'tippable', 'torch', 'turret',
     'vineSprout', 'waterfall', 'waterPot',
 ];
 
@@ -422,6 +422,7 @@ export function createObjectDefinition(
         case 'pushPull':
         case 'rollingBall':
         case 'saveStatue':
+        case 'shieldingUnit':
         case 'tippable':
         case 'torch':
         case 'vineSprout':
@@ -524,7 +525,7 @@ export function getSwitchTargetProperties(
         ...getTargetObjectIdsByTypesAndArea(state.areaInstance.definition,
             [
                 'door', 'chest', 'loot', 'airBubbles', 'beadGrate', 'beadCascade',
-                'narration', 'pitEntrance',
+                'narration', 'pitEntrance', 'shieldingUnit',
                 'teleporter', 'torch', 'escalator', 'anode'
             ]
         )
@@ -587,6 +588,7 @@ function getPossibleStatuses(type: ObjectType): ObjectStatus[] {
         case 'anode':
         case 'escalator':
             return ['normal', 'off', 'frozen'];
+        case 'shieldingUnit':
         case 'turret':
             return ['normal', 'off'];
         default:

@@ -478,7 +478,6 @@ const f0_1x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "", x: 0, y: 96, type: "door", style: "wooden", targetObjectId: "fireSanctumKey", d: "left"},
         {status: "normal", id: "", x: 248, y: 256, d: "down", behavior: "idle", style: "midMonk", type: "npc", dialogue: "May the Spirits guide you."},
         {status: "normal", id: "", x: 0, y: 96, type: "door", style: "wooden", targetObjectId: "fireSanctumKey", d: "left"},
         {status: "normal", id: "", x: 496, y: 96, type: "door", style: "wooden", targetObjectId: "fireSanctumKey", d: "right"},

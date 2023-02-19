@@ -20,6 +20,7 @@ export * from 'app/content/objects/pitEntrance';
 export * from 'app/content/objects/pushPullObject';
 export * from 'app/content/objects/rollingBallObject';
 export * from 'app/content/objects/saveStatue';
+export * from 'app/content/objects/shieldingUnit';
 export * from 'app/content/objects/sign';
 export * from 'app/content/objects/spikeBall';
 export * from 'app/content/objects/teleporter';
