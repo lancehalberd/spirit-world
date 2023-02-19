@@ -17,8 +17,8 @@ import {
     moveEnemyToTargetLocation,
     //paceRandomly,
 } from 'app/utils/enemies';
-import { getDirection } from 'app/utils/field';
-import { pad, rectanglesOverlap } from 'app/utils/index';
+import { getDirection, isTargetHit } from 'app/utils/field';
+import { pad } from 'app/utils/index';
 import { allImagesLoaded } from 'app/utils/images';
 import Random from 'app/utils/Random';
 import {
@@ -143,14 +143,16 @@ enemyDefinitions.stormHeart = {
         };
     },
     onHit(state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
-        const hitInnerBox = hit.hitbox && rectanglesOverlap({
+        const innerHitbox = {
             x: enemy.x,
             y: enemy.y,
             w: 32,
             h: 16 + Math.max(16, Math.ceil((enemy.params.cloudLife + 1) / 2) * 16),
-        }, hit.hitbox);
+        };
         // Cloud cannot be damaged while it is reforming after a counter attack or while enraged
-        if (enemy.params.cloudIsReforming || enemy.params.enrageTime > 0 || !hitInnerBox) {
+        if (enemy.params.cloudIsReforming || enemy.params.enrageTime > 0
+            || !isTargetHit(innerHitbox, hit)
+        ) {
             return { hit: true, stopped: true };
         }
         if (enemy.params.cloudLife > 0) {

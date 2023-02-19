@@ -637,6 +637,28 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
     return combinedResult;
 }
 
+export function isTargetHit(hitbox: Rect, hit: HitProperties): boolean {
+    if (hit.hitCircle) {
+        const r = hit.hitCircle.r;
+        // Fudge a little by pretending the target is a circle.
+        const fakeRadius = hitbox.w / 4 + hitbox.h / 4;
+        const r2 = (r + fakeRadius) ** 2;
+        const dx = hitbox.x + hitbox.w / 2 - hit.hitCircle.x;
+        const dy = hitbox.y + hitbox.h / 2 - hit.hitCircle.y;
+        return dx * dx + dy * dy < r2;
+    }
+    if (hit.hitRay) {
+        // Fudge a little by pretending the target is a circle.
+        const fakeRadius = hitbox.w / 4 + hitbox.h / 4;
+        const { distance } = distanceToSegment(
+            { x: hitbox.x + hitbox.w / 2, y: hitbox.y + hitbox.h / 2},
+            hit.hitRay
+        );
+        return distance <= (hit.hitRay.r + fakeRadius);
+    }
+    return hit.hitbox && rectanglesOverlap(hitbox, hit.hitbox);
+}
+
 function isObject(object: ObjectInstance | EffectInstance): object is ObjectInstance {
     return !!(object as ObjectInstance).isObject;
 }

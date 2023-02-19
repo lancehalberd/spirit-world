@@ -4,14 +4,13 @@ import { LaserBeam } from 'app/content/effects/laserBeam';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { Enemy } from 'app/content/enemy';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
-import { rectanglesOverlap } from 'app/utils/index';
 import {
     accelerateInDirection,
     moveEnemy,
     moveEnemyToTargetLocation,
 } from 'app/utils/enemies';
 import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
-import { addScreenShake } from 'app/utils/field';
+import { addScreenShake, isTargetHit } from 'app/utils/field';
 import { getAreaSize } from 'app/utils/getAreaSize';
 import { addObjectToArea } from 'app/utils/objects';
 import { getNearbyTarget} from 'app/utils/target';
@@ -220,14 +219,14 @@ enemyDefinitions.golem = {
             return { hit: true, blocked: true, stopped: true };
         }
         const hitbox = enemy.getHitbox(state);
-        const hitInnerBox = hit.hitbox && rectanglesOverlap({
+        const innerHitbox = {
             x: hitbox.x + hitbox.w / 2 - 6,
             y: hitbox.y + hitbox.h - 20,
             w: 12,
             h: 20,
-        }, hit.hitbox);
+        };
         // Only striking the vulnerable point will deal damage.
-        if (!hitInnerBox) {
+        if (isTargetHit(innerHitbox, hit)) {
             enemy.makeSound(state, 'blockAttack');
             return { hit: true, blocked: true, stopped: true };
         }
@@ -278,7 +277,7 @@ enemyDefinitions.golemHand = {
             if (enemy.d === 'right') {
                 jewelHitbox.x = hitbox.x + (32 - jewelX - jewelHitbox.w);
             }
-            hitJewel = hit.hitbox && rectanglesOverlap(jewelHitbox, hit.hitbox);
+            hitJewel = isTargetHit(jewelHitbox, hit);
         } else if (enemy.currentAnimationKey === 'returning') {
             // The hand cannot be hit during the returning animation.
             const jewelX = 14;
@@ -291,7 +290,7 @@ enemyDefinitions.golemHand = {
             if (enemy.d === 'right') {
                 jewelHitbox.x = hitbox.x + (32 - jewelX - jewelHitbox.w);
             }
-            hitJewel = hit.hitbox && rectanglesOverlap(jewelHitbox, hit.hitbox);
+            hitJewel = isTargetHit(jewelHitbox, hit);
         } else if (enemy.currentAnimationKey === 'punching') {
             const fistX = 1;
             const fistHitbox = {
@@ -303,7 +302,7 @@ enemyDefinitions.golemHand = {
             if (enemy.d === 'right') {
                 fistHitbox.x = hitbox.x + (32 - fistX - fistHitbox.w);
             }
-            hitHand = hit.hitbox && rectanglesOverlap(fistHitbox, hit.hitbox);
+            hitHand = isTargetHit(fistHitbox, hit);
             const jewelX = 28;
             const jewelHitbox = {
                 x: hitbox.x + jewelX,
@@ -314,7 +313,7 @@ enemyDefinitions.golemHand = {
             if (enemy.d === 'right') {
                 jewelHitbox.x = hitbox.x + (32 - jewelX - jewelHitbox.w);
             }
-            hitJewel = hit.hitbox && rectanglesOverlap(jewelHitbox, hit.hitbox);
+            hitJewel = isTargetHit(jewelHitbox, hit);
         } else {
             hitHand = true;
         }

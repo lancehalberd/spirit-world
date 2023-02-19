@@ -39,9 +39,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Make sure hitRay/hitCircle apply to enemies with special hit detection.
-        - Add function for testing any hit properties for intersection against a hit box and use that in onHit logic.
-
     - Forge
         - Stair case on rails that can be pushed with mitts.
         - Central chamber with moveable stairs and multiple checks

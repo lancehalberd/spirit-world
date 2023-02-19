@@ -22,9 +22,8 @@ import {
     moveEnemy,
     moveEnemyToTargetLocation,
 } from 'app/utils/enemies';
-import { addScreenShake } from 'app/utils/field';
+import { addScreenShake, isTargetHit } from 'app/utils/field';
 import { allImagesLoaded } from 'app/utils/images';
-import { rectanglesOverlap } from 'app/utils/index';
 import { addObjectToArea, saveObjectStatus } from 'app/utils/objects'
 import Random from 'app/utils/Random';
 import {
@@ -523,7 +522,7 @@ enemyDefinitions.voidHand = {
             if (enemy.d === 'right') {
                 jewelHitbox.x = hitbox.x + (32 - jewelX - jewelHitbox.w);
             }
-            hitJewel = hit.hitbox && rectanglesOverlap(jewelHitbox, hit.hitbox);
+            hitJewel = isTargetHit(jewelHitbox, hit);
         } else if (enemy.currentAnimationKey === 'returning') {
             // The hand cannot be hit during the returning animation.
             const jewelX = 14;
@@ -536,7 +535,7 @@ enemyDefinitions.voidHand = {
             if (enemy.d === 'right') {
                 jewelHitbox.x = hitbox.x + (32 - jewelX - jewelHitbox.w);
             }
-            hitJewel = hit.hitbox && rectanglesOverlap(jewelHitbox, hit.hitbox);
+            hitJewel = isTargetHit(jewelHitbox, hit);
         } else if (enemy.currentAnimationKey === 'punching') {
             const fistX = 1;
             const fistHitbox = {
@@ -548,7 +547,7 @@ enemyDefinitions.voidHand = {
             if (enemy.d === 'right') {
                 fistHitbox.x = hitbox.x + (32 - fistX - fistHitbox.w);
             }
-            hitHand = hit.hitbox && rectanglesOverlap(fistHitbox, hit.hitbox);
+            hitHand = isTargetHit(fistHitbox, hit);
             const jewelX = 28;
             const jewelHitbox = {
                 x: hitbox.x + jewelX,
@@ -559,7 +558,7 @@ enemyDefinitions.voidHand = {
             if (enemy.d === 'right') {
                 jewelHitbox.x = hitbox.x + (32 - jewelX - jewelHitbox.w);
             }
-            hitJewel = hit.hitbox && rectanglesOverlap(jewelHitbox, hit.hitbox);
+            hitJewel = isTargetHit(jewelHitbox, hit);
         } else {
             hitHand = true;
         }
