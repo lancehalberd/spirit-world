@@ -2,6 +2,8 @@ import {Howl} from 'howler';
 
 import { GameSound, GameState, HowlerProperties, SoundSettings } from 'app/types';
 
+import { noteFrequencies } from './noteFrequencies';
+
 const sounds = new Map<string, GameSound>();
 window['sounds'] = sounds;
 let audioUnlocked = false;
@@ -520,15 +522,12 @@ function getBellFrequencies(baseFrequency: number): number[] {
     return bellFrequencies.map(n => baseFrequency * n);
 }
 
-sounds.set('bellA', {
-    play() {
-        playBellSound(getBellFrequencies(440), 0.2, 2);
-    }
-});
+const notes = Object.keys(noteFrequencies);
 
-sounds.set('bellB', {
-    play() {
-        playBellSound(getBellFrequencies(493.88), 0.2, 2);
-    }
+notes.forEach((noteName) => {
+    sounds.set(`bell${noteName}`, {
+        play() {
+            playBellSound(getBellFrequencies(noteFrequencies[noteName]), 0.2, 2);
+        }
+    });
 });
-
