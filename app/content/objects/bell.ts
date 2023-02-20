@@ -10,14 +10,14 @@ import {
 const potFrame: Frame = createAnimation('gfx/tiles/movablepot.png', {w: 16, h: 18}).frames[0];
 
 export const bellStyles = {
-    bellA: {
+    bellA4: {
         playSound(state: GameState, bell: Bell) {
-            playAreaSound(state, bell.area, 'bellA');
+            playAreaSound(state, bell.area, 'bellA4');
         }
     },
-    bellB: {
+    bellB4: {
         playSound(state: GameState, bell: Bell) {
-            playAreaSound(state, bell.area, 'bellB');
+            playAreaSound(state, bell.area, 'bellB4');
         }
     }
 }
@@ -46,7 +46,7 @@ export class Bell implements ObjectInstance {
     }
     onHit(state: GameState, hit: HitProperties): HitResult {
         if (hit.isBonk) {
-            const style = bellStyles[this.definition.style] || bellStyles.bellA;
+            const style = bellStyles[this.definition.style] || bellStyles.bellA4;
             style.playSound(state, this);
         }
         return {
