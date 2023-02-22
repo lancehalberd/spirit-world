@@ -51,6 +51,8 @@ export interface TileBehaviors {
     lowCeiling?: boolean
     // Tile to replace this with if it is exposed to an element (fire melts/burns things, ice freezes things, etc)
     elementTiles?: {[key in MagicElement]?: number}
+    // Specifies tile replacements when exposed to an element based on an offset rather than absolute tile index.
+    elementOffsets?: {[key in MagicElement]?: number}
     // Indicates this tile is outside of the current area section.
     outOfBounds?: boolean
     maskFrame?: Frame
@@ -251,15 +253,24 @@ export interface AreaLayer extends AreaTileGrid {
     y?: number,
 }
 
+export interface AreaSection extends Rect {
+    hotLogic?: LogicDefinition
+}
+
+export interface AreaSectionInstance extends AreaSection {
+    // Just added this here for convenient access when editing.
+    definition: AreaSection
+    isHot?: boolean
+}
+
 export interface AreaDefinition {
     default?: boolean
     layers: AreaLayerDefinition[]
     objects: ObjectDefinition[]
     // Used to divide a larger super tile into smaller screens.
-    sections: Rect[]
+    sections: AreaSection[]
     // 0/undefined = fully lit, 100 = pitch black.
     dark?: number
-    hotLogic?: LogicDefinition
     corrosiveLogic?: LogicDefinition
     // Spirit world areas with real counterparts have this reference set
     // to make it more convenient to translate real tiles/objects to the spirit world.
@@ -329,7 +340,6 @@ export interface AreaInstance {
     allyTargets: (EffectInstance | ObjectInstance)[]
     enemyTargets: (EffectInstance | ObjectInstance)[]
     neutralTargets: (EffectInstance | ObjectInstance)[]
-    isHot?: boolean
     // This flag causes the hero to lose spirit energy over time unless they have the water blessing.
     // It is mainly used in waterfall tower, but is also used in the Ice portion of the Holy Sanctum.
     isCorrosive?: boolean

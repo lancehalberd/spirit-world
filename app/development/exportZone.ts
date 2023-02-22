@@ -110,7 +110,12 @@ export function serializeZone(zone: Zone) {
                     lines.push('    ],');
                     lines.push('    sections: [');
                     for (const section of area.sections) {
-                        lines.push(`        {x: ${section.x}, y: ${section.y}, w: ${section.w}, h: ${section.h}},`);
+                        let extraFields = '';
+                        if (section.hotLogic) {
+                            extraFields += `, hotLogic: ${JSON.stringify(section.hotLogic)}`;
+                        }
+                        lines.push(`        {x: ${section.x}, y: ${section.y}, w: ${section.w}, h: ${section.h}${extraFields}}, `);
+
                     }
                     lines.push('    ],');
                     if (area.dark) {
@@ -118,9 +123,6 @@ export function serializeZone(zone: Zone) {
                     }
                     if (area.corrosiveLogic) {
                         lines.push(`    corrosiveLogic: ${JSON.stringify(area.corrosiveLogic)},`);
-                    }
-                    if (area.hotLogic) {
-                        lines.push(`    hotLogic: ${JSON.stringify(area.hotLogic)},`);
                     }
                     if (area.specialBehaviorKey) {
                         lines.push(`    specialBehaviorKey: '${area.specialBehaviorKey}',`);

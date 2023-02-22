@@ -2,7 +2,7 @@ import { evaluateLogicDefinition, logicHash, isLogicValid, isObjectLogicValid } 
 import { allTiles } from 'app/content/tiles';
 import { zones } from 'app/content/zones';
 import { editingState } from 'app/development/editingState';
-import { cleanupHeroFromArea, removeAllClones } from 'app/utils/area';
+import { cleanupHeroFromArea, getAreaSectionInstance, removeAllClones } from 'app/utils/area';
 import { isPointInShortRect } from 'app/utils/index';
 import { specialBehaviorsHash } from 'app/content/specialBehaviors';
 import { createCanvasAndContext } from 'app/utils/canvas';
@@ -288,7 +288,7 @@ export function scrollToArea(state: GameState, area: AreaDefinition, direction: 
 export function setNextAreaSection(state: GameState, d: Direction): void {
     //console.log('setNextAreaSection', d);
     removeAllClones(state);
-    state.nextAreaSection = state.areaInstance.definition.sections[0];
+    state.nextAreaSection = getAreaSectionInstance(state, state.areaInstance.definition.sections[0]);
     const hero = state.hero;
     let x = hero.x / 16;
     let y = hero.y / 16;
@@ -300,7 +300,7 @@ export function setNextAreaSection(state: GameState, d: Direction): void {
     }
     for (const section of state.areaInstance.definition.sections) {
         if (isPointInShortRect(x, y, section)) {
-            state.nextAreaSection = section;
+            state.nextAreaSection = getAreaSectionInstance(state, section);
             break;
         }
     }
@@ -315,6 +315,7 @@ export function switchToNextAreaSection(state: GameState): void {
     refreshSection(state, state.alternateAreaInstance, state.areaSection);
     linkObjects(state);
     state.areaSection = state.nextAreaSection;
+    editingState.needsRefresh = true;
     cleanupHeroFromArea(state);
     state.hero.safeD = state.hero.d;
     state.hero.safeX = state.hero.x;
@@ -483,7 +484,6 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
     definition.objects.filter(
         object => isObjectLogicValid(state, object)
     ).map(o => addObjectToArea(state, instance, createObjectInstance(state, o)));
-    instance.isHot = evaluateLogicDefinition(state, instance.definition.hotLogic, false);
     instance.isCorrosive = evaluateLogicDefinition(state, instance.definition.corrosiveLogic, false);
     if (definition.specialBehaviorKey) {
         const specialBehavior = specialBehaviorsHash[definition.specialBehaviorKey] as SpecialAreaBehavior;
@@ -495,6 +495,9 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
 export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefresh = false): void {
     if (!area) {
         return;
+    }
+    if (state.areaSection) {
+        state.areaSection = getAreaSectionInstance(state, state.areaSection.definition);
     }
     area.needsLogicRefresh = false;
     let lastLayerIndex = -1, refreshBehavior = false;
@@ -545,8 +548,7 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
         }
     }
     for (let instance of [area, area.alternateArea]) {
-        const shouldBeHot = evaluateLogicDefinition(state, instance.definition.hotLogic, false);
-        if (refreshBehavior || instance.isHot !== shouldBeHot) {
+        if (refreshBehavior) {
             state.fadeLevel = (state.areaInstance.dark || 0) / 100;
             state.hero.vx = state.hero.vy = 0;
             const nextAreaInstance = createAreaInstance(state, instance.definition);

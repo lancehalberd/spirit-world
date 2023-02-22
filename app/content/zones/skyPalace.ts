@@ -3055,7 +3055,7 @@ const sf0_2x1: AreaDefinition = {
         {status: "normal", id: "skyPalace:s0:2x1-floorEye-2", x: 176, y: 112, type: "enemy", enemyType: "floorEye", d: "down", params: {}},
         {status: "normal", id: "skyPalace:s0:2x1-floorEye-3", x: 192, y: 96, type: "enemy", enemyType: "floorEye", d: "down", params: {}},
         {status: "normal", id: "skyPalace:s0:2x1-crystalBat-0", x: 164, y: 356, type: "enemy", enemyType: "crystalBat", d: "down", params: {}},
-        {status: "normal", id: "", x: 288, y: 360, type: "movingPlatform", d: "down", w: 32, h: 32, speed: 1, turn: "bounce"},
+        {status: "normal", id: "", x: 296, y: 360, type: "movingPlatform", d: "down", w: 32, h: 32, speed: 1, turn: "bounce"},
         {status: "normal", id: "", x: 344, y: 320, type: "movingPlatform", d: "down", w: 32, h: 32, speed: 1, turn: "bounce"},
         {status: "normal", id: "skyPalace:s0:2x1-crusher-0", x: 320, y: 144, type: "enemy", enemyType: "crusher", d: "up", params: {}},
         {status: "normal", id: "skyPalace:s0:2x1-crystalGuardian-0", x: 320, y: 48, type: "enemy", enemyType: "crystalGuardian", d: "up", params: {}},

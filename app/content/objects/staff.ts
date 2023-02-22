@@ -98,12 +98,12 @@ export class Staff implements ObjectInstance {
             }
         }
         if (direction === 'left' && x - this.x >= 40) {
-            this.w = x - this.x
+            this.w = x - this.x;
         } else if (direction === 'right' && this.x - x >= 40) {
             this.w = this.x - x;
             this.x = x + 16;
         } else if (direction === 'up' && y - this.y >= 40) {
-            this.h = y - this.y
+            this.h = y - this.y;
         } else if (direction === 'down' && this.y - y >= 40) {
             this.h = this.y - y;
             this.y = y + 16;

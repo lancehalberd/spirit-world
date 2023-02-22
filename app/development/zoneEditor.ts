@@ -379,8 +379,8 @@ export function getBehaviorProperties(): PanelRows {
         state.areaInstance.definition.corrosiveLogic = updatedLogic;
         refreshArea(state);
     })];
-    rows = [...rows, ...getLogicProperties(state, 'Is Hot?', state.areaInstance.definition.hotLogic, updatedLogic => {
-        state.areaInstance.definition.hotLogic = updatedLogic;
+    rows = [...rows, ...getLogicProperties(state, 'Is Section Hot?', state.areaSection.definition.hotLogic, updatedLogic => {
+        state.areaSection.definition.hotLogic = updatedLogic;
         refreshArea(state);
     })];
     rows.push({

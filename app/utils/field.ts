@@ -23,10 +23,14 @@ export function canSomersaultToCoords(state: GameState, hero: Hero, {x, y}: Tile
 }
 
 export function isTileOpen(state: GameState, area: AreaInstance, {x, y}: Tile, movementProperties: MovementProperties): boolean {
-    return isPointOpen(state, area, {x: x + 2, y: y + 2}, movementProperties) &&
+   /* return isPointOpen(state, area, {x: x + 2, y: y + 2}, movementProperties) &&
         isPointOpen(state, area, {x: x + 13, y: y + 2}, movementProperties) &&
         isPointOpen(state, area, {x: x + 2, y: y + 13}, movementProperties) &&
-        isPointOpen(state, area, {x: x + 13, y: y + 13}, movementProperties);
+        isPointOpen(state, area, {x: x + 13, y: y + 13}, movementProperties);*/
+    return isPointOpen(state, area, {x: x, y: y}, movementProperties) &&
+        isPointOpen(state, area, {x: x + 15, y: y}, movementProperties) &&
+        isPointOpen(state, area, {x: x, y: y + 15}, movementProperties) &&
+        isPointOpen(state, area, {x: x + 15, y: y + 15}, movementProperties);
 }
 
 export function isPointOpen(
@@ -506,10 +510,34 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
                 setProjectileHigh = true;
             }
         }
-        // Ice hits that effect tiles cover them in ice as long as they aren't pits or walls.
-        if (hit.element === 'ice' && typeof behavior?.elementTiles?.fire === 'undefined'
-            // Cannot freeze ground in hot areas.
-            && !area.isHot
+        if (behavior?.elementOffsets?.[hit.element]) {
+            for (const layer of area.layers) {
+                const offset = layer.tiles?.[target.y]?.[target.x]?.behaviors?.elementOffsets?.[hit.element];
+                if (offset) {
+                    const tileIndex = layer.tiles[target.y][target.x].index;
+                    layer.tiles[target.y][target.x] = allTiles[tileIndex + offset];
+                }
+            }
+            if (area.tilesDrawn[target.y]?.[target.x]) {
+                area.tilesDrawn[target.y][target.x] = false;
+            }
+            area.checkToRedrawTiles = true;
+            resetTileBehavior(area, target);
+        } else if (behavior?.elementTiles?.[hit.element]) {
+            for (const layer of area.layers) {
+                const tileIndex = layer.tiles?.[target.y]?.[target.x]?.behaviors?.elementTiles?.[hit.element];
+                if (tileIndex !== undefined) {
+                    layer.tiles[target.y][target.x] = allTiles[tileIndex];
+                }
+            }
+            if (area.tilesDrawn[target.y]?.[target.x]) {
+                area.tilesDrawn[target.y][target.x] = false;
+            }
+            area.checkToRedrawTiles = true;
+            resetTileBehavior(area, target);
+        } else if (hit.element === 'ice' && typeof behavior?.elementTiles?.fire === 'undefined'
+            // Cannot freeze generic ground tiles in hot areas.
+            && !state.areaSection?.isHot
             && !behavior?.solid && !behavior?.solidMap && !(behavior?.covered || behavior?.blocksStaff)
             && !behavior?.pit && !behavior?.ledges && !behavior?.diagonalLedge
             // Only attackes that hit allies freeze most ground tiles. Attacks from the player should only freeze water tiles
@@ -530,34 +558,22 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
             }
             // Fabricate a frozen tile that has the original tile "underneath it", so it will
             // return to the original state if exposed to fire.
-            if (behavior?.isLava || behavior?.isLavaMap) {
-                // For now lava tiles just become permanent ground when frozen.
-                topLayer.tiles[target.y][target.x] = {
-                    ...allTiles[776],
-                    behaviors: {
-                        ...allTiles[776].behaviors,
-                        // In case lava was covering ledges or other behaviors, mark this tile as isGround.
-                        isGround: true,
+            topLayer.tiles[target.y][target.x] = {
+                ...allTiles[294],
+                behaviors: {
+                    ...allTiles[294].behaviors,
+                    elementTiles: {
+                        fire: topLayer.tiles[target.y][target.x]?.index || 0,
                     },
-                };
-            } else {
-                topLayer.tiles[target.y][target.x] = {
-                    ...allTiles[294],
-                    behaviors: {
-                        ...allTiles[294].behaviors,
-                        elementTiles: {
-                            fire: topLayer.tiles[target.y][target.x]?.index || 0,
-                        },
-                    },
-                };
-            }
+                },
+            };
             if (area.tilesDrawn[target.y]?.[target.x]) {
                 area.tilesDrawn[target.y][target.x] = false;
             }
             area.checkToRedrawTiles = true;
             resetTileBehavior(area, target);
             //console.log('froze tile', area.behaviorGrid?.[target.y]?.[target.x]);
-        } else if (hit.element === 'fire' && typeof behavior?.elementTiles?.fire !== 'undefined') {
+        } /*else if (hit.element === 'fire' && typeof behavior?.elementTiles?.fire !== 'undefined') {
             for (const layer of area.layers) {
                 const tile = layer.tiles?.[target.y]?.[target.x];
                 const fireTile = tile?.behaviors?.elementTiles?.fire;
@@ -570,7 +586,7 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
             }
             area.checkToRedrawTiles = true;
             resetTileBehavior(area, target);
-        }
+        }*/
         // Determine if this hit a solid wall that would stop a projectile:
         const direction = (hit.vx || hit.vy) ? getDirection(hit.vx, hit.vy, true) : null;
 

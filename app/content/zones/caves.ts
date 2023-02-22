@@ -963,11 +963,10 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "caves-ascentExitSpirit", x: 96, y: 240, type: "door", style: "cavern", targetZone: "sky", targetObjectId: "caves-ascentExitSpirit", d: "down"},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 32},
+        {x: 0, y: 0, w: 16, h: 16, hotLogic: {"logicKey":"mountainLava","isInverted":false}},
+        {x: 0, y: 16, w: 16, h: 16, hotLogic: {"logicKey":"mountainLava","isInverted":false}},
+        {x: 16, y: 0, w: 16, h: 32, hotLogic: {"logicKey":"mountainLava","isInverted":false}},
     ],
-    hotLogic: {"logicKey":"mountainLava","isInverted":false},
 };
 const sf0_1x0: AreaDefinition = {
     isSpiritWorld: true,

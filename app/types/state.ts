@@ -1,6 +1,6 @@
 import {
-    ActiveScriptEvent, AreaGrid, AreaInstance,
-    Floor, FullZoneLocation, Hero, SavedHeroData, Rect, ScriptEvent, TextPage, TrackKey,
+    ActiveScriptEvent, AreaGrid, AreaInstance, AreaSectionInstance,
+    Floor, FullZoneLocation, Hero, SavedHeroData, ScriptEvent, TextPage, TrackKey,
     Zone, ZoneLocation,
 } from 'app/types';
 
@@ -66,9 +66,9 @@ export interface GameState {
     areaInstance?: AreaInstance
     surfaceAreaInstance?: AreaInstance
     underwaterAreaInstance?: AreaInstance
-    areaSection?: Rect
+    areaSection?: AreaSectionInstance
     nextAreaInstance?: AreaInstance
-    nextAreaSection?: Rect
+    nextAreaSection?: AreaSectionInstance
     zone: Zone
     floor: Floor
     areaGrid: AreaGrid

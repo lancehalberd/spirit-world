@@ -39,6 +39,13 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Make hot effect fade in/out smoothly.
+    - Add lava stone over lava tiles that are 1:1 with lava tiles and flip back and forth with lava based on fire/ice effects.
+        - Use these tiles in Fire sanctum, change flame turret room to be half flame half ice at 180 degree offset so the ice creates ground and the flames destroy it.
+        - Add lava stone to lava layers in crater.
+    - Add hot logic to doors which will make them render warning state that the connected area is super hot.
+        - Maybe just use flame particles for this for now.
+
     - Forge
         - Stair case on rails that can be pushed with mitts.
         - Central chamber with moveable stairs and multiple checks
@@ -49,22 +56,9 @@ Current tasks:
             - To get to boss
         - Gold mail offered by NPC if you bring gold ore and 500 money
 
-    - When hero/clone is falling, draw it behind all other sprites (on top of the background).
-        - Try using getDrawPriority to apply this to clone, we may need a new priority 'afterBackground' to force it to draw on top of all background elements (for example, it should be drawn on top of pit entrance objects).
-        - The hero itself will probably need special handling to render it immediately after the background in renderField since it always has special handling.
-
-    - Balloon Megapede Improvements
-        - Tail leaves behind time AoE bombs
-
-    - Flame wall improvement
-        - Refactor as individual flames so that each flame can hit individually or be destroyed by ice.
+    - Underwater clone bug: cannot detonate clones underwater, probably because spirit sight is disabled.
 
     - Heavy 2x2 blocks that can only be pushed if the player has mitts
-    - Mechanic: Windstream
-        - Pushes player back unless they are using iron boots or holding on to a solid object.
-        - Player can push pots to move through wind streams.
-        - Player can be pushed across wide pits by equipping cloud boots and entering a wind stream or up to the next floor
-        - There may be light objects that players can push into windstreams to move them, perhaps to solve switch puzzles
 
     - Fire damage burns players/enemies
         - Only one burn effect tracked, new ones replace old ones if they would do more damage than what remains
@@ -76,6 +70,33 @@ Current tasks:
         - If the hero has cloak up, they cannot be burned but fire attacks deal 50% more upfront damage to cloak.
         - Fire blessing reduces burns on player to half damage over 1 second.
         - Burning damage does not cause and is not prevented by iframes
+        - Standing on top of shallow/deep (z===0) water causes burn to expire 2x as fast
+        - Being in deep water/under water prevents burn effects and causes them to expire immediately.
+
+    - Add save statues
+        - Sky Palace
+        - Gauntlet
+        - Holy Sanctum
+        - Crater
+        - Grand Temple/Palace (same statue)
+        - Outside War Temple/Palace (same statue)
+        - Forge
+        - Lab
+
+    - Update save statue dialog
+
+    - When hero/clone is falling, draw it behind all other sprites (on top of the background).
+        - Try using getDrawPriority to apply this to clone, we may need a new priority 'afterBackground' to force it to draw on top of all background elements (for example, it should be drawn on top of pit entrance objects).
+        - The hero itself will probably need special handling to render it immediately after the background in renderField since it always has special handling.
+
+    - Flame wall improvement
+        - Refactor as individual flames so that each flame can hit individually or be destroyed by ice.
+
+    - Mechanic: Windstream
+        - Pushes player back unless they are using iron boots or holding on to a solid object.
+        - Player can push pots to move through wind streams.
+        - Player can be pushed across wide pits by equipping cloud boots and entering a wind stream or up to the next floor
+        - There may be light objects that players can push into windstreams to move them, perhaps to solve switch puzzles
 
     - Allow sneaking into grand temple with invisibility
         - Ultimately this should be a narration box that causes the guard to say Vanara cannot enter the temple.
@@ -167,6 +188,9 @@ Current tasks:
 
     - Cloud jumping near the edges can sometimes result in landing poorly either taking damage or underground in a ledge. Would be nice to find a way to clean up jumping from ledge to ledge.
 
+    - Balloon Megapede Improvements
+        - Tail leaves behind time AoE bombs
+
     - Allow destroying light stones when landing with iron boots?
 
     - Drain all lava in the crater when the fire beast isn't spawned yet? (only matters for entrance randomizer)
@@ -192,10 +216,9 @@ Current tasks:
         before becoming small again and returning to the boss.
 
     Puzzle ideas
-        - Send a clone into the spirit world for "temporary" true sight. Might be annoying to switch between.
-        - Some kind of hazards in the spirit world that move slowly and knock you back, where you need true sight to navigate successfully because spirit sight is too slow.
         - Use a clone to stand on a switch to hold a door open.
         - Use a clone to jump off a cliff to press one switch, then destroy it and make another clone to jump down another cliff to press another switch to open a door at the top of the cliff.
+        - A linked pot needs to be dragged to cover a switch in the other world, but there are pits only in the other world that you must use spirit sight/trueSight to see.
 
     Change prep animation for explosion
         charge particles form randomly in a circle around the hero shooting into them,
@@ -376,7 +399,6 @@ High level list of things left to do:
         Forge
     Areas missing significant content:
         Forest Temple
-        River Temple
     Missing Bosses for existing areas:
         Phoenix boss in Holy Sanctum
         Eight Trigram Furnace at the end of the Gauntlet

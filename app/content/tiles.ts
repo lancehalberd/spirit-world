@@ -9,7 +9,7 @@ import {
     BITMAP_RIGHT_6, BITMAP_RIGHT_6_BOTTOM_9, BITMAP_RIGHT_6_TOP_5,
 } from 'app/content/bitMasks';
 import { simpleLootTable, lifeLootTable, moneyLootTable } from 'app/content/lootTables';
-import { createAnimation, drawFrame, drawTintedImage } from 'app/utils/animations';
+import { createAnimation, drawFrame } from 'app/utils/animations';
 import { createCanvasAndContext, debugCanvas } from 'app/utils/canvas';
 import { allImagesLoaded, requireImage } from 'app/utils/images';
 
@@ -1413,7 +1413,7 @@ const crystalBeadFloor: TileSource = {
     ]
 };
 
-
+/*
 const [lavaCanvas, lavaContext] = createCanvasAndContext(64, 80);
 const createLavaTiles = async () => {
     await allImagesLoaded();
@@ -1422,13 +1422,22 @@ const createLavaTiles = async () => {
         {x: 0, y: 0, w: lavaCanvas.width, h: lavaCanvas.height }
     );
 }
-createLavaTiles();
+createLavaTiles();*/
 //debugCanvas(lavaCanvas);
+// First tile is 886
 const lava: TileSource = {
     w: 16, h: 16,
-    source: {image: lavaCanvas, x: 0, y: 0, w: 64, h: 80},
+    source: {image: requireImage('gfx/tiles/lava.png'), x: 0, y: 0, w: 64, h: 80},
     behaviors: {
-        'all': { defaultLayer: 'floor2', isLava: true, editorTransparency: 0.3 },
+        'all': { defaultLayer: 'floor2', isLava: true, editorTransparency: 0.3, elementOffsets: {ice: 256} },
+    },
+};
+// First tile is 1142
+const lavaStone: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/lavaStone.png'), x: 0, y: 0, w: 64, h: 80},
+    behaviors: {
+        'all': { defaultLayer: 'floor2', isGround: true, elementOffsets: {fire: -256} },
     },
 };
 
@@ -1612,6 +1621,7 @@ addTiles([
     spiritFloor,
     spiritFloorEdges,
     crystalBeadFloor,
+    lavaStone,
 ]);
 
 // This invalid is in the middle of a bunch of other tiles so it is easiest to just delete after adding it.

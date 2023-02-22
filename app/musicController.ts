@@ -112,9 +112,9 @@ export const updateMusic = (state: GameState): void => {
     } else if (location.logicalZoneKey === 'forge') {
         playTrack('forgeTheme', 0, soundSettings);
     } else if (location.zoneKey === 'skyPalace') {
-        playTrack('helixTheme', 0, soundSettings);
+        playTrack('lakeTheme', 0, soundSettings);
     } else if (location.logicalZoneKey === 'holySanctum') {
-        playTrack('skyTheme', 0, soundSettings);
+        playTrack('helixTheme', 0, soundSettings);
     } else if (location.zoneKey === 'crater') {
         playTrack('craterTheme', 0, soundSettings);
     } else if (location.zoneKey === 'staffTower') {

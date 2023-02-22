@@ -219,7 +219,7 @@ export function renderWaterOverlay(context: CanvasRenderingContext2D, state: Gam
     }
 }
 export function renderHeatOverlay(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance) {
-    if (!editingState.isEditing && area?.isHot) {
+    if (!editingState.isEditing && state.areaSection?.isHot) {
         context.save();
             context.globalAlpha = 0.4;
             context.fillStyle = 'red';

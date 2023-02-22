@@ -1,7 +1,9 @@
+import { evaluateLogicDefinition } from 'app/content/logic';
+import { editingState } from 'app/development/editingState';
 import { isPointInShortRect } from 'app/utils/index';
 import { removeObjectFromArea } from 'app/utils/objects';
 
-import { Direction, GameState } from 'app/types';
+import { AreaSection, AreaSectionInstance, Direction, GameState } from 'app/types';
 
 export function removeAllClones(state: GameState): void {
     for (const clone of state.hero.clones) {
@@ -13,20 +15,29 @@ export function removeAllClones(state: GameState): void {
 export function setAreaSection(state: GameState, d: Direction, newArea: boolean = false): void {
     //console.log('setAreaSection', state.hero.x, state.hero.y, d);
     const lastAreaSection = state.areaSection;
-    state.areaSection = state.areaInstance.definition.sections[0];
+    state.areaSection = getAreaSectionInstance(state, state.areaInstance.definition.sections[0]);
     let x = Math.min(32, Math.max(0, (state.hero.x + 8) / 16));
     let y = Math.min(32, Math.max(0, (state.hero.y + 8) / 16));
     for (const section of state.areaInstance.definition.sections) {
         if (isPointInShortRect(x, y, section)) {
-            state.areaSection = section;
+            state.areaSection = getAreaSectionInstance(state, section);
             break;
         }
     }
+    editingState.needsRefresh = true;
     if (newArea || lastAreaSection !== state.areaSection) {
         cleanupHeroFromArea(state);
         state.hero.safeD = state.hero.d;
         state.hero.safeX = state.hero.x;
         state.hero.safeY = state.hero.y;
+    }
+}
+
+export function getAreaSectionInstance(state: GameState, definition: AreaSection): AreaSectionInstance {
+    return {
+        ...definition,
+        definition,
+        isHot: evaluateLogicDefinition(state, definition.hotLogic, false)
     }
 }
 

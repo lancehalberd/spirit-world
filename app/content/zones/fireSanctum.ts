@@ -224,12 +224,11 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "fireSanctumPeachPiece", x: 120, y: 136, type: "chest", lootType: "peachOfImmortalityPiece", lootLevel: 1},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 16, h: 16, hotLogic: {"isTrue":true,"isInverted":false}},
+        {x: 16, y: 0, w: 16, h: 16, hotLogic: {"isTrue":true,"isInverted":false}},
+        {x: 0, y: 16, w: 16, h: 16, hotLogic: {"isTrue":true,"isInverted":false}},
+        {x: 16, y: 16, w: 16, h: 16, hotLogic: {"isTrue":true,"isInverted":false}},
     ],
-    hotLogic: {"isTrue":true,"isInverted":false},
 };
 const sf0_0x0: AreaDefinition = {
     isSpiritWorld: true,
@@ -475,12 +474,11 @@ const sf0_0x0: AreaDefinition = {
         {status: "hiddenSwitch", id: "fireSanctumTeleporter", linked: true, spirit: true, x: 464, y: 120, type: "teleporter"},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 16, h: 16, hotLogic: {"isTrue":true,"isInverted":false}},
+        {x: 16, y: 0, w: 16, h: 16, hotLogic: {"isTrue":true,"isInverted":false}},
+        {x: 0, y: 16, w: 16, h: 16, hotLogic: {"isTrue":true,"isInverted":false}},
+        {x: 16, y: 16, w: 16, h: 16, hotLogic: {"isTrue":true,"isInverted":false}},
     ],
-    hotLogic: {"isTrue":true,"isInverted":false},
 };
 zones.fireSanctum = {
     key: 'fireSanctum',

@@ -4718,7 +4718,6 @@ const sf0_1x1: AreaDefinition = {
     sections: [
         {x: 0, y: 0, w: 32, h: 32},
     ],
-    hotLogic: {},
 };
 const sf0_2x1: AreaDefinition = {
     isSpiritWorld: true,
