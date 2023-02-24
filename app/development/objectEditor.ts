@@ -185,7 +185,7 @@ export function getObjectTypeProperties(): PanelRows {
 export const combinedObjectTypes: ObjectType[] = [
     'anode', 'cathode', 'airBubbles', 'ballGoal', 'beadCascade', 'beadGrate', 'bell', 'bigChest', 'chest', 'crystalSwitch', 'decoration',
     'door', 'escalator', 'flameTurret', 'floorSwitch', 'indicator', 'keyBlock', 'loot','marker', 'movingPlatform', 'narration', 'npc', 'pitEntrance',
-    'pushPull', 'rollingBall', 'saveStatue', 'shieldingUnit', 'shopItem', 'sign', 'spawnMarker', 'spikeBall', 'teleporter', 'tippable', 'torch', 'turret',
+    'pushPull', 'pushStairs', 'rollingBall', 'saveStatue', 'shieldingUnit', 'shopItem', 'sign', 'spawnMarker', 'spikeBall', 'teleporter', 'tippable', 'torch', 'turret',
     'vineSprout', 'waterfall', 'waterPot',
 ];
 
@@ -432,6 +432,14 @@ export function createObjectDefinition(
                 saveStatus: definition.saveStatus,
                 status: definition.status || commonProps.status,
                 type: definition.type,
+            };
+        case 'pushStairs':
+            return {
+                ...commonProps,
+                saveStatus: definition.saveStatus,
+                type: definition.type,
+                w: definition.w || 48,
+                offset: definition.offset || 0,
             };
         case 'spikeBall':
             return {
@@ -764,6 +772,41 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                 value: object.h,
                 onChange(h: number) {
                     object.h = h;
+                    updateObjectInstance(state, object);
+                },
+            });
+            break;
+        case 'pushStairs':
+            rows.push({
+                name: 'w',
+                value: object.w,
+                onChange(w: number) {
+                    if (!(w >= 48)) {
+                        return 48;
+                    }
+                    object.w = w;
+                    // Reset the stairs to their starting point when editing them.
+                    if (object.id) {
+                        delete state.savedState.objectFlags[object.id];
+                    }
+                    updateObjectInstance(state, object);
+                },
+            });
+            rows.push({
+                name: 'offset',
+                value: object.offset || 0,
+                onChange(offset: number) {
+                    if (!(offset >= 0)) {
+                        return 0;
+                    }
+                    if (!(offset <= object.w - 32)) {
+                        return object.w - 32;
+                    }
+                    object.offset = offset;
+                    // Reset the stairs to their starting point when editing them.
+                    if (object.id) {
+                        delete state.savedState.objectFlags[object.id];
+                    }
                     updateObjectInstance(state, object);
                 },
             });

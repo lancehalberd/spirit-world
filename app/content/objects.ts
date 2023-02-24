@@ -18,6 +18,7 @@ export * from 'app/content/objects/narration';
 export * from 'app/content/objects/npc';
 export * from 'app/content/objects/pitEntrance';
 export * from 'app/content/objects/pushPullObject';
+export * from 'app/content/objects/pushStairs';
 export * from 'app/content/objects/rollingBallObject';
 export * from 'app/content/objects/saveStatue';
 export * from 'app/content/objects/shieldingUnit';

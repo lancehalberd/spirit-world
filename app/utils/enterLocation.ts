@@ -136,7 +136,7 @@ export function enterLocation(
         state.hero.safeX = location.x;
         state.hero.safeY = location.y;
     }
-    setAreaSection(state, state.hero.d, !isMutation);
+    setAreaSection(state, !isMutation);
     fixCamera(state);
     checkToUpdateSpawnLocation(state);
     // Make sure the actor is shown as swimming/wading during the transition frames.

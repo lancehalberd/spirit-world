@@ -196,7 +196,7 @@ export const SPAWN_WATERFALL_BOSS: ZoneLocation = {
 export const SPAWN_FORGE_ENTRANCE: ZoneLocation = {
     zoneKey: 'forge',
     floor: 0,
-    x: 124,
+    x: 244,
     y: 448,
     z: 0,
     d: 'down',

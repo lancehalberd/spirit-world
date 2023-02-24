@@ -139,6 +139,8 @@ export interface Actor extends ObjectInstance {
     // Generic flag set to remove player control when the hero is controlled by
     // various objects like a BeadCascade BeadSection that sweeps them south.
     isControlledByObject?: boolean
+    // This will get set when the actor is standing on an object that acts as ground and covers ledges.
+    ignoreLedges?: boolean
 }
 /* In case using the Hero class causes dependency issues, maybe switching to this interface could help.
 export interface Hero extends Actor, SavedHeroData {

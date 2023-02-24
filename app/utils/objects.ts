@@ -76,7 +76,7 @@ export function changeObjectStatus(state: GameState, object: ObjectInstance, new
     }
 }
 
-export function saveObjectStatus(this: void, state: GameState, definition: ObjectDefinition, flag: boolean = true): void {
+export function saveObjectStatus(this: void, state: GameState, definition: ObjectDefinition, flag: boolean | number = true): void {
     let treatment = definition.saveStatus;
     // Make sure treatment is forever for locked doors. Might as well do the same for frozen/cracked doors.
     if (definition.type === 'door' && (
@@ -100,6 +100,8 @@ export function saveObjectStatus(this: void, state: GameState, definition: Objec
             treatment = 'forever';
         } else if (definition.type === 'saveStatue') {
             treatment = 'forever';
+        } else if (definition.type === 'pushStairs') {
+            treatment = 'forever';
         }
     }
     if (treatment === 'forever' || treatment === 'zone') {
@@ -110,17 +112,17 @@ export function saveObjectStatus(this: void, state: GameState, definition: Objec
             console.error('Missing object id', definition);
             return;
         }
-        if (flag && !hash[definition.id]) {
-            hash[definition.id] = true;
+        if (flag !== false && hash[definition.id] !== flag) {
+            hash[definition.id] = flag;
             saveGame(state);
-        } else if (!flag && hash[definition.id]) {
+        } else if (flag === false && hash[definition.id]) {
             delete hash[definition.id];
             saveGame(state);
         }
     }
 }
 
-export function getObjectStatus(this: void, state: GameState, definition: ObjectDefinition): boolean {
+export function getObjectStatus(this: void, state: GameState, definition: ObjectDefinition): boolean | number | string {
     // Lucky beetles have special logic to prevent farming the same few over and over again.
     if (definition.type === 'enemy' && definition.enemyType === 'luckyBeetle') {
         // Lucky Beetle must have an id in order to appear.
@@ -132,7 +134,13 @@ export function getObjectStatus(this: void, state: GameState, definition: Object
     if (!definition.id) {
         return false;
     }
-    return !!state.savedState.zoneFlags[definition.id] || !!state.savedState.objectFlags[definition.id];
+    if (state.savedState.zoneFlags[definition.id] !== undefined) {
+        return state.savedState.zoneFlags[definition.id];
+    }
+    if (state.savedState.objectFlags[definition.id] !== undefined) {
+        return state.savedState.objectFlags[definition.id];
+    }
+    return false;
 }
 
 export function getObjectBehaviors(this: void, state: GameState, object: ObjectInstance | EffectInstance) {

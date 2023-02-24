@@ -73,7 +73,7 @@ export class KeyBlock implements ObjectInstance {
         if (this.definition.id) {
             state.savedState.objectFlags[this.definition.id] = true;
             // Immediately save that the target object has been activated,
-            // but wait for the animation to finsh before activating the target.
+            // but wait for the animation to finish before activating the target.
             // Saving the flag immediately is important in case the player leaves the screen
             // mid animation.
             if (this.definition.targetObjectId) {
@@ -103,9 +103,12 @@ export class KeyBlock implements ObjectInstance {
     update(state: GameState) {
         if (this.isOpen && this.animationTime < this.animation.duration) {
             this.animationTime += FRAME_LENGTH;
-            if (this.animationTime === blockedDuration && this.definition.targetObjectId) {
-                const target = findObjectInstanceById(this.area, this.definition.targetObjectId, false);
-                activateTarget(state, target);
+            if (this.animationTime === blockedDuration) {
+                if (this.definition.targetObjectId) {
+                    const target = findObjectInstanceById(this.area, this.definition.targetObjectId, false);
+                    activateTarget(state, target);
+                }
+                this.area.needsLogicRefresh = true;
             }
         }
     }

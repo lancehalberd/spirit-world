@@ -80,7 +80,7 @@ export function updateCamera(state: GameState, speed?: number): void {
             state.areaInstance.alternateArea = state.alternateAreaInstance;
             state.alternateAreaInstance.alternateArea = state.areaInstance;
             linkObjects(state);
-            setAreaSection(state, state.hero.d);
+            setAreaSection(state);
             setConnectedAreas(state, lastAreaInstance);
             state.hero.area = state.areaInstance;
             if (editingState.isEditing) {

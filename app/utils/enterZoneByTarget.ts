@@ -56,7 +56,7 @@ export function enterZoneByTarget(
                                     const hitbox = target.getHitbox(state);
                                     state.hero.x = hitbox.x + hitbox.w / 2 - state.hero.w / 2;
                                     state.hero.y = hitbox.y + hitbox.h / 2 - state.hero.h / 2;
-                                    setAreaSection(state, state.hero.d, true);
+                                    setAreaSection(state, true);
                                     checkForFloorEffects(state, state.hero);
                                     fixCamera(state);
                                 }

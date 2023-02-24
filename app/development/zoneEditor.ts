@@ -478,6 +478,7 @@ export function getZoneProperties(): PanelRows {
                 state.alternateAreaInstance = tempInstance;
                 state.hero.area = state.areaInstance;
                 setConnectedAreas(state, tempInstance);
+                setAreaSection(state);
                 //enterLocation(state, state.location);
                 editingState.needsRefresh = true;
             }
@@ -536,7 +537,7 @@ export function getZoneProperties(): PanelRows {
         onChange(sectionType: string) {
             state.areaInstance.definition.sections = sectionLayouts[sectionType];
             state.areaSection = null;
-            setAreaSection(state, state.hero.d);
+            setAreaSection(state);
             return 'Change Layout';
         }
     });

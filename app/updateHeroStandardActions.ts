@@ -609,25 +609,27 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                 }
             }
         }
-        for (const object of objects) {
-            if (object === hero) {
-                continue;
-            }
-            const behavior = getObjectBehaviors(state, object);
-            if (behavior?.solid) {
-                hero.action = 'grabbing';
-            }
-            if (object.onGrab) {
-                const frame = object.getHitbox(state);
-                // This is an unusual distance, but should do what we want still.
-                const distance = (
-                    Math.abs(frame.x + frame.w / 2 - hero.x - hero.w / 2) +
-                    Math.abs(frame.y + frame.h / 2 - hero.y - hero.h / 2)
-                );
-                if (distance < closestDistance) {
-                    closestDistance = distance;
-                    closestObject = object;
-                    closestLiftableTileCoords = null;
+        for (const baseObject of objects) {
+            for (const object of [baseObject, ...(baseObject.getParts?.(state) || [])]) {
+                if (object === hero) {
+                    continue;
+                }
+                const behavior = getObjectBehaviors(state, object);
+                if (behavior?.solid) {
+                    hero.action = 'grabbing';
+                }
+                if (object.getHitbox && (behavior?.solid || object.onGrab)) {
+                    const frame = object.getHitbox(state);
+                    // This is an unusual distance, but should do what we want still.
+                    const distance = (
+                        Math.abs(frame.x + frame.w / 2 - hero.x - hero.w / 2) +
+                        Math.abs(frame.y + frame.h / 2 - hero.y - hero.h / 2)
+                    );
+                    if (distance < closestDistance) {
+                        closestDistance = distance;
+                        closestObject = object;
+                        closestLiftableTileCoords = null;
+                    }
                 }
             }
         }

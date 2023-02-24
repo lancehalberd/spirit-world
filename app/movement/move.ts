@@ -15,6 +15,9 @@ export function moveUp(
     // Moving within the same subpixel is always allowed.
     if ((hitbox.y | 0) === ((hitbox.y - amount) | 0)) {
         object.y -= amount;
+        if (movementProperties.actor) {
+            movementProperties.actor.ignoreLedges = true;
+        }
         return true;
     }
     const result = canMoveUp(state, object.area, hitbox, movementProperties);
@@ -52,6 +55,9 @@ export function moveLeft(
     // Moving within the same subpixel is always allowed.
     if ((hitbox.x | 0) === ((hitbox.x - amount) | 0)) {
         object.x -= amount;
+        if (movementProperties.actor) {
+            movementProperties.actor.ignoreLedges = true;
+        }
         return true;
     }
     const result = canMoveLeft(state, object.area, hitbox, movementProperties);
@@ -89,6 +95,9 @@ export function moveDown(
     // Moving within the same subpixel is always allowed.
     if ((hitbox.y | 0) === ((hitbox.y + amount) | 0)) {
         object.y += amount;
+        if (movementProperties.actor) {
+            movementProperties.actor.ignoreLedges = true;
+        }
         return true;
     }
     const result = canMoveDown(state, object.area, hitbox, movementProperties);
@@ -126,6 +135,9 @@ export function moveRight(
     // Moving within the same subpixel is always allowed.
     if ((hitbox.x | 0) === ((hitbox.x + amount) | 0)) {
         object.x += amount;
+        if (movementProperties.actor) {
+            movementProperties.actor.ignoreLedges = true;
+        }
         return true;
     }
     const result = canMoveRight(state, object.area, hitbox, movementProperties);

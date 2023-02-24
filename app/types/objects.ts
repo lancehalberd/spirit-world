@@ -147,7 +147,7 @@ export interface ObjectInstance {
     // which is used by switch toggling logic to determine whether to activate or deactivate next.
     isActive?: (state: GameState) => boolean
     previewColor?: string
-    getParts?: (state: GameState) => (ObjectInstance | EffectInstance)[]
+    getParts?: (state: GameState) => ObjectInstance[]
 }
 
 export interface EffectInstance {
@@ -199,7 +199,7 @@ export interface EffectInstance {
     // The following are added for convenience when we have ambiguous type `EffectInstance | ObjectInstance`
     status?: ObjectStatus
     definition?: ObjectDefinition
-    getParts?: (state: GameState) => (ObjectInstance | EffectInstance)[]
+    getParts?: (state: GameState) => EffectInstance[]
 
 }
 
@@ -562,6 +562,12 @@ export interface EscalatorDefinition extends BaseObjectDefinition {
     h: number
 }
 
+export interface PushStairsDefinition extends BaseObjectDefinition {
+    type: 'pushStairs'
+    w: number
+    offset: number
+}
+
 export interface EnemyObjectDefinition extends BaseObjectDefinition {
     type: 'enemy',
     enemyType: EnemyType | MinionType,
@@ -592,6 +598,7 @@ export type ObjectDefinition = SimpleObjectDefinition
     | MovingPlatformDefinition
     | NarrationDefinition
     | NPCDefinition
+    | PushStairsDefinition
     | SignDefinition
     | SpikeBallDefinition
     | TurretDefinition

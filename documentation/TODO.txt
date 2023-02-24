@@ -40,25 +40,6 @@ Graphics:
 
 Current tasks:
     - Make hot effect fade in/out smoothly.
-    - Add lava stone over lava tiles that are 1:1 with lava tiles and flip back and forth with lava based on fire/ice effects.
-        - Use these tiles in Fire sanctum, change flame turret room to be half flame half ice at 180 degree offset so the ice creates ground and the flames destroy it.
-        - Add lava stone to lava layers in crater.
-    - Add hot logic to doors which will make them render warning state that the connected area is super hot.
-        - Maybe just use flame particles for this for now.
-
-    - Forge
-        - Stair case on rails that can be pushed with mitts.
-        - Central chamber with moveable stairs and multiple checks
-        - Use portals to go to material world and drain lava to progress in the dungeon 4 times
-            - At entrance
-            - To get to big key
-            - To get to big chest
-            - To get to boss
-        - Gold mail offered by NPC if you bring gold ore and 500 money
-
-    - Underwater clone bug: cannot detonate clones underwater, probably because spirit sight is disabled.
-
-    - Heavy 2x2 blocks that can only be pushed if the player has mitts
 
     - Fire damage burns players/enemies
         - Only one burn effect tracked, new ones replace old ones if they would do more damage than what remains
@@ -73,6 +54,18 @@ Current tasks:
         - Standing on top of shallow/deep (z===0) water causes burn to expire 2x as fast
         - Being in deep water/under water prevents burn effects and causes them to expire immediately.
 
+    - Add hot logic to doors which will make them render warning state that the connected area is super hot.
+        - Maybe just use flame particles for this for now.
+
+    - Forge
+        - Gold mail offered by NPC if you bring gold ore and 500 money
+
+    - Underwater clone bug: cannot detonate clones underwater, probably because spirit sight is disabled.
+
+    - Heavy 2x2 blocks that can only be pushed if the player has mitts
+        - Start with push stairs to implement this
+
+
     - Add save statues
         - Sky Palace
         - Gauntlet
@@ -80,7 +73,6 @@ Current tasks:
         - Crater
         - Grand Temple/Palace (same statue)
         - Outside War Temple/Palace (same statue)
-        - Forge
         - Lab
 
     - Update save statue dialog

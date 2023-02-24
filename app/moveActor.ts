@@ -113,6 +113,7 @@ function moveActorInDirection(
             return false;
         }
     }
+    actor.ignoreLedges = false;
     let result = false;
     if (direction === 'up') {
         result = moveUp(state, actor, movementProperties, -amount);
@@ -126,25 +127,27 @@ function moveActorInDirection(
     if (direction === 'right') {
         result = moveRight(state, actor, movementProperties, amount);
     }
-    const jv = getJumpVector(state, actor.area, actor.getHitbox());
-    if (jv[0] !== 0 || jv[1] !== 0) {
-        if (actor.action === 'thrown' || actor.action === 'knocked' || actor.action === 'knockedHard') {
-            actor.action = 'jumpingDown';
-            actor.jumpingVx = actor.vx;
-            actor.jumpingVy = actor.vy;
-            actor.jumpingVz = actor.vz;
-        } else {
-            let speed = 2;
-            if ((actor as Hero).equippedBoots === 'cloudBoots') {
-                speed = 2.2;
-            } else if ((actor as Hero).equippedBoots === 'ironBoots') {
-                speed = 1.5;
+    if (!actor.ignoreLedges) {
+        const jv = getJumpVector(state, actor.area, actor.getHitbox());
+        if (jv[0] !== 0 || jv[1] !== 0) {
+            if (actor.action === 'thrown' || actor.action === 'knocked' || actor.action === 'knockedHard') {
+                actor.action = 'jumpingDown';
+                actor.jumpingVx = actor.vx;
+                actor.jumpingVy = actor.vy;
+                actor.jumpingVz = actor.vz;
+            } else {
+                let speed = 2;
+                if ((actor as Hero).equippedBoots === 'cloudBoots') {
+                    speed = 2.2;
+                } else if ((actor as Hero).equippedBoots === 'ironBoots') {
+                    speed = 1.5;
+                }
+                actor.action = 'jumpingDown';
+                actor.jumpingVx = speed * jv[0];
+                actor.jumpingVy = speed * jv[1];
+                actor.jumpingVz = 3;
+                actor.animationTime = 0;
             }
-            actor.action = 'jumpingDown';
-            actor.jumpingVx = speed * jv[0];
-            actor.jumpingVy = speed * jv[1];
-            actor.jumpingVz = 3;
-            actor.animationTime = 0;
         }
     }
     return result;

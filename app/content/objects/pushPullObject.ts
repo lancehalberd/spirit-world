@@ -22,7 +22,6 @@ export class PushPullObject implements ObjectInstance {
     x: number;
     y: number;
     z = 0;
-    grabDirection: Direction;
     isObject = <const>true;
     linkedObject: PushPullObject;
     pullingHeroDirection: Direction;
@@ -38,9 +37,6 @@ export class PushPullObject implements ObjectInstance {
     }
     getHitbox(state: GameState): Rect {
         return { x: this.x, y: this.y, w: 16, h: 16 };
-    }
-    onGrab(state: GameState, direction: Direction): void {
-        this.grabDirection = direction;
     }
     onHit(state: GameState, {canPush, direction}: HitProperties): HitResult {
         if (!this.pushDirection) {
