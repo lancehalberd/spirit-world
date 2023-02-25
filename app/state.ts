@@ -131,6 +131,7 @@ export function getDefaultState(): GameState {
             mostRecentKeysPressed: new Set(),
         },
         fadeLevel: 0,
+        hotLevel: 0,
         scriptEvents: {
             activeEvents: [],
             blockEventQueue: false,

@@ -130,6 +130,9 @@ export interface GameState {
     }
     isUsingKeyboard?: boolean
     isUsingXbox?: boolean
+    // used to ease the darkness effect in and out
     fadeLevel: number
+    // used to ease the hot effect in and out
+    hotLevel: number
     screenShakes: ScreenShake[]
 }

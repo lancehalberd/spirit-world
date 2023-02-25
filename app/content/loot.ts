@@ -121,7 +121,7 @@ export function getLootGetMessage(state: GameState, lootType: LootType, lootLeve
         case 'roll':
         case 'clone':
         case 'teleportation':
-            return `You learned the ${lootName} Techique!` + equipToolMessage;
+            return `You learned the ${lootName} Techique!`;
         // obtained tools
         case 'bow':
         case 'cloak':

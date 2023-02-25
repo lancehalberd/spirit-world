@@ -24,8 +24,7 @@ export const treeVillageNodes: LogicNode[] = [
         zoneId: 'treeVillage',
         nodeId: 'elderDownstairs',
         checks: [
-            { objectId: 'elderPeachPiece', logic: orLogic(hasMediumRange,
-                orLogic(hasSomersault, hasTeleportation)) },
+            { objectId: 'elderPeachPiece', logic: hasMediumRange },
             { objectId: 'treeVillage:1:0x0-bow-0', logic: hasCatEyes },
         ],
         entranceIds: [

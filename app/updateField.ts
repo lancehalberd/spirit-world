@@ -39,6 +39,12 @@ export function updateField(this: void, state: GameState) {
     } else if (state.fadeLevel > targetFadeLevel){
         state.fadeLevel = Math.max(state.fadeLevel - 0.05, targetFadeLevel);
     }
+    const targetHotLevel = ((!state.nextAreaSection && state.areaSection?.isHot) || state.nextAreaSection?.isHot) ? 1 : 0;
+    if (state.hotLevel < targetHotLevel) {
+        state.hotLevel = Math.min(state.hotLevel + 0.05, targetHotLevel);
+    } else if (state.hotLevel > targetHotLevel){
+        state.hotLevel = Math.max(state.hotLevel - 0.05, targetHotLevel);
+    }
     // If any priority objects are defined for the area, only process them
     // until there are none remaining in the queue.
     if (state.areaInstance.priorityObjects.length) {
