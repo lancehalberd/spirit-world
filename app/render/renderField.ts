@@ -82,7 +82,7 @@ export function renderStandardFieldStack(context: CanvasRenderingContext2D, stat
     applyScreenShakes(context, state);
         renderField(context, state, renderHero);
         renderSurfaceLighting(context, state, state.areaInstance);
-        renderFieldForeground(context, state);
+        renderFieldForeground(context, state, state.areaInstance, state.nextAreaInstance);
         renderWaterOverlay(context, state);
         renderHeatOverlay(context, state, state.areaInstance);
         renderSpiritOverlay(context, state);
@@ -92,7 +92,7 @@ export function renderStandardFieldStack(context: CanvasRenderingContext2D, stat
 export function renderStandardFieldStackWithoutWaterOverlay(context: CanvasRenderingContext2D, state: GameState, renderHero: boolean = null): void {
     renderField(context, state, renderHero);
     renderSurfaceLighting(context, state, state.areaInstance);
-    renderFieldForeground(context, state);
+    renderFieldForeground(context, state, state.areaInstance, state.nextAreaInstance);
     renderSpiritOverlay(context, state);
     renderAreaLighting(context, state, state.areaInstance, state.nextAreaInstance);
 }
@@ -202,11 +202,15 @@ export function renderHero(context: CanvasRenderingContext2D, state: GameState) 
     context.restore();
 }
 
-export function renderFieldForeground(context: CanvasRenderingContext2D, state: GameState) {
-    renderAreaForeground(context, state, state.areaInstance);
-    renderAreaForeground(context, state, state.nextAreaInstance);
-    renderForegroundObjects(context, state, state.areaInstance);
-    renderForegroundObjects(context, state, state.nextAreaInstance);
+export function renderFieldForeground(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance, nextArea?: AreaInstance) {
+    renderAreaForeground(context, state, area);
+    if (nextArea) {
+        renderAreaForeground(context, state, nextArea);
+    }
+    renderForegroundObjects(context, state, area);
+    if (nextArea) {
+        renderForegroundObjects(context, state, nextArea);
+    }
 }
 
 export function renderWaterOverlay(context: CanvasRenderingContext2D, state: GameState) {
@@ -618,7 +622,7 @@ export function renderTransition(context: CanvasRenderingContext2D, state: GameS
             underContext.restore();
             renderAreaObjectsAfterHero(underContext, state, area);
             renderSurfaceLighting(underContext, state, area);
-            renderFieldForeground(underContext, state);
+            renderFieldForeground(underContext, state, area);
             renderHeatOverlay(underContext, state, area);
             renderAreaLighting(underContext, state, area);
         }
