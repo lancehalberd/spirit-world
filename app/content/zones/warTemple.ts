@@ -1703,7 +1703,7 @@ const f2_0x0: AreaDefinition = {
         {status: "normal", id: "warTemple:2:0x0-lightningBug-0", x: 400, y: 144, type: "enemy", enemyType: "lightningBug", d: "down", params: {}},
         {status: "normal", id: "warTempleSave", x: 64, y: 336, type: "saveStatue"},
         {status: "normal", id: "warTemple:2:0x0-flameSnake-0", x: 448, y: 416, type: "enemy", enemyType: "flameSnake", d: "down", params: {}},
-        {status: "closed", id: "warTempleExit", x: 112, y: 0, type: "door", style: "cavernDownstairs", targetZone: "overworld", targetObjectId: "warTempleEntrance", d: "up", linked: true},
+        {status: "closedSwitch", id: "warTempleExit", x: 112, y: 0, type: "door", style: "cavernDownstairs", targetZone: "overworld", targetObjectId: "warTempleEntrance", d: "up", linked: true},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},
