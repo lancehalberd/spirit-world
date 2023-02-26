@@ -3,6 +3,7 @@ import {
     scrollToArea, setNextAreaSection,
     swapHeroStates,
 } from 'app/content/areas';
+import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { AirBubbles } from 'app/content/objects/airBubbles';
 import { Enemy } from 'app/content/enemy';
 import { editingState } from 'app/development/editingState';
@@ -19,7 +20,7 @@ import {
 } from 'app/utils/field';
 import { getAreaSize } from 'app/utils/getAreaSize';
 import { getFullZoneLocation } from 'app/utils/getFullZoneLocation';
-import { boxesIntersect } from 'app/utils/index';
+import { boxesIntersect, pad } from 'app/utils/index';
 import { removeObjectFromArea } from 'app/utils/objects';
 
 import {
@@ -151,6 +152,38 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
             }
         }
     }
+    // Burns end immediately dealing no damage to swimming targets.
+    if (hero.swimming) {
+        hero.burnDuration = 0;
+    }
+    if (hero.burnDuration > 0) {
+        hero.burnDuration -= FRAME_LENGTH;
+        // Burns expire twice as fast when standing on water.
+        if (hero.wading) {
+            hero.burnDuration -= FRAME_LENGTH;
+        }
+        // If the hero has magic, half of burning damage applies to magic and half applies to their life.
+        if (hero.magic > 0) {
+            const drainCoefficient = state.hero.magicRegen ? 4 / state.hero.magicRegen : 0;
+            state.hero.magic -= drainCoefficient * 10 * hero.burnDamage / 2 * FRAME_LENGTH / 1000;
+            // This will result in a 1 second cooldown by default for a 2 second burn.
+            state.hero.increaseMagicRegenCooldown(10);
+            // If the hero has iron skin, no burning damage applies to life so long as they still have magic.
+            if (!(hero.ironSkinLife > 0)) {
+                hero.life = Math.max(0, hero.life - hero.burnDamage / 2 * FRAME_LENGTH / 1000);
+            }
+        } else {
+            if (hero.ironSkinLife > 0) {
+                hero.ironSkinLife = Math.max(0, hero.ironSkinLife - hero.burnDamage * FRAME_LENGTH / 1000);
+            } else {
+                hero.life = Math.max(0, hero.life - hero.burnDamage * FRAME_LENGTH / 1000);
+            }
+        }
+        if (hero.burnDuration % 40 === 0) {
+            const hitbox = hero.getHitbox(state);
+            addSparkleAnimation(state, hero.area, pad(hitbox, -4), { element: 'fire' });
+        }
+    }
     // Remove action targets from old areas.
     if (hero.actionTarget && hero.actionTarget.area !== hero.area) {
         hero.actionTarget = null;
@@ -184,13 +217,7 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
 export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero) {
     // Hero takes one damage every half second while in a hot room without the fire blessing.
     if (!editingState.isEditing && state.areaSection?.isHot && !hero.passiveTools.fireBlessing) {
-        if (state.time % 500 === 0) {
-            hero.onHit(state, {damage: 1, canDamageRollingHero: true, element: 'fire'});
-            // Stop updating this hero if it was destroyed by taking damage,
-            if (!hero.area) {
-                return;
-            }
-        }
+        hero.applyBurn(1, 500);
     }
     let activeAirBubbles: AirBubbles = null;
     for (const object of hero.area.objects) {
@@ -248,7 +275,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
             drainAmount *= 2;
         }
         state.hero.actualMagicRegen = Math.max(-20, Math.min(0, state.hero.actualMagicRegen) - drainAmount);
-        state.hero.increasedMagicRegenCooldown(drainCoefficient * FRAME_LENGTH / 2);
+        state.hero.increaseMagicRegenCooldown(drainCoefficient * FRAME_LENGTH / 2);
     } else if (hasBarrier) {
         if (state.hero.invulnerableFrames > 0) {
             // Regenerate no magic during iframes after the barrier is damaged.
@@ -281,7 +308,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
     }
     const isActuallyRunning = state.hero.action === 'walking' && state.hero.isRunning && state.hero.magic > 0;
     const preventRegeneration = state.hero.actualMagicRegen < 0
-        || state.hero.toolCooldown > 0 || state.hero.action === 'roll' || isActuallyRunning;
+        || state.hero.toolCooldown > 0 || state.hero.action === 'roll' || isActuallyRunning || state.hero.burnDuration > 0;
     if (state.hero.magicRegenCooldown > 0 && !preventRegeneration) {
         state.hero.magicRegenCooldown -= FRAME_LENGTH;
     }
@@ -297,7 +324,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
         }
         // Slowly expend spirit energy while running.
         state.hero.magic -= drainCoefficient * 5 * FRAME_LENGTH / 1000;
-        state.hero.increasedMagicRegenCooldown(drainCoefficient * FRAME_LENGTH / 5);
+        state.hero.increaseMagicRegenCooldown(drainCoefficient * FRAME_LENGTH / 5);
     } else if (state.hero.actualMagicRegen < 0) {
         // Magic is being drained for some reason
         state.hero.magic += state.hero.actualMagicRegen * FRAME_LENGTH / 1000;

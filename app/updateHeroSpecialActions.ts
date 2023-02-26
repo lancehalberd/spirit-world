@@ -603,7 +603,7 @@ function performSomersault(this: void, state: GameState, hero: Hero) {
     // Cloud somersault roll activated by rolling again mid roll.
     const [dx, dy] = getCloneMovementDeltas(state, hero);
     state.hero.magic -= 10;
-    state.hero.increasedMagicRegenCooldown(500);
+    state.hero.increaseMagicRegenCooldown(500);
     hero.d = (dx || dy) ? getDirection(dx, dy) : hero.d;
     // Default direction is the direction the current roll uses.
     const defaultDirection = getDirection(hero.actionDx, hero.actionDy, true, hero.d);

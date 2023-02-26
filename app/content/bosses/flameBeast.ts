@@ -154,7 +154,7 @@ function updateFireHeart(this: void, state: GameState, enemy: Enemy): void {
                     vx: speed * dx,
                     vy: speed * dy,
                     ttl: 600 + (isEnraged ? 1000 : enemy.params.enrageLevel * 500),
-                    damage: 4,
+                    damage: 2,
                 });
                 flame.x -= flame.w / 2;
                 flame.y -= flame.h / 2;
@@ -187,7 +187,7 @@ const spawnGiantFlame = (state: GameState, enemy: Enemy): void => {
         y,
         ttl: 2000 + getFlameBeastEnrageLevel(state, enemy) * 500,
         scale: 4,
-        damage: 4,
+        damage: 3,
     });
     flame.x -= flame.w / 2;
     flame.y -= flame.h / 2;
@@ -226,7 +226,7 @@ function updateFireBeast(this: void, state: GameState, enemy: Enemy): void {
     // since our heuristic of using the actual sprite overlap doesn't make sense this high in the air and
     // for these movements.
     enemy.isInvulnerable = (enemy.z > 8);
-    enemy.touchHit = (enemy.z <= 0) ? { damage: 4, element: 'fire'} : null;
+    enemy.touchHit = (enemy.z <= 0) ? { damage: 2, element: 'fire'} : null;
     if (enemy.mode === 'regenerate') {
         // Fall to the ground if we start regeneration mid leap.
         if (enemy.z > 0) {

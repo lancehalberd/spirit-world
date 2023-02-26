@@ -70,7 +70,7 @@ export class FlameTurret implements ObjectInstance {
                     vx: 3 * dx,
                     vy: 3 * dy,
                     ttl: Math.min(800, 100 + this.animationTime),
-                    damage: 4,
+                    damage: 2,
                 });
                 flame.x -= flame.w / 2;
                 flame.y -= flame.h / 2;

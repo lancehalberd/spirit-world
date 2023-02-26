@@ -94,6 +94,8 @@ export class Hero implements Actor, SavedHeroData {
     sinking?: boolean;
     inAirBubbles?: boolean;
     frozenDuration?: number;
+    burnDamage?: number = 0;
+    burnDuration?: number = 0;
     isRunning?: boolean;
     isUsingDoor?: boolean;
     isExitingDoor?: boolean;
@@ -287,14 +289,32 @@ export class Hero implements Actor, SavedHeroData {
             return {};
         }
         if (this.hasBarrier) {
+            let iframeMultiplier = 1;
             let spiritDamage = hit.spiritCloakDamage || Math.max(10, hit.damage * 5);
             // The cloak halves incoming damage that matches its current element.
+            // Note that since the base cloak tool can no longer be charged, barrier element is never set.
             if (hit.element && hit.element === this.barrierElement) {
                 spiritDamage /= 2;
             }
             let reflectDamage = this.barrierLevel;
             if (!this.barrierElement) {
                 reflectDamage++;
+            }
+            //
+            if (hit.element === 'fire') {
+                // The barrier prevents burning damage entirely (normally a 2x multiplier)
+                // so to balance this out the barrier takes a flat 50% more damage from fire elements.
+                spiritDamage *= 1.5;
+                if (state.hero.passiveTools.fireBlessing) {
+                    spiritDamage /= 2;
+                }
+            }
+            if (hit.element === 'ice' && state.hero.passiveTools.waterBlessing) {
+                spiritDamage /= 2;
+            }
+            if (hit.element === 'lightning' && state.hero.passiveTools.lightningBlessing) {
+                spiritDamage /= 2;
+                iframeMultiplier *= 0.5;
             }
             // The cloak does increased extra damage and prevents all spirit damage while the cloak is being activated.
             // This rewards players for using the cloak just in time to block attacks, but may be too generous.
@@ -304,8 +324,8 @@ export class Hero implements Actor, SavedHeroData {
             }
             if (hit.damage && state.hero.invulnerableFrames <= 0) {
                 state.hero.magic -= spiritDamage;
-                state.hero.invulnerableFrames = Math.max(state.hero.invulnerableFrames, 10);
-                state.hero.increasedMagicRegenCooldown(1000 * spiritDamage / 20);
+                state.hero.invulnerableFrames = Math.max(state.hero.invulnerableFrames, iframeMultiplier * 10);
+                state.hero.increaseMagicRegenCooldown(1000 * spiritDamage / 20);
             }
             const hitbox = this.getHitbox(state);
             if (hit.canAlwaysKnockback && hit.knockback) {
@@ -334,8 +354,14 @@ export class Hero implements Actor, SavedHeroData {
         if (hit.damage) {
             let damage = hit.damage;
             let iframeMultiplier = 1;
-            if (hit.element === 'fire' && state.hero.passiveTools.fireBlessing) {
-                damage /= 2;
+            if (hit.element === 'fire') {
+                let burnDuration = 2000;
+                const burnDamage = damage / 2;
+                if (state.hero.passiveTools.fireBlessing) {
+                    damage /= 2;
+                    burnDuration /= 2;
+                }
+                this.applyBurn(burnDamage, burnDuration);
             }
             if (hit.element === 'ice' && state.hero.passiveTools.waterBlessing) {
                 damage /= 2;
@@ -365,6 +391,13 @@ export class Hero implements Actor, SavedHeroData {
             }
         }
         return { hit: true };
+    }
+
+    applyBurn(burnDamage: number, burnDuration: number) {
+        if (burnDuration * burnDamage >= this.burnDuration * this.burnDamage) {
+            this.burnDuration = burnDuration;
+            this.burnDamage = burnDamage;
+        }
     }
 
     burstBarrier(state: GameState) {
@@ -711,7 +744,7 @@ export class Hero implements Actor, SavedHeroData {
         hero.pickUpTile = null;
     }
 
-    increasedMagicRegenCooldown(amount: number): void {
+    increaseMagicRegenCooldown(amount: number): void {
         this.magicRegenCooldown = Math.min(Math.max(100, this.magicRegenCooldown + amount), this.magicRegenCooldownLimit);
     }
 }

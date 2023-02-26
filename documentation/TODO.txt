@@ -39,23 +39,21 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Make hot effect fade in/out smoothly.
+    - Fix golem hitbox is too small
 
-    - Fire damage burns players/enemies
-        - Only one burn effect tracked, new ones replace old ones if they would do more damage than what remains
-        - Burn does damage over 2 seconds
-        - If the hero has spirit energy, half of burning damage is instead taken from spirit energy at 10 spirit per 1 point of damage,
-        modified by spirit loss coefficient
-        - If the hero has iron skin, burning damage applies to spirit energy, and the health portion is ignored.
-            - Burning damage applies to iron skin life if player is out of spirit energy
-        - If the hero has cloak up, they cannot be burned but fire attacks deal 50% more upfront damage to cloak.
-        - Fire blessing reduces burns on player to half damage over 1 second.
-        - Burning damage does not cause and is not prevented by iframes
-        - Standing on top of shallow/deep (z===0) water causes burn to expire 2x as fast
-        - Being in deep water/under water prevents burn effects and causes them to expire immediately.
+    - Don't allow using menu when player is falling/fallen.
+
+    - Fire damage should remove freeze on enemy/player
+    - Ice damage should remove burn on enemy/player
+
+    - Add burn status to enemies
+        - Add graphical indicator for burning enemies.
 
     - Add hot logic to doors which will make them render warning state that the connected area is super hot.
         - Maybe just use flame particles for this for now.
+
+    - Try using fade transition for material -> spirit world
+        - If this isn't better, try using a circle wipe transition with a gradient instead.
 
     - Forge
         - Gold mail offered by NPC if you bring gold ore and 500 money
@@ -387,11 +385,12 @@ Improve Staff Tower Setup:
     - Animation should be throwing staff into the sky as it grows with its shadow, then falls to the ground when the shadow is as large as the foundation.
 
 High level list of things left to do:
-    New dungeons(need enemies, mechanics, bosses, entrances):
-        Forge
     Areas missing significant content:
         Forest Temple
+        Lab
+        World Tree
     Missing Bosses for existing areas:
+        Forge Boss
         Phoenix boss in Holy Sanctum
         Eight Trigram Furnace at the end of the Gauntlet
         Crater midboss
