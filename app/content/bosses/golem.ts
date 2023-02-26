@@ -225,8 +225,8 @@ enemyDefinitions.golem = {
             w: 12,
             h: 20,
         };
-        // Only striking the vulnerable point will deal damage.
-        if (isTargetHit(innerHitbox, hit)) {
+        // If they miss the vulnerable section, the attack is blocked.
+        if (!isTargetHit(innerHitbox, hit)) {
             enemy.makeSound(state, 'blockAttack');
             return { hit: true, blocked: true, stopped: true };
         }
