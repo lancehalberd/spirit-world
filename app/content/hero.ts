@@ -389,6 +389,8 @@ export class Hero implements Actor, SavedHeroData {
             } else {
                 this.frozenDuration = 1500;
             }
+            // ice hits remove burns.
+            this.burnDuration = 0;
         }
         return { hit: true };
     }
@@ -398,6 +400,8 @@ export class Hero implements Actor, SavedHeroData {
             this.burnDuration = burnDuration;
             this.burnDamage = burnDamage;
         }
+        // Burns unfreeze the player.
+        this.frozenDuration = 0;
     }
 
     burstBarrier(state: GameState) {

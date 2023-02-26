@@ -39,11 +39,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Fire damage should remove freeze on enemy/player
-    - Ice damage should remove burn on enemy/player
-
-    - Add burn status to enemies
-        - Add graphical indicator for burning enemies.
 
     - Add hot logic to doors which will make them render warning state that the connected area is super hot.
         - Maybe just use flame particles for this for now.

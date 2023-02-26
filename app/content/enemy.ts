@@ -1,4 +1,4 @@
-import { AnimationEffect } from 'app/content/effects/animationEffect';
+import { addSparkleAnimation, AnimationEffect } from 'app/content/effects/animationEffect';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { addTextCue } from 'app/content/effects/textCue';
 import { dropItemFromTable, getLoot } from 'app/content/objects/lootObject';
@@ -9,6 +9,7 @@ import { playAreaSound } from 'app/musicController';
 import { appendCallback } from 'app/scriptEvents';
 import { drawFrame, getFrame } from 'app/utils/animations';
 import { getDirection } from 'app/utils/field';
+import { pad } from 'app/utils/index';
 import { renderEnemyShadow } from 'app/renderActor';
 import { addEffectToArea } from 'app/utils/effects';
 import { checkForFloorEffects, moveEnemy } from 'app/utils/enemies';
@@ -52,6 +53,8 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
     alwaysReset: boolean = false;
     alwaysUpdate: boolean = false;
     frozenDuration = 0;
+    burnDuration = 0;
+    burnDamage = 0;
     // This ignores the default pit logic in favor of the ground effects
     // code used internally.
     ignorePits = true;
@@ -321,12 +324,16 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             const multiplier = this.enemyDefinition.elementalMultipliers?.[hit.element] || 1;
             damageDealt = multiplier * hit.damage;
             this.applyDamage(state, damageDealt, 'enemyHit', hit.element === 'lightning' ? 0.5 : 1);
+            if (hit.element === 'fire') {
+                this.applyBurn(hit.damage, 2000);
+            }
         }
         // Hitting frozen enemies unfreezes them.
         if (this.frozenDuration > 0) {
             this.frozenDuration = 0;
         } else if (hit.element === 'ice' && this.definition.type !== 'boss') {
             this.frozenDuration = 1500;
+            this.burnDuration = 0;
         }
         return {
             damageDealt,
@@ -343,9 +350,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         // This is actually the number of frames the enemy cannot damage the hero for.
         this.invulnerableFrames = this.enemyDefinition.invulnerableFrames ?? 50;
         this.enemyInvulnerableFrames = (iframeMultiplier * 20) | 0;
-        if (this.life <= 0 && !this.isImmortal) {
-            this.showDeathAnimation(state);
-        } else {
+        if (!this.checkIfDefeated(state)) {
             playAreaSound(state, this.area, damageSound);
         }
         if (this.area !== state.areaInstance) {
@@ -359,6 +364,21 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             }));
         }
         return true;
+    }
+    checkIfDefeated(state: GameState) {
+        if (this.life <= 0 && !this.isImmortal) {
+            this.showDeathAnimation(state);
+            return true;
+        }
+        return false;
+    }
+    applyBurn(burnDamage: number, burnDuration: number) {
+        if (burnDuration * burnDamage >= this.burnDuration * this.burnDamage) {
+            this.burnDuration = burnDuration;
+            this.burnDamage = burnDamage;
+        }
+        // Burns unfreeze the player.
+        this.frozenDuration = 0;
     }
     showDeathAnimation(state: GameState) {
         if (this.status === 'gone' || this.isDefeated) {
@@ -547,6 +567,17 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             //this.vx *= 0.95;
             //this.vy *= 0.95;
             return;
+        }
+        if (this.burnDuration > 0) {
+            this.burnDuration -= FRAME_LENGTH;
+            this.life = Math.max(0, this.life - this.burnDamage * FRAME_LENGTH / 1000);
+            if (this.checkIfDefeated(state)) {
+                return;
+            }
+            if (this.burnDuration % 40 === 0) {
+                const hitbox = this.getHitbox();
+                addSparkleAnimation(state, this.area, pad(hitbox, -4), { element: 'fire' });
+            }
         }
         for (const tauntKey in this.taunts ?? []) {
             const tauntInstance = this.taunts[tauntKey];
