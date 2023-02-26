@@ -39,10 +39,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Fix golem hitbox is too small
-
-    - Don't allow using menu when player is falling/fallen.
-
     - Fire damage should remove freeze on enemy/player
     - Ice damage should remove burn on enemy/player
 

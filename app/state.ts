@@ -194,6 +194,7 @@ export function shouldHideMenu(state: GameState): boolean {
         || state.messagePage || state.transitionState || state.defeatState.defeated
         || state.nextAreaSection || state.nextAreaInstance
         || state.areaInstance.priorityObjects?.length
+        || state.hero.action === 'falling' || state.hero.action === 'fallen'
     );
 }
 
