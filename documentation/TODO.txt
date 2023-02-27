@@ -39,7 +39,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Prevent jumping north into southern facing walls
     - Fix loot on staff causes the loot to move in strange ways
     - Make sure hero can fall into a 1x1 pit while wearing the cloak
     - Share google doc with Nick with zone descriptions to use as a guide for BGM

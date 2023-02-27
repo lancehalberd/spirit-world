@@ -61,13 +61,17 @@ export function isPointOpen(
         if (tileBehavior.solidMap[sy] >> (15 - sx) & 1) {
             return false;
         }
-    } else if (!movementProperties.canCrossLedges && tileBehavior?.ledges?.up && sy === 0 && movementProperties.direction !== 'up') {
+    } else if (!movementProperties.canCrossLedges && tileBehavior?.ledges?.up && sy === 0
+        && movementProperties.direction && movementProperties.direction !== 'up') {
         return false;
-    } else if (!movementProperties.canCrossLedges && tileBehavior?.ledges?.down && sy === 15 && movementProperties.direction !== 'down') {
+    } else if (!movementProperties.canCrossLedges && tileBehavior?.ledges?.down && sy === 15
+        && movementProperties.direction && movementProperties.direction !== 'down') {
         return false;
-    } else if (!movementProperties.canCrossLedges && tileBehavior?.ledges?.left && sx === 0 && movementProperties.direction !== 'left') {
+    } else if (!movementProperties.canCrossLedges && tileBehavior?.ledges?.left && sx === 0
+        && movementProperties.direction && movementProperties.direction !== 'left') {
         return false;
-    } else if (!movementProperties.canCrossLedges && tileBehavior?.ledges?.right && sx === 15 && movementProperties.direction !== 'right') {
+    } else if (!movementProperties.canCrossLedges && tileBehavior?.ledges?.right && sx === 15
+        && movementProperties.direction && movementProperties.direction !== 'right') {
         return false;
     }
     if (tileBehavior?.water && !movementProperties.canSwim) {
