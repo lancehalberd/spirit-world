@@ -39,7 +39,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Make sure hero can fall into a 1x1 pit while wearing the cloak
     - Share google doc with Nick with zone descriptions to use as a guide for BGM
 
     - Add hot logic to doors which will make them render warning state that the connected area is super hot.
