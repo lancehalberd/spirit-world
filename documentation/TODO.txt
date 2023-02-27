@@ -39,8 +39,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Fix cannot melt lake ice with fire element any more.
-    - Gauntlet water area has wrong music.
     - Hot overlay doesn't render during transition to spirit world.
     - Prevent jumping north into southern facing walls
     - Iron skin should protect spirit energy from burning damage

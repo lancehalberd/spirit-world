@@ -523,7 +523,7 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
             }
             area.checkToRedrawTiles = true;
             resetTileBehavior(area, target);
-        } else if (behavior?.elementTiles?.[hit.element]) {
+        } else if (behavior?.elementTiles?.[hit.element] !== undefined) {
             for (const layer of area.layers) {
                 const tileIndex = layer.tiles?.[target.y]?.[target.x]?.behaviors?.elementTiles?.[hit.element];
                 if (tileIndex !== undefined) {

@@ -54,7 +54,7 @@ export const updateMusic = (state: GameState): void => {
         } else {
             playTrack('skyTheme', 0, soundSettings);
         }
-    } else if (location.zoneKey === 'grandTemple') {
+    } else if (location.zoneKey === 'grandTemple' || location.zoneKey === 'jadePalace') {
         playTrack('vanaraDreamTheme', 0, soundSettings);
     } else if (location.zoneKey === 'peachCave'
         || location.zoneKey === 'peachCaveWater'

@@ -17,8 +17,10 @@ export function getFullZoneLocation(location: ZoneLocation): FullZoneLocation {
                 logicalZoneKey = isSpiritWorld ? 'fertilityShrineSpirit' : 'fertilityShrine';
             }
         }
-    } else if (zoneKey === 'grandTemple' || zoneKey === 'grandTempleWater') {
+    } else if (zoneKey === 'grandTemple') {
         logicalZoneKey = isSpiritWorld ? 'jadePalace' : 'grandTemple';
+    } else if (zoneKey === 'gauntlet' || zoneKey === 'gauntletWater') {
+        logicalZoneKey = 'gauntlet';
     } else if (zoneKey === 'overworld' || zoneKey === 'underwater') {
         logicalZoneKey = isSpiritWorld ? 'spiritWorld' : 'overworld';
     } else if (zoneKey === 'peachCave' || zoneKey === 'peachCaveWater') {
