@@ -283,11 +283,12 @@ function applyLootObjectToState(state: GameState, lootWithLocation: LootWithLoca
 function setAllFlagsInLogic(state: GameState, allNodes: LogicNode[], startingNodes: LogicNode[]): GameState {
     let changed, updatedState = state;
     do {
-        startingNodes = findReachableNodes(allNodes, startingNodes, state);
+        changed = false;
+        startingNodes = findReachableNodes(allNodes, startingNodes, updatedState);
         for (const node of startingNodes) {
             for (const flag of (node.flags || [])) {
-                if (flag.logic && !isLogicValid(state, flag.logic)) {
-                    //console.log('Invalid logic', exit);
+                if (flag.logic && !isLogicValid(updatedState, flag.logic)) {
+                    //console.log('Invalid logic', flag);
                     continue;
                 }
                 if (!updatedState.savedState.objectFlags[flag.flag]) {
@@ -295,12 +296,11 @@ function setAllFlagsInLogic(state: GameState, allNodes: LogicNode[], startingNod
                         updatedState = copyState(state);
                     }
                     updatedState.savedState.objectFlags[flag.flag] = true;
-                    // console.log('    Setting flag', flag.flag);
+                    //console.log('    Setting flag', flag.flag);
                     changed = true;
                 }
             }
         }
-        changed = false;
     } while (changed);
     return updatedState;
 }

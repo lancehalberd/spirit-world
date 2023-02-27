@@ -1639,7 +1639,7 @@ const sf2_0x0: AreaDefinition = {
         {status: "normal", id: "forgeSmallKey", x: 72, y: 56, type: "chest", lootType: "smallKey", lootLevel: 1},
         {status: "normal", id: "forgePushStairs2", x: 88, y: 208, type: "pushStairs", w: 80, offset: 48},
         {status: "normal", id: "forgePushStairs2", x: 88, y: 128, type: "pushStairs", w: 80, offset: 0},
-        {status: "normal", id: "forgeStairs3", x: 160, y: 16, type: "door", style: "cavernUpstairs", targetZone: "forge", targetObjectId: "forgeStairs3", d: "up", locationCue: "Forge B2"},
+        {status: "bigKeyLocked", id: "forgeStairs3", x: 160, y: 16, type: "door", style: "cavernUpstairs", targetZone: "forge", targetObjectId: "forgeStairs3", d: "up", locationCue: "Forge B2"},
         {status: "normal", id: "forgeShortcut", x: 288, y: 48, type: "door", style: "cavernUpstairs", targetZone: "forge", targetObjectId: "forgeShortcut", d: "up"},
         {status: "closedEnemy", id: "", x: 304, y: 272, type: "door", style: "cavern", d: "up"},
         {status: "closedEnemy", id: "forgeStairs3", x: 448, y: 272, type: "door", style: "cavernUpstairs", targetZone: "forge", targetObjectId: "forgeStairs3", d: "up"},
