@@ -645,8 +645,8 @@ export function renderTransition(context: CanvasRenderingContext2D, state: GameS
         return;
     }
 
-    renderStandardFieldStack(context, state);
     if (state.transitionState.type === 'portal') {
+        renderStandardFieldStack(context, state);
         if (!state.alternateAreaInstance) {
             return;
         }
@@ -657,6 +657,7 @@ export function renderTransition(context: CanvasRenderingContext2D, state: GameS
                 const [patternCanvas, patternContext] = createCanvasAndContext(CANVAS_WIDTH, CANVAS_HEIGHT);
                 state.transitionState.patternCanvas = patternCanvas;
                 renderArea(patternContext, state, state.alternateAreaInstance, true);
+                renderHeatOverlay(patternContext, state, state.alternateAreaInstance);
                 state.transitionState.pattern = context.createPattern(state.transitionState.patternCanvas, 'repeat');
             }
             context.save();
@@ -675,6 +676,7 @@ export function renderTransition(context: CanvasRenderingContext2D, state: GameS
             context.restore();
         }
     } else if (state.transitionState.type === 'fade') {
+        renderStandardFieldStack(context, state);
         if (state.transitionState.time <= FADE_OUT_DURATION) {
             context.save();
                 const p = Math.min(1, 1.5 * state.transitionState.time / FADE_OUT_DURATION);
@@ -691,6 +693,7 @@ export function renderTransition(context: CanvasRenderingContext2D, state: GameS
             context.restore();
         }
     } else {
+        renderStandardFieldStack(context, state);
         const x = state.hero.x + state.hero.w / 2 - state.camera.x;
         const y = state.hero.y + 2 - state.camera.y;
         if (state.transitionState.time <= CIRCLE_WIPE_OUT_DURATION) {

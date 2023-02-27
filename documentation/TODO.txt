@@ -43,7 +43,6 @@ Current tasks:
     - Fix loot on staff causes the loot to move in strange ways
     - Make sure hero can fall into a 1x1 pit while wearing the cloak
     - Share google doc with Nick with zone descriptions to use as a guide for BGM
-    - Hot overlay doesn't render during transition to spirit world.
 
     - Add hot logic to doors which will make them render warning state that the connected area is super hot.
         - Maybe just use flame particles for this for now.
