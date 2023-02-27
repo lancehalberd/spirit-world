@@ -39,14 +39,13 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Hot overlay doesn't render during transition to spirit world.
     - Prevent jumping north into southern facing walls
-    - Iron skin should protect spirit energy from burning damage
-    - Possibly reduce the rate of burning damage from hot rooms
     - Clear burn duration on death/revive
     - Fix loot on staff causes the loot to move in strange ways
     - Make sure hero can fall into a 1x1 pit while wearing the cloak
     - Fix defeated enemies are briefly visible during screen transitions.
+    - Share google doc with Nick with zone descriptions to use as a guide for BGM
+    - Hot overlay doesn't render during transition to spirit world.
 
     - Add hot logic to doors which will make them render warning state that the connected area is super hot.
         - Maybe just use flame particles for this for now.
@@ -153,6 +152,7 @@ Current tasks:
     - Mysteries
         - Lava appears under floor 2 in the middle of void tree fight
         - Certain tiles can be frozen in lava on voidFlame
+        - Sometimes the vanara forest theme continues to play after leaving the area.
 
     - Increase world map super tile size to at least 48x48 bu try 64x64
         - Change crater to single 64x64 tile if it is supported

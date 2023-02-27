@@ -162,22 +162,19 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
         if (hero.wading) {
             hero.burnDuration -= FRAME_LENGTH;
         }
-        // If the hero has magic, half of burning damage applies to magic and half applies to their life.
-        if (hero.magic > 0) {
+        if (hero.ironSkinLife > 0) {
+            // If the hero has iron skin, they only take half as much damage to the iron skin and nothing from life/magic.
+            hero.ironSkinLife = Math.max(0, hero.ironSkinLife - hero.burnDamage / 2 * FRAME_LENGTH / 1000);
+        } else if (hero.magic > 0) {
+            // If the hero has magic, half of burning damage applies to magic and half applies to their life.
             const drainCoefficient = state.hero.magicRegen ? 4 / state.hero.magicRegen : 0;
             state.hero.magic -= drainCoefficient * 10 * hero.burnDamage / 2 * FRAME_LENGTH / 1000;
             // This will result in a 1 second cooldown by default for a 2 second burn.
             state.hero.increaseMagicRegenCooldown(10);
-            // If the hero has iron skin, no burning damage applies to life so long as they still have magic.
-            if (!(hero.ironSkinLife > 0)) {
-                hero.life = Math.max(0, hero.life - hero.burnDamage / 2 * FRAME_LENGTH / 1000);
-            }
+            hero.life = Math.max(0, hero.life - hero.burnDamage / 2 * FRAME_LENGTH / 1000);
         } else {
-            if (hero.ironSkinLife > 0) {
-                hero.ironSkinLife = Math.max(0, hero.ironSkinLife - hero.burnDamage * FRAME_LENGTH / 1000);
-            } else {
-                hero.life = Math.max(0, hero.life - hero.burnDamage * FRAME_LENGTH / 1000);
-            }
+            // 100% of burn damage goes to life without iron skin or magic.
+            hero.life = Math.max(0, hero.life - hero.burnDamage * FRAME_LENGTH / 1000);
         }
         if (hero.burnDuration % 40 === 0) {
             const hitbox = hero.getHitbox(state);
@@ -217,7 +214,7 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
 export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero) {
     // Hero takes one damage every half second while in a hot room without the fire blessing.
     if (!editingState.isEditing && state.areaSection?.isHot && !hero.passiveTools.fireBlessing) {
-        hero.applyBurn(1, 500);
+        hero.applyBurn(0.5, 500);
     }
     let activeAirBubbles: AirBubbles = null;
     for (const object of hero.area.objects) {
