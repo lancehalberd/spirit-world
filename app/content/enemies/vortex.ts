@@ -108,6 +108,9 @@ enemyDefinitions.vortex = {
     render(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) {
     },
     renderShadow(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) {
+        if (enemy.status === 'gone' || enemy.status === 'hidden') {
+            return;
+        }
         const hitbox = enemy.getHitbox(state);
         const armCount = 6;
         const x = hitbox.x + hitbox.w / 2, y = hitbox.y + hitbox.h / 2;

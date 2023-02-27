@@ -20,6 +20,7 @@ export function returnToSpawnLocation(state: GameState) {
     state.hero.isInvisible = false;
     state.hero.activeStaff = null;
     state.hero.frozenDuration = 0;
+    state.hero.burnDuration = 0;
     state.hero.vx = 0;
     state.hero.vy = 0;
     state.hero.vz = 0;

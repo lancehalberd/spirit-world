@@ -322,6 +322,9 @@ enemyDefinitions.floorEye = {
     drawPriority: 'background',
     canBeKnockedBack: false,
     renderShadow(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
+        if (enemy.status === 'gone' || enemy.status === 'hidden') {
+            return;
+        }
         if (isUnderTile(state, enemy)) {
             if (state.hero.passiveTools.trueSight) {
                 renderIndicator(context, enemy.getHitbox(), enemy.animationTime);

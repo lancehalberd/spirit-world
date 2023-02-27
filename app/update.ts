@@ -323,6 +323,8 @@ function updateDefeated(state: GameState) {
     if (state.hero.hasRevive) {
         state.defeatState.reviving = true;
         state.hero.hasRevive = false;
+        state.hero.frozenDuration = 0;
+        state.hero.burnDuration = 0;
     }
     if (state.defeatState.reviving) {
         // Show a burst of particles right before the MC gets up
