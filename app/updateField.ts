@@ -125,6 +125,7 @@ export function updateAreaObjects(this: void, state: GameState, area: AreaInstan
         }
         object.update?.(state);
         if (object.area && !object.ignorePits && object.getHitbox) {
+            object.groundHeight = 0;
             // Objects that can fall in pits are assumed to fall to the ground when not supported.
             if (object.z > 0) {
                 object.z = Math.max(0, object.z - 1);
@@ -137,11 +138,12 @@ export function updateAreaObjects(this: void, state: GameState, area: AreaInstan
                     continue;
                 }
                 if (otherObject.behaviors?.groundHeight > 0 && rectanglesOverlap(hitbox, otherObject.getHitbox())) {
-                    object.z = Math.max(object.z, otherObject.behaviors?.groundHeight);
+                    object.groundHeight = Math.max(object.groundHeight, otherObject.behaviors?.groundHeight);
                 } else if (otherObject.behaviors?.groundHeight > 0) {
                     //console.log(hitbox, otherObject.getHitbox());
                 }
             }
+            object.z = Math.max(object.z, object.groundHeight);
             const { tileBehavior } = getTileBehaviorsAndObstacles(state, object.area, {x, y});
             if (tileBehavior?.pit  && !(object.z > 0)) {
                 const animation = new AnimationEffect({

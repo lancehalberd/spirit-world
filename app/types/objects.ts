@@ -89,6 +89,8 @@ export interface ObjectInstance {
     x: number
     y: number
     z?: number
+    // Stores the last calculated ground height for this object.
+    groundHeight?: number
     height?: number
     status: ObjectStatus
     // This status can be set on certain switch types to make them not count towards required

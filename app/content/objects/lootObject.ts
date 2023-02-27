@@ -127,6 +127,7 @@ export class LootObject implements ObjectInstance {
     x: number;
     y: number;
     z: number = 0;
+    groundHeight = 0;
     status: ObjectStatus;
     time = 0;
     constructor(state: GameState, definition: LootObjectDefinition) {
@@ -271,7 +272,7 @@ export class LootDropObject extends LootObject {
     alwaysReset = true;
     isObject = <const>true;
     update(state: GameState) {
-        if (this.z > 0 || this.vz > 0) {
+        if (this.z > (this.groundHeight || 0) || this.vz > 0) {
             this.x += this.vx;
             this.y += this.vy;
             this.z += this.vz;
