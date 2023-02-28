@@ -39,7 +39,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Charging beetles can get stuck in southern cliffs in tomb big chest room.
     - Revealing teleporter in tomb back should make secret chime.
     - Share google doc with Nick with zone descriptions to use as a guide for BGM
 

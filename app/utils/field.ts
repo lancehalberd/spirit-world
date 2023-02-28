@@ -21,6 +21,7 @@ export function canTeleportToCoords(state: GameState, hero: Hero, {x, y}: Tile):
 export function canSomersaultToCoords(state: GameState, hero: Hero, {x, y}: Tile): boolean {
     return isTileOpen(state, hero.area, {x, y}, {canSwim: true, canFall: true});
 }
+window['canSomersaultToCoords'] = canSomersaultToCoords;
 
 export function isTileOpen(state: GameState, area: AreaInstance, {x, y}: Tile, movementProperties: MovementProperties): boolean {
    /* return isPointOpen(state, area, {x: x + 2, y: y + 2}, movementProperties) &&
@@ -41,9 +42,13 @@ export function isPointOpen(
 ): boolean {
     const tx = Math.floor(x / 16);
     const ty = Math.floor(y / 16);
+    // Point is not considered open if it is not in either the current or next area section.
     if (!state.areaSection || tx < state.areaSection.x || tx >= state.areaSection.x + state.areaSection.w
         || ty < state.areaSection.y || ty >= state.areaSection.y + state.areaSection.h) {
-        return false;
+        if (!state.nextAreaSection || tx < state.nextAreaSection.x || tx >= state.nextAreaSection.x + state.nextAreaSection.w
+            || ty < state.nextAreaSection.y || ty >= state.nextAreaSection.y + state.nextAreaSection.h) {
+            return false;
+        }
     }
     const tileBehavior = area?.behaviorGrid[ty]?.[tx];
     const sy = (y | 0) % 16;

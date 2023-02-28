@@ -72,7 +72,12 @@ export function isMovementBlocked(
         }
     }
     if (!walkableObject) {
-        if (isAbove && (!behaviors?.isVeryTall || !movementProperties.canJump)) {
+        // Actors that cannot jump are not allowed to walk over the tips of ledges.
+        if (isAbove && !movementProperties.canJump) {
+            return {};
+        }
+        // Once a pixel is over the tip of a ledge, all collisions are ignored except for with very tall objects/tiles.
+        if (isAbove && !behaviors?.isVeryTall) {
             return false;
         }
         if (actor
