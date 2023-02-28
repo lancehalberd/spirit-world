@@ -147,8 +147,8 @@ export class Door implements ObjectInstance {
         // 'closedEnemy' doors will start open and only close when we confirm there are enemies in the current
         // are section. This way we don't play the secret chime every time we enter a room with a closed enemy
         // door where the enemies are already defeated (or there are not yet enemies).
-        if (this.definition.status === 'closedEnemy' && !this.area?.enemies.length) {
-            this.changeStatus(state, 'normal');
+        if (this.definition.status === 'closedEnemy') {
+            this.changeStatus(state, !this.area?.enemies.length ? 'normal' : 'closedEnemy');
         }
     }
     getParts(state: GameState) {
@@ -180,10 +180,12 @@ export class Door implements ObjectInstance {
             this.linkedObject.changeStatus(state, status);
         }
         if (this.definition.id && isOpen && !forceOpen) {
-            // Update the other half of this door if it is in the same super tile.
+            // Update the other half of this door if it is in the same super tile and doesn't use a wipe transition.
             for (const object of (this.area?.objects || [])) {
                 if (object?.definition?.type === 'door' &&
-                    object?.definition.id === this.definition.id &&
+                    !object.definition.targetZone &&
+                    object.definition.id === this.definition.id &&
+                    object.definition.status === this.definition.status &&
                     object.status !== this.status
                 ) {
                     object.changeStatus(state, this.status);

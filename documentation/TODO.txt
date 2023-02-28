@@ -39,7 +39,24 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Make spirit world check in war temple F2 count towards war temple zone.
+    - Make hotLevel change instantly when doing a full transition.
+    - Charging beetles can get stuck in southern cliffs in tomb big chest room.
+    - REvealing teleporter in tomb back should make secret chime.
     - Share google doc with Nick with zone descriptions to use as a guide for BGM
+
+    - Improve top floor of staff tower
+    - Add new graphics for storm beast
+        - Summon lightning animation
+        - Shoot lightning animation
+        - Charge animation
+        - Idle animation
+        - Transform animation
+        - lightning ball animation
+    - New storm beast abilities
+        - Summon lightning bolt
+        - Transform into lightning and warp to one of the other attack points in between attacks
+        - Move vertically/horizontally across the screen releasing sparks
 
     - Add hot logic to doors which will make them render warning state that the connected area is super hot.
         - Maybe just use flame particles for this for now.
@@ -54,6 +71,49 @@ Current tasks:
 
     - Heavy 2x2 blocks that can only be pushed if the player has mitts
         - Start with push stairs to implement this
+
+    - Tasks before next major release
+        - Combine map marker and hint logic so they always agree.
+        - Hint signs:
+            "Want a hint?" or "20 Jade for a hint?"
+        - Tomb
+            Add Taunts to boss (maybe change these to sound like a machine)
+                - On blocking attacks: "Attacks are useless against my stone skin"
+                - Charging laser: "Charging laser..."
+                - Preparing punch: "My punch is like a cannon."
+                - Targeted slam: "I will crush you!"
+                - Preparing flurry: "Beware my wrath!"
+                - On rage: "That was a lucky shot!" / "Enough of this!"
+                - Preparing strafe laser: "There's no escape!" / "Just try and dodge this..."
+
+        - Cocoon
+            - Fix shallow water in floor 2
+            - Improve barrier burst Instructions
+                - Instructions change depending on your state.
+                - "Press > to open your inventory and assign Spirit Cloak to X/Y"
+                - "Press X to create a Spirit Barrier"
+                - "Hold X to use the Barrier Burst Technique"
+                - Instructions will always display in this area, even after activating the switches
+            - Astral projection of boss size scales with health to 1/4 < 25%, 1/2 < 50%
+            - Astral projection starts with 0 life recharging on the boss
+            - Astral projection lifebar depletes over time and as it uses skills
+            - Astral projection still returns to the boss to recharge when its life is depleted
+            - Add taunts to boss that give progressively useful hints for defeating it over time
+                - When the body starts regenerating and they have not damaged the boss in 20s and boss health > 6)
+                    health > 6 "I can do this all day!"
+                    health > 2 "I'm not done yet!"
+                    "You must be getting tired too!"
+                - If they damage the projection
+                    no damage to boss in 30s "Attacking my projection will only slow me down."
+                    no damage to boss in 45s "My real body is beyond the reach of your weapons."
+                    no damage to boss in 60s "Everything is there for a reason."
+                    no damage to boss in 75s "The boulders are important."
+                - If the player runs into the boss with their astral projection
+                    "Your Astral Body is too weak to harm me."
+                - Taunts for skills
+                - Taunts when damaged
+        - Redesign Helix dungeon with updated graphics and mechanics
+
 
 
     - Add save statues
@@ -193,10 +253,6 @@ Current tasks:
 
     - Update logic to account for clone throw over obstacles?
         - Wait on this until we have adjusted any obstacles we don't want to allow this for.
-
-    - Cocoon boss
-        - Make astral projection spawn from the boss small, grow, then approach the player to attack
-        before becoming small again and returning to the boss.
 
     Puzzle ideas
         - Use a clone to stand on a switch to hold a door open.
