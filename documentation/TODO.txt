@@ -39,10 +39,9 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Make spirit world check in war temple F2 count towards war temple zone.
     - Make hotLevel change instantly when doing a full transition.
     - Charging beetles can get stuck in southern cliffs in tomb big chest room.
-    - REvealing teleporter in tomb back should make secret chime.
+    - Revealing teleporter in tomb back should make secret chime.
     - Share google doc with Nick with zone descriptions to use as a guide for BGM
 
     - Improve top floor of staff tower

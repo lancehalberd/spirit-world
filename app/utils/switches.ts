@@ -17,7 +17,7 @@ export function checkIfAllSwitchesAreActivated(state: GameState, area: AreaInsta
     if (!areAllSwitchesActivated(state, area, switchInstance)) {
         return;
     }
-    for (const object of area.objects) {
+    for (const object of [...area.objects, ...(area.alternateArea?.objects || [])]) {
         if (object.definition?.id === switchInstance.definition.targetObjectId) {
             activateTarget(state, object, true);
         }

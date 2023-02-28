@@ -1449,7 +1449,7 @@ const f1_0x0: AreaDefinition = {
         {status: "normal", id: "warTemple:1:0x0-frostBeetle-3", spirit: true, x: 260, y: 24, type: "enemy", enemyType: "frostBeetle", d: "down", params: {}},
         {status: "normal", id: "", linked: true, spirit: true, x: 96, y: 368, targetObjectId: "warTempleCrackedPot", type: "indicator"},
         {status: "normal", id: "", linked: true, spirit: true, x: 112, y: 384, type: "indicator"},
-        {status: "hiddenSwitch", id: "warTempleHugeMoney", linked: true, spirit: false, x: 192, y: 304, type: "chest", lootType: "money", lootAmount: 300},
+        {status: "hiddenSwitch", id: "warTempleHugeMoney", linked: false, spirit: false, x: 192, y: 304, type: "chest", lootType: "money", lootAmount: 300},
         {status: "normal", id: "", linked: true, x: 192, y: 448, type: "indicator"},
     ],
     sections: [
@@ -1583,7 +1583,6 @@ const sf1_0x0: AreaDefinition = {
         {status: "normal", id: "warTempleHugeMoneySwitch", spirit: true, x: 192, y: 448, type: "floorSwitch", linked: true, targetObjectId: "warTempleHugeMoney"},
         {status: "normal", id: "", linked: true, spirit: false, x: 96, y: 368, type: "indicator"},
         {status: "normal", id: "warTemple:s1:0x0-floorSwitch-0", spirit: true, x: 112, y: 384, targetObjectId: "spiritDoor", type: "floorSwitch", linked: true},
-        {status: "hiddenSwitch", id: "warTempleHugeMoney", linked: true, spirit: true, x: 192, y: 304, type: "chest", lootType: "money", lootAmount: 300},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16},
