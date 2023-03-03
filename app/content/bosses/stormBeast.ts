@@ -8,7 +8,7 @@ import { allTiles } from 'app/content/tiles';
 import { omniAnimation } from 'app/content/enemyAnimations';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { renderLightningCircle } from 'app/render/renderLightning';
-import { createAnimation, drawFrame, drawFrameAt } from 'app/utils/animations';
+import { createAnimation, drawFrame, drawFrameAt, getFrame } from 'app/utils/animations';
 import { createCanvasAndContext, debugCanvas } from 'app/utils/canvas';
 import { addEffectToArea } from 'app/utils/effects';
 import {
@@ -76,7 +76,8 @@ Frame 8 is the warning. Frame 9 is at 20 FPS and when the attack begins. Frames 
 Transformed - 12-13 loop. Runs at 2 FPS.
 */
 
-const stormBeastGeometry = {w: 156, h: 121, content: {x: 48, y: 22, w: 60, h: 90}};
+// The hitbox won't rotate with the frame so we use a fairly small square hitbox that will be approximately correct regardless of rotation.
+const stormBeastGeometry = {w: 156, h: 121, content: {x: 53, y: 39, w: 50, h: 50}};
 const stormBeastFlyingAnimation = createAnimation('gfx/enemies/stormbeast1.png', stormBeastGeometry, {cols: 4, duration: 10});
 const stormBeastPrepareCastAnimation = createAnimation('gfx/enemies/stormbeast1.png', stormBeastGeometry, {x: 4, cols: 1, duration: 10});
 const stormBeastCastAnimation = createAnimation('gfx/enemies/stormbeast1.png', stormBeastGeometry, {x: 5, cols: 1, duration: 10});
@@ -96,6 +97,27 @@ const stormBeastAnimations = {
     attack: omniAnimation(stormBeastAttackAnimation),
     attackRecover: omniAnimation(stormBeastAttackRecoverAnimation),
     ball: omniAnimation(stormBeastBallAnimation),
+}
+
+const stormBeastFlyingGlowAnimation = createAnimation('gfx/enemies/stormbeast2.png', stormBeastGeometry, {cols: 4, duration: 10});
+const stormBeastPrepareCastGlowAnimation = createAnimation('gfx/enemies/stormbeast2.png', stormBeastGeometry, {x: 4, cols: 1, duration: 10});
+const stormBeastCastGlowAnimation = createAnimation('gfx/enemies/stormbeast2.png', stormBeastGeometry, {x: 5, cols: 1, duration: 10});
+const stormBeastChargingGlowAnimation = createAnimation('gfx/enemies/stormbeast2.png', stormBeastGeometry, {x: 6, cols: 2, duration: 10});
+const stormBeastPrepareAttackGlowAnimation = createAnimation('gfx/enemies/stormbeast2.png', stormBeastGeometry, {x: 7, cols: 1, duration: 10});
+const stormBeastAttackGlowAnimation = createAnimation('gfx/enemies/stormbeast2.png', stormBeastGeometry, {x: 8, cols: 1, duration: 10});
+const stormBeastAttackRecoverGlowAnimation = createAnimation('gfx/enemies/stormbeast2.png', stormBeastGeometry, {x: 9, cols: 2, duration: 10});
+const stormBeastBallGlowAnimation = createAnimation('gfx/enemies/stormbeast2.png', stormBeastGeometry, {x: 11, cols: 2, duration: 10});
+
+const stormBeastGlowAnimations = {
+    idle: omniAnimation(stormBeastFlyingGlowAnimation),
+    flying: omniAnimation(stormBeastFlyingGlowAnimation),
+    prepareCast: omniAnimation(stormBeastPrepareCastGlowAnimation),
+    cast: omniAnimation(stormBeastCastGlowAnimation),
+    charging: omniAnimation(stormBeastChargingGlowAnimation),
+    prepareAttack: omniAnimation(stormBeastPrepareAttackGlowAnimation),
+    attack: omniAnimation(stormBeastAttackGlowAnimation),
+    attackRecover: omniAnimation(stormBeastAttackRecoverGlowAnimation),
+    ball: omniAnimation(stormBeastBallGlowAnimation),
 }
 
 const cloudFormations = [
@@ -381,7 +403,7 @@ const stormBeastLightningAbility = {
     cooldown: 2000,
     initialCharges: 2,
     charges: 2,
-    prepTime: 400,
+    prepTime: 600,
     recoverTime: 400,
 }
 
@@ -403,11 +425,45 @@ enemyDefinitions.stormBeast = {
         }
         return enemy.defaultOnHit(state, hit);
     },
+    renderShadow(this: void, context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) {
+        const animation = stormBeastGlowAnimations[enemy.currentAnimationKey]?.down;
+        if (animation) {
+            const frame = getFrame(animation, enemy.animationTime);
+            enemy.defaultRender(context, state, frame);
+        }
+    },
     renderOver(this: void, context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) {
         if (enemy.currentAnimationKey === 'ball') {
             const circle = getBallLightningCircle(enemy);
-            renderLightningCircle(context, {...circle, r: circle.r + 8});
+            renderLightningCircle(context, {...circle, r: circle.r + 8}, 4, 50);
         }
+        if (enemy.currentAnimationKey === 'prepareCast') {
+            const hitbox = enemy.getHitbox();
+            const circle = {
+                x: hitbox.x + hitbox.w / 2 - 30 * Math.sin(enemy.rotation),
+                y: hitbox.y + hitbox.h / 2 + 30 * Math.cos(enemy.rotation),
+                r: Math.min(32, 8 + enemy.animationTime / 10),
+            };
+            // This is based on the prep time for the lightning bolt animation and causes
+            // the circle to rapidly shrink for the last 200ms.
+            //if (enemy.animationTime > 400) {
+            //    circle.r = Math.max(0, 40 - (enemy.animationTime - 400) / 5);
+            //}
+            if (circle.r > 4) {
+                renderLightningCircle(context, circle, 4, 50);
+            }
+        }
+        /*if (enemy.currentAnimationKey === 'cast') {
+            const hitbox = enemy.getHitbox();
+            const circle = {
+                x: hitbox.x + hitbox.w / 2 - 30 * Math.sin(enemy.rotation),
+                y: hitbox.y + hitbox.h / 2 + 30 * Math.cos(enemy.rotation),
+                r: Math.max(0, 40 - enemy.animationTime / 4),
+            };
+            if (circle.r > 4) {
+                renderLightningCircle(context, circle, 4, 50);
+            }
+        }*/
     },
 };
 
@@ -420,14 +476,20 @@ function faceCenter(state: GameState, enemy: Enemy): void {
 }
 
 function getBallLightningCircle(enemy: Enemy): Circle {
-    const r = Math.min(40, enemy.animationTime / 100);
+    const r = Math.min(32, enemy.animationTime / 20);
     const hitbox = enemy.getHitbox();
-    return {x: hitbox.x + hitbox.w / 2, y: hitbox.y + hitbox.h / 2, r};
+    return {
+        x: hitbox.x + hitbox.w / 2,
+        y: hitbox.y + hitbox.h / 2,
+        r,
+    };
 }
 
 function leaveScreen(enemy: Enemy): void {
     enemy.setMode('leave');
-    enemy.changeToAnimation('flying');
+    if (!(enemy.params.enrageTime > 0)) {
+        enemy.changeToAnimation('flying');
+    }
     const theta = Math.random() * 2 * Math.PI;
     enemy.rotation = theta - Math.PI / 2;
     enemy.params.targetVector = {x: Math.cos(theta), y: Math.sin(theta)};
@@ -450,7 +512,7 @@ function updateStormBeast(this: void, state: GameState, enemy: Enemy): void {
     }
     // While the beast is a ball of lightning, it moves super fast and does AoE lightning damage around it.
     if (enemy.currentAnimationKey === 'ball') {
-        enemy.speed = 10;
+        enemy.speed = 6;
         hitTargets(state, enemy.area, {
             hitCircle: getBallLightningCircle(enemy),
             damage: 4,
@@ -461,6 +523,16 @@ function updateStormBeast(this: void, state: GameState, enemy: Enemy): void {
         enemy.speed = 4;
     }
     const stormHeart = getStormHeart(state, enemy.area);
+    const maxLife = enemy.enemyDefinition.life;
+    if (isEnemyDefeated(stormHeart)) {
+        if (enemy.life <= maxLife * 2 / 3 && enemy.params.enrageLevel === 0) {
+            enemy.params.enrageLevel = 1;
+            enemy.params.enrageTime = 6500;
+        } else if (enemy.life <= maxLife * 1 / 3 && enemy.params.enrageLevel === 1) {
+            enemy.params.enrageLevel = 2;
+            enemy.params.enrageTime = 8500;
+        }
+    }
     const target = getNearbyTarget(state, enemy, 2000, enemy.area.allyTargets);
     // The storm beast teleports to the center of the screen as a ball of lightning.
     if (enemy.mode === 'enter') {
@@ -477,11 +549,13 @@ function updateStormBeast(this: void, state: GameState, enemy: Enemy): void {
         enemy.y += enemy.vy;
         if (hasEnemyLeftSection(state, enemy, 48) && enemy.modeTime > 2000) {
             enemy.setMode('choose');
-            enemy.changeToAnimation('idle');
         }
         return;
     }
-    const maxLife = enemy.enemyDefinition.life;
+    const isEnraged = enemy.params.enrageTime > 0;
+    if (isEnraged) {
+        enemy.params.enrageTime -= FRAME_LENGTH;
+    }
     if (enemy.mode === 'transform') {
         if (enemy.modeTime <= 100) {
             enemy.changeToAnimation('prepareCast');
@@ -517,7 +591,13 @@ function updateStormBeast(this: void, state: GameState, enemy: Enemy): void {
         }
         return;
     }
-    if (!enemy.activeAbility && enemy.life < enemy.enemyDefinition.life * 2 / 3 && !isEnemyDefeated(stormHeart)) {
+    if (!enemy.activeAbility && enemy.life < enemy.enemyDefinition.life * 2 / 3
+        && !isEnemyDefeated(stormHeart) && enemy.currentAnimationKey !== 'ball'
+    ) {
+        enemy.setMode('transform');
+        return;
+    }
+    if (isEnraged && enemy.currentAnimationKey !== 'ball') {
         enemy.setMode('transform');
         return;
     }
@@ -536,19 +616,29 @@ function updateStormBeast(this: void, state: GameState, enemy: Enemy): void {
         }
         return;
     }
-
     if (enemy.mode === 'choose') {
         // Occasionally the Storm Beast will just fly across the screen at the player.
-        if (target && Math.random() <= 0.2) {
+        if (isEnraged || Math.random() <= 0.2) {
             const theta = 2 * Math.PI * Math.random();
             enemy.x = 256 + 400 * Math.cos(theta);
             enemy.y = 256 + 400 * Math.sin(theta);
-            enemy.params.targetVector = getVectorToTarget(state, enemy, target);
-            enemy.vx = enemy.params.targetVector.x;
-            enemy.vy = enemy.params.targetVector.y;
-            enemy.rotation = Math.atan2(enemy.vy, enemy.vx) - Math.PI / 2;
+            if (target) {
+                enemy.params.targetVector = getVectorToTarget(state, enemy, target);
+            } else {
+                const { section } = getAreaSize(state);
+                enemy.params.targetVector = {
+                    x: section.x + section.w / 2 - enemy.x,
+                    y: section.y + section.h / 2 - enemy.y,
+                };
+            }
+            enemy.vx = 0;
+            enemy.vy = 0;
+            enemy.rotation = Math.atan2(enemy.params.targetVector.y, enemy.params.targetVector.x) - Math.PI / 2;
             enemy.setMode('charge');
-            enemy.changeToAnimation('charging');
+            // Beast stays in ball lightning form the entire enrage phase.
+            if (!isEnraged) {
+                enemy.changeToAnimation('charging');
+            }
             return;
         }
         // Usually the Storm Beast will pick a location near the platform to fly to
@@ -575,7 +665,28 @@ function updateStormBeast(this: void, state: GameState, enemy: Enemy): void {
         return;
     }
     if (enemy.mode === 'charge') {
-        enemy.changeToAnimation('charging');
+        if (isEnraged && enemy.modeTime % 200 === 0) {
+            enemy.speed = 3;
+            // This is already orthogonal to the direction the beast is moving.
+            let theta = enemy.rotation;
+            if (enemy.modeTime % 400 === 0) {
+                theta += Math.PI;
+            }
+            const dx = Math.cos(theta), dy = Math.sin(theta);
+            const hitbox = enemy.getHitbox();
+            const spark = new Spark({
+                x: hitbox.x + hitbox.w / 2 + 4 * dx,
+                y: hitbox.y + hitbox.h / 2 + 4 * dy,
+                vx: 2 * dx,
+                vy: 2 * dy,
+                damage: 2,
+                ttl: 2000,
+                hitCircle: {
+                    x: 0, y: 0, r: 8
+                },
+            });
+            addEffectToArea(state, enemy.area, spark);
+        }
         accelerateInDirection(state, enemy, enemy.params.targetVector);
         enemy.x += enemy.vx;
         enemy.y += enemy.vy;

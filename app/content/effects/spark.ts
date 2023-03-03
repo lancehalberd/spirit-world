@@ -36,13 +36,22 @@ export class Spark implements EffectInstance, Props {
     vy: number = this.props.vy ?? 0;
     vz: number = this.props.vz ?? 0;
     az: number = this.props.az ?? -0.3;
-    hitCircle = this.props.hitCircle
-        || ((!this.vx && !this.vy) ? {x: 0, y: 0, r: 6} : undefined);
-    hitRay = this.props.hitRay
-        || ((this.vx || this.vy) ? {x1: -4 * this.vx, y1 : -4 * this.vy, x2: 4 * this.vx, y2: 4 * this.vy, r: 2} : undefined);
+    hitCircle: Circle;
+    hitRay: Ray;
     animationTime = 0;
     ttl: number = this.props.ttl ?? 2000;
-    constructor(readonly props: Props) { }
+    constructor(readonly props: Props) {
+        this.hitCircle = this.props.hitCircle;
+        this.hitRay = this.props.hitRay;
+        // If no hit type is provided, choose one automatically based on the velocity.
+        if (!this.hitCircle && !this.hitRay) {
+            if (!this.vx && !this.vy) {
+                this.hitCircle = {x: 0, y: 0, r: 6};
+            } else {
+                this.hitRay = {x1: -4 * this.vx, y1 : -4 * this.vy, x2: 4 * this.vx, y2: 4 * this.vy, r: 2};
+            }
+        }
+    }
     getHitProperties(): HitProperties {
         const hitProperties: HitProperties = {
             damage: this.damage,
@@ -93,11 +102,13 @@ export class Spark implements EffectInstance, Props {
                 r: this.hitRay.r + 2
             }, 1, 20);
         } else {
+            //const strength = this.hitCircle.r < 8 ? 1 : 2;
+            //const count = this.hitCircle.r < 8 ? 20 : 30;
             renderLightningCircle(context, {
                 x: this.x + this.hitCircle.x,
                 y: this.y + this.hitCircle.y,
                 r: this.hitCircle.r + 2
-            }, 1, 20);
+            }, 2, 20);
         }
     }
 }
