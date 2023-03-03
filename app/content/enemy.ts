@@ -59,6 +59,8 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
     // code used internally.
     ignorePits = true;
     d: Direction;
+    // Rotation is used for changing directions of certain sprites.
+    rotation: number;
     spawnX: number;
     spawnY: number;
     x: number;
@@ -751,6 +753,24 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
                 drawFrame(context, frame, { ...frame,
                     x: - (w / 2 + (frame.content?.x || 0)) * this.scale,
                     y: this.y - (frame.content?.y || 0) * this.scale - this.z,
+                    w: frame.w * this.scale,
+                    h: frame.h * this.scale,
+                });
+                /*
+                // Draw a red dot where we are flipping
+                context.fillStyle = 'red';
+                context.fillRect( -1, this.y, 2, frame.content?.h || frame.h);
+                */
+            } else if (this.rotation) {
+                // Flip the frame when facing right. We may need an additional flag for this behavior
+                // if we don't do it for all enemies on the right frames.
+                const w = frame.content?.w ?? frame.w;
+                const h = frame.content?.h ?? frame.h;
+                context.translate((this.x | 0) + (w / 2) * this.scale, (this.y | 0) + (h / 2) * this.scale - this.z);
+                context.rotate(this.rotation);
+                drawFrame(context, frame, { ...frame,
+                    x: - (w / 2 + (frame.content?.x || 0)) * this.scale,
+                    y: - (h / 2 + (frame.content?.y || 0)) * this.scale,
                     w: frame.w * this.scale,
                     h: frame.h * this.scale,
                 });

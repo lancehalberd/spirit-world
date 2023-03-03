@@ -204,13 +204,13 @@ function makeEnemyFallIntoPit(state: GameState, enemy: Enemy) {
     enemy.status = 'gone';
 }
 
-export function hasEnemyLeftSection(state: GameState, enemy: Enemy): boolean {
+export function hasEnemyLeftSection(state: GameState, enemy: Enemy, padding = 32): boolean {
     const { section } = getAreaSize(state);
     const hitbox = enemy.getHitbox(state);
-    return (enemy.vx < 0 && hitbox.x + hitbox.w < section.x - 32)
-        || (enemy.vx > 0 && hitbox.x > section.x + section.w + 32)
-        || (enemy.vy < 0 && hitbox.y + hitbox.h < section.y - 32)
-        || (enemy.vy > 0 && hitbox.y > section.y + section.h + 32);
+    return (enemy.vx < 0 && hitbox.x + hitbox.w < section.x - padding)
+        || (enemy.vx > 0 && hitbox.x > section.x + section.w + padding)
+        || (enemy.vy < 0 && hitbox.y + hitbox.h < section.y - padding)
+        || (enemy.vy > 0 && hitbox.y > section.y + section.h + padding);
 }
 
 // Returns true if the enemy moves at all.

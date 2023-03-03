@@ -3,14 +3,14 @@ import { frostHeartAnimations, shootFrostInCone } from 'app/content/bosses/frost
 import { addSlamEffect, golemHandAnimations, golemHandHurtAnimations } from 'app/content/bosses/golem';
 import { stormHeartAnimations } from 'app/content/bosses/stormBeast';
 import { FlameWall } from 'app/content/effects/flameWall';
-import { throwIceGrenadeAtLocation } from 'app/content/effects/frostGrenade';
 import { LaserBeam } from 'app/content/effects/laserBeam';
-import { LightningBolt } from 'app/content/effects/lightningBolt';
 import { LightningDischarge } from 'app/content/effects/lightningDischarge';
 import { addArcOfShockWaves, addRadialShockWaves } from 'app/content/effects/shockWave';
 import { addRadialSparks } from 'app/content/effects/spark';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { Enemy } from 'app/content/enemy';
+import { iceGrenadeAbility } from 'app/content/enemyAbilities/iceGrenade';
+import { lightningBoltAbility } from 'app/content/enemyAbilities/lightningBolt';
 import { certainLifeLootTable } from 'app/content/lootTables';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
@@ -144,17 +144,8 @@ function addLaserWarningToArea(state: GameState) {
     }
 }
 
-const iceGrenadeAbility: EnemyAbility<NearbyTargetType> = {
-    getTarget(this: void, state: GameState, enemy: Enemy): NearbyTargetType {
-        return getVectorToNearbyTarget(state, enemy, enemy.aggroRadius, enemy.area.allyTargets);
-    },
-    prepareAbility(this: void, state: GameState, enemy: Enemy, target: NearbyTargetType) {
-        enemy.changeToAnimation('attack');
-    },
-    useAbility(this: void, state: GameState, enemy: Enemy, target: NearbyTargetType): void {
-        const hitbox = target.target.getHitbox();
-        throwIceGrenadeAtLocation(state, enemy, {tx: hitbox.x + hitbox.w / 2, ty: hitbox.y + hitbox.h / 2});
-    },
+const voidTreeIceGrenadeAbility: EnemyAbility<NearbyTargetType> = {
+    ...iceGrenadeAbility,
     cooldown: 4000,
     initialCharges: 0,
     charges: 3,
@@ -181,32 +172,6 @@ const flameWallAbility: EnemyAbility<NearbyTargetType> = {
     initialCharges: 0,
     charges: 2,
     chargesRecovered: 2,
-    prepTime: 0,
-    recoverTime: 1000,
-};
-
-const lightningBoltAbility: EnemyAbility<NearbyTargetType> = {
-    getTarget(this: void, state: GameState, enemy: Enemy): NearbyTargetType {
-        return getVectorToNearbyTarget(state, enemy, enemy.aggroRadius, enemy.area.allyTargets);
-    },
-    prepareAbility(this: void, state: GameState, enemy: Enemy, target: NearbyTargetType) {
-        enemy.changeToAnimation('attack');
-    },
-    useAbility(this: void, state: GameState, enemy: Enemy, target: NearbyTargetType): void {
-        enemy.params.theta = (enemy.params.theta || 0) + Math.PI / 4;
-        const hitbox = target.target.getHitbox();
-        const lightningBolt = new LightningBolt({
-            damage: 4,
-            x: hitbox.x + hitbox.w / 2,
-            y: hitbox.y + hitbox.h / 2,
-            shockWaveTheta: enemy.params.theta,
-        });
-        addEffectToArea(state, enemy.area, lightningBolt);
-    },
-    cooldown: 4000,
-    initialCharges: 0,
-    charges: 3,
-    chargesRecovered: 3,
     prepTime: 0,
     recoverTime: 1000,
 };
@@ -313,7 +278,7 @@ enemyDefinitions.voidFrost = {
     showHealthBar: true, isImmortal: true,
     canBeKnockedBack: false,
     aggroRadius: 144,
-    abilities: [iceGrenadeAbility],
+    abilities: [voidTreeIceGrenadeAbility],
     immunities: ['ice'],
     elementalMultipliers: {'fire': 2, 'lightning': 1.5},
 };
@@ -344,7 +309,7 @@ enemyDefinitions.voidTree = {
     abilities: [
         summonVoidHandAbility, giantLaserAbility,
         flameWallAbility,
-        iceGrenadeAbility,
+        voidTreeIceGrenadeAbility,
         dischargeAbility, lightningBoltAbility,
     ],
     // void tree is immune to all damage types until one of the hearts is destroyed.
@@ -471,7 +436,7 @@ function updateVoidTree(this: void, state: GameState, enemy: Enemy): void {
         enemy.enemyDefinition.immunities.push('ice');
         useSpinningFrostAttack(state, enemy);
     } else {
-        enemy.getAbility(iceGrenadeAbility).charges = 0;
+        enemy.getAbility(voidTreeIceGrenadeAbility).charges = 0;
     }
     if (hasStorm) {
         enemy.enemyDefinition.immunities.push('lightning');

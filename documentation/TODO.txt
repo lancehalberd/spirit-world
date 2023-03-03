@@ -39,20 +39,8 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Revealing teleporter in tomb back should make secret chime.
-    - Share google doc with Nick with zone descriptions to use as a guide for BGM
-
     - Improve top floor of staff tower
-    - Add new graphics for storm beast
-        - Summon lightning animation
-        - Shoot lightning animation
-        - Charge animation
-        - Idle animation
-        - Transform animation
-        - lightning ball animation
     - New storm beast abilities
-        - Summon lightning bolt
-        - Transform into lightning and warp to one of the other attack points in between attacks
         - Move vertically/horizontally across the screen releasing sparks
 
     - Add hot logic to doors which will make them render warning state that the connected area is super hot.
@@ -111,8 +99,6 @@ Current tasks:
                 - Taunts when damaged
         - Redesign Helix dungeon with updated graphics and mechanics
 
-
-
     - Add save statues
         - Sky Palace
         - Gauntlet
@@ -123,6 +109,8 @@ Current tasks:
         - Lab
 
     - Update save statue dialog
+
+    - Ask Jon for falling animation with cloud poof for falling through clouds.
 
     - When hero/clone is falling, draw it behind all other sprites (on top of the background).
         - Try using getDrawPriority to apply this to clone, we may need a new priority 'afterBackground' to force it to draw on top of all background elements (for example, it should be drawn on top of pit entrance objects).

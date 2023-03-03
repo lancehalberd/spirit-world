@@ -93,7 +93,7 @@ const f0_0x0: AreaDefinition = {
         {x: 0, y: 0, w: 32, h: 32},
     ],
 };
-const f0_0x1: AreaDefinition = {
+const f0_1x0: AreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -192,7 +192,7 @@ const f0_0x1: AreaDefinition = {
         {x: 16, y: 0, w: 16, h: 32},
     ],
 };
-const f0_0x2: AreaDefinition = {
+const f0_2x0: AreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -283,7 +283,7 @@ const f0_0x2: AreaDefinition = {
         {x: 0, y: 0, w: 32, h: 32},
     ],
 };
-const f0_1x0: AreaDefinition = {
+const f0_0x1: AreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -619,7 +619,7 @@ const f0_1x1: AreaDefinition = {
         {x: 16, y: 0, w: 16, h: 32},
     ],
 };
-const f0_1x2: AreaDefinition = {
+const f0_2x1: AreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -711,9 +711,9 @@ const f0_1x2: AreaDefinition = {
     ],
 };
 const sf0_0x0: AreaDefinition = null;
-const sf0_0x1: AreaDefinition = {
+const sf0_1x0: AreaDefinition = {
     isSpiritWorld: true,
-    parentDefinition: f0_0x1,
+    parentDefinition: f0_1x0,
     layers: null,
     objects: [
         {status: "closedSwitch", id: "tombSpiritExit", x: 112, y: 0, type: "door", style: "cave", targetObjectId: "cocoonEntrance", d: "up", linked: true, spirit: true},
@@ -723,17 +723,17 @@ const sf0_0x1: AreaDefinition = {
         {status: "normal", id: "tomb:s0:1x0-floorSwitch-1", x: 64, y: 64, toggleOnRelease: true, type: "floorSwitch", spirit: true, targetObjectId: "tombSpiritExit"},
         {status: "normal", id: "", linked: true, x: 80, y: 288, type: "pushPull", spirit: true},
         {status: "normal", id: "tombTeleporter", x: 160, y: 288, type: "floorSwitch", saveStatus: "forever", targetObjectId: "tombSwitchAction"},
-        {status: "normal", id: "tombSwitchAction", x: 160, y: 256, type: "narration", message: "{removeCue}\n{flag:tombTeleporter}", delay: 0, w: 16, h: 16, saveStatus: "never", hasCustomLogic: true, customLogic: "", trigger: "activate"},
+        {status: "normal", id: "tombSwitchAction", x: 160, y: 256, type: "narration", message: "{removeCue}\n{playSound:secretChime}\n{flag:tombTeleporter}", delay: 0, w: 16, h: 16, saveStatus: "never", hasCustomLogic: true, customLogic: "", trigger: "activate"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 32},
         {x: 16, y: 0, w: 16, h: 32},
     ],
 };
-const sf0_0x2: AreaDefinition = null;
-const sf0_1x0: AreaDefinition = null;
+const sf0_2x0: AreaDefinition = null;
+const sf0_0x1: AreaDefinition = null;
 const sf0_1x1: AreaDefinition = null;
-const sf0_1x2: AreaDefinition = null;
+const sf0_2x1: AreaDefinition = null;
 const f1_0x0: AreaDefinition = {
     layers: [
         {
@@ -856,7 +856,7 @@ const f1_0x0: AreaDefinition = {
         {x: 0, y: 16, w: 32, h: 16},
     ],
 };
-const f1_0x1: AreaDefinition = {
+const f1_1x0: AreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -1014,7 +1014,7 @@ const f1_0x1: AreaDefinition = {
         {x: 0, y: 0, w: 32, h: 32},
     ],
 };
-const f1_0x2: AreaDefinition = {
+const f1_2x0: AreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -1128,7 +1128,7 @@ const f1_0x2: AreaDefinition = {
         {x: 0, y: 16, w: 32, h: 16},
     ],
 };
-const f1_1x0: AreaDefinition = {
+const f1_0x1: AreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -1343,7 +1343,7 @@ const f1_1x1: AreaDefinition = {
         {x: 0, y: 16, w: 32, h: 16},
     ],
 };
-const f1_1x2: AreaDefinition = {
+const f1_2x1: AreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -1461,32 +1461,32 @@ const f1_1x2: AreaDefinition = {
     ],
 };
 const sf1_0x0: AreaDefinition = null;
-const sf1_0x1: AreaDefinition = null;
-const sf1_0x2: AreaDefinition = null;
 const sf1_1x0: AreaDefinition = null;
+const sf1_2x0: AreaDefinition = null;
+const sf1_0x1: AreaDefinition = null;
 const sf1_1x1: AreaDefinition = null;
-const sf1_1x2: AreaDefinition = null;
+const sf1_2x1: AreaDefinition = null;
 zones.tomb = {
     key: 'tomb',
     floors: [
         {
             grid: [
-                [f0_0x0,f0_0x1,f0_0x2,],
-                [f0_1x0,f0_1x1,f0_1x2,],
+                [f0_0x0,f0_1x0,f0_2x0,],
+                [f0_0x1,f0_1x1,f0_2x1,],
             ],
             spiritGrid: [
-                [sf0_0x0,sf0_0x1,sf0_0x2,],
-                [sf0_1x0,sf0_1x1,sf0_1x2,],
+                [sf0_0x0,sf0_1x0,sf0_2x0,],
+                [sf0_0x1,sf0_1x1,sf0_2x1,],
             ],
         },
         {
             grid: [
-                [f1_0x0,f1_0x1,f1_0x2,],
-                [f1_1x0,f1_1x1,f1_1x2,],
+                [f1_0x0,f1_1x0,f1_2x0,],
+                [f1_0x1,f1_1x1,f1_2x1,],
             ],
             spiritGrid: [
-                [sf1_0x0,sf1_0x1,sf1_0x2,],
-                [sf1_1x0,sf1_1x1,sf1_1x2,],
+                [sf1_0x0,sf1_1x0,sf1_2x0,],
+                [sf1_0x1,sf1_1x1,sf1_2x1,],
             ],
         },
     ],
