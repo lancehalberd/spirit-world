@@ -1,5 +1,5 @@
 import { TextCue } from 'app/content/effects/textCue';
-import { isObjectLogicValid } from 'app/content/logic';
+import { evaluateLogicDefinition, isObjectLogicValid } from 'app/content/logic';
 import { Door } from 'app/content/objects/door';
 import { doorStyles } from 'app/content/objects/doorStyles';
 import { Teleporter } from 'app/content/objects/teleporter';
@@ -7,12 +7,13 @@ import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
 import { zones } from 'app/content/zones';
 import { setAreaSection } from 'app/utils/area';
 import { addEffectToArea } from 'app/utils/effects';
-import { directionMap, getDirection } from 'app/utils/field';
 import { enterLocation } from 'app/utils/enterLocation';
+import { directionMap, getDirection } from 'app/utils/field';
 import { findObjectInstanceById } from 'app/utils/findObjectInstanceById';
 import { fixCamera } from 'app/utils/fixCamera';
+import { isPointInShortRect } from 'app/utils/index';
 
-import { AreaInstance, EntranceDefinition, GameState, ObjectDefinition, ObjectInstance } from 'app/types';
+import { AreaInstance, EntranceDefinition, GameState, ObjectDefinition, ObjectInstance, ZoneLocation } from 'app/types';
 
 export function enterZoneByTarget(
     state: GameState,
@@ -27,10 +28,44 @@ export function enterZoneByTarget(
         console.error(`Missing zone: ${zoneKey}`);
         return false;
     }
+    const objectLocation = findObjectLocation(state, zoneKey, targetObjectId, state.areaInstance.definition.isSpiritWorld, skipObject);
+    if (!objectLocation) {
+        return false;
+    }
+    enterLocation(state, objectLocation, instant, () => {
+        const target = findEntranceById(state.areaInstance, targetObjectId, [skipObject]);
+        if (target?.getHitbox) {
+            const hitbox = target.getHitbox(state);
+            state.hero.x = hitbox.x + hitbox.w / 2 - state.hero.w / 2;
+            state.hero.y = hitbox.y + hitbox.h / 2 - state.hero.h / 2;
+            setAreaSection(state, true);
+            checkForFloorEffects(state, state.hero);
+            fixCamera(state);
+        }
+        // Technically this could also be a MarkerDefinition.
+        const definition = target.definition as EntranceDefinition;
+        if (definition.locationCue) {
+            const textCue = new TextCue(state, { text: definition.locationCue});
+            addEffectToArea(state, state.areaInstance, textCue);
+        }
+        // Entering via a door requires some special logic to orient the
+        // character to the door properly.
+        if (definition.type === 'door') {
+            enterZoneByDoorCallback(state, targetObjectId, skipObject);
+        } else if (definition.type === 'teleporter') {
+            enterZoneByTeleporterCallback(state, targetObjectId);
+        }
+        callback?.();
+    });
+    return true;
+}
+
+export function findObjectLocation(state: GameState, zoneKey: string, targetObjectId: string, checkSpiritWorldFirst = false, skipObject: ObjectDefinition = null): ZoneLocation | false {
+    const zone = zones[zoneKey];
     for (let worldIndex = 0; worldIndex < 2; worldIndex++) {
         for (let floor = 0; floor < zone.floors.length; floor++) {
             // Search the corresponding spirit/material world before checking in the alternate world.
-            const areaGrids = state.areaInstance.definition.isSpiritWorld
+            const areaGrids = checkSpiritWorldFirst
                 ? [zone.floors[floor].spiritGrid, zone.floors[floor].grid]
                 : [zone.floors[floor].grid, zone.floors[floor].spiritGrid];
             const areaGrid = areaGrids[worldIndex];
@@ -42,7 +77,7 @@ export function enterZoneByTarget(
                             if (!isObjectLogicValid(state, object)) {
                                 continue;
                             }
-                            enterLocation(state, {
+                            return {
                                 zoneKey,
                                 floor,
                                 areaGridCoords: {x, y},
@@ -50,32 +85,7 @@ export function enterZoneByTarget(
                                 y: object.y,
                                 d: state.hero.d,
                                 isSpiritWorld: inSpiritWorld,
-                            }, instant, () => {
-                                const target = findEntranceById(state.areaInstance, targetObjectId, [skipObject]);
-                                if (target?.getHitbox) {
-                                    const hitbox = target.getHitbox(state);
-                                    state.hero.x = hitbox.x + hitbox.w / 2 - state.hero.w / 2;
-                                    state.hero.y = hitbox.y + hitbox.h / 2 - state.hero.h / 2;
-                                    setAreaSection(state, true);
-                                    checkForFloorEffects(state, state.hero);
-                                    fixCamera(state);
-                                }
-                                // Technically this could also be a MarkerDefinition.
-                                const definition = target.definition as EntranceDefinition;
-                                if (definition.locationCue) {
-                                    const textCue = new TextCue(state, { text: definition.locationCue});
-                                    addEffectToArea(state, state.areaInstance, textCue);
-                                }
-                                // Entering via a door requires some special logic to orient the
-                                // character to the door properly.
-                                if (definition.type === 'door') {
-                                    enterZoneByDoorCallback(state, targetObjectId, skipObject);
-                                } else if (definition.type === 'teleporter') {
-                                    enterZoneByTeleporterCallback(state, targetObjectId);
-                                }
-                                callback?.();
-                            });
-                            return true;
+                            }
                         }
                     }
                 }
@@ -83,6 +93,29 @@ export function enterZoneByTarget(
         }
     }
     console.error('Could not find', targetObjectId, 'in', zoneKey);
+    return false;
+}
+
+export function isLocationHot(state: GameState, location: ZoneLocation): boolean {
+    const floor = zones[location.zoneKey]?.floors?.[location.floor];
+    const grid = location.isSpiritWorld ? floor?.spiritGrid : floor?.grid;
+    const areaDefinition = grid?.[location.areaGridCoords.y]?.[location.areaGridCoords.x];
+    if (!areaDefinition) {
+        console.error('Could not find area definition for location: ', location);
+        return false;
+    }
+    const x = Math.min(31, Math.max(0, (location.x + 8) / 16));
+    const y = Math.min(31, Math.max(0, (location.y + 8) / 16));
+    //console.log('is hot?', location, x, y);
+    for (const section of areaDefinition.sections) {
+        if (isPointInShortRect(x, y, section)) {
+            if (section.hotLogic) {
+                //console.log(section);
+               // console.log('Hot Logic', section.hotLogic);
+                return evaluateLogicDefinition(state, section.hotLogic, false);
+            }
+        }
+    }
     return false;
 }
 

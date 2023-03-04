@@ -86,10 +86,15 @@ export class AnimationEffect implements EffectInstance {
         this.behaviors = {};
         this.target = target;
     }
-    getHitbox(state: GameState) {
+    getHitbox() {
         const frame = getFrame(this.animation, this.animationTime);
         const originX = this.target?.x || 0, originY = (this.target?.y || 0) - (this.target?.z || 0);
         return {x: originX + this.x, y: originY + this.y - this.z, w: frame.w, h: frame.h};
+    }
+    getYDepth() {
+        const frame = getFrame(this.animation, this.animationTime);
+        const originY = (this.target?.y || 0);
+        return originY + this.y + frame.h;
     }
     update(state: GameState) {
         if (this.delay > 0) {
@@ -198,13 +203,14 @@ interface SparkleProps {
     element?: MagicElement
     target?: ObjectInstance | EffectInstance
     velocity?: {x: number, y: number, z?: number}
+    friction?: number
     z?: number
 }
 
 export function addSparkleAnimation(
-    state: GameState, area: AreaInstance, hitbox: Rect, sparkleProps: SparkleProps
+    state: GameState, area: AreaInstance, hitbox: Rect, sparkleProps: SparkleProps, overrideProps: Partial<AnimationProps> = null,
 ): void {
-    addEffectToArea(state, area, makeSparkleAnimation(state, hitbox, sparkleProps));
+    addEffectToArea(state, area, makeSparkleAnimation(state, hitbox, sparkleProps, overrideProps));
 }
 export function makeSparkleAnimation(
     state: GameState,
@@ -215,7 +221,8 @@ export function makeSparkleAnimation(
         target,
         velocity,
         z,
-    }: SparkleProps
+    }: SparkleProps,
+    overrideProps: Partial<AnimationProps> = null,
 ): AnimationEffect {
     const animation = element
         ? {
@@ -223,7 +230,7 @@ export function makeSparkleAnimation(
             ice: iceSparkleAnimation,
             lightning: lightningSparkleAnimation,
         }[element] : sparkleAnimation;
-    const animationProps: AnimationProps = {
+    let animationProps: AnimationProps = {
         animation: animation,
         delay,
         drawPriority: 'foreground',
@@ -236,8 +243,10 @@ export function makeSparkleAnimation(
         animationProps.vz = velocity.z;
     }
     if (element === 'fire') {
-        animationProps.vz = 0.3 + Math.random() / 2;
+        animationProps.az = 0.08;
+        animationProps.vz = 0.2 + Math.random() / 4;
         animationProps.vx = 0.8 * Math.random() - 0.4;
+        animationProps.friction = 0.05;
     }
     if (element === 'lightning') {
         animationProps.rotation = ((Math.random() * 4) | 0) / 4 * 2 * Math.PI;
@@ -254,6 +263,12 @@ export function makeSparkleAnimation(
         } else if (velocity?.y < 0) {
             animationProps.vy = -6;
         }
+    }
+    if (overrideProps) {
+        animationProps = {
+            ...animationProps,
+            ...overrideProps,
+        };
     }
     const effect = new AnimationEffect(animationProps);
     if (element === 'fire') {

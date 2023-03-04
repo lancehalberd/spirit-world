@@ -1,3 +1,4 @@
+import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { evaluateLogicDefinition } from 'app/content/logic';
 import { doorStyles, DoorStyle } from 'app/content/objects/doorStyles';
 import { objectHash } from 'app/content/objects/objectHash';
@@ -9,7 +10,7 @@ import {
 import { playAreaSound } from 'app/musicController';
 import { showMessage } from 'app/scriptEvents';
 import { drawFrame } from 'app/utils/animations';
-import { enterZoneByTarget } from 'app/utils/enterZoneByTarget';
+import { enterZoneByTarget, findObjectLocation, isLocationHot } from 'app/utils/enterZoneByTarget';
 import { directionMap } from 'app/utils/field';
 import { boxesIntersect, isObjectInsideTarget, isPointInShortRect, pad } from 'app/utils/index';
 import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
@@ -118,6 +119,7 @@ export class Door implements ObjectInstance {
     // This gets set to true if this instance has been opened and is used to prevent the door
     // from closing automatically when logic is refreshed.
     wasOpened: boolean = false;
+    isHot = false;
     constructor(state: GameState, definition: EntranceDefinition) {
         this.definition = definition;
         this.x = definition.x;
@@ -149,6 +151,54 @@ export class Door implements ObjectInstance {
         // door where the enemies are already defeated (or there are not yet enemies).
         if (this.definition.status === 'closedEnemy') {
             this.changeStatus(state, !this.area?.enemies.length ? 'normal' : 'closedEnemy');
+        }
+        this.refreshIsHot(state);
+    }
+    refreshIsHot(state: GameState) {
+        if (!this.area) {
+            return;
+        }
+        // For a door you can walk through, we need to check if the section on the other side is hot.
+        if (!this.definition.targetObjectId) {
+            // This is a fairly crude way of choosing a point in the section that the player ought to be
+            // in after walking through this door.
+            let gridX = state.location.areaGridCoords.x;
+            let gridY = state.location.areaGridCoords.y;
+            let x = this.x + 8 + directionMap[this.definition.d][0] * 96;
+            let y = this.y + 8 + directionMap[this.definition.d][1] * 96;
+            if (x < 0) {
+                x += 512;
+                gridX--;
+            } else if (x > 512) {
+                x -= 512
+                gridX++;
+            }
+            if (y < 0) {
+                y += 512;
+                gridY--;
+            } else if (y > 512) {
+                y -= 512
+                gridY++;
+            }
+            this.isHot = isLocationHot(state, {
+                ...state.location,
+                isSpiritWorld: this.area.definition.isSpiritWorld,
+                areaGridCoords: {x: gridX, y: gridY},
+                x,
+                y,
+                d: state.hero.d,
+            });
+            return;
+        }
+        const location = findObjectLocation(
+            state,
+            this.definition.targetZone,
+            this.definition.targetObjectId,
+            this.area.definition.isSpiritWorld,
+            this.definition
+        );
+        if (location) {
+            this.isHot = isLocationHot(state, location);
         }
     }
     getParts(state: GameState) {
@@ -338,6 +388,7 @@ export class Door implements ObjectInstance {
         this.area = area;
         area.objects.push(this);
         this.applyDoorBehaviorsToArea();
+        this.refreshIsHot(state);
     }
     getEditorHitbox(): Rect {
         const hitbox = this.getHitbox();
@@ -458,6 +509,29 @@ export class Door implements ObjectInstance {
         // Nothing to update if the hero cannot enter the door.
         if (!this.heroCanEnter(state)) {
             return;
+        }
+        if (this.status === 'normal' && this.isHot) {
+            if (state.fieldTime % 40 === 0) {
+                let hitbox = {...this.getHitbox()};
+                if (this.definition.d === 'up') {
+                    hitbox.x += 5;
+                    hitbox.w -= 10;
+                    hitbox.z = 0;
+                    hitbox.zd = hitbox.h - 8;
+                    hitbox.y += hitbox.h - 2;
+                    hitbox.h = 0;
+                } else {
+                    hitbox.y += 6;
+                    hitbox = pad(hitbox, -4);
+                }
+                addSparkleAnimation(state, this.area, hitbox, {
+                    element: 'fire',
+                }, {
+                    drawPriority: 'sprites',
+                    vx: (-1 + Math.random() / 2) * directionMap[this.definition.d][0],
+                    vy: (-1 + Math.random() / 2) * directionMap[this.definition.d][1],
+                });
+            }
         }
         // For some reason this can trigger when the door is closed after recent movement changes
         // so we reduce the

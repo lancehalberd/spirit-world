@@ -39,9 +39,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Add hot logic to doors which will make them render warning state that the connected area is super hot.
-        - Maybe just use flame particles for this for now.
-
     - Try using fade transition for material -> spirit world
         - If this isn't better, try using a circle wipe transition with a gradient instead.
 
