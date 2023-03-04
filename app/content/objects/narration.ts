@@ -1,11 +1,12 @@
 import { objectHash } from 'app/content/objects/objectHash';
+import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
 import { FRAME_LENGTH, isRandomizer } from 'app/gameConstants';
 import { setScript } from 'app/scriptEvents';
 import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
 
 import {
     AreaInstance, GameState, NarrationDefinition,
-    ObjectInstance, ObjectStatus, Rect,
+    ObjectInstance, ObjectStatus, Rect, SpecialNarrationBehavior,
 } from 'app/types';
 
 export class Narration implements ObjectInstance {
@@ -53,6 +54,10 @@ export class Narration implements ObjectInstance {
     }
     update(state: GameState) {
         if (this.status === 'gone') {
+            if (this.definition.specialBehaviorKey) {
+                const specialBehavior = specialBehaviorsHash[this.definition.specialBehaviorKey] as SpecialNarrationBehavior;
+                specialBehavior?.update(state, this);
+            }
             return;
         }
         // If the flag gets set for some reason, set this object to gone so it won't trigger.

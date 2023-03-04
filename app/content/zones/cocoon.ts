@@ -608,7 +608,7 @@ const sf1_0x0: AreaDefinition = {
         {status: "normal", id: "", linked: false, spirit: true, x: 384, y: 80, type: "crystalSwitch", timer: 100, targetObjectId: "cocoonBackTeleporter"},
         {status: "normal", id: "", linked: false, spirit: true, x: 352, y: 128, type: "crystalSwitch", timer: 100, targetObjectId: "cocoonBackTeleporter"},
         {status: "normal", id: "", linked: false, spirit: true, x: 304, y: 96, type: "crystalSwitch", timer: 100, targetObjectId: "cocoonBackTeleporter"},
-        {status: "normal", id: "cocoonBackTeleporter", x: 400, y: 176, type: "narration", message: "{addCue: Hold [B_TOOL] while the spirit barrier is active to use Barrier Burst}", trigger: "touch", delay: 0, w: 32, h: 32, invertLogic: true, customLogic: "", saveStatus: "never"},
+        {status: "normal", id: "", x: 400, y: 176, type: "narration", message: "", trigger: "touch", delay: 0, w: 32, h: 32, customLogic: "", saveStatus: "never", specialBehaviorKey: "barrierBurstInstructions"},
         {status: "normal", id: "", x: 96, y: 128, type: "pushPull"},
         {status: "normal", id: "", x: 128, y: 112, type: "pushPull"},
         {status: "normal", id: "", x: 400, y: 368, type: "pushPull"},

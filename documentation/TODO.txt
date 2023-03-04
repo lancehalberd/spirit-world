@@ -41,12 +41,6 @@ Graphics:
 Current tasks:
     - Tasks before next major release
         - Cocoon
-            - Improve barrier burst Instructions
-                - Instructions change depending on your state.
-                - "Press > to open your inventory and assign Spirit Cloak to X/Y"
-                - "Press X to create a Spirit Barrier"
-                - "Hold X to use the Barrier Burst Technique"
-                - Instructions will always display in this area, even after activating the switches
             - Astral projection of boss size scales with health to 1/4 < 25%, 1/2 < 50%
             - Astral projection starts with 0 life recharging on the boss
             - Astral projection lifebar depletes over time and as it uses skills

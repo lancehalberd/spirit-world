@@ -26,15 +26,20 @@ export class TextCue implements EffectInstance {
     isEffect = <const>true;
     x: number;
     y: number;
-    textFrames: Frame[][];
     time: number = 0;
-    priority: number = 0;
-    duration: number;
-    constructor(state, { duration = 3000, priority = 0, text }: TextCueProps) {
+    priority: number = this.props.priority ?? 0;
+    duration: number = this.props.duration ?? 3000;
+    textFrames: Frame[][];
+    constructor(state, readonly props: TextCueProps) {
         // TextCue only supports a single page of messages.
-        this.textFrames = parseMessage(state, text, CANVAS_WIDTH - 2 * padding)[0].frames;
-        this.duration = duration;
-        this.priority = priority;
+        this.textFrames = parseMessage(state, this.props.text, CANVAS_WIDTH - 2 * padding)[0].frames;
+    }
+    fadeOut() {
+        if (this.duration === 0) {
+            this.duration = this.time + fadeDuration;
+        } else {
+            this.time = Math.max(this.time, this.duration - fadeDuration);
+        }
     }
     update(state: GameState) {
         this.time += FRAME_LENGTH;
@@ -73,13 +78,19 @@ export class TextCue implements EffectInstance {
     }
 }
 
+export function findTextCue(state: GameState): TextCue | undefined {
+    for (const effect of state.areaInstance.effects) {
+        if (effect instanceof TextCue) {
+            return effect;
+        }
+    }
+}
+
 export function removeTextCue(state: GameState, priority: number = 10000): boolean {
     if (!state.areaInstance) {
         return false;
     }
-    const effect = state.areaInstance.effects.find(
-        effect => effect instanceof TextCue
-    ) as TextCue;
+    const effect = findTextCue(state);
     if (effect && effect.priority <= priority) {
         removeEffectFromArea(state, effect);
         return true;

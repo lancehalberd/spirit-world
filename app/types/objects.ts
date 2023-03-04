@@ -641,6 +641,12 @@ export interface SpecialTippableBehavior {
     apply?: (state: GameState, object: ObjectInstance) => void
 }
 
+export interface SpecialNarrationBehavior {
+    type: 'narration'
+    apply?: (state: GameState, object: ObjectInstance) => void
+    update?: (state: GameState, object: ObjectInstance) => void
+}
+
 export interface SpecialAreaBehavior {
     type: 'area'
     apply: (state: GameState, area: AreaInstance) => void
@@ -648,6 +654,7 @@ export interface SpecialAreaBehavior {
 
 export type SpecialBehavior
     = SpecialDoorBehavior
+    | SpecialNarrationBehavior
     | SpecialPushPullBehavior
     | SpecialSwitchBehavior
     | SpecialSignBehavior
