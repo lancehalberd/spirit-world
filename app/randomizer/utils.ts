@@ -733,7 +733,7 @@ export function applyLootAssignments(assignments: LootAssignment[]): void {
                 if (dialogueKey === 'streetVendor') {
                     newScript = `${beginning}{|}${flagScript}Haha, scammed you!{|}${end}`;
                 } else {
-                    newScript = `${beginning}{|}${flagScript}I'm sorry but I don't have anything for you today.{|}${end}`;
+                    newScript = `${beginning}{|}${flagScript}Huh, that's weird, I thought I had something for you!{|}${end}`;
                 }
             } else if (lootAmount) {
                 newScript = `${beginning}${flagScript}{item:${assignment.lootType}=${lootAmount}}${end}`;

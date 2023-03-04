@@ -159,7 +159,11 @@ export class Door implements ObjectInstance {
             return;
         }
         // For a door you can walk through, we need to check if the section on the other side is hot.
-        if (!this.definition.targetObjectId) {
+        if (!this.definition.targetObjectId || !this.definition.targetZone) {
+            // This logic is only valid if this door is at the same coordinates as the current super tile.
+            if (this.area !== state.areaInstance && this.area !== state.alternateAreaInstance) {
+                return;
+            }
             // This is a fairly crude way of choosing a point in the section that the player ought to be
             // in after walking through this door.
             let gridX = state.location.areaGridCoords.x;

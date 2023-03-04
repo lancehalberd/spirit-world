@@ -39,33 +39,8 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Try using fade transition for material -> spirit world
-        - If this isn't better, try using a circle wipe transition with a gradient instead.
-
-    - Forge
-        - Gold mail offered by NPC if you bring gold ore and 500 money
-
-    - Underwater clone bug: cannot detonate clones underwater, probably because spirit sight is disabled.
-
-    - Heavy 2x2 blocks that can only be pushed if the player has mitts
-        - Start with push stairs to implement this
-
     - Tasks before next major release
-        - Combine map marker and hint logic so they always agree.
-        - Hint signs:
-            "Want a hint?" or "20 Jade for a hint?"
-        - Tomb
-            Add Taunts to boss (maybe change these to sound like a machine)
-                - On blocking attacks: "Attacks are useless against my stone skin"
-                - Charging laser: "Charging laser..."
-                - Preparing punch: "My punch is like a cannon."
-                - Targeted slam: "I will crush you!"
-                - Preparing flurry: "Beware my wrath!"
-                - On rage: "That was a lucky shot!" / "Enough of this!"
-                - Preparing strafe laser: "There's no escape!" / "Just try and dodge this..."
-
         - Cocoon
-            - Fix shallow water in floor 2
             - Improve barrier burst Instructions
                 - Instructions change depending on your state.
                 - "Press > to open your inventory and assign Spirit Cloak to X/Y"
@@ -90,18 +65,40 @@ Current tasks:
                     "Your Astral Body is too weak to harm me."
                 - Taunts for skills
                 - Taunts when damaged
+        - Combine map marker and hint logic so they always agree.
+        - Hint signs:
+            "Want a hint?" or "20 Jade for a hint?"
+        - Tomb
+            Add Taunts to boss (maybe change these to sound like a machine)
+                - On blocking attacks: "Attacks are useless against my stone skin"
+                - Charging laser: "Charging laser..."
+                - Preparing punch: "My punch is like a cannon."
+                - Targeted slam: "I will crush you!"
+                - Preparing flurry: "Beware my wrath!"
+                - On rage: "That was a lucky shot!" / "Enough of this!"
+                - Preparing strafe laser: "There's no escape!" / "Just try and dodge this..."
+
         - Redesign Helix dungeon with updated graphics and mechanics
 
-    - Add save statues
-        - Sky Palace
-        - Gauntlet
-        - Holy Sanctum
-        - Crater
-        - Grand Temple/Palace (same statue)
-        - Outside War Temple/Palace (same statue)
-        - Lab
+        - Add save statues
+            - Sky Palace
+            - Gauntlet
+            - Holy Sanctum
+            - Crater
+            - Grand Temple/Palace (same statue)
+            - Outside War Temple/Palace (same statue)
+            - Lab
 
-    - Update save statue dialog
+        - Update save statue dialog
+
+    - Forge
+        - Gold mail offered by NPC if you bring gold ore and 500 money
+
+    - Heavy 2x2 blocks that can only be pushed if the player has mitts
+        - Make this a variation of push/pull object that is 32x32
+
+    - Try using fade transition for material -> spirit world
+        - If this isn't better, try using a circle wipe transition with a gradient instead.
 
     - Ask Jon for falling animation with cloud poof for falling through clouds.
 

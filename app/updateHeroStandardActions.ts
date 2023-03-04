@@ -696,38 +696,39 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         hero.actionDy = directionMap[direction][1];
         return;
     }
-    if ((hero.swimming || isUnderwater(state, hero)) && wasGameKeyPressed(state, GAME_KEY.MEDITATE)) {
-        // The meditate key can be used to quickly toggle iron boots in/under water.
-        if (hero.equipment.ironBoots) {
-            if (hero.equippedBoots !== 'ironBoots') {
-                setEquippedBoots(state, 'ironBoots');
-            } else {
-                setEquippedBoots(state, 'leatherBoots');
+    if (wasGameKeyPressed(state, GAME_KEY.MEDITATE)) {
+        if (!hero.clones.length && (hero.swimming || isUnderwater(state, hero))) {
+            // The meditate key can be used to quickly toggle iron boots in/under water.
+            if (hero.equipment.ironBoots) {
+                if (hero.equippedBoots !== 'ironBoots') {
+                    setEquippedBoots(state, 'ironBoots');
+                } else {
+                    setEquippedBoots(state, 'leatherBoots');
+                }
             }
-        }
-    } else if (wasGameKeyPressed(state, GAME_KEY.MEDITATE)
-        && !hero.isAstralProjection
-        && !isActionBlocked && (hero.passiveTools.spiritSight || hero.clones.length)
-        && !hero.heldChakram && !hero.chargingLeftTool && !hero.chargingRightTool
-    ) {
-        if (!hero.clones.length) {
-            // You can only meditate with no clones up.
-            hero.action = 'meditating';
-            hero.spiritRadius = 0;
-        } else if (hero.clones.filter(clone => !clone.isUncontrollable).length) {
-            // You can only charge clone explosion with at least one controllable clone.
-            hero.action = 'chargingCloneExplosion';
-            hero.explosionTime = 0;
-        } else {
+        } else if (!hero.isAstralProjection
+            && !isActionBlocked && (hero.passiveTools.spiritSight || hero.clones.length)
+            && !hero.heldChakram && !hero.chargingLeftTool && !hero.chargingRightTool
+        ) {
+            if (!hero.clones.length) {
+                // You can only meditate with no clones up.
+                hero.action = 'meditating';
+                hero.spiritRadius = 0;
+            } else if (hero.clones.filter(clone => !clone.isUncontrollable).length) {
+                // You can only charge clone explosion with at least one controllable clone.
+                hero.action = 'chargingCloneExplosion';
+                hero.explosionTime = 0;
+            } else {
+                return;
+            }
+            hero.actionFrame = 0;
+            hero.d = 'down';
+            if (hero.astralProjection) {
+                hero.astralProjection.d = hero.d;
+                hero.astralProjection.x = hero.x;
+                hero.astralProjection.y = hero.y;
+            }
             return;
         }
-        hero.actionFrame = 0;
-        hero.d = 'down';
-        if (hero.astralProjection) {
-            hero.astralProjection.d = hero.d;
-            hero.astralProjection.x = hero.x;
-            hero.astralProjection.y = hero.y;
-        }
-        return;
     }
 }

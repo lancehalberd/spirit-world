@@ -62,6 +62,11 @@ export function enterZoneByTarget(
 
 export function findObjectLocation(state: GameState, zoneKey: string, targetObjectId: string, checkSpiritWorldFirst = false, skipObject: ObjectDefinition = null): ZoneLocation | false {
     const zone = zones[zoneKey];
+    if (!zone) {
+        debugger;
+        console.error('Missing zone', zoneKey);
+        return false;
+    }
     for (let worldIndex = 0; worldIndex < 2; worldIndex++) {
         for (let floor = 0; floor < zone.floors.length; floor++) {
             // Search the corresponding spirit/material world before checking in the alternate world.
@@ -102,6 +107,7 @@ export function isLocationHot(state: GameState, location: ZoneLocation): boolean
     const areaDefinition = grid?.[location.areaGridCoords.y]?.[location.areaGridCoords.x];
     if (!areaDefinition) {
         console.error('Could not find area definition for location: ', location);
+        debugger;
         return false;
     }
     const x = Math.min(31, Math.max(0, (location.x + 8) / 16));
