@@ -48,11 +48,11 @@ export class RollingBallObject implements ObjectInstance {
     getHitbox(state: GameState): Rect {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
-    onHit(state: GameState, {canPush, direction, isStaff}: HitProperties): HitResult {
+    onHit(state: GameState, {canPush, direction, isBonk, isStaff}: HitProperties): HitResult {
         // If the staff is allowed to hit rolling balls, it should shatter them instead of appear to
         // go through them.
         // Another option would be for it to bounce the staff back instead.
-        if (isStaff) {
+        if (isStaff && isBonk) {
             playAreaSound(state, this.area, 'rockShatter');
             addParticleAnimations(state, this.area, this.x + 8, this.y + 8, 0, lightStoneParticles);
             removeObjectFromArea(state, this);

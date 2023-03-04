@@ -39,6 +39,9 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Randomizer hint sometimes says you are in BK mode with checks in logic
+        - I think this happens when your last check is behind a locked door that you have enough keys for but the randomizer thinks you don't because it isn't counting locked doors you have already opened.
+
     - Tasks before next major release
         - Cocoon
             - Astral projection of boss size scales with health to 1/4 < 25%, 1/2 < 50%
