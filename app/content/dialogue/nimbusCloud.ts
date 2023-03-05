@@ -80,7 +80,9 @@ dialogueHash.nimbusCloud = {
             return '';
         },
         chooseDestination: (state: GameState) => {
-            if (zoneEntranceMap[state.location.logicalZoneKey]) {
+            // There is a section of the sky that is part of the Sky Palace logical zone, but since it is outside,
+            // it should *not* show the return to entrance option.
+            if (state.location.zoneKey !== 'sky' && zoneEntranceMap[state.location.logicalZoneKey]) {
                 return `
                 {choice:Return to entrance?|Yes:nimbusCloud.returnToEntrance|No:nimbusCloud.no}`;
             }

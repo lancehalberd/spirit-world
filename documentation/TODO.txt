@@ -39,7 +39,9 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Show normal nimbus cloud options from the sky tile in Sky Palace.
+    - Rolling up stairs makes you jump backwards.
+
+    - Basement shortcut doesn't work for the spirit world in staff tower.
 
     - Randomizer hint sometimes says you are in BK mode with checks in logic
         - I think this happens when your last check is behind a locked door that you have enough keys for but the randomizer thinks you don't because it isn't counting locked doors you have already opened.
@@ -91,6 +93,11 @@ Current tasks:
             - Lab
 
         - Update save statue dialog
+
+        - Support multiple active missions
+            - Remove hint option from menu
+            - On map, highlight the first mission and display a location name
+            - If the user confirms, show them the help text or the mission.
 
     - Forge
         - Gold mail offered by NPC if you bring gold ore and 500 money
