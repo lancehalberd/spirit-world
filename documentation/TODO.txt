@@ -39,6 +39,8 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Show normal nimbus cloud options from the sky tile in Sky Palace.
+
     - Randomizer hint sometimes says you are in BK mode with checks in logic
         - I think this happens when your last check is behind a locked door that you have enough keys for but the randomizer thinks you don't because it isn't counting locked doors you have already opened.
 
@@ -62,7 +64,6 @@ Current tasks:
                     "Your Astral Body is too weak to harm me."
                 - Taunts for skills
                 - Taunts when damaged
-        - Combine map marker and hint logic so they always agree.
         - Hint signs:
             "Want a hint?" or "20 Jade for a hint?"
         - Tomb
@@ -76,6 +77,9 @@ Current tasks:
                 - Preparing strafe laser: "There's no escape!" / "Just try and dodge this..."
 
         - Redesign Helix dungeon with updated graphics and mechanics
+
+        - Add a mission to talk to the Spirit King after the beasts escape before starting forest temple
+            - Eventually might want additional triggers for each dungeon mission.
 
         - Add save statues
             - Sky Palace

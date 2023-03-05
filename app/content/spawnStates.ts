@@ -73,7 +73,7 @@ const peachBossState = applyItems(defaultSavedState, {weapon: 1, money: 50, seco
     ['peachCave:0:0x0-weapon-0', 'peachCaveSprout1', 'peachCaveSprout2']
 );
 const peachCaveExitState = applyItems(peachBossState, {maxLife: 1, catEyes: 1},
-    ['peachCave:boss', 'peachCave:fullPeach', 'homeInstructions']
+    ['peachCaveBoss', 'peachCave:fullPeach', 'homeInstructions']
 );
 const tombRivalState = applyItems(peachCaveExitState, {bow: 1},
     ['treeVillage:1:0x0-bow-0', 'closedBowDoor', 'elderTomb']

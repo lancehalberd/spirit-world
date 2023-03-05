@@ -60,7 +60,8 @@ export function enterZoneByTarget(
     return true;
 }
 
-export function findObjectLocation(state: GameState, zoneKey: string, targetObjectId: string, checkSpiritWorldFirst = false, skipObject: ObjectDefinition = null): ZoneLocation | false {
+export function findObjectLocation(state: GameState, zoneKey: string, targetObjectId: string, checkSpiritWorldFirst = false, skipObject: ObjectDefinition = null):
+    ZoneLocation & {object: ObjectDefinition} | false {
     const zone = zones[zoneKey];
     if (!zone) {
         debugger;
@@ -90,7 +91,8 @@ export function findObjectLocation(state: GameState, zoneKey: string, targetObje
                                 y: object.y,
                                 d: state.hero.d,
                                 isSpiritWorld: inSpiritWorld,
-                            }
+                                object,
+                            };
                         }
                     }
                 }

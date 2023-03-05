@@ -355,7 +355,7 @@ export function fixSpawnLocationOnLoad(state: GameState): void {
         state.hero.spawnLocation.zoneKey = 'peachCave';
     }
     // The player restarts at the defeated boss if they haven't made it to the overworld yet.
-    if (state.hero.spawnLocation.zoneKey === 'peachCave' && state.savedState.objectFlags['peachCave:boss']) {
+    if (state.hero.spawnLocation.zoneKey === 'peachCave' && state.savedState.objectFlags.peachCaveBoss) {
         state.hero.spawnLocation = SPAWN_LOCATION_PEACH_CAVE_BOSS;
     }
     // Once the elavator has been dropped, the player spawns in the elevator until it is fixed,

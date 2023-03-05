@@ -32,14 +32,14 @@ export const peachCaveNodes: LogicNode[] = [
         zoneId,
         nodeId: 'peachCave:stairsDown',
         paths: [
-            { nodeId: 'peachCave:boss', logic: hasWeapon },
+            { nodeId: 'peachCaveBoss', logic: hasWeapon },
         ],
         entranceIds: ['peachCave:stairsDown'],
         exits: [{ objectId: 'peachCave:stairsDown' }],
     },
     {
         zoneId,
-        nodeId: 'peachCave:boss',
+        nodeId: 'peachCaveBoss',
         checks: [{ objectId: 'peachCave:fullPeach', logic: hasBossWeapon }],
         paths: [
             // There is no path to `peachCave:stairsDown` from here because:
@@ -54,7 +54,7 @@ export const peachCaveNodes: LogicNode[] = [
         paths: [
             // Need mitts to lift rocks at the top of the stairs.
             { nodeId: 'peachCave:upperSilver', logic: hasGloves },
-            { nodeId: 'peachCave:boss' },
+            { nodeId: 'peachCaveBoss' },
         ],
         exits: [{ objectId: 'peachCave:pitB' }],
     },
