@@ -39,8 +39,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Rolling up stairs makes you jump backwards.
-
     - Basement shortcut doesn't work for the spirit world in staff tower.
 
     - Randomizer hint sometimes says you are in BK mode with checks in logic

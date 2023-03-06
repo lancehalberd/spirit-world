@@ -92,10 +92,11 @@ function moveActorInDirection(
     }
     const canWiggle = movementProperties.canWiggle ?? true;
     movementProperties = {
+        actor,
         ...movementProperties,
         canWiggle,
         excludedObjects,
-    }
+    };
 
     // If this movement would move outside of the bounding rectangle, do not allow
     // it if it moves them further outside the rectangle, but do allow it otherwise.
