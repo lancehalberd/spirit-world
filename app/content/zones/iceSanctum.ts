@@ -299,7 +299,6 @@ const f0_0x0: AreaDefinition = {
         {x: 0, y: 16, w: 32, h: 16},
     ],
     dark: 100,
-    corrosiveLogic: {"isTrue":true,"isInverted":false},
 };
 const sf0_0x0: AreaDefinition = {
     isSpiritWorld: true,
@@ -616,6 +615,7 @@ const sf0_0x0: AreaDefinition = {
         {x: 0, y: 16, w: 32, h: 16},
     ],
     dark: 100,
+    corrosiveLogic: {"isTrue":true,"isInverted":false},
 };
 zones.iceSanctum = {
     key: 'iceSanctum',
