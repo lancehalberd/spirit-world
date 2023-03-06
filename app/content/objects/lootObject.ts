@@ -306,6 +306,11 @@ const [chestClosedFrame, chestOpenedFrame] = createAnimation('gfx/tiles/chest.pn
     {w: 18, h: 20, content: {x: 1, y: 4, w: 16, h: 16}}, {cols: 2}
 ).frames;
 
+
+const [largeChestClosedFrame, largeChestOpenedFrame] = createAnimation('gfx/objects/chest2.png',
+    {w: 36, h: 40, content: {x: 2, y: 8, w: 32, h: 32}}, {cols: 2}
+).frames;
+
 export class ChestObject implements ObjectInstance {
     area: AreaInstance;
     definition: LootObjectDefinition;
@@ -456,15 +461,9 @@ export class BigChest extends ChestObject implements ObjectInstance {
     }
     render(context, state: GameState) {
         if (this.isOpen(state)) {
-            drawFrame(context, chestOpenedFrame, {
-                x: this.x - chestOpenedFrame.content.x, y: this.y - chestOpenedFrame.content.y,
-                w: chestOpenedFrame.w * 2, h: chestOpenedFrame.h * 2,
-            });
+            drawFrameAt(context, largeChestOpenedFrame, {x: this.x, y: this.y});
         } else {
-            drawFrame(context, chestClosedFrame, {
-                x: this.x - chestClosedFrame.content.x, y: this.y - chestClosedFrame.content.y,
-                w: chestClosedFrame.w * 2, h: chestClosedFrame.h * 2,
-            });
+            drawFrameAt(context, largeChestClosedFrame, {x: this.x, y: this.y});
         }
     }
 }
