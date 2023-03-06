@@ -39,8 +39,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Basement shortcut doesn't work for the spirit world in staff tower.
-
     - Randomizer hint sometimes says you are in BK mode with checks in logic
         - I think this happens when your last check is behind a locked door that you have enough keys for but the randomizer thinks you don't because it isn't counting locked doors you have already opened.
 
@@ -557,13 +555,12 @@ River Temple Improvements:
 
 
 Staff Tower Improvements
+    - Add a prompt after defeating the boss to indicate that the elevator is working again
+        - Might be tricky to word in a way that makes sense. "The lights got brighter, maybe some of the machines work now."
     - Add content to 4F Material world, probably some sort of gauntlet that is easier when the boss is defeated.
         - Should have a short cut so it can by bypassed after completing once.
-    - All machine enemies have an offline state where they cannot be damaged, and possibly can be pushed around.
-        - Hitting offline machines with lightning will turn them on.
     - Conveyer belts/escalators.
         - Conveyer belts should also effect movable object/enemies on the ground touching them.
-        - Ice magic can freeze the conveyer belts which stops them but makes them slippery.
         - Lightning magic will turn a conveyer belt on if it is off.
     - Disabled conveyer belt with pots on it that needs to be turned on to move the pots out of the way.
 
