@@ -535,7 +535,11 @@ export function getZoneProperties(): PanelRows {
         value: 'Change Layout',
         values: ['Change Layout', ...Object.keys(sectionLayouts)],
         onChange(sectionType: string) {
-            state.areaInstance.definition.sections = sectionLayouts[sectionType];
+            // Section layout is required to match between material and spirit world.
+            // Mostly this is because it is annoying to have to update it in both places
+            // when we almost always intend for them to be the same anyway.
+            state.areaInstance.definition.sections = sectionLayouts[sectionType].map(section => ({...section}));
+            state.alternateAreaInstance.definition.sections = sectionLayouts[sectionType].map(section => ({...section}));
             state.areaSection = null;
             setAreaSection(state);
             return 'Change Layout';
