@@ -1,4 +1,5 @@
 import { evaluateLogicDefinition, logicHash, isLogicValid, isObjectLogicValid } from 'app/content/logic';
+import { exploreSection } from 'app/content/sections';
 import { allTiles } from 'app/content/tiles';
 import { zones } from 'app/content/zones';
 import { editingState } from 'app/development/editingState';
@@ -301,6 +302,7 @@ export function setNextAreaSection(state: GameState, d: Direction): void {
     for (const section of state.areaInstance.definition.sections) {
         if (isPointInShortRect(x, y, section)) {
             state.nextAreaSection = getAreaSectionInstance(state, section);
+            exploreSection(state, section.index);
             break;
         }
     }

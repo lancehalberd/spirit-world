@@ -115,6 +115,7 @@ export function getLootGetMessage(state: GameState, lootType: LootType, lootLeve
         case 'ironBoots': return `You found the ${lootName}!` + equipBootsMessage;
         case 'bigKey': return 'You found a special key!';
         case 'smallKey': return 'You found a small key!';
+        case 'map': return 'You found a map!';
         case 'peachOfImmortality': return 'You ate a Golden Peach!';
         case 'peachOfImmortalityPiece': return 'You found a Golden Peach Slice!';
         // Learned techniques
@@ -293,6 +294,9 @@ export function showLootMessage(state: GameState, lootType: LootType, lootLevel?
                 return showMessage(state, getMessage + '{|}Use it to unlock one locked door.');
             }
             return;
+        case 'map':
+            return showMessage(state, getMessage
+                + '{|}Press [B_MAP] to see the full map of this area!');
         case 'peachOfImmortality':
             if (!state.hero.passiveTools.catEyes) {
                 return showMessage(state, `
@@ -366,7 +370,7 @@ export const [
     circlet, phoenixCrown,
     teleportFrame, /* teleportFrame2 */,
     treeStaff, towerStaff,
-    /* recycle */, /* book */, /* scroll1 */, /* scroll2 */, scroll3,
+    /* recycle */, /* book */, scroll1, /* scroll2 */, scroll3,
     nimbusCloud, trueSight,
     goldOre, silverOre,
     goldMedal, silverMedal, bronzeMedal,
@@ -416,6 +420,7 @@ const lootFrames = {
     goldMail,
     ironSkin,
     bigKey: bigKeyOutlineFrame,
+    map: scroll1,
     catEyes: catEyes,
     charge: neutralElement,
     clone: twoCloneFrame,

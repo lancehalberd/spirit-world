@@ -5,6 +5,8 @@ import { SavedHeroData, SavedState } from 'app/types';
 export function getDefaultSavedState(): SavedState {
     return {
         dungeonInventories: {},
+        // Used to track what parts of the map are displayed.
+        exploredSections: [],
         objectFlags: {},
         zoneFlags: {},
         luckyBeetles: [],

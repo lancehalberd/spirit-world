@@ -1,3 +1,4 @@
+import { populateAllSections} from 'app/content/sections';
 import { zones } from 'app/content/zones/zoneHash';
 
 import { Zone } from 'app/types';
@@ -43,6 +44,10 @@ export * from 'app/content/zones/tree';
 export * from 'app/content/zones/void';
 // minimizer zones
 export * from 'app/content/zones/minimizer/light1';
+
+
+// This must be run after all zones are imported.
+populateAllSections();
 
 export function getZone(zoneKey: string): Zone {
     if (!zones[zoneKey]) {

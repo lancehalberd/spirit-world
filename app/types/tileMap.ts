@@ -255,6 +255,7 @@ export interface AreaLayer extends AreaTileGrid {
 
 export interface AreaSection extends Rect {
     hotLogic?: LogicDefinition
+    index?: number
 }
 
 export interface AreaSectionInstance extends AreaSection {

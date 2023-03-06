@@ -225,7 +225,7 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 240, y: 64, type: "crystalSwitch", element: "lightning", timer: 0, targetObjectId: "staffTowerBasementLadder"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 443},
     ],
     specialBehaviorKey: 'staffTower',
 };
@@ -448,7 +448,7 @@ const f0_0x1: AreaDefinition = {
         {status: "normal", id: "staffTower:0:0x1-sentryBot-2", x: 268, y: 412, type: "enemy", enemyType: "sentryBot", d: "down", params: {}},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 444},
     ],
     dark: 100,
     specialBehaviorKey: 'staffTower',
@@ -677,7 +677,7 @@ const sf0_0x0: AreaDefinition = {
         {status: "closedSwitch", id: "staffTowerSpiritBasementLadder", x: 224, y: 80, type: "door", style: "ladderDown", targetZone: "staffTower", targetObjectId: "staffTowerSpiritBasementLadder", d: "down", customLogic: "elevatorDropped", linked: true, spirit: true, saveStatus: "forever"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 445},
     ],
     specialBehaviorKey: 'staffTower',
 };
@@ -902,7 +902,7 @@ const sf0_0x1: AreaDefinition = {
         {status: "closed", id: "staffTowerSpiritBasementLadder", x: 224, y: 16, type: "door", style: "ladderUp", targetZone: "staffTower", targetObjectId: "staffTowerSpiritBasementLadder", d: "up", customLogic: "elevatorDropped", openLogic: {"hasCustomLogic":true,"customLogic":"elevatorDropped","isInverted":false}},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 446},
     ],
     dark: 100,
     specialBehaviorKey: 'staffTower',
@@ -1145,7 +1145,7 @@ const f1_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 416, y: 416, type: "cathode"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 447},
     ],
     specialBehaviorKey: 'staffTower',
 };
@@ -1376,7 +1376,7 @@ const f1_0x1: AreaDefinition = {
         {status: "normal", id: "", x: 224, y: 336, type: "cathode"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 448},
     ],
     specialBehaviorKey: 'staffTower',
 };
@@ -1606,7 +1606,7 @@ const sf1_0x0: AreaDefinition = {
         {status: "normal", id: "staffTowerBigMoney2", x: 208, y: 448, type: "chest", lootType: "money", lootAmount: 100},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 449},
     ],
     specialBehaviorKey: 'staffTower',
 };
@@ -1835,7 +1835,7 @@ const sf1_0x1: AreaDefinition = {
         {status: "normal", id: "staffTower:s1:0x1-lightningDrone-0", x: 272, y: 464, type: "enemy", enemyType: "lightningDrone", d: "down", params: {}},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 450},
     ],
     specialBehaviorKey: 'staffTower',
 };
@@ -2072,7 +2072,7 @@ const f2_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 16, y: 352, type: "anode"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 451},
     ],
     specialBehaviorKey: 'staffTower',
 };
@@ -2295,7 +2295,7 @@ const f2_0x1: AreaDefinition = {
         {status: "normal", id: "staffTower:2:0x1-luckyBeetle-0", x: 256, y: 272, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 452},
     ],
     specialBehaviorKey: 'staffTower',
 };
@@ -2532,7 +2532,7 @@ const sf2_0x0: AreaDefinition = {
         {status: "normal", id: "staffTowerSave", x: 240, y: 272, type: "saveStatue"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 453},
     ],
     specialBehaviorKey: 'staffTower',
 };
@@ -2759,7 +2759,7 @@ const sf2_0x1: AreaDefinition = {
         {status: "normal", id: "staffTower:s2:0x1-sentryBot-0", x: 240, y: 208, type: "enemy", enemyType: "sentryBot", d: "down", params: {}, saveStatus: "forever"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 454},
     ],
     specialBehaviorKey: 'staffTower',
 };
@@ -3042,7 +3042,7 @@ const f3_0x0: AreaDefinition = {
         {status: "hidden", id: "stormBeast", x: 256, y: 304, targetObjectId: "stormBeast", type: "teleporter", linked: true},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 455},
     ],
 };
 const f3_0x1: AreaDefinition = {
@@ -3259,7 +3259,7 @@ const f3_0x1: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 456},
     ],
 };
 const sf3_0x0: AreaDefinition = {
@@ -3524,7 +3524,7 @@ const sf3_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 256, y: 304, targetObjectId: "stormBeast", type: "teleporter", linked: true},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 457},
     ],
 };
 const sf3_0x1: AreaDefinition = {
@@ -3747,7 +3747,7 @@ const sf3_0x1: AreaDefinition = {
         {status: "normal", id: "", specialBehaviorKey: "elevatorControls", x: 240, y: 352, style: "displayScreen", type: "sign", message: "\n            !WARNING![-]POWER FAILURE DETECTED\n            {|}EMERGENCY BREAK ACTIVATED\n            {choice:RELEASE BREAK?|Yes:elevator.releaseBreak|No}\n        "},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 458},
     ],
     specialBehaviorKey: 'staffTower',
 };

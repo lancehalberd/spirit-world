@@ -141,6 +141,9 @@ export function getDefaultState(): GameState {
             queue: [],
         },
         screenShakes: [],
+        map: {
+            needsRefresh: true,
+        },
     };
     return state;
 }

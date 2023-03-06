@@ -1,4 +1,5 @@
 import { evaluateLogicDefinition } from 'app/content/logic';
+import { exploreSection } from 'app/content/sections';
 import { editingState } from 'app/development/editingState';
 import { isPointInShortRect } from 'app/utils/index';
 import { removeObjectFromArea } from 'app/utils/objects';
@@ -21,6 +22,7 @@ export function setAreaSection(state: GameState, newArea: boolean = false): void
     for (const section of state.areaInstance.definition.sections) {
         if (isPointInShortRect(x, y, section)) {
             state.areaSection = getAreaSectionInstance(state, section);
+            exploreSection(state, section.index);
             break;
         }
     }

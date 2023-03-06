@@ -90,6 +90,7 @@ export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: An
     map: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
         const inventory = getDungeonInventory(state);
         inventory.map = true;
+        state.map.needsRefresh = true;
         updateDungeonInventory(state, inventory, false);
     },
     smallKey: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {

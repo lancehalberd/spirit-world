@@ -15,6 +15,7 @@ import {
     SPAWN_LOCATION_FULL,
     fixSpawnLocationOnLoad,
 } from 'app/content/spawnLocations';
+import { zones } from 'app/content/zones/zoneHash';
 import {
     FRAME_LENGTH, GAME_KEY,
     FADE_IN_DURATION, FADE_OUT_DURATION,
@@ -101,6 +102,9 @@ export function update() {
                 )
             ) {
                 state.showMap = !state.showMap;
+                if (state.showMap) {
+                    state.menuIndex = state.location.floor;
+                }
                 state.paused = state.showMap;
                 updateSoundSettings(state);
             }
@@ -218,6 +222,18 @@ function updateTitle(state: GameState) {
 }
 
 function updateMenu(state: GameState) {
+    if (state.showMap) {
+        const zone = zones[state.location.zoneKey];
+        if (wasGameKeyPressed(state, GAME_KEY.UP)) {
+            state.menuIndex = (state.menuIndex + 1) % zone.floors.length;
+        } else if (wasGameKeyPressed(state, GAME_KEY.DOWN)) {
+            state.menuIndex = (state.menuIndex + zone.floors.length - 1) % zone.floors.length;
+        }
+        if (wasMenuConfirmKeyPressed(state)) {
+            state.paused = false;
+        }
+        return;
+    }
     const menuRows = getMenuRows(state);
     // Cycle to the next row that isn't empty.
     // There is always at least one row since the help tool is always there.

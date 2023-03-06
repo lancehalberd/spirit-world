@@ -111,6 +111,9 @@ export function serializeZone(zone: Zone) {
                     lines.push('    sections: [');
                     for (const section of area.sections) {
                         let extraFields = '';
+                        if (section.index >= 0) {
+                            extraFields += `, index: ${section.index}`;
+                        }
                         if (section.hotLogic) {
                             extraFields += `, hotLogic: ${JSON.stringify(section.hotLogic)}`;
                         }

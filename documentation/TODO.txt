@@ -40,17 +40,6 @@ Graphics:
 
 Current tasks:
     - Add dungeon maps
-        - Render default dungeon map fully revealed, 1 map per zone, 1 floor per floor, centered in 6x6 grid
-            - 6x6 grid of 32x32 squares for each 1/4 super tile.
-            - Draw 2x2 white pixel for every solid tile on the edge of each 1/4 tile
-                - Draw fill color for any doors without targets
-                - Draw special color for any doors with targets
-                - Draw black for any pits with targets
-            - Draw floor indicator digits on the left "1F"/"B1" with menu select reticule on selected floor
-            - Press up/down to change floors
-        - Track explored screens and only render screens if the player has a map or has explored them
-            - Add map item to Tomb to test this
-            - Unexplored tiles are grey, explored are blue
         - Support selecting 16x16 tiles when editor is open
             - Click to select a tile
             - SHIFT click unselected tile to add it to current selection
@@ -66,6 +55,8 @@ Current tasks:
                 mapData = [TL, TR, BL, BR]
                 with structure as {id?: string, floor: '1F', x: 0, y: 0}
             - read and write mapData from areaDefinition.parentDefinition.mapData when parentDefinition exists.
+        - Initialized map data after zones are all loaded
+            - map -> floors -> tile grid -> {zone + floor + screen x/y}
         - Use WASD/arrow keys or click and drag to move all selected tiles within the 6x6 bounds.
 
     - Tasks before next major release
