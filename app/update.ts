@@ -10,6 +10,7 @@ import {
     setLeftTool,
     setRightTool,
 } from 'app/content/menu';
+import { dungeonMaps } from 'app/content/sections';
 import {
     SPAWN_LOCATION_DEMO,
     SPAWN_LOCATION_FULL,
@@ -102,8 +103,9 @@ export function update() {
                 )
             ) {
                 state.showMap = !state.showMap;
-                if (state.showMap) {
-                    state.menuIndex = state.location.floor;
+                const dungeonMap = dungeonMaps[state.areaSection?.mapId];
+                if (state.showMap && dungeonMap) {
+                    state.menuIndex = Object.keys(dungeonMap.floors).indexOf(state.areaSection.floorId);
                 }
                 state.paused = state.showMap;
                 updateSoundSettings(state);

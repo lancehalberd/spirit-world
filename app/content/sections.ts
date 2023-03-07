@@ -1,8 +1,28 @@
 import { zones } from 'app/content/zones/zoneHash';
 
-import { AreaSection, GameState } from 'app/types';
+import { AreaDefinition, AreaSection, GameState, Point } from 'app/types';
+
+interface SectionData {
+    section: AreaSection
+    area: AreaDefinition
+    zoneKey: string
+    floor: number
+    isSpiritWorld: boolean
+    coords: Point
+}
+
+interface DungeonMap {
+    floors: {[key: string]: DungeonFloorMap}
+}
+interface DungeonFloorMap {
+    grid: number[][]
+}
+
 let nextFreeId = 0;
-export const allSections: AreaSection[] = [];
+export const allSections: SectionData[] = [];
+window['allSections'] = allSections;
+export const dungeonMaps: {[key: string]: DungeonMap} = {};
+window['dungeonMaps'] = dungeonMaps;
 
 function goToNextFreeId() {
     while(allSections[nextFreeId]) {
@@ -11,12 +31,14 @@ function goToNextFreeId() {
 }
 
 export function populateAllSections() {
+    const newSections: SectionData[] = [];
     for (const zoneKey of Object.keys(zones)) {
         const zone = zones[zoneKey];
-        const newSections: AreaSection[] = [];
         // populate sections that already have an index to the allSections array.
-        for (const floor of zone.floors) {
+        for (let floorIndex = 0; floorIndex < zone.floors.length; floorIndex++) {
+            const floor = zone.floors[floorIndex];
             for (const grid of [floor.grid, floor.spiritGrid]) {
+                const isSpiritWorld = grid === floor.spiritGrid;
                 for (let y = 0; y < grid.length; y++) {
                     for (let x = 0; x < grid[y].length; x++) {
                         for (const section of (grid[y][x]?.sections || [])) {
@@ -26,21 +48,67 @@ export function populateAllSections() {
                                     goToNextFreeId();
                                     allSections[nextFreeId] = allSections[section.index]
                                 }
-                                allSections[section.index] = section;
+                                allSections[section.index] = {
+                                    section,
+                                    area: grid[y][x],
+                                    zoneKey,
+                                    floor: floorIndex,
+                                    coords: [x, y],
+                                    isSpiritWorld,
+                                };
                             } else {
-                                newSections.push(section);
+                                newSections.push({
+                                    section,
+                                    area: grid[y][x],
+                                    zoneKey,
+                                    floor: floorIndex,
+                                    coords: [x, y],
+                                    isSpiritWorld,
+                                });
                             }
                         }
                     }
                 }
             }
         }
-        // Assign indexes to any sections that didn't have one yet and add them to allSections array.
-        for (const section of newSections) {
-            goToNextFreeId();
-            section.index = nextFreeId;
-            allSections[section.index] = section;
+    }
+    // Assign indexes to any sections that didn't have one yet and add them to allSections array.
+    for (const section of newSections) {
+        goToNextFreeId();
+        section.section.index = nextFreeId;
+        allSections[nextFreeId] = section;
+    }
+    populateSectionMapData();
+}
+function populateSectionMapData(): void {
+    for (const sectionData of allSections) {
+        const section = sectionData?.section;
+        if (!section) {
+            continue;
         }
+        if (!section.mapId) {
+            section.mapId = sectionData.zoneKey;
+            if (sectionData.isSpiritWorld) {
+                section.mapId += 'Spirit';
+            }
+        }
+        if (!section.entranceId) {
+            if (!section.floorId) {
+                section.floorId = `${sectionData.floor + 1}F`;
+            }
+            if (!(section.mapX >= 0 && section.mapY >= 0)) {
+                section.mapX = sectionData.coords[0] * 2 + (section.x / 16) | 0;
+                section.mapY = sectionData.coords[1] * 2 + (section.y / 16) | 0;
+            }
+        }
+        // Sections that show overworld areas aren't added to any dungeon maps.
+        if (['underwater', 'overworld', 'sky'].includes(section.mapId)) {
+            continue;
+        }
+        const map = dungeonMaps[section.mapId] = dungeonMaps[section.mapId] || {floors: {}};
+        const floor = map.floors[section.floorId] = map.floors[section.floorId] || {grid: []};
+        floor.grid[section.mapY] = floor.grid[section.mapY] || [];
+        floor.grid[section.mapY][section.mapX] = section.index;
     }
 }
 

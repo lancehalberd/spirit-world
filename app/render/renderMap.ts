@@ -1,12 +1,13 @@
-import { getAreaInstanceFromLocation } from 'app/content/areas';
+import { createAreaInstance } from 'app/content/areas';
 import { getMapTarget } from 'app/content/hints';
 import { isLogicValid, logicHash } from 'app/content/logic';
-import { isSectionExplored } from 'app/content/sections';
+import { allSections, dungeonMaps, isSectionExplored } from 'app/content/sections';
 import { zones } from 'app/content/zones/zoneHash';
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
 import { heroIcon } from 'app/render/heroAnimations';
 import { checkToRedrawTiles } from 'app/render/renderField';
 import { createAnimation, drawFrame } from 'app/utils/animations';
+import { findObjectLocation } from 'app/utils/enterZoneByTarget';
 import { createCanvasAndContext, drawCanvas } from 'app/utils/canvas';
 import { drawText } from 'app/utils/simpleWhiteFont';
 import { rectanglesOverlap, pad } from 'app/utils/index';
@@ -27,6 +28,8 @@ const worldSize = 192;
 
 export function renderMap(context: CanvasRenderingContext2D, state: GameState): void {
     if (['underwater', 'overworld', 'sky'].includes(state.location.zoneKey)) {
+        renderOverworldMap(context, state);
+    } else if (['underwater', 'overworld', 'sky'].includes(state.areaSection?.mapId)) {
         renderOverworldMap(context, state);
     } else {
         renderDungeonMap(context, state);
@@ -73,7 +76,7 @@ export function renderOverworldMap(context: CanvasRenderingContext2D, state: Gam
     drawFrame(context, ground12, {x: r.x + 64, y: r.y + 128, w: 64, h: 64});
     drawFrame(context, ground22, {x: r.x + 128, y: r.y + 128, w: 64, h: 64});
 
-    if (state.location.zoneKey === 'sky') {
+    if (state.location.zoneKey === 'sky' || state.areaSection?.mapId === 'sky') {
         context.save();
             context.globalAlpha *= 0.5;
             context.fillStyle = '#0FF';
@@ -96,7 +99,17 @@ export function renderOverworldMap(context: CanvasRenderingContext2D, state: Gam
                 y: r.y + (state.location.areaGridCoords.y * 64 + state.location.y / 8 - heroIcon.h / 2) | 0,
             });
         }
+    } else if (state.areaSection?.entranceId) {
+        const location = findObjectLocation(state, state.areaSection?.mapId, state.areaSection?.entranceId, state.location.isSpiritWorld);
+        if (location && state.time % 1000 <= 600) {
+            drawFrame(context, heroIcon, {
+                ...heroIcon,
+                x: r.x + (location.areaGridCoords.x * 64 + location.x / 8 - heroIcon.w / 2) | 0,
+                y: r.y + (location.areaGridCoords.y * 64 + location.y / 8 - heroIcon.h / 2) | 0,
+            });
+        }
     }
+
     if (state.time % 1000 <= 600) {
         const target = getMapTarget(state);
         if (target) {
@@ -118,37 +131,46 @@ const cursor = createAnimation('gfx/hud/cursortemp.png', {w: frameSize, h: frame
 
 const [mapCanvas, mapContext] = createCanvasAndContext(192, 192);
 
-function refreshDungeonMap(state: GameState, zoneKey: string, floor: number): void {
+const [sectionCanvas, sectionContext] = createCanvasAndContext(64, 64);
+
+function refreshDungeonMap(state: GameState, mapId: string, floorId: string): void {
     // It is expensive to render the dungeon map, so only re-render if it has important changes.
-    if (!state.map.needsRefresh && state.map.renderedZoneKey === zoneKey && state.map.renderedFloorIndex === floor) {
+    if (!state.map.needsRefresh && state.map.renderedMapId === mapId && state.map.renderedFloorId === floorId) {
         return;
     }
     state.map.needsRefresh = false;
-    state.map.renderedZoneKey = zoneKey;
-    state.map.renderedFloorIndex = floor;
+    state.map.renderedMapId = mapId;
+    state.map.renderedFloorId = floorId;
 
-    const zone = zones[zoneKey];
-    const grid = state.location.isSpiritWorld ? zone.floors[floor].grid : zone.floors[floor].grid;
+    const hasMap = state.savedState.dungeonInventories[state.location.logicalZoneKey]?.map;
+
 
     mapContext.clearRect(0, 0, mapCanvas.width, mapCanvas.height);
+    const grid = dungeonMaps[mapId].floors[floorId].grid;
     for (let row = 0; row < grid.length; row++) {
-        for (let column = 0; column < grid[row].length; column++) {
-            const areaInstance = getAreaInstanceFromLocation(
-                state,
-                {...state.location, floor, areaGridCoords: {x: column, y: row}}
-            );
-            // Draw the full tile first.
-            renderActualMapTile(mapContext, state, areaInstance,
-                {x: column * 64, w: 64, y: row * 64, h: 64},  {x: 0, y: 0, w: 512, h: 512});
-            // Then obscure any unexplored sections of the tile.
-            if (!state.savedState.dungeonInventories[state.location.logicalZoneKey]?.map) {
-                mapContext.fillStyle = 'black';
-                for (const section of areaInstance.definition.sections) {
-                    if (!isSectionExplored(state, section.index)) {
-                        mapContext.fillRect(column * 64 + section.x * 2, row * 64 + section.y * 2, section.w * 2, section.h * 2);
-                    }
-                }
+        for (let column = 0; column < grid[row]?.length; column++) {
+            const sectionData = allSections[grid[row][column]];
+            if (!sectionData) {
+                continue;
             }
+            //mapContext.fillStyle = 'blue';
+            if (!hasMap && !isSectionExplored(state, sectionData.section.index)) {
+                //mapContext.fillStyle = 'red';
+                continue;
+            }
+            const {area, section} = sectionData;
+            //mapContext.fillRect(column * 32, row * 32, section.w * 2, section.h * 2);
+            //mapContext.fillStyle = 'white'
+            //mapContext.fillRect(column * 32, row * 32, 8, 8);
+            const areaInstance = createAreaInstance(state, area);
+            // Draw the full tile first.
+            sectionContext.clearRect(0, 0, 64, 64);
+            renderActualMapTile(sectionContext, state, areaInstance,
+                {x: 0, w: 64, y: 0, h: 64},  {x: 0, y: 0, w: 512, h: 512});
+            mapContext.drawImage(sectionCanvas,
+                section.x * 2, section.y * 2, section.w * 2, section.h * 2,
+                column * 32, row * 32, section.w * 2, section.h * 2,
+            );
         }
     }
 }
@@ -167,13 +189,15 @@ function renderDungeonMap(context: CanvasRenderingContext2D, state: GameState): 
     // TODO: Draw floor indicators
 
     const zone = zones[state.location.zoneKey];
-    const selectedFloor = state.menuIndex % zone.floors.length;
-    refreshDungeonMap(state, state.location.zoneKey, selectedFloor);
+    const selectedFloorIndex = state.menuIndex % zone.floors.length;
+    const floorIds = Object.keys(dungeonMaps[state.areaSection?.mapId].floors);
+    const selectedFloorId = floorIds[selectedFloorIndex];
+    refreshDungeonMap(state, state.areaSection?.mapId, selectedFloorId);
 
     const rowHeight = 24;
 
-    for (let floor = 0; floor < zone.floors.length; floor++) {
-        drawText(context, `${floor +1}F`, r.x + 12, r.y + r.h - rowHeight * floor - rowHeight / 2, {
+    for (let floor = 0; floor < floorIds.length; floor++) {
+        drawText(context, floorIds[floor], r.x + 12, r.y + r.h - rowHeight * floor - rowHeight / 2, {
             textBaseline: 'middle',
             textAlign: 'center',
             size: 16,
@@ -190,7 +214,7 @@ function renderDungeonMap(context: CanvasRenderingContext2D, state: GameState): 
     drawFrame(context, cursor, {
         ...cursor,
         x: r.x,
-        y: r.y + r.h - rowHeight * selectedFloor - 24,
+        y: r.y + r.h - rowHeight * selectedFloorIndex - 24,
     });
 
     // Adjust the rectangle to just include the portion where the map should be drawn
@@ -198,7 +222,7 @@ function renderDungeonMap(context: CanvasRenderingContext2D, state: GameState): 
 
     drawCanvas(context, mapCanvas, {x: 0, y: 0, w: 192, h: 192}, r);
 
-    if (state.time % 1000 <= 600 && state.location.floor === selectedFloor) {
+    if (state.time % 1000 <= 600 && state.location.floor === selectedFloorIndex) {
         drawFrame(context, heroIcon, {
             ...heroIcon,
             x: r.x + (state.location.areaGridCoords.x * 64 + state.location.x / 8 - heroIcon.w / 2) | 0,
@@ -226,11 +250,17 @@ export function renderActualMapTile(context: CanvasRenderingContext2D, state: Ga
         context.translate(target.x, target.y);
         context.scale(1 / 8, 1 / 8);
         for (const object of area.objects) {
+            if (object.definition?.type === 'enemy' || object.definition?.type === 'boss') {
+                continue;
+            }
             const hitbox = object.getHitbox();
             if (!rectanglesOverlap(hitbox, source)) {
                 continue;
             }
-            object.render(context, state);
+            for(const part of [object, ...(object.getParts?.(state) || [])]) {
+                part.render(context, state);
+                part.renderForeground?.(context, state);
+            }
 
             if (object.definition?.type === 'door' && object.definition.targetZone && object.definition.targetObjectId) {
                 context.fillStyle = 'rgba(0, 255, 255, 1)';

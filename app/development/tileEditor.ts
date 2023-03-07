@@ -44,6 +44,12 @@ mainCanvas.addEventListener('mousemove', function () {
     }
     const state = getState();
     const [x, y] = getMousePosition(mainCanvas, CANVAS_SCALE);
+    if (state.paused) {
+        if (state.showMap) {
+            // TODO:
+        }
+        return;
+    }
     switch(editingState.tool) {
         case 'select':
             onMouseMoveSelect(state, editingState, x, y);
@@ -66,6 +72,12 @@ mainCanvas.addEventListener('mousedown', function (event) {
     }
     const state = getState();
     const [x, y] = getMousePosition(mainCanvas, CANVAS_SCALE);
+    if (state.paused) {
+        if (state.showMap) {
+            // TODO:
+        }
+        return;
+    }
     switch(editingState.tool) {
         case 'select':
             onMouseDownSelect(state, editingState, x, y);

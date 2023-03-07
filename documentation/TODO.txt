@@ -50,14 +50,21 @@ Current tasks:
             - ESCAPE to unselect all tiles
         - Special context menu when tiles are selected
             - setMap -> "map zone id" + "new map"(default floor is '1F') -> "floor" + "new floor"
+                Set mapId/floorId
+            - showMap -> [overworld/sky/spiritworld/spiritsky] -> list of door/teleporter/pit ids
+                Set mapId/entranceId
             - list of floors is returned dynamically based on existing map and floor ids
             - store map data on each material world area definition as:
                 mapData = [TL, TR, BL, BR]
                 with structure as {id?: string, floor: '1F', x: 0, y: 0}
             - read and write mapData from areaDefinition.parentDefinition.mapData when parentDefinition exists.
-        - Initialized map data after zones are all loaded
-            - map -> floors -> tile grid -> {zone + floor + screen x/y}
         - Use WASD/arrow keys or click and drag to move all selected tiles within the 6x6 bounds.
+
+        - set section.index and update allSections when creating new sections
+        - figure out how to sort display of floor ids so it is B2/B1/1F/2F etc.
+        - update allSections when deleting sections.
+
+    - Finish updating any maps that are left
 
     - Tasks before next major release
         - Cocoon
@@ -115,6 +122,13 @@ Current tasks:
         - When hero/clone is falling, draw it behind all other sprites (on top of the background).
             - Try using getDrawPriority to apply this to clone, we may need a new priority 'afterBackground' to force it to draw on top of all background elements (for example, it should be drawn on top of pit entrance objects).
             - The hero itself will probably need special handling to render it immediately after the background in renderField since it always has special handling.
+
+    - Replace inventory tab with editor UI that uses the main inventory screen
+        - Missing items are drawn faded when editing is on.
+        - Clicking an item cycles from 0 -> 1 -> 2 -> 0
+        - Click on big/small keys/map to get dungeon items
+        - Click on chakrams to add upgrades
+        - Click on ores to increase ore count
 
     - Forge
         - Gold mail offered by NPC if you bring gold ore and 500 money

@@ -138,7 +138,7 @@ export interface GameState {
     screenShakes: ScreenShake[]
     map: {
         needsRefresh: boolean
-        renderedZoneKey?: string
-        renderedFloorIndex?: number
+        renderedMapId?: string
+        renderedFloorId?: string
     }
 }

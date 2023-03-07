@@ -255,7 +255,19 @@ export interface AreaLayer extends AreaTileGrid {
 
 export interface AreaSection extends Rect {
     hotLogic?: LogicDefinition
+    // Unique identifier for this section that can be used to look it up
+    // and is used when tracking whether the player has explored a section.
     index?: number
+    // The ID of the map to display this section in, defaults to the zoneKey of the section.
+    mapId?: string
+    // The ID of the map floor to display this section in. Defaults to `${floorIndex + 1}F`
+    floorId?: string
+    // The map grid coordinates of this section
+    mapX?: number
+    mapY?: number
+    // The entrance to render the hero marker at for sections that display the world map
+    // instead of dungeon maps.
+    entranceId?: string
 }
 
 export interface AreaSectionInstance extends AreaSection {
