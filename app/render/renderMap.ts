@@ -156,13 +156,16 @@ function refreshDungeonMap(state: GameState, mapId: string, floorId: string): vo
             continue;
         }
         //mapContext.fillStyle = 'blue';
+        const isHidden = sectionData.section.hideMap;
         const isExplored = hasMap || isSectionExplored(state, sectionData.section.index);
-        if (!editingState.isEditing && !isExplored) {
+        if (!editingState.isEditing && (!isExplored || isHidden)) {
             //mapContext.fillStyle = 'red';
             continue;
         }
         mapContext.save();
-            if (!isExplored) {
+            if (isHidden) {
+                mapContext.globalAlpha *= 0.2;
+            } else if (!isExplored) {
                 mapContext.globalAlpha *= 0.6;
             }
             const {area, section} = sectionData;
@@ -245,8 +248,8 @@ function renderDungeonMap(context: CanvasRenderingContext2D, state: GameState): 
     if (state.time % 1000 <= 600 && state.location.floor === selectedFloorIndex) {
         drawFrame(context, heroIcon, {
             ...heroIcon,
-            x: innerDungeonMapRectangle.x + (state.location.areaGridCoords.x * 64 + state.location.x / 8 - heroIcon.w / 2) | 0,
-            y: innerDungeonMapRectangle.y + (state.location.areaGridCoords.y * 64 + state.location.y / 8 - heroIcon.h / 2) | 0,
+            x: innerDungeonMapRectangle.x + (state.areaSection.definition.mapX * 32 + state.location.x / 8 - heroIcon.w / 2 - state.areaSection.x * 2) | 0,
+            y: innerDungeonMapRectangle.y + (state.areaSection.definition.mapY * 32 + state.location.y / 8 - heroIcon.h / 2 - state.areaSection.y * 2) | 0,
         });
     }
     if (editingState.isEditing) {
@@ -287,7 +290,7 @@ function renderDungeonMap(context: CanvasRenderingContext2D, state: GameState): 
 }
 
 
-const mapObjectTypes: ObjectType[] = ['door', 'pitEntrance'];
+const mapObjectTypes: ObjectType[] = ['door', 'pitEntrance', 'saveStatue', 'pushStairs'];
 export function renderActualMapTile(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance, target: Rect, source: Rect): void {
     if (area.checkToRedrawTiles) {
         checkToRedrawTiles(area);
@@ -332,6 +335,13 @@ export function renderActualMapTile(context: CanvasRenderingContext2D, state: Ga
     context.restore();
 }
 
+export function mouseCoordsToMapCoords({x, y}: {x: number, y: number}): {x: number, y: number} {
+    return {
+        x: ((x - innerDungeonMapRectangle.x) / 32) | 0,
+        y: ((y - innerDungeonMapRectangle.y) / 32) | 0,
+    }
+}
+
 export function getSectionUnderMouse(state: GameState): AreaSection | undefined {
     const sections = getDisplayedMapSections(state);
     if (!sections) {
@@ -360,84 +370,3 @@ export function getDisplayedMapSections(state: GameState): number[] | undefined 
     const map = dungeonMaps[state.areaSection?.mapId];
     return map.floors[selectedFloorId].sections;
 }
-
-/*
-const wallColor = 'white';
-const unexploredColor = 'grey';
-const exploredColor = 'blue';
-const pitColor = 'black';
-const entranceColor = 'red';
-export function renderMapTile(context: CanvasRenderingContext2D, state: GameState, target: Rect, area: AreaDefinition, source: Rect ): void {
-    const explored = true;
-    const fillColor = explored ? exploredColor : unexploredColor;
-    context.fillStyle = fillColor;
-    context.fillRect(target.x, target.y, target.w, target.h);
-    context.fillStyle = wallColor;
-    // Draw a 2x2 wall pixel for every solid pixel around the exterior of the source rectangle.
-    for (let y = source.y; y < source.y + source.h; y++) {
-        for (let x = source.x; x < source.x + source.w; x++) {
-            // Skip all tiles that aren't on the border.
-            if (y !== source.y && y !== source.y + source.h - 1
-                && x !== source.x && x !== source.x + source.w - 1) {
-                continue;
-            }
-
-            for (let i = 0; i < area.layers.length; i++) {
-                const layer = area.layers[i], parentLayer = area.parentDefinition?.layers?.[i];
-                // Masked tiles are assumed not to set any behaviors as they are mostly hidden by the mask.
-                if (layer.mask?.tiles?.[y]?.[x]) {
-                    continue;
-                }
-                let tileIndex = layer.grid?.tiles?.[y]?.[x];
-                if (!tileIndex && parentLayer) {
-                    // Masked tiles are assumed not to set any behaviors as they are mostly hidden by the mask.
-                    if (parentLayer.mask?.tiles?.[y]?.[x]) {
-                        continue;
-                    }
-                    tileIndex = parentLayer.grid?.tiles?.[y]?.[x];
-                }
-                if (!tileIndex) {
-                    continue;
-                }
-                const tile = allTiles[tileIndex];
-                // The behavior grid combines behaviors of all layers, with higher layers
-                // overriding the behavior of lower layers.
-                if (tile.behaviors?.solid) {
-                    context.fillRect(target.x + 2 * (x - source.x), target.y + 2 * (y - source.y), 2, 2);
-                }
-            }
-
-        }
-    }
-    // Draw additional objects that we want to show on the map.
-    for (const object of area.objects) {
-        if (object.type === 'door') {
-            if (object.targetZone && object.targetObjectId) {
-                context.fillStyle = entranceColor;
-            } else {
-                context.fillStyle = fillColor
-            }
-        } else if (object.type === 'pitEntrance' && object.targetZone && object.targetObjectId) {
-            context.fillStyle = pitColor;
-        } else {
-            continue;
-        }
-        const instance = createObjectInstance(state, object);
-        const hitbox = instance.getHitbox();
-        const tileRectangle = {
-            x: (hitbox.x / 16) | 0,
-            y: (hitbox.y / 16) | 0,
-            w: Math.ceil(hitbox.w / 16),
-            h: Math.ceil(hitbox.h / 16),
-        }
-        if (rectanglesOverlap(tileRectangle, source)) {
-            context.fillRect(
-                target.x + 2 * (tileRectangle.x - source.x),
-                target.y + 2 * (tileRectangle.y - source.y),
-                2 * tileRectangle.w,
-                2 * tileRectangle.h,
-            );
-        }
-    }
-}
-*/

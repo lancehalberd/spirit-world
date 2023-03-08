@@ -3,10 +3,11 @@ import {
     initializeAreaLayerTiles,
     //mapTileNumbersToFullTiles,
 } from 'app/content/areas';
+import { allSections } from 'app/content/sections';
 import { allTiles } from 'app/content/tiles';
 import { zones } from 'app/content/zones';
 import { getSelectionBounds } from 'app/development/brushSelection';
-import { editingState } from 'app/development/editingState';
+import { contextMenuState, editingState } from 'app/development/editingState';
 import { addMissingLayer } from 'app/development/layers';
 import {
     createObjectDefinition,
@@ -21,7 +22,7 @@ import {
 import { updateBrushCanvas } from 'app/development/propertyPanel';
 import { setEditingTool } from 'app/development/toolTab';
 import { CANVAS_SCALE } from 'app/gameConstants';
-import { getDisplayedMapSections, getSectionUnderMouse } from 'app/render/renderMap';
+import { getDisplayedMapSections, getSectionUnderMouse, mouseCoordsToMapCoords } from 'app/render/renderMap';
 import { getState } from 'app/state';
 import { KEY, isKeyboardKeyDown } from 'app/userInput';
 import { mainCanvas } from 'app/utils/canvas';
@@ -40,14 +41,29 @@ function refreshArea(state: GameState, doNotRefreshEditor = false) {
 }
 
 mainCanvas.addEventListener('mousemove', function () {
-    if (!editingState.isEditing || !isMouseDown()) {
+    if (!editingState.isEditing || !isMouseDown() || contextMenuState.contextMenu) {
         return;
     }
     const state = getState();
     const [x, y] = getMousePosition(mainCanvas, CANVAS_SCALE);
     if (state.paused) {
-        if (state.showMap) {
-            // TODO: Drag selected map sections.
+        if (editingState.sectionDragData && state.showMap && isMouseDown() && editingState.selectedSections.length) {
+            const sectionIndex = editingState.sectionDragData.sectionIndex;
+            const section = allSections[sectionIndex].section;
+            const mapCoords = mouseCoordsToMapCoords({x, y});
+            // Calculate where the anchor section should be based on the map coords delta of the mouse drag and the original
+            // position of the anchor section when the drag started.
+            const tx = editingState.sectionDragData.originalSectionX + (mapCoords.x - editingState.sectionDragData.x);
+            const ty = editingState.sectionDragData.originalSectionY + (mapCoords.y - editingState.sectionDragData.y);
+            // Compute the map deltas for the anchor section based on where it currently is and where its target position is.
+            const dx = tx - section.mapX;
+            const dy = ty - section.mapY;
+            editingState.sectionDragData.movedCount++;
+            if (dx || dy || editingState.sectionDragData.movedCount > 1) {
+                editingState.sectionDragData.dragged = true;
+            }
+            // Attempt to move all selected sections by the calculated map deltas.
+            moveSections(editingState.selectedSections, dx, dy);
         }
         return;
     }
@@ -65,7 +81,7 @@ mainCanvas.addEventListener('mousemove', function () {
     }
 });
 mainCanvas.addEventListener('mousedown', function (event) {
-    if (event.which !== 1) {
+    if (event.which !== 1 || contextMenuState.contextMenu) {
         return;
     }
     if (!editingState.isEditing) {
@@ -75,20 +91,22 @@ mainCanvas.addEventListener('mousedown', function (event) {
     const [x, y] = getMousePosition(mainCanvas, CANVAS_SCALE);
     if (state.paused) {
         if (state.showMap) {
-            const section = getSectionUnderMouse(state);
-            if (isKeyboardKeyDown(KEY.SHIFT)) {
-                if (section) {
-                    const arrayIndex = editingState.selectedSections.indexOf(section.index);
-                    if (arrayIndex >= 0) {
-                        editingState.selectedSections.splice(arrayIndex, 1);
-                    } else {
-                        editingState.selectedSections.push(section.index);
-                    }
-                }
-            } else if (!section || (editingState.selectedSections.length === 1 && editingState.selectedSections[0] === section.index)) {
-                editingState.selectedSections = [];
-            } else {
-                editingState.selectedSections = [section.index];
+            if (editingState.selectedSections.length && !isKeyboardKeyDown(KEY.SHIFT)) {
+                const mapCoords = mouseCoordsToMapCoords({x, y});
+                // The anchor section is arbitrarily set to the first selected section.
+                // It will be used to keep track of how much we need to move the sections at any point
+                // during the drag operation.
+                const sectionIndex = editingState.selectedSections[0];
+                const section = allSections[sectionIndex].section;
+                editingState.sectionDragData = {
+                    dragged: false,
+                    movedCount: 0,
+                    x: mapCoords.x,
+                    y: mapCoords.y,
+                    sectionIndex,
+                    originalSectionX: section.mapX,
+                    originalSectionY: section.mapY,
+                };
             }
         }
         return;
@@ -115,8 +133,34 @@ mainCanvas.addEventListener('mousedown', function (event) {
             break;
     }
 });
-document.addEventListener('mouseup', () => {
+document.addEventListener('mouseup', (event) => {
+    if (event.which !== 1 || contextMenuState.contextMenu) {
+        return;
+    }
     editingState.dragOffset = null;
+    if (!editingState.sectionDragData?.dragged) {
+        const state = getState();
+        if (state.paused) {
+            if (state.showMap) {
+                const section = getSectionUnderMouse(state);
+                if (isKeyboardKeyDown(KEY.SHIFT)) {
+                    if (section) {
+                        const arrayIndex = editingState.selectedSections.indexOf(section.index);
+                        if (arrayIndex >= 0) {
+                            editingState.selectedSections.splice(arrayIndex, 1);
+                        } else {
+                            editingState.selectedSections.push(section.index);
+                        }
+                    }
+                } else if (!section || (editingState.selectedSections.length === 1 && editingState.selectedSections[0] === section.index)) {
+                    editingState.selectedSections = [];
+                } else {
+                    editingState.selectedSections = [section.index];
+                }
+            }
+        }
+    }
+    editingState.sectionDragData = null;
 });
 
 function onMouseDownObject(state: GameState, editingState: EditingState, x: number, y: number): void {
@@ -445,13 +489,43 @@ document.addEventListener('keydown', function(event: KeyboardEvent) {
             setEditingTool(editingState.previousTool);
         }
     }
+    /*
+    // Don't support moving sections with keyboard because it
+    // conflicts with controls for changing map floor.
     if (state.paused && state.showMap) {
         if (event.which === KEY.LEFT || event.which === KEY.A) {
-
+            moveSections(editingState.selectedSections, -1, 0);
         }
-    }
+        if (event.which === KEY.RIGHT || event.which === KEY.D) {
+            moveSections(editingState.selectedSections, 1, 0);
+        }
+        if (event.which === KEY.UP || event.which === KEY.W) {
+            moveSections(editingState.selectedSections, 0, -1);
+        }
+        if (event.which === KEY.DOWN || event.which === KEY.S) {
+            moveSections(editingState.selectedSections, 0, 1);
+        }
+    }*/
 
 });
+
+function canMoveSection(sectionIndex: number, dx: number, dy: number): boolean {
+    const section = allSections[sectionIndex].section;
+    const l = section.mapX + dx, t = section.mapY + dy;
+    const r = l + (section.w / 16) | 0, b = t + (section.h / 16) | 0;
+    return l >= 0 && r <= 6 && t >= 0 && b <= 6;
+}
+
+function moveSections(sections: number[], dx: number, dy: number) {
+    if (sections.every(section => canMoveSection(section, dx, dy))) {
+        for (const sectionIndex of sections) {
+            const section = allSections[sectionIndex].section;
+            section.mapX += dx;
+            section.mapY += dy;
+        }
+        getState().map.needsRefresh = true;
+    }
+}
 
 function performGlobalTileReplacement(oldPalette: TilePalette, newPalette: TilePalette): void {
     const map: number[] = [];

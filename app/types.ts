@@ -15,6 +15,7 @@ export type { Enemy } from 'app/content/enemy';
 export type { Hero } from 'app/content/hero';
 export type { BallGoal } from 'app/content/objects/ballGoal';
 export type { CrystalSwitch } from 'app/content/objects/crystalSwitch';
+export type { ContextMenu } from 'app/development/ContextMenu';
 export type { Escalator } from 'app/content/objects/escalator';
 export type { FloorSwitch } from 'app/content/objects/floorSwitch';
 export type { Anode, Cathode } from 'app/content/objects/lightningBarrier';

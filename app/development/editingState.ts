@@ -1,6 +1,10 @@
 import { palettes } from 'app/content/palettes';
 
-import { EditingState } from 'app/types';
+import { ContextMenu, EditingState } from 'app/types';
+
+interface ContextMenuState {
+    contextMenu: ContextMenu,
+}
 
 export const editingState: EditingState = {
     tool: 'brush',
@@ -20,4 +24,8 @@ window.onbeforeunload = () => {
         // Chrome ignores this message but displays an appropriate message.
         return 'You have may unsaved changes.';
     }
+}
+
+export const contextMenuState: ContextMenuState = {
+    contextMenu: null,
 }

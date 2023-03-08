@@ -1,6 +1,7 @@
+import { allSections } from 'app/content/sections';
 import { setSpawnLocation } from 'app/content/spawnLocations';
 import { getSpawnLocationContextMenuOption, getTestStateContextMenuOption } from 'app/development/contextMenu/setState';
-import { editingState } from 'app/development/editingState';
+import { contextMenuState, editingState } from 'app/development/editingState';
 import { toggleEditing } from 'app/development/editor';
 import { tagElement } from 'app/dom';
 import { CANVAS_SCALE } from 'app/gameConstants';
@@ -15,14 +16,8 @@ import { updateSoundSettings } from 'app/utils/sounds';
 
 import { MenuOption } from 'app/types';
 
-interface ContextMenuState {
-    contextMenu: ContextMenu,
-}
-const contextMenuState: ContextMenuState = {
-    contextMenu: null,
-}
 
-class ContextMenu {
+export class ContextMenu {
     container: HTMLElement;
     domElement: HTMLElement;
     menuOptions: MenuOption[];
@@ -114,9 +109,22 @@ export function getContextMenu(): MenuOption[] {
     // Special context menu for editing map sections when the map is shown with the editor enabled.
     if (state.paused && state.showMap && editingState.isEditing && editingState.selectedSections.length) {
         // TODO: Add options for setting mapId+floorId or mapId+entranceId
-        // TODO: Add optiosn for creating new mapId and new floorId
+        // TODO: Add options for creating new mapId and new floorId
+        const areAllSectionsHidden = editingState.selectedSections.every(index => allSections[index].section.hideMap);
         return [
-
+            {
+                label: areAllSectionsHidden ? 'Show' : 'Hide',
+                onSelect() {
+                    for (const sectionIndex of editingState.selectedSections) {
+                        if (areAllSectionsHidden) {
+                            delete allSections[sectionIndex].section.hideMap;
+                        } else {
+                            allSections[sectionIndex].section.hideMap = true;
+                        }
+                    }
+                    state.map.needsRefresh = true;
+                }
+            }
         ];
     }
     const options = [

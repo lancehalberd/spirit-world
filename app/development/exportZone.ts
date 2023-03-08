@@ -117,6 +117,24 @@ export function serializeZone(zone: Zone) {
                         if (section.hotLogic) {
                             extraFields += `, hotLogic: ${JSON.stringify(section.hotLogic)}`;
                         }
+                        if (section.hideMap) {
+                            extraFields += `, hideMap: ${section.hideMap}`;
+                        }
+                        if (section.mapId) {
+                            extraFields += `, mapId: '${section.mapId}'`;
+                        }
+                        if (section.floorId) {
+                            extraFields += `, floorId: '${section.floorId}'`;
+                        }
+                        if (section.entranceId) {
+                            extraFields += `, entranceId: '${section.entranceId}'`;
+                        }
+                        if (section.mapX) {
+                            extraFields += `, mapX: ${section.mapX}`;
+                        }
+                        if (section.mapY) {
+                            extraFields += `, mapY: ${section.mapY}`;
+                        }
                         lines.push(`        {x: ${section.x}, y: ${section.y}, w: ${section.w}, h: ${section.h}${extraFields}}, `);
 
                     }

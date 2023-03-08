@@ -40,7 +40,6 @@ Graphics:
 
 Current tasks:
     - Add dungeon maps
-        - Use WASD/arrow keys or click and drag to move all selected tiles within the 6x6 bounds.
         - Special context menu when tiles are selected
             - setMap -> "map zone id" + "new map"(default floor is '1F') -> "floor" + "new floor"
                 Set mapId/floorId

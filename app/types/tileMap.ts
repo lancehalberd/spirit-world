@@ -268,6 +268,7 @@ export interface AreaSection extends Rect {
     // The entrance to render the hero marker at for sections that display the world map
     // instead of dungeon maps.
     entranceId?: string
+    hideMap?: boolean
 }
 
 export interface AreaSectionInstance extends AreaSection {

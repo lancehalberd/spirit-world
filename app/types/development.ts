@@ -17,4 +17,13 @@ export interface EditingState {
     spirit: boolean
     dragOffset?: {x: number, y: number}
     selectedSections: number[]
+    sectionDragData?: {
+        x: number
+        y: number
+        sectionIndex: number
+        originalSectionX: number
+        originalSectionY: number
+        dragged: boolean
+        movedCount: number
+    }
 }
