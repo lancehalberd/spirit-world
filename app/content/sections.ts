@@ -1,6 +1,7 @@
+import { getAreaFromLocation } from 'app/content/areas';
 import { zones } from 'app/content/zones/zoneHash';
 
-import { AreaDefinition, AreaSection, GameState, Point } from 'app/types';
+import { AreaDefinition, AreaSection, Point, ZoneLocation } from 'app/types';
 
 interface SectionData {
     section: AreaSection
@@ -42,6 +43,14 @@ export function populateAllSections() {
                 for (let y = 0; y < grid.length; y++) {
                     for (let x = 0; x < grid[y].length; x++) {
                         for (const section of (grid[y][x]?.sections || [])) {
+                            const location: ZoneLocation = {
+                                zoneKey,
+                                floor: floorIndex,
+                                isSpiritWorld,
+                                areaGridCoords: {x, y},
+                                x: 0, y: 0,
+                                d: 'down'
+                            }
                             if (section.index >= 0) {
                                 // If this spot was assigned, move whatever is there to a new location.
                                 if (allSections[section.index]) {
@@ -50,7 +59,7 @@ export function populateAllSections() {
                                 }
                                 allSections[section.index] = {
                                     section,
-                                    area: grid[y][x],
+                                    area: getAreaFromLocation(location),
                                     zoneKey,
                                     floor: floorIndex,
                                     coords: [x, y],
@@ -59,7 +68,7 @@ export function populateAllSections() {
                             } else {
                                 newSections.push({
                                     section,
-                                    area: grid[y][x],
+                                    area: getAreaFromLocation(location),
                                     zoneKey,
                                     floor: floorIndex,
                                     coords: [x, y],
@@ -80,6 +89,7 @@ export function populateAllSections() {
     }
     populateSectionMapData();
 }
+
 function populateSectionMapData(): void {
     for (const sectionData of allSections) {
         const section = sectionData?.section;
@@ -108,21 +118,5 @@ function populateSectionMapData(): void {
         const map = dungeonMaps[section.mapId] = dungeonMaps[section.mapId] || {floors: {}};
         const floor = map.floors[section.floorId] = map.floors[section.floorId] || {sections: []};
         floor.sections.push(section.index);
-    }
-}
-
-export function isSectionExplored(state: GameState, sectionIndex: number): boolean {
-    const numberIndex = (sectionIndex / 32) | 0;
-    const bitIndex = sectionIndex % 32;
-    return !!(state.savedState.exploredSections[numberIndex] >> bitIndex & 1)
-}
-
-export function exploreSection(state: GameState, sectionIndex: number) {
-    const numberIndex = (sectionIndex / 32) | 0;
-    const bitIndex = sectionIndex % 32;
-    if (!(state.savedState.exploredSections[numberIndex] >> bitIndex & 1)) {
-        state.savedState.exploredSections[numberIndex] = state.savedState.exploredSections[numberIndex] || 0;
-        state.savedState.exploredSections[numberIndex] = state.savedState.exploredSections[numberIndex] | (1 << bitIndex);
-        state.map.needsRefresh = true;
     }
 }

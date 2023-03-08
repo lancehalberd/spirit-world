@@ -1,5 +1,5 @@
 import { evaluateLogicDefinition, logicHash, isLogicValid, isObjectLogicValid } from 'app/content/logic';
-import { exploreSection } from 'app/content/sections';
+import { exploreSection } from 'app/utils/sections';
 import { allTiles } from 'app/content/tiles';
 import { zones } from 'app/content/zones';
 import { editingState } from 'app/development/editingState';

@@ -1,7 +1,7 @@
 import { createAreaInstance } from 'app/content/areas';
 import { getMapTarget } from 'app/content/hints';
 import { isLogicValid, logicHash } from 'app/content/logic';
-import { allSections, dungeonMaps, isSectionExplored } from 'app/content/sections';
+import { allSections, dungeonMaps } from 'app/content/sections';
 import { zones } from 'app/content/zones/zoneHash';
 import { editingState } from 'app/development/editingState';
 import { CANVAS_WIDTH, CANVAS_HEIGHT, CANVAS_SCALE } from 'app/gameConstants';
@@ -13,6 +13,7 @@ import { findObjectLocation } from 'app/utils/enterZoneByTarget';
 import { createCanvasAndContext, drawCanvas } from 'app/utils/canvas';
 import { isPointInShortRect, rectanglesOverlap, pad } from 'app/utils/index';
 import { getMousePosition, isMouseDown } from 'app/utils/mouse';
+import { isSectionExplored } from 'app/utils/sections';
 import { drawText } from 'app/utils/simpleWhiteFont';
 
 import { AreaInstance, AreaSection, GameState, ObjectType, Rect } from 'app/types';

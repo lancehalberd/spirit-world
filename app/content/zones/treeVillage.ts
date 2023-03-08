@@ -200,10 +200,10 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 144, y: 80, type: "pushPull"},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 16, h: 16, index: 128, mapId: 'overworld', entranceId: 'northwestTreeEntrance', mapX: 0, mapY: 0},
+        {x: 16, y: 0, w: 16, h: 16, index: 129, mapId: 'overworld', entranceId: 'northeastTreeEntrance', mapX: 1, mapY: 0},
+        {x: 0, y: 16, w: 16, h: 16, index: 130, mapId: 'overworld', entranceId: 'elderEntrance', mapX: 0, mapY: 1},
+        {x: 16, y: 16, w: 16, h: 16, index: 131, mapId: 'overworld', entranceId: 'southeastTreeEntrance', mapX: 1, mapY: 1},
     ],
 };
 const sf0_0x0: AreaDefinition = {
@@ -215,10 +215,10 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "elderSpiritStairs", x: 96, y: 304, type: "door", style: "woodenDownstairs", targetZone: "treeVillage", targetObjectId: "elderSpiritStairs", d: "up"},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 16, h: 16, index: 132, mapId: 'treeVillageSpirit', floorId: '1F', mapX: 0, mapY: 0},
+        {x: 16, y: 0, w: 16, h: 16, index: 133, mapId: 'treeVillageSpirit', floorId: '1F', mapX: 1, mapY: 0},
+        {x: 0, y: 16, w: 16, h: 16, index: 134, mapId: 'overworld', entranceId: 'elderSpiritEntrance', mapX: 0, mapY: 1},
+        {x: 16, y: 16, w: 16, h: 16, index: 135, mapId: 'treeVillageSpirit', floorId: '1F', mapX: 1, mapY: 1},
     ],
 };
 const f1_0x0: AreaDefinition = {
@@ -418,10 +418,10 @@ const f1_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 352, y: 64, type: "tippable"},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 16, h: 16, index: 136, mapId: 'treeVillage', floorId: '2F', mapX: 0, mapY: 0},
+        {x: 16, y: 0, w: 16, h: 16, index: 137, mapId: 'overworld', entranceId: 'treeVillageStoragePit', mapX: 1, mapY: 0},
+        {x: 0, y: 16, w: 16, h: 16, index: 138, mapId: 'overworld', entranceId: 'elderEntrance', mapX: 0, mapY: 1},
+        {x: 16, y: 16, w: 16, h: 16, index: 139, mapId: 'overworld', entranceId: 'elderEntrance', mapX: 1, mapY: 1},
     ],
     dark: 100,
 };
@@ -609,10 +609,10 @@ const sf1_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 432, y: 448, type: "crystalSwitch", timer: 4000, targetObjectId: "forestTempleBackDoor"},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 16, h: 16, index: 140, mapId: 'treeVillageSpirit', floorId: '2F', mapX: 0, mapY: 0},
+        {x: 16, y: 0, w: 16, h: 16, index: 141, mapId: 'treeVillageSpirit', floorId: '2F', mapX: 1, mapY: 0},
+        {x: 0, y: 16, w: 16, h: 16, index: 142, mapId: 'overworld', entranceId: 'elderSpiritEntrance', mapX: 0, mapY: 1},
+        {x: 16, y: 16, w: 16, h: 16, index: 143, mapId: 'overworld', entranceId: 'elderSpiritEntrance', mapX: 1, mapY: 1},
     ],
 };
 zones.treeVillage = {

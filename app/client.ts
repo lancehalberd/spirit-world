@@ -4,6 +4,7 @@ import { refreshEditor } from 'app/development/editor';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { update } from 'app/update';
 import { render } from 'app/render';
+import { populateAllSections} from 'app/content/sections';
 import { getState } from 'app/state';
 import { updateMusic } from 'app/musicController';
 
@@ -14,6 +15,8 @@ export * from 'app/development/tests';
 export * from 'app/randomizer/main';
 
 setInterval(update, FRAME_LENGTH);
+
+populateAllSections();
 
 
 function renderLoop() {
