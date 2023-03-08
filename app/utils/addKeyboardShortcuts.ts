@@ -58,7 +58,9 @@ export function addKeyboardShortcuts() {
             return;
         }
         if (keyCode === KEY.A && commandIsDown) {
-            selectSection();
+            if (editingState.isEditing) {
+                selectSection();
+            }
             event.preventDefault();
             return;
         }

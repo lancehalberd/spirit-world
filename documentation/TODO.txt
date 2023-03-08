@@ -40,14 +40,7 @@ Graphics:
 
 Current tasks:
     - Add dungeon maps
-        - Support selecting 16x16 tiles when editor is open
-            - Click to select a tile
-            - SHIFT click unselected tile to add it to current selection
-            - SHIFT click selected tile to remove it from current selection
-            - CTRL + A to select the entire floor of the current map
-            - Render effect for selected tile
-            - Render effect for hover over tile
-            - ESCAPE to unselect all tiles
+        - Use WASD/arrow keys or click and drag to move all selected tiles within the 6x6 bounds.
         - Special context menu when tiles are selected
             - setMap -> "map zone id" + "new map"(default floor is '1F') -> "floor" + "new floor"
                 Set mapId/floorId
@@ -58,7 +51,6 @@ Current tasks:
                 mapData = [TL, TR, BL, BR]
                 with structure as {id?: string, floor: '1F', x: 0, y: 0}
             - read and write mapData from areaDefinition.parentDefinition.mapData when parentDefinition exists.
-        - Use WASD/arrow keys or click and drag to move all selected tiles within the 6x6 bounds.
 
         - set section.index and update allSections when creating new sections
         - figure out how to sort display of floor ids so it is B2/B1/1F/2F etc.

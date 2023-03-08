@@ -21,6 +21,7 @@ export function toggleEditing(state: GameState) {
     state.hero.z = 0;
     state.hero.actionTarget = null;
     editingState.isEditing = !editingState.isEditing;
+    state.map.needsRefresh = true;
     if (editingState.isEditing) {
         startEditing(state);
     } else {

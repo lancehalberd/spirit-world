@@ -12,6 +12,7 @@ export const editingState: EditingState = {
     refreshMinimap: true,
     replacePercentage: 100,
     spirit: false,
+    selectedSections: [],
 };
 window['editingState'] = editingState;
 window.onbeforeunload = () => {

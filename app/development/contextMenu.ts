@@ -110,6 +110,15 @@ class ContextMenu {
 }
 
 export function getContextMenu(): MenuOption[] {
+    const state = getState()
+    // Special context menu for editing map sections when the map is shown with the editor enabled.
+    if (state.paused && state.showMap && editingState.isEditing && editingState.selectedSections.length) {
+        // TODO: Add options for setting mapId+floorId or mapId+entranceId
+        // TODO: Add optiosn for creating new mapId and new floorId
+        return [
+
+        ];
+    }
     const options = [
         getSpawnLocationContextMenuOption(),
         getAssistanceMenuOption(),

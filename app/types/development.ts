@@ -16,4 +16,5 @@ export interface EditingState {
     selectedObject?: ObjectDefinition
     spirit: boolean
     dragOffset?: {x: number, y: number}
+    selectedSections: number[]
 }

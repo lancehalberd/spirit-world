@@ -96,6 +96,9 @@ export function pad({x, y, w, h}: Rect, m: number): Rect {
 export function scaleRect({x, y, w, h}: Rect, scale: number): Rect {
     return {x: x * scale, w: w * scale, y: y * scale, h: h * scale};
 }
+export function translateRect({x, y, w, h}: Rect, tx: number, ty: number): Rect {
+    return {x: x + tx, w, y: y + ty, h};
+}
 export function rectangleCenter(rectangle: FullRectangle): [number, number] {
     return [rectangle.left + rectangle.width / 2, rectangle.top + rectangle.height / 2];
 }

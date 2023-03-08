@@ -21,8 +21,9 @@ import {
 import { updateBrushCanvas } from 'app/development/propertyPanel';
 import { setEditingTool } from 'app/development/toolTab';
 import { CANVAS_SCALE } from 'app/gameConstants';
-import { KEY, isKeyboardKeyDown } from 'app/userInput';
+import { getDisplayedMapSections, getSectionUnderMouse } from 'app/render/renderMap';
 import { getState } from 'app/state';
+import { KEY, isKeyboardKeyDown } from 'app/userInput';
 import { mainCanvas } from 'app/utils/canvas';
 import { enterLocation } from 'app/utils/enterLocation';
 import { getMousePosition, isMouseDown, /*isMouseOverElement*/ } from 'app/utils/mouse';
@@ -46,7 +47,7 @@ mainCanvas.addEventListener('mousemove', function () {
     const [x, y] = getMousePosition(mainCanvas, CANVAS_SCALE);
     if (state.paused) {
         if (state.showMap) {
-            // TODO:
+            // TODO: Drag selected map sections.
         }
         return;
     }
@@ -74,7 +75,21 @@ mainCanvas.addEventListener('mousedown', function (event) {
     const [x, y] = getMousePosition(mainCanvas, CANVAS_SCALE);
     if (state.paused) {
         if (state.showMap) {
-            // TODO:
+            const section = getSectionUnderMouse(state);
+            if (isKeyboardKeyDown(KEY.SHIFT)) {
+                if (section) {
+                    const arrayIndex = editingState.selectedSections.indexOf(section.index);
+                    if (arrayIndex >= 0) {
+                        editingState.selectedSections.splice(arrayIndex, 1);
+                    } else {
+                        editingState.selectedSections.push(section.index);
+                    }
+                }
+            } else if (!section || (editingState.selectedSections.length === 1 && editingState.selectedSections[0] === section.index)) {
+                editingState.selectedSections = [];
+            } else {
+                editingState.selectedSections = [section.index];
+            }
         }
         return;
     }
@@ -372,6 +387,17 @@ function getTileGridFromLayer(layerDefinition: AreaLayerDefinition, rectangle: R
 
 export function selectSection() {
     const state = getState();
+    if (state.paused) {
+        if (state.showMap) {
+            const allSections = getDisplayedMapSections(state);
+            if (editingState.selectedSections.length === allSections.length) {
+                editingState.selectedSections = [];
+            } else {
+                editingState.selectedSections = [...allSections];
+            }
+        }
+        return;
+    }
     editingState.brush = {};
     if (editingState.selectedLayerKey) {
         const layerDefinition = state.areaInstance.definition.layers.find(l => l.key === editingState.selectedLayerKey);
@@ -400,8 +426,8 @@ document.addEventListener('keydown', function(event: KeyboardEvent) {
         || (event.target as HTMLElement).closest('select')) {
         return;
     }
+    const state = getState();
     if (event.which === KEY.BACK_SPACE) {
-        const state = getState();
         if (editingState.tool === 'brush') {
             const [x, y] = getMousePosition(mainCanvas, CANVAS_SCALE);
             deleteTile(x, y);
@@ -411,6 +437,7 @@ document.addEventListener('keydown', function(event: KeyboardEvent) {
         }
     }
     if (event.which === KEY.ESCAPE) {
+        editingState.selectedSections = [];
         if (editingState.selectedObject) {
             unselectObject(editingState);
         }
@@ -418,6 +445,12 @@ document.addEventListener('keydown', function(event: KeyboardEvent) {
             setEditingTool(editingState.previousTool);
         }
     }
+    if (state.paused && state.showMap) {
+        if (event.which === KEY.LEFT || event.which === KEY.A) {
+
+        }
+    }
+
 });
 
 function performGlobalTileReplacement(oldPalette: TilePalette, newPalette: TilePalette): void {

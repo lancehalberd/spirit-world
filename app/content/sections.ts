@@ -15,7 +15,7 @@ interface DungeonMap {
     floors: {[key: string]: DungeonFloorMap}
 }
 interface DungeonFloorMap {
-    grid: number[][]
+    sections: number[]
 }
 
 let nextFreeId = 0;
@@ -106,9 +106,8 @@ function populateSectionMapData(): void {
             continue;
         }
         const map = dungeonMaps[section.mapId] = dungeonMaps[section.mapId] || {floors: {}};
-        const floor = map.floors[section.floorId] = map.floors[section.floorId] || {grid: []};
-        floor.grid[section.mapY] = floor.grid[section.mapY] || [];
-        floor.grid[section.mapY][section.mapX] = section.index;
+        const floor = map.floors[section.floorId] = map.floors[section.floorId] || {sections: []};
+        floor.sections.push(section.index);
     }
 }
 
