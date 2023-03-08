@@ -90,7 +90,7 @@ const f0_0x0: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 181, hideMap: true, mapId: 'tomb', floorId: '1F', mapX: 1, mapY: 1},
+        {x: 0, y: 0, w: 32, h: 32, index: 181, hideMap: true, mapId: 'tomb', floorId: 'B1', mapX: 1, mapY: 1},
     ],
 };
 const f0_1x0: AreaDefinition = {
@@ -188,8 +188,8 @@ const f0_1x0: AreaDefinition = {
         {status: "normal", id: "", x: 96, y: 288, type: "pushPull"},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 32, index: 182, mapId: 'tomb', floorId: '1F', mapX: 3, mapY: 1},
-        {x: 16, y: 0, w: 16, h: 32, index: 183, hideMap: true, mapId: 'tomb', floorId: '1F', mapX: 4, mapY: 1},
+        {x: 0, y: 0, w: 16, h: 32, index: 182, mapId: 'tomb', floorId: 'B1', mapX: 3, mapY: 1},
+        {x: 16, y: 0, w: 16, h: 32, index: 183, hideMap: true, mapId: 'tomb', floorId: 'B1', mapX: 4, mapY: 1},
     ],
 };
 const f0_0x1: AreaDefinition = {
@@ -423,9 +423,9 @@ const f0_0x1: AreaDefinition = {
         {status: "normal", id: "", x: 224, y: 304, type: "turret", d: "down", fireInterval: 1600, fireOffset: 800},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16, index: 185, mapId: 'tomb', floorId: '1F', mapX: 1, mapY: 3},
-        {x: 0, y: 16, w: 16, h: 16, index: 186, mapId: 'tomb', floorId: '1F', mapX: 1, mapY: 4},
-        {x: 16, y: 0, w: 16, h: 32, index: 187, mapId: 'tomb', floorId: '1F', mapX: 2, mapY: 3},
+        {x: 0, y: 0, w: 16, h: 16, index: 185, mapId: 'tomb', floorId: 'B1', mapX: 1, mapY: 3},
+        {x: 0, y: 16, w: 16, h: 16, index: 186, mapId: 'tomb', floorId: 'B1', mapX: 1, mapY: 4},
+        {x: 16, y: 0, w: 16, h: 32, index: 187, mapId: 'tomb', floorId: 'B1', mapX: 2, mapY: 3},
     ],
 };
 const f0_1x1: AreaDefinition = {
@@ -524,9 +524,9 @@ const f0_1x1: AreaDefinition = {
         {status: "normal", id: "tomb:0:1x1-map-0", x: 104, y: 416, type: "chest", lootType: "map", lootLevel: 1},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16, index: 188, mapId: 'tomb', floorId: '1F', mapX: 3, mapY: 3},
-        {x: 0, y: 16, w: 16, h: 16, index: 189, mapId: 'tomb', floorId: '1F', mapX: 3, mapY: 4},
-        {x: 16, y: 0, w: 16, h: 32, index: 190, hideMap: true, mapId: 'tomb', floorId: '1F', mapX: 4, mapY: 3},
+        {x: 0, y: 0, w: 16, h: 16, index: 188, mapId: 'tomb', floorId: 'B1', mapX: 3, mapY: 3},
+        {x: 0, y: 16, w: 16, h: 16, index: 189, mapId: 'tomb', floorId: 'B1', mapX: 3, mapY: 4},
+        {x: 16, y: 0, w: 16, h: 32, index: 190, hideMap: true, mapId: 'tomb', floorId: 'B1', mapX: 4, mapY: 3},
     ],
 };
 const sf0_0x0: AreaDefinition = null;
@@ -668,9 +668,9 @@ const f1_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 176, y: 16, type: "turret", d: "down", fireInterval: 1000, fireOffset: 500},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16, index: 194, mapId: 'tomb', floorId: '2F', mapX: 0, mapY: 1},
-        {x: 16, y: 0, w: 16, h: 16, index: 195, mapId: 'tomb', floorId: '2F', mapX: 1, mapY: 1},
-        {x: 0, y: 16, w: 32, h: 16, index: 196, mapId: 'tomb', floorId: '2F', mapX: 0, mapY: 2},
+        {x: 0, y: 0, w: 16, h: 16, index: 194, mapId: 'tomb', floorId: '1F', mapX: 0, mapY: 1},
+        {x: 16, y: 0, w: 16, h: 16, index: 195, mapId: 'tomb', floorId: '1F', mapX: 1, mapY: 1},
+        {x: 0, y: 16, w: 32, h: 16, index: 196, mapId: 'tomb', floorId: '1F', mapX: 0, mapY: 2},
     ],
 };
 const f1_1x0: AreaDefinition = {
@@ -828,7 +828,7 @@ const f1_1x0: AreaDefinition = {
         {status: "normal", id: "tombSave", x: 192, y: 32, type: "saveStatue"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32, index: 197, mapId: 'tomb', floorId: '2F', mapX: 2, mapY: 1},
+        {x: 0, y: 0, w: 32, h: 32, index: 197, mapId: 'tomb', floorId: '1F', mapX: 2, mapY: 1},
     ],
 };
 const f1_2x0: AreaDefinition = {
@@ -940,9 +940,9 @@ const f1_2x0: AreaDefinition = {
         {status: "normal", id: "tomb:1:2x0-luckyBeetle-0", x: 376, y: 120, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16, index: 198, mapId: 'tomb', floorId: '2F', mapX: 4, mapY: 1},
-        {x: 16, y: 0, w: 16, h: 16, index: 199, mapId: 'tomb', floorId: '2F', mapX: 5, mapY: 1},
-        {x: 0, y: 16, w: 32, h: 16, index: 200, mapId: 'tomb', floorId: '2F', mapX: 4, mapY: 2},
+        {x: 0, y: 0, w: 16, h: 16, index: 198, mapId: 'tomb', floorId: '1F', mapX: 4, mapY: 1},
+        {x: 16, y: 0, w: 16, h: 16, index: 199, mapId: 'tomb', floorId: '1F', mapX: 5, mapY: 1},
+        {x: 0, y: 16, w: 32, h: 16, index: 200, mapId: 'tomb', floorId: '1F', mapX: 4, mapY: 2},
     ],
 };
 const f1_0x1: AreaDefinition = {
@@ -1049,9 +1049,9 @@ const f1_0x1: AreaDefinition = {
         {id: "tomb:1:0x1-beetleHorned-1", linked: false, spirit: false, status: "normal", x: 336, y: 192, type: "enemy", enemyType: "beetleHorned"},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16, index: 201, mapId: 'tomb', floorId: '2F', mapX: 0, mapY: 3},
-        {x: 16, y: 0, w: 16, h: 16, index: 202, mapId: 'tomb', floorId: '2F', mapX: 1, mapY: 3},
-        {x: 0, y: 16, w: 32, h: 16, index: 203, mapId: 'tomb', floorId: '2F', mapX: 0, mapY: 4},
+        {x: 0, y: 0, w: 16, h: 16, index: 201, mapId: 'tomb', floorId: '1F', mapX: 0, mapY: 3},
+        {x: 16, y: 0, w: 16, h: 16, index: 202, mapId: 'tomb', floorId: '1F', mapX: 1, mapY: 3},
+        {x: 0, y: 16, w: 32, h: 16, index: 203, mapId: 'tomb', floorId: '1F', mapX: 0, mapY: 4},
     ],
 };
 const f1_1x1: AreaDefinition = {
@@ -1156,8 +1156,8 @@ const f1_1x1: AreaDefinition = {
         {status: "normal", id: "tombEntered", x: 240, y: 448, type: "narration", message: "", trigger: "touch", delay: 0, w: 32, h: 32, saveStatus: "forever"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16, index: 204, mapId: 'tomb', floorId: '2F', mapX: 2, mapY: 3},
-        {x: 0, y: 16, w: 32, h: 16, index: 205, mapId: 'tomb', floorId: '2F', mapX: 2, mapY: 4},
+        {x: 0, y: 0, w: 32, h: 16, index: 204, mapId: 'tomb', floorId: '1F', mapX: 2, mapY: 3},
+        {x: 0, y: 16, w: 32, h: 16, index: 205, mapId: 'tomb', floorId: '1F', mapX: 2, mapY: 4},
     ],
 };
 const f1_2x1: AreaDefinition = {
@@ -1254,7 +1254,7 @@ const f1_2x1: AreaDefinition = {
         {id: "tomb:1:2x1-door-5", linked: false, spirit: false, status: "closed", x: 256, y: 368, type: "door", style: "cave", d: "left"},
         {id: "tomb:1:2x1-door-6", linked: false, spirit: false, status: "normal", x: 224, y: 368, type: "door", style: "cave", d: "right"},
         {id: "tombLock1", linked: false, spirit: false, status: "locked", x: 0, y: 112, type: "door", style: "cave", d: "left"},
-        {id: "tombMoney", linked: false, spirit: false, status: "normal", x: 384, y: 96, type: "chest", lootType: "money", lootLevel: 0, lootAmount: 50},
+        {id: "tombMap", linked: false, spirit: false, status: "normal", x: 384, y: 96, type: "chest", lootType: "map", lootLevel: 0, lootAmount: 50},
         {id: "tomb:1:2x1-arrowTurret-0", linked: false, spirit: false, status: "normal", x: 160, y: 304, type: "enemy", enemyType: "arrowTurret"},
         {id: "tomb:1:2x1-arrowTurret-1", linked: false, spirit: false, status: "normal", x: 128, y: 224, type: "enemy", enemyType: "arrowTurret"},
         {id: "tomb:1:2x1-arrowTurret-2", linked: false, spirit: false, status: "normal", x: 400, y: 352, type: "enemy", enemyType: "arrowTurret"},
@@ -1272,9 +1272,9 @@ const f1_2x1: AreaDefinition = {
         {status: "normal", id: "", x: 320, y: 112, type: "spawnMarker"},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 32, index: 206, mapId: 'tomb', floorId: '2F', mapX: 4, mapY: 3},
-        {x: 16, y: 0, w: 16, h: 16, index: 207, mapId: 'tomb', floorId: '2F', mapX: 5, mapY: 3},
-        {x: 16, y: 16, w: 16, h: 16, index: 208, mapId: 'tomb', floorId: '2F', mapX: 5, mapY: 4},
+        {x: 0, y: 0, w: 16, h: 32, index: 206, mapId: 'tomb', floorId: '1F', mapX: 4, mapY: 3},
+        {x: 16, y: 0, w: 16, h: 16, index: 207, mapId: 'tomb', floorId: '1F', mapX: 5, mapY: 3},
+        {x: 16, y: 16, w: 16, h: 16, index: 208, mapId: 'tomb', floorId: '1F', mapX: 5, mapY: 4},
     ],
 };
 const sf1_0x0: AreaDefinition = null;

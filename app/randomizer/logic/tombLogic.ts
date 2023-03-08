@@ -14,7 +14,7 @@ export const tombNodes: LogicNode[] = [
         nodeId: 'tombEntrance',
         checks: [
             {objectId: 'tombKey1', logic: hasWeapon},
-            {objectId: 'tombMoney'},
+            {objectId: 'tombMap'},
         ],
         paths: [
             {nodeId: 'tombMiddleHallway', doorId: 'tombLock1'},

@@ -16,7 +16,7 @@ import {
     SPAWN_LOCATION_FULL,
     fixSpawnLocationOnLoad,
 } from 'app/content/spawnLocations';
-import { zones } from 'app/content/zones/zoneHash';
+import { editingState } from 'app/development/editingState';
 import {
     FRAME_LENGTH, GAME_KEY,
     FADE_IN_DURATION, FADE_OUT_DURATION,
@@ -103,9 +103,14 @@ export function update() {
                 )
             ) {
                 state.showMap = !state.showMap;
-                const dungeonMap = dungeonMaps[state.areaSection?.mapId];
+                const dungeonMap = dungeonMaps[state.areaSection?.definition.mapId];
                 if (state.showMap && dungeonMap) {
-                    state.menuIndex = Object.keys(dungeonMap.floors).indexOf(state.areaSection.floorId);
+                    state.menuIndex = Object.keys(dungeonMap.floors).indexOf(state.areaSection.definition.floorId);
+                    if (state.menuIndex < 0) {
+                        console.error('Could not find map floor', state.areaSection.definition.floorId, 'in', Object.keys(dungeonMap.floors));
+                        state.menuIndex = 0;
+                        debugger;
+                    }
                 }
                 state.paused = state.showMap;
                 updateSoundSettings(state);
@@ -225,14 +230,17 @@ function updateTitle(state: GameState) {
 
 function updateMenu(state: GameState) {
     if (state.showMap) {
-        const zone = zones[state.location.zoneKey];
+        const floorKeys = Object.keys(dungeonMaps[state.areaSection?.definition.mapId]?.floors || {});
         if (wasGameKeyPressed(state, GAME_KEY.UP)) {
-            state.menuIndex = (state.menuIndex + 1) % zone.floors.length;
+            state.menuIndex = (state.menuIndex + 1) % floorKeys.length;
+            editingState.selectedSections = [];
         } else if (wasGameKeyPressed(state, GAME_KEY.DOWN)) {
-            state.menuIndex = (state.menuIndex + zone.floors.length - 1) % zone.floors.length;
+            state.menuIndex = (state.menuIndex + floorKeys.length - 1) % floorKeys.length;
+            editingState.selectedSections = [];
         }
         if (wasMenuConfirmKeyPressed(state)) {
             state.paused = false;
+            editingState.selectedSections = [];
         }
         return;
     }

@@ -32,7 +32,7 @@ const worldSize = 192;
 export function renderMap(context: CanvasRenderingContext2D, state: GameState): void {
     if (['underwater', 'overworld', 'sky'].includes(state.location.zoneKey)) {
         renderOverworldMap(context, state);
-    } else if (['underwater', 'overworld', 'sky'].includes(state.areaSection?.mapId)) {
+    } else if (['underwater', 'overworld', 'sky'].includes(state.areaSection?.definition?.mapId)) {
         renderOverworldMap(context, state);
     } else {
         renderDungeonMap(context, state);
@@ -79,7 +79,7 @@ export function renderOverworldMap(context: CanvasRenderingContext2D, state: Gam
     drawFrame(context, ground12, {x: r.x + 64, y: r.y + 128, w: 64, h: 64});
     drawFrame(context, ground22, {x: r.x + 128, y: r.y + 128, w: 64, h: 64});
 
-    if (state.location.zoneKey === 'sky' || state.areaSection?.mapId === 'sky') {
+    if (state.location.zoneKey === 'sky' || state.areaSection?.definition.mapId === 'sky') {
         context.save();
             context.globalAlpha *= 0.5;
             context.fillStyle = '#0FF';
@@ -102,8 +102,8 @@ export function renderOverworldMap(context: CanvasRenderingContext2D, state: Gam
                 y: r.y + (state.location.areaGridCoords.y * 64 + state.location.y / 8 - heroIcon.h / 2) | 0,
             });
         }
-    } else if (state.areaSection?.entranceId) {
-        const location = findObjectLocation(state, state.areaSection?.mapId, state.areaSection?.entranceId, state.location.isSpiritWorld);
+    } else if (state.areaSection?.definition.entranceId) {
+        const location = findObjectLocation(state, state.areaSection?.definition.mapId, state.areaSection?.definition.entranceId, state.location.isSpiritWorld);
         if (location && state.time % 1000 <= 600) {
             drawFrame(context, heroIcon, {
                 ...heroIcon,
@@ -206,46 +206,20 @@ const floorMarkerRectangle = {
 };
 
 export function getSelectedFloorId(state: GameState) {
-    const zone = zones[state.location.zoneKey];
-    const selectedFloorIndex = state.menuIndex % zone.floors.length;
-    const floorIds = Object.keys(dungeonMaps[state.areaSection?.mapId].floors);
+    const floorIds = Object.keys(dungeonMaps[state.areaSection?.definition.mapId].floors);
+    const selectedFloorIndex = state.menuIndex % floorIds.length;
     return floorIds[selectedFloorIndex];
 }
 
 function renderDungeonMap(context: CanvasRenderingContext2D, state: GameState): void {
-    drawMapFrame(context, fullDungeonMapRectangle);
-    // Render the floor markers with hero marker + selected floor cursor
-    const r = floorMarkerRectangle;
-    const zone = zones[state.location.zoneKey];
-    const selectedFloorIndex = state.menuIndex % zone.floors.length;
-    const floorIds = Object.keys(dungeonMaps[state.areaSection?.mapId].floors);
     const selectedFloorId = getSelectedFloorId(state);
-    const rowHeight = 24;
-    for (let floor = 0; floor < floorIds.length; floor++) {
-        drawText(context, floorIds[floor], r.x + 12, r.y + r.h - rowHeight * floor - rowHeight / 2, {
-            textBaseline: 'middle',
-            textAlign: 'center',
-            size: 16,
-        });
-        if (state.time % 1000 <= 600 && floor === state.location.floor) {
-            drawFrame(context, heroIcon, {
-                ...heroIcon,
-                x: r.x + 20 - (heroIcon.w / 2) | 0,
-                y: r.y + r.h - rowHeight * floor - 8 - (heroIcon.h / 2) | 0,
-            });
-        }
-    }
-    drawFrame(context, cursor, {
-        ...cursor,
-        x: r.x,
-        y: r.y + r.h - rowHeight * selectedFloorIndex - 24,
-    });
+    drawMapFrame(context, fullDungeonMapRectangle);
     // Refresh the dungeon map if necessary
-    refreshDungeonMap(state, state.areaSection?.mapId, selectedFloorId);
+    refreshDungeonMap(state, state.areaSection?.definition.mapId, selectedFloorId);
     // Draw the dungeon map to the screen
     drawCanvas(context, mapCanvas, {x: 0, y: 0, w: 192, h: 192}, innerDungeonMapRectangle);
-    // Draw the flashing hero icon on top of the dungeon map.
-    if (state.time % 1000 <= 600 && state.location.floor === selectedFloorIndex) {
+    // Draw the flashing hero icon on top of the dungeon map if the hero is currently on the displayed floor.
+    if (state.time % 1000 <= 600 && state.areaSection.definition.floorId === selectedFloorId) {
         drawFrame(context, heroIcon, {
             ...heroIcon,
             x: innerDungeonMapRectangle.x + (state.areaSection.definition.mapX * 32 + state.location.x / 8 - heroIcon.w / 2 - state.areaSection.x * 2) | 0,
@@ -287,6 +261,32 @@ function renderDungeonMap(context: CanvasRenderingContext2D, state: GameState): 
             );
         }
     }
+
+    // Render the floor markers with hero marker + selected floor cursor
+    const r = floorMarkerRectangle;
+    const rowHeight = 24;
+    const zone = zones[state.location.zoneKey];
+    const selectedFloorIndex = state.menuIndex % zone.floors.length;
+    const floorIds = Object.keys(dungeonMaps[state.areaSection?.definition.mapId].floors || {});
+    for (let floor = 0; floor < floorIds.length; floor++) {
+        drawText(context, floorIds[floor], r.x + 12, r.y + r.h - rowHeight * floor - rowHeight / 2, {
+            textBaseline: 'middle',
+            textAlign: 'center',
+            size: 16,
+        });
+        if (state.time % 1000 <= 600 && floorIds[floor] === state.areaSection.definition.floorId) {
+            drawFrame(context, heroIcon, {
+                ...heroIcon,
+                x: r.x + 20 - (heroIcon.w / 2) | 0,
+                y: r.y + r.h - rowHeight * floor - 8 - (heroIcon.h / 2) | 0,
+            });
+        }
+    }
+    drawFrame(context, cursor, {
+        ...cursor,
+        x: r.x,
+        y: r.y + r.h - rowHeight * selectedFloorIndex - 24,
+    });
 }
 
 
@@ -367,6 +367,6 @@ export function getDisplayedMapSections(state: GameState): number[] | undefined 
         return;
     }
     const selectedFloorId = getSelectedFloorId(state);
-    const map = dungeonMaps[state.areaSection?.mapId];
+    const map = dungeonMaps[state.areaSection?.definition.mapId];
     return map.floors[selectedFloorId].sections;
 }

@@ -40,17 +40,6 @@ Graphics:
 
 Current tasks:
     - Add dungeon maps
-        - Special context menu when tiles are selected
-            - setMap -> "map zone id" + "new map"(default floor is '1F') -> "floor" + "new floor"
-                Set mapId/floorId
-            - showMap -> [overworld/sky/spiritworld/spiritsky] -> list of door/teleporter/pit ids
-                Set mapId/entranceId
-            - list of floors is returned dynamically based on existing map and floor ids
-            - store map data on each material world area definition as:
-                mapData = [TL, TR, BL, BR]
-                with structure as {id?: string, floor: '1F', x: 0, y: 0}
-            - read and write mapData from areaDefinition.parentDefinition.mapData when parentDefinition exists.
-
         - set section.index and update allSections when creating new sections
         - figure out how to sort display of floor ids so it is B2/B1/1F/2F etc.
         - update allSections when deleting sections.
