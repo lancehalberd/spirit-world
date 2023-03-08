@@ -129,10 +129,10 @@ export function serializeZone(zone: Zone) {
                         if (section.entranceId) {
                             extraFields += `, entranceId: '${section.entranceId}'`;
                         }
-                        if (section.mapX) {
+                        if (section.mapX >= 0) {
                             extraFields += `, mapX: ${section.mapX}`;
                         }
-                        if (section.mapY) {
+                        if (section.mapY >= 0) {
                             extraFields += `, mapY: ${section.mapY}`;
                         }
                         lines.push(`        {x: ${section.x}, y: ${section.y}, w: ${section.w}, h: ${section.h}${extraFields}}, `);
