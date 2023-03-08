@@ -274,14 +274,14 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "waterfallCaveLeftMain", x: 128, y: 496, type: "door", style: "cavern", targetZone: "waterfallCave", targetObjectId: "waterfallCaveLeftMain", d: "down"},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 32, h: 16},
+        {x: 0, y: 0, w: 16, h: 16, index: 122, mapId: 'overworld', entranceId: 'waterfallCaveEntrance', mapX: 0, mapY: 0},
+        {x: 16, y: 0, w: 16, h: 16, index: 123, mapId: 'overworld', entranceId: 'waterfallCaveEntrance', mapX: 1, mapY: 0},
+        {x: 0, y: 16, w: 32, h: 16, index: 124, mapId: 'overworld', entranceId: 'waterfallCaveEntrance', mapX: 0, mapY: 1},
     ],
     dark: 50,
 };
-const f0_0x1: AreaDefinition = null;
-const f0_1x0: AreaDefinition = {
+const f0_1x0: AreaDefinition = null;
+const f0_0x1: AreaDefinition = {
     layers: [
         {
             key: 'water',
@@ -629,7 +629,7 @@ const f0_1x0: AreaDefinition = {
         {status: "normal", id: "", x: 400, y: 400, d: "down", behavior: "idle", style: "mom", type: "npc", dialogueKey: "mom"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 125, mapId: 'overworld', entranceId: 'waterfallCaveEntrance', mapX: 0, mapY: 2},
     ],
 };
 const f0_1x1: AreaDefinition = {
@@ -936,25 +936,25 @@ const f0_1x1: AreaDefinition = {
         {status: "normal", id: "", x: 176, y: 96, type: "pushPull"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 32, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 126, mapId: 'overworld', entranceId: 'waterfallCaveEntrance', mapX: 2, mapY: 2},
+        {x: 0, y: 16, w: 32, h: 16, index: 127, mapId: 'overworld', entranceId: 'waterfallCaveEntrance', mapX: 2, mapY: 3},
     ],
 };
 const sf0_0x0: AreaDefinition = null;
-const sf0_0x1: AreaDefinition = null;
 const sf0_1x0: AreaDefinition = null;
+const sf0_0x1: AreaDefinition = null;
 const sf0_1x1: AreaDefinition = null;
 zones.waterfallCave = {
     key: 'waterfallCave',
     floors: [
         {
             grid: [
-                [f0_0x0,f0_0x1,],
-                [f0_1x0,f0_1x1,],
+                [f0_0x0,f0_1x0,],
+                [f0_0x1,f0_1x1,],
             ],
             spiritGrid: [
-                [sf0_0x0,sf0_0x1,],
-                [sf0_1x0,sf0_1x1,],
+                [sf0_0x0,sf0_1x0,],
+                [sf0_0x1,sf0_1x1,],
             ],
         },
     ],

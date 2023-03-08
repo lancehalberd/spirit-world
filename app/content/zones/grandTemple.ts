@@ -262,8 +262,8 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "holyCityInterior:0:0x0-npc-0", x: 240, y: 384, d: "down", behavior: "random", style: "midMonk", type: "npc", dialogue: "Ommmmmmm..."},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 32, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 86, mapId: 'overworld', entranceId: 'grandTempleEntrance', mapX: 0, mapY: 0},
+        {x: 0, y: 16, w: 32, h: 16, index: 87, mapId: 'overworld', entranceId: 'grandTempleEntrance', mapX: 0, mapY: 1},
     ],
 };
 const f0_1x0: AreaDefinition = {
@@ -484,7 +484,7 @@ const f0_1x0: AreaDefinition = {
         {status: "normal", id: "gauntletEntrance", x: 80, y: 32, type: "door", style: "woodenDownstairs", targetZone: "gauntlet", targetObjectId: "gauntletEntrance", d: "up", locationCue: "Grand Temple"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 88, mapId: 'overworld', entranceId: 'grandTempleEntrance', mapX: 2, mapY: 0},
     ],
 };
 const f0_2x0: AreaDefinition = {
@@ -747,8 +747,8 @@ const f0_2x0: AreaDefinition = {
         {status: "normal", id: "holyCityInterior:0:0x0-npc-0", x: 232, y: 392, d: "down", behavior: "random", style: "darkMonk", type: "npc", dialogue: "Ommmmmmm..."},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 32, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 89, mapId: 'overworld', entranceId: 'grandTempleEntrance', mapX: 4, mapY: 0},
+        {x: 0, y: 16, w: 32, h: 16, index: 90, mapId: 'overworld', entranceId: 'grandTempleEntrance', mapX: 4, mapY: 1},
     ],
 };
 const f0_0x1: AreaDefinition = {
@@ -1008,8 +1008,8 @@ const f0_0x1: AreaDefinition = {
         {status: "normal", id: "holyCityInterior:0:0x0-npc-0", x: 336, y: 280, d: "down", behavior: "random", style: "paleMonk", type: "npc", dialogue: "Ommmmmmm..."},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 32},
-        {x: 16, y: 0, w: 16, h: 32},
+        {x: 0, y: 0, w: 16, h: 32, index: 91, mapId: 'overworld', entranceId: 'grandTempleEntrance', mapX: 0, mapY: 2},
+        {x: 16, y: 0, w: 16, h: 32, index: 92, mapId: 'overworld', entranceId: 'grandTempleEntrance', mapX: 1, mapY: 2},
     ],
 };
 const f0_1x1: AreaDefinition = {
@@ -1186,7 +1186,7 @@ const f0_1x1: AreaDefinition = {
         {status: "normal", id: "portalMarker", x: 248, y: 320, type: "spawnMarker", linked: true},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 93, mapId: 'overworld', entranceId: 'grandTempleEntrance', mapX: 2, mapY: 2},
     ],
 };
 const f0_2x1: AreaDefinition = {
@@ -1446,8 +1446,8 @@ const f0_2x1: AreaDefinition = {
         {status: "normal", id: "holyCityInterior:0:0x0-npc-0", x: 88, y: 392, d: "down", behavior: "random", style: "midMonk", type: "npc", dialogue: "Ommmmmmm..."},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 32},
-        {x: 16, y: 0, w: 16, h: 32},
+        {x: 0, y: 0, w: 16, h: 32, index: 94, mapId: 'overworld', entranceId: 'grandTempleEntrance', mapX: 4, mapY: 2},
+        {x: 16, y: 0, w: 16, h: 32, index: 95, mapId: 'overworld', entranceId: 'grandTempleEntrance', mapX: 5, mapY: 2},
     ],
 };
 const f0_0x2: AreaDefinition = {
@@ -1706,9 +1706,9 @@ const f0_0x2: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 32, h: 16},
+        {x: 0, y: 0, w: 16, h: 16, index: 96, mapId: 'overworld', entranceId: 'grandTempleEntrance', mapX: 0, mapY: 4},
+        {x: 16, y: 0, w: 16, h: 16, index: 97, mapId: 'overworld', entranceId: 'grandTempleEntrance', mapX: 1, mapY: 4},
+        {x: 0, y: 16, w: 32, h: 16, index: 98, mapId: 'overworld', entranceId: 'grandTempleEntrance', mapX: 0, mapY: 5},
     ],
 };
 const f0_1x2: AreaDefinition = {
@@ -1969,8 +1969,8 @@ const f0_1x2: AreaDefinition = {
         {status: "normal", id: "generousPriest", x: 192, y: 320, d: "down", behavior: "idle", style: "midMonk", type: "npc", dialogue: "Ommmmmmm...", dialogueKey: "generousPriest"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 32, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 99, mapId: 'overworld', entranceId: 'grandTempleEntrance', mapX: 2, mapY: 4},
+        {x: 0, y: 16, w: 32, h: 16, index: 100, mapId: 'overworld', entranceId: 'grandTempleEntrance', mapX: 2, mapY: 5},
     ],
 };
 const f0_2x2: AreaDefinition = {
@@ -2229,9 +2229,9 @@ const f0_2x2: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 32, h: 16},
+        {x: 0, y: 0, w: 16, h: 16, index: 101, mapId: 'overworld', entranceId: 'grandTempleEntrance', mapX: 4, mapY: 4},
+        {x: 16, y: 0, w: 16, h: 16, index: 102, mapId: 'overworld', entranceId: 'grandTempleEntrance', mapX: 5, mapY: 4},
+        {x: 0, y: 16, w: 32, h: 16, index: 103, mapId: 'overworld', entranceId: 'grandTempleEntrance', mapX: 4, mapY: 5},
     ],
 };
 const sf0_0x0: AreaDefinition = {
@@ -2497,8 +2497,8 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 80, y: 288, type: "door", style: "wooden", d: "up"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 32, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 104, mapId: 'overworld', entranceId: 'jadePalaceEntrance', mapX: 0, mapY: 0},
+        {x: 0, y: 16, w: 32, h: 16, index: 105, mapId: 'overworld', entranceId: 'jadePalaceEntrance', mapX: 0, mapY: 1},
     ],
 };
 const sf0_1x0: AreaDefinition = {
@@ -2722,7 +2722,7 @@ const sf0_1x0: AreaDefinition = {
         {status: "normal", id: "holySanctumEntrance", x: 240, y: 32, type: "door", style: "wooden", targetZone: "holySanctum", targetObjectId: "holySanctumEntrance", d: "up", locationCue: "Jade Palace"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 106, mapId: 'overworld', entranceId: 'jadePalaceEntrance', mapX: 2, mapY: 0},
     ],
 };
 const sf0_2x0: AreaDefinition = {
@@ -2988,8 +2988,8 @@ const sf0_2x0: AreaDefinition = {
         {status: "normal", id: "", x: 0, y: 96, type: "door", style: "wooden", targetObjectId: "fireSanctumKey", d: "left"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 32, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 107, mapId: 'overworld', entranceId: 'jadePalaceEntrance', mapX: 4, mapY: 0},
+        {x: 0, y: 16, w: 32, h: 16, index: 108, mapId: 'overworld', entranceId: 'jadePalaceEntrance', mapX: 4, mapY: 1},
     ],
 };
 const sf0_0x1: AreaDefinition = {
@@ -3252,8 +3252,8 @@ const sf0_0x1: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 32},
-        {x: 16, y: 0, w: 16, h: 32},
+        {x: 0, y: 0, w: 16, h: 32, index: 109, mapId: 'overworld', entranceId: 'jadePalaceEntrance', mapX: 0, mapY: 2},
+        {x: 16, y: 0, w: 16, h: 32, index: 110, mapId: 'overworld', entranceId: 'jadePalaceEntrance', mapX: 1, mapY: 2},
     ],
 };
 const sf0_1x1: AreaDefinition = {
@@ -3434,7 +3434,7 @@ const sf0_1x1: AreaDefinition = {
         {status: "normal", id: "spiritPortalMarker", x: 248, y: 320, type: "spawnMarker", linked: true, spirit: true},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 111, mapId: 'overworld', entranceId: 'jadePalaceEntrance', mapX: 2, mapY: 2},
     ],
 };
 const sf0_2x1: AreaDefinition = {
@@ -3697,8 +3697,8 @@ const sf0_2x1: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 32},
-        {x: 16, y: 0, w: 16, h: 32},
+        {x: 0, y: 0, w: 16, h: 32, index: 112, mapId: 'overworld', entranceId: 'jadePalaceEntrance', mapX: 4, mapY: 2},
+        {x: 16, y: 0, w: 16, h: 32, index: 113, mapId: 'overworld', entranceId: 'jadePalaceEntrance', mapX: 5, mapY: 2},
     ],
 };
 const sf0_0x2: AreaDefinition = {
@@ -3961,9 +3961,9 @@ const sf0_0x2: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 32, h: 16},
+        {x: 0, y: 0, w: 16, h: 16, index: 114, mapId: 'overworld', entranceId: 'jadePalaceEntrance', mapX: 0, mapY: 4},
+        {x: 16, y: 0, w: 16, h: 16, index: 115, mapId: 'overworld', entranceId: 'jadePalaceEntrance', mapX: 1, mapY: 4},
+        {x: 0, y: 16, w: 32, h: 16, index: 116, mapId: 'overworld', entranceId: 'jadePalaceEntrance', mapX: 0, mapY: 5},
     ],
 };
 const sf0_1x2: AreaDefinition = {
@@ -4227,8 +4227,8 @@ const sf0_1x2: AreaDefinition = {
         {status: "normal", id: "jadePalaceEntrance", x: 224, y: 496, type: "door", style: "wooden", d: "down", targetZone: "overworld", targetObjectId: "jadePalaceEntrance", locationCue: "Jade Palace"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 32, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 117, mapId: 'overworld', entranceId: 'jadePalaceEntrance', mapX: 2, mapY: 4},
+        {x: 0, y: 16, w: 32, h: 16, index: 118, mapId: 'overworld', entranceId: 'jadePalaceEntrance', mapX: 2, mapY: 5},
     ],
 };
 const sf0_2x2: AreaDefinition = {
@@ -4491,9 +4491,9 @@ const sf0_2x2: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 32, h: 16},
+        {x: 0, y: 0, w: 16, h: 16, index: 119, mapId: 'overworld', entranceId: 'jadePalaceEntrance', mapX: 4, mapY: 4},
+        {x: 16, y: 0, w: 16, h: 16, index: 120, mapId: 'overworld', entranceId: 'jadePalaceEntrance', mapX: 5, mapY: 4},
+        {x: 0, y: 16, w: 32, h: 16, index: 121, mapId: 'overworld', entranceId: 'jadePalaceEntrance', mapX: 4, mapY: 5},
     ],
 };
 zones.grandTemple = {

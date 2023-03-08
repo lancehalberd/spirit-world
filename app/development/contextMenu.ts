@@ -252,11 +252,14 @@ function updateMapSections(state: GameState, sections: number[], data: Partial<A
         section.mapId = data.mapId;
         section.floorId = data.floorId;
         section.entranceId = data.entranceId;
-        dungeonMaps[section.mapId] = dungeonMaps[section.mapId] || {floors: {}};
-        dungeonMaps[section.mapId].floors[section.floorId] = dungeonMaps[section.mapId]?.floors[section.floorId] || {sections: []};
-        dungeonMaps[section.mapId].floors[section.floorId].sections.push(sectionIndex);
-        if (dungeonMaps[oldMapId]?.floors[oldFloorId]?.sections.length === 0) {
-            delete dungeonMaps[oldMapId]?.floors[oldFloorId];
+        // Add the section to the new map, if it is a dungeon map (as opposed to an overworld map).
+        if (!data.entranceId) {
+            dungeonMaps[section.mapId] = dungeonMaps[section.mapId] || {floors: {}};
+            dungeonMaps[section.mapId].floors[section.floorId] = dungeonMaps[section.mapId]?.floors[section.floorId] || {sections: []};
+            dungeonMaps[section.mapId].floors[section.floorId].sections.push(sectionIndex);
+            if (dungeonMaps[oldMapId]?.floors[oldFloorId]?.sections.length === 0) {
+                delete dungeonMaps[oldMapId]?.floors[oldFloorId];
+            }
         }
     }
     state.map.needsRefresh = true;
