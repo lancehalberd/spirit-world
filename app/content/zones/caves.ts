@@ -346,9 +346,9 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "caves-ascentPeachPiece", x: 144, y: 112, type: "chest", lootType: "peachOfImmortalityPiece", lootLevel: 1},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 32},
+        {x: 0, y: 0, w: 16, h: 16, index: 56, mapId: 'overworld', entranceId: 'caves-ascentEntrance', mapX: 0, mapY: 0},
+        {x: 0, y: 16, w: 16, h: 16, index: 57, mapId: 'overworld', entranceId: 'caves-ascentEntrance', mapX: 0, mapY: 1},
+        {x: 16, y: 0, w: 16, h: 32, index: 58, mapId: 'overworld', entranceId: 'caves-ascentEntrance', mapX: 1, mapY: 0},
     ],
 };
 const f0_1x0: AreaDefinition = {
@@ -611,9 +611,9 @@ const f0_1x0: AreaDefinition = {
         {status: "normal", id: "fertilityTempleEntrance", linked: false, x: 352, y: 480, type: "door", style: "wooden", targetZone: "overworld", targetObjectId: "fertilityTempleEntrance", d: "down"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 59, mapId: 'overworld', entranceId: 'sideArea:noToolEntrance', mapX: 2, mapY: 0},
+        {x: 0, y: 16, w: 16, h: 16, index: 60, mapId: 'overworld', entranceId: 'fertilityTempleEntrance', mapX: 2, mapY: 1},
+        {x: 16, y: 16, w: 16, h: 16, index: 61, mapId: 'overworld', entranceId: 'fertilityTempleEntrance', mapX: 3, mapY: 1},
     ],
 };
 const sf0_0x0: AreaDefinition = {
@@ -963,9 +963,9 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "caves-ascentExitSpirit", x: 96, y: 240, type: "door", style: "cavern", targetZone: "sky", targetObjectId: "caves-ascentExitSpirit", d: "down"},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16, hotLogic: {"logicKey":"mountainLava","isInverted":false}},
-        {x: 0, y: 16, w: 16, h: 16, hotLogic: {"logicKey":"mountainLava","isInverted":false}},
-        {x: 16, y: 0, w: 16, h: 32, hotLogic: {"logicKey":"mountainLava","isInverted":false}},
+        {x: 0, y: 0, w: 16, h: 16, index: 62, hotLogic: {"logicKey":"mountainLava","isInverted":false}, mapId: 'overworld', entranceId: 'caves-ascentEntranceSpirit', mapX: 0, mapY: 0},
+        {x: 0, y: 16, w: 16, h: 16, index: 63, hotLogic: {"logicKey":"mountainLava","isInverted":false}, mapId: 'overworld', entranceId: 'caves-ascentEntranceSpirit', mapX: 0, mapY: 1},
+        {x: 16, y: 0, w: 16, h: 32, index: 64, hotLogic: {"logicKey":"mountainLava","isInverted":false}, mapId: 'overworld', entranceId: 'caves-ascentEntranceSpirit', mapX: 1, mapY: 0},
     ],
 };
 const sf0_1x0: AreaDefinition = {
@@ -1232,9 +1232,9 @@ const sf0_1x0: AreaDefinition = {
         {status: "normal", id: "fertilityTempleExit", spirit: true, x: 96, y: 480, type: "door", style: "wooden", targetZone: "overworld", targetObjectId: "fertilityTempleExit", d: "down"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 65, mapId: 'cavesSpirit', floorId: '1F', mapX: 2, mapY: 0},
+        {x: 0, y: 16, w: 16, h: 16, index: 66, mapId: 'overworld', entranceId: 'fertilityTempleExit', mapX: 2, mapY: 1},
+        {x: 16, y: 16, w: 16, h: 16, index: 67, mapId: 'overworld', entranceId: 'fertilityTempleSpiritEntrance', mapX: 3, mapY: 1},
     ],
 };
 zones.caves = {

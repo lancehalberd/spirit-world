@@ -259,8 +259,8 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "hypeCaveEntrance", x: 64, y: 496, type: "door", style: "cavern", targetZone: "sky", targetObjectId: "hypeCaveEntrance", d: "down"},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 32},
-        {x: 16, y: 0, w: 16, h: 32},
+        {x: 0, y: 0, w: 16, h: 32, index: 68, mapId: 'hypeCave', floorId: '1F', mapX: 0, mapY: 0},
+        {x: 16, y: 0, w: 16, h: 32, index: 69, mapId: 'hypeCave', floorId: '1F', mapX: 1, mapY: 0},
     ],
 };
 const sf0_0x0: AreaDefinition = {
@@ -529,8 +529,8 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "hypeCavePeachPiece", x: 120, y: 48, type: "chest", lootType: "peachOfImmortalityPiece", lootAmount: 1},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 32},
-        {x: 16, y: 0, w: 16, h: 32},
+        {x: 0, y: 0, w: 16, h: 32, index: 70, mapId: 'sky', entranceId: 'hypeCaveEntranceSpirit', mapX: 0, mapY: 0},
+        {x: 16, y: 0, w: 16, h: 32, index: 71, mapId: 'hypeCaveSpirit', floorId: '1F', mapX: 1, mapY: 0},
     ],
 };
 zones.hypeCave = {

@@ -137,9 +137,9 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "holyCityInterior:0:0x0-npc-2", x: 96, y: 160, d: "right", behavior: "idle", style: "midMonk", type: "npc", dialogue: "Tending my flowers makes feel closer to the spirits."},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 32, h: 16},
+        {x: 0, y: 0, w: 16, h: 16, index: 74, mapId: 'overworld', entranceId: 'overworld:holyCityGardenHouse', mapX: 0, mapY: 0},
+        {x: 16, y: 0, w: 16, h: 16, index: 75, mapId: 'overworld', entranceId: 'overworld:holyCityBridgeHouse', mapX: 1, mapY: 0},
+        {x: 0, y: 16, w: 32, h: 16, index: 76, mapId: 'holyCityInterior', floorId: '1F', mapX: 0, mapY: 1},
     ],
 };
 const f0_1x0: AreaDefinition = {
@@ -279,9 +279,9 @@ const f0_1x0: AreaDefinition = {
         {status: "normal", id: "holyCityInterior:0:1x0-npc-0", x: 192, y: 416, d: "left", behavior: "idle", style: "darkMonk", type: "npc", dialogue: "We don't serve Vanara food here, just regular food. Go somewhere else!"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 77, mapId: 'holyCityInterior', floorId: '1F', mapX: 2, mapY: 0},
+        {x: 0, y: 16, w: 16, h: 16, index: 78, mapId: 'overworld', entranceId: 'overworld:holyCityFoodHouse', mapX: 2, mapY: 1},
+        {x: 16, y: 16, w: 16, h: 16, index: 79, mapId: 'overworld', entranceId: 'overworld:holyCityClothesHouse', mapX: 3, mapY: 1},
     ],
 };
 const f0_0x1: AreaDefinition = null;
@@ -511,9 +511,9 @@ const f0_1x1: AreaDefinition = {
         {status: "normal", id: "", x: 448, y: 320, type: "spawnMarker"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 80, mapId: 'overworld', entranceId: 'moneyMazeEntrance', mapX: 2, mapY: 2},
+        {x: 0, y: 16, w: 16, h: 16, index: 81, mapId: 'overworld', entranceId: 'moneyMazeEntrance', mapX: 2, mapY: 3},
+        {x: 16, y: 16, w: 16, h: 16, index: 82, mapId: 'overworld', entranceId: 'moneyMazeEntrance', mapX: 3, mapY: 3},
     ],
 };
 const sf0_0x0: AreaDefinition = {
@@ -653,9 +653,9 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 368, y: 128, type: "indicator"},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 32, h: 16},
+        {x: 0, y: 0, w: 16, h: 16, index: 83, mapId: 'holyCityInteriorSpirit', floorId: '1F', mapX: 0, mapY: 0},
+        {x: 16, y: 0, w: 16, h: 16, index: 84, mapId: 'overworld', entranceId: 'jadeCitySoutheastDoor', mapX: 1, mapY: 0},
+        {x: 0, y: 16, w: 32, h: 16, index: 85, mapId: 'holyCityInteriorSpirit', floorId: '1F', mapX: 0, mapY: 1},
     ],
 };
 const sf0_1x0: AreaDefinition = null;
