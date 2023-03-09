@@ -2,9 +2,9 @@ import { createAreaInstance } from 'app/content/areas';
 import { getMapTarget } from 'app/content/hints';
 import { isLogicValid, logicHash } from 'app/content/logic';
 import { allSections, dungeonMaps } from 'app/content/sections';
-import { zones } from 'app/content/zones/zoneHash';
 import { editingState } from 'app/development/editingState';
-import { CANVAS_WIDTH, CANVAS_HEIGHT, CANVAS_SCALE } from 'app/gameConstants';
+import { initializeSection } from 'app/development/sections';
+import { CANVAS_WIDTH, CANVAS_HEIGHT, CANVAS_SCALE, overworldKeys } from 'app/gameConstants';
 import { heroIcon } from 'app/render/heroAnimations';
 import { checkToRedrawTiles } from 'app/render/renderField';
 import { createAnimation, drawFrame } from 'app/utils/animations';
@@ -31,9 +31,9 @@ const worldSize = 192;
 
 
 export function renderMap(context: CanvasRenderingContext2D, state: GameState): void {
-    if (['underwater', 'overworld', 'sky'].includes(state.location.zoneKey)) {
-        renderOverworldMap(context, state);
-    } else if (['underwater', 'overworld', 'sky'].includes(state.areaSection?.definition?.mapId)) {
+    if (overworldKeys.includes(state.location.zoneKey)
+        || overworldKeys.includes(state.areaSection?.definition?.mapId)
+    ) {
         renderOverworldMap(context, state);
     } else {
         renderDungeonMap(context, state);
@@ -95,7 +95,7 @@ export function renderOverworldMap(context: CanvasRenderingContext2D, state: Gam
         drawFrame(context, sky12, {x: r.x + 64, y: r.y + 128, w: 64, h: 64});
     }
 
-    if (state.location.zoneKey === 'overworld' || state.location.zoneKey === 'sky' || state.location.zoneKey === 'underwater') {
+    if (overworldKeys.includes(state.location.zoneKey)) {
         if (state.time % 1000 <= 600) {
             drawFrame(context, heroIcon, {
                 ...heroIcon,
@@ -206,8 +206,18 @@ const floorMarkerRectangle = {
     h: worldSize,
 };
 
-export function getSelectedFloorId(state: GameState) {
-    const floorIds = Object.keys(dungeonMaps[state.areaSection?.definition.mapId].floors);
+export function getSelectedFloorId(state: GameState): string {
+    // This happens when visiting an unpopulated super tile, for example when a new super tile is created in the editor
+    // or a super tile is never edited after being created.
+    if (!state.areaSection?.definition?.mapId) {
+        initializeSection(state.areaSection.definition, state.location);
+    }
+    const map = dungeonMaps[state.areaSection?.definition.mapId];
+    if (!map) {
+        console.error('Could not find dungeon map for', state.areaSection?.definition.mapId);
+        return '1F';
+    }
+    const floorIds = Object.keys(map.floors);
     const selectedFloorIndex = state.menuIndex % floorIds.length;
     return floorIds[selectedFloorIndex];
 }
@@ -266,9 +276,8 @@ function renderDungeonMap(context: CanvasRenderingContext2D, state: GameState): 
     // Render the floor markers with hero marker + selected floor cursor
     const r = floorMarkerRectangle;
     const rowHeight = 24;
-    const zone = zones[state.location.zoneKey];
-    const selectedFloorIndex = state.menuIndex % zone.floors.length;
     const floorIds = Object.keys(dungeonMaps[state.areaSection?.definition.mapId].floors || {});
+    const selectedFloorIndex = state.menuIndex % floorIds.length;
     for (let floor = 0; floor < floorIds.length; floor++) {
         drawText(context, floorIds[floor], r.x + 12, r.y + r.h - rowHeight * floor - rowHeight / 2, {
             textBaseline: 'middle',
@@ -367,7 +376,11 @@ export function getDisplayedMapSections(state: GameState): number[] | undefined 
     if (!state.showMap || !state.paused) {
         return;
     }
+    const mapId = state.areaSection?.definition.mapId;
+    if (overworldKeys.includes(mapId)) {
+        return [];
+    }
     const selectedFloorId = getSelectedFloorId(state);
-    const map = dungeonMaps[state.areaSection?.definition.mapId];
+    const map = dungeonMaps[mapId];
     return map.floors[selectedFloorId].sections;
 }

@@ -1,5 +1,6 @@
 import { getAreaFromLocation } from 'app/content/areas';
 import { zones } from 'app/content/zones/zoneHash';
+import { overworldKeys } from 'app/gameConstants';
 
 import { AreaDefinition, AreaSection, Point, ZoneLocation } from 'app/types';
 
@@ -25,10 +26,11 @@ window['allSections'] = allSections;
 export const dungeonMaps: {[key: string]: DungeonMap} = {};
 window['dungeonMaps'] = dungeonMaps;
 
-function goToNextFreeId() {
+export function getNextFreeId() {
     while(allSections[nextFreeId]) {
         nextFreeId++;
     }
+    return nextFreeId;
 }
 
 export function populateAllSections() {
@@ -54,8 +56,7 @@ export function populateAllSections() {
                             if (section.index >= 0) {
                                 // If this spot was assigned, move whatever is there to a new location.
                                 if (allSections[section.index]) {
-                                    goToNextFreeId();
-                                    allSections[nextFreeId] = allSections[section.index]
+                                    allSections[getNextFreeId()] = allSections[section.index]
                                 }
                                 allSections[section.index] = {
                                     section,
@@ -83,9 +84,8 @@ export function populateAllSections() {
     }
     // Assign indexes to any sections that didn't have one yet and add them to allSections array.
     for (const section of newSections) {
-        goToNextFreeId();
-        section.section.index = nextFreeId;
-        allSections[nextFreeId] = section;
+        section.section.index = getNextFreeId();
+        allSections[section.section.index] = section;
     }
     populateSectionMapData();
 }
@@ -112,11 +112,33 @@ function populateSectionMapData(): void {
             }
         }
         // Sections that show overworld areas aren't added to any dungeon maps.
-        if (['underwater', 'overworld', 'sky'].includes(section.mapId)) {
+        if (overworldKeys.includes(section.mapId)) {
             continue;
         }
         const map = dungeonMaps[section.mapId] = dungeonMaps[section.mapId] || {floors: {}};
         const floor = map.floors[section.floorId] = map.floors[section.floorId] || {sections: []};
         floor.sections.push(section.index);
+    }
+    // Fix the maps so the floors appear in the order B(N), B(N - 1)..., B1, 1F, ... (N-1)F, (N)F.
+    for (const map of Object.values(dungeonMaps)) {
+        const orderedFloors = {};
+        const orderedKeys = Object.keys(map.floors).sort((a, b) => {
+            if (a[0] === 'B') {
+                if (b[0] === 'B') {
+                    return Number(a.substring(1)) - Number(b.substring(1));
+                }
+                return -1;
+            } else {
+                if (b[0] === 'B') {
+                    return 1;
+                }
+                return Number(a.substring(0, a.length - 1)) - Number(b.substring(0, b.length - 1));
+            }
+            return 0;
+        })
+        for (const key of orderedKeys) {
+            orderedFloors[key] = map.floors[key];
+        }
+        map.floors = orderedFloors;
     }
 }

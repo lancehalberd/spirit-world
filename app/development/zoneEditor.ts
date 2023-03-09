@@ -5,6 +5,7 @@ import { logicHash } from 'app/content/logic';
 import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
 import { zones } from 'app/content/zones';
 import { exportZoneToClipboard, importZone, serializeZone } from 'app/development/exportZone';
+import { replaceMapSections } from 'app/development/sections';
 import { TabContainer } from 'app/development/tabContainer';
 import { renderPropertyRows } from 'app/development/propertyPanel';
 import { editingState } from 'app/development/editingState';
@@ -184,9 +185,10 @@ function fillMinimap(state: GameState): void {
     }
 }
 let lastMinimapZoneKey = '', lastFloor = 0, lastIsSpiritWorld = false;
-export function checkToRefreshMinimap(state: GameState): void {
+export function checkToRefreshMinimap(state: GameState, forceRefresh = false): void {
     updateMinimapSize(state);
-    if (lastMinimapZoneKey !== state.location.zoneKey
+    if (forceRefresh
+        || lastMinimapZoneKey !== state.location.zoneKey
         || lastFloor !== state.location.floor
         || lastIsSpiritWorld !== state.location.isSpiritWorld
     ) {
@@ -500,11 +502,14 @@ export function getZoneProperties(): PanelRows {
                             grid[i].push(null);
                         }
                         while (grid[i].length > columns) {
-                            grid[i].pop();
+                            const area = grid[i].pop();
+                            // Remove any deleted sections from the map.
+                            replaceMapSections(state, area.sections || []);
                         }
                     }
                 }
                 refreshArea(state);
+                checkToRefreshMinimap(state, true);
             }
         }
     }, 'x', {
@@ -522,11 +527,16 @@ export function getZoneProperties(): PanelRows {
                             grid.push([...new Array(grid[0].length)].map(() => null));
                         }
                         while (grid.length > rows) {
-                            grid.pop();
+                            const row = grid.pop();
+                            for (const area of row) {
+                                // Remove any deleted sections from the map.
+                                replaceMapSections(state, area.sections || []);
+                            }
                         }
                     }
                 }
                 refreshArea(state);
+                checkToRefreshMinimap(state, true);
             }
         }
     }]);
@@ -538,8 +548,12 @@ export function getZoneProperties(): PanelRows {
             // Section layout is required to match between material and spirit world.
             // Mostly this is because it is annoying to have to update it in both places
             // when we almost always intend for them to be the same anyway.
-            state.areaInstance.definition.sections = sectionLayouts[sectionType].map(section => ({...section}));
-            state.alternateAreaInstance.definition.sections = sectionLayouts[sectionType].map(section => ({...section}));
+            const newCurrentSections = sectionLayouts[sectionType].map(section => ({...section}));
+            replaceMapSections(state, state.areaInstance.definition.sections || [], newCurrentSections);
+            state.areaInstance.definition.sections = newCurrentSections;
+            const newAlternateSections = sectionLayouts[sectionType].map(section => ({...section}));
+            replaceMapSections(state, state.alternateAreaInstance.definition.sections || [], newAlternateSections);
+            state.alternateAreaInstance.definition.sections = newAlternateSections;
             state.areaSection = null;
             setAreaSection(state);
             return 'Change Layout';

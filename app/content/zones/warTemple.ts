@@ -102,9 +102,9 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "warTemple:0:0x0-lightningBug-0", x: 432, y: 304, type: "enemy", enemyType: "lightningBug", d: "down", params: {}},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 32},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 16, h: 32, index: 184, hideMap: true, mapId: 'warTemple', floorId: '1F', mapX: 0, mapY: 0},
+        {x: 16, y: 0, w: 16, h: 16, index: 191, mapId: 'overworld', entranceId: 'warTempleNorthEntrance', mapX: 1, mapY: 0},
+        {x: 16, y: 16, w: 16, h: 16, index: 209, mapId: 'warTemple', floorId: '1F', mapX: 1, mapY: 2},
     ],
 };
 const f0_1x0: AreaDefinition = {
@@ -202,8 +202,8 @@ const f0_1x0: AreaDefinition = {
         {status: "normal", id: "", linked: true, x: 288, y: 368, type: "pushPull"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 32, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 210, hideMap: true, mapId: 'warTemple', floorId: '1F', mapX: 2, mapY: 0},
+        {x: 0, y: 16, w: 32, h: 16, index: 211, mapId: 'warTemple', floorId: '1F', mapX: 2, mapY: 2},
     ],
 };
 const f0_2x0: AreaDefinition = {
@@ -302,7 +302,7 @@ const f0_2x0: AreaDefinition = {
         {status: "normal", id: "warTemple:0:2x0-beetleHorned-3", x: 416, y: 400, type: "enemy", enemyType: "beetleHorned", d: "down", params: {}},
         {status: "normal", id: "warTemple:0:2x0-door-3", x: 0, y: 368, type: "door", style: "cave", d: "left"},
         {status: "normal", id: "warTemple:0:2x0-door-4", x: 112, y: 480, type: "door", style: "cave", d: "down"},
-        {status: "hiddenEnemy", id: "warTemple:0:2x0-money-0", x: 176, y: 320, type: "chest", lootType: "money", lootAmount: 50, lootLevel: 1},
+        {status: "hiddenEnemy", id: "warTempleMap", x: 176, y: 320, type: "chest", lootType: "map", lootAmount: 50, lootLevel: 1},
         {status: "normal", id: "warTemple:0:2x0-empty-0", x: 80, y: 80, type: "chest", lootType: "empty", lootLevel: 1},
         {status: "normal", id: "warTemple:0:2x0-arrowTurret-0", x: 416, y: 80, type: "enemy", enemyType: "arrowTurret", d: "down", params: {}},
         {status: "normal", id: "warTemple:0:2x0-arrowTurret-1", x: 288, y: 80, type: "enemy", enemyType: "arrowTurret", d: "down", params: {}},
@@ -312,9 +312,9 @@ const f0_2x0: AreaDefinition = {
         {status: "normal", id: "warTemple:0:2x0-frostBeetle-0", x: 120, y: 368, type: "enemy", enemyType: "frostBeetle", d: "down", params: {}},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 212, mapId: 'warTemple', floorId: '1F', mapX: 4, mapY: 1},
+        {x: 0, y: 16, w: 16, h: 16, index: 213, mapId: 'warTemple', floorId: '1F', mapX: 4, mapY: 2},
+        {x: 16, y: 16, w: 16, h: 16, index: 214, mapId: 'warTemple', floorId: '1F', mapX: 5, mapY: 2},
     ],
 };
 const f0_0x1: AreaDefinition = {
@@ -493,9 +493,9 @@ const f0_0x1: AreaDefinition = {
         {status: "normal", id: "warTemple:0:0x1-flameSnake-1", x: 304, y: 80, type: "enemy", enemyType: "flameSnake", d: "down", params: {}},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 32},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 16, h: 32, index: 215, hideMap: true, mapId: 'warTemple', floorId: '1F', mapX: 0, mapY: 2},
+        {x: 16, y: 0, w: 16, h: 16, index: 216, mapId: 'warTemple', floorId: '1F', mapX: 1, mapY: 3},
+        {x: 16, y: 16, w: 16, h: 16, index: 217, hideMap: true, mapId: 'warTemple', floorId: '1F', mapX: 1, mapY: 3},
     ],
 };
 const f0_1x1: AreaDefinition = {
@@ -642,7 +642,7 @@ const f0_1x1: AreaDefinition = {
         {status: "normal", id: "", x: 355, y: 334, type: "decoration", w: 16, h: 16, decorationType: "iceBeastStatue"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 218, mapId: 'warTemple', floorId: '1F', mapX: 2, mapY: 3},
     ],
 };
 const f0_2x1: AreaDefinition = {
@@ -751,9 +751,9 @@ const f0_2x1: AreaDefinition = {
         {status: "normal", id: "warTemple:0:2x1-luckyBeetle-0", x: 120, y: 384, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 32},
+        {x: 0, y: 0, w: 16, h: 16, index: 219, mapId: 'warTemple', floorId: '1F', mapX: 4, mapY: 3},
+        {x: 0, y: 16, w: 16, h: 16, index: 220, mapId: 'warTemple', floorId: '1F', mapX: 4, mapY: 4},
+        {x: 16, y: 0, w: 16, h: 32, index: 221, mapId: 'warTemple', floorId: '1F', mapX: 5, mapY: 3},
     ],
 };
 const f0_0x2: AreaDefinition = {
@@ -849,8 +849,8 @@ const f0_0x2: AreaDefinition = {
         {status: "normal", id: "warTemple:0:0x2-empty-1", x: 416, y: 80, type: "chest", lootType: "empty", lootLevel: 1},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 32, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 222, hideMap: true, mapId: 'warTemple', floorId: '1F', mapX: 0, mapY: 4},
+        {x: 0, y: 16, w: 32, h: 16, index: 223, hideMap: true, mapId: 'warTemple', floorId: '1F', mapX: 0, mapY: 5},
     ],
 };
 const f0_1x2: AreaDefinition = {
@@ -941,7 +941,7 @@ const f0_1x2: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 224, hideMap: true, mapId: 'warTemple', floorId: '1F', mapX: 2, mapY: 4},
     ],
 };
 const f0_2x2: AreaDefinition = {
@@ -1038,8 +1038,8 @@ const f0_2x2: AreaDefinition = {
         {status: "normal", id: "warTempleKeyDoorSwitch", x: 160, y: 160, targetObjectId: "warTempleKeyDoor", type: "floorSwitch", saveStatus: "forever"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 32, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 225, mapId: 'warTemple', floorId: '1F', mapX: 4, mapY: 5},
+        {x: 0, y: 16, w: 32, h: 16, index: 226, hideMap: true, mapId: 'warTemple', floorId: '1F', mapX: 4, mapY: 5},
     ],
 };
 const sf0_0x0: AreaDefinition = null;
@@ -1137,8 +1137,8 @@ const sf0_1x0: AreaDefinition = {
         {status: "normal", id: "", linked: true, x: 288, y: 368, type: "pushPull", spirit: true},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 32, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 227, mapId: 'warTempleSpirit', floorId: '1F', mapX: 2, mapY: 0},
+        {x: 0, y: 16, w: 32, h: 16, index: 228, mapId: 'warTempleSpirit', floorId: '1F', mapX: 2, mapY: 1},
     ],
 };
 const sf0_2x0: AreaDefinition = null;
@@ -1151,10 +1151,10 @@ const sf0_0x1: AreaDefinition = {
         {status: "normal", id: "labEntrance", x: 112, y: 32, type: "door", style: "cavern", d: "up", linked: true, targetZone: "lab", targetObjectId: "labEntrance", locationCue: "War Temple B1"},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 16, h: 16, index: 229, mapId: 'warTempleSpirit', floorId: '1F', mapX: 0, mapY: 2},
+        {x: 16, y: 0, w: 16, h: 16, index: 230, mapId: 'warTempleSpirit', floorId: '1F', mapX: 1, mapY: 2},
+        {x: 0, y: 16, w: 16, h: 16, index: 231, mapId: 'warTempleSpirit', floorId: '1F', mapX: 0, mapY: 3},
+        {x: 16, y: 16, w: 16, h: 16, index: 232, mapId: 'warTempleSpirit', floorId: '1F', mapX: 1, mapY: 3},
     ],
 };
 const sf0_1x1: AreaDefinition = {
@@ -1295,7 +1295,7 @@ const sf0_1x1: AreaDefinition = {
         {status: "normal", id: "warTempleEntranceSpirit", x: 240, y: 480, type: "door", style: "cave", targetZone: "overworld", targetObjectId: "warTempleEntranceSpirit", d: "down", linked: true, spirit: true, locationCue: "War Temple 1F"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 233, mapId: 'warTempleSpirit', floorId: '1F', mapX: 2, mapY: 2},
     ],
 };
 const sf0_2x1: AreaDefinition = null;
@@ -1453,9 +1453,9 @@ const f1_0x0: AreaDefinition = {
         {status: "normal", id: "", linked: true, x: 192, y: 448, type: "indicator"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 234, mapId: 'warTemple', floorId: '2F', mapX: 1, mapY: 2},
+        {x: 0, y: 16, w: 16, h: 16, index: 235, mapId: 'warTemple', floorId: '2F', mapX: 1, mapY: 3},
+        {x: 16, y: 16, w: 16, h: 16, index: 236, mapId: 'warTemple', floorId: '2F', mapX: 2, mapY: 3},
     ],
 };
 const f1_1x0: AreaDefinition = {
@@ -1561,9 +1561,9 @@ const f1_1x0: AreaDefinition = {
         {status: "normal", id: "warTempleEscapePit", x: 112, y: 112, targetZone: "warTemple", targetObjectId: "warTempleEscapeMarker", type: "pitEntrance"},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 32, h: 16},
+        {x: 0, y: 0, w: 16, h: 16, index: 237, mapId: 'warTemple', floorId: '2F', mapX: 3, mapY: 2},
+        {x: 16, y: 0, w: 16, h: 16, index: 238, mapId: 'warTemple', floorId: '2F', mapX: 4, mapY: 2},
+        {x: 0, y: 16, w: 32, h: 16, index: 239, mapId: 'warTemple', floorId: '2F', mapX: 3, mapY: 3},
     ],
 };
 const f1_2x0: AreaDefinition = null;
@@ -1585,9 +1585,9 @@ const sf1_0x0: AreaDefinition = {
         {status: "normal", id: "warTemple:s1:0x0-floorSwitch-0", spirit: true, x: 112, y: 384, targetObjectId: "spiritDoor", type: "floorSwitch", linked: true},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 240, mapId: 'warTempleSpirit', floorId: '2F', mapX: 0, mapY: 0},
+        {x: 0, y: 16, w: 16, h: 16, index: 241, mapId: 'warTempleSpirit', floorId: '2F', mapX: 0, mapY: 1},
+        {x: 16, y: 16, w: 16, h: 16, index: 242, mapId: 'warTempleSpirit', floorId: '2F', mapX: 1, mapY: 1},
     ],
 };
 const sf1_1x0: AreaDefinition = null;
@@ -1705,10 +1705,10 @@ const f2_0x0: AreaDefinition = {
         {status: "closedSwitch", id: "warTempleExit", x: 112, y: 0, type: "door", style: "cavernDownstairs", targetZone: "overworld", targetObjectId: "warTempleEntrance", d: "up", linked: true},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 16, h: 16, index: 243, mapId: 'warTemple', floorId: '3F', mapX: 2, mapY: 2},
+        {x: 16, y: 0, w: 16, h: 16, index: 244, mapId: 'warTemple', floorId: '3F', mapX: 3, mapY: 2},
+        {x: 0, y: 16, w: 16, h: 16, index: 245, mapId: 'warTemple', floorId: '3F', mapX: 2, mapY: 3},
+        {x: 16, y: 16, w: 16, h: 16, index: 246, mapId: 'warTemple', floorId: '3F', mapX: 3, mapY: 3},
     ],
 };
 const sf2_0x0: AreaDefinition = {
@@ -1721,10 +1721,10 @@ const sf2_0x0: AreaDefinition = {
         {status: "closedSwitch", id: "warTempleSpiritExit", x: 112, y: 0, type: "door", style: "cavernDownstairs", d: "up", linked: true, spirit: true},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 16, h: 16, index: 247, mapId: 'warTempleSpirit', floorId: '3F', mapX: 0, mapY: 0},
+        {x: 16, y: 0, w: 16, h: 16, index: 248, mapId: 'warTempleSpirit', floorId: '3F', mapX: 1, mapY: 0},
+        {x: 0, y: 16, w: 16, h: 16, index: 249, mapId: 'warTempleSpirit', floorId: '3F', mapX: 0, mapY: 1},
+        {x: 16, y: 16, w: 16, h: 16, index: 250, mapId: 'warTempleSpirit', floorId: '3F', mapX: 1, mapY: 1},
     ],
 };
 zones.warTemple = {

@@ -373,9 +373,9 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 112, y: 352, type: "narration", message: "{flag:thornsInstructions}\n{removeCue}", w: 32, h: 144, saveStatus: "never"},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 32},
+        {x: 0, y: 0, w: 16, h: 16, index: 152, mapId: 'peachCave', floorId: '1F', mapX: 2, mapY: 1},
+        {x: 0, y: 16, w: 16, h: 16, index: 153, mapId: 'peachCave', floorId: '1F', mapX: 2, mapY: 2},
+        {x: 16, y: 0, w: 16, h: 32, index: 154, mapId: 'peachCave', floorId: '1F', mapX: 3, mapY: 1},
     ],
     dark: 25,
     specialBehaviorKey: 'peachCave',
@@ -892,10 +892,10 @@ const f0_0x1: AreaDefinition = {
         {status: "normal", id: "jumpInstructions1", x: 256, y: 112, type: "narration", message: "Wow, the cave is full of glowing plants!\n{|}If I jump down I could use that vine to climb up over there.", w: 48, h: 64, delay: 500},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 16, h: 16, index: 155, mapId: 'peachCave', floorId: '1F', mapX: 2, mapY: 3},
+        {x: 16, y: 0, w: 16, h: 16, index: 156, mapId: 'peachCave', floorId: '1F', mapX: 3, mapY: 3},
+        {x: 0, y: 16, w: 16, h: 16, index: 157, mapId: 'peachCave', floorId: '1F', mapX: 2, mapY: 4},
+        {x: 16, y: 16, w: 16, h: 16, index: 158, mapId: 'peachCave', floorId: '1F', mapX: 3, mapY: 4},
     ],
     dark: 75,
     specialBehaviorKey: 'peachCave',
@@ -1247,9 +1247,9 @@ const sf0_0x0: AreaDefinition = {
         {id: "", linked: false, spirit: false, status: "closed", x: 272, y: 32, type: "door", targetZone: "peachCave", targetObjectId: "peachCave:stairsDown", d: "left", style: "cavern", openLogic: {"logicKey":"isRandomizer","isInverted":false}},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 32},
+        {x: 0, y: 0, w: 16, h: 16, index: 159, mapId: 'peachCaveSpirit', floorId: '1F', mapX: 0, mapY: 0},
+        {x: 0, y: 16, w: 16, h: 16, index: 160, mapId: 'peachCaveSpirit', floorId: '1F', mapX: 0, mapY: 1},
+        {x: 16, y: 0, w: 16, h: 32, index: 161, mapId: 'peachCaveSpirit', floorId: '1F', mapX: 1, mapY: 0},
     ],
 };
 const sf0_0x1: AreaDefinition = {
@@ -1714,10 +1714,10 @@ const sf0_0x1: AreaDefinition = {
         {id: "peachCaveLowerCrackedDoor", linked: false, spirit: false, status: "cracked", x: 368, y: 272, type: "door", d: "up", style: "cavern"},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 16, h: 16, index: 162, mapId: 'peachCaveSpirit', floorId: '1F', mapX: 0, mapY: 2},
+        {x: 16, y: 0, w: 16, h: 16, index: 163, mapId: 'peachCaveSpirit', floorId: '1F', mapX: 1, mapY: 2},
+        {x: 0, y: 16, w: 16, h: 16, index: 164, mapId: 'peachCaveSpirit', floorId: '1F', mapX: 0, mapY: 3},
+        {x: 16, y: 16, w: 16, h: 16, index: 165, mapId: 'peachCaveSpirit', floorId: '1F', mapX: 1, mapY: 3},
     ],
 };
 const f1_0x0: AreaDefinition = {
@@ -2077,10 +2077,10 @@ const f1_0x0: AreaDefinition = {
         {status: "normal", id: "peachCave:1:0x0-luckyBeetle-0", x: 384, y: 144, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 16, h: 16, index: 166, mapId: 'peachCave', floorId: '2F', mapX: 2, mapY: 1},
+        {x: 16, y: 0, w: 16, h: 16, index: 167, mapId: 'peachCave', floorId: '2F', mapX: 3, mapY: 1},
+        {x: 0, y: 16, w: 16, h: 16, index: 168, mapId: 'peachCave', floorId: '2F', mapX: 2, mapY: 2},
+        {x: 16, y: 16, w: 16, h: 16, index: 169, mapId: 'peachCave', floorId: '2F', mapX: 3, mapY: 2},
     ],
     dark: 50,
     specialBehaviorKey: 'peachCave',
@@ -2224,9 +2224,9 @@ const f1_0x1: AreaDefinition = {
         {status: "normal", id: "peachCaveSilver", x: 342, y: 74, type: "loot", lootType: "silverOre", lootLevel: 1},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 32},
+        {x: 0, y: 0, w: 16, h: 16, index: 170, mapId: 'peachCave', floorId: '2F', mapX: 2, mapY: 3},
+        {x: 0, y: 16, w: 16, h: 16, index: 171, mapId: 'peachCave', floorId: '2F', mapX: 2, mapY: 4},
+        {x: 16, y: 0, w: 16, h: 32, index: 172, mapId: 'peachCave', floorId: '2F', mapX: 3, mapY: 3},
     ],
     dark: 100,
     specialBehaviorKey: 'peachCave',
@@ -2577,10 +2577,10 @@ const sf1_0x0: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 16, h: 16, index: 173, mapId: 'peachCaveSpirit', floorId: '2F', mapX: 0, mapY: 0},
+        {x: 16, y: 0, w: 16, h: 16, index: 174, mapId: 'peachCaveSpirit', floorId: '2F', mapX: 1, mapY: 0},
+        {x: 0, y: 16, w: 16, h: 16, index: 175, mapId: 'peachCaveSpirit', floorId: '2F', mapX: 0, mapY: 1},
+        {x: 16, y: 16, w: 16, h: 16, index: 176, mapId: 'peachCaveSpirit', floorId: '2F', mapX: 1, mapY: 1},
     ],
 };
 const sf1_0x1: AreaDefinition = null;

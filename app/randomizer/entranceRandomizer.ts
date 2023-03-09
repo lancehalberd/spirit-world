@@ -1,4 +1,5 @@
 import { zoneEntranceMap } from 'app/content/dialogue/nimbusCloud';
+import { overworldKeys } from 'app/gameConstants';
 import SRandom from 'app/utils/SRandom';
 
 import {
@@ -14,7 +15,7 @@ const ignoredZones = [
     'void',
 ];
 
-const outsideZones = ['overworld', 'sky', 'underwater'];
+const outsideZones = overworldKeys;
 
 
 const disabledDoors = [

@@ -39,10 +39,9 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Add dungeon maps
-        - set section.index and update allSections when creating new sections
-        - figure out how to sort display of floor ids so it is B2/B1/1F/2F etc.
-        - update allSections when deleting sections.
+    - Fix annoying lightning sanctum puzzle
+    - Fix loot goblins break with fire damage
+    - Fix portal position in top left puzzle in cocoon.
 
     - Finish updating any maps that are left
 

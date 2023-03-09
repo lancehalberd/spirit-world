@@ -96,3 +96,5 @@ export const allLootTypes: LootType[] = [
 ];
 
 export const layersInOrder = ['floor', 'floor2', 'field', 'field2', 'foreground', 'foreground2'];
+
+export const overworldKeys = ['overworld', 'sky', 'underwater'];
