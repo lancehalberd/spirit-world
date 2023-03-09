@@ -41,7 +41,6 @@ Graphics:
 Current tasks:
     - Fix annoying lightning sanctum puzzle
     - Fix loot goblins break with fire damage
-    - Fix portal position in top left puzzle in cocoon.
 
     - Finish updating any maps that are left
 

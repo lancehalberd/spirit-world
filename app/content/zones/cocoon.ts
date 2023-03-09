@@ -96,7 +96,7 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 160, y: 336, type: "rollingBall", spirit: false},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 251, mapId: 'cocoon', floorId: 'B3', mapX: 1, mapY: 2},
     ],
 };
 const sf0_0x0: AreaDefinition = {
@@ -209,7 +209,7 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 400, y: 96, targetZone: "overworld", targetObjectId: "tombTeleporter", type: "teleporter"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 252, mapId: 'cocoon', floorId: 'B3', mapX: 3, mapY: 2},
     ],
 };
 const f1_0x0: AreaDefinition = {
@@ -416,7 +416,7 @@ const f1_0x0: AreaDefinition = {
         {status: "hiddenSwitch", id: "cocoonBackTeleporter", x: 336, y: 160, type: "teleporter", linked: true, spirit: true},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 253, mapId: 'cocoon', floorId: 'B2', mapX: 1, mapY: 2},
     ],
 };
 const sf1_0x0: AreaDefinition = {
@@ -615,7 +615,7 @@ const sf1_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 368, y: 384, type: "pushPull"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 254, mapId: 'cocoon', floorId: 'B2', mapX: 3, mapY: 2},
     ],
 };
 const f2_0x0: AreaDefinition = {
@@ -826,7 +826,7 @@ const f2_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 120, y: 40, style: "short", type: "sign", message: "You can only get the treasure from the spirit world.", spirit: false, linked: true},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 255, mapId: 'cocoon', floorId: 'B1', mapX: 1, mapY: 2},
     ],
 };
 const sf2_0x0: AreaDefinition = {
@@ -1034,18 +1034,19 @@ const sf2_0x0: AreaDefinition = {
         {status: "locked", id: "cocoonLockedDoor", x: 400, y: 272, type: "door", style: "cavernUpstairs", targetZone: "cocoon", targetObjectId: "cocoonSealedLockedDoor", d: "up", locationCue: "Cocoon B1"},
         {status: "normal", id: "cocoonOpenDoor", x: 80, y: 272, type: "door", style: "cavernUpstairs", targetZone: "cocoon", targetObjectId: "cocoonOpenDoor", d: "up", locationCue: "Cocoon B1"},
         {status: "bigKeyLocked", id: "cocoonBigLock", x: 368, y: 0, type: "door", style: "cavernUpstairs", targetZone: "cocoon", targetObjectId: "cocoonBigLock", d: "up", locationCue: "Cocoon B1"},
-        {status: "normal", id: "", x: 144, y: 144, type: "teleporter"},
+        {status: "normal", id: "", x: 176, y: 144, type: "teleporter"},
         {status: "normal", id: "", x: 80, y: 112, type: "rollingBall", linked: true},
         {status: "normal", id: "", x: 128, y: 176, type: "ballGoal", targetObjectId: "cocoonBigMoney"},
         {status: "hiddenSwitch", id: "cocoonBigMoney", x: 96, y: 64, type: "chest", lootType: "money", lootAmount: 100},
-        {status: "normal", id: "cocoonLadderBack", x: 416, y: 160, type: "door", style: "ladderDown", targetZone: "cocoon", targetObjectId: "cocoonLadderBack", d: "down"},
-        {status: "normal", id: "cocoonLadderNW", x: 160, y: 80, type: "door", style: "ladderUp", targetZone: "cocoon", targetObjectId: "cocoonLadderNW", d: "up"},
-        {status: "normal", id: "cocoonLadderNE", x: 336, y: 80, type: "door", style: "ladderUp", targetZone: "cocoon", targetObjectId: "cocoonLadderNE", d: "up"},
+        {status: "normal", id: "cocoonLadderBack", x: 416, y: 160, type: "door", style: "ladderDown", targetZone: "cocoon", targetObjectId: "cocoonLadderBack", d: "down", locationCue: "Cocoon B1"},
+        {status: "normal", id: "cocoonLadderNW", x: 160, y: 80, type: "door", style: "ladderUp", targetZone: "cocoon", targetObjectId: "cocoonLadderNW", d: "up", locationCue: "Cocoon B1"},
+        {status: "normal", id: "cocoonLadderNE", x: 336, y: 80, type: "door", style: "ladderUp", targetZone: "cocoon", targetObjectId: "cocoonLadderNE", d: "up", locationCue: "Cocoon B1"},
         {status: "normal", id: "cocoon:s2:0x0-luckyBeetle-0", x: 400, y: 344, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
         {status: "normal", id: "", x: 120, y: 40, style: "short", type: "sign", message: "I've hidden some Jade here for anyone who can roll the ball into that hole.", spirit: true, linked: true},
+        {status: "normal", id: "cocoonMap", x: 368, y: 288, type: "chest", lootType: "map", lootLevel: 1},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 256, mapId: 'cocoon', floorId: 'B1', mapX: 3, mapY: 2},
     ],
 };
 const f3_0x0: AreaDefinition = {
@@ -1257,7 +1258,7 @@ const f3_0x0: AreaDefinition = {
         {status: "normal", id: "", linked: true, spirit: false, x: 440, y: 336, style: "short", type: "sign", message: "Some puzzles can only be solved by traveling to the other world."},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 257, mapId: 'cocoon', floorId: '1F', mapX: 1, mapY: 2},
     ],
 };
 const sf3_0x0: AreaDefinition = {
@@ -1450,7 +1451,7 @@ const sf3_0x0: AreaDefinition = {
         {status: "normal", id: "", linked: true, spirit: true, x: 440, y: 336, style: "short", type: "sign", message: "If you ever get stuck, try using your Spirit Sight!"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 258, mapId: 'cocoon', floorId: '1F', mapX: 3, mapY: 2},
     ],
 };
 zones.cocoon = {

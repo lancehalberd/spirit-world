@@ -98,7 +98,7 @@ export const warTempleNodes: LogicNode[] = [
             // The player can defeat all these enemies using stones now that enemies stay
             // defeated when leaving and returning to rooms.
             {objectId: 'warTemple:0:0x0-money-0', logic: orLogic(hasWeapon, hasGloves)},
-            {objectId: 'warTemple:0:2x0-money-0', logic: orLogic(hasWeapon, hasGloves)},
+            {objectId: 'warTempleMap', logic: orLogic(hasWeapon, hasGloves)},
         ],
         paths: [
             {nodeId: 'warTempleMainEntrance', logic: hasGloves},

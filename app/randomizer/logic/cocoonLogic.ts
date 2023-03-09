@@ -92,6 +92,7 @@ export const cocoonNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'cocoon3SE',
+        checks: [{objectId: 'cocoonMap'}],
         paths: [{nodeId: 'cocoon3', logic: canUseTeleporters}],
         entranceIds: ['cocoonLockedDoor'],
         exits: [{objectId: 'cocoonLockedDoor'}]
