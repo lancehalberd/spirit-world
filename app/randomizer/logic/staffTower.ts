@@ -24,7 +24,7 @@ export const staffTowerNodes: LogicNode[] = [
         zoneId,
         nodeId: 'staffTowerF1Downstairs',
         paths: [
-            {nodeId: 'staffTowerF1Upstairs', logic: orLogic(hasIce, hasCloudBoots, hasClone)}
+            {nodeId: 'staffTowerF1Upstairs', logic: orLogic(hasIce, hasCloudBoots, hasClone, hasSomersault)}
         ],
         entranceIds: ['staffTowerEntrance'],
         exits: [{objectId: 'staffTowerEntrance'}],
@@ -76,7 +76,7 @@ export const staffTowerNodes: LogicNode[] = [
         zoneId,
         nodeId: 'staffTowerF2',
         checks: [
-            { objectId: 'staffTowerSmallMoney1', logic: orLogic(hasStaff, hasCloudBoots) },
+            { objectId: 'staffTowerMap', logic: orLogic(hasIce, hasStaff, hasCloudBoots, hasSomersault) },
         ],
         // This is blocked as an entrance because of the lightning barrier.
         // Can eventually remove this and split the upper area and allow invisibility to move past the barrier.
