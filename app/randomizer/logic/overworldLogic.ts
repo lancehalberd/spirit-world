@@ -352,6 +352,8 @@ export const skyNodes: LogicNode[] = [
         paths: [
             { nodeId: 'overworldMountain' },
             { nodeId: 'mainCloudPath', logic: hasCloudBoots },
+            // Jump down on the far right.
+            { nodeId: 'overworldWaterfall'},
         ],
         entranceIds: ['craterEntrance'],
         exits: [
