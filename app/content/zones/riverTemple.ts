@@ -218,10 +218,10 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "frostBeast", x: 224, y: 176, type: "boss", enemyType: "frostBeast", lootType: "ice", lootLevel: 1, d: "down", params: {}, logicKey: "frozenLake"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 395, mapId: 'riverTemple', floorId: '2F', mapX: 2, mapY: 1},
     ],
 };
-const f0_1x0: AreaDefinition = {
+const f0_0x1: AreaDefinition = {
     layers: [
         {
             key: 'water',
@@ -449,15 +449,15 @@ const f0_1x0: AreaDefinition = {
         {status: "normal", id: "riverTempleSave", x: 240, y: 112, type: "saveStatue"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 396, mapId: 'riverTemple', floorId: '2F', mapX: 2, mapY: 3},
+        {x: 0, y: 16, w: 16, h: 16, index: 397, mapId: 'riverTemple', floorId: '2F', mapX: 2, mapY: 4},
+        {x: 16, y: 16, w: 16, h: 16, index: 398, mapId: 'riverTemple', floorId: '2F', mapX: 3, mapY: 4},
     ],
 };
 const sf0_0x0: AreaDefinition = null;
-const sf0_1x0: AreaDefinition = {
+const sf0_0x1: AreaDefinition = {
     isSpiritWorld: true,
-    parentDefinition: f0_1x0,
+    parentDefinition: f0_0x1,
     layers: [
         {
             key: 'water',
@@ -627,9 +627,9 @@ const sf0_1x0: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 399, mapId: 'riverTempleSpirit', floorId: '1F', mapX: 0, mapY: 2},
+        {x: 0, y: 16, w: 16, h: 16, index: 400, mapId: 'riverTempleSpirit', floorId: '1F', mapX: 0, mapY: 3},
+        {x: 16, y: 16, w: 16, h: 16, index: 401, mapId: 'riverTempleSpirit', floorId: '1F', mapX: 1, mapY: 3},
     ],
 };
 const f1_0x0: AreaDefinition = {
@@ -724,13 +724,13 @@ const f1_0x0: AreaDefinition = {
         {status: "normal", id: "riverTemple:1:0x0-luckyBeetle-0", x: 376, y: 376, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 16, h: 16, index: 402, hideMap: true, mapId: 'riverTemple', floorId: '3F', mapX: 2, mapY: 1},
+        {x: 16, y: 0, w: 16, h: 16, index: 403, hideMap: true, mapId: 'riverTemple', floorId: '3F', mapX: 3, mapY: 1},
+        {x: 0, y: 16, w: 16, h: 16, index: 404, hideMap: true, mapId: 'riverTemple', floorId: '3F', mapX: 2, mapY: 2},
+        {x: 16, y: 16, w: 16, h: 16, index: 405, mapId: 'riverTemple', floorId: '3F', mapX: 3, mapY: 2},
     ],
 };
-const f1_1x0: AreaDefinition = {
+const f1_0x1: AreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -832,14 +832,14 @@ const f1_1x0: AreaDefinition = {
         {status: "frozen", id: "floor2FrozenDoor", x: 256, y: 80, type: "door", style: "cave", d: "left", saveStatus: "forever", logicKey: "frozenLake"},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 16, h: 16, index: 406, mapId: 'riverTemple', floorId: '3F', mapX: 2, mapY: 3},
+        {x: 16, y: 0, w: 16, h: 16, index: 407, mapId: 'riverTemple', floorId: '3F', mapX: 3, mapY: 3},
+        {x: 0, y: 16, w: 16, h: 16, index: 408, hideMap: true, mapId: 'riverTemple', floorId: '3F', mapX: 2, mapY: 4},
+        {x: 16, y: 16, w: 16, h: 16, index: 409, hideMap: true, mapId: 'riverTemple', floorId: '3F', mapX: 3, mapY: 4},
     ],
 };
 const sf1_0x0: AreaDefinition = null;
-const sf1_1x0: AreaDefinition = null;
+const sf1_0x1: AreaDefinition = null;
 zones.riverTemple = {
     key: 'riverTemple',
     underwaterKey: 'riverTempleWater',
@@ -847,21 +847,21 @@ zones.riverTemple = {
         {
             grid: [
                 [f0_0x0,],
-                [f0_1x0,],
+                [f0_0x1,],
             ],
             spiritGrid: [
                 [sf0_0x0,],
-                [sf0_1x0,],
+                [sf0_0x1,],
             ],
         },
         {
             grid: [
                 [f1_0x0,],
-                [f1_1x0,],
+                [f1_0x1,],
             ],
             spiritGrid: [
                 [sf1_0x0,],
-                [sf1_1x0,],
+                [sf1_0x1,],
             ],
         },
     ],

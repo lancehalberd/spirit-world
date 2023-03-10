@@ -155,10 +155,10 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 176, y: 240, type: "spikeBall", d: "down", speed: 1, turn: "left"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 410, mapId: 'riverTemple', floorId: '1F', mapX: 2, mapY: 1},
     ],
 };
-const f0_1x0: AreaDefinition = {
+const f0_0x1: AreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -300,12 +300,12 @@ const f0_1x0: AreaDefinition = {
         {status: "normal", id: "", x: 336, y: 112, type: "airBubbles"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 32, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 411, mapId: 'riverTemple', floorId: '1F', mapX: 2, mapY: 3},
+        {x: 0, y: 16, w: 32, h: 16, index: 412, mapId: 'riverTemple', floorId: '1F', mapX: 2, mapY: 4},
     ],
 };
 const sf0_0x0: AreaDefinition = null;
-const sf0_1x0: AreaDefinition = null;
+const sf0_0x1: AreaDefinition = null;
 const f1_0x0: AreaDefinition = {
     layers: [
         {
@@ -400,10 +400,10 @@ const f1_0x0: AreaDefinition = {
         {status: "normal", id: "frostBeast", x: 224, y: 176, type: "boss", enemyType: "frostBeast", lootType: "empty", lootLevel: 1, d: "down", params: {}, logicKey: "frozenLake"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 413, hideMap: true, mapId: 'riverTemple', floorId: '2F', mapX: 2, mapY: 1},
     ],
 };
-const f1_1x0: AreaDefinition = {
+const f1_0x1: AreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -507,13 +507,13 @@ const f1_1x0: AreaDefinition = {
         {status: "normal", id: "", x: 80, y: 464, type: "spikeBall", d: "up", speed: 0, turn: "bounce", hasCustomLogic: true, customLogic: "frostBeast", invertLogic: true},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 414, hideMap: true, mapId: 'riverTemple', floorId: '2F', mapX: 2, mapY: 3},
+        {x: 0, y: 16, w: 16, h: 16, index: 415, hideMap: true, mapId: 'riverTemple', floorId: '2F', mapX: 2, mapY: 4},
+        {x: 16, y: 16, w: 16, h: 16, index: 416, hideMap: true, mapId: 'riverTemple', floorId: '2F', mapX: 3, mapY: 4},
     ],
 };
 const sf1_0x0: AreaDefinition = null;
-const sf1_1x0: AreaDefinition = null;
+const sf1_0x1: AreaDefinition = null;
 zones.riverTempleWater = {
     key: 'riverTempleWater',
     surfaceKey: 'riverTemple',
@@ -521,21 +521,21 @@ zones.riverTempleWater = {
         {
             grid: [
                 [f0_0x0,],
-                [f0_1x0,],
+                [f0_0x1,],
             ],
             spiritGrid: [
                 [sf0_0x0,],
-                [sf0_1x0,],
+                [sf0_0x1,],
             ],
         },
         {
             grid: [
                 [f1_0x0,],
-                [f1_1x0,],
+                [f1_0x1,],
             ],
             spiritGrid: [
                 [sf1_0x0,],
-                [sf1_1x0,],
+                [sf1_0x1,],
             ],
         },
     ],
