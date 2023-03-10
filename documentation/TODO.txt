@@ -41,8 +41,6 @@ Graphics:
 Current tasks:
     - Fix loot goblins break with fire damage
 
-    - Finish updating any maps that are left
-
     - Change floorId of elevator as it changes floors.
 
     - Fix error when updating map in crater when not drained

@@ -260,10 +260,10 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "finalSaveStatue", x: 392, y: 144, type: "saveStatue"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 465, mapId: 'tree', floorId: '1F', mapX: 1, mapY: 1},
     ],
 };
-const f0_0x1: AreaDefinition = {
+const f0_1x0: AreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -519,10 +519,10 @@ const f0_0x1: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 466, mapId: 'tree', floorId: '1F', mapX: 3, mapY: 1},
     ],
 };
-const f0_1x0: AreaDefinition = {
+const f0_0x1: AreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -696,7 +696,7 @@ const f0_1x0: AreaDefinition = {
         {status: "normal", id: "", linked: true, spirit: false, x: 392, y: 368, type: "teleporter"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 467, mapId: 'tree', floorId: '1F', mapX: 1, mapY: 3},
     ],
 };
 const f0_1x1: AreaDefinition = {
@@ -871,21 +871,21 @@ const f0_1x1: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 468, mapId: 'tree', floorId: '1F', mapX: 3, mapY: 3},
     ],
 };
 const sf0_0x0: AreaDefinition = null;
-const sf0_0x1: AreaDefinition = null;
-const sf0_1x0: AreaDefinition = {
+const sf0_1x0: AreaDefinition = null;
+const sf0_0x1: AreaDefinition = {
     isSpiritWorld: true,
-    parentDefinition: f0_1x0,
+    parentDefinition: f0_0x1,
     layers: null,
     objects: [
         {status: "normal", id: "treeEntrance", x: 368, y: 496, type: "door", style: "wooden", targetZone: "lab", targetObjectId: "treeEntrance", d: "down", locationCue: "World Tree 1F", linked: true, spirit: true},
         {status: "normal", id: "", linked: true, spirit: true, x: 392, y: 368, type: "teleporter"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 469, mapId: 'treeSpirit', floorId: '1F', mapX: 0, mapY: 2},
     ],
 };
 const sf0_1x1: AreaDefinition = null;
@@ -894,12 +894,12 @@ zones.tree = {
     floors: [
         {
             grid: [
-                [f0_0x0,f0_0x1,],
-                [f0_1x0,f0_1x1,],
+                [f0_0x0,f0_1x0,],
+                [f0_0x1,f0_1x1,],
             ],
             spiritGrid: [
-                [sf0_0x0,sf0_0x1,],
-                [sf0_1x0,sf0_1x1,],
+                [sf0_0x0,sf0_1x0,],
+                [sf0_0x1,sf0_1x1,],
             ],
         },
     ],

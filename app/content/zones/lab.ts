@@ -376,10 +376,10 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "", linked: true, spirit: true, x: 240, y: 336, type: "door", style: "knobbyTree", targetObjectId: "treeEntrance", d: "up", locationCue: "Lab B1"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 435, mapId: 'lab', floorId: '1F', mapX: 0, mapY: 0},
     ],
 };
-const f0_1x0: AreaDefinition = {
+const f0_0x1: AreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -597,10 +597,10 @@ const f0_1x0: AreaDefinition = {
         {status: "normal", id: "", linked: true, x: 240, y: 16, type: "door", style: "cavern", d: "up"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 436, mapId: 'lab', floorId: '1F', mapX: 0, mapY: 2},
     ],
 };
-const f0_2x0: AreaDefinition = {
+const f0_0x2: AreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -823,9 +823,9 @@ const f0_2x0: AreaDefinition = {
         {status: "normal", id: "", x: 224, y: 496, type: "door", style: "cavern", d: "down", linked: true, spirit: true, targetObjectId: "labEntrance", locationCue: "Lab B1"},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 32, h: 16},
+        {x: 0, y: 0, w: 16, h: 16, index: 437, mapId: 'lab', floorId: '1F', mapX: 0, mapY: 4},
+        {x: 16, y: 0, w: 16, h: 16, index: 438, mapId: 'lab', floorId: '1F', mapX: 1, mapY: 4},
+        {x: 0, y: 16, w: 32, h: 16, index: 439, mapId: 'lab', floorId: '1F', mapX: 0, mapY: 5},
     ],
 };
 const sf0_0x0: AreaDefinition = {
@@ -1174,24 +1174,24 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "treeEntrance", linked: true, spirit: false, x: 240, y: 336, type: "door", style: "knobbyTree", targetZone: "tree", targetObjectId: "treeEntrance", d: "up", locationCue: "Lab B1"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 440, mapId: 'labSpirit', floorId: '1F', mapX: 2, mapY: 0},
     ],
 };
-const sf0_1x0: AreaDefinition = {
+const sf0_0x1: AreaDefinition = {
     isSpiritWorld: true,
-    parentDefinition: f0_1x0,
+    parentDefinition: f0_0x1,
     layers: null,
     objects: [
         {status: "normal", id: "", x: 48, y: 496, type: "door", style: "cavern", d: "down", linked: true, spirit: true},
         {status: "normal", id: "", linked: true, x: 240, y: 16, type: "door", style: "cavern", d: "up", spirit: true},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 441, mapId: 'labSpirit', floorId: '1F', mapX: 2, mapY: 2},
     ],
 };
-const sf0_2x0: AreaDefinition = {
+const sf0_0x2: AreaDefinition = {
     isSpiritWorld: true,
-    parentDefinition: f0_2x0,
+    parentDefinition: f0_0x2,
     layers: null,
     objects: [
         {status: "normal", id: "", x: 96, y: 240, type: "door", style: "cavern", d: "down", linked: true, spirit: true},
@@ -1203,9 +1203,9 @@ const sf0_2x0: AreaDefinition = {
         {status: "normal", id: "", x: 112, y: 272, type: "door", style: "cavern", d: "up", linked: true, spirit: true},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 32, h: 16},
+        {x: 0, y: 0, w: 16, h: 16, index: 442, mapId: 'labSpirit', floorId: '1F', mapX: 2, mapY: 4},
+        {x: 16, y: 0, w: 16, h: 16, index: 459, mapId: 'labSpirit', floorId: '1F', mapX: 3, mapY: 4},
+        {x: 0, y: 16, w: 32, h: 16, index: 460, mapId: 'labSpirit', floorId: '1F', mapX: 2, mapY: 5},
     ],
 };
 const f1_0x0: AreaDefinition = {
@@ -1591,13 +1591,13 @@ const f1_0x0: AreaDefinition = {
         {status: "normal", id: "labStairs", linked: true, spirit: true, x: 416, y: 0, type: "door", style: "cavernDownstairs", targetZone: "lab", targetObjectId: "labStairs", d: "up", locationCue: "Lab 1F"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 486, mapId: 'lab', floorId: '2F', mapX: 0, mapY: 0},
+        {x: 0, y: 16, w: 16, h: 16, index: 487, mapId: 'lab', floorId: '2F', mapX: 0, mapY: 1},
+        {x: 16, y: 16, w: 16, h: 16, index: 488, mapId: 'lab', floorId: '2F', mapX: 1, mapY: 1},
     ],
 };
-const f1_1x0: AreaDefinition = null;
-const f1_2x0: AreaDefinition = null;
+const f1_0x1: AreaDefinition = null;
+const f1_0x2: AreaDefinition = null;
 const sf1_0x0: AreaDefinition = {
     isSpiritWorld: true,
     parentDefinition: f1_0x0,
@@ -1606,36 +1606,38 @@ const sf1_0x0: AreaDefinition = {
         {status: "normal", id: "labStairs", linked: true, spirit: false, x: 416, y: 0, type: "door", style: "cavernDownstairs", targetZone: "lab", targetObjectId: "labStairs", d: "up", locationCue: "Lab 1F"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 16, index: 489, mapId: 'labSpirit', floorId: '2F', mapX: 2, mapY: 1},
+        {x: 0, y: 16, w: 16, h: 16, index: 490, hideMap: true, mapId: 'labSpirit', floorId: '2F', mapX: 2, mapY: 2},
+        {x: 16, y: 16, w: 16, h: 16, index: 491, hideMap: true, mapId: 'labSpirit', floorId: '2F', mapX: 3, mapY: 2},
     ],
 };
-const sf1_1x0: AreaDefinition = null;
-const sf1_2x0: AreaDefinition = null;
+const sf1_0x1: AreaDefinition = null;
+const sf1_0x2: AreaDefinition = null;
 zones.lab = {
     key: 'lab',
     floors: [
         {
             grid: [
                 [f0_0x0,],
-                [f0_1x0,],
-                [f0_2x0,],
+                [f0_0x1,],
+                [f0_0x2,],
             ],
             spiritGrid: [
                 [sf0_0x0,],
-                [sf0_1x0,],
-                [sf0_2x0,],
+                [sf0_0x1,],
+                [sf0_0x2,],
             ],
         },
         {
             grid: [
                 [f1_0x0,],
-                [f1_1x0,],
-                [f1_2x0,],
+                [f1_0x1,],
+                [f1_0x2,],
             ],
             spiritGrid: [
                 [sf1_0x0,],
-                [sf1_1x0,],
-                [sf1_2x0,],
+                [sf1_0x1,],
+                [sf1_0x2,],
             ],
         },
     ],

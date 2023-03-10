@@ -504,7 +504,7 @@ export function getZoneProperties(): PanelRows {
                         while (grid[i].length > columns) {
                             const area = grid[i].pop();
                             // Remove any deleted sections from the map.
-                            replaceMapSections(state, area.sections || []);
+                            replaceMapSections(state, state.location, area.sections || []);
                         }
                     }
                 }
@@ -530,7 +530,7 @@ export function getZoneProperties(): PanelRows {
                             const row = grid.pop();
                             for (const area of row) {
                                 // Remove any deleted sections from the map.
-                                replaceMapSections(state, area.sections || []);
+                                replaceMapSections(state, state.location, area.sections || []);
                             }
                         }
                     }
@@ -549,10 +549,13 @@ export function getZoneProperties(): PanelRows {
             // Mostly this is because it is annoying to have to update it in both places
             // when we almost always intend for them to be the same anyway.
             const newCurrentSections = sectionLayouts[sectionType].map(section => ({...section}));
-            replaceMapSections(state, state.areaInstance.definition.sections || [], newCurrentSections);
+            replaceMapSections(state, state.location, state.areaInstance.definition.sections || [], newCurrentSections);
             state.areaInstance.definition.sections = newCurrentSections;
             const newAlternateSections = sectionLayouts[sectionType].map(section => ({...section}));
-            replaceMapSections(state, state.alternateAreaInstance.definition.sections || [], newAlternateSections);
+            replaceMapSections(state, {
+                ...state.location,
+                isSpiritWorld: !state.location.isSpiritWorld,
+            }, state.alternateAreaInstance.definition.sections || [], newAlternateSections);
             state.alternateAreaInstance.definition.sections = newAlternateSections;
             state.areaSection = null;
             setAreaSection(state);

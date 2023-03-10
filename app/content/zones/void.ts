@@ -227,7 +227,7 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "finalMom", x: 248, y: 56, d: "down", behavior: "idle", style: "mom", type: "npc", dialogueKey: "mom", hasCustomLogic: true, customLogic: "voidTree"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 470, mapId: 'void', floorId: '1F', mapX: 1, mapY: 2},
     ],
 };
 const sf0_0x0: AreaDefinition = {
@@ -458,7 +458,7 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "voidFrostExit", x: 120, y: 320, type: "teleporter", hasCustomLogic: true, customLogic: "voidFrost"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 471, mapId: 'void', floorId: '1F', mapX: 3, mapY: 2},
     ],
 };
 zones.void = {

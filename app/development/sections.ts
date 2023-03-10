@@ -66,7 +66,7 @@ export function updateMapSections(state: GameState, sections: number[], data: Pa
     editingState.selectedSections = [];
 }
 
-export function replaceMapSections(state: GameState, removedSections: AreaSection[], addedSections: AreaSection[] = []) {
+export function replaceMapSections(state: GameState, location: ZoneLocation, removedSections: AreaSection[], addedSections: AreaSection[] = []) {
     for (const section of removedSections) {
         if (!(section.index >= 0)) {
             continue;
@@ -81,7 +81,7 @@ export function replaceMapSections(state: GameState, removedSections: AreaSectio
         }
     }
     for (const section of addedSections) {
-        initializeSection(section, state.location);
+        initializeSection(section, location);
     }
     state.map.needsRefresh = true;
     editingState.selectedSections = [];
