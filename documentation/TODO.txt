@@ -39,8 +39,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Fix loot goblins break with fire damage
-
     - Change floorId of elevator as it changes floors.
 
     - Fix error when updating map in crater when not drained

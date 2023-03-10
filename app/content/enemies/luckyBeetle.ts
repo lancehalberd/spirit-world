@@ -52,6 +52,7 @@ enemyDefinitions.luckyBeetle = {
     params: {hits: 0, duration: 20000, switch: false},
     tileBehaviors: {brightness: 0.6, lightRadius: 32},
     update(this: void, state: GameState, enemy: Enemy<LuckyBeetleParams>) {
+        enemy.life = 1;
         if (enemy.params.hits) {
             enemy.params.duration -= FRAME_LENGTH;
         }
@@ -108,7 +109,6 @@ enemyDefinitions.luckyBeetle = {
             }
         }
         if (result.hit) {
-            enemy.life = 1;
             enemy.params.hits++;
             // The net result of this is that you have anywhere from 10-20s before it disappears,
             // with more time if you hit it less.
