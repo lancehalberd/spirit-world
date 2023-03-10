@@ -310,7 +310,7 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "crater:0:2x0-flameSnake-0", x: 256, y: 240, type: "enemy", enemyType: "flameSnake", d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava1"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 417, mapId: 'crater', floorId: '1F', mapX: 0, mapY: 0},
     ],
 };
 const f0_1x0: AreaDefinition = {
@@ -620,7 +620,7 @@ const f0_1x0: AreaDefinition = {
         {status: "normal", id: "crater:0:2x0-flameSnake-1", x: 368, y: 208, type: "enemy", enemyType: "flameSnake", d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava1"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 418, mapId: 'crater', floorId: '1F', mapX: 2, mapY: 0},
     ],
 };
 const f0_2x0: AreaDefinition = {
@@ -932,7 +932,7 @@ const f0_2x0: AreaDefinition = {
         {status: "normal", id: "crater:0:2x0-ent-1", x: 128, y: 320, type: "enemy", enemyType: "ent", d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava1"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 419, mapId: 'crater', floorId: '1F', mapX: 4, mapY: 0},
     ],
 };
 const f0_0x1: AreaDefinition = {
@@ -1329,7 +1329,7 @@ const f0_0x1: AreaDefinition = {
         {status: "closed", id: "", x: 112, y: 128, type: "door", style: "cavern", d: "up"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 420, mapId: 'crater', floorId: '1F', mapX: 0, mapY: 2},
     ],
 };
 const f0_1x1: AreaDefinition = {
@@ -1684,7 +1684,7 @@ const f0_1x1: AreaDefinition = {
         {status: "normal", id: "craterBossPortal", x: 256, y: 272, targetZone: "crater", targetObjectId: "craterBossPortal", type: "teleporter", hasCustomLogic: true, customLogic: "flameBeast"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 421, mapId: 'crater', floorId: '1F', mapX: 2, mapY: 2},
     ],
 };
 const f0_2x1: AreaDefinition = {
@@ -2077,13 +2077,13 @@ const f0_2x1: AreaDefinition = {
     objects: [
         {status: "normal", id: "craterLavaDoor", x: 192, y: 352, type: "door", style: "wideEntrance", d: "right", hasCustomLogic: true, customLogic: "craterLava3", targetZone: "crater", targetObjectId: "craterLavaDoor"},
         {status: "normal", id: "craterEastDoor", x: 160, y: 208, type: "door", style: "cavern", d: "up", hasCustomLogic: true, customLogic: "craterLava2", targetZone: "crater", targetObjectId: "craterEastDoor"},
-        {status: "normal", id: "craterSmallMoney", x: 272, y: 288, type: "chest", lootType: "money", lootAmount: 50, lootLevel: 1},
+        {status: "normal", id: "craterMap", x: 272, y: 288, type: "chest", lootType: "map", lootAmount: 50, lootLevel: 1},
         {status: "normal", id: "crater:0:2x1-arrowTurret-0", x: 384, y: 320, type: "enemy", enemyType: "arrowTurret", d: "down", params: {}},
         {status: "normal", id: "crater:0:2x0-flameSnake-5", x: 256, y: 144, type: "enemy", enemyType: "flameSnake", d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava1"},
         {status: "normal", id: "crater:0:2x1-ent-0", x: 160, y: 240, type: "enemy", enemyType: "ent", d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava2"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 422, mapId: 'crater', floorId: '1F', mapX: 4, mapY: 2},
     ],
 };
 const f0_0x2: AreaDefinition = {
@@ -2483,7 +2483,7 @@ const f0_0x2: AreaDefinition = {
         {status: "normal", id: "crater:0:2x0-flameSnake-6", x: 240, y: 64, type: "enemy", enemyType: "flameSnake", d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava1"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 423, mapId: 'crater', floorId: '1F', mapX: 0, mapY: 4},
     ],
 };
 const f0_1x2: AreaDefinition = {
@@ -2880,7 +2880,7 @@ const f0_1x2: AreaDefinition = {
         {status: "normal", id: "crater:0:2x0-flameSnake-7", x: 256, y: 192, type: "enemy", enemyType: "flameSnake", d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava1"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 424, mapId: 'crater', floorId: '1F', mapX: 2, mapY: 4},
     ],
 };
 const f0_2x2: AreaDefinition = {
@@ -3414,7 +3414,7 @@ const f0_2x2: AreaDefinition = {
         {status: "normal", id: "crater:0:2x2-luckyBeetle-0", x: 264, y: 304, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 425, mapId: 'crater', floorId: '1F', mapX: 4, mapY: 4},
     ],
 };
 const sf0_0x0: AreaDefinition = null;
@@ -3814,7 +3814,7 @@ const sf0_0x1: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 426, mapId: 'craterSpirit', floorId: '1F', mapX: 0, mapY: 2},
     ],
 };
 const sf0_1x1: AreaDefinition = null;
@@ -4080,9 +4080,9 @@ const f1_0x0: AreaDefinition = {
         {status: "normal", id: "craterMiniBoss", x: 400, y: 160, type: "boss", enemyType: "frostIdol", lootType: "fireBlessing", lootLevel: 1, d: "down", params: {}},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 32, hotLogic: {"hasCustomLogic":true,"customLogic":"craterMiniBoss"}},
-        {x: 16, y: 0, w: 16, h: 16, hotLogic: {"hasCustomLogic":true,"customLogic":"craterMiniBoss"}},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 16, h: 32, index: 427, hotLogic: {"hasCustomLogic":true,"customLogic":"craterMiniBoss"}, mapId: 'crater', floorId: 'B1', mapX: 2, mapY: 0},
+        {x: 16, y: 0, w: 16, h: 16, index: 428, hotLogic: {"hasCustomLogic":true,"customLogic":"craterMiniBoss"}, mapId: 'crater', floorId: 'B1', mapX: 3, mapY: 0},
+        {x: 16, y: 16, w: 16, h: 16, index: 429, hideMap: true, mapId: 'crater', floorId: 'B1', mapX: 1, mapY: 2.5},
     ],
 };
 const f1_1x0: AreaDefinition = {
@@ -4387,9 +4387,9 @@ const f1_1x0: AreaDefinition = {
         {status: "normal", id: "craterLowerDoor", x: 352, y: 272, type: "door", style: "cavern", targetZone: "crater", targetObjectId: "craterLowerDoor", d: "down", hasCustomLogic: true, customLogic: "craterLava2"},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16, hotLogic: {"isTrue":true,"isInverted":false}},
-        {x: 0, y: 16, w: 16, h: 16, hotLogic: {"isTrue":true,"isInverted":false}},
-        {x: 16, y: 0, w: 16, h: 32, hotLogic: {"isTrue":true,"isInverted":false}},
+        {x: 0, y: 0, w: 16, h: 16, index: 430, hotLogic: {"isTrue":true,"isInverted":false}, mapId: 'crater', floorId: 'B1', mapX: 0, mapY: 0},
+        {x: 0, y: 16, w: 16, h: 16, index: 431, hotLogic: {"isTrue":true,"isInverted":false}, hideMap: true, mapId: 'crater', floorId: 'B1', mapX: 3, mapY: 1},
+        {x: 16, y: 0, w: 16, h: 32, index: 432, hotLogic: {"isTrue":true,"isInverted":false}, mapId: 'crater', floorId: 'B1', mapX: 1, mapY: 0},
     ],
 };
 const f1_2x0: AreaDefinition = {
@@ -4737,8 +4737,8 @@ const f1_2x0: AreaDefinition = {
         {status: "normal", id: "craterLava3", x: 400, y: 64, type: "floorSwitch", saveStatus: "forever", customLogic: "craterLava2"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16, hotLogic: {"isTrue":true,"isInverted":false}},
-        {x: 0, y: 16, w: 32, h: 16, hotLogic: {"isTrue":true,"isInverted":false}},
+        {x: 0, y: 0, w: 32, h: 16, index: 433, hotLogic: {"isTrue":true,"isInverted":false}, mapId: 'crater', floorId: 'B1', mapX: 4, mapY: 2.5},
+        {x: 0, y: 16, w: 32, h: 16, index: 434, hotLogic: {"isTrue":true,"isInverted":false}, hideMap: true, mapId: 'crater', floorId: 'B1', mapX: 4, mapY: 1},
     ],
 };
 const sf1_0x0: AreaDefinition = null;
