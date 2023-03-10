@@ -28,7 +28,7 @@ export function enterZoneByTarget(
         console.error(`Missing zone: ${zoneKey}`);
         return false;
     }
-    const objectLocation = findObjectLocation(state, zoneKey, targetObjectId, state.areaInstance.definition.isSpiritWorld, skipObject);
+    const objectLocation = findObjectLocation(state, zoneKey, targetObjectId, state.areaInstance.definition.isSpiritWorld, skipObject, true);
     if (!objectLocation) {
         return false;
     }
@@ -60,8 +60,14 @@ export function enterZoneByTarget(
     return true;
 }
 
-export function findObjectLocation(state: GameState, zoneKey: string, targetObjectId: string, checkSpiritWorldFirst = false, skipObject: ObjectDefinition = null):
-    ZoneLocation & {object: ObjectDefinition} | false {
+export function findObjectLocation(
+    state: GameState,
+    zoneKey: string,
+    targetObjectId: string,
+    checkSpiritWorldFirst = false,
+    skipObject: ObjectDefinition = null,
+    showErrorIfMissing = false
+): ZoneLocation & {object: ObjectDefinition} | false {
     const zone = zones[zoneKey];
     if (!zone) {
         debugger;
@@ -99,7 +105,9 @@ export function findObjectLocation(state: GameState, zoneKey: string, targetObje
             }
         }
     }
-    console.error('Could not find', targetObjectId, 'in', zoneKey);
+    if (showErrorIfMissing) {
+        console.error('Could not find', targetObjectId, 'in', zoneKey);
+    }
     return false;
 }
 

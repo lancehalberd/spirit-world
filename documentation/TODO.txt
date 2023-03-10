@@ -41,12 +41,6 @@ Graphics:
 Current tasks:
     - Change floorId of elevator as it changes floors.
 
-    - Fix error when updating map in crater when not drained
-        - "enterZoneByTarget.ts:108 Could not find craterLockedDoor in crater"
-        - The map shouldn't need to call 'enterZoneByTarget'.
-        - Triggered by "refreshIsHot", let's fail quietly in this case.
-
-
     - Tasks before next major release
         - Cocoon
             - Astral projection of boss size scales with health to 1/4 < 25%, 1/2 < 50%

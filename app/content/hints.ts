@@ -14,28 +14,41 @@ interface Mission {
     isResolved: (state: GameState) => boolean
 }
 
-const getPeachCaveLocation = (state: GameState) => findObjectLocation(state, 'overworld', 'peachCaveTopEntrance');
-const getWaterfallVillageLocation = (state: GameState) => findObjectLocation(state, 'overworld', 'waterfallCaveEntrance');
-const getVanaraElderLocation = (state: GameState) => findObjectLocation(state, 'overworld', 'elderEntrance');
+function findMaterialWorldObject(state: GameState, objectId: string) {
+    return findObjectLocation(state, 'overworld', objectId, false, null, true);
+}
+function findSpiritWorldObject(state: GameState, objectId: string) {
+    return findObjectLocation(state, 'overworld', objectId, true, null, true);
+}
+function findMaterialSkyObject(state: GameState, objectId: string) {
+    return findObjectLocation(state, 'sky', objectId, false, null, true);
+}
+function findSpiritSkyObject(state: GameState, objectId: string) {
+    return findObjectLocation(state, 'sky', objectId, true, null, true);
+}
 
-const getTombLocation = (state: GameState) => findObjectLocation(state, 'overworld', 'tombEntrance');
-const getWarTempleLocation = (state: GameState) => findObjectLocation(state, 'overworld', 'warTempleEntrance');
-const getLakeTeleporterLocation = (state: GameState) => findObjectLocation(state, 'overworld', 'tombTeleporter');
+const getPeachCaveLocation = (state: GameState) => findMaterialWorldObject(state, 'peachCaveTopEntrance');
+const getWaterfallVillageLocation = (state: GameState) => findMaterialWorldObject(state, 'waterfallCaveEntrance');
+const getVanaraElderLocation = (state: GameState) => findMaterialWorldObject(state, 'elderEntrance');
 
-const getLakeTunnelLocation = (state: GameState) => findObjectLocation(state, 'overworld', 'lakeTunnelEntrance');
-const getGrandTempleLocation = (state: GameState) => findObjectLocation(state, 'overworld', 'grandTempleEntrance');
+const getTombLocation = (state: GameState) => findMaterialWorldObject(state, 'tombEntrance');
+const getWarTempleLocation = (state: GameState) => findMaterialWorldObject(state, 'warTempleEntrance');
+const getLakeTeleporterLocation = (state: GameState) => findMaterialWorldObject(state, 'tombTeleporter');
 
-const getForestTempleLocation = (state: GameState) => findObjectLocation(state, 'overworld', 'elderSpiritEntrance', true);
-const getWaterfallTowerLocation = (state: GameState) => findObjectLocation(state, 'overworld', 'waterfallTowerEntrance');
-const getForgeLocation = (state: GameState) => findObjectLocation(state, 'sky', 'forgeEntrance', true);
-const getSkyPalaceLocation = (state: GameState) => findObjectLocation(state, 'sky', 'skyPalaceEntrance', true);
-const getJadePalaceLocation = (state: GameState) => findObjectLocation(state, 'overworld', 'jadePalaceEntrance', true);
+const getLakeTunnelLocation = (state: GameState) => findMaterialWorldObject(state, 'lakeTunnelEntrance');
+const getGrandTempleLocation = (state: GameState) => findMaterialWorldObject(state, 'grandTempleEntrance');
 
-const getCraterLocation = (state: GameState) => findObjectLocation(state, 'sky', 'craterEntrance');
-const getLakeTempleLocation = (state: GameState) => findObjectLocation(state, 'overworld', 'riverTempleUpperEntrance');
-const getStaffTowerLocation = (state: GameState) => findObjectLocation(state, 'overworld', 'staffTowerEntrance');
+const getForestTempleLocation = (state: GameState) => findSpiritWorldObject(state, 'elderSpiritEntrance');
+const getWaterfallTowerLocation = (state: GameState) => findMaterialWorldObject(state, 'waterfallTowerEntrance');
+const getForgeLocation = (state: GameState) => findSpiritSkyObject(state, 'forgeEntrance');
+const getSkyPalaceLocation = (state: GameState) => findSpiritSkyObject(state, 'skyPalaceEntrance');
+const getJadePalaceLocation = (state: GameState) => findSpiritWorldObject(state, 'jadePalaceEntrance');
 
-const getWarPalaceLocation = (state: GameState) => findObjectLocation(state, 'overworld', 'warTempleEntranceSpirit', true);
+const getCraterLocation = (state: GameState) => findMaterialSkyObject(state, 'craterEntrance');
+const getLakeTempleLocation = (state: GameState) => findMaterialWorldObject(state, 'riverTempleUpperEntrance');
+const getStaffTowerLocation = (state: GameState) => findMaterialWorldObject(state, 'staffTowerEntrance');
+
+const getWarPalaceLocation = (state: GameState) => findSpiritWorldObject(state, 'warTempleEntranceSpirit');
 
 const missions: Mission[] = [
     {
