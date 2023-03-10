@@ -42,8 +42,6 @@ Current tasks:
     - Fix loot goblins break with fire damage
 
     - Finish updating any maps that are left
-    - Add overworld maps for spirit world and spirit sky
-        - Maybe add these all programmatically.
 
     - Tasks before next major release
         - Cocoon
@@ -95,9 +93,8 @@ Current tasks:
         - Update save statue dialog
 
         - Support multiple active missions
-            - Remove hint option from menu
             - On map, highlight the first mission and display a location name
-            - If the user confirms, show them the help text or the mission.
+            - If the user confirms, show them the help text for the mission.
 
         - When hero/clone is falling, draw it behind all other sprites (on top of the background).
             - Try using getDrawPriority to apply this to clone, we may need a new priority 'afterBackground' to force it to draw on top of all background elements (for example, it should be drawn on top of pit entrance objects).

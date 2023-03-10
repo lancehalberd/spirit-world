@@ -62,6 +62,9 @@ const innerWorldMapRectangle = {
     h: worldSize,
 };
 export function renderOverworldMap(context: CanvasRenderingContext2D, state: GameState, zone: string): void {
+    if (zone === 'underwater') {
+        zone = 'overworld';
+    }
     drawMapFrame(context, fullWorldMapRectangle);
     const r = innerWorldMapRectangle;
     refreshWorldMap(state, zone);
@@ -89,11 +92,12 @@ export function renderOverworldMap(context: CanvasRenderingContext2D, state: Gam
     }
 
     if (state.time % 1000 <= 600) {
-        const target = getMapTarget(state);
-        if (target) {
+        const location = getMapTarget(state);
+        if (location && location.zoneKey === zone && location.isSpiritWorld === state.location.isSpiritWorld) {
             context.strokeStyle = 'red';
             context.beginPath();
-            const x = r.x + target.x, y = r.y + target.y;
+            const mapCoordinates = convertLocationToMapCoordinates(location);
+            const x = r.x + mapCoordinates.x, y = r.y + mapCoordinates.y;
             context.moveTo(x - 6, y - 6);
             context.lineTo(x + 6, y + 6);
             context.moveTo(x + 6, y - 6);
@@ -113,12 +117,14 @@ const [sectionCanvas, sectionContext] = createCanvasAndContext(64, 64);
 
 
 function refreshWorldMap(state: GameState, zoneKey: string): void {
+    const floorId = state.location.isSpiritWorld ? 'spirit' : 'material';
     // It is expensive to render the world map, so only re-render if it has important changes.
-    if (!state.map.needsRefresh && state.map.renderedMapId === zoneKey) {
+    if (!state.map.needsRefresh && state.map.renderedMapId === zoneKey && state.map.renderedFloorId === floorId) {
         return;
     }
     state.map.needsRefresh = false;
     state.map.renderedMapId = zoneKey;
+    state.map.renderedFloorId = floorId;
 
     mapContext.clearRect(0, 0, mapCanvas.width, mapCanvas.height);
     const zone = zones[zoneKey];
@@ -295,7 +301,9 @@ function renderDungeonMap(context: CanvasRenderingContext2D, state: GameState): 
 }
 
 
-const mapObjectTypes: ObjectType[] = ['door', 'pitEntrance', 'saveStatue', 'pushStairs'];
+const mapObjectTypes: ObjectType[] = [
+    'waterfall', 'door', 'pitEntrance', 'saveStatue', 'pushStairs', 'teleporter'
+];
 export function renderActualMapTile(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance, target: Rect, source: Rect): void {
     if (area.checkToRedrawTiles) {
         checkToRedrawTiles(area);
@@ -327,7 +335,10 @@ export function renderActualMapTile(context: CanvasRenderingContext2D, state: Ga
                 part.renderForeground?.(context, state);
             }
 
-            if (object.definition?.type === 'door' && object.definition.targetZone && object.definition.targetObjectId) {
+            if (object.definition?.type === 'door'
+                && object.definition.targetZone && object.definition.targetObjectId
+                && object.status !== 'cracked'
+            ) {
                 context.fillStyle = 'rgba(0, 255, 255, 1)';
                 context.fillRect(
                     hitbox.x,

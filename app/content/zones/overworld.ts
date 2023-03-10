@@ -325,8 +325,8 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "overworld:0:0x0-luckyBeetle-0", x: 232, y: 408, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 32, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 18, mapId: 'overworld', floorId: '1F', mapX: 0, mapY: 0},
+        {x: 0, y: 16, w: 32, h: 16, index: 19, mapId: 'overworld', floorId: '1F', mapX: 0, mapY: 1},
     ],
 };
 const f0_1x0: AreaDefinition = {
@@ -585,10 +585,10 @@ const f0_1x0: AreaDefinition = {
                 tiles: [
                     [762,764,753,754,770,763,762,764,753,754,770,763,762,763,762,763,762,763,762,763,762,763,764,753,754,753,754,753,754,753,764,758],
                     [1,772,762,763,773,0,0,772,762,763,773,1,1,1,1,1,1,1,16,1,1,1,772,762,763,762,763,762,763,762,764,758],
-                    [1,1,10,10,0,0,0,0,13,9,1,1,1,1,1,1,1,1,19,1,1,1,21,1,21,1,1,15,14,17,772,758],
-                    [1,1,0,10,1,1,1,1,1,9,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,756],
-                    [1,16,0,0,10,10,10,10,8,1,1,12,1,1,1,1,1,1,1,1,1,1,19,1,1,18,1,1,1,1,1,756],
-                    [1,1,1,1,0,0,0,0,1,1,1,1,20,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,756],
+                    [1,1,10,0,0,0,0,0,13,7,4,1,1,1,1,1,1,1,19,1,1,1,21,1,21,1,1,15,14,17,772,758],
+                    [1,1,10,0,1,1,1,1,1,9,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,756],
+                    [1,16,0,10,0,0,0,0,8,1,1,12,1,1,1,1,1,1,1,1,1,1,19,1,1,18,1,1,1,1,1,756],
+                    [1,1,1,1,10,10,10,10,1,1,1,1,20,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,756],
                     [1,20,1,1,0,0,0,0,1,1,13,1,20,1,1,1,1,1,1,1,1,19,1,20,1,1,18,1,1,1,1,767],
                     [1,1,1,1,0,0,0,0,1,1,1,1,12,13,1,1,19,1,1,1,1,1,1,1,1,1,19,1,1,1,770,762],
                     [1,1,1,1,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,20,1,1,1,1,1,1,19,1,1,770,773,0],
@@ -751,16 +751,14 @@ const f0_1x0: AreaDefinition = {
         {status: "normal", id: "waterfallCaveEntrance", x: 80, y: 240, type: "door", style: "cavern", targetZone: "waterfallCave", targetObjectId: "waterfallCaveEntrance", d: "up"},
         {status: "normal", id: "overworld:0:1x0-decoration-1", x: 68, y: 276, type: "waterfall", w: 56, h: 103},
         {status: "normal", id: "overworld:0:1x0-decoration-0", x: 68, y: 368, type: "waterfall", w: 72, h: 67},
-        {status: "normal", id: "overworld:0:1x0-decoration-2", x: 69, y: 48, type: "waterfall", w: 56, h: 48},
-        {status: "normal", id: "waterfallTowerEntrance", x: 80, y: 32, targetZone: "waterfallTower", targetObjectId: "waterfallTowerEntrance", type: "teleporter"},
+        {status: "normal", id: "waterfallTowerEntrance", x: 88, y: 32, targetZone: "waterfallTower", targetObjectId: "waterfallTowerEntrance", type: "teleporter"},
         {status: "normal", id: "overworld:0:1x0-beetleHorned-0", x: 368, y: 192, type: "enemy", enemyType: "beetleHorned", d: "down", params: {}},
         {status: "normal", id: "overworld:0:1x0-beetleHorned-1", x: 384, y: 80, type: "enemy", enemyType: "beetleHorned", d: "down", params: {}},
         {status: "normal", id: "overworld:0:1x0-beetleMini-0", x: 384, y: 352, type: "enemy", enemyType: "beetleMini", d: "down", params: {}},
         {status: "normal", id: "overworld:0:1x0-beetleMini-1", x: 432, y: 384, type: "enemy", enemyType: "beetleMini", d: "down", params: {}},
-        {status: "normal", id: "", x: 32, y: 80, type: "spawnMarker", linked: true},
-        {status: "normal", id: "", x: 176, y: 64, type: "spawnMarker", linked: true},
+        {status: "normal", id: "", x: 24, y: 104, type: "spawnMarker", linked: true},
+        {status: "normal", id: "", x: 120, y: 40, type: "spawnMarker", linked: true},
         {status: "normal", id: "", x: 176, y: 128, type: "spawnMarker", linked: true},
-        {status: "normal", id: "", x: 32, y: 128, type: "spawnMarker", linked: true},
         {status: "normal", id: "", x: 432, y: 64, type: "spawnMarker"},
         {status: "normal", id: "", x: 304, y: 64, type: "spawnMarker", linked: true},
         {status: "normal", id: "", x: 432, y: 192, type: "spawnMarker", linked: true},
@@ -776,10 +774,13 @@ const f0_1x0: AreaDefinition = {
         {status: "normal", id: "waterfallCaveSave", x: 32, y: 256, type: "saveStatue"},
         {status: "normal", id: "waterfallMarker", x: 144, y: 280, type: "marker"},
         {status: "normal", id: "overworld:0:1x0-luckyBeetle-0", x: 360, y: 120, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
-        {status: "normal", id: "", x: 80, y: 32, type: "indicator"},
+        {status: "normal", id: "", x: 88, y: 32, type: "indicator"},
+        {status: "normal", id: "", x: 176, y: 64, type: "spawnMarker", linked: true},
+        {status: "normal", id: "", x: 72, y: 56, type: "spawnMarker", linked: true},
+        {status: "normal", id: "overworld:0:1x0-decoration-2", x: 69, y: 48, type: "waterfall", w: 56, h: 48},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 20, mapId: 'overworld', floorId: '1F', mapX: 2, mapY: 0},
     ],
 };
 const f0_2x0: AreaDefinition = {
@@ -1143,7 +1144,7 @@ const f0_2x0: AreaDefinition = {
         {status: "normal", id: "cityCliffMoney", x: 48, y: 16, type: "chest", lootType: "money", lootAmount: 100},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 21, mapId: 'overworld', floorId: '1F', mapX: 4, mapY: 0},
     ],
 };
 const f0_0x1: AreaDefinition = {
@@ -1435,9 +1436,9 @@ const f0_0x1: AreaDefinition = {
         {status: "normal", id: "tombRivalNpc", logicKey: "tombRivalNpc", x: 120, y: 112, d: "down", behavior: "none", style: "rival", type: "npc", dialogueKey: "rival"},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 32, h: 16},
+        {x: 0, y: 0, w: 16, h: 16, index: 22, mapId: 'overworld', floorId: '1F', mapX: 0, mapY: 2},
+        {x: 16, y: 0, w: 16, h: 16, index: 23, mapId: 'overworld', floorId: '1F', mapX: 1, mapY: 2},
+        {x: 0, y: 16, w: 32, h: 16, index: 24, mapId: 'overworld', floorId: '1F', mapX: 0, mapY: 3},
     ],
 };
 const f0_1x1: AreaDefinition = {
@@ -1856,7 +1857,7 @@ const f0_1x1: AreaDefinition = {
         {status: "normal", id: "lakeVortex", x: 344, y: 296, type: "enemy", enemyType: "vortex", d: "down", params: {}, hasCustomLogic: true, customLogic: "frostBeast"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 25, mapId: 'overworld', floorId: '1F', mapX: 2, mapY: 2},
     ],
 };
 const f0_2x1: AreaDefinition = {
@@ -2188,9 +2189,9 @@ const f0_2x1: AreaDefinition = {
         {status: "normal", id: "overworld:0:2x1-luckyBeetle-0", x: 304, y: 392, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 26, mapId: 'overworld', floorId: '1F', mapX: 4, mapY: 2},
+        {x: 0, y: 16, w: 16, h: 16, index: 27, mapId: 'overworld', floorId: '1F', mapX: 4, mapY: 3},
+        {x: 16, y: 16, w: 16, h: 16, index: 28, mapId: 'overworld', floorId: '1F', mapX: 5, mapY: 3},
     ],
 };
 const f0_0x2: AreaDefinition = {
@@ -2432,7 +2433,7 @@ const f0_0x2: AreaDefinition = {
         {status: "normal", id: "treeVillageStoragePit", x: 320, y: 272, style: "singleTile", targetZone: "treeVillage", targetObjectId: "treeVillageStorageMarker", type: "pitEntrance"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 29, mapId: 'overworld', floorId: '1F', mapX: 0, mapY: 4},
     ],
     dark: 50,
 };
@@ -2714,9 +2715,9 @@ const f0_1x2: AreaDefinition = {
         {status: "normal", id: "overworld:0:1x2-luckyBeetle-0", x: 176, y: 176, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 32},
+        {x: 0, y: 0, w: 16, h: 16, index: 30, mapId: 'overworld', floorId: '1F', mapX: 2, mapY: 4},
+        {x: 0, y: 16, w: 16, h: 16, index: 31, mapId: 'overworld', floorId: '1F', mapX: 2, mapY: 5},
+        {x: 16, y: 0, w: 16, h: 32, index: 32, mapId: 'overworld', floorId: '1F', mapX: 3, mapY: 4},
     ],
 };
 const f0_2x2: AreaDefinition = {
@@ -2886,7 +2887,7 @@ const f0_2x2: AreaDefinition = {
         {status: "normal", id: "", x: 224, y: 368, targetObjectId: "overworldWarTemplePotA", type: "indicator"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 33, mapId: 'overworld', floorId: '1F', mapX: 4, mapY: 4},
     ],
 };
 const sf0_0x0: AreaDefinition = {
@@ -3214,8 +3215,8 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 368, y: 368, type: "teleporter"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 32, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 34, mapId: 'overworldSpirit', floorId: '1F', mapX: 0, mapY: 0},
+        {x: 0, y: 16, w: 32, h: 16, index: 35, mapId: 'overworldSpirit', floorId: '1F', mapX: 0, mapY: 1},
     ],
 };
 const sf0_1x0: AreaDefinition = {
@@ -3477,9 +3478,9 @@ const sf0_1x0: AreaDefinition = {
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,1,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                    [0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                    [0,0,0,0,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,1,1,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -3641,10 +3642,9 @@ const sf0_1x0: AreaDefinition = {
         {status: "normal", id: "overworld:s0:1x0-arrowTurret-1", x: 368, y: 48, type: "enemy", enemyType: "arrowTurret", d: "down", params: {}},
         {status: "normal", id: "overworld:s0:1x0-frostBeetle-0", x: 368, y: 176, type: "enemy", enemyType: "frostBeetle", d: "down", params: {}},
         {status: "normal", id: "overworld:s0:1x0-frostBeetle-1", x: 208, y: 48, type: "enemy", enemyType: "frostBeetle", d: "down", params: {}},
-        {status: "normal", id: "", x: 32, y: 80, type: "spawnMarker", linked: true, spirit: true},
-        {status: "normal", id: "", x: 176, y: 64, type: "spawnMarker", linked: true, spirit: true},
+        {status: "normal", id: "", x: 24, y: 104, type: "spawnMarker", linked: true, spirit: true},
+        {status: "normal", id: "", x: 120, y: 40, type: "spawnMarker", linked: true, spirit: true},
         {status: "normal", id: "", x: 176, y: 128, type: "spawnMarker", linked: true, spirit: true},
-        {status: "normal", id: "", x: 32, y: 128, type: "spawnMarker", linked: true, spirit: true},
         {status: "normal", id: "", x: 40, y: 280, type: "spawnMarker", linked: true, spirit: true},
         {status: "normal", id: "", x: 176, y: 296, type: "spawnMarker", linked: true, spirit: true},
         {status: "normal", id: "", x: 184, y: 424, type: "spawnMarker", linked: true, spirit: true},
@@ -3661,9 +3661,10 @@ const sf0_1x0: AreaDefinition = {
         {status: "cracked", id: "cloneCaveExit", x: 16, y: 224, type: "door", style: "cavern", targetZone: "cloneCave", targetObjectId: "cloneCaveExit", d: "up"},
         {status: "cracked", id: "cloneCaveEntrance", x: 288, y: 256, type: "door", style: "cavern", targetZone: "cloneCave", targetObjectId: "cloneCaveEntrance", d: "up"},
         {status: "cracked", id: "bellCaveEntrance", x: 384, y: 0, type: "door", style: "cavern", targetZone: "bellCave", targetObjectId: "bellCaveEntrance", d: "up"},
+        {status: "normal", id: "", x: 72, y: 56, type: "spawnMarker", linked: true, spirit: true},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 36, mapId: 'overworldSpirit', floorId: '1F', mapX: 2, mapY: 0},
     ],
 };
 const sf0_2x0: AreaDefinition = {
@@ -4020,7 +4021,7 @@ const sf0_2x0: AreaDefinition = {
         {status: "normal", id: "jadeCitySoutheastDoor", x: 432, y: 384, type: "door", style: "wooden", targetZone: "holyCityInterior", targetObjectId: "jadeCitySoutheastDoor", d: "up"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 37, mapId: 'overworldSpirit', floorId: '1F', mapX: 4, mapY: 0},
     ],
 };
 const sf0_0x1: AreaDefinition = {
@@ -4318,9 +4319,9 @@ const sf0_0x1: AreaDefinition = {
         {status: "normal", id: "overworld:s0:0x1-luckyBeetle-0", x: 144, y: 320, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 32, h: 16},
+        {x: 0, y: 0, w: 16, h: 16, index: 38, mapId: 'overworldSpirit', floorId: '1F', mapX: 0, mapY: 2},
+        {x: 16, y: 0, w: 16, h: 16, index: 39, mapId: 'overworldSpirit', floorId: '1F', mapX: 1, mapY: 2},
+        {x: 0, y: 16, w: 32, h: 16, index: 40, mapId: 'overworldSpirit', floorId: '1F', mapX: 0, mapY: 3},
     ],
 };
 const sf0_1x1: AreaDefinition = {
@@ -4693,7 +4694,7 @@ const sf0_1x1: AreaDefinition = {
         },
     ],
     objects: [
-        {id: "", linked: true, spirit: true, status: "normal", x: 256, y: 80, type: "door", style: "lightCave", d: "up"},
+        {id: "", linked: true, spirit: true, status: "cracked", x: 256, y: 80, type: "door", style: "cavern", d: "up"},
         {status: "normal", id: "overworld:s0:1x1-teleporter-0", x: 400, y: 64, type: "teleporter", linked: true},
         {status: "normal", id: "overworld:s0:1x1-frostBeetle-0", x: 64, y: 240, type: "enemy", enemyType: "frostBeetle", d: "down", params: {}},
         {status: "normal", id: "overworld:s0:1x1-frostBeetle-1", x: 128, y: 432, type: "enemy", enemyType: "frostBeetle", d: "down", params: {}},
@@ -4716,7 +4717,7 @@ const sf0_1x1: AreaDefinition = {
         {status: "normal", id: "", x: 128, y: 16, type: "spawnMarker", linked: true, spirit: true},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 41, mapId: 'overworldSpirit', floorId: '1F', mapX: 2, mapY: 2},
     ],
 };
 const sf0_2x1: AreaDefinition = {
@@ -5051,9 +5052,9 @@ const sf0_2x1: AreaDefinition = {
         {status: "normal", id: "", x: 64, y: 352, type: "spawnMarker", linked: true, spirit: true},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 42, mapId: 'overworldSpirit', floorId: '1F', mapX: 4, mapY: 2},
+        {x: 0, y: 16, w: 16, h: 16, index: 43, mapId: 'overworldSpirit', floorId: '1F', mapX: 4, mapY: 3},
+        {x: 16, y: 16, w: 16, h: 16, index: 44, mapId: 'overworldSpirit', floorId: '1F', mapX: 5, mapY: 3},
     ],
 };
 const sf0_0x2: AreaDefinition = {
@@ -5304,7 +5305,7 @@ const sf0_0x2: AreaDefinition = {
         {status: "normal", id: "spiritForestSave", linked: true, spirit: true, x: 416, y: 64, type: "saveStatue"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 45, mapId: 'overworldSpirit', floorId: '1F', mapX: 0, mapY: 4},
     ],
 };
 const sf0_1x2: AreaDefinition = {
@@ -5591,9 +5592,9 @@ const sf0_1x2: AreaDefinition = {
         {status: "normal", id: "forestTempleMarker", x: 112, y: 368, type: "marker"},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 32},
+        {x: 0, y: 0, w: 16, h: 16, index: 46, mapId: 'overworldSpirit', floorId: '1F', mapX: 2, mapY: 4},
+        {x: 0, y: 16, w: 16, h: 16, index: 47, mapId: 'overworldSpirit', floorId: '1F', mapX: 2, mapY: 5},
+        {x: 16, y: 0, w: 16, h: 32, index: 48, mapId: 'overworldSpirit', floorId: '1F', mapX: 3, mapY: 4},
     ],
 };
 const sf0_2x2: AreaDefinition = {
@@ -5753,7 +5754,7 @@ const sf0_2x2: AreaDefinition = {
         {status: "normal", id: "overworld:s0:2x2-luckyBeetle-0", x: 280, y: 64, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 49, mapId: 'overworldSpirit', floorId: '1F', mapX: 4, mapY: 4},
     ],
 };
 zones.overworld = {

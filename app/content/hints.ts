@@ -483,7 +483,7 @@ export function showHint(state: GameState): void {
     }
 }
 
-export function getMapTarget(state: GameState): {x: number, y: number} | null {
+export function getMapTarget(state: GameState): ZoneLocation & { object?: ObjectDefinition } | false {
     if (isRandomizer) {
         return null;
     }
@@ -491,7 +491,7 @@ export function getMapTarget(state: GameState): {x: number, y: number} | null {
         if (mission.isAvailable(state) && !mission.isResolved(state)) {
             const location = mission.getMarkerLocation(state);
             if (location) {
-                return convertLocationToMapCoordinates(location);
+                return location;
             }
         }
     }

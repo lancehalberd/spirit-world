@@ -76,7 +76,7 @@ const peachCaveExitState = applyItems(peachBossState, {maxLife: 1, catEyes: 1},
     ['peachCaveBoss', 'peachCave:fullPeach', 'homeInstructions']
 );
 const tombRivalState = applyItems(peachCaveExitState, {bow: 1},
-    ['treeVillage:1:0x0-bow-0', 'closedBowDoor', 'elderTomb']
+    ['momElder', 'treeVillage:1:0x0-bow-0', 'closedBowDoor', 'elderTomb']
 );
 tombRivalState.savedHeroData.leftTool = 'bow';
 const tombRivalDefeatState = applyItems(tombRivalState, {}, ['tombRivalEnraged']);
@@ -84,12 +84,12 @@ tombRivalDefeatState.savedHeroData.life = 0.25;
 const tombStartState = applyItems(tombRivalState, {},
     ['tombEntrance', 'enteredTomb']
 );
-const tombBossState = applyItems(tombStartState, {roll: 1, 'tomb:bigKey': 1, silverOre: 1},
+const tombBossState = applyItems(tombStartState, {roll: 1, 'tomb:bigKey': 1, 'tomb:map': 1, silverOre: 1},
     ['tombKey1', 'tombKey2', 'tombBigKey', 'tomb:1:1x0-roll-0']
 );
 const warTempleStart = applyItems(tombBossState, {maxLife: 1, spiritSight: 1},
-    ['tombBoss', 'warTempleEntrance', 'tombTeleporter']);
-const warTempleBoss = applyItems(warTempleStart, {gloves: 1, 'warTemple:bigKey': 1});
+    ['tombBoss', 'tombTeleporter', 'momRuins', 'warTempleEntrance']);
+const warTempleBoss = applyItems(warTempleStart, {gloves: 1, 'warTemple:bigKey': 1, 'warTemple:map': 1});
 const cocoonStartState = applyItems(warTempleBoss, {maxLife: 1, astralProjection: 1, normalRange: 1},
     ['warTempleBoss', 'tombExit']);
 const cocoonBossState = applyItems(cocoonStartState, {'cocoon:bigKey': 1, 'cloak': 1}, []);
