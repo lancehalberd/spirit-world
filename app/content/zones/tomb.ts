@@ -521,7 +521,6 @@ const f0_1x1: AreaDefinition = {
         {status: "normal", id: "tombBoss", x: 96, y: 96, type: "enemy", enemyType: "golemHand", d: "right", params: {}, saveStatus: "never"},
         {status: "normal", id: "tombBoss", x: 128, y: 96, type: "enemy", enemyType: "golemHand", d: "left", params: {}, saveStatus: "never"},
         {status: "closedEnemy", id: "tomb:0:1x1-door-0", x: 112, y: 0, type: "door", style: "cave", targetObjectId: "tombEntrance", d: "up"},
-        {status: "normal", id: "tomb:0:1x1-map-0", x: 104, y: 416, type: "chest", lootType: "map", lootLevel: 1},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16, index: 188, mapId: 'tomb', floorId: 'B1', mapX: 3, mapY: 3},

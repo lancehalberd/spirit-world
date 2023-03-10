@@ -211,6 +211,7 @@ function countRequiredKeysForEntrance(allNodes: LogicNode[], startingNodes: Logi
 function organizeLootObjects(lootObjects: LootWithLocation[]) {
     const bigKeys: LootWithLocation[] = [];
     const smallKeys: LootWithLocation[] = [];
+    const maps: LootWithLocation[] = [];
     const progressLoot: LootWithLocation[] = [];
     const peachLoot: LootWithLocation[] = [];
     const trashLoot: LootWithLocation[] = [];
@@ -232,6 +233,9 @@ function organizeLootObjects(lootObjects: LootWithLocation[]) {
             case 'smallKey':
                 smallKeys.push(lootWithLocation);
                 break;
+            case 'map':
+                maps.push(lootWithLocation);
+                break;
             case 'peachOfImmortality':
             case 'peachOfImmortalityPiece':
                 peachLoot.push(lootWithLocation);
@@ -241,7 +245,7 @@ function organizeLootObjects(lootObjects: LootWithLocation[]) {
         }
     }
 
-    return { bigKeys, smallKeys, progressLoot, peachLoot, trashLoot };
+    return { bigKeys, smallKeys, maps, progressLoot, peachLoot, trashLoot };
 }
 
 // Make a deep copy of the state.
@@ -402,7 +406,7 @@ export function reverseFill(random: typeof SRandom, allNodes: LogicNode[], start
     let placeFullPeachFirst = initialReachableChecks.length < 13;
 
 
-    let { bigKeys, smallKeys, peachLoot, progressLoot, trashLoot } = organizeLootObjects(allLootObjects);
+    let { bigKeys, smallKeys, maps, peachLoot, progressLoot, trashLoot } = organizeLootObjects(allLootObjects);
     progressLoot = random.shuffle(progressLoot);
     random.generateAndMutate();
     peachLoot = random.shuffle(peachLoot);
@@ -426,7 +430,7 @@ export function reverseFill(random: typeof SRandom, allNodes: LogicNode[], start
         assignItemToLocation(assignmentsState, fullPeach, location);
     }
     let remainingLoot = [...bigKeys, ...smallKeys, ...progressLoot, ...peachLoot];
-    for (let itemSet of [bigKeys, smallKeys, progressLoot, peachLoot]) {
+    for (let itemSet of [bigKeys, smallKeys, maps, progressLoot, peachLoot]) {
         while (itemSet.length) {
             const itemToPlace = random.removeElement(itemSet);
             random.generateAndMutate();
@@ -493,7 +497,10 @@ function placeItem(random: typeof SRandom, allNodes: LogicNode[], startingNodes:
         console.log('hasTeleportation', isLogicValid(currentState, hasTeleportation));
         debugger;
     }*/
-    if (loot.lootObject.lootType === 'bigKey' || loot.lootObject.lootType === 'smallKey') {
+    if (loot.lootObject.lootType === 'bigKey'
+        || loot.lootObject.lootType === 'smallKey'
+        || loot.lootObject.lootType === 'map'
+    ) {
         allAppropriateChecks = allAppropriateChecks.filter(lootWithLocation => {
             return lootWithLocation.location?.logicalZoneKey === loot.location?.logicalZoneKey
         });

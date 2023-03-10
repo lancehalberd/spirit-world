@@ -849,7 +849,7 @@ const f0_0x2: AreaDefinition = {
         {status: "normal", id: "warTemple:0:0x2-empty-1", x: 416, y: 80, type: "chest", lootType: "empty", lootLevel: 1},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16, index: 222, hideMap: true, mapId: 'warTemple', floorId: '1F', mapX: 0, mapY: 4},
+        {x: 0, y: 0, w: 32, h: 16, index: 222, hideMap: true, mapId: 'overworld', entranceId: 'warTempleChestEntrance', mapX: 0, mapY: 4},
         {x: 0, y: 16, w: 32, h: 16, index: 223, hideMap: true, mapId: 'warTemple', floorId: '1F', mapX: 0, mapY: 5},
     ],
 };

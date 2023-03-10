@@ -5,7 +5,7 @@ import { zones } from 'app/content/zones';
 import { editingState } from 'app/development/editingState';
 import { cleanupHeroFromArea, getAreaSectionInstance, removeAllClones } from 'app/utils/area';
 import { isPointInShortRect } from 'app/utils/index';
-import { specialBehaviorsHash } from 'app/content/specialBehaviors';
+import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
 import { createCanvasAndContext } from 'app/utils/canvas';
 import { createObjectInstance, } from 'app/utils/createObjectInstance';
 import { checkIfAllEnemiesAreDefeated } from 'app/utils/checkIfAllEnemiesAreDefeated';

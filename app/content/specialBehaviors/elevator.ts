@@ -1,5 +1,6 @@
 import { Door } from 'app/content/objects/door';
 import { Sign } from 'app/content/objects/sign';
+import { allSections } from 'app/content/sections';
 import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 import { setScript } from 'app/scriptEvents';
@@ -97,6 +98,8 @@ specialBehaviorsHash.elevatorControls = {
     },
 };
 
+const elevatorSectionIndex = 458;
+
 specialBehaviorsHash.elevatorDoor = {
     type: 'door',
     apply(state: GameState, door: Door) {
@@ -104,6 +107,8 @@ specialBehaviorsHash.elevatorDoor = {
         const elevatorDropped = !!state.savedState.objectFlags.elevatorDropped;
         const elevatorClosed = !!state.savedState.objectFlags.elevatorClosed;
         const elevatorFloor = getElevatorFloor(state);
+        // Move the elevator section to the current floor so that the map looks correct.
+        allSections[elevatorSectionIndex].section.floorId = ['B1', '1F', '2F', '3F', '4F', '5F'][elevatorFloor];
         // The interior elevator door.
         if (door.definition.id === 'elevatorDoor') {
             door.changeStatus(state, elevatorClosed ? 'closed' : 'normal');
