@@ -92,11 +92,11 @@ const f0_0x0: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 32},
-        {x: 16, y: 0, w: 16, h: 32},
+        {x: 0, y: 0, w: 16, h: 32, index: 275, mapId: 'forestTemple', floorId: '1F', mapX: 1, mapY: 1},
+        {x: 16, y: 0, w: 16, h: 32, index: 276, mapId: 'forestTemple', floorId: '1F', mapX: 2, mapY: 1},
     ],
 };
-const f0_0x1: AreaDefinition = {
+const f0_1x0: AreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -186,12 +186,12 @@ const f0_0x1: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 277, hideMap: true, mapId: 'forestTemple', floorId: '1F', mapX: 3, mapY: 1},
+        {x: 0, y: 16, w: 16, h: 16, index: 278, mapId: 'forestTemple', floorId: '1F', mapX: 3, mapY: 2},
+        {x: 16, y: 16, w: 16, h: 16, index: 279, mapId: 'forestTemple', floorId: '1F', mapX: 4, mapY: 2},
     ],
 };
-const f0_1x0: AreaDefinition = {
+const f0_0x1: AreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -281,10 +281,10 @@ const f0_1x0: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 16, h: 16, index: 280, mapId: 'forestTemple', floorId: '1F', mapX: 1, mapY: 3},
+        {x: 16, y: 0, w: 16, h: 16, index: 281, mapId: 'forestTemple', floorId: '1F', mapX: 2, mapY: 3},
+        {x: 0, y: 16, w: 16, h: 16, index: 282, mapId: 'forestTemple', floorId: '1F', mapX: 1, mapY: 4},
+        {x: 16, y: 16, w: 16, h: 16, index: 283, mapId: 'forestTemple', floorId: '1F', mapX: 2, mapY: 4},
     ],
 };
 const f0_1x1: AreaDefinition = {
@@ -377,8 +377,8 @@ const f0_1x1: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 32, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 284, mapId: 'forestTemple', floorId: '1F', mapX: 3, mapY: 3},
+        {x: 0, y: 16, w: 32, h: 16, index: 285, mapId: 'forestTemple', floorId: '1F', mapX: 3, mapY: 4},
     ],
 };
 const sf0_0x0: AreaDefinition = {
@@ -393,13 +393,13 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "forestTempleBigKey", x: 112, y: 112, type: "chest", lootType: "bigKey", lootLevel: 1},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 32},
-        {x: 16, y: 0, w: 16, h: 32},
+        {x: 0, y: 0, w: 16, h: 32, index: 286, mapId: 'forestTempleSpirit', floorId: '1F', mapX: 0, mapY: 1},
+        {x: 16, y: 0, w: 16, h: 32, index: 287, mapId: 'forestTempleSpirit', floorId: '1F', mapX: 1, mapY: 1},
     ],
 };
-const sf0_0x1: AreaDefinition = {
+const sf0_1x0: AreaDefinition = {
     isSpiritWorld: true,
-    parentDefinition: f0_0x1,
+    parentDefinition: f0_1x0,
     layers: null,
     objects: [
         {status: "normal", id: "", x: 368, y: 480, type: "door", style: "cave", d: "down"},
@@ -412,14 +412,14 @@ const sf0_0x1: AreaDefinition = {
         {status: "normal", id: "forestTemple:s0:1x0-luckyBeetle-0", x: 120, y: 376, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 288, mapId: 'forestTempleSpirit', floorId: '1F', mapX: 2, mapY: 1},
+        {x: 0, y: 16, w: 16, h: 16, index: 289, mapId: 'forestTempleSpirit', floorId: '1F', mapX: 2, mapY: 2},
+        {x: 16, y: 16, w: 16, h: 16, index: 290, mapId: 'forestTempleSpirit', floorId: '1F', mapX: 4, mapY: 1},
     ],
 };
-const sf0_1x0: AreaDefinition = {
+const sf0_0x1: AreaDefinition = {
     isSpiritWorld: true,
-    parentDefinition: f0_1x0,
+    parentDefinition: f0_0x1,
     layers: null,
     objects: [
         {status: "bigKeyLocked", id: "forestTempleBigDoor", x: 112, y: 0, type: "door", style: "cave", d: "up"},
@@ -434,10 +434,10 @@ const sf0_1x0: AreaDefinition = {
         {status: "normal", id: "forestTempleExit", x: 384, y: 256, type: "door", style: "ladderUp", targetZone: "overworld", targetObjectId: "forestTempleLadder1", d: "up", hasCustomLogic: true, customLogic: "forestTempleBoss"},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 16, h: 16, index: 291, mapId: 'forestTempleSpirit', floorId: '1F', mapX: 0, mapY: 3},
+        {x: 16, y: 0, w: 16, h: 16, index: 292, mapId: 'forestTempleSpirit', floorId: '1F', mapX: 1, mapY: 3},
+        {x: 0, y: 16, w: 16, h: 16, index: 293, mapId: 'forestTempleSpirit', floorId: '1F', mapX: 3, mapY: 4},
+        {x: 16, y: 16, w: 16, h: 16, index: 294, mapId: 'forestTempleSpirit', floorId: '1F', mapX: 4, mapY: 4},
     ],
 };
 const sf0_1x1: AreaDefinition = {
@@ -460,8 +460,8 @@ const sf0_1x1: AreaDefinition = {
         {status: "normal", id: "forestTemple:s0:1x1-ent-2", x: 400, y: 32, type: "enemy", enemyType: "ent", d: "down", saveStatus: "forever", params: {}},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 32, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 295, mapId: 'forestTempleSpirit', floorId: '1F', mapX: 3, mapY: 2},
+        {x: 0, y: 16, w: 32, h: 16, index: 296, mapId: 'forestTempleSpirit', floorId: '1F', mapX: 3, mapY: 3},
     ],
 };
 zones.forestTemple = {
@@ -469,12 +469,12 @@ zones.forestTemple = {
     floors: [
         {
             grid: [
-                [f0_0x0,f0_0x1,],
-                [f0_1x0,f0_1x1,],
+                [f0_0x0,f0_1x0,],
+                [f0_0x1,f0_1x1,],
             ],
             spiritGrid: [
-                [sf0_0x0,sf0_0x1,],
-                [sf0_1x0,sf0_1x1,],
+                [sf0_0x0,sf0_1x0,],
+                [sf0_0x1,sf0_1x1,],
             ],
         },
     ],

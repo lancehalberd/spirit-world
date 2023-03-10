@@ -1,7 +1,9 @@
 import {
     andLogic,
+    canCross2Gaps,
     canCross6Gaps,
     hasAstralProjection,
+    hasGloves,
     hasSomersault,
     canUseTeleporters,
     hasTeleportation,
@@ -17,11 +19,14 @@ export const helixNodes: LogicNode[] = [
         zoneId,
         nodeId: 'helixEntrance',
         paths: [
-            {nodeId: 'helixEntranceStaff', logic: canCross6Gaps},
-            {nodeId: 'helixEntrancePortal', logic: canCross6Gaps},
+            {nodeId: 'helixEntranceStaff', logic: andLogic(canCross6Gaps, hasGloves)},
+            {nodeId: 'helixEntrancePortal', logic: andLogic(canCross6Gaps, hasGloves)},
         ],
         entranceIds: ['helixEntrance', 'helixStairs1'],
-        exits: [{objectId: 'helixEntrance'}, {objectId: 'helixStairs1'}],
+        exits: [
+            {objectId: 'helixEntrance'},
+            {objectId: 'helixStairs1', logic: canCross2Gaps},
+        ],
     },
     {
         zoneId,
@@ -55,13 +60,13 @@ export const helixNodes: LogicNode[] = [
         nodeId: 'helixEntranceStaff',
         checks: [{objectId: 'helix:0:0x0-staff-0'}],
         entranceIds: ['helixMarker'],
-        paths: [{nodeId: 'helixEntrance', logic: canCross6Gaps}],
+        paths: [{nodeId: 'helixEntrance', logic: andLogic(canCross6Gaps, hasGloves)}],
     },
     {
         zoneId,
         nodeId: 'helixEntrancePortal',
         paths: [
-            {nodeId: 'helixEntrance', logic: canCross6Gaps},
+            {nodeId: 'helixEntrance', logic: andLogic(canCross6Gaps, hasGloves)},
             {nodeId: 'helixEntranceSpiritPortal', logic: canUseTeleporters}
         ],
     },
@@ -69,17 +74,17 @@ export const helixNodes: LogicNode[] = [
         zoneId,
         nodeId: 'helixEntranceSpiritPortal',
         paths: [
-            {nodeId: 'helixEntrance', logic: canUseTeleporters},
-            {nodeId: 'helixEntranceSpirit', logic: canCross6Gaps}
+            {nodeId: 'helixEntrancePortal', logic: canUseTeleporters},
+            {nodeId: 'helixEntranceSpirit', logic: andLogic(canCross6Gaps, hasGloves)}
         ],
     },
     {
         zoneId,
         nodeId: 'helixEntranceSpirit',
-        paths: [{nodeId: 'helixEntranceSpiritPortal', logic: canCross6Gaps}],
+        paths: [{nodeId: 'helixEntranceSpiritPortal', logic: andLogic(canCross6Gaps, hasGloves)}],
         entranceIds: ['helixSpiritDoor1'],
         exits: [
-            {objectId: 'helixSpiritDoor1', logic: canCross6Gaps},
+            {objectId: 'helixSpiritDoor1', logic: canCross2Gaps},
         ],
     },
     {

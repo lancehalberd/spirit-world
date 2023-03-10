@@ -217,7 +217,7 @@ const sf0_0x0: AreaDefinition = {
     sections: [
         {x: 0, y: 0, w: 16, h: 16, index: 132, mapId: 'treeVillageSpirit', floorId: '1F', mapX: 0, mapY: 0},
         {x: 16, y: 0, w: 16, h: 16, index: 133, mapId: 'treeVillageSpirit', floorId: '1F', mapX: 1, mapY: 0},
-        {x: 0, y: 16, w: 16, h: 16, index: 134, mapId: 'overworld', entranceId: 'elderSpiritEntrance', mapX: 0, mapY: 1},
+        {x: 0, y: 16, w: 16, h: 16, index: 134, mapId: 'overworld', entranceId: 'elderSpiritEntrance', mapX: 0, mapY: 3},
         {x: 16, y: 16, w: 16, h: 16, index: 135, mapId: 'treeVillageSpirit', floorId: '1F', mapX: 1, mapY: 1},
     ],
 };
@@ -611,8 +611,8 @@ const sf1_0x0: AreaDefinition = {
     sections: [
         {x: 0, y: 0, w: 16, h: 16, index: 140, mapId: 'treeVillageSpirit', floorId: '2F', mapX: 0, mapY: 0},
         {x: 16, y: 0, w: 16, h: 16, index: 141, mapId: 'treeVillageSpirit', floorId: '2F', mapX: 1, mapY: 0},
-        {x: 0, y: 16, w: 16, h: 16, index: 142, mapId: 'overworld', entranceId: 'elderSpiritEntrance', mapX: 0, mapY: 1},
-        {x: 16, y: 16, w: 16, h: 16, index: 143, mapId: 'overworld', entranceId: 'elderSpiritEntrance', mapX: 1, mapY: 1},
+        {x: 0, y: 16, w: 16, h: 16, index: 142, mapId: 'forestTempleSpirit', floorId: '1F', mapX: 1, mapY: 4},
+        {x: 16, y: 16, w: 16, h: 16, index: 143, mapId: 'forestTempleSpirit', floorId: '1F', mapX: 2, mapY: 4},
     ],
 };
 zones.treeVillage = {

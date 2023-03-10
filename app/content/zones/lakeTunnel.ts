@@ -96,10 +96,10 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "lakeTunneBoss", x: 160, y: 64, type: "boss", enemyType: "stormIdol", lootType: "empty", lootLevel: 1, d: "up", params: {}},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 16, h: 16, index: 259, mapId: 'overworld', entranceId: 'lakeTunnelEntrance', mapX: 0, mapY: 0},
+        {x: 16, y: 0, w: 16, h: 16, index: 260, mapId: 'lakeTunnel', floorId: '1F', mapX: 1, mapY: 0},
+        {x: 0, y: 16, w: 16, h: 16, index: 261, mapId: 'overworld', entranceId: 'lakeTunnelEntrance', mapX: 0, mapY: 1},
+        {x: 16, y: 16, w: 16, h: 16, index: 262, mapId: 'lakeTunnel', floorId: '1F', mapX: 1, mapY: 1},
     ],
 };
 const sf0_0x0: AreaDefinition = {
@@ -192,10 +192,10 @@ const sf0_0x0: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 16, h: 16, index: 263, mapId: 'lakeTunnelSpirit', floorId: '1F', mapX: 0, mapY: 0},
+        {x: 16, y: 0, w: 16, h: 16, index: 264, mapId: 'lakeTunnelSpirit', floorId: '1F', mapX: 1, mapY: 0},
+        {x: 0, y: 16, w: 16, h: 16, index: 265, mapId: 'lakeTunnelSpirit', floorId: '1F', mapX: 0, mapY: 1},
+        {x: 16, y: 16, w: 16, h: 16, index: 266, mapId: 'lakeTunnelSpirit', floorId: '1F', mapX: 1, mapY: 1},
     ],
 };
 zones.lakeTunnel = {

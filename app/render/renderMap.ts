@@ -1,5 +1,5 @@
 import { createAreaInstance } from 'app/content/areas';
-import { getMapTarget } from 'app/content/hints';
+import { convertLocationToMapCoordinates, getMapTarget } from 'app/content/hints';
 import { isLogicValid, logicHash } from 'app/content/logic';
 import { allSections, dungeonMaps } from 'app/content/sections';
 import { editingState } from 'app/development/editingState';
@@ -97,19 +97,21 @@ export function renderOverworldMap(context: CanvasRenderingContext2D, state: Gam
 
     if (overworldKeys.includes(state.location.zoneKey)) {
         if (state.time % 1000 <= 600) {
+            const mapCoordinates = convertLocationToMapCoordinates(state.location);
             drawFrame(context, heroIcon, {
                 ...heroIcon,
-                x: r.x + (state.location.areaGridCoords.x * 64 + state.location.x / 8 - heroIcon.w / 2) | 0,
-                y: r.y + (state.location.areaGridCoords.y * 64 + state.location.y / 8 - heroIcon.h / 2) | 0,
+                x: r.x + (mapCoordinates.x - heroIcon.w / 2) | 0,
+                y: r.y + (mapCoordinates.y - heroIcon.h / 2) | 0,
             });
         }
     } else if (state.areaSection?.definition.entranceId) {
         const location = findObjectLocation(state, state.areaSection?.definition.mapId, state.areaSection?.definition.entranceId, state.location.isSpiritWorld);
         if (location && state.time % 1000 <= 600) {
+            const mapCoordinates = convertLocationToMapCoordinates(location);
             drawFrame(context, heroIcon, {
                 ...heroIcon,
-                x: r.x + (location.areaGridCoords.x * 64 + location.x / 8 - heroIcon.w / 2) | 0,
-                y: r.y + (location.areaGridCoords.y * 64 + location.y / 8 - heroIcon.h / 2) | 0,
+                x: r.x + (mapCoordinates.x - heroIcon.w / 2) | 0,
+                y: r.y + (mapCoordinates.y - heroIcon.h / 2) | 0,
             });
         }
     }
