@@ -39,10 +39,11 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Fix annoying lightning sanctum puzzle
     - Fix loot goblins break with fire damage
 
     - Finish updating any maps that are left
+    - Add overworld maps for spirit world and spirit sky
+        - Maybe add these all programmatically.
 
     - Tasks before next major release
         - Cocoon
@@ -77,6 +78,7 @@ Current tasks:
                 - Preparing strafe laser: "There's no escape!" / "Just try and dodge this..."
 
         - Redesign Helix dungeon with updated graphics and mechanics
+            - Add new floor in between current 2F and 3F for rival boss fight instead of lake tunnel?
 
         - Add a mission to talk to the Spirit King after the beasts escape before starting forest temple
             - Eventually might want additional triggers for each dungeon mission.
@@ -122,6 +124,12 @@ Current tasks:
     - Randomizer hint sometimes says you are in BK mode with checks in logic
         - I think this happens when your last check is behind a locked door that you have enough keys for but the randomizer thinks you don't because it isn't counting locked doors you have already opened.
 
+    - Add vertical tiles in between sky and ground:
+        - Could give a greater feeling of vertical depth to the world
+        - south facing cliff face near the mountains
+        - waterfall near the waterfall
+        - outside of staff tower when it is setup in the tile
+        - empty sky/abyss tiles when falling through random sky tiles.
 
     - Flame wall improvement
         - Refactor as individual flames so that each flame can hit individually or be destroyed by ice.

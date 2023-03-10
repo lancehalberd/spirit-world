@@ -295,8 +295,8 @@ const f0_0x0: AreaDefinition = {
         {status: "hiddenSwitch", id: "iceSanctumTeleporter", x: 424, y: 48, type: "teleporter"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 32, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 383, mapId: 'holySanctum', floorId: '2F', mapX: 3.5, mapY: 3},
+        {x: 0, y: 16, w: 32, h: 16, index: 384, mapId: 'holySanctum', floorId: '2F', mapX: 3.5, mapY: 4},
     ],
     dark: 100,
 };
@@ -611,8 +611,8 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "iceSanctumKey", x: 32, y: 64, type: "chest", lootType: "smallKey", lootLevel: 1},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 32, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 385, mapId: 'holySanctumSpirit', floorId: '2F', mapX: 3.5, mapY: 3},
+        {x: 0, y: 16, w: 32, h: 16, index: 386, mapId: 'holySanctumSpirit', floorId: '2F', mapX: 3.5, mapY: 4},
     ],
     dark: 100,
     corrosiveLogic: {"isTrue":true,"isInverted":false},

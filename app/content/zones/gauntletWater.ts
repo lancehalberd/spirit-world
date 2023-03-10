@@ -176,8 +176,8 @@ const f0_0x1: AreaDefinition = {
         {status: "normal", id: "gauntletWaterEntrance", x: 416, y: 496, type: "door", style: "wooden", d: "down", targetZone: "underwater", targetObjectId: "gauntletWaterEntrance", locationCue: "Gauntlet 1F"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 32, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 367, hideMap: true, mapId: 'gauntlet', floorId: 'B1', mapX: 1, mapY: 3},
+        {x: 0, y: 16, w: 32, h: 16, index: 368, mapId: 'gauntlet', floorId: 'B1', mapX: 1, mapY: 4},
     ],
 };
 const sf0_0x0: AreaDefinition = null;

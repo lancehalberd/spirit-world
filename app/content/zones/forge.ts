@@ -312,8 +312,8 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "forgeLava1", x: 248, y: 64, type: "floorSwitch", saveStatus: "forever"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 32, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 311, mapId: 'forge', floorId: '1F', mapX: 3, mapY: 2},
+        {x: 0, y: 16, w: 32, h: 16, index: 312, mapId: 'forge', floorId: '1F', mapX: 3, mapY: 3},
     ],
 };
 const sf0_0x0: AreaDefinition = {
@@ -631,8 +631,8 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "forgeStairs1", x: 32, y: 48, type: "door", style: "cavernDownstairs", d: "up", hasCustomLogic: true, customLogic: "forgeLava1", targetZone: "forge", targetObjectId: "forgeStairs1", locationCue: "Forge 1F"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16, hotLogic: {"hasCustomLogic":true,"customLogic":"forgeLava1","isInverted":true}},
-        {x: 0, y: 16, w: 32, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 313, hotLogic: {"hasCustomLogic":true,"customLogic":"forgeLava1","isInverted":true}, mapId: 'forge', floorId: '1F', mapX: 1, mapY: 2},
+        {x: 0, y: 16, w: 32, h: 16, index: 314, mapId: 'forge', floorId: '1F', mapX: 1, mapY: 3},
     ],
 };
 const f1_0x0: AreaDefinition = {
@@ -994,9 +994,9 @@ const f1_0x0: AreaDefinition = {
         {status: "normal", id: "forgeMaterialStairs2", linked: true, x: 448, y: 16, type: "door", style: "cavernDownstairs", targetZone: "forge", targetObjectId: "forgeMaterialStairs2", d: "up", spirit: true, locationCue: "Forge B1"},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 16, h: 16, hotLogic: {"hasCustomLogic":true,"customLogic":"","isInverted":false}},
-        {x: 16, y: 0, w: 16, h: 32},
+        {x: 0, y: 0, w: 16, h: 16, index: 315, mapId: 'forge', floorId: 'B1', mapX: 3, mapY: 3},
+        {x: 0, y: 16, w: 16, h: 16, index: 316, hotLogic: {"hasCustomLogic":true,"customLogic":"","isInverted":false}, mapId: 'forge', floorId: 'B1', mapX: 3, mapY: 4},
+        {x: 16, y: 0, w: 16, h: 32, index: 317, mapId: 'forge', floorId: 'B1', mapX: 4, mapY: 3},
     ],
 };
 const sf1_0x0: AreaDefinition = {
@@ -1008,7 +1008,7 @@ const sf1_0x0: AreaDefinition = {
         {status: "normal", id: "", linked: false, x: 224, y: 48, type: "door", style: "cavern", d: "right", spirit: true},
         {status: "normal", id: "forgeStairs1", linked: false, x: 48, y: 16, type: "door", style: "cavernUpstairs", targetZone: "forge", targetObjectId: "forgeStairs1", d: "up", locationCue: "Forge B1", spirit: true, price: 0},
         {status: "normal", id: "forgeGloves", linked: false, spirit: true, x: 376, y: 48, type: "bigChest", lootType: "gloves", lootLevel: 2, hasCustomLogic: true, customLogic: "forgeLava2"},
-        {status: "normal", id: "forgeBigKey", spirit: true, x: 104, y: 448, type: "chest", lootType: "bigKey", lootLevel: 2, hasCustomLogic: true, customLogic: "forgeLava3"},
+        {status: "normal", id: "forgeMap", spirit: true, x: 72, y: 336, type: "chest", lootType: "map", lootLevel: 1, hasCustomLogic: true, customLogic: "forgeLava2"},
         {status: "normal", id: "", linked: false, x: 144, y: 240, type: "door", style: "cavern", d: "down", spirit: true},
         {status: "normal", id: "", spirit: false, x: 160, y: 272, type: "door", style: "cavern", d: "up", linked: true},
         {status: "normal", id: "", linked: true, x: 160, y: 48, type: "shieldingUnit"},
@@ -1019,11 +1019,12 @@ const sf1_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 464, y: 464, type: "teleporter", linked: true},
         {status: "normal", id: "forgeStairs2", linked: true, x: 448, y: 16, type: "door", style: "cavernDownstairs", targetZone: "forge", targetObjectId: "forgeStairs2", d: "up", locationCue: "Forge B1"},
         {status: "normal", id: "forgeLavaCoveredShieldUnit", linked: false, spirit: true, x: 352, y: 464, type: "shieldingUnit", hasCustomLogic: true, customLogic: "forgeLava2"},
+        {status: "normal", id: "forgeBigKey", spirit: true, x: 104, y: 448, type: "chest", lootType: "bigKey", lootLevel: 2, hasCustomLogic: true, customLogic: "forgeLava3"},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 16, h: 16, hotLogic: {"hasCustomLogic":true,"customLogic":"forgeLava3","isInverted":true}},
-        {x: 16, y: 0, w: 16, h: 32, hotLogic: {"hasCustomLogic":true,"customLogic":"forgeLava3","isInverted":true}},
+        {x: 0, y: 0, w: 16, h: 16, index: 318, mapId: 'forge', floorId: 'B1', mapX: 1, mapY: 3},
+        {x: 0, y: 16, w: 16, h: 16, index: 319, hotLogic: {"hasCustomLogic":true,"customLogic":"forgeLava3","isInverted":true}, mapId: 'forge', floorId: 'B1', mapX: 1, mapY: 4},
+        {x: 16, y: 0, w: 16, h: 32, index: 320, hotLogic: {"hasCustomLogic":true,"customLogic":"forgeLava3","isInverted":true}, mapId: 'forge', floorId: 'B1', mapX: 2, mapY: 3},
     ],
 };
 const f2_0x0: AreaDefinition = {
@@ -1328,9 +1329,9 @@ const f2_0x0: AreaDefinition = {
         {status: "normal", id: "forgeLava4", x: 48, y: 240, type: "floorSwitch", saveStatus: "forever"},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 32},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 16, h: 32, index: 321, mapId: 'forge', floorId: 'B2', mapX: 3, mapY: 2},
+        {x: 16, y: 0, w: 16, h: 16, index: 322, hideMap: true, mapId: 'forge', floorId: 'B1', mapX: 3, mapY: 1},
+        {x: 16, y: 16, w: 16, h: 16, index: 323, hideMap: true, mapId: 'forge', floorId: 'B1', mapX: 3, mapY: 2},
     ],
 };
 const sf2_0x0: AreaDefinition = {
@@ -1640,9 +1641,9 @@ const sf2_0x0: AreaDefinition = {
         {status: "normal", id: "forgePushStairs2", x: 88, y: 208, type: "pushStairs", w: 80, offset: 48},
         {status: "normal", id: "forgePushStairs2", x: 88, y: 128, type: "pushStairs", w: 80, offset: 0},
         {status: "bigKeyLocked", id: "forgeStairs3", x: 160, y: 16, type: "door", style: "cavernUpstairs", targetZone: "forge", targetObjectId: "forgeStairs3", d: "up", locationCue: "Forge B2"},
-        {status: "normal", id: "forgeShortcut", x: 288, y: 48, type: "door", style: "cavernUpstairs", targetZone: "forge", targetObjectId: "forgeShortcut", d: "up"},
+        {status: "normal", id: "forgeShortcut", x: 288, y: 48, type: "door", style: "cavernUpstairs", targetZone: "forge", targetObjectId: "forgeShortcut", d: "up", locationCue: "Forge B1"},
         {status: "closedEnemy", id: "", x: 304, y: 272, type: "door", style: "cavern", d: "up"},
-        {status: "closedEnemy", id: "forgeStairs3", x: 448, y: 272, type: "door", style: "cavernUpstairs", targetZone: "forge", targetObjectId: "forgeStairs3", d: "up"},
+        {status: "closedEnemy", id: "forgeStairs3", x: 448, y: 272, type: "door", style: "cavernUpstairs", targetZone: "forge", targetObjectId: "forgeStairs3", d: "up", locationCue: "Forge B1"},
         {status: "normal", id: "forgeBoss", x: 344, y: 428, type: "boss", enemyType: "balloonMegapede", lootType: "peachOfImmortality", lootAmount: 1, lootLevel: 1, d: "up", params: {"length":7}},
         {status: "normal", id: "", x: 288, y: 240, type: "door", style: "cavern", d: "down"},
         {status: "normal", id: "forgeArmor", x: 416, y: 64, type: "chest", lootType: "goldMail", lootAmount: 50, lootLevel: 1},
@@ -1651,9 +1652,9 @@ const sf2_0x0: AreaDefinition = {
         {status: "normal", id: "forgeSaveStatue", linked: true, spirit: true, x: 48, y: 160, type: "saveStatue"},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 32, hotLogic: {"hasCustomLogic":true,"customLogic":"forgeLava4","isInverted":true}},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 16, h: 32, index: 324, hotLogic: {"hasCustomLogic":true,"customLogic":"forgeLava4","isInverted":true}, mapId: 'forge', floorId: 'B2', mapX: 2, mapY: 2},
+        {x: 16, y: 0, w: 16, h: 16, index: 325, mapId: 'forge', floorId: 'B1', mapX: 2, mapY: 1},
+        {x: 16, y: 16, w: 16, h: 16, index: 326, mapId: 'forge', floorId: 'B1', mapX: 2, mapY: 2},
     ],
 };
 zones.forge = {

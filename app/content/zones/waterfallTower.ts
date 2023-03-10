@@ -8,7 +8,7 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "waterfallTower:0:0x0-decoration-0", x: 0, y: 512, type: "waterfall", w: 512, h: 512},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 297, mapId: 'waterfallTower', floorId: '1F', mapX: 0, mapY: 0},
     ],
 };
 const f0_0x1: AreaDefinition = {
@@ -17,7 +17,7 @@ const f0_0x1: AreaDefinition = {
         {status: "normal", id: "waterfallTower:0:0x0-decoration-0", x: 0, y: 512, type: "waterfall", w: 512, h: 512},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 298, mapId: 'waterfallTower', floorId: '1F', mapX: 0, mapY: 2},
     ],
 };
 const sf0_0x0: AreaDefinition = {
@@ -305,7 +305,7 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "waterfallTowerSave", x: 208, y: 400, type: "saveStatue"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 299, mapId: 'waterfallTowerSpirit', floorId: '1F', mapX: 2, mapY: 1},
     ],
     corrosiveLogic: {"isTrue":true,"isInverted":false},
 };
@@ -598,7 +598,7 @@ const sf0_0x1: AreaDefinition = {
         {status: "normal", id: "waterfallTowerDoorBeadsSwitch", x: 288, y: 176, type: "crystalSwitch", element: "lightning", saveStatus: "forever", timer: 0, targetObjectId: "waterfallTowerDoorBeads"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 300, mapId: 'waterfallTowerSpirit', floorId: '1F', mapX: 2, mapY: 3},
     ],
     corrosiveLogic: {"isTrue":true,"isInverted":false},
 };
@@ -608,8 +608,8 @@ const f1_0x0: AreaDefinition = {
         {status: "normal", id: "waterfallTower:0:0x0-decoration-0", x: 0, y: 512, type: "waterfall", w: 512, h: 512},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 32, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 301, mapId: 'waterfallTower', floorId: '2F', mapX: 0, mapY: 0},
+        {x: 0, y: 16, w: 32, h: 16, index: 302, mapId: 'waterfallTower', floorId: '2F', mapX: 0, mapY: 1},
     ],
 };
 const f1_0x1: AreaDefinition = {
@@ -618,9 +618,9 @@ const f1_0x1: AreaDefinition = {
         {status: "normal", id: "waterfallTower:0:0x0-decoration-0", x: 0, y: 512, type: "waterfall", w: 512, h: 512},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 303, mapId: 'waterfallTower', floorId: '2F', mapX: 0, mapY: 2},
+        {x: 0, y: 16, w: 16, h: 16, index: 304, mapId: 'waterfallTower', floorId: '2F', mapX: 0, mapY: 3},
+        {x: 16, y: 16, w: 16, h: 16, index: 305, mapId: 'waterfallTower', floorId: '2F', mapX: 1, mapY: 3},
     ],
 };
 const sf1_0x0: AreaDefinition = {
@@ -856,8 +856,8 @@ const sf1_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 336, y: 288, type: "turret", d: "down", fireInterval: 1200, fireOffset: 400, style: "crystal"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 32, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 306, mapId: 'waterfallTowerSpirit', floorId: '3F', mapX: 2, mapY: 1},
+        {x: 0, y: 16, w: 32, h: 16, index: 307, mapId: 'waterfallTowerSpirit', floorId: '2F', mapX: 2, mapY: 2},
     ],
     corrosiveLogic: {"isTrue":true,"isInverted":false},
 };
@@ -1211,9 +1211,9 @@ const sf1_0x1: AreaDefinition = {
         {status: "normal", id: "waterfallTowerLadderSwitch", x: 448, y: 416, targetObjectId: "waterfallTowerLadder", type: "floorSwitch", saveStatus: "forever"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 308, mapId: 'waterfallTowerSpirit', floorId: 'B1', mapX: 2, mapY: 3},
+        {x: 0, y: 16, w: 16, h: 16, index: 309, mapId: 'waterfallTowerSpirit', floorId: '2F', mapX: 2, mapY: 4},
+        {x: 16, y: 16, w: 16, h: 16, index: 310, mapId: 'waterfallTowerSpirit', floorId: '2F', mapX: 3, mapY: 4},
     ],
     corrosiveLogic: {"isTrue":true,"isInverted":false},
 };

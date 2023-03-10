@@ -216,10 +216,10 @@ const f0_0x0: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 16, h: 16, index: 387, mapId: 'holySanctumBack', floorId: '1F', mapX: 0, mapY: 0},
+        {x: 16, y: 0, w: 16, h: 16, index: 388, mapId: 'holySanctumBack', floorId: '1F', mapX: 1, mapY: 0},
+        {x: 0, y: 16, w: 16, h: 16, index: 389, mapId: 'holySanctumBack', floorId: '1F', mapX: 0, mapY: 1},
+        {x: 16, y: 16, w: 16, h: 16, index: 390, mapId: 'holySanctumBack', floorId: '1F', mapX: 1, mapY: 1},
     ],
 };
 const sf0_0x0: AreaDefinition = {
@@ -457,10 +457,10 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "holySanctumIdols", spirit: true, x: 432, y: 152, type: "boss", enemyType: "frostIdol", lootType: "money", lootAmount: 100, lootLevel: 1, d: "up", params: {}},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 16, h: 16, index: 391, mapId: 'holySanctumSpirit', floorId: '1F', mapX: 2.5, mapY: 0},
+        {x: 16, y: 0, w: 16, h: 16, index: 392, mapId: 'holySanctumSpirit', floorId: '2F', mapX: 2.5, mapY: 0},
+        {x: 0, y: 16, w: 16, h: 16, index: 393, mapId: 'holySanctumSpirit', floorId: '1F', mapX: 2.5, mapY: 1},
+        {x: 16, y: 16, w: 16, h: 16, index: 394, mapId: 'holySanctumSpirit', floorId: '3F', mapX: 2.5, mapY: 0},
     ],
 };
 zones.holySanctumBack = {

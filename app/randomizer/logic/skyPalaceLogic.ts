@@ -25,7 +25,7 @@ export const skyPalaceNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'skyPalaceEntrance',
-        checks: [{objectId: 'skyPalaceMoney'}],
+        checks: [{objectId: 'skyPalaceMap'}],
         paths: [
             { nodeId: 'skyPalaceKeyBlockArea', logic: hasSomersault},
             { nodeId: 'skyPalaceKeyArea', logic: hasSomersault},

@@ -34,8 +34,9 @@ export const forgeNodes: LogicNode[] = [
         zoneId,
         nodeId: 'forgeB1',
         checks: [
-            {objectId: 'forgeBigKey', logic: andLogic(drainedLava2, drainedLava3)},
+            {objectId: 'forgeMap', logic: andLogic(drainedLava2)},
             {objectId: 'forgeGloves', logic: andLogic(drainedLava2)},
+            {objectId: 'forgeBigKey', logic: andLogic(drainedLava2, drainedLava3)},
         ],
         paths: [{nodeId: 'forgeB1Material', logic: orLogic(canCross2Gaps, hasIce, hasInvisibility) }],
         entranceIds: ['forgeStairs1', 'forgeStairs2'],

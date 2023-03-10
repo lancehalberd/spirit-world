@@ -224,10 +224,10 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "fireSanctumPeachPiece", x: 120, y: 136, type: "chest", lootType: "peachOfImmortalityPiece", lootLevel: 1},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16, hotLogic: {"isTrue":true,"isInverted":false}},
-        {x: 16, y: 0, w: 16, h: 16, hotLogic: {"isTrue":true,"isInverted":false}},
-        {x: 0, y: 16, w: 16, h: 16, hotLogic: {"isTrue":true,"isInverted":false}},
-        {x: 16, y: 16, w: 16, h: 16, hotLogic: {"isTrue":true,"isInverted":false}},
+        {x: 0, y: 0, w: 16, h: 16, index: 369, hotLogic: {"isTrue":true,"isInverted":false}, mapId: 'holySanctum', floorId: '2F', mapX: 0.5, mapY: 3},
+        {x: 16, y: 0, w: 16, h: 16, index: 370, hotLogic: {"isTrue":true,"isInverted":false}, mapId: 'holySanctum', floorId: '2F', mapX: 1.5, mapY: 3},
+        {x: 0, y: 16, w: 16, h: 16, index: 371, hotLogic: {"isTrue":true,"isInverted":false}, mapId: 'holySanctum', floorId: '2F', mapX: 0.5, mapY: 4},
+        {x: 16, y: 16, w: 16, h: 16, index: 373, hotLogic: {"isTrue":true,"isInverted":false}, mapId: 'holySanctum', floorId: '2F', mapX: 1.5, mapY: 4},
     ],
 };
 const sf0_0x0: AreaDefinition = {
@@ -474,10 +474,10 @@ const sf0_0x0: AreaDefinition = {
         {status: "hiddenSwitch", id: "fireSanctumTeleporter", linked: true, spirit: true, x: 464, y: 120, type: "teleporter"},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16, hotLogic: {"isTrue":true,"isInverted":false}},
-        {x: 16, y: 0, w: 16, h: 16, hotLogic: {"isTrue":true,"isInverted":false}},
-        {x: 0, y: 16, w: 16, h: 16, hotLogic: {"isTrue":true,"isInverted":false}},
-        {x: 16, y: 16, w: 16, h: 16, hotLogic: {"isTrue":true,"isInverted":false}},
+        {x: 0, y: 0, w: 16, h: 16, index: 374, hotLogic: {"isTrue":true,"isInverted":false}, mapId: 'holySanctumSpirit', floorId: '2F', mapX: 0.5, mapY: 3},
+        {x: 16, y: 0, w: 16, h: 16, index: 375, hotLogic: {"isTrue":true,"isInverted":false}, mapId: 'holySanctumSpirit', floorId: '2F', mapX: 1.5, mapY: 3},
+        {x: 0, y: 16, w: 16, h: 16, index: 377, hotLogic: {"isTrue":true,"isInverted":false}, mapId: 'holySanctumSpirit', floorId: '2F', mapX: 0.5, mapY: 4},
+        {x: 16, y: 16, w: 16, h: 16, index: 378, hotLogic: {"isTrue":true,"isInverted":false}, mapId: 'holySanctumSpirit', floorId: '2F', mapX: 1.5, mapY: 4},
     ],
 };
 zones.fireSanctum = {

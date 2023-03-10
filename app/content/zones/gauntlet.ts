@@ -269,7 +269,7 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "gauntletPitMarker", linked: true, spirit: false, x: 248, y: 312, locationCue: "Gauntlet 1F", type: "marker"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 355, mapId: 'gauntlet', floorId: '1F', mapX: 1, mapY: 1},
     ],
 };
 const f0_0x1: AreaDefinition = {
@@ -539,8 +539,8 @@ const f0_0x1: AreaDefinition = {
         {status: "hiddenSwitch", id: "gauntletPortal", x: 248, y: 400, type: "teleporter", saveStatus: "forever", linked: true},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 32, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 356, mapId: 'gauntlet', floorId: '1F', mapX: 1, mapY: 3},
+        {x: 0, y: 16, w: 32, h: 16, index: 357, mapId: 'gauntlet', floorId: '1F', mapX: 1, mapY: 4},
     ],
 };
 const sf0_0x0: AreaDefinition = {
@@ -810,7 +810,7 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "gauntlet:s0:0x0-crystalGuardian-0", x: 192, y: 72, type: "enemy", enemyType: "crystalGuardian", d: "down", params: {}},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 358, mapId: 'gauntlet', floorId: '1F', mapX: 3, mapY: 1},
     ],
 };
 const sf0_0x1: AreaDefinition = {
@@ -1091,8 +1091,8 @@ const sf0_0x1: AreaDefinition = {
         {status: "normal", id: "gauntlet:s0:0x1-floorEye-3", x: 320, y: 112, type: "enemy", enemyType: "floorEye", d: "down", params: {}},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 32, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 359, mapId: 'gauntlet', floorId: '1F', mapX: 3, mapY: 3},
+        {x: 0, y: 16, w: 32, h: 16, index: 360, mapId: 'gauntlet', floorId: '1F', mapX: 3, mapY: 4},
     ],
 };
 const f1_0x0: AreaDefinition = {
@@ -1382,11 +1382,12 @@ const f1_0x0: AreaDefinition = {
         {status: "normal", id: "", linked: true, x: 256, y: 416, type: "rollingBall"},
         {status: "hiddenSwitch", id: "gauntletPit", linked: true, x: 240, y: 448, style: "default", type: "pitEntrance", targetZone: "gauntlet", targetObjectId: "gauntletPitMarker", saveStatus: "forever"},
         {status: "normal", id: "", x: 208, y: 336, style: "short", type: "sign", message: "Return here when you have awakened the Third Eye."},
+        {status: "normal", id: "gauntletMap", x: 288, y: 336, type: "chest", lootType: "map", lootLevel: 1},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 32, h: 16},
+        {x: 0, y: 0, w: 16, h: 16, index: 361, mapId: 'gauntlet', floorId: '2F', mapX: 1, mapY: 1},
+        {x: 16, y: 0, w: 16, h: 16, index: 362, mapId: 'gauntlet', floorId: '2F', mapX: 2, mapY: 1},
+        {x: 0, y: 16, w: 32, h: 16, index: 363, mapId: 'gauntlet', floorId: '2F', mapX: 1, mapY: 2},
     ],
 };
 const sf1_0x0: AreaDefinition = {
@@ -1670,9 +1671,9 @@ const sf1_0x0: AreaDefinition = {
         {status: "normal", id: "", spirit: true, x: 288, y: 336, style: "short", type: "sign", message: "The way forward can only be opened from the material world."},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 32, h: 16},
+        {x: 0, y: 0, w: 16, h: 16, index: 364, hideMap: true, mapId: 'gauntlet', floorId: '2F', mapX: 3, mapY: 1},
+        {x: 16, y: 0, w: 16, h: 16, index: 365, hideMap: true, mapId: 'gauntlet', floorId: '2F', mapX: 4, mapY: 1},
+        {x: 0, y: 16, w: 32, h: 16, index: 366, mapId: 'gauntlet', floorId: '2F', mapX: 3, mapY: 2},
     ],
 };
 zones.gauntlet = {

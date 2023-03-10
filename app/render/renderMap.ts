@@ -1,7 +1,7 @@
 import { createAreaInstance } from 'app/content/areas';
 import { convertLocationToMapCoordinates, getMapTarget } from 'app/content/hints';
-import { isLogicValid, logicHash } from 'app/content/logic';
 import { allSections, dungeonMaps } from 'app/content/sections';
+import { zones } from 'app/content/zones/zoneHash';
 import { editingState } from 'app/development/editingState';
 import { initializeSection } from 'app/development/sections';
 import { CANVAS_WIDTH, CANVAS_HEIGHT, CANVAS_SCALE, overworldKeys } from 'app/gameConstants';
@@ -18,12 +18,6 @@ import { drawText } from 'app/utils/simpleWhiteFont';
 
 import { AreaInstance, AreaSection, GameState, ObjectType, Rect } from 'app/types';
 
-const [
-    sky00, sky10, sky20, ground00, ground10, ground20,
-    sky01, sky11, sky21, ground01, ground11, ground21,
-         , sky12, froze, ground02, ground12, ground22,
-] = createAnimation('gfx/hud/overworld.png', {w: 64, h: 64}, {xSpace: 2, ySpace: 2, rows: 3, cols: 6}).frames;
-
 const menuSlices = createAnimation('gfx/hud/menu9slice.png', {w: 8, h: 8}, {cols: 3, rows: 3}).frames;
 
 const borderSize = 4;
@@ -31,10 +25,10 @@ const worldSize = 192;
 
 
 export function renderMap(context: CanvasRenderingContext2D, state: GameState): void {
-    if (overworldKeys.includes(state.location.zoneKey)
-        || overworldKeys.includes(state.areaSection?.definition?.mapId)
-    ) {
-        renderOverworldMap(context, state);
+    if (overworldKeys.includes(state.location.zoneKey)) {
+        renderOverworldMap(context, state, state.location.zoneKey);
+    } else if (overworldKeys.includes(state.areaSection?.definition?.mapId)) {
+        renderOverworldMap(context, state, state.areaSection?.definition?.mapId);
     } else {
         renderDungeonMap(context, state);
     }
@@ -54,46 +48,24 @@ export function drawMapFrame(context: CanvasRenderingContext2D, r: Rect): void {
     drawFrame(context, menuSlices[8], {x: r.x + r.w - 8, y: r.y + r.h - 8, w: 8, h: 8});
 }
 
-export function renderOverworldMap(context: CanvasRenderingContext2D, state: GameState): void {
-    const w = worldSize + 2 * borderSize;
-    const h = worldSize + 2 * borderSize;
-    let r = {
-        x: (CANVAS_WIDTH - w ) / 2,
-        y: (CANVAS_HEIGHT - h ) / 2,
-        w, h,
-    };
-    drawMapFrame(context, r);
-
-    r = pad(r, -borderSize);
-
-    drawFrame(context, ground00, {x: r.x, y: r.y, w: 64, h: 64});
-    drawFrame(context, ground10, {x: r.x + 64, y: r.y, w: 64, h: 64});
-    drawFrame(context, ground20, {x: r.x + 128, y: r.y, w: 64, h: 64});
-    drawFrame(context, ground01, {x: r.x, y: r.y + 64, w: 64, h: 64});
-    if (isLogicValid(state, logicHash.frozenLake)) {
-        drawFrame(context, froze, {x: r.x + 64, y: r.y + 64, w: 64, h: 64});
-    } else {
-        drawFrame(context, ground11, {x: r.x + 64, y: r.y + 64, w: 64, h: 64});
-    }
-    drawFrame(context, ground21, {x: r.x + 128, y: r.y + 64, w: 64, h: 64});
-    drawFrame(context, ground02, {x: r.x, y: r.y + 128, w: 64, h: 64});
-    drawFrame(context, ground12, {x: r.x + 64, y: r.y + 128, w: 64, h: 64});
-    drawFrame(context, ground22, {x: r.x + 128, y: r.y + 128, w: 64, h: 64});
-
-    if (state.location.zoneKey === 'sky' || state.areaSection?.definition.mapId === 'sky') {
-        context.save();
-            context.globalAlpha *= 0.5;
-            context.fillStyle = '#0FF';
-            context.fillRect(r.x, r.y, r.w, r.h);
-        context.restore();
-        drawFrame(context, sky00, {x: r.x, y: r.y, w: 64, h: 64});
-        drawFrame(context, sky10, {x: r.x + 64, y: r.y, w: 64, h: 64});
-        drawFrame(context, sky20, {x: r.x + 128, y: r.y, w: 64, h: 64});
-        drawFrame(context, sky01, {x: r.x, y: r.y + 64, w: 64, h: 64});
-        drawFrame(context, sky11, {x: r.x + 64, y: r.y + 64, w: 64, h: 64});
-        drawFrame(context, sky21, {x: r.x + 128, y: r.y + 64, w: 64, h: 64});
-        drawFrame(context, sky12, {x: r.x + 64, y: r.y + 128, w: 64, h: 64});
-    }
+let w = worldSize + 2 * borderSize;
+let h = worldSize + 2 * borderSize;
+const fullWorldMapRectangle = {
+    x: (CANVAS_WIDTH - w ) / 2,
+    y: (CANVAS_HEIGHT - h ) / 2,
+    w, h,
+};
+const innerWorldMapRectangle = {
+    x: fullWorldMapRectangle.x + borderSize,
+    y: fullWorldMapRectangle.y + borderSize,
+    w: worldSize,
+    h: worldSize,
+};
+export function renderOverworldMap(context: CanvasRenderingContext2D, state: GameState, zone: string): void {
+    drawMapFrame(context, fullWorldMapRectangle);
+    const r = innerWorldMapRectangle;
+    refreshWorldMap(state, zone);
+    drawCanvas(context, mapCanvas, {x: 0, y: 0, w: 192, h: 192}, innerWorldMapRectangle);
 
     if (overworldKeys.includes(state.location.zoneKey)) {
         if (state.time % 1000 <= 600) {
@@ -138,6 +110,27 @@ const cursor = createAnimation('gfx/hud/cursortemp.png', {w: frameSize, h: frame
 const [mapCanvas, mapContext] = createCanvasAndContext(192, 192);
 
 const [sectionCanvas, sectionContext] = createCanvasAndContext(64, 64);
+
+
+function refreshWorldMap(state: GameState, zoneKey: string): void {
+    // It is expensive to render the world map, so only re-render if it has important changes.
+    if (!state.map.needsRefresh && state.map.renderedMapId === zoneKey) {
+        return;
+    }
+    state.map.needsRefresh = false;
+    state.map.renderedMapId = zoneKey;
+
+    mapContext.clearRect(0, 0, mapCanvas.width, mapCanvas.height);
+    const zone = zones[zoneKey];
+    const grid = state.location.isSpiritWorld ? zone.floors[0].spiritGrid : zone.floors[0].grid;
+    for (let row = 0; row < grid.length; row++) {
+        for (let column = 0; column < grid[row].length; column++) {
+            const areaInstance = createAreaInstance(state, grid[row][column]);
+            renderActualMapTile(mapContext, state, areaInstance,
+                {x: column * 64, w: 64, y: row * 64, h: 64},  {x: 0, y: 0, w: 512, h: 512});
+        }
+    }
+}
 
 function refreshDungeonMap(state: GameState, mapId: string, floorId: string): void {
     // It is expensive to render the dungeon map, so only re-render if it has important changes.
@@ -188,8 +181,8 @@ function refreshDungeonMap(state: GameState, mapId: string, floorId: string): vo
     }
 }
 
-const w = worldSize + 2 * borderSize + 4 + 20;
-const h = worldSize + 2 * borderSize;
+w = worldSize + 2 * borderSize + 4 + 20;
+h = worldSize + 2 * borderSize;
 const fullDungeonMapRectangle = {
     x: (CANVAS_WIDTH - w ) / 2,
     y: (CANVAS_HEIGHT - h ) / 2,
@@ -349,8 +342,8 @@ export function renderActualMapTile(context: CanvasRenderingContext2D, state: Ga
 
 export function mouseCoordsToMapCoords({x, y}: {x: number, y: number}): {x: number, y: number} {
     return {
-        x: ((x - innerDungeonMapRectangle.x) / 32) | 0,
-        y: ((y - innerDungeonMapRectangle.y) / 32) | 0,
+        x: ((x - innerDungeonMapRectangle.x) / 32),
+        y: ((y - innerDungeonMapRectangle.y) / 32),
     }
 }
 

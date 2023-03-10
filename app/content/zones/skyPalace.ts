@@ -258,8 +258,8 @@ const f0_0x0: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 32},
-        {x: 16, y: 0, w: 16, h: 32},
+        {x: 0, y: 0, w: 16, h: 32, index: 327, mapId: 'skyPalace', floorId: '1F', mapX: 0, mapY: 0},
+        {x: 16, y: 0, w: 16, h: 32, index: 328, mapId: 'skyPalace', floorId: '1F', mapX: 1, mapY: 0},
     ],
 };
 const f0_1x0: AreaDefinition = {
@@ -476,8 +476,8 @@ const f0_1x0: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 32, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 329, mapId: 'skyPalace', floorId: '1F', mapX: 2, mapY: 0},
+        {x: 0, y: 16, w: 32, h: 16, index: 330, mapId: 'skyPalace', floorId: '1F', mapX: 2, mapY: 1},
     ],
 };
 const f0_2x0: AreaDefinition = {
@@ -736,9 +736,9 @@ const f0_2x0: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 32},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 16, h: 32, index: 331, mapId: 'skyPalace', floorId: '1F', mapX: 4, mapY: 0},
+        {x: 16, y: 0, w: 16, h: 16, index: 332, mapId: 'skyPalace', floorId: '1F', mapX: 5, mapY: 0},
+        {x: 16, y: 16, w: 16, h: 16, index: 333, mapId: 'skyPalace', floorId: '1F', mapX: 5, mapY: 1},
     ],
 };
 const f0_0x1: AreaDefinition = {
@@ -997,9 +997,9 @@ const f0_0x1: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 32},
+        {x: 0, y: 0, w: 16, h: 16, index: 334, mapId: 'skyPalace', floorId: '1F', mapX: 0, mapY: 2},
+        {x: 0, y: 16, w: 16, h: 16, index: 335, mapId: 'skyPalace', floorId: '1F', mapX: 0, mapY: 3},
+        {x: 16, y: 0, w: 16, h: 32, index: 336, mapId: 'skyPalace', floorId: '1F', mapX: 1, mapY: 2},
     ],
 };
 const f0_1x1: AreaDefinition = {
@@ -1216,7 +1216,7 @@ const f0_1x1: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 337, mapId: 'skyPalace', floorId: '1F', mapX: 2, mapY: 2},
     ],
 };
 const f0_2x1: AreaDefinition = {
@@ -1475,9 +1475,9 @@ const f0_2x1: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 32},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 16, h: 32, index: 338, mapId: 'skyPalace', floorId: '1F', mapX: 4, mapY: 2},
+        {x: 16, y: 0, w: 16, h: 16, index: 339, mapId: 'skyPalace', floorId: '1F', mapX: 5, mapY: 2},
+        {x: 16, y: 16, w: 16, h: 16, index: 340, mapId: 'skyPalace', floorId: '1F', mapX: 5, mapY: 3},
     ],
 };
 const sf0_0x0: AreaDefinition = {
@@ -1748,8 +1748,8 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "skyPalace:s0:0x0-crusher-0", x: 320, y: 224, type: "enemy", enemyType: "crusher", d: "down", params: {}},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 32},
-        {x: 16, y: 0, w: 16, h: 32},
+        {x: 0, y: 0, w: 16, h: 32, index: 341, mapId: 'skyPalaceSpirit', floorId: 'B1', mapX: 2, mapY: 1},
+        {x: 16, y: 0, w: 16, h: 32, index: 342, mapId: 'skyPalaceSpirit', floorId: '1F', mapX: 1, mapY: 1},
     ],
 };
 const sf0_1x0: AreaDefinition = {
@@ -1981,8 +1981,8 @@ const sf0_1x0: AreaDefinition = {
         {status: "normal", id: "skyPalace:s0:1x0-balloonCentipede-1", x: 328, y: 120, type: "enemy", enemyType: "balloonCentipede", d: "down", params: {}},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 32, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 343, mapId: 'skyPalaceSpirit', floorId: '1F', mapX: 2, mapY: 1},
+        {x: 0, y: 16, w: 32, h: 16, index: 344, mapId: 'skyPalaceSpirit', floorId: '1F', mapX: 2, mapY: 2},
     ],
 };
 const sf0_2x0: AreaDefinition = {
@@ -2256,9 +2256,9 @@ const sf0_2x0: AreaDefinition = {
         {status: "normal", id: "skyPalace:s0:2x0-floorEye-1", x: 160, y: 128, type: "enemy", enemyType: "floorEye", d: "down", params: {}},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 32},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 16, h: 32, index: 345, mapId: 'skyPalaceSpirit', floorId: '1F', mapX: 4, mapY: 1},
+        {x: 16, y: 0, w: 16, h: 16, index: 346, mapId: 'skyPalaceSpirit', floorId: 'B2', mapX: 2, mapY: 1},
+        {x: 16, y: 16, w: 16, h: 16, index: 347, mapId: 'sky', entranceId: 'skyPalaceTowerEntrance', mapX: 5, mapY: 1},
     ],
 };
 const sf0_0x1: AreaDefinition = {
@@ -2542,9 +2542,9 @@ const sf0_0x1: AreaDefinition = {
         {status: "normal", id: "skyPalace:s0:0x1-balloonCentipede-0", x: 420, y: 424, type: "enemy", enemyType: "balloonCentipede", d: "down", params: {}},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 32},
+        {x: 0, y: 0, w: 16, h: 16, index: 348, mapId: 'sky', entranceId: 'skyPalacePitEntrance', mapX: 0, mapY: 2},
+        {x: 0, y: 16, w: 16, h: 16, index: 349, mapId: 'sky', entranceId: 'skyPalaceSecretEntrance', mapX: 0, mapY: 3},
+        {x: 16, y: 0, w: 16, h: 32, index: 350, mapId: 'skyPalaceSpirit', floorId: '1F', mapX: 1, mapY: 3},
     ],
 };
 const sf0_1x1: AreaDefinition = {
@@ -2767,7 +2767,7 @@ const sf0_1x1: AreaDefinition = {
         {status: "normal", id: "", x: 32, y: 48, type: "movingPlatform", d: "down", w: 32, h: 32, speed: 2, turn: "left"},
         {status: "normal", id: "", x: 32, y: 464, type: "movingPlatform", d: "right", w: 32, h: 32, speed: 2, turn: "left"},
         {status: "normal", id: "", x: 176, y: 256, type: "movingPlatform", d: "up", w: 32, h: 32, speed: 2, turn: "left"},
-        {status: "normal", id: "skyPalaceMoney", x: 248, y: 248, type: "chest", lootType: "money", lootAmount: 50},
+        {status: "normal", id: "skyPalaceMap", x: 248, y: 248, type: "chest", lootType: "map", lootAmount: 50},
         {status: "normal", id: "", x: 448, y: 464, type: "movingPlatform", d: "up", w: 32, h: 32, speed: 2, turn: "left"},
         {status: "normal", id: "", x: 240, y: 320, type: "movingPlatform", d: "left", w: 32, h: 32, speed: 2, turn: "left"},
         {status: "normal", id: "", x: 304, y: 256, type: "movingPlatform", d: "down", w: 32, h: 32, speed: 2, turn: "left"},
@@ -2782,7 +2782,7 @@ const sf0_1x1: AreaDefinition = {
         {status: "normal", id: "skyPalace:s0:1x1-balloonCentipede-1", x: 364, y: 396, type: "enemy", enemyType: "balloonCentipede", d: "up", params: {}},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 351, mapId: 'skyPalaceSpirit', floorId: '1F', mapX: 2, mapY: 3},
     ],
 };
 const sf0_2x1: AreaDefinition = {
@@ -3062,9 +3062,9 @@ const sf0_2x1: AreaDefinition = {
         {status: "normal", id: "skyPalace:s0:2x1-crystalBat-1", x: 420, y: 148, type: "enemy", enemyType: "crystalBat", d: "up", params: {}},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 32},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 16, h: 32, index: 352, mapId: 'skyPalaceSpirit', floorId: '1F', mapX: 4, mapY: 3},
+        {x: 16, y: 0, w: 16, h: 16, index: 353, mapId: 'sky', entranceId: 'skyPalaceTowerEntrance', mapX: 5, mapY: 2},
+        {x: 16, y: 16, w: 16, h: 16, index: 354, mapId: 'sky', entranceId: 'skyPalaceTowerEntrance', mapX: 5, mapY: 3},
     ],
 };
 zones.skyPalace = {

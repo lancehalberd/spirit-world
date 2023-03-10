@@ -87,6 +87,7 @@ export const gauntletNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'gauntletBallRoom',
+        checks: [{objectId: 'gauntletMap'}],
         entranceIds: ['gauntletStairs'],
         exits: [
             { objectId: 'gauntletStairs' },

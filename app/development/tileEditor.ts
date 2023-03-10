@@ -40,6 +40,13 @@ function refreshArea(state: GameState, doNotRefreshEditor = false) {
     enterLocation(state, state.location, true, undefined, true, false, doNotRefreshEditor);
 }
 
+function roundMapCoords(coords: {x: number, y: number}): {x: number, y: number} {
+    return {
+        x: ((coords.x * 2) | 0) / 2,
+        y: ((coords.y * 2) | 0) / 2,
+    };
+}
+
 mainCanvas.addEventListener('mousemove', function () {
     if (!editingState.isEditing || !isMouseDown() || contextMenuState.contextMenu) {
         return;
@@ -50,7 +57,7 @@ mainCanvas.addEventListener('mousemove', function () {
         if (editingState.sectionDragData && state.showMap && isMouseDown() && editingState.selectedSections.length) {
             const sectionIndex = editingState.sectionDragData.sectionIndex;
             const section = allSections[sectionIndex].section;
-            const mapCoords = mouseCoordsToMapCoords({x, y});
+            const mapCoords = roundMapCoords(mouseCoordsToMapCoords({x, y}));
             // Calculate where the anchor section should be based on the map coords delta of the mouse drag and the original
             // position of the anchor section when the drag started.
             const tx = editingState.sectionDragData.originalSectionX + (mapCoords.x - editingState.sectionDragData.x);
@@ -92,7 +99,7 @@ mainCanvas.addEventListener('mousedown', function (event) {
     if (state.paused) {
         if (state.showMap) {
             if (editingState.selectedSections.length && !isKeyboardKeyDown(KEY.SHIFT)) {
-                const mapCoords = mouseCoordsToMapCoords({x, y});
+                const mapCoords = roundMapCoords(mouseCoordsToMapCoords({x, y}));
                 // The anchor section is arbitrarily set to the first selected section.
                 // It will be used to keep track of how much we need to move the sections at any point
                 // during the drag operation.
