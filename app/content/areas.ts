@@ -551,6 +551,7 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
     }
     for (let instance of [area, area.alternateArea]) {
         if (refreshBehavior) {
+            state.map.needsRefresh = true;
             state.fadeLevel = (state.areaInstance.dark || 0) / 100;
             state.hero.vx = state.hero.vy = 0;
             const nextAreaInstance = createAreaInstance(state, instance.definition);

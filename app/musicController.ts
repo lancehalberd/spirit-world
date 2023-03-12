@@ -33,19 +33,28 @@ export const updateMusic = (state: GameState): void => {
         }
     } else if (location.zoneKey === 'overworld') {
         if (!location.isSpiritWorld
-            && location.areaGridCoords.x === 0 && location.areaGridCoords.y === 2) {
+            && location.areaGridCoords.x === 0 && location.areaGridCoords.y === 2
+        ) {
             playTrack('vanaraForestTheme', 0, soundSettings);
         } else if (!location.isSpiritWorld
-            && location.areaGridCoords.x === 2 && location.areaGridCoords.y === 2) {
+            && location.areaGridCoords.x === 2 && location.areaGridCoords.y === 2
+        ) {
             playTrack('ruins', 0, soundSettings);
         } else if (!location.isSpiritWorld
-            && location.areaGridCoords.x === 2 && location.areaGridCoords.y === 0) {
+            && location.areaGridCoords.x === 2 && location.areaGridCoords.y === 0
+        ) {
             playTrack('village', 0, soundSettings);
         } else {
             playTrack('mainTheme', 0, soundSettings);
         }
     } else if (location.zoneKey === 'underwater') {
-        playTrack('mainTheme', 0, soundSettings);
+        if (!location.isSpiritWorld
+            && location.areaGridCoords.x === 2 && location.areaGridCoords.y === 0
+        ) {
+            playTrack('village', 0, soundSettings);
+        }  else {
+            playTrack('mainTheme', 0, soundSettings);
+        }
     }  else if (location.zoneKey === 'treeVillage') {
         playTrack('vanaraForestTheme', 0, soundSettings);
     } else if (location.zoneKey === 'sky') {
