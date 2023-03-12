@@ -39,11 +39,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Fix squirrels stop moving if they hit thorns
-    - Prevent getting knocked through doors/screen transitions/off cliffs
-        - Just set movement properties appropriately
-        - Apply the same restrictions when moving backwards (while slipping from ice/cloudboots).
-
     - Tasks before next major release
         - Cocoon
             - Astral projection of boss size scales with health to 1/4 < 25%, 1/2 < 50%

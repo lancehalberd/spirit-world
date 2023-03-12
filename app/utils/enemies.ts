@@ -226,6 +226,7 @@ export function moveEnemyFull(state: GameState, enemy: Enemy, dx: number, dy: nu
 }
 
 function moveEnemyProper(state: GameState, enemy: Enemy, dx: number, dy: number, movementProperties: MovementProperties): {mx: number, my: number} {
+    movementProperties = {...movementProperties, dx, dy};
     if (enemy.enemyDefinition.baseMovementProperties) {
         movementProperties = {...enemy.enemyDefinition.baseMovementProperties, ...movementProperties};
     }
