@@ -15,12 +15,11 @@ export function isMovementBlocked(
     isUnder: boolean,
     movementProperties: MovementProperties
 ): false | {object?: ObjectInstance | EffectInstance} {
-    // This is not currently used.
-    /*for (const box of (movementProperties.blockedBoxes || [])) {
+    for (const box of (movementProperties.blockedBoxes || [])) {
         if (isPixelInShortRect(x, y, box)) {
             return {};
         }
-    }*/
+    }
     const actor = movementProperties.actor;
 
     // Check for this before tiles so that objects on top of solid tiles can be pushed, such as doors.

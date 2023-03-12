@@ -11,6 +11,10 @@ export function moveNPC(state, npc: NPC, dx, dy, movementProperties: MovementPro
         npc.y += dy;
         return true;
     }
+    movementProperties.blockedBoxes = [
+        ...(movementProperties.blockedBoxes || []),
+        state.hero.getMovementHitbox(),
+    ];
     const { mx, my } = moveActor(state, npc, dx, dy, movementProperties);
     return mx !== 0 || my !== 0;
 }
