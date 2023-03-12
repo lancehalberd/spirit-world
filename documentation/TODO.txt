@@ -39,8 +39,10 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Cannot find area definition (probably door going nowhere, Lab left hallway)
-    - Pits are randomized across worlds in entrance randomizer (entranceSeed=3, underwater took me to sky palace entrance)
+    - Fix squirrels stop moving if they hit thorns
+    - Prevent getting knocked through doors/screen transitions/off cliffs
+        - Just set movement properties appropriately
+        - Apply the same restrictions when moving backwards (while slipping from ice/cloudboots).
 
     - Tasks before next major release
         - Cocoon

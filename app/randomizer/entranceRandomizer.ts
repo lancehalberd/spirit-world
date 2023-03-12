@@ -31,9 +31,12 @@ interface DoorLocation {
     definition: EntranceDefinition
 }
 
-// These entrances are unreachable and should only be connected to zones with multiple
-// exits or zones with no checks or settable flags.
-const unreachableSpiritEntranceTargets = ['caves:caves-ascentExitSpirit'];
+// These groups of entrances are not reachable except from one of the other exits, so at least
+// one needs to be connected to a reachable entrance using a connected exit group.
+const unreachableSpiritEntranceGroups = [
+    ['caves:caves-ascentExitSpirit'],
+    ['skyPalace:skyPalaceWestEntrance', 'skyPalace:skyPalaceTowerEntrance', 'skyPalace:skyPalaceEastEntrance'],
+];
 
 interface ConnectedExitGroup {
     normalEntranceTargets?: string[]
@@ -128,8 +131,10 @@ export function randomizeEntrances(random: typeof SRandom) {
     const normalExits = new Set<string>();
     const spiritExits = new Set<string>();
     const waterExits = new Set<string>();
-    const pitEntrances = [];
-    const pitTargets = new Set<string>();
+    const normalPitEntrances: EntranceDefinition[] = [];
+    const spiritPitEntrances: EntranceDefinition[] = [];
+    const normalPitTargets = new Set<string>();
+    const spiritPitTargets = new Set<string>();
     const targetIdMap: {[key in string]: DoorLocation[]} = {};
     const allTargetedKeys = new Set<string>();
     const fixedNimbusCloudZones = new Set<string>();
@@ -142,8 +147,13 @@ export function randomizeEntrances(random: typeof SRandom) {
                 return;
             }
             const targetKey = `${object.targetZone}:${object.targetObjectId}`;
-            pitTargets.add(targetKey);
-            pitEntrances.push(object);
+            if (area.isSpiritWorld) {
+                spiritPitTargets.add(targetKey);
+                spiritPitEntrances.push(object);
+            } else {
+                normalPitTargets.add(targetKey);
+                normalPitEntrances.push(object);
+            }
             return;
         }
         if (object.type !== 'door') {
@@ -219,7 +229,10 @@ export function randomizeEntrances(random: typeof SRandom) {
 
     //console.log('EXIT ONLY ENTRANCE ASSIGNMENTS:');
     // Assign all unreachable entrances first to a random entrance with other connections.
-    for (const unreachableEntranceTarget of unreachableSpiritEntranceTargets) {
+    for (const unreachableEntranceTargets of unreachableSpiritEntranceGroups) {
+        // Choose one entrance in the group to assign as a forced connection through a reachable
+        // exit.
+        const unreachableEntranceTarget = random.shuffle(unreachableEntranceTargets)[0];
         for (const exitGroup of random.shuffle(connectedExitGroups)) {
             const spiritExits = exitGroup.spiritEntranceTargets?.length ?? 0;
             const normalExits = exitGroup.normalEntranceTargets?.length ?? 0;
@@ -357,12 +370,17 @@ export function randomizeEntrances(random: typeof SRandom) {
             assignEntranceExitPair(entranceId, exitId);
         }
     }
-    const targetIds = [...pitTargets];
-    for (const pitEntrance of random.shuffle(pitEntrances)) {
-        const exitId = targetIds.pop();
-        const [zone, objectId] = exitId.split(':');
-        pitEntrance.targetZone = zone;
-        pitEntrance.targetObjectId = objectId;
+    for (const [pitTargets, pitEntrances] of [
+        <const>[normalPitTargets, normalPitEntrances],
+        <const>[spiritPitTargets, spiritPitEntrances],
+    ]) {
+        const targetIds = [...pitTargets];
+        for (const pitEntrance of random.shuffle(pitEntrances)) {
+            const exitId = targetIds.pop();
+            const [zone, objectId] = exitId.split(':');
+            pitEntrance.targetZone = zone;
+            pitEntrance.targetObjectId = objectId;
+        }
     }
     verifyNodeConnections();
 }
