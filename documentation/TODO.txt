@@ -39,6 +39,10 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Make hero solid for NPC movement (new property, blockedByHero)
+    - Check for better south key door graphics,
+        - ask Jon for updates if we don't have them.
+
     - Tasks before next major release
         - Cocoon
             - Astral projection of boss size scales with health to 1/4 < 25%, 1/2 < 50%
@@ -399,8 +403,6 @@ Respawn improvements:
         Map dungeon entrances to respawn points?
 
 Tutorial Improvements:
-    - chest instructions are lost if you exit without obtaining the chakram.
-    - no instructions for picking up objects before obtaining the glove
     Add advanced combat/tool tutorials
         - Maybe NPCs in home cave, or some kind of training/tutorial dojo?
         - Hitting enemies with chakram held in hand

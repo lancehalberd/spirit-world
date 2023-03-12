@@ -11,6 +11,7 @@ import {
 
 export class Narration implements ObjectInstance {
     area: AreaInstance;
+    alwaysReset = true;
     definition: NarrationDefinition;
     drawPriority = <const>'foreground';
     isObject = <const>true;
