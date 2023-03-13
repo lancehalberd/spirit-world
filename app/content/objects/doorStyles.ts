@@ -85,6 +85,7 @@ interface DoorStyleDefinition {
     up?: DoorStyleFrames,
     left?: DoorStyleFrames,
 }
+
 const woodImage = requireImage('gfx/tiles/woodhousetilesarranged.png');
 //const woodenCrackedSouthBackground: Frame = {image: woodImage, x: 48, y: 0, w: 16, h: 16};
 const woodenSouthCrackedWall: Frame = {image: woodImage, x: 32, y: 96, w: 16, h: 16};
@@ -295,7 +296,7 @@ const [
 const [
     blockedDoorCover, lockedDoorCover, bigLockedDoorCover,
 ] = createAnimation('gfx/tiles/cavearranged.png', {w: 32, h: 32},
-    {left: 304, top: 192, cols: 3, rows: 1}).frames;
+    {left: 304, top: 224, cols: 3, rows: 1}).frames;
 
 debugCanvas;//(blockedDoorCover);
 
@@ -458,7 +459,7 @@ const [
 const [
     blockedCrystalDoorCover, lockedCrystalDoorCover, bigLockedCrystalDoorCover,
 ] = createAnimation('gfx/tiles/crystalcavesheet.png', {w: 32, h: 32},
-    {left: 304, top: 192, cols: 3, rows: 1}).frames;
+    {left: 304, top: 224, cols: 3, rows: 1}).frames;
 
 debugCanvas;//(blockedDoorCover);
 

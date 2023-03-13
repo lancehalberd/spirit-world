@@ -207,37 +207,37 @@ window['playingTracks'] = playingTracks;
 const musicTracks = {
     // Tracks from Nick
     // Used in various caves
-    caveTheme: {key: 'caveTheme', type: 'bgm', source: 'bgm/Spirit 1.mp3', volume: 10 },
+    caveTheme: {key: 'caveTheme', type: 'bgm', source: 'bgm/Spirit 1.mp3', volume: 20 },
     // Used on the title screen and world map
-    mainTheme: {key: 'mainTheme', type: 'bgm', source: 'bgm/Spirit 4.2_demo.mp3', volume: 5 },
+    mainTheme: {key: 'mainTheme', type: 'bgm', source: 'bgm/Spirit 4.2_demo.mp3', volume: 10 },
     // Used for holy city, but a bit to relaxed for that.
-    waterfallVillageTheme: {key : 'waterfallVillage', type: 'bgm', source: 'bgm/Spirit 21.A_demo.mp3', volume: 5},
-    vanaraForestTheme: {key: 'vanaraForestTheme', type: 'bgm', source: 'bgm/Spirit 16_concept.mp3', volume: 5 },
-    tombTheme: {key: 'tombTheme', type: 'bgm', source: 'bgm/Spirit 5.2_demo.mp3', volume: 5 },
+    waterfallVillageTheme: {key : 'waterfallVillage', type: 'bgm', source: 'bgm/Spirit 21.A_demo.mp3', volume: 10},
+    vanaraForestTheme: {key: 'vanaraForestTheme', type: 'bgm', source: 'bgm/Spirit 16_concept.mp3', volume: 10 },
+    tombTheme: {key: 'tombTheme', type: 'bgm', source: 'bgm/Spirit 5.2_demo.mp3', volume: 10 },
     // Used for Vanara ship dungeons like cocoon, helix and forest temple.
-    cocoonTheme: {key: 'cocoonTheme', type: 'bgm', source: 'bgm/Spirit 6 Demo.mp3', volume: 5 },
-    vanaraDreamTheme: {key: 'vanaraDreamTheme', type: 'bgm', source: 'bgm/Spirit 18_concept.mp3', volume: 5 },
-    helixTheme: {key: 'helixTheme', type: 'bgm', source: 'bgm/Spirit 13.2_demo.mp3', volume: 5 },
-    waterfallTowerTheme: {key: 'waterfallTowerTheme', type: 'bgm', source: 'bgm/Public Surface_concept.mp3', volume: 5 },
-    forgeTheme: {key: 'forgeTheme', type: 'bgm', source: 'bgm/Public Surface.b_concept.mp3', volume: 5 },
-    craterTheme: {key: 'craterTheme', type: 'bgm', source: 'bgm/Fatty Richness_demo.mp3', volume: 5 },
+    cocoonTheme: {key: 'cocoonTheme', type: 'bgm', source: 'bgm/Spirit 6 Demo.mp3', volume: 10 },
+    vanaraDreamTheme: {key: 'vanaraDreamTheme', type: 'bgm', source: 'bgm/Spirit 18_concept.mp3', volume: 10 },
+    helixTheme: {key: 'helixTheme', type: 'bgm', source: 'bgm/Spirit 13.2_demo.mp3', volume: 10 },
+    waterfallTowerTheme: {key: 'waterfallTowerTheme', type: 'bgm', source: 'bgm/Public Surface_concept.mp3', volume: 10 },
+    forgeTheme: {key: 'forgeTheme', type: 'bgm', source: 'bgm/Public Surface.b_concept.mp3', volume: 10 },
+    craterTheme: {key: 'craterTheme', type: 'bgm', source: 'bgm/Fatty Richness_demo.mp3', volume: 10 },
     // Used for the tower after it is activated.
-    towerTheme: {key: 'towerTheme', type: 'bgm', source: 'bgm/Spirit 15.4.mp3', volume: 5 },
-    skyTheme: {key: 'skyTheme', type: 'bgm', source: 'bgm/Spirit 14_demo.mp3', volume: 5 },
+    towerTheme: {key: 'towerTheme', type: 'bgm', source: 'bgm/Spirit 15.4.mp3', volume: 10 },
+    skyTheme: {key: 'skyTheme', type: 'bgm', source: 'bgm/Spirit 14_demo.mp3', volume: 10 },
     // Used for the lake temple
-    lakeTheme: {key: 'lakeTheme', type: 'bgm', source: 'bgm/Spirit 9 Demo.mp3', volume: 5 },
+    lakeTheme: {key: 'lakeTheme', type: 'bgm', source: 'bgm/Spirit 9 Demo.mp3', volume: 10 },
     // Used for holy city, but a bit to relaxed for that.
-    village: {key : 'village', type: 'bgm', source: 'bgm/Spirit 21_demo.mp3', volume: 5},
+    village: {key : 'village', type: 'bgm', source: 'bgm/Spirit 21_demo.mp3', volume: 10},
     // Used for summoner ruins.
-    ruins: {key : 'ruins', type: 'bgm', source: 'bgm/Spirit 22_concept.mp3', volume: 5},
+    ruins: {key : 'ruins', type: 'bgm', source: 'bgm/Spirit 22_concept.mp3', volume: 10},
 
     // Tracks from Leon
     // For War Temple and other dungeons
-    dungeonTheme: {key: 'dungeonTheme', type: 'bgm', source: 'bgm/SpiritQuestSong_Leon1.mp3', volume: 10 },
+    dungeonTheme: {key: 'dungeonTheme', type: 'bgm', source: 'bgm/SpiritQuestSong_Leon1.mp3', volume: 20 },
     idleTheme: {key: 'idleTheme', type: 'bgm', source: 'bgm/IdleMusic.mp3', volume: 20 },
-    bossIntro: {key: 'bossIntro', type: 'bgm', source: 'bgm/SpookyThemeIntro.mp3', volume: 20, nextTrack: 'bossA' },
-    bossA: {key: 'bossA', type: 'bgm', source: 'bgm/SpookyThemeA.mp3', volume: 20, nextTrack: 'bossB' },
-    bossB: {key: 'bossB', type: 'bgm', source: 'bgm/SpookyThemeB.mp3', volume: 20, nextTrack: 'bossA' },
+    bossIntro: {key: 'bossIntro', type: 'bgm', source: 'bgm/SpookyThemeIntro.mp3', volume: 40, nextTrack: 'bossA' },
+    bossA: {key: 'bossA', type: 'bgm', source: 'bgm/SpookyThemeA.mp3', volume: 40, nextTrack: 'bossB' },
+    bossB: {key: 'bossB', type: 'bgm', source: 'bgm/SpookyThemeB.mp3', volume: 40, nextTrack: 'bossA' },
 };
 export type TrackKey = keyof typeof musicTracks;
 export function playTrack(trackKey: TrackKey, timeOffset, soundSettings: SoundSettings, fadeOutOthers = true, crossFade = true) {
@@ -384,14 +384,14 @@ const preloadSounds = () => {
         {key: 'rockShatter', source: 'sfx/3x3_odrive.wav', volume: 15, limit: 2},
         {key: 'doorClose', source: 'sfx/Cube-24_odrive.wav', volume: 10, limit: 1},
         {key: 'doorOpen', source: 'sfx/cube-24.slide_odrive.wav', volume: 10, limit: 1},
-        {key: 'chakramHold', source: 'sfx/chakram 5.wav', volume: 1 / 2, offset: '60:100', limit: 1},
-        {key: 'chakramCharge1', source: 'sfx/chakram 5.wav', volume: 1 / 2, offset: '60:100', limit: 1},
+        {key: 'chakramHold', source: 'sfx/chakram 5.wav', volume: 1, offset: '60:100', limit: 1},
+        {key: 'chakramCharge1', source: 'sfx/chakram 5.wav', volume: 1, offset: '60:100', limit: 1},
         //{key: 'weakChakram', source: 'sfx/chakram 5.wav', volume: 1 / 2, offset: '0:80', limit: 2},
         //{key: 'normalChakram', source: 'sfx/chakram 5.wav', volume: 2, limit: 2},
         //{key: 'strongChakram', source: 'sfx/chakram 5.wav', volume: 5, limit: 2},
-        {key: 'weakChakram', source: 'sfx/chakram sweep.wav', volume: 1, limit: 2},
-        {key: 'normalChakram', source: 'sfx/chakram sweep.wav', volume: 3, limit: 2},
-        {key: 'strongChakram', source: 'sfx/chakram sweep.wav', volume: 5, limit: 2},
+        {key: 'weakChakram', source: 'sfx/chakram sweep.wav', volume: 2, limit: 2},
+        {key: 'normalChakram', source: 'sfx/chakram sweep.wav', volume: 4, limit: 2},
+        {key: 'strongChakram', source: 'sfx/chakram sweep.wav', volume: 8, limit: 2},
         {key: 'secretChime', source: 'sfx/chime 14_1.wav', volume: 4, limit: 2},
         {key: 'bigSuccessChime', source: 'sfx/chime 06.wav', offset: '0:2000', volume: 4, limit: 2},
         {key: 'smallSuccessChime', source: 'sfx/chime 15.wav', offset: '0:2000', volume: 4, limit: 2},

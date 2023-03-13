@@ -39,9 +39,6 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
-    - Check for better south key door graphics,
-        - ask Jon for updates if we don't have them.
-
     - Tasks before next major release
         - Cocoon
             - Astral projection of boss size scales with health to 1/4 < 25%, 1/2 < 50%
