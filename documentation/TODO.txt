@@ -39,35 +39,31 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Replace frost grenades with ice mines.
+        - Copy FrostGrenade code.
+        - Thrown like frost grenades.
+        - Arm 500ms on the ground.
+        - render damage warning ring around them even before triggered
+        - trigger+blast radius are the same (24px default)
+        - 500 ms time to detonate after triggered
+        - Use the ice element graphic for them
+
+    - Move astral projection healthbar up by making it a minion
+
+    - Improve visuals for persistent blast attacks
+
+    - Change revive cost to [1, 0.2 * jade, 50]
+
     - Tasks before next major release
-        - Cocoon
-            - Astral projection of boss size scales with health to 1/4 < 25%, 1/2 < 50%
-            - Astral projection starts with 0 life recharging on the boss
-            - Astral projection lifebar depletes over time and as it uses skills
-            - Astral projection still returns to the boss to recharge when its life is depleted
-            - Add taunts to boss that give progressively useful hints for defeating it over time
-                - When the body starts regenerating and they have not damaged the boss in 20s and boss health > 6)
-                    health > 6 "I can do this all day!"
-                    health > 2 "I'm not done yet!"
-                    "You must be getting tired too!"
-                - If they damage the projection
-                    no damage to boss in 30s "Attacking my projection will only slow me down."
-                    no damage to boss in 45s "My real body is beyond the reach of your weapons."
-                    no damage to boss in 60s "Everything is there for a reason."
-                    no damage to boss in 75s "The boulders are important."
-                - If the player runs into the boss with their astral projection
-                    "Your Astral Body is too weak to harm me."
-                - Taunts for skills
-                - Taunts when damaged
         - Hint signs:
             "Want a hint?" or "20 Jade for a hint?"
         - Tomb
             Add Taunts to boss (maybe change these to sound like a machine)
-                - On blocking attacks: "Attacks are useless against my stone skin"
+                - On blocking attacks: "Attacks are useless against my stone skin."
                 - Charging laser: "Charging laser..."
                 - Preparing punch: "My punch is like a cannon."
                 - Targeted slam: "I will crush you!"
-                - Preparing flurry: "Beware my wrath!"
+                - Preparing flurry: "Fall to my wrath!"
                 - On rage: "That was a lucky shot!" / "Enough of this!"
                 - Preparing strafe laser: "There's no escape!" / "Just try and dodge this..."
 

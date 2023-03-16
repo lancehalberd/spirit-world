@@ -3,10 +3,11 @@ import { cloneDeep } from 'lodash';
 import { applySavedState, cleanState, getState } from 'app/state';
 import { setSpawnLocation } from 'app/content/spawnLocations';
 import {
-    earlySpawnLocations,
-    middleSpawnLocations,
-    lateSpawnLocations,
-    finalSpawnLocations,
+    earlyDungeonSpawnLocations,
+    middleDungeonSpawnLocations,
+    lateDungeonSpawnLocations,
+    easyBossSpawnLocations,
+    storySpawnLocations,
     minimizerSpawnLocations,
     SpawnLocationOptions,
 } from 'app/content/spawnStates';
@@ -35,43 +36,6 @@ function getSpawnLocationOptions(spawnLocations: SpawnLocationOptions, useSavedS
     });
 }
 
-export function getSpawnLocationContextMenuOption(): MenuOption {
-    return {
-        getLabel() {
-            return 'Teleport...';
-        },
-        getChildren() {
-            return [
-                { label: 'Teleport To...'},
-                {
-                    label: 'Early',
-                    getChildren() {
-                        return getSpawnLocationOptions(earlySpawnLocations);
-                    }
-                },
-                {
-                    label: 'Mid',
-                    getChildren() {
-                        return getSpawnLocationOptions(middleSpawnLocations);
-                    }
-                },
-                {
-                    label: 'Late',
-                    getChildren() {
-                        return getSpawnLocationOptions(lateSpawnLocations);
-                    }
-                },
-                {
-                    label: 'Final',
-                    getChildren() {
-                        return getSpawnLocationOptions(finalSpawnLocations);
-                    }
-                },
-            ];
-        }
-    }
-}
-
 export function getTestStateContextMenuOption(): MenuOption {
     return {
         getLabel() {
@@ -79,29 +43,34 @@ export function getTestStateContextMenuOption(): MenuOption {
         },
         getChildren() {
             return [
-                { label: 'Set State To...'},
                 {
                     label: 'Early',
                     getChildren() {
-                        return getSpawnLocationOptions(earlySpawnLocations, true);
+                        return getSpawnLocationOptions(earlyDungeonSpawnLocations, true);
                     }
                 },
                 {
                     label: 'Mid',
                     getChildren() {
-                        return getSpawnLocationOptions(middleSpawnLocations, true);
+                        return getSpawnLocationOptions(middleDungeonSpawnLocations, true);
                     }
                 },
                 {
                     label: 'Late',
                     getChildren() {
-                        return getSpawnLocationOptions(lateSpawnLocations, true);
+                        return getSpawnLocationOptions(lateDungeonSpawnLocations, true);
                     }
                 },
                 {
-                    label: 'Final',
+                    label: 'Boss',
                     getChildren() {
-                        return getSpawnLocationOptions(finalSpawnLocations, true);
+                        return getSpawnLocationOptions(easyBossSpawnLocations, true);
+                    }
+                },
+                {
+                    label: 'Story',
+                    getChildren() {
+                        return getSpawnLocationOptions(storySpawnLocations, true);
                     }
                 },
                 {

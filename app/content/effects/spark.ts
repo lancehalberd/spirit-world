@@ -17,6 +17,7 @@ interface Props {
     vy?: number
     vz?: number
     az?: number
+    friction?: number
     ttl?: number
     hitCircle?: Circle
     hitRay?: Ray
@@ -36,6 +37,7 @@ export class Spark implements EffectInstance, Props {
     vy: number = this.props.vy ?? 0;
     vz: number = this.props.vz ?? 0;
     az: number = this.props.az ?? -0.3;
+    friction = this.props.friction ?? 0;
     hitCircle: Circle;
     hitRay: Ray;
     animationTime = 0;
@@ -81,6 +83,11 @@ export class Spark implements EffectInstance, Props {
         this.y += this.vy;
         this.z = Math.max(0, this.z + this.vz);
         this.vz = Math.max(-8, this.vz + this.az);
+        if (this.friction > 0) {
+            this.vx *= (1 - this.friction);
+            this.vy *= (1 - this.friction);
+            this.vz *= (1 - this.friction);
+        }
         this.animationTime += FRAME_LENGTH;
 
         if (this.animationTime >= this.ttl) {

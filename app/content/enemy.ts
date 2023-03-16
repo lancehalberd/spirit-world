@@ -94,6 +94,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
     // healthbar.
     // There is a 100ms grace period before the bar is displayed at all.
     healthBarTime = 0;
+    healthBarColor?: string;
     params: Params;
     enemyInvulnerableFrames = 0;
     // This is used to prevent the block effect from happening too frequently
@@ -157,6 +158,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
                 timesUsed: 0,
             };
         }
+        this.healthBarColor = this.enemyDefinition.healthBarColor;
     }
     getFrame(): Frame {
         return getFrame(this.currentAnimation, this.animationTime);
@@ -348,7 +350,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         if (this.life <= 0) {
             return;
         }
-        this.life -= damage;
+        this.life = Math.max(0, this.life - damage);
         // This is actually the number of frames the enemy cannot damage the hero for.
         this.invulnerableFrames = this.enemyDefinition.invulnerableFrames ?? 50;
         this.enemyInvulnerableFrames = (iframeMultiplier * 20) | 0;
@@ -519,20 +521,22 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             }
         }
     }
-    useTaunt(state: GameState, tauntKey: string) {
+    useTaunt(state: GameState, tauntKey: string): boolean {
         const tauntInstance = this.taunts[tauntKey];
         if (!tauntInstance) {
             console.error('Missing taunt ', tauntKey);
-            return;
+            return false;
         }
         const definition = tauntInstance.definition;
         if (tauntInstance.cooldown || tauntInstance.timesUsed >= definition.limit) {
-            return;
+            return false;
         }
         if (addTextCue(state, definition.text, definition.duration, definition.priority)) {
             tauntInstance.cooldown = definition.cooldown || 3000;
             tauntInstance.timesUsed++;
+            return true;
         }
+        return false;
     }
     update(state: GameState) {
         if (this.status === 'gone') {
@@ -574,7 +578,8 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             this.burnDuration -= FRAME_LENGTH;
             this.life = Math.max(0, this.life - this.burnDamage * FRAME_LENGTH / 1000);
             if (this.checkIfDefeated(state)) {
-                return;
+                // End ths burn when the enemy is defeated.
+                this.burnDuration = 0;
             }
             if (this.burnDuration % 40 === 0) {
                 const hitbox = this.getHitbox();
@@ -826,6 +831,18 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
     }
     makeSound(state: GameState, soundKey: string) {
         playAreaSound(state, this.area, soundKey);
+    }
+    // Update the scale of the enemy without moving the center of its feet.
+    changeScale(scale: number): void {
+        if (scale === this.scale) {
+            return;
+        }
+        let hitbox = this.getHitbox();
+        const cx = hitbox.x + hitbox.w / 2, by = hitbox.y + hitbox.h;
+        this.scale = scale;
+        hitbox = this.getHitbox();
+        this.x += (cx - hitbox.x - hitbox.w / 2);
+        this.y += (by - hitbox.y - hitbox.h);
     }
 }
 objectHash.enemy = Enemy;

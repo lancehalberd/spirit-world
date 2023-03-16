@@ -1,5 +1,5 @@
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
-import { FrostBlast } from 'app/content/effects/frostBlast';
+import { Blast } from 'app/content/effects/blast';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 
@@ -53,11 +53,14 @@ export class FrostGrenade implements EffectInstance, Props {
         this.vz += this.az;
         this.animationTime += FRAME_LENGTH;
         if (this.z <= 0) {
-            const frostBlast = new FrostBlast({
+            const frostBlast = new Blast({
                 x: this.x,
                 y: this.y,
                 radius: this.radius,
                 damage: this.damage,
+                // The trajectory of the grenade gives enough warning.
+                tellDuration: 0,
+                element: 'ice',
             });
             addEffectToArea(state, this.area, frostBlast);
             removeEffectFromArea(state, this);

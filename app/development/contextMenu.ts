@@ -1,6 +1,6 @@
 import { setSpawnLocation } from 'app/content/spawnLocations';
 import { getMapOptions } from 'app/development/contextMenu/map';
-import { getSpawnLocationContextMenuOption, getTestStateContextMenuOption } from 'app/development/contextMenu/setState';
+import { getTestStateContextMenuOption } from 'app/development/contextMenu/setState';
 import { contextMenuState, editingState } from 'app/development/editingState';
 import { toggleEditing } from 'app/development/editor';
 import { tagElement } from 'app/dom';
@@ -115,7 +115,6 @@ export function getContextMenu(): MenuOption[] {
         }
     }
     const options = [
-        getSpawnLocationContextMenuOption(),
         getAssistanceMenuOption(),
         getSettingsMenuOption(),
         getTestStateContextMenuOption(),

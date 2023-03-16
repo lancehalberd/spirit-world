@@ -146,6 +146,7 @@ export interface EnemyDefinition {
     acceleration?: number
     scale?: number
     showHealthBar?: boolean
+    healthBarColor?: string
     touchDamage?: number
     touchHit?: HitProperties
     update?: (state: GameState, enemy: Enemy) => void
@@ -274,7 +275,7 @@ function updateEnt(state: GameState, enemy: Enemy): void {
             const thorns = new GrowingThorn({
                 x: targetHitbox.x + targetHitbox.w / 2,
                 y: targetHitbox.y + targetHitbox.h / 2,
-                damage: 2,
+                damage: 1,
             });
             addEffectToArea(state, enemy.area, thorns);
         }

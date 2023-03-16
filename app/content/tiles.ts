@@ -8,7 +8,7 @@ import {
     BITMAP_LEFT_6, BITMAP_LEFT_6_BOTTOM_9, BITMAP_LEFT_6_TOP_5,
     BITMAP_RIGHT_6, BITMAP_RIGHT_6_BOTTOM_9, BITMAP_RIGHT_6_TOP_5,
 } from 'app/content/bitMasks';
-import { simpleLootTable, lifeLootTable, moneyLootTable } from 'app/content/lootTables';
+import { rareLifeLootTable, simpleLootTable, lifeLootTable, moneyLootTable } from 'app/content/lootTables';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { createCanvasAndContext, debugCanvas } from 'app/utils/canvas';
 import { allImagesLoaded, requireImage } from 'app/utils/images';
@@ -78,6 +78,7 @@ const lowWallBehavior: TileBehaviors = {
 const pitBehavior: TileBehaviors = { defaultLayer: 'field', pit: true };
 const thornBehavior: TileBehaviors = {
     defaultLayer: 'field',
+    lootTable: rareLifeLootTable,
     low: true, touchHit: {damage: 1, spiritCloakDamage: 5, isGroundHit: true }, cuttable: 1,
     underTile: 23,
     particles: thornParticles,

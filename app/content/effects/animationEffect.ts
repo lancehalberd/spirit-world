@@ -355,3 +355,38 @@ const splashGeometry: FrameDimensions = {w: 22, h: 20, content: {x: 3, w: 16, y:
 export const splashAnimation: FrameAnimation = createAnimation('gfx/effects/watersplash.png', splashGeometry, { cols: 8, duration: 5}, { loop: false });
 const enemyFallGeometry: FrameDimensions = {w: 20, h: 22, content: {x: 2, w: 16, y: 3, h: 16}};
 export const enemyFallAnimation: FrameAnimation = createAnimation('gfx/effects/enemyfall2.png', enemyFallGeometry, { cols: 13, duration: 5}, { loop: false });
+
+
+const regenerationParticles
+    = createAnimation('gfx/tiles/spiritparticlesregeneration.png', {w: 4, h: 4}, {cols: 4, duration: 6}).frames;
+
+export function addBurstParticle(
+    state: GameState, area: AreaInstance,
+    x: number, y: number, z: number, element: MagicElement, delay = 0
+): void {
+    const theta = 2 * Math.PI * Math.random();
+    const vx = 1.5 * Math.cos(theta);
+    const vy = 1.5 * Math.sin(theta);
+    if (element === null ){
+        const frame = Random.element(regenerationParticles);
+        const particle = new AnimationEffect({
+            animation: frameAnimation(frame),
+            delay,
+            drawPriority: 'foreground',
+            x: x - frame.w / 2 + vx,
+            y: y - frame.h / 2 + vy, z,
+            vx, vy, vz: 1,
+            //ax: vx / 10, ay: vy / 10,
+            ttl: 160,
+        });
+        addEffectToArea(state, area, particle);
+    } else {
+        addSparkleAnimation(state, area, {x, y, w: 0, h: 0},
+            {
+                velocity: { x: vx, y:vy, z: 1},
+                element,
+                z,
+            }
+        );
+    }
+}

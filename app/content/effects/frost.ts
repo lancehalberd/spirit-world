@@ -13,7 +13,7 @@ interface Props {
     y: number
     z?: number
     damage?: number
-    ignoreTargets: Set<ObjectInstance>
+    ignoreTargets?: Set<ObjectInstance>
     vx?: number
     vy?: number
     vz?: number
@@ -55,7 +55,7 @@ export class Frost implements EffectInstance, Props {
         this.vz = vz;
         this.az = az;
         this.ttl = ttl;
-        this.ignoreTargets = ignoreTargets;
+        this.ignoreTargets = ignoreTargets || new Set();
         this.hitEnemies = hitEnemies;
         this.animationOffset = ((Math.random() * 10) | 0) * 20;
     }

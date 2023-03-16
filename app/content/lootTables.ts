@@ -32,6 +32,10 @@ export const lifeLootTable = createLootTable(200, [
     {type: 'peach', weight: 50},
 ]);
 
+export const rareLifeLootTable = createLootTable(200, [
+    {type: 'peach', weight: 25},
+]);
+
 export const certainLifeLootTable = createLootTable(100, [
     {type: 'peach', weight: 90},
     // Make this a big peach that gives 5 life.

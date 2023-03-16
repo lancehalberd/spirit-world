@@ -1,6 +1,6 @@
 import { readGetParameter, readGetParameterAsInt } from 'app/utils/index';
 
-import { LootType } from 'app/types';
+import { LootType, MagicElement } from 'app/types';
 
 // Update duration in milliseconds.
 export const FRAME_LENGTH = 20;
@@ -98,3 +98,12 @@ export const allLootTypes: LootType[] = [
 export const layersInOrder = ['floor', 'floor2', 'field', 'field2', 'foreground', 'foreground2'];
 
 export const overworldKeys = ['overworld', 'sky', 'underwater'];
+
+export function getElementColor(element: MagicElement) {
+    switch(element){
+        case 'fire': return 'red';
+        case 'ice': return 'white';
+        case 'lightning': return 'yellow';
+    }
+    return 'grey';
+}

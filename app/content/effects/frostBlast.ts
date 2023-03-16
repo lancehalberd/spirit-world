@@ -4,7 +4,7 @@ import { removeEffectFromArea } from 'app/utils/effects';
 import { hitTargets } from 'app/utils/field';
 
 import {
-    AreaInstance, EffectInstance, Frame, GameState,
+    AreaInstance, EffectInstance, GameState,
     ObjectInstance,
 } from 'app/types';
 
@@ -24,7 +24,6 @@ export class FrostBlast implements EffectInstance, Props {
     area: AreaInstance = null;
     isEffect = <const>true;
     isEnemyAttack = true;
-    frame: Frame;
     damage: number;
     x: number;
     y: number;

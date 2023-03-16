@@ -3,7 +3,7 @@ import { FRAME_LENGTH } from 'app/gameConstants';
 import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import { hitTargets } from 'app/utils/field';
 
-import { AreaInstance, EffectInstance, Enemy, GameState } from 'app/types';
+import { AreaInstance, EffectInstance, Enemy, GameState, } from 'app/types';
 
 interface Props {
     x: number
@@ -78,13 +78,13 @@ export class LightningDischarge implements EffectInstance {
                 context.globalAlpha *= 0.3;
                 context.beginPath();
                 context.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
-                context.strokeStyle = 'yellow';
+                context.strokeStyle = 'red';
                 context.stroke();
                 // Lighter fill grows to indicate when the attack will hit.
                 context.globalAlpha *= 0.3;
                 context.beginPath();
                 context.arc(this.x, this.y, p * this.radius, 0, 2 * Math.PI);
-                context.fillStyle = 'yellow';
+                context.fillStyle = 'red';
                 context.fill();
                 //context.globalAlpha *= 0.66;
                 //renderLightningCircle(context, {x: this.x, y: this.y, r: p * this.radius}, 5);

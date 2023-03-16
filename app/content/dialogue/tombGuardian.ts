@@ -11,8 +11,8 @@ dialogueHash.tombGuardian = {
             },
             isExclusive: true,
             text: [
-                `You have come so far in such a short time, but are you worthy of taking the next step?
-                {|}Prove your worth and show me what you've learned!
+                `You have come far, but there is no going back after this step.
+                {|}Show me your determination if you wish to proceed!
                 {flag:cocoonBossStarted}
                 `
             ],

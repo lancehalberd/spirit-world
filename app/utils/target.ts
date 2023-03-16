@@ -51,7 +51,9 @@ export function getVectorToNearbyTarget(state: GameState,
         }
         const targetHitbox = target.getHitbox(state);
         const dx = (targetHitbox.x + targetHitbox.w / 2) - (hitbox.x + hitbox.w / 2);
-        const dy = (targetHitbox.y + targetHitbox.h / 2) - (hitbox.y + hitbox.h / 2);
+        // Experiment aiming for the center of the bottom of the hitbox, the point on the ground
+        // the actor is on top of, rather than the center of their hitbox.
+        const dy = (targetHitbox.y + targetHitbox.h) - (hitbox.y + hitbox.h);
         const mag = Math.sqrt(dx * dx + dy * dy);
         if (mag <= radius) {
             if (mag) {

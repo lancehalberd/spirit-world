@@ -176,19 +176,50 @@ export interface SpawnLocationOptions {
     [key: string]: {location: ZoneLocation, savedState: SavedState},
 }
 
-export const earlySpawnLocations: SpawnLocationOptions = {
-    'Peach Cave Start': {
-        location: spawnLocations.SPAWN_LOCATION_FULL,
-        savedState: defaultSavedState,
-    },
-    'Peach Cave Boss': {
+export const easyBossSpawnLocations: SpawnLocationOptions = {
+    'Giant Beetle': {
         location: spawnLocations.SPAWN_LOCATION_PEACH_CAVE_BOSS,
         savedState: peachBossState,
     },
-    'Peach Cave Exit': {
-        location: spawnLocations.SPAWN_LOCATION_PEACH_CAVE_EXIT,
-        savedState: peachCaveExitState,
+    'Golem': {
+        location: spawnLocations.SPAWN_LOCATION_TOMB_BOSS,
+        savedState: tombBossState,
     },
+    'Elemental Idols': {
+        location: spawnLocations.SPAWN_WAR_TEMPLE_BOSS,
+        savedState: warTempleBoss,
+    },
+    'Vanara Guardian': {
+        location: spawnLocations.SPAWN_COCOON_BOSS,
+        savedState: cocoonBossState,
+    },
+    'Forest Back': {
+        location: spawnLocations.SPAWN_FOREST_BACK,
+        savedState: forestBackState,
+    },
+    'Collector': {
+        location: spawnLocations.SPAWN_WATERFALL_BOSS,
+        savedState: waterfallBossState,
+    },
+    'Flame Beast': {
+        location: spawnLocations.SPAWN_CRATER_BOSS,
+        savedState: craterBossState,
+    },
+    'Frost Beast': {
+        location: spawnLocations.RIVER_TEMPLE_BOSS,
+        savedState: riverTempleBossState,
+    },
+    'Storm Beast': {
+        location: spawnLocations.SPAWN_STAFF_BOSS,
+        savedState: staffBossState,
+    },
+    'Void Tree': {
+        location: spawnLocations.SPAWN_FINAL_BOSS_1,
+        savedState: finalBoss1State,
+    },
+};
+
+export const storySpawnLocations: SpawnLocationOptions = {
     'Rival Fight': {
         location: spawnLocations.SPAWN_LOCATION_TOMB_RIVAL,
         savedState: tombRivalState,
@@ -197,87 +228,70 @@ export const earlySpawnLocations: SpawnLocationOptions = {
         location: spawnLocations.SPAWN_LOCATION_TOMB_RIVAL,
         savedState: tombRivalDefeatState,
     },
-    'Tomb Start': {
+};
+
+export const earlyDungeonSpawnLocations: SpawnLocationOptions = {
+    'Peach Cave': {
+        location: spawnLocations.SPAWN_LOCATION_FULL,
+        savedState: defaultSavedState,
+    },
+    'Overworld': {
+        location: spawnLocations.SPAWN_LOCATION_PEACH_CAVE_EXIT,
+        savedState: peachCaveExitState,
+    },
+    'Tomb': {
         location: spawnLocations.SPAWN_LOCATION_TOMB_ENTRANCE,
         savedState: tombStartState,
     },
-    'Tomb Boss': {
-        location: spawnLocations.SPAWN_LOCATION_TOMB_BOSS,
-        savedState: tombBossState,
-    },
-    'War Temple Start': {
+    'War Temple': {
         location: spawnLocations.SPAWN_WAR_TEMPLE_ENTRANCE,
         savedState: warTempleStart,
     },
-    'War Temple Boss': {
-        location: spawnLocations.SPAWN_WAR_TEMPLE_BOSS,
-        savedState: warTempleBoss,
-    },
-    'Cocoon Start': {
+    'Cocoon': {
         location: spawnLocations.SPAWN_COCOON_ENTRANCE,
         savedState: cocoonStartState,
     },
-    'Cocoon Boss': {
-        location: spawnLocations.SPAWN_COCOON_BOSS,
-        savedState: cocoonBossState,
-    },
-    'Helix Start': {
+    'Helix': {
         location: spawnLocations.SPAWN_HELIX_ENTRANCE,
         savedState: helixStartState,
     },
 };
 
-export const middleSpawnLocations: SpawnLocationOptions = {
-    'Forest Start': {
+export const middleDungeonSpawnLocations: SpawnLocationOptions = {
+    'Forest': {
         location: spawnLocations.SPAWN_FOREST_ENTRANCE,
         savedState: helixEndState,
     },
-    'Forest Back': {
-        location: spawnLocations.SPAWN_FOREST_BACK,
-        savedState: forestBackState,
-    },
-    'Gauntlet Start': {
+    'Gauntlet': {
         location: spawnLocations.SPAWN_GAUNTLET_ENTRANCE,
         savedState: gauntletStartState,
     },
-    'Waterfall Start': {
+    'Waterfall': {
         location: spawnLocations.SPAWN_WATERFALL_ENTRANCE,
         savedState: helixEndState,
     },
-    'Waterfall Boss': {
-        location: spawnLocations.SPAWN_WATERFALL_BOSS,
-        savedState: waterfallBossState,
-    },
-    'Forge Start': {
+    'Forge': {
         location: spawnLocations.SPAWN_FORGE_ENTRANCE,
         savedState: helixEndState,
     },
-    'Sky Palace Start': {
+    'Sky Palace': {
         location: spawnLocations.SPAWN_SKY_PALACE_ENTRANCE,
         savedState: skyPalaceStartState,
     },
-    'Holy Sanctum Start': {
+    'Holy Sanctum': {
         location: spawnLocations.SPAWN_HOLY_SANCTUM_ENTRANCE,
         savedState: holySanctumStartState,
     },
 };
 
-export const lateSpawnLocations: SpawnLocationOptions = {
-    'Lake Start': {
+export const lateDungeonSpawnLocations: SpawnLocationOptions = {
+    'Lake': {
         location: spawnLocations.SPAWN_LOCATION_PEACH_CAVE_EXIT,
         savedState: riverTempleStartState,
     },
-    'Lake Boss': {
-        location: spawnLocations.RIVER_TEMPLE_BOSS,
-        savedState: riverTempleBossState,
-    },
-    'Crater Start': {
+    'Crater': {
         location: spawnLocations.SPAWN_CRATER_ENTRANCE,
         savedState: craterStartState,
-    },
-    'Crater Boss': {
-        location: spawnLocations.SPAWN_CRATER_BOSS,
-        savedState: craterBossState,
     },
     'Tower Lower': {
         location: spawnLocations.SPAWN_STAFF_LOWER_ENTRANCE,
@@ -287,25 +301,13 @@ export const lateSpawnLocations: SpawnLocationOptions = {
         location: spawnLocations.SPAWN_STAFF_UPPER_ENTRANCE,
         savedState: staffStartState,
     },
-    'Tower Boss': {
-        location: spawnLocations.SPAWN_STAFF_BOSS,
-        savedState: staffBossState,
-    },
     'Tower Aquired': {
         location: spawnLocations.SPAWN_STAFF_LOWER_ENTRANCE,
         savedState: staffAquiredState,
     },
-};
-
-
-export const finalSpawnLocations: SpawnLocationOptions = {
     'Rival 3': {
         location: spawnLocations.SPAWN_WAR_TEMPLE_ENTRANCE_SPIRIT,
         savedState: warshipStartState,
-    },
-    'Void Tree': {
-        location: spawnLocations.SPAWN_FINAL_BOSS_1,
-        savedState: finalBoss1State,
     },
 };
 
