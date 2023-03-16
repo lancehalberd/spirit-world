@@ -17,7 +17,7 @@ export const bossTypes = <const>[
     'rival',
     'golem',
     'stormIdol', 'flameIdol', 'frostIdol',
-    'guardian', 'guardianProjection',
+    'guardian',
     'crystalCollector',
     'balloonMegapede',
     'superSquirrel',
@@ -29,7 +29,9 @@ export const bossTypes = <const>[
 export type BossType = typeof bossTypes[number];
 
 const minionTypes = <const>[
-    'beetleBossWingedMinionDefinition', 'golemHand',
+    'beetleBossWingedMinionDefinition',
+    'golemHand',
+    'guardianProjection',
     'voidStone', 'voidFlame', 'voidFrost', 'voidStorm', 'voidHand',
 ];
 

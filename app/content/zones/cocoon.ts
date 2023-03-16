@@ -89,7 +89,7 @@ const f0_0x0: AreaDefinition = {
     ],
     objects: [
         {status: "hiddenEnemy", id: "", x: 144, y: 144, targetObjectId: "tombTeleporter", type: "teleporter"},
-        {status: "normal", id: "cocoonBoss", logicKey: "cocoonBossStarted", x: 380, y: 112, type: "boss", enemyType: "guardianProjection", lootType: "peachOfImmortality", lootLevel: 1, d: "down", params: {}},
+        {status: "normal", id: "cocoonBossProjection", logicKey: "cocoonBossStarted", x: 380, y: 112, type: "enemy", enemyType: "guardianProjection", d: "down", params: {}},
         {status: "normal", id: "", linked: true, x: 160, y: 160, type: "rollingBall", spirit: false},
         {status: "normal", id: "", x: 336, y: 160, type: "rollingBall", spirit: false},
         {status: "normal", id: "", x: 336, y: 336, type: "rollingBall", spirit: false},

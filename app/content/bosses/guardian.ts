@@ -72,7 +72,7 @@ const mediumBlastAbility: EnemyAbility<true> = {
             y: hitbox.y + hitbox.h / 2,
             damage: 1,
             element: enemy.params.element,
-            tellDuration: 1000,
+            tellDuration: 800,
             persistDuration: 2600,
             radius: 48,
             source: enemy,
@@ -94,7 +94,7 @@ enemyDefinitions.guardianProjection = {
     abilities: [blastAbility, mediumBlastAbility],
     acceleration: 0.3, speed: 1.5, isImmortal: true,
     // This should match the spirit energy fill color.
-    healthBarColor: '#6BD657',
+    healthBarColor: '#6BD657', showHealthBar: true,
     flying: true,
     params: {
     },
@@ -185,7 +185,7 @@ enemyDefinitions.guardian = {
 
 function getGuardian(projection: Enemy<ProjectionParams>): Enemy<GuardianParams> {
     return projection.area.alternateArea.enemies.find(o =>
-        o.definition.type === 'boss' && o.definition.enemyType === 'guardian' && o.definition.id === projection.definition.id
+        o.definition.type === 'boss' && o.definition.enemyType === 'guardian'
     );
 }
 
@@ -225,7 +225,6 @@ function switchToNextMode(state: GameState, enemy: Enemy<ProjectionParams>) {
         }
     }
     enemy.setMode(enemy.params.modeOrder.pop());
-    console.log('Attack mode:', enemy.mode);
 }
 
 function shootProjectile(state: GameState, enemy: Enemy<ProjectionParams>, theta: number) {
@@ -358,7 +357,7 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
         const v = getVectorToNearbyTarget(state, enemy, 2000, enemy.area.allyTargets);
         if (enemy.modeTime >= 3000) {
             enemy.setMode('choose');
-        } else if (v.target && enemy.modeTime % 600 === 0) {
+        } else if (v.target && enemy.modeTime > 0 && enemy.modeTime % 600 === 0) {
             enemy.life--;
             shootProjectile(state, enemy, Math.atan2(v.y, v.x));
         }
@@ -366,7 +365,7 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
         const v = getVectorToNearbyTarget(state, enemy, 2000, enemy.area.allyTargets);
         if (enemy.modeTime >= 3000) {
             enemy.setMode('choose');
-        } else if (enemy.modeTime % 800 === 0) {
+        } else if (enemy.modeTime > 0 && enemy.modeTime % 800 === 0) {
             enemy.life--;
             if (v) {
                 const count = 2 + enemy.modeTime / 800; // 3, 4, 5
@@ -410,9 +409,9 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
                 enemy.life--;
                 const spark = new Spark({
                     x, y,
-                    friction: 0.05,
-                    vx: (3 + enemy.modeTime / 1000) * dx,
-                    vy: (3 + enemy.modeTime / 1000) * dy,
+                    friction: 0.05 - 0.01 * enemy.modeTime / 1500,
+                    vx: 3 * dx,
+                    vy: 3 * dy,
                     damage: 1,
                     ttl: 8000,
                     hitCircle: {x: 0, y: 0, r: 24},
@@ -433,7 +432,7 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
                     // TODO: replace this with Ice Mines
                     throwIceGrenadeAtLocation(state, enemy, {
                         tx: tx + r * Math.cos(theta2 + i * 2 * Math.PI / 5),
-                        ty: ty + r * Math.cos(theta2 + i * 2 * Math.PI / 5),
+                        ty: ty + r * Math.sin(theta2 + i * 2 * Math.PI / 5),
                     });
                 }
             }
@@ -441,7 +440,7 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
                 enemy.setMode('choose');
             }
         } else if (enemy.params.element === 'fire') {
-            if (enemy.modeTime % 1000 === 0) {
+            if (enemy.modeTime % 1000 === 100) {
                 enemy.life--;
                 const mag = (v?.mag || 64) - 8 + Math.random() * 16;
                 const tx = x + mag * Math.cos(theta), ty = y + mag * Math.sin(theta);
@@ -457,7 +456,7 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
                 enemy.setMode('choose');
             }
         } else {
-            if (enemy.modeTime > 0 && enemy.modeTime % 500 === 0) {
+            if (enemy.modeTime > 0 && enemy.modeTime % 500 === 100) {
                 enemy.life -= 0.5;
                 const mag = (v?.mag || 64) - 8 + Math.random() * 16;
                 const tx = x + mag * Math.cos(theta), ty = y + mag * Math.sin(theta);
@@ -468,7 +467,7 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
                 });
                 addEffectToArea(state, enemy.area, thorns);
             }
-            if (enemy.modeTime >= 2900) {
+            if (enemy.modeTime >= 3000) {
                 enemy.setMode('choose');
             }
         }
@@ -508,7 +507,6 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
         }
         if (v && enemy.modeTime >= 1000) {
             if (v.mag >= 128) {
-                console.log('Teleporting');
                 enemy.setMode('teleport');
             } else {
                 switchToNextMode(state, enemy);
@@ -559,7 +557,7 @@ function updateGuardian(this: void, state: GameState, enemy: Enemy): void {
         enemy.useTaunt(state, 'intro');
     }
     const projection = enemy.area.alternateArea.enemies.find(o =>
-        o.definition.type === 'boss' && o.definition.enemyType === 'guardianProjection' && o.definition.id === enemy.definition.id
+        o.definition.type === 'enemy' && o.definition.enemyType === 'guardianProjection'
     );
     const heroProjection = state.hero.astralProjection;
     if (heroProjection?.area === enemy.area && heroProjection.overlaps(enemy.getHitbox())) {

@@ -151,7 +151,7 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
             context.fillRect(x, y, animatedWidth, barHeight);
             const healthWidth = animatedWidth * enemy.getHealthPercent(state) | 0;
             if (healthWidth > 0) {
-                context.fillStyle = 'orange';
+                context.fillStyle = enemy.healthBarColor ?? 'orange';
                 context.fillRect(x, y, healthWidth, barHeight);
             }
             const shieldWidth = animatedWidth * enemy.getShieldPercent(state) | 0;

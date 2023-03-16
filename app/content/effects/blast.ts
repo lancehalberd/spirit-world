@@ -31,7 +31,7 @@ export class Blast implements EffectInstance {
     damage: number = this.props.damage ?? 2;
     element: MagicElement = this.props.element ?? null;
     radius: number = this.props.radius ?? 32;
-    minRadius: number = this.props.radius ?? 4;
+    minRadius: number = this.props.minRadius ?? 4;
     source: Enemy = this.props.source;
     hitTargets: Set<EffectInstance | ObjectInstance> = new Set([this.source]);
     tellDuration: number = this.props.tellDuration ?? 1000;
@@ -52,8 +52,8 @@ export class Blast implements EffectInstance {
             this.x = enemyHitbox.x + enemyHitbox.w / 2;
             this.y = enemyHitbox.y + enemyHitbox.h / 2;
         }
-        if (this.animationTime >= this.tellDuration) {
-            const circle = this.getHitCircle();
+        const circle = this.getHitCircle();
+        if (circle) {
             const hitResult = hitTargets(state, this.area, {
                 damage: this.damage,
                 element: this.element,
@@ -87,7 +87,7 @@ export class Blast implements EffectInstance {
         }
     }
     getHitCircle(): Circle | null {
-        if (this.animationTime < this.tellDuration) {
+        if (this.animationTime <= this.tellDuration) {
             return null;
         }
         const time = this.animationTime - this.tellDuration;
@@ -95,14 +95,8 @@ export class Blast implements EffectInstance {
         return {x: this.x, y: this.y, r: this.minRadius + p * (this.radius - this.minRadius)};
     }
     render(context, state: GameState) {
-        if (this.animationTime < this.tellDuration) {
-            renderDamageWarning(context, {
-                circle: {x: this.x, y: this.y, r: this.radius},
-                duration: this.tellDuration,
-                time: this.animationTime,
-            });
-        } else {
-            const circle = this.getHitCircle();
+        const circle = this.getHitCircle();
+        if (circle) {
             context.save();
                 context.globalAlpha *= 0.2;
                 context.beginPath();
@@ -113,6 +107,12 @@ export class Blast implements EffectInstance {
             if (this.element === 'lightning') {
                 renderLightningCircle(context, circle, 4, Math.min(100, Math.max(40, circle.r | 0)));
             }
+        } else if (this.animationTime <= this.tellDuration) {
+            renderDamageWarning(context, {
+                circle: {x: this.x, y: this.y, r: this.radius},
+                duration: this.tellDuration,
+                time: this.animationTime,
+            });
         }
     }
 }

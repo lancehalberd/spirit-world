@@ -48,8 +48,6 @@ Current tasks:
         - 500 ms time to detonate after triggered
         - Use the ice element graphic for them
 
-    - Move astral projection healthbar up by making it a minion
-
     - Improve visuals for persistent blast attacks
 
     - Change revive cost to [1, 0.2 * jade, 50]

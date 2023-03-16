@@ -359,7 +359,9 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         }
         if (this.area !== state.areaInstance) {
             addEffectToArea(state, state.areaInstance, new AnimationEffect({
-                animation: this.isDefeated ? enemyDeathAnimation : this.currentAnimation || enemyDeathAnimation,
+                animation: (this.isDefeated && this.definition.type !== 'boss')
+                    ? enemyDeathAnimation
+                    : this.currentAnimation || enemyDeathAnimation,
                 x: this.x,
                 y: this.y,
                 scale: this.scale,
@@ -515,6 +517,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         ability.definition.prepareAbility?.(state, this, target);
         if ((ability.definition.prepTime || 0) <= 0) {
             ability.definition.useAbility?.(state, this, target);
+            this.activeAbility.used = true;
             if ((ability.definition.recoverTime || 0) <= 0) {
                 this.activeAbility = null;
                 this.changeToAnimation('idle');
