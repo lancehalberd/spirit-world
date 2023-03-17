@@ -48,9 +48,6 @@ Pending Graphics From Jon:
 
 
 Current tasks:
-
-    - Change revive cost to [1, 0.2 * jade, 50]
-
     - Tasks before next major release
         - Tomb
             Add Taunts to boss (maybe change these to sound like a machine)
