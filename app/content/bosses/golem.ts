@@ -185,6 +185,13 @@ enemyDefinitions.golem = {
     initialMode: 'warmup',
     immunities: ['fire', 'ice'],
     elementalMultipliers: {'lightning': 2},
+    taunts: {
+        intro: { text: `Intruders will be eliminated.`, priority: 2, limit: 1},
+        protect: { text: 'Protect the core', priority: 4, cooldown: 10000},
+        punch: { text: `My punch is like a cannon.`, priority: 1, cooldown: 20000},
+        flurry: { text: `Fall to my wrath!`, priority: 1, cooldown: 20000},
+        doubleLaser: { text: "There's no escape!", priority: 1, cooldown: 20000},
+    },
     renderOver(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
         if (enemy.mode === 'chargeLaser') {
             context.save();
@@ -451,6 +458,7 @@ function updateGolem(this: void, state: GameState, enemy: Enemy): void {
             enemy.animationTime = 0;
         }
         if (enemy.modeTime >= 2000) {
+            enemy.useTaunt(state, 'intro');
             enemy.setMode('choose');
         }
     } else if (enemy.mode === 'choose') {
@@ -463,6 +471,7 @@ function updateGolem(this: void, state: GameState, enemy: Enemy): void {
             enemy.setMode('prepareAttack');
         }
     } else if (enemy.mode === 'prepareStrafe') {
+        enemy.useTaunt(state, 'doubleLaser');
         const { section }  = getAreaSize(state);
         if (hitbox.x + hitbox.w / 2 <= section.x + section.w / 2) {
             if (moveEnemy(state, enemy, -enemy.speed, 0, {})) {
@@ -528,11 +537,15 @@ function updateGolem(this: void, state: GameState, enemy: Enemy): void {
                 enemy.setMode('choose');
             } else if (hands.length >= 2 && enemy.params.enrageLevel && Math.random() <= 0.75) {
                 enemy.setMode('slamHands');
+                enemy.useTaunt(state, 'flurry');
             } else {
                 enemy.setMode('chargeLaser');
             }
         }
     } else if (enemy.mode === 'chargeLaser') {
+        if (hands.length) {
+            enemy.useTaunt(state, 'protect');
+        }
         enemy.changeToAnimation(isAngry ? 'angryChargeMouth' : 'chargeMouth');
         if (enemy.modeTime >= LASER_CHARGE_TIME) {
             enemy.setMode('fireLaser');
@@ -749,6 +762,7 @@ function updateGolemHand(this: void, state: GameState, enemy: Enemy): void {
             } else if (otherHands.length && Math.random() < 0.5) {
                 enemy.setMode('hoverOverTarget');
             } else {
+                golem.useTaunt(state, 'punch');
                 enemy.setMode('followTarget');
             }
         }

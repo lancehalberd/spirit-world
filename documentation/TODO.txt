@@ -49,16 +49,6 @@ Pending Graphics From Jon:
 
 Current tasks:
     - Tasks before next major release
-        - Tomb
-            Add Taunts to boss (maybe change these to sound like a machine)
-                - On blocking attacks: "Attacks are useless against my stone skin."
-                - Charging laser: "Charging laser..."
-                - Preparing punch: "My punch is like a cannon."
-                - Targeted slam: "I will crush you!"
-                - Preparing flurry: "Fall to my wrath!"
-                - On rage: "That was a lucky shot!" / "Enough of this!"
-                - Preparing strafe laser: "There's no escape!" / "Just try and dodge this..."
-
         - Redesign Helix dungeon with updated graphics and mechanics
             - Add new floor in between current 2F and 3F for rival boss fight instead of lake tunnel?
 

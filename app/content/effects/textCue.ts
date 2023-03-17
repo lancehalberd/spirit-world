@@ -56,12 +56,25 @@ export class TextCue implements EffectInstance {
                 context.globalAlpha = Math.max(0, (this.duration - this.time) / fadeDuration);
             }
             let x = padding, y = CANVAS_HEIGHT - 36 - (this.textFrames.length - 1) * 16;
+            let maxWidth = 0;
             for (const frameRow of this.textFrames) {
                 let rowWidth = 0;
                 for (const frame of frameRow) {
                     rowWidth += frame?.w ?? characterWidth;
                 }
-                x = (CANVAS_WIDTH - rowWidth) / 2;
+                maxWidth = Math.max(maxWidth, rowWidth);
+            }
+            context.save();
+                context.fillStyle = 'black';
+                context.globalAlpha *= 0.4;
+                context.fillRect(((CANVAS_WIDTH - maxWidth) / 2) | 0, y - 2, maxWidth, this.textFrames.length * 16 + 4);
+            context.restore();
+            for (const frameRow of this.textFrames) {
+                let rowWidth = 0;
+                for (const frame of frameRow) {
+                    rowWidth += frame?.w ?? characterWidth;
+                }
+                x = ((CANVAS_WIDTH - rowWidth) / 2) | 0;
                 for (const frame of frameRow) {
                     if (!frame) {
                         x += characterWidth;
