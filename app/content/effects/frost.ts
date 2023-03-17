@@ -1,5 +1,6 @@
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { createAnimation, drawFrameCenteredAt } from 'app/utils/animations';
 import { removeEffectFromArea } from 'app/utils/effects';
 import { hitTargets } from 'app/utils/field';
 
@@ -7,6 +8,9 @@ import {
     AreaInstance, DrawPriority, EffectInstance,
     Frame, GameState, ObjectInstance,
 } from 'app/types';
+
+
+const [iceElement] = createAnimation('gfx/hud/elementhud.png', {w: 20, h: 20}, {x: 2}).frames;
 
 interface Props {
     x: number
@@ -100,5 +104,6 @@ export class Frost implements EffectInstance, Props {
             );
             context.fill();
         context.restore();
+        drawFrameCenteredAt(context, iceElement, {x: this.x + this.w / 2, y: this.y + this.h / 2 - this.z, w: 0, h: 0});
     }
 }

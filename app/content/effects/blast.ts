@@ -8,7 +8,7 @@ import Random from 'app/utils/Random';
 
 import { AreaInstance, Circle, EffectInstance, Enemy, GameState, MagicElement, ObjectInstance } from 'app/types';
 
-interface Props {
+export interface BlastProps {
     x: number
     y: number,
     damage?: number
@@ -37,7 +37,7 @@ export class Blast implements EffectInstance {
     tellDuration: number = this.props.tellDuration ?? 1000;
     expansionDuration: number = this.props.expansionDuration ?? 140;
     persistDuration: number = this.props.persistDuration ?? 60;
-    constructor(public props: Props) {}
+    constructor(public props: BlastProps) {}
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;
         // If this effect has an enemy as a source, remove it if the source disappears during the tell duration.
@@ -87,7 +87,7 @@ export class Blast implements EffectInstance {
         }
     }
     getHitCircle(): Circle | null {
-        if (this.animationTime <= this.tellDuration) {
+        if (this.animationTime < this.tellDuration) {
             return null;
         }
         const time = this.animationTime - this.tellDuration;

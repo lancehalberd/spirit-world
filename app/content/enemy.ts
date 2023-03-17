@@ -366,7 +366,8 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
                 y: this.y,
                 scale: this.scale,
                 alpha: 0.3,
-                ttl: 200,
+                // Extend the TTL if we are showing the boss explosion animation.
+                ttl: (this.isDefeated && this.definition.type === 'boss') ? 2500 : 200,
             }));
         }
         return true;
@@ -650,8 +651,10 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
                     x: hitbox.x + Math.random() * hitbox.w - animation.frames[0].w / 2,
                     y: hitbox.y + Math.random() * hitbox.h - animation.frames[0].h / 2,
                 });
-                addEffectToArea(state, this.area, explosionAnimation);
-                playAreaSound(state, this.area, 'enemyDeath');
+                // Always show the explosion in the player's instance so that the animation
+                // is always visible.
+                addEffectToArea(state, state.areaInstance, explosionAnimation);
+                playAreaSound(state, state.areaInstance, 'enemyDeath');
             }
             if (this.animationTime >= 2800) {
                 this.status = 'gone';

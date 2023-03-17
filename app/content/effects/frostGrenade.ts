@@ -1,9 +1,13 @@
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { Blast } from 'app/content/effects/blast';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { createAnimation, drawFrameCenteredAt } from 'app/utils/animations';
 import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 
 import { AreaInstance, EffectInstance, Enemy, Frame, GameState } from 'app/types';
+
+
+const [iceElement] = createAnimation('gfx/hud/elementhud.png', {w: 20, h: 20}, {x: 2}).frames;
 
 interface Props {
     x: number,
@@ -80,10 +84,19 @@ export class FrostGrenade implements EffectInstance, Props {
             context.arc(this.x, this.y - this.z, r, 0, 2 * Math.PI);
             context.fill();
         context.restore();
-        context.beginPath();
-        r = this.w / 4 + Math.sin(this.animationTime / 60) * this.w / 8;
-        context.arc(this.x, this.y - this.z, r, 0, 2 * Math.PI);
-        context.fill();
+        drawFrameCenteredAt(context, iceElement, {x: this.x, y: this.y - this.z, w: 0, h: 0});
+    }
+    renderShadow(context: CanvasRenderingContext2D) {
+        const shadowRadius = Math.max(3, 6 - this.z / 2);
+        context.save();
+            context.globalAlpha = 0.3;
+            context.fillStyle = 'white';
+            context.translate(this.x, this.y);
+            context.scale(this.w / 12, this.h / 18);
+            context.beginPath();
+            context.arc(0, 0, shadowRadius, 0, 2 * Math.PI);
+            context.fill();
+        context.restore();
     }
 }
 

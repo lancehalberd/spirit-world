@@ -38,23 +38,20 @@ Graphics:
     Add damage effects for hitting enemies?
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
-Current tasks:
-    - Replace frost grenades with ice mines.
-        - Copy FrostGrenade code.
-        - Thrown like frost grenades.
-        - Arm 500ms on the ground.
-        - render damage warning ring around them even before triggered
-        - trigger+blast radius are the same (24px default)
-        - 500 ms time to detonate after triggered
-        - Use the ice element graphic for them
+Pending Graphics From Jon:
+    Cloud poof animation
+    Guardian Projection Boss animations
+    Golem graphic updates
+    Spinning turret enemy graphics
+    Storm Beast Statue animations
 
-    - Improve visuals for persistent blast attacks
+
+
+Current tasks:
 
     - Change revive cost to [1, 0.2 * jade, 50]
 
     - Tasks before next major release
-        - Hint signs:
-            "Want a hint?" or "20 Jade for a hint?"
         - Tomb
             Add Taunts to boss (maybe change these to sound like a machine)
                 - On blocking attacks: "Attacks are useless against my stone skin."
@@ -89,6 +86,9 @@ Current tasks:
         - When hero/clone is falling, draw it behind all other sprites (on top of the background).
             - Try using getDrawPriority to apply this to clone, we may need a new priority 'afterBackground' to force it to draw on top of all background elements (for example, it should be drawn on top of pit entrance objects).
             - The hero itself will probably need special handling to render it immediately after the background in renderField since it always has special handling.
+
+        - Hint signs:
+            "Want a hint?" or "20 Jade for a hint?"
 
     - Replace inventory tab with editor UI that uses the main inventory screen
         - Missing items are drawn faded when editing is on.
@@ -194,6 +194,10 @@ Current tasks:
         - Lava appears under floor 2 in the middle of void tree fight
         - Certain tiles can be frozen in lava on voidFlame
         - Sometimes the vanara forest theme continues to play after leaving the area.
+
+
+    Cocoon Boss
+        - Improve visuals for persistent blast attacks
 
     - Increase world map super tile size to at least 48x48 bu try 64x64
         - Change crater to single 64x64 tile if it is supported

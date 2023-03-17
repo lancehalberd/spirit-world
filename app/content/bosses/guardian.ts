@@ -4,7 +4,7 @@ import { CrystalSpike } from 'app/content/effects/arrow';
 import { Blast } from 'app/content/effects/blast';
 import { Flame } from 'app/content/effects/flame';
 import { Frost } from 'app/content/effects/frost';
-import { throwIceGrenadeAtLocation } from 'app/content/effects/frostGrenade';
+import { throwMineAtLocation } from 'app/content/effects/landMine';
 import { GrowingThorn } from 'app/content/effects/growingThorn';
 import { Spark } from 'app/content/effects/spark';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
@@ -88,8 +88,33 @@ const mediumBlastAbility: EnemyAbility<true> = {
     recoverTime: 3000,
 };
 
+function checkToGiveHint(state: GameState, guardian: Enemy<GuardianParams>) {
+    // Increased the time since last hit by 0.5s every time we check. This will cause the hints
+    // to be given slightly faster the more often the player hits the projection, which may
+    // indicate that they haven't figured out how to complete the battle yet.
+    guardian.params.lastDamaged -= 500;
+    const timeSinceDamaged = state.fieldTime - guardian.params.lastDamaged;
+    if (timeSinceDamaged >= 105000) {
+        guardian.useTaunt(state, 'hint6');
+        // Reset the time since last damaged at the final hint so that the earlier
+        // hints will repeat in case the player missed some of them.
+        guardian.params.lastDamaged = state.fieldTime - 15000;
+    } else if (timeSinceDamaged >= 90000) {
+        guardian.useTaunt(state, 'hint5');
+    } else if (timeSinceDamaged >= 75000) {
+        guardian.useTaunt(state, 'hint4');
+    } else if (timeSinceDamaged >= 60000) {
+        guardian.useTaunt(state, 'hint3');
+    } else if (timeSinceDamaged >= 45000) {
+        guardian.useTaunt(state, 'hint2');
+    } else if (timeSinceDamaged >= 30000) {
+        guardian.useTaunt(state, 'hint1');
+    }
+}
+
 enemyDefinitions.guardianProjection = {
     animations: heroSpiritAnimations, life: 20, scale: 1, update: updateProjection,
+    canBeKnockedBack: false,
     aggroRadius: 2000,
     abilities: [blastAbility, mediumBlastAbility],
     acceleration: 0.3, speed: 1.5, isImmortal: true,
@@ -102,18 +127,10 @@ enemyDefinitions.guardianProjection = {
         if (enemy.mode === 'teleport') {
             return {};
         }
-        const guardian = getGuardian(enemy);
-        const timeSinceDamaged = state.fieldTime - guardian.params.lastDamaged;
-        if (timeSinceDamaged >= 75000) {
-            guardian.useTaunt(state, 'hint4');
-        } else if (timeSinceDamaged >= 60000) {
-            guardian.useTaunt(state, 'hint3');
-        } else if (timeSinceDamaged >= 45000) {
-            guardian.useTaunt(state, 'hint2');
-        } else if (timeSinceDamaged >= 30000) {
-            guardian.useTaunt(state, 'hint1');
-        }
         const result = enemy.defaultOnHit(state, hit);
+        if (result.hit) {
+            checkToGiveHint(state, getGuardian(enemy));
+        }
         // The projection should not actually stop any attacks, which can be annoying
         // when trying to hit the rolling rocks.
         return {
@@ -130,8 +147,7 @@ enemyDefinitions.guardianProjection = {
                 } else if (enemy.modeTime >= 1400) {
                     alpha *= Math.min(1, (enemy.modeTime - 1400) / 600);
                 } else {
-                    // Projection is completely invisible, so don't render anything in this case.
-                    return;
+                    alpha = 0;
                 }
             }
             context.globalAlpha *= alpha;
@@ -167,10 +183,14 @@ enemyDefinitions.guardian = {
         hint1: { text: `Attacking my projection will only slow me down.`, priority: 4, cooldown: 20000},
         // Triggered when damaging the projection with no damage to guardian in 45s.
         hint2: { text: `My real body is beyond the reach of your weapons.`, priority: 4, cooldown: 20000},
-        // Triggered when damaging the projection with no damage to guardian in 60s.
-        hint3: { text: `Everything is there for a reason.`, priority: 4, cooldown: 20000},
-        // Triggered when damaging the projection with no damage to guardian in 75s.
-        hint4: { text: `The boulders are important.`, priority: 4, cooldown: 20000},
+        // Triggered when no damage to guardian in 60s.
+        hint3: { text: `Remember to use your Spirit Sight.`, priority: 4, cooldown: 20000},
+        // Triggered when no damage to guardian in 75s.
+        hint4: { text: `Everything is there for a reason.`, priority: 4, cooldown: 20000},
+        // Triggered when no damage to guardian in 90s.
+        hint5: { text: `You need to use the boulders.`, priority: 4, cooldown: 20000},
+        // Triggered when no damage to guardian in 105s.
+        hint6: { text: `I cannot attack while my projection regenerates.`, priority: 4, cooldown: 20000},
         // Triggered when taking hit damage from the boss as the astral projection
         astralBody: { text: `Your Astral Body is too weak to harm me.`, priority: 3, cooldown: 15000, limit: 3},
         // Triggered when switching to lightning element for the first time.
@@ -191,6 +211,7 @@ function getGuardian(projection: Enemy<ProjectionParams>): Enemy<GuardianParams>
 
 
 const elements: MagicElement[] = [null, 'lightning', 'ice', 'fire'];
+//const elements: MagicElement[] = ['ice', 'ice', 'ice', 'ice'];
 function switchElements(state: GameState, enemy: Enemy<ProjectionParams>) {
     const guardian = getGuardian(enemy);
     if (!guardian) {
@@ -311,6 +332,7 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
         enemy.life = Math.max(enemy.life, 0);
         if (enemy.mode !== 'regenerate') {
             enemy.setMode('regenerate');
+            checkToGiveHint(state, guardian);
             cancelBlastAttacks(state, enemy);
             const timeSinceDamaged = state.fieldTime - guardian.params.lastDamaged;
             if (timeSinceDamaged >= 20000) {
@@ -429,10 +451,16 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
                 const theta2 = Math.random() * 2 * Math.PI;
                 for (let i = 0; i < 5; i++) {
                     const r = 24 + Math.random() * 32;
-                    // TODO: replace this with Ice Mines
-                    throwIceGrenadeAtLocation(state, enemy, {
+                    throwMineAtLocation(state, enemy, {
                         tx: tx + r * Math.cos(theta2 + i * 2 * Math.PI / 5),
                         ty: ty + r * Math.sin(theta2 + i * 2 * Math.PI / 5),
+                    }, {
+                        blastProps: {
+                            radius: 24,
+                            damage: 1,
+                            element: 'ice',
+                            tellDuration: 500,
+                        },
                     });
                 }
             }

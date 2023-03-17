@@ -11,6 +11,7 @@ import {
 } from 'app/utils/enemies';
 import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import { addScreenShake, isTargetHit } from 'app/utils/field';
+import { pad } from 'app/utils/index';
 import { getAreaSize } from 'app/utils/getAreaSize';
 import { addObjectToArea } from 'app/utils/objects';
 import { getNearbyTarget} from 'app/utils/target';
@@ -220,9 +221,9 @@ enemyDefinitions.golem = {
         }
         const hitbox = enemy.getHitbox(state);
         const innerHitbox = {
-            x: hitbox.x + hitbox.w / 2 - 6,
+            x: hitbox.x + hitbox.w / 2 - 8,
             y: hitbox.y + hitbox.h - 20,
-            w: 12,
+            w: 16,
             h: 20,
         };
         // If they miss the vulnerable section, the attack is blocked.
@@ -277,7 +278,7 @@ enemyDefinitions.golemHand = {
             if (enemy.d === 'right') {
                 jewelHitbox.x = hitbox.x + (32 - jewelX - jewelHitbox.w);
             }
-            hitJewel = isTargetHit(jewelHitbox, hit);
+            hitJewel = isTargetHit(pad(jewelHitbox, 2), hit);
         } else if (enemy.currentAnimationKey === 'returning') {
             // The hand cannot be hit during the returning animation.
             const jewelX = 14;
@@ -290,7 +291,7 @@ enemyDefinitions.golemHand = {
             if (enemy.d === 'right') {
                 jewelHitbox.x = hitbox.x + (32 - jewelX - jewelHitbox.w);
             }
-            hitJewel = isTargetHit(jewelHitbox, hit);
+            hitJewel = isTargetHit(pad(jewelHitbox, 2), hit);
         } else if (enemy.currentAnimationKey === 'punching') {
             const fistX = 1;
             const fistHitbox = {
