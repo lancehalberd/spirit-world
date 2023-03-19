@@ -48,12 +48,19 @@ Pending Graphics From Jon:
 
 
 Current tasks:
+    - Brainstorm how the beasts get released
+        - Maybe destroying the idols causes them to wake up and flee the War Temple
+        - War God convinces Rival to summon the beasts to the material world to distract the Spirit Gods from his plan
+        - While they are "missing" they are actually being given their Vanaran Hearts
+
     - Tasks before next major release
+        - Add a mission to talk to the Spirit King after the beasts escape before starting forest temple
+            - Add tile changes for the front gate of the grand temple being destroyed.
+            - Eventually might want additional triggers for each dungeon mission.
+                - There could be multiple triggers for certain dungeons.
+
         - Redesign Helix dungeon with updated graphics and mechanics
             - Add new floor in between current 2F and 3F for rival boss fight instead of lake tunnel?
-
-        - Add a mission to talk to the Spirit King after the beasts escape before starting forest temple
-            - Eventually might want additional triggers for each dungeon mission.
 
         - Add save statues
             - Sky Palace
@@ -73,6 +80,8 @@ Current tasks:
         - When hero/clone is falling, draw it behind all other sprites (on top of the background).
             - Try using getDrawPriority to apply this to clone, we may need a new priority 'afterBackground' to force it to draw on top of all background elements (for example, it should be drawn on top of pit entrance objects).
             - The hero itself will probably need special handling to render it immediately after the background in renderField since it always has special handling.
+
+        - Fix old cave tiles in peach cave 2F.
 
         - Hint signs:
             "Want a hint?" or "20 Jade for a hint?"
@@ -331,14 +340,17 @@ Current tasks:
     - Flying enemies should not move over abyss tiles(make abyss tiles + ceiling tiles impassable to flying enemies).
 
     Peach Cave improvements
-        - Add new graphics to 2F
         - Fix spirit world tiles
+        - Add Spirit World Checks
+            - Add a 2 way portal to boss chamber
+            - Add a single cracked entrance to the top from the overworld.
+                - This is to allow easy discover from the spirit world but prevent using this cave for spirit world access early.
             - Add 4 easy checks to top floor and bombable pit entrance to basement
-            - Require Mitts for entering from the bottom floor.
-            - Add harder beetle boss with a Peach piece on it
+                - Add cracked status to pit entrances.
+            - Require Mitts for entering/exiting from the basement.
             - Add 3 checks behind different tool combinations
-                - cracked ground for cloud boots/ice magic
-                - staff or teleportation to get across pits
+                - cracked ground for cloud boots/ice magic/invisibility
+                - staff or teleportation to get across L shaped pits
                 - bow+torches or fire element to unfreeze a chest
 
     - Add behavior that prevents non-flying enemies from crossing tiles/objects, use for cracked ground, escalators, bead cascades, etc.
