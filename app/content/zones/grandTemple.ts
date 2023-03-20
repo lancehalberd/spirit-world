@@ -2720,6 +2720,7 @@ const sf0_1x0: AreaDefinition = {
         {status: "normal", id: "", x: 0, y: 96, type: "door", style: "wooden", targetObjectId: "fireSanctumKey", d: "left"},
         {status: "normal", id: "", x: 496, y: 96, type: "door", style: "wooden", targetObjectId: "fireSanctumKey", d: "right"},
         {status: "normal", id: "holySanctumEntrance", x: 240, y: 32, type: "door", style: "wooden", targetZone: "holySanctum", targetObjectId: "holySanctumEntrance", d: "up", locationCue: "Jade Palace"},
+        {status: "normal", id: "spiritKing", x: 232, y: 224, d: "down", behavior: "idle", style: "giantSnake", type: "npc", dialogueKey: "spiritKing"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 106, mapId: 'overworld', entranceId: 'jadePalaceEntrance', mapX: 2, mapY: 0},

@@ -150,6 +150,17 @@ export const SPAWN_HELIX_ENTRANCE: ZoneLocation = {
     isSpiritWorld: false,
 };
 
+export const SPAWN_GRAND_TEMPLE_ENTRANCE: ZoneLocation = {
+    zoneKey: 'grandTemple',
+    floor: 0,
+    x: 244,
+    y: 470,
+    z: 0,
+    d: 'up',
+    areaGridCoords: {x: 1, y: 2},
+    isSpiritWorld: false,
+};
+
 
 export const SPAWN_FOREST_ENTRANCE: ZoneLocation = {
     zoneKey: 'overworld',

@@ -54,14 +54,6 @@ Current tasks:
         - While they are "missing" they are actually being given their Vanaran Hearts
 
     - Tasks before next major release
-        - Add a mission to talk to the Spirit King after the beasts escape before starting forest temple
-            - Add tile changes for the front gate of the grand temple being destroyed.
-            - Eventually might want additional triggers for each dungeon mission.
-                - There could be multiple triggers for certain dungeons.
-
-        - Redesign Helix dungeon with updated graphics and mechanics
-            - Add new floor in between current 2F and 3F for rival boss fight instead of lake tunnel?
-
         - Add save statues
             - Sky Palace
             - Gauntlet

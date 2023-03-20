@@ -268,28 +268,54 @@ const missions: Mission[] = [
             return !!state.hero.passiveTools.teleportation;
         },
         isResolved(state: GameState) {
-            return !!state.savedState.objectFlags.elementalBeastsEscaped;
+            return !!state.savedState.objectFlags.vanaraCommanderBeasts;
         },
     },
     {
-        getMarkerLocation: getGrandTempleLocation,
+        getMarkerLocation(state: GameState) {
+            if (state.location.isSpiritWorld) {
+                return getJadePalaceLocation(state);
+            } else {
+                return getGrandTempleLocation(state);
+            }
+        },
         getScript(state: GameState) {
-            return `There is a portal to the spirit world in the middle of the Grand Temple, north of the Holy City.`;
+            if (state.location.isSpiritWorld) {
+                if (state.location.zoneKey === 'grandTemple') {
+                    return `The Spirit King should be in the throne room at the north end of the palace.`;
+                } else {
+                    return `I should head to the Jade Palace and talk to the Spirit King.`;
+                }
+            } else {
+                return `There is a portal to the spirit world in the middle of the Grand Temple, north of the Holy City.
+                    {|}If I travel through the portal I should be able to speak to the Spirit King on the other side.`;
+            }
         },
         isAvailable(state: GameState) {
-            return !!state.savedState.objectFlags.elementalBeastsEscaped && !state.location.isSpiritWorld;
+            return !!state.savedState.objectFlags.vanaraCommanderBeasts && !state.savedState.objectFlags.spiritKingForestTemple;
         },
         isResolved(state: GameState) {
-            return !!state.hero.activeTools.clone && !!state.hero.equipment.cloudBoots;
+            return !!state.savedState.objectFlags.spiritKingForestTemple;
         },
     },
     {
-        getMarkerLocation: getForestTempleLocation,
+        getMarkerLocation(state: GameState) {
+            if (state.location.isSpiritWorld) {
+                return getForestTempleLocation(state);
+            } else {
+                return getGrandTempleLocation(state);
+            }
+        },
         getScript(state: GameState) {
-            return `There must be something in the strange forest to the southwest.`;
+            if (state.location.isSpiritWorld) {
+                return `The Spirit King said I would find something useful in the Fertility Temple.
+                    {|}It is in the strange forest to the Southwest.`;
+            } else {
+                return `There is a portal to the spirit world in the middle of the Grand Temple, north of the Holy City.`;
+            }
         },
         isAvailable(state: GameState) {
-            return !!state.savedState.objectFlags.elementalBeastsEscaped && state.location.isSpiritWorld;
+            return !!state.savedState.objectFlags.spiritKingForestTemple;
         },
         isResolved(state: GameState) {
             return !!state.hero.activeTools.clone && !!state.hero.equipment.cloudBoots;

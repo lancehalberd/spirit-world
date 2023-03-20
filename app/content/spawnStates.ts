@@ -97,8 +97,10 @@ cocoonBossState.savedHeroData.rightTool = 'cloak';
 const helixStartState = applyItems(cocoonBossState, {maxLife: 1, teleportation: 1},
     ['cocoonTeleporter', 'lakeTunneBoss']);
 const helixEndState = applyItems(helixStartState, {staff: 1, normalDamage: 1, weapon: 2},
-    ['elementalBeastsEscaped']);
-const forestBackState = applyItems(helixEndState, {cloudBoots: 1, 'forestTemple:bigKey': 1});
+    ['elementalBeastsEscaped', 'vanaraCommanderBeasts']);
+const forestStartState = applyItems(helixEndState, {}, ['spiritKingForestTemple']);
+const forestBackState = applyItems(forestStartState, {cloudBoots: 1, 'forestTemple:bigKey': 1},
+    ['spiritKingForestTemple']);
 const waterfallBossState = applyItems(helixEndState, {ironBoots: 1});
 
 const gauntletStartState = applyItems(helixEndState, {
@@ -258,9 +260,13 @@ export const earlyDungeonSpawnLocations: SpawnLocationOptions = {
 };
 
 export const middleDungeonSpawnLocations: SpawnLocationOptions = {
+    'Grand Temple': {
+        location: spawnLocations.SPAWN_GRAND_TEMPLE_ENTRANCE,
+        savedState: helixEndState,
+    },
     'Forest': {
         location: spawnLocations.SPAWN_FOREST_ENTRANCE,
-        savedState: helixEndState,
+        savedState: forestStartState,
     },
     'Gauntlet': {
         location: spawnLocations.SPAWN_GAUNTLET_ENTRANCE,
