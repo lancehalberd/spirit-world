@@ -1,4 +1,5 @@
 import { destroyTile } from 'app/utils/destroyTile';
+import { directionMap } from 'app/utils/direction';
 import { boxesIntersect } from 'app/utils/index';
 
 import { GameState, Hero } from 'app/types';
@@ -176,9 +177,32 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
                 hero.throwHeldObject(state);
                 hero.heldChakram?.throw(state);
                 hero.action = 'falling';
-                hero.isOverClouds = !!behaviors?.cloudGround && !behaviors.diagonalLedge;
+                //hero.isOverClouds = !!behaviors?.cloudGround && !behaviors.diagonalLedge;
                 hero.x = Math.round(hero.x / tileSize) * tileSize;
                 hero.y = Math.round(hero.y / tileSize) * tileSize;
+                if (behaviors?.cloudGround) {
+                    hero.y -= 4;
+                    // This will play the cloud poof animation over the hero as they fall.
+                    hero.isOverClouds = true;
+                    if (behaviors?.diagonalLedge) {
+                        hero.x -= directionMap[behaviors?.diagonalLedge][0] * 12;
+                        hero.y -= directionMap[behaviors?.diagonalLedge][1] * 12;
+                    }
+                    if (behaviors?.ledges?.up) {
+                        hero.y += 8;
+                    }
+                    if (behaviors?.ledges?.down) {
+                        hero.y -= 8;
+                    }
+                    if (behaviors?.ledges?.left) {
+                        hero.x += 8;
+                    }
+                    if (behaviors?.ledges?.right) {
+                        hero.x -= 8;
+                    }
+                } else {
+                    hero.isOverClouds = false;
+                }
                 hero.animationTime = 0;
             }
         }

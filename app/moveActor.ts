@@ -1,6 +1,6 @@
 import { getJumpVector } from 'app/movement/getJumpVector';
 import { moveDown, moveLeft, moveRight, moveUp } from 'app/movement/move';
-import { directionMap, getDirection } from 'app/utils/field';
+import { directionMap, getDirection } from 'app/utils/direction';
 import { getAreaSize } from 'app/utils/getAreaSize';
 import { pad } from 'app/utils/index';
 
