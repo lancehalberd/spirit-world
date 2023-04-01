@@ -29,22 +29,22 @@ const SLAM_HANDS_PAUSE_DURATION = 3000;
 
 
 const golemHeadGeometry: FrameDimensions = { w: 64, h: 64 };
-const golemHeadAsleepAnimation: FrameAnimation = createAnimation('gfx/enemies/boss_golem_body.png', golemHeadGeometry);
-const golemHeadWarmupAnimation: FrameAnimation = createAnimation('gfx/enemies/boss_golem_body.png', golemHeadGeometry, { y: 0, cols: 5}, {loop: false});
-const golemHeadIdleAnimation: FrameAnimation = createAnimation('gfx/enemies/boss_golem_body.png', golemHeadGeometry, { y: 1 });
+const golemHeadAsleepAnimation: FrameAnimation = createAnimation('gfx/enemies/boss_golem_bodynew.png', golemHeadGeometry);
+const golemHeadWarmupAnimation: FrameAnimation = createAnimation('gfx/enemies/boss_golem_bodynew.png', golemHeadGeometry, { y: 0, cols: 5}, {loop: false});
+const golemHeadIdleAnimation: FrameAnimation = createAnimation('gfx/enemies/boss_golem_bodynew.png', golemHeadGeometry, { y: 1 });
 // Used for warming up+cooling down from eye lasers
-const golemHeadChargeEyesAnimation: FrameAnimation = createAnimation('gfx/enemies/boss_golem_body.png', golemHeadGeometry, { y: 1, x: 1, cols: 2});
-const golemHeadShootEyesAnimation: FrameAnimation = createAnimation('gfx/enemies/boss_golem_body.png', golemHeadGeometry, { y: 1, x: 3, cols: 2});
-const golemHeadChargeMouthAnimation: FrameAnimation = createAnimation('gfx/enemies/boss_golem_body.png', golemHeadGeometry, { y: 2, x: 1, cols: 2});
-const golemHeadShootMouthAnimation: FrameAnimation = createAnimation('gfx/enemies/boss_golem_body.png', golemHeadGeometry, { y: 2, x: 3, cols: 2});
+const golemHeadChargeEyesAnimation: FrameAnimation = createAnimation('gfx/enemies/boss_golem_bodynew.png', golemHeadGeometry, { y: 1, x: 1, cols: 2});
+const golemHeadShootEyesAnimation: FrameAnimation = createAnimation('gfx/enemies/boss_golem_bodynew.png', golemHeadGeometry, { y: 1, x: 3, cols: 2});
+const golemHeadChargeMouthAnimation: FrameAnimation = createAnimation('gfx/enemies/boss_golem_bodynew.png', golemHeadGeometry, { y: 2, x: 1, cols: 2});
+const golemHeadShootMouthAnimation: FrameAnimation = createAnimation('gfx/enemies/boss_golem_bodynew.png', golemHeadGeometry, { y: 2, x: 3, cols: 2});
 
-const golemHeadAngryIdleAnimation: FrameAnimation = createAnimation('gfx/enemies/boss_golem_body.png', golemHeadGeometry, { y: 3 });
-const golemHeadAngryChargeEyesAnimation: FrameAnimation = createAnimation('gfx/enemies/boss_golem_body.png', golemHeadGeometry, { y: 3, x: 1, cols: 2});
-const golemHeadAngryShootEyesAnimation: FrameAnimation = createAnimation('gfx/enemies/boss_golem_body.png', golemHeadGeometry, { y: 3, x: 3, cols: 2});
-const golemHeadAngryChargeMouthAnimation: FrameAnimation = createAnimation('gfx/enemies/boss_golem_body.png', golemHeadGeometry, { y: 4, x: 1, cols: 2});
-const golemHeadAngryShootMouthAnimation: FrameAnimation = createAnimation('gfx/enemies/boss_golem_body.png', golemHeadGeometry, { y: 4, x: 3, cols: 2});
+const golemHeadAngryIdleAnimation: FrameAnimation = createAnimation('gfx/enemies/boss_golem_bodynew.png', golemHeadGeometry, { y: 3 });
+const golemHeadAngryChargeEyesAnimation: FrameAnimation = createAnimation('gfx/enemies/boss_golem_bodynew.png', golemHeadGeometry, { y: 3, x: 1, cols: 2});
+const golemHeadAngryShootEyesAnimation: FrameAnimation = createAnimation('gfx/enemies/boss_golem_bodynew.png', golemHeadGeometry, { y: 3, x: 3, cols: 2});
+const golemHeadAngryChargeMouthAnimation: FrameAnimation = createAnimation('gfx/enemies/boss_golem_bodynew.png', golemHeadGeometry, { y: 4, x: 1, cols: 2});
+const golemHeadAngryShootMouthAnimation: FrameAnimation = createAnimation('gfx/enemies/boss_golem_bodynew.png', golemHeadGeometry, { y: 4, x: 3, cols: 2});
 
-const golemHeadDeathAnimation: FrameAnimation = createAnimation('gfx/enemies/boss_golem_body.png', golemHeadGeometry, { y: 5 });
+const golemHeadDeathAnimation: FrameAnimation = createAnimation('gfx/enemies/boss_golem_bodynew.png', golemHeadGeometry, { y: 5 });
 
 const golemHeadAnimations: ActorAnimations = {
     asleep: {
