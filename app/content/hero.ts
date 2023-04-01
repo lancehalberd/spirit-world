@@ -3,12 +3,14 @@ import { BarrierBurstEffect } from 'app/content/effects/barrierBurstEffect';
 import { Staff } from 'app/content/objects/staff';
 import { getChargedArrowAnimation } from 'app/content/effects/arrow';
 import { ThrownObject } from 'app/content/effects/thrownObject';
+import { FRAME_LENGTH } from 'app/gameConstants';
 import {
     arrowAnimations, bowAnimations, cloakAnimations,
     chargeBackAnimation, chargeFrontAnimation,
     chargeFireBackAnimation, chargeFireFrontAnimation,
     chargeIceBackAnimation, chargeIceFrontAnimation,
     chargeLightningBackAnimation, chargeLightningFrontAnimation,
+    cloudPoofAnimation,
     goldBowAnimations,
     heroAnimations,
     staffAnimations,
@@ -102,6 +104,7 @@ export class Hero implements Actor, SavedHeroData {
     isControlledByObject?: boolean;
     isTouchingPit?: boolean;
     isOverPit?: boolean;
+    isOverClouds?: boolean;
     canFloat?: boolean;
     // stats
     magic: number = 0;
@@ -579,7 +582,16 @@ export class Hero implements Actor, SavedHeroData {
         const hero = this;
         // 'sinkingInLava' action is currently unused, lava ground just does a lot of damage instead.
         if (hero.action === 'falling' || hero.action === 'sinkingInLava') {
-            this.renderHeroFrame(context, state);
+
+            if (hero.isOverClouds) {
+                if (hero.animationTime < FRAME_LENGTH * cloudPoofAnimation.frameDuration) {
+                    this.renderHeroFrame(context, state);
+                }
+                const frame = getFrame(cloudPoofAnimation, hero.animationTime);
+                drawFrameAt(context, frame, { x: this.x, y: this.y - this.z });
+            } else {
+                this.renderHeroFrame(context, state);
+            }
             return;
         }
         if (hero.action === 'fallen' || hero.action === 'sankInLava') {

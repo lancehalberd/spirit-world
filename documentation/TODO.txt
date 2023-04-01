@@ -42,28 +42,70 @@ Pending Graphics From Jon:
     Cloud poof animation
     Guardian Projection Boss animations
     Golem graphic updates
+         Remove jewel from top of head
+         Make jewel in mouth more obvious
     Spinning turret enemy graphics
     Storm Beast Statue animations
 
 
 
 Current tasks:
+    - Fix ledge graphics in tomb
+        - War Temple
+
+    - Make sure door open/close sound effects are playing
+        - Check tomb crystal switch doors specifically.
+
+    - Change tomb boss slam patterns not to fire in cardinal directions. Use upside down V and an X.
+
+    - Add quest marker to mom? This would require adding a map for waterfall cave.
+
+    - Simplify language?
+        - Obtained -> Got
+        - Material World -> Physical World
+        - Gaze -> Look
+
+    - Make it easier to find the gloves
+        - Add a quest state that highlights the entrance with the gloves.
+        - Move the map to the main chamber as a new check with a simple puzzle to obtain it
+            - Include the big chest room on the map, draw chests and big chests to the map
+
+    - Block exit door in pit room in War Temple 3F
+
+    - Fix soft lock in Cocoon, some doors can be blocked by rolling balls into them
+        - Solvable by keeping doors out of corners.
+
+    - Aimed Projectiles for Cocoon boss an other
+        - EnemyProjectile wrapper for CrystalSpike/Flame/Frost/Spark that takes an element to determine which projectile to use
+            - Or it takes a projectile Effect, but there is a utility method to generate to the projectile effect from element.
+        - Projectile appears stationary in the air during delay frames (this can be set as a boolean)
+        - Projectile can be assigned a target, if so
+            - Projectile vx/vy update to point at target as long as it is visible
+            - Possibly can set an additional delay where vx/vy stop targeting before projectiles launch
+        - Cocoon boss summons a ring of aimed projectiles around them with 400ms increasing delay on each one
+
+
     - Brainstorm how the beasts get released
         - Maybe destroying the idols causes them to wake up and flee the War Temple
         - War God convinces Rival to summon the beasts to the material world to distract the Spirit Gods from his plan
         - While they are "missing" they are actually being given their Vanaran Hearts
 
     - Tasks before next major release
-        - Add save statues
-            - Sky Palace
-            - Gauntlet
-            - Holy Sanctum
-            - Crater
-            - Grand Temple/Palace (same statue)
-            - Outside War Temple/Palace (same statue)
-            - Lab
-
         - Update save statue dialog
+            - outside waterfall cave
+            - city
+            - jade city
+            - summoner ruins
+            - war palace
+            - lab
+            - forest
+            - spirit forest
+            - sky
+            - spirit sky
+            - gauntlet
+            - holy sanctum
+            - sky palace
+            - forge
 
         - Support multiple active missions
             - On map, highlight the first mission and display a location name

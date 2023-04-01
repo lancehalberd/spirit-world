@@ -246,7 +246,13 @@ export function renderCarriedTile(context: CanvasRenderingContext2D, state: Game
 }
 
 
-export function renderHeroShadow(context: CanvasRenderingContext2D, state: GameState, hero: Hero, forceDraw: boolean = false): void {
+export function renderHeroShadow(this: void, context: CanvasRenderingContext2D, state: GameState, hero: Hero, forceDraw: boolean = false): void {
+   /* if (hero.isOverClouds && hero.action === 'falling' && hero.animationTime < cloudPoofAnimation.frameDuration * FRAME_LENGTH) {
+        const frame = getFrame(cloudPoofAnimation, hero.animationTime);
+        drawFrameAt(context, frame, { x: hero.x, y: hero.y - hero.z });
+        return;
+    }*/
+
     if (hero.wading && !hero.swimming) {
         const frame = getFrame(wadingAnimation, hero.animationTime);
         drawFrameAt(context, frame, { x: hero.x, y: hero.y - hero.z });

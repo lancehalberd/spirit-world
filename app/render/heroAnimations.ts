@@ -180,6 +180,10 @@ const spiritPullRightAnimation: FrameAnimation = createAnimation('gfx/mc/spiritp
 const fallGeometry: FrameDimensions = {w: 20, h: 28, content: {x: 2, y: 16 + Y_OFF, w: 16, h: 16}};
 export const fallAnimation: FrameAnimation = createAnimation('gfx/mc/mcfall.png', fallGeometry, { cols: 13, duration: 4}, { loop: false });
 
+const cloudPoofGeometry: FrameDimensions = {w: 20, h: 25, content: {x: 2, y: 13 + Y_OFF, w: 16, h: 16}};
+export const cloudPoofAnimation: FrameAnimation = createAnimation('gfx/effects/cloudfall.png', cloudPoofGeometry,
+    { x: 1, cols: 7, duration: 5}, { loop: false });
+
 const chargeGeometry: FrameDimensions = {w: 24, h: 32, content: {x: 4, y: 16, w: 16, h: 16} };
 export const chargeBackAnimation: FrameAnimation = createAnimation('gfx/mc/aura.png', chargeGeometry, { cols: 4, y: 0, duration: 5});
 export const chargeFrontAnimation: FrameAnimation = createAnimation('gfx/mc/aura.png', chargeGeometry, { cols: 4, y: 1, duration: 5});

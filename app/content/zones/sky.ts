@@ -3395,6 +3395,7 @@ const sf0_1x1: AreaDefinition = {
         {status: "normal", id: "", x: 288, y: 432, type: "cathode"},
         {status: "normal", id: "", x: 192, y: 448, type: "crystalSwitch", element: "lightning", timer: 0, targetObjectId: "skyPalaceEntranceBarrier"},
         {status: "normal", id: "", x: 248, y: 264, type: "teleporter"},
+        {status: "normal", id: "skyPalaceSave", x: 168, y: 32, type: "saveStatue"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 13, mapId: 'skySpirit', floorId: '1F', mapX: 2, mapY: 2},

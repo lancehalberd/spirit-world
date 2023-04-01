@@ -44,6 +44,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
         }
     }
     hero.canFloat = true;
+    hero.isOverClouds = false;
     for (let row = topRow; row <= bottomRow; row++) {
         for (let column = leftColumn; column <= rightColumn; column++) {
             let behaviors = behaviorGrid[row]?.[column];
@@ -102,6 +103,9 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
             // Clouds boots are not slippery when walking on clouds.
             if (behaviors.cloudGround && hero.equippedBoots === 'cloudBoots') {
                 hero.slipping = false;
+            }
+            if (behaviors.cloudGround) {
+                hero.isOverClouds = true;
             }
             if (!behaviors.shallowWater && !behaviors.water) {
                 hero.wading = false;
@@ -172,6 +176,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
                 hero.throwHeldObject(state);
                 hero.heldChakram?.throw(state);
                 hero.action = 'falling';
+                hero.isOverClouds = !!behaviors?.cloudGround && !behaviors.diagonalLedge;
                 hero.x = Math.round(hero.x / tileSize) * tileSize;
                 hero.y = Math.round(hero.y / tileSize) * tileSize;
                 hero.animationTime = 0;

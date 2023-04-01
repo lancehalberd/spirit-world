@@ -906,6 +906,7 @@ const sf0_0x1: AreaDefinition = {
         {status: "normal", id: "", x: 64, y: 304, style: "short", type: "sign", message: "A burst of flame will light the way."},
         {status: "normal", id: "", x: 432, y: 304, style: "short", type: "sign", message: "Two must wield ice in perfect harmony."},
         {status: "normal", id: "", x: 128, y: 48, style: "short", type: "sign", message: "A lightning fast shot completes the circuit."},
+        {status: "normal", id: "holySanctumSave", x: 208, y: 72, type: "saveStatue"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 376, mapId: 'holySanctumSpirit', floorId: '1F', mapX: 2, mapY: 3},

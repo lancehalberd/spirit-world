@@ -9,7 +9,7 @@ import { getCloneMovementDeltas, isGameKeyDown, wasGameKeyPressed } from 'app/us
 import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
 import { getSectionBoundingBox, moveActor } from 'app/moveActor';
 import { playAreaSound } from 'app/musicController';
-import { fallAnimation, heroAnimations } from 'app/render/heroAnimations';
+import { cloudPoofAnimation, fallAnimation, heroAnimations } from 'app/render/heroAnimations';
 import { isUnderwater } from 'app/utils/actor';
 import { destroyClone } from 'app/utils/destroyClone';
 import { addEffectToArea } from 'app/utils/effects';
@@ -116,7 +116,10 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
     if (hero.action === 'falling' || hero.action === 'sinkingInLava') {
         hero.vx = 0;
         hero.vy = 0;
-        if (hero.animationTime >= fallAnimation.duration) {
+        if (hero.isOverClouds && hero.animationTime >= cloudPoofAnimation.duration) {
+            hero.action = 'fallen';
+            hero.actionFrame = 0;
+        } else if (hero.animationTime >= fallAnimation.duration) {
             hero.action = hero.action === 'falling' ? 'fallen' : 'sankInLava';
             hero.actionFrame = 0;
         }

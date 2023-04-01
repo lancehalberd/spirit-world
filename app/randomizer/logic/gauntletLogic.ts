@@ -117,7 +117,7 @@ export const gauntletNodes: LogicNode[] = [
         nodeId: 'gauntletSpiritEntrance',
         checks: [
             // This is in an invisible chest to the left
-            {objectId: 'gauntletPeachPiece', logic: hasTrueSight},
+            {objectId: 'gauntletMap', logic: hasTrueSight},
             // Sitting in the open on the right.
             {objectId: 'gauntletFirstKey'},
         ],
