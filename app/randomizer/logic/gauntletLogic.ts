@@ -87,7 +87,6 @@ export const gauntletNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'gauntletBallRoom',
-        checks: [{objectId: 'gauntletMap'}],
         entranceIds: ['gauntletStairs'],
         exits: [
             { objectId: 'gauntletStairs' },
@@ -152,6 +151,7 @@ export const gauntletNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'gauntletSpiritBallRoom',
+        checks: [{objectId: 'gauntletSilver'}],
         exits: [
             { objectId: 'gauntletSpiritStairs' },
             { objectId: 'gauntletPit', logic: {requiredFlags: ['gauntletPit']} },

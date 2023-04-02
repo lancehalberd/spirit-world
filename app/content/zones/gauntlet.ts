@@ -1074,7 +1074,7 @@ const sf0_0x1: AreaDefinition = {
         {status: "normal", id: "", x: 224, y: 240, type: "door", style: "wooden", d: "down"},
         {status: "closedSwitch", id: "gauntletSwitchDoor", x: 240, y: 272, type: "door", style: "wooden", d: "up", saveStatus: "forever"},
         {status: "normal", id: "gauntletFirstKey", x: 440, y: 328, type: "loot", lootType: "smallKey", lootLevel: 1},
-        {status: "normal", id: "gauntletMap", x: 56, y: 352, type: "chest", lootType: "peachOfImmortalityPiece", lootLevel: 1, isInvisible: true},
+        {status: "normal", id: "gauntletMap", x: 56, y: 352, type: "chest", lootType: "map", lootLevel: 1, isInvisible: true},
         {status: "normal", id: "gauntletSwitchD", x: 288, y: 416, toggleOnRelease: true, type: "floorSwitch", isInvisible: true, specialBehaviorKey: "gauntletSwitch", targetObjectId: "gauntletSwitchDoor"},
         {status: "normal", id: "gauntletSwitchC", x: 144, y: 416, toggleOnRelease: true, type: "floorSwitch", isInvisible: true, specialBehaviorKey: "gauntletSwitch", targetObjectId: "gauntletSwitchDoor"},
         {status: "normal", id: "gauntletSwitchA", x: 144, y: 320, toggleOnRelease: true, type: "floorSwitch", isInvisible: true, specialBehaviorKey: "gauntletSwitch", targetObjectId: "gauntletSwitchDoor"},
@@ -1383,7 +1383,6 @@ const f1_0x0: AreaDefinition = {
         {status: "normal", id: "", linked: true, x: 256, y: 416, type: "rollingBall"},
         {status: "hiddenSwitch", id: "gauntletPit", linked: true, x: 240, y: 448, style: "default", type: "pitEntrance", targetZone: "gauntlet", targetObjectId: "gauntletPitMarker", saveStatus: "forever"},
         {status: "normal", id: "", x: 208, y: 336, style: "short", type: "sign", message: "Return here when you have awakened the Third Eye."},
-        {status: "normal", id: "gauntletMap", x: 288, y: 336, type: "chest", lootType: "map", lootLevel: 1},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16, index: 361, mapId: 'gauntlet', floorId: '2F', mapX: 1, mapY: 1},
@@ -1670,6 +1669,7 @@ const sf1_0x0: AreaDefinition = {
         {status: "normal", id: "", linked: true, x: 256, y: 416, type: "rollingBall", spirit: true},
         {status: "hiddenSwitch", id: "gauntletPit", linked: true, x: 240, y: 448, style: "default", type: "pitEntrance", spirit: true, targetZone: "gauntlet", targetObjectId: "gauntletSpiritPitMarker", saveStatus: "forever"},
         {status: "normal", id: "", spirit: true, x: 288, y: 336, style: "short", type: "sign", message: "The way forward can only be opened from the material world."},
+        {status: "normal", id: "gauntletSilver", x: 208, y: 336, type: "chest", lootType: "silverOre", lootLevel: 1},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16, index: 364, hideMap: true, mapId: 'gauntlet', floorId: '2F', mapX: 3, mapY: 1},

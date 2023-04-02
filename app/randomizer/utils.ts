@@ -27,7 +27,7 @@ import {
     AnyLootDefinition, AreaDefinition, AssignmentState,
     BossObjectDefinition, EntranceDefinition, FullZoneLocation,
     GameState, LogicalZoneKey, LogicNode,
-    LootAssignment, LootObjectDefinition,
+    LootAssignment, LootObjectDefinition, LootType,
     LootWithLocation, NPCDefinition,
     ObjectDefinition,
     Zone, ZoneLocation,
@@ -314,6 +314,17 @@ export function reverseFill(random: typeof SRandom, allNodes: LogicNode[], start
     calculateKeyLogic(allNodes, startingNodes);
     //console.log({ allNodes, startingNodes });
     const allLootObjects = findLootObjects(allNodes);
+    const lootMap: {[key: string]: LootType } = {};
+    for (const lootWithLocation of allLootObjects) {
+        if (lootMap[lootWithLocation.lootObject.id] &&
+            lootMap[lootWithLocation.lootObject.id] !== lootWithLocation.lootObject.lootType) {
+            console.warn('Duplicate loot id with mismatched type',
+                lootWithLocation.lootObject.id,
+                lootMap[lootWithLocation.lootObject.id], '!=', lootWithLocation.lootObject.lootType
+            );
+        }
+        lootMap[lootWithLocation.lootObject.id] = lootWithLocation.lootObject.lootType;
+    }
     // Try to replace as many unimportant checks with victory points as we can
     // until we either run out of checks or hit the victory point target.
     let victoryPointsHidden = 0, replaceGoodChecks = false;

@@ -222,7 +222,7 @@ enemyDefinitions.golem = {
     },
     onHit(state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
         // Cannot damage the golem head at all unless it is in a mode where its mouth is open.
-        if (!['chargeLaser', 'fireLaser', 'cooldown'].includes(enemy.mode)) {
+        if (!['chargeLaser', 'fireLaser', 'firingLaser', 'cooldown'].includes(enemy.mode)) {
             enemy.makeSound(state, 'blockAttack');
             return { hit: true, blocked: true, stopped: true };
         }
@@ -553,10 +553,14 @@ function updateGolem(this: void, state: GameState, enemy: Enemy): void {
     } else if (enemy.mode === 'fireLaser') {
         enemy.changeToAnimation(isAngry ? 'angryShootMouth' : 'shootMouth');
         enemy.params.mouthLaser = fireLaser(state, enemy, 900, 8, getMouthLaserCoords(state, enemy));
-        enemy.setMode('cooldown')
+        enemy.setMode('firingLaser')
+    } else if (enemy.mode === 'firingLaser') {
+        if (enemy.modeTime >= 1000) {
+            enemy.setMode('cooldown');
+        }
     } else if (enemy.mode === 'cooldown') {
         enemy.changeToAnimation(isAngry ? 'angryChargeMouth' : 'chargeMouth');
-        if (enemy.modeTime >= 2000 || enemy.params.enragedAttacks > 0) {
+        if (enemy.modeTime >= 1000 || enemy.params.enragedAttacks > 0) {
             enemy.setMode('choose');
         }
     } else if (enemy.mode === 'slamHands') {
@@ -577,7 +581,11 @@ function updateGolem(this: void, state: GameState, enemy: Enemy): void {
         enemy.params.enrageLevel = targetEnrageLevel;
         enemy.params.enragedAttacks = targetEnrageLevel;
         // Immediately stop laser attack on becoming enraged to prevent further damage.
-        if (enemy.mode === 'chargeLaser' || enemy.mode === 'fireLaser' || enemy.mode === 'cooldown') {
+        if (enemy.mode === 'chargeLaser'
+            || enemy.mode === 'fireLaser'
+            || enemy.mode === 'firingLaser'
+            || enemy.mode === 'cooldown'
+        ) {
             if (enemy.params.mouthLaser) {
                 removeEffectFromArea(state, enemy.params.mouthLaser);
                 delete enemy.params.mouthLaser;
@@ -725,6 +733,7 @@ function updateGolemHand(this: void, state: GameState, enemy: Enemy): void {
         // Hands should move apart and stay apart just before the laser fires.
         if ((golem.mode === 'chargeLaser' && golem.modeTime > LASER_CHARGE_TIME - 100)
             || golem.mode === 'fireLaser'
+            || golem.mode === 'firingLaser'
             || (golem.params.mouthLaser && !golem.params.mouthLaser.done)
         ) {
             if (enemy.params.side === 'left') {
@@ -743,6 +752,7 @@ function updateGolemHand(this: void, state: GameState, enemy: Enemy): void {
         if (golem.mode === 'prepareAttack'
             || golem.mode === 'chargeLaser'
             || golem.mode === 'fireLaser'
+            || golem.mode === 'firingLaser'
             || golem.mode === 'prepareStrafe'
             || golem.mode === 'chargeStrafeLaser'
             || golem.mode === 'fireStrafeLaser'
@@ -844,8 +854,8 @@ function updateGolemHand(this: void, state: GameState, enemy: Enemy): void {
                 state, enemy.area,
                 [hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2],
                 // We could increase the spark count for a more difficult version of the boss.
-                3, // + (golem?.params.enrageLevel || 0),
-                Math.PI / 2, Math.PI / 3
+                2, // + (golem?.params.enrageLevel || 0),
+                Math.PI / 2, Math.PI / 6
             );
             if (isSlammingHands) {
                 // Continue slamming until the last N seconds of the slam attack.
@@ -871,7 +881,7 @@ function updateGolemHand(this: void, state: GameState, enemy: Enemy): void {
             addRadialShockWaves(
                 state, enemy.area,
                 [hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2],
-                6, Math.PI / 6
+                4, Math.PI / 4
             );
             enemy.params.stunTime = 1500;
             enemy.setMode('stunned');

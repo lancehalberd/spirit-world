@@ -50,13 +50,16 @@ Pending Graphics From Jon:
 
 
 Current tasks:
+    - Statue name is duplicated in crater.
+    - tiles in TL corner of crater with lava 1 drained
+    - tutorial doesn't disappear in cocoon
+    - lightning cloak burst hits golem too many times
+
     - Fix ledge graphics in tomb
         - War Temple
 
     - Make sure door open/close sound effects are playing
         - Check tomb crystal switch doors specifically.
-
-    - Change tomb boss slam patterns not to fire in cardinal directions. Use upside down V and an X.
 
     - Add quest marker to mom? This would require adding a map for waterfall cave.
 
