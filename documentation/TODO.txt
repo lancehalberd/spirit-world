@@ -50,16 +50,45 @@ Pending Graphics From Jon:
 
 
 Current tasks:
-    - Statue name is duplicated in crater.
-    - tiles in TL corner of crater with lava 1 drained
-    - tutorial doesn't disappear in cocoon
-    - lightning cloak burst hits golem too many times
+    - Use grey cloud tiles for lightning bolt cloud animation
+        - Possibly also for the cloud tiles during the storm beast fight
+            - At least the clouds around the storm heart
+        - Would be good to change to normal clouds after the fight.
+
+    - Add cue for using the bow once it is acquired.
+        - Use same approach as the chakram cue
+
+    - Make it easier to shoot switches to open tomb
+        - Increase time by 500-1000ms
+        - change stone layout to help line up shot
+
+    - Remove contact damage from golem+hand
+        - Make sure the golem is solid and knocks the player away without damaging them
+        - Make sure the player cannot get stuck next to/behind the golem
+
+    - Fix safari transitions, use Hillary's machine
+        - Spirit sight fails, perhaps only in areas with foreground layers.
+
+    - Weapon help text appeared when hitting buttons.
+        - Possibly as a result of pressing shift R though
+
+    - Add indicators for NPCs next dialogue option
+        - New vs Read dialogue (could just be 100 vs 50% opacity)
+        - Quest info Golden or Red !
+        - Side-quest info Green or Blue !
+        - hint ?
+        - generic text ... or empty bubble
+
+    - lose money when collecting money loot as clone?
+        - lose most progress this way.
 
     - Fix ledge graphics in tomb
         - War Temple
 
     - Make sure door open/close sound effects are playing
         - Check tomb crystal switch doors specifically.
+
+    - Crystal collector doesn't turn on waterfall second time.
 
     - Add quest marker to mom? This would require adding a map for waterfall cave.
 

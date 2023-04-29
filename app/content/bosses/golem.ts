@@ -223,8 +223,7 @@ enemyDefinitions.golem = {
     onHit(state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
         // Cannot damage the golem head at all unless it is in a mode where its mouth is open.
         if (!['chargeLaser', 'fireLaser', 'firingLaser', 'cooldown'].includes(enemy.mode)) {
-            enemy.makeSound(state, 'blockAttack');
-            return { hit: true, blocked: true, stopped: true };
+            return enemy.defaultBlockHit(state, hit);
         }
         const hitbox = enemy.getHitbox(state);
         const innerHitbox = {
@@ -235,8 +234,7 @@ enemyDefinitions.golem = {
         };
         // If they miss the vulnerable section, the attack is blocked.
         if (!isTargetHit(innerHitbox, hit)) {
-            enemy.makeSound(state, 'blockAttack');
-            return { hit: true, blocked: true, stopped: true };
+            return enemy.defaultBlockHit(state, hit);
         }
         if (hit.damage) {
             hit = {
@@ -330,8 +328,7 @@ enemyDefinitions.golemHand = {
             return enemy.defaultOnHit(state, hit);
         }
         if (hitHand) {
-            enemy.makeSound(state, 'blockAttack');
-            return { hit: true, blocked: true, stopped: true };
+            return enemy.defaultBlockHit(state, hit);
         }
         // This is the case if the hand is too high for the hit to effect in the current frame.
         return {};

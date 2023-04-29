@@ -474,7 +474,7 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "craterEntrance", x: 64, y: 0, type: "door", style: "wideEntrance", targetZone: "crater", targetObjectId: "craterEntrance", d: "up"},
         {status: "closed", id: "staffTowerSkyEntrance", logicKey: "mountainTower", x: 64, y: 416, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerSkyEntrance", d: "up"},
         {status: "normal", id: "craterMarker", x: 208, y: 32, type: "marker"},
-        {status: "normal", id: "craterSave", x: 128, y: 48, type: "saveStatue"},
+        {status: "normal", id: "peaksSave", x: 128, y: 48, type: "saveStatue"},
         {status: "normal", id: "sky:0:0x0-luckyBeetle-0", x: 128, y: 112, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
     ],
     sections: [
@@ -1348,6 +1348,7 @@ const f0_1x1: AreaDefinition = {
     ],
     objects: [
         {status: "normal", id: "helixSkyEntrance", x: 352, y: 96, type: "door", style: "cavern", targetZone: "helix", targetObjectId: "helixSkyEntrance", d: "up"},
+        {status: "normal", id: "", x: 248, y: 264, type: "teleporter", linked: true, spirit: true},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 4, mapId: 'sky', floorId: '1F', mapX: 2, mapY: 2},
@@ -2495,7 +2496,7 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "staffTowerSpiritSkyEntrance", logicKey: "mountainTower", x: 64, y: 416, type: "door", style: "cave", targetZone: "staffTower", targetObjectId: "staffTowerSpiritSkyEntrance", d: "up"},
         {status: "normal", id: "forgeEntrance", x: 64, y: 16, type: "door", style: "cavern", targetZone: "forge", targetObjectId: "forgeEntrance", d: "up"},
         {status: "normal", id: "caves-ascentExitSpirit", x: 208, y: 0, type: "door", style: "cavern", targetZone: "caves", targetObjectId: "caves-ascentExitSpirit", d: "up"},
-        {status: "normal", id: "forgeSave", x: 128, y: 48, type: "saveStatue"},
+        {status: "normal", id: "spiritPeaksSave", x: 128, y: 48, type: "saveStatue"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 9, mapId: 'skySpirit', floorId: '1F', mapX: 0, mapY: 0},
@@ -3394,7 +3395,7 @@ const sf0_1x1: AreaDefinition = {
         {status: "normal", id: "", x: 288, y: 352, type: "cathode"},
         {status: "normal", id: "", x: 288, y: 432, type: "cathode"},
         {status: "normal", id: "", x: 192, y: 448, type: "crystalSwitch", element: "lightning", timer: 0, targetObjectId: "skyPalaceEntranceBarrier"},
-        {status: "normal", id: "", x: 248, y: 264, type: "teleporter"},
+        {status: "normal", id: "", x: 248, y: 264, type: "teleporter", linked: true},
         {status: "normal", id: "skyPalaceSave", x: 168, y: 32, type: "saveStatue"},
     ],
     sections: [

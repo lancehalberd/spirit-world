@@ -42,7 +42,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
     area: AreaInstance;
     drawPriority: DrawPriority = 'sprites';
     definition: EnemyObjectDefinition | BossObjectDefinition;
-    enemyDefinition: EnemyDefinition;
+    enemyDefinition: EnemyDefinition<Params>;
     // Which key was read from this.animations to produce the current animation.
     // Only valid if `currentAnimation` is set using standard methods.
     currentAnimationKey: string;
@@ -135,7 +135,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         this.params = {
             ...(this.enemyDefinition.params || {}),
             ...(definition.params || {}),
-        };
+        } as Params;
         this.status = definition.status;
         if (this.definition.id && getObjectStatus(state, this.definition)) {
             this.status = 'gone';
@@ -159,6 +159,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             };
         }
         this.healthBarColor = this.enemyDefinition.healthBarColor;
+        this.enemyDefinition.initialize?.(state, this);
     }
     getFrame(): Frame {
         return getFrame(this.currentAnimation, this.animationTime);
@@ -276,6 +277,22 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
     updateDrawPriority() {
         this.drawPriority = this.flying ? 'foreground' : (this.enemyDefinition.drawPriority || 'sprites');
     }
+    playBlockSound(state: GameState) {
+        if (this.blockInvulnerableFrames) {
+            return;
+        }
+        playAreaSound(state, this.area, 'blockAttack');
+        this.blockInvulnerableFrames = 30;
+    }
+    defaultBlockHit(state: GameState, hit: HitProperties, stopped = false): HitResult {
+        this.playBlockSound(state);
+        return {
+            hit: true,
+            blocked: true,
+            stopped,
+            knockback: hit.knockback ? {vx: -hit.knockback.vx, vy: -hit.knockback.vy, vz: 0 } : null
+        };
+    }
     defaultOnHit(state: GameState, hit: HitProperties): HitResult {
         if (this.status === 'off') {
             if (hit.element === 'lightning') {
@@ -300,17 +317,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             return {};
         }
         if (this.shielded) {
-            // When the shield is invulnerable, it still blocks the attacks but it doesn't play the sound.
-            if (this.blockInvulnerableFrames) {
-                return { hit: true, blocked: true };
-            }
-            playAreaSound(state, this.area, 'blockAttack');
-            this.blockInvulnerableFrames = 30;
-            return {
-                hit: true,
-                blocked: true,
-                knockback: hit.knockback ? {vx: -hit.knockback.vx, vy: -hit.knockback.vy, vz: 0 } : null
-            };
+            return this.defaultBlockHit(state, hit);
         }
         if (hit.knockback) {
             this.knockBack(state, hit.knockback);

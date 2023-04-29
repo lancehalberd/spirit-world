@@ -38,6 +38,7 @@ import {
     TileBehaviors,
 } from 'app/types';
 
+export * from 'app/content/enemies/arrowTurret';
 export * from 'app/content/enemies/balloonCentipede';
 export * from 'app/content/enemies/crusher';
 export * from 'app/content/enemies/crystalBat';
@@ -111,7 +112,7 @@ export interface EnemyAbilityInstance<T> {
     used?: boolean
 }
 
-export interface EnemyDefinition {
+export interface EnemyDefinition<Params> {
     alwaysReset?: boolean
     abilities?: EnemyAbility<any>[]
     taunts?: {[key in string]: TextCueTaunt}
@@ -128,7 +129,7 @@ export interface EnemyDefinition {
     // If true, default z updates will be ignored.
     floating?: boolean
     // This is used instead of standard code for flying enemies
-    updateFlyingZ?: (state: GameState, enemy: Enemy) => void
+    updateFlyingZ?: (state: GameState, enemy: Enemy<Params>) => void
     hasShadow?: boolean
     ignorePits?: boolean
     life?: number
@@ -141,7 +142,8 @@ export interface EnemyDefinition {
     elementalMultipliers?: {[key in MagicElement]?: number}
     initialAnimation?: string
     initialMode?: string
-    params?: any
+    params?: Params
+    initialize?: (state: GameState, enemy: Enemy<Params>) => void
     speed?: number
     acceleration?: number
     scale?: number
@@ -149,32 +151,22 @@ export interface EnemyDefinition {
     healthBarColor?: string
     touchDamage?: number
     touchHit?: HitProperties
-    update?: (state: GameState, enemy: Enemy) => void
-    onDeath?: (state: GameState, enemy: Enemy) => void
-    onHit?: (state: GameState, enemy: Enemy, hit: HitProperties) => HitResult
+    update?: (state: GameState, enemy: Enemy<Params>) => void
+    onDeath?: (state: GameState, enemy: Enemy<Params>) => void
+    onHit?: (state: GameState, enemy: Enemy<Params>, hit: HitProperties) => HitResult
     // Optional render function called instead of the standard render logic.
-    render?: (context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) => void
+    render?: (context: CanvasRenderingContext2D, state: GameState, enemy: Enemy<Params>) => void
     // Optional render function called instead of the standard renderShadow logic.
-    renderShadow?: (context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) => void
+    renderShadow?: (context: CanvasRenderingContext2D, state: GameState, enemy: Enemy<Params>) => void
     // Optional render function called after the standard render.
-    renderOver?: (context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) => void
+    renderOver?: (context: CanvasRenderingContext2D, state: GameState, enemy: Enemy<Params>) => void
     renderPreview?: (context: CanvasRenderingContext2D, enemy: Enemy, target: Rect) => void
-    getHealthPercent?: (state: GameState, enemy: Enemy) => number
-    getShieldPercent?: (state: GameState, enemy: Enemy) => number
-    getHitbox?: (enemy: Enemy) => Rect
-    getYDepth?: (enemy: Enemy) => number
+    getHealthPercent?: (state: GameState, enemy: Enemy<Params>) => number
+    getShieldPercent?: (state: GameState, enemy: Enemy<Params>) => number
+    getHitbox?: (enemy: Enemy<Params>) => Rect
+    getYDepth?: (enemy: Enemy<Params>) => number
 }
 
-enemyDefinitions.arrowTurret = {
-    animations: beetleAnimations, life: 4, touchDamage: 1, update: spinAndShoot,
-    lootTable: simpleLootTable,
-    canBeKnockedBack: false,
-    elementalMultipliers: {'lightning': 2},
-    renderPreview(context: CanvasRenderingContext2D, enemy: Enemy, target: Rect): void {
-        enemy.defaultRenderPreview(context, target);
-        drawFrameCenteredAt(context, spiritArrowIcon, target);
-    }
-};
 enemyDefinitions.snake = {
     animations: snakeAnimations, life: 2, touchDamage: 1, update: paceRandomly, flipRight: true,
     lootTable: simpleLootTable,
@@ -446,37 +438,6 @@ function renderLightningShield(context: CanvasRenderingContext2D, hitbox: Rect, 
             context.arc(hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2, hitbox.w / 2, theta, theta + (1 + Math.random()) * Math.PI / 8);
             theta += 2 * Math.PI / 4 + Math.random() * Math.PI / 8;
             context.stroke();
-        }
-    }
-}
-
-function spinAndShoot(state: GameState, enemy: Enemy): void {
-    if (typeof enemy.params.currentTheta === 'undefined') {
-        enemy.params.lastTheta = enemy.params.currentTheta = Math.floor(Math.random() * 2) * Math.PI / 4;
-    }
-    if (enemy.mode === 'shoot') {
-        if (enemy.modeTime === 100) {
-            for (let i = 0; i < 4; i++) {
-                const hitbox = enemy.getHitbox(state);
-                const dx = Math.cos(enemy.params.currentTheta + i * Math.PI / 2);
-                const dy = Math.sin(enemy.params.currentTheta + i * Math.PI / 2);
-                const arrow = new EnemyArrow({
-                    x: hitbox.x + hitbox.w / 2 + hitbox.w / 2 * dx,
-                    y: hitbox.y + hitbox.h / 2 + hitbox.h / 2 * dy,
-                    vx: 4 * dx,
-                    vy: 4 * dy,
-                });
-                addEffectToArea(state, enemy.area, arrow);
-            }
-        }
-        if (enemy.modeTime >= 500) {
-            enemy.setMode('spin');
-        }
-    } else {
-        enemy.params.currentTheta = enemy.params.lastTheta + Math.PI / 4 * enemy.modeTime / 1000;
-        if (enemy.modeTime >= 500) {
-            enemy.params.lastTheta = enemy.params.currentTheta = (enemy.params.lastTheta + Math.PI / 4) % (2 * Math.PI);
-            enemy.setMode('shoot');
         }
     }
 }

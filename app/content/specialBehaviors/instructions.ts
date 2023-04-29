@@ -24,9 +24,9 @@ specialBehaviorsHash.barrierBurstInstructions = {
             helpText = `Press [B_MENU] to open your inventory and assign Spirit Cloak to [B_TOOL]`;
         }
         const textCue = findTextCue(state);
-        if (!textCue) {
+        if (!textCue && object.area === state.areaInstance) {
             addTextCue(state, helpText, 0);
-        } else if (textCue.props.text !== helpText) {
+        } else if (textCue.props.text !== helpText || object.area !== state.areaInstance) {
             textCue.fadeOut();
         }
     }

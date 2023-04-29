@@ -146,6 +146,7 @@ export function swapHeroStates(heroA: Hero, heroB: Hero) {
     for (const key of allKeys) {
         if (key === 'behaviors' || key === 'magic'
             || key === 'isUncontrollable' || key === 'explosionTime'
+            || key === 'money'
         ) {
             continue;
         }

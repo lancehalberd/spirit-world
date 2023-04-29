@@ -463,3 +463,40 @@ export const icePlantAnimations: ActorAnimations = {
     attack: omniAnimation(icePlantAttackAnimation),
 };
 
+/*
+Frame 1 - Idle facing 4 directions "horizontal/vertical"
+Frames 2-3 - runs at 5FPS, is the attacking animation
+Frames 4-5 - transition frame  from horizontal/vertical shooting to diagonal shooting. Runs at 10 FPS and goes to Frame 6
+Frame 6 - Idle facing 4 directions "diagonal"
+Frames 7-8 runs at 5 FPS, is the attacking animation
+Frames 9-10 - transition frames from diagonal shooting to horizontal/vertical shooting. Runs at 10 FPS and goes to Frame 1
+Frame 11 - Cracked frame. I can also make a cracked version for all frames, but I figure this is just for when it is actively destroyed.
+*/
+const turretGeometry: FrameDimensions = { w: 18, h: 23, content: {x: 1, y: 7, w: 16, h: 16} };
+export const turretIdleAnimation = createAnimation('gfx/enemies/turret.png', turretGeometry,
+    { x: 0, cols: 1, duration: 10});
+export const turretAttackAnimation = createAnimation('gfx/enemies/turret.png', turretGeometry,
+    { x: 1, cols: 2, duration: 10});
+export const turretRotateAnimation = createAnimation('gfx/enemies/turret.png', turretGeometry,
+    { x: 3, cols: 3, duration: 5});
+export const diagonalTurretIdleAnimation = createAnimation('gfx/enemies/turret.png', turretGeometry,
+    { x: 5, cols: 1, duration: 10});
+export const diagonalTurretAttackAnimation = createAnimation('gfx/enemies/turret.png', turretGeometry,
+    { x: 6, cols: 2, duration: 10});
+// This looks strange because this animation has to wrap back to frame 0.
+export const diagonalTurretRotateAnimation = createAnimation('gfx/enemies/turret.png', turretGeometry,
+    { x: 0, cols: 10, duration: 5, frameMap: [8, 9, 0]});
+export const turretGemAnimation = createAnimation('gfx/enemies/turret.png', turretGeometry,
+    { x: 10, cols: 1, duration: 5});
+export const turretCrackedGemAnimation = createAnimation('gfx/enemies/turret.png', turretGeometry,
+    { x: 11, cols: 1, duration: 5});
+export const turretAnimations: ActorAnimations = {
+    idle: omniAnimation(turretIdleAnimation),
+    rotate: omniAnimation(turretRotateAnimation),
+    attack: omniAnimation(turretAttackAnimation),
+};
+export const diagonalTurretAnimations: ActorAnimations = {
+    idle: omniAnimation(diagonalTurretIdleAnimation),
+    rotate: omniAnimation(diagonalTurretRotateAnimation),
+    attack: omniAnimation(diagonalTurretAttackAnimation),
+};
