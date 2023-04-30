@@ -44,7 +44,7 @@ enemyDefinitions.arrowTurret = {
             });
         }
         // Draw the cracked frame on the gem.
-        const animation = (enemy.enemyInvulnerableFrames || enemy.invulnerableFrames)
+        const animation = (enemy.enemyInvulnerableFrames || enemy.invulnerableFrames || enemy.life <= 2)
             ? turretCrackedGemAnimation
             : turretGemAnimation;
         const frame = getFrame(animation, enemy.animationTime);

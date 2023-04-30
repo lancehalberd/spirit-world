@@ -416,6 +416,7 @@ const f1_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 336, y: 80, type: "pushPull"},
         {status: "normal", id: "", x: 352, y: 80, type: "tippable"},
         {status: "normal", id: "", x: 352, y: 64, type: "tippable"},
+        {status: "normal", id: "bowInstructions", x: 272, y: 360, type: "narration", message: "{addCue: Use the Bow to hit distant targets}", w: 48, h: 48, delay: 100, hasCustomLogic: true, customLogic: "$bow"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16, index: 136, mapId: 'treeVillage', floorId: '2F', mapX: 0, mapY: 0},

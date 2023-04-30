@@ -50,14 +50,6 @@ Pending Graphics From Jon:
 
 
 Current tasks:
-    - Use grey cloud tiles for lightning bolt cloud animation
-        - Possibly also for the cloud tiles during the storm beast fight
-            - At least the clouds around the storm heart
-        - Would be good to change to normal clouds after the fight.
-
-    - Add cue for using the bow once it is acquired.
-        - Use same approach as the chakram cue
-
     - Make it easier to shoot switches to open tomb
         - Increase time by 500-1000ms
         - change stone layout to help line up shot
@@ -90,7 +82,10 @@ Current tasks:
 
     - Crystal collector doesn't turn on waterfall second time.
 
-    - Add quest marker to mom? This would require adding a map for waterfall cave.
+    - Use grey cloud tiles for lightning bolt cloud animation
+        - Possibly also for the cloud tiles during the storm beast fight
+            - At least the clouds around the storm heart
+        - Would be good to change to normal clouds after the fight.
 
     - Simplify language?
         - Obtained -> Got
