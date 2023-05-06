@@ -10,8 +10,8 @@ import { Spark } from 'app/content/effects/spark';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { Indicator } from 'app/content/objects/indicator';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { heroSpiritAnimations } from 'app/render/heroAnimations';
 import { vanaraBlueAnimations } from 'app/render/npcAnimations';
+import { createAnimation } from 'app/utils/animations';
 import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import { accelerateInDirection, hasEnemyLeftSection } from 'app/utils/enemies';
 import { getDirection } from 'app/utils/field';
@@ -19,7 +19,33 @@ import { addObjectToArea } from 'app/utils/objects';
 import { getVectorToNearbyTarget, getVectorToTarget } from 'app/utils/target';
 
 
-import { Enemy, EnemyAbility, GameState, HitProperties, HitResult, MagicElement, ObjectInstance } from 'app/types';
+import { ActorAnimations, Enemy, EnemyAbility, FrameAnimation, FrameDimensions, GameState, HitProperties, HitResult, MagicElement, ObjectInstance } from 'app/types';
+
+// Taken from heroAnimations.ts
+export const Y_OFF = -4;
+const guardianSpiritGeometry: FrameDimensions = {w: 24, h: 32, content: {x: 2, y: 16 + Y_OFF, w: 16, h: 16}};
+const guardianSpiritUpAnimation: FrameAnimation = createAnimation('gfx/enemies/spiritboss.png', guardianSpiritGeometry, { cols: 8, y: 2, duration: 5});
+const guardianSpiritDownAnimation: FrameAnimation = createAnimation('gfx/enemies/spiritboss.png', guardianSpiritGeometry, { cols: 8, y: 0, duration: 5});
+const guardianSpiritLeftAnimation: FrameAnimation = createAnimation('gfx/enemies/spiritboss.png', guardianSpiritGeometry, { cols: 8, y: 3, duration: 5});
+const guardianSpiritRightAnimation: FrameAnimation = createAnimation('gfx/enemies/spiritboss.png', guardianSpiritGeometry, { cols: 8, y: 1, duration: 5});
+const guardianSpiritCastAnimation: FrameAnimation = createAnimation('gfx/enemies/spiritboss.png', guardianSpiritGeometry, { cols: 12, y: 4, duration: 5});
+const guardianSpiritAttackAnimation: FrameAnimation = createAnimation('gfx/enemies/spiritboss.png', guardianSpiritGeometry, { cols: 8, y: 5, duration: 5});
+
+function omniAnimation(animation: FrameAnimation) {
+    return {
+        up: animation, down: animation, left: animation, right: animation,
+    };
+}
+const guardianSpiritAnimations: ActorAnimations = {
+    idle: {
+        up: guardianSpiritUpAnimation,
+        down: guardianSpiritDownAnimation,
+        left: guardianSpiritLeftAnimation,
+        right: guardianSpiritRightAnimation,
+    },
+    attack: omniAnimation(guardianSpiritAttackAnimation),
+    cast: omniAnimation(guardianSpiritCastAnimation),
+};
 
 
 interface ProjectionParams {
@@ -37,13 +63,15 @@ const blastAbility: EnemyAbility<true> = {
         // enemy.changeToAnimation('attack');
     },
     useAbility(this: void, state: GameState, enemy: Enemy<ProjectionParams>): void {
+        enemy.d = 'down';
+        enemy.changeToAnimation('cast', 'idle');
         const hitbox = enemy.getHitbox(state);
         const blast = new Blast({
             x: hitbox.x + hitbox.w / 2,
             y: hitbox.y + hitbox.h / 2,
             element: enemy.params.element,
             damage: 2,
-            tellDuration: 1000,
+            tellDuration: 800,
             persistDuration: 400,
             radius: 80,
             source: enemy,
@@ -113,7 +141,7 @@ function checkToGiveHint(state: GameState, guardian: Enemy<GuardianParams>) {
 }
 
 enemyDefinitions.guardianProjection = {
-    animations: heroSpiritAnimations, life: 20, scale: 1, update: updateProjection,
+    animations: guardianSpiritAnimations, life: 20, scale: 1, update: updateProjection,
     canBeKnockedBack: false,
     aggroRadius: 2000,
     abilities: [blastAbility, mediumBlastAbility],
@@ -370,6 +398,8 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
     enemy.life = Math.max(0, enemy.life - 0.5 * FRAME_LENGTH / 1000);
     if (enemy.mode === 'projectiles') {
         const v = getVectorToNearbyTarget(state, enemy, 2000, enemy.area.allyTargets);
+        enemy.d = 'down';
+        enemy.changeToAnimation('attack', 'idle');
         if (v?.mag >= 80) {
             enemy.setMode('aimedProjectiles');
         } else {
@@ -426,6 +456,10 @@ function updateProjection(this: void, state: GameState, enemy: Enemy<ProjectionP
         const v = getVectorToNearbyTarget(state, enemy, 2000, enemy.area.allyTargets);
         const theta = v ? Math.atan2(v.y, v.x) : Math.random() * 2 * Math.PI;
         const dx = Math.cos(theta), dy = Math.sin(theta);
+        if (enemy.modeTime === 0) {
+            enemy.d = 'down';
+            enemy.changeToAnimation('cast', 'idle');
+        }
         if (enemy.params.element === 'lightning') {
             if (enemy.modeTime % 1500 === 0) {
                 enemy.life--;

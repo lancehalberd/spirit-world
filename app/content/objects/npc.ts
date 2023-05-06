@@ -14,6 +14,7 @@ import {
     vanaraGrayAnimations, vanaraPurpleAnimations,
     vanaraRedAnimations, zoroAnimations,
 } from 'app/render/npcAnimations';
+import { lightningBeastAnimations } from 'app/content/npcs/npcAnimations'
 import { shadowFrame, smallShadowFrame } from 'app/renderActor';
 import { showMessage } from 'app/scriptEvents';
 import { drawFrame, getFrame } from 'app/utils/animations';
@@ -40,6 +41,9 @@ export const npcStyles = {
         scale: 3,
         shadowOffset: -3,
         flipRight: true,
+    } as NPCStyleDefinition,
+    sleepingLightningBeast: {
+        animations: lightningBeastAnimations,
     } as NPCStyleDefinition,
     gal: {
         animations: galAnimations,

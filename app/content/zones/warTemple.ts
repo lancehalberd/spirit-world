@@ -637,9 +637,9 @@ const f0_1x1: AreaDefinition = {
         {status: "locked", id: "warTempleLock1", x: 240, y: 0, type: "door", style: "cavernUpstairs", targetZone: "warTemple", targetObjectId: "warTempleLock1", d: "up", locationCue: "War Temple 1F"},
         {status: "normal", id: "warTemple:0:1x1-door-2", x: 480, y: 112, type: "door", style: "cave", d: "right"},
         {status: "normal", id: "warTemple:0:1x1-door-3", x: 0, y: 112, type: "door", style: "cave", d: "left"},
-        {status: "normal", id: "", x: 98, y: 333, type: "decoration", w: 16, h: 16, decorationType: "fireBeastStatue"},
-        {status: "normal", id: "", x: 227, y: 79, type: "decoration", w: 16, h: 16, decorationType: "lightningBeastStatue"},
-        {status: "normal", id: "", x: 355, y: 334, type: "decoration", w: 16, h: 16, decorationType: "iceBeastStatue"},
+        {status: "normal", id: "", x: 98, y: 341, type: "decoration", w: 16, h: 16, decorationType: "fireBeastStatue", drawPriority: "sprites"},
+        {status: "normal", id: "", x: 226, y: 84, type: "decoration", w: 16, h: 16, decorationType: "lightningBeastStatue", drawPriority: "sprites"},
+        {status: "normal", id: "", x: 355, y: 341, type: "decoration", w: 16, h: 16, decorationType: "iceBeastStatue", drawPriority: "sprites"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 218, mapId: 'warTemple', floorId: '1F', mapX: 2, mapY: 3},
@@ -1293,6 +1293,7 @@ const sf0_1x1: AreaDefinition = {
     objects: [
         {status: "normal", id: "warTempleLadder", x: 256, y: 240, type: "door", style: "ladderDown", d: "down", logicKey: "beastsDefeated", targetZone: "warTemple", targetObjectId: "warTempleLadder", locationCue: "War Temple 1F"},
         {status: "normal", id: "warTempleEntranceSpirit", x: 240, y: 480, type: "door", style: "cave", targetZone: "overworld", targetObjectId: "warTempleEntranceSpirit", d: "down", linked: true, spirit: true, locationCue: "War Temple 1F"},
+        {status: "normal", id: "", x: 224, y: 96, d: "down", behavior: "none", style: "sleepingLightningBeast", type: "npc", dialogue: "Leave me to my sleep little warrior.", customLogic: "warTempleBoss", logicKey: "sleepingBeastsLogic"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 233, mapId: 'warTempleSpirit', floorId: '1F', mapX: 2, mapY: 2},

@@ -193,3 +193,10 @@ export function createFrameCanvas(frame: Frame, scale: number = 1): HTMLCanvasEl
     drawFrame(context, frame, {x: 0, y: 0, w: frame.w, h: frame.h});
     return canvas;
 }
+
+// Convenience function for assigning a single animation to all directions for an ActorAnimation.
+export function omniAnimation(animation: FrameAnimation) {
+    return {
+        up: animation, down: animation, left: animation, right: animation,
+    };
+}

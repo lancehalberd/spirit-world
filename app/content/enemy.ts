@@ -47,6 +47,9 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
     // Only valid if `currentAnimation` is set using standard methods.
     currentAnimationKey: string;
     currentAnimation: FrameAnimation;
+    // If this is set, the enemy will automatically transition to this animation key
+    // once it has completed the current animation.
+    nextAnimationKey?: string;
     hasShadow: boolean = true;
     animationTime: number;
     animations: ActorAnimations;
@@ -217,11 +220,12 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         return !(this.spawnX < section.x || this.spawnX > section.x + section.w ||
                 this.spawnY < section.y || this.spawnY > section.y + section.h)
     }
-    changeToAnimation(type: string) {
+    changeToAnimation(type: string, nextAnimationKey?: string) {
         if (!this.animations) {
             debugger;
         }
         this.currentAnimationKey = type;
+        this.nextAnimationKey = nextAnimationKey;
         const animationSet = this.animations[type] || this.animations.idle;
         // Fallback to the first defined direction if the current direction isn't defined.
         const targetAnimation = animationSet[this.d] || Object.values(animationSet)[0];
@@ -234,8 +238,9 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             this.animationTime = 0;
         }
     }
-    setAnimation(type: string, d: Direction, time: number = 0) {
+    setAnimation(type: string, d: Direction, time: number = 0, nextAnimationKey?: string) {
         this.currentAnimationKey = type;
+        this.nextAnimationKey = nextAnimationKey;
         const animationSet = this.animations[type] || this.animations.idle;
         // Fallback to the first defined direction if the current direction isn't defined.
         this.currentAnimation = animationSet[d] || Object.values(animationSet)[0];
@@ -555,6 +560,9 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         }
         if (!this.alwaysUpdate && !this.isFromCurrentSection(state)) {
             return;
+        }
+        if (this.nextAnimationKey && this.animationTime >= this.currentAnimation.duration) {
+            this.changeToAnimation(this.nextAnimationKey);
         }
         this.time += FRAME_LENGTH;
         if (this.invulnerableFrames > 0) {

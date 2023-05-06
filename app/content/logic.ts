@@ -226,6 +226,11 @@ export const logicHash: {[key: string]: LogicCheck} = {
     cocoonBossDefeated: {
         requiredFlags: ['cocoonBoss'],
     },
+    // Normally the sleeping beasts disappear when you beat the War Temple boss, but they must also
+    // disappear if the beasts escape without defeating that boss.
+    sleepingBeastsLogic: {
+        excludedFlags: ['elementalBeastsEscaped', 'warTempleBoss'],
+    },
     hasReleasedBeasts,
     frozenLake: {
         // Frozen lake is only displayed after beasts escaped.
