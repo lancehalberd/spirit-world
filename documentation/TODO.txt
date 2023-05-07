@@ -53,9 +53,6 @@ Current tasks:
     - Fix safari transitions, use Hillary's machine
         - Spirit sight fails, perhaps only in areas with foreground layers.
 
-    - Weapon help text appeared when hitting buttons.
-        - Possibly as a result of pressing shift R though
-
     - Add indicators for NPCs next dialogue option
         - New vs Read dialogue (could just be 100 vs 50% opacity)
         - Quest info Golden or Red !
@@ -91,9 +88,6 @@ Current tasks:
             - Include the big chest room on the map, draw chests and big chests to the map
 
     - Block exit door in pit room in War Temple 3F
-
-    - Fix soft lock in Cocoon, some doors can be blocked by rolling balls into them
-        - Solvable by keeping doors out of corners.
 
     - Aimed Projectiles for Cocoon boss an other
         - EnemyProjectile wrapper for CrystalSpike/Flame/Frost/Spark that takes an element to determine which projectile to use

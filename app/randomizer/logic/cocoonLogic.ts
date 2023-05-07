@@ -1,5 +1,6 @@
 import {
     andLogic,
+    canCross2Gaps,
     canUseTeleporters,
     orLogic,
     hasAstralProjection,
@@ -42,8 +43,8 @@ export const cocoonNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'cocoon4SW',
-        checks: [{objectId: 'cocoonSmallKey'}],
-        paths: [{nodeId: 'cocoonEntrance', logic: canUseTeleporters}],
+        checks: [{objectId: 'cocoonSmallKey', logic: canCross2Gaps}],
+        paths: [{nodeId: 'cocoonEntrance', logic: andLogic(canUseTeleporters, canCross2Gaps)}],
         exits: [{objectId: 'cocoonOpenDoor'}],
         entranceIds: ['cocoonOpenDoor'],
     },
