@@ -16,8 +16,10 @@ import {
 export function moveEnemyToTargetLocation(
     state: GameState,
     enemy: Enemy, tx: number, ty: number,
-    animationStyle?: string
+    animationStyle?: string,
+    movementProperties?: MovementProperties
 ): number {
+    movementProperties = movementProperties ?? {};
     const hitbox = enemy.getHitbox(state);
     const dx = tx - (hitbox.x + hitbox.w / 2), dy = ty - (hitbox.y + hitbox.h / 2);
     if (animationStyle) {
@@ -28,11 +30,12 @@ export function moveEnemyToTargetLocation(
     const mag = Math.sqrt(dx * dx + dy * dy);
     if (mag > enemy.speed) {
         moveEnemy(state, enemy, enemy.speed * dx / mag, enemy.speed * dy / mag, {
+            ...movementProperties,
             boundingBox: false,
         });
         return mag - enemy.speed;
     }
-    moveEnemy(state, enemy, dx, dy, {boundingBox: false});
+    moveEnemy(state, enemy, dx, dy, {...movementProperties, boundingBox: false});
     return 0;
 }
 

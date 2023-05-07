@@ -50,14 +50,6 @@ Pending Graphics From Jon:
 
 
 Current tasks:
-    - Make it easier to shoot switches to open tomb
-        - Increase time by 500-1000ms
-        - change stone layout to help line up shot
-
-    - Remove contact damage from golem+hand
-        - Make sure the golem is solid and knocks the player away without damaging them
-        - Make sure the player cannot get stuck next to/behind the golem
-
     - Fix safari transitions, use Hillary's machine
         - Spirit sight fails, perhaps only in areas with foreground layers.
 
@@ -73,6 +65,7 @@ Current tasks:
 
     - lose money when collecting money loot as clone?
         - lose most progress this way.
+        - Add both list of copied and not copied props, log warning if a property is not on a list and copy.
 
     - Fix ledge graphics in tomb
         - War Temple
