@@ -5,6 +5,18 @@ import {
     Rect,
 } from 'app/types';
 
+export interface TileSource {
+    // The size of the tiles
+    w: number,
+    h: number,
+    // The source frame of the tiles.
+    source: Frame,
+    behaviors?: {
+        [key: string]: TileBehaviors,
+    },
+    tileCoordinates?: number[][],
+}
+
 export type Direction = 'up' | 'down' | 'left' | 'right' | 'upleft' | 'upright' | 'downleft' | 'downright';
 
 export interface TileBehaviors {

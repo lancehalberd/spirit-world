@@ -593,6 +593,169 @@ function renderCrystalDoorForeground(context: CanvasRenderingContext2D, state: G
     }
 }
 
+
+const stoneImage = requireImage('gfx/tiles/stonetileset.png');
+const stoneCrackedBackground: Frame = {image: stoneImage, x: 0, y: 240, w: 16, h: 16};
+const stoneEastCrackedWall: Frame = {image: stoneImage, x: 304, y: 64, w: 16, h: 16};
+const stoneWestCrackedWall: Frame = {image: stoneImage, x: 320, y: 64, w: 16, h: 16};
+//const stoneNorthCrackedWall: Frame = {image: stoneImage, x: 304, y: 80, w: 16, h: 16};
+const stoneSouthCrackedWall: Frame = {image: stoneImage, x: 320, y: 80, w: 16, h: 16};
+const [
+    stoneSouthDoorClosed, stoneSouthDoorOpen, stoneSouthDoorEmpty
+] = createAnimation(stoneImage, {w: 64, h: 16},
+    {left: 432, y: 9, cols: 1, rows: 3}).frames;
+const [
+    stoneWestDoorClosed, stoneEastDoorClosed, stoneWestDoorOpen, stoneEastDoorOpen,
+    /* */, /* */, stoneWestDoorEmpty, stoneEastDoorEmpty,
+] = createAnimation(stoneImage, {w: 16, h: 64},
+    {left: 432, y: 0, cols: 4, rows: 2}).frames;
+const [
+    stoneWestDoorOpenForeground, stoneEastDoorOpenForeground,
+    stoneWestDoorEmptyForeground, stoneEastDoorEmptyForeground,
+] = createAnimation(stoneImage, {w: 16, h: 64},
+    {left: 432, top: 192, cols: 4, rows: 1}).frames;
+const [
+    stoneStairsUp, stoneStairsDown, stoneNorthDoorway, stoneNorthBlownup,
+    /*stoneStairs*/, stoneNorthCrack,
+] = createAnimation(stoneImage, {w: 32, h: 32},
+    {left: 304, y: 0, cols: 4, rows: 2}).frames;
+const [
+    blockedStoneDoorCover, lockedStoneDoorCover, bigLockedStoneDoorCover,
+] = createAnimation(stoneImage, {w: 32, h: 32},
+    {left: 304, top: 224, cols: 3, rows: 1}).frames;
+
+debugCanvas;//(blockedDoorCover);
+
+function renderStoneDoor(this: void, context: CanvasRenderingContext2D, state: GameState, door: Door) {
+    if (door.definition.d === 'up') {
+        let frame = stoneNorthDoorway, overFrame: Frame = null;
+        if (door.renderOpen(state)) {
+            if (door.definition.status === 'cracked') {
+                context.fillStyle = 'black';
+                context.fillRect(door.x, door.y, 32, 32);
+                frame = stoneNorthBlownup;
+            }
+        } else if (door.status === 'locked') {
+            overFrame = lockedStoneDoorCover;
+        } else if (door.status === 'bigKeyLocked' ) {
+            overFrame = bigLockedStoneDoorCover;
+        } else if (door.status === 'cracked') {
+            frame = stoneNorthCrack;
+        } else if (door.definition.status !== 'frozen') {
+            // This covers closed, closedEnemy + closedSwitch
+            overFrame = blockedStoneDoorCover;
+        }
+        drawFrame(context, frame, {...frame, x: door.x, y: door.y});
+        if (overFrame) {
+            drawFrame(context, overFrame, {...overFrame, x: door.x, y: door.y});
+        }
+        if (door.status === 'frozen') {
+            context.save();
+                context.globalAlpha = 0.5;
+                context.fillStyle = 'white';
+                context.fillRect(door.x, door.y, 32, 32);
+            context.restore();
+        }
+    } else if (door.definition.d === 'left') {
+        if (door.status === 'cracked') {
+            return;
+        }
+        let frame = stoneWestDoorEmpty;
+        if (door.definition.status !== 'normal'
+            && door.definition.status !== 'cracked'
+            && door.definition.status !== 'blownOpen'
+        ) {
+            frame = door.renderOpen(state) ? stoneWestDoorOpen : stoneWestDoorClosed;
+        }
+        drawFrame(context, frame, {...frame, x: door.x, y: door.y});
+    } else if (door.definition.d === 'right') {
+        if (door.status === 'cracked') {
+            return;
+        }
+        let frame = stoneEastDoorEmpty;
+        if (door.definition.status !== 'normal'
+            && door.definition.status !== 'cracked'
+            && door.definition.status !== 'blownOpen'
+        ) {
+            frame = door.renderOpen(state) ? stoneEastDoorOpen : stoneEastDoorClosed;
+        }
+        drawFrame(context, frame, {...frame, x: door.x, y: door.y});
+    }
+    // There is no background frame for southern doors.
+}
+
+function renderStoneDoorForeground(context: CanvasRenderingContext2D, state: GameState, door: Door) {
+    if (door.definition.d === 'down') {
+        let frame = stoneSouthDoorEmpty;
+        // This frame is used if the doorway can have a door in it (closed or locked).
+        if (door.definition.status !== 'normal'
+            && door.definition.status !== 'cracked'
+            && door.definition.status !== 'blownOpen'
+        ) {
+            frame = door.renderOpen(state) ? stoneSouthDoorOpen : stoneSouthDoorClosed;
+        }
+        // Draw cracked tiles instead of the door.
+        if (door.status === 'cracked') {
+            drawFrame(context, stoneCrackedBackground, {x: door.x, y: door.y, w: 16, h: 16});
+            drawFrame(context, stoneCrackedBackground, {x: door.x + 16, y: door.y, w: 16, h: 16});
+            drawFrame(context, stoneCrackedBackground, {x: door.x + 32, y: door.y, w: 16, h: 16});
+            drawFrame(context, stoneCrackedBackground, {x: door.x + 48, y: door.y, w: 16, h: 16});
+            drawFrame(context, stoneSouthCrackedWall, {x: door.x + 16, y: door.y, w: 16, h: 16});
+            drawFrame(context, stoneSouthCrackedWall, {x: door.x + 32, y: door.y, w: 16, h: 16});
+        } else {
+            drawFrame(context, frame, {...frame, x: door.x, y: door.y});
+        }
+    } else if (door.definition.d === 'up') {
+        let frame = stoneNorthDoorway;
+        if (door.definition.status === 'cracked'
+            || door.definition.status === 'blownOpen'
+            || door.definition.status === 'frozen'
+        ) {
+            frame = door.renderOpen(state) ? stoneNorthBlownup : null;
+        }
+        // Only draw the top 12 pixels of southern facing doors over the player.
+        if (frame) {
+            drawFrame(context, {...frame, h: 12}, {...frame, x: door.x, y: door.y, h: 12});
+        }
+    } else if (door.definition.d === 'left') {
+        let frame = stoneWestDoorEmptyForeground;
+        if (door.definition.status !== 'normal'
+            && door.definition.status !== 'cracked'
+            && door.definition.status !== 'blownOpen'
+        ) {
+            frame = door.renderOpen(state) ? stoneWestDoorOpenForeground : null;
+        }
+        // Draw cracked tiles on top fo the door frame graphic.
+        if (door.status === 'cracked') {
+            drawFrame(context, stoneCrackedBackground, {x: door.x, y: door.y, w: 16, h: 16});
+            drawFrame(context, stoneCrackedBackground, {x: door.x, y: door.y + 16, w: 16, h: 16});
+            drawFrame(context, stoneCrackedBackground, {x: door.x, y: door.y + 32, w: 16, h: 16});
+            drawFrame(context, stoneWestCrackedWall, {x: door.x, y: door.y + 16, w: 16, h: 16});
+            drawFrame(context, stoneWestCrackedWall, {x: door.x, y: door.y + 32, w: 16, h: 16});
+        } else if (frame) {
+            drawFrame(context, frame, {...frame, x: door.x, y: door.y});
+        }
+    } else if (door.definition.d === 'right') {
+        let frame = stoneEastDoorEmptyForeground;
+        if (door.definition.status !== 'normal'
+            && door.definition.status !== 'cracked'
+            && door.definition.status !== 'blownOpen'
+        ) {
+            frame = door.renderOpen(state) ? stoneEastDoorOpenForeground : null;
+        }
+        // Draw cracked tiles on top fo the door frame graphic.
+        if (door.status === 'cracked') {
+            drawFrame(context, stoneCrackedBackground, {x: door.x, y: door.y, w: 16, h: 16});
+            drawFrame(context, stoneCrackedBackground, {x: door.x, y: door.y + 16, w: 16, h: 16});
+            drawFrame(context, stoneCrackedBackground, {x: door.x, y: door.y + 32, w: 16, h: 16});
+            drawFrame(context, stoneEastCrackedWall, {x: door.x, y: door.y + 16, w: 16, h: 16});
+            drawFrame(context, stoneEastCrackedWall, {x: door.x, y: door.y + 32, w: 16, h: 16});
+        } else if (frame) {
+            drawFrame(context, frame, {...frame, x: door.x, y: door.y});
+        }
+    }
+}
+
 export const doorStyles: {[key: string]: DoorStyleDefinition} = {
     cavernDownstairs: {
         w: 32,
@@ -691,6 +854,55 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
         },
         render: renderCrystalDoor,
         renderForeground: renderCrystalDoorForeground
+    },
+    stoneDownstairs: {
+        w: 32,
+        h: 32,
+        isStairs: true,
+        render(context: CanvasRenderingContext2D, state: GameState, door: Door) {
+            if (door.status !== 'normal') {
+                doorStyles.stone.render(context, state, door);
+                return;
+            }
+            const frame = stoneStairsDown;
+            drawFrameAt(context, frame, {x: door.x, y: door.y});
+        },
+        renderForeground(context: CanvasRenderingContext2D, state: GameState, door: Door) {
+            const frame = stoneStairsDown;
+            drawFrame(context, {...frame, h: 12}, {...frame, x: door.x, y: door.y, h: 12});
+        }
+    },
+    stoneUpstairs: {
+        w: 32,
+        h: 32,
+        isStairs: true,
+        render(context: CanvasRenderingContext2D, state: GameState, door: Door) {
+            if (door.status !== 'normal') {
+                doorStyles.stone.render(context, state, door);
+                return;
+            }
+            const frame = stoneStairsUp;
+            drawFrameAt(context, frame, {x: door.x, y: door.y});
+        },
+        renderForeground(context: CanvasRenderingContext2D, state: GameState, door: Door) {
+            const frame = stoneStairsUp;
+            drawFrame(context, {...frame, h: 12}, {...frame, x: door.x, y: door.y, h: 12});
+        }
+    },
+    stone: {
+        w: 64,
+        h: 16,
+        getHitbox(door: Door) {
+            if (door.definition.d === 'up') {
+                return {x: door.x, y: door.y, w: 32, h: 32};
+            }
+            if (door.definition.d === 'down') {
+                return {x: door.x, y: door.y + 8, w: 64, h: 8};
+            }
+            return {x: door.x, y: door.y, w: 16, h: 64};
+        },
+        render: renderStoneDoor,
+        renderForeground: renderStoneDoorForeground
     },
     woodenDownstairs: {
         w: 32,

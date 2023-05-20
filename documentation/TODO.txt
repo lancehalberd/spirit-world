@@ -50,6 +50,14 @@ Pending Graphics From Jon:
 
 
 Current tasks:
+    - Investigate updating various tile sets to new version:
+        - identify changed tiles and plan how to fix issues caused by the update:
+            - possibly switch the order of tiles to prevent any changes
+            - identify and update maps where tiles change
+        - crystal
+        - cave
+
+
     - Fix safari transitions, use Hillary's machine
         - Spirit sight fails, perhaps only in areas with foreground layers.
 
@@ -69,6 +77,9 @@ Current tasks:
 
     - Make sure door open/close sound effects are playing
         - Check tomb crystal switch doors specifically.
+
+    - Add push/pull instructions to the key room in tomb
+        - Add respawn flag to objects that causes them to respawn if destroyed, use to prevent soft lock in tomb.
 
     - Crystal collector doesn't turn on waterfall second time.
 

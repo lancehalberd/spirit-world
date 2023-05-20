@@ -1,6 +1,6 @@
 import { addParticleAnimations } from 'app/content/effects/animationEffect';
 import { objectHash } from 'app/content/objects/objectHash';
-import { lightStoneParticles } from 'app/content/tiles';
+import { lightStoneParticles } from 'app/content/tiles/constants';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { playAreaSound, stopSound } from 'app/musicController';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
