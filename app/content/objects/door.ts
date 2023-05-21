@@ -293,7 +293,7 @@ export class Door implements ObjectInstance {
                     applyBehaviorToTile(this.area, x, y + 2, { solid: true, low: false });
                 }
             }
-        } else if (this.style === 'cavern' || this.style === 'crystal') {
+        } else if (this.style === 'cavern' || this.style === 'crystal' || this.style === 'stone') {
             if (this.definition.d === 'down') {
                 this.applyWideSouthernDoorBehaviorToArea();
             } else if (this.definition.d === 'up') {
