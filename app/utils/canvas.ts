@@ -64,13 +64,22 @@ export function drawCanvas(
     {x, y, w, h}: Rect,
     {x: tx, y: ty, w: tw, h: th}:Rect
 ): void {
+    // Render nothing if the source is entirely
+    // outside of the canvas rect.
+    if (x + w < 0
+        || y + h < 0
+        || x > canvas.width
+        || y > canvas.height
+    ) {
+        return;
+    }
     if (w > canvas.width - x) {
-        const dx = w - (canvas.width - x);
+        const dx = (canvas.width - x) - w;
         w += dx;
         tw += dx;
     }
     if (h > canvas.height - y) {
-        const dy = h - (canvas.height - y);
+        const dy = (canvas.height - y) - h;
         h += dy;
         th += dy;
     }
@@ -86,7 +95,12 @@ export function drawCanvas(
         h += y;
         y = 0;
     }
-    if (w > 0 && h > 0){
+    if (w > 0 && h > 0) {
+        if (x < 0 || y < 0 || x + w > canvas.width || y + h > canvas.height) {
+            console.log('Attempted to render from outside canvas bounds');
+            console.log({x, y, w, h}, {width: canvas.width, height: canvas.height});
+            debugger;
+        }
         context.drawImage(
             canvas,
             x, y,
