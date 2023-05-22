@@ -9,7 +9,7 @@ import {
     renderForegroundObjects,
 } from 'app/render/renderField';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
-import { createCanvasAndContext } from 'app/utils/canvas';
+import { createCanvasAndContext, drawCanvas } from 'app/utils/canvas';
 import { enterLocation } from 'app/utils/enterLocation';
 import { enterZoneByTarget } from 'app/utils/enterZoneByTarget';
 import { directionMap, getTileBehaviors } from 'app/utils/field';
@@ -181,9 +181,9 @@ export class Teleporter implements ObjectInstance {
         }
         const hitbox = this.getRenderBox(state);
         updateSpiritCanvas(state, hitbox);
-        context.drawImage(spiritCanvas,
-            0, 0, hitbox.w, hitbox.h,
-            hitbox.x, hitbox.y, hitbox.w, hitbox.h
+        drawCanvas(context, spiritCanvas,
+            {x: 0, y: 0, w: hitbox.w, h: hitbox.h},
+            hitbox
         );
 
         context.save();
@@ -228,10 +228,14 @@ function updateSpiritCanvas(state: GameState, hitbox: Rect): void {
             -(hitbox.x) | 0,
             -(hitbox.y) | 0
         );
-        spiritContext.drawImage(
+        /*spiritContext.drawImage(
             area.canvas,
             hitbox.x, hitbox.y, hitbox.w, hitbox.h,
             hitbox.x, hitbox.y, hitbox.w, hitbox.h,
+        );*/
+        drawCanvas(spiritContext, area.canvas,
+            hitbox,
+            hitbox
         );
         for (const object of area.objectsToRender) {
             if (object.drawPriority === 'background' || object.getDrawPriority?.(state) === 'background') {
@@ -241,10 +245,14 @@ function updateSpiritCanvas(state: GameState, hitbox: Rect): void {
         renderAreaObjectsBeforeHero(spiritContext, state, area, true);
         renderAreaObjectsAfterHero(spiritContext, state, area, true);
         if (area?.foregroundCanvas) {
-            spiritContext.drawImage(
+            /*spiritContext.drawImage(
                 area.foregroundCanvas,
                 hitbox.x, hitbox.y, hitbox.w, hitbox.h,
                 hitbox.x, hitbox.y, hitbox.w, hitbox.h,
+            );*/
+            drawCanvas(spiritContext, area.foregroundCanvas,
+                hitbox,
+                hitbox
             );
         }
         renderForegroundObjects(spiritContext, state, area, true);
