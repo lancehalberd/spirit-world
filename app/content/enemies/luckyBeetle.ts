@@ -9,7 +9,6 @@ import { addObjectToArea } from 'app/utils/objects';
 import { saveGame } from 'app/utils/saveGame';
 import { getVectorToTarget } from 'app/utils/target';
 
-import { Enemy, GameState, HitProperties, HitResult } from 'app/types';
 
 function spawnMoney(state: GameState, enemy: Enemy, amount: number): void {
     let theta = 2 * Math.PI * Math.random();

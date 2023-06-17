@@ -1,6 +1,5 @@
 import { isRandomizer } from 'app/gameConstants';
 
-import { AndLogicCheck, GameState, LogicCheck, LogicDefinition, ObjectDefinition, OrLogicCheck } from 'app/types';
 
 export function andLogic(...logicChecks: LogicCheck[]): AndLogicCheck {
     return { operation: 'and', logicChecks};

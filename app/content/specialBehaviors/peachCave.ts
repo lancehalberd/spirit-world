@@ -1,6 +1,5 @@
 import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
 
-import { AreaInstance, GameState } from 'app/types';
 
 specialBehaviorsHash.peachCave = {
     type: 'area',

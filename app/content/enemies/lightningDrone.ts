@@ -15,7 +15,6 @@ import {
     getVectorToNearbyTarget,
 } from 'app/utils/target';
 
-import { Enemy, GameState } from 'app/types';
 
 const chargeTime = 1000;
 const dischargeRadius = 48;

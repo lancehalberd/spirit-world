@@ -2,7 +2,6 @@ import { GAME_KEY } from 'app/gameConstants';
 import { createAnimation } from 'app/utils/animations';
 import { requireImage } from 'app/utils/images';
 
-import { Frame } from 'app/types';
 
 /*const font = requireImage('gfx/simpleFontWhite.png');
 

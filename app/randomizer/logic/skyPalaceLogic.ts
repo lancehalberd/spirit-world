@@ -6,7 +6,6 @@ import {
     orLogic,
 } from 'app/content/logic';
 
-import { LogicNode } from 'app/types';
 
 const zoneId = 'skyPalace';
 export const skyPalaceNodes: LogicNode[] = [

@@ -1,6 +1,5 @@
 import { query } from 'app/dom';
 
-import { Frame, Rect } from 'app/types';
 
 export const mainCanvas:HTMLCanvasElement = query('.js-mainCanvas') as HTMLCanvasElement;
 window['mainCanvas'] = mainCanvas;

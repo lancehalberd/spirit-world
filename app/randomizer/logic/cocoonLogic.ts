@@ -11,7 +11,6 @@ import {
     hasTeleportation,
 } from 'app/content/logic';
 
-import { LogicNode } from 'app/types';
 
 const zoneId = 'cocoon';
 export const cocoonNodes: LogicNode[] = [

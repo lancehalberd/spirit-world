@@ -6,11 +6,6 @@ import { isPixelInShortRect, rectanglesOverlap } from 'app/utils/index';
 import { getObjectBehaviors, removeObjectFromArea } from 'app/utils/objects';
 import { resetTileBehavior } from 'app/utils/tileBehavior';
 
-import {
-    AreaInstance, AreaLayer, Direction, EffectInstance, Enemy, GameState,
-    Hero, HitProperties, HitResult, MovementProperties,
-    ObjectInstance, Rect, Tile, TileCoords, TileBehaviors,
-} from 'app/types';
 
 export { directionMap, getDirection } from 'app/utils/direction';
 

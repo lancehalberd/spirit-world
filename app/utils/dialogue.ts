@@ -1,7 +1,6 @@
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 import { isLogicValid } from 'app/content/logic';
 
-import { DialogueOption, DialogueSet, GameState } from 'app/types';
 
 export function getDialogue(dialogueKey: string): DialogueSet {
     return dialogueHash[dialogueKey];

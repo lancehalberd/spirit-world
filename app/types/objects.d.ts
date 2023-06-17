@@ -1,19 +1,8 @@
-import { Door } from 'app/content/objects/door';
-import { Sign } from 'app/content/objects/sign';
-import {
-    Actor, AreaInstance, BossType,
-    DecorationType, Direction, Enemy, EnemyType, FullZoneLocation,
-    GameState, Hero, LogicDefinition, LootType,
-    MagicElement, MinionType,
-    NPCBehavior, NPCStyle,
-    Rect, TileBehaviors,
-} from 'app/types';
-
-export type DrawPriority = 'background' | 'foreground' | 'sprites' | 'hud'
+type DrawPriority = 'background' | 'foreground' | 'sprites' | 'hud'
     // Currently just used for effects that should be rendered during defeat sequence.
     | 'background-special' | 'foreground-special';
 
-export interface LootData {
+interface LootData {
     lootType: LootType
     // Only applies to 'money' loot currently.
     lootAmount?: number
@@ -23,7 +12,7 @@ export interface LootData {
 }
 
 
-export type DialogueLootDefinition = LootData & {
+type DialogueLootDefinition = LootData & {
     type: 'dialogueLoot'
     // The id of the object associated with this dialogue (used during randomization).
     id?: string
@@ -31,9 +20,9 @@ export type DialogueLootDefinition = LootData & {
     cost?: number
 }
 
-export type AnyLootDefinition = BossObjectDefinition | DialogueLootDefinition | LootObjectDefinition;
+type AnyLootDefinition = BossObjectDefinition | DialogueLootDefinition | LootObjectDefinition;
 
-export interface LootWithLocation {
+interface LootWithLocation {
     // Either location will be set or dialogueKey+optionKey will be set
     location?: FullZoneLocation
     dialogueKey?: string
@@ -42,7 +31,7 @@ export interface LootWithLocation {
     progressFlags?: string[]
 }
 
-export interface LootAssignment {
+interface LootAssignment {
     source: LootWithLocation
     lootType: LootType
     lootLevel: number
@@ -50,7 +39,7 @@ export interface LootAssignment {
     target: LootWithLocation
 }
 
-export interface AssignmentState {
+interface AssignmentState {
     // The array of loot assignments that can be used to apply this assignment state to the game.
     assignments: LootAssignment[]
     // The ids of all the checks that have contents assigned to them already.
@@ -59,7 +48,7 @@ export interface AssignmentState {
     assignedContents: string[]
 }
 
-export interface ObjectInstance {
+interface ObjectInstance {
     isObject: true
     area?: AreaInstance
     definition?: ObjectDefinition
@@ -152,7 +141,7 @@ export interface ObjectInstance {
     getParts?: (state: GameState) => ObjectInstance[]
 }
 
-export interface EffectInstance {
+interface EffectInstance {
     isEffect: true
     area?: AreaInstance
     linkedObject?: EffectInstance
@@ -205,11 +194,11 @@ export interface EffectInstance {
 
 }
 
-export type ObjectStatus = 'active' | 'closed' | 'closedEnemy' | 'closedSwitch'
+type ObjectStatus = 'active' | 'closed' | 'closedEnemy' | 'closedSwitch'
     | 'gone' | 'hidden' | 'hiddenSwitch' | 'hiddenEnemy' | 'normal'
     | 'locked' | 'bigKeyLocked' | 'cracked' | 'blownOpen' | 'frozen' | 'off';
 
-export interface MovementProperties {
+interface MovementProperties {
     boundingBox?: false | Rect
     // Can set an arbitrary array of rectangles that block this movement.
     blockedBoxes?: Rect[]
@@ -250,7 +239,7 @@ export interface MovementProperties {
     dy?: number
 }
 
-export interface Projectile {
+interface Projectile {
     // Set when the projectile passes over a ledge from high to low.
     // Once this is set the projectile can only hit objects marked very tall
     // and it can pass up ledges from low to high, which unsets the flag.
@@ -271,20 +260,20 @@ export interface Projectile {
     stopped?: boolean
 }
 
-export interface Ray {
+interface Ray {
     x1: number
     y1: number
     x2: number
     y2: number
     r: number
 }
-export interface Circle {
+interface Circle {
    x: number
    y: number
    r: number
 }
 
-export interface HitProperties {
+interface HitProperties {
     direction?: Direction
     damage?: number
     // When defined this damage will be used when hitting the spirit cloak.
@@ -347,7 +336,7 @@ export interface HitProperties {
     projectile?: Projectile
 }
 
-export interface HitResult {
+interface HitResult {
     // Indicates the hit connected with something solid.
     // This is generally true unless the hit is invalidated by some special condition like
     // an enemies invulnerability frames.
@@ -378,7 +367,7 @@ export interface HitResult {
     hitTargets?: Set<EffectInstance | ObjectInstance>
 }
 
-export interface BaseObjectDefinition {
+interface BaseObjectDefinition {
     id: string
     // Whether this is linked to an object in the physical/spirit world.
     linked?: boolean
@@ -409,25 +398,25 @@ export interface BaseObjectDefinition {
     d?: Direction
 }
 
-export interface BallGoalDefinition extends BaseObjectDefinition {
+interface BallGoalDefinition extends BaseObjectDefinition {
     type: 'ballGoal',
     targetObjectId?: string,
 }
 
-export interface BeadCascadeDefinition extends BaseObjectDefinition {
+interface BeadCascadeDefinition extends BaseObjectDefinition {
     type: 'beadCascade'
     height?: number
     onInterval?: number
     offInterval?: number
 }
-export interface AnodeDefinition extends BaseObjectDefinition {
+interface AnodeDefinition extends BaseObjectDefinition {
     type: 'anode'
     onInterval?: number
     offInterval?: number
 }
 
-export type TurretStyles = 'crystal' | 'arrow';
-export interface TurretDefinition extends BaseObjectDefinition {
+type TurretStyles = 'crystal' | 'arrow';
+interface TurretDefinition extends BaseObjectDefinition {
     type: 'turret'
     style?: TurretStyles
     // Milliseconds between arrows
@@ -436,28 +425,28 @@ export interface TurretDefinition extends BaseObjectDefinition {
     fireOffset?: number
 }
 
-export interface FloorSwitchDefinition extends BaseObjectDefinition {
+interface FloorSwitchDefinition extends BaseObjectDefinition {
     type: 'floorSwitch',
     toggleOnRelease?: boolean,
     targetObjectId?: string,
 }
 
-export interface KeyBlockDefinition extends BaseObjectDefinition {
+interface KeyBlockDefinition extends BaseObjectDefinition {
     type: 'keyBlock',
     targetObjectId?: string,
 }
 
-export interface IndicatorDefinition extends BaseObjectDefinition {
+interface IndicatorDefinition extends BaseObjectDefinition {
     type: 'indicator',
     targetObjectId?: string,
 }
 
-export type LootObjectDefinition = BaseObjectDefinition & LootData & {
+type LootObjectDefinition = BaseObjectDefinition & LootData & {
     type: 'bigChest' | 'chest' | 'loot' | 'shopItem',
     price?: number
 }
 
-export interface CrystalSwitchDefinition extends BaseObjectDefinition {
+interface CrystalSwitchDefinition extends BaseObjectDefinition {
     type: 'crystalSwitch',
     element?: MagicElement,
     // If this is set, this crystal will de-activate after this many milliseconds.
@@ -465,7 +454,7 @@ export interface CrystalSwitchDefinition extends BaseObjectDefinition {
     targetObjectId?: string,
 }
 
-export interface EntranceDefinition extends BaseObjectDefinition {
+interface EntranceDefinition extends BaseObjectDefinition {
     type: 'teleporter' | 'pitEntrance' | 'door' | 'stairs'
     targetZone?: string
     targetObjectId?: string
@@ -481,35 +470,35 @@ export interface EntranceDefinition extends BaseObjectDefinition {
     // money to open them.
     price?: number
 }
-export interface MarkerDefinition extends BaseObjectDefinition {
+interface MarkerDefinition extends BaseObjectDefinition {
     type: 'marker' | 'spawnMarker',
     // This message will be displayed as a location indicator when arriving at this entrance.
     locationCue?: string,
 }
 
-export interface SignDefinition extends BaseObjectDefinition {
-    type: 'sign',
-    message: string,
+interface SignDefinition extends BaseObjectDefinition {
+    type: 'sign'
+    message: string
 }
 
-export interface NPCDefinition extends BaseObjectDefinition {
-    type: 'npc',
-    behavior: NPCBehavior,
-    style: NPCStyle,
-    dialogueKey?: string,
-    dialogue?: string,
+interface NPCDefinition extends BaseObjectDefinition {
+    type: 'npc'
+    behavior: NPCBehavior
+    style: NPCStyle
+    dialogueKey?: string
+    dialogue?: string
 }
 
-export type SimpleObjectType = 'airBubbles' | 'beadGrate' | 'bell' | 'cathode'
+type SimpleObjectType = 'airBubbles' | 'beadGrate' | 'bell' | 'cathode'
     | 'flameTurret'
     | 'pushPull' | 'rollingBall' | 'saveStatue' | 'shieldingUnit'
     | 'tippable' | 'torch' | 'vineSprout' | 'waterPot';
 
-export interface SimpleObjectDefinition extends BaseObjectDefinition {
-    type: SimpleObjectType,
+interface SimpleObjectDefinition extends BaseObjectDefinition {
+    type: SimpleObjectType
 }
 
-export interface DecorationDefinition extends BaseObjectDefinition {
+interface DecorationDefinition extends BaseObjectDefinition {
     type: 'decoration'
     decorationType: DecorationType
     drawPriority?: DrawPriority
@@ -517,13 +506,13 @@ export interface DecorationDefinition extends BaseObjectDefinition {
     h: number,
 }
 
-export interface WaterfallDefinition extends BaseObjectDefinition {
+interface WaterfallDefinition extends BaseObjectDefinition {
     type: 'waterfall'
     w: number,
     h: number,
 }
 
-export interface NarrationDefinition extends BaseObjectDefinition {
+interface NarrationDefinition extends BaseObjectDefinition {
     type: 'narration'
     message: string
     trigger?: 'touch' | 'activate' | 'enterSection'
@@ -532,57 +521,57 @@ export interface NarrationDefinition extends BaseObjectDefinition {
     h: number
 }
 
-export interface EscalatorDefinition extends BaseObjectDefinition {
+interface EscalatorDefinition extends BaseObjectDefinition {
     type: 'escalator'
     speed: 'slow' | 'fast'
     w: number
     h: number
 }
 
-export interface SimpleMovementDefinition {
+interface SimpleMovementDefinition {
     d?: Direction
     speed: number
     turn: 'left' | 'right' | 'bounce'
 }
 
 
-export interface MovingPlatformDefinition extends BaseObjectDefinition, SimpleMovementDefinition {
+interface MovingPlatformDefinition extends BaseObjectDefinition, SimpleMovementDefinition {
     type: 'movingPlatform'
     w: number
     h: number
 }
 
-export interface SpikeBallDefinition extends BaseObjectDefinition, SimpleMovementDefinition {
+interface SpikeBallDefinition extends BaseObjectDefinition, SimpleMovementDefinition {
     type: 'spikeBall'
 }
 
 
-export interface EscalatorDefinition extends BaseObjectDefinition {
+interface EscalatorDefinition extends BaseObjectDefinition {
     type: 'escalator'
     speed: 'slow' | 'fast'
     w: number
     h: number
 }
 
-export interface PushStairsDefinition extends BaseObjectDefinition {
+interface PushStairsDefinition extends BaseObjectDefinition {
     type: 'pushStairs'
     w: number
     offset: number
 }
 
-export interface EnemyObjectDefinition extends BaseObjectDefinition {
+interface EnemyObjectDefinition extends BaseObjectDefinition {
     type: 'enemy',
     enemyType: EnemyType | MinionType,
     params?: {[key: string]: any},
 }
 
-export type BossObjectDefinition = BaseObjectDefinition & LootData & {
+type BossObjectDefinition = BaseObjectDefinition & LootData & {
     type: 'boss',
     enemyType: BossType,
     params?: {[key: string]: any},
 }
 
-export type ObjectDefinition = SimpleObjectDefinition
+type ObjectDefinition = SimpleObjectDefinition
     | AnodeDefinition
     | BallGoalDefinition
     | BeadCascadeDefinition
@@ -607,52 +596,52 @@ export type ObjectDefinition = SimpleObjectDefinition
     | WaterfallDefinition
     ;
 
-export type ObjectType = ObjectDefinition['type'];
+type ObjectType = ObjectDefinition['type'];
 
 
-export interface SpecialDoorBehavior {
+interface SpecialDoorBehavior {
     type: 'door'
     apply: (state: GameState, object: Door) => void
 }
-export interface SpecialEnemyBehavior {
+interface SpecialEnemyBehavior {
     type: 'enemy'
     apply: (state: GameState, object: Enemy) => void
 }
 
-export interface SpecialSignBehavior {
+interface SpecialSignBehavior {
     type: 'sign'
     apply: (state: GameState, object: Sign) => void
 }
 
-export interface SpecialSwitchBehavior {
+interface SpecialSwitchBehavior {
     // This could be extended for floor switches and other switches.
     type: 'crystalSwitch' | 'floorSwitch' | 'ballGoal'
     apply?: (state: GameState, object: ObjectInstance) => void
     onActivate?: (state: GameState, object: ObjectInstance) => void
 }
 
-export interface SpecialPushPullBehavior {
+interface SpecialPushPullBehavior {
     type: 'pushPull',
     apply?: (state: GameState, object: ObjectInstance) => void
 }
 
-export interface SpecialTippableBehavior {
+interface SpecialTippableBehavior {
     type: 'tippable',
     apply?: (state: GameState, object: ObjectInstance) => void
 }
 
-export interface SpecialNarrationBehavior {
+interface SpecialNarrationBehavior {
     type: 'narration'
     apply?: (state: GameState, object: ObjectInstance) => void
     update?: (state: GameState, object: ObjectInstance) => void
 }
 
-export interface SpecialAreaBehavior {
+interface SpecialAreaBehavior {
     type: 'area'
     apply: (state: GameState, area: AreaInstance) => void
 }
 
-export type SpecialBehavior
+type SpecialBehavior
     = SpecialDoorBehavior
     | SpecialNarrationBehavior
     | SpecialPushPullBehavior

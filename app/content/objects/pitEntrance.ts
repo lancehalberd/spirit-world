@@ -8,10 +8,6 @@ import { getTileBehaviors } from 'app/utils/field';
 import { isObjectInsideTarget, pad } from 'app/utils/index';
 import { getObjectStatus } from 'app/utils/objects';
 
-import {
-    AreaInstance, DrawPriority, GameState, ObjectInstance,
-    ObjectStatus, Rect, EntranceDefinition, TileBehaviors,
-} from 'app/types';
 
 const pitFrame = createAnimation('gfx/tiles/pit.png', {w: 16, h: 16}).frames[0];
 

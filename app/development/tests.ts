@@ -1,6 +1,5 @@
 import { zones } from 'app/content/zones/zoneHash';
 
-import { AreaDefinition, ObjectDefinition, Zone, ZoneLocation } from 'app/types';
 
 function everyZone(callback: (location: Partial<ZoneLocation>, zone: Zone) => void ) {
     for (const zoneKey in zones) {

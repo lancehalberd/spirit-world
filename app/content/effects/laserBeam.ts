@@ -2,10 +2,6 @@ import { FRAME_LENGTH } from 'app/gameConstants';
 import { removeEffectFromArea } from 'app/utils/effects';
 import { getTileBehaviors, hitTargets } from 'app/utils/field';
 
-import {
-    AreaInstance, EffectInstance,
-    Frame, GameState, Ray,
-} from 'app/types';
 
 function truncateRay(state: GameState, area: AreaInstance, ray: Ray): Ray {
     const dx = ray.x2 - ray.x1, dy = ray.y2 - ray.y1;

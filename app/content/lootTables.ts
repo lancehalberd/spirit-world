@@ -1,6 +1,5 @@
 
 
-import { LootTable, LootType } from 'app/types';
 
 
 function createLootTable(totalWeight: number, entries: {type: LootType, amount?: number, weight: number}[]) {

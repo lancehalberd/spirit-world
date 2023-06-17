@@ -5,7 +5,6 @@ import {
     hasRangedPush, hasWeapon,
 } from 'app/content/logic';
 
-import {LogicNode} from 'app/types';
 
 const zoneId = 'tomb';
 export const tombNodes: LogicNode[] = [

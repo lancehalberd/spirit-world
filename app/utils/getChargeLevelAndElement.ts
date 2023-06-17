@@ -1,6 +1,5 @@
 import { isUnderwater } from 'app/utils/actor';
 
-import { ActiveTool, GameState, Hero, MagicElement } from 'app/types';
 
 export function getChargeLevelAndElement(state: GameState, hero: Hero, tool: ActiveTool = null) {
     if (state.hero.magic <= 0) {

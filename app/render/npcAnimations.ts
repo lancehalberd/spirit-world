@@ -1,6 +1,5 @@
 import { createAnimation } from 'app/utils/animations';
 
-import { ActorAnimations, FrameAnimation, FrameDimensions } from 'app/types';
 
 /*
 

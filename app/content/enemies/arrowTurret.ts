@@ -11,9 +11,6 @@ import { FRAME_LENGTH } from 'app/gameConstants';
 import { getFrame } from 'app/utils/animations';
 import { addEffectToArea } from 'app/utils/effects';
 
-import {
-    Enemy, GameState,
-} from 'app/types';
 
 interface TurretParams {
     isDiagonal?: boolean

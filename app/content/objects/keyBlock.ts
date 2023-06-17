@@ -6,10 +6,6 @@ import { findObjectInstanceById } from 'app/utils/findObjectInstanceById';
 import { activateTarget, getObjectStatus } from 'app/utils/objects';
 import { saveGame } from 'app/utils/saveGame';
 
-import {
-    AreaInstance, GameState, Frame, FrameAnimation, KeyBlockDefinition,
-    ObjectInstance, ObjectStatus, Rect,
-} from 'app/types';
 
 const blockGeometry = {w: 32, h: 36, content: {x: 0, y: 4, w: 32, h: 32}};
 const blockAnimationProperties = {

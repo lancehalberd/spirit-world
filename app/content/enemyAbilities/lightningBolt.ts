@@ -2,7 +2,6 @@ import { LightningBolt } from 'app/content/effects/lightningBolt';
 import { addEffectToArea } from 'app/utils/effects';
 import { getVectorToNearbyTarget } from 'app/utils/target';
 
-import { EnemyAbility, Enemy, GameState } from 'app/types';
 
 type NearbyTargetType = ReturnType<typeof getVectorToNearbyTarget>;
 export const lightningBoltAbility: EnemyAbility<NearbyTargetType> = {

@@ -1,6 +1,3 @@
-import {
-    AreaInstance, EffectInstance, GameState,
-} from 'app/types';
 
 export function addEffectToArea(state: GameState, area: AreaInstance, effect: EffectInstance): void {
     if (effect.area && effect.area !== area) {

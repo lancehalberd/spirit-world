@@ -1,4 +1,3 @@
-import { LogicNode } from 'app/types';
 
 import {
     andLogic, canCross2Gaps, hasCharge, hasUpgradedBow,

@@ -1,4 +1,4 @@
-import { AnimationEffect } from 'app/content/effects/animationEffect';
+import { FieldAnimationEffect } from 'app/content/effects/animationEffect';
 import { objectHash } from 'app/content/objects/objectHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, frameAnimation } from 'app/utils/animations';
@@ -7,10 +7,6 @@ import { pad } from 'app/utils/index';
 import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
 import Random from 'app/utils/Random';
 
-import {
-    AreaInstance, DrawPriority, GameState, ObjectInstance,
-    ObjectStatus, SimpleObjectDefinition, Rect,
-} from 'app/types';
 
 const underFrame = createAnimation('gfx/objects/icicleholemonster.png', {w: 16, h: 32}).frames[0];
 const overFrame = createAnimation('gfx/objects/icicleholemonster.png', {w: 16, h: 32}, {x: 1}).frames[0];
@@ -70,7 +66,7 @@ function addRegenerationParticle(
     const frame = Random.element(regenerationParticles);
     const vx = Math.cos(theta) / 4;
     const vy = Math.sin(theta) / 4;
-    const particle = new AnimationEffect({
+    const particle = new FieldAnimationEffect({
         animation: frameAnimation(frame),
         drawPriority: 'foreground',
         x: target.x + Math.random() * target.w,

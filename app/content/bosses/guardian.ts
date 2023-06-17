@@ -1,4 +1,3 @@
-import { sample } from 'lodash';
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { CrystalSpike } from 'app/content/effects/arrow';
 import { Blast } from 'app/content/effects/blast';
@@ -15,11 +14,11 @@ import { createAnimation } from 'app/utils/animations';
 import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import { accelerateInDirection, hasEnemyLeftSection } from 'app/utils/enemies';
 import { getDirection } from 'app/utils/field';
+import { sample } from 'app/utils/index';
 import { addObjectToArea } from 'app/utils/objects';
 import { getVectorToNearbyTarget, getVectorToTarget } from 'app/utils/target';
 
 
-import { ActorAnimations, Enemy, EnemyAbility, FrameAnimation, FrameDimensions, GameState, HitProperties, HitResult, MagicElement, ObjectInstance } from 'app/types';
 
 // Taken from heroAnimations.ts
 export const Y_OFF = -4;

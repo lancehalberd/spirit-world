@@ -6,10 +6,6 @@ import { removeEffectFromArea } from 'app/utils/effects';
 import { hitTargets } from 'app/utils/field';
 import { allImagesLoaded } from 'app/utils/images';
 
-import {
-    AreaInstance, DrawPriority, EffectInstance,
-    Frame, GameState, HitProperties, HitResult, TileBehaviors,
-} from 'app/types';
 
 const flameGeometry = {w: 20, h: 20, content: {x: 2, y: 2, w: 16, h: 16}};
 export const [

@@ -28,7 +28,6 @@ import {
     getVectorToNearbyTarget,
 } from 'app/utils/target';
 
-import { AreaInstance, Circle, EnemyAbility, GameState, HitProperties, HitResult, Rect } from 'app/types';
 
 // This is just the spirit sight frame.
 

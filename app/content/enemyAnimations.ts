@@ -1,9 +1,5 @@
 import { createAnimation } from 'app/utils/animations';
 
-import {
-    ActorAnimations, CreateAnimationOptions,
-    ExtraAnimationProperties, FrameAnimation, FrameDimensions,
-} from 'app/types';
 
 const enemyDeathGeometry: FrameDimensions = {w: 20, h: 20};
 export const enemyDeathAnimation: FrameAnimation = createAnimation('gfx/effects/enemydeath.png', enemyDeathGeometry, { cols: 9, duration: 4}, { loop: false });

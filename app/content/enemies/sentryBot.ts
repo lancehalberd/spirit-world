@@ -12,7 +12,6 @@ import {
 import { getTileBehaviors } from 'app/utils/field';
 import { getVectorToNearbyTarget } from 'app/utils/target';
 
-import { Enemy, GameState } from 'app/types';
 
 const updateTarget = (state: GameState, enemy: Enemy, ignoreWalls: boolean = false): boolean => {
     const vector = getVectorToNearbyTarget(state, enemy, 2000, enemy.area.allyTargets);

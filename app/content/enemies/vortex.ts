@@ -1,4 +1,4 @@
-import { AnimationEffect, splashAnimation } from 'app/content/effects/animationEffect';
+import { FieldAnimationEffect, splashAnimation } from 'app/content/effects/animationEffect';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { omniAnimation } from 'app/content/enemyAnimations';
 import { Hero } from 'app/content/hero';
@@ -17,7 +17,6 @@ import {
     getVectorToTarget,
 } from 'app/utils/target';
 
-import { Enemy, GameState, HitProperties } from 'app/types';
 
 const poolAnimation = createAnimation('gfx/tiles/deeptoshallowwater.png', {w: 16, h: 16}, {x: 3, y: 0});
 
@@ -71,7 +70,7 @@ enemyDefinitions.vortex = {
                     hero.x = enemy.x + 4;
                     hero.y = enemy.y + 4;
                     enemy.params.chaseCooldown = 1500;
-                    const animation = new AnimationEffect({
+                    const animation = new FieldAnimationEffect({
                         animation: splashAnimation,
                         drawPriority: 'sprites',
                         // increase y+z by 4 to make this draw in front of the hero fall animation.

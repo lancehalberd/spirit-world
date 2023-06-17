@@ -17,10 +17,6 @@ import { isObjectInsideTarget, pad } from 'app/utils/index';
 import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
 import { getVectorToTarget } from 'app/utils/target';
 
-import {
-    AreaInstance, DrawPriority, GameState, ObjectInstance,
-    ObjectStatus, Rect, EntranceDefinition,
-} from 'app/types';
 
 
 const floorAnimation = createAnimation('gfx/tiles/spirit_regeneration_bottom.png', {w: 16, h: 32}, {x: 0, cols: 4, duration: 5})

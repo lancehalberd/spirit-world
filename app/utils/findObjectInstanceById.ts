@@ -1,4 +1,3 @@
-import { AreaInstance, ObjectDefinition, ObjectInstance } from 'app/types';
 
 export function findObjectInstanceById(areaInstance: AreaInstance, id: string, allowMissing: boolean = false): ObjectInstance {
     for (const object of areaInstance.objects) {

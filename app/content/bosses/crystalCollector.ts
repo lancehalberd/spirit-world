@@ -24,10 +24,6 @@ import Random from 'app/utils/Random';
 import { getNearbyTarget } from 'app/utils/target';
 
 
-import {
-    AreaInstance, BeadCascade, EffectInstance, EnemyAbility, Frame,
-    GameState, Hero, HitProperties, HitResult, ObjectInstance, Rect,
-} from 'app/types';
 
 const maxShieldLife = 6;
 

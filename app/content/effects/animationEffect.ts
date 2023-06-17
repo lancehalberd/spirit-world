@@ -3,10 +3,6 @@ import { createAnimation, drawFrame, frameAnimation, getFrame } from 'app/utils/
 import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import Random from 'app/utils/Random';
 
-import {
-    AreaInstance, DrawPriority, EffectInstance, Frame, FrameAnimation, FrameDimensions,
-    GameState, MagicElement, ObjectInstance, Rect, TileBehaviors,
-} from 'app/types';
 
 
 interface AnimationProps {
@@ -31,7 +27,7 @@ interface AnimationProps {
     target?: ObjectInstance | EffectInstance
 }
 
-export class AnimationEffect implements EffectInstance {
+export class FieldAnimationEffect implements EffectInstance {
     alpha = 1
     area: AreaInstance;
     delay: number = 0;
@@ -176,7 +172,7 @@ export function addParticleAnimations(
         const frame = Random.element(particles);
         const vx = Math.cos(theta);
         const vy = Math.sin(theta);
-        const particle = new AnimationEffect({
+        const particle = new FieldAnimationEffect({
             animation: frameAnimation(frame),
             drawPriority: 'foreground',
             x: x + radius * vx - frame.w / 2, y: y + radius * vy - frame.h / 2, z,
@@ -223,7 +219,7 @@ export function makeSparkleAnimation(
         z,
     }: SparkleProps,
     overrideProps: Partial<AnimationProps> = null,
-): AnimationEffect {
+): FieldAnimationEffect {
     const animation = element
         ? {
             fire: fireSparkleAnimation,
@@ -270,7 +266,7 @@ export function makeSparkleAnimation(
             ...overrideProps,
         };
     }
-    const effect = new AnimationEffect(animationProps);
+    const effect = new FieldAnimationEffect(animationProps);
     if (element === 'fire') {
         effect.behaviors.brightness = 0.5;
         effect.behaviors.lightRadius = 40;
@@ -291,7 +287,7 @@ export function addDustBurst(
         const theta = i * Math.PI / 3;
         const vx = Math.cos(theta) / 2;
         const vy = Math.sin(theta);
-        const particle = new AnimationEffect({
+        const particle = new FieldAnimationEffect({
             animation: dustParticleAnimation,
             drawPriority: 'background-special',
             x: x + vx * 8 - 3, y: y + vy * 2, z,
@@ -308,7 +304,7 @@ export function addReviveBurst(
     for (let i = 0; i < 8; i++) {
         const vx = Math.cos(theta) / 2;
         const vy = Math.sin(theta) / 2;
-        const particle = new AnimationEffect({
+        const particle = new FieldAnimationEffect({
             animation: reviveParticleAnimation,
             drawPriority: 'foreground-special',
             x: x + vx - 3, y: y + vy - 3, z,
@@ -336,7 +332,7 @@ export function addParticleSpray(
     } else {
         animation = frameOrAnimation as FrameAnimation;
     }
-    const particle = new AnimationEffect({
+    const particle = new FieldAnimationEffect({
         animation: animation as FrameAnimation,
         drawPriority: 'sprites',
         x: x + vx, y: y + vy, z,
@@ -369,7 +365,7 @@ export function addBurstParticle(
     const vy = 1.5 * Math.sin(theta);
     if (element === null ){
         const frame = Random.element(regenerationParticles);
-        const particle = new AnimationEffect({
+        const particle = new FieldAnimationEffect({
             animation: frameAnimation(frame),
             delay,
             drawPriority: 'foreground',
@@ -389,4 +385,9 @@ export function addBurstParticle(
             }
         );
     }
+}
+
+class _FieldAnimationEffect extends FieldAnimationEffect {}
+declare global {
+    export interface FieldAnimationEffect extends _FieldAnimationEffect {}
 }

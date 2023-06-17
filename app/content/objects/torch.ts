@@ -8,10 +8,6 @@ import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
 
 import { drawFrameAt, getFrame } from 'app/utils/animations';
 
-import {
-    AreaInstance, GameState, HitProperties, HitResult, ObjectInstance,
-    ObjectStatus, SimpleObjectDefinition, Rect, TileBehaviors,
-} from 'app/types';
 
 export class Torch implements ObjectInstance {
     area: AreaInstance;

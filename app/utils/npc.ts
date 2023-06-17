@@ -1,7 +1,6 @@
 import { getSectionBoundingBox, moveActor } from 'app/moveActor';
 import { getDirection } from 'app/utils/direction';
 
-import { GameState,  MovementProperties, NPC } from 'app/types';
 
 export function moveNPC(state, npc: NPC, dx, dy, movementProperties: MovementProperties): boolean {
     movementProperties.boundingBox = movementProperties.boundingBox ?? getSectionBoundingBox(state, npc, 16);

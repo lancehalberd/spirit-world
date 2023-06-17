@@ -6,7 +6,6 @@ import { createAnimation, getFrame, drawFrameCenteredAt } from 'app/utils/animat
 import { removeEffectFromArea } from 'app/utils/effects';
 import { hitTargets } from 'app/utils/field';
 
-import { AreaInstance, DrawPriority, GameState, Hero, EffectInstance, MagicElement } from 'app/types';
 
 const burstAnimation = createAnimation('gfx/effects/45radiusburst.png', {w: 90, h: 90}, {cols: 9, duration: 2});
 

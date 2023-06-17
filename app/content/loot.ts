@@ -3,7 +3,6 @@ import { createAnimation } from 'app/utils/animations';
 import { createCanvasAndContext } from 'app/utils/canvas';
 import { requireImage } from 'app/utils/images';
 
-import { Frame, FrameDimensions, GameState, LootType } from 'app/types';
 
 
 const equipToolMessage = '{|}Press [B_MENU] to open your menu.'

@@ -1,7 +1,6 @@
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
 import { getAreaSize } from 'app/utils/getAreaSize';
 
-import { GameState } from 'app/types';
 
 // Instantly move the camera to the current target location.
 // This logic needs to be keyp up to date with the target location logic in `updateCamera`.

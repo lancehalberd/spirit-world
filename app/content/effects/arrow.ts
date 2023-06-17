@@ -7,10 +7,6 @@ import { getDirection, hitTargets } from 'app/utils/field';
 import { getAreaSize } from 'app/utils/getAreaSize';
 import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 
-import {
-    AreaInstance, Direction, DrawPriority, EffectInstance, Frame, FrameAnimation,
-    GameState, HitProperties, MagicElement, ObjectInstance, Projectile
-} from 'app/types';
 
 const upGeometry = {w: 16, h: 16, content: {x: 4, y: 0, w: 7, h: 5}};
 const downGeometry = {w: 16, h: 16, content: {x: 4, y: 11, w: 7, h: 5}};

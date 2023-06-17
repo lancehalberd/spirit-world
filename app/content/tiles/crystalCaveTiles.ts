@@ -14,7 +14,6 @@ import {
 } from 'app/content/tiles/constants';
 import { requireImage } from 'app/utils/images';
 
-import { TileSource } from 'app/types';
 
 
 const crystalCaveCeiling: TileSource = {

@@ -1,7 +1,6 @@
 import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
 import { saveGame } from 'app/utils/saveGame';
 
-import { GameState, ObjectInstance } from 'app/types';
 
 specialBehaviorsHash.tombEntranceSwitch = {
     type: 'crystalSwitch',

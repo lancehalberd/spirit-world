@@ -1,7 +1,5 @@
 import { SPAWN_LOCATION_FULL } from 'app/content/spawnLocations';
 
-import { SavedHeroData, SavedState } from 'app/types';
-
 export function getDefaultSavedState(): SavedState {
     return {
         dungeonInventories: {},

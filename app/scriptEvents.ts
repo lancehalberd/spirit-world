@@ -1,10 +1,6 @@
 import { allLootTypes, GAME_KEY } from 'app/gameConstants';
 import { parseMessage, textScriptToString } from 'app/render/renderMessage';
 
-import {
-     GameState, LootType, ScriptEvent, TextScript
-} from 'app/types';
-
 export function wait(state: GameState, duration: number) {
     state.scriptEvents.queue.push({
         type: 'wait',

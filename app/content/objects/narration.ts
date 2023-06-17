@@ -4,10 +4,6 @@ import { FRAME_LENGTH, isRandomizer } from 'app/gameConstants';
 import { setScript } from 'app/scriptEvents';
 import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
 
-import {
-    AreaInstance, GameState, NarrationDefinition,
-    ObjectInstance, ObjectStatus, Rect, SpecialNarrationBehavior,
-} from 'app/types';
 
 export class Narration implements ObjectInstance {
     area: AreaInstance;

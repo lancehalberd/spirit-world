@@ -6,10 +6,6 @@ import { createAnimation, drawFrameAt, getFrame } from 'app/utils/animations';
 import { directionMap, getDirection, rotateDirection } from 'app/utils/direction';
 import { boxesIntersect } from 'app/utils/index';
 
-import {
-    AreaInstance, DrawPriority, GameState, Frame, MovingPlatformDefinition,
-    ObjectInstance, ObjectStatus, Rect, TileBehaviors
-} from 'app/types';
 
 // This is a 9 slice that is 6/20/6 in both directions.
 const platformAnimation = createAnimation('gfx/objects/platform.png', {w: 32, h: 32});

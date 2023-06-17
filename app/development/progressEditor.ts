@@ -4,9 +4,6 @@ import { updateHeroMagicStats } from 'app/render/spiritBar';
 import { getState } from 'app/state';
 import { enterLocation } from 'app/utils/enterLocation';
 
-import {
-    PanelRows, PropertyRow,
-} from 'app/types';
 
 const progressTabContainer = new TabContainer('Inventory', [
     {

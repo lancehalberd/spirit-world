@@ -1,7 +1,6 @@
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 import { saveGame } from 'app/utils/saveGame';
 
-import { GameState } from 'app/types';
 
 dialogueHash.rival = {
     key: 'rival',

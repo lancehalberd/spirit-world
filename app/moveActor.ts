@@ -4,8 +4,6 @@ import { directionMap, getDirection } from 'app/utils/direction';
 import { getAreaSize } from 'app/utils/getAreaSize';
 import { pad } from 'app/utils/index';
 
-import { Actor, Direction, GameState, Hero, MovementProperties, ObjectInstance, Rect } from 'app/types';
-
 export function moveActor(state: GameState, actor: Actor, dx: number, dy: number, movementProperties: MovementProperties): {mx: number, my: number} {
     let sx = dx;
     if (sx < -1){

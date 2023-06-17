@@ -2,7 +2,6 @@ import { zones } from 'app/content/zones';
 import { showToast } from 'app/development/toast';
 import { randomizerSeed, enemySeed, entranceSeed } from 'app/gameConstants';
 
-import { AreaGrid, Zone } from 'app/types';
 
 export function exportZoneToClipboard(zone: Zone): void {
     navigator.clipboard.writeText(serializeZone(zone));

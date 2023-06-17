@@ -52,8 +52,6 @@ import { areAllImagesLoaded } from 'app/utils/images';
 import { returnToSpawnLocation } from 'app/utils/returnToSpawnLocation'
 import { saveGame, saveGamesToLocalStorage, } from 'app/utils/saveGame';
 
-import { ActiveTool, PassiveTool, GameState, MagicElement } from 'app/types';
-
 let isGameInitialized = false;
 export function update() {
     // Don't run the main loop until everything necessary is initialized.

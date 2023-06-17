@@ -4,7 +4,6 @@ import {
     hasFire, hasLightning, hasRoll, hasStaff,
 } from 'app/content/logic';
 
-import { LogicNode } from 'app/types';
 
 // The frostBeast flag is set correctly during simulation, so this logic works as expected.
 const canMeltIce = orLogic({requiredFlags: ['frostBeast']}, andLogic(orLogic(hasLightning, hasFire), hasMediumRange));

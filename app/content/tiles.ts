@@ -35,7 +35,6 @@ import { createAnimation, drawFrame } from 'app/utils/animations';
 import { createCanvasAndContext, debugCanvas } from 'app/utils/canvas';
 import { allImagesLoaded, requireImage } from 'app/utils/images';
 
-import { Frame, FullTile, TileBehaviors, TileHashMap, TileSource } from 'app/types';
 
 
 export const allTiles: FullTile[] = [null];

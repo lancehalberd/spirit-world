@@ -1,6 +1,5 @@
 import { unlockAudio } from 'app/utils/sounds';
 
-import { Coords } from 'app/types';
 
 let mousePosition: Coords = [-1000, -1000];
 let mouseIsDown: boolean = false;

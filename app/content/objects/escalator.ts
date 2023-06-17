@@ -6,10 +6,6 @@ import { directionMap } from 'app/utils/field';
 import { createCanvasAndContext, debugCanvas } from 'app/utils/canvas';
 import { allImagesLoaded, requireImage } from 'app/utils/images';
 import { isObjectInsideTarget, pad } from 'app/utils/index';
-import {
-    AreaInstance, Direction, DrawPriority, Frame, FrameWithPattern, GameState,
-    ObjectInstance, ObjectStatus, EscalatorDefinition, HitProperties, HitResult, TileBehaviors,
-} from 'app/types';
 
 
 //const woodenStairs: Frame = {image: requireImage('gfx/woodhousetilesarranged.png'), x: 224, y: 16, w: 16, h: 48};
@@ -195,3 +191,8 @@ export class Escalator implements ObjectInstance {
     }
 }
 objectHash.escalator = Escalator;
+
+class _Escalator extends Escalator {}
+declare global {
+    export interface Escalator extends _Escalator {}
+}

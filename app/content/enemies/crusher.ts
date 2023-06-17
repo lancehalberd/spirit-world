@@ -7,7 +7,6 @@ import { scurryAndChase } from 'app/utils/enemies';
 import { addScreenShake, hitTargets } from 'app/utils/field';
 import { getVectorToNearbyTarget } from 'app/utils/target';
 
-import { GameState } from 'app/types';
 
 enemyDefinitions.crusher = {
     animations: golemHandAnimations, life: 10, scale: 1,

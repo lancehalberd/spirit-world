@@ -28,11 +28,6 @@ import { addObjectToArea } from 'app/utils/objects';
 import { saveGame } from 'app/utils/saveGame';
 import { getVectorToTarget } from 'app/utils/target';
 
-
-import {
-    GameState, Hero, HitProperties, ObjectInstance, Rect, StaffTowerLocation,
-} from 'app/types';
-
 const rollSpeed = [
     5, 5, 5, 5,
     4, 4, 4, 4,

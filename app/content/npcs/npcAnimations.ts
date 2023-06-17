@@ -1,8 +1,5 @@
 import { createAnimation, omniAnimation } from 'app/utils/animations';
 
-import {
-    ActorAnimations, FrameAnimation, FrameDimensions,
-} from 'app/types';
 
 
 // This box is taller than it needs as a hack to make it easy to interact with when it is on the pedestal.

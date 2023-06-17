@@ -14,11 +14,6 @@ import { addObjectToArea, getObjectStatus, removeObjectFromArea } from 'app/util
 import { drawText } from 'app/utils/simpleWhiteFont';
 import { saveGame } from 'app/utils/saveGame';
 
-import {
-    AreaInstance, BossObjectDefinition, DialogueLootDefinition, Direction,
-    EffectInstance, Frame, GameState, Hero, LootObjectDefinition,
-    LootTable, ObjectInstance, ObjectStatus, Rect, TileBehaviors,
-} from 'app/types';
 
 /*const [coin] =
     createAnimation('gfx/hud/money.png', {w: 16, h: 16}, {x: 9}).frames;*/

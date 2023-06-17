@@ -1,4 +1,3 @@
-import { GameState } from 'app/types';
 
 export function isSectionExplored(state: GameState, sectionIndex: number): boolean {
     const numberIndex = (sectionIndex / 32) | 0;

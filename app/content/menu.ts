@@ -1,7 +1,6 @@
 import { getLootHelpMessage, getLootName } from 'app/content/loot';
 import { isRandomizer } from 'app/gameConstants';
 
-import { ActiveTool, Equipment, GameState, MagicElement, MenuOptionType } from 'app/types';
 
 
 export function getMenuRows(state: GameState): MenuOptionType[][] {

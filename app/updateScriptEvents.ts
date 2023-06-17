@@ -10,10 +10,6 @@ import { enterLocation } from 'app/utils/enterLocation';
 import { clearObjectFlag, setObjectFlag } from 'app/utils/objectFlags';
 import { saveGame } from 'app/utils/saveGame';
 
-import {
-    ActiveScriptEvent, GameState
-} from 'app/types';
-
 export function updateScriptEvents(state: GameState): void {
     state.scriptEvents.blockEventQueue = false;
     state.scriptEvents.blockFieldUpdates = false;

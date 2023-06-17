@@ -10,7 +10,6 @@ import { addObjectToArea } from 'app/utils/objects';
 import { getVectorToNearbyTarget } from 'app/utils/target';
 
 
-import { BossObjectDefinition, Direction, EnemyAbility, GameState, HitProperties, HitResult, Rect } from 'app/types';
 
 type NearbyTargetType = ReturnType<typeof getVectorToNearbyTarget>;
 

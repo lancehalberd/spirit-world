@@ -3,7 +3,6 @@ import {
     hasBossWeapon, hasIce, hasInvisibility, hasMitts, orLogic,
 } from 'app/content/logic';
 
-import { LogicNode } from 'app/types';
 
 
 const drainedLava1 = {requiredFlags: ['forgeLava1']};

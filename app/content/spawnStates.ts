@@ -1,9 +1,7 @@
-import { cloneDeep } from 'lodash';
-
 import * as spawnLocations from 'app/content/spawnLocations';
 import { getDefaultSavedState } from 'app/savedState'
+import { cloneDeep } from 'app/utils/index';
 
-import { SavedState, ZoneLocation } from 'app/types';
 
 function applyItems(savedState: SavedState, items: {[key: string]: number}, objectFlags: string[] = []): SavedState {
     const newState: SavedState = cloneDeep(savedState);

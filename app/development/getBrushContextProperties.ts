@@ -5,10 +5,6 @@ import { layersInOrder } from 'app/gameConstants';
 import { enterLocation } from 'app/utils/enterLocation';
 
 
-import {
-    AreaLayer, DrawPriority, GameState,
-    PanelRows, PropertyRow,
-} from 'app/types';
 
 
 function refreshArea(state: GameState, doNotRefreshEditor = false) {

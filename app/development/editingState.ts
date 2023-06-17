@@ -1,6 +1,5 @@
 import { palettes } from 'app/content/palettes';
 
-import { ContextMenu, EditingState } from 'app/types';
 
 interface ContextMenuState {
     contextMenu: ContextMenu,

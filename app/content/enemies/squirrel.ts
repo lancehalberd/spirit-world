@@ -9,7 +9,6 @@ import {
 } from 'app/utils/enemies';
 import { getDirection } from 'app/utils/field';
 
-import { Enemy, GameState } from 'app/types';
 
 enemyDefinitions.squirrel = {
     animations: brownSquirrelAnimations,

@@ -1,10 +1,4 @@
-//import { Staff } from 'app/content/objects/staff';
-import {
-    Direction, EffectInstance, FrameAnimation, FullTile, GameState, Hero,
-    ObjectInstance, TileCoords, ZoneLocation,
-} from 'app/types';
-
-export type Action =
+type Action =
     'attack' | 'charging' | 'roll' | 'preparingSomersault' | 'usingStaff'
     // Hero can be forced into screen transitions when knockedHard.
     | 'knocked' | 'knockedHard'
@@ -20,48 +14,12 @@ export type Action =
     // Used when jumping off of ledges. This causes the character to move in a specific fall trajectory
     // based on the direction they jump down until they "land" on a walkable tile.
     | 'jumpingDown';
-export type ActiveTool = 'bow' | 'staff' | 'clone' | 'cloak';
-export type Equipment = 'leatherBoots' | 'cloudBoots' | 'ironBoots';
-export type PassiveTool = 'gloves'
-    | 'roll'
-    | 'nimbusCloud'
-    | 'catEyes' | 'spiritSight' | 'trueSight'
-    | 'astralProjection' | 'teleportation'
-    | 'ironSkin' | 'goldMail' | 'phoenixCrown'
-    | 'waterBlessing' | 'fireBlessing' | 'lightningBlessing';
-export type MagicElement = 'fire' | 'ice' | 'lightning';
-export type Collectible = 'peachOfImmortality'
-    | 'peachOfImmortalityPiece'
-    | 'silverOre'
-    | 'goldOre'
-    | 'victoryPoint';
-export type CommonLoot = 'money' | 'peach';
-export type DungeonLoot = 'smallKey' | 'bigKey' | 'map';
 
-export type LootType = 'empty' | 'weapon'
-    // In the randomizer spiritSight, astralProjection + teleportation are changed to this progressive spirit power
-    // ability so that you will always get the abilities in an order that they can be used immediately.
-    | 'spiritPower'
-    | 'secondChance'
-    | ActiveTool | Equipment | PassiveTool
-    // Neutral element is used to unequip elements in the menu
-    | 'neutral' | MagicElement
-    | Collectible | CommonLoot | DungeonLoot | 'unknown';
 
-export type MenuOptionType = LootType | 'help' | 'return';
-
-export type WeaponUpgrades = 'normalDamage' | 'normalRange' | 'spiritDamage' | 'spiritRange';
-
-export interface LootTable {
-    totalWeight: number
-    thresholds:  number[]
-    loot: {type: LootType, amount?: number}[]
-}
-
-export type AnimationSet = {
+type AnimationSet = {
     [key in Direction]?: FrameAnimation
 }
-export interface ActorAnimations {
+interface ActorAnimations {
     attack?: AnimationSet
     cloak?: AnimationSet
     climbing?: AnimationSet
@@ -80,7 +38,7 @@ export interface ActorAnimations {
     [key: string]: AnimationSet
 }
 
-export interface Actor extends ObjectInstance {
+interface Actor extends ObjectInstance {
     w: number
     h: number
     vx: number
@@ -143,7 +101,7 @@ export interface Actor extends ObjectInstance {
     ignoreLedges?: boolean
 }
 /* In case using the Hero class causes dependency issues, maybe switching to this interface could help.
-export interface Hero extends Actor, SavedHeroData {
+interface Hero extends Actor, SavedHeroData {
     isAstralProjection: boolean
     isClone: boolean
 
@@ -173,7 +131,7 @@ export interface Hero extends Actor, SavedHeroData {
     spiritRadius: number
 }*/
 
-export interface SavedHeroData {
+interface SavedHeroData {
     maxLife: number
     // If this isn't set, the hero will start with maxLife.
     life?: number

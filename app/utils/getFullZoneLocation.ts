@@ -1,4 +1,3 @@
-import { FullZoneLocation, LogicalZoneKey, ZoneLocation } from 'app/types';
 
 export function getFullZoneLocation(location: ZoneLocation): FullZoneLocation {
     const { zoneKey, isSpiritWorld, areaGridCoords } = location;

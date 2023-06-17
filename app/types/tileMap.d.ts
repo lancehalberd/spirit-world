@@ -1,11 +1,4 @@
-import {
-    DrawPriority, EffectInstance, Enemy, Frame,
-    HitProperties, LogicDefinition, LootTable, MagicElement,
-    ObjectDefinition, ObjectInstance,
-    Rect,
-} from 'app/types';
-
-export interface TileSource {
+interface TileSource {
     // The size of the tiles
     w: number,
     h: number,
@@ -17,9 +10,8 @@ export interface TileSource {
     tileCoordinates?: number[][],
 }
 
-export type Direction = 'up' | 'down' | 'left' | 'right' | 'upleft' | 'upright' | 'downleft' | 'downright';
 
-export interface TileBehaviors {
+interface TileBehaviors {
     // 0-1
     brightness?: number
     defaultLayer?: 'floor' | 'floor2' | 'field' | 'field2' | 'foreground' | 'foreground2'
@@ -126,9 +118,9 @@ export interface TileBehaviors {
     isVeryTall?: boolean
 }
 
-export type TilePalette = number[][];
+type TilePalette = number[][];
 
-export interface SourcePalette {
+interface SourcePalette {
     source: Frame
     // This stores the unique set of tiles that have already been imported
     // from this source palette.
@@ -142,24 +134,24 @@ export interface SourcePalette {
 // A hash for storing full tiles.
 // Currently just used to map pixel strings to tiles when checking for unique
 // or matching tiles in SourcePalettes.
-export interface TileHashMap {
+interface TileHashMap {
     [key: string]: FullTile
 }
 
 
-export interface TileCoords {
+interface TileCoords {
     layerKey?: string,
     x: number,
     y: number,
 }
 
-export interface Tile {
+interface Tile {
     // The column/row coordinates of the tile in the source frame.
     x: number,
     y: number,
 }
 
-export interface FullTile {
+interface FullTile {
     // The index of this tile in the `allTiles` array.
     index: number,
     frame: Frame,
@@ -168,7 +160,7 @@ export interface FullTile {
     linkedTile?: FullTile,
 }
 
-export interface TileGridDefinition {
+interface TileGridDefinition {
     // The dimensions of the grid.
     w: number,
     h: number,
@@ -177,7 +169,7 @@ export interface TileGridDefinition {
     tiles: number[][],
 }
 
-export interface TileGrid {
+interface TileGrid {
     // The dimensions of the grid.
     w: number,
     h: number,
@@ -185,7 +177,7 @@ export interface TileGrid {
     tiles: FullTile[][],
 }
 
-export interface AreaTileGrid extends TileGrid {
+interface AreaTileGrid extends TileGrid {
     // The matrix of tiles as they should be on resetting the area (respawning bushes etc)
     // This is different than the definition because certain effects change the reset behavior
     // but should not actually change the definition of the area.
@@ -193,7 +185,7 @@ export interface AreaTileGrid extends TileGrid {
     maskTiles?: FullTile[][],
 }
 
-export interface ZoneLocation {
+interface ZoneLocation {
     zoneKey: string
     floor: number
     areaGridCoords: {x: number, y: number}
@@ -205,7 +197,7 @@ export interface ZoneLocation {
     d: Direction
 }
 
-export type LogicalZoneKey =
+type LogicalZoneKey =
     'overworld' | 'sky'
     // Material world towns
     | 'waterfallCave' | 'treeVillage'
@@ -234,12 +226,12 @@ export type LogicalZoneKey =
     // Final dungeons
     | 'warPalace' | 'lab' | 'tree' | 'void';
 
-export interface FullZoneLocation extends ZoneLocation {
+interface FullZoneLocation extends ZoneLocation {
     logicalZoneKey: LogicalZoneKey
 }
 
 
-export interface AreaLayerDefinition {
+interface AreaLayerDefinition {
     // Unique identifier for this layer.
     key: string
     logicKey?: string
@@ -249,14 +241,14 @@ export interface AreaLayerDefinition {
     drawPriority?: DrawPriority
     grid?: TileGridDefinition
     mask?: TileGridDefinition
-    // This is not saved on export and is just used when editing.
+    // This is not saved on and is just used when editing.
     visibilityOverride?: 'show' | 'fade' | 'hide'
     // Coordinates for the layer origin, if not (0, 0).
     x?: number
     y?: number
 }
 
-export interface AreaLayer extends AreaTileGrid {
+interface AreaLayer extends AreaTileGrid {
     // Unique identifier for this layer.
     key: string,
     definition: AreaLayerDefinition,
@@ -265,7 +257,7 @@ export interface AreaLayer extends AreaTileGrid {
     y?: number,
 }
 
-export interface AreaSection extends Rect {
+interface AreaSection extends Rect {
     hotLogic?: LogicDefinition
     // Unique identifier for this section that can be used to look it up
     // and is used when tracking whether the player has explored a section.
@@ -283,13 +275,13 @@ export interface AreaSection extends Rect {
     hideMap?: boolean
 }
 
-export interface AreaSectionInstance extends AreaSection {
+interface AreaSectionInstance extends AreaSection {
     // Just added this here for convenient access when editing.
     definition: AreaSection
     isHot?: boolean
 }
 
-export interface AreaDefinition {
+interface AreaDefinition {
     default?: boolean
     layers: AreaLayerDefinition[]
     objects: ObjectDefinition[]
@@ -306,7 +298,7 @@ export interface AreaDefinition {
     isSpiritWorld?: boolean
 }
 
-export interface Zone {
+interface Zone {
     key: string,
     // If this zone is an underwater area, this key is set to the zone key of the surface area.
     // Travel to the surface is always from the top floor of the underwater zone to the bottom
@@ -317,15 +309,15 @@ export interface Zone {
     floors: Floor[],
 }
 
-export interface Floor {
+interface Floor {
     origin?: {x: number, y: number},
     grid?: AreaGrid,
     spiritGrid: AreaGrid,
 }
 
-export type AreaGrid = AreaDefinition[][];
+type AreaGrid = AreaDefinition[][];
 
-export interface AreaInstance {
+interface AreaInstance {
     alternateArea: AreaInstance
     definition: AreaDefinition
     w: number

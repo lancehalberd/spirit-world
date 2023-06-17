@@ -1,10 +1,7 @@
-import { flatten } from 'lodash';
 import { CANVAS_WIDTH, CANVAS_HEIGHT, GAME_KEY } from 'app/gameConstants';
 import { drawFrame } from 'app/utils/animations';
 import { characterMap, keyboardMap, xboxMap } from 'app/utils/simpleWhiteFont';
 import { fillRect, pad } from 'app/utils/index';
-
-import { Frame, GameState, ShowChoiceBoxActiveScriptEvent, TextPage, TextScript } from 'app/types';
 
 const characterWidth = 8;
 const messageWidth = 160;
@@ -23,7 +20,7 @@ function getActiveControllerMaps(state: GameState) {
 function getEscapedFrames(state: GameState, escapedToken: string): Frame[] {
     const controllerMaps = getActiveControllerMaps(state);
     function getGameKeyFrames(key: number) {
-        return flatten(controllerMaps.map(controllerMap => controllerMap[key])).filter(f => f);
+        return controllerMaps.map(controllerMap => controllerMap[key]).flat().filter(f => f);
     }
     switch (escapedToken.toUpperCase()) {
         case 'B_DPAD':
@@ -39,11 +36,11 @@ function getEscapedFrames(state: GameState, escapedToken: string): Frame[] {
         case 'B_WEAPON':
             return getGameKeyFrames(GAME_KEY.WEAPON);
         case 'B_TOOL':
-            return flatten([
+            return [
                 getGameKeyFrames(GAME_KEY.LEFT_TOOL),
                 characterMap['/'],
                 getGameKeyFrames(GAME_KEY.RIGHT_TOOL),
-            ]);
+            ].flat();
         case 'B_LEFT_TOOL':
             return getGameKeyFrames(GAME_KEY.LEFT_TOOL);
         case 'B_RIGHT_TOOL':

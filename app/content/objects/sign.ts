@@ -2,10 +2,6 @@ import { objectHash } from 'app/content/objects/objectHash';
 import { showMessage } from 'app/scriptEvents';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 
-import {
-    AreaInstance, GameState, Direction, Hero, SignDefinition,
-    ObjectInstance, ObjectStatus, Rect,
-} from 'app/types';
 
 const signGeometry = {w: 16, h: 19, content: {x: 0, y: 3, w: 16, h: 16}};
 const [shortSign] = createAnimation('gfx/tiles/signshort.png', signGeometry).frames;
@@ -112,3 +108,8 @@ export class Sign implements ObjectInstance {
     }
 }
 objectHash.sign = Sign;
+
+class _Sign extends Sign {}
+declare global {
+    export interface Sign extends _Sign {}
+}

@@ -6,7 +6,6 @@ import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 import { setScript } from 'app/scriptEvents';
 import { textScriptToString } from 'app/render/renderMessage';
 
-import { GameState } from 'app/types';
 
 dialogueHash.elevator = {
     key: 'elevator',

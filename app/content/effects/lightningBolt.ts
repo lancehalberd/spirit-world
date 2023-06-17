@@ -7,10 +7,6 @@ import { drawFrameAt } from 'app/utils/animations';
 import { removeEffectFromArea } from 'app/utils/effects';
 import { hitTargets } from 'app/utils/field';
 
-import {
-    AreaInstance, EffectInstance,
-    Frame, GameState,
-} from 'app/types';
 
 
 

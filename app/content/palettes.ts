@@ -1,6 +1,5 @@
 import { allTiles } from 'app/content/tiles';
 
-import { SourcePalette, TilePalette } from 'app/types';
 
 export const sourcePalettes: {[key: string]: SourcePalette} = {};
 const everything: TilePalette = [[]];

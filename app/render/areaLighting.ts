@@ -8,7 +8,6 @@ import { createCanvasAndContext, drawCanvas } from 'app/utils/canvas';
 import { carryMap, directionMap } from 'app/utils/direction';
 import { getObjectBehaviors } from 'app/utils/objects';
 
-import { AreaInstance, GameState } from 'app/types';
 
 const lightingGranularity = 1;
 const [lightingCanvas, lightingContext] = createCanvasAndContext(

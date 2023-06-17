@@ -1,4 +1,3 @@
-import { GameState, Rect } from 'app/types'
 
 export function getAreaSize(state: GameState): {w: number, h: number, section: Rect} {
     const area = state.areaInstance;

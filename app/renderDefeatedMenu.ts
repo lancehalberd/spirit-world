@@ -2,8 +2,6 @@ import { CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
 import { fillRect, pad } from 'app/utils/index';
 import { drawText } from 'app/utils/simpleWhiteFont';
 
-import { GameState } from 'app/types';
-
 const WIDTH = CANVAS_WIDTH * 3 / 4;
 const HEIGHT = 3 * CANVAS_HEIGHT / 8;
 

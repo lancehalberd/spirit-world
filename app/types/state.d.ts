@@ -1,12 +1,6 @@
-import {
-    ActiveScriptEvent, AreaGrid, AreaInstance, AreaSectionInstance,
-    Floor, FullZoneLocation, Hero, SavedHeroData, ScriptEvent, TextPage, TrackKey,
-    Zone, ZoneLocation,
-} from 'app/types';
+type StaffTowerLocation = 'desert' | 'forest' | 'mountain';
 
-export type StaffTowerLocation = 'desert' | 'forest' | 'mountain';
-
-export type SavedState = {
+type SavedState = {
     // Flags that are set permanently for objects, like opened treasure chests or defeated bosses.
     objectFlags: {[key: string]: boolean | number | string}
     // Flags that remain set as long as the character does not leave the current zone.
@@ -22,7 +16,7 @@ export type SavedState = {
 }
 
 // These settings are global and can be saved independent of saved state
-export interface Settings {
+interface Settings {
     // Mute everything
     muteAllSounds?: boolean
     // Mute background music
@@ -31,26 +25,18 @@ export interface Settings {
     muteSounds?: boolean
 }
 
-export interface DungeonInventory {
+interface DungeonInventory {
     bigKey: boolean
     map: boolean
     smallKeys: number
 }
 
-export type Scene = 'title'
+type Scene = 'title'
     | 'chooseGameMode' | 'deleteSavedGame' | 'deleteSavedGameConfirmation'
     | 'game' | 'credits' | 'options';
 
-export interface ScreenShake {
-    dx: number
-    dy: number
-    startTime: number
-    endTime?: number
-    // This can be set to help removing a specific screen shake later.
-    id?: string
-}
 
-export interface GameState {
+interface GameState {
     savedState: SavedState
     settings: Settings
     savedGames: SavedState[]

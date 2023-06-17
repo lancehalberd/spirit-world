@@ -1,10 +1,7 @@
 import { objectHash } from 'app/content/objects/objectHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame } from 'app/utils/animations';
-import {
-    AreaInstance, DrawPriority, GameState,
-    ObjectInstance, ObjectStatus, DecorationDefinition, Rect,
-} from 'app/types';
+
 
 export class Decoration implements ObjectInstance {
     area: AreaInstance;
@@ -60,6 +57,8 @@ export const decorationTypes = {
         }
     },
 }
-
-export type DecorationType = keyof typeof decorationTypes;
 objectHash.decoration = Decoration;
+
+declare global {
+    export type DecorationType = keyof typeof decorationTypes;
+}

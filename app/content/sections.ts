@@ -2,7 +2,6 @@ import { getAreaFromLocation } from 'app/content/areas';
 import { zones } from 'app/content/zones/zoneHash';
 import { overworldKeys } from 'app/gameConstants';
 
-import { AreaDefinition, AreaSection, Point, ZoneLocation } from 'app/types';
 
 interface SectionData {
     section: AreaSection

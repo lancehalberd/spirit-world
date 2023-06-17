@@ -1,7 +1,6 @@
 import { initializeAreaLayerTiles } from 'app/content/areas';
 import { layersInOrder } from 'app/gameConstants';
 
-import { AreaLayerDefinition, GameState } from 'app/types';
 
 export function addNewLayer(state: GameState, layerKey: string, layerIndex: number) {
     const definition = state.areaInstance.definition;

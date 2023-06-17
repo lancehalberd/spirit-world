@@ -1,4 +1,4 @@
-import { AnimationEffect } from 'app/content/effects/animationEffect';
+import { FieldAnimationEffect } from 'app/content/effects/animationEffect';
 import { addArcOfShockWaves, addRadialShockWaves } from 'app/content/effects/shockWave';
 import { LaserBeam } from 'app/content/effects/laserBeam';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
@@ -16,10 +16,6 @@ import { getAreaSize } from 'app/utils/getAreaSize';
 import { addObjectToArea } from 'app/utils/objects';
 import { getNearbyTarget} from 'app/utils/target';
 
-import {
-    ActorAnimations, AreaInstance, FrameDimensions, FrameAnimation,
-    GameState, HitProperties, HitResult
-} from 'app/types';
 
 const LASER_CHARGE_TIME = 2000;
 const FAST_LASER_CHARGE_TIME = 1000;
@@ -677,7 +673,7 @@ function moveHandToPosition(this: void, state: GameState, enemy: Enemy, otherHan
 }
 
 export function addSlamEffect(this: void, state: GameState, enemy: Enemy): void {
-    const slamAnimation = new AnimationEffect({
+    const slamAnimation = new FieldAnimationEffect({
         drawPriority: 'background',
         animation: golemSlamEffectAnimation,
         x: enemy.x, y: enemy.y,

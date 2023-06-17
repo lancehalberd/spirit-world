@@ -14,7 +14,6 @@ import {
     orLogic,
 } from 'app/content/logic';
 
-import {LogicNode } from 'app/types';
 
 const hasDroppedElevator = {requiredFlags: ['elevatorDropped']};
 

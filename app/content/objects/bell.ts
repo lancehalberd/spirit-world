@@ -2,10 +2,6 @@ import { objectHash } from 'app/content/objects/objectHash';
 import { playAreaSound } from 'app/musicController';
 import { createAnimation, drawFrameAt } from 'app/utils/animations';
 
-import {
-    AreaInstance, DrawPriority, GameState, Frame, FrameAnimation, HitProperties, HitResult, SimpleObjectDefinition,
-    ObjectInstance, ObjectStatus, Rect, TileBehaviors,
-} from 'app/types';
 
 const potFrame: Frame = createAnimation('gfx/tiles/movablepot.png', {w: 16, h: 18}).frames[0];
 

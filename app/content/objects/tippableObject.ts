@@ -6,10 +6,6 @@ import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { directionMap, isPointOpen } from 'app/utils/field';
 import { addObjectToArea, removeObjectFromArea } from 'app/utils/objects';
 
-import {
-    AreaInstance, Direction, DrawPriority, Frame, FrameAnimation, GameState, HitProperties, HitResult,
-    SimpleObjectDefinition, ObjectInstance, ObjectStatus, Rect,
-} from 'app/types';
 
 
 //const crackedPotFrame: Frame = createAnimation('gfx/tiles/tippablepot.png', {w: 16, h: 18}).frames[0];

@@ -4,10 +4,6 @@ import { createAnimation, drawFrameCenteredAt } from 'app/utils/animations';
 import { removeEffectFromArea } from 'app/utils/effects';
 import { hitTargets } from 'app/utils/field';
 
-import {
-    AreaInstance, DrawPriority, EffectInstance,
-    Frame, GameState, ObjectInstance,
-} from 'app/types';
 
 
 const [iceElement] = createAnimation('gfx/hud/elementhud.png', {w: 20, h: 20}, {x: 2}).frames;

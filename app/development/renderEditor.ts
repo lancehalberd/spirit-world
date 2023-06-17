@@ -16,10 +16,6 @@ import { mainCanvas } from 'app/utils/canvas';
 import { createObjectInstance } from 'app/utils/createObjectInstance';
 import { getMousePosition, isMouseDown, /*isMouseOverElement*/ } from 'app/utils/mouse';
 
-import {
-    AreaInstance, AreaLayerDefinition, GameState,
-    Rect, TileGridDefinition,
-} from 'app/types';
 
 export function renderEditor(context: CanvasRenderingContext2D, state: GameState): void {
     if (!editingState.isEditing) {

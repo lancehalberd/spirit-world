@@ -14,15 +14,6 @@ import { findObjectInstanceByDefinition } from 'app/utils/findObjectInstanceById
 import { addObjectToArea, removeObjectFromArea } from 'app/utils/objects';
 import { applyTileToBehaviorGrid, resetTileBehavior } from 'app/utils/tileBehavior';
 
-import {
-    AreaDefinition, AreaInstance, AreaLayerDefinition,
-    Direction,
-    FullTile, GameState, Hero,
-    ObjectDefinition,
-    ObjectInstance,
-    Rect, SpecialAreaBehavior, TileBehaviors,
-    ZoneLocation,
-} from 'app/types';
 
 export function getDefaultArea(): AreaDefinition {
     return {

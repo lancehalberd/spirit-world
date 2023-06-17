@@ -2,7 +2,6 @@ import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 import { isRandomizer, randomizerGoalType } from 'app/gameConstants';
 import { saveGame } from 'app/utils/saveGame';
 
-import { GameState } from 'app/types';
 
 dialogueHash.mom = {
     key: 'mom',

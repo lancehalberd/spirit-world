@@ -5,11 +5,6 @@ import { removeEffectFromArea } from 'app/utils/effects';
 import { rectanglesOverlap } from 'app/utils/index';
 import { getVectorToNearestTargetOrRandom } from 'app/utils/target';
 
-import {
-    AreaInstance, EffectInstance,
-    Frame, GameState,
-    HitProperties, HitResult,
-} from 'app/types';
 
 interface Props {
     x?: number

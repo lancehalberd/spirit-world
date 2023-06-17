@@ -1,20 +1,6 @@
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createCanvas, createCanvasAndContext, debugCanvas, drawCanvas } from 'app/utils/canvas';
 import { requireImage } from 'app/utils/images';
-import {
-    ExtraAnimationProperties, Frame, FrameAnimation, FrameDimensions, FrameRectangle,
-    Rect, TintedFrame,
-} from 'app/types';
-
-export interface CreateAnimationOptions {
-    x?: number, y?: number,
-    xSpace?: number,
-    ySpace?: number,
-    rows?: number, cols?: number,
-    top?: number, left?: number,
-    duration?: number,
-    frameMap?: number[],
-}
 
 export function frame(
     x: number, y: number, w: number, h: number,

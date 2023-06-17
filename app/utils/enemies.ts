@@ -1,16 +1,11 @@
-import { sample } from 'lodash';
-
-import { AnimationEffect, enemyFallAnimation } from 'app/content/effects/animationEffect';
+import { FieldAnimationEffect, enemyFallAnimation } from 'app/content/effects/animationEffect';
 import { addEffectToArea } from 'app/utils/effects';
 import { directionMap, getDirection, getTileBehaviorsAndObstacles } from 'app/utils/field';
 import { getAreaSize } from 'app/utils/getAreaSize';
+import { sample } from 'app/utils/index';
 import { getLineOfSightTargetAndDirection, getVectorToNearbyTarget } from 'app/utils/target';
 import { getSectionBoundingBox, moveActor } from 'app/moveActor';
 
-import {
-    Enemy, GameState,
-    MovementProperties,
-} from 'app/types';
 
 
 export function moveEnemyToTargetLocation(
@@ -199,7 +194,7 @@ export function checkForFloorEffects(state: GameState, enemy: Enemy) {
 
 function makeEnemyFallIntoPit(state: GameState, enemy: Enemy) {
     const hitbox = enemy.getHitbox(state);
-    const pitAnimation = new AnimationEffect({
+    const pitAnimation = new FieldAnimationEffect({
         animation: enemyFallAnimation,
         x: Math.floor(hitbox.x / 16) * 16, y: Math.floor(hitbox.y / 16) * 16,
     });

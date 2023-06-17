@@ -10,7 +10,6 @@ import { getState } from 'app/state';
 import { readImageFromFile } from 'app/utils/index';
 
 
-import { EditorToolType, PanelRows, TileGridDefinition } from 'app/types';
 
 const toolTabContainer = new TabContainer<EditorToolType>('brush', [
     {

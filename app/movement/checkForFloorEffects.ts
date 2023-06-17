@@ -2,7 +2,6 @@ import { destroyTile } from 'app/utils/destroyTile';
 import { directionMap } from 'app/utils/direction';
 import { boxesIntersect } from 'app/utils/index';
 
-import { GameState, Hero } from 'app/types';
 
 export function checkForFloorEffects(state: GameState, hero: Hero) {
     if (!hero.area) {

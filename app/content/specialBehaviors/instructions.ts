@@ -1,7 +1,6 @@
 import { addTextCue, findTextCue } from 'app/content/effects/textCue';
 import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
 
-import { GameState, ObjectInstance } from 'app/types';
 
 
 specialBehaviorsHash.barrierBurstInstructions = {

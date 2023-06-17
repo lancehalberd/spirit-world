@@ -1,7 +1,5 @@
 import { readGetParameter, readGetParameterAsInt } from 'app/utils/index';
 
-import { LootType, MagicElement } from 'app/types';
-
 // Update duration in milliseconds.
 export const FRAME_LENGTH = 20;
 

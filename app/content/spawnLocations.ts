@@ -1,7 +1,6 @@
 import { CANVAS_HEIGHT } from 'app/gameConstants';
 import { saveGame } from 'app/utils/saveGame';
 
-import { GameState, ZoneLocation } from 'app/types';
 
 
 export const SPAWN_LOCATION_FULL: ZoneLocation = {

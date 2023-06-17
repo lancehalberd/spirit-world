@@ -3,7 +3,6 @@ import { CANVAS_HEIGHT } from 'app/gameConstants';
 import { enterZoneByTarget } from 'app/utils/enterZoneByTarget';
 import { returnToSpawnLocation } from 'app/utils/returnToSpawnLocation';
 
-import { GameState } from 'app/types';
 
 
 // Currently only one default entrance is supported for each dungeon.

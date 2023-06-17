@@ -10,8 +10,7 @@
     "server": "node server"
   },
   "dependencies": {
-    "howler": "^2.2.3",
-    "lodash": "^4.17.19"
+    "howler": "^2.2.3"
   },
   "devDependencies": {
     "@types/howler": "^2.2.4",

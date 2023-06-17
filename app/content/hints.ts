@@ -4,7 +4,6 @@ import { setScript } from 'app/scriptEvents';
 import { findObjectLocation } from 'app/utils/enterZoneByTarget';
 import Random from 'app/utils/Random';
 
-import { Frame, GameState, LogicalZoneKey, LootWithLocation, ObjectDefinition, ZoneLocation } from 'app/types';
 
 interface Mission {
     getMarkerLocation?: (state :GameState) => ZoneLocation & { object?: ObjectDefinition } | false

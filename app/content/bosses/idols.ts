@@ -8,7 +8,6 @@ import { rotateDirection } from 'app/utils/direction';
 import { addEffectToArea } from 'app/utils/effects';
 
 
-import { GameState, HitProperties, HitResult } from 'app/types';
 
 function onHitIdol(state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
     // Idols take much less damage during their enraged phase.

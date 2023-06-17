@@ -1,4 +1,3 @@
-import { Circle, Ray, Rect } from 'app/types';
 
 // Based on Rapidly Exploring Random Tree Algorithm
 interface DamageWarningProps {

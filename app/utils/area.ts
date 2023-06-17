@@ -4,7 +4,6 @@ import { editingState } from 'app/development/editingState';
 import { isPointInShortRect } from 'app/utils/index';
 import { removeObjectFromArea } from 'app/utils/objects';
 
-import { AreaSection, AreaSectionInstance, GameState } from 'app/types';
 
 export function removeAllClones(state: GameState): void {
     for (const clone of state.hero.clones) {

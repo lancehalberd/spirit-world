@@ -3,7 +3,6 @@ import { allSections, dungeonMaps, getNextFreeId } from 'app/content/sections';
 import { editingState } from 'app/development/editingState';
 import { overworldKeys } from 'app/gameConstants';
 
-import { AreaSection, GameState, ZoneLocation } from 'app/types';
 
 export function initializeSection(section: AreaSection, location: ZoneLocation) {
     if (!(section.index >= 0)) {

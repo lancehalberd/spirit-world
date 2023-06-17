@@ -16,7 +16,6 @@ import { drawFrameCenteredAt } from 'app/utils/animations';
 import { addEffectToArea } from 'app/utils/effects';
 import { getVectorToNearbyTarget } from 'app/utils/target';
 
-import { Enemy, EnemyAbility, Frame, GameState, HitProperties, HitResult, Rect } from 'app/types';
 
 const maxShieldLife = 6;
 

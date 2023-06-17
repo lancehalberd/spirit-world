@@ -9,11 +9,6 @@ import { coverTile, getTileBehaviors, getTileBehaviorsAndObstacles } from 'app/u
 import { boxesIntersect } from 'app/utils/index';
 import { addObjectToArea, getObjectStatus, removeObjectFromArea, saveObjectStatus  } from 'app/utils/objects';
 import Random from 'app/utils/Random';
-import {
-    AreaInstance, DrawPriority, FrameWithPattern, GameState,
-    ObjectInstance, ObjectStatus, BeadCascadeDefinition, SimpleObjectDefinition,
-    Rect,
-} from 'app/types';
 
 const crystalBeadsBasePattern = createAnimation('gfx/effects/beadcascadeunder.png', {w: 16, h: 16},
     {cols: 8, duration: 3});
@@ -404,3 +399,8 @@ function drawCascade(context: CanvasRenderingContext2D, r: Rect, time: number) {
 
 objectHash.beadCascade = BeadCascade;
 objectHash.beadGrate = BeadGrate;
+
+class _BeadCascade extends BeadCascade {}
+declare global {
+    export interface BeadCascade extends _BeadCascade {}
+}

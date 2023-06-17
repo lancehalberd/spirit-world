@@ -1,4 +1,3 @@
-import { Direction } from 'app/types';
 
 const root2over2 = Math.sqrt(2) / 2;
 

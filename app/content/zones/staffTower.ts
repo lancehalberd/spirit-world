@@ -1,6 +1,5 @@
 import { zones } from 'app/content/zones/zoneHash';
 
-import { AreaDefinition } from 'app/types';
 
 const f0_0x0: AreaDefinition = {
     layers: [

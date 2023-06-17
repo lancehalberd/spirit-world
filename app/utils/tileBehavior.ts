@@ -1,6 +1,3 @@
-import {
-    AreaInstance, FullTile, Tile, TileBehaviors,
-} from 'app/types';
 
 // This resets the tile behavior for a specific tile to whatever the combined behavior of the layers are.
 // This is useful when an object in a tile was overriding the tile behavior beneath it and we need to

@@ -2,8 +2,6 @@
 import { GAME_KEY } from 'app/gameConstants';
 import { unlockAudio } from 'app/utils/sounds';
 
-import { GameState, Hero } from 'app/types'
-
 export const KEY = {
     ESCAPE: 27,
     LEFT: 37,
@@ -84,8 +82,8 @@ const GAME_PAD_MAPPINGS = {
     [GAME_KEY.RIGHT]: 15,
     [GAME_KEY.PREVIOUS_ELEMENT]: 4, // L Front Bumper
     [GAME_KEY.NEXT_ELEMENT]: 5,  // R Front bumper
-    [GAME_KEY.ROLL]: 6, // L Front Bumper
-    [GAME_KEY.MEDITATE]: 7,  // R Front bumper
+    [GAME_KEY.ROLL]: 6, // L Back Bumper
+    [GAME_KEY.MEDITATE]: 7,  // R Back bumper
     [GAME_KEY.MAP]: 8, // BACK
 };
 

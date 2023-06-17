@@ -6,10 +6,6 @@ import { rectanglesOverlap } from 'app/utils/index';
 import { deactivateTargets, getObjectStatus, saveObjectStatus} from 'app/utils/objects';
 import { checkIfAllSwitchesAreActivated } from 'app/utils/switches';
 
-import {
-    AreaInstance, DrawPriority, FloorSwitchDefinition, GameState,
-    ObjectInstance, ObjectStatus, Rect,
-} from 'app/types';
 
 const [upFrame, downFrame] = createAnimation('gfx/tiles/toggletiles.png', {w: 16, h: 16}, {cols: 2}).frames;
 
@@ -102,3 +98,8 @@ export class FloorSwitch implements ObjectInstance {
     }
 }
 objectHash.floorSwitch = FloorSwitch;
+
+class _FloorSwitch extends FloorSwitch {}
+declare global {
+    export interface FloorSwitch extends _FloorSwitch {}
+}

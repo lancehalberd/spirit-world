@@ -3,10 +3,6 @@ import { FRAME_LENGTH } from 'app/gameConstants';
 import { drawFrameAt } from 'app/utils/animations';
 import { createCanvasAndContext } from 'app/utils/canvas';
 import { requireImage } from 'app/utils/images';
-import {
-    AreaInstance, DrawPriority, Frame, FrameWithPattern, GameState,
-    ObjectInstance, ObjectStatus, WaterfallDefinition, Rect,
-} from 'app/types';
 
 export class Waterfall implements ObjectInstance {
     area: AreaInstance;

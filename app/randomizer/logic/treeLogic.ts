@@ -5,7 +5,6 @@ import {
     canUseTeleporters,
 } from 'app/content/logic';
 
-import { LogicNode } from 'app/types';
 
 const zoneId = 'tree';
 export const treeNodes: LogicNode[] = [

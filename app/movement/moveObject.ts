@@ -1,7 +1,6 @@
 import { moveDown, moveLeft, moveRight, moveUp } from 'app/movement/move';
 import { directionMap, getDirection } from 'app/utils/field';
 
-import { Direction, GameState, MovementProperties, ObjectInstance, EffectInstance } from 'app/types';
 
 // This file contains a couple of functions copied from `moveActor` that have been simplified for use with objects.
 export function moveObject(state: GameState, object: ObjectInstance | EffectInstance, dx: number, dy: number, movementProperties: MovementProperties): {mx: number, my: number} {

@@ -14,7 +14,6 @@ import { getElementRectangle } from 'app/utils/index';
 import { getMousePosition } from 'app/utils/mouse';
 import { updateSoundSettings } from 'app/utils/sounds';
 
-import { MenuOption } from 'app/types';
 
 
 export class ContextMenu {
@@ -316,4 +315,9 @@ export function addContextMenuListeners(): void {
         const menu = getContextMenu();
         showContextMenu(menu, x, y);
     });
+}
+
+class _ContextMenu extends ContextMenu {}
+declare global {
+    export interface ContextMenu extends _ContextMenu {}
 }

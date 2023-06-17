@@ -6,7 +6,6 @@ import {
     everyObject, verifyNodeConnections
 } from 'app/randomizer/utils';
 
-import { AreaDefinition, EntranceDefinition, Zone, ZoneLocation } from 'app/types';
 
 const ignoredZones = [
     // These zones are part of the 'Holy Sanctum' and should not be randomized.

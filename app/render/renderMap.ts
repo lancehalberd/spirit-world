@@ -16,7 +16,6 @@ import { getMousePosition, isMouseDown } from 'app/utils/mouse';
 import { isSectionExplored } from 'app/utils/sections';
 import { drawText } from 'app/utils/simpleWhiteFont';
 
-import { AreaInstance, AreaSection, GameState, ObjectType, Rect } from 'app/types';
 
 const menuSlices = createAnimation('gfx/hud/menu9slice.png', {w: 8, h: 8}, {cols: 3, rows: 3}).frames;
 

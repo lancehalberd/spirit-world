@@ -6,12 +6,6 @@ import { drawFrame } from 'app/utils/animations';
 import { createCanvas } from 'app/utils/canvas';
 import { getMousePosition, isMouseDown } from 'app/utils/mouse';
 
-import {
-    EditorArrayProperty, EditorButtonProperty, EditorPaletteProperty,
-    EditorProperty, EditorSingleProperty,
-    EditorSourcePaletteProperty, FullTile,
-    PanelRows, PropertyRow, TileGridDefinition,
-} from 'app/types';
 
 const panelsByClass: {[key: string]: HTMLElement} = {};
 // We may need to split these by class and reset them when rendering properties again.

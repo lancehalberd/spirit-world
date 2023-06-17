@@ -4,9 +4,6 @@ import { Frost } from 'app/content/effects/frost';
 import { Spark } from 'app/content/effects/spark';
 import { addEffectToArea } from 'app/utils/effects';
 
-import {
-    AreaInstance, GameState, Point,
-} from 'app/types';
 
 export const flameDefinition = {
     type: 'flame' as const,

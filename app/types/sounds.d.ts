@@ -1,13 +1,11 @@
-import { Howl } from 'howler';
-
-export interface SoundSettings {
+interface SoundSettings {
     muteTracks?: boolean
     muteSounds?: boolean
     globalVolume?: number
     musicVolume?: number
     soundVolume?: number
 }
-export interface HowlerProperties {
+interface HowlerProperties {
     src: string[]
     html5?: boolean
     loop?: boolean
@@ -20,7 +18,7 @@ export interface HowlerProperties {
     onend?: () => void
     sprite?: { sprite: [number, number] }
 }
-export interface GameSound {
+interface GameSound {
     soundSettings?: SoundSettings
     props?: HowlerProperties
     howl?: Howl

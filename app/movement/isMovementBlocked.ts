@@ -3,7 +3,6 @@ import { tileHitAppliesToTarget } from 'app/utils/field';
 import { isPixelInShortRect } from 'app/utils/index';
 import { getObjectBehaviors } from 'app/utils/objects';
 
-import { AreaInstance, EffectInstance, GameState, MovementProperties, ObjectInstance, TileBehaviors } from 'app/types';
 
 export function isMovementBlocked(
     state: GameState,

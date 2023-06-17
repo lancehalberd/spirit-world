@@ -3,10 +3,6 @@ import { objectHash } from 'app/content/objects/objectHash';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { checkIfAllSwitchesAreActivated } from 'app/utils/switches';
 
-import {
-    AreaInstance, BallGoalDefinition, DrawPriority, GameState,
-    ObjectInstance, ObjectStatus, Rect, TileBehaviors,
-} from 'app/types';
 
 const [emptyFrame, filledFrame] = createAnimation('gfx/tiles/circulardepression.png', {w: 16, h: 16}, {cols: 2}).frames;
 
@@ -56,3 +52,8 @@ export class BallGoal implements ObjectInstance {
     }
 }
 objectHash.ballGoal = BallGoal;
+
+class _BallGoal extends BallGoal {}
+declare global {
+    export interface BallGoal extends _BallGoal {}
+}

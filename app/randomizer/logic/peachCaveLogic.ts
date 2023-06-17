@@ -3,7 +3,6 @@ import {
     hasClone, hasIronBoots, hasGloves, hasWeapon,
 } from 'app/content/logic';
 
-import { LogicNode } from 'app/types';
 
 const zoneId = 'peachCave';
 export const peachCaveNodes: LogicNode[] = [

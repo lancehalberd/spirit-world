@@ -1,4 +1,4 @@
-import { AnimationEffect, objectFallAnimation, enemyFallAnimation, splashAnimation } from 'app/content/effects/animationEffect';
+import { FieldAnimationEffect, objectFallAnimation, enemyFallAnimation, splashAnimation } from 'app/content/effects/animationEffect';
 import { Enemy } from 'app/content/enemy';
 import { setEquippedElement } from 'app/content/menu';
 import { editingState } from 'app/development/editingState';
@@ -11,11 +11,6 @@ import { addEffectToArea } from 'app/utils/effects';
 import { getTileBehaviorsAndObstacles } from 'app/utils/field';
 import { rectanglesOverlap } from 'app/utils/index';
 import { removeObjectFromArea } from 'app/utils/objects';
-
-import {
-    AreaInstance, EffectInstance,
-    GameState, MagicElement, ObjectInstance
-} from 'app/types';
 
 export function updateField(this: void, state: GameState) {
     if (editingState.isEditing) {
@@ -146,14 +141,14 @@ export function updateAreaObjects(this: void, state: GameState, area: AreaInstan
             object.z = Math.max(object.z, object.groundHeight);
             const { tileBehavior } = getTileBehaviorsAndObstacles(state, object.area, {x, y});
             if (tileBehavior?.pit  && !(object.z > 0)) {
-                const animation = new AnimationEffect({
+                const animation = new FieldAnimationEffect({
                     animation: object.definition?.type === 'enemy' ? enemyFallAnimation : objectFallAnimation,
                     x: ((x / 16) | 0) * 16, y: ((y / 16) | 0) * 16,
                 });
                 addEffectToArea(state, object.area, animation);
                 removeObjectFromArea(state, object);
             } else if (tileBehavior?.water  && !(object.z > 0)) {
-                const animation = new AnimationEffect({
+                const animation = new FieldAnimationEffect({
                     animation: splashAnimation,
                     x: ((x / 16) | 0) * 16, y: ((y / 16) | 0) * 16,
                 });

@@ -1,7 +1,6 @@
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { createCanvasAndContext } from 'app/utils/canvas';
 
-import { Frame, GameState } from 'app/types';
 
 
 const [

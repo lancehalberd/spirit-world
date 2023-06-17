@@ -11,10 +11,6 @@ import { displayPropertyPanel, hideAllPropertyPanels } from 'app/development/pro
 import { createObjectDefinition, combinedObjectTypes } from 'app/development/objectEditor';
 import { enterLocation } from 'app/utils/enterLocation';
 
-import {
-    BossObjectDefinition, EnemyObjectDefinition, EnemyType,
-    GameState, ObjectDefinition, ObjectType, PanelRows,
-} from 'app/types';
 
 export function toggleEditing(state: GameState) {
     state.scene = 'game';

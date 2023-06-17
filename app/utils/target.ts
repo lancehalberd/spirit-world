@@ -1,6 +1,3 @@
-import {
-    Direction, EffectInstance, GameState, Hero, ObjectInstance,
-} from 'app/types';
 
 export function isTargetVisible(state: GameState, source: EffectInstance | ObjectInstance, target: EffectInstance | ObjectInstance): boolean {
     return !!target && !!target.getHitbox && !target.isInvisible;

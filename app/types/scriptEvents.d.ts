@@ -1,9 +1,16 @@
-import { Frame, GameState, LootData, ZoneLocation } from 'app/types';
-
+interface TextPopup {
+    value?: string | number
+    fontSize?: number
+    x: number, y: number, z: number
+    vx: number, vy: number
+    color: Color
+    duration?: number
+    gravity?: number
+}
 
 // Defines a taunt an enemy can make as a text cue with parameters to control
 // how often and when it can override other text cues.
-export interface TextCueTaunt {
+interface TextCueTaunt {
     text: string
     // Higher priority taunts can override lower priority text cues
     priority?: number
@@ -15,7 +22,7 @@ export interface TextCueTaunt {
     limit?: number
 }
 
-export interface TextCueTauntInstance {
+interface TextCueTauntInstance {
     definition: TextCueTaunt
     // Time until this taunt can be used again.
     cooldown: number
@@ -23,16 +30,16 @@ export interface TextCueTauntInstance {
     timesUsed: number
 }
 
-export interface TextPage {
+interface TextPage {
     textRows: string[]
     frames: Frame[][]
 }
 
-export interface ShowTextBoxScriptEvent {
+interface ShowTextBoxScriptEvent {
     type: 'showTextBox'
     textPage: TextPage
 }
-export interface ClearTextBoxScriptEvent {
+interface ClearTextBoxScriptEvent {
     type: 'clearTextBox'
 }
 // This event will cause a corresponding WaitActiveScriptEvent to be added to the active events.
@@ -43,7 +50,7 @@ export interface ClearTextBoxScriptEvent {
 // the tutorial instructions.
 // During a cut scene, active events can be run to perform simultaneous animations or other effects
 // and a wait event can be added to delay the next script until all existing animations complete
-export interface WaitScriptEvent {
+interface WaitScriptEvent {
     type: 'wait'
     // Whether or not to block field updates while this event is active.
     blockFieldUpdates?: boolean
@@ -59,10 +66,10 @@ export interface WaitScriptEvent {
     // between it and any other 'wait' events.
     waitingOnActiveEvents?: boolean
 }
-export type WaitActiveScriptEvent = WaitScriptEvent & {
+type WaitActiveScriptEvent = WaitScriptEvent & {
     time: number
 }
-export interface ShowChoiceBoxScriptEvent {
+interface ShowChoiceBoxScriptEvent {
     type: 'showChoiceBox'
     prompt?: string
     choices: {
@@ -70,35 +77,35 @@ export interface ShowChoiceBoxScriptEvent {
         key: string
     }[]
 }
-export type ShowChoiceBoxActiveScriptEvent = ShowChoiceBoxScriptEvent & {
+type ShowChoiceBoxActiveScriptEvent = ShowChoiceBoxScriptEvent & {
     choiceIndex: number
 }
-export interface SetFlagScriptEvent {
+interface SetFlagScriptEvent {
     type: 'setFlag'
     flag: string
     value?: boolean | number | string
 }
-export interface CallbackScriptEvent {
+interface CallbackScriptEvent {
     type: 'callback'
     callback: (state: GameState) => void
 }
-export interface ClearFlagScriptEvent {
+interface ClearFlagScriptEvent {
     type: 'clearFlag'
     flag: string
 }
-export interface RefreshAreaLogicScriptEvent {
+interface RefreshAreaLogicScriptEvent {
     type: 'refreshAreaLogic'
     // Perhaps define whether to use a transition here.
 }
-export interface GainLootScriptEvent {
+interface GainLootScriptEvent {
     type: 'gainLoot'
     lootDefinition: LootData
 }
-export interface PlaySoundScriptEvent {
+interface PlaySoundScriptEvent {
     type: 'playSound'
     sound: string
 }
-export interface RunDialogueScriptScriptEvent {
+interface RunDialogueScriptScriptEvent {
     type: 'runDialogueScript'
     // Dialogue is currently organized by npc
     npcKey: string
@@ -106,7 +113,7 @@ export interface RunDialogueScriptScriptEvent {
     scriptKey: string
 }
 
-export interface AttemptPurchaseScriptEvent {
+interface AttemptPurchaseScriptEvent {
     type: 'attemptPurchase'
     cost: number
     // Instead of using string here, these could also be parsed arrays of ScriptEvents
@@ -114,45 +121,45 @@ export interface AttemptPurchaseScriptEvent {
     failScript: string
 }
 
-export interface RestScriptEvent {
+interface RestScriptEvent {
     type: 'rest'
 }
-export interface ScreenShakeScriptEvent {
+interface ScreenShakeScriptEvent {
     type: 'screenShake'
     dx: number
     dy: number
     duration: number
 }
-export interface StartScreenShakeScriptEvent {
+interface StartScreenShakeScriptEvent {
     type: 'startScreenShake'
     dx: number
     dy: number
     id: string
 }
-export interface StopScreenShakeScriptEvent {
+interface StopScreenShakeScriptEvent {
     type: 'stopScreenShake'
     id: string
 }
-export interface EnterLocationScriptEvent {
+interface EnterLocationScriptEvent {
     type: 'enterLocation'
     location: ZoneLocation
 }
 
-export interface AddTextCueScriptEvent {
+interface AddTextCueScriptEvent {
     type: 'addTextCue'
     text: string
 }
 
-export interface RemoveTextCueScriptEvent {
+interface RemoveTextCueScriptEvent {
     type: 'removeTextCue'
 }
 
-export interface UpdateActiveScriptEvent {
+interface UpdateActiveScriptEvent {
     type: 'update'
     update: (state: GameState) => boolean
 }
 
-export type ScriptEvent
+type ScriptEvent
     = AddTextCueScriptEvent
     | AttemptPurchaseScriptEvent
     | CallbackScriptEvent
@@ -174,7 +181,7 @@ export type ScriptEvent
     | WaitScriptEvent
     ;
 
-export type ActiveScriptEvent
+type ActiveScriptEvent
     = UpdateActiveScriptEvent
     | ShowChoiceBoxActiveScriptEvent
     | WaitActiveScriptEvent

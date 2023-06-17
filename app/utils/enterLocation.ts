@@ -13,7 +13,6 @@ import { fixCamera } from 'app/utils/fixCamera';
 import { getFullZoneLocation } from 'app/utils/getFullZoneLocation';
 import { removeObjectFromArea } from 'app/utils/objects';
 
-import { GameState, ZoneLocation } from 'app/types';
 
 export function enterLocation(
     state: GameState,

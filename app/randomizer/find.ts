@@ -5,11 +5,6 @@ import { allNodes } from 'app/randomizer/allNodes';
 import { missingExitNodeSet, missingNodeSet, missingObjectSet, warnOnce } from 'app/randomizer/warnOnce';
 import { getFullZoneLocation } from 'app/utils/getFullZoneLocation';
 
-import {
-    AnyLootDefinition, EntranceDefinition, FullZoneLocation,
-    GameState, LogicNode, LootWithLocation, LootType,
-    ObjectDefinition, ObjectType, Zone
-} from 'app/types';
 
 export function findReachableNodes(allNodes: LogicNode[], startingNodes: LogicNode[], state: GameState): LogicNode[] {
     const reachableNodes = [...startingNodes];

@@ -4,10 +4,6 @@ import { createAnimation, drawFrame } from 'app/utils/animations';
 import { directionMap, isTileOpen } from 'app/utils/field';
 import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
 
-import {
-    AreaInstance, Direction, DrawPriority, Frame, GameState, Hero, ObjectInstance,
-    ObjectStatus, PushStairsDefinition, Rect, TileBehaviors,
-} from 'app/types';
 
 const pushStairsFrame: Frame = createAnimation('gfx/objects/pushStairs.png', {w: 36, h: 80}).frames[0];
 

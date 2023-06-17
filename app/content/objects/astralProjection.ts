@@ -5,9 +5,6 @@ import { heroSpiritAnimations } from 'app/render/heroAnimations';
 import { drawFrameAt, getFrame } from 'app/utils/animations';
 import { directionMap, getDirection } from 'app/utils/field';
 
-import {
-    ActorAnimations, Frame, GameState, HitProperties, HitResult,
-} from 'app/types';
 
 
 let lastPullAnimation = null;

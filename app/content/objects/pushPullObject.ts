@@ -2,10 +2,6 @@ import { objectHash } from 'app/content/objects/objectHash';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { directionMap, isTileOpen } from 'app/utils/field';
 
-import {
-    AreaInstance, Direction, Frame, GameState, Hero, HitProperties, HitResult, ObjectInstance,
-    ObjectStatus, SimpleObjectDefinition, Rect,
-} from 'app/types';
 
 const potFrame: Frame = createAnimation('gfx/tiles/movablepot.png', {w: 16, h: 18}).frames[0];
 

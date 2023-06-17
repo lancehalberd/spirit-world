@@ -2,10 +2,6 @@ import { objectHash } from 'app/content/objects/objectHash';
 import { editingState } from 'app/development/editingState';
 import { FRAME_LENGTH } from 'app/gameConstants';
 
-import {
-    AreaInstance, GameState, ObjectInstance,
-    ObjectStatus, IndicatorDefinition, Rect,
-} from 'app/types';
 
 export class Indicator implements ObjectInstance {
     area: AreaInstance;

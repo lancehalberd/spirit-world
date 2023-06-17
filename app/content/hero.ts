@@ -1,4 +1,4 @@
-import { AnimationEffect } from 'app/content/effects/animationEffect';
+import { FieldAnimationEffect } from 'app/content/effects/animationEffect';
 import { BarrierBurstEffect } from 'app/content/effects/barrierBurstEffect';
 import { Staff } from 'app/content/objects/staff';
 import { getChargedArrowAnimation } from 'app/content/effects/arrow';
@@ -27,15 +27,6 @@ import { addEffectToArea } from 'app/utils/effects';
 import { directionMap, getDirection } from 'app/utils/field';
 import { getChargeLevelAndElement } from 'app/utils/getChargeLevelAndElement';
 import { boxesIntersect } from 'app/utils/index';
-
-import {
-    Action, ActiveTool, Actor, AreaInstance,
-    Direction, DrawPriority, EffectInstance, Equipment, Frame,
-    FullTile, GameState, HeldChakram, HitProperties, HitResult,
-    MagicElement, ObjectInstance, ObjectStatus,
-    PassiveTool, Rect, SavedHeroData, ThrownChakram, TileCoords,
-    WeaponUpgrades, ZoneLocation
-} from 'app/types';
 
 const throwSpeed = 6;
 
@@ -425,7 +416,7 @@ export class Hero implements Actor, SavedHeroData {
             return;
         }
         this.hasBarrier = false;
-        const shatteredBarrier = new AnimationEffect({
+        const shatteredBarrier = new FieldAnimationEffect({
             animation: spiritBarrierBreakingAnimation,
             x: this.x - 7,
             y: this.y + 5,
@@ -763,4 +754,9 @@ export class Hero implements Actor, SavedHeroData {
     increaseMagicRegenCooldown(amount: number): void {
         this.magicRegenCooldown = Math.min(Math.max(100, this.magicRegenCooldown + amount), this.magicRegenCooldownLimit);
     }
+}
+
+class _Hero extends Hero {}
+declare global {
+    export interface Hero extends _Hero {}
 }

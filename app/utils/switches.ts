@@ -1,6 +1,5 @@
 import { activateTarget } from 'app/utils/objects'
 
-import { AreaInstance, BallGoal, CrystalSwitch, FloorSwitch, GameState } from 'app/types';
 
 export function areAllSwitchesActivated(state: GameState, area: AreaInstance, switchInstance: BallGoal | CrystalSwitch | FloorSwitch): boolean {
     return !area.objects.some(o =>

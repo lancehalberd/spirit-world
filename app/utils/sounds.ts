@@ -1,8 +1,8 @@
 import {Howl} from 'howler';
-
-import { GameSound, GameState, HowlerProperties, SoundSettings } from 'app/types';
-
 import { noteFrequencies } from './noteFrequencies';
+
+class _Howl extends Howl {}
+
 
 const sounds = new Map<string, GameSound>();
 window['sounds'] = sounds;
@@ -239,7 +239,6 @@ const musicTracks = {
     bossA: {key: 'bossA', type: 'bgm', source: 'bgm/SpookyThemeA.mp3', volume: 40, nextTrack: 'bossB' },
     bossB: {key: 'bossB', type: 'bgm', source: 'bgm/SpookyThemeB.mp3', volume: 40, nextTrack: 'bossA' },
 };
-export type TrackKey = keyof typeof musicTracks;
 export function playTrack(trackKey: TrackKey, timeOffset, soundSettings: SoundSettings, fadeOutOthers = true, crossFade = true) {
     if (!audioUnlocked) {
         return;
@@ -531,3 +530,8 @@ notes.forEach((noteName) => {
         }
     });
 });
+
+declare global {
+    export interface Howl extends _Howl {}
+    export type TrackKey = keyof typeof musicTracks;
+}

@@ -2,11 +2,6 @@ import { setLeftTool, setRightTool } from 'app/content/menu';
 import { updateHeroMagicStats } from 'app/render/spiritBar';
 import { saveGame } from 'app/utils/saveGame';
 
-import {
-    ActiveTool, BossObjectDefinition, DialogueLootDefinition,
-    DungeonInventory, GameState, LootObjectDefinition,
-    LootType
-} from 'app/types';
 
 type AnyLootDefinition = LootObjectDefinition | BossObjectDefinition | DialogueLootDefinition;
 

@@ -3,10 +3,6 @@ import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import { getTileBehaviors, hitTargets } from 'app/utils/field';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 
-import {
-    AreaInstance, DrawPriority, EffectInstance,
-    Frame, GameState, Point, TileBehaviors
-} from 'app/types';
 
 interface Props {
     x?: number

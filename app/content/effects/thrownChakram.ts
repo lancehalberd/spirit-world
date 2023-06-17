@@ -9,9 +9,6 @@ import { getAreaSize } from 'app/utils/getAreaSize';
 import { getChargeLevelAndElement } from 'app/utils/getChargeLevelAndElement';
 import { isPointInShortRect, pad } from 'app/utils/index';
 
-import {
-    AnimationEffect, AreaInstance, DrawPriority, EffectInstance, Frame, GameState, Hero, HitProperties, MagicElement,
-} from 'app/types';
 
 const chakramGeometry = {w: 16, h: 16, content: {x: 1, y: 1, w: 14, h: 14}};
 const chakramAnimation = createAnimation('gfx/chakram1.png', chakramGeometry, {cols: 9, x: 0, duration: 2}, {loopFrame: 1});
@@ -53,8 +50,8 @@ export class ThrownChakram implements EffectInstance {
     vy: number;
     source: Hero;
     animationTime = 0;
-    sparkles: AnimationEffect[];
-    relativeSparkles: AnimationEffect[];
+    sparkles: FieldAnimationEffect[];
+    relativeSparkles: FieldAnimationEffect[];
     hitCooldown: number = 0;
     isPlayerAttack = true;
     // The level of the chakram weapon item.
@@ -286,7 +283,7 @@ export class HeldChakram implements EffectInstance {
     animationTime = 0;
     changesAreas = true;
     updateDuringTransition = true;
-    sparkles: AnimationEffect[];
+    sparkles: FieldAnimationEffect[];
     isPlayerAttack = true;
     level: number;
     constructor({x = 0, y = 0, vx = 0, vy = 0, source, level}: Props) {
@@ -473,4 +470,11 @@ export class HeldChakram implements EffectInstance {
             sparkle.render(context, state);
         }
     }
+}
+
+class _HeldChakram extends HeldChakram {}
+class _ThrownChakram extends ThrownChakram {}
+declare global {
+    export interface HeldChakram extends _HeldChakram {}
+    export interface ThrownChakram extends _ThrownChakram {}
 }

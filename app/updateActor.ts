@@ -23,10 +23,6 @@ import { getFullZoneLocation } from 'app/utils/getFullZoneLocation';
 import { boxesIntersect, pad } from 'app/utils/index';
 import { removeObjectFromArea } from 'app/utils/objects';
 
-import {
-    GameState, Hero,
-} from 'app/types';
-
 export function updateAllHeroes(this: void, state: GameState) {
     if (state.hero.action === 'preparingSomersault' && state.fieldTime % 200 !== 0) {
         updateHeroSpecialActions(state, state.hero);

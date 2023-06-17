@@ -11,8 +11,6 @@ import { addEffectToArea } from 'app/utils/effects';
 import { addObjectToArea } from 'app/utils/objects';
 import { isObjectInsideTarget } from 'app/utils/index';
 
-import { GameState } from 'app/types';
-
 const cameraSpeed = 10;
 export function updateCamera(state: GameState, speed?: number): void {
     if (!speed) {

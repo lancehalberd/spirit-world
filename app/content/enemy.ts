@@ -1,4 +1,4 @@
-import { addSparkleAnimation, AnimationEffect } from 'app/content/effects/animationEffect';
+import { addSparkleAnimation, FieldAnimationEffect } from 'app/content/effects/animationEffect';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { addTextCue } from 'app/content/effects/textCue';
 import { dropItemFromTable, getLoot } from 'app/content/objects/lootObject';
@@ -17,13 +17,6 @@ import { getAreaSize } from 'app/utils/getAreaSize';
 import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
 import Random from 'app/utils/Random';
 import { isTargetVisible } from 'app/utils/target';
-
-import {
-    Action, Actor, ActorAnimations, AreaInstance, BossObjectDefinition, Direction, DrawPriority, EffectInstance,
-    EnemyAbility, EnemyAbilityInstance, EnemyDefinition, EnemyObjectDefinition,
-    Frame, FrameAnimation, GameState, HitProperties, HitResult,
-    ObjectInstance, ObjectStatus, Point, Rect, TileBehaviors, TextCueTauntInstance,
-} from 'app/types';
 
 interface EnemyAbilityWithCharges {
     definition: EnemyAbility<any>
@@ -370,7 +363,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             playAreaSound(state, this.area, damageSound);
         }
         if (this.area !== state.areaInstance) {
-            addEffectToArea(state, state.areaInstance, new AnimationEffect({
+            addEffectToArea(state, state.areaInstance, new FieldAnimationEffect({
                 animation: (this.isDefeated && this.definition.type !== 'boss')
                     ? enemyDeathAnimation
                     : this.currentAnimation || enemyDeathAnimation,
@@ -451,7 +444,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             return;
         }
         const hitbox = this.getHitbox(state);
-        const deathAnimation = new AnimationEffect({
+        const deathAnimation = new FieldAnimationEffect({
             animation: enemyDeathAnimation,
             x: hitbox.x + hitbox.w / 2 - enemyDeathAnimation.frames[0].w / 2 * this.scale,
             // +1 to make sure the explosion appears in front of enemies the frame they die.
@@ -660,7 +653,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             ) {
                 const hitbox = this.getHitbox(state);
                 const animation = bossDeathExplosionAnimation;
-                const explosionAnimation = new AnimationEffect({
+                const explosionAnimation = new FieldAnimationEffect({
                     animation,
                     drawPriority: 'foreground',
                     x: hitbox.x + Math.random() * hitbox.w - animation.frames[0].w / 2,
@@ -868,3 +861,8 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
 }
 objectHash.enemy = Enemy;
 objectHash.boss = Enemy;
+
+class _Enemy<T> extends Enemy<T> {}
+declare global {
+    export interface Enemy<T=any> extends _Enemy<T> {}
+}

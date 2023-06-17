@@ -1,6 +1,5 @@
 import { isMovementBlocked } from 'app/movement/isMovementBlocked';
 
-import { AreaInstance, EffectInstance, GameState, MovementProperties, ObjectInstance, Rect } from 'app/types';
 
 export function canMoveDown(
     state: GameState,

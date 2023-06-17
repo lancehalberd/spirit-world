@@ -7,10 +7,6 @@ import { createAnimation, drawFrame } from 'app/utils/animations';
 import { selectDialogueOption } from 'app/utils/dialogue';
 import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
 
-import {
-    AreaInstance, GameState, Direction, Hero, SimpleObjectDefinition,
-    ObjectInstance, ObjectStatus, Rect,
-} from 'app/types';
 
 const geometry = {w: 32, h: 48};
 const [saveStatue] = createAnimation('gfx/tiles/savepoint.png', geometry).frames;

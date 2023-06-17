@@ -8,7 +8,6 @@ import { moveEnemyToTargetLocation } from 'app/utils/enemies';
 import { moveNPCToTargetLocation } from 'app/utils/npc';
 import { addObjectToArea, removeObjectFromArea } from 'app/utils/objects';
 
-import { Enemy, GameState, NPC } from 'app/types';
 
 function getRivalBoss(state: GameState): Enemy {
     const rival = state.areaInstance.enemies.find(t => t.definition?.id === 'tombRivalBoss') as Enemy;

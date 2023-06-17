@@ -10,7 +10,6 @@ import { addEffectToArea } from 'app/utils/effects';
 import { directionMap } from 'app/utils/field';
 
 
-import { Enemy, EnemyAbility, GameState, Rect } from 'app/types';
 
 const fireBallAbility: EnemyAbility<boolean> = {
     getTarget(this: void, state: GameState, enemy: Enemy): boolean {

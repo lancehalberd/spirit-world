@@ -3,9 +3,6 @@ import { playSound } from 'app/musicController';
 import { applyBehaviorToTile } from 'app/utils/tileBehavior';
 import { saveGame } from 'app/utils/saveGame';
 
-import {
-    AreaInstance, EffectInstance, GameState, ObjectDefinition, ObjectInstance, ObjectStatus, Rect
-} from 'app/types';
 
 
 function hitboxToGrid(hitbox: Rect): Rect {

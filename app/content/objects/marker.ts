@@ -2,10 +2,6 @@ import { objectHash } from 'app/content/objects/objectHash';
 import { editingState } from 'app/development/editingState';
 import { getVectorToTarget } from 'app/utils/target';
 
-import {
-    AreaInstance, DrawPriority, GameState, ObjectInstance,
-    ObjectStatus, Rect, MarkerDefinition,
-} from 'app/types';
 
 
 export class Marker implements ObjectInstance {

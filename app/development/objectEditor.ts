@@ -1,5 +1,3 @@
-import { flatten } from 'lodash';
-
 import {
     findZoneTargets,
     linkObject,
@@ -29,18 +27,6 @@ import { createObjectInstance } from 'app/utils/createObjectInstance';
 import { isPointInShortRect } from 'app/utils/index';
 import { addObjectToArea, removeObjectFromArea } from 'app/utils/objects';
 
-import {
-    AreaDefinition, AreaInstance, BallGoalDefinition,
-    BossObjectDefinition,
-    BossType, CrystalSwitchDefinition, EditingState, EditorProperty, EntranceDefinition,
-    EnemyObjectDefinition,
-    FloorSwitchDefinition, KeyBlockDefinition,
-    FrameDimensions, DecorationType, Direction, DrawPriority, EnemyType, GameState, LootObjectDefinition,
-    LootType, MagicElement, NarrationDefinition, NPCBehavior, NPCStyle,
-    ObjectDefinition, ObjectStatus, ObjectType, PanelRows,
-    Rect, ObjectInstance, SpecialAreaBehavior,
-    Zone, ZoneLocation,
-} from 'app/types';
 
 type PartialObjectDefinitionWithType = Partial<ObjectDefinition> & {type: ObjectType};
 
@@ -512,7 +498,7 @@ function getTargetObjectIdsByTypes(zone: Zone, types: ObjectType[]): string[] {
             }
         }
     }
-    return flatten(combinedObjectIds).filter(id => id);
+    return combinedObjectIds.flat().filter(id => id);
 }
 
 function getTargetObjectIdsByTypesAndArea(area: AreaDefinition, types: ObjectType[]): string[] {

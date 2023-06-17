@@ -17,12 +17,6 @@ import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
 import { drawText } from 'app/utils/simpleWhiteFont';
 import { applyBehaviorToTile, resetTileBehavior } from 'app/utils/tileBehavior';
 
-import {
-    AreaInstance, Direction, DrawPriority, Frame, GameState, Hero, HitProperties, HitResult, ObjectInstance,
-    ObjectStatus, EntranceDefinition, Rect, TileBehaviors,
-} from 'app/types';
-
-
 const BITMAP_SIDE_DOOR_TOP: Uint16Array = new Uint16Array([
     0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
     0xFFFF, 0xFFFF, 0xFFFF, 0, 0, 0, 0, 0,
@@ -684,3 +678,9 @@ export class Door implements ObjectInstance {
 }
 objectHash.door = Door;
 objectHash.stairs = Door;
+
+
+class _Door extends Door {}
+declare global {
+    export interface Door extends _Door {}
+}

@@ -6,7 +6,6 @@ import {
     hasInvisibility, hasLightningBlessing, hasLightning,
 } from 'app/content/logic';
 
-import { LogicNode } from 'app/types';
 
 let zoneId = 'overworld';
 export const mainOverworldNode: LogicNode = {

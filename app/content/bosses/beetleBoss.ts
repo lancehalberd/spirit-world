@@ -11,9 +11,6 @@ import { getAreaSize } from 'app/utils/getAreaSize';
 import { addObjectToArea } from 'app/utils/objects';
 import { getVectorToNearbyTarget } from 'app/utils/target';
 
-
-import { GameState } from 'app/types';
-
 enemyDefinitions.beetleBoss = {
     // Reset the boss to its starting position if you leave the arena.
     alwaysReset: true,

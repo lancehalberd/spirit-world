@@ -3,7 +3,6 @@ import { createAnimation, drawFrame, drawFrameAt } from 'app/utils/animations';
 import { debugCanvas } from 'app/utils/canvas';
 import { requireImage } from 'app/utils/images';
 
-import { Frame, GameState, Rect } from 'app/types';
 
 
 const [

@@ -6,10 +6,6 @@ import { drawFrame,getFrame } from 'app/utils/animations';
 import { addEffectToArea } from 'app/utils/effects';
 import { getAreaSize } from 'app/utils/getAreaSize';
 import { rectanglesOverlap } from 'app/utils/index';
-import {
-    AreaInstance, DrawPriority, GameState, ObjectInstance, ObjectStatus,
-    SimpleObjectDefinition, TileBehaviors,
-} from 'app/types';
 
 export class FlameTurret implements ObjectInstance {
     behaviors: TileBehaviors = {

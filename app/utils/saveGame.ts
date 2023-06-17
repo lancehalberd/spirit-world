@@ -1,4 +1,3 @@
-import { GameState } from 'app/types';
 
 export function saveGame(state: GameState): void {
     state.savedState.savedHeroData = state.hero.exportSavedHeroData();

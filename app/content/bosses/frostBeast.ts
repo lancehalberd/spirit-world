@@ -1,5 +1,4 @@
-import { sample } from 'lodash';
-import { AnimationEffect } from 'app/content/effects/animationEffect';
+import { FieldAnimationEffect } from 'app/content/effects/animationEffect';
 import { Frost } from 'app/content/effects/frost';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { throwIceGrenadeAtLocation } from 'app/content/effects/frostGrenade';
@@ -16,10 +15,10 @@ import {
 } from 'app/utils/enemies';
 import { getDirection, hitTargets } from 'app/utils/field';
 import { allImagesLoaded } from 'app/utils/images';
+import { sample } from 'app/utils/index';
 import { getVectorToNearbyTarget } from 'app/utils/target';
 
 
-import { AreaInstance, GameState, HitProperties, HitResult } from 'app/types';
 
 const frostGeometry = {w: 20, h: 20, content: {x: 4, y: 10, w: 12, h: 8}};
 export const [iceElement] = createAnimation('gfx/hud/elementhud.png', frostGeometry, {x: 2}).frames;
@@ -272,7 +271,7 @@ function updateFrostSerpent(this: void, state: GameState, enemy: Enemy): void {
         }
         if (enemy.life < enemy.enemyDefinition.life * 2 / 3) {
             const hitbox = enemy.getHitbox(state);
-            const deathAnimation = new AnimationEffect({
+            const deathAnimation = new FieldAnimationEffect({
                 animation: enemyDeathAnimation,
                 x: hitbox.x + hitbox.w / 2 - enemyDeathAnimation.frames[0].w / 2 * enemy.scale,
                 // +1 to make sure the explosion appears in front of enemies the frame they die.

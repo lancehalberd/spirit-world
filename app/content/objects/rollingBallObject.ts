@@ -7,10 +7,6 @@ import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { directionMap, getTileBehaviorsAndObstacles, hitTargets, isPointOpen } from 'app/utils/field';
 import { removeObjectFromArea } from 'app/utils/objects';
 
-import {
-    AreaInstance, BallGoal, Direction, GameState, HitProperties, HitResult,
-    BaseObjectDefinition, ObjectInstance, ObjectStatus, Rect,
-} from 'app/types';
 
 const rollingAnimation = createAnimation('gfx/tiles/rollingboulder.png', {w: 16, h: 16}, {cols:4});
 const rollingAnimationSpirit = createAnimation('gfx/tiles/rollingboulderspirit.png', {w: 16, h: 16}, {cols:4});

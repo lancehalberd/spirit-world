@@ -5,10 +5,6 @@ import { createAnimation, drawFrame } from 'app/utils/animations';
 import { deactivateTargets, getObjectStatus, saveObjectStatus } from 'app/utils/objects';
 import { checkIfAllSwitchesAreActivated } from 'app/utils/switches';
 
-import {
-    AreaInstance, CrystalSwitchDefinition, DrawPriority, GameState,
-    HitProperties, HitResult, ObjectInstance, ObjectStatus, Rect, SpecialSwitchBehavior,
-} from 'app/types';
 
 const crystalGeometry = {w: 16, h: 20, content: {x: 0, y: 4, w: 16, h: 16, }};
 const [baseFrame, crystalFrame, activeCrystalFrame] = createAnimation('gfx/tiles/activatablecrystal.png', crystalGeometry, {cols: 3}).frames;
@@ -129,3 +125,8 @@ export class CrystalSwitch implements ObjectInstance {
     }
 }
 objectHash.crystalSwitch = CrystalSwitch;
+
+class _CrystalSwitch extends CrystalSwitch {}
+declare global {
+    export interface CrystalSwitch extends _CrystalSwitch {}
+}

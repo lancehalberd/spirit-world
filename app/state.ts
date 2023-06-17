@@ -11,8 +11,6 @@ import { getDefaultSavedState } from 'app/savedState'
 import { returnToSpawnLocation } from 'app/utils/returnToSpawnLocation';
 import { getFullZoneLocation, getShortZoneName } from 'app/utils/getFullZoneLocation';
 
-import { GameState, SavedState } from 'app/types';
-
 export function loadSavedData(): boolean {
     //return false;
     if (window.location.search.substr(1) === 'reset' && confirm('Clear your saved data?')) {

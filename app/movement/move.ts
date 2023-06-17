@@ -3,7 +3,6 @@ import { canMoveLeft } from 'app/movement/canMoveLeft';
 import { canMoveRight } from 'app/movement/canMoveRight';
 import { canMoveUp } from 'app/movement/canMoveUp';
 
-import { Direction, EffectInstance, GameState, Hero, MovementProperties, ObjectInstance } from 'app/types';
 
 export function moveUp(
     state: GameState,

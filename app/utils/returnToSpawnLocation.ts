@@ -1,6 +1,5 @@
 import { enterLocation } from 'app/utils/enterLocation';
 
-import { GameState } from 'app/types';
 
 export function returnToSpawnLocation(state: GameState) {
     state.hero.life = state.hero.maxLife;

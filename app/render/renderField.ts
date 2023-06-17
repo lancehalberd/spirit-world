@@ -9,7 +9,6 @@ import { renderHeroEyes, renderHeroShadow } from 'app/renderActor';
 import { drawFrame } from 'app/utils/animations';
 import { createCanvasAndContext, drawCanvas } from 'app/utils/canvas';
 
-import { AreaInstance, AreaLayer, AreaLayerDefinition, EffectInstance, ObjectInstance, GameState } from 'app/types';
 
 // This is the max size of the s
 const [spiritCanvas, spiritContext] = createCanvasAndContext(MAX_SPIRIT_RADIUS * 2, MAX_SPIRIT_RADIUS * 2);

@@ -1,5 +1,3 @@
-import { sample } from 'lodash';
-
 import { objectHash } from 'app/content/objects/objectHash';
 import { snakeAnimations } from 'app/content/enemyAnimations';
 import { FRAME_LENGTH } from 'app/gameConstants';
@@ -19,14 +17,10 @@ import { shadowFrame, smallShadowFrame } from 'app/renderActor';
 import { showMessage } from 'app/scriptEvents';
 import { drawFrame, getFrame } from 'app/utils/animations';
 import { selectDialogueOption } from 'app/utils/dialogue';
+import { sample } from 'app/utils/index';
 import { moveNPC } from 'app/utils/npc';
 import { directionMap, rotateDirection } from 'app/utils/direction';
 
-import {
-    Actor, ActorAnimations, AreaInstance, GameState, DialogueOption, Direction,
-    Frame, FrameAnimation, Hero, NPCDefinition,
-    ObjectInstance, ObjectStatus, Rect,
-} from 'app/types';
 
 interface NPCStyleDefinition {
     animations: ActorAnimations
@@ -184,8 +178,6 @@ export const npcBehaviors = {
 }
 
 
-export type NPCStyle = keyof typeof npcStyles;
-export type NPCBehavior = keyof typeof npcBehaviors;
 
 export class NPC implements Actor, ObjectInstance  {
     area: AreaInstance;
@@ -338,3 +330,10 @@ export class NPC implements Actor, ObjectInstance  {
     }
 }
 objectHash.npc = NPC;
+
+class _NPC extends NPC {}
+declare global {
+    export type NPCStyle = keyof typeof npcStyles;
+    export type NPCBehavior = keyof typeof npcBehaviors;
+    export interface NPC extends _NPC {}
+}

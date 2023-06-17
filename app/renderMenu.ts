@@ -6,8 +6,6 @@ import { createAnimation, drawFrame, drawFrameCenteredAt } from 'app/utils/anima
 import { fillRect, pad } from 'app/utils/index';
 import { drawText } from 'app/utils/simpleWhiteFont';
 
-import { ActiveTool, PassiveTool, Equipment, GameState, LootType, MagicElement } from 'app/types';
-
 const MARGIN = 20;
 
 

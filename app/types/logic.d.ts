@@ -1,6 +1,4 @@
-import { DialogueLootDefinition, GameState } from 'app/types';
-
-export interface SimpleLogicCheck {
+interface SimpleLogicCheck {
     operation?: 'isTrue' | 'isFalse'
     // This logic check is false unless all required flags are set.
     requiredFlags?: string[]
@@ -11,7 +9,7 @@ export interface SimpleLogicCheck {
     zones?: string[]
 }
 
-export interface LogicDefinition {
+interface LogicDefinition {
     // Set this to indicate something is always in logic
     isTrue?: boolean
     // This can be set to a single key to check.
@@ -23,37 +21,37 @@ export interface LogicDefinition {
     isInverted?: boolean
 }
 
-export interface AndLogicCheck {
+interface AndLogicCheck {
     operation: 'and'
     logicChecks: LogicCheck[]
 }
 
-export interface OrLogicCheck {
+interface OrLogicCheck {
     operation: 'or'
     logicChecks: LogicCheck[]
 }
 
-export type LogicCheck = SimpleLogicCheck | AndLogicCheck | OrLogicCheck |
+type LogicCheck = SimpleLogicCheck | AndLogicCheck | OrLogicCheck |
     ((state: GameState) => boolean) | true | false;
 
-export interface DialogueOption {
+interface DialogueOption {
     // The logic that determines if this dialogue option is valid for the current game state.
-    logicCheck: LogicCheck,
+    logicCheck: LogicCheck
     // If this is set, this flag will be set once the player has finished this dialogue option.
     // Combining this with the same flag in `excludedFlags` will cause dialogue to occur no more than once
     // and should be used for dialogue that grants rewards to prevent giving the awards multiple times.
-    progressFlag?: string,
+    progressFlag?: string
     // If this flag is set, this dialogue will be shown if it is the first valid option found with this flag set.
-    isExclusive?: boolean,
+    isExclusive?: boolean
     // The set of dialogues that can occur when this option is chosen.
-    text: TextScript[],
+    text: TextScript[]
     // If set, dialogue will return to this index after exhausting all options.
     repeatIndex?: number
     // Notes for development purposes.
-    notes?: string,
+    notes?: string
 }
 
-export interface DialogueChoiceDefinition {
+interface DialogueChoiceDefinition {
     prompt?: string
     choices: {
         text: string
@@ -61,9 +59,9 @@ export interface DialogueChoiceDefinition {
     }[]
 }
 
-export type TextScript = ((state: GameState) => string) | string
+type TextScript = ((state: GameState) => string) | string
 
-export interface DialogueSet {
+interface DialogueSet {
     // The identifier for this dialogue set, used to attach it to a particular NPC.
     key: string,
     // Mapped dialogue options are trigged through {@key} indicators in text.
@@ -75,10 +73,10 @@ export interface DialogueSet {
     options: DialogueOption[],
 }
 
-export type DialogueKey = 'streetVendor' | 'storageVanara';
+type DialogueKey = 'streetVendor' | 'storageVanara';
 
 // Node used for building the logical graph of the game used for randomization.
-export interface LogicNode {
+interface LogicNode {
     // The id of the zone this node is in
     zoneId: string
     // The id for this node, used for targeting it from other nodes.

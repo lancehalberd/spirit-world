@@ -1,7 +1,6 @@
 import { createAnimation } from 'app/utils/animations';
 import { debugCanvas } from 'app/utils/canvas';
 
-import { ActorAnimations, AnimationSet, Frame, FrameAnimation, FrameDimensions } from 'app/types';
 
 export const Y_OFF = -4;
 

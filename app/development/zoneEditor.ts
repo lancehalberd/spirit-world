@@ -20,9 +20,6 @@ import { getFullZoneLocation } from 'app/utils/getFullZoneLocation';
 import { readFromFile, saveToFile, scaleRect } from 'app/utils/index';
 import { getMousePosition, isMouseDown } from 'app/utils/mouse';
 
-import {
-    AreaInstance, EditingState, Floor, GameState, LogicDefinition, PanelRows, PropertyRow, Zone
-} from 'app/types';
 
 const fullSection = {x: 0, y: 0, w: 32, h: 32};
 const leftColumn = {x: 0, y: 0, w: 16, h: 32};

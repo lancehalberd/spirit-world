@@ -1,4 +1,3 @@
-import { cloneDeep } from 'lodash';
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 import { getRandomizerZoneDescription } from 'app/content/hints';
 import { isLogicValid } from 'app/content/logic';
@@ -18,20 +17,12 @@ import {
 } from 'app/randomizer/find';
 import { missingExitNodeSet, missingNodeSet, warnOnce } from 'app/randomizer/warnOnce';
 
+import { cloneDeep } from 'app/utils/index';
 import { applySavedState, getDefaultState } from 'app/state';
 import { getFullZoneLocation } from 'app/utils/getFullZoneLocation';
 import SRandom from 'app/utils/SRandom';
 
 
-import {
-    AnyLootDefinition, AreaDefinition, AssignmentState,
-    BossObjectDefinition, EntranceDefinition, FullZoneLocation,
-    GameState, LogicalZoneKey, LogicNode,
-    LootAssignment, LootObjectDefinition, LootType,
-    LootWithLocation, NPCDefinition,
-    ObjectDefinition,
-    Zone, ZoneLocation,
-} from 'app/types';
 
 
 interface LootData {

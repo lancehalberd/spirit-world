@@ -1,6 +1,5 @@
 import { arrMod } from 'app/utils/index';
 
-import { Color, Point } from 'app/types';
 
 export const tolerance = .000001;
 

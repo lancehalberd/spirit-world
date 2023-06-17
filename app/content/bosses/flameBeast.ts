@@ -12,7 +12,6 @@ import { getDirection } from 'app/utils/field';
 import { allImagesLoaded } from 'app/utils/images';
 import { getNearbyTarget, getVectorToTarget, getVectorToNearbyTarget } from 'app/utils/target';
 
-import { AreaInstance, EnemyAbility, GameState } from 'app/types';
 
 const flameGeometry = {w: 20, h: 20, content: {x: 4, y: 10, w: 12, h: 8}};
 export const [fireElement] = createAnimation('gfx/hud/elementhud.png', flameGeometry, {x: 1}).frames;

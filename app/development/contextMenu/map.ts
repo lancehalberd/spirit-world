@@ -3,7 +3,6 @@ import { zones } from 'app/content/zones/zoneHash';
 import { updateMapSections } from 'app/development/sections';
 import { overworldKeys } from 'app/gameConstants';
 
-import { GameState, MenuOption } from 'app/types';
 
 export function getMapOptions(state: GameState, selectedSections: number[]): MenuOption[] {
     const areAllSectionsHidden = selectedSections.every(index => allSections[index].section.hideMap);

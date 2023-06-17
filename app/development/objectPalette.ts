@@ -3,7 +3,6 @@ import { drawFrame } from 'app/utils/animations';
 import { createCanvasAndContext } from 'app/utils/canvas';
 import { getMousePosition } from 'app/utils/mouse';
 
-import { Rect } from 'app/types';
 
 const [tempCanvas, tempContext] = createCanvasAndContext(32, 32);
 

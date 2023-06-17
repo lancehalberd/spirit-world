@@ -31,7 +31,6 @@ import {
     getVectorToNearbyTarget,
 } from 'app/utils/target';
 
-import { EnemyAbility, GameState, HitProperties, HitResult } from 'app/types';
 
 
 const stoneGeometry = {w: 20, h: 20, content: {x: 4, y: 10, w: 12, h: 8}};

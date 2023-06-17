@@ -5,10 +5,6 @@ import { createAnimation, drawFrameCenteredAt, drawFrameAt, getFrame } from 'app
 import { directionMap, getDirection, rotateDirection } from 'app/utils/direction';
 import { hitTargets } from 'app/utils/field';
 
-import {
-    AreaInstance, GameState, Frame, SpikeBallDefinition,
-    ObjectInstance, ObjectStatus, Rect,
-} from 'app/types';
 
 // The key block sticks up until it reaches frame 9.
 const spikeBallAnimation = createAnimation('gfx/objects/iceSpikeBall.png', {w: 16, h: 16});

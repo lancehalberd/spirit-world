@@ -5,10 +5,6 @@ import { hitTargets } from 'app/utils/field';
 import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
 import { getVectorToTarget } from 'app/utils/target';
 
-import {
-    AreaInstance, AnodeDefinition, GameState, ObjectInstance,
-    ObjectStatus, SimpleObjectDefinition, Rect,
-} from 'app/types';
 
 export class Anode implements ObjectInstance {
     area: AreaInstance;

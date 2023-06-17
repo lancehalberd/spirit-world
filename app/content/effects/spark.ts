@@ -3,10 +3,6 @@ import { renderLightningCircle, renderLightningRay } from 'app/render/renderLigh
 import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import { hitTargets } from 'app/utils/field';
 
-import {
-    AreaInstance, Circle, DrawPriority, EffectInstance,
-    Frame, GameState, HitProperties, Point, Ray,
-} from 'app/types';
 
 interface Props {
     x: number

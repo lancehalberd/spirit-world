@@ -1,5 +1,3 @@
-import { cloneDeep } from 'lodash';
-
 import { applySavedState, cleanState, getState } from 'app/state';
 import { setSpawnLocation } from 'app/content/spawnLocations';
 import {
@@ -12,8 +10,8 @@ import {
     SpawnLocationOptions,
 } from 'app/content/spawnStates';
 import { returnToSpawnLocation } from 'app/utils/returnToSpawnLocation';
+import { cloneDeep } from 'app/utils/index';
 
-import { MenuOption } from 'app/types';
 
 function getSpawnLocationOptions(spawnLocations: SpawnLocationOptions, useSavedState = false) {
     return Object.keys(spawnLocations).map(name => {

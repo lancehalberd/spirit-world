@@ -2,7 +2,6 @@ import { FRAME_LENGTH } from 'app/gameConstants';
 import { renderLightningCircle, renderLightningRay } from 'app/render/renderLightning'
 import { removeEffectFromArea } from 'app/utils/effects';
 
-import { AreaInstance, Circle, EffectInstance, GameState, Ray } from 'app/types';
 
 interface Props {
     ray?: Ray

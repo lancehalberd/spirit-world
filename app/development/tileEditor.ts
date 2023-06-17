@@ -30,11 +30,6 @@ import { enterLocation } from 'app/utils/enterLocation';
 import { getMousePosition, isMouseDown, /*isMouseOverElement*/ } from 'app/utils/mouse';
 import { resetTileBehavior } from 'app/utils/tileBehavior';
 
-import {
-    AreaInstance, AreaLayer, AreaLayerDefinition, EditingState,
-    FullTile, GameState, ObjectDefinition,
-    Rect, TileGridDefinition, TilePalette,
-} from 'app/types';
 
 function refreshArea(state: GameState, doNotRefreshEditor = false) {
     enterLocation(state, state.location, true, undefined, true, false, doNotRefreshEditor);

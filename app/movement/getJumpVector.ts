@@ -1,4 +1,3 @@
-import { AreaInstance, GameState, Rect } from 'app/types';
 
 const anchors = [
     {dx: 0, dy: 0, vx: -1, vy: -1},

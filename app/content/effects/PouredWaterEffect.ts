@@ -3,7 +3,6 @@ import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { removeEffectFromArea } from 'app/utils/effects';
 import { getTileBehaviorsAndObstacles } from 'app/utils/field';
 
-import { AreaInstance, EffectInstance, GameState, VineSprout } from 'app/types';
 
 const waterDropFallAnimation = createAnimation('gfx/tiles/pod.png', {w: 16, h: 16}, {y: 3, cols: 4, duration: 8});
 const waterDropHitAnimation = createAnimation('gfx/tiles/pod.png', {w: 16, h: 16}, {y: 4, cols: 3, duration: 8});

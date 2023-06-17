@@ -10,7 +10,6 @@ import {
     orLogic,
 } from 'app/content/logic';
 
-import {LogicNode } from 'app/types';
 
 // Magic is drained inside the waterfall tower unless you have the water blessing,
 // So the chakram is the only useable weapon without the water blessing.

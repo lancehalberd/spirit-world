@@ -2,7 +2,6 @@ import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehavi
 import { randomizerSeed } from 'app/gameConstants';
 import SRandom from 'app/utils/SRandom';
 
-import { GameState, ObjectInstance } from 'app/types';
 
 const gauntletRandom = SRandom.seed(randomizerSeed).addSeed(726235);
 

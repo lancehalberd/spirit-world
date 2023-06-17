@@ -1,6 +1,5 @@
 import { removeObjectFromArea } from 'app/utils/objects';
 
-import { GameState, Hero } from 'app/types';
 
 export function destroyClone(state: GameState, clone: Hero): void {
     // Cannot destroy a clone if none remain.

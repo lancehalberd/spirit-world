@@ -11,7 +11,6 @@ import {
 import { addEffectToArea } from 'app/utils/effects';
 import { getDirection } from 'app/utils/field';
 
-import { Enemy, GameState, HitProperties, HitResult } from 'app/types';
 
 
 const maxJumpSpeed = 5;

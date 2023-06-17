@@ -9,7 +9,6 @@ import { createAnimation } from 'app/utils/animations';
 
 import { rareLifeLootTable, simpleLootTable, lifeLootTable, moneyLootTable } from 'app/content/lootTables';
 
-import { Frame, TileBehaviors } from 'app/types';
 
 
 export const bushParticles: Frame[] = createAnimation('gfx/tiles/bush.png', {w: 16, h: 16}, {x: 2, cols: 3}).frames;

@@ -5,8 +5,6 @@ import { getTitleOptions } from 'app/state';
 import { drawText } from 'app/utils/simpleWhiteFont';
 import { fillRect, pad } from 'app/utils/index';
 
-import { GameState } from 'app/types';
-
 const WIDTH = 144;
 const ROW_HEIGHT = 20;
 

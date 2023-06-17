@@ -1,6 +1,5 @@
 import { objectHash } from 'app/content/objects/objectHash';
 
-import { GameState, ObjectDefinition, ObjectInstance } from 'app/types';
 
 export function createObjectInstance(state: GameState, object: ObjectDefinition): ObjectInstance {
     if (!objectHash[object.type]) {

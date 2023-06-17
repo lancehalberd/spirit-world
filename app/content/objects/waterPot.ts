@@ -4,10 +4,6 @@ import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { addEffectToArea } from 'app/utils/effects';
 
-import {
-    AreaInstance, Direction, DrawPriority, GameState, HitProperties, HitResult,
-    ObjectInstance, ObjectStatus, Rect, SimpleObjectDefinition,
-} from 'app/types';
 
 const fullPodAnimation = createAnimation('gfx/tiles/pod.png', {w: 16, h: 16}, {cols: 2, y: 0, duration: 24});
 const tippingPodAnimation = createAnimation('gfx/tiles/pod.png', {w: 16, h: 16}, {cols: 4, y: 1, duration: 4});

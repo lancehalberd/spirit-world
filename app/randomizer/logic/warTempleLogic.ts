@@ -5,7 +5,6 @@ import {
     logicHash
 } from 'app/content/logic';
 
-import {LogicNode } from 'app/types';
 
 
 const zoneId = 'warTemple';

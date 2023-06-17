@@ -12,7 +12,6 @@ import {
 import { pad } from 'app/utils/index';
 import {  getVectorToNearbyTarget } from 'app/utils/target';
 
-import { EnemyAbility, Enemy, GameState } from 'app/types';
 
 type SpikeWaveTargetType = ReturnType<typeof getVectorToNearbyTarget>;
 

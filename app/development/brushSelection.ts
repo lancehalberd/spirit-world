@@ -1,4 +1,3 @@
-import { GameState } from 'app/types';
 
 export function getSelectionBounds(state: GameState, x1: number, y1: number, x2: number, y2: number): {L: number, R: number, T: number, B: number} {
     const layerDefinition = state.areaInstance.definition.layers[0];

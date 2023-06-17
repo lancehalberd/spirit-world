@@ -1,4 +1,3 @@
-import { GameState, Hero, ObjectInstance } from 'app/types';
 
 export function isUnderwater(state: GameState, actor: ObjectInstance): boolean {
     return state.zone.surfaceKey && !actor.area.definition.isSpiritWorld;

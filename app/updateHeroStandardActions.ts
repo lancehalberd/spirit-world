@@ -1,5 +1,3 @@
-import { find } from 'lodash';
-
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { HeldChakram } from 'app/content/effects/thrownChakram';
 import { setEquippedBoots } from 'app/content/menu';
@@ -30,11 +28,6 @@ import {
 } from 'app/utils/field';
 import { getChargeLevelAndElement } from 'app/utils/getChargeLevelAndElement';
 import { addObjectToArea, getObjectBehaviors } from 'app/utils/objects';
-
-import {
-    FullTile, GameState, Hero,
-    ObjectInstance, TileCoords,
-} from 'app/types';
 
 export function updateHeroStandardActions(this: void, state: GameState, hero: Hero) {
     hero.thrownChakrams = hero.thrownChakrams.filter(
@@ -643,7 +636,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
                     playAreaSound(state, hero.area, 'pickUpObject');
                     destroyTile(state, hero.area, {...closestLiftableTileCoords, layerKey: layer.key}, true);
                     if (behavior.linkableTiles) {
-                        const alternateLayer = find(state.alternateAreaInstance.layers, {key: layer.key});
+                        const alternateLayer = state.alternateAreaInstance.layers.find(l => l.key === layer.key);
                         if(alternateLayer) {
                             const linkedTile: FullTile = alternateLayer.tiles[closestLiftableTileCoords.y][closestLiftableTileCoords.x];
                             if (linkedTile && behavior.linkableTiles.includes(linkedTile.index)) {

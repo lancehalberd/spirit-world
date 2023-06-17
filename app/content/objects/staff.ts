@@ -6,10 +6,6 @@ import { debugCanvas } from 'app/utils/canvas';
 import { directionMap } from 'app/utils/direction';
 import { pad } from 'app/utils/index';
 
-import {
-    AreaInstance, Direction, DrawPriority, Hero, MagicElement, MovementProperties,
-    GameState, ObjectInstance, ObjectStatus, TileBehaviors,
-} from 'app/types';
 
 const staffPartGeometry = {w: 20, h: 17};
 const leftAnimation = createAnimation('gfx/effects/wukong_staff_parts.png', staffPartGeometry, {x: 0, y: 3, rows: 3, frameMap: [2, 1,0], duration: 3}, {loop: false});

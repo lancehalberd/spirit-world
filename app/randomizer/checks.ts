@@ -1,5 +1,4 @@
 
-import { GameState, LogicalZoneKey } from 'app/types';
 
 const allChecks = new Set<string>();
 const checksByZone: {[key: string]: Set<string>} = {};

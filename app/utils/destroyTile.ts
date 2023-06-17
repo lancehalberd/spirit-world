@@ -1,15 +1,12 @@
-import { find } from 'lodash';
-
 import { addParticleAnimations } from 'app/content/effects/animationEffect';
 import { dropItemFromTable } from 'app/content/objects/lootObject';
 import { allTiles } from 'app/content/tiles';
 import { playAreaSound } from 'app/musicController';
 import { resetTileBehavior } from 'app/utils/tileBehavior';
 
-import { AreaInstance,  GameState, TileCoords } from 'app/types';
 
 export function destroyTile(state: GameState, area: AreaInstance, target: TileCoords, noParticles: boolean = false): void {
-    const layer = find(area.layers, { key: target.layerKey });
+    const layer = area.layers.find(l => l.key === target.layerKey);
     if (!layer) {
         console.error(`Missing target layer: ${target.layerKey}`);
         return;

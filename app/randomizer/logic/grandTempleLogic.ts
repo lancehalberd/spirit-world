@@ -2,7 +2,6 @@ import {
     canUseTeleporters,
 } from 'app/content/logic';
 
-import { LogicNode } from 'app/types';
 
 const zoneId = 'grandTemple';
 export const grandTempleNodes: LogicNode[] = [

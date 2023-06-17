@@ -13,7 +13,6 @@ import { findObjectInstanceById } from 'app/utils/findObjectInstanceById';
 import { fixCamera } from 'app/utils/fixCamera';
 import { isPointInShortRect } from 'app/utils/index';
 
-import { AreaInstance, EntranceDefinition, GameState, ObjectDefinition, ObjectInstance, ZoneLocation } from 'app/types';
 
 export function enterZoneByTarget(
     state: GameState,

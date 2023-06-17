@@ -7,10 +7,6 @@ import { removeObjectFromArea } from 'app/utils/objects';
 import { saveGame } from 'app/utils/saveGame';
 import { resetTileBehavior } from 'app/utils/tileBehavior';
 
-import {
-    AreaInstance, AreaLayer, DrawPriority, FrameAnimation, GameState,
-    ObjectInstance, ObjectStatus, Rect, SimpleObjectDefinition,
-} from 'app/types';
 
 
 const growFrameDuration = 4;
@@ -198,3 +194,9 @@ export class VineSprout implements ObjectInstance {
     }
 }
 objectHash.vineSprout = VineSprout;
+
+class _VineSprout extends VineSprout {}
+declare global {
+    export interface VineSprout extends _VineSprout {}
+}
+

@@ -5,7 +5,6 @@ import {
     orLogic,
 } from 'app/content/logic';
 
-import { LogicNode } from 'app/types';
 
 export const treeVillageNodes: LogicNode[] = [
     {

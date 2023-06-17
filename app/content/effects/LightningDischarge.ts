@@ -3,7 +3,6 @@ import { FRAME_LENGTH } from 'app/gameConstants';
 import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import { hitTargets } from 'app/utils/field';
 
-import { AreaInstance, EffectInstance, Enemy, GameState, } from 'app/types';
 
 interface Props {
     x: number

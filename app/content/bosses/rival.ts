@@ -19,9 +19,6 @@ import {
 } from 'app/utils/target';
 
 
-import {
-    Direction, Enemy, EnemyAbility, GameState, HitProperties, HitResult, Point, Rect
-} from 'app/types';
 
 const rivalAnimations = {
     ...vanaraBlackAnimations,

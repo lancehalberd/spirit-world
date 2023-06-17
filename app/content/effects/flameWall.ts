@@ -7,10 +7,6 @@ import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import { hitTargets } from 'app/utils/field';
 import { getAreaSize } from 'app/utils/getAreaSize';
 
-import {
-    AreaInstance, Direction, EffectInstance,
-    Frame, GameState, ObjectStatus,
-} from 'app/types';
 
 interface Props {
     direction: Direction

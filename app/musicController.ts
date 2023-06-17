@@ -1,8 +1,6 @@
 import { getFullZoneLocation } from 'app/utils/getFullZoneLocation';
 import { getSoundSettings, isTrackPlaying, playSound as playSoundProper, playTrack } from 'app/utils/sounds';
 
-import { AreaInstance, Enemy, GameState } from 'app/types';
-
 export { stopSound, updateSoundSettings } from 'app/utils/sounds';
 export const updateMusic = (state: GameState): void => {
     if (!state?.gameHasBeenInitialized) {
