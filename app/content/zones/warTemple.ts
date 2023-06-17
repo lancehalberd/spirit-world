@@ -1,6 +1,5 @@
 import { zones } from 'app/content/zones/zoneHash';
 
-
 const f0_0x0: AreaDefinition = {
     layers: [
         {
@@ -805,10 +804,10 @@ const f0_1x1: AreaDefinition = {
     objects: [
         {status: "normal", id: "warTempleMainEntrance", x: 224, y: 496, type: "door", style: "stone", targetZone: "overworld", targetObjectId: "warTempleEntrance", d: "down", linked: true, locationCue: "War Temple 1F"},
         {status: "normal", id: "warTemple:0:1x1-door-0", x: 496, y: 352, type: "door", style: "stone", d: "right"},
-        {status: "normal", id: "warTemple:0:1x1-sign-0", x: 288, y: 336, style: "short", type: "sign", message: "Conquer or be conquered"},
-        {status: "normal", id: "warTemple:0:1x1-sign-1", x: 120, y: 416, style: "short", type: "sign", message: "The Purifying Flame"},
-        {status: "normal", id: "warTemple:0:1x1-sign-2", x: 376, y: 416, style: "short", type: "sign", message: "The Inescapable Frost"},
-        {status: "normal", id: "warTemple:0:1x1-sign-3", x: 248, y: 176, style: "short", type: "sign", message: "The Storm of Devastation"},
+        {status: "normal", id: "warTemple:0:1x1-sign-0", x: 296, y: 320, style: "brokenPlaque", type: "sign", message: "Conquer or be conquered"},
+        {status: "normal", id: "warTemple:0:1x1-sign-1", x: 120, y: 416, style: "brokenPlaque", type: "sign", message: "The Purifying Flame"},
+        {status: "normal", id: "warTemple:0:1x1-sign-2", x: 376, y: 416, style: "brokenPlaque", type: "sign", message: "The Inescapable Frost"},
+        {status: "normal", id: "warTemple:0:1x1-sign-3", x: 248, y: 176, style: "brokenPlaque", type: "sign", message: "The Storm of Devastation"},
         {status: "locked", id: "warTempleLock1", x: 240, y: 48, type: "door", style: "stoneUpstairs", targetZone: "warTemple", targetObjectId: "warTempleLock1", d: "up", locationCue: "War Temple 1F"},
         {status: "normal", id: "warTemple:0:1x1-door-2", x: 496, y: 96, type: "door", style: "stone", d: "right"},
         {status: "normal", id: "warTemple:0:1x1-door-3", x: 0, y: 96, type: "door", style: "stone", d: "left"},

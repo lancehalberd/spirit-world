@@ -49,12 +49,6 @@ Pending Graphics From Jon:
 
 
 Current tasks:
-    - Make game build faster
-        - Moving zones out reduces from ~18s -> 8.7s
-        - Removing howler+lodash -> ~6-8s
-        - Move level files to json files that are loaded like assets and not compiled with the game.
-        - Presence of howler js doesn't seem to make a big difference.
-
     - Add indicators for NPCs next dialogue option
         - New vs Read dialogue (could just be 100 vs 50% opacity)
         - Quest info Golden or Red !
@@ -63,8 +57,6 @@ Current tasks:
         - generic text ... or empty bubble
 
     - Add door light effect to entrances.
-
-    - Add plaque sign styles and apply to war temple.
 
     - Investigate updating various tile sets to new version:
         - identify changed tiles and plan how to fix issues caused by the update:

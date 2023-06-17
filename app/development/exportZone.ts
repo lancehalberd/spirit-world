@@ -41,8 +41,6 @@ export function serializeZone(zone: Zone) {
     const lines = [];
     lines.push("import { zones } from 'app/content/zones/zoneHash';");
     lines.push("");
-    lines.push("import { AreaDefinition } from 'app/types';");
-    lines.push("");
     for (let floorIndex = 0; floorIndex < zone.floors.length; floorIndex++) {
         const floor = zone.floors[floorIndex];
         for (const areaGrid of [floor.grid, floor.spiritGrid]) {

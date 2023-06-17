@@ -8,6 +8,9 @@ const [shortSign] = createAnimation('gfx/tiles/signshort.png', signGeometry).fra
 const [shortSignSpirit] = createAnimation('gfx/tiles/shortsignspirit.png', signGeometry).frames;
 const [tallSign] = createAnimation('gfx/tiles/signtall.png', signGeometry).frames;
 const [tallSignSpirit] = createAnimation('gfx/tiles/signtallspirit.png', signGeometry).frames;
+const plaqueGeometry = {w: 16, h: 16, content: {x: 0, y: -2, w: 16, h: 16}};
+const [nicePlaque] = createAnimation('gfx/objects/plaque.png', plaqueGeometry).frames;
+const [brokenPlaque] = createAnimation('gfx/objects/plaque_broken.png', plaqueGeometry).frames;
 
 export const signStyles = {
     displayScreen: {
@@ -52,6 +55,20 @@ export const signStyles = {
         h: 16,
         normal: tallSign,
         spirit: tallSignSpirit,
+        isSpiritReadable: true,
+    },
+    nicePlaque: {
+        w: 16,
+        h: 16,
+        normal: nicePlaque,
+        spirit: nicePlaque,
+        isSpiritReadable: true,
+    },
+    brokenPlaque: {
+        w: 16,
+        h: 16,
+        normal: brokenPlaque,
+        spirit: brokenPlaque,
         isSpiritReadable: true,
     },
 };
@@ -104,7 +121,7 @@ export class Sign implements ObjectInstance {
             return;
         }
         const frame = this.definition.spirit ? style.spirit : style.normal;
-        drawFrame(context, frame, { ...frame, x: this.x - frame.content.x, y: this.y - frame.content.y });
+        drawFrame(context, frame, { ...frame, x: this.x - (frame.content?.x ?? 0), y: this.y - (frame.content?.y ?? 0) });
     }
 }
 objectHash.sign = Sign;
