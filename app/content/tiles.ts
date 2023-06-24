@@ -29,7 +29,10 @@ import {
     topRightWall,
 } from 'app/content/tiles/constants';
 import { allCrystalCaveTileSources } from 'app/content/tiles/crystalCaveTiles';
+import { allDesertTileSources } from 'app/content/tiles/desertTiles';
 import { allStoneTileSources } from 'app/content/tiles/stoneTiles';
+import { allStoneCeilingTileSources } from 'app/content/tiles/stoneCeilingTiles';
+import { allStoneExteriorTileSources } from 'app/content/tiles/stoneExteriorTiles';
 import { allWoodTileSources, extraWoodWalls } from 'app/content/tiles/woodTiles';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { createCanvasAndContext, debugCanvas } from 'app/utils/canvas';
@@ -952,12 +955,12 @@ const caveFloorEdgesRed: TileSource = {
 };
 
 const newTiles: Frame = {
-    image: requireImage('gfx/tiles/crystalbeadpiles.png'),
+    image: requireImage('gfx/tiles/stonebuilding.png'),
     x: 0, y: 0,
     //w: 48, h: 48,
-    w: 256, h: 48,
+    w: 448, h: 144,
 };
-//(async () => console.log((await findUniqueTiles(newTiles)).map(o => `[${o.x},${o.y}]`).join(',')));//();
+(async () => console.log((await findUniqueTiles(newTiles)).map(o => `[${o.x},${o.y}]`).join(',')));//();
 (() => logUniqueTiles(newTiles));//();
 
 
@@ -1192,6 +1195,9 @@ addTiles([
     crystalBeadFloor,
     lavaStone,
     ...allStoneTileSources,
+    ...allStoneExteriorTileSources,
+    ...allStoneCeilingTileSources,
+    ...allDesertTileSources,
 ]);
 
 // This invalid is in the middle of a bunch of other tiles so it is easiest to just delete after adding it.

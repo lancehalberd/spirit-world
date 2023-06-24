@@ -40,6 +40,10 @@ const [
     fireBeastStatueImage
 ] = createAnimation('gfx/objects/spiritQuestStatue-draftSprites-58x60.png', {w: 58, h: 60}, {cols: 3}).frames;
 
+const [
+    entranceLightFrame
+] = createAnimation('gfx/objects/cavelight.png', {w: 64, h: 32}).frames;
+
 export const decorationTypes = {
     lightningBeastStatue: {
         render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
@@ -54,6 +58,11 @@ export const decorationTypes = {
     iceBeastStatue: {
         render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
             drawFrame(context, iceBeastStatueImage, {...iceBeastStatueImage, x: decoration.x, y: decoration.y});
+        }
+    },
+    entranceLight: {
+        render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+            drawFrame(context, entranceLightFrame, {...entranceLightFrame, x: decoration.x, y: decoration.y});
         }
     },
 }
