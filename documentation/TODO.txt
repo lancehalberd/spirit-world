@@ -57,6 +57,7 @@ Current tasks:
         - generic text ... or empty bubble
 
     - Add door light effect to entrances.
+        - Check if zone target is outside, then render door light on background of southern doors automagically.
 
     - Investigate updating various tile sets to new version:
         - identify changed tiles and plan how to fix issues caused by the update:

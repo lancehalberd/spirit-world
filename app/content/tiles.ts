@@ -945,20 +945,18 @@ const caveFloorEdgesRed: TileSource = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/cavearranged.png'), x: 0, y: 0, w: 48, h: 64},
     behaviors: {
+        // Index 785 should map to 1116
         'all': { defaultLayer: 'floor2', linkedOffset: 331 },
     },
     tileCoordinates: [
-        // Index 785 should map to 1116
         [ 8, 6],[ 9, 6],[10, 6],[11, 6],
         [ 8, 7],[ 9, 7],[10, 7],[11, 7],
     ],
 };
 
 const newTiles: Frame = {
-    image: requireImage('gfx/tiles/stonebuilding.png'),
-    x: 0, y: 0,
-    //w: 48, h: 48,
-    w: 448, h: 144,
+    image: requireImage('gfx/tiles/stonebuildingtileset.png'),
+    x: 96, y: 0, w: 80, h: 96
 };
 (async () => console.log((await findUniqueTiles(newTiles)).map(o => `[${o.x},${o.y}]`).join(',')));//();
 (() => logUniqueTiles(newTiles));//();
