@@ -58,6 +58,9 @@ function getElevatorFloor(state: GameState): number {
 specialBehaviorsHash.elevatorControls = {
     type: 'sign',
     apply(state: GameState, sign: Sign) {
+        this.onRefreshLogic(state, sign);
+    },
+    onRefreshLogic(state: GameState, sign: Sign) {
         const elevatorFalling = !!state.savedState.objectFlags.elevatorFalling;
         // Elevator controls don't work while the elevator is falling.
         if (elevatorFalling) {
@@ -102,6 +105,9 @@ const elevatorSectionIndex = 458;
 specialBehaviorsHash.elevatorDoor = {
     type: 'door',
     apply(state: GameState, door: Door) {
+        this.onRefreshLogic(state, door);
+    },
+    onRefreshLogic(state: GameState, door: Door) {
         const elevatorFixed = !!state.savedState.objectFlags.elevatorFixed;
         const elevatorDropped = !!state.savedState.objectFlags.elevatorDropped;
         const elevatorClosed = !!state.savedState.objectFlags.elevatorClosed;

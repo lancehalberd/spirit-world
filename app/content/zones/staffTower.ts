@@ -1,6 +1,5 @@
 import { zones } from 'app/content/zones/zoneHash';
 
-
 const f0_0x0: AreaDefinition = {
     layers: [
         {
@@ -673,7 +672,7 @@ const sf0_0x0: AreaDefinition = {
         {status: "closedSwitch", id: "staffTowerSpiritEntrance", x: 224, y: 496, type: "door", style: "wooden", targetZone: "overworld", targetObjectId: "staffTowerSpiritEntrance", d: "down", locationCue: "Tower 1F", saveStatus: "forever"},
         {status: "normal", id: "", x: 208, y: 480, targetObjectId: "staffTowerSpiritEntrance", type: "floorSwitch"},
         {status: "normal", id: "", x: 336, y: 80, style: "displayScreen", type: "sign", message: "", specialBehaviorKey: "towerTeleporter"},
-        {status: "closedSwitch", id: "staffTowerSpiritBasementLadder", x: 224, y: 80, type: "door", style: "ladderDown", targetZone: "staffTower", targetObjectId: "staffTowerSpiritBasementLadder", d: "down", customLogic: "elevatorDropped", linked: true, spirit: true, saveStatus: "forever"},
+        {status: "closedSwitch", id: "staffTowerSpiritBasementLadder", x: 224, y: 80, type: "door", style: "ladderDown", targetZone: "staffTower", targetObjectId: "staffTowerSpiritBasementLadder", d: "down", customLogic: "elevatorDropped", linked: true, spirit: true, saveStatus: "forever", openLogic: {"hasCustomLogic":true,"customLogic":"elevatorDropped","isInverted":false}},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 445, mapId: 'staffTower', floorId: '1F', mapX: 3, mapY: 2},
@@ -3742,7 +3741,7 @@ const sf3_0x1: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "closed", id: "elevatorDoor", x: 224, y: 448, type: "door", style: "wooden", targetZone: "staffTower", targetObjectId: "elevatorDoor5", d: "down", specialBehaviorKey: "elevatorDoor"},
+        {status: "closed", id: "elevatorDoor", x: 224, y: 448, type: "door", style: "wooden", targetZone: "staffTower", targetObjectId: "elevatorDoor2", d: "down", specialBehaviorKey: "elevatorDoor"},
         {status: "normal", id: "", specialBehaviorKey: "elevatorControls", x: 240, y: 352, style: "displayScreen", type: "sign", message: "\n            !WARNING![-]POWER FAILURE DETECTED\n            {|}EMERGENCY BREAK ACTIVATED\n            {choice:RELEASE BREAK?|Yes:elevator.releaseBreak|No}\n        "},
     ],
     sections: [

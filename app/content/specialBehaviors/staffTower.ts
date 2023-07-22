@@ -6,6 +6,9 @@ import { Sign } from 'app/content/objects/sign';
 specialBehaviorsHash.staffTower = {
     type: 'area',
     apply(state: GameState, area: AreaInstance) {
+        this.onRefreshLogic(state, area);
+    },
+    onRefreshLogic(state: GameState, area: AreaInstance) {
         const towerIsOn = !!state.savedState.objectFlags.elementalBeastsEscaped;
         const towerIsHaywire = towerIsOn && !state.savedState.objectFlags.stormBeast;
         if (!towerIsOn) {
@@ -51,6 +54,9 @@ specialBehaviorsHash.staffTower = {
 specialBehaviorsHash.towerTeleporter = {
     type: 'sign',
     apply(state: GameState, object: Sign) {
+        this.onRefreshLogic(state, object);
+    },
+    onRefreshLogic(state: GameState, object: Sign) {
         object.message = object.area.definition.isSpiritWorld
             ? 'THIS TERMINAL CONTROLS TRANSFER TO THE CORE?{choice:TRANSFER?|Yes:towerTeleporter.teleport|No}'
             : 'THIS TERMINAL CONTROLS TRANSFER TO THE PERIPHERY.{choice:TRANSFER?|Yes:towerTeleporter.teleport|No}'
@@ -70,6 +76,9 @@ dialogueHash.towerTeleporter = {
 specialBehaviorsHash.towerLargeTerminal = {
     type: 'sign',
     apply(state: GameState, object: Sign) {
+        this.onRefreshLogic(state, object);
+    },
+    onRefreshLogic(state: GameState, object: Sign) {
         const towerIsHaywire = !state.savedState.objectFlags.stormBeast;
         if (towerIsHaywire) {
             object.message = `
@@ -134,6 +143,9 @@ dialogueHash.towerLargeTerminal = {
 specialBehaviorsHash.towerExteriorTerminal = {
     type: 'sign',
     apply(state: GameState, object: Sign) {
+        this.onRefreshLogic(state, object);
+    },
+    onRefreshLogic(state: GameState, object: Sign) {
         const towerIsOn = !!state.savedState.objectFlags.elementalBeastsEscaped;
         if (!towerIsOn) {
             object.status = 'off';

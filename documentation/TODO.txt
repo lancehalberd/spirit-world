@@ -1,6 +1,9 @@
 Test at http://localhost:81/alttp/public/
 
 Known Bugs:
+    - Enemies can get trapped inside the Staff Tower graphics if they are in the are it occupies when it is created.
+        - Should probably kill enemies in this area when setting up the tower.
+
     - Door closing sound plays while in the title screen
         - Maybe just disable playAreaSound in the title scene or only play this sound if the player passes through the door and it closes behind them.
     - Teleporting while grabbing a pot with astral projection can make you face south but still be grabbing the pot
@@ -24,11 +27,6 @@ Known Bugs:
             - Marking these tiles as low would allow shooting up them as they don't have actual cliff ledges
             - Marking these tiles as cliff ledges will probably allow jumping down them in some cases which will need to be fixed.
     - Shadow renders behind door tops when jumping down ledges.
-
-Possible issues in the future:
-    - Refresh area logic application of special behavior doesn't quite work as intended
-        - Objects that change position based on location will get reset on area logic refresh, which might be strange if they had been moved beforehand.
-            - Currently this doesn't actually happen anywhere, but it could cause unexpected issues if we add a case that runs into this issue.
 
 Graphics:
     Add slam effects for the staff.

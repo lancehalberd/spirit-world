@@ -24,13 +24,13 @@ export class Indicator implements ObjectInstance {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
     update(state: GameState) {
-        if (this.status !== 'normal') {
+        if (!this.area || this.status !== 'normal') {
             return;
         }
         if (this.target) {
-            // If the target is removed then the indicator should disappear as well.
-            if (!this.target.area || this.target.status === 'hidden' || this.target.status === 'gone') {
-                this.status = 'hidden';
+            // If the target is removed, delete the target and try finding a matching target next frame.
+            if ((this.target.area !== this.area && this.target.area !== this.area.alternateArea) || this.target.status === 'hidden' || this.target.status === 'gone') {
+                delete this.target;
                 return;
             }
             const targetHitbox = this.target.getHitbox();
@@ -51,7 +51,7 @@ export class Indicator implements ObjectInstance {
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
         // Indicators will be wrong the first frame they appear for certain randomized target objects, so wait 1 frame before rendering them.
-        if (this.definition.targetObjectId && this.animationTime <= 20) {
+        if (this.definition.targetObjectId && (!this.target || this.animationTime <= 20)) {
             return;
         }
         if (this.status !== 'normal' || !(state.hero.passiveTools.trueSight || editingState.isEditing)) {

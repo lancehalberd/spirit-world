@@ -598,47 +598,48 @@ type ObjectDefinition = SimpleObjectDefinition
 
 type ObjectType = ObjectDefinition['type'];
 
+interface BaseSpecialBehavior<T> {
+    type: string
+    // Apply is called only after the object is first initialized and added to the area.
+    apply?: (state: GameState, object: T) => void
+    // On Refresh Logic is called any time the area logic refreshes after the object
+    // has already been initialized and added to the area.
+    onRefreshLogic?: (state: GameState, object: T) => void
+}
 
-interface SpecialDoorBehavior {
+
+interface SpecialDoorBehavior extends BaseSpecialBehavior<Door> {
     type: 'door'
-    apply: (state: GameState, object: Door) => void
 }
-interface SpecialEnemyBehavior {
+interface SpecialEnemyBehavior extends BaseSpecialBehavior<Enemy> {
     type: 'enemy'
-    apply: (state: GameState, object: Enemy) => void
 }
 
-interface SpecialSignBehavior {
+interface SpecialSignBehavior extends BaseSpecialBehavior<Sign> {
     type: 'sign'
-    apply: (state: GameState, object: Sign) => void
 }
 
-interface SpecialSwitchBehavior {
+interface SpecialSwitchBehavior extends BaseSpecialBehavior<Sign> {
     // This could be extended for floor switches and other switches.
     type: 'crystalSwitch' | 'floorSwitch' | 'ballGoal'
-    apply?: (state: GameState, object: ObjectInstance) => void
     onActivate?: (state: GameState, object: ObjectInstance) => void
 }
 
-interface SpecialPushPullBehavior {
+interface SpecialPushPullBehavior extends BaseSpecialBehavior<ObjectInstance> {
     type: 'pushPull',
-    apply?: (state: GameState, object: ObjectInstance) => void
 }
 
-interface SpecialTippableBehavior {
+interface SpecialTippableBehavior extends BaseSpecialBehavior<ObjectInstance> {
     type: 'tippable',
-    apply?: (state: GameState, object: ObjectInstance) => void
 }
 
-interface SpecialNarrationBehavior {
+interface SpecialNarrationBehavior extends BaseSpecialBehavior<ObjectInstance> {
     type: 'narration'
-    apply?: (state: GameState, object: ObjectInstance) => void
     update?: (state: GameState, object: ObjectInstance) => void
 }
 
-interface SpecialAreaBehavior {
+interface SpecialAreaBehavior extends BaseSpecialBehavior<AreaInstance> {
     type: 'area'
-    apply: (state: GameState, area: AreaInstance) => void
 }
 
 type SpecialBehavior

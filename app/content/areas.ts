@@ -538,7 +538,7 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
     for (const instance of [area, area.alternateArea]) {
         if (instance.definition.specialBehaviorKey) {
             const specialBehavior = specialBehaviorsHash[instance.definition.specialBehaviorKey] as SpecialAreaBehavior;
-            specialBehavior?.apply(state, instance);
+            specialBehavior?.onRefreshLogic(state, instance);
         }
     }
     for (let instance of [area, area.alternateArea]) {
@@ -617,21 +617,21 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
             instance.priorityObjects = []
             instance = nextAreaInstance;
         }
-        for (const object of instance.definition.objects) {
-            /*if (object.id.includes('void')
-                && !object.id.includes('-')
-                && !object.id.includes('Entrance')
-                && !object.id.includes('Exit')
-                && object.id !== 'voidTree' && !state.savedState.objectFlags[object.id]) {
-                debugger;
-            }*/
-            if (!object.logicKey && !object.hasCustomLogic) {
-                if (object.specialBehaviorKey) {
-                    const objectInstance = instance.objects.find(o => o.definition === object);
-                    if (objectInstance) {
-                        specialBehaviorsHash[objectInstance.definition.specialBehaviorKey].apply?.(state, objectInstance as any);
-                    }
+        // Call refresh logic on any objects currently in the area in case their state depends on the current logic.
+        // For example, the door and signs in the Staff Tower Elevator update their state as you interact with the elevator
+        // controls.
+        for (const object of area.objects) {
+            object.refreshLogic?.(state);
+            if (object.definition?.specialBehaviorKey) {
+                try {
+                    specialBehaviorsHash[object.definition.specialBehaviorKey].onRefreshLogic?.(state, object as any);
+                } catch (error) {
+                    console.error(object.definition.specialBehaviorKey);
                 }
+            }
+        }
+        for (const object of instance.definition.objects) {
+            if (!object.logicKey && !object.hasCustomLogic) {
                 continue;
             }
             let objectInstance = instance.objects.find(o => o.definition === object);
@@ -639,27 +639,14 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
                 // If the object is valid but was never added to the area, add it now.
                 if (!objectInstance && object.id && !instance.removedObjectIds.includes(object.id)) {
                     objectInstance = createObjectInstance(state, object);
+                    // Note that special behavior is applied to objects as part of adding them to the area.
                     addObjectToArea(state, instance, objectInstance);
-                } else if (objectInstance) {
-                    if (objectInstance.definition.specialBehaviorKey) {
-                        specialBehaviorsHash[objectInstance.definition.specialBehaviorKey].apply?.(state, objectInstance as any);
-                    }
                 }
             } else {
                 // If the object is invalid but present, remove it from the area, but don't track it as removed by gameplay
                 // so that logical changes can bring it back.
                 if (objectInstance) {
                     removeObjectFromArea(state, objectInstance, false);
-                }
-            }
-        }
-        for (const object of area.objects) {
-            object.refreshLogic?.(state);
-            if (object.definition?.specialBehaviorKey) {
-                try {
-                    specialBehaviorsHash[object.definition.specialBehaviorKey].apply?.(state, object as any);
-                } catch (error) {
-                    console.error(object.definition.specialBehaviorKey);
                 }
             }
         }
