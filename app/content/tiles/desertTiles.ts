@@ -28,8 +28,17 @@ const desertDecorationsTiles: TileSource = {
     },
 };
 
+const desertSandPilesTiles: TileSource = {
+    w: 16, h: 16,
+    source: {image: requireImage('gfx/tiles/deserttiles.png'), x: 48, y: 32, w: 64, h: 32},
+    behaviors: {
+        'all': { defaultLayer: 'field2' },
+    },
+};
+
 export const allDesertTileSources: TileSource[] = [
     convexDesertTiles,
     concaveDesertTiles,
     desertDecorationsTiles,
+    desertSandPilesTiles,
 ];

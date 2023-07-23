@@ -542,7 +542,10 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
         } else if (hit.element === 'ice' && typeof behavior?.elementTiles?.fire === 'undefined'
             // Cannot freeze generic ground tiles in hot areas.
             && !state.areaSection?.isHot
-            && !behavior?.solid && !behavior?.solidMap && !(behavior?.covered || behavior?.blocksStaff)
+            && !behavior?.solid && !behavior?.solidMap
+            // Cannot freeze ground when staff is on top of it.
+            && !behavior?.blocksStaff
+            //&& !(behavior?.covered || behavior?.blocksStaff)
             && !behavior?.pit && !behavior?.ledges && !behavior?.diagonalLedge
             // Only attackes that hit allies freeze most ground tiles. Attacks from the player should only freeze water tiles
             // and any ground tiles that are useful to freeze.

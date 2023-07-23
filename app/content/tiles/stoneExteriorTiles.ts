@@ -97,8 +97,8 @@ const stoneWallTiles: TileSource = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/stonebuildingtileset.png'), x: 0, y: 0, w: 256, h: 96},
     behaviors: {
-        'all': { defaultLayer: 'field', solid: true },
-        '5x5': { defaultLayer: 'field', solidMap: BITMAP_TOP_6},
+        'all': southernWallBehavior,
+        '5x5': { ...southernWallBehavior, solidMap: BITMAP_TOP_6},
     },
     tileCoordinates: [
         [ 0, 3],[ 1, 3],[ 2, 3],[ 3, 3],[ 4, 3],[ 5, 3],

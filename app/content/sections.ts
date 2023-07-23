@@ -55,7 +55,9 @@ export function populateAllSections() {
                             if (section.index >= 0) {
                                 // If this spot was assigned, move whatever is there to a new location.
                                 if (allSections[section.index]) {
-                                    allSections[getNextFreeId()] = allSections[section.index]
+                                    const newIndex = getNextFreeId();
+                                    allSections[newIndex] = allSections[section.index];
+                                    allSections[newIndex].section.index = newIndex;
                                 }
                                 allSections[section.index] = {
                                     section,
