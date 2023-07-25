@@ -47,9 +47,9 @@ Pending Graphics From Jon:
 
 
 Current tasks:
-    - Finish updating War Temple interior
-        - Big Chest Room
-        - Check Spirit War Temple interior looks okay.
+    - Add door light effect to entrances.
+        - Check if zone target is outside, then render door light on background of southern doors automagically.
+
     - Push to staging, test
     - Push to production
 
@@ -62,8 +62,6 @@ Current tasks:
         - hint ?
         - generic text ... or empty bubble
 
-    - Add door light effect to entrances.
-        - Check if zone target is outside, then render door light on background of southern doors automagically.
 
     - Expand overworld tiles to 48x48
 

@@ -303,7 +303,7 @@ function renderCavernDoor(this: void, context: CanvasRenderingContext2D, state: 
     if (door.definition.d === 'up') {
         let frame = cavernNorthDoorway, overFrame: Frame = null;
         if (door.renderOpen(state)) {
-            if (door.definition.status === 'cracked') {
+            if (door.definition.status === 'cracked' || door.definition.status === 'blownOpen') {
                 context.fillStyle = 'black';
                 context.fillRect(door.x, door.y, 32, 32);
                 frame = cavernNorthBlownup;
@@ -466,7 +466,7 @@ function renderCrystalDoor(this: void, context: CanvasRenderingContext2D, state:
     if (door.definition.d === 'up') {
         let frame = crystalNorthDoorway, overFrame: Frame = null;
         if (door.renderOpen(state)) {
-            if (door.definition.status === 'cracked') {
+            if (door.definition.status === 'cracked' || door.definition.status === 'blownOpen') {
                 context.fillStyle = 'black';
                 context.fillRect(door.x, door.y, 32, 32);
                 frame = crystalNorthBlownup;
@@ -629,7 +629,7 @@ function renderStoneDoor(this: void, context: CanvasRenderingContext2D, state: G
     if (door.definition.d === 'up') {
         let frame = stoneNorthDoorway, overFrame: Frame = null;
         if (door.renderOpen(state)) {
-            if (door.definition.status === 'cracked') {
+            if (door.definition.status === 'cracked' || door.definition.status === 'blownOpen') {
                 context.fillStyle = 'black';
                 context.fillRect(door.x, door.y, 32, 32);
                 frame = stoneNorthBlownup;
