@@ -1402,7 +1402,6 @@ const f0_1x1: AreaDefinition = {
         {status: "normal", id: "", x: 98, y: 354, type: "decoration", w: 16, h: 16, decorationType: "fireBeastStatue", drawPriority: "sprites"},
         {status: "normal", id: "", x: 226, y: 115, type: "decoration", w: 16, h: 16, decorationType: "lightningBeastStatue", drawPriority: "sprites"},
         {status: "normal", id: "", x: 355, y: 354, type: "decoration", w: 16, h: 16, decorationType: "iceBeastStatue", drawPriority: "sprites"},
-        {status: "normal", id: "", x: 224, y: 480, type: "decoration", w: 16, h: 16, decorationType: "entranceLight", drawPriority: "background", linked: true},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 218, mapId: 'warTemple', floorId: '1F', mapX: 2, mapY: 2},

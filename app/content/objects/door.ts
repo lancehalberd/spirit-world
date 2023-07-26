@@ -9,7 +9,7 @@ import {
 } from 'app/content/bitMasks';
 import { playAreaSound } from 'app/musicController';
 import { showMessage } from 'app/scriptEvents';
-import { drawFrame } from 'app/utils/animations';
+import { createAnimation, drawFrame } from 'app/utils/animations';
 import { enterZoneByTarget, findObjectLocation, isLocationHot } from 'app/utils/enterZoneByTarget';
 import { directionMap } from 'app/utils/field';
 import { boxesIntersect, isObjectInsideTarget, isPointInShortRect, pad } from 'app/utils/index';
@@ -25,6 +25,10 @@ const BITMAP_SIDE_DOOR_BOTTOM: Uint16Array = new Uint16Array([
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF, 0xFFFF,
 ]);
+
+const [
+    entranceLightFrame
+] = createAnimation('gfx/objects/cavelight.png', {w: 64, h: 32}).frames;
 
 export class DoorTop implements ObjectInstance {
     area: AreaInstance;
@@ -615,6 +619,14 @@ export class Door implements ObjectInstance {
         }
         if (doorStyle.render) {
             doorStyle.render(context, state, this);
+            if (this.definition.d === 'down'
+                && (this.definition.targetZone === 'overworld' || this.definition.targetZone === 'sky')
+                && this.isOpen()
+            ) {
+                // For some reasont his renders when the door is closed while editing, which isn't a problem,
+                // but I would like to understand at some point.
+                drawFrame(context, entranceLightFrame, {...entranceLightFrame, x: this.x, y: this.y - 16});
+            }
         } else if (doorStyle[this.definition.d]) {
             let frame: Frame;
             if (this.status !== 'cracked') {

@@ -47,9 +47,6 @@ Pending Graphics From Jon:
 
 
 Current tasks:
-    - Add door light effect to entrances.
-        - Check if zone target is outside, then render door light on background of southern doors automagically.
-
     - Push to staging, test
     - Push to production
 
