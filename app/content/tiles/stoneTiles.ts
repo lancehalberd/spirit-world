@@ -1,5 +1,4 @@
 import {
-    BITMAP_MIDDLE_DOWN_RIGHT, BITMAP_MIDDLE_UP_RIGHT,
     BITMAP_BOTTOM_6,
     BITMAP_BOTTOM_LEFT, BITMAP_BOTTOM_RIGHT,
     BITMAP_LEFT_6,
@@ -56,8 +55,7 @@ const stoneCeilingTopAngles: TileSource = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/stonetileset.png'), x: 0, y: 0, w: 48, h: 80},
     behaviors: {
-        '8x2': bottomLeftCeiling, '9x2': bottomLeftCeiling,
-        '10x2': bottomRightCeiling, '11x2': bottomRightCeiling,
+        'all': {defaultLayer: 'foreground2'},
     },
     tileCoordinates: [
         [ 9, 2],[10, 2],
@@ -124,32 +122,21 @@ const stoneLedges: TileSource = {
         '9x12': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_LEFT, low: true, diagonalLedge: 'downleft' },
         '10x12': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_RIGHT, low: true, diagonalLedge: 'downright' },
         '11x12': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_LEFT, low: true, diagonalLedge: 'downleft' },
-        '12x12': { defaultLayer: 'floor2'},
-        '13x12': { defaultLayer: 'floor2'},
 
         '8x13': { defaultLayer: 'floor2', diagonalLedge: 'upright' },
         '9x13': { defaultLayer: 'floor2', diagonalLedge: 'upleft' },
         '10x13': { defaultLayer: 'floor2', diagonalLedge: 'upright' },
         '11x13': { defaultLayer: 'floor2', diagonalLedge: 'upleft' },
-        '12x13': { defaultLayer: 'floor2'},
-        '13x13': { defaultLayer: 'floor2'},
-
-        '10x14': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_RIGHT },
-        '11x14': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_LEFT},
-
-        '10x15': { defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_DOWN_RIGHT },
-        '11x15': { defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_UP_RIGHT},
-
     },
     tileCoordinates: [
+        [ 8, 6],[ 9, 6],
+        [ 8, 7],[ 9, 7],
         [ 8, 8],[ 9, 8],
         [ 8, 9],[ 9, 9],[10, 9],[11, 9],[12, 9],[13, 9],
         [ 8,10],[ 9,10],
         [ 8,11],[ 9,11],[10,11],[11,11],[12,11],[13,11],
         [ 8,12],[ 9,12],[10,12],[11,12],[12,12],[13,12],
         [ 8,13],[ 9,13],[10,13],[11,13],[12,13],[13,13],
-                        [10,14],[11,14],
-                        [10,15],[11,15],
     ],
 };
 
