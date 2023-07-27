@@ -47,25 +47,19 @@ Pending Graphics From Jon:
 
 
 Current tasks:
-    - Spirit Barrier text does not disappear after opening the portal in cocoon.
-
-    Low priority
-    - Bow help text should not appear in the spirit world fertility temple.
-    - Forest temple boss should provide a golden peach in addition to the clone tool.
-    - Spirit king text should remove sections for completed dungeons.
-
-    - Push to staging, test
-    - Push to production
-
-    - Render faint Vanara spirits for Vanara in the other world.
-
     - Add indicators for NPCs next dialogue option
+        - Must assign every NPC text option a unique id and an optional type: quest, subquest, hint
+            - objects with dialogue should
+        - Spirit king text should remove sections for completed dungeons.
         - New vs Read dialogue (could just be 100 vs 50% opacity)
         - Quest info Golden or Red !
         - Side-quest info Green or Blue !
         - hint ?
         - generic text ... or empty bubble
 
+    - Forest temple boss should provide a golden peach in addition to the clone tool.
+
+    - Render faint Vanara spirits for Vanara in the other world.
 
     - Expand overworld tiles to 48x48
 

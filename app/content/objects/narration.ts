@@ -72,7 +72,7 @@ export class Narration implements ObjectInstance {
         }
         if (this.trigger === 'touch') {
             // This 'knocked' check is a hack to prevent triggering narration while falling.
-            if (state.hero.action !== 'knocked' && state.hero.action !== 'jumpingDown'
+            if (state.hero.area === this.area && state.hero.action !== 'knocked' && state.hero.action !== 'jumpingDown'
                 && state.hero.overlaps(this)
             ) {
                 this.runScript(state);

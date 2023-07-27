@@ -22,10 +22,14 @@ specialBehaviorsHash.barrierBurstInstructions = {
         } else if (state.hero.activeTools.cloak) {
             helpText = `Press [B_MENU] to open your inventory and assign Spirit Cloak to [B_TOOL]`;
         }
+        // Stop showing this help text once the player has successfully opened the cocoon back teleporter.
+        if (state.savedState.objectFlags.cocoonBackTeleporter) {
+            helpText = '';
+        }
         const textCue = findTextCue(state);
-        if (!textCue && object.area === state.areaInstance) {
+        if (!textCue && helpText && object.area === state.areaInstance) {
             addTextCue(state, helpText, 0);
-        } else if (textCue.props.text !== helpText || object.area !== state.areaInstance) {
+        } else if (textCue && (textCue.props.text !== helpText || object.area !== state.areaInstance)) {
             textCue.fadeOut();
         }
     }
