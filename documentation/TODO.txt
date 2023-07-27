@@ -47,7 +47,6 @@ Pending Graphics From Jon:
 
 
 Current tasks:
-    - Soft lock if you enter the helix portal on 1f diagonally (you walk left/right into pit over and over).
     - Fix Basement order is backwards (test in cocoon dungeon and forge)
     - Spirit Barrier text does not disappear after opening the portal in cocoon.
 

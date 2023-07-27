@@ -183,11 +183,11 @@ function enterZoneByTeleporterCallback(this: void, state: GameState, targetObjec
         console.error(state.areaInstance.objects);
         console.error(targetObjectId);
         debugger;
+    } else {
+        target.disabledUntilHeroLeaves = true;
     }
-    hero.actionTarget = target;
-    target.disabledTime = 500;
-    hero.actionDx = directionMap[hero.d][0];
-    hero.actionDy = directionMap[hero.d][1];
+    // Make sure the hero appears to be behind the teleporter glow.
+    hero.y--;
 }
 
 function findEntranceById(areaInstance: AreaInstance, id: string, skippedDefinitions: ObjectDefinition[]): ObjectInstance {

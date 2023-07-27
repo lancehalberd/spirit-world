@@ -12,7 +12,7 @@ import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { createCanvasAndContext, drawCanvas } from 'app/utils/canvas';
 import { enterLocation } from 'app/utils/enterLocation';
 import { enterZoneByTarget } from 'app/utils/enterZoneByTarget';
-import { directionMap, getTileBehaviors } from 'app/utils/field';
+import { getTileBehaviors } from 'app/utils/field';
 import { isObjectInsideTarget, pad } from 'app/utils/index';
 import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
 import { getVectorToTarget } from 'app/utils/target';
@@ -35,6 +35,7 @@ export class Teleporter implements ObjectInstance {
     linkedObject: Teleporter;
     wasUnderObject: boolean;
     actualRadius: number = 0;
+    disabledUntilHeroLeaves = false;
     constructor(state: GameState, definition: EntranceDefinition) {
         this.definition = definition;
         this.x = definition.x;
@@ -78,7 +79,18 @@ export class Teleporter implements ObjectInstance {
         const {tileBehavior} = getTileBehaviors(state, this.area, {x: this.x + 8, y: this.y + 8});
         return tileBehavior.solid;
     }
+
+    isHeroInPortal(state: GameState) {
+        return isObjectInsideTarget(state.hero, pad(this.getHitbox(), 9));
+    }
+
     update(state: GameState) {
+        if (this.disabledUntilHeroLeaves) {
+            if (!this.isHeroInPortal(state)) {
+                this.disabledUntilHeroLeaves = false;
+            }
+            return;
+        }
         if (this.status !== 'normal' && state.hero.actionTarget !== this) {
             if (state.savedState.objectFlags[this.definition.id]) {
                 this.changeStatus(state, 'normal');
@@ -107,12 +119,10 @@ export class Teleporter implements ObjectInstance {
             this.disabledTime -= FRAME_LENGTH;
             return;
         }
-        if (hero.actionTarget === this || this.area !== hero.area || !isObjectInsideTarget(hero, pad(this.getHitbox(), 8))) {
+        if (hero.actionTarget === this || this.area !== hero.area || !this.isHeroInPortal(state)) {
             return;
         }
         if (!this.definition.targetZone) {
-            // This is the behavior we want for portals eventually, but we are just adding it
-            // to teleporter for now.
             enterLocation(state, {
                 ...state.location,
                 x: hero.x,
@@ -120,14 +130,8 @@ export class Teleporter implements ObjectInstance {
                 d: hero.d,
                 isSpiritWorld: !state.location.isSpiritWorld,
             }, false, () => {
-                // In the future, check if there is a teleporter where the hero ends up and set it to control them
-                // so it moves them off of it.
                 if (this.linkedObject) {
-                    hero.actionTarget = this.linkedObject;
-                    this.linkedObject.disabledTime = 500;
-                    hero.isUsingDoor = true;
-                    hero.actionDx = directionMap[hero.d][0];
-                    hero.actionDy = directionMap[hero.d][1];
+                    this.linkedObject.disabledUntilHeroLeaves = true;
                 }
             });
         } else {
