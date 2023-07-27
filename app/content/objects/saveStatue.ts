@@ -6,6 +6,7 @@ import { showMessage } from 'app/scriptEvents';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { selectDialogueOption } from 'app/utils/dialogue';
 import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
+import { FRAME_LENGTH } from 'app/gameConstants';
 
 
 const geometry = {w: 32, h: 48};
@@ -25,6 +26,7 @@ export class SaveStatue implements ObjectInstance {
     y: number;
     status: ObjectStatus = 'normal';
     isNeutralTarget = true;
+    time = 0;
     constructor(state: GameState, definition: SimpleObjectDefinition) {
         this.definition = definition;
         this.x = definition.x;
@@ -74,8 +76,9 @@ export class SaveStatue implements ObjectInstance {
         }
     }
     update(state: GameState) {
+        this.time += FRAME_LENGTH;
         // The statue sparkles if you haven't used it yet.
-        if (state.fieldTime % 100 === 0 && !getObjectStatus(state, this.definition)) {
+        if (this.time % 100 === 0 && !getObjectStatus(state, this.definition)) {
             addSparkleAnimation(state, this.area, this.getHitbox(state), {});
         }
     }
