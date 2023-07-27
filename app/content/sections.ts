@@ -126,7 +126,7 @@ function populateSectionMapData(): void {
         const orderedKeys = Object.keys(map.floors).sort((a, b) => {
             if (a[0] === 'B') {
                 if (b[0] === 'B') {
-                    return Number(a.substring(1)) - Number(b.substring(1));
+                    return Number(b.substring(1)) - Number(a.substring(1));
                 }
                 return -1;
             } else {

@@ -47,7 +47,6 @@ Pending Graphics From Jon:
 
 
 Current tasks:
-    - Fix Basement order is backwards (test in cocoon dungeon and forge)
     - Spirit Barrier text does not disappear after opening the portal in cocoon.
 
     Low priority
