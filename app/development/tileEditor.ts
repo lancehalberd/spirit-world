@@ -29,6 +29,7 @@ import { mainCanvas } from 'app/utils/canvas';
 import { enterLocation } from 'app/utils/enterLocation';
 import { getMousePosition, isMouseDown, /*isMouseOverElement*/ } from 'app/utils/mouse';
 import { resetTileBehavior } from 'app/utils/tileBehavior';
+export * from 'app/development/packSprites';
 
 
 function refreshArea(state: GameState, doNotRefreshEditor = false) {

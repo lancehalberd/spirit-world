@@ -297,7 +297,7 @@ export class LootDropObject extends LootObject {
 
 
 
-const [chestClosedFrame, chestOpenedFrame] = createAnimation('gfx/tiles/chest.png',
+const [chestClosedFrame, chestOpenedFrame] = createAnimation('gfx/objects/chest.png',
     {w: 18, h: 20, content: {x: 1, y: 4, w: 16, h: 16}}, {cols: 2}
 ).frames;
 

@@ -7,10 +7,10 @@ import { checkIfAllSwitchesAreActivated } from 'app/utils/switches';
 
 
 const crystalGeometry = {w: 16, h: 20, content: {x: 0, y: 4, w: 16, h: 16, }};
-const [baseFrame, crystalFrame, activeCrystalFrame] = createAnimation('gfx/tiles/activatablecrystal.png', crystalGeometry, {cols: 3}).frames;
-const whiteGlowFrames = createAnimation('gfx/tiles/activatablecrystal.png', crystalGeometry, {x: 3, cols: 3}).frames;
-const redGlowFrames = createAnimation('gfx/tiles/activatablecrystal.png', crystalGeometry, {x: 6, cols: 3}).frames;
-const blueGlowFrames = createAnimation('gfx/tiles/activatablecrystal.png', crystalGeometry, {x: 9, cols: 3}).frames;
+const [baseFrame, crystalFrame, activeCrystalFrame] = createAnimation('gfx/objects/activatablecrystal.png', crystalGeometry, {cols: 3}).frames;
+const whiteGlowFrames = createAnimation('gfx/objects/activatablecrystal.png', crystalGeometry, {x: 3, cols: 3}).frames;
+const redGlowFrames = createAnimation('gfx/objects/activatablecrystal.png', crystalGeometry, {x: 6, cols: 3}).frames;
+const blueGlowFrames = createAnimation('gfx/objects/activatablecrystal.png', crystalGeometry, {x: 9, cols: 3}).frames;
 
 export class CrystalSwitch implements ObjectInstance {
     area: AreaInstance;

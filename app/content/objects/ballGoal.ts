@@ -4,7 +4,7 @@ import { createAnimation, drawFrame } from 'app/utils/animations';
 import { checkIfAllSwitchesAreActivated } from 'app/utils/switches';
 
 
-const [emptyFrame, filledFrame] = createAnimation('gfx/tiles/circulardepression.png', {w: 16, h: 16}, {cols: 2}).frames;
+const [emptyFrame, filledFrame] = createAnimation('gfx/objects/circulardepression.png', {w: 16, h: 16}, {cols: 2}).frames;
 
 export class BallGoal implements ObjectInstance {
     area: AreaInstance;

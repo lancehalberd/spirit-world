@@ -45,6 +45,16 @@ export const allTiles: FullTile[] = [null];
 window['allTiles'] = allTiles;
 
 
+const deletedTileSource: TileSource = solidColorTile('#FF0000', {deleted: true});
+function deletedTiles(n: number): TileSource {
+    return {
+        ...deletedTileSource,
+        tileCoordinates: [...new Array(n)].map(() => [0, 0]),
+    };
+}
+// Add this to ignore if deletedTiles isn't called
+deletedTiles;
+
 let index = 1;
 function addSingleTileFromTileSource(tileSource: TileSource, x: number, y: number) {
     const behaviors = tileSource.behaviors?.[`${x}x${y}`] || tileSource.behaviors?.all;
@@ -313,7 +323,7 @@ const lightCaveWallsPalette: TileSource = {
 
 const furnitureCozyTiles: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/temp_furniture.png'), x: 496, y: 0, w: 4 * 16, h: 3 * 16},
+    source: {image: requireImage('gfx/temporary_tiles/temp_furniture.png'), x: 496, y: 0, w: 4 * 16, h: 3 * 16},
     behaviors: {
         'all': {defaultLayer: 'field', solid: true, low: true},
         '3x2': {pit: true},
@@ -322,7 +332,7 @@ const furnitureCozyTiles: TileSource = {
 
 const furnitureWoodTiles: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/temp_furniture.png'), x: 560, y: 272, w: 4 * 16, h: 6 * 16},
+    source: {image: requireImage('gfx/temporary_tiles/temp_furniture.png'), x: 560, y: 272, w: 4 * 16, h: 6 * 16},
     behaviors: {
         'all': {defaultLayer: 'field', solid: true, low: true},
     },
@@ -330,7 +340,7 @@ const furnitureWoodTiles: TileSource = {
 
 const furniturePlantTiles: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/temp_woodAndFood.png'), x: 112, y: 206, w: 1 * 16, h: 1 * 16},
+    source: {image: requireImage('gfx/temporary_tiles/temp_woodAndFood.png'), x: 112, y: 206, w: 1 * 16, h: 1 * 16},
     behaviors: {
         'all': {defaultLayer: 'field', solid: true, low: true},
     },
@@ -344,7 +354,7 @@ const iceTiles: TileSource = {
 
 const furnitureLampTiles: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/temp_furniture.png'), x: 560, y: 368, w: 1 * 16, h: 1 * 16},
+    source: {image: requireImage('gfx/temporary_tiles/temp_furniture.png'), x: 560, y: 368, w: 1 * 16, h: 1 * 16},
     behaviors: {
         'all': {defaultLayer: 'field', solid: true, low: true, brightness: 0.6, lightRadius: 32},
     },
@@ -352,15 +362,7 @@ const furnitureLampTiles: TileSource = {
 
 const laundryTiles: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/temp_laundry32.png'), x: 0, y: 0, w: 6 * 16, h: 2 * 16},
-    behaviors: {
-        'all': {defaultLayer: 'field', solid: true, low: false},
-    },
-};
-
-const fireTiles: TileSource = {
-    w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/temp_fire.png'), x: 0, y: 0, w: 1 * 16, h: 1 * 16},
+    source: {image: requireImage('gfx/temporary_tiles/temp_laundry32.png'), x: 0, y: 0, w: 6 * 16, h: 2 * 16},
     behaviors: {
         'all': {defaultLayer: 'field', solid: true, low: false},
     },
@@ -368,7 +370,7 @@ const fireTiles: TileSource = {
 
 const logChoppingTiles: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/temp_woodAndFood.png'), x: 240, y: 64, w: 1 * 16, h: 1 * 16},
+    source: {image: requireImage('gfx/temporary_tiles/temp_woodAndFood.png'), x: 240, y: 64, w: 1 * 16, h: 1 * 16},
     behaviors: {
         'all': {solid: true, low: true},
     },
@@ -376,7 +378,7 @@ const logChoppingTiles: TileSource = {
 
 const foodBoxTiles: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/temp_woodAndFood.png'), x: 192, y: 102, w: 4 * 16, h: 2 * 16},
+    source: {image: requireImage('gfx/temporary_tiles/temp_woodAndFood.png'), x: 192, y: 102, w: 4 * 16, h: 2 * 16},
     behaviors: {
         'all': {solid: true, low: true},
     },
@@ -384,7 +386,7 @@ const foodBoxTiles: TileSource = {
 
 const logAndFoodBagTiles: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/temp_woodAndFood.png'), x: 64, y: 160, w: 5 * 16, h: 1 * 16},
+    source: {image: requireImage('gfx/temporary_tiles/temp_woodAndFood.png'), x: 64, y: 160, w: 5 * 16, h: 1 * 16},
     behaviors: {
         'all': {solid: true, low: true},
     },
@@ -392,51 +394,10 @@ const logAndFoodBagTiles: TileSource = {
 
 const largeLogPileTiles: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/temp_woodAndFood.png'), x: 112, y: 176, w: 2 * 16, h: 2 * 16},
+    source: {image: requireImage('gfx/temporary_tiles/temp_woodAndFood.png'), x: 112, y: 176, w: 2 * 16, h: 2 * 16},
     behaviors: {
         'all': {solid: true, low: true},
     },
-};
-
-const blueHouseTiles: TileSource = {
-    w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/temp_furniture.png'), x: 368, y: 80, w: 4 * 16, h: 5 * 16},
-    behaviors: {
-        'all': {solid: true, low: false},
-    },
-};
-
-const greenHouseTiles: TileSource = {
-    w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/temp_furniture.png'), x: 368, y: 160, w: 4 * 16, h: 5 * 16},
-    behaviors: {
-        'all': {solid: true, low: false},
-    },
-};
-
-const fenceTiles: TileSource = {
-    w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/temp_furniture.png'), x: 240, y: 0, w: 3 * 16, h: 3 * 16},
-    behaviors: {
-        'all': {solid: true, low: true},
-    },
-};
-
-const bridgeHorizontalTiles: TileSource = {
-    w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/temp_bridgeAndTree.png'), x: 128, y: 48, w: 3 * 16, h: 1 * 16},
-    behaviors: {},
-};
-
-const bridgeVerticalTiles: TileSource = {
-    w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/temp_bridgeAndTree.png'), x: 144, y: 32, w: 3 * 16, h: 1 * 16},
-    behaviors: {},
-};
-
-const roomFloorTiles: TileSource = {
-    w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/temp_furniture.png'), x: 768, y: 192, w: 3 * 16, h: 1 * 16},
 };
 
 const railsTiles: TileSource = {
@@ -1041,15 +1002,6 @@ const spiritFloorEdges: TileSource = {
     },
 };
 
-
-
-const deletedTileSource: TileSource = solidColorTile('#FF0000', {deleted: true});
-function deletedTiles(n: number): TileSource[] {
-    return [...new Array(n)].map(() => deletedTileSource);
-}
-// Add this to ignore if deletedTiles isn't called
-deletedTiles;
-
 const solidPitSource: TileSource = solidColorTile('#111111', {pit: true});
 
 
@@ -1135,21 +1087,16 @@ addTiles([
     furnitureWoodTiles,
     furnitureLampTiles,
     furniturePlantTiles,
-    ...deletedTiles(5),
+    deletedTiles(5),
     iceTiles,
-    ...deletedTiles(10),
+    deletedTiles(10),
     laundryTiles,
-    fireTiles,
+    deletedTiles(1),
     logChoppingTiles,
     foodBoxTiles,
     logAndFoodBagTiles,
     largeLogPileTiles,
-    blueHouseTiles,
-    greenHouseTiles,
-    fenceTiles,
-    bridgeHorizontalTiles,
-    bridgeVerticalTiles,
-    roomFloorTiles,
+    deletedTiles(58),
     clouds,
     railsTiles,
     spiritRailsTiles,
@@ -1206,4 +1153,3 @@ allTiles[127] = {
     frame: deletedTileSource.source,
     behaviors: { deleted: true },
 };
-

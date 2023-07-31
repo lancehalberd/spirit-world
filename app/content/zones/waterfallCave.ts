@@ -1,6 +1,5 @@
 import { zones } from 'app/content/zones/zoneHash';
 
-
 const f0_0x0: AreaDefinition = {
     layers: [
         {
@@ -161,7 +160,7 @@ const f0_0x0: AreaDefinition = {
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,8,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,324,0,0],
-                    [0,0,0,8,317,49,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,326,0,0],
+                    [0,0,0,8,1,49,9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,326,0,0],
                     [0,0,0,0,8,8,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,325,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,330,330,330,0,323,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -255,7 +254,6 @@ const f0_0x0: AreaDefinition = {
     ],
     objects: [
         {status: "normal", id: "waterfallCave:0:0x0-npc-0", x: 112, y: 416, d: "down", behavior: "idle", style: "guy", type: "npc", dialogue: "This soup sure will be tasty!"},
-        {status: "normal", id: "waterfallCave:0:0x0-waterPot-0", x: 80, y: 432, type: "waterPot"},
         {status: "normal", id: "waterfallCave:0:0x0-npc-1", x: 128, y: 336, d: "down", behavior: "idle", style: "vanaraGold", type: "npc", dialogue: "The laundry is almost done."},
         {status: "normal", id: "waterfallCaveBigMoney", x: 192, y: 32, type: "chest", lootType: "money", lootAmount: 5},
         {status: "normal", id: "waterfallCaveLittleMoney", x: 208, y: 128, type: "chest", lootType: "money", lootAmount: 1},
@@ -271,6 +269,7 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "waterfallCave:0:0x0-npc-8", x: 432, y: 432, d: "down", behavior: "idle", style: "gal", type: "npc", dialogue: "I have to check all of the food for freshness. Maybe I'll have a little snack while I work..."},
         {status: "normal", id: "waterfallCave:0:0x0-npc-10", x: 240, y: 384, d: "right", behavior: "idle", style: "vanaraGold", type: "npc", dialogue: "Chopping wood sure calms me down."},
         {status: "normal", id: "waterfallCaveLeftMain", x: 128, y: 496, type: "door", style: "cavern", targetZone: "waterfallCave", targetObjectId: "waterfallCaveLeftMain", d: "down"},
+        {status: "normal", id: "", x: 80, y: 432, type: "pushPull"},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16, index: 122, mapId: 'overworld', entranceId: 'waterfallCaveEntrance', mapX: 0, mapY: 0},
