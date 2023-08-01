@@ -1,6 +1,5 @@
 import { isMovementBlocked } from 'app/movement/isMovementBlocked';
 
-import { AreaInstance, EffectInstance, GameState, MovementProperties, ObjectInstance, Rect } from 'app/types';
 
 export function canMoveRight(
     state: GameState,
@@ -277,17 +276,18 @@ export function canMoveRight(
                 }
             }
         }
-        let blocked = (isUnder && !movementProperties.canCrossLedges) || (isAbove && !movementProperties.canJump);
-        if (!blocked) {
-            const result = isMovementBlocked(state, area, pixelTileBehaviors, x, y, isAbove, movementProperties);
-            if (result) {
-                blocked = true;
-                if (result.object) {
-                    pushedObjects.add(result.object);
-                }
+        let blocked = false;
+        const result = isMovementBlocked(state, area, pixelTileBehaviors, x, y, isAbove, isUnder, movementProperties);
+        if (result) {
+            blocked = true;
+            if (result.object) {
+                pushedObjects.add(result.object);
             }
         }
         if (blocked) {
+            if (!movementProperties.canWiggle) {
+                return { pushedObjects: [...pushedObjects] };
+            }
             if (checkingLeft) {
                 minBlock = y;
             } else {

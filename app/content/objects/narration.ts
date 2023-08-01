@@ -1,14 +1,13 @@
-import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
+import { objectHash } from 'app/content/objects/objectHash';
+import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
 import { FRAME_LENGTH, isRandomizer } from 'app/gameConstants';
 import { setScript } from 'app/scriptEvents';
+import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
 
-import {
-    AreaInstance, GameState, NarrationDefinition,
-    ObjectInstance, ObjectStatus, Rect,
-} from 'app/types';
 
 export class Narration implements ObjectInstance {
     area: AreaInstance;
+    alwaysReset = true;
     definition: NarrationDefinition;
     drawPriority = <const>'foreground';
     isObject = <const>true;
@@ -52,19 +51,28 @@ export class Narration implements ObjectInstance {
     }
     update(state: GameState) {
         if (this.status === 'gone') {
+            if (this.definition.specialBehaviorKey) {
+                const specialBehavior = specialBehaviorsHash[this.definition.specialBehaviorKey] as SpecialNarrationBehavior;
+                specialBehavior?.update(state, this);
+            }
             return;
         }
         // If the flag gets set for some reason, set this object to gone so it won't trigger.
         if (getObjectStatus(state, this.definition)) {
             this.status = 'gone';
         }
+        // Narration competes with other scripts, so don't run it until other scripts are completed.
+        // Revive this code if it seems necessary
+        /*if (state.scriptEvents.queue.length || state.scriptEvents.activeEvents.length || state.messagePage) {
+            return;
+        }*/
         this.time += FRAME_LENGTH;
         if (this.time < this.definition.delay) {
             return;
         }
         if (this.trigger === 'touch') {
             // This 'knocked' check is a hack to prevent triggering narration while falling.
-            if (state.hero.action !== 'knocked' && state.hero.action !== 'jumpingDown'
+            if (state.hero.area === this.area && state.hero.action !== 'knocked' && state.hero.action !== 'jumpingDown'
                 && state.hero.overlaps(this)
             ) {
                 this.runScript(state);
@@ -74,3 +82,4 @@ export class Narration implements ObjectInstance {
     render(context: CanvasRenderingContext2D, state: GameState) {
     }
 }
+objectHash.narration = Narration;

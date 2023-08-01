@@ -1,23 +1,22 @@
-import { enterLocation, enterZoneByTarget, playAreaSound } from 'app/content/areas';
-import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
-import { findObjectInstanceById } from 'app/content/objects';
-import { editingState } from 'app/development/tileEditor';
-import { createCanvasAndContext } from 'app/dom';
+import { renderIndicator } from 'app/content/objects/indicator';
+import { objectHash } from 'app/content/objects/objectHash';
+import { editingState } from 'app/development/editingState';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { getVectorToTarget } from 'app/content/enemies';
+import { playAreaSound } from 'app/musicController';
 import {
     renderAreaObjectsBeforeHero,
     renderAreaObjectsAfterHero,
     renderForegroundObjects,
-} from 'app/render';
+} from 'app/render/renderField';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
-import { directionMap, getTileBehaviors } from 'app/utils/field';
+import { createCanvasAndContext, drawCanvas } from 'app/utils/canvas';
+import { enterLocation } from 'app/utils/enterLocation';
+import { enterZoneByTarget } from 'app/utils/enterZoneByTarget';
+import { getTileBehaviors } from 'app/utils/field';
 import { isObjectInsideTarget, pad } from 'app/utils/index';
+import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
+import { getVectorToTarget } from 'app/utils/target';
 
-import {
-    AreaInstance, DrawPriority, GameState, ObjectInstance,
-    ObjectStatus, Rect, EntranceDefinition,
-} from 'app/types';
 
 
 const floorAnimation = createAnimation('gfx/tiles/spirit_regeneration_bottom.png', {w: 16, h: 32}, {x: 0, cols: 4, duration: 5})
@@ -36,6 +35,7 @@ export class Teleporter implements ObjectInstance {
     linkedObject: Teleporter;
     wasUnderObject: boolean;
     actualRadius: number = 0;
+    disabledUntilHeroLeaves = false;
     constructor(state: GameState, definition: EntranceDefinition) {
         this.definition = definition;
         this.x = definition.x;
@@ -79,14 +79,25 @@ export class Teleporter implements ObjectInstance {
         const {tileBehavior} = getTileBehaviors(state, this.area, {x: this.x + 8, y: this.y + 8});
         return tileBehavior.solid;
     }
+
+    isHeroInPortal(state: GameState) {
+        return isObjectInsideTarget(state.hero, pad(this.getHitbox(), 9));
+    }
+
     update(state: GameState) {
+        if (this.disabledUntilHeroLeaves) {
+            if (!this.isHeroInPortal(state)) {
+                this.disabledUntilHeroLeaves = false;
+            }
+            return;
+        }
         if (this.status !== 'normal' && state.hero.actionTarget !== this) {
             if (state.savedState.objectFlags[this.definition.id]) {
                 this.changeStatus(state, 'normal');
             }
             return;
         }
-        if (!(this.definition.targetZone && this.definition.targetZone) && !state.hero.passiveTools.spiritSight) {
+        if (!state.hero.passiveTools.spiritSight && !state.hero.passiveTools.trueSight) {
             return;
         }
         if (this.isUnderObject(state)) {
@@ -108,12 +119,10 @@ export class Teleporter implements ObjectInstance {
             this.disabledTime -= FRAME_LENGTH;
             return;
         }
-        if (hero.actionTarget === this || this.area !== hero.area || !isObjectInsideTarget(hero, pad(this.getHitbox(), 8))) {
+        if (hero.actionTarget === this || this.area !== hero.area || !this.isHeroInPortal(state)) {
             return;
         }
         if (!this.definition.targetZone) {
-            // This is the behavior we want for portals eventually, but we are just adding it
-            // to teleporter for now.
             enterLocation(state, {
                 ...state.location,
                 x: hero.x,
@@ -121,14 +130,8 @@ export class Teleporter implements ObjectInstance {
                 d: hero.d,
                 isSpiritWorld: !state.location.isSpiritWorld,
             }, false, () => {
-                // In the future, check if there is a teleporter where the hero ends up and set it to control them
-                // so it moves them off of it.
                 if (this.linkedObject) {
-                    hero.actionTarget = this.linkedObject;
-                    this.linkedObject.disabledTime = 500;
-                    hero.isUsingDoor = true;
-                    hero.actionDx = directionMap[hero.d][0];
-                    hero.actionDy = directionMap[hero.d][1];
+                    this.linkedObject.disabledUntilHeroLeaves = true;
                 }
             });
         } else {
@@ -137,12 +140,21 @@ export class Teleporter implements ObjectInstance {
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
         if (this.status !== 'normal' && !editingState.isEditing) {
+            if (state.hero.passiveTools.trueSight) {
+                renderIndicator(context, this.getHitbox(), state.fieldTime);
+            }
             return;
         }
         if (this.isUnderObject(state) && !editingState.isEditing) {
+            if (state.hero.passiveTools.trueSight) {
+                renderIndicator(context, this.getHitbox(), state.fieldTime);
+            }
             return;
         }
         if (!this.definition.targetZone || !this.definition.targetObjectId) {
+            return;
+        }
+        if (!state.hero.passiveTools.spiritSight && !state.hero.passiveTools.trueSight) {
             return;
         }
         const gradient = context.createLinearGradient(0, 0, 0, 16);
@@ -164,14 +176,14 @@ export class Teleporter implements ObjectInstance {
         if (this.definition.targetZone && this.definition.targetObjectId) {
             return;
         }
-        if (!state.hero.passiveTools.spiritSight) {
+        if (!state.hero.passiveTools.spiritSight && !state.hero.passiveTools.trueSight) {
             return;
         }
         const hitbox = this.getRenderBox(state);
         updateSpiritCanvas(state, hitbox);
-        context.drawImage(spiritCanvas,
-            0, 0, hitbox.w, hitbox.h,
-            hitbox.x, hitbox.y, hitbox.w, hitbox.h
+        drawCanvas(context, spiritCanvas,
+            {x: 0, y: 0, w: hitbox.w, h: hitbox.h},
+            hitbox
         );
 
         context.save();
@@ -216,10 +228,14 @@ function updateSpiritCanvas(state: GameState, hitbox: Rect): void {
             -(hitbox.x) | 0,
             -(hitbox.y) | 0
         );
-        spiritContext.drawImage(
+        /*spiritContext.drawImage(
             area.canvas,
             hitbox.x, hitbox.y, hitbox.w, hitbox.h,
             hitbox.x, hitbox.y, hitbox.w, hitbox.h,
+        );*/
+        drawCanvas(spiritContext, area.canvas,
+            hitbox,
+            hitbox
         );
         for (const object of area.objectsToRender) {
             if (object.drawPriority === 'background' || object.getDrawPriority?.(state) === 'background') {
@@ -229,10 +245,14 @@ function updateSpiritCanvas(state: GameState, hitbox: Rect): void {
         renderAreaObjectsBeforeHero(spiritContext, state, area, true);
         renderAreaObjectsAfterHero(spiritContext, state, area, true);
         if (area?.foregroundCanvas) {
-            spiritContext.drawImage(
+            /*spiritContext.drawImage(
                 area.foregroundCanvas,
                 hitbox.x, hitbox.y, hitbox.w, hitbox.h,
                 hitbox.x, hitbox.y, hitbox.w, hitbox.h,
+            );*/
+            drawCanvas(spiritContext, area.foregroundCanvas,
+                hitbox,
+                hitbox
             );
         }
         renderForegroundObjects(spiritContext, state, area, true);
@@ -247,18 +267,4 @@ function updateSpiritCanvas(state: GameState, hitbox: Rect): void {
     }
     isRenderingSpiritCanvas = false;
 }
-
-export function enterZoneByTeleporterCallback(this: void, state: GameState, targetObjectId: string) {
-    const hero = state.hero;
-    hero.isUsingDoor = true;
-    const target = findObjectInstanceById(state.areaInstance, targetObjectId) as Teleporter;
-    if (!target){
-        console.error(state.areaInstance.objects);
-        console.error(targetObjectId);
-        debugger;
-    }
-    hero.actionTarget = target;
-    target.disabledTime = 500;
-    hero.actionDx = directionMap[hero.d][0];
-    hero.actionDy = directionMap[hero.d][1];
-}
+objectHash.teleporter = Teleporter;

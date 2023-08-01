@@ -1,15 +1,17 @@
-import { addEffectToArea } from 'app/content/areas';
-import { AnimationEffect } from 'app/content/effects/animationEffect';
+import { FieldAnimationEffect } from 'app/content/effects/animationEffect';
 import { BarrierBurstEffect } from 'app/content/effects/barrierBurstEffect';
-import { destroyClone } from 'app/content/objects/clone';
 import { Staff } from 'app/content/objects/staff';
 import { getChargedArrowAnimation } from 'app/content/effects/arrow';
+import { ThrownObject } from 'app/content/effects/thrownObject';
+import { FRAME_LENGTH } from 'app/gameConstants';
 import {
     arrowAnimations, bowAnimations, cloakAnimations,
     chargeBackAnimation, chargeFrontAnimation,
     chargeFireBackAnimation, chargeFireFrontAnimation,
     chargeIceBackAnimation, chargeIceFrontAnimation,
     chargeLightningBackAnimation, chargeLightningFrontAnimation,
+    cloudPoofAnimation,
+    goldBowAnimations,
     heroAnimations,
     staffAnimations,
 } from 'app/render/heroAnimations';
@@ -18,20 +20,13 @@ import {
     renderExplosionRing, renderHeroBarrier,
     spiritBarrierBreakingAnimation,
 } from 'app/renderActor';
-import { getChargeLevelAndElement } from 'app/useTool';
 import { drawFrameAt, getFrame } from 'app/utils/animations';
 import { isUnderwater } from 'app/utils/actor';
+import { destroyClone } from 'app/utils/destroyClone';
+import { addEffectToArea } from 'app/utils/effects';
 import { directionMap, getDirection } from 'app/utils/field';
+import { getChargeLevelAndElement } from 'app/utils/getChargeLevelAndElement';
 import { boxesIntersect } from 'app/utils/index';
-
-import {
-    Action, ActiveTool, Actor, AreaInstance,
-    Direction, DrawPriority, EffectInstance, Equipment, Frame,
-    FullTile, GameState, HeldChakram, HitProperties, HitResult,
-    MagicElement, ObjectInstance, ObjectStatus,
-    PassiveTool, Rect, SavedHeroData, ThrownChakram, ThrownObject, TileCoords,
-    WeaponUpgrades, ZoneLocation
-} from 'app/types';
 
 const throwSpeed = 6;
 
@@ -40,6 +35,7 @@ export class Hero implements Actor, SavedHeroData {
     isClone = false;
     isAllyTarget = true;
     isObject = <const>true;
+    canPressSwitches = true;
     // These aren't used by the Hero itself since it has special handling,
     // but these are used on objects that inherit from hero: AstralProjection and Clone.
     drawPriority: DrawPriority = 'sprites';
@@ -63,7 +59,7 @@ export class Hero implements Actor, SavedHeroData {
     attackBufferTime: number = 0;
     // like being knocked but doesn't stop MC charge or other actions.
     bounce?: {vx: number; vy: number; frames: number};
-    equipedBoots: Equipment = 'leatherBoots';
+    equippedBoots: Equipment = 'leatherBoots';
     hasBarrier?: boolean = false;
     hasRevive: boolean = false;
     isInvisible?: boolean = false;
@@ -91,12 +87,15 @@ export class Hero implements Actor, SavedHeroData {
     sinking?: boolean;
     inAirBubbles?: boolean;
     frozenDuration?: number;
+    burnDamage?: number = 0;
+    burnDuration?: number = 0;
     isRunning?: boolean;
     isUsingDoor?: boolean;
     isExitingDoor?: boolean;
     isControlledByObject?: boolean;
     isTouchingPit?: boolean;
     isOverPit?: boolean;
+    isOverClouds?: boolean;
     canFloat?: boolean;
     // stats
     magic: number = 0;
@@ -106,6 +105,10 @@ export class Hero implements Actor, SavedHeroData {
     magicRegen: number = 0;
     // This is the actual mana regen rate, which changes depending on circumstances and can even become negative.
     actualMagicRegen: number = 0;
+    // Until this reaches zero, magic will not regenerate.
+    magicRegenCooldown: number = 0;
+    // This is the maximum value magic regen cooldown can reach. It is reduced by certain items.
+    magicRegenCooldownLimit: number = 4000;
     lightRadius: number = 20;
     rollCooldown: number = 0;
     toolCooldown: number = 0;
@@ -156,12 +159,16 @@ export class Hero implements Actor, SavedHeroData {
 
     heldChakram?: HeldChakram;
     thrownChakrams: ThrownChakram[] = [];
-    activeStaff?: Staff
+    activeStaff?: Staff;
+    activeBarrierBurst?: BarrierBurstEffect;
+    // This is set if the player attempts to use the staff tool while it is in use
+    // and prevents it from being placed. This is useful for attacking quickly.
+    canceledStaffPlacement?: boolean;
 
     constructor() {
         this.life = this.maxLife;
         this.clones = [];
-        this.equipedBoots = 'leatherBoots';
+        this.equippedBoots = 'leatherBoots';
     }
 
     applySavedHeroData(defaultSavedHeroData: SavedHeroData, savedHeroData?: SavedHeroData) {
@@ -265,6 +272,9 @@ export class Hero implements Actor, SavedHeroData {
         if (this.life <= 0) {
             return {};
         }
+        if (state.scriptEvents.blockPlayerInput) {
+            return {};
+        }
         if (this.action === 'getItem' || this.action === 'jumpingDown' || this.action === 'falling' || this.action === 'fallen') {
             return {};
         }
@@ -273,8 +283,10 @@ export class Hero implements Actor, SavedHeroData {
             return {};
         }
         if (this.hasBarrier) {
+            let iframeMultiplier = 1;
             let spiritDamage = hit.spiritCloakDamage || Math.max(10, hit.damage * 5);
             // The cloak halves incoming damage that matches its current element.
+            // Note that since the base cloak tool can no longer be charged, barrier element is never set.
             if (hit.element && hit.element === this.barrierElement) {
                 spiritDamage /= 2;
             }
@@ -282,17 +294,32 @@ export class Hero implements Actor, SavedHeroData {
             if (!this.barrierElement) {
                 reflectDamage++;
             }
+            //
+            if (hit.element === 'fire') {
+                // The barrier prevents burning damage entirely (normally a 2x multiplier)
+                // so to balance this out the barrier takes a flat 50% more damage from fire elements.
+                spiritDamage *= 1.5;
+                if (state.hero.passiveTools.fireBlessing) {
+                    spiritDamage /= 2;
+                }
+            }
+            if (hit.element === 'ice' && state.hero.passiveTools.waterBlessing) {
+                spiritDamage /= 2;
+            }
+            if (hit.element === 'lightning' && state.hero.passiveTools.lightningBlessing) {
+                spiritDamage /= 2;
+                iframeMultiplier *= 0.5;
+            }
             // The cloak does increased extra damage and prevents all spirit damage while the cloak is being activated.
             // This rewards players for using the cloak just in time to block attacks, but may be too generous.
             if (this.toolOnCooldown === 'cloak') {
                 spiritDamage = 0;
                 reflectDamage++;
             }
-            // This is a bit of a hack. When damaged with barrier, we set 50 iframes,
-            // during which magic regen is paused, but only the first 10 preven the barrier from taking damage.
-            if (hit.damage && state.hero.invulnerableFrames <= 40) {
+            if (hit.damage && state.hero.invulnerableFrames <= 0) {
                 state.hero.magic -= spiritDamage;
-                state.hero.invulnerableFrames = Math.max(state.hero.invulnerableFrames, 50);
+                state.hero.invulnerableFrames = Math.max(state.hero.invulnerableFrames, iframeMultiplier * 10);
+                state.hero.increaseMagicRegenCooldown(1000 * spiritDamage / 20);
             }
             const hitbox = this.getHitbox(state);
             if (hit.canAlwaysKnockback && hit.knockback) {
@@ -317,22 +344,31 @@ export class Hero implements Actor, SavedHeroData {
             }
             return {};
         }
-        const preventKnockback = this.equipedBoots === 'ironBoots' || this.ironSkinLife > 0;
+        const preventKnockback = this.equippedBoots === 'ironBoots' || this.ironSkinLife > 0;
         if (hit.damage) {
             let damage = hit.damage;
-            if (hit.element === 'fire' && state.hero.passiveTools.fireBlessing) {
-                damage /= 2;
+            let iframeMultiplier = 1;
+            if (hit.element === 'fire') {
+                let burnDuration = 2000;
+                const burnDamage = damage / 2;
+                if (state.hero.passiveTools.fireBlessing) {
+                    damage /= 2;
+                    burnDuration /= 2;
+                }
+                this.applyBurn(burnDamage, burnDuration);
             }
             if (hit.element === 'ice' && state.hero.passiveTools.waterBlessing) {
                 damage /= 2;
             }
             if (hit.element === 'lightning' && state.hero.passiveTools.lightningBlessing) {
                 damage /= 2;
+                iframeMultiplier *= 0.5;
             }
             if (state.hero.passiveTools.goldMail) {
                 damage /= 2;
+                iframeMultiplier *= 1.2;
             }
-            this.takeDamage(state, damage);
+            this.takeDamage(state, damage, iframeMultiplier);
         }
         if (hit.knockback && (hit.canAlwaysKnockback || !preventKnockback)) {
             this.knockBack(state, hit.knockback);
@@ -342,9 +378,24 @@ export class Hero implements Actor, SavedHeroData {
             this.frozenDuration = 0;
         } else if (hit.element === 'ice' && !(this.ironSkinLife > 0)) {
             // Getting hit by ice freezes you unless you have iron skin up.
-            this.frozenDuration = 1500;
+            if (this.passiveTools.waterBlessing) {
+                this.frozenDuration = 1000;
+            } else {
+                this.frozenDuration = 1500;
+            }
+            // ice hits remove burns.
+            this.burnDuration = 0;
         }
         return { hit: true };
+    }
+
+    applyBurn(burnDamage: number, burnDuration: number) {
+        if (burnDuration * burnDamage >= this.burnDuration * this.burnDamage) {
+            this.burnDuration = burnDuration;
+            this.burnDamage = burnDamage;
+        }
+        // Burns unfreeze the player.
+        this.frozenDuration = 0;
     }
 
     burstBarrier(state: GameState) {
@@ -352,11 +403,12 @@ export class Hero implements Actor, SavedHeroData {
             return;
         }
         this.hasBarrier = false;
-        const barrierBurst = new BarrierBurstEffect({
-            x: this.x + 8,
-            y: this.y + 8,
+        this.activeBarrierBurst = new BarrierBurstEffect({
+            element: this.element,
+            level: this.activeTools.cloak,
+            source: this,
         });
-        addEffectToArea(state, this.area, barrierBurst);
+        addEffectToArea(state, this.area, this.activeBarrierBurst);
     }
 
     shatterBarrier(state: GameState) {
@@ -364,7 +416,7 @@ export class Hero implements Actor, SavedHeroData {
             return;
         }
         this.hasBarrier = false;
-        const shatteredBarrier = new AnimationEffect({
+        const shatteredBarrier = new FieldAnimationEffect({
             animation: spiritBarrierBreakingAnimation,
             x: this.x - 7,
             y: this.y + 5,
@@ -393,15 +445,21 @@ export class Hero implements Actor, SavedHeroData {
         }
     }
 
-    takeDamage(this: Hero, state: GameState, damage: number): void {
+    takeDamage(this: Hero, state: GameState, damage: number, iframeMultiplier = 1): void {
+        if (state.scriptEvents.blockPlayerInput) {
+            return;
+        }
         if (this.ironSkinLife) {
             this.ironSkinCooldown = 3000;
-            if (this.ironSkinLife > damage) {
-                this.ironSkinLife -= damage;
-                state.hero.invulnerableFrames = 50;
+            if (this.ironSkinLife > damage / 2) {
+                this.ironSkinLife -= damage / 2;
+                state.hero.invulnerableFrames = 50 * iframeMultiplier;
+                if (state.hero.clones.filter(clone => !clone.isUncontrollable).length || this !== state.hero) {
+                    destroyClone(state, this);
+                }
                 return;
             } else {
-                damage -= this.ironSkinLife;
+                damage -= 2 * this.ironSkinLife;
                 this.ironSkinLife = 0;
             }
         }
@@ -420,7 +478,7 @@ export class Hero implements Actor, SavedHeroData {
                 this.invulnerableFrames = 1;
             } else {
                 state.hero.life -= damage / 2;
-                state.hero.invulnerableFrames = 50;
+                state.hero.invulnerableFrames = 50 * iframeMultiplier;
                 // Taking damage resets radius for spirit sight meditation.
                 state.hero.spiritRadius = 0;
             }
@@ -428,7 +486,7 @@ export class Hero implements Actor, SavedHeroData {
         } else {
             // Damage applies to the hero, not the clone.
             state.hero.life -= damage / 2;
-            state.hero.invulnerableFrames = 50;
+            state.hero.invulnerableFrames = 50 * iframeMultiplier;
             // Taking damage resets radius for spirit sight meditation.
             state.hero.spiritRadius = 0;
         }
@@ -448,7 +506,8 @@ export class Hero implements Actor, SavedHeroData {
         } else if (directionMap[bowDirection][1] > 0) {
             arrowYOffset += directionMap[bowDirection][0] === 0 ? 8 : 4;
         }
-        const frame = getFrame(bowAnimations[bowDirection], bowAnimationTime);
+        const animations = this.activeTools.bow >= 2 ? goldBowAnimations : bowAnimations;
+        const frame = getFrame(animations[bowDirection], bowAnimationTime);
         drawFrameAt(context, frame, { x: this.x - 6, y: this.y - this.z - 11 });
         if (isChargingBow && state.hero.magic > 0) {
             const arrowFrame = getFrame(arrowAnimations[bowDirection], bowAnimationTime);
@@ -514,30 +573,25 @@ export class Hero implements Actor, SavedHeroData {
         const hero = this;
         // 'sinkingInLava' action is currently unused, lava ground just does a lot of damage instead.
         if (hero.action === 'falling' || hero.action === 'sinkingInLava') {
-            this.renderHeroFrame(context, state);
-            return;
-        }
-        if (state.hero.isInvisible || hero.action === 'fallen' || hero.action === 'sankInLava') {
-            return;
-        }
-        const renderCharging = state.hero.magic > 0 && hero.passiveTools.charge
-            && hero.action === 'charging' && hero.chargeTime >= 60
-        if (renderCharging) {
-            const { chargeLevel, element } = getChargeLevelAndElement(state, hero);
-            if (chargeLevel) {
-                const animation = !element
-                    ? chargeBackAnimation
-                    : {
-                        fire: chargeFireBackAnimation,
-                        ice: chargeIceBackAnimation,
-                        lightning: chargeLightningBackAnimation
-                    }[element];
-                context.save();
-                    context.globalAlpha *= 0.8;
-                    const frame = getFrame(animation, hero.chargeTime);
-                    drawFrameAt(context, frame, { x: hero.x, y: hero.y - hero.z });
-                context.restore();
+
+            if (hero.isOverClouds) {
+                if (hero.animationTime < FRAME_LENGTH * cloudPoofAnimation.frameDuration) {
+                    this.renderHeroFrame(context, state);
+                }
+                const frame = getFrame(cloudPoofAnimation, hero.animationTime);
+                drawFrameAt(context, frame, { x: this.x, y: this.y - this.z });
+            } else {
+                this.renderHeroFrame(context, state);
             }
+            return;
+        }
+        if (hero.action === 'fallen' || hero.action === 'sankInLava') {
+            return;
+        }
+        this.renderChargingBehind(context, state);
+        if (this.isInvisible) {
+            this.renderChargingFront(context, state);
+            return;
         }
         const isChargingBow = (hero.chargingRightTool && hero.rightTool === 'bow')
                 || (hero.chargingLeftTool && hero.leftTool === 'bow');
@@ -570,7 +624,7 @@ export class Hero implements Actor, SavedHeroData {
             context.save();
                 context.fillStyle = 'white';
                 const p = Math.round(Math.min(3, hero.frozenDuration / 200));
-                context.globalAlpha *= (0.3 + 0.2 * p);
+                context.globalAlpha *= (0.3 + 0.15 * p);
                 context.fillRect(
                     Math.round(hero.x - frame.content.x - p),
                     Math.round(hero.y - hero.z - frame.content.y - p),
@@ -580,8 +634,49 @@ export class Hero implements Actor, SavedHeroData {
             context.restore();
         }
         renderExplosionRing(context, state, hero);
+        this.renderChargingFront(context, state);
+    }
+
+    getMaxChargeLevel(this: Hero, state: GameState): number {
+        if (state.hero.elements.fire && state.hero.elements.ice && state.hero.elements.lightning) {
+            return 2;
+        }
+        if (state.hero.elements.fire || state.hero.elements.ice || state.hero.elements.lightning) {
+            return 1;
+        }
+        return 0;
+    }
+
+    renderChargingBehind(this: Hero, context: CanvasRenderingContext2D, state: GameState) {
+        const renderCharging = state.hero.magic > 0 && this.getMaxChargeLevel(state)
+            && this.action === 'charging' && this.chargeTime >= 60
         if (renderCharging) {
-            const element = isUnderwater(state, hero) ? null : hero.element;
+            const { chargeLevel, element } = getChargeLevelAndElement(state, this);
+            if (chargeLevel) {
+                const animation = !element
+                    ? chargeBackAnimation
+                    : {
+                        fire: chargeFireBackAnimation,
+                        ice: chargeIceBackAnimation,
+                        lightning: chargeLightningBackAnimation
+                    }[element];
+                context.save();
+                    context.globalAlpha *= 0.8;
+                    const frame = getFrame(animation, this.chargeTime);
+                    if (chargeLevel >= 2) {
+                        drawFrameAt(context, frame, { x: this.x, y: this.y - this.z - 9 });
+                    }
+                    drawFrameAt(context, frame, { x: this.x, y: this.y - this.z });
+                context.restore();
+            }
+        }
+    }
+
+    renderChargingFront(this: Hero, context: CanvasRenderingContext2D, state: GameState) {
+        const renderCharging = state.hero.magic > 0 && this.getMaxChargeLevel(state)
+            && this.action === 'charging' && this.chargeTime >= 60
+        if (renderCharging) {
+            const element = isUnderwater(state, this) ? null : this.element;
             const animation = !element
                 ? chargeFrontAnimation
                 : {
@@ -589,10 +684,17 @@ export class Hero implements Actor, SavedHeroData {
                     ice: chargeIceFrontAnimation,
                     lightning: chargeLightningFrontAnimation
                 }[element];
+            const { chargeLevel } = getChargeLevelAndElement(state, this);
             context.save();
                 context.globalAlpha *= 0.8;
-                const frame = getFrame(animation, hero.chargeTime);
-                drawFrameAt(context, frame, { x: hero.x, y: hero.y - hero.z });
+                const frame = getFrame(animation, this.chargeTime);
+                if (chargeLevel >= 2) {
+                    let frame = getFrame(animation, this.chargeTime + 100);
+                    drawFrameAt(context, frame, { x: this.x, y: this.y - this.z - 6 });
+                    frame = getFrame(animation, this.chargeTime + 200);
+                    drawFrameAt(context, frame, { x: this.x, y: this.y - this.z - 12 });
+                }
+                drawFrameAt(context, frame, { x: this.x, y: this.y - this.z });
             context.restore();
         }
     }
@@ -648,4 +750,13 @@ export class Hero implements Actor, SavedHeroData {
         }
         hero.pickUpTile = null;
     }
+
+    increaseMagicRegenCooldown(amount: number): void {
+        this.magicRegenCooldown = Math.min(Math.max(100, this.magicRegenCooldown + amount), this.magicRegenCooldownLimit);
+    }
+}
+
+class _Hero extends Hero {}
+declare global {
+    export interface Hero extends _Hero {}
 }

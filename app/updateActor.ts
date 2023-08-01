@@ -1,35 +1,35 @@
 import {
-    getAreaFromLocation, getAreaSize, removeEffectFromArea,
-    removeObjectFromArea, scrollToArea, setNextAreaSection,
+    getAreaFromLocation,
+    scrollToArea, setNextAreaSection,
     swapHeroStates,
 } from 'app/content/areas';
+import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { AirBubbles } from 'app/content/objects/airBubbles';
 import { Enemy } from 'app/content/enemy';
-import { editingState } from 'app/development/tileEditor';
-import { FRAME_LENGTH, GAME_KEY } from 'app/gameConstants';
-import {
-    wasGameKeyPressedAndReleased, wasGameKeyPressed
-} from 'app/keyCommands';
+import { editingState } from 'app/development/editingState';
+import { FRAME_LENGTH } from 'app/gameConstants';
 import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
 import { prependScript } from 'app/scriptEvents';
 import { updateHeroSpecialActions } from 'app/updateHeroSpecialActions';
 import { updateHeroStandardActions } from 'app/updateHeroStandardActions';
+import { isToolButtonPressed, wasToolButtonPressed, wasToolButtonPressedAndReleased, } from 'app/useTool';
+import { removeAllClones } from 'app/utils/area';
+import { removeEffectFromArea } from 'app/utils/effects';
 import {
     directionMap,
 } from 'app/utils/field';
-import { boxesIntersect } from 'app/utils/index';
-
-import {
-    GameState, Hero,
-} from 'app/types';
+import { getAreaSize } from 'app/utils/getAreaSize';
+import { getFullZoneLocation } from 'app/utils/getFullZoneLocation';
+import { boxesIntersect, pad } from 'app/utils/index';
+import { removeObjectFromArea } from 'app/utils/objects';
 
 export function updateAllHeroes(this: void, state: GameState) {
+    if (state.hero.action === 'preparingSomersault' && state.fieldTime % 200 !== 0) {
+        updateHeroSpecialActions(state, state.hero);
+        return;
+    }
     // Switching clones is done outside of updateHero, otherwise the switch gets processed by each clone.
-    if (state.hero.clones.length
-        && !state.hero.pickUpObject && (
-            (state.hero.leftTool === 'clone' && wasGameKeyPressedAndReleased(state, GAME_KEY.LEFT_TOOL))
-            || (state.hero.rightTool === 'clone' && wasGameKeyPressedAndReleased(state, GAME_KEY.RIGHT_TOOL))
-    )) {
+    if (state.hero.clones.length && !state.hero.pickUpObject && wasToolButtonPressedAndReleased(state, 'clone')) {
         if (!state.hero.cloneToolReleased){
             state.hero.cloneToolReleased = true;
         } else {
@@ -46,10 +46,7 @@ export function updateAllHeroes(this: void, state: GameState) {
         }
     }
     // This is for switching to thrown clone as you throw it.
-    if (state.hero.clones.length && state.hero.cloneToolReleased && (
-        (state.hero.leftTool === 'clone' && wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL))
-            || (state.hero.rightTool === 'clone' && wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL))
-    )) {
+    if (state.hero.clones.length && state.hero.cloneToolReleased && wasToolButtonPressed(state, 'clone')) {
         for (let i = 0; i < state.hero.clones.length; i++) {
             if (state.hero.clones[i].isUncontrollable
                 && !state.hero.clones[i].cannotSwapTo
@@ -115,14 +112,29 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
     if (hero.invulnerableFrames > 0) {
         hero.invulnerableFrames--;
     }
+    // Remove barrier/invisibility if the hero does not have the cloak equipped.
+    if ((hero.hasBarrier || hero.isInvisible) && hero.leftTool !== 'cloak' && hero.rightTool !== 'cloak') {
+        hero.shatterBarrier(state);
+        hero.isInvisible = false;
+    }
+    // End invisibility once the player lets go of the cloak tool.
+    if (hero.isInvisible && !isToolButtonPressed(state, 'cloak')) {
+        hero.isInvisible = false;
+    }
+    if (hero.activeStaff && hero.leftTool !== 'staff' && hero.rightTool !== 'staff') {
+        hero.activeStaff.recall(state);
+    }
+    if (hero.clones?.length && hero.leftTool !== 'clone' && hero.rightTool !== 'clone') {
+        removeAllClones(state);
+    }
     if (hero.frozenDuration > 0) {
         hero.frozenDuration -= FRAME_LENGTH;
     } else {
         hero.animationTime += FRAME_LENGTH;
-        if (hero.action === 'walking' && hero.isRunning && hero.magic >= 0) {
+        if (hero.action === 'walking' && hero.isRunning && hero.magic > 0) {
             hero.animationTime += FRAME_LENGTH / 2;
         }
-        if (hero.passiveTools.ironSkin) {
+        if (hero.passiveTools.ironSkin && hero.magic >= hero.maxMagic) {
             hero.ironSkinCooldown -= FRAME_LENGTH;
             // Iron skin restored twice as quickly when still.
             if (!hero.action || hero.action === 'meditating') {
@@ -130,8 +142,39 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
             }
             if (hero.ironSkinCooldown <= 0) {
                 hero.ironSkinCooldown = 1000;
-                hero.ironSkinLife = Math.min(hero.ironSkinLife + 0.25, hero.maxLife / 4);
+                // Iron skin life can be increased over the normal max using shielding units, so don't reduce
+                // iron skin life here it is over the max.
+                hero.ironSkinLife = Math.max(hero.ironSkinLife, Math.min(hero.ironSkinLife + 0.25, hero.maxLife / 4));
             }
+        }
+    }
+    // Burns end immediately dealing no damage to swimming targets.
+    if (hero.swimming) {
+        hero.burnDuration = 0;
+    }
+    if (hero.burnDuration > 0) {
+        hero.burnDuration -= FRAME_LENGTH;
+        // Burns expire twice as fast when standing on water.
+        if (hero.wading) {
+            hero.burnDuration -= FRAME_LENGTH;
+        }
+        if (hero.ironSkinLife > 0) {
+            // If the hero has iron skin, they only take half as much damage to the iron skin and nothing from life/magic.
+            hero.ironSkinLife = Math.max(0, hero.ironSkinLife - hero.burnDamage / 2 * FRAME_LENGTH / 1000);
+        } else if (hero.magic > 0) {
+            // If the hero has magic, half of burning damage applies to magic and half applies to their life.
+            const drainCoefficient = state.hero.magicRegen ? 4 / state.hero.magicRegen : 0;
+            state.hero.magic -= drainCoefficient * 10 * hero.burnDamage / 2 * FRAME_LENGTH / 1000;
+            // This will result in a 1 second cooldown by default for a 2 second burn.
+            state.hero.increaseMagicRegenCooldown(10);
+            hero.life = Math.max(0, hero.life - hero.burnDamage / 2 * FRAME_LENGTH / 1000);
+        } else {
+            // 100% of burn damage goes to life without iron skin or magic.
+            hero.life = Math.max(0, hero.life - hero.burnDamage * FRAME_LENGTH / 1000);
+        }
+        if (hero.burnDuration % 40 === 0) {
+            const hitbox = hero.getHitbox(state);
+            addSparkleAnimation(state, hero.area, pad(hitbox, -4), { element: 'fire' });
         }
     }
     // Remove action targets from old areas.
@@ -159,18 +202,15 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
             hero.toolOnCooldown = null;
         }
     }
+    if (hero.isInvisible && !isToolButtonPressed(state, 'cloak')) {
+
+    }
 }
 
 export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero) {
     // Hero takes one damage every half second while in a hot room without the fire blessing.
-    if (!editingState.isEditing && hero.area?.isHot && !hero.passiveTools.fireBlessing) {
-        if (state.time % 500 === 0) {
-            hero.onHit(state, {damage: 1, canDamageRollingHero: true, element: 'fire'});
-            // Stop updating this hero if it was destroyed by taking damage,
-            if (!hero.area) {
-                return;
-            }
-        }
+    if (!editingState.isEditing && state.areaSection?.isHot && !hero.passiveTools.fireBlessing) {
+        hero.applyBurn(0.5, 500);
     }
     let activeAirBubbles: AirBubbles = null;
     for (const object of hero.area.objects) {
@@ -179,6 +219,9 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
                 activeAirBubbles = object;
                 break;
             }
+        }
+        if (object.definition?.type === 'shieldingUnit' && hero.overlaps(object.getHitbox())) {
+            hero.ironSkinLife = Math.min(hero.maxLife, hero.ironSkinLife + 2 * FRAME_LENGTH / 1000);
         }
     }
     if (hero.life <= 0
@@ -204,29 +247,39 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
                 removeEffectFromArea(state, hero.heldChakram);
                 delete hero.heldChakram;
             }
+            if (hero.activeBarrierBurst) {
+                removeEffectFromArea(state, hero.activeBarrierBurst);
+                delete hero.activeBarrierBurst;
+            }
             if (state.hero.hasRevive) {
                 state.reviveTime = state.fieldTime;
             }
             state.menuIndex = 0;
         }
     }
-    if (state.hero.isInvisible) {
-        state.hero.actualMagicRegen = Math.max(-20, state.hero.actualMagicRegen - 4 * FRAME_LENGTH / 1000);
-    } else if (state.hero.hasBarrier) {
+    // This value starts at 1 and decreases to 1 / 4 once the max of 16 magicRegen is reached.
+    const drainCoefficient = state.hero.magicRegen ? 4 / state.hero.magicRegen : 0;
+    const isInvisible = !![state.hero, ...state.hero.clones].find(hero => hero.isInvisible);
+    const hasBarrier = !![state.hero, ...state.hero.clones].find(hero => hero.hasBarrier);
+
+    if (isInvisible) {
+        let drainAmount = drainCoefficient * 4 * FRAME_LENGTH / 1000;
+        if (state.hero.activeBarrierBurst?.element) {
+            drainAmount *= 2;
+        }
+        state.hero.actualMagicRegen = Math.max(-20, Math.min(0, state.hero.actualMagicRegen) - drainAmount);
+        state.hero.increaseMagicRegenCooldown(drainCoefficient * FRAME_LENGTH / 2);
+    } else if (hasBarrier) {
         if (state.hero.invulnerableFrames > 0) {
             // Regenerate no magic during iframes after the barrier is damaged.
             state.hero.actualMagicRegen = 0;
         } else {
             state.hero.actualMagicRegen = !state.hero.action ? 2 : 1;
         }
-    } else {
-        state.hero.actualMagicRegen
     }
     const isHoldingBreath = !state.hero.passiveTools.waterBlessing && state.zone.surfaceKey;
-    // The waterfall tower area drains mana unless you have the water blessing.
-    // Might make more sense to have this related to the water tiles in the material world or have
-    // it be configurable on the area like `darkness` but for now just using the zone key is fine.
-    const isWaterDrainingMagic = !state.hero.passiveTools.waterBlessing && state.zone.key === 'waterfallTower';
+    // Corrosive areas drain mana unless you have the water blessing.
+    const isWaterDrainingMagic = !state.hero.passiveTools.waterBlessing && hero.area.isCorrosive;
     if (activeAirBubbles) {
         // "airBubbles" are actually going to be "Spirit Recharge" points that regenerate mana quickly.
         state.hero.magic = Math.max(0, state.hero.magic);
@@ -234,7 +287,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
 
         if (activeAirBubbles.charge > 0) {
             state.hero.actualMagicRegen = Math.max(5, state.hero.actualMagicRegen);
-        } else if (isWaterDrainingMagic || isHoldingBreath || state.hero.isInvisible) {
+        } else if (isWaterDrainingMagic || isHoldingBreath || isInvisible) {
             // Magic regen is 0 while magic is being drained but the hero is standing on
             // a depleted spirit recharge point.
             state.hero.actualMagicRegen = 0;
@@ -243,29 +296,41 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
         state.hero.actualMagicRegen = Math.min(-20, state.hero.actualMagicRegen);
     } else if (isHoldingBreath) {
         state.hero.actualMagicRegen = Math.min(-1, state.hero.actualMagicRegen);
-    } else if (!state.hero.isInvisible && !state.hero.hasBarrier) {
+    } else if (!isInvisible && !hasBarrier) {
         state.hero.actualMagicRegen = !state.hero.action ? 2 * state.hero.magicRegen : state.hero.magicRegen;
     }
-    if (!state.hero.action && state.hero.actualMagicRegen > 0) {
+    const isActuallyRunning = state.hero.action === 'walking' && state.hero.isRunning && state.hero.magic > 0;
+    const preventRegeneration = state.hero.actualMagicRegen < 0
+        || state.hero.toolCooldown > 0 || state.hero.action === 'roll' || isActuallyRunning || state.hero.burnDuration > 0;
+    if (state.hero.magicRegenCooldown > 0 && !preventRegeneration) {
+        state.hero.magicRegenCooldown -= FRAME_LENGTH;
+    }
+    if (!state.hero.action && state.hero.actualMagicRegen >= 0) {
         // Double regeneration rate while idle.
-        state.hero.magic += 2 * state.hero.actualMagicRegen * FRAME_LENGTH / 1000;
-    } else if (state.hero.action === 'walking' && state.hero.isRunning) {
+        if (state.hero.magicRegenCooldown <= 0) {
+            state.hero.magic += 2 * state.hero.actualMagicRegen * FRAME_LENGTH / 1000;
+        }
+    } else if (isActuallyRunning) {
         // Spirit regeneration does not apply while running, but depletion still takes effect.
         if (state.hero.actualMagicRegen < 0) {
             state.hero.magic += state.hero.actualMagicRegen * FRAME_LENGTH / 1000;
         }
         // Slowly expend spirit energy while running.
-        if (state.hero.magic >= 0) {
-            state.hero.magic -= 5 * FRAME_LENGTH / 1000;
-        }
+        state.hero.magic -= drainCoefficient * 5 * FRAME_LENGTH / 1000;
+        state.hero.increaseMagicRegenCooldown(drainCoefficient * FRAME_LENGTH / 5);
+    } else if (state.hero.actualMagicRegen < 0) {
+        // Magic is being drained for some reason
+        state.hero.magic += state.hero.actualMagicRegen * FRAME_LENGTH / 1000;
     } else {
         // Normal regeneration rate.
-        state.hero.magic += state.hero.actualMagicRegen * FRAME_LENGTH / 1000;
+        if (state.hero.magicRegenCooldown <= 0) {
+            state.hero.magic += state.hero.actualMagicRegen * FRAME_LENGTH / 1000;
+        }
     }
     // Clones drain 2 magic per second.
-    state.hero.magic -= 2 * state.hero.clones.length * FRAME_LENGTH / 1000;
+    state.hero.magic -= 2 * drainCoefficient * state.hero.clones.length * FRAME_LENGTH / 1000;
     // Meditation grants 3 additional spirit energy per second.
-    if (hero.action === 'meditating') {
+    if (hero.action === 'meditating' && state.hero.magicRegenCooldown <= 0) {
         state.hero.magic += 3 * FRAME_LENGTH / 1000;
     }
     //if (hero.action !== 'knocked' && hero.action !== 'thrown') {
@@ -275,11 +340,12 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
             const coefficient = 100 / hero.area.dark;
             minLightRadius *= coefficient;
             if (state.hero.passiveTools.trueSight > 0) {
-                state.hero.magic -= 10 * FRAME_LENGTH / 1000 / coefficient;
+                // True sight gives better vision and consumes less spirit energy.
+                state.hero.magic -= drainCoefficient * 2 * FRAME_LENGTH / 1000 / coefficient;
                 targetLightRadius = 320 * coefficient;
                 minLightRadius += 20 * coefficient;
             } else if (state.hero.passiveTools.catEyes > 0) {
-                state.hero.magic -= 5 * FRAME_LENGTH / 1000 / coefficient;
+                state.hero.magic -= drainCoefficient * 4 * FRAME_LENGTH / 1000 / coefficient;
                 targetLightRadius = 80 * coefficient;
                 minLightRadius += 10 * coefficient;
             }
@@ -296,9 +362,11 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
     if (editingState.isEditing && state.hero.magicRegen) {
         state.hero.magic = state.hero.maxMagic;
     }
-    if (state.hero.magic < 0) {
-        state.hero.shatterBarrier(state);
-        state.hero.isInvisible = false;
+    if (state.hero.magic <= 0) {
+        for (const hero of [state.hero, ...state.hero.clones]) {
+            hero.shatterBarrier(state);
+            hero.isInvisible = false;
+        }
         /*if (state.hero.clones.length) {
             state.hero.x = hero.x;
             state.hero.y = hero.y;
@@ -310,6 +378,8 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
     }
     if (state.hero.magic > state.hero.maxMagic) {
         state.hero.magic = state.hero.maxMagic;
+    } else if (state.hero.magic < -10) {
+        state.hero.magic = -10;
     }
     state.location.x = state.hero.x;
     state.location.y = state.hero.y;
@@ -391,12 +461,14 @@ function checkToStartScreenTransition(state: GameState, hero: Hero) {
             y: state.location.areaGridCoords.y,
         };
         scrollToArea(state, getAreaFromLocation(state.location), 'left');
+        state.location = getFullZoneLocation(state.location);
     } else if (hero.x + hero.w > w && (hero.vx > 0 || hero.actionDx > 0)) {
         state.location.areaGridCoords = {
             x: (state.location.areaGridCoords.x + 1) % state.areaGrid[0].length,
             y: state.location.areaGridCoords.y,
         };
         scrollToArea(state, getAreaFromLocation(state.location), 'right');
+        state.location = getFullZoneLocation(state.location);
     } else if (hero.x < section.x && (hero.vx < 0 || hero.actionDx < 0)) {
         setNextAreaSection(state, 'left');
     } else if (hero.x + hero.w > section.x + section.w && (hero.vx > 0 || hero.actionDx > 0)) {
@@ -410,12 +482,14 @@ function checkToStartScreenTransition(state: GameState, hero: Hero) {
             y: (state.location.areaGridCoords.y + state.areaGrid.length - 1) % state.areaGrid.length,
         };
         scrollToArea(state, getAreaFromLocation(state.location), 'up');
+        state.location = getFullZoneLocation(state.location);
     } else if (hero.y + hero.h > h && isHeroMovingDown) {
         state.location.areaGridCoords = {
             x: state.location.areaGridCoords.x,
             y: (state.location.areaGridCoords.y + 1) % state.areaGrid.length,
         };
         scrollToArea(state, getAreaFromLocation(state.location), 'down');
+        state.location = getFullZoneLocation(state.location);
     } else if (hero.y < section.y && (hero.vy < 0 || hero.actionDy < 0)) {
         setNextAreaSection(state, 'up');
     } else if (hero.y + hero.h > section.y + section.h && isHeroMovingDown) {

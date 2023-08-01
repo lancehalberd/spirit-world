@@ -1,7 +1,6 @@
 import { createAnimation } from 'app/utils/animations';
-import { debugCanvas } from 'app/dom';
+import { debugCanvas } from 'app/utils/canvas';
 
-import { ActorAnimations, AnimationSet, Frame, FrameAnimation, FrameDimensions } from 'app/types';
 
 export const Y_OFF = -4;
 
@@ -180,6 +179,10 @@ const spiritPullRightAnimation: FrameAnimation = createAnimation('gfx/mc/spiritp
 const fallGeometry: FrameDimensions = {w: 20, h: 28, content: {x: 2, y: 16 + Y_OFF, w: 16, h: 16}};
 export const fallAnimation: FrameAnimation = createAnimation('gfx/mc/mcfall.png', fallGeometry, { cols: 13, duration: 4}, { loop: false });
 
+const cloudPoofGeometry: FrameDimensions = {w: 20, h: 25, content: {x: 2, y: 13 + Y_OFF, w: 16, h: 16}};
+export const cloudPoofAnimation: FrameAnimation = createAnimation('gfx/effects/cloudfall.png', cloudPoofGeometry,
+    { x: 1, cols: 7, duration: 5}, { loop: false });
+
 const chargeGeometry: FrameDimensions = {w: 24, h: 32, content: {x: 4, y: 16, w: 16, h: 16} };
 export const chargeBackAnimation: FrameAnimation = createAnimation('gfx/mc/aura.png', chargeGeometry, { cols: 4, y: 0, duration: 5});
 export const chargeFrontAnimation: FrameAnimation = createAnimation('gfx/mc/aura.png', chargeGeometry, { cols: 4, y: 1, duration: 5});
@@ -199,6 +202,15 @@ const bowUpAnimation: FrameAnimation = createAnimation('gfx/mc/bow1.png', bowGeo
 const bowUpLeftAnimation: FrameAnimation = createAnimation('gfx/mc/bow1.png', bowGeometry, { cols: 3, x: 18, duration: 4});
 const bowLeftAnimation: FrameAnimation = createAnimation('gfx/mc/bow1.png', bowGeometry, { cols: 3, x: 22, duration: 4});
 const bowDownLeftAnimation: FrameAnimation = createAnimation('gfx/mc/bow1.png', bowGeometry, { cols: 3, x: 26, duration: 4});
+
+const goldBowDownAnimation: FrameAnimation = createAnimation('gfx/mc/bow2.png', bowGeometry, { cols: 3, x: 1, duration: 4});
+const goldBowDownRightAnimation: FrameAnimation = createAnimation('gfx/mc/bow2.png', bowGeometry, { cols: 3, x: 5, duration: 4});
+const goldBowRightAnimation: FrameAnimation = createAnimation('gfx/mc/bow2.png', bowGeometry, { cols: 3, x: 9, duration: 4});
+const goldBowUpRightAnimation: FrameAnimation = createAnimation('gfx/mc/bow2.png', bowGeometry, { cols: 3, x: 13, duration: 4});
+const goldBowUpAnimation: FrameAnimation = createAnimation('gfx/mc/bow2.png', bowGeometry, { cols: 1, x: 16, duration: 4});
+const goldBowUpLeftAnimation: FrameAnimation = createAnimation('gfx/mc/bow2.png', bowGeometry, { cols: 3, x: 18, duration: 4});
+const goldBowLeftAnimation: FrameAnimation = createAnimation('gfx/mc/bow2.png', bowGeometry, { cols: 3, x: 22, duration: 4});
+const goldBowDownLeftAnimation: FrameAnimation = createAnimation('gfx/mc/bow2.png', bowGeometry, { cols: 3, x: 26, duration: 4});
 
 const cloakGeometry: FrameDimensions = {w: 32, h: 32};
 const cloakFrameMap = [0, 0, 1, 2, 3, 4, 5, 6, 7];
@@ -245,6 +257,17 @@ export const bowAnimations: AnimationSet = {
     downright: bowDownRightAnimation,
     left: bowLeftAnimation,
     right: bowRightAnimation,
+}
+
+export const goldBowAnimations: AnimationSet = {
+    up: goldBowUpAnimation,
+    upleft: goldBowUpLeftAnimation,
+    upright: goldBowUpRightAnimation,
+    down: goldBowDownAnimation,
+    downleft: goldBowDownLeftAnimation,
+    downright: goldBowDownRightAnimation,
+    left: goldBowLeftAnimation,
+    right: goldBowRightAnimation,
 }
 
 export const arrowAnimations: AnimationSet = {

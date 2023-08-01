@@ -1,15 +1,11 @@
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
-import { removeEffectFromArea } from 'app/content/areas';
-import { createCanvasAndContext } from 'app/dom';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, drawFrameAt, getFrame } from 'app/utils/animations';
+import { createCanvasAndContext } from 'app/utils/canvas';
+import { removeEffectFromArea } from 'app/utils/effects';
 import { hitTargets } from 'app/utils/field';
 import { allImagesLoaded } from 'app/utils/images';
 
-import {
-    AreaInstance, DrawPriority, EffectInstance,
-    Frame, GameState, TileBehaviors,
-} from 'app/types';
 
 const flameGeometry = {w: 20, h: 20, content: {x: 2, y: 2, w: 16, h: 16}};
 export const [
@@ -72,6 +68,7 @@ export class Flame implements EffectInstance, Props {
     ttl: number;
     isPreparing = false;
     reflected = false;
+    isEnemyTarget: boolean = true;
     constructor({x, y, z = 0, vx = 0, vy = 0, vz = 0, az = -0.3, damage = 1, scale = 1, ttl = 2000, isPreparing = false}: Props) {
         this.damage = damage;
         this.x = x;
@@ -87,6 +84,15 @@ export class Flame implements EffectInstance, Props {
         this.h = 12 * scale;
         this.isPreparing = isPreparing
         this.animationTime = Math.floor(Math.random() * 10) * FRAME_LENGTH;
+    }
+    getHitbox() {
+        return this;
+    }
+    onHit(state: GameState, hit: HitProperties): HitResult {
+        if (hit.element === 'ice') {
+            removeEffectFromArea(state, this);
+        }
+        return {};
     }
     update(state: GameState) {
         this.x += this.vx;
@@ -105,7 +111,7 @@ export class Flame implements EffectInstance, Props {
                 const hitResult = hitTargets(state, this.area, {
                     canPush: false,
                     damage: this.damage,
-                    hitbox: this,
+                    hitbox: this.getHitbox(),
                     element: 'fire',
                     hitAllies: !this.reflected,
                     hitEnemies: this.reflected,

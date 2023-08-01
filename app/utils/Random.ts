@@ -1,5 +1,3 @@
-type Collection<T> = {[key:string]: T} | Array<T>;
-
 const Random = {
     /**
      * @param {number} min  The smallest returned value

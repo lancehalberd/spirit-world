@@ -1,7 +1,6 @@
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
-import { saveGame } from 'app/state';
+import { saveGame } from 'app/utils/saveGame';
 
-import { GameState } from 'app/types';
 
 dialogueHash.citySmith = {
     key: 'citySmith',
@@ -36,7 +35,7 @@ dialogueHash.citySmith = {
             state.hero.silverOre -= 2;
             state.hero.money -= 100;
             state.hero.weaponUpgrades.normalRange = true;
-            saveGame();
+            saveGame(state);
             return `Excellent! Your Chakram is faster than ever!`;
         },
         craftDamage: (state: GameState) => {
@@ -49,7 +48,7 @@ dialogueHash.citySmith = {
             state.hero.silverOre -= 3;
             state.hero.money -= 100;
             state.hero.weaponUpgrades.normalDamage = true;
-            saveGame();
+            saveGame(state);
             return `Excellent! Your Chakram is more powerful than ever!`;
         },
         fail: 'This work doesn\'t come cheap, you need to bring more Jade.',
@@ -118,7 +117,7 @@ dialogueHash.forgeSmith = {
             state.hero.silverOre -= 2;
             state.hero.money -= 200;
             state.hero.weaponUpgrades.spiritRange = true;
-            saveGame();
+            saveGame(state);
             return `Excellent! Your Chakram is faster than ever!`;
         },
         craftDamage: (state: GameState) => {
@@ -135,7 +134,7 @@ dialogueHash.forgeSmith = {
             state.hero.silverOre -= 3;
             state.hero.money -= 200;
             state.hero.weaponUpgrades.spiritDamage = true;
-            saveGame();
+            saveGame(state);
             return `Excellent! Your Chakram is more powerful than ever!`;
         },
         fail: 'You still need Jade even in the Spirit World.',

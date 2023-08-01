@@ -1,13 +1,10 @@
 import { Hero } from 'app/content/hero';
-import { getCloneMovementDeltas } from 'app/keyCommands';
+import { getCloneMovementDeltas } from 'app/userInput';
 import { renderCarriedTile } from 'app/renderActor';
 import { heroSpiritAnimations } from 'app/render/heroAnimations';
 import { drawFrameAt, getFrame } from 'app/utils/animations';
 import { directionMap, getDirection } from 'app/utils/field';
 
-import {
-    ActorAnimations, Frame, GameState, HitProperties, HitResult,
-} from 'app/types';
 
 
 let lastPullAnimation = null;
@@ -70,7 +67,6 @@ export class AstralProjection extends Hero {
             ...hero.passiveTools,
             gloves: 0,
             roll: 0,
-            charge: 0,
         };
     }
     render(this: Hero, context: CanvasRenderingContext2D, state: GameState): void {

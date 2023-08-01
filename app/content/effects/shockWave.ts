@@ -1,12 +1,8 @@
-import { addEffectToArea, removeEffectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrameAt, getFrame } from 'app/utils/animations';
+import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import { hitTargets } from 'app/utils/field';
 
-import {
-    AreaInstance, EffectInstance, GameState,
-    DrawPriority, Frame, Point,
-} from 'app/types';
 
 
 const geometry = {w: 8, h: 16};

@@ -1,112 +1,32 @@
-import { destroyTile, removeEffectFromArea, removeObjectFromArea, resetTileBehavior } from 'app/content/areas';
-import { getObjectBehaviors } from 'app/content/objects';
 import { allTiles } from 'app/content/tiles';
+import { destroyTile } from 'app/utils/destroyTile';
+import { directionMap, getDirection } from 'app/utils/direction';
+import { removeEffectFromArea } from 'app/utils/effects';
 import { isPixelInShortRect, rectanglesOverlap } from 'app/utils/index';
-
-import {
-    AreaInstance, AreaLayer, Direction, EffectInstance, Enemy, GameState, Hero,
-    HitProperties, HitResult, MovementProperties,
-    ObjectInstance, Rect, Tile, TileCoords, TileBehaviors,
-} from 'app/types';
-
-const root2over2 = Math.sqrt(2) / 2;
-
-export const directionMap = {
-    upleft: [-root2over2, -root2over2],
-    up: [0, -1],
-    upright: [root2over2, -root2over2],
-    downleft: [-root2over2, root2over2],
-    down: [0, 1],
-    downright: [root2over2, root2over2],
-    left: [-1, 0],
-    right: [1, 0],
-};
-
-export const directionToLeftRotationsFromRight = {
-    right: 0,
-    upright: 1,
-    up: 2,
-    upleft: 3,
-    left: 4,
-    downleft: 5,
-    down: 6,
-    downright: 7,
-}
-export const leftRotationsFromRightToDirection = Object.keys(directionToLeftRotationsFromRight) as Direction[];
-
-// leftRotations is in 90 degree rotations to the left and can accept half rotations for 45 degrees.
-export function rotateDirection(d: Direction, leftRotations: number): Direction {
-    leftRotations = Math.round(leftRotations * 2);
-    // Calculates a new rotation in the range of 0-7.
-    const newRotation = ((directionToLeftRotationsFromRight[d] + leftRotations) % 8 + 8) % 8;
-    return leftRotationsFromRightToDirection[newRotation];
-}
+import { getObjectBehaviors, removeObjectFromArea } from 'app/utils/objects';
+import { resetTileBehavior } from 'app/utils/tileBehavior';
 
 
-// 15, 4, 4,
-// This is a map of offsets used to animate an object being picked up by the player, and is designed for use with a
-// 16x16 tile.
-// Originally values before adding new carrying animations, consistent y offset at end of animations.
-/*export const carryMap = {
-    'right': [{x: 12, y: -9}, {x: 12, y: -9}, {x: 12, y: -9}, {x: 12, y: -9}, {x: 9, y: -13}, {x: 7, y: -16}, {x: 0, y: -17}],
-    'left': [{x: -12, y: -9}, {x: -12, y: -9}, {x: -12, y: -9}, {x: -12, y: -9}, {x: -9, y: -13}, {x: -7, y: -16}, {x: 0, y: -17}],
-    'down': [{x: 0, y: 3}, {x: 0, y: 3}, {x: 0, y: 3}, {x: 0, y: 3}, {x: 0, y: -4}, {x: 0, y: -9}, {x: 0, y: -17}],
-    'up': [{x: 0, y: -15}, {x: 0, y: -15}, {x: 0, y: -15}, {x: 0, y: -15}, {x: 0, y: -16}, {x: 0, y: -17}, {x: 0, y: -17}],
-};*/
-// New values to match new carrying animations, final y offset is a bit different depending on direction.
-export const carryMap = {
-    'right': [{x: 12, y: -9}, {x: 12, y: -9}, {x: 12, y: -9}, {x: 12, y: -9}, {x: 9, y: -13}, {x: 7, y: -16}, {x: 0, y: -17}],
-    'left': [{x: -12, y: -9}, {x: -12, y: -9}, {x: -12, y: -9}, {x: -12, y: -9}, {x: -9, y: -13}, {x: -7, y: -16}, {x: 0, y: -17}],
-    //'right': [{x: 12, y: -9}, {x: 12, y: -9}, {x: 12, y: -9}, {x: 12, y: -9}, {x: 9, y: -12}, {x: 7, y: -15}, {x: 0, y: -16}],
-    //'left': [{x: -12, y: -9}, {x: -12, y: -9}, {x: -12, y: -9}, {x: -12, y: -9}, {x: -9, y: -12}, {x: -7, y: -15}, {x: 0, y: -16}],
-    'down': [{x: 0, y: 3}, {x: 0, y: 3}, {x: 0, y: 3}, {x: 0, y: 3}, {x: 0, y: -4}, {x: 0, y: -9}, {x: 0, y: -17}],
-    //'down': [{x: 0, y: 3}, {x: 0, y: 3}, {x: 0, y: 3}, {x: 0, y: 3}, {x: 0, y: -3}, {x: 0, y: -7}, {x: 0, y: -13}],
-    'up': [{x: 0, y: -15}, {x: 0, y: -15}, {x: 0, y: -15}, {x: 0, y: -15}, {x: 0, y: -16}, {x: 0, y: -17}, {x: 0, y: -17}],
-};
-
-export function getDirection(dx: number, dy: number, includeDiagonals = false, defaultDirection: Direction = null): Direction {
-    if (Math.abs(dy) < 0.2) {
-        dy = 0;
-    }
-    if (Math.abs(dx) < 0.2) {
-        dx = 0;
-    }
-    if (defaultDirection && !dy && !dx) {
-        return defaultDirection;
-    }
-    if (includeDiagonals) {
-        const r = Math.abs(dx) / (Math.abs(dy) + .000001);
-        if (r >= 2) {
-            return dx < 0 ? 'left' : 'right';
-        }
-        if (r <= 1 / 2) {
-            return dy < 0 ? 'up' : 'down';
-        }
-        if (dy < 0) {
-            return dx < 0 ? 'upleft' : 'upright';
-        }
-        return dx < 0 ? 'downleft' : 'downright';
-    }
-    if (Math.abs(dx) > Math.abs(dy)) {
-        return dx < 0 ? 'left' : 'right';
-    }
-    return dy < 0 ? 'up' : 'down';
-}
+export { directionMap, getDirection } from 'app/utils/direction';
 
 export function canTeleportToCoords(state: GameState, hero: Hero, {x, y}: Tile): boolean {
-    const excludedObjects = new Set([hero]);
-    return isPointOpen(state, hero.area, {x: x + 2, y: y + 2}, {canSwim: true}, excludedObjects) &&
-        isPointOpen(state, hero.area, {x: x + 13, y: y + 2}, {canSwim: true}, excludedObjects) &&
-        isPointOpen(state, hero.area, {x: x + 2, y: y + 13}, {canSwim: true}, excludedObjects) &&
-        isPointOpen(state, hero.area, {x: x + 13, y: y + 13}, {canSwim: true}, excludedObjects);
+    return isTileOpen(state, hero.area, {x, y}, {canSwim: true, canFall: true});
 }
 
 export function canSomersaultToCoords(state: GameState, hero: Hero, {x, y}: Tile): boolean {
-    const excludedObjects = new Set([hero]);
-    return isPointOpen(state, hero.area, {x: x + 2, y: y + 2}, {canSwim: true, canFall: true}, excludedObjects) &&
-        isPointOpen(state, hero.area, {x: x + 13, y: y + 2}, {canSwim: true, canFall: true}, excludedObjects) &&
-        isPointOpen(state, hero.area, {x: x + 2, y: y + 13}, {canSwim: true, canFall: true}, excludedObjects) &&
-        isPointOpen(state, hero.area, {x: x + 13, y: y + 13}, {canSwim: true, canFall: true}, excludedObjects);
+    return isTileOpen(state, hero.area, {x, y}, {canSwim: true, canFall: true});
+}
+window['canSomersaultToCoords'] = canSomersaultToCoords;
+
+export function isTileOpen(state: GameState, area: AreaInstance, {x, y}: Tile, movementProperties: MovementProperties): boolean {
+   /* return isPointOpen(state, area, {x: x + 2, y: y + 2}, movementProperties) &&
+        isPointOpen(state, area, {x: x + 13, y: y + 2}, movementProperties) &&
+        isPointOpen(state, area, {x: x + 2, y: y + 13}, movementProperties) &&
+        isPointOpen(state, area, {x: x + 13, y: y + 13}, movementProperties);*/
+    return isPointOpen(state, area, {x: x, y: y}, movementProperties) &&
+        isPointOpen(state, area, {x: x + 15, y: y}, movementProperties) &&
+        isPointOpen(state, area, {x: x, y: y + 15}, movementProperties) &&
+        isPointOpen(state, area, {x: x + 15, y: y + 15}, movementProperties);
 }
 
 export function isPointOpen(
@@ -114,13 +34,16 @@ export function isPointOpen(
     area: AreaInstance,
     {x, y, z}: {x: number, y: number, z?: number},
     movementProperties: MovementProperties,
-    excludedObjects: Set<any> = null
 ): boolean {
     const tx = Math.floor(x / 16);
     const ty = Math.floor(y / 16);
+    // Point is not considered open if it is not in either the current or next area section.
     if (!state.areaSection || tx < state.areaSection.x || tx >= state.areaSection.x + state.areaSection.w
         || ty < state.areaSection.y || ty >= state.areaSection.y + state.areaSection.h) {
-        return false;
+        if (!state.nextAreaSection || tx < state.nextAreaSection.x || tx >= state.nextAreaSection.x + state.nextAreaSection.w
+            || ty < state.nextAreaSection.y || ty >= state.nextAreaSection.y + state.nextAreaSection.h) {
+            return false;
+        }
     }
     const tileBehavior = area?.behaviorGrid[ty]?.[tx];
     const sy = (y | 0) % 16;
@@ -138,13 +61,17 @@ export function isPointOpen(
         if (tileBehavior.solidMap[sy] >> (15 - sx) & 1) {
             return false;
         }
-    } else if (tileBehavior?.ledges?.up && sy === 0 && movementProperties.direction !== 'up') {
+    } else if (!movementProperties.canCrossLedges && tileBehavior?.ledges?.up && sy === 0
+        && movementProperties.direction && movementProperties.direction !== 'up') {
         return false;
-    } else if (tileBehavior?.ledges?.down && sy === 15 && movementProperties.direction !== 'down') {
+    } else if (!movementProperties.canCrossLedges && tileBehavior?.ledges?.down && sy === 15
+        && movementProperties.direction && movementProperties.direction !== 'down') {
         return false;
-    } else if (tileBehavior?.ledges?.left && sx === 0 && movementProperties.direction !== 'left') {
+    } else if (!movementProperties.canCrossLedges && tileBehavior?.ledges?.left && sx === 0
+        && movementProperties.direction && movementProperties.direction !== 'left') {
         return false;
-    } else if (tileBehavior?.ledges?.right && sx === 15 && movementProperties.direction !== 'right') {
+    } else if (!movementProperties.canCrossLedges && tileBehavior?.ledges?.right && sx === 15
+        && movementProperties.direction && movementProperties.direction !== 'right') {
         return false;
     }
     if (tileBehavior?.water && !movementProperties.canSwim) {
@@ -154,10 +81,10 @@ export function isPointOpen(
         return false;
     }
     for (const object of area.objects) {
-        if (object.status === 'hidden' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
+        if (object.status === 'gone' || object.status === 'hidden' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
             continue;
         }
-        if (excludedObjects?.has(object)) {
+        if (movementProperties.excludedObjects?.has(object)) {
             continue;
         }
         const behaviors = getObjectBehaviors(state, object);
@@ -293,10 +220,10 @@ export function getTileBehaviorsAndObstacles(
                 }
                 if (behaviors?.touchHit) {
                     // Don't apply touchHit from enemies during iframes when they shouldn't damage the hero.
-                    if (!(object instanceof Enemy) || !(object.invulnerableFrames > 0)) {
+                    if (!(object.isEnemyTarget) || !((object as Enemy).invulnerableFrames > 0)) {
                         tileBehavior.touchHit = {...behaviors.touchHit};
-                        if (object instanceof Enemy) {
-                            tileBehavior.touchHit.source = object;
+                        if (object.isEnemyTarget) {
+                            tileBehavior.touchHit.source = (object as Enemy);
                         }
                     }
                 }
@@ -425,11 +352,11 @@ function distanceToSegment({x, y}, {x1, y1, x2, y2}) {
 
 export function tileHitAppliesToTarget(this: void, state: GameState, hit: HitProperties, target: ObjectInstance | EffectInstance) {
     // Hits from tiles only apply to enemies if `hitEnemies` is explicitly set to `true`.
-    if (target instanceof Enemy){
+    if (target.isEnemyTarget){
         return hit?.hitEnemies === true;
     }
     // Hits from tiles always apply to heroes unless `hitAllies` is explicitly set to `false`.
-    if (target instanceof Hero) {
+    if (target.isAllyTarget) {
         return hit?.hitAllies !== false;
     }
     // Hits from tiles only apply to objects if `hitObjects` is explicitly set to `true`.
@@ -437,6 +364,8 @@ export function tileHitAppliesToTarget(this: void, state: GameState, hit: HitPro
 }
 
 export function hitTargets(this: void, state: GameState, area: AreaInstance, hit: HitProperties): HitResult {
+    // explicitly default element to null if it is not set.
+    hit = {...hit, element: hit.element ?? null}
     const combinedResult: HitResult = { pierced: true, hitTargets: new Set() };
     let targets: (EffectInstance | ObjectInstance)[] = [];
     if (hit.hitEnemies) {
@@ -457,6 +386,18 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
         }
         if (hit.ignoreTargets?.has(object)) {
             continue;
+        }
+        // Projectiles from high attacks ignore anything that isn't very tall.
+        if (hit.projectile?.isHigh && !object.behaviors?.isVeryTall) {
+            continue;
+        }
+        // If the hit specifies a z range, skip objects outside of the range.
+        if (hit.zRange) {
+            const z = object.z || 0;
+            const height = object.height || 20;
+            if (z + height < hit.zRange[0] || z > hit.zRange[1]) {
+                continue;
+            }
         }
         const hitbox = object.getHitbox(state);
         if (hit.hitCircle) {
@@ -509,9 +450,15 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
                 hitbox.y - hit.hitbox.y + 8 * (hit.vy || 0)
             );
             let knockback = hit.knockback;
-            if (!hit.knockback && hit.knockAwayFrom) {
+            if (!knockback && hit.knockAwayFrom) {
                 const dx = (hitbox.x + hitbox.w / 2) - hit.knockAwayFrom.x;
                 const dy = (hitbox.y + hitbox.h / 2) - hit.knockAwayFrom.y;
+                const mag = Math.sqrt(dx * dx + dy * dy);
+                knockback = mag ? {vx: 4 * dx / mag, vy: 4 * dy / mag, vz: 0} : null;
+            }
+            if (!knockback && hit.knockAwayFromHit) {
+                const dx = (hitbox.x + hitbox.w / 2) - (hit.hitbox.x + hit.hitbox.w / 2);
+                const dy = (hitbox.y + hitbox.h / 2) - (hit.hitbox.y + hit.hitbox.h / 2);
                 const mag = Math.sqrt(dx * dx + dy * dy);
                 knockback = mag ? {vx: 4 * dx / mag, vy: 4 * dy / mag, vz: 0} : null;
             }
@@ -525,16 +472,87 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
     if (hit.hitTiles && hit.hitCircle) {
         hitTiles = [...hitTiles, ...getTilesInCircle(area, hit.hitCircle)];
     }
+    let setProjectileHigh = false, setProjectileLow = false;
+    if (hit.projectile?.isHigh) {
+        hit.projectile.passedLedgeTiles = [];
+    }
     // TODO: Get tiles hit by ray
     for (const target of hitTiles) {
         const behavior = area.behaviorGrid?.[target.y]?.[target.x];
-        // Ice hits that effect tiles cover them in ice as long as they aren't pits or walls.
-        if (hit.element === 'ice' && typeof behavior?.elementTiles?.fire === 'undefined'
-            // Cannot freeze ground in hot areas.
-            && !area.isHot
-            && !behavior?.solid && !behavior?.solidMap && !(behavior?.covered || behavior?.blocksStaff)
-            && !behavior?.pit && !behavior?.ledges
-            && !behavior?.isLava && !behavior?.isLavaMap
+        // Projectiles from high attacks ignore anything that isn't very tall or a ledge.
+        if (hit.projectile?.isHigh) {
+            const direction = (hit.vx || hit.vy) ? getDirection(hit.vx, hit.vy, true) : null;
+            hit.projectile.passedLedgeTiles.push(target);
+            if (!setProjectileLow && (
+                (direction === 'upleft' && (behavior?.ledges?.down || behavior?.ledges?.right || behavior?.diagonalLedge === 'downright'))
+                || (direction === 'up' && (behavior?.ledges?.down || behavior?.diagonalLedge === 'downleft' || behavior?.diagonalLedge === 'downright'))
+                || (direction === 'upright' && (behavior?.ledges?.down || behavior?.diagonalLedge === 'downleft' || behavior?.ledges?.left))
+                || (direction === 'downleft' && (behavior?.ledges?.up || behavior?.ledges?.right || behavior?.diagonalLedge === 'upright'))
+                || (direction === 'down' && (behavior?.ledges?.up || behavior?.diagonalLedge === 'upleft' || behavior?.diagonalLedge === 'upright'))
+                || (direction === 'downright' && (behavior?.ledges?.up || behavior?.diagonalLedge === 'upleft' || behavior?.ledges?.left))
+                || (direction === 'left' && (behavior?.ledges?.right || behavior?.diagonalLedge === 'downright' || behavior?.diagonalLedge === 'upright'))
+                || (direction === 'right' && (behavior?.ledges?.left || behavior?.diagonalLedge === 'downleft' || behavior?.diagonalLedge === 'upleft'))
+            )) {
+                setProjectileLow = true;
+            }
+            // Ignore tiles that are not very tall.
+            if (!behavior?.isVeryTall) {
+                continue;
+            }
+        } else if (hit.projectile && !setProjectileHigh) {
+            // Check if this projectile is going down over a cliff and set isHigh to true if so.
+            const direction = (hit.vx || hit.vy) ? getDirection(hit.vx, hit.vy, true) : null;
+            if ((direction === 'downright' && (behavior?.ledges?.down || behavior?.ledges?.right || behavior?.diagonalLedge === 'downright'))
+                || (direction === 'down' && (behavior?.ledges?.down || behavior?.diagonalLedge === 'downleft' || behavior?.diagonalLedge === 'downright'))
+                || (direction === 'downleft' && (behavior?.ledges?.down || behavior?.diagonalLedge === 'downleft' || behavior?.ledges?.left))
+                || (direction === 'upright' && (behavior?.ledges?.up || behavior?.ledges?.right || behavior?.diagonalLedge === 'upright'))
+                || (direction === 'up' && (behavior?.ledges?.up || behavior?.diagonalLedge === 'upleft' || behavior?.diagonalLedge === 'upright'))
+                || (direction === 'upleft' && (behavior?.ledges?.up || behavior?.diagonalLedge === 'upleft' || behavior?.ledges?.left))
+                || (direction === 'right' && (behavior?.ledges?.right || behavior?.diagonalLedge === 'downright' || behavior?.diagonalLedge === 'upright'))
+                || (direction === 'left' && (behavior?.ledges?.left || behavior?.diagonalLedge === 'downleft' || behavior?.diagonalLedge === 'upleft'))
+            ) {
+                setProjectileHigh = true;
+            }
+        }
+        if (behavior?.elementOffsets?.[hit.element]) {
+            for (const layer of area.layers) {
+                const offset = layer.tiles?.[target.y]?.[target.x]?.behaviors?.elementOffsets?.[hit.element];
+                if (offset) {
+                    const tileIndex = layer.tiles[target.y][target.x].index;
+                    layer.tiles[target.y][target.x] = allTiles[tileIndex + offset];
+                }
+            }
+            if (area.tilesDrawn[target.y]?.[target.x]) {
+                area.tilesDrawn[target.y][target.x] = false;
+            }
+            area.checkToRedrawTiles = true;
+            resetTileBehavior(area, target);
+        } else if (behavior?.elementTiles?.[hit.element] !== undefined) {
+            for (const layer of area.layers) {
+                const tileIndex = layer.tiles?.[target.y]?.[target.x]?.behaviors?.elementTiles?.[hit.element];
+                if (tileIndex !== undefined) {
+                    layer.tiles[target.y][target.x] = allTiles[tileIndex];
+                }
+            }
+            if (area.tilesDrawn[target.y]?.[target.x]) {
+                area.tilesDrawn[target.y][target.x] = false;
+            }
+            area.checkToRedrawTiles = true;
+            resetTileBehavior(area, target);
+        } else if (hit.element === 'ice' && typeof behavior?.elementTiles?.fire === 'undefined'
+            // Cannot freeze generic ground tiles in hot areas.
+            && !state.areaSection?.isHot
+            && !behavior?.solid && !behavior?.solidMap
+            // Cannot freeze ground when staff is on top of it.
+            && !behavior?.blocksStaff
+            //&& !(behavior?.covered || behavior?.blocksStaff)
+            && !behavior?.pit && !behavior?.ledges && !behavior?.diagonalLedge
+            // Only attackes that hit allies freeze most ground tiles. Attacks from the player should only freeze water tiles
+            // and any ground tiles that are useful to freeze.
+            && (hit.hitAllies
+                || behavior?.isBrittleGround || behavior?.isLava || behavior?.isLavaMap || behavior?.touchHit
+                || behavior?.shallowWater || behavior?.water
+            )
         ) {
             let topLayer: AreaLayer = area.layers[0];
             for (const layer of area.layers) {
@@ -562,7 +580,7 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
             area.checkToRedrawTiles = true;
             resetTileBehavior(area, target);
             //console.log('froze tile', area.behaviorGrid?.[target.y]?.[target.x]);
-        } else if (hit.element === 'fire' && typeof behavior?.elementTiles?.fire !== 'undefined') {
+        } /*else if (hit.element === 'fire' && typeof behavior?.elementTiles?.fire !== 'undefined') {
             for (const layer of area.layers) {
                 const tile = layer.tiles?.[target.y]?.[target.x];
                 const fireTile = tile?.behaviors?.elementTiles?.fire;
@@ -575,8 +593,11 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
             }
             area.checkToRedrawTiles = true;
             resetTileBehavior(area, target);
-        }
+        }*/
+        // Determine if this hit a solid wall that would stop a projectile:
         const direction = (hit.vx || hit.vy) ? getDirection(hit.vx, hit.vy, true) : null;
+
+        // This hit a tile that could be cut so we ignore
         if (behavior?.cuttable <= hit.damage && (!behavior?.low || hit.cutsGround)) {
             // We need to find the specific cuttable layers that can be destroyed.
             for (const layer of area.layers) {
@@ -586,20 +607,24 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
                 }
             }
             combinedResult.hit = true;
-        } else if (
+            continue;
+        }
+        if (
             (
                 (behavior?.cuttable > hit.damage || behavior?.solid)
                 && (!behavior?.low || hit.cutsGround)
                 && (!behavior?.isSouthernWall || (direction !== 'down' && direction !== 'downleft' && direction !== 'downright'))
             )
-            || (direction === 'upleft' && (behavior?.ledges?.down || behavior?.ledges?.right || behavior?.diagonalLedge === 'downright'))
-            || (direction === 'up' && (behavior?.ledges?.down || behavior?.diagonalLedge === 'downleft' || behavior?.diagonalLedge === 'downright'))
-            || (direction === 'upright' && (behavior?.ledges?.down || behavior?.diagonalLedge === 'downleft' || behavior?.ledges?.right))
-            || (direction === 'downleft' && (behavior?.ledges?.up || behavior?.ledges?.right || behavior?.diagonalLedge === 'upright'))
-            || (direction === 'down' && (behavior?.ledges?.up || behavior?.diagonalLedge === 'upleft' || behavior?.diagonalLedge === 'upright'))
-            || (direction === 'downright' && (behavior?.ledges?.up || behavior?.diagonalLedge === 'upleft' || behavior?.ledges?.left))
-            || (direction === 'left' && (behavior?.ledges?.right || behavior?.diagonalLedge === 'downright' || behavior?.diagonalLedge === 'upright'))
-            || (direction === 'right' && (behavior?.ledges?.left || behavior?.diagonalLedge === 'downleft' || behavior?.diagonalLedge === 'upleft'))
+            || (!hit.projectile?.passedLedgeTiles?.find(t => t.x === target.x && t.y === target.y) && (
+                (direction === 'upleft' && (behavior?.ledges?.down || behavior?.ledges?.right || behavior?.diagonalLedge === 'downright'))
+                || (direction === 'up' && (behavior?.ledges?.down || behavior?.diagonalLedge === 'downleft' || behavior?.diagonalLedge === 'downright'))
+                || (direction === 'upright' && (behavior?.ledges?.down || behavior?.diagonalLedge === 'downleft' || behavior?.ledges?.left))
+                || (direction === 'downleft' && (behavior?.ledges?.up || behavior?.ledges?.right || behavior?.diagonalLedge === 'upright'))
+                || (direction === 'down' && (behavior?.ledges?.up || behavior?.diagonalLedge === 'upleft' || behavior?.diagonalLedge === 'upright'))
+                || (direction === 'downright' && (behavior?.ledges?.up || behavior?.diagonalLedge === 'upleft' || behavior?.ledges?.left))
+                || (direction === 'left' && (behavior?.ledges?.right || behavior?.diagonalLedge === 'downright' || behavior?.diagonalLedge === 'upright'))
+                || (direction === 'right' && (behavior?.ledges?.left || behavior?.diagonalLedge === 'downleft' || behavior?.diagonalLedge === 'upleft'))
+            ))
         ) {
             combinedResult.hit = true;
             combinedResult.pierced = false;
@@ -626,8 +651,35 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
             }
         }
     }
+    if (setProjectileLow) {
+        hit.projectile.isHigh = false;
+    } else if (setProjectileHigh) {
+        hit.projectile.isHigh = true;
+    }
 
     return combinedResult;
+}
+
+export function isTargetHit(hitbox: Rect, hit: HitProperties): boolean {
+    if (hit.hitCircle) {
+        const r = hit.hitCircle.r;
+        // Fudge a little by pretending the target is a circle.
+        const fakeRadius = hitbox.w / 4 + hitbox.h / 4;
+        const r2 = (r + fakeRadius) ** 2;
+        const dx = hitbox.x + hitbox.w / 2 - hit.hitCircle.x;
+        const dy = hitbox.y + hitbox.h / 2 - hit.hitCircle.y;
+        return dx * dx + dy * dy < r2;
+    }
+    if (hit.hitRay) {
+        // Fudge a little by pretending the target is a circle.
+        const fakeRadius = hitbox.w / 4 + hitbox.h / 4;
+        const { distance } = distanceToSegment(
+            { x: hitbox.x + hitbox.w / 2, y: hitbox.y + hitbox.h / 2},
+            hit.hitRay
+        );
+        return distance <= (hit.hitRay.r + fakeRadius);
+    }
+    return hit.hitbox && rectanglesOverlap(hitbox, hit.hitbox);
 }
 
 function isObject(object: ObjectInstance | EffectInstance): object is ObjectInstance {
@@ -680,7 +732,10 @@ export function coverTile(
 ): boolean {
     const behavior = area.behaviorGrid?.[ty]?.[tx];
     // For now solid tiles and pits cannot be covered
-    if (behavior?.solid || behavior?.pit || behavior?.covered || behavior?.blocksStaff) {
+    if (behavior?.solid || behavior?.pit || behavior?.covered
+        || behavior?.blocksStaff || behavior?.solidMap
+        || behavior?.diagonalLedge
+    ) {
         return false;
     }
     let topLayer: AreaLayer = area.layers[0];

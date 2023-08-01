@@ -1,11 +1,9 @@
 import {  CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
-import { renderStandardFieldStack } from 'app/render';
+import { renderStandardFieldStack } from 'app/render/renderField';
 import { renderHUD } from 'app/renderHUD';
 import { getTitleOptions } from 'app/state';
 import { drawText } from 'app/utils/simpleWhiteFont';
 import { fillRect, pad } from 'app/utils/index';
-
-import { GameState } from 'app/types';
 
 const WIDTH = 144;
 const ROW_HEIGHT = 20;

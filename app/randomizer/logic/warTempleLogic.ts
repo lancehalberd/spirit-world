@@ -1,13 +1,10 @@
 import {
-    andLogic,
     orLogic,
-    hasBossWeapon,
-    hasGloves, canAvoidBossAttacks,
-    hasSpiritSight, hasWeapon,
+    hasGloves, canBeatIdols,
+    hasSpiritSight, hasTrueSight, hasWeapon,
     logicHash
 } from 'app/content/logic';
 
-import {LogicNode } from 'app/types';
 
 
 const zoneId = 'warTemple';
@@ -100,7 +97,7 @@ export const warTempleNodes: LogicNode[] = [
             // The player can defeat all these enemies using stones now that enemies stay
             // defeated when leaving and returning to rooms.
             {objectId: 'warTemple:0:0x0-money-0', logic: orLogic(hasWeapon, hasGloves)},
-            {objectId: 'warTemple:0:2x0-money-0', logic: orLogic(hasWeapon, hasGloves)},
+            {objectId: 'warTempleMap', logic: orLogic(hasWeapon, hasGloves)},
         ],
         paths: [
             {nodeId: 'warTempleMainEntrance', logic: hasGloves},
@@ -109,8 +106,9 @@ export const warTempleNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'warTempleLock1',
+        checks: [{objectId: 'warTempleHugeMoney', logic: orLogic(hasSpiritSight, hasTrueSight)}],
         paths: [
-            {nodeId: 'warTempleStairs2', logic: hasSpiritSight},
+            {nodeId: 'warTempleStairs2', logic: orLogic(hasSpiritSight, hasTrueSight)},
         ],
         entranceIds: ['warTempleLock1'],
         exits: [
@@ -173,8 +171,8 @@ export const warTempleNodes: LogicNode[] = [
         zoneId,
         nodeId: 'warTempleBoss',
         checks: [
-            {objectId: 'warTempleBoss', logic: andLogic(hasBossWeapon, canAvoidBossAttacks)},
-            {objectId: 'warTemple:2:0x0-astralProjection-0', logic: andLogic(hasBossWeapon, canAvoidBossAttacks)},
+            {objectId: 'warTempleBoss', logic: canBeatIdols},
+            {objectId: 'warTemple:2:0x0-astralProjection-0', logic: canBeatIdols},
         ],
     },
     // Spirit world is only accessible from outside

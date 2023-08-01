@@ -1,10 +1,6 @@
-import { sample } from 'lodash';
-
-import { getAreaSize } from 'app/content/areas';
-import { selectDialogueOption } from 'app/content/dialogue';
+import { objectHash } from 'app/content/objects/objectHash';
 import { snakeAnimations } from 'app/content/enemyAnimations';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { moveActor } from 'app/moveActor';
 import { heroAnimations } from 'app/render/heroAnimations';
 import {
     galAnimations, gal2Animations,
@@ -16,16 +12,15 @@ import {
     vanaraGrayAnimations, vanaraPurpleAnimations,
     vanaraRedAnimations, zoroAnimations,
 } from 'app/render/npcAnimations';
+import { lightningBeastAnimations } from 'app/content/npcs/npcAnimations'
 import { shadowFrame, smallShadowFrame } from 'app/renderActor';
-import { showMessage } from 'app/render/renderMessage';
+import { showMessage } from 'app/scriptEvents';
 import { drawFrame, getFrame } from 'app/utils/animations';
-import { directionMap, getDirection, rotateDirection } from 'app/utils/field';
+import { selectDialogueOption } from 'app/utils/dialogue';
+import { sample } from 'app/utils/index';
+import { moveNPC } from 'app/utils/npc';
+import { directionMap, rotateDirection } from 'app/utils/direction';
 
-import {
-    Actor, ActorAnimations, AreaInstance, GameState, DialogueOption, Direction,
-    Frame, FrameAnimation, Hero, MovementProperties, NPCDefinition,
-    ObjectInstance, ObjectStatus, Rect,
-} from 'app/types';
 
 interface NPCStyleDefinition {
     animations: ActorAnimations
@@ -40,6 +35,9 @@ export const npcStyles = {
         scale: 3,
         shadowOffset: -3,
         flipRight: true,
+    } as NPCStyleDefinition,
+    sleepingLightningBeast: {
+        animations: lightningBeastAnimations,
     } as NPCStyleDefinition,
     gal: {
         animations: galAnimations,
@@ -179,53 +177,7 @@ export const npcBehaviors = {
     }
 }
 
-function moveNPC(state, npc: NPC, dx, dy, movementProperties: MovementProperties): boolean {
-    const { section } = getAreaSize(state);
-    // By default, don't allow the enemy to move towards the outer edges of the screen.
-    if (movementProperties.boundToSection ?? true) {
-        if ((dx < 0 && npc.x + dx < section.x + 16)
-            || (dx > 0 && npc.x + dx + npc.w > section.x + section.w - 16)
-            || (dy < 0 && npc.y < section.y + 16)
-            || (dy > 0 && npc.y + npc.h > section.y + section.h - 16)
-        ) {
-            return false;
-        }
-    }
-    if (npc.flying) {
-        npc.x += dx;
-        npc.y += dy;
-        return true;
-    }
-    const { mx, my } = moveActor(state, npc, dx, dy, movementProperties);
-    return mx !== 0 || my !== 0;
-}
 
-export function moveNPCToTargetLocation(
-    state: GameState,
-    npc: NPC, tx: number, ty: number,
-    animationStyle?: string
-): number {
-    const hitbox = npc.getHitbox(state);
-    const dx = tx - (hitbox.x + hitbox.w / 2), dy = ty - (hitbox.y + hitbox.h / 2);
-    if (animationStyle) {
-        npc.d = getDirection(dx, dy);
-        npc.changeToAnimation(animationStyle)
-    }
-    //enemy.currentAnimation = enemy.enemyDefinition.animations.idle[enemy.d];
-    const mag = Math.sqrt(dx * dx + dy * dy);
-    if (mag > npc.speed) {
-        moveNPC(state, npc, npc.speed * dx / mag, npc.speed * dy / mag, {
-            boundToSection: false,
-            boundToSectionPadding: 0,
-        });
-        return mag - npc.speed;
-    }
-    moveNPC(state, npc, dx, dy, {});
-    return 0;
-}
-
-export type NPCStyle = keyof typeof npcStyles;
-export type NPCBehavior = keyof typeof npcBehaviors;
 
 export class NPC implements Actor, ObjectInstance  {
     area: AreaInstance;
@@ -257,7 +209,7 @@ export class NPC implements Actor, ObjectInstance  {
     showMessage = false;
     dialogueIndex = 0;
     lastDialogueOption: DialogueOption;
-    constructor(definition: NPCDefinition) {
+    constructor(state: GameState, definition: NPCDefinition) {
         this.definition = definition;
         this.d = definition.d || 'down';
         this.x = definition.x;
@@ -376,4 +328,12 @@ export class NPC implements Actor, ObjectInstance  {
             h: frame.h * scale,
         });
     }
+}
+objectHash.npc = NPC;
+
+class _NPC extends NPC {}
+declare global {
+    export type NPCStyle = keyof typeof npcStyles;
+    export type NPCBehavior = keyof typeof npcBehaviors;
+    export interface NPC extends _NPC {}
 }

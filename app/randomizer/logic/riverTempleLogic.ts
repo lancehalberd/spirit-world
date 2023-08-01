@@ -1,10 +1,9 @@
 import {
     andLogic, orLogic, hasReleasedBeasts, canTravelFarUnderWater,
     hasBossWeapon, hasIronBoots,  hasMediumRange,
-    hasFire, hasLightning,
+    hasFire, hasLightning, hasRoll, hasStaff,
 } from 'app/content/logic';
 
-import { LogicNode } from 'app/types';
 
 // The frostBeast flag is set correctly during simulation, so this logic works as expected.
 const canMeltIce = orLogic({requiredFlags: ['frostBeast']}, andLogic(orLogic(hasLightning, hasFire), hasMediumRange));
@@ -45,7 +44,12 @@ export const riverTempleWaterNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'riverTempleWaterMaze2',
-        checks: [{objectId: 'riverTempleSilver', logic: canTravelFarUnderWater}],
+        checks: [{objectId: 'riverTempleSilver', logic:
+            andLogic(canTravelFarUnderWater,
+                // Defeating the frost beast removes the ice spikes.
+                // The staff or roll can be used to pass under the ice spikes.
+                orLogic({requiredFlags: ['frostBeast']}, hasRoll, hasStaff))
+        }],
         paths: [
             {nodeId: 'riverTempleSEArea', logic: canTravelFarUnderWater},
             {nodeId: 'riverTempleSWArea', logic: canTravelFarUnderWater},

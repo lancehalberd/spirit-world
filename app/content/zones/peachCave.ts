@@ -1,6 +1,5 @@
 import { zones } from 'app/content/zones/zoneHash';
 
-import { AreaDefinition } from 'app/types';
 
 const f0_0x0: AreaDefinition = {
     layers: [
@@ -48,7 +47,7 @@ const f0_0x0: AreaDefinition = {
         {
             key: 'glowingGrass',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'peachCave:boss',
+            hasCustomLogic: true, customLogic: 'peachCaveBoss',
             invertLogic: true,
             grid: {
                 w: 32,
@@ -143,7 +142,7 @@ const f0_0x0: AreaDefinition = {
                     [1,1,773,1,1,56,1,1,1,1,1,56,772,764,1,1,1,1,1,1,1,0,1,1,1,773,0,0,0,0,1,1],
                     [1,1,1,1,1,1,1,1,1,1,1,1,1,771,1,1,1,1,1,1,1,767,753,754,770,1,1,1,1,1,1,1],
                     [1,1,54,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,771,762,763,774,1,1,1,1,0,1,1],
-                    [1,1,1,1,56,1,1,1,1,1,1,1,1,1,1,1,1,1,753,754,754,0,1,1,1,1,0,754,753,754,1,1],
+                    [1,1,1,1,56,0,1,1,1,1,1,1,1,1,1,1,1,1,753,754,754,0,1,1,1,1,0,754,753,754,1,1],
                     [1,1,1,1,1,54,1,1,1,1,1,1,1,1,1,1,1,1,762,763,763,767,0,1,1,1,753,763,753,754,1,1],
                     [1,1,1,1,1,54,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,771,753,754,753,770,773,1,753,754,1,1],
                     [1,1,1,1,55,1,1,1,1,0,0,0,0,1,1,1,1,1,1,1,1,1,771,763,762,774,1,0,762,763,1,1],
@@ -175,7 +174,7 @@ const f0_0x0: AreaDefinition = {
         {
             key: 'glowingPlants',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'peachCave:boss',
+            hasCustomLogic: true, customLogic: 'peachCaveBoss',
             invertLogic: true,
             grid: {
                 w: 32,
@@ -344,7 +343,7 @@ const f0_0x0: AreaDefinition = {
         },
     ],
     objects: [
-        {id: "peachCave:0:0x0-waterPot-0", linked: false, spirit: false, status: "normal", x: 336, y: 96, type: "waterPot", hasCustomLogic: true, customLogic: "peachCave:boss", invertLogic: true},
+        {id: "peachCave:0:0x0-waterPot-0", linked: false, spirit: false, status: "normal", x: 336, y: 96, type: "waterPot", hasCustomLogic: true, customLogic: "peachCaveBoss", invertLogic: true},
         {id: "peachCave:0:0x0-door-0", linked: false, spirit: false, status: "normal", x: 64, y: 272, type: "door", d: "up", style: "cavern"},
         {id: "peachCave:0:0x0-weapon-0", linked: false, spirit: false, status: "normal", x: 176, y: 80, type: "chest", lootType: "weapon", lootLevel: 0},
         {id: "peachCave:stairsUp", linked: false, spirit: false, status: "closed", x: 272, y: 32, type: "door", targetZone: "peachCave", targetObjectId: "peachCave:stairsDown", d: "left", style: "cavern", openLogic: {"logicKey":"isRandomizer","isInverted":false}},
@@ -357,29 +356,31 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "peachCave-climber1", x: 336, y: 304, type: "enemy", enemyType: "climbingBeetle", d: "down", params: {}},
         {status: "normal", id: "peachCave-climber3", x: 304, y: 192, type: "enemy", enemyType: "climbingBeetle", d: "down", params: {}},
         {id: "", linked: false, spirit: false, status: "closedEnemy", x: 48, y: 240, type: "door", d: "down", style: "cavern"},
-        {status: "normal", id: "peachCaveSprout1", x: 320, y: 128, type: "vineSprout", customLogic: "peachCave:boss", invertLogic: true},
-        {status: "normal", id: "", x: 112, y: 352, type: "narration", message: "{flag:thornsInstructions}\n{removeCue}", w: 32, h: 144, saveStatus: "never"},
-        {status: "normal", id: "hideChestInstructions", x: 176, y: 96, type: "narration", message: "{removeCue}", w: 16, h: 16, logicKey: "hasWeapon"},
-        {status: "normal", id: "exploreInstructions", x: 320, y: 320, type: "narration", message: "That bug on the vine doesn't look friendly.\n{|}I won't be able to climb with it in the way.\n{|}(Explore the cave to find something to remove the beetle.)", w: 48, h: 32, hasCustomLogic: true, customLogic: "$weapon", invertLogic: true},
+        {status: "normal", id: "peachCaveSprout1", x: 320, y: 128, type: "vineSprout", customLogic: "peachCaveBoss", invertLogic: true},
+        {status: "normal", id: "", x: 144, y: 432, type: "narration", message: "{flag:thornsInstructions}\n{removeCue}", w: 24, h: 64, saveStatus: "never"},
+        {status: "normal", id: "hideChestInstructions", x: 160, y: 88, type: "narration", message: "{addCue: Press [B_WEAPON] to throw the chakram at enemies}", w: 48, h: 48, logicKey: "hasWeapon", delay: 100},
         {status: "normal", id: "thornsInstructions", x: 208, y: 448, type: "narration", message: "I don't like the look of those thorns...\n{|}Maybe I can find another way?", w: 48, h: 48, delay: 500},
         {status: "normal", id: "", x: 384, y: 352, type: "spawnMarker"},
         {status: "normal", id: "", x: 336, y: 256, type: "spawnMarker"},
         {status: "normal", id: "", x: 448, y: 368, type: "spawnMarker"},
         {status: "normal", id: "", x: 432, y: 240, type: "spawnMarker"},
         {status: "normal", id: "peachCave-climber2", x: 464, y: 144, type: "enemy", enemyType: "climbingBeetle", d: "down", params: {}},
-        {status: "normal", id: "chestInstructions", x: 64, y: 208, type: "narration", message: "Hey, a chest!\n{|}Maybe it has something in it that will help.\n{addCue:Face a chest from the south and press [B_PASSIVE] to open it}", w: 32, h: 32},
-        {status: "normal", id: "jumpInstructions2", x: 208, y: 368, type: "narration", message: "It looks like I could jump down over there.\n{addCue: Hold [B_LEFT] against the ledge to jump down}", w: 48, h: 48, delay: 500},
+        {status: "normal", id: "chestInstructions", x: 64, y: 208, type: "narration", message: "Hey, a chest!\n{|}Maybe it has something in it that will help.\n{addCue:Face a chest from the south and press [B_PASSIVE] to open it}", w: 32, h: 32, saveStatus: "never", logicKey: "hasWeapon", invertLogic: true},
+        {status: "normal", id: "jumpInstructions2", x: 208, y: 368, type: "narration", message: "{addCue: Walk off a ledge to jump down}", w: 48, h: 48, delay: 500, saveStatus: "never"},
         {status: "normal", id: "peachCaveSave", x: 304, y: 32, type: "saveStatue"},
+        {status: "normal", id: "", x: 112, y: 352, type: "narration", message: "{flag:thornsInstructions}\n{removeCue}", w: 32, h: 144, saveStatus: "never"},
+        {status: "normal", id: "exploreInstructions", x: 320, y: 320, type: "narration", message: "That bug on the vine doesn't look friendly.\n{|}I won't be able to climb with it in the way.\n{addCue: Search for a way to get past the beetle.}", w: 48, h: 32, hasCustomLogic: true, customLogic: "$weapon", invertLogic: true},
+        {status: "normal", id: "peachCaveSave", x: 288, y: 48, type: "narration", message: "{addCue: Face an object and press [B_PASSIVE] to interact with it.}", w: 48, h: 40, customLogic: "$weapon", saveStatus: "never"},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 32},
+        {x: 0, y: 0, w: 16, h: 16, index: 152, mapId: 'peachCave', floorId: '1F', mapX: 2, mapY: 1},
+        {x: 0, y: 16, w: 16, h: 16, index: 153, mapId: 'peachCave', floorId: '1F', mapX: 2, mapY: 2},
+        {x: 16, y: 0, w: 16, h: 32, index: 154, mapId: 'peachCave', floorId: '1F', mapX: 3, mapY: 1},
     ],
     dark: 25,
     specialBehaviorKey: 'peachCave',
 };
-const f0_1x0: AreaDefinition = {
+const f0_0x1: AreaDefinition = {
     layers: [
         {
             key: 'water',
@@ -583,7 +584,7 @@ const f0_1x0: AreaDefinition = {
         {
             key: 'glowingGrass',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'peachCave:boss',
+            hasCustomLogic: true, customLogic: 'peachCaveBoss',
             invertLogic: true,
             grid: {
                 w: 32,
@@ -710,7 +711,7 @@ const f0_1x0: AreaDefinition = {
         {
             key: 'glowingPlants',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'peachCave:boss',
+            hasCustomLogic: true, customLogic: 'peachCaveBoss',
             invertLogic: true,
             grid: {
                 w: 32,
@@ -886,16 +887,15 @@ const f0_1x0: AreaDefinition = {
         {id: "peachCave:waterEntrance", linked: true, spirit: false, status: "normal", x: 352, y: 496, type: "door", style: "wideEntrance", targetZone: "overworld", targetObjectId: "peachCaveWaterEntrance", d: "down"},
         {status: "normal", id: "peachCavePiece", x: 144, y: 288, type: "chest", lootType: "peachOfImmortalityPiece", lootLevel: 1},
         {status: "normal", id: "", x: 224, y: 112, type: "narration", message: "{flag:movementInstructions}\n{removeCue}", w: 32, h: 64, delay: 2000, saveStatus: "never"},
-        {status: "normal", id: "hideJumpInstructions1", x: 320, y: 128, type: "narration", message: "{removeCue}", w: 32, h: 64, delay: 500},
         {status: "normal", id: "movementInstructions", x: 112, y: 160, type: "narration", message: "This cave is so dark I didn't see that hole until it was too late...\n{|}Huh, there is a strange glow over there.\n{addCue:Use [B_DPAD] to investigate the light to the east}", w: 32, h: 32, delay: 2000},
         {status: "normal", id: "peachCaveFinalNarration", x: 368, y: 416, type: "narration", message: "Hey I know this place...\n{|}This is the cave by the lake, I can swim out over there!", delay: 1200, w: 32, h: 32},
-        {status: "normal", id: "jumpInstructions1", x: 256, y: 112, type: "narration", message: "Wow, the cave is full of glowing plants!\n{|}If I jump down I could use that vine to climb up over there.\n{addCue: Hold [B_RIGHT] against the ledge to jump down}", w: 48, h: 64, delay: 500},
+        {status: "normal", id: "jumpInstructions1", x: 256, y: 112, type: "narration", message: "Wow, the cave is full of glowing plants!\n{|}If I jump down I could use that vine to climb up over there.", w: 48, h: 64, delay: 500},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 16, h: 16, index: 155, mapId: 'peachCave', floorId: '1F', mapX: 2, mapY: 3},
+        {x: 16, y: 0, w: 16, h: 16, index: 156, mapId: 'peachCave', floorId: '1F', mapX: 3, mapY: 3},
+        {x: 0, y: 16, w: 16, h: 16, index: 157, mapId: 'peachCave', floorId: '1F', mapX: 2, mapY: 4},
+        {x: 16, y: 16, w: 16, h: 16, index: 158, mapId: 'peachCave', floorId: '1F', mapX: 3, mapY: 4},
     ],
     dark: 75,
     specialBehaviorKey: 'peachCave',
@@ -948,7 +948,7 @@ const sf0_0x0: AreaDefinition = {
         {
             key: 'glowingGrass',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'peachCave:boss',
+            hasCustomLogic: true, customLogic: 'peachCaveBoss',
             invertLogic: true,
             grid: {
                 w: 32,
@@ -1075,7 +1075,7 @@ const sf0_0x0: AreaDefinition = {
         {
             key: 'glowingPlants',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'peachCave:boss',
+            hasCustomLogic: true, customLogic: 'peachCaveBoss',
             invertLogic: true,
             grid: {
                 w: 32,
@@ -1180,7 +1180,7 @@ const sf0_0x0: AreaDefinition = {
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,28,28,28,28,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -1244,16 +1244,17 @@ const sf0_0x0: AreaDefinition = {
         },
     ],
     objects: [
+        {id: "", linked: false, spirit: false, status: "closed", x: 272, y: 32, type: "door", targetZone: "peachCave", targetObjectId: "peachCave:stairsDown", d: "left", style: "cavern", openLogic: {"logicKey":"isRandomizer","isInverted":false}},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 32},
+        {x: 0, y: 0, w: 16, h: 16, index: 159, mapId: 'peachCaveSpirit', floorId: '1F', mapX: 0, mapY: 0},
+        {x: 0, y: 16, w: 16, h: 16, index: 160, mapId: 'peachCaveSpirit', floorId: '1F', mapX: 0, mapY: 1},
+        {x: 16, y: 0, w: 16, h: 32, index: 161, mapId: 'peachCaveSpirit', floorId: '1F', mapX: 1, mapY: 0},
     ],
 };
-const sf0_1x0: AreaDefinition = {
+const sf0_0x1: AreaDefinition = {
     isSpiritWorld: true,
-    parentDefinition: f0_1x0,
+    parentDefinition: f0_0x1,
     layers: [
         {
             key: 'water',
@@ -1326,15 +1327,15 @@ const sf0_1x0: AreaDefinition = {
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,294,294,291,293,0,0,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,294,294,291,292,296,297,294,0,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,294,291,292,296,296,296,296,293,0,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,294,291,296,296,296,296,296,296,297,0,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,294,291,296,296,296,296,296,296,296,297,0,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,294,295,296,296,296,296,296,296,296,297,0,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,299,300,296,296,296,296,296,296,301,0,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,299,296,296,296,296,301,0,0,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,295,296,296,297,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,294,294,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,294,294,0,0,0,0,294,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,294,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,294,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,294,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,294,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                 ],
             },
             mask: {
@@ -1413,7 +1414,7 @@ const sf0_1x0: AreaDefinition = {
         {
             key: 'glowingGrass',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'peachCave:boss',
+            hasCustomLogic: true, customLogic: 'peachCaveBoss',
             invertLogic: true,
             grid: {
                 w: 32,
@@ -1540,7 +1541,7 @@ const sf0_1x0: AreaDefinition = {
         {
             key: 'glowingPlants',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'peachCave:boss',
+            hasCustomLogic: true, customLogic: 'peachCaveBoss',
             invertLogic: true,
             grid: {
                 w: 32,
@@ -1713,10 +1714,10 @@ const sf0_1x0: AreaDefinition = {
         {id: "peachCaveLowerCrackedDoor", linked: false, spirit: false, status: "cracked", x: 368, y: 272, type: "door", d: "up", style: "cavern"},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 16, h: 16, index: 162, mapId: 'peachCaveSpirit', floorId: '1F', mapX: 0, mapY: 2},
+        {x: 16, y: 0, w: 16, h: 16, index: 163, mapId: 'peachCaveSpirit', floorId: '1F', mapX: 1, mapY: 2},
+        {x: 0, y: 16, w: 16, h: 16, index: 164, mapId: 'peachCaveSpirit', floorId: '1F', mapX: 0, mapY: 3},
+        {x: 16, y: 16, w: 16, h: 16, index: 165, mapId: 'peachCaveSpirit', floorId: '1F', mapX: 1, mapY: 3},
     ],
 };
 const f1_0x0: AreaDefinition = {
@@ -1730,8 +1731,8 @@ const f1_0x0: AreaDefinition = {
                     [775,67,66,67,66,67,66,67,66,67,66,67,66,67,66,77,57,74,66,67,66,67,66,67,66,67,66,67,66,67,77,57],
                     [775,69,68,69,68,69,68,69,68,69,68,69,68,69,92,93,74,88,91,69,68,69,68,69,68,69,68,69,68,92,87,77],
                     [775,775,775,775,775,775,775,775,775,775,775,775,775,775,62,63,90,91,105,775,775,775,775,775,775,775,775,775,775,102,92,63],
-                    [775,775,775,775,775,775,775,775,775,775,775,775,775,775,1,1,775,775,775,775,775,775,775,775,775,775,775,775,775,775,64,65],
-                    [775,775,775,775,775,775,775,775,775,775,775,775,775,775,1,1,775,775,775,775,775,775,775,775,775,775,775,775,775,775,62,63],
+                    [775,775,775,775,775,775,775,775,775,775,775,775,775,775,775,775,775,775,775,775,775,775,775,775,775,775,775,775,775,775,64,65],
+                    [775,775,775,775,775,775,775,775,775,775,775,775,775,775,775,775,775,775,775,775,775,775,775,775,775,775,775,775,775,775,62,63],
                     [775,775,775,775,775,775,775,775,775,775,775,775,775,775,64,65,70,71,775,775,775,775,775,775,775,775,775,775,775,775,64,65],
                     [775,775,775,775,775,775,775,775,775,775,775,775,775,775,62,63,72,73,775,775,775,775,775,775,775,775,775,775,775,775,62,63],
                     [775,775,775,775,775,775,775,775,775,775,775,775,775,775,64,65,70,71,775,775,775,775,775,775,775,775,775,775,775,775,64,65],
@@ -1765,7 +1766,7 @@ const f1_0x0: AreaDefinition = {
         {
             key: 'glowingGrass',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'peachCave:boss',
+            hasCustomLogic: true, customLogic: 'peachCaveBoss',
             invertLogic: true,
             grid: {
                 w: 32,
@@ -1830,11 +1831,11 @@ const f1_0x0: AreaDefinition = {
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,837,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,838,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,837,0,0,0,0,0,0,0,0,0,0],
-                    [0,0,0,0,837,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,838,0,0,0,0,0,0,0,0,0,0],
-                    [0,0,0,0,846,831,832,831,832,831,832,831,832,831,832,831,831,832,831,0,831,837,0,0,0,0,0,0,0,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,838,0,0,0,0,0,0,0,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,837,0,0,0,0,0,0,0,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,837,0,0,0,0,0,0,0,0,0,0,838,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,829,0,0,0,0,0,0,0,0,0,0,0,0,838,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,829,0,0,831,832,831,832,831,831,832,831,0,831,837,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,846,832,845,0,0,0,0,0,0,0,0,0,0,838,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,846,831,832,831,0,0,0,0,0,0,0,0,0,0,0,0,0,837,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,829,0,0,0,0,0,0,0,0,0,0,838,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,829,0,0,0,0,0,0,0,0,0,0,837,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,846,831,0,831,832,842,841,842,841,842,841,838,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -1851,7 +1852,7 @@ const f1_0x0: AreaDefinition = {
         {
             key: 'glowingPlants',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'peachCave:boss',
+            hasCustomLogic: true, customLogic: 'peachCaveBoss',
             invertLogic: true,
             grid: {
                 w: 32,
@@ -1873,14 +1874,14 @@ const f1_0x0: AreaDefinition = {
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,108,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,109,0,0,0,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,0,1,1,109,1,1,1,1,1,0,0],
-                    [0,0,1,1,0,1,1,1,1,109,108,1,1,1,0,0,1,1,1,1,1,0,1,1,1,1,1,1,1,0,0,0],
-                    [0,0,1,1,1,1,109,108,1,1,1,1,1,1,0,0,1,1,1,168,1,0,1,1,1,1,0,0,0,1,0,0],
-                    [0,0,1,0,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,167,1,0,1,1,1,0,0,1,1,1,0,0],
-                    [0,0,108,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,166,1,0,1,107,106,1,50,1,0,0,0,0],
+                    [0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,0,1,1,109,1,1,1,1,1,0,0],
+                    [0,0,1,1,0,1,1,1,0,1,108,1,1,1,0,0,1,1,1,1,1,0,1,1,1,1,1,1,1,0,0,0],
+                    [0,0,1,1,0,1,1,1,0,109,1,1,1,1,0,0,1,1,1,168,1,0,1,1,1,1,0,0,0,1,0,0],
+                    [0,0,1,1,0,1,109,1,1,1,1,1,1,1,1,0,1,1,1,167,1,0,1,1,1,0,0,1,1,1,0,0],
+                    [0,0,1,1,1,1,0,0,1,1,1,1,1,1,0,0,1,1,1,166,1,0,1,107,106,1,50,1,0,0,0,0],
                     [0,0,1,1,1,1,1,1,1,1,0,1,108,1,0,0,1,1,1,165,1,0,1,106,107,1,1,0,0,1,0,0],
-                    [0,0,1,1,1,1,1,1,1,1,0,1,1,1,0,0,1,1,1,1,1,0,1,1,1,0,0,0,1,1,0,0],
-                    [0,0,1,1,1,1,108,1,1,109,1,1,168,108,1,1,1,1,1,1,0,0,1,0,0,0,1,1,1,1,0,0],
+                    [0,0,1,1,1,1,1,1,1,1,0,1,1,108,0,0,1,1,1,1,1,0,1,1,1,0,0,0,1,1,0,0],
+                    [0,0,1,1,1,1,108,1,1,109,1,1,168,1,1,1,1,1,1,1,0,0,1,0,0,0,1,1,1,1,0,0],
                     [0,0,108,1,1,1,1,1,1,1,1,1,167,1,1,1,1,1,1,1,1,1,1,1,1,1,107,106,1,1,0,0],
                     [0,0,1,1,107,106,1,1,1,1,1,1,166,1,1,1,1,1,1,1,1,1,0,0,1,1,106,107,1,1,0,0],
                     [0,1,1,1,106,107,1,1,1,1,1,1,165,1,1,1,1,1,1,1,1,1,1,0,0,0,1,108,1,1,0,0],
@@ -1914,13 +1915,13 @@ const f1_0x0: AreaDefinition = {
                     [1,0,0,1,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,1,1,1,0,1,1,1,1,1,1],
                     [1,753,753,754,753,754,753,754,753,754,753,754,753,754,753,754,753,754,753,754,753,0,1,1,1,0,1,56,1,1,1,1],
                     [1,753,753,754,753,754,753,754,753,754,753,754,753,754,753,754,753,754,753,754,753,0,1,1,1,0,1,1,1,1,1,1],
-                    [1,754,753,754,770,763,762,763,762,763,762,763,762,763,762,763,762,763,762,763,763,0,1,1,0,1,1,1,1,1,1,1],
-                    [1,754,753,754,773,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,54,1,1],
-                    [1,763,762,763,0,1,0,0,0,0,1,1,1,1,1,1,1,1,1,0,1,0,1,1,1,1,55,1,55,1,1,1],
-                    [1,1,1,0,768,754,753,754,753,754,754,754,754,754,754,754,753,754,753,754,754,0,1,1,1,56,1,1,1,1,1,1],
-                    [1,1,0,0,768,754,754,754,754,754,770,763,762,763,762,763,762,763,762,763,763,0,1,0,0,1,50,1,56,1,1,1],
-                    [1,1,0,1,771,763,762,763,762,763,773,0,0,1,1,1,1,1,1,0,0,0,1,0,0,1,1,1,1,1,1,1],
-                    [1,1,0,1,1,1,1,1,1,1,0,1,0,0,1,1,1,1,1,1,0,0,1,0,1,54,56,1,1,1,1,1],
+                    [1,754,753,754,770,754,754,754,762,763,762,763,762,763,762,763,762,763,762,763,763,0,1,1,0,1,1,1,1,1,1,1],
+                    [1,754,753,754,770,754,754,754,0,0,0,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,54,1,1],
+                    [1,754,753,754,770,763,763,762,0,0,1,1,1,1,1,1,1,1,1,0,1,0,1,1,1,1,55,1,55,1,1,1],
+                    [1,754,753,754,773,1,1,1,0,0,0,754,754,754,754,754,753,754,753,754,754,0,1,1,1,56,1,1,1,1,1,1],
+                    [1,763,762,763,0,1,0,0,751,754,770,763,762,763,762,763,762,763,762,763,763,0,1,0,0,1,50,1,56,1,1,1],
+                    [1,1,0,1,768,754,753,754,754,754,774,0,0,1,1,1,1,1,1,0,0,0,1,0,0,1,1,1,1,1,1,1],
+                    [1,1,0,1,771,763,762,763,762,763,0,1,0,0,1,1,1,1,1,1,0,0,1,0,1,54,56,1,1,1,1,1],
                     [1,1,0,0,1,1,0,0,0,0,0,1,0,0,0,0,1,1,1,1,1,0,1,56,1,1,1,1,1,1,1,1],
                     [1,1,0,0,1,1,0,1,0,0,768,754,754,754,754,754,754,754,754,754,754,1,1,1,1,1,0,0,1,1,1,1],
                     [1,1,1,0,0,0,0,1,1,1,771,763,763,763,762,763,763,762,763,762,763,1,54,1,1,1,0,0,1,1,1,1],
@@ -2064,27 +2065,27 @@ const f1_0x0: AreaDefinition = {
         {id: "peachCave:1:0x0-door-0", linked: false, spirit: false, status: "normal", x: 256, y: 48, type: "door", d: "left"},
         {id: "peachCave:1:0x0-door-1", linked: false, spirit: false, status: "closedEnemy", x: 224, y: 48, type: "door", d: "right"},
         {id: "peachCave:stairsDown", linked: false, spirit: false, status: "normal", x: 240, y: 416, type: "door", targetZone: "peachCave", targetObjectId: "peachCave:stairsUp", d: "right", style: "cavern"},
-        {id: "peachCave:1:0x0-waterPot-0", linked: false, spirit: false, status: "normal", x: 64, y: 272, type: "waterPot", hasCustomLogic: true, customLogic: "peachCave:boss", invertLogic: true},
-        {id: "peachCave:1:0x0-beetleHorned-0", linked: false, spirit: false, status: "normal", x: 48, y: 352, type: "enemy", enemyType: "beetleHorned"},
+        {status: "normal", id: "peachCave:1:0x0-waterPot-0", x: 64, y: 304, type: "waterPot"},
+        {id: "peachCave:1:0x0-beetleHorned-0", linked: false, spirit: false, status: "normal", x: 32, y: 368, type: "enemy", enemyType: "beetleHorned"},
         {id: "peachCave:1:0x0-beetleWinged-0", linked: false, spirit: false, status: "normal", x: 96, y: 272, type: "enemy", enemyType: "beetleWinged"},
-        {id: "peachCave:1:0x0-beetleWinged-1", linked: false, spirit: false, status: "normal", x: 192, y: 288, type: "enemy", enemyType: "beetleWinged"},
-        {id: "peachCave:1:0x0-beetleWinged-2", linked: false, spirit: false, status: "normal", x: 320, y: 288, type: "enemy", enemyType: "beetleWinged"},
+        {id: "peachCave:1:0x0-beetleWinged-1", linked: false, spirit: false, status: "normal", x: 144, y: 288, type: "enemy", enemyType: "beetleWinged"},
+        {id: "peachCave:1:0x0-beetleWinged-2", linked: false, spirit: false, status: "normal", x: 352, y: 320, type: "enemy", enemyType: "beetleWinged"},
         {id: "peachCave:1:0x0-beetleWinged-3", linked: false, spirit: false, status: "normal", x: 400, y: 400, type: "enemy", enemyType: "beetleWinged"},
-        {id: "peachCave:boss", linked: false, spirit: false, status: "normal", x: 96, y: 32, type: "boss", enemyType: "beetleBoss", lootType: "empty"},
-        {status: "normal", id: "peachCaveSprout2", x: 48, y: 304, type: "vineSprout", customLogic: "peachCave:boss", invertLogic: true},
-        {status: "normal", id: "peachCave:fullPeach", x: 120, y: 99, type: "loot", lootType: "peachOfImmortality", lootLevel: 1, hasCustomLogic: true, customLogic: "peachCave:boss"},
+        {id: "peachCaveBoss", linked: false, spirit: false, status: "normal", x: 96, y: 32, type: "boss", enemyType: "beetleBoss", lootType: "empty"},
+        {status: "normal", id: "peachCaveSprout2", x: 48, y: 336, type: "vineSprout", customLogic: "peachCaveBoss", invertLogic: true},
+        {status: "normal", id: "peachCave:fullPeach", x: 120, y: 99, type: "loot", lootType: "peachOfImmortality", lootLevel: 1, hasCustomLogic: true, customLogic: "peachCaveBoss"},
         {status: "normal", id: "peachCave:1:0x0-luckyBeetle-0", x: 384, y: 144, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 16, h: 16, index: 166, mapId: 'peachCave', floorId: '2F', mapX: 2, mapY: 1},
+        {x: 16, y: 0, w: 16, h: 16, index: 167, mapId: 'peachCave', floorId: '2F', mapX: 3, mapY: 1},
+        {x: 0, y: 16, w: 16, h: 16, index: 168, mapId: 'peachCave', floorId: '2F', mapX: 2, mapY: 2},
+        {x: 16, y: 16, w: 16, h: 16, index: 169, mapId: 'peachCave', floorId: '2F', mapX: 3, mapY: 2},
     ],
     dark: 50,
     specialBehaviorKey: 'peachCave',
 };
-const f1_1x0: AreaDefinition = {
+const f1_0x1: AreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -2213,19 +2214,19 @@ const f1_1x0: AreaDefinition = {
     ],
     objects: [
         {id: "peachCaveUpperCrackedDoor", linked: false, spirit: false, status: "cracked", x: 256, y: 96, type: "door", d: "left", style: "cave"},
-        {id: "peachCave:pitB", linked: false, spirit: false, status: "normal", x: 368, y: 416, type: "pitEntrance", targetZone: "peachCave", targetObjectId: "peachCave:markerB"},
+        {id: "peachCave:pitB", linked: false, spirit: false, status: "normal", x: 368, y: 416, type: "pitEntrance", targetZone: "peachCave", targetObjectId: "peachCave:markerB", style: "default"},
         {id: "peachCave:pitA", linked: false, spirit: false, status: "normal", x: 112, y: 160, type: "pitEntrance", targetZone: "peachCave", targetObjectId: "peachCave:markerA"},
         {id: "peachCaveTopEntrance", linked: false, spirit: false, status: "normal", x: 112, y: 480, type: "door", targetZone: "overworld", targetObjectId: "peachCaveTopEntrance", d: "down", style: "cave"},
         {id: "peachCave:1:0x1-door-2", linked: false, spirit: false, status: "normal", x: 112, y: 224, type: "door", targetObjectId: "peachCave:0:0x0-door-0", d: "down"},
         {id: "peachCave:1:0x1-door-3", linked: false, spirit: false, status: "normal", x: 112, y: 256, type: "door", targetObjectId: "peachCave:0:0x0-door-0", d: "up"},
         {id: "peachCaveUpperCrackedDoor", linked: false, spirit: false, status: "cracked", x: 224, y: 96, type: "door", targetObjectId: "peachCave:0:0x0-door-0", d: "right", style: "cave"},
-        {status: "normal", id: "pitInstructions", x: 336, y: 384, type: "narration", message: "It looks like jumping down this hole is my only option.\n{|}Here we go again...\n{|}(Walk into the large hole to drop down to somewhere new)", delay: 0, w: 80, h: 80},
+        {status: "normal", id: "pitInstructions", x: 336, y: 384, type: "narration", message: "It looks like jumping down this hole is my only option.\n{|}Here we go again...\n{addCue: Fall into the large hole to drop down to somewhere new}", delay: 0, w: 80, h: 80},
         {status: "normal", id: "peachCaveSilver", x: 342, y: 74, type: "loot", lootType: "silverOre", lootLevel: 1},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 32},
+        {x: 0, y: 0, w: 16, h: 16, index: 170, mapId: 'peachCave', floorId: '2F', mapX: 2, mapY: 3},
+        {x: 0, y: 16, w: 16, h: 16, index: 171, mapId: 'peachCave', floorId: '2F', mapX: 2, mapY: 4},
+        {x: 16, y: 0, w: 16, h: 32, index: 172, mapId: 'peachCave', floorId: '2F', mapX: 3, mapY: 3},
     ],
     dark: 100,
     specialBehaviorKey: 'peachCave',
@@ -2278,7 +2279,7 @@ const sf1_0x0: AreaDefinition = {
         {
             key: 'glowingGrass',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'peachCave:boss',
+            hasCustomLogic: true, customLogic: 'peachCaveBoss',
             invertLogic: true,
             grid: {
                 w: 32,
@@ -2364,7 +2365,7 @@ const sf1_0x0: AreaDefinition = {
         {
             key: 'glowingPlants',
             drawPriority: 'background',
-            hasCustomLogic: true, customLogic: 'peachCave:boss',
+            hasCustomLogic: true, customLogic: 'peachCaveBoss',
             invertLogic: true,
             grid: {
                 w: 32,
@@ -2576,13 +2577,13 @@ const sf1_0x0: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 16, h: 16, index: 173, mapId: 'peachCaveSpirit', floorId: '2F', mapX: 0, mapY: 0},
+        {x: 16, y: 0, w: 16, h: 16, index: 174, mapId: 'peachCaveSpirit', floorId: '2F', mapX: 1, mapY: 0},
+        {x: 0, y: 16, w: 16, h: 16, index: 175, mapId: 'peachCaveSpirit', floorId: '2F', mapX: 0, mapY: 1},
+        {x: 16, y: 16, w: 16, h: 16, index: 176, mapId: 'peachCaveSpirit', floorId: '2F', mapX: 1, mapY: 1},
     ],
 };
-const sf1_1x0: AreaDefinition = null;
+const sf1_0x1: AreaDefinition = null;
 zones.peachCave = {
     key: 'peachCave',
     underwaterKey: 'peachCaveWater',
@@ -2590,21 +2591,21 @@ zones.peachCave = {
         {
             grid: [
                 [f0_0x0,],
-                [f0_1x0,],
+                [f0_0x1,],
             ],
             spiritGrid: [
                 [sf0_0x0,],
-                [sf0_1x0,],
+                [sf0_0x1,],
             ],
         },
         {
             grid: [
                 [f1_0x0,],
-                [f1_1x0,],
+                [f1_0x1,],
             ],
             spiritGrid: [
                 [sf1_0x0,],
-                [sf1_1x0,],
+                [sf1_0x1,],
             ],
         },
     ],

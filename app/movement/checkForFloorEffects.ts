@@ -1,14 +1,26 @@
-import { destroyTile, } from 'app/content/areas';
+import { destroyTile } from 'app/utils/destroyTile';
+import { directionMap } from 'app/utils/direction';
 import { boxesIntersect } from 'app/utils/index';
 
-import { GameState, Hero } from 'app/types';
 
 export function checkForFloorEffects(state: GameState, hero: Hero) {
     if (!hero.area) {
         return;
     }
+    hero.groundHeight = 0;
+    const hitbox = hero.getHitbox(state);
+    for (const entity of [...hero.area.objects, ...hero.area.effects]) {
+        if (!(entity.behaviors?.groundHeight > hero.groundHeight)) {
+            continue;
+        }
+        // The padding here needs to match any used for other interactions with this object,
+        // in particular, movingPlatform padding should match this.
+        if (boxesIntersect(entity.getHitbox(state), hitbox)) {
+            hero.groundHeight = entity.behaviors?.groundHeight;
+        }
+    }
+    hero.z = Math.max(hero.z, hero.groundHeight);
     const tileSize = 16;
-    const hitbox = hero.getHitbox(state)
 
     let leftColumn = Math.floor((hero.x + 4) / tileSize);
     let rightColumn = Math.floor((hero.x + hero.w - 5) / tileSize);
@@ -19,20 +31,20 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
     // We don't want a player to be able to walk in between pits without falling, so the character is forced to fall
     // any time all four corners are over pits.
     hero.wading = hero.z <= 0;
-    hero.swimming = hero.action !== 'roll' && hero.z <= 0;
-    hero.slipping = hero.equipedBoots === 'cloudBoots';
+    hero.swimming = hero.action !== 'roll' && hero.action !== 'preparingSomersault' && hero.z <= 0;
+    hero.slipping = hero.equippedBoots === 'cloudBoots';
     let fallingTopLeft = false, fallingTopRight = false, fallingBottomLeft = false, fallingBottomRight = false;
     let startClimbing = false;
-    hero.groundHeight = 0;
     // Apply floor effects from objects/effects.
     for (const entity of [...hero.area.objects, ...hero.area.effects]) {
-        if (entity.getHitbox && entity.behaviors?.groundHeight > hero.groundHeight) {
-            if (boxesIntersect(entity.getHitbox(state), hitbox)) {
-                hero.groundHeight = entity.behaviors.groundHeight;
+        if (entity.getHitbox && (entity.behaviors?.groundHeight || 0) >= hero.z) {
+            if (entity.behaviors?.slippery && boxesIntersect(entity.getHitbox(state), hitbox)) {
+                hero.slipping = hero.slipping || (!hero.isAstralProjection && !hero.isInvisible && hero.equippedBoots !== 'ironBoots');
             }
         }
     }
     hero.canFloat = true;
+    hero.isOverClouds = false;
     for (let row = topRow; row <= bottomRow; row++) {
         for (let column = leftColumn; column <= rightColumn; column++) {
             let behaviors = behaviorGrid[row]?.[column];
@@ -85,12 +97,15 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
             if (!behaviors.water || behaviors.solid) {
                 hero.swimming = false;
             }
-            if (behaviors.slippery && hero.equipedBoots !== 'ironBoots') {
-                hero.slipping = !hero.isAstralProjection && !hero.isInvisible;
+            if (behaviors.slippery && hero.equippedBoots !== 'ironBoots') {
+                hero.slipping = hero.slipping || (!hero.isAstralProjection && !hero.isInvisible);
             }
             // Clouds boots are not slippery when walking on clouds.
-            if (behaviors.cloudGround && hero.equipedBoots === 'cloudBoots') {
+            if (behaviors.cloudGround && hero.equippedBoots === 'cloudBoots') {
                 hero.slipping = false;
+            }
+            if (behaviors.cloudGround) {
+                hero.isOverClouds = true;
             }
             if (!behaviors.shallowWater && !behaviors.water) {
                 hero.wading = false;
@@ -100,12 +115,12 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
                 hero.canFloat = false;
             }
             if (behaviors.isLava && hero.z <= 0) {
-                hero.onHit(state, { damage: 8, element: 'fire' });
+                hero.onHit(state, { damage: 4, element: 'fire' });
             }
             // Lava is like a pit for the sake of cloud walking boots sinking over them, but it damages
             // like normal damaging ground rather than a pit. This was done because there were many instances
             // it was difficult to reset the player's position when transition screens over lava.
-            if (behaviors.pit || (behaviors.cloudGround && hero.equipedBoots !== 'cloudBoots')) {
+            if (behaviors.pit || (behaviors.cloudGround && hero.equippedBoots !== 'cloudBoots')) {
                 const tileIsUp = row < bottomRow;
                 const tileIsDown = row > topRow;
                 const tileIsLeft = column < rightColumn;
@@ -138,7 +153,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
             }
         }
     }
-    if (hero.swimming && hero.equipedBoots === 'cloudBoots') {
+    if (hero.swimming && hero.equippedBoots === 'cloudBoots') {
         hero.swimming = false;
         hero.wading = true;
     }
@@ -155,14 +170,38 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
     if (hero.isOverPit && !state.nextAreaSection && !state.nextAreaInstance) {
         if (hero.z <= 0 && hero.action !== 'roll') {
             let behaviors = behaviorGrid[Math.round(hero.y / tileSize)]?.[Math.round(hero.x / tileSize)];
-            if (behaviors?.cloudGround && hero.equipedBoots === 'cloudBoots') {
+            if (behaviors?.cloudGround && hero.equippedBoots === 'cloudBoots') {
                 // Do nothing.
             } else {
                 hero.throwHeldObject(state);
                 hero.heldChakram?.throw(state);
                 hero.action = 'falling';
+                //hero.isOverClouds = !!behaviors?.cloudGround && !behaviors.diagonalLedge;
                 hero.x = Math.round(hero.x / tileSize) * tileSize;
                 hero.y = Math.round(hero.y / tileSize) * tileSize;
+                if (behaviors?.cloudGround) {
+                    hero.y -= 4;
+                    // This will play the cloud poof animation over the hero as they fall.
+                    hero.isOverClouds = true;
+                    if (behaviors?.diagonalLedge) {
+                        hero.x -= directionMap[behaviors?.diagonalLedge][0] * 12;
+                        hero.y -= directionMap[behaviors?.diagonalLedge][1] * 12;
+                    }
+                    if (behaviors?.ledges?.up) {
+                        hero.y += 8;
+                    }
+                    if (behaviors?.ledges?.down) {
+                        hero.y -= 8;
+                    }
+                    if (behaviors?.ledges?.left) {
+                        hero.x += 8;
+                    }
+                    if (behaviors?.ledges?.right) {
+                        hero.x -= 8;
+                    }
+                } else {
+                    hero.isOverClouds = false;
+                }
                 hero.animationTime = 0;
             }
         }

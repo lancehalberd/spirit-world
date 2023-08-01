@@ -1,19 +1,14 @@
-import { createCanvasAndContext } from 'app/dom';
-import { addObjectToArea, removeObjectFromArea } from 'app/content/areas';
 import { addParticleSpray } from 'app/content/effects/animationEffect';
-import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
+import { objectHash } from 'app/content/objects/objectHash';
 import { crystalParticles } from 'app/content/tiles';
 import { Staff } from 'app/content/objects/staff';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, drawFrameAt, getFrame } from 'app/utils/animations';
-import { coverTile, getTileBehaviorsAndObstacles } from 'app/utils/field';
+import { createCanvasAndContext } from 'app/utils/canvas';
+import { coverTile, getTileBehaviors, getTileBehaviorsAndObstacles } from 'app/utils/field';
 import { boxesIntersect } from 'app/utils/index';
+import { addObjectToArea, getObjectStatus, removeObjectFromArea, saveObjectStatus  } from 'app/utils/objects';
 import Random from 'app/utils/Random';
-import {
-    AreaInstance, DrawPriority, FrameWithPattern, GameState,
-    ObjectInstance, ObjectStatus, BeadCascadeDefinition, SimpleObjectDefinition,
-    Rect,
-} from 'app/types';
 
 const crystalBeadsBasePattern = createAnimation('gfx/effects/beadcascadeunder.png', {w: 16, h: 16},
     {cols: 8, duration: 3});
@@ -57,6 +52,11 @@ export class BeadCascade implements ObjectInstance {
     h: number = 16;
     isObject = <const>true;
     status: ObjectStatus = 'normal';
+    // This flag is used to toggle between on and off states when the cascade is timed
+    // to turn off/on after a certain duration.
+    // In comparision, when status === 'off', the object is off permanently unless an
+    // external event updates its status.
+    isOn: boolean = true;
     animationTime = 0;
     constructor(state: GameState, definition: BeadCascadeDefinition) {
         this.definition = definition;
@@ -64,7 +64,7 @@ export class BeadCascade implements ObjectInstance {
         this.y = definition.y;
         this.status = this.definition.status;
         if (getObjectStatus(state, this.definition)) {
-            this.status = 'normal';
+            this.status = (this.definition.status === 'normal') ? 'hidden' : 'normal';
         }
     }
     add(state: GameState, area: AreaInstance) {
@@ -83,24 +83,42 @@ export class BeadCascade implements ObjectInstance {
     getHitbox(state: GameState) {
         return this;
     }
-    onActivate(state: GameState) {
-        this.status = 'normal';
+    isRunning(state: GameState): boolean {
+        return this.status === 'normal' && this.isOn;
+    }
+    onActivate(state: GameState): boolean {
+        if (this.definition.status !== 'normal') {
+            this.status = 'normal';
+            this.animationTime = 0;
+        } else {
+            this.status = 'hidden';
+        }
+        saveObjectStatus(state, this.definition, this.definition.status !== this.status);
+        return true;
+    }
+    onDeactivate(state: GameState): boolean {
+        this.status = this.definition.status;
+        saveObjectStatus(state, this.definition, this.definition.status !== this.status);
+        return false;
+    }
+    turnOn(state: GameState) {
+        this.isOn = true;
         this.animationTime = 0;
     }
-    onDeactivate(state: GameState) {
-        this.status = 'hidden';
+    turnOff(state: GameState) {
+        this.isOn = false;
         this.animationTime = 0;
     }
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;
-        if (this.status !== 'normal') {
+        if (!this.isRunning(state)) {
             if (this.definition.offInterval && this.animationTime >= this.definition.offInterval) {
-                this.onActivate(state);
+                this.turnOn(state);
             }
             return;
         }
         if (this.definition.onInterval && this.animationTime >= this.definition.onInterval) {
-            this.onDeactivate(state);
+            this.turnOff(state);
         }
         const { objects } = getTileBehaviorsAndObstacles(
             state, this.area, {x: this.x + 8, y: this.y + 2},
@@ -148,6 +166,13 @@ export class BeadGrate implements ObjectInstance {
         }
         this.animationTime = 1000;
     }
+    isUnderObject(state: GameState): boolean {
+        if (!this.area) {
+            return false;
+        }
+        const {tileBehavior} = getTileBehaviors(state, this.area, {x: this.x + 8, y: this.y + 8});
+        return tileBehavior.solid || tileBehavior.covered;
+    }
     getHitbox(state: GameState) {
         return this;
     }
@@ -172,6 +197,9 @@ export class BeadGrate implements ObjectInstance {
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
+        if (this.isUnderObject(state)) {
+            return;
+        }
         const animation = this.status === 'normal' ? grateOpenAnimation : grateCloseAnimation;
         let frame = getFrame(animation, this.animationTime);
         drawFrame(context, frame, {...frame, x: this.x, y: this.y});
@@ -215,11 +243,14 @@ export class BeadSection implements ObjectInstance {
     getHitbox(state: GameState) {
         return this;
     }
+    getHitboxForMovingObjects(state: GameState) {
+        return {x: this.x + 10, y: this.y, w: this.w - 20, h: this.h};
+    }
     update(state: GameState) {
         this.animationTime += FRAME_LENGTH;
         const { objects } = getTileBehaviorsAndObstacles(
             state, this.area, {x: this.x + 8, y: this.y},
-            null, null, object => object.definition?.type === 'beadCascade' && object.status === 'normal'
+            null, null, object => object.definition?.type === 'beadCascade' && (object as BeadCascade).isRunning(state)
         );
         const isGrowing = (objects.length > 0);
         if (isGrowing) {
@@ -265,16 +296,16 @@ export class BeadSection implements ObjectInstance {
         // If touching center of player, pull player in and push them south.
         for (const hero of [state.hero, ...state.hero.clones]) {
             if (hero.area === this.area) {
-                const touchingHero = boxesIntersect(hero, this.getHitbox(state))
-                    && hero.action !== 'roll' && hero.z <= 4
+                const touchingHero = boxesIntersect(hero, this.getHitboxForMovingObjects(state))
+                    && hero.action !== 'roll' && hero.action !== 'preparingSomersault' && hero.z <= 4
                     && hero.y + hero.h < this.y + this.h + 4;
-                if (touchingHero && hero.equipedBoots === 'ironBoots') {
+                if (touchingHero && hero.equippedBoots === 'ironBoots') {
                     const x = hero.x + hero.w / 4 + Math.random() * hero.w / 2;
                     addParticleSpray(state, this.area, Random.element(crystalParticles),
                         Math.min(this.x + this.w, Math.max(this.x, x)), hero.y + hero.h, 0);
                 }
-                const shouldPullHero = touchingHero && hero.equipedBoots !== 'ironBoots'&& !this.area.objects.some(object => {
-                    return object instanceof Staff && boxesIntersect(hero, object.getHitbox(state));
+                const shouldPullHero = touchingHero && hero.equippedBoots !== 'ironBoots'&& !this.area.objects.some(object => {
+                    return object instanceof Staff && boxesIntersect(hero.getHitbox(state), object.getHitbox());
                 });
                 if (hero.actionTarget === this && !shouldPullHero) {
                     hero.actionTarget = null;
@@ -301,12 +332,12 @@ export class BeadSection implements ObjectInstance {
                 if (hero.actionTarget === this) {
                     hero.isControlledByObject = true;
                     hero.swimming = true;
-                    if (hero.x < this.x) {
+                    if (hero.x < this.x - 4) {
                         hero.x++;
                         hero.y += 0.75;
                         hero.actionDy = 0.75;
                         hero.d = 'left';
-                    } else if (hero.x + hero.w > this.x + this.w) {
+                    } else if (hero.x + hero.w > this.x + this.w + 4) {
                         hero.x--;
                         hero.y += 0.75;
                         hero.actionDy = 0.75;
@@ -365,4 +396,12 @@ function drawCascade(context: CanvasRenderingContext2D, r: Rect, time: number) {
         }
         h += 4;
     }
+}
+
+objectHash.beadCascade = BeadCascade;
+objectHash.beadGrate = BeadGrate;
+
+class _BeadCascade extends BeadCascade {}
+declare global {
+    export interface BeadCascade extends _BeadCascade {}
 }

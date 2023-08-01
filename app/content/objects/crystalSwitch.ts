@@ -1,23 +1,16 @@
-import {
-    checkIfAllSwitchesAreActivated,
-    deactivateTargets,
-    getObjectStatus,
-    saveObjectStatus,
-} from 'app/content/objects';
-import { specialBehaviorsHash } from 'app/content/specialBehaviors';
+import { objectHash } from 'app/content/objects/objectHash';
+import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame } from 'app/utils/animations';
+import { deactivateTargets, getObjectStatus, saveObjectStatus } from 'app/utils/objects';
+import { checkIfAllSwitchesAreActivated } from 'app/utils/switches';
 
-import {
-    AreaInstance, CrystalSwitchDefinition, DrawPriority, GameState,
-    HitProperties, HitResult, ObjectInstance, ObjectStatus, Rect, SpecialSwitchBehavior,
-} from 'app/types';
 
 const crystalGeometry = {w: 16, h: 20, content: {x: 0, y: 4, w: 16, h: 16, }};
-const [baseFrame, crystalFrame, activeCrystalFrame] = createAnimation('gfx/tiles/activatablecrystal.png', crystalGeometry, {cols: 3}).frames;
-const whiteGlowFrames = createAnimation('gfx/tiles/activatablecrystal.png', crystalGeometry, {x: 3, cols: 3}).frames;
-const redGlowFrames = createAnimation('gfx/tiles/activatablecrystal.png', crystalGeometry, {x: 6, cols: 3}).frames;
-const blueGlowFrames = createAnimation('gfx/tiles/activatablecrystal.png', crystalGeometry, {x: 9, cols: 3}).frames;
+const [baseFrame, crystalFrame, activeCrystalFrame] = createAnimation('gfx/objects/activatablecrystal.png', crystalGeometry, {cols: 3}).frames;
+const whiteGlowFrames = createAnimation('gfx/objects/activatablecrystal.png', crystalGeometry, {x: 3, cols: 3}).frames;
+const redGlowFrames = createAnimation('gfx/objects/activatablecrystal.png', crystalGeometry, {x: 6, cols: 3}).frames;
+const blueGlowFrames = createAnimation('gfx/objects/activatablecrystal.png', crystalGeometry, {x: 9, cols: 3}).frames;
 
 export class CrystalSwitch implements ObjectInstance {
     area: AreaInstance;
@@ -130,4 +123,10 @@ export class CrystalSwitch implements ObjectInstance {
             context.restore();
         }
     }
+}
+objectHash.crystalSwitch = CrystalSwitch;
+
+class _CrystalSwitch extends CrystalSwitch {}
+declare global {
+    export interface CrystalSwitch extends _CrystalSwitch {}
 }

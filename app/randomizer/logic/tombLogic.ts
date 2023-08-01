@@ -1,11 +1,10 @@
 import {
     andLogic, orLogic,
-    canCross2Gaps,
-    hasAstralProjection, hasClone, hasSpiritSight, hasBossWeapon, hasGloves, hasMediumRange,
-    hasRangedPush, hasWeapon, canAvoidBossAttacks,
+    canCross2Gaps, hasSpiritSight, hasTrueSight,
+    hasAstralProjection, hasClone, canBeatGolem, hasGloves, hasMediumRange,
+    hasRangedPush, hasWeapon,
 } from 'app/content/logic';
 
-import {LogicNode} from 'app/types';
 
 const zoneId = 'tomb';
 export const tombNodes: LogicNode[] = [
@@ -14,7 +13,7 @@ export const tombNodes: LogicNode[] = [
         nodeId: 'tombEntrance',
         checks: [
             {objectId: 'tombKey1', logic: hasWeapon},
-            {objectId: 'tombMoney'},
+            {objectId: 'tombMap'},
         ],
         paths: [
             {nodeId: 'tombMiddleHallway', doorId: 'tombLock1'},
@@ -94,12 +93,10 @@ export const tombNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'tombBoss',
-        // Boss has attacks that require roll to dodge.
-        // For harder logic clone throw or teleportation would also work.
         checks: [
-            {objectId: 'tombBoss', logic: andLogic(hasBossWeapon, canAvoidBossAttacks)},
+            {objectId: 'tombBoss', logic: canBeatGolem},
         ],
-        paths: [{ nodeId: 'tombGuardian', logic: andLogic(hasBossWeapon, canAvoidBossAttacks)}],
+        paths: [{ nodeId: 'tombGuardian', logic: canBeatGolem}],
     },
     {
         zoneId,
@@ -110,7 +107,7 @@ export const tombNodes: LogicNode[] = [
         paths: [{ nodeId: 'tombCocoonEntrance', logic: hasGloves}],
         entranceIds: ['tombTeleporter'],
         exits: [
-            {objectId: 'tombTeleporter', logic: hasSpiritSight},
+            {objectId: 'tombTeleporter', logic: orLogic(hasSpiritSight, hasTrueSight)},
         ],
     },
     {

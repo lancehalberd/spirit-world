@@ -1,11 +1,11 @@
 import { Door } from 'app/content/objects/door';
 import { Sign } from 'app/content/objects/sign';
+import { allSections } from 'app/content/sections';
 import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 import { setScript } from 'app/scriptEvents';
 import { textScriptToString } from 'app/render/renderMessage';
 
-import { GameState } from 'app/types';
 
 dialogueHash.elevator = {
     key: 'elevator',
@@ -58,6 +58,9 @@ function getElevatorFloor(state: GameState): number {
 specialBehaviorsHash.elevatorControls = {
     type: 'sign',
     apply(state: GameState, sign: Sign) {
+        this.onRefreshLogic(state, sign);
+    },
+    onRefreshLogic(state: GameState, sign: Sign) {
         const elevatorFalling = !!state.savedState.objectFlags.elevatorFalling;
         // Elevator controls don't work while the elevator is falling.
         if (elevatorFalling) {
@@ -97,13 +100,20 @@ specialBehaviorsHash.elevatorControls = {
     },
 };
 
+const elevatorSectionIndex = 458;
+
 specialBehaviorsHash.elevatorDoor = {
     type: 'door',
     apply(state: GameState, door: Door) {
+        this.onRefreshLogic(state, door);
+    },
+    onRefreshLogic(state: GameState, door: Door) {
         const elevatorFixed = !!state.savedState.objectFlags.elevatorFixed;
         const elevatorDropped = !!state.savedState.objectFlags.elevatorDropped;
         const elevatorClosed = !!state.savedState.objectFlags.elevatorClosed;
         const elevatorFloor = getElevatorFloor(state);
+        // Move the elevator section to the current floor so that the map looks correct.
+        allSections[elevatorSectionIndex].section.floorId = ['B1', '1F', '2F', '3F', '4F', '5F'][elevatorFloor];
         // The interior elevator door.
         if (door.definition.id === 'elevatorDoor') {
             door.changeStatus(state, elevatorClosed ? 'closed' : 'normal');

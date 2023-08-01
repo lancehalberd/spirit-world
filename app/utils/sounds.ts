@@ -1,6 +1,8 @@
 import {Howl} from 'howler';
+import { noteFrequencies } from './noteFrequencies';
 
-import { GameSound, GameState, HowlerProperties, SoundSettings } from 'app/types';
+class _Howl extends Howl {}
+
 
 const sounds = new Map<string, GameSound>();
 window['sounds'] = sounds;
@@ -205,39 +207,38 @@ window['playingTracks'] = playingTracks;
 const musicTracks = {
     // Tracks from Nick
     // Used in various caves
-    caveTheme: {key: 'caveTheme', type: 'bgm', source: 'bgm/Spirit 1.mp3', volume: 10 },
+    caveTheme: {key: 'caveTheme', type: 'bgm', source: 'bgm/Spirit 1.mp3', volume: 20 },
     // Used on the title screen and world map
-    mainTheme: {key: 'mainTheme', type: 'bgm', source: 'bgm/Spirit 4.2_demo.mp3', volume: 5 },
+    mainTheme: {key: 'mainTheme', type: 'bgm', source: 'bgm/Spirit 4.2_demo.mp3', volume: 10 },
     // Used for holy city, but a bit to relaxed for that.
-    waterfallVillageTheme: {key : 'waterfallVillage', type: 'bgm', source: 'bgm/Spirit 21.A_demo.mp3', volume: 5},
-    vanaraForestTheme: {key: 'vanaraForestTheme', type: 'bgm', source: 'bgm/Spirit 16_concept.mp3', volume: 5 },
-    tombTheme: {key: 'tombTheme', type: 'bgm', source: 'bgm/Spirit 5.2_demo.mp3', volume: 5 },
+    waterfallVillageTheme: {key : 'waterfallVillage', type: 'bgm', source: 'bgm/Spirit 21.A_demo.mp3', volume: 10},
+    vanaraForestTheme: {key: 'vanaraForestTheme', type: 'bgm', source: 'bgm/Spirit 16_concept.mp3', volume: 10 },
+    tombTheme: {key: 'tombTheme', type: 'bgm', source: 'bgm/Spirit 5.2_demo.mp3', volume: 10 },
     // Used for Vanara ship dungeons like cocoon, helix and forest temple.
-    cocoonTheme: {key: 'cocoonTheme', type: 'bgm', source: 'bgm/Spirit 6 Demo.mp3', volume: 5 },
-    vanaraDreamTheme: {key: 'vanaraDreamTheme', type: 'bgm', source: 'bgm/Spirit 18_concept.mp3', volume: 5 },
-    helixTheme: {key: 'helixTheme', type: 'bgm', source: 'bgm/Spirit 13.2_demo.mp3', volume: 5 },
-    waterfallTowerTheme: {key: 'waterfallTowerTheme', type: 'bgm', source: 'bgm/Public Surface_concept.mp3', volume: 5 },
-    forgeTheme: {key: 'forgeTheme', type: 'bgm', source: 'bgm/Public Surface.b_concept.mp3', volume: 5 },
-    craterTheme: {key: 'craterTheme', type: 'bgm', source: 'bgm/Fatty Richness_demo.mp3', volume: 5 },
+    cocoonTheme: {key: 'cocoonTheme', type: 'bgm', source: 'bgm/Spirit 6 Demo.mp3', volume: 10 },
+    vanaraDreamTheme: {key: 'vanaraDreamTheme', type: 'bgm', source: 'bgm/Spirit 18_concept.mp3', volume: 10 },
+    helixTheme: {key: 'helixTheme', type: 'bgm', source: 'bgm/Spirit 13.2_demo.mp3', volume: 10 },
+    waterfallTowerTheme: {key: 'waterfallTowerTheme', type: 'bgm', source: 'bgm/Public Surface_concept.mp3', volume: 10 },
+    forgeTheme: {key: 'forgeTheme', type: 'bgm', source: 'bgm/Public Surface.b_concept.mp3', volume: 10 },
+    craterTheme: {key: 'craterTheme', type: 'bgm', source: 'bgm/Fatty Richness_demo.mp3', volume: 10 },
     // Used for the tower after it is activated.
-    towerTheme: {key: 'towerTheme', type: 'bgm', source: 'bgm/Spirit 15.4.mp3', volume: 5 },
-    skyTheme: {key: 'skyTheme', type: 'bgm', source: 'bgm/Spirit 14_demo.mp3', volume: 5 },
+    towerTheme: {key: 'towerTheme', type: 'bgm', source: 'bgm/Spirit 15.4.mp3', volume: 10 },
+    skyTheme: {key: 'skyTheme', type: 'bgm', source: 'bgm/Spirit 14_demo.mp3', volume: 10 },
     // Used for the lake temple
-    lakeTheme: {key: 'lakeTheme', type: 'bgm', source: 'bgm/Spirit 9 Demo.mp3', volume: 5 },
+    lakeTheme: {key: 'lakeTheme', type: 'bgm', source: 'bgm/Spirit 9 Demo.mp3', volume: 10 },
     // Used for holy city, but a bit to relaxed for that.
-    village: {key : 'village', type: 'bgm', source: 'bgm/Spirit 21_demo.mp3', volume: 5},
+    village: {key : 'village', type: 'bgm', source: 'bgm/Spirit 21_demo.mp3', volume: 10},
     // Used for summoner ruins.
-    ruins: {key : 'ruins', type: 'bgm', source: 'bgm/Spirit 22_concept.mp3', volume: 5},
+    ruins: {key : 'ruins', type: 'bgm', source: 'bgm/Spirit 22_concept.mp3', volume: 10},
 
     // Tracks from Leon
     // For War Temple and other dungeons
-    dungeonTheme: {key: 'dungeonTheme', type: 'bgm', source: 'bgm/SpiritQuestSong_Leon1.mp3', volume: 10 },
+    dungeonTheme: {key: 'dungeonTheme', type: 'bgm', source: 'bgm/SpiritQuestSong_Leon1.mp3', volume: 20 },
     idleTheme: {key: 'idleTheme', type: 'bgm', source: 'bgm/IdleMusic.mp3', volume: 20 },
-    bossIntro: {key: 'bossIntro', type: 'bgm', source: 'bgm/SpookyThemeIntro.mp3', volume: 20, nextTrack: 'bossA' },
-    bossA: {key: 'bossA', type: 'bgm', source: 'bgm/SpookyThemeA.mp3', volume: 20, nextTrack: 'bossB' },
-    bossB: {key: 'bossB', type: 'bgm', source: 'bgm/SpookyThemeB.mp3', volume: 20, nextTrack: 'bossA' },
+    bossIntro: {key: 'bossIntro', type: 'bgm', source: 'bgm/SpookyThemeIntro.mp3', volume: 40, nextTrack: 'bossA' },
+    bossA: {key: 'bossA', type: 'bgm', source: 'bgm/SpookyThemeA.mp3', volume: 40, nextTrack: 'bossB' },
+    bossB: {key: 'bossB', type: 'bgm', source: 'bgm/SpookyThemeB.mp3', volume: 40, nextTrack: 'bossA' },
 };
-export type TrackKey = keyof typeof musicTracks;
 export function playTrack(trackKey: TrackKey, timeOffset, soundSettings: SoundSettings, fadeOutOthers = true, crossFade = true) {
     if (!audioUnlocked) {
         return;
@@ -382,14 +383,14 @@ const preloadSounds = () => {
         {key: 'rockShatter', source: 'sfx/3x3_odrive.wav', volume: 15, limit: 2},
         {key: 'doorClose', source: 'sfx/Cube-24_odrive.wav', volume: 10, limit: 1},
         {key: 'doorOpen', source: 'sfx/cube-24.slide_odrive.wav', volume: 10, limit: 1},
-        {key: 'chakramHold', source: 'sfx/chakram 5.wav', volume: 1 / 2, offset: '60:100', limit: 1},
-        {key: 'chakramCharge1', source: 'sfx/chakram 5.wav', volume: 1 / 2, offset: '60:100', limit: 1},
+        {key: 'chakramHold', source: 'sfx/chakram 5.wav', volume: 1, offset: '60:100', limit: 1},
+        {key: 'chakramCharge1', source: 'sfx/chakram 5.wav', volume: 1, offset: '60:100', limit: 1},
         //{key: 'weakChakram', source: 'sfx/chakram 5.wav', volume: 1 / 2, offset: '0:80', limit: 2},
         //{key: 'normalChakram', source: 'sfx/chakram 5.wav', volume: 2, limit: 2},
         //{key: 'strongChakram', source: 'sfx/chakram 5.wav', volume: 5, limit: 2},
-        {key: 'weakChakram', source: 'sfx/chakram sweep.wav', volume: 1, limit: 2},
-        {key: 'normalChakram', source: 'sfx/chakram sweep.wav', volume: 3, limit: 2},
-        {key: 'strongChakram', source: 'sfx/chakram sweep.wav', volume: 5, limit: 2},
+        {key: 'weakChakram', source: 'sfx/chakram sweep.wav', volume: 2, limit: 2},
+        {key: 'normalChakram', source: 'sfx/chakram sweep.wav', volume: 4, limit: 2},
+        {key: 'strongChakram', source: 'sfx/chakram sweep.wav', volume: 8, limit: 2},
         {key: 'secretChime', source: 'sfx/chime 14_1.wav', volume: 4, limit: 2},
         {key: 'bigSuccessChime', source: 'sfx/chime 06.wav', offset: '0:2000', volume: 4, limit: 2},
         {key: 'smallSuccessChime', source: 'sfx/chime 15.wav', offset: '0:2000', volume: 4, limit: 2},
@@ -417,7 +418,7 @@ window['stopTrack'] = stopTrack;
 window['requireSound'] = requireSound;
 
 // Safari uses webkitAudioContext instead of AudioContext.
-var audioContext = new (window.AudioContext || window['webkitAudioContext'])();
+const audioContext: AudioContext = new (window.AudioContext || window['webkitAudioContext'])();
 
 function makeDistortionCurve(amount) {
   var k = typeof amount === 'number' ? amount : 50,
@@ -474,6 +475,34 @@ function playBeeps(frequencies, volume, duration, {smooth=false, swell=false, ta
     oscillator.stop(audioContext.currentTime + duration);
 }
 
+function playBellSound(frequencies, volume, duration) {
+    const combinedGainedNode = audioContext.createGain();
+    combinedGainedNode.connect(audioContext.destination);
+    combinedGainedNode.gain.value = volume;
+
+    const currentTime = audioContext.currentTime;
+    frequencies = Float32Array.from(frequencies);
+    const attackTime = 0.003;
+    let frequencyVolume = 0.5;
+    let fadeDuration = duration - attackTime;
+    for (const frequency of frequencies) {
+        const gainNode = audioContext.createGain();
+        gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+        gainNode.gain.linearRampToValueAtTime(frequencyVolume, audioContext.currentTime + attackTime);
+        gainNode.gain.setValueAtTime(frequencyVolume, audioContext.currentTime + attackTime);
+        gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + attackTime + fadeDuration);
+        const oscillator = audioContext.createOscillator();
+        oscillator.frequency.value = frequency;
+        oscillator.type = 'sine';
+        oscillator.connect(gainNode);
+        oscillator.start(currentTime);
+        oscillator.stop(currentTime + duration);
+        frequencyVolume *= 0.5;
+        fadeDuration *= 0.75;
+        gainNode.connect(combinedGainedNode);
+    }
+}
+
 sounds.set('reflect', {
     play() {
         playBeeps([2000, 8000, 4000], .01, .1, {});
@@ -485,3 +514,24 @@ sounds.set('wand', {
     }
 });
 
+// Frequencies from https://www.computermusicresource.com/Simple.bell.tutorial.html
+const bellFrequencies = [0.56, 0.92, 1.19, 1.71, 2, 2.74, 3, 3.76, 4.07];
+
+function getBellFrequencies(baseFrequency: number): number[] {
+    return bellFrequencies.map(n => baseFrequency * n);
+}
+
+const notes = Object.keys(noteFrequencies);
+
+notes.forEach((noteName) => {
+    sounds.set(`bell${noteName}`, {
+        play() {
+            playBellSound(getBellFrequencies(noteFrequencies[noteName]), 0.2, 2);
+        }
+    });
+});
+
+declare global {
+    export interface Howl extends _Howl {}
+    export type TrackKey = keyof typeof musicTracks;
+}

@@ -1,24 +1,25 @@
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
-import { removeEffectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { createAnimation, drawFrameCenteredAt } from 'app/utils/animations';
+import { removeEffectFromArea } from 'app/utils/effects';
 import { hitTargets } from 'app/utils/field';
 
-import {
-    AreaInstance, DrawPriority, EffectInstance,
-    Frame, GameState, ObjectInstance,
-} from 'app/types';
+
+
+const [iceElement] = createAnimation('gfx/hud/elementhud.png', {w: 20, h: 20}, {x: 2}).frames;
 
 interface Props {
-    x: number,
-    y: number,
-    z?: number,
-    damage?: number,
-    ignoreTargets: Set<ObjectInstance>;
-    vx?: number,
-    vy?: number,
-    vz?: number,
-    az?: number,
-    ttl?: number,
+    x: number
+    y: number
+    z?: number
+    damage?: number
+    ignoreTargets?: Set<ObjectInstance>
+    vx?: number
+    vy?: number
+    vz?: number
+    az?: number
+    ttl?: number
+    hitEnemies?: boolean
 }
 
 export class Frost implements EffectInstance, Props {
@@ -43,18 +44,23 @@ export class Frost implements EffectInstance, Props {
     speed = 0;
     ttl: number;
     animationOffset: number;
-    constructor({x, y, z = 4, vx = 0, vy = 0, vz = 0, az = -0.1, damage = 1, ttl = 400, ignoreTargets}: Props) {
+    hitEnemies: boolean;
+    constructor({x, y, z = 4, vx = 0, vy = 0, vz = 0, az = -0.1, damage = 1, ttl = 400, hitEnemies = false, ignoreTargets}: Props) {
         this.damage = damage;
-        this.x = x;
-        this.y = y;
+        this.x = x - 6;
+        this.y = y - 6;
         this.z = z;
         this.vx = vx;
         this.vy = vy;
         this.vz = vz;
         this.az = az;
         this.ttl = ttl;
-        this.ignoreTargets = ignoreTargets;
+        this.ignoreTargets = ignoreTargets || new Set();
+        this.hitEnemies = hitEnemies;
         this.animationOffset = ((Math.random() * 10) | 0) * 20;
+    }
+    getHitbox() {
+        return this;
     }
     update(state: GameState) {
         this.x += this.vx;
@@ -72,7 +78,7 @@ export class Frost implements EffectInstance, Props {
                 hitbox: this,
                 element: 'ice',
                 hitAllies: true,
-                hitEnemies: true,
+                hitEnemies: this.hitEnemies,
                 hitObjects: true,
                 hitTiles: true,
                 ignoreTargets: this.ignoreTargets,
@@ -83,7 +89,6 @@ export class Frost implements EffectInstance, Props {
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
-        // Sold red circle in a transparent rectangle
         context.fillStyle = 'white';
         context.save();
             context.beginPath();
@@ -95,5 +100,6 @@ export class Frost implements EffectInstance, Props {
             );
             context.fill();
         context.restore();
+        drawFrameCenteredAt(context, iceElement, {x: this.x + this.w / 2, y: this.y + this.h / 2 - this.z, w: 0, h: 0});
     }
 }

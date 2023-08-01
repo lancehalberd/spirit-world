@@ -1,34 +1,32 @@
-import { addEffectToArea, addObjectToArea, enterLocation, getAreaSize, playAreaSound, refreshAreaLogic } from 'app/content/areas';
-import { AnimationEffect } from 'app/content/effects/animationEffect';
-import { getVectorToTarget } from 'app/content/enemies';
+import { refreshAreaLogic } from 'app/content/areas';
+import { addSparkleAnimation } from 'app/content/effects/animationEffect';
+import { LightningAnimationEffect } from 'app/content/effects/lightningAnimationEffect';
 import { Door } from 'app/content/objects/door';
-import { destroyClone } from 'app/content/objects/clone';
 import { Staff } from 'app/content/objects/staff';
 import { CANVAS_HEIGHT, FALLING_HEIGHT, FRAME_LENGTH, GAME_KEY } from 'app/gameConstants';
-import { editingState } from 'app/development/tileEditor';
-import { getCloneMovementDeltas, wasGameKeyPressed } from 'app/keyCommands';
+import { editingState } from 'app/development/editingState';
+import { getCloneMovementDeltas, isGameKeyDown, wasGameKeyPressed } from 'app/userInput';
 import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
-import { moveActor } from 'app/moveActor';
-import { fallAnimation, heroAnimations } from 'app/render/heroAnimations';
-import { saveGame } from 'app/state';
-import { updateCamera } from 'app/updateCamera';
+import { getSectionBoundingBox, moveActor } from 'app/moveActor';
+import { playAreaSound } from 'app/musicController';
+import { cloudPoofAnimation, fallAnimation, heroAnimations } from 'app/render/heroAnimations';
 import { isUnderwater } from 'app/utils/actor';
-import { createAnimation, frameAnimation } from 'app/utils/animations';
+import { destroyClone } from 'app/utils/destroyClone';
+import { addEffectToArea } from 'app/utils/effects';
+import { enterLocation } from 'app/utils/enterLocation';
 import {
     canSomersaultToCoords,
     directionMap,
     getDirection,
     getTileBehaviorsAndObstacles,
     hitTargets,
-    rotateDirection,
 } from 'app/utils/field';
+import { fixCamera } from 'app/utils/fixCamera';
+import { getAreaSize } from 'app/utils/getAreaSize';
 import { boxesIntersect, isObjectInsideTarget, pad } from 'app/utils/index';
-import Random from 'app/utils/Random';
-
-
-import {
-    GameState, Hero, HitProperties, ObjectInstance, StaffTowerLocation,
-} from 'app/types';
+import { addObjectToArea } from 'app/utils/objects';
+import { saveGame } from 'app/utils/saveGame';
+import { getVectorToTarget } from 'app/utils/target';
 
 const rollSpeed = [
     5, 5, 5, 5,
@@ -37,9 +35,7 @@ const rollSpeed = [
     2, 2, 2, 2,
 ];
 
-const regenerationParticles
-    = createAnimation('gfx/tiles/spiritparticlesregeneration.png', {w: 4, h: 4}, {cols: 4, duration: 6}).frames;
-
+let sommersaultCount = 0;
 
 export function updateHeroSpecialActions(this: void, state: GameState, hero: Hero): boolean {
     const isPrimaryHero = hero === state.hero;
@@ -115,14 +111,17 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
     if (hero.action === 'falling' || hero.action === 'sinkingInLava') {
         hero.vx = 0;
         hero.vy = 0;
-        if (hero.animationTime >= fallAnimation.duration) {
+        if (hero.isOverClouds && hero.animationTime >= cloudPoofAnimation.duration) {
+            hero.action = 'fallen';
+            hero.actionFrame = 0;
+        } else if (hero.animationTime >= fallAnimation.duration) {
             hero.action = hero.action === 'falling' ? 'fallen' : 'sankInLava';
             hero.actionFrame = 0;
         }
         return true;
     }
     if (hero.action === 'fallen' || hero.action === 'sankInLava') {
-        if (hero.action === 'fallen' && state.location.zoneKey === 'sky') {
+        if (hero === state.hero && hero.action === 'fallen' && state.location.zoneKey === 'sky') {
             enterLocation(state, {
                 zoneKey: 'overworld',
                 floor: 0,
@@ -155,7 +154,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 if (best) {
                     hero.x = best.x;
                     hero.y = best.y;
-                    updateCamera(state, 512);
+                    fixCamera(state);
                 }
             });
             return true;
@@ -306,8 +305,26 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         if (hero.isUncontrollable) {
             hero.explosionTime += FRAME_LENGTH;
         }
-        hero.z += hero.vz;
-        hero.vz = Math.max(-8, hero.vz - 0.5);
+        const isFloating = isUnderwater(state, hero) && hero.equippedBoots !== 'ironBoots';
+        if (isFloating) {
+            hero.vz *= 0.9;
+            hero.vx *= 0.9;
+            hero.vy *= 0.9;
+            hero.z = Math.min(24, hero.z + hero.vz);
+            if (hero.vz < 0.2) {
+                if (hero.action === 'thrown') {
+                    if (!canSomersaultToCoords(state, hero, hero)) {
+                        destroyClone(state, hero);
+                        return;
+                    }
+                }
+                hero.action = null;
+                hero.vz = 0;
+            }
+        } else {
+            hero.z += hero.vz;
+            hero.vz = Math.max(-8, hero.vz - 0.5);
+        }
         // Clones ignore collisions with heroes/other clones when being thrown or knocked.
         const excludedObjects = new Set<ObjectInstance>([state.hero, ...state.hero.clones]);
         // The hero obeys normal collision detection when being knocked around, but they won't trigger effects
@@ -318,11 +335,11 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             canJump: hero.action === 'thrown' && hero.z >= 12,
             canPassMediumWalls: hero.action === 'thrown' && hero.z >= 12,
             direction: hero.d,
-            boundToSection: hero.action !== 'knockedHard',
+            boundingBox: hero.action !== 'knockedHard' ? getSectionBoundingBox(state, hero) : undefined,
             excludedObjects
         });
         // The astral projection stays 4px off the ground.
-        if (hero.z <= minZ) {
+        if (!isFloating && hero.z <= minZ) {
             if (hero.vz <= -8) {
                 const landingHit: HitProperties = {
                     damage: 1,
@@ -361,29 +378,18 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         hero.action = null;
     }
     if (hero.action === 'usingStaff') {
+        // Pressing either tool button while using the staff will cancel placing it.
+        hero.vx = 0;
+        hero.vy = 0;
+        if (wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL) || wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL)) {
+            hero.canceledStaffPlacement = true;
+        }
         const jumpDuration = heroAnimations.staffJump[hero.d].duration;
         const slamDuration = heroAnimations.staffSlam[hero.d].duration;
        // console.log(hero.animationTime, jumpDuration, slamDuration);
         if (hero.animationTime < jumpDuration - FRAME_LENGTH) {
             hero.vz = 1 - 1 * hero.animationTime / jumpDuration;
             hero.z += hero.vz;
-            const mx = hero.x % 16;
-            const my = hero.y % 16;
-            if (hero.d === 'up' || hero.d === 'down') {
-                if (mx >= 8 && mx < 14) {
-                    hero.x++;
-                }
-                if (mx < 8 && mx > 2) {
-                    hero.x--;
-                }
-            } else {
-                if (my >= 8 && my < 14) {
-                    hero.y++;
-                }
-                if (my < 8 && my > 2) {
-                    hero.y--;
-                }
-            }
         } else if (hero.animationTime === jumpDuration - FRAME_LENGTH) {
             hero.vz = -4;
             hero.z = Math.max(hero.z + hero.vz, minZ);
@@ -408,7 +414,11 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 }
                 for (const object of hero.area.objects) {
                     if (object.definition?.id === 'towerMarker') {
-                        if (isObjectInsideTarget(hitbox, pad(object.getHitbox(state), 6))) {
+                        const objectHitbox = {...object.getHitbox()};
+                        // Make the effective hitbox slightly south of the mark so that
+                        // the player won't be inside the door when they activate the tower.
+                        objectHitbox.y += 6;
+                        if (isObjectInsideTarget(hitbox, pad(objectHitbox, 6))) {
                             onTowerMarker = true;
                             break;
                         }
@@ -418,7 +428,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                     state.savedState.staffTowerLocation = towerLocation as StaffTowerLocation;
                     state.hero.activeTools.staff = 1;
                     refreshAreaLogic(state, hero.area);
-                    saveGame();
+                    saveGame(state);
                     return;
                 }
             }
@@ -426,31 +436,44 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             const staffLevel = state.hero.activeTools.staff;
             const maxLength = staffLevel > 1 ? 64 : 4;
             const staff = new Staff(state, {
-                x: hero.x + 8 + 12 * directionMap[hero.d][0],
-                y: hero.y + 8 + 12 * directionMap[hero.d][1],
+                x: hero.x,
+                y: hero.y,
                 damage: 4 * staffLevel,
                 direction: hero.d,
                 element: hero.element,
                 maxLength,
             });
-            let baseTarget = {
-                x: staff.leftColumn * 16,
-                y: staff.topRow * 16,
-                w: (staff.rightColumn - staff.leftColumn + 1) * 16,
-                h: (staff.bottomRow - staff.topRow + 1) * 16,
-            }
-            if (!staff.invalid) {
+            let baseTarget: Rect = staff.getAttackHitbox();
+            if (!staff.isInvalid && !hero.canceledStaffPlacement) {
                 hero.activeStaff = staff;
                 addObjectToArea(state, state.areaInstance, staff);
-            } else {
+            } else if (staff.staffBonked) {
+                // Staff does no damage, hero is knocked back.
+                const [dx, dy] = directionMap[staff.direction];
+                let vz = 2;
+                if (hero.equippedBoots === 'cloudBoots') {
+                    vz = 3;
+                } else if (hero.equippedBoots === 'ironBoots') {
+                    vz = 1;
+                }
+                hero.knockBack(state, {vx: -2.5*dx, vy: -2.5*dy, vz});
+                state.screenShakes.push({
+                    dx: staffLevel > 1 ? 5 : 2,
+                    dy: staffLevel > 1 ? 5 : 2,
+                    startTime: state.fieldTime,
+                    endTime: state.fieldTime + 350,
+                });
+            } else if (staff.isInvalid) {
                 // Staff hits at least a 3 tile area even if it doesn't get placed.
-                const isVertical = staff.direction === 'up' || staff.direction === 'down';
-                baseTarget = {
-                    x: staff.leftColumn * 16 - (staff.direction === 'left' ? 32 : 0),
-                    y: staff.topRow * 16 - (staff.direction === 'up' ? 32 : 0),
-                    w: isVertical ? 16 : 48,
-                    h: isVertical ? 48 : 16,
-                };
+                if (staff.direction === 'up') {
+                    baseTarget = {x: hero.x, y: hero.y - 48, w: 16, h: 48};
+                } else if (staff.direction === 'down') {
+                    baseTarget = {x: hero.x, y: hero.y + 16, w: 16, h: 48};
+                } else if (staff.direction === 'left') {
+                    baseTarget = {x: hero.x - 48, y: hero.y, w: 48, h: 16};
+                } else if (staff.direction === 'right') {
+                    baseTarget = {x: hero.x + 16, y: hero.y, w: 48, h: 16};
+                }
             }
             playAreaSound(state, state.areaInstance, 'bossDeath');
             hitTargets(state, state.areaInstance, {
@@ -459,15 +482,19 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 hitEnemies: true,
                 knockAwayFromHit: true,
                 isStaff: true,
+                isBonk: staff.staffBonked,
             });
             hitTargets(state, state.areaInstance, {
                 hitbox: baseTarget,
                 hitObjects: true,
                 isStaff: true,
+                isBonk: staff.staffBonked,
             });
-            state.screenShakes.push({
-                dx: 0, dy: staffLevel > 1 ? 5 : 2, startTime: state.fieldTime, endTime: state.fieldTime + 200
-            });
+            if (!staff.staffBonked) {
+                state.screenShakes.push({
+                    dx: 0, dy: staffLevel > 1 ? 5 : 2, startTime: state.fieldTime, endTime: state.fieldTime + 200
+                });
+            }
         } else if (hero.animationTime < jumpDuration + slamDuration) {
              hero.z = Math.max(hero.z + hero.vz, minZ);
         } else if (hero.animationTime >= jumpDuration + slamDuration) {
@@ -476,7 +503,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         return true;
     }
     const isFallingToGround = !isUnderwater(state, hero)
-        && hero.z > minZ && (hero.equipedBoots !== 'cloudBoots' || hero.z > FALLING_HEIGHT);
+        && hero.z > minZ + 2 && (hero.equippedBoots !== 'cloudBoots' || hero.z > FALLING_HEIGHT);
     if (isFallingToGround) {
         hero.action = null;
         hero.z += hero.vz;
@@ -493,97 +520,23 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         return true;
     }
     if (hero.action === 'roll') {
+        // Double pressing roll performs a quick somersault.
         if (wasGameKeyPressed(state, GAME_KEY.ROLL)
             && hero.passiveTools.roll > 1
             && hero.actionFrame > 4
             && state.hero.magic > 0
         ) {
-            state.hero.magic -= 10;
-            // Cloud somersault roll activated by rolling again mid roll.
-            const [dx, dy] = getCloneMovementDeltas(state, hero);
-            hero.d = (dx || dy) ? getDirection(dx, dy) : hero.d;
-            // Default direction is the direction the current roll uses.
-            const defaultDirection = getDirection(hero.actionDx, hero.actionDy, true, hero.d);
-            const direction = getDirection(dx, dy, true, defaultDirection);
-            const moveX = directionMap[direction][0] * 8, moveY = directionMap[direction][1] * 8;
-            const originalArea = hero.area, alternateArea = hero.area.alternateArea;
-            let hitbox = hero.getHitbox(state);
-            const leftD = rotateDirection(direction, 1);
-            const leftDx = directionMap[leftD][0], leftDy = directionMap[leftD][1];
-            const particleCount = 9;
-            for (let i = 0; i < particleCount; i++) {
-                const frame = Random.element(regenerationParticles);
-                // This makes a verticle ring around the axis the player is teleporting,
-                // with some variance, and also moving in the direction of movement.
-                const vx = 2 * leftDx * Math.cos(i * 2 * Math.PI / particleCount) - 0.5 + Math.random() - 2 * dx;
-                const vy = 2 * leftDy * Math.cos(i * 2 * Math.PI / particleCount) - 0.5 + Math.random() - 2 * dy;
-                const vz = 2 * Math.sin(i * 2 * Math.PI / particleCount);
-                const particle = new AnimationEffect({
-                    animation: frameAnimation(frame),
-                    drawPriority: 'sprites',
-                    // These values make the particles implod in a ring.
-                    x: hitbox.x + hitbox.w / 2 + 8 * vx, y: hitbox.y + hitbox.h / 2 + 8 * vy, z: 8 + 12 * vz,
-                    vx: -vx, vy: -vy, vz: -vz,
-                    ttl: 200,
-                });
-                addEffectToArea(state, hero.area, particle);
-            }
-            const lastOpenPosition = {x: hero.x, y: hero.y};
-            // Move 8px at a time 6 times in either area.
-            for (let i = 0; i < 6; i++) {
-                let result = moveActor(state, hero, moveX, moveY, {
-                    canFall: true,
-                    canSwim: true,
-                    direction: hero.d,
-                    boundToSection: true,
-                });
-                if (result.mx || result.my) {
-                    if (canSomersaultToCoords(state, hero, {x: hero.x, y: hero.y})) {
-                        lastOpenPosition.x = hero.x;
-                        lastOpenPosition.y = hero.y;
-                    }
-                    continue;
-                }
-                hero.area = alternateArea;
-                result = moveActor(state, hero, moveX, moveY, {
-                    canFall: true,
-                    canSwim: true,
-                    direction: hero.d,
-                    boundToSection: true,
-                });
-                hero.area = originalArea;
-                if (!result.mx && !result.my) {
-                    break;
-                }
-                if (canSomersaultToCoords(state, hero, {x: hero.x, y: hero.y})) {
-                    lastOpenPosition.x = hero.x;
-                    lastOpenPosition.y = hero.y;
-                }
-            }
-            hero.x = lastOpenPosition.x;
-            hero.y = lastOpenPosition.y;
-            hitbox = hero.getHitbox(state);
-            for (let i = 0; i < particleCount; i++) {
-                const frame = Random.element(regenerationParticles);
-                // This makes a verticle ring around the axis the player is teleporting,
-                // with some variance, and also moving in the direction of movement.
-                const vx = leftDx * Math.cos(i * 2 * Math.PI / particleCount) - 0.5 + Math.random() + 3 * dx;
-                const vy = leftDy * Math.cos(i * 2 * Math.PI / particleCount) - 0.5 + Math.random() + 3 * dy;
-                const vz = Math.sin(i * 2 * Math.PI / particleCount) * 0.7;
-                const particle = new AnimationEffect({
-                    animation: frameAnimation(frame),
-                    drawPriority: 'sprites',
-                    x: hitbox.x + hitbox.w / 2 + vx, y: hitbox.y + hitbox.h / 2 + vy, z: 8 + vz,
-                    vx, vy, vz,
-                    ttl: 400,
-                });
-                addEffectToArea(state, hero.area, particle);
-            }
-            // The fullroll action is 16 frames.
-            hero.actionFrame = 0;
-            hero.animationTime = 0 * FRAME_LENGTH;
-            hero.actionDx = directionMap[direction][0];
-            hero.actionDy = directionMap[direction][1];
+            performSomersault(state, hero);
+            return true;
+        }
+        // Holding roll performs a normal somersaul with preparation.
+        if (isGameKeyDown(state, GAME_KEY.ROLL)
+            && hero.passiveTools.roll > 1
+            && hero.actionFrame === 11
+            && state.hero.magic > 0
+        ) {
+            hero.action = 'preparingSomersault';
+            sommersaultCount = 0;
             return true;
         }
         if (hero.actionFrame >= rollSpeed.length) {
@@ -608,8 +561,30 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         }
         return true;
     }
+    if (hero.action === 'preparingSomersault') {
+        if (!isGameKeyDown(state, GAME_KEY.ROLL)) {
+            hero.action = 'roll';
+            hero.actionFrame = 12;
+            hero.animationTime = 12 * FRAME_LENGTH;
+            return true;
+        }
+        if (sommersaultCount
+            || wasGameKeyPressed(state, GAME_KEY.UP)
+            || wasGameKeyPressed(state, GAME_KEY.DOWN)
+            || wasGameKeyPressed(state, GAME_KEY.LEFT)
+            || wasGameKeyPressed(state, GAME_KEY.RIGHT)
+        ) {
+            sommersaultCount++;
+            if (sommersaultCount < 2) {
+                return true;
+            }
+            performSomersault(state, hero);
+            return true;
+        }
+        return true;
+    }
     if (hero.frozenDuration > 0) {
-        hero.frozenDuration--;
+        hero.frozenDuration -= FRAME_LENGTH;
         hero.vx *= 0.99;
         hero.vy *= 0.99;
         moveActor(state, hero, hero.vx, hero.vy, {
@@ -620,6 +595,115 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         return true;
     }
     return false;
+}
+
+function performSomersault(this: void, state: GameState, hero: Hero) {
+    // Cloud somersault roll activated by rolling again mid roll.
+    const [dx, dy] = getCloneMovementDeltas(state, hero);
+    state.hero.magic -= 10;
+    state.hero.increaseMagicRegenCooldown(500);
+    hero.d = (dx || dy) ? getDirection(dx, dy) : hero.d;
+    // Default direction is the direction the current roll uses.
+    const defaultDirection = getDirection(hero.actionDx, hero.actionDy, true, hero.d);
+    const direction = getDirection(dx, dy, true, defaultDirection);
+    const moveX = directionMap[direction][0] * 8, moveY = directionMap[direction][1] * 8;
+    const originalArea = hero.area, alternateArea = hero.area.alternateArea;
+    let hitbox = hero.getHitbox();
+    const startPosition = {x: hitbox.x + hitbox.w / 2, y: hitbox.y + hitbox.h / 2};
+    const lastOpenPosition = {x: hero.x, y: hero.y};
+    // Move 8px at a time 6 times in either area.
+    for (let i = 0; i < 6; i++) {
+        let result = moveActor(state, hero, moveX, moveY, {
+            canFall: true,
+            canSwim: true,
+            direction: hero.d,
+            boundingBox: getSectionBoundingBox(state, hero),
+        });
+        if (result.mx || result.my) {
+            if (canSomersaultToCoords(state, hero, {x: hero.x, y: hero.y})) {
+                lastOpenPosition.x = hero.x;
+                lastOpenPosition.y = hero.y;
+            }
+            addSparkleAnimation(state, hero.area, pad(hero.getHitbox(), -4), { element: hero.element });
+            continue;
+        }
+        hero.area = alternateArea;
+        result = moveActor(state, hero, moveX, moveY, {
+            canFall: true,
+            canSwim: true,
+            direction: hero.d,
+            boundingBox: getSectionBoundingBox(state, hero),
+        });
+        hero.area = originalArea;
+        if (!result.mx && !result.my) {
+            break;
+        }
+        if (canSomersaultToCoords(state, hero, {x: hero.x, y: hero.y})) {
+            lastOpenPosition.x = hero.x;
+            lastOpenPosition.y = hero.y;
+        }
+        addSparkleAnimation(state, hero.area, pad(hero.getHitbox(), -4), { element: hero.element });
+    }
+    hitbox = hero.getHitbox();
+    const endPosition = {x: hitbox.x + hitbox.w / 2, y: hitbox.y + hitbox.h / 2};
+    const teleportHit: HitProperties = {
+        damage: 5,
+        element: hero.element,
+        hitRay: {
+            x1: startPosition.x, y1: startPosition.y,
+            x2: endPosition.x, y2: endPosition.y,
+            r: 6,
+        },
+        hitTiles: true,
+        hitEnemies: true,
+        hitObjects: true,
+    };
+    hitTargets(state, hero.area, teleportHit);
+    if (hero.element === 'lightning') {
+        addEffectToArea(state, hero.area, new LightningAnimationEffect({
+            ray: teleportHit.hitRay,
+            duration: 100,
+        }));
+    }
+    const landingHit: HitProperties = {
+        damage: 5,
+        element: hero.element,
+        hitCircle: {
+            x: endPosition.x, y: endPosition.y,
+            r: 24,
+        },
+        hitTiles: true,
+        hitEnemies: true,
+        hitObjects: true,
+    };
+    for (let i = 0; i < 8; i++) {
+        const theta = 2 * Math.PI * i / 8;
+        addSparkleAnimation(state, hero.area,
+            {
+                x: endPosition.x + 19 * Math.cos(theta) - 3,
+                y: endPosition.y + 19 * Math.sin(theta) - 3,
+                w: 6, h: 6,
+            },
+            { element: hero.element }
+        );
+    }
+    hitTargets(state, hero.area, landingHit);
+    if (hero.element === 'lightning') {
+        addEffectToArea(state, hero.area, new LightningAnimationEffect({
+            circle: landingHit.hitCircle,
+            duration: 200,
+        }));
+    }
+    hero.x = lastOpenPosition.x;
+    hero.y = lastOpenPosition.y;
+    hitbox = hero.getHitbox(state);
+
+    // The fullroll action is 16 frames.
+    hero.action = 'roll';
+    hero.actionFrame = 0;
+    hero.animationTime = 0 * FRAME_LENGTH;
+    hero.actionDx = directionMap[direction][0];
+    hero.actionDy = directionMap[direction][1];
 }
 
 function isHeroOnOpenTile(this: void, state: GameState, hero: Hero): boolean {

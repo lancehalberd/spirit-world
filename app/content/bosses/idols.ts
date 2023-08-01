@@ -1,15 +1,13 @@
-import { addEffectToArea } from 'app/content/areas';
 import { LightningBolt } from 'app/content/effects/lightningBolt';
 import { FlameWall } from 'app/content/effects/flameWall';
-import {
-    throwIceGrenadeAtLocation,
-} from 'app/content/enemies';
+import { throwIceGrenadeAtLocation } from 'app/content/effects/frostGrenade';
+import { Enemy } from 'app/content/enemy';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { fireIdolAnimations, iceIdolAnimations, lightningIdolAnimations } from 'app/content/enemyAnimations';
-import { rotateDirection } from 'app/utils/field';
+import { rotateDirection } from 'app/utils/direction';
+import { addEffectToArea } from 'app/utils/effects';
 
 
-import { Enemy, GameState, HitProperties, HitResult } from 'app/types';
 
 function onHitIdol(state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
     // Idols take much less damage during their enraged phase.
@@ -27,6 +25,7 @@ enemyDefinitions.stormIdol = {
     animations: lightningIdolAnimations, scale: 1,
     isImmortal: true,
     life: 8, touchDamage: 1, update: updateStormIdol,
+    elementalMultipliers: {'fire': 1.5, 'ice': 1.5},
     immunities: ['lightning'],
     onHit: onHitIdol,
 };
@@ -35,6 +34,7 @@ enemyDefinitions.flameIdol = {
     animations: fireIdolAnimations, scale: 1,
     isImmortal: true,
     life: 8, touchDamage: 1, update: updateFlameIdol,
+    elementalMultipliers: {'lightning': 1.5, 'ice': 2},
     immunities: ['fire'],
     onHit: onHitIdol,
 };
@@ -43,6 +43,7 @@ enemyDefinitions.frostIdol = {
     animations: iceIdolAnimations, scale: 1,
     isImmortal: true,
     life: 8, touchDamage: 1, update: updateFrostIdol,
+    elementalMultipliers: {'lightning': 1.5, 'fire': 2},
     immunities: ['ice'],
     onHit: onHitIdol,
 };
@@ -98,7 +99,8 @@ function updateElementalIdol(state: GameState, enemy: Enemy, attack: () => void)
         enemy.params.priority = undefined;
         // When all bosses are at 1 life or lower, all the statues get destroyed.
         if (!enemy.area.objects.some(object =>
-            object instanceof Enemy && object.definition.type === 'boss' && object.life > 0
+            object instanceof Enemy && object.definition?.type === 'boss' && object.life > 0
+            && object.isFromCurrentSection(state)
         )) {
             enemy.showDeathAnimation(state);
             return;

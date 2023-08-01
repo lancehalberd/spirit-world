@@ -1,4 +1,4 @@
-import { enterLocation } from 'app/content/areas';
+import { Hero } from 'app/content/hero';
 import {
     SPAWN_LOCATION_DEMO,
     SPAWN_LOCATION_FULL,
@@ -7,8 +7,9 @@ import {
 import { zones } from 'app/content/zones';
 import { updateHeroMagicStats } from 'app/render/spiritBar';
 import { randomizerSeed, randomizerGoal } from 'app/gameConstants';
-
-import { GameState, Hero, SavedHeroData, SavedState } from 'app/types';
+import { getDefaultSavedState } from 'app/savedState'
+import { returnToSpawnLocation } from 'app/utils/returnToSpawnLocation';
+import { getFullZoneLocation, getShortZoneName } from 'app/utils/getFullZoneLocation';
 
 export function loadSavedData(): boolean {
     //return false;
@@ -54,27 +55,6 @@ export function loadSavedData(): boolean {
     return false;
 }
 
-export function saveGame(): void {
-    state.savedState.savedHeroData = state.hero.exportSavedHeroData();
-    // There is a bug where selecting the delete option in randomizer triggers the `saveGame`
-    // function and saves a new file to the delete index which keeps creating more save files.
-    // This is a hack to prevent this from happening.
-    //if (state.savedGameIndex < state.savedGames.length) {
-    //    state.savedGames[state.savedGameIndex] = state.savedState;
-    //}
-    state.savedGames[state.savedGameIndex] = state.savedState;
-    // console.log(exportState(getState()));
-    saveGamesToLocalStorage();
-}
-export function saveGamesToLocalStorage(): void {
-    try {
-        const seed = state.randomizer?.seed || 0;
-        window.localStorage.setItem('savedGames' + (seed || ''), JSON.stringify(state.savedGames));
-    } catch (e) {
-        console.error(e);
-        debugger;
-    }
-}
 export function saveSettings(state: GameState) {
     window.localStorage.setItem('settings', JSON.stringify(state.settings));
 }
@@ -106,69 +86,6 @@ export function applySavedState(state: GameState, savedState: SavedState): void 
     returnToSpawnLocation(state);
 }
 
-export function getDefaultSavedState(): SavedState {
-    return {
-        dungeonInventories: {},
-        objectFlags: {},
-        zoneFlags: {},
-        luckyBeetles: [],
-        savedHeroData: getDefaultSavedHeroData(),
-        staffTowerLocation: 'desert',
-    };
-}
-
-function getDefaultSavedHeroData(): SavedHeroData {
-    return {
-        playTime: 0,
-        winTime: 0,
-        maxLife: 4,
-        hasRevive: false,
-        money: 0,
-        silverOre: 0,
-        goldOre: 0,
-        peachQuarters: 0,
-        spiritTokens: 0,
-        victoryPoints: 0,
-        weapon: 0,
-        weaponUpgrades: {},
-        activeTools: {
-            bow: 0,
-            staff: 0,
-            clone: 0,
-            cloak: 0,
-        },
-        element: null,
-        elements: {
-            fire: 0,
-            ice: 0,
-            lightning: 0,
-        },
-        equipment: {
-            leatherBoots: 1,
-            cloudBoots: 0,
-            ironBoots: 0,
-        },
-        passiveTools: {
-            gloves: 0,
-            roll: 0,
-            charge: 0,
-            nimbusCloud: 0,
-            catEyes: 0,
-            spiritSight: 0,
-            trueSight: 0,
-            astralProjection: 0,
-            teleportation: 0,
-            ironSkin: 0,
-            goldMail: 0,
-            phoenixCrown: 0,
-            waterBlessing: 0,
-            fireBlessing: 0,
-            lightningBlessing: 0,
-        },
-        spawnLocation: SPAWN_LOCATION_FULL,
-    };
-}
-
 export function getDefaultState(): GameState {
     const state: GameState = {
         savedState: getDefaultSavedState(),
@@ -191,7 +108,7 @@ export function getDefaultState(): GameState {
         reviveTime: 0,
         gameHasBeenInitialized: false,
         lastTimeRendered: 0,
-        location: SPAWN_LOCATION_FULL,
+        location: getFullZoneLocation(SPAWN_LOCATION_FULL),
         zone: zones.peachCave,
         areaGrid: zones.peachCave.floors[0].grid,
         floor: zones.peachCave.floors[0],
@@ -212,6 +129,7 @@ export function getDefaultState(): GameState {
             mostRecentKeysPressed: new Set(),
         },
         fadeLevel: 0,
+        hotLevel: 0,
         scriptEvents: {
             activeEvents: [],
             blockEventQueue: false,
@@ -221,6 +139,9 @@ export function getDefaultState(): GameState {
             queue: [],
         },
         screenShakes: [],
+        map: {
+            needsRefresh: true,
+        },
     };
     return state;
 }
@@ -243,32 +164,6 @@ export function initializeState() {
     state.scene = 'title';
 }
 
-export function returnToSpawnLocation(state: GameState) {
-    state.hero.life = state.hero.maxLife;
-    // Only fill the magic bar if the hero has some magic regen.
-    if (state.hero.magicRegen) {
-        state.hero.magic = state.hero.maxMagic;
-    }
-    state.defeatState.defeated = false;
-    // Clear out any state/flags that shouldn't be kept on the hero.
-    state.hero.pickUpTile = null;
-    state.hero.pickUpObject = null;
-    state.hero.grabObject = null;
-    state.hero.grabTile = null;
-    state.hero.action = null;
-    state.hero.invulnerableFrames = 0;
-    state.hero.hasBarrier = false;
-    state.hero.isInvisible = false;
-    state.hero.activeStaff = null;
-    state.hero.frozenDuration = 0;
-    state.hero.vx = 0;
-    state.hero.vy = 0;
-    state.hero.vz = 0;
-    state.hero.d = state.hero.spawnLocation.d;
-    enterLocation(state, state.hero.spawnLocation, true, null, true);
-    state.fadeLevel = (state.areaInstance.dark || 0) / 100;
-}
-
 export function getState(): GameState {
     return state;
 }
@@ -285,7 +180,7 @@ export function getTitleOptions(state: GameState): string[] {
         if (!savedGame) {
             return 'New Game';
         }
-        return savedGame.savedHeroData.spawnLocation.zoneKey;// + ' ' + 'V'.repeat(savedGame.hero.maxLife) + ' life';
+        return getShortZoneName(savedGame.savedHeroData.spawnLocation);
     });
     if (state.scene === 'deleteSavedGame') {
         return [...gameFiles, 'CANCEL'];
@@ -300,9 +195,11 @@ export function shouldHideMenu(state: GameState): boolean {
         || state.messagePage || state.transitionState || state.defeatState.defeated
         || state.nextAreaSection || state.nextAreaInstance
         || state.areaInstance.priorityObjects?.length
+        || state.hero.action === 'falling' || state.hero.action === 'fallen'
     );
 }
 
 export function canPauseGame(state: GameState): boolean {
     return state.alwaysHideMenu || !shouldHideMenu(state);
 }
+

@@ -1,21 +1,28 @@
-import { enterLocation } from 'app/content/areas';
+import { refreshAreaLogic } from 'app/content/areas';
 import { addDustBurst, addReviveBurst } from 'app/content/effects/animationEffect';
 import { Hero } from 'app/content/hero';
 import { showHint } from 'app/content/hints';
 import { getLootHelpMessage } from 'app/content/loot';
-import { getMenuRows } from 'app/content/menu';
-import { showMessage } from 'app/render/renderMessage';
+import {
+    getMenuRows,
+    setEquippedBoots,
+    setEquippedElement,
+    setLeftTool,
+    setRightTool,
+} from 'app/content/menu';
+import { dungeonMaps } from 'app/content/sections';
 import {
     SPAWN_LOCATION_DEMO,
     SPAWN_LOCATION_FULL,
     fixSpawnLocationOnLoad,
 } from 'app/content/spawnLocations';
+import { editingState } from 'app/development/editingState';
 import {
     FRAME_LENGTH, GAME_KEY,
     FADE_IN_DURATION, FADE_OUT_DURATION,
     CIRCLE_WIPE_IN_DURATION, CIRCLE_WIPE_OUT_DURATION,
     MUTATE_DURATION,
-    isRandomizer,
+    isRandomizer, randomizerGoal, randomizerTotal, randomizerGoalType,
 } from 'app/gameConstants';
 import { initializeGame } from 'app/initialize';
 import {
@@ -25,26 +32,25 @@ import {
     wasGameKeyPressed,
     wasConfirmKeyPressed,
     wasMenuConfirmKeyPressed,
-} from 'app/keyCommands';
+} from 'app/userInput';
+import { playSound, updateSoundSettings } from 'app/musicController';
 import { updateHeroMagicStats } from 'app/render/spiritBar';
-import { parseScriptText, setScript, updateScriptEvents } from 'app/scriptEvents';
+import { getDefaultSavedState } from 'app/savedState'
+import { parseScriptText, setScript, showMessage } from 'app/scriptEvents';
 import {
     canPauseGame,
-    getDefaultSavedState,
     getState,
     getTitleOptions,
-    returnToSpawnLocation,
-    saveGame,
-    saveGamesToLocalStorage,
     setSaveFileToState,
     shouldHideMenu,
 } from 'app/state';
 import { updateCamera } from 'app/updateCamera';
 import { updateField } from 'app/updateField';
+import { updateScriptEvents } from 'app/updateScriptEvents';
+import { enterLocation } from 'app/utils/enterLocation';
 import { areAllImagesLoaded } from 'app/utils/images';
-import { playSound, updateSoundSettings } from 'app/musicController';
-
-import { ActiveTool, PassiveTool, GameState, MagicElement } from 'app/types';
+import { returnToSpawnLocation } from 'app/utils/returnToSpawnLocation'
+import { saveGame, saveGamesToLocalStorage, } from 'app/utils/saveGame';
 
 let isGameInitialized = false;
 export function update() {
@@ -95,9 +101,23 @@ export function update() {
                 )
             ) {
                 state.showMap = !state.showMap;
+                const dungeonMap = dungeonMaps[state.areaSection?.definition.mapId];
+                if (state.showMap && dungeonMap) {
+                    state.menuIndex = Object.keys(dungeonMap.floors).indexOf(state.areaSection.definition.floorId);
+                    if (state.menuIndex < 0) {
+                        console.error('Could not find map floor', state.areaSection.definition.floorId, 'in', Object.keys(dungeonMap.floors));
+                        state.menuIndex = 0;
+                        debugger;
+                    }
+                }
                 state.paused = state.showMap;
                 updateSoundSettings(state);
             }
+        }
+        if (state.areaInstance?.needsLogicRefresh) {
+            refreshAreaLogic(state, state.areaInstance);
+        } else if (state.alternateAreaInstance?.needsLogicRefresh) {
+            refreshAreaLogic(state, state.alternateAreaInstance);
         }
         const hideMenu = shouldHideMenu(state);
         if (state.paused && !(hideMenu && wasGameKeyPressed(state, GAME_KEY.PASSIVE_TOOL))) {
@@ -133,11 +153,11 @@ function updateTitle(state: GameState) {
     if (wasGameKeyPressed(state, GAME_KEY.UP)) {
         state.menuIndex = (state.menuIndex - 1 + options.length) % options.length;
         changedOption = true;
-        playSound('menuTick');
+        playSound(state, 'menuTick');
     } else if (wasGameKeyPressed(state, GAME_KEY.DOWN)) {
         state.menuIndex = (state.menuIndex + 1) % options.length;
         changedOption = true;
-        playSound('menuTick');
+        playSound(state, 'menuTick');
     }
     if (changedOption) {
         if (state.scene === 'title' || state.scene === 'deleteSavedGame') {
@@ -149,12 +169,12 @@ function updateTitle(state: GameState) {
         }
     }
     if (wasConfirmKeyPressed(state)) {
-        playSound('menuTick');
+        playSound(state, 'menuTick');
         switch (state.scene) {
             case 'deleteSavedGameConfirmation':
                 if (state.menuIndex === 1) {
                     state.savedGames[state.savedGameIndex] = null;
-                    saveGamesToLocalStorage();
+                    saveGamesToLocalStorage(state);
                 }
                 state.scene = 'title';
                 state.menuIndex = state.savedGameIndex;
@@ -207,6 +227,21 @@ function updateTitle(state: GameState) {
 }
 
 function updateMenu(state: GameState) {
+    if (state.showMap) {
+        const floorKeys = Object.keys(dungeonMaps[state.areaSection?.definition.mapId]?.floors || {});
+        if (wasGameKeyPressed(state, GAME_KEY.UP)) {
+            state.menuIndex = (state.menuIndex + 1) % floorKeys.length;
+            editingState.selectedSections = [];
+        } else if (wasGameKeyPressed(state, GAME_KEY.DOWN)) {
+            state.menuIndex = (state.menuIndex + floorKeys.length - 1) % floorKeys.length;
+            editingState.selectedSections = [];
+        }
+        if (wasMenuConfirmKeyPressed(state)) {
+            state.paused = false;
+            editingState.selectedSections = [];
+        }
+        return;
+    }
     const menuRows = getMenuRows(state);
     // Cycle to the next row that isn't empty.
     // There is always at least one row since the help tool is always there.
@@ -244,32 +279,32 @@ function updateMenu(state: GameState) {
         if (state.hero.activeTools[menuItem]) {
             if (wasGameKeyPressed(state, GAME_KEY.RIGHT_TOOL)) {
                 if (state.hero.leftTool === menuItem) {
-                    state.hero.leftTool = state.hero.rightTool;
+                    setLeftTool(state, state.hero.rightTool);
                 }
-                state.hero.rightTool = menuItem as ActiveTool;
+                setRightTool(state, menuItem as ActiveTool);
             } else {
                 // Assign to left tool as default action.
                 // If a generic confirm key was pressed, cycle the current left tool
                 // over to the right tool slot.
                 if (!wasGameKeyPressed(state, GAME_KEY.LEFT_TOOL) && state.hero.leftTool !== menuItem) {
-                    state.hero.rightTool = state.hero.leftTool;
+                    setRightTool(state, state.hero.leftTool);
                 }
                 if (state.hero.rightTool === menuItem) {
-                    state.hero.rightTool = state.hero.leftTool;
+                    setRightTool(state, state.hero.leftTool);
                 }
-                state.hero.leftTool = menuItem as ActiveTool;
+                setLeftTool(state, menuItem as ActiveTool);
             }
             return;
         }
         if (menuItem === 'leatherBoots' || menuItem === 'ironBoots' || menuItem === 'cloudBoots') {
-            state.hero.equipedBoots = menuItem;
+            setEquippedBoots(state, menuItem);
             return;
         }
-        if (menuItem === 'charge' || state.hero.element === menuItem) {
-            state.hero.setElement(null);
+        if (menuItem === 'neutral' || state.hero.element === menuItem) {
+            setEquippedElement(state, null);
             return;
         } else if (state.hero.elements[menuItem]) {
-            state.hero.setElement(menuItem as MagicElement);
+            setEquippedElement(state, menuItem as MagicElement);
             return;
         }
         if (menuItem === 'nimbusCloud') {
@@ -312,6 +347,8 @@ function updateDefeated(state: GameState) {
     if (state.hero.hasRevive) {
         state.defeatState.reviving = true;
         state.hero.hasRevive = false;
+        state.hero.frozenDuration = 0;
+        state.hero.burnDuration = 0;
     }
     if (state.defeatState.reviving) {
         // Show a burst of particles right before the MC gets up
@@ -331,7 +368,7 @@ function updateDefeated(state: GameState) {
             state.hero.life = Math.min(state.hero.maxLife, state.hero.life + 0.5);
             if (state.hero.life === state.hero.maxLife) {
                 state.defeatState.defeated = false;
-                saveGame();
+                saveGame(state);
             }
         }
         return;
@@ -370,7 +407,7 @@ function updateTransition(state: GameState) {
         }
     } else if (state.transitionState.type === 'mutating') {
         if (state.transitionState.time === MUTATE_DURATION) {
-            enterLocation(state, state.transitionState.nextLocation, true);
+            enterLocation(state, state.transitionState.nextLocation, true, null, false, true);
             state.transitionState.callback?.();
             updateCamera(state);
             state.transitionState = null;
@@ -413,7 +450,12 @@ function selectSaveFile(state: GameState, savedGameIndex: number): void {
             state.scriptEvents.queue = parseScriptText(state, 'Waaaaah!', 1000, false);
             state.scriptEvents.queue.push({type: 'clearTextBox'});
         } else {
-            setScript(state, '{@mom.randomizer}');
+            if (randomizerGoalType === 'finalBoss') {
+                setScript(state, `Defeat the final boss then talk to your mom to win!`);
+            } else if (randomizerGoalType === 'victoryPoints') {
+                setScript(state, `Find ${randomizerGoal} of ${randomizerTotal} Victory Points then talk to your mom to win!`);
+            }
+
         }
         return;
         // Old code for showing the "Choose Game Mode" menu when selecting "New Game".

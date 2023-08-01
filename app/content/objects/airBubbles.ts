@@ -1,14 +1,11 @@
-import { addEffectToArea } from 'app/content/areas';
-import { AnimationEffect } from 'app/content/effects/animationEffect';
-import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
+import { FieldAnimationEffect } from 'app/content/effects/animationEffect';
+import { objectHash } from 'app/content/objects/objectHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, frameAnimation, getFrame } from 'app/utils/animations';
+import { addEffectToArea } from 'app/utils/effects';
+import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
 import Random from 'app/utils/Random';
 
-import {
-    AreaInstance, FrameAnimation, GameState, ObjectInstance,
-    ObjectStatus, SimpleObjectDefinition, Rect,
-} from 'app/types';
 
 function animationSet(source: string): FrameAnimation[] {
     return [
@@ -81,6 +78,7 @@ export class AirBubbles implements ObjectInstance {
         }
     }
 }
+objectHash.airBubbles = AirBubbles;
 
 export class AirBubbleBack implements ObjectInstance {
     area: AreaInstance;
@@ -138,7 +136,7 @@ export function addRegenerationParticle(
     const frame = Random.element(regenerationParticles);
     const vx = Math.cos(theta) / 4;
     const vy = Math.sin(theta) / 4;
-    const particle = new AnimationEffect({
+    const particle = new FieldAnimationEffect({
         animation: frameAnimation(frame),
         drawPriority: 'foreground',
         x: x - 2 + vx, y: y + vy, z,

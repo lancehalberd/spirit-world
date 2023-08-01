@@ -1,8 +1,7 @@
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
-import { randomizerSeed, randomizerTotal } from 'app/gameConstants';
-import { saveGame } from 'app/state';
+import { isRandomizer, randomizerGoalType } from 'app/gameConstants';
+import { saveGame } from 'app/utils/saveGame';
 
-import { GameState } from 'app/types';
 
 dialogueHash.mom = {
     key: 'mom',
@@ -14,21 +13,42 @@ dialogueHash.mom = {
             if (state.hero.winTime) {
                 return 'You did great!{|}Feel free to keep exploring if you like!';
             }
-            if (state.hero.victoryPoints >= state.randomizer.goal) {
-                state.hero.winTime = state.hero.playTime;
-                saveGame();
-                return 'Finished!'
+            if (randomizerGoalType === 'finalBoss') {
+                if (state.location.zoneKey === 'void') {
+                    state.hero.winTime = state.hero.playTime;
+                    saveGame(state);
+                    return 'Finished!'
+                }
+                return `You must talk to me after defeating the final boss to finish.`;
             }
-            return `I've hidden ${randomizerTotal} Victory Points around the world.
-                {|}Find ${state.randomizer.goal} total and talk to me to win!
-                {|}You have found ${state.hero.victoryPoints} so far.`;
+            if (randomizerGoalType === 'victoryPoints') {
+                if (state.hero.victoryPoints >= state.randomizer.goal) {
+                    state.hero.winTime = state.hero.playTime;
+                    saveGame(state);
+                    return 'Finished!'
+                }
+                return `You must find ${state.randomizer.goal} victory points and talk to me to finish!`;
+            }
+            return `Your guess is as good as mine.`;
         },
     },
     options: [
-        ...(randomizerSeed ? [{
+        ...(isRandomizer ? [{
             logicCheck: {},
             text: [`{@mom.randomizer}`],
         }] : []),
+        {
+            logicCheck: {
+                zones: ['void'],
+            },
+            isExclusive: true,
+            text: [
+                `Surprised to see me here?
+                {|}There isn't really a proper ending yet, so I'm here to tell you:
+                {|}Congratulations, you did it! I'm so proud of everything you've accomplished.`,
+                `If you want to play more, try adding ?seed=20 to the url to try random mode.`,
+            ],
+        },
         {
             logicCheck: {
                 requiredFlags: ['$astralProjection'],

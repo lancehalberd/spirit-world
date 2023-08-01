@@ -1,11 +1,7 @@
-import { getVectorToTarget } from 'app/content/enemies';
-import { editingState } from 'app/development/tileEditor';
+import { objectHash } from 'app/content/objects/objectHash';
+import { editingState } from 'app/development/editingState';
+import { getVectorToTarget } from 'app/utils/target';
 
-
-import {
-    AreaInstance, DrawPriority, GameState, ObjectInstance,
-    ObjectStatus, Rect, MarkerDefinition,
-} from 'app/types';
 
 
 export class Marker implements ObjectInstance {
@@ -17,7 +13,7 @@ export class Marker implements ObjectInstance {
     y: number;
     ignorePits = true;
     status: ObjectStatus = 'normal';
-    constructor(definition: MarkerDefinition) {
+    constructor(state: GameState, definition: MarkerDefinition) {
         this.definition = definition;
         this.x = definition.x;
         this.y = definition.y;
@@ -64,3 +60,5 @@ export class Marker implements ObjectInstance {
         }
     }
 }
+objectHash.marker = Marker;
+objectHash.spawnMarker = Marker;

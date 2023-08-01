@@ -1,7 +1,4 @@
-import { drawFrame } from 'app/utils/animations';
 import { rectangleCenter } from 'app/utils/index';
-
-import { Frame } from 'app/types';
 
 export function query(className): HTMLElement {
     return document.querySelector(className);
@@ -10,67 +7,6 @@ export function query(className): HTMLElement {
 export function queryAll(className): NodeListOf<HTMLElement> {
     return document.querySelectorAll(className);
 }
-
-export const mainCanvas:HTMLCanvasElement = query('.js-mainCanvas') as HTMLCanvasElement;
-window['mainCanvas'] = mainCanvas;
-// mainCanvas.width = mainCanvas.height = 512;
-export const mainContext = mainCanvas.getContext('2d');
-mainContext.imageSmoothingEnabled = false;
-window['mainContext'] = mainContext;
-
-export function createCanvas(width, height, classes = ''): HTMLCanvasElement {
-    const canvas = document.createElement('canvas');
-    canvas.className = classes;
-    canvas.width = width;
-    canvas.height = height;
-    return canvas;
-}
-
-export function createCanvasAndContext(width, height): [HTMLCanvasElement, CanvasRenderingContext2D] {
-    const canvas = createCanvas(width, height);
-    const context = canvas.getContext('2d');
-    context.imageSmoothingEnabled = false;
-    return [canvas, context];
-}
-
-export function createFrameCanvas(frame: Frame, scale: number = 1): HTMLCanvasElement {
-    const canvas = createCanvas(frame.w, frame.h);
-    if (scale !== 1) {
-        canvas.style.transform = `scale(${scale})`;
-    }
-    const context = canvas.getContext('2d');
-    context.imageSmoothingEnabled = false;
-    drawFrame(context, frame, {x: 0, y: 0, w: frame.w, h: frame.h});
-    return canvas;
-}
-
-const CANVAS_SCALE = 10;
-
-export function debugCanvas(canvas: HTMLCanvasElement | Frame, scale = CANVAS_SCALE) {
-    if (canvas instanceof HTMLCanvasElement) {
-        document.body.append(canvas);
-        canvas.style.position = 'absolute';
-        canvas.style.top = '0';
-        canvas.style.backgroundColor = 'blue';
-    } else {
-        document.body.append(canvas.image);
-        canvas.image.style.position = 'absolute';
-        canvas.image.style.top = '0';
-        canvas.image.style.backgroundColor = 'blue';
-        canvas.image.style.transformOrigin = '0 0';
-        canvas.image.style.transform = `scale(${scale})`;
-        const div = document.createElement('div');
-        div.style.position = 'absolute';
-        div.style.top = `${canvas.y * scale}px`;
-        div.style.left = `${canvas.x * scale}px`;
-        div.style.height = `${canvas.h * scale}px`;
-        div.style.width = `${canvas.w * scale}px`;
-        div.style.border = '1px solid red';
-        div.style.boxSizing = 'border-box';
-        document.body.append(div);
-    }
-}
-window['debugCanvas'] = debugCanvas;
 
 export const mouseContainer:HTMLElement = query('.js-mouseContainer');
 export const mainContent: HTMLElement = query('.js-gameContent');

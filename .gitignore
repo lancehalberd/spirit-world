@@ -75,8 +75,10 @@ public/sfx/staging
 public/bgm/old
 # Don't include bgm that haven't been processed yet.
 public/bgm/staging
+source_assets
 # Don't include rsync command.
 rsync.txt
+yarn.lock
 
 # osx file
 .DS_Store

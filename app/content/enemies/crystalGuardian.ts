@@ -1,10 +1,6 @@
-import { addEffectToArea } from 'app/content/areas';
 import { addParticleAnimations } from 'app/content/effects/animationEffect';
 import { addLineOfSpikes } from 'app/content/effects/groundSpike';
 import { SpikePod } from 'app/content/effects/spikePod';
-import {
-    getVectorToNearbyTarget,
-} from 'app/content/enemies';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import {
     crystalGuardianAnimations,
@@ -17,9 +13,9 @@ import {
 } from 'app/content/enemyAnimations';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { drawFrameCenteredAt } from 'app/utils/animations';
-import { playSound } from 'app/musicController';
+import { addEffectToArea } from 'app/utils/effects';
+import { getVectorToNearbyTarget } from 'app/utils/target';
 
-import { Enemy, EnemyAbility, Frame, GameState, HitProperties, HitResult, Rect } from 'app/types';
 
 const maxShieldLife = 6;
 
@@ -83,6 +79,7 @@ enemyDefinitions.crystalGuardian = {
     // which is more specific than touch damage on enemies which requires actually being in the same pixel.
     // Touch damage gets added to this enemy when the shield goes down.
     tileBehaviors: {solid: true},
+    elementalMultipliers: {'lightning': 1.5},
     getHitbox(enemy: Enemy): Rect {
         const hitbox = enemy.getDefaultHitbox();
         if (enemy.params.shieldLife) {
@@ -108,7 +105,7 @@ enemyDefinitions.crystalGuardian = {
                 // Right now shield takes a flat 2 damage no matter the source.
                 enemy.params.shieldLife = Math.max(0, enemy.params.shieldLife - 2);
                 enemy.params.shieldInvulnerableTime = 100;
-                playSound('enemyHit');
+                enemy.makeSound(state, 'enemyHit');
                 const hitbox = enemy.getHitbox();
                 addParticleAnimations(state, enemy.area,
                     hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2, 16, crystalBarrierSmallParticles,

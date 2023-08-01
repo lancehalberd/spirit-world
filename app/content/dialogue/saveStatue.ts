@@ -1,11 +1,21 @@
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 
+
+function getReviveCost(state: GameState): number {
+    return Math.max(5, Math.min(50, (state.hero.money / 5) | 0 ));
+}
+
 dialogueHash.saveStatue = {
     key: 'saveStatue',
     mappedOptions: {
-        reviveChoice: `Offer 50 Jade for a Second Chance?
-                {choice: Offer 50 Jade?|Yes:saveStatue.attemptPurchaseRevive|No:saveStatue.no}`,
-        attemptPurchaseRevive: `{buy:50:saveStatue.purchaseRevive:saveStatue.fail`,
+        reviveChoice: (state: GameState) => {
+            const cost = getReviveCost(state);
+            return `Offer ${cost} Jade for a Second Chance?
+                {choice: Offer ${cost} Jade?|Yes:saveStatue.attemptPurchaseRevive|No:saveStatue.no}`;
+        },
+        attemptPurchaseRevive: (state: GameState) => {
+            return `{buy:${getReviveCost(state)}:saveStatue.purchaseRevive:saveStatue.fail`;
+        },
         purchaseRevive: `Make it count. {item:secondChance}`,
         fail: 'If only you hade more Jade.',
         no: 'Then be careful out there.',
@@ -87,6 +97,18 @@ dialogueHash.saveStatue = {
                 `
                     There is a hidden staircase behind one of the bead flows.
                     {|}Find a way to wade through the beads without being swept away!
+                    {item:secondChance}
+                `
+            ],
+        },
+        {
+            logicCheck: {
+                zones: ['tree'],
+            },
+            text: [
+                `
+                    The final battle is ahead.
+                    {|}It isn't finished yet, but hopefully it will still be a fun challenge.
                     {item:secondChance}
                 `
             ],

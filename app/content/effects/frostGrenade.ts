@@ -1,9 +1,12 @@
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
-import { addEffectToArea, removeEffectFromArea } from 'app/content/areas';
-import { FrostBlast } from 'app/content/effects/frostBlast';
+import { Blast } from 'app/content/effects/blast';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { createAnimation, drawFrameCenteredAt } from 'app/utils/animations';
+import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 
-import { AreaInstance, EffectInstance, Frame, GameState } from 'app/types';
+
+
+const [iceElement] = createAnimation('gfx/hud/elementhud.png', {w: 20, h: 20}, {x: 2}).frames;
 
 interface Props {
     x: number,
@@ -53,11 +56,14 @@ export class FrostGrenade implements EffectInstance, Props {
         this.vz += this.az;
         this.animationTime += FRAME_LENGTH;
         if (this.z <= 0) {
-            const frostBlast = new FrostBlast({
+            const frostBlast = new Blast({
                 x: this.x,
                 y: this.y,
                 radius: this.radius,
                 damage: this.damage,
+                // The trajectory of the grenade gives enough warning.
+                tellDuration: 0,
+                element: 'ice',
             });
             addEffectToArea(state, this.area, frostBlast);
             removeEffectFromArea(state, this);
@@ -73,12 +79,42 @@ export class FrostGrenade implements EffectInstance, Props {
         context.save();
             context.globalAlpha *= 0.3;
             context.beginPath();
-            const r = 3 * this.w / 4 + Math.cos(this.animationTime / 500) * this.w / 4;
+            let r = this.w / 2 + Math.sin(this.animationTime / 60) * this.w / 8;
             context.arc(this.x, this.y - this.z, r, 0, 2 * Math.PI);
             context.fill();
         context.restore();
-        context.beginPath();
-        context.arc(this.x, this.y - this.z, this.w / 2, 0, 2 * Math.PI);
-        context.fill();
+        drawFrameCenteredAt(context, iceElement, {x: this.x, y: this.y - this.z, w: 0, h: 0});
     }
+    renderShadow(context: CanvasRenderingContext2D) {
+        const shadowRadius = Math.max(3, 6 - this.z / 2);
+        context.save();
+            context.globalAlpha = 0.3;
+            context.fillStyle = 'white';
+            context.translate(this.x, this.y);
+            context.scale(this.w / 12, this.h / 18);
+            context.beginPath();
+            context.arc(0, 0, shadowRadius, 0, 2 * Math.PI);
+            context.fill();
+        context.restore();
+    }
+}
+
+export function throwIceGrenadeAtLocation(state: GameState, enemy: Enemy, {tx, ty}: {tx: number, ty: number}, damage = 1, z = 8): void {
+    const hitbox = enemy.getHitbox(state);
+    const x = hitbox.x + hitbox.w / 2;
+    const y = hitbox.y + hitbox.h / 2;
+    const vz = 4;
+    const az = -0.2;
+    const duration = -2 * vz / az;
+    const frostGrenade = new FrostGrenade({
+        damage,
+        x,
+        y,
+        z,
+        vx: (tx - x) / duration,
+        vy: (ty - y) / duration,
+        vz,
+        az,
+    });
+    addEffectToArea(state, enemy.area, frostGrenade);
 }

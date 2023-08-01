@@ -1,31 +1,20 @@
-import { addEffectToArea } from 'app/content/areas';
 import { Flame } from 'app/content/effects/flame';
 import { FlameWall } from 'app/content/effects/flameWall';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
-import { createCanvasAndContext, debugCanvas } from 'app/dom';
-import {
-    //accelerateInDirection,
-    getNearbyTarget,
-    getVectorToNearbyTarget,
-    getVectorToTarget,
-    //moveEnemy,
-    //moveEnemyToTargetLocation,
-    paceRandomly,
-} from 'app/content/enemies';
+import { createCanvasAndContext, debugCanvas } from 'app/utils/canvas';
+import { Enemy } from 'app/content/enemy';
 import { beetleHornedAnimations } from 'app/content/enemyAnimations';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame } from 'app/utils/animations';
+import { addEffectToArea } from 'app/utils/effects';
+import { paceRandomly } from 'app/utils/enemies';
 import { getDirection } from 'app/utils/field';
 import { allImagesLoaded } from 'app/utils/images';
+import { getNearbyTarget, getVectorToTarget, getVectorToNearbyTarget } from 'app/utils/target';
 
-import { AreaInstance, Enemy, EnemyAbility, GameState } from 'app/types';
 
-const flameGeometry = {w: 20, h: 20, content: {x: 2, y: 2, w: 16, h: 16}};
-export const [
-    /* container */, fireElement, /* elementShine */
-] = createAnimation('gfx/hud/elementhud.png',
-    flameGeometry, {cols: 2}
-).frames;
+const flameGeometry = {w: 20, h: 20, content: {x: 4, y: 10, w: 12, h: 8}};
+export const [fireElement] = createAnimation('gfx/hud/elementhud.png', flameGeometry, {x: 1}).frames;
 const [flameHeartCanvas, flameHeartContext] = createCanvasAndContext(fireElement.w * 4, fireElement.h * 2);
 const createFlameAnimation = async () => {
     await allImagesLoaded();
@@ -45,10 +34,10 @@ const createFlameAnimation = async () => {
 }
 debugCanvas;//(flameHeartCanvas);
 createFlameAnimation();
-const flameHeartAnimation = createAnimation(flameHeartCanvas, {w: 40, h: 40, content: {x: 4, y: 4, w: 32, h: 32}}, {cols: 2});
+const flameHeartAnimation = createAnimation(flameHeartCanvas, {w: 40, h: 40, content: {x: 8, y: 20, w: 24, h: 16}}, {cols: 2});
 
 
-const flameHeartAnimations = {
+export const flameHeartAnimations = {
     idle: {
         up: flameHeartAnimation,
         down: flameHeartAnimation,
@@ -94,7 +83,7 @@ enemyDefinitions.flameHeart = {
     },
     initialMode: 'choose',
     immunities: ['fire'],
-    elementalMultipliers: {'ice': 2},
+    elementalMultipliers: {'ice': 2, 'lightning': 1.5},
 };
 enemyDefinitions.flameBeast = {
     abilities: [leapStrikeAbility],
@@ -102,7 +91,7 @@ enemyDefinitions.flameBeast = {
     initialMode: 'hidden',
     acceleration: 0.3, speed: 2,
     immunities: ['fire'],
-    elementalMultipliers: {'ice': 2},
+    elementalMultipliers: {'ice': 2, 'lightning': 1.5},
     params: {
         enrageLevel: 0,
     },
@@ -164,7 +153,7 @@ function updateFireHeart(this: void, state: GameState, enemy: Enemy): void {
                     vx: speed * dx,
                     vy: speed * dy,
                     ttl: 600 + (isEnraged ? 1000 : enemy.params.enrageLevel * 500),
-                    damage: 4,
+                    damage: 2,
                 });
                 flame.x -= flame.w / 2;
                 flame.y -= flame.h / 2;
@@ -197,7 +186,7 @@ const spawnGiantFlame = (state: GameState, enemy: Enemy): void => {
         y,
         ttl: 2000 + getFlameBeastEnrageLevel(state, enemy) * 500,
         scale: 4,
-        damage: 4,
+        damage: 3,
     });
     flame.x -= flame.w / 2;
     flame.y -= flame.h / 2;
@@ -236,7 +225,7 @@ function updateFireBeast(this: void, state: GameState, enemy: Enemy): void {
     // since our heuristic of using the actual sprite overlap doesn't make sense this high in the air and
     // for these movements.
     enemy.isInvulnerable = (enemy.z > 8);
-    enemy.touchHit = (enemy.z <= 0) ? { damage: 4, element: 'fire'} : null;
+    enemy.touchHit = (enemy.z <= 0) ? { damage: 2, element: 'fire'} : null;
     if (enemy.mode === 'regenerate') {
         // Fall to the ground if we start regeneration mid leap.
         if (enemy.z > 0) {

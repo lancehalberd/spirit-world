@@ -1,6 +1,5 @@
 import { zones } from 'app/content/zones/zoneHash';
 
-import { AreaDefinition } from 'app/types';
 
 const f0_0x0: AreaDefinition = {
     layers: null,
@@ -8,16 +7,16 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "waterfallTower:0:0x0-decoration-0", x: 0, y: 512, type: "waterfall", w: 512, h: 512},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 297, mapId: 'waterfallTower', floorId: '1F', mapX: 0, mapY: 0},
     ],
 };
-const f0_1x0: AreaDefinition = {
+const f0_0x1: AreaDefinition = {
     layers: null,
     objects: [
         {status: "normal", id: "waterfallTower:0:0x0-decoration-0", x: 0, y: 512, type: "waterfall", w: 512, h: 512},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 298, mapId: 'waterfallTower', floorId: '1F', mapX: 0, mapY: 2},
     ],
 };
 const sf0_0x0: AreaDefinition = {
@@ -280,12 +279,12 @@ const sf0_0x0: AreaDefinition = {
         {status: "bigKeyLocked", id: "waterfallTowerBigKeyBlock", x: 416, y: 80, type: "keyBlock", targetObjectId: "waterfallTowerBeadCascade"},
         {status: "hidden", id: "waterfallTower-grateD", x: 128, y: 128, type: "beadGrate"},
         {status: "normal", id: "", x: 288, y: 240, type: "beadGrate"},
-        {status: "bigKeyLocked", id: "waterfallTower-backEntrance", x: 240, y: 320, type: "door", style: "cavernUpstairs", d: "up", targetZone: "waterfallTower", targetObjectId: "waterfallTower-backEntrance"},
+        {status: "bigKeyLocked", id: "waterfallTower-backEntrance", x: 240, y: 320, type: "door", style: "crystalUpstairs", d: "up", targetZone: "waterfallTower", targetObjectId: "waterfallTower-backEntrance"},
         {status: "normal", id: "waterfallTower:s0:0x0-bigKey-0", x: 288, y: 400, type: "chest", lootType: "bigKey"},
         {status: "normal", id: "waterfallTower:s0:0x0-money-0", x: 64, y: 48, type: "chest", lootType: "money", lootAmount: 100},
         {status: "normal", id: "waterfallTower:s0:0x0-peachOfImmortalityPiece-0", x: 464, y: 64, type: "chest", lootType: "peachOfImmortalityPiece"},
         {status: "normal", id: "", x: 288, y: 16, type: "beadCascade", onInterval: 2000, offInterval: 2000},
-        {status: "normal", id: "", x: 240, y: 320, type: "beadCascade"},
+        {status: "normal", id: "waterfallTowerDoorBeads", x: 240, y: 320, type: "beadCascade", saveStatus: "forever"},
         {status: "normal", id: "", x: 128, y: 32, type: "beadCascade"},
         {status: "hidden", id: "waterfallTowerBeadCascade", x: 416, y: 32, type: "beadCascade", saveStatus: "forever"},
         {status: "normal", id: "", x: 288, y: 432, type: "airBubbles"},
@@ -305,12 +304,13 @@ const sf0_0x0: AreaDefinition = {
         {status: "normal", id: "waterfallTowerSave", x: 208, y: 400, type: "saveStatue"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 299, mapId: 'waterfallTowerSpirit', floorId: '1F', mapX: 2, mapY: 1},
     ],
+    corrosiveLogic: {"isTrue":true,"isInverted":false},
 };
-const sf0_1x0: AreaDefinition = {
+const sf0_0x1: AreaDefinition = {
     isSpiritWorld: true,
-    parentDefinition: f0_1x0,
+    parentDefinition: f0_0x1,
     layers: [
         {
             key: 'floor',
@@ -569,7 +569,7 @@ const sf0_1x0: AreaDefinition = {
         {status: "normal", id: "", x: 416, y: 96, type: "beadGrate"},
         {status: "normal", id: "", x: 240, y: 464, type: "beadGrate"},
         {status: "hidden", id: "waterfallTower-grateC", x: 128, y: 16, type: "beadGrate", saveStatus: "forever"},
-        {status: "hidden", id: "waterfallTower-grateA", x: 240, y: 288, type: "beadGrate"},
+        {status: "hidden", id: "waterfallTower-grateA", x: 240, y: 288, type: "beadGrate", customLogic: "waterfallTowerDoorBeads", invertLogic: true},
         {status: "normal", id: "", x: 352, y: 416, type: "beadGrate"},
         {status: "hidden", id: "waterfallTower-grateB", x: 352, y: 224, type: "beadGrate"},
         {status: "normal", id: "", x: 128, y: 288, type: "beadGrate"},
@@ -582,21 +582,24 @@ const sf0_1x0: AreaDefinition = {
         {status: "normal", id: "", x: 288, y: 400, type: "airBubbles"},
         {status: "normal", id: "", x: 304, y: 208, type: "airBubbles"},
         {status: "hidden", id: "waterfallTowerBeadCascade", x: 416, y: 0, type: "beadCascade", height: 0},
-        {status: "normal", id: "", x: 240, y: 0, type: "beadCascade", height: 0},
+        {status: "normal", id: "waterfallTowerDoorBeads", x: 240, y: 0, type: "beadCascade", height: 0, saveStatus: "forever"},
         {status: "normal", id: "", x: 128, y: 0, type: "beadCascade", height: 0},
         {status: "normal", id: "", x: 352, y: 176, type: "beadCascade"},
         {status: "normal", id: "", x: 336, y: 304, type: "crystalSwitch", timer: 4000, targetObjectId: "waterfallTower-grateB"},
         {status: "locked", id: "waterfallTowerKeyBlock", x: 208, y: 288, type: "keyBlock", targetObjectId: "waterfallTower-grateA"},
-        {status: "normal", id: "waterfallTowerMarkerC", x: 416, y: 416, type: "marker", locationCue: "Waterfall 1F"},
         {status: "normal", id: "", x: 80, y: 352, type: "spawnMarker"},
         {status: "normal", id: "", x: 96, y: 448, type: "spawnMarker"},
         {status: "normal", id: "", x: 176, y: 448, type: "spawnMarker"},
         {status: "normal", id: "waterfallTower:s0:0x1-crystalBat-0", x: 96, y: 320, type: "enemy", enemyType: "crystalBat", d: "down", params: {}},
         {status: "normal", id: "waterfallTower:s0:0x1-crystalBat-1", x: 192, y: 96, type: "enemy", enemyType: "crystalBat", d: "down", params: {}},
+        {status: "closedSwitch", id: "waterfallTowerLadder", x: 464, y: 320, type: "door", style: "ladderUpTall", targetZone: "waterfallTower", targetObjectId: "waterfallTowerLadder", d: "up", saveStatus: "forever"},
+        {status: "normal", id: "waterfallTowerLadderSwitch", x: 480, y: 432, type: "crystalSwitch", element: "lightning", saveStatus: "forever", timer: 0, targetObjectId: "waterfallTowerLadder"},
+        {status: "normal", id: "waterfallTowerDoorBeadsSwitch", x: 288, y: 176, type: "crystalSwitch", element: "lightning", saveStatus: "forever", timer: 0, targetObjectId: "waterfallTowerDoorBeads"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 300, mapId: 'waterfallTowerSpirit', floorId: '1F', mapX: 2, mapY: 3},
     ],
+    corrosiveLogic: {"isTrue":true,"isInverted":false},
 };
 const f1_0x0: AreaDefinition = {
     layers: null,
@@ -604,19 +607,19 @@ const f1_0x0: AreaDefinition = {
         {status: "normal", id: "waterfallTower:0:0x0-decoration-0", x: 0, y: 512, type: "waterfall", w: 512, h: 512},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 32, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 301, mapId: 'waterfallTower', floorId: '2F', mapX: 0, mapY: 0},
+        {x: 0, y: 16, w: 32, h: 16, index: 302, mapId: 'waterfallTower', floorId: '2F', mapX: 0, mapY: 1},
     ],
 };
-const f1_1x0: AreaDefinition = {
+const f1_0x1: AreaDefinition = {
     layers: null,
     objects: [
         {status: "normal", id: "waterfallTower:0:0x0-decoration-0", x: 0, y: 512, type: "waterfall", w: 512, h: 512},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 303, mapId: 'waterfallTower', floorId: '2F', mapX: 0, mapY: 2},
+        {x: 0, y: 16, w: 16, h: 16, index: 304, mapId: 'waterfallTower', floorId: '2F', mapX: 0, mapY: 3},
+        {x: 16, y: 16, w: 16, h: 16, index: 305, mapId: 'waterfallTower', floorId: '2F', mapX: 1, mapY: 3},
     ],
 };
 const sf1_0x0: AreaDefinition = {
@@ -852,13 +855,14 @@ const sf1_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 336, y: 288, type: "turret", d: "down", fireInterval: 1200, fireOffset: 400, style: "crystal"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 32, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 306, mapId: 'waterfallTowerSpirit', floorId: '3F', mapX: 2, mapY: 1},
+        {x: 0, y: 16, w: 32, h: 16, index: 307, mapId: 'waterfallTowerSpirit', floorId: '2F', mapX: 2, mapY: 2},
     ],
+    corrosiveLogic: {"isTrue":true,"isInverted":false},
 };
-const sf1_1x0: AreaDefinition = {
+const sf1_0x1: AreaDefinition = {
     isSpiritWorld: true,
-    parentDefinition: f1_1x0,
+    parentDefinition: f1_0x1,
     layers: [
         {
             key: 'floor',
@@ -890,10 +894,10 @@ const sf1_1x0: AreaDefinition = {
                     [1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007],
                     [1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007],
                     [1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007],
-                    [1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1006,1006,1006,1006,1007,1007,1007],
-                    [1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1006,1006,1006,1006,1007,1007,1007],
-                    [1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1006,1006,1006,1006,1007,1007,1007],
-                    [1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1006,1006,1006,1006,1007,1007,1007],
+                    [1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1005,1005,1005,1007,1007],
+                    [1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1006,1007,1007,1007],
+                    [1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007],
+                    [1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007],
                     [1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007],
                     [1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007],
                     [1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007,1007],
@@ -929,10 +933,10 @@ const sf1_1x0: AreaDefinition = {
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1089,1090,1090,1091,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1092,1093,1093,1094,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1098,1099,1099,1100,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1101,1102,1102,1103,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -973,11 +977,11 @@ const sf1_1x0: AreaDefinition = {
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,695,0,0,692,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,703,0,0,700,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,703,0,0,700,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,703,0,0,700,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,701,685,685,702,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -1014,12 +1018,12 @@ const sf1_1x0: AreaDefinition = {
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1049,0,0,0,0,1051,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1050,0,0,0,0,1052,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1049,0,0,0,0,1051,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1050,0,0,0,0,1052,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1049,0,0,0,0,1051,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1050,1055,1056,1055,1056,1052,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -1059,8 +1063,8 @@ const sf1_1x0: AreaDefinition = {
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,189,0,189,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,189,189,189,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -1176,14 +1180,12 @@ const sf1_1x0: AreaDefinition = {
         {status: "normal", id: "", x: 304, y: 224, type: "beadGrate"},
         {status: "normal", id: "", x: 336, y: 224, type: "beadGrate"},
         {status: "normal", id: "", x: 368, y: 224, type: "beadGrate"},
-        {status: "closed", id: "waterfallTowerBoss", x: 176, y: 48, type: "door", style: "cavernUpstairs", d: "up", saveStatus: "forever", targetZone: "waterfallTower", targetObjectId: "waterfallTowerBoss", locationCue: "Waterfall 1F"},
-        {status: "closed", id: "waterfallTowerThroneDoor", x: 256, y: 352, type: "door", style: "cavern", d: "left"},
-        {status: "closed", id: "waterfallTowerThroneDoor", x: 240, y: 352, type: "door", style: "cavern", d: "right"},
-        {status: "normal", id: "waterfallTowerTopEntrance", x: 352, y: 496, type: "door", style: "cavern", d: "down", targetZone: "sky", targetObjectId: "waterfallTowerTopEntrance", locationCue: "Waterfall 2F"},
-        {status: "closed", id: "waterfallTowerBoss", x: 176, y: 272, type: "door", style: "cavernDownstairs", d: "up", targetZone: "waterfallTower", targetObjectId: "waterfallTowerBoss", locationCue: "Waterfall 2F"},
-        {status: "normal", id: "", x: 416, y: 384, targetZone: "waterfallTower", targetObjectId: "waterfallTowerMarkerC", type: "pitEntrance"},
+        {status: "closed", id: "waterfallTowerBoss", x: 176, y: 48, type: "door", style: "crystalUpstairs", d: "up", saveStatus: "forever", targetZone: "waterfallTower", targetObjectId: "waterfallTowerBoss", locationCue: "Waterfall 1F"},
+        {status: "closed", id: "waterfallTowerThroneDoor", x: 256, y: 352, type: "door", style: "crystal", d: "left"},
+        {status: "closed", id: "waterfallTowerThroneDoor", x: 240, y: 352, type: "door", style: "crystal", d: "right"},
+        {status: "normal", id: "waterfallTowerTopEntrance", x: 352, y: 496, type: "door", style: "crystal", d: "down", targetZone: "sky", targetObjectId: "waterfallTowerTopEntrance", locationCue: "Waterfall 2F"},
+        {status: "closed", id: "waterfallTowerBoss", x: 176, y: 272, type: "door", style: "crystalDownstairs", d: "up", targetZone: "waterfallTower", targetObjectId: "waterfallTowerBoss", locationCue: "Waterfall 2F"},
         {status: "normal", id: "", x: 272, y: 336, style: "short", type: "sign", message: "The King is not to be disturbed."},
-        {status: "normal", id: "", x: 400, y: 432, style: "short", type: "sign", message: "Waste Disposal Chute"},
         {status: "normal", id: "waterfallDragon", x: 32, y: 384, d: "right", behavior: "none", style: "giantSnake", type: "npc", dialogueKey: "waterfallDragon"},
         {status: "off", id: "", x: 112, y: 40, type: "turret", d: "down", fireInterval: 1000, fireOffset: 0, style: "crystal"},
         {status: "off", id: "", x: 128, y: 40, type: "turret", d: "down", fireInterval: 1000, fireOffset: 0, style: "crystal"},
@@ -1204,12 +1206,15 @@ const sf1_1x0: AreaDefinition = {
         {status: "off", id: "", x: 368, y: 40, type: "turret", d: "down", fireInterval: 1000, fireOffset: 0, style: "crystal"},
         {status: "off", id: "", x: 384, y: 40, type: "turret", d: "down", fireInterval: 1000, fireOffset: 0, style: "crystal"},
         {status: "normal", id: "waterfallTower:s1:0x1-luckyBeetle-0", x: 328, y: 384, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
+        {status: "closedSwitch", id: "waterfallTowerLadder", x: 448, y: 384, type: "door", style: "ladderDown", targetZone: "waterfallTower", targetObjectId: "waterfallTowerLadder", d: "down", saveStatus: "forever"},
+        {status: "normal", id: "waterfallTowerLadderSwitch", x: 448, y: 416, targetObjectId: "waterfallTowerLadder", type: "floorSwitch", saveStatus: "forever"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 308, mapId: 'waterfallTowerSpirit', floorId: 'B1', mapX: 2, mapY: 3},
+        {x: 0, y: 16, w: 16, h: 16, index: 309, mapId: 'waterfallTowerSpirit', floorId: '2F', mapX: 2, mapY: 4},
+        {x: 16, y: 16, w: 16, h: 16, index: 310, mapId: 'waterfallTowerSpirit', floorId: '2F', mapX: 3, mapY: 4},
     ],
+    corrosiveLogic: {"isTrue":true,"isInverted":false},
 };
 zones.waterfallTower = {
     key: 'waterfallTower',
@@ -1217,21 +1222,21 @@ zones.waterfallTower = {
         {
             grid: [
                 [f0_0x0,],
-                [f0_1x0,],
+                [f0_0x1,],
             ],
             spiritGrid: [
                 [sf0_0x0,],
-                [sf0_1x0,],
+                [sf0_0x1,],
             ],
         },
         {
             grid: [
                 [f1_0x0,],
-                [f1_1x0,],
+                [f1_0x1,],
             ],
             spiritGrid: [
                 [sf1_0x0,],
-                [sf1_1x0,],
+                [sf1_0x1,],
             ],
         },
     ],

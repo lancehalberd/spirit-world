@@ -6,6 +6,7 @@ import {
     hasCloudBoots,
     hasClone,
     hasIce,
+    hasLightning,
     hasRoll,
     hasSomersault,
     hasStaff,
@@ -13,7 +14,8 @@ import {
     orLogic,
 } from 'app/content/logic';
 
-import {LogicNode } from 'app/types';
+
+const hasDroppedElevator = {requiredFlags: ['elevatorDropped']};
 
 const zoneId = 'staffTower';
 export const staffTowerNodes: LogicNode[] = [
@@ -21,7 +23,7 @@ export const staffTowerNodes: LogicNode[] = [
         zoneId,
         nodeId: 'staffTowerF1Downstairs',
         paths: [
-            {nodeId: 'staffTowerF1Upstairs', logic: orLogic(hasIce, hasCloudBoots, hasClone)}
+            {nodeId: 'staffTowerF1Upstairs', logic: orLogic(hasIce, hasCloudBoots, hasClone, hasSomersault)}
         ],
         entranceIds: ['staffTowerEntrance'],
         exits: [{objectId: 'staffTowerEntrance'}],
@@ -34,6 +36,17 @@ export const staffTowerNodes: LogicNode[] = [
             // Power is only on after the storm beast is released.
             {nodeId: 'staffTowerF1Spirit', logic: hasReleasedBeasts},
         ],
+        entranceIds: ['staffTowerBasementLadder'],
+        exits: [{objectId: 'staffTowerBasementLadder', logic: orLogic(hasLightning, hasDroppedElevator)}],
+    },
+    {
+        zoneId,
+        nodeId: 'staffTowerB1',
+        checks: [
+            { objectId: 'staffTowerGold', logic: andLogic(hasLightning, hasBossWeapon) },
+        ],
+        entranceIds: ['staffTowerBasementLadder'],
+        exits: [{objectId: 'staffTowerBasementLadder', logic: hasDroppedElevator}],
     },
     {
         zoneId,
@@ -62,7 +75,7 @@ export const staffTowerNodes: LogicNode[] = [
         zoneId,
         nodeId: 'staffTowerF2',
         checks: [
-            { objectId: 'staffTowerSmallMoney1', logic: orLogic(hasStaff, hasCloudBoots) },
+            { objectId: 'staffTowerMap', logic: orLogic(hasIce, hasStaff, hasCloudBoots, hasSomersault) },
         ],
         // This is blocked as an entrance because of the lightning barrier.
         // Can eventually remove this and split the upper area and allow invisibility to move past the barrier.

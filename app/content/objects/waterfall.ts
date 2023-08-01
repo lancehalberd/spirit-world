@@ -1,11 +1,8 @@
+import { objectHash } from 'app/content/objects/objectHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { createCanvasAndContext } from 'app/dom';
 import { drawFrameAt } from 'app/utils/animations';
-import { requireImage } from 'app/utils/images';
-import {
-    AreaInstance, DrawPriority, Frame, FrameWithPattern, GameState,
-    ObjectInstance, ObjectStatus, WaterfallDefinition, Rect,
-} from 'app/types';
+import { createCanvasAndContext } from 'app/utils/canvas';
+import { requireFrame } from 'app/utils/packedImages';
 
 export class Waterfall implements ObjectInstance {
     area: AreaInstance;
@@ -20,7 +17,7 @@ export class Waterfall implements ObjectInstance {
     status: ObjectStatus = 'normal';
     animationTime = 0;
     back: WaterfallBack;
-    constructor(definition: WaterfallDefinition) {
+    constructor(state: GameState, definition: WaterfallDefinition) {
         this.definition = definition;
         this.x = definition.x;
         this.y = definition.y;
@@ -30,6 +27,9 @@ export class Waterfall implements ObjectInstance {
     }
     getHitbox(): Rect {
         return {x: this.x, y: this.y - this.h, w: this.w, h: this.h - 8};
+    }
+    getYDepth() {
+        return this.y + 8;
     }
     getParts() {
         return [this.back];
@@ -62,7 +62,7 @@ class WaterfallBack implements ObjectInstance {
         return {x: this.waterfall.x, y: this.waterfall.y - this.waterfall.h, w: this.waterfall.w, h: this.waterfall.h};
     }
     getYDepth(): number {
-        return this.waterfall.y - 16;
+        return this.waterfall.y;
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
         const target = this.getHitbox();
@@ -75,18 +75,18 @@ class WaterfallBack implements ObjectInstance {
     }
 }
 
-const waterfallImage = requireImage('gfx/tiles/waterfalltilesdeep.png');
+const waterfallImage = 'gfx/tiles/waterfalltilesdeep.png';
 
-const waterfallTopPattern: FrameWithPattern = {image: waterfallImage, x: 16, y: 12, w: 32, h: 20};
-const waterfallMiddlePattern: FrameWithPattern = {image: waterfallImage, x: 16, y: 32, w: 32, h: 16};
-const waterfallBottomPattern: FrameWithPattern = {image: waterfallImage, x: 16, y: 48, w: 32, h: 16};
-const waterfallLeftPattern: FrameWithPattern = {image: waterfallImage, x: 0, y: 32, w: 16, h: 16};
-const waterfallRightPattern: FrameWithPattern = {image: waterfallImage, x: 48, y: 32, w: 16, h: 16};
+const waterfallTopPattern: FrameWithPattern = requireFrame(waterfallImage, {x: 16, y: 12, w: 32, h: 20});
+const waterfallMiddlePattern: FrameWithPattern = requireFrame(waterfallImage, {x: 16, y: 32, w: 32, h: 16});
+const waterfallBottomPattern: FrameWithPattern = requireFrame(waterfallImage, {x: 16, y: 48, w: 32, h: 16});
+const waterfallLeftPattern: FrameWithPattern = requireFrame(waterfallImage, {x: 0, y: 32, w: 16, h: 16});
+const waterfallRightPattern: FrameWithPattern = requireFrame(waterfallImage, {x: 48, y: 32, w: 16, h: 16});
 
-const waterfallTL: Frame = {image: waterfallImage, x: 0, y: 12, w: 16, h: 20};
-const waterfallTR: Frame = {image: waterfallImage, x: 48, y: 12, w: 16, h: 20};
-const waterfallBL: Frame = {image: waterfallImage, x: 0, y: 48, w: 16, h: 16};
-const waterfallBR: Frame = {image: waterfallImage, x: 48, y: 48, w: 16, h: 16};
+const waterfallTL: Frame = requireFrame(waterfallImage, {x: 0, y: 12, w: 16, h: 20});
+const waterfallTR: Frame = requireFrame(waterfallImage, {x: 48, y: 12, w: 16, h: 20});
+const waterfallBL: Frame = requireFrame(waterfallImage, {x: 0, y: 48, w: 16, h: 16});
+const waterfallBR: Frame = requireFrame(waterfallImage, {x: 48, y: 48, w: 16, h: 16});
 
 
 function fillPattern(context: CanvasRenderingContext2D, frame: FrameWithPattern, target: Rect, offset = {x: 0, y: 0}) {
@@ -208,3 +208,4 @@ function renderWaterfallTiles(context: CanvasRenderingContext2D, state: GameStat
         ...waterfallBR, x: waterfall.x + waterfall.w - 8, y,
     });
 }
+objectHash.waterfall = Waterfall;

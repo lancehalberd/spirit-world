@@ -1,6 +1,5 @@
 
 
-import { LootTable, LootType } from 'app/types';
 
 
 function createLootTable(totalWeight: number, entries: {type: LootType, amount?: number, weight: number}[]) {
@@ -30,6 +29,10 @@ export const lifeLootTable = createLootTable(200, [
     {type: 'money', amount: 5, weight: 2},
     {type: 'money', amount: 1, weight: 20},
     {type: 'peach', weight: 50},
+]);
+
+export const rareLifeLootTable = createLootTable(200, [
+    {type: 'peach', weight: 25},
 ]);
 
 export const certainLifeLootTable = createLootTable(100, [

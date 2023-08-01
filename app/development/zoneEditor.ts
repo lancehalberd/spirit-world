@@ -1,23 +1,25 @@
 import {
-    enterLocation, getAreaInstanceFromLocation, setAreaSection, setConnectedAreas,
+    getAreaInstanceFromLocation, setConnectedAreas,
 } from 'app/content/areas';
 import { logicHash } from 'app/content/logic';
-import { specialBehaviorsHash } from 'app/content/specialBehaviors';
+import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
 import { zones } from 'app/content/zones';
 import { exportZoneToClipboard, importZone, serializeZone } from 'app/development/exportZone';
+import { replaceMapSections } from 'app/development/sections';
 import { TabContainer } from 'app/development/tabContainer';
 import { renderPropertyRows } from 'app/development/propertyPanel';
-import { displayTileEditorPropertyPanel, editingState, EditingState } from 'app/development/tileEditor';
-import { createCanvasAndContext, tagElement } from 'app/dom';
+import { editingState } from 'app/development/editingState';
+import { tagElement } from 'app/dom';
 import { CANVAS_WIDTH, CANVAS_HEIGHT } from 'app/gameConstants';
-import { checkToRedrawTiles } from 'app/render';
+import { checkToRedrawTiles } from 'app/render/renderField';
 import { getState } from 'app/state';
+import { setAreaSection } from 'app/utils/area';
+import { createCanvasAndContext } from 'app/utils/canvas';
+import { enterLocation } from 'app/utils/enterLocation';
+import { getFullZoneLocation } from 'app/utils/getFullZoneLocation';
 import { readFromFile, saveToFile, scaleRect } from 'app/utils/index';
 import { getMousePosition, isMouseDown } from 'app/utils/mouse';
 
-import {
-    AreaInstance, Floor, GameState, LogicDefinition, PanelRows, PropertyRow, Zone
-} from 'app/types';
 
 const fullSection = {x: 0, y: 0, w: 32, h: 32};
 const leftColumn = {x: 0, y: 0, w: 16, h: 32};
@@ -64,6 +66,10 @@ mapOverlayCanvas.onmousemove = function (e: MouseEvent) {
       return;
   }
   jumpToMinimapLocation();
+}
+
+function refreshArea(state: GameState) {
+    enterLocation(state, state.location, true);
 }
 
 function jumpToMinimapLocation() {
@@ -176,9 +182,10 @@ function fillMinimap(state: GameState): void {
     }
 }
 let lastMinimapZoneKey = '', lastFloor = 0, lastIsSpiritWorld = false;
-export function checkToRefreshMinimap(state: GameState): void {
+export function checkToRefreshMinimap(state: GameState, forceRefresh = false): void {
     updateMinimapSize(state);
-    if (lastMinimapZoneKey !== state.location.zoneKey
+    if (forceRefresh
+        || lastMinimapZoneKey !== state.location.zoneKey
         || lastFloor !== state.location.floor
         || lastIsSpiritWorld !== state.location.isSpiritWorld
     ) {
@@ -275,8 +282,7 @@ export function getImportExportProperties(): PanelRows {
                 const state = getState();
                 state.location.zoneKey = importZone(contents, state.location.zoneKey);
                 state.location.floor = 0;
-                enterLocation(state, state.location);
-                displayTileEditorPropertyPanel();
+                refreshArea(state);
             });
         },
     }, {
@@ -286,8 +292,7 @@ export function getImportExportProperties(): PanelRows {
                 const state = getState();
                 state.location.zoneKey = importZone(contents, state.location.zoneKey);
                 state.location.floor = 0;
-                enterLocation(state, state.location);
-                displayTileEditorPropertyPanel();
+                refreshArea(state);
             });
         },
     }]);
@@ -313,8 +318,7 @@ export function getBehaviorProperties(): PanelRows {
                 } else {
                     state.areaInstance.definition.specialBehaviorKey = specialBehaviorKey;
                 }
-                enterLocation(state, state.location);
-                displayTileEditorPropertyPanel();
+                refreshArea(state);
             },
         });
     }
@@ -335,7 +339,7 @@ export function getBehaviorProperties(): PanelRows {
                     delete state.zone.underwaterKey;
                 }
             }
-            displayTileEditorPropertyPanel();
+            editingState.needsRefresh = true;
         }
     }, {
         name: 'Underwater Key',
@@ -354,7 +358,7 @@ export function getBehaviorProperties(): PanelRows {
                     delete state.zone.surfaceKey;
                 }
             }
-            displayTileEditorPropertyPanel();
+            editingState.needsRefresh = true;
         }
     });
     rows.push({
@@ -367,21 +371,23 @@ export function getBehaviorProperties(): PanelRows {
             } else {
                 state.areaInstance.definition.dark = dark;
             }
-            enterLocation(state, state.location);
+            refreshArea(state);
         }
     });
-    rows = [...rows, ...getLogicProperties(state, 'Is Hot?', state.areaInstance.definition.hotLogic || {}, updatedLogic => {
-        state.areaInstance.definition.hotLogic = updatedLogic;
-        enterLocation(state, state.location);
-        displayTileEditorPropertyPanel();
+    rows = [...rows, ...getLogicProperties(state, 'Drains Spirit?', state.areaInstance.definition.corrosiveLogic, updatedLogic => {
+        state.areaInstance.definition.corrosiveLogic = updatedLogic;
+        refreshArea(state);
+    })];
+    rows = [...rows, ...getLogicProperties(state, 'Is Section Hot?', state.areaSection.definition.hotLogic, updatedLogic => {
+        state.areaSection.definition.hotLogic = updatedLogic;
+        refreshArea(state);
     })];
     rows.push({
         name: 'Refresh Area',
         onClick() {
             state.location.x = state.hero.x;
             state.location.y = state.hero.y;
-            // Calling this will instantiate the area again and place the player back in their current location.
-            enterLocation(state, state.location);
+            refreshArea(state);
         }
     });
     return rows;
@@ -399,8 +405,7 @@ export function getZoneProperties(): PanelRows {
             if (state.location.zoneKey !== zoneKey) {
                 state.location.zoneKey = zoneKey;
                 state.location.floor = 0;
-                enterLocation(state, state.location);
-                displayTileEditorPropertyPanel();
+                refreshArea(state);
             }
         }
     }, {
@@ -423,8 +428,7 @@ export function getZoneProperties(): PanelRows {
             zones[newZoneKey] = zone;
             state.location.zoneKey = zone.key;
             state.location.floor = 0;
-            enterLocation(state, state.location);
-            displayTileEditorPropertyPanel();
+            refreshArea(state);
         },
     },
     {
@@ -435,8 +439,7 @@ export function getZoneProperties(): PanelRows {
             const floorNumber = parseInt(floorString, 10) - 1;
             if (state.location.floor !== floorNumber) {
                 state.location.floor = floorNumber;
-                enterLocation(state, state.location);
-                displayTileEditorPropertyPanel();
+                refreshArea(state);
             }
         }
     }, {
@@ -457,8 +460,7 @@ export function getZoneProperties(): PanelRows {
             }
             state.zone.floors.push(floor);
             state.location.floor = state.zone.floors.length - 1;
-            enterLocation(state, state.location);
-            displayTileEditorPropertyPanel();
+            refreshArea(state);
         },
     }]);
     rows.push({
@@ -467,6 +469,7 @@ export function getZoneProperties(): PanelRows {
         onChange(isSpiritWorld: boolean) {
             if (state.location.isSpiritWorld != isSpiritWorld) {
                 state.location.isSpiritWorld = isSpiritWorld;
+                state.location = getFullZoneLocation(state.location);
                 editingState.spirit = isSpiritWorld;
                 const tempInstance = state.areaInstance;
                 state.areaGrid = isSpiritWorld ? state.floor.spiritGrid : state.floor.grid;
@@ -474,8 +477,9 @@ export function getZoneProperties(): PanelRows {
                 state.alternateAreaInstance = tempInstance;
                 state.hero.area = state.areaInstance;
                 setConnectedAreas(state, tempInstance);
+                setAreaSection(state);
                 //enterLocation(state, state.location);
-                displayTileEditorPropertyPanel();
+                editingState.needsRefresh = true;
             }
         }
     });
@@ -495,12 +499,14 @@ export function getZoneProperties(): PanelRows {
                             grid[i].push(null);
                         }
                         while (grid[i].length > columns) {
-                            grid[i].pop();
+                            const area = grid[i].pop();
+                            // Remove any deleted sections from the map.
+                            replaceMapSections(state, state.location, area.sections || []);
                         }
                     }
                 }
-                enterLocation(state, state.location);
-                displayTileEditorPropertyPanel();
+                refreshArea(state);
+                checkToRefreshMinimap(state, true);
             }
         }
     }, 'x', {
@@ -518,12 +524,16 @@ export function getZoneProperties(): PanelRows {
                             grid.push([...new Array(grid[0].length)].map(() => null));
                         }
                         while (grid.length > rows) {
-                            grid.pop();
+                            const row = grid.pop();
+                            for (const area of row) {
+                                // Remove any deleted sections from the map.
+                                replaceMapSections(state, state.location, area.sections || []);
+                            }
                         }
                     }
                 }
-                enterLocation(state, state.location);
-                displayTileEditorPropertyPanel();
+                refreshArea(state);
+                checkToRefreshMinimap(state, true);
             }
         }
     }]);
@@ -532,9 +542,20 @@ export function getZoneProperties(): PanelRows {
         value: 'Change Layout',
         values: ['Change Layout', ...Object.keys(sectionLayouts)],
         onChange(sectionType: string) {
-            state.areaInstance.definition.sections = sectionLayouts[sectionType];
+            // Section layout is required to match between material and spirit world.
+            // Mostly this is because it is annoying to have to update it in both places
+            // when we almost always intend for them to be the same anyway.
+            const newCurrentSections = sectionLayouts[sectionType].map(section => ({...section}));
+            replaceMapSections(state, state.location, state.areaInstance.definition.sections || [], newCurrentSections);
+            state.areaInstance.definition.sections = newCurrentSections;
+            const newAlternateSections = sectionLayouts[sectionType].map(section => ({...section}));
+            replaceMapSections(state, {
+                ...state.location,
+                isSpiritWorld: !state.location.isSpiritWorld,
+            }, state.alternateAreaInstance.definition.sections || [], newAlternateSections);
+            state.alternateAreaInstance.definition.sections = newAlternateSections;
             state.areaSection = null;
-            setAreaSection(state, state.hero.d);
+            setAreaSection(state);
             return 'Change Layout';
         }
     });
@@ -543,8 +564,7 @@ export function getZoneProperties(): PanelRows {
         onClick() {
             state.location.x = state.hero.x;
             state.location.y = state.hero.y;
-            // Calling this will instantiate the area again and place the player back in their current location.
-            enterLocation(state, state.location);
+            refreshArea(state);
         }
     });
     return rows;
@@ -570,16 +590,16 @@ export function getMinimapProperties(): PanelRows {
 export function getLogicProperties(
     state: GameState,
     label: string,
-    logic: LogicDefinition,
+    logic: LogicDefinition | undefined,
     updateLogic: (newLogic?: LogicDefinition) => void
 ): PanelRows {
     const rows: PanelRows = [];
     let currentValue = 'none';
-    if (logic.isTrue) {
+    if (logic?.isTrue) {
         currentValue = 'true';
-    } else if (logic.hasCustomLogic) {
+    } else if (logic?.hasCustomLogic) {
         currentValue = 'custom';
-    } else if (logic.logicKey) {
+    } else if (logic?.logicKey) {
         currentValue = logic.logicKey;
     }
     const row: PropertyRow = [{
@@ -593,18 +613,18 @@ export function getLogicProperties(
             } else if (logicType === 'true') {
                 updateLogic({
                     isTrue: true,
-                    isInverted: !!logic.isInverted,
+                    isInverted: !!logic?.isInverted,
                 });
             } else if (logicType === 'custom') {
                 updateLogic({
                     hasCustomLogic: true,
-                    customLogic: logic.customLogic || '',
-                    isInverted: !!logic.isInverted,
+                    customLogic: logic?.customLogic || '',
+                    isInverted: !!logic?.isInverted,
                 });
             } else {
                 updateLogic({
                     logicKey: logicType,
-                    isInverted: !!logic.isInverted,
+                    isInverted: !!logic?.isInverted,
                 });
             }
         }
@@ -615,9 +635,9 @@ export function getLogicProperties(
     if (currentValue === 'custom') {
         row.push({
             name: 'Flag',
-            value: logic.customLogic || '',
+            value: logic?.customLogic || '',
             onChange(customLogic: string) {
-                const updatedLogic = {...logic};
+                const updatedLogic = {...(logic || {})};
                 updatedLogic.customLogic = customLogic;
                 updateLogic(updatedLogic);
             },
@@ -627,9 +647,9 @@ export function getLogicProperties(
     if (currentValue !== 'none' && currentValue !== 'true') {
         rows.push({
             name: 'Invert',
-            value: !!logic.isInverted,
+            value: !!logic?.isInverted,
             onChange(isInverted: boolean) {
-                const updatedLogic = {...logic};
+                const updatedLogic = {...(logic || {})};
                 if (!isInverted) {
                     delete updatedLogic.isInverted;
                 } else {

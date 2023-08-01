@@ -1,11 +1,10 @@
 import {
-    andLogic, canCross2Gaps,
-    hasBossWeapon, hasWeapon, hasCatEyes, hasFireBlessing, hasInvisibility,
+    andLogic, canCross2Gaps, canHasTowerStaff, hasClone,
+    hasBossWeapon, hasWeapon, hasCatEyes, hasFireBlessing, hasIce, hasInvisibility,
     hasMediumRange, hasMitts, hasSomersault, hasTeleportation,
     orLogic,
 } from 'app/content/logic';
 
-import { LogicNode } from 'app/types';
 
 export const treeVillageNodes: LogicNode[] = [
     {
@@ -24,8 +23,7 @@ export const treeVillageNodes: LogicNode[] = [
         zoneId: 'treeVillage',
         nodeId: 'elderDownstairs',
         checks: [
-            { objectId: 'elderPeachPiece', logic: orLogic(hasMediumRange,
-                orLogic(hasSomersault, hasTeleportation)) },
+            { objectId: 'elderPeachPiece', logic: hasMediumRange },
             { objectId: 'treeVillage:1:0x0-bow-0', logic: hasCatEyes },
         ],
         entranceIds: [
@@ -180,7 +178,7 @@ export const waterfallCaveNodes: LogicNode[] = [
 ];
 
 // The flameBeast flag is set correctly during simulation, so this logic works as expected.
-const canAscendToCrater = orLogic(hasMitts, hasInvisibility, {requiredFlags: ['flameBeast']});
+const canAscendToCrater = orLogic(hasMitts, hasIce, hasInvisibility, {requiredFlags: ['flameBeast']});
 const canAscendToCraterSpirit = orLogic(hasInvisibility, hasFireBlessing, {requiredFlags: ['flameBeast']});
 export const cavesNodes: LogicNode[] = [
     // This cave connects the NW corner of the overworld to the sky and is one way.
@@ -269,6 +267,49 @@ export const cavesNodes: LogicNode[] = [
             { objectId: 'helixEntrance' },
         ],
     },
+
+    // Clone Cave
+    {
+        zoneId: 'cloneCave',
+        nodeId: 'cloneCaveEntrance',
+        checks: [{objectId: 'cloneCaveMoney', logic: hasClone}],
+        paths: [{ nodeId: 'cloneCaveExit'}],
+        entranceIds: ['cloneCaveEntrance'],
+        exits: [
+            { objectId: 'cloneCaveEntrance' },
+        ],
+    },
+    {
+        zoneId: 'cloneCave',
+        nodeId: 'cloneCaveExit',
+        entranceIds: ['cloneCaveExit'],
+        exits: [
+            { objectId: 'cloneCaveExit' },
+        ],
+    },
+
+    // Hype Cave
+    {
+        zoneId: 'hypeCave',
+        nodeId: 'hypeCave',
+        checks: [
+            {objectId: 'hypeCaveMoney1'},
+            {objectId: 'hypeCaveMoney2'},
+            {objectId: 'hypeCaveMoney3'},
+            {objectId: 'hypeCaveMoney4'},
+            {objectId: 'hypeCavePeachPiece', logic: orLogic(hasSomersault, canHasTowerStaff)},
+        ],
+        entranceIds: ['hypeCaveEntranceSpirit'],
+        exits: [
+            { objectId: 'hypeCaveEntranceSpirit' },
+        ],
+    },
+    {
+        zoneId: 'bellCave',
+        nodeId: 'bellCave',
+        exits: [{ objectId: 'bellCaveEntrance' }],
+        entranceIds: ['bellCaveEntrance'],
+    },
 ];
 
 
@@ -309,5 +350,13 @@ export const holyCityNodes: LogicNode[] = [
         entranceIds: ['clothesHouse'],
         exits: [{ objectId: 'clothesHouse'}],
     },
-];
 
+    // Jade city
+    {
+        zoneId: 'holyCityInterior',
+        nodeId: 'jadeCitySoutheastHouse',
+        checks: [{objectId: 'jadeCityPeachPiece'}],
+        entranceIds: ['jadeCitySoutheastDoor'],
+        exits: [{ objectId: 'jadeCitySoutheastDoor'}],
+    },
+];

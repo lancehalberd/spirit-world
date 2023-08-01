@@ -1,14 +1,12 @@
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
-import { addEffectToArea, getAreaSize, removeEffectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { playAreaSound } from 'app/musicController';
+import { renderLightningCircle } from 'app/render/renderLightning';
 import { createAnimation, drawFrameAt, getFrame } from 'app/utils/animations';
 import { getDirection, hitTargets } from 'app/utils/field';
-import { playSound } from 'app/musicController';
+import { getAreaSize } from 'app/utils/getAreaSize';
+import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 
-import {
-    AreaInstance, Direction, DrawPriority, EffectInstance, Frame, FrameAnimation,
-    GameState, HitProperties, MagicElement, ObjectInstance,
-} from 'app/types';
 
 const upGeometry = {w: 16, h: 16, content: {x: 4, y: 0, w: 7, h: 5}};
 const downGeometry = {w: 16, h: 16, content: {x: 4, y: 11, w: 7, h: 5}};
@@ -174,7 +172,7 @@ interface Props {
     style?: ArrowStyle
 }
 
-export class Arrow implements EffectInstance {
+export class Arrow implements EffectInstance, Projectile {
     area: AreaInstance;
     drawPriority: DrawPriority = 'sprites';
     frame: Frame;
@@ -205,6 +203,7 @@ export class Arrow implements EffectInstance {
     } = null;
     style: ArrowStyle = 'normal';
     isPlayerAttack = true;
+    isHigh = false;
     constructor({
         x = 0, y = 0, vx = 0, vy = 0, chargeLevel = 0, damage = 1, 
         spiritCloakDamage = 5, delay = 0, element = null, reflected = false, style = 'normal',
@@ -227,6 +226,15 @@ export class Arrow implements EffectInstance {
         this.y -= this.h / 2 ;
         this.style = style;
         this.reflected = reflected;
+    }
+    getHitbox() {
+        return this;
+    }
+    getYDepth() {
+        if (this.isHigh) {
+            return this.y + this.h + 32;
+        }
+        return this.y + this.h;
     }
     getHitProperties(state: GameState): HitProperties {
         return {
@@ -251,6 +259,7 @@ export class Arrow implements EffectInstance {
             hitObjects: true,
             hitTiles: this.animationTime >= this.ignoreWallsDuration,
             isArrow: true,
+            projectile: this,
         };
     }
     update(state: GameState) {
@@ -292,19 +301,39 @@ export class Arrow implements EffectInstance {
             removeEffectFromArea(state, this);
             return;
         }
-        if (!this.stuckFrames && this.damage > 1 && this.animationTime % 60 === 0) {
+        if (!this.stuckFrames && this.damage > 2 && this.animationTime % 60 === 0) {
             addSparkleAnimation(state, this.area, this, { element: this.element });
+        }
+        if (this.element === 'lightning') {
+            const r = this.chargeLevel > 1 ? 24 : 16;
+            hitTargets(state, this.area, {
+                direction: this.direction,
+                damage: this.damage,
+                spiritCloakDamage: this.spiritCloakDamage,
+                hitCircle: {x: this.x + this.w / 2, y: this.y + this.h / 2, r},
+                vx: this.vx,
+                vy: this.vy,
+                element: this.element,
+                hitAllies: this.reflected,
+                hitEnemies: !this.reflected,
+                hitObjects: true,
+                // Technically this might not be the arrow, but if we set this to false
+                // then the bubble will hit first leaving the enemy immune to the actual
+                // arrow itself, which would disable arrow weakness on enemies if using
+                // lightning element, which seems undesirable.
+                isArrow: true,
+            });
         }
         const hitResult = hitTargets(state, this.area, this.getHitProperties(state));
         if (hitResult.reflected) {
             this.vx = -this.vx;
             this.vy = -this.vy;
             this.reflected = !this.reflected;
-            playSound('blockAttack');
+            playAreaSound(state, this.area, 'blockAttack');
             this.direction = getDirection(this.vx, this.vy, true);
             return;
         }
-        if (hitResult.blocked) {
+        if (hitResult.blocked || hitResult.stopped) {
             this.stuckFrames = 1;
             this.blocked = true;
             this.vz = 1;
@@ -344,6 +373,18 @@ export class Arrow implements EffectInstance {
         if (chargeAnimation) {
             frame = getFrame(chargeAnimation, this.animationTime);
             drawFrameAt(context, frame, { x: this.x, y: this.y - this.z });
+        }
+        if (!this.blocked && !this.stuckFrames && this.element === 'lightning') {
+            const x = this.x + this.w / 2, y = this.y + this.h / 2;
+            const r = this.chargeLevel > 1 ? 24 : 16;
+            /*context.beginPath();
+            context.arc(x, y, r, 0, 2 * Math.PI);
+            context.save();
+                context.globalAlpha *= 0.1;
+                context.fillStyle = 'yellow'
+                context.fill();
+            context.restore();*/
+            renderLightningCircle(context, {x, y, r});
         }
     }
 }
@@ -404,6 +445,7 @@ export class EnemyArrow extends Arrow {
             hitObjects: true,
             hitTiles: this.animationTime >= this.ignoreWallsDuration,
             isArrow: true,
+            projectile: this,
         };
     }
     update(state: GameState) {
@@ -448,6 +490,7 @@ export class CrystalSpike extends Arrow {
             hitEnemies: this.reflected,
             hitObjects: true,
             hitTiles: this.animationTime >= this.ignoreWallsDuration,
+            projectile: this,
         };
     }
     render(context: CanvasRenderingContext2D, state: GameState) {

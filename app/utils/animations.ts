@@ -1,20 +1,6 @@
-import { createCanvasAndContext, debugCanvas } from 'app/dom';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { requireImage } from 'app/utils/images';
-import {
-    ExtraAnimationProperties, Frame, FrameAnimation, FrameDimensions, FrameRectangle,
-    Rect, TintedFrame,
-} from 'app/types';
-
-export interface CreateAnimationOptions {
-    x?: number, y?: number,
-    xSpace?: number,
-    ySpace?: number,
-    rows?: number, cols?: number,
-    top?: number, left?: number,
-    duration?: number,
-    frameMap?: number[],
-}
+import { createCanvas, createCanvasAndContext, debugCanvas, drawCanvas } from 'app/utils/canvas';
+import { requireFrame } from 'app/utils/packedImages';
 
 export function frame(
     x: number, y: number, w: number, h: number,
@@ -39,19 +25,19 @@ export function createAnimation(
     props: ExtraAnimationProperties = {},
 ): FrameAnimation {
     let frames: Frame[] = [];
-    let image: HTMLImageElement | HTMLCanvasElement;
+    let frame: Frame;
     if (typeof source === 'string') {
-        image = requireImage(source);
+        frame = requireFrame(source);
     } else {
-        image = source;
+        frame = {image: source, x: 0, y: 0, w: 0, h: 0};
     }
     for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
             frames[row * cols + col] = {
                 ...dimensions,
-                x: left + (dimensions.w + xSpace) * (x + col),
-                y: top + (dimensions.h + ySpace) * (y + row),
-                image
+                image: frame.image,
+                x: frame.x + left + (dimensions.w + xSpace) * (x + col),
+                y: frame.y + top + (dimensions.h + ySpace) * (y + row),
             };
         }
     }
@@ -82,6 +68,15 @@ export function drawFrame(
     {image, x, y, w, h}: Frame,
     {x: tx, y: ty, w: tw, h: th}: Rect
 ): void {
+    // Drawing canvas elements can fail in Safari so we use a special function
+    // to avoid this.
+    if (image instanceof HTMLCanvasElement) {
+        drawCanvas(context, image,
+            {x: x | 0, y: y | 0, w: w | 0, h: h | 0},
+            {x: tx | 0, y: ty | 0, w: tw | 0, h: th | 0}
+        );
+        return;
+    }
     // (x | 0) is faster than Math.floor(x)
     context.drawImage(image, x | 0, y | 0, w | 0, h | 0, tx | 0, ty | 0, tw | 0, th | 0);
 }
@@ -105,6 +100,15 @@ export function drawFrameAt(
     tw = xScale * w;
     th = yScale * h;
     // (x | 0) is faster than Math.floor(x)
+    // Drawing canvas elements can fail in Safari so we use a special function
+    // to avoid this.
+    if (image instanceof HTMLCanvasElement) {
+        drawCanvas(context, image,
+            {x: x | 0, y: y | 0, w: w | 0, h: h | 0},
+            {x: tx | 0, y: ty | 0, w: tw | 0, h: th | 0}
+        );
+        return;
+    }
     context.drawImage(image,
         x | 0, y | 0, w | 0, h | 0,
         tx | 0, ty | 0, tw | 0, th | 0);
@@ -120,6 +124,15 @@ export function drawFrameCenteredAt(
     // Adjust tx/ty so that x/y will be the top left corner of the content of the frame.
     tx = tx - (content?.x || 0) + (tw - cw) / 2;
     ty = ty - (content?.y || 0) + (th - ch) / 2;
+    // Drawing canvas elements can fail in Safari so we use a special function
+    // to avoid this.
+    if (image instanceof HTMLCanvasElement) {
+        drawCanvas(context, image,
+            {x: x | 0, y: y | 0, w: w | 0, h: h | 0},
+            {x: tx | 0, y: ty | 0, w: tw | 0, h: th | 0}
+        );
+        return;
+    }
     // (x | 0) is faster than Math.floor(x)
     context.drawImage(image,
         x | 0, y | 0, w | 0, h | 0,
@@ -183,3 +196,20 @@ debugCanvas;
     context.drawImage(image, x | 0, y | 0, w | 0, h | 0, tx | 0, ty | 0, w | 0, h | 0);
 }*/
 
+export function createFrameCanvas(frame: Frame, scale: number = 1): HTMLCanvasElement {
+    const canvas = createCanvas(frame.w, frame.h);
+    if (scale !== 1) {
+        canvas.style.transform = `scale(${scale})`;
+    }
+    const context = canvas.getContext('2d');
+    context.imageSmoothingEnabled = false;
+    drawFrame(context, frame, {x: 0, y: 0, w: frame.w, h: frame.h});
+    return canvas;
+}
+
+// Convenience function for assigning a single animation to all directions for an ActorAnimation.
+export function omniAnimation(animation: FrameAnimation) {
+    return {
+        up: animation, down: animation, left: animation, right: animation,
+    };
+}

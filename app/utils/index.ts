@@ -1,4 +1,5 @@
-import { FrameDimensions, FullRectangle, Rect } from 'app/types';
+import Random from 'app/utils/Random';
+
 
 export function isPointInRect(x: number, y: number, l: number, t: number, w: number, h: number): boolean {
     return !(y <= t || y >= (t + h) || x <= l || x >= (l + w));
@@ -95,6 +96,9 @@ export function pad({x, y, w, h}: Rect, m: number): Rect {
 }
 export function scaleRect({x, y, w, h}: Rect, scale: number): Rect {
     return {x: x * scale, w: w * scale, y: y * scale, h: h * scale};
+}
+export function translateRect({x, y, w, h}: Rect, tx: number, ty: number): Rect {
+    return {x: x + tx, w, y: y + ty, h};
 }
 export function rectangleCenter(rectangle: FullRectangle): [number, number] {
     return [rectangle.left + rectangle.width / 2, rectangle.top + rectangle.height / 2];
@@ -222,4 +226,12 @@ export function readGetParameter(parameterName: string): string {
 export function readGetParameterAsInt(parameterName: string): number {
     const number = parseInt(readGetParameter(parameterName), 10);
     return isNaN(number) ? 0 : number;
+}
+
+export function cloneDeep<T>(value: T): T {
+    return JSON.parse(JSON.stringify(value)) as T;
+}
+
+export function sample<T>(collection: Collection<T>): T {
+    return Random.element(collection);
 }

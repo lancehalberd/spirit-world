@@ -1,22 +1,16 @@
-import { addEffectToArea, checkIfAllEnemiesAreDefeated, removeObjectFromArea } from 'app/content/areas';
-import { AnimationEffect } from 'app/content/effects/animationEffect';
+import { FieldAnimationEffect, objectFallAnimation, enemyFallAnimation, splashAnimation } from 'app/content/effects/animationEffect';
 import { Enemy } from 'app/content/enemy';
-import { editingState } from 'app/development/tileEditor';
+import { setEquippedElement } from 'app/content/menu';
+import { editingState } from 'app/development/editingState';
 import { FRAME_LENGTH, GAME_KEY } from 'app/gameConstants';
-import { wasGameKeyPressed } from 'app/keyCommands';
+import { wasGameKeyPressed } from 'app/userInput';
 import { updateAllHeroes } from 'app/updateActor';
 import { updateCamera } from 'app/updateCamera';
-import { createAnimation } from 'app/utils/animations';
+import { checkIfAllEnemiesAreDefeated } from 'app/utils/checkIfAllEnemiesAreDefeated';
+import { addEffectToArea } from 'app/utils/effects';
 import { getTileBehaviorsAndObstacles } from 'app/utils/field';
-
-import {
-    AreaInstance, EffectInstance, FrameAnimation, FrameDimensions,
-    GameState, MagicElement, ObjectInstance
-} from 'app/types';
-
-const fallGeometry: FrameDimensions = {w: 24, h: 24};
-export const objectFallAnimation: FrameAnimation = createAnimation('gfx/effects/enemyfall.png', fallGeometry, { cols: 10, duration: 4}, { loop: false });
-
+import { rectanglesOverlap } from 'app/utils/index';
+import { removeObjectFromArea } from 'app/utils/objects';
 
 export function updateField(this: void, state: GameState) {
     if (editingState.isEditing) {
@@ -39,6 +33,12 @@ export function updateField(this: void, state: GameState) {
         state.fadeLevel = Math.min(state.fadeLevel + 0.05, targetFadeLevel);
     } else if (state.fadeLevel > targetFadeLevel){
         state.fadeLevel = Math.max(state.fadeLevel - 0.05, targetFadeLevel);
+    }
+    const targetHotLevel = ((!state.nextAreaSection && state.areaSection?.isHot) || state.nextAreaSection?.isHot) ? 1 : 0;
+    if (state.hotLevel < targetHotLevel) {
+        state.hotLevel = Math.min(state.hotLevel + 0.05, targetHotLevel);
+    } else if (state.hotLevel > targetHotLevel){
+        state.hotLevel = Math.max(state.hotLevel - 0.05, targetHotLevel);
     }
     // If any priority objects are defined for the area, only process them
     // until there are none remaining in the queue.
@@ -74,6 +74,9 @@ export function updateField(this: void, state: GameState) {
     updateAreaObjects(state, state.alternateAreaInstance);
 }
 export function updateAreaObjects(this: void, state: GameState, area: AreaInstance) {
+    if (state.hero.action === 'preparingSomersault' && state.fieldTime % 200 !== 0) {
+        return;
+    }
     const isScreenTransitioning = state.nextAreaInstance || state.nextAreaSection;
     // Time passes slowly for everything but the astral projection while meditating.
     const skipFrame = state.hero.action === 'meditating' && (state.hero.animationTime % 100) !== 0;
@@ -117,16 +120,39 @@ export function updateAreaObjects(this: void, state: GameState, area: AreaInstan
         }
         object.update?.(state);
         if (object.area && !object.ignorePits && object.getHitbox) {
+            object.groundHeight = 0;
+            // Objects that can fall in pits are assumed to fall to the ground when not supported.
+            if (object.z > 0) {
+                object.z = Math.max(0, object.z - 1);
+            }
             const hitbox = object.getHitbox(state);
             const x = hitbox.x + hitbox.w / 2;
             const y = hitbox.y + hitbox.h / 2;
+            for (const otherObject of area.objects) {
+                if (otherObject === object) {
+                    continue;
+                }
+                if (otherObject.behaviors?.groundHeight > 0 && rectanglesOverlap(hitbox, otherObject.getHitbox())) {
+                    object.groundHeight = Math.max(object.groundHeight, otherObject.behaviors?.groundHeight);
+                } else if (otherObject.behaviors?.groundHeight > 0) {
+                    //console.log(hitbox, otherObject.getHitbox());
+                }
+            }
+            object.z = Math.max(object.z, object.groundHeight);
             const { tileBehavior } = getTileBehaviorsAndObstacles(state, object.area, {x, y});
-            if (tileBehavior?.pit && !(object.z > 0)) {
-                const pitAnimation = new AnimationEffect({
-                    animation: objectFallAnimation,
-                    x: ((x / 16) | 0) * 16 - 4, y: ((y / 16) | 0) * 16 - 4,
+            if (tileBehavior?.pit  && !(object.z > 0)) {
+                const animation = new FieldAnimationEffect({
+                    animation: object.definition?.type === 'enemy' ? enemyFallAnimation : objectFallAnimation,
+                    x: ((x / 16) | 0) * 16, y: ((y / 16) | 0) * 16,
                 });
-                addEffectToArea(state, object.area, pitAnimation);
+                addEffectToArea(state, object.area, animation);
+                removeObjectFromArea(state, object);
+            } else if (tileBehavior?.water  && !(object.z > 0)) {
+                const animation = new FieldAnimationEffect({
+                    animation: splashAnimation,
+                    x: ((x / 16) | 0) * 16, y: ((y / 16) | 0) * 16,
+                });
+                addEffectToArea(state, object.area, animation);
                 removeObjectFromArea(state, object);
             }
         }
@@ -156,7 +182,7 @@ function switchElement(state: GameState, delta: number): void {
         }
     }
     const index = allElements.indexOf(state.hero.element);
-    state.hero.setElement(allElements[(index + delta + allElements.length) % allElements.length])
+    setEquippedElement(state, allElements[(index + delta + allElements.length) % allElements.length]);
 }
 
 function removeDefeatedEnemies(state: GameState, area: AreaInstance): void {

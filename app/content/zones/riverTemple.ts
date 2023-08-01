@@ -1,6 +1,5 @@
 import { zones } from 'app/content/zones/zoneHash';
 
-import { AreaDefinition } from 'app/types';
 
 const f0_0x0: AreaDefinition = {
     layers: [
@@ -207,21 +206,21 @@ const f0_0x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "closedEnemy", id: "", x: 240, y: 480, type: "door", style: "cave", targetObjectId: "peachCaveTopEntrance", d: "down"},
+        {status: "closedEnemy", id: "", x: 240, y: 480, type: "door", style: "cave", d: "down"},
         {status: "normal", id: "bossTorchSW", x: 144, y: 352, saveStatus: "forever", type: "torch"},
         {status: "normal", id: "bossTorchNW", x: 144, y: 144, saveStatus: "forever", type: "torch"},
         {status: "normal", id: "bossTorchNE", x: 352, y: 144, saveStatus: "forever", type: "torch"},
         {status: "normal", id: "bossTorchSE", x: 352, y: 352, saveStatus: "forever", type: "torch"},
-        {status: "normal", id: "frostBeast", x: 224, y: 224, type: "boss", enemyType: "frostHeart", lootType: "ice", lootLevel: 1, d: "down", params: {}, logicKey: "frozenLake"},
+        {status: "normal", id: "frostBeast", x: 232, y: 240, type: "boss", enemyType: "frostHeart", lootType: "ice", lootLevel: 1, d: "down", params: {}, logicKey: "frozenLake"},
         {status: "normal", id: "", x: 128, y: 336, type: "crystalSwitch", element: "lightning", timer: 1000, targetObjectId: "bossTorchSW"},
         {status: "normal", id: "", x: 368, y: 336, type: "crystalSwitch", element: "lightning", timer: 1000, targetObjectId: "bossTorchSE"},
         {status: "normal", id: "frostBeast", x: 224, y: 176, type: "boss", enemyType: "frostBeast", lootType: "ice", lootLevel: 1, d: "down", params: {}, logicKey: "frozenLake"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 32},
+        {x: 0, y: 0, w: 32, h: 32, index: 395, mapId: 'riverTemple', floorId: '2F', mapX: 2, mapY: 1},
     ],
 };
-const f0_1x0: AreaDefinition = {
+const f0_0x1: AreaDefinition = {
     layers: [
         {
             key: 'water',
@@ -426,13 +425,13 @@ const f0_1x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "", x: 368, y: 224, type: "door", style: "cave", targetObjectId: "peachCaveTopEntrance", d: "down", invertLogic: true, logicKey: "frozenLake"},
-        {status: "normal", id: "", x: 112, y: 224, type: "door", style: "cave", targetObjectId: "peachCaveTopEntrance", d: "down"},
-        {status: "normal", id: "", x: 112, y: 256, type: "door", style: "cave", targetObjectId: "peachCaveTopEntrance", d: "up"},
-        {status: "normal", id: "", x: 224, y: 368, type: "door", style: "cave", targetObjectId: "peachCaveTopEntrance", d: "right", logicKey: "frozenLake", invertLogic: true},
-        {status: "normal", id: "", x: 256, y: 368, type: "door", style: "cave", targetObjectId: "peachCaveTopEntrance", d: "left", logicKey: "frozenLake", invertLogic: true},
-        {status: "normal", id: "", x: 368, y: 256, type: "door", style: "cave", targetObjectId: "peachCaveTopEntrance", d: "up", invertLogic: true, logicKey: "frozenLake"},
-        {status: "bigKeyLocked", id: "riverTempleBossDoor", x: 240, y: 0, type: "door", style: "cave", targetObjectId: "peachCaveTopEntrance", d: "up"},
+        {status: "normal", id: "", x: 368, y: 224, type: "door", style: "cave", d: "down", invertLogic: true, logicKey: "frozenLake"},
+        {status: "normal", id: "", x: 112, y: 224, type: "door", style: "cave", d: "down"},
+        {status: "normal", id: "", x: 112, y: 256, type: "door", style: "cave", d: "up"},
+        {status: "normal", id: "", x: 224, y: 368, type: "door", style: "cave", d: "right", logicKey: "frozenLake", invertLogic: true},
+        {status: "normal", id: "", x: 256, y: 368, type: "door", style: "cave", d: "left", logicKey: "frozenLake", invertLogic: true},
+        {status: "normal", id: "", x: 368, y: 256, type: "door", style: "cave", d: "up", invertLogic: true, logicKey: "frozenLake"},
+        {status: "bigKeyLocked", id: "riverTempleBossDoor", x: 240, y: 0, type: "door", style: "cave", d: "up"},
         {status: "normal", id: "riverTempleBigKey", x: 64, y: 400, type: "chest", lootType: "bigKey", lootLevel: 1},
         {status: "bigKeyLocked", id: "riverTempleBigKeyDoor", x: 176, y: 256, type: "door", style: "cave", d: "up"},
         {status: "bigKeyLocked", id: "riverTempleBigKeyDoor", x: 176, y: 224, type: "door", style: "cave", d: "down"},
@@ -442,22 +441,22 @@ const f0_1x0: AreaDefinition = {
         {status: "normal", id: "", x: 400, y: 400, type: "crystalSwitch", element: "lightning", timer: 1000, targetObjectId: "cornerTorch"},
         {status: "normal", id: "cornerTorch", x: 368, y: 368, saveStatus: "forever", type: "torch"},
         {status: "frozen", id: "frozenStairs", x: 112, y: 0, type: "door", style: "cavernUpstairs", targetZone: "riverTemple", targetObjectId: "frozenStairs", d: "up", saveStatus: "forever", logicKey: "frozenLake", locationCue: "Lake Temple 2F"},
-        {status: "frozen", id: "frozenDoorEast", x: 368, y: 224, type: "door", style: "cave", targetObjectId: "peachCaveTopEntrance", d: "down", saveStatus: "forever", logicKey: "frozenLake"},
-        {status: "frozen", id: "frozenDoorEast", x: 368, y: 256, type: "door", style: "cave", targetObjectId: "peachCaveTopEntrance", d: "up", saveStatus: "forever", logicKey: "frozenLake"},
-        {status: "frozen", id: "frozenDoorSouth", x: 256, y: 368, type: "door", style: "cave", targetObjectId: "peachCaveTopEntrance", d: "left", saveStatus: "forever", logicKey: "frozenLake"},
-        {status: "frozen", id: "frozenDoorSouth", x: 224, y: 368, type: "door", style: "cave", targetObjectId: "peachCaveTopEntrance", d: "right", saveStatus: "forever", logicKey: "frozenLake"},
+        {status: "frozen", id: "frozenDoorEast", x: 368, y: 224, type: "door", style: "cave", d: "down", saveStatus: "forever", logicKey: "frozenLake"},
+        {status: "frozen", id: "frozenDoorEast", x: 368, y: 256, type: "door", style: "cave", d: "up", saveStatus: "forever", logicKey: "frozenLake"},
+        {status: "frozen", id: "frozenDoorSouth", x: 256, y: 368, type: "door", style: "cave", d: "left", saveStatus: "forever", logicKey: "frozenLake"},
+        {status: "frozen", id: "frozenDoorSouth", x: 224, y: 368, type: "door", style: "cave", d: "right", saveStatus: "forever", logicKey: "frozenLake"},
         {status: "normal", id: "riverTempleSave", x: 240, y: 112, type: "saveStatue"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 396, mapId: 'riverTemple', floorId: '2F', mapX: 2, mapY: 3},
+        {x: 0, y: 16, w: 16, h: 16, index: 397, mapId: 'riverTemple', floorId: '2F', mapX: 2, mapY: 4},
+        {x: 16, y: 16, w: 16, h: 16, index: 398, mapId: 'riverTemple', floorId: '2F', mapX: 3, mapY: 4},
     ],
 };
 const sf0_0x0: AreaDefinition = null;
-const sf0_1x0: AreaDefinition = {
+const sf0_0x1: AreaDefinition = {
     isSpiritWorld: true,
-    parentDefinition: f0_1x0,
+    parentDefinition: f0_0x1,
     layers: [
         {
             key: 'water',
@@ -627,9 +626,9 @@ const sf0_1x0: AreaDefinition = {
     objects: [
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 32, h: 16, index: 399, mapId: 'riverTempleSpirit', floorId: '1F', mapX: 0, mapY: 2},
+        {x: 0, y: 16, w: 16, h: 16, index: 400, mapId: 'riverTempleSpirit', floorId: '1F', mapX: 0, mapY: 3},
+        {x: 16, y: 16, w: 16, h: 16, index: 401, mapId: 'riverTempleSpirit', floorId: '1F', mapX: 1, mapY: 3},
     ],
 };
 const f1_0x0: AreaDefinition = {
@@ -724,13 +723,13 @@ const f1_0x0: AreaDefinition = {
         {status: "normal", id: "riverTemple:1:0x0-luckyBeetle-0", x: 376, y: 376, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 16, h: 16, index: 402, hideMap: true, mapId: 'riverTemple', floorId: '3F', mapX: 2, mapY: 1},
+        {x: 16, y: 0, w: 16, h: 16, index: 403, hideMap: true, mapId: 'riverTemple', floorId: '3F', mapX: 3, mapY: 1},
+        {x: 0, y: 16, w: 16, h: 16, index: 404, hideMap: true, mapId: 'riverTemple', floorId: '3F', mapX: 2, mapY: 2},
+        {x: 16, y: 16, w: 16, h: 16, index: 405, mapId: 'riverTemple', floorId: '3F', mapX: 3, mapY: 2},
     ],
 };
-const f1_1x0: AreaDefinition = {
+const f1_0x1: AreaDefinition = {
     layers: [
         {
             key: 'floor',
@@ -832,14 +831,14 @@ const f1_1x0: AreaDefinition = {
         {status: "frozen", id: "floor2FrozenDoor", x: 256, y: 80, type: "door", style: "cave", d: "left", saveStatus: "forever", logicKey: "frozenLake"},
     ],
     sections: [
-        {x: 0, y: 0, w: 16, h: 16},
-        {x: 16, y: 0, w: 16, h: 16},
-        {x: 0, y: 16, w: 16, h: 16},
-        {x: 16, y: 16, w: 16, h: 16},
+        {x: 0, y: 0, w: 16, h: 16, index: 406, mapId: 'riverTemple', floorId: '3F', mapX: 2, mapY: 3},
+        {x: 16, y: 0, w: 16, h: 16, index: 407, mapId: 'riverTemple', floorId: '3F', mapX: 3, mapY: 3},
+        {x: 0, y: 16, w: 16, h: 16, index: 408, hideMap: true, mapId: 'riverTemple', floorId: '3F', mapX: 2, mapY: 4},
+        {x: 16, y: 16, w: 16, h: 16, index: 409, hideMap: true, mapId: 'riverTemple', floorId: '3F', mapX: 3, mapY: 4},
     ],
 };
 const sf1_0x0: AreaDefinition = null;
-const sf1_1x0: AreaDefinition = null;
+const sf1_0x1: AreaDefinition = null;
 zones.riverTemple = {
     key: 'riverTemple',
     underwaterKey: 'riverTempleWater',
@@ -847,21 +846,21 @@ zones.riverTemple = {
         {
             grid: [
                 [f0_0x0,],
-                [f0_1x0,],
+                [f0_0x1,],
             ],
             spiritGrid: [
                 [sf0_0x0,],
-                [sf0_1x0,],
+                [sf0_0x1,],
             ],
         },
         {
             grid: [
                 [f1_0x0,],
-                [f1_1x0,],
+                [f1_0x1,],
             ],
             spiritGrid: [
                 [sf1_0x0,],
-                [sf1_1x0,],
+                [sf1_0x1,],
             ],
         },
     ],

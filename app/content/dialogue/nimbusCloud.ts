@@ -1,9 +1,8 @@
-import { enterZoneByTarget } from 'app/content/areas';
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 import { CANVAS_HEIGHT } from 'app/gameConstants';
-import { returnToSpawnLocation } from 'app/state';
+import { enterZoneByTarget } from 'app/utils/enterZoneByTarget';
+import { returnToSpawnLocation } from 'app/utils/returnToSpawnLocation';
 
-import { GameState } from 'app/types';
 
 
 // Currently only one default entrance is supported for each dungeon.
@@ -33,8 +32,12 @@ export const zoneEntranceMap = {
     'waterfallTower': 'overworld:waterfallTowerEntrance',
      // waterfallTowerTopEntrance
     'forge': 'sky:forgeEntrance',
-    'grandTemple': 'overworld:templeDoor',
+    // These are both considered part of the overworld now.
+    //'grandTemple': 'overworld:grandTempleEntrance',
+    //'jadePalace': 'overworld:jadePalaceEntrance',
+    'gauntlet': 'grandTemple:gauntletEntrance',
     'skyPalace': 'sky:skyPalaceEntrance',
+    'holySanctum': 'grandTemple:holySanctumEntrance',
     'riverTemple': 'overworld:riverTempleUpperEntrance',
     // underwater:riverTempleWaterEntrance
     'staffTower': 'overworld:staffTowerEntrance',
@@ -42,6 +45,10 @@ export const zoneEntranceMap = {
     // overworld:staffTowerSpiritEntrance
     // sky:staffTowerSpiritSkyEntrance
     'crater': 'sky:craterEntrance',
+    'warPalace': 'overworld:warTempleEntranceSpirit',
+    'lab': 'warTemple:labEntrance',
+    'tree': 'lab:treeEntrance',
+    'void': 'lab:treeEntrance',
 };
 
 function travelToLocation(state: GameState, zoneKey: string, markerId: string): string {
@@ -64,7 +71,7 @@ function fallIntoLocation(state: GameState) {
 dialogueHash.nimbusCloud = {
     key: 'nimbusCloud',
     mappedOptions: {
-        returnMenu: `{choice:Return?|No:nimbusCloud.no|Home:nimbusCloud.returnToHome|Last Save:nimbusCloud.returnToLastSave}`,
+        returnMenu: `{choice:Return?|No:nimbusCloud.no|Last Save:nimbusCloud.returnToLastSave|Home:nimbusCloud.returnToHome}`,
         returnToHome: (state: GameState) => travelToLocation(state, 'overworld', 'waterfallMarker'),
         returnToLastSave: (state: GameState) => {
             returnToSpawnLocation(state);
@@ -72,14 +79,17 @@ dialogueHash.nimbusCloud = {
             return '';
         },
         chooseDestination: (state: GameState) => {
-            if (zoneEntranceMap[state.zone.key]) {
+            // There is a section of the sky that is part of the Sky Palace logical zone, but since it is outside,
+            // it should *not* show the return to entrance option.
+            if (state.location.zoneKey !== 'sky' && zoneEntranceMap[state.location.logicalZoneKey]) {
                 return `
                 {choice:Return to entrance?|Yes:nimbusCloud.returnToEntrance|No:nimbusCloud.no}`;
             }
             if (state.location.isSpiritWorld) {
                 return `{choice:Where to?
+                        |Jade Palace:nimbusCloud.jadePalace
                         |Shop:nimbusCloud.spiritShop
-                        |Temple:nimbusCloud.forestTemple
+                        |Forest Temple:nimbusCloud.forestTemple
                         |Sky:nimbusCloud.skyCity
                         |City:nimbusCloud.jadeCity
                         |Nevermind:nimbusCloud.no
@@ -89,6 +99,7 @@ dialogueHash.nimbusCloud = {
                 return `The Nimbus Cloud won't appear underwater.`;
             }
             return `{choice:Where to?
+                    |Grand Temple:nimbusCloud.grandTemple
                     |Lake:nimbusCloud.lake
                     |City:nimbusCloud.holyCity
                     |Forest:nimbusCloud.vanaraVillage
@@ -99,17 +110,19 @@ dialogueHash.nimbusCloud = {
             // return `For some reason, the Nimbus Cloud doesn't appear.`;
         },
         returnToEntrance: (state: GameState) => {
-            const [zoneKey, ...rest] = zoneEntranceMap[state.location.zoneKey].split(':', );
+            const [zoneKey, ...rest] = zoneEntranceMap[state.location.logicalZoneKey].split(':', );
             enterZoneByTarget(state, zoneKey, rest.join(':'), null, false);
             return '';
         },
         // Material world destinations
+        grandTemple: (state: GameState) => travelToLocation(state, 'grandTemple', 'portalMarker'),
         lake: (state: GameState) => travelToLocation(state, 'overworld', 'lakeMarker'),
         holyCity: (state: GameState) => travelToLocation(state, 'overworld', 'holyCityMarker'),
         vanaraVillage: (state: GameState) => travelToLocation(state, 'overworld', 'vanaraVillageMarker'),
         crater: (state: GameState) => travelToLocation(state, 'sky', 'craterMarker'),
         summonerRuins: (state: GameState) => travelToLocation(state, 'overworld', 'summonerRuinsMarker'),
         // Spirit world destinations
+        jadePalace: (state: GameState) => travelToLocation(state, 'grandTemple', 'spiritPortalMarker'),
         spiritShop: (state: GameState) => travelToLocation(state, 'overworld', 'spiritShopMarker'),
         forestTemple: (state: GameState) => travelToLocation(state, 'overworld', 'forestTempleMarker'),
         skyCity: (state: GameState) => travelToLocation(state, 'sky', 'skyCityMarker'),

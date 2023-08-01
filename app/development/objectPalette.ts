@@ -1,8 +1,10 @@
 import { hideTooltip, showTooltip } from 'app/development/tooltip';
-import { createCanvasAndContext } from 'app/dom';
+import { drawFrame } from 'app/utils/animations';
+import { createCanvasAndContext } from 'app/utils/canvas';
 import { getMousePosition } from 'app/utils/mouse';
 
-import { Rect } from 'app/types';
+
+const [tempCanvas, tempContext] = createCanvasAndContext(32, 32);
 
 export interface ObjectPaletteItem<T extends string> {
     key: T
@@ -48,7 +50,9 @@ export class ObjectPalette<T extends string> {
         this.context.clearRect(0, 0, this.w, this.h);
         let x = 0, y = 0;
         for (const item of this.items) {
-            item.render(this.context, {x: x + 4, y: y + 4, w: 32, h: 32});
+            tempContext.clearRect(0, 0, 32, 32);
+            item.render(tempContext, {x: 0, y:0, w: 32, h: 32});
+            drawFrame(this.context, {image: tempCanvas, x: 0, y: 0, w: 32, h: 32}, {x: x + 4, y: y + 4, w: 32, h: 32});
             if (item.key === this.selectedKey) {
                 this.context.beginPath();
                 this.context.strokeStyle = 'black';

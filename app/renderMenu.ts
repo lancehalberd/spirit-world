@@ -6,8 +6,6 @@ import { createAnimation, drawFrame, drawFrameCenteredAt } from 'app/utils/anima
 import { fillRect, pad } from 'app/utils/index';
 import { drawText } from 'app/utils/simpleWhiteFont';
 
-import { ActiveTool, PassiveTool, Equipment, GameState, LootType, MagicElement } from 'app/types';
-
 const MARGIN = 20;
 
 
@@ -65,7 +63,7 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
     function renderBoots(equipment: Equipment): void {
         const frame = getLootFrame(state, { lootType: equipment, lootLevel: state.hero.equipment[equipment] });
         const target = {w: frameSize, h: frameSize, x, y};
-        if (state.hero.equipedBoots === equipment) {
+        if (state.hero.equippedBoots === equipment) {
             fillRect(context, target, 'white');
             fillRect(context, pad(target, -2), 'black');
         }
@@ -97,7 +95,7 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
                 renderSelectableTool(menuItem as ActiveTool);
             } else if (state.hero.equipment[menuItem]) {
                 renderBoots(menuItem as Equipment);
-            } else if (menuItem === 'charge') {
+            } else if (menuItem === 'neutral') {
                 drawFrameCenteredAt(context, neutralElement, {x, y, w: frameSize, h: frameSize});
             } else if (state.hero.elements[menuItem]) {
                 renderElement(menuItem as MagicElement);
@@ -129,17 +127,18 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
 
     // Weapon isn't currently part of the selectable menu rows.
     if (state.hero.weapon === 1) {
-        const frame = getLootFrame(state, { lootType: 'weapon', lootLevel: state.hero.weapon });
+        const frame = getLootFrame(state, { lootType: 'weapon', lootLevel: 1 });
         drawFrameCenteredAt(context, frame, {x: r.x + 155, y: r.y, w: frameSize, h: frameSize});
     } else if (state.hero.weapon >= 2) {
-        const frame = getLootFrame(state, { lootType: 'weapon', lootLevel: state.hero.weapon });
+        let frame = getLootFrame(state, { lootType: 'weapon', lootLevel: 1 });
         drawFrameCenteredAt(context, frame, {x: r.x + 150, y: r.y, w: frameSize, h: frameSize});
+        frame = getLootFrame(state, { lootType: 'weapon', lootLevel: state.hero.weapon });
         drawFrameCenteredAt(context, frame, {x: r.x + 155, y: r.y, w: frameSize, h: frameSize});
     }
     if (state.hero.silverOre) {
         const frame = getLootFrame(state, {lootType: 'silverOre'});
         const x = r.x + 140, y = r.y + 26;
-        drawFrame(context, frame, {x, y, w: frameSize, h: frameSize});
+        drawFrameCenteredAt(context, frame, {x, y, w: frameSize, h: frameSize});
         drawText(context, `${state.hero.silverOre}`, x + 24, y + frameSize / 2, {
             textBaseline: 'middle',
             textAlign: 'left',
@@ -149,7 +148,7 @@ export function renderMenu(context: CanvasRenderingContext2D, state: GameState):
     if (state.hero.goldOre) {
         const frame = getLootFrame(state, {lootType: 'goldOre'});
         const x = r.x + 140, y = r.y + 50;
-        drawFrame(context, frame, {x, y, w: frameSize, h: frameSize});
+        drawFrameCenteredAt(context, frame, {x, y, w: frameSize, h: frameSize});
         drawText(context, `${state.hero.goldOre}`, x + 24, y + frameSize / 2, {
             textBaseline: 'middle',
             textAlign: 'left',

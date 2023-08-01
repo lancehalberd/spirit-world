@@ -1,15 +1,13 @@
-import { getObjectBehaviors } from 'app/content/objects';
-import { Clone } from 'app/content/objects/clone';
-import { editingState } from 'app/development/tileEditor';
-import { createCanvasAndContext } from 'app/dom';
+import { Hero } from 'app/content/hero';
+import { editingState } from 'app/development/editingState';
 import {
     CANVAS_HEIGHT, CANVAS_WIDTH, FRAME_LENGTH,
 } from 'app/gameConstants';
 import { heroCarryAnimations } from 'app/render/heroAnimations';
+import { createCanvasAndContext, drawCanvas } from 'app/utils/canvas';
+import { carryMap, directionMap } from 'app/utils/direction';
+import { getObjectBehaviors } from 'app/utils/objects';
 
-import { carryMap, directionMap } from 'app/utils/field';
-
-import { AreaInstance, GameState } from 'app/types';
 
 const lightingGranularity = 1;
 const [lightingCanvas, lightingContext] = createCanvasAndContext(
@@ -161,20 +159,34 @@ export function renderAreaLighting(context: CanvasRenderingContext2D, state: Gam
     // Next add lighting effects from the background.
     lightingContext.globalCompositeOperation = 'destination-out';
     if (area?.lightingCanvas) {
-        lightingContext.drawImage(area.lightingCanvas,
-            Math.floor((state.camera.x - area.cameraOffset.x) / lightingGranularity),
-            Math.floor((state.camera.y - area.cameraOffset.y) / lightingGranularity),
-            lightingCanvas.width, lightingCanvas.height,
-            0, 0, lightingCanvas.width, lightingCanvas.height,
-        );
+        const source = {
+            x: Math.floor((state.camera.x - area.cameraOffset.x) / lightingGranularity),
+            y: Math.floor((state.camera.y - area.cameraOffset.y) / lightingGranularity),
+            w: lightingCanvas.width,
+            h: lightingCanvas.height,
+        }
+        const target = {
+            x: 0,
+            y: 0,
+            w: lightingCanvas.width,
+            h: lightingCanvas.height,
+        }
+        drawCanvas(lightingContext, area.lightingCanvas, source, target);
     }
     if (nextArea?.lightingCanvas) {
-        lightingContext.drawImage(nextArea.lightingCanvas,
-            Math.floor((state.camera.x - nextArea.cameraOffset.x) / lightingGranularity),
-            Math.floor((state.camera.y - nextArea.cameraOffset.y) / lightingGranularity),
-            lightingCanvas.width, lightingCanvas.height,
-            0, 0, lightingCanvas.width, lightingCanvas.height,
-        );
+        const source = {
+            x: Math.floor((state.camera.x - nextArea.cameraOffset.x) / lightingGranularity),
+            y: Math.floor((state.camera.y - nextArea.cameraOffset.y) / lightingGranularity),
+            w: lightingCanvas.width,
+            h: lightingCanvas.height,
+        }
+        const target = {
+            x: 0,
+            y: 0,
+            w: lightingCanvas.width,
+            h: lightingCanvas.height,
+        }
+        drawCanvas(lightingContext, nextArea.lightingCanvas, source, target);
     }
     // Next add light from the player's light radius.
     const hero = state.hero;
@@ -233,7 +245,7 @@ export function renderAreaLighting(context: CanvasRenderingContext2D, state: Gam
                     behaviors.brightness, behaviors.lightRadius
                 );
             }
-            if (object instanceof Clone) {
+            if (object instanceof Hero) {
                 if (object.pickUpTile) {
                     const behaviors = object.pickUpTile.behaviors;
                     if (behaviors?.brightness) {
@@ -273,7 +285,7 @@ export function renderAreaLighting(context: CanvasRenderingContext2D, state: Gam
             Math.floor((nextArea.cameraOffset.y - state.camera.y) / lightingGranularity)
         )
         for (const object of nextArea.objects || []) {
-            if (object.status === 'hidden' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
+            if (object.status === 'gone' || object.status === 'hidden' || object.status === 'hiddenEnemy' || object.status === 'hiddenSwitch') {
                 continue;
             }
             const behaviors = getObjectBehaviors(state, object);

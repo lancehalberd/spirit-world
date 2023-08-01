@@ -1,15 +1,14 @@
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
-import {
-    moveEnemyFull,
-} from 'app/content/enemies';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import {
     brownSquirrelAnimations,
 } from 'app/content/enemyAnimations';
 import { lifeLootTable } from 'app/content/lootTables';
+import {
+    moveEnemyFull,
+} from 'app/utils/enemies';
 import { getDirection } from 'app/utils/field';
 
-import { Enemy, GameState } from 'app/types';
 
 enemyDefinitions.squirrel = {
     animations: brownSquirrelAnimations,

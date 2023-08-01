@@ -1,4 +1,4 @@
-import { readGetParameterAsInt } from 'app/utils/index';
+import { readGetParameter, readGetParameterAsInt } from 'app/utils/index';
 
 // Update duration in milliseconds.
 export const FRAME_LENGTH = 20;
@@ -60,5 +60,48 @@ export const randomizerSeed = readGetParameterAsInt('seed') || entranceSeed;
 export const isRandomizer = !!randomizerSeed;
 // Limit randomizer total to 999 to avoid having the victory point display get too large.
 export const randomizerTotal = Math.min(readGetParameterAsInt('total') || 20, 999);
+const isBossGoal = readGetParameter('goal') === 'boss';
+export const randomizerGoalType: 'victoryPoints' | 'finalBoss' = isBossGoal ? 'finalBoss' : 'victoryPoints';
 export const randomizerGoal = Math.min(randomizerTotal, readGetParameterAsInt('goal') || 10);
 export const enemySeed = readGetParameterAsInt('enemySeed');
+
+export const allLootTypes: LootType[] = [
+    'empty',
+    'peachOfImmortality',
+    'peachOfImmortalityPiece',
+    'money',
+    'silverOre',
+    'goldOre',
+    'weapon',
+    'bigKey',
+    'smallKey',
+    'map',
+    'secondChance',
+    // This is used for the basic goal in randomizer.
+    'victoryPoint',
+    // This is the special progressive spirit power loot used by the randomizer.
+    'spiritPower',
+    'bow', 'clone', 'staff', 'cloak',
+    'gloves',
+    'roll',
+    'nimbusCloud',
+    'catEyes', 'spiritSight', 'trueSight',
+    'astralProjection', 'teleportation',
+    'ironSkin', 'goldMail', 'phoenixCrown',
+    'waterBlessing', 'fireBlessing', 'lightningBlessing',
+    'ironBoots', 'cloudBoots',
+    'fire', 'ice', 'lightning'
+];
+
+export const layersInOrder = ['floor', 'floor2', 'field', 'field2', 'foreground', 'foreground2'];
+
+export const overworldKeys = ['overworld', 'sky', 'underwater'];
+
+export function getElementColor(element: MagicElement) {
+    switch(element){
+        case 'fire': return 'red';
+        case 'ice': return 'white';
+        case 'lightning': return 'yellow';
+    }
+    return 'grey';
+}

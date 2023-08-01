@@ -4,7 +4,6 @@ import {
     canAvoidBossAttacks,
 } from 'app/content/logic';
 
-import { LogicNode } from 'app/types';
 
 // This logic does not appropriately support traversing the tower in reverse.
 const zoneId = 'forestTemple';

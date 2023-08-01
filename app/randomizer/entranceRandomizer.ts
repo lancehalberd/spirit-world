@@ -1,25 +1,41 @@
 import { zoneEntranceMap } from 'app/content/dialogue/nimbusCloud';
+import { overworldKeys } from 'app/gameConstants';
 import SRandom from 'app/utils/SRandom';
 
 import {
     everyObject, verifyNodeConnections
 } from 'app/randomizer/utils';
 
-import { AreaDefinition, EntranceDefinition, Zone, ZoneLocation } from 'app/types';
 
-const outsideZones = ['overworld', 'sky', 'underwater'];
+const ignoredZones = [
+    // These zones are part of the 'Holy Sanctum' and should not be randomized.
+    'fireSanctum', 'iceSanctum', 'lightningSanctum', 'holySanctumBack',
+    // The void is part of the 'Tree' zone and should not be randomized.
+    'void',
+];
 
-// Money maze isn't designed to allow entering from the exit, so just disable this door.
-const disabledDoors = ['overworld:moneyMazeExit'];
+const outsideZones = overworldKeys;
+
+
+const disabledDoors = [
+    // Money maze isn't designed to allow entering from the exit, so just disable this door.
+    'overworld:moneyMazeExit',
+    // Neither this door or its target are reachable in the game.
+    // This door just exists as a reason for there to be corresponding cave in the spirit world.
+    'sky:hypeCaveEntrance',
+];
 
 interface DoorLocation {
     location: ZoneLocation
     definition: EntranceDefinition
 }
 
-// These entrances are unreachable and should only be connected to zones with multiple
-// exits or zones with no checks or settable flags.
-const unreachableSpiritEntranceTargets = ['caves:caves-ascentExitSpirit'];
+// These groups of entrances are not reachable except from one of the other exits, so at least
+// one needs to be connected to a reachable entrance using a connected exit group.
+const unreachableSpiritEntranceGroups = [
+    ['caves:caves-ascentExitSpirit'],
+    ['skyPalace:skyPalaceWestEntrance', 'skyPalace:skyPalaceTowerEntrance', 'skyPalace:skyPalaceEastEntrance'],
+];
 
 interface ConnectedExitGroup {
     normalEntranceTargets?: string[]
@@ -74,6 +90,13 @@ const connectedExitGroups: ConnectedExitGroup[] = [
     {
         spiritEntranceTargets: ['overworld:forestTempleLadder3', 'overworld:forestTempleLadder4'],
     },
+    /* Although this could form a tunnel from entrance -> exit, the randomizer logic doesn't currently
+    have support for a one way tunnel, so this cannot currently function as a connected exit group.
+    {
+        spiritEntranceTargets: ['overworld:cloneCaveExit'],
+        // It is not possible to reach the entrance door when entering from the exit door.
+        immutableEntranceTargets: ['overworld:cloneCaveEntrance'],
+    },*/
 ];
 
 // Loopable entrance pairs occur when a zone contains both an entrance and an exit.
@@ -84,6 +107,8 @@ const normalLoopableEntrancePairs = [
     {outerTarget: 'overworld:tombEntrance', innerTarget: 'cocoon:cocoonEntrance'},
     // Lake Tunnel -> Helix
     {outerTarget: 'overworld:lakeTunnelEntrance', innerTarget: 'helix:helixEntrance'},
+    // Grand temple -> Gauntlet
+    {outerTarget: 'overworld:grandTempleEntrance', innerTarget: 'gauntlet:gauntletEntrance'},
 ];
 const spiritLoopableEntrancePairs = [
     // Elder Spirit -> Forest Temple Back
@@ -92,6 +117,8 @@ const spiritLoopableEntrancePairs = [
     {outerTarget: 'overworld:warTempleEntranceSpirit', innerTarget: 'lab:labEntrance'},
     // Lab -> Tre
     {outerTarget: 'warTemple:labEntrance', innerTarget: 'tree:treeEntrance'},
+    // Jade Palace -> Holy Sanctum
+    {outerTarget: 'overworld:jadePalaceEntrance', innerTarget: 'holySanctum:holySanctumEntrance'},
 ];
 
 export function randomizeEntrances(random: typeof SRandom) {
@@ -103,25 +130,38 @@ export function randomizeEntrances(random: typeof SRandom) {
     const normalExits = new Set<string>();
     const spiritExits = new Set<string>();
     const waterExits = new Set<string>();
-    const pitEntrances = [];
-    const pitTargets = new Set<string>();
+    const normalPitEntrances: EntranceDefinition[] = [];
+    const spiritPitEntrances: EntranceDefinition[] = [];
+    const normalPitTargets = new Set<string>();
+    const spiritPitTargets = new Set<string>();
     const targetIdMap: {[key in string]: DoorLocation[]} = {};
     const allTargetedKeys = new Set<string>();
     const fixedNimbusCloudZones = new Set<string>();
     everyObject((location, zone: Zone, area: AreaDefinition, object) => {
+        if (ignoredZones.includes(zone.key)) {
+            return;
+        }
         if (object.type === 'pitEntrance') {
             if (!object.targetZone || object.targetZone === zone.key) {
                 return;
             }
             const targetKey = `${object.targetZone}:${object.targetObjectId}`;
-            pitTargets.add(targetKey);
-            pitEntrances.push(object);
+            if (area.isSpiritWorld) {
+                spiritPitTargets.add(targetKey);
+                spiritPitEntrances.push(object);
+            } else {
+                normalPitTargets.add(targetKey);
+                normalPitEntrances.push(object);
+            }
             return;
         }
         if (object.type !== 'door') {
             return;
         }
         if (!object.targetZone || object.targetZone === zone.key) {
+            return;
+        }
+        if (ignoredZones.includes(object.targetZone)) {
             return;
         }
         const key = `${zone.key}:${object.id}`;
@@ -150,14 +190,16 @@ export function randomizeEntrances(random: typeof SRandom) {
             || zone.key === 'lakeTunnel' && object.targetZone === 'helix'
             || zone.key === 'warTemple' && object.targetZone === 'lab'
             || zone.key === 'lab' && object.targetZone === 'tree'
+            || zone.key === 'grandTemple' && object.targetZone === 'gauntlet'
+            || zone.key === 'grandTemple' && object.targetZone === 'holySanctum'
         ) {
-           if (outsideZones.includes(zone.key)) {
+            if (outsideZones.includes(zone.key)) {
                 if (area.isSpiritWorld) {
                    connectedSpiritEntrances.add(targetKey);
                 } else {
                    connectedNormalEntrances.add(targetKey);
-               }
-           }
+                }
+            }
             if (area.isSpiritWorld) {
                 spiritExits.add(targetKey);
             } else {
@@ -186,7 +228,10 @@ export function randomizeEntrances(random: typeof SRandom) {
 
     //console.log('EXIT ONLY ENTRANCE ASSIGNMENTS:');
     // Assign all unreachable entrances first to a random entrance with other connections.
-    for (const unreachableEntranceTarget of unreachableSpiritEntranceTargets) {
+    for (const unreachableEntranceTargets of unreachableSpiritEntranceGroups) {
+        // Choose one entrance in the group to assign as a forced connection through a reachable
+        // exit.
+        const unreachableEntranceTarget = random.shuffle(unreachableEntranceTargets)[0];
         for (const exitGroup of random.shuffle(connectedExitGroups)) {
             const spiritExits = exitGroup.spiritEntranceTargets?.length ?? 0;
             const normalExits = exitGroup.normalEntranceTargets?.length ?? 0;
@@ -324,12 +369,17 @@ export function randomizeEntrances(random: typeof SRandom) {
             assignEntranceExitPair(entranceId, exitId);
         }
     }
-    const targetIds = [...pitTargets];
-    for (const pitEntrance of random.shuffle(pitEntrances)) {
-        const exitId = targetIds.pop();
-        const [zone, objectId] = exitId.split(':');
-        pitEntrance.targetZone = zone;
-        pitEntrance.targetObjectId = objectId;
+    for (const [pitTargets, pitEntrances] of [
+        <const>[normalPitTargets, normalPitEntrances],
+        <const>[spiritPitTargets, spiritPitEntrances],
+    ]) {
+        const targetIds = [...pitTargets];
+        for (const pitEntrance of random.shuffle(pitEntrances)) {
+            const exitId = targetIds.pop();
+            const [zone, objectId] = exitId.split(':');
+            pitEntrance.targetZone = zone;
+            pitEntrance.targetObjectId = objectId;
+        }
     }
     verifyNodeConnections();
 }

@@ -1,16 +1,16 @@
-import { showMessage } from 'app/render/renderMessage';
+import { objectHash } from 'app/content/objects/objectHash';
+import { showMessage } from 'app/scriptEvents';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 
-import {
-    AreaInstance, GameState, Direction, Hero, SignDefinition,
-    ObjectInstance, ObjectStatus, Rect,
-} from 'app/types';
 
 const signGeometry = {w: 16, h: 19, content: {x: 0, y: 3, w: 16, h: 16}};
 const [shortSign] = createAnimation('gfx/tiles/signshort.png', signGeometry).frames;
 const [shortSignSpirit] = createAnimation('gfx/tiles/shortsignspirit.png', signGeometry).frames;
 const [tallSign] = createAnimation('gfx/tiles/signtall.png', signGeometry).frames;
 const [tallSignSpirit] = createAnimation('gfx/tiles/signtallspirit.png', signGeometry).frames;
+const plaqueGeometry = {w: 16, h: 16, content: {x: 0, y: -2, w: 16, h: 16}};
+const [nicePlaque] = createAnimation('gfx/objects/plaque.png', plaqueGeometry).frames;
+const [brokenPlaque] = createAnimation('gfx/objects/plaque_broken.png', plaqueGeometry).frames;
 
 export const signStyles = {
     displayScreen: {
@@ -57,6 +57,20 @@ export const signStyles = {
         spirit: tallSignSpirit,
         isSpiritReadable: true,
     },
+    nicePlaque: {
+        w: 16,
+        h: 16,
+        normal: nicePlaque,
+        spirit: nicePlaque,
+        isSpiritReadable: true,
+    },
+    brokenPlaque: {
+        w: 16,
+        h: 16,
+        normal: brokenPlaque,
+        spirit: brokenPlaque,
+        isSpiritReadable: true,
+    },
 };
 
 export class Sign implements ObjectInstance {
@@ -74,7 +88,7 @@ export class Sign implements ObjectInstance {
     status: ObjectStatus = 'normal';
     isNeutralTarget = true;
     message: string;
-    constructor(definition: SignDefinition) {
+    constructor(state: GameState, definition: SignDefinition) {
         this.definition = definition;
         this.x = definition.x;
         this.y = definition.y;
@@ -107,6 +121,12 @@ export class Sign implements ObjectInstance {
             return;
         }
         const frame = this.definition.spirit ? style.spirit : style.normal;
-        drawFrame(context, frame, { ...frame, x: this.x - frame.content.x, y: this.y - frame.content.y });
+        drawFrame(context, frame, { ...frame, x: this.x - (frame.content?.x ?? 0), y: this.y - (frame.content?.y ?? 0) });
     }
+}
+objectHash.sign = Sign;
+
+class _Sign extends Sign {}
+declare global {
+    export interface Sign extends _Sign {}
 }

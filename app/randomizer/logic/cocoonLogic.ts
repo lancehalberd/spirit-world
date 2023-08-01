@@ -1,8 +1,9 @@
 import {
     andLogic,
+    canCross2Gaps,
+    canUseTeleporters,
     orLogic,
     hasAstralProjection,
-    hasSpiritSight,
     hasBossWeapon,
     hasSpiritBarrier,
     hasGloves,
@@ -10,7 +11,6 @@ import {
     hasTeleportation,
 } from 'app/content/logic';
 
-import { LogicNode } from 'app/types';
 
 const zoneId = 'cocoon';
 export const cocoonNodes: LogicNode[] = [
@@ -18,8 +18,8 @@ export const cocoonNodes: LogicNode[] = [
         zoneId,
         nodeId: 'cocoonEntrance',
         paths: [
-            {nodeId: 'cocoon4NW', logic: andLogic(hasSpiritSight, hasBossWeapon)},
-            {nodeId: 'cocoon4NE', logic: andLogic(hasSpiritSight, hasBossWeapon)},
+            {nodeId: 'cocoon4NW', logic: andLogic(canUseTeleporters, hasBossWeapon)},
+            {nodeId: 'cocoon4NE', logic: andLogic(canUseTeleporters, hasBossWeapon)},
         ],
         entranceIds: ['cocoonEntrance'],
         exits: [{objectId: 'cocoonEntrance'}],
@@ -42,8 +42,8 @@ export const cocoonNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'cocoon4SW',
-        checks: [{objectId: 'cocoonSmallKey'}],
-        paths: [{nodeId: 'cocoonEntrance', logic: hasSpiritSight}],
+        checks: [{objectId: 'cocoonSmallKey', logic: canCross2Gaps}],
+        paths: [{nodeId: 'cocoonEntrance', logic: andLogic(canUseTeleporters, canCross2Gaps)}],
         exits: [{objectId: 'cocoonOpenDoor'}],
         entranceIds: ['cocoonOpenDoor'],
     },
@@ -51,28 +51,28 @@ export const cocoonNodes: LogicNode[] = [
         zoneId,
         nodeId: 'cocoon4SE',
         checks: [{objectId: 'cocoonBigKey', logic: andLogic(hasAstralProjection, hasGloves)}],
-        paths: [{nodeId: 'cocoonEntrance', logic: hasSpiritSight}],
+        paths: [{nodeId: 'cocoonEntrance', logic: canUseTeleporters}],
         entranceIds: ['cocoonSealedLockedDoor'],
     },
     {
         zoneId,
         nodeId: 'cocoon3',
         paths: [
-            {nodeId: 'cocoon3SW', logic: hasSpiritSight},
-            {nodeId: 'cocoon3SE', logic: hasSpiritSight},
+            {nodeId: 'cocoon3SW', logic: canUseTeleporters},
+            {nodeId: 'cocoon3SE', logic: canUseTeleporters},
         ],
     },
     {
         zoneId,
         nodeId: 'cocoon3NW',
-        paths: [{nodeId: 'cocoon3', logic: hasSpiritSight}],
+        paths: [{nodeId: 'cocoon3', logic: canUseTeleporters}],
         entranceIds: ['cocoonLadderNW'],
     },
     {
         zoneId,
         nodeId: 'cocoon3NE',
         checks: [{objectId: 'cocoonBigMoney', logic: andLogic(hasAstralProjection, hasGloves)}],
-        paths: [{nodeId: 'cocoon3', logic: hasSpiritSight}],
+        paths: [{nodeId: 'cocoon3', logic: canUseTeleporters}],
         entranceIds: ['cocoonLadderNE'],
     },
     {
@@ -85,14 +85,15 @@ export const cocoonNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'cocoon3SW',
-        paths: [{nodeId: 'cocoon3', logic: hasSpiritSight}],
+        paths: [{nodeId: 'cocoon3', logic: canUseTeleporters}],
         entranceIds: ['cocoonOpenDoor'],
         exits: [{objectId: 'cocoonOpenDoor'}]
     },
     {
         zoneId,
         nodeId: 'cocoon3SE',
-        paths: [{nodeId: 'cocoon3', logic: hasSpiritSight}],
+        checks: [{objectId: 'cocoonMap'}],
+        paths: [{nodeId: 'cocoon3', logic: canUseTeleporters}],
         entranceIds: ['cocoonLockedDoor'],
         exits: [{objectId: 'cocoonLockedDoor'}]
     },
@@ -100,7 +101,7 @@ export const cocoonNodes: LogicNode[] = [
         zoneId,
         nodeId: 'cocoonBack',
         paths: [
-            {nodeId: 'cocoonBoss', logic: andLogic(hasBossWeapon, hasSpiritSight, hasSpiritBarrier)},
+            {nodeId: 'cocoonBoss', logic: andLogic(hasBossWeapon, canUseTeleporters, hasSpiritBarrier)},
         ],
         entranceIds: ['cocoonLadderBack'],
         exits: [{objectId: 'cocoonLadderBack'}],

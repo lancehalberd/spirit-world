@@ -1,16 +1,13 @@
 //import { resetTileBehavior } from 'app/content/areas';
 //import { allTiles } from 'app/content/tiles';
-import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
 import { flameAnimation } from 'app/content/effects/flame';
+import { objectHash } from 'app/content/objects/objectHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { hitTargets } from 'app/utils/field';
+import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
 
 import { drawFrameAt, getFrame } from 'app/utils/animations';
 
-import {
-    AreaInstance, GameState, HitProperties, HitResult, ObjectInstance,
-    ObjectStatus, SimpleObjectDefinition, Rect, TileBehaviors,
-} from 'app/types';
 
 export class Torch implements ObjectInstance {
     area: AreaInstance;
@@ -120,3 +117,4 @@ export class Torch implements ObjectInstance {
         }
     }
 }
+objectHash.torch = Torch;

@@ -1,14 +1,13 @@
-import { addObjectToArea, removeObjectFromArea } from 'app/content/areas';
-import { moveNPCToTargetLocation, NPC } from 'app/content/objects/npc';
-import { moveEnemyToTargetLocation } from 'app/content/enemies';
 import { logicHash } from 'app/content/logic';
 import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 import { FRAME_LENGTH, RIVAL_NAME } from 'app/gameConstants';
 import { appendCallback, appendScript, wait } from 'app/scriptEvents';
+import { createObjectInstance } from 'app/utils/createObjectInstance';
+import { saveGame } from 'app/utils/saveGame';
+import { moveEnemyToTargetLocation } from 'app/utils/enemies';
+import { moveNPCToTargetLocation } from 'app/utils/npc';
+import { addObjectToArea, removeObjectFromArea } from 'app/utils/objects';
 
-import { saveGame } from 'app/state';
-
-import { Enemy, GameState } from 'app/types';
 
 function getRivalBoss(state: GameState): Enemy {
     const rival = state.areaInstance.enemies.find(t => t.definition?.id === 'tombRivalBoss') as Enemy;
@@ -42,7 +41,7 @@ dialogueHash.elder = {
             // Remove any attack effects on defeat.
             // rival.area.effects = rival.area.effects.filter(effect => !effect.isEnemyAttack);
             //rival.changeToAnimation('idle');
-            saveGame();
+            saveGame(state);
             // Wait a moment for the battle to calm down.
             state.scriptEvents.activeEvents.push({
                 type: 'wait',
@@ -65,7 +64,7 @@ dialogueHash.elder = {
             appendScript(state, '{removeCue}');
             appendScript(state, `That's enough!`);
             appendCallback(state, (state: GameState) => {
-                const elder = new NPC({
+                const elder = createObjectInstance(state, {
                     id: 'elder',
                     status: 'normal',
                     x: 64,
@@ -74,7 +73,7 @@ dialogueHash.elder = {
                     behavior: 'none',
                     style: 'vanaraGray',
                     d: 'up',
-                });
+                }) as NPC;
                 elder.speed = 1.5;
                 addObjectToArea(state, state.hero.area, elder);
                 state.scriptEvents.activeEvents.push({

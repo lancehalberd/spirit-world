@@ -1,10 +1,7 @@
+import { objectHash } from 'app/content/objects/objectHash';
 import { createAnimation, drawFrame } from 'app/utils/animations';
-import { directionMap, isPointOpen } from 'app/utils/field';
+import { directionMap, isTileOpen } from 'app/utils/field';
 
-import {
-    AreaInstance, Direction, Frame, GameState, Hero, HitProperties, HitResult, ObjectInstance,
-    ObjectStatus, SimpleObjectDefinition, Rect,
-} from 'app/types';
 
 const potFrame: Frame = createAnimation('gfx/tiles/movablepot.png', {w: 16, h: 18}).frames[0];
 
@@ -20,7 +17,7 @@ export class PushPullObject implements ObjectInstance {
     definition: SimpleObjectDefinition = null;
     x: number;
     y: number;
-    grabDirection: Direction;
+    z = 0;
     isObject = <const>true;
     linkedObject: PushPullObject;
     pullingHeroDirection: Direction;
@@ -29,16 +26,13 @@ export class PushPullObject implements ObjectInstance {
     pushCounter: number = 0;
     pushedLastFrame: boolean = false;
     status: ObjectStatus = 'normal';
-    constructor(definition: SimpleObjectDefinition) {
+    constructor(state: GameState, definition: SimpleObjectDefinition) {
         this.definition = definition;
         this.x = definition.x;
         this.y = definition.y;
     }
     getHitbox(state: GameState): Rect {
         return { x: this.x, y: this.y, w: 16, h: 16 };
-    }
-    onGrab(state: GameState, direction: Direction): void {
-        this.grabDirection = direction;
     }
     onHit(state: GameState, {canPush, direction}: HitProperties): HitResult {
         if (!this.pushDirection) {
@@ -65,12 +59,12 @@ export class PushPullObject implements ObjectInstance {
         if (this.pushDirection) {
             return;
         }
-        const x = this.x + 8 + 16 * directionMap[direction][0];
-        const y = this.y + 8 + 16 * directionMap[direction][1];
-        const excludedObjects = new Set([hero, this, this.linkedObject]);
-        const movementProperties = {canFall: true, needsFullTile: true};
-        if (isPointOpen(state, this.area, {x, y}, movementProperties, excludedObjects)
-            && (!this.linkedObject || isPointOpen(state, this.linkedObject.area, {x, y}, movementProperties, excludedObjects))
+        const x = this.x + 16 * directionMap[direction][0];
+        const y = this.y + 16 * directionMap[direction][1];
+        const excludedObjects = new Set([this, this.linkedObject]);
+        const movementProperties = {canFall: true, canSwim: true, needsFullTile: true, excludedObjects};
+        if (isTileOpen(state, this.area, {x, y}, movementProperties)
+            && (!this.linkedObject || isTileOpen(state, this.linkedObject.area, {x, y}, movementProperties))
         ) {
             this.pushDirection = direction;
             this.pullingHeroDirection = direction;
@@ -99,6 +93,7 @@ export class PushPullObject implements ObjectInstance {
         }
     }
     render(context, state: GameState) {
-        drawFrame(context, potFrame, { ...potFrame, x: this.x, y: this.y - 2});
+        drawFrame(context, potFrame, { ...potFrame, x: this.x, y: this.y - 2 - this.z});
     }
 }
+objectHash.pushPull = PushPullObject;

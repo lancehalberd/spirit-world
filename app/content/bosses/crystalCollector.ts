@@ -1,9 +1,8 @@
-import { addEffectToArea, addObjectToArea } from 'app/content/areas';
 import { addParticleAnimations } from 'app/content/effects/animationEffect';
 import { GroundSpike, addLineOfSpikes } from 'app/content/effects/groundSpike';
 import { SpikePod } from 'app/content/effects/spikePod';
-import { getNearbyTarget } from 'app/content/enemies';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
+import { Enemy } from 'app/content/enemy';
 import {
     crystalCollectorAnimations,
     crystalCollecterBackFrame,
@@ -17,18 +16,91 @@ import {
 } from 'app/content/enemyAnimations';
 import { WallTurret } from 'app/content/objects/wallTurret';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { playSound } from 'app/musicController';
 import { drawFrame, getFrame, drawFrameCenteredAt } from 'app/utils/animations';
-import { getTileBehaviors } from 'app/utils/field';
+import { addEffectToArea } from 'app/utils/effects';
+import { getTileBehaviors, hitTargets } from 'app/utils/field';
+import { addObjectToArea } from 'app/utils/objects';
 import Random from 'app/utils/Random';
+import { getNearbyTarget } from 'app/utils/target';
 
 
-import {
-    AreaInstance, EffectInstance, Enemy, Frame,
-    GameState, Hero, HitProperties, HitResult, ObjectInstance, Rect,
-} from 'app/types';
 
 const maxShieldLife = 6;
+
+
+type NearbyTargetType = ReturnType<typeof getNearbyTarget>;
+
+const crystalTurretAbility: EnemyAbility<NearbyTargetType> = {
+    getTarget(this: void, state: GameState, enemy: Enemy): NearbyTargetType {
+        return getNearbyTarget(state, enemy, enemy.aggroRadius, enemy.area.allyTargets);
+    },
+    prepareAbility(this: void, state: GameState, enemy: Enemy, target: NearbyTargetType) {
+        enemy.changeToAnimation('attack');
+    },
+    useAbility(this: void, state: GameState, enemy: Enemy, target: NearbyTargetType): void {
+        summonProjectiles(state, enemy, target);
+    },
+    cooldown: 8000,
+    initialCharges: 0,
+    charges: 1,
+    chargesRecovered: 1,
+    prepTime: 0,
+    recoverTime: 1000,
+};
+
+function summonProjectiles(state: GameState, enemy: Enemy, target: EffectInstance | ObjectInstance) {
+    if (!target) {
+        return;
+    }
+    const { enrageLevel = 0 } = enemy.params;
+    const arrowTurrets = enemy.area.objects.filter(o => o.definition?.type === 'turret') as WallTurret[];
+    if (enrageLevel >= 2 && Math.random() < 0.5) {
+        for (let i = arrowTurrets.length - 1; i >= 0; i--) {
+            arrowTurrets[i].fireAfter(600 + (i % 4) * 600);
+        }
+    } else if (enrageLevel >= 1 && Math.random() < 0.5) {
+        for (let i = 0; i < arrowTurrets.length; i++) {
+            arrowTurrets[i].fireAfter((i % 4 <= 1) ? 600 : 1200);
+        }
+    } else {
+        const targetHitbox = target.getHitbox(state);
+        const x = targetHitbox.x + targetHitbox.w / 2;
+        let delay = 600;
+        const radius = 32 + 16 * enrageLevel
+        let left = x - radius;
+        let right = x + radius;
+        // Arrows furthest towards the edges of the field start first, forcing the player
+        // to the center. This avoids the edges either being traps or always having to
+        // be safe from arrows.
+        if ((left + right) / 2 > 256) {
+            for (let i = arrowTurrets.length - 1; i >= 0; i--) {
+                if (arrowTurrets[i].x + 8 <= right && arrowTurrets[i].x + 8 >= left) {
+                    arrowTurrets[i].fireAfter(delay += 200);
+                }
+            }
+        } else {
+            for (let i = 0; i < arrowTurrets.length; i++) {
+                if (arrowTurrets[i].x + 8 <= right && arrowTurrets[i].x + 8 >= left) {
+                    arrowTurrets[i].fireAfter(delay += 200);
+                }
+            }
+        }
+    }
+}
+
+function getShieldHitbox(enemy: Enemy): Rect {
+    const hitbox = enemy.getDefaultHitbox();
+    const frame = crystalBarrierNormalAnimation.frames[0];
+    const w = (frame.content?.w ?? frame.w) * enemy.scale;
+    const h = (frame.content?.h ?? frame.h) * enemy.scale;
+    return {
+        // Shield is horizontally centered over the eye.
+        x: hitbox.x + (hitbox.w - w) / 2,
+        // Shield hitbox is 16px below the bottom of the eye hitbox.
+        y: hitbox.y + (hitbox.h - h) + 16,
+        w, h,
+    };
+}
 
 enemyDefinitions.crystalCollector = {
     animations: crystalCollectorAnimations, life: 24, touchDamage: 0, update: updateCrystalCollector, params: {
@@ -38,26 +110,25 @@ enemyDefinitions.crystalCollector = {
         enrageLevel: 0,
         enrageTime: 0,
     },
+    abilities: [crystalTurretAbility],
     invulnerableFrames: 20,
     hasShadow: false,
     initialAnimation: 'open',
     initialMode: 'initialMode',
     tileBehaviors: {solid: true},
+    // Technically this should probably be rendered as part of the background layer, but we can do something similar
+    // by setting the y depth very low.
+    getYDepth(enemy: Enemy): number {
+        return enemy.y - 16;
+    },
     getHitbox(enemy: Enemy): Rect {
-        const hitbox = enemy.getDefaultHitbox();
-        if (enemy.params.shieldLife) {
-            const frame = crystalBarrierNormalAnimation.frames[0];
-            const w = (frame.content?.w ?? frame.w) * enemy.scale;
-            const h = (frame.content?.h ?? frame.h) * enemy.scale;
-            return {
-                // Shield is horizontally centered over the eye.
-                x: hitbox.x + (hitbox.w - w) / 2,
-                // Shield hitbox is 16px below the bottom of the eye hitbox.
-                y: hitbox.y + (hitbox.h - h) + 16,
-                w, h,
-            };
+        if (enemy.mode === 'initialMode' || enemy.mode === 'sleeping') {
+            return enemy.getDefaultHitbox();
         }
-        return hitbox;
+        if (enemy.params.shieldLife && enemy.params.shieldTime > 0) {
+            return getShieldHitbox(enemy);
+        }
+        return enemy.getDefaultHitbox();
     },
     renderOver(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
         if (enemy.mode === 'initialMode' || enemy.mode === 'sleeping') {
@@ -101,8 +172,12 @@ enemyDefinitions.crystalCollector = {
         if (enemy.mode === 'initialMode' || enemy.mode === 'sleeping' || enemy.mode === 'opening') {
             return {};
         }
+
+        const isPartiallyShielded = enemy.params.enrageTime > 0
+            || enemy.params.shieldTime < crystalBarrierSummonAnimation.duration;
+
         // If the shield is up, only fire damage can hurt it.
-        if (enemy.params.shieldLife > 0) {
+        if (!isPartiallyShielded && enemy.params.shieldLife > 0) {
             if (hit.canDamageCrystalShields) {
                 // Right now shield takes a flat 2 damage no matter the source.
                 if (enemy.params.shieldInvulnerableTime <= 0) {
@@ -111,7 +186,7 @@ enemyDefinitions.crystalCollector = {
                 } else {
                     return { hit: true };
                 }
-                playSound('enemyHit');
+                enemy.makeSound(state, 'enemyHit');
                 const hitbox = enemy.getHitbox();
                 addParticleAnimations(state, enemy.area,
                     hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2, 16, crystalBarrierSmallParticles,
@@ -129,11 +204,21 @@ enemyDefinitions.crystalCollector = {
                 return { hit: true };
             }
         }
+        // Boss can be damaged when enraged, but takes much less damage
+        if (isPartiallyShielded) {
+            hit = {
+                ...hit,
+                damage: hit.damage / 5,
+            }
+        }
         // Use the default hit behavior, the attack will be blocked if the shield is still up.
         return enemy.defaultOnHit(state, hit);
     },
     getShieldPercent(state: GameState, enemy: Enemy) {
-        return enemy.params.shieldLife / maxShieldLife;
+        // Don't render the shield graphic until it
+        return (enemy.params.shieldTime < crystalBarrierSummonAnimation.duration)
+            ? 0
+            : enemy.params.shieldLife / maxShieldLife;
     }
 };
 function getFloorEye(this: void, state: GameState, area: AreaInstance): Enemy {
@@ -241,12 +326,11 @@ const summonLineOfSpikes = (state: GameState, enemy: Enemy) => {
 }
 
 const turnOnRandomCascade = (state: GameState, enemy: Enemy, count = 1) => {
-    const beadCascades = enemy.area.objects.filter(o => o.definition?.type === 'beadCascade');
+    const beadCascades = enemy.area.objects.filter(o => o.definition?.type === 'beadCascade') as BeadCascade[];
     let numberEnabled = 0;
     while (beadCascades.length) {
         const cascade = Random.removeElement(beadCascades);
-        if (cascade.status !== 'normal') {
-            cascade.onActivate(state);
+        if (turnOnCascade(state, cascade)) {
             numberEnabled++;
             if (numberEnabled >= count) {
                 return;
@@ -255,57 +339,24 @@ const turnOnRandomCascade = (state: GameState, enemy: Enemy, count = 1) => {
     }
 };
 
-const summonProjectiles = (state: GameState, enemy: Enemy, target: EffectInstance | ObjectInstance) => {
-    if (!target) {
-        return;
+function turnOnCascade(state: GameState, cascade: BeadCascade): boolean {
+    // Initially the cascades are turned off by being hidden,
+    // But after being turned on once they will be turned off
+    // by having the `isOn` flag set to false.
+    if (cascade.status !== 'normal') {
+        cascade.onActivate(state);
+        return true
+    } else if (!cascade.isOn) {
+        cascade.turnOn(state);
+        return true;
     }
-    const { enrageLevel = 0 } = enemy.params;
-    const arrowTurrets = enemy.area.objects.filter(o => o.definition?.type === 'turret') as WallTurret[];
-    if (enrageLevel >= 2 && Math.random() < 0.5) {
-        for (let i = arrowTurrets.length - 1; i >= 0; i--) {
-            arrowTurrets[i].fireAfter(600 + (i % 4) * 600);
-        }
-    } else if (enrageLevel >= 1 && Math.random() < 0.5) {
-        for (let i = 0; i < arrowTurrets.length; i++) {
-            arrowTurrets[i].fireAfter((i % 4 <= 1) ? 600 : 1200);
-        }
-    } else {
-        const targetHitbox = target.getHitbox(state);
-        const x = targetHitbox.x + targetHitbox.w / 2;
-        let delay = 600;
-        const radius = 32 + 16 * enrageLevel
-        let left = x - radius;
-        let right = x + radius;
-        // Arrows furthest towards the edges of the field start first, forcing the player
-        // to the center. This avoids the edges either being traps or always having to
-        // be safe from arrows.
-        if ((left + right) / 2 > 256) {
-            for (let i = arrowTurrets.length - 1; i >= 0; i--) {
-                if (arrowTurrets[i].x + 8 <= right && arrowTurrets[i].x + 8 >= left) {
-                    arrowTurrets[i].fireAfter(delay += 200);
-                }
-            }
-        } else {
-            for (let i = 0; i < arrowTurrets.length; i++) {
-                if (arrowTurrets[i].x + 8 <= right && arrowTurrets[i].x + 8 >= left) {
-                    arrowTurrets[i].fireAfter(delay += 200);
-                }
-            }
-        }
-    }
-};
+    return false;
+}
 
 function updateCrystalCollector(this: void, state: GameState, enemy: Enemy): void {
-    // enemy.params.shieldLife = 0;
     const { enrageLevel } = enemy.params;
     if (enemy.params.shieldInvulnerableTime  > 0) {
         enemy.params.shieldInvulnerableTime -= FRAME_LENGTH;
-    }
-    // Boss doesn't update for half of their iframes to make sure the damage animation isn't
-    // entirely interrupted.
-    if (enemy.enemyInvulnerableFrames > 10) {
-        enemy.changeToAnimation('hurt');
-        return;
     }
 
     // Check if we should start an enraged phase
@@ -319,38 +370,77 @@ function updateCrystalCollector(this: void, state: GameState, enemy: Enemy): voi
     // Enraged attacks have a duration + speed
     if (enemy.life <= 8 && enrageLevel === 1) {
         // Change these to choosing an array of attacks instead of a time.
+        enemy.animations = crystalCollectorEnragedAnimations;
+        enemy.currentAnimation = enemy.animations[enemy.currentAnimationKey][enemy.d];
         enemy.params.enrageTime = 12000;
         enemy.params.enrageLevel = 2;
-        enemy.params.shieldLife = maxShieldLife;
-        enemy.params.shieldTime = 0;
     } else if (enemy.life <= 16 && enrageLevel === 0) {
+        enemy.animations = crystalCollectorEnragedAnimations;
+        enemy.currentAnimation = enemy.animations[enemy.currentAnimationKey][enemy.d];
         enemy.params.enrageTime = 8000;
         enemy.params.enrageLevel = 1;
-        enemy.params.shieldLife = maxShieldLife;
-        enemy.params.shieldTime = 0;
     }
 
+    // Boss doesn't update for half of their iframes to make sure the damage animation isn't
+    // entirely interrupted.
+    if (enemy.enemyInvulnerableFrames > 10) {
+        enemy.changeToAnimation('hurt');
+        return;
+    }
+
+    // Don't show the attack animation for longer than one second unless enraged.
+    if (enemy.currentAnimationKey === 'attack' && enemy.animationTime > 1000 && !(enemy.params.enrageTime > 0)) {
+        enemy.changeToAnimation('idle');
+    }
+    // The crystal ability can be used at any point once the eye is open.
+    if (enemy.mode !== 'initialMode' && enemy.mode !== 'sleeping') {
+        enemy.useRandomAbility(state);
+    }
+    // The boss can only use one ability at a time unless it is enraged.
+    if (enemy.activeAbility && !(enemy.params.enrageTime > 0)) {
+        return;
+    }
+
+    if (enemy.params.shieldTime === 200) {
+        hitTargets(state, enemy.area, {
+            canAlwaysKnockback: true,
+            canDamageRollingHero: true,
+            damage: 1,
+            hitAllies: true,
+            hitTiles:true,
+            cutsGround: true,
+            hitbox: getShieldHitbox(enemy),
+            knockback: {
+                vx: 0, vy: 4, vz: 2
+            }
+        });
+    }
 
     enemy.shielded = enemy.params.shieldLife > 0;
     // Enraged behavior
     if (enemy.params.enrageTime > 0) {
-        enemy.animations = crystalCollectorEnragedAnimations;
+        // Start summoning the shield so it will finish activating at the end of the current rage phase.
+        if (enemy.params.shieldLife <= 0 && enemy.params.enrageTime <= crystalBarrierSummonAnimation.duration) {
+            enemy.params.shieldLife = maxShieldLife;
+            enemy.params.shieldTime = 0;
+        }
+        enemy.params.shieldTime += FRAME_LENGTH;
         enemy.params.enrageTime -= FRAME_LENGTH;
         if (enemy.params.enrageTime <= 0) {
             enemy.changeToAnimation('idle');
             // Summon new floor eyes, once the enrage mode is over
-            let [tx, ty] = Random.removeElement(enemy.params.eyeLocations);
+            let [tx, ty] = Random.removeElement(enemy.params.eyeLocations as number[][]);
             addFloorEye(state, enemy.area, tx, ty);
-            [tx, ty] = Random.removeElement(enemy.params.eyeLocations);
+            [tx, ty] = Random.removeElement(enemy.params.eyeLocations as number[][]);
             addFloorEye(state, enemy.area, tx, ty);
         } else if (enemy.params.enrageTime <= 3000) {
             enemy.changeToAnimation('confused');
-            const beadCascades = enemy.area.objects.filter(o => o.definition?.type === 'beadCascade');
+            const beadCascades = enemy.area.objects.filter(o => o.definition?.type === 'beadCascade') as BeadCascade[];
             // Activate all bead cascades from left to right, one each 100ms, for 1000ms
             // This assumes the index of the cascades is in order of their left to right position.
             for (let i = 0; i < beadCascades.length; i++) {
                 if (enemy.params.enrageTime === 3000 - 100 * i) {
-                    beadCascades[i].onActivate(state);
+                    turnOnCascade(state, beadCascades[i]);
                 }
             }
         } else {
@@ -367,7 +457,6 @@ function updateCrystalCollector(this: void, state: GameState, enemy: Enemy): voi
                     summonSpikeAheadOfPlayer(state, enemy);
                 }
             }
-            // Randomly choose "easier" patterns until they are all used, then randomly choose "hard" patterns.
         }
         return;
     } else {
@@ -393,7 +482,7 @@ function updateCrystalCollector(this: void, state: GameState, enemy: Enemy): voi
             [14, 8],  [17, 8],
             [9, 12], [22, 12]
         ];
-        const [tx, ty] = Random.removeElement(enemy.params.eyeLocations);
+        const [tx, ty] = Random.removeElement(enemy.params.eyeLocations as number[][]);
         addFloorEye(state, enemy.area, tx, ty);
         enemy.setMode('sleeping');
     } else if (enemy.mode === 'sleeping') {
@@ -425,11 +514,7 @@ function updateCrystalCollector(this: void, state: GameState, enemy: Enemy): voi
                 if (enemy.params.enrageLevel > 0 && Math.random() < 0.5) {
                     turnOnRandomCascade(state, enemy, enemy.params.enrageLevel);
                 }
-                if (Math.random() < 0.4) {
-                    enemy.setMode('summonProjectiles');
-                } else {
-                    enemy.setMode('summonSpikes');
-                }
+                enemy.setMode('summonSpikes');
             } else {
                 enemy.setMode('summonPod');
             }
@@ -438,9 +523,7 @@ function updateCrystalCollector(this: void, state: GameState, enemy: Enemy): voi
         if (enemy.animationTime > 1000) {
             enemy.changeToAnimation('idle');
         }
-        if ((enemy.modeTime === 0 && enrageLevel > 0)
-            || enemy.modeTime === 1000
-        ) {
+        if (enemy.modeTime === 0 || (enemy.modeTime === 1000 && enrageLevel > 0)) {
             // Pod spawn location spreads out with enrage level.
             addEffectToArea(state, enemy.area, new SpikePod({
                 x: enemy.x + enemy.w / 2 - (32 + 16 * enrageLevel) + Math.random() * (64 + 32 * enrageLevel),
@@ -475,16 +558,6 @@ function updateCrystalCollector(this: void, state: GameState, enemy: Enemy): voi
             }
         }
         if (enemy.modeTime >= 2000 + enrageLevel * 2000) {
-            enemy.setMode('choose');
-        }
-    } else if (enemy.mode === 'summonProjectiles') {
-        if (enemy.animationTime > 1000) {
-            enemy.changeToAnimation('idle');
-        }
-        if (enemy.modeTime === 20) {
-            summonProjectiles(state, enemy, getNearbyTarget(state, enemy, 1000, enemy.area.allyTargets));
-        }
-        if (enemy.modeTime >= 4000 - enrageLevel * 500) {
             enemy.setMode('choose');
         }
     }

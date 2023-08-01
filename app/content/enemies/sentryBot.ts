@@ -1,8 +1,3 @@
-import { addEffectToArea } from 'app/content/areas';
-import {
-    getVectorToNearbyTarget,
-    paceAndCharge,
-} from 'app/content/enemies';
 import { LaserBeam } from 'app/content/effects/laserBeam';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import {
@@ -10,9 +5,13 @@ import {
 } from 'app/content/enemyAnimations';
 import { lifeLootTable } from 'app/content/lootTables';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { addEffectToArea } from 'app/utils/effects';
+import {
+    paceAndCharge,
+} from 'app/utils/enemies';
 import { getTileBehaviors } from 'app/utils/field';
+import { getVectorToNearbyTarget } from 'app/utils/target';
 
-import { Enemy, GameState } from 'app/types';
 
 const updateTarget = (state: GameState, enemy: Enemy, ignoreWalls: boolean = false): boolean => {
     const vector = getVectorToNearbyTarget(state, enemy, 2000, enemy.area.allyTargets);

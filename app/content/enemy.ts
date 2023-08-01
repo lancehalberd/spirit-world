@@ -1,24 +1,22 @@
-import { AnimationEffect } from 'app/content/effects/animationEffect';
-import { checkForFloorEffects, isTargetVisible, moveEnemy } from 'app/content/enemies';
+import { addSparkleAnimation, FieldAnimationEffect } from 'app/content/effects/animationEffect';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
+import { addTextCue } from 'app/content/effects/textCue';
 import { dropItemFromTable, getLoot } from 'app/content/objects/lootObject';
-import { addEffectToArea, getAreaSize, refreshAreaLogic } from 'app/content/areas';
+import { objectHash } from 'app/content/objects/objectHash';
 import { bossDeathExplosionAnimation, enemyDeathAnimation } from 'app/content/enemyAnimations';
-import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { appendCallback, addTextCue } from 'app/scriptEvents';
+import { playAreaSound } from 'app/musicController';
+import { appendCallback } from 'app/scriptEvents';
 import { drawFrame, getFrame } from 'app/utils/animations';
 import { getDirection } from 'app/utils/field';
-import { playSound } from 'app/musicController';
+import { pad } from 'app/utils/index';
 import { renderEnemyShadow } from 'app/renderActor';
+import { addEffectToArea } from 'app/utils/effects';
+import { checkForFloorEffects, moveEnemy } from 'app/utils/enemies';
+import { getAreaSize } from 'app/utils/getAreaSize';
+import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
 import Random from 'app/utils/Random';
-
-import {
-    Action, Actor, ActorAnimations, AreaInstance, BossObjectDefinition, Direction, DrawPriority, EffectInstance,
-    EnemyAbility, EnemyAbilityInstance, EnemyDefinition, EnemyObjectDefinition,
-    Frame, FrameAnimation, GameState, HitProperties, HitResult,
-    ObjectInstance, ObjectStatus, Point, Rect, TileBehaviors, TextCueTauntInstance,
-} from 'app/types';
+import { isTargetVisible } from 'app/utils/target';
 
 interface EnemyAbilityWithCharges {
     definition: EnemyAbility<any>
@@ -37,20 +35,28 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
     area: AreaInstance;
     drawPriority: DrawPriority = 'sprites';
     definition: EnemyObjectDefinition | BossObjectDefinition;
-    enemyDefinition: EnemyDefinition;
+    enemyDefinition: EnemyDefinition<Params>;
     // Which key was read from this.animations to produce the current animation.
     // Only valid if `currentAnimation` is set using standard methods.
     currentAnimationKey: string;
     currentAnimation: FrameAnimation;
+    // If this is set, the enemy will automatically transition to this animation key
+    // once it has completed the current animation.
+    nextAnimationKey?: string;
     hasShadow: boolean = true;
     animationTime: number;
     animations: ActorAnimations;
     alwaysReset: boolean = false;
     alwaysUpdate: boolean = false;
+    frozenDuration = 0;
+    burnDuration = 0;
+    burnDamage = 0;
     // This ignores the default pit logic in favor of the ground effects
     // code used internally.
     ignorePits = true;
     d: Direction;
+    // Rotation is used for changing directions of certain sprites.
+    rotation: number;
     spawnX: number;
     spawnY: number;
     x: number;
@@ -84,6 +90,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
     // healthbar.
     // There is a 100ms grace period before the bar is displayed at all.
     healthBarTime = 0;
+    healthBarColor?: string;
     params: Params;
     enemyInvulnerableFrames = 0;
     // This is used to prevent the block effect from happening too frequently
@@ -124,9 +131,9 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         this.params = {
             ...(this.enemyDefinition.params || {}),
             ...(definition.params || {}),
-        };
+        } as Params;
         this.status = definition.status;
-        if (getObjectStatus(state, this.definition)) {
+        if (this.definition.id && getObjectStatus(state, this.definition)) {
             this.status = 'gone';
         }
         this.alwaysReset = this.enemyDefinition.alwaysReset;
@@ -136,8 +143,8 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         for (const ability of this.enemyDefinition.abilities ?? []) {
             this.abilities.push({
                 definition: ability,
-                charges: ability.initialCharges || 1,
-                cooldown: ability.cooldown || 0,
+                charges: ability.initialCharges ?? 1,
+                cooldown: ability.initialCooldown || ability.cooldown || 0,
             });
         }
         for (const tauntKey in this.enemyDefinition.taunts ?? []) {
@@ -147,6 +154,8 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
                 timesUsed: 0,
             };
         }
+        this.healthBarColor = this.enemyDefinition.healthBarColor;
+        this.enemyDefinition.initialize?.(state, this);
     }
     getFrame(): Frame {
         return getFrame(this.currentAnimation, this.animationTime);
@@ -158,7 +167,11 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         return this.getDefaultHitbox();
     }
     getYDepth(): number {
-        return this.enemyDefinition.getYDepth?.(this) ?? this.y;
+        if (this.enemyDefinition.getYDepth) {
+            return this.enemyDefinition.getYDepth(this);
+        }
+        const hitbox = this.getHitbox();
+        return hitbox.y + hitbox.h + this.z;
     }
     getDefaultHitbox(): Rect {
         const frame = this.getFrame();
@@ -200,11 +213,12 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         return !(this.spawnX < section.x || this.spawnX > section.x + section.w ||
                 this.spawnY < section.y || this.spawnY > section.y + section.h)
     }
-    changeToAnimation(type: string) {
+    changeToAnimation(type: string, nextAnimationKey?: string) {
         if (!this.animations) {
             debugger;
         }
         this.currentAnimationKey = type;
+        this.nextAnimationKey = nextAnimationKey;
         const animationSet = this.animations[type] || this.animations.idle;
         // Fallback to the first defined direction if the current direction isn't defined.
         const targetAnimation = animationSet[this.d] || Object.values(animationSet)[0];
@@ -217,8 +231,9 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             this.animationTime = 0;
         }
     }
-    setAnimation(type: string, d: Direction, time: number = 0) {
+    setAnimation(type: string, d: Direction, time: number = 0, nextAnimationKey?: string) {
         this.currentAnimationKey = type;
+        this.nextAnimationKey = nextAnimationKey;
         const animationSet = this.animations[type] || this.animations.idle;
         // Fallback to the first defined direction if the current direction isn't defined.
         this.currentAnimation = animationSet[d] || Object.values(animationSet)[0];
@@ -260,6 +275,22 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
     updateDrawPriority() {
         this.drawPriority = this.flying ? 'foreground' : (this.enemyDefinition.drawPriority || 'sprites');
     }
+    playBlockSound(state: GameState) {
+        if (this.blockInvulnerableFrames) {
+            return;
+        }
+        playAreaSound(state, this.area, 'blockAttack');
+        this.blockInvulnerableFrames = 30;
+    }
+    defaultBlockHit(state: GameState, hit: HitProperties, stopped = false): HitResult {
+        this.playBlockSound(state);
+        return {
+            hit: true,
+            blocked: true,
+            stopped,
+            knockback: hit.knockback ? {vx: -hit.knockback.vx, vy: -hit.knockback.vy, vz: 0 } : null
+        };
+    }
     defaultOnHit(state: GameState, hit: HitProperties): HitResult {
         if (this.status === 'off') {
             if (hit.element === 'lightning') {
@@ -284,16 +315,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             return {};
         }
         if (this.shielded) {
-            if (this.blockInvulnerableFrames) {
-                return {};
-            }
-            playSound('blockAttack');
-            this.blockInvulnerableFrames = 30;
-            return {
-                hit: true,
-                blocked: true,
-                knockback: hit.knockback ? {vx: -hit.knockback.vx, vy: -hit.knockback.vy, vz: 0 } : null
-            };
+            return this.defaultBlockHit(state, hit);
         }
         if (hit.knockback) {
             this.knockBack(state, hit.knockback);
@@ -310,7 +332,17 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         if (hit.damage) {
             const multiplier = this.enemyDefinition.elementalMultipliers?.[hit.element] || 1;
             damageDealt = multiplier * hit.damage;
-            this.applyDamage(state, damageDealt);
+            this.applyDamage(state, damageDealt, 'enemyHit', hit.element === 'lightning' ? 0.5 : 1);
+            if (hit.element === 'fire') {
+                this.applyBurn(hit.damage, 2000);
+            }
+        }
+        // Hitting frozen enemies unfreezes them.
+        if (this.frozenDuration > 0) {
+            this.frozenDuration = 0;
+        } else if (hit.element === 'ice' && this.definition.type !== 'boss') {
+            this.frozenDuration = 1500;
+            this.burnDuration = 0;
         }
         return {
             damageDealt,
@@ -319,30 +351,46 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             knockback: hit.knockback ? {vx: -hit.knockback.vx, vy: -hit.knockback.vy, vz: 0 } : null
         };
     }
-    applyDamage(state: GameState, damage: number, damageSound: string = 'enemyHit') {
+    applyDamage(state: GameState, damage: number, damageSound: string = 'enemyHit', iframeMultiplier = 1) {
         if (this.life <= 0) {
             return;
         }
-        this.life -= damage;
+        this.life = Math.max(0, this.life - damage);
         // This is actually the number of frames the enemy cannot damage the hero for.
         this.invulnerableFrames = this.enemyDefinition.invulnerableFrames ?? 50;
-        this.enemyInvulnerableFrames = 20;
-        if (this.life <= 0 && !this.isImmortal) {
-            this.showDeathAnimation(state);
-        } else {
-            playSound(damageSound);
+        this.enemyInvulnerableFrames = (iframeMultiplier * 20) | 0;
+        if (!this.checkIfDefeated(state)) {
+            playAreaSound(state, this.area, damageSound);
         }
         if (this.area !== state.areaInstance) {
-            addEffectToArea(state, state.areaInstance, new AnimationEffect({
-                animation: this.isDefeated ? enemyDeathAnimation : this.currentAnimation || enemyDeathAnimation,
+            addEffectToArea(state, state.areaInstance, new FieldAnimationEffect({
+                animation: (this.isDefeated && this.definition.type !== 'boss')
+                    ? enemyDeathAnimation
+                    : this.currentAnimation || enemyDeathAnimation,
                 x: this.x,
                 y: this.y,
                 scale: this.scale,
                 alpha: 0.3,
-                ttl: 200,
+                // Extend the TTL if we are showing the boss explosion animation.
+                ttl: (this.isDefeated && this.definition.type === 'boss') ? 2500 : 200,
             }));
         }
         return true;
+    }
+    checkIfDefeated(state: GameState) {
+        if (this.life <= 0 && !this.isImmortal) {
+            this.showDeathAnimation(state);
+            return true;
+        }
+        return false;
+    }
+    applyBurn(burnDamage: number, burnDuration: number) {
+        if (burnDuration * burnDamage >= this.burnDuration * this.burnDamage) {
+            this.burnDuration = burnDuration;
+            this.burnDamage = burnDamage;
+        }
+        // Burns unfreeze the player.
+        this.frozenDuration = 0;
     }
     showDeathAnimation(state: GameState) {
         if (this.status === 'gone' || this.isDefeated) {
@@ -358,7 +406,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             // Immediately kill other enemies and remove enemy attack effects when the boss is defeated.
             // Bosses in both material+spirit realms must be defeated before the battle is over.
             const allEnemies = [...this.area.enemies, ...this.area.alternateArea.enemies];
-            if (!allEnemies.some(object => object.definition.type === 'boss'
+            if (!allEnemies.some(object => object.definition.type === 'boss' && object.isFromCurrentSection(state)
                     && object.status !== 'gone' && !object.isDefeated)
             ) {
                 // Remove all enemy attacks from the screen when a boss is defeated.
@@ -387,8 +435,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
                     if (bossDefinition.lootType && bossDefinition.lootType !== 'empty') {
                         getLoot(state, bossDefinition);
                     } else {
-                        refreshAreaLogic(state, state.areaInstance);
-                        refreshAreaLogic(state, state.alternateAreaInstance);
+                        state.areaInstance.needsLogicRefresh = true;
                     }
                 });
             }
@@ -397,7 +444,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             return;
         }
         const hitbox = this.getHitbox(state);
-        const deathAnimation = new AnimationEffect({
+        const deathAnimation = new FieldAnimationEffect({
             animation: enemyDeathAnimation,
             x: hitbox.x + hitbox.w / 2 - enemyDeathAnimation.frames[0].w / 2 * this.scale,
             // +1 to make sure the explosion appears in front of enemies the frame they die.
@@ -409,7 +456,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             deathAnimation.vy = this.vy;
             deathAnimation.friction = 0.1;
         }
-        playSound('enemyDeath');
+        playAreaSound(state, this.area, 'enemyDeath');
         if (this.enemyDefinition.lootTable) {
             dropItemFromTable(state, this.area, this.enemyDefinition.lootTable,
                 hitbox.x + hitbox.w / 2,
@@ -421,7 +468,9 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             this.enemyDefinition.onDeath(state, this);
         }
         this.status = 'gone';
-        saveObjectStatus(state, this.definition);
+        if (this.definition.id) {
+            saveObjectStatus(state, this.definition);
+        }
     }
     shouldReset(state: GameState) {
         return true;
@@ -472,21 +521,31 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             time: 0,
         };
         ability.definition.prepareAbility?.(state, this, target);
+        if ((ability.definition.prepTime || 0) <= 0) {
+            ability.definition.useAbility?.(state, this, target);
+            this.activeAbility.used = true;
+            if ((ability.definition.recoverTime || 0) <= 0) {
+                this.activeAbility = null;
+                this.changeToAnimation('idle');
+            }
+        }
     }
-    useTaunt(state: GameState, tauntKey: string) {
+    useTaunt(state: GameState, tauntKey: string): boolean {
         const tauntInstance = this.taunts[tauntKey];
         if (!tauntInstance) {
             console.error('Missing taunt ', tauntKey);
-            return;
+            return false;
         }
         const definition = tauntInstance.definition;
         if (tauntInstance.cooldown || tauntInstance.timesUsed >= definition.limit) {
-            return;
+            return false;
         }
         if (addTextCue(state, definition.text, definition.duration, definition.priority)) {
             tauntInstance.cooldown = definition.cooldown || 3000;
             tauntInstance.timesUsed++;
+            return true;
         }
+        return false;
     }
     update(state: GameState) {
         if (this.status === 'gone') {
@@ -495,13 +554,56 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         if (!this.alwaysUpdate && !this.isFromCurrentSection(state)) {
             return;
         }
+        if (this.nextAnimationKey && this.animationTime >= this.currentAnimation.duration) {
+            this.changeToAnimation(this.nextAnimationKey);
+        }
+        this.time += FRAME_LENGTH;
+        if (this.invulnerableFrames > 0) {
+            this.invulnerableFrames--;
+        }
+        if (this.enemyInvulnerableFrames > 0) {
+            this.enemyInvulnerableFrames--;
+        }
+        if (this.blockInvulnerableFrames > 0) {
+            this.blockInvulnerableFrames--;
+        }
+        if (this.frozenDuration > 0) {
+            this.frozenDuration -= FRAME_LENGTH;
+            /*if (this.vx > 0.1 || this.vy > 0.1) {
+                moveEnemy(state, this, this.vx, this.vy, {canFall: true});
+            }*/
+            if (this.z > 0) {
+                this.z = Math.max(0, this.z + this.vz);
+                this.vz = Math.max(-8, this.vz + this.az);
+                // Enemy can take 1-2 fall damage while frozen if it lands hard enough.
+                if (this.z === 0 && this.vz <= -4) {
+                    this.applyDamage(state, (this.vz / -4) | 0);
+                    this.frozenDuration = 0;
+                }
+            }
+            // Slowly slide to a stop
+            //this.vx *= 0.95;
+            //this.vy *= 0.95;
+            return;
+        }
+        if (this.burnDuration > 0) {
+            this.burnDuration -= FRAME_LENGTH;
+            this.life = Math.max(0, this.life - this.burnDamage * FRAME_LENGTH / 1000);
+            if (this.checkIfDefeated(state)) {
+                // End ths burn when the enemy is defeated.
+                this.burnDuration = 0;
+            }
+            if (this.burnDuration % 40 === 0) {
+                const hitbox = this.getHitbox();
+                addSparkleAnimation(state, this.area, pad(hitbox, -4), { element: 'fire' });
+            }
+        }
         for (const tauntKey in this.taunts ?? []) {
             const tauntInstance = this.taunts[tauntKey];
             if (tauntInstance.cooldown > 0) {
                 tauntInstance.cooldown -= FRAME_LENGTH;
             }
         }
-        this.time += FRAME_LENGTH;
         // Only time counter advances for enemies that are off.
         // This status is only meant to apply to machines.
         if (this.status === 'off') {
@@ -533,11 +635,13 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         if (this.activeAbility) {
             this.activeAbility.time += FRAME_LENGTH;
             // Actually use the ability once the prepTime has passed.
-            if (!this.activeAbility.used && this.activeAbility.time >= this.activeAbility.definition.prepTime) {
+            if (!this.activeAbility.used && this.activeAbility.time >= (this.activeAbility.definition.prepTime || 0)) {
                 this.activeAbility.definition.useAbility(state, this, this.activeAbility.target);
                 this.activeAbility.used = true;
+            } else if (!this.activeAbility.used && this.activeAbility.definition.updateAbility) {
+                this.activeAbility.definition.updateAbility(state, this, this.activeAbility.target);
             }
-            if (this.activeAbility.time >= this.activeAbility.definition.prepTime + this.activeAbility.definition.recoverTime) {
+            if (this.activeAbility.time >= (this.activeAbility.definition.prepTime || 0) + (this.activeAbility.definition.recoverTime || 0)) {
                 this.activeAbility = null;
                 this.changeToAnimation('idle');
             }
@@ -549,25 +653,21 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             ) {
                 const hitbox = this.getHitbox(state);
                 const animation = bossDeathExplosionAnimation;
-                const explosionAnimation = new AnimationEffect({
+                const explosionAnimation = new FieldAnimationEffect({
                     animation,
                     drawPriority: 'foreground',
                     x: hitbox.x + Math.random() * hitbox.w - animation.frames[0].w / 2,
                     y: hitbox.y + Math.random() * hitbox.h - animation.frames[0].h / 2,
                 });
-                addEffectToArea(state, this.area, explosionAnimation);
-                playSound('enemyDeath');
+                // Always show the explosion in the player's instance so that the animation
+                // is always visible.
+                addEffectToArea(state, state.areaInstance, explosionAnimation);
+                playAreaSound(state, state.areaInstance, 'enemyDeath');
+            }
+            if (this.animationTime >= 2800) {
+                this.status = 'gone';
             }
             return;
-        }
-        if (this.invulnerableFrames > 0) {
-            this.invulnerableFrames--;
-        }
-        if (this.enemyInvulnerableFrames > 0) {
-            this.enemyInvulnerableFrames--;
-        }
-        if (this.blockInvulnerableFrames > 0) {
-            this.blockInvulnerableFrames--;
         }
         const minZ = this.canBeKnockedDown ? 0 : (this.flying ? 12 : 0);
         if (this.action === 'knocked') {
@@ -636,6 +736,21 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         if (this.enemyDefinition.renderOver) {
             this.enemyDefinition.renderOver(context, state, this);
         }
+        if (this.frozenDuration > 0) {
+            context.save();
+                context.fillStyle = 'white';
+                const p = Math.round(Math.min(3, this.frozenDuration / 200));
+                context.globalAlpha *= (0.3 + 0.15 * p);
+                // Note enemy hitbox already incorporates the z value into the y value of the hitbox.
+                const hitbox = this.getHitbox(state);
+                context.fillRect(
+                    Math.round(hitbox.x - p),
+                    Math.round(hitbox.y - p),
+                    Math.round(hitbox.w + 2 * p),
+                    Math.round(hitbox.h + 2 * p)
+                );
+            context.restore();
+        }
     }
     defaultRender(context: CanvasRenderingContext2D, state?: GameState, frame = this.getFrame()) {
         if (!frame) {
@@ -657,6 +772,24 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
                 drawFrame(context, frame, { ...frame,
                     x: - (w / 2 + (frame.content?.x || 0)) * this.scale,
                     y: this.y - (frame.content?.y || 0) * this.scale - this.z,
+                    w: frame.w * this.scale,
+                    h: frame.h * this.scale,
+                });
+                /*
+                // Draw a red dot where we are flipping
+                context.fillStyle = 'red';
+                context.fillRect( -1, this.y, 2, frame.content?.h || frame.h);
+                */
+            } else if (this.rotation) {
+                // Flip the frame when facing right. We may need an additional flag for this behavior
+                // if we don't do it for all enemies on the right frames.
+                const w = frame.content?.w ?? frame.w;
+                const h = frame.content?.h ?? frame.h;
+                context.translate((this.x | 0) + (w / 2) * this.scale, (this.y | 0) + (h / 2) * this.scale - this.z);
+                context.rotate(this.rotation);
+                drawFrame(context, frame, { ...frame,
+                    x: - (w / 2 + (frame.content?.x || 0)) * this.scale,
+                    y: - (h / 2 + (frame.content?.y || 0)) * this.scale,
                     w: frame.w * this.scale,
                     h: frame.h * this.scale,
                 });
@@ -710,4 +843,26 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             this.defaultRender(context);
         context.restore();
     }
+    makeSound(state: GameState, soundKey: string) {
+        playAreaSound(state, this.area, soundKey);
+    }
+    // Update the scale of the enemy without moving the center of its feet.
+    changeScale(scale: number): void {
+        if (scale === this.scale) {
+            return;
+        }
+        let hitbox = this.getHitbox();
+        const cx = hitbox.x + hitbox.w / 2, by = hitbox.y + hitbox.h;
+        this.scale = scale;
+        hitbox = this.getHitbox();
+        this.x += (cx - hitbox.x - hitbox.w / 2);
+        this.y += (by - hitbox.y - hitbox.h);
+    }
+}
+objectHash.enemy = Enemy;
+objectHash.boss = Enemy;
+
+class _Enemy<T> extends Enemy<T> {}
+declare global {
+    export interface Enemy<T=any> extends _Enemy<T> {}
 }

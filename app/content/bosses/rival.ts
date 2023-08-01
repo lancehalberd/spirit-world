@@ -1,24 +1,24 @@
-import { playAreaSound, removeObjectFromArea } from 'app/content/areas';
-import {
-    getVectorToNearbyTarget,
-    isTargetVisible,
-    moveEnemy,
-    moveEnemyToTargetLocation,
-} from 'app/content/enemies';
 import { CrystalSpike } from 'app/content/effects/arrow';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { rivalAnimations } from 'app/content/enemyAnimations';
 import { heroAnimations, staffAnimations } from 'app/render/heroAnimations';
-import { appendScript, removeTextCue } from 'app/scriptEvents';
-import { saveGame } from 'app/state';
+import { appendScript } from 'app/scriptEvents';
+import { removeTextCue } from 'app/content/effects/textCue';
 import { drawFrameAt, getFrame } from 'app/utils/animations';
-import { directionMap, getDirection, hitTargets } from 'app/utils/field';
-
-
 import {
-    Direction, Enemy, EnemyAbility, GameState, HitProperties, HitResult, Point, Rect
-} from 'app/types';
+    moveEnemy,
+    moveEnemyToTargetLocation,
+} from 'app/utils/enemies';
+import { directionMap, getDirection, hitTargets } from 'app/utils/field';
+import { removeObjectFromArea } from 'app/utils/objects';
+import { saveGame } from 'app/utils/saveGame';
+import {
+    getVectorToNearbyTarget,
+    isTargetVisible,
+} from 'app/utils/target';
+
+
 
 // const rivalMergedAnimations = {
 //     ...rivalAnimations,
@@ -122,7 +122,7 @@ const staffAbility: EnemyAbility<Direction> = {
     useAbility(this: void, state: GameState, enemy: Enemy, target: Direction): void {
         enemy.changeToAnimation('staffSlam');
         enemy.z = Math.max(enemy.z + enemy.vz, 0);
-        playAreaSound(state, enemy.area, 'bossDeath');
+        enemy.makeSound(state, 'bossDeath');
         hitTargets(state, enemy.area, {
             damage: 2,
             hitbox: getStaffHitbox(enemy, enemy.d),
@@ -264,7 +264,7 @@ function updateRival(this: void, state: GameState, enemy: Enemy): void {
             appendScript(state, '{@rival.lostFirstFight}');
             enemy.setMode('escaping');
             state.savedState.objectFlags[enemy.definition.id] = true;
-            saveGame();
+            saveGame(state);
             return;
         }
     }

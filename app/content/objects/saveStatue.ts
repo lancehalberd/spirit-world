@@ -1,15 +1,13 @@
-import { selectDialogueOption } from 'app/content/dialogue';
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
-import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
+import { objectHash } from 'app/content/objects/objectHash';
 import { setSpawnLocation } from 'app/content/spawnLocations';
 import { isRandomizer } from 'app/gameConstants';
-import { showMessage } from 'app/render/renderMessage';
+import { showMessage } from 'app/scriptEvents';
 import { createAnimation, drawFrame } from 'app/utils/animations';
+import { selectDialogueOption } from 'app/utils/dialogue';
+import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
+import { FRAME_LENGTH } from 'app/gameConstants';
 
-import {
-    AreaInstance, GameState, Direction, Hero, SimpleObjectDefinition,
-    ObjectInstance, ObjectStatus, Rect,
-} from 'app/types';
 
 const geometry = {w: 32, h: 48};
 const [saveStatue] = createAnimation('gfx/tiles/savepoint.png', geometry).frames;
@@ -28,7 +26,8 @@ export class SaveStatue implements ObjectInstance {
     y: number;
     status: ObjectStatus = 'normal';
     isNeutralTarget = true;
-    constructor(definition: SimpleObjectDefinition) {
+    time = 0;
+    constructor(state: GameState, definition: SimpleObjectDefinition) {
         this.definition = definition;
         this.x = definition.x;
         this.y = definition.y;
@@ -47,7 +46,7 @@ export class SaveStatue implements ObjectInstance {
         if (hero.isAstralProjection) {
             return;
         }
-        // Remove the grab action since the hero is reading the sign, not grabbing it.
+        // Remove the grab action since the hero is interacting with the statue, not grabbing it.
         hero.action = null;
         setSpawnLocation(state, {
             ...state.location,
@@ -55,6 +54,10 @@ export class SaveStatue implements ObjectInstance {
             y: this.y + 16,
         });
         state.hero.life = state.hero.maxLife;
+        if (state.hero.magicRegen > 0 && (!this.area.isCorrosive || state.hero.passiveTools.waterBlessing)) {
+            state.hero.magic = state.hero.maxMagic;
+            state.hero.magicRegenCooldown = 0;
+        }
         if (getObjectStatus(state, this.definition)) {
             if (!state.hero.hasRevive) {
                 showMessage(state, '{@saveStatue.reviveChoice}');
@@ -73,8 +76,9 @@ export class SaveStatue implements ObjectInstance {
         }
     }
     update(state: GameState) {
+        this.time += FRAME_LENGTH;
         // The statue sparkles if you haven't used it yet.
-        if (state.fieldTime % 100 === 0 && !getObjectStatus(state, this.definition)) {
+        if (this.time % 100 === 0 && !getObjectStatus(state, this.definition)) {
             addSparkleAnimation(state, this.area, this.getHitbox(state), {});
         }
     }
@@ -83,3 +87,4 @@ export class SaveStatue implements ObjectInstance {
         drawFrame(context, frame, { ...frame, x: this.x, y: this.y - 32 });
     }
 }
+objectHash.saveStatue = SaveStatue;

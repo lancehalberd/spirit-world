@@ -1,9 +1,7 @@
+import { objectHash } from 'app/content/objects/objectHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame } from 'app/utils/animations';
-import {
-    AreaInstance, DrawPriority, GameState,
-    ObjectInstance, ObjectStatus, DecorationDefinition, Rect,
-} from 'app/types';
+
 
 export class Decoration implements ObjectInstance {
     area: AreaInstance;
@@ -16,7 +14,7 @@ export class Decoration implements ObjectInstance {
     h: number;
     status: ObjectStatus = 'normal';
     animationTime = 0;
-    constructor(definition: DecorationDefinition) {
+    constructor(state: GameState, definition: DecorationDefinition) {
         this.definition = definition;
         this.drawPriority = definition.drawPriority || 'foreground';
         this.x = definition.x;
@@ -42,6 +40,10 @@ const [
     fireBeastStatueImage
 ] = createAnimation('gfx/objects/spiritQuestStatue-draftSprites-58x60.png', {w: 58, h: 60}, {cols: 3}).frames;
 
+const [
+    entranceLightFrame
+] = createAnimation('gfx/objects/cavelight.png', {w: 64, h: 32}).frames;
+
 export const decorationTypes = {
     lightningBeastStatue: {
         render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
@@ -58,6 +60,14 @@ export const decorationTypes = {
             drawFrame(context, iceBeastStatueImage, {...iceBeastStatueImage, x: decoration.x, y: decoration.y});
         }
     },
+    entranceLight: {
+        render(context: CanvasRenderingContext2D, state: GameState, decoration: Decoration) {
+            drawFrame(context, entranceLightFrame, {...entranceLightFrame, x: decoration.x, y: decoration.y});
+        }
+    },
 }
+objectHash.decoration = Decoration;
 
-export type DecorationType = keyof typeof decorationTypes;
+declare global {
+    export type DecorationType = keyof typeof decorationTypes;
+}

@@ -1,6 +1,9 @@
 Test at http://localhost:81/alttp/public/
 
 Known Bugs:
+    - Enemies can get trapped inside the Staff Tower graphics if they are in the are it occupies when it is created.
+        - Should probably kill enemies in this area when setting up the tower.
+
     - Door closing sound plays while in the title screen
         - Maybe just disable playAreaSound in the title scene or only play this sound if the player passes through the door and it closes behind them.
     - Teleporting while grabbing a pot with astral projection can make you face south but still be grabbing the pot
@@ -12,8 +15,6 @@ Known Bugs:
         - when players can actively hit enemies in the spirit world we should play a sound. For example, hitting an enemy with a linked bush shouldn't be silent.
     - Clone tool bugs
         - Mana regen is wrong when using clone tools (seems to multiply consumption/regen by number of clones)
-        - Should destroy clones when the clone technique is unequipped.
-        - Clones should all share the same tools (store tools on state instead of hero)
     - Held rocks/bushes are invisible while using cloak
     - Piercing projectiles that can push things should be stopped by the first object they push
         or not be able to push additional objects, for example, the charged chakram.
@@ -35,22 +36,232 @@ Graphics:
     Add damage effects for hitting enemies?
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
-Current tasks:
-    - Fix bead flow depth by using sprite ordering for the ordered part instead of foreground, use the y value based on where it hits the floor but only draw it start 16px up from that point so it gradually covers while moving behind it.
+Pending Graphics From Jon:
+    Cloud poof animation
+    Guardian Projection Boss animations
+    Golem graphic updates
+         Remove jewel from top of head
+         Make jewel in mouth more obvious
+    Spinning turret enemy graphics
+    Storm Beast Statue animations
 
-    - nextAreaInstance is not rendered in Safari
-        - Fix this from Hillary's machine
+
+Current tasks:
+    - Add material tile -> spirit tile mapping function:
+        - Add reasonable defaults like based on defaultLayer, solid, solidMap
+        - Check explicit tile mappings first
+        - Do this after we split tiles up into multiple tile sheets.
+
+    - populate project board with art tasks for Jon and prioritize them
+
+    - Add indicators for NPCs next dialogue option
+        - Must assign every NPC text option a unique id and an optional type: quest, subquest, hint
+            - objects with dialogue should
+        - Spirit king text should remove sections for completed dungeons.
+        - New vs Read dialogue (could just be 100 vs 50% opacity)
+        - Quest info Golden or Red !
+        - Side-quest info Green or Blue !
+        - hint ?
+        - generic text ... or empty bubble
+
+    - Forest temple boss should provide a golden peach in addition to the clone tool.
+
+    - Render faint Vanara spirits for Vanara in the other world.
+
+    - Expand overworld tiles to 48x48
+
+    - Investigate updating various tile sets to new version:
+        - identify changed tiles and plan how to fix issues caused by the update:
+            - possibly switch the order of tiles to prevent any changes
+            - identify and update maps where tiles change
+        - crystal
+        - cave
+
+
+    - lose money when collecting money loot as clone?
+        - lose most progress this way.
+        - Add both list of copied and not copied props, log warning if a property is not on a list and copy.
+
+    - Fix ledge graphics in tomb
+        - War Temple
+
+    - Make sure door open/close sound effects are playing
+        - Check tomb crystal switch doors specifically.
+
+    - Add push/pull instructions to the key room in tomb
+        - Add respawn flag to objects that causes them to respawn if destroyed, use to prevent soft lock in tomb.
+
+
+    - Use grey cloud tiles for lightning bolt cloud animation
+        - Possibly also for the cloud tiles during the storm beast fight
+            - At least the clouds around the storm heart
+        - Would be good to change to normal clouds after the fight.
+
+    - Make it easier to find the gloves
+        - Add a quest state that highlights the entrance with the gloves.
+        - Move the map to the main chamber as a new check with a simple puzzle to obtain it
+            - Include the big chest room on the map, draw chests and big chests to the map
+
+    - Block exit door in pit room in War Temple 3F
+
+    - Aimed Projectiles for Cocoon boss an other
+        - EnemyProjectile wrapper for CrystalSpike/Flame/Frost/Spark that takes an element to determine which projectile to use
+            - Or it takes a projectile Effect, but there is a utility method to generate to the projectile effect from element.
+        - Projectile appears stationary in the air during delay frames (this can be set as a boolean)
+        - Projectile can be assigned a target, if so
+            - Projectile vx/vy update to point at target as long as it is visible
+            - Possibly can set an additional delay where vx/vy stop targeting before projectiles launch
+        - Cocoon boss summons a ring of aimed projectiles around them with 400ms increasing delay on each one
+
+
+    - Brainstorm how the beasts get released
+        - Maybe destroying the idols causes them to wake up and flee the War Temple
+        - War God convinces Rival to summon the beasts to the material world to distract the Spirit Gods from his plan
+        - While they are "missing" they are actually being given their Vanaran Hearts
+
+    - Tasks before next major release
+        - Update save statue dialog
+            - outside waterfall cave
+            - city
+            - jade city
+            - summoner ruins
+            - war palace
+            - lab
+            - forest
+            - spirit forest
+            - sky
+            - spirit sky
+            - gauntlet
+            - holy sanctum
+            - sky palace
+            - forge
+
+        - Support multiple active missions
+            - On map, highlight the first mission and display a location name
+            - If the user confirms, show them the help text for the mission.
+
+        - When hero/clone is falling, draw it behind all other sprites (on top of the background).
+            - Try using getDrawPriority to apply this to clone, we may need a new priority 'afterBackground' to force it to draw on top of all background elements (for example, it should be drawn on top of pit entrance objects).
+            - The hero itself will probably need special handling to render it immediately after the background in renderField since it always has special handling.
+
+        - Fix old cave tiles in peach cave 2F.
+
+        - Hint signs:
+            "Want a hint?" or "20 Jade for a hint?"
+
+    - Replace inventory tab with editor UI that uses the main inventory screen
+        - Missing items are drawn faded when editing is on.
+        - Clicking an item cycles from 0 -> 1 -> 2 -> 0
+        - Click on big/small keys/map to get dungeon items
+        - Click on chakrams to add upgrades
+        - Click on ores to increase ore count
+
+    - Forge
+        - Gold mail offered by NPC if you bring gold ore and 500 money
+
+    - Heavy 2x2 blocks that can only be pushed if the player has mitts
+        - Make this a variation of push/pull object that is 32x32
+
+    - Try using fade transition for material -> spirit world
+        - If this isn't better, try using a circle wipe transition with a gradient instead.
+
+    - Ask Jon for falling animation with cloud poof for falling through clouds.
+
+    - Randomizer hint sometimes says you are in BK mode with checks in logic
+        - I think this happens when your last check is behind a locked door that you have enough keys for but the randomizer thinks you don't because it isn't counting locked doors you have already opened.
+
+    - Add vertical tiles in between sky and ground:
+        - Could give a greater feeling of vertical depth to the world
+        - south facing cliff face near the mountains
+        - waterfall near the waterfall
+        - outside of staff tower when it is setup in the tile
+        - empty sky/abyss tiles when falling through random sky tiles.
+
+    - Flame wall improvement
+        - Refactor as individual flames so that each flame can hit individually or be destroyed by ice.
+
+    - Mechanic: Windstream
+        - Pushes player back unless they are using iron boots or holding on to a solid object.
+        - Player can push pots to move through wind streams.
+        - Player can be pushed across wide pits by equipping cloud boots and entering a wind stream or up to the next floor
+        - There may be light objects that players can push into windstreams to move them, perhaps to solve switch puzzles
+
+    - Allow sneaking into grand temple with invisibility
+        - Ultimately this should be a narration box that causes the guard to say Vanara cannot enter the temple.
+        - Make sure rolling doesn't let you pass
+
+    - Idea to fix small hit immunity from preventing larger damage:
+        - When setting iframes, record the damage that caused it.
+        - When something takes a hit and has iframes, if the damage is greater than the previous iframe hit,
+            take damage equal to the difference, extend iframes, and record the greater damage amount.
+
+    - Upgrade entrance randomizer to support complex connected exit graphs.
+        - Currently it only supports connected exits that can be traveled in all directions.
+
+    - Improve projectile interactions
+        - Set stopX/Y when stopping a projectile which will prevent them from appearing to into cliffs/walls that they hit.
+            - if stopX > hitbox.x and direction is left, adjust x by the difference, similarly for other directions.
+        - Creating a projectile while standing over a ledge won't register it is high because it never hits the ledge.
+            - Maybe add a function that runs hits for 8px before the projectiles starting position that we run when it is
+            created to set isHigh, then clear passedLedgeTiles in case that was set to avoid accidentally throwing up ledges.
+        - Right now ledges block attacks anywhere in the tile rather than just when they are on the ledge, additionally only true values apply instead of both true+false values.
+            - You can observe this by standing halfway off a cliff then turning away from the cliff and attacking with chakram/bow
+
+    - Projectiles should be able to shoot down over solid ledges, but not up them
+        - Make solid ledges actually ledges but prevent jumping over them
+        - Might have to implement this as a one way ledge to prevent the down ledge from causing the player to ignore walls.
+            - Does not allow jumping down
+            - Blocks moving into as if going up a ledge
+            - Could implement with solidLedges+solidDiagonalLedge
+
+    - Add underwater mechanics
+        - allow swimming over low/medium barriers (set floorHeight to 16px on these)
+        - Swarms of fish that are composed of fish shaped particles that chase the player
+            - Hitting them destroys a couple of particles and slows the fish down but does not destroy them
+        - large turtle monster
+            - spawns up to 2-3 small swimming turtles that chase and attack you with 3-4 hp a piece
+            - does a 2s spinning aoe bubble attack (like void frost) on 6s cooldown
+        - simple medium fish monster that just wander around like snakes.
+        - medium sword fish that moves back and forth and speeds up if you are lined up with it
+
+    - Add additional uses for true sight
+        - Rolling ball puzzles that can be solved by moving an invisible pot
+        - Invisible cracked doorway to a new cave in spirit world.
+            - To prevent memorizing this in randomizer, we could randomly place the door in four different places that are inconvient to check
+                - For example, they might require you to jump down a cliff to check if the door is there.
+
+    - Add meteor attacks that leave behind rocks to void tree fight
+        - Give to tree + voidFlame
+        - Use smaller versions for enrage mode when voidFlame is active
+        - Reduce number of rocks in the golem fight and add this attack to it
+
+    - Spawn up to 2 Lightning Drones in void tree fight
+
+    - Add punching fist attack to void tree rage phase if voidStone is active
+
+    - Restrict laser barrage to if voidStone is active. Change it to be single bursts of 4 that can occur multiple times per phase. Slightly increase delay.
+
+    - Add void pit tiles and use them in the void area, add solid cliff edges to prevent jumping into the void.
+        - This will allow the astral projection to move freely over the void.
+
+    - Holy Sanctum Improvements
+        - Add phoenix boss before phoenix crown prize
+        - Add sanctum tower with bow in big chest
+            - Include hybrid material/spirt world puzzles
+
+    - Mysteries
+        - Lava appears under floor 2 in the middle of void tree fight
+        - Certain tiles can be frozen in lava on voidFlame
+        - Sometimes the vanara forest theme continues to play after leaving the area.
+
+
+    Cocoon Boss
+        - Improve visuals for persistent blast attacks
+
+    - Increase world map super tile size to at least 48x48 bu try 64x64
+        - Change crater to single 64x64 tile if it is supported
 
     - Add crucible to the end of the Grand Temple
-
-    - Add `getLogicalZone` function that returns a logical zone for a given state location wich can differ from the actual zone key, use this for randomizer locations and dungeon item associations.
-        - Move underwater areas into the same logical zone so that keys can be shared above and below water
-        - Split different caves into distinct logical zones like 'bushCave', 'fertilityTemple', and 'ascentCave'
-        - These logical zones should be added to randomizer logic nodes when they don't match the zone for the node.
-        - This will also allow using the same tile in material vs spirit world in distinct dungeons, for example, tiles could be shared inside the Grand Temple and Jade Palace but be treated as distinct dungones wrt keys and checks.
-        - We could probably then use this for simplifying logic to determine what music to play.
-        - Should probably also use this for Nimbus Cloud entrance behavior in some cases.
-        - Make sure to update Hint location names to be more specific by using the logical zones instead.
 
     - Add 'only' visibility option to layers that hides everything else when selected.
 
@@ -61,28 +272,21 @@ Current tasks:
     - Add some additional requirement for completing crater to put the boss out of logic with few items.
         - Switches that can only be hit with staff or clone throw + iron boots
 
-    - Fix ledges so that:
-        - Right now ledges block attacks anywhere in the tile rather than just when they are on the ledge, additionally only true values apply instead of both true+false values.
-        - solidMap behavior can block projectiles.
-        - Shooting an arrow down N ledges allows it to go up N ledges
-            - For now, have a property increments for every frame it is over a ledge in the correct direction.
-            - If the property is positive, instead of hitting ledges/southernwalls in the wrong direction, decrement the property.
-            - veryTall tiles will still block the projectile even when the property is set.
-
-    - Add and test many more ledges
-
     - test staff interactions with ledges.
+
+    - Stretch goal: allow changing lightning AOE attacks to use a ray instead of a circle if the player is too close to a conductive object.
 
     - Prevent grabbing tiles/objects across ledges
         - on grab, check if the player can move into the object by running the movement algorithm with a special mode that ignores all normal collisions and prevents crossing ledges in any direction. Prevent the grab if this movement check fails.
 
-    - Perhaps southern facing tiles should block left/right movement if not currently over SF tile.
-
     - Cloud jumping near the edges can sometimes result in landing poorly either taking damage or underground in a ledge. Would be nice to find a way to clean up jumping from ledge to ledge.
+
+    - Balloon Megapede Improvements
+        - Tail leaves behind time AoE bombs
 
     - Allow destroying light stones when landing with iron boots?
 
-    - Drain all lava in the crater when the fire beast isn't spawned yet?
+    - Drain all lava in the crater when the fire beast isn't spawned yet? (only matters for entrance randomizer)
 
     - Allow walking on clouds/cracked ground while invisible?
         - Would have to be careful in sky not to run out of spirit energy
@@ -100,19 +304,10 @@ Current tasks:
     - Update logic to account for clone throw over obstacles?
         - Wait on this until we have adjusted any obstacles we don't want to allow this for.
 
-    - Cocoon boss
-        - Make astral projection spawn from the boss small, grow, then approach the player to attack
-        before becoming small again and returning to the boss.
-
-    True sight
-        For now try just rendering all spirit world objects at 50% opacity.
-        Probably allow toggling it off in the menu, possibly a quick command like B_MEDITATE + B_ROLL
-
     Puzzle ideas
-        - Send a clone into the spirit world for "temporary" true sight. Might be annoying to switch between.
-        - Some kind of hazards in the spirit world that move slowly and knock you back, where you need true sight to navigate successfully because spirit sight is too slow.
         - Use a clone to stand on a switch to hold a door open.
         - Use a clone to jump off a cliff to press one switch, then destroy it and make another clone to jump down another cliff to press another switch to open a door at the top of the cliff.
+        - A linked pot needs to be dragged to cover a switch in the other world, but there are pits only in the other world that you must use spirit sight/trueSight to see.
 
     Change prep animation for explosion
         charge particles form randomly in a circle around the hero shooting into them,
@@ -154,6 +349,23 @@ Current tasks:
         - Tree is a clone of the helix, but allowed to grow to completion this time.
 
     World Tree Boss Void Beast
+        - Possible 3 phase approach
+            - Void tree, Outer shell, defeat to open up a pit to reach the heart
+                - Takes place on most of a super tile
+                - Has four sub targets that can be destroyed to temporarily disable some of its attacks/defenses
+                    - Possibly starts with 2 and spawns 3 during second phase and all 4 for final phase.
+                    - Which ones spawned are random, but deterministic for each seed.
+                    - Targets are neutral, fire, ice, lightning, and enable different defense/offense mechanics.
+                - Lots of large attacks to dodge while you navigate the arena
+                    - (neutral) golem hands, Laser beams
+                    - Fire walls, lava ground
+                    - Lightning strikes, lightning barriers
+                    - Frost grenades, ice walls
+            - Void heart, defeat to relase the final boss
+            - Void beast
+                - maybe looks like a carnivorous plant with a giant mouth full of teeth and a bunch of tendrils like scorpion tails.
+                    - Could use this boss design for the forest temple if not here.
+
         - Fight takes place on most of a full super tile, but each section of the fight is on a smaller platform in the material world where the player damages the boss and avoids various attack mechanics.
             - Maybe the battlefield is even taller than a regular super tile and the player must keep advancing tiers sort of like the final battle with the statues in ff6.
             - Each tier could focus on a different pair of combat mechanics like staff + iron boots, and each travel section could focus on different movement mechanics
@@ -191,14 +403,17 @@ Current tasks:
     - Flying enemies should not move over abyss tiles(make abyss tiles + ceiling tiles impassable to flying enemies).
 
     Peach Cave improvements
-        - Add new graphics to 2F
         - Fix spirit world tiles
+        - Add Spirit World Checks
+            - Add a 2 way portal to boss chamber
+            - Add a single cracked entrance to the top from the overworld.
+                - This is to allow easy discover from the spirit world but prevent using this cave for spirit world access early.
             - Add 4 easy checks to top floor and bombable pit entrance to basement
-            - Require Mitts for entering from the bottom floor.
-            - Add harder beetle boss with a Peach piece on it
+                - Add cracked status to pit entrances.
+            - Require Mitts for entering/exiting from the basement.
             - Add 3 checks behind different tool combinations
-                - cracked ground for cloud boots/ice magic
-                - staff or teleportation to get across pits
+                - cracked ground for cloud boots/ice magic/invisibility
+                - staff or teleportation to get across L shaped pits
                 - bow+torches or fire element to unfreeze a chest
 
     - Add behavior that prevents non-flying enemies from crossing tiles/objects, use for cracked ground, escalators, bead cascades, etc.
@@ -210,8 +425,7 @@ Current tasks:
 
     - Game occasionally plays small bits of music while muted.
 
-    Make mutation transition use the same area instance so contents don't reset
-        - Will need to add special handling to remove extra ice tiles from frost beast+heat sink battles.
+    - Make sure ice tiles are removed from frost beast+heat sink battles after they are defeated.
 
     - Add new hold+walk chakram animations
         - play last 2 frames of attack animation on release.
@@ -219,9 +433,6 @@ Current tasks:
     - Work on new waterfall graphics
         - Email Jon about waterfall graphic updates.
 
-True sight Idea:
-    - Split the screen vertically and render the current world in the left half and the alternate world in the right half (or always material left + spirit right).
-    - Could be used for puzzles that involve killing enemies you can't see in the current world or puzzle elements that are too hard to figure out with spirit sight.
 
 Combat Ideas:
     - Concentric damaging rings that collapse into the player. Player must time it so that they are close enough together to dodge roll through in order to avoid damage.
@@ -239,7 +450,6 @@ Staff Improvements:
         - Preview will only show the max size that will fit in the current space
         - Ideally you could move around while charging and the preview will update appropriately
         - Would be nice to have this preview behavior when holding down the staff button for staff 1.
-    - If the staff doesn't have enough area, maybe it should still swing and hit, but despawn or bounce off the terrain after landing.
 
 Throwing an object into a pit should use the pit animation rather than breaking.
 
@@ -249,8 +459,6 @@ Respawn improvements:
         Map dungeon entrances to respawn points?
 
 Tutorial Improvements:
-    - chest instructions are lost if you exit without obtaining the chakram.
-    - no instructions for picking up objects before obtaining the glove
     Add advanced combat/tool tutorials
         - Maybe NPCs in home cave, or some kind of training/tutorial dojo?
         - Hitting enemies with chakram held in hand
@@ -277,23 +485,21 @@ Improve Staff Tower Setup:
     - Animation should be throwing staff into the sky as it grows with its shadow, then falls to the ground when the shadow is as large as the foundation.
 
 High level list of things left to do:
-    New dungeons(need enemies, mechanics, bosses, entrances):
-        Jade Palace
-        Sky Palace
-        Forge
     Areas missing significant content:
-        Grand Temple
         Forest Temple
-        River Temple
+        Lab
+        World Tree
     Missing Bosses for existing areas:
+        Forge Boss
+        Phoenix boss in Holy Sanctum
+        Eight Trigram Furnace at the end of the Gauntlet
         Crater midboss
         Rival fight before Helix
         Helix Boss
             - Instead of fighting this boss, you will see it, but then abort because of the beasts attacking the city
             - Then you will actually fight this boss at the end of the Grand Temple or Jade Palace or possibly as a mid boss on the Warship.
     Missing mechanics:
-        Difficulty shrines for dungeons/bosses
-            - Probably just roll this into VR minigame where you can fight old bosses.
+        - Vanara dreamland boss simulator with difficulty modifiers
         Hero helping during first elemental beast fight
             Hero wears monk fighting attire
             Creates a spirit barrier during rage phase that MC can hide in to prevent all damage
@@ -306,25 +512,28 @@ High level list of things left to do:
         Treasure Hunter Shop
         Fertility shrine donations
     Items missing implementation:
-        Charge level 2
-            Bow charge 2 shoots 5 arrows in 120 degree arc -60, -30, 0, 30, 60
-        Clone charge 1 + 2
-        True Sight (Render certain enemies/objects flagged for true sight)
         Gloves charge 1 + 2
 
 Generic boss improvements
     - Add vulnerable phases for bosses where they take ~5x damage, increase boss health by ~2x
 
-Lava improvments:
-    - Temporarily create solid ground when hit by ice.
+Lava improvements:
+    - Add new graphic for solidifed lava
+    - Eventually we might want to make this temporary.
 
 Misc improvements
-    - double tap direction to roll?
     - allow facing diagonals while not moving?
 
 Add toasts to development for undoing actions:
     - Deleting layers
     - Replacing > 100 tiles
+
+
+Simple randomization ideas:
+    - Allow floor switches under covered tiles, randomizer the location of a floor switch to open a door.
+        - Make sure true sight reveals this.
+    - Place a key under a random pot
+        - Make sure spirit sight reveals this.
 
 Treasure Hunter Store
     - Initially can only carry 200 coins
@@ -357,8 +566,6 @@ Spirit Store(s)
 Charge Chakram Attack:
     - Maybe change level 1 charge to spin around hero in a circle twice? Brief 0.5s invulnerability with attack animation.
     - Charge level 2 could have 2 chakrams spin at different radiuses and directions? 50 mana, lasts 4 seconds.
-Chakram Improvements:
-    - Add some damage or charge time bonus for timing your next attack within X frames of catching the Chakram?
 
 At some point I should write tests to validate certain things like:
     - All zone+object targets are defined.
@@ -420,13 +627,12 @@ River Temple Improvements:
 
 
 Staff Tower Improvements
+    - Add a prompt after defeating the boss to indicate that the elevator is working again
+        - Might be tricky to word in a way that makes sense. "The lights got brighter, maybe some of the machines work now."
     - Add content to 4F Material world, probably some sort of gauntlet that is easier when the boss is defeated.
         - Should have a short cut so it can by bypassed after completing once.
-    - All machine enemies have an offline state where they cannot be damaged, and possibly can be pushed around.
-        - Hitting offline machines with lightning will turn them on.
     - Conveyer belts/escalators.
         - Conveyer belts should also effect movable object/enemies on the ground touching them.
-        - Ice magic can freeze the conveyer belts which stops them but makes them slippery.
         - Lightning magic will turn a conveyer belt on if it is off.
     - Disabled conveyer belt with pots on it that needs to be turned on to move the pots out of the way.
 
@@ -514,11 +720,6 @@ Idea:
     Objects you can bounce off of when jumping
         - Just make them solid and knock the player back a bit if the player's y velocity is >= some value?
 
-Include some random dungeon design in the base game:
-    - Location of key under object might change (there should be some clue where it is or use spirit sight).
-    - Something like peg cave, but only a single peg needs to be pressed to open it (spirit sight reveals which?).
-    - Something like Eastern Palace Foyer except the correct door isn't always the center door.
-
 Support 64x64 super tiles for world map. Or maybe just 48x48.
 
 Possible tool: Leather gloves protect you from thorn bushes.
@@ -567,17 +768,17 @@ Ability Locations:
     clone               Forest Temple Boss
     ironBoots           Waterfall Tower Chest
     spiritCloak 2       Waterfall Tower Boss
+    True Sight          Gauntlet Chest
+    ironSkin            Gauntlet Boss
     gloves 2            Forge Chest
     goldMail            Forge Boss
     roll 2              Cloud Temple Chest
     nimbusCloud         Cloud Temple Boss
-    bow 2               Grand Temple Chest
-    ironSkin            Grand Temple Boss
-    trueSight           Jade Palace Chest
-    phoenixCrown        Jade Palace Boss
+    bow 2               Holy Sanctum Chest
+    phoenixCrown        Holy Sanctum Boss
 # First Quest Dungeon
     staff               Helix Chest
-    charge              Helix Boss
+    weapon 2            Helix Boss
 # Middle Quest Dungeons
     fireBlessing        Crater Big Chest
     fire                Crater Boss Flame Beast
@@ -585,38 +786,10 @@ Ability Locations:
     ice                 River Temple Boss Frost Beast
     lightning           Staff Tower Boss Storm Beast
     staff 2             Staff Tower "Chest" (after boss)
-    weapon 2            Acquired with first Element
-    charge 2            Acquired with second Element
+    charge 1            Acquired with first Element
+    charge 2            Acquired with third Element
 # Final Quest Dungeon
-    clone 2             Warship Chest
-
-Ability order:
-
-Early Dungeons:
-    Peach Cave: Completing the cave awakens MCs spirit abilities giving them their spirit bar + cat eyes.
-(Head home, mother indicates you should head to Vanara Village to speak with the elder.)
-(Vanara Village: Get the bow from the elder.)
-    Vanara Tomb: Dodge Roll in big chest, Spirit Sight from the Vanara Guardian.
-(mother indicates you should head to Summoner Ruins.)
-    Summoner Ruins: Bracers in big chest, Astral Projection after defeating the boss.
-    Cocoon: spiritCloak in big chest, Teleportation from Vanara Guardian.
-    Helix: Tree Staff in big chest, charge from Vanara Captain.
-
-Elemental Beasts: (triggered by Helix or entering the Spirit World)
-    River Temple(Old Fertility Temple: Water Blessing Big Chest, Frost Beast(ice element)
-    Mountain Crater: Fire Blessing Big Chest, Flame Beast(fire element)
-    Staff Tower: Storm Beast(lightning element) + Tower Staff in Big Chest after boss
-
-Late Dungeons:
-    Forest Temple(New Fertility Temple): Cloud Boots in chest, Clone after boss
-    Waterfall Tower: Iron Boots in chest, spiritCloak 2 after boss
-    The Forge: Gloves 2 in chest, gold mail after boss
-    Grand Temple: Bow 2 chest, iron Skin after boss
-    Jade Palace: True Sight in chest, Phoenix Crown after boss
-    Cloud Temple: Roll 2 in chest, Nimbus Cloud after boss.
-
-Final Dungeon:
-    Warship: Clone 2 in big chest
+    clone 2             Hidden Lab
 
 Dungeon 1: Vanara Tomb (fortress around the Cocoon)
     - Traps+locks to keep intruders away. Need to use bow to enter
@@ -631,29 +804,13 @@ Dungeon 1: Vanara Tomb (fortress around the Cocoon)
     - A facade is built aroaund the structure to disguise it as a mundane structure
         - The Vanara village posts guards in addition to the traps to keep people out
     - MCs father refused to go back to sleep, having fallen in love with MCs mother and not wanting to forget about her.
-Dungeon 1 Boss Golem:
-    - Vulnerable to bow
-    - Invulnerable except for weak spot
-    - Has two hands for guarding adn attacking
-    - Sometimes does larger coordinated attacks depending on which parts are alive.
-    - Tedious to kill without destroying any hands
-    - Fastest to kill destroying only one hand
 
-
-Dungeon 2: Ruins of Summoner village and Temple of War
-    - Expected loadout: Cat Eyes, 6 hearts, Dodge, Bow, Spirit Sight
-    - Enemies: Flame/Frost/Storm mobs
-    - Big Chest: Gloves 1
-    - Boss: Elemental idols
-    - Boss Reward: Astral Projection
-
-Dungeon 3: Cocoon (Vanara Regeneration Unit)
-    - Expected loadout: Cat Eyes, 7 hearts, Dodge, Bow, Spirit Sight, Gloves, Astral Projection
-    - Enemies
-    - Big Chest: Invisibility Technique
-    - Boss:
-    - Boss Reward: Teleportation (body moves to astral projection when pressing either tool button)
-
+Jade Palace:
+    - Boss Reward: Phoenix Feather
+        Uses a feather from a legender spirit beast that could survive on its own in the material world and once threatened to destroy the world.
+        The War God wants to combine science and Vanara biology to make a new "Void Phoenix" to replicate the old beast.
+        An ancestor of the MC+Hero defeated the original Phoenix
+        The feather is kept in the Jade palace, too dangerous to use but too precious to destroy
 
 River Temple:
     - No NPCs here, this was the old Fertility Temple, but it was destroyed by the Vanara Ship crashing. The survivors all moved to the new Fertility Temple near the forest (Forest Temple).

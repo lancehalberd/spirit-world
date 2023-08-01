@@ -1,16 +1,14 @@
-import { addObjectToArea } from 'app/content/areas';
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
-import {
-    getVectorToTarget, moveEnemyFull,
-} from 'app/content/enemies';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { goldenBeetleAnimations } from 'app/content/enemyAnimations';
 import { LootDropObject } from 'app/content/objects/lootObject';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { saveGame } from 'app/state';
+import { moveEnemyFull } from 'app/utils/enemies';
 import { getDirection } from 'app/utils/field';
+import { addObjectToArea } from 'app/utils/objects';
+import { saveGame } from 'app/utils/saveGame';
+import { getVectorToTarget } from 'app/utils/target';
 
-import { Enemy, GameState, HitProperties, HitResult } from 'app/types';
 
 function spawnMoney(state: GameState, enemy: Enemy, amount: number): void {
     let theta = 2 * Math.PI * Math.random();
@@ -53,6 +51,7 @@ enemyDefinitions.luckyBeetle = {
     params: {hits: 0, duration: 20000, switch: false},
     tileBehaviors: {brightness: 0.6, lightRadius: 32},
     update(this: void, state: GameState, enemy: Enemy<LuckyBeetleParams>) {
+        enemy.life = 1;
         if (enemy.params.hits) {
             enemy.params.duration -= FRAME_LENGTH;
         }
@@ -97,7 +96,7 @@ enemyDefinitions.luckyBeetle = {
         if (state.savedState.luckyBeetles.length > 3) {
             state.savedState.luckyBeetles.pop();
         }
-        saveGame();
+        saveGame(state);
     },
     onHit(this: void, state: GameState, enemy: Enemy<LuckyBeetleParams>, hit: HitProperties): HitResult {
         const result = enemy.defaultOnHit(state, hit);
@@ -109,7 +108,6 @@ enemyDefinitions.luckyBeetle = {
             }
         }
         if (result.hit) {
-            enemy.life = 1;
             enemy.params.hits++;
             // The net result of this is that you have anywhere from 10-20s before it disappears,
             // with more time if you hit it less.

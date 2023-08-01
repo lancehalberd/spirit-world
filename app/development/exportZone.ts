@@ -1,11 +1,11 @@
 import { zones } from 'app/content/zones';
+import { showToast } from 'app/development/toast';
 import { randomizerSeed, enemySeed, entranceSeed } from 'app/gameConstants';
 
-import { AreaGrid, Zone } from 'app/types';
 
 export function exportZoneToClipboard(zone: Zone): void {
     navigator.clipboard.writeText(serializeZone(zone));
-    console.log('Exported Zone', zone.key);
+    showToast(`Exported Zone  ${zone.key}`);
 }
 
 export function serializeZone(zone: Zone) {
@@ -41,8 +41,6 @@ export function serializeZone(zone: Zone) {
     const lines = [];
     lines.push("import { zones } from 'app/content/zones/zoneHash';");
     lines.push("");
-    lines.push("import { AreaDefinition } from 'app/types';");
-    lines.push("");
     for (let floorIndex = 0; floorIndex < zone.floors.length; floorIndex++) {
         const floor = zone.floors[floorIndex];
         for (const areaGrid of [floor.grid, floor.spiritGrid]) {
@@ -51,13 +49,13 @@ export function serializeZone(zone: Zone) {
                 for (let column = 0; column < areaGrid[row].length; column++) {
                     const area = areaGrid[row][column];
                     if (!area || (emptyAreas.includes(area) && !area.objects.length)) {
-                        lines.push(`const ${key}${floorIndex}_${row}x${column}: AreaDefinition = null;`);
+                        lines.push(`const ${key}${floorIndex}_${column}x${row}: AreaDefinition = null;`);
                         continue;
                     }
-                    lines.push(`const ${key}${floorIndex}_${row}x${column}: AreaDefinition = {`);
+                    lines.push(`const ${key}${floorIndex}_${column}x${row}: AreaDefinition = {`);
                     if (key === 'sf') {
                         lines.push(`    isSpiritWorld: true,`);
-                        lines.push(`    parentDefinition: f${floorIndex}_${row}x${column},`);
+                        lines.push(`    parentDefinition: f${floorIndex}_${column}x${row},`);
                     }
                     if (!area.layers || emptyAreas.includes(area)) {
                         // Setting the layers to null will initialize this to the
@@ -109,14 +107,40 @@ export function serializeZone(zone: Zone) {
                     lines.push('    ],');
                     lines.push('    sections: [');
                     for (const section of area.sections) {
-                        lines.push(`        {x: ${section.x}, y: ${section.y}, w: ${section.w}, h: ${section.h}},`);
+                        let extraFields = '';
+                        if (section.index >= 0) {
+                            extraFields += `, index: ${section.index}`;
+                        }
+                        if (section.hotLogic) {
+                            extraFields += `, hotLogic: ${JSON.stringify(section.hotLogic)}`;
+                        }
+                        if (section.hideMap) {
+                            extraFields += `, hideMap: ${section.hideMap}`;
+                        }
+                        if (section.mapId) {
+                            extraFields += `, mapId: '${section.mapId}'`;
+                        }
+                        if (section.floorId) {
+                            extraFields += `, floorId: '${section.floorId}'`;
+                        }
+                        if (section.entranceId) {
+                            extraFields += `, entranceId: '${section.entranceId}'`;
+                        }
+                        if (section.mapX >= 0) {
+                            extraFields += `, mapX: ${section.mapX}`;
+                        }
+                        if (section.mapY >= 0) {
+                            extraFields += `, mapY: ${section.mapY}`;
+                        }
+                        lines.push(`        {x: ${section.x}, y: ${section.y}, w: ${section.w}, h: ${section.h}${extraFields}}, `);
+
                     }
                     lines.push('    ],');
                     if (area.dark) {
                         lines.push(`    dark: ${area.dark},`);
                     }
-                    if (area.hotLogic) {
-                        lines.push(`    hotLogic: ${JSON.stringify(area.hotLogic)},`);
+                    if (area.corrosiveLogic) {
+                        lines.push(`    corrosiveLogic: ${JSON.stringify(area.corrosiveLogic)},`);
                     }
                     if (area.specialBehaviorKey) {
                         lines.push(`    specialBehaviorKey: '${area.specialBehaviorKey}',`);
@@ -144,7 +168,7 @@ export function serializeZone(zone: Zone) {
         for (let row = 0; row < areaGrid.length; row++) {
             let rowLine = '                [';
             for (let column = 0; column < areaGrid[row].length; column++) {
-                rowLine += `${key}${floorIndex}_${row}x${column},`;
+                rowLine += `${key}${floorIndex}_${column}x${row},`;
             }
             lines.push(rowLine + '],');
         }
@@ -155,7 +179,7 @@ export function serializeZone(zone: Zone) {
         for (let row = 0; row < areaGrid.length; row++) {
             let rowLine = '                [';
             for (let column = 0; column < areaGrid[row].length; column++) {
-                rowLine += `${key}${floorIndex}_${row}x${column},`;
+                rowLine += `${key}${floorIndex}_${column}x${row},`;
             }
             lines.push(rowLine + '],');
         }

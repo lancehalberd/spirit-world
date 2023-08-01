@@ -1,16 +1,15 @@
 import { GAME_KEY } from 'app/gameConstants';
 import { createAnimation } from 'app/utils/animations';
-import { requireImage } from 'app/utils/images';
+import { requireFrame } from 'app/utils/packedImages';
 
-import { Frame } from 'app/types';
 
-/*const font = requireImage('gfx/simpleFontWhite.png');
+/*const font = requireFrame('gfx/simpleFontWhite.png');
 
 const simpleFontString = ' !"#$%&\'()*+,-./0123456789'
     + ':;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_'
     + '`abcdefghijklmnopqrstuvwxyz{|}';*/
 
-const font = requireImage('gfx/hud/whiteFont8x16.png');
+const fontSource = 'gfx/hud/whiteFont8x16.png';
 const simpleFontString = ' !"#$%&\'()*+,-./0123456789'
     + ':;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_'
     + '`abcdefghijklmnopqrstuvwxyz{|}';
@@ -19,12 +18,12 @@ export const characterMap: {[key: string]: Frame} = {};
 const baseHeight = 16;
 const baseWidth = 8;
 for (let i = 1; i < simpleFontString.length; i++) {
-    characterMap[simpleFontString[i]] = {image: font, x: baseWidth * i, y: 0, w: baseWidth, h: baseHeight};
+    characterMap[simpleFontString[i]] = requireFrame(fontSource, {x: baseWidth * i, y: 0, w: baseWidth, h: baseHeight});
 }
 
 const [
     xbox_y, xbox_b, xbox_a, xbox_x,
-    xbox_start, /*xbox_select*/, xbox_dpad,
+    xbox_start, xbox_select, xbox_dpad,
     /*xbox_rightStick*/, xbox_leftStick,
     xbox_r1, xbox_l1, xbox_r2, xbox_l2,
     ps_dpad, ps_start,
@@ -34,19 +33,20 @@ const [
     keyboard_enter,
     /*keyboard_w*/, /*keyboard_d*/, /*keyboard_s*/, /*keyboard_a*/,
     keyboard_wasd,
-    /*keyboard_left*/, /*keyboard_right*/, /*keyboard_up*/,  /*keyboard_down*/,
+    /*keyboard_right*/, /*keyboard_left*/, /*keyboard_up*/,  /*keyboard_down*/,
     /*keyboard_uldr*/,
     keyboard_c, keyboard_v, keyboard_z, keyboard_x,
     keyboard_space, /*keyboard_shift*/,
     keyboard_h,
     keyboard_j,
     keyboard_k,
-    keyboard_y,
     /*keyboard_l*/,
+    keyboard_y,
     keyboard_u,
     keyboard_i,
     keyboard_o,
-] = createAnimation('gfx/hud/controllerbuttonswhite.png', {w: 26, h: 18, content: {x: 0, y: 1, w: 26, h: 16}}, {cols: 50}).frames;
+    keyboard_m,
+] = createAnimation('gfx/hud/controllerbuttonswhite.png', {w: 26, h: 18, content: {x: 0, y: 1, w: 26, h: 16}}, {cols: 51}).frames;
 
 const smallKeys = [
     xbox_y, xbox_b, xbox_a, xbox_x, xbox_start,
@@ -64,10 +64,11 @@ export const xboxMap = {
     [GAME_KEY.LEFT]: [xbox_dpad, characterMap['/'], xbox_leftStick],
     [GAME_KEY.RIGHT]: [xbox_dpad, characterMap['/'], xbox_leftStick],
     [GAME_KEY.MENU]: [xbox_start],
+    [GAME_KEY.MAP]: [xbox_select],
     [GAME_KEY.WEAPON]: [xbox_a],
     [GAME_KEY.PASSIVE_TOOL]: [xbox_b],
-    [GAME_KEY.LEFT_TOOL]: [xbox_y],
-    [GAME_KEY.RIGHT_TOOL]: [xbox_x],
+    [GAME_KEY.LEFT_TOOL]: [xbox_x],
+    [GAME_KEY.RIGHT_TOOL]: [xbox_y],
     [GAME_KEY.PREVIOUS_ELEMENT]: [xbox_l1],
     [GAME_KEY.NEXT_ELEMENT]: [xbox_r1],
     [GAME_KEY.ROLL]: [xbox_l2],
@@ -80,6 +81,7 @@ export const psMap = {
     [GAME_KEY.LEFT]: [ps_dpad, characterMap['/'], ps_leftStick],
     [GAME_KEY.RIGHT]: [ps_dpad, characterMap['/'], ps_leftStick],
     [GAME_KEY.MENU]: [ps_start],
+    [GAME_KEY.MAP]: [ps_start],
     [GAME_KEY.WEAPON]: [ps_x],
     [GAME_KEY.PASSIVE_TOOL]: [ps_circle],
     [GAME_KEY.LEFT_TOOL]: [ps_square],
@@ -96,6 +98,7 @@ export const keyboardMap = {
     [GAME_KEY.LEFT]: [keyboard_wasd],
     [GAME_KEY.RIGHT]: [keyboard_wasd],
     [GAME_KEY.MENU]: [keyboard_enter],
+    [GAME_KEY.MAP]: [keyboard_m],
     [GAME_KEY.WEAPON]: [keyboard_h],
     [GAME_KEY.PASSIVE_TOOL]: [keyboard_space],
     [GAME_KEY.LEFT_TOOL]: [keyboard_y],
@@ -132,13 +135,13 @@ export function drawText(context: CanvasRenderingContext2D, text: string, x: num
 
 
     for (const c of text) {
-        const r = characterMap[c];
-        if (r) {
-            context.drawImage(font,
-                r.x, r.y, r.w, r.h,
-                x, y, r.w * scale, r.h * scale,
+        const frame = characterMap[c];
+        if (frame) {
+            context.drawImage(frame.image,
+                frame.x, frame.y, frame.w, frame.h,
+                x, y, frame.w * scale, frame.h * scale,
             );
-            x += r.w * scale;
+            x += frame.w * scale;
         } else {
             x += baseWidth * scale;
         }

@@ -1,16 +1,11 @@
 import { palettes } from 'app/content/palettes';
 import { addNewTile, allTiles, generateTileHash, generateTileHashMap } from 'app/content/tiles';
-import { createCanvas, tagElement } from 'app/dom';
-import { KEY, isKeyboardKeyDown } from 'app/keyCommands';
+import { tagElement } from 'app/dom';
+import { KEY, isKeyboardKeyDown } from 'app/userInput';
 import { drawFrame } from 'app/utils/animations';
+import { createCanvas } from 'app/utils/canvas';
 import { getMousePosition, isMouseDown } from 'app/utils/mouse';
 
-import {
-    EditorArrayProperty, EditorButtonProperty, EditorPaletteProperty,
-    EditorProperty, EditorSingleProperty,
-    EditorSourcePaletteProperty, FullTile,
-    PanelRows, PropertyRow, TileGridDefinition,
-} from 'app/types';
 
 const panelsByClass: {[key: string]: HTMLElement} = {};
 // We may need to split these by class and reset them when rendering properties again.
@@ -339,10 +334,12 @@ function renderProperty(property: EditorProperty<any> | HTMLElement | string): s
                 drawFrame(paletteContext, frame, {...frame, x: 0,y: 0});
             paletteContext.restore();
 
+            paletteContext.fillStyle = 'red';
             const tiles = property.sourcePalette.tiles;
             for (let i = 0; i < tiles.length; i++) {
                 const tile = allTiles[tiles[i]];
                 drawFrame(paletteContext, tile.frame, { x: tile.frame.x, y: tile.frame.y, w: 16, h: 16});
+                paletteContext.fillRect(tile.frame.x + 6, tile.frame.y + 6, 4, 4);
             }
         };
         refreshPaletteCanvas();

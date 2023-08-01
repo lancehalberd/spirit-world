@@ -7,7 +7,6 @@ import {
     orLogic,
 } from 'app/content/logic';
 
-import { LogicNode } from 'app/types';
 
 // This logic does not appropriately support traversing the tower in reverse.
 const zoneId = 'crater';
@@ -34,7 +33,7 @@ export const craterNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'craterLevel2',
-        checks: [{objectId: 'craterSmallMoney'}],
+        checks: [{objectId: 'craterMap'}],
         paths: [
             // Eventually this will also require the staff.
             {nodeId: 'craterLevel3'},

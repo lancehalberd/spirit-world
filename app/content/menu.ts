@@ -1,7 +1,6 @@
 import { getLootHelpMessage, getLootName } from 'app/content/loot';
 import { isRandomizer } from 'app/gameConstants';
 
-import { GameState, MenuOptionType } from 'app/types';
 
 
 export function getMenuRows(state: GameState): MenuOptionType[][] {
@@ -35,8 +34,8 @@ export function getMenuRows(state: GameState): MenuOptionType[][] {
     menuRows.push(equipment);
 
     const elements: MenuOptionType[] = [];
-    if (state.hero.passiveTools.charge) {
-        elements.push('charge');
+    if (state.hero.elements.fire || state.hero.elements.ice || state.hero.elements.lightning) {
+        elements.push('neutral');
     }
     if (state.hero.elements.fire) {
         elements.push('fire');
@@ -51,8 +50,9 @@ export function getMenuRows(state: GameState): MenuOptionType[][] {
 
     let passiveToolRow: MenuOptionType[] = [];
     for (let key in state.hero.passiveTools) {
-        // This is included among the elements.
-        if (key === 'charge' || !state.hero.passiveTools[key]) continue;
+        if (!state.hero.passiveTools[key]) continue;
+        // Don't show cat eyes once true sight is obtained.
+        if (key === 'catEyes' && state.hero.passiveTools.trueSight) continue;
         passiveToolRow.push(key as MenuOptionType);
         if (passiveToolRow.length >= 7) {
             menuRows.push(passiveToolRow);
@@ -84,4 +84,32 @@ export function getMenuHelpMessage(state: GameState, type: MenuOptionType): stri
         return 'Return Home';
     }
     return getLootHelpMessage(state, type);
+}
+
+// Function to set the left tool on all copies of the hero.
+export function setLeftTool(state: GameState, tool: ActiveTool): void {
+    for (const hero of [state.hero, ...state.hero.clones]) {
+        hero.leftTool = tool;
+    }
+}
+
+// Function to set the right tool on all copies of the hero.
+export function setRightTool(state: GameState, tool: ActiveTool): void {
+    for (const hero of [state.hero, ...state.hero.clones]) {
+        hero.rightTool = tool;
+    }
+}
+
+// Function to set the equipped boots on all copies of the hero.
+export function setEquippedBoots(state: GameState, boots: Equipment): void {
+    for (const hero of [state.hero, ...state.hero.clones]) {
+        hero.equippedBoots = boots;
+    }
+}
+
+// Function to set the equipped element on all copies of the hero.
+export function setEquippedElement(state: GameState, element: MagicElement): void {
+    for (const hero of [state.hero, ...state.hero.clones]) {
+        hero.setElement(element);
+    }
 }

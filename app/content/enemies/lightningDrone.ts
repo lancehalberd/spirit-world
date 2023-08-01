@@ -1,19 +1,20 @@
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
-import { addEffectToArea } from 'app/content/areas';
 import { LightningDischarge } from 'app/content/effects/lightningDischarge';
-import {
-    getVectorToNearbyTarget,
-    moveEnemyToTargetLocation,
-    paceRandomly,
-} from 'app/content/enemies';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import {
     droneAnimations,
 } from 'app/content/enemyAnimations';
 import { lifeLootTable } from 'app/content/lootTables';
+import { addEffectToArea } from 'app/utils/effects';
+import {
+    moveEnemyToTargetLocation,
+    paceRandomly,
+} from 'app/utils/enemies';
 import { hitTargets } from 'app/utils/field';
+import {
+    getVectorToNearbyTarget,
+} from 'app/utils/target';
 
-import { Enemy, GameState } from 'app/types';
 
 const chargeTime = 1000;
 const dischargeRadius = 48;
@@ -81,7 +82,8 @@ enemyDefinitions.lightningDrone = {
                 damage: 4,
                 element: 'lightning',
                 hitbox,
-                hitAllies: true,
+                // Hack to prevent damage from this attack when the hero has lightning blessing.
+                hitAllies: !state.hero.passiveTools.lightningBlessing,
                 hitObjects: true,
                 hitTiles: true,
                 hitEnemies: true,

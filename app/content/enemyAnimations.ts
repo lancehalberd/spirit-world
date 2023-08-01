@@ -1,9 +1,5 @@
 import { createAnimation } from 'app/utils/animations';
 
-import {
-    ActorAnimations, CreateAnimationOptions,
-    ExtraAnimationProperties, FrameAnimation, FrameDimensions,
-} from 'app/types';
 
 const enemyDeathGeometry: FrameDimensions = {w: 20, h: 20};
 export const enemyDeathAnimation: FrameAnimation = createAnimation('gfx/effects/enemydeath.png', enemyDeathGeometry, { cols: 9, duration: 4}, { loop: false });
@@ -323,7 +319,7 @@ export const brownSquirrelAnimations: ActorAnimations = {
     },
 };
 
-function omniAnimation(animation: FrameAnimation) {
+export function omniAnimation(animation: FrameAnimation) {
     return {
         up: animation, down: animation, left: animation, right: animation,
     };
@@ -339,7 +335,6 @@ const floorEyeAttackAnimation: FrameAnimation = createAnimation('gfx/enemies/eye
 const floorEyeClosingAnimation: FrameAnimation = createAnimation('gfx/enemies/eyemonster.png', floorEyeGeometry,
     { x: 0, cols: 3, duration: 5, frameMap: [2, 1, 0]}, {loop: false});
 const floorEyeHurtAnimation: FrameAnimation = createAnimation('gfx/enemies/eyemonster.png', floorEyeGeometry, { x: 16, cols: 1, duration: 5});
-const floorEyeDefeatedAnimation: FrameAnimation = createAnimation('gfx/enemies/eyemonster.png', floorEyeGeometry, { x: 17, cols: 1, duration: 5});
 
 export const floorEyeAnimations: ActorAnimations = {
     idle: omniAnimation(floorEyeClosedAnimation),
@@ -348,7 +343,6 @@ export const floorEyeAnimations: ActorAnimations = {
     attack: omniAnimation(floorEyeAttackAnimation),
     closing: omniAnimation(floorEyeClosingAnimation),
     hurt: omniAnimation(floorEyeHurtAnimation),
-    defeated: omniAnimation(floorEyeDefeatedAnimation),
 };
 
 /*
@@ -448,7 +442,6 @@ Frame 1 - this is the idle standing frame
 Frame 2-3 - this is the hammering frame. I imagine you should keep the golem on frame 3 for longer just to help show that the attack came from the hammer
 Frame 4-7 - this is the golem preparing and then casting a spell. Loop frames 5-7 for however long the casting is.
 Frame 8 - hurt frame*/
-
 
 /* RIVAL */
 // image layout
@@ -551,4 +544,55 @@ export const rivalAnimations: ActorAnimations = {
         left: rivalStaffSlamLeftAnimation,
         right: rivalStaffSlamRightAnimation,
     },
+};
+
+const icePlantGeometry: FrameDimensions = { w: 48, h: 32, content: {x: 12, y: 16, w: 24, h: 16} };
+export const icePlantIdleAnimation = createAnimation('gfx/enemies/icePlant.png', icePlantGeometry,
+    { x: 0, cols: 1, duration: 10});
+export const icePlantPrepareAnimation = createAnimation('gfx/enemies/icePlant.png', icePlantGeometry,
+    { x: 1, cols: 1, duration: 20});
+export const icePlantAttackAnimation = createAnimation('gfx/enemies/icePlant.png', icePlantGeometry,
+    { x: 2, cols: 1, duration: 15});
+export const icePlantAnimations: ActorAnimations = {
+    idle: omniAnimation(icePlantIdleAnimation),
+    prepare: omniAnimation(icePlantPrepareAnimation),
+    attack: omniAnimation(icePlantAttackAnimation),
+};
+
+/*
+Frame 1 - Idle facing 4 directions "horizontal/vertical"
+Frames 2-3 - runs at 5FPS, is the attacking animation
+Frames 4-5 - transition frame  from horizontal/vertical shooting to diagonal shooting. Runs at 10 FPS and goes to Frame 6
+Frame 6 - Idle facing 4 directions "diagonal"
+Frames 7-8 runs at 5 FPS, is the attacking animation
+Frames 9-10 - transition frames from diagonal shooting to horizontal/vertical shooting. Runs at 10 FPS and goes to Frame 1
+Frame 11 - Cracked frame. I can also make a cracked version for all frames, but I figure this is just for when it is actively destroyed.
+*/
+const turretGeometry: FrameDimensions = { w: 18, h: 23, content: {x: 1, y: 7, w: 16, h: 16} };
+export const turretIdleAnimation = createAnimation('gfx/enemies/turret.png', turretGeometry,
+    { x: 0, cols: 1, duration: 10});
+export const turretAttackAnimation = createAnimation('gfx/enemies/turret.png', turretGeometry,
+    { x: 1, cols: 2, duration: 10});
+export const turretRotateAnimation = createAnimation('gfx/enemies/turret.png', turretGeometry,
+    { x: 3, cols: 3, duration: 5});
+export const diagonalTurretIdleAnimation = createAnimation('gfx/enemies/turret.png', turretGeometry,
+    { x: 5, cols: 1, duration: 10});
+export const diagonalTurretAttackAnimation = createAnimation('gfx/enemies/turret.png', turretGeometry,
+    { x: 6, cols: 2, duration: 10});
+// This looks strange because this animation has to wrap back to frame 0.
+export const diagonalTurretRotateAnimation = createAnimation('gfx/enemies/turret.png', turretGeometry,
+    { x: 0, cols: 10, duration: 5, frameMap: [8, 9, 0]});
+export const turretGemAnimation = createAnimation('gfx/enemies/turret.png', turretGeometry,
+    { x: 10, cols: 1, duration: 5});
+export const turretCrackedGemAnimation = createAnimation('gfx/enemies/turret.png', turretGeometry,
+    { x: 11, cols: 1, duration: 5});
+export const turretAnimations: ActorAnimations = {
+    idle: omniAnimation(turretIdleAnimation),
+    rotate: omniAnimation(turretRotateAnimation),
+    attack: omniAnimation(turretAttackAnimation),
+};
+export const diagonalTurretAnimations: ActorAnimations = {
+    idle: omniAnimation(diagonalTurretIdleAnimation),
+    rotate: omniAnimation(diagonalTurretRotateAnimation),
+    attack: omniAnimation(diagonalTurretAttackAnimation),
 };

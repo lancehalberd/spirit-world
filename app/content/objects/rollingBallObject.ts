@@ -1,15 +1,12 @@
-import { playAreaSound, removeObjectFromArea } from 'app/content/areas';
 import { addParticleAnimations } from 'app/content/effects/animationEffect';
-import { lightStoneParticles } from 'app/content/tiles';
+import { objectHash } from 'app/content/objects/objectHash';
+import { lightStoneParticles } from 'app/content/tiles/constants';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { playAreaSound, stopSound } from 'app/musicController';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { directionMap, getTileBehaviorsAndObstacles, hitTargets, isPointOpen } from 'app/utils/field';
-import { stopSound } from 'app/musicController';
+import { removeObjectFromArea } from 'app/utils/objects';
 
-import {
-    AreaInstance, BallGoal, Direction, GameState, HitProperties, HitResult,
-    BaseObjectDefinition, ObjectInstance, ObjectStatus, Rect,
-} from 'app/types';
 
 const rollingAnimation = createAnimation('gfx/tiles/rollingboulder.png', {w: 16, h: 16}, {cols:4});
 const rollingAnimationSpirit = createAnimation('gfx/tiles/rollingboulderspirit.png', {w: 16, h: 16}, {cols:4});
@@ -26,6 +23,7 @@ export class RollingBallObject implements ObjectInstance {
     definition = null;
     x: number;
     y: number;
+    z: number = 0;
     isObject = <const>true;
     linkedObject: RollingBallObject;
     rollDirection: Direction;
@@ -35,7 +33,7 @@ export class RollingBallObject implements ObjectInstance {
     animationTime = 0;
     stuck: boolean = false;
     soundReference;
-    constructor(definition: BaseObjectDefinition) {
+    constructor(state: GameState, definition: BaseObjectDefinition) {
         this.definition = definition;
         this.x = definition.x;
         this.y = definition.y;
@@ -46,11 +44,11 @@ export class RollingBallObject implements ObjectInstance {
     getHitbox(state: GameState): Rect {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
-    onHit(state: GameState, {canPush, direction, isStaff}: HitProperties): HitResult {
+    onHit(state: GameState, {canPush, direction, isBonk, isStaff}: HitProperties): HitResult {
         // If the staff is allowed to hit rolling balls, it should shatter them instead of appear to
         // go through them.
         // Another option would be for it to bounce the staff back instead.
-        if (isStaff) {
+        if (isStaff && isBonk) {
             playAreaSound(state, this.area, 'rockShatter');
             addParticleAnimations(state, this.area, this.x + 8, this.y + 8, 0, lightStoneParticles);
             removeObjectFromArea(state, this);
@@ -79,9 +77,9 @@ export class RollingBallObject implements ObjectInstance {
         }
         const x = this.x + 8 + 16 * directionMap[direction][0];
         const y = this.y + 8 + 16 * directionMap[direction][1];
-        const excludedObjects = new Set([this, state.hero, state.hero.astralProjection, ...state.hero.clones]);
-        if (isPointOpen(state, this.area, {x, y}, {canFall: true}, excludedObjects)
-            && (!this.linkedObject || isPointOpen(state, this.linkedObject.area, {x, y}, {canFall: true}, excludedObjects))
+        const movementProperties = {canFall: true, canSwim: true, needsFullTile: true};
+        if (isPointOpen(state, this.area, {x, y}, movementProperties)
+            && (!this.linkedObject || isPointOpen(state, this.linkedObject.area, {x, y}, movementProperties))
         ) {
             this.rollDirection = direction;
             this.startRollingSound(state);
@@ -101,14 +99,9 @@ export class RollingBallObject implements ObjectInstance {
         }
     }
     update(state: GameState) {
-        if (this.rollDirection) {
-            this.animationTime += FRAME_LENGTH;
-            const dx = 2 * directionMap[this.rollDirection][0];
-            const dy = 2 * directionMap[this.rollDirection][1];
-            const x = this.x + dx + (this.rollDirection === 'right' ? 15 : 0);
-            const y = this.y + dy + (this.rollDirection === 'down' ? 15 : 0);
+        if (this.z <= 0) {
             for (const object of this.area.objects) {
-                if (object.definition?.type !== 'ballGoal') {
+                if (object.definition?.type !== 'ballGoal' || object.status === 'active') {
                     continue;
                 }
                 if (Math.abs(this.x - object.x) <= 2 && Math.abs(this.y - object.y) <= 2) {
@@ -133,16 +126,21 @@ export class RollingBallObject implements ObjectInstance {
                     return;
                 }
             }
+        }
+        if (this.rollDirection) {
+            this.animationTime += FRAME_LENGTH;
+            const dx = 2 * directionMap[this.rollDirection][0];
+            const dy = 2 * directionMap[this.rollDirection][1];
+            const x = this.x + dx + (this.rollDirection === 'right' ? 15 : 1);
+            const y = this.y + dy + (this.rollDirection === 'down' ? 15 : 1);
             // Rolling balls hurt actors and push on other objects.
             // Use a slightly larger hitbox so we trigger hitting objects before stopping.
             const bigHitbox = { x: this.x, y: this.y, w: 16, h: 16 };
             if (dx) {
-                bigHitbox.w += 2;
-                bigHitbox.x -= dx / 2;
+                bigHitbox.x += dx;
             }
             if (dy) {
-                bigHitbox.h += 2;
-                bigHitbox.y -= dy / 2;
+                bigHitbox.y += dy;
             }
             hitTargets(state, this.area, {
                 canPush: true,
@@ -168,7 +166,7 @@ export class RollingBallObject implements ObjectInstance {
             // MC + clones do not obstruct rolling balls.
             const excludedObjects = new Set([this, state.hero, state.hero.astralProjection, ...state.hero.clones]);
             const { tileBehavior } = getTileBehaviorsAndObstacles(state, this.area, {x, y}, excludedObjects);
-            if (!tileBehavior.solid && !tileBehavior.outOfBounds) {
+            if (!tileBehavior.solid && !tileBehavior.solidMap && !tileBehavior.outOfBounds) {
                 this.x += dx;
                 this.y += dy;
             } else {
@@ -192,6 +190,7 @@ export class RollingBallObject implements ObjectInstance {
     }
     render(context, state: GameState) {
         const frame = getFrame(this.definition.spirit ? rollingAnimationSpirit : rollingAnimation, this.animationTime);
-        drawFrame(context, frame, { ...frame, x: this.x, y: this.y });
+        drawFrame(context, frame, { ...frame, x: this.x, y: this.y - this.z });
     }
 }
+objectHash.rollingBall = RollingBallObject;

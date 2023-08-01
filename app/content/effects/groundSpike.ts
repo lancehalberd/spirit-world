@@ -1,12 +1,8 @@
-import { addEffectToArea, removeEffectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import { getTileBehaviors, hitTargets } from 'app/utils/field';
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 
-import {
-    AreaInstance, DrawPriority, EffectInstance,
-    Frame, GameState, Point, TileBehaviors
-} from 'app/types';
 
 interface Props {
     x?: number
@@ -61,7 +57,7 @@ export class GroundSpike implements EffectInstance, Props {
         if (this.animationTime >= this.tellDuration + 60 && this.animationTime <= this.tellDuration + animationDuration) {
             hitTargets(state, this.area, {
                 damage: this.damage,
-                hitbox: this.getHitbox(state),
+                hitbox: this.getHitbox(),
                 knockAwayFrom: {x: this.x + this.w / 2, y: this.y + this.h / 2},
                 hitAllies: true,
                 hitTiles: true,
@@ -70,7 +66,7 @@ export class GroundSpike implements EffectInstance, Props {
         } else if (this.animationTime < this.tellDuration) {
             hitTargets(state, this.area, {
                 damage: this.damage,
-                hitbox: this.getHitbox(state),
+                hitbox: this.getHitbox(),
                 hitAllies: false,
                 hitTiles: true,
                 cutsGround: true,
@@ -80,7 +76,7 @@ export class GroundSpike implements EffectInstance, Props {
             removeEffectFromArea(state, this);
         }
     }
-    getHitbox(state: GameState) {
+    getHitbox() {
         // The animation for the ground crack is a bit shorter than a full tile
         // so the hitbox is reduced to make it a bit easier to dodge.
         return {x: this.x, y: this.y + 2, w: 16, h: 12};
@@ -109,7 +105,7 @@ export class GroundSpike implements EffectInstance, Props {
         }
         // Uncomment this to see how the warningAnimation tracks with the hitbox.
         // context.fillStyle = 'red';
-        // const hitbox = this.getHitbox(state);
+        // const hitbox = this.getHitbox();
         // context.fillRect(hitbox.x, hitbox.y, hitbox.w, hitbox.h);
         // This draws the ground cracking with a small spike protruding
         // indicating where the spike will damage the player.

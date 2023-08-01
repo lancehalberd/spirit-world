@@ -1,13 +1,9 @@
-import { enterLocation } from 'app/content/areas';
 import { renderPropertyRows } from 'app/development/propertyPanel';
 import { TabContainer } from 'app/development/tabContainer';
-import { displayTileEditorPropertyPanel } from 'app/development/tileEditor';
 import { updateHeroMagicStats } from 'app/render/spiritBar';
 import { getState } from 'app/state';
+import { enterLocation } from 'app/utils/enterLocation';
 
-import {
-    PanelRows, PropertyRow,
-} from 'app/types';
 
 const progressTabContainer = new TabContainer('Inventory', [
     {
@@ -153,7 +149,6 @@ function getProgressProperties() {
                     state.location.y = state.hero.y;
                     // Calling this will instantiate the area again and place the player back in their current location.
                     enterLocation(state, state.location);
-                    displayTileEditorPropertyPanel();
                     return;
                 }
             }

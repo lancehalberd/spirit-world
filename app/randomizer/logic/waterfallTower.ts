@@ -4,13 +4,13 @@ import {
     hasChakram,
     hasGloves, hasIronBoots,
     hasMediumRange, hasRoll,
+    hasLightning,
     hasStaff,
     hasWeapon,
     hasWaterBlessing,
     orLogic,
 } from 'app/content/logic';
 
-import {LogicNode } from 'app/types';
 
 // Magic is drained inside the waterfall tower unless you have the water blessing,
 // So the chakram is the only useable weapon without the water blessing.
@@ -54,14 +54,16 @@ export const waterfallTowerNodes: LogicNode[] = [
         paths: [
             // Must have a weapon to defeat the crystal guardian in order to hit the switch to advance.
             {nodeId: 'waterfallTowerAfterGuardian', logic: hasWaterfallWeapon},
-            {nodeId: 'waterfallTowerAfterGuardian', logic: hasIronBoots},
+            // Lightning can be used to turn off the waterfall blocking the entrance to the top of the tower,
+            // which gives easy access to all three of these areas and the back.
+            {nodeId: 'waterfallTowerAfterGuardian', logic: orLogic(andLogic(hasWaterBlessing, hasRoll), hasIronBoots, hasLightning)},
             // You can run up the center with the iron boots to reach the big key area directly.
-            {nodeId: 'waterfallTowerBigKey', logic: hasIronBoots},
+            {nodeId: 'waterfallTowerBigKey', logic: orLogic(andLogic(hasWaterBlessing, hasRoll), hasIronBoots, hasLightning)},
             // Just cross the middle stream to reach the big chest area with iron boots or roll across with water blessing.
-            {nodeId: 'waterfallTowerBigChest', logic: orLogic(andLogic(hasWaterBlessing, hasRoll), hasIronBoots)},
+            {nodeId: 'waterfallTowerBigChest', logic: orLogic(andLogic(hasWaterBlessing, hasRoll), hasIronBoots, hasLightning)},
         ],
         entranceIds: ['waterfallTower-backEntrance'],
-        exits: [{objectId: 'waterfallTower-backEntrance', logic: hasIronBoots}],
+        exits: [{objectId: 'waterfallTower-backEntrance', logic: orLogic(hasIronBoots, hasLightning)}],
     },
     {
         zoneId,

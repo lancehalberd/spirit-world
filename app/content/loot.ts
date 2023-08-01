@@ -1,19 +1,7 @@
-import { enterLocation } from 'app/content/areas';
-import { createCanvasAndContext } from 'app/dom';
-import { showMessage } from 'app/render/renderMessage';
-import { updateHeroMagicStats } from 'app/render/spiritBar';
-import { saveGame } from 'app/state';
+import { showMessage } from 'app/scriptEvents';
 import { createAnimation } from 'app/utils/animations';
-import { requireImage } from 'app/utils/images';
-import { setSpawnLocation, SPAWN_LOCATION_PEACH_CAVE_EXIT } from 'app/content/spawnLocations';
-
-import {
-    ActiveTool, BossObjectDefinition, DialogueLootDefinition,
-    DungeonInventory, Frame, FrameDimensions, GameState, LootObjectDefinition,
-    LootType
-} from 'app/types';
-
-type AnyLootDefinition = LootObjectDefinition | BossObjectDefinition | DialogueLootDefinition;
+import { createCanvasAndContext } from 'app/utils/canvas';
+import { requireFrame } from 'app/utils/packedImages';
 
 const equipToolMessage = '{|}Press [B_MENU] to open your menu.'
     + '{|}Select a tool and press [B_TOOL] to assign it.';
@@ -29,8 +17,19 @@ function getEquipElementMessage(state: GameState) {
             + '{|}Press [B_WEAPON] again to unequip the element.'
             + '{|}The equipped element will be applied any time you charge an attack.';
     }
-    return '{|}Press [B_PREVIOUS_ELEMENT]/[B_NEXT_ELEMENT] to switch elements.'
-        + '{|}The equipped element will be applied any time you charge an attack.';
+    return '{|}Press [B_PREVIOUS_ELEMENT]/[B_NEXT_ELEMENT] to switch elements.';
+}
+
+function getChargeMessage(state: GameState) {
+    return `{|}Press and hold [B_WEAPON] to channel your Spirit Energy into the Chakram,
+        then release it to unleash a powerful attack!
+        {|}Press and hold [B_TOOL] to channel your Spirit Energy into your Bow to make it more powerful.
+        {|}Charged attacks will apply your currently selected element.
+    `;
+    // Only bow can be charged currently
+    // {|}Press and hold [B_TOOL] to channel your Spirit Energy into your Tools to make them more powerful.
+    // Not implemented yet.
+    // {|}You can even hold [B_PASSIVE] when picking up an object to channel Spirit Energy into them!
 }
 
 export function getLootName(state: GameState, lootType: LootType, lootLevel?: number): string {
@@ -42,7 +41,7 @@ export function getLootName(state: GameState, lootType: LootType, lootLevel?: nu
             if (lootLevel === 1) {
                 return 'Spirit Bow';
             }
-            return 'Magical Bow';
+            return 'Golden Bow';
         case 'cloak':
             if (lootLevel === 1) {
                 return 'Spirit Cloak';
@@ -55,7 +54,7 @@ export function getLootName(state: GameState, lootType: LootType, lootLevel?: nu
             return 'Tower Staff';
         case 'clone':
             if (lootLevel === 1) {
-                return 'Clone Techique';
+                return 'Clone';
             }
             return 'Double Clone';
         case 'roll':
@@ -80,10 +79,11 @@ export function getLootName(state: GameState, lootType: LootType, lootLevel?: nu
             if (lootLevel === 1) {
                 return 'Chakram';
             }
-            return 'Spirit Chakram';
+            return 'Golden Chakram';
         case 'spiritSight': return 'Spirit Sight';
         case 'astralProjection': return 'Summoner\'s Circlet';
         case 'teleportation': return 'Teleportation';
+        case 'neutral': return 'Neutral Element';
         case 'fire': return 'Fire Element';
         case 'ice': return 'Ice Element';
         case 'lightning': return 'Lightning Element';
@@ -91,13 +91,12 @@ export function getLootName(state: GameState, lootType: LootType, lootLevel?: nu
         case 'goldMail': return 'Golden Mail';
         case 'ironSkin': return 'Iron Skin';
         case 'catEyes': return 'Cat Eyes';
-        case 'charge': return 'Channel Spirit';
         case 'nimbusCloud': return 'Nimbus Cloud';
         case 'trueSight': return 'True Sight';
         case 'leatherBoots': return 'Leather Boots';
         case 'ironBoots': return 'Iron Boots';
         case 'cloudBoots': return 'Cloud Boots';
-        case 'fireBlessing': return 'Cooling Spirit';
+        case 'fireBlessing': return 'Fire Blessing';
         case 'waterBlessing': return 'Water Blessing';
         case 'lightningBlessing': return 'Ancient Badge';
         case 'silverOre': return 'Silver Ore';
@@ -108,48 +107,43 @@ export function getLootName(state: GameState, lootType: LootType, lootLevel?: nu
 
 export function getLootGetMessage(state: GameState, lootType: LootType, lootLevel?: number, lootAmount?: number): string {
     const lootName = getLootName(state, lootType, lootLevel);
-    const defaultMessage = `You found the ${lootName}!`;
     switch (lootType) {
         case 'cloudBoots':
         case 'ironBoots': return `You found the ${lootName}!` + equipBootsMessage;
         case 'bigKey': return 'You found a special key!';
         case 'smallKey': return 'You found a small key!';
+        case 'map': return 'You found a map!';
         case 'peachOfImmortality': return 'You ate a Golden Peach!';
         case 'peachOfImmortalityPiece': return 'You found a Golden Peach Slice!';
-        case 'charge':
-            if (state.hero.passiveTools.charge === 1) {
-                return 'You have learned to Channel Spirit Energy!';
-            }
-            return 'You have learned to Overcharge objects!'
+        // Learned techniques
+        case 'roll':
         case 'clone':
-            if (state.hero.activeTools.clone === 1) {
-                return 'You learned the Clone Techique!' + equipToolMessage;
-            }
-            return 'You learned the Double Clone Techique!' + equipToolMessage;
+        case 'teleportation':
+            return `You learned the ${lootName} Techique!`;
+        // obtained tools
         case 'bow':
         case 'cloak':
         case 'staff':
             return `You have obtained the ${lootName}!` + equipToolMessage;
-        case 'roll':
-            if (state.hero.passiveTools.roll === 1) {
-                return 'You learned the Mist Roll Technique!';
-            }
-            return 'You learned the Cloud Somersault Technique!';
-        case 'catEyes': return 'You have been blessed with Cat Eyes!';
-        case 'ironSkin': return `You have been blessed with ${lootName}!`;
-        case 'spiritSight': return 'You have been blessed with Spirit Sight!';
-        case 'teleportation': return 'You have learned Teleportation!';
-        case 'fire': return 'You have received the Fire Element!' + getEquipElementMessage(state);
-        case 'ice': return 'You have received the Ice Element!' + getEquipElementMessage(state);
-        case 'lightning': return 'You have received the Lightning Element!' + getEquipElementMessage(state);
-        case 'fireBlessing': return 'You have absorbed a Cooling Spirit!';
+        // blessed with passives
+        case 'catEyes':
+        case 'ironSkin':
+        case 'spiritSight':
+        case 'trueSight':
+            return `You have been blessed with ${lootName}!`;
+        // received elements
+        case 'fire':
+        case 'ice':
+        case 'lightning':
+            return `You have received the ${lootName}!` + getEquipElementMessage(state) + getChargeMessage(state);
+        case 'fireBlessing': return 'You have received the Blessing of Fire!';
         case 'waterBlessing': return 'You have received the Blessing of Water!';
         case 'lightningBlessing': return `You have obtained the ${lootName}!`;
         case 'money': return `You found ${lootAmount || 1} Jade!`;
         case 'silverOre':
         case 'goldOre': return `You found some ${lootName}`;
     }
-    return defaultMessage;
+    return `You found the ${lootName}!`;
 }
 
 export function getLootHelpMessage(state: GameState, lootType: LootType, lootLevel?: number, lootAmount?: number): string {
@@ -160,15 +154,6 @@ export function getLootHelpMessage(state: GameState, lootType: LootType, lootLev
         case 'ironBoots':
             return 'Use the Iron Boots to explore under water but watch your breath!'
                 + '{|}Iron boots slow you down but keep you from slipping and being knocked back.';
-        case 'charge':
-            if (state.hero.passiveTools.charge === 1) {
-                return `Press and hold [B_WEAPON] to channel your Spirit Energy into the Chakram,
-                    then release it to unleash a powerful attack!
-                    {|}Press and hold [B_TOOL] to channel your Spirit Energy into your Tools to make them more powerful.
-                    {|}You can even hold [B_PASSIVE] when picking up an object to channel Spirit Energy into them!
-                `;
-            }
-            return 'Unleash even more powerful attacks by charging your Chakram and Tools further.';
         case 'weapon':
             if (state.hero.weapon === 1) {
                 return `Press [B_WEAPON] to throw the Chakram.
@@ -227,8 +212,10 @@ export function getLootHelpMessage(state: GameState, lootType: LootType, lootLev
                 return 'Press [B_ROLL] to do a quick roll forward.'
                     + '{|}You can avoid most damage while rolling and cross small gaps.'
             }
-            return 'While rolling press [B_ROLL] again to teleport in any direction.'
-                + '{|}You can even teleport through walls that your astral body can cross.'
+            return `Press and hold [B_ROLL] to slow down time while rolling.
+                {|}While time is slowed, press [B_DPAD] to teleport in any direction, damaging enemies in the way.
+                {|}Continue holding [B_ROLL] to teleport more as long as you have spirit energy.
+                `
         case 'catEyes':
             return 'This strange energy allows you to see much better in the dark.'
                 + '{|}Using cat eyes consumes spirit energy, stand still to recover.'
@@ -236,6 +223,8 @@ export function getLootHelpMessage(state: GameState, lootType: LootType, lootLev
             return 'Hold [B_MEDITATE] to gaze into the Spirit World.'
                 + '{|}If an object is in both the Material World and Spirit World,'
                 + '{|}see what happens if you change it in the Material World!';
+        case 'trueSight':
+            return 'Now you can see objects that have been hidden between worlds.';
         case 'astralProjection':
             return 'Hold [B_MEDITATE] to gaze into the Spirit World.'
                 + '{|}While looking into the Spirit World, use [B_UP] to move your Astral Body.'
@@ -246,6 +235,7 @@ export function getLootHelpMessage(state: GameState, lootType: LootType, lootLev
                 + '{|}Press [B_TOOL] to teleport your Real Body to your Astral Body.'
                 + '{|}Teleportation consumes spirit energy, stand still to recover'
                 + '{|}Use teleportation to move past obstacles in the Real World.';
+        case 'neutral': return 'Neutral element uses less spirit energy with charged attacks.'
         case 'fire': return 'Fire can be used to light torches and melt ice.';
         case 'ice': return 'Ice can be used to freeze objects and enemies.';
         case 'lightning': return 'Lightning stuns enemies and activates some objects.';
@@ -258,6 +248,7 @@ export function getLootHelpMessage(state: GameState, lootType: LootType, lootLev
         case 'lightningBlessing':
             return 'This ancient artifact halves the damage from lightning effects.';
         case 'goldMail': return 'This amazing armor reduces all damage you receive.';
+        case 'phoenixCrown': return `The feather in this crown absorbs almost limitless energy from the spirit world.`;
         case 'ironSkin': return `The Iron Skin technique allows you to coat your skin
             with layers of Spirit Energy until it is as hard as iron!
             {|}Iron Skin will build up slowly over time as long as you take no damage.
@@ -300,6 +291,9 @@ export function showLootMessage(state: GameState, lootType: LootType, lootLevel?
                 return showMessage(state, getMessage + '{|}Use it to unlock one locked door.');
             }
             return;
+        case 'map':
+            return showMessage(state, getMessage
+                + '{|}Press [B_MAP] to see the full map of this area!');
         case 'peachOfImmortality':
             if (!state.hero.passiveTools.catEyes) {
                 return showMessage(state, `
@@ -324,11 +318,9 @@ export function showLootMessage(state: GameState, lootType: LootType, lootLevel?
         
         case 'staff':
             if (state.hero.activeTools.staff === 2) {
-                // Reset the spawn location so that you don't respawn in the tower
-                // when it is not active.
-                setSpawnLocation(state, SPAWN_LOCATION_PEACH_CAVE_EXIT);
                 // Refresh the location to hide the tower.
-                enterLocation(state, state.location);
+                //enterLocation(state, state.location);
+                state.areaInstance.needsLogicRefresh = true;
             }
             // Use default handling for first staff.
             break;
@@ -362,20 +354,10 @@ function createLootFrame(color: string, letter: string): Frame {
     return {image: toolCanvas, x: 0, y: 0, w: toolCanvas.width, h: toolCanvas.height};
 }
 
-// BizmasterStudios
-// https://opengameart.org/users/bizmasterstudios
-// https://opengameart.org/content/rpg-crafting-material-icons
-// https://creativecommons.org/licenses/by/4.0/
-export const [
-    silverOre, goldOre
-] = createAnimation('gfx/hud/nails.png',
-    {w: 32, h: 32, content: {x: 8, y: 8, w: 16, h: 16}}, {x:2, y: 2, cols: 2}
-).frames;
-
 export const [
     /*fullPeachFrame*/, goldPeachFrame,
     keyOutlineFrame, bigKeyOutlineFrame,
-    bowOutlineFrame, mistScrollFrame,
+    bow, mistScrollFrame,
     spiritSightFrame,
     catEyes,
     twoCloneFrame, threeCloneFrame, /* fourCloneFrame */,
@@ -385,9 +367,16 @@ export const [
     circlet, phoenixCrown,
     teleportFrame, /* teleportFrame2 */,
     treeStaff, towerStaff,
-    /* recycle */, /* book */, /* scroll1 */, /* scroll2 */, scroll3
+    /* recycle */, /* book */, scroll1, /* scroll2 */, scroll3,
+    nimbusCloud, trueSight,
+    goldOre, silverOre,
+    goldMedal, silverMedal, bronzeMedal,
+    waterBlessing, fireBlessing, lightningBlessing,
+    goldBow,
+    silverChakram, goldChakram,
+    goldMail, ironSkin,
 ] = createAnimation('gfx/hud/icons.png',
-    {w: 18, h: 18, content: {x: 1, y: 1, w: 16, h: 16}}, {cols: 28}
+    {w: 18, h: 18, content: {x: 1, y: 1, w: 16, h: 16}}, {cols: 43}
 ).frames;
 export const [
     /* container */, fireElement, iceElement, lightningElement, neutralElement, /* elementShine */
@@ -405,10 +394,7 @@ const [invisibilityCloak] = createAnimation('gfx/hud/cloak2.png',
 const [/*smallPeach*/, /*fullPeachFrame*/, /*threeQuartersPeach*/, /*halfPeach*/, /*quarterPeach*/, peachPieceFrame] =
     createAnimation('gfx/hud/peaches.png', {w: 18, h: 18}, {cols: 3, rows: 2}).frames;
 
-const [weaponFrame] = createAnimation('gfx/chakram1.png', {w: 16, h: 16}, {x: 9}).frames;
-const [cloudFrame] = createAnimation('gfx/tiles/cloud.png', {w: 16, h: 16}, {x: 3, y: 2}).frames;
-
-const smallPeachFrame = {image: requireImage('gfx/hud/peaches.png'), x: 4, y: 3, w: 12, h: 12 };
+const smallPeachFrame = requireFrame('gfx/hud/peaches.png', {x: 4, y: 3, w: 12, h: 12 });
 const smallMoneyGeometry: FrameDimensions = {w: 16, h: 16, content:{ x: 4, y: 8, w: 8, h: 8}};
 const largeMoneyGeometry: FrameDimensions = {w: 16, h: 16, content:{ x: 2, y: 4, w: 12, h: 12}};
 const [
@@ -428,18 +414,18 @@ const lootFrames = {
     // Summoner's Circlet.
     astralProjection: circlet,
     phoenixCrown,
-    goldMail: createLootFrame('orange', 'Au'),
-    ironSkin: createLootFrame('grey', 'Fe'),
+    goldMail,
+    ironSkin,
     bigKey: bigKeyOutlineFrame,
-    bow: bowOutlineFrame,
+    map: scroll1,
     catEyes: catEyes,
     charge: neutralElement,
     clone: twoCloneFrame,
     clone2: threeCloneFrame,
     invisibilityCloak,
-    nimbusCloud: cloudFrame,
+    nimbusCloud,
     spiritCloak,
-    trueSight: createLootFrame('blue', 'TS'),
+    trueSight,
     gloves: gloveFrame,
     bracelet,
     roll: mistScrollFrame,
@@ -457,13 +443,11 @@ const lootFrames = {
     leatherBoots: normalBoots,
     ironBoots: ironBoots,
     cloudBoots: cloudBoots,
-    fireBlessing: createLootFrame('red', 'Fir'),
-    waterBlessing: createLootFrame('blue', 'Wat'),
-    lightningBlessing: createLootFrame('green', 'Fr'),
-    weapon: weaponFrame,
+    fireBlessing,
+    waterBlessing,
+    lightningBlessing,
     // This is invisible for now, an effect is applied to the HUD representing this.
     secondChance: {image: createCanvasAndContext(16, 16)[0], x :0, y: 0, w: 16, h: 16},
-    victoryPoint: createLootFrame('green', 'VP'),
 } as const;
 
 const [
@@ -486,6 +470,18 @@ export function getLootFrame(state: GameState, {lootType, lootLevel, lootAmount}
             return darkHalf;
         }
         return wholeCoin;
+    }
+    if (lootType === 'weapon') {
+        if (lootLevel === 1 || (lootLevel === 0 && !state.hero.weapon)){
+            return silverChakram;
+        }
+        return goldChakram;
+    }
+    if (lootType === 'bow') {
+        if (lootLevel === 1 || (lootLevel === 0 && !state.hero.activeTools.bow)){
+            return bow;
+        }
+        return goldBow;
     }
     if (lootType === 'cloak') {
         if (lootLevel === 1 || (lootLevel === 0 && !state.hero.activeTools.cloak)){
@@ -526,6 +522,15 @@ export function getLootFrame(state: GameState, {lootType, lootLevel, lootAmount}
         }
         return lootFrames.teleportation;
     }
+    if (lootType === 'victoryPoint') {
+        if (lootAmount >= 5) {
+            return goldMedal;
+        }
+        if (lootAmount > 1) {
+            return silverMedal;
+        }
+        return bronzeMedal;
+    }
     return lootFrames[lootType] || lootFrames.unknown;
 }
 
@@ -542,125 +547,4 @@ export function getLootShadowFrame({lootType, lootLevel, lootAmount}:
         return smallShadow;
     }
     return bigShadow;
-}
-
-export function applyUpgrade(currentLevel: number, loot: LootObjectDefinition | BossObjectDefinition): number {
-    // Negative number indicates losing loot, and currently is just for setting down the Tower Staff.
-    if (loot.lootLevel < 0) {
-        return Math.max(0, currentLevel + loot.lootLevel);
-    }
-    // Non-progressive upgrades specify the exact level of the item. Lower level items will be ignored
-    // if the player already possesses a better version.
-    if (loot.lootLevel) {
-        //console.log(loot.lootType, 'max', currentLevel, loot.lootLevel);
-        return Math.max(currentLevel, loot.lootLevel);
-    }
-    //console.log(loot.lootType, 'increment', currentLevel);
-    return currentLevel + 1;
-}
-
-function getDungeonInventory(state: GameState): DungeonInventory {
-    return state.savedState.dungeonInventories[state.location.zoneKey] || {
-        bigKey: false,
-        map: false,
-        smallKeys: 0,
-    };
-}
-function updateDungeonInventory(state: GameState, inventory: DungeonInventory, save: boolean = true): void {
-    state.savedState.dungeonInventories[state.location.zoneKey] = inventory;
-    if (save) {
-        saveGame();
-    }
-}
-
-export const lootEffects:Partial<{[key in LootType]: (state: GameState, loot: AnyLootDefinition, simulate?: boolean) => void}> = {
-    unknown: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
-        if (loot.lootType === 'weapon') {
-            state.hero.weapon = applyUpgrade(state.hero.weapon, loot);
-        } else if (['bow', 'staff', 'clone', 'cloak'].includes(loot.lootType)) {
-            if (!state.hero.leftTool && state.hero.rightTool !== loot.lootType) {
-                state.hero.leftTool = loot.lootType as ActiveTool;
-            } else if (!state.hero.rightTool && state.hero.leftTool !== loot.lootType) {
-                state.hero.rightTool = loot.lootType as ActiveTool;
-            }
-            //console.log(loot.lootType, state.hero.activeTools[loot.lootType]);
-            state.hero.activeTools[loot.lootType] = applyUpgrade(state.hero.activeTools[loot.lootType], loot);
-            //console.log('->', loot.lootType, state.hero.activeTools[loot.lootType]);
-        } else if ([
-            'gloves', 'roll', 'charge', 'nimbusCloud', 'catEyes', 'spiritSight',
-            'trueSight', 'astralProjection', 'teleportation', 'ironSkin', 'goldMail', 'phoenixCrown',
-            'waterBlessing', 'fireBlessing', 'lightningBlessing',
-        ].includes(loot.lootType)) {
-            //console.log(loot.lootType, state.hero.passiveTools[loot.lootType]);
-            state.hero.passiveTools[loot.lootType] = applyUpgrade(state.hero.passiveTools[loot.lootType], loot);
-            //console.log('->', loot.lootType, state.hero.passiveTools[loot.lootType]);
-        } else if ([
-            'fire', 'lightning', 'ice'
-        ].includes(loot.lootType)) {
-            state.hero.elements[loot.lootType] = applyUpgrade(state.hero.elements[loot.lootType], loot);
-        }  else if ([
-            'cloudBoots', 'ironBoots'
-        ].includes(loot.lootType)) {
-            state.hero.equipment[loot.lootType] = applyUpgrade(state.hero.equipment[loot.lootType], loot);
-        } else if (loot.lootType === 'money') {
-            state.hero.money += (loot.lootAmount || 1);
-        } else if (loot.lootType === 'silverOre') {
-            state.hero.silverOre++;
-        } else if (loot.lootType === 'goldOre') {
-            state.hero.goldOre++;
-        } else if (loot.lootType === 'victoryPoint') {
-            state.hero.victoryPoints += (loot.lootAmount || 1);
-        }  else {
-            console.error('Unhandled loot type:', loot.lootType);
-            // throw new Error('Unhandled loot type: ' + loot.lootType);
-        }
-        updateHeroMagicStats(state);
-    },
-    bigKey: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
-        const inventory = getDungeonInventory(state);
-        inventory.bigKey = true;
-        updateDungeonInventory(state, inventory, false);
-    },
-    map: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
-        const inventory = getDungeonInventory(state);
-        inventory.map = true;
-        updateDungeonInventory(state, inventory, false);
-    },
-    smallKey: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
-        const inventory = getDungeonInventory(state);
-        inventory.smallKeys++;
-        updateDungeonInventory(state, inventory, false);
-    },
-    peach: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
-        state.hero.life = Math.min(state.hero.life + 1, state.hero.maxLife);
-    },
-    peachOfImmortality: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
-        state.hero.maxLife++;
-        state.hero.life = state.hero.maxLife;
-    },
-    peachOfImmortalityPiece: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
-        state.hero.peachQuarters++;
-        if (state.hero.peachQuarters >= 4) {
-            state.hero.peachQuarters -= 4;
-            if (simulate) {
-                state.hero.maxLife++;
-            }
-            // You will gain the full peach from the dialogue effect.
-        }
-    },
-    secondChance: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
-        state.hero.hasRevive = true;
-        state.reviveTime = state.fieldTime;
-    },
-    spiritPower: (state: GameState, loot: LootObjectDefinition | BossObjectDefinition, simulate: boolean = false) => {
-        if (loot.lootType === 'spiritPower') {
-            if (!state.hero.passiveTools.spiritSight) {
-                state.hero.passiveTools.spiritSight = 1;
-            } else if (!state.hero.passiveTools.astralProjection) {
-                state.hero.passiveTools.astralProjection = 1;
-            } else {
-                state.hero.passiveTools.teleportation = 1;
-            }
-        }
-    }
 }

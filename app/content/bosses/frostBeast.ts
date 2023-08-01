@@ -1,42 +1,64 @@
-import { sample } from 'lodash';
-import { AnimationEffect } from 'app/content/effects/animationEffect';
-import { addEffectToArea } from 'app/content/areas';
+import { FieldAnimationEffect } from 'app/content/effects/animationEffect';
 import { Frost } from 'app/content/effects/frost';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
-import {
-    accelerateInDirection,
-    getVectorToNearbyTarget,
-    moveEnemy,
-    moveEnemyToTargetLocation,
-    throwIceGrenadeAtLocation,
-} from 'app/content/enemies';
+import { throwIceGrenadeAtLocation } from 'app/content/effects/frostGrenade';
+import { Enemy } from 'app/content/enemy';
 import { enemyDeathAnimation, snakeAnimations } from 'app/content/enemyAnimations';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { createAnimation } from 'app/utils/animations';
-import { playSound } from 'app/musicController';
+import { createAnimation, drawFrame } from 'app/utils/animations';
+import { createCanvasAndContext } from 'app/utils/canvas';
+import { addEffectToArea } from 'app/utils/effects';
+import {
+    accelerateInDirection,
+    moveEnemy,
+    moveEnemyToTargetLocation,
+} from 'app/utils/enemies';
 import { getDirection, hitTargets } from 'app/utils/field';
+import { allImagesLoaded } from 'app/utils/images';
+import { sample } from 'app/utils/index';
+import { getVectorToNearbyTarget } from 'app/utils/target';
 
 
-import { AreaInstance, Enemy, GameState, HitProperties, HitResult } from 'app/types';
 
+const frostGeometry = {w: 20, h: 20, content: {x: 4, y: 10, w: 12, h: 8}};
+export const [iceElement] = createAnimation('gfx/hud/elementhud.png', frostGeometry, {x: 2}).frames;
+const [frostHeartCanvas, frostHeartContext] = createCanvasAndContext(iceElement.w * 4, iceElement.h * 2);
+const createFrostAnimation = async () => {
+    await allImagesLoaded();
+    drawFrame(frostHeartContext, iceElement, {x: 0, y: 0, w: iceElement.w * 2, h: iceElement.h * 2});
+    frostHeartContext.save();
+        frostHeartContext.translate((iceElement.w + iceElement.content.x + iceElement.content.w / 2) * 2, 0);
+        frostHeartContext.scale(-1, 1);
+        drawFrame(frostHeartContext, iceElement, {
+            x: 2* (-iceElement.content.w / 2 - iceElement.content.x), y: 0,
+            w: iceElement.w * 2, h: iceElement.h * 2
+        });
+    frostHeartContext.restore();
+    drawFrame(frostHeartContext, iceElement, {...iceElement, x: 0, y: 2});
+    drawFrame(frostHeartContext, iceElement, {...iceElement, x: iceElement.w, y: 0});
+    drawFrame(frostHeartContext, iceElement, {...iceElement, x: 2 * iceElement.w, y: 0});
+    drawFrame(frostHeartContext, iceElement, {...iceElement, x: 3 * iceElement.w, y: 2});
+}
+createFrostAnimation();
+const frostHeartAnimation = createAnimation(frostHeartCanvas, {w: 40, h: 40, content: {x: 8, y: 20, w: 24, h: 16}}, {cols: 2});
 
-const peachAnimation = createAnimation('gfx/hud/icons.png', {w: 18, h: 18, content: {x: 1, y: 1, w: 16, h: 16}}, {x: 0});
-const peachAnimations = {
+export const frostHeartAnimations = {
     idle: {
-        up: peachAnimation,
-        down: peachAnimation,
-        left: peachAnimation,
-        right: peachAnimation,
+        up: frostHeartAnimation,
+        down: frostHeartAnimation,
+        left: frostHeartAnimation,
+        right: frostHeartAnimation,
     },
 };
 
 enemyDefinitions.frostHeart = {
-    animations: peachAnimations, life: 16, scale: 3, touchDamage: 1, update: updateFrostHeart, params: {
+    animations: frostHeartAnimations, life: 16, scale: 2, touchDamage: 1, update: updateFrostHeart, params: {
         chargeLevel: 0,
         enrageLevel: 0,
         shieldLife: 8,
     },
     immunities: ['ice'],
+    elementalMultipliers: {'fire': 2, 'lightning': 1.5},
     renderOver: renderIceShield,
     onHit(state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
         // If the shield is up, only fire damage can hurt it.
@@ -47,7 +69,7 @@ enemyDefinitions.frostHeart = {
                 }
                 enemy.params.shieldLife = Math.max(0, enemy.params.shieldLife - hit.damage);
                 enemy.enemyInvulnerableFrames = 20;
-                playSound('enemyHit');
+                enemy.makeSound(state, 'enemyHit');
                 return { hit: true };
             }
         }
@@ -60,7 +82,7 @@ enemyDefinitions.frostHeart = {
             enemy.params.shieldLife = Math.min(8, enemy.params.shieldLife + hit.damage);
             //console.log('healed shield', enemy.params.shieldLife);
             enemy.blockInvulnerableFrames = 50;
-            playSound('blocked');
+            enemy.makeSound(state, 'blocked');
             return { hit: true };
         }
         if (enemy.area.underwater) {
@@ -77,6 +99,7 @@ enemyDefinitions.frostBeast = {
     animations: snakeAnimations, life: 36, scale: 3, touchDamage: 2, update: updateFrostSerpent, flipRight: true,
     acceleration: 0.3, speed: 2,
     immunities: ['ice'],
+    elementalMultipliers: {'fire': 2, 'lightning': 1.5},
     params: {
         submerged: true,
     },
@@ -248,7 +271,7 @@ function updateFrostSerpent(this: void, state: GameState, enemy: Enemy): void {
         }
         if (enemy.life < enemy.enemyDefinition.life * 2 / 3) {
             const hitbox = enemy.getHitbox(state);
-            const deathAnimation = new AnimationEffect({
+            const deathAnimation = new FieldAnimationEffect({
                 animation: enemyDeathAnimation,
                 x: hitbox.x + hitbox.w / 2 - enemyDeathAnimation.frames[0].w / 2 * enemy.scale,
                 // +1 to make sure the explosion appears in front of enemies the frame they die.
@@ -483,8 +506,8 @@ function atan3(y, x) {
     return (Math.atan2(y, x) + 2 * Math.PI) % (2 * Math.PI);
 }
 
-function shootFrostInCone(state: GameState, enemy: Enemy, theta: number, damage = 1, speed = 4): void {
-    const hitbox = enemy.getHitbox(state);
+export function shootFrostInCone(state: GameState, enemy: Enemy, theta: number, damage = 1, speed = 4, hitEnemies = true): void {
+    const hitbox = enemy.getHitbox();
     const x = hitbox.x + hitbox.w / 2 + Math.cos(theta) * hitbox.w / 2;
     const y = hitbox.y + hitbox.h / 2 + Math.sin(theta) * hitbox.h / 2;
     const attackTheta = theta - Math.PI / 10 + Math.random() * Math.PI / 5;
@@ -494,6 +517,7 @@ function shootFrostInCone(state: GameState, enemy: Enemy, theta: number, damage 
         y,
         vx: speed * Math.cos(attackTheta),
         vy: speed * Math.sin(attackTheta),
+        hitEnemies,
         ignoreTargets: new Set([enemy]),
     });
     addEffectToArea(state, enemy.area, frost);

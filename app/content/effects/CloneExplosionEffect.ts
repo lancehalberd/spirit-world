@@ -1,8 +1,7 @@
-import { removeEffectFromArea } from 'app/content/areas';
 import { EXPLOSION_RADIUS, FRAME_LENGTH } from 'app/gameConstants';
+import { removeEffectFromArea } from 'app/utils/effects';
 import { hitTargets } from 'app/utils/field';
 
-import { AreaInstance, GameState, EffectInstance, ObjectInstance } from 'app/types';
 
 
 interface Props {

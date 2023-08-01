@@ -1,12 +1,8 @@
-import { addEffectToArea, removeEffectFromArea } from 'app/content/areas';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, frameAnimation, getFrame } from 'app/utils/animations';
+import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import Random from 'app/utils/Random';
 
-import {
-    AreaInstance, DrawPriority, EffectInstance, Frame, FrameAnimation,
-    GameState, MagicElement, ObjectInstance, Rect, TileBehaviors,
-} from 'app/types';
 
 
 interface AnimationProps {
@@ -31,7 +27,7 @@ interface AnimationProps {
     target?: ObjectInstance | EffectInstance
 }
 
-export class AnimationEffect implements EffectInstance {
+export class FieldAnimationEffect implements EffectInstance {
     alpha = 1
     area: AreaInstance;
     delay: number = 0;
@@ -86,10 +82,15 @@ export class AnimationEffect implements EffectInstance {
         this.behaviors = {};
         this.target = target;
     }
-    getHitbox(state: GameState) {
+    getHitbox() {
         const frame = getFrame(this.animation, this.animationTime);
         const originX = this.target?.x || 0, originY = (this.target?.y || 0) - (this.target?.z || 0);
         return {x: originX + this.x, y: originY + this.y - this.z, w: frame.w, h: frame.h};
+    }
+    getYDepth() {
+        const frame = getFrame(this.animation, this.animationTime);
+        const originY = (this.target?.y || 0);
+        return originY + this.y + frame.h;
     }
     update(state: GameState) {
         if (this.delay > 0) {
@@ -130,7 +131,16 @@ export class AnimationEffect implements EffectInstance {
             context.globalAlpha *= this.alpha;
         }
         const originX = this.target?.x || 0, originY = (this.target?.y || 0) - (this.target?.z || 0);
-        if (this.rotation) {
+        drawFrame(context, frame, { ...frame,
+            x: originX + this.x - (frame.content?.x || 0),
+            y: originY + this.y - (frame.content?.y || 0) - this.z,
+            w: frame.w * this.scale,
+            h: frame.h * this.scale,
+        });
+        // Rotation is currently disabled as it causes pixels from adjacent frames to be drawn.
+        // If we really want to support it, we would need to add at least 1px padding between frames
+        // or make sure to load rotated sprites from isolated sources.
+        /*if (this.rotation) {
             const w = frame.content?.w || frame.w;
             const h = frame.content?.h || frame.h;
             context.translate(
@@ -151,7 +161,7 @@ export class AnimationEffect implements EffectInstance {
                 w: frame.w * this.scale,
                 h: frame.h * this.scale,
             });
-        }
+        }*/
         if (this.rotation || this.alpha < 1) {
             context.restore();
         }
@@ -171,7 +181,7 @@ export function addParticleAnimations(
         const frame = Random.element(particles);
         const vx = Math.cos(theta);
         const vy = Math.sin(theta);
-        const particle = new AnimationEffect({
+        const particle = new FieldAnimationEffect({
             animation: frameAnimation(frame),
             drawPriority: 'foreground',
             x: x + radius * vx - frame.w / 2, y: y + radius * vy - frame.h / 2, z,
@@ -198,13 +208,14 @@ interface SparkleProps {
     element?: MagicElement
     target?: ObjectInstance | EffectInstance
     velocity?: {x: number, y: number, z?: number}
+    friction?: number
     z?: number
 }
 
 export function addSparkleAnimation(
-    state: GameState, area: AreaInstance, hitbox: Rect, sparkleProps: SparkleProps
+    state: GameState, area: AreaInstance, hitbox: Rect, sparkleProps: SparkleProps, overrideProps: Partial<AnimationProps> = null,
 ): void {
-    addEffectToArea(state, area, makeSparkleAnimation(state, hitbox, sparkleProps));
+    addEffectToArea(state, area, makeSparkleAnimation(state, hitbox, sparkleProps, overrideProps));
 }
 export function makeSparkleAnimation(
     state: GameState,
@@ -215,15 +226,16 @@ export function makeSparkleAnimation(
         target,
         velocity,
         z,
-    }: SparkleProps
-): AnimationEffect {
+    }: SparkleProps,
+    overrideProps: Partial<AnimationProps> = null,
+): FieldAnimationEffect {
     const animation = element
         ? {
             fire: fireSparkleAnimation,
             ice: iceSparkleAnimation,
             lightning: lightningSparkleAnimation,
         }[element] : sparkleAnimation;
-    const animationProps: AnimationProps = {
+    let animationProps: AnimationProps = {
         animation: animation,
         delay,
         drawPriority: 'foreground',
@@ -236,8 +248,10 @@ export function makeSparkleAnimation(
         animationProps.vz = velocity.z;
     }
     if (element === 'fire') {
-        animationProps.vz = 0.3 + Math.random() / 2;
+        animationProps.az = 0.08;
+        animationProps.vz = 0.2 + Math.random() / 4;
         animationProps.vx = 0.8 * Math.random() - 0.4;
+        animationProps.friction = 0.05;
     }
     if (element === 'lightning') {
         animationProps.rotation = ((Math.random() * 4) | 0) / 4 * 2 * Math.PI;
@@ -255,7 +269,13 @@ export function makeSparkleAnimation(
             animationProps.vy = -6;
         }
     }
-    const effect = new AnimationEffect(animationProps);
+    if (overrideProps) {
+        animationProps = {
+            ...animationProps,
+            ...overrideProps,
+        };
+    }
+    const effect = new FieldAnimationEffect(animationProps);
     if (element === 'fire') {
         effect.behaviors.brightness = 0.5;
         effect.behaviors.lightRadius = 40;
@@ -276,7 +296,7 @@ export function addDustBurst(
         const theta = i * Math.PI / 3;
         const vx = Math.cos(theta) / 2;
         const vy = Math.sin(theta);
-        const particle = new AnimationEffect({
+        const particle = new FieldAnimationEffect({
             animation: dustParticleAnimation,
             drawPriority: 'background-special',
             x: x + vx * 8 - 3, y: y + vy * 2, z,
@@ -293,7 +313,7 @@ export function addReviveBurst(
     for (let i = 0; i < 8; i++) {
         const vx = Math.cos(theta) / 2;
         const vy = Math.sin(theta) / 2;
-        const particle = new AnimationEffect({
+        const particle = new FieldAnimationEffect({
             animation: reviveParticleAnimation,
             drawPriority: 'foreground-special',
             x: x + vx - 3, y: y + vy - 3, z,
@@ -321,7 +341,7 @@ export function addParticleSpray(
     } else {
         animation = frameOrAnimation as FrameAnimation;
     }
-    const particle = new AnimationEffect({
+    const particle = new FieldAnimationEffect({
         animation: animation as FrameAnimation,
         drawPriority: 'sprites',
         x: x + vx, y: y + vy, z,
@@ -332,4 +352,51 @@ export function addParticleSpray(
     particle.x -= (animation.frames[0].content?.w || animation.frames[0].w) / 2;
     particle.y -= (animation.frames[0].content?.h || animation.frames[0].h) / 2;
     addEffectToArea(state, area, particle);
+}
+
+const fallGeometry: FrameDimensions = {w: 24, h: 24, content: {x: 4, w: 16, y: 4, h: 16}};
+export const objectFallAnimation: FrameAnimation = createAnimation('gfx/effects/enemyfall.png', fallGeometry, { cols: 10, duration: 4}, { loop: false });
+const splashGeometry: FrameDimensions = {w: 22, h: 20, content: {x: 3, w: 16, y: 2, h: 16}};
+export const splashAnimation: FrameAnimation = createAnimation('gfx/effects/watersplash.png', splashGeometry, { cols: 8, duration: 5}, { loop: false });
+const enemyFallGeometry: FrameDimensions = {w: 20, h: 22, content: {x: 2, w: 16, y: 3, h: 16}};
+export const enemyFallAnimation: FrameAnimation = createAnimation('gfx/effects/enemyfall2.png', enemyFallGeometry, { cols: 13, duration: 5}, { loop: false });
+
+
+const regenerationParticles
+    = createAnimation('gfx/tiles/spiritparticlesregeneration.png', {w: 4, h: 4}, {cols: 4, duration: 6}).frames;
+
+export function addBurstParticle(
+    state: GameState, area: AreaInstance,
+    x: number, y: number, z: number, element: MagicElement, delay = 0
+): void {
+    const theta = 2 * Math.PI * Math.random();
+    const vx = 1.5 * Math.cos(theta);
+    const vy = 1.5 * Math.sin(theta);
+    if (element === null ){
+        const frame = Random.element(regenerationParticles);
+        const particle = new FieldAnimationEffect({
+            animation: frameAnimation(frame),
+            delay,
+            drawPriority: 'foreground',
+            x: x - frame.w / 2 + vx,
+            y: y - frame.h / 2 + vy, z,
+            vx, vy, vz: 1,
+            //ax: vx / 10, ay: vy / 10,
+            ttl: 160,
+        });
+        addEffectToArea(state, area, particle);
+    } else {
+        addSparkleAnimation(state, area, {x, y, w: 0, h: 0},
+            {
+                velocity: { x: vx, y:vy, z: 1},
+                element,
+                z,
+            }
+        );
+    }
+}
+
+class _FieldAnimationEffect extends FieldAnimationEffect {}
+declare global {
+    export interface FieldAnimationEffect extends _FieldAnimationEffect {}
 }

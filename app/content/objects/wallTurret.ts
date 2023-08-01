@@ -1,12 +1,9 @@
-import { createCanvasAndContext } from 'app/dom';
 import { CrystalSpike, drawArrow, drawCrystal, EnemyArrow } from 'app/content/effects/arrow';
-
+import { objectHash } from 'app/content/objects/objectHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame } from 'app/utils/animations';
+import { createCanvasAndContext } from 'app/utils/canvas';
 import { directionMap } from 'app/utils/field';
-import {
-    AreaInstance, DrawPriority, GameState, ObjectInstance, ObjectStatus, TurretDefinition,
-} from 'app/types';
 
 const underFrame = createAnimation('gfx/objects/icicleholemonster.png', {w: 16, h: 32}).frames[0];
 const overFrame = createAnimation('gfx/objects/icicleholemonster.png', {w: 16, h: 32}, {x: 1}).frames[0];
@@ -149,4 +146,4 @@ export class WallTurret implements ObjectInstance {
 
     }
 }
-
+objectHash.turret = WallTurret;

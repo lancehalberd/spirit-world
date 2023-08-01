@@ -1,6 +1,5 @@
 import { isRandomizer } from 'app/gameConstants';
 
-import { AndLogicCheck, GameState, LogicCheck, OrLogicCheck } from 'app/types';
 
 export function andLogic(...logicChecks: LogicCheck[]): AndLogicCheck {
     return { operation: 'and', logicChecks};
@@ -89,9 +88,43 @@ export function isLogicValid(state: GameState, logic: LogicCheck, invertLogic = 
     }
     return trueResult;
 }
+
+export function isObjectLogicValid(state: GameState, definition: ObjectDefinition): boolean {
+    if (definition.hasCustomLogic && definition.customLogic) {
+        return isLogicValid(state, {requiredFlags: [definition.customLogic]}, definition.invertLogic);
+    }
+    if (!definition.logicKey) {
+        return true;
+    }
+    const logic = logicHash[definition.logicKey];
+    // Logic should never be missing, so surface an error and hide the layer.
+    if (!logic) {
+        console.error('Missing logic!', definition.logicKey);
+        debugger;
+        return false;
+    }
+    return isLogicValid(state, logic, definition.invertLogic);
+}
+
+export function evaluateLogicDefinition(state: GameState, logicDefinition?: LogicDefinition, defaultValue: boolean = true): boolean {
+    if (!logicDefinition) {
+        return defaultValue;
+    }
+    if (logicDefinition.isTrue) {
+        return !logicDefinition.isInverted;
+    }
+    if (logicDefinition.hasCustomLogic) {
+        return isLogicValid(state, { requiredFlags: [logicDefinition.customLogic] }, logicDefinition.isInverted);
+    }
+    if (logicDefinition.logicKey) {
+        return isLogicValid(state, logicHash[logicDefinition.logicKey], logicDefinition.isInverted);
+    }
+    return defaultValue;
+}
 window['isLogicValid'] = isLogicValid;
 
 export const hasCatEyes: LogicCheck = { requiredFlags: ['$catEyes'] };
+export const hasTrueSight: LogicCheck = { requiredFlags: ['$trueSight'] };
 export const hasClone: LogicCheck = { requiredFlags: ['$clone'] };
 export const hasDoubleClone: LogicCheck = { requiredFlags: ['$clone:2'] };
 export const hasIronBoots: LogicCheck = { requiredFlags: ['$ironBoots'] };
@@ -107,13 +140,18 @@ export const hasSmallKey: LogicCheck = { requiredFlags: ['$smallKey'] };
 export const hasBigKey: LogicCheck = { requiredFlags: ['$bigKey'] };
 export const hasFireBlessing: LogicCheck = {requiredFlags: ['$fireBlessing']};
 export const hasWaterBlessing: LogicCheck = {requiredFlags: ['$waterBlessing']};
+export const hasLightningBlessing: LogicCheck = {requiredFlags: ['$lightningBlessing']};
 export const hasChakram: LogicCheck = {requiredFlags: ['$weapon']};
 export const hasNimbusCloud: LogicCheck = {requiredFlags: ['$nimbusCloud']};
 
-// This check will be added automatically to any tiles that have 100% darkness effect.
-//const hasEyes: LogicCheck = { requiredFlags: ['$catEyes:1'] };
 export const hasBow: LogicCheck = {requiredFlags: ['$bow']};
 export const hasUpgradedBow: LogicCheck = {requiredFlags: ['$bow:2']};
+export const hasElementalWeapon: OrLogicCheck = orLogic(hasChakram, hasBow, hasSpiritBarrier);
+export const hasFire: LogicCheck = andLogic(hasElementalWeapon, {requiredFlags: ['$fire']});
+export const hasIce: LogicCheck = andLogic(hasElementalWeapon, {requiredFlags: ['$ice']});
+export const hasLightning: LogicCheck = andLogic(hasElementalWeapon, {requiredFlags: ['$lightning']});
+export const hasCharge: OrLogicCheck = orLogic(hasFire, hasIce, hasLightning);
+
 export const hasRoll: LogicCheck = {requiredFlags: ['$roll']};
 export const hasSomersault: LogicCheck = {requiredFlags: ['$roll:2']};
 export const hasStaff: LogicCheck = {requiredFlags: ['$staff']};
@@ -126,20 +164,20 @@ export const hasBossWeapon: OrLogicCheck = orLogic(hasChakram, hasBow, hasStaff)
 // This check is for being able to push objects at the range of the chakram like pots.
 export const hasRangedPush: OrLogicCheck = orLogic(hasChakram, hasBow);
 // This check is used for being able to defeat enemies at all.
-export const hasWeapon: OrLogicCheck = orLogic(hasChakram, hasBow, hasSpiritBarrier, hasStaff);
-export const hasElementalWeapon: OrLogicCheck = orLogic(hasChakram, hasBow);
+export const hasWeapon: OrLogicCheck = orLogic(hasChakram, hasBow, hasSpiritBarrier, hasStaff, hasSomersault);
 // This check is used for weapons that have the range of the charged chakram or greater.
-export const hasMediumRange: OrLogicCheck = orLogic({requiredFlags: ['$weapon', '$charge']}, hasBow);
+export const hasMediumRange: OrLogicCheck = orLogic(andLogic(hasChakram, hasCharge), hasBow);
 
-export const hasTripleShot: AndLogicCheck = andLogic(hasUpgradedBow, {requiredFlags: ['$charge']});
+export const hasTripleShot: AndLogicCheck = andLogic(hasUpgradedBow, hasCharge);
 
-// Attacks that you are expected to roll to avoid can also reasonably be dealt with by absorbing the hit
+// Attacks that you are expected to roll to avoid can also reasonably be dealt with by ab$sorbing the hit
 // with spirit barrier or even invisibility.
 export const canAvoidBossAttacks: OrLogicCheck = orLogic(hasRoll, hasSpiritBarrier);
 
-export const hasFire: LogicCheck = andLogic(hasElementalWeapon, {requiredFlags: ['$fire', '$charge']});
-export const hasIce: LogicCheck = andLogic(hasElementalWeapon, {requiredFlags: ['$ice', '$charge']});
-export const hasLightning: LogicCheck = andLogic(hasElementalWeapon, {requiredFlags: ['$lightning', '$charge']});
+// Although these are the same now, they might be made different in the future.
+export const canBeatGolem = andLogic(hasBossWeapon, canAvoidBossAttacks);
+export const canBeatIdols = andLogic(hasBossWeapon, canAvoidBossAttacks);
+export const canDefeatBalloonMegapede = andLogic(hasBossWeapon, canAvoidBossAttacks);
 
 
 // Note that in some areas teleportation may not be possible contextually, for example if the player cannot
@@ -161,6 +199,7 @@ export const canCrossDynamic6Gaps: OrLogicCheck = orLogic(hasSomersault, canHasT
 export const canCrossDynamic8Gaps: OrLogicCheck = orLogic(hasSomersault, canHasTowerStaff, andLogic(hasRoll, hasCloudBoots, hasStaff));
 
 export const canTravelFarUnderWater = andLogic(hasIronBoots);
+export const canUseTeleporters = orLogic(hasSpiritSight, hasTrueSight);
 
 export const canHitCrystalSwitches = orLogic(hasChakram, hasBow, hasSpiritBarrier);
 
@@ -186,6 +225,12 @@ export const logicHash: {[key: string]: LogicCheck} = {
     cocoonBossDefeated: {
         requiredFlags: ['cocoonBoss'],
     },
+    // Normally the sleeping beasts disappear when you beat the War Temple boss, but they must also
+    // disappear if the beasts escape without defeating that boss.
+    sleepingBeastsLogic: {
+        excludedFlags: ['elementalBeastsEscaped', 'warTempleBoss'],
+    },
+    hasReleasedBeasts,
     frozenLake: {
         // Frozen lake is only displayed after beasts escaped.
         requiredFlags: ['elementalBeastsEscaped'],

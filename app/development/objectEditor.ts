@@ -1,20 +1,15 @@
-import { flatten } from 'lodash';
-
 import {
-    addObjectToArea,
     findZoneTargets,
-    isObjectLogicValid,
     linkObject,
-    removeObjectFromArea,
 } from 'app/content/areas';
 import { bossTypes } from 'app/content/bosses';
-import { dialogueHash } from 'app/content/dialogue';
-import { logicHash } from 'app/content/logic';
-import { createObjectInstance } from 'app/content/objects';
+import { dialogueHash } from 'app/content/dialogue/dialogueHash';
+import { logicHash, isObjectLogicValid } from 'app/content/logic';
+import { bellStyles } from 'app/content/objects/bell';
 import { decorationTypes } from 'app/content/objects/decoration';
 import { escalatorStyles } from 'app/content/objects/escalator';
-import { specialBehaviorsHash } from 'app/content/specialBehaviors';
-import { doorStyles } from 'app/content/objects/door';
+import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
+import { doorStyles } from 'app/content/objects/doorStyles';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { enemyTypes } from 'app/content/enemies';
 import { npcBehaviors, npcStyles } from 'app/content/objects/npc';
@@ -24,27 +19,14 @@ import { pitStyles } from 'app/content/objects/pitEntrance';
 import { turretStyles } from 'app/content/objects/wallTurret';
 import { zones } from 'app/content/zones';
 import { ObjectPalette, ObjectPaletteItem } from 'app/development/objectPalette';
-import {
-    displayTileEditorPropertyPanel, editingState,
-    EditingState, setEditingTool,
-} from 'app/development/tileEditor';
+import { editingState } from 'app/development/editingState';
 import { getLogicProperties } from 'app/development/zoneEditor';
-import { isKeyboardKeyDown, KEY } from 'app/keyCommands';
+import { allLootTypes } from 'app/gameConstants';
 import { getState } from 'app/state';
+import { createObjectInstance } from 'app/utils/createObjectInstance';
 import { isPointInShortRect } from 'app/utils/index';
+import { addObjectToArea, removeObjectFromArea } from 'app/utils/objects';
 
-import {
-    AreaDefinition, AreaInstance, BallGoalDefinition,
-    BossObjectDefinition,
-    BossType, CrystalSwitchDefinition, EditorProperty, EntranceDefinition,
-    EnemyObjectDefinition,
-    FloorSwitchDefinition, KeyBlockDefinition,
-    FrameDimensions, DecorationType, Direction, DrawPriority, EnemyType, GameState, LootObjectDefinition,
-    LootType, MagicElement, NarrationDefinition, NPCBehavior, NPCStyle,
-    ObjectDefinition, ObjectStatus, ObjectType, PanelRows,
-    Rect, ObjectInstance, SpecialAreaBehavior,
-    Zone, ZoneLocation,
-} from 'app/types';
 
 type PartialObjectDefinitionWithType = Partial<ObjectDefinition> & {type: ObjectType};
 
@@ -118,7 +100,7 @@ function getObjectPalette() {
                 object.type = objectType as any;
                 editingState.selectedObject = createObjectDefinition(state, object);
                 updateObjectInstance(state, editingState.selectedObject, object);
-                displayTileEditorPropertyPanel();
+                editingState.needsRefresh = true;
             }
         );
     }
@@ -135,8 +117,7 @@ function getEnemyPalette() {
                 const object = editingState.selectedObject as EnemyObjectDefinition;
                 object.enemyType = enemyType;
                 updateObjectInstance(getState(), object);
-                // We need to refresh the panel to get enemy specific properties.
-                displayTileEditorPropertyPanel();
+                editingState.needsRefresh = true;
             }
         );
     }
@@ -153,8 +134,7 @@ function getBossPalette() {
                 const object = editingState.selectedObject as BossObjectDefinition;
                 object.enemyType = enemyType;
                 updateObjectInstance(getState(), object);
-                // We need to refresh the panel to get enemy specific properties.
-                displayTileEditorPropertyPanel();
+                editingState.needsRefresh = true;
             }
         );
     }
@@ -188,40 +168,10 @@ export function getObjectTypeProperties(): PanelRows {
     return [palette.canvas];
 }
 
-
-let allLootTypes: LootType[];
-export function getLootTypes(): LootType[] {
-    if (!allLootTypes) {
-        const state = getState();
-        allLootTypes = [
-            'empty',
-            'peachOfImmortality',
-            'peachOfImmortalityPiece',
-            'money',
-            'silverOre',
-            'goldOre',
-            'weapon',
-            'bigKey',
-            'smallKey',
-            'map',
-            'secondChance',
-            // This is used for the basic goal in randomizer.
-            'victoryPoint',
-            // This is the special progressive spirit power loot used by the randomizer.
-            'spiritPower',
-            ...(Object.keys(state.hero.activeTools) as LootType[]),
-            ...(Object.keys(state.hero.passiveTools) as LootType[]),
-            ...(Object.keys(state.hero.equipment) as LootType[]),
-            ...(Object.keys(state.hero.elements) as LootType[]),
-        ];
-    }
-    return allLootTypes;
-}
-
 export const combinedObjectTypes: ObjectType[] = [
-    'anode', 'cathode', 'airBubbles', 'ballGoal', 'beadCascade', 'beadGrate', 'bigChest', 'chest', 'crystalSwitch', 'decoration',
-    'door', 'escalator', 'floorSwitch', 'keyBlock', 'loot','marker', 'narration', 'npc', 'pitEntrance',
-    'pushPull', 'rollingBall', 'saveStatue', 'shopItem', 'sign', 'spawnMarker', 'teleporter', 'tippable', 'torch', 'turret',
+    'anode', 'cathode', 'airBubbles', 'ballGoal', 'beadCascade', 'beadGrate', 'bell', 'bigChest', 'chest', 'crystalSwitch', 'decoration',
+    'door', 'escalator', 'flameTurret', 'floorSwitch', 'indicator', 'keyBlock', 'loot','marker', 'movingPlatform', 'narration', 'npc', 'pitEntrance',
+    'pushPull', 'pushStairs', 'rollingBall', 'saveStatue', 'shieldingUnit', 'shopItem', 'sign', 'spawnMarker', 'spikeBall', 'teleporter', 'tippable', 'torch', 'turret',
     'vineSprout', 'waterfall', 'waterPot',
 ];
 
@@ -231,17 +181,25 @@ export function createObjectDefinition(
 ): ObjectDefinition {
     const x = definition.x || 0;
     const y = definition.y || 0;
+
+    const specialBehaviorKeys = Object.keys(specialBehaviorsHash).filter(
+        key => specialBehaviorsHash[key].type === definition.type
+    );
     const commonProps = {
         // Assign defaults for any props the definitions might require.
         status: getPossibleStatuses(definition.type)[0],
         id: definition.id || '',
         linked: definition.linked,
         logicKey: definition.logicKey,
-        specialBehaviorKey: definition.specialBehaviorKey,
         spirit: definition.spirit,
+        specialBehaviorKey: definition.specialBehaviorKey,
         x,
         y,
     };
+    // Clear the special behavior if it doesn't apply to the new type selected.
+    if (!specialBehaviorKeys.includes(commonProps.specialBehaviorKey)) {
+        delete commonProps.specialBehaviorKey;
+    }
     // Omit spirit/linked if they are false.
     if (!commonProps.linked) {
         delete commonProps.linked;
@@ -307,7 +265,7 @@ export function createObjectDefinition(
             };
         case 'boss': {
             const bossType = definition.enemyType;
-            const lootType = definition.lootType || getLootTypes()[0];
+            const lootType = definition.lootType || allLootTypes[0];
             const enemyDefinition = enemyDefinitions[bossType];
             const params = {};
             for (let key in enemyDefinition?.params || {}) {
@@ -380,6 +338,12 @@ export function createObjectDefinition(
                 toggleOnRelease: definition.toggleOnRelease,
                 type: definition.type,
             };
+        case 'indicator':
+            return {
+                ...commonProps,
+                targetObjectId: definition.targetObjectId,
+                type: definition.type,
+            };
         case 'keyBlock':
             return {
                 ...commonProps,
@@ -408,7 +372,7 @@ export function createObjectDefinition(
         case 'bigChest':
         case 'shopItem':
         case 'loot': {
-            const lootType = definition.lootType || getLootTypes()[0];
+            const lootType = definition.lootType || allLootTypes[0];
             const lootDefinition: LootObjectDefinition = {
                 ...commonProps,
                 type: definition.type,
@@ -427,12 +391,24 @@ export function createObjectDefinition(
             }
             return lootDefinition;
         }
+        case 'movingPlatform':
+            return {
+                ...commonProps,
+                type: definition.type,
+                d: definition.d || 'up',
+                w: definition.w || 32,
+                h: definition.h || 32,
+                speed: definition.speed || 1,
+                turn: definition.turn || 'bounce',
+            };
         case 'airBubbles':
         case 'beadGrate':
         case 'cathode':
+        case 'flameTurret':
         case 'pushPull':
         case 'rollingBall':
         case 'saveStatue':
+        case 'shieldingUnit':
         case 'tippable':
         case 'torch':
         case 'vineSprout':
@@ -443,6 +419,22 @@ export function createObjectDefinition(
                 status: definition.status || commonProps.status,
                 type: definition.type,
             };
+        case 'pushStairs':
+            return {
+                ...commonProps,
+                saveStatus: definition.saveStatus,
+                type: definition.type,
+                w: definition.w || 48,
+                offset: definition.offset || 0,
+            };
+        case 'spikeBall':
+            return {
+                ...commonProps,
+                type: definition.type,
+                d: definition.d || 'up',
+                speed: definition.speed || 1,
+                turn: definition.turn || 'bounce',
+            };
         case 'narration':
             return {
                 ...commonProps,
@@ -452,6 +444,12 @@ export function createObjectDefinition(
                 delay: definition.delay || 0,
                 w: definition.w || 32,
                 h: definition.h || 32,
+            };
+        case 'bell':
+            return {
+                ...commonProps,
+                style: definition.style || Object.keys(bellStyles)[0],
+                type: definition.type,
             };
         case 'sign':
             return {
@@ -500,7 +498,7 @@ function getTargetObjectIdsByTypes(zone: Zone, types: ObjectType[]): string[] {
             }
         }
     }
-    return flatten(combinedObjectIds).filter(id => id);
+    return combinedObjectIds.flat().filter(id => id);
 }
 
 function getTargetObjectIdsByTypesAndArea(area: AreaDefinition, types: ObjectType[]): string[] {
@@ -517,11 +515,11 @@ export function getSwitchTargetProperties(
 ): PanelRows {
     const rows: PanelRows = [];
     const objectIds = [
-        'all',
+        'none',
         ...getTargetObjectIdsByTypesAndArea(state.areaInstance.definition,
             [
                 'door', 'chest', 'loot', 'airBubbles', 'beadGrate', 'beadCascade',
-                'narration',
+                'narration', 'pitEntrance', 'shieldingUnit',
                 'teleporter', 'torch', 'escalator', 'anode'
             ]
         )
@@ -532,14 +530,28 @@ export function getSwitchTargetProperties(
     }
     rows.push({
         name: 'target object',
-        value: object.targetObjectId ?? 'all',
+        value: object.targetObjectId ?? 'none',
         values: objectIds,
         onChange(targetObjectId: string) {
-            object.targetObjectId = targetObjectId;
+            if (targetObjectId === 'none' || targetObjectId === 'all') {
+                delete object.targetObjectId;
+            } else {
+                object.targetObjectId = targetObjectId;
+            }
             updateObjectInstance(state, object);
         },
     });
     return rows;
+}
+
+function getUniqueObjectIdsForBothAreas(state: GameState, editingState: EditingState): string[] {
+    const ids = [];
+    for (const object of [...state.areaInstance.definition.objects, ...state.alternateAreaInstance.definition.objects]) {
+        if (object.id) {
+            ids.push(object.id);
+        }
+    }
+    return [...new Set(ids)];
 }
 
 function getPossibleStatuses(type: ObjectType): ObjectStatus[] {
@@ -570,6 +582,7 @@ function getPossibleStatuses(type: ObjectType): ObjectStatus[] {
         case 'anode':
         case 'escalator':
             return ['normal', 'off', 'frozen'];
+        case 'shieldingUnit':
         case 'turret':
             return ['normal', 'off'];
         default:
@@ -642,7 +655,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                 delete object.hasCustomLogic;
             }
             updateObjectInstance(state, object);
-            displayTileEditorPropertyPanel();
+                    editingState.needsRefresh = true;
         },
     });
     if (object.hasCustomLogic) {
@@ -682,6 +695,14 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             },
         });
     }
+    rows.push({
+        name: 'invisible',
+        value: !!object.isInvisible,
+        onChange(isInvisible: boolean) {
+            object.isInvisible = isInvisible;
+            updateObjectInstance(state, object);
+        },
+    });
     const specialBehaviorKeys = Object.keys(specialBehaviorsHash).filter(
         key => specialBehaviorsHash[key].type === object.type
     );
@@ -741,6 +762,90 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                 },
             });
             break;
+        case 'pushStairs':
+            rows.push({
+                name: 'w',
+                value: object.w,
+                onChange(w: number) {
+                    if (!(w >= 48)) {
+                        return 48;
+                    }
+                    object.w = w;
+                    // Reset the stairs to their starting point when editing them.
+                    if (object.id) {
+                        delete state.savedState.objectFlags[object.id];
+                    }
+                    updateObjectInstance(state, object);
+                },
+            });
+            rows.push({
+                name: 'offset',
+                value: object.offset || 0,
+                onChange(offset: number) {
+                    if (!(offset >= 0)) {
+                        return 0;
+                    }
+                    if (!(offset <= object.w - 32)) {
+                        return object.w - 32;
+                    }
+                    object.offset = offset;
+                    // Reset the stairs to their starting point when editing them.
+                    if (object.id) {
+                        delete state.savedState.objectFlags[object.id];
+                    }
+                    updateObjectInstance(state, object);
+                },
+            });
+            break;
+        case 'movingPlatform':
+            rows.push({
+                name: 'w',
+                value: object.w,
+                onChange(w: number) {
+                    object.w = w;
+                    updateObjectInstance(state, object);
+                },
+            });
+            rows.push({
+                name: 'h',
+                value: object.h,
+                onChange(h: number) {
+                    object.h = h;
+                    updateObjectInstance(state, object);
+                },
+            });
+            // This should fall through to use the same movement properties as the spike ball.
+        case 'spikeBall':
+            rows.push({
+                name: 'direction',
+                value: object.d || 'up',
+                values: ['up', 'down', 'left', 'right'],
+                onChange(d: Direction) {
+                    object.d = d;
+                    updateObjectInstance(state, object);
+                },
+            });
+            rows.push({
+                name: 'speed',
+                value: object.speed,
+                onChange(speed: number) {
+                    if (speed < 0) {
+                        return 0;
+                    }
+                    object.speed = speed;
+                    updateObjectInstance(state, object);
+                },
+            });
+            rows.push({
+                name: 'turn',
+                value: object.turn || 'bounce',
+                values: ['bounce', 'left', 'right'],
+                onChange(turn: 'bounce' | 'left' | 'right') {
+                    object.turn = turn;
+                    updateObjectInstance(state, object);
+                },
+            });
+            break;
         case 'door':
             rows.push(getDirectionFields(state, object));
             rows.push({
@@ -753,10 +858,10 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             });
             rows = [
                 ...rows,
-                ...getLogicProperties(state, 'Force Open?', object.openLogic || {}, updatedLogic => {
+                ...getLogicProperties(state, 'Force Open?', object.openLogic, updatedLogic => {
                     object.openLogic = updatedLogic;
                     updateObjectInstance(state, object);
-                    displayTileEditorPropertyPanel();
+                    editingState.needsRefresh = true;
                 })
             ];
             // This intentionally continue on to the marker properties.
@@ -775,8 +880,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                     }
                     object.targetZone = targetZone;
                     updateObjectInstance(state, object);
-                    // We need to refresh the panel to get the new marker ids for the selected zone.
-                    displayTileEditorPropertyPanel();
+                    editingState.needsRefresh = true;
                 },
             });
             const zone = zones[zoneKey];
@@ -915,6 +1019,22 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             });
             rows = [...rows, ...getSwitchTargetProperties(state, editingState, object)];
             break;
+        case 'indicator':object
+            const ids = getUniqueObjectIdsForBothAreas(state, editingState);
+            rows.push({
+                name: 'target',
+                value: object.targetObjectId ?? 'none',
+                values: ['none', ...ids],
+                onChange(targetObjectId: string) {
+                    if (targetObjectId === 'none') {
+                        delete object.targetObjectId;
+                    } else {
+                        object.targetObjectId = targetObjectId;
+                    }
+                    updateObjectInstance(state, object);
+                },
+            });
+            break;
         case 'keyBlock':
             rows = [...rows, ...getSwitchTargetProperties(state, editingState, object)];
             break;
@@ -1022,7 +1142,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                     }
                     object.dialogueKey = dialogueKey;
                     updateObjectInstance(state, object);
-                    displayTileEditorPropertyPanel();
+                    editingState.needsRefresh = true;
                 },
             });
             if (!object.dialogueKey) {
@@ -1128,6 +1248,8 @@ function getStyleFields(state: GameState, editingState: EditingState, object: Ob
         styles = turretStyles;
     } else if (object.type === 'pitEntrance') {
         styles = pitStyles;
+    } else if (object.type === 'bell') {
+        styles = bellStyles;
     }
     if (!styles) {
         return [];
@@ -1165,11 +1287,11 @@ function getLootFields(state: GameState, editingState: EditingState, object: Obj
     rows.push({
         name: 'lootType',
         value: lootType,
-        values: getLootTypes(),
+        values: allLootTypes,
         onChange(lootType: LootType) {
             object.lootType = lootType;
             updateObjectInstance(state, object);
-            displayTileEditorPropertyPanel();
+            editingState.needsRefresh = true;
         },
     });
     if (lootType === 'money') {
@@ -1201,33 +1323,10 @@ function getLootFields(state: GameState, editingState: EditingState, object: Obj
     return rows;
 }
 
-export function onMouseDownObject(state: GameState, editingState: EditingState, x: number, y: number): void {
-    const newObject: ObjectDefinition = createObjectDefinition(
-        state,
-        {
-            ...editingState.selectedObject,
-            x: Math.round(x + state.camera.x),
-            y: Math.round(y + state.camera.y),
-        }
-    );
-    // type: editingState.tool === 'object' ? editingState.objectType : editingState.tool as 'enemy' | 'boss',
-
-    const frame = getObjectFrame(newObject);
-    newObject.x -= (frame.content?.w || frame.w) / 2;
-    newObject.y -= (frame.content?.h || frame.h) / 2;
-    fixObjectPosition(state, newObject);
-    updateObjectInstance(state, newObject, null, state.areaInstance, true);
-    if (!isKeyboardKeyDown(KEY.SHIFT)) {
-        setEditingTool('select');
-        editingState.selectedObject = newObject;
-        displayTileEditorPropertyPanel();
-    }
-}
-
 export function unselectObject(editingState: EditingState, refresh: boolean = true) {
     editingState.selectedObject = {...editingState.selectedObject};
     delete editingState.selectedObject.id;
-    displayTileEditorPropertyPanel();
+    editingState.needsRefresh = true;
 }
 
 export function onMouseDownSelect(state: GameState, editingState: EditingState, x: number, y: number): void {
@@ -1248,7 +1347,7 @@ export function onMouseDownSelect(state: GameState, editingState: EditingState, 
         }
     }
     if (changedSelection) {
-        displayTileEditorPropertyPanel();
+        editingState.needsRefresh = true;
     }
     // If selectedObject is still set, then we are dragging it, so indicate the drag offset.
     if (state.areaInstance.definition.objects.includes(editingState.selectedObject)) {
@@ -1271,6 +1370,12 @@ export function fixObjectPosition(state: GameState, object: ObjectDefinition): v
         object.x = Math.round(object.x / 16) * 16;
         object.y = Math.round(object.y / 16) * 16;
         return
+    }
+    // Default behavior is to snap to half grid.
+    if (object.type === 'enemy' || object.type === 'boss') {
+        object.x = Math.round(object.x / 4) * 4;
+        object.y = Math.round(object.y / 4) * 4;
+        return;
     }
     // Default behavior is to snap to half grid.
     if (object.type !== 'loot') {

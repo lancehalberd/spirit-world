@@ -1,17 +1,16 @@
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
-import { addEffectToArea } from 'app/content/areas';
 import { LightningDischarge } from 'app/content/effects/lightningDischarge';
-import {
-    moveEnemyFull,
-} from 'app/content/enemies';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import {
     electricSquirrelAnimations, superElectricSquirrelAnimations,
 } from 'app/content/enemyAnimations';
 import { lifeLootTable } from 'app/content/lootTables';
+import {
+    moveEnemyFull,
+} from 'app/utils/enemies';
+import { addEffectToArea } from 'app/utils/effects';
 import { getDirection } from 'app/utils/field';
 
-import { Enemy, GameState, HitProperties, HitResult } from 'app/types';
 
 
 const maxJumpSpeed = 5;
@@ -177,6 +176,11 @@ enemyDefinitions.superSquirrel = {
         return enemy.defaultOnHit(state, hit);
     },
     update(this: void, state: GameState, enemy: Enemy) {
+        if (enemy.area !== state.hero.area) {
+            enemy.healthBarTime = 0;
+            enemy.setMode('hidden');
+            return;
+        }
         enemy.isInvulnerable = (enemy.z > 4);
         enemy.touchHit = (enemy.z <= 0) ? touchHit : null;
         if (enemy.mode === 'pause') {

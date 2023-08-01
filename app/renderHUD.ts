@@ -1,13 +1,11 @@
 import { getLootFrame } from 'app/content/loot';
-import { CANVAS_HEIGHT, CANVAS_WIDTH, isRandomizer } from 'app/gameConstants';
+import { CANVAS_HEIGHT, CANVAS_WIDTH, isRandomizer, randomizerGoalType } from 'app/gameConstants';
 import { getCheckInfo } from 'app/randomizer/checks';
 import { renderTextRow } from 'app/render/renderMessage';
 import { renderSpiritBar } from 'app/render/spiritBar';
 import { shouldHideMenu } from 'app/state';
 import { createAnimation, drawFrame, drawFrameAt, drawFrameCenteredAt } from 'app/utils/animations';
 import { drawText } from 'app/utils/simpleWhiteFont';
-
-import { Enemy, Frame, GameState } from 'app/types';
 
 const [emptyHeart, fullHeart, threeQuarters, halfHeart, quarterHeart] =
     createAnimation('gfx/hud/hearts.png', {w: 10, h: 10}, {cols: 5}).frames;
@@ -69,7 +67,7 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
         drawFrame(context, frame, {...frame, x, y});
         x += 11;
     }
-    const dungeonInventory = state.savedState.dungeonInventories[state.location.zoneKey];
+    const dungeonInventory = state.savedState.dungeonInventories[state.location.logicalZoneKey];
     if (dungeonInventory?.bigKey) {
         drawFrameAt(context, bigKeyFrame, {x: CANVAS_WIDTH - 21, y: 28});
     }
@@ -122,7 +120,7 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
             context.fillRect(x, y, animatedWidth, barHeight);
             const healthWidth = animatedWidth * boss.getHealthPercent(state) | 0;
             if (healthWidth > 0) {
-                context.fillStyle = 'red';
+                context.fillStyle = boss.healthBarColor ?? 'red';
                 context.fillRect(x, y, healthWidth, barHeight);
             }
             const shieldWidth = animatedWidth * boss.getShieldPercent(state) | 0;
@@ -142,7 +140,7 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
         const totalSpace = CANVAS_WIDTH - 32 - otherEnemiesWithHealthBars.length * 4 + 4;
         const barHeight = 4;
         // This probably won't work when there are more than three such enemies.
-        const barWidth = (totalSpace / 3) | 0;
+        const barWidth = (totalSpace / Math.max(3, otherEnemiesWithHealthBars.length)) | 0;
         y -= barHeight;
         x = 16;
         for (const enemy of otherEnemiesWithHealthBars) {
@@ -151,7 +149,7 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
             context.fillRect(x, y, animatedWidth, barHeight);
             const healthWidth = animatedWidth * enemy.getHealthPercent(state) | 0;
             if (healthWidth > 0) {
-                context.fillStyle = 'orange';
+                context.fillStyle = enemy.healthBarColor ?? 'orange';
                 context.fillRect(x, y, healthWidth, barHeight);
             }
             const shieldWidth = animatedWidth * enemy.getShieldPercent(state) | 0;
@@ -173,11 +171,13 @@ export function renderHUD(context: CanvasRenderingContext2D, state: GameState): 
         const secondsString = seconds.toFixed(1).padStart(4, '0');
         const timeString = `${hours}:${minutesString}:${secondsString}`;
         const info = getCheckInfo(state);
-        drawText(context, `${Math.max(0, state.randomizer.goal - state.hero.victoryPoints)}`, 2, CANVAS_HEIGHT - 8 - 16, {
-            textBaseline: 'middle',
-            textAlign: 'left',
-            size: 16,
-        });
+        if (randomizerGoalType === 'victoryPoints') {
+            drawText(context, `${Math.max(0, state.randomizer.goal - state.hero.victoryPoints)}`, 2, CANVAS_HEIGHT - 8 - 16, {
+                textBaseline: 'middle',
+                textAlign: 'left',
+                size: 16,
+            });
+        }
         drawText(context, timeString, 2, CANVAS_HEIGHT - 8, {
             textBaseline: 'middle',
             textAlign: 'left',

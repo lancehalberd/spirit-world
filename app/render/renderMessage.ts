@@ -1,12 +1,7 @@
-import { flatten } from 'lodash';
 import { CANVAS_WIDTH, CANVAS_HEIGHT, GAME_KEY } from 'app/gameConstants';
 import { drawFrame } from 'app/utils/animations';
 import { characterMap, keyboardMap, xboxMap } from 'app/utils/simpleWhiteFont';
 import { fillRect, pad } from 'app/utils/index';
-
-import { prependScript } from 'app/scriptEvents';
-
-import { Frame, GameState, ShowChoiceBoxActiveScriptEvent, TextPage, TextScript } from 'app/types';
 
 const characterWidth = 8;
 const messageWidth = 160;
@@ -25,7 +20,7 @@ function getActiveControllerMaps(state: GameState) {
 function getEscapedFrames(state: GameState, escapedToken: string): Frame[] {
     const controllerMaps = getActiveControllerMaps(state);
     function getGameKeyFrames(key: number) {
-        return flatten(controllerMaps.map(controllerMap => controllerMap[key])).filter(f => f);
+        return controllerMaps.map(controllerMap => controllerMap[key]).flat().filter(f => f);
     }
     switch (escapedToken.toUpperCase()) {
         case 'B_DPAD':
@@ -41,11 +36,15 @@ function getEscapedFrames(state: GameState, escapedToken: string): Frame[] {
         case 'B_WEAPON':
             return getGameKeyFrames(GAME_KEY.WEAPON);
         case 'B_TOOL':
-            return flatten([
+            return [
                 getGameKeyFrames(GAME_KEY.LEFT_TOOL),
                 characterMap['/'],
                 getGameKeyFrames(GAME_KEY.RIGHT_TOOL),
-            ]);
+            ].flat();
+        case 'B_LEFT_TOOL':
+            return getGameKeyFrames(GAME_KEY.LEFT_TOOL);
+        case 'B_RIGHT_TOOL':
+            return getGameKeyFrames(GAME_KEY.RIGHT_TOOL);
         case 'B_PASSIVE':
             return getGameKeyFrames(GAME_KEY.PASSIVE_TOOL);
         case 'B_ROLL':
@@ -54,6 +53,8 @@ function getEscapedFrames(state: GameState, escapedToken: string): Frame[] {
             return getGameKeyFrames(GAME_KEY.MEDITATE);
         case 'B_MENU':
             return getGameKeyFrames(GAME_KEY.MENU);
+        case 'B_MAP':
+            return getGameKeyFrames(GAME_KEY.MAP);
         case 'B_PREVIOUS_ELEMENT':
             return getGameKeyFrames(GAME_KEY.PREVIOUS_ELEMENT);
         case 'B_NEXT_ELEMENT':
@@ -69,16 +70,6 @@ export function textScriptToString(state: GameState, textScript: TextScript): st
         return textScript;
     }
     return textScript(state)
-}
-
-export function showMessage(
-    state: GameState,
-    message: TextScript
-): void {
-    if (!message){
-        return;
-    }
-    prependScript(state, `${textScriptToString(state, message)}{clearTextBox}{wait:200}`);
 }
 
 export function parseMessage(state: GameState, message: TextScript, maxWidth = messageWidth): TextPage[] {

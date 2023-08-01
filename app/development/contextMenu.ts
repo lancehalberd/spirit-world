@@ -1,22 +1,22 @@
-import { getSpawnLocationContextMenuOption, getTestStateContextMenuOption } from 'app/content/spawnLocations';
-import { mainCanvas, tagElement } from 'app/dom';
-import { defeatAllEnemies, KEY, isKeyboardKeyDown } from 'app/keyCommands';
+import { setSpawnLocation } from 'app/content/spawnLocations';
+import { getMapOptions } from 'app/development/contextMenu/map';
+import { getTestStateContextMenuOption } from 'app/development/contextMenu/setState';
+import { contextMenuState, editingState } from 'app/development/editingState';
+import { toggleEditing } from 'app/development/editor';
+import { tagElement } from 'app/dom';
+import { CANVAS_SCALE, overworldKeys } from 'app/gameConstants';
+import { KEY, isKeyboardKeyDown } from 'app/userInput';
+import { showMessage } from 'app/scriptEvents';
 import { getState } from 'app/state';
+import { mainCanvas } from 'app/utils/canvas';
+import { defeatAllEnemies } from 'app/utils/addKeyboardShortcuts';
 import { getElementRectangle } from 'app/utils/index';
 import { getMousePosition } from 'app/utils/mouse';
 import { updateSoundSettings } from 'app/utils/sounds';
-import { showMessage } from 'app/render/renderMessage';
 
-import { MenuOption } from 'app/types';
 
-interface ContextMenuState {
-    contextMenu: ContextMenu,
-}
-const contextMenuState: ContextMenuState = {
-    contextMenu: null,
-}
 
-class ContextMenu {
+export class ContextMenu {
     container: HTMLElement;
     domElement: HTMLElement;
     menuOptions: MenuOption[];
@@ -104,12 +104,46 @@ class ContextMenu {
 }
 
 export function getContextMenu(): MenuOption[] {
-    return [
-        getSpawnLocationContextMenuOption(),
+    const state = getState()
+    // Special context menu for editing map sections when the map is shown with the editor enabled.
+    if (state.paused && state.showMap && editingState.isEditing && !overworldKeys.includes(state.location.zoneKey)) {
+        const selectedSections = overworldKeys.includes(state.areaSection?.mapId)
+            ? [state.areaSection.index] : editingState.selectedSections;
+        if (selectedSections.length) {
+            return getMapOptions(state, selectedSections);
+        }
+    }
+    const options = [
         getAssistanceMenuOption(),
         getSettingsMenuOption(),
         getTestStateContextMenuOption(),
+        {
+            label: 'Save Location',
+            onSelect() {
+                const state = getState();
+                setSpawnLocation(state, state.location);
+            }
+        },
+        {
+            label: editingState.isEditing ? 'Stop Map Editor' : 'Start Map Editor',
+            onSelect() {
+                toggleEditing(getState());
+            }
+        },
     ];
+    if (editingState.isEditing) {
+        options.push({
+            label: 'Log Tile Behaviors',
+            onSelect() {
+                const state = getState();
+                const sx = Math.floor((state.camera.x + lastContextClick[0]) / 16);
+                const sy = Math.floor((state.camera.y + lastContextClick[1]) / 16);
+                console.log(state.areaInstance.behaviorGrid?.[sy]?.[sx]);
+            }
+        });
+    }
+
+    return options;
 }
 
 function getAssistanceMenuOption(): MenuOption {
@@ -139,6 +173,7 @@ function getAssistanceMenuOption(): MenuOption {
                     onSelect() {
                         const state = getState();
                         state.hero.life = 0.25;
+                        state.hero.ironSkinLife = 0;
                     }
                 },
                 {
@@ -215,11 +250,17 @@ function getSettingsMenuOption(): MenuOption {
                             [-] [B_ROLL] Roll
                             [-] [B_MEDITATE] Meditate
                             [-] [B_MENU] Menu
+                            [-] [B_MAP] Map
                             [-] [B_PREVIOUS_ELEMENT] Prev Element
                             [-] [B_NEXT_ELEMENT] Next Element
                         `);
                     }
-
+                },
+                {
+                    label: state.renderMagicCooldown ? 'Hide Cooldown Bar' : 'Show Cooldown Bar',
+                    onSelect() {
+                        state.renderMagicCooldown = !state.renderMagicCooldown;
+                    }
                 }
             ];
         }
@@ -252,6 +293,8 @@ export function hideContextMenu(): void {
     }
 }
 
+let lastContextClick: number[];
+
 export function addContextMenuListeners(): void {
     document.addEventListener('mouseup', function (event) {
         if (event.which !== 1) {
@@ -268,7 +311,13 @@ export function addContextMenuListeners(): void {
         }
         event.preventDefault();
         const [x, y] = getMousePosition();
+        lastContextClick = getMousePosition(mainCanvas, CANVAS_SCALE);
         const menu = getContextMenu();
         showContextMenu(menu, x, y);
     });
+}
+
+class _ContextMenu extends ContextMenu {}
+declare global {
+    export interface ContextMenu extends _ContextMenu {}
 }

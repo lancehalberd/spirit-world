@@ -1,19 +1,11 @@
-import { playAreaSound, refreshAreaLogic } from 'app/content/areas';
-import {
-    toggleTarget,
-    checkIfAllSwitchesAreActivated,
-    deactivateTargets,
-    findObjectInstanceById,
-    getObjectStatus,
-    saveObjectStatus,
-} from 'app/content/objects';
+import { renderIndicator } from 'app/content/objects/indicator';
+import { objectHash } from 'app/content/objects/objectHash';
+import { playAreaSound } from 'app/musicController';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { rectanglesOverlap } from 'app/utils/index';
+import { deactivateTargets, getObjectStatus, saveObjectStatus} from 'app/utils/objects';
+import { checkIfAllSwitchesAreActivated } from 'app/utils/switches';
 
-import {
-    AreaInstance, DrawPriority, FloorSwitchDefinition, GameState,
-    ObjectInstance, ObjectStatus, Rect,
-} from 'app/types';
 
 const [upFrame, downFrame] = createAnimation('gfx/tiles/toggletiles.png', {w: 16, h: 16}, {cols: 2}).frames;
 
@@ -34,16 +26,17 @@ export class FloorSwitch implements ObjectInstance {
             this.status = 'active';
         }
     }
-    getHitbox(state: GameState): Rect {
+    getHitbox(): Rect {
         return { x: this.x + 2, y: this.y + 2, w: 12, h: 12 };
     }
     isDepressed(state: GameState): boolean {
-        const hitbox = this.getHitbox(state);
+        const hitbox = this.getHitbox();
         if (state.hero.z <= 0 && state.hero.area === this.area && state.hero.overlaps(hitbox)) {
             return true;
         }
         for (const object of this.area.objects) {
-            if (object === this || !object.getHitbox) {
+            // Only solid objects with hitboxes can press switches.
+            if (object === this || !object.getHitbox || !(object.behaviors?.solid || object.canPressSwitches)) {
                 continue;
             }
             if (!(object.z > 0) && rectanglesOverlap(object.getHitbox(state), hitbox)) {
@@ -60,8 +53,7 @@ export class FloorSwitch implements ObjectInstance {
             saveObjectStatus(state, this.definition, true);
             if (this.definition.id && (this.definition.saveStatus === 'forever' || this.definition.saveStatus === 'zone')) {
                 // Refresh the area to update layer logic, for example drainging lava in the crater.
-                refreshAreaLogic(state, state.areaInstance);
-                refreshAreaLogic(state, state.alternateAreaInstance);
+                state.areaInstance.needsLogicRefresh = true;
             }
         }
         if (this.definition.toggleOnRelease && this.definition.targetObjectId) {
@@ -80,14 +72,7 @@ export class FloorSwitch implements ObjectInstance {
             return;
         }
         playAreaSound(state, this.area, 'switch');
-        if (this.definition.targetObjectId) {
-            const object = findObjectInstanceById(this.area, this.definition.targetObjectId);
-            toggleTarget(state, object);
-        } else {
-            for (const object of this.area.objects) {
-                toggleTarget(state, object);
-            }
-        }
+        checkIfAllSwitchesAreActivated(state, this.area, this);
     }
 
     update(state: GameState) {
@@ -107,5 +92,14 @@ export class FloorSwitch implements ObjectInstance {
         } else {
             drawFrame(context, upFrame, {...upFrame, x: this.x, y: this.y});
         }
+        if (this.definition.isInvisible && state.hero.passiveTools.trueSight) {
+            renderIndicator(context, this.getHitbox(), state.fieldTime);
+        }
     }
+}
+objectHash.floorSwitch = FloorSwitch;
+
+class _FloorSwitch extends FloorSwitch {}
+declare global {
+    export interface FloorSwitch extends _FloorSwitch {}
 }

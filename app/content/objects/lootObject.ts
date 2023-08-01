@@ -1,20 +1,19 @@
-import { addEffectToArea, addObjectToArea, refreshAreaLogic, removeEffectFromArea, removeObjectFromArea } from 'app/content/areas';
-import { lootEffects, getLootFrame, getLootShadowFrame, showLootMessage } from 'app/content/loot';
-import { getObjectStatus } from 'app/content/objects';
-import { editingState } from 'app/development/tileEditor';
+import { renderIndicator } from 'app/content/objects/indicator';
+import { objectHash } from 'app/content/objects/objectHash';
+import { getLootFrame, getLootShadowFrame, showLootMessage } from 'app/content/loot';
+import { lootEffects } from 'app/content/lootEffects';
+import { editingState } from 'app/development/editingState';
 import { CANVAS_WIDTH, CANVAS_HEIGHT, FRAME_LENGTH } from 'app/gameConstants';
-import { showMessage } from 'app/render/renderMessage';
-import { getState, saveGame } from 'app/state';
-import { createAnimation, drawFrame, drawFrameAt, getFrameHitBox } from 'app/utils/animations';
 import { playSound } from 'app/musicController';
+import { showMessage } from 'app/scriptEvents';
+import { createAnimation, drawFrame, drawFrameAt, getFrameHitBox } from 'app/utils/animations';
+import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import { pad, boxesIntersect } from 'app/utils/index';
+import { setObjectFlag } from 'app/utils/objectFlags';
+import { addObjectToArea, getObjectStatus, removeObjectFromArea } from 'app/utils/objects';
 import { drawText } from 'app/utils/simpleWhiteFont';
+import { saveGame } from 'app/utils/saveGame';
 
-import {
-    AreaInstance, BossObjectDefinition, DialogueLootDefinition, Direction,
-    EffectInstance, Frame, GameState, Hero, LootObjectDefinition,
-    LootTable, ObjectInstance, ObjectStatus, Rect, TileBehaviors,
-} from 'app/types';
 
 /*const [coin] =
     createAnimation('gfx/hud/money.png', {w: 16, h: 16}, {x: 9}).frames;*/
@@ -66,9 +65,8 @@ export class LootGetAnimation implements EffectInstance {
     y: number;
     z: number;
     status: ObjectStatus = 'normal';
-    constructor(loot: AnyLootDefinition) {
+    constructor(state: GameState, loot: AnyLootDefinition) {
         this.loot = loot;
-        const state = getState();
         this.frame = getLootFrame(state, loot);
         if (loot.type === 'bigChest') {
             this.x = loot.x + chestOpenedFrame.w - this.frame.w / 2;
@@ -96,9 +94,9 @@ export class LootGetAnimation implements EffectInstance {
             } else if (this.loot.lootType === 'peachOfImmortalityPiece' || this.loot.lootType === 'money'
                 || this.loot.lootType === 'smallKey' || this.loot.lootType === 'map' || this.loot.lootType === 'peach'
             ) {
-                playSound('smallSuccessChime');
+                playSound(state, 'smallSuccessChime');
             } else {
-                playSound('bigSuccessChime');
+                playSound(state, 'bigSuccessChime');
             }
         }
         if (this.animationTime === 1000) {
@@ -124,6 +122,7 @@ export class LootObject implements ObjectInstance {
     x: number;
     y: number;
     z: number = 0;
+    groundHeight = 0;
     status: ObjectStatus;
     time = 0;
     constructor(state: GameState, definition: LootObjectDefinition) {
@@ -170,7 +169,7 @@ export class LootObject implements ObjectInstance {
                 const onPickup = lootEffects[this.definition.lootType] || lootEffects.unknown;
                 onPickup(state, this.definition);
                 if (this.definition.lootType === 'money') {
-                    playSound('getMoney');
+                    playSound(state, 'getMoney');
                 }
                 removeObjectFromArea(state, this);
             }
@@ -236,17 +235,14 @@ export function getLoot(this: void, state: GameState, definition: AnyLootDefinit
     definition = getActualLootDefinition(state, definition);
     const onPickup = lootEffects[definition.lootType] || lootEffects.unknown;
     state.hero.action = 'getItem';
-    const lootAnimation = new LootGetAnimation(definition);
+    const lootAnimation = new LootGetAnimation(state, definition);
     // Apply the pickup after creating the loot animation so that it uses the correct graphic for progressive items.
     onPickup(state, definition);
     addEffectToArea(state, state.hero.area, lootAnimation);
     state.hero.area.priorityObjects.push([lootAnimation]);
-    // Hack to prevent the game from looking like it is freezing when you obtain the tower staff.
-    const fastRefresh = definition.lootType === 'staff';
-    // Refresh the area so that the guardian NPC moves to the correct location now that the boss is defeated.
-    refreshAreaLogic(state, state.areaInstance, fastRefresh);
-    refreshAreaLogic(state, state.alternateAreaInstance, fastRefresh);
-    saveGame();
+    // Refresh the area in case acquiring the item has change the logic of the area.
+    state.areaInstance.needsLogicRefresh = true;
+    saveGame(state);
 }
 
 // Simple loot drop doesn't show the loot animation when collected.
@@ -271,7 +267,7 @@ export class LootDropObject extends LootObject {
     alwaysReset = true;
     isObject = <const>true;
     update(state: GameState) {
-        if (this.z > 0 || this.vz > 0) {
+        if (this.z > (this.groundHeight || 0) || this.vz > 0) {
             this.x += this.vx;
             this.y += this.vy;
             this.z += this.vz;
@@ -289,7 +285,7 @@ export class LootDropObject extends LootObject {
                     const onPickup = lootEffects[this.definition.lootType] || lootEffects.unknown;
                     onPickup(state, this.definition);
                     if (this.definition.lootType === 'money') {
-                        playSound('getMoney');
+                        playSound(state, 'getMoney');
                     }
                     removeObjectFromArea(state, this);
                     break;
@@ -301,8 +297,13 @@ export class LootDropObject extends LootObject {
 
 
 
-const [chestClosedFrame, chestOpenedFrame] = createAnimation('gfx/tiles/chest.png',
+const [chestClosedFrame, chestOpenedFrame] = createAnimation('gfx/objects/chest.png',
     {w: 18, h: 20, content: {x: 1, y: 4, w: 16, h: 16}}, {cols: 2}
+).frames;
+
+
+const [largeChestClosedFrame, largeChestOpenedFrame] = createAnimation('gfx/objects/chest2.png',
+    {w: 36, h: 40, content: {x: 2, y: 8, w: 32, h: 32}}, {cols: 2}
 ).frames;
 
 export class ChestObject implements ObjectInstance {
@@ -338,7 +339,7 @@ export class ChestObject implements ObjectInstance {
             }*/
         }
     }
-    getHitbox(state: GameState): Rect {
+    getHitbox(): Rect {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
     isOpen(state: GameState): boolean {
@@ -349,6 +350,10 @@ export class ChestObject implements ObjectInstance {
         // Surpisingly, this prevents the Astral Projection from opening chests,
         // because the hero always faces south when meditating.
         if (!this.definition.id || state.hero.d !== 'up') {
+            return;
+        }
+        // The hero cannot open chests that they cannot see.
+        if (this.definition.isInvisible && !state.hero.passiveTools.trueSight) {
             return;
         }
         state.hero.action = null;
@@ -367,23 +372,23 @@ export class ChestObject implements ObjectInstance {
         getLoot(state, this.definition);
     }
     update(state: GameState) {
-        // Make sure empty chese are recorded as opened for the randomizer, since some logic
+        // Make sure empty chests are recorded as opened for the randomizer, since some logic
         // depends on whether a chest was opened yet (cocoon small key chest, for example).
         if (this.definition.id && !state.savedState.objectFlags[this.definition.id] && this.isOpen(state)) {
             if (this.x + 16 > state.camera.x && this.x < state.camera.x + CANVAS_WIDTH
                 && this.y + 16 > state.camera.y && this.y < state.camera.y + CANVAS_HEIGHT
                 && this.definition.lootType === 'empty'
             ) {
-                state.savedState.objectFlags[this.definition.id] = true;
-                // Refresh the area so that the guardian NPC moves to the correct location now that the boss is defeated.
-                refreshAreaLogic(state, state.areaInstance);
-                refreshAreaLogic(state, state.alternateAreaInstance);
-                saveGame();
+                setObjectFlag(state, this.definition.id);
+                saveGame(state);
             }
         }
     }
     render(context, state: GameState) {
         if (this.status === 'hidden' || this.status === 'hiddenEnemy' || this.status === 'hiddenSwitch') {
+            if (state.hero.passiveTools.trueSight) {
+                renderIndicator(context, this.getHitbox(), state.fieldTime);
+            }
             return;
         }
         if (this.isOpen(state)) {
@@ -394,6 +399,9 @@ export class ChestObject implements ObjectInstance {
             drawFrame(context, chestClosedFrame, {
                 ...chestClosedFrame, x: this.x - chestClosedFrame.content.x, y: this.y - chestClosedFrame.content.y
             });
+        }
+        if (this.definition.isInvisible && state.hero.passiveTools.trueSight) {
+            renderIndicator(context, this.getHitbox(), state.fieldTime);
         }
     }
 }
@@ -413,12 +421,16 @@ export class BigChest extends ChestObject implements ObjectInstance {
     y: number;
     z: number;
     status: ObjectStatus;
-    getHitbox(state: GameState): Rect {
+    getHitbox(): Rect {
         return { x: this.x, y: this.y, w: 32, h: 32 };
     }
     onGrab(state: GameState) {
         // You can only open a chest from the bottom.
         if (state.hero.d !== 'up') {
+            return;
+        }
+        // The hero cannot open chests that they cannot see.
+        if (this.definition.isInvisible && !state.hero.passiveTools.trueSight) {
             return;
         }
         state.hero.action = null;
@@ -430,7 +442,7 @@ export class BigChest extends ChestObject implements ObjectInstance {
             }
             return;
         }
-        if (!state.savedState.dungeonInventories[state.location.zoneKey]?.bigKey) {
+        if (!state.savedState.dungeonInventories[state.location.logicalZoneKey]?.bigKey) {
             showMessage(state, 'You need a special key to open this chest.');
             return;
         }
@@ -444,15 +456,9 @@ export class BigChest extends ChestObject implements ObjectInstance {
     }
     render(context, state: GameState) {
         if (this.isOpen(state)) {
-            drawFrame(context, chestOpenedFrame, {
-                x: this.x - chestOpenedFrame.content.x, y: this.y - chestOpenedFrame.content.y,
-                w: chestOpenedFrame.w * 2, h: chestOpenedFrame.h * 2,
-            });
+            drawFrameAt(context, largeChestOpenedFrame, {x: this.x, y: this.y});
         } else {
-            drawFrame(context, chestClosedFrame, {
-                x: this.x - chestClosedFrame.content.x, y: this.y - chestClosedFrame.content.y,
-                w: chestClosedFrame.w * 2, h: chestClosedFrame.h * 2,
-            });
+            drawFrameAt(context, largeChestClosedFrame, {x: this.x, y: this.y});
         }
     }
 }
@@ -478,6 +484,10 @@ export class ShopObject extends LootObject implements ObjectInstance {
     }
     onGrab(state: GameState, d: Direction, hero: Hero) {
         if (hero !== state.hero) {
+            return;
+        }
+        // The hero cannot purchase items that they cannot see.
+        if (this.definition.isInvisible && !state.hero.passiveTools.trueSight) {
             return;
         }
         state.hero.action = null;
@@ -534,3 +544,8 @@ export class ShopObject extends LootObject implements ObjectInstance {
         });
     }
 }
+
+objectHash.bigChest = BigChest;
+objectHash.chest = ChestObject;
+objectHash.loot = LootObject
+objectHash.shopItem = ShopObject;

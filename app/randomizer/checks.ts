@@ -1,5 +1,4 @@
 
-import { GameState } from 'app/types';
 
 const allChecks = new Set<string>();
 const checksByZone: {[key: string]: Set<string>} = {};
@@ -14,7 +13,7 @@ export function getCheckInfo(state: GameState) {
             checksCompleted++;
         }
     }
-    const zoneChecks = checksByZone[state.location.zoneKey] || new Set<string>();
+    const zoneChecks = checksByZone[state.location.logicalZoneKey] || new Set<string>();
     for (const key of zoneChecks.keys()) {
         if (state.savedState.objectFlags[key]) {
             zoneChecksCompleted++;
@@ -28,8 +27,8 @@ export function getCheckInfo(state: GameState) {
     };
 }
 
-export function addCheck(checkId: string, zoneKey: string) {
+export function addCheck(checkId: string, logicalZoneKey: LogicalZoneKey) {
     allChecks.add(checkId);
-    checksByZone[zoneKey] = checksByZone[zoneKey] || new Set();
-    checksByZone[zoneKey].add(checkId);
+    checksByZone[logicalZoneKey] = checksByZone[logicalZoneKey] || new Set();
+    checksByZone[logicalZoneKey].add(checkId);
 }
