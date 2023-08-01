@@ -497,9 +497,9 @@ const rivalStaffJumpRightAnimation: FrameAnimation = createAnimation(rivalImg, r
 const rivalStaffJumpUpAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 2, x: 1, y: 20, duration: 3,   frameMap: [0, 0, 0, 0, 0, 1, 1, 1, 1]});
 const rivalStaffJumpLeftAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 3, x: 1, y: 21, duration: 3, frameMap: [0, 1, 1, 1, 1, 2, 2, 2, 2]});
 const rivalStaffSlamDownAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 1, x: 4, y: 18, duration: 9});
-const rivalStaffSlamRightAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 1, x: 9, y: 19, duration: 9});
-const rivalStaffSlamUpAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 1, x: 13, y: 20, duration: 9});
-const rivalStaffSlamLeftAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 1, x: 18, y: 21, duration: 9});
+const rivalStaffSlamRightAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 1, x: 4, y: 19, duration: 9});
+const rivalStaffSlamUpAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 1, x: 3, y: 20, duration: 9});
+const rivalStaffSlamLeftAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 1, x: 4, y: 21, duration: 9});
 
 // const staffImg = 'gfx/effects/wukong_staff.png';
 // const staffGeometry = {w: 123, h: 181};
