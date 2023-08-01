@@ -47,9 +47,6 @@ Pending Graphics From Jon:
 
 
 Current tasks:
-    - Crystal collector doesn't turn on waterfall second time.
-
-    - Fix download speed can be very slow
     - Add material tile -> spirit tile mapping function:
         - Add reasonable defaults like based on defaultLayer, solid, solidMap
         - Check explicit tile mappings first

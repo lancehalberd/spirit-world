@@ -330,17 +330,7 @@ const turnOnRandomCascade = (state: GameState, enemy: Enemy, count = 1) => {
     let numberEnabled = 0;
     while (beadCascades.length) {
         const cascade = Random.removeElement(beadCascades);
-        // Initially the cascades are turned off by being hidden,
-        // But after being turned on once they will be turned off
-        // by having the `isOn` flag set to false.
-        if (cascade.status !== 'normal') {
-            cascade.onActivate(state);
-            numberEnabled++;
-            if (numberEnabled >= count) {
-                return;
-            }
-        } else if (!cascade.isOn) {
-            cascade.turnOn(state);
+        if (turnOnCascade(state, cascade)) {
             numberEnabled++;
             if (numberEnabled >= count) {
                 return;
@@ -348,6 +338,20 @@ const turnOnRandomCascade = (state: GameState, enemy: Enemy, count = 1) => {
         }
     }
 };
+
+function turnOnCascade(state: GameState, cascade: BeadCascade): boolean {
+    // Initially the cascades are turned off by being hidden,
+    // But after being turned on once they will be turned off
+    // by having the `isOn` flag set to false.
+    if (cascade.status !== 'normal') {
+        cascade.onActivate(state);
+        return true
+    } else if (!cascade.isOn) {
+        cascade.turnOn(state);
+        return true;
+    }
+    return false;
+}
 
 function updateCrystalCollector(this: void, state: GameState, enemy: Enemy): void {
     const { enrageLevel } = enemy.params;
@@ -431,12 +435,12 @@ function updateCrystalCollector(this: void, state: GameState, enemy: Enemy): voi
             addFloorEye(state, enemy.area, tx, ty);
         } else if (enemy.params.enrageTime <= 3000) {
             enemy.changeToAnimation('confused');
-            const beadCascades = enemy.area.objects.filter(o => o.definition?.type === 'beadCascade');
+            const beadCascades = enemy.area.objects.filter(o => o.definition?.type === 'beadCascade') as BeadCascade[];
             // Activate all bead cascades from left to right, one each 100ms, for 1000ms
             // This assumes the index of the cascades is in order of their left to right position.
             for (let i = 0; i < beadCascades.length; i++) {
                 if (enemy.params.enrageTime === 3000 - 100 * i) {
-                    beadCascades[i].onActivate(state);
+                    turnOnCascade(state, beadCascades[i]);
                 }
             }
         } else {

@@ -89,6 +89,7 @@ export class BeadCascade implements ObjectInstance {
     onActivate(state: GameState): boolean {
         if (this.definition.status !== 'normal') {
             this.status = 'normal';
+            this.animationTime = 0;
         } else {
             this.status = 'hidden';
         }
