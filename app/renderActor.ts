@@ -210,20 +210,34 @@ export function renderHeroBarrier(context: CanvasRenderingContext2D, state: Game
 
 export function renderHeroEyes(context: CanvasRenderingContext2D, state: GameState, hero: Hero) {
     const frame = heroAnimations.idle.down.frames[0];
-    let eyeFrame = {...frame, x: 4, y: 11, w: 3, h: 2};
+    let xOffset = 4, yOffset = 11;
+    let eyeFrame = {...frame, x: frame.x + xOffset, y: frame.y + yOffset, w: 3, h: 2};
     drawFrame(context, eyeFrame, {
-        x: hero.x - eyeFrame.content.x + eyeFrame.x,
-        y: hero.y - eyeFrame.content.y + eyeFrame.y - hero.z,
+        x: hero.x - eyeFrame.content.x + xOffset,
+        y: hero.y - eyeFrame.content.y + yOffset - hero.z,
         w: eyeFrame.w,
         h: eyeFrame.h,
     });
-    eyeFrame = {...frame, x: 11, y: 11, w: 3, h: 2};
+    // Until we get new graphics for this, just color the irises light blue for contrast.
+    context.fillStyle = '#0CF';
+    context.fillRect((hero.x - eyeFrame.content.x + xOffset + 1) | 0, (hero.y - eyeFrame.content.y + yOffset - hero.z) | 0, 1, 2);
+    /*context.fillStyle = '#08D';
+    context.fillRect(hero.x - eyeFrame.content.x + xOffset, hero.y - eyeFrame.content.y + yOffset - hero.z, 1, 1);
+    context.fillStyle = '#0CF';
+    context.fillRect(hero.x - eyeFrame.content.x + xOffset, hero.y - eyeFrame.content.y + yOffset - hero.z + 1, 1, 1);*/
+    xOffset = 11;
+    eyeFrame = {...frame, x: frame.x + xOffset, y: frame.y + 11, w: 3, h: 2};
     drawFrame(context, eyeFrame, {
-        x: hero.x - eyeFrame.content.x + eyeFrame.x,
-        y: hero.y - eyeFrame.content.y + eyeFrame.y - hero.z,
+        x: hero.x - eyeFrame.content.x + xOffset,
+        y: hero.y - eyeFrame.content.y + yOffset - hero.z,
         w: eyeFrame.w,
         h: eyeFrame.h,
     });
+    context.fillRect((hero.x - eyeFrame.content.x + xOffset + 1) | 0, (hero.y - eyeFrame.content.y + yOffset - hero.z) | 0, 1, 2);
+    /*context.fillStyle = '#08D';
+    context.fillRect(hero.x - eyeFrame.content.x + xOffset + 2, hero.y - eyeFrame.content.y + yOffset - hero.z, 1, 1);
+    context.fillStyle = '#0CF';
+    context.fillRect(hero.x - eyeFrame.content.x + xOffset + 2, hero.y - eyeFrame.content.y + yOffset - hero.z + 1, 1, 1);*/
 }
 
 export function renderCarriedTile(context: CanvasRenderingContext2D, state: GameState, actor: Actor): void {

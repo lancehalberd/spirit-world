@@ -20,7 +20,7 @@ import { certainLifeLootTable, simpleLootTable, lifeLootTable, moneyLootTable } 
 import { renderIndicator } from 'app/content/objects/indicator';
 import { editingState } from 'app/development/editingState';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { drawFrameAt, drawFrameCenteredAt } from 'app/utils/animations';
+import { drawFrameCenteredAt } from 'app/utils/animations';
 import {
     paceAndCharge, paceRandomly, scurryAndChase,
 } from 'app/utils/enemies';
@@ -218,10 +218,6 @@ enemyDefinitions.floorEye = {
             }
             return;
         }
-        // Draw the dead frame behind the enemy, so the background doesn't flash when
-        // the enemy is damaged.
-        const frame = floorEyeAnimations.defeated.down.frames[0];
-        drawFrameAt(context, frame, enemy);
         enemy.defaultRender(context, state);
     },
 };

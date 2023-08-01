@@ -11,8 +11,7 @@ import {
     ceilingBehavior,
     southernWallBehavior,
 } from 'app/content/tiles/constants';
-import { requireImage } from 'app/utils/images';
-
+import { requireFrame } from 'app/utils/packedImages';
 
 const leftRailMask = BITMAP_LEFT_5;
 const rightRailMask = BITMAP_RIGHT_5;
@@ -28,7 +27,7 @@ const baseRailBehavior: TileBehaviors = { defaultLayer: 'field', low: true };
 // Railings are 5px wide on the sides, 5 px tall on the south and 7px tall on the north
 const stoneRailings1: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/stonebuildingtileset.png'), x: 0, y: 0, w: 256, h: 96},
+    source: requireFrame('gfx/tiles/stonebuildingtileset.png', {x: 0, y: 0, w: 256, h: 96}),
     behaviors: {
         '0x0': { ...baseRailBehavior, solidMap: topAndLeftRailMask },
         '1x0': { ...baseRailBehavior, solidMap: topRailMask },
@@ -54,7 +53,7 @@ const stoneRailings1: TileSource = {
 };
 const stoneRailings2: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/stonebuildingtileset.png'), x: 0, y: 0, w: 256, h: 96},
+    source: requireFrame('gfx/tiles/stonebuildingtileset.png', {x: 0, y: 0, w: 256, h: 96}),
     behaviors: {
         '6x0': { ...baseRailBehavior, solidMap: topAndLeftRailMask },
         '7x0': { ...baseRailBehavior, solidMap: topRailMask },
@@ -95,7 +94,7 @@ const stoneRailings2: TileSource = {
 
 const stoneWallTiles: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/stonebuildingtileset.png'), x: 0, y: 0, w: 256, h: 96},
+    source: requireFrame('gfx/tiles/stonebuildingtileset.png', {x: 0, y: 0, w: 256, h: 96}),
     behaviors: {
         'all': southernWallBehavior,
         '5x5': { ...southernWallBehavior, solidMap: BITMAP_TOP_6},
@@ -109,7 +108,7 @@ const stoneWallTiles: TileSource = {
 
 const stoneCeilingTiles: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/stonebuildingtileset.png'), x: 0, y: 0, w: 256, h: 96},
+    source: requireFrame('gfx/tiles/stonebuildingtileset.png', {x: 0, y: 0, w: 256, h: 96}),
     behaviors: {
         'all': ceilingBehavior,
         '11x0': bottomCeilingBehavior,

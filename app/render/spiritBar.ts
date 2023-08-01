@@ -1,8 +1,6 @@
 import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { createCanvasAndContext } from 'app/utils/canvas';
 
-
-
 const [
     /*topCap*/, bottomCap,
     // These are drawn on the top/bottom 5px of the bar itself.
@@ -36,7 +34,7 @@ export const [
 ).frames;
 
 // This frame needs to have the exact height+y set on it so that it stretches verically correctly.
-spiritFill.y = 13;
+spiritFill.y += 13;
 spiritFill.h = 1;
 
 const [spiritBarFrameCanvas, spiritBarFrameContext] = createCanvasAndContext(32, 100 + 42);

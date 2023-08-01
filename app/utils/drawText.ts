@@ -1,8 +1,8 @@
-import { requireImage } from 'app/utils/images';
+import { requireFrame } from 'app/utils/packedImages';
 
 const cachedFonts = {};
 
-const font = requireImage('gfx/whiteFont.png');
+const fontSource = 'gfx/whiteFont.png';
 const aCode = 'a'.charCodeAt(0);
 const characterMap = {};
 for (let i = 0; i < 26; i++) {
@@ -13,7 +13,7 @@ for (let i = 0; i < 26; i++) {
     if (c === 'm' || c === 't' || c === 'w' || c === 'x' || c === 'y') {
         w++;
     }
-    characterMap[c] = {x: col * 5, y: row * 6, w, h: 6};
+    characterMap[c] = requireFrame(fontSource, {x: col * 5, y: row * 6, w, h: 6});
 }
 
 export function drawSpecialFontText(context, text, x, y,
@@ -40,7 +40,7 @@ export function drawSpecialFontText(context, text, x, y,
     for (const c of text.toLowerCase()) {
         const r = characterMap[c];
         if (r) {
-            context.drawImage(font,
+            context.drawImage(r.image,
                 r.x, r.y, r.w, r.h,
                 x, y, r.w * scale, r.h * scale,
             );

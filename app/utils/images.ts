@@ -1,24 +1,24 @@
-
-export const images: {[key: string]: HTMLImageElement & { originalSource?: string}} = {};
+export const images: {[key: string]: HTMLImageElement} = {};
 
 const version = window.version;
 
-function loadImage(source, callback) {
+function loadImage(source: string, callback: () => void): HTMLImageElement {
     images[source] = new Image();
     images[source].onload = () => callback();
     images[source].src = `${source}?v=${version}`;
-    // Used for serializing images.
-    images[source].originalSource = source;
     return images[source];
 }
 
 let startedLoading = false;
 let numberOfImagesLeftToLoad = 0;
-export function requireImage(imageFile) {
+export function requireImage(imageFile: string, callback?: () => void): HTMLImageElement {
     if (images[imageFile]) return images[imageFile];
     startedLoading = true;
     numberOfImagesLeftToLoad++;
-    return loadImage(imageFile, () => numberOfImagesLeftToLoad--);
+    return loadImage(imageFile, () => {
+        callback?.();
+        numberOfImagesLeftToLoad--;
+    });
 }
 
 let allImagesAreLoaded = false;

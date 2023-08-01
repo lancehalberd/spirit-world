@@ -4,14 +4,13 @@ import { moveActor } from 'app/moveActor';
 import { drawFrameAt } from 'app/utils/animations';
 import { directionMap } from 'app/utils/field';
 import { createCanvasAndContext, debugCanvas } from 'app/utils/canvas';
-import { allImagesLoaded, requireImage } from 'app/utils/images';
+import { allImagesLoaded } from 'app/utils/images';
 import { isObjectInsideTarget, pad } from 'app/utils/index';
+import { requireFrame } from 'app/utils/packedImages';
 
-
-//const woodenStairs: Frame = {image: requireImage('gfx/woodhousetilesarranged.png'), x: 224, y: 16, w: 16, h: 48};
 // Middle wooden stair tile for escalator.
-const woodenStairs: Frame = {image: requireImage('gfx/tiles/woodhousetilesarranged.png'), x: 224, y: 32, w: 16, h: 16};
-const verticalBelt: Frame = {image: requireImage('gfx/tiles/woodhousetilesarranged.png'), x: 208, y: 96, w: 16, h: 16};
+const woodenStairs: Frame = requireFrame('gfx/tiles/woodhousetilesarranged.png', {x: 224, y: 32, w: 16, h: 16});
+const verticalBelt: Frame = requireFrame('gfx/tiles/woodhousetilesarranged.png', {x: 208, y: 96, w: 16, h: 16});
 const [horizontalBeltCanvas, horizontalBeltContext] = createCanvasAndContext(16, 16);
 const [verticalBeltCanvas, verticalBeltContext] = createCanvasAndContext(16, 16);
 const [escalatorCanvas, escalatorContext] = createCanvasAndContext(16, 16);

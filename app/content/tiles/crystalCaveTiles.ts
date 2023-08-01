@@ -12,13 +12,11 @@ import {
     topRightWall,
     topLeftWall,
 } from 'app/content/tiles/constants';
-import { requireImage } from 'app/utils/images';
-
-
+import { requireFrame } from 'app/utils/packedImages';
 
 const crystalCaveCeiling: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/crystalcavesheet.png'), x: 0, y: 0, w: 48, h: 64},
+    source: requireFrame('gfx/tiles/crystalcavesheet.png', {x: 0, y: 0, w: 48, h: 64}),
     behaviors: {
         'all': { defaultLayer: 'foreground2' },
         '0x12': bottomLeftCeiling, '1x12': bottomLeftCeiling,
@@ -36,7 +34,7 @@ const crystalCaveCeiling: TileSource = {
 
 const crystalCaveCeilingTopAngles: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/crystalcavesheet.png'), x: 0, y: 0, w: 48, h: 80},
+    source: requireFrame('gfx/tiles/crystalcavesheet.png', {x: 0, y: 0, w: 48, h: 80}),
     behaviors: {
         '8x2': bottomLeftCeiling, '9x2': bottomLeftCeiling,
         '10x2': bottomRightCeiling, '11x2': bottomRightCeiling,
@@ -48,7 +46,7 @@ const crystalCaveCeilingTopAngles: TileSource = {
 
 const crystalCaveWalls: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/crystalcavesheet.png'), x: 0, y: 0, w: 48, h: 80},
+    source: requireFrame('gfx/tiles/crystalcavesheet.png', {x: 0, y: 0, w: 48, h: 80}),
     behaviors: {
         'all': southernWallBehavior,
         '12x3': topRightWall, '13x3': topRightWall,
@@ -64,7 +62,7 @@ const crystalCaveWalls: TileSource = {
 
 const crystalCaveStairs: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/crystalcavesheet.png'), x: 0, y: 0, w: 48, h: 64},
+    source: requireFrame('gfx/tiles/crystalcavesheet.png', {x: 0, y: 0, w: 48, h: 64}),
     behaviors: {
         'all': { defaultLayer: 'field' },
     },
@@ -79,7 +77,7 @@ const crystalCaveStairs: TileSource = {
 
 const crystalCaveLedges: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/crystalcavesheet.png'), x: 0, y: 0, w: 48, h: 64},
+    source: requireFrame('gfx/tiles/crystalcavesheet.png', {x: 0, y: 0, w: 48, h: 64}),
     behaviors: {
         'all': { defaultLayer: 'floor2' },
         '8x8': { defaultLayer: 'floor2', ledges: { right: true } },
@@ -141,7 +139,7 @@ const crystalCaveLedges: TileSource = {
 
 const crystalCaveFloorDecorations: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/crystalcavesheet.png'), x: 0, y: 0, w: 48, h: 64},
+    source: requireFrame('gfx/tiles/crystalcavesheet.png', {x: 0, y: 0, w: 48, h: 64}),
     behaviors: {
         'all': { defaultLayer: 'floor2' },
     },
@@ -162,7 +160,7 @@ const crystalCaveFloorDecorations: TileSource = {
 
 const crystalCaveFloor: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/crystalcavesheet.png'), x: 0, y: 0, w: 48, h: 64},
+    source: requireFrame('gfx/tiles/crystalcavesheet.png', {x: 0, y: 0, w: 48, h: 64}),
     behaviors: {
         'all': { defaultLayer: 'floor' },
         '13x5': { defaultLayer: 'field', underTile: 4, isBrittleGround: true},
@@ -174,7 +172,7 @@ const crystalCaveFloor: TileSource = {
 };
 const crystalCaveFloorEdges: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/crystalcavesheet.png'), x: 0, y: 0, w: 48, h: 64},
+    source: requireFrame('gfx/tiles/crystalcavesheet.png', {x: 0, y: 0, w: 48, h: 64}),
     behaviors: {
         'all': { defaultLayer: 'floor2' },
     },
@@ -186,7 +184,7 @@ const crystalCaveFloorEdges: TileSource = {
 
 const crystalGrates: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/crystalgrateplain.png'), x: 0, y: 0, w: 48, h: 32},
+    source: requireFrame('gfx/tiles/crystalgrateplain.png', {x: 0, y: 0, w: 48, h: 32}),
     behaviors: {
         'all': { defaultLayer: 'floor2' },
     },

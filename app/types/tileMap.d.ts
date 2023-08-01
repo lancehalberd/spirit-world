@@ -1,3 +1,18 @@
+interface PackedImage extends Rect {
+    originalSource: string
+}
+
+interface PackedImageData {
+    packedImages: PackedImage[]
+    image: HTMLImageElement | HTMLCanvasElement
+}
+
+// PackedImageData with additional fields used while packing.
+interface PackingImageData extends PackedImageData {
+    grid: boolean[][]
+    context: CanvasRenderingContext2D
+}
+
 interface TileSource {
     // The size of the tiles
     w: number,

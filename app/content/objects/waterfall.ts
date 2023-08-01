@@ -2,7 +2,7 @@ import { objectHash } from 'app/content/objects/objectHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { drawFrameAt } from 'app/utils/animations';
 import { createCanvasAndContext } from 'app/utils/canvas';
-import { requireImage } from 'app/utils/images';
+import { requireFrame } from 'app/utils/packedImages';
 
 export class Waterfall implements ObjectInstance {
     area: AreaInstance;
@@ -75,18 +75,18 @@ class WaterfallBack implements ObjectInstance {
     }
 }
 
-const waterfallImage = requireImage('gfx/tiles/waterfalltilesdeep.png');
+const waterfallImage = 'gfx/tiles/waterfalltilesdeep.png';
 
-const waterfallTopPattern: FrameWithPattern = {image: waterfallImage, x: 16, y: 12, w: 32, h: 20};
-const waterfallMiddlePattern: FrameWithPattern = {image: waterfallImage, x: 16, y: 32, w: 32, h: 16};
-const waterfallBottomPattern: FrameWithPattern = {image: waterfallImage, x: 16, y: 48, w: 32, h: 16};
-const waterfallLeftPattern: FrameWithPattern = {image: waterfallImage, x: 0, y: 32, w: 16, h: 16};
-const waterfallRightPattern: FrameWithPattern = {image: waterfallImage, x: 48, y: 32, w: 16, h: 16};
+const waterfallTopPattern: FrameWithPattern = requireFrame(waterfallImage, {x: 16, y: 12, w: 32, h: 20});
+const waterfallMiddlePattern: FrameWithPattern = requireFrame(waterfallImage, {x: 16, y: 32, w: 32, h: 16});
+const waterfallBottomPattern: FrameWithPattern = requireFrame(waterfallImage, {x: 16, y: 48, w: 32, h: 16});
+const waterfallLeftPattern: FrameWithPattern = requireFrame(waterfallImage, {x: 0, y: 32, w: 16, h: 16});
+const waterfallRightPattern: FrameWithPattern = requireFrame(waterfallImage, {x: 48, y: 32, w: 16, h: 16});
 
-const waterfallTL: Frame = {image: waterfallImage, x: 0, y: 12, w: 16, h: 20};
-const waterfallTR: Frame = {image: waterfallImage, x: 48, y: 12, w: 16, h: 20};
-const waterfallBL: Frame = {image: waterfallImage, x: 0, y: 48, w: 16, h: 16};
-const waterfallBR: Frame = {image: waterfallImage, x: 48, y: 48, w: 16, h: 16};
+const waterfallTL: Frame = requireFrame(waterfallImage, {x: 0, y: 12, w: 16, h: 20});
+const waterfallTR: Frame = requireFrame(waterfallImage, {x: 48, y: 12, w: 16, h: 20});
+const waterfallBL: Frame = requireFrame(waterfallImage, {x: 0, y: 48, w: 16, h: 16});
+const waterfallBR: Frame = requireFrame(waterfallImage, {x: 48, y: 48, w: 16, h: 16});
 
 
 function fillPattern(context: CanvasRenderingContext2D, frame: FrameWithPattern, target: Rect, offset = {x: 0, y: 0}) {

@@ -131,7 +131,16 @@ export class FieldAnimationEffect implements EffectInstance {
             context.globalAlpha *= this.alpha;
         }
         const originX = this.target?.x || 0, originY = (this.target?.y || 0) - (this.target?.z || 0);
-        if (this.rotation) {
+        drawFrame(context, frame, { ...frame,
+            x: originX + this.x - (frame.content?.x || 0),
+            y: originY + this.y - (frame.content?.y || 0) - this.z,
+            w: frame.w * this.scale,
+            h: frame.h * this.scale,
+        });
+        // Rotation is currently disabled as it causes pixels from adjacent frames to be drawn.
+        // If we really want to support it, we would need to add at least 1px padding between frames
+        // or make sure to load rotated sprites from isolated sources.
+        /*if (this.rotation) {
             const w = frame.content?.w || frame.w;
             const h = frame.content?.h || frame.h;
             context.translate(
@@ -152,7 +161,7 @@ export class FieldAnimationEffect implements EffectInstance {
                 w: frame.w * this.scale,
                 h: frame.h * this.scale,
             });
-        }
+        }*/
         if (this.rotation || this.alpha < 1) {
             context.restore();
         }

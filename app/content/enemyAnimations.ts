@@ -336,7 +336,6 @@ const floorEyeAttackAnimation: FrameAnimation = createAnimation('gfx/enemies/eye
 const floorEyeClosingAnimation: FrameAnimation = createAnimation('gfx/enemies/eyemonster.png', floorEyeGeometry,
     { x: 0, cols: 3, duration: 5, frameMap: [2, 1, 0]}, {loop: false});
 const floorEyeHurtAnimation: FrameAnimation = createAnimation('gfx/enemies/eyemonster.png', floorEyeGeometry, { x: 16, cols: 1, duration: 5});
-const floorEyeDefeatedAnimation: FrameAnimation = createAnimation('gfx/enemies/eyemonster.png', floorEyeGeometry, { x: 17, cols: 1, duration: 5});
 
 export const floorEyeAnimations: ActorAnimations = {
     idle: omniAnimation(floorEyeClosedAnimation),
@@ -345,7 +344,6 @@ export const floorEyeAnimations: ActorAnimations = {
     attack: omniAnimation(floorEyeAttackAnimation),
     closing: omniAnimation(floorEyeClosingAnimation),
     hurt: omniAnimation(floorEyeHurtAnimation),
-    defeated: omniAnimation(floorEyeDefeatedAnimation),
 };
 
 /*

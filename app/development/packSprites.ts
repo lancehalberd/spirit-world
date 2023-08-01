@@ -1,22 +1,6 @@
 import { createCanvasAndContext } from 'app/utils/canvas';
 import { images } from 'app/utils/images';
 
-interface PackedImage extends Rect {
-    originalSource: string
-}
-
-interface PackedImageData {
-    packedImageSource: string
-    packedImages: PackedImage[]
-    image: HTMLImageElement | HTMLCanvasElement
-}
-
-// PackedImageData with additional fields used while packing.
-interface PackingImageData extends PackedImageData {
-    grid: boolean[][]
-    context: CanvasRenderingContext2D
-}
-
 function booleanGrid(columns: number, rows: number): boolean[][] {
     const grid: boolean[][] = [];
     for (let y = 0; y < rows; y++) {
@@ -31,10 +15,13 @@ function booleanGrid(columns: number, rows: number): boolean[][] {
 export function packSprites(prefix: string, gridSize: number, columns: number, rows: number): PackedImageData[] {
     const packedImages: PackingImageData[] = [];
     for (const key of Object.keys(images)) {
+        // Ignore already packed images.
+        if (key.startsWith('gfx/packed_images')) {
+            continue;
+        }
         if (!key.startsWith(prefix)) {
             continue;
         }
-        console.log(key);
         const {width, height} = images[key];
         if (width > gridSize * columns) {
             console.log('Image ' + key + ' is too wide to pack: ' + width);
@@ -46,7 +33,7 @@ export function packSprites(prefix: string, gridSize: number, columns: number, r
         }
         let packed = false;
         for (const packedImage of packedImages) {
-            if (packSprite(images[key], packedImage, gridSize)) {
+            if (packSprite(key, images[key], packedImage, gridSize)) {
                 packed = true;
                 break;
             }
@@ -54,13 +41,12 @@ export function packSprites(prefix: string, gridSize: number, columns: number, r
         if (!packed) {
             const [canvas, context] = createCanvasAndContext(gridSize * columns, gridSize * rows);
             const newPackedImage: PackingImageData = {
-                packedImageSource: `${prefix}-pack-${packedImages.length}`,
                 packedImages: [],
                 grid: booleanGrid(columns, rows),
                 image: canvas,
                 context,
             };
-            packSprite(images[key], newPackedImage, gridSize);
+            packSprite(key, images[key], newPackedImage, gridSize);
             packedImages.push(newPackedImage);
         }
         // Loop through existing packedImages and try to place this image in free cells.
@@ -71,7 +57,20 @@ export function packSprites(prefix: string, gridSize: number, columns: number, r
 }
 window['packSprites'] = packSprites;
 
-export function packSprite(image: HTMLImageElement, packedImage: PackingImageData, gridSize: number): boolean {
+export function serializePackedImage(packedImage: PackingImageData): string {
+    return `
+{
+    image: requireImage('gfx/packed_images/packed-sprites.png'),
+    packedImages: [
+`
+    + packedImage.packedImages.map(i => `        {x:${i.x},y:${i.y},w:${i.w},h:${i.h},originalSource:'${i.originalSource}'}`).join(",\n") +
+`
+    ],
+},`
+}
+window['serializePackedImage'] = serializePackedImage;
+
+export function packSprite(key: string, image: HTMLImageElement, packedImage: PackingImageData, gridSize: number): boolean {
     const cellHeight = Math.ceil(image.height / gridSize);
     const cellWidth = Math.ceil(image.width / gridSize);
     const { grid } = packedImage;
@@ -81,7 +80,7 @@ export function packSprite(image: HTMLImageElement, packedImage: PackingImageDat
                 // This spot is taken.
                 continue;
             }
-            if (addSpriteToLocation(image, packedImage, gridSize, [x, y])) {
+            if (addSpriteToLocation(key, image, packedImage, gridSize, [x, y])) {
                 return true;
             }
         }
@@ -89,7 +88,7 @@ export function packSprite(image: HTMLImageElement, packedImage: PackingImageDat
     return false;
 }
 
-export function addSpriteToLocation(image: HTMLImageElement, packedImage: PackingImageData, gridSize: number, [x, y]: Point): boolean {
+export function addSpriteToLocation(key: string, image: HTMLImageElement, packedImage: PackingImageData, gridSize: number, [x, y]: Point): boolean {
     const cellHeight = Math.ceil(image.height / gridSize);
     const cellWidth = Math.ceil(image.width / gridSize);
     const { grid } = packedImage;
@@ -106,7 +105,7 @@ export function addSpriteToLocation(image: HTMLImageElement, packedImage: Packin
         y: y * gridSize,
         w: image.width,
         h: image.height,
-        originalSource: image.src,
+        originalSource: key,
     });
     packedImage.context.drawImage(image, x * gridSize, y * gridSize);
     // If they are all unused, add the image and mark the cells as used.

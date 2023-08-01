@@ -1,11 +1,11 @@
-import { requireImage } from 'app/utils/images';
 import {
     southernWallBehavior
 } from 'app/content/tiles/constants';
+import { requireFrame } from 'app/utils/packedImages';
 
 const convexFancyStoneCeilingTiles: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/ceilingtilesfancystone.png'), x: 0, y: 0, w: 48, h: 48},
+    source: requireFrame('gfx/tiles/ceilingtilesfancystone.png', {x: 0, y: 0, w: 48, h: 48}),
     behaviors: {
         'all': { defaultLayer: 'floor2' },
         '1x1': { defaultLayer: 'floor' },
@@ -14,7 +14,7 @@ const convexFancyStoneCeilingTiles: TileSource = {
 
 const concaveFancyStoneCeilingTiles: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/ceilingtilesfancystone.png'), x: 48, y: 0, w: 64, h: 32},
+    source: requireFrame('gfx/tiles/ceilingtilesfancystone.png', {x: 48, y: 0, w: 64, h: 32}),
     behaviors: {
         'all': { defaultLayer: 'floor2' },
     },
@@ -22,7 +22,7 @@ const concaveFancyStoneCeilingTiles: TileSource = {
 
 const fancyStoneCeilingAlternateTiles: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/ceilingtilesfancystone.png'), x: 16, y: 48, w: 16, h: 32},
+    source: requireFrame('gfx/tiles/ceilingtilesfancystone.png', {x: 16, y: 48, w: 16, h: 32}),
     behaviors: {
         '0x0': {defaultLayer: 'floor'},
         '0x1': {defaultLayer: 'floor2', underTile: 4, isBrittleGround: true},
@@ -31,7 +31,7 @@ const fancyStoneCeilingAlternateTiles: TileSource = {
 
 const fancyStoneEdges: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/nicestonebuilding.png'), x: 0, y: 0, w: 80, h: 48},
+    source: requireFrame('gfx/tiles/nicestonebuilding.png', {x: 0, y: 0, w: 80, h: 48}),
     behaviors: {
         'all': { defaultLayer: 'foreground2' },
         '1x1': {skipped: true},
@@ -42,7 +42,7 @@ const fancyStoneEdges: TileSource = {
 
 const fancyStoneWall: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/nicestonebuilding.png'), x: 0, y: 48, w: 48, h: 48},
+    source: requireFrame('gfx/tiles/nicestonebuilding.png', {x: 0, y: 48, w: 48, h: 48}),
     behaviors: {
         'all': southernWallBehavior,
     },
@@ -50,7 +50,7 @@ const fancyStoneWall: TileSource = {
 
 const fancyStonePillar: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/nicestonebuilding.png'), x: 64, y: 32, w: 16, h: 64},
+    source: requireFrame('gfx/tiles/nicestonebuilding.png', {x: 64, y: 32, w: 16, h: 64}),
     behaviors: {
         'all': southernWallBehavior,
         '0x3': { defaultLayer: 'floor2'},

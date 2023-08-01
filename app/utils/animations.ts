@@ -1,6 +1,6 @@
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createCanvas, createCanvasAndContext, debugCanvas, drawCanvas } from 'app/utils/canvas';
-import { requireImage } from 'app/utils/images';
+import { requireFrame } from 'app/utils/packedImages';
 
 export function frame(
     x: number, y: number, w: number, h: number,
@@ -25,19 +25,19 @@ export function createAnimation(
     props: ExtraAnimationProperties = {},
 ): FrameAnimation {
     let frames: Frame[] = [];
-    let image: HTMLImageElement | HTMLCanvasElement;
+    let frame: Frame;
     if (typeof source === 'string') {
-        image = requireImage(source);
+        frame = requireFrame(source);
     } else {
-        image = source;
+        frame = {image: source, x: 0, y: 0, w: 0, h: 0};
     }
     for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
             frames[row * cols + col] = {
                 ...dimensions,
-                x: left + (dimensions.w + xSpace) * (x + col),
-                y: top + (dimensions.h + ySpace) * (y + row),
-                image
+                image: frame.image,
+                x: frame.x + left + (dimensions.w + xSpace) * (x + col),
+                y: frame.y + top + (dimensions.h + ySpace) * (y + row),
             };
         }
     }

@@ -1,9 +1,7 @@
 import type { Door } from 'app/content/objects/door';
 import { createAnimation, drawFrame, drawFrameAt } from 'app/utils/animations';
 import { debugCanvas } from 'app/utils/canvas';
-import { requireImage } from 'app/utils/images';
-
-
+import { requireFrame } from 'app/utils/packedImages';
 
 const [
     southCrackedWall, southCaveFrame, southCaveCeiling, southCave,
@@ -85,13 +83,13 @@ interface DoorStyleDefinition {
     left?: DoorStyleFrames,
 }
 
-const woodImage = requireImage('gfx/tiles/woodhousetilesarranged.png');
-//const woodenCrackedSouthBackground: Frame = {image: woodImage, x: 48, y: 0, w: 16, h: 16};
-const woodenSouthCrackedWall: Frame = {image: woodImage, x: 32, y: 96, w: 16, h: 16};
-//const woodenCrackedEastBackground: Frame = {image: woodImage, x: 0, y: 0, w: 16, h: 16};
-const woodenEastCrackedWall: Frame = {image: woodImage, x: 32, y: 80, w: 16, h: 16};
-//const woodenCrackedWestBackground: Frame = {image: woodImage, x: 0, y: 0, w: 16, h: 16};
-const woodenWestCrackedWall: Frame = {image: woodImage, x: 32, y: 80, w: 16, h: 16};
+const woodImage = 'gfx/tiles/woodhousetilesarranged.png';
+//const woodenCrackedSouthBackground: Frame = requireFrame(woodImage, {x: 48, y: 0, w: 16, h: 16});
+const woodenSouthCrackedWall: Frame = requireFrame(woodImage, {x: 32, y: 96, w: 16, h: 16});
+//const woodenCrackedEastBackground: Frame = requireFrame(woodImage, {x: 0, y: 0, w: 16, h: 16});
+const woodenEastCrackedWall: Frame =  requireFrame(woodImage, {x: 32, y: 80, w: 16, h: 16});
+//const woodenCrackedWestBackground: Frame = requireFrame(woodImage, {x: 0, y: 0, w: 16, h: 16});
+const woodenWestCrackedWall: Frame =  requireFrame(woodImage, {x: 32, y: 80, w: 16, h: 16});
 const [
     woodenSouthDoorClosed, /* empty space */, woodenSouthDoorOpen, woodenSouthDoorEmpty
 ] = createAnimation('gfx/tiles/woodhousetilesarranged.png', {w: 64, h: 16},
@@ -267,12 +265,12 @@ function renderWoodenDoorForeground(context: CanvasRenderingContext2D, state: Ga
     }
 }
 
-const cavernImage = requireImage('gfx/tiles/cavearranged.png');
-const cavernCrackedBackground: Frame = {image: cavernImage, x: 0, y: 240, w: 16, h: 16};
-const cavernEastCrackedWall: Frame = {image: cavernImage, x: 304, y: 64, w: 16, h: 16};
-const cavernWestCrackedWall: Frame = {image: cavernImage, x: 320, y: 64, w: 16, h: 16};
+const cavernImage = 'gfx/tiles/cavearranged.png';
+const cavernCrackedBackground: Frame = requireFrame(cavernImage, {x: 0, y: 240, w: 16, h: 16});
+const cavernEastCrackedWall: Frame = requireFrame(cavernImage, {x: 304, y: 64, w: 16, h: 16});
+const cavernWestCrackedWall: Frame = requireFrame(cavernImage, {x: 320, y: 64, w: 16, h: 16});
 //const cavernNorthCrackedWall: Frame = {image: cavernImage, x: 304, y: 80, w: 16, h: 16};
-const cavernSouthCrackedWall: Frame = {image: cavernImage, x: 320, y: 80, w: 16, h: 16};
+const cavernSouthCrackedWall: Frame = requireFrame(cavernImage, {x: 320, y: 80, w: 16, h: 16});
 const [
     cavernSouthDoorClosed, cavernSouthDoorOpen, cavernSouthDoorEmpty
 ] = createAnimation('gfx/tiles/cavearranged.png', {w: 64, h: 16},
@@ -430,12 +428,12 @@ function renderCavernDoorForeground(context: CanvasRenderingContext2D, state: Ga
 }
 
 
-const crystalImage = requireImage('gfx/tiles/crystalcavesheet.png');
-const crystalCrackedBackground: Frame = {image: crystalImage, x: 0, y: 240, w: 16, h: 16};
-const crystalEastCrackedWall: Frame = {image: crystalImage, x: 304, y: 64, w: 16, h: 16};
-const crystalWestCrackedWall: Frame = {image: crystalImage, x: 320, y: 64, w: 16, h: 16};
-//const crystalNorthCrackedWall: Frame = {image: crystalImage, x: 304, y: 80, w: 16, h: 16};
-const crystalSouthCrackedWall: Frame = {image: crystalImage, x: 320, y: 80, w: 16, h: 16};
+const crystalImage = 'gfx/tiles/crystalcavesheet.png';
+const crystalCrackedBackground: Frame = requireFrame(crystalImage, {x: 0, y: 240, w: 16, h: 16});
+const crystalEastCrackedWall: Frame = requireFrame(crystalImage, {x: 304, y: 64, w: 16, h: 16});
+const crystalWestCrackedWall: Frame = requireFrame(crystalImage, {x: 320, y: 64, w: 16, h: 16});
+//const crystalNorthCrackedWall: Frame = requireFrame(crystalImage, {x: 304, y: 80, w: 16, h: 16});
+const crystalSouthCrackedWall: Frame = requireFrame(crystalImage, {x: 320, y: 80, w: 16, h: 16});
 const [
     crystalSouthDoorClosed, crystalSouthDoorOpen, crystalSouthDoorEmpty
 ] = createAnimation('gfx/tiles/crystalcavesheet.png', {w: 64, h: 16},
@@ -593,12 +591,12 @@ function renderCrystalDoorForeground(context: CanvasRenderingContext2D, state: G
 }
 
 
-const stoneImage = requireImage('gfx/tiles/stonetileset.png');
-const stoneCrackedBackground: Frame = {image: stoneImage, x: 0, y: 240, w: 16, h: 16};
-const stoneEastCrackedWall: Frame = {image: stoneImage, x: 304, y: 64, w: 16, h: 16};
-const stoneWestCrackedWall: Frame = {image: stoneImage, x: 320, y: 64, w: 16, h: 16};
-//const stoneNorthCrackedWall: Frame = {image: stoneImage, x: 304, y: 80, w: 16, h: 16};
-const stoneSouthCrackedWall: Frame = {image: stoneImage, x: 320, y: 80, w: 16, h: 16};
+const stoneImage = 'gfx/tiles/stonetileset.png';
+const stoneCrackedBackground: Frame = requireFrame(stoneImage, {x: 0, y: 240, w: 16, h: 16});
+const stoneEastCrackedWall: Frame = requireFrame(stoneImage, {x: 304, y: 64, w: 16, h: 16});
+const stoneWestCrackedWall: Frame = requireFrame(stoneImage, {x: 320, y: 64, w: 16, h: 16});
+//const stoneNorthCrackedWall: Frame = requireFrame(stoneImage, {x: 304, y: 80, w: 16, h: 16});
+const stoneSouthCrackedWall: Frame = requireFrame(stoneImage, {x: 320, y: 80, w: 16, h: 16});
 const [
     stoneSouthDoorClosed, stoneSouthDoorOpen, stoneSouthDoorEmpty
 ] = createAnimation(stoneImage, {w: 64, h: 16},

@@ -1,15 +1,15 @@
 import { GAME_KEY } from 'app/gameConstants';
 import { createAnimation } from 'app/utils/animations';
-import { requireImage } from 'app/utils/images';
+import { requireFrame } from 'app/utils/packedImages';
 
 
-/*const font = requireImage('gfx/simpleFontWhite.png');
+/*const font = requireFrame('gfx/simpleFontWhite.png');
 
 const simpleFontString = ' !"#$%&\'()*+,-./0123456789'
     + ':;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_'
     + '`abcdefghijklmnopqrstuvwxyz{|}';*/
 
-const font = requireImage('gfx/hud/whiteFont8x16.png');
+const fontSource = 'gfx/hud/whiteFont8x16.png';
 const simpleFontString = ' !"#$%&\'()*+,-./0123456789'
     + ':;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_'
     + '`abcdefghijklmnopqrstuvwxyz{|}';
@@ -18,7 +18,7 @@ export const characterMap: {[key: string]: Frame} = {};
 const baseHeight = 16;
 const baseWidth = 8;
 for (let i = 1; i < simpleFontString.length; i++) {
-    characterMap[simpleFontString[i]] = {image: font, x: baseWidth * i, y: 0, w: baseWidth, h: baseHeight};
+    characterMap[simpleFontString[i]] = requireFrame(fontSource, {x: baseWidth * i, y: 0, w: baseWidth, h: baseHeight});
 }
 
 const [
@@ -135,13 +135,13 @@ export function drawText(context: CanvasRenderingContext2D, text: string, x: num
 
 
     for (const c of text) {
-        const r = characterMap[c];
-        if (r) {
-            context.drawImage(font,
-                r.x, r.y, r.w, r.h,
-                x, y, r.w * scale, r.h * scale,
+        const frame = characterMap[c];
+        if (frame) {
+            context.drawImage(frame.image,
+                frame.x, frame.y, frame.w, frame.h,
+                x, y, frame.w * scale, frame.h * scale,
             );
-            x += r.w * scale;
+            x += frame.w * scale;
         } else {
             x += baseWidth * scale;
         }

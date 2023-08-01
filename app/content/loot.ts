@@ -1,9 +1,7 @@
 import { showMessage } from 'app/scriptEvents';
 import { createAnimation } from 'app/utils/animations';
 import { createCanvasAndContext } from 'app/utils/canvas';
-import { requireImage } from 'app/utils/images';
-
-
+import { requireFrame } from 'app/utils/packedImages';
 
 const equipToolMessage = '{|}Press [B_MENU] to open your menu.'
     + '{|}Select a tool and press [B_TOOL] to assign it.';
@@ -396,7 +394,7 @@ const [invisibilityCloak] = createAnimation('gfx/hud/cloak2.png',
 const [/*smallPeach*/, /*fullPeachFrame*/, /*threeQuartersPeach*/, /*halfPeach*/, /*quarterPeach*/, peachPieceFrame] =
     createAnimation('gfx/hud/peaches.png', {w: 18, h: 18}, {cols: 3, rows: 2}).frames;
 
-const smallPeachFrame = {image: requireImage('gfx/hud/peaches.png'), x: 4, y: 3, w: 12, h: 12 };
+const smallPeachFrame = requireFrame('gfx/hud/peaches.png', {x: 4, y: 3, w: 12, h: 12 });
 const smallMoneyGeometry: FrameDimensions = {w: 16, h: 16, content:{ x: 4, y: 8, w: 8, h: 8}};
 const largeMoneyGeometry: FrameDimensions = {w: 16, h: 16, content:{ x: 2, y: 4, w: 12, h: 12}};
 const [

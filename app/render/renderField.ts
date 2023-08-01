@@ -482,6 +482,10 @@ export function renderLayer(area: AreaInstance, layer: AreaLayer, parentLayer: A
                 if (tile) {
                     maskContext.clearRect(0, 0, 16, 16);
                     maskContext.globalCompositeOperation = 'source-over';
+                    if (!maskTile.behaviors.maskFrame) {
+                        console.error('Mask tile was missing maskFrame. This can happen when tile indexes are shifted due to added/removed tiles.');
+                        debugger;
+                    }
                     drawFrame(maskContext, maskTile.behaviors.maskFrame, {x: 0, y: 0, w: 16, h: 16});
                     maskContext.globalCompositeOperation = 'source-in';
                     drawFrame(maskContext, tile.frame, {x: 0, y: 0, w: 16, h: 16});

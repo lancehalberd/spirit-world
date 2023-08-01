@@ -15,13 +15,11 @@ import {
     topLeftCeiling,
     topLeftWall,
 } from 'app/content/tiles/constants';
-import { requireImage } from 'app/utils/images';
-
-
+import { requireFrame } from 'app/utils/packedImages';
 
 const stoneCeiling: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/stonetileset.png'), x: 0, y: 0, w: 48, h: 64},
+    source: requireFrame('gfx/tiles/stonetileset.png', {x: 0, y: 0, w: 48, h: 64}),
     behaviors: {
         'all': ceilingBehavior,
         '3x0': bottomCeilingBehavior,
@@ -53,7 +51,7 @@ const stoneCeiling: TileSource = {
 
 const stoneCeilingTopAngles: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/stonetileset.png'), x: 0, y: 0, w: 48, h: 80},
+    source: requireFrame('gfx/tiles/stonetileset.png', {x: 0, y: 0, w: 48, h: 80}),
     behaviors: {
         'all': {defaultLayer: 'foreground2'},
     },
@@ -64,7 +62,7 @@ const stoneCeilingTopAngles: TileSource = {
 
 const stoneWalls: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/stonetileset.png'), x: 0, y: 0, w: 48, h: 80},
+    source: requireFrame('gfx/tiles/stonetileset.png', {x: 0, y: 0, w: 48, h: 80}),
     behaviors: {
         'all': southernWallBehavior,
         '12x3': topRightWall, '13x3': topRightWall,
@@ -80,7 +78,7 @@ const stoneWalls: TileSource = {
 
 const stoneStairs: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/stonetileset.png'), x: 0, y: 0, w: 48, h: 64},
+    source: requireFrame('gfx/tiles/stonetileset.png', {x: 0, y: 0, w: 48, h: 64}),
     behaviors: {
         'all': { defaultLayer: 'field' },
     },
@@ -95,7 +93,7 @@ const stoneStairs: TileSource = {
 
 const stoneLedges: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/stonetileset.png'), x: 0, y: 0, w: 48, h: 64},
+    source: requireFrame('gfx/tiles/stonetileset.png', {x: 0, y: 0, w: 48, h: 64}),
     behaviors: {
         'all': { defaultLayer: 'floor2' },
         '8x8': { defaultLayer: 'floor2', ledges: { right: true } },
@@ -142,7 +140,7 @@ const stoneLedges: TileSource = {
 
 const stoneFloorDecorations: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/stonetileset.png'), x: 0, y: 0, w: 48, h: 64},
+    source: requireFrame('gfx/tiles/stonetileset.png', {x: 0, y: 0, w: 48, h: 64}),
     behaviors: {
         'all': { defaultLayer: 'floor2' },
     },
@@ -163,7 +161,7 @@ const stoneFloorDecorations: TileSource = {
 
 const stoneFloor: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/stonetileset.png'), x: 0, y: 0, w: 48, h: 64},
+    source: requireFrame('gfx/tiles/stonetileset.png', {x: 0, y: 0, w: 48, h: 64}),
     behaviors: {
         'all': { defaultLayer: 'floor' },
         '13x5': { defaultLayer: 'field', underTile: 4, isBrittleGround: true},
@@ -175,7 +173,7 @@ const stoneFloor: TileSource = {
 };
 const stoneFloorEdges: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/stonetileset.png'), x: 0, y: 0, w: 48, h: 64},
+    source: requireFrame('gfx/tiles/stonetileset.png', {x: 0, y: 0, w: 48, h: 64}),
     behaviors: {
         'all': { defaultLayer: 'floor2' },
     },

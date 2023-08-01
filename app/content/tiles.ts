@@ -37,7 +37,8 @@ import { allStoneExteriorTileSources } from 'app/content/tiles/stoneExteriorTile
 import { allWoodTileSources, extraWoodWalls } from 'app/content/tiles/woodTiles';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 import { createCanvasAndContext, debugCanvas } from 'app/utils/canvas';
-import { allImagesLoaded, requireImage } from 'app/utils/images';
+import { allImagesLoaded } from 'app/utils/images';
+import { requireFrame } from 'app/utils/packedImages';
 
 
 
@@ -221,15 +222,16 @@ async function logUniqueTiles(newTiles: Frame): Promise<void> {
 function singleTileSource(source: string, behaviors: TileBehaviors = null, x = 0, y = 0, w = 16, h = 16): TileSource {
     return {
         w, h,
-        source: {image: requireImage(source), x, y, w, h},
+        source: requireFrame(source, {x, y, w, h}),
         behaviors: behaviors ? {'0x0': behaviors} : {},
     };
 }
 
-function stampTileSource(frame: Frame, behaviors: {[key: string]: TileBehaviors} = {}): TileSource {
+function stampTileSource(frame: Frame, tileCoordinates: number[][], behaviors: {[key: string]: TileBehaviors} = {}): TileSource {
     return {
         w: 16, h: 16,
         source: frame,
+        tileCoordinates,
         behaviors,
     };
 }
@@ -262,38 +264,34 @@ function gradientColorTile(colors: string[], x0, y0, x1, y1, behaviors: TileBeha
     }, behaviors);
 }
 
-const rockWallFrame: Frame = {
-    image: requireImage('gfx/tiles/rockwalltiles.png'),
-    x: 0, y: 0, w: 48, h: 32,
-}
-
+const rockWallFrame: Frame = requireFrame('gfx/tiles/rockwalltiles.png');
 
 const caveFloorPalette: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/cavefloor.png'), x: 0, y: 0, w: 336, h: 16},
+    source: requireFrame('gfx/tiles/cavefloor.png', {x: 0, y: 0, w: 336, h: 16}),
     behaviors: {all: {linkedOffset: 448}, '0x0': {linkedOffset: 1078}},
 };
 const caveFloorSpiritPalette: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/cavefloorspirit.png'), x: 16, y: 0, w: 320, h: 16},
+    source: requireFrame('gfx/tiles/cavefloorspirit.png', {x: 16, y: 0, w: 320, h: 16}),
     behaviors: {},
 };
 
 const caveCornersPalette: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/cavewalls.png'), x: 32, y: 0, w: 8 * 32, h: 32},
+    source: requireFrame('gfx/tiles/cavewalls.png', {x: 32, y: 0, w: 8 * 32, h: 32}),
     behaviors: {'all': {solid: true}},
 };
 const caveWallsPalette: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/cavewalls.png'), x: 0, y: 32, w: 32, h: 4 * 32},
+    source: requireFrame('gfx/tiles/cavewalls.png', {x: 0, y: 32, w: 32, h: 4 * 32}),
     behaviors: {'all': {solid: true}},
 };
 
 
 const spiritPlantsPalette: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/spiritplants.png'), x: 0, y: 0, w: 5 * 16, h: 16},
+    source: requireFrame('gfx/tiles/spiritplants.png', {x: 0, y: 0, w: 5 * 16, h: 16}),
     behaviors: {
         '0x0': spiritPlantBehavior,
         '1x0': spiritPlantBehavior,
@@ -303,7 +301,7 @@ const spiritPlantsPalette: TileSource = {
 };
 const brightGrass: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/grass.png'), x: 0, y: 0, w: 11 * 16, h: 16},
+    source: requireFrame('gfx/tiles/grass.png', {x: 0, y: 0, w: 11 * 16, h: 16}),
     behaviors: {
         '0x0': {brightness: 1, lightRadius: 16},
     },
@@ -311,19 +309,19 @@ const brightGrass: TileSource = {
 
 const lightCaveCornersPalette: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/cavewalls2temp.png'), x: 32, y: 0, w: 8 * 32, h: 32},
+    source: requireFrame('gfx/tiles/cavewalls2temp.png', {x: 32, y: 0, w: 8 * 32, h: 32}),
     behaviors: {'all': {solid: true}},
 };
 const lightCaveWallsPalette: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/cavewalls2temp.png'), x: 0, y: 32, w: 32, h: 4 * 32},
+    source: requireFrame('gfx/tiles/cavewalls2temp.png', {x: 0, y: 32, w: 32, h: 4 * 32}),
     behaviors: {'all': {solid: true}},
 };
 
 
 const furnitureCozyTiles: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/temporary_tiles/temp_furniture.png'), x: 496, y: 0, w: 4 * 16, h: 3 * 16},
+    source: requireFrame('gfx/temporary_tiles/temp_furniture.png', {x: 496, y: 0, w: 4 * 16, h: 3 * 16}),
     behaviors: {
         'all': {defaultLayer: 'field', solid: true, low: true},
         '3x2': {pit: true},
@@ -332,7 +330,7 @@ const furnitureCozyTiles: TileSource = {
 
 const furnitureWoodTiles: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/temporary_tiles/temp_furniture.png'), x: 560, y: 272, w: 4 * 16, h: 6 * 16},
+    source: requireFrame('gfx/temporary_tiles/temp_furniture.png', {x: 560, y: 272, w: 4 * 16, h: 6 * 16}),
     behaviors: {
         'all': {defaultLayer: 'field', solid: true, low: true},
     },
@@ -340,7 +338,7 @@ const furnitureWoodTiles: TileSource = {
 
 const furniturePlantTiles: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/temporary_tiles/temp_woodAndFood.png'), x: 112, y: 206, w: 1 * 16, h: 1 * 16},
+    source: requireFrame('gfx/temporary_tiles/temp_woodAndFood.png', {x: 112, y: 206, w: 1 * 16, h: 1 * 16}),
     behaviors: {
         'all': {defaultLayer: 'field', solid: true, low: true},
     },
@@ -348,13 +346,13 @@ const furniturePlantTiles: TileSource = {
 
 const iceTiles: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/iceTile.png'), x: 0, y: 0, w: 16, h: 16},
+    source: requireFrame('gfx/tiles/iceTile.png', {x: 0, y: 0, w: 16, h: 16}),
     behaviors: {'all': {isGround: true, slippery: true, elementTiles: {fire: 0}}},
 };
 
 const furnitureLampTiles: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/temporary_tiles/temp_furniture.png'), x: 560, y: 368, w: 1 * 16, h: 1 * 16},
+    source: requireFrame('gfx/temporary_tiles/temp_furniture.png', {x: 560, y: 368, w: 1 * 16, h: 1 * 16}),
     behaviors: {
         'all': {defaultLayer: 'field', solid: true, low: true, brightness: 0.6, lightRadius: 32},
     },
@@ -362,7 +360,7 @@ const furnitureLampTiles: TileSource = {
 
 const laundryTiles: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/temporary_tiles/temp_laundry32.png'), x: 0, y: 0, w: 6 * 16, h: 2 * 16},
+    source: requireFrame('gfx/temporary_tiles/temp_laundry32.png', {x: 0, y: 0, w: 6 * 16, h: 2 * 16}),
     behaviors: {
         'all': {defaultLayer: 'field', solid: true, low: false},
     },
@@ -370,7 +368,7 @@ const laundryTiles: TileSource = {
 
 const logChoppingTiles: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/temporary_tiles/temp_woodAndFood.png'), x: 240, y: 64, w: 1 * 16, h: 1 * 16},
+    source: requireFrame('gfx/temporary_tiles/temp_woodAndFood.png', {x: 240, y: 64, w: 1 * 16, h: 1 * 16}),
     behaviors: {
         'all': {solid: true, low: true},
     },
@@ -378,7 +376,7 @@ const logChoppingTiles: TileSource = {
 
 const foodBoxTiles: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/temporary_tiles/temp_woodAndFood.png'), x: 192, y: 102, w: 4 * 16, h: 2 * 16},
+    source: requireFrame('gfx/temporary_tiles/temp_woodAndFood.png', {x: 192, y: 102, w: 4 * 16, h: 2 * 16}),
     behaviors: {
         'all': {solid: true, low: true},
     },
@@ -386,7 +384,7 @@ const foodBoxTiles: TileSource = {
 
 const logAndFoodBagTiles: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/temporary_tiles/temp_woodAndFood.png'), x: 64, y: 160, w: 5 * 16, h: 1 * 16},
+    source: requireFrame('gfx/temporary_tiles/temp_woodAndFood.png', {x: 64, y: 160, w: 5 * 16, h: 1 * 16}),
     behaviors: {
         'all': {solid: true, low: true},
     },
@@ -394,7 +392,7 @@ const logAndFoodBagTiles: TileSource = {
 
 const largeLogPileTiles: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/temporary_tiles/temp_woodAndFood.png'), x: 112, y: 176, w: 2 * 16, h: 2 * 16},
+    source: requireFrame('gfx/temporary_tiles/temp_woodAndFood.png', {x: 112, y: 176, w: 2 * 16, h: 2 * 16}),
     behaviors: {
         'all': {solid: true, low: true},
     },
@@ -402,20 +400,20 @@ const largeLogPileTiles: TileSource = {
 
 const railsTiles: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/rails.png'), x: 0, y: 0, w: 64, h: 16},
+    source: requireFrame('gfx/tiles/rails.png', {x: 0, y: 0, w: 64, h: 16}),
     behaviors: {'all': {solid: true, defaultLayer: 'field', linkedOffset: 4}},
 };
 
 const spiritRailsTiles: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/rails.png'), x: 0, y: 16, w: 64, h: 16},
+    source: requireFrame('gfx/tiles/rails.png', {x: 0, y: 16, w: 64, h: 16}),
     behaviors: {'all': {solid: true, defaultLayer: 'field'}},
 };
 
 const shallowWaterBehavior: TileBehaviors = { defaultLayer: 'field', shallowWater: true };
 const deepToShallow: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/deeptoshallowwater.png'), x: 0, y: 0, w: 64, h: 80},
+    source: requireFrame('gfx/tiles/deeptoshallowwater.png', {x: 0, y: 0, w: 64, h: 80}),
     behaviors: {
         'all': shallowWaterBehavior,
         '0x3': deepWaterBehavior, '1x3': deepWaterBehavior,
@@ -425,7 +423,7 @@ const deepToShallow: TileSource = {
 };
 const deepToShallowAngles: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/deeptoshallowwater.png'), x: 64, y: 0, w: 64, h: 64},
+    source: requireFrame('gfx/tiles/deeptoshallowwater.png', {x: 64, y: 0, w: 64, h: 64}),
     behaviors: {
         'all': deepWaterBehavior,
         '0x0': { skipped: true }, '3x0': { skipped: true },
@@ -436,7 +434,7 @@ const deepToShallowAngles: TileSource = {
 };
 const shallowToDeep: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/shallowtodeepwater1.png'), x: 0, y: 0, w: 64, h: 80},
+    source: requireFrame('gfx/tiles/shallowtodeepwater1.png', {x: 0, y: 0, w: 64, h: 80}),
     behaviors: {
         'all': deepWaterBehavior,
         '0x3': shallowWaterBehavior, '1x3': shallowWaterBehavior,
@@ -446,7 +444,7 @@ const shallowToDeep: TileSource = {
 };
 const shallowToDeepAngles: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/shallowtodeepwater1.png'), x: 64, y: 0, w: 64, h: 64},
+    source: requireFrame('gfx/tiles/shallowtodeepwater1.png', {x: 64, y: 0, w: 64, h: 64}),
     behaviors: {
         'all': shallowWaterBehavior,
         '0x0': { skipped: true }, '3x0': { skipped: true },
@@ -458,7 +456,7 @@ const shallowToDeepAngles: TileSource = {
 
 const shore: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/watershore.png'), x: 0, y: 0, w: 64, h: 80},
+    source: requireFrame('gfx/tiles/watershore.png', {x: 0, y: 0, w: 64, h: 80}),
     behaviors: {
         'all': { defaultLayer: 'floor' },
         '3x0': { skipped: true }, '3x1': { skipped: true },
@@ -466,7 +464,7 @@ const shore: TileSource = {
 };
 const shoreAngles: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/watershore.png'), x: 64, y: 0, w: 64, h: 64},
+    source: requireFrame('gfx/tiles/watershore.png', {x: 64, y: 0, w: 64, h: 64}),
     behaviors: {
         'all': { defaultLayer: 'floor' },
         '0x0': { skipped: true }, '3x0': { skipped: true },
@@ -476,7 +474,7 @@ const shoreAngles: TileSource = {
 
 const shoreMask: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/blackmaskground.png'), x: 0, y: 0, w: 64, h: 80},
+    source: requireFrame('gfx/tiles/blackmaskground.png', {x: 0, y: 0, w: 64, h: 80}),
     behaviors: {
         'all': { defaultLayer: 'floor' },
         '3x0': { skipped: true }, '3x1': { skipped: true },
@@ -484,7 +482,7 @@ const shoreMask: TileSource = {
 };
 const shoreAnglesMask: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/blackmaskground.png'), x: 64, y: 0, w: 64, h: 64},
+    source: requireFrame('gfx/tiles/blackmaskground.png', {x: 64, y: 0, w: 64, h: 64}),
     behaviors: {
         'all': { defaultLayer: 'floor' },
         '0x0': { skipped: true }, '3x0': { skipped: true },
@@ -495,7 +493,7 @@ const shoreAnglesMask: TileSource = {
 const cloudBehavior = <const>{ cloudGround: true, defaultLayer: 'field'  };
 const clouds: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/cloud.png'), x: 0, y: 0, w: 64, h: 80},
+    source: requireFrame('gfx/tiles/cloud.png', {x: 0, y: 0, w: 64, h: 80}),
     behaviors: {
         'all': cloudBehavior,
         '0x0': { ...cloudBehavior, ledges: {up: true, left: true}},
@@ -514,7 +512,7 @@ const clouds: TileSource = {
 };
 const cloudAngles: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/cloud.png'), x: 64, y: 0, w: 64, h: 64},
+    source: requireFrame('gfx/tiles/cloud.png', {x: 64, y: 0, w: 64, h: 64}),
     behaviors: {
         'all': cloudBehavior,
         '0x0': { skipped: true }, '3x0': { skipped: true },
@@ -532,21 +530,21 @@ const cloudAngles: TileSource = {
 
 const vineBase: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/vines.png'), x: 48, y: 0, w: 16, h: 16},
+    source: requireFrame('gfx/tiles/vines.png', {x: 48, y: 0, w: 16, h: 16}),
     behaviors: {
         'all': { defaultLayer: 'field', brightness: 0.5, lightRadius: 24 },
     },
 };
 const vineMiddle: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/vines.png'), x: 80, y: 16, w: 16, h: 32},
+    source: requireFrame('gfx/tiles/vines.png', {x: 80, y: 16, w: 16, h: 32}),
     behaviors: {
         'all': {...climbableWall, brightness: 0.5, lightRadius: 24},
     },
 };
 const vineTop: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/vines.png'), x: 80, y: 48, w: 16, h: 16},
+    source: requireFrame('gfx/tiles/vines.png', {x: 80, y: 48, w: 16, h: 16}),
     behaviors: {
         'all': { defaultLayer: 'field', brightness: 0.5, lightRadius: 24 },
     },
@@ -579,56 +577,56 @@ applyMask(shoreAngles, shoreAnglesMask);
 
 const treeStump: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/treesheet.png'), x: 0, y: 128, w: 64, h: 48},
+    source: requireFrame('gfx/tiles/treesheet.png', {x: 0, y: 128, w: 64, h: 48}),
     behaviors: {
         'all': { defaultLayer: 'field', solid: true, linkedOffset: 401 },
     },
 };
 const treeLeavesTop: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/treesheet.png'), x: 80, y: 0, w: 64, h: 16},
+    source: requireFrame('gfx/tiles/treesheet.png', {x: 80, y: 0, w: 64, h: 16}),
     behaviors: {
         'all': { defaultLayer: 'foreground2', linkedOffset: 401 },
     },
 };
 const treeLeaves: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/treesheet.png'), x: 64, y: 16, w: 96, h: 48},
+    source: requireFrame('gfx/tiles/treesheet.png', {x: 64, y: 16, w: 96, h: 48}),
     behaviors: {
         'all': { defaultLayer: 'foreground', linkedOffset: 401 },
     },
 };
 const treeLeavesBottom: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/treesheet.png'), x: 96, y: 64, w: 32, h: 16},
+    source: requireFrame('gfx/tiles/treesheet.png', {x: 96, y: 64, w: 32, h: 16}),
     behaviors: {
         'all': { defaultLayer: 'foreground', linkedOffset: 401 },
     },
 };
 const treeLeavesDoor: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/treesheet.png'), x: 16, y: 96, w: 32, h: 16},
+    source: requireFrame('gfx/tiles/treesheet.png', {x: 16, y: 96, w: 32, h: 16}),
     behaviors: {
         'all': { defaultLayer: 'foreground', linkedOffset: 401 },
     },
 };
 const treeLeavesMerged: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/treesheet.png'), x: 160, y: 16, w: 32, h: 48},
+    source: requireFrame('gfx/tiles/treesheet.png', {x: 160, y: 16, w: 32, h: 48}),
     behaviors: {
         'all': { defaultLayer: 'foreground', linkedOffset: 401 },
     },
 };
 const treeLeavesCorridor: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/treesheet.png'), x: 224, y: 16, w: 16, h: 48},
+    source: requireFrame('gfx/tiles/treesheet.png', {x: 224, y: 16, w: 16, h: 48}),
     behaviors: {
         'all': { defaultLayer: 'foreground', linkedOffset: 401 },
     },
 };
 const treeStumpDoor: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/treesheet.png'), x: 64, y: 96, w: 64, h: 32},
+    source: requireFrame('gfx/tiles/treesheet.png', {x: 64, y: 96, w: 64, h: 32}),
     behaviors: {
         'all': { defaultLayer: 'field', solid: true, linkedOffset: 401 },
     },
@@ -637,56 +635,56 @@ const treeStumpDoor: TileSource = {
 
 const knobbyTreeStump: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/knobbytrees.png'), x: 0, y: 128, w: 64, h: 48},
+    source: requireFrame('gfx/tiles/knobbytrees.png', {x: 0, y: 128, w: 64, h: 48}),
     behaviors: {
         'all': { defaultLayer: 'field', solid: true },
     },
 };
 const knobbyTreeLeavesTop: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/knobbytrees.png'), x: 80, y: 0, w: 64, h: 16},
+    source: requireFrame('gfx/tiles/knobbytrees.png', {x: 80, y: 0, w: 64, h: 16}),
     behaviors: {
         'all': { defaultLayer: 'foreground2' },
     },
 };
 const knobbyTreeLeaves: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/knobbytrees.png'), x: 64, y: 16, w: 96, h: 48},
+    source: requireFrame('gfx/tiles/knobbytrees.png', {x: 64, y: 16, w: 96, h: 48}),
     behaviors: {
         'all': { defaultLayer: 'foreground' },
     },
 };
 const knobbyTreeLeavesBottom: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/knobbytrees.png'), x: 96, y: 64, w: 32, h: 16},
+    source: requireFrame('gfx/tiles/knobbytrees.png', {x: 96, y: 64, w: 32, h: 16}),
     behaviors: {
         'all': { defaultLayer: 'foreground' },
     },
 };
 const knobbyTreeLeavesDoor: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/knobbytrees.png'), x: 16, y: 96, w: 32, h: 16},
+    source: requireFrame('gfx/tiles/knobbytrees.png', {x: 16, y: 96, w: 32, h: 16}),
     behaviors: {
         'all': { defaultLayer: 'foreground' },
     },
 };
 const knobbyTreeLeavesMerged: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/knobbytrees.png'), x: 160, y: 16, w: 32, h: 48},
+    source: requireFrame('gfx/tiles/knobbytrees.png', {x: 160, y: 16, w: 32, h: 48}),
     behaviors: {
         'all': { defaultLayer: 'foreground' },
     },
 };
 const knobbyTreeLeavesCorridor: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/knobbytrees.png'), x: 224, y: 16, w: 16, h: 48},
+    source: requireFrame('gfx/tiles/knobbytrees.png', {x: 224, y: 16, w: 16, h: 48}),
     behaviors: {
         'all': { defaultLayer: 'foreground' },
     },
 };
 const knobbyTreeStumpDoor: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/knobbytrees.png'), x: 64, y: 96, w: 64, h: 32},
+    source: requireFrame('gfx/tiles/knobbytrees.png', {x: 64, y: 96, w: 64, h: 32}),
     behaviors: {
         'all': { defaultLayer: 'field', solid: true },
     },
@@ -695,7 +693,7 @@ const knobbyTreeStumpDoor: TileSource = {
 
 const crackedFloor: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/clifffloors.png'), x: 0, y: 0, w: 48, h: 16},
+    source: requireFrame('gfx/tiles/clifffloors.png', {x: 0, y: 0, w: 48, h: 16}),
     behaviors: {
         'all': { defaultLayer: 'floor' },
     },
@@ -703,7 +701,7 @@ const crackedFloor: TileSource = {
 
 const breakableFloor: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/clifffloors.png'), x: 0, y: 0, w: 16, h: 16},
+    source: requireFrame('gfx/tiles/clifffloors.png', {x: 0, y: 0, w: 16, h: 16}),
     behaviors: {
         'all': { defaultLayer: 'field', underTile: 4, isBrittleGround: true},
     },
@@ -711,7 +709,7 @@ const breakableFloor: TileSource = {
 
 const stairs: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/exteriorstairs.png'), x: 0, y: 0, w: 48, h: 64},
+    source: requireFrame('gfx/tiles/exteriorstairs.png', {x: 0, y: 0, w: 48, h: 64}),
     behaviors: {
         'all': { defaultLayer: 'floor2' },
     },
@@ -720,7 +718,7 @@ const stairs: TileSource = {
 
 const shadows: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/shadowtiles.png'), x: 0, y: 0, w: 48, h: 64},
+    source: requireFrame('gfx/tiles/shadowtiles.png', {x: 0, y: 0, w: 48, h: 64}),
     behaviors: {
         'all': { defaultLayer: 'field2', isGround: false },
     },
@@ -734,7 +732,7 @@ const shadows: TileSource = {
 
 const caveCeiling: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/cavearranged.png'), x: 0, y: 0, w: 48, h: 64},
+    source: requireFrame('gfx/tiles/cavearranged.png', {x: 0, y: 0, w: 48, h: 64}),
     behaviors: {
         'all': { defaultLayer: 'foreground2' },
         '0x12': bottomLeftCeiling, '1x12': bottomLeftCeiling,
@@ -752,7 +750,7 @@ const caveCeiling: TileSource = {
 
 const caveCeilingTopAngles: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/cavearranged.png'), x: 0, y: 0, w: 48, h: 80},
+    source: requireFrame('gfx/tiles/cavearranged.png', {x: 0, y: 0, w: 48, h: 80}),
     behaviors: {
         '8x2': ceilingBehavior, '9x2': ceilingBehavior,
         '10x2': ceilingBehavior, '11x2': ceilingBehavior,
@@ -764,7 +762,7 @@ const caveCeilingTopAngles: TileSource = {
 
 const caveWalls: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/cavearranged.png'), x: 0, y: 0, w: 48, h: 80},
+    source: requireFrame('gfx/tiles/cavearranged.png', {x: 0, y: 0, w: 48, h: 80}),
     behaviors: {
         'all': southernWallBehavior,
         '12x3': topRightWall, '13x3': topRightWall,
@@ -780,7 +778,7 @@ const caveWalls: TileSource = {
 
 const caveStairs: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/cavearranged.png'), x: 0, y: 0, w: 48, h: 64},
+    source: requireFrame('gfx/tiles/cavearranged.png', {x: 0, y: 0, w: 48, h: 64}),
     behaviors: {
         'all': { defaultLayer: 'field' },
     },
@@ -795,7 +793,7 @@ const caveStairs: TileSource = {
 
 const caveLedges: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/cavearranged.png'), x: 0, y: 0, w: 48, h: 64},
+    source: requireFrame('gfx/tiles/cavearranged.png', {x: 0, y: 0, w: 48, h: 64}),
     behaviors: {
         'all': { defaultLayer: 'floor2' },
         '8x8': { defaultLayer: 'floor2', ledges: { right: true }, isGround: false },
@@ -860,7 +858,7 @@ const caveLedges: TileSource = {
 
 const caveFloorDecorations: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/cavearranged.png'), x: 0, y: 0, w: 48, h: 64},
+    source: requireFrame('gfx/tiles/cavearranged.png', {x: 0, y: 0, w: 48, h: 64}),
     behaviors: {
         'all': { defaultLayer: 'floor2' },
     },
@@ -881,7 +879,7 @@ const caveFloorDecorations: TileSource = {
 
 const caveFloor: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/cavearranged.png'), x: 0, y: 0, w: 48, h: 64},
+    source: requireFrame('gfx/tiles/cavearranged.png', {x: 0, y: 0, w: 48, h: 64}),
     behaviors: {
         '12x5': { defaultLayer: 'floor', linkedOffset: 339 /* 775 -> 1114 */},
         '12x6': { defaultLayer: 'floor', linkedOffset: 338 /* 776 -> 1114 */},
@@ -893,7 +891,7 @@ const caveFloor: TileSource = {
 };
 const caveFloorEdgesGreen: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/cavearranged.png'), x: 0, y: 0, w: 48, h: 64},
+    source: requireFrame('gfx/tiles/cavearranged.png', {x: 0, y: 0, w: 48, h: 64}),
     behaviors: {
         'all': { defaultLayer: 'floor2', linkedOffset: 339 },
     },
@@ -905,7 +903,7 @@ const caveFloorEdgesGreen: TileSource = {
 };
 const caveFloorEdgesRed: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/cavearranged.png'), x: 0, y: 0, w: 48, h: 64},
+    source: requireFrame('gfx/tiles/cavearranged.png', {x: 0, y: 0, w: 48, h: 64}),
     behaviors: {
         // Index 785 should map to 1116
         'all': { defaultLayer: 'floor2', linkedOffset: 331 },
@@ -916,17 +914,14 @@ const caveFloorEdgesRed: TileSource = {
     ],
 };
 
-const newTiles: Frame = {
-    image: requireImage('gfx/tiles/stonebuildingtileset.png'),
-    x: 96, y: 0, w: 80, h: 96
-};
+const newTiles: Frame = requireFrame('gfx/tiles/stonebuildingtileset.png', {x: 96, y: 0, w: 80, h: 96});
 (async () => console.log((await findUniqueTiles(newTiles)).map(o => `[${o.x},${o.y}]`).join(',')));//();
 (() => logUniqueTiles(newTiles));//();
 
 
 const floorEyeTile: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/eyemonsterbase.png'), x: 0, y: 0, w: 16, h: 16},
+    source: requireFrame('gfx/tiles/eyemonsterbase.png', {x: 0, y: 0, w: 16, h: 16}),
     behaviors: {
         'all': { defaultLayer: 'floor2' },
     },
@@ -937,7 +932,7 @@ export const crystalParticles: Frame[] = createAnimation('gfx/effects/particles_
 
 const crystalBeadFloor: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/crystalbeadpiles.png'), x: 0, y: 0, w: 256, h: 48},
+    source: requireFrame('gfx/tiles/crystalbeadpiles.png', {x: 0, y: 0, w: 256, h: 48}),
     behaviors: {
         'all': { defaultLayer: 'floor2' },
         // We place the horizontal edges on field layer by default so it is easy to overlap
@@ -960,7 +955,7 @@ const [lavaCanvas, lavaContext] = createCanvasAndContext(64, 80);
 const createLavaTiles = async () => {
     await allImagesLoaded();
     drawTintedImage(lavaContext,
-        {image: requireImage('gfx/tiles/cloud.png'), x: 0, y: 0, w: 64, h: 80, color: '#F00', amount: 0.6},
+        requireFrame('gfx/tiles/cloud.png', {x: 0, y: 0, w: 64, h: 80, color: '#F00', amount: 0.6},
         {x: 0, y: 0, w: lavaCanvas.width, h: lavaCanvas.height }
     );
 }
@@ -969,7 +964,7 @@ createLavaTiles();*/
 // First tile is 886
 const lava: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/lava.png'), x: 0, y: 0, w: 64, h: 80},
+    source: requireFrame('gfx/tiles/lava.png', {x: 0, y: 0, w: 64, h: 80}),
     behaviors: {
         'all': { defaultLayer: 'floor2', isLava: true, editorTransparency: 0.3, elementOffsets: {ice: 256} },
     },
@@ -977,7 +972,7 @@ const lava: TileSource = {
 // First tile is 1142
 const lavaStone: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/lavaStone.png'), x: 0, y: 0, w: 64, h: 80},
+    source: requireFrame('gfx/tiles/lavaStone.png', {x: 0, y: 0, w: 64, h: 80}),
     behaviors: {
         'all': { defaultLayer: 'floor2', isGround: true, elementOffsets: {fire: -256} },
     },
@@ -985,7 +980,7 @@ const lavaStone: TileSource = {
 
 const spiritFloor: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/spiritfloor.png'), x: 0, y: 0, w: 80, h: 64},
+    source: requireFrame('gfx/tiles/spiritfloor.png', {x: 0, y: 0, w: 80, h: 64}),
     behaviors: {
         'all': { defaultLayer: 'floor' },
     },
@@ -996,7 +991,7 @@ const spiritFloor: TileSource = {
 };
 const spiritFloorEdges: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/spiritfloor.png'), x: 0, y: 0, w: 64, h: 64},
+    source: requireFrame('gfx/tiles/spiritfloor.png', {x: 0, y: 0, w: 64, h: 64}),
     behaviors: {
         'all': { defaultLayer: 'floor2' },
     },
@@ -1032,7 +1027,7 @@ addTiles([
         }, 160),
     {
         w: 16, h: 16,
-        source: {image: requireImage('gfx/tiles/grass.png'), x: 0, y: 0, w: 11 * 16, h: 16},
+        source: requireFrame('gfx/tiles/grass.png', {x: 0, y: 0, w: 11 * 16, h: 16}),
         behaviors: {
             'all': { linkedOffset: 179, defaultLayer: 'floor2'},
             '0x0': { linkedOffset: 179, defaultLayer: 'floor'},
@@ -1048,7 +1043,11 @@ addTiles([
     // go behind it a bit.
     singleTileSource('gfx/tiles/cavearranged.png', { defaultLayer: 'foreground', isVeryTall: true, solidMap: BITMAP_BOTTOM }, 0, 240),
     solidPitSource,
-    stampTileSource(rockWallFrame, {
+    stampTileSource(rockWallFrame, [
+            [0,0], [0,1],
+            [1,0], [2,1],
+            [2,0], [2,1],
+        ], {
         '0x0': southernWallBehavior, '1x0': southernWallBehavior, '2x0': southernWallBehavior,
         '0x1': southernWallBehavior, '1x1': southernWallBehavior, '2x1': southernWallBehavior,
     }),
@@ -1077,7 +1076,7 @@ addTiles([
     singleTileSource('gfx/tiles/rocksspirit.png', lowWallBehavior, 160),
     {
         w: 16, h: 16,
-        source: {image: requireImage('gfx/tiles/grassspirit.png'), x: 0, y: 0, w: 11 * 16, h: 16},
+        source: requireFrame('gfx/tiles/grassspirit.png', {x: 0, y: 0, w: 11 * 16, h: 16}),
     },
     singleTileSource('gfx/tiles/bushspirit.png', null, 16),
     singleTileSource('gfx/tiles/thornsspirit.png', null, 16),

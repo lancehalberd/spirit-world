@@ -17,13 +17,11 @@ import {
     topLeftCeiling,
     topRightCeiling,
 } from 'app/content/tiles/constants';
-import { requireImage } from 'app/utils/images';
-
-
+import { requireFrame } from 'app/utils/packedImages';
 
 const woodCeiling: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/woodhousetilesarranged.png'), x: 0, y: 0, w: 48, h: 64},
+    source: requireFrame('gfx/tiles/woodhousetilesarranged.png', {x: 0, y: 0, w: 48, h: 64}),
     behaviors: {
         'all': ceilingBehavior,
         '3x0': bottomCeilingBehavior,
@@ -50,7 +48,7 @@ const woodCeiling: TileSource = {
 
 const woodWalls: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/woodhousetilesarranged.png'), x: 0, y: 0, w: 48, h: 80},
+    source: requireFrame('gfx/tiles/woodhousetilesarranged.png', {x: 0, y: 0, w: 48, h: 80}),
     behaviors: {
         'all': southernWallBehavior,
         '11x4': topLeftWall, '12x4': topLeftWall,
@@ -69,7 +67,7 @@ const woodWalls: TileSource = {
 };
 const woodStairs: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/woodhousetilesarranged.png'), x: 0, y: 0, w: 48, h: 64},
+    source: requireFrame('gfx/tiles/woodhousetilesarranged.png', {x: 0, y: 0, w: 48, h: 64}),
     behaviors: {
         'all': { defaultLayer: 'field' },
         '13x0': { defaultLayer: 'field', solidMap: BITMAP_LEFT_6_BOTTOM_9},
@@ -94,7 +92,7 @@ const woodStairs: TileSource = {
 
 const woodLedges: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/woodhousetilesarranged.png'), x: 0, y: 0, w: 48, h: 64},
+    source: requireFrame('gfx/tiles/woodhousetilesarranged.png', {x: 0, y: 0, w: 48, h: 64}),
     behaviors: {
         'all': { defaultLayer: 'floor2' },
         '8x9': { defaultLayer: 'floor2', ledges: { up: true, left: true}},
@@ -124,7 +122,7 @@ const woodLedges: TileSource = {
 };
 const woodFloorDecorations: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/woodhousetilesarranged.png'), x: 0, y: 0, w: 48, h: 64},
+    source: requireFrame('gfx/tiles/woodhousetilesarranged.png', {x: 0, y: 0, w: 48, h: 64}),
     behaviors: {
         'all': { defaultLayer: 'floor2' },
     },
@@ -137,7 +135,7 @@ const woodFloorDecorations: TileSource = {
 };
 const woodFloor: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/woodhousetilesarranged.png'), x: 0, y: 0, w: 48, h: 64},
+    source: requireFrame('gfx/tiles/woodhousetilesarranged.png', {x: 0, y: 0, w: 48, h: 64}),
     behaviors: {
         'all': { defaultLayer: 'floor' },
     },
@@ -157,7 +155,7 @@ export const allWoodTileSources: TileSource[] = [
 
 export const extraWoodWalls: TileSource = {
     w: 16, h: 16,
-    source: {image: requireImage('gfx/tiles/woodhousetilesarranged.png'), x: 0, y: 0, w: 48, h: 80},
+    source: requireFrame('gfx/tiles/woodhousetilesarranged.png', {x: 0, y: 0, w: 48, h: 80}),
     behaviors: {
         'all': southernWallBehavior,
     },
