@@ -37,6 +37,7 @@ export const GAME_KEY = {
     RIGHT: 10,
     ROLL: 11,
     MEDITATE: 12,
+    MAP: 13,
 };
 
 export const FADE_IN_DURATION = 600;

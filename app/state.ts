@@ -111,6 +111,7 @@ export function getDefaultSavedState(): SavedState {
         dungeonInventories: {},
         objectFlags: {},
         zoneFlags: {},
+        luckyBeetles: [],
         savedHeroData: getDefaultSavedHeroData(),
         staffTowerLocation: 'desert',
     };
@@ -195,6 +196,7 @@ export function getDefaultState(): GameState {
         areaGrid: zones.peachCave.floors[0].grid,
         floor: zones.peachCave.floors[0],
         paused: false,
+        showMap: false,
         menuIndex: 0,
         menuRow: 0,
         defeatState: {
@@ -257,7 +259,7 @@ export function returnToSpawnLocation(state: GameState) {
     state.hero.invulnerableFrames = 0;
     state.hero.hasBarrier = false;
     state.hero.isInvisible = false;
-    state.activeStaff = null;
+    state.hero.activeStaff = null;
     state.hero.frozenDuration = 0;
     state.hero.vx = 0;
     state.hero.vy = 0;
@@ -292,7 +294,15 @@ export function getTitleOptions(state: GameState): string[] {
 }
 
 export function shouldHideMenu(state: GameState): boolean {
-    return !!state.alwaysHideMenu || state.hero.isExitingDoor || state.hero.isControlledByObject
-        || state.scriptEvents.queue.length > 0 || state.scriptEvents.activeEvents.length > 0
-        || !!state.messagePage || !!state.transitionState;
+    return !!(
+        state.alwaysHideMenu || state.hero.isExitingDoor || state.hero.isControlledByObject
+        || state.scriptEvents.queue.length || state.scriptEvents.activeEvents.length
+        || state.messagePage || state.transitionState || state.defeatState.defeated
+        || state.nextAreaSection || state.nextAreaInstance
+        || state.areaInstance.priorityObjects?.length
+    );
+}
+
+export function canPauseGame(state: GameState): boolean {
+    return state.alwaysHideMenu || !shouldHideMenu(state);
 }

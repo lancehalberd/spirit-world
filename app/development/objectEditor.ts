@@ -20,6 +20,7 @@ import { enemyTypes } from 'app/content/enemies';
 import { npcBehaviors, npcStyles } from 'app/content/objects/npc';
 import { signStyles } from 'app/content/objects/sign';
 import { getLootFrame } from 'app/content/loot';
+import { pitStyles } from 'app/content/objects/pitEntrance';
 import { turretStyles } from 'app/content/objects/wallTurret';
 import { zones } from 'app/content/zones';
 import { ObjectPalette, ObjectPaletteItem } from 'app/development/objectPalette';
@@ -221,7 +222,7 @@ export const combinedObjectTypes: ObjectType[] = [
     'anode', 'cathode', 'airBubbles', 'ballGoal', 'beadCascade', 'beadGrate', 'bigChest', 'chest', 'crystalSwitch', 'decoration',
     'door', 'escalator', 'floorSwitch', 'keyBlock', 'loot','marker', 'narration', 'npc', 'pitEntrance',
     'pushPull', 'rollingBall', 'saveStatue', 'shopItem', 'sign', 'spawnMarker', 'teleporter', 'tippable', 'torch', 'turret',
-    'vineSprout', 'waterPot',
+    'vineSprout', 'waterfall', 'waterPot',
 ];
 
 export function createObjectDefinition(
@@ -335,6 +336,13 @@ export function createObjectDefinition(
                 h: definition.h || 16,
                 decorationType: definition.decorationType || Object.keys(decorationTypes)[0] as DecorationType,
             };
+        case 'waterfall':
+            return {
+                ...commonProps,
+                type: definition.type,
+                w: definition.w || 16,
+                h: definition.h || 16,
+            };
         case 'enemy': {
             const enemyType = definition.enemyType;
             const enemyDefinition = enemyDefinitions[enemyType];
@@ -382,6 +390,7 @@ export function createObjectDefinition(
         case 'pitEntrance':
             return {
                 ...commonProps,
+                style: definition.style || Object.keys(pitStyles)[0],
                 targetZone: definition.targetZone,
                 targetObjectId: definition.targetObjectId,
                 type: definition.type,
@@ -714,6 +723,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                     updateObjectInstance(state, object);
                 },
             });
+        case 'waterfall':
             rows.push({
                 name: 'w',
                 value: object.w,
@@ -1116,6 +1126,8 @@ function getStyleFields(state: GameState, editingState: EditingState, object: Ob
         styles = escalatorStyles;
     } else if (object.type === 'turret') {
         styles = turretStyles;
+    } else if (object.type === 'pitEntrance') {
+        styles = pitStyles;
     }
     if (!styles) {
         return [];
@@ -1248,10 +1260,17 @@ export function onMouseDownSelect(state: GameState, editingState: EditingState, 
 }
 
 export function fixObjectPosition(state: GameState, object: ObjectDefinition): void {
-    if (object.type === 'escalator' || object.type === 'decoration') {
+    if (object.type === 'escalator' || object.type === 'decoration' || object.type === 'waterfall') {
         //object.x = Math.round(object.x / 8) * 8;
         //object.y = Math.round(object.y / 8) * 8;
         return;
+    }
+    const instance = createObjectInstance(state, object);
+    // Objects that apply their behaviors to the grid must be tile aligned.
+    if (instance.applyBehaviorsToGrid) {
+        object.x = Math.round(object.x / 16) * 16;
+        object.y = Math.round(object.y / 16) * 16;
+        return
     }
     // Default behavior is to snap to half grid.
     if (object.type !== 'loot') {
@@ -1313,9 +1332,12 @@ export function getObjectFrame(object: ObjectDefinition): FrameDimensions {
     return getLootFrame(state, {lootType: 'unknown'});
 }
 
-export function getObjectHitBox(object: ObjectDefinition): Rect {
+function getObjectHitBox(object: ObjectDefinition): Rect {
     const state = getState();
     const instance = createObjectInstance(state, object);
+    if (instance.getEditorHitbox) {
+        return instance.getEditorHitbox(state);
+    }
     if (instance.getHitbox) {
         return instance.getHitbox(state);
     }
@@ -1421,6 +1443,12 @@ export function renderObjectPreview(
     definition.x -= (frame.content?.w || frame.w) / 2;
     definition.y -= (frame.content?.h || frame.h) / 2;
     fixObjectPosition(state, definition);
+    const hitbox = getObjectHitBox(definition);
+    context.save();
+        context.globalAlpha *= 0.3;
+        context.fillStyle = 'white';
+        context.fillRect(hitbox.x, hitbox.y, hitbox.w, hitbox.h);
+    context.restore();
     const object = createObjectInstance(state, definition);
     if (object.renderPreview) {
         object.renderPreview(context, object.getHitbox(state));

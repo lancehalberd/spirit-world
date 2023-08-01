@@ -11,6 +11,7 @@ import { renderHeroEyes, renderHeroShadow } from 'app/renderActor';
 import { renderDefeatedMenu } from 'app/renderDefeatedMenu';
 import { renderHUD } from 'app/renderHUD';
 import { renderMenu } from 'app/renderMenu';
+import { renderMap } from 'app/render/renderMap';
 import { renderMessage } from 'app/render/renderMessage';
 import { renderTitle } from 'app/renderTitle';
 import { getState, shouldHideMenu } from 'app/state';
@@ -56,7 +57,7 @@ export function updateSpiritCanvas(state: GameState, radius: number): void {
         spiritContext.restore();
         renderAreaObjectsAfterHero(spiritContext, state, area);
         renderAreaForeground(spiritContext, state, area);
-        renderForegroundObjects(spiritContext, state, area);
+        // renderForegroundObjects(spiritContext, state, area);
     spiritContext.restore();
     if (state.zone.surfaceKey && !area.definition.isSpiritWorld) {
         spiritContext.save();
@@ -118,7 +119,11 @@ export function render() {
         renderTransition(context, state);
         renderHUD(context, state);
         if (state.paused && !shouldHideMenu(state)) {
-            renderMenu(context, state);
+            if (state.showMap) {
+                renderMap(context, state);
+            } else {
+                renderMenu(context, state);
+            }
         }
         return;
     }
@@ -175,7 +180,11 @@ export function render() {
         renderHUD(context, state);
     }
     if (state.paused && !shouldHideMenu(state)) {
-        renderMenu(context, state);
+        if (state.showMap) {
+            renderMap(context, state);
+        } else {
+            renderMenu(context, state);
+        }
     }
 }
 
@@ -460,7 +469,7 @@ export function renderField(
             updateWaterSurfaceCanvas(state);
         }
     }
-    if (state.hero.spiritRadius > 0 && state.alternateAreaInstance.checkToRedrawTiles) {
+    if (state.alternateAreaInstance.checkToRedrawTiles) {
         checkToRedrawTiles(state.alternateAreaInstance);
         updateLightingCanvas(state.alternateAreaInstance);
     }
@@ -590,12 +599,19 @@ export function renderAreaForeground(context: CanvasRenderingContext2D, state: G
     renderForegroundObjects(context, state, area);
 }
 
-export function renderAreaObjectsBeforeHero(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance): void {
+export function renderAreaObjectsBeforeHero(
+    context: CanvasRenderingContext2D,
+    state: GameState,
+    area: AreaInstance,
+    doNotTranslate: boolean = false,
+): void {
     if (!area) {
         return;
     }
     context.save();
-        translateContextForAreaAndCamera(context, state, area);
+        if (!doNotTranslate) {
+            translateContextForAreaAndCamera(context, state, area);
+        }
         if (area === state.areaInstance && !editingState.isEditing) {
             renderHeroShadow(context, state, state.hero);
         } else if (state.transitionState?.type === 'mutating' && area === state.transitionState.nextAreaInstance) {
@@ -625,19 +641,26 @@ export function renderAreaObjectsBeforeHero(context: CanvasRenderingContext2D, s
                 }
             }
         }
-        spriteObjects.sort((A, B) => A.y - B.y);
+        spriteObjects.sort((A, B) => (A.getYDepth?.() ?? A.y) - (B.getYDepth?.() ?? B.y));
         for (const objectOrEffect of spriteObjects) {
             objectOrEffect.render(context, state);
         }
     context.restore();
 }
 
-export function renderAreaObjectsAfterHero(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance): void {
+export function renderAreaObjectsAfterHero(
+    context: CanvasRenderingContext2D,
+    state: GameState,
+    area: AreaInstance,
+    doNotTranslate: boolean = false,
+): void {
     if (!area) {
         return;
     }
     context.save();
-        translateContextForAreaAndCamera(context, state, area);
+        if (!doNotTranslate) {
+            translateContextForAreaAndCamera(context, state, area);
+        }
         const spriteObjects: (EffectInstance | ObjectInstance)[] = [];
         // Currently the jumping down logic uses hero y value to simulate a z value.
         // Because of this, to render the hero in the correct order we need to pretend the
@@ -655,19 +678,26 @@ export function renderAreaObjectsAfterHero(context: CanvasRenderingContext2D, st
             }
         }
         // Sprite objects are rendered in order of their y positions.
-        spriteObjects.sort((A, B) => A.y - B.y);
+        spriteObjects.sort((A, B) => (A.getYDepth?.() ?? A.y) - (B.getYDepth?.() ?? B.y));
         for (const objectOrEffect of spriteObjects) {
             objectOrEffect.render(context, state);
         }
     context.restore();
 }
 
-export function renderForegroundObjects(context: CanvasRenderingContext2D, state: GameState, area: AreaInstance): void {
+export function renderForegroundObjects(
+    context: CanvasRenderingContext2D,
+    state: GameState,
+    area: AreaInstance,
+    doNotTranslate: boolean = false,
+): void {
     if (!area) {
         return;
     }
     context.save();
-        translateContextForAreaAndCamera(context, state, area);
+        if (!doNotTranslate) {
+            translateContextForAreaAndCamera(context, state, area);
+        }
         const foregroundObjects: (EffectInstance | ObjectInstance)[] = [];
         for (const object of area.objectsToRender) {
             if (object.renderForeground) {

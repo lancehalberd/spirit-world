@@ -409,6 +409,7 @@ const sf0_0x1: AreaDefinition = {
         {status: "normal", id: "forestTempleLadder3", x: 400, y: 0, type: "door", style: "ladderUp", targetZone: "overworld", targetObjectId: "forestTempleLadder3", d: "up"},
         {status: "locked", id: "forestTempleLockedDoor", x: 0, y: 368, type: "door", style: "cave", d: "left"},
         {status: "normal", id: "forestTempleSmallKey", x: 128, y: 112, type: "chest", lootType: "smallKey", lootLevel: 1},
+        {status: "normal", id: "forestTemple:s0:1x0-luckyBeetle-0", x: 120, y: 376, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16},

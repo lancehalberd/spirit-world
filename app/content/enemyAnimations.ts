@@ -25,6 +25,28 @@ export const snakeAnimations: ActorAnimations = {
         right: leftSnakeAnimation,
     },
 };
+const leftRedSnakeAnimation: FrameAnimation = createAnimation('gfx/enemies/snekred.png', snakeGeometry, { x: 0});
+const downRedSnakeAnimation: FrameAnimation = createAnimation('gfx/enemies/snekred.png', snakeGeometry, { x: 1});
+const upRedSnakeAnimation: FrameAnimation = createAnimation('gfx/enemies/snekred.png', snakeGeometry, { x: 2});
+export const redSnakeAnimations: ActorAnimations = {
+    idle: {
+        up: upRedSnakeAnimation,
+        down: downRedSnakeAnimation,
+        left: leftRedSnakeAnimation,
+        right: leftRedSnakeAnimation,
+    },
+};
+const leftBlueSnakeAnimation: FrameAnimation = createAnimation('gfx/enemies/snekblue.png', snakeGeometry, { x: 0});
+const downBlueSnakeAnimation: FrameAnimation = createAnimation('gfx/enemies/snekblue.png', snakeGeometry, { x: 1});
+const upBlueSnakeAnimation: FrameAnimation = createAnimation('gfx/enemies/snekblue.png', snakeGeometry, { x: 2});
+export const blueSnakeAnimations: ActorAnimations = {
+    idle: {
+        up: upBlueSnakeAnimation,
+        down: downBlueSnakeAnimation,
+        left: leftBlueSnakeAnimation,
+        right: leftBlueSnakeAnimation,
+    },
+};
 // all idols share the same layout and dimensions
 // row 0: still frames; row 1: float;
 // row 2: float attack; row 3: dead float attack;
@@ -111,19 +133,16 @@ export const fireIdolAnimations: ActorAnimations = {
 };
 
 const beetleGeometry: FrameDimensions = { w: 18, h: 17, content: { x: 2, y: 4, w: 14, h: 12} };
-const beetleDownAnimation: FrameAnimation = createAnimation('gfx/enemies/genericbeetle.png', beetleGeometry, { y: 0, cols: 4});
-const beetleRightAnimation: FrameAnimation = createAnimation('gfx/enemies/genericbeetle.png', beetleGeometry, { y: 1, cols: 4});
-const beetleUpAnimation: FrameAnimation = createAnimation('gfx/enemies/genericbeetle.png', beetleGeometry, { y: 2, cols: 4});
-const beetleLeftAnimation: FrameAnimation = createAnimation('gfx/enemies/genericbeetle.png', beetleGeometry, { y: 4, cols: 4});
-const beetleClimbAnimation: FrameAnimation = createAnimation('gfx/enemies/genericbeetle.png', beetleGeometry, { y: 3, cols: 4});
-
+function genericBeetleAnimation(props: CreateAnimationOptions, extra?: ExtraAnimationProperties) {
+    return createAnimation('gfx/enemies/genericbeetle.png', beetleGeometry, props, extra);
+}
+const beetleDownAnimation: FrameAnimation = genericBeetleAnimation({ y: 0, cols: 4});
+const beetleRightAnimation: FrameAnimation = genericBeetleAnimation({ y: 1, cols: 4});
+const beetleUpAnimation: FrameAnimation = genericBeetleAnimation({ y: 2, cols: 4});
+const beetleLeftAnimation: FrameAnimation = genericBeetleAnimation({ y: 4, cols: 4});
+const beetleClimbAnimation: FrameAnimation = genericBeetleAnimation({ y: 3, cols: 4});
 export const beetleAnimations: ActorAnimations = {
-    climbing: {
-        up: beetleClimbAnimation,
-        down: beetleClimbAnimation,
-        left: beetleClimbAnimation,
-        right: beetleClimbAnimation,
-    },
+    climbing: omniAnimation(beetleClimbAnimation),
     idle: {
         up: beetleUpAnimation,
         down: beetleDownAnimation,
@@ -131,13 +150,24 @@ export const beetleAnimations: ActorAnimations = {
         right: beetleRightAnimation,
     },
 };
-
 export const climbingBeetleAnimations: ActorAnimations = {
+    idle: omniAnimation(beetleClimbAnimation),
+};
+
+
+function goldenBeetleAnimation(props: CreateAnimationOptions, extra?: ExtraAnimationProperties) {
+    return createAnimation('gfx/enemies/goldenbeetle.png', beetleGeometry, props, extra);
+}
+const goldenBeetleDownAnimation: FrameAnimation = goldenBeetleAnimation({ y: 0, cols: 4});
+const goldenBeetleRightAnimation: FrameAnimation = goldenBeetleAnimation({ y: 1, cols: 4});
+const goldenBeetleUpAnimation: FrameAnimation = goldenBeetleAnimation({ y: 2, cols: 4});
+const goldenBeetleLeftAnimation: FrameAnimation = goldenBeetleAnimation({ y: 4, cols: 4});
+export const goldenBeetleAnimations: ActorAnimations = {
     idle: {
-        up: beetleClimbAnimation,
-        down: beetleClimbAnimation,
-        left: beetleClimbAnimation,
-        right: beetleClimbAnimation,
+        up: goldenBeetleUpAnimation,
+        down: goldenBeetleDownAnimation,
+        left: goldenBeetleLeftAnimation,
+        right: goldenBeetleRightAnimation,
     },
 };
 
@@ -341,7 +371,7 @@ export const crystalBatAnimations: ActorAnimations = {
 
 const crystalCollectorGeometry: FrameDimensions = { w: 50, h: 39, content: {x: 7, y: 9, w: 36, h: 30} };
 const crystalBossAnimation = (props: CreateAnimationOptions, extra?: ExtraAnimationProperties) =>
-    createAnimation('gfx/enemies/eyeboss1.png', crystalCollectorGeometry, props, extra);
+    createAnimation('gfx/enemies/eyeboss2.png', crystalCollectorGeometry, props, extra);
 
 
 const crystalCollectorOpenAnimation = crystalBossAnimation({ cols: 5, duration: 10}, {loop: false});
@@ -358,6 +388,8 @@ const crystalCollectorEnragedConfusedAnimation = crystalBossAnimation({ y: 1, x:
 
 const crystalCollectorAttackAnimation = crystalBossAnimation({ x: 8, cols: 3, duration: 5});
 const crystalCollectorEnragedAttackAnimation = crystalBossAnimation({ y: 1, x: 8, cols: 3, duration: 5});
+
+export const crystalCollecterBackFrame = crystalBossAnimation({x: 11}).frames[0];
 
 export const crystalCollectorAnimations: ActorAnimations = {
     open: omniAnimation(crystalCollectorOpenAnimation),
@@ -383,8 +415,40 @@ export const crystalBarrierNormalAnimation = createAnimation('gfx/effects/monste
 export const crystalBarrierDamagedAnimation = createAnimation('gfx/effects/monstershield.png', crystalBarrierGeometry, { x: 4, cols: 1, duration: 5});
 export const crystalBarrierVeryDamagedAnimation = createAnimation('gfx/effects/monstershield.png', crystalBarrierGeometry, { x: 5, cols: 1, duration: 5});
 
+const smallCrystalBarrierGeometry: FrameDimensions = { w: 68, h: 72, content: {x: 2, y: 20, w: 64, h: 44} };
+export const [
+    smallCrystalBarrierFlashFrame,
+    smallCrystalBarrierNormalFrame,
+    smallCrystalBarrierDamagedFrame,
+    smallCrystalBarrierVeryDamagedFrame,
+] = createAnimation('gfx/effects/golemshield.png', smallCrystalBarrierGeometry, { x: 0, cols: 4}).frames;
+
 export const crystalBarrierSmallParticles = createAnimation('gfx/effects/crystalwallparticles.png', {w: 8, h: 8}, { cols: 3}).frames;
 export const crystalBarrierLargeParticles = createAnimation('gfx/effects/crystalwallparticles2.png', {w: 16, h: 28}, { cols: 4}).frames;
+
+const crystalGuardianGeometry: FrameDimensions = { w: 40, h: 48, content: {x: 4, y: 16, w: 32, h: 32} };
+export const crystalGuardianIdleAnimation = createAnimation('gfx/enemies/golem.png', crystalGuardianGeometry,
+    { x: 0, cols: 1, duration: 10});
+export const crystalGuardianAttackAnimation = createAnimation('gfx/enemies/golem.png', crystalGuardianGeometry,
+    { x: 1, cols: 2, duration: 10, frameMap: [0, 0, 1]}, {loop: false});
+export const crystalGuardianSpellAnimation = createAnimation('gfx/enemies/golem.png', crystalGuardianGeometry,
+    { x: 3, cols: 4, duration: 10}, {loopFrame: 1});
+export const crystalGuardianHurtAnimation = createAnimation('gfx/enemies/golem.png', crystalGuardianGeometry,
+    { x: 7, cols: 1, duration: 10}, {loop: false});
+export const crystalGuardianAnimations: ActorAnimations = {
+    idle: omniAnimation(crystalGuardianIdleAnimation),
+    hurt: omniAnimation(crystalGuardianHurtAnimation),
+    attack: omniAnimation(crystalGuardianAttackAnimation),
+    spell: omniAnimation(crystalGuardianSpellAnimation),
+    death: omniAnimation(crystalGuardianHurtAnimation),
+};
+/*
+//
+Frame 1 - this is the idle standing frame
+Frame 2-3 - this is the hammering frame. I imagine you should keep the golem on frame 3 for longer just to help show that the attack came from the hammer
+Frame 4-7 - this is the golem preparing and then casting a spell. Loop frames 5-7 for however long the casting is.
+Frame 8 - hurt frame*/
+
 
 /* RIVAL */
 // image layout

@@ -9,9 +9,6 @@ export function unlockAudio() {
     audioUnlocked = true;
 }
 
-const version = window.version;
-
-
 export function requireSound(key, callback = null): GameSound {
     let source, loop, offset, volume, duration, limit, repeatFrom, nextTrack, type = 'default';
     if (typeof key === 'string') {
@@ -32,7 +29,7 @@ export function requireSound(key, callback = null): GameSound {
     if (offset) [offset, duration] = String(offset).split(':').map(Number);
     if (type === 'bgm') {
         const howlerProperties: HowlerProperties = {
-            src: [`${source}?v=${version}`],
+            src: [`${source}`],
             html5: true,
             loop: false,
             volume: volume / 50,
@@ -99,7 +96,7 @@ export function requireSound(key, callback = null): GameSound {
         return newSound;
     } else {
         const howlerProperties: HowlerProperties = {
-            src: [`${source}?v=${version}`],
+            src: [`${source}`],
             loop: loop || false,
             volume: (volume || 1) / 50,
             onplay: function () {
@@ -211,6 +208,8 @@ const musicTracks = {
     caveTheme: {key: 'caveTheme', type: 'bgm', source: 'bgm/Spirit 1.mp3', volume: 10 },
     // Used on the title screen and world map
     mainTheme: {key: 'mainTheme', type: 'bgm', source: 'bgm/Spirit 4.2_demo.mp3', volume: 5 },
+    // Used for holy city, but a bit to relaxed for that.
+    waterfallVillageTheme: {key : 'waterfallVillage', type: 'bgm', source: 'bgm/Spirit 21.A_demo.mp3', volume: 5},
     vanaraForestTheme: {key: 'vanaraForestTheme', type: 'bgm', source: 'bgm/Spirit 16_concept.mp3', volume: 5 },
     tombTheme: {key: 'tombTheme', type: 'bgm', source: 'bgm/Spirit 5.2_demo.mp3', volume: 5 },
     // Used for Vanara ship dungeons like cocoon, helix and forest temple.
@@ -225,6 +224,10 @@ const musicTracks = {
     skyTheme: {key: 'skyTheme', type: 'bgm', source: 'bgm/Spirit 14_demo.mp3', volume: 5 },
     // Used for the lake temple
     lakeTheme: {key: 'lakeTheme', type: 'bgm', source: 'bgm/Spirit 9 Demo.mp3', volume: 5 },
+    // Used for holy city, but a bit to relaxed for that.
+    village: {key : 'village', type: 'bgm', source: 'bgm/Spirit 21_demo.mp3', volume: 5},
+    // Used for summoner ruins.
+    ruins: {key : 'ruins', type: 'bgm', source: 'bgm/Spirit 22_concept.mp3', volume: 5},
 
     // Tracks from Leon
     // For War Temple and other dungeons

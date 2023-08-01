@@ -37,8 +37,17 @@ dialogueHash.mom = {
             isExclusive: true,
             text: [
                 `May our ancestors watch over you.`,
-                `{@mom.rest}`,
             ],
+        },
+        {
+            logicCheck: {
+                requiredFlags: ['$spiritSight', 'momRuins'],
+                excludedFlags: ['$astralProjection'],
+            },
+            text: [
+                `I'm sure you can find what you need in the summoner ruins to the Southeast!`,
+            ],
+            repeatIndex: 0,
         },
         {
             logicCheck: {
@@ -50,26 +59,58 @@ dialogueHash.mom = {
                 `So you've learned to look into the spirit world...
                 {|}It is forbidden to speak of, but my ancestors gained great powers by summoning beings from the spirit world.
                 {|}They say the ruins in the Southeast are where the ancient summoners lived.
-                {|}Perhaps you can find something there to help you.`,
-                `I'm sure you can find what you need in the summoner ruins to the Southeast!`,
-                `{@mom.rest}`,
+                {|}Perhaps you can find something there to help you.
+                {flag:momRuins}`,
             ],
         },
+        {
+            logicCheck: {
+                requiredFlags: ['elderTomb'],
+                excludedFlags: ['$spiritSight'],
+            },
+            text: [
+                `The Vanara Elder said you should visit the Tomb to learn more about your spirit powers?
+                {|}Please be careful, I hear the tomb is full of traps to keep away grave robbers.`,
+            ],
+            repeatIndex: 0,
+        },
+        {
+            logicCheck: {
+                requiredFlags: ['$catEyes', 'momElder'],
+                excludedFlags: ['elderTomb'],
+            },
+            text: [
+                `You should head Southwest to the Vanara Village if you want to learn
+                {|}more about the Vanara powers you inherited from your father.`,
+            ],
+            repeatIndex: 0,
+        },
+        {
+            logicCheck: {
+                requiredFlags: ['$catEyes'],
+                excludedFlags: ['momElder', 'elderTomb'],
+            },
+            text: [
+                `Welcome home son!
+                {|}You were gone so long I was worried you got into some kind of trouble again!
+                {|}...
+                {|}You ate a strange fruit in a cave and now you can see in the dark?
+                {|}Your father said that the Vanara Elder had some kind of magic power but he
+                said it was dangerous and they had to keep it secret.
+                {|}If you have the same kind of power you should go talk to the Elder just to be safe.
+                {|}The Elder lives in the Forest Village to the Southwest, just try not to bother them too much.
+                {flag:momElder}`,
+            ],
+        },
+        // The player never gets advice from their mom if they don't obtain the cat eyes.
         {
             logicCheck: {
                 requiredFlags: [],
                 excludedFlags: [],
             },
             text: [
-                `Welcome home son!
-                {|}Try not to get too wet going into our cave.
-                {|}Talk to me again if you want a hint.`,
-                `You should head Southwest to the Vanara Village if you want to learn
-                {|}more about the Vanara powers you inherited from your father.`,
-                `This waterfall is a great disguise for our cave, but I wish it wasn't so cold!`,
-                `{@mom.rest}`,
+                'Welcome home son!',
             ],
-            repeatIndex: 0,
         },
     ],
 };

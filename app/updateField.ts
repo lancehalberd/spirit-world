@@ -7,7 +7,7 @@ import { wasGameKeyPressed } from 'app/keyCommands';
 import { updateAllHeroes } from 'app/updateActor';
 import { updateCamera } from 'app/updateCamera';
 import { createAnimation } from 'app/utils/animations';
-import { getTileBehaviors } from 'app/utils/field';
+import { getTileBehaviorsAndObstacles } from 'app/utils/field';
 
 import {
     AreaInstance, EffectInstance, FrameAnimation, FrameDimensions,
@@ -116,11 +116,11 @@ export function updateAreaObjects(this: void, state: GameState, area: AreaInstan
             continue;
         }
         object.update?.(state);
-        if (!object.ignorePits && object.getHitbox) {
+        if (object.area && !object.ignorePits && object.getHitbox) {
             const hitbox = object.getHitbox(state);
             const x = hitbox.x + hitbox.w / 2;
             const y = hitbox.y + hitbox.h / 2;
-            const { tileBehavior } = getTileBehaviors(state, object.area, {x, y});
+            const { tileBehavior } = getTileBehaviorsAndObstacles(state, object.area, {x, y});
             if (tileBehavior?.pit && !(object.z > 0)) {
                 const pitAnimation = new AnimationEffect({
                     animation: objectFallAnimation,

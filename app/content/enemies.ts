@@ -19,6 +19,8 @@ import {
     beetleWingedAnimations,
     entAnimations,
     floorEyeAnimations,
+    blueSnakeAnimations,
+    redSnakeAnimations,
     snakeAnimations,
 } from 'app/content/enemyAnimations';
 import { certainLifeLootTable, simpleLootTable, lifeLootTable, moneyLootTable } from 'app/content/lootTables';
@@ -27,7 +29,7 @@ import { editingState } from 'app/development/tileEditor';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { moveActor } from 'app/moveActor';
 import { createAnimation, drawFrameAt, drawFrameCenteredAt } from 'app/utils/animations';
-import { directionMap, getDirection } from 'app/utils/field';
+import { directionMap, getDirection, getTileBehaviorsAndObstacles } from 'app/utils/field';
 
 import {
     ActorAnimations, Direction, DrawPriority, EffectInstance,
@@ -42,6 +44,7 @@ export * from 'app/content/enemies/crystalBat';
 export * from 'app/content/enemies/crystalGuardian';
 export * from 'app/content/enemies/electricSquirrel';
 export * from 'app/content/enemies/lightningDrone';
+export * from 'app/content/enemies/luckyBeetle';
 export * from 'app/content/enemies/sentryBot';
 export * from 'app/content/enemies/squirrel';
 
@@ -55,6 +58,7 @@ export const enemyTypes = <const>[
     // These are designed for the golem boss but can be use in isolation.
     'golemHand',
     'lightningBug', 'lightningDrone',
+    'luckyBeetle',
     'sentryBot', 'snake', 'squirrel',
     'wallLaser',
 ];
@@ -193,7 +197,7 @@ enemyDefinitions.beetleWinged = {
     lootTable: simpleLootTable,
 };
 enemyDefinitions.wallLaser = {
-    animations: snakeAnimations, life: 1, touchDamage: 1, update: updateWallLaser, flipRight: true,
+    animations: blueSnakeAnimations, life: 1, touchDamage: 1, update: updateWallLaser, flipRight: true,
     lootTable: simpleLootTable, params: { alwaysShoot: false },
     renderPreview(context: CanvasRenderingContext2D, enemy: Enemy, target: Rect): void {
         enemy.defaultRenderPreview(context, target);
@@ -202,7 +206,7 @@ enemyDefinitions.wallLaser = {
 };
 enemyDefinitions.flameSnake = {
     alwaysReset: true,
-    animations: snakeAnimations, speed: 1.1,
+    animations: redSnakeAnimations, speed: 1.1,
     life: 3, touchDamage: 1, update: updateFlameSnake, flipRight: true,
     elementalMultipliers: {'ice': 2},
     immunities: ['fire'],
@@ -916,46 +920,55 @@ export function checkForFloorEffects(state: GameState, enemy: Enemy) {
     if (!enemy.area) {
         return;
     }
-    const behaviorGrid = enemy.area.behaviorGrid;
-    const tileSize = 16;
+    //const behaviorGrid = enemy.area.behaviorGrid;
+    //const tileSize = 16;
 
     const hitbox = enemy.getHitbox(state);
-    let leftColumn = Math.floor((hitbox.x + 6) / tileSize);
+    /*let leftColumn = Math.floor((hitbox.x + 6) / tileSize);
     let rightColumn = Math.floor((hitbox.x + hitbox.w - 7) / tileSize);
     let topRow = Math.floor((hitbox.y + 6) / tileSize);
-    let bottomRow = Math.floor((hitbox.y + hitbox.h - 7) / tileSize);
+    let bottomRow = Math.floor((hitbox.y + hitbox.h - 7) / tileSize);*/
 
-    for (let row = topRow; row <= bottomRow; row++) {
+    const checkForPits = enemy.z <= 0
+        && !enemy.flying
+        // Bosses don't fall in pits.
+        && enemy.definition?.type !== 'boss'
+        // Specific enemies can be set to ignore pits.
+        && !enemy.enemyDefinition.ignorePits;
+
+    /*for (let row = topRow; row <= bottomRow; row++) {
         for (let column = leftColumn; column <= rightColumn; column++) {
             const behaviors = behaviorGrid?.[row]?.[column];
             // This will happen when the player moves off the edge of the screen.
             if (!behaviors) {
-                //startSwimming = false;
                 continue;
             }
-            /*if (behaviors.climbable) {
-                startClimbing = true;
-            }
-            if (!behaviors.water) {
-                startSwimming = false;
-            }*/
-            if (behaviors.pit && enemy.z <= 0
-                && !enemy.flying
-                // Bosses don't fall in pits.
-                && enemy.definition?.type !== 'boss'
-                // Specific enemies can be set to ignore pits.
-                && !enemy.enemyDefinition.ignorePits
-            ) {
-                const pitAnimation = new AnimationEffect({
-                    animation: enemyFallAnimation,
-                    x: column * 16 - 4, y: row * 16 - 4,
-                });
-                addEffectToArea(state, enemy.area, pitAnimation);
-                enemy.status = 'gone';
+            if (behaviors.pit && checkForPits) {
+                makeEnemyFallIntoPit(state, enemy);
                 return;
             }
         }
+    }*/
+
+    if (checkForPits) {
+        const x = hitbox.x + hitbox.w / 2;
+        const y = hitbox.y + hitbox.h / 2;
+        const { tileBehavior } = getTileBehaviorsAndObstacles(state, enemy.area, {x, y});
+        if (tileBehavior?.pit) {
+            makeEnemyFallIntoPit(state, enemy);
+            return;
+        }
     }
+}
+
+function makeEnemyFallIntoPit(state: GameState, enemy: Enemy) {
+    const hitbox = enemy.getHitbox(state);
+    const pitAnimation = new AnimationEffect({
+        animation: enemyFallAnimation,
+        x: Math.round(hitbox.x / 16) * 16 - 4, y: Math.round(hitbox.y / 16) * 16 - 4,
+    });
+    addEffectToArea(state, enemy.area, pitAnimation);
+    enemy.status = 'gone';
 }
 
 export function hasEnemyLeftSection(state: GameState, enemy: Enemy): boolean {

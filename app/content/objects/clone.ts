@@ -4,13 +4,10 @@ import { Hero } from 'app/content/hero';
 import { carryMap, directionMap, directionToLeftRotationsFromRight, rotateDirection } from 'app/utils/field';
 
 import {
-    Direction, GameState, Rect, TileBehaviors,
+    Direction, GameState, Rect,
 } from 'app/types';
 
 export class Clone extends Hero {
-    behaviors: TileBehaviors = {
-        solid: true,
-    };
     carryRotationOffset: number;
     ignorePits = true;
     uncontrollable = false;
@@ -68,9 +65,12 @@ export function destroyClone(state: GameState, clone: Hero): void {
         clone.y = clone.safeY;
         return;
     }
+    // Clone staff gets recalled when it is destroyed.
+    clone.activeStaff?.recall(state);
     if (clone === state.hero) {
         // If the "clone" destroyed was the hero, then pop the last clone and move the hero to it.
         const lastClone = state.hero.clones.pop();
+        state.hero.activeStaff = lastClone.activeStaff;
         state.hero.x = lastClone.x;
         state.hero.y = lastClone.y;
         removeObjectFromArea(state, lastClone);

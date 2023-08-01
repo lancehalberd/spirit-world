@@ -207,6 +207,17 @@ export const SPAWN_FORGE_ENTRANCE: ZoneLocation = {
     isSpiritWorld: true,
 };
 
+export const SPAWN_GRAND_TEMPLE_ENTRANCE: ZoneLocation = {
+    zoneKey: 'grandTemple',
+    floor: 0,
+    x: 248,
+    y: 448,
+    z: 0,
+    d: 'up',
+    areaGridCoords: {x: 0, y: 1},
+    isSpiritWorld: false,
+};
+
 export const SPAWN_SKY_PALACE_ENTRANCE: ZoneLocation = {
     zoneKey: 'skyPalace',
     floor: 0,
@@ -409,6 +420,10 @@ const helixEndState = applyItems(helixStartState, {charge: 1, staff: 1, normalDa
 const forestBackState = applyItems(helixEndState, {cloudBoots: 1, 'forestTemple:bigKey': 1});
 const waterfallBossState = applyItems(helixEndState, {ironBoots: 1});
 
+const grandTempleStartState = applyItems(helixEndState, {
+    clone: 1, cloudBoots: 1, gloves: 2, cloak: 2, nimbusCloud: 1, roll: 2},
+    []);
+
 const riverTempleStartState = applyItems(helixEndState, {
     cloudBoots: 1, clone: 1,
     ironBoots: 1, cloak: 2, roll: 2,
@@ -529,6 +544,10 @@ const middleSpawnLocations: SpawnLocationOptions = {
     'Forge Start': {
         location: SPAWN_FORGE_ENTRANCE,
         savedState: helixEndState,
+    },
+    'Grand Temple Start': {
+        location: SPAWN_GRAND_TEMPLE_ENTRANCE,
+        savedState: grandTempleStartState,
     },
     'Sky Palace Start': {
         location: SPAWN_SKY_PALACE_ENTRANCE,

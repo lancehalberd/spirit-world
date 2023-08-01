@@ -8,7 +8,8 @@ dialogueHash.saveStatue = {
         attemptPurchaseRevive: `{buy:50:saveStatue.purchaseRevive:saveStatue.fail`,
         purchaseRevive: `Make it count. {item:secondChance}`,
         fail: 'If only you hade more Jade.',
-        no: 'Then be careful out there.'
+        no: 'Then be careful out there.',
+        randomizer: '{item:secondChance}',
     },
     options: [
         {

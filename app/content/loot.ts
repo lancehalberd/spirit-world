@@ -136,6 +136,7 @@ export function getLootGetMessage(state: GameState, lootType: LootType, lootLeve
             }
             return 'You learned the Cloud Somersault Technique!';
         case 'catEyes': return 'You have been blessed with Cat Eyes!';
+        case 'ironSkin': return `You have been blessed with ${lootName}!`;
         case 'spiritSight': return 'You have been blessed with Spirit Sight!';
         case 'teleportation': return 'You have learned Teleportation!';
         case 'fire': return 'You have received the Fire Element!' + getEquipElementMessage(state);
@@ -182,14 +183,16 @@ export function getLootHelpMessage(state: GameState, lootType: LootType, lootLev
                 return 'Press [B_TOOL] to shoot a magic arrow.'
                     + '{|}Use the bow to hit distant enemies and objects.';
             }
-            return;
+            return `Press [B_TOOL] to shoot a magic arrow.
+                    {|}This magical bow applies your equipped element to every shot.
+                    {|}Charge the bow to shoot multiple arrows at once.`;
         case 'clone':
             if (state.hero.activeTools.clone === 1) {
                 return 'Press [B_TOOL] to create a clone or switch between clones.'
                     + '{|}Hold [B_TOOL] to control all clones at once!'
                     + '{|}Hold [B_MEDITATE] to make a clone explode!';
             }
-            return;
+            return `Your clone technique now creates two clones!`;
         case 'cloak':
             if (state.hero.activeTools.cloak === 1) {
                 return 'Press [B_TOOL] to create a Spirit Barrier around you.'
@@ -255,6 +258,10 @@ export function getLootHelpMessage(state: GameState, lootType: LootType, lootLev
         case 'lightningBlessing':
             return 'This ancient artifact halves the damage from lightning effects.';
         case 'goldMail': return 'This amazing armor reduces all damage you receive.';
+        case 'ironSkin': return `The Iron Skin technique allows you to coat your skin
+            with layers of Spirit Energy until it is as hard as iron!
+            {|}Iron Skin will build up slowly over time as long as you take no damage.
+            {|}Iron Skin will protect you from damage and many other effects!`;
         case 'nimbusCloud':
             return 'Use the Nimbus Cloud to quickly travel the world!'
                 + '{|}Press [B_MENU] to open your menu.'
@@ -422,6 +429,7 @@ const lootFrames = {
     astralProjection: circlet,
     phoenixCrown,
     goldMail: createLootFrame('orange', 'Au'),
+    ironSkin: createLootFrame('grey', 'Fe'),
     bigKey: bigKeyOutlineFrame,
     bow: bowOutlineFrame,
     catEyes: catEyes,

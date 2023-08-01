@@ -1037,7 +1037,9 @@ function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, a
             context.save();
                 context.globalAlpha *= 0.3;
                 context.fillStyle = instance.previewColor || 'blue';
-                const hitbox = instance?.getHitbox(state) || {x: instance.x, y: instance.y, w: 16, h: 16};
+                const hitbox = instance.getEditorHitbox?.(state)
+                    || instance.getHitbox?.(state)
+                    || {x: instance.x, y: instance.y, w: 16, h: 16};
                 context.fillRect(hitbox.x, hitbox.y, hitbox.w, hitbox.h);
             context.restore();
             if (instance.renderPreview) {

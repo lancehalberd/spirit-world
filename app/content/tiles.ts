@@ -64,11 +64,12 @@ const heavyStoneBehavior: TileBehaviors = {
     linkableTiles: [187, 188],
     linkedOffset: 179,
 };
-const wallBehavior: TileBehaviors = {
+const southernWallBehavior: TileBehaviors = {
     solid: true,
     // Wall appear behind the player except over doorways.
     defaultLayer: 'field',
-};
+    isSouthernWall: true,
+}
 const lowWallBehavior: TileBehaviors = {
     defaultLayer: 'field',
     low: true,
@@ -87,12 +88,14 @@ const deepWaterBehavior: TileBehaviors = {
     water: true,
 };
 const southCliffBehavior: TileBehaviors = {
-    jumpDirection: 'down',
+    ledges: {up: false},
+    isSouthernWall: true,
     solid: true,
 };
 const climbableWall: TileBehaviors = {
     defaultLayer: 'field',
     climbable: true,
+    isSouthernWall: true,
     solid: true,
     low: true,
 };
@@ -619,25 +622,24 @@ const shoreAnglesMask: TileSource = {
     },
 };
 
-
-const cloudBehavior = <const>{ cloudGround: true, defaultLayer: 'field' };
+const cloudBehavior = <const>{ cloudGround: true, defaultLayer: 'field'  };
 const clouds: TileSource = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/cloud.png'), x: 0, y: 0, w: 64, h: 80},
     behaviors: {
         'all': cloudBehavior,
-        '0x0': { ...cloudBehavior, edges: {up: true, left: true}},
-        '1x0': { ...cloudBehavior, edges: {up: true}},
-        '2x0': { ...cloudBehavior, edges: {up: true, right: true}},
-        '0x1': { ...cloudBehavior, edges: {left: true}},
-        '2x1': { ...cloudBehavior, edges: {right: true}},
-        '0x2': { ...cloudBehavior, edges: {down: true, left: true}},
-        '1x2': { ...cloudBehavior, edges: {down: true}},
-        '2x2': { ...cloudBehavior, edges: {down: true, right: true}},
-        '0x3': { ...cloudBehavior, edges: {up: true, left: true}},
-        '1x3': { ...cloudBehavior, edges: {up: true, right: true}},
-        '0x4': { ...cloudBehavior, edges: {down: true, left: true}},
-        '1x4': { ...cloudBehavior, edges: {down: true, right: true}},
+        '0x0': { ...cloudBehavior, ledges: {up: true, left: true}},
+        '1x0': { ...cloudBehavior, ledges: {up: true}},
+        '2x0': { ...cloudBehavior, ledges: {up: true, right: true}},
+        '0x1': { ...cloudBehavior, ledges: {left: true}},
+        '2x1': { ...cloudBehavior, ledges: {right: true}},
+        '0x2': { ...cloudBehavior, ledges: {down: true, left: true}},
+        '1x2': { ...cloudBehavior, ledges: {down: true}},
+        '2x2': { ...cloudBehavior, ledges: {down: true, right: true}},
+        '0x3': { ...cloudBehavior, ledges: {up: true, left: true}},
+        '1x3': { ...cloudBehavior, ledges: {up: true, right: true}},
+        '0x4': { ...cloudBehavior, ledges: {down: true, left: true}},
+        '1x4': { ...cloudBehavior, ledges: {down: true, right: true}},
     },
 };
 const cloudAngles: TileSource = {
@@ -647,14 +649,14 @@ const cloudAngles: TileSource = {
         'all': cloudBehavior,
         '0x0': { skipped: true }, '3x0': { skipped: true },
         '0x3': { skipped: true }, '3x3': { skipped: true },
-        '1x0': { ...cloudBehavior, solidMap: BITMAP_TOP_LEFT, jumpDirection: 'upleft'},
-        '0x1': { ...cloudBehavior, solidMap: BITMAP_TOP_LEFT, jumpDirection: 'upleft'},
-        '2x0': { ...cloudBehavior, solidMap: BITMAP_TOP_RIGHT, jumpDirection: 'upright'},
-        '3x1': { ...cloudBehavior, solidMap: BITMAP_TOP_RIGHT, jumpDirection: 'upright'},
-        '0x2': { ...cloudBehavior, solidMap: BITMAP_BOTTOM_LEFT, jumpDirection: 'downleft'},
-        '1x3': { ...cloudBehavior, solidMap: BITMAP_BOTTOM_LEFT, jumpDirection: 'downleft'},
-        '2x3': { ...cloudBehavior, solidMap: BITMAP_BOTTOM_RIGHT, jumpDirection: 'downright'},
-        '3x2': { ...cloudBehavior, solidMap: BITMAP_BOTTOM_RIGHT, jumpDirection: 'downright'},
+        '1x0': { ...cloudBehavior, solidMap: BITMAP_TOP_LEFT, diagonalLedge: 'upleft'},
+        '0x1': { ...cloudBehavior, solidMap: BITMAP_TOP_LEFT, diagonalLedge: 'upleft'},
+        '2x0': { ...cloudBehavior, solidMap: BITMAP_TOP_RIGHT, diagonalLedge: 'upright'},
+        '3x1': { ...cloudBehavior, solidMap: BITMAP_TOP_RIGHT, diagonalLedge: 'upright'},
+        '0x2': { ...cloudBehavior, solidMap: BITMAP_BOTTOM_LEFT, diagonalLedge: 'downleft'},
+        '1x3': { ...cloudBehavior, solidMap: BITMAP_BOTTOM_LEFT, diagonalLedge: 'downleft'},
+        '2x3': { ...cloudBehavior, solidMap: BITMAP_BOTTOM_RIGHT, diagonalLedge: 'downright'},
+        '3x2': { ...cloudBehavior, solidMap: BITMAP_BOTTOM_RIGHT, diagonalLedge: 'downright'},
     },
 };
 
@@ -848,11 +850,12 @@ const stairs: TileSource = {
 
 // use `foreground2` as default so that it can appear on top of walls that might be on `foreground`
 // All of these solid maps are set so that only the bottom half of the ceiling graphics are solid.
-const ceilingBehavior: TileBehaviors = { defaultLayer: 'foreground2', solidMap: BITMAP_BOTTOM};
-const topLeftCeiling: TileBehaviors = { ...ceilingBehavior, solidMap: BITMAP_TOP_LEFT_8_STRIP};
-const topRightCeiling: TileBehaviors = { ...ceilingBehavior, solidMap: BITMAP_TOP_RIGHT_8_STRIP};
-const bottomLeftCeiling: TileBehaviors = { ...ceilingBehavior, solidMap: BITMAP_BOTTOM_LEFT_8};
-const bottomRightCeiling: TileBehaviors = { ...ceilingBehavior, solidMap: BITMAP_BOTTOM_RIGHT_8};
+const ceilingBehavior: TileBehaviors = { defaultLayer: 'foreground2', isVeryTall: true, solid: true};
+const bottomCeilingBehavior: TileBehaviors = { defaultLayer: 'foreground2', isVeryTall: true, solidMap: BITMAP_BOTTOM};
+const topLeftCeiling: TileBehaviors = { ...ceilingBehavior, isVeryTall: true, solidMap: BITMAP_TOP_LEFT_8_STRIP};
+const topRightCeiling: TileBehaviors = { ...ceilingBehavior, isVeryTall: true, solidMap: BITMAP_TOP_RIGHT_8_STRIP};
+const bottomLeftCeiling: TileBehaviors = { ...ceilingBehavior, isVeryTall: true, solidMap: BITMAP_BOTTOM_LEFT_8};
+const bottomRightCeiling: TileBehaviors = { ...ceilingBehavior, isVeryTall: true, solidMap: BITMAP_BOTTOM_RIGHT_8};
 
 
 const woodCeiling: TileSource = {
@@ -860,6 +863,10 @@ const woodCeiling: TileSource = {
     source: {image: requireImage('gfx/tiles/woodhousetilesarranged.png'), x: 0, y: 0, w: 48, h: 64},
     behaviors: {
         'all': ceilingBehavior,
+        '3x0': bottomCeilingBehavior,
+        '1x1': bottomCeilingBehavior,
+        '2x2': bottomCeilingBehavior, '3x2': bottomCeilingBehavior, '4x2': bottomCeilingBehavior,
+        '0x3': bottomCeilingBehavior, '1x3': bottomCeilingBehavior, '3x3': bottomCeilingBehavior,
         '0x4': topLeftCeiling, '4x4': topLeftCeiling, '1x7': topLeftCeiling,
         '1x4': topRightCeiling, '5x4': topRightCeiling, '0x7': topRightCeiling,
         '5x3': bottomLeftCeiling, '0x5': bottomLeftCeiling, '1x6': bottomLeftCeiling,
@@ -878,16 +885,16 @@ const woodCeiling: TileSource = {
     ],
 };
 
-const topLeftWall: TileBehaviors = { defaultLayer: 'field', solidMap: BITMAP_TOP_LEFT};
-const topRightWall: TileBehaviors = { defaultLayer: 'field', solidMap: BITMAP_TOP_RIGHT};
-const bottomLeftWall: TileBehaviors = { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_LEFT};
-const bottomRightWall: TileBehaviors = { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_RIGHT};
+const topLeftWall: TileBehaviors = { defaultLayer: 'field', solidMap: BITMAP_TOP_LEFT, isSouthernWall: true};
+const topRightWall: TileBehaviors = { defaultLayer: 'field', solidMap: BITMAP_TOP_RIGHT, isSouthernWall: true};
+const bottomLeftWall: TileBehaviors = { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_LEFT, isSouthernWall: true};
+const bottomRightWall: TileBehaviors = { defaultLayer: 'field', solidMap: BITMAP_BOTTOM_RIGHT, isSouthernWall: true};
 
 const woodWalls: TileSource = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/woodhousetilesarranged.png'), x: 0, y: 0, w: 48, h: 80},
     behaviors: {
-        'all': wallBehavior,
+        'all': southernWallBehavior,
         '11x4': topLeftWall, '12x4': topLeftWall,
         '9x4': topRightWall, '10x4': topRightWall,
         '9x0': bottomLeftWall, '10x0': bottomLeftWall,
@@ -906,7 +913,7 @@ const extraWoodWalls: TileSource = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/woodhousetilesarranged.png'), x: 0, y: 0, w: 48, h: 80},
     behaviors: {
-        'all': wallBehavior,
+        'all': southernWallBehavior,
     },
     tileCoordinates: [
                     [9,6],[10,6],[11,6],[12,6],
@@ -942,14 +949,18 @@ const woodLedges: TileSource = {
     source: {image: requireImage('gfx/tiles/woodhousetilesarranged.png'), x: 0, y: 0, w: 48, h: 64},
     behaviors: {
         'all': { defaultLayer: 'floor2' },
-        '8x9': { defaultLayer: 'floor2', edges: { up: true, left: true}},
-        '9x9': { defaultLayer: 'floor2', edges: { up: true }},
-        '10x9': { defaultLayer: 'floor2', edges: { up: true, right: true}},
-        '8x10': { defaultLayer: 'floor2', edges: { left: true}},
-        '10x10': { defaultLayer: 'floor2', edges: {right: true}},
-        '8x11': { defaultLayer: 'floor2', edges: { down: true, left: true}},
-        '9x11': { defaultLayer: 'floor2', edges: { down: true }},
-        '10x11': { defaultLayer: 'floor2', edges: { down: true, right: true}},
+        '8x9': { defaultLayer: 'floor2', ledges: { up: true, left: true}},
+        '9x9': { defaultLayer: 'floor2', ledges: { up: true }},
+        '10x9': { defaultLayer: 'floor2', ledges: { up: true, right: true}},
+        '8x10': { defaultLayer: 'floor2', ledges: { left: true}},
+        '10x10': { defaultLayer: 'floor2', ledges: {right: true}},
+        '8x11': { defaultLayer: 'floor2', ledges: { down: true, left: true}},
+        '9x11': { defaultLayer: 'floor2', ledges: { down: true }},
+        '10x11': { defaultLayer: 'floor2', ledges: { down: true, right: true}},
+        '9x12': { defaultLayer: 'floor2', diagonalLedge: 'upleft'},
+        '10x12': { defaultLayer: 'floor2', diagonalLedge: 'upright'},
+        '8x14': { defaultLayer: 'floor2', diagonalLedge: 'downleft'},
+        '11x14': { defaultLayer: 'floor2', diagonalLedge: 'downright'},
     },
     tileCoordinates: [
         // This is a quare
@@ -1035,7 +1046,7 @@ const caveWalls: TileSource = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/cavearranged.png'), x: 0, y: 0, w: 48, h: 80},
     behaviors: {
-        'all': wallBehavior,
+        'all': southernWallBehavior,
         '12x3': topRightWall, '13x3': topRightWall,
         '14x3': topLeftWall, '15x3': topLeftWall,
     },
@@ -1067,53 +1078,53 @@ const caveLedges: TileSource = {
     source: {image: requireImage('gfx/tiles/cavearranged.png'), x: 0, y: 0, w: 48, h: 64},
     behaviors: {
         'all': { defaultLayer: 'floor2' },
-        '8x8': { defaultLayer: 'floor2', edges: { right: true } },
-        '9x8': { defaultLayer: 'floor2', edges: { right: true } },
+        '8x8': { defaultLayer: 'floor2', ledges: { right: true }, isGround: false },
+        '9x8': { defaultLayer: 'floor2', ledges: { right: true }, isGround: false },
 
-        '8x9': { defaultLayer: 'floor2', edges: { left: true } },
-        '9x9': { defaultLayer: 'floor2', edges: { left: true } },
-        '10x9': { defaultLayer: 'floor2', edges: { down: true } },
-        '11x9': { defaultLayer: 'floor2', edges: { down: true } },
-        '12x9': { defaultLayer: 'floor2', jumpDirection: 'up', solidMap: BITMAP_BOTTOM_6 },
-        '13x9': { defaultLayer: 'floor2', jumpDirection: 'up', solidMap: BITMAP_BOTTOM_6 },
+        '8x9': { defaultLayer: 'floor2', ledges: { left: true }, isGround: false },
+        '9x9': { defaultLayer: 'floor2', ledges: { left: true }, isGround: false },
+        '10x9': { defaultLayer: 'floor2', ledges: { down: true }, isGround: false },
+        '11x9': { defaultLayer: 'floor2', ledges: { down: true }, isGround: false },
+        '12x9': { defaultLayer: 'floor2', ledges: {down: false}, solidMap: BITMAP_BOTTOM_6, isGround: false },
+        '13x9': { defaultLayer: 'floor2', ledges: {down: false}, solidMap: BITMAP_BOTTOM_6, isGround: false },
 
-        '8x10': { defaultLayer: 'floor2', solidMap: BITMAP_RIGHT_6 },
-        '9x10': { defaultLayer: 'floor2', solidMap: BITMAP_RIGHT_6 },
+        '8x10': { defaultLayer: 'floor2', solidMap: BITMAP_RIGHT_6, isGround: false },
+        '9x10': { defaultLayer: 'floor2', solidMap: BITMAP_RIGHT_6, isGround: false },
 
-        '8x11': { defaultLayer: 'floor2', solidMap: BITMAP_LEFT_6 },
-        '9x11': { defaultLayer: 'floor2', solidMap: BITMAP_LEFT_6 },
-        '10x11': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_6 },
-        '11x11': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_6 },
-        '12x11': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_6 },
-        '13x11': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_6 },
+        '8x11': { defaultLayer: 'floor2', solidMap: BITMAP_LEFT_6, isGround: false },
+        '9x11': { defaultLayer: 'floor2', solidMap: BITMAP_LEFT_6, isGround: false },
+        '10x11': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_6, isGround: false },
+        '11x11': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_6, isGround: false },
+        '12x11': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_6, isGround: false },
+        '13x11': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_6, isGround: false },
 
-        '8x12': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_RIGHT, jumpDirection: 'downright' },
-        '9x12': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_LEFT, jumpDirection: 'downleft' },
-        '10x12': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_RIGHT, jumpDirection: 'downleft' },
-        '11x12': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_LEFT, jumpDirection: 'downright' },
+        '8x12': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_RIGHT, diagonalLedge: 'downright', isGround: false },
+        '9x12': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_LEFT, diagonalLedge: 'downleft', isGround: false },
+        '10x12': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_RIGHT, diagonalLedge: 'downright', isGround: false },
+        '11x12': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_LEFT, diagonalLedge: 'downleft', isGround: false },
         '12x12': { defaultLayer: 'floor2'},
         '13x12': { defaultLayer: 'floor2'},
 
-        '8x13': { defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_DOWN_RIGHT },
-        '9x13': { defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_UP_RIGHT },
-        '10x13': { defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_DOWN_RIGHT },
-        '11x13': { defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_UP_RIGHT},
-        '12x13': { defaultLayer: 'floor2'},
-        '13x13': { defaultLayer: 'floor2'},
+        '8x13': { defaultLayer: 'floor2', diagonalLedge: 'upright', isGround: false },
+        '9x13': { defaultLayer: 'floor2', diagonalLedge: 'upleft', isGround: false },
+        '10x13': { defaultLayer: 'floor2', diagonalLedge: 'upright', isGround: false },
+        '11x13': { defaultLayer: 'floor2', diagonalLedge: 'upleft', isGround: false },
+        '12x13': { defaultLayer: 'floor2', isGround: false},
+        '13x13': { defaultLayer: 'floor2', isGround: false},
 
-        '8x14': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_RIGHT },
-        '9x14': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_LEFT },
-        '10x14': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_RIGHT },
-        '11x14': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_LEFT},
-        '12x14': { defaultLayer: 'floor2'},
-        '13x14': { defaultLayer: 'floor2'},
+        '8x14': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_RIGHT, isGround: false },
+        '9x14': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_LEFT, isGround: false },
+        '10x14': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_RIGHT, isGround: false },
+        '11x14': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_LEFT, isGround: false},
+        '12x14': { defaultLayer: 'floor2', isGround: false},
+        '13x14': { defaultLayer: 'floor2', isGround: false},
 
-        '8x15': { defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_DOWN_RIGHT },
-        '9x15': { defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_UP_RIGHT },
-        '10x15': { defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_DOWN_RIGHT },
-        '11x15': { defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_UP_RIGHT},
-        '12x15': { defaultLayer: 'floor2'},
-        '13x15': { defaultLayer: 'floor2'},
+        '8x15': { defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_DOWN_RIGHT, isGround: false },
+        '9x15': { defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_UP_RIGHT, isGround: false },
+        '10x15': { defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_DOWN_RIGHT, isGround: false },
+        '11x15': { defaultLayer: 'floor2', solidMap: BITMAP_MIDDLE_UP_RIGHT, isGround: false},
+        '12x15': { defaultLayer: 'floor2', isGround: false},
+        '13x15': { defaultLayer: 'floor2', isGround: false},
     },
     tileCoordinates: [
         [ 8, 8],[ 9, 8],
@@ -1220,7 +1231,7 @@ const crystalCaveWalls: TileSource = {
     w: 16, h: 16,
     source: {image: requireImage('gfx/tiles/crystalcavesheet.png'), x: 0, y: 0, w: 48, h: 80},
     behaviors: {
-        'all': wallBehavior,
+        'all': southernWallBehavior,
         '12x3': topRightWall, '13x3': topRightWall,
         '14x3': topLeftWall, '15x3': topLeftWall,
     },
@@ -1252,15 +1263,15 @@ const crystalCaveLedges: TileSource = {
     source: {image: requireImage('gfx/tiles/crystalcavesheet.png'), x: 0, y: 0, w: 48, h: 64},
     behaviors: {
         'all': { defaultLayer: 'floor2' },
-        '8x8': { defaultLayer: 'floor2', edges: { right: true } },
-        '9x8': { defaultLayer: 'floor2', edges: { right: true } },
+        '8x8': { defaultLayer: 'floor2', ledges: { right: true } },
+        '9x8': { defaultLayer: 'floor2', ledges: { right: true } },
 
-        '8x9': { defaultLayer: 'floor2', edges: { left: true } },
-        '9x9': { defaultLayer: 'floor2', edges: { left: true } },
-        '10x9': { defaultLayer: 'floor2', edges: { down: true } },
-        '11x9': { defaultLayer: 'floor2', edges: { down: true } },
-        '12x9': { defaultLayer: 'floor2', jumpDirection: 'up', solidMap: BITMAP_BOTTOM_6 },
-        '13x9': { defaultLayer: 'floor2', jumpDirection: 'up', solidMap: BITMAP_BOTTOM_6 },
+        '8x9': { defaultLayer: 'floor2', ledges: { left: true } },
+        '9x9': { defaultLayer: 'floor2', ledges: { left: true } },
+        '10x9': { defaultLayer: 'floor2', ledges: { down: true } },
+        '11x9': { defaultLayer: 'floor2', ledges: { down: true } },
+        '12x9': { defaultLayer: 'floor2', ledges: {down: false}, solidMap: BITMAP_BOTTOM_6 },
+        '13x9': { defaultLayer: 'floor2', ledges: {down: false}, solidMap: BITMAP_BOTTOM_6 },
 
         '8x10': { defaultLayer: 'floor2', solidMap: BITMAP_RIGHT_6 },
         '9x10': { defaultLayer: 'floor2', solidMap: BITMAP_RIGHT_6 },
@@ -1272,10 +1283,10 @@ const crystalCaveLedges: TileSource = {
         '12x11': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_6 },
         '13x11': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_6 },
 
-        '8x12': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_RIGHT, jumpDirection: 'downright' },
-        '9x12': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_LEFT, jumpDirection: 'downleft' },
-        '10x12': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_RIGHT, jumpDirection: 'downleft' },
-        '11x12': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_LEFT, jumpDirection: 'downright' },
+        '8x12': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_RIGHT, diagonalLedge: 'downright' },
+        '9x12': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_LEFT, diagonalLedge: 'downleft' },
+        '10x12': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_RIGHT, diagonalLedge: 'downright' },
+        '11x12': { defaultLayer: 'floor2', solidMap: BITMAP_BOTTOM_LEFT, diagonalLedge: 'downleft' },
         '12x12': { defaultLayer: 'floor2'},
         '13x12': { defaultLayer: 'floor2'},
 
@@ -1482,15 +1493,18 @@ addTiles([
     singleTileSource('gfx/tiles/thornsspirit.png', { touchHit: {damage: 1, spiritCloakDamage: 2, isGroundHit: true }, defaultLayer: 'field' }),
     breakableFloor,
     gradientColorTile(['#A08000', '#806000'], 0, 0, 0, 16, southCliffBehavior), // southCliffTop
-    solidColorTile('#806000', wallBehavior), // cliffBottom
-    ...deletedTiles(2),
+    solidColorTile('#806000', southernWallBehavior), // cliffBottom
+    // This is the 'Abyss' tile for the southern edge of walls, it uses bitmap bottom so the player can
+    // go behind it a bit.
+    singleTileSource('gfx/tiles/cavearranged.png', { defaultLayer: 'foreground', isVeryTall: true, solidMap: BITMAP_BOTTOM }, 0, 240),
+    ...deletedTiles(1),
     stampTileSource(rockWallFrame, {
-        '0x0': wallBehavior, '1x0': wallBehavior, '2x0': wallBehavior,
-        '0x1': wallBehavior, '1x1': wallBehavior, '2x1': wallBehavior,
+        '0x0': southernWallBehavior, '1x0': southernWallBehavior, '2x0': southernWallBehavior,
+        '0x1': southernWallBehavior, '1x1': southernWallBehavior, '2x1': southernWallBehavior,
     }),
     caveFloorPalette,
-    // 'Abyss' between walls. This uses BITMAP_BOTTOM to be consistent with other ceiling tiles.
-    singleTileSource('gfx/tiles/cavearranged.png', { defaultLayer: 'foreground', solidMap: BITMAP_BOTTOM }, 0, 240),
+    // 'Abyss' between walls.
+    singleTileSource('gfx/tiles/cavearranged.png', { defaultLayer: 'foreground', isVeryTall: true, solid: true }, 0, 240),
     caveWallsPalette,
     caveCornersPalette,
     spiritPlantsPalette,

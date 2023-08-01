@@ -1,7 +1,6 @@
 Test at http://localhost:81/alttp/public/
 
 Known Bugs:
-    - Sometimes extra chakram hangs out on the player.
     - Door closing sound plays while in the title screen
         - Maybe just disable playAreaSound in the title scene or only play this sound if the player passes through the door and it closes behind them.
     - Teleporting while grabbing a pot with astral projection can make you face south but still be grabbing the pot
@@ -15,23 +14,18 @@ Known Bugs:
         - Mana regen is wrong when using clone tools (seems to multiply consumption/regen by number of clones)
         - Should destroy clones when the clone technique is unequipped.
         - Clones should all share the same tools (store tools on state instead of hero)
-        - Staff won't be placed when controlling multiple clones (one places, another retrieves?)
-            - Let's allow one staff per clone, similar to chakrams.
     - Held rocks/bushes are invisible while using cloak
     - Piercing projectiles that can push things should be stopped by the first object they push
         or not be able to push additional objects, for example, the charged chakram.
-    - Astral Projection appears in front of waterfall graphics only when south of main body in waterfall tower.
     - Pushing on a solid object sitting on thorny ground shouldn't hurt you:
         -return tileBehaviors and objectBehaviors separately, only damage if tile is solid+damaging.
-    - nextAreaInstance is not rendered in Safari
-    - Enemies with small hitboxes are checking pixels outside of their hitbox while moving.
-        - For example snakes when moving left/right will be forced to move up if there is a wall to their south.
-    - Can get to undefined area in city by sinking in the water.
     - Cliff Edge issues:
         - Would be nice if staff could go across edges.
-        - Bow can fire up thin cliffs
-        - Bow cannot fire down southern cliffs.
-    - Projectiles can fire in between black abyss tiles, for example, shooting a bow at an east or west wall it may go through instead of stopping.
+        - Sometimes bow/chakram get stopped when firing down cliff edges
+            - This is because these tiles are not marked low.
+            - Marking these tiles as low would allow shooting up them as they don't have actual cliff ledges
+            - Marking these tiles as cliff ledges will probably allow jumping down them in some cases which will need to be fixed.
+    - Shadow renders behind door tops when jumping down ledges.
 
 Graphics:
     Add slam effects for the staff.
@@ -42,22 +36,63 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Current tasks:
+    - Fix bead flow depth by using sprite ordering for the ordered part instead of foreground, use the y value based on where it hits the floor but only draw it start 16px up from that point so it gradually covers while moving behind it.
+
+    - nextAreaInstance is not rendered in Safari
+        - Fix this from Hillary's machine
+
+    - Add crucible to the end of the Grand Temple
+
+    - Add `getLogicalZone` function that returns a logical zone for a given state location wich can differ from the actual zone key, use this for randomizer locations and dungeon item associations.
+        - Move underwater areas into the same logical zone so that keys can be shared above and below water
+        - Split different caves into distinct logical zones like 'bushCave', 'fertilityTemple', and 'ascentCave'
+        - These logical zones should be added to randomizer logic nodes when they don't match the zone for the node.
+        - This will also allow using the same tile in material vs spirit world in distinct dungeons, for example, tiles could be shared inside the Grand Temple and Jade Palace but be treated as distinct dungones wrt keys and checks.
+        - We could probably then use this for simplifying logic to determine what music to play.
+        - Should probably also use this for Nimbus Cloud entrance behavior in some cases.
+        - Make sure to update Hint location names to be more specific by using the logical zones instead.
+
+    - Add 'only' visibility option to layers that hides everything else when selected.
+
+    - Add full buildings to Summoner ruins in Spirit World.
+        - Wait for new building tiles before doing this.
+        - Populate with War God Alcolytes and the Progenitor Spirit
+
+    - Add some additional requirement for completing crater to put the boss out of logic with few items.
+        - Switches that can only be hit with staff or clone throw + iron boots
+
     - Fix ledges so that:
-        - You can shoot arrows down ledges but not up them. Applies to projectiles in general.
-        - You can throw a clone down a ledge but not up a ledge.
+        - Right now ledges block attacks anywhere in the tile rather than just when they are on the ledge, additionally only true values apply instead of both true+false values.
         - solidMap behavior can block projectiles.
-        - Shooting an arrow down a ledge allows it to go over solid tiles unless they
-            are marked as "veryTall".
-        - Special exception for southern edges+wall tiles
-            - All Southern edges(SW/S/SE) do not block movement/projectiles in any southern direction.
         - Shooting an arrow down N ledges allows it to go up N ledges
-            - Let's just assume all ledges are 32px tall
-        - Nice to have: actors can be partially off of ledges and just walk off them to jump down instead of pushing
-            against a barrier.
-        - New behaviors:
-            isSouthernWall - solid pixels only block movement/projectiles that are not down, downleft or downright
-            isVeryTall - solid pixels apply to movement/projectiles that have crossed ledges.
-                (Alternatively, this could be tileHeight, and tileHeight > 32 would have this effect if ledges assume 32px height)
+            - For now, have a property increments for every frame it is over a ledge in the correct direction.
+            - If the property is positive, instead of hitting ledges/southernwalls in the wrong direction, decrement the property.
+            - veryTall tiles will still block the projectile even when the property is set.
+
+    - Add and test many more ledges
+
+    - test staff interactions with ledges.
+
+    - Prevent grabbing tiles/objects across ledges
+        - on grab, check if the player can move into the object by running the movement algorithm with a special mode that ignores all normal collisions and prevents crossing ledges in any direction. Prevent the grab if this movement check fails.
+
+    - Perhaps southern facing tiles should block left/right movement if not currently over SF tile.
+
+    - Cloud jumping near the edges can sometimes result in landing poorly either taking damage or underground in a ledge. Would be nice to find a way to clean up jumping from ledge to ledge.
+
+    - Allow destroying light stones when landing with iron boots?
+
+    - Drain all lava in the crater when the fire beast isn't spawned yet?
+
+    - Allow walking on clouds/cracked ground while invisible?
+        - Would have to be careful in sky not to run out of spirit energy
+        - Might be difficult to tell if checks are in logic based on mana bar
+            - Could add special logic check against specific max spirit amounts to simplify this.
+
+    - Mine cart mechanic with switchable tracks.
+        - Or maybe a pipe puzzle with lava flow in the forge. Maybe NPC asks for help fixing the pipes.
+
+    - Dungeon with super tile that is just the vertical face of a cliff/tower/tree that you can climb up/jump down to change floors.
 
     - Add some speaker name so it is clear who is talking in cut scenes with multiple characters.
         - Add this to cut scene with Elder+Rival
@@ -76,6 +111,8 @@ Current tasks:
     Puzzle ideas
         - Send a clone into the spirit world for "temporary" true sight. Might be annoying to switch between.
         - Some kind of hazards in the spirit world that move slowly and knock you back, where you need true sight to navigate successfully because spirit sight is too slow.
+        - Use a clone to stand on a switch to hold a door open.
+        - Use a clone to jump off a cliff to press one switch, then destroy it and make another clone to jump down another cliff to press another switch to open a door at the top of the cliff.
 
     Change prep animation for explosion
         charge particles form randomly in a circle around the hero shooting into them,
@@ -117,6 +154,15 @@ Current tasks:
         - Tree is a clone of the helix, but allowed to grow to completion this time.
 
     World Tree Boss Void Beast
+        - Fight takes place on most of a full super tile, but each section of the fight is on a smaller platform in the material world where the player damages the boss and avoids various attack mechanics.
+            - Maybe the battlefield is even taller than a regular super tile and the player must keep advancing tiers sort of like the final battle with the statues in ff6.
+            - Each tier could focus on a different pair of combat mechanics like staff + iron boots, and each travel section could focus on different movement mechanics
+        - After a certain amount of time/damage, the boss phases and requires the player reach another platform to damage it, which becomes more difficult as the phases progress, eventually requiring the player to use portals to the spirit realm to cross platforms provided by NPC helpers to reach the next platform.
+        - Elemental weak spots that must each be hit to briefly expose the main weak spot.
+            - Start with a single spot + 1 element, and advance to up to 5 across all 3 elements.
+            - Can arrange them differently to benefit different tools.
+        - Aided by Champion initially and then Vanara Rival during the last phase.
+
         Must rescue Champion and work together to defeat the boss
             - Mechanics where one of you creates an opening for the other to damage the boss.
             - Mechanics where you protect each other from boss attacks.
@@ -232,16 +278,15 @@ Improve Staff Tower Setup:
 
 High level list of things left to do:
     New dungeons(need enemies, mechanics, bosses, entrances):
-        Grand Temple
         Jade Palace
-        Sky Temple
+        Sky Palace
         Forge
     Areas missing significant content:
+        Grand Temple
         Forest Temple
         River Temple
     Missing Bosses for existing areas:
         Crater midboss
-        Rival fight before Tomb
         Rival fight before Helix
         Helix Boss
             - Instead of fighting this boss, you will see it, but then abort because of the beasts attacking the city
@@ -262,11 +307,9 @@ High level list of things left to do:
         Fertility shrine donations
     Items missing implementation:
         Charge level 2
-        Bow level 2
-        Bow charge 2
+            Bow charge 2 shoots 5 arrows in 120 degree arc -60, -30, 0, 30, 60
         Clone charge 1 + 2
         True Sight (Render certain enemies/objects flagged for true sight)
-        Iron Skin (slowly regenerates health shield = 20% total health)
         Gloves charge 1 + 2
 
 Generic boss improvements
@@ -370,6 +413,8 @@ Dungeon 3 Improvements:
 River Temple Improvements:
     - Some underwater enemies
     - Some crab enemies with ice shells that require fire element to defeat
+    - Floating ice spike obstacles that hurt you when floating into them and prevent passing through.
+        - Allow swimming over stones and then use these to prevent swimming movement where it makes sense.
     - Maybe torches should stay lit during the boss fight once turned on.
     - Add special behavior for frozen doors instead of having two door objects.
 
@@ -387,6 +432,9 @@ Staff Tower Improvements
 
 
 Crater Improvements
+    - Add animation for draining lava
+        - Add a layer for each frame of the animation, but only on the screen lava can be drained on
+        - Run a script that switches to each frame with a fairly quick fade transition.
     - Add platforms floating on lava.
     - Add peg switches that require hitting with the staff to activate, replace all regular switches with these.
     - Add Flame Guardian enemies
@@ -453,12 +501,6 @@ Additional Staff Behavior:
         Lvl 2 charge is a screen wide attack the applies damage+element to all enemies.
     Top N pixels of character should be drawn on foreground as well so that it appears in front of staff when facing north.
         - Probably should disable staff when character is standing on any tiles marked with low ceiling just in case.
-
-Update collision detection and wiggle logic:
-    - Create an array that is the width of the character(relative to movement direction) + 16
-    - Assuming entry 8 = [ax, ay] and length - 9 = [ax + width - 1, ay] (for moving up or down) check pairs of 0 and 3 pixels every 4 pixels, so for w = 16, check 8+11,12+15,16+19,20+23. If any are blocked, movement is blocked, remember the blocked pixel index.
-    - If movement is blocked if blocked index <= length / 2 then scan right starting at blocked index + 1. If w open pixels are found, wiggle right. If a blocked pixel is found at index >= length - w, then abort, wiggling is not possible.
-    - If blocked index > length / 2, repeat the above except scanning left to check for left wiggle.
 
 Some puzzle ideas:
     - A puzzle where 4 switches need to be hit in 200ms, you can blow up the clone in the middle to activate all at once.

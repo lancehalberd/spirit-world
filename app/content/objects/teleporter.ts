@@ -1,8 +1,16 @@
-import { enterLocation, enterZoneByTarget } from 'app/content/areas';
+import { enterLocation, enterZoneByTarget, playAreaSound } from 'app/content/areas';
 import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
 import { findObjectInstanceById } from 'app/content/objects';
 import { editingState } from 'app/development/tileEditor';
+import { createCanvasAndContext } from 'app/dom';
 import { FRAME_LENGTH } from 'app/gameConstants';
+import { getVectorToTarget } from 'app/content/enemies';
+import {
+    renderAreaObjectsBeforeHero,
+    renderAreaObjectsAfterHero,
+    renderForegroundObjects,
+} from 'app/render';
+import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
 import { directionMap, getTileBehaviors } from 'app/utils/field';
 import { isObjectInsideTarget, pad } from 'app/utils/index';
 
@@ -10,6 +18,9 @@ import {
     AreaInstance, DrawPriority, GameState, ObjectInstance,
     ObjectStatus, Rect, EntranceDefinition,
 } from 'app/types';
+
+
+const floorAnimation = createAnimation('gfx/tiles/spirit_regeneration_bottom.png', {w: 16, h: 32}, {x: 0, cols: 4, duration: 5})
 
 export class Teleporter implements ObjectInstance {
     area: AreaInstance;
@@ -23,6 +34,8 @@ export class Teleporter implements ObjectInstance {
     disabledTime = 0;
     isObject = <const>true;
     linkedObject: Teleporter;
+    wasUnderObject: boolean;
+    actualRadius: number = 0;
     constructor(state: GameState, definition: EntranceDefinition) {
         this.definition = definition;
         this.x = definition.x;
@@ -38,8 +51,26 @@ export class Teleporter implements ObjectInstance {
             this.linkedObject.changeStatus(state, status);
         }
     }
-    getHitbox(state: GameState): Rect {
+    getHitbox(): Rect {
         return { x: this.x, y: this.y, w: 16, h: 16 };
+    }
+    getRenderBox(state: GameState): Rect {
+        const size = ((this.actualRadius / 2) | 0) * 2;
+        return {
+            x: this.x + 8 - size / 2,
+            y: this.y + 8 - size / 2,
+            w: size,
+            h: size,
+        };
+    }
+    getTargetRadius(state: GameState): number {
+        if (state.hero.area !== this.area) {
+            return 0;
+        }
+        const { mag } = getVectorToTarget(state, this, state.hero);
+        let size = Math.min(128, Math.max(0, 128 * 32 * 32 / mag / mag));
+        size = ((size / 2) | 0) * 2;
+        return size;
     }
     isUnderObject(state: GameState): boolean {
         if (!this.area) {
@@ -55,8 +86,21 @@ export class Teleporter implements ObjectInstance {
             }
             return;
         }
-        if (this.isUnderObject(state)) {
+        if (!(this.definition.targetZone && this.definition.targetZone) && !state.hero.passiveTools.spiritSight) {
             return;
+        }
+        if (this.isUnderObject(state)) {
+            this.wasUnderObject = true;
+            return;
+        } else if (this.wasUnderObject) {
+            this.wasUnderObject = false;
+            playAreaSound(state, this.area, 'secretChime');
+        }
+        const targetRadius = this.getTargetRadius(state);
+        if (this.actualRadius < targetRadius) {
+            this.actualRadius = Math.min(targetRadius, this.actualRadius + 4);
+        } else if (this.actualRadius > targetRadius) {
+            this.actualRadius = Math.max(targetRadius, this.actualRadius - 8);
         }
         this.animationTime += FRAME_LENGTH;
         const hero = state.hero;
@@ -64,7 +108,7 @@ export class Teleporter implements ObjectInstance {
             this.disabledTime -= FRAME_LENGTH;
             return;
         }
-        if (hero.actionTarget === this || this.area !== hero.area || !isObjectInsideTarget(hero, pad(this.getHitbox(state), 8))) {
+        if (hero.actionTarget === this || this.area !== hero.area || !isObjectInsideTarget(hero, pad(this.getHitbox(), 8))) {
             return;
         }
         if (!this.definition.targetZone) {
@@ -88,19 +132,7 @@ export class Teleporter implements ObjectInstance {
                 }
             });
         } else {
-            enterZoneByTarget(state, this.definition.targetZone, this.definition.targetObjectId, this.definition, false, () => {
-                hero.isUsingDoor = true;
-                const target = findObjectInstanceById(state.areaInstance, this.definition.targetObjectId) as Teleporter;
-                if (!target){
-                    console.error(state.areaInstance.objects);
-                    console.error(this.definition.targetObjectId);
-                    debugger;
-                }
-                hero.actionTarget = target;
-                target.disabledTime = 500;
-                hero.actionDx = directionMap[hero.d][0];
-                hero.actionDy = directionMap[hero.d][1];
-            });
+            enterZoneByTarget(state, this.definition.targetZone, this.definition.targetObjectId, this.definition, false);
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
@@ -108,6 +140,9 @@ export class Teleporter implements ObjectInstance {
             return;
         }
         if (this.isUnderObject(state) && !editingState.isEditing) {
+            return;
+        }
+        if (!this.definition.targetZone || !this.definition.targetObjectId) {
             return;
         }
         const gradient = context.createLinearGradient(0, 0, 0, 16);
@@ -119,4 +154,111 @@ export class Teleporter implements ObjectInstance {
         context.fillRect(0, 0, 16, 16);
         context.restore();
     }
+    renderShadow(context: CanvasRenderingContext2D, state: GameState) {
+        if (this.status !== 'normal' && !editingState.isEditing) {
+            return;
+        }
+        if (this.isUnderObject(state) && !editingState.isEditing) {
+            return;
+        }
+        if (this.definition.targetZone && this.definition.targetObjectId) {
+            return;
+        }
+        if (!state.hero.passiveTools.spiritSight) {
+            return;
+        }
+        const hitbox = this.getRenderBox(state);
+        updateSpiritCanvas(state, hitbox);
+        context.drawImage(spiritCanvas,
+            0, 0, hitbox.w, hitbox.h,
+            hitbox.x, hitbox.y, hitbox.w, hitbox.h
+        );
+
+        context.save();
+        context.globalAlpha *= 0.7;
+            const frame = getFrame(floorAnimation, this.animationTime);
+            drawFrame(context, frame, {...frame, x: this.x, y: this.y - 16});
+        context.restore();
+    }
+}
+
+const maxPortalWidth = 128, maxPortalHeight = 128;
+
+const [spiritCanvas, spiritContext] = createCanvasAndContext(maxPortalWidth, maxPortalHeight);
+let isRenderingSpiritCanvas = false;
+
+//let spiritCanvasRadius: number;
+function updateSpiritCanvas(state: GameState, hitbox: Rect): void {
+    // Prevent recursively running this function.
+    if (isRenderingSpiritCanvas) {
+        return;
+    }
+    isRenderingSpiritCanvas = true;
+    const spiritAlpha = 1;
+    const x = hitbox.w / 2;
+    const y = hitbox.h / 2
+    const area = state.alternateAreaInstance;
+    spiritContext.save();
+        spiritContext.clearRect(0, 0, spiritCanvas.width, spiritCanvas.height);
+        const gradient = spiritContext.createRadialGradient(x, y, 0, x, y, hitbox.w / 2);
+        gradient.addColorStop(0.1, 'rgba(0, 0, 0, 1)');
+        gradient.addColorStop(0.5, 'rgba(0, 0, 0, 0.7)');
+        gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        spiritContext.fillStyle = 'white';
+        spiritContext.globalAlpha = spiritAlpha;
+        spiritContext.fillStyle = gradient;
+        spiritContext.beginPath();
+        spiritContext.arc(x, y, hitbox.w / 2, 0, 2 * Math.PI);
+        spiritContext.fill();
+        spiritContext.globalAlpha = 1;
+        spiritContext.globalCompositeOperation = 'source-atop';
+        spiritContext.translate(
+            -(hitbox.x) | 0,
+            -(hitbox.y) | 0
+        );
+        spiritContext.drawImage(
+            area.canvas,
+            hitbox.x, hitbox.y, hitbox.w, hitbox.h,
+            hitbox.x, hitbox.y, hitbox.w, hitbox.h,
+        );
+        for (const object of area.objectsToRender) {
+            if (object.drawPriority === 'background' || object.getDrawPriority?.(state) === 'background') {
+                object.render?.(spiritContext, state);
+            }
+        }
+        renderAreaObjectsBeforeHero(spiritContext, state, area, true);
+        renderAreaObjectsAfterHero(spiritContext, state, area, true);
+        if (area?.foregroundCanvas) {
+            spiritContext.drawImage(
+                area.foregroundCanvas,
+                hitbox.x, hitbox.y, hitbox.w, hitbox.h,
+                hitbox.x, hitbox.y, hitbox.w, hitbox.h,
+            );
+        }
+        renderForegroundObjects(spiritContext, state, area, true);
+    spiritContext.restore();
+    if (state.zone.surfaceKey && !area.definition.isSpiritWorld) {
+        spiritContext.save();
+            spiritContext.globalCompositeOperation = 'source-atop';
+            spiritContext.globalAlpha = 0.6;
+            spiritContext.fillStyle = 'blue';
+            spiritContext.fillRect(0, 0, spiritCanvas.width, spiritCanvas.height);
+        spiritContext.restore();
+    }
+    isRenderingSpiritCanvas = false;
+}
+
+export function enterZoneByTeleporterCallback(this: void, state: GameState, targetObjectId: string) {
+    const hero = state.hero;
+    hero.isUsingDoor = true;
+    const target = findObjectInstanceById(state.areaInstance, targetObjectId) as Teleporter;
+    if (!target){
+        console.error(state.areaInstance.objects);
+        console.error(targetObjectId);
+        debugger;
+    }
+    hero.actionTarget = target;
+    target.disabledTime = 500;
+    hero.actionDx = directionMap[hero.d][0];
+    hero.actionDy = directionMap[hero.d][1];
 }

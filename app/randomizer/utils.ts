@@ -16,6 +16,7 @@ import { helixNodes } from 'app/randomizer/logic/helixLogic';
 import { forestTempleNodes } from 'app/randomizer/logic/forestTempleLogic';
 import { waterfallTowerNodes } from 'app/randomizer/logic/waterfallTower';
 import { forgeNodes } from 'app/randomizer/logic/forgeLogic';
+import { grandTempleNodes } from 'app/randomizer/logic/grandTempleLogic';
 import { skyPalaceNodes } from 'app/randomizer/logic/skyPalaceLogic';
 import { riverTempleNodes, riverTempleWaterNodes } from 'app/randomizer/logic/riverTempleLogic';
 import { craterNodes } from 'app/randomizer/logic/craterLogic';
@@ -53,6 +54,7 @@ export const allNodes = [
     ...forestTempleNodes,
     ...waterfallTowerNodes,
     ...forgeNodes,
+    ...grandTempleNodes,
     ...skyPalaceNodes,
     ...riverTempleNodes,
     ...riverTempleWaterNodes,
@@ -876,7 +878,13 @@ export function getRandomizerHint(state: GameState): string {
             if (state.savedState.objectFlags[flag]) {
                 continue;
             }
-            return `The merchant has something for sale.`;
+            if (dialogueKey === 'streetVendor') {
+                return `The merchant has something for sale.`;
+            }
+            if (dialogueKey === 'storageVanara') {
+                return `A vanara would be grateful for an exterminator.`;
+            }
+            return `Try talking to someone called ${dialogueKey}.`;
         }
     }
     return 'Looks like BK Mode to me :)';

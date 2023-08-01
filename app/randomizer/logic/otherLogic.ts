@@ -1,6 +1,6 @@
 import {
     andLogic, canCross2Gaps,
-    hasBossWeapon, hasCatEyes, hasFireBlessing, hasInvisibility,
+    hasBossWeapon, hasWeapon, hasCatEyes, hasFireBlessing, hasInvisibility,
     hasMediumRange, hasMitts, hasSomersault, hasTeleportation,
     orLogic,
 } from 'app/content/logic';
@@ -37,6 +37,58 @@ export const treeVillageNodes: LogicNode[] = [
     },
     {
         zoneId: 'treeVillage',
+        nodeId: 'northwestTree',
+        entranceIds: [
+            'northwestTreeEntrance',
+        ],
+        exits: [
+            { objectId: 'northwestTreeEntrance' },
+        ],
+    },
+    {
+        zoneId: 'treeVillage',
+        nodeId: 'northeastTreeEntrance',
+        entranceIds: [
+            'northeastTreeEntrance',
+        ],
+        exits: [
+            { objectId: 'northeastTreeEntrance' },
+        ],
+    },
+    {
+        zoneId: 'treeVillage',
+        nodeId: 'southeastTree',
+        complexNpcs: [{
+            dialogueKey: 'storageVanara',
+            optionKey: 'peachReward',
+            logic: {requiredFlags: ['clearedTreeVillageStorageRoom']},
+        }],
+        entranceIds: [
+            'southeastTreeEntrance',
+            'vanaraStorageStairs',
+        ],
+        exits: [
+            { objectId: 'southeastTreeEntrance' },
+        ],
+    },
+    {
+        zoneId: 'treeVillage',
+        nodeId: 'treeVillageStorageRoom',
+        checks: [
+            {objectId: 'treeVillageMoneyA'},
+            {objectId: 'treeVillageMoneyB'},
+            {objectId: 'treeVillageEmptyChest'},
+        ],
+        flags: [{flag: 'clearedTreeVillageStorageRoom', logic: hasWeapon }],
+        entranceIds: [
+            'treeVillageStorageMarker',
+        ],
+        exits: [
+            { objectId: 'vanaraStorageStairs' },
+        ],
+    },
+    {
+        zoneId: 'treeVillage',
         nodeId: 'elderSpiritEntrance',
         entranceIds: [
             'elderSpiritEntrance',
@@ -64,14 +116,67 @@ export const treeVillageNodes: LogicNode[] = [
 export const waterfallCaveNodes: LogicNode[] = [
     {
         zoneId: 'waterfallCave',
-        nodeId: 'elderEntrance',
+        nodeId: 'waterfallCaveEntrance',
+        entranceIds: [
+            'waterfallCaveEntrance',
+            'waterfallCaveLeftMain', 'waterfallCaveRightMain',
+            'waterfallCaveLeft', 'waterfallCaveRight',
+            'waterfallCaveBackLeft', 'waterfallCaveBackRight',
+        ],
+        exits: [
+            { objectId: 'waterfallCaveEntrance' },
+            { objectId: 'waterfallCaveLeftMain' },
+            { objectId: 'waterfallCaveRightMain' },
+            { objectId: 'waterfallCaveBackLeft' },
+            { objectId: 'waterfallCaveBackRight' },
+            { objectId: 'waterfallCaveLeft' },
+            { objectId: 'waterfallCaveRight' },
+
+        ],
+    },
+    {
+        zoneId: 'waterfallCave',
+        nodeId: 'waterfallCaveBackLeft',
         checks: [
             { objectId: 'waterfallCaveBigMoney' },
             { objectId: 'waterfallCaveLittleMoney'} ,
         ],
-        entranceIds: ['waterfallCaveEntrance'],
-        exits: [{ objectId: 'waterfallCaveEntrance' }],
+        entranceIds: ['waterfallCaveBackLeft'],
+        exits: [{ objectId: 'waterfallCaveBackLeft' }],
     },
+    {
+        zoneId: 'waterfallCave',
+        nodeId: 'waterfallCaveBackRight',
+        entranceIds: ['waterfallCaveBackRight'],
+        exits: [{ objectId: 'waterfallCaveBackRight' }],
+    },
+    {
+        zoneId: 'waterfallCave',
+        nodeId: 'waterfallCaveLeft',
+        checks: [{ objectId: 'waterfallCaveEmptyChest' }],
+        entranceIds: ['waterfallCaveLeft'],
+        exits: [{ objectId: 'waterfallCaveLeft' }],
+    },
+    {
+        zoneId: 'waterfallCave',
+        nodeId: 'waterfallCaveRight',
+        checks: [{ objectId: 'waterfallCaveBiggerMoney' }],
+        entranceIds: ['waterfallCaveRight'],
+        exits: [{ objectId: 'waterfallCaveRight' }],
+    },
+    {
+        zoneId: 'waterfallCave',
+        nodeId: 'waterfallCaveMain',
+        entranceIds: ['waterfallCaveLeftMain', 'waterfallCaveRightMain'],
+        exits: [{ objectId: 'waterfallCaveLeftMain' }, { objectId: 'waterfallCaveRightMain' }],
+    },
+    {
+        zoneId: 'waterfallCave',
+        nodeId: 'waterfallCaveTop',
+        checks: [{ objectId: 'waterfallCavePeachPiece' }],
+        paths: [{ nodeId:'waterfallCaveEntrance' }],
+        entranceIds: ['waterfallCaveMarker'],
+    }
 ];
 
 // The flameBeast flag is set correctly during simulation, so this logic works as expected.
@@ -170,24 +275,6 @@ export const cavesNodes: LogicNode[] = [
 export const holyCityNodes: LogicNode[] = [
     {
         zoneId: 'holyCityInterior',
-        nodeId: 'templePeachPiece',
-        checks: [
-            { objectId: 'templePeachPiece' },
-        ],
-        entranceIds: ['templeCrackedDoor'],
-        exits: [{ objectId: 'templeCrackedDoor' }],
-    },
-    {
-        zoneId: 'holyCityInterior',
-        nodeId: 'templeMain',
-        npcs: [
-            {loot: {type: 'dialogueLoot', id: 'generousPriest', lootType: 'money', lootAmount: 10}},
-        ],
-        entranceIds: ['templeDoor'],
-        exits: [{ objectId: 'templeDoor' }],
-    },
-    {
-        zoneId: 'holyCityInterior',
         nodeId: 'moneyMaze',
         checks: [
             { objectId: 'moneyMazePeachPiece' },
@@ -222,7 +309,5 @@ export const holyCityNodes: LogicNode[] = [
         entranceIds: ['clothesHouse'],
         exits: [{ objectId: 'clothesHouse'}],
     },
-
-
 ];
 

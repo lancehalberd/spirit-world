@@ -930,6 +930,7 @@ const sf2_0x0: AreaDefinition = {
         {status: "normal", id: "cocoonLadderBack", x: 416, y: 160, type: "door", style: "ladderDown", targetZone: "cocoon", targetObjectId: "cocoonLadderBack", d: "down"},
         {status: "normal", id: "cocoonLadderNW", x: 160, y: 80, type: "door", style: "ladderUp", targetZone: "cocoon", targetObjectId: "cocoonLadderNW", d: "up"},
         {status: "normal", id: "cocoonLadderNE", x: 336, y: 80, type: "door", style: "ladderUp", targetZone: "cocoon", targetObjectId: "cocoonLadderNE", d: "up"},
+        {status: "normal", id: "cocoon:s2:0x0-luckyBeetle-0", x: 400, y: 344, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},

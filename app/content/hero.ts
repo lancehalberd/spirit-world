@@ -2,6 +2,7 @@ import { addEffectToArea } from 'app/content/areas';
 import { AnimationEffect } from 'app/content/effects/animationEffect';
 import { BarrierBurstEffect } from 'app/content/effects/barrierBurstEffect';
 import { destroyClone } from 'app/content/objects/clone';
+import { Staff } from 'app/content/objects/staff';
 import { getChargedArrowAnimation } from 'app/content/effects/arrow';
 import {
     arrowAnimations, bowAnimations, cloakAnimations,
@@ -28,7 +29,7 @@ import {
     Direction, DrawPriority, EffectInstance, Equipment, Frame,
     FullTile, GameState, HeldChakram, HitProperties, HitResult,
     MagicElement, ObjectInstance, ObjectStatus,
-    PassiveTool, Rect, SavedHeroData, ThrownChakram, ThrownObject, TileBehaviors, TileCoords,
+    PassiveTool, Rect, SavedHeroData, ThrownChakram, ThrownObject, TileCoords,
     WeaponUpgrades, ZoneLocation
 } from 'app/types';
 
@@ -42,9 +43,6 @@ export class Hero implements Actor, SavedHeroData {
     // These aren't used by the Hero itself since it has special handling,
     // but these are used on objects that inherit from hero: AstralProjection and Clone.
     drawPriority: DrawPriority = 'sprites';
-    behaviors: TileBehaviors = {
-        solid: true,
-    };
     x: number = 0;
     y: number = 0;
     z: number = 0;
@@ -69,8 +67,6 @@ export class Hero implements Actor, SavedHeroData {
     hasBarrier?: boolean = false;
     hasRevive: boolean = false;
     isInvisible?: boolean = false;
-    jumpingTime?: number;
-    jumpDirection?: Direction;
     jumpingVx?: number;
     jumpingVy?: number;
     jumpingVz?: number;
@@ -86,6 +82,8 @@ export class Hero implements Actor, SavedHeroData {
     lastTouchedObject?: EffectInstance | ObjectInstance;
     invulnerableFrames?: number;
     life: number;
+    ironSkinLife: number = 0;
+    ironSkinCooldown: number = 500;
     wading?: boolean;
     slipping?: boolean;
     swimming?: boolean;
@@ -158,6 +156,7 @@ export class Hero implements Actor, SavedHeroData {
 
     heldChakram?: HeldChakram;
     thrownChakrams: ThrownChakram[] = [];
+    activeStaff?: Staff
 
     constructor() {
         this.life = this.maxLife;
@@ -251,6 +250,9 @@ export class Hero implements Actor, SavedHeroData {
         }
         return { x: this.x, y: this.y, w: this.w, h: this.h };
     }
+    getMovementHitbox(this: Hero, state?: GameState): Rect {
+        return { x: this.x, y: this.y, w: this.w, h: this.h };
+    }
 
     overlaps(this: Hero, target: Rect | {getHitbox: () => Rect}) {
         if ((target as any).getHitbox) {
@@ -315,6 +317,7 @@ export class Hero implements Actor, SavedHeroData {
             }
             return {};
         }
+        const preventKnockback = this.equipedBoots === 'ironBoots' || this.ironSkinLife > 0;
         if (hit.damage) {
             let damage = hit.damage;
             if (hit.element === 'fire' && state.hero.passiveTools.fireBlessing) {
@@ -331,14 +334,14 @@ export class Hero implements Actor, SavedHeroData {
             }
             this.takeDamage(state, damage);
         }
-        if (hit.knockback && (hit.canAlwaysKnockback || this.equipedBoots !== 'ironBoots')) {
+        if (hit.knockback && (hit.canAlwaysKnockback || !preventKnockback)) {
             this.knockBack(state, hit.knockback);
         }
         // Getting hit while frozen unfreezes you.
         if (this.frozenDuration > 0) {
             this.frozenDuration = 0;
-        } else if (hit.element === 'ice') {
-            // Getting hit by ice freezes you.
+        } else if (hit.element === 'ice' && !(this.ironSkinLife > 0)) {
+            // Getting hit by ice freezes you unless you have iron skin up.
             this.frozenDuration = 1500;
         }
         return { hit: true };
@@ -391,6 +394,17 @@ export class Hero implements Actor, SavedHeroData {
     }
 
     takeDamage(this: Hero, state: GameState, damage: number): void {
+        if (this.ironSkinLife) {
+            this.ironSkinCooldown = 3000;
+            if (this.ironSkinLife > damage) {
+                this.ironSkinLife -= damage;
+                state.hero.invulnerableFrames = 50;
+                return;
+            } else {
+                damage -= this.ironSkinLife;
+                this.ironSkinLife = 0;
+            }
+        }
         // If any controllable clones are in use,
         // any damage the hero or any clone take destroys it.
         // If there are no controllable clones, damage will only kill the

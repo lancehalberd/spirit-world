@@ -10,7 +10,7 @@ import { FRAME_LENGTH, GAME_KEY } from 'app/gameConstants';
 import {
     wasGameKeyPressedAndReleased, wasGameKeyPressed
 } from 'app/keyCommands';
-import { checkForFloorEffects } from 'app/moveActor';
+import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
 import { prependScript } from 'app/scriptEvents';
 import { updateHeroSpecialActions } from 'app/updateHeroSpecialActions';
 import { updateHeroStandardActions } from 'app/updateHeroStandardActions';
@@ -122,6 +122,17 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
         if (hero.action === 'walking' && hero.isRunning && hero.magic >= 0) {
             hero.animationTime += FRAME_LENGTH / 2;
         }
+        if (hero.passiveTools.ironSkin) {
+            hero.ironSkinCooldown -= FRAME_LENGTH;
+            // Iron skin restored twice as quickly when still.
+            if (!hero.action || hero.action === 'meditating') {
+                hero.ironSkinCooldown -= FRAME_LENGTH;
+            }
+            if (hero.ironSkinCooldown <= 0) {
+                hero.ironSkinCooldown = 1000;
+                hero.ironSkinLife = Math.min(hero.ironSkinLife + 0.25, hero.maxLife / 4);
+            }
+        }
     }
     // Remove action targets from old areas.
     if (hero.actionTarget && hero.actionTarget.area !== hero.area) {
@@ -170,7 +181,10 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
             }
         }
     }
-    if (hero.life <= 0) {
+    if (hero.life <= 0
+        && hero.action !== 'thrown' && hero.action !== 'knocked' && hero.action !== 'knockedHard'
+        && hero.action !== 'jumpingDown' && hero.action !== 'falling' && hero.action !== 'fallen'
+    ) {
         if (hero.area.enemies.find(enemy => enemy.definition.id === 'tombRivalBoss')
             && state.savedState.objectFlags.elderTomb
         ) {
@@ -181,6 +195,7 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
             hero.life = 0;
             hero.action = null;
             hero.chargeTime = 0;
+            hero.frozenDuration = 0;
             state.defeatState = {
                 defeated: true,
                 time: 0,

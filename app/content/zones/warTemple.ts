@@ -748,6 +748,7 @@ const f0_1x2: AreaDefinition = {
         {status: "normal", id: "warTemple:0:2x1-door-6", x: 112, y: 0, type: "door", style: "cave", d: "up"},
         {status: "normal", id: "warTemple:0:2x1-frostBeetle-0", x: 160, y: 160, type: "enemy", enemyType: "frostBeetle", d: "down", params: {}},
         {status: "normal", id: "warTempleEscapeMarker", x: 64, y: 64, type: "marker"},
+        {status: "normal", id: "warTemple:0:2x1-luckyBeetle-0", x: 120, y: 384, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16},

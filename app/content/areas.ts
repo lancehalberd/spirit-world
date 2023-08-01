@@ -6,12 +6,13 @@ import { changeObjectStatus, createObjectInstance, findObjectInstanceById } from
 import { allTiles } from 'app/content/tiles';
 import { logicHash, isLogicValid } from 'app/content/logic';
 import { enterZoneByDoorCallback } from 'app/content/objects/door';
+import { enterZoneByTeleporterCallback } from 'app/content/objects/teleporter';
 import { dropItemFromTable } from 'app/content/objects/lootObject';
 import { checkToUpdateSpawnLocation } from 'app/content/spawnLocations';
 import { zones } from 'app/content/zones';
 import { editingState } from 'app/development/tileEditor';
 import { createCanvasAndContext } from 'app/dom';
-import { checkForFloorEffects } from 'app/moveActor';
+import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
 import { isPointInShortRect } from 'app/utils/index';
 import { playSound } from 'app/musicController';
 import { removeTextCue } from 'app/scriptEvents';
@@ -261,8 +262,7 @@ export function enterLocation(
     const alternateArea = getAreaFromLocation({...state.location, isSpiritWorld: !state.location.isSpiritWorld});
 
     // Remove all clones on changing areas.
-    removeAllClones(state);
-    state.activeStaff?.remove(state);
+    cleanupHeroFromArea(state);
     const lastAreaInstance = state.areaInstance;
     // Use the existing area instances on the transition state if any are present.
     state.areaInstance = state.transitionState?.nextAreaInstance
@@ -347,7 +347,7 @@ export function setConnectedAreas(state: GameState, lastAreaInstance: AreaInstan
 }
 
 export function linkObjects(state: GameState): void {
-    for (const object of state.areaInstance.objects) {
+    for (const object of [...state.areaInstance.objects, ...state.alternateAreaInstance.objects]) {
         linkObject(object);
     }
 }
@@ -475,6 +475,8 @@ export function enterZoneByTarget(
                                 // character to the door properly.
                                 if (definition.type === 'door') {
                                     enterZoneByDoorCallback(state, targetObjectId, skipObject);
+                                } else if (definition.type === 'teleporter') {
+                                    enterZoneByTeleporterCallback(state, targetObjectId);
                                 }
                                 callback?.();
                             });
@@ -519,8 +521,7 @@ export function switchToNextAreaSection(state: GameState): void {
     refreshSection(state, state.alternateAreaInstance, state.areaSection);
     linkObjects(state);
     state.areaSection = state.nextAreaSection;
-    removeAllClones(state);
-    state.activeStaff?.remove(state);
+    cleanupHeroFromArea(state);
     state.hero.safeD = state.hero.d;
     state.hero.safeX = state.hero.x;
     state.hero.safeY = state.hero.y;
@@ -541,12 +542,18 @@ export function setAreaSection(state: GameState, d: Direction, newArea: boolean 
         }
     }
     if (newArea || lastAreaSection !== state.areaSection) {
-        removeAllClones(state);
-        state.activeStaff?.remove(state);
+        cleanupHeroFromArea(state);
         state.hero.safeD = state.hero.d;
         state.hero.safeX = state.hero.x;
         state.hero.safeY = state.hero.y;
     }
+}
+
+export function cleanupHeroFromArea(state: GameState): void {
+    for (const hero of [state.hero, ...state.hero.clones]) {
+        hero.activeStaff?.remove(state);
+    }
+    removeAllClones(state);
 }
 
 export function scrollToArea(state: GameState, area: AreaDefinition, direction: Direction): void {
@@ -625,7 +632,9 @@ function applyTileToBehaviorGrid(behaviorGrid: TileBehaviors[][], {x, y}: Tile, 
         behaviorGrid[y][x] = {};
     }
     // Any background tile rendered on top of lava removes the lava behavior from it.
-    if (!isForeground && behaviorGrid[y]?.[x] && !behaviors.isLava && !behaviors.isLavaMap) {
+    if (!isForeground && behaviorGrid[y]?.[x]
+        && !behaviors.isLava && !behaviors.isLavaMap && behaviors.isGround !== false
+    ) {
         delete behaviorGrid[y][x].isLava;
         delete behaviorGrid[y][x].isLavaMap;
     }
@@ -633,7 +642,7 @@ function applyTileToBehaviorGrid(behaviorGrid: TileBehaviors[][], {x, y}: Tile, 
     // If this causes issues with decorations like shadows we may need to explicitly set pit = false
     // on tiles that can cover up pits (like in the sky) and use that, or alternatively, make a separate
     // sky behavior that has this behavior instead of pits.
-    if (!isForeground && behaviorGrid[y]?.[x]?.pit && !behaviors.pit) {
+    if (!isForeground && behaviorGrid[y]?.[x]?.pit && !behaviors.pit && behaviors.isGround !== false) {
         delete behaviorGrid[y][x].pit;
     }
     if (!isForeground && behaviorGrid[y]?.[x]?.cloudGround && !behaviors.cloudGround) {
@@ -988,7 +997,11 @@ export function refreshSection(state: GameState, area: AreaInstance, section: Re
     }
     area.checkToRedrawTiles = true;
     // Remove effects unless they update during the transition, like the held chakram.
-    area.effects = area.effects.filter(effect => effect.updateDuringTransition);
+    for (const effect of [...area.effects]) {
+        if (!effect.updateDuringTransition) {
+            removeEffectFromArea(state, effect);
+        }
+    }
     const l = section.x * 16;
     const t = section.y * 16;
     // Remove any objects from that area that should be reset.
@@ -1031,6 +1044,13 @@ export function refreshSection(state: GameState, area: AreaInstance, section: Re
         }
     }
 }
+function hitboxToGrid(hitbox: Rect): Rect {
+    const x = (hitbox.x / 16) | 0;
+    const w = (hitbox.w / 16) | 0;
+    const y = (hitbox.y / 16) | 0;
+    const h = (hitbox.h / 16) | 0;
+    return {x, y, w, h};
+}
 export function addObjectToArea(state: GameState, area: AreaInstance, object: ObjectInstance): void {
     if (object.area && object.area !== area) {
         removeObjectFromArea(state, object);
@@ -1047,6 +1067,15 @@ export function addObjectToArea(state: GameState, area: AreaInstance, object: Ob
             specialBehaviorsHash[object.definition.specialBehaviorKey].apply?.(state, object as any);
         } catch (error) {
             console.error(object.definition.specialBehaviorKey);
+        }
+    }
+
+    if (object.applyBehaviorsToGrid && object.behaviors) {
+        const gridRect = hitboxToGrid(object.getHitbox());
+        for (let x = gridRect.x; x < gridRect.x + gridRect.w; x++) {
+            for (let y = gridRect.y; y < gridRect.y + gridRect.h; y++) {
+                applyBehaviorToTile(area, x, y, object.behaviors);
+            }
         }
     }
 }

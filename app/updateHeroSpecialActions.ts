@@ -7,7 +7,8 @@ import { Staff } from 'app/content/objects/staff';
 import { CANVAS_HEIGHT, FALLING_HEIGHT, FRAME_LENGTH, GAME_KEY } from 'app/gameConstants';
 import { editingState } from 'app/development/tileEditor';
 import { getCloneMovementDeltas, wasGameKeyPressed } from 'app/keyCommands';
-import { checkForFloorEffects, moveActor } from 'app/moveActor';
+import { checkForFloorEffects } from 'app/movement/checkForFloorEffects';
+import { moveActor } from 'app/moveActor';
 import { fallAnimation, heroAnimations } from 'app/render/heroAnimations';
 import { saveGame } from 'app/state';
 import { updateCamera } from 'app/updateCamera';
@@ -26,7 +27,7 @@ import Random from 'app/utils/Random';
 
 
 import {
-    GameState, Hero, ObjectInstance, StaffTowerLocation,
+    GameState, Hero, HitProperties, ObjectInstance, StaffTowerLocation,
 } from 'app/types';
 
 const rollSpeed = [
@@ -178,12 +179,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             if (!hero.area) {
                 return;
             }
-            // For now leave the hero in the 'fallen' state if they died, otherwise they reappear
-            // just fine when the continue/quit option shows up.
-            // Once the death animation is added we can probably remove this check if we want.
-            if (hero.life > 0) {
-                hero.action = null;
-            }
+            hero.action = null;
         }
         return true;
     }
@@ -237,65 +233,69 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         // Freeze at the leaping frame, the flip looks bad if the jump isn't the right length.
         hero.animationTime = Math.min(hero.animationTime, 100);
         const groundZ = 0;
-        // Once the hero is over their landing tile, they fall straight down until they hit the ground.
-        if (!hero.jumpingVy && !hero.jumpingVx) {
-            hero.z += hero.jumpingVz;
-            hero.jumpingVz = Math.max(-2, hero.jumpingVz - 0.5);
-            if (hero.z <= hero.groundHeight) {
-                hero.z = hero.groundHeight;
-                hero.action = null;
-                hero.animationTime = 0;
-                checkForFloorEffects(state, hero);
-            }
-            return true;
+        // When jumping any direction but down, the jump is precomputed so we just
+        // move the character along the arc until they reach the ground.
+        hero.x += hero.jumpingVx;
+        if (isHeroOnVeryTallWall(state, hero)) {
+            hero.x -= hero.jumpingVx;
         }
-        if (hero.jumpDirection === 'down') {
-            // After the hero has jumped a bit, we stop the jump when they hit a position they can successfully move to.
-            let shouldLand = false;
-            // As the hero approaches each new row of tiles, check if they should land on this row of tiles.
-            // The player can fall as many as 4 pixels per frame, so we check when the user is in the last 4 pixels
-            // of the previous row.
-            if (hero.y >= hero.jumpingDownY + 24 && (hero.y % 16 > 12 || hero.y % 16 === 0)) {
-                const y = (((hero.y - 1) / 16) | 0) * 16 + 16;
-                const excludedObjects = new Set([hero]);
-                const { tileBehavior: b1 } = getTileBehaviorsAndObstacles(state, hero.area, {x: hero.x, y }, excludedObjects, state.nextAreaInstance);
-                const { tileBehavior: b2 } = getTileBehaviorsAndObstacles(state, hero.area, {x: hero.x + hero.w - 1, y}, excludedObjects, state.nextAreaInstance);
-                // console.log(hero.x, y, b1.solid, b1.cannotLand, b2.solid, b2.cannotLand);
-                shouldLand = !b1.solid && !b2.solid && !b1.cannotLand && !b2.cannotLand;
+        hero.y += hero.jumpingVy;
+        if (isHeroOnVeryTallWall(state, hero)) {
+            hero.y -= hero.jumpingVy;
+        }
+        hero.jumpingVx *= 0.98;
+        hero.jumpingVy *= 0.98;
+        hero.z += hero.jumpingVz;
+        hero.jumpingVz = Math.max(-4, hero.jumpingVz - 0.5);
+        if (hero.jumpingVy >= 0 && hero.jumpingVz < 0) {
+            let i = 0;
+            while (i < 4 && isHeroOnSouthernWallTile(state, hero)) {
+                hero.y++;
+                hero.z++;
+                i++;
+                // Uncomment and possibly reduce this if hero is jumping too far south from tall cliffs.
+                //hero.jumpingVy = Math.min(hero.jumpingVy, 1);
+                // Without this, the hero will not be able to transition south while jumping east/west
+                // and moving down across a southern facing wall.
+                hero.actionDy = 1;
             }
-            if (shouldLand) {
-                hero.y = (((hero.y - 1) / 16) | 0) * 16 + 16;
-                hero.jumpingVy = 0;
-                hero.jumpingVx = 0;
-                hero.vz = hero.jumpingVz;
-                return true;
-            } else {
-                hero.x += hero.jumpingVx;
-                hero.y += hero.jumpingVy;
-                hero.z += hero.jumpingVz;
-                // Don't allow z to fall below 4 until landing so the shadow stays small while falling.
-                if (hero.z <= 4) {
-                    hero.y += (4 - hero.z);
-                    hero.z = 4;
-                }
-                // Since the player can fall arbitrarily far when jumping in the 'down' direction,
-                // we limit them with a terminal velocity of -2 (so net -4 vy when hitting min z value)
-                hero.jumpingVz = Math.max(-2, hero.jumpingVz - 0.5);
+            while (i < 2 && hero.jumpingVy > 0 && !canSomersaultToCoords(state, hero, hero) && hero.z < 48) {
+                hero.y++;
+                hero.z++;
+                i++;
+                // Reduce this to close to 0 so that the hero doesn't jump further south than necessary
+                // but leave it slightly positive so that screen transitions still trigger.
+                hero.jumpingVy = Math.min(hero.jumpingVy, 0.1);
+                // Without this, the hero will not be able to transition south while jumping east/west
+                // and moving down across an obstacle.
+                hero.actionDy = 1;
             }
-        } else {
-            // When jumping any direction but down, the jump is precomputed so we just
-            // move the character along the arc until they reach the ground.
-            hero.x += hero.jumpingVx;
-            hero.y += hero.jumpingVy;
-            hero.z += hero.jumpingVz;
-            hero.jumpingVz -= 0.5;
-            // console.log([hero.x, hero.y, hero.z], ' -> ', [hero.jumpingVx, hero.jumpingVy, hero.jumpingVz]);
-            if (hero.z <= groundZ) {
-                hero.z = groundZ
+        }
+        // console.log([hero.x, hero.y, hero.z], ' -> ', [hero.jumpingVx, hero.jumpingVy, hero.jumpingVz]);
+        if (hero.z <= groundZ) {
+            hero.z = groundZ
+            hero.action = null;
+            hero.actionDy = 0;
+            hero.animationTime = 0;
+            const landingHit: HitProperties = {
+                damage: 1,
+                hitbox: pad(hero.getHitbox(), 4),
+                hitTiles: true,
+            };
+            hitTargets(state, hero.area, landingHit);
+            // If the hero lands somewhere invalid, damage them and return them to there last safe location,
+            // similar to if they had fallen into a pit.
+            if (!canSomersaultToCoords(state, hero, hero)) {
+                hero.vx = 0;
+                hero.vy = 0;
+                hero.d = hero.safeD;
+                hero.x = hero.safeX;
+                hero.y = hero.safeY;
+                hero.takeDamage(state, 1);
                 hero.action = null;
-                hero.animationTime = 0;
-                checkForFloorEffects(state, hero);
+                return;
             }
+            checkForFloorEffects(state, hero);
         }
         // Make sure vx/vy are updated for screen transition/slipping logic on landing.
         hero.vx = hero.jumpingVx;
@@ -315,6 +315,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         moveActor(state, hero, hero.vx, hero.vy, {
             canFall: true,
             canSwim: true,
+            canJump: hero.action === 'thrown' && hero.z >= 12,
             canPassMediumWalls: hero.action === 'thrown' && hero.z >= 12,
             direction: hero.d,
             boundToSection: hero.action !== 'knockedHard',
@@ -323,6 +324,12 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         // The astral projection stays 4px off the ground.
         if (hero.z <= minZ) {
             if (hero.vz <= -8) {
+                const landingHit: HitProperties = {
+                    damage: 1,
+                    hitbox: pad(hero.getHitbox(), 4),
+                    hitTiles: true,
+                };
+                hitTargets(state, hero.area, landingHit);
                 const { tileBehavior } = getTileBehaviorsAndObstacles(state, hero.area, {x: hero.x, y: hero.y }, excludedObjects, state.nextAreaInstance);
                 if (!tileBehavior?.water && !tileBehavior?.pit) {
                     state.screenShakes.push({
@@ -343,6 +350,10 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             hero.z = minZ;
             hero.action = null;
             hero.vz = 0;
+            // If the hero is at 0 life, they will show the death sequence on top of pits,
+            // so we immediately apply floor effects so that they will apply pits before
+            // starting the death sequence.
+            checkForFloorEffects(state, hero);
         }
         return true;
     }
@@ -422,30 +433,35 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 element: hero.element,
                 maxLength,
             });
+            let baseTarget = {
+                x: staff.leftColumn * 16,
+                y: staff.topRow * 16,
+                w: (staff.rightColumn - staff.leftColumn + 1) * 16,
+                h: (staff.bottomRow - staff.topRow + 1) * 16,
+            }
             if (!staff.invalid) {
-                state.activeStaff = staff;
+                hero.activeStaff = staff;
                 addObjectToArea(state, state.areaInstance, staff);
+            } else {
+                // Staff hits at least a 3 tile area even if it doesn't get placed.
+                const isVertical = staff.direction === 'up' || staff.direction === 'down';
+                baseTarget = {
+                    x: staff.leftColumn * 16 - (staff.direction === 'left' ? 32 : 0),
+                    y: staff.topRow * 16 - (staff.direction === 'up' ? 32 : 0),
+                    w: isVertical ? 16 : 48,
+                    h: isVertical ? 48 : 16,
+                };
             }
             playAreaSound(state, state.areaInstance, 'bossDeath');
             hitTargets(state, state.areaInstance, {
                 damage: 4 * staffLevel,
-                hitbox: {
-                    x: staff.leftColumn * 16 - 2,
-                    y: staff.topRow * 16 - 2,
-                    w: (staff.rightColumn - staff.leftColumn + 1) * 16 + 4,
-                    h: (staff.bottomRow - staff.topRow + 1) * 16 + 4,
-                },
+                hitbox: pad(baseTarget, 2),
                 hitEnemies: true,
                 knockAwayFromHit: true,
                 isStaff: true,
             });
             hitTargets(state, state.areaInstance, {
-                hitbox: {
-                    x: staff.leftColumn * 16,
-                    y: staff.topRow * 16,
-                    w: (staff.rightColumn - staff.leftColumn + 1) * 16,
-                    h: (staff.bottomRow - staff.topRow + 1) * 16,
-                },
+                hitbox: baseTarget,
                 hitObjects: true,
                 isStaff: true,
             });
@@ -606,7 +622,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
     return false;
 }
 
-function isHeroOnOpenTile(this: void, state: GameState, hero: Hero) {
+function isHeroOnOpenTile(this: void, state: GameState, hero: Hero): boolean {
     const L = hero.x + 3, R = hero.x + hero.w - 4, T = hero.y + 3, B = hero.y + hero.h - 4;
     const points = [{x: L, y: T}, {x: R, y: T}, {x: L, y: B}, {x: R, y: B}];
     const excludedObjects = new Set([hero]);
@@ -617,5 +633,32 @@ function isHeroOnOpenTile(this: void, state: GameState, hero: Hero) {
         }
     }
     return true;
+}
+
+
+function isHeroOnSouthernWallTile(this: void, state: GameState, hero: Hero): boolean {
+    const L = hero.x, R = hero.x + hero.w - 1, T = hero.y, B = hero.y + hero.h - 1;
+    const points = [{x: L, y: T}, {x: R, y: T}, {x: L, y: B}, {x: R, y: B}];
+    const excludedObjects = new Set([hero]);
+    for (const point of points) {
+        const { tileBehavior } = getTileBehaviorsAndObstacles(state, hero.area, point, excludedObjects, state.nextAreaInstance);
+        if (tileBehavior.isSouthernWall) {
+            return true
+        }
+    }
+    return false;
+}
+
+function isHeroOnVeryTallWall(this: void, state: GameState, hero: Hero): boolean {
+    const L = hero.x, R = hero.x + hero.w - 1, T = hero.y, B = hero.y + hero.h - 1;
+    const points = [{x: L, y: T}, {x: R, y: T}, {x: L, y: B}, {x: R, y: B}];
+    const excludedObjects = new Set([hero]);
+    for (const point of points) {
+        const { tileBehavior } = getTileBehaviorsAndObstacles(state, hero.area, point, excludedObjects, state.nextAreaInstance);
+        if (tileBehavior.isVeryTall && tileBehavior.solid) {
+            return true
+        }
+    }
+    return false;
 }
 

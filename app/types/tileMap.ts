@@ -22,6 +22,9 @@ export interface TileBehaviors {
     // Indicates this tile is already covered and cannot be covered by anything else. Added to prevent tile behavior
     // from getting messed up while the staff is covering the ground.
     covered?: boolean
+    // Similar behavior to covered but only applied when the staff covers the ground.
+    // Used to prevents staffs from overlapping.
+    blocksStaff?: boolean
     // Can be destroyed by weapon
     cuttable?: number
     // Hit applies to enemies/heroes on contact.
@@ -33,18 +36,6 @@ export interface TileBehaviors {
     destructible?: boolean
     // Elemental association that can be passed to other objects.
     element?: MagicElement
-    // Cliff edges in this tile, for example, if cliff edge up is true,
-    // then the tile cannot be entered from the north, and can be jumped off of
-    // from the south.
-    // TBD: include upleft/etc which will cut tiles in half diagonally.
-    edges?: {
-        up?: true
-        down?: true
-        left?: true
-        right?: true
-    }
-    // This tile can be jumped over in this direction but is otherwise impassable.
-    jumpDirection?: Direction
     // If this is true then this tile will link to a tile with the given tile index in the alternate world.
     linkableTiles?: number[]
     // If this is set, then the default tile in the spirit world will be offset by this number.
@@ -75,6 +66,8 @@ export interface TileBehaviors {
     pit?: boolean
     isLava?: Boolean
     isLavaMap?: Uint16Array
+    // If this is set to false, then a tile won't override pit/lava behavior underneath it.
+    isGround?: false
     // number of pixels to raise the player when on this tile. Created for the staff ground.
     groundHeight?: number
     // Assign this to skip tiles in source images.
@@ -86,7 +79,6 @@ export interface TileBehaviors {
     pickupWeight?: number
     // Tile to display if this tile is removed (picked up, cut, blown up).
     underTile?: number
-    growTiles?: number[]
     shallowWater?: boolean
     slippery?: boolean
     water?: boolean
@@ -95,6 +87,28 @@ export interface TileBehaviors {
     // Sets a standard transparency for this tile type when the editor is open.
     // This was added for lava tiles since I want to see what is underneath lava as I edit it.
     editorTransparency?: number
+
+    // Indicates ledges that can be jumped down.
+    // True values indicate that you can jump out of the tile in the indicated direction.
+    // False values indicate that you can jump into the tile from the opposite direction
+    // e.g. ledges: {up: false, left: true} means that you can jump south into this tile,
+    // and moving north out of this tile is blocked, you can jump west out of this tile and
+    // moving east into this tile is blocked.
+    ledges?: {
+        up?: boolean
+        down?: boolean
+        left?: boolean
+        right?: boolean
+    }
+    // Only one diagonal ledge can be present in a tile, and it overrides ledges in the corresponding
+    // directions. The direction here is the direction the character can jump down.
+    diagonalLedge?: 'upleft' | 'upright' | 'downleft' | 'downright'
+    // tiles with this behavior will not apply solid property to anything moving south. This should
+    // be applied to south, southwest and southeast facing cliff faces so that projectiles can be
+    // fired down them, but not up them.
+    isSouthernWall?: boolean
+    // Implies the tile is >32px tall and can block projectiles even if they
+    isVeryTall?: boolean
 }
 
 export type TilePalette = number[][];

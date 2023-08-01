@@ -29,6 +29,7 @@ import {
 import { updateHeroMagicStats } from 'app/render/spiritBar';
 import { parseScriptText, setScript, updateScriptEvents } from 'app/scriptEvents';
 import {
+    canPauseGame,
     getDefaultSavedState,
     getState,
     getTitleOptions,
@@ -67,11 +68,34 @@ export function update() {
         }
         if (wasGameKeyPressed(state, GAME_KEY.MENU)) {
             // Don't allow pausing while dialogue is displayed.
-            if (state.paused ||
-                !(state.messagePage?.frames?.length || state.defeatState.defeated || state.scriptEvents.blockFieldUpdates)
+            if (state.paused
+                || (canPauseGame(state)
+                    && !(
+                        state.messagePage?.frames?.length
+                        || state.defeatState.defeated
+                        || state.scriptEvents.blockFieldUpdates
+                    )
+                )
             ) {
                 state.paused = !state.paused;
+                state.showMap = false;
                 state.menuIndex = 0;
+                updateSoundSettings(state);
+            }
+        }
+        if (wasGameKeyPressed(state, GAME_KEY.MAP)) {
+            // Don't allow pausing while dialogue is displayed.
+            if (state.showMap
+                || (canPauseGame(state)
+                    && !(
+                        state.messagePage?.frames?.length
+                        || state.defeatState.defeated
+                        || state.scriptEvents.blockFieldUpdates
+                    )
+                )
+            ) {
+                state.showMap = !state.showMap;
+                state.paused = state.showMap;
                 updateSoundSettings(state);
             }
         }
@@ -214,7 +238,7 @@ function updateMenu(state: GameState) {
         if (menuItem === 'return') {
             state.paused = false;
             updateSoundSettings(state);
-            showMessage(state, '{@nimbusCloud.returnHomeChoice}');
+            showMessage(state, '{@nimbusCloud.returnMenu}');
             return;
         }
         if (state.hero.activeTools[menuItem]) {

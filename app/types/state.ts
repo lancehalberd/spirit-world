@@ -1,5 +1,3 @@
-import { Staff } from 'app/content/objects/staff';
-
 import {
     ActiveScriptEvent, AreaGrid, AreaInstance,
     Floor, Hero, LootData, SavedHeroData, Rect, ScriptEvent, TextPage, TrackKey,
@@ -18,6 +16,8 @@ export type SavedState = {
         [key: string]: DungeonInventory
     }
     staffTowerLocation: StaffTowerLocation
+    // Stores the last N lucky beetle ids defeated, which will not respawn.
+    luckyBeetles: string[]
 }
 
 // These settings are global and can be saved independent of saved state
@@ -63,7 +63,6 @@ export interface GameState {
     savedGames: SavedState[]
     savedGameIndex: number
     hero: Hero
-    activeStaff?: Staff
     camera: { x: number, y: number }
     fieldTime: number
     time: number
@@ -101,6 +100,7 @@ export interface GameState {
         targetZ?: number
     }
     paused: boolean
+    showMap: boolean
     menuIndex: number
     menuRow: number
     // This is mostly used for debugging animations.

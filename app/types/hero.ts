@@ -100,8 +100,6 @@ export interface Actor extends ObjectInstance {
     groundHeight: number
     hasBarrier?: boolean
     isInvisible?: boolean
-    jumpingTime?: number
-    jumpDirection?: Direction
     jumpingVx?: number
     jumpingVy?: number
     jumpingVz?: number
@@ -159,7 +157,6 @@ export interface Hero extends Actor, SavedHeroData {
     toolCooldown: number
     astralProjection?: Hero
     clones: Hero[]
-    activeStaff?: Staff
     barrierElement?: MagicElement
     barrierLevel?: number
     safeD: Direction

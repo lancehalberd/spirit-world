@@ -46,7 +46,7 @@ export function createFrameCanvas(frame: Frame, scale: number = 1): HTMLCanvasEl
 
 const CANVAS_SCALE = 10;
 
-export function debugCanvas(canvas: HTMLCanvasElement | Frame) {
+export function debugCanvas(canvas: HTMLCanvasElement | Frame, scale = CANVAS_SCALE) {
     if (canvas instanceof HTMLCanvasElement) {
         document.body.append(canvas);
         canvas.style.position = 'absolute';
@@ -58,13 +58,13 @@ export function debugCanvas(canvas: HTMLCanvasElement | Frame) {
         canvas.image.style.top = '0';
         canvas.image.style.backgroundColor = 'blue';
         canvas.image.style.transformOrigin = '0 0';
-        canvas.image.style.transform = `scale(${CANVAS_SCALE})`;
+        canvas.image.style.transform = `scale(${scale})`;
         const div = document.createElement('div');
         div.style.position = 'absolute';
-        div.style.top = `${canvas.y * CANVAS_SCALE}px`;
-        div.style.left = `${canvas.x * CANVAS_SCALE}px`;
-        div.style.height = `${canvas.h * CANVAS_SCALE}px`;
-        div.style.width = `${canvas.w * CANVAS_SCALE}px`;
+        div.style.top = `${canvas.y * scale}px`;
+        div.style.left = `${canvas.x * scale}px`;
+        div.style.height = `${canvas.h * scale}px`;
+        div.style.width = `${canvas.w * scale}px`;
         div.style.border = '1px solid red';
         div.style.boxSizing = 'border-box';
         document.body.append(div);

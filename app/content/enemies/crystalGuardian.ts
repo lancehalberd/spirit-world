@@ -7,28 +7,76 @@ import {
 } from 'app/content/enemies';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import {
-    entAnimations,
-    crystalBarrierNormalAnimation,
-    crystalBarrierDamagedAnimation,
-    crystalBarrierVeryDamagedAnimation,
+    crystalGuardianAnimations,
+    // smallCrystalBarrierFlashFrame,
+    smallCrystalBarrierNormalFrame,
+    smallCrystalBarrierDamagedFrame,
+    smallCrystalBarrierVeryDamagedFrame,
     crystalBarrierSmallParticles,
     crystalBarrierLargeParticles,
 } from 'app/content/enemyAnimations';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { getFrame, drawFrameCenteredAt } from 'app/utils/animations';
+import { drawFrameCenteredAt } from 'app/utils/animations';
 import { playSound } from 'app/musicController';
 
-import { Enemy, Frame, GameState, HitProperties, HitResult, Rect } from 'app/types';
+import { Enemy, EnemyAbility, Frame, GameState, HitProperties, HitResult, Rect } from 'app/types';
 
-const maxShieldLife = 8;
+const maxShieldLife = 6;
+
+type NearbyTargetType = ReturnType<typeof getVectorToNearbyTarget>;
+
+const spikeLineAbility: EnemyAbility<NearbyTargetType> = {
+    getTarget(this: void, state: GameState, enemy: Enemy): NearbyTargetType {
+        return getVectorToNearbyTarget(state, enemy, enemy.aggroRadius, enemy.area.allyTargets);
+    },
+    prepareAbility(this: void, state: GameState, enemy: Enemy, target: NearbyTargetType) {
+        enemy.changeToAnimation('attack');
+    },
+    useAbility(this: void, state: GameState, enemy: Enemy, target: NearbyTargetType): void {
+        addLineOfSpikes({
+            state, area: enemy.area,
+            source: [enemy.x + enemy.w / 2 + target.x * 8, enemy.y + enemy.h / 2 + target.y * 8],
+            target: [enemy.x + enemy.w / 2 + target.x * 32, enemy.y + enemy.h / 2 + target.y * 32],
+        });
+    },
+    cooldown: 5000,
+    initialCharges: 0,
+    charges: 1,
+    prepTime: crystalGuardianAnimations.attack.down.duration - 200,
+    recoverTime: 400,
+};
+
+const spikePodAbility: EnemyAbility<NearbyTargetType> = {
+    getTarget(this: void, state: GameState, enemy: Enemy): NearbyTargetType {
+        return getVectorToNearbyTarget(state, enemy, enemy.aggroRadius, enemy.area.allyTargets);
+    },
+    prepareAbility(this: void, state: GameState, enemy: Enemy, target: NearbyTargetType) {
+        enemy.changeToAnimation('spell');
+    },
+    useAbility(this: void, state: GameState, enemy: Enemy, target: NearbyTargetType): void {
+        const {x, y} = target;
+        // This should spawn in a fixed radius around the guardian in between it and the target.
+        addEffectToArea(state, enemy.area, new SpikePod({
+            x: enemy.x + enemy.w / 2 + 72 * x,
+            y: enemy.y + enemy.h / 2 + 72 * y,
+            damage: 2,
+        }));
+    },
+    cooldown: 3000,
+    initialCharges: 1,
+    charges: 1,
+    prepTime: 200,
+    recoverTime: 1000,
+};
 
 enemyDefinitions.crystalGuardian = {
     alwaysReset: true,
+    abilities: [spikeLineAbility, spikePodAbility],
     params: {
         shieldLife: maxShieldLife,
         shieldInvulnerableTime: 0,
     },
-    animations: entAnimations, aggroRadius: 128,
+    animations: crystalGuardianAnimations, aggroRadius: 128,
     life: 8, touchDamage: 2,
     canBeKnockedBack: false,
     // The damage from tile behaviors will trigger when the player attempts to move into the same pixel,
@@ -38,7 +86,7 @@ enemyDefinitions.crystalGuardian = {
     getHitbox(enemy: Enemy): Rect {
         const hitbox = enemy.getDefaultHitbox();
         if (enemy.params.shieldLife) {
-            const frame = crystalBarrierNormalAnimation.frames[0];
+            const frame = smallCrystalBarrierNormalFrame;
             const w = (frame.content?.w ?? frame.w) * enemy.scale;
             const h = (frame.content?.h ?? frame.h) * enemy.scale;
             return {
@@ -92,27 +140,14 @@ enemyDefinitions.crystalGuardian = {
         if (enemy.params.shieldInvulnerableTime  > 0) {
             enemy.params.shieldInvulnerableTime -= FRAME_LENGTH;
         }
-        // Summon a pod once very 2 seconds if a target is nearby.
-        if (enemy.modeTime % 3000 === 0) {
-            const v = getVectorToNearbyTarget(state, enemy, enemy.enemyDefinition.aggroRadius, enemy.area.allyTargets);
-            if (v) {
-                const {x, y} = v;
-                // This should spawn in a fixed radius around the guardian in between it and the target.
-                addEffectToArea(state, enemy.area, new SpikePod({
-                    x: enemy.x + enemy.w / 2 + 72 * x,
-                    y: enemy.y + enemy.h / 2 + 72 * y,
-                    damage: 2,
-                }));
+        if (!enemy.activeAbility) {
+            if (enemy.invulnerableFrames > 0) {
+                enemy.changeToAnimation('hurt');
+            } else {
+                enemy.changeToAnimation('idle');
             }
-        }
-        if (enemy.modeTime % 5000 === 0) {
-            const v = getVectorToNearbyTarget(state, enemy, enemy.enemyDefinition.aggroRadius, enemy.area.allyTargets);
-            if (v) {
-                addLineOfSpikes({
-                    state, area: enemy.area,
-                    source: [enemy.x + enemy.w / 2 + v.x * 8, enemy.y + enemy.h / 2 + v.y * 8],
-                    target: [enemy.x + enemy.w / 2 + v.x * 32, enemy.y + enemy.h / 2 + v.y * 32],
-                });
+            if (enemy.enemyInvulnerableFrames <= 0) {
+                enemy.useRandomAbility(state);
             }
         }
     },
@@ -123,11 +158,11 @@ enemyDefinitions.crystalGuardian = {
         }
         let frame: Frame;
         if (enemy.params.shieldLife === maxShieldLife) {
-            frame = getFrame(crystalBarrierNormalAnimation, enemy.animationTime);
+            frame = smallCrystalBarrierNormalFrame;
         } else if (enemy.params.shieldLife > maxShieldLife / 3) {
-            frame = getFrame(crystalBarrierDamagedAnimation, enemy.animationTime);
+            frame = smallCrystalBarrierDamagedFrame;
         } else {
-            frame = getFrame(crystalBarrierVeryDamagedAnimation, enemy.animationTime);
+            frame = smallCrystalBarrierVeryDamagedFrame;
         }
         const hitbox = enemy.getHitbox(state);
         drawFrameCenteredAt(context, frame, hitbox);

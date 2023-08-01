@@ -2,7 +2,7 @@ import {
     andLogic,
     orLogic,
     hasBossWeapon,
-    hasGloves, hasRoll,
+    hasGloves, canAvoidBossAttacks,
     hasSpiritSight, hasWeapon,
     logicHash
 } from 'app/content/logic';
@@ -173,8 +173,8 @@ export const warTempleNodes: LogicNode[] = [
         zoneId,
         nodeId: 'warTempleBoss',
         checks: [
-            {objectId: 'warTempleBoss', logic: andLogic(hasBossWeapon, hasRoll)},
-            {objectId: 'warTemple:2:0x0-astralProjection-0', logic: andLogic(hasBossWeapon, hasRoll)},
+            {objectId: 'warTempleBoss', logic: andLogic(hasBossWeapon, canAvoidBossAttacks)},
+            {objectId: 'warTemple:2:0x0-astralProjection-0', logic: andLogic(hasBossWeapon, canAvoidBossAttacks)},
         ],
     },
     // Spirit world is only accessible from outside

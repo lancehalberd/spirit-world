@@ -2,6 +2,7 @@ import { selectDialogueOption } from 'app/content/dialogue';
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
 import { setSpawnLocation } from 'app/content/spawnLocations';
+import { isRandomizer } from 'app/gameConstants';
 import { showMessage } from 'app/render/renderMessage';
 import { createAnimation, drawFrame } from 'app/utils/animations';
 
@@ -60,6 +61,9 @@ export class SaveStatue implements ObjectInstance {
             } else {
                 showMessage(state, `You will return here if defeated.`);
             }
+        } else if (isRandomizer) {
+            showMessage(state, '{@saveStatue.randomizer}');
+            saveObjectStatus(state, this.definition, true);
         } else {
             // The save statue only shows one set of dialog per area and only
             // the first time you interact with it.

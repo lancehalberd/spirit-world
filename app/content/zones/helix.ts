@@ -913,6 +913,7 @@ const f3_0x0: AreaDefinition = {
     objects: [
         {status: "normal", id: "helix:3:0x0-teleporter-0", x: 304, y: 96, type: "teleporter"},
         {status: "normal", id: "helixSkyEntrance", x: 240, y: 400, type: "door", style: "cave", targetZone: "sky", targetObjectId: "helixSkyEntrance", d: "down", locationCue: "Helix Bridge"},
+        {status: "normal", id: "helix:3:0x0-luckyBeetle-0", x: 264, y: 160, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32},

@@ -38,6 +38,12 @@ export const updateMusic = (): void => {
         if (!state.location.isSpiritWorld
             && state.location.areaGridCoords.x === 0 && state.location.areaGridCoords.y === 2) {
             playTrack('vanaraForestTheme', 0, soundSettings);
+        } else if (!state.location.isSpiritWorld
+            && state.location.areaGridCoords.x === 2 && state.location.areaGridCoords.y === 2) {
+            playTrack('ruins', 0, soundSettings);
+        } else if (!state.location.isSpiritWorld
+            && state.location.areaGridCoords.x === 2 && state.location.areaGridCoords.y === 0) {
+            playTrack('village', 0, soundSettings);
         } else {
             playTrack('mainTheme', 0, soundSettings);
         }
@@ -62,11 +68,39 @@ export const updateMusic = (): void => {
         playTrack('lakeTheme', 0, soundSettings);
     } else if (state.location.zoneKey === 'tomb') {
         playTrack('tombTheme', 0, soundSettings);
-    } else if (state.location.zoneKey === 'waterfallCave'
-        || state.location.zoneKey === 'holyCityInterior'
-    ) {
-        playTrack('idleTheme', 0, soundSettings);
-    } else if (state.location.zoneKey === 'warTemple' || state.location.zoneKey === 'forestTemple') {
+    } else if (state.location.zoneKey === 'holyCityInterior') {
+        playTrack('village', 0, soundSettings);
+    } else if (state.location.zoneKey === 'waterfallCave' ) {
+        playTrack('waterfallVillageTheme', 0, soundSettings);
+    } else if (state.location.zoneKey === 'warTemple') {
+        // Don't change music during transitions since the logic below that depends on x/y locations
+        // may be invalid during transitions.
+        if (state.nextAreaInstance || state.nextAreaSection) {
+            return;
+        }
+        // There is one frame after the transition finishes where the coordinates can be out
+        // of range, but work correctly if taken mod 512.
+        const x = (state.location.x + 512) % 512;
+        const y = (state.location.y + 512) % 512;
+        // War Temple technically includes a lot of areas in the ruins around it, but I only
+        // want to use the dungeon theme for the dungeon areas proper.
+        if (!state.location.isSpiritWorld && state.location.floor === 0 &&
+            (
+                // Top row
+                (state.location.areaGridCoords.y === 0 && y < 256)
+                // Bottom tiles
+                || state.location.areaGridCoords.y === 2
+                // Right edge
+                || (state.location.areaGridCoords.x === 2 && x > 256)
+                // Bottom section of middle right tile
+                || (y > 256 && state.location.areaGridCoords.x === 2 && state.location.areaGridCoords.y === 1)
+            )
+        ) {
+            playTrack('ruins', 0, soundSettings);
+        } else {
+            playTrack('dungeonTheme', 0, soundSettings);
+        }
+    } else if (state.location.zoneKey === 'forestTemple') {
         playTrack('dungeonTheme', 0, soundSettings);
     } else if (state.location.zoneKey === 'cocoon') {
         playTrack('cocoonTheme', 0, soundSettings);
@@ -76,7 +110,9 @@ export const updateMusic = (): void => {
         playTrack('waterfallTowerTheme', 0, soundSettings);
     } else if (state.location.zoneKey === 'forge') {
         playTrack('forgeTheme', 0, soundSettings);
-    } else if (state.location.zoneKey === 'crater') {
+    } else if (state.location.zoneKey === 'grandTemple') {
+        playTrack('helixTheme', 0, soundSettings);
+    }  else if (state.location.zoneKey === 'crater') {
         playTrack('craterTheme', 0, soundSettings);
     } else if (state.location.zoneKey === 'staffTower') {
         // Play a different track when the tower is activated later.

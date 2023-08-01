@@ -241,7 +241,7 @@ export class Arrow implements EffectInstance {
                 h: this.h,
                 x: this.x,
                 // Hit box is lowered for northern walls to match the perspective.
-                y: this.y - Math.max(0, this.vy),
+                y: this.y + (this.vy < 0 ? 8 : 0),
             },
             vx: this.vx,
             vy: this.vy, element:

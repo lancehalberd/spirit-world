@@ -99,12 +99,25 @@ export function randomizeEntrances(random: typeof SRandom) {
     const connectedSpiritEntrances = new Set<string>();
     const normalEntrances = new Set<string>();
     const spiritEntrances = new Set<string>();
+    const waterEntrances = new Set<string>();
     const normalExits = new Set<string>();
     const spiritExits = new Set<string>();
+    const waterExits = new Set<string>();
+    const pitEntrances = [];
+    const pitTargets = new Set<string>();
     const targetIdMap: {[key in string]: DoorLocation[]} = {};
     const allTargetedKeys = new Set<string>();
     const fixedNimbusCloudZones = new Set<string>();
     everyObject((location, zone: Zone, area: AreaDefinition, object) => {
+        if (object.type === 'pitEntrance') {
+            if (!object.targetZone || object.targetZone === zone.key) {
+                return;
+            }
+            const targetKey = `${object.targetZone}:${object.targetObjectId}`;
+            pitTargets.add(targetKey);
+            pitEntrances.push(object);
+            return;
+        }
         if (object.type !== 'door') {
             return;
         }
@@ -119,14 +132,17 @@ export function randomizeEntrances(random: typeof SRandom) {
         if (disabledDoors.includes(key) || disabledDoors.includes(targetKey)) {
             return;
         }
-        // Ignore underwater doors for now, they will take extra logic,
-        // and there are not enough of them to be interesting yet.
-        if (zone.surfaceKey) {
-            return;
-        }
         targetIdMap[targetKey] = targetIdMap[targetKey] || [];
         targetIdMap[targetKey].push({ definition: object, location });
         allTargetedKeys.add(targetKey);
+        if (zone.surfaceKey) {
+            if (zone.key === 'underwater') {
+                waterExits.add(targetKey);
+            } else {
+                waterEntrances.add(targetKey);
+            }
+            return;
+        }
         if (outsideZones.includes(zone.key)
             // There are a few special "entrances" inside other zones
             || zone.key === 'tomb' && object.targetZone === 'cocoon'
@@ -134,14 +150,14 @@ export function randomizeEntrances(random: typeof SRandom) {
             || zone.key === 'lakeTunnel' && object.targetZone === 'helix'
             || zone.key === 'warTemple' && object.targetZone === 'lab'
             || zone.key === 'lab' && object.targetZone === 'tree'
-           ) {
-               if (outsideZones.includes(zone.key)) {
+        ) {
+           if (outsideZones.includes(zone.key)) {
                 if (area.isSpiritWorld) {
-                       connectedSpiritEntrances.add(targetKey);
-                   } else {
-                       connectedNormalEntrances.add(targetKey);
-                   }
+                   connectedSpiritEntrances.add(targetKey);
+                } else {
+                   connectedNormalEntrances.add(targetKey);
                }
+           }
             if (area.isSpiritWorld) {
                 spiritExits.add(targetKey);
             } else {
@@ -217,7 +233,6 @@ export function randomizeEntrances(random: typeof SRandom) {
             console.error('Could not find a targeted entrance that targets', targetIdOfEntrance);
             return;
         }
-
         if (!targetIdMap[targetIdOfExit]) {
             debugger;
         }
@@ -227,8 +242,9 @@ export function randomizeEntrances(random: typeof SRandom) {
                 exitTarget = entrance.definition.id;
             }
         }
+
         if (!exitZone) {
-            console.error('Could not find a targeted entrance that targets', targetIdOfEntrance);
+            console.error('Could not find a targeted exit that targets', targetIdOfExit);
             return;
         }
 
@@ -242,6 +258,7 @@ export function randomizeEntrances(random: typeof SRandom) {
                 fixedNimbusCloudZones.add(zone);
             }
         }
+
         if (!targetIdMap[targetIdOfEntrance]) {
             debugger;
         }
@@ -287,15 +304,32 @@ export function randomizeEntrances(random: typeof SRandom) {
         console.error([...spiritExits]);
         return;
     }
+    if (waterEntrances.size !== waterExits.size) {
+        console.error(`water entrances/exits: ${waterEntrances.size}/${waterExits.size}`);
+        console.error([...waterEntrances]);
+        console.error([...waterExits]);
+        return;
+    }
 
     //console.log('GENERAL ASSIGNMENTS:');
-    for (const entrancePairing of [[normalEntrances, normalExits], [spiritEntrances, spiritExits]]) {
+    for (const entrancePairing of [
+        [normalEntrances, normalExits],
+        [spiritEntrances, spiritExits],
+        [waterEntrances, waterExits],
+    ]) {
         const [entrances, exits] = entrancePairing;
         const exitIds = [...exits];
         for (const entranceId of random.shuffle([...entrances])) {
             const exitId = exitIds.pop();
             assignEntranceExitPair(entranceId, exitId);
         }
+    }
+    const targetIds = [...pitTargets];
+    for (const pitEntrance of random.shuffle(pitEntrances)) {
+        const exitId = targetIds.pop();
+        const [zone, objectId] = exitId.split(':');
+        pitEntrance.targetZone = zone;
+        pitEntrance.targetObjectId = objectId;
     }
     verifyNodeConnections();
 }

@@ -1,8 +1,8 @@
 import {
     andLogic,
     canCross4Gaps, hasReleasedBeasts, canTravelFarUnderWater,
-    hasCloudBoots, hasIronBoots, hasGloves, hasIce, hasMitts, hasSomersault, hasTeleportation,
-    hasMediumRange, hasNimbusCloud, hasSpiritSight, hasTowerStaff, orLogic,
+    hasCloudBoots, hasIronBoots, hasFire, hasGloves, hasIce, hasMitts, hasSomersault, hasTeleportation,
+    hasMediumRange, hasNimbusCloud, hasSpiritSight, orLogic,
 } from 'app/content/logic';
 
 import { LogicNode } from 'app/types';
@@ -17,19 +17,24 @@ export const mainOverworldNode: LogicNode = {
     ],
     paths: [
         { nodeId: 'overworldMountain', logic: hasGloves },
+        { nodeId: 'forestArea' },
         { nodeId: 'warTempleArea' },
-        { nodeId: 'mainSpiritWorld', logic: orLogic(hasSomersault, hasTeleportation) },
+        { nodeId: 'mainSpiritWorld', logic: andLogic(hasSpiritSight, orLogic(hasSomersault, hasTeleportation)) },
         { nodeId: 'nimbusCloud', logic: hasNimbusCloud},
         { nodeId: 'overworldLakeTunnel', logic: orLogic(hasGloves, hasTeleportation) },
         // This represents moving the tower to the forest position and using cloud boots to
         // fall on the river temple roof.
-        { nodeId: 'riverTempleRoof', logic: andLogic({requiredFlags: ['stormBeast']}, hasCloudBoots)}
+        { nodeId: 'riverTempleRoof', logic: andLogic({requiredFlags: ['stormBeast']}, hasCloudBoots)},
+        { nodeId: 'underLake', logic: andLogic(canTravelFarUnderWater,
+            orLogic({requiredFlags: ['frostBeast']}, hasFire)
+        )},
+        { nodeId: 'underCity', logic: canTravelFarUnderWater},
     ],
     entranceIds: [
-        'sideArea:noToolEntrance', 'elderEntrance', 'tombTeleporter',
+        'sideArea:noToolEntrance', 'tombTeleporter',
         'lakeTunnelEntrance', 'peachCaveTopEntrance', 'peachCaveWaterEntrance',
         'staffTowerEntrance',
-        'tombEntrance', 'waterfallCaveEntrance', 'templeCrackedDoor', 'templeDoor',
+        'tombEntrance', 'waterfallCaveEntrance', 'grandTempleSecretEntrance', 'templeDoor',
         'moneyMazeEntrance',
         'overworld:holyCityFoodHouse', 'overworld:holyCityBridgeHouse',
         'overworld:holyCityGardenHouse', 'overworld:holyCityClothesHouse',
@@ -43,7 +48,7 @@ export const mainOverworldNode: LogicNode = {
         { objectId: 'staffTowerEntrance' },
         { objectId: 'tombEntrance', logic: hasMediumRange },
         { objectId: 'waterfallCaveEntrance' },
-        { objectId: 'templeCrackedDoor' },
+        { objectId: 'grandTempleSecretEntrance' },
         { objectId: 'templeDoor' },
         { objectId: 'moneyMazeEntrance' },
         { objectId: 'overworld:holyCityFoodHouse' },
@@ -98,6 +103,26 @@ export const overworldNodes: LogicNode[] = [
     },
     {
         zoneId,
+        nodeId: 'forestArea',
+        paths: [
+            { nodeId: 'overworldMain' },
+        ],
+        entranceIds: [
+            'elderEntrance',
+            'northwestTreeEntrance',
+            'northeastTreeEntrance',
+            'southeastTreeEntrance',
+        ],
+        exits: [
+            { objectId: 'elderEntrance' },
+            { objectId: 'northwestTreeEntrance' },
+            { objectId: 'northeastTreeEntrance' },
+            { objectId: 'southeastTreeEntrance' },
+            { objectId: 'treeVillageStoragePit' },
+        ],
+    },
+    {
+        zoneId,
         nodeId: 'warTempleArea',
         paths: [
             { nodeId: 'overworldMain' },
@@ -126,10 +151,12 @@ export const overworldNodes: LogicNode[] = [
         nodeId: 'overworldMountain',
         checks: [
             { objectId: 'overworldCliffPeachPiece' },
+            { objectId: 'cityCliffMoney' },
         ],
         paths: [
             { nodeId: 'overworldMain' },
-            { nodeId: 'overworldWaterfall', logic: orLogic(hasSomersault, hasTeleportation, hasIronBoots, hasMitts) },
+            { nodeId: 'overworldWaterfall', logic: orLogic(hasSomersault, hasTeleportation, hasMitts) },
+            { nodeId: 'overworldMountainWater', logic: hasIronBoots },
         ],
         entranceIds: ['caves-ascentEntrance'],
         exits: [{objectId: 'caves-ascentEntrance' }],
@@ -146,6 +173,7 @@ export const overworldNodes: LogicNode[] = [
     {
         zoneId,
         nodeId: 'overworldLakePiece',
+        paths: [{nodeId: 'mainSpiritWorld', logic: hasSpiritSight}],
         checks: [
             { objectId: 'overworldLakePiece' },
         ],
@@ -157,9 +185,10 @@ export const overworldNodes: LogicNode[] = [
             { objectId: 'spiritChakram' },
         ],
         paths: [
+            { nodeId: 'overworldMain', logic: hasSpiritSight },
             { nodeId: 'spiritWorldMountain', logic: hasGloves },
             { nodeId: 'westSpiritWorld', logic: hasCloudBoots },
-            { nodeId: 'overworldLakePiece' },
+            { nodeId: 'overworldLakePiece', logic: hasSpiritSight },
             { nodeId: 'nimbusCloudSpirit', logic: hasNimbusCloud},
             { nodeId: 'warTempleSpiritArea', logic: hasMitts },
         ],
@@ -178,6 +207,7 @@ export const overworldNodes: LogicNode[] = [
             { objectId: 'spiritShopLightningBlessing' },
         ],
         paths: [
+            { nodeId: 'overworldMain', logic: hasSpiritSight },
             { nodeId: 'mainSpiritWorld', logic: hasCloudBoots },
             { nodeId: 'nimbusCloudSpirit', logic: hasNimbusCloud},
         ],
@@ -252,7 +282,6 @@ export const underwaterNodes: LogicNode[] = [
         zoneId,
         nodeId: 'underLake',
         paths: [
-            // This logic doesn't work since the randomizer doesn't currently set flags when simulating.
             {nodeId: 'overworldMain', logic: {requiredFlags: ['frostBeast']}},
         ],
         entranceIds: [
@@ -261,6 +290,29 @@ export const underwaterNodes: LogicNode[] = [
         exits: [
             { objectId: 'peachCaveUnderwaterEntrance', logic: canTravelFarUnderWater  },
             { objectId: 'riverTempleWaterEntrance', logic: canTravelFarUnderWater  },
+        ],
+    },
+    {
+        zoneId,
+        nodeId: 'overworldMountainWater',
+        paths: [
+            {nodeId: 'overworldMain', logic: hasIronBoots},
+            {nodeId: 'overworldWaterfall', logic: hasIronBoots},
+        ],
+        exits: [
+            { objectId: 'waterfallCavePitEntrance', logic: hasIronBoots  },
+        ],
+    },
+    {
+        zoneId,
+        nodeId: 'underCity',
+        checks: [{objectId: 'underwaterMoney'}],
+        paths: [{nodeId: 'overworldMain'}],
+        entranceIds: [
+            'grandTempleWaterEntrance',
+        ],
+        exits: [
+            { objectId: 'grandTempleWaterEntrance', logic: canTravelFarUnderWater  },
         ],
     },
 ];
@@ -307,6 +359,8 @@ export const skyNodes: LogicNode[] = [
             { nodeId: 'mainCloudPath', logic: hasCloudBoots },
         ],
         checks: [{ objectId: 'skyMoney'}],
+        entranceIds: ['craterSecretEntrance'],
+        exits: [{ objectId: 'craterSecretEntrance' }],
     },
     {
         zoneId,
@@ -384,8 +438,7 @@ export const skyNodes: LogicNode[] = [
         ],
         entranceIds: ['skyPalaceEntrance'],
         exits: [{ objectId: 'skyPalaceEntrance', logic:
-            // This logic is probably a good default
-            orLogic(hasMitts, andLogic(hasTeleportation, hasTowerStaff)),
+            hasMitts,
             // Could use this as advance logic
             /*orLogic(
                 // Simple path, lift the stones to enter

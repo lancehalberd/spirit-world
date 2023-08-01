@@ -78,7 +78,7 @@ export class TippableObject implements ObjectInstance {
         if (!this.fallDirection && !this.fallingInPlace) {
             this.pushCounter++;
             this.pushedLastFrame = true;
-            if (this.pushCounter >= 25) {
+            if (this.pushCounter >= 20) {
                 this.fallInDirection(state, direction);
             }
         }

@@ -6,7 +6,7 @@ import { addEffectToArea, getAreaSize, refreshAreaLogic } from 'app/content/area
 import { bossDeathExplosionAnimation, enemyDeathAnimation } from 'app/content/enemyAnimations';
 import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { addTextCue } from 'app/scriptEvents';
+import { appendCallback, addTextCue } from 'app/scriptEvents';
 import { drawFrame, getFrame } from 'app/utils/animations';
 import { getDirection } from 'app/utils/field';
 import { playSound } from 'app/musicController';
@@ -26,7 +26,7 @@ interface EnemyAbilityWithCharges {
     charges: number
 }
 
-export class Enemy implements Actor, ObjectInstance {
+export class Enemy<Params=any> implements Actor, ObjectInstance {
     type = 'enemy' as 'enemy';
     behaviors: TileBehaviors;
     isObject = <const>true;
@@ -84,7 +84,7 @@ export class Enemy implements Actor, ObjectInstance {
     // healthbar.
     // There is a 100ms grace period before the bar is displayed at all.
     healthBarTime = 0;
-    params: any;
+    params: Params;
     enemyInvulnerableFrames = 0;
     // This is used to prevent the block effect from happening too frequently
     blockInvulnerableFrames = 0;
@@ -351,6 +351,7 @@ export class Enemy implements Actor, ObjectInstance {
         this.isDefeated = true;
         this.setMode('defeated');
         if (this.definition.type === 'boss') {
+            const bossDefinition = this.definition;
             if (this.enemyDefinition.onDeath) {
                 this.enemyDefinition.onDeath(state, this);
             }
@@ -362,7 +363,34 @@ export class Enemy implements Actor, ObjectInstance {
             ) {
                 // Remove all enemy attacks from the screen when a boss is defeated.
                 this.area.effects = this.area.effects.filter(effect => !effect.isEnemyAttack);
-                allEnemies.forEach(object => object.showDeathAnimation(state));
+                allEnemies.filter(e => e.isFromCurrentSection(state)).forEach(object => object.showDeathAnimation(state));
+
+                // Freeze player from taking any action for ~3 seconds during the explosion
+                state.scriptEvents.queue.push({
+                    type: 'wait',
+                    duration: 3000,
+                    blockPlayerInput: true,
+                });
+                appendCallback(state, (state: GameState) => {
+                    for (const enemy of allEnemies) {
+                        if (enemy.definition.type === 'boss') {
+                            enemy.status = 'gone';
+                        }
+                    }
+                    // Do nothing if this boss was already defeated.
+                    if (getObjectStatus(state, bossDefinition)) {
+                        return;
+                    }
+                    // Make sure to save status before gaining loot since gaining loot refreshes object status.
+                    saveObjectStatus(state, bossDefinition);
+                    // Gain loot if any is defined.
+                    if (bossDefinition.lootType && bossDefinition.lootType !== 'empty') {
+                        getLoot(state, bossDefinition);
+                    } else {
+                        refreshAreaLogic(state, state.areaInstance);
+                        refreshAreaLogic(state, state.alternateAreaInstance);
+                    }
+                });
             }
             // Show the boss death animation.
             this.setAnimation('death', this.d);
@@ -394,30 +422,6 @@ export class Enemy implements Actor, ObjectInstance {
         }
         this.status = 'gone';
         saveObjectStatus(state, this.definition);
-    }
-    finishBossDeath(state: GameState) {
-        if (this.definition.type !== 'boss') {
-            return;
-        }
-        this.status = 'gone';
-        // If the last boss is defeated kill all regular enemies.
-        // Bosses in both material+spirit realms must be defeated before the battle is over.
-        const allEnemies = [...this.area.enemies, ...this.area.alternateArea.enemies];
-        if (!allEnemies.some(object => object.definition.type === 'boss' && object.status !== 'gone')) {
-            // Gain loot if this boss hasn't been defeated yet.
-            if (!getObjectStatus(state, this.definition)) {
-                // Make sure to save status before gaining loot since gaining loot refreshes object status.
-                saveObjectStatus(state, this.definition);
-                if (this.definition.lootType && this.definition.lootType !== 'empty') {
-                    getLoot(state, this.definition);
-                } else {
-                    refreshAreaLogic(state, state.areaInstance);
-                    refreshAreaLogic(state, state.alternateAreaInstance);
-                }
-            } else {
-                saveObjectStatus(state, this.definition);
-            }
-        }
     }
     shouldReset(state: GameState) {
         return true;
@@ -554,12 +558,8 @@ export class Enemy implements Actor, ObjectInstance {
                 addEffectToArea(state, this.area, explosionAnimation);
                 playSound('enemyDeath');
             }
-            if (this.animationTime >= 3000) {
-                this.finishBossDeath(state);
-            }
             return;
         }
-        this.healthBarTime += FRAME_LENGTH;
         if (this.invulnerableFrames > 0) {
             this.invulnerableFrames--;
         }
@@ -605,6 +605,7 @@ export class Enemy implements Actor, ObjectInstance {
                 this.z = Math.max(12, this.z - 2);
             }
         }
+        this.healthBarTime += FRAME_LENGTH;
         if (this.enemyDefinition.update) {
             this.enemyDefinition.update(state, this);
         }

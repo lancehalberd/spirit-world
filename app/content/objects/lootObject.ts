@@ -7,6 +7,7 @@ import { showMessage } from 'app/render/renderMessage';
 import { getState, saveGame } from 'app/state';
 import { createAnimation, drawFrame, drawFrameAt, getFrameHitBox } from 'app/utils/animations';
 import { playSound } from 'app/musicController';
+import { pad, boxesIntersect } from 'app/utils/index';
 import { drawText } from 'app/utils/simpleWhiteFont';
 
 import {
@@ -30,6 +31,8 @@ function rollItem(table: LootTable) {
 export function dropItemFromTable(state: GameState, area: AreaInstance, lootTable: LootTable, x: number, y: number) {
     const item = rollItem(lootTable);
     if (item) {
+        const theta = 2 * Math.PI * Math.random();
+        const vx = Math.cos(theta), vy = Math.sin(theta);
         const drop = new LootDropObject(state, {
             id: 'drop',
             type: 'loot',
@@ -37,6 +40,9 @@ export function dropItemFromTable(state: GameState, area: AreaInstance, lootTabl
             lootAmount: item.amount || 1,
             x,
             y,
+            vx: vx / 2,
+            vy: vy / 2,
+            vz: 2,
             status: 'normal'
         });
         addObjectToArea(state, area, drop);
@@ -117,7 +123,7 @@ export class LootObject implements ObjectInstance {
     isObject = <const>true;
     x: number;
     y: number;
-    z: number;
+    z: number = 0;
     status: ObjectStatus;
     time = 0;
     constructor(state: GameState, definition: LootObjectDefinition) {
@@ -179,7 +185,7 @@ export class LootObject implements ObjectInstance {
         if (!editingState.isEditing && this.definition.lootType === 'empty') {
             return;
         }
-        drawFrameAt(context, this.frame, { x: this.x, y: this.y });
+        drawFrameAt(context, this.frame, { x: this.x, y: this.y - this.z });
     }
     renderShadow(context, state: GameState) {
         if (this.status === 'hidden' || this.status === 'hiddenEnemy'
@@ -244,17 +250,51 @@ export function getLoot(this: void, state: GameState, definition: AnyLootDefinit
 }
 
 // Simple loot drop doesn't show the loot animation when collected.
+interface LootDropDefinition extends LootObjectDefinition {
+    vx?: number
+    vy?: number
+    vz?: number
+    z?: number
+}
+
 export class LootDropObject extends LootObject {
+    vx: number;
+    vy: number;
+    vz: number;
+    constructor(state: GameState, definition: LootDropDefinition) {
+        super(state, definition);
+        this.vx = definition.vx || 0;
+        this.vy = definition.vy || 0;
+        this.vz = definition.vz || 0;
+        this.z = definition.z || 0;
+    }
     alwaysReset = true;
     isObject = <const>true;
     update(state: GameState) {
-        if (this.area === state.hero.area && state.hero.overlaps(this)) {
-            const onPickup = lootEffects[this.definition.lootType] || lootEffects.unknown;
-            onPickup(state, this.definition);
-            if (this.definition.lootType === 'money') {
-                playSound('getMoney');
+        if (this.z > 0 || this.vz > 0) {
+            this.x += this.vx;
+            this.y += this.vy;
+            this.z += this.vz;
+            this.vz -= 0.3;
+            if (this.z <= 0) {
+                this.z = 0;
+                this.vz = 0;
             }
-            removeObjectFromArea(state, this);
+        } else if (this.area === state.hero.area) {
+            const bigHitbox = pad(this.getHitbox(), 2);
+            for (const hero of [state.hero, ...state.hero.clones]) {
+                if (hero.overlaps(bigHitbox)
+                    || state.hero.thrownChakrams.some(chakram => boxesIntersect(chakram, bigHitbox))
+                ) {
+                    const onPickup = lootEffects[this.definition.lootType] || lootEffects.unknown;
+                    onPickup(state, this.definition);
+                    if (this.definition.lootType === 'money') {
+                        playSound('getMoney');
+                    }
+                    removeObjectFromArea(state, this);
+                    break;
+                }
+            }
         }
     }
 }
@@ -427,7 +467,7 @@ export class ShopObject extends LootObject implements ObjectInstance {
     isObject = <const>true;
     x: number;
     y: number;
-    z: number;
+    z: number = 0;
     status: ObjectStatus;
     price: number;
     time = 0;

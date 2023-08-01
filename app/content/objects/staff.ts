@@ -57,7 +57,7 @@ export class Staff implements ObjectInstance {
         const movementProps = {canFall: true, canSwim: true};
         const excludedObjects = new Set([state.hero]);
         const tileBehavior = this.area?.behaviorGrid[row]?.[column];
-        if (tileBehavior?.solid || tileBehavior?.solidMap || tileBehavior?.edges) {
+        if (tileBehavior?.solid || tileBehavior?.solidMap || tileBehavior?.ledges) {
             this.invalid = true;
             return;
         }
@@ -70,7 +70,7 @@ export class Staff implements ObjectInstance {
             for (let i = 1; i < maxLength; i++) {
                 column = this.rightColumn - i;
                 const tileBehavior = this.area?.behaviorGrid[row]?.[column];
-                if (column * 16 < section.x || tileBehavior?.solid || tileBehavior?.solidMap || tileBehavior?.edges) {
+                if (column * 16 < section.x || tileBehavior?.solid || tileBehavior?.solidMap || tileBehavior?.ledges || tileBehavior?.blocksStaff) {
                     break;
                 }
                 if (!isPointOpen(state, this.area, {x: column * 16 + 8, y: row * 16 + 8 }, movementProps,  excludedObjects)) {
@@ -82,7 +82,7 @@ export class Staff implements ObjectInstance {
             for (let i = 1; i < maxLength; i++) {
                 column = this.leftColumn + i;
                 const tileBehavior = this.area?.behaviorGrid[row]?.[column];
-                if (column * 16 >= section.x + section.w || tileBehavior?.solid || tileBehavior?.solidMap || tileBehavior?.edges) {
+                if (column * 16 >= section.x + section.w || tileBehavior?.solid || tileBehavior?.solidMap || tileBehavior?.ledges || tileBehavior?.blocksStaff) {
                     break;
                 }
                 if (!isPointOpen(state, this.area, {x: column * 16 + 8, y: row * 16 + 8 }, movementProps,  excludedObjects)) {
@@ -94,7 +94,7 @@ export class Staff implements ObjectInstance {
             for (let i = 1; i < maxLength; i++) {
                 row = this.bottomRow - i;
                 const tileBehavior = this.area?.behaviorGrid[row]?.[column];
-                if (row * 16 < section.y || tileBehavior?.solid || tileBehavior?.solidMap || tileBehavior?.edges) {
+                if (row * 16 < section.y || tileBehavior?.solid || tileBehavior?.solidMap || tileBehavior?.ledges || tileBehavior?.blocksStaff) {
                     break;
                 }
                 if (!isPointOpen(state, this.area, {x: column * 16 + 8, y: row * 16 + 8 }, movementProps,  excludedObjects)) {
@@ -106,7 +106,7 @@ export class Staff implements ObjectInstance {
             for (let i = 1; i < maxLength; i++) {
                 row = this.topRow + i;
                 const tileBehavior = this.area?.behaviorGrid[row]?.[column];
-                if (row * 16 >= section.y + section.h || tileBehavior?.solid || tileBehavior?.solidMap || tileBehavior?.edges) {
+                if (row * 16 >= section.y + section.h || tileBehavior?.solid || tileBehavior?.solidMap || tileBehavior?.ledges || tileBehavior?.blocksStaff) {
                     break;
                 }
                 if (!isPointOpen(state, this.area, {x: column * 16 + 8, y: row * 16 + 8 }, movementProps,  excludedObjects)) {
@@ -115,7 +115,7 @@ export class Staff implements ObjectInstance {
                 this.bottomRow = row;
             }
         }
-        if (this.leftColumn === this.rightColumn && this.topRow === this.bottomRow) {
+        if (this.rightColumn - this.leftColumn < 2 && this.bottomRow - this.topRow < 2) {
             this.invalid = true;
         }
     }
@@ -136,7 +136,7 @@ export class Staff implements ObjectInstance {
             this.storedBehaviors[row] = []
             for (let column = this.leftColumn; column <= this.rightColumn; column++) {
                 this.storedBehaviors[row][column] = state.areaInstance.behaviorGrid[row][column];
-                state.areaInstance.behaviorGrid[row][column] = { groundHeight: 2, covered: true };
+                state.areaInstance.behaviorGrid[row][column] = { groundHeight: 2, blocksStaff: true };
             }
         }
     }
@@ -165,13 +165,14 @@ export class Staff implements ObjectInstance {
         // Restore the original tiles under the staff.
         for (let row = this.topRow; row <= this.bottomRow; row++) {
             for (let column = this.leftColumn; column <= this.rightColumn; column++) {
-                // Indicate that the tiles need to be redrawn now that the staff is gone.
-                this.area.tilesDrawn[row][column] = false;
                 this.area.behaviorGrid[row][column] = this.storedBehaviors[row][column];
             }
         }
-        this.area.checkToRedrawTiles = true;
-        state.activeStaff = null;
+        for (const hero of [state.hero, ...state.hero.clones]) {
+            if (hero.activeStaff === this) {
+                delete hero.activeStaff;
+            }
+        }
     }
     render(context, state: GameState) {
         if (this.direction === 'left' || this.direction === 'right') {

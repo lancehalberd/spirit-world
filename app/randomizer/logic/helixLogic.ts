@@ -3,6 +3,7 @@ import {
     canCross6Gaps,
     hasAstralProjection,
     hasSomersault,
+    hasSpiritSight,
     hasTeleportation,
     orLogic,
 } from 'app/content/logic';
@@ -61,13 +62,21 @@ export const helixNodes: LogicNode[] = [
         nodeId: 'helixEntrancePortal',
         paths: [
             {nodeId: 'helixEntrance', logic: canCross6Gaps},
-            {nodeId: 'helixEntranceSpirit'}
+            {nodeId: 'helixEntranceSpiritPortal', logic: hasSpiritSight}
+        ],
+    },
+    {
+        zoneId,
+        nodeId: 'helixEntranceSpiritPortal',
+        paths: [
+            {nodeId: 'helixEntrance', logic: hasSpiritSight},
+            {nodeId: 'helixEntranceSpirit', logic: canCross6Gaps}
         ],
     },
     {
         zoneId,
         nodeId: 'helixEntranceSpirit',
-        paths: [{nodeId: 'helixEntrance', logic: canCross6Gaps}],
+        paths: [{nodeId: 'helixEntranceSpiritPortal', logic: canCross6Gaps}],
         entranceIds: ['helixSpiritDoor1'],
         exits: [
             {objectId: 'helixSpiritDoor1', logic: canCross6Gaps},
@@ -103,12 +112,12 @@ export const helixNodes: LogicNode[] = [
                 progressFlags: ['elementalBeastsEscaped']
             },
         ],
-        paths: [{nodeId: 'helix4'}, {nodeId: 'helix3Spirit'}],
+        paths: [{nodeId: 'helix4', logic: hasSpiritSight}, {nodeId: 'helix3Spirit'}],
     },
     {
         zoneId,
         nodeId: 'helix4',
-        paths: [{nodeId: 'helix4Spirit'}],
+        paths: [{nodeId: 'helix4Spirit', logic: hasSpiritSight}],
         entranceIds: ['helixSkyEntrance'],
         exits: [
             {objectId: 'helixSkyEntrance'},

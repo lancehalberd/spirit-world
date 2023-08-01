@@ -6,13 +6,14 @@ import { getObjectStatus, saveObjectStatus } from 'app/content/objects';
 import {
     BITMAP_LEFT, BITMAP_RIGHT,
     BITMAP_BOTTOM, BITMAP_BOTTOM_LEFT_QUARTER, BITMAP_BOTTOM_RIGHT_QUARTER,
+    BITMAP_TOP,
 } from 'app/content/bitMasks';
 import { debugCanvas } from 'app/dom';
 import { showMessage } from 'app/render/renderMessage';
 import { createAnimation, drawFrame, drawFrameAt } from 'app/utils/animations';
 import { directionMap, getDirection } from 'app/utils/field';
 import { requireImage } from 'app/utils/images';
-import { boxesIntersect, isObjectInsideTarget, isPointInShortRect } from 'app/utils/index';
+import { boxesIntersect, isObjectInsideTarget, isPointInShortRect, pad } from 'app/utils/index';
 import { drawText } from 'app/utils/simpleWhiteFont';
 
 import {
@@ -100,7 +101,7 @@ interface DoorStyleFrames {
 interface DoorStyleDefinition {
     w: number,
     h: number,
-    getHitbox?: (state: GameState, door: Door) => Rect
+    getHitbox?: (door: Door) => Rect
     render?: (context: CanvasRenderingContext2D, state: GameState, door: Door) => void
     renderForeground?: (context: CanvasRenderingContext2D, state: GameState, door: Door) => void
     down?: DoorStyleFrames,
@@ -488,7 +489,7 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
     cavern: {
         w: 64,
         h: 16,
-        getHitbox(state: GameState, door: Door) {
+        getHitbox(door: Door) {
             if (door.definition.d === 'up') {
                 return {x: door.x, y: door.y, w: 32, h: 32};
             }
@@ -535,7 +536,7 @@ export const doorStyles: {[key: string]: DoorStyleDefinition} = {
     wooden: {
         w: 64,
         h: 16,
-        getHitbox(state: GameState, door: Door) {
+        getHitbox(door: Door) {
             if (door.definition.d === 'up') {
                 return {x: door.x, y: door.y, w: 32, h: 32};
             }
@@ -700,11 +701,25 @@ export class DoorTop implements ObjectInstance {
     constructor(door: Door) {
         this.door = door;
         this.x = this.door.x;
-        // The top of the door frame is 20px from the ground.
-        this.y = this.door.y + 20;
+        this.y = this.door.y;
     }
-    getHitbox(state: GameState): Rect {
-        return this.door.getHitbox(state);
+    getHitbox(): Rect {
+        return this.door.getHitbox();
+    }
+    getYDepth(): number {
+        // These legacy door styles should eventually be removed, but for now make sure they
+        // render correctly.
+        if (this.door.style === 'cave' || this.door.style === 'lightCave') {
+            if (this.door.definition.d === 'down') {
+                return this.y + 48;
+            }
+        }
+        if (this.door.definition.d === 'up' || this.door.definition.d === 'down') {
+            // The top of the door frame is 20px from the ground.
+            return this.y + 20;
+        }
+        // This left/right door frames are very tall because of the perspective.
+        return this.y + 48;
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
         const definition = this.door.definition;
@@ -805,7 +820,7 @@ export class Door implements ObjectInstance {
         return state.hero.area === this.area && state.hero.action !== 'jumpingDown' && state.hero.z <= 8;
     }
     renderOpen(state: GameState): boolean {
-        const heroIsTouchingDoor = boxesIntersect(state.hero, this.getHitbox(state)) && this.heroCanEnter(state);
+        const heroIsTouchingDoor = boxesIntersect(pad(state.hero.getMovementHitbox(), 0), this.getHitbox()) && this.heroCanEnter(state);
         return heroIsTouchingDoor || this.status === 'normal' || this.status === 'blownOpen' || this.status === 'frozen' || state.hero.actionTarget === this;
     }
     changeStatus(state: GameState, status: ObjectStatus): void {
@@ -905,13 +920,23 @@ export class Door implements ObjectInstance {
             applyBehaviorToTile(this.area, x, y, behaviors);
             applyBehaviorToTile(this.area, x, y + 1, behaviors);
         } else if (doorStyle.w === 64) {
-            const behaviors: TileBehaviors = this.isOpen() ? { cannotLand: true, solid: false, lowCeiling: true  } : { solid: true, low: false};
+            const behaviors: TileBehaviors = this.isOpen() ? { cannotLand: true, solid: false, low: true, lowCeiling: true  } : { solid: true, low: false};
             if (this.definition.d === 'up' || this.definition.d === 'down') {
+                if (this.definition.d === 'up') {
+                    behaviors.solidMap = BITMAP_TOP;
+                } else {
+                    behaviors.solidMap = BITMAP_BOTTOM;
+                }
                 applyBehaviorToTile(this.area, x, y, behaviors);
                 applyBehaviorToTile(this.area, x + 1, y, behaviors);
                 applyBehaviorToTile(this.area, x + 2, y, behaviors);
                 applyBehaviorToTile(this.area, x + 3, y, behaviors);
             } else {
+                if (this.definition.d === 'left') {
+                    behaviors.solidMap = BITMAP_LEFT;
+                } else {
+                    behaviors.solidMap = BITMAP_RIGHT;
+                }
                 applyBehaviorToTile(this.area, x, y, behaviors);
                 applyBehaviorToTile(this.area, x, y + 1, behaviors);
                 applyBehaviorToTile(this.area, x, y + 2, behaviors);
@@ -964,10 +989,14 @@ export class Door implements ObjectInstance {
         area.objects.push(this);
         this.applyDoorBehaviorsToArea();
     }
-    getHitbox(state: GameState): Rect {
+    getEditorHitbox(): Rect {
+        const hitbox = this.getHitbox();
+        return {x: this.x, y: this.y, w: Math.max(16, hitbox.w), h: Math.max(16, hitbox.h)};
+    }
+    getHitbox(): Rect {
         const doorStyle = doorStyles[this.style];
         if (doorStyle.getHitbox) {
-            return doorStyle.getHitbox(state, this);
+            return doorStyle.getHitbox(this);
         }
         if (this.definition.d === 'up' || this.definition.d === 'down') {
             if (this.definition.style === 'wooden') {
@@ -1081,7 +1110,9 @@ export class Door implements ObjectInstance {
         if (!this.heroCanEnter(state)) {
             return;
         }
-        const heroIsTouchingDoor = boxesIntersect(hero, this.getHitbox(state));
+        // For some reason this can trigger when the door is closed after recent movement changes
+        // so we reduce the
+        const heroIsTouchingDoor = boxesIntersect(pad(hero.getMovementHitbox(), 0), this.getHitbox());
         if (heroIsTouchingDoor &&
             // If the hero has no action target, have the door control them as soon as they touch it
             (!hero.actionTarget || (hero.actionTarget !== this && !hero.isExitingDoor))
@@ -1109,7 +1140,7 @@ export class Door implements ObjectInstance {
         if (hero.actionTarget === this) {
             const x = hero.x + hero.w / 2 + hero.actionDx * hero.w / 2;
             const y = hero.y + hero.h / 2 + hero.actionDy * hero.h / 2;
-            const hitbox = this.getHitbox(state);
+            const hitbox = this.getHitbox();
             let changedZones = false;
             if (this.style === 'ladderUp') {
                 const reachedTop = hero.y <= this.y;
@@ -1118,8 +1149,12 @@ export class Door implements ObjectInstance {
                     // 'ladderUp' is only for changing zones so make the hero climb back down if changing zones fails.
                     if (!changedZones) {
                         hero.isExitingDoor = true;
-                        hero.actionDx = -directionMap[this.definition.d][0];
-                        hero.actionDy = -directionMap[this.definition.d][1];
+                        // Go back down the ladder if this was a missing target object.
+                        // Otherwise keep going up so the ladder can be used to climb short walls.
+                        if (this.definition.targetZone && this.definition.targetObjectId) {
+                            hero.actionDx = -directionMap[this.definition.d][0];
+                            hero.actionDy = -directionMap[this.definition.d][1];
+                        }
                     }
                 }
             } else if (this.style === 'ladderDown') {
@@ -1149,7 +1184,7 @@ export class Door implements ObjectInstance {
         const doorStyle = doorStyles[this.style];
         context.fillStyle = '#888';
         if (this.definition.d === 'up' && this.status === 'closed' && this.definition.price) {
-            const hitbox = this.getHitbox(state);
+            const hitbox = this.getHitbox();
             drawText(context, `${this.definition.price}`,
                 hitbox.x + hitbox. w / 2, hitbox.y + hitbox.h + 2, {
                 textBaseline: 'top',
@@ -1200,7 +1235,7 @@ export class Door implements ObjectInstance {
             drawFrame(context, frame, { ...frame, x: this.x, y: this.y });
         } else if (doorStyle.w === 64) {
             if (!this.isOpen() && state.hero.actionTarget !== this) {
-                const hitbox = this.getHitbox(state);
+                const hitbox = this.getHitbox();
                 context.fillRect(hitbox.x, hitbox.y, hitbox.w, hitbox.h);
             } else {
                 // Display nothing when this entrance is open.

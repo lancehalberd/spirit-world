@@ -28,6 +28,9 @@ export interface ObjectInstance {
     definition?: ObjectDefinition
     linkedObject?: ObjectInstance
     behaviors?: TileBehaviors
+    // If this is true behaviors will be applied to the behavior grid when this
+    // object gets added.
+    applyBehaviorsToGrid?: boolean
     getBehaviors?: (state: GameState) => TileBehaviors
     drawPriority?: DrawPriority
     getDrawPriority?: (state: GameState) => DrawPriority
@@ -50,6 +53,8 @@ export interface ObjectInstance {
     cleanup?: (state: GameState) => void,
     // This is called when a user grabs a solid tile
     getHitbox?: (state?: GameState) => Rect
+    // This hitbox will be used for movement instead of getHitbox if defined.
+    getMovementHitbox?: () => Rect
     // Used instead of the literal y value for depth sorting if defined.
     getYDepth?: () => number
     // This will be used for the hitbox for the editor only if it is defined.
@@ -109,12 +114,16 @@ export interface EffectInstance {
     cleanup?: (state: GameState) => void
     // This is called when a user grabs a solid tile
     getHitbox?: (state?: GameState) => Rect
+    // This hitbox will be used for movement instead of getHitbox if defined.
+    getMovementHitbox?: () => Rect
     // Used instead of the literal y value for depth sorting if defined.
     getYDepth?: () => number
     onEnterArea?: (state: GameState) => void
     // When the hero hits the effect with a weapon or tool.
     // This is used by certain enemy attacks, but it might be better to change those to objects.
     onHit?: (state: GameState, hit: HitProperties) => HitResult
+    // When the hero walks into an object
+    onPush?: (state: GameState, direction: Direction) => void
     update?: (state: GameState) => void
     add?: (state: GameState, area: AreaInstance) => void
     remove?: (state: GameState) => void
@@ -146,6 +155,8 @@ export interface MovementProperties {
     canFall?: boolean
     canSwim?: boolean
     canClimb?: boolean
+    // True when climbing.
+    canCrossLedges?: boolean
     canJump?: boolean
     // Whether the mover should wiggle to fit into tight spaces.
     canWiggle?: boolean
@@ -158,6 +169,11 @@ export interface MovementProperties {
     // Objects to ignore for hit detection.
     excludedObjects?: Set<any>
     needsFullTile?: boolean
+    // The actor moving, if an actor. This will be used for hitting damaging tiles
+    actor?: Actor
+    // The delta for the complete movement.
+    dx?: number
+    dy?: number
 }
 
 
@@ -386,9 +402,15 @@ export interface SimpleObjectDefinition extends BaseObjectDefinition {
 }
 
 export interface DecorationDefinition extends BaseObjectDefinition {
-    type: 'decoration',
-    decorationType: DecorationType,
-    drawPriority?: DrawPriority,
+    type: 'decoration'
+    decorationType: DecorationType
+    drawPriority?: DrawPriority
+    w: number,
+    h: number,
+}
+
+export interface WaterfallDefinition extends BaseObjectDefinition {
+    type: 'waterfall'
     w: number,
     h: number,
 }
@@ -439,6 +461,7 @@ export type ObjectDefinition = SimpleObjectDefinition
     | NPCDefinition
     | SignDefinition
     | TurretDefinition
+    | WaterfallDefinition
     ;
 
 export type ObjectType = ObjectDefinition['type'];
@@ -460,9 +483,14 @@ export interface SpecialSignBehavior {
 
 export interface SpecialSwitchBehavior {
     // This could be extended for floor switches and other switches.
-    type: 'crystalSwitch'
+    type: 'crystalSwitch' | 'floorSwitch'
     apply?: (state: GameState, object: ObjectInstance) => void
     onActivate?: (state: GameState, object: ObjectInstance) => void
+}
+
+export interface SpecialPushPullBehavior {
+    type: 'pushPull',
+    apply?: (state: GameState, object: ObjectInstance) => void
 }
 
 
@@ -473,6 +501,7 @@ export interface SpecialAreaBehavior {
 
 export type SpecialBehavior
     = SpecialDoorBehavior
+    | SpecialPushPullBehavior
     | SpecialSwitchBehavior
     | SpecialSignBehavior
     | SpecialAreaBehavior;
