@@ -20,11 +20,11 @@ import {
     Direction, Enemy, EnemyAbility, GameState, HitProperties, HitResult, Point, Rect
 } from 'app/types';
 
-const rivalMergedAnimations = {
-    ...rivalAnimations,
-    staffJump: heroAnimations.staffJump,
-    staffSlam: heroAnimations.staffSlam,
-}
+// const rivalMergedAnimations = {
+//     ...rivalAnimations,
+//     staffJump: heroAnimations.staffJump,
+//     staffSlam: heroAnimations.staffSlam,
+// }
 
 const rollSpeed = [
     5, 5, 5, 5,
@@ -137,8 +137,8 @@ const staffAbility: EnemyAbility<Direction> = {
     cancelsOtherAbilities: true,
     cannotBeCanceled: true,
     cooldown: 4000,
-    prepTime: rivalMergedAnimations.staffJump.down.duration,
-    recoverTime: rivalMergedAnimations.staffSlam.down.duration + 500,
+    prepTime: rivalAnimations.staffJump.down.duration,
+    recoverTime: rivalAnimations.staffSlam.down.duration + 500,
 };
 
 // This is hardcoded for the area outside of the tomb.
@@ -170,7 +170,7 @@ function getTargetLocation(state: GameState, enemy: Enemy): Point {
 
 enemyDefinitions.rival = {
     // This should match the NPC style of the Rival.
-    animations: rivalMergedAnimations,
+    animations: rivalAnimations,
     abilities: [rollAbility, staffAbility, throwAbility],
     taunts: {
         throw: { text: 'Get out of here!', priority: 1},
