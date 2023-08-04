@@ -14,7 +14,10 @@ dialogueHash.npc = {
                 zones: ['warTemple'],
             },
             text: [
-                `Those gloves are gorgeous! Let's take them to a museum.{|} What, you're putting them on? Stop!`
+                {
+                    dialogueIndex: 29,
+                    text: `Those gloves are gorgeous! Let's take them to a museum.{|} What, you're putting them on? Stop!`,
+                },
             ],
             notes: `The citizen is amazed that you opened the chest.`
         },
@@ -25,7 +28,11 @@ dialogueHash.npc = {
                 zones: ['warTemple'],
             },
             text: [
-                `Does your key fit in the lock?`
+                {
+                    dialogueIndex: 30,
+                    dialogueType: 'hint',
+                    text: `Does your key fit in the lock?`,
+                },
             ],
             notes: `The citizen is curious about the key.`
         },
@@ -36,7 +43,11 @@ dialogueHash.npc = {
                 zones: ['warTemple'],
             },
             text: [
-                `We've tried picking the lock and breaking it open,{|} but nobody could open this chest!`,
+                {
+                    dialogueIndex: 31,
+                    dialogueType: 'hint',
+                    text: `We've tried picking the lock and breaking it open,{|} but nobody could open this chest!`,
+                },
             ],
             notes: `The citizen tells the player this is an interesting chest to try and open`
         },
@@ -46,9 +57,18 @@ dialogueHash.npc = {
                 excludedFlags: [],
             },
             text: [
-                `Hello.`,
-                `It's a lovely day.`,
-                `It's nice to see a friendly face.`,
+                {
+                    dialogueIndex: 32,
+                    text: `Hello.`,
+                },
+                {
+                    dialogueIndex: 33,
+                    text: `It's a lovely day.`,
+                },
+                {
+                    dialogueIndex: 34,
+                    text: `It's nice to see a friendly face.`,
+                },
             ],
             repeatIndex: 1,
         },

@@ -9,9 +9,13 @@ dialogueHash.generousPriest = {
                 excludedFlags: ['generousPriest'],
             },
             text: [
-                `This temple is open to all, even you small one.
-                {|}Although it isn't much, please accept this gift.
-                {flag:generousPriest} {item:money=10}`
+                {
+                    dialogueIndex: 10,
+                    dialogueType: 'subquest',
+                    text: `This temple is open to all, even you small one.
+                    {|}Although it isn't much, please accept this gift.
+                    {flag:generousPriest} {item:money=10}`,
+                },
             ],
 
         },
@@ -21,7 +25,10 @@ dialogueHash.generousPriest = {
                 excludedFlags: [],
             },
             text: [
-                `I'm sorry I cannot offer you any more.`
+                {
+                    dialogueIndex: 11,
+                    text: `I'm sorry I cannot offer you any more.`,
+                }
             ],
         },
     ],
@@ -36,7 +43,11 @@ dialogueHash.meanPerson = {
                 excludedFlags: ['meanPerson'],
             },
             text: [
-                `Dance for your dinner little monkey! {flag:meanPerson} {item:money=1}`
+                {
+                    dialogueIndex: 12,
+                    dialogueType: 'subquest',
+                    text: `Dance for your dinner little monkey! {flag:meanPerson} {item:money=1}`,
+                }
             ],
 
         },
@@ -46,8 +57,15 @@ dialogueHash.meanPerson = {
                 excludedFlags: [],
             },
             text: [
-                `Back for more?[-] How pathetic.`,
-                `Scram monkey.`
+                {
+                    dialogueIndex: 13,
+                    text: `Back for more?[-] How pathetic.`,
+                },
+                {
+                    dialogueIndex: 14,
+                    dialogueType: 'subquest',
+                    text: `Scram monkey.`,
+                },
             ],
         },
     ],
@@ -62,11 +80,15 @@ dialogueHash.grandPriest = {
                 excludedFlags: ['grandPriest'],
             },
             text: [
-                `You've done well to make it this far.
-                 {|}To be honest many were skeptical about asking you for help.
-                 {|}You may need some tougher skin yet to finish this quest.
-                 {|}Thank you for your service, and take this blessing with you.
-                 {flag:grandPriest} {item:ironSkin=1}`
+                {
+                    dialogueIndex: 15,
+                    dialogueType: 'quest',
+                    text: `You've done well to make it this far.
+                     {|}To be honest many were skeptical about asking you for help.
+                     {|}You may need some tougher skin yet to finish this quest.
+                     {|}Thank you for your service, and take this blessing with you.
+                     {flag:grandPriest} {item:ironSkin=1}`
+                },
             ],
         },
         {
@@ -75,7 +97,10 @@ dialogueHash.grandPriest = {
                 excludedFlags: [],
             },
             text: [
-                'May the wisdom of the spirits guide you.'
+                {
+                    dialogueIndex: 16,
+                    text: 'May the wisdom of the spirits guide you.',
+                },
             ],
         },
     ],
@@ -89,7 +114,7 @@ dialogueHash.streetVendor = {
         attempt2: `{buy:150:streetVendor.purchase2:streetVendor.fail`,
         purchase2: `You're getting a great deal. {item:silverOre} {flag:vendor2}`,
         fail: 'Come back with more Jade.',
-        no: 'Your loss friend.'
+        no: 'Your loss friend.',
     },
     options: [
         {
@@ -98,8 +123,12 @@ dialogueHash.streetVendor = {
                 excludedFlags: ['vendor2'],
             },
             text: [
-                `I found something rare while exploring, only 150 Jade...
-                {choice:Buy for 150 Jade?|Yes:streetVendor.attempt2|No:streetVendor.no}`
+                {
+                    dialogueIndex: -1,
+                    dialogueType: 'subquest',
+                    text: `I found something rare while exploring, only 150 Jade...
+                    {choice:Buy for 150 Jade?|Yes:streetVendor.attempt2|No:streetVendor.no}`,
+                },
             ],
 
         },
@@ -109,8 +138,12 @@ dialogueHash.streetVendor = {
                 excludedFlags: ['vendor1'],
             },
             text: [
-                `I found something special while exploring, only 100 Jade...
-                {choice:Buy for 100 Jade?|Yes:streetVendor.attempt1|No:streetVendor.no}`
+                {
+                    dialogueIndex: -1,
+                    dialogueType: 'subquest',
+                    text: `I found something special while exploring, only 100 Jade...
+                    {choice:Buy for 100 Jade?|Yes:streetVendor.attempt1|No:streetVendor.no}`,
+                },
             ],
 
         },
@@ -120,7 +153,10 @@ dialogueHash.streetVendor = {
                 excludedFlags: [],
             },
             text: [
-                `That's all I have for now friend.`
+                {
+                    dialogueIndex: 18,
+                    text: `That's all I have for now friend.`,
+                },
             ],
         },
     ],

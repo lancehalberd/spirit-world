@@ -10,9 +10,18 @@ dialogueHash.waterfallDragon = {
             },
             isExclusive: true,
             text: [
-                `I have nothing to say to the likes of you.`,
-                `Be gone frome my presence.`,
-                `Do you feel clever?`,
+                {
+                    dialogueIndex: 90,
+                    text: `I have nothing to say to the likes of you.`,
+                },
+                {
+                    dialogueIndex: 91,
+                    text: `Be gone frome my presence.`,
+                },
+                {
+                    dialogueIndex: 92,
+                    text: `Do you feel clever?`,
+                },
             ],
         },
         {
@@ -22,12 +31,16 @@ dialogueHash.waterfallDragon = {
             },
             isExclusive: true,
             text: [
-                `You would approach me and seek a boon after ransacking my tower and destroying my machinery?
-                {|}I did promise to help, but I never thought you would make it this far.
-                {|}...
-                {|}Very well, take this cloak and be gone from here.
-                {flag:waterfallTowerThroneDoor}
-                {item:cloak=2}`,
+                {
+                    dialogueIndex: 93,
+                    dialogueType: 'quest',
+                    text: `You would approach me and seek a boon after ransacking my tower and destroying my machinery?
+                    {|}I did promise to help, but I never thought you would make it this far.
+                    {|}...
+                    {|}Very well, take this cloak and be gone from here.
+                    {flag:waterfallTowerThroneDoor}
+                    {item:cloak=2}`,
+                },
             ],
         },
         {
@@ -36,7 +49,10 @@ dialogueHash.waterfallDragon = {
                 excludedFlags: [],
             },
             text: [
-                `I have nothing more to say to you for now...`,
+                {
+                    dialogueIndex: 94,
+                    text: `I have nothing more to say to you for now...`,
+                },
             ],
             repeatIndex: 0,
         },

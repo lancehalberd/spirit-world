@@ -487,6 +487,7 @@ interface NPCDefinition extends BaseObjectDefinition {
     style: NPCStyle
     dialogueKey?: string
     dialogue?: string
+    dialogueType?: DialogueType
     // If this NPC stores dialogue directly on it, then this dialogueIndex
     // should be set to a unique identifier that can be used to look it up
     // and is used when tracking whether the player has read this dialogue.

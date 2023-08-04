@@ -44,7 +44,7 @@ interface DialogueOption {
     // If this flag is set, this dialogue will be shown if it is the first valid option found with this flag set.
     isExclusive?: boolean
     // The set of dialogues that can occur when this option is chosen.
-    text: TextScript[]
+    text: DialogueScript[]
     // If set, dialogue will return to this index after exhausting all options.
     repeatIndex?: number
     // Notes for development purposes.
@@ -58,6 +58,16 @@ interface DialogueChoiceDefinition {
         key: string
     }[]
 }
+
+type DialogueType = 'quest' | 'reminder' | 'subquest' | 'hint';
+
+interface Dialogue {
+    text: TextScript
+    dialogueType?: DialogueType
+    dialogueIndex?: number
+}
+
+type DialogueScript = ((state: GameState) => Dialogue) | Dialogue
 
 type TextScript = ((state: GameState) => string) | string
 

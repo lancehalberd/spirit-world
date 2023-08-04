@@ -20,7 +20,7 @@ function getRivalBoss(state: GameState): Enemy {
 dialogueHash.elder = {
     key: 'elder',
     mappedOptions: {
-        tombRescue: (state: GameState) => {
+        tombRescue(state: GameState) {
             state.savedState.objectFlags.tombRivalRescued = true;
             //state.hero.action = null;
             //state.scriptEvents.blockFieldUpdates = true;
@@ -213,9 +213,13 @@ dialogueHash.elder = {
             logicCheck: logicHash.tombRivalBoss,
             isExclusive: true,
             text: [
-                `Oh ${RIVAL_NAME} won't let you enter the tomb?{|}
-                I'm so sorry, he is just doing his job, I'll send word that he should let you pass.
-                {flag:tombRivalAvoided}`,
+                {
+                    dialogueIndex: 1,
+                    dialogueType: 'quest',
+                    text: `Oh ${RIVAL_NAME} won't let you enter the tomb?{|}
+                    I'm so sorry, he is just doing his job, I'll send word that he should let you pass.
+                    {flag:tombRivalAvoided}`,
+                },
             ],
         },
         {
@@ -225,8 +229,16 @@ dialogueHash.elder = {
             },
             isExclusive: true,
             text: [
-                `So sorry about the misunderstanding, you are free to enter the tomb now.`,
-                `The Vanara Tomb is just to the north of here.`
+                {
+                    dialogueIndex: 2,
+                    dialogueType: 'reminder',
+                    text: `So sorry about the misunderstanding, you are free to enter the tomb now.`,
+                },
+                {
+                    dialogueIndex: 3,
+                    dialogueType: 'reminder',
+                    text: `The Vanara Tomb is just to the north of here.`,
+                },
             ],
         },
         {
@@ -236,11 +248,19 @@ dialogueHash.elder = {
             },
             isExclusive: true,
             text: [
-                `So you want to learn more about your Spirit powers?
-                {|}Seek out the Guardian in the Vanara Tomb to the north.
-                {|}Search my cellar for a tool you will need to enter the Tomb.
-                {flag:elderTomb}`,
-                `Search my cellar for a tool you will need to enter the Tomb.`,
+                {
+                    dialogueIndex: 4,
+                    dialogueType: 'quest',
+                    text: `So you want to learn more about your Spirit powers?
+                    {|}Seek out the Guardian in the Vanara Tomb to the north.
+                    {|}Search my cellar for a tool you will need to enter the Tomb.
+                    {flag:elderTomb}`,
+                },
+                {
+                    dialogueIndex: 5,
+                    dialogueType: 'reminder',
+                    text: `Search my cellar for a tool you will need to enter the Tomb.`,
+                },
             ],
             notes: `If this flag is set the elder will rescue you if you are defeated
                 by your rival outside the tomb.`
@@ -252,8 +272,15 @@ dialogueHash.elder = {
             },
             isExclusive: true,
             text: [
-                `I see you decided to help yourself to my family heirloom.`,
-                `You can use the Spirit Bow to enter the Vanara Tomb to the north.{flag:elderTomb}`,
+                {
+                    dialogueIndex: 6,
+                    text: `I see you decided to help yourself to my family heirloom.`,
+                },
+                {
+                    dialogueIndex: 7,
+                    dialogueType: 'quest',
+                    text: `You can use the Spirit Bow to enter the Vanara Tomb to the north.{flag:elderTomb}`,
+                },
             ],
             notes: `The elder won't help you with the rival fight until you listen to the line where they tell you
                     to visit the tomb`,
@@ -265,7 +292,11 @@ dialogueHash.elder = {
             },
             isExclusive: true,
             text: [
-                `You can use the Spirit Bow to enter the Vanara Tomb to the north.`,
+                {
+                    dialogueIndex: 7,
+                    dialogueType: 'reminder',
+                    text: `You can use the Spirit Bow to enter the Vanara Tomb to the north.`,
+                },
             ],
         },
         {
@@ -274,8 +305,12 @@ dialogueHash.elder = {
                 excludedFlags: [],
             },
             text: [
-                `I have done all that I can for you.`,
-                `Please leave our village in peace.`
+                {
+                    dialogueIndex: 8,
+                    text: `I have done all that I can for now.`},
+                {
+                    dialogueIndex: 9,
+                    text: `Please leave our village in peace.`}
             ],
             notes: `This is fall back text.`
         }

@@ -31,12 +31,18 @@ dialogueHash.rival = {
             },
             isExclusive: true,
             text: [
-                `I'm in no mood for your tricks today!
-                `,
-                `You're not getting me in trouble today!
-                `,
-                `You know you're not allowed in here.
-                `,
+                {
+                    dialogueIndex: 35,
+                    text: `I'm in no mood for your tricks today!`,
+                },
+                {
+                    dialogueIndex: 36,
+                    text: `You're not getting me in trouble today!`,
+                },
+                {
+                    dialogueIndex: 37,
+                    text: `You know you're not allowed in here.`,
+                },
             ],
         },
     ],

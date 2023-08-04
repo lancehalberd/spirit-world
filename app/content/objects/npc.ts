@@ -278,7 +278,12 @@ export class NPC implements Actor, ObjectInstance  {
             }
             this.lastDialogueOption = dialogueOption;
             // Need to track if the dialogue option changed here so that we can reset index if it changes.
-            showMessage(state, dialogueOption.text[this.dialogueIndex]);
+            const dialogueScript = dialogueOption.text[this.dialogueIndex];
+            if (typeof dialogueScript === 'function') {
+                showMessage(state, dialogueScript(state).text);
+            } else {
+                showMessage(state, dialogueScript.text);
+            }
             this.dialogueIndex++;
             if (this.dialogueIndex >= dialogueOption.text.length) {
                 this.dialogueIndex = dialogueOption.repeatIndex ?? this.dialogueIndex - 1;

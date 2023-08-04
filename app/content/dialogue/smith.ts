@@ -61,10 +61,22 @@ dialogueHash.citySmith = {
                 requiredFlags: ['$normalDamage', '$normalRange'],
             },
             text: [
-                `They tell stories of smiths in the Spirit World with skills
-                beyond those of any man.`,
-                `Maybe there is a forge in the Spirit World that can help you.`,
-                `Where do you suppose a mythical forge could be found?`
+                {
+                    dialogueIndex: 46,
+                    dialogueType: 'subquest',
+                    text: `They tell stories of smiths in the Spirit World with skills
+                    beyond those of any man.`,
+                },
+                {
+                    dialogueIndex: 47,
+                    dialogueType: 'subquest',
+                    text: `Maybe there is a forge in the Spirit World that can help you.`,
+                },
+                {
+                    dialogueIndex: 48,
+                    dialogueType: 'subquest',
+                    text: `Where do you suppose a mythical forge could be found?`,
+                },
             ],
         },
         {
@@ -72,13 +84,20 @@ dialogueHash.citySmith = {
                 requiredFlags: ['$weapon'],
             },
             text: [
-                `{@citySmith.upgrade}`
+                {
+                    dialogueIndex: -1,
+                    dialogueType: 'subquest',
+                    text: `{@citySmith.upgrade}`
+                },
             ],
         },
         {
             logicCheck: {},
             text: [
-                `You have no need of my services.`
+                {
+                    dialogueIndex: 49,
+                    text: `You have no need of my services.`
+                },
             ],
         },
     ],
@@ -147,7 +166,10 @@ dialogueHash.forgeSmith = {
                 requiredFlags: ['$normalDamage', '$normalRange', '$spiritDamage', '$spiritRange'],
             },
             text: [
-                'Someday I will craft you a real masterpiece'
+                {
+                    dialogueIndex: 50,
+                    text: 'Someday I will craft you a real masterpiece.',
+                },
             ],
         },
         {
@@ -155,7 +177,11 @@ dialogueHash.forgeSmith = {
                 requiredFlags: ['$spiritDamage', '$spiritRange'],
             },
             text: [
-                'You\'ll need to find a more conventional smith for your other weapon.'
+                {
+                    dialogueIndex: 51,
+                    dialogueType: 'subquest',
+                    text: 'You\'ll need to find a more conventional smith for your other weapon.',
+                },
             ],
         },
         {
@@ -163,13 +189,21 @@ dialogueHash.forgeSmith = {
                 requiredFlags: ['$weapon:2'],
             },
             text: [
-                `{@forgeSmith.upgrade}`
+                {
+                    dialogueIndex: -1,
+                    dialogueType: 'subquest',
+                    text: `{@forgeSmith.upgrade}`,
+                }
             ],
         },
         {
             logicCheck: {},
             text: [
-                `I only work on the finest weapons.`
+                {
+                    dialogueIndex: 52,
+                    dialogueType: 'subquest',
+                    text: `I only work on the finest weapons.`,
+                },
             ],
         },
     ],

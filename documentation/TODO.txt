@@ -47,13 +47,6 @@ Pending Graphics From Jon:
 
 
 Current tasks:
-    - Add material tile -> spirit tile mapping function:
-        - Add reasonable defaults like based on defaultLayer, solid, solidMap
-        - Check explicit tile mappings first
-        - Do this after we split tiles up into multiple tile sheets.
-
-    - populate project board with art tasks for Jon and prioritize them
-
     - Add indicators for NPCs next dialogue option
         - Must assign every NPC text option a unique id and an optional type: quest, subquest, hint
             - objects with dialogue should
@@ -63,6 +56,15 @@ Current tasks:
         - Side-quest info Green or Blue !
         - hint ?
         - generic text ... or empty bubble
+
+
+    - Add material tile -> spirit tile mapping function:
+        - Add reasonable defaults like based on defaultLayer, solid, solidMap
+        - Check explicit tile mappings first
+        - Do this after we split tiles up into multiple tile sheets.
+
+    - populate project board with art tasks for Jon and prioritize them
+
 
     - Forest temple boss should provide a golden peach in addition to the clone tool.
 

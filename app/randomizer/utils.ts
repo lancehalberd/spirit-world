@@ -777,11 +777,11 @@ export function applyLootAssignments(assignments: LootAssignment[]): void {
                     options: [
                         {
                             logicCheck: { excludedFlags: [`${npcKey}`] },
-                            text: [text],
+                            text: [{dialogueType: 'quest', text}],
                         },
                         {
                             logicCheck: {},
-                            text: ['You already got it!'],
+                            text: [{text: 'You already got it!'}],
                         },
                     ],
                 };
