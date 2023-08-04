@@ -9,7 +9,6 @@ const bossDeathExplosionGeometry: FrameDimensions = {w: 28, h: 28};
 export const bossDeathExplosionAnimation: FrameAnimation
     = createAnimation('gfx/effects/powersource_explosion.png', bossDeathExplosionGeometry, { cols: 9, duration: 4}, { loop: false });
 
-
 const snakeGeometry: FrameDimensions = { w: 18, h: 18, content: { x: 2, y: 6, w: 14, h: 11} };
 const leftSnakeAnimation: FrameAnimation = createAnimation('gfx/enemies/snek.png', snakeGeometry, { x: 0});
 const downSnakeAnimation: FrameAnimation = createAnimation('gfx/enemies/snek.png', snakeGeometry, { x: 1});
@@ -443,6 +442,109 @@ Frame 1 - this is the idle standing frame
 Frame 2-3 - this is the hammering frame. I imagine you should keep the golem on frame 3 for longer just to help show that the attack came from the hammer
 Frame 4-7 - this is the golem preparing and then casting a spell. Loop frames 5-7 for however long the casting is.
 Frame 8 - hurt frame*/
+
+/* RIVAL */
+// image layout
+// row 0: still; row 1: walk-down;
+// row 2: walk-right; row 3: walk-up;
+// row 4: walk-left; row 5: roll-down;
+// row 6: roll-right; row 7: roll-up;
+// row 8: roll-left; row 9: attack-down;
+// row 10: attack-right; row 11: attack-up;
+// row 12: attack-left; row 13: staff-down;
+// row 14: staff-right; row 15: staff-up;
+// row 16: staff-left; row 17: kneel;
+// row 18: staff-right-body; row 19: staff-up-body
+// row 20: staff-left-body; row 21: staff-down-body
+const rivalGeometry: FrameDimensions = { w: 30, h: 28, content: { x: 11, y: 10, w: 18, h: 18} };
+const rivalImg = 'gfx/enemies/rival.png';
+
+// rival animations
+const rivalStillDownAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 0, y: 0, cols: 1});
+const rivalStillRightAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 1, y: 0, cols: 1});
+const rivalStillUpAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 2, y: 0, cols: 1});
+const rivalStillLeftAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 3, y: 0, cols: 1});
+
+const rivalWalkDownAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 0, y: 1, cols: 8});
+const rivalWalkRightAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 0, y: 2, cols: 8});
+const rivalWalkUpAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 0, y: 3, cols: 8});
+const rivalWalkLeftAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 0, y: 4, cols: 8});
+
+const rivalRollDownAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 4, x: 1, y: 5, duration: 4}, {loop: false});
+const rivalRollRightAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 4, x: 1, y: 6, duration: 4}, {loop: false});
+const rivalRollUpAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 4, x: 1, y: 7, duration: 4}, {loop: false});
+const rivalRollLeftAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 4, x: 1, y: 8, duration: 4}, {loop: false});
+
+const rivalAttackDownAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 0, y: 9, cols: 5});
+const rivalAttackRightAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 0, y: 10, cols: 5});
+const rivalAttackUpAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 0, y: 11, cols: 5});
+const rivalAttackLeftAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 0, y: 12, cols: 5});
+
+const rivalKneelDownAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 0, y: 17, cols: 1});
+const rivalKneelRightAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 1, y: 17, cols: 1});
+const rivalKneelUpAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 2, y: 17, cols: 1});
+const rivalKneelLeftAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { x: 3, y: 17, cols: 1});
+
+const rivalStaffJumpDownAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 3, x: 1, y: 18, duration: 3,  frameMap: [0, 1, 1, 1, 1, 2, 2, 2, 2]});
+const rivalStaffJumpRightAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 3, x: 1, y: 19, duration: 3, frameMap: [0, 1, 1, 1, 1, 2, 2, 2, 2]});
+const rivalStaffJumpUpAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 2, x: 1, y: 20, duration: 3,   frameMap: [0, 0, 0, 0, 0, 1, 1, 1, 1]});
+const rivalStaffJumpLeftAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 3, x: 1, y: 21, duration: 3, frameMap: [0, 1, 1, 1, 1, 2, 2, 2, 2]});
+const rivalStaffSlamDownAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 1, x: 4, y: 18, duration: 9});
+const rivalStaffSlamRightAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 1, x: 4, y: 19, duration: 9});
+const rivalStaffSlamUpAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 1, x: 3, y: 20, duration: 9});
+const rivalStaffSlamLeftAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 1, x: 4, y: 21, duration: 9});
+
+// const staffImg = 'gfx/effects/wukong_staff.png';
+// const staffGeometry = {w: 123, h: 181};
+// const staffDownAnimation: FrameAnimation = createAnimation(staffImg, staffGeometry, { cols: 8, x: 0, duration: 3, frameMap: [0, 1, 2, 3, 4, 5, 6, 6, 6, 7]}, {loop: false});
+// const staffRightAnimation: FrameAnimation = createAnimation(staffImg, staffGeometry, { cols: 10, x: 8, duration: 3}, {loop: false});
+// const staffUpAnimation: FrameAnimation = createAnimation(staffImg, staffGeometry, { cols: 8, x: 18, duration: 3, frameMap: [0, 1, 2, 3, 4, 5, 6, 6, 6, 7]}, {loop: false});
+// const staffLeftAnimation: FrameAnimation = createAnimation(staffImg, staffGeometry, { cols: 10, x: 26, duration: 3}, {loop: false});
+
+export const rivalAnimations: ActorAnimations = {
+    idle: {
+        down: rivalStillDownAnimation,
+        right: rivalStillRightAnimation,
+        up: rivalStillUpAnimation,
+        left: rivalStillLeftAnimation,
+    },
+    move: {
+        down: rivalWalkDownAnimation,
+        right: rivalWalkRightAnimation,
+        up: rivalWalkUpAnimation,
+        left: rivalWalkLeftAnimation,
+    },
+    roll: {
+        down: rivalRollDownAnimation,
+        right: rivalRollRightAnimation,
+        up: rivalRollUpAnimation,
+        left: rivalRollLeftAnimation,
+    },
+    attack: {
+        down: rivalAttackDownAnimation,
+        right: rivalAttackRightAnimation,
+        up: rivalAttackUpAnimation,
+        left: rivalAttackLeftAnimation,
+    },
+    kneel: {
+        down: rivalKneelDownAnimation,
+        right: rivalKneelRightAnimation,
+        up: rivalKneelUpAnimation,
+        left: rivalKneelLeftAnimation,
+    },
+    staffJump: {
+        up: rivalStaffJumpUpAnimation,
+        down: rivalStaffJumpDownAnimation,
+        left: rivalStaffJumpLeftAnimation,
+        right: rivalStaffJumpRightAnimation,
+    },
+    staffSlam: {
+        up: rivalStaffSlamUpAnimation,
+        down: rivalStaffSlamDownAnimation,
+        left: rivalStaffSlamLeftAnimation,
+        right: rivalStaffSlamRightAnimation,
+    },
+};
 
 const icePlantGeometry: FrameDimensions = { w: 48, h: 32, content: {x: 12, y: 16, w: 24, h: 16} };
 export const icePlantIdleAnimation = createAnimation('gfx/enemies/icePlant.png', icePlantGeometry,

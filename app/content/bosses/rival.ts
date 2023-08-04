@@ -1,7 +1,7 @@
 import { CrystalSpike } from 'app/content/effects/arrow';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { vanaraBlackAnimations } from 'app/render/npcAnimations';
+import { rivalAnimations } from 'app/content/enemyAnimations';
 import { heroAnimations, staffAnimations } from 'app/render/heroAnimations';
 import { appendScript } from 'app/scriptEvents';
 import { removeTextCue } from 'app/content/effects/textCue';
@@ -20,13 +20,11 @@ import {
 
 
 
-const rivalAnimations = {
-    ...vanaraBlackAnimations,
-    kneel: heroAnimations.kneel,
-    roll: heroAnimations.roll,
-    staffJump: heroAnimations.staffJump,
-    staffSlam: heroAnimations.staffSlam,
-}
+// const rivalMergedAnimations = {
+//     ...rivalAnimations,
+//     staffJump: heroAnimations.staffJump,
+//     staffSlam: heroAnimations.staffSlam,
+// }
 
 const rollSpeed = [
     5, 5, 5, 5,
