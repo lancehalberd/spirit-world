@@ -57,6 +57,9 @@ Current tasks:
         - hint ?
         - generic text ... or empty bubble
 
+    - Falling in water with high enough velocity transitions you underwater with slightly reduced velocity
+        - Allows you to peak underwater, but not really do anything.
+        - Might have a peach piece you can by falling fast enough into the water.
 
     - Add material tile -> spirit tile mapping function:
         - Add reasonable defaults like based on defaultLayer, solid, solidMap

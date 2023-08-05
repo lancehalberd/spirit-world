@@ -71,12 +71,7 @@ export class SaveStatue implements ObjectInstance {
             // The save statue only shows one set of dialog per area and only
             // the first time you interact with it.
             const dialogueOption = selectDialogueOption(state, 'saveStatue');
-            const dialogueScript = dialogueOption.text[0];
-            if (typeof dialogueScript === 'function') {
-                showMessage(state, dialogueScript(state).text);
-            } else {
-                showMessage(state, dialogueScript.text);
-            }
+            showMessage(state, dialogueOption.text[0].text);
             saveObjectStatus(state, this.definition, true);
         }
     }

@@ -5,6 +5,7 @@ import { FRAME_LENGTH } from 'app/gameConstants';
 import { update } from 'app/update';
 import { render } from 'app/render';
 import { populateAllSections} from 'app/content/sections';
+import { populateAllDialogue} from 'app/content/dialogue/dialogueList';
 import { getState } from 'app/state';
 import { updateMusic } from 'app/musicController';
 
@@ -17,6 +18,7 @@ export * from 'app/randomizer/main';
 setInterval(update, FRAME_LENGTH);
 
 populateAllSections();
+populateAllDialogue();
 
 
 function renderLoop() {

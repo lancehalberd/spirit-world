@@ -277,7 +277,7 @@ dialogueHash.elder = {
                     text: `I see you decided to help yourself to my family heirloom.`,
                 },
                 {
-                    dialogueIndex: 7,
+                    dialogueIndex: 0,
                     dialogueType: 'quest',
                     text: `You can use the Spirit Bow to enter the Vanara Tomb to the north.{flag:elderTomb}`,
                 },

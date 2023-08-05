@@ -1,39 +1,69 @@
-import { getAreaFromLocation } from 'app/content/areas';
+import { dialogueHash } from 'app/content/dialogue/dialogueHash';
 import { zones } from 'app/content/zones/zoneHash';
-import { overworldKeys } from 'app/gameConstants';
 
 
-interface SectionData {
-    section: AreaSection
-    area: AreaDefinition
-    zoneKey: string
-    floor: number
-    isSpiritWorld: boolean
-    coords: Point
-}
-
-interface DungeonMap {
-    floors: {[key: string]: DungeonFloorMap}
-}
-interface DungeonFloorMap {
-    sections: number[]
-}
-
-let nextFreeId = 0;
-export const allSections: SectionData[] = [];
-window['allSections'] = allSections;
-export const dungeonMaps: {[key: string]: DungeonMap} = {};
-window['dungeonMaps'] = dungeonMaps;
-
-export function getNextFreeId() {
-    while(allSections[nextFreeId]) {
-        nextFreeId++;
+interface DialogueData {
+    // Used for dialogue stored directly on an object
+    objectData?: {
+        definition: NPCDefinition
+        zoneKey: string
+        floor: number
+        isSpiritWorld: boolean
+        coords: Point
     }
-    return nextFreeId;
+    // Used for dialogue stored on the dialogue hash as an indexed option.
+    hashData?: {
+        npcKey: string
+        optionIndex: number
+        textIndex: number
+    }
+    // Metadata indicating this dialogue data was moved to a new index.
+    // After all indexes are assigned, this will be used to report which
+    // dialogue was moved during the assignment process.
+    wasMoved?: boolean
 }
 
-export function populateAllSections() {
-    const newSections: SectionData[] = [];
+let nextFreeIndex = 0;
+export const allDialogue: DialogueData[] = [];
+window['allDialogue'] = allDialogue;
+
+
+export function getNextFreeIndex() {
+    while(allDialogue[nextFreeIndex]) {
+        nextFreeIndex++;
+    }
+    return nextFreeIndex;
+}
+
+// Adds the dialogue data to the given index, displacing any existing data.
+function setDialogueIndex(index: number, data: DialogueData) {
+    // If this spot was assigned, move whatever is there to a new location.
+    const existingData = allDialogue[index];
+    allDialogue[index] = data;
+    if (!existingData) {
+        return;
+    }
+    const newIndex = getNextFreeIndex();
+    assignIndexToDialogueData(existingData, newIndex);
+    allDialogue[newIndex] = existingData;
+}
+
+// Sets the index to the NPCDefinition/Dialogue described by the dialoguedata and marks it as moved.
+function assignIndexToDialogueData(data: DialogueData, index: number): void {
+    if (data.objectData) {
+        data.objectData.definition.dialogueIndex = index;
+    } else if (data.hashData) {
+        const textOption = dialogueHash[data.hashData.npcKey]?.options?.[data.hashData.optionIndex]?.text?.[data.hashData.textIndex];
+        if (!textOption) {
+            console.error('Missing text option for ', data.hashData);
+        }
+        textOption.dialogueIndex = index;
+    }
+    data.wasMoved = true;
+}
+
+export function populateAllDialogue() {
+    const newDialogueData: DialogueData[] = [];
     for (const zoneKey of Object.keys(zones)) {
         const zone = zones[zoneKey];
         // populate sections that already have an index to the allSections array.
@@ -43,39 +73,24 @@ export function populateAllSections() {
                 const isSpiritWorld = grid === floor.spiritGrid;
                 for (let y = 0; y < grid.length; y++) {
                     for (let x = 0; x < grid[y].length; x++) {
-                        for (const section of (grid[y][x]?.sections || [])) {
-                            const location: ZoneLocation = {
-                                zoneKey,
-                                floor: floorIndex,
-                                isSpiritWorld,
-                                areaGridCoords: {x, y},
-                                x: 0, y: 0,
-                                d: 'down'
+                        for (const object of (grid[y][x]?.objects || [])) {
+                            // Objects with negative dialogue index are ignored.
+                            if (object.type !== 'npc' || object.dialogueIndex < 0) {
+                                continue;
                             }
-                            if (section.index >= 0) {
-                                // If this spot was assigned, move whatever is there to a new location.
-                                if (allSections[section.index]) {
-                                    const newIndex = getNextFreeId();
-                                    allSections[newIndex] = allSections[section.index];
-                                    allSections[newIndex].section.index = newIndex;
-                                }
-                                allSections[section.index] = {
-                                    section,
-                                    area: getAreaFromLocation(location),
+                            const data: DialogueData = {
+                                objectData: {
+                                    definition: object,
                                     zoneKey,
                                     floor: floorIndex,
                                     coords: [x, y],
                                     isSpiritWorld,
-                                };
+                                },
+                            };
+                            if (object.dialogueIndex >= 0) {
+                                setDialogueIndex(object.dialogueIndex, data);
                             } else {
-                                newSections.push({
-                                    section,
-                                    area: getAreaFromLocation(location),
-                                    zoneKey,
-                                    floor: floorIndex,
-                                    coords: [x, y],
-                                    isSpiritWorld,
-                                });
+                                newDialogueData.push(data);
                             }
                         }
                     }
@@ -83,63 +98,39 @@ export function populateAllSections() {
             }
         }
     }
-    // Assign indexes to any sections that didn't have one yet and add them to allSections array.
-    for (const section of newSections) {
-        section.section.index = getNextFreeId();
-        allSections[section.section.index] = section;
-    }
-    populateSectionMapData();
-}
-
-function populateSectionMapData(): void {
-    for (const sectionData of allSections) {
-        const section = sectionData?.section;
-        if (!section) {
-            continue;
-        }
-        if (!section.mapId) {
-            section.mapId = sectionData.zoneKey;
-            if (sectionData.isSpiritWorld) {
-                section.mapId += 'Spirit';
-            }
-        }
-        if (!section.entranceId) {
-            if (!section.floorId) {
-                section.floorId = `${sectionData.floor + 1}F`;
-            }
-            if (!(section.mapX >= 0 && section.mapY >= 0)) {
-                section.mapX = sectionData.coords[0] * 2 + (section.x / 16) | 0;
-                section.mapY = sectionData.coords[1] * 2 + (section.y / 16) | 0;
-            }
-        }
-        // Sections that show overworld areas aren't added to any dungeon maps.
-        if (overworldKeys.includes(section.mapId)) {
-            continue;
-        }
-        const map = dungeonMaps[section.mapId] = dungeonMaps[section.mapId] || {floors: {}};
-        const floor = map.floors[section.floorId] = map.floors[section.floorId] || {sections: []};
-        floor.sections.push(section.index);
-    }
-    // Fix the maps so the floors appear in the order B(N), B(N - 1)..., B1, 1F, ... (N-1)F, (N)F.
-    for (const map of Object.values(dungeonMaps)) {
-        const orderedFloors = {};
-        const orderedKeys = Object.keys(map.floors).sort((a, b) => {
-            if (a[0] === 'B') {
-                if (b[0] === 'B') {
-                    return Number(b.substring(1)) - Number(a.substring(1));
+    for (const npcKey of Object.keys(dialogueHash)) {
+        const dialogueOptions = dialogueHash[npcKey].options;
+        for (let optionIndex = 0; optionIndex < dialogueOptions.length; optionIndex++) {
+            const textOptions = dialogueOptions[optionIndex].text;
+            for (let textIndex = 0; textIndex < textOptions.length; textIndex++) {
+                if (textOptions[textIndex].dialogueIndex < 0) {
+                    continue;
                 }
-                return -1;
-            } else {
-                if (b[0] === 'B') {
-                    return 1;
+                const data: DialogueData = {
+                    hashData: {
+                        npcKey,
+                        optionIndex,
+                        textIndex,
+                    },
+                };
+                if (textOptions[textIndex].dialogueIndex >= 0) {
+                    setDialogueIndex(textOptions[textIndex].dialogueIndex, data);
+                } else {
+                    newDialogueData.push(data);
                 }
-                return Number(a.substring(0, a.length - 1)) - Number(b.substring(0, b.length - 1));
             }
-            return 0;
-        })
-        for (const key of orderedKeys) {
-            orderedFloors[key] = map.floors[key];
         }
-        map.floors = orderedFloors;
+    }
+    // Assign indexes to any sections that didn't have one yet and add them to allDialogue array.
+    for (const dialogueData of newDialogueData) {
+        const newIndex = getNextFreeIndex();
+        allDialogue[newIndex] = dialogueData;
+        assignIndexToDialogueData(dialogueData, newIndex);
+    }
+    for (let index = 0; index < allDialogue.length; index++) {
+        const dialogue = allDialogue[index];
+        if (dialogue.wasMoved) {
+            console.log(dialogue, ' was moved to ', index);
+        }
     }
 }
