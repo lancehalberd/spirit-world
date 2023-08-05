@@ -3777,7 +3777,7 @@ const sf0_1x1: AreaDefinition = {
     objects: [
         {status: "normal", id: "warTempleLadder", x: 256, y: 240, type: "door", style: "ladderDown", d: "down", logicKey: "beastsDefeated", targetZone: "warTemple", targetObjectId: "warTempleLadder", locationCue: "War Temple 1F"},
         {status: "normal", id: "warTempleEntranceSpirit", x: 224, y: 496, type: "door", style: "stone", targetZone: "overworld", targetObjectId: "warTempleEntranceSpirit", d: "down", linked: true, spirit: true, locationCue: "War Temple 1F"},
-        {status: "normal", id: "", x: 224, y: 128, d: "down", behavior: "none", style: "sleepingLightningBeast", type: "npc", dialogue: "Leave me to my sleep little warrior.", customLogic: "warTempleBoss", logicKey: "sleepingBeastsLogic"},
+        {status: "normal", id: "", x: 224, y: 128, d: "down", behavior: "none", style: "sleepingLightningBeast", type: "npc", dialogue: "Leave me to my sleep little warrior.", customLogic: "warTempleBoss", logicKey: "sleepingBeastsLogic", dialogueIndex: 95},
         {status: "normal", id: "warTemple:0:1x1-door-3", x: 0, y: 96, type: "door", style: "stone", d: "left", linked: true, spirit: true},
         {status: "normal", id: "", x: 224, y: 480, type: "decoration", w: 16, h: 16, decorationType: "entranceLight", drawPriority: "background", linked: true, spirit: true},
         {status: "normal", id: "warTemple:0:1x1-door-2", x: 496, y: 96, type: "door", style: "stone", d: "right", linked: true, spirit: true},

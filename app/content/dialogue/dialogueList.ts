@@ -74,8 +74,16 @@ export function populateAllDialogue() {
                 for (let y = 0; y < grid.length; y++) {
                     for (let x = 0; x < grid[y].length; x++) {
                         for (const object of (grid[y][x]?.objects || [])) {
-                            // Objects with negative dialogue index are ignored.
-                            if (object.type !== 'npc' || object.dialogueIndex < 0) {
+                            if (object.type !== 'npc'
+                                // Objects with negative dialogue index are ignored.
+                                || object.dialogueIndex < 0
+                                // Objects with dialogue key are handled on the dialogue hash.
+                                || object.dialogueKey
+                            ) {
+                                if (object.type === 'npc' && object.dialogueIndex >= 0) {
+                                    delete object.dialogueIndex;
+                                    console.log('Index removed from', object.id, ' in ', zoneKey);
+                                }
                                 continue;
                             }
                             const data: DialogueData = {
@@ -129,8 +137,12 @@ export function populateAllDialogue() {
     }
     for (let index = 0; index < allDialogue.length; index++) {
         const dialogue = allDialogue[index];
-        if (dialogue.wasMoved) {
-            console.log(dialogue, ' was moved to ', index);
+        if (dialogue?.wasMoved) {
+            console.log(dialogue.hashData
+                ? dialogue.hashData
+                : `Zone dialogue from ${dialogue.objectData.zoneKey}`,
+                ' was moved to ', index
+            );
         }
     }
 }

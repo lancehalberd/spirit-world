@@ -130,9 +130,9 @@ const f0_0x0: AreaDefinition = {
     objects: [
         {status: "normal", id: "gardenHouse", x: 96, y: 240, type: "door", style: "wooden", targetZone: "overworld", targetObjectId: "overworld:holyCityGardenHouse", d: "down"},
         {status: "normal", id: "bridgeHouse", x: 352, y: 240, type: "door", style: "wooden", targetZone: "overworld", targetObjectId: "overworld:holyCityBridgeHouse", d: "down"},
-        {status: "normal", id: "holyCityInterior:0:0x0-npc-1", x: 400, y: 176, d: "left", behavior: "idle", style: "darkMonk", type: "npc", dialogue: "I love being a little outside of town. The hustle and bustle stresses me out."},
+        {status: "normal", id: "holyCityInterior:0:0x0-npc-1", x: 400, y: 176, d: "left", behavior: "idle", style: "darkMonk", type: "npc", dialogue: "I love being a little outside of town. The hustle and bustle stresses me out.", dialogueIndex: 101},
         {status: "normal", id: "citySmith", x: 120, y: 72, d: "down", behavior: "idle", style: "zoro", type: "npc", dialogue: "I can upgrade that Chakram!", dialogueKey: "citySmith"},
-        {status: "normal", id: "holyCityInterior:0:0x0-npc-2", x: 40, y: 144, d: "right", behavior: "idle", style: "midMonk", type: "npc", dialogue: "Tending my flowers makes feel closer to the spirits."},
+        {status: "normal", id: "holyCityInterior:0:0x0-npc-2", x: 40, y: 144, d: "right", behavior: "idle", style: "midMonk", type: "npc", dialogue: "Tending my flowers makes feel closer to the spirits.", dialogueIndex: 103},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 16, index: 74, mapId: 'overworld', entranceId: 'overworld:holyCityGardenHouse', mapX: 0, mapY: 0},
@@ -312,15 +312,15 @@ const f0_1x0: AreaDefinition = {
     objects: [
         {status: "normal", id: "foodHouse", x: 96, y: 496, type: "door", style: "wooden", targetZone: "overworld", targetObjectId: "overworld:holyCityFoodHouse", d: "down"},
         {status: "normal", id: "clothesHouse", x: 352, y: 496, type: "door", style: "wooden", targetZone: "overworld", targetObjectId: "overworld:holyCityClothesHouse", d: "down"},
-        {status: "normal", id: "holyCityInterior:0:1x0-npc-1", x: 416, y: 352, d: "down", behavior: "idle", style: "paleMonk", type: "npc", dialogue: "You're practically dressed in rags! I guess I shouldn't expect any better of a dirty Vanara!"},
-        {status: "normal", id: "holyCityInterior:0:1x0-npc-2", x: 256, y: 128, d: "down", behavior: "idle", style: "midMonk", type: "npc", dialogue: "All this sawdust is making me cough! I really should sweep soon."},
+        {status: "normal", id: "holyCityInterior:0:1x0-npc-1", x: 416, y: 352, d: "down", behavior: "idle", style: "paleMonk", type: "npc", dialogue: "You're practically dressed in rags! I guess I shouldn't expect any better of a dirty Vanara!", dialogueIndex: 104},
+        {status: "normal", id: "holyCityInterior:0:1x0-npc-2", x: 256, y: 128, d: "down", behavior: "idle", style: "midMonk", type: "npc", dialogue: "All this sawdust is making me cough! I really should sweep soon.", dialogueIndex: 105},
         {status: "normal", id: "meanPerson", x: 56, y: 328, d: "down", behavior: "idle", style: "darkMonk", type: "npc", dialogue: "We don't serve Vanara food here, just regular food. Go somewhere else!", dialogueKey: "meanPerson"},
-        {status: "normal", id: "holyCityInterior:0:1x0-npc-0", x: 200, y: 432, d: "left", behavior: "idle", style: "darkMonk", type: "npc", dialogue: "We don't serve Vanara food here, just regular food. Go somewhere else!"},
+        {status: "normal", id: "holyCityInterior:0:1x0-npc-0", x: 200, y: 432, d: "left", behavior: "idle", style: "darkMonk", type: "npc", dialogue: "We don't serve Vanara food here, just regular food. Go somewhere else!", dialogueIndex: 107},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16, index: 77, mapId: 'holyCityInterior', floorId: '1F', mapX: 2, mapY: 0},
-        {x: 0, y: 16, w: 16, h: 16, index: 78, mapId: 'overworld', entranceId: 'overworld:holyCityFoodHouse', mapX: 2, mapY: 1},
-        {x: 16, y: 16, w: 16, h: 16, index: 79, mapId: 'overworld', entranceId: 'overworld:holyCityClothesHouse', mapX: 3, mapY: 1},
+        {x: 0, y: 0, w: 32, h: 16, index: 226, mapId: 'holyCityInterior', floorId: '1F', mapX: 2, mapY: 0},
+        {x: 0, y: 16, w: 16, h: 16, index: 462, mapId: 'overworld', entranceId: 'overworld:holyCityFoodHouse', mapX: 2, mapY: 1},
+        {x: 16, y: 16, w: 16, h: 16, index: 479, mapId: 'overworld', entranceId: 'overworld:holyCityClothesHouse', mapX: 3, mapY: 1},
     ],
 };
 const f0_0x1: AreaDefinition = null;
@@ -550,9 +550,9 @@ const f0_1x1: AreaDefinition = {
         {status: "normal", id: "", x: 448, y: 320, type: "spawnMarker"},
     ],
     sections: [
-        {x: 0, y: 0, w: 32, h: 16, index: 80, mapId: 'overworld', entranceId: 'moneyMazeEntrance', mapX: 2, mapY: 2},
-        {x: 0, y: 16, w: 16, h: 16, index: 81, mapId: 'overworld', entranceId: 'moneyMazeEntrance', mapX: 2, mapY: 3},
-        {x: 16, y: 16, w: 16, h: 16, index: 82, mapId: 'overworld', entranceId: 'moneyMazeEntrance', mapX: 3, mapY: 3},
+        {x: 0, y: 0, w: 32, h: 16, index: 475, mapId: 'overworld', entranceId: 'moneyMazeEntrance', mapX: 2, mapY: 2},
+        {x: 0, y: 16, w: 16, h: 16, index: 478, mapId: 'overworld', entranceId: 'moneyMazeEntrance', mapX: 2, mapY: 3},
+        {x: 16, y: 16, w: 16, h: 16, index: 225, mapId: 'overworld', entranceId: 'moneyMazeEntrance', mapX: 3, mapY: 3},
     ],
 };
 const sf0_0x0: AreaDefinition = {

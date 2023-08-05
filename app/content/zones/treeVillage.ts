@@ -1,6 +1,5 @@
 import { zones } from 'app/content/zones/zoneHash';
 
-
 const f0_0x0: AreaDefinition = {
     layers: [
         {
@@ -179,14 +178,14 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "northwestTreeEntrance", x: 96, y: 224, type: "door", style: "wooden", targetZone: "overworld", targetObjectId: "northwestTreeEntrance", d: "down"},
         {status: "normal", id: "storageVanara", x: 336, y: 384, d: "down", behavior: "none", style: "vanaraBrown", type: "npc", dialogueKey: "storageVanara"},
         {status: "closed", id: "vanaraStorageStairs", x: 384, y: 304, type: "door", style: "woodenDownstairs", targetZone: "treeVillage", targetObjectId: "vanaraStorageStairs", d: "up", openLogic: {"hasCustomLogic":true,"customLogic":"vanaraStoragePeachPiece","isInverted":false}},
-        {status: "normal", id: "", x: 432, y: 112, d: "down", behavior: "none", style: "vanaraBlack", type: "npc", dialogue: "Sorry, I can't play today."},
-        {status: "normal", id: "", x: 304, y: 144, d: "right", behavior: "none", style: "vanaraBlack", type: "npc", dialogue: "Please don't bother us."},
-        {status: "normal", id: "", x: 320, y: 160, d: "up", behavior: "none", style: "vanaraBrown", type: "npc", dialogue: "I'm just trying to eat, can you ask someone else?"},
-        {status: "normal", id: "", x: 432, y: 144, d: "up", behavior: "none", style: "vanaraBrown", type: "npc", dialogue: "Are you here to steal our food again? \n{|}Didn't you say it was so bland that you thought you lost your sense of taste?"},
-        {status: "normal", id: "", x: 320, y: 128, d: "down", behavior: "none", style: "vanaraBrown", type: "npc", dialogue: "You should go before you get in trouble again.{|}...or get us in trouble."},
+        {status: "normal", id: "", x: 432, y: 112, d: "down", behavior: "none", style: "vanaraBlack", type: "npc", dialogue: "Sorry, I can't play today.", dialogueIndex: 128},
+        {status: "normal", id: "", x: 304, y: 144, d: "right", behavior: "none", style: "vanaraBlack", type: "npc", dialogue: "Please don't bother us.", dialogueIndex: 129},
+        {status: "normal", id: "", x: 320, y: 160, d: "up", behavior: "none", style: "vanaraBrown", type: "npc", dialogue: "I'm just trying to eat, can you ask someone else?", dialogueIndex: 130},
+        {status: "normal", id: "", x: 432, y: 144, d: "up", behavior: "none", style: "vanaraBrown", type: "npc", dialogue: "Are you here to steal our food again? \n{|}Didn't you say it was so bland that you thought you lost your sense of taste?", dialogueIndex: 131},
+        {status: "normal", id: "", x: 320, y: 128, d: "down", behavior: "none", style: "vanaraBrown", type: "npc", dialogue: "You should go before you get in trouble again.{|}...or get us in trouble.", dialogueIndex: 132},
         {status: "normal", id: "", x: 320, y: 144, type: "pushPull"},
         {status: "normal", id: "", x: 432, y: 128, type: "pushPull"},
-        {status: "normal", id: "", x: 192, y: 144, d: "left", behavior: "none", style: "vanaraBlack", type: "npc", dialogue: "Can you tell me the one about the Monkey King again?"},
+        {status: "normal", id: "", x: 192, y: 144, d: "left", behavior: "none", style: "vanaraBlack", type: "npc", dialogue: "Can you tell me the one about the Monkey King again?", dialogueIndex: 133},
         {status: "normal", id: "", x: 48, y: 112, type: "pushPull"},
         {status: "normal", id: "", x: 80, y: 96, type: "pushPull"},
         {status: "normal", id: "", x: 64, y: 96, type: "pushPull"},

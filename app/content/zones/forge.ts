@@ -618,7 +618,7 @@ const sf0_0x0: AreaDefinition = {
     objects: [
         {status: "normal", id: "forgeEntrance", x: 224, y: 496, type: "door", style: "cavern", targetZone: "sky", targetObjectId: "forgeEntrance", d: "down", locationCue: "Forge 1F"},
         {status: "normal", id: "forgeSmallMoney", x: 456, y: 88, type: "chest", lootType: "money", lootLevel: 1, hasCustomLogic: true, customLogic: "forgeLava1", lootAmount: 50},
-        {status: "normal", id: "forgeWorker", x: 80, y: 400, d: "down", behavior: "idle", style: "gal", type: "npc", dialogue: "Be careful, lava has flooded the forge!\n{|}You can coat yourself with spirit dust for temporary protection."},
+        {status: "normal", id: "forgeWorker", x: 80, y: 400, d: "down", behavior: "idle", style: "gal", type: "npc", dialogue: "Be careful, lava has flooded the forge!\n{|}You can coat yourself with spirit dust for temporary protection.", dialogueIndex: 96},
         {status: "normal", id: "", linked: true, x: 64, y: 272, type: "door", style: "cavern", d: "up", spirit: true},
         {status: "normal", id: "", linked: true, x: 416, y: 272, type: "door", style: "cavern", d: "up", spirit: true},
         {status: "normal", id: "", linked: true, x: 464, y: 320, type: "teleporter", spirit: true},

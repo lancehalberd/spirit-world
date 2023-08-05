@@ -1,6 +1,5 @@
 import { zones } from 'app/content/zones/zoneHash';
 
-
 const f0_0x0: AreaDefinition = {
     layers: [
         {
@@ -258,7 +257,7 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "", x: 496, y: 96, type: "door", style: "wooden", targetObjectId: "fireSanctumKey", d: "right"},
         {status: "normal", id: "", x: 80, y: 288, type: "door", style: "wooden", d: "up"},
         {status: "normal", id: "", x: 64, y: 240, type: "door", style: "wooden", d: "down"},
-        {status: "normal", id: "holyCityInterior:0:0x0-npc-0", x: 240, y: 384, d: "down", behavior: "random", style: "midMonk", type: "npc", dialogue: "Ommmmmmm..."},
+        {status: "normal", id: "holyCityInterior:0:0x0-npc-0", x: 240, y: 384, d: "down", behavior: "random", style: "midMonk", type: "npc", dialogue: "Ommmmmmm...", dialogueIndex: 108},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16, index: 86, mapId: 'overworld', entranceId: 'grandTempleEntrance', mapX: 0, mapY: 0},
@@ -477,7 +476,7 @@ const f0_1x0: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "", x: 248, y: 256, d: "down", behavior: "idle", style: "midMonk", type: "npc", dialogue: "May the Spirits guide you."},
+        {status: "normal", id: "", x: 248, y: 256, d: "down", behavior: "idle", style: "midMonk", type: "npc", dialogue: "May the Spirits guide you.", dialogueIndex: 109},
         {status: "normal", id: "", x: 0, y: 96, type: "door", style: "wooden", targetObjectId: "fireSanctumKey", d: "left"},
         {status: "normal", id: "", x: 496, y: 96, type: "door", style: "wooden", targetObjectId: "fireSanctumKey", d: "right"},
         {status: "normal", id: "gauntletEntrance", x: 80, y: 32, type: "door", style: "woodenDownstairs", targetZone: "gauntlet", targetObjectId: "gauntletEntrance", d: "up", locationCue: "Grand Temple"},
@@ -743,7 +742,7 @@ const f0_2x0: AreaDefinition = {
         {status: "normal", id: "", x: 0, y: 96, type: "door", style: "wooden", targetObjectId: "fireSanctumKey", d: "left"},
         {status: "normal", id: "", x: 400, y: 288, type: "door", style: "wooden", d: "up"},
         {status: "normal", id: "", x: 384, y: 240, type: "door", style: "wooden", d: "down"},
-        {status: "normal", id: "holyCityInterior:0:0x0-npc-0", x: 232, y: 392, d: "down", behavior: "random", style: "darkMonk", type: "npc", dialogue: "Ommmmmmm..."},
+        {status: "normal", id: "holyCityInterior:0:0x0-npc-0", x: 232, y: 392, d: "down", behavior: "random", style: "darkMonk", type: "npc", dialogue: "Ommmmmmm...", dialogueIndex: 110},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16, index: 89, mapId: 'overworld', entranceId: 'grandTempleEntrance', mapX: 4, mapY: 0},
@@ -1004,7 +1003,7 @@ const f0_0x1: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "holyCityInterior:0:0x0-npc-0", x: 336, y: 280, d: "down", behavior: "random", style: "paleMonk", type: "npc", dialogue: "Ommmmmmm..."},
+        {status: "normal", id: "holyCityInterior:0:0x0-npc-0", x: 336, y: 280, d: "down", behavior: "random", style: "paleMonk", type: "npc", dialogue: "Ommmmmmm...", dialogueIndex: 111},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 32, index: 91, mapId: 'overworld', entranceId: 'grandTempleEntrance', mapX: 0, mapY: 2},
@@ -1442,7 +1441,7 @@ const f0_2x1: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "holyCityInterior:0:0x0-npc-0", x: 88, y: 392, d: "down", behavior: "random", style: "midMonk", type: "npc", dialogue: "Ommmmmmm..."},
+        {status: "normal", id: "holyCityInterior:0:0x0-npc-0", x: 88, y: 392, d: "down", behavior: "random", style: "midMonk", type: "npc", dialogue: "Ommmmmmm...", dialogueIndex: 112},
     ],
     sections: [
         {x: 0, y: 0, w: 16, h: 32, index: 94, mapId: 'overworld', entranceId: 'grandTempleEntrance', mapX: 4, mapY: 2},
