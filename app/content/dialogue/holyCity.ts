@@ -63,7 +63,6 @@ dialogueHash.meanPerson = {
                 },
                 {
                     dialogueIndex: 14,
-                    dialogueType: 'subquest',
                     text: `Scram monkey.`,
                 },
             ],

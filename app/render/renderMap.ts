@@ -21,7 +21,10 @@ const menuSlices = createAnimation('gfx/hud/menu9slice.png', {w: 8, h: 8}, {cols
 
 const borderSize = 4;
 const worldSize = 192;
-
+const [
+    /*speechBubble*/,
+    /*yellowQuest*/,
+] = createAnimation('gfx/npcs/dialoguebubble.png', {w: 12, h: 12}, {cols: 11}).frames;
 
 export function renderMap(context: CanvasRenderingContext2D, state: GameState): void {
     if (overworldKeys.includes(state.location.zoneKey)) {
@@ -93,9 +96,15 @@ export function renderOverworldMap(context: CanvasRenderingContext2D, state: Gam
     if (state.time % 1000 <= 600) {
         const location = getMapTarget(state);
         if (location && location.zoneKey === zone && location.isSpiritWorld === state.location.isSpiritWorld) {
+            const mapCoordinates = convertLocationToMapCoordinates(location);
+            /*drawFrame(context, yellowQuest, {
+                x: r.x + mapCoordinates.x - 12,
+                y: r.y + mapCoordinates.y - 12,
+                w: yellowQuest.w * 2,
+                h: yellowQuest.h * 2,
+            });*/
             context.strokeStyle = 'red';
             context.beginPath();
-            const mapCoordinates = convertLocationToMapCoordinates(location);
             const x = r.x + mapCoordinates.x, y = r.y + mapCoordinates.y;
             context.moveTo(x - 6, y - 6);
             context.lineTo(x + 6, y + 6);

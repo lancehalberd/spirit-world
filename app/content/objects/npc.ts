@@ -15,11 +15,19 @@ import {
 import { lightningBeastAnimations } from 'app/content/npcs/npcAnimations'
 import { shadowFrame, smallShadowFrame } from 'app/renderActor';
 import { showMessage } from 'app/scriptEvents';
-import { drawFrame, getFrame } from 'app/utils/animations';
-import { selectDialogueOption } from 'app/utils/dialogue';
+import { createAnimation, drawFrame, getFrame } from 'app/utils/animations';
+import { isDialogueHeard, selectDialogueOption, setDialogueHeard } from 'app/utils/dialogue';
+import { directionMap, rotateDirection } from 'app/utils/direction';
 import { sample } from 'app/utils/index';
 import { moveNPC } from 'app/utils/npc';
-import { directionMap, rotateDirection } from 'app/utils/direction';
+
+const [
+    speechBubble,
+    yellowQuest, /*redQuest*/, /*greenQuest*/, blueQuest,
+    /*yellowHint*/, /*redHint*/, greenHint, /*blueHint*/,
+    /*blackQuest*/,
+    speechDots,
+] = createAnimation('gfx/npcs/dialoguebubble.png', {w: 12, h: 12}, {cols: 11}).frames;
 
 
 interface NPCStyleDefinition {
@@ -259,12 +267,31 @@ export class NPC implements Actor, ObjectInstance  {
         this.mode = mode;
         this.modeTime = 0;
     }
+    getNextDialogue(state: GameState): Dialogue|undefined {
+        if (!this.definition.dialogueKey) {
+            return {
+                text: this.definition.dialogue ?? '...',
+                dialogueIndex: this.definition.dialogueIndex ?? -1,
+                dialogueType: this.definition.dialogueType,
+            };
+        }
+        const dialogueOption = selectDialogueOption(state, this.definition.dialogueKey);
+        if (!dialogueOption) {
+            return;
+        }
+        if (dialogueOption !== this.lastDialogueOption) {
+            this.dialogueIndex = 0;
+        }
+        this.lastDialogueOption = dialogueOption;
+        return dialogueOption.text[this.dialogueIndex];
+    }
     update(state: GameState) {
         if (this.showMessage) {
             this.showMessage = false;
             if (!this.definition.dialogueKey) {
                 // This text is shown if custom dialogue is set for an NPC but not defined.
                 showMessage(state, this.definition.dialogue ?? '...');
+                setDialogueHeard(state, this.definition.dialogueIndex);
                 return;
             }
             const dialogueOption = selectDialogueOption(state, this.definition.dialogueKey);
@@ -278,11 +305,13 @@ export class NPC implements Actor, ObjectInstance  {
             }
             this.lastDialogueOption = dialogueOption;
             // Need to track if the dialogue option changed here so that we can reset index if it changes.
-            showMessage(state, dialogueOption.text[this.dialogueIndex].text);
+            const dialogue = dialogueOption.text[this.dialogueIndex];
+            showMessage(state, dialogue.text);
             this.dialogueIndex++;
             if (this.dialogueIndex >= dialogueOption.text.length) {
                 this.dialogueIndex = dialogueOption.repeatIndex ?? this.dialogueIndex - 1;
             }
+            setDialogueHeard(state, dialogue.dialogueIndex);
             return;
         }
         npcBehaviors[this.definition.behavior]?.(state, this);
@@ -296,9 +325,9 @@ export class NPC implements Actor, ObjectInstance  {
         if (this.d === 'right' && animationStyle.flipRight) {
             // Flip the frame when facing right. We may need an additional flag for this behavior
             // if we don't do it for all enemies on the right frames.
-            const w = frame.content?.w ?? frame.w;
+            const w = (frame.content?.w ?? frame.w) * scale;
             context.save();
-                context.translate((this.x | 0) + ((frame?.content?.x || 0) + w / 2) * scale, 0);
+                context.translate((this.x | 0) + (frame?.content?.x || 0) * scale + w / 2, 0);
                 context.scale(-1, 1);
                 drawFrame(context, frame, { ...frame,
                     x: - w / 2 - (frame?.content?.x || 0) * scale,
@@ -316,6 +345,27 @@ export class NPC implements Actor, ObjectInstance  {
             });
         }
         //drawFrameAt(context, frame, this);
+        const dialogue = this.getNextDialogue(state);
+        if (dialogue) {
+            context.save();
+                if (dialogue.dialogueType === 'reminder' || isDialogueHeard(state, dialogue.dialogueIndex)) {
+                    context.globalAlpha *= 0.5;
+                }
+                const w = (frame.content?.w ?? frame.w) * scale;
+                const x = this.x + w / 2, y = this.y - (frame?.content?.y || 0) * scale - this.z - 12;
+                drawFrame(context, speechBubble, {...speechBubble, x, y });
+                if (dialogue.dialogueType === 'quest') {
+                    drawFrame(context, yellowQuest, {...yellowQuest, x, y });
+                } else if (dialogue.dialogueType === 'subquest') {
+                    drawFrame(context, blueQuest, {...blueQuest, x, y });
+                } else if (dialogue.dialogueType === 'hint' || dialogue.dialogueType === 'reminder') {
+                    drawFrame(context, blueQuest, {...greenHint, x, y });
+                } else {
+                    drawFrame(context, speechDots, {...speechDots, x, y });
+                }
+            context.restore();
+        }
+
     }
     renderShadow(context: CanvasRenderingContext2D, state: GameState) {
         const animationStyle = npcStyles[this.definition.style];

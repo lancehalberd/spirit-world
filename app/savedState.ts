@@ -5,6 +5,8 @@ export function getDefaultSavedState(): SavedState {
         dungeonInventories: {},
         // Used to track what parts of the map are displayed.
         exploredSections: [],
+        // Used to track what dialogue the player has heard.
+        heardDialogue: [],
         objectFlags: {},
         zoneFlags: {},
         luckyBeetles: [],

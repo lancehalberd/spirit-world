@@ -17,3 +17,24 @@ export function selectDialogueOption(state: GameState, dialogueKey: string): Dia
     }
     return null;
 }
+
+export function isDialogueHeard(state: GameState, dialogueIndex: number): boolean {
+    if (!(dialogueIndex >= 0)) {
+        return false;
+    }
+    const numberIndex = (dialogueIndex / 32) | 0;
+    const bitIndex = dialogueIndex % 32;
+    return !!(state.savedState.heardDialogue[numberIndex] >> bitIndex & 1)
+}
+
+export function setDialogueHeard(state: GameState, dialogueIndex: number) {
+    if (!(dialogueIndex >= 0)) {
+        return;
+    }
+    const numberIndex = (dialogueIndex / 32) | 0;
+    const bitIndex = dialogueIndex % 32;
+    if (!(state.savedState.heardDialogue[numberIndex] >> bitIndex & 1)) {
+        state.savedState.heardDialogue[numberIndex] = state.savedState.heardDialogue[numberIndex] || 0;
+        state.savedState.heardDialogue[numberIndex] = state.savedState.heardDialogue[numberIndex] | (1 << bitIndex);
+    }
+}

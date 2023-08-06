@@ -87,30 +87,30 @@ export class MovingPlatform implements ObjectInstance {
         const w = this.w - 12, h = this.h - 12;
         // Top
         let y = this.y;
-        drawFrameAt(context, {...frame, x: 0, y: 0, w: 6, h: 6}, { x: this.x, y });
+        drawFrameAt(context, {...frame, x: frame.x, y: frame.y, w: 6, h: 6}, { x: this.x, y });
         for (let x = this.x + 6; x < this.x + 6 + w; x += 20) {
             const sw = Math.min(20, this.x + 6 + w - x);
-            drawFrameAt(context, {...frame, x: 6, y: 0, w: sw, h: 6}, { x, y });
+            drawFrameAt(context, {...frame, x: frame.x + 6, y: frame.y, w: sw, h: 6}, { x, y });
         }
-        drawFrameAt(context, {...frame, x: 26, y: 0, w: 6, h: 6}, { x: this.x + this.w - 6, y });
+        drawFrameAt(context, {...frame, x: frame.x + 26, y: frame.y, w: 6, h: 6}, { x: this.x + this.w - 6, y });
         // Middle
         for (y = this.y + 6; y < this.y + 6 + h; y += 20) {
             const sh = Math.min(20, this.y + 6 + h - y);
-            drawFrameAt(context, {...frame, x: 0, y: 6, w: 6, h: sh}, { x: this.x, y });
+            drawFrameAt(context, {...frame, x: frame.x, y: frame.y + 6, w: 6, h: sh}, { x: this.x, y });
             for (let x = this.x + 6; x < this.x + w; x += 20) {
                 const sw = Math.min(20, this.x + 6 + w - x);
-                drawFrameAt(context, {...frame, x: 6, y: 6, w: sw, h: sh}, { x, y });
+                drawFrameAt(context, {...frame, x: frame.x + 6, y: frame.y + 6, w: sw, h: sh}, { x, y });
             }
-            drawFrameAt(context, {...frame, x: 26, y: 6, w: 6, h: sh}, { x: this.x + this.w - 6, y });
+            drawFrameAt(context, {...frame, x: frame.x + 26, y: frame.y + 6, w: 6, h: sh}, { x: this.x + this.w - 6, y });
         }
         // Bottom
         y = this.y + this.h - 6
-        drawFrameAt(context, {...frame, x: 0, y: 26, w: 6, h: 6}, { x: this.x, y });
+        drawFrameAt(context, {...frame, x: frame.x, y: frame.y + 26, w: 6, h: 6}, { x: this.x, y });
         for (let x = this.x + 6; x < this.x + 6 + w; x += 20) {
             const sw = Math.min(20, this.x + 6 + w - x);
-            drawFrameAt(context, {...frame, x: 6, y: 26, w: sw, h: 6}, { x, y });
+            drawFrameAt(context, {...frame, x: frame.x + 6, y: frame.y + 26, w: sw, h: 6}, { x, y });
         }
-        drawFrameAt(context, {...frame, x: 26, y: 26, w: 6, h: 6}, { x: this.x + this.w - 6, y });
+        drawFrameAt(context, {...frame, x: frame.x + 26, y: frame.y + 26, w: 6, h: 6}, { x: this.x + this.w - 6, y });
     }
 }
 objectHash.movingPlatform = MovingPlatform;
