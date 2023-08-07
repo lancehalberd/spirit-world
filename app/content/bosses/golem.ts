@@ -217,6 +217,10 @@ enemyDefinitions.golem = {
         }
     },
     onHit(state: GameState, enemy: Enemy, hit: HitProperties): HitResult {
+        // Thrown objects can hurt the golem as if it as an ordinary enemy.
+        if (hit.isThrownObject) {
+            return enemy.defaultOnHit(state, hit);
+        }
         // Cannot damage the golem head at all unless it is in a mode where its mouth is open.
         if (!['chargeLaser', 'fireLaser', 'firingLaser', 'cooldown'].includes(enemy.mode)) {
             return enemy.defaultBlockHit(state, hit);
