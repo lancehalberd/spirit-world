@@ -151,6 +151,27 @@ function updateObjectsToRender(this: void, state: GameState, area: AreaInstance)
             }
         }
     }
+    // Also include anything from the alternate area that has an `alternateRender*` method defined.
+    // For example, Vanara NPCs render faint spirits in the alternate world.
+    for (const object of [...area?.alternateArea?.objects || [], ...area?.alternateArea?.effects || []]) {
+        for (const part of [object, ...(object.getParts?.(state) || [])]) {
+            // Invisible objects are not rendered unless the hero has true sight.
+            if (!editingState.isEditing && !state.hero.passiveTools.trueSight && object.definition?.isInvisible) {
+                continue;
+            }
+            if (part.alternateRender || part.alternateRenderShadow || part.alternateRenderForeground) {
+                area.objectsToRender.push(part);
+                if (part.getYDepth) {
+                    part.yDepth = part.getYDepth();
+                } else if (part.getHitbox) {
+                    const hitbox = part.getHitbox();
+                    part.yDepth = hitbox.y + hitbox.h;
+                } else {
+                    part.yDepth = part.y;
+                }
+            }
+        }
+    }
 }
 
 export function renderField(
@@ -293,7 +314,11 @@ export function renderAreaBackground(context: CanvasRenderingContext2D, state: G
         drawCanvas(context, area.canvas, source, target);
         for (const object of area.objectsToRender) {
             if (object.drawPriority === 'background' || object.getDrawPriority?.(state) === 'background') {
-                object.render?.(context, state);
+                if (object.area === area) {
+                    object.render?.(context, state);
+                } else {
+                    object.alternateRender?.(context, state);
+                }
             }
         }
     context.restore();
@@ -342,8 +367,10 @@ export function renderAreaObjectsBeforeHero(
         }
         // Render shadows before anything else.
         for (const object of area.objectsToRender) {
-            if (object.renderShadow) {
-                object.renderShadow(context, state);
+            if (object.area === area) {
+                object.renderShadow?.(context, state);
+            } else {
+                object.alternateRenderShadow?.(context, state);
             }
         }
         const spriteObjects: (EffectInstance | ObjectInstance)[] = [];
@@ -357,14 +384,20 @@ export function renderAreaObjectsBeforeHero(
             if ((object.drawPriority === 'sprites' || object.getDrawPriority?.(state) === 'sprites')
                 && object.yDepth <= heroYDepth
             ) {
-                if (object.render) {
+                if (object.area === area && object.render) {
+                    spriteObjects.push(object);
+                } else if (object.area !== area && object.alternateRender) {
                     spriteObjects.push(object);
                 }
             }
         }
         spriteObjects.sort((A, B) => A.yDepth - B.yDepth);
         for (const objectOrEffect of spriteObjects) {
-            objectOrEffect.render(context, state);
+            if (objectOrEffect.area === area) {
+                objectOrEffect.render?.(context, state);
+            } else {
+                objectOrEffect.alternateRender?.(context, state);
+            }
         }
     context.restore();
 }
@@ -393,7 +426,9 @@ export function renderAreaObjectsAfterHero(
             if ((object.drawPriority === 'sprites' || object.getDrawPriority?.(state) === 'sprites')
                 && (object.yDepth) > heroYDepth
             ) {
-                if (object.render) {
+                if (object.area === area && object.render) {
+                    spriteObjects.push(object);
+                } else if (object.area !== area && object.alternateRender) {
                     spriteObjects.push(object);
                 }
             }
@@ -401,7 +436,11 @@ export function renderAreaObjectsAfterHero(
         // Sprite objects are rendered in order of their y positions.
         spriteObjects.sort((A, B) => A.yDepth - B.yDepth);
         for (const objectOrEffect of spriteObjects) {
-            objectOrEffect.render(context, state);
+            if (objectOrEffect.area === area) {
+                objectOrEffect.render?.(context, state);
+            } else {
+                objectOrEffect.alternateRender?.(context, state);
+            }
         }
     context.restore();
 }
@@ -421,7 +460,9 @@ export function renderForegroundObjects(
         }
         const foregroundObjects: (EffectInstance | ObjectInstance)[] = [];
         for (const object of area.objectsToRender) {
-            if (object.renderForeground) {
+            if ((object.area === area && object.renderForeground)
+                || (object.area !== area && object.alternateRenderForeground)
+            ) {
                 foregroundObjects.push(object);
             } else {
                 const drawPriority = object.drawPriority || object.getDrawPriority?.(state);
@@ -431,10 +472,18 @@ export function renderForegroundObjects(
             }
         }
         for (const object of foregroundObjects) {
-            if (object.renderForeground) {
-                object.renderForeground(context, state);
+            if (object.area === area) {
+                if (object.renderForeground) {
+                    object.renderForeground(context, state);
+                } else {
+                    object.render?.(context, state);
+                }
             } else {
-                object.render?.(context, state);
+                if (object.alternateRenderForeground) {
+                    object.alternateRenderForeground(context, state);
+                } else {
+                    object.alternateRender?.(context, state);
+                }
             }
         }
         state.hero.renderForeground?.(context, state);

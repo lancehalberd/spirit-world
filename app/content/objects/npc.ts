@@ -2,6 +2,7 @@ import { objectHash } from 'app/content/objects/objectHash';
 import { rivalAnimations, snakeAnimations } from 'app/content/enemyAnimations';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { heroAnimations } from 'app/render/heroAnimations';
+import { heroSpiritAnimations } from 'app/render/heroAnimations';
 import {
     galAnimations, gal2Animations,
     guyAnimations, guy2Animations,
@@ -35,6 +36,23 @@ interface NPCStyleDefinition {
     scale?: number
     shadowOffset?: number
     flipRight?: boolean
+    alternateRender?: (context: CanvasRenderingContext2D, state: GameState, npc: NPC) => void
+}
+
+function renderVanaraSpirit(this: void, context: CanvasRenderingContext2D, state: GameState, npc: NPC): void {
+    const animationStyle = npcStyles[npc.definition.style];
+    const scale = animationStyle.scale || 1;
+    const animationSet = heroSpiritAnimations[npc.currentAnimationKey] || heroSpiritAnimations.idle;
+    const frame = getFrame(animationSet[npc.d], npc.animationTime);
+    context.save();
+        context.globalAlpha *= 0.2;
+        drawFrame(context, frame, { ...frame,
+            x: npc.x - (frame?.content?.x || 0) * scale,
+            y: npc.y - (frame?.content?.y || 0) * scale - npc.z,
+            w: frame.w * scale,
+            h: frame.h * scale,
+        });
+    context.restore();
 }
 
 export const npcStyles = {
@@ -70,6 +88,7 @@ export const npcStyles = {
     rival: {
         animations: rivalAnimations,
         shadowOffset: 1,
+        alternateRender: renderVanaraSpirit,
     } as NPCStyleDefinition,
     paleMonk: {
         animations: paleMonkAnimations,
@@ -86,34 +105,42 @@ export const npcStyles = {
     vanara: {
         animations: heroAnimations,
         shadowOffset: 1,
+        alternateRender: renderVanaraSpirit,
     } as NPCStyleDefinition,
     vanaraBlack: {
         animations: vanaraBlackAnimations,
         shadowOffset: 1,
+        alternateRender: renderVanaraSpirit,
     } as NPCStyleDefinition,
     vanaraBlue: {
         animations: vanaraBlueAnimations,
         shadowOffset: 1,
+        alternateRender: renderVanaraSpirit,
     } as NPCStyleDefinition,
     vanaraBrown: {
         animations: vanaraBrownAnimations,
         shadowOffset: 1,
+        alternateRender: renderVanaraSpirit,
     } as NPCStyleDefinition,
     vanaraGold: {
         animations: vanaraGoldAnimations,
         shadowOffset: 1,
+        alternateRender: renderVanaraSpirit,
     } as NPCStyleDefinition,
     vanaraGray: {
         animations: vanaraGrayAnimations,
         shadowOffset: 1,
+        alternateRender: renderVanaraSpirit,
     } as NPCStyleDefinition,
     vanaraPurple: {
         animations: vanaraPurpleAnimations,
         shadowOffset: 1,
+        alternateRender: renderVanaraSpirit,
     } as NPCStyleDefinition,
     vanaraRed: {
         animations: vanaraRedAnimations,
         shadowOffset: 1,
+        alternateRender: renderVanaraSpirit,
     } as NPCStyleDefinition,
     zoro: {
         animations: zoroAnimations,
@@ -207,6 +234,7 @@ export class NPC implements Actor, ObjectInstance  {
     w = 16;
     h = 16;
     groundHeight = 0;
+    currentAnimationKey: string;
     currentAnimation: FrameAnimation;
     animationTime = 0;
     mode = 'choose';
@@ -249,6 +277,7 @@ export class NPC implements Actor, ObjectInstance  {
         hero.action = null;
     }
     changeToAnimation(type: string) {
+        this.currentAnimationKey = type;
         const animationStyle = npcStyles[this.definition.style];
         const animationSet = animationStyle.animations[type] || animationStyle.animations.idle;
         const targetAnimation = animationSet[this.d];
@@ -258,6 +287,7 @@ export class NPC implements Actor, ObjectInstance  {
         }
     }
     setAnimation(type: string, d: Direction, time: number = 0) {
+        this.currentAnimationKey = type;
         const animationStyle = npcStyles[this.definition.style];
         const animationSet = animationStyle.animations[type] || animationStyle.animations.idle;
         this.currentAnimation = animationSet[d];
@@ -365,7 +395,6 @@ export class NPC implements Actor, ObjectInstance  {
                 }
             context.restore();
         }
-
     }
     renderShadow(context: CanvasRenderingContext2D, state: GameState) {
         const animationStyle = npcStyles[this.definition.style];
@@ -377,6 +406,10 @@ export class NPC implements Actor, ObjectInstance  {
             w: frame.w * scale,
             h: frame.h * scale,
         });
+    }
+    alternateRender(context: CanvasRenderingContext2D, state: GameState) {
+        const animationStyle = npcStyles[this.definition.style];
+        animationStyle.alternateRender?.(context, state, this);
     }
 }
 objectHash.npc = NPC;

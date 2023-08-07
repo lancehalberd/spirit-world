@@ -48,18 +48,32 @@ interface AssignmentState {
     assignedContents: string[]
 }
 
-interface ObjectInstance {
-    isObject: true
+interface BaseFieldInstance {
     area?: AreaInstance
-    definition?: ObjectDefinition
-    linkedObject?: ObjectInstance
     behaviors?: TileBehaviors
-    // If this is true behaviors will be applied to the behavior grid when this
-    // object gets added.
-    applyBehaviorsToGrid?: boolean
     getBehaviors?: (state: GameState) => TileBehaviors
     drawPriority?: DrawPriority
     getDrawPriority?: (state: GameState) => DrawPriority
+    render: (context: CanvasRenderingContext2D, state: GameState) => void
+    renderShadow?: (context: CanvasRenderingContext2D, state: GameState) => void
+    renderForeground?: (context: CanvasRenderingContext2D, state: GameState) => void
+    alternateRender?: (context: CanvasRenderingContext2D, state: GameState) => void
+    alternateRenderShadow?: (context: CanvasRenderingContext2D, state: GameState) => void
+    alternateRenderForeground?: (context: CanvasRenderingContext2D, state: GameState) => void
+}
+
+interface ObjectInstance extends BaseFieldInstance {
+    isObject: true
+    definition?: ObjectDefinition
+    linkedObject?: ObjectInstance
+    // Optional render method for previewing the object in the editor palette or area.
+    // This method draws the object to a set target rectangle and should render the object
+    // unambiguously so that editors can distinguish between different objects that may normally
+    // look identical.
+    renderPreview?: (context: CanvasRenderingContext2D, target: Rect) => void
+    // If this is true behaviors will be applied to the behavior grid when this
+    // object gets added.
+    applyBehaviorsToGrid?: boolean
     // Set this flag for objects that need to update during screen transitions, such as doorways.
     updateDuringTransition?: boolean
     changesAreas?: boolean
@@ -119,17 +133,6 @@ interface ObjectInstance {
     update?: (state: GameState) => void
     add?: (state: GameState, area: AreaInstance) => void
     remove?: (state: GameState) => void
-    render: (context: CanvasRenderingContext2D, state: GameState) => void
-    // Optional render method for previewing the object in the editor palette or area.
-    // This method draws the object to a set target rectangle and should render the object
-    // unambiguously so that editors can distinguish between different objects that may normally
-    // look identical.
-    renderPreview?: (context: CanvasRenderingContext2D, target: Rect) => void
-    renderShadow?: (context: CanvasRenderingContext2D, state: GameState) => void
-    renderForeground?: (context: CanvasRenderingContext2D, state: GameState) => void
-    alternateRender?: (context: CanvasRenderingContext2D, state: GameState) => void
-    alternateRenderShadow?: (context: CanvasRenderingContext2D, state: GameState) => void
-    alternateRenderForeground?: (context: CanvasRenderingContext2D, state: GameState) => void
     isAllyTarget?: boolean
     isEnemyTarget?: boolean
     isNeutralTarget?: boolean
@@ -141,17 +144,11 @@ interface ObjectInstance {
     getParts?: (state: GameState) => ObjectInstance[]
 }
 
-interface EffectInstance {
+interface EffectInstance extends BaseFieldInstance {
     isEffect: true
-    area?: AreaInstance
     linkedObject?: EffectInstance
-    // This is used for effects that create light around them.
-    behaviors?: TileBehaviors
-    getBehaviors?: (state: GameState) => TileBehaviors
     // Only used by the held chakram at the moment.
     changesAreas?: boolean
-    drawPriority?: DrawPriority
-    getDrawPriority?: (state: GameState) => DrawPriority
     // Set this flag for objects that need to update during screen transitions, such as doorways.
     updateDuringTransition?: boolean
     x?: number
@@ -176,9 +173,6 @@ interface EffectInstance {
     update?: (state: GameState) => void
     add?: (state: GameState, area: AreaInstance) => void
     remove?: (state: GameState) => void
-    render: (context: CanvasRenderingContext2D, state: GameState) => void
-    renderShadow?: (context: CanvasRenderingContext2D, state: GameState) => void
-    renderForeground?: (context: CanvasRenderingContext2D, state: GameState) => void
     isAllyTarget?: boolean
     isEnemyTarget?: boolean
     isNeutralTarget?: boolean
