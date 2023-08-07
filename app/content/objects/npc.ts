@@ -1,5 +1,5 @@
 import { objectHash } from 'app/content/objects/objectHash';
-import { snakeAnimations } from 'app/content/enemyAnimations';
+import { rivalAnimations, snakeAnimations } from 'app/content/enemyAnimations';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { heroAnimations } from 'app/render/heroAnimations';
 import {
@@ -68,7 +68,7 @@ export const npcStyles = {
         shadowOffset: 1,
     } as NPCStyleDefinition,
     rival: {
-        animations: vanaraBlackAnimations,
+        animations: rivalAnimations,
         shadowOffset: 1,
     } as NPCStyleDefinition,
     paleMonk: {

@@ -456,7 +456,7 @@ Frame 8 - hurt frame*/
 // row 16: staff-left; row 17: kneel;
 // row 18: staff-right-body; row 19: staff-up-body
 // row 20: staff-left-body; row 21: staff-down-body
-const rivalGeometry: FrameDimensions = { w: 30, h: 28, content: { x: 11, y: 10, w: 18, h: 18} };
+const rivalGeometry: FrameDimensions = { w: 30, h: 28, content: { x: 7, y: 12, w: 16, h: 16} };
 const rivalImg = 'gfx/enemies/rival.png';
 
 // rival animations
@@ -493,13 +493,6 @@ const rivalStaffSlamDownAnimation: FrameAnimation = createAnimation(rivalImg, ri
 const rivalStaffSlamRightAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 1, x: 4, y: 19, duration: 9});
 const rivalStaffSlamUpAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 1, x: 3, y: 20, duration: 9});
 const rivalStaffSlamLeftAnimation: FrameAnimation = createAnimation(rivalImg, rivalGeometry, { cols: 1, x: 4, y: 21, duration: 9});
-
-// const staffImg = 'gfx/effects/wukong_staff.png';
-// const staffGeometry = {w: 123, h: 181};
-// const staffDownAnimation: FrameAnimation = createAnimation(staffImg, staffGeometry, { cols: 8, x: 0, duration: 3, frameMap: [0, 1, 2, 3, 4, 5, 6, 6, 6, 7]}, {loop: false});
-// const staffRightAnimation: FrameAnimation = createAnimation(staffImg, staffGeometry, { cols: 10, x: 8, duration: 3}, {loop: false});
-// const staffUpAnimation: FrameAnimation = createAnimation(staffImg, staffGeometry, { cols: 8, x: 18, duration: 3, frameMap: [0, 1, 2, 3, 4, 5, 6, 6, 6, 7]}, {loop: false});
-// const staffLeftAnimation: FrameAnimation = createAnimation(staffImg, staffGeometry, { cols: 10, x: 26, duration: 3}, {loop: false});
 
 export const rivalAnimations: ActorAnimations = {
     idle: {
