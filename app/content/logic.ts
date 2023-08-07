@@ -143,6 +143,7 @@ export const hasWaterBlessing: LogicCheck = {requiredFlags: ['$waterBlessing']};
 export const hasLightningBlessing: LogicCheck = {requiredFlags: ['$lightningBlessing']};
 export const hasChakram: LogicCheck = {requiredFlags: ['$weapon']};
 export const hasNimbusCloud: LogicCheck = {requiredFlags: ['$nimbusCloud']};
+export const hasPhoenixCrown: LogicCheck = {requiredFlags: ['$phoenixCrown']};
 
 export const hasBow: LogicCheck = {requiredFlags: ['$bow']};
 export const hasUpgradedBow: LogicCheck = {requiredFlags: ['$bow:2']};

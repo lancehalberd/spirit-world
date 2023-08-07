@@ -153,7 +153,7 @@ class PushStairsRailing implements ObjectInstance {
         return this.pushStairs.area;
     }
     render(context, state: GameState) {
-        drawFrame(context, {...pushStairsFrame, x: this.xOffset, w: 7},
+        drawFrame(context, {...pushStairsFrame, x: pushStairsFrame.x + this.xOffset, w: 7},
             { ...pushStairsFrame, x: this.pushStairs.x + this.xOffset - pushBarWidth, w: 7, y: this.pushStairs.y - 48}
         );
         //const r = this.getHitbox();

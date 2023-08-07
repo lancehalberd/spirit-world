@@ -47,7 +47,6 @@ export class Waterfall implements ObjectInstance {
 }
 
 class WaterfallBack implements ObjectInstance {
-    area: AreaInstance;
     drawPriority: DrawPriority = 'sprites';
     isObject = <const>true;
     x: number;
@@ -60,6 +59,9 @@ class WaterfallBack implements ObjectInstance {
     }
     getHitbox(): Rect {
         return {x: this.waterfall.x, y: this.waterfall.y - this.waterfall.h, w: this.waterfall.w, h: this.waterfall.h};
+    }
+    get area(): AreaInstance {
+        return this.waterfall.area;
     }
     getYDepth(): number {
         return this.waterfall.y;

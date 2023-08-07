@@ -54,8 +54,6 @@ Current tasks:
 
     - Forest temple boss should provide a golden peach in addition to the clone tool.
 
-    - Render faint Vanara spirits for Vanara in the other world.
-
     - Expand overworld tiles to 48x48
 
     - Investigate updating various tile sets to new version:

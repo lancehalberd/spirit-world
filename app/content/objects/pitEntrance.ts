@@ -47,7 +47,7 @@ export class PitEntrance implements ObjectInstance {
         }
     }
     getHitbox(): Rect {
-        return pitStyles[this.style].getHitbox(this);
+        return (pitStyles[this.style] || pitStyles.default).getHitbox(this);
     }
     isUnderObject(state: GameState): boolean {
         if (!this.area || this.style !== 'singleTile') {

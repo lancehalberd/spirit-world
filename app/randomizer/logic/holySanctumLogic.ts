@@ -2,8 +2,8 @@
 import {
     andLogic, canCross2Gaps, hasCharge, hasUpgradedBow,
     hasAstralProjection, hasCatEyes, hasWaterBlessing, canUseTeleporters, hasFireBlessing,
-    hasLightning, hasMediumRange, hasFire, hasSpiritBarrier, hasIce,
-    hasClone, hasStaff, hasWeapon, canBeatGolem, canBeatIdols,
+    hasLightning, hasMediumRange, hasFire, hasPhoenixCrown, hasSpiritBarrier, hasIce,
+    hasClone, hasStaff, hasWeapon, canBeatGolem, canBeatIdols, orLogic,
 } from 'app/content/logic';
 
 const zoneId = 'holySanctum';
@@ -103,8 +103,8 @@ export const holySanctumNodes: LogicNode[] = [
         zoneId: 'fireSanctum',
         nodeId: 'fireSanctumBack',
         checks: [
-            {objectId: 'fireSanctumKey', logic: hasFireBlessing},
-            {objectId: 'fireSanctumPeachPiece', logic: andLogic(canUseTeleporters, hasFireBlessing, hasAstralProjection)},
+            {objectId: 'fireSanctumKey', logic: orLogic(hasFireBlessing, hasPhoenixCrown)},
+            {objectId: 'fireSanctumPeachPiece', logic: andLogic(canUseTeleporters, orLogic(hasFireBlessing, hasPhoenixCrown), hasAstralProjection)},
         ],
         exits: [
             {objectId: 'fireSanctumExit'},

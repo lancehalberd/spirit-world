@@ -3,6 +3,7 @@ import {
     hasFireBlessing,
     hasInvisibility,
     hasBossWeapon,
+    hasPhoenixCrown,
     hasRoll,
     orLogic,
 } from 'app/content/logic';
@@ -68,7 +69,7 @@ export const craterNodes: LogicNode[] = [
         entranceIds: ['craterLowerDoor', 'craterUpperDoor'],
         exits: [
             {objectId: 'craterLowerDoor'},
-            {objectId: 'craterUpperDoor', logic: orLogic(hasFireBlessing, hasInvisibility) },
+            {objectId: 'craterUpperDoor', logic: orLogic(hasFireBlessing, hasPhoenixCrown, hasInvisibility) },
         ],
     },
     {
@@ -86,7 +87,7 @@ export const craterNodes: LogicNode[] = [
         entranceIds: ['craterEastDoor', 'craterLavaDoor'],
         exits: [
             {objectId: 'craterEastDoor'},
-            {objectId: 'craterLavaDoor', logic: orLogic(hasFireBlessing, hasInvisibility)},
+            {objectId: 'craterLavaDoor', logic: orLogic(hasFireBlessing, hasPhoenixCrown, hasInvisibility)},
         ],
     },
     // There are several inner rings, but they are all accessible only after `craterLavaDoor` is traversible.

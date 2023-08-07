@@ -81,18 +81,18 @@ export class AirBubbles implements ObjectInstance {
 objectHash.airBubbles = AirBubbles;
 
 export class AirBubbleBack implements ObjectInstance {
-    area: AreaInstance;
     drawPriority: 'sprites' = 'sprites';
-    airBubble: AirBubbles;
     isObject = <const>true;
     x: number;
     y: number;
     status: ObjectStatus = 'normal';
-    constructor(airBubble: AirBubbles) {
-        this.airBubble = airBubble;
+    constructor(private airBubble: AirBubbles) {
     }
     getHitbox(state: GameState): Rect {
         return this.airBubble.getHitbox(state);
+    }
+    get area(): AreaInstance {
+        return this.airBubble.area;
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
         if (this.airBubble.status !== 'normal') {
@@ -104,18 +104,18 @@ export class AirBubbleBack implements ObjectInstance {
 }
 
 export class AirBubbleFront implements ObjectInstance {
-    area: AreaInstance;
     drawPriority: 'sprites' = 'sprites';
-    airBubble: AirBubbles;
     isObject = <const>true;
     x: number;
     y: number;
     status: ObjectStatus = 'normal';
-    constructor(airBubble: AirBubbles) {
-        this.airBubble = airBubble;
+    constructor(private airBubble: AirBubbles) {
     }
     getHitbox(state: GameState): Rect {
         return this.airBubble.getHitbox(state);
+    }
+    get area(): AreaInstance {
+        return this.airBubble.area;
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
         if (this.airBubble.status !== 'normal') {

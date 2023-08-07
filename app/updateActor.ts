@@ -158,7 +158,10 @@ export function updateGenericHeroState(this: void, state: GameState, hero: Hero)
         if (hero.wading) {
             hero.burnDuration -= FRAME_LENGTH;
         }
-        if (hero.ironSkinLife > 0) {
+        if (hero.passiveTools.phoenixCrown > 0) {
+            // If the hero has the phoenix crown, burning causes them to gain spirit instead of draining it an causing damage.
+            state.hero.magic += 5 * FRAME_LENGTH / 1000;
+        } else if (hero.ironSkinLife > 0) {
             // If the hero has iron skin, they only take half as much damage to the iron skin and nothing from life/magic.
             hero.ironSkinLife = Math.max(0, hero.ironSkinLife - hero.burnDamage / 2 * FRAME_LENGTH / 1000);
         } else if (hero.magic > 0) {
@@ -301,7 +304,8 @@ export function updatePrimaryHeroState(this: void, state: GameState, hero: Hero)
     }
     const isActuallyRunning = state.hero.action === 'walking' && state.hero.isRunning && state.hero.magic > 0;
     const preventRegeneration = state.hero.actualMagicRegen < 0
-        || state.hero.toolCooldown > 0 || state.hero.action === 'roll' || isActuallyRunning || state.hero.burnDuration > 0;
+        || state.hero.toolCooldown > 0 || state.hero.action === 'roll' || isActuallyRunning
+        || (!state.hero.passiveTools.phoenixCrown && state.hero.burnDuration > 0);
     if (state.hero.magicRegenCooldown > 0 && !preventRegeneration) {
         state.hero.magicRegenCooldown -= FRAME_LENGTH;
     }

@@ -21,7 +21,7 @@ const createFlameAnimation = async () => {
     drawFrame(flameContext, fireElement, {...fireElement, x: 0, y: 0});
     flameContext.translate(fireElement.w + fireElement.content.x + fireElement.content.w / 2, 0);
     flameContext.scale(-1, 1);
-    drawFrame(flameContext, fireElement, {...fireElement, x: -fireElement.content.w / 2 - fireElement.content.x});
+    drawFrame(flameContext, fireElement, {...fireElement, x: -fireElement.content.w / 2 - fireElement.content.x, y: 0});
 }
 createFlameAnimation();
 export const flameAnimation = createAnimation(flameCanvas, flameGeometry, {cols: 2});

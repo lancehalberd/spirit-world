@@ -31,7 +31,9 @@ const [
 ] = createAnimation('gfx/objects/cavelight.png', {w: 64, h: 32}).frames;
 
 export class DoorTop implements ObjectInstance {
-    area: AreaInstance;
+    get area(): AreaInstance {
+        return this.door.area;
+    }
     drawPriority: 'sprites' = 'sprites';
     status: ObjectStatus;
     x: number;
