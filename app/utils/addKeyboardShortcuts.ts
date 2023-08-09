@@ -1,7 +1,6 @@
 import { editingState } from 'app/development/editingState';
 import { exportZoneToClipboard } from 'app/development/exportZone';
 import { toggleEditing } from 'app/development/editor';
-import { selectSection } from 'app/development/tileEditor';
 import { updateObjectInstance } from 'app/development/objectEditor';
 import { getState, saveSettings } from 'app/state';
 import { isKeyboardKeyDown, KEY } from 'app/userInput'
@@ -53,13 +52,6 @@ export function addKeyboardShortcuts() {
             if (editingState.clipboardObject) {
                 const state = getState();
                 updateObjectInstance(state, {...editingState.clipboardObject}, null, state.areaInstance, true);
-            }
-            event.preventDefault();
-            return;
-        }
-        if (keyCode === KEY.A && commandIsDown) {
-            if (editingState.isEditing) {
-                selectSection();
             }
             event.preventDefault();
             return;

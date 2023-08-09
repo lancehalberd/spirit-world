@@ -444,7 +444,7 @@ function getTileGridFromLayer(layerDefinition: AreaLayerDefinition, rectangle: R
     return gridDefinition;
 }
 
-export function selectSection() {
+export function selectAll() {
     const state = getState();
     if (state.paused) {
         if (state.showMap) {
@@ -457,18 +457,26 @@ export function selectSection() {
         }
         return;
     }
-    editingState.brush = {};
-    if (editingState.selectedLayerKey) {
-        const layerDefinition = state.areaInstance.definition.layers.find(l => l.key === editingState.selectedLayerKey);
-        editingState.brush = {
-            none: getTileGridFromLayer(layerDefinition, state.areaSection),
-        };
-    } else {
-        for (const layer of state.areaInstance.definition.layers) {
-            editingState.brush[layer.key] = getTileGridFromLayer(layer, state.areaSection);
+    if (editingState.tool === 'brush') {
+        editingState.brush = {};
+        if (editingState.selectedLayerKey) {
+            const layerDefinition = state.areaInstance.definition.layers.find(l => l.key === editingState.selectedLayerKey);
+            editingState.brush = {
+                none: getTileGridFromLayer(layerDefinition, state.areaSection),
+            };
+        } else {
+            for (const layer of state.areaInstance.definition.layers) {
+                editingState.brush[layer.key] = getTileGridFromLayer(layer, state.areaSection);
+            }
         }
+        updateBrushCanvas(editingState.brush);
+        return;
     }
-    updateBrushCanvas(editingState.brush);
+    if (editingState.tool === 'tileChunk') {
+        chunkGenerators[editingState.tileChunkKey](state.areaInstance.definition, state.areaSection, state.alternateAreaInstance.definition);
+        refreshArea(state);
+        editingState.hasChanges = true;
+    }
 }
 
 document.addEventListener('keydown', function(event: KeyboardEvent) {
@@ -486,6 +494,12 @@ document.addEventListener('keydown', function(event: KeyboardEvent) {
         return;
     }
     const state = getState();
+    const commandIsDown = isKeyboardKeyDown(KEY.CONTROL) || isKeyboardKeyDown(KEY.COMMAND);
+    if (event.which === KEY.A && commandIsDown) {
+        selectAll();
+        event.preventDefault();
+        return;
+    }
     if (event.which === KEY.BACK_SPACE) {
         if (editingState.tool === 'brush') {
             const [x, y] = getMousePosition(mainCanvas, CANVAS_SCALE);

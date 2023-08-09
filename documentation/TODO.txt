@@ -67,6 +67,29 @@ Current tasks:
 
     - Require traversing War Palace from top to bottom in the Spirit World, starting from the Sky
 
+    - generate bow chest switch puzzle
+        - switches are E/W/N/S from a single point in the area at least 4 tiles out from the point.
+        - increase difficulty with
+            - 2 - 4 switches
+            - prefer adding any additional locks below for required items since that will make the puzzle more unique based on context.
+                - This should be a general design principal for generating puzzles.
+            - add pots in front of switches
+                - add rocks/walls to the sides of pots
+            - add pits or other obstacles to the area
+            - offset row/cols of switches
+            - switches are not all on screen at once.
+        - additional locks:
+            - any element by setting switch element
+            - spirit sight by adding decoy switches and requiring sight to identify the correct switch
+                - Only effective with 2+ switches
+            - gloves by locking the pot with stones
+            - staff by putting pits around the shooting area
+                - need to be careful about only offsetting switches in one direction if this is used.
+
+    - generate bow door switch puzzle
+        - increase difficulty with
+            - 1 - 4 switches on 4/3/2/1s timers
+
 
     - Chest styles
         - Trash (Jade)

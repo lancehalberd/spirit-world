@@ -1,0 +1,168 @@
+
+
+Procedural Generation Notes:
+
+Game Constraints:
+    Final item pool
+        Required items
+        Optional upgrades: life, weapons
+    Enemy pool
+        Enemy generation/randomization:
+            modify life, damage, weaknesses/immunities, elemental damage, speed, aggression, behavior difficulty
+    Boss pool
+        Similar parameterization to enemies
+    Dungeon constraints:
+        # of dungeons
+        # by size/type/relative difficulty
+        Order constraints (free for all vs linear vs dungeon groups)
+            This could be represented by a graph with edges that include multiple source nodes.
+    Overworld 
+        Size
+        segmentation
+
+
+
+Specific Dungeon Constraints:
+    Worlds - array of Material/Spirit
+    Styles - Stone Temple, Natural Cave, Cave Temple, Stone Tower, Wood Temple etc, including hybrid like "Wood Tower inside Stone Temple"
+    Size: 0-N number of additional rooms beyond the minimum required to satisfy all constraints
+        Additional size will be filled with:
+            key rooms (possibly with obstacles/enemies/puzzles)
+            travel rooms (empty or with obstacles/enemies/puzzles)
+            dead ends (possibly traps or trash loot)
+    Boss+Enemy Pool (subset of the pool for the entire game)
+    Obstacle Pool - Arrow traps, pits, etc
+    Dungeon prizes - Array of items that can be found in the dungeon
+    Boss prizes - Array of items that can be found upon completing the dungeon
+    Additional Required Items - Array of dungeon prizes that must be used to complete the dungeon.
+        - If this includes items that are not required for entrances or provided by the dungeon it may be difficult for players to determine whether or not
+        they meet the requirements for completing a dungeon.
+        - As long as this is a subset of dungeon prizes, then players can complete dungeons so long as they can get beyond the entrance and are skilled enough to overcome enemies/traps/bosses with their current loadout.
+
+    Shortcut items - Array of aditional items that unlock shortcuts in the dungeon
+    optional items - Array of additional items that may be required for optional prizes.
+                     If these are specified than some prizes in the dungeon may not be obtainable even when the dungeon itself is completable
+                     and may require backtracking later to obtain.
+    Entrance specifications - List of entrances and associated required item sets
+        Exterior Required Item Sets - Array of item sets, at least one of which the player will have on entering the dungeon
+            - For example [[Cat Eyes, Bow,], [Cat Eyes, Gloves]] for Tomb
+              or [[roll, lightningBlessing], [roll, Mitts], [roll, lightningMagic], [roll, invisibility]] for Sky Palace
+        Interior Required Item Sets - Array of item sets that the dungeon will require in order to access the rest of the dungeon from this entrance.
+            The cross product of exterior X interior items sets for a door form the set of required external item sets for completing the dungeon.
+        Geographical information:
+            style: ladder up/down, stairs up/down, N/E/S/W door or path
+            floor
+            relative location (eg North, Middle, Southwest)
+    Exit specifications - List of exits and associated requirements
+        In addition to required item sets, these can also specify:
+        Whether they require completing the dungeon
+        Whether they can be blocked by optional items
+        Geographical information:
+            style: ladder up/down, stairs up/down, N/E/S/W door or path, teleporter
+            floor
+            relative location (eg North, Middle, Southwest)
+
+Combat difficulty:
+
+
+Desirable Dungeon Traits and How to Produce them
+    * A memorable, visually impressive hub that the player will traverse multiple times
+        - Gives the player a landmark to orient themselves around allowing a more complex dungeon without making it too difficult to navigate
+        - Having a hub structure keeps the dungeon "bushier" and reduces the longest path between parts of the dungeon
+        - Examples:
+            Eastern chest room 7 exits, 3 minimum visits
+            Desert entrance ~4 exits, 1 minimum visit
+            Hera entrance 4 exits, 3 minimum visits
+            PoD arena 6 exits ? minimum visits
+            Swamp chest room 6 exits 2 minimum visits
+    * Key and locks that require backtracking
+        - Prevents the dungeon from being too linear
+        - Locks present subgoals which help break the large dungeon mission into more manageable pieces
+        - Don't have to be literal keys and locks, can be switches, unique items+obstacles
+        - Doesn't have to be 1-1. A "key" might open many "locks" or a "lock" might require multiple "keys" to open.
+    * Key item that re-contextualizes the dungeon
+        - Opens access to new parts of the dungeon (usually a one key to many locks situation)
+        - Makes dungeon more convenient
+            - Grants access to shortcuts making it easy to navigate previously time consuming routes
+            - Applies in dungeon combat in a meaningful way
+    * Good bosses+mini bosses
+    * A unique theme/gimmick that distinguishes the dungeon from others
+        * The "Fire" dungeon or "arrow trap" dungeon or "rolling ball puzzle" dungeon
+        * At least one unique enemy type/category, or strongly represented enemy type: "undead", "bugs", "water monsters"
+        * These things need to be contextually determined at the world level to prevent duplication.
+            * A dungeon that requires multiple visits to complete like the Tower of Babel in Mystic Quest is fun and memorable, but would not
+              be as good if there were two or more similar dungeons in the same game.
+            * Similarly, there should be enough gimmicks that not every gimmick is present in every world, and some gimmicks should preclude others
+    * Strong cohesion
+        * Factors listed above are cohesive, so theme matches gimmick, enemies, bosses and key item
+        * Everything seems to belong together. It is easy to remember which aspects belong to which dungeon.
+    * Optional rewards
+        * Makes work/reward feel better in larger dungeons if there are prizes to be found amongst challenges and dead ends.
+        * Rewards player for exploring and fully engaging with the dungeon.
+            * Don't want the player to feel like they are wasting time in a dungeon by not finishing it ASAP.
+    * Easy backtracking
+        * Backtracking is desirable as mentioned above, but it can also be annoying if it is too difficult/time consuming/boring
+        * Don't require players to complete the same challenges multiple times (boring+time consuming, perhaps difficult in an uninteresting way)
+        * Design challenges so that they are quick to back track through after finishing
+            * Leave enemies defeated in gauntlet rooms
+            * Add two-way shortcuts that open up on completing mazes
+            * Add one-way doors to force players to take shortcuts when backtracking so they don't accidentally take long paths back
+    * No deep locks
+        * A deep lock is a lock that is more than one room/challenge away from the path to the key once the lock is discovered
+            * Requires the player to backtrack significantly if they find the lock before the key
+        * The lock can be several rooms off of the path to the key so long as a quick shortcut is created back to the key path.
+
+
+Tomb:
+    World: [Material]
+    Style: Cave Temple
+    SizeRange: +20, 25
+    BossPool: 1 of [Golem]
+    EnemyPool:
+        2 of [Snake 1, Beetle 1, FlyingBeetle 2, TinyBeetle 0]
+        2 of [ChargingBeetle 3, golemHand 3, ArrowTurret 3]
+        1 of [miniGolem 5]
+    Obstacle Pool: [Pits, arrow traps]
+    Dungeon prizes: [Roll, Silver Ore, Map, Big Key]
+    Additional required items: [Roll, Big Key]
+    Shortcut items: [Roll, Gloves]
+    Boss prizes: [Peach, Spirit Sight]
+    Entrances:
+        Main entrance:
+            Material
+            South Door
+            Exterior required Item Sets: [Bow], [Gloves]
+            Interior required Item Sets: none
+    Exits:
+        Cocoon entrance:
+            After Boss
+            Material
+            North Door
+            Required item sets: [Gloves, Astral Projection]
+        Teleporter:
+            After Boss
+            Material
+            Teleporter
+            Required Item sets: [Spirit Sight]
+
+
+Gradual Approach
+    -Create generators at many tiers, narrow to broad, for example:
+        Chunk generator - generates content to fill a rectangle of space, for example, a small puzzle for hitting a single switch, an obstacle or enemy that can be used in many context.
+            Chunks can be used during room generation or as pieces of otherwise static rooms.
+        Room generator - generates a room that fills an entire section satisfying given constraints including entrances/exits
+        Dungeon generator - generates a dungeon satisfying given constraints
+        World generator - generates an overworld satisfying given constraints
+    - Each of these generator types could be used by itself with enough content.
+        - For example a dungeon generator could be created using hand crafted rooms similar to Rogue Legacy/Spelunky style generation
+        - Chunks can be included in hand crafted areas
+        - World generator could be used and link to hand crafted dungeons
+            - This can probably be broken up into smaller generated areas similar to rooms/chunks in dungeons.
+        - In general generated content can live in/next to/around crafted content
+    - Ideally any good hand crafted content can be changed into a generator
+        - A hand crafted puzzle can be parameterized into a style of puzzle with variable size/difficulty/requirements
+            - Highly flexible puzzle chunks can satisfy a wider variety of constraints and allow more higher level possibilities.
+            - Flexible enough puzzles can be reused during generation when their constraints are different enough to make it not feel repetitive.
+        - A hand crafted room can be changed to use multiple chunks internally and entrance/exit configurations to satisfy various room generation requirements
+        - Various aspects of hand crafted dungeons can be coded into dungeon generator styles and dungeon generator constraints
+        - There should be some ways of gradually taking hand crafted world designs and porting them into generators for the overworld.

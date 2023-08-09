@@ -76,11 +76,6 @@ export const deepWaterBehavior: TileBehaviors = {
     defaultLayer: 'field',
     water: true,
 };
-export const southCliffBehavior: TileBehaviors = {
-    ledges: {up: false},
-    isSouthernWall: true,
-    solid: true,
-};
 export const climbableWall: TileBehaviors = {
     defaultLayer: 'field',
     climbable: true,

@@ -17,7 +17,6 @@ import {
     lightStoneBehavior,
     lowWallBehavior,
     pitBehavior,
-    southCliffBehavior,
     southernWallBehavior,
     spiritPlantBehavior,
     spiritBushBehavior,
@@ -253,7 +252,7 @@ function solidColorTile(color: string, behaviors: TileBehaviors = null): TileSou
         context.fillRect(0, 0, 16, 16);
     }, behaviors);
 }
-function gradientColorTile(colors: string[], x0, y0, x1, y1, behaviors: TileBehaviors = null): TileSource {
+export function gradientColorTile(colors: string[], x0, y0, x1, y1, behaviors: TileBehaviors = null): TileSource {
     return canvasPalette(context => {
         const gradient = context.createLinearGradient(x0, y0, x1, y1);
         for (let i = 0; i < colors.length; i++) {
@@ -1037,8 +1036,7 @@ addTiles([
     singleTileSource('gfx/tiles/thorns.png', null, 16),
     singleTileSource('gfx/tiles/thornsspirit.png', { touchHit: {damage: 1, spiritCloakDamage: 2, isGroundHit: true }, defaultLayer: 'field' }),
     breakableFloor,
-    gradientColorTile(['#A08000', '#806000'], 0, 0, 0, 16, southCliffBehavior), // southCliffTop
-    solidColorTile('#806000', southernWallBehavior), // cliffBottom
+    deletedTiles(2),
     // This is the 'Abyss' tile for the southern edge of walls, it uses bitmap bottom so the player can
     // go behind it a bit.
     singleTileSource('gfx/tiles/cavearranged.png', { defaultLayer: 'foreground', isVeryTall: true, solidMap: BITMAP_BOTTOM }, 0, 240),

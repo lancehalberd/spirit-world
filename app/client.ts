@@ -13,6 +13,7 @@ export * from 'app/content/objects';
 export * from 'app/content/dialogue';
 export * from 'app/content/specialBehaviors';
 export * from 'app/development/tests';
+export * from 'app/development/tileEditor';
 export * from 'app/randomizer/main';
 
 setInterval(update, FRAME_LENGTH);
