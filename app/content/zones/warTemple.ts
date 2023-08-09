@@ -1130,8 +1130,6 @@ const f0_1x1: AreaDefinition = {
         {
             key: 'hiddenLedges',
             drawPriority: 'background',
-            logicKey: 'beastsDefeated',
-            invertLogic: true,
             grid: {
                 w: 32,
                 h: 32,
@@ -1174,8 +1172,6 @@ const f0_1x1: AreaDefinition = {
         {
             key: 'floor2',
             drawPriority: 'background',
-            logicKey: 'beastsDefeated',
-            invertLogic: true,
             grid: {
                 w: 32,
                 h: 32,
@@ -1279,7 +1275,7 @@ const f0_1x1: AreaDefinition = {
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,1020,1020,1020,1020,1020,1020,1020,1020,1020,0,0,0,0,0,0,0,0,0,0,0,0],
-                    [0,0,0,0,0,0,0,0,0,0,1020,1020,1020,1172,1165,1165,1165,1165,1165,1020,0,0,0,0,0,0,0,0,0,0,0,0],
+                    [0,0,0,0,0,0,0,0,0,0,1020,1020,1020,1172,1165,1165,1165,1165,1171,1020,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,1020,1164,28,28,28,28,1169,1020,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,1020,1168,1166,1166,1166,1166,1167,1020,0,0,0,0,0,0,0,0,0,0,0,0],
                     [0,0,0,0,0,0,0,0,0,0,0,0,1020,1201,1203,1204,1203,1204,1202,1020,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -1303,8 +1299,6 @@ const f0_1x1: AreaDefinition = {
         {
             key: 'field2',
             drawPriority: 'background',
-            logicKey: 'beastsDefeated',
-            invertLogic: true,
             grid: {
                 w: 32,
                 h: 32,
@@ -1347,8 +1341,6 @@ const f0_1x1: AreaDefinition = {
         {
             key: 'foreground2',
             drawPriority: 'foreground',
-            logicKey: 'beastsDefeated',
-            invertLogic: true,
             grid: {
                 w: 32,
                 h: 32,
@@ -1367,8 +1359,8 @@ const f0_1x1: AreaDefinition = {
                     [1162,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1162],
                     [1162,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1162],
                     [1162,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1162],
-                    [1162,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1171,0,0,0,0,0,0,0,0,0,0,0,0,1162],
-                    [1162,0,0,0,0,0,0,0,0,0,0,0,0,0,1175,1175,1175,1175,0,0,0,0,0,0,0,0,0,0,0,0,0,1162],
+                    [1162,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1162],
+                    [1162,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1162],
                     [1162,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1162],
                     [1162,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1162],
                     [1162,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1162],
@@ -3514,8 +3506,6 @@ const sf0_1x1: AreaDefinition = {
         {
             key: 'hiddenLedges',
             drawPriority: 'background',
-            logicKey: 'beastsDefeated',
-            invertLogic: true,
             grid: {
                 w: 32,
                 h: 32,
@@ -3558,8 +3548,6 @@ const sf0_1x1: AreaDefinition = {
         {
             key: 'floor2',
             drawPriority: 'background',
-            logicKey: 'beastsDefeated',
-            invertLogic: true,
             grid: {
                 w: 32,
                 h: 32,
@@ -3688,8 +3676,6 @@ const sf0_1x1: AreaDefinition = {
         {
             key: 'field2',
             drawPriority: 'background',
-            logicKey: 'beastsDefeated',
-            invertLogic: true,
             grid: {
                 w: 32,
                 h: 32,
@@ -3732,8 +3718,6 @@ const sf0_1x1: AreaDefinition = {
         {
             key: 'foreground2',
             drawPriority: 'foreground',
-            logicKey: 'beastsDefeated',
-            invertLogic: true,
             grid: {
                 w: 32,
                 h: 32,
@@ -3779,7 +3763,6 @@ const sf0_1x1: AreaDefinition = {
         {status: "normal", id: "warTempleEntranceSpirit", x: 224, y: 496, type: "door", style: "stone", targetZone: "overworld", targetObjectId: "warTempleEntranceSpirit", d: "down", linked: true, spirit: true, locationCue: "War Temple 1F"},
         {status: "normal", id: "", x: 224, y: 128, d: "down", behavior: "none", style: "sleepingLightningBeast", type: "npc", dialogue: "Leave me to my sleep little warrior.", customLogic: "warTempleBoss", logicKey: "sleepingBeastsLogic", dialogueIndex: 95},
         {status: "normal", id: "warTemple:0:1x1-door-3", x: 0, y: 96, type: "door", style: "stone", d: "left", linked: true, spirit: true},
-        {status: "normal", id: "", x: 224, y: 480, type: "decoration", w: 16, h: 16, decorationType: "entranceLight", drawPriority: "background", linked: true, spirit: true},
         {status: "normal", id: "warTemple:0:1x1-door-2", x: 496, y: 96, type: "door", style: "stone", d: "right", linked: true, spirit: true},
     ],
     sections: [
