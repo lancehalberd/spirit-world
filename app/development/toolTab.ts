@@ -8,7 +8,7 @@ import { TabContainer } from 'app/development/tabContainer';
 import { getState } from 'app/state';
 
 import { readImageFromFile } from 'app/utils/index';
-
+import { chunkGenerators } from 'app/generator/tileChunkGenerators';
 
 
 const toolTabContainer = new TabContainer<EditorToolType>('brush', [
@@ -27,6 +27,16 @@ const toolTabContainer = new TabContainer<EditorToolType>('brush', [
         label: '🖌',
         render(container: HTMLElement) {
             renderPropertyRows(container, getBrushPaletteProperties());
+        },
+        refresh(container: HTMLElement) {
+            this.render(container);
+        },
+    },
+    {
+        key: 'tileChunk',
+        label: '⋮⋮⋮',
+        render(container: HTMLElement) {
+            renderPropertyRows(container, getTileChunkProperties());
         },
         refresh(container: HTMLElement) {
             this.render(container);
@@ -95,6 +105,20 @@ export function renderToolTabContainer(): HTMLElement {
 
 function getObjectPaletteProperties(): PanelRows {
     return getObjectTypeProperties();
+}
+
+function getTileChunkProperties(): PanelRows {
+    let rows: PanelRows = [];
+    rows.push({
+        name: 'style',
+        value: editingState.tileChunkKey,
+        values: Object.keys(chunkGenerators),
+        onChange(tileChunkKey: string) {
+            editingState.tileChunkKey = tileChunkKey;
+        }
+    });
+
+    return rows;
 }
 
 function getBrushPaletteProperties(): PanelRows {

@@ -1,14 +1,9 @@
-import {
-    //applyLayerToBehaviorGrid,
-    initializeAreaLayerTiles,
-    //mapTileNumbersToFullTiles,
-} from 'app/content/areas';
 import { allSections } from 'app/content/sections';
 import { allTiles } from 'app/content/tiles';
 import { zones } from 'app/content/zones';
 import { getSelectionBounds } from 'app/development/brushSelection';
 import { contextMenuState, editingState } from 'app/development/editingState';
-import { addMissingLayer } from 'app/development/layers';
+import { addMissingLayer } from 'app/utils/layers';
 import {
     createObjectDefinition,
     deleteObject,
@@ -27,8 +22,10 @@ import { getState } from 'app/state';
 import { KEY, isKeyboardKeyDown } from 'app/userInput';
 import { mainCanvas } from 'app/utils/canvas';
 import { enterLocation } from 'app/utils/enterLocation';
+import { initializeAreaLayerTiles } from 'app/utils/layers';
 import { getMousePosition, isMouseDown, /*isMouseOverElement*/ } from 'app/utils/mouse';
 import { resetTileBehavior } from 'app/utils/tileBehavior';
+import { chunkGenerators } from 'app/generator/tileChunkGenerators';
 export * from 'app/development/packSprites';
 
 
@@ -123,6 +120,9 @@ mainCanvas.addEventListener('mousedown', function (event) {
         case 'object':
             onMouseDownObject(state, editingState, x, y);
             break;
+        case 'tileChunk':
+            editingState.dragOffset = {x, y};
+            break;
         case 'brush':
             if (isKeyboardKeyDown(KEY.SHIFT)) {
                 editingState.dragOffset = {x, y};
@@ -138,6 +138,18 @@ mainCanvas.addEventListener('mousedown', function (event) {
 });
 document.addEventListener('mouseup', (event) => {
     if (event.which !== 1 || contextMenuState.contextMenu) {
+        editingState.dragOffset = null;
+        return;
+    }
+    if (editingState.tool === 'tileChunk' && editingState.dragOffset) {
+        const state = getState();
+        const [x, y] = getMousePosition(mainCanvas, CANVAS_SCALE);
+        const {L, R, T, B} = getSelectionBounds(state, editingState.dragOffset.x, editingState.dragOffset.y, x, y);
+        editingState.dragOffset = null;
+        const r: Rect = {x: L, y: T, w: R - L + 1, h: B - T + 1};
+        chunkGenerators[editingState.tileChunkKey](state.areaInstance.definition, r, state.alternateAreaInstance.definition);
+        refreshArea(state);
+        editingState.hasChanges = true;
         return;
     }
     editingState.dragOffset = null;
@@ -225,7 +237,7 @@ function deleteTileFromLayer(tx: number, ty: number, area: AreaInstance, layer: 
         // Clear the tile definition in the spirit world.
         tiles[ty][tx] = 0;
         // And set the instance to use the tile from the parent definition.
-        const parentLayer = definition.parentDefinition?.layers?.find(layer => layer.key === editingState.selectedLayerKey);
+        const parentLayer = definition.parentDefinition?.layers?.find(parentLayer => parentLayer.key === layer.key);
         if (parentLayer) {
             layer.originalTiles[ty][tx] = layer.tiles[ty][tx] = allTiles[parentLayer.grid.tiles[ty][tx]];
         }
@@ -268,14 +280,14 @@ function drawBrush(targetX: number, targetY: number): void {
                         let fullTile = allTiles[tile];
                         const defaultLayer = fullTile ? (fullTile.behaviors?.defaultLayer || 'floor') : 'field';
                         if (!area.definition.layers.find(layer => layer.key === defaultLayer)) {
-                            addMissingLayer(state, defaultLayer);
+                            addMissingLayer(defaultLayer, area.definition, area.alternateArea.definition);
                             addedNewLayer = true;
                         }
                     }
                 }
             } else {
                 if (!area.definition.layers.find(layer => layer.key === layerKey)) {
-                    addMissingLayer(state, layerKey);
+                    addMissingLayer(layerKey, area.definition, area.alternateArea.definition);
                     addedNewLayer = true;
                 }
             }
@@ -484,6 +496,7 @@ document.addEventListener('keydown', function(event: KeyboardEvent) {
         }
     }
     if (event.which === KEY.ESCAPE) {
+        editingState.dragOffset = null;
         editingState.selectedSections = [];
         if (editingState.selectedObject) {
             unselectObject(editingState);

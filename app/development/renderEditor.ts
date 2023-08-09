@@ -67,6 +67,18 @@ function renderEditorArea(context: CanvasRenderingContext2D, state: GameState, a
         }
         // Tool previews are only drawn for the current area.
         if (area === state.areaInstance) {
+            if (editingState.tool === 'tileChunk') {
+                const w = 16, h = 16;
+                let x1 = x, y1 = y;
+                if (isMouseDown() && editingState.dragOffset) {
+                    x1 = editingState.dragOffset.x;
+                    y1 = editingState.dragOffset.y;
+                }
+                const {L, R, T, B} = getSelectionBounds(state, x1, y1, x, y);
+                context.lineWidth = 2;
+                context.strokeStyle = 'white';
+                context.strokeRect(L * w, T * h, (R - L + 1) * w, (B - T + 1) * h);
+            }
             if (editingState.tool === 'brush') {
                 const w = 16, h = 16;
                 if (isKeyboardKeyDown(KEY.SHIFT)) {

@@ -235,3 +235,14 @@ export function cloneDeep<T>(value: T): T {
 export function sample<T>(collection: Collection<T>): T {
     return Random.element(collection);
 }
+
+export function fillGrid<T>(value: T, w: number, h: number): T[][] {
+    const grid: T[][] = [];
+    for (let y = 0; y < h; y++){
+        grid[y] = [];
+        for (let x = 0; x < w; x++){
+            grid[y][x] = value;
+        }
+    }
+    return grid;
+}

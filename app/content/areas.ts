@@ -11,11 +11,12 @@ import { createObjectInstance, } from 'app/utils/createObjectInstance';
 import { checkIfAllEnemiesAreDefeated } from 'app/utils/checkIfAllEnemiesAreDefeated';
 import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import { findObjectInstanceByDefinition } from 'app/utils/findObjectInstanceById';
+import { initializeAreaLayerTiles, initializeAreaTiles } from 'app/utils/layers';
 import { addObjectToArea, removeObjectFromArea } from 'app/utils/objects';
 import { applyTileToBehaviorGrid, resetTileBehavior } from 'app/utils/tileBehavior';
 
 
-export function getDefaultArea(): AreaDefinition {
+export function getDefaultArea(w = 32, h = 32): AreaDefinition {
     return {
         default: true,
         layers: [
@@ -23,8 +24,8 @@ export function getDefaultArea(): AreaDefinition {
                 key: 'floor',
                 grid: {
                     // The dimensions of the grid.
-                    w: 32,
-                    h: 32,
+                    w,
+                    h,
                     // The matrix of tiles
                     tiles: [],
                 },
@@ -33,15 +34,15 @@ export function getDefaultArea(): AreaDefinition {
                 key: 'field',
                 grid: {
                     // The dimensions of the grid.
-                    w: 32,
-                    h: 32,
+                    w,
+                    h,
                     // The matrix of tiles
                     tiles: [],
                 },
             },
         ],
         objects: [],
-        sections: [{ x: 0, y: 0, w: 32, h: 32}],
+        sections: [{ x: 0, y: 0, w, h}],
     };
 }
 
@@ -112,24 +113,6 @@ export function getAreaFromLocation(location: ZoneLocation): AreaDefinition {
 
 export function getAreaInstanceFromLocation(state: GameState, location: ZoneLocation): AreaInstance {
     return createAreaInstance(state, getAreaFromLocation(location));
-}
-
-export function initializeAreaLayerTiles(layer: AreaLayerDefinition): AreaLayerDefinition {
-    const tiles = layer.grid.tiles;
-    for (let y = 0; y < layer.grid.h; y++) {
-        tiles[y] = tiles[y] || [];
-        // We need to do this so that each row has the correct number of elements, as in some places
-        // we use row.length for iterating through tiles or checking the bounds of the grid.
-        for (let x = 0; x < layer.grid.w; x++) {
-            tiles[y][x] = tiles[y][x] || null;
-        }
-    }
-    return layer;
-}
-
-export function initializeAreaTiles(area: AreaDefinition): AreaDefinition {
-    area.layers.map(initializeAreaLayerTiles);
-    return area;
 }
 
 export function swapHeroStates(heroA: Hero, heroB: Hero) {
@@ -562,8 +545,8 @@ export function refreshAreaLogic(state: GameState, area: AreaInstance, fastRefre
                 );
             }*/
             // Update any tile behaviors that may have changed as layers were added/removed.
-            for (let y = 0; y < 32; y++) {
-                for (let x = 0; x < 32; x++) {
+            for (let y = 0; y < nextAreaInstance.h; y++) {
+                for (let x = 0; x < nextAreaInstance.w; x++) {
                     for (const layer of nextAreaInstance.layers) {
                         layer.tiles[y][x] = layer.originalTiles[y][x];
                     }

@@ -197,9 +197,11 @@ window['serializeZone'] = serializeZone;
 
 // Importing a zone will override the zones hash entry for the zone.
 export function importZone(fileContents: string, currentZoneKey: string): string {
-    worldMap = null;
     // Remove all import lines.
-    fileContents = fileContents.replace(/import.*\n/g, '');
+    fileContents = fileContents.replace(/import[^;]*;/g, '');
+    if (fileContents.includes('import')) {
+        debugger;
+    }
     // Remove all export tokens at the start of lines.
     fileContents = fileContents.replace(/\bexport /g, '');
     // Remove all type definitions.
@@ -214,26 +216,12 @@ export function importZone(fileContents: string, currentZoneKey: string): string
     // console.log(fileContents);
     fileContents = fileContents.replace(/zones\./, 'localZones.');
     const localZones = {};
-    eval(fileContents);
+    try {
+        eval(fileContents);
+    } catch (error) {
+        console.log(fileContents);
+        throw error;
+    }
     zones[zoneKey] = localZones[zoneKey];
     return zoneKey;
-}
-
-let worldMap: AreaGrid;
-export function importAreaGrid(fileContents: string): AreaGrid {
-    if (!window.confirm('Replace current area?')) {
-        return;
-    }
-    worldMap = null;
-    // Remove all import lines.
-    fileContents = fileContents.replace(/import.*\n/g, '');
-    // Remove all export tokens at the start of lines.
-    fileContents = fileContents.replace(/\bexport /g, '');
-    // Remove all type definitions.
-    fileContents = fileContents.replace(/: [A-Z][a-zA-Z]+/g, '');
-    // Remove const declaration so we will set the local `worldMap` variable instead.
-    fileContents = fileContents.replace(/const worldMap/g, 'worldMap');
-    // console.log(fileContents);
-    eval(fileContents);
-    return worldMap;
 }

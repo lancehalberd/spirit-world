@@ -1,11 +1,8 @@
 import { logicHash } from 'app/content/logic';
 import { editingState } from 'app/development/editingState';
-import { addNewLayer } from 'app/development/layers';
 import { layersInOrder } from 'app/gameConstants';
 import { enterLocation } from 'app/utils/enterLocation';
-
-
-
+import { addNewLayer } from 'app/utils/layers';
 
 function refreshArea(state: GameState, doNotRefreshEditor = false) {
     enterLocation(state, state.location, true, undefined, true, false, doNotRefreshEditor);
@@ -227,7 +224,7 @@ export function getBrushContextProperties(state: GameState): PanelRows {
                     key = 'layer-' + definition.layers.length;
                 }
             }
-            addNewLayer(state, key, previousLayerIndex + 1);
+            addNewLayer(key, previousLayerIndex + 1, state.areaInstance.definition, state.alternateAreaInstance.definition);
             // Calling this will instantiate the area again and place the player back in their current location.
             if (editingState.selectedLayerKey) {
                 editingState.selectedLayerKey = key;

@@ -1,4 +1,5 @@
 import { palettes } from 'app/content/palettes';
+import { chunkGenerators } from 'app/generator/tileChunkGenerators';
 
 
 interface ContextMenuState {
@@ -11,6 +12,7 @@ export const editingState: EditingState = {
     hasChanges: false,
     isEditing: false,
     paletteKey: Object.keys(palettes)[0],
+    tileChunkKey: Object.keys(chunkGenerators)[0],
     // Default editing the field, not the floor.
     refreshMinimap: true,
     replacePercentage: 100,

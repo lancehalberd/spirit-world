@@ -60,7 +60,7 @@ type PropertyRow = (EditorProperty<any> | HTMLElement | string)[];
 
 type PanelRows = (EditorProperty<any> | PropertyRow | HTMLElement | string)[];
 
-type EditorToolType = 'brush' | 'object' | 'enemy' | 'boss' | 'replace' | 'select';
+type EditorToolType = 'brush' | 'object' | 'enemy' | 'boss' | 'replace' | 'select' | 'tileChunk';
 interface EditingState {
     tool: EditorToolType
     previousTool: EditorToolType
@@ -70,6 +70,7 @@ interface EditingState {
     clipboardObject?: ObjectDefinition
     needsRefresh?: boolean
     paletteKey: string
+    tileChunkKey: string
     selectedLayerKey?: string
     refreshMinimap?: boolean
     replacePercentage: number

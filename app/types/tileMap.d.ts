@@ -25,6 +25,16 @@ interface TileSource {
     tileCoordinates?: number[][],
 }
 
+interface NineSlice {
+    w: number
+    h: number
+    // Rectangle that defines the center of the nine slice
+    r: Rect
+    layers: {
+        key: string
+        grid: number[][]
+    }[]
+}
 
 interface TileBehaviors {
     // 0-1

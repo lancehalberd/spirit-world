@@ -42,6 +42,39 @@ Pending Graphics From Jon:
     - Storm Beast Statue animations
 
 Current tasks:
+    - Expand overworld tiles to 48x48
+        - Support any area size with section matching the full area.
+        - Technically 1024*1024 Tiles is the maximum size for modern browsers, but this is way larger than I'm intending.
+    - Steps to support:
+        - Set grid size on zone
+            - Add UI for changing these dimensions
+                - Don't delete remoted rows/columns in case people accidentally set it lower than intended.
+        DONE Use area instance w/h instead of 32/32 in refreshAreaLogic.
+        - Update map preview in editor to render larger than 32x32
+        - Figure out why swimming outside of normal dimensions
+
+    - Break up Spirit Sky to make it act like a hub for exploring the spirit world.
+        - Add magic beans that can grow vines to the sky
+            - Above lake to top of helix/sky palace courtyard
+            - Above holy city to ???/sky city
+            - Above forest to two-way teleporter above forest
+        - Plant beans by having a bean and interacting with a planter (plant a bean here?)
+        - Beans cost 20/50/100/200 Jade
+            - Beans sold in Sky City so cannot be source of sky access
+        - Need some kind of one way locks that can be opened in spirit sky after opening a new entrance
+            - Activatable bridges (cloud sommersault would allow full traversal of sky, which is probably fine)
+            - Could make it so that entering sky palace requires gaining access to multiple sky areas first
+
+    - Require traversing War Palace from top to bottom in the Spirit World, starting from the Sky
+
+
+    - Chest styles
+        - Trash (Jade)
+        - Dungeon Item (Key/Map/Big Key)
+        - Collectible (Silver/Gold Ore/Peach/Peach Piece)
+        - Prize (Chakram/Tool/Victory Point)
+
+
     - Falling in water with high enough velocity transitions you underwater with slightly reduced velocity
         - Allows you to peak underwater, but not really do anything.
         - Might have a peach piece you can by falling fast enough into the water.
@@ -54,7 +87,6 @@ Current tasks:
 
     - Forest temple boss should provide a golden peach in addition to the clone tool.
 
-    - Expand overworld tiles to 48x48
 
     - Investigate updating various tile sets to new version:
         - identify changed tiles and plan how to fix issues caused by the update:
