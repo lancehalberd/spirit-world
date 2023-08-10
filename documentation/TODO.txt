@@ -106,14 +106,7 @@ Current tasks:
         - The only difference is that the northern ledge graphics are now at the top of the sprite instead of the bottom
         - These are tiles 833,834
 
-    - Add material tile -> spirit tile mapping function:
-        - Add reasonable defaults like based on defaultLayer, solid, solidMap
-        - Check explicit tile mappings first
-        - Do this after we split tiles up into multiple tile sheets.
-
-
     - Forest temple boss should provide a golden peach in addition to the clone tool.
-
 
     - Investigate updating various tile sets to new version:
         - identify changed tiles and plan how to fix issues caused by the update:

@@ -15,16 +15,14 @@ import { isPointInShortRect, rectanglesOverlap, pad } from 'app/utils/index';
 import { getMousePosition, isMouseDown } from 'app/utils/mouse';
 import { isSectionExplored } from 'app/utils/sections';
 import { drawText } from 'app/utils/simpleWhiteFont';
+import { requireFrame } from 'app/utils/packedImages';
 
 
 const menuSlices = createAnimation('gfx/hud/menu9slice.png', {w: 8, h: 8}, {cols: 3, rows: 3}).frames;
 
 const borderSize = 4;
 const worldSize = 192;
-const [
-    /*speechBubble*/,
-    /*yellowQuest*/,
-] = createAnimation('gfx/npcs/dialoguebubble.png', {w: 12, h: 12}, {cols: 11}).frames;
+const questMarker = requireFrame('gfx/hud/questMarker.png', {x: 0, y: 0, w: 9, h: 18});
 
 export function renderMap(context: CanvasRenderingContext2D, state: GameState): void {
     if (overworldKeys.includes(state.location.zoneKey)) {
@@ -97,20 +95,11 @@ export function renderOverworldMap(context: CanvasRenderingContext2D, state: Gam
         const location = getMapTarget(state);
         if (location && location.zoneKey === zone && location.isSpiritWorld === state.location.isSpiritWorld) {
             const mapCoordinates = convertLocationToMapCoordinates(location);
-            /*drawFrame(context, yellowQuest, {
-                x: r.x + mapCoordinates.x - 12,
-                y: r.y + mapCoordinates.y - 12,
-                w: yellowQuest.w * 2,
-                h: yellowQuest.h * 2,
-            });*/
-            context.strokeStyle = 'red';
-            context.beginPath();
-            const x = r.x + mapCoordinates.x, y = r.y + mapCoordinates.y;
-            context.moveTo(x - 6, y - 6);
-            context.lineTo(x + 6, y + 6);
-            context.moveTo(x + 6, y - 6);
-            context.lineTo(x - 6, y + 6);
-            context.stroke();
+            drawFrame(context, questMarker, {
+                ...questMarker,
+                x: r.x + mapCoordinates.x - 4,
+                y: r.y + mapCoordinates.y - 15,
+            });
         }
     }
 }
