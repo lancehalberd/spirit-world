@@ -75,7 +75,7 @@ Current tasks:
                 - This should be a general design principal for generating puzzles.
             - add pots in front of switches
                 - add rocks/walls to the sides of pots
-            - add pits or other obstacles to the area
+            - add pits around switches+pots to prevent manually pushing/pulling the pots.
             - offset row/cols of switches
             - switches are not all on screen at once.
         - additional locks:
@@ -102,6 +102,10 @@ Current tasks:
         - Allows you to peak underwater, but not really do anything.
         - Might have a peach piece you can by falling fast enough into the water.
 
+    - Update cavearranged to cavearraned2
+        - The only difference is that the northern ledge graphics are now at the top of the sprite instead of the bottom
+        - These are tiles 833,834
+
     - Add material tile -> spirit tile mapping function:
         - Add reasonable defaults like based on defaultLayer, solid, solidMap
         - Check explicit tile mappings first
@@ -122,8 +126,6 @@ Current tasks:
     - lose money when collecting money loot as clone?
         - lose most progress this way.
         - Add both list of copied and not copied props, log warning if a property is not on a list and copy.
-
-    - Fix ledge graphics in tomb
 
     - Make sure door open/close sound effects are playing
         - Check tomb crystal switch doors specifically.
@@ -203,8 +205,6 @@ Current tasks:
 
     - Try using fade transition for material -> spirit world
         - If this isn't better, try using a circle wipe transition with a gradient instead.
-
-    - Ask Jon for falling animation with cloud poof for falling through clouds.
 
     - Randomizer hint sometimes says you are in BK mode with checks in logic
         - I think this happens when your last check is behind a locked door that you have enough keys for but the randomizer thinks you don't because it isn't counting locked doors you have already opened.

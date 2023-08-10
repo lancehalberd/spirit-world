@@ -23,6 +23,7 @@ import { KEY, isKeyboardKeyDown } from 'app/userInput';
 import { mainCanvas } from 'app/utils/canvas';
 import { enterLocation } from 'app/utils/enterLocation';
 import { initializeAreaLayerTiles } from 'app/utils/layers';
+import { mapTile } from 'app/utils/mapTile';
 import { getMousePosition, isMouseDown, /*isMouseOverElement*/ } from 'app/utils/mouse';
 import { resetTileBehavior } from 'app/utils/tileBehavior';
 import { chunkGenerators } from 'app/generator/tileChunkGenerators';
@@ -365,9 +366,7 @@ function paintSingleTile(area: AreaInstance, layer: AreaLayer, parentDefinition:
     // If this tile was erased, replace it with the tile dictated by the parent definition if there is one.
     if (!fullTile && parentDefinition) {
         const parentTile = allTiles[parentDefinition.grid?.tiles[y][x]];
-        // Tiles with linked offsets map to different tiles than the parent definition.
-        const linkedOffset = parentTile?.behaviors?.linkedOffset || 0;
-        fullTile = linkedOffset ? allTiles[parentTile.index + linkedOffset] : parentTile;
+        fullTile = mapTile(parentTile);
     }
     if (fullTile?.behaviors?.maskFrame) {
         if (!layer.definition.mask) {

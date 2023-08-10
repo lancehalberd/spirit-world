@@ -12,6 +12,7 @@ import { checkIfAllEnemiesAreDefeated } from 'app/utils/checkIfAllEnemiesAreDefe
 import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
 import { findObjectInstanceByDefinition } from 'app/utils/findObjectInstanceById';
 import { initializeAreaLayerTiles, initializeAreaTiles } from 'app/utils/layers';
+import { mapTile } from 'app/utils/mapTile';
 import { addObjectToArea, removeObjectFromArea } from 'app/utils/objects';
 import { applyTileToBehaviorGrid, resetTileBehavior } from 'app/utils/tileBehavior';
 
@@ -440,9 +441,7 @@ export function createAreaInstance(state: GameState, definition: AreaDefinition)
                 for (let x = 0; x < layer.tiles[y].length; x++) {
                     if (!layer.tiles[y][x]) {
                         const parentTile = allTiles[definition.parentDefinition.layers[definitionIndex].grid.tiles[y]?.[x]];
-                        // Tiles with linked offsets map to different tiles than the parent definition.
-                        const linkedOffset = parentTile?.behaviors?.linkedOffset || 0;
-                        const tile = linkedOffset ? allTiles[parentTile.index + linkedOffset] : parentTile;
+                        const tile = mapTile(parentTile);
                         layer.tiles[y][x] = tile;
                         layer.originalTiles[y][x] = tile;
                     }

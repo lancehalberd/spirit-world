@@ -1042,9 +1042,8 @@ addTiles([
     singleTileSource('gfx/tiles/cavearranged.png', { defaultLayer: 'foreground', isVeryTall: true, solidMap: BITMAP_BOTTOM }, 0, 240),
     solidPitSource,
     stampTileSource(rockWallFrame, [
-            [0,0], [0,1],
-            [1,0], [2,1],
-            [2,0], [2,1],
+            [0,0], [1,0], [2, 0],
+            [0,1], [1,1], [2, 2],
         ], {
         '0x0': southernWallBehavior, '1x0': southernWallBehavior, '2x0': southernWallBehavior,
         '0x1': southernWallBehavior, '1x1': southernWallBehavior, '2x1': southernWallBehavior,

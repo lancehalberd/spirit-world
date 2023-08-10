@@ -14,6 +14,7 @@ import { translateContextForAreaAndCamera } from 'app/render/renderField';
 import { drawFrame } from 'app/utils/animations';
 import { mainCanvas } from 'app/utils/canvas';
 import { createObjectInstance } from 'app/utils/createObjectInstance';
+import { mapTile } from 'app/utils/mapTile';
 import { getMousePosition, isMouseDown, /*isMouseOverElement*/ } from 'app/utils/mouse';
 
 
@@ -209,7 +210,7 @@ function drawBrushLayerPreview(
         for (let x = 0; x < rectangle.w; x++) {
             const tx = rectangle.x + x;
             if (tx < 0 || tx >= 32) continue;
-            let tile = null;
+            let tile: FullTile|undefined|null = null;
             // The brush is used if it is defined.
             if (brush) {
                 tile = allTiles[brush.tiles[y][x]];
@@ -229,9 +230,7 @@ function drawBrushLayerPreview(
             }
             if (!tile && parentLayer) {
                 const parentTile = allTiles[parentLayer.grid?.tiles[ty][tx]];
-                // Tiles with linked offsets map to different tiles than the parent definition.
-                const linkedOffset = parentTile?.behaviors?.linkedOffset || 0;
-                tile = linkedOffset ? allTiles[parentTile.index + linkedOffset] : parentTile;
+                tile = mapTile(parentTile);
             }
             if (tile) {
                 context.save();
