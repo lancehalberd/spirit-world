@@ -80,9 +80,11 @@ export function getDefaultSpiritArea(location: ZoneLocation): AreaDefinition {
 }
 
 export function getAreaFromLocation(location: ZoneLocation): AreaDefinition {
-    const floor = zones[location.zoneKey].floors[location.floor];
+    const zone = zones[location.zoneKey];
+    const floor = zone.floors[location.floor];
     const grid = location.isSpiritWorld ? floor.spiritGrid : floor.grid;
     const alternateGrid = location.isSpiritWorld ? floor.grid : floor.spiritGrid;
+    const {w, h} = zone.areaSize ?? {w: 32, h: 32};
 
     const {x, y} = location.areaGridCoords;
     if (!grid[y]) {
@@ -90,7 +92,7 @@ export function getAreaFromLocation(location: ZoneLocation): AreaDefinition {
     }
     if (!grid[y][x]) {
         grid[y][x] =
-            initializeAreaTiles(location.isSpiritWorld ? getDefaultSpiritArea(location) : getDefaultArea());
+            initializeAreaTiles(location.isSpiritWorld ? getDefaultSpiritArea(location) : getDefaultArea(w, h));
         return grid[y][x] as AreaDefinition;
     } else if (!grid[y][x].layers) {
         const areaDefinition = grid[y][x];
@@ -101,7 +103,7 @@ export function getAreaFromLocation(location: ZoneLocation): AreaDefinition {
                 layers: alternateAreaDefinition.layers.map(copyLayerTemplate),
             });
         } else {
-            const defaultLayers = (location.isSpiritWorld ? getDefaultSpiritArea(location) : getDefaultArea()).layers;
+            const defaultLayers = (location.isSpiritWorld ? getDefaultSpiritArea(location) : getDefaultArea(w, h)).layers;
             grid[y][x] = initializeAreaTiles({
                 ...areaDefinition,
                 layers: defaultLayers

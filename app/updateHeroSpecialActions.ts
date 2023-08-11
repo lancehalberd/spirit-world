@@ -54,7 +54,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         }
         if (state.nextAreaInstance.cameraOffset.y) {
             const dy = state.nextAreaInstance.cameraOffset.y / Math.abs(state.nextAreaInstance.cameraOffset.y);
-            if (dy > 0 && hero.y < 512 + 18) {
+            if (dy > 0 && hero.y < (state.zone.areaSize?.h ?? 32) * 16 + 18) {
                 hero.y += 0.7;
             } else if (dy < 0 && hero.y > -18) {
                 hero.y -= 0.7;

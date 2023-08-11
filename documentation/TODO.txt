@@ -43,15 +43,26 @@ Pending Graphics From Jon:
 
 Current tasks:
     - Expand overworld tiles to 48x48
-        - Support any area size with section matching the full area.
         - Technically 1024*1024 Tiles is the maximum size for modern browsers, but this is way larger than I'm intending.
     - Steps to support:
-        - Set grid size on zone
+        DONE Set grid size on zone
             - Add UI for changing these dimensions
+                - Upate every TileGrid+Section in the zone to match the new dimensions when updating them.
                 - Don't delete remoted rows/columns in case people accidentally set it lower than intended.
         DONE Use area instance w/h instead of 32/32 in refreshAreaLogic.
-        - Update map preview in editor to render larger than 32x32
-        - Figure out why swimming outside of normal dimensions
+        DONE Update map preview in editor to render larger than 32x32
+        DONE Update section selection to be based on the size instead of always 32x32
+        DONE - Fix brush doesn't work correctly over new dimensions
+            - Painting used tiles.length/tiles[0].length instead of layer.w/layer.h for dimensions.
+        DONE Figure out why swimming outside of normal dimensions
+            - Code for handling behaviors during screen transition was hardcoded to check 32x32 dimensions
+        DONE Fix scrolling to wrong section on larger areas.
+            - Only seems to happen on the right side when traveling south,
+            - Caused by various assumptions during screen transition.
+        - Fix brush preview doesn't show up correctly on larger areas.
+        - Check enemies use actual area size/section boundaries, particularly bosses that try to move offscreen.
+
+    - Add mapTile functionality that shows a 100xN area where every pair of tiles is each tile in order next to its mapped tile.
 
     - Break up Spirit Sky to make it act like a hub for exploring the spirit world.
         - Add magic beans that can grow vines to the sky

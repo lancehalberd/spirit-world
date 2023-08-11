@@ -45,6 +45,7 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
     }
     hero.canFloat = true;
     hero.isOverClouds = false;
+    const {w, h} = state.zone.areaSize ?? {w: 32, h: 32};
     for (let row = topRow; row <= bottomRow; row++) {
         for (let column = leftColumn; column <= rightColumn; column++) {
             let behaviors = behaviorGrid[row]?.[column];
@@ -52,12 +53,12 @@ export function checkForFloorEffects(state: GameState, hero: Hero) {
             let actualColumn = column;
             // During screen transitions, the row/column will be out of bounds for the current screen,
             // so we need to wrap them and work against the next screen.
-            if (row < 0 || row >= 32 || column < 0 || column >= 32) {
+            if (row < 0 || row >= h || column < 0 || column >= w) {
                 if (!state.nextAreaInstance) {
                     continue;
                 }
-                actualRow = (row + 32) % 32;
-                actualColumn = (column + 32) % 32;
+                actualRow = (row + h) % h;
+                actualColumn = (column + w) % w;
                 behaviors = state.nextAreaInstance.behaviorGrid[actualRow]?.[actualColumn];
             }
             // Default behavior is open solid ground.

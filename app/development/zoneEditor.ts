@@ -16,6 +16,7 @@ import { getState } from 'app/state';
 import { setAreaSection } from 'app/utils/area';
 import { createCanvasAndContext } from 'app/utils/canvas';
 import { enterLocation } from 'app/utils/enterLocation';
+import { everyAreaInZone } from 'app/utils/every';
 import { getFullZoneLocation } from 'app/utils/getFullZoneLocation';
 import { readFromFile, saveToFile, scaleRect } from 'app/utils/index';
 import { getMousePosition, isMouseDown } from 'app/utils/mouse';
@@ -41,8 +42,7 @@ const sectionLayouts = {
     bottomRow: [tlSection, trSection, bottomRow],
 }
 
-const superTileSize = 64;
-const tileScale = superTileSize / 32;
+const tileScale = 2;
 const pixelScale = tileScale / 16;
 
 const [mapCanvas, mapContext] = createCanvasAndContext(128, 128);
@@ -73,16 +73,18 @@ function refreshArea(state: GameState) {
 }
 
 function jumpToMinimapLocation() {
-  const [x, y] = getMousePosition(mapOverlayCanvas);
-  const gridRow = Math.floor(y / superTileSize);
-  const gridColumn = Math.floor(x / superTileSize);
-  const pixelX = Math.round(x / pixelScale) % 512;
-  const pixelY = Math.round(y / pixelScale) % 512;
-  const state = getState();
-  if (gridRow >= state.areaGrid.length && gridColumn >= state.areaGrid[0].length) {
-      return;
-  }
-  enterLocation(state, {
+    const [x, y] = getMousePosition(mapOverlayCanvas);
+    const state = getState();
+    const {w, h} = state.zone.areaSize ?? {w: 32, h: 32};
+
+    const gridRow = Math.floor(y / h / tileScale);
+    const gridColumn = Math.floor(x / w / tileScale);
+    const pixelX = Math.round(x / pixelScale) % (w * 16);
+    const pixelY = Math.round(y / pixelScale) % (h * 16);
+    if (gridRow >= state.areaGrid.length && gridColumn >= state.areaGrid[0].length) {
+        return;
+    }
+    enterLocation(state, {
       zoneKey: state.location.zoneKey,
       floor: state.location.floor,
       isSpiritWorld: state.location.isSpiritWorld,
@@ -91,7 +93,7 @@ function jumpToMinimapLocation() {
       x: pixelX,
       y: pixelY,
       z: 0,
-  });
+    });
 }
 
 const minimapContainer = tagElement('div');
@@ -135,9 +137,10 @@ export function renderZoneTabContainer(): HTMLElement {
     return zoneTabContainer.element;
 }
 export function getMinimapSize(state: GameState): {w: number, h: number} {
+    const {w, h} = state.zone.areaSize ?? {w: 32, h: 32};
     return {
-        w: state.areaGrid[0].length * superTileSize,
-        h: state.areaGrid.length * superTileSize,
+        w: state.areaGrid[0].length * w * tileScale,
+        h: state.areaGrid.length * h * tileScale,
     }
 }
 export function updateMinimapSize(state: GameState): void {
@@ -159,14 +162,15 @@ export function renderAreaToMinimap(state: GameState, area: AreaInstance, gridCo
     if (area.checkToRedrawTiles) {
         checkToRedrawTiles(area);
     }
+    const {w, h} = state.zone.areaSize ?? {w: 32, h: 32};
     mapContext.drawImage(area.canvas,
-        0, 0, 512, 512,
-        gridCoords.x * superTileSize, gridCoords.y * superTileSize, superTileSize, superTileSize
+        0, 0, w * 16, h * 16,
+        gridCoords.x * w * tileScale, gridCoords.y * h * tileScale, w * tileScale, h * tileScale
     );
     if (area.foregroundCanvas) {
         mapContext.drawImage(area.foregroundCanvas,
-            0, 0, 512, 512,
-            gridCoords.x * superTileSize, gridCoords.y * superTileSize, superTileSize, superTileSize
+            0, 0, w * 16, h * 16,
+            gridCoords.x * w * tileScale, gridCoords.y * h * tileScale, w * tileScale, h * tileScale
         );
     }
 }
@@ -202,14 +206,15 @@ export function checkToRefreshMinimap(state: GameState, forceRefresh = false): v
 }
 
 export function renderZoneEditor(context: CanvasRenderingContext2D, state: GameState, editingState: EditingState): void {
+    const {w, h} = state.zone.areaSize ?? {w: 32, h: 32};
     mapOverlayContext.clearRect(0, 0, mapOverlayCanvas.width, mapOverlayCanvas.height);
     mapOverlayContext.fillStyle = 'rgba(255, 255, 255, 1)';
     // Draw edges separating screens.
     for (let row = 0; row < state.areaGrid.length; row++) {
         for (let column = 0; column < state.areaGrid[row].length; column++) {
             mapOverlayContext.save();
-            mapOverlayContext.translate(column * superTileSize, row * superTileSize);
-            for( const section of (state.areaGrid[row][column]?.sections || [fullSection])) {
+            mapOverlayContext.translate(column * w * tileScale, row * h * tileScale);
+            for( const section of (state.areaGrid[row][column]?.sections || [{x: 0, y: 0, w, h}])) {
                 const {x, y, w, h} = scaleRect(section, tileScale);
                 mapOverlayContext.fillRect(x, y, w, 1);
                 mapOverlayContext.fillRect(x, y + h - 1, w, 1);
@@ -223,7 +228,7 @@ export function renderZoneEditor(context: CanvasRenderingContext2D, state: GameS
     for (let row = 0; row < state.areaGrid.length; row++) {
         for (let column = 0; column < state.areaGrid[row].length; column++) {
             mapOverlayContext.save();
-            mapOverlayContext.translate(column * superTileSize, row * superTileSize);
+            mapOverlayContext.translate(column * w * tileScale, row * h * tileScale);
             for(const object of (state.areaGrid[row][column]?.objects || [])) {
                 if (object.type !== 'door') {
                     continue;
@@ -257,8 +262,8 @@ export function renderZoneEditor(context: CanvasRenderingContext2D, state: GameS
     mapOverlayContext.fillStyle = 'rgba(255, 255, 255, 0.3)';
     const area = state.nextAreaInstance || state.areaInstance;
     renderAreaToMinimap(state, area, state.location.areaGridCoords);
-    const cameraX = Math.floor(state.location.areaGridCoords.x * superTileSize + state.camera.x * pixelScale - area.cameraOffset.x * pixelScale);
-    const cameraY = Math.floor(state.location.areaGridCoords.y * superTileSize + state.camera.y * pixelScale - area.cameraOffset.y * pixelScale);
+    const cameraX = Math.floor(state.location.areaGridCoords.x * w * tileScale + state.camera.x * pixelScale - area.cameraOffset.x * pixelScale);
+    const cameraY = Math.floor(state.location.areaGridCoords.y * h * tileScale + state.camera.y * pixelScale - area.cameraOffset.y * pixelScale);
     mapOverlayContext.fillRect(cameraX, cameraY, CANVAS_WIDTH * pixelScale, CANVAS_HEIGHT * pixelScale);
 }
 
@@ -463,6 +468,80 @@ export function getZoneProperties(): PanelRows {
             refreshArea(state);
         },
     }]);
+    rows.push(['Area Size', {
+        name: '',
+        id: `area-columns`,
+        value: state.zone.areaSize?.w ?? 32,
+        onChange(w: number) {
+            if (w < 1 || w > 512) {
+                return state.zone.areaSize?.w ?? 32;
+            }
+            if (w !== state.zone.areaSize?.w) {
+                const ow = state.zone.areaSize?.w ?? 32;
+                if (!state.zone.areaSize) {
+                    state.zone.areaSize = {w, h: 32};
+                } else {
+                    state.zone.areaSize.w = w;
+                }
+                everyAreaInZone(state.zone, (location, area) => {
+                    for (const layer of area.layers) {
+                        layer.grid.w = w;
+                    }
+                    for (const section of area.sections) {
+                        // Update sections to use the full width of the area between them.
+                        if (section.x > 0) {
+                            section.x = Math.floor(w / 2);
+                            section.w = w - section.x;
+                        } else if (section.w === ow) {
+                            section.w = w;
+                        } else {
+                            section.w = Math.floor(w / 2);
+                        }
+                    }
+                });
+                refreshArea(state);
+                checkToRefreshMinimap(state, true);
+            }
+        }
+    }, 'x', {
+        name: '',
+        id: `area-rows`,
+        value: state.zone.areaSize?.h ?? 32,
+        onChange(h: number) {
+            if (h < 1 || h > 512) {
+                return state.zone.areaSize?.h ?? 32;
+            }
+            if (h !== state.zone.areaSize?.h) {
+                const oh = state.zone.areaSize?.h ?? 32;
+                if (!state.zone.areaSize) {
+                    state.zone.areaSize = {w: 32, h};
+                } else {
+                    state.zone.areaSize.h = h;
+                }
+                everyAreaInZone(state.zone, (location, area) => {
+                    for (const layer of area.layers) {
+                        layer.grid.h = h;
+                        while (layer.grid.tiles.length < h) {
+                            layer.grid.tiles.push([]);
+                        }
+                    }
+                    for (const section of area.sections) {
+                        // Update sections to use the full height of the area between them.
+                        if (section.y > 0) {
+                            section.y = Math.floor(h / 2);
+                            section.h = h - section.y;
+                        } else if (section.h === oh) {
+                            section.h = h;
+                        } else {
+                            section.h = Math.floor(h / 2);
+                        }
+                    }
+                });
+                refreshArea(state);
+                checkToRefreshMinimap(state, true);
+            }
+        }
+    }]);
     rows.push({
         name: 'Spirit World',
         value: !!state.location.isSpiritWorld,
@@ -484,7 +563,7 @@ export function getZoneProperties(): PanelRows {
         }
     });
     rows = [...rows, ...getMinimapProperties()];
-    rows.push(['Size', {
+    rows.push(['Grid Size', {
         name: '',
         id: `floor-columns`,
         value: state.areaGrid[0].length,
@@ -542,13 +621,34 @@ export function getZoneProperties(): PanelRows {
         value: 'Change Layout',
         values: ['Change Layout', ...Object.keys(sectionLayouts)],
         onChange(sectionType: string) {
+            const areaSize = state.zone.areaSize ?? {w: 32, h: 32};
+            const scaledSections = sectionLayouts[sectionType].map(section => {
+                let {x, y, w, h} = section;
+                if (x > 0) {
+                    x = Math.floor(areaSize.w / 2);
+                    w = areaSize.w - x;
+                } else if (w === 32) {
+                    w = areaSize.w;
+                } else {
+                    w = Math.floor(areaSize.w / 2);
+                }
+                if (y > 0) {
+                    y = Math.floor(areaSize.h / 2);
+                    h = areaSize.h - y;
+                } else if (h === 32) {
+                    h = areaSize.h;
+                } else {
+                    h = Math.floor(areaSize.h / 2);
+                }
+                return {x, y, w, h};
+            })
             // Section layout is required to match between material and spirit world.
             // Mostly this is because it is annoying to have to update it in both places
             // when we almost always intend for them to be the same anyway.
-            const newCurrentSections = sectionLayouts[sectionType].map(section => ({...section}));
+            const newCurrentSections = scaledSections.map(section => ({...section}));
             replaceMapSections(state, state.location, state.areaInstance.definition.sections || [], newCurrentSections);
             state.areaInstance.definition.sections = newCurrentSections;
-            const newAlternateSections = sectionLayouts[sectionType].map(section => ({...section}));
+            const newAlternateSections = scaledSections.map(section => ({...section}));
             replaceMapSections(state, {
                 ...state.location,
                 isSpiritWorld: !state.location.isSpiritWorld,

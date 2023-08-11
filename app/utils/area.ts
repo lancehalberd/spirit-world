@@ -16,8 +16,11 @@ export function setAreaSection(state: GameState, newArea: boolean = false): void
     //console.log('setAreaSection', state.hero.x, state.hero.y);
     const lastAreaSection = state.areaSection;
     state.areaSection = getAreaSectionInstance(state, state.areaInstance.definition.sections[0]);
-    const x = Math.min(31, Math.max(0, (state.hero.x + 8) / 16));
-    const y = Math.min(31, Math.max(0, (state.hero.y + 8) / 16));
+    const {w, h} = state.zone.areaSize ?? {w: 32, h: 32};
+    // Make sure these are restricted to 1 tile inside the max dimensions as `isPointInShortRect`
+    // returns false for points on the edge of the rectangle.
+    const x = Math.min(w - 1, Math.max(1, (state.hero.x + 8) / 16));
+    const y = Math.min(h - 1, Math.max(1, (state.hero.y + 8) / 16));
     for (const section of state.areaInstance.definition.sections) {
         if (isPointInShortRect(x, y, section)) {
             state.areaSection = getAreaSectionInstance(state, section);
@@ -31,6 +34,31 @@ export function setAreaSection(state: GameState, newArea: boolean = false): void
         state.hero.safeD = state.hero.d;
         state.hero.safeX = state.hero.x;
         state.hero.safeY = state.hero.y;
+    }
+}
+
+export function setNextAreaSection(state: GameState, d: Direction): void {
+    //console.log('setNextAreaSection', d);
+    removeAllClones(state);
+    state.nextAreaSection = getAreaSectionInstance(state, state.areaInstance.definition.sections[0]);
+    const hero = state.hero;
+    let x = hero.x / 16;
+    let y = hero.y / 16;
+    if (d === 'right') {
+        x += hero.w / 16;
+    }
+    if (d === 'down') {
+        y += hero.h / 16;
+    }
+    const {w, h} = state.zone.areaSize ?? {w: 32, h: 32};
+    x = Math.min(w - 1, Math.max(1, x));
+    y = Math.min(h - 1, Math.max(1, y));
+    for (const section of state.areaInstance.definition.sections) {
+        if (isPointInShortRect(x, y, section)) {
+            state.nextAreaSection = getAreaSectionInstance(state, section);
+            exploreSection(state, section.index);
+            break;
+        }
     }
 }
 

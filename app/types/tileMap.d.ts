@@ -324,20 +324,24 @@ interface AreaDefinition {
 }
 
 interface Zone {
-    key: string,
+    key: string
     // If this zone is an underwater area, this key is set to the zone key of the surface area.
     // Travel to the surface is always from the top floor of the underwater zone to the bottom
     // floor of the surface zone.
-    surfaceKey?: string,
+    surfaceKey?: string
     // If this zone has a corresponding underwater area, this key is set to the zone key of the underwater area.
-    underwaterKey?: string,
-    floors: Floor[],
+    underwaterKey?: string
+    floors: Floor[]
+    // How large each area is in this zone. Since each floor is on a grid, areas must have consistent sizes in order
+    // to be laid out without gaps between them.
+    // If this is not set, a default value of {w: 32, h: 32} is assumed.
+    areaSize?: {w: number, h: number}
 }
 
 interface Floor {
-    origin?: {x: number, y: number},
-    grid?: AreaGrid,
-    spiritGrid: AreaGrid,
+    origin?: {x: number, y: number}
+    grid?: AreaGrid
+    spiritGrid: AreaGrid
 }
 
 type AreaGrid = AreaDefinition[][];

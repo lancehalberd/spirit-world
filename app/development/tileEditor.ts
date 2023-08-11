@@ -319,13 +319,12 @@ function drawBrush(targetX: number, targetY: number): void {
             }
             for (let y = 0; y < brushGrid.h; y++) {
                 const row = sy + y;
-                if (row < 0 || row >= layerDefinition.grid.tiles.length) {
+                if (row < 0 || row >= layerDefinition.grid.h) {
                     continue;
                 }
-                const tileRow = layerDefinition.grid.tiles[row];
                 for (let x = 0; x < brushGrid.w; x++) {
                     const column = sx + x;
-                    if (column < 0 || column >= tileRow.length) {
+                    if (column < 0 || column >= layerDefinition.grid.w) {
                         continue;
                     }
                     const tile = brushGrid.tiles[y][x];
@@ -383,6 +382,7 @@ function paintSingleTile(area: AreaInstance, layer: AreaLayer, parentDefinition:
         layer.maskTiles[y][x] = fullTile;
         // console.log(layer.key, layer.tiles[y][x], layer.maskTiles[y][x]);
     } else {
+        layer.definition.grid.tiles[y] = layer.definition.grid.tiles[y] || [];
         layer.definition.grid.tiles[y][x] = tile;
         layer.tiles[y][x] = fullTile;
         layer.originalTiles[y][x] = fullTile;
@@ -573,8 +573,9 @@ function performGlobalTileReplacement(oldPalette: TilePalette, newPalette: TileP
                     for (const area of areaRow) {
                         if (!area?.layers) continue;
                         for (const layer of area.layers) {
-                            for (const tileRow of layer.grid.tiles) {
-                                for (let x = 0; x < tileRow.length; x++) {
+                            for (let y = 0; y < layer.grid.h; y++) {
+                                const tileRow = layer.grid.tiles[y] || [];
+                                for (let x = 0; x < layer.grid.w; x++) {
                                     if (map[tileRow[x]] !== undefined) {
                                         console.log(tileRow[x] + ' => ' + map[tileRow[x]]);
                                         tileRow[x] = map[tileRow[x]];

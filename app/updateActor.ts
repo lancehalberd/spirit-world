@@ -1,6 +1,6 @@
 import {
     getAreaFromLocation,
-    scrollToArea, setNextAreaSection,
+    scrollToArea,
     swapHeroStates,
 } from 'app/content/areas';
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
@@ -13,7 +13,7 @@ import { prependScript } from 'app/scriptEvents';
 import { updateHeroSpecialActions } from 'app/updateHeroSpecialActions';
 import { updateHeroStandardActions } from 'app/updateHeroStandardActions';
 import { isToolButtonPressed, wasToolButtonPressed, wasToolButtonPressedAndReleased, } from 'app/useTool';
-import { removeAllClones } from 'app/utils/area';
+import { removeAllClones, setNextAreaSection } from 'app/utils/area';
 import { removeEffectFromArea } from 'app/utils/effects';
 import {
     directionMap,
