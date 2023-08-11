@@ -171,17 +171,17 @@ export class Door implements ObjectInstance {
             let x = this.x + 8 + directionMap[this.definition.d][0] * 96;
             let y = this.y + 8 + directionMap[this.definition.d][1] * 96;
             if (x < 0) {
-                x += 512;
+                x += this.area.w * 16;
                 gridX--;
-            } else if (x > 512) {
-                x -= 512
+            } else if (x > this.area.w * 16) {
+                x -= this.area.w * 16
                 gridX++;
             }
             if (y < 0) {
-                y += 512;
+                y += this.area.h * 16;
                 gridY--;
-            } else if (y > 512) {
-                y -= 512
+            } else if (y > this.area.h * 16) {
+                y -= this.area.h * 16
                 gridY++;
             }
             this.isHot = isLocationHot(state, {

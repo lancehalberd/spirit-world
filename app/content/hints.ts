@@ -1,3 +1,4 @@
+import { zones } from 'app/content/zones/zoneHash';
 import { isRandomizer } from 'app/gameConstants';
 import { findReachableChecksFromStart } from 'app/randomizer/find';
 import { setScript } from 'app/scriptEvents';
@@ -537,9 +538,15 @@ export function getMapTarget(state: GameState): ZoneLocation & { object?: Object
 }
 
 export function convertLocationToMapCoordinates(location: ZoneLocation & {object?: ObjectDefinition}): {x: number, y: number} {
+    const zone = zones[location.zoneKey];
+    const {w, h} = zone.areaSize ?? {w: 32, h: 32};
+    const pixel = {
+        x: location.areaGridCoords.x * w * 16 + location.x,
+        y: location.areaGridCoords.y * h * 16 + location.y,
+    }
     const coords = {
-        x: location.areaGridCoords.x * 64 + location.x / 8,
-        y: location.areaGridCoords.y * 64 + location.y / 8,
+        x: pixel.x * 4 / w,
+        y: pixel.y * 4 / h,
     };
     // Most doors are 32x32, so add 16 / 2 px to the coords to target the center of the door
     if (location.object?.type === 'door') {

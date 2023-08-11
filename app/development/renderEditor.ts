@@ -203,13 +203,14 @@ function drawBrushLayerPreview(
     defaultBrush: TileGridDefinition | null,
     rectangle: Rect,
 ): void {
+    const areaSize = state.zone.areaSize ?? {w: 32, h: 32};
     const w = 16, h = 16;
     for (let y = 0; y < rectangle.h; y++) {
         const ty = rectangle.y + y;
-        if (ty < 0 || ty >= 32) continue;
+        if (ty < 0 || ty >= areaSize.h) continue;
         for (let x = 0; x < rectangle.w; x++) {
             const tx = rectangle.x + x;
-            if (tx < 0 || tx >= 32) continue;
+            if (tx < 0 || tx >= areaSize.w) continue;
             let tile: FullTile|undefined|null = null;
             // The brush is used if it is defined.
             if (brush) {

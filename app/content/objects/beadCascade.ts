@@ -20,7 +20,7 @@ const crystalBeadsBottomOverAnimation = createAnimation('gfx/effects/beadcascade
     {x: 1, y: 1, cols: 7, duration: 2});
 
 function findBeadCutoff(this: void, state: GameState, area: AreaInstance, x: number, sy: number): number {
-    for (let y = Math.floor(sy / 16) * 16 + 8; y < 512; y += 16) {
+    for (let y = Math.floor(sy / 16) * 16 + 8; y < area.h * 16; y += 16) {
         const { objects } = getTileBehaviorsAndObstacles(
             state, area, {x: x + 8, y},
             null, null, object => {
@@ -36,7 +36,7 @@ function findBeadCutoff(this: void, state: GameState, area: AreaInstance, x: num
             return objects[0].y + 8;
         }
     }
-    return 512;
+    return area.h * 16;
 }
 
 const beadTileIndex = 1135;

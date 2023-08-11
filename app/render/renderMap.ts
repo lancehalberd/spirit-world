@@ -130,7 +130,7 @@ function refreshWorldMap(state: GameState, zoneKey: string): void {
         for (let column = 0; column < grid[row].length; column++) {
             const areaInstance = createAreaInstance(state, grid[row][column]);
             renderActualMapTile(mapContext, state, areaInstance,
-                {x: column * 64, w: 64, y: row * 64, h: 64},  {x: 0, y: 0, w: 512, h: 512});
+                {x: column * 64, w: 64, y: row * 64, h: 64},  {x: 0, y: 0, w: areaInstance.w * 16, h: areaInstance.h * 16});
         }
     }
 }
@@ -149,6 +149,7 @@ function refreshDungeonMap(state: GameState, mapId: string, floorId: string): vo
 
     mapContext.clearRect(0, 0, mapCanvas.width, mapCanvas.height);
     const sections = dungeonMaps[mapId].floors[floorId].sections;
+    const {w, h} = state.zone.areaSize ?? {w: 32, h: 32};
     for (let sectionIndex of sections) {
         const sectionData = allSections[sectionIndex];
         if (!sectionData) {
@@ -175,10 +176,10 @@ function refreshDungeonMap(state: GameState, mapId: string, floorId: string): vo
             // Draw the full tile first.
             sectionContext.clearRect(0, 0, 64, 64);
             renderActualMapTile(sectionContext, state, areaInstance,
-                {x: 0, w: 64, y: 0, h: 64},  {x: 0, y: 0, w: 512, h: 512});
+                {x: 0, w: 64, y: 0, h: 64},  {x: 0, y: 0, w: areaInstance.w * 16, h: areaInstance.h * 16});
             mapContext.drawImage(sectionCanvas,
-                section.x * 2, section.y * 2, section.w * 2, section.h * 2,
-                section.mapX * 32, section.mapY * 32, section.w * 2, section.h * 2,
+                section.x * 16 * 4 / w, section.y * 16 * 4 / h, section.w * 16 * 4 / w, section.h * 16 * 4 / h,
+                section.mapX * 32, section.mapY * 32, section.w * 16 * 4 / w, section.h * 16 * 4 / h,
             );
         mapContext.restore();
     }
@@ -228,11 +229,12 @@ function renderDungeonMap(context: CanvasRenderingContext2D, state: GameState): 
     // Draw the dungeon map to the screen
     drawCanvas(context, mapCanvas, {x: 0, y: 0, w: 192, h: 192}, innerDungeonMapRectangle);
     // Draw the flashing hero icon on top of the dungeon map if the hero is currently on the displayed floor.
+    const {w, h} = state.areaInstance;
     if (state.time % 1000 <= 600 && state.areaSection.definition.floorId === selectedFloorId) {
         drawFrame(context, heroIcon, {
             ...heroIcon,
-            x: innerDungeonMapRectangle.x + (state.areaSection.definition.mapX * 32 + state.location.x / 8 - heroIcon.w / 2 - state.areaSection.x * 2) | 0,
-            y: innerDungeonMapRectangle.y + (state.areaSection.definition.mapY * 32 + state.location.y / 8 - heroIcon.h / 2 - state.areaSection.y * 2) | 0,
+            x: innerDungeonMapRectangle.x + (state.areaSection.definition.mapX * 32 + (state.location.x - 16 * state.areaSection.x) * 4 / w - heroIcon.w / 2) | 0,
+            y: innerDungeonMapRectangle.y + (state.areaSection.definition.mapY * 32 + (state.location.y - 16 * state.areaSection.y) * 4 / h  - heroIcon.h / 2) | 0,
         });
     }
     if (editingState.isEditing) {
@@ -244,8 +246,8 @@ function renderDungeonMap(context: CanvasRenderingContext2D, state: GameState): 
                 context.fillRect(
                     innerDungeonMapRectangle.x + hoverSection.mapX * 32,
                     innerDungeonMapRectangle.y + hoverSection.mapY * 32,
-                    hoverSection.w * 2,
-                    hoverSection.h * 2
+                    hoverSection.w * 16 * 4 / w,
+                    hoverSection.h * 16 * 4 / h,
                 );
             context.restore();
         }
@@ -257,8 +259,8 @@ function renderDungeonMap(context: CanvasRenderingContext2D, state: GameState): 
             const r = pad({
                 x: section.mapX * 32,
                 y: section.mapY * 32,
-                w: section.w * 2,
-                h: section.h * 2
+                w: section.w * 16 * 4 / w,
+                h: section.h * 16 * 4 / h
             }, -4);
             context.strokeStyle = 'white';
             context.lineWidth = 2;
@@ -318,7 +320,7 @@ export function renderActualMapTile(context: CanvasRenderingContext2D, state: Ga
     // Draw additional objects that we want to show on the map.
     context.save();
         context.translate(target.x, target.y);
-        context.scale(1 / 8, 1 / 8);
+        context.scale(4 / area.w, 4 / area.h);
         for (const object of area.objects) {
             if (!mapObjectTypes.includes(object.definition?.type)) {
                 continue;

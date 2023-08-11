@@ -1,10 +1,8 @@
 import { evaluateLogicDefinition, logicHash, isLogicValid, isObjectLogicValid } from 'app/content/logic';
-import { exploreSection } from 'app/utils/sections';
 import { allTiles } from 'app/content/tiles';
 import { zones } from 'app/content/zones';
 import { editingState } from 'app/development/editingState';
 import { cleanupHeroFromArea, getAreaSectionInstance, removeAllClones } from 'app/utils/area';
-import { isPointInShortRect } from 'app/utils/index';
 import { specialBehaviorsHash } from 'app/content/specialBehaviors/specialBehaviorsHash';
 import { createCanvasAndContext } from 'app/utils/canvas';
 import { createObjectInstance, } from 'app/utils/createObjectInstance';
@@ -75,7 +73,7 @@ export function getDefaultSpiritArea(location: ZoneLocation): AreaDefinition {
         objects: [],
         // Spirit world sections should match their parent definition, otherwise the
         // camera will not be aligned correctly when switching back and forth.
-        sections: parentDefinition.sections,
+        sections: parentDefinition.sections.map(section => ({...section})),
     };
 }
 
@@ -260,29 +258,6 @@ export function scrollToArea(state: GameState, area: AreaDefinition, direction: 
     }
     if (direction === 'right') {
         state.nextAreaInstance.cameraOffset.x = state.areaInstance.canvas.width;
-    }
-}
-
-
-export function setNextAreaSection(state: GameState, d: Direction): void {
-    //console.log('setNextAreaSection', d);
-    removeAllClones(state);
-    state.nextAreaSection = getAreaSectionInstance(state, state.areaInstance.definition.sections[0]);
-    const hero = state.hero;
-    let x = hero.x / 16;
-    let y = hero.y / 16;
-    if (d === 'right') {
-        x += hero.w / 16;
-    }
-    if (d === 'down') {
-        y += hero.h / 16;
-    }
-    for (const section of state.areaInstance.definition.sections) {
-        if (isPointInShortRect(x, y, section)) {
-            state.nextAreaSection = getAreaSectionInstance(state, section);
-            exploreSection(state, section.index);
-            break;
-        }
     }
 }
 
