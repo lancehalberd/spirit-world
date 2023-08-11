@@ -22,8 +22,8 @@ export function serializeZone(zone: Zone) {
                         continue;
                     }
                     area.layers.forEach(layer => {
-                        for (let r = 0; r < layer.grid.tiles.length; r++) {
-                            for (let c = 0; c < layer.grid.tiles[r].length; c++) {
+                        for (let r = 0; r < layer.grid.h; r++) {
+                            for (let c = 0; c < layer.grid.w; c++) {
                                 if (layer.grid.tiles[r][c]) {
                                     isEmpty = false;
                                     return false;
@@ -79,8 +79,9 @@ export function serializeZone(zone: Zone) {
                                 lines.push(`                w: ${layer.grid.w},`);
                                 lines.push(`                h: ${layer.grid.h},`);
                                 lines.push('                tiles: [');
-                                for (const row of layer.grid.tiles) {
-                                    lines.push(`                    [${row.map(v => v || 0).join(',')}],`);
+                                for (let y = 0; y < layer.grid.h; y++) {
+                                    const row = layer.grid.tiles[y];
+                                    lines.push(`                    [${row.slice(0, layer.grid.w).map(v => v || 0).join(',')}],`);
                                 }
                                 lines.push('                ],');
                                 lines.push('            },');
@@ -90,8 +91,9 @@ export function serializeZone(zone: Zone) {
                                 lines.push(`                w: ${layer.mask.w},`);
                                 lines.push(`                h: ${layer.mask.h},`);
                                 lines.push('                tiles: [');
-                                for (const row of layer.mask.tiles) {
-                                    lines.push(`                    [${row?.map(v => v || 0).join(',') || ''}],`);
+                                for (let y = 0; y < layer.grid.h; y++) {
+                                    const row = layer.mask.tiles[y];
+                                    lines.push(`                    [${row?.slice(0, layer.grid.w).map(v => v || 0).join(',') || ''}],`);
                                 }
                                 lines.push('                ],');
                                 lines.push('            },');
@@ -153,6 +155,8 @@ export function serializeZone(zone: Zone) {
 
     lines.push(`zones.${zone.key} = {`);
     lines.push(`    key: '${zone.key}',`);
+    const {w, h} = zone.areaSize ?? {w:32, h: 32};
+    lines.push(`    areaSize: {w: ${w}, h: ${h}},`);
     if (zone.surfaceKey) {
         lines.push(`    surfaceKey: '${zone.surfaceKey}',`);
     }

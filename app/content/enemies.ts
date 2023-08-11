@@ -14,7 +14,6 @@ import {
     floorEyeAnimations,
     icePlantAnimations,
     blueSnakeAnimations,
-    snakeAnimations,
 } from 'app/content/enemyAnimations';
 import { certainLifeLootTable, simpleLootTable, lifeLootTable, moneyLootTable } from 'app/content/lootTables';
 import { renderIndicator } from 'app/content/objects/indicator';
@@ -22,7 +21,7 @@ import { editingState } from 'app/development/editingState';
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { drawFrameCenteredAt } from 'app/utils/animations';
 import {
-    paceAndCharge, paceRandomly, scurryAndChase,
+    paceAndCharge, scurryAndChase,
 } from 'app/utils/enemies';
 import { getLineOfSightTargetAndDirection, getNearbyTarget, getVectorToNearbyTarget } from 'app/utils/target';
 import { addEffectToArea } from 'app/utils/effects';
@@ -34,7 +33,7 @@ export * from 'app/content/enemies/crusher';
 export * from 'app/content/enemies/crystalBat';
 export * from 'app/content/enemies/crystalGuardian';
 export * from 'app/content/enemies/electricSquirrel';
-export * from 'app/content/enemies/flameSnake';
+export * from 'app/content/enemies/snake';
 export * from 'app/content/enemies/lightningDrone';
 export * from 'app/content/enemies/luckyBeetle';
 export * from 'app/content/enemies/sentryBot';
@@ -61,10 +60,6 @@ declare global {
 }
 
 
-enemyDefinitions.snake = {
-    animations: snakeAnimations, life: 2, touchDamage: 1, update: paceRandomly, flipRight: true,
-    lootTable: simpleLootTable,
-};
 enemyDefinitions.beetle = {
     animations: beetleAnimations, acceleration: 0.05, life: 2, touchDamage: 1, update: scurryAndChase,
     lootTable: simpleLootTable,
