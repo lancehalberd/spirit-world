@@ -39,6 +39,8 @@ export * from 'app/content/zones/staffTower';
 export * from 'app/content/zones/lab';
 export * from 'app/content/zones/tree';
 export * from 'app/content/zones/void';
+// debugging zones
+export * from 'app/content/zones/tileMapping';
 // minimizer zones
 export * from 'app/content/zones/minimizer/light1';
 

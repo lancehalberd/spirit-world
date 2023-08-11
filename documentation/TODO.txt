@@ -42,7 +42,29 @@ Pending Graphics From Jon:
     - Storm Beast Statue animations
 
 Current tasks:
-    - Add mapTile functionality that shows a 100xN area where every pair of tiles is each tile in order next to its mapped tile.
+    - Brainstorm ideas for Forest Temple
+        - Include as much generated content as possible
+            - Generated content should use a new worldSeed that is readable from url parameters
+                - worldSeed should be 0 by default
+                - For randomizer, worldSeed should default to randomizer seed
+        - NPCs should be Vanara Crew Biologists and Native Spirit Scientists
+            - Might have to think about how specifically Vanara share information+techniques with native Spirit Gods to avoid giving them too much power/information.
+            - Probably an underlying tension where as factions they are strategically trying to gain more information, but at the same time many individuals
+                just want to learn more and solve important problems.
+            - There is a faction of military scientists that previously served the War God that other native scientists distrust more than the Vanara.
+                - The boss could be a side project of these scientists that the Vanara have allowed them to create specifically for training Vanara in combat.
+        - Area should contain artificial biomes for hosting a variety of creatures both native material/native spirit and vanara as well as new hybrids.
+            - Will need to support hybrid monsters of various sorts
+                - exist fully in both worlds
+                - have different parts in each world
+                - phase in and out between worlds
+            - Water Biome, Fire Biome, Desert Biome, Cave Biome, Forest Biome, Grass Biome, Cold Biome, Marshe Biome
+            - New enemies added here can be used to populate other areas of the game.
+                For example the water temple and the crater need new enemies that could be shared here.
+            - It would also be cool to have a history of successful hybrids with some having been out in nature for generations, and others recently released and
+                others currently in testing, others still in development or planning.
+            - The enemies the hero encounters are intentionally accessible and being tests for hostility and survivability.
+                - MC has been expected here for some time, perhaps even before the start of the game.
 
     - Break up Spirit Sky to make it act like a hub for exploring the spirit world.
         - Add magic beans that can grow vines to the sky
