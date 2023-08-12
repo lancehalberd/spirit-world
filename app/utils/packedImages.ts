@@ -263,12 +263,12 @@ export function checkForPackedImage(source: string): Frame|undefined {
     return {...r, image: imagePack.image};
 }
 
-export function requireFrame(source: string, r?: Rect): Frame {
+export function requireFrame(source: string, r?: FrameRectangle): Frame {
     const p = checkForPackedImage(source);
     // If the
     if (p) {
         return r
-            ? {image: p.image, x: r.x + p.x, y: r.y + p.y, w: r.w, h: r.h}
+            ? {image: p.image, x: r.x + p.x, y: r.y + p.y, w: r.w, h: r.h, content: r.content}
             : p;
     }
     const frame = {
@@ -279,7 +279,9 @@ export function requireFrame(source: string, r?: Rect): Frame {
                 frame.h = frame.image.height;
             }
         }),
-        x: r?.x ?? 0, y: r?.y ?? 0, w: r?.w ?? 0, h: r?.h ?? 0
+        x: r?.x ?? 0, y: r?.y ?? 0,
+        w: r?.w ?? 0, h: r?.h ?? 0,
+        content: r?.content
     };
     return frame;
 }

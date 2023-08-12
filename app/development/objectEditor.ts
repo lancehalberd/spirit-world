@@ -290,6 +290,7 @@ export function createObjectDefinition(
             return {
                 ...commonProps,
                 type: definition.type,
+                z: definition.z,
                 w: definition.w || 16,
                 h: definition.h || 16,
                 decorationType: definition.decorationType || Object.keys(decorationTypes)[0] as DecorationType,
@@ -741,6 +742,14 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                 values: ['background', 'sprites', 'foreground'],
                 onChange(drawPriority: DrawPriority) {
                     object.drawPriority = drawPriority;
+                    updateObjectInstance(state, object);
+                },
+            });
+            rows.push({
+                name: 'z',
+                value: object.z || 0,
+                onChange(z: number) {
+                    object.z = z;
                     updateObjectInstance(state, object);
                 },
             });

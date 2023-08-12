@@ -501,8 +501,10 @@ interface DecorationDefinition extends BaseObjectDefinition {
     type: 'decoration'
     decorationType: DecorationType
     drawPriority?: DrawPriority
-    w: number,
-    h: number,
+    w: number
+    h: number
+    // Useful for fixing the layering of decorations on top of other objects.
+    z?: number
 }
 
 interface WaterfallDefinition extends BaseObjectDefinition {
