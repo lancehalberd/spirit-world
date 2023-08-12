@@ -143,6 +143,11 @@ const stoneFloorDecorations: TileSource = {
     source: requireFrame('gfx/tiles/stonetileset.png', {x: 0, y: 0, w: 48, h: 64}),
     behaviors: {
         'all': { defaultLayer: 'floor2' },
+        '17x7': { defaultLayer: 'floor' },
+        '18x7': { defaultLayer: 'floor' },
+        '17x8': { defaultLayer: 'floor' },
+        '18x8': { defaultLayer: 'floor' },
+
     },
     tileCoordinates: [
         [15, 5],[16, 5],[17, 5],[18, 5],
