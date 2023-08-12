@@ -21,6 +21,9 @@ export function isItemLogicTrue(state: GameState, itemFlag: string): boolean {
             return !!state.savedState.dungeonInventories[itemFlag]?.[levelString];
         }
     }
+    if (itemFlag === 'isSpirit') {
+        return !!state.hero.astralProjection;
+    }
     if (itemFlag === 'randomizer') {
         return isRandomizer;
     }

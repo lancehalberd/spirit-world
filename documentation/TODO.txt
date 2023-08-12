@@ -42,7 +42,6 @@ Pending Graphics From Jon:
     - Storm Beast Statue animations
 
 Current tasks:
-    - give the vanara guardian alternate text when talking to him as astral projection (do not allow getting teleportation while talking as astral projection).
     - Elemental enemy
         - Immune to attacks except for different elements
             - Will attempt to bond with unbonded hosts that are compatible:

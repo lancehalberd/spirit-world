@@ -40,8 +40,23 @@ dialogueHash.tombGuardian = {
         },
         {
             logicCheck: {
-                requiredFlags: ['cocoonBoss'],
+                requiredFlags: ['cocoonBoss', '$isSpirit'],
                 excludedFlags: ['$teleportation'],
+                zones: ['cocoon'],
+            },
+            isExclusive: true,
+            text: [
+                {
+                    dialogueIndex: 98,
+                    text:`I am impressed!{|}
+                    Step through the portal and speak to me to learn my final technique.`
+                },
+            ],
+        },
+        {
+            logicCheck: {
+                requiredFlags: ['cocoonBoss'],
+                excludedFlags: ['$teleportation', '$isSpirit'],
                 zones: ['cocoon'],
             },
             isExclusive: true,

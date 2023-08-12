@@ -258,7 +258,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         }
     }
     if (hero.action === 'meditating') {
-        if (isPlayerControlled && isGameKeyDown(state, GAME_KEY.MEDITATE)) {
+        if (isPlayerControlled && (isGameKeyDown(state, GAME_KEY.MEDITATE) || state.scriptEvents.blockPlayerInput)) {
             // You can use the clone explosion ability only if a controllable clone exists
             // to either explode or switch to.
             if (hero.isUncontrollable
