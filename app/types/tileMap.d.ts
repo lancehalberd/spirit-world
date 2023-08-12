@@ -100,6 +100,12 @@ interface TileBehaviors {
     // If this is set to false, then a tile shouldn't override pit/lava behavior underneath it.
     // If this is set to true on an object then it should override ground behavior underneath it.
     isGround?: boolean
+    // If this is true, this tile is an overlay on top of the ground and should have cover effects applied
+    // to the layer beneath it instead of on top of it.
+    // For example, shadows are typically on `field2` which is in the background, but freezing tiles shuold
+    // apply to the layers beneath the shadow, otherwise the frozen tile will be rendered over the shadow
+    // instead of under it.
+    isOverlay?: boolean
     // number of pixels to raise the player when on this tile. Created for the staff ground.
     groundHeight?: number
     // Assign this to skip tiles in source images.

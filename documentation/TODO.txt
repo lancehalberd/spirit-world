@@ -42,8 +42,6 @@ Pending Graphics From Jon:
     - Storm Beast Statue animations
 
 Current tasks:
-    - freezing tiles removes shadows
-        - mark shadows as not coverable.
     - for boss music: wait until area track fades out before starting boss music at full volume
         - fade boss music out when the boss is showing the defeated animation
     - make the map chest in the top right of the war temple accessible without gloves

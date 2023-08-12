@@ -719,7 +719,7 @@ const shadows: TileSource = {
     w: 16, h: 16,
     source: requireFrame('gfx/tiles/shadowtiles.png', {x: 0, y: 0, w: 48, h: 64}),
     behaviors: {
-        'all': { defaultLayer: 'field2', isGround: false },
+        'all': { defaultLayer: 'field2', isGround: false, isOverlay: true },
     },
     tileCoordinates: [
         [0,0],[1,0],[2,0],[3,0],[4,0],[6,0],[7,0],[8,0],[9,0],[0,1],[2,1],[3,1],[4,1],[6,1],[7,1],[8,1],[9,1],

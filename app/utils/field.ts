@@ -558,7 +558,10 @@ export function hitTargets(this: void, state: GameState, area: AreaInstance, hit
             for (const layer of area.layers) {
                 // 'foreground' layer defaults to being in the foreground regardless of drawPriority.
                 if (layer.definition.key !== 'foreground' && layer.definition.drawPriority !== 'foreground') {
-                    topLayer = layer;
+                    const behaviors = layer.tiles[target.y][target.x]?.behaviors;
+                    if (!behaviors?.isOverlay) {
+                        topLayer = layer;
+                    }
                 } else {
                     break;
                 }
