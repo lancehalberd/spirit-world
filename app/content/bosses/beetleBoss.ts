@@ -40,7 +40,7 @@ function updateBeetleBoss(state: GameState, enemy: Enemy): void {
     }
     if (enemy.mode === 'enter') {
         // Don't show the healthbar immediately.
-        if (enemy.modeTime < 2000) {
+        if (enemy.modeTime < 1000) {
             enemy.healthBarTime = 0;
         }
         if (enemy.modeTime < 1500) {

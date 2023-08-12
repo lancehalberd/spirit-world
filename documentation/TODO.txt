@@ -42,8 +42,7 @@ Pending Graphics From Jon:
     - Storm Beast Statue animations
 
 Current tasks:
-    - for boss music: wait until area track fades out before starting boss music at full volume
-        - fade boss music out when the boss is showing the defeated animation
+    - fade boss music out when the boss is showing the defeated animation
     - make the map chest in the top right of the war temple accessible without gloves
     - give the vanara guardian alternate text when talking to him as astral projection (do not allow getting teleportation while talking as astral projection).
     - Elemental enemy

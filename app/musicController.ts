@@ -1,5 +1,13 @@
 import { getFullZoneLocation } from 'app/utils/getFullZoneLocation';
-import { getSoundSettings, isTrackPlaying, playSound as playSoundProper, playTrack } from 'app/utils/sounds';
+import {
+    fadeOutPlayingTracks,
+    getSoundSettings,
+    isATrackFadingOut,
+    isATrackPlaying,
+    isTrackPlaying,
+    playSound as playSoundProper,
+    playTrack,
+} from 'app/utils/sounds';
 
 export { stopSound, updateSoundSettings } from 'app/utils/sounds';
 export const updateMusic = (state: GameState): void => {
@@ -27,7 +35,13 @@ export const updateMusic = (state: GameState): void => {
         // Eventually it might be fun to add logic here to manipulate which sections play based on
         // how the fight is going, for example more intense music when the boss is enraged.
         if (!isTrackPlaying('bossIntro') && !isTrackPlaying('bossA') && !isTrackPlaying('bossB')) {
-            playTrack('bossIntro', 0, soundSettings);
+            if (isATrackPlaying()) {
+                // If other tracks are still playing fade them out.
+                fadeOutPlayingTracks();
+            } else if (!isATrackFadingOut()) {
+                // Once all tracks are faded out, start the boss music without fading in.
+                playTrack('bossIntro', 0, soundSettings, false, false);
+            }
         }
     } else if (location.zoneKey === 'overworld') {
         if (!location.isSpiritWorld

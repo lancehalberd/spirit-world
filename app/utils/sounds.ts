@@ -36,7 +36,7 @@ export function requireSound(key, callback = null): GameSound {
             loop: false,
             volume: volume / 50,
             // Stop the track when it finishes fading out.
-            onfade: function () {
+            onfade() {
                 //console.log('finished fade', newSound.props.src, newSound.shouldPlay, newSound.howl.volume());
                 // console.log(id, 'fadein', currentTrackSource, key, this.volume());
                 // Documentation says this only runs when fade completes,
@@ -45,6 +45,9 @@ export function requireSound(key, callback = null): GameSound {
                     //console.log('Stopping from onFade ', newSound.props.src);
                     newSound.howl.stop();
                     // this.volume(volume / 50);
+                    removeFadingTrack(newSound);
+                } else if (newSound.howl.volume() === 0) {
+                    removeFadingTrack(newSound);
                 }
             },
             onplay() {
@@ -60,20 +63,20 @@ export function requireSound(key, callback = null): GameSound {
                     newSound.howl.volume(newSound.props.volume * newSound.soundSettings.globalVolume);
                 }
             },
-            onplayerror: function (error) {
+            onplayerror(error) {
                 //console.log('onplayerror', newSound.props.src, error);
             },
-            onload: function () {
+            onload() {
                 if (callback) {
                     callback(newSound);
                 }
             },
-        };
-        howlerProperties.onend = function() {
-            //console.log('onend repeatFrom', repeatFrom, newSound.props.src, key);
-            newSound.shouldFadeIn = false;
-            newSound.howl.seek((repeatFrom || 0) / 1000);
-            newSound.howl.play();
+            onend() {
+                //console.log('onend repeatFrom', repeatFrom, newSound.props.src, key);
+                newSound.shouldFadeIn = false;
+                newSound.howl.seek((repeatFrom || 0) / 1000);
+                newSound.howl.play();
+            }
         };
         // A track can specify another track source to automatically transition to without crossfade.
         if (nextTrack) {
@@ -93,7 +96,7 @@ export function requireSound(key, callback = null): GameSound {
             howl: new Howl(howlerProperties),
             props: howlerProperties,
             nextTrack,
-        }
+        };
         sounds.set(key, newSound);
         return newSound;
     } else {
@@ -200,7 +203,14 @@ export function stopSound(sound: GameSound): void {
 window['stopSound'] = stopSound;
 
 
-let playingTracks: GameSound[] = [], trackIsPlaying = false;
+let playingTracks: GameSound[] = [];
+const fadingTracks: GameSound[] = [];
+function removeFadingTrack(track: GameSound) {
+    const index = fadingTracks.indexOf(track);
+    if (index >= 0) {
+        fadingTracks.splice(index, 1);
+    }
+}
 window['playingTracks'] = playingTracks;
 
 
@@ -239,7 +249,7 @@ const musicTracks = {
     bossA: {key: 'bossA', type: 'bgm', source: 'bgm/SpookyThemeA.mp3', volume: 40, nextTrack: 'bossB' },
     bossB: {key: 'bossB', type: 'bgm', source: 'bgm/SpookyThemeB.mp3', volume: 40, nextTrack: 'bossA' },
 };
-export function playTrack(trackKey: TrackKey, timeOffset, soundSettings: SoundSettings, fadeOutOthers = true, crossFade = true) {
+export function playTrack(trackKey: TrackKey, timeOffset, soundSettings: SoundSettings, fadeOutOthers = true, crossFade = true): GameSound|false {
     if (!audioUnlocked) {
         return;
     }
@@ -261,7 +271,6 @@ export function playTrack(trackKey: TrackKey, timeOffset, soundSettings: SoundSe
         }
     }*/
     //console.log('playTrack', playingTracks, source, sound);
-    trackIsPlaying = false;
     if (fadeOutOthers) {
         if (crossFade) fadeOutPlayingTracks();
         else stopTrack();
@@ -293,17 +302,21 @@ export function playTrack(trackKey: TrackKey, timeOffset, soundSettings: SoundSe
     return sound;
 }
 
-function fadeOutPlayingTracks(currentTracks: GameSound[] = []) {
+export function fadeOutPlayingTracks(currentTracks: GameSound[] = []) {
     const keepPlayingTracks: GameSound[] = [];
     for (const trackToFadeOut of playingTracks) {
         if (currentTracks.includes(trackToFadeOut)) {
             keepPlayingTracks.push(trackToFadeOut);
             continue;
         }
+        // This will cause the track to stop playing the next time a fade completes.
         trackToFadeOut.shouldPlay = false;
         if (trackToFadeOut.howl.volume()) {
             //console.log('Fade out ' + trackToFadeOut.props.src, trackToFadeOut.howl.volume());
             trackToFadeOut.howl.fade(trackToFadeOut.howl.volume(), 0, 1000);
+            if (fadingTracks.indexOf(trackToFadeOut) < 0) {
+                fadingTracks.push(trackToFadeOut);
+            }
         } else {
             //console.log('Fade directly stop ' + trackToFadeOut.props.src, trackToFadeOut.howl.volume());
             trackToFadeOut.howl.stop();
@@ -340,7 +353,6 @@ export function updateSoundSettings(state: GameState) {
 }
 
 export function stopTrack() {
-    trackIsPlaying = false;
     for (const playingTrack of playingTracks) {
         //console.log('Stopping from stopTrack ', playingTrack.props.src);
         playingTrack.howl.stop();
@@ -348,8 +360,12 @@ export function stopTrack() {
     playingTracks = [];
     window['playingTracks'] = playingTracks;
 }
-export function isATrackPlaying() {
-    return trackIsPlaying;
+// Tracks may still be fading out when this returns false. Check isATrackFadingOut as well to avoid this.
+export function isATrackPlaying(): boolean {
+    return !!playingTracks.length;
+}
+export function isATrackFadingOut(): boolean {
+    return !!fadingTracks.length;
 }
 export function isTrackPlaying(trackKey: TrackKey): boolean {
     const sound = requireSound(musicTracks[trackKey]);
