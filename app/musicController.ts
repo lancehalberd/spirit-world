@@ -27,20 +27,28 @@ export const updateMusic = (state: GameState): void => {
         e => e.status !== 'gone' && e.healthBarTime > 100 && e.definition.type === 'boss'
         && e.isFromCurrentSection(state)
     ) as Enemy[];
+    const livingBosses = bosses.filter(boss => !boss.isDefeated);
     const location = getFullZoneLocation(state.location);
     if (bosses.length) {
-        // The boss track is several different pieces, so we want to make sure not to restart the intro
-        // when any of them are still playing. Note that the tracks will automatically transition
-        // because of built in logic so we don't need to add logic to play the other tracks.
-        // Eventually it might be fun to add logic here to manipulate which sections play based on
-        // how the fight is going, for example more intense music when the boss is enraged.
-        if (!isTrackPlaying('bossIntro') && !isTrackPlaying('bossA') && !isTrackPlaying('bossB')) {
+        if (!livingBosses.length) {
+            // Fade out the boss music once the last boss is defeated.
             if (isATrackPlaying()) {
-                // If other tracks are still playing fade them out.
                 fadeOutPlayingTracks();
-            } else if (!isATrackFadingOut()) {
-                // Once all tracks are faded out, start the boss music without fading in.
-                playTrack('bossIntro', 0, soundSettings, false, false);
+            }
+        } else {
+            // The boss track is several different pieces, so we want to make sure not to restart the intro
+            // when any of them are still playing. Note that the tracks will automatically transition
+            // because of built in logic so we don't need to add logic to play the other tracks.
+            // Eventually it might be fun to add logic here to manipulate which sections play based on
+            // how the fight is going, for example more intense music when the boss is enraged.
+            if (!isTrackPlaying('bossIntro') && !isTrackPlaying('bossA') && !isTrackPlaying('bossB')) {
+                if (isATrackPlaying()) {
+                    // If other tracks are still playing fade them out.
+                    fadeOutPlayingTracks();
+                } else if (!isATrackFadingOut()) {
+                    // Once all tracks are faded out, start the boss music without fading in.
+                    playTrack('bossIntro', 0, soundSettings, false, false);
+                }
             }
         }
     } else if (location.zoneKey === 'overworld') {
