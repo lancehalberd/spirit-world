@@ -42,6 +42,26 @@ Pending Graphics From Jon:
     - Storm Beast Statue animations
 
 Current tasks:
+    - missing hiddne ledges south of peach piece in war temple near big key,
+    - for boss music: wait until area track fades out before starting boss music at full volume
+        - fade boss music out when the boss is showing the defeated animation
+    - make the map chest in the top right of the war temple accessible without gloves
+    - give the vanara guardian alternate text when talking to him as astral projection (do not allow getting teleportation while talking as astral projection).
+    - Elemental enemy
+        - Immune to attacks except for different elements
+            - Will attempt to bond with unbonded hosts that are compatible:
+                - Snake/Flower/Flying Beetle/Charging Beetle/Ent/Turret/Squirrel
+                    - Ideally each of these would support the base type + all three elements, but initially we can just support a few.
+            - Once bonded the elemental will render as a transparent version of the host with damaging particles, similar to the lightning bots in staff tower
+            - The bonded elemental is still immune to the same attacks. However, if defeated, the host will revert to the base type, possibly being destroyed:
+                - For example, a fire snake in a hot room will become a normal snake and start suffering burning damage if the fire spirit attached to it is destroyed.
+            - If the host is defeated the elemental will rever to its original form, potentially bonding with other nearby targets.
+                - This could be used for a puzzle in the war temple where you need to kill one type of frost enemy so the the ice elemental possesses a different monster,
+                    for example a plant, that can then be leveraged to solve a puzzle, say freezing a broken pot, or getting a flame enemy to melt ice around a chest.
+            - Add one of each elemental to the plant room to posses them and create all three plant varieties
+                - Lightning plant does an AOE discharge around it when the player is in range.
+                - Flame plant errupts with a spray of flames that float down and persist for a while.
+
     - Brainstorm ideas for Forest Temple
         - Include as much generated content as possible
             - Generated content should use a new worldSeed that is readable from url parameters
@@ -58,6 +78,19 @@ Current tasks:
                 - exist fully in both worlds
                 - have different parts in each world
                 - phase in and out between worlds
+                - symbiotic pairs between spirit beings and material beings
+                    - flame spirit pairs with a snake to give it fire powers and allow it to survive in colder environments
+                - Set of native elemental spirits for each element, lightning/fire/ice
+                    - generic plant/snake/beetle/squirrel monsters can bond with spirit beings to become hybrid creatures through symbiosis
+                    - The ice plant/fire snake/lightning beetle/lightning squirrels in game can just be examples of these hybrids.
+                    - Could have more powerful spirits make more powerful hybrids.
+                    - This also sets a good precedence for spirits bonding with the MC after defeating the elemental beasts.
+                    - Summoning the elemental beasts would require sacrificing animals for them to bond with.
+                        - The elemental beasts power is so destructive that the animals' bodies are destroyed over the course of the summoning.
+                        - The phoenix was created by progenitors but was too powerful being able to restore its physical body with energy from the spirit world.
+                        - The elemental beasts with their Vanara hearts represents a similar threat as the phoenix, except the hearts function as a weakness.
+                        - Level 2 charged attacks could damage the player as they are channeling too much energy from the spirit realm for their body to handle.
+                            - The phoenix crown would eliminate this damage by using the crown to channel energy more effectively.
             - Water Biome, Fire Biome, Desert Biome, Cave Biome, Forest Biome, Grass Biome, Cold Biome, Marshe Biome
             - New enemies added here can be used to populate other areas of the game.
                 For example the water temple and the crater need new enemies that could be shared here.
@@ -291,6 +324,15 @@ Current tasks:
 
     - Holy Sanctum Improvements
         - Add phoenix boss before phoenix crown prize
+            - The phoenix spawns by opening the large chest with the crown inside of it and drops the crown when defeated.
+            - When opening the chest, the crown prize appears.
+                "You obtained the Phoenix Crown?!" "..." "The Crown bursts into flames!!"
+                Then the crown sprite turns into the Phoenix and the battle commences
+                The Phoenix regenerates life faster the more wounded it is. It can only be defeated with a level 2 charge attack when weakened enough.
+                ? Should this same sequence play out with any item in randomizer, or should the Phoenix crown always initiate the fight in randomizer
+                    - Perhaps spawning the Phoenix briefly transports the player to a pocket spirit dimension where the fight happens.
+                    - For now, let's just have this apply to whichever item is placed in the Phoenix Crown chest in the Holy Sanctum.
+                    - The item will still appear to be the phoenix crown on opening the chest, butt then the Phoenix will just drop whatever it was assigned.
         - Add sanctum tower with bow in big chest
             - Include hybrid material/spirt world puzzles
 
@@ -303,15 +345,11 @@ Current tasks:
     Cocoon Boss
         - Improve visuals for persistent blast attacks
 
-    - Increase world map super tile size to at least 48x48 bu try 64x64
-        - Change crater to single 64x64 tile if it is supported
-
     - Add crucible to the end of the Grand Temple
 
     - Add 'only' visibility option to layers that hides everything else when selected.
 
-    - Add full buildings to Summoner ruins in Spirit World.
-        - Wait for new building tiles before doing this.
+    - Add doors and interiors to summoner ruin buildins in spirit world
         - Populate with War God Alcolytes and the Progenitor Spirit
 
     - Add some additional requirement for completing crater to put the boss out of logic with few items.
