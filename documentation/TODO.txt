@@ -42,20 +42,20 @@ Pending Graphics From Jon:
     - Storm Beast Statue animations
 
 Current tasks:
-    - Elemental enemy
-        - Immune to attacks except for different elements
-            - Will attempt to bond with unbonded hosts that are compatible:
-                - Snake/Flower/Flying Beetle/Charging Beetle/Ent/Turret/Squirrel
-                    - Ideally each of these would support the base type + all three elements, but initially we can just support a few.
-            - Once bonded the elemental will render as a transparent version of the host with damaging particles, similar to the lightning bots in staff tower
-            - The bonded elemental is still immune to the same attacks. However, if defeated, the host will revert to the base type, possibly being destroyed:
-                - For example, a fire snake in a hot room will become a normal snake and start suffering burning damage if the fire spirit attached to it is destroyed.
-            - If the host is defeated the elemental will rever to its original form, potentially bonding with other nearby targets.
-                - This could be used for a puzzle in the war temple where you need to kill one type of frost enemy so the the ice elemental possesses a different monster,
-                    for example a plant, that can then be leveraged to solve a puzzle, say freezing a broken pot, or getting a flame enemy to melt ice around a chest.
-            - Add one of each elemental to the plant room to posses them and create all three plant varieties
-                - Lightning plant does an AOE discharge around it when the player is in range.
-                - Flame plant errupts with a spray of flames that float down and persist for a while.
+    - Hybrid enemies remaining
+        Frost/Storm Snake
+        Flame/Frost/Storm Flying Beetle
+        Flame/Frost/Storm Charging Beetle
+        Flame/Frost/Storm Squirrel
+
+    - Center Flame effect on x/y instead of using x/y as top left corner
+        - This will require deleting all the code that is accomplishing this by updating x/y after creating the clame.
+
+    - Hot rooms should burn enemies.
+        - This will gradually kill enemies that aren't immune to fire damage.
+
+    - Add puzzle to forest temple where you need to move element from one enemy to another to solve.
+        - Defeate Ice snake to let ice element possess plant, then have the plant freeze cracked ground or a pot.
 
     - Brainstorm ideas for Forest Temple
         - Include as much generated content as possible

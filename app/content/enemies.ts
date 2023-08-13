@@ -1,5 +1,4 @@
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
-import { iceGrenadeAbility } from 'app/content/enemyAbilities/iceGrenade';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { EnemyArrow, spiritArrowIcon } from 'app/content/effects/arrow';
 import { GrowingThorn } from 'app/content/effects/growingThorn';
@@ -12,7 +11,6 @@ import {
     beetleWingedAnimations,
     entAnimations,
     floorEyeAnimations,
-    icePlantAnimations,
     blueSnakeAnimations,
 } from 'app/content/enemyAnimations';
 import { certainLifeLootTable, simpleLootTable, lifeLootTable, moneyLootTable } from 'app/content/lootTables';
@@ -33,10 +31,12 @@ export * from 'app/content/enemies/crusher';
 export * from 'app/content/enemies/crystalBat';
 export * from 'app/content/enemies/crystalGuardian';
 export * from 'app/content/enemies/electricSquirrel';
-export * from 'app/content/enemies/snake';
+export * from 'app/content/enemies/elemental';
 export * from 'app/content/enemies/lightningDrone';
 export * from 'app/content/enemies/luckyBeetle';
+export * from 'app/content/enemies/plant';
 export * from 'app/content/enemies/sentryBot';
+export * from 'app/content/enemies/snake';
 export * from 'app/content/enemies/squirrel';
 export * from 'app/content/enemies/vortex';
 
@@ -46,12 +46,14 @@ export const enemyTypes = <const>[
     'beetle', 'climbingBeetle', 'beetleHorned', 'beetleMini', 'beetleWinged',
     'crusher', 'crystalBat', 'crystalGuardian',
     'electricSquirrel', 'ent',
-    'flameSnake', 'frostBeetle',
+    'flameSnake',
     'floorEye',
+    'elementalFlame', 'elementalFrost', 'elementalStorm',
     // These are designed for the golem boss but could be use in isolation with some adjustments.
     'golemHand',
     'lightningBug', 'lightningDrone',
     'luckyBeetle',
+    'plant', 'plantFlame', 'plantFrost', 'plantStorm',
     'sentryBot', 'snake', 'squirrel',
     'vortex', 'wallLaser',
 ];
@@ -97,27 +99,6 @@ enemyDefinitions.wallLaser = {
     },
 };
 
-const icePlantIceGrenadeAbility = {
-    ...iceGrenadeAbility,
-    prepTime: icePlantAnimations.prepare.down.duration,
-    recoverTime:icePlantAnimations.attack.down.duration,
-}
-
-enemyDefinitions.frostBeetle = {
-    alwaysReset: true,
-    abilities: [icePlantIceGrenadeAbility],
-    animations: icePlantAnimations, speed: 0.7, aggroRadius: 112,
-    life: 5, touchDamage: 1,
-    update(state: GameState, enemy: Enemy): void {
-        if (!enemy.activeAbility) {
-            enemy.changeToAnimation('idle');
-            enemy.useRandomAbility(state);
-        }
-    },
-    elementalMultipliers: {'fire': 2},
-    immunities: ['ice'],
-    canBeKnockedBack: false,
-};
 enemyDefinitions.lightningBug = {
     alwaysReset: true,
     animations: beetleWingedAnimations, acceleration: 0.2, speed: 1, aggroRadius: 112, flying: true,

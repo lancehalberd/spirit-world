@@ -81,6 +81,8 @@ interface EnemyDefinition<Params> {
     healthBarColor?: string
     touchDamage?: number
     touchHit?: HitProperties
+    // This is a mapping of enemy types that can combine with this enemy to become the resulting enemy type.
+    hybrids?: {[key in EnemyType]?: EnemyType}
     update?: (state: GameState, enemy: Enemy<Params>) => void
     onDeath?: (state: GameState, enemy: Enemy<Params>) => void
     onHit?: (state: GameState, enemy: Enemy<Params>, hit: HitProperties) => HitResult

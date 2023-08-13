@@ -34,10 +34,12 @@ interface Props {
     vx?: number
     vy?: number
     vz?: number
+    minVz ?: number
     az?: number
     scale?: number
     ttl?: number
     isPreparing?: boolean
+    groundFriction?: number
 }
 
 export class Flame implements EffectInstance, Props {
@@ -56,6 +58,7 @@ export class Flame implements EffectInstance, Props {
     y: number;
     z: number = 0;
     vz: number = 0;
+    minVz = -8;
     vx: number;
     vy: number;
     az: number;
@@ -69,7 +72,8 @@ export class Flame implements EffectInstance, Props {
     isPreparing = false;
     reflected = false;
     isEnemyTarget: boolean = true;
-    constructor({x, y, z = 0, vx = 0, vy = 0, vz = 0, az = -0.3, damage = 1, scale = 1, ttl = 2000, isPreparing = false}: Props) {
+    groundFriction = 0;
+    constructor({x, y, z = 0, vx = 0, vy = 0, vz = 0, az = -0.3, damage = 1, scale = 1, ttl = 2000, isPreparing = false, groundFriction = 0, minVz = -8}: Props) {
         this.damage = damage;
         this.x = x;
         this.y = y;
@@ -77,6 +81,7 @@ export class Flame implements EffectInstance, Props {
         this.vx = vx;
         this.vy = vy;
         this.vz = vz;
+        this.minVz = minVz;
         this.az = az;
         this.ttl = ttl;
         this.scale = scale;
@@ -84,6 +89,7 @@ export class Flame implements EffectInstance, Props {
         this.h = 12 * scale;
         this.isPreparing = isPreparing
         this.animationTime = Math.floor(Math.random() * 10) * FRAME_LENGTH;
+        this.groundFriction = groundFriction;
     }
     getHitbox() {
         return this;
@@ -98,11 +104,16 @@ export class Flame implements EffectInstance, Props {
         this.x += this.vx;
         this.y += this.vy;
         this.z = Math.max(0, this.z + this.vz);
-        this.vz = Math.max(-8, this.vz + this.az);
+        this.vz = Math.max(this.minVz, this.vz + this.az);
         this.w = 12 * this.scale;
         this.h = 12 * this.scale;
         this.animationTime += FRAME_LENGTH;
         this.time += FRAME_LENGTH;
+
+        if (this.z <= 0 && this.groundFriction) {
+            this.vx *= (1 - this.groundFriction);
+            this.vy *= (1 - this.groundFriction);
+        }
 
         if (this.time >= this.ttl) {
             removeEffectFromArea(state, this);

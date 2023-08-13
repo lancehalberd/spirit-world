@@ -539,19 +539,6 @@ export const rivalAnimations: ActorAnimations = {
     },
 };
 
-const icePlantGeometry: FrameDimensions = { w: 48, h: 32, content: {x: 12, y: 16, w: 24, h: 16} };
-export const icePlantIdleAnimation = createAnimation('gfx/enemies/icePlant.png', icePlantGeometry,
-    { x: 0, cols: 1, duration: 10});
-export const icePlantPrepareAnimation = createAnimation('gfx/enemies/icePlant.png', icePlantGeometry,
-    { x: 1, cols: 1, duration: 20});
-export const icePlantAttackAnimation = createAnimation('gfx/enemies/icePlant.png', icePlantGeometry,
-    { x: 2, cols: 1, duration: 15});
-export const icePlantAnimations: ActorAnimations = {
-    idle: omniAnimation(icePlantIdleAnimation),
-    prepare: omniAnimation(icePlantPrepareAnimation),
-    attack: omniAnimation(icePlantAttackAnimation),
-};
-
 /*
 Frame 1 - Idle facing 4 directions "horizontal/vertical"
 Frames 2-3 - runs at 5FPS, is the attacking animation

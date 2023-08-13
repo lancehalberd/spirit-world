@@ -1,0 +1,150 @@
+import { addSparkleAnimation } from 'app/content/effects/animationEffect';
+import { enemyDefinitions } from 'app/content/enemies/enemyHash';
+import { simpleLootTable } from 'app/content/lootTables';
+import { Enemy } from 'app/content/enemy';
+
+import { omniAnimation } from 'app/content/enemyAnimations';
+import { createAnimation, frameAnimation } from 'app/utils/animations';
+import { moveEnemyToTargetLocation, paceRandomly } from 'app/utils/enemies';
+import { addObjectToArea, removeObjectFromArea } from 'app/utils/objects';
+import { getVectorToTarget } from 'app/utils/target';
+
+
+export const [
+    /* container */, fireFrame, iceFrame, lightningFrame
+] = createAnimation('gfx/hud/elementhud.png',
+    {w: 20, h: 20, content: {x: 2, y: 2, w: 16, h: 16}}, {cols: 4}
+).frames;
+
+interface ElementalProps {
+    possessionTarget?: Enemy
+    possessedTarget?: Enemy
+    baseTargetType?: BossType|MinionType|EnemyType
+}
+
+const baseElementalDefinition: Partial<EnemyDefinition<ElementalProps>> = {
+    flying: true,
+    lootTable: simpleLootTable,
+    render(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy<ElementalProps>): void {
+        if (enemy.params.possessedTarget) {
+            // The possessed target becomes faintly visible in the spirit world.
+            context.save();
+                context.globalAlpha *= (0.1 + 0.05 * Math.sin(enemy.time / 200));
+                enemy.params.possessedTarget.defaultRender(context, state);
+            context.restore();
+        } else {
+            enemy.defaultRender(context, state);
+        }
+    },
+    renderShadow: (context: CanvasRenderingContext2D, state: GameState, enemy: Enemy<ElementalProps>) => {
+        if (!enemy.params.possessedTarget) {
+            //enemy.defaultRenderShadow(context, state);
+        }
+    },
+    updateFlyingZ(state: GameState, enemy: Enemy) {
+        if (enemy.params.possessedTarget) {
+            enemy.z = Math.max(1, enemy.params.possessedTarget.z);
+        } else {
+            enemy.z = 1;
+        }
+    },
+    getHitbox(enemy: Enemy): Rect {
+        if (enemy.params.possessedTarget) {
+            return enemy.params.possessedTarget.getHitbox();
+        } else {
+            return enemy.getDefaultHitbox();
+        }
+    },
+};
+
+// TODO: Add onDeath effect to restore possessedTarget to its original type if the elemental is destroyed.
+// TODO: Render elemental at 50% opacity in the alternate world if true sight is enabled.
+enemyDefinitions.elementalFlame = {
+    ...baseElementalDefinition,
+    animations: {idle: omniAnimation(frameAnimation(fireFrame))}, life: 1, touchHit: {element: 'fire', damage: 1}, update: paceRandomlyAndPossess,
+    immunities: ['fire', null],
+};
+enemyDefinitions.elementalFrost = {
+    ...baseElementalDefinition,
+    animations: {idle: omniAnimation(frameAnimation(iceFrame))}, life: 1, touchHit: {element: 'ice', damage: 1}, update: paceRandomlyAndPossess,
+    immunities: ['ice', null],
+};
+enemyDefinitions.elementalStorm = {
+    ...baseElementalDefinition,
+    animations: {idle: omniAnimation(frameAnimation(lightningFrame))}, life: 1, touchHit: {element: 'lightning', damage: 1}, update: paceRandomlyAndPossess,
+    immunities: ['lightning', null],
+};
+
+function isTargetAvailable(state: GameState, enemy: Enemy, target: Enemy) {
+    return target && target.area === enemy.area.alternateArea && !target.isDefeated && target.status !== 'gone';
+}
+
+function paceRandomlyAndPossess(this: void, state: GameState, enemy: Enemy<ElementalProps>) {
+    const hitbox = enemy.getHitbox(state);
+    if (enemy.touchHit.element && enemy.time % 200 === 0) {
+        addSparkleAnimation(state, enemy.area, hitbox, { element: enemy.touchHit.element });
+    }
+    if (!isTargetAvailable(state, enemy, enemy.params.possessedTarget)) {
+        delete enemy.params.possessedTarget;
+    }
+    if (!isTargetAvailable(state, enemy, enemy.params.possessionTarget)) {
+        delete enemy.params.possessionTarget;
+    }
+    // When a target is possessed, the elemental just matches the targets position
+    if (enemy.params.possessedTarget) {
+        enemy.flying = enemy.params.possessedTarget.flying;
+        const hitbox = enemy.params.possessedTarget.getHitbox();
+        enemy.x = hitbox.x + hitbox.w / 2 - 8;
+        enemy.y = hitbox.y + hitbox.h / 2 - 8;
+        enemy.updateDrawPriority();
+        return;
+    } else {
+        enemy.flying = true;
+        enemy.updateDrawPriority();
+    }
+
+
+    // Search for an enemy in the alternate world to possess.
+    // In cannon, the elementals only exist in the spirit world and possess enemies in the material world.
+    for (const alternateEnemy of enemy.area.alternateArea.enemies) {
+        if (alternateEnemy.isDefeated || !alternateEnemy.isInCurrentSection(state)) {
+            continue;
+        }
+        const hybridEnemyType = alternateEnemy.enemyDefinition?.hybrids?.[enemy.definition.enemyType];
+        if (enemyDefinitions[hybridEnemyType]) {
+            const mag = getVectorToTarget(state, enemy, alternateEnemy).mag;
+            if (!enemy.params.possessionTarget || mag < getVectorToTarget(state, enemy, enemy.params.possessionTarget).mag) {
+                enemy.params.possessionTarget = alternateEnemy;
+            }
+        }
+    }
+
+    // If there is currently a possession target, move towards it.
+    const target = enemy.params.possessionTarget;
+    if (target) {
+        const hitbox = target.getHitbox();
+        if (moveEnemyToTargetLocation(state, enemy, hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2) < 8) {
+            const hybridEnemyType = target.enemyDefinition?.hybrids?.[enemy.definition.enemyType];
+
+            const definition = enemyDefinitions[hybridEnemyType];
+            const hybridEnemy = new Enemy(state, {
+                id: definition.id,
+                status: 'normal',
+                type: 'enemy',
+                enemyType: hybridEnemyType,
+                x: target.x,
+                y: target.y,
+            });
+            hybridEnemy.z = target.z;
+            removeObjectFromArea(state, target);
+            addObjectToArea(state, enemy.area.alternateArea, hybridEnemy);
+
+            enemy.params.possessedTarget = hybridEnemy;
+            // Store the base type so that it can be recreated if thie elemental is destroyed.
+            enemy.params.baseTargetType = enemy.params.possessionTarget.definition.enemyType;
+            delete enemy.params.possessionTarget
+        }
+    } else {
+        paceRandomly(state, enemy);
+    }
+}

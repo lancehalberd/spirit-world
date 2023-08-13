@@ -1140,7 +1140,7 @@ const sf2_0x0: AreaDefinition = {
         {status: "normal", id: "helix:s2:0x0-pushPull-0", linked: true, x: 368, y: 320, type: "pushPull", spirit: true},
         {status: "normal", id: "helix:s2:0x0-pushPull-1", linked: true, x: 384, y: 320, type: "pushPull", spirit: true},
         {status: "normal", id: "helix:s2:0x0-wallLaser-1", x: 356, y: 236, type: "enemy", enemyType: "wallLaser", d: "up", params: {}},
-        {status: "normal", id: "helix:s2:0x0-frostBeetle-2", x: 192, y: 320, type: "enemy", enemyType: "frostBeetle", d: "up", params: {}},
+        {status: "normal", id: "helix:s2:0x0-plantFrost-2", x: 192, y: 320, type: "enemy", enemyType: "plantFrost", d: "up", params: {}},
         {status: "normal", id: "helixTopTeleporter", x: 240, y: 240, targetZone: "helix", targetObjectId: "helixTopTeleporter", type: "teleporter", locationCue: "Helix 3F"},
         {status: "normal", id: "", x: 328, y: 360, type: "spawnMarker"},
         {status: "normal", id: "", x: 352, y: 392, type: "spawnMarker"},

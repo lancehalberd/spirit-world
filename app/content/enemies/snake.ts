@@ -13,6 +13,11 @@ import { directionMap } from 'app/utils/field';
 enemyDefinitions.snake = {
     animations: snakeAnimations, life: 2, touchDamage: 1, update: paceRandomly, flipRight: true,
     lootTable: simpleLootTable,
+    hybrids: {
+        elementalFlame: 'flameSnake',
+        //elementalFrost: 'frostSnake',
+        //elementalStorm: 'stormSnake',
+    },
 };
 
 const fireBallAbility: EnemyAbility<boolean> = {
