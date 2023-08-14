@@ -334,8 +334,6 @@ Current tasks:
     - Mysteries
         - Lava appears under floor 2 in the middle of void tree fight
         - Certain tiles can be frozen in lava on voidFlame
-        - Sometimes the vanara forest theme continues to play after leaving the area.
-
 
     Cocoon Boss
         - Improve visuals for persistent blast attacks

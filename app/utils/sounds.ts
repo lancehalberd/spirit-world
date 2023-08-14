@@ -74,8 +74,14 @@ export function requireSound(key, callback = null): GameSound {
             onend() {
                 //console.log('onend repeatFrom', repeatFrom, newSound.props.src, key);
                 newSound.shouldFadeIn = false;
-                newSound.howl.seek((repeatFrom || 0) / 1000);
-                newSound.howl.play();
+                // Make sure we don't loop if this track is no longer playing. This condition may be
+                // reached when the track loops while it is fading out so that the howl is still playing
+                // but the track has already been removed from the array of playingTracks and shouldPlay
+                // is already set to false.
+                if (newSound.shouldPlay) {
+                    newSound.howl.seek((repeatFrom || 0) / 1000);
+                    newSound.howl.play();
+                }
             }
         };
         // A track can specify another track source to automatically transition to without crossfade.
