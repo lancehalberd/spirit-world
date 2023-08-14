@@ -1828,8 +1828,8 @@ const sf1_0x1: AreaDefinition = {
         {status: "normal", id: "staffTower1F2F", x: 288, y: 32, type: "door", style: "woodenDownstairs", targetZone: "staffTower", targetObjectId: "staffTower1F2F", d: "up", locationCue: "Tower 2F"},
         {status: "normal", id: "", specialBehaviorKey: "towerTeleporter", x: 160, y: 144, style: "displayScreen", type: "sign", message: ""},
         {status: "normal", id: "tower2FMarker", specialBehaviorKey: "towerTeleporter", x: 160, y: 464, type: "marker", locationCue: "Tower 2F"},
-        {status: "normal", id: "staffTower:s1:0x1-electricSquirrel-0", x: 352, y: 208, type: "enemy", enemyType: "electricSquirrel", d: "down", params: {}},
-        {status: "normal", id: "staffTower:s1:0x1-electricSquirrel-1", x: 144, y: 208, type: "enemy", enemyType: "electricSquirrel", d: "down", params: {}},
+        {status: "normal", id: "staffTower:s1:0x1-squirrelStorm-0", x: 352, y: 208, type: "enemy", enemyType: "squirrelStorm", d: "down", params: {}},
+        {status: "normal", id: "staffTower:s1:0x1-squirrelStorm-1", x: 144, y: 208, type: "enemy", enemyType: "squirrelStorm", d: "down", params: {}},
         {status: "normal", id: "staffTower:s1:0x1-lightningDrone-0", x: 272, y: 464, type: "enemy", enemyType: "lightningDrone", d: "down", params: {}},
     ],
     sections: [

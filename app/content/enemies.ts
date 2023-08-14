@@ -26,7 +26,6 @@ export * from 'app/content/enemies/balloonCentipede';
 export * from 'app/content/enemies/crusher';
 export * from 'app/content/enemies/crystalBat';
 export * from 'app/content/enemies/crystalGuardian';
-export * from 'app/content/enemies/electricSquirrel';
 export * from 'app/content/enemies/elemental';
 export * from 'app/content/enemies/lightningDrone';
 export * from 'app/content/enemies/luckyBeetle';
@@ -41,8 +40,7 @@ export const enemyTypes = <const>[
     'balloonCentipede',
     'beetle', 'climbingBeetle', 'beetleHorned', 'beetleMini', 'beetleWinged',
     'crusher', 'crystalBat', 'crystalGuardian',
-    'electricSquirrel', 'ent',
-
+    'ent',
     'floorEye',
     'elementalFlame', 'elementalFrost', 'elementalStorm',
     // These are designed for the golem boss but could be use in isolation with some adjustments.
@@ -52,7 +50,7 @@ export const enemyTypes = <const>[
     'plant', 'plantFlame', 'plantFrost', 'plantStorm',
     'sentryBot',
     'snake', 'snakeFlame', 'snakeFrost', 'snakeStorm',
-    'squirrel',
+    'squirrel', 'squirrelFlame', 'squirrelFrost', 'squirrelStorm',
     'vortex',
 ];
 declare global {

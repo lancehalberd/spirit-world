@@ -241,69 +241,23 @@ export const sentryBotAnimations: ActorAnimations = {
 };
 
 const squirrelGeometry: FrameDimensions = { w: 24, h: 24, content: { x: 3, y: 7, w: 18, h: 18} };
-type SquirrelObject = {
-    down: FrameAnimation;
-    right: FrameAnimation;
-    up: FrameAnimation;
-    left: FrameAnimation;
-    climb: FrameAnimation;
+function createSquirrelAnimation(source: string): ActorAnimations {
+    return {
+        climbing: omniAnimation(createAnimation(source, squirrelGeometry, { y: 3, cols: 4, duration: 10})),
+        idle: {
+            up: createAnimation(source, squirrelGeometry, { y: 4, cols: 4, duration: 10}),
+            down: createAnimation(source, squirrelGeometry, { y: 0, cols: 4, duration: 10}),
+            left: createAnimation(source, squirrelGeometry, { y: 2, cols: 4, duration: 10}),
+            right: createAnimation(source, squirrelGeometry, { y: 1, cols: 4, duration: 10}),
+        },
+    };
 }
-function createSquirrelAnimation(squirrelType: string): SquirrelObject {
-    const down: FrameAnimation = createAnimation(`gfx/enemies/${squirrelType}.png`, squirrelGeometry, { y: 0, cols: 4, duration: 10});
-    const right: FrameAnimation = createAnimation(`gfx/enemies/${squirrelType}.png`, squirrelGeometry, { y: 1, cols: 4, duration: 10});
-    const up: FrameAnimation = createAnimation(`gfx/enemies/${squirrelType}.png`, squirrelGeometry, { y: 4, cols: 4, duration: 10});
-    const left: FrameAnimation = createAnimation(`gfx/enemies/${squirrelType}.png`, squirrelGeometry, { y: 2, cols: 4, duration: 10});
-    const climb: FrameAnimation = createAnimation(`gfx/enemies/${squirrelType}.png`, squirrelGeometry, { y: 3, cols: 4, duration: 10});
-    return {down, right, up, left, climb};
-}
+export const squirrelAnimations = createSquirrelAnimation('gfx/enemies/squirrel.png');
+export const squirrelFlameAnimations = createSquirrelAnimation('gfx/enemies/squirrelFlame.png');
+export const squirrelFrostAnimations = createSquirrelAnimation('gfx/enemies/squirrelFrost.png');
+export const squirrelStormAnimations = createSquirrelAnimation('gfx/enemies/squirrelStorm.png');
+export const superElectricSquirrelAnimations = createSquirrelAnimation('gfx/enemies/superelectricsquirrel.png');
 
-const electricSquirrelAnimation = createSquirrelAnimation('electricsquirrel');
-export const electricSquirrelAnimations: ActorAnimations = {
-    climbing: {
-        up: electricSquirrelAnimation.climb,
-        down: electricSquirrelAnimation.climb,
-        left: electricSquirrelAnimation.climb,
-        right: electricSquirrelAnimation.climb,
-    },
-    idle: {
-        up: electricSquirrelAnimation.up,
-        down: electricSquirrelAnimation.down,
-        left: electricSquirrelAnimation.left,
-        right: electricSquirrelAnimation.right,
-    },
-};
-
-const superElectricSquirrelAnimation = createSquirrelAnimation('superelectricsquirrel');
-export const superElectricSquirrelAnimations: ActorAnimations = {
-    climbing: {
-        up: superElectricSquirrelAnimation.climb,
-        down: superElectricSquirrelAnimation.climb,
-        left: superElectricSquirrelAnimation.climb,
-        right: superElectricSquirrelAnimation.climb,
-    },
-    idle: {
-        up: superElectricSquirrelAnimation.up,
-        down: superElectricSquirrelAnimation.down,
-        left: superElectricSquirrelAnimation.left,
-        right: superElectricSquirrelAnimation.right,
-    },
-};
-
-const brownSquirrelAnimation = createSquirrelAnimation('brownsquirrel');
-export const brownSquirrelAnimations: ActorAnimations = {
-    climbing: {
-        up: brownSquirrelAnimation.climb,
-        down: brownSquirrelAnimation.climb,
-        left: brownSquirrelAnimation.climb,
-        right: brownSquirrelAnimation.climb,
-    },
-    idle: {
-        up: brownSquirrelAnimation.up,
-        down: brownSquirrelAnimation.down,
-        left: brownSquirrelAnimation.left,
-        right: brownSquirrelAnimation.right,
-    },
-};
 
 export function omniAnimation(animation: FrameAnimation) {
     return {

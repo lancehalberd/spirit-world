@@ -37,13 +37,11 @@ Graphics:
     Add damage effect for player hurt? (alttp doesn't have anything like this)
 
 Pending Graphics From Jon:
-    - Golden quest marker for map.
     - Eye graphics for looking into the spirit world
     - Storm Beast Statue animations
 
 Current tasks:
     - Hybrid enemies remaining
-        Flame/Frost/Storm Squirrel
         Flame/Frost/Storm Flying Beetle
         Flame/Frost/Storm Charging Beetle
 
@@ -73,8 +71,6 @@ Current tasks:
                 - symbiotic pairs between spirit beings and material beings
                     - flame spirit pairs with a snake to give it fire powers and allow it to survive in colder environments
                 - Set of native elemental spirits for each element, lightning/fire/ice
-                    - generic plant/snake/beetle/squirrel monsters can bond with spirit beings to become hybrid creatures through symbiosis
-                    - The ice plant/fire snake/lightning beetle/lightning squirrels in game can just be examples of these hybrids.
                     - Could have more powerful spirits make more powerful hybrids.
                     - This also sets a good precedence for spirits bonding with the MC after defeating the elemental beasts.
                     - Summoning the elemental beasts would require sacrificing animals for them to bond with.
