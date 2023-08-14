@@ -43,7 +43,6 @@ Pending Graphics From Jon:
 
 Current tasks:
     - Hybrid enemies remaining
-        Frost/Storm Snake
         Flame/Frost/Storm Flying Beetle
         Flame/Frost/Storm Charging Beetle
         Flame/Frost/Storm Squirrel

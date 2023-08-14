@@ -288,10 +288,6 @@ const sf0_0x0: AreaDefinition = {
     objects: [
         {status: "normal", id: "helixSpiritDoor1", x: 272, y: 64, type: "door", style: "cavernUpstairs", targetZone: "helix", targetObjectId: "helixSpiritDoor1", d: "up", spirit: false, locationCue: "Helix 1F"},
         {status: "normal", id: "helix:s0:0x0-teleporter-0", x: 248, y: 216, type: "teleporter", linked: true},
-        {status: "normal", id: "helix:s0:0x0-wallLaser-0", x: 192, y: 288, type: "enemy", enemyType: "wallLaser", d: "up", params: {}},
-        {status: "normal", id: "helix:s0:0x0-wallLaser-1", x: 208, y: 288, type: "enemy", enemyType: "wallLaser", d: "up", params: {}},
-        {status: "normal", id: "helix:s0:0x0-wallLaser-4", x: 288, y: 148, type: "enemy", enemyType: "wallLaser", d: "down", params: {}},
-        {status: "normal", id: "helix:s0:0x0-wallLaser-5", x: 304, y: 148, type: "enemy", enemyType: "wallLaser", d: "down", params: {}},
         {status: "normal", id: "", x: 288, y: 256, type: "spawnMarker"},
         {status: "normal", id: "", x: 304, y: 256, type: "spawnMarker"},
         {status: "normal", id: "", x: 352, y: 256, type: "spawnMarker"},
@@ -1139,7 +1135,6 @@ const sf2_0x0: AreaDefinition = {
         {status: "normal", id: "helixSpiritDoor2", x: 112, y: 16, type: "door", style: "cavernDownstairs", targetZone: "helix", targetObjectId: "helixSpiritDoor2", d: "up", locationCue: "Helix 3F"},
         {status: "normal", id: "helix:s2:0x0-pushPull-0", linked: true, x: 368, y: 320, type: "pushPull", spirit: true},
         {status: "normal", id: "helix:s2:0x0-pushPull-1", linked: true, x: 384, y: 320, type: "pushPull", spirit: true},
-        {status: "normal", id: "helix:s2:0x0-wallLaser-1", x: 356, y: 236, type: "enemy", enemyType: "wallLaser", d: "up", params: {}},
         {status: "normal", id: "helix:s2:0x0-plantFrost-2", x: 192, y: 320, type: "enemy", enemyType: "plantFrost", d: "up", params: {}},
         {status: "normal", id: "helixTopTeleporter", x: 240, y: 240, targetZone: "helix", targetObjectId: "helixTopTeleporter", type: "teleporter", locationCue: "Helix 3F"},
         {status: "normal", id: "", x: 328, y: 360, type: "spawnMarker"},
@@ -1148,7 +1143,6 @@ const sf2_0x0: AreaDefinition = {
         {status: "normal", id: "", linked: true, x: 352, y: 320, type: "pushPull", spirit: true},
         {status: "normal", id: "helix:2:0x0-tippable-1", x: 256, y: 80, type: "tippable", linked: true, spirit: true},
         {status: "normal", id: "helix:2:0x0-tippable-2", x: 272, y: 96, type: "tippable", linked: true, spirit: true},
-        {status: "normal", id: "helix:s2:0x0-wallLaser-2", x: 380, y: 244, type: "enemy", enemyType: "wallLaser", d: "up", params: {}},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 272, mapId: 'helix', floorId: '3F', mapX: 3, mapY: 2},

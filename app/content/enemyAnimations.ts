@@ -9,40 +9,26 @@ const bossDeathExplosionGeometry: FrameDimensions = {w: 28, h: 28};
 export const bossDeathExplosionAnimation: FrameAnimation
     = createAnimation('gfx/effects/powersource_explosion.png', bossDeathExplosionGeometry, { cols: 9, duration: 4}, { loop: false });
 
+
+
 const snakeGeometry: FrameDimensions = { w: 18, h: 18, content: { x: 2, y: 6, w: 14, h: 11} };
-const leftSnakeAnimation: FrameAnimation = createAnimation('gfx/enemies/snek.png', snakeGeometry, { x: 0});
-const downSnakeAnimation: FrameAnimation = createAnimation('gfx/enemies/snek.png', snakeGeometry, { x: 1});
-const upSnakeAnimation: FrameAnimation = createAnimation('gfx/enemies/snek.png', snakeGeometry, { x: 2});
-export const snakeAnimations: ActorAnimations = {
-    idle: {
-        up: upSnakeAnimation,
-        down: downSnakeAnimation,
-        left: leftSnakeAnimation,
-        right: leftSnakeAnimation,
-    },
-};
-const leftRedSnakeAnimation: FrameAnimation = createAnimation('gfx/enemies/snekred.png', snakeGeometry, { x: 0});
-const downRedSnakeAnimation: FrameAnimation = createAnimation('gfx/enemies/snekred.png', snakeGeometry, { x: 1});
-const upRedSnakeAnimation: FrameAnimation = createAnimation('gfx/enemies/snekred.png', snakeGeometry, { x: 2});
-export const redSnakeAnimations: ActorAnimations = {
-    idle: {
-        up: upRedSnakeAnimation,
-        down: downRedSnakeAnimation,
-        left: leftRedSnakeAnimation,
-        right: leftRedSnakeAnimation,
-    },
-};
-const leftBlueSnakeAnimation: FrameAnimation = createAnimation('gfx/enemies/snekblue.png', snakeGeometry, { x: 0});
-const downBlueSnakeAnimation: FrameAnimation = createAnimation('gfx/enemies/snekblue.png', snakeGeometry, { x: 1});
-const upBlueSnakeAnimation: FrameAnimation = createAnimation('gfx/enemies/snekblue.png', snakeGeometry, { x: 2});
-export const blueSnakeAnimations: ActorAnimations = {
-    idle: {
-        up: upBlueSnakeAnimation,
-        down: downBlueSnakeAnimation,
-        left: leftBlueSnakeAnimation,
-        right: leftBlueSnakeAnimation,
-    },
-};
+function createSnakeAnimations(source: string): ActorAnimations {
+    const leftAnimation: FrameAnimation = createAnimation(source, snakeGeometry, { x: 0});
+    return {
+        idle: {
+            up: createAnimation(source, snakeGeometry, { x: 2}),
+            down: createAnimation(source, snakeGeometry, { x: 1}),
+            left: leftAnimation,
+            right: leftAnimation,
+        },
+    };
+}
+export const snakeAnimations: ActorAnimations = createSnakeAnimations('gfx/enemies/snek.png');
+export const snakeFlameAnimations: ActorAnimations = createSnakeAnimations('gfx/enemies/snekred.png');
+export const snakeFrostAnimations: ActorAnimations = createSnakeAnimations('gfx/enemies/snekblue.png');
+export const snakeStormAnimations: ActorAnimations = createSnakeAnimations('gfx/enemies/snekStorm.png');
+
+
 // all idols share the same layout and dimensions
 // row 0: still frames; row 1: float;
 // row 2: float attack; row 3: dead float attack;

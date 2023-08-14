@@ -4460,7 +4460,7 @@ const sf0_0x1: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "overworld:s0:0x1-flameSnake-0", x: 304, y: 336, type: "enemy", enemyType: "flameSnake", d: "down", params: {}},
+        {status: "normal", id: "overworld:s0:0x1-snakeFlame-0", x: 304, y: 336, type: "enemy", enemyType: "snakeFlame", d: "down", params: {}},
         {status: "normal", id: "overworld:s0:0x1-electricSquirrel-0", x: 304, y: 64, type: "enemy", enemyType: "electricSquirrel", d: "down", params: {}},
         {status: "normal", id: "overworld:s0:0x1-ent-1", x: 288, y: 368, type: "enemy", enemyType: "ent", d: "down", params: {}},
         {status: "normal", id: "", linked: true, x: 432, y: 64, type: "spawnMarker", spirit: true},

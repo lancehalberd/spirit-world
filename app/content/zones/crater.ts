@@ -305,7 +305,7 @@ const f0_0x0: AreaDefinition = {
         {status: "normal", id: "craterPeachPiece", x: 176, y: 64, type: "chest", lootType: "peachOfImmortalityPiece", lootLevel: 1, hasCustomLogic: true, customLogic: "craterLava1"},
         {status: "normal", id: "craterUpperDoor", x: 256, y: 16, type: "door", style: "cavern", d: "up", targetZone: "crater", targetObjectId: "craterUpperDoor"},
         {status: "normal", id: "craterLowerDoor", x: 368, y: 304, type: "door", style: "cavern", d: "up", hasCustomLogic: true, customLogic: "craterLava2", targetZone: "crater", targetObjectId: "craterLowerDoor"},
-        {status: "normal", id: "crater:0:2x0-flameSnake-0", x: 256, y: 240, type: "enemy", enemyType: "flameSnake", d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava1"},
+        {status: "normal", id: "crater:0:2x0-snakeFlame-0", x: 256, y: 240, type: "enemy", enemyType: "snakeFlame", d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava1"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 417, mapId: 'crater', floorId: '1F', mapX: 0, mapY: 0},
@@ -614,7 +614,7 @@ const f0_1x0: AreaDefinition = {
     ],
     objects: [
         {status: "locked", id: "craterLockedDoor", x: 288, y: 192, type: "door", style: "cavern", d: "up", hasCustomLogic: true, customLogic: "craterLava1", targetZone: "crater", targetObjectId: "craterLockedDoor"},
-        {status: "normal", id: "crater:0:2x0-flameSnake-1", x: 368, y: 208, type: "enemy", enemyType: "flameSnake", d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava1"},
+        {status: "normal", id: "crater:0:2x0-snakeFlame-1", x: 368, y: 208, type: "enemy", enemyType: "snakeFlame", d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava1"},
         {status: "normal", id: "craterSave", x: 224, y: 184, type: "saveStatue", hasCustomLogic: true, customLogic: "craterLava1"},
     ],
     sections: [
@@ -926,7 +926,7 @@ const f0_2x0: AreaDefinition = {
         {status: "normal", id: "craterLava1", x: 416, y: 80, type: "floorSwitch", saveStatus: "forever"},
         {status: "normal", id: "craterKey", x: 176, y: 272, type: "chest", lootType: "smallKey", lootLevel: 1, hasCustomLogic: true, customLogic: "craterLava1"},
         {status: "normal", id: "crater:0:2x0-ent-0", x: 384, y: 80, type: "enemy", enemyType: "ent", d: "down", params: {}},
-        {status: "normal", id: "crater:0:2x0-flameSnake-2", x: 256, y: 240, type: "enemy", enemyType: "flameSnake", d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava1"},
+        {status: "normal", id: "crater:0:2x0-snakeFlame-2", x: 256, y: 240, type: "enemy", enemyType: "snakeFlame", d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava1"},
         {status: "normal", id: "crater:0:2x0-ent-1", x: 128, y: 320, type: "enemy", enemyType: "ent", d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava1"},
     ],
     sections: [
@@ -1321,7 +1321,7 @@ const f0_0x1: AreaDefinition = {
         },
     ],
     objects: [
-        {status: "normal", id: "crater:0:2x0-flameSnake-4", x: 224, y: 240, type: "enemy", enemyType: "flameSnake", d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava1"},
+        {status: "normal", id: "crater:0:2x0-snakeFlame-4", x: 224, y: 240, type: "enemy", enemyType: "snakeFlame", d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava1"},
         {status: "normal", id: "crater:0:0x1-ent-0", x: 320, y: 288, type: "enemy", enemyType: "ent", d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava2"},
         {status: "normal", id: "", x: 112, y: 32, type: "door", style: "square", d: "down"},
         {status: "closed", id: "", x: 112, y: 128, type: "door", style: "cavern", d: "up"},
@@ -2034,7 +2034,7 @@ const f0_2x1: AreaDefinition = {
         {status: "normal", id: "craterEastDoor", x: 160, y: 208, type: "door", style: "cavern", d: "up", hasCustomLogic: true, customLogic: "craterLava2", targetZone: "crater", targetObjectId: "craterEastDoor"},
         {status: "normal", id: "craterMap", x: 272, y: 288, type: "chest", lootType: "map", lootAmount: 50, lootLevel: 1},
         {status: "normal", id: "crater:0:2x1-arrowTurret-0", x: 384, y: 320, type: "enemy", enemyType: "arrowTurret", d: "down", params: {}},
-        {status: "normal", id: "crater:0:2x0-flameSnake-5", x: 256, y: 144, type: "enemy", enemyType: "flameSnake", d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava1"},
+        {status: "normal", id: "crater:0:2x0-snakeFlame-5", x: 256, y: 144, type: "enemy", enemyType: "snakeFlame", d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava1"},
         {status: "normal", id: "crater:0:2x1-ent-0", x: 160, y: 240, type: "enemy", enemyType: "ent", d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava2"},
     ],
     sections: [
@@ -2435,7 +2435,7 @@ const f0_0x2: AreaDefinition = {
         {status: "normal", id: "craterBigMoney", x: 352, y: 32, type: "chest", lootType: "money", lootAmount: 100, lootLevel: 1},
         {status: "normal", id: "crater:0:0x2-beetleWinged-0", x: 112, y: 160, type: "enemy", enemyType: "beetleWinged", d: "down", params: {}},
         {status: "normal", id: "crater:0:0x2-snake-0", x: 208, y: 272, type: "enemy", enemyType: "snake", d: "down", params: {}},
-        {status: "normal", id: "crater:0:2x0-flameSnake-6", x: 240, y: 64, type: "enemy", enemyType: "flameSnake", d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava1"},
+        {status: "normal", id: "crater:0:2x0-snakeFlame-6", x: 240, y: 64, type: "enemy", enemyType: "snakeFlame", d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava1"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 423, mapId: 'crater', floorId: '1F', mapX: 0, mapY: 4},
@@ -2832,7 +2832,7 @@ const f0_1x2: AreaDefinition = {
     ],
     objects: [
         {status: "normal", id: "crater:0:1x2-beetleHorned-0", x: 400, y: 336, type: "enemy", enemyType: "arrowTurret", d: "down", params: {}},
-        {status: "normal", id: "crater:0:2x0-flameSnake-7", x: 256, y: 192, type: "enemy", enemyType: "flameSnake", d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava1"},
+        {status: "normal", id: "crater:0:2x0-snakeFlame-7", x: 256, y: 192, type: "enemy", enemyType: "snakeFlame", d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava1"},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 424, mapId: 'crater', floorId: '1F', mapX: 2, mapY: 4},
@@ -3363,7 +3363,7 @@ const f0_2x2: AreaDefinition = {
         {status: "normal", id: "crater:0:2x2-snake-0", x: 160, y: 304, type: "enemy", enemyType: "snake", d: "down", params: {}},
         {status: "normal", id: "crater:0:2x2-snake-1", x: 416, y: 160, type: "enemy", enemyType: "snake", d: "down", params: {}},
         {status: "normal", id: "crater:0:2x2-beetleWinged-0", x: 368, y: 288, type: "enemy", enemyType: "beetleWinged", d: "down", params: {}},
-        {status: "normal", id: "crater:0:2x0-flameSnake-8", x: 240, y: 128, type: "enemy", enemyType: "flameSnake", d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava1"},
+        {status: "normal", id: "crater:0:2x0-snakeFlame-8", x: 240, y: 128, type: "enemy", enemyType: "snakeFlame", d: "down", params: {}, hasCustomLogic: true, customLogic: "craterLava1"},
         {status: "normal", id: "craterSecretEntrance", x: 408, y: 496, type: "door", style: "wideEntrance", targetZone: "sky", targetObjectId: "craterSecretEntrance", d: "down"},
         {status: "normal", id: "craterSecret", x: 432, y: 448, type: "chest", lootType: "goldOre", lootLevel: 1},
         {status: "normal", id: "crater:0:2x2-luckyBeetle-0", x: 264, y: 304, type: "enemy", enemyType: "luckyBeetle", d: "down", params: {}},

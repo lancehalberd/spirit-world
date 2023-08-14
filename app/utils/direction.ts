@@ -12,6 +12,17 @@ export const directionMap = {
     right: [1, 0],
 };
 
+export const directionToRadiansMap = {
+    upleft: -3 * Math.PI / 4,
+    up: -Math.PI / 2,
+    upright: -Math.PI / 4,
+    downleft: 3 * Math.PI / 4,
+    down: Math.PI / 2,
+    downright: Math.PI / 4,
+    left: Math.PI,
+    right: 0,
+};
+
 export const directionToLeftRotationsFromRight = {
     right: 0,
     upright: 1,
@@ -31,7 +42,6 @@ export function rotateDirection(d: Direction, leftRotations: number): Direction 
     const newRotation = ((directionToLeftRotationsFromRight[d] + leftRotations) % 8 + 8) % 8;
     return leftRotationsFromRightToDirection[newRotation];
 }
-
 
 // 15, 4, 4,
 // This is a map of offsets used to animate an object being picked up by the player, and is designed for use with a

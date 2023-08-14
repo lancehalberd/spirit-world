@@ -1,24 +1,15 @@
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
-import { flameAnimation } from 'app/content/effects/flame';
+import { shootFrostInCone } from 'app/content/bosses/frostBeast';
 import { Flame } from 'app/content/effects/flame';
 import { simpleLootTable } from 'app/content/lootTables';
 
-import { redSnakeAnimations, snakeAnimations } from 'app/content/enemyAnimations';
-import { drawFrameCenteredAt } from 'app/utils/animations';
-import { paceRandomly } from 'app/utils/enemies';
-import { getLineOfSightTargetAndDirection } from 'app/utils/target';
+import { snakeAnimations, snakeFlameAnimations, snakeFrostAnimations, snakeStormAnimations } from 'app/content/enemyAnimations';
+import { directionMap, directionToRadiansMap } from 'app/utils/direction';
 import { addEffectToArea } from 'app/utils/effects';
-import { directionMap } from 'app/utils/field';
+import { paceRandomly } from 'app/utils/enemies';
+import { hitTargets } from 'app/utils/field';
+import { getLineOfSightTargetAndDirection } from 'app/utils/target';
 
-enemyDefinitions.snake = {
-    animations: snakeAnimations, life: 2, touchDamage: 1, update: paceRandomly, flipRight: true,
-    lootTable: simpleLootTable,
-    hybrids: {
-        elementalFlame: 'flameSnake',
-        //elementalFrost: 'frostSnake',
-        //elementalStorm: 'stormSnake',
-    },
-};
 
 const fireBallAbility: EnemyAbility<boolean> = {
     getTarget(this: void, state: GameState, enemy: Enemy): boolean {
@@ -91,24 +82,120 @@ const leaveFlameAbility: EnemyAbility<boolean> = {
     charges: 1,
 };
 
-enemyDefinitions.flameSnake = {
-    abilities: [fireBallAbility, leaveFlameAbility],
+
+type LineOfSightTargetType = ReturnType<typeof getLineOfSightTargetAndDirection>;
+const frostConeAbility: EnemyAbility<LineOfSightTargetType> = {
+    getTarget(this: void, state: GameState, enemy: Enemy): LineOfSightTargetType {
+        const target = getLineOfSightTargetAndDirection(state, enemy);
+        return target.hero ? target : undefined;
+    },
+    prepareAbility(this: void, state: GameState, enemy: Enemy, target: LineOfSightTargetType) {
+        enemy.d = target.d;
+        enemy.changeToAnimation('attack');
+    },
+    updateAbility(this: void, state: GameState, enemy: Enemy, target: LineOfSightTargetType) {
+        const frostTime = enemy.activeAbility.time;
+        if (frostTime >= 0 && frostTime % 100 === 0) {
+            // Start with very slow projectiles to give the player some warning.
+            shootFrostInCone(state, enemy, directionToRadiansMap[enemy.d], 2, Math.min(4, frostTime / 300), false);
+        }
+    },
+    cooldown: 2000,
+    initialCharges: 1,
+    charges: 1,
+    // This is actually the duration of the ability.
+    prepTime: 1200,
+    recoverTime: 400,
+};
+
+
+
+const baseSnakeDefinition: Partial<EnemyDefinition<any>> = {
     alwaysReset: true,
-    animations: redSnakeAnimations, speed: 1.1,
-    baseMovementProperties: {canMoveInLava: true},
-    life: 3,
-    touchHit: {damage: 1, element: 'fire'},
     flipRight: true,
-    elementalMultipliers: {'ice': 2},
-    immunities: ['fire'],
+    life: 3,
     update(state: GameState, enemy: Enemy): void {
         enemy.useRandomAbility(state);
         if (!enemy.activeAbility) {
             paceRandomly(state, enemy);
         }
-    }, 
-    renderPreview(context: CanvasRenderingContext2D, enemy: Enemy, target: Rect): void {
-        enemy.defaultRenderPreview(context, target);
-        drawFrameCenteredAt(context, flameAnimation.frames[0], target);
     },
+};
+
+enemyDefinitions.snake = {
+    ...baseSnakeDefinition,
+    abilities: [],
+    animations: snakeAnimations,
+    life: 2,
+    touchDamage: 1,
+    lootTable: simpleLootTable,
+    hybrids: {
+        elementalFlame: 'snakeFlame',
+        elementalFrost: 'snakeFrost',
+        elementalStorm: 'snakeStorm',
+    },
+};
+
+enemyDefinitions.snakeFlame = {
+    ...baseSnakeDefinition,
+    abilities: [fireBallAbility, leaveFlameAbility],
+    animations: snakeFlameAnimations,
+    baseMovementProperties: {canMoveInLava: true},
+    touchHit: {damage: 1, element: 'fire'},
+    elementalMultipliers: {'ice': 2},
+    immunities: ['fire'],
+};
+
+enemyDefinitions.snakeFrost = {
+    ...baseSnakeDefinition,
+    abilities: [frostConeAbility],
+    animations: snakeFrostAnimations,
+    baseMovementProperties: {canSwim: true},
+    elementalMultipliers: {'fire': 2},
+    immunities: ['ice'],
+    update(state: GameState, enemy: Enemy) {
+        hitTargets(state, enemy.area, {
+            element: 'ice',
+            hitbox: enemy.getHitbox(),
+            hitAllies: true,
+            hitTiles: true,
+            damage: 1,
+            knockAwayFromHit: true,
+        });
+        baseSnakeDefinition.update(state, enemy);
+    },
+};
+
+const maxImageCount = 13;
+enemyDefinitions.snakeStorm = {
+    ...baseSnakeDefinition,
+    abilities: [],
+    animations: snakeStormAnimations, speed: 3,
+    // baseMovementProperties: {canSwim: true},
+    touchHit: {damage: 1, element: 'lightning'},
+    elementalMultipliers: {'fire': 1.5, 'ice': 1.5},
+    immunities: ['lightning'],
+    update(state: GameState, enemy: Enemy) {
+        paceRandomly(state, enemy, 0);
+        enemy.params.afterFrames = enemy.params.afterFrames ?? [];
+        //if (enemy.time % 60 === 0) {
+            const afterFrames = enemy.params.afterFrames;
+            // Rough code for cloning a class instance found here:
+            // https://stackoverflow.com/questions/41474986/how-to-clone-a-javascript-es6-class-instance
+            const enemyClone = Object.assign(Object.create(Object.getPrototypeOf(enemy)), enemy);
+            afterFrames.unshift(enemyClone);
+            if (afterFrames.length > maxImageCount) {
+                afterFrames.pop();
+            }
+        //}
+    },
+    render(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy): void {
+        const afterFrames = enemy.params.afterFrames ?? [];
+        for (let i = afterFrames.length - 1; i >= 0; i -= 2) {
+            context.save();
+                context.globalAlpha *= 0.6 * (1 - (i + 1) / (maxImageCount + 2));
+                afterFrames[i].defaultRender(context, state);
+            context.restore();
+        }
+    }
 };

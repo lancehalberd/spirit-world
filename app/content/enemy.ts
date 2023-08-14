@@ -636,7 +636,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             this.activeAbility.time += FRAME_LENGTH;
             // Actually use the ability once the prepTime has passed.
             if (!this.activeAbility.used && this.activeAbility.time >= (this.activeAbility.definition.prepTime || 0)) {
-                this.activeAbility.definition.useAbility(state, this, this.activeAbility.target);
+                this.activeAbility.definition.useAbility?.(state, this, this.activeAbility.target);
                 this.activeAbility.used = true;
             } else if (!this.activeAbility.used && this.activeAbility.definition.updateAbility) {
                 this.activeAbility.definition.updateAbility(state, this, this.activeAbility.target);

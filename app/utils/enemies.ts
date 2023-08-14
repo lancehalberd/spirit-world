@@ -1,4 +1,4 @@
-import { FieldAnimationEffect, enemyFallAnimation } from 'app/content/effects/animationEffect';
+import { FieldAnimationEffect, enemyFallAnimation, splashAnimation } from 'app/content/effects/animationEffect';
 import { addEffectToArea } from 'app/utils/effects';
 import { directionMap, getDirection, getTileBehaviorsAndObstacles } from 'app/utils/field';
 import { getAreaSize } from 'app/utils/getAreaSize';
@@ -99,7 +99,7 @@ export function paceAndCharge(state: GameState, enemy: Enemy) {
             enemy.setAnimation('idle', enemy.d);
         }
     } else if (enemy.mode !== 'charge') {
-        const {d, hero} = getLineOfSightTargetAndDirection(state, enemy);
+        const {d, hero} = getLineOfSightTargetAndDirection(state, enemy, undefined, false, enemy.aggroRadius);
         if (hero) {
             enemy.d = d;
             enemy.setMode('charge');
@@ -113,7 +113,7 @@ export function paceAndCharge(state: GameState, enemy: Enemy) {
             enemy.animationTime = 0;
             return;
         }
-        if (!moveEnemyFull(state, enemy, 3 * enemy.speed * directionMap[enemy.d][0], 3 * enemy.speed * directionMap[enemy.d][1], {canFall: true, canWiggle: false})) {
+        if (!moveEnemyFull(state, enemy, 3 * enemy.speed * directionMap[enemy.d][0], 3 * enemy.speed * directionMap[enemy.d][1], {canFall: true, canSwim: true, canWiggle: false})) {
             enemy.setMode('stunned');
             enemy.canBeKnockedBack = true;
             enemy.knockBack(state, {
@@ -127,14 +127,14 @@ export function paceAndCharge(state: GameState, enemy: Enemy) {
 
 // The enemy pauses to choose a random direction, then moves in that direction for a bit and repeats.
 // If the enemy encounters an obstacle, it will change directions more quickly.
-export function paceRandomly(state: GameState, enemy: Enemy) {
-    if (enemy.mode !== 'walk' && enemy.modeTime > 200) {
+export function paceRandomly(state: GameState, enemy: Enemy, pauseDuration = 400) {
+    if (enemy.mode !== 'walk' && enemy.modeTime > pauseDuration / 2) {
         enemy.setMode('walk');
         enemy.d = sample(['up', 'down', 'left', 'right']);
         enemy.currentAnimation = enemy.enemyDefinition.animations.idle[enemy.d];
     }
     if (enemy.mode === 'walk') {
-        if (enemy.modeTime >= 200) {
+        if (enemy.modeTime >= pauseDuration / 2) {
             if (!moveEnemy(state, enemy, enemy.speed * directionMap[enemy.d][0], enemy.speed * directionMap[enemy.d][1], {})) {
                 enemy.setMode('choose');
                 enemy.modeTime = 200;
@@ -187,7 +187,8 @@ export function checkForFloorEffects(state: GameState, enemy: Enemy) {
         const { tileBehavior } = getTileBehaviorsAndObstacles(state, enemy.area, {x, y});
         if (tileBehavior?.pit) {
             makeEnemyFallIntoPit(state, enemy);
-            return;
+        } else if (tileBehavior?.water) {
+            makeEnemyFallIntoWater(state, enemy);
         }
     }
 }
@@ -202,6 +203,18 @@ function makeEnemyFallIntoPit(state: GameState, enemy: Enemy) {
     enemy.status = 'gone';
 }
 
+function makeEnemyFallIntoWater(state: GameState, enemy: Enemy) {
+    const hitbox = enemy.getHitbox(state);
+    const x = hitbox.x + hitbox.w / 2;
+    const y = hitbox.y + hitbox.h / 2;
+    const animation = new FieldAnimationEffect({
+        animation: splashAnimation,
+        x: ((x / 16) | 0) * 16, y: ((y / 16) | 0) * 16,
+    });
+    addEffectToArea(state, enemy.area, animation);
+    enemy.status = 'gone';
+}
+
 export function hasEnemyLeftSection(state: GameState, enemy: Enemy, padding = 32): boolean {
     const { section } = getAreaSize(state);
     const hitbox = enemy.getHitbox(state);
@@ -210,6 +223,8 @@ export function hasEnemyLeftSection(state: GameState, enemy: Enemy, padding = 32
         || (enemy.vy < 0 && hitbox.y + hitbox.h < section.y - padding)
         || (enemy.vy > 0 && hitbox.y > section.y + section.h + padding);
 }
+
+
 
 // Returns true if the enemy moves at all.
 export function moveEnemy(state: GameState, enemy: Enemy, dx: number, dy: number, movementProperties: MovementProperties): boolean {

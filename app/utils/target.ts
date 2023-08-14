@@ -82,11 +82,16 @@ export function getLineOfSightTargetAndDirection(
     state: GameState,
     source: EffectInstance | ObjectInstance,
     direction: Direction = null,
-    projectile: boolean = false
+    projectile: boolean = false,
+    // By default enemies will not aggro you from much further than half a screen.
+    distance = 128
 ): {d: Direction, hero: Hero} {
     const hitbox = source.getHitbox(state);
     for (const hero of [state.hero, state.hero.astralProjection, ...state.hero.clones]) {
         if (!isTargetVisible(state, source, hero)) {
+            continue;
+        }
+        if (getVectorToTarget(state, source, hero).mag > distance) {
             continue;
         }
         // Reduce dimensions of hitbox for these checks so that the hero is not in line of sight when they are most of a tile

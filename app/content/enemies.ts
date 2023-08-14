@@ -1,6 +1,5 @@
 import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
-import { EnemyArrow, spiritArrowIcon } from 'app/content/effects/arrow';
 import { GrowingThorn } from 'app/content/effects/growingThorn';
 import { GroundSpike } from 'app/content/effects/groundSpike';
 import {
@@ -11,19 +10,16 @@ import {
     beetleWingedAnimations,
     entAnimations,
     floorEyeAnimations,
-    blueSnakeAnimations,
 } from 'app/content/enemyAnimations';
 import { certainLifeLootTable, simpleLootTable, lifeLootTable, moneyLootTable } from 'app/content/lootTables';
 import { renderIndicator } from 'app/content/objects/indicator';
 import { editingState } from 'app/development/editingState';
 import { FRAME_LENGTH } from 'app/gameConstants';
-import { drawFrameCenteredAt } from 'app/utils/animations';
 import {
     paceAndCharge, scurryAndChase,
 } from 'app/utils/enemies';
-import { getLineOfSightTargetAndDirection, getNearbyTarget, getVectorToNearbyTarget } from 'app/utils/target';
+import { getNearbyTarget, getVectorToNearbyTarget } from 'app/utils/target';
 import { addEffectToArea } from 'app/utils/effects';
-import { directionMap } from 'app/utils/field';
 
 export * from 'app/content/enemies/arrowTurret';
 export * from 'app/content/enemies/balloonCentipede';
@@ -46,7 +42,7 @@ export const enemyTypes = <const>[
     'beetle', 'climbingBeetle', 'beetleHorned', 'beetleMini', 'beetleWinged',
     'crusher', 'crystalBat', 'crystalGuardian',
     'electricSquirrel', 'ent',
-    'flameSnake',
+
     'floorEye',
     'elementalFlame', 'elementalFrost', 'elementalStorm',
     // These are designed for the golem boss but could be use in isolation with some adjustments.
@@ -54,8 +50,10 @@ export const enemyTypes = <const>[
     'lightningBug', 'lightningDrone',
     'luckyBeetle',
     'plant', 'plantFlame', 'plantFrost', 'plantStorm',
-    'sentryBot', 'snake', 'squirrel',
-    'vortex', 'wallLaser',
+    'sentryBot',
+    'snake', 'snakeFlame', 'snakeFrost', 'snakeStorm',
+    'squirrel',
+    'vortex',
 ];
 declare global {
     export type EnemyType = typeof enemyTypes[number];
@@ -74,6 +72,7 @@ enemyDefinitions.climbingBeetle = {
 };
 enemyDefinitions.beetleHorned = {
     animations: beetleHornedAnimations, life: 3, touchDamage: 1, update: paceAndCharge,
+    aggroRadius: 128,
     lootTable: moneyLootTable,
 };
 enemyDefinitions.beetleMini = {
@@ -89,14 +88,6 @@ enemyDefinitions.beetleWinged = {
     life: 1, touchDamage: 1, update: scurryAndChase,
     lootTable: simpleLootTable,
     elementalMultipliers: {'lightning': 2},
-};
-enemyDefinitions.wallLaser = {
-    animations: blueSnakeAnimations, life: 1, touchDamage: 1, update: updateWallLaser, flipRight: true,
-    lootTable: simpleLootTable, params: { alwaysShoot: false },
-    renderPreview(context: CanvasRenderingContext2D, enemy: Enemy, target: Rect): void {
-        enemy.defaultRenderPreview(context, target);
-        drawFrameCenteredAt(context, spiritArrowIcon, target);
-    },
 };
 
 enemyDefinitions.lightningBug = {
@@ -308,6 +299,7 @@ function renderLightningShield(context: CanvasRenderingContext2D, hitbox: Rect, 
     }
 }
 
+/*
 function updateWallLaser(state: GameState, enemy: Enemy): void {
     function shoot() {
         const hitbox = enemy.getHitbox(state);
@@ -344,5 +336,5 @@ function updateWallLaser(state: GameState, enemy: Enemy): void {
             enemy.setMode('charge');
         }
     }
-}
+}*/
 
