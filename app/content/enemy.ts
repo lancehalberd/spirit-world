@@ -752,6 +752,11 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             context.restore();
         }
     }
+    alternateRender(context: CanvasRenderingContext2D, state: GameState) {
+        if (this.enemyDefinition.alternateRender) {
+            this.enemyDefinition.alternateRender(context, state, this);
+        }
+    }
     defaultRender(context: CanvasRenderingContext2D, state?: GameState, frame = this.getFrame()) {
         if (!frame) {
             console.error('Frame not found for enemy animation', this, this.currentAnimation);

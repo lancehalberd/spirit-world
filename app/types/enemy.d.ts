@@ -88,6 +88,8 @@ interface EnemyDefinition<Params> {
     onHit?: (state: GameState, enemy: Enemy<Params>, hit: HitProperties) => HitResult
     // Optional render function called instead of the standard render logic.
     render?: (context: CanvasRenderingContext2D, state: GameState, enemy: Enemy<Params>) => void
+    // Optional render function called to render content in the alternate world.
+    alternateRender?: (context: CanvasRenderingContext2D, state: GameState, enemy: Enemy<Params>) => void
     // Optional render function called instead of the standard renderShadow logic.
     renderShadow?: (context: CanvasRenderingContext2D, state: GameState, enemy: Enemy<Params>) => void
     // Optional render function called after the standard render.

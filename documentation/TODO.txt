@@ -43,9 +43,9 @@ Pending Graphics From Jon:
 
 Current tasks:
     - Hybrid enemies remaining
+        Flame/Frost/Storm Squirrel
         Flame/Frost/Storm Flying Beetle
         Flame/Frost/Storm Charging Beetle
-        Flame/Frost/Storm Squirrel
 
     - Center Flame effect on x/y instead of using x/y as top left corner
         - This will require deleting all the code that is accomplishing this by updating x/y after creating the clame.

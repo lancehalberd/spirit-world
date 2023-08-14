@@ -9,7 +9,6 @@ import { moveEnemyToTargetLocation, paceRandomly } from 'app/utils/enemies';
 import { addObjectToArea, removeObjectFromArea } from 'app/utils/objects';
 import { getVectorToTarget } from 'app/utils/target';
 
-
 export const [
     /* container */, fireFrame, iceFrame, lightningFrame
 ] = createAnimation('gfx/hud/elementhud.png',
@@ -36,7 +35,15 @@ const baseElementalDefinition: Partial<EnemyDefinition<ElementalProps>> = {
             enemy.defaultRender(context, state);
         }
     },
-    renderShadow: (context: CanvasRenderingContext2D, state: GameState, enemy: Enemy<ElementalProps>) => {
+    alternateRender(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy<ElementalProps>) {
+        if (state.hero.passiveTools.trueSight > 0 && !enemy.params.possessedTarget) {
+            context.save();
+                context.globalAlpha *= (0.1 + 0.05 * Math.sin(enemy.time / 200));
+                enemy.defaultRender(context, state);
+            context.restore();
+        }
+    },
+    renderShadow(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy<ElementalProps>) {
         if (!enemy.params.possessedTarget) {
             //enemy.defaultRenderShadow(context, state);
         }
@@ -55,10 +62,24 @@ const baseElementalDefinition: Partial<EnemyDefinition<ElementalProps>> = {
             return enemy.getDefaultHitbox();
         }
     },
+    onDeath(state: GameState, enemy: Enemy) {
+        if (enemy.params.possessedTarget && enemy.params.baseTargetType) {
+            const target = enemy.params.possessedTarget;
+            const baseEnemy = new Enemy(state, {
+                id: target.definition?.id,
+                status: 'normal',
+                type: 'enemy',
+                enemyType: enemy.params.baseTargetType,
+                x: target.x,
+                y: target.y,
+            });
+            baseEnemy.z = target.z;
+            removeObjectFromArea(state, target);
+            addObjectToArea(state, enemy.area.alternateArea, baseEnemy);
+        }
+    }
 };
 
-// TODO: Add onDeath effect to restore possessedTarget to its original type if the elemental is destroyed.
-// TODO: Render elemental at 50% opacity in the alternate world if true sight is enabled.
 enemyDefinitions.elementalFlame = {
     ...baseElementalDefinition,
     animations: {idle: omniAnimation(frameAnimation(fireFrame))}, life: 1, touchHit: {element: 'fire', damage: 1}, update: paceRandomlyAndPossess,
@@ -103,7 +124,6 @@ function paceRandomlyAndPossess(this: void, state: GameState, enemy: Enemy<Eleme
         enemy.updateDrawPriority();
     }
 
-
     // Search for an enemy in the alternate world to possess.
     // In cannon, the elementals only exist in the spirit world and possess enemies in the material world.
     for (const alternateEnemy of enemy.area.alternateArea.enemies) {
@@ -125,10 +145,8 @@ function paceRandomlyAndPossess(this: void, state: GameState, enemy: Enemy<Eleme
         const hitbox = target.getHitbox();
         if (moveEnemyToTargetLocation(state, enemy, hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2) < 8) {
             const hybridEnemyType = target.enemyDefinition?.hybrids?.[enemy.definition.enemyType];
-
-            const definition = enemyDefinitions[hybridEnemyType];
             const hybridEnemy = new Enemy(state, {
-                id: definition.id,
+                id: target.definition?.id,
                 status: 'normal',
                 type: 'enemy',
                 enemyType: hybridEnemyType,
