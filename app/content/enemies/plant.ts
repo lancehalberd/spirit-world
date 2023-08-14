@@ -62,14 +62,17 @@ export const volcanoAbility: EnemyAbility<NearbyTargetType> = {
     useAbility(this: void, state: GameState, enemy: Enemy, target: NearbyTargetType): void {
         enemy.changeToAnimation('attack');
         const baseTheta = Math.random() * 2 * Math.PI;
-        const hitbox = enemy.getHitbox(state);
+        const hitbox = enemy.getHitbox();
+        const targetHitbox = target.target.getHitbox();
         const x = hitbox.x + hitbox.w / 2, y = hitbox.y + hitbox.h / 2;
         //const v = getVectorToNearbyTarget(state, enemy, 2000, enemy.area.allyTargets);
         const count = 5;
+        const baseTx = (x + 2 * (targetHitbox.x + targetHitbox.w / 2)) / 3;
+        const baseTy = (y + 2 * (targetHitbox.y + targetHitbox.h / 2)) / 3;
         for (let i = 0; i < count; i++) {
             const theta = baseTheta + i * 2 * Math.PI / count - Math.PI / count / 2 + Math.random() * Math.PI / count;
             const mag = 32 + 8 * i - 8 + Math.random() * 16;
-            const tx = x + mag * Math.cos(theta), ty = y + mag * Math.sin(theta);
+            const tx = baseTx + mag * Math.cos(theta), ty = baseTy + mag * Math.sin(theta);
             const vz = 3 + i / 2;
             const az = -0.1;
             const duration = -2 * vz / az;

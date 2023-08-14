@@ -3,7 +3,7 @@ import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, drawFrameAt, getFrame } from 'app/utils/animations';
 import { createCanvasAndContext } from 'app/utils/canvas';
 import { removeEffectFromArea } from 'app/utils/effects';
-import { hitTargets } from 'app/utils/field';
+import { getTileBehaviorsAndObstacles, hitTargets } from 'app/utils/field';
 import { allImagesLoaded } from 'app/utils/images';
 
 
@@ -95,7 +95,7 @@ export class Flame implements EffectInstance, Props {
         return this;
     }
     onHit(state: GameState, hit: HitProperties): HitResult {
-        if (hit.element === 'ice') {
+        if (this.z <= 16 && hit.element === 'ice') {
             removeEffectFromArea(state, this);
         }
         return {};
@@ -109,6 +109,24 @@ export class Flame implements EffectInstance, Props {
         this.h = 12 * this.scale;
         this.animationTime += FRAME_LENGTH;
         this.time += FRAME_LENGTH;
+
+        // Experimental code to make falling flames "fall down" southern cliffs they pass over.
+        // Falls a max of 80px a frame.
+        if (this.z >= 4) {
+            const hitbox = this.getHitbox();
+            const x = hitbox.x + hitbox.w / 2;
+            let y = hitbox.y + hitbox.h / 2;
+            for (let i = 0; i < 48; i++) {
+                const { tileBehavior } = getTileBehaviorsAndObstacles(state, this.area, {x, y});
+                if (tileBehavior?.isSouthernWall) {
+                    this.z++;
+                    this.y++;
+                    y++;
+                } else {
+                    break;
+                }
+            }
+        }
 
         if (this.z <= 0 && this.groundFriction) {
             this.vx *= (1 - this.groundFriction);

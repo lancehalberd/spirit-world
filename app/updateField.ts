@@ -125,7 +125,7 @@ export function updateAreaObjects(this: void, state: GameState, area: AreaInstan
             if (object.z > 0) {
                 object.z = Math.max(0, object.z - 1);
             }
-            const hitbox = object.getHitbox(state);
+            const hitbox = object.getHitbox();
             const x = hitbox.x + hitbox.w / 2;
             const y = hitbox.y + hitbox.h / 2;
             for (const otherObject of area.objects) {
