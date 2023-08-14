@@ -32,8 +32,6 @@ const fireBallAbility: EnemyAbility<boolean> = {
             scale: 0.1,
             ttl: 2000,
         });
-        flame.x -= flame.w / 2;
-        flame.y -= flame.h / 2;
         addEffectToArea(state, enemy.area, flame);
         enemy.params.fireball = flame;
     },
@@ -43,8 +41,8 @@ const fireBallAbility: EnemyAbility<boolean> = {
         fireball.animationTime = 0;
         fireball.scale = Math.min(1, fireball.scale + 0.05);
         const hitbox = enemy.getHitbox(state);
-        fireball.x = hitbox.x + hitbox.w / 2 + dx * 3 * hitbox.w / 4 - fireball.w / 2;
-        fireball.y = hitbox.y + hitbox.h / 2 + dy * 3 * hitbox.h / 4 - fireball.h / 2;
+        fireball.x = hitbox.x + hitbox.w / 2 + dx * 3 * hitbox.w / 4;
+        fireball.y = hitbox.y + hitbox.h / 2 + dy * 3 * hitbox.h / 4;
     },
     useAbility(this: void, state: GameState, enemy: Enemy, target: boolean): void {
         const fireball = enemy.params.fireball;
@@ -74,8 +72,6 @@ const leaveFlameAbility: EnemyAbility<boolean> = {
             x: hitbox.x + hitbox.w / 2,
             y: hitbox.y + hitbox.h / 2 - 1,
         });
-        flame.x -= flame.w / 2;
-        flame.y -= flame.h / 2;
         addEffectToArea(state, enemy.area, flame);
     },
     cooldown: 600,

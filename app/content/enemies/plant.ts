@@ -93,9 +93,6 @@ export const volcanoAbility: EnemyAbility<NearbyTargetType> = {
                 ttl: 6000,
                 groundFriction: 1,
             })
-            // TODO: make x/y the center of the flame so we don't have to keep doing this.
-            flame.x -= flame.w / 2;
-            flame.y -= flame.h / 2;
             addEffectToArea(state, enemy.area, flame);
         }
     },

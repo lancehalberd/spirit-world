@@ -45,10 +45,6 @@ Current tasks:
         Flame/Frost/Storm Flying Beetle
         Flame/Frost/Storm Charging Beetle
 
-    - Center Flame effect on x/y instead of using x/y as top left corner
-        - This will require deleting all the code that is accomplishing this by updating x/y after creating the clame.
-
-
     - Add puzzle to forest temple where you need to move element from one enemy to another to solve.
         - Defeate Ice snake to let ice element possess plant, then have the plant freeze cracked ground or a pot.
 

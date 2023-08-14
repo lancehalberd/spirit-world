@@ -114,7 +114,6 @@ function jumpTowardsPoint(state: GameState, enemy: Enemy, {x: tx, y: ty}, blastR
         enemy.vy = maxJumpSpeed * enemy.vy / mag;
     }
     enemy.setMode('jumping');
-    //const discharge = new LightningDischarge({x, y, radius: blastRadius, damage: 2, source: enemy, tellDuration: 20 * duration});
     const blast = new Blast({
         x,
         y,
@@ -138,8 +137,6 @@ const leaveFlameAbility: EnemyAbility<boolean> = {
             x: hitbox.x + hitbox.w / 2,
             y: hitbox.y + hitbox.h / 2 - 1,
         });
-        flame.x -= flame.w / 2;
-        flame.y -= flame.h / 2;
         addEffectToArea(state, enemy.area, flame);
     },
     cooldown: 600,

@@ -92,7 +92,12 @@ export class Flame implements EffectInstance, Props {
         this.groundFriction = groundFriction;
     }
     getHitbox() {
-        return this;
+        return {
+            x: this.x - this.w / 2,
+            y: this.y - this.h / 2,
+            w: this.w,
+            h: this.h,
+        };
     }
     onHit(state: GameState, hit: HitProperties): HitResult {
         if (this.z <= 16 && hit.element === 'ice') {
@@ -163,11 +168,14 @@ export class Flame implements EffectInstance, Props {
     render(context: CanvasRenderingContext2D, state: GameState) {
         const frame = getFrame(flameAnimation, this.animationTime);
         drawFrameAt(context, frame, {
-            x: this.x - 2,
-            y: this.y - 4 + 2 * Math.sin(this.animationTime / 150) - this.z,
+            x: this.x - 2 - this.w / 2,
+            y: this.y - 4 + 2 * Math.sin(this.animationTime / 150) - this.z - this.h / 2,
             w: fireElement.content.w * this.scale,
             h: fireElement.content.h * this.scale,
         });
+        /*context.fillStyle = 'red';
+        const {x, y, w, h} = this.getHitbox();
+        context.fillRect(x, y, w, h);*/
     }
 
     renderShadow(context: CanvasRenderingContext2D) {
@@ -176,7 +184,7 @@ export class Flame implements EffectInstance, Props {
         context.save();
         context.globalAlpha = 0.5;
         context.fillStyle = 'red';
-        context.translate(this.x + this.w / 2, this.y + this.h / 2);
+        context.translate(this.x, this.y + this.h / 2);
         context.scale(this.w / 12, this.h / 18);
         context.beginPath();
         context.arc(0, 0, shadowRadius, 0, 2 * Math.PI);

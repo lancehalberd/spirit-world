@@ -155,8 +155,6 @@ function updateFireHeart(this: void, state: GameState, enemy: Enemy): void {
                     ttl: 600 + (isEnraged ? 1000 : enemy.params.enrageLevel * 500),
                     damage: 2,
                 });
-                flame.x -= flame.w / 2;
-                flame.y -= flame.h / 2;
                 addEffectToArea(state, enemy.area, flame);
             }
             enemy.params.theta += Math.PI / 20;
@@ -188,8 +186,6 @@ const spawnGiantFlame = (state: GameState, enemy: Enemy): void => {
         scale: 4,
         damage: 3,
     });
-    flame.x -= flame.w / 2;
-    flame.y -= flame.h / 2;
     addEffectToArea(state, enemy.area, flame);
 };
 
