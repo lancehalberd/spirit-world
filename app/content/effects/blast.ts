@@ -96,8 +96,9 @@ export class Blast implements EffectInstance {
     render(context, state: GameState) {
         const circle = this.getHitCircle();
         if (circle) {
+            const persistTime = this.animationTime - this.tellDuration - this.expansionDuration;
             context.save();
-                context.globalAlpha *= 0.2;
+                context.globalAlpha *= (0.2 - 0.15 * persistTime / this.persistDuration);
                 context.beginPath();
                 context.fillStyle = getElementColor(this.element);
                 context.arc(circle.x, circle.y, circle.r, 0, 2 * Math.PI);

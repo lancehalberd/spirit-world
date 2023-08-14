@@ -1,4 +1,4 @@
-import { LightningDischarge } from 'app/content/effects/lightningDischarge';
+import { Blast } from 'app/content/effects/blast';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { Flame } from 'app/content/effects/flame';
 import { iceGrenadeAbility } from 'app/content/enemyAbilities/iceGrenade';
@@ -35,14 +35,18 @@ export const dischargeAbility: EnemyAbility<NearbyTargetType> = {
     useAbility(this: void, state: GameState, enemy: Enemy, target: NearbyTargetType): void {
         enemy.changeToAnimation('attack');
         const hitbox = enemy.getHitbox(state);
-        const discharge = new LightningDischarge({
+        const blast = new Blast({
             x: hitbox.x + hitbox.w / 2,
             y: hitbox.y + hitbox.h / 2,
-            tellDuration: 1000,
+            damage: 2,
+            element: 'lightning',
+            tellDuration: 800,
+            expansionDuration: 100,
+            persistDuration: 200,
             radius: 80,
             source: enemy,
         });
-        addEffectToArea(state, enemy.area, discharge);
+        addEffectToArea(state, enemy.area, blast);
     },
     cooldown: 3000,
     initialCooldown: 1000,
