@@ -1,10 +1,9 @@
 import { zones } from 'app/content/zones/zoneHash';
 
-
 const f0_0x0: AreaDefinition = {
     layers: null,
     objects: [
-        {status: "normal", id: "waterfallTower:0:0x0-decoration-0", x: 0, y: 512, type: "waterfall", w: 512, h: 512},
+        {status: "normal", id: "waterfallTower:0:0x0-decoration-0", x: 0, y: 520, type: "waterfall", w: 512, h: 520},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 297, mapId: 'waterfallTower', floorId: '1F', mapX: 0, mapY: 0},
@@ -13,7 +12,7 @@ const f0_0x0: AreaDefinition = {
 const f0_0x1: AreaDefinition = {
     layers: null,
     objects: [
-        {status: "normal", id: "waterfallTower:0:0x0-decoration-0", x: 0, y: 512, type: "waterfall", w: 512, h: 512},
+        {status: "normal", id: "waterfallTower:0:0x0-decoration-0", x: 0, y: 520, type: "waterfall", w: 512, h: 520},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 32, index: 298, mapId: 'waterfallTower', floorId: '1F', mapX: 0, mapY: 2},
@@ -604,7 +603,7 @@ const sf0_0x1: AreaDefinition = {
 const f1_0x0: AreaDefinition = {
     layers: null,
     objects: [
-        {status: "normal", id: "waterfallTower:0:0x0-decoration-0", x: 0, y: 512, type: "waterfall", w: 512, h: 512},
+        {status: "normal", id: "waterfallTower:0:0x0-decoration-0", x: 0, y: 520, type: "waterfall", w: 512, h: 520},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16, index: 301, mapId: 'waterfallTower', floorId: '2F', mapX: 0, mapY: 0},
@@ -614,7 +613,7 @@ const f1_0x0: AreaDefinition = {
 const f1_0x1: AreaDefinition = {
     layers: null,
     objects: [
-        {status: "normal", id: "waterfallTower:0:0x0-decoration-0", x: 0, y: 512, type: "waterfall", w: 512, h: 512},
+        {status: "normal", id: "waterfallTower:0:0x0-decoration-0", x: 0, y: 520, type: "waterfall", w: 512, h: 520},
     ],
     sections: [
         {x: 0, y: 0, w: 32, h: 16, index: 303, mapId: 'waterfallTower', floorId: '2F', mapX: 0, mapY: 2},
@@ -1218,6 +1217,7 @@ const sf1_0x1: AreaDefinition = {
 };
 zones.waterfallTower = {
     key: 'waterfallTower',
+    areaSize: {w: 32, h: 32},
     floors: [
         {
             grid: [

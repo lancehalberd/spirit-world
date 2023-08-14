@@ -58,7 +58,7 @@ class WaterfallBack implements ObjectInstance {
     constructor(private waterfall: Waterfall) {
     }
     getHitbox(): Rect {
-        return {x: this.waterfall.x, y: this.waterfall.y - this.waterfall.h, w: this.waterfall.w, h: this.waterfall.h};
+        return {x: this.waterfall.x, y: this.waterfall.y - this.waterfall.h, w: this.waterfall.w, h: this.waterfall.h - 8};
     }
     get area(): AreaInstance {
         return this.waterfall.area;
@@ -69,7 +69,7 @@ class WaterfallBack implements ObjectInstance {
     render(context: CanvasRenderingContext2D, state: GameState) {
         const target = this.getHitbox();
         context.save();
-            context.globalAlpha *= 0.6;
+            context.globalAlpha *= 0.3;
             context.fillStyle = '#2B68D5';
             context.fillRect(target.x, target.y, target.w, target.h - 3);
         context.restore();
@@ -114,7 +114,7 @@ function renderWaterfallVectors(this: void,
     target: Rect
 ): void {
     context.save();
-        context.globalAlpha *= 0.8;
+        context.globalAlpha *= 0.3;
         context.fillStyle = 'white';
         const baseValue = 128 * animationTime / 1000;
         let y = baseValue % 64 - 128;
@@ -135,7 +135,7 @@ function renderWaterfallVectors(this: void,
         }
     context.restore();
     context.save();
-        context.globalAlpha *= 0.7;
+        context.globalAlpha *= 0.3;
         context.fillStyle = '#0034A0';
         y = baseValue % 64 - 128;
         for (; y < target.h + 32; y += 32) {

@@ -50,8 +50,6 @@ Current tasks:
     - Center Flame effect on x/y instead of using x/y as top left corner
         - This will require deleting all the code that is accomplishing this by updating x/y after creating the clame.
 
-    - Hot rooms should burn enemies.
-        - This will gradually kill enemies that aren't immune to fire damage.
 
     - Add puzzle to forest temple where you need to move element from one enemy to another to solve.
         - Defeate Ice snake to let ice element possess plant, then have the plant freeze cracked ground or a pot.
@@ -107,6 +105,7 @@ Current tasks:
 
     - Require traversing War Palace from top to bottom in the Spirit World, starting from the Sky
 
+
     - generate bow chest switch puzzle
         - switches are E/W/N/S from a single point in the area at least 4 tiles out from the point.
         - increase difficulty with
@@ -155,6 +154,10 @@ Current tasks:
         - crystal
         - cave
 
+    - Hot rooms should burn enemies.
+        - This is a little tricky because currently we only calculate whether the current section is hot rather than all active sections.
+        - It would be good to do this though as the status quo makes sections the hero isn't in behave inconsistently (as if they match the current section).
+        - This will gradually kill enemies that aren't immune to fire damage.
 
     - lose money when collecting money loot as clone?
         - lose most progress this way.
