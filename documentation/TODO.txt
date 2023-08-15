@@ -41,6 +41,11 @@ Pending Graphics From Jon:
     - Storm Beast Statue animations
 
 Current tasks:
+    - Allow freezing tiles behind foreground walls
+        - This should be okay since the solid/solidMap is applied on top of the frozen layer
+        - Test that this doesn't break unfreezing the tile.
+        - In particular there are water tiles behind southern foreground walls that cannot be frozen which is unintuitive and annoying
+
     Charging Beetle Hybrids
         Storm - Instead of a normal charge, show a red ray warning and then do a lightning warp up to 96px that hurts everything in between.
         Flame - Leave flames behind while charging and create a fire blast on impact with radius 48 and no tell.

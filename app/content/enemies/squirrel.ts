@@ -234,6 +234,7 @@ enemyDefinitions.squirrelFlame = {
         element: 'fire',
     },
     touchHit: { damage: 2, element: 'fire'},
+    baseMovementProperties: {canMoveInLava: true},
     immunities: ['fire'],
     lootTable: lifeLootTable,
     initialMode: 'pause',

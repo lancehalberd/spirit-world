@@ -27,6 +27,8 @@ explicitIndexMapping[21] = 0;
 
 // Sky
 explicitIndexMapping[262] = spiritCrystalGround;
+// This is used a lot in the holy sanctum currently.
+explicitIndexMapping[spiritCrystalGround] = spiritCrystalGround;
 
 
 //const logged: boolean[] = [];
