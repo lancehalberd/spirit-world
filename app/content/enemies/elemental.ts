@@ -24,6 +24,7 @@ interface ElementalProps {
 const baseElementalDefinition: Partial<EnemyDefinition<ElementalProps>> = {
     flying: true,
     lootTable: simpleLootTable,
+    speed: 1.5,
     render(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy<ElementalProps>): void {
         if (enemy.params.possessedTarget) {
             // The possessed target becomes faintly visible in the spirit world.
@@ -135,6 +136,9 @@ function paceRandomlyAndPossess(this: void, state: GameState, enemy: Enemy<Eleme
             const mag = getVectorToTarget(state, enemy, alternateEnemy).mag;
             if (!enemy.params.possessionTarget || mag < getVectorToTarget(state, enemy, enemy.params.possessionTarget).mag) {
                 enemy.params.possessionTarget = alternateEnemy;
+                // Give the elemental different speeds when targeting enemies to make the results for a
+                // particular situation less deterministic.
+                enemy.speed = enemy.enemyDefinition.speed * (1 + Math.random() * 0.5);
             }
         }
     }
@@ -163,6 +167,8 @@ function paceRandomlyAndPossess(this: void, state: GameState, enemy: Enemy<Eleme
             delete enemy.params.possessionTarget
         }
     } else {
+        // Use normal speed when pacing.
+        enemy.speed = enemy.enemyDefinition.speed;
         paceRandomly(state, enemy);
     }
 }

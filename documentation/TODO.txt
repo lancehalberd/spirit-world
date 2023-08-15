@@ -41,9 +41,10 @@ Pending Graphics From Jon:
     - Storm Beast Statue animations
 
 Current tasks:
-    - Hybrid enemies remaining
-        Flame/Frost/Storm Flying Beetle
-        Flame/Frost/Storm Charging Beetle
+    Charging Beetle Hybrids
+        Storm - Instead of a normal charge, show a red ray warning and then do a lightning warp up to 96px that hurts everything in between.
+        Flame - Leave flames behind while charging and create a fire blast on impact with radius 48 and no tell.
+        Frost - Freeze ground while charging (can charge across water). Ice blast on death.
 
     - Add puzzle to forest temple where you need to move element from one enemy to another to solve.
         - Defeate Ice snake to let ice element possess plant, then have the plant freeze cracked ground or a pot.

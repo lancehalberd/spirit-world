@@ -1,4 +1,3 @@
-import { addSparkleAnimation } from 'app/content/effects/animationEffect';
 import { enemyDefinitions } from 'app/content/enemies/enemyHash';
 import { GrowingThorn } from 'app/content/effects/growingThorn';
 import { GroundSpike } from 'app/content/effects/groundSpike';
@@ -7,22 +6,21 @@ import {
     climbingBeetleAnimations,
     beetleHornedAnimations,
     beetleMiniAnimations,
-    beetleWingedAnimations,
     entAnimations,
     floorEyeAnimations,
 } from 'app/content/enemyAnimations';
 import { certainLifeLootTable, simpleLootTable, lifeLootTable, moneyLootTable } from 'app/content/lootTables';
 import { renderIndicator } from 'app/content/objects/indicator';
 import { editingState } from 'app/development/editingState';
-import { FRAME_LENGTH } from 'app/gameConstants';
 import {
     paceAndCharge, scurryAndChase,
 } from 'app/utils/enemies';
-import { getNearbyTarget, getVectorToNearbyTarget } from 'app/utils/target';
+import { getNearbyTarget } from 'app/utils/target';
 import { addEffectToArea } from 'app/utils/effects';
 
 export * from 'app/content/enemies/arrowTurret';
 export * from 'app/content/enemies/balloonCentipede';
+export * from 'app/content/enemies/beetleWinged';
 export * from 'app/content/enemies/crusher';
 export * from 'app/content/enemies/crystalBat';
 export * from 'app/content/enemies/crystalGuardian';
@@ -38,14 +36,15 @@ export * from 'app/content/enemies/vortex';
 export const enemyTypes = <const>[
     'arrowTurret',
     'balloonCentipede',
-    'beetle', 'climbingBeetle', 'beetleHorned', 'beetleMini', 'beetleWinged',
+    'beetle', 'climbingBeetle', 'beetleHorned', 'beetleMini',
+    'beetleWinged', 'beetleWingedFlame', 'beetleWingedFrost', 'beetleWingedStorm',
     'crusher', 'crystalBat', 'crystalGuardian',
     'ent',
     'floorEye',
     'elementalFlame', 'elementalFrost', 'elementalStorm',
-    // These are designed for the golem boss but could be use in isolation with some adjustments.
+    // This is for the Golem Boss, use "Crusher" for a standalone enemy.
     'golemHand',
-    'lightningBug', 'lightningDrone',
+    'lightningDrone',
     'luckyBeetle',
     'plant', 'plantFlame', 'plantFrost', 'plantStorm',
     'sentryBot',
@@ -79,30 +78,6 @@ enemyDefinitions.beetleMini = {
     speed: 0.8,
     hasShadow: false, life: 1, touchDamage: 1, update: scurryAndChase,
     lootTable: lifeLootTable,
-};
-enemyDefinitions.beetleWinged = {
-    animations: beetleWingedAnimations,
-    flying: true, acceleration: 0.1, aggroRadius: 112,
-    life: 1, touchDamage: 1, update: scurryAndChase,
-    lootTable: simpleLootTable,
-    elementalMultipliers: {'lightning': 2},
-};
-
-enemyDefinitions.lightningBug = {
-    alwaysReset: true,
-    animations: beetleWingedAnimations, acceleration: 0.2, speed: 1, aggroRadius: 112, flying: true,
-    life: 3, touchDamage: 1, update: updateStormLightningBug,
-    params: {
-        shieldColor: 'yellow',
-    },
-    renderOver(context: CanvasRenderingContext2D, state: GameState, enemy: Enemy) {
-        renderLightningShield(context, enemy.getHitbox(), enemy.shielded, enemy.params.shieldColor);
-    } ,
-    immunities: ['lightning'],
-    renderPreview(context: CanvasRenderingContext2D, enemy: Enemy, target: Rect): void {
-        enemy.defaultRenderPreview(context, target);
-        renderLightningShield(context, target, true, enemy.params.shieldColor);
-    },
 };
 
 enemyDefinitions.ent = {
@@ -231,70 +206,6 @@ function updateFloorEye(state: GameState, enemy: Enemy): void {
         }
     }
     enemy.touchHit = enemy.isInvulnerable ? null : { damage: 2 };
-}
-
-function updateStormLightningBug(state: GameState, enemy: Enemy): void {
-    scurryAndChase(state, enemy);
-    enemy.params.shieldCooldown = enemy.params.shieldCooldown ?? 1000 + Math.random() * 1000;
-    if (enemy.params.shieldCooldown > 0) {
-        enemy.params.shieldCooldown -= FRAME_LENGTH;
-        if (enemy.params.shieldCooldown < 3000) {
-            enemy.shielded = false;
-        }
-    } else {
-        const chaseVector = getVectorToNearbyTarget(state, enemy, enemy.aggroRadius, enemy.area.allyTargets);
-        if (chaseVector) {
-            enemy.params.shieldCooldown = 5000;
-            enemy.shielded = true;
-        }
-    }
-    if (enemy.shielded) {
-        if (enemy.animationTime % 200 === 0) {
-            const hitbox = enemy.getHitbox(state);
-            for (let i = 0; i < 4; i ++) {
-                const theta = Math.PI / 2 + 2 * Math.PI * i / 4;
-                addSparkleAnimation(state, enemy.area, {
-                    ...hitbox,
-                    x: hitbox.x + 4 * Math.cos(theta),
-                    y: hitbox.y + 4 * Math.sin(theta),
-                    w: hitbox.w / 2,
-                    h: hitbox.h / 2,
-                }, {element: 'lightning', velocity: {x: enemy.vx, y: enemy.vy}});
-            }
-        }
-    } else {
-        if (enemy.animationTime % 300 === 0) {
-            const hitbox = enemy.getHitbox(state);
-            const theta = Math.PI / 2 + 2 * Math.PI * enemy.animationTime / 900;
-            addSparkleAnimation(state, enemy.area, {
-                ...hitbox,
-                x: hitbox.x + 4 * Math.cos(theta),
-                y: hitbox.y + 4 * Math.sin(theta),
-                w: hitbox.w / 2,
-                h: hitbox.h / 2,
-            }, { element: 'lightning', velocity: {x: enemy.vx, y: enemy.vy}});
-        }
-    }
-}
-
-function renderLightningShield(context: CanvasRenderingContext2D, hitbox: Rect, shielded = true, color = '#888'): void {
-    context.strokeStyle = color; //enemy.params.shieldColor ?? '#888';
-    if (shielded) {
-        context.save();
-            context.globalAlpha *= (0.7 + 0.3 * Math.random());
-            context.beginPath();
-            context.arc(hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2, hitbox.w / 2, 0, 2 * Math.PI);
-            context.stroke();
-        context.restore();
-    } else {
-        let theta = Math.random() * Math.PI / 8;
-        for (let i = 0; i < 4; i++) {
-            context.beginPath();
-            context.arc(hitbox.x + hitbox.w / 2, hitbox.y + hitbox.h / 2, hitbox.w / 2, theta, theta + (1 + Math.random()) * Math.PI / 8);
-            theta += 2 * Math.PI / 4 + Math.random() * Math.PI / 8;
-            context.stroke();
-        }
-    }
 }
 
 /*

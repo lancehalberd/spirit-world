@@ -378,7 +378,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         return true;
     }
     checkIfDefeated(state: GameState) {
-        if (this.life <= 0 && !this.isImmortal) {
+        if (this.life <= 0 && !this.isImmortal && this.action !== 'knocked') {
             this.showDeathAnimation(state);
             return true;
         }
@@ -682,6 +682,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
                 this.action = null;
                 this.changeToAnimation('idle');
                 this.animationTime = 0;
+                this.checkIfDefeated(state);
             }
             return;
         } else if (
