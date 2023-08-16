@@ -133,7 +133,7 @@ export function addLineOfSpikes(this: void, {
         const x = source[0] + i * dx, y = source[1] + i * dy;
         // Solid tiles/pits stop the line of spikes
         const { tileBehavior } = getTileBehaviors(state, area, {x: x + 8, y: y + 8});
-        if (tileBehavior?.solid || tileBehavior?.pit) {
+        if ((tileBehavior?.solid && !tileBehavior?.low) || tileBehavior?.pit) {
             return;
         }
         const groundSpike = new GroundSpike({
@@ -146,7 +146,7 @@ export function addLineOfSpikes(this: void, {
         // Do an additional check for a barrier when spacing is greater than 16px to avoid skipping over barriers.
         if (spacing > 16) {
             const { tileBehavior } = getTileBehaviors(state, area, {x: x + 8 + spacing / 2, y: y + 8 + spacing / 2});
-            if (tileBehavior?.solid || tileBehavior?.pit) {
+            if ((tileBehavior?.solid && !tileBehavior?.low) || tileBehavior?.pit) {
                 return;
             }
         }

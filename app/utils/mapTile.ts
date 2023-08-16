@@ -4,6 +4,7 @@ import { allTiles } from 'app/content/tiles';
 // Grass maps to this floor tile.
 const spiritGround = 1114;
 const spiritDustGround = 190;
+const spiritCrystalGroundSquare = 1005;
 const spiritCrystalGround = 1007;
 
 // Maps specific parent tile indexes to  child tile indexes.
@@ -29,6 +30,8 @@ explicitIndexMapping[21] = 0;
 explicitIndexMapping[262] = spiritCrystalGround;
 // This is used a lot in the holy sanctum currently.
 explicitIndexMapping[spiritCrystalGround] = spiritCrystalGround;
+// This is used a lot in the sky palace currently.
+explicitIndexMapping[spiritCrystalGroundSquare] = spiritCrystalGroundSquare;
 
 
 //const logged: boolean[] = [];
