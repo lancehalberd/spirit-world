@@ -830,15 +830,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
             });
             // This should fall through to use the same movement properties as the spike ball.
         case 'spikeBall':
-            rows.push({
-                name: 'direction',
-                value: object.d || 'up',
-                values: ['up', 'down', 'left', 'right'],
-                onChange(d: Direction) {
-                    object.d = d;
-                    updateObjectInstance(state, object);
-                },
-            });
+            rows.push(getDirectionFields(state, object));
             rows.push({
                 name: 'speed',
                 value: object.speed,
@@ -970,6 +962,27 @@ export function getObjectProperties(state: GameState, editingState: EditingState
         case 'ballGoal':
             rows = [...rows, ...getSwitchTargetProperties(state, editingState, object)];
             break;
+        case 'airStream':
+            rows.push(getDirectionFields(state, object));
+            rows.push({
+                name: 'onInterval',
+                value: object.onInterval || 0,
+                inputClass: 'large',
+                onChange(onInterval: number) {
+                    object.onInterval = onInterval;
+                    updateObjectInstance(state, object);
+                },
+            });
+            rows.push({
+                name: 'offInterval',
+                value: object.offInterval || 0,
+                inputClass: 'large',
+                onChange(offInterval: number) {
+                    object.offInterval = offInterval;
+                    updateObjectInstance(state, object);
+                },
+            });
+            break;
         case 'beadCascade':
             rows.push({
                 name: 'height',
@@ -979,7 +992,6 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                     updateObjectInstance(state, object);
                 },
             });
-        case 'airStream':
         case 'anode':
             rows.push({
                 name: 'onInterval',

@@ -5,7 +5,8 @@ import { moveActor } from 'app/moveActor';
 import { createAnimation, drawFrame, frameAnimation } from 'app/utils/animations';
 import { directionMap } from 'app/utils/direction';
 import { addEffectToArea } from 'app/utils/effects';
-import { intersectArea, pad } from 'app/utils/index';
+import { getTileBehaviorsAndObstacles } from 'app/utils/field';
+import { intersectArea } from 'app/utils/index';
 import { getObjectStatus, saveObjectStatus } from 'app/utils/objects';
 import Random from 'app/utils/Random';
 
@@ -13,9 +14,11 @@ import Random from 'app/utils/Random';
 const underFrame = createAnimation('gfx/objects/icicleholemonster.png', {w: 16, h: 32}).frames[0];
 const overFrame = createAnimation('gfx/objects/icicleholemonster.png', {w: 16, h: 32}, {x: 1}).frames[0];
 
+const maxLength = 256;
+
 export class AirStream implements ObjectInstance {
     area: AreaInstance;
-    drawPriority: DrawPriority = 'sprites';
+    drawPriority: DrawPriority = 'background';
     definition: AirStreamDefinition = null;
     isObject = <const>true;
     x: number;
@@ -37,22 +40,37 @@ export class AirStream implements ObjectInstance {
     getHitbox(): Rect {
         return { x: this.x, y: this.y, w: 16, h: 16 };
     }
-    getEffectHitbox(): Rect {
-        const effectHitbox = { x: this.x, y: this.y, w: 16, h: 16 };
-        // TODO: stop this effect when it hits a solid tile.
-        const d = 160;
-        if (this.d === 'up') {
-            effectHitbox.y -= d;
-            effectHitbox.h += d;
-        } else if (this.d === 'down') {
-            effectHitbox.h += d;
-        } else if (this.d === 'left') {
-            effectHitbox.x -= d;
-            effectHitbox.w += d;
-        } else if (this.d === 'right') {
-            effectHitbox.w += d;
+    getEffectHitboxAndBlockedPoint(state: GameState): {effectHitbox: Rect, blockedPoint?: {x: number,y : number}} {
+        let blockedPoint: {x: number, y: number};
+        const [dx, dy] = directionMap[this.d];
+        const cx = this.x + 8, cy = this.y + 8;
+        let x = cx + 8 * dx, y = cy + 8 * dy;
+        for (let i = 0; i < maxLength / 8 - 1; i++) {
+            x += 8 * dx;
+            y += 8 * dy;
+            const { tileBehavior } = getTileBehaviorsAndObstacles(state, this.area, {x, y});
+            if (tileBehavior?.solid && !tileBehavior?.low && !tileBehavior?.isSouthernWall) {
+                blockedPoint = {x, y};
+                // This number is pretty specific. At <= 16 the airflow won't push the player the full
+                // amount when they are blocking the air (because we use overlap area to approximate the length overlap)
+                // And at >= 20 the airflow can push the player when behind a full tile wall like a pot.
+                // 18 seems to work well. If we run into problems with this, we should reduce this to +8 and the
+                // change the calculation for windForce to be based on the amount of edge exposed to the airFlow
+                // rather than the overlapping area.
+                x += 18 * dx;
+                y += 18 * dy;
+                break;
+            }
         }
-        return effectHitbox;
+        return {
+            effectHitbox: {
+                x: Math.min(x, this.x),
+                y: Math.min(y, this.y),
+                w: Math.max(16, Math.abs(cx - x)),
+                h: Math.max(16, Math.abs(cy - y)),
+            },
+            blockedPoint,
+        };
     }
     getYDepth(): number {
         return this.y + 16 + 4;
@@ -61,26 +79,42 @@ export class AirStream implements ObjectInstance {
         if (this.status !== 'normal') {
             return;
         }
+        // TODO: Support on/off interval.
         this.animationTime += FRAME_LENGTH;0
         saveObjectStatus(state, this.definition);
-        if (this.animationTime % 60 === 0) {
+        const {effectHitbox, blockedPoint} = this.getEffectHitboxAndBlockedPoint(state);
+        // This makes the number of particles proportional to the size of the air stream, which
+        // makes the particle density consistent across different sized air streams.
+        // It is based on 1 particle every 20ms for a max length air stream.
+        /*const interval = ((20 * 16 * maxLength / effectHitbox.h / effectHitbox.w / 20) | 0) * 20;
+        if (this.animationTime % interval === 0) {
             addWindParticle(state, this.area, this);
+        }*/
+        if (this.animationTime % 60 === 0) {
+            const boundingBox = {...effectHitbox};
+            if (blockedPoint) {
+                if (this.d === 'up') boundingBox.y = blockedPoint.y - 4;
+                if (this.d === 'down') boundingBox.h = blockedPoint.y - effectHitbox.y + 4;
+                if (this.d === 'left') boundingBox.x = blockedPoint.x - 4;
+                if (this.d === 'right') boundingBox.w = blockedPoint.x - effectHitbox.x + 4;
+            }
+            addWindParticle2(state, this.area, this, boundingBox);
         }
+        // TODO: Spawn wind particles orthogonally to direction from the blocked point.
         const actors = [
             ...[state.hero, ...state.hero.clones].filter(h => h.area === this.area
-                && !h.isInvisible && h.equippedBoots !== 'ironBoots' && h.action !== 'falling' && h.action !== 'fallen'),
+                && !h.isInvisible && h.equippedBoots !== 'ironBoots' && h.action !== 'falling' && h.action !== 'fallen' && h.action !== 'grabbing'),
             ...this.area.enemies,
         ];
         if (state.hero.astralProjection?.area === this.area) {
             actors.push(state.hero.astralProjection);
         }
-        const effectHitbox = this.getEffectHitbox();
         const [dx, dy] = directionMap[this.d];
         for (const actor of actors) {
             const actorHitbox = actor.getHitbox(state);
             const overlapArea = intersectArea(actorHitbox, effectHitbox);
-            if (overlapArea > 0) {
-                const windForce = overlapArea / (actorHitbox.w * actorHitbox.h);
+            const windForce = overlapArea / (actorHitbox.w * actorHitbox.h);
+            if (windForce > 0.1) {
                 let speed = 4 * windForce;
                 if (actor.isAirborn) {
                     speed *= 1.5;
@@ -98,11 +132,15 @@ export class AirStream implements ObjectInstance {
         }
     }
     render(context: CanvasRenderingContext2D, state: GameState) {
-        drawFrame(context, underFrame, {x: this.x, y: this.y - 8, w: 16, h: 32});
-        if (this.status === 'normal') {
-            renderWindVectors(context, state, this.animationTime, this.getEffectHitbox());
+        if (this.d === 'down') {
+            drawFrame(context, underFrame, {x: this.x, y: this.y, w: 16, h: 32});
         }
-        drawFrame(context, overFrame, {x: this.x, y: this.y - 8, w: 16, h: 32});
+        if (this.status === 'normal') {
+            //renderWindVectors(context, state, this.animationTime, this.getEffectHitbox(state), this.d);
+        }
+        if (this.d === 'down') {
+            drawFrame(context, overFrame, {x: this.x, y: this.y, w: 16, h: 32});
+        }
     }
 }
 objectHash.airStream = AirStream;
@@ -110,10 +148,32 @@ objectHash.airStream = AirStream;
 const regenerationParticles
     = createAnimation('gfx/tiles/spiritparticlesregeneration.png', {w: 4, h: 4}, {cols: 4, duration: 6}).frames;
 
+function addWindParticle2(this: void,
+    state: GameState, area: AreaInstance, airStream: AirStream, boundingBox: Rect
+): void {
+    const [dx, dy] = directionMap[airStream.d];
+    const x = airStream.x + 6 + Math.random() * 4 - 2, y = airStream.y + 6 + Math.random() * 4 - 2;
+    const vx = dx * 5 - 0.5 + (1 + dx) * Math.random(), vy = dy * 5 - 0.5 + (1 + dy) * Math.random();
+    const frame = Random.element(regenerationParticles);
+    const particle = new FieldAnimationEffect({
+        animation: frameAnimation(frame),
+        drawPriority: 'sprites',
+        x,
+        y,
+        z: 0,
+        vx,
+        vy,
+        vz: 0, az: 0,
+        //ax: vx / 10, ay: vy / 10,
+        boundingBox,
+    });
+    addEffectToArea(state, area, particle);
+}
+/*
 function addWindParticle(this: void,
     state: GameState, area: AreaInstance, airStream: AirStream
 ): void {
-    let target = airStream.getEffectHitbox();
+    let target = airStream.getEffectHitbox(state);
     const [dx, dy] = directionMap[airStream.d];
     target = pad(target, -2);
     const frame = Random.element(regenerationParticles);
@@ -137,8 +197,11 @@ function renderWindVectors(this: void,
     context: CanvasRenderingContext2D,
     state: GameState,
     animationTime: number,
-    target: Rect
+    target: Rect,
+    d: Direction
 ): void {
+    // TODO: rotate this so that it points the correct direction:
+    // context.rotate(directionMapToAngle[d])
     context.save();
         context.globalAlpha *= 0.3;
         context.fillStyle = 'white';
@@ -180,4 +243,4 @@ function renderWindVectors(this: void,
             }
         }
     context.restore();
-}
+}*/

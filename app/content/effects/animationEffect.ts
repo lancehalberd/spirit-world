@@ -1,6 +1,7 @@
 import { FRAME_LENGTH } from 'app/gameConstants';
 import { createAnimation, drawFrame, frameAnimation, getFrame } from 'app/utils/animations';
 import { addEffectToArea, removeEffectFromArea } from 'app/utils/effects';
+import { rectanglesOverlap } from 'app/utils/index';
 import Random from 'app/utils/Random';
 
 
@@ -9,6 +10,8 @@ interface AnimationProps {
     animation: FrameAnimation
     drawPriority?: DrawPriority
     alpha?: number
+    // If defined, animations will be removed if they are outside of this box.
+    boundingBox?: Rect
     friction?: number
     x?: number
     y?: number
@@ -30,6 +33,7 @@ interface AnimationProps {
 export class FieldAnimationEffect implements EffectInstance {
     alpha = 1
     area: AreaInstance;
+    boundingBox: Rect;
     delay: number = 0;
     done = false;
     drawPriority: DrawPriority;
@@ -53,7 +57,7 @@ export class FieldAnimationEffect implements EffectInstance {
     target?: ObjectInstance | EffectInstance;
     ttl: number;
     constructor({
-        animation, drawPriority = 'background',
+        animation, boundingBox, drawPriority = 'background',
         x = 0, y = 0, z = 0, vx = 0, vy = 0, vz = 0, vstep = 0,
         ax = 0, ay = 0, az = 0,
         rotation = 0, scale = 1, alpha = 1,
@@ -62,6 +66,7 @@ export class FieldAnimationEffect implements EffectInstance {
      }: AnimationProps) {
         this.animation = animation;
         this.animationTime = 0;
+        this.boundingBox = boundingBox;
         this.drawPriority = drawPriority;
         this.friction = friction;
         this.x = x;
@@ -86,6 +91,12 @@ export class FieldAnimationEffect implements EffectInstance {
         const frame = getFrame(this.animation, this.animationTime);
         const originX = this.target?.x || 0, originY = (this.target?.y || 0) - (this.target?.z || 0);
         return {x: originX + this.x, y: originY + this.y - this.z, w: frame.w, h: frame.h};
+    }
+    // Returns the hitbox relative to the ground (does not subtract z from the y value).
+    getGroundHitbox() {
+        const frame = getFrame(this.animation, this.animationTime);
+        const originX = this.target?.x || 0, originY = (this.target?.y || 0) - (this.target?.z || 0);
+        return {x: originX + this.x, y: originY + this.y, w: frame.w, h: frame.h};
     }
     getYDepth() {
         const frame = getFrame(this.animation, this.animationTime);
@@ -115,6 +126,10 @@ export class FieldAnimationEffect implements EffectInstance {
             this.behaviors.brightness *= 0.9;
         }
         if (this.animationTime > this.ttl || this.z < 0 || (this.animation.loop === false && this.animationTime >= this.animation.duration)) {
+            this.done = true;
+            removeEffectFromArea(state, this);
+        }
+        if (this.boundingBox && !rectanglesOverlap(this.boundingBox, this.getGroundHitbox())) {
             this.done = true;
             removeEffectFromArea(state, this);
         }
