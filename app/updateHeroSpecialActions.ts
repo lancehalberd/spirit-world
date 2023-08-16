@@ -551,8 +551,9 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
             hero.rollCooldown = 40;
         } else {
             const direction = getDirection(hero.actionDx, hero.actionDy, true, hero.d);
-            hero.vx = directionMap[direction][0] * rollSpeed[hero.actionFrame];
-            hero.vy = directionMap[direction][1] * rollSpeed[hero.actionFrame];
+            const speedFactor = hero.equippedBoots === 'ironBoots' ? 0.5 : 1;
+            hero.vx = directionMap[direction][0] * speedFactor * rollSpeed[hero.actionFrame];
+            hero.vy = directionMap[direction][1] * speedFactor * rollSpeed[hero.actionFrame];
             hero.actionFrame++;
             if (hero.z >= minZ) {
                 hero.z = Math.max(minZ, hero.z - 0.4);
