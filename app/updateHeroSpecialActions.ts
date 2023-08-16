@@ -133,6 +133,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 isSpiritWorld: state.location.isSpiritWorld,
             }, false, () => {
                 hero.action = 'knocked';
+                hero.isAirborn = true;
                 const { section } = getAreaSize(state);
                 let best: ObjectInstance = null, bestDistance: number;
                 for (const object of state.areaInstance.objects) {
@@ -275,6 +276,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
         // console.log([hero.x, hero.y, hero.z], ' -> ', [hero.jumpingVx, hero.jumpingVy, hero.jumpingVz]);
         if (hero.z <= groundZ) {
             hero.z = groundZ
+            hero.isAirborn = hero.isAstralProjection;
             hero.action = null;
             hero.actionDy = 0;
             hero.animationTime = 0;
@@ -369,6 +371,7 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 }
             }
             hero.z = minZ;
+            hero.isAirborn = hero.isAstralProjection;
             hero.action = null;
             hero.vz = 0;
             // If the hero is at 0 life, they will show the death sequence on top of pits,
@@ -437,6 +440,9 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 }
             }
             hero.z = Math.max(hero.z + hero.vz, minZ);
+            if (hero.z <= minZ) {
+                hero.isAirborn = hero.isAstralProjection;
+            }
             const staffLevel = state.hero.savedData.activeTools.staff;
             const maxLength = staffLevel > 1 ? 64 : 4;
             const staff = new Staff(state, {
@@ -500,7 +506,10 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
                 });
             }
         } else if (hero.animationTime < jumpDuration + slamDuration) {
-             hero.z = Math.max(hero.z + hero.vz, minZ);
+            hero.z = Math.max(hero.z + hero.vz, minZ);
+            if (hero.z <= minZ) {
+                hero.isAirborn = hero.isAstralProjection;
+            }
         } else if (hero.animationTime >= jumpDuration + slamDuration) {
             hero.action = null;
         }
@@ -511,10 +520,14 @@ export function updateHeroSpecialActions(this: void, state: GameState, hero: Her
     if (isFallingToGround) {
         hero.action = null;
         hero.z += hero.vz;
-        hero.vz = Math.max(-8, hero.vz - 0.5);
+        let fallAcceleration = 1;
+        if (hero.equippedBoots === 'cloudBoots') fallAcceleration = 0.5;
+        else if (hero.equippedBoots === 'ironBoots') fallAcceleration = 2;
+        hero.vz = Math.max(-8, hero.vz - fallAcceleration);
         if (hero.z <= minZ) {
             hero.z = minZ;
             hero.vz = 0;
+            hero.isAirborn = hero.isAstralProjection;
         }
         moveActor(state, hero, hero.vx, hero.vy, {
             canFall: true,
@@ -705,6 +718,7 @@ function performSomersault(this: void, state: GameState, hero: Hero) {
 
     // The fullroll action is 16 frames.
     hero.action = 'roll';
+    hero.isAirborn = true;
     hero.actionFrame = 0;
     hero.animationTime = 0 * FRAME_LENGTH;
     hero.actionDx = directionMap[direction][0];

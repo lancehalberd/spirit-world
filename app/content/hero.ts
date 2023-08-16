@@ -63,6 +63,7 @@ export class Hero implements Actor {
     hasBarrier?: boolean = false;
     hasRevive: boolean = false;
     isInvisible?: boolean = false;
+    isAirborn = false;
     jumpingVx?: number;
     jumpingVy?: number;
     jumpingVz?: number;
@@ -206,7 +207,7 @@ export class Hero implements Actor {
         return copy;
     }
 
-    getHitbox(this: Hero, state?: GameState): Rect {
+    getHitbox(state?: GameState): Rect {
         if (this.hasBarrier) {
             const p = 4;
             return { x: this.x - p, y: this.y - p, w: this.w + 2 * p, h: this.h + 2 * p };
@@ -386,6 +387,7 @@ export class Hero implements Actor {
     knockBack(state: GameState, knockback: {vx: number; vy: number; vz: number}) {
         this.throwHeldObject(state);
         this.action = 'knocked';
+        this.isAirborn = true;
         this.animationTime = 0;
         this.vx = knockback.vx;
         this.vy = knockback.vy;
@@ -668,6 +670,7 @@ export class Hero implements Actor {
             clone.vy = directionMap[hero.d][1] * throwSpeed;
             clone.vz = 2;
             clone.action = 'thrown';
+            clone.isAirborn = true;
             clone.animationTime = 0;
             clone.carrier = null;
             hero.pickUpObject = null;

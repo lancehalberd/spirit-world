@@ -75,6 +75,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
     isImmortal: boolean = false;
     isInvulnerable: boolean = false;
     isEnemyTarget: boolean = true;
+    isAirborn = false;
     life: number;
     speed: number;
     acceleration: number;
@@ -156,6 +157,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         }
         this.healthBarColor = this.enemyDefinition.healthBarColor;
         this.enemyDefinition.initialize?.(state, this);
+        this.isAirborn = this.flying || this.enemyDefinition.floating || this.z > 0;
     }
     getFrame(): Frame {
         return getFrame(this.currentAnimation, this.animationTime);
@@ -257,6 +259,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
         this.activeAbility = null;
         this.changeToAnimation('hurt');
         this.action = 'knocked';
+        this.isAirborn = true;
         this.animationTime = 0;
         this.az = Math.min(-0.2, this.az);
         this.vx = vx;
@@ -299,6 +302,7 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
                     ...(this.enemyDefinition.tileBehaviors || {}),
                 };
                 this.flying = this.enemyDefinition.flying;
+                this.isAirborn = this.flying || this.enemyDefinition.floating || this.z > 0;
                 this.updateDrawPriority();
                 return {
                     hit: true,
@@ -576,6 +580,9 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
                 this.z = Math.max(0, this.z + this.vz);
                 this.vz = Math.max(-8, this.vz + this.az);
                 // Enemy can take 1-2 fall damage while frozen if it lands hard enough.
+                if (this.z <= 0) {
+                    this.isAirborn = false;
+                }
                 if (this.z === 0 && this.vz <= -4) {
                     this.applyDamage(state, (this.vz / -4) | 0);
                     this.frozenDuration = 0;
@@ -612,6 +619,9 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             this.updateDrawPriority();
             if (this.z > 0) {
                 this.z = Math.max(0, this.z + this.vz);
+                if (this.z <= 0) {
+                    this.isAirborn = false;
+                }
                 this.vz = Math.max(-8, this.vz + this.az);
             }
             return;
@@ -677,6 +687,9 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             if (this.z <= minZ) {
                 this.z = minZ;
             }
+            if (this.z <= 0) {
+                this.isAirborn = this.flying || this.enemyDefinition.floating || false;
+            }
             this.animationTime += FRAME_LENGTH;
             if (this.animationTime >= 200 && this.z <= minZ) {
                 this.action = null;
@@ -693,6 +706,9 @@ export class Enemy<Params=any> implements Actor, ObjectInstance {
             this.z += this.vz;
             if (this.z <= minZ) {
                 this.z = minZ;
+            }
+            if (this.z <= 0) {
+                this.isAirborn = this.flying || this.enemyDefinition.floating || false;
             }
             this.animationTime += FRAME_LENGTH;
         }

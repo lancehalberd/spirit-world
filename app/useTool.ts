@@ -225,6 +225,7 @@ export function useTool(
             hero.toolOnCooldown = 'staff';
             hero.canceledStaffPlacement = false;
             hero.action = 'usingStaff';
+            hero.isAirborn = true;
             hero.animationTime = 0;
             return;
         }

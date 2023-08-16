@@ -169,7 +169,7 @@ export function getObjectTypeProperties(): PanelRows {
 }
 
 export const combinedObjectTypes: ObjectType[] = [
-    'anode', 'cathode', 'airBubbles', 'ballGoal', 'beadCascade', 'beadGrate', 'bell', 'bigChest', 'chest', 'crystalSwitch', 'decoration',
+    'airStream', 'anode', 'cathode', 'airBubbles', 'ballGoal', 'beadCascade', 'beadGrate', 'bell', 'bigChest', 'chest', 'crystalSwitch', 'decoration',
     'door', 'escalator', 'flameTurret', 'floorSwitch', 'indicator', 'keyBlock', 'loot','marker', 'movingPlatform', 'narration', 'npc', 'pitEntrance',
     'pushPull', 'pushStairs', 'rollingBall', 'saveStatue', 'shieldingUnit', 'shopItem', 'sign', 'spawnMarker', 'spikeBall', 'teleporter', 'tippable', 'torch', 'turret',
     'vineSprout', 'waterfall', 'waterPot',
@@ -185,9 +185,10 @@ export function createObjectDefinition(
     const specialBehaviorKeys = Object.keys(specialBehaviorsHash).filter(
         key => specialBehaviorsHash[key].type === definition.type
     );
+    const possibleStatuses = getPossibleStatuses(definition.type);
     const commonProps = {
         // Assign defaults for any props the definitions might require.
-        status: getPossibleStatuses(definition.type)[0],
+        status: possibleStatuses.includes(definition.status) ? definition.status : possibleStatuses[0],
         id: definition.id || '',
         linked: definition.linked,
         logicKey: definition.logicKey,
@@ -208,6 +209,15 @@ export function createObjectDefinition(
         delete commonProps.spirit;
     }
     switch (definition.type) {
+        case 'airStream':
+            return {
+                ...commonProps,
+                saveStatus: definition.saveStatus,
+                type: definition.type,
+                d: definition.d || 'down',
+                offInterval: definition.offInterval,
+                onInterval: definition.onInterval,
+            };
         case 'anode':
             return {
                 ...commonProps,
@@ -252,7 +262,6 @@ export function createObjectDefinition(
                 d: definition.d || 'up',
                 locationCue: definition.locationCue,
                 saveStatus: definition.saveStatus,
-                status: definition.status || commonProps.status,
             };
         case 'marker':
         case 'spawnMarker':
@@ -260,7 +269,6 @@ export function createObjectDefinition(
                 ...commonProps,
                 locationCue: definition.locationCue,
                 saveStatus: definition.saveStatus,
-                status: definition.status || commonProps.status,
                 type: definition.type,
             };
         case 'boss': {
@@ -349,7 +357,6 @@ export function createObjectDefinition(
             return {
                 ...commonProps,
                 type: definition.type,
-                status: definition.status || commonProps.status,
                 targetObjectId: definition.targetObjectId,
             };
         case 'pitEntrance':
@@ -379,7 +386,6 @@ export function createObjectDefinition(
                 type: definition.type,
                 id: definition.id || uniqueId(state, lootType),
                 lootType,
-                status: definition.status || commonProps.status,
             };
             if (definition.type === 'shopItem') {
                 lootDefinition.price = definition.price || 100;
@@ -417,7 +423,6 @@ export function createObjectDefinition(
             return {
                 ...commonProps,
                 saveStatus: definition.saveStatus,
-                status: definition.status || commonProps.status,
                 type: definition.type,
             };
         case 'pushStairs':
@@ -475,7 +480,6 @@ export function createObjectDefinition(
                 type: definition.type,
                 style: definition.style || turretStyles[0],
                 d: definition.d || 'down',
-                status: definition.status || commonProps.status,
                 fireInterval: definition.fireInterval || 1000,
                 fireOffset: definition.fireOffset || 0,
             };
@@ -521,7 +525,7 @@ export function getSwitchTargetProperties(
             [
                 'door', 'chest', 'loot', 'airBubbles', 'beadGrate', 'beadCascade',
                 'narration', 'pitEntrance', 'shieldingUnit',
-                'teleporter', 'torch', 'escalator', 'anode'
+                'teleporter', 'torch', 'escalator', 'airStream', 'anode',
             ]
         )
     ];
@@ -583,6 +587,7 @@ function getPossibleStatuses(type: ObjectType): ObjectStatus[] {
         case 'anode':
         case 'escalator':
             return ['normal', 'off', 'frozen'];
+        case 'airStream':
         case 'shieldingUnit':
         case 'turret':
             return ['normal', 'off'];
@@ -974,6 +979,7 @@ export function getObjectProperties(state: GameState, editingState: EditingState
                     updateObjectInstance(state, object);
                 },
             });
+        case 'airStream':
         case 'anode':
             rows.push({
                 name: 'onInterval',

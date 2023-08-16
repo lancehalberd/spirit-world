@@ -81,6 +81,9 @@ interface Actor extends ObjectInstance {
     wading?: boolean
     slipping?: boolean
     swimming?: boolean
+    // Set to true if the actor is rolling or hasn't touched the ground for a full frame.
+    // An airborn actor is pushed more easily.
+    isAirborn?: boolean
     isRunning?: boolean
     floating?: boolean
     sinking?: boolean

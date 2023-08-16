@@ -137,7 +137,15 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
     } else if (hero.equippedBoots === 'cloudBoots' && hero.canFloat && hero.vx * hero.vx + hero.vy * hero.vy >= 4) {
         hero.z = Math.min(hero.z + 0.1, maxCloudBootsZ);
     } else if (hero.z >= minZ) {
-        hero.z = Math.max(minZ, hero.z - 0.2);
+        let fallSpeed = 1;
+        if (hero.equippedBoots === 'cloudBoots' || hero.action === 'roll') fallSpeed = 0.5;
+        else if (hero.equippedBoots === 'ironBoots') fallSpeed = 2;
+        hero.z = Math.max(minZ, hero.z - fallSpeed);
+        if (hero.z <= minZ) {
+            hero.isAirborn = hero.isAstralProjection;
+        } else {
+            hero.isAirborn = true;
+        }
     }
 
     // The astral projection uses the weapon tool as the passive tool button
@@ -676,6 +684,7 @@ export function updateHeroStandardActions(this: void, state: GameState, hero: He
         state.hero.magic -= 5;
         state.hero.increaseMagicRegenCooldown(200);
         hero.action = 'roll';
+        hero.isAirborn = true;
         hero.actionFrame = 0;
         hero.animationTime = 0;
         // Rolling decreases duration of burns by 1 second.

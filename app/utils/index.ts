@@ -31,6 +31,12 @@ export function isObjectInsideTarget(object: Rect, target: Rect): boolean {
         && object.x + object.w <= target.x + target.w && object.y + object.h <= target.y + target.h;
 }
 
+export function intersectArea(A: Rect, B: Rect): number {
+    const l = Math.max(A.x, B.x), r = Math.min(A.x + A.w, B.x + B.w);
+    const t = Math.max(A.y, B.y), b = Math.min(A.y + A.h, B.y + B.h);
+    return Math.max(0, r - l) * Math.max(0, b - t)
+}
+
 export function rectanglesOverlap(A: Rect, B: Rect) {
     return !(A.y + A.h <= B.y || A.y >= B.y + B.h || A.x + A.w <= B.x || A.x >= B.x + B.w);
 }

@@ -59,6 +59,7 @@ function travelToLocation(state: GameState, zoneKey: string, markerId: string): 
 }
 function fallIntoLocation(state: GameState) {
     state.hero.action = 'knocked';
+    state.hero.isAirborn = true;
     state.hero.animationTime = 0;
     state.hero.z = CANVAS_HEIGHT;
     state.hero.vx = state.hero.vy = 0;

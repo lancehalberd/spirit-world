@@ -418,6 +418,11 @@ interface TurretDefinition extends BaseObjectDefinition {
     // Setting different offsets on turrets will make them fire at different times
     fireOffset?: number
 }
+interface AirStreamDefinition extends BaseObjectDefinition {
+    type: 'airStream'
+    onInterval?: number
+    offInterval?: number
+}
 
 interface FloorSwitchDefinition extends BaseObjectDefinition {
     type: 'floorSwitch',
@@ -573,6 +578,7 @@ type BossObjectDefinition = BaseObjectDefinition & LootData & {
 }
 
 type ObjectDefinition = SimpleObjectDefinition
+    | AirStreamDefinition
     | AnodeDefinition
     | BallGoalDefinition
     | BeadCascadeDefinition

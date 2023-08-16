@@ -147,6 +147,7 @@ function moveActorInDirection(
                 actor.jumpingVz = 3;
                 actor.animationTime = 0;
             }
+            actor.isAirborn = true;
         }
     }
     return result;

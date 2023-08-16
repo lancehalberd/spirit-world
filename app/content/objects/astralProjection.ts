@@ -54,6 +54,7 @@ export class AstralProjection extends Hero {
     constructor(hero: Hero) {
         super();
         this.isAstralProjection = true;
+        this.isAirborn = true;
         this.life = hero.magic;
         this.x = hero.x;
         this.y = hero.y;
@@ -61,6 +62,7 @@ export class AstralProjection extends Hero {
         this.h = hero.h;
         this.d = hero.d;
         this.invulnerableFrames = 0;
+        this.savedData = {...hero.savedData};
         this.savedData.leftTool = this.savedData.rightTool = null;
         this.z = 4;
         this.savedData.passiveTools = {
